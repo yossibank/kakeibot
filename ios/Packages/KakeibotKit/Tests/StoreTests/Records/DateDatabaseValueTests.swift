@@ -8,9 +8,11 @@ struct DateDatabaseValueTests {
     func storesLocalDateAsText() throws {
         let database = try makeDatabase()
         let date = try #require(LocalDate("2026-02-01"))
+
         try insert(date, into: database)
         let text = try fetch(String.self, from: database)
         let decoded = try fetch(LocalDate.self, from: database)
+
         #expect(text == "2026-02-01")
         #expect(decoded == date)
     }
@@ -19,9 +21,11 @@ struct DateDatabaseValueTests {
     func storesYearMonthAsText() throws {
         let database = try makeDatabase()
         let month = try #require(YearMonth("2026-02"))
+
         try insert(month, into: database)
         let text = try fetch(String.self, from: database)
         let decoded = try fetch(YearMonth.self, from: database)
+
         #expect(text == "2026-02")
         #expect(decoded == month)
     }
@@ -29,6 +33,7 @@ struct DateDatabaseValueTests {
     @Test
     func rejectsInvalidText() throws {
         let database = try makeDatabase()
+
         try insert("2026-02-30", into: database)
 
         #expect(throws: (any Error).self) {
