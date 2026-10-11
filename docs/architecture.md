@@ -9,12 +9,12 @@ OS ごとに、次の技術を使う。
 | 項目 | iOS | Android |
 | --- | --- | --- |
 | 言語 | Swift 6 | Kotlin |
-| 画面 | decisions の「画面の作り」 | Jetpack Compose |
-| 保存 | decisions の「DB」 | Room（SQLite）。表の形は iOS と同じ |
+| 画面 | SwiftUI ＋ `@Observable`。[理由](decisions.md#画面の作り) | Jetpack Compose |
+| 保存 | GRDB（SQLite）。[理由](decisions.md#db) | Room（SQLite）。表の形は iOS と同じ |
 | ウィジェット | WidgetKit | Glance |
 | 通信 | なし。通知も端末の中で予約する | 同じ |
 
-両 OS の分け方とそろえ方は、[decisions.md](decisions.md) の「共通化」にある。
+両 OS の分け方とそろえ方は、[decisions.md の「共通化」](decisions.md#共通化)にある。
 
 ## リポジトリ
 

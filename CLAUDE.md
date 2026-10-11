@@ -6,7 +6,7 @@
 
 変更したら `make build` を通す。
 
-pre-commit の整形で commit が止まったら、差分を確かめてからステージし直す。止まる仕組みは [README](README.md) の「動かし方」にある。`--no-verify` で飛ばさない。
+pre-commit の整形で commit が止まったら、差分を確かめてからステージし直す。止まる仕組みは [README の「動かし方」](README.md#動かし方)にある。`--no-verify` で飛ばさない。
 
 ## 文書
 
@@ -23,6 +23,6 @@ pre-commit の整形で commit が止まったら、差分を確かめてから�
 | 対応 OS を変える | [overview](docs/overview.md) | overview、README のバッジ |
 | Swift の版を変える | [architecture](docs/architecture.md) | architecture、README のバッジ |
 | 未検証の項目を確かめる | 各文書の `[!WARNING]` | 結果で本文を書き換え、WARNING から消す |
-| 整形・確認の仕組みを変える | [README](README.md) の「動かし方」 | README、architecture のリポジトリの木 |
+| 整形・確認の仕組みを変える | [README の「動かし方」](README.md#動かし方) | README、architecture のリポジトリの木 |
 
 どの事実をどの文書に書くかは [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) にあり、文書を開くと読み込まれる。
