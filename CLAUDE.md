@@ -6,7 +6,7 @@
 
 変更したら `make build` を通す。
 
-commit の前に [pre-commit](https://pre-commit.com/)（`.pre-commit-config.yaml`）が、Swift を SwiftFormat で整形する。直して止まったら、差分を確かめてステージし直す。`--no-verify` で飛ばさない。
+commit が pre-commit の整形で止まったら、差分を確かめてステージし直す。`--no-verify` で飛ばさない。
 
 ## 文書
 

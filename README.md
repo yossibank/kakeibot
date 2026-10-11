@@ -6,8 +6,6 @@ iOS・Android の家計簿アプリ
 ![Android 8+](https://img.shields.io/badge/Android-8%2B-3DDC84?logo=android&logoColor=white)
 ![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)
 
-何を作るかは [docs/overview.md](docs/overview.md)、進み具合は [docs/roadmap.md](docs/roadmap.md) の「作る順番」にある。
-
 ## 文書
 
 知りたいことごとに、読む文書が分かれている。
@@ -36,7 +34,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 > [!NOTE]
 > commit の前に pre-commit が、ステージした Swift を SwiftFormat で整形する。直したファイルがあると commit は止まるので、`git add` して commit し直す。
 
-よく使うコマンドは、次の 3 つである。
+よく使うコマンドを、次の表に挙げる。
 
 | 対象 | コマンド |
 | --- | --- |
