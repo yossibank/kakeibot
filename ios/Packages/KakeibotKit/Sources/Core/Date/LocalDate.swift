@@ -29,7 +29,10 @@ public struct LocalDate: Hashable, Sendable {
     }
 
     public init?(_ text: String) {
-        guard let numbers = DateText.numbers(in: text, digits: [4, 2, 2]) else {
+        guard
+            let numbers = DateText.numbers(in: text, digits: [4, 2, 2]),
+            DateText.yearRange.contains(numbers[0])
+        else {
             return nil
         }
 
@@ -123,7 +126,7 @@ private extension LocalDate {
 
 extension LocalDate: Comparable {
     public static func < (lhs: LocalDate, rhs: LocalDate) -> Bool {
-        lhs.dayNumber < rhs.dayNumber
+        (lhs.yearMonth, lhs.day) < (rhs.yearMonth, rhs.day)
     }
 }
 

@@ -51,6 +51,16 @@ struct LocalDateTests {
     }
 
     @Test
+    func movesBeforeYearOne() throws {
+        let date = try #require(LocalDate("0001-01-01"))
+
+        let earlier = date.adding(days: -1)
+
+        #expect(earlier == LocalDate(year: 0, month: 12, day: 31))
+        #expect(earlier.adding(days: 1) == date)
+    }
+
+    @Test
     func encodesAsText() throws {
         let date = try #require(LocalDate("2026-02-01"))
 

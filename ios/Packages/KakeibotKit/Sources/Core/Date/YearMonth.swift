@@ -6,7 +6,7 @@ public struct YearMonth: Hashable, Sendable {
         year: Int,
         month: Int
     ) {
-        guard (1...9999).contains(year), (1...12).contains(month) else {
+        guard (1...12).contains(month) else {
             return nil
         }
 
@@ -15,7 +15,10 @@ public struct YearMonth: Hashable, Sendable {
     }
 
     public init?(_ text: String) {
-        guard let numbers = DateText.numbers(in: text, digits: [4, 2]) else {
+        guard
+            let numbers = DateText.numbers(in: text, digits: [4, 2]),
+            DateText.yearRange.contains(numbers[0])
+        else {
             return nil
         }
 
@@ -54,26 +57,35 @@ extension YearMonth {
 
     var firstDayNumber: Int {
         let previousYear = year - 1
-        let leapDays = previousYear / 4 - previousYear / 100 + previousYear / 400
-
-        let daysBeforeMonth = (1..<month).reduce(0) { total, earlierMonth in
-            total + YearMonth(monthIndex: year * 12 + earlierMonth - 1).numberOfDays
-        }
-
-        return previousYear * 365 + leapDays + daysBeforeMonth
+        let daysBeforeYear = previousYear * 365 + Self.leapDays(through: previousYear)
+        let leapDayThisYear = month > 2 && isLeapYear ? 1 : 0
+        let daysBeforeMonth = Self.daysBeforeMonthInCommonYear[month - 1] + leapDayThisYear
+        return daysBeforeYear + daysBeforeMonth
     }
 
     init(monthIndex: Int) {
-        let (quotient, remainder) = monthIndex.quotientAndRemainder(dividingBy: 12)
-        let borrow = remainder < 0 ? 1 : 0
-        self.year = quotient - borrow
-        self.month = remainder + borrow * 12 + 1
+        self.year = Self.floor(monthIndex, 12)
+        self.month = monthIndex - year * 12 + 1
     }
 }
 
 private extension YearMonth {
+    static let daysBeforeMonthInCommonYear = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
+
     var isLeapYear: Bool {
         year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
+    }
+
+    static func leapDays(through year: Int) -> Int {
+        floor(year, 4) - floor(year, 100) + floor(year, 400)
+    }
+
+    static func floor(
+        _ value: Int,
+        _ divisor: Int
+    ) -> Int {
+        let (quotient, remainder) = value.quotientAndRemainder(dividingBy: divisor)
+        return remainder < 0 ? quotient - 1 : quotient
     }
 }
 

@@ -33,6 +33,7 @@ Swift は、整形では直らない次の決まりで書く。
 | ターゲット・依存・フォルダを変える | [architecture](docs/architecture.md) | architecture |
 | 表の形を変える | [data](docs/data.md) | data。書き出しに響くなら export-format も |
 | 書き出しの形式を変える | [export-format](spec/export-format.md) | export-format |
+| fixtures を足す・変える | [fixtures](spec/fixtures.md) | fixtures |
 | 方針を決める・変える | [decisions](docs/decisions.md) | decisions |
 | 作る順番の 1 段を終える | [roadmap](docs/roadmap.md) | roadmap の状態 |
 | 対応 OS を変える | [overview](docs/overview.md) | overview、README のバッジ |

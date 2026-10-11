@@ -1,6 +1,8 @@
 enum DateText {}
 
 extension DateText {
+    static let yearRange = 1...9999
+
     static func numbers(
         in text: String,
         digits: [Int]
@@ -20,9 +22,10 @@ extension DateText {
         _ value: Int,
         digits: Int
     ) -> String {
-        let text = String(value)
+        let text = String(value.magnitude)
         let padding = String(repeating: "0", count: max(0, digits - text.count))
-        return padding + text
+        let sign = value < 0 ? "-" : ""
+        return sign + padding + text
     }
 }
 

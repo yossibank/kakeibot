@@ -25,6 +25,7 @@ kakeibot/
 ├── ios/
 ├── spec/
 │   ├── export-format.md
+│   ├── fixtures.md
 │   └── fixtures/            Core のフォルダ名の小文字にそろえる
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
