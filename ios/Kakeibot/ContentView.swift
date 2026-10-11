@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  Kakeibot
-//
-//  Created by Kamiyama Yoshihito on 2026/10/10.
-//
-
 import SwiftUI
 
 struct ContentView: View {
