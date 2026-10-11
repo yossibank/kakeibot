@@ -25,7 +25,7 @@ kakeibot/
 ├── ios/
 ├── spec/
 │   ├── export-format.md
-│   └── fixtures/            未着手。Core のフォルダ名の小文字にそろえる
+│   └── fixtures/            Core のフォルダ名の小文字にそろえる
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
 ├── Brewfile                 Mint と pre-commit
@@ -268,7 +268,7 @@ sequenceDiagram
 
 | 対象 | 方法 |
 | --- | --- |
-| Core | `swift test`。fixtures を全部通す |
+| Core | `swift test`。fixtures を全部通す。fixtures は `#filePath` からの相対パスで読む |
 | Store | メモリ上の DB で、表の形の変更・集計・書き出しの往復 |
 | Features | 処理のある画面のモデル |
 | AppFeature | SideEffects。通知の予約係だけテスト用に差し替える |
@@ -279,6 +279,5 @@ sequenceDiagram
 > [!WARNING]
 > - App Group 上の SQLite で `0xdead10cc` が起きないか（0 番、実機）
 > - パッケージの中のフォントを、起動時の登録で使えるか（DesignSystem を作るとき）
-> - Swift の fixtures をパッケージの外から相対パスで読めるか（0 番）
 > - Apple Developer Program に加入しているか。プロファイルの期限が 1 年なのは有料のチームの特徴だが、加入状態は確かめていない
 > - 配布用の証明書を Xcode がクラウドで管理するか（11 番で確かめる）

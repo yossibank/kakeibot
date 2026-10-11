@@ -1,0 +1,13 @@
+[
+  { "weekStart": "monday", "date": "2026-10-11", "start": "2026-10-05", "end": "2026-10-11" },
+  { "weekStart": "monday", "date": "2026-10-05", "start": "2026-10-05", "end": "2026-10-11" },
+  { "weekStart": "sunday", "date": "2026-10-11", "start": "2026-10-11", "end": "2026-10-17" },
+  { "weekStart": "sunday", "date": "2026-10-10", "start": "2026-10-04", "end": "2026-10-10" },
+  { "weekStart": "saturday", "date": "2026-10-11", "start": "2026-10-10", "end": "2026-10-16" },
+  { "weekStart": "monday", "date": "2026-01-01", "start": "2025-12-29", "end": "2026-01-04" },
+  { "weekStart": "monday", "date": "2026-03-01", "start": "2026-02-23", "end": "2026-03-01" },
+  { "weekStart": "tuesday", "date": "2026-10-11", "start": "2026-10-06", "end": "2026-10-12" },
+  { "weekStart": "wednesday", "date": "2026-10-11", "start": "2026-10-07", "end": "2026-10-13" },
+  { "weekStart": "thursday", "date": "2026-10-11", "start": "2026-10-08", "end": "2026-10-14" },
+  { "weekStart": "friday", "date": "2026-10-11", "start": "2026-10-09", "end": "2026-10-15" }
+]
