@@ -82,7 +82,7 @@ KakeibotKit/
 │   │   ├── Category/        記録のカテゴリ（EntryCategory）
 │   │   ├── Character/       一言の文と選び方
 │   │   ├── Date/            LocalDate、期間の区切りと呼び方、週の始まり
-│   │   ├── Entry/           記録の型、支出なしの日、よく使う組み合わせの並べ方
+│   │   ├── Entry/           記録の型、入力の判定、日ごとのまとめ、支出なしの日、よく使う組み合わせの並べ方
 │   │   ├── Export/
 │   │   │   ├── Upgrade/     古い版から新しい版への変換
 │   │   │   └── V1/
@@ -95,12 +95,13 @@ KakeibotKit/
 │   │   ├── Theme/           テーマの型、読みやすさの判定
 │   │   └── Wallet/          財布の型、残高
 │   └── Store/
-│       ├── Database/        App Group、DatabasePool、止められる前の対策。止める通知は AppFeature が送る
+│       ├── Database/        App Group、DatabasePool、止められる前の対策、最初の財布とカテゴリ。止める通知は AppFeature が送る
 │       ├── Migrations/      版ごとに 1 ファイル
 │       ├── Preview/         プレビュー用のサンプルデータ（#if DEBUG）
-│       ├── Queries/         月の要約・日ごとの合計・よく使う組み合わせの元データ
+│       ├── Queries/         記録の一覧、入力の選択肢、月の要約・日ごとの合計・よく使う組み合わせの元データ
 │       ├── Records/         Core の型を GRDB で読み書きできるようにする
-│       └── Snapshot/        書き出し用の全データの読み出し、読み込み用の全置き換え
+│       ├── Snapshot/        書き出し用の全データの読み出し、読み込み用の全置き換え
+│       └── Writes/          記録の保存・更新・削除
 └── Tests/
     ├── CoreTests/           Core と同じフォルダ分け
     └── StoreTests/          メモリ上の DB

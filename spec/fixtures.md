@@ -28,6 +28,17 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 `year-month-period.json` では、期間の範囲のほかに日付から月への向きも試す。`start` と `end` はその月に入り、`start` の前日と `end` の翌日は前後の月に入る。
 
+## entry
+
+`spec/fixtures/entry` のファイルは、次の表のとおりである。
+
+| ファイル | 試すこと | 項目 |
+| --- | --- | --- |
+| `entry-draft.json` | 入力の判定で出る問題 | `type`、`amount`、`category`（真偽）、`toWallet`（`none`・`same`・`other`）、`problems` |
+| `entry-day.json` | 記録を日ごとにまとめ、支出と収入の合計を出す | `entries`（`id`・`type`・`amount`・`date`・`createdAt`）、`days`（`date`・`expense`・`income`・`entryIds`） |
+
+`entry-day.json` の日は新しい順に並べる。同じ日の記録は `createdAt` の新しい順にし、同じ時刻なら `id` の小さい順にする。
+
 ## export
 
 `spec/fixtures/export` のファイルは、次の表のとおりである。形式は [export-format.md](export-format.md) にある。
