@@ -32,7 +32,7 @@ erDiagram
 
 ほかに、すべての表で次の決まりを守る。
 
-- ID は UUID（文字列）
+- ID は UUID の小文字の文字列
 - 通貨の列は持たない。円だけを扱う
 - 月は `YYYY-MM`。期間との対応は下の表
 - 日時は UTC の ISO 8601
@@ -102,7 +102,7 @@ erDiagram
 | recurring_date | TEXT | どの回の分か |
 | created_at / updated_at | TEXT | |
 
-`(recurring_id, recurring_date)` は重複禁止。支出を記録した日の `no_spend_day` は消す。
+`recurring_id` と `recurring_date` は、そろって入るか、どちらも空にする。`(recurring_id, recurring_date)` は重複禁止。支出を記録した日の `no_spend_day` は消す。
 
 ### budget
 

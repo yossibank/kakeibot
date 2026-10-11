@@ -98,6 +98,14 @@ SwiftUI ＋ `@Observable`、処理のある画面だけモデル。
 | --- | --- |
 | 部品の置き場所を 1 つにする | Features の中に Shared/ を置く |
 
+### カテゴリの型の名前
+
+`EntryCategory`。表の名前と書き出しのキーは `category` のまま。
+
+| 理由 | 選ばなかった案 |
+| --- | --- |
+| Foundation を読み込むと、Objective-C の `Category` と名前がぶつかり、毎回 `Core.Category` と書くことになる | `Category`、`SpendingCategory` |
+
 ### 依存を渡す方法
 
 モデルを作るときに引数で渡す。Environment で渡すのはテーマだけ。
