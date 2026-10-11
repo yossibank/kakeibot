@@ -22,8 +22,9 @@ public extension AppDatabase {
 
         let path = directory.appending(path: fileName).path(percentEncoded: false)
         let pool = try DatabasePool(path: path, configuration: configuration)
-
-        return try AppDatabase(pool)
+        let database = try AppDatabase(pool)
+        try database.insertDefaultsIfEmpty(at: Date())
+        return database
     }
 
     static func inMemory() throws -> AppDatabase {

@@ -1,0 +1,58 @@
+import Core
+import GRDB
+
+public extension AppDatabase {
+    func entryListUpdates() -> some AsyncSequence<EntryList, any Error> {
+        ValueObservation
+            .tracking(Self.entryList)
+            .values(in: writer)
+    }
+
+    func entryOptions() async throws -> EntryOptions {
+        try await writer.read(Self.entryOptions)
+    }
+}
+
+private extension AppDatabase {
+    static func entryList(in db: Database) throws -> EntryList {
+        let entries = try Entry.fetchAll(db)
+        let days = EntryDay.grouping(entries)
+        let categories = try byID(EntryCategory.fetchAll(db))
+        let wallets = try byID(Wallet.fetchAll(db))
+        let icons = try byID(Icon.fetchAll(db))
+
+        return EntryList(
+            days: days,
+            categories: categories,
+            wallets: wallets,
+            icons: icons
+        )
+    }
+
+    static func entryOptions(in db: Database) throws -> EntryOptions {
+        let categories = try EntryCategory
+            .filter(Column("archived_at") == nil)
+            .order(Column("sort_order"))
+            .fetchAll(db)
+
+        let wallets = try Wallet
+            .filter(Column("archived_at") == nil)
+            .order(Column("sort_order"))
+            .fetchAll(db)
+
+        let expenseCategories = categories.filter { $0.kind == .expense }
+        let incomeCategories = categories.filter { $0.kind == .income }
+        let icons = try byID(Icon.fetchAll(db))
+
+        return EntryOptions(
+            expenseCategories: expenseCategories,
+            incomeCategories: incomeCategories,
+            wallets: wallets,
+            icons: icons
+        )
+    }
+
+    static func byID<Item: Identifiable>(_ items: [Item]) -> [Item.ID: Item] {
+        Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
+    }
+}
