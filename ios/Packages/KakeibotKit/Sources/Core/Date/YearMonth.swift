@@ -1,4 +1,30 @@
 public struct YearMonth: Hashable, Sendable {
+    public let year: Int
+    public let month: Int
+
+    public var numberOfDays: Int {
+        switch month {
+        case 2:
+            isLeapYear ? 29 : 28
+        case 4, 6, 9, 11:
+            30
+        default:
+            31
+        }
+    }
+
+    private var isLeapYear: Bool {
+        year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
+    }
+
+    private var firstDay: LocalDate {
+        LocalDate(yearMonth: self, day: 1)!
+    }
+
+    private var lastDay: LocalDate {
+        LocalDate(yearMonth: self, day: numberOfDays)!
+    }
+
     public init?(
         year: Int,
         month: Int
@@ -25,20 +51,6 @@ public struct YearMonth: Hashable, Sendable {
         self.init(year: year, month: month)
     }
 
-    public let year: Int
-    public let month: Int
-
-    public var numberOfDays: Int {
-        switch month {
-        case 2:
-            isLeapYear ? 29 : 28
-        case 4, 6, 9, 11:
-            30
-        default:
-            31
-        }
-    }
-
     public func adding(months: Int) -> YearMonth {
         let index = year * 12 + (month - 1) + months
         return YearMonth(year: index / 12, month: index % 12 + 1)!
@@ -59,18 +71,6 @@ public struct YearMonth: Hashable, Sendable {
 
     func clampedDate(day: Int) -> LocalDate {
         LocalDate(yearMonth: self, day: min(day, numberOfDays))!
-    }
-
-    private var isLeapYear: Bool {
-        year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
-    }
-
-    private var firstDay: LocalDate {
-        LocalDate(yearMonth: self, day: 1)!
-    }
-
-    private var lastDay: LocalDate {
-        LocalDate(yearMonth: self, day: numberOfDays)!
     }
 }
 

@@ -12,7 +12,7 @@
 --header strip
 --mark-categories false
 --max-width 100
---organization-mode visibility
+--organization-mode type
 --ranges no-space
 --redundant-type inferred
 --self init-only

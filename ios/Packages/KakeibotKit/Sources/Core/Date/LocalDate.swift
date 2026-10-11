@@ -1,6 +1,33 @@
 import Foundation
 
 public struct LocalDate: Hashable, Sendable {
+    private static let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+
+        return calendar
+    }()
+
+    public let yearMonth: YearMonth
+    public let day: Int
+
+    public var year: Int {
+        yearMonth.year
+    }
+
+    public var month: Int {
+        yearMonth.month
+    }
+
+    public var weekday: Weekday {
+        let sundayFirst = Self.calendar.component(.weekday, from: date)
+        return Weekday.allCases[(sundayFirst + 5) % 7]
+    }
+
+    private var date: Date {
+        Self.calendar.date(from: DateComponents(year: year, month: month, day: day))!
+    }
+
     public init?(
         yearMonth: YearMonth,
         day: Int
@@ -51,22 +78,6 @@ public struct LocalDate: Hashable, Sendable {
         self.init(year: components.year!, month: components.month!, day: components.day!)!
     }
 
-    public let yearMonth: YearMonth
-    public let day: Int
-
-    public var year: Int {
-        yearMonth.year
-    }
-
-    public var month: Int {
-        yearMonth.month
-    }
-
-    public var weekday: Weekday {
-        let sundayFirst = Self.calendar.component(.weekday, from: date)
-        return Weekday.allCases[(sundayFirst + 5) % 7]
-    }
-
     public func adding(days: Int) -> LocalDate {
         let moved = Self.calendar.date(byAdding: .day, value: days, to: date)!
         return LocalDate(moved, in: Self.calendar.timeZone)
@@ -88,17 +99,6 @@ public struct LocalDate: Hashable, Sendable {
         let start = adding(days: -offset)
 
         return start...start.adding(days: 6)
-    }
-
-    private static let calendar: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "UTC")!
-
-        return calendar
-    }()
-
-    private var date: Date {
-        Self.calendar.date(from: DateComponents(year: year, month: month, day: day))!
     }
 }
 
