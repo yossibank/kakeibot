@@ -55,4 +55,20 @@ public extension Entry {
 
 extension Entry: Identifiable {}
 
-extension Entry: Codable {}
+extension Entry: Codable {
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(type, forKey: .type)
+        try container.encode(amount, forKey: .amount)
+        try container.encode(date, forKey: .date)
+        try container.encodeOrNull(categoryId, forKey: .categoryId)
+        try container.encode(walletId, forKey: .walletId)
+        try container.encodeOrNull(toWalletId, forKey: .toWalletId)
+        try container.encodeOrNull(memo, forKey: .memo)
+        try container.encodeOrNull(recurringId, forKey: .recurringId)
+        try container.encodeOrNull(recurringDate, forKey: .recurringDate)
+        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(updatedAt, forKey: .updatedAt)
+    }
+}

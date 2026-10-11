@@ -31,4 +31,14 @@ public extension Icon {
 
 extension Icon: Identifiable {}
 
-extension Icon: Codable {}
+extension Icon: Codable {
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encodeOrNull(emoji, forKey: .emoji)
+        try container.encodeOrNull(text, forKey: .text)
+        try container.encode(color, forKey: .color)
+        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(updatedAt, forKey: .updatedAt)
+    }
+}

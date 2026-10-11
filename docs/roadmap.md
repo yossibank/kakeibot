@@ -34,7 +34,7 @@ flowchart LR
 | 2 | KakeibotKit・KakeibotApp の骨組みと、Xcode プロジェクトへのつなぎ | Claude | ✅ 完了 |
 | 3 | `spec/fixtures/date` → Core の Date → CoreTests | Claude | ✅ 完了 |
 | 4 | DB の最初の形（[data.md](data.md) の表すべて）と Records | Claude | ✅ 完了 |
-| 5 | 書き出し V1（Core の Export、Store の Snapshot、往復の fixtures） | Claude | ⬜ 未着手 |
+| 5 | 書き出し V1（Core の Export、Store の Snapshot、往復の fixtures） | Claude | ✅ 完了 |
 | 6 | 実機で `0xdead10cc` が起きないか確かめる | 自分 | ⬜ 未着手 |
 
 0 番が終わったと言える条件と、その確かめ方を次の表に挙げる。

@@ -48,4 +48,17 @@ public extension Wallet {
 
 extension Wallet: Identifiable {}
 
-extension Wallet: Codable {}
+extension Wallet: Codable {
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(kind, forKey: .kind)
+        try container.encode(iconId, forKey: .iconId)
+        try container.encode(initialBalance, forKey: .initialBalance)
+        try container.encode(sortOrder, forKey: .sortOrder)
+        try container.encodeOrNull(archivedAt, forKey: .archivedAt)
+        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(updatedAt, forKey: .updatedAt)
+    }
+}

@@ -66,4 +66,24 @@ public extension Recurring {
 
 extension Recurring: Identifiable {}
 
-extension Recurring: Codable {}
+extension Recurring: Codable {
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(type, forKey: .type)
+        try container.encode(amount, forKey: .amount)
+        try container.encodeOrNull(categoryId, forKey: .categoryId)
+        try container.encode(walletId, forKey: .walletId)
+        try container.encodeOrNull(toWalletId, forKey: .toWalletId)
+        try container.encodeOrNull(memo, forKey: .memo)
+        try container.encode(frequency, forKey: .frequency)
+        try container.encodeOrNull(month, forKey: .month)
+        try container.encode(day, forKey: .day)
+        try container.encode(startDate, forKey: .startDate)
+        try container.encodeOrNull(endDate, forKey: .endDate)
+        try container.encodeOrNull(remindDaysBefore, forKey: .remindDaysBefore)
+        try container.encodeOrNull(generatedUntil, forKey: .generatedUntil)
+        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(updatedAt, forKey: .updatedAt)
+    }
+}

@@ -3,11 +3,15 @@ import Foundation
 enum Fixture {}
 
 extension Fixture {
+    static func data(_ path: String) throws -> Data {
+        try Data(contentsOf: root.appending(path: path))
+    }
+
     static func load<Value: Decodable>(
         _ path: String,
         as type: Value.Type = Value.self
     ) throws -> Value {
-        let data = try Data(contentsOf: root.appending(path: path))
+        let data = try data(path)
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return try decoder.decode(type, from: data)

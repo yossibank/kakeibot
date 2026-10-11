@@ -23,4 +23,12 @@ public extension Budget {
 
 extension Budget: Identifiable {}
 
-extension Budget: Codable {}
+extension Budget: Codable {
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encodeOrNull(categoryId, forKey: .categoryId)
+        try container.encode(fromMonth, forKey: .fromMonth)
+        try container.encodeOrNull(amount, forKey: .amount)
+    }
+}
