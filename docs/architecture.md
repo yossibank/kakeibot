@@ -24,6 +24,8 @@ kakeibot/
 │   └── fixtures/            未着手。Core のフォルダ名の小文字にそろえる
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
+├── Brewfile                 Mint と pre-commit
+├── Makefile                 準備・整形・ビルドのコマンド
 └── Mintfile                 SwiftFormat の版
 ```
 

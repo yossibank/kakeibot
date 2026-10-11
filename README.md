@@ -24,16 +24,16 @@
 
 ## 準備
 
-| 道具 | 使い道 |
-| --- | --- |
-| Xcode | iOS のビルド |
-| [Mint](https://github.com/yonaskolb/Mint) | SwiftFormat の版をそろえる |
-| [pre-commit](https://pre-commit.com/) | commit の前の確認を動かす |
+Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は次のコマンドで入る。
 
 ```sh
-mint bootstrap
-pre-commit install
+make setup
 ```
+
+| 道具 | 使い道 |
+| --- | --- |
+| [Mint](https://github.com/yonaskolb/Mint) | SwiftFormat の版をそろえる（`Mintfile`） |
+| [pre-commit](https://pre-commit.com/) | commit の前の確認を動かす |
 
 > [!NOTE]
 > commit の前に pre-commit が、ステージした Swift を SwiftFormat で整形する。直したファイルがあると commit は止まるので、`git add` して commit し直す。
@@ -42,5 +42,6 @@ pre-commit install
 
 | 対象 | コマンド |
 | --- | --- |
-| iOS のビルド（シミュレーター） | `xcodebuild -project ios/Kakeibot.xcodeproj -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build` |
-| Swift の整形 | `mint run swiftformat .` |
+| 道具を入れ、hook を入れる | `make setup` |
+| iOS のビルド（シミュレーター） | `make build` |
+| Swift の整形 | `make format` |
