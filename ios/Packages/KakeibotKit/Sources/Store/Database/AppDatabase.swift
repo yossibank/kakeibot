@@ -30,6 +30,14 @@ public extension AppDatabase {
         let queue = try DatabaseQueue(configuration: configuration)
         return try AppDatabase(queue)
     }
+
+    static func suspend() {
+        NotificationCenter.default.post(name: Database.suspendNotification, object: nil)
+    }
+
+    static func resume() {
+        NotificationCenter.default.post(name: Database.resumeNotification, object: nil)
+    }
 }
 
 extension AppDatabase {

@@ -23,7 +23,11 @@ let package = Package(
     targets: [
         .target(
             name: "AppFeature",
-            dependencies: ["Features", "Notifications"]
+            dependencies: [
+                "Features",
+                "Notifications",
+                .product(name: "Store", package: "KakeibotKit")
+            ]
         ),
         .target(
             name: "WidgetFeature",
@@ -53,7 +57,10 @@ let package = Package(
         ),
         .testTarget(
             name: "AppFeatureTests",
-            dependencies: ["AppFeature"]
+            dependencies: [
+                "AppFeature",
+                .product(name: "Store", package: "KakeibotKit")
+            ]
         ),
         .testTarget(
             name: "FeaturesTests",

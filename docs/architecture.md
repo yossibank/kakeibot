@@ -110,7 +110,7 @@ KakeibotKit/
 ```
 KakeibotApp/
 ├── Sources/
-│   ├── AppFeature/          AppModel、DeepLink、RootView、Routes、SideEffects
+│   ├── AppFeature/          AppModel、DebugView、DeepLink、RootView、Routes、SideEffects
 │   ├── DesignSystem/
 │   │   ├── Components/
 │   │   │   ├── Common/      ボタン、カード、テンキー
@@ -254,6 +254,8 @@ sequenceDiagram
 | 固定費の記録漏れを作る | する | する | する |
 | 通知を予約し直す | する | する | する |
 | ウィジェットに更新を頼む | する | する | する |
+
+裏に回ると `AppDatabase.suspend()` で DB を止め、裏から戻ると `AppDatabase.resume()` で再開する。DEBUG のビルドでは、DB を開いた後に確認用の画面（`DebugView`）を出す。
 
 ### 外からの入口
 
