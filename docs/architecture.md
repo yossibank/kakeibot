@@ -77,21 +77,23 @@ KakeibotKit/
 ├── Sources/
 │   ├── Core/
 │   │   ├── Budget/          予算の型、「この月から」、残り、消化
-│   │   ├── Category/
+│   │   ├── Category/        記録のカテゴリ（EntryCategory）
 │   │   ├── Character/       一言の文と選び方
 │   │   ├── Date/            LocalDate、期間の区切りと呼び方、週の始まり
-│   │   ├── Entry/           記録の型、よく使う組み合わせの並べ方
+│   │   ├── Entry/           記録の型、支出なしの日、よく使う組み合わせの並べ方
 │   │   ├── Export/
 │   │   │   ├── Upgrade/     古い版から新しい版への変換
 │   │   │   └── V1/
-│   │   ├── Icon/
+│   │   ├── Icon/            アイコン、カレンダーのスタンプ
+│   │   ├── Identifier/      型付きの ID
 │   │   ├── Notification/    予約されているべき通知の計算
 │   │   ├── Recurring/       固定費の記録の作成、記録漏れの後追い
 │   │   ├── Reward/          決まり・記録・目標、貯金箱の残高
+│   │   ├── Setting/         設定の行
 │   │   ├── Theme/           テーマの型、読みやすさの判定
 │   │   └── Wallet/          財布の型、残高
 │   └── Store/
-│       ├── Database/        App Group、DatabasePool、止められる前の対策
+│       ├── Database/        App Group、DatabasePool、止められる前の対策。止める通知は AppFeature が送る
 │       ├── Migrations/      版ごとに 1 ファイル
 │       ├── Preview/         プレビュー用のサンプルデータ（#if DEBUG）
 │       ├── Queries/         月の要約・日ごとの合計・よく使う組み合わせの元データ

@@ -1,0 +1,56 @@
+import Foundation
+import GRDB
+
+public struct AppDatabase: Sendable {
+    public let writer: any DatabaseWriter
+
+    public init(_ writer: any DatabaseWriter) throws {
+        self.writer = writer
+        try Self.migrator.migrate(writer)
+    }
+}
+
+public extension AppDatabase {
+    enum SetupError: Error {
+        case appGroupUnavailable
+    }
+
+    static func appGroup() throws -> AppDatabase {
+        guard let directory = groupContainer else {
+            throw SetupError.appGroupUnavailable
+        }
+
+        let path = directory.appending(path: fileName).path(percentEncoded: false)
+        let pool = try DatabasePool(path: path, configuration: configuration)
+
+        return try AppDatabase(pool)
+    }
+
+    static func inMemory() throws -> AppDatabase {
+        let queue = try DatabaseQueue(configuration: configuration)
+        return try AppDatabase(queue)
+    }
+}
+
+extension AppDatabase {
+    static var migrator: DatabaseMigrator {
+        var migrator = DatabaseMigrator()
+        migrator.registerMigration("v1", migrate: MigrationV1.migrate)
+        return migrator
+    }
+}
+
+private extension AppDatabase {
+    static let groupIdentifier = "group.com.yossibank.kakeibot"
+    static let fileName = "kakeibot.sqlite"
+
+    static var groupContainer: URL? {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)
+    }
+
+    static var configuration: Configuration {
+        var configuration = Configuration()
+        configuration.observesSuspensionNotifications = true
+        return configuration
+    }
+}
