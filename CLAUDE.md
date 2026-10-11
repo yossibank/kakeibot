@@ -6,7 +6,7 @@
 
 変更したら `make build` を通す。
 
-commit の前に [pre-commit](https://pre-commit.com/)（`.pre-commit-config.yaml`）が、Swift を SwiftFormat で整形する。直して止まったら、差分を確かめてステージし直す。`--no-verify` で飛ばさない。
+commit が pre-commit の整形で止まったら、差分を確かめてステージし直す。`--no-verify` で飛ばさない。
 
 ## 文書
 
@@ -24,4 +24,4 @@ commit の前に [pre-commit](https://pre-commit.com/)（`.pre-commit-config.yam
 | 未検証の項目を確かめる | 各文書の `[!WARNING]` | 結果で本文を書き換え、WARNING から消す |
 | 整形・確認の仕組みを変える | [README](README.md) の「動かし方」 | README、architecture のリポジトリの木 |
 
-どの事実をどの文書に書くかは [.claude/rules/docs.md](.claude/rules/docs.md) にあり、文書を開くと読み込まれる。
+どの事実をどの文書に書くかは [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) にあり、文書を開くと読み込まれる。
