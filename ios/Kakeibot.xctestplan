@@ -1,0 +1,45 @@
+{
+  "configurations" : [
+    {
+      "id" : "11DB58D4-1667-415B-85C6-3ED08017164D",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/KakeibotKit",
+        "identifier" : "CoreTests",
+        "name" : "CoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/KakeibotKit",
+        "identifier" : "StoreTests",
+        "name" : "StoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/KakeibotApp",
+        "identifier" : "AppFeatureTests",
+        "name" : "AppFeatureTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/KakeibotApp",
+        "identifier" : "FeaturesTests",
+        "name" : "FeaturesTests"
+      }
+    }
+  ],
+  "version" : 1
+}
