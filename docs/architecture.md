@@ -42,7 +42,7 @@ ios/
 ├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）
 ├── Kakeibot.xcodeproj
 ├── KakeibotWidget/          ウィジェット（@main で WidgetFeature を呼ぶだけ）
-└── Packages/                未着手
+└── Packages/
     ├── KakeibotApp/         iOS 専用。Xcode でテスト
     └── KakeibotKit/         iOS と macOS。Mac の上で swift test
 ```
@@ -63,9 +63,9 @@ ios/
 | プロファイル | 2027-10-10 まで |
 | 配布用の証明書 | なし。Archive のときに Xcode がクラウドで管理するものを使う |
 
-## パッケージ（未着手）
+## パッケージ
 
-0 番の 2 で、この形に作る。
+2 つのパッケージは、次の形である。ターゲットはすべてあり、中のフォルダはそのコードを作るときに足す。
 
 ### KakeibotKit
 
