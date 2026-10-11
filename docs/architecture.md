@@ -41,7 +41,7 @@ kakeibot/
 
 ```
 ios/
-├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）
+├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）とアプリアイコン
 ├── Kakeibot.xcodeproj
 ├── Kakeibot.xctestplan      テストターゲットをまとめたテストプラン
 ├── KakeibotWidget/          ウィジェット（@main で WidgetFeature を呼ぶだけ）
@@ -55,6 +55,7 @@ ios/
 | ターゲット | `Kakeibot` | `KakeibotWidgetExtension` |
 | Bundle ID | `com.yossibank.kakeibot` | `com.yossibank.kakeibot.widget` |
 | App Group | `group.com.yossibank.kakeibot` | 同じ |
+| アプリアイコン | Icon Composer の `AppIcon.icon`。設定で選べる色違いは `AppIcon-Black`・`AppIcon-Forest`・`AppIcon-Silver`・`AppIcon-Ivory`・`AppIcon-White`・`AppIcon-Gold` | |
 
 ### 署名
 
