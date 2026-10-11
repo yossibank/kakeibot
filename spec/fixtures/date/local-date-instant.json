@@ -1,0 +1,8 @@
+[
+  { "instant": "2026-10-10T14:59:59Z", "timeZone": "Asia/Tokyo", "date": "2026-10-10" },
+  { "instant": "2026-10-10T15:00:00Z", "timeZone": "Asia/Tokyo", "date": "2026-10-11" },
+  { "instant": "2026-10-10T15:00:00Z", "timeZone": "UTC", "date": "2026-10-10" },
+  { "instant": "2026-12-31T15:00:00Z", "timeZone": "Asia/Tokyo", "date": "2027-01-01" },
+  { "instant": "2026-03-08T07:59:59Z", "timeZone": "America/Los_Angeles", "date": "2026-03-07" },
+  { "instant": "2026-03-08T08:00:00Z", "timeZone": "America/Los_Angeles", "date": "2026-03-08" }
+]

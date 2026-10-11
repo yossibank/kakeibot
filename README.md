@@ -22,6 +22,7 @@ iOS・Android の家計簿アプリ
 | なぜそう決めたか | [docs/decisions.md](docs/decisions.md) |
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
+| fixtures の形式 | [spec/fixtures.md](spec/fixtures.md) |
 | 作業と文書の決まり | [CLAUDE.md](CLAUDE.md) |
 | 文書の役割 | [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) |
 | 全リポジトリ共通の決まり | [claude-config](https://github.com/yossibank/claude-config) |

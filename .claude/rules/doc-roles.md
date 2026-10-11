@@ -12,12 +12,13 @@ kakeibot の文書を読み書きするときに読み込まれる。どの事�
 | 文書 | 書く | 書かない |
 | --- | --- | --- |
 | README | 入口、準備、コマンド、バッジ | 機能の中身、決定 |
-| CLAUDE.md | 作業の進め方、コードの書き方、作業と文書の対応 | 全リポジトリ共通の決まり（claude-config） |
+| CLAUDE.md | 作業の進め方、このリポジトリだけのコードの書き方、作業と文書の対応 | 全リポジトリ共通の決まり（claude-config） |
 | overview | 何を作るか、守ること、未決 | 作り方 |
 | architecture | 今の形（フォルダ、ターゲット、依存、署名の状態） | 理由、選ばなかった案、decisions の決定の言い直し |
 | decisions | 決定、理由、選ばなかった案 | 形の詳しい説明（architecture へリンク） |
 | data | 表の形と、その決まり | なぜその形か |
 | roadmap | 作る順番、状態、画面 | 設定・環境の状態 |
 | spec/export-format | 書き出しの形式 | 表の形（data へリンク） |
+| spec/fixtures | fixtures の JSON の形式 | 置き場所と名前（architecture へリンク） |
 
 README のバッジは、ほかの文書と同じ事実を書く例外である。対応 OS は overview、言語の版と使う技術は architecture と同じにする。CLAUDE.md の「文書」の表で一緒に直す。

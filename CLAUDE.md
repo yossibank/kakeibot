@@ -8,10 +8,6 @@
 
 pre-commit の整形で commit が止まったら、差分を確かめてからステージし直す。止まる仕組みは [README の「動かし方」](README.md#動かし方)にある。`--no-verify` で飛ばさない。
 
-## コードの書き方
-
-引数が 2 つ以上ある関数とイニシャライザの宣言は、100 字に収まっても引数を 1 行に 1 つずつ書く。
-
 ## 文書
 
 作業ごとに、先に読む文書と、終えたら直す文書が決まっている。
@@ -22,6 +18,7 @@ pre-commit の整形で commit が止まったら、差分を確かめてから�
 | ターゲット・依存・フォルダを変える | [architecture](docs/architecture.md) | architecture |
 | 表の形を変える | [data](docs/data.md) | data。書き出しに響くなら export-format も |
 | 書き出しの形式を変える | [export-format](spec/export-format.md) | export-format |
+| fixtures を足す・変える | [fixtures](spec/fixtures.md) | fixtures |
 | 方針を決める・変える | [decisions](docs/decisions.md) | decisions |
 | 作る順番の 1 段を終える | [roadmap](docs/roadmap.md) | roadmap の状態 |
 | 対応 OS を変える | [overview](docs/overview.md) | overview、README のバッジ |

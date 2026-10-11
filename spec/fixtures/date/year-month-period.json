@@ -1,0 +1,16 @@
+[
+  { "monthStartDay": 1, "month": "2026-02", "start": "2026-02-01", "end": "2026-02-28" },
+  { "monthStartDay": 1, "month": "2028-02", "start": "2028-02-01", "end": "2028-02-29" },
+  { "monthStartDay": 1, "month": "2026-12", "start": "2026-12-01", "end": "2026-12-31" },
+  { "monthStartDay": 2, "month": "2026-03", "start": "2026-02-02", "end": "2026-03-01" },
+  { "monthStartDay": 25, "month": "2026-02", "start": "2026-01-25", "end": "2026-02-24" },
+  { "monthStartDay": 25, "month": "2026-01", "start": "2025-12-25", "end": "2026-01-24" },
+  { "monthStartDay": 28, "month": "2026-03", "start": "2026-02-28", "end": "2026-03-27" },
+  { "monthStartDay": 29, "month": "2026-02", "start": "2026-01-29", "end": "2026-02-27" },
+  { "monthStartDay": 29, "month": "2026-03", "start": "2026-02-28", "end": "2026-03-28" },
+  { "monthStartDay": 29, "month": "2028-03", "start": "2028-02-29", "end": "2028-03-28" },
+  { "monthStartDay": 31, "month": "2026-02", "start": "2026-01-31", "end": "2026-02-27" },
+  { "monthStartDay": 31, "month": "2026-03", "start": "2026-02-28", "end": "2026-03-30" },
+  { "monthStartDay": 31, "month": "2026-04", "start": "2026-03-31", "end": "2026-04-29" },
+  { "monthStartDay": 31, "month": "2026-05", "start": "2026-04-30", "end": "2026-05-30" }
+]

@@ -45,6 +45,7 @@ erDiagram
 | --- | --- | --- |
 | 1 日 | 2/1〜2/28 | `2026-02` |
 | 25 日（給料日） | 1/25〜2/24 | `2026-02` |
+| 31 日 | 1/31〜2/27 | `2026-02` |
 
 ## 表
 
@@ -215,8 +216,8 @@ erDiagram
 
 | key | 値 |
 | --- | --- |
-| month_start_day | 1〜31 |
-| week_start | `monday` など |
+| month_start_day | 1〜31。月末を超えたらその月の最終日 |
+| week_start | `monday`〜`sunday` |
 | reminder_time | `HH:mm`。空なら知らせない |
 | character_id | 同梱キャラクターの ID |
 | character_name | |
