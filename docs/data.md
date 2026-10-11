@@ -1,12 +1,35 @@
 # データ
 
+## 表の関係
+
+```mermaid
+erDiagram
+    icon ||--o{ wallet : "icon_id"
+    icon ||--o{ category : "icon_id"
+    icon ||--o{ reward_rule : "icon_id"
+    icon ||--o{ calendar_stamp : "icon_id"
+    wallet ||--o{ entry : "wallet_id・to_wallet_id"
+    category |o--o{ entry : "category_id"
+    recurring |o--o{ entry : "recurring_id"
+    wallet ||--o{ recurring : "wallet_id・to_wallet_id"
+    category |o--o{ recurring : "category_id"
+    category |o--o{ budget : "category_id"
+    reward_rule ||--o{ reward_log : "rule_id"
+    entry |o--o| reward_goal : "entry_id"
+```
+
+`no_spend_day`・`theme`・`setting` はほかの表を参照しない（`setting` の `theme_id` は値として持つ）。
+
 ## 共通の決まり
+
+> [!IMPORTANT]
+> - 金額は整数（円）。小数の型を使わない
+> - 記録の日付は `YYYY-MM-DD` の文字列。時刻と時差を含めない
 
 | 決まり | 理由 |
 | --- | --- |
 | ID は UUID（文字列） | 書き出したデータを別の端末で読み込んでも ID がぶつからない |
-| 金額は整数（円）。通貨の列は持たない | 円だけを扱う |
-| 記録の日付は `YYYY-MM-DD` | 時差で日付がずれない |
+| 通貨の列は持たない | 円だけを扱う |
 | 月は `YYYY-MM`。期間の終わりが入っている月の名前で呼ぶ | 給料日 25 日なら 1/25〜2/24 が `2026-02` |
 | 日時は UTC の ISO 8601 | 書き出しと記録忘れの判定に使う |
 | 財布・カテゴリは消さずに `archived_at` でしまう | 過去の記録が参照している |
@@ -153,18 +176,13 @@
 | --- | --- | --- |
 | id | TEXT | |
 | name | TEXT | |
-| background / surface / text_primary / text_secondary / accent / expense / income | TEXT | `#RRGGBB`。色の数は仮 |
+| background / surface / text_primary / text_secondary / accent / expense / income | TEXT | `#RRGGBB`。色の数は未決 |
 | corner_radius | INTEGER | |
 | font_id | TEXT | 同梱フォントから選ぶ |
 | is_builtin | INTEGER | |
 | created_at / updated_at | TEXT | |
 
 ### setting
-
-| 列 | 型 |
-| --- | --- |
-| key | TEXT（主キー） |
-| value | TEXT |
 
 | key | 値 |
 | --- | --- |
@@ -176,9 +194,11 @@
 | theme_id | |
 | onboarding_completed | `true` `false` |
 
+列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。
+
 ## よく使う組み合わせ
 
-表は持たない。直近 60 日の記録を「種類・カテゴリ・財布・金額」でまとめ、回数の多い順に 6 つ（日数と件数は仮）。
+表は持たない。直近 60 日の記録を「種類・カテゴリ・財布・金額」でまとめ、回数の多い順に 6 つ出す。日数と件数は未決。
 
 ## 表の形の変更
 

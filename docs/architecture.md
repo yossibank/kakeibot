@@ -10,16 +10,21 @@
 | 保存 | iOS は GRDB（SQLite）、Android は Room。表の形は同じ |
 | 通信 | なし。通知はすべて端末の中で予約する |
 
+理由と選ばなかった案は [decisions.md](decisions.md)。
+
 ## リポジトリ
 
 ```
 kakeibot/
-├── android/                 iOS の 1〜5 番のあとで作る
+├── android/                 未着手
 ├── docs/
 ├── ios/
-└── spec/
-    ├── export-format.md
-    └── fixtures/            Core のフォルダ名の小文字にそろえる
+├── spec/
+│   ├── export-format.md
+│   └── fixtures/            未着手。Core のフォルダ名の小文字にそろえる
+├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
+├── .swiftformat
+└── Mintfile                 SwiftFormat の版
 ```
 
 ## ios
@@ -29,20 +34,21 @@ ios/
 ├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）
 ├── Kakeibot.xcodeproj
 ├── KakeibotWidget/          ウィジェット（@main で WidgetFeature を呼ぶだけ）
-└── Packages/
+└── Packages/                未着手
     ├── KakeibotApp/         iOS 専用。Xcode でテスト
     └── KakeibotKit/         iOS と macOS。Mac の上で swift test
 ```
 
-パッケージを 2 つに分けるのは、1 つのパッケージに iOS 専用のターゲットがあると、`swift test --filter` で絞っても全ターゲットがビルドされて失敗するため（Swift 6.4 で確認済み）。
+| 項目 | アプリ | ウィジェット |
+| --- | --- | --- |
+| ターゲット | `Kakeibot` | `KakeibotWidgetExtension` |
+| Bundle ID | `com.yossibank.kakeibot` | `com.yossibank.kakeibot.widget` |
+| App Group | `group.com.yossibank.kakeibot` | 同じ |
+| 端末 | iPhone のみ | 同じ |
+| 署名 | 自動（チーム `6WHPY5MQSB`） | 同じ |
 
-### ID
-
-| 対象 | ID |
-| --- | --- |
-| アプリ | `com.yossibank.kakeibot` |
-| ウィジェット | `com.yossibank.kakeibot.widget` |
-| App Group | `group.com.yossibank.kakeibot` |
+> [!NOTE]
+> パッケージを 2 つに分けるのは、1 つのパッケージに iOS 専用のターゲットがあると、`swift test --filter` で絞っても全ターゲットがビルドされて失敗するため（Swift 6.4 で確認済み）。
 
 ### KakeibotKit
 
@@ -117,15 +123,38 @@ KakeibotApp/
 
 ### 依存の向き
 
-| ターゲット | 依存先 |
-| --- | --- |
-| Core | なし |
-| Store | Core、GRDB |
-| DesignSystem | Core |
-| Notifications | Core |
-| Features | Store、DesignSystem |
-| AppFeature | Features、Notifications |
-| WidgetFeature | Store、DesignSystem |
+```mermaid
+flowchart TB
+    subgraph xcode["Xcode プロジェクト"]
+        App["Kakeibot"]
+        Widget["KakeibotWidgetExtension"]
+    end
+    subgraph app["KakeibotApp（iOS 専用）"]
+        AppFeature
+        WidgetFeature
+        Features
+        Notifications
+        DesignSystem
+    end
+    subgraph kit["KakeibotKit（iOS・macOS）"]
+        Store
+        Core
+    end
+    GRDB[("GRDB")]
+
+    App --> AppFeature
+    Widget --> WidgetFeature
+    AppFeature --> Features
+    AppFeature --> Notifications
+    WidgetFeature --> Store
+    WidgetFeature --> DesignSystem
+    Features --> Store
+    Features --> DesignSystem
+    Notifications --> Core
+    DesignSystem --> Core
+    Store --> Core
+    Store --> GRDB
+```
 
 ## 名前の決まり
 
@@ -165,9 +194,25 @@ KakeibotApp/
 | 移動先 | タブごとの `NavigationStack` の path |
 | 最初の設定 | 済んでいなければ Onboarding を出す |
 
-### SideEffects
+### 保存から反映まで
 
-| 見張るもの | すること |
+```mermaid
+sequenceDiagram
+    actor U as 利用者
+    participant HM as HomeModel
+    participant S as Store
+    participant M as 各画面のモデル
+    participant SE as SideEffects
+
+    U->>HM: よく使う組み合わせをタップ
+    HM->>S: 記録を書く
+    S-->>M: ValueObservation で変更を知らせる
+    S-->>SE: ValueObservation で変更を知らせる
+    SE->>SE: 記録忘れの通知を予約し直す
+    SE->>SE: ウィジェットに更新を頼む
+```
+
+| SideEffects が見張るもの | すること |
 | --- | --- |
 | 今日の記録、今日の支出なしの印 | 記録忘れの通知を予約し直す |
 | 固定費 | 更新前の通知を予約し直す |
@@ -175,12 +220,10 @@ KakeibotApp/
 
 ### 起動と画面復帰
 
-| 順 | 処理 |
-| --- | --- |
-| 1 | DB を開き、表の形を最新にする |
-| 2 | 固定費の記録漏れを作る |
-| 3 | 通知を予約し直す |
-| 4 | ウィジェットに更新を頼む |
+1. DB を開き、表の形を最新にする
+2. 固定費の記録漏れを作る
+3. 通知を予約し直す
+4. ウィジェットに更新を頼む
 
 前面に戻ったときと日付が変わったときにも 2〜4 を行う。
 
@@ -192,19 +235,14 @@ KakeibotApp/
 | 記録忘れの通知 | 入力シート（今日） |
 | 固定費の更新前の通知 | 設定 → 固定費 → その固定費 |
 
-## 通知
+## 通知とウィジェット
 
-| 通知 | 方式 |
+| 対象 | 方式 |
 | --- | --- |
-| 記録忘れ | 数日先まで予約し、当日の記録か支出なしの印ができたら当日分を取り消す |
-| 固定費の更新前 | 更新日の N 日前で予約する |
-
-## ウィジェット
-
-| | 方式 |
-| --- | --- |
-| iOS | WidgetFeature が Store で DB を直接読む。ホームと同じ集計クエリを使う |
-| Android | Glance |
+| 記録忘れの通知 | 数日先まで予約し、当日の記録か支出なしの印ができたら当日分を取り消す |
+| 固定費の更新前の通知 | 更新日の N 日前で予約する |
+| iOS のウィジェット | WidgetFeature が Store で DB を直接読む。ホームと同じ集計クエリを使う |
+| Android のウィジェット | Glance |
 
 ## テスト
 
@@ -216,11 +254,8 @@ KakeibotApp/
 | AppFeature | SideEffects。通知の予約係だけテスト用に差し替える |
 | 見た目 | プレビューで目で確かめる。UI テストは書かない |
 
-## 未検証
-
-| 項目 | 確かめる時期 |
-| --- | --- |
-| App Group 上の SQLite で `0xdead10cc` が起きないか | 0 番、実機 |
-| パッケージの中のフォントを、起動時の登録で使えるか | DesignSystem を作るとき |
-| Swift の fixtures をパッケージの外から相対パスで読めるか | 0 番 |
-| 無料のアカウントで App Group が使えるか | Xcode プロジェクトを作るとき |
+> [!WARNING]
+> **未検証**
+> - App Group 上の SQLite で `0xdead10cc` が起きないか（0 番、実機）
+> - パッケージの中のフォントを、起動時の登録で使えるか（DesignSystem を作るとき）
+> - Swift の fixtures をパッケージの外から相対パスで読めるか（0 番）

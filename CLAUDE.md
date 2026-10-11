@@ -1,15 +1,22 @@
 # Kakeibot
 
-個人開発の iOS・Android 家計簿アプリ。設計は `docs/` にある。
+個人開発の iOS・Android 家計簿アプリ。人間向けの入口は [README.md](README.md)。
 
-| ファイル | 中身 |
-| --- | --- |
-| `docs/overview.md` | アプリの概要、機能、この先の段階、守ること |
-| `docs/architecture.md` | リポジトリと iOS の構成、依存の向き、名前の決まり |
-| `docs/data.md` | 表の形 |
-| `docs/decisions.md` | 決めたことと理由、選ばなかった案 |
-| `docs/roadmap.md` | 画面、作る順番 |
-| `spec/export-format.md` | 書き出しの形式 |
+## 作業と文書
+
+| 作業 | 先に読む | 終えたら直す |
+| --- | --- | --- |
+| 機能・画面を足す | [overview](docs/overview.md)、[roadmap](docs/roadmap.md) | overview、roadmap |
+| ターゲット・依存・フォルダを変える | [architecture](docs/architecture.md) | architecture |
+| 表の形を変える | [data](docs/data.md) | data。書き出しに響くなら export-format も |
+| 書き出しの形式を変える | [export-format](spec/export-format.md) | export-format |
+| 方針を決める・変える | [decisions](docs/decisions.md) | decisions |
+| 作る順番の 1 段を終える | [roadmap](docs/roadmap.md) | roadmap の状態 |
+| 対応 OS・Swift の版を変える | [overview](docs/overview.md) | overview、README のバッジ |
+| 未検証の項目を確かめる | 各文書の `[!WARNING]` | 結果で本文を書き換え、WARNING から消す |
+| 整形・確認の仕組みを変える | [README](README.md) の「準備」 | README、architecture のリポジトリの木 |
+
+commit の前に [pre-commit](https://pre-commit.com/)（`.pre-commit-config.yaml`）が、Swift を SwiftFormat で整形する。直して止まったら、差分を確かめてステージし直す。`--no-verify` で飛ばさない。
 
 ## 言語
 
@@ -31,3 +38,30 @@
 - 報告には「無い状態で試したらこうなった」を含める。
 - 自分で思いついた追加は、実装せずに提案に留める。「必要なら作ります」と言った直後に作り始めない。
 - 頼まれたものの実装そのものには、この節を適用しない。
+
+## 文書の運用
+
+> [!IMPORTANT]
+> 文書には**今の状態だけ**を書く。経緯は git の履歴に任せる。
+
+| 決まり | 中身 |
+| --- | --- |
+| 書き換える | 事実が変わったら、その箇所を書き換える。末尾への追記や「以前は〜」で済ませない |
+| 1 つの事実は 1 か所 | ほかの文書はリンクで指す。例外は README のバッジだけ（上の表で一緒に直す） |
+| コードと同じコミット | コードを変えて文書の記述が古くなったら、同じコミットで直す |
+| 消す | 使わなくなった節・表の行・図は消す。空の見出しを残さない |
+| 決まっていないこと | 「未決」と書く。決まったら書き換えて「未決」を消す |
+| 確かめていないこと | `[!WARNING]` にまとめる。確かめたら本文に結果を書き、WARNING から消す |
+
+### 表現の使い分け
+
+| 表現 | 使う場面 | 使わない場面 |
+| --- | --- | --- |
+| 表 | 項目が 3 つ以上並ぶもの、比較 | 1〜2 項目なら文で書く |
+| Mermaid の図 | 依存の向き、処理の流れ、表どうしの関係 | 表で足りるもの |
+| フォルダの木 | フォルダ構成 | |
+| アラート | `NOTE` 補足、`IMPORTANT` 守ること、`WARNING` 未検証・注意 | 本文の言い換え。1 節に 1 つまで |
+| バッジ | README の、変わりにくい事実（対応 OS・言語の版） | 進み具合など、よく変わるもの |
+| 状態の絵文字 | roadmap の状態（✅ 完了、🚧 作業中、⬜ 未着手） | ほかの文書 |
+| グラフ | 数値のデータがあるとき | 数値がないとき |
+| 画像 | 使わない。AI が読めず、差分も見えない | |
