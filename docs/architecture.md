@@ -120,7 +120,7 @@ KakeibotApp/
 │   │   ├── Resources/
 │   │   │   ├── Assets.xcassets
 │   │   │   └── Fonts/
-│   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録
+│   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色の文字列の読み取り
 │   ├── Features/
 │   │   ├── Entry/
 │   │   ├── Onboarding/
