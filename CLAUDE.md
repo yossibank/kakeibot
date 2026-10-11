@@ -21,7 +21,7 @@ pre-commit の整形で commit が止まったら、差分を確かめてから�
 | 方針を決める・変える | [decisions](docs/decisions.md) | decisions |
 | 作る順番の 1 段を終える | [roadmap](docs/roadmap.md) | roadmap の状態 |
 | 対応 OS を変える | [overview](docs/overview.md) | overview、README のバッジ |
-| Swift の版を変える | [architecture](docs/architecture.md) | architecture、README のバッジ |
+| Swift の版・使う技術を変える | [architecture](docs/architecture.md) | architecture、README のバッジ |
 | 未検証の項目を確かめる | 各文書の `[!WARNING]` | 結果で本文を書き換え、WARNING から消す |
 | 整形・確認の仕組みを変える | [README の「動かし方」](README.md#動かし方) | README、architecture のリポジトリの木 |
 

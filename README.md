@@ -2,9 +2,11 @@
 
 iOS・Android の家計簿アプリ
 
-![iOS 18+](https://img.shields.io/badge/iOS-18%2B-000000?logo=apple)
+![iOS 18+](https://img.shields.io/badge/iOS-18%2B-000000?logo=apple&logoColor=white)
 ![Android 8+](https://img.shields.io/badge/Android-8%2B-3DDC84?logo=android&logoColor=white)
 ![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)
+![SwiftUI](https://img.shields.io/badge/SwiftUI-0A84FF?logo=swift&logoColor=white)
+![GRDB](https://img.shields.io/badge/GRDB-003B57?logo=sqlite&logoColor=white)
 
 ## 文書
 
