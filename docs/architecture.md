@@ -256,7 +256,7 @@ sequenceDiagram
 | 通知を予約し直す | する | する | する |
 | ウィジェットに更新を頼む | する | する | する |
 
-裏に回ると `AppDatabase.suspend()` で DB を止め、裏から戻ると `AppDatabase.resume()` で再開する。DEBUG のビルドでは、DB を開いた後に確認用の画面（`DebugView`）を出す。
+裏に回ると `AppDatabase.suspend()` で DB を止め、裏から戻ると `AppDatabase.resume()` で再開する。実機で、書き込みの最中に裏に回しても `0xdead10cc` で終了しないことを確かめた。DEBUG のビルドでは、DB を開いた後に確認用の画面（`DebugView`）を出す。
 
 ### 外からの入口
 
@@ -289,7 +289,6 @@ sequenceDiagram
 ## 未検証
 
 > [!WARNING]
-> - App Group 上の SQLite で `0xdead10cc` が起きないか（0 番、実機）
 > - パッケージの中のフォントを、起動時の登録で使えるか（DesignSystem を作るとき）
 > - Apple Developer Program に加入しているか。プロファイルの期限が 1 年なのは有料のチームの特徴だが、加入状態は確かめていない
 > - 配布用の証明書を Xcode がクラウドで管理するか（11 番で確かめる）
