@@ -21,7 +21,8 @@ iOS・Android の家計簿アプリ。何を作るかは [docs/overview.md](docs
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
 | 作業と文書の決まり | [CLAUDE.md](CLAUDE.md) |
-| 文書の書き方 | [.claude/rules/docs.md](.claude/rules/docs.md) |
+| 文書の役割 | [.claude/rules/docs.md](.claude/rules/docs.md) |
+| 全リポジトリ共通の決まり | [claude-config](https://github.com/yossibank/claude-config) |
 
 ## 準備
 
