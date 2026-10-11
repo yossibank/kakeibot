@@ -13,16 +13,12 @@ public struct YearMonth: Hashable, Sendable {
         }
     }
 
+    var monthIndex: Int {
+        year * 12 + month - 1
+    }
+
     private var isLeapYear: Bool {
         year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
-    }
-
-    private var firstDay: LocalDate {
-        LocalDate(yearMonth: self, day: 1)!
-    }
-
-    private var lastDay: LocalDate {
-        LocalDate(yearMonth: self, day: numberOfDays)!
     }
 
     public init?(
@@ -51,32 +47,38 @@ public struct YearMonth: Hashable, Sendable {
         self.init(year: year, month: month)
     }
 
+    init(monthIndex: Int) {
+        let (quotient, remainder) = monthIndex.quotientAndRemainder(dividingBy: 12)
+        let borrow = remainder < 0 ? 1 : 0
+
+        self.year = quotient - borrow
+        self.month = remainder + borrow * 12 + 1
+    }
+
     public func adding(months: Int) -> YearMonth {
-        let index = year * 12 + (month - 1) + months
-        return YearMonth(year: index / 12, month: index % 12 + 1)!
+        YearMonth(monthIndex: monthIndex + months)
     }
 
     public func period(monthStartDay: Int) -> ClosedRange<LocalDate> {
         precondition((1...31).contains(monthStartDay))
 
         if monthStartDay == 1 {
-            return firstDay...lastDay
+            let first = LocalDate(yearMonth: self, clampedDay: 1)
+            let last = LocalDate(yearMonth: self, clampedDay: numberOfDays)
+
+            return first...last
         }
 
-        let start = adding(months: -1).clampedDate(day: monthStartDay)
-        let end = clampedDate(day: monthStartDay).adding(days: -1)
+        let start = LocalDate(yearMonth: adding(months: -1), clampedDay: monthStartDay)
+        let end = LocalDate(yearMonth: self, clampedDay: monthStartDay).adding(days: -1)
 
         return start...end
-    }
-
-    func clampedDate(day: Int) -> LocalDate {
-        LocalDate(yearMonth: self, day: min(day, numberOfDays))!
     }
 }
 
 extension YearMonth: Comparable {
     public static func < (lhs: YearMonth, rhs: YearMonth) -> Bool {
-        (lhs.year, lhs.month) < (rhs.year, rhs.month)
+        lhs.monthIndex < rhs.monthIndex
     }
 }
 

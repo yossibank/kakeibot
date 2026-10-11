@@ -1,12 +1,8 @@
 import Foundation
 
 public struct LocalDate: Hashable, Sendable {
-    private static let calendar: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "UTC")!
-
-        return calendar
-    }()
+    private static let secondsPerDay = 86400
+    private static let unixEpochDayNumber = daysBefore(year: 1970)
 
     public let yearMonth: YearMonth
     public let day: Int
@@ -20,12 +16,16 @@ public struct LocalDate: Hashable, Sendable {
     }
 
     public var weekday: Weekday {
-        let sundayFirst = Self.calendar.component(.weekday, from: date)
-        return Weekday.allCases[(sundayFirst + 5) % 7]
+        Weekday(daysSinceMonday: dayNumber)
     }
 
-    private var date: Date {
-        Self.calendar.date(from: DateComponents(year: year, month: month, day: day))!
+    var dayNumber: Int {
+        let january = YearMonth(monthIndex: year * 12)
+        let daysBeforeMonth = (0..<(month - 1)).reduce(0) { total, offset in
+            total + january.adding(months: offset).numberOfDays
+        }
+
+        return Self.daysBefore(year: year) + daysBeforeMonth + day - 1
     }
 
     public init?(
@@ -71,22 +71,59 @@ public struct LocalDate: Hashable, Sendable {
         _ date: Date,
         in timeZone: TimeZone
     ) {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = timeZone
+        let offset = TimeInterval(timeZone.secondsFromGMT(for: date))
+        let localSeconds = date.timeIntervalSince1970 + offset
+        let days = Int((localSeconds / TimeInterval(Self.secondsPerDay)).rounded(.down))
 
-        let components = calendar.dateComponents([.year, .month, .day], from: date)
-        self.init(year: components.year!, month: components.month!, day: components.day!)!
+        self.init(dayNumber: Self.unixEpochDayNumber + days)
+    }
+
+    init(
+        yearMonth: YearMonth,
+        clampedDay day: Int
+    ) {
+        self.yearMonth = yearMonth
+        self.day = min(max(day, 1), yearMonth.numberOfDays)
+    }
+
+    init(dayNumber: Int) {
+        var year = dayNumber * 400 / 146_097 + 1
+
+        while Self.daysBefore(year: year + 1) <= dayNumber {
+            year += 1
+        }
+
+        while Self.daysBefore(year: year) > dayNumber {
+            year -= 1
+        }
+
+        var yearMonth = YearMonth(monthIndex: year * 12)
+        var remainingDays = dayNumber - Self.daysBefore(year: year)
+
+        while remainingDays >= yearMonth.numberOfDays {
+            remainingDays -= yearMonth.numberOfDays
+            yearMonth = yearMonth.adding(months: 1)
+        }
+
+        self.yearMonth = yearMonth
+        self.day = remainingDays + 1
+    }
+
+    private static func daysBefore(year: Int) -> Int {
+        let previousYear = year - 1
+        let leapDays = previousYear / 4 - previousYear / 100 + previousYear / 400
+
+        return previousYear * 365 + leapDays
     }
 
     public func adding(days: Int) -> LocalDate {
-        let moved = Self.calendar.date(byAdding: .day, value: days, to: date)!
-        return LocalDate(moved, in: Self.calendar.timeZone)
+        LocalDate(dayNumber: dayNumber + days)
     }
 
     public func periodMonth(monthStartDay: Int) -> YearMonth {
         precondition((1...31).contains(monthStartDay))
 
-        if monthStartDay == 1 || day < yearMonth.clampedDate(day: monthStartDay).day {
+        if monthStartDay == 1 || day < min(monthStartDay, yearMonth.numberOfDays) {
             return yearMonth
         }
 
@@ -94,8 +131,7 @@ public struct LocalDate: Hashable, Sendable {
     }
 
     public func week(startingOn weekStart: Weekday) -> ClosedRange<LocalDate> {
-        let days = Weekday.allCases
-        let offset = (days.firstIndex(of: weekday)! - days.firstIndex(of: weekStart)! + 7) % 7
+        let offset = (weekday.daysSinceMonday - weekStart.daysSinceMonday + 7) % 7
         let start = adding(days: -offset)
 
         return start...start.adding(days: 6)
@@ -104,7 +140,7 @@ public struct LocalDate: Hashable, Sendable {
 
 extension LocalDate: Comparable {
     public static func < (lhs: LocalDate, rhs: LocalDate) -> Bool {
-        (lhs.yearMonth, lhs.day) < (rhs.yearMonth, rhs.day)
+        lhs.dayNumber < rhs.dayNumber
     }
 }
 
