@@ -31,7 +31,7 @@ flowchart LR
 | 順 | 作業 | 担当 | 状態 |
 | --- | --- | --- | --- |
 | 1 | Xcode プロジェクト（アプリ、ウィジェット、App Group、Swift 6、iOS 18、iPhone のみ） | 自分 | ✅ 完了 |
-| 2 | KakeibotKit・KakeibotApp の骨組みと、Xcode プロジェクトへのつなぎ | Claude | ⬜ 未着手 |
+| 2 | KakeibotKit・KakeibotApp の骨組みと、Xcode プロジェクトへのつなぎ | Claude | ✅ 完了 |
 | 3 | `spec/fixtures/date` → Core の Date → CoreTests | Claude | ⬜ 未着手 |
 | 4 | DB の最初の形（[data.md](data.md) の表すべて）と Records | Claude | ⬜ 未着手 |
 | 5 | 書き出し V1（Core の Export、Store の Snapshot、往復の fixtures） | Claude | ⬜ 未着手 |

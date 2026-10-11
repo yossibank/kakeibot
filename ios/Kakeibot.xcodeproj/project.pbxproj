@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		78875D743079D400005422E3 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 78875D723079D400005422E3 /* AppFeature */; };
+		78875D753079D400005422E3 /* WidgetFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 78875D733079D400005422E3 /* WidgetFeature */; };
 		78875D493079D3CE005422E3 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78875D483079D3CD005422E3 /* WidgetKit.framework */; };
 		78875D4B3079D3CE005422E3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78875D4A3079D3CE005422E3 /* SwiftUI.framework */; };
 		78875D5A3079D3D2005422E3 /* KakeibotWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 78875D463079D3CD005422E3 /* KakeibotWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -71,6 +73,7 @@
 		78875D313079D362005422E3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				78875D743079D400005422E3 /* AppFeature in Frameworks */,
 			);
 		};
 		78875D433079D3CD005422E3 /* Frameworks */ = {
@@ -78,6 +81,7 @@
 			files = (
 				78875D4B3079D3CE005422E3 /* SwiftUI.framework in Frameworks */,
 				78875D493079D3CE005422E3 /* WidgetKit.framework in Frameworks */,
+				78875D753079D400005422E3 /* WidgetFeature in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -132,6 +136,9 @@
 				78875D363079D362005422E3 /* Kakeibot */,
 			);
 			name = Kakeibot;
+			packageProductDependencies = (
+				78875D723079D400005422E3 /* AppFeature */,
+			);
 			productName = Kakeibot;
 			productReference = 78875D343079D362005422E3 /* Kakeibot.app */;
 			productType = "com.apple.product-type.application";
@@ -150,6 +157,9 @@
 				78875D4C3079D3CE005422E3 /* KakeibotWidget */,
 			);
 			name = KakeibotWidgetExtension;
+			packageProductDependencies = (
+				78875D733079D400005422E3 /* WidgetFeature */,
+			);
 			productName = KakeibotWidgetExtension;
 			productReference = 78875D463079D3CD005422E3 /* KakeibotWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -181,6 +191,10 @@
 			);
 			mainGroup = 78875D2B3079D362005422E3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				78875D703079D400005422E3 /* XCLocalSwiftPackageReference "Packages/KakeibotApp" */,
+				78875D713079D400005422E3 /* XCLocalSwiftPackageReference "Packages/KakeibotKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 78875D353079D362005422E3 /* Products */;
 			projectDirPath = "";
@@ -520,6 +534,28 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		78875D703079D400005422E3 /* XCLocalSwiftPackageReference "Packages/KakeibotApp" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/KakeibotApp;
+		};
+		78875D713079D400005422E3 /* XCLocalSwiftPackageReference "Packages/KakeibotKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/KakeibotKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		78875D723079D400005422E3 /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFeature;
+		};
+		78875D733079D400005422E3 /* WidgetFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WidgetFeature;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 78875D2C3079D362005422E3 /* Project object */;
 	validationLevel = 1;
