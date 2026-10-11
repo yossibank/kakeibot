@@ -1,28 +1,8 @@
 import Foundation
 
 public struct LocalDate: Hashable, Sendable {
-    private static let secondsPerDay = 86400
-    private static let daysPer400Years = 146_097
-    private static let unixEpochDayNumber = YearMonth(monthIndex: 1970 * 12).firstDayNumber
-
     public let yearMonth: YearMonth
     public let day: Int
-
-    public var year: Int {
-        yearMonth.year
-    }
-
-    public var month: Int {
-        yearMonth.month
-    }
-
-    public var weekday: Weekday {
-        Weekday(daysSinceMonday: dayNumber)
-    }
-
-    var dayNumber: Int {
-        yearMonth.firstDayNumber + day - 1
-    }
 
     public init?(
         yearMonth: YearMonth,
@@ -63,8 +43,41 @@ public struct LocalDate: Hashable, Sendable {
         let offset = TimeInterval(timeZone.secondsFromGMT(for: date))
         let localSeconds = date.timeIntervalSince1970 + offset
         let days = Int((localSeconds / TimeInterval(Self.secondsPerDay)).rounded(.down))
-
         self.init(dayNumber: Self.unixEpochDayNumber + days)
+    }
+}
+
+public extension LocalDate {
+    var year: Int {
+        yearMonth.year
+    }
+
+    var month: Int {
+        yearMonth.month
+    }
+
+    var weekday: Weekday {
+        Weekday(daysSinceMonday: dayNumber)
+    }
+
+    func adding(days: Int) -> LocalDate {
+        LocalDate(dayNumber: dayNumber + days)
+    }
+
+    func periodMonth(startingOn startDay: MonthStartDay) -> YearMonth {
+        period(startingOn: startDay).upperBound.yearMonth
+    }
+
+    func week(startingOn weekStart: Weekday) -> ClosedRange<LocalDate> {
+        let offset = (weekday.daysSinceMonday - weekStart.daysSinceMonday + 7) % 7
+        let start = adding(days: -offset)
+        return start...start.adding(days: 6)
+    }
+}
+
+extension LocalDate {
+    var dayNumber: Int {
+        yearMonth.firstDayNumber + day - 1
     }
 
     init(
@@ -91,21 +104,6 @@ public struct LocalDate: Hashable, Sendable {
         self.day = dayNumber - yearMonth.firstDayNumber + 1
     }
 
-    public func adding(days: Int) -> LocalDate {
-        LocalDate(dayNumber: dayNumber + days)
-    }
-
-    public func periodMonth(startingOn startDay: MonthStartDay) -> YearMonth {
-        period(startingOn: startDay).upperBound.yearMonth
-    }
-
-    public func week(startingOn weekStart: Weekday) -> ClosedRange<LocalDate> {
-        let offset = (weekday.daysSinceMonday - weekStart.daysSinceMonday + 7) % 7
-        let start = adding(days: -offset)
-
-        return start...start.adding(days: 6)
-    }
-
     func period(startingOn startDay: MonthStartDay) -> ClosedRange<LocalDate> {
         let startedThisMonth = startDay.period(startingIn: yearMonth)
 
@@ -115,6 +113,12 @@ public struct LocalDate: Hashable, Sendable {
 
         return startDay.period(startingIn: yearMonth.adding(months: -1))
     }
+}
+
+private extension LocalDate {
+    static let secondsPerDay = 86400
+    static let daysPer400Years = 146_097
+    static let unixEpochDayNumber = YearMonth(monthIndex: 1970 * 12).firstDayNumber
 }
 
 extension LocalDate: Comparable {

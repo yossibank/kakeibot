@@ -8,7 +8,9 @@ public struct MonthStartDay: Hashable, Sendable {
 
         self.day = day
     }
+}
 
+extension MonthStartDay {
     func date(in yearMonth: YearMonth) -> LocalDate {
         LocalDate(yearMonth: yearMonth, clampedDay: day)
     }
@@ -16,7 +18,6 @@ public struct MonthStartDay: Hashable, Sendable {
     func period(startingIn yearMonth: YearMonth) -> ClosedRange<LocalDate> {
         let start = date(in: yearMonth)
         let end = date(in: yearMonth.adding(months: 1)).adding(days: -1)
-
         return start...end
     }
 }

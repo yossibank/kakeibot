@@ -1,4 +1,6 @@
-enum DateText {
+enum DateText {}
+
+extension DateText {
     static func numbers(
         in text: String,
         digits: [Int]
@@ -19,10 +21,13 @@ enum DateText {
         digits: Int
     ) -> String {
         let text = String(value)
-        return String(repeating: "0", count: max(0, digits - text.count)) + text
+        let padding = String(repeating: "0", count: max(0, digits - text.count))
+        return padding + text
     }
+}
 
-    private static func number(
+private extension DateText {
+    static func number(
         in part: Substring,
         digits: Int
     ) -> Int? {

@@ -2,35 +2,6 @@ public struct YearMonth: Hashable, Sendable {
     public let year: Int
     public let month: Int
 
-    public var numberOfDays: Int {
-        switch month {
-        case 2:
-            isLeapYear ? 29 : 28
-        case 4, 6, 9, 11:
-            30
-        default:
-            31
-        }
-    }
-
-    var monthIndex: Int {
-        year * 12 + month - 1
-    }
-
-    var firstDayNumber: Int {
-        let previousYear = year - 1
-        let leapDays = previousYear / 4 - previousYear / 100 + previousYear / 400
-        let daysBeforeMonth = (1..<month).reduce(0) { total, earlierMonth in
-            total + YearMonth(monthIndex: year * 12 + earlierMonth - 1).numberOfDays
-        }
-
-        return previousYear * 365 + leapDays + daysBeforeMonth
-    }
-
-    private var isLeapYear: Bool {
-        year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
-    }
-
     public init?(
         year: Int,
         month: Int
@@ -50,20 +21,22 @@ public struct YearMonth: Hashable, Sendable {
 
         self.init(year: numbers[0], month: numbers[1])
     }
+}
 
-    init(monthIndex: Int) {
-        let (quotient, remainder) = monthIndex.quotientAndRemainder(dividingBy: 12)
-        let borrow = remainder < 0 ? 1 : 0
-
-        self.year = quotient - borrow
-        self.month = remainder + borrow * 12 + 1
+public extension YearMonth {
+    var numberOfDays: Int {
+        switch month {
+        case 2: isLeapYear ? 29 : 28
+        case 4, 6, 9, 11: 30
+        default: 31
+        }
     }
 
-    public func adding(months: Int) -> YearMonth {
+    func adding(months: Int) -> YearMonth {
         YearMonth(monthIndex: monthIndex + months)
     }
 
-    public func period(startingOn startDay: MonthStartDay) -> ClosedRange<LocalDate> {
+    func period(startingOn startDay: MonthStartDay) -> ClosedRange<LocalDate> {
         let startedLastMonth = startDay.period(startingIn: adding(months: -1))
 
         if startedLastMonth.upperBound.yearMonth == self {
@@ -71,6 +44,36 @@ public struct YearMonth: Hashable, Sendable {
         }
 
         return startDay.period(startingIn: self)
+    }
+}
+
+extension YearMonth {
+    var monthIndex: Int {
+        year * 12 + month - 1
+    }
+
+    var firstDayNumber: Int {
+        let previousYear = year - 1
+        let leapDays = previousYear / 4 - previousYear / 100 + previousYear / 400
+
+        let daysBeforeMonth = (1..<month).reduce(0) { total, earlierMonth in
+            total + YearMonth(monthIndex: year * 12 + earlierMonth - 1).numberOfDays
+        }
+
+        return previousYear * 365 + leapDays + daysBeforeMonth
+    }
+
+    init(monthIndex: Int) {
+        let (quotient, remainder) = monthIndex.quotientAndRemainder(dividingBy: 12)
+        let borrow = remainder < 0 ? 1 : 0
+        self.year = quotient - borrow
+        self.month = remainder + borrow * 12 + 1
+    }
+}
+
+private extension YearMonth {
+    var isLeapYear: Bool {
+        year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
     }
 }
 
