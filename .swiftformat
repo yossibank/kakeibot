@@ -1,6 +1,7 @@
 --swift-version 6.4
 
 --disable wrapMultilineStatementBraces
+--enable blankLinesAfterGuardStatements
 --enable blankLinesBetweenImports
 --enable wrapIfStatementBodies
 --enable wrapGuardStatementBodies

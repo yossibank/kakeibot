@@ -32,6 +32,7 @@ public struct YearMonth: Hashable, Comparable, Sendable {
         guard (1...9999).contains(year), (1...12).contains(month) else {
             return nil
         }
+
         self.year = year
         self.month = month
     }
@@ -45,6 +46,7 @@ public struct YearMonth: Hashable, Comparable, Sendable {
         else {
             return nil
         }
+
         self.init(year: year, month: month)
     }
 
@@ -59,9 +61,11 @@ public struct YearMonth: Hashable, Comparable, Sendable {
 
     public func period(monthStartDay: Int) -> ClosedRange<LocalDate> {
         precondition((1...31).contains(monthStartDay))
+
         if monthStartDay == 1 {
             return firstDay...lastDay
         }
+
         let start = adding(months: -1).clampedDate(day: monthStartDay)
         let end = clampedDate(day: monthStartDay).adding(days: -1)
         return start...end
@@ -88,6 +92,7 @@ extension YearMonth: Codable {
                 debugDescription: "Invalid year-month: \(text)"
             )
         }
+
         self = value
     }
 

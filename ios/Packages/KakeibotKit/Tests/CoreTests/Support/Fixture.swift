@@ -11,6 +11,7 @@ enum Fixture {
         as type: Value.Type = Value.self
     ) throws -> Value {
         let data = try Data(contentsOf: root.appending(path: path))
+
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return try decoder.decode(type, from: data)

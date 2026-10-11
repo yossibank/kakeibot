@@ -34,6 +34,7 @@ public struct LocalDate: Hashable, Comparable, Sendable {
         guard (1...yearMonth.numberOfDays).contains(day) else {
             return nil
         }
+
         self.yearMonth = yearMonth
         self.day = day
     }
@@ -46,6 +47,7 @@ public struct LocalDate: Hashable, Comparable, Sendable {
         guard let yearMonth = YearMonth(year: year, month: month) else {
             return nil
         }
+
         self.init(yearMonth: yearMonth, day: day)
     }
 
@@ -59,6 +61,7 @@ public struct LocalDate: Hashable, Comparable, Sendable {
         else {
             return nil
         }
+
         self.init(year: year, month: month, day: day)
     }
 
@@ -68,6 +71,7 @@ public struct LocalDate: Hashable, Comparable, Sendable {
     ) {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
+
         let components = calendar.dateComponents([.year, .month, .day], from: date)
         self.init(year: components.year!, month: components.month!, day: components.day!)!
     }
@@ -83,9 +87,11 @@ public struct LocalDate: Hashable, Comparable, Sendable {
 
     public func periodMonth(monthStartDay: Int) -> YearMonth {
         precondition((1...31).contains(monthStartDay))
+
         if monthStartDay == 1 || day < yearMonth.clampedDate(day: monthStartDay).day {
             return yearMonth
         }
+
         return yearMonth.adding(months: 1)
     }
 
@@ -113,6 +119,7 @@ extension LocalDate: Codable {
                 debugDescription: "Invalid date: \(text)"
             )
         }
+
         self = value
     }
 

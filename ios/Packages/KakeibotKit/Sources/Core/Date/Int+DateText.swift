@@ -9,6 +9,7 @@ extension Int {
         else {
             return nil
         }
+
         self.init(text)
     }
 
