@@ -37,8 +37,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		78875D763079D400005422E3 /* KakeibotApp */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = KakeibotApp; path = Packages/KakeibotApp; sourceTree = "<group>"; };
-		78875D773079D400005422E3 /* KakeibotKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = KakeibotKit; path = Packages/KakeibotKit; sourceTree = "<group>"; };
 		78875D343079D362005422E3 /* Kakeibot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kakeibot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		78875D463079D3CD005422E3 /* KakeibotWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KakeibotWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		78875D483079D3CD005422E3 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -92,8 +90,6 @@
 		78875D2B3079D362005422E3 = {
 			isa = PBXGroup;
 			children = (
-				78875D763079D400005422E3 /* KakeibotApp */,
-				78875D773079D400005422E3 /* KakeibotKit */,
 				78875D363079D362005422E3 /* Kakeibot */,
 				78875D4C3079D3CE005422E3 /* KakeibotWidget */,
 				78875D473079D3CD005422E3 /* Frameworks */,
