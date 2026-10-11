@@ -1,16 +1,21 @@
+<div align="center">
+
 # Kakeibot（カケイボット）
+
+iOS・Android の家計簿アプリ
 
 ![iOS 18+](https://img.shields.io/badge/iOS-18%2B-000000?logo=apple)
 ![Android 8+](https://img.shields.io/badge/Android-8%2B-3DDC84?logo=android&logoColor=white)
 ![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)
 ![開発中](https://img.shields.io/badge/status-開発中-orange)
 
-iOS・Android の家計簿アプリ。何を作るかは [docs/overview.md](docs/overview.md) にある。
+</div>
 
-> [!NOTE]
-> 進み具合は [docs/roadmap.md](docs/roadmap.md) の「作る順番」にある。
+何を作るかは [docs/overview.md](docs/overview.md)、進み具合は [docs/roadmap.md](docs/roadmap.md) の「作る順番」にある。
 
 ## 文書
+
+知りたいことごとに、読む文書が分かれている。
 
 | 知りたいこと | 文書 |
 | --- | --- |
@@ -21,15 +26,12 @@ iOS・Android の家計簿アプリ。何を作るかは [docs/overview.md](docs
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
 | 作業と文書の決まり | [CLAUDE.md](CLAUDE.md) |
-| 文書の書き方 | [.claude/rules/docs.md](.claude/rules/docs.md) |
+| 文書の役割 | [.claude/rules/docs.md](.claude/rules/docs.md) |
+| 全リポジトリ共通の決まり | [claude-config](https://github.com/yossibank/claude-config) |
 
-## 準備
+## 動かし方
 
-Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は次のコマンドで入る。
-
-```sh
-make setup
-```
+Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setup` で入る。
 
 | 道具 | 使い道 |
 | --- | --- |
@@ -39,7 +41,7 @@ make setup
 > [!NOTE]
 > commit の前に pre-commit が、ステージした Swift を SwiftFormat で整形する。直したファイルがあると commit は止まるので、`git add` して commit し直す。
 
-## コマンド
+よく使うコマンドは、次の 3 つである。
 
 | 対象 | コマンド |
 | --- | --- |
