@@ -34,7 +34,12 @@ struct RecordTests {
     func acceptsValidEntry() throws {
         let database = try AppDatabase.inMemory()
         let sample = try Sample()
-        let entry = sample.entry(type: .expense, categoryId: sample.category.id, toWalletId: nil)
+
+        let entry = sample.entry(
+            type: .expense,
+            categoryId: sample.category.id,
+            toWalletId: nil
+        )
 
         try database.writer.write { try sample.insert(into: $0) }
         try database.writer.write { try entry.insert($0) }
@@ -110,7 +115,11 @@ extension RecordTests.InvalidRow {
     func record(alongside sample: RecordTests.Sample) -> any PersistableRecord {
         switch self {
         case .expenseWithoutCategory:
-            sample.entry(type: .expense, categoryId: nil, toWalletId: nil)
+            sample.entry(
+                type: .expense,
+                categoryId: nil,
+                toWalletId: nil
+            )
         case .transferWithCategory:
             sample.entry(
                 type: .transfer,
@@ -118,9 +127,18 @@ extension RecordTests.InvalidRow {
                 toWalletId: sample.cash.id
             )
         case .transferToSameWallet:
-            sample.entry(type: .transfer, categoryId: nil, toWalletId: sample.bank.id)
+            sample.entry(
+                type: .transfer,
+                categoryId: nil,
+                toWalletId: sample.bank.id
+            )
         case .zeroAmount:
-            sample.entry(type: .expense, categoryId: sample.category.id, toWalletId: nil, amount: 0)
+            sample.entry(
+                type: .expense,
+                categoryId: sample.category.id,
+                toWalletId: nil,
+                amount: 0
+            )
         case .duplicateRecurringDate:
             sample.entry(
                 type: .expense,
@@ -137,7 +155,11 @@ extension RecordTests.InvalidRow {
                 walletId: Wallet.ID()
             )
         case .secondWholeMonthBudget:
-            Budget(categoryId: nil, fromMonth: sample.wholeBudget.fromMonth, amount: 1)
+            Budget(
+                categoryId: nil,
+                fromMonth: sample.wholeBudget.fromMonth,
+                amount: 1
+            )
         case .duplicateRewardLog:
             RewardLog(
                 ruleId: sample.rule.id,
@@ -198,7 +220,20 @@ extension RecordTests.Sample {
 
     init() throws {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
-        let icon = Icon(emoji: "🍙", text: nil, color: "#FF8800", createdAt: now, updatedAt: now)
+        let previousDay = try #require(LocalDate("2026-02-26"))
+        let day = try #require(LocalDate("2026-02-27"))
+        let nextDay = try #require(LocalDate("2026-02-28"))
+        let firstRecurringDay = try #require(LocalDate("2026-01-27"))
+        let month = try #require(YearMonth("2026-01"))
+
+        let icon = Icon(
+            emoji: "🍙",
+            text: nil,
+            color: "#FF8800",
+            createdAt: now,
+            updatedAt: now
+        )
+
         let cash = Wallet(
             name: "財布",
             kind: .cash,
@@ -208,6 +243,7 @@ extension RecordTests.Sample {
             createdAt: now,
             updatedAt: now
         )
+
         let bank = Wallet(
             name: "銀行",
             kind: .bank,
@@ -217,6 +253,7 @@ extension RecordTests.Sample {
             createdAt: now,
             updatedAt: now
         )
+
         let category = EntryCategory(
             kind: .expense,
             name: "食費",
@@ -225,19 +262,55 @@ extension RecordTests.Sample {
             createdAt: now,
             updatedAt: now
         )
-        let recurring = try Recurring(
+
+        let recurring = Recurring(
             type: .expense,
             amount: 980,
             categoryId: category.id,
             walletId: bank.id,
             frequency: .monthly,
             day: 27,
-            startDate: #require(LocalDate("2026-01-27")),
+            startDate: firstRecurringDay,
             createdAt: now,
             updatedAt: now
         )
-        let day = try #require(LocalDate("2026-02-27"))
-        let month = try #require(YearMonth("2026-01"))
+
+        let expense = Entry(
+            type: .expense,
+            amount: 980,
+            date: day,
+            categoryId: category.id,
+            walletId: bank.id,
+            memo: "動画",
+            recurringId: recurring.id,
+            recurringDate: day,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let transfer = Entry(
+            type: .transfer,
+            amount: 3000,
+            date: nextDay,
+            categoryId: nil,
+            walletId: bank.id,
+            toWalletId: cash.id,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let wholeBudget = Budget(
+            categoryId: nil,
+            fromMonth: month,
+            amount: 100_000
+        )
+
+        let categoryBudget = Budget(
+            categoryId: category.id,
+            fromMonth: month,
+            amount: 30000
+        )
+
         let rule = RewardRule(
             name: "自炊した日",
             amount: 300,
@@ -248,61 +321,76 @@ extension RecordTests.Sample {
             updatedAt: now
         )
 
-        try self.init(
+        let rewardLog = RewardLog(
+            ruleId: rule.id,
+            date: day,
+            amount: 300,
+            createdAt: now
+        )
+
+        let goal = RewardGoal(
+            name: "新しい靴",
+            targetAmount: 8000,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let stamp = CalendarStamp(
+            date: day,
+            iconId: icon.id,
+            createdAt: now
+        )
+
+        let noSpendDay = NoSpendDay(
+            date: previousDay,
+            createdAt: now
+        )
+
+        let theme = Theme(
+            name: "標準",
+            background: "#FFFFFF",
+            surface: "#F5F5F5",
+            textPrimary: "#111111",
+            textSecondary: "#666666",
+            accent: "#FF8800",
+            expense: "#D33F49",
+            income: "#2E8B57",
+            cornerRadius: 12,
+            fontId: "system",
+            isBuiltin: true,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let settings = [
+            Setting(
+                key: .monthStartDay,
+                value: "25"
+            ),
+            Setting(
+                key: .weekStart,
+                value: "monday"
+            )
+        ]
+
+        self.init(
             now: now,
             icon: icon,
             cash: cash,
             bank: bank,
             category: category,
             recurring: recurring,
-            expense: Entry(
-                type: .expense,
-                amount: 980,
-                date: day,
-                categoryId: category.id,
-                walletId: bank.id,
-                memo: "動画",
-                recurringId: recurring.id,
-                recurringDate: day,
-                createdAt: now,
-                updatedAt: now
-            ),
-            transfer: Entry(
-                type: .transfer,
-                amount: 3000,
-                date: #require(LocalDate("2026-02-28")),
-                categoryId: nil,
-                walletId: bank.id,
-                toWalletId: cash.id,
-                createdAt: now,
-                updatedAt: now
-            ),
-            wholeBudget: Budget(categoryId: nil, fromMonth: month, amount: 100_000),
-            categoryBudget: Budget(categoryId: category.id, fromMonth: month, amount: 30000),
+            expense: expense,
+            transfer: transfer,
+            wholeBudget: wholeBudget,
+            categoryBudget: categoryBudget,
             rule: rule,
-            rewardLog: RewardLog(ruleId: rule.id, date: day, amount: 300, createdAt: now),
-            goal: RewardGoal(name: "新しい靴", targetAmount: 8000, createdAt: now, updatedAt: now),
-            stamp: CalendarStamp(date: day, iconId: icon.id, createdAt: now),
-            noSpendDay: NoSpendDay(date: #require(LocalDate("2026-02-26")), createdAt: now),
-            theme: Theme(
-                name: "標準",
-                background: "#FFFFFF",
-                surface: "#F5F5F5",
-                textPrimary: "#111111",
-                textSecondary: "#666666",
-                accent: "#FF8800",
-                expense: "#D33F49",
-                income: "#2E8B57",
-                cornerRadius: 12,
-                fontId: "system",
-                isBuiltin: true,
-                createdAt: now,
-                updatedAt: now
-            ),
-            settings: [
-                Setting(key: .monthStartDay, value: "25"),
-                Setting(key: .weekStart, value: "monday")
-            ]
+            rewardLog: rewardLog,
+            goal: goal,
+            stamp: stamp,
+            noSpendDay: noSpendDay,
+            theme: theme,
+            settings: settings
         )
     }
 
