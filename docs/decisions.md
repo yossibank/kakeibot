@@ -12,7 +12,7 @@
 | 署名 | 自動 | 1 人・端末 1 台・CI なしなので、端末の追加・更新・提出を Xcode に任せられる | 手動 |
 | プロジェクトのファイル | `.xcodeproj` をそのまま管理する | 1 人なので衝突しない。中身はほぼパッケージ側 | XcodeGen、Tuist |
 | 整形 | SwiftFormat（Mint で版を固定）。commit の前に pre-commit が整形し、直したら commit を止める。ステージし直すのは人 | 自分で整形を走らせずに済む。一部だけステージしたファイルは、pre-commit が整形を取り消すので壊れない | hook は違反を止めるだけで直さない、hook がステージし直して commit まで通す、SwiftLint も入れる |
-| 文書の確認 | 自動では確かめない | 文書が少なく、名前の変更もまれ | hook でリンク切れ・Mermaid の図を確かめる |
+| 文書の確認 | Claude Code のフック（claude-config の `hooks/check-docs.py`）で、書き方の決まりを確かめる | 文書を書くのはほぼ Claude なので、書いたその場で直せる。リポジトリごとの準備が要らない | pre-commit で確かめる、自動では確かめない |
 
 ## iOS の構成
 
