@@ -8,13 +8,13 @@ setup:
 	pre-commit install
 
 open:
-	open ios/Kakeibot.xcodeproj
+	open ios/Kakeibot.xcworkspace
 
 format:
 	mint run swiftformat .
 
 build:
-	xcodebuild -project ios/Kakeibot.xcodeproj -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build
+	xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build
 
 test:
-	xcodebuild -project ios/Kakeibot.xcodeproj -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' test
+	xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' test
