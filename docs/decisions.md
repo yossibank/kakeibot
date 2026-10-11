@@ -18,7 +18,7 @@
 
 | 項目 | 決定 | 理由 | 選ばなかった案 |
 | --- | --- | --- | --- |
-| パッケージ | KakeibotKit（iOS・macOS）と KakeibotApp（iOS 専用）の 2 つ | 1 つにすると Core の `swift test` が iOS 専用ターゲットのせいで失敗する（確認済み） | 1 つのパッケージにターゲットを分けて入れる |
+| パッケージ | KakeibotKit（iOS・macOS）と KakeibotApp（iOS 専用）の 2 つ | 1 つにすると、iOS 専用のターゲットのせいで Core の `swift test` が失敗する。`--filter` で絞っても全ターゲットがビルドされる（Swift 6.4 で確認済み） | 1 つのパッケージにターゲットを分けて入れる |
 | 画面の作り | SwiftUI ＋ `@Observable`、処理のある画面だけモデル | 計算は Core にあり、テストもされる | TCA、全画面に ViewModel |
 | Features | 1 つのターゲット、画面ごとのフォルダ | 1 人では、ターゲットを分ける管理の手間が勝つ | 機能ごとにターゲットを分ける |
 | 部品の置き場所 | 値を表示するだけの部品は DesignSystem、データを読み書きするものは Features | 部品の置き場所を 1 つにする | Features の中に Shared/ を置く |

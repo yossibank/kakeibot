@@ -1,16 +1,15 @@
 # 構成
 
-## 方針
+## 使う技術
 
-| 項目 | 決定 |
-| --- | --- |
-| 作り方 | iOS を Swift で先に作り、Android は計算部分を Kotlin に移す |
-| ずれの防止 | `spec/fixtures` の JSON テストケースを、Swift と Kotlin の両方のテストで読む |
-| 画面 | iOS は SwiftUI ＋ `@Observable`、Android は Jetpack Compose |
-| 保存 | iOS は GRDB（SQLite）、Android は Room。表の形は同じ |
-| 通信 | なし。通知はすべて端末の中で予約する |
+| 項目 | iOS | Android |
+| --- | --- | --- |
+| 画面 | decisions の「画面の作り」 | Jetpack Compose |
+| 保存 | decisions の「DB」 | Room（SQLite）。表の形は iOS と同じ |
+| ウィジェット | WidgetKit | Glance |
+| 通信 | なし。通知も端末の中で予約する | 同じ |
 
-理由と選ばなかった案は [decisions.md](decisions.md)。
+両 OS の分け方とそろえ方は、[decisions.md](decisions.md) の「共通化」にある。
 
 ## リポジトリ
 
@@ -46,11 +45,20 @@ ios/
 | ターゲット | `Kakeibot` | `KakeibotWidgetExtension` |
 | Bundle ID | `com.yossibank.kakeibot` | `com.yossibank.kakeibot.widget` |
 | App Group | `group.com.yossibank.kakeibot` | 同じ |
-| 端末 | iPhone のみ | 同じ |
-| 署名 | 自動（チーム `6WHPY5MQSB`） | 同じ |
 
-> [!NOTE]
-> パッケージを 2 つに分けるのは、1 つのパッケージに iOS 専用のターゲットがあると、`swift test --filter` で絞っても全ターゲットがビルドされて失敗するため（Swift 6.4 で確認済み）。
+### 署名
+
+| 項目 | 状態 |
+| --- | --- |
+| チーム | `6WHPY5MQSB` |
+| 登録済みの端末 | 自分の iPhone 1 台 |
+| 開発用の証明書 | 2027-01-25 まで |
+| プロファイル | 2027-10-10 まで |
+| 配布用の証明書 | なし。Archive のときに Xcode がクラウドで管理するものを使う |
+
+## パッケージ（未着手）
+
+0 番の 2 で、この形に作る。
 
 ### KakeibotKit
 
@@ -160,13 +168,11 @@ flowchart TB
 
 ## 名前の決まり
 
-| 決まり |
-| --- |
-| 同じ役割のものは 1 つの親フォルダにまとめる |
-| Core は概念ごとのフォルダに、型と計算を一緒に入れる |
-| Features は画面の名前。一覧の画面は複数形 |
-| 1 つのフォルダには、ファイルかサブフォルダのどちらかだけを入れる |
-| ファイル名の頭に画面の名前を付ける（`HomeView`、`HomeModel`） |
+- 同じ役割のものは 1 つの親フォルダにまとめる
+- Core は概念ごとのフォルダに、型と計算を一緒に入れる
+- Features は画面の名前。一覧の画面は複数形
+- 1 つのフォルダには、ファイルかサブフォルダのどちらかだけを入れる
+- ファイル名の頭に画面の名前を付ける（`HomeView`、`HomeModel`）
 
 ## Features と AppFeature
 
@@ -177,14 +183,12 @@ flowchart TB
 
 ### 画面のモデル
 
-| 決まり |
-| --- |
-| 処理のある画面だけ `@Observable` のモデルを置く。表示だけの画面には置かない |
-| 作るときに `AppDatabase`・`LocalDate`・ほかの画面を開く関数を引数で受け取る。Environment で渡すのはテーマだけ |
-| ほかの画面を開く関数は Core の型だけを使う（`openNewEntry(LocalDate)`、`openEntry(Entry.ID)`） |
-| DB は `ValueObservation` で見張る。保存すると、見張っている画面が自動で変わる |
-| 計算は Core に任せる。書き込みは DB に書くだけ |
-| 設定の一覧は項目の enum を持ち、移る先は AppFeature が決める |
+- 処理のある画面だけ `@Observable` のモデルを置く。表示だけの画面には置かない
+- 作るときに `AppDatabase`・`LocalDate`・ほかの画面を開く関数を引数で受け取る
+- ほかの画面を開く関数は Core の型だけを使う（`openNewEntry(LocalDate)`、`openEntry(Entry.ID)`）
+- DB は `ValueObservation` で見張る。保存すると、見張っている画面が自動で変わる
+- 計算は Core に任せる。書き込みは DB に書くだけ
+- 設定の一覧は項目の enum を持ち、移る先は AppFeature が決める
 
 ### AppModel
 
@@ -244,7 +248,6 @@ sequenceDiagram
 | 記録忘れの通知 | 数日先まで予約し、当日の記録か支出なしの印ができたら当日分を取り消す |
 | 固定費の更新前の通知 | 更新日の N 日前で予約する |
 | iOS のウィジェット | WidgetFeature が Store で DB を直接読む。ホームと同じ集計クエリを使う |
-| Android のウィジェット | Glance |
 
 ## テスト
 
@@ -256,8 +259,11 @@ sequenceDiagram
 | AppFeature | SideEffects。通知の予約係だけテスト用に差し替える |
 | 見た目 | プレビューで目で確かめる。UI テストは書かない |
 
+## 未検証
+
 > [!WARNING]
-> **未検証**
 > - App Group 上の SQLite で `0xdead10cc` が起きないか（0 番、実機）
 > - パッケージの中のフォントを、起動時の登録で使えるか（DesignSystem を作るとき）
 > - Swift の fixtures をパッケージの外から相対パスで読めるか（0 番）
+> - Apple Developer Program に加入しているか。プロファイルの期限が 1 年なのは有料のチームの特徴だが、加入状態は確かめていない
+> - 配布用の証明書を Xcode がクラウドで管理するか（11 番で確かめる）

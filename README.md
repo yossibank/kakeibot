@@ -5,7 +5,7 @@
 ![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)
 ![開発中](https://img.shields.io/badge/status-開発中-orange)
 
-**見返すのが楽しい家計簿。** テーマと、家計簿の相棒のキャラクターを自分で作れる。広告なし、データは端末の中だけ。
+iOS・Android の家計簿アプリ。何を作るかは [docs/overview.md](docs/overview.md) にある。
 
 > [!NOTE]
 > 進み具合は [docs/roadmap.md](docs/roadmap.md) の「作る順番」にある。
@@ -21,6 +21,7 @@
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
 | 作業と文書の決まり | [CLAUDE.md](CLAUDE.md) |
+| 文書の書き方 | [.claude/rules/docs.md](.claude/rules/docs.md) |
 
 ## 準備
 
