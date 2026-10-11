@@ -31,7 +31,7 @@ kakeibot/
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
 ├── Brewfile                 Mint と pre-commit
-├── Makefile                 準備・整形・ビルド・テストのコマンド
+├── Makefile                 準備・開く・整形・ビルド・テストのコマンド
 └── Mintfile                 SwiftFormat の版
 ```
 
