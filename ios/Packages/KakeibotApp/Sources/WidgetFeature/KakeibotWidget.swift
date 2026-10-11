@@ -4,6 +4,8 @@ import SwiftUI
 import WidgetKit
 
 public struct KakeibotWidget: Widget {
+    public init() {}
+
     public var body: some WidgetConfiguration {
         StaticConfiguration(kind: "KakeibotWidget", provider: Provider()) { _ in
             Text("Kakeibot")
@@ -11,8 +13,6 @@ public struct KakeibotWidget: Widget {
         }
         .configurationDisplayName("Kakeibot")
     }
-
-    public init() {}
 }
 
 private struct Provider: TimelineProvider {

@@ -1,30 +1,4 @@
-public struct YearMonth: Hashable, Comparable, Sendable {
-    public let year: Int
-    public let month: Int
-
-    public var numberOfDays: Int {
-        switch month {
-        case 2:
-            isLeapYear ? 29 : 28
-        case 4, 6, 9, 11:
-            30
-        default:
-            31
-        }
-    }
-
-    private var isLeapYear: Bool {
-        year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
-    }
-
-    private var firstDay: LocalDate {
-        LocalDate(yearMonth: self, day: 1)!
-    }
-
-    private var lastDay: LocalDate {
-        LocalDate(yearMonth: self, day: numberOfDays)!
-    }
-
+public struct YearMonth: Hashable, Sendable {
     public init?(
         year: Int,
         month: Int
@@ -39,6 +13,7 @@ public struct YearMonth: Hashable, Comparable, Sendable {
 
     public init?(_ text: String) {
         let parts = text.split(separator: "-", omittingEmptySubsequences: false)
+
         guard
             parts.count == 2,
             let year = Int(asciiDigits: parts[0], count: 4),
@@ -50,8 +25,18 @@ public struct YearMonth: Hashable, Comparable, Sendable {
         self.init(year: year, month: month)
     }
 
-    public static func < (lhs: YearMonth, rhs: YearMonth) -> Bool {
-        (lhs.year, lhs.month) < (rhs.year, rhs.month)
+    public let year: Int
+    public let month: Int
+
+    public var numberOfDays: Int {
+        switch month {
+        case 2:
+            isLeapYear ? 29 : 28
+        case 4, 6, 9, 11:
+            30
+        default:
+            31
+        }
     }
 
     public func adding(months: Int) -> YearMonth {
@@ -68,11 +53,30 @@ public struct YearMonth: Hashable, Comparable, Sendable {
 
         let start = adding(months: -1).clampedDate(day: monthStartDay)
         let end = clampedDate(day: monthStartDay).adding(days: -1)
+
         return start...end
     }
 
     func clampedDate(day: Int) -> LocalDate {
         LocalDate(yearMonth: self, day: min(day, numberOfDays))!
+    }
+
+    private var isLeapYear: Bool {
+        year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
+    }
+
+    private var firstDay: LocalDate {
+        LocalDate(yearMonth: self, day: 1)!
+    }
+
+    private var lastDay: LocalDate {
+        LocalDate(yearMonth: self, day: numberOfDays)!
+    }
+}
+
+extension YearMonth: Comparable {
+    public static func < (lhs: YearMonth, rhs: YearMonth) -> Bool {
+        (lhs.year, lhs.month) < (rhs.year, rhs.month)
     }
 }
 
@@ -86,6 +90,7 @@ extension YearMonth: Codable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let text = try container.decode(String.self)
+
         guard let value = YearMonth(text) else {
             throw DecodingError.dataCorruptedError(
                 in: container,

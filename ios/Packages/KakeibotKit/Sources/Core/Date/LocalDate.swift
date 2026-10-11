@@ -1,32 +1,6 @@
 import Foundation
 
-public struct LocalDate: Hashable, Comparable, Sendable {
-    private static let calendar: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(identifier: "UTC")!
-        return calendar
-    }()
-
-    public let yearMonth: YearMonth
-    public let day: Int
-
-    public var year: Int {
-        yearMonth.year
-    }
-
-    public var month: Int {
-        yearMonth.month
-    }
-
-    public var weekday: Weekday {
-        let sundayFirst = Self.calendar.component(.weekday, from: date)
-        return Weekday.allCases[(sundayFirst + 5) % 7]
-    }
-
-    private var date: Date {
-        Self.calendar.date(from: DateComponents(year: year, month: month, day: day))!
-    }
-
+public struct LocalDate: Hashable, Sendable {
     public init?(
         yearMonth: YearMonth,
         day: Int
@@ -53,6 +27,7 @@ public struct LocalDate: Hashable, Comparable, Sendable {
 
     public init?(_ text: String) {
         let parts = text.split(separator: "-", omittingEmptySubsequences: false)
+
         guard
             parts.count == 3,
             let year = Int(asciiDigits: parts[0], count: 4),
@@ -76,8 +51,20 @@ public struct LocalDate: Hashable, Comparable, Sendable {
         self.init(year: components.year!, month: components.month!, day: components.day!)!
     }
 
-    public static func < (lhs: LocalDate, rhs: LocalDate) -> Bool {
-        (lhs.yearMonth, lhs.day) < (rhs.yearMonth, rhs.day)
+    public let yearMonth: YearMonth
+    public let day: Int
+
+    public var year: Int {
+        yearMonth.year
+    }
+
+    public var month: Int {
+        yearMonth.month
+    }
+
+    public var weekday: Weekday {
+        let sundayFirst = Self.calendar.component(.weekday, from: date)
+        return Weekday.allCases[(sundayFirst + 5) % 7]
     }
 
     public func adding(days: Int) -> LocalDate {
@@ -99,7 +86,25 @@ public struct LocalDate: Hashable, Comparable, Sendable {
         let days = Weekday.allCases
         let offset = (days.firstIndex(of: weekday)! - days.firstIndex(of: weekStart)! + 7) % 7
         let start = adding(days: -offset)
+
         return start...start.adding(days: 6)
+    }
+
+    private static let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC")!
+
+        return calendar
+    }()
+
+    private var date: Date {
+        Self.calendar.date(from: DateComponents(year: year, month: month, day: day))!
+    }
+}
+
+extension LocalDate: Comparable {
+    public static func < (lhs: LocalDate, rhs: LocalDate) -> Bool {
+        (lhs.yearMonth, lhs.day) < (rhs.yearMonth, rhs.day)
     }
 }
 
@@ -113,6 +118,7 @@ extension LocalDate: Codable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let text = try container.decode(String.self)
+
         guard let value = LocalDate(text) else {
             throw DecodingError.dataCorruptedError(
                 in: container,

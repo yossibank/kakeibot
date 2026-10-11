@@ -6,36 +6,39 @@ struct YearMonthTests {
     @Test(arguments: try validity.valid)
     func parsesValidText(text: String) throws {
         let month = try #require(YearMonth(text))
+
         #expect(month.description == text)
     }
 
     @Test(arguments: try validity.invalid)
     func rejectsInvalidText(text: String) {
-        #expect(YearMonth(text) == nil)
+        let month = YearMonth(text)
+
+        #expect(month == nil)
     }
 
     @Test(arguments: try periodCases)
     func findsPeriodOfMonth(fixture: PeriodCase) {
         let period = fixture.month.period(monthStartDay: fixture.monthStartDay)
+
         #expect(period == fixture.start...fixture.end)
     }
 
     @Test(arguments: try periodCases)
     func namesPeriodByMonth(fixture: PeriodCase) {
         let day = fixture.monthStartDay
+        let dayBefore = fixture.start.adding(days: -1)
+        let dayAfter = fixture.end.adding(days: 1)
 
-        #expect(fixture.start.periodMonth(monthStartDay: day) == fixture.month)
-        #expect(fixture.end.periodMonth(monthStartDay: day) == fixture.month)
+        let startMonth = fixture.start.periodMonth(monthStartDay: day)
+        let endMonth = fixture.end.periodMonth(monthStartDay: day)
+        let dayBeforeMonth = dayBefore.periodMonth(monthStartDay: day)
+        let dayAfterMonth = dayAfter.periodMonth(monthStartDay: day)
 
-        #expect(
-            fixture.start.adding(days: -1).periodMonth(monthStartDay: day)
-                == fixture.month.adding(months: -1)
-        )
-
-        #expect(
-            fixture.end.adding(days: 1).periodMonth(monthStartDay: day)
-                == fixture.month.adding(months: 1)
-        )
+        #expect(startMonth == fixture.month)
+        #expect(endMonth == fixture.month)
+        #expect(dayBeforeMonth == fixture.month.adding(months: -1))
+        #expect(dayAfterMonth == fixture.month.adding(months: 1))
     }
 }
 
