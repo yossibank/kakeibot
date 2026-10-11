@@ -21,11 +21,14 @@ public extension AppDatabase {
         }
 
         let path = directory.appending(path: fileName).path(percentEncoded: false)
-        return try AppDatabase(DatabasePool(path: path, configuration: configuration))
+        let pool = try DatabasePool(path: path, configuration: configuration)
+
+        return try AppDatabase(pool)
     }
 
     static func inMemory() throws -> AppDatabase {
-        try AppDatabase(DatabaseQueue(configuration: configuration))
+        let queue = try DatabaseQueue(configuration: configuration)
+        return try AppDatabase(queue)
     }
 }
 
