@@ -2,7 +2,10 @@ import AppFeature
 import SwiftUI
 
 @main
-struct KakeibotApp: App {
+@MainActor
+struct KakeibotApp {}
+
+extension KakeibotApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
