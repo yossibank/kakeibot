@@ -17,8 +17,8 @@ struct LocalDateTests {
         #expect(date == nil)
     }
 
-    @Test(arguments: try todayCases)
-    func convertsInstantInTimeZone(fixture: TodayCase) throws {
+    @Test(arguments: try instantCases)
+    func convertsInstantInTimeZone(fixture: InstantCase) throws {
         let timeZone = try #require(TimeZone(identifier: fixture.timeZone))
 
         let date = LocalDate(fixture.instant, in: timeZone)
@@ -31,6 +31,23 @@ struct LocalDateTests {
         let week = fixture.date.week(startingOn: fixture.weekStart)
 
         #expect(week == fixture.start...fixture.end)
+    }
+
+    @Test(arguments: try periodCases)
+    func findsPeriodMonth(fixture: PeriodCase) {
+        let startDay = fixture.monthStartDay
+        let dayBefore = fixture.start.adding(days: -1)
+        let dayAfter = fixture.end.adding(days: 1)
+
+        let startMonth = fixture.start.periodMonth(startingOn: startDay)
+        let endMonth = fixture.end.periodMonth(startingOn: startDay)
+        let dayBeforeMonth = dayBefore.periodMonth(startingOn: startDay)
+        let dayAfterMonth = dayAfter.periodMonth(startingOn: startDay)
+
+        #expect(startMonth == fixture.month)
+        #expect(endMonth == fixture.month)
+        #expect(dayBeforeMonth == fixture.month.adding(months: -1))
+        #expect(dayAfterMonth == fixture.month.adding(months: 1))
     }
 
     @Test
@@ -46,10 +63,17 @@ struct LocalDateTests {
 }
 
 extension LocalDateTests {
-    struct TodayCase: Decodable, Sendable {
+    struct InstantCase: Decodable, Sendable {
         let instant: Date
         let timeZone: String
         let date: LocalDate
+    }
+
+    struct PeriodCase: Decodable, Sendable {
+        let monthStartDay: MonthStartDay
+        let month: YearMonth
+        let start: LocalDate
+        let end: LocalDate
     }
 
     struct WeekCase: Decodable, Sendable {
@@ -61,21 +85,27 @@ extension LocalDateTests {
 }
 
 private extension LocalDateTests {
-    static var validity: ValidityFixture {
+    static var validity: ValidityFixture<String> {
         get throws {
-            try Fixture.load("date/local-date.json")
+            try Fixture.load("date/local-date-text.json")
         }
     }
 
-    static var todayCases: [TodayCase] {
+    static var instantCases: [InstantCase] {
         get throws {
-            try Fixture.load("date/today.json")
+            try Fixture.load("date/local-date-instant.json")
+        }
+    }
+
+    static var periodCases: [PeriodCase] {
+        get throws {
+            try Fixture.load("date/year-month-period.json")
         }
     }
 
     static var weekCases: [WeekCase] {
         get throws {
-            try Fixture.load("date/week.json")
+            try Fixture.load("date/local-date-week.json")
         }
     }
 }

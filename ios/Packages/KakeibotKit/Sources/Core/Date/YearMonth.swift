@@ -17,6 +17,16 @@ public struct YearMonth: Hashable, Sendable {
         year * 12 + month - 1
     }
 
+    var firstDayNumber: Int {
+        let previousYear = year - 1
+        let leapDays = previousYear / 4 - previousYear / 100 + previousYear / 400
+        let daysBeforeMonth = (1..<month).reduce(0) { total, earlierMonth in
+            total + YearMonth(monthIndex: year * 12 + earlierMonth - 1).numberOfDays
+        }
+
+        return previousYear * 365 + leapDays + daysBeforeMonth
+    }
+
     private var isLeapYear: Bool {
         year.isMultiple(of: 4) && (!year.isMultiple(of: 100) || year.isMultiple(of: 400))
     }
@@ -34,17 +44,11 @@ public struct YearMonth: Hashable, Sendable {
     }
 
     public init?(_ text: String) {
-        let parts = text.split(separator: "-", omittingEmptySubsequences: false)
-
-        guard
-            parts.count == 2,
-            let year = Int(asciiDigits: parts[0], count: 4),
-            let month = Int(asciiDigits: parts[1], count: 2)
-        else {
+        guard let numbers = DateText.numbers(in: text, digits: [4, 2]) else {
             return nil
         }
 
-        self.init(year: year, month: month)
+        self.init(year: numbers[0], month: numbers[1])
     }
 
     init(monthIndex: Int) {
@@ -59,20 +63,14 @@ public struct YearMonth: Hashable, Sendable {
         YearMonth(monthIndex: monthIndex + months)
     }
 
-    public func period(monthStartDay: Int) -> ClosedRange<LocalDate> {
-        precondition((1...31).contains(monthStartDay))
+    public func period(startingOn startDay: MonthStartDay) -> ClosedRange<LocalDate> {
+        let startedLastMonth = startDay.period(startingIn: adding(months: -1))
 
-        if monthStartDay == 1 {
-            let first = LocalDate(yearMonth: self, clampedDay: 1)
-            let last = LocalDate(yearMonth: self, clampedDay: numberOfDays)
-
-            return first...last
+        if startedLastMonth.upperBound.yearMonth == self {
+            return startedLastMonth
         }
 
-        let start = LocalDate(yearMonth: adding(months: -1), clampedDay: monthStartDay)
-        let end = LocalDate(yearMonth: self, clampedDay: monthStartDay).adding(days: -1)
-
-        return start...end
+        return startDay.period(startingIn: self)
     }
 }
 
@@ -84,7 +82,7 @@ extension YearMonth: Comparable {
 
 extension YearMonth: CustomStringConvertible {
     public var description: String {
-        "\(Int.paddedText(year, count: 4))-\(Int.paddedText(month, count: 2))"
+        "\(DateText.padded(year, digits: 4))-\(DateText.padded(month, digits: 2))"
     }
 }
 

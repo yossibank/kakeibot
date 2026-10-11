@@ -19,7 +19,7 @@ enum Fixture {
     }
 }
 
-struct ValidityFixture: Decodable {
-    let valid: [String]
-    let invalid: [String]
+struct ValidityFixture<Value: Decodable & Sendable>: Decodable {
+    let valid: [Value]
+    let invalid: [Value]
 }

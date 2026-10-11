@@ -182,6 +182,7 @@ flowchart TB
 - Features は画面の名前。一覧の画面は複数形
 - 1 つのフォルダには、ファイルかサブフォルダのどちらかだけを入れる
 - ファイル名の頭に画面の名前を付ける（`HomeView`、`HomeModel`）
+- fixtures のファイル名の頭に、試す型の名前を kebab-case で付ける（`local-date-week.json`）
 
 ## Features と AppFeature
 

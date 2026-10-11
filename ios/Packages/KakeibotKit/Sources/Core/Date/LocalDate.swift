@@ -2,7 +2,8 @@ import Foundation
 
 public struct LocalDate: Hashable, Sendable {
     private static let secondsPerDay = 86400
-    private static let unixEpochDayNumber = daysBefore(year: 1970)
+    private static let daysPer400Years = 146_097
+    private static let unixEpochDayNumber = YearMonth(monthIndex: 1970 * 12).firstDayNumber
 
     public let yearMonth: YearMonth
     public let day: Int
@@ -20,12 +21,7 @@ public struct LocalDate: Hashable, Sendable {
     }
 
     var dayNumber: Int {
-        let january = YearMonth(monthIndex: year * 12)
-        let daysBeforeMonth = (0..<(month - 1)).reduce(0) { total, offset in
-            total + january.adding(months: offset).numberOfDays
-        }
-
-        return Self.daysBefore(year: year) + daysBeforeMonth + day - 1
+        yearMonth.firstDayNumber + day - 1
     }
 
     public init?(
@@ -53,18 +49,11 @@ public struct LocalDate: Hashable, Sendable {
     }
 
     public init?(_ text: String) {
-        let parts = text.split(separator: "-", omittingEmptySubsequences: false)
-
-        guard
-            parts.count == 3,
-            let year = Int(asciiDigits: parts[0], count: 4),
-            let month = Int(asciiDigits: parts[1], count: 2),
-            let day = Int(asciiDigits: parts[2], count: 2)
-        else {
+        guard let numbers = DateText.numbers(in: text, digits: [4, 2, 2]) else {
             return nil
         }
 
-        self.init(year: year, month: month, day: day)
+        self.init(year: numbers[0], month: numbers[1], day: numbers[2])
     }
 
     public init(
@@ -87,47 +76,27 @@ public struct LocalDate: Hashable, Sendable {
     }
 
     init(dayNumber: Int) {
-        var year = dayNumber * 400 / 146_097 + 1
+        let estimatedYear = dayNumber * 400 / Self.daysPer400Years + 1
+        var yearMonth = YearMonth(monthIndex: estimatedYear * 12)
 
-        while Self.daysBefore(year: year + 1) <= dayNumber {
-            year += 1
+        while yearMonth.firstDayNumber > dayNumber {
+            yearMonth = yearMonth.adding(months: -1)
         }
 
-        while Self.daysBefore(year: year) > dayNumber {
-            year -= 1
-        }
-
-        var yearMonth = YearMonth(monthIndex: year * 12)
-        var remainingDays = dayNumber - Self.daysBefore(year: year)
-
-        while remainingDays >= yearMonth.numberOfDays {
-            remainingDays -= yearMonth.numberOfDays
+        while yearMonth.adding(months: 1).firstDayNumber <= dayNumber {
             yearMonth = yearMonth.adding(months: 1)
         }
 
         self.yearMonth = yearMonth
-        self.day = remainingDays + 1
-    }
-
-    private static func daysBefore(year: Int) -> Int {
-        let previousYear = year - 1
-        let leapDays = previousYear / 4 - previousYear / 100 + previousYear / 400
-
-        return previousYear * 365 + leapDays
+        self.day = dayNumber - yearMonth.firstDayNumber + 1
     }
 
     public func adding(days: Int) -> LocalDate {
         LocalDate(dayNumber: dayNumber + days)
     }
 
-    public func periodMonth(monthStartDay: Int) -> YearMonth {
-        precondition((1...31).contains(monthStartDay))
-
-        if monthStartDay == 1 || day < min(monthStartDay, yearMonth.numberOfDays) {
-            return yearMonth
-        }
-
-        return yearMonth.adding(months: 1)
+    public func periodMonth(startingOn startDay: MonthStartDay) -> YearMonth {
+        period(startingOn: startDay).upperBound.yearMonth
     }
 
     public func week(startingOn weekStart: Weekday) -> ClosedRange<LocalDate> {
@@ -135,6 +104,16 @@ public struct LocalDate: Hashable, Sendable {
         let start = adding(days: -offset)
 
         return start...start.adding(days: 6)
+    }
+
+    func period(startingOn startDay: MonthStartDay) -> ClosedRange<LocalDate> {
+        let startedThisMonth = startDay.period(startingIn: yearMonth)
+
+        if startedThisMonth.contains(self) {
+            return startedThisMonth
+        }
+
+        return startDay.period(startingIn: yearMonth.adding(months: -1))
     }
 }
 
@@ -146,7 +125,7 @@ extension LocalDate: Comparable {
 
 extension LocalDate: CustomStringConvertible {
     public var description: String {
-        "\(yearMonth)-\(Int.paddedText(day, count: 2))"
+        "\(yearMonth)-\(DateText.padded(day, digits: 2))"
     }
 }
 
