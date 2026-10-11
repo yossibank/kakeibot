@@ -27,10 +27,11 @@ kakeibot/
 │   ├── export-format.md
 │   ├── fixtures.md
 │   └── fixtures/            Core のフォルダ名の小文字にそろえる
+├── .github/                 CI（ビルドとテスト）
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
 ├── Brewfile                 Mint と pre-commit
-├── Makefile                 準備・整形・ビルドのコマンド
+├── Makefile                 準備・整形・ビルド・テストのコマンド
 └── Mintfile                 SwiftFormat の版
 ```
 
@@ -42,6 +43,7 @@ kakeibot/
 ios/
 ├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）
 ├── Kakeibot.xcodeproj
+├── Kakeibot.xctestplan      テストターゲットをまとめたテストプラン
 ├── KakeibotWidget/          ウィジェット（@main で WidgetFeature を呼ぶだけ）
 └── Packages/
     ├── KakeibotApp/         iOS 専用。Xcode でテスト
@@ -268,9 +270,11 @@ sequenceDiagram
 
 ## テスト
 
+テストターゲットは `ios/Kakeibot.xctestplan` にまとめ、`Kakeibot` スキームに付ける。`make test` と CI（`.github/workflows/verify.yml`）は、このテストプランを iOS シミュレーターで走らせる。パッケージは、プロジェクトのフォルダとしても登録する。こうしないと、スキームからパッケージのテストターゲットが見えない。
+
 | 対象 | 方法 |
 | --- | --- |
-| Core | `swift test`。fixtures を全部通す。fixtures は `#filePath` からの相対パスで読む |
+| Core | `make test`。Mac の上では `swift test` でも走る。fixtures を全部通し、`#filePath` からの相対パスで読む |
 | Store | メモリ上の DB で、表の形の変更・集計・書き出しの往復 |
 | Features | 処理のある画面のモデル |
 | AppFeature | SideEffects。通知の予約係だけテスト用に差し替える |

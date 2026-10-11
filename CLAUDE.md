@@ -4,7 +4,7 @@
 
 ## 作業の進め方
 
-変更したら `make build` を通す。
+変更したら `make build` と `make test` を通す。PR では CI が同じ 2 つを走らせる。
 
 pre-commit の整形で commit が止まったら、差分を確かめてからステージし直す。止まる仕組みは [README の「動かし方」](README.md#動かし方)にある。`--no-verify` で飛ばさない。
 
