@@ -1,6 +1,6 @@
 # 構成
 
-kakeibot の今の形を書く。使う技術、リポジトリと iOS のフォルダ、パッケージ、画面の仕組み、通知、テストの順に並べる。
+kakeibot の今の形を書く。
 
 ## 使う技術
 
@@ -8,6 +8,7 @@ OS ごとに、次の技術を使う。
 
 | 項目 | iOS | Android |
 | --- | --- | --- |
+| 言語 | Swift 6 | Kotlin |
 | 画面 | decisions の「画面の作り」 | Jetpack Compose |
 | 保存 | decisions の「DB」 | Room（SQLite）。表の形は iOS と同じ |
 | ウィジェット | WidgetKit | Glance |
@@ -33,6 +34,8 @@ kakeibot/
 ```
 
 ## ios
+
+`ios/` の中は、次の形である。
 
 ```
 ios/
@@ -181,6 +184,8 @@ flowchart TB
 - ファイル名の頭に画面の名前を付ける（`HomeView`、`HomeModel`）
 
 ## Features と AppFeature
+
+画面の処理は、各画面と、画面どうしをつなぐ部分に分ける。
 
 | ターゲット | 受け持つこと | 知らないこと |
 | --- | --- | --- |
