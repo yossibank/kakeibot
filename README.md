@@ -44,6 +44,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | 対象 | コマンド |
 | --- | --- |
 | 道具を入れ、hook を入れる | `make setup` |
+| Xcode でプロジェクトを開く | `make open` |
 | iOS のビルド（シミュレーター） | `make build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
 | Swift の整形 | `make format` |

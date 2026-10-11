@@ -369,6 +369,7 @@
 		78875D403079D363005422E3 /* Debug configuration for PBXNativeTarget "Kakeibot" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Black AppIcon-Forest AppIcon-Silver AppIcon-Ivory AppIcon-White AppIcon-Gold";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Kakeibot/Kakeibot.entitlements;
@@ -406,6 +407,7 @@
 		78875D413079D363005422E3 /* Release configuration for PBXNativeTarget "Kakeibot" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Black AppIcon-Forest AppIcon-Silver AppIcon-Ivory AppIcon-White AppIcon-Gold";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Kakeibot/Kakeibot.entitlements;
