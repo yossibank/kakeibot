@@ -13,10 +13,11 @@ public extension EntryDay {
     }
 
     static func grouping(_ entries: [Entry]) -> [EntryDay] {
-        let byDate = Dictionary(grouping: entries, by: \.date)
-
-        return byDate
-            .map { EntryDay(date: $0.key, entries: $0.value.sorted(by: isNewer)) }
+        Dictionary(grouping: entries, by: \.date)
+            .map { date, entries in
+                let sorted = entries.sorted(by: isNewer)
+                return EntryDay(date: date, entries: sorted)
+            }
             .sorted { $0.date > $1.date }
     }
 }
