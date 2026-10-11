@@ -20,4 +20,4 @@ kakeibot の文書を読み書きするときに読み込まれる。どの事�
 | roadmap | 作る順番、状態、画面 | 設定・環境の状態 |
 | spec/export-format | 書き出しの形式 | 表の形（data へリンク） |
 
-README のバッジは、overview と同じ事実を書く例外。CLAUDE.md の「文書」の表で一緒に直す。
+README のバッジは、ほかの文書と同じ事実を書く例外である。対応 OS は overview、Swift の版は architecture と同じにする。CLAUDE.md の「文書」の表で一緒に直す。
