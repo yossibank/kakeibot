@@ -13,7 +13,7 @@ flowchart LR
 
 | 順 | 中身 | OS | 状態 |
 | --- | --- | --- | --- |
-| 0 | 土台（下の表） | iOS | 🚧 作業中 |
+| 0 | 土台（下の表） | iOS | ✅ 完了 |
 | 1 | 入力シート、記録の一覧 → 毎日使い始める | iOS | ⬜ 未着手 |
 | 2 | 財布の残高、振替 | iOS | ⬜ 未着手 |
 | 3 | 期間の設定、予算、ホームの「あといくら」 | iOS | ⬜ 未着手 |
@@ -35,7 +35,7 @@ flowchart LR
 | 3 | `spec/fixtures/date` → Core の Date → CoreTests | Claude | ✅ 完了 |
 | 4 | DB の最初の形（[data.md](data.md) の表すべて）と Records | Claude | ✅ 完了 |
 | 5 | 書き出し V1（Core の Export、Store の Snapshot、往復の fixtures） | Claude | ✅ 完了 |
-| 6 | 実機で `0xdead10cc` が起きないか確かめる | 自分 | ⬜ 未着手 |
+| 6 | 実機で `0xdead10cc` が起きないか確かめる | 自分 | ✅ 完了 |
 
 0 番が終わったと言える条件と、その確かめ方を次の表に挙げる。
 
