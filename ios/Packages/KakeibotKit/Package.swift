@@ -4,13 +4,25 @@ import PackageDescription
 
 let package = Package(
     name: "KakeibotKit",
-    platforms: [.iOS(.v18), .macOS(.v15)],
+    platforms: [
+        .iOS(.v18),
+        .macOS(.v15)
+    ],
     products: [
-        .library(name: "Core", targets: ["Core"]),
-        .library(name: "Store", targets: ["Store"])
+        .library(
+            name: "Core",
+            targets: ["Core"]
+        ),
+        .library(
+            name: "Store",
+            targets: ["Store"]
+        )
     ],
     dependencies: [
-        .package(url: "https://github.com/groue/GRDB.swift", from: "7.11.1")
+        .package(
+            url: "https://github.com/groue/GRDB.swift",
+            from: "7.11.1"
+        )
     ],
     targets: [
         .target(name: "Core"),
@@ -21,7 +33,13 @@ let package = Package(
                 .product(name: "GRDB", package: "GRDB.swift")
             ]
         ),
-        .testTarget(name: "CoreTests", dependencies: ["Core"]),
-        .testTarget(name: "StoreTests", dependencies: ["Store"])
+        .testTarget(
+            name: "CoreTests",
+            dependencies: ["Core"]
+        ),
+        .testTarget(
+            name: "StoreTests",
+            dependencies: ["Store"]
+        )
     ]
 )

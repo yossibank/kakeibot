@@ -20,11 +20,17 @@ private struct Provider: TimelineProvider {
         SimpleEntry(date: .now)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
+    func getSnapshot(
+        in context: Context,
+        completion: @escaping (SimpleEntry) -> Void
+    ) {
         completion(SimpleEntry(date: .now))
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> Void) {
+    func getTimeline(
+        in context: Context,
+        completion: @escaping (Timeline<SimpleEntry>) -> Void
+    ) {
         completion(Timeline(entries: [SimpleEntry(date: .now)], policy: .never))
     }
 }

@@ -4,16 +4,27 @@ import PackageDescription
 
 let package = Package(
     name: "KakeibotApp",
-    platforms: [.iOS(.v18)],
+    platforms: [
+        .iOS(.v18)
+    ],
     products: [
-        .library(name: "AppFeature", targets: ["AppFeature"]),
-        .library(name: "WidgetFeature", targets: ["WidgetFeature"])
+        .library(
+            name: "AppFeature",
+            targets: ["AppFeature"]
+        ),
+        .library(
+            name: "WidgetFeature",
+            targets: ["WidgetFeature"]
+        )
     ],
     dependencies: [
         .package(path: "../KakeibotKit")
     ],
     targets: [
-        .target(name: "AppFeature", dependencies: ["Features", "Notifications"]),
+        .target(
+            name: "AppFeature",
+            dependencies: ["Features", "Notifications"]
+        ),
         .target(
             name: "WidgetFeature",
             dependencies: [
@@ -30,13 +41,23 @@ let package = Package(
         ),
         .target(
             name: "Notifications",
-            dependencies: [.product(name: "Core", package: "KakeibotKit")]
+            dependencies: [
+                .product(name: "Core", package: "KakeibotKit")
+            ]
         ),
         .target(
             name: "DesignSystem",
-            dependencies: [.product(name: "Core", package: "KakeibotKit")]
+            dependencies: [
+                .product(name: "Core", package: "KakeibotKit")
+            ]
         ),
-        .testTarget(name: "AppFeatureTests", dependencies: ["AppFeature"]),
-        .testTarget(name: "FeaturesTests", dependencies: ["Features"])
+        .testTarget(
+            name: "AppFeatureTests",
+            dependencies: ["AppFeature"]
+        ),
+        .testTarget(
+            name: "FeaturesTests",
+            dependencies: ["Features"]
+        )
     ]
 )
