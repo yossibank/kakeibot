@@ -1,6 +1,10 @@
 # 画面と作る順番
 
+kakeibot を作る順番と、その状態、作る画面を書く。
+
 ## 作る順番
+
+作る順番は、大きく 4 つの段階に分かれる。
 
 ```mermaid
 flowchart LR
@@ -9,29 +13,29 @@ flowchart LR
 
 | 順 | 中身 | OS | 状態 |
 | --- | --- | --- | --- |
-| 0 | 土台（下の表） | iOS | 🚧 |
-| 1 | 入力シート、記録の一覧 → 毎日使い始める | iOS | ⬜ |
-| 2 | 財布の残高、振替 | iOS | ⬜ |
-| 3 | 期間の設定、予算、ホームの「あといくら」 | iOS | ⬜ |
-| 4 | 振り返り、カレンダー | iOS | ⬜ |
-| 5 | 固定費・繰り返し、通知 | iOS | ⬜ |
-| 6 | Core を Kotlin に移して fixtures を通し、1〜5 の画面を作る | Android | ⬜ |
-| 7 | 自作のアイコン、カレンダーのスタンプ | 両方 | ⬜ |
-| 8 | テーマ | 両方 | ⬜ |
-| 9 | キャラクター、ごほうび貯金 | 両方 | ⬜ |
-| 10 | ウィジェット | 両方 | ⬜ |
-| 11 | ストアの準備 | 両方 | ⬜ |
+| 0 | 土台（下の表） | iOS | 🚧 作業中 |
+| 1 | 入力シート、記録の一覧 → 毎日使い始める | iOS | ⬜ 未着手 |
+| 2 | 財布の残高、振替 | iOS | ⬜ 未着手 |
+| 3 | 期間の設定、予算、ホームの「あといくら」 | iOS | ⬜ 未着手 |
+| 4 | 振り返り、カレンダー | iOS | ⬜ 未着手 |
+| 5 | 固定費・繰り返し、通知 | iOS | ⬜ 未着手 |
+| 6 | Core を Kotlin に移して fixtures を通し、1〜5 の画面を作る | Android | ⬜ 未着手 |
+| 7 | 自作のアイコン、カレンダーのスタンプ | 両方 | ⬜ 未着手 |
+| 8 | テーマ | 両方 | ⬜ 未着手 |
+| 9 | キャラクター、ごほうび貯金 | 両方 | ⬜ 未着手 |
+| 10 | ウィジェット | 両方 | ⬜ 未着手 |
+| 11 | ストアの準備 | 両方 | ⬜ 未着手 |
 
 ### 0 番の中身
 
 | 順 | 作業 | 担当 | 状態 |
 | --- | --- | --- | --- |
-| 1 | Xcode プロジェクト（アプリ、ウィジェット、App Group、Swift 6、iOS 18、iPhone のみ） | 自分 | ✅ |
-| 2 | KakeibotKit・KakeibotApp の骨組みと、Xcode プロジェクトへのつなぎ | Claude | ⬜ |
-| 3 | `spec/fixtures/date` → Core の Date → CoreTests | Claude | ⬜ |
-| 4 | DB の最初の形（[data.md](data.md) の表すべて）と Records | Claude | ⬜ |
-| 5 | 書き出し V1（Core の Export、Store の Snapshot、往復の fixtures） | Claude | ⬜ |
-| 6 | 実機で `0xdead10cc` が起きないか確かめる | 自分 | ⬜ |
+| 1 | Xcode プロジェクト（アプリ、ウィジェット、App Group、Swift 6、iOS 18、iPhone のみ） | 自分 | ✅ 完了 |
+| 2 | KakeibotKit・KakeibotApp の骨組みと、Xcode プロジェクトへのつなぎ | Claude | ⬜ 未着手 |
+| 3 | `spec/fixtures/date` → Core の Date → CoreTests | Claude | ⬜ 未着手 |
+| 4 | DB の最初の形（[data.md](data.md) の表すべて）と Records | Claude | ⬜ 未着手 |
+| 5 | 書き出し V1（Core の Export、Store の Snapshot、往復の fixtures） | Claude | ⬜ 未着手 |
+| 6 | 実機で `0xdead10cc` が起きないか確かめる | 自分 | ⬜ 未着手 |
 
 0 番が終わったと言える条件：
 
@@ -43,6 +47,8 @@ flowchart LR
 | 裏に回ってもアプリが止められない | 実機 |
 
 ## 画面
+
+画面は、タブと、そこから開くシート・設定に分かれる。
 
 ### タブと ＋ ボタン
 
