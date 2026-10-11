@@ -27,3 +27,12 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | `year-month-text.json` | 月の文字列の判定 | `valid`、`invalid`（文字列） |
 
 `year-month-period.json` では、期間の範囲のほかに日付から月への向きも試す。`start` と `end` はその月に入り、`start` の前日と `end` の翌日は前後の月に入る。
+
+## export
+
+`spec/fixtures/export` のファイルは、次の表のとおりである。形式は [export-format.md](export-format.md) にある。
+
+| ファイル | 試すこと | 項目 |
+| --- | --- | --- |
+| `export-v1.json` | 読み込んで書き出すと同じ JSON になる。DB に入れて読み出しても同じになる | 書き出しの JSON そのもの |
+| `export-v1-header.json` | 読み込める `format` と `version` の判定 | `valid`、`invalid`（`format` と `version` のオブジェクト） |

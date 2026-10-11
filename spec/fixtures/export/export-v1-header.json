@@ -1,0 +1,10 @@
+{
+  "valid": [
+    { "format": "kakeibot-export", "version": 1 }
+  ],
+  "invalid": [
+    { "format": "kakeibot-backup", "version": 1 },
+    { "format": "kakeibot-export", "version": 0 },
+    { "format": "kakeibot-export", "version": 2 }
+  ]
+}

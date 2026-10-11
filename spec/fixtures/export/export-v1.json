@@ -1,0 +1,300 @@
+{
+  "format": "kakeibot-export",
+  "version": 1,
+  "exportedAt": "2026-10-09T12:00:00Z",
+  "app": { "platform": "ios", "version": "1.0.0" },
+  "data": {
+    "icons": [
+      {
+        "id": "10000000-0000-4000-8000-000000000001",
+        "emoji": "🍙",
+        "text": null,
+        "color": "#FF8800",
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": "10000000-0000-4000-8000-000000000002",
+        "emoji": null,
+        "text": "給",
+        "color": "#2E8B57",
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-02-01T09:30:00Z"
+      }
+    ],
+    "wallets": [
+      {
+        "id": "20000000-0000-4000-8000-000000000001",
+        "name": "財布",
+        "kind": "cash",
+        "iconId": "10000000-0000-4000-8000-000000000001",
+        "initialBalance": 1000,
+        "sortOrder": 0,
+        "archivedAt": null,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": "20000000-0000-4000-8000-000000000002",
+        "name": "銀行",
+        "kind": "bank",
+        "iconId": "10000000-0000-4000-8000-000000000002",
+        "initialBalance": 50000,
+        "sortOrder": 1,
+        "archivedAt": null,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": "20000000-0000-4000-8000-000000000003",
+        "name": "カード",
+        "kind": "card",
+        "iconId": "10000000-0000-4000-8000-000000000001",
+        "initialBalance": -5000,
+        "sortOrder": 2,
+        "archivedAt": "2026-09-30T15:00:00Z",
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-09-30T15:00:00Z"
+      }
+    ],
+    "categories": [
+      {
+        "id": "30000000-0000-4000-8000-000000000001",
+        "kind": "expense",
+        "name": "食費",
+        "iconId": "10000000-0000-4000-8000-000000000001",
+        "sortOrder": 0,
+        "archivedAt": null,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": "30000000-0000-4000-8000-000000000002",
+        "kind": "income",
+        "name": "給料",
+        "iconId": "10000000-0000-4000-8000-000000000002",
+        "sortOrder": 0,
+        "archivedAt": null,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "entries": [
+      {
+        "id": "50000000-0000-4000-8000-000000000001",
+        "type": "expense",
+        "amount": 980,
+        "date": "2026-09-27",
+        "categoryId": "30000000-0000-4000-8000-000000000001",
+        "walletId": "20000000-0000-4000-8000-000000000002",
+        "toWalletId": null,
+        "memo": "動画",
+        "recurringId": "40000000-0000-4000-8000-000000000001",
+        "recurringDate": "2026-09-27",
+        "createdAt": "2026-09-27T00:00:00Z",
+        "updatedAt": "2026-09-27T00:00:00Z"
+      },
+      {
+        "id": "50000000-0000-4000-8000-000000000002",
+        "type": "income",
+        "amount": 250000,
+        "date": "2026-09-25",
+        "categoryId": "30000000-0000-4000-8000-000000000002",
+        "walletId": "20000000-0000-4000-8000-000000000002",
+        "toWalletId": null,
+        "memo": null,
+        "recurringId": null,
+        "recurringDate": null,
+        "createdAt": "2026-09-25T01:00:00Z",
+        "updatedAt": "2026-09-25T01:00:00Z"
+      },
+      {
+        "id": "50000000-0000-4000-8000-000000000003",
+        "type": "transfer",
+        "amount": 3000,
+        "date": "2026-09-28",
+        "categoryId": null,
+        "walletId": "20000000-0000-4000-8000-000000000002",
+        "toWalletId": "20000000-0000-4000-8000-000000000001",
+        "memo": "おろす",
+        "recurringId": null,
+        "recurringDate": null,
+        "createdAt": "2026-09-28T03:00:00Z",
+        "updatedAt": "2026-09-28T03:00:00Z"
+      },
+      {
+        "id": "50000000-0000-4000-8000-000000000004",
+        "type": "expense",
+        "amount": 4800,
+        "date": "2026-10-01",
+        "categoryId": "30000000-0000-4000-8000-000000000001",
+        "walletId": "20000000-0000-4000-8000-000000000001",
+        "toWalletId": null,
+        "memo": "靴",
+        "recurringId": null,
+        "recurringDate": null,
+        "createdAt": "2026-10-01T10:00:00Z",
+        "updatedAt": "2026-10-01T10:00:00Z"
+      }
+    ],
+    "budgets": [
+      {
+        "id": "60000000-0000-4000-8000-000000000001",
+        "categoryId": null,
+        "fromMonth": "2026-01",
+        "amount": 100000
+      },
+      {
+        "id": "60000000-0000-4000-8000-000000000002",
+        "categoryId": "30000000-0000-4000-8000-000000000001",
+        "fromMonth": "2026-01",
+        "amount": 30000
+      },
+      {
+        "id": "60000000-0000-4000-8000-000000000003",
+        "categoryId": null,
+        "fromMonth": "2026-07",
+        "amount": null
+      }
+    ],
+    "recurrings": [
+      {
+        "id": "40000000-0000-4000-8000-000000000001",
+        "type": "expense",
+        "amount": 980,
+        "categoryId": "30000000-0000-4000-8000-000000000001",
+        "walletId": "20000000-0000-4000-8000-000000000002",
+        "toWalletId": null,
+        "memo": "動画",
+        "frequency": "monthly",
+        "month": null,
+        "day": 27,
+        "startDate": "2026-01-27",
+        "endDate": null,
+        "remindDaysBefore": 1,
+        "generatedUntil": "2026-09-27",
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-09-27T00:00:00Z"
+      },
+      {
+        "id": "40000000-0000-4000-8000-000000000002",
+        "type": "transfer",
+        "amount": 20000,
+        "categoryId": null,
+        "walletId": "20000000-0000-4000-8000-000000000002",
+        "toWalletId": "20000000-0000-4000-8000-000000000001",
+        "memo": null,
+        "frequency": "yearly",
+        "month": 12,
+        "day": 31,
+        "startDate": "2026-12-31",
+        "endDate": "2030-12-31",
+        "remindDaysBefore": null,
+        "generatedUntil": null,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "rewardRules": [
+      {
+        "id": "70000000-0000-4000-8000-000000000001",
+        "name": "自炊した日",
+        "amount": 300,
+        "iconId": "10000000-0000-4000-8000-000000000001",
+        "isActive": true,
+        "sortOrder": 0,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      },
+      {
+        "id": "70000000-0000-4000-8000-000000000002",
+        "name": "歩いて帰った日",
+        "amount": 100,
+        "iconId": "10000000-0000-4000-8000-000000000002",
+        "isActive": false,
+        "sortOrder": 1,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-03-01T00:00:00Z"
+      }
+    ],
+    "rewardLogs": [
+      {
+        "id": "80000000-0000-4000-8000-000000000001",
+        "ruleId": "70000000-0000-4000-8000-000000000001",
+        "date": "2026-09-27",
+        "amount": 300,
+        "createdAt": "2026-09-27T12:00:00Z"
+      }
+    ],
+    "rewardGoals": [
+      {
+        "id": "90000000-0000-4000-8000-000000000001",
+        "name": "新しい靴",
+        "targetAmount": 4800,
+        "purchasedAt": "2026-10-01T10:00:00Z",
+        "entryId": "50000000-0000-4000-8000-000000000004",
+        "createdAt": "2026-06-01T00:00:00Z",
+        "updatedAt": "2026-10-01T10:00:00Z"
+      },
+      {
+        "id": "90000000-0000-4000-8000-000000000002",
+        "name": "旅行",
+        "targetAmount": 50000,
+        "purchasedAt": null,
+        "entryId": null,
+        "createdAt": "2026-06-01T00:00:00Z",
+        "updatedAt": "2026-06-01T00:00:00Z"
+      }
+    ],
+    "calendarStamps": [
+      {
+        "id": "a0000000-0000-4000-8000-000000000001",
+        "date": "2026-09-27",
+        "iconId": "10000000-0000-4000-8000-000000000001",
+        "createdAt": "2026-09-27T12:00:00Z"
+      }
+    ],
+    "noSpendDays": [
+      {
+        "date": "2026-09-26",
+        "createdAt": "2026-09-26T14:00:00Z"
+      },
+      {
+        "date": "2026-09-29",
+        "createdAt": "2026-09-29T14:00:00Z"
+      }
+    ],
+    "themes": [
+      {
+        "id": "b0000000-0000-4000-8000-000000000001",
+        "name": "標準",
+        "background": "#FFFFFF",
+        "surface": "#F5F5F5",
+        "textPrimary": "#111111",
+        "textSecondary": "#666666",
+        "accent": "#FF8800",
+        "expense": "#D33F49",
+        "income": "#2E8B57",
+        "cornerRadius": 12,
+        "fontId": "system",
+        "isBuiltin": true,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "settings": [
+      {
+        "key": "month_start_day",
+        "value": "25"
+      },
+      {
+        "key": "onboarding_completed",
+        "value": "true"
+      },
+      {
+        "key": "week_start",
+        "value": "monday"
+      }
+    ]
+  }
+}

@@ -42,4 +42,16 @@ public extension EntryCategory {
 
 extension EntryCategory: Identifiable {}
 
-extension EntryCategory: Codable {}
+extension EntryCategory: Codable {
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(kind, forKey: .kind)
+        try container.encode(name, forKey: .name)
+        try container.encode(iconId, forKey: .iconId)
+        try container.encode(sortOrder, forKey: .sortOrder)
+        try container.encodeOrNull(archivedAt, forKey: .archivedAt)
+        try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(updatedAt, forKey: .updatedAt)
+    }
+}
