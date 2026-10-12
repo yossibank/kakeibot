@@ -20,11 +20,11 @@
   ],
   "groups": [
     {
-      "name": "Spark",
+      "name": "Yen",
       "layers": [
         {
-          "name": "Spark",
-          "image-name": "spark.svg",
+          "name": "Yen",
+          "image-name": "yen.svg",
           "fill-specializations": [
             {
               "value": {
