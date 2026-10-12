@@ -5,18 +5,18 @@ public struct RingButton: View {
 
     let title: LocalizedStringKey
     let systemImage: String
-    let isProminent: Bool
+    let style: Style
     let action: () -> Void
 
     public init(
         _ title: LocalizedStringKey,
         systemImage: String,
-        isProminent: Bool = false,
+        style: Style = .plain,
         action: @escaping () -> Void
     ) {
         self.title = title
         self.systemImage = systemImage
-        self.isProminent = isProminent
+        self.style = style
         self.action = action
     }
 
@@ -36,36 +36,45 @@ public struct RingButton: View {
     }
 }
 
+public extension RingButton {
+    enum Style: Sendable {
+        case plain
+        case prominent
+        case destructive
+    }
+}
+
 private extension RingButton {
     var foreground: Color {
-        switch (isEnabled, isProminent) {
+        switch (isEnabled, style) {
         case (false, _): Palette.dusk
-        case (true, true): Palette.champagne
-        case (true, false): Palette.mist
+        case (true, .plain): Palette.mist
+        case (true, .prominent): Palette.champagne
+        case (true, .destructive): Palette.rose
         }
     }
 
     var stroke: Color {
-        switch (isEnabled, isProminent) {
+        switch (isEnabled, style) {
         case (false, _): Palette.line
-        case (true, true): Palette.gold
-        case (true, false): Palette.gold.opacity(0.35)
+        case (true, .plain): Palette.gold.opacity(0.35)
+        case (true, .prominent): Palette.gold
+        case (true, .destructive): Palette.rose.opacity(0.6)
         }
     }
 
     var fill: Color {
-        isEnabled && isProminent ? Palette.gold.opacity(0.14) : Color.clear
+        isEnabled && style == .prominent ? Palette.gold.opacity(0.14) : Color.clear
     }
 }
 
 #Preview {
     HStack(spacing: 24) {
-        RingButton("キャンセル", systemImage: "xmark") {}
+        RingButton("閉じる", systemImage: "xmark") {}
 
-        RingButton("保存", systemImage: "checkmark", isProminent: true) {}
+        RingButton("保存", systemImage: "checkmark", style: .prominent) {}
 
-        RingButton("保存", systemImage: "checkmark", isProminent: true) {}
-            .disabled(true)
+        RingButton("消す", systemImage: "trash", style: .destructive) {}
     }
     .padding()
     .background(Palette.night)

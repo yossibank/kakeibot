@@ -19,12 +19,14 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
+| `holiday-dates.json` | 1 年分の祝日と名前（振替休日・国民の休日を含む） | `year`、`holidays`（その年の祝日の `date` と `name` をすべて、日付の順に） |
 | `local-date-instant.json` | 時刻と時差から、その場所の日付を出す | `instant`、`timeZone`（IANA の名前）、`date` |
 | `local-date-text.json` | 日付の文字列の判定 | `valid`、`invalid`（文字列） |
 | `local-date-week.json` | 日付を含む週の範囲 | `weekStart`（`monday`〜`sunday`）、`date`、`start`、`end` |
 | `month-start-day.json` | 月の始まりの日の範囲 | `valid`、`invalid`（整数） |
 | `year-month-period.json` | 月の始まりごとの、その月の期間 | `monthStartDay`、`month`、`start`、`end` |
 | `year-month-text.json` | 月の文字列の判定 | `valid`、`invalid`（文字列） |
+| `year-month-weeks.json` | カレンダーのマス目 | `weekStart`、`month`、`leading`・`trailing`（前後の空きマスの数）、`rows`（週の数） |
 
 `year-month-period.json` では、期間の範囲のほかに日付から月への向きも試す。`start` と `end` はその月に入り、`start` の前日と `end` の翌日は前後の月に入る。
 

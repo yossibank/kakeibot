@@ -9,7 +9,7 @@ public struct Keypad: View {
 
     public var body: some View {
         Grid(horizontalSpacing: 0, verticalSpacing: 0) {
-            ForEach(Self.rows, id: \.self) { row in
+            ForEach(Array(Self.rows.enumerated()), id: \.offset) { index, row in
                 GridRow {
                     ForEach(row, id: \.self) { key in
                         button(for: key)
@@ -17,7 +17,7 @@ public struct Keypad: View {
                 }
                 .overlay(alignment: .top) {
                     Rectangle()
-                        .fill(Palette.gold.opacity(0.15))
+                        .fill(Palette.gold.opacity(index == 0 ? 0 : 0.15))
                         .frame(height: 0.5)
                 }
             }

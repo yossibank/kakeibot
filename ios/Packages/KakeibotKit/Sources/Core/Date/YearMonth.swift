@@ -39,6 +39,19 @@ public extension YearMonth {
         YearMonth(monthIndex: monthIndex + months)
     }
 
+    func weeks(startingOn weekStart: Weekday) -> [[LocalDate?]] {
+        let first = LocalDate(yearMonth: self, clampedDay: 1)
+        let leading = (first.weekday.daysSinceMonday - weekStart.daysSinceMonday + 7) % 7
+        let days = (0..<numberOfDays).map { first.adding(days: $0) }
+        let filled = Array(repeating: nil, count: leading) + days
+        let trailing = (7 - filled.count % 7) % 7
+        let cells = filled + Array(repeating: nil, count: trailing)
+
+        return stride(from: 0, to: cells.count, by: 7).map { start in
+            Array(cells[start..<start + 7])
+        }
+    }
+
     func period(startingOn startDay: MonthStartDay) -> ClosedRange<LocalDate> {
         let startedLastMonth = startDay.period(startingIn: adding(months: -1))
 

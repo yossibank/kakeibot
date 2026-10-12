@@ -32,6 +32,13 @@ public final class EntryModel {
 }
 
 public extension EntryModel {
+    struct WalletSection {
+        public let kind: Wallet.Kind
+        public let wallets: [Wallet]
+    }
+
+    static let categoriesPerPage = 12
+
     var isEditing: Bool {
         editingId != nil
     }
@@ -40,8 +47,26 @@ public extension EntryModel {
         categories(for: type)
     }
 
+    var categoryPages: [[EntryCategory]] {
+        stride(from: 0, to: categories.count, by: Self.categoriesPerPage).map { start in
+            let end = min(start + Self.categoriesPerPage, categories.count)
+            return Array(categories[start..<end])
+        }
+    }
+
+    var selectedCategory: EntryCategory? {
+        categories.first { $0.id == categoryId }
+    }
+
     var wallets: [Wallet] {
         options?.wallets ?? []
+    }
+
+    var walletSections: [WalletSection] {
+        Wallet.Kind.allCases.compactMap { kind in
+            let wallets = wallets.filter { $0.kind == kind }
+            return wallets.isEmpty ? nil : WalletSection(kind: kind, wallets: wallets)
+        }
     }
 
     var walletName: String {
@@ -52,8 +77,37 @@ public extension EntryModel {
         draft?.problems.isEmpty == true
     }
 
+    var saveTitle: String {
+        if isEditing {
+            return "変更を保存"
+        }
+
+        return amount == 0 ? "金額を入れてください" : "\(AmountText.text(amount)) を記録する"
+    }
+
+    static func dateText(
+        for date: LocalDate,
+        today: LocalDate
+    ) -> String {
+        let day = date.year == today.year
+            ? "\(date.month)/\(date.day)"
+            : "\(date.year)/\(date.month)/\(date.day)"
+
+        let text = "\(day)（\(date.weekday.shortName)）"
+
+        switch date {
+        case today: return "今日 \(text)"
+        case today.adding(days: -1): return "昨日 \(text)"
+        default: return text
+        }
+    }
+
     func icon(for category: EntryCategory) -> Icon? {
         options?.icons[category.iconId]
+    }
+
+    func icon(for wallet: Wallet) -> Icon? {
+        options?.icons[wallet.iconId]
     }
 
     func load() async {
@@ -166,5 +220,11 @@ private extension EntryModel {
         categoryId = entry.categoryId
         walletId = entry.walletId
         memo = entry.memo ?? ""
+    }
+}
+
+extension EntryModel.WalletSection: Identifiable {
+    public var id: Wallet.Kind {
+        kind
     }
 }

@@ -81,7 +81,7 @@ KakeibotKit/
 │   │   ├── Budget/          予算の型、「この月から」、残り、消化
 │   │   ├── Category/        記録のカテゴリ（EntryCategory）
 │   │   ├── Character/       一言の文と選び方
-│   │   ├── Date/            LocalDate、期間の区切りと呼び方、週の始まり
+│   │   ├── Date/            LocalDate、期間の区切りと呼び方、週の始まり、カレンダーのマス目、祝日
 │   │   ├── Entry/           記録の型、入力の判定、日ごとのまとめ、支出なしの日、よく使う組み合わせの並べ方
 │   │   ├── Export/
 │   │   │   ├── Upgrade/     古い版から新しい版への変換
@@ -115,13 +115,16 @@ KakeibotApp/
 │   ├── DesignSystem/
 │   │   ├── Components/      表すものごとのフォルダ
 │   │   │   ├── Amount/      金額
-│   │   │   ├── Button/      輪のボタン
+│   │   │   ├── Button/      輪のボタン、大きなボタン
+│   │   │   ├── Calendar/    月のカレンダー、曜日の名前
 │   │   │   ├── Chip/        財布・メモなどのチップ
-│   │   │   ├── Dial/        ダイヤルの目盛り
+│   │   │   ├── Dial/        ダイヤルの面と目盛り
 │   │   │   ├── Entry/       記録の 1 行
 │   │   │   ├── Icon/        アイコン、絵柄から SF Symbols への置き換え
 │   │   │   ├── Keypad/      テンキー
-│   │   │   └── Picker/      カプセルの切り替え
+│   │   │   ├── Pager/       ページの点
+│   │   │   ├── Picker/      カプセルの切り替え
+│   │   │   └── Sheet/       中身の高さに合わせたシート
 │   │   ├── Resources/
 │   │   │   ├── Assets.xcassets
 │   │   │   └── Fonts/

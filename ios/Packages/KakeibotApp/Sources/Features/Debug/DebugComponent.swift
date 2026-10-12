@@ -12,6 +12,9 @@ enum DebugComponent: CaseIterable, Identifiable {
     case ringButton
     case chip
     case capsulePicker
+    case primaryButton
+    case pageDots
+    case monthCalendar
 
     var id: Self {
         self
@@ -26,10 +29,13 @@ extension DebugComponent {
         case .icon: "アイコン"
         case .entryRow: "記録の 1 行"
         case .keypad: "テンキー"
-        case .dial: "ダイヤルの目盛り"
+        case .dial: "ダイヤル"
         case .ringButton: "輪のボタン"
         case .chip: "チップ"
         case .capsulePicker: "切り替え"
+        case .primaryButton: "大きなボタン"
+        case .pageDots: "ページの点"
+        case .monthCalendar: "月のカレンダー"
         }
     }
 
@@ -44,6 +50,9 @@ extension DebugComponent {
         case .ringButton: ringButtonPage
         case .chip: chipPage
         case .capsulePicker: CapsulePickerPage()
+        case .primaryButton: primaryButtonPage
+        case .pageDots: pageDotsPage
+        case .monthCalendar: MonthCalendarPage()
         }
     }
 }
@@ -135,25 +144,26 @@ private extension DebugComponent {
     }
 
     var dialPage: some View {
-        ZStack {
-            DialTicks(count: 60, length: 9)
-                .stroke(Palette.gold.opacity(0.85), lineWidth: 1)
+        VStack(spacing: 32) {
+            DialFace(isActive: false)
+                .frame(width: 200, height: 200)
 
-            DialTicks(count: 12, length: 14)
-                .stroke(Palette.champagne, lineWidth: 1.5)
+            DialFace(isActive: true)
+                .frame(width: 200, height: 200)
         }
-        .frame(width: 214, height: 214)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Palette.night)
     }
 
     var ringButtonPage: some View {
         HStack(spacing: 24) {
-            RingButton("キャンセル", systemImage: "xmark") {}
+            RingButton("閉じる", systemImage: "xmark") {}
 
-            RingButton("保存", systemImage: "checkmark", isProminent: true) {}
+            RingButton("保存", systemImage: "checkmark", style: .prominent) {}
 
-            RingButton("保存", systemImage: "checkmark", isProminent: true) {}
+            RingButton("消す", systemImage: "trash", style: .destructive) {}
+
+            RingButton("保存", systemImage: "checkmark", style: .prominent) {}
                 .disabled(true)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -163,7 +173,28 @@ private extension DebugComponent {
     var chipPage: some View {
         HStack {
             Chip("財布", systemImage: "wallet.bifold")
-            Chip("ランチ", systemImage: "square.and.pencil")
+            Chip("9/10（木）", systemImage: "calendar", isHighlighted: true)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Palette.night)
+    }
+
+    var primaryButtonPage: some View {
+        VStack(spacing: 16) {
+            PrimaryButton("¥12,800 を記録する") {}
+
+            PrimaryButton("金額を入れてください") {}
+                .disabled(true)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Palette.night)
+    }
+
+    var pageDotsPage: some View {
+        VStack(spacing: 24) {
+            PageDots(count: 2, current: 0)
+            PageDots(count: 3, current: 1)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Palette.night)
@@ -200,6 +231,17 @@ private struct CapsulePickerPage: View {
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Palette.night)
+    }
+}
+
+private struct MonthCalendarPage: View {
+    @State private var selection = LocalDate(Date(), in: .current)
+
+    var body: some View {
+        MonthCalendar(selection: $selection, today: LocalDate(Date(), in: .current))
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Palette.night)
     }
 }
 #endif
