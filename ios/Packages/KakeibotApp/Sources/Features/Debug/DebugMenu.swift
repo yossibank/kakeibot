@@ -1,80 +1,80 @@
 #if DEBUG
-    import Core
-    import DesignSystem
-    import SwiftUI
+import Core
+import DesignSystem
+import SwiftUI
 
-    public struct DebugMenu: View {
-        @State private var model = DebugMenuModel()
-        @State private var sheet: Sheet?
+public struct DebugMenu: View {
+    @State private var model = DebugMenuModel()
+    @State private var sheet: Sheet?
 
-        @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismiss) private var dismiss
 
-        public init() {}
+    public init() {}
 
-        public var body: some View {
-            NavigationStack {
-                List {
-                    Section("画面") {
-                        Button("入力シート（新規）") {
-                            sheet = .newEntry
-                        }
-
-                        Button("入力シート（編集）") {
-                            sheet = .editEntry
-                        }
-                    }
-                    .disabled(model.database == nil)
-
-                    Section("部品") {
-                        ForEach(DebugComponent.allCases) { component in
-                            NavigationLink(component.title) {
-                                component.page
-                                    .navigationTitle(component.title)
-                                    .navigationBarTitleDisplayMode(.inline)
-                            }
-                        }
+    public var body: some View {
+        NavigationStack {
+            List {
+                Section("画面") {
+                    Button("入力シート（新規）") {
+                        sheet = .newEntry
                     }
 
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .foregroundStyle(.red)
+                    Button("入力シート（編集）") {
+                        sheet = .editEntry
                     }
                 }
-                .navigationTitle("デバッグ")
-                .toolbar {
-                    Button("閉じる") { dismiss() }
+                .disabled(model.database == nil)
+
+                Section("部品") {
+                    ForEach(DebugComponent.allCases) { component in
+                        NavigationLink(component.title) {
+                            component.page
+                                .navigationTitle(component.title)
+                                .navigationBarTitleDisplayMode(.inline)
+                        }
+                    }
+                }
+
+                if let errorMessage = model.errorMessage {
+                    Text(errorMessage)
+                        .foregroundStyle(.red)
                 }
             }
-            .sheet(item: $sheet) { sheet in
-                entrySheet(for: sheet)
+            .navigationTitle("デバッグ")
+            .toolbar {
+                Button("閉じる") { dismiss() }
             }
-            .task { await model.prepare() }
+        }
+        .sheet(item: $sheet) { sheet in
+            entrySheet(for: sheet)
+        }
+        .task { await model.prepare() }
+    }
+}
+
+private extension DebugMenu {
+    enum Sheet: Identifiable {
+        case newEntry
+        case editEntry
+
+        var id: Self {
+            self
         }
     }
 
-    private extension DebugMenu {
-        enum Sheet: Identifiable {
-            case newEntry
-            case editEntry
+    @ViewBuilder
+    func entrySheet(for sheet: Sheet) -> some View {
+        if let database = model.database {
+            let editing = sheet == .editEntry ? model.sampleEntryId : nil
+            let today = LocalDate(Date(), in: .current)
+            let entryModel = EntryModel(database: database, editing: editing, date: today)
 
-            var id: Self {
-                self
-            }
-        }
-
-        @ViewBuilder
-        func entrySheet(for sheet: Sheet) -> some View {
-            if let database = model.database {
-                let editing = sheet == .editEntry ? model.sampleEntryId : nil
-                let today = LocalDate(Date(), in: .current)
-                let entryModel = EntryModel(database: database, editing: editing, date: today)
-
-                EntrySheet(model: entryModel)
-            }
+            EntrySheet(model: entryModel)
         }
     }
+}
 
-    #Preview {
-        DebugMenu()
-    }
+#Preview {
+    DebugMenu()
+}
 #endif

@@ -10,6 +10,7 @@
 --enable organizeDeclarations
 
 --header strip
+--ifdef no-indent
 --line-between-guards true
 --mark-categories false
 --max-width 100
