@@ -375,6 +375,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "かけいぼっと";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -413,6 +414,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "かけいぼっと";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -450,7 +452,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KakeibotWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = KakeibotWidget;
+				INFOPLIST_KEY_CFBundleDisplayName = "かけいぼっと";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -485,7 +487,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KakeibotWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = KakeibotWidget;
+				INFOPLIST_KEY_CFBundleDisplayName = "かけいぼっと";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
