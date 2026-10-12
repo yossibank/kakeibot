@@ -3,13 +3,20 @@ import Notifications
 import Store
 import SwiftUI
 
-@MainActor
-public struct RootView {
+public struct RootView: View {
     @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
 
     @Environment(\.scenePhase) private var scenePhase
 
     public init() {}
+
+    public var body: some View {
+        content
+            .task { model.open() }
+            .onChange(of: scenePhase) { _, phase in
+                model.changeScene(to: phase)
+            }
+    }
 }
 
 private extension RootView {
@@ -31,16 +38,6 @@ private extension RootView {
                 description: Text(message)
             )
         }
-    }
-}
-
-extension RootView: View {
-    public var body: some View {
-        content
-            .task { model.open() }
-            .onChange(of: scenePhase) { _, phase in
-                model.changeScene(to: phase)
-            }
     }
 }
 

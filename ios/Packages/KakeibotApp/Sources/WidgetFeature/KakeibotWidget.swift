@@ -3,12 +3,7 @@ import Store
 import SwiftUI
 import WidgetKit
 
-@MainActor
-public struct KakeibotWidget {
-    public init() {}
-}
-
-extension KakeibotWidget: Widget {
+public struct KakeibotWidget: Widget {
     public var body: some WidgetConfiguration {
         let provider = Provider()
 
@@ -18,6 +13,8 @@ extension KakeibotWidget: Widget {
         }
         .configurationDisplayName("Kakeibot")
     }
+
+    public init() {}
 }
 
 private struct Provider {}

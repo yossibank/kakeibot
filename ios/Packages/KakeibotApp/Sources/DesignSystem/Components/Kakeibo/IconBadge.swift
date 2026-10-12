@@ -1,8 +1,7 @@
 import Core
 import SwiftUI
 
-@MainActor
-public struct IconBadge {
+public struct IconBadge: View {
     let icon: Icon?
     let size: CGFloat
 
@@ -13,19 +12,7 @@ public struct IconBadge {
         self.icon = icon
         self.size = size
     }
-}
 
-private extension IconBadge {
-    var tint: Color {
-        icon.flatMap { Color(hex: $0.color) } ?? .secondary
-    }
-
-    var label: String {
-        icon?.emoji ?? icon?.text ?? ""
-    }
-}
-
-extension IconBadge: View {
     public var body: some View {
         RoundedRectangle(cornerRadius: size * 0.3, style: .continuous)
             .fill(tint.opacity(0.18))
@@ -39,6 +26,16 @@ extension IconBadge: View {
                     .padding(size * 0.1)
             }
             .accessibilityHidden(true)
+    }
+}
+
+private extension IconBadge {
+    var tint: Color {
+        icon.flatMap { Color(hex: $0.color) } ?? .secondary
+    }
+
+    var label: String {
+        icon?.emoji ?? icon?.text ?? ""
     }
 }
 

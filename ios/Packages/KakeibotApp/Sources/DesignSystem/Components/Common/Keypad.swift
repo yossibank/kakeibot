@@ -1,11 +1,22 @@
 import SwiftUI
 
-@MainActor
-public struct Keypad {
+public struct Keypad: View {
     let onKey: (Key) -> Void
 
     public init(onKey: @escaping (Key) -> Void) {
         self.onKey = onKey
+    }
+
+    public var body: some View {
+        Grid(horizontalSpacing: 8, verticalSpacing: 8) {
+            ForEach(Self.rows, id: \.self) { row in
+                GridRow {
+                    ForEach(row, id: \.self) { key in
+                        button(for: key)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -54,20 +65,6 @@ private extension Keypad {
         case let .digit(value): "\(value)"
         case .doubleZero: "00"
         case .delete: "1 文字消す"
-        }
-    }
-}
-
-extension Keypad: View {
-    public var body: some View {
-        Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-            ForEach(Self.rows, id: \.self) { row in
-                GridRow {
-                    ForEach(row, id: \.self) { key in
-                        button(for: key)
-                    }
-                }
-            }
         }
     }
 }

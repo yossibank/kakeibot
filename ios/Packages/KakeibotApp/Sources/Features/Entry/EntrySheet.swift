@@ -3,8 +3,7 @@ import DesignSystem
 import Store
 import SwiftUI
 
-@MainActor
-public struct EntrySheet {
+public struct EntrySheet: View {
     @State private var model: EntryModel
     @State private var isConfirmingDelete = false
 
@@ -12,6 +11,59 @@ public struct EntrySheet {
 
     public init(model: EntryModel) {
         _model = State(initialValue: model)
+    }
+
+    public var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    Picker("種類", selection: typeBinding) {
+                        Text("支出").tag(Entry.Kind.expense)
+                        Text("収入").tag(Entry.Kind.income)
+                    }
+                    .pickerStyle(.segmented)
+
+                    AmountText(model.amount, type: model.type)
+                        .font(.system(size: 44, weight: .bold))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .accessibilityLabel("金額")
+                        .accessibilityValue(AmountText.text(model.amount))
+
+                    categoryGrid
+                    details
+
+                    if let errorMessage = model.errorMessage {
+                        Text(errorMessage)
+                            .foregroundStyle(.red)
+                    }
+
+                    if model.isEditing {
+                        Button("この記録を消す", role: .destructive) {
+                            isConfirmingDelete = true
+                        }
+                    }
+                }
+                .padding()
+            }
+            .safeAreaInset(edge: .bottom) {
+                Keypad { model.press($0) }
+                    .padding()
+                    .background(.bar)
+            }
+            .navigationTitle(model.isEditing ? "記録を直す" : "記録する")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { toolbar }
+            .confirmationDialog(
+                "この記録を消しますか",
+                isPresented: $isConfirmingDelete,
+                titleVisibility: .visible
+            ) {
+                Button("消す", role: .destructive) {
+                    Task { await delete() }
+                }
+            }
+        }
+        .task { await model.load() }
     }
 }
 
@@ -110,61 +162,6 @@ private extension EntrySheet {
         if await model.delete() {
             dismiss()
         }
-    }
-}
-
-extension EntrySheet: View {
-    public var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    Picker("種類", selection: typeBinding) {
-                        Text("支出").tag(Entry.Kind.expense)
-                        Text("収入").tag(Entry.Kind.income)
-                    }
-                    .pickerStyle(.segmented)
-
-                    AmountText(model.amount, type: model.type)
-                        .font(.system(size: 44, weight: .bold))
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .accessibilityLabel("金額")
-                        .accessibilityValue(AmountText.text(model.amount))
-
-                    categoryGrid
-                    details
-
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .foregroundStyle(.red)
-                    }
-
-                    if model.isEditing {
-                        Button("この記録を消す", role: .destructive) {
-                            isConfirmingDelete = true
-                        }
-                    }
-                }
-                .padding()
-            }
-            .safeAreaInset(edge: .bottom) {
-                Keypad { model.press($0) }
-                    .padding()
-                    .background(.bar)
-            }
-            .navigationTitle(model.isEditing ? "記録を直す" : "記録する")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { toolbar }
-            .confirmationDialog(
-                "この記録を消しますか",
-                isPresented: $isConfirmingDelete,
-                titleVisibility: .visible
-            ) {
-                Button("消す", role: .destructive) {
-                    Task { await delete() }
-                }
-            }
-        }
-        .task { await model.load() }
     }
 }
 
