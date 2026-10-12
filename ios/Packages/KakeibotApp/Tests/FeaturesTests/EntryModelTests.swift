@@ -86,6 +86,56 @@ struct EntryModelTests {
     }
 
     @Test
+    func groupsWalletsByKind() async throws {
+        let model = try await Self.newModel()
+
+        let sections = model.walletSections
+
+        #expect(sections.map(\.kind) == [.cash, .bank])
+        #expect(sections.map { $0.wallets.map(\.name) } == [["財布"], ["銀行"]])
+    }
+
+    @Test
+    func splitsCategoriesIntoPages() async throws {
+        let model = try await Self.newModel()
+
+        let expensePages = model.categoryPages
+        model.select(.income)
+        let incomePages = model.categoryPages
+
+        #expect(expensePages.map(\.count) == [12])
+        #expect(incomePages.map(\.count) == [3])
+    }
+
+    @Test
+    func namesSaveButtonByState() async throws {
+        let model = try await Self.newModel()
+
+        let empty = model.saveTitle
+        model.press(.digit(9))
+        model.press(.digit(8))
+        model.press(.digit(0))
+
+        #expect(empty == "金額を入れてください")
+        #expect(model.saveTitle == "¥980 を記録する")
+    }
+
+    @Test(arguments: [
+        ("2026-10-12", "今日 10/12（月）"),
+        ("2026-10-11", "昨日 10/11（日）"),
+        ("2026-10-05", "10/5（月）"),
+        ("2025-12-31", "2025/12/31（水）")
+    ])
+    func describesDate(text: String, expected: String) throws {
+        let today = try #require(LocalDate("2026-10-12"))
+        let date = try #require(LocalDate(text))
+
+        let description = EntryModel.dateText(for: date, today: today)
+
+        #expect(description == expected)
+    }
+
+    @Test
     func deletesExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)

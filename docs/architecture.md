@@ -115,12 +115,14 @@ KakeibotApp/
 │   ├── DesignSystem/
 │   │   ├── Components/      表すものごとのフォルダ
 │   │   │   ├── Amount/      金額
-│   │   │   ├── Button/      輪のボタン
+│   │   │   ├── Button/      輪のボタン、大きなボタン
+│   │   │   ├── Calendar/    月のカレンダー、曜日の名前
 │   │   │   ├── Chip/        財布・メモなどのチップ
-│   │   │   ├── Dial/        ダイヤルの目盛り
+│   │   │   ├── Dial/        ダイヤルの面と目盛り
 │   │   │   ├── Entry/       記録の 1 行
 │   │   │   ├── Icon/        アイコン、絵柄から SF Symbols への置き換え
 │   │   │   ├── Keypad/      テンキー
+│   │   │   ├── Pager/       ページの点
 │   │   │   └── Picker/      カプセルの切り替え
 │   │   ├── Resources/
 │   │   │   ├── Assets.xcassets

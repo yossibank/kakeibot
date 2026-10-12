@@ -25,6 +25,7 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | `month-start-day.json` | 月の始まりの日の範囲 | `valid`、`invalid`（整数） |
 | `year-month-period.json` | 月の始まりごとの、その月の期間 | `monthStartDay`、`month`、`start`、`end` |
 | `year-month-text.json` | 月の文字列の判定 | `valid`、`invalid`（文字列） |
+| `year-month-weeks.json` | カレンダーのマス目 | `weekStart`、`month`、`leading`・`trailing`（前後の空きマスの数）、`rows`（週の数） |
 
 `year-month-period.json` では、期間の範囲のほかに日付から月への向きも試す。`start` と `end` はその月に入り、`start` の前日と `end` の翌日は前後の月に入る。
 
