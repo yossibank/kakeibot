@@ -6,6 +6,7 @@ import SwiftUI
 public struct EntrySheet: View {
     @State private var model: EntryModel
     @State private var isEnteringAmount = false
+    @State private var isEditingMemo = false
     @State private var categoryPage = 0
     @State private var sheet: Sheet?
 
@@ -45,6 +46,12 @@ public struct EntrySheet: View {
             if isEnteringAmount {
                 keypadDrawer
                     .transition(.move(edge: .bottom))
+            }
+        }
+        .ignoresSafeArea(.keyboard)
+        .overlay(alignment: .bottom) {
+            if isEditingMemo {
+                memoOverlay
             }
         }
         .background {
@@ -124,7 +131,7 @@ private extension EntrySheet {
             }
 
             Button {
-                open(.memo)
+                editMemo(true)
             } label: {
                 Chip(
                     model.memo.isEmpty ? "メモ" : model.memo,
@@ -182,6 +189,24 @@ private extension EntrySheet {
                         .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
+        }
+    }
+
+    var memoOverlay: some View {
+        ZStack(alignment: .bottom) {
+            Color.black
+                .opacity(0.35)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    editMemo(false)
+                }
+
+            EntryMemoCard(model: model) {
+                editMemo(false)
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
         }
     }
 
@@ -273,8 +298,6 @@ private extension EntrySheet {
             EntryWalletSheet(model: model)
         case .date:
             EntryDateSheet(model: model, today: today)
-        case .memo:
-            EntryMemoSheet(model: model)
         case .delete:
             EntryDeleteSheet(model: model, today: today) {
                 Task { await delete() }
@@ -287,7 +310,6 @@ private extension EntrySheet {
     enum Sheet: Identifiable {
         case wallet
         case date
-        case memo
         case delete
 
         var id: Self {
@@ -317,6 +339,14 @@ private extension EntrySheet {
     func open(_ sheet: Sheet) {
         setEnteringAmount(false)
         self.sheet = sheet
+    }
+
+    func editMemo(_ isEditing: Bool) {
+        setEnteringAmount(false)
+
+        withAnimation(.snappy) {
+            isEditingMemo = isEditing
+        }
     }
 
     func setEnteringAmount(_ isEntering: Bool) {

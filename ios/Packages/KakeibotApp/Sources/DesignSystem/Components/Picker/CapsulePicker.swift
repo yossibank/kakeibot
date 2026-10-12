@@ -3,6 +3,8 @@ import SwiftUI
 public struct CapsulePicker<Value: Hashable>: View {
     @Binding var selection: Value
 
+    @State private var thumbOffset: CGFloat?
+
     let options: [Option]
 
     public init(
@@ -14,14 +16,39 @@ public struct CapsulePicker<Value: Hashable>: View {
     }
 
     public var body: some View {
-        HStack(spacing: 0) {
-            ForEach(options, id: \.value) { option in
-                button(for: option)
+        ZStack(alignment: .leading) {
+            Capsule()
+                .fill(Palette.gold)
+                .frame(width: Self.segmentWidth, height: Self.segmentHeight)
+                .offset(x: thumbX)
+
+            HStack(spacing: 0) {
+                ForEach(Array(options.enumerated()), id: \.offset) { index, option in
+                    let isHighlighted = index == highlightedIndex
+
+                    Text(option.title)
+                        .font(.footnote.weight(isHighlighted ? .bold : .regular))
+                        .foregroundStyle(isHighlighted ? Palette.nightBottom : Palette.mist)
+                        .frame(width: Self.segmentWidth, height: Self.segmentHeight)
+                }
             }
         }
-        .padding(3)
+        .padding(Self.inset)
+        .fixedSize()
         .background(Palette.gold.opacity(0.08), in: Capsule())
         .overlay(Capsule().stroke(Palette.gold.opacity(0.3), lineWidth: 1))
+        .contentShape(Capsule())
+        .gesture(dragGesture)
+        .sensoryFeedback(.selection, trigger: highlightedIndex)
+        .accessibilityRepresentation {
+            Picker("", selection: $selection) {
+                ForEach(options, id: \.value) { option in
+                    Text(option.title)
+                        .tag(option.value)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
     }
 }
 
@@ -41,18 +68,64 @@ public extension CapsulePicker {
 }
 
 private extension CapsulePicker {
-    func button(for option: Option) -> some View {
-        let isSelected = selection == option.value
+    static var segmentWidth: CGFloat {
+        72
+    }
 
-        return Button(option.title) {
-            selection = option.value
-        }
-        .font(.footnote.weight(isSelected ? .bold : .regular))
-        .foregroundStyle(isSelected ? Palette.nightBottom : Palette.mist)
-        .padding(.horizontal, 18)
-        .padding(.vertical, 6)
-        .background(isSelected ? Palette.gold : Color.clear, in: Capsule())
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    static var segmentHeight: CGFloat {
+        30
+    }
+
+    static var inset: CGFloat {
+        3
+    }
+
+    static var spring: Animation {
+        .spring(response: 0.32, dampingFraction: 0.78)
+    }
+
+    var selectedIndex: Int {
+        options.firstIndex { $0.value == selection } ?? 0
+    }
+
+    var maxOffset: CGFloat {
+        CGFloat(options.count - 1) * Self.segmentWidth
+    }
+
+    var thumbX: CGFloat {
+        thumbOffset ?? CGFloat(selectedIndex) * Self.segmentWidth
+    }
+
+    var highlightedIndex: Int {
+        index(at: thumbX + Self.segmentWidth / 2)
+    }
+
+    var dragGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                let start = CGFloat(selectedIndex) * Self.segmentWidth
+                let touch = value.startLocation.x - Self.inset
+
+                guard (start...(start + Self.segmentWidth)).contains(touch) else {
+                    return
+                }
+
+                thumbOffset = min(max(start + value.translation.width, 0), maxOffset)
+            }
+            .onEnded { value in
+                let center = thumbOffset.map { $0 + Self.segmentWidth / 2 }
+                let index = index(at: center ?? value.location.x - Self.inset)
+
+                withAnimation(Self.spring) {
+                    thumbOffset = nil
+                    selection = options[index].value
+                }
+            }
+    }
+
+    func index(at x: CGFloat) -> Int {
+        let index = Int((x / Self.segmentWidth).rounded(.down))
+        return min(max(index, 0), options.count - 1)
     }
 }
 
