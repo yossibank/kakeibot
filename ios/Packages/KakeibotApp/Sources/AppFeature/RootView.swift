@@ -6,19 +6,10 @@ import SwiftUI
 @MainActor
 public struct RootView {
     @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
+
     @Environment(\.scenePhase) private var scenePhase
 
     public init() {}
-}
-
-extension RootView: View {
-    public var body: some View {
-        content
-            .task { model.open() }
-            .onChange(of: scenePhase) { _, phase in
-                model.changeScene(to: phase)
-            }
-    }
 }
 
 private extension RootView {
@@ -28,7 +19,11 @@ private extension RootView {
         case .opening:
             ProgressView()
         case let .ready(database):
-            ready(database)
+            #if DEBUG
+                DebugView(database: database)
+            #else
+                Text("Kakeibot")
+            #endif
         case let .failed(message):
             ContentUnavailableView(
                 "データを開けませんでした",
@@ -37,14 +32,15 @@ private extension RootView {
             )
         }
     }
+}
 
-    @ViewBuilder
-    func ready(_ database: AppDatabase) -> some View {
-        #if DEBUG
-            DebugView(database: database)
-        #else
-            Text("Kakeibot")
-        #endif
+extension RootView: View {
+    public var body: some View {
+        content
+            .task { model.open() }
+            .onChange(of: scenePhase) { _, phase in
+                model.changeScene(to: phase)
+            }
     }
 }
 

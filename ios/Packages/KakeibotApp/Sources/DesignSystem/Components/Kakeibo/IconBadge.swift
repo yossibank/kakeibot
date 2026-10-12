@@ -15,6 +15,16 @@ public struct IconBadge {
     }
 }
 
+private extension IconBadge {
+    var tint: Color {
+        icon.flatMap { Color(hex: $0.color) } ?? .secondary
+    }
+
+    var label: String {
+        icon?.emoji ?? icon?.text ?? ""
+    }
+}
+
 extension IconBadge: View {
     public var body: some View {
         RoundedRectangle(cornerRadius: size * 0.3, style: .continuous)
@@ -29,16 +39,6 @@ extension IconBadge: View {
                     .padding(size * 0.1)
             }
             .accessibilityHidden(true)
-    }
-}
-
-private extension IconBadge {
-    var tint: Color {
-        icon.flatMap { Color(hex: $0.color) } ?? .secondary
-    }
-
-    var label: String {
-        icon?.emoji ?? icon?.text ?? ""
     }
 }
 

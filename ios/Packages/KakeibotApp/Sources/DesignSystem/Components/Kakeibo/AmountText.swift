@@ -26,14 +26,6 @@ public extension AmountText {
     }
 }
 
-extension AmountText: View {
-    public var body: some View {
-        Text(Self.text(amount, type: type))
-            .monospacedDigit()
-            .foregroundStyle(color)
-    }
-}
-
 private extension AmountText {
     static let locale = Locale(identifier: "ja_JP")
 
@@ -43,6 +35,14 @@ private extension AmountText {
         case .transfer: .secondary
         case .expense, nil: .primary
         }
+    }
+}
+
+extension AmountText: View {
+    public var body: some View {
+        Text(Self.text(amount, type: type))
+            .monospacedDigit()
+            .foregroundStyle(color)
     }
 }
 

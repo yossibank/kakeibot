@@ -7,12 +7,13 @@ import Store
 @MainActor
 @Observable
 public final class EntryModel {
-    public private(set) var type: Entry.Kind = .expense
-    public private(set) var amount = 0
     public var date: LocalDate
     public var categoryId: EntryCategory.ID?
     public var walletId: Wallet.ID?
     public var memo = ""
+
+    public private(set) var type: Entry.Kind = .expense
+    public private(set) var amount = 0
     public private(set) var options: EntryOptions?
     public private(set) var errorMessage: String?
 
@@ -150,6 +151,7 @@ private extension EntryModel {
             walletId = wallets.first?.id
             return
         }
+
         guard let entry = try await database.entry(editingId) else {
             throw AppDatabase.WriteError.entryNotFound
         }

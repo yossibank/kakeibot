@@ -7,6 +7,7 @@ import SwiftUI
 public struct EntrySheet {
     @State private var model: EntryModel
     @State private var isConfirmingDelete = false
+
     @Environment(\.dismiss) private var dismiss
 
     public init(model: EntryModel) {
@@ -14,80 +15,7 @@ public struct EntrySheet {
     }
 }
 
-extension EntrySheet: View {
-    public var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    typePicker
-                    amount
-                    categoryGrid
-                    details
-
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .foregroundStyle(.red)
-                    }
-
-                    if model.isEditing {
-                        deleteButton
-                    }
-                }
-                .padding()
-            }
-            .safeAreaInset(edge: .bottom) {
-                Keypad { model.press($0) }
-                    .padding()
-                    .background(.bar)
-            }
-            .navigationTitle(model.isEditing ? "記録を直す" : "記録する")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { toolbar }
-            .confirmationDialog(
-                "この記録を消しますか",
-                isPresented: $isConfirmingDelete,
-                titleVisibility: .visible
-            ) {
-                Button("消す", role: .destructive) {
-                    Task { await delete() }
-                }
-            }
-        }
-        .task { await model.load() }
-    }
-}
-
 private extension EntrySheet {
-    var typeBinding: Binding<Entry.Kind> {
-        Binding(
-            get: { model.type },
-            set: { model.select($0) }
-        )
-    }
-
-    var dayBinding: Binding<Date> {
-        Binding(
-            get: { Self.startOfDay(model.date) },
-            set: { model.date = LocalDate($0, in: .current) }
-        )
-    }
-
-    var typePicker: some View {
-        Picker("種類", selection: typeBinding) {
-            Text("支出").tag(Entry.Kind.expense)
-            Text("収入").tag(Entry.Kind.income)
-        }
-        .pickerStyle(.segmented)
-    }
-
-    var amount: some View {
-        AmountText(model.amount, type: model.type)
-            .font(.system(size: 44, weight: .bold))
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            .accessibilityLabel("金額")
-            .accessibilityValue(AmountText.text(model.amount))
-    }
-
     var categoryGrid: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 72))], spacing: 12) {
             ForEach(model.categories) { category in
@@ -114,12 +42,6 @@ private extension EntrySheet {
         }
     }
 
-    var deleteButton: some View {
-        Button("この記録を消す", role: .destructive) {
-            isConfirmingDelete = true
-        }
-    }
-
     @ToolbarContentBuilder
     var toolbar: some ToolbarContent {
         ToolbarItem(placement: .cancellationAction) {
@@ -132,11 +54,6 @@ private extension EntrySheet {
             }
             .disabled(!model.canSave)
         }
-    }
-
-    static func startOfDay(_ date: LocalDate) -> Date {
-        let components = DateComponents(year: date.year, month: date.month, day: date.day)
-        return Calendar.current.date(from: components) ?? Date()
     }
 
     func categoryButton(_ category: EntryCategory) -> some View {
@@ -161,6 +78,27 @@ private extension EntrySheet {
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
+}
+
+private extension EntrySheet {
+    var typeBinding: Binding<Entry.Kind> {
+        Binding(
+            get: { model.type },
+            set: { model.select($0) }
+        )
+    }
+
+    var dayBinding: Binding<Date> {
+        Binding(
+            get: { Self.startOfDay(model.date) },
+            set: { model.date = LocalDate($0, in: .current) }
+        )
+    }
+
+    static func startOfDay(_ date: LocalDate) -> Date {
+        let components = DateComponents(year: date.year, month: date.month, day: date.day)
+        return Calendar.current.date(from: components) ?? Date()
+    }
 
     func save() async {
         if await model.save() {
@@ -172,6 +110,61 @@ private extension EntrySheet {
         if await model.delete() {
             dismiss()
         }
+    }
+}
+
+extension EntrySheet: View {
+    public var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    Picker("種類", selection: typeBinding) {
+                        Text("支出").tag(Entry.Kind.expense)
+                        Text("収入").tag(Entry.Kind.income)
+                    }
+                    .pickerStyle(.segmented)
+
+                    AmountText(model.amount, type: model.type)
+                        .font(.system(size: 44, weight: .bold))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .accessibilityLabel("金額")
+                        .accessibilityValue(AmountText.text(model.amount))
+
+                    categoryGrid
+                    details
+
+                    if let errorMessage = model.errorMessage {
+                        Text(errorMessage)
+                            .foregroundStyle(.red)
+                    }
+
+                    if model.isEditing {
+                        Button("この記録を消す", role: .destructive) {
+                            isConfirmingDelete = true
+                        }
+                    }
+                }
+                .padding()
+            }
+            .safeAreaInset(edge: .bottom) {
+                Keypad { model.press($0) }
+                    .padding()
+                    .background(.bar)
+            }
+            .navigationTitle(model.isEditing ? "記録を直す" : "記録する")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { toolbar }
+            .confirmationDialog(
+                "この記録を消しますか",
+                isPresented: $isConfirmingDelete,
+                titleVisibility: .visible
+            ) {
+                Button("消す", role: .destructive) {
+                    Task { await delete() }
+                }
+            }
+        }
+        .task { await model.load() }
     }
 }
 
