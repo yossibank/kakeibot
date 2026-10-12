@@ -97,7 +97,6 @@ KakeibotKit/
 │   └── Store/
 │       ├── Database/        App Group、DatabasePool、止められる前の対策、最初の財布とカテゴリ。止める通知は AppFeature が送る
 │       ├── Migrations/      版ごとに 1 ファイル
-│       ├── Preview/         プレビュー用のサンプルデータ（#if DEBUG）
 │       ├── Queries/         記録の一覧、入力の選択肢、月の要約・日ごとの合計・よく使う組み合わせの元データ
 │       ├── Records/         Core の型を GRDB で読み書きできるようにする
 │       ├── Snapshot/        書き出し用の全データの読み出し、読み込み用の全置き換え
