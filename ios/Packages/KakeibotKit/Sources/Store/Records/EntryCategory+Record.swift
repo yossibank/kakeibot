@@ -6,3 +6,5 @@ extension EntryCategory: StoreRecord {
 }
 
 extension EntryCategory.Kind: DatabaseValueConvertible {}
+
+extension EntryCategory: ArchivableRecord {}

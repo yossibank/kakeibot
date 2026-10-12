@@ -67,6 +67,15 @@ public extension LocalDate {
         LocalDate(dayNumber: dayNumber + days)
     }
 
+    func startOfDay(in timeZone: TimeZone) -> Date {
+        let localSeconds = TimeInterval((dayNumber - Self.unixEpochDayNumber) * Self.secondsPerDay)
+        let localStart = Date(timeIntervalSince1970: localSeconds)
+        let estimatedOffset = TimeInterval(timeZone.secondsFromGMT(for: localStart))
+        let estimate = localStart.addingTimeInterval(-estimatedOffset)
+        let offset = TimeInterval(timeZone.secondsFromGMT(for: estimate))
+        return localStart.addingTimeInterval(-offset)
+    }
+
     func periodMonth(startingOn startDay: MonthStartDay) -> YearMonth {
         period(startingOn: startDay).upperBound.yearMonth
     }

@@ -34,4 +34,26 @@ struct EntryListTests {
         #expect(second?.days.first?.entries == [saved])
         #expect(second?.days.first?.expenseTotal == 980)
     }
+
+    @Test
+    func optionsSkipArchivedAndFollowSortOrder() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        let defaults = try await database.entryOptions()
+        var archived = defaults.expenseCategories[0]
+        archived.archivedAt = now
+        var moved = defaults.wallets[0]
+        moved.sortOrder = 9
+
+        try await database.writer.write { [archived, moved] db in
+            try archived.update(db)
+            try moved.update(db)
+        }
+
+        let options = try await database.entryOptions()
+
+        #expect(options.expenseCategories == Array(defaults.expenseCategories.dropFirst()))
+        #expect(options.wallets.map(\.name) == ["銀行", "財布"])
+    }
 }

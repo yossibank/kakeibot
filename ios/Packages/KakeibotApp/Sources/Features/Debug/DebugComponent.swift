@@ -10,6 +10,8 @@ enum DebugComponent: CaseIterable, Identifiable {
     case keypad
     case dial
     case ringButton
+    case chip
+    case capsulePicker
 
     var id: Self {
         self
@@ -26,6 +28,8 @@ extension DebugComponent {
         case .keypad: "テンキー"
         case .dial: "ダイヤルの目盛り"
         case .ringButton: "輪のボタン"
+        case .chip: "チップ"
+        case .capsulePicker: "切り替え"
         }
     }
 
@@ -38,6 +42,8 @@ extension DebugComponent {
         case .keypad: keypadPage
         case .dial: dialPage
         case .ringButton: ringButtonPage
+        case .chip: chipPage
+        case .capsulePicker: CapsulePickerPage()
         }
     }
 }
@@ -154,6 +160,15 @@ private extension DebugComponent {
         .background(Palette.night)
     }
 
+    var chipPage: some View {
+        HStack {
+            Chip("財布", systemImage: "wallet.bifold")
+            Chip("ランチ", systemImage: "square.and.pencil")
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Palette.night)
+    }
+
     static func icon(
         glyph: Icon.Glyph? = nil,
         emoji: String? = nil,
@@ -169,6 +184,22 @@ private extension DebugComponent {
             createdAt: now,
             updatedAt: now
         )
+    }
+}
+
+private struct CapsulePickerPage: View {
+    @State private var selection = Entry.Kind.expense
+
+    var body: some View {
+        CapsulePicker(
+            selection: $selection,
+            options: [
+                .init("支出", value: .expense),
+                .init("収入", value: .income)
+            ]
+        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Palette.night)
     }
 }
 #endif

@@ -6,3 +6,5 @@ extension Wallet: StoreRecord {
 }
 
 extension Wallet.Kind: DatabaseValueConvertible {}
+
+extension Wallet: ArchivableRecord {}
