@@ -9,6 +9,7 @@ public struct EntrySheet: View {
     @State private var isEditingMemo = false
     @State private var categoryPage = 0
     @State private var sheet: Sheet?
+    @State private var memoChipFrame: CGRect = .zero
 
     @FocusState private var isMemoFocused: Bool
 
@@ -26,6 +27,8 @@ public struct EntrySheet: View {
                 memoLayer
             }
         }
+        .coordinateSpace(.named(Self.coordinateSpace))
+        .ignoresSafeArea(.keyboard)
         .background {
             Rectangle()
                 .fill(Palette.night)
@@ -75,7 +78,6 @@ private extension EntrySheet {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .ignoresSafeArea(.keyboard)
     }
 
     var header: some View {
@@ -147,6 +149,11 @@ private extension EntrySheet {
                 )
             }
             .layoutPriority(-1)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .named(Self.coordinateSpace))
+            } action: { frame in
+                memoChipFrame = frame
+            }
 
             Spacer(minLength: 0)
         }
@@ -209,12 +216,19 @@ private extension EntrySheet {
             }
             .transition(.opacity)
 
-        EntryMemoCard(model: model, isFocused: $isMemoFocused) {
-            editMemo(false)
-        }
-        .padding(.horizontal, 12)
-        .padding(.top, 12)
-        .transition(.move(edge: .top).combined(with: .opacity))
+        Color.clear
+            .frame(height: max(memoChipFrame.minY - 10, 0))
+            .overlay(alignment: .bottom) {
+                EntryMemoCard(
+                    model: model,
+                    isFocused: $isMemoFocused,
+                    pointerX: memoChipFrame.midX - Self.memoCardInset
+                ) {
+                    editMemo(false)
+                }
+                .padding(.horizontal, Self.memoCardInset)
+            }
+            .transition(.scale(scale: 0.92, anchor: .bottom).combined(with: .opacity))
     }
 
     func dialFace(size: CGFloat) -> some View {
@@ -329,6 +343,8 @@ private extension EntrySheet {
         .init("収入", value: .income)
     ]
 
+    static let coordinateSpace = "EntrySheet"
+    static let memoCardInset: CGFloat = 12
     static let categoryRows = 3
     static let categoryColumns = 4
 
