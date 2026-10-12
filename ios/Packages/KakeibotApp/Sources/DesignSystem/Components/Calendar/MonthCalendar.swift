@@ -5,6 +5,7 @@ public struct MonthCalendar: View {
     @Binding var selection: LocalDate
 
     @State private var month: YearMonth
+    @State private var movesForward = true
 
     let today: LocalDate
     let weekStart: Weekday
@@ -45,21 +46,21 @@ public struct MonthCalendar: View {
                 }
             }
 
-            ForEach(Array(weeks.enumerated()), id: \.offset) { _, week in
-                HStack(spacing: 0) {
-                    ForEach(Array(week.enumerated()), id: \.offset) { _, date in
-                        cell(for: date)
+            VStack(spacing: 6) {
+                ForEach(Array(weeks.enumerated()), id: \.offset) { _, week in
+                    HStack(spacing: 0) {
+                        ForEach(Array(week.enumerated()), id: \.offset) { _, date in
+                            cell(for: date)
+                        }
                     }
                 }
             }
-
-            Text(holidayText)
-                .font(.caption2)
-                .foregroundStyle(Palette.holiday)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, minHeight: 30, alignment: .topLeading)
-                .padding(.top, 4)
+            .id(month)
+            .transition(.push(from: movesForward ? .trailing : .leading))
+            .contentShape(.rect)
+            .simultaneousGesture(swipe)
         }
+        .clipped()
     }
 }
 
@@ -70,7 +71,7 @@ private extension MonthCalendar {
         months: Int
     ) -> some View {
         Button {
-            month = month.adding(months: months)
+            move(months: months)
         } label: {
             Image(systemName: systemImage)
                 .font(.footnote.weight(.semibold))
@@ -88,31 +89,56 @@ private extension MonthCalendar {
             let isSelected = date == selection
             let weight: Font.Weight = isSelected ? .semibold : .regular
             let ring = date == today && !isSelected ? Palette.gold : Color.clear
+            let holiday = Holiday.name(of: date)
 
             Button {
                 selection = date
             } label: {
-                Text(String(date.day))
-                    .font(.system(size: 18, weight: weight, design: .serif))
-                    .foregroundStyle(foreground(for: date))
-                    .opacity(date > today && !isSelected ? 0.5 : 1)
-                    .frame(width: 40, height: 40)
-                    .background(isSelected ? Palette.gold : Color.clear, in: Circle())
-                    .overlay(Circle().stroke(ring, lineWidth: 1))
-                    .frame(maxWidth: .infinity)
-                    .contentShape(.rect)
+                VStack(spacing: 1) {
+                    Text(String(date.day))
+                        .font(.system(size: 17, weight: weight, design: .serif))
+                        .foregroundStyle(foreground(for: date))
+                        .frame(width: 32, height: 32)
+                        .background(isSelected ? Palette.gold : Color.clear, in: Circle())
+                        .overlay(Circle().stroke(ring, lineWidth: 1))
+
+                    Text(holiday ?? "")
+                        .font(.system(size: 8))
+                        .foregroundStyle(Palette.holiday)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .frame(height: 10)
+                }
+                .opacity(date > today && !isSelected ? 0.5 : 1)
+                .frame(maxWidth: .infinity, minHeight: Self.cellHeight)
+                .contentShape(.rect)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(holiday.map { "\(date.day)日 \($0)" } ?? "\(date.day)日")
             .accessibilityAddTraits(isSelected ? .isSelected : [])
         } else {
             Color.clear
-                .frame(height: 40)
+                .frame(height: Self.cellHeight)
                 .frame(maxWidth: .infinity)
         }
     }
 }
 
 private extension MonthCalendar {
+    var swipe: some Gesture {
+        DragGesture(minimumDistance: 20)
+            .onEnded { value in
+                let width = value.translation.width
+
+                guard abs(width) > Self.swipeDistance,
+                      abs(width) > abs(value.translation.height) else {
+                    return
+                }
+
+                move(months: width < 0 ? 1 : -1)
+            }
+    }
+
     var monthTitle: String {
         "\(month.year)年 \(month.month)月"
     }
@@ -124,26 +150,23 @@ private extension MonthCalendar {
         return weeks + Array(repeating: blank, count: missing)
     }
 
-    var holidayText: String {
-        guard let first = LocalDate(yearMonth: month, day: 1) else {
-            return ""
-        }
-
-        let names = (0..<month.numberOfDays).compactMap { offset in
-            let date = first.adding(days: offset)
-            return Holiday.name(of: date).map { "\(date.day)日 \($0)" }
-        }
-
-        return names.joined(separator: "　")
-    }
-
     static let rowCount = 6
+    static let swipeDistance: CGFloat = 50
+    static let cellHeight: CGFloat = 46
 
     static func color(for weekday: Weekday) -> Color? {
         switch weekday {
         case .sunday: Palette.holiday
         case .saturday: Palette.saturday
         default: nil
+        }
+    }
+
+    func move(months: Int) {
+        movesForward = months > 0
+
+        withAnimation(.snappy) {
+            month = month.adding(months: months)
         }
     }
 

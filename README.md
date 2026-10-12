@@ -50,4 +50,4 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
 | Swift の整形 | `make format` |
 
-Debug のビルドでは、端末を振るとデバッグメニューが開き、画面と部品を実機で確かめられる。シミュレーターでは `⌃⌘Z` で振る。
+Debug のビルドでは、端末を振るとデバッグメニューが開き、画面を実機で確かめられる。シミュレーターでは `⌃⌘Z` で振る。

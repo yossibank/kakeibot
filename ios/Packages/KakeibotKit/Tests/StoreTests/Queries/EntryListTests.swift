@@ -36,6 +36,34 @@ struct EntryListTests {
     }
 
     @Test
+    func listsRecentMemosOnce() async throws {
+        let database = try AppDatabase.inMemory()
+        let start = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: start)
+        let options = try await database.entryOptions()
+        let date = try #require(LocalDate("2026-10-03"))
+        let memos = ["ランチ", "", "コーヒー", "ランチ", "スーパー"]
+
+        for (offset, memo) in memos.enumerated() {
+            let draft = EntryDraft(
+                type: .expense,
+                amount: 500,
+                date: date,
+                categoryId: options.expenseCategories[0].id,
+                walletId: options.wallets[0].id,
+                memo: memo
+            )
+
+            let now = start.addingTimeInterval(TimeInterval(offset))
+            try await database.saveEntry(draft, at: now)
+        }
+
+        let recent = try await database.recentMemos(limit: 2)
+
+        #expect(recent == ["スーパー", "ランチ"])
+    }
+
+    @Test
     func optionsSkipArchivedAndFollowSortOrder() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)

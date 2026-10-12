@@ -1,6 +1,5 @@
 #if DEBUG
 import Core
-import DesignSystem
 import SwiftUI
 
 public struct DebugMenu: View {
@@ -24,16 +23,6 @@ public struct DebugMenu: View {
                     }
                 }
                 .disabled(model.database == nil)
-
-                Section("部品") {
-                    ForEach(DebugComponent.allCases) { component in
-                        NavigationLink(component.title) {
-                            component.page
-                                .navigationTitle(component.title)
-                                .navigationBarTitleDisplayMode(.inline)
-                        }
-                    }
-                }
 
                 if let errorMessage = model.errorMessage {
                     Text(errorMessage)

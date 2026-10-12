@@ -15,9 +15,23 @@ public extension AppDatabase {
     func entry(_ id: Entry.ID) async throws -> Entry? {
         try await writer.read { try Entry.fetchOne($0, key: id) }
     }
+
+    func recentMemos(limit: Int) async throws -> [String] {
+        try await writer.read { db in
+            try String.fetchAll(db, sql: Self.recentMemosSQL, arguments: [limit])
+        }
+    }
 }
 
 private extension AppDatabase {
+    static let recentMemosSQL = """
+    SELECT memo FROM entry
+    WHERE memo IS NOT NULL AND memo <> ''
+    GROUP BY memo
+    ORDER BY MAX(created_at) DESC
+    LIMIT ?
+    """
+
     static func entryList(in db: Database) throws -> EntryList {
         let entries = try Entry.fetchAll(db)
         let days = EntryDay.grouping(entries)

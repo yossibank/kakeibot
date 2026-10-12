@@ -13,8 +13,9 @@ public final class EntryModel {
     public var memo = ""
 
     public private(set) var type: Entry.Kind = .expense
-    public private(set) var amount = 0
+    public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
+    public private(set) var recentMemos: [String] = []
     public private(set) var errorMessage: String?
 
     private let database: AppDatabase
@@ -41,6 +42,29 @@ public extension EntryModel {
 
     var isEditing: Bool {
         editingId != nil
+    }
+
+    var amount: Int {
+        calculator.amount
+    }
+
+    var expressionText: String? {
+        if let note = calculator.taxNote {
+            return "\(Self.number(note.base)) の税込み \(note.rate.rawValue)%"
+        }
+
+        guard calculator.hasOperation else {
+            return nil
+        }
+
+        let parts = calculator.tokens.map { token in
+            switch token {
+            case let .number(number): Self.number(number)
+            case let .operation(operation): operation.symbol
+            }
+        }
+
+        return parts.joined(separator: " ")
     }
 
     var categories: [EntryCategory] {
@@ -113,22 +137,15 @@ public extension EntryModel {
     func load() async {
         do {
             options = try await database.entryOptions()
+            recentMemos = try await database.recentMemos(limit: Self.recentMemoLimit)
             try await loadEntry()
         } catch {
             errorMessage = Self.message(for: error)
         }
     }
 
-    func press(_ key: Keypad.Key) {
-        let next = switch key {
-        case let .digit(value): amount * 10 + value
-        case .doubleZero: amount * 100
-        case .delete: amount / 10
-        }
-
-        if next <= Self.maxAmount {
-            amount = next
-        }
+    func press(_ key: AmountCalculator.Key) {
+        calculator.press(key)
     }
 
     func select(_ type: Entry.Kind) {
@@ -169,7 +186,12 @@ public extension EntryModel {
 }
 
 private extension EntryModel {
-    static let maxAmount = 999_999_999
+    static let recentMemoLimit = 6
+    static let numberLocale = Locale(identifier: "ja_JP")
+
+    static func number(_ value: Int) -> String {
+        value.formatted(.number.locale(numberLocale))
+    }
 
     var draft: EntryDraft? {
         guard let walletId else {
@@ -215,7 +237,7 @@ private extension EntryModel {
         }
 
         type = entry.type
-        amount = entry.amount
+        calculator = AmountCalculator(amount: entry.amount)
         date = entry.date
         categoryId = entry.categoryId
         walletId = entry.walletId

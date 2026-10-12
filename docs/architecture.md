@@ -82,7 +82,7 @@ KakeibotKit/
 │   │   ├── Category/        記録のカテゴリ（EntryCategory）
 │   │   ├── Character/       一言の文と選び方
 │   │   ├── Date/            LocalDate、期間の区切りと呼び方、週の始まり、カレンダーのマス目、祝日
-│   │   ├── Entry/           記録の型、入力の判定、日ごとのまとめ、支出なしの日、よく使う組み合わせの並べ方
+│   │   ├── Entry/           記録の型、入力の判定、金額の電卓、日ごとのまとめ、支出なしの日
 │   │   ├── Export/
 │   │   │   ├── Upgrade/     古い版から新しい版への変換
 │   │   │   └── V1/
@@ -97,7 +97,7 @@ KakeibotKit/
 │   └── Store/
 │       ├── Database/        App Group、DatabasePool、止められる前の対策、最初の財布とカテゴリ。止める通知は AppFeature が送る
 │       ├── Migrations/      版ごとに 1 ファイル
-│       ├── Queries/         記録の一覧、入力の選択肢、月の要約・日ごとの合計・よく使う組み合わせの元データ
+│       ├── Queries/         記録の一覧、入力の選択肢、月の要約・日ごとの合計、テンプレート
 │       ├── Records/         Core の型を GRDB で読み書きできるようにする
 │       ├── Snapshot/        書き出し用の全データの読み出し、読み込み用の全置き換え
 │       └── Writes/          記録の保存・更新・削除
@@ -130,7 +130,7 @@ KakeibotApp/
 │   │   │   └── Fonts/
 │   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）、色の文字列の読み取り
 │   ├── Features/
-│   │   ├── Debug/           画面と部品を実機で開くデバッグメニュー（#if DEBUG）
+│   │   ├── Debug/           画面を実機で開くデバッグメニュー（#if DEBUG）
 │   │   ├── Entry/
 │   │   ├── Onboarding/
 │   │   ├── Settings/
@@ -241,7 +241,7 @@ sequenceDiagram
     participant M as 各画面のモデル
     participant SE as SideEffects
 
-    U->>HM: よく使う組み合わせをタップ
+    U->>HM: テンプレートをタップ
     HM->>S: 記録を書く
     S-->>M: ValueObservation で変更を知らせる
     S-->>SE: ValueObservation で変更を知らせる
