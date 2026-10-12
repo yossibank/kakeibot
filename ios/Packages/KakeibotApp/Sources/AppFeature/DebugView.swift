@@ -2,16 +2,13 @@
     import Store
     import SwiftUI
 
-    @MainActor
-    struct DebugView {
+    struct DebugView: View {
         @State private var model: DebugModel
 
         init(database: AppDatabase) {
             _model = State(initialValue: DebugModel(database: database))
         }
-    }
 
-    extension DebugView: View {
         var body: some View {
             NavigationStack {
                 List {
@@ -35,4 +32,5 @@
             .task { await model.refresh() }
         }
     }
+
 #endif

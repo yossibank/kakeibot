@@ -114,13 +114,17 @@ KakeibotApp/
 ├── Sources/
 │   ├── AppFeature/          AppModel、DebugView、DeepLink、RootView、Routes、SideEffects
 │   ├── DesignSystem/
-│   │   ├── Components/
-│   │   │   ├── Common/      ボタン、カード、テンキー
-│   │   │   └── Kakeibo/     アイコン、金額、記録の 1 行、期間の切り替え
+│   │   ├── Components/      表すものごとのフォルダ。中のファイル名の頭にフォルダ名を付ける
+│   │   │   ├── Amount/      金額
+│   │   │   ├── Button/      輪のボタン
+│   │   │   ├── Dial/        ダイヤルの目盛り
+│   │   │   ├── Entry/       記録の 1 行
+│   │   │   ├── Icon/        アイコン、絵柄から SF Symbols への置き換え
+│   │   │   └── Keypad/      テンキー
 │   │   ├── Resources/
 │   │   │   ├── Assets.xcassets
 │   │   │   └── Fonts/
-│   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色の文字列の読み取り
+│   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）、色の文字列の読み取り
 │   ├── Features/
 │   │   ├── Entry/
 │   │   ├── Onboarding/

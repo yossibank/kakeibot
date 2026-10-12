@@ -57,7 +57,7 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 | category（`expense`） | 食費、日用品、交通、交際、趣味、衣服、美容、医療、住まい、通信、光熱費、その他 |
 | category（`income`） | 給料、臨時収入、その他 |
 
-どれにも、絵文字と色の icon を 1 つずつ付ける。
+どれにも、絵柄（`glyph`）と色の icon を 1 つずつ付ける。
 
 ## 表
 
@@ -69,9 +69,12 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 | --- | --- | --- |
 | id | TEXT | |
 | emoji | TEXT | 空でもよい |
-| text | TEXT | 3 文字まで。emoji と text のどちらかは必須 |
+| text | TEXT | 3 文字まで |
+| glyph | TEXT | 決まった絵柄の名前（`food`・`transit` など）。OS ごとに絵に置き換える |
 | color | TEXT | `#RRGGBB` |
 | created_at / updated_at | TEXT | |
+
+emoji・text・glyph のどれかは必須。
 
 ### wallet
 

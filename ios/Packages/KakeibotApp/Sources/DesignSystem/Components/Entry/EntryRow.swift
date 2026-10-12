@@ -1,8 +1,7 @@
 import Core
 import SwiftUI
 
-@MainActor
-public struct EntryRow {
+public struct EntryRow: View {
     let icon: Icon?
     let title: String
     let detail: String?
@@ -22,9 +21,7 @@ public struct EntryRow {
         self.amount = amount
         self.type = type
     }
-}
 
-extension EntryRow: View {
     public var body: some View {
         HStack(spacing: 12) {
             IconBadge(icon)

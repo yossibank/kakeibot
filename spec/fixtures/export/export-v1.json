@@ -9,6 +9,7 @@
         "id": "10000000-0000-4000-8000-000000000001",
         "emoji": "🍙",
         "text": null,
+        "glyph": null,
         "color": "#FF8800",
         "createdAt": "2026-01-01T00:00:00Z",
         "updatedAt": "2026-01-01T00:00:00Z"
@@ -17,9 +18,19 @@
         "id": "10000000-0000-4000-8000-000000000002",
         "emoji": null,
         "text": "給",
+        "glyph": null,
         "color": "#2E8B57",
         "createdAt": "2026-01-01T00:00:00Z",
         "updatedAt": "2026-02-01T09:30:00Z"
+      },
+      {
+        "id": "10000000-0000-4000-8000-000000000003",
+        "emoji": null,
+        "text": null,
+        "glyph": "transit",
+        "color": "#3D5A80",
+        "createdAt": "2026-10-12T00:00:00Z",
+        "updatedAt": "2026-10-12T00:00:00Z"
       }
     ],
     "wallets": [

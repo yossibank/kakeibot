@@ -3,10 +3,7 @@ import WidgetFeature
 import WidgetKit
 
 @main
-@MainActor
-struct KakeibotWidgetBundle {}
-
-extension KakeibotWidgetBundle: WidgetBundle {
+struct KakeibotWidgetBundle: WidgetBundle {
     var body: some Widget {
         KakeibotWidget()
     }

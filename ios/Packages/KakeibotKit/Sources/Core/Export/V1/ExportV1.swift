@@ -122,6 +122,7 @@ extension ExportV1: Codable {
         guard format == Self.format else {
             throw ReadError.unknownFormat(format)
         }
+
         guard version == Self.version else {
             throw ReadError.unsupportedVersion(version)
         }

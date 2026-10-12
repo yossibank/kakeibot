@@ -17,34 +17,34 @@ public extension AppDatabase {
 private extension AppDatabase {
     struct Seed {
         let name: String
-        let emoji: String
+        let glyph: Icon.Glyph
         let color: String
     }
 
     static let wallets: [(Seed, Wallet.Kind)] = [
-        (Seed(name: "財布", emoji: "👛", color: "#C9A465"), .cash),
-        (Seed(name: "銀行", emoji: "🏦", color: "#4A6FA5"), .bank)
+        (Seed(name: "財布", glyph: .cash, color: "#C9A465"), .cash),
+        (Seed(name: "銀行", glyph: .bank, color: "#4A6FA5"), .bank)
     ]
 
     static let expenseCategories: [Seed] = [
-        Seed(name: "食費", emoji: "🍙", color: "#E07A5F"),
-        Seed(name: "日用品", emoji: "🧻", color: "#81B29A"),
-        Seed(name: "交通", emoji: "🚃", color: "#3D5A80"),
-        Seed(name: "交際", emoji: "🍻", color: "#F2CC8F"),
-        Seed(name: "趣味", emoji: "🎮", color: "#9C6ADE"),
-        Seed(name: "衣服", emoji: "👕", color: "#5FA8D3"),
-        Seed(name: "美容", emoji: "💄", color: "#E5989B"),
-        Seed(name: "医療", emoji: "💊", color: "#6CBF84"),
-        Seed(name: "住まい", emoji: "🏠", color: "#B08968"),
-        Seed(name: "通信", emoji: "📱", color: "#577590"),
-        Seed(name: "光熱費", emoji: "💡", color: "#F4A261"),
-        Seed(name: "その他", emoji: "📦", color: "#8D99AE")
+        Seed(name: "食費", glyph: .food, color: "#E07A5F"),
+        Seed(name: "日用品", glyph: .daily, color: "#81B29A"),
+        Seed(name: "交通", glyph: .transit, color: "#3D5A80"),
+        Seed(name: "交際", glyph: .social, color: "#F2CC8F"),
+        Seed(name: "趣味", glyph: .hobby, color: "#9C6ADE"),
+        Seed(name: "衣服", glyph: .clothes, color: "#5FA8D3"),
+        Seed(name: "美容", glyph: .beauty, color: "#E5989B"),
+        Seed(name: "医療", glyph: .medical, color: "#6CBF84"),
+        Seed(name: "住まい", glyph: .home, color: "#B08968"),
+        Seed(name: "通信", glyph: .phone, color: "#577590"),
+        Seed(name: "光熱費", glyph: .utility, color: "#F4A261"),
+        Seed(name: "その他", glyph: .other, color: "#8D99AE")
     ]
 
     static let incomeCategories: [Seed] = [
-        Seed(name: "給料", emoji: "💴", color: "#2A9D8F"),
-        Seed(name: "臨時収入", emoji: "🎁", color: "#E9C46A"),
-        Seed(name: "その他", emoji: "✨", color: "#8D99AE")
+        Seed(name: "給料", glyph: .salary, color: "#2A9D8F"),
+        Seed(name: "臨時収入", glyph: .bonus, color: "#E9C46A"),
+        Seed(name: "その他", glyph: .other, color: "#8D99AE")
     ]
 
     static func insertDefaults(
@@ -99,8 +99,9 @@ private extension AppDatabase {
         at now: Date
     ) throws -> Icon {
         let icon = Icon(
-            emoji: seed.emoji,
+            emoji: nil,
             text: nil,
+            glyph: seed.glyph,
             color: seed.color,
             createdAt: now,
             updatedAt: now

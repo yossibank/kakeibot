@@ -42,6 +42,7 @@ private extension AppDatabase {
         guard let id else {
             return try draft.newEntry(at: now)
         }
+
         guard let existing = try Entry.fetchOne(db, key: id) else {
             throw WriteError.entryNotFound
         }

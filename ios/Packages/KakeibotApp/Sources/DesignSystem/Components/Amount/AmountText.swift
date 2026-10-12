@@ -1,8 +1,7 @@
 import Core
 import SwiftUI
 
-@MainActor
-public struct AmountText {
+public struct AmountText: View {
     let amount: Int
     let type: Entry.Kind?
 
@@ -12,6 +11,12 @@ public struct AmountText {
     ) {
         self.amount = amount
         self.type = type
+    }
+
+    public var body: some View {
+        Text(Self.text(amount, type: type))
+            .monospacedDigit()
+            .foregroundStyle(color)
     }
 }
 
@@ -23,14 +28,6 @@ public extension AmountText {
         let sign = type == .income ? "+" : ""
         let number = amount.formatted(.number.locale(locale))
         return "\(sign)¥\(number)"
-    }
-}
-
-extension AmountText: View {
-    public var body: some View {
-        Text(Self.text(amount, type: type))
-            .monospacedDigit()
-            .foregroundStyle(color)
     }
 }
 

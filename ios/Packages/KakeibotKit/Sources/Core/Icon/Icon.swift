@@ -4,6 +4,7 @@ public struct Icon: Hashable, Sendable {
     public let id: ID
     public var emoji: String?
     public var text: String?
+    public var glyph: Glyph?
     public var color: String
     public var createdAt: Date
     public var updatedAt: Date
@@ -12,6 +13,7 @@ public struct Icon: Hashable, Sendable {
         id: ID = ID(),
         emoji: String?,
         text: String?,
+        glyph: Glyph? = nil,
         color: String,
         createdAt: Date,
         updatedAt: Date
@@ -19,6 +21,7 @@ public struct Icon: Hashable, Sendable {
         self.id = id
         self.emoji = emoji
         self.text = text
+        self.glyph = glyph
         self.color = color
         self.createdAt = createdAt
         self.updatedAt = updatedAt
@@ -27,6 +30,25 @@ public struct Icon: Hashable, Sendable {
 
 public extension Icon {
     typealias ID = Identifier<Icon>
+
+    enum Glyph: String, CaseIterable, Codable, Sendable {
+        case food
+        case daily
+        case transit
+        case social
+        case hobby
+        case clothes
+        case beauty
+        case medical
+        case home
+        case phone
+        case utility
+        case salary
+        case bonus
+        case other
+        case cash
+        case bank
+    }
 }
 
 extension Icon: Identifiable {}
@@ -37,6 +59,7 @@ extension Icon: Codable {
         try container.encode(id, forKey: .id)
         try container.encodeOrNull(emoji, forKey: .emoji)
         try container.encodeOrNull(text, forKey: .text)
+        try container.encodeOrNull(glyph, forKey: .glyph)
         try container.encode(color, forKey: .color)
         try container.encode(createdAt, forKey: .createdAt)
         try container.encode(updatedAt, forKey: .updatedAt)
