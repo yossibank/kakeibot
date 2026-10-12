@@ -2,6 +2,7 @@ import Core
 import DesignSystem
 import Store
 import SwiftUI
+import UIKit
 
 public struct EntrySheet: View {
     @State private var model: EntryModel
@@ -9,6 +10,8 @@ public struct EntrySheet: View {
     @State private var isEditingMemo = false
     @State private var categoryPage = 0
     @State private var sheet: Sheet?
+    @State private var keyboardHeight: CGFloat = 0
+    @State private var bottomInset: CGFloat = 0
 
     @FocusState private var isMemoFocused: Bool
 
@@ -37,6 +40,14 @@ public struct EntrySheet: View {
         }
         .onChange(of: model.type) {
             categoryPage = 0
+        }
+        .onReceive(NotificationCenter.default
+            .publisher(for: UIResponder.keyboardWillShowNotification)) {
+                updateKeyboard($0, isShown: true)
+        }
+        .onReceive(NotificationCenter.default
+            .publisher(for: UIResponder.keyboardWillHideNotification)) {
+                updateKeyboard($0, isShown: false)
         }
         .task { await load() }
     }
@@ -212,7 +223,13 @@ private extension EntrySheet {
                 editMemo(false)
             }
             .padding(.horizontal, 12)
-            .padding(.bottom, 8)
+            .padding(.bottom, max(keyboardHeight - bottomInset, 0) + 12)
+        }
+        .ignoresSafeArea(.keyboard)
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.safeAreaInsets.bottom
+        } action: { inset in
+            bottomInset = inset
         }
         .transition(.opacity)
     }
@@ -346,6 +363,18 @@ private extension EntrySheet {
     func open(_ sheet: Sheet) {
         setEnteringAmount(false)
         self.sheet = sheet
+    }
+
+    func updateKeyboard(
+        _ notification: Notification,
+        isShown: Bool
+    ) {
+        let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+        let height = isShown ? frame?.height ?? 0 : 0
+
+        withAnimation(.easeOut(duration: 0.25)) {
+            keyboardHeight = height
+        }
     }
 
     func editMemo(_ isEditing: Bool) {
