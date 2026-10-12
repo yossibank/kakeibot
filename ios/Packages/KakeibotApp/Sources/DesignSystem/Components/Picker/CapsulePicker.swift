@@ -1,9 +1,11 @@
 import SwiftUI
+import UIKit
 
 public struct CapsulePicker<Value: Hashable>: View {
     @Binding var selection: Value
 
     @State private var thumbOffset: CGFloat?
+    @State private var feedback = UISelectionFeedbackGenerator()
 
     let options: [Option]
 
@@ -39,7 +41,13 @@ public struct CapsulePicker<Value: Hashable>: View {
         .overlay(Capsule().stroke(Palette.gold.opacity(0.3), lineWidth: 1))
         .contentShape(Capsule())
         .gesture(dragGesture)
-        .sensoryFeedback(.selection, trigger: highlightedIndex)
+        .onAppear {
+            feedback.prepare()
+        }
+        .onChange(of: highlightedIndex) {
+            feedback.selectionChanged()
+            feedback.prepare()
+        }
         .accessibilityRepresentation {
             Picker("", selection: $selection) {
                 ForEach(options, id: \.value) { option in
@@ -103,6 +111,7 @@ private extension CapsulePicker {
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
+                feedback.prepare()
                 let start = CGFloat(selectedIndex) * Self.segmentWidth
                 let touch = value.startLocation.x - Self.inset
 

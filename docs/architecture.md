@@ -130,7 +130,7 @@ KakeibotApp/
 │   │   │   └── Fonts/
 │   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）、色の文字列の読み取り
 │   ├── Features/
-│   │   ├── Debug/           画面と部品を実機で開くデバッグメニュー（#if DEBUG）
+│   │   ├── Debug/           画面を実機で開くデバッグメニュー（#if DEBUG）
 │   │   ├── Entry/
 │   │   ├── Onboarding/
 │   │   ├── Settings/

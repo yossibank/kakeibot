@@ -6,7 +6,7 @@
 
 変更したら `make build` と `make test` を通す。PR では CI が同じ 2 つを走らせる。
 
-画面や DesignSystem の部品を足したら、デバッグメニュー（`Features/Debug`）にも足す。
+画面を足したら、デバッグメニュー（`Features/Debug`）にも足す。部品は足さない。
 
 pre-commit の整形で commit が止まったら、差分を確かめてからステージし直す。止まる仕組みは [README の「動かし方」](README.md#動かし方)にある。`--no-verify` で飛ばさない。
 

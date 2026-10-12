@@ -2,7 +2,6 @@ import Core
 import DesignSystem
 import Store
 import SwiftUI
-import UIKit
 
 public struct EntrySheet: View {
     @State private var model: EntryModel
@@ -10,8 +9,6 @@ public struct EntrySheet: View {
     @State private var isEditingMemo = false
     @State private var categoryPage = 0
     @State private var sheet: Sheet?
-    @State private var keyboardHeight: CGFloat = 0
-    @State private var bottomInset: CGFloat = 0
 
     @FocusState private var isMemoFocused: Bool
 
@@ -22,7 +19,7 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .top) {
             content
 
             if isEditingMemo {
@@ -40,14 +37,6 @@ public struct EntrySheet: View {
         }
         .onChange(of: model.type) {
             categoryPage = 0
-        }
-        .onReceive(NotificationCenter.default
-            .publisher(for: UIResponder.keyboardWillShowNotification)) {
-                updateKeyboard($0, isShown: true)
-        }
-        .onReceive(NotificationCenter.default
-            .publisher(for: UIResponder.keyboardWillHideNotification)) {
-                updateKeyboard($0, isShown: false)
         }
         .task { await load() }
     }
@@ -210,28 +199,22 @@ private extension EntrySheet {
         }
     }
 
+    @ViewBuilder
     var memoLayer: some View {
-        ZStack(alignment: .bottom) {
-            Color.black
-                .opacity(0.35)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    editMemo(false)
-                }
-
-            EntryMemoCard(model: model, isFocused: $isMemoFocused) {
+        Color.black
+            .opacity(0.35)
+            .ignoresSafeArea()
+            .onTapGesture {
                 editMemo(false)
             }
-            .padding(.horizontal, 12)
-            .padding(.bottom, max(keyboardHeight - bottomInset, 0) + 12)
+            .transition(.opacity)
+
+        EntryMemoCard(model: model, isFocused: $isMemoFocused) {
+            editMemo(false)
         }
-        .ignoresSafeArea(.keyboard)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.safeAreaInsets.bottom
-        } action: { inset in
-            bottomInset = inset
-        }
-        .transition(.opacity)
+        .padding(.horizontal, 12)
+        .padding(.top, 12)
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 
     func dialFace(size: CGFloat) -> some View {
@@ -365,23 +348,14 @@ private extension EntrySheet {
         self.sheet = sheet
     }
 
-    func updateKeyboard(
-        _ notification: Notification,
-        isShown: Bool
-    ) {
-        let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
-        let height = isShown ? frame?.height ?? 0 : 0
-
-        withAnimation(.easeOut(duration: 0.25)) {
-            keyboardHeight = height
-        }
-    }
-
     func editMemo(_ isEditing: Bool) {
         setEnteringAmount(false)
-        isMemoFocused = isEditing
 
-        withAnimation(.easeOut(duration: 0.18)) {
+        if !isEditing {
+            isMemoFocused = false
+        }
+
+        withAnimation(.snappy(duration: 0.25)) {
             isEditingMemo = isEditing
         }
     }
