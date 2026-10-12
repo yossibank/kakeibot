@@ -113,13 +113,15 @@ KakeibotApp/
 ├── Sources/
 │   ├── AppFeature/          AppModel、DeepLink、RootView、Routes、SideEffects、端末を振ったことの検知（#if DEBUG）
 │   ├── DesignSystem/
-│   │   ├── Components/      表すものごとのフォルダ。中のファイル名の頭にフォルダ名を付ける
+│   │   ├── Components/      表すものごとのフォルダ
 │   │   │   ├── Amount/      金額
 │   │   │   ├── Button/      輪のボタン
+│   │   │   ├── Chip/        財布・メモなどのチップ
 │   │   │   ├── Dial/        ダイヤルの目盛り
 │   │   │   ├── Entry/       記録の 1 行
 │   │   │   ├── Icon/        アイコン、絵柄から SF Symbols への置き換え
-│   │   │   └── Keypad/      テンキー
+│   │   │   ├── Keypad/      テンキー
+│   │   │   └── Picker/      カプセルの切り替え
 │   │   ├── Resources/
 │   │   │   ├── Assets.xcassets
 │   │   │   └── Fonts/

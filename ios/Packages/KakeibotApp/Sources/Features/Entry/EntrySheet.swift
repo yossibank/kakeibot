@@ -68,7 +68,7 @@ private extension EntrySheet {
 
             Spacer()
 
-            typePicker
+            CapsulePicker(selection: typeBinding, options: Self.typeOptions)
 
             Spacer()
 
@@ -78,16 +78,6 @@ private extension EntrySheet {
             .disabled(!model.canSave)
         }
         .frame(minHeight: 44)
-    }
-
-    var typePicker: some View {
-        HStack(spacing: 0) {
-            typeButton("支出", type: .expense)
-            typeButton("収入", type: .income)
-        }
-        .padding(3)
-        .background(Palette.gold.opacity(0.08), in: Capsule())
-        .overlay(Capsule().stroke(Palette.gold.opacity(0.3), lineWidth: 1))
     }
 
     var dial: some View {
@@ -133,7 +123,7 @@ private extension EntrySheet {
                     }
                 }
             } label: {
-                chip(model.walletName, systemImage: "wallet.bifold")
+                Chip(model.walletName, systemImage: "wallet.bifold")
             }
 
             DatePicker("日付", selection: dayBinding, displayedComponents: .date)
@@ -143,7 +133,7 @@ private extension EntrySheet {
             Button {
                 isEditingMemo = true
             } label: {
-                chip(model.memo.isEmpty ? "メモ" : model.memo, systemImage: "square.and.pencil")
+                Chip(model.memo.isEmpty ? "メモ" : model.memo, systemImage: "square.and.pencil")
             }
         }
     }
@@ -154,35 +144,6 @@ private extension EntrySheet {
                 categoryButton(category)
             }
         }
-    }
-
-    func typeButton(
-        _ title: String,
-        type: Entry.Kind
-    ) -> some View {
-        let isSelected = model.type == type
-
-        return Button(title) {
-            model.select(type)
-        }
-        .font(.footnote.weight(isSelected ? .bold : .regular))
-        .foregroundStyle(isSelected ? Palette.nightBottom : Palette.mist)
-        .padding(.horizontal, 18)
-        .padding(.vertical, 6)
-        .background(isSelected ? Palette.gold : Color.clear, in: Capsule())
-    }
-
-    func chip(
-        _ title: String,
-        systemImage: String
-    ) -> some View {
-        Label(title, systemImage: systemImage)
-            .font(.caption)
-            .lineLimit(1)
-            .foregroundStyle(Palette.ink.opacity(0.85))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
-            .overlay(Capsule().stroke(Palette.line, lineWidth: 1))
     }
 
     func categoryButton(_ category: EntryCategory) -> some View {
@@ -214,16 +175,23 @@ private extension EntrySheet {
 }
 
 private extension EntrySheet {
-    var dayBinding: Binding<Date> {
+    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
+        .init("支出", value: .expense),
+        .init("収入", value: .income)
+    ]
+
+    var typeBinding: Binding<Entry.Kind> {
         Binding(
-            get: { Self.startOfDay(model.date) },
-            set: { model.date = LocalDate($0, in: .current) }
+            get: { model.type },
+            set: { model.select($0) }
         )
     }
 
-    static func startOfDay(_ date: LocalDate) -> Date {
-        let components = DateComponents(year: date.year, month: date.month, day: date.day)
-        return Calendar.current.date(from: components) ?? Date()
+    var dayBinding: Binding<Date> {
+        Binding(
+            get: { model.date.startOfDay(in: .current) },
+            set: { model.date = LocalDate($0, in: .current) }
+        )
     }
 
     func save() async {

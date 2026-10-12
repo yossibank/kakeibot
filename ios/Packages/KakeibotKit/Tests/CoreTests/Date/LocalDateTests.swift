@@ -22,6 +22,17 @@ struct LocalDateTests {
         #expect(date == fixture.date)
     }
 
+    @Test(arguments: try instantCases)
+    func findsStartOfDayInTimeZone(fixture: InstantCase) throws {
+        let timeZone = try #require(TimeZone(identifier: fixture.timeZone))
+
+        let start = fixture.date.startOfDay(in: timeZone)
+        let justBefore = start.addingTimeInterval(-1)
+
+        #expect(LocalDate(start, in: timeZone) == fixture.date)
+        #expect(LocalDate(justBefore, in: timeZone) == fixture.date.adding(days: -1))
+    }
+
     @Test(arguments: try weekCases)
     func findsWeek(fixture: WeekCase) {
         let week = fixture.date.week(startingOn: fixture.weekStart)

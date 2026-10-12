@@ -34,16 +34,8 @@ private extension AppDatabase {
     }
 
     static func entryOptions(in db: Database) throws -> EntryOptions {
-        let categories = try EntryCategory
-            .filter(Column("archived_at") == nil)
-            .order(Column("sort_order"))
-            .fetchAll(db)
-
-        let wallets = try Wallet
-            .filter(Column("archived_at") == nil)
-            .order(Column("sort_order"))
-            .fetchAll(db)
-
+        let categories = try EntryCategory.unarchivedInOrder().fetchAll(db)
+        let wallets = try Wallet.unarchivedInOrder().fetchAll(db)
         let expenseCategories = categories.filter { $0.kind == .expense }
         let incomeCategories = categories.filter { $0.kind == .income }
         let icons = try byID(Icon.fetchAll(db))
