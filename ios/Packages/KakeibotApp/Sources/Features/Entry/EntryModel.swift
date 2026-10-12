@@ -44,6 +44,10 @@ public extension EntryModel {
         options?.wallets ?? []
     }
 
+    var walletName: String {
+        wallets.first { $0.id == walletId }?.name ?? "財布"
+    }
+
     var canSave: Bool {
         draft?.problems.isEmpty == true
     }

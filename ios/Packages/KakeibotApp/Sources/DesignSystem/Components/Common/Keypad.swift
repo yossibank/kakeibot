@@ -8,12 +8,17 @@ public struct Keypad: View {
     }
 
     public var body: some View {
-        Grid(horizontalSpacing: 8, verticalSpacing: 8) {
+        Grid(horizontalSpacing: 0, verticalSpacing: 0) {
             ForEach(Self.rows, id: \.self) { row in
                 GridRow {
                     ForEach(row, id: \.self) { key in
                         button(for: key)
                     }
+                }
+                .overlay(alignment: .top) {
+                    Rectangle()
+                        .fill(Palette.gold.opacity(0.15))
+                        .frame(height: 0.5)
                 }
             }
         }
@@ -37,15 +42,13 @@ private extension Keypad {
                 switch key {
                 case let .digit(value): Text("\(value)")
                 case .doubleZero: Text("00")
-                case .delete: Image(systemName: "delete.left")
+                case .delete: Image(systemName: "delete.left").imageScale(.small)
                 }
             }
-            .font(.title2.weight(.medium))
-            .frame(maxWidth: .infinity, minHeight: 52)
-            .background(
-                .fill.tertiary,
-                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-            )
+            .font(.system(size: 28, weight: .regular, design: .serif))
+            .foregroundStyle(Palette.ink)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel(for: key))
@@ -54,9 +57,9 @@ private extension Keypad {
 
 private extension Keypad {
     static let rows: [[Key]] = [
-        [.digit(7), .digit(8), .digit(9)],
-        [.digit(4), .digit(5), .digit(6)],
         [.digit(1), .digit(2), .digit(3)],
+        [.digit(4), .digit(5), .digit(6)],
+        [.digit(7), .digit(8), .digit(9)],
         [.doubleZero, .digit(0), .delete]
     ]
 
@@ -72,4 +75,5 @@ private extension Keypad {
 #Preview {
     Keypad { _ in }
         .padding()
+        .background(Palette.night)
 }

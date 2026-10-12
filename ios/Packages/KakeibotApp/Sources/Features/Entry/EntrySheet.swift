@@ -6,6 +6,7 @@ import SwiftUI
 public struct EntrySheet: View {
     @State private var model: EntryModel
     @State private var isConfirmingDelete = false
+    @State private var isEditingMemo = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -14,53 +15,44 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    Picker("種類", selection: typeBinding) {
-                        Text("支出").tag(Entry.Kind.expense)
-                        Text("収入").tag(Entry.Kind.income)
-                    }
-                    .pickerStyle(.segmented)
+        VStack(spacing: 14) {
+            header
+            dial
+            chips
+            categoryGrid
 
-                    AmountText(model.amount, type: model.type)
-                        .font(.system(size: 44, weight: .bold))
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .accessibilityLabel("金額")
-                        .accessibilityValue(AmountText.text(model.amount))
-
-                    categoryGrid
-                    details
-
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .foregroundStyle(.red)
-                    }
-
-                    if model.isEditing {
-                        Button("この記録を消す", role: .destructive) {
-                            isConfirmingDelete = true
-                        }
-                    }
-                }
-                .padding()
+            if let errorMessage = model.errorMessage {
+                Text(errorMessage)
+                    .font(.footnote)
+                    .foregroundStyle(Palette.champagne)
             }
-            .safeAreaInset(edge: .bottom) {
-                Keypad { model.press($0) }
-                    .padding()
-                    .background(.bar)
-            }
-            .navigationTitle(model.isEditing ? "記録を直す" : "記録する")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { toolbar }
-            .confirmationDialog(
-                "この記録を消しますか",
-                isPresented: $isConfirmingDelete,
-                titleVisibility: .visible
-            ) {
-                Button("消す", role: .destructive) {
-                    Task { await delete() }
+
+            if model.isEditing {
+                Button("この記録を消す", role: .destructive) {
+                    isConfirmingDelete = true
                 }
+                .font(.footnote)
+            }
+
+            Spacer(minLength: 0)
+
+            Keypad { model.press($0) }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 18)
+        .background(Palette.night.ignoresSafeArea())
+        .preferredColorScheme(.dark)
+        .alert("メモ", isPresented: $isEditingMemo) {
+            TextField("メモ", text: $model.memo)
+            Button("OK") {}
+        }
+        .confirmationDialog(
+            "この記録を消しますか",
+            isPresented: $isConfirmingDelete,
+            titleVisibility: .visible
+        ) {
+            Button("消す", role: .destructive) {
+                Task { await delete() }
             }
         }
         .task { await model.load() }
@@ -68,44 +60,130 @@ public struct EntrySheet: View {
 }
 
 private extension EntrySheet {
+    var header: some View {
+        HStack {
+            Button("キャンセル") { dismiss() }
+                .foregroundStyle(Palette.mist)
+
+            Spacer()
+
+            typePicker
+
+            Spacer()
+
+            Button("保存") {
+                Task { await save() }
+            }
+            .fontWeight(.bold)
+            .foregroundStyle(model.canSave ? Palette.champagne : Palette.dusk)
+            .disabled(!model.canSave)
+        }
+        .frame(minHeight: 44)
+    }
+
+    var typePicker: some View {
+        HStack(spacing: 0) {
+            typeButton("支出", type: .expense)
+            typeButton("収入", type: .income)
+        }
+        .padding(3)
+        .background(Palette.gold.opacity(0.08), in: Capsule())
+        .overlay(Capsule().stroke(Palette.gold.opacity(0.3), lineWidth: 1))
+    }
+
+    var dial: some View {
+        ZStack {
+            Circle()
+                .stroke(Palette.gold.opacity(0.6), lineWidth: 1)
+                .frame(width: 240, height: 240)
+
+            DialTicks(count: 60, length: 9)
+                .stroke(Palette.gold.opacity(0.85), lineWidth: 1)
+                .frame(width: 214, height: 214)
+
+            DialTicks(count: 12, length: 14)
+                .stroke(Palette.champagne, lineWidth: 1.5)
+                .frame(width: 214, height: 214)
+
+            VStack(spacing: 4) {
+                Text(model.type == .income ? "INCOME" : "EXPENSE")
+                    .font(.caption2)
+                    .tracking(3)
+                    .foregroundStyle(Palette.gold)
+
+                Text(AmountText.text(model.amount))
+                    .font(.system(size: 54, weight: .semibold, design: .serif))
+                    .foregroundStyle(Palette.champagne)
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
+                    .frame(maxWidth: 180)
+            }
+        }
+        .frame(height: 250)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("金額")
+        .accessibilityValue(AmountText.text(model.amount))
+    }
+
+    var chips: some View {
+        HStack(spacing: 8) {
+            Menu {
+                Picker("財布", selection: $model.walletId) {
+                    ForEach(model.wallets) { wallet in
+                        Text(wallet.name).tag(Optional(wallet.id))
+                    }
+                }
+            } label: {
+                chip(model.walletName, systemImage: "wallet.bifold")
+            }
+
+            DatePicker("日付", selection: dayBinding, displayedComponents: .date)
+                .labelsHidden()
+                .tint(Palette.gold)
+
+            Button {
+                isEditingMemo = true
+            } label: {
+                chip(model.memo.isEmpty ? "メモ" : model.memo, systemImage: "square.and.pencil")
+            }
+        }
+    }
+
     var categoryGrid: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 72))], spacing: 12) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 6) {
             ForEach(model.categories) { category in
                 categoryButton(category)
             }
         }
     }
 
-    var details: some View {
-        VStack(spacing: 12) {
-            LabeledContent("財布") {
-                Picker("財布", selection: $model.walletId) {
-                    ForEach(model.wallets) { wallet in
-                        Text(wallet.name).tag(Optional(wallet.id))
-                    }
-                }
-                .labelsHidden()
-            }
+    func typeButton(
+        _ title: String,
+        type: Entry.Kind
+    ) -> some View {
+        let isSelected = model.type == type
 
-            DatePicker("日付", selection: dayBinding, displayedComponents: .date)
-
-            TextField("メモ", text: $model.memo)
-                .textFieldStyle(.roundedBorder)
+        return Button(title) {
+            model.select(type)
         }
+        .font(.footnote.weight(isSelected ? .bold : .regular))
+        .foregroundStyle(isSelected ? Palette.nightBottom : Palette.mist)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 6)
+        .background(isSelected ? Palette.gold : Color.clear, in: Capsule())
     }
 
-    @ToolbarContentBuilder
-    var toolbar: some ToolbarContent {
-        ToolbarItem(placement: .cancellationAction) {
-            Button("キャンセル") { dismiss() }
-        }
-
-        ToolbarItem(placement: .confirmationAction) {
-            Button("保存") {
-                Task { await save() }
-            }
-            .disabled(!model.canSave)
-        }
+    func chip(
+        _ title: String,
+        systemImage: String
+    ) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.caption)
+            .lineLimit(1)
+            .foregroundStyle(Palette.ink.opacity(0.85))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .overlay(Capsule().stroke(Palette.line, lineWidth: 1))
     }
 
     func categoryButton(_ category: EntryCategory) -> some View {
@@ -114,18 +192,22 @@ private extension EntrySheet {
         return Button {
             model.categoryId = category.id
         } label: {
-            VStack(spacing: 4) {
-                IconBadge(model.icon(for: category), size: 44)
+            VStack(spacing: 5) {
+                IconImage(model.icon(for: category), size: 20)
 
                 Text(category.name)
-                    .font(.caption)
+                    .font(.system(size: 10))
                     .lineLimit(1)
+                    .padding(.bottom, 3)
+                    .overlay(alignment: .bottom) {
+                        Rectangle()
+                            .fill(isSelected ? Palette.gold : Color.clear)
+                            .frame(height: 1)
+                    }
             }
-            .frame(maxWidth: .infinity, minHeight: 72)
-            .background(
-                isSelected ? Color.accentColor.opacity(0.15) : Color.clear,
-                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-            )
+            .foregroundStyle(isSelected ? Palette.champagne : Palette.dusk)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -133,13 +215,6 @@ private extension EntrySheet {
 }
 
 private extension EntrySheet {
-    var typeBinding: Binding<Entry.Kind> {
-        Binding(
-            get: { model.type },
-            set: { model.select($0) }
-        )
-    }
-
     var dayBinding: Binding<Date> {
         Binding(
             get: { Self.startOfDay(model.date) },

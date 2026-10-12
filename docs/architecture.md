@@ -116,11 +116,11 @@ KakeibotApp/
 │   ├── DesignSystem/
 │   │   ├── Components/
 │   │   │   ├── Common/      ボタン、カード、テンキー
-│   │   │   └── Kakeibo/     アイコン、金額、記録の 1 行、期間の切り替え
+│   │   │   └── Kakeibo/     アイコンと絵柄、金額、記録の 1 行、ダイヤルの目盛り、期間の切り替え
 │   │   ├── Resources/
 │   │   │   ├── Assets.xcassets
 │   │   │   └── Fonts/
-│   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色の文字列の読み取り
+│   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）、色の文字列の読み取り
 │   ├── Features/
 │   │   ├── Entry/
 │   │   ├── Onboarding/

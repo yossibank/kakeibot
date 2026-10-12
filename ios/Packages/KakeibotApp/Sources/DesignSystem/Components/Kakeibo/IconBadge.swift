@@ -18,12 +18,8 @@ public struct IconBadge: View {
             .fill(tint.opacity(0.18))
             .frame(width: size, height: size)
             .overlay {
-                Text(label)
-                    .font(.system(size: size * 0.5))
-                    .minimumScaleFactor(0.5)
-                    .lineLimit(1)
+                IconImage(icon, size: size * 0.45)
                     .foregroundStyle(tint)
-                    .padding(size * 0.1)
             }
             .accessibilityHidden(true)
     }
@@ -32,10 +28,6 @@ public struct IconBadge: View {
 private extension IconBadge {
     var tint: Color {
         icon.flatMap { Color(hex: $0.color) } ?? .secondary
-    }
-
-    var label: String {
-        icon?.emoji ?? icon?.text ?? ""
     }
 }
 
