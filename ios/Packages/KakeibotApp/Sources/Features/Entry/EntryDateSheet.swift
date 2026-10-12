@@ -10,26 +10,21 @@ struct EntryDateSheet: View {
     let today: LocalDate
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("日付")
-                .font(.headline)
-                .foregroundStyle(Palette.champagne)
+        FittedSheet {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("日付")
+                    .font(.headline)
+                    .foregroundStyle(Palette.champagne)
 
-            HStack(spacing: 8) {
-                ForEach(Self.quickDays, id: \.offset) { quickDay in
-                    quickButton(quickDay)
+                HStack(spacing: 8) {
+                    ForEach(Self.quickDays, id: \.offset) { quickDay in
+                        quickButton(quickDay)
+                    }
                 }
+
+                MonthCalendar(selection: dateBinding, today: today)
             }
-
-            MonthCalendar(selection: dateBinding, today: today)
-
-            Spacer(minLength: 0)
         }
-        .padding(20)
-        .presentationDetents([.height(520), .large])
-        .presentationDragIndicator(.visible)
-        .presentationBackground(Palette.drawer)
-        .preferredColorScheme(.dark)
     }
 }
 

@@ -8,7 +8,7 @@ struct EntryWalletSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        ScrollView {
+        FittedSheet {
             VStack(alignment: .leading, spacing: 20) {
                 Text("財布")
                     .font(.headline)
@@ -27,12 +27,7 @@ struct EntryWalletSheet: View {
                     }
                 }
             }
-            .padding(20)
         }
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
-        .presentationBackground(Palette.drawer)
-        .preferredColorScheme(.dark)
     }
 }
 

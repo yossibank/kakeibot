@@ -13,6 +13,8 @@ public extension Palette {
     static let line = Color(rgb: 0x26314A)
     static let drawer = Color(rgb: 0x0E1628)
     static let rose = Color(rgb: 0xE3A3A3)
+    static let holiday = Color(rgb: 0xEE8A84)
+    static let saturday = Color(rgb: 0x8DB0EA)
 
     static var night: LinearGradient {
         LinearGradient(

@@ -5,7 +5,7 @@ import SwiftUI
 
 public struct EntrySheet: View {
     @State private var model: EntryModel
-    @State private var isEnteringAmount: Bool
+    @State private var isEnteringAmount = false
     @State private var categoryPage = 0
     @State private var sheet: Sheet?
 
@@ -15,7 +15,6 @@ public struct EntrySheet: View {
 
     public init(model: EntryModel) {
         _model = State(initialValue: model)
-        _isEnteringAmount = State(initialValue: !model.isEditing)
     }
 
     public var body: some View {
@@ -28,6 +27,7 @@ public struct EntrySheet: View {
                 VStack(spacing: 18) {
                     dial
                     details
+                    categoryPager
 
                     TextField(
                         "メモ",
@@ -49,8 +49,6 @@ public struct EntrySheet: View {
                                 lineWidth: 1
                             )
                     }
-
-                    categoryPager
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
@@ -58,7 +56,9 @@ public struct EntrySheet: View {
             .scrollDismissesKeyboard(.interactively)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            bottomPanel
+            if !isMemoFocused {
+                bottomPanel
+            }
         }
         .background(Palette.night.ignoresSafeArea())
         .preferredColorScheme(.dark)
@@ -187,16 +187,11 @@ private extension EntrySheet {
         VStack(spacing: 12) {
             if isEnteringAmount {
                 VStack(spacing: 4) {
-                    Capsule()
-                        .fill(Palette.line)
-                        .frame(width: 36, height: 4)
-                        .frame(maxWidth: .infinity, minHeight: 36)
-                        .overlay(alignment: .trailing) {
-                            Button("完了") { setEnteringAmount(false) }
-                                .font(.subheadline.weight(.bold))
-                                .foregroundStyle(Palette.gold)
-                                .frame(minWidth: 44, minHeight: 36)
-                        }
+                    Button("完了") { setEnteringAmount(false) }
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Palette.gold)
+                        .frame(minWidth: 44, minHeight: 36)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
 
                     Keypad { model.press($0) }
                 }

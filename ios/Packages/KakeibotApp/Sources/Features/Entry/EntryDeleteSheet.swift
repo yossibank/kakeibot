@@ -10,50 +10,45 @@ struct EntryDeleteSheet: View {
     let onDelete: () -> Void
 
     var body: some View {
-        VStack(spacing: 14) {
-            Image(systemName: "trash")
-                .font(.system(size: 20, weight: .light))
-                .foregroundStyle(Palette.rose)
-                .frame(width: 52, height: 52)
-                .overlay(Circle().stroke(Palette.rose.opacity(0.6), lineWidth: 1))
-                .accessibilityHidden(true)
-
-            VStack(spacing: 6) {
-                Text("この記録を消しますか")
-                    .font(.headline)
-                    .foregroundStyle(Palette.champagne)
-
-                Text("消すと元に戻せません")
-                    .font(.caption)
-                    .foregroundStyle(Palette.mist)
-            }
-
-            summary
-
-            Button {
-                dismiss()
-                onDelete()
-            } label: {
-                Text("消す")
-                    .font(.body.weight(.bold))
+        FittedSheet {
+            VStack(spacing: 14) {
+                Image(systemName: "trash")
+                    .font(.system(size: 20, weight: .light))
                     .foregroundStyle(Palette.rose)
-                    .frame(maxWidth: .infinity, minHeight: 52)
-                    .background(Palette.rose.opacity(0.12), in: Capsule())
-                    .overlay(Capsule().stroke(Palette.rose, lineWidth: 1))
-            }
-            .buttonStyle(.plain)
+                    .frame(width: 52, height: 52)
+                    .overlay(Circle().stroke(Palette.rose.opacity(0.6), lineWidth: 1))
+                    .accessibilityHidden(true)
 
-            Button("やめる") { dismiss() }
-                .foregroundStyle(Palette.mist)
-                .frame(minHeight: 44)
+                VStack(spacing: 6) {
+                    Text("この記録を消しますか")
+                        .font(.headline)
+                        .foregroundStyle(Palette.champagne)
+
+                    Text("消すと元に戻せません")
+                        .font(.caption)
+                        .foregroundStyle(Palette.mist)
+                }
+
+                summary
+
+                Button {
+                    dismiss()
+                    onDelete()
+                } label: {
+                    Text("消す")
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(Palette.rose)
+                        .frame(maxWidth: .infinity, minHeight: 52)
+                        .background(Palette.rose.opacity(0.12), in: Capsule())
+                        .overlay(Capsule().stroke(Palette.rose, lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+
+                Button("やめる") { dismiss() }
+                    .foregroundStyle(Palette.mist)
+                    .frame(minHeight: 44)
+            }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 32)
-        .frame(maxHeight: .infinity, alignment: .top)
-        .presentationDetents([.height(420)])
-        .presentationDragIndicator(.visible)
-        .presentationBackground(Palette.drawer)
-        .preferredColorScheme(.dark)
     }
 }
 

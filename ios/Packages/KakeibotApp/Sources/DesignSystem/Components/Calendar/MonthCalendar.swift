@@ -40,7 +40,7 @@ public struct MonthCalendar: View {
                 ForEach(Weekday.week(startingOn: weekStart), id: \.self) { weekday in
                     Text(weekday.shortName)
                         .font(.caption2)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Self.color(for: weekday) ?? Palette.mist)
                         .frame(maxWidth: .infinity, minHeight: 24)
                 }
             }
@@ -88,6 +88,7 @@ private extension MonthCalendar {
                 Text(String(date.day))
                     .font(.system(size: 18, weight: weight, design: .serif))
                     .foregroundStyle(foreground(for: date))
+                    .opacity(date > today && !isSelected ? 0.5 : 1)
                     .frame(width: 40, height: 40)
                     .background(isSelected ? Palette.gold : Color.clear, in: Circle())
                     .overlay(Circle().stroke(ring, lineWidth: 1))
@@ -113,12 +114,24 @@ private extension MonthCalendar {
         month.weeks(startingOn: weekStart)
     }
 
+    static func color(for weekday: Weekday) -> Color? {
+        switch weekday {
+        case .sunday: Palette.holiday
+        case .saturday: Palette.saturday
+        default: nil
+        }
+    }
+
     func foreground(for date: LocalDate) -> Color {
         if date == selection {
             return Palette.nightBottom
         }
 
-        return date > today ? Palette.dusk : Palette.ink
+        if Holiday.contains(date) {
+            return Palette.holiday
+        }
+
+        return Self.color(for: date.weekday) ?? Palette.ink
     }
 }
 
