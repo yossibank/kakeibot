@@ -11,6 +11,10 @@ public extension AppDatabase {
     func entryOptions() async throws -> EntryOptions {
         try await writer.read(Self.entryOptions)
     }
+
+    func entry(_ id: Entry.ID) async throws -> Entry? {
+        try await writer.read { try Entry.fetchOne($0, key: id) }
+    }
 }
 
 private extension AppDatabase {
