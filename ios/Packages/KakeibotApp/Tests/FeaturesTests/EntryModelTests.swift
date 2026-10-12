@@ -86,6 +86,31 @@ struct EntryModelTests {
     }
 
     @Test
+    func describesExpressionAndTax() async throws {
+        let model = try await Self.newModel()
+
+        for key: AmountCalculator.Key in [
+            .digit(1),
+            .digit(2),
+            .doubleZero,
+            .operation(.add),
+            .digit(8)
+        ] {
+            model.press(key)
+        }
+
+        let expression = model.expressionText
+        model.press(.equals)
+        let settled = model.expressionText
+        model.press(.tax(.standard))
+
+        #expect(expression == "1,200 ＋ 8")
+        #expect(settled == nil)
+        #expect(model.expressionText == "1,208 の税込み 10%")
+        #expect(model.amount == 1328)
+    }
+
+    @Test
     func groupsWalletsByKind() async throws {
         let model = try await Self.newModel()
 

@@ -9,8 +9,6 @@ public struct EntrySheet: View {
     @State private var categoryPage = 0
     @State private var sheet: Sheet?
 
-    @FocusState private var isMemoFocused: Bool
-
     @Environment(\.dismiss) private var dismiss
 
     public init(model: EntryModel) {
@@ -18,71 +16,48 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 14) {
             header
-                .padding(.horizontal, 20)
-                .padding(.top, 18)
+            dial
+            details
+            categoryPager
 
-            ScrollView {
-                VStack(spacing: 18) {
-                    dial
-                    details
-                    categoryPager
-
-                    TextField(
-                        "メモ",
-                        text: $model.memo,
-                        prompt: Text("メモ").foregroundStyle(Palette.dusk),
-                        axis: .vertical
-                    )
-                    .lineLimit(1...4)
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.ink)
-                    .tint(Palette.gold)
-                    .focused($isMemoFocused)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 12)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(
-                                isMemoFocused ? Palette.gold.opacity(0.6) : Palette.line,
-                                lineWidth: 1
-                            )
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-                .contentShape(.rect)
-                .onTapGesture {
-                    setEnteringAmount(false)
-                }
+            if let errorMessage = model.errorMessage {
+                Text(errorMessage)
+                    .font(.footnote)
+                    .foregroundStyle(Palette.rose)
             }
-            .scrollDismissesKeyboard(.interactively)
+
+            PrimaryButton(model.saveTitle) {
+                Task { await save() }
+            }
+            .disabled(!model.canSave)
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if !isMemoFocused {
-                bottomPanel
+        .padding(.horizontal, 20)
+        .padding(.top, 18)
+        .padding(.bottom, 8)
+        .contentShape(.rect)
+        .onTapGesture {
+            setEnteringAmount(false)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(alignment: .bottom) {
+            if isEnteringAmount {
+                keypadDrawer
+                    .transition(.move(edge: .bottom))
             }
         }
-        .background(Palette.night.ignoresSafeArea())
+        .background {
+            Rectangle()
+                .fill(Palette.night)
+                .ignoresSafeArea()
+        }
         .preferredColorScheme(.dark)
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-
-                Button("完了") { isMemoFocused = false }
-            }
-        }
         .sheet(item: $sheet) { sheet in
             sheetContent(for: sheet)
         }
         .onChange(of: model.type) {
             categoryPage = 0
-        }
-        .onChange(of: isMemoFocused) { _, isFocused in
-            if isFocused {
-                setEnteringAmount(false)
-            }
         }
         .task { await load() }
     }
@@ -114,35 +89,17 @@ private extension EntrySheet {
 
     var dial: some View {
         Button {
-            isMemoFocused = false
             setEnteringAmount(!isEnteringAmount)
         } label: {
-            ZStack {
-                DialFace(isActive: isEnteringAmount)
+            GeometryReader { proxy in
+                let size = min(proxy.size.width, proxy.size.height)
 
-                Text(model.type == .income ? "収入" : "支出")
-                    .font(.system(size: 12, design: .serif))
-                    .tracking(5)
-                    .foregroundStyle(Palette.gold)
-                    .offset(y: -46)
-
-                Text(AmountText.text(model.amount))
-                    .font(.system(size: amountFontSize, weight: .semibold, design: .serif))
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.champagne)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
-                    .frame(width: 164, height: 60)
-
-                Text(isEnteringAmount ? "入力中" : "タップして入力")
-                    .font(.caption2)
-                    .foregroundStyle(Palette.mist)
-                    .offset(y: 46)
+                dialFace(size: size)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(width: 236, height: 236)
-            .contentShape(Circle())
         }
         .buttonStyle(.plain)
+        .frame(minHeight: 150, maxHeight: 270)
         .accessibilityLabel("金額")
         .accessibilityValue(AmountText.text(model.amount))
         .accessibilityHint("タップしてテンキーを開く")
@@ -166,66 +123,58 @@ private extension EntrySheet {
                 )
             }
 
+            Button {
+                open(.memo)
+            } label: {
+                Chip(
+                    model.memo.isEmpty ? "メモ" : model.memo,
+                    systemImage: "square.and.pencil",
+                    isHighlighted: !model.memo.isEmpty
+                )
+            }
+            .layoutPriority(-1)
+
             Spacer(minLength: 0)
         }
         .buttonStyle(.plain)
     }
 
     var categoryPager: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             TabView(selection: $categoryPage) {
                 ForEach(Array(model.categoryPages.enumerated()), id: \.offset) { index, page in
-                    LazyVGrid(columns: Self.categoryColumns, spacing: 6) {
-                        ForEach(page) { category in
-                            categoryButton(category)
-                        }
-                    }
-                    .frame(maxHeight: .infinity, alignment: .top)
-                    .tag(index)
+                    categoryGrid(page)
+                        .tag(index)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 3 * Self.categoryHeight + 2 * 6)
+            .frame(minHeight: 168, maxHeight: 264)
 
-            PageDots(count: model.categoryPages.count, current: categoryPage)
+            if model.categoryPages.count > 1 {
+                PageDots(count: model.categoryPages.count, current: categoryPage)
+            }
         }
     }
 
-    var bottomPanel: some View {
-        VStack(spacing: 12) {
-            if isEnteringAmount {
-                VStack(spacing: 4) {
-                    Button("完了") { setEnteringAmount(false) }
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Palette.gold)
-                        .frame(minWidth: 44, minHeight: 36)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+    var keypadDrawer: some View {
+        VStack(spacing: 10) {
+            Button("完了") { setEnteringAmount(false) }
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Palette.gold)
+                .frame(minWidth: 44, minHeight: 32)
+                .frame(maxWidth: .infinity, alignment: .trailing)
 
-                    Keypad { model.press($0) }
-                }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-
-            if let errorMessage = model.errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(Palette.rose)
-            }
+            Keypad(activeTax: model.calculator.taxNote?.rate) { model.press($0) }
 
             PrimaryButton(model.saveTitle) {
                 Task { await save() }
             }
             .disabled(!model.canSave)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, isEnteringAmount ? 8 : 16)
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
         .padding(.bottom, 8)
-        .background { panelBackground }
-    }
-
-    @ViewBuilder
-    var panelBackground: some View {
-        if isEnteringAmount {
+        .background {
             UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
                 .fill(Palette.drawer)
                 .overlay {
@@ -233,13 +182,57 @@ private extension EntrySheet {
                         .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
-        } else {
-            LinearGradient(
-                colors: [Palette.nightBottom.opacity(0), Palette.nightBottom],
-                startPoint: .top,
-                endPoint: UnitPoint(x: 0.5, y: 0.35)
-            )
-            .ignoresSafeArea(edges: .bottom)
+        }
+    }
+
+    func dialFace(size: CGFloat) -> some View {
+        let amountScale: CGFloat = model.amount < 100_000 ? 0.2 : 0.118
+        let note = model.expressionText ?? (isEnteringAmount ? "入力中" : "タップして入力")
+
+        return ZStack {
+            DialFace(isActive: isEnteringAmount)
+
+            Text(model.type == .income ? "収入" : "支出")
+                .font(.system(size: 12, design: .serif))
+                .tracking(5)
+                .foregroundStyle(Palette.gold)
+                .offset(y: -size * 0.19)
+
+            Text(AmountText.text(model.amount))
+                .font(.system(size: size * amountScale, weight: .semibold, design: .serif))
+                .monospacedDigit()
+                .foregroundStyle(Palette.champagne)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+                .frame(width: size * 0.7, height: size * 0.26)
+
+            Text(note)
+                .font(.caption2)
+                .foregroundStyle(Palette.mist)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(width: size * 0.66)
+                .offset(y: size * 0.19)
+        }
+        .frame(width: size, height: size)
+        .contentShape(Circle())
+    }
+
+    func categoryGrid(_ page: [EntryCategory]) -> some View {
+        Grid(horizontalSpacing: 6, verticalSpacing: 6) {
+            ForEach(0..<Self.categoryRows, id: \.self) { row in
+                GridRow {
+                    ForEach(0..<Self.categoryColumns, id: \.self) { column in
+                        let index = row * Self.categoryColumns + column
+
+                        if index < page.count {
+                            categoryButton(page[index])
+                        } else {
+                            Color.clear
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -247,7 +240,6 @@ private extension EntrySheet {
         let isSelected = model.categoryId == category.id
 
         return Button {
-            isMemoFocused = false
             setEnteringAmount(false)
             model.categoryId = category.id
         } label: {
@@ -259,7 +251,7 @@ private extension EntrySheet {
                     .lineLimit(1)
             }
             .foregroundStyle(isSelected ? Palette.champagne : Palette.mist)
-            .frame(maxWidth: .infinity, minHeight: Self.categoryHeight)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
                 isSelected ? Palette.gold.opacity(0.12) : Color.clear,
                 in: .rect(cornerRadius: 14)
@@ -281,6 +273,8 @@ private extension EntrySheet {
             EntryWalletSheet(model: model)
         case .date:
             EntryDateSheet(model: model, today: today)
+        case .memo:
+            EntryMemoSheet(model: model)
         case .delete:
             EntryDeleteSheet(model: model, today: today) {
                 Task { await delete() }
@@ -293,6 +287,7 @@ private extension EntrySheet {
     enum Sheet: Identifiable {
         case wallet
         case date
+        case memo
         case delete
 
         var id: Self {
@@ -305,15 +300,11 @@ private extension EntrySheet {
         .init("収入", value: .income)
     ]
 
-    static let categoryHeight: CGFloat = 64
-    static let categoryColumns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 4)
+    static let categoryRows = 3
+    static let categoryColumns = 4
 
     var today: LocalDate {
         LocalDate(Date(), in: .current)
-    }
-
-    var amountFontSize: CGFloat {
-        model.amount < 100_000 ? 48 : 28
     }
 
     var typeBinding: Binding<Entry.Kind> {
@@ -324,7 +315,6 @@ private extension EntrySheet {
     }
 
     func open(_ sheet: Sheet) {
-        isMemoFocused = false
         setEnteringAmount(false)
         self.sheet = sheet
     }
