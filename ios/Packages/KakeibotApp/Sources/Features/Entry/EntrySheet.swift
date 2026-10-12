@@ -62,8 +62,9 @@ public struct EntrySheet: View {
 private extension EntrySheet {
     var header: some View {
         HStack {
-            Button("キャンセル") { dismiss() }
-                .foregroundStyle(Palette.mist)
+            RingButton("キャンセル", systemImage: "xmark") {
+                dismiss()
+            }
 
             Spacer()
 
@@ -71,11 +72,9 @@ private extension EntrySheet {
 
             Spacer()
 
-            Button("保存") {
+            RingButton("保存", systemImage: "checkmark", isProminent: true) {
                 Task { await save() }
             }
-            .fontWeight(.bold)
-            .foregroundStyle(model.canSave ? Palette.champagne : Palette.dusk)
             .disabled(!model.canSave)
         }
         .frame(minHeight: 44)
@@ -106,9 +105,9 @@ private extension EntrySheet {
                 .frame(width: 214, height: 214)
 
             VStack(spacing: 4) {
-                Text(model.type == .income ? "INCOME" : "EXPENSE")
-                    .font(.caption2)
-                    .tracking(3)
+                Text(model.type == .income ? "収入" : "支出")
+                    .font(.system(.caption, design: .serif))
+                    .tracking(4)
                     .foregroundStyle(Palette.gold)
 
                 Text(AmountText.text(model.amount))
@@ -240,14 +239,12 @@ private extension EntrySheet {
     }
 }
 
-#if DEBUG
-    #Preview {
-        let database = try? AppDatabase.inMemory()
-        let today = LocalDate(Date(), in: .current)
+#Preview {
+    let database = try? AppDatabase.inMemory()
+    let today = LocalDate(Date(), in: .current)
 
-        if let database {
-            let _ = try? database.insertDefaultsIfEmpty(at: Date())
-            EntrySheet(model: EntryModel(database: database, date: today))
-        }
+    if let database {
+        let _ = try? database.insertDefaultsIfEmpty(at: Date())
+        EntrySheet(model: EntryModel(database: database, date: today))
     }
-#endif
+}

@@ -183,10 +183,10 @@
 				};
 			};
 			buildConfigurationList = 78875D2F3079D362005422E3 /* Build configuration list for PBXProject "Kakeibot" */;
-			developmentRegion = en;
+			developmentRegion = ja;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
+				ja,
 				Base,
 			);
 			mainGroup = 78875D2B3079D362005422E3;
