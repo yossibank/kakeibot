@@ -112,7 +112,7 @@ KakeibotKit/
 ```
 KakeibotApp/
 ├── Sources/
-│   ├── AppFeature/          AppModel、DebugView、DeepLink、RootView、Routes、SideEffects
+│   ├── AppFeature/          AppModel、DeepLink、RootView、Routes、SideEffects、端末を振ったことの検知（#if DEBUG）
 │   ├── DesignSystem/
 │   │   ├── Components/      表すものごとのフォルダ。中のファイル名の頭にフォルダ名を付ける
 │   │   │   ├── Amount/      金額
@@ -126,6 +126,7 @@ KakeibotApp/
 │   │   │   └── Fonts/
 │   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）、色の文字列の読み取り
 │   ├── Features/
+│   │   ├── Debug/           画面と部品を実機で開くデバッグメニュー（#if DEBUG）
 │   │   ├── Entry/
 │   │   ├── Onboarding/
 │   │   ├── Settings/
@@ -261,7 +262,9 @@ sequenceDiagram
 | 通知を予約し直す | する | する | する |
 | ウィジェットに更新を頼む | する | する | する |
 
-裏に回ると `AppDatabase.suspend()` で DB を止め、裏から戻ると `AppDatabase.resume()` で再開する。実機で、書き込みの最中に裏に回しても `0xdead10cc` で終了しないことを確かめた。DEBUG のビルドでは、DB を開いた後に確認用の画面（`DebugView`）を出す。
+裏に回ると `AppDatabase.suspend()` で DB を止め、裏から戻ると `AppDatabase.resume()` で再開する。実機で、書き込みの最中に裏に回しても `0xdead10cc` で終了しないことを確かめた。
+
+DEBUG のビルドでは、端末を振るとデバッグメニュー（`DebugMenu`）を開く。画面はメモリ上の DB で開くので、端末のデータは変わらない。
 
 ### 外からの入口
 
