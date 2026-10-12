@@ -4,8 +4,7 @@ import SwiftUI
 struct EntryMemoCard: View {
     @Bindable var model: EntryModel
 
-    @FocusState private var isFocused: Bool
-
+    let isFocused: FocusState<Bool>.Binding
     let onDone: () -> Void
 
     var body: some View {
@@ -33,7 +32,7 @@ struct EntryMemoCard: View {
             .font(.subheadline)
             .foregroundStyle(Palette.ink)
             .tint(Palette.gold)
-            .focused($isFocused)
+            .focused(isFocused)
 
             if !model.recentMemos.isEmpty {
                 ScrollView(.horizontal) {
@@ -53,8 +52,8 @@ struct EntryMemoCard: View {
                 .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
         }
         .shadow(color: .black.opacity(0.45), radius: 20, y: 10)
-        .task {
-            isFocused = true
+        .onAppear {
+            isFocused.wrappedValue = true
         }
     }
 }

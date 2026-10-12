@@ -10,6 +10,8 @@ public struct EntrySheet: View {
     @State private var categoryPage = 0
     @State private var sheet: Sheet?
 
+    @FocusState private var isMemoFocused: Bool
+
     @Environment(\.dismiss) private var dismiss
 
     public init(model: EntryModel) {
@@ -17,6 +19,31 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
+        ZStack(alignment: .bottom) {
+            content
+
+            if isEditingMemo {
+                memoLayer
+            }
+        }
+        .background {
+            Rectangle()
+                .fill(Palette.night)
+                .ignoresSafeArea()
+        }
+        .preferredColorScheme(.dark)
+        .sheet(item: $sheet) { sheet in
+            sheetContent(for: sheet)
+        }
+        .onChange(of: model.type) {
+            categoryPage = 0
+        }
+        .task { await load() }
+    }
+}
+
+private extension EntrySheet {
+    var content: some View {
         VStack(spacing: 14) {
             header
             dial
@@ -45,32 +72,12 @@ public struct EntrySheet: View {
         .overlay(alignment: .bottom) {
             if isEnteringAmount {
                 keypadDrawer
-                    .transition(.move(edge: .bottom))
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .ignoresSafeArea(.keyboard)
-        .overlay(alignment: .bottom) {
-            if isEditingMemo {
-                memoOverlay
-            }
-        }
-        .background {
-            Rectangle()
-                .fill(Palette.night)
-                .ignoresSafeArea()
-        }
-        .preferredColorScheme(.dark)
-        .sheet(item: $sheet) { sheet in
-            sheetContent(for: sheet)
-        }
-        .onChange(of: model.type) {
-            categoryPage = 0
-        }
-        .task { await load() }
     }
-}
 
-private extension EntrySheet {
     var header: some View {
         HStack {
             RingButton("閉じる", systemImage: "xmark") {
@@ -192,7 +199,7 @@ private extension EntrySheet {
         }
     }
 
-    var memoOverlay: some View {
+    var memoLayer: some View {
         ZStack(alignment: .bottom) {
             Color.black
                 .opacity(0.35)
@@ -201,13 +208,13 @@ private extension EntrySheet {
                     editMemo(false)
                 }
 
-            EntryMemoCard(model: model) {
+            EntryMemoCard(model: model, isFocused: $isMemoFocused) {
                 editMemo(false)
             }
             .padding(.horizontal, 12)
             .padding(.bottom, 8)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
         }
+        .transition(.opacity)
     }
 
     func dialFace(size: CGFloat) -> some View {
@@ -343,8 +350,9 @@ private extension EntrySheet {
 
     func editMemo(_ isEditing: Bool) {
         setEnteringAmount(false)
+        isMemoFocused = isEditing
 
-        withAnimation(.snappy) {
+        withAnimation(.easeOut(duration: 0.18)) {
             isEditingMemo = isEditing
         }
     }

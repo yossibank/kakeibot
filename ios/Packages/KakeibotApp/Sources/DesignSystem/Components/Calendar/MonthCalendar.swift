@@ -5,6 +5,7 @@ public struct MonthCalendar: View {
     @Binding var selection: LocalDate
 
     @State private var month: YearMonth
+    @State private var movesForward = true
 
     let today: LocalDate
     let weekStart: Weekday
@@ -45,14 +46,21 @@ public struct MonthCalendar: View {
                 }
             }
 
-            ForEach(Array(weeks.enumerated()), id: \.offset) { _, week in
-                HStack(spacing: 0) {
-                    ForEach(Array(week.enumerated()), id: \.offset) { _, date in
-                        cell(for: date)
+            VStack(spacing: 6) {
+                ForEach(Array(weeks.enumerated()), id: \.offset) { _, week in
+                    HStack(spacing: 0) {
+                        ForEach(Array(week.enumerated()), id: \.offset) { _, date in
+                            cell(for: date)
+                        }
                     }
                 }
             }
+            .id(month)
+            .transition(.push(from: movesForward ? .trailing : .leading))
+            .contentShape(.rect)
+            .simultaneousGesture(swipe)
         }
+        .clipped()
     }
 }
 
@@ -63,7 +71,7 @@ private extension MonthCalendar {
         months: Int
     ) -> some View {
         Button {
-            month = month.adding(months: months)
+            move(months: months)
         } label: {
             Image(systemName: systemImage)
                 .font(.footnote.weight(.semibold))
@@ -117,6 +125,20 @@ private extension MonthCalendar {
 }
 
 private extension MonthCalendar {
+    var swipe: some Gesture {
+        DragGesture(minimumDistance: 20)
+            .onEnded { value in
+                let width = value.translation.width
+
+                guard abs(width) > Self.swipeDistance,
+                      abs(width) > abs(value.translation.height) else {
+                    return
+                }
+
+                move(months: width < 0 ? 1 : -1)
+            }
+    }
+
     var monthTitle: String {
         "\(month.year)年 \(month.month)月"
     }
@@ -129,6 +151,7 @@ private extension MonthCalendar {
     }
 
     static let rowCount = 6
+    static let swipeDistance: CGFloat = 50
     static let cellHeight: CGFloat = 46
 
     static func color(for weekday: Weekday) -> Color? {
@@ -136,6 +159,14 @@ private extension MonthCalendar {
         case .sunday: Palette.holiday
         case .saturday: Palette.saturday
         default: nil
+        }
+    }
+
+    func move(months: Int) {
+        movesForward = months > 0
+
+        withAnimation(.snappy) {
+            month = month.adding(months: months)
         }
     }
 

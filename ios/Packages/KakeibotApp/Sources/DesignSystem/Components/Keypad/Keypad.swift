@@ -33,12 +33,15 @@ private extension Keypad {
         return Button {
             onKey(key)
         } label: {
-            label(for: key)
+            label(for: key, isActive: isActive)
                 .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Self.background(for: key), in: .rect(cornerRadius: 14))
+                .background(
+                    Self.background(for: key, isActive: isActive),
+                    in: .rect(cornerRadius: 14)
+                )
                 .overlay {
                     RoundedRectangle(cornerRadius: 14)
-                        .stroke(isActive ? Palette.gold : Color.clear, lineWidth: 1)
+                        .stroke(Self.stroke(for: key, isActive: isActive), lineWidth: 0.75)
                 }
                 .contentShape(.rect)
         }
@@ -47,7 +50,10 @@ private extension Keypad {
     }
 
     @ViewBuilder
-    func label(for key: AmountCalculator.Key) -> some View {
+    func label(
+        for key: AmountCalculator.Key,
+        isActive: Bool
+    ) -> some View {
         switch key {
         case let .digit(value):
             digitText(String(value))
@@ -58,9 +64,26 @@ private extension Keypad {
                 .font(.system(size: 20, weight: .light))
                 .foregroundStyle(Palette.ink)
         case .clear:
-            functionText("AC")
+            Text("AC")
+                .font(.system(size: 15, weight: .medium, design: .serif))
+                .tracking(3)
+                .foregroundStyle(Palette.gold)
         case let .tax(rate):
-            functionText("税込 \(rate.rawValue)%")
+            VStack(spacing: 0) {
+                Text("税込")
+                    .font(.system(size: 9))
+                    .tracking(3)
+                    .foregroundStyle(isActive ? Palette.gold : Palette.mist)
+
+                HStack(alignment: .firstTextBaseline, spacing: 1) {
+                    Text(String(rate.rawValue))
+                        .font(.system(size: 20, design: .serif))
+
+                    Text("%")
+                        .font(.system(size: 11, design: .serif))
+                }
+                .foregroundStyle(isActive ? Palette.champagne : Palette.ink)
+            }
         case let .operation(operation):
             Text(operation.symbol)
                 .font(.system(size: 22))
@@ -77,12 +100,6 @@ private extension Keypad {
             .font(.system(size: 28, design: .serif))
             .foregroundStyle(Palette.ink)
     }
-
-    func functionText(_ text: String) -> some View {
-        Text(text)
-            .font(.footnote.weight(.medium))
-            .foregroundStyle(Palette.ink.opacity(0.85))
-    }
 }
 
 private extension Keypad {
@@ -94,12 +111,26 @@ private extension Keypad {
         [.doubleZero, .digit(0), .delete, .equals]
     ]
 
-    static func background(for key: AmountCalculator.Key) -> Color {
+    static func background(
+        for key: AmountCalculator.Key,
+        isActive: Bool
+    ) -> Color {
         switch key {
-        case .digit, .doubleZero, .delete: Color.clear
-        case .clear, .tax: Color.white.opacity(0.05)
+        case .digit, .doubleZero, .delete, .clear: Color.clear
+        case .tax: isActive ? Palette.gold.opacity(0.1) : Color.clear
         case .operation: Palette.gold.opacity(0.12)
         case .equals: Palette.gold
+        }
+    }
+
+    static func stroke(
+        for key: AmountCalculator.Key,
+        isActive: Bool
+    ) -> Color {
+        switch key {
+        case .clear: Palette.gold.opacity(0.3)
+        case .tax: isActive ? Palette.gold : Palette.gold.opacity(0.3)
+        default: Color.clear
         }
     }
 
