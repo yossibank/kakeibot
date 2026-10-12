@@ -41,7 +41,7 @@ kakeibot/
 
 ```
 ios/
-├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）とアプリアイコン
+├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）、アプリアイコン、起動画面
 ├── Kakeibot.xcodeproj       アプリとウィジェットのターゲット
 ├── Kakeibot.xctestplan      テストターゲットをまとめたテストプラン
 ├── Kakeibot.xcworkspace     プロジェクトと 2 つのパッケージを並べる。Xcode ではこれを開く
