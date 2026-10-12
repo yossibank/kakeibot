@@ -1,4 +1,4 @@
-# Kakeibot（カケイボット）
+# かけいぼっと（Kakeibot）
 
 iOS・Android の家計簿アプリ
 
