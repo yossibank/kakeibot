@@ -52,6 +52,10 @@ public struct EntrySheet: View {
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
+                .contentShape(.rect)
+                .onTapGesture {
+                    setEnteringAmount(false)
+                }
             }
             .scrollDismissesKeyboard(.interactively)
         }
@@ -155,7 +159,11 @@ private extension EntrySheet {
             Button {
                 open(.date)
             } label: {
-                Chip(EntryModel.dateText(for: model.date, today: today), systemImage: "calendar")
+                Chip(
+                    EntryModel.dateText(for: model.date, today: today),
+                    systemImage: "calendar",
+                    isHighlighted: model.date != today
+                )
             }
 
             Spacer(minLength: 0)
@@ -240,6 +248,7 @@ private extension EntrySheet {
 
         return Button {
             isMemoFocused = false
+            setEnteringAmount(false)
             model.categoryId = category.id
         } label: {
             VStack(spacing: 6) {
@@ -316,6 +325,7 @@ private extension EntrySheet {
 
     func open(_ sheet: Sheet) {
         isMemoFocused = false
+        setEnteringAmount(false)
         self.sheet = sheet
     }
 

@@ -173,7 +173,7 @@ private extension DebugComponent {
     var chipPage: some View {
         HStack {
             Chip("財布", systemImage: "wallet.bifold")
-            Chip("ランチ", systemImage: "square.and.pencil")
+            Chip("9/10（木）", systemImage: "calendar", isHighlighted: true)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Palette.night)

@@ -3,32 +3,52 @@ public enum Holiday {}
 public extension Holiday {
     static let supportedYears = 2022...2099
 
-    static func contains(_ date: LocalDate) -> Bool {
+    static func name(of date: LocalDate) -> String? {
         guard supportedYears.contains(date.year) else {
-            return false
+            return nil
         }
 
-        return isNamed(date) || isSubstitute(date) || isBetweenHolidays(date)
+        if let name = namedHoliday(on: date) {
+            return name
+        }
+
+        if isSubstitute(date) {
+            return "振替休日"
+        }
+
+        return isBetweenHolidays(date) ? "国民の休日" : nil
+    }
+
+    static func contains(_ date: LocalDate) -> Bool {
+        name(of: date) != nil
     }
 }
 
 private extension Holiday {
-    static func isNamed(_ date: LocalDate) -> Bool {
-        let day = date.day
-
-        switch date.month {
-        case 1: return day == 1 || isMonday(date, week: 2)
-        case 2: return day == 11 || day == 23
-        case 3: return day == springEquinox(in: date.year)
-        case 4: return day == 29
-        case 5: return (3...5).contains(day)
-        case 7: return isMonday(date, week: 3)
-        case 8: return day == 11
-        case 9: return isMonday(date, week: 3) || day == autumnEquinox(in: date.year)
-        case 10: return isMonday(date, week: 2)
-        case 11: return day == 3 || day == 23
-        default: return false
+    static func namedHoliday(on date: LocalDate) -> String? {
+        switch (date.month, date.day) {
+        case (1, 1): "元日"
+        case (1, _) where isMonday(date, week: 2): "成人の日"
+        case (2, 11): "建国記念の日"
+        case (2, 23): "天皇誕生日"
+        case (3, springEquinox(in: date.year)): "春分の日"
+        case (4, 29): "昭和の日"
+        case (5, 3): "憲法記念日"
+        case (5, 4): "みどりの日"
+        case (5, 5): "こどもの日"
+        case (7, _) where isMonday(date, week: 3): "海の日"
+        case (8, 11): "山の日"
+        case (9, _) where isMonday(date, week: 3): "敬老の日"
+        case (9, autumnEquinox(in: date.year)): "秋分の日"
+        case (10, _) where isMonday(date, week: 2): "スポーツの日"
+        case (11, 3): "文化の日"
+        case (11, 23): "勤労感謝の日"
+        default: nil
         }
+    }
+
+    static func isNamed(_ date: LocalDate) -> Bool {
+        namedHoliday(on: date) != nil
     }
 
     static func isSubstitute(_ date: LocalDate) -> Bool {

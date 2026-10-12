@@ -19,7 +19,7 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
-| `holiday-dates.json` | 1 年分の祝日（振替休日・国民の休日を含む） | `year`、`holidays`（その年の祝日をすべて、日付の順に） |
+| `holiday-dates.json` | 1 年分の祝日と名前（振替休日・国民の休日を含む） | `year`、`holidays`（その年の祝日の `date` と `name` をすべて、日付の順に） |
 | `local-date-instant.json` | 時刻と時差から、その場所の日付を出す | `instant`、`timeZone`（IANA の名前）、`date` |
 | `local-date-text.json` | 日付の文字列の判定 | `valid`、`invalid`（文字列） |
 | `local-date-week.json` | 日付を含む週の範囲 | `weekStart`（`monday`〜`sunday`）、`date`、`start`、`end` |

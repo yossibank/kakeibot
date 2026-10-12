@@ -52,6 +52,13 @@ public struct MonthCalendar: View {
                     }
                 }
             }
+
+            Text(holidayText)
+                .font(.caption2)
+                .foregroundStyle(Palette.holiday)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, minHeight: 30, alignment: .topLeading)
+                .padding(.top, 4)
         }
     }
 }
@@ -111,8 +118,26 @@ private extension MonthCalendar {
     }
 
     var weeks: [[LocalDate?]] {
-        month.weeks(startingOn: weekStart)
+        let weeks = month.weeks(startingOn: weekStart)
+        let blank = [LocalDate?](repeating: nil, count: 7)
+        let missing = max(Self.rowCount - weeks.count, 0)
+        return weeks + Array(repeating: blank, count: missing)
     }
+
+    var holidayText: String {
+        guard let first = LocalDate(yearMonth: month, day: 1) else {
+            return ""
+        }
+
+        let names = (0..<month.numberOfDays).compactMap { offset in
+            let date = first.adding(days: offset)
+            return Holiday.name(of: date).map { "\(date.day)日 \($0)" }
+        }
+
+        return names.joined(separator: "　")
+    }
+
+    static let rowCount = 6
 
     static func color(for weekday: Weekday) -> Color? {
         switch weekday {

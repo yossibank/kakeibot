@@ -3,11 +3,13 @@ import Testing
 
 struct HolidayTests {
     @Test(arguments: try cases)
-    func marksHolidaysOfYear(fixture: YearCase) throws {
+    func namesHolidaysOfYear(fixture: YearCase) throws {
         let first = try #require(LocalDate(year: fixture.year, month: 1, day: 1))
         let days = (0..<365).map { first.adding(days: $0) }
 
-        let holidays = days.filter(Holiday.contains)
+        let holidays = days.compactMap { date in
+            Holiday.name(of: date).map { NamedDate(date: date, name: $0) }
+        }
 
         #expect(holidays == fixture.holidays)
     }
@@ -22,7 +24,12 @@ struct HolidayTests {
 extension HolidayTests {
     struct YearCase: Decodable, Sendable {
         let year: Int
-        let holidays: [LocalDate]
+        let holidays: [NamedDate]
+    }
+
+    struct NamedDate: Decodable, Equatable, Sendable {
+        let date: LocalDate
+        let name: String
     }
 }
 
