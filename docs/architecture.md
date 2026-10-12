@@ -97,7 +97,6 @@ KakeibotKit/
 │   └── Store/
 │       ├── Database/        App Group、DatabasePool、止められる前の対策、最初の財布とカテゴリ。止める通知は AppFeature が送る
 │       ├── Migrations/      版ごとに 1 ファイル
-│       ├── Preview/         プレビュー用のサンプルデータ（#if DEBUG）
 │       ├── Queries/         記録の一覧、入力の選択肢、月の要約・日ごとの合計・よく使う組み合わせの元データ
 │       ├── Records/         Core の型を GRDB で読み書きできるようにする
 │       ├── Snapshot/        書き出し用の全データの読み出し、読み込み用の全置き換え
@@ -112,7 +111,7 @@ KakeibotKit/
 ```
 KakeibotApp/
 ├── Sources/
-│   ├── AppFeature/          AppModel、DebugView、DeepLink、RootView、Routes、SideEffects
+│   ├── AppFeature/          AppModel、DeepLink、RootView、Routes、SideEffects、端末を振ったことの検知（#if DEBUG）
 │   ├── DesignSystem/
 │   │   ├── Components/      表すものごとのフォルダ。中のファイル名の頭にフォルダ名を付ける
 │   │   │   ├── Amount/      金額
@@ -126,6 +125,7 @@ KakeibotApp/
 │   │   │   └── Fonts/
 │   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）、色の文字列の読み取り
 │   ├── Features/
+│   │   ├── Debug/           画面と部品を実機で開くデバッグメニュー（#if DEBUG）
 │   │   ├── Entry/
 │   │   ├── Onboarding/
 │   │   ├── Settings/
@@ -261,7 +261,9 @@ sequenceDiagram
 | 通知を予約し直す | する | する | する |
 | ウィジェットに更新を頼む | する | する | する |
 
-裏に回ると `AppDatabase.suspend()` で DB を止め、裏から戻ると `AppDatabase.resume()` で再開する。実機で、書き込みの最中に裏に回しても `0xdead10cc` で終了しないことを確かめた。DEBUG のビルドでは、DB を開いた後に確認用の画面（`DebugView`）を出す。
+裏に回ると `AppDatabase.suspend()` で DB を止め、裏から戻ると `AppDatabase.resume()` で再開する。実機で、書き込みの最中に裏に回しても `0xdead10cc` で終了しないことを確かめた。
+
+DEBUG のビルドでは、端末を振るとデバッグメニュー（`DebugMenu`）を開く。画面はメモリ上の DB で開くので、端末のデータは変わらない。
 
 ### 外からの入口
 

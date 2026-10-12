@@ -16,6 +16,7 @@ public struct RootView: View {
             .onChange(of: scenePhase) { _, phase in
                 model.changeScene(to: phase)
             }
+            .debugMenuOnShake()
     }
 }
 
@@ -25,12 +26,8 @@ private extension RootView {
         switch model.launch {
         case .opening:
             ProgressView()
-        case let .ready(database):
-            #if DEBUG
-                DebugView(database: database)
-            #else
-                Text("Kakeibot")
-            #endif
+        case .ready:
+            Text("Kakeibot")
         case let .failed(message):
             ContentUnavailableView(
                 "データを開けませんでした",
