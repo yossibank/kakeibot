@@ -134,6 +134,7 @@ KakeibotApp/
 │   ├── Features/
 │   │   ├── Debug/           画面を実機で開くデバッグメニュー（#if DEBUG）
 │   │   ├── Entry/
+│   │   ├── Launch/          起動の印の動き
 │   │   ├── Main/            タブの骨組みと、まだ作っていないタブの表示
 │   │   ├── Onboarding/
 │   │   ├── Settings/

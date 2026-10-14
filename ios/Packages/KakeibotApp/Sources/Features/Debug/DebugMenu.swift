@@ -18,6 +18,10 @@ public struct DebugMenu: View {
                         sheet = .main
                     }
 
+                    Button("起動の動き") {
+                        sheet = .launch
+                    }
+
                     Button("入力シート（新規）") {
                         sheet = .newEntry
                     }
@@ -52,6 +56,7 @@ public struct DebugMenu: View {
 private extension DebugMenu {
     enum Sheet: Identifiable {
         case main
+        case launch
         case newEntry
         case editEntry
 
@@ -66,6 +71,11 @@ private extension DebugMenu {
             switch sheet {
             case .main:
                 MainView(database: database)
+            case .launch:
+                MainView(database: database)
+                    .overlay {
+                        LaunchView(isReady: true) {}
+                    }
             case .newEntry, .editEntry:
                 let editing = sheet == .editEntry ? model.sampleEntryId : nil
                 let today = LocalDate(Date(), in: .current)
