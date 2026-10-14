@@ -6,6 +6,13 @@ public enum TemplateCardSize: Sendable {
 }
 
 public extension TemplateCardSize {
+    var textSpacing: CGFloat {
+        switch self {
+        case .regular: 3
+        case .large: 10
+        }
+    }
+
     var height: CGFloat {
         switch self {
         case .regular: 108

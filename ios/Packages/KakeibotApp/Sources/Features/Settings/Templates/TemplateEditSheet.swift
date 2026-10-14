@@ -23,7 +23,7 @@ public struct TemplateEditSheet: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .top) {
             content
                 .ignoresSafeArea(.keyboard)
 
@@ -43,6 +43,7 @@ public struct TemplateEditSheet: View {
                         .transition(Self.memoTransition)
                 } else {
                     drawerView(panel)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
                         .transition(Self.drawerTransition)
                 }
             }
@@ -120,6 +121,7 @@ private extension TemplateEditSheet {
             RingButton(systemImage: "xmark") {
                 close()
             }
+            .frame(width: 64, alignment: .leading)
 
             Spacer()
 
@@ -130,14 +132,18 @@ private extension TemplateEditSheet {
 
             Spacer()
 
-            Button("保存") {
+            Button {
                 Task {
                     await save()
                 }
+            } label: {
+                Text("保存")
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(saveColor)
+                    .frame(minWidth: 64, minHeight: 44)
+                    .contentShape(.rect)
             }
-            .font(.subheadline.weight(.bold))
-            .foregroundStyle(saveColor)
-            .frame(minWidth: 44, minHeight: 44)
+            .buttonStyle(.plain)
         }
     }
 
@@ -181,7 +187,7 @@ private extension TemplateEditSheet {
             .onSubmit {
                 focus = nil
             }
-            .padding(.bottom, 4)
+            .padding(.bottom, 8)
             .overlay(alignment: .bottom) {
                 Rectangle()
                     .fill(nameLine)

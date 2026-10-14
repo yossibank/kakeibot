@@ -21,6 +21,7 @@ public final class EntryModel {
     private var baseline: Snapshot?
     private var allTemplates: [EntryTemplate] = []
     private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
+    private var appliedTemplateId: EntryTemplate.ID?
 
     private let database: AppDatabase
     private let editingId: Entry.ID?
@@ -201,7 +202,8 @@ public extension EntryModel {
     func isApplied(_ template: EntryTemplate) -> Bool {
         let amountMatches = template.amount.map { $0 == amount } ?? true
 
-        return template.type == type
+        return template.id == appliedTemplateId
+            && template.type == type
             && template.categoryId == categoryId
             && template.walletId == walletId
             && (template.memo ?? "") == memo
@@ -214,6 +216,7 @@ public extension EntryModel {
         walletId = template.walletId
         memo = template.memo ?? ""
         calculator = AmountCalculator(amount: template.amount ?? 0)
+        appliedTemplateId = template.id
     }
 
     func reloadTemplates() async {

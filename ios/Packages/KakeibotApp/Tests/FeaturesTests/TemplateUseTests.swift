@@ -22,6 +22,20 @@ struct TemplateUseTests {
     }
 
     @Test
+    func highlightsOnlyTheAppliedTemplate() async throws {
+        let setup = try await Setup()
+        let pass = try await setup.saveTemplate(name: "定期", amount: nil)
+        let bus = try await setup.saveTemplate(name: "バス", amount: nil)
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        model.apply(bus)
+
+        #expect(model.isApplied(bus))
+        #expect(!model.isApplied(pass))
+    }
+
+    @Test
     func startsFromTemplateWithoutChanges() async throws {
         let setup = try await Setup()
         let pass = try await setup.saveTemplate(name: "定期", amount: nil)

@@ -34,7 +34,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
                             .strokeBorder(Self.foil, lineWidth: 1)
                     }
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: size.textSpacing) {
                     name
                         .lineLimit(1)
 
