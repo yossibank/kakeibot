@@ -28,7 +28,7 @@ struct EntryCategoryMenu: View {
             hairline
 
             row(
-                "このカテゴリを直す",
+                "このカテゴリを編集",
                 systemImage: "square.and.pencil",
                 action: onEdit
             )
@@ -36,7 +36,7 @@ struct EntryCategoryMenu: View {
             hairline
 
             row(
-                "隠す",
+                "非表示にする",
                 note: "設定のカテゴリから戻せる",
                 systemImage: "eye.slash",
                 action: onHide

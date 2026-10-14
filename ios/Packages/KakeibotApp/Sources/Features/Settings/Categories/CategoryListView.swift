@@ -26,7 +26,7 @@ public struct CategoryListView: View {
             header
             CapsulePicker(selection: $model.kind, options: Self.kindOptions)
 
-            Text("長押しで動かす。下の枠に置くと隠す")
+            Text("長押しで動かす。下の枠に置くと非表示")
                 .font(.caption)
                 .foregroundStyle(Palette.mist)
 
@@ -137,7 +137,7 @@ private extension CategoryListView {
         return HStack(spacing: 8) {
             Image(systemName: "eye.slash")
 
-            Text("ここに置いて隠す")
+            Text("ここに置いて非表示にする")
         }
         .font(.subheadline)
         .foregroundStyle(color)
@@ -156,7 +156,7 @@ private extension CategoryListView {
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("隠したカテゴリ")
+            Text("非表示のカテゴリ")
                 .font(.caption2)
                 .tracking(2)
                 .foregroundStyle(Palette.mist)

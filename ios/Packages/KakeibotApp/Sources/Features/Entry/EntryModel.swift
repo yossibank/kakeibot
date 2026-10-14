@@ -19,6 +19,7 @@ public final class EntryModel {
     public private(set) var errorMessage: String?
 
     private var baseline: Snapshot?
+    private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
 
     private let database: AppDatabase
     private let editingId: Entry.ID?
@@ -219,9 +220,18 @@ public extension EntryModel {
     }
 
     func select(_ type: Entry.Kind) {
+        guard type != self.type else {
+            return
+        }
+
+        categoryByType[self.type] = categoryId
         self.type = type
 
-        if !categories.contains(where: { $0.id == categoryId }) {
+        let remembered = categoryByType[type]
+
+        if categories.contains(where: { $0.id == remembered }) {
+            categoryId = remembered
+        } else if !categories.contains(where: { $0.id == categoryId }) {
             categoryId = categories.first?.id
         }
     }

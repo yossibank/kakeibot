@@ -139,6 +139,29 @@ struct EntryModelTests {
     }
 
     @Test
+    func remembersCategoryForEachType() async throws {
+        let model = try await Self.newModel()
+        let expense = model.categories
+        let transit = try #require(expense.first { $0.name == "交通" })
+        model.categoryId = transit.id
+
+        model.select(.income)
+        let incomeFirst = model.selectedCategory?.name
+        let income = model.categories
+        let bonus = try #require(income.first { $0.name == "臨時収入" })
+        model.categoryId = bonus.id
+
+        model.select(.expense)
+        let expenseBack = model.selectedCategory?.name
+
+        model.select(.income)
+
+        #expect(incomeFirst == "給料")
+        #expect(expenseBack == "交通")
+        #expect(model.selectedCategory?.name == "臨時収入")
+    }
+
+    @Test
     func tracksChangesAfterLoading() async throws {
         let model = try await Self.newModel()
         let loaded = model.isChanged

@@ -65,9 +65,6 @@ public struct EntrySheet: View {
         .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
             sheetContent(for: sheet)
         }
-        .onChange(of: model.type) {
-            categoryPage = 0
-        }
         .task {
             await load()
         }
@@ -214,16 +211,15 @@ private extension EntrySheet {
             .scrollPosition(id: $categoryPage)
             .scrollIndicators(.hidden)
             .frame(minHeight: 168, maxHeight: 264)
+            .id(model.type)
 
-            if model.categoryPages.count > 1 {
-                PageDots(
-                    count: model.categoryPages.count,
-                    current: categoryPage ?? 0
-                )
-            }
+            PageDots(
+                count: model.categoryPages.count,
+                current: categoryPage ?? 0
+            )
 
             if !hasOpenedMenu {
-                Label("長押しで直す・隠す", systemImage: "hand.tap")
+                Label("長押しで編集・非表示", systemImage: "hand.tap")
                     .font(.caption2)
                     .foregroundStyle(Palette.mist)
             }
@@ -548,7 +544,13 @@ private extension EntrySheet {
                 model.type
             },
             set: { type in
-                model.select(type)
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+
+                withTransaction(transaction) {
+                    model.select(type)
+                    showSelectedCategory()
+                }
             }
         )
     }

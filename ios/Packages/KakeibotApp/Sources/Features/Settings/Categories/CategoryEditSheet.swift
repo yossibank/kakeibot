@@ -97,7 +97,7 @@ private extension CategoryEditSheet {
 
             Spacer()
 
-            Text(model.isEditing ? "カテゴリを直す" : "カテゴリを足す")
+            Text(model.isEditing ? "カテゴリを編集" : "カテゴリを追加")
                 .font(.system(size: 16, design: .serif))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
@@ -231,7 +231,7 @@ private extension CategoryEditSheet {
                 await setHidden(!model.isHidden)
             }
         } label: {
-            Text(model.isHidden ? "表示に戻す" : "このカテゴリを隠す")
+            Text(model.isHidden ? "表示に戻す" : "このカテゴリを非表示にする")
                 .font(.subheadline)
                 .foregroundStyle(hideColor)
                 .frame(maxWidth: .infinity, minHeight: 46)

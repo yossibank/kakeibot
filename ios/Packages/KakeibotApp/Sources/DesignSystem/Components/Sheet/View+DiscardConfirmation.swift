@@ -72,7 +72,7 @@ private extension DiscardCard {
                     .font(.system(size: 18, weight: .medium, design: .serif))
                     .foregroundStyle(Palette.champagne)
 
-                Text("入れた内容は残りません")
+                Text("入力した内容は残りません")
                     .font(.caption)
                     .foregroundStyle(Palette.mist)
             }
