@@ -61,7 +61,6 @@ private extension HomeView {
                     }
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("設定")
         }
     }
 
@@ -85,7 +84,6 @@ private extension HomeView {
                 }
             }
             .frame(maxWidth: 290)
-            .accessibilityElement(children: .combine)
 
             HStack(spacing: 0) {
                 stat("今日", amount: model.todayExpense, color: Palette.champagne)
@@ -175,6 +173,5 @@ private extension HomeView {
                 .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .combine)
     }
 }

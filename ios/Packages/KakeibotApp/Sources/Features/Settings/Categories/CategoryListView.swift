@@ -76,7 +76,7 @@ public struct CategoryListView: View {
 private extension CategoryListView {
     var header: some View {
         HStack {
-            RingButton("戻る", systemImage: "chevron.left") {
+            RingButton(systemImage: "chevron.left") {
                 dismiss()
             }
 
@@ -86,7 +86,6 @@ private extension CategoryListView {
                 .font(.system(size: 16, design: .serif))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
-                .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
@@ -130,7 +129,6 @@ private extension CategoryListView {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("カテゴリを足す")
     }
 
     var hideTarget: some View {
@@ -195,10 +193,6 @@ private extension CategoryListView {
                 sheet = .edit(category.kind, category.id)
             }
             .gesture(reorderGesture(for: category))
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAction {
-                sheet = .edit(category.kind, category.id)
-            }
     }
 
     func tileFace(
@@ -277,7 +271,7 @@ private extension CategoryListView {
         .init("収入", value: .income)
     ]
 
-    static let space = "CategoryBoard"
+    nonisolated static let space = "CategoryBoard"
     static let columnCount = 4
     static let spacing: CGFloat = 8
     static let tileHeight: CGFloat = 78

@@ -7,8 +7,6 @@ public struct LaunchView: View {
     @State private var hasSwept = false
     @State private var isLeaving = false
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
     let isReady: Bool
     let onFinish: () -> Void
 
@@ -21,7 +19,7 @@ public struct LaunchView: View {
     }
 
     public var body: some View {
-        let scale: CGFloat = isLeaving && !reduceMotion ? 1.12 : 1
+        let scale: CGFloat = isLeaving ? 1.12 : 1
 
         ZStack {
             Palette.drawer
@@ -32,7 +30,6 @@ public struct LaunchView: View {
         .ignoresSafeArea()
         .opacity(isLeaving ? 0 : 1)
         .allowsHitTesting(!isLeaving)
-        .accessibilityHidden(true)
         .task {
             await sweepRing()
         }
@@ -70,18 +67,15 @@ private extension LaunchView {
     }
 
     func sweepRing() async {
-        if !reduceMotion {
-            withAnimation(.easeInOut(duration: 0.8)) {
-                sweep = 1 + Self.sweepLength
-            }
-
-            withAnimation(.easeOut(duration: 0.5).delay(0.45)) {
-                glow = 0.7
-            }
-
-            try? await Task.sleep(for: .milliseconds(850))
+        withAnimation(.easeInOut(duration: 0.8)) {
+            sweep = 1 + Self.sweepLength
         }
 
+        withAnimation(.easeOut(duration: 0.5).delay(0.45)) {
+            glow = 0.7
+        }
+
+        try? await Task.sleep(for: .milliseconds(850))
         hasSwept = true
     }
 

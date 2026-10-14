@@ -22,8 +22,6 @@ public struct PageDots: View {
         }
         .animation(.easeOut(duration: 0.2), value: current)
         .opacity(count > 1 ? 1 : 0)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(current + 1) / \(count) ページ")
     }
 }
 

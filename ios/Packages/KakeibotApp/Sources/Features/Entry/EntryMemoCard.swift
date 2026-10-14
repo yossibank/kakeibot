@@ -78,7 +78,6 @@ private extension EntryMemoCard {
         }
         .frame(width: size.width, height: size.height)
         .offset(x: pointerX - size.width / 2, y: size.height - 1)
-        .accessibilityHidden(true)
     }
 
     func suggestionButton(_ memo: String) -> some View {

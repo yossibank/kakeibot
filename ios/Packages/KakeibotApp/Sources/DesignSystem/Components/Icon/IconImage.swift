@@ -26,7 +26,6 @@ public struct IconImage: View {
             }
         }
         .frame(width: size * 1.4, height: size * 1.4)
-        .accessibilityHidden(true)
     }
 }
 

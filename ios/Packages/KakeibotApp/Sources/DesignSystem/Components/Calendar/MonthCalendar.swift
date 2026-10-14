@@ -24,7 +24,7 @@ public struct MonthCalendar: View {
     public var body: some View {
         VStack(spacing: 6) {
             HStack {
-                monthButton("前の月", systemImage: "chevron.left", months: -1)
+                monthButton(systemImage: "chevron.left", months: -1)
 
                 Spacer()
 
@@ -34,7 +34,7 @@ public struct MonthCalendar: View {
 
                 Spacer()
 
-                monthButton("次の月", systemImage: "chevron.right", months: 1)
+                monthButton(systemImage: "chevron.right", months: 1)
             }
 
             HStack(spacing: 0) {
@@ -72,7 +72,6 @@ public struct MonthCalendar: View {
 
 private extension MonthCalendar {
     func monthButton(
-        _ title: LocalizedStringKey,
         systemImage: String,
         months: Int
     ) -> some View {
@@ -86,7 +85,6 @@ private extension MonthCalendar {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(title)
     }
 
     @ViewBuilder
@@ -123,8 +121,6 @@ private extension MonthCalendar {
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(Self.label(for: date, holiday: holiday))
-            .accessibilityAddTraits(isSelected ? .isSelected : [])
         } else {
             Color.clear
                 .frame(height: Self.cellHeight)
@@ -163,17 +159,6 @@ private extension MonthCalendar {
     static let rowCount = 6
     static let swipeDistance: CGFloat = 50
     static let cellHeight: CGFloat = 46
-
-    static func label(
-        for date: LocalDate,
-        holiday: String?
-    ) -> String {
-        guard let holiday else {
-            return "\(date.day)日"
-        }
-
-        return "\(date.day)日 \(holiday)"
-    }
 
     static func headerColor(for weekday: Weekday) -> Color {
         color(for: weekday) ?? Palette.mist

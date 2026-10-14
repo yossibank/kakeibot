@@ -12,6 +12,9 @@ public struct EntrySheet: View {
     @State private var memoChipFrame: CGRect = .zero
     @State private var isConfirmingDiscard = false
     @State private var categoryMenu: CategoryMenu?
+    @State private var pressingCategory: EntryCategory.ID?
+
+    @AppStorage("entry.hasOpenedCategoryMenu") private var hasOpenedMenu = false
     @State private var sheetWidth: CGFloat = 0
 
     @FocusState private var isMemoFocused: Bool
@@ -110,7 +113,7 @@ private extension EntrySheet {
 
     var header: some View {
         HStack {
-            RingButton("閉じる", systemImage: "xmark") {
+            RingButton(systemImage: "xmark") {
                 close()
             }
 
@@ -122,7 +125,6 @@ private extension EntrySheet {
 
             if model.isEditing {
                 RingButton(
-                    "この記録を消す",
                     systemImage: "trash",
                     style: .destructive
                 ) {
@@ -148,9 +150,6 @@ private extension EntrySheet {
         }
         .buttonStyle(.plain)
         .frame(minHeight: 150, maxHeight: 270)
-        .accessibilityLabel("金額")
-        .accessibilityValue(AmountText.text(model.amount))
-        .accessibilityHint("タップしてテンキーを開く")
     }
 
     var details: some View {
@@ -221,6 +220,12 @@ private extension EntrySheet {
                     count: model.categoryPages.count,
                     current: categoryPage ?? 0
                 )
+            }
+
+            if !hasOpenedMenu {
+                Label("長押しで直す・隠す", systemImage: "hand.tap")
+                    .font(.caption2)
+                    .foregroundStyle(Palette.mist)
             }
         }
     }
@@ -368,14 +373,16 @@ private extension EntrySheet {
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("カテゴリを足す")
         }
     }
 
     func categoryButton(_ category: EntryCategory) -> some View {
-        let isSelected = model.categoryId == category.id
+        let isPressing = pressingCategory == category.id
+        let scale: CGFloat = isPressing ? 0.93 : 1
 
         return categoryFace(category, isLifted: false)
+            .scaleEffect(scale)
+            .animation(.snappy(duration: 0.2), value: isPressing)
             .overlay {
                 GeometryReader { proxy in
                     Color.clear
@@ -383,27 +390,17 @@ private extension EntrySheet {
                         .onTapGesture {
                             select(category)
                         }
-                        .onLongPressGesture(minimumDuration: 0.4) {
+                        .onLongPressGesture(
+                            minimumDuration: Self.menuPressDuration
+                        ) {
                             let space = CoordinateSpace.named(
                                 Self.coordinateSpace
                             )
 
                             openMenu(for: category, at: proxy.frame(in: space))
+                        } onPressingChanged: { isPressing in
+                            pressingCategory = isPressing ? category.id : nil
                         }
-                }
-            }
-            .accessibilityElement(children: .combine)
-            .accessibilityAddTraits(.isButton)
-            .accessibilityAddTraits(isSelected ? .isSelected : [])
-            .accessibilityAction {
-                select(category)
-            }
-            .accessibilityAction(named: "このカテゴリを直す") {
-                open(.editCategory(category))
-            }
-            .accessibilityAction(named: "隠す") {
-                Task {
-                    await model.hideCategory(category)
                 }
             }
     }
@@ -526,7 +523,7 @@ private extension EntrySheet {
         .init("収入", value: .income)
     ]
 
-    static let coordinateSpace = "EntrySheet"
+    nonisolated static let coordinateSpace = "EntrySheet"
     static let memoCardInset: CGFloat = 12
     static let drawerShape = UnevenRoundedRectangle(
         topLeadingRadius: 28,
@@ -535,6 +532,7 @@ private extension EntrySheet {
     static let categoryRows = 3
     static let categoryColumns = 4
     static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
+    static let menuPressDuration = 0.25
 
     static var memoTransition: AnyTransition {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
@@ -623,6 +621,8 @@ private extension EntrySheet {
         at frame: CGRect
     ) {
         setEnteringAmount(false)
+        pressingCategory = nil
+        hasOpenedMenu = true
 
         withAnimation(.snappy(duration: 0.25)) {
             categoryMenu = CategoryMenu(category: category, frame: frame)

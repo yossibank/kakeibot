@@ -27,7 +27,6 @@ public struct HalfDial: View {
                 .stroke(Palette.gold, lineWidth: 1.4)
         }
         .aspectRatio(2, contentMode: .fit)
-        .accessibilityHidden(true)
     }
 }
 

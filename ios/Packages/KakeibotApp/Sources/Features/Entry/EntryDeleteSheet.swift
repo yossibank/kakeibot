@@ -20,7 +20,6 @@ struct EntryDeleteSheet: View {
                         Circle()
                             .stroke(Palette.rose.opacity(0.6), lineWidth: 1)
                     }
-                    .accessibilityHidden(true)
 
                 VStack(spacing: 6) {
                     Text("この記録を消しますか")
@@ -88,7 +87,6 @@ private extension EntryDeleteSheet {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Palette.line, lineWidth: 1)
         }
-        .accessibilityElement(children: .combine)
     }
 }
 

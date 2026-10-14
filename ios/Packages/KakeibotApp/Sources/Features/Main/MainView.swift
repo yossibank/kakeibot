@@ -79,8 +79,7 @@ public struct MainView: View {
         .overlay(alignment: .bottom) {
             FloatingTabBar(
                 selection: $tab,
-                items: Self.tabItems,
-                addTitle: "記録する"
+                items: Self.tabItems
             ) {
                 sheet = .new
             }
@@ -167,7 +166,6 @@ private extension MainView {
         EntrySheet(model: draft)
             .opacity(0)
             .allowsHitTesting(false)
-            .accessibilityHidden(true)
             .task {
                 try? await Task.sleep(for: .milliseconds(500))
                 isWarmingEntry = false

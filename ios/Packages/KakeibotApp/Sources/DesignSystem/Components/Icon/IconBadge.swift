@@ -21,7 +21,6 @@ public struct IconBadge: View {
                 IconImage(icon, size: size * 0.45)
                     .foregroundStyle(tint)
             }
-            .accessibilityHidden(true)
     }
 }
 

@@ -91,7 +91,7 @@ private extension CategoryEditSheet {
 
     var header: some View {
         HStack {
-            RingButton("閉じる", systemImage: "xmark") {
+            RingButton(systemImage: "xmark") {
                 close()
             }
 
@@ -101,7 +101,6 @@ private extension CategoryEditSheet {
                 .font(.system(size: 16, design: .serif))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
-                .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
@@ -149,7 +148,6 @@ private extension CategoryEditSheet {
             .font(.caption2)
             .foregroundStyle(Palette.mist)
         }
-        .accessibilityElement(children: .combine)
     }
 
     var colors: some View {
@@ -308,8 +306,6 @@ private extension CategoryEditSheet {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(glyph.rawValue)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     func emojiButton(_ emoji: String) -> some View {
@@ -335,7 +331,6 @@ private extension CategoryEditSheet {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     func colorButton(_ hex: String) -> some View {
@@ -357,8 +352,6 @@ private extension CategoryEditSheet {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(hex)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

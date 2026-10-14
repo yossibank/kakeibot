@@ -58,15 +58,6 @@ public struct CapsulePicker<Value: Hashable>: View {
             feedback.selectionChanged()
             feedback.prepare()
         }
-        .accessibilityRepresentation {
-            Picker("", selection: $selection) {
-                ForEach(options, id: \.value) { option in
-                    Text(option.title)
-                        .tag(option.value)
-                }
-            }
-            .pickerStyle(.segmented)
-        }
     }
 }
 

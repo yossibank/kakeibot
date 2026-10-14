@@ -55,11 +55,10 @@ private extension SettingsSheet {
                 .font(.system(size: 16, design: .serif))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
-                .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
-            RingButton("閉じる", systemImage: "xmark") {
+            RingButton(systemImage: "xmark") {
                 dismiss()
             }
         }

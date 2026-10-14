@@ -47,7 +47,6 @@ public struct EntryRow: View {
         }
         .frame(minHeight: 48)
         .contentShape(.rect)
-        .accessibilityElement(children: .combine)
     }
 }
 

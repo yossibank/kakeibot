@@ -49,7 +49,6 @@ private extension Keypad {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Self.accessibilityLabel(for: key))
     }
 
     @ViewBuilder
@@ -136,18 +135,6 @@ private extension Keypad {
         default: Color.clear
         }
     }
-
-    static func accessibilityLabel(for key: AmountCalculator.Key) -> String {
-        switch key {
-        case let .digit(value): String(value)
-        case .doubleZero: "00"
-        case .delete: "1 文字消す"
-        case .clear: "全部消す"
-        case let .tax(rate): "税込み \(rate.rawValue)%"
-        case let .operation(operation): operation.name
-        case .equals: "計算する"
-        }
-    }
 }
 
 public extension AmountCalculator.Operation {
@@ -157,17 +144,6 @@ public extension AmountCalculator.Operation {
         case .subtract: "−"
         case .multiply: "×"
         case .divide: "÷"
-        }
-    }
-}
-
-private extension AmountCalculator.Operation {
-    var name: String {
-        switch self {
-        case .add: "足す"
-        case .subtract: "引く"
-        case .multiply: "掛ける"
-        case .divide: "割る"
         }
     }
 }

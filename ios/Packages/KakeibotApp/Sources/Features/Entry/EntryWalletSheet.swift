@@ -71,7 +71,6 @@ private extension EntryWalletSheet {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
