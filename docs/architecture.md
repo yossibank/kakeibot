@@ -125,7 +125,8 @@ KakeibotApp/
 │   │   │   ├── Keypad/      テンキー
 │   │   │   ├── Pager/       ページの点
 │   │   │   ├── Picker/      カプセルの切り替え
-│   │   │   └── Sheet/       中身の高さに合わせたシート
+│   │   │   ├── Sheet/       中身の高さに合わせたシート
+│   │   │   └── TabBar/      浮かせたタブの帯と ＋ ボタン
 │   │   ├── Resources/
 │   │   │   ├── Assets.xcassets
 │   │   │   └── Fonts/

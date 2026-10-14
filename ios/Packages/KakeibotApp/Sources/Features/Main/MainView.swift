@@ -14,46 +14,81 @@ public struct MainView: View {
 
     public init(database: AppDatabase) {
         let today = LocalDate(Date(), in: .current)
-        _home = State(initialValue: HomeModel(database: database, today: today))
-        _records = State(initialValue: RecordsModel(database: database, month: today.yearMonth))
+
+        _home = State(
+            initialValue: HomeModel(
+                database: database,
+                today: today
+            )
+        )
+
+        _records = State(
+            initialValue: RecordsModel(
+                database: database,
+                month: today.yearMonth
+            )
+        )
+
         self.database = database
     }
 
     public var body: some View {
-        TabView(selection: selection) {
-            Tab("ホーム", systemImage: "house", value: MainTab.home) {
+        TabView(selection: $tab) {
+            Tab(value: MainTab.home) {
                 HomeView(
                     model: home,
-                    onOpenEntry: { sheet = .edit($0) },
-                    onShowRecords: { tab = .records },
-                    onOpenSettings: { sheet = .settings }
+                    onOpenEntry: { id in
+                        sheet = .edit(id)
+                    },
+                    onShowRecords: {
+                        tab = .records
+                    },
+                    onOpenSettings: {
+                        sheet = .settings
+                    }
                 )
+                .tabContent()
             }
 
-            Tab("記録", systemImage: "calendar", value: MainTab.records) {
-                RecordsView(model: records) { sheet = .edit($0) }
+            Tab(value: MainTab.records) {
+                RecordsView(model: records) { id in
+                    sheet = .edit(id)
+                }
+                .tabContent()
             }
 
-            Tab("振り返り", systemImage: "chart.pie", value: MainTab.review) {
+            Tab(value: MainTab.review) {
                 ComingSoonView(title: "振り返り", systemImage: "chart.pie")
+                    .tabContent()
             }
 
-            Tab("資産", systemImage: "building.columns", value: MainTab.assets) {
+            Tab(value: MainTab.assets) {
                 ComingSoonView(title: "資産", systemImage: "building.columns")
-            }
-
-            Tab("記録する", systemImage: "plus", value: MainTab.add, role: .search) {
-                Color.clear
+                    .tabContent()
             }
         }
-        .tint(Palette.gold)
+        .overlay(alignment: .bottom) {
+            FloatingTabBar(
+                selection: $tab,
+                items: Self.tabItems,
+                addTitle: "記録する"
+            ) {
+                sheet = .new
+            }
+        }
         .preferredColorScheme(.dark)
         .sheet(item: $sheet) { sheet in
             sheetContent(for: sheet)
         }
-        .task { await home.observe() }
-        .task { await records.observe() }
-        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+        .task {
+            await home.observe()
+        }
+        .task {
+            await records.observe()
+        }
+        .onReceive(
+            NotificationCenter.default.publisher(for: .NSCalendarDayChanged)
+        ) { _ in
             home.today = LocalDate(Date(), in: .current)
         }
     }
@@ -64,9 +99,20 @@ private extension MainView {
     func sheetContent(for sheet: Sheet) -> some View {
         switch sheet {
         case .new:
-            EntrySheet(model: EntryModel(database: database, date: home.today))
+            EntrySheet(
+                model: EntryModel(
+                    database: database,
+                    date: home.today
+                )
+            )
         case let .edit(id):
-            EntrySheet(model: EntryModel(database: database, editing: id, date: home.today))
+            EntrySheet(
+                model: EntryModel(
+                    database: database,
+                    editing: id,
+                    date: home.today
+                )
+            )
         case .settings:
             SettingsSheet()
         }
@@ -79,7 +125,6 @@ private extension MainView {
         case records
         case review
         case assets
-        case add
     }
 
     enum Sheet: Identifiable {
@@ -96,17 +141,18 @@ private extension MainView {
         }
     }
 
-    var selection: Binding<MainTab> {
-        Binding(
-            get: { tab },
-            set: { newTab in
-                if newTab == .add {
-                    sheet = .new
-                } else {
-                    tab = newTab
-                }
-            }
-        )
+    static let tabItems: [FloatingTabBar<MainTab>.Item] = [
+        .init("ホーム", systemImage: "house", value: .home),
+        .init("記録", systemImage: "calendar", value: .records),
+        .init("振り返り", systemImage: "chart.pie", value: .review),
+        .init("資産", systemImage: "building.columns", value: .assets)
+    ]
+}
+
+private extension View {
+    func tabContent() -> some View {
+        toolbar(.hidden, for: .tabBar)
+            .safeAreaPadding(.bottom, FloatingTabBar<Int>.height)
     }
 }
 
