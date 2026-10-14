@@ -80,8 +80,7 @@ private extension FloatingTabBar {
         }
         .overlay {
             Capsule()
-                .strokeBorder(Self.rim, lineWidth: 0.6)
-                .padding(Self.rimInset)
+                .strokeBorder(Self.rim, lineWidth: 1)
         }
         .glass(tint: nil, in: Capsule())
     }
@@ -125,8 +124,7 @@ private extension FloatingTabBar {
             }
             .overlay {
                 Circle()
-                    .strokeBorder(Self.goldRing, lineWidth: 1)
-                    .padding(Self.rimInset)
+                    .strokeBorder(Self.goldRing, lineWidth: 1.2)
             }
             .contentShape(Circle())
         }
@@ -169,10 +167,6 @@ private extension FloatingTabBar {
 }
 
 private extension FloatingTabBar {
-    static var rimInset: CGFloat {
-        1.5
-    }
-
     static var sheen: LinearGradient {
         LinearGradient(
             colors: [.white.opacity(0.14), .white.opacity(0)],
@@ -183,7 +177,7 @@ private extension FloatingTabBar {
 
     static var rim: LinearGradient {
         LinearGradient(
-            colors: [Palette.gold.opacity(0.45), Palette.gold.opacity(0.08)],
+            colors: [Palette.gold.opacity(0.85), Palette.gold.opacity(0.3)],
             startPoint: .top,
             endPoint: .bottom
         )
