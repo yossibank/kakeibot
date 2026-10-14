@@ -11,6 +11,8 @@ public struct EntrySheet: View {
     @State private var sheet: Sheet?
     @State private var memoChipFrame: CGRect = .zero
     @State private var isConfirmingDiscard = false
+    @State private var categoryMenu: CategoryMenu?
+    @State private var sheetWidth: CGFloat = 0
 
     @FocusState private var isMemoFocused: Bool
 
@@ -27,8 +29,23 @@ public struct EntrySheet: View {
             if isEditingMemo {
                 memoLayer
             }
+
+            if let categoryMenu {
+                categoryMenuLayer(categoryMenu)
+            }
         }
         .coordinateSpace(.named(Self.coordinateSpace))
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            sheetWidth = width
+        }
+        .sensoryFeedback(
+            .impact(weight: .medium),
+            trigger: categoryMenu
+        ) { _, menu in
+            menu != nil
+        }
         .ignoresSafeArea(.keyboard)
         .background {
             Rectangle()
@@ -42,7 +59,7 @@ public struct EntrySheet: View {
         ) {
             dismiss()
         }
-        .sheet(item: $sheet) { sheet in
+        .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
             sheetContent(for: sheet)
         }
         .onChange(of: model.type) {
@@ -357,33 +374,108 @@ private extension EntrySheet {
 
     func categoryButton(_ category: EntryCategory) -> some View {
         let isSelected = model.categoryId == category.id
-        let border = isSelected ? Palette.gold.opacity(0.55) : Color.clear
 
-        return Button {
-            setEnteringAmount(false)
-            model.categoryId = category.id
-        } label: {
-            VStack(spacing: 6) {
-                IconImage(model.icon(for: category), size: 20)
-
-                Text(category.name)
-                    .font(.system(size: 11))
-                    .lineLimit(1)
-            }
-            .foregroundStyle(isSelected ? Palette.champagne : Palette.mist)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                isSelected ? Palette.gold.opacity(0.12) : Color.clear,
-                in: .rect(cornerRadius: 14)
-            )
+        return categoryFace(category, isLifted: false)
             .overlay {
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(border, lineWidth: 1)
+                GeometryReader { proxy in
+                    Color.clear
+                        .contentShape(.rect)
+                        .onTapGesture {
+                            select(category)
+                        }
+                        .onLongPressGesture(minimumDuration: 0.4) {
+                            let space = CoordinateSpace.named(
+                                Self.coordinateSpace
+                            )
+
+                            openMenu(for: category, at: proxy.frame(in: space))
+                        }
+                }
             }
-            .contentShape(.rect)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAddTraits(isSelected ? .isSelected : [])
+            .accessibilityAction {
+                select(category)
+            }
+            .accessibilityAction(named: "このカテゴリを直す") {
+                open(.editCategory(category))
+            }
+            .accessibilityAction(named: "隠す") {
+                Task {
+                    await model.hideCategory(category)
+                }
+            }
+    }
+
+    func categoryFace(
+        _ category: EntryCategory,
+        isLifted: Bool
+    ) -> some View {
+        let isSelected = model.categoryId == category.id
+        let isLit = isSelected || isLifted
+        let color = isLit ? Palette.champagne : Palette.mist
+        let fill = isLifted ? Palette.drawer : Self.categoryFill(isLit)
+        let border = isLit ? Palette.gold.opacity(0.55) : Color.clear
+        let width: CGFloat = isLifted ? 1.2 : 1
+
+        return VStack(spacing: 6) {
+            IconImage(model.icon(for: category), size: 20)
+
+            Text(category.name)
+                .font(.system(size: 11))
+                .lineLimit(1)
         }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .foregroundStyle(color)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(fill, in: .rect(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(border, lineWidth: width)
+        }
+        .contentShape(.rect)
+    }
+
+    @ViewBuilder
+    func categoryMenuLayer(_ menu: CategoryMenu) -> some View {
+        Color.black
+            .opacity(0.45)
+            .ignoresSafeArea()
+            .onTapGesture {
+                closeCategoryMenu()
+            }
+            .transition(.opacity)
+
+        categoryFace(menu.category, isLifted: true)
+            .frame(width: menu.frame.width, height: menu.frame.height)
+            .scaleEffect(1.06)
+            .shadow(color: Palette.gold.opacity(0.35), radius: 12)
+            .position(x: menu.frame.midX, y: menu.frame.midY)
+            .allowsHitTesting(false)
+            .transition(.opacity)
+
+        Color.clear
+            .frame(height: max(menu.frame.minY - 12, 0))
+            .frame(maxWidth: .infinity)
+            .overlay(alignment: .bottomLeading) {
+                EntryCategoryMenu(
+                    icon: model.icon(for: menu.category),
+                    name: menu.category.name,
+                    onEdit: {
+                        closeCategoryMenu()
+                        open(.editCategory(menu.category))
+                    },
+                    onHide: {
+                        closeCategoryMenu()
+
+                        Task {
+                            await model.hideCategory(menu.category)
+                        }
+                    }
+                )
+                .offset(x: menuX(for: menu))
+            }
+            .transition(Self.memoTransition)
     }
 
     @ViewBuilder
@@ -405,16 +497,24 @@ private extension EntrySheet {
                     await addCategory(category)
                 }
             }
+        case let .editCategory(category):
+            CategoryEditSheet(model: model.editCategoryModel(category))
         }
     }
 }
 
 private extension EntrySheet {
-    enum Sheet: Identifiable {
+    struct CategoryMenu: Equatable {
+        let category: EntryCategory
+        let frame: CGRect
+    }
+
+    enum Sheet: Hashable, Identifiable {
         case wallet
         case date
         case delete
         case newCategory
+        case editCategory(EntryCategory)
 
         var id: Self {
             self
@@ -502,8 +602,47 @@ private extension EntrySheet {
         categoryPage = page ?? 0
     }
 
+    static func categoryFill(_ isSelected: Bool) -> Color {
+        isSelected ? Palette.gold.opacity(0.12) : Color.clear
+    }
+
+    func menuX(for menu: CategoryMenu) -> CGFloat {
+        let width = EntryCategoryMenu.width
+        let inset = Self.memoCardInset
+        let preferred = menu.frame.midX - width / 2
+        return min(max(preferred, inset), sheetWidth - width - inset)
+    }
+
+    func select(_ category: EntryCategory) {
+        setEnteringAmount(false)
+        model.categoryId = category.id
+    }
+
+    func openMenu(
+        for category: EntryCategory,
+        at frame: CGRect
+    ) {
+        setEnteringAmount(false)
+
+        withAnimation(.snappy(duration: 0.25)) {
+            categoryMenu = CategoryMenu(category: category, frame: frame)
+        }
+    }
+
+    func closeCategoryMenu() {
+        withAnimation(.snappy(duration: 0.2)) {
+            categoryMenu = nil
+        }
+    }
+
+    func reloadCategories() {
+        Task {
+            await model.reloadCategories()
+        }
+    }
+
     func addCategory(_ category: EntryCategory) async {
-        await model.addCategory(category)
+        await model.reloadCategories(selecting: category.id)
 
         withAnimation(.snappy) {
             showSelectedCategory()

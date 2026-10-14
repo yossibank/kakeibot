@@ -71,6 +71,7 @@ extension DismissAttemptController: UIAdaptivePresentationControllerDelegate {
         _ presentationController: UIPresentationController
     ) {
         onAttempt()
+
         original?.presentationControllerDidAttemptToDismiss?(
             presentationController
         )

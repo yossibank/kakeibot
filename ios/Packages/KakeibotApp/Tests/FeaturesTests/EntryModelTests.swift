@@ -158,6 +158,17 @@ struct EntryModelTests {
     }
 
     @Test
+    func hidesSelectedCategoryAndSelectsNext() async throws {
+        let model = try await Self.newModel()
+        let food = try #require(model.selectedCategory)
+
+        await model.hideCategory(food)
+
+        #expect(!model.categories.contains(food))
+        #expect(model.selectedCategory?.name == "日用品")
+    }
+
+    @Test
     func selectsAddedCategory() async throws {
         let model = try await Self.newModel()
         model.select(.income)
@@ -166,7 +177,7 @@ struct EntryModelTests {
         editor.glyph = .invest
 
         let saved = try #require(await editor.save())
-        await model.addCategory(saved)
+        await model.reloadCategories(selecting: saved.id)
 
         #expect(editor.kind == .income)
         #expect(model.categoryId == saved.id)

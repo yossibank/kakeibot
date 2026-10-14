@@ -178,10 +178,37 @@ public extension EntryModel {
         return CategoryEditModel(database: database, kind: kind)
     }
 
-    func addCategory(_ category: EntryCategory) async {
+    func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
+        CategoryEditModel(
+            database: database,
+            kind: category.kind,
+            editing: category.id
+        )
+    }
+
+    func reloadCategories(selecting id: EntryCategory.ID? = nil) async {
         do {
             options = try await database.entryOptions()
-            categoryId = category.id
+
+            if let id {
+                categoryId = id
+            } else if !categories.contains(where: { $0.id == categoryId }) {
+                categoryId = categories.first?.id
+            }
+        } catch {
+            errorMessage = Self.message(for: error)
+        }
+    }
+
+    func hideCategory(_ category: EntryCategory) async {
+        do {
+            try await database.setCategoryHidden(
+                category.id,
+                isHidden: true,
+                at: Date()
+            )
+
+            await reloadCategories()
         } catch {
             errorMessage = Self.message(for: error)
         }
