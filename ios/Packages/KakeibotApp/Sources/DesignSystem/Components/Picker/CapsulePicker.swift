@@ -58,7 +58,7 @@ public struct CapsulePicker<Value: Hashable>: View {
             Capsule()
                 .strokeBorder(Self.rim, lineWidth: 1)
         }
-        .glass(tint: nil, in: Capsule())
+        .glass(tint: Palette.nightBottom.opacity(0.6), in: Capsule())
         .contentShape(Capsule())
         .gesture(dragGesture)
         .onAppear {
@@ -117,7 +117,7 @@ private extension CapsulePicker {
 
     static var sheen: LinearGradient {
         LinearGradient(
-            colors: [.white.opacity(0.12), .white.opacity(0)],
+            colors: [.white.opacity(0.06), .white.opacity(0)],
             startPoint: .top,
             endPoint: .center
         )

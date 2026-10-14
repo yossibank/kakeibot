@@ -79,7 +79,7 @@ private extension FloatingTabBar {
             Capsule()
                 .strokeBorder(Self.rim, lineWidth: 1)
         }
-        .glass(tint: nil, in: Capsule())
+        .glass(tint: Palette.nightBottom.opacity(0.6), in: Capsule())
     }
 
     var indicator: some View {
@@ -126,7 +126,7 @@ private extension FloatingTabBar {
             .contentShape(Circle())
         }
         .buttonStyle(PressStyle())
-        .glass(tint: Palette.nightTop.opacity(0.85), in: Circle())
+        .glass(tint: Palette.nightBottom.opacity(0.75), in: Circle())
         .shadow(color: Palette.gold.opacity(0.3), radius: 14, y: 4)
         .sensoryFeedback(.impact(weight: .light), trigger: addCount)
     }
@@ -156,7 +156,7 @@ private extension FloatingTabBar {
 private extension FloatingTabBar {
     static var sheen: LinearGradient {
         LinearGradient(
-            colors: [.white.opacity(0.14), .white.opacity(0)],
+            colors: [.white.opacity(0.07), .white.opacity(0)],
             startPoint: .top,
             endPoint: .center
         )
