@@ -40,8 +40,14 @@ private extension EntryDateSheet {
         .foregroundStyle(isSelected ? Palette.champagne : Palette.ink)
         .padding(.horizontal, 16)
         .frame(minHeight: 40)
-        .background(isSelected ? Palette.gold.opacity(0.12) : Color.clear, in: Capsule())
-        .overlay(Capsule().stroke(isSelected ? Palette.gold : Palette.line, lineWidth: 1))
+        .background(
+            isSelected ? Palette.gold.opacity(0.12) : Color.clear,
+            in: Capsule()
+        )
+        .overlay {
+            Capsule()
+                .stroke(isSelected ? Palette.gold : Palette.line, lineWidth: 1)
+        }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
@@ -61,7 +67,9 @@ private extension EntryDateSheet {
 
     var dateBinding: Binding<LocalDate> {
         Binding(
-            get: { model.date },
+            get: {
+                model.date
+            },
             set: { date in
                 model.date = date
                 dismiss()

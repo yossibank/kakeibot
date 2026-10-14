@@ -55,7 +55,10 @@ private extension HomeView {
                     .font(.system(size: 17, weight: .light))
                     .foregroundStyle(Palette.gold)
                     .frame(width: 44, height: 44)
-                    .overlay(Circle().stroke(Palette.gold.opacity(0.28), lineWidth: 1))
+                    .overlay {
+                        Circle()
+                            .stroke(Palette.gold.opacity(0.28), lineWidth: 1)
+                    }
             }
             .buttonStyle(.plain)
             .accessibilityLabel("設定")

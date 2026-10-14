@@ -6,7 +6,9 @@ extension YearMonth: DatabaseValueConvertible {
         description.databaseValue
     }
 
-    public static func fromDatabaseValue(_ dbValue: DatabaseValue) -> YearMonth? {
+    public static func fromDatabaseValue(
+        _ dbValue: DatabaseValue
+    ) -> YearMonth? {
         String.fromDatabaseValue(dbValue).flatMap(YearMonth.init)
     }
 }

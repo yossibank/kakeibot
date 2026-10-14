@@ -6,7 +6,9 @@ extension Identifier: DatabaseValueConvertible {
         description.databaseValue
     }
 
-    public static func fromDatabaseValue(_ dbValue: DatabaseValue) -> Identifier? {
+    public static func fromDatabaseValue(
+        _ dbValue: DatabaseValue
+    ) -> Identifier? {
         String.fromDatabaseValue(dbValue).flatMap { Identifier($0) }
     }
 }

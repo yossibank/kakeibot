@@ -105,7 +105,9 @@ struct EntryListTests {
 
         let options = try await database.entryOptions()
 
-        #expect(options.expenseCategories == Array(defaults.expenseCategories.dropFirst()))
+        let remaining = Array(defaults.expenseCategories.dropFirst())
+
+        #expect(options.expenseCategories == remaining)
         #expect(options.wallets.map(\.name) == ["銀行", "財布"])
     }
 }

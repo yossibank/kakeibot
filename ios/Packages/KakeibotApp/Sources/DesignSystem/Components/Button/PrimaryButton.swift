@@ -22,7 +22,10 @@ public struct PrimaryButton: View {
                 .minimumScaleFactor(0.8)
                 .foregroundStyle(isEnabled ? Palette.nightBottom : Palette.mist)
                 .frame(maxWidth: .infinity, minHeight: 56)
-                .background(isEnabled ? Palette.gold : Palette.line, in: Capsule())
+                .background(
+                    isEnabled ? Palette.gold : Palette.line,
+                    in: Capsule()
+                )
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)

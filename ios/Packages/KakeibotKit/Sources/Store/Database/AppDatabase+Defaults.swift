@@ -5,7 +5,9 @@ import GRDB
 public extension AppDatabase {
     func insertDefaultsIfEmpty(at now: Date) throws {
         try writer.write { db in
-            guard try Wallet.fetchCount(db) == 0, try EntryCategory.fetchCount(db) == 0 else {
+            guard
+                try Wallet.fetchCount(db) == 0,
+                try EntryCategory.fetchCount(db) == 0 else {
                 return
             }
 
@@ -67,7 +69,12 @@ private extension AppDatabase {
             try wallet.insert(db)
         }
 
-        try insertCategories(expenseCategories, kind: .expense, into: db, at: now)
+        try insertCategories(
+            expenseCategories,
+            kind: .expense,
+            into: db,
+            at: now
+        )
         try insertCategories(incomeCategories, kind: .income, into: db, at: now)
     }
 

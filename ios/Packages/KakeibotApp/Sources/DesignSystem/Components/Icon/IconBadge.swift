@@ -33,8 +33,20 @@ private extension IconBadge {
 
 #Preview {
     let now = Date()
-    let emoji = Icon(emoji: "🍙", text: nil, color: "#E07A5F", createdAt: now, updatedAt: now)
-    let text = Icon(emoji: nil, text: "給料", color: "#2A9D8F", createdAt: now, updatedAt: now)
+    let emoji = Icon(
+        emoji: "🍙",
+        text: nil,
+        color: "#E07A5F",
+        createdAt: now,
+        updatedAt: now
+    )
+    let text = Icon(
+        emoji: nil,
+        text: "給料",
+        color: "#2A9D8F",
+        createdAt: now,
+        updatedAt: now
+    )
 
     HStack {
         IconBadge(emoji)

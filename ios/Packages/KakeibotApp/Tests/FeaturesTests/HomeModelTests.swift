@@ -32,7 +32,12 @@ struct HomeModelTests {
         for daysAgo in 0..<7 {
             let amount = 100 + daysAgo
             let memo = "メモ\(daysAgo)"
-            try await setup.save(.expense, amount: amount, daysAgo: daysAgo, memo: memo)
+            try await setup.save(
+                .expense,
+                amount: amount,
+                daysAgo: daysAgo,
+                memo: memo
+            )
         }
 
         let model = HomeModel(database: setup.database, today: setup.today)
@@ -71,8 +76,11 @@ extension HomeModelTests.Setup {
         memo: String = ""
     ) async throws {
         let options = try await database.entryOptions()
-        let categories = type == .income ? options.incomeCategories : options.expenseCategories
-        let createdAt = Date(timeIntervalSince1970: 1_791_000_000 - TimeInterval(daysAgo))
+        let categories = type == .income
+            ? options.incomeCategories
+            : options.expenseCategories
+        let offset = TimeInterval(daysAgo)
+        let createdAt = Date(timeIntervalSince1970: 1_791_000_000 - offset)
 
         let draft = EntryDraft(
             type: type,

@@ -16,8 +16,9 @@ struct RecordsModelTests {
         let model = RecordsModel(database: setup.database, month: setup.month)
 
         await model.load()
+        let dates = model.days.map(\.date.description)
 
-        #expect(model.days.map(\.date.description) == ["2026-10-12", "2026-10-10"])
+        #expect(dates == ["2026-10-12", "2026-10-10"])
         #expect(model.expenseTotal == 4960)
         #expect(model.incomeTotal == 250_000)
 
@@ -31,7 +32,12 @@ struct RecordsModelTests {
     @Test
     func describesRowsWithMemoAndWallet() async throws {
         let setup = try await Setup()
-        try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
+        try await setup.save(
+            .expense,
+            amount: 980,
+            on: "2026-10-12",
+            memo: "ランチ"
+        )
         try await setup.save(.expense, amount: 220, on: "2026-10-12", memo: "")
         let model = RecordsModel(database: setup.database, month: setup.month)
 
@@ -66,10 +72,14 @@ extension RecordsModelTests.Setup {
         memo: String = ""
     ) async throws {
         let options = try await database.entryOptions()
-        let categories = type == .income ? options.incomeCategories : options.expenseCategories
+        let categories = type == .income
+            ? options.incomeCategories
+            : options.expenseCategories
         let date = try #require(LocalDate(text))
-        let count = try await database.entryList().days.reduce(0) { $0 + $1.entries.count }
-        let createdAt = Date(timeIntervalSince1970: 1_791_000_000 + TimeInterval(count))
+        let days = try await database.entryList().days
+        let count = days.reduce(0) { $0 + $1.entries.count }
+        let offset = TimeInterval(count)
+        let createdAt = Date(timeIntervalSince1970: 1_791_000_000 + offset)
 
         let draft = EntryDraft(
             type: type,

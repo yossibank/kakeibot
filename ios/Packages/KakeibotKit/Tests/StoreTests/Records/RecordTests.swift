@@ -10,8 +10,13 @@ struct RecordTests {
         let database = try AppDatabase.inMemory()
         let sample = try Sample()
 
-        try database.writer.write { try sample.insert(into: $0) }
-        let stored = try database.writer.read { try Tables(fetchingFrom: $0) }
+        try database.writer.write { db in
+            try sample.insert(into: db)
+        }
+
+        let stored = try database.writer.read { db in
+            try Tables(fetchingFrom: db)
+        }
 
         #expect(stored == sample.tables)
     }
@@ -21,8 +26,13 @@ struct RecordTests {
         let database = try AppDatabase.inMemory()
         let sample = try Sample()
 
-        try database.writer.write { try sample.insert(into: $0) }
-        let row = try database.writer.read { try Row.fetchOne($0, sql: Self.expenseQuery) }
+        try database.writer.write { db in
+            try sample.insert(into: db)
+        }
+
+        let row = try database.writer.read { db in
+            try Row.fetchOne(db, sql: Self.expenseQuery)
+        }
 
         #expect(row?["id"] == sample.expense.id.description)
         #expect(row?["type"] == "expense")
@@ -41,9 +51,17 @@ struct RecordTests {
             toWalletId: nil
         )
 
-        try database.writer.write { try sample.insert(into: $0) }
-        try database.writer.write { try entry.insert($0) }
-        let count = try database.writer.read { try Entry.fetchCount($0) }
+        try database.writer.write { db in
+            try sample.insert(into: db)
+        }
+
+        try database.writer.write { db in
+            try entry.insert(db)
+        }
+
+        let count = try database.writer.read { db in
+            try Entry.fetchCount(db)
+        }
 
         #expect(count == 3)
     }
@@ -53,10 +71,14 @@ struct RecordTests {
         let database = try AppDatabase.inMemory()
         let sample = try Sample()
 
-        try database.writer.write { try sample.insert(into: $0) }
+        try database.writer.write { db in
+            try sample.insert(into: db)
+        }
 
         #expect(throws: DatabaseError.self) {
-            try database.writer.write { try invalid.record(alongside: sample).insert($0) }
+            try database.writer.write { db in
+                try invalid.record(alongside: sample).insert(db)
+            }
         }
     }
 }

@@ -22,7 +22,11 @@ public extension AppDatabase {
 
     func recentMemos(limit: Int) async throws -> [String] {
         try await writer.read { db in
-            try String.fetchAll(db, sql: Self.recentMemosSQL, arguments: [limit])
+            try String.fetchAll(
+                db,
+                sql: Self.recentMemosSQL,
+                arguments: [limit]
+            )
         }
     }
 }

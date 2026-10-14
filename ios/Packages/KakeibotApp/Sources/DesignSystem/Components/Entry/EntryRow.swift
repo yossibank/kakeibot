@@ -71,9 +71,27 @@ public struct EntryRow: View {
     )
 
     VStack(spacing: 0) {
-        EntryRow(icon: food, title: "食費", detail: "ランチ・財布", amount: 980, type: .expense)
-        EntryRow(icon: salary, title: "給料", detail: "銀行", amount: 250_000, type: .income)
-        EntryRow(icon: nil, title: "その他", detail: nil, amount: 120, type: .expense)
+        EntryRow(
+            icon: food,
+            title: "食費",
+            detail: "ランチ・財布",
+            amount: 980,
+            type: .expense
+        )
+        EntryRow(
+            icon: salary,
+            title: "給料",
+            detail: "銀行",
+            amount: 250_000,
+            type: .income
+        )
+        EntryRow(
+            icon: nil,
+            title: "その他",
+            detail: nil,
+            amount: 120,
+            type: .expense
+        )
     }
     .padding()
     .background(Palette.night)

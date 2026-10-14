@@ -13,7 +13,8 @@ extension DateText {
             return nil
         }
 
-        let numbers = zip(parts, digits).compactMap { number(in: $0, digits: $1) }
+        let numbers = zip(parts, digits)
+            .compactMap { number(in: $0, digits: $1) }
 
         return numbers.count == digits.count ? numbers : nil
     }

@@ -7,7 +7,10 @@ public struct KakeibotWidget: Widget {
     public var body: some WidgetConfiguration {
         let provider = Provider()
 
-        return StaticConfiguration(kind: "KakeibotWidget", provider: provider) { _ in
+        return StaticConfiguration(
+            kind: "KakeibotWidget",
+            provider: provider
+        ) { _ in
             Text("Kakeibot")
                 .containerBackground(.fill.tertiary, for: .widget)
         }

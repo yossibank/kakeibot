@@ -14,7 +14,10 @@ public struct HalfDial: View {
 
             if let progress {
                 HalfArc(progress: min(max(progress, 0), 1))
-                    .stroke(Palette.gold, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                    .stroke(
+                        Palette.gold,
+                        style: StrokeStyle(lineWidth: 2, lineCap: .round)
+                    )
             }
 
             HalfTicks(count: 30, step: 1, length: 6, inset: 10)
@@ -62,8 +65,10 @@ private struct HalfTicks: Shape {
         return Path { path in
             for index in stride(from: 0, through: count, by: step) {
                 let angle = Double.pi + Double(index) / Double(count) * .pi
-                path.move(to: Self.point(from: center, at: angle, radius: inner))
-                path.addLine(to: Self.point(from: center, at: angle, radius: outer))
+                let start = Self.point(from: center, at: angle, radius: inner)
+                let end = Self.point(from: center, at: angle, radius: outer)
+                path.move(to: start)
+                path.addLine(to: end)
             }
         }
     }

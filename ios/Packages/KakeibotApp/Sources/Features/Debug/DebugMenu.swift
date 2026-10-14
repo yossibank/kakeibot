@@ -35,13 +35,17 @@ public struct DebugMenu: View {
             }
             .navigationTitle("デバッグ")
             .toolbar {
-                Button("閉じる") { dismiss() }
+                Button("閉じる") {
+                    dismiss()
+                }
             }
         }
         .sheet(item: $sheet) { sheet in
             screen(for: sheet)
         }
-        .task { await model.prepare() }
+        .task {
+            await model.prepare()
+        }
     }
 }
 
@@ -66,7 +70,13 @@ private extension DebugMenu {
                 let editing = sheet == .editEntry ? model.sampleEntryId : nil
                 let today = LocalDate(Date(), in: .current)
 
-                EntrySheet(model: EntryModel(database: database, editing: editing, date: today))
+                EntrySheet(
+                    model: EntryModel(
+                        database: database,
+                        editing: editing,
+                        date: today
+                    )
+                )
             }
         }
     }

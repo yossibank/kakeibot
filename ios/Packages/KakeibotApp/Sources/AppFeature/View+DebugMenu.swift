@@ -18,12 +18,18 @@ private struct DebugMenuOnShake: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .onReceive(NotificationCenter.default.publisher(for: .deviceDidShake)) { _ in
+            .onReceive(shakes) { _ in
                 isShowing = true
             }
             .sheet(isPresented: $isShowing) {
                 DebugMenu()
             }
+    }
+}
+
+private extension DebugMenuOnShake {
+    var shakes: NotificationCenter.Publisher {
+        NotificationCenter.default.publisher(for: .deviceDidShake)
     }
 }
 

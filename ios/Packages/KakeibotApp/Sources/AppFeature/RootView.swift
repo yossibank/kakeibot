@@ -12,7 +12,9 @@ public struct RootView: View {
 
     public var body: some View {
         content
-            .task { model.open() }
+            .task {
+                model.open()
+            }
             .onChange(of: scenePhase) { _, phase in
                 model.changeScene(to: phase)
             }

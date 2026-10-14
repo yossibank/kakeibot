@@ -18,7 +18,9 @@ struct AppModelTests {
 
     @Test
     func reportsFailureToOpen() {
-        let model = AppModel { throw AppDatabase.SetupError.appGroupUnavailable }
+        let model = AppModel {
+            throw AppDatabase.SetupError.appGroupUnavailable
+        }
 
         model.open()
 

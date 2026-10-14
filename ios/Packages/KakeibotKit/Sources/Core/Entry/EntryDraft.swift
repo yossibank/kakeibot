@@ -95,7 +95,9 @@ private extension EntryDraft {
         case .expense, .income:
             return categoryId == nil ? [.missingCategory] : []
         case .transfer:
-            let categoryProblems: [Problem] = categoryId == nil ? [] : [.categoryOnTransfer]
+            let categoryProblems: [Problem] = categoryId == nil
+                ? []
+                : [.categoryOnTransfer]
             return categoryProblems + destinationProblems
         }
     }

@@ -45,7 +45,8 @@ public struct LocalDate: Hashable, Sendable {
     ) {
         let offset = TimeInterval(timeZone.secondsFromGMT(for: date))
         let localSeconds = date.timeIntervalSince1970 + offset
-        let days = Int((localSeconds / TimeInterval(Self.secondsPerDay)).rounded(.down))
+        let dayLength = TimeInterval(Self.secondsPerDay)
+        let days = Int((localSeconds / dayLength).rounded(.down))
         self.init(dayNumber: Self.unixEpochDayNumber + days)
     }
 }
@@ -68,9 +69,11 @@ public extension LocalDate {
     }
 
     func startOfDay(in timeZone: TimeZone) -> Date {
-        let localSeconds = TimeInterval((dayNumber - Self.unixEpochDayNumber) * Self.secondsPerDay)
+        let localDays = dayNumber - Self.unixEpochDayNumber
+        let localSeconds = TimeInterval(localDays * Self.secondsPerDay)
         let localStart = Date(timeIntervalSince1970: localSeconds)
-        let estimatedOffset = TimeInterval(timeZone.secondsFromGMT(for: localStart))
+        let offsetSeconds = timeZone.secondsFromGMT(for: localStart)
+        let estimatedOffset = TimeInterval(offsetSeconds)
         let estimate = localStart.addingTimeInterval(-estimatedOffset)
         let offset = TimeInterval(timeZone.secondsFromGMT(for: estimate))
         return localStart.addingTimeInterval(-offset)
@@ -81,7 +84,8 @@ public extension LocalDate {
     }
 
     func week(startingOn weekStart: Weekday) -> ClosedRange<LocalDate> {
-        let offset = (weekday.daysSinceMonday - weekStart.daysSinceMonday + 7) % 7
+        let difference = weekday.daysSinceMonday - weekStart.daysSinceMonday
+        let offset = (difference + 7) % 7
         let start = adding(days: -offset)
         return start...start.adding(days: 6)
     }
@@ -130,7 +134,8 @@ extension LocalDate {
 private extension LocalDate {
     static let secondsPerDay = 86400
     static let daysPer400Years = 146_097
-    static let unixEpochDayNumber = YearMonth(monthIndex: 1970 * 12).firstDayNumber
+    static let unixEpochMonth = YearMonth(monthIndex: 1970 * 12)
+    static let unixEpochDayNumber = unixEpochMonth.firstDayNumber
 }
 
 extension LocalDate: Comparable {

@@ -50,7 +50,8 @@ private extension ExportV1Tests {
 
     static func fixture(with header: Header) throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
-        var object = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
         object["format"] = header.format
         object["version"] = header.version
         return try JSONSerialization.data(withJSONObject: object)
