@@ -15,6 +15,16 @@ struct ExportV1Tests {
         #expect(reread == export)
     }
 
+    @Test
+    func readsFileWithoutTemplates() throws {
+        let json = try Self.fixtureWithoutTemplates()
+
+        let export = try ExportV1(json: json)
+
+        #expect(export.data.templates.isEmpty)
+        #expect(!export.data.entries.isEmpty)
+    }
+
     @Test(arguments: try headers.valid)
     func readsSupportedHeader(header: Header) throws {
         let json = try Self.fixture(with: header)
@@ -54,6 +64,16 @@ private extension ExportV1Tests {
         var object = try #require(json as? [String: Any])
         object["format"] = header.format
         object["version"] = header.version
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixtureWithoutTemplates() throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+        tables["templates"] = nil
+        object["data"] = tables
         return try JSONSerialization.data(withJSONObject: object)
     }
 

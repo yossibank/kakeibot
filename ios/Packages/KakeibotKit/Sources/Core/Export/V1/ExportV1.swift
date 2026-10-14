@@ -45,6 +45,7 @@ public extension ExportV1 {
         public var wallets: [Wallet]
         public var categories: [EntryCategory]
         public var entries: [Entry]
+        public var templates: [EntryTemplate]
         public var budgets: [Budget]
         public var recurrings: [Recurring]
         public var rewardRules: [RewardRule]
@@ -60,6 +61,7 @@ public extension ExportV1 {
             wallets: [Wallet],
             categories: [EntryCategory],
             entries: [Entry],
+            templates: [EntryTemplate] = [],
             budgets: [Budget],
             recurrings: [Recurring],
             rewardRules: [RewardRule],
@@ -74,6 +76,7 @@ public extension ExportV1 {
             self.wallets = wallets
             self.categories = categories
             self.entries = entries
+            self.templates = templates
             self.budgets = budgets
             self.recurrings = recurrings
             self.rewardRules = rewardRules
@@ -114,6 +117,53 @@ private extension ExportV1 {
         case exportedAt
         case app
         case data
+    }
+}
+
+public extension ExportV1.Tables {
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        try self.init(
+            icons: container.decode([Icon].self, forKey: .icons),
+            wallets: container.decode([Wallet].self, forKey: .wallets),
+            categories: container.decode(
+                [EntryCategory].self,
+                forKey: .categories
+            ),
+            entries: container.decode([Entry].self, forKey: .entries),
+            templates: container.decodeIfPresent(
+                [EntryTemplate].self,
+                forKey: .templates
+            ) ?? [],
+            budgets: container.decode([Budget].self, forKey: .budgets),
+            recurrings: container.decode(
+                [Recurring].self,
+                forKey: .recurrings
+            ),
+            rewardRules: container.decode(
+                [RewardRule].self,
+                forKey: .rewardRules
+            ),
+            rewardLogs: container.decode(
+                [RewardLog].self,
+                forKey: .rewardLogs
+            ),
+            rewardGoals: container.decode(
+                [RewardGoal].self,
+                forKey: .rewardGoals
+            ),
+            calendarStamps: container.decode(
+                [CalendarStamp].self,
+                forKey: .calendarStamps
+            ),
+            noSpendDays: container.decode(
+                [NoSpendDay].self,
+                forKey: .noSpendDays
+            ),
+            themes: container.decode([Theme].self, forKey: .themes),
+            settings: container.decode([Setting].self, forKey: .settings)
+        )
     }
 }
 

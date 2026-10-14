@@ -1,0 +1,11 @@
+[
+  { "name": "ランチ", "type": "expense", "amount": 980, "category": true, "wallet": true, "problems": [] },
+  { "name": "定期", "type": "expense", "amount": null, "category": true, "wallet": true, "problems": [] },
+  { "name": "お小遣い", "type": "income", "amount": 30000, "category": true, "wallet": true, "problems": [] },
+  { "name": "  ", "type": "expense", "amount": 980, "category": true, "wallet": true, "problems": ["emptyName"] },
+  { "name": "移動", "type": "transfer", "amount": 1000, "category": true, "wallet": true, "problems": ["transfer"] },
+  { "name": "ゼロ", "type": "expense", "amount": 0, "category": true, "wallet": true, "problems": ["amountNotPositive"] },
+  { "name": "カテゴリなし", "type": "expense", "amount": 980, "category": false, "wallet": true, "problems": ["missingCategory"] },
+  { "name": "財布なし", "type": "income", "amount": null, "category": true, "wallet": false, "problems": ["missingWallet"] },
+  { "name": "", "type": "transfer", "amount": -1, "category": false, "wallet": false, "problems": ["emptyName", "transfer", "amountNotPositive", "missingCategory", "missingWallet"] }
+]
