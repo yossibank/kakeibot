@@ -53,6 +53,7 @@ extension AppDatabase {
         var migrator = DatabaseMigrator()
         migrator.registerMigration("v1", migrate: MigrationV1.migrate)
         migrator.registerMigration("v2", migrate: MigrationV2.migrate)
+        migrator.registerMigration("v3", migrate: MigrationV3.migrate)
         return migrator
     }
 }
