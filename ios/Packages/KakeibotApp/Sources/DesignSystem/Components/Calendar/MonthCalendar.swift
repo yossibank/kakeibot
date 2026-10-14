@@ -149,18 +149,14 @@ private extension MonthCalendar {
             }
     }
 
+    var weeks: [[LocalDate?]] {
+        month.weeks(startingOn: weekStart)
+    }
+
     var monthTitle: String {
         "\(month.year)年 \(month.month)月"
     }
 
-    var weeks: [[LocalDate?]] {
-        let weeks = month.weeks(startingOn: weekStart)
-        let blank = [LocalDate?](repeating: nil, count: 7)
-        let missing = max(Self.rowCount - weeks.count, 0)
-        return weeks + Array(repeating: blank, count: missing)
-    }
-
-    static let rowCount = 6
     static let swipeDistance: CGFloat = 50
     static let cellHeight: CGFloat = 46
 

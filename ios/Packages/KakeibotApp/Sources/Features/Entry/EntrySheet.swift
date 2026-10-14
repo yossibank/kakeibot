@@ -134,7 +134,11 @@ private extension EntrySheet {
             Button {
                 open(.wallet)
             } label: {
-                Chip(model.walletName, systemImage: "wallet.bifold")
+                Chip(
+                    model.walletName,
+                    systemImage: "wallet.bifold",
+                    isHighlighted: model.walletId != nil
+                )
             }
 
             Button {
@@ -143,7 +147,7 @@ private extension EntrySheet {
                 Chip(
                     EntryModel.dateText(for: model.date, today: today),
                     systemImage: "calendar",
-                    isHighlighted: model.date != today
+                    isHighlighted: true
                 )
             }
 

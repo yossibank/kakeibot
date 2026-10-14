@@ -74,11 +74,16 @@ private extension FloatingTabBar {
         .gesture(dragGesture)
         .sensoryFeedback(.selection, trigger: highlightedIndex)
         .padding(6)
-        .glass(tint: nil, in: Capsule())
+        .background {
+            Capsule()
+                .fill(Self.sheen)
+        }
         .overlay {
             Capsule()
-                .strokeBorder(Self.rim, lineWidth: 0.8)
+                .strokeBorder(Self.rim, lineWidth: 0.6)
+                .padding(Self.rimInset)
         }
+        .glass(tint: nil, in: Capsule())
     }
 
     var indicator: some View {
@@ -114,14 +119,19 @@ private extension FloatingTabBar {
                     .foregroundStyle(Palette.champagne)
             }
             .frame(width: Self.height, height: Self.height)
+            .background {
+                Circle()
+                    .fill(Self.sheen)
+            }
+            .overlay {
+                Circle()
+                    .strokeBorder(Self.goldRing, lineWidth: 1)
+                    .padding(Self.rimInset)
+            }
             .contentShape(Circle())
         }
         .buttonStyle(PressStyle())
-        .glass(tint: Palette.nightTop.opacity(0.4), in: Circle())
-        .overlay {
-            Circle()
-                .strokeBorder(Self.goldRing, lineWidth: 1.2)
-        }
+        .glass(tint: Palette.nightTop.opacity(0.85), in: Circle())
         .shadow(color: Palette.gold.opacity(0.3), radius: 14, y: 4)
         .sensoryFeedback(.impact(weight: .light), trigger: addCount)
         .accessibilityLabel(addTitle)
@@ -159,6 +169,18 @@ private extension FloatingTabBar {
 }
 
 private extension FloatingTabBar {
+    static var rimInset: CGFloat {
+        1.5
+    }
+
+    static var sheen: LinearGradient {
+        LinearGradient(
+            colors: [.white.opacity(0.14), .white.opacity(0)],
+            startPoint: .top,
+            endPoint: .center
+        )
+    }
+
     static var rim: LinearGradient {
         LinearGradient(
             colors: [Palette.gold.opacity(0.45), Palette.gold.opacity(0.08)],
@@ -246,8 +268,17 @@ private extension FloatingTabBar {
 }
 
 private struct PressStyle: ButtonStyle {
+    static var usesGlass: Bool {
+        if #available(iOS 26, *) {
+            true
+        } else {
+            false
+        }
+    }
+
     func makeBody(configuration: Configuration) -> some View {
-        let scale: CGFloat = configuration.isPressed ? 0.92 : 1
+        let isShrinking = configuration.isPressed && !Self.usesGlass
+        let scale: CGFloat = isShrinking ? 0.92 : 1
 
         return configuration.label
             .scaleEffect(scale)
