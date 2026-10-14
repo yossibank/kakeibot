@@ -139,6 +139,25 @@ struct EntryModelTests {
     }
 
     @Test
+    func tracksChangesAfterLoading() async throws {
+        let model = try await Self.newModel()
+        let loaded = model.isChanged
+
+        model.press(.digit(5))
+        let typed = model.isChanged
+
+        model.press(.clear)
+        let cleared = model.isChanged
+
+        model.memo = "ランチ"
+
+        #expect(!loaded)
+        #expect(typed)
+        #expect(!cleared)
+        #expect(model.isChanged)
+    }
+
+    @Test
     func selectsAddedCategory() async throws {
         let model = try await Self.newModel()
         model.select(.income)

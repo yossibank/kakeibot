@@ -5,6 +5,7 @@ import SwiftUI
 
 public struct CategoryEditSheet: View {
     @State private var model: CategoryEditModel
+    @State private var isConfirmingDiscard = false
 
     @FocusState private var focus: Field?
 
@@ -24,6 +25,12 @@ public struct CategoryEditSheet: View {
         content
             .ignoresSafeArea(.keyboard)
             .preferredColorScheme(.dark)
+            .confirmsDiscard(
+                when: model.isChanged,
+                isPresented: $isConfirmingDiscard
+            ) {
+                dismiss()
+            }
             .onChange(of: model.markKind) {
                 focus = nil
             }
@@ -85,7 +92,7 @@ private extension CategoryEditSheet {
     var header: some View {
         HStack {
             RingButton("閉じる", systemImage: "xmark") {
-                dismiss()
+                close()
             }
 
             Spacer()
@@ -423,6 +430,16 @@ private extension CategoryEditSheet {
 
     func tileStroke(isSelected: Bool) -> Color {
         isSelected ? Palette.gold : Palette.gold.opacity(0.14)
+    }
+
+    func close() {
+        focus = nil
+
+        if model.isChanged {
+            isConfirmingDiscard = true
+        } else {
+            dismiss()
+        }
     }
 
     func save() async {

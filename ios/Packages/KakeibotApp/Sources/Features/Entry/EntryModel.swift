@@ -18,6 +18,8 @@ public final class EntryModel {
     public private(set) var recentMemos: [String] = []
     public private(set) var errorMessage: String?
 
+    private var baseline: Snapshot?
+
     private let database: AppDatabase
     private let editingId: Entry.ID?
 
@@ -59,6 +61,10 @@ public extension EntryModel {
 
     var isLoaded: Bool {
         options != nil
+    }
+
+    var isChanged: Bool {
+        baseline.map { $0 != snapshot } ?? false
     }
 
     var amount: Int {
@@ -161,6 +167,7 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
             try await loadEntry()
+            baseline = snapshot
         } catch {
             errorMessage = Self.message(for: error)
         }
@@ -222,6 +229,26 @@ public extension EntryModel {
 }
 
 private extension EntryModel {
+    struct Snapshot: Equatable {
+        let type: Entry.Kind
+        let calculator: AmountCalculator
+        let date: LocalDate
+        let categoryId: EntryCategory.ID?
+        let walletId: Wallet.ID?
+        let memo: String
+    }
+
+    var snapshot: Snapshot {
+        Snapshot(
+            type: type,
+            calculator: calculator,
+            date: date,
+            categoryId: categoryId,
+            walletId: walletId,
+            memo: memo
+        )
+    }
+
     static let recentMemoLimit = 6
     static let numberLocale = Locale(identifier: "ja_JP")
 

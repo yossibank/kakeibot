@@ -68,6 +68,25 @@ struct CategoryEditModelTests {
         #expect(model.glyph == .food)
         #expect(model.color == "#E07A5F")
         #expect(!model.isHidden)
+        #expect(!model.isChanged)
+    }
+
+    @Test
+    func tracksChangesFromStart() throws {
+        let database = try Self.database()
+        let model = CategoryEditModel(database: database, kind: .expense)
+        let start = model.isChanged
+
+        model.name = "外食"
+        let named = model.isChanged
+
+        model.name = ""
+        let cleared = model.isChanged
+
+        #expect(model.glyph == .food)
+        #expect(!start)
+        #expect(named)
+        #expect(!cleared)
     }
 }
 

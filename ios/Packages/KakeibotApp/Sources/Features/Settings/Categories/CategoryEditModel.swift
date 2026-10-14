@@ -8,7 +8,7 @@ import Store
 public final class CategoryEditModel {
     public var name = ""
     public var markKind: MarkKind = .glyph
-    public var glyph: Icon.Glyph = .other
+    public var glyph: Icon.Glyph = .food
     public var color = CategoryEditModel.colors[0]
 
     public private(set) var emoji = ""
@@ -17,6 +17,8 @@ public final class CategoryEditModel {
     public private(set) var errorMessage: String?
 
     public let kind: EntryCategory.Kind
+
+    private var baseline: Snapshot?
 
     private let database: AppDatabase
     private let editingId: EntryCategory.ID?
@@ -237,6 +239,10 @@ public extension CategoryEditModel {
         editingId != nil
     }
 
+    var isChanged: Bool {
+        snapshot != (baseline ?? Self.blank)
+    }
+
     var draft: CategoryDraft {
         CategoryDraft(kind: kind, name: name, mark: mark, color: color)
     }
@@ -283,6 +289,7 @@ public extension CategoryEditModel {
 
             apply(CategoryDraft(category, icon: icon))
             isHidden = category.archivedAt != nil
+            baseline = snapshot
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -323,8 +330,37 @@ public extension CategoryEditModel {
 }
 
 private extension CategoryEditModel {
+    struct Snapshot: Equatable {
+        let name: String
+        let markKind: MarkKind
+        let glyph: Icon.Glyph
+        let emoji: String
+        let text: String
+        let color: String
+    }
+
+    static let blank = Snapshot(
+        name: "",
+        markKind: .glyph,
+        glyph: .food,
+        emoji: "",
+        text: "",
+        color: colors[0]
+    )
+
     static let loadFailedMessage = "カテゴリを読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
+
+    var snapshot: Snapshot {
+        Snapshot(
+            name: name,
+            markKind: markKind,
+            glyph: glyph,
+            emoji: emoji,
+            text: text,
+            color: color
+        )
+    }
 
     var mark: CategoryDraft.Mark {
         switch markKind {

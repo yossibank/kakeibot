@@ -10,6 +10,7 @@ public struct EntrySheet: View {
     @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
     @State private var memoChipFrame: CGRect = .zero
+    @State private var isConfirmingDiscard = false
 
     @FocusState private var isMemoFocused: Bool
 
@@ -35,6 +36,12 @@ public struct EntrySheet: View {
                 .ignoresSafeArea()
         }
         .preferredColorScheme(.dark)
+        .confirmsDiscard(
+            when: model.isChanged,
+            isPresented: $isConfirmingDiscard
+        ) {
+            dismiss()
+        }
         .sheet(item: $sheet) { sheet in
             sheetContent(for: sheet)
         }
@@ -87,7 +94,7 @@ private extension EntrySheet {
     var header: some View {
         HStack {
             RingButton("閉じる", systemImage: "xmark") {
-                dismiss()
+                close()
             }
 
             Spacer()
@@ -446,6 +453,14 @@ private extension EntrySheet {
                 model.select(type)
             }
         )
+    }
+
+    func close() {
+        if model.isChanged {
+            isConfirmingDiscard = true
+        } else {
+            dismiss()
+        }
     }
 
     func open(_ sheet: Sheet) {
