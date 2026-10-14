@@ -93,6 +93,14 @@ public extension TemplateEditModel {
         options?.wallets ?? []
     }
 
+    var selectedCategory: EntryCategory? {
+        categories.first { $0.id == categoryId }
+    }
+
+    var selectedWallet: Wallet? {
+        wallets.first { $0.id == walletId }
+    }
+
     func icon(for category: EntryCategory) -> Icon? {
         options?.icons[category.iconId]
     }

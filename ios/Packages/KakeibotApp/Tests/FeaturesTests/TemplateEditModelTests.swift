@@ -62,6 +62,8 @@ struct TemplateEditModelTests {
 
         #expect(model.name == "定期")
         #expect(model.type == .income)
+        #expect(model.selectedCategory?.id == saved.categoryId)
+        #expect(model.selectedWallet?.id == saved.walletId)
         #expect(model.amount == nil)
         #expect(!loaded)
         #expect(model.isChanged)
