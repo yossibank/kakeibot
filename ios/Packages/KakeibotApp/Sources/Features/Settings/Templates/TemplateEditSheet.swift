@@ -5,7 +5,7 @@ import SwiftUI
 
 public struct TemplateEditSheet: View {
     @State private var model: TemplateEditModel
-    @State private var drawer: Drawer?
+    @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
 
     @FocusState private var focus: Field?
@@ -27,23 +27,34 @@ public struct TemplateEditSheet: View {
             content
                 .ignoresSafeArea(.keyboard)
 
-            if let drawer {
+            if let panel {
                 Color.black
                     .opacity(0.35)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        closeDrawer()
+                        closePanel()
                     }
                     .transition(.opacity)
 
-                drawerView(drawer)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                if panel == .memo {
+                    memoCard
+                        .padding(.horizontal, 14)
+                        .padding(.top, 76)
+                        .frame(maxHeight: .infinity, alignment: .top)
+                        .transition(Self.memoTransition)
+                } else {
+                    drawerView(panel)
+                        .transition(Self.drawerTransition)
+                }
             }
         }
         .background {
             Rectangle()
                 .fill(Palette.night)
                 .ignoresSafeArea()
+                .onTapGesture {
+                    focus = nil
+                }
         }
         .preferredColorScheme(.dark)
         .sensoryFeedback(.selection, trigger: model.categoryId)
@@ -56,7 +67,7 @@ public struct TemplateEditSheet: View {
         }
         .onChange(of: focus) {
             if focus == .name {
-                closeDrawer()
+                hidePanel()
             }
         }
         .task {
@@ -96,10 +107,6 @@ private extension TemplateEditSheet {
         .padding(.horizontal, 18)
         .padding(.top, 18)
         .padding(.bottom, 8)
-        .contentShape(.rect)
-        .onTapGesture {
-            focus = nil
-        }
     }
 
     var header: some View {
@@ -130,7 +137,7 @@ private extension TemplateEditSheet {
     }
 
     var preview: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             card
 
             Text("ホームでは、このカードで並ぶ")
@@ -138,7 +145,7 @@ private extension TemplateEditSheet {
                 .tracking(1)
                 .foregroundStyle(Palette.mist)
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 12)
         .frame(maxWidth: .infinity)
         .background {
             EllipticalGradient(
@@ -156,12 +163,13 @@ private extension TemplateEditSheet {
                 IconImage(categoryIcon, size: 22)
                     .foregroundStyle(Palette.gold)
                     .frame(width: 46, height: 46)
+                    .background(Palette.gold.opacity(0.06), in: Circle())
                     .overlay {
                         Circle()
-                            .stroke(Palette.gold.opacity(0.45), lineWidth: 1)
+                            .strokeBorder(Self.foil, lineWidth: 1)
                     }
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(detail)
                         .font(.caption2)
                         .tracking(2)
@@ -173,7 +181,7 @@ private extension TemplateEditSheet {
                         text: $model.name,
                         prompt: Text("名前を入れる").foregroundStyle(Palette.dusk)
                     )
-                    .font(.title3)
+                    .font(Self.nameFont)
                     .foregroundStyle(Palette.champagne)
                     .tint(Palette.gold)
                     .submitLabel(.done)
@@ -181,7 +189,7 @@ private extension TemplateEditSheet {
                     .onSubmit {
                         focus = nil
                     }
-                    .padding(.bottom, 3)
+                    .padding(.bottom, 4)
                     .overlay(alignment: .bottom) {
                         Rectangle()
                             .fill(nameLine)
@@ -210,12 +218,38 @@ private extension TemplateEditSheet {
         .padding(.top, 22)
         .padding(.bottom, 18)
         .frame(maxWidth: 290)
-        .background(Self.cardFill, in: Self.cardShape)
+        .background {
+            cardSurface
+        }
         .overlay {
             Self.cardShape
-                .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+                .strokeBorder(Self.foil, lineWidth: 1.2)
         }
-        .shadow(color: .black.opacity(0.55), radius: 20, y: 16)
+        .overlay {
+            Self.cardShape
+                .inset(by: 5)
+                .strokeBorder(Palette.gold.opacity(0.1), lineWidth: 0.5)
+        }
+        .shadow(color: .black.opacity(0.35), radius: 3, y: 2)
+        .shadow(color: .black.opacity(0.6), radius: 24, y: 18)
+        .shadow(color: Palette.gold.opacity(0.12), radius: 30)
+        .background(alignment: .bottom) {
+            Ellipse()
+                .fill(.black.opacity(0.55))
+                .frame(width: 230, height: 22)
+                .blur(radius: 14)
+                .offset(y: 26)
+        }
+    }
+
+    var cardSurface: some View {
+        ZStack {
+            Self.cardShape
+                .fill(Self.cardFill)
+
+            Self.cardShape
+                .fill(Self.gloss)
+        }
     }
 
     @ViewBuilder
@@ -229,7 +263,7 @@ private extension TemplateEditSheet {
                 .minimumScaleFactor(0.6)
         } else {
             Text("毎回入れる")
-                .font(.title3)
+                .font(Self.emptyAmountFont)
                 .foregroundStyle(Palette.dusk)
         }
     }
@@ -304,13 +338,55 @@ private extension TemplateEditSheet {
         .frame(minHeight: 46)
     }
 
+    var memoCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("メモ", systemImage: "square.and.pencil")
+                    .font(.caption)
+                    .foregroundStyle(Palette.gold)
+
+                Spacer()
+
+                Button("完了") {
+                    closePanel()
+                }
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Palette.gold)
+                .frame(minWidth: 44, minHeight: 32)
+            }
+
+            TextField(
+                "メモ",
+                text: $model.memo,
+                prompt: Text("メモを書く").foregroundStyle(Palette.dusk),
+                axis: .vertical
+            )
+            .lineLimit(1...4)
+            .font(.subheadline)
+            .foregroundStyle(Palette.ink)
+            .tint(Palette.gold)
+            .focused($focus, equals: .memo)
+        }
+        .padding(14)
+        .background(Palette.drawer, in: .rect(cornerRadius: 20))
+        .overlay {
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+        }
+        .shadow(color: .black.opacity(0.45), radius: 20, y: 10)
+        .task {
+            try? await Task.sleep(for: .milliseconds(250))
+            focus = .memo
+        }
+    }
+
     func rowButton(_ item: RowItem) -> some View {
-        let isAmount = item.drawer == .amount && !item.isEmpty
+        let isAmount = item.panel == .amount && !item.isEmpty
         let font: Font = isAmount ? Self.amountFont : .subheadline
         let color = item.isEmpty ? Palette.dusk : Palette.champagne
 
         return Button {
-            open(item.drawer)
+            open(item.panel)
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: item.systemImage)
@@ -341,10 +417,10 @@ private extension TemplateEditSheet {
         .buttonStyle(.plain)
     }
 
-    func drawerView(_ drawer: Drawer) -> some View {
+    func drawerView(_ panel: Panel) -> some View {
         VStack(spacing: 12) {
             HStack {
-                Text(drawer.title)
+                Text(panel.title)
                     .font(.caption2)
                     .tracking(3)
                     .foregroundStyle(Palette.gold)
@@ -352,14 +428,14 @@ private extension TemplateEditSheet {
                 Spacer()
 
                 Button("完了") {
-                    closeDrawer()
+                    closePanel()
                 }
                 .font(.subheadline.weight(.bold))
                 .foregroundStyle(Palette.gold)
                 .frame(minWidth: 44, minHeight: 32)
             }
 
-            drawerBody(drawer)
+            drawerBody(panel)
         }
         .padding(.horizontal, 16)
         .padding(.top, 12)
@@ -376,55 +452,48 @@ private extension TemplateEditSheet {
     }
 
     @ViewBuilder
-    func drawerBody(_ drawer: Drawer) -> some View {
-        switch drawer {
+    func drawerBody(_ panel: Panel) -> some View {
+        switch panel {
         case .amount:
             Keypad(activeTax: model.calculator.taxNote?.rate) { key in
                 model.press(key)
             }
         case .category:
-            LazyVGrid(columns: Self.categoryColumns, spacing: 5) {
-                ForEach(model.categories) { category in
-                    categoryButton(category)
-                }
+            tileGrid(model.categories, columns: 5, spacing: 5) { category in
+                categoryButton(category)
             }
             .padding(.bottom, 8)
         case .wallet:
-            LazyVGrid(columns: Self.walletColumns, spacing: 8) {
-                ForEach(model.wallets) { wallet in
-                    walletButton(wallet)
-                }
+            tileGrid(model.wallets, columns: 3, spacing: 8) { wallet in
+                walletButton(wallet)
             }
             .padding(.bottom, 8)
         case .memo:
-            memoField
+            EmptyView()
         }
     }
 
-    var memoField: some View {
-        TextField(
-            "メモ",
-            text: $model.memo,
-            prompt: Text("メモ（なくてもよい）").foregroundStyle(Palette.dusk)
-        )
-        .font(.body)
-        .foregroundStyle(Palette.ink)
-        .tint(Palette.gold)
-        .submitLabel(.done)
-        .focused($focus, equals: .memo)
-        .onSubmit {
-            closeDrawer()
-        }
-        .padding(.horizontal, 14)
-        .frame(height: 46)
-        .background(Palette.night, in: .rect(cornerRadius: 14))
-        .overlay {
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Palette.gold, lineWidth: 1)
-        }
-        .padding(.bottom, 8)
-        .onAppear {
-            focus = .memo
+    func tileGrid<Item: Identifiable>(
+        _ items: [Item],
+        columns: Int,
+        spacing: CGFloat,
+        @ViewBuilder tile: @escaping (Item) -> some View
+    ) -> some View {
+        let rows = Self.rows(of: items, size: columns)
+
+        return Grid(horizontalSpacing: spacing, verticalSpacing: spacing) {
+            ForEach(rows.indices, id: \.self) { index in
+                GridRow {
+                    ForEach(rows[index]) { item in
+                        tile(item)
+                    }
+
+                    ForEach(rows[index].count..<columns, id: \.self) { _ in
+                        Color.clear
+                            .gridCellUnsizedAxes(.vertical)
+                    }
+                }
+            }
         }
     }
 
@@ -434,7 +503,7 @@ private extension TemplateEditSheet {
 
         return Button {
             model.categoryId = category.id
-            closeDrawer()
+            closePanel()
         } label: {
             VStack(spacing: 4) {
                 IconImage(model.icon(for: category), size: 17)
@@ -464,7 +533,7 @@ private extension TemplateEditSheet {
 
         return Button {
             model.walletId = wallet.id
-            closeDrawer()
+            closePanel()
         } label: {
             HStack(spacing: 6) {
                 IconImage(model.icon(for: wallet), size: 13)
@@ -493,7 +562,7 @@ private extension TemplateEditSheet {
         case memo
     }
 
-    enum Drawer: Hashable {
+    enum Panel: Hashable {
         case amount
         case category
         case wallet
@@ -510,7 +579,7 @@ private extension TemplateEditSheet {
     }
 
     struct RowItem {
-        let drawer: Drawer
+        let panel: Panel
         let systemImage: String
         let title: String
         let value: String
@@ -520,20 +589,12 @@ private extension TemplateEditSheet {
     static let cardShape = RoundedRectangle(cornerRadius: 26)
     static let rowsShape = RoundedRectangle(cornerRadius: 20)
     static let amountFont = Font.system(size: 20, design: .serif)
+    static let nameFont = Font.system(size: 17, weight: .medium, design: .serif)
+    static let emptyAmountFont = Font.system(size: 15, design: .serif)
 
     static let drawerShape = UnevenRoundedRectangle(
         topLeadingRadius: 28,
         topTrailingRadius: 28
-    )
-
-    static let categoryColumns = Array(
-        repeating: GridItem(.flexible(), spacing: 5),
-        count: 5
-    )
-
-    static let walletColumns = Array(
-        repeating: GridItem(.flexible(), spacing: 8),
-        count: 3
     )
 
     static var cardFill: LinearGradient {
@@ -542,6 +603,35 @@ private extension TemplateEditSheet {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    static var gloss: LinearGradient {
+        LinearGradient(
+            colors: [.white.opacity(0.09), .white.opacity(0)],
+            startPoint: .topLeading,
+            endPoint: .center
+        )
+    }
+
+    static var foil: AngularGradient {
+        AngularGradient(
+            colors: [
+                Palette.champagne.opacity(0.9),
+                Palette.gold.opacity(0.6),
+                Palette.bronze.opacity(0.5),
+                Palette.gold.opacity(0.6),
+                Palette.champagne.opacity(0.9)
+            ],
+            center: .center
+        )
+    }
+
+    static var drawerTransition: AnyTransition {
+        .move(edge: .bottom).combined(with: .opacity)
+    }
+
+    static var memoTransition: AnyTransition {
+        .scale(scale: 0.95, anchor: .top).combined(with: .opacity)
     }
 
     var title: String {
@@ -589,34 +679,43 @@ private extension TemplateEditSheet {
     var rowItems: [RowItem] {
         [
             RowItem(
-                drawer: .amount,
+                panel: .amount,
                 systemImage: "yensign",
                 title: "金額",
                 value: amountValue,
                 isEmpty: model.amount == nil
             ),
             RowItem(
-                drawer: .category,
+                panel: .category,
                 systemImage: "square.grid.2x2",
                 title: "カテゴリ",
                 value: model.selectedCategory?.name ?? "選ぶ",
                 isEmpty: model.selectedCategory == nil
             ),
             RowItem(
-                drawer: .wallet,
+                panel: .wallet,
                 systemImage: "wallet.bifold",
                 title: "財布",
                 value: model.selectedWallet?.name ?? "選ぶ",
                 isEmpty: model.selectedWallet == nil
             ),
             RowItem(
-                drawer: .memo,
+                panel: .memo,
                 systemImage: "square.and.pencil",
                 title: "メモ",
                 value: memoValue,
                 isEmpty: model.memo.isEmpty
             )
         ]
+    }
+
+    static func rows<Item>(
+        of items: [Item],
+        size: Int
+    ) -> [[Item]] {
+        stride(from: 0, to: items.count, by: size).map { start in
+            Array(items[start..<min(start + size, items.count)])
+        }
     }
 
     func tileFill(isSelected: Bool) -> Color {
@@ -627,26 +726,27 @@ private extension TemplateEditSheet {
         isSelected ? Palette.gold.opacity(0.55) : Palette.gold.opacity(0.12)
     }
 
-    func open(_ drawer: Drawer) {
-        if drawer != .memo {
-            focus = nil
-        }
-
-        withAnimation(.snappy) {
-            self.drawer = drawer
-        }
-    }
-
-    func closeDrawer() {
+    func open(_ panel: Panel) {
         focus = nil
 
         withAnimation(.snappy) {
-            drawer = nil
+            self.panel = panel
         }
     }
 
+    func hidePanel() {
+        withAnimation(.snappy) {
+            panel = nil
+        }
+    }
+
+    func closePanel() {
+        focus = nil
+        hidePanel()
+    }
+
     func close() {
-        closeDrawer()
+        closePanel()
 
         if model.isChanged {
             isConfirmingDiscard = true
@@ -656,7 +756,7 @@ private extension TemplateEditSheet {
     }
 
     func save() async {
-        closeDrawer()
+        closePanel()
 
         guard let template = await model.save() else {
             return
