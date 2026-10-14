@@ -21,6 +21,14 @@ extension AppModel {
         case failed(String)
     }
 
+    var isOpened: Bool {
+        if case .opening = launch {
+            false
+        } else {
+            true
+        }
+    }
+
     func open() {
         guard case .opening = launch else {
             return

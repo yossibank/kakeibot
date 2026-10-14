@@ -5,6 +5,7 @@ import SwiftUI
 
 public struct RootView: View {
     @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
+    @State private var isLaunching = true
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -12,6 +13,13 @@ public struct RootView: View {
 
     public var body: some View {
         content
+            .overlay {
+                if isLaunching {
+                    LaunchView(isReady: model.isOpened) {
+                        isLaunching = false
+                    }
+                }
+            }
             .task {
                 model.open()
             }
