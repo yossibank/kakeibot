@@ -7,7 +7,10 @@ import Store
 @MainActor
 @Observable
 public final class TemplateListModel {
+    public var type: Entry.Kind = .expense
+
     public private(set) var templates: [EntryTemplate] = []
+    public private(set) var movingOrder: [EntryTemplate.ID]?
     public private(set) var categories: CategoryList?
     public private(set) var wallets: [Wallet] = []
     public private(set) var errorMessage: String?
@@ -20,16 +23,27 @@ public final class TemplateListModel {
 }
 
 public extension TemplateListModel {
+    var shown: [EntryTemplate] {
+        let templates = templates.filter { $0.type == type }
+
+        guard let movingOrder else {
+            return templates
+        }
+
+        return movingOrder.compactMap { id in
+            templates.first { $0.id == id }
+        }
+    }
+
     func icon(for template: EntryTemplate) -> Icon? {
         let category = category(for: template)
         return category.flatMap { categories?.icons[$0.iconId] }
     }
 
     func detail(for template: EntryTemplate) -> String {
-        let type = template.type == .income ? "収入" : "支出"
         let category = category(for: template)?.name
         let wallet = wallets.first { $0.id == template.walletId }?.name
-        let parts = [type, category, wallet, template.memo]
+        let parts = [category, wallet, template.memo]
         return parts.compactMap(\.self).joined(separator: "・")
     }
 
@@ -60,19 +74,42 @@ public extension TemplateListModel {
     }
 
     func move(
-        from source: IndexSet,
-        to destination: Int
-    ) async {
-        var reordered = templates
-        reordered.move(fromOffsets: source, toOffset: destination)
-        templates = reordered
+        _ id: EntryTemplate.ID,
+        to index: Int
+    ) {
+        var order = movingOrder ?? shown.map(\.id)
+
+        guard let from = order.firstIndex(of: id) else {
+            return
+        }
+
+        let to = min(max(index, 0), order.count - 1)
+
+        guard from != to else {
+            return
+        }
+
+        order.remove(at: from)
+        order.insert(id, at: to)
+        movingOrder = order
+    }
+
+    func finishMoving() async {
+        guard let movingOrder else {
+            return
+        }
+
+        let others = templates.filter { $0.type != type }.map(\.id)
+        let ids = movingOrder + others
 
         do {
-            let ids = reordered.map(\.id)
             try await database.reorderTemplates(ids, at: Date())
+            templates = try await database.templates()
         } catch {
             errorMessage = Self.saveFailedMessage
         }
+
+        self.movingOrder = nil
     }
 }
 

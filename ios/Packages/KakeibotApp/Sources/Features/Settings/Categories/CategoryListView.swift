@@ -118,7 +118,7 @@ private extension CategoryListView {
             sheet = .new(model.kind)
         } label: {
             Image(systemName: "plus")
-                .font(.system(size: 22, weight: .ultraLight))
+                .font(.system(size: 17, weight: .ultraLight))
                 .foregroundStyle(Palette.gold)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Palette.gold.opacity(0.06), in: Self.tileShape)
@@ -179,7 +179,7 @@ private extension CategoryListView {
         let isLifted = lift?.id == category.id
         let index = model.shown.firstIndex(of: category) ?? 0
         let position = isLifted ? liftedCenter : center(at: index)
-        let scale: CGFloat = isLifted ? 1.1 : 1
+        let scale: CGFloat = isLifted ? 1.12 : 1
         let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
@@ -203,12 +203,12 @@ private extension CategoryListView {
         let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.mist
         let opacity: Double = isHidden ? 0.6 : 1
 
-        return VStack(spacing: 6) {
-            IconImage(icon, size: 20)
+        return VStack(spacing: 4) {
+            IconImage(icon, size: 17)
                 .foregroundStyle(Palette.gold)
 
             Text(category.name)
-                .font(.system(size: 11))
+                .font(.system(size: 10))
                 .foregroundStyle(Palette.ink)
                 .lineLimit(1)
         }
@@ -216,8 +216,8 @@ private extension CategoryListView {
         .overlay(alignment: .bottom) {
             Capsule()
                 .fill(color)
-                .frame(width: 24, height: 2)
-                .padding(.bottom, 7)
+                .frame(width: 16, height: 2)
+                .padding(.bottom, 4)
         }
         .background(tileBackground(isHidden: isHidden))
         .overlay {
@@ -272,10 +272,10 @@ private extension CategoryListView {
     ]
 
     nonisolated static let space = "CategoryBoard"
-    static let columnCount = 4
-    static let spacing: CGFloat = 8
-    static let tileHeight: CGFloat = 78
-    static let tileShape = RoundedRectangle(cornerRadius: 16)
+    static let columnCount = 5
+    static let spacing: CGFloat = 5
+    static let tileHeight: CGFloat = 54
+    static let tileShape = RoundedRectangle(cornerRadius: 12)
     static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
 
     static let columns = Array(

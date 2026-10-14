@@ -145,7 +145,12 @@ private extension MainView {
                 )
             )
         case .newTemplate:
-            TemplateEditSheet(model: TemplateEditModel(database: database))
+            TemplateEditSheet(
+                model: TemplateEditModel(
+                    database: database,
+                    type: home.templateType
+                )
+            )
         }
     }
 }

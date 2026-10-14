@@ -123,7 +123,12 @@ private extension DebugMenu {
                     TemplateListView(database: database)
                 }
             case .newTemplate:
-                TemplateEditSheet(model: TemplateEditModel(database: database))
+                TemplateEditSheet(
+                    model: TemplateEditModel(
+                        database: database,
+                        type: .expense
+                    )
+                )
             }
         }
     }

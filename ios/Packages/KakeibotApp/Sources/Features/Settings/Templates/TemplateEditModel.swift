@@ -12,7 +12,7 @@ public final class TemplateEditModel {
     public var memo: String
 
     public private(set) var type: Entry.Kind
-    public private(set) var amountText: String
+    public private(set) var calculator: AmountCalculator
     public private(set) var options: EntryOptions?
     public private(set) var errorMessage: String?
 
@@ -23,29 +23,43 @@ public final class TemplateEditModel {
 
     public init(
         database: AppDatabase,
-        editing id: EntryTemplate.ID? = nil,
-        draft: EntryTemplateDraft? = nil
+        type: Entry.Kind,
+        editing id: EntryTemplate.ID? = nil
     ) {
         self.database = database
         self.editingId = id
-        self.name = draft?.name ?? ""
-        self.type = draft?.type ?? .expense
-        self.amountText = draft?.amount.map(String.init) ?? ""
-        self.categoryId = draft?.categoryId
-        self.walletId = draft?.walletId
-        self.memo = draft?.memo ?? ""
+        self.name = ""
+        self.type = type
+        self.calculator = AmountCalculator()
+        self.memo = ""
+    }
+
+    public init(
+        database: AppDatabase,
+        draft: EntryTemplateDraft
+    ) {
+        self.database = database
+        self.editingId = nil
+        self.name = draft.name
+        self.type = draft.type
+        self.calculator = AmountCalculator(amount: draft.amount ?? 0)
+        self.categoryId = draft.categoryId
+        self.walletId = draft.walletId
+        self.memo = draft.memo
     }
 }
 
 public extension TemplateEditModel {
-    static let maxAmountDigits = 9
-
     var isEditing: Bool {
         editingId != nil
     }
 
     var amount: Int? {
-        Int(amountText)
+        calculator.amount > 0 ? calculator.amount : nil
+    }
+
+    var typeName: String {
+        type == .income ? "収入" : "支出"
     }
 
     var draft: EntryTemplateDraft {
@@ -87,22 +101,8 @@ public extension TemplateEditModel {
         options?.icons[wallet.iconId]
     }
 
-    func select(_ type: Entry.Kind) {
-        guard type != self.type else {
-            return
-        }
-
-        self.type = type
-
-        if !categories.contains(where: { $0.id == categoryId }) {
-            categoryId = categories.first?.id
-        }
-    }
-
-    func inputAmount(_ text: String) {
-        let digits = text.filter(\.isNumber).prefix(Self.maxAmountDigits)
-        let trimmed = digits.drop { $0 == "0" }
-        amountText = String(trimmed)
+    func press(_ key: AmountCalculator.Key) {
+        calculator.press(key)
     }
 
     func load() async {
@@ -179,7 +179,7 @@ private extension TemplateEditModel {
         let draft = EntryTemplateDraft(template)
         name = draft.name
         type = draft.type
-        amountText = draft.amount.map(String.init) ?? ""
+        calculator = AmountCalculator(amount: draft.amount ?? 0)
         categoryId = draft.categoryId
         walletId = draft.walletId
         memo = draft.memo

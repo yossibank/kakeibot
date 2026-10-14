@@ -25,6 +25,7 @@ struct TemplateUseTests {
     func startsFromTemplateWithoutChanges() async throws {
         let setup = try await Setup()
         let pass = try await setup.saveTemplate(name: "定期", amount: nil)
+        try await setup.saveTemplate(name: "給料", amount: nil, type: .income)
 
         let model = EntryModel(
             database: setup.database,
@@ -61,19 +62,52 @@ struct TemplateUseTests {
     func describesAndReordersTemplates() async throws {
         let setup = try await Setup()
         try await setup.saveTemplate(name: "ランチ", amount: 980)
-        try await setup.saveTemplate(name: "定期", amount: nil)
+        try await setup.saveTemplate(name: "給料", amount: nil, type: .income)
+        let pass = try await setup.saveTemplate(name: "定期", amount: nil)
         let model = TemplateListModel(database: setup.database)
         await model.load()
-        let first = try #require(model.templates.first)
+        let first = try #require(model.shown.first)
         let detail = model.detail(for: first)
-        let amounts = model.templates.map { model.amountText(for: $0) }
+        let amounts = model.shown.map { model.amountText(for: $0) }
 
-        await model.move(from: [0], to: 2)
+        model.move(pass.id, to: 0)
+        let moving = model.shown.map(\.name)
+        await model.finishMoving()
         let stored = try await setup.database.templates()
 
-        #expect(detail == "支出・日用品・財布・社食")
+        model.type = .income
+        let income = model.shown.map(\.name)
+
+        #expect(detail == "日用品・財布・社食")
         #expect(amounts == ["¥980", "毎回入れる"])
-        #expect(stored.map(\.name) == ["定期", "ランチ"])
+        #expect(moving == ["定期", "ランチ"])
+        #expect(stored.map(\.name) == ["定期", "ランチ", "給料"])
+        #expect(income == ["給料"])
+        #expect(model.movingOrder == nil)
+    }
+
+    @Test
+    func showsTemplatesOfSelectedTypeOnHome() async throws {
+        let setup = try await Setup()
+        try await setup.saveTemplate(name: "ランチ", amount: 980)
+        try await setup.saveTemplate(name: "給料", amount: nil, type: .income)
+        let home = HomeModel(database: setup.database, today: setup.date)
+
+        let task = Task {
+            await home.observeTemplates()
+        }
+
+        for _ in 0..<200 where home.templates.isEmpty {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let expense = home.templates.map(\.name)
+        home.templateType = .income
+        let income = home.templates.map(\.name)
+        task.cancel()
+
+        #expect(expense == ["ランチ"])
+        #expect(income == ["給料"])
     }
 
     @Test
@@ -115,15 +149,20 @@ extension TemplateUseTests.Setup {
     @discardableResult
     func saveTemplate(
         name: String,
-        amount: Int?
+        amount: Int?,
+        type: Entry.Kind = .expense
     ) async throws -> EntryTemplate {
         let options = try await database.entryOptions()
 
+        let categories = type == .income
+            ? options.incomeCategories
+            : options.expenseCategories
+
         let draft = EntryTemplateDraft(
             name: name,
-            type: .expense,
+            type: type,
             amount: amount,
-            categoryId: options.expenseCategories[1].id,
+            categoryId: categories[1].id,
             walletId: options.wallets[0].id,
             memo: "社食"
         )

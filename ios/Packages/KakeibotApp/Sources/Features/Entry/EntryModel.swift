@@ -16,10 +16,10 @@ public final class EntryModel {
     public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
-    public private(set) var templates: [EntryTemplate] = []
     public private(set) var errorMessage: String?
 
     private var baseline: Snapshot?
+    private var allTemplates: [EntryTemplate] = []
     private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
 
     private let database: AppDatabase
@@ -97,6 +97,10 @@ public extension EntryModel {
 
     var categories: [EntryCategory] {
         categories(for: type)
+    }
+
+    var templates: [EntryTemplate] {
+        allTemplates.filter { $0.type == type }
     }
 
     var categoryPages: [[CategoryCell]] {
@@ -177,7 +181,7 @@ public extension EntryModel {
             options = try await database.entryOptions()
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
-            templates = try await database.templates()
+            allTemplates = try await database.templates()
             try await loadEntry()
 
             if let startingTemplate {
@@ -210,7 +214,7 @@ public extension EntryModel {
 
     func reloadTemplates() async {
         do {
-            templates = try await database.templates()
+            allTemplates = try await database.templates()
         } catch {
             errorMessage = Self.message(for: error)
         }

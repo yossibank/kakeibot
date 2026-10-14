@@ -6,6 +6,7 @@ import SwiftUI
 public struct TemplateEditSheet: View {
     @State private var model: TemplateEditModel
     @State private var isConfirmingDiscard = false
+    @State private var isEnteringAmount = false
 
     @FocusState private var focus: Field?
 
@@ -23,7 +24,6 @@ public struct TemplateEditSheet: View {
 
     public var body: some View {
         content
-            .ignoresSafeArea(.keyboard)
             .preferredColorScheme(.dark)
             .confirmsDiscard(
                 when: model.isChanged,
@@ -31,11 +31,16 @@ public struct TemplateEditSheet: View {
             ) {
                 dismiss()
             }
+            .onChange(of: focus) {
+                if focus != nil {
+                    setEnteringAmount(false)
+                }
+            }
             .onChange(of: model.categoryId) {
-                focus = nil
+                finishTyping()
             }
             .onChange(of: model.walletId) {
-                focus = nil
+                finishTyping()
             }
             .task {
                 await model.load()
@@ -47,65 +52,26 @@ private extension TemplateEditSheet {
     var content: some View {
         VStack(spacing: 14) {
             header
-            field("名前（ランチ・定期など）", text: $model.name, focus: .name)
 
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 12) {
-                    CapsulePicker(selection: typeBinding, options: Self.types)
-                    amountField
+            ScrollViewReader { proxy in
+                ScrollView {
+                    form
                 }
-
-                Text("金額を空にすると、使うときに入れる")
-                    .font(.caption2)
-                    .foregroundStyle(Palette.mist)
-            }
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    section("カテゴリ") {
-                        LazyVGrid(columns: Self.columns, spacing: 5) {
-                            ForEach(model.categories) { category in
-                                categoryButton(category)
-                            }
-                        }
-                    }
-
-                    section("財布") {
-                        ScrollView(.horizontal) {
-                            HStack(spacing: 8) {
-                                ForEach(model.wallets) { wallet in
-                                    walletButton(wallet)
-                                }
-                            }
-                        }
-                        .scrollIndicators(.hidden)
-                    }
-
-                    section("メモ") {
-                        field("メモ（なくてもよい）", text: $model.memo, focus: .memo)
-                    }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: focus) {
+                    reveal(focus, in: proxy)
                 }
-                .padding(.bottom, 8)
-            }
-            .scrollIndicators(.hidden)
-            .scrollDismissesKeyboard(.interactively)
-
-            if let errorMessage = model.errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(Palette.rose)
-            }
-
-            if model.isEditing {
-                deleteButton
             }
         }
         .padding(.horizontal, 18)
         .padding(.top, 18)
-        .padding(.bottom, 8)
-        .contentShape(.rect)
-        .onTapGesture {
-            focus = nil
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .overlay(alignment: .bottom) {
+            if isEnteringAmount {
+                keypadDrawer
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
         .background {
             Rectangle()
@@ -122,7 +88,7 @@ private extension TemplateEditSheet {
 
             Spacer()
 
-            Text(model.isEditing ? "テンプレートを編集" : "テンプレートを追加")
+            Text(title)
                 .font(.system(size: 16, design: .serif))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
@@ -141,30 +107,125 @@ private extension TemplateEditSheet {
         }
     }
 
-    var amountField: some View {
-        HStack(spacing: 4) {
-            Text("¥")
-                .foregroundStyle(Palette.gold)
+    var form: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            field("名前（ランチ・定期など）", text: $model.name, focus: .name)
 
-            TextField(
-                "金額",
-                text: amountBinding,
-                prompt: Text("毎回入れる").foregroundStyle(Palette.dusk)
-            )
-            .keyboardType(.numberPad)
-            .foregroundStyle(Palette.champagne)
-            .tint(Palette.gold)
-            .focused($focus, equals: .amount)
+            VStack(alignment: .leading, spacing: 6) {
+                amountField
+
+                Text("金額を空にすると、使うときに入れる")
+                    .font(.caption2)
+                    .foregroundStyle(Palette.mist)
+                    .padding(.leading, 4)
+            }
+
+            section("カテゴリ") {
+                LazyVGrid(columns: Self.columns, spacing: 5) {
+                    ForEach(model.categories) { category in
+                        categoryButton(category)
+                    }
+                }
+            }
+
+            section("財布") {
+                ScrollView(.horizontal) {
+                    HStack(spacing: 8) {
+                        ForEach(model.wallets) { wallet in
+                            walletButton(wallet)
+                        }
+                    }
+                }
+                .scrollIndicators(.hidden)
+            }
+
+            section("メモ") {
+                field("メモ（なくてもよい）", text: $model.memo, focus: .memo)
+            }
+            .id(Field.memo)
+
+            if let errorMessage = model.errorMessage {
+                Text(errorMessage)
+                    .font(.footnote)
+                    .foregroundStyle(Palette.rose)
+            }
+
+            if model.isEditing {
+                deleteButton
+            }
         }
-        .font(.system(size: 20, weight: .medium, design: .serif))
-        .padding(.horizontal, 14)
-        .frame(height: 46)
-        .background(Palette.drawer, in: .rect(cornerRadius: 14))
-        .overlay {
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(fieldStroke(for: .amount), lineWidth: 1)
+        .padding(.top, 4)
+        .padding(.bottom, bottomSpace)
+        .contentShape(.rect)
+        .onTapGesture {
+            finishTyping()
         }
-        .animation(.snappy(duration: 0.2), value: focus)
+    }
+
+    var amountField: some View {
+        Button {
+            focus = nil
+            setEnteringAmount(true)
+        } label: {
+            HStack {
+                if let amount = model.amount {
+                    Text(AmountText.text(amount))
+                        .font(
+                            .system(
+                                size: 20,
+                                weight: .medium,
+                                design: .serif
+                            )
+                        )
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.champagne)
+                } else {
+                    Text("毎回入れる")
+                        .font(.body)
+                        .foregroundStyle(Palette.dusk)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .frame(height: 46)
+            .background(Palette.drawer, in: .rect(cornerRadius: 14))
+            .overlay {
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(amountStroke, lineWidth: 1)
+            }
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .animation(.snappy(duration: 0.2), value: isEnteringAmount)
+    }
+
+    var keypadDrawer: some View {
+        VStack(spacing: 10) {
+            Button("完了") {
+                setEnteringAmount(false)
+            }
+            .font(.subheadline.weight(.bold))
+            .foregroundStyle(Palette.gold)
+            .frame(minWidth: 44, minHeight: 32)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+
+            Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+                model.press(key)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .padding(.bottom, 8)
+        .background {
+            Self.drawerShape
+                .fill(Palette.drawer)
+                .overlay {
+                    Self.drawerShape
+                        .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
+                }
+                .ignoresSafeArea(edges: .bottom)
+        }
     }
 
     var deleteButton: some View {
@@ -184,6 +245,7 @@ private extension TemplateEditSheet {
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .padding(.top, 6)
     }
 
     func section(
@@ -292,40 +354,33 @@ private extension TemplateEditSheet {
         case memo
     }
 
-    static let types: [CapsulePicker<Entry.Kind>.Option] = [
-        .init("支出", value: .expense),
-        .init("収入", value: .income)
-    ]
+    static let drawerShape = UnevenRoundedRectangle(
+        topLeadingRadius: 28,
+        topTrailingRadius: 28
+    )
+
+    static let drawerSpace: CGFloat = 340
 
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: 5),
         count: 5
     )
 
+    var title: String {
+        let action = model.isEditing ? "編集" : "追加"
+        return "\(model.typeName)テンプレートを\(action)"
+    }
+
     var saveColor: Color {
         model.canSave ? Palette.gold : Palette.dusk
     }
 
-    var typeBinding: Binding<Entry.Kind> {
-        Binding(
-            get: {
-                model.type
-            },
-            set: { type in
-                model.select(type)
-            }
-        )
+    var amountStroke: Color {
+        isEnteringAmount ? Palette.gold : Palette.gold.opacity(0.35)
     }
 
-    var amountBinding: Binding<String> {
-        Binding(
-            get: {
-                model.amountText
-            },
-            set: { text in
-                model.inputAmount(text)
-            }
-        )
+    var bottomSpace: CGFloat {
+        isEnteringAmount ? Self.drawerSpace : 8
     }
 
     func fieldStroke(for field: Field) -> Color {
@@ -340,8 +395,38 @@ private extension TemplateEditSheet {
         isSelected ? Palette.gold.opacity(0.55) : Palette.gold.opacity(0.12)
     }
 
-    func close() {
+    func setEnteringAmount(_ isEntering: Bool) {
+        withAnimation(.snappy) {
+            isEnteringAmount = isEntering
+        }
+    }
+
+    func finishTyping() {
         focus = nil
+        setEnteringAmount(false)
+    }
+
+    func reveal(
+        _ field: Field?,
+        in proxy: ScrollViewProxy
+    ) {
+        guard field == .memo else {
+            return
+        }
+
+        Task {
+            guard await (try? Task.sleep(for: .seconds(0.35))) != nil else {
+                return
+            }
+
+            withAnimation(.snappy) {
+                proxy.scrollTo(Field.memo, anchor: .bottom)
+            }
+        }
+    }
+
+    func close() {
+        finishTyping()
 
         if model.isChanged {
             isConfirmingDiscard = true
@@ -351,7 +436,7 @@ private extension TemplateEditSheet {
     }
 
     func save() async {
-        focus = nil
+        finishTyping()
 
         guard let template = await model.save() else {
             return
@@ -371,6 +456,11 @@ private extension TemplateEditSheet {
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
-        TemplateEditSheet(model: TemplateEditModel(database: database))
+        TemplateEditSheet(
+            model: TemplateEditModel(
+                database: database,
+                type: .expense
+            )
+        )
     }
 }

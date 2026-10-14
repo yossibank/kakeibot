@@ -8,11 +8,13 @@ import Store
 @Observable
 public final class HomeModel {
     public var today: LocalDate
+    public var templateType: Entry.Kind = .expense
 
     public private(set) var list: EntryList?
-    public private(set) var templates: [EntryTemplate] = []
     public private(set) var recorded: Recorded?
     public private(set) var errorMessage: String?
+
+    private var allTemplates: [EntryTemplate] = []
 
     private let database: AppDatabase
 
@@ -57,6 +59,10 @@ public extension HomeModel {
         expense(on: today.adding(days: -1))
     }
 
+    var templates: [EntryTemplate] {
+        allTemplates.filter { $0.type == templateType }
+    }
+
     var recentRows: [EntryRowItem] {
         guard let list else {
             return []
@@ -95,7 +101,7 @@ public extension HomeModel {
     func observeTemplates() async {
         do {
             for try await templates in database.templateUpdates() {
-                self.templates = templates
+                allTemplates = templates
             }
         } catch {
             errorMessage = Self.loadFailedMessage

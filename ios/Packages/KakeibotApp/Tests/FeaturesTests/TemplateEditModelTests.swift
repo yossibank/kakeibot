@@ -7,26 +7,31 @@ import Testing
 @MainActor
 struct TemplateEditModelTests {
     @Test
-    func keepsOnlyDigitsInAmount() throws {
-        let model = try TemplateEditModel(database: Self.database())
+    func entersAmountWithKeypad() throws {
+        let database = try Self.database()
+        let model = TemplateEditModel(database: database, type: .income)
 
-        model.inputAmount("0¥1,280")
+        model.press(.digit(1))
+        model.press(.doubleZero)
         let typed = model.amount
 
-        model.inputAmount("")
+        model.press(.clear)
 
-        #expect(typed == 1280)
+        #expect(typed == 100)
         #expect(model.amount == nil)
+        #expect(model.typeName == "収入")
     }
 
     @Test
     func savesNewTemplateWithDefaults() async throws {
         let database = try Self.database()
-        let model = TemplateEditModel(database: database)
+        let model = TemplateEditModel(database: database, type: .expense)
         await model.load()
         let canSaveWithoutName = model.canSave
         model.name = "ランチ"
-        model.inputAmount("980")
+        model.press(.digit(9))
+        model.press(.digit(8))
+        model.press(.digit(0))
 
         let saved = await model.save()
         let templates = try await database.templates()
@@ -40,18 +45,23 @@ struct TemplateEditModelTests {
     @Test
     func loadsExistingTemplateAndTracksChanges() async throws {
         let database = try Self.database()
-        let creator = TemplateEditModel(database: database)
+        let creator = TemplateEditModel(database: database, type: .income)
         await creator.load()
         creator.name = "定期"
         let saved = try #require(await creator.save())
 
-        let model = TemplateEditModel(database: database, editing: saved.id)
+        let model = TemplateEditModel(
+            database: database,
+            type: .expense,
+            editing: saved.id
+        )
         await model.load()
         let loaded = model.isChanged
 
         model.memo = "通勤"
 
         #expect(model.name == "定期")
+        #expect(model.type == .income)
         #expect(model.amount == nil)
         #expect(!loaded)
         #expect(model.isChanged)

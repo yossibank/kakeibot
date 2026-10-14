@@ -135,10 +135,15 @@ private extension HomeView {
 
                 Spacer()
 
-                Text(templateHint)
-                    .font(.caption2)
-                    .foregroundStyle(Palette.mist)
+                CapsulePicker(
+                    selection: $model.templateType,
+                    options: Self.typeOptions
+                )
             }
+
+            Text(templateHint)
+                .font(.caption2)
+                .foregroundStyle(Palette.mist)
 
             LazyVGrid(columns: Self.templateColumns, spacing: 8) {
                 ForEach(model.templates) { template in
@@ -323,6 +328,11 @@ private extension HomeView {
 
 private extension HomeView {
     static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
+
+    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
+        .init("支出", value: .expense),
+        .init("収入", value: .income)
+    ]
 
     static let templateColumns = Array(
         repeating: GridItem(.flexible(), spacing: 8),
