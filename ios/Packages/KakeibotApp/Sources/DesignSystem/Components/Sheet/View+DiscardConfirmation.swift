@@ -68,18 +68,18 @@ private extension DiscardCard {
                             .stroke(Palette.gold.opacity(0.5), lineWidth: 0.8)
                     }
 
-                Text("入力を捨てますか")
+                Text("保存せずに閉じますか")
                     .font(.system(size: 18, weight: .medium, design: .serif))
                     .foregroundStyle(Palette.champagne)
 
-                Text("閉じると、いま入れた内容は残らない")
+                Text("入れた内容は残りません")
                     .font(.caption)
                     .foregroundStyle(Palette.mist)
             }
 
             VStack(spacing: 10) {
                 Button(action: onKeep) {
-                    Text("入力を続ける")
+                    Text("入力に戻る")
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(Palette.nightBottom)
                         .frame(maxWidth: .infinity, minHeight: 48)
@@ -88,7 +88,7 @@ private extension DiscardCard {
                 }
 
                 Button(action: onDiscard) {
-                    Text("捨てて閉じる")
+                    Text("保存せずに閉じる")
                         .font(.subheadline)
                         .foregroundStyle(Palette.rose)
                         .frame(maxWidth: .infinity, minHeight: 48)
