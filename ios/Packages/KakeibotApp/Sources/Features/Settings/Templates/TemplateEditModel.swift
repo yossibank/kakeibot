@@ -1,0 +1,187 @@
+import Core
+import Foundation
+import Observation
+import Store
+
+@MainActor
+@Observable
+public final class TemplateEditModel {
+    public var name: String
+    public var categoryId: EntryCategory.ID?
+    public var walletId: Wallet.ID?
+    public var memo: String
+
+    public private(set) var type: Entry.Kind
+    public private(set) var amountText: String
+    public private(set) var options: EntryOptions?
+    public private(set) var errorMessage: String?
+
+    private var baseline: Snapshot?
+
+    private let database: AppDatabase
+    private let editingId: EntryTemplate.ID?
+
+    public init(
+        database: AppDatabase,
+        editing id: EntryTemplate.ID? = nil,
+        draft: EntryTemplateDraft? = nil
+    ) {
+        self.database = database
+        self.editingId = id
+        self.name = draft?.name ?? ""
+        self.type = draft?.type ?? .expense
+        self.amountText = draft?.amount.map(String.init) ?? ""
+        self.categoryId = draft?.categoryId
+        self.walletId = draft?.walletId
+        self.memo = draft?.memo ?? ""
+    }
+}
+
+public extension TemplateEditModel {
+    static let maxAmountDigits = 9
+
+    var isEditing: Bool {
+        editingId != nil
+    }
+
+    var amount: Int? {
+        Int(amountText)
+    }
+
+    var draft: EntryTemplateDraft {
+        EntryTemplateDraft(
+            name: name,
+            type: type,
+            amount: amount,
+            categoryId: categoryId,
+            walletId: walletId,
+            memo: memo
+        )
+    }
+
+    var canSave: Bool {
+        draft.problems.isEmpty
+    }
+
+    var isChanged: Bool {
+        baseline.map { $0 != snapshot } ?? false
+    }
+
+    var categories: [EntryCategory] {
+        switch type {
+        case .expense: options?.expenseCategories ?? []
+        case .income: options?.incomeCategories ?? []
+        case .transfer: []
+        }
+    }
+
+    var wallets: [Wallet] {
+        options?.wallets ?? []
+    }
+
+    func icon(for category: EntryCategory) -> Icon? {
+        options?.icons[category.iconId]
+    }
+
+    func icon(for wallet: Wallet) -> Icon? {
+        options?.icons[wallet.iconId]
+    }
+
+    func select(_ type: Entry.Kind) {
+        guard type != self.type else {
+            return
+        }
+
+        self.type = type
+
+        if !categories.contains(where: { $0.id == categoryId }) {
+            categoryId = categories.first?.id
+        }
+    }
+
+    func inputAmount(_ text: String) {
+        let digits = text.filter(\.isNumber).prefix(Self.maxAmountDigits)
+        let trimmed = digits.drop { $0 == "0" }
+        amountText = String(trimmed)
+    }
+
+    func load() async {
+        do {
+            options = try await database.entryOptions()
+            try await loadTemplate()
+
+            if categoryId == nil {
+                categoryId = categories.first?.id
+            }
+
+            if walletId == nil {
+                walletId = wallets.first?.id
+            }
+
+            baseline = snapshot
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func save() async -> EntryTemplate? {
+        do {
+            return try await database.saveTemplate(
+                draft,
+                editing: editingId,
+                at: Date()
+            )
+        } catch {
+            errorMessage = Self.saveFailedMessage
+            return nil
+        }
+    }
+
+    func delete() async -> Bool {
+        guard let editingId else {
+            return false
+        }
+
+        do {
+            try await database.deleteTemplate(editingId)
+            return true
+        } catch {
+            errorMessage = Self.saveFailedMessage
+            return false
+        }
+    }
+}
+
+private extension TemplateEditModel {
+    struct Snapshot: Equatable {
+        let draft: EntryTemplateDraft
+    }
+
+    static let loadFailedMessage = "テンプレートを読めませんでした"
+    static let saveFailedMessage = "保存できませんでした"
+
+    var snapshot: Snapshot {
+        Snapshot(draft: draft)
+    }
+
+    func loadTemplate() async throws {
+        guard let editingId else {
+            return
+        }
+
+        let templates = try await database.templates()
+        let template = templates.first { $0.id == editingId }
+
+        guard let template else {
+            throw AppDatabase.TemplateWriteError.templateNotFound
+        }
+
+        let draft = EntryTemplateDraft(template)
+        name = draft.name
+        type = draft.type
+        amountText = draft.amount.map(String.init) ?? ""
+        categoryId = draft.categoryId
+        walletId = draft.walletId
+        memo = draft.memo
+    }
+}

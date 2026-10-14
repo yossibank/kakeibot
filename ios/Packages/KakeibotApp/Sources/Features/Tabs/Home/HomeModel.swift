@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -9,6 +10,8 @@ public final class HomeModel {
     public var today: LocalDate
 
     public private(set) var list: EntryList?
+    public private(set) var templates: [EntryTemplate] = []
+    public private(set) var recorded: Recorded?
     public private(set) var errorMessage: String?
 
     private let database: AppDatabase
@@ -23,6 +26,11 @@ public final class HomeModel {
 }
 
 public extension HomeModel {
+    struct Recorded: Equatable {
+        public let entryId: Entry.ID
+        public let message: String
+    }
+
     static let recentLimit = 5
 
     var month: YearMonth {
@@ -79,6 +87,57 @@ public extension HomeModel {
         }
     }
 
+    func icon(for template: EntryTemplate) -> Icon? {
+        let category = list?.categories[template.categoryId]
+        return category.flatMap { list?.icons[$0.iconId] }
+    }
+
+    func observeTemplates() async {
+        do {
+            for try await templates in database.templateUpdates() {
+                self.templates = templates
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func record(_ template: EntryTemplate) async {
+        guard let draft = template.entryDraft(on: today) else {
+            return
+        }
+
+        do {
+            let entry = try await database.saveEntry(draft, at: Date())
+            let amount = AmountText.text(entry.amount)
+
+            recorded = Recorded(
+                entryId: entry.id,
+                message: "\(template.name) \(amount) を記録した"
+            )
+        } catch {
+            errorMessage = Self.saveFailedMessage
+        }
+    }
+
+    func undoRecorded() async {
+        guard let recorded else {
+            return
+        }
+
+        self.recorded = nil
+
+        do {
+            try await database.deleteEntry(recorded.entryId)
+        } catch {
+            errorMessage = Self.saveFailedMessage
+        }
+    }
+
+    func clearRecorded() {
+        recorded = nil
+    }
+
     func observe() async {
         do {
             for try await list in database.entryListUpdates() {
@@ -92,6 +151,7 @@ public extension HomeModel {
 
 private extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
+    static let saveFailedMessage = "記録できませんでした"
 
     var monthDays: [EntryDay] {
         list?.days.filter { $0.date.yearMonth == month } ?? []

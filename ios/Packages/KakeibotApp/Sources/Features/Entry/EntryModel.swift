@@ -16,6 +16,7 @@ public final class EntryModel {
     public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
+    public private(set) var templates: [EntryTemplate] = []
     public private(set) var errorMessage: String?
 
     private var baseline: Snapshot?
@@ -23,15 +24,18 @@ public final class EntryModel {
 
     private let database: AppDatabase
     private let editingId: Entry.ID?
+    private let startingTemplate: EntryTemplate?
 
     public init(
         database: AppDatabase,
         editing id: Entry.ID? = nil,
-        date: LocalDate
+        date: LocalDate,
+        template: EntryTemplate? = nil
     ) {
         self.database = database
         self.editingId = id
         self.date = date
+        self.startingTemplate = template
     }
 }
 
@@ -54,7 +58,7 @@ public extension EntryModel {
         public let wallets: [Wallet]
     }
 
-    static let categoriesPerPage = 12
+    static let categoriesPerPage = 15
 
     var isEditing: Bool {
         editingId != nil
@@ -162,16 +166,69 @@ public extension EntryModel {
         options?.icons[wallet.iconId]
     }
 
+    func icon(for template: EntryTemplate) -> Icon? {
+        let categories = categories(for: template.type)
+        let category = categories.first { $0.id == template.categoryId }
+        return category.flatMap { options?.icons[$0.iconId] }
+    }
+
     func load() async {
         do {
             options = try await database.entryOptions()
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
+            templates = try await database.templates()
             try await loadEntry()
+
+            if let startingTemplate {
+                apply(startingTemplate)
+            }
+
             baseline = snapshot
         } catch {
             errorMessage = Self.message(for: error)
         }
+    }
+
+    func isApplied(_ template: EntryTemplate) -> Bool {
+        let amountMatches = template.amount.map { $0 == amount } ?? true
+
+        return template.type == type
+            && template.categoryId == categoryId
+            && template.walletId == walletId
+            && (template.memo ?? "") == memo
+            && amountMatches
+    }
+
+    func apply(_ template: EntryTemplate) {
+        select(template.type)
+        categoryId = template.categoryId
+        walletId = template.walletId
+        memo = template.memo ?? ""
+        calculator = AmountCalculator(amount: template.amount ?? 0)
+    }
+
+    func reloadTemplates() async {
+        do {
+            templates = try await database.templates()
+        } catch {
+            errorMessage = Self.message(for: error)
+        }
+    }
+
+    func newTemplateModel() -> TemplateEditModel {
+        let templateType: Entry.Kind = type == .income ? .income : .expense
+
+        let draft = EntryTemplateDraft(
+            name: "",
+            type: templateType,
+            amount: amount > 0 ? amount : nil,
+            categoryId: categoryId,
+            walletId: walletId,
+            memo: memo
+        )
+
+        return TemplateEditModel(database: database, draft: draft)
     }
 
     func newCategoryModel() -> CategoryEditModel {

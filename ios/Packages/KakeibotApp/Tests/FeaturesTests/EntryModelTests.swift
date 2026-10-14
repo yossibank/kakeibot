@@ -132,8 +132,8 @@ struct EntryModelTests {
         model.select(.income)
         let incomePages = model.categoryPages
 
-        #expect(expensePages.map(\.count) == [12, 1])
-        #expect(expensePages.last == [.add])
+        #expect(expensePages.map(\.count) == [13])
+        #expect(expensePages[0].last == .add)
         #expect(incomePages.map(\.count) == [4])
         #expect(incomePages[0].last == .add)
     }

@@ -18,6 +18,8 @@ erDiagram
     wallet ||--o{ recurring : "wallet_id・to_wallet_id"
     category |o--o{ recurring : "category_id"
     category |o--o{ budget : "category_id"
+    category ||--o{ template : "category_id"
+    wallet ||--o{ template : "wallet_id"
     reward_rule ||--o{ reward_log : "rule_id"
     entry |o--o| reward_goal : "entry_id"
 ```
@@ -118,6 +120,22 @@ emoji・text・glyph のどれかは必須。
 | created_at / updated_at | TEXT | |
 
 `recurring_id` と `recurring_date` は、そろって入るか、どちらも空にする。`(recurring_id, recurring_date)` は重複禁止。支出を記録した日の `no_spend_day` は消す。
+
+### template
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| id | TEXT | |
+| name | TEXT | |
+| type | TEXT | `expense` `income` |
+| amount | INTEGER | 空なら使うときに入れる。入れるなら 1 以上 |
+| category_id | TEXT | |
+| wallet_id | TEXT | |
+| memo | TEXT | |
+| sort_order | INTEGER | |
+| created_at / updated_at | TEXT | |
+
+テンプレートはしまわずに消す。どの記録からも参照されない。
 
 ### budget
 
@@ -240,10 +258,6 @@ emoji・text・glyph のどれかは必須。
 | onboarding_completed | `true` `false` |
 
 列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。
-
-## テンプレート
-
-表 `template` を足す。列は、作るときに決める（未決）。
 
 ## 表の形の変更
 
