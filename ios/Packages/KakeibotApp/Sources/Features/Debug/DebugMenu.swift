@@ -14,6 +14,10 @@ public struct DebugMenu: View {
         NavigationStack {
             List {
                 Section("画面") {
+                    Button("メイン画面") {
+                        sheet = .main
+                    }
+
                     Button("入力シート（新規）") {
                         sheet = .newEntry
                     }
@@ -35,7 +39,7 @@ public struct DebugMenu: View {
             }
         }
         .sheet(item: $sheet) { sheet in
-            entrySheet(for: sheet)
+            screen(for: sheet)
         }
         .task { await model.prepare() }
     }
@@ -43,6 +47,7 @@ public struct DebugMenu: View {
 
 private extension DebugMenu {
     enum Sheet: Identifiable {
+        case main
         case newEntry
         case editEntry
 
@@ -52,13 +57,17 @@ private extension DebugMenu {
     }
 
     @ViewBuilder
-    func entrySheet(for sheet: Sheet) -> some View {
+    func screen(for sheet: Sheet) -> some View {
         if let database = model.database {
-            let editing = sheet == .editEntry ? model.sampleEntryId : nil
-            let today = LocalDate(Date(), in: .current)
-            let entryModel = EntryModel(database: database, editing: editing, date: today)
+            switch sheet {
+            case .main:
+                MainView(database: database)
+            case .newEntry, .editEntry:
+                let editing = sheet == .editEntry ? model.sampleEntryId : nil
+                let today = LocalDate(Date(), in: .current)
 
-            EntrySheet(model: entryModel)
+                EntrySheet(model: EntryModel(database: database, editing: editing, date: today))
+            }
         }
     }
 }

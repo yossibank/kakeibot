@@ -27,8 +27,8 @@ private extension RootView {
         switch model.launch {
         case .opening:
             ProgressView()
-        case .ready:
-            Text("Kakeibot")
+        case let .ready(database):
+            MainView(database: database)
         case let .failed(message):
             ContentUnavailableView(
                 "データを開けませんでした",

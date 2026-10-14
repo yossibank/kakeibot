@@ -8,6 +8,10 @@ public extension AppDatabase {
             .values(in: writer)
     }
 
+    func entryList() async throws -> EntryList {
+        try await writer.read(Self.entryList)
+    }
+
     func entryOptions() async throws -> EntryOptions {
         try await writer.read(Self.entryOptions)
     }

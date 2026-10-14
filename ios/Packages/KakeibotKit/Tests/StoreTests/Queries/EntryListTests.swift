@@ -36,6 +36,30 @@ struct EntryListTests {
     }
 
     @Test
+    func readsListOnce() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        let options = try await database.entryOptions()
+        let date = try #require(LocalDate("2026-10-03"))
+
+        let draft = EntryDraft(
+            type: .income,
+            amount: 250_000,
+            date: date,
+            categoryId: options.incomeCategories[0].id,
+            walletId: options.wallets[1].id
+        )
+
+        let saved = try await database.saveEntry(draft, at: now)
+        let list = try await database.entryList()
+
+        #expect(list.days.first?.entries == [saved])
+        #expect(list.days.first?.incomeTotal == 250_000)
+        #expect(list.wallets[saved.walletId]?.name == "銀行")
+    }
+
+    @Test
     func listsRecentMemosOnce() async throws {
         let database = try AppDatabase.inMemory()
         let start = Date(timeIntervalSince1970: 1_791_000_000)

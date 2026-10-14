@@ -115,10 +115,11 @@ KakeibotApp/
 │   ├── DesignSystem/
 │   │   ├── Components/      表すものごとのフォルダ
 │   │   │   ├── Amount/      金額
+│   │   │   ├── Card/        カードの見た目、見出し
 │   │   │   ├── Button/      輪のボタン、大きなボタン
 │   │   │   ├── Calendar/    月のカレンダー、曜日の名前
 │   │   │   ├── Chip/        財布・メモなどのチップ
-│   │   │   ├── Dial/        ダイヤルの面と目盛り
+│   │   │   ├── Dial/        ダイヤルの面と目盛り、半円のダイヤル
 │   │   │   ├── Entry/       記録の 1 行
 │   │   │   ├── Icon/        アイコン、絵柄から SF Symbols への置き換え
 │   │   │   ├── Keypad/      テンキー
@@ -132,6 +133,7 @@ KakeibotApp/
 │   ├── Features/
 │   │   ├── Debug/           画面を実機で開くデバッグメニュー（#if DEBUG）
 │   │   ├── Entry/
+│   │   ├── Main/            タブの骨組みと、まだ作っていないタブの表示
 │   │   ├── Onboarding/
 │   │   ├── Settings/
 │   │   │   ├── Backup/
@@ -144,10 +146,10 @@ KakeibotApp/
 │   │   │   ├── Rewards/
 │   │   │   └── Themes/
 │   │   └── Tabs/
-│   │       ├── Calendar/
+│   │       ├── Assets/
 │   │       ├── Home/
-│   │       ├── Review/
-│   │       └── Wallets/
+│   │       ├── Records/
+│   │       └── Review/
 │   ├── Notifications/       予約されているべき通知と今の予約の差を OS に反映
 │   └── WidgetFeature/
 └── Tests/
