@@ -38,9 +38,8 @@ struct CategoryListModelTests {
         let model = CategoryListModel(database: database)
         await model.load()
         let first = try #require(model.shown.first)
-        let third = model.shown[2]
 
-        model.move(first.id, to: third.id)
+        model.move(first.id, to: 2)
         let moving = model.shown.map(\.name)
 
         await model.finishMoving()
@@ -48,6 +47,21 @@ struct CategoryListModelTests {
 
         #expect(Array(moving.prefix(3)) == ["日用品", "交通", "食費"])
         #expect(saved == moving)
+        #expect(model.movingOrder == nil)
+    }
+
+    @Test
+    func hidesWhileMoving() async throws {
+        let database = try Self.database()
+        let model = CategoryListModel(database: database)
+        await model.load()
+        let first = try #require(model.shown.first)
+
+        model.move(first.id, to: 4)
+        await model.hide(first.id)
+
+        #expect(model.hidden.map(\.name) == ["食費"])
+        #expect(model.shown.first?.name == "日用品")
         #expect(model.movingOrder == nil)
     }
 }

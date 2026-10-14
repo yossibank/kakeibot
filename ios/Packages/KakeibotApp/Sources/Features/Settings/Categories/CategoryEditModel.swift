@@ -48,67 +48,160 @@ public extension CategoryEditModel {
         }
     }
 
+    struct EmojiSection: Identifiable {
+        public let title: String
+        public let emojis: [String]
+
+        public var id: String {
+            title
+        }
+    }
+
     static let colors = [
-        "#E07A5F", "#F4A261", "#F2CC8F", "#E9C46A",
-        "#C9A465", "#B08968", "#81B29A", "#6CBF84",
-        "#2A9D8F", "#5FA8D3", "#4A6FA5", "#3D5A80",
-        "#577590", "#9C6ADE", "#E5989B", "#8D99AE"
+        "#E07A5F", "#E76F51", "#F28482", "#F4A261",
+        "#F6BD60", "#F2CC8F", "#E9C46A", "#C9A465",
+        "#B08968", "#9C6644", "#D4C5A9", "#A3B18A",
+        "#81B29A", "#6CBF84", "#52B788", "#2A9D8F",
+        "#84A98C", "#48CAE4", "#5FA8D3", "#4A6FA5",
+        "#3D5A80", "#577590", "#1D3557", "#7B6CF6",
+        "#9C6ADE", "#C08497", "#B5838D", "#E5989B",
+        "#FFAFCC", "#ADB5BD", "#8D99AE", "#6C757D"
     ]
 
-    static let emojiSuggestions = [
-        "🍙", "🍜", "☕️", "🍺", "🛒", "🚃", "🚕", "✈️",
-        "🏠", "💡", "📱", "🎮", "🎬", "📚", "💊", "🐶"
+    static let emojiSections = [
+        EmojiSection(
+            title: "食べ物",
+            emojis: [
+                "🍙", "🍣", "🍜", "🍛", "🍝", "🍔", "🍕", "🍞",
+                "🥗", "🍱", "🍰", "🍩", "🍎", "🥩", "🥚", "🍪"
+            ]
+        ),
+        EmojiSection(
+            title: "飲み物",
+            emojis: [
+                "☕️", "🍵", "🧋", "🥤", "🍺", "🍷", "🍶", "🍹",
+                "🥛", "🧃"
+            ]
+        ),
+        EmojiSection(
+            title: "暮らし",
+            emojis: [
+                "🏠", "🛒", "🧻", "🧴", "🧹", "🛁", "💡", "💧",
+                "🔥", "📦", "🧺", "🪴", "🛋️", "🔑"
+            ]
+        ),
+        EmojiSection(
+            title: "乗り物",
+            emojis: [
+                "🚃", "🚌", "🚕", "🚗", "🚲", "✈️", "⛽️", "🚢",
+                "🛵", "🅿️"
+            ]
+        ),
+        EmojiSection(
+            title: "遊び",
+            emojis: [
+                "🎮", "🎬", "🎤", "🎵", "🎨", "📚", "🎯", "🎳",
+                "⚽️", "⛳️", "🎢", "🎁", "🎉", "🏕️", "♨️", "📷"
+            ]
+        ),
+        EmojiSection(
+            title: "からだ",
+            emojis: [
+                "💊", "🏥", "🦷", "💇", "💄", "👕", "👟", "👜",
+                "💅", "🧖"
+            ]
+        ),
+        EmojiSection(
+            title: "人と動物",
+            emojis: [
+                "👶", "🧒", "👪", "🐶", "🐱", "🐟", "🐦", "🌸"
+            ]
+        ),
+        EmojiSection(
+            title: "お金",
+            emojis: [
+                "💰", "💴", "💳", "🏦", "📈", "🧾", "💼", "🏢",
+                "🎫", "✉️", "📱", "💻"
+            ]
+        )
     ]
 
     static let glyphSections = [
         GlyphSection(
             title: "食べる",
-            glyphs: [.food, .cafe, .cake, .grocery, .fish, .takeout, .social]
+            glyphs: [
+                .food, .cafe, .drink, .cake, .snack, .grocery, .fish,
+                .cooking, .takeout, .bottle, .social
+            ]
         ),
         GlyphSection(
             title: "暮らし",
             glyphs: [
-                .daily, .cart, .bag, .home, .sofa, .tools, .laundry,
-                .utility, .light, .water, .gas, .phone, .wifi, .laptop,
-                .tv
+                .daily, .cart, .bag, .store, .delivery, .home, .bed, .sofa,
+                .bath, .toilet, .laundry, .cleaning, .trash, .fridge, .lamp,
+                .light, .utility, .water, .gas, .key, .lock, .tools, .repair,
+                .battery
+            ]
+        ),
+        GlyphSection(
+            title: "機械",
+            glyphs: [
+                .phone, .wifi, .laptop, .computer, .tv, .audio, .printer
             ]
         ),
         GlyphSection(
             title: "移動",
             glyphs: [
-                .transit, .bus, .car, .bicycle, .airplane, .fuel,
-                .parking, .travel
+                .transit, .train, .bus, .car, .ev, .bicycle, .scooter,
+                .motorcycle, .airplane, .ferry, .boat, .fuel, .parking,
+                .highway, .walk, .map, .travel
             ]
         ),
         GlyphSection(
             title: "楽しむ",
             glyphs: [
-                .hobby, .movie, .music, .ticket, .camera, .sports,
-                .fitness, .beach, .mountain, .tent, .theater, .art,
-                .book, .star
+                .hobby, .movie, .music, .karaoke, .guitar, .ticket, .party,
+                .balloon, .camera, .photo, .paint, .art, .theater, .book,
+                .news, .magazine, .puzzle, .dice, .star, .trophy
+            ]
+        ),
+        GlyphSection(
+            title: "運動と外出",
+            glyphs: [
+                .sports, .fitness, .yoga, .swim, .soccer, .baseball, .tennis,
+                .beach, .mountain, .tent, .binoculars
             ]
         ),
         GlyphSection(
             title: "からだ",
             glyphs: [
-                .beauty, .haircut, .clothes, .shoe, .medical, .pill,
-                .health
+                .beauty, .haircut, .comb, .glasses, .clothes, .hanger, .shoe,
+                .handbag, .medical, .pill, .syringe, .bandage, .mask, .health
             ]
         ),
         GlyphSection(
-            title: "家族",
-            glyphs: [.baby, .family, .pet, .school, .plant, .flower]
+            title: "人と動物",
+            glyphs: [
+                .baby, .toy, .family, .parent, .friends, .person, .pet, .dog,
+                .cat, .bird, .rabbit, .tortoise, .school, .plant, .tree,
+                .flower
+            ]
         ),
         GlyphSection(
             title: "お金",
             glyphs: [
                 .salary, .bonus, .cash, .bank, .card, .banknote, .coin,
-                .invest, .insurance, .tax, .work, .office
+                .invest, .budget, .stats, .discount, .insurance, .tax,
+                .contract, .subscription, .work, .office, .goal, .target
             ]
         ),
         GlyphSection(
             title: "ほか",
-            glyphs: [.mail, .calendar, .umbrella, .other]
+            glyphs: [
+                .mail, .calendar, .clock, .hourglass, .bell, .bookmark, .clip,
+                .sun, .moon, .rain, .snow, .umbrella, .globe, .question,
+                .other
+            ]
         )
     ]
 
@@ -167,18 +260,16 @@ public extension CategoryEditModel {
         }
     }
 
-    func save() async -> Bool {
+    func save() async -> EntryCategory? {
         do {
-            try await database.saveCategory(
+            return try await database.saveCategory(
                 draft,
                 editing: editingId,
                 at: Date()
             )
-
-            return true
         } catch {
             errorMessage = Self.saveFailedMessage
-            return false
+            return nil
         }
     }
 

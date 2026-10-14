@@ -33,6 +33,19 @@ public final class EntryModel {
 }
 
 public extension EntryModel {
+    enum CategoryCell: Hashable {
+        case category(EntryCategory)
+        case add
+
+        public var categoryId: EntryCategory.ID? {
+            if case let .category(category) = self {
+                category.id
+            } else {
+                nil
+            }
+        }
+    }
+
     struct WalletSection {
         public let kind: Wallet.Kind
         public let wallets: [Wallet]
@@ -75,12 +88,13 @@ public extension EntryModel {
         categories(for: type)
     }
 
-    var categoryPages: [[EntryCategory]] {
-        stride(from: 0, to: categories.count, by: Self.categoriesPerPage)
-            .map { start in
-                let end = min(start + Self.categoriesPerPage, categories.count)
-                return Array(categories[start..<end])
-            }
+    var categoryPages: [[CategoryCell]] {
+        let cells = categories.map(CategoryCell.category) + [.add]
+        let size = Self.categoriesPerPage
+
+        return stride(from: 0, to: cells.count, by: size).map { start in
+            Array(cells[start..<min(start + size, cells.count)])
+        }
     }
 
     var selectedCategory: EntryCategory? {
@@ -147,6 +161,20 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
             try await loadEntry()
+        } catch {
+            errorMessage = Self.message(for: error)
+        }
+    }
+
+    func newCategoryModel() -> CategoryEditModel {
+        let kind: EntryCategory.Kind = type == .income ? .income : .expense
+        return CategoryEditModel(database: database, kind: kind)
+    }
+
+    func addCategory(_ category: EntryCategory) async {
+        do {
+            options = try await database.entryOptions()
+            categoryId = category.id
         } catch {
             errorMessage = Self.message(for: error)
         }

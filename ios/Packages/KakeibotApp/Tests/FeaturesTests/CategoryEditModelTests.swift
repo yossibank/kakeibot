@@ -44,7 +44,7 @@ struct CategoryEditModelTests {
         let category = list.categories.first { $0.name == "配当" }
 
         #expect(!canSaveBeforeName)
-        #expect(saved)
+        #expect(saved?.id == category?.id)
         #expect(category?.kind == .income)
         #expect(category?.sortOrder == 3)
     }

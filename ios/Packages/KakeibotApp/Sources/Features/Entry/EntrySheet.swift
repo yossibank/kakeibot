@@ -301,7 +301,7 @@ private extension EntrySheet {
         .contentShape(Circle())
     }
 
-    func categoryGrid(_ page: [EntryCategory]) -> some View {
+    func categoryGrid(_ page: [EntryModel.CategoryCell]) -> some View {
         Grid(horizontalSpacing: 6, verticalSpacing: 6) {
             ForEach(0..<Self.categoryRows, id: \.self) { row in
                 GridRow {
@@ -309,13 +309,42 @@ private extension EntrySheet {
                         let index = row * Self.categoryColumns + column
 
                         if index < page.count {
-                            categoryButton(page[index])
+                            categoryCell(page[index])
                         } else {
                             Color.clear
                         }
                     }
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    func categoryCell(_ cell: EntryModel.CategoryCell) -> some View {
+        switch cell {
+        case let .category(category):
+            categoryButton(category)
+        case .add:
+            Button {
+                open(.newCategory)
+            } label: {
+                VStack(spacing: 6) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 20, weight: .ultraLight))
+
+                    Text("追加")
+                        .font(.system(size: 11))
+                }
+                .foregroundStyle(Palette.gold)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Palette.gold.opacity(0.45), style: Self.dash)
+                }
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("カテゴリを足す")
         }
     }
 
@@ -363,6 +392,12 @@ private extension EntrySheet {
                     await delete()
                 }
             }
+        case .newCategory:
+            CategoryEditSheet(model: model.newCategoryModel()) { category in
+                Task {
+                    await addCategory(category)
+                }
+            }
         }
     }
 }
@@ -372,6 +407,7 @@ private extension EntrySheet {
         case wallet
         case date
         case delete
+        case newCategory
 
         var id: Self {
             self
@@ -391,6 +427,7 @@ private extension EntrySheet {
     )
     static let categoryRows = 3
     static let categoryColumns = 4
+    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
 
     static var memoTransition: AnyTransition {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
@@ -439,11 +476,23 @@ private extension EntrySheet {
             await model.load()
         }
 
+        showSelectedCategory()
+    }
+
+    func showSelectedCategory() {
         let page = model.categoryPages.firstIndex { page in
-            page.contains { $0.id == model.categoryId }
+            page.contains { $0.categoryId == model.categoryId }
         }
 
         categoryPage = page ?? 0
+    }
+
+    func addCategory(_ category: EntryCategory) async {
+        await model.addCategory(category)
+
+        withAnimation(.snappy) {
+            showSelectedCategory()
+        }
     }
 
     func save() async {

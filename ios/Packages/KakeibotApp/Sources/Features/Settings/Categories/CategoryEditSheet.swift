@@ -6,33 +6,48 @@ import SwiftUI
 public struct CategoryEditSheet: View {
     @State private var model: CategoryEditModel
 
+    @FocusState private var focus: Field?
+
     @Environment(\.dismiss) private var dismiss
 
-    public init(model: CategoryEditModel) {
+    let onSave: (EntryCategory) -> Void
+
+    public init(
+        model: CategoryEditModel,
+        onSave: @escaping (EntryCategory) -> Void = { _ in }
+    ) {
         _model = State(initialValue: model)
+        self.onSave = onSave
     }
 
     public var body: some View {
+        NavigationStack {
+            content
+                .toolbar(.hidden, for: .navigationBar)
+                .toolbar {
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+
+                        Button("閉じる") {
+                            focus = nil
+                        }
+                        .foregroundStyle(Palette.gold)
+                    }
+                }
+        }
+        .preferredColorScheme(.dark)
+        .task {
+            await model.load()
+        }
+    }
+}
+
+private extension CategoryEditSheet {
+    var content: some View {
         VStack(spacing: 16) {
             header
             preview
-
-            TextField(
-                "名前",
-                text: $model.name,
-                prompt: Text("名前").foregroundStyle(Palette.dusk)
-            )
-            .font(.body)
-            .foregroundStyle(Palette.ink)
-            .tint(Palette.gold)
-            .padding(.horizontal, 14)
-            .frame(height: 46)
-            .background(Palette.drawer, in: .rect(cornerRadius: 14))
-            .overlay {
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
-            }
-
+            field("名前", text: $model.name, font: .body, focus: .name)
             colors
             CapsulePicker(selection: $model.markKind, options: Self.markOptions)
 
@@ -41,6 +56,7 @@ public struct CategoryEditSheet: View {
                     .padding(.bottom, 8)
             }
             .scrollIndicators(.hidden)
+            .scrollDismissesKeyboard(.interactively)
 
             if let errorMessage = model.errorMessage {
                 Text(errorMessage)
@@ -60,14 +76,8 @@ public struct CategoryEditSheet: View {
                 .fill(Palette.night)
                 .ignoresSafeArea()
         }
-        .preferredColorScheme(.dark)
-        .task {
-            await model.load()
-        }
     }
-}
 
-private extension CategoryEditSheet {
     var header: some View {
         HStack {
             RingButton("閉じる", systemImage: "xmark") {
@@ -100,6 +110,7 @@ private extension CategoryEditSheet {
         HStack(spacing: 18) {
             VStack(spacing: 6) {
                 IconImage(model.preview, size: 24)
+                    .foregroundStyle(Palette.gold)
 
                 Text(model.name.isEmpty ? "名前" : model.name)
                     .font(.system(size: 12))
@@ -131,11 +142,23 @@ private extension CategoryEditSheet {
     }
 
     var colors: some View {
-        LazyVGrid(columns: Self.colorColumns, spacing: 8) {
-            ForEach(CategoryEditModel.colors, id: \.self) { hex in
-                colorButton(hex)
+        ScrollView(.horizontal) {
+            HStack(spacing: 6) {
+                ForEach(CategoryEditModel.colors, id: \.self) { hex in
+                    colorButton(hex)
+                }
+
+                ColorPicker(
+                    "ほかの色",
+                    selection: customColor,
+                    supportsOpacity: false
+                )
+                .labelsHidden()
+                .frame(width: 36, height: 36)
             }
+            .padding(.horizontal, 2)
         }
+        .scrollIndicators(.hidden)
     }
 
     @ViewBuilder
@@ -154,12 +177,9 @@ private extension CategoryEditSheet {
         VStack(alignment: .leading, spacing: 14) {
             ForEach(CategoryEditModel.glyphSections) { section in
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(section.title)
-                        .font(.caption2)
-                        .tracking(3)
-                        .foregroundStyle(Palette.gold)
+                    sectionTitle(section.title)
 
-                    LazyVGrid(columns: Self.glyphColumns, spacing: 6) {
+                    LazyVGrid(columns: Self.gridColumns, spacing: 6) {
                         ForEach(section.glyphs, id: \.self) { glyph in
                             glyphButton(glyph)
                         }
@@ -170,19 +190,16 @@ private extension CategoryEditSheet {
     }
 
     var emojiChooser: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            field(
-                "絵文字を 1 つ入れる",
-                text: emojiBinding,
-                font: .title3
-            )
+        VStack(alignment: .leading, spacing: 14) {
+            ForEach(CategoryEditModel.emojiSections) { section in
+                VStack(alignment: .leading, spacing: 8) {
+                    sectionTitle(section.title)
 
-            LazyVGrid(columns: Self.glyphColumns, spacing: 6) {
-                ForEach(
-                    CategoryEditModel.emojiSuggestions,
-                    id: \.self
-                ) { emoji in
-                    emojiButton(emoji)
+                    LazyVGrid(columns: Self.gridColumns, spacing: 6) {
+                        ForEach(section.emojis, id: \.self) { emoji in
+                            emojiButton(emoji)
+                        }
+                    }
                 }
             }
         }
@@ -193,7 +210,8 @@ private extension CategoryEditSheet {
             field(
                 "3 文字まで",
                 text: textBinding,
-                font: .system(size: 20, design: .serif)
+                font: .system(size: 20, design: .serif),
+                focus: .text
             )
 
             Text("「外」「推し」のように、短い文字をアイコンにする")
@@ -218,10 +236,18 @@ private extension CategoryEditSheet {
         .buttonStyle(.plain)
     }
 
+    func sectionTitle(_ title: String) -> some View {
+        Text(title)
+            .font(.caption2)
+            .tracking(3)
+            .foregroundStyle(Palette.gold)
+    }
+
     func field(
         _ prompt: String,
         text: Binding<String>,
-        font: Font
+        font: Font,
+        focus field: Field
     ) -> some View {
         TextField(
             prompt,
@@ -231,6 +257,11 @@ private extension CategoryEditSheet {
         .font(font)
         .foregroundStyle(Palette.ink)
         .tint(Palette.gold)
+        .submitLabel(.done)
+        .focused($focus, equals: field)
+        .onSubmit {
+            focus = nil
+        }
         .padding(.horizontal, 14)
         .frame(height: 46)
         .background(Palette.drawer, in: .rect(cornerRadius: 14))
@@ -309,8 +340,7 @@ private extension CategoryEditSheet {
                     Circle()
                         .stroke(ring, lineWidth: 1.5)
                 }
-                .frame(width: 32, height: 32)
-                .frame(maxWidth: .infinity, minHeight: 36)
+                .frame(width: 36, height: 36)
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -320,20 +350,21 @@ private extension CategoryEditSheet {
 }
 
 private extension CategoryEditSheet {
-    static let markOptions: [CapsulePicker<CategoryEditModel.MarkKind>.Option] =
-        [
-            .init("絵柄", value: .glyph),
-            .init("絵文字", value: .emoji),
-            .init("文字", value: .text)
-        ]
+    enum Field: Hashable {
+        case name
+        case text
+    }
 
-    static let glyphColumns = Array(
+    typealias MarkOption = CapsulePicker<CategoryEditModel.MarkKind>.Option
+
+    static let markOptions: [MarkOption] = [
+        .init("絵柄", value: .glyph),
+        .init("絵文字", value: .emoji),
+        .init("文字", value: .text)
+    ]
+
+    static let gridColumns = Array(
         repeating: GridItem(.flexible(), spacing: 6),
-        count: 8
-    )
-
-    static let colorColumns = Array(
-        repeating: GridItem(.flexible(), spacing: 4),
         count: 8
     )
 
@@ -345,13 +376,13 @@ private extension CategoryEditSheet {
         model.isHidden ? Palette.gold : Palette.mist
     }
 
-    var emojiBinding: Binding<String> {
+    var customColor: Binding<Color> {
         Binding(
             get: {
-                model.emoji
+                Color(hex: model.color) ?? Palette.mist
             },
-            set: { value in
-                model.inputEmoji(value)
+            set: { color in
+                model.color = color.hex
             }
         )
     }
@@ -376,9 +407,14 @@ private extension CategoryEditSheet {
     }
 
     func save() async {
-        if await model.save() {
-            dismiss()
+        focus = nil
+
+        guard let category = await model.save() else {
+            return
         }
+
+        onSave(category)
+        dismiss()
     }
 
     func setHidden(_ isHidden: Bool) async {

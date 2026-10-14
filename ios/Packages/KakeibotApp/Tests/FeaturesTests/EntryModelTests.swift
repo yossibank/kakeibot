@@ -125,15 +125,33 @@ struct EntryModelTests {
     }
 
     @Test
-    func splitsCategoriesIntoPages() async throws {
+    func splitsCategoriesAndAddIntoPages() async throws {
         let model = try await Self.newModel()
 
         let expensePages = model.categoryPages
         model.select(.income)
         let incomePages = model.categoryPages
 
-        #expect(expensePages.map(\.count) == [12])
-        #expect(incomePages.map(\.count) == [3])
+        #expect(expensePages.map(\.count) == [12, 1])
+        #expect(expensePages.last == [.add])
+        #expect(incomePages.map(\.count) == [4])
+        #expect(incomePages[0].last == .add)
+    }
+
+    @Test
+    func selectsAddedCategory() async throws {
+        let model = try await Self.newModel()
+        model.select(.income)
+        let editor = model.newCategoryModel()
+        editor.name = "配当"
+        editor.glyph = .invest
+
+        let saved = try #require(await editor.save())
+        await model.addCategory(saved)
+
+        #expect(editor.kind == .income)
+        #expect(model.categoryId == saved.id)
+        #expect(model.categories.last?.name == "配当")
     }
 
     @Test

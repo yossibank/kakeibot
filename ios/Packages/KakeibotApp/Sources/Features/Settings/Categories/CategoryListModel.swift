@@ -60,20 +60,43 @@ public extension CategoryListModel {
 
     func move(
         _ id: EntryCategory.ID,
-        to target: EntryCategory.ID
+        to index: Int
     ) {
         var order = movingOrder ?? shown.map(\.id)
 
-        guard
-            id != target,
-            let from = order.firstIndex(of: id),
-            let to = order.firstIndex(of: target) else {
+        guard let from = order.firstIndex(of: id) else {
+            return
+        }
+
+        let to = min(max(index, 0), order.count - 1)
+
+        guard from != to else {
             return
         }
 
         order.remove(at: from)
         order.insert(id, at: to)
         movingOrder = order
+    }
+
+    func cancelMoving() {
+        movingOrder = nil
+    }
+
+    func hide(_ id: EntryCategory.ID) async {
+        movingOrder = nil
+
+        do {
+            try await database.setCategoryHidden(
+                id,
+                isHidden: true,
+                at: Date()
+            )
+
+            await load()
+        } catch {
+            errorMessage = Self.saveFailedMessage
+        }
     }
 
     func finishMoving() async {
