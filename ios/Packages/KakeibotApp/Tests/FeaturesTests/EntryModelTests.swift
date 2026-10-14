@@ -125,15 +125,86 @@ struct EntryModelTests {
     }
 
     @Test
-    func splitsCategoriesIntoPages() async throws {
+    func splitsCategoriesAndAddIntoPages() async throws {
         let model = try await Self.newModel()
 
         let expensePages = model.categoryPages
         model.select(.income)
         let incomePages = model.categoryPages
 
-        #expect(expensePages.map(\.count) == [12])
-        #expect(incomePages.map(\.count) == [3])
+        #expect(expensePages.map(\.count) == [12, 1])
+        #expect(expensePages.last == [.add])
+        #expect(incomePages.map(\.count) == [4])
+        #expect(incomePages[0].last == .add)
+    }
+
+    @Test
+    func remembersCategoryForEachType() async throws {
+        let model = try await Self.newModel()
+        let expense = model.categories
+        let transit = try #require(expense.first { $0.name == "交通" })
+        model.categoryId = transit.id
+
+        model.select(.income)
+        let incomeFirst = model.selectedCategory?.name
+        let income = model.categories
+        let bonus = try #require(income.first { $0.name == "臨時収入" })
+        model.categoryId = bonus.id
+
+        model.select(.expense)
+        let expenseBack = model.selectedCategory?.name
+
+        model.select(.income)
+
+        #expect(incomeFirst == "給料")
+        #expect(expenseBack == "交通")
+        #expect(model.selectedCategory?.name == "臨時収入")
+    }
+
+    @Test
+    func tracksChangesAfterLoading() async throws {
+        let model = try await Self.newModel()
+        let loaded = model.isChanged
+
+        model.press(.digit(5))
+        let typed = model.isChanged
+
+        model.press(.clear)
+        let cleared = model.isChanged
+
+        model.memo = "ランチ"
+
+        #expect(!loaded)
+        #expect(typed)
+        #expect(!cleared)
+        #expect(model.isChanged)
+    }
+
+    @Test
+    func hidesSelectedCategoryAndSelectsNext() async throws {
+        let model = try await Self.newModel()
+        let food = try #require(model.selectedCategory)
+
+        await model.hideCategory(food)
+
+        #expect(!model.categories.contains(food))
+        #expect(model.selectedCategory?.name == "日用品")
+    }
+
+    @Test
+    func selectsAddedCategory() async throws {
+        let model = try await Self.newModel()
+        model.select(.income)
+        let editor = model.newCategoryModel()
+        editor.name = "配当"
+        editor.glyph = .invest
+
+        let saved = try #require(await editor.save())
+        await model.reloadCategories(selecting: saved.id)
+
+        #expect(editor.kind == .income)
+        #expect(model.categoryId == saved.id)
+        #expect(model.categories.last?.name == "配当")
     }
 
     @Test

@@ -18,6 +18,9 @@ public final class EntryModel {
     public private(set) var recentMemos: [String] = []
     public private(set) var errorMessage: String?
 
+    private var baseline: Snapshot?
+    private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
+
     private let database: AppDatabase
     private let editingId: Entry.ID?
 
@@ -33,6 +36,19 @@ public final class EntryModel {
 }
 
 public extension EntryModel {
+    enum CategoryCell: Hashable {
+        case category(EntryCategory)
+        case add
+
+        public var categoryId: EntryCategory.ID? {
+            if case let .category(category) = self {
+                category.id
+            } else {
+                nil
+            }
+        }
+    }
+
     struct WalletSection {
         public let kind: Wallet.Kind
         public let wallets: [Wallet]
@@ -46,6 +62,10 @@ public extension EntryModel {
 
     var isLoaded: Bool {
         options != nil
+    }
+
+    var isChanged: Bool {
+        baseline.map { $0 != snapshot } ?? false
     }
 
     var amount: Int {
@@ -75,12 +95,13 @@ public extension EntryModel {
         categories(for: type)
     }
 
-    var categoryPages: [[EntryCategory]] {
-        stride(from: 0, to: categories.count, by: Self.categoriesPerPage)
-            .map { start in
-                let end = min(start + Self.categoriesPerPage, categories.count)
-                return Array(categories[start..<end])
-            }
+    var categoryPages: [[CategoryCell]] {
+        let cells = categories.map(CategoryCell.category) + [.add]
+        let size = Self.categoriesPerPage
+
+        return stride(from: 0, to: cells.count, by: size).map { start in
+            Array(cells[start..<min(start + size, cells.count)])
+        }
     }
 
     var selectedCategory: EntryCategory? {
@@ -147,6 +168,48 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
             try await loadEntry()
+            baseline = snapshot
+        } catch {
+            errorMessage = Self.message(for: error)
+        }
+    }
+
+    func newCategoryModel() -> CategoryEditModel {
+        let kind: EntryCategory.Kind = type == .income ? .income : .expense
+        return CategoryEditModel(database: database, kind: kind)
+    }
+
+    func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
+        CategoryEditModel(
+            database: database,
+            kind: category.kind,
+            editing: category.id
+        )
+    }
+
+    func reloadCategories(selecting id: EntryCategory.ID? = nil) async {
+        do {
+            options = try await database.entryOptions()
+
+            if let id {
+                categoryId = id
+            } else if !categories.contains(where: { $0.id == categoryId }) {
+                categoryId = categories.first?.id
+            }
+        } catch {
+            errorMessage = Self.message(for: error)
+        }
+    }
+
+    func hideCategory(_ category: EntryCategory) async {
+        do {
+            try await database.setCategoryHidden(
+                category.id,
+                isHidden: true,
+                at: Date()
+            )
+
+            await reloadCategories()
         } catch {
             errorMessage = Self.message(for: error)
         }
@@ -157,9 +220,18 @@ public extension EntryModel {
     }
 
     func select(_ type: Entry.Kind) {
+        guard type != self.type else {
+            return
+        }
+
+        categoryByType[self.type] = categoryId
         self.type = type
 
-        if !categories.contains(where: { $0.id == categoryId }) {
+        let remembered = categoryByType[type]
+
+        if categories.contains(where: { $0.id == remembered }) {
+            categoryId = remembered
+        } else if !categories.contains(where: { $0.id == categoryId }) {
             categoryId = categories.first?.id
         }
     }
@@ -194,6 +266,26 @@ public extension EntryModel {
 }
 
 private extension EntryModel {
+    struct Snapshot: Equatable {
+        let type: Entry.Kind
+        let calculator: AmountCalculator
+        let date: LocalDate
+        let categoryId: EntryCategory.ID?
+        let walletId: Wallet.ID?
+        let memo: String
+    }
+
+    var snapshot: Snapshot {
+        Snapshot(
+            type: type,
+            calculator: calculator,
+            date: date,
+            categoryId: categoryId,
+            walletId: walletId,
+            memo: memo
+        )
+    }
+
     static let recentMemoLimit = 6
     static let numberLocale = Locale(identifier: "ja_JP")
 

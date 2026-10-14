@@ -3,18 +3,15 @@ import SwiftUI
 public struct RingButton: View {
     @Environment(\.isEnabled) private var isEnabled
 
-    let title: LocalizedStringKey
     let systemImage: String
     let style: Style
     let action: () -> Void
 
     public init(
-        _ title: LocalizedStringKey,
         systemImage: String,
         style: Style = .plain,
         action: @escaping () -> Void
     ) {
-        self.title = title
         self.systemImage = systemImage
         self.style = style
         self.action = action
@@ -32,7 +29,6 @@ public struct RingButton: View {
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(title)
     }
 }
 
@@ -72,11 +68,11 @@ private extension RingButton {
 
 #Preview {
     HStack(spacing: 24) {
-        RingButton("閉じる", systemImage: "xmark") {}
+        RingButton(systemImage: "xmark") {}
 
-        RingButton("保存", systemImage: "checkmark", style: .prominent) {}
+        RingButton(systemImage: "checkmark", style: .prominent) {}
 
-        RingButton("消す", systemImage: "trash", style: .destructive) {}
+        RingButton(systemImage: "trash", style: .destructive) {}
     }
     .padding()
     .background(Palette.night)

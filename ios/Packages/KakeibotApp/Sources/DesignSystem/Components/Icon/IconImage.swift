@@ -20,13 +20,26 @@ public struct IconImage: View {
                     .font(.system(size: size, weight: .light))
             } else {
                 Text(icon?.emoji ?? icon?.text ?? "")
-                    .font(.system(size: size))
+                    .font(.system(size: textSize))
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
             }
         }
         .frame(width: size * 1.4, height: size * 1.4)
-        .accessibilityHidden(true)
+    }
+}
+
+private extension IconImage {
+    var textSize: CGFloat {
+        guard icon?.emoji == nil, let text = icon?.text else {
+            return size
+        }
+
+        switch text.count {
+        case ...1: return size
+        case 2: return size * 0.7
+        default: return size * 0.55
+        }
     }
 }
 

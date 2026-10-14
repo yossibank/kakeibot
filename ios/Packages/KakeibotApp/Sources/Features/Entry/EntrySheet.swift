@@ -10,6 +10,12 @@ public struct EntrySheet: View {
     @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
     @State private var memoChipFrame: CGRect = .zero
+    @State private var isConfirmingDiscard = false
+    @State private var categoryMenu: CategoryMenu?
+    @State private var pressingCategory: EntryCategory.ID?
+
+    @AppStorage("entry.hasOpenedCategoryMenu") private var hasOpenedMenu = false
+    @State private var sheetWidth: CGFloat = 0
 
     @FocusState private var isMemoFocused: Bool
 
@@ -26,8 +32,23 @@ public struct EntrySheet: View {
             if isEditingMemo {
                 memoLayer
             }
+
+            if let categoryMenu {
+                categoryMenuLayer(categoryMenu)
+            }
         }
         .coordinateSpace(.named(Self.coordinateSpace))
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            sheetWidth = width
+        }
+        .sensoryFeedback(
+            .impact(weight: .medium),
+            trigger: categoryMenu
+        ) { _, menu in
+            menu != nil
+        }
         .ignoresSafeArea(.keyboard)
         .background {
             Rectangle()
@@ -35,11 +56,14 @@ public struct EntrySheet: View {
                 .ignoresSafeArea()
         }
         .preferredColorScheme(.dark)
-        .sheet(item: $sheet) { sheet in
-            sheetContent(for: sheet)
+        .confirmsDiscard(
+            when: model.isChanged,
+            isPresented: $isConfirmingDiscard
+        ) {
+            dismiss()
         }
-        .onChange(of: model.type) {
-            categoryPage = 0
+        .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
+            sheetContent(for: sheet)
         }
         .task {
             await load()
@@ -86,8 +110,8 @@ private extension EntrySheet {
 
     var header: some View {
         HStack {
-            RingButton("閉じる", systemImage: "xmark") {
-                dismiss()
+            RingButton(systemImage: "xmark") {
+                close()
             }
 
             Spacer()
@@ -98,7 +122,6 @@ private extension EntrySheet {
 
             if model.isEditing {
                 RingButton(
-                    "この記録を消す",
                     systemImage: "trash",
                     style: .destructive
                 ) {
@@ -124,9 +147,6 @@ private extension EntrySheet {
         }
         .buttonStyle(.plain)
         .frame(minHeight: 150, maxHeight: 270)
-        .accessibilityLabel("金額")
-        .accessibilityValue(AmountText.text(model.amount))
-        .accessibilityHint("タップしてテンキーを開く")
     }
 
     var details: some View {
@@ -191,12 +211,17 @@ private extension EntrySheet {
             .scrollPosition(id: $categoryPage)
             .scrollIndicators(.hidden)
             .frame(minHeight: 168, maxHeight: 264)
+            .id(model.type)
 
-            if model.categoryPages.count > 1 {
-                PageDots(
-                    count: model.categoryPages.count,
-                    current: categoryPage ?? 0
-                )
+            PageDots(
+                count: model.categoryPages.count,
+                current: categoryPage ?? 0
+            )
+
+            if !hasOpenedMenu {
+                Label("長押しで編集・非表示", systemImage: "hand.tap")
+                    .font(.caption2)
+                    .foregroundStyle(Palette.mist)
             }
         }
     }
@@ -301,7 +326,7 @@ private extension EntrySheet {
         .contentShape(Circle())
     }
 
-    func categoryGrid(_ page: [EntryCategory]) -> some View {
+    func categoryGrid(_ page: [EntryModel.CategoryCell]) -> some View {
         Grid(horizontalSpacing: 6, verticalSpacing: 6) {
             ForEach(0..<Self.categoryRows, id: \.self) { row in
                 GridRow {
@@ -309,7 +334,7 @@ private extension EntrySheet {
                         let index = row * Self.categoryColumns + column
 
                         if index < page.count {
-                            categoryButton(page[index])
+                            categoryCell(page[index])
                         } else {
                             Color.clear
                         }
@@ -319,35 +344,131 @@ private extension EntrySheet {
         }
     }
 
-    func categoryButton(_ category: EntryCategory) -> some View {
-        let isSelected = model.categoryId == category.id
-        let border = isSelected ? Palette.gold.opacity(0.55) : Color.clear
+    @ViewBuilder
+    func categoryCell(_ cell: EntryModel.CategoryCell) -> some View {
+        switch cell {
+        case let .category(category):
+            categoryButton(category)
+        case .add:
+            Button {
+                open(.newCategory)
+            } label: {
+                VStack(spacing: 6) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 20, weight: .ultraLight))
 
-        return Button {
-            setEnteringAmount(false)
-            model.categoryId = category.id
-        } label: {
-            VStack(spacing: 6) {
-                IconImage(model.icon(for: category), size: 20)
-
-                Text(category.name)
-                    .font(.system(size: 11))
-                    .lineLimit(1)
+                    Text("追加")
+                        .font(.system(size: 11))
+                }
+                .foregroundStyle(Palette.gold)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Palette.gold.opacity(0.45), style: Self.dash)
+                }
+                .contentShape(.rect)
             }
-            .foregroundStyle(isSelected ? Palette.champagne : Palette.mist)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                isSelected ? Palette.gold.opacity(0.12) : Color.clear,
-                in: .rect(cornerRadius: 14)
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(border, lineWidth: 1)
-            }
-            .contentShape(.rect)
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    func categoryButton(_ category: EntryCategory) -> some View {
+        let isPressing = pressingCategory == category.id
+        let scale: CGFloat = isPressing ? 0.93 : 1
+
+        return categoryFace(category, isLifted: false)
+            .scaleEffect(scale)
+            .animation(.snappy(duration: 0.2), value: isPressing)
+            .overlay {
+                GeometryReader { proxy in
+                    Color.clear
+                        .contentShape(.rect)
+                        .onTapGesture {
+                            select(category)
+                        }
+                        .onLongPressGesture(
+                            minimumDuration: Self.menuPressDuration
+                        ) {
+                            let space = CoordinateSpace.named(
+                                Self.coordinateSpace
+                            )
+
+                            openMenu(for: category, at: proxy.frame(in: space))
+                        } onPressingChanged: { isPressing in
+                            pressingCategory = isPressing ? category.id : nil
+                        }
+                }
+            }
+    }
+
+    func categoryFace(
+        _ category: EntryCategory,
+        isLifted: Bool
+    ) -> some View {
+        let isSelected = model.categoryId == category.id
+        let isLit = isSelected || isLifted
+        let color = isLit ? Palette.champagne : Palette.mist
+        let fill = isLifted ? Palette.drawer : Self.categoryFill(isLit)
+        let border = isLit ? Palette.gold.opacity(0.55) : Color.clear
+        let width: CGFloat = isLifted ? 1.2 : 1
+
+        return VStack(spacing: 6) {
+            IconImage(model.icon(for: category), size: 20)
+
+            Text(category.name)
+                .font(.system(size: 11))
+                .lineLimit(1)
+        }
+        .foregroundStyle(color)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(fill, in: .rect(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(border, lineWidth: width)
+        }
+        .contentShape(.rect)
+    }
+
+    @ViewBuilder
+    func categoryMenuLayer(_ menu: CategoryMenu) -> some View {
+        Color.black
+            .opacity(0.45)
+            .ignoresSafeArea()
+            .onTapGesture {
+                closeCategoryMenu()
+            }
+            .transition(.opacity)
+
+        categoryFace(menu.category, isLifted: true)
+            .frame(width: menu.frame.width, height: menu.frame.height)
+            .scaleEffect(1.06)
+            .shadow(color: Palette.gold.opacity(0.35), radius: 12)
+            .position(x: menu.frame.midX, y: menu.frame.midY)
+            .allowsHitTesting(false)
+            .transition(.opacity)
+
+        Color.clear
+            .frame(height: max(menu.frame.minY - 12, 0))
+            .frame(maxWidth: .infinity)
+            .overlay(alignment: .bottomLeading) {
+                EntryCategoryMenu(
+                    icon: model.icon(for: menu.category),
+                    name: menu.category.name,
+                    onEdit: {
+                        closeCategoryMenu()
+                        open(.editCategory(menu.category))
+                    },
+                    onHide: {
+                        closeCategoryMenu()
+
+                        Task {
+                            await model.hideCategory(menu.category)
+                        }
+                    }
+                )
+                .offset(x: menuX(for: menu))
+            }
+            .transition(Self.memoTransition)
     }
 
     @ViewBuilder
@@ -363,15 +484,30 @@ private extension EntrySheet {
                     await delete()
                 }
             }
+        case .newCategory:
+            CategoryEditSheet(model: model.newCategoryModel()) { category in
+                Task {
+                    await addCategory(category)
+                }
+            }
+        case let .editCategory(category):
+            CategoryEditSheet(model: model.editCategoryModel(category))
         }
     }
 }
 
 private extension EntrySheet {
-    enum Sheet: Identifiable {
+    struct CategoryMenu: Equatable {
+        let category: EntryCategory
+        let frame: CGRect
+    }
+
+    enum Sheet: Hashable, Identifiable {
         case wallet
         case date
         case delete
+        case newCategory
+        case editCategory(EntryCategory)
 
         var id: Self {
             self
@@ -383,7 +519,7 @@ private extension EntrySheet {
         .init("収入", value: .income)
     ]
 
-    static let coordinateSpace = "EntrySheet"
+    nonisolated static let coordinateSpace = "EntrySheet"
     static let memoCardInset: CGFloat = 12
     static let drawerShape = UnevenRoundedRectangle(
         topLeadingRadius: 28,
@@ -391,6 +527,8 @@ private extension EntrySheet {
     )
     static let categoryRows = 3
     static let categoryColumns = 4
+    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
+    static let menuPressDuration = 0.25
 
     static var memoTransition: AnyTransition {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
@@ -406,9 +544,23 @@ private extension EntrySheet {
                 model.type
             },
             set: { type in
-                model.select(type)
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+
+                withTransaction(transaction) {
+                    model.select(type)
+                    showSelectedCategory()
+                }
             }
         )
+    }
+
+    func close() {
+        if model.isChanged {
+            isConfirmingDiscard = true
+        } else {
+            dismiss()
+        }
     }
 
     func open(_ sheet: Sheet) {
@@ -439,11 +591,64 @@ private extension EntrySheet {
             await model.load()
         }
 
+        showSelectedCategory()
+    }
+
+    func showSelectedCategory() {
         let page = model.categoryPages.firstIndex { page in
-            page.contains { $0.id == model.categoryId }
+            page.contains { $0.categoryId == model.categoryId }
         }
 
         categoryPage = page ?? 0
+    }
+
+    static func categoryFill(_ isSelected: Bool) -> Color {
+        isSelected ? Palette.gold.opacity(0.12) : Color.clear
+    }
+
+    func menuX(for menu: CategoryMenu) -> CGFloat {
+        let width = EntryCategoryMenu.width
+        let inset = Self.memoCardInset
+        let preferred = menu.frame.midX - width / 2
+        return min(max(preferred, inset), sheetWidth - width - inset)
+    }
+
+    func select(_ category: EntryCategory) {
+        setEnteringAmount(false)
+        model.categoryId = category.id
+    }
+
+    func openMenu(
+        for category: EntryCategory,
+        at frame: CGRect
+    ) {
+        setEnteringAmount(false)
+        pressingCategory = nil
+        hasOpenedMenu = true
+
+        withAnimation(.snappy(duration: 0.25)) {
+            categoryMenu = CategoryMenu(category: category, frame: frame)
+        }
+    }
+
+    func closeCategoryMenu() {
+        withAnimation(.snappy(duration: 0.2)) {
+            categoryMenu = nil
+        }
+    }
+
+    func reloadCategories() {
+        Task {
+            await model.reloadCategories()
+        }
+    }
+
+    func addCategory(_ category: EntryCategory) async {
+        await model.reloadCategories(selecting: category.id)
+
+        withAnimation(.snappy) {
+            showSelectedCategory()
+        }
     }
 
     func save() async {

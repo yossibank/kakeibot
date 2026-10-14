@@ -12,7 +12,6 @@ public struct SectionTitle: View {
             .font(.system(size: 11))
             .tracking(3)
             .foregroundStyle(Palette.gold)
-            .accessibilityAddTraits(.isHeader)
     }
 }
 

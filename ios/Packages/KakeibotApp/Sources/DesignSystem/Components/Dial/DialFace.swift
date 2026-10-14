@@ -24,7 +24,6 @@ public struct DialFace: View {
                 .stroke(Palette.champagne, lineWidth: 1.5)
                 .padding(12)
         }
-        .accessibilityHidden(true)
     }
 }
 

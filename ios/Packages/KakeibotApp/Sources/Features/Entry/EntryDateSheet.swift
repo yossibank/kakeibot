@@ -49,7 +49,6 @@ private extension EntryDateSheet {
                 .stroke(isSelected ? Palette.gold : Palette.line, lineWidth: 1)
         }
         .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

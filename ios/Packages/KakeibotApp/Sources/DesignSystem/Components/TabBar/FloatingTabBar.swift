@@ -8,18 +8,15 @@ public struct FloatingTabBar<Value: Hashable>: View {
     @State private var addCount = 0
 
     let items: [Item]
-    let addTitle: String
     let onAdd: () -> Void
 
     public init(
         selection: Binding<Value>,
         items: [Item],
-        addTitle: String,
         onAdd: @escaping () -> Void
     ) {
         _selection = selection
         self.items = items
-        self.addTitle = addTitle
         self.onAdd = onAdd
     }
 
@@ -132,19 +129,14 @@ private extension FloatingTabBar {
         .glass(tint: Palette.nightTop.opacity(0.85), in: Circle())
         .shadow(color: Palette.gold.opacity(0.3), radius: 14, y: 4)
         .sensoryFeedback(.impact(weight: .light), trigger: addCount)
-        .accessibilityLabel(addTitle)
     }
 
     func tabItem(
         _ item: Item,
         isHighlighted: Bool
     ) -> some View {
-        let isSelected = item.value == selection
         let iconColor = isHighlighted ? Palette.gold : Palette.mist
         let titleColor = isHighlighted ? Palette.champagne : Palette.mist
-        let traits: AccessibilityTraits = isSelected
-            ? [.isButton, .isSelected]
-            : .isButton
 
         return VStack(spacing: 3) {
             Image(systemName: item.systemImage)
@@ -158,11 +150,6 @@ private extension FloatingTabBar {
         }
         .frame(maxWidth: .infinity, minHeight: Self.height - 12)
         .contentShape(Capsule())
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(traits)
-        .accessibilityAction {
-            select(item.value)
-        }
     }
 }
 
@@ -253,12 +240,6 @@ private extension FloatingTabBar {
         let index = Int((x / itemWidth).rounded(.down))
         return min(max(index, 0), items.count - 1)
     }
-
-    func select(_ value: Value) {
-        withAnimation(.snappy) {
-            selection = value
-        }
-    }
 }
 
 private struct PressStyle: ButtonStyle {
@@ -309,8 +290,7 @@ private extension View {
 
         FloatingTabBar(
             selection: $selection,
-            items: items,
-            addTitle: "記録する"
+            items: items
         ) {}
     }
     .background(Palette.night)

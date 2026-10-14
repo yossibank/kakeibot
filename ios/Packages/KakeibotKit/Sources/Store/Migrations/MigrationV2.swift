@@ -9,8 +9,7 @@ extension MigrationV2 {
             table.primaryKey("id", .text)
             table.column("emoji", .text)
             table.column("text", .text).check { length($0) <= 3 }
-            table.column("glyph", .text)
-                .check { Icon.Glyph.allCases.contains($0) }
+            table.column("glyph", .text).check { glyphNames.contains($0) }
             table.column("color", .text).notNull()
             table.column("created_at", .text).notNull()
             table.column("updated_at", .text).notNull()
@@ -32,6 +31,12 @@ extension MigrationV2 {
 }
 
 private extension MigrationV2 {
+    static let glyphNames = [
+        "food", "daily", "transit", "social", "hobby", "clothes", "beauty",
+        "medical", "home", "phone", "utility", "salary", "bonus", "other",
+        "cash", "bank"
+    ]
+
     static let copyIcons = """
     INSERT INTO new_icon (id, emoji, text, glyph, color, created_at, updated_at)
     SELECT id, emoji, text, NULL, color, created_at, updated_at FROM icon

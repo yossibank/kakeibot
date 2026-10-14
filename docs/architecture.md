@@ -79,7 +79,7 @@ KakeibotKit/
 ├── Sources/
 │   ├── Core/
 │   │   ├── Budget/          予算の型、「この月から」、残り、消化
-│   │   ├── Category/        記録のカテゴリ（EntryCategory）
+│   │   ├── Category/        記録のカテゴリ（EntryCategory）と、その入力の判定
 │   │   ├── Character/       一言の文と選び方
 │   │   ├── Date/            LocalDate、期間の区切りと呼び方、週の始まり、カレンダーのマス目、祝日
 │   │   ├── Entry/           記録の型、入力の判定、金額の電卓、日ごとのまとめ、支出なしの日
@@ -97,10 +97,10 @@ KakeibotKit/
 │   └── Store/
 │       ├── Database/        App Group、DatabasePool、止められる前の対策、最初の財布とカテゴリ。止める通知は AppFeature が送る
 │       ├── Migrations/      版ごとに 1 ファイル
-│       ├── Queries/         記録の一覧、入力の選択肢、月の要約・日ごとの合計、テンプレート
+│       ├── Queries/         記録とカテゴリの一覧、入力の選択肢、月の要約・日ごとの合計、テンプレート
 │       ├── Records/         Core の型を GRDB で読み書きできるようにする
 │       ├── Snapshot/        書き出し用の全データの読み出し、読み込み用の全置き換え
-│       └── Writes/          記録の保存・更新・削除
+│       └── Writes/          記録の保存・更新・削除、カテゴリの保存・並べ替え・非表示
 └── Tests/
     ├── CoreTests/           Core と同じフォルダ分け
     └── StoreTests/          メモリ上の DB

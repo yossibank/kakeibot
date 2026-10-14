@@ -49,17 +49,16 @@ private extension RecordsView {
                 .font(.system(size: 15, design: .serif))
                 .tracking(3)
                 .foregroundStyle(Palette.gold)
-                .accessibilityAddTraits(.isHeader)
 
             Spacer()
 
-            monthButton("前の月", systemImage: "chevron.left", months: -1)
+            monthButton(systemImage: "chevron.left", months: -1)
 
             Text("\(String(model.month.year))年 \(model.month.month)月")
                 .font(.system(size: 15, design: .serif))
                 .foregroundStyle(Palette.champagne)
 
-            monthButton("次の月", systemImage: "chevron.right", months: 1)
+            monthButton(systemImage: "chevron.right", months: 1)
         }
     }
 
@@ -77,7 +76,6 @@ private extension RecordsView {
     }
 
     func monthButton(
-        _ title: LocalizedStringKey,
         systemImage: String,
         months: Int
     ) -> some View {
@@ -93,7 +91,6 @@ private extension RecordsView {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(title)
     }
 
     func total(
@@ -112,7 +109,6 @@ private extension RecordsView {
                 .foregroundStyle(color)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .combine)
     }
 
     func dayCard(_ day: EntryDay) -> some View {
@@ -171,8 +167,6 @@ private extension RecordsView {
         }
         .padding(.top, 12)
         .padding(.bottom, 8)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isHeader)
     }
 }
 

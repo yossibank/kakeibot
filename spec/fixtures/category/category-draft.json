@@ -1,0 +1,62 @@
+[
+  {
+    "name": "外食",
+    "mark": { "kind": "glyph", "value": "food" },
+    "color": "#E07A5F",
+    "problems": []
+  },
+  {
+    "name": "  推し  ",
+    "mark": { "kind": "text", "value": "推し" },
+    "color": "#9C6ADE",
+    "problems": []
+  },
+  {
+    "name": "ペット",
+    "mark": { "kind": "emoji", "value": "🐶" },
+    "color": "#81B29A",
+    "problems": []
+  },
+  {
+    "name": "   ",
+    "mark": { "kind": "glyph", "value": "other" },
+    "color": "#8D99AE",
+    "problems": ["emptyName"]
+  },
+  {
+    "name": "空の絵文字",
+    "mark": { "kind": "emoji", "value": " " },
+    "color": "#8D99AE",
+    "problems": ["emptyMark"]
+  },
+  {
+    "name": "空の文字",
+    "mark": { "kind": "text", "value": "" },
+    "color": "#8D99AE",
+    "problems": ["emptyMark"]
+  },
+  {
+    "name": "長い文字",
+    "mark": { "kind": "text", "value": "サブスク" },
+    "color": "#8D99AE",
+    "problems": ["textTooLong"]
+  },
+  {
+    "name": "色なし",
+    "mark": { "kind": "glyph", "value": "other" },
+    "color": "8D99AE",
+    "problems": ["invalidColor"]
+  },
+  {
+    "name": "短い色",
+    "mark": { "kind": "glyph", "value": "other" },
+    "color": "#8D9",
+    "problems": ["invalidColor"]
+  },
+  {
+    "name": "",
+    "mark": { "kind": "text", "value": "" },
+    "color": "#GGGGGG",
+    "problems": ["emptyName", "emptyMark", "invalidColor"]
+  }
+]
