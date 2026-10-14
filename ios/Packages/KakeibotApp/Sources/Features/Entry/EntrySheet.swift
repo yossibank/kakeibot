@@ -605,14 +605,13 @@ private extension EntrySheet {
     static let categorySpacing: CGFloat = 5
     static let categoryHeight: CGFloat = 54
     static let templateHeight: CGFloat = 34
+    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
+    static let menuPressDuration = 0.15
 
     static var pagerHeight: CGFloat {
         let rows = CGFloat(categoryRows)
         return categoryHeight * rows + categorySpacing * (rows - 1)
     }
-
-    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-    static let menuPressDuration = 0.25
 
     static var memoTransition: AnyTransition {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
