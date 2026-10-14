@@ -98,6 +98,12 @@ public extension HomeModel {
         return category.flatMap { list?.icons[$0.iconId] }
     }
 
+    func detail(for template: EntryTemplate) -> String {
+        let category = list?.categories[template.categoryId]?.name
+        let wallet = list?.wallets[template.walletId]?.name
+        return [category, wallet].compactMap(\.self).joined(separator: "・")
+    }
+
     func observeTemplates() async {
         do {
             for try await templates in database.templateUpdates() {

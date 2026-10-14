@@ -20,6 +20,7 @@ struct TemplateEditModelTests {
         #expect(typed == 100)
         #expect(model.amount == nil)
         #expect(model.typeName == "収入")
+        #expect(model.walletTitle == "入金先")
     }
 
     @Test
@@ -28,6 +29,8 @@ struct TemplateEditModelTests {
         let model = TemplateEditModel(database: database, type: .expense)
         await model.load()
         let canSaveWithoutName = model.canSave
+        let refused = await model.save()
+        let refusal = model.errorMessage
         model.name = "ランチ"
         model.press(.digit(9))
         model.press(.digit(8))
@@ -37,6 +40,8 @@ struct TemplateEditModelTests {
         let templates = try await database.templates()
 
         #expect(!canSaveWithoutName)
+        #expect(refused == nil)
+        #expect(refusal == "名前を入れてください")
         #expect(saved?.amount == 980)
         #expect(templates.map(\.name) == ["ランチ"])
         #expect(templates.first?.categoryId == model.categoryId)

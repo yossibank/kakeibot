@@ -130,7 +130,11 @@ public extension EntryModel {
     }
 
     var walletName: String {
-        wallets.first { $0.id == walletId }?.name ?? "財布"
+        wallets.first { $0.id == walletId }?.name ?? walletTitle
+    }
+
+    var walletTitle: String {
+        type == .income ? "入金先" : "支払い元"
     }
 
     var canSave: Bool {

@@ -39,14 +39,18 @@ public struct TemplateEditSheet: View {
                 if panel == .memo {
                     memoCard
                         .padding(.horizontal, 14)
-                        .padding(.top, 76)
-                        .frame(maxHeight: .infinity, alignment: .top)
+                        .frame(maxHeight: .infinity)
                         .transition(Self.memoTransition)
                 } else {
                     drawerView(panel)
                         .transition(Self.drawerTransition)
                 }
             }
+        }
+        .overlay(alignment: .top) {
+            header
+                .padding(.horizontal, 18)
+                .padding(.top, 18)
         }
         .background {
             Rectangle()
@@ -79,7 +83,9 @@ public struct TemplateEditSheet: View {
 private extension TemplateEditSheet {
     var content: some View {
         VStack(spacing: 16) {
-            header
+            Color.clear
+                .frame(height: 44)
+
             preview
             rows
 
@@ -132,7 +138,6 @@ private extension TemplateEditSheet {
             .font(.subheadline.weight(.bold))
             .foregroundStyle(saveColor)
             .frame(minWidth: 44, minHeight: 44)
-            .disabled(!model.canSave)
         }
     }
 
@@ -158,113 +163,47 @@ private extension TemplateEditSheet {
     }
 
     var card: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 12) {
-                IconImage(categoryIcon, size: 22)
-                    .foregroundStyle(Palette.gold)
-                    .frame(width: 46, height: 46)
-                    .background(Palette.gold.opacity(0.06), in: Circle())
-                    .overlay {
-                        Circle()
-                            .strokeBorder(Self.foil, lineWidth: 1)
-                    }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(detail)
-                        .font(.caption2)
-                        .tracking(2)
-                        .foregroundStyle(Palette.mist)
-                        .lineLimit(1)
-
-                    TextField(
-                        "名前",
-                        text: $model.name,
-                        prompt: Text("名前を入れる").foregroundStyle(Palette.dusk)
-                    )
-                    .font(Self.nameFont)
-                    .foregroundStyle(Palette.champagne)
-                    .tint(Palette.gold)
-                    .submitLabel(.done)
-                    .focused($focus, equals: .name)
-                    .onSubmit {
-                        focus = nil
-                    }
-                    .padding(.bottom, 4)
-                    .overlay(alignment: .bottom) {
-                        Rectangle()
-                            .fill(nameLine)
-                            .frame(height: 1)
-                    }
-                }
+        TemplateCard(
+            icon: categoryIcon,
+            detail: detail,
+            size: .large
+        ) {
+            TextField(
+                "名前",
+                text: $model.name,
+                prompt: Text("名前を入れる").foregroundStyle(Palette.dusk)
+            )
+            .font(TemplateCardSize.large.nameFont)
+            .foregroundStyle(Palette.champagne)
+            .tint(Palette.gold)
+            .submitLabel(.done)
+            .focused($focus, equals: .name)
+            .onSubmit {
+                focus = nil
             }
-
-            HStack(alignment: .firstTextBaseline) {
-                Button {
-                    open(.amount)
-                } label: {
-                    cardAmount
-                }
-                .buttonStyle(.plain)
-
-                Spacer(minLength: 8)
-
-                Text(cardHint)
-                    .font(.caption2)
-                    .tracking(1)
-                    .foregroundStyle(Palette.gold)
+            .padding(.bottom, 4)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(nameLine)
+                    .frame(height: 1)
             }
+        } amount: {
+            Button {
+                open(.amount)
+            } label: {
+                TemplateCardAmount(amount: model.amount, size: .large)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 22)
-        .padding(.bottom, 18)
-        .frame(maxWidth: 290)
-        .background {
-            cardSurface
-        }
-        .overlay {
-            Self.cardShape
-                .strokeBorder(Self.foil, lineWidth: 1.2)
-        }
-        .overlay {
-            Self.cardShape
-                .inset(by: 5)
-                .strokeBorder(Palette.gold.opacity(0.1), lineWidth: 0.5)
-        }
-        .shadow(color: .black.opacity(0.35), radius: 3, y: 2)
-        .shadow(color: .black.opacity(0.6), radius: 24, y: 18)
         .shadow(color: Palette.gold.opacity(0.12), radius: 30)
         .background(alignment: .bottom) {
             Ellipse()
                 .fill(.black.opacity(0.55))
-                .frame(width: 230, height: 22)
+                .frame(width: 260, height: 22)
                 .blur(radius: 14)
                 .offset(y: 26)
-        }
-    }
-
-    var cardSurface: some View {
-        ZStack {
-            Self.cardShape
-                .fill(Self.cardFill)
-
-            Self.cardShape
-                .fill(Self.gloss)
-        }
-    }
-
-    @ViewBuilder
-    var cardAmount: some View {
-        if let amount = model.amount {
-            Text(AmountText.text(amount))
-                .font(.system(size: 34, weight: .medium, design: .serif))
-                .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-        } else {
-            Text("毎回入れる")
-                .font(Self.emptyAmountFont)
-                .foregroundStyle(Palette.dusk)
         }
     }
 
@@ -420,7 +359,7 @@ private extension TemplateEditSheet {
     func drawerView(_ panel: Panel) -> some View {
         VStack(spacing: 12) {
             HStack {
-                Text(panel.title)
+                Text(title(for: panel))
                     .font(.caption2)
                     .tracking(3)
                     .foregroundStyle(Palette.gold)
@@ -567,15 +506,6 @@ private extension TemplateEditSheet {
         case category
         case wallet
         case memo
-
-        var title: String {
-            switch self {
-            case .amount: "金額"
-            case .category: "カテゴリ"
-            case .wallet: "財布"
-            case .memo: "メモ"
-            }
-        }
     }
 
     struct RowItem {
@@ -586,11 +516,8 @@ private extension TemplateEditSheet {
         let isEmpty: Bool
     }
 
-    static let cardShape = RoundedRectangle(cornerRadius: 26)
     static let rowsShape = RoundedRectangle(cornerRadius: 20)
     static let amountFont = Font.system(size: 20, design: .serif)
-    static let nameFont = Font.system(size: 17, weight: .medium, design: .serif)
-    static let emptyAmountFont = Font.system(size: 15, design: .serif)
 
     static let drawerShape = UnevenRoundedRectangle(
         topLeadingRadius: 28,
@@ -605,33 +532,12 @@ private extension TemplateEditSheet {
         )
     }
 
-    static var gloss: LinearGradient {
-        LinearGradient(
-            colors: [.white.opacity(0.09), .white.opacity(0)],
-            startPoint: .topLeading,
-            endPoint: .center
-        )
-    }
-
-    static var foil: AngularGradient {
-        AngularGradient(
-            colors: [
-                Palette.champagne.opacity(0.9),
-                Palette.gold.opacity(0.6),
-                Palette.bronze.opacity(0.5),
-                Palette.gold.opacity(0.6),
-                Palette.champagne.opacity(0.9)
-            ],
-            center: .center
-        )
-    }
-
     static var drawerTransition: AnyTransition {
         .move(edge: .bottom).combined(with: .opacity)
     }
 
     static var memoTransition: AnyTransition {
-        .scale(scale: 0.95, anchor: .top).combined(with: .opacity)
+        .scale(scale: 0.95).combined(with: .opacity)
     }
 
     var title: String {
@@ -654,10 +560,6 @@ private extension TemplateEditSheet {
 
     var nameLine: Color {
         focus == .name ? Palette.gold : Palette.gold.opacity(0.45)
-    }
-
-    var cardHint: String {
-        model.amount == nil ? "押すと金額を入れる" : "押すとすぐ記録"
     }
 
     var previewName: String {
@@ -695,7 +597,7 @@ private extension TemplateEditSheet {
             RowItem(
                 panel: .wallet,
                 systemImage: "wallet.bifold",
-                title: "財布",
+                title: model.walletTitle,
                 value: model.selectedWallet?.name ?? "選ぶ",
                 isEmpty: model.selectedWallet == nil
             ),
@@ -715,6 +617,15 @@ private extension TemplateEditSheet {
     ) -> [[Item]] {
         stride(from: 0, to: items.count, by: size).map { start in
             Array(items[start..<min(start + size, items.count)])
+        }
+    }
+
+    func title(for panel: Panel) -> String {
+        switch panel {
+        case .amount: "金額"
+        case .category: "カテゴリ"
+        case .wallet: model.walletTitle
+        case .memo: "メモ"
         }
     }
 
@@ -757,6 +668,7 @@ private extension TemplateEditSheet {
 
     func save() async {
         closePanel()
+        try? await Task.sleep(for: .milliseconds(80))
 
         guard let template = await model.save() else {
             return

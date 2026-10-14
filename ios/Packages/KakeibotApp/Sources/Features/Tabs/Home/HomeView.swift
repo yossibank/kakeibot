@@ -145,7 +145,7 @@ private extension HomeView {
                 .font(.caption2)
                 .foregroundStyle(Palette.mist)
 
-            LazyVGrid(columns: Self.templateColumns, spacing: 8) {
+            LazyVGrid(columns: Self.templateColumns, spacing: 10) {
                 ForEach(model.templates) { template in
                     templateButton(template)
                 }
@@ -154,9 +154,10 @@ private extension HomeView {
                     Label("追加", systemImage: "plus")
                         .font(.footnote)
                         .foregroundStyle(Palette.gold)
-                        .frame(maxWidth: .infinity, minHeight: 54)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: TemplateCardSize.regular.height)
                         .overlay {
-                            RoundedRectangle(cornerRadius: 16)
+                            RoundedRectangle(cornerRadius: 20)
                                 .stroke(
                                     Palette.gold.opacity(0.45),
                                     style: Self.dash
@@ -217,39 +218,15 @@ private extension HomeView {
     }
 
     func templateButton(_ template: EntryTemplate) -> some View {
-        let amount = template.amount.map { AmountText.text($0) } ?? "金額を入れる"
-        let amountColor = template.amount == nil
-            ? Palette.mist
-            : Palette.champagne
-
-        return Button {
+        Button {
             use(template)
         } label: {
-            HStack(spacing: 10) {
-                IconImage(model.icon(for: template), size: 17)
-                    .foregroundStyle(Palette.gold)
-
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(template.name)
-                        .font(.footnote)
-                        .foregroundStyle(Palette.ink)
-                        .lineLimit(1)
-
-                    Text(amount)
-                        .font(.system(size: 12, design: .serif))
-                        .foregroundStyle(amountColor)
-                        .lineLimit(1)
-                }
-
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 12)
-            .frame(maxWidth: .infinity, minHeight: 54)
-            .background(Palette.gold.opacity(0.04), in: .rect(cornerRadius: 16))
-            .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Palette.gold.opacity(0.22), lineWidth: 1)
-            }
+            TemplateCard(
+                icon: model.icon(for: template),
+                name: template.name,
+                detail: model.detail(for: template),
+                amount: template.amount
+            )
             .contentShape(.rect)
         }
         .buttonStyle(.plain)

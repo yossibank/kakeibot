@@ -43,12 +43,8 @@ public extension TemplateListModel {
     func detail(for template: EntryTemplate) -> String {
         let category = category(for: template)?.name
         let wallet = wallets.first { $0.id == template.walletId }?.name
-        let parts = [category, wallet, template.memo]
+        let parts = [category, wallet]
         return parts.compactMap(\.self).joined(separator: "・")
-    }
-
-    func amountText(for template: EntryTemplate) -> String {
-        template.amount.map { AmountText.text($0) } ?? "毎回入れる"
     }
 
     func load() async {

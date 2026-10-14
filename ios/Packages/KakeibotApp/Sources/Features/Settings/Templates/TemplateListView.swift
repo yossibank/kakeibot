@@ -93,7 +93,7 @@ private extension TemplateListView {
     var board: some View {
         ZStack(alignment: .topLeading) {
             ForEach(model.shown) { template in
-                movableRow(template)
+                movableCard(template)
             }
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -123,61 +123,30 @@ private extension TemplateListView {
         .buttonStyle(.plain)
     }
 
-    func movableRow(_ template: EntryTemplate) -> some View {
+    func movableCard(_ template: EntryTemplate) -> some View {
         let isLifted = lift?.id == template.id
         let index = model.shown.firstIndex(of: template) ?? 0
         let position = isLifted ? liftedCenter : center(at: index)
-        let scale: CGFloat = isLifted ? 1.04 : 1
+        let scale: CGFloat = isLifted ? 1.06 : 1
         let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
-        return rowFace(template)
-            .frame(width: boardWidth, height: Self.rowHeight)
-            .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
-            .position(position)
-            .zIndex(layer)
-            .onTapGesture {
-                sheet = .edit(template.id)
-            }
-            .gesture(reorderGesture(for: template))
-    }
-
-    func rowFace(_ template: EntryTemplate) -> some View {
-        HStack(spacing: 12) {
-            IconImage(model.icon(for: template), size: 17)
-                .foregroundStyle(Palette.gold)
-                .frame(width: 38, height: 38)
-                .overlay {
-                    Circle()
-                        .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
-                }
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(template.name)
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.ink)
-
-                Text(model.detail(for: template))
-                    .font(.caption2)
-                    .foregroundStyle(Palette.mist)
-                    .lineLimit(1)
-            }
-
-            Spacer(minLength: 8)
-
-            Text(model.amountText(for: template))
-                .font(.system(size: 15, design: .serif))
-                .foregroundStyle(amountColor(for: template))
-        }
-        .padding(.horizontal, 14)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Self.rowFill, in: Self.rowShape)
-        .overlay {
-            Self.rowShape
-                .stroke(Palette.gold.opacity(0.18), lineWidth: 1)
-        }
+        return TemplateCard(
+            icon: model.icon(for: template),
+            name: template.name,
+            detail: model.detail(for: template),
+            amount: template.amount
+        )
+        .frame(width: tileWidth)
         .contentShape(.rect)
+        .scaleEffect(scale)
+        .shadow(color: shadow, radius: 16, y: 8)
+        .position(position)
+        .zIndex(layer)
+        .onTapGesture {
+            sheet = .edit(template.id)
+        }
+        .gesture(reorderGesture(for: template))
     }
 }
 
@@ -203,18 +172,10 @@ private extension TemplateListView {
     ]
 
     nonisolated static let space = "TemplateBoard"
-    static let rowHeight: CGFloat = 62
-    static let spacing: CGFloat = 8
-    static let rowShape = RoundedRectangle(cornerRadius: 18)
+    static let columnCount = 2
+    static let spacing: CGFloat = 10
+    static let tileHeight = TemplateCardSize.regular.height
     static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-
-    static var rowFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.cardTop, Palette.cardBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
 
     var typeName: String {
         model.type == .income ? "収入" : "支出"
@@ -232,10 +193,16 @@ private extension TemplateListView {
         }
     }
 
+    var tileWidth: CGFloat {
+        let gaps = Self.spacing * CGFloat(Self.columnCount - 1)
+        return max((boardWidth - gaps) / CGFloat(Self.columnCount), 0)
+    }
+
     var boardHeight: CGFloat {
         let count = model.shown.count
-        let gaps = Self.spacing * CGFloat(max(count - 1, 0))
-        return Self.rowHeight * CGFloat(count) + gaps
+        let rows = (count + Self.columnCount - 1) / Self.columnCount
+        let gaps = Self.spacing * CGFloat(max(rows - 1, 0))
+        return Self.tileHeight * CGFloat(rows) + gaps
     }
 
     var liftedCenter: CGPoint {
@@ -246,24 +213,26 @@ private extension TemplateListView {
         let grab = lift.grab ?? .zero
 
         return CGPoint(
-            x: boardWidth / 2,
+            x: lift.location.x + grab.width,
             y: lift.location.y + grab.height
         )
     }
 
-    func amountColor(for template: EntryTemplate) -> Color {
-        template.amount == nil ? Palette.mist : Palette.champagne
-    }
-
     func center(at index: Int) -> CGPoint {
-        let y = (Self.rowHeight + Self.spacing) * CGFloat(index)
-        return CGPoint(x: boardWidth / 2, y: y + Self.rowHeight / 2)
+        let column = index % Self.columnCount
+        let row = index / Self.columnCount
+        let x = (tileWidth + Self.spacing) * CGFloat(column) + tileWidth / 2
+        let y = (Self.tileHeight + Self.spacing) * CGFloat(row)
+
+        return CGPoint(x: x, y: y + Self.tileHeight / 2)
     }
 
     func index(at point: CGPoint) -> Int {
-        let height = Self.rowHeight + Self.spacing
+        let width = tileWidth + Self.spacing
+        let height = Self.tileHeight + Self.spacing
+        let column = min(max(Int(point.x / width), 0), Self.columnCount - 1)
         let row = max(Int(point.y / height), 0)
-        return min(row, model.shown.count - 1)
+        return min(row * Self.columnCount + column, model.shown.count - 1)
     }
 
     func reorderGesture(for template: EntryTemplate) -> some Gesture {

@@ -68,7 +68,6 @@ struct TemplateUseTests {
         await model.load()
         let first = try #require(model.shown.first)
         let detail = model.detail(for: first)
-        let amounts = model.shown.map { model.amountText(for: $0) }
 
         model.move(pass.id, to: 0)
         let moving = model.shown.map(\.name)
@@ -78,8 +77,7 @@ struct TemplateUseTests {
         model.type = .income
         let income = model.shown.map(\.name)
 
-        #expect(detail == "日用品・財布・社食")
-        #expect(amounts == ["¥980", "毎回入れる"])
+        #expect(detail == "日用品・財布")
         #expect(moving == ["定期", "ランチ"])
         #expect(stored.map(\.name) == ["定期", "ランチ", "給料"])
         #expect(income == ["給料"])

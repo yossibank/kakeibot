@@ -62,6 +62,10 @@ public extension TemplateEditModel {
         type == .income ? "収入" : "支出"
     }
 
+    var walletTitle: String {
+        type == .income ? "入金先" : "支払い元"
+    }
+
     var draft: EntryTemplateDraft {
         EntryTemplateDraft(
             name: name,
@@ -133,6 +137,11 @@ public extension TemplateEditModel {
     }
 
     func save() async -> EntryTemplate? {
+        if let problem = draft.problems.first {
+            errorMessage = message(for: problem)
+            return nil
+        }
+
         do {
             return try await database.saveTemplate(
                 draft,
@@ -170,6 +179,15 @@ private extension TemplateEditModel {
 
     var snapshot: Snapshot {
         Snapshot(draft: draft)
+    }
+
+    func message(for problem: EntryTemplateDraft.Problem) -> String {
+        switch problem {
+        case .emptyName: "名前を入れてください"
+        case .missingCategory: "カテゴリを選んでください"
+        case .missingWallet: "\(walletTitle)を選んでください"
+        case .amountNotPositive, .transfer: Self.saveFailedMessage
+        }
     }
 
     func loadTemplate() async throws {
