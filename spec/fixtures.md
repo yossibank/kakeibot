@@ -13,6 +13,16 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | 判定の fixtures | `valid` と `invalid` の 2 つの配列を持つオブジェクト。`valid` は受け付け、`invalid` は受け付けない |
 | 計算の fixtures | 入力と期待値を並べたオブジェクトの配列。1 つのオブジェクトが 1 つのテストになる |
 
+## category
+
+`spec/fixtures/category` のファイルは、次の表のとおりである。
+
+| ファイル | 試すこと | 項目 |
+| --- | --- | --- |
+| `category-draft.json` | カテゴリの入力の判定で出る問題 | `name`、`mark`（`kind` が `glyph`・`emoji`・`text`、`value`）、`color`、`problems` |
+
+名前と、絵文字・文字の前後の空白は除いてから判定する。文字は 3 文字まで、色は `#RRGGBB` にする。
+
 ## date
 
 `spec/fixtures/date` のファイルは、次の表のとおりである。

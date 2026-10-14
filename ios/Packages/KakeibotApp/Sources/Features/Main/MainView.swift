@@ -127,7 +127,7 @@ private extension MainView {
                 )
             )
         case .settings:
-            SettingsSheet()
+            SettingsSheet(database: database)
         }
     }
 }

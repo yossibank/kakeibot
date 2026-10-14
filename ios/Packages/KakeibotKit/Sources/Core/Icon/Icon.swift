@@ -48,6 +48,63 @@ public extension Icon {
         case other
         case cash
         case bank
+        case cafe
+        case cake
+        case grocery
+        case fish
+        case takeout
+        case cart
+        case bag
+        case sofa
+        case tools
+        case laundry
+        case light
+        case water
+        case gas
+        case wifi
+        case laptop
+        case tv
+        case bus
+        case car
+        case bicycle
+        case airplane
+        case fuel
+        case parking
+        case travel
+        case movie
+        case music
+        case ticket
+        case camera
+        case sports
+        case fitness
+        case beach
+        case mountain
+        case tent
+        case theater
+        case art
+        case book
+        case star
+        case haircut
+        case shoe
+        case pill
+        case health
+        case baby
+        case family
+        case pet
+        case school
+        case plant
+        case flower
+        case card
+        case banknote
+        case coin
+        case invest
+        case insurance
+        case tax
+        case work
+        case office
+        case mail
+        case calendar
+        case umbrella
     }
 }
 
