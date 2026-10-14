@@ -8,6 +8,10 @@ public extension AppDatabase {
             .values(in: writer)
     }
 
+    func entryList() async throws -> EntryList {
+        try await writer.read(Self.entryList)
+    }
+
     func entryOptions() async throws -> EntryOptions {
         try await writer.read(Self.entryOptions)
     }
@@ -18,7 +22,11 @@ public extension AppDatabase {
 
     func recentMemos(limit: Int) async throws -> [String] {
         try await writer.read { db in
-            try String.fetchAll(db, sql: Self.recentMemosSQL, arguments: [limit])
+            try String.fetchAll(
+                db,
+                sql: Self.recentMemosSQL,
+                arguments: [limit]
+            )
         }
     }
 }

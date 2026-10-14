@@ -20,7 +20,8 @@ public extension AppDatabase {
             throw SetupError.appGroupUnavailable
         }
 
-        let path = directory.appending(path: fileName).path(percentEncoded: false)
+        let url = directory.appending(path: fileName)
+        let path = url.path(percentEncoded: false)
         let pool = try DatabasePool(path: path, configuration: configuration)
         let database = try AppDatabase(pool)
         try database.insertDefaultsIfEmpty(at: Date())
@@ -33,11 +34,17 @@ public extension AppDatabase {
     }
 
     static func suspend() {
-        NotificationCenter.default.post(name: Database.suspendNotification, object: nil)
+        NotificationCenter.default.post(
+            name: Database.suspendNotification,
+            object: nil
+        )
     }
 
     static func resume() {
-        NotificationCenter.default.post(name: Database.resumeNotification, object: nil)
+        NotificationCenter.default.post(
+            name: Database.resumeNotification,
+            object: nil
+        )
     }
 }
 
@@ -55,7 +62,11 @@ private extension AppDatabase {
     static let fileName = "kakeibot.sqlite"
 
     static var groupContainer: URL? {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)
+        let manager = FileManager.default
+
+        return manager.containerURL(
+            forSecurityApplicationGroupIdentifier: groupIdentifier
+        )
     }
 
     static var configuration: Configuration {

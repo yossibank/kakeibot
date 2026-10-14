@@ -9,11 +9,13 @@ extension MigrationV2 {
             table.primaryKey("id", .text)
             table.column("emoji", .text)
             table.column("text", .text).check { length($0) <= 3 }
-            table.column("glyph", .text).check { Icon.Glyph.allCases.contains($0) }
+            table.column("glyph", .text)
+                .check { Icon.Glyph.allCases.contains($0) }
             table.column("color", .text).notNull()
             table.column("created_at", .text).notNull()
             table.column("updated_at", .text).notNull()
-            table.check(sql: "emoji IS NOT NULL OR text IS NOT NULL OR glyph IS NOT NULL")
+            let hasLook = "emoji IS NOT NULL OR text IS NOT NULL OR glyph IS NOT NULL"
+            table.check(sql: hasLook)
         }
 
         try db.execute(sql: copyIcons)

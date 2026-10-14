@@ -14,7 +14,12 @@ public extension AppDatabase {
         at now: Date
     ) async throws -> Entry {
         try await writer.write { db in
-            let entry = try Self.entry(from: draft, editing: id, in: db, at: now)
+            let entry = try Self.entry(
+                from: draft,
+                editing: id,
+                in: db,
+                at: now
+            )
             try entry.save(db)
 
             if entry.type == .expense {

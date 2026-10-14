@@ -41,7 +41,10 @@ private extension Keypad {
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: 14)
-                        .stroke(Self.stroke(for: key, isActive: isActive), lineWidth: 0.75)
+                        .stroke(
+                            Self.stroke(for: key, isActive: isActive),
+                            lineWidth: 0.75
+                        )
                 }
                 .contentShape(.rect)
         }

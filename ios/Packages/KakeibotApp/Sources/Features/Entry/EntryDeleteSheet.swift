@@ -16,7 +16,10 @@ struct EntryDeleteSheet: View {
                     .font(.system(size: 20, weight: .light))
                     .foregroundStyle(Palette.rose)
                     .frame(width: 52, height: 52)
-                    .overlay(Circle().stroke(Palette.rose.opacity(0.6), lineWidth: 1))
+                    .overlay {
+                        Circle()
+                            .stroke(Palette.rose.opacity(0.6), lineWidth: 1)
+                    }
                     .accessibilityHidden(true)
 
                 VStack(spacing: 6) {
@@ -44,9 +47,11 @@ struct EntryDeleteSheet: View {
                 }
                 .buttonStyle(.plain)
 
-                Button("やめる") { dismiss() }
-                    .foregroundStyle(Palette.mist)
-                    .frame(minHeight: 44)
+                Button("やめる") {
+                    dismiss()
+                }
+                .foregroundStyle(Palette.mist)
+                .frame(minHeight: 44)
             }
         }
     }
@@ -54,8 +59,10 @@ struct EntryDeleteSheet: View {
 
 private extension EntryDeleteSheet {
     var summary: some View {
-        HStack(spacing: 12) {
-            IconImage(model.selectedCategory.flatMap(model.icon(for:)), size: 20)
+        let icon = model.selectedCategory.flatMap(model.icon(for:))
+
+        return HStack(spacing: 12) {
+            IconImage(icon, size: 20)
                 .foregroundStyle(Palette.gold)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -77,7 +84,10 @@ private extension EntryDeleteSheet {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Palette.line, lineWidth: 1))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Palette.line, lineWidth: 1)
+        }
         .accessibilityElement(children: .combine)
     }
 }

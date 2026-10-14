@@ -30,7 +30,9 @@ struct LocalDateTests {
         let justBefore = start.addingTimeInterval(-1)
 
         #expect(LocalDate(start, in: timeZone) == fixture.date)
-        #expect(LocalDate(justBefore, in: timeZone) == fixture.date.adding(days: -1))
+        let previousDay = fixture.date.adding(days: -1)
+
+        #expect(LocalDate(justBefore, in: timeZone) == previousDay)
     }
 
     @Test(arguments: try weekCases)

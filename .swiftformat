@@ -13,7 +13,7 @@
 --ifdef no-indent
 --line-between-guards true
 --mark-categories false
---max-width 100
+--max-width 80
 --organization-mode type
 --ranges no-space
 --redundant-type inferred
@@ -23,4 +23,7 @@
 --trailing-commas never
 --wrap-arguments before-first
 --wrap-collections before-first
+--wrap-conditions before-first
 --wrap-parameters before-first
+--wrap-string-interpolation false
+--wrap-ternary before-operators

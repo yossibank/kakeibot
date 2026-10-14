@@ -11,7 +11,10 @@ public struct DialFace: View {
         ZStack {
             Circle()
                 .stroke(Palette.gold.opacity(isActive ? 1 : 0.55), lineWidth: 1)
-                .shadow(color: Palette.gold.opacity(isActive ? 0.3 : 0), radius: 16)
+                .shadow(
+                    color: Palette.gold.opacity(isActive ? 0.3 : 0),
+                    radius: 16
+                )
 
             DialTicks(count: 60, length: 9)
                 .stroke(Palette.gold.opacity(0.8), lineWidth: 1)

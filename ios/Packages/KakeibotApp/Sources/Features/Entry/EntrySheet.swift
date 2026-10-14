@@ -7,7 +7,7 @@ public struct EntrySheet: View {
     @State private var model: EntryModel
     @State private var isEnteringAmount = false
     @State private var isEditingMemo = false
-    @State private var categoryPage = 0
+    @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
     @State private var memoChipFrame: CGRect = .zero
 
@@ -41,7 +41,9 @@ public struct EntrySheet: View {
         .onChange(of: model.type) {
             categoryPage = 0
         }
-        .task { await load() }
+        .task {
+            await load()
+        }
     }
 }
 
@@ -60,7 +62,9 @@ private extension EntrySheet {
             }
 
             PrimaryButton(model.saveTitle) {
-                Task { await save() }
+                Task {
+                    await save()
+                }
             }
             .disabled(!model.canSave)
         }
@@ -93,7 +97,11 @@ private extension EntrySheet {
             Spacer()
 
             if model.isEditing {
-                RingButton("この記録を消す", systemImage: "trash", style: .destructive) {
+                RingButton(
+                    "この記録を消す",
+                    systemImage: "trash",
+                    style: .destructive
+                ) {
                     open(.delete)
                 }
             } else {
@@ -126,7 +134,11 @@ private extension EntrySheet {
             Button {
                 open(.wallet)
             } label: {
-                Chip(model.walletName, systemImage: "wallet.bifold")
+                Chip(
+                    model.walletName,
+                    systemImage: "wallet.bifold",
+                    isHighlighted: model.walletId != nil
+                )
             }
 
             Button {
@@ -135,7 +147,7 @@ private extension EntrySheet {
                 Chip(
                     EntryModel.dateText(for: model.date, today: today),
                     systemImage: "calendar",
-                    isHighlighted: model.date != today
+                    isHighlighted: true
                 )
             }
 
@@ -162,33 +174,51 @@ private extension EntrySheet {
 
     var categoryPager: some View {
         VStack(spacing: 8) {
-            TabView(selection: $categoryPage) {
-                ForEach(Array(model.categoryPages.enumerated()), id: \.offset) { index, page in
-                    categoryGrid(page)
-                        .tag(index)
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 0) {
+                    ForEach(
+                        Array(model.categoryPages.enumerated()),
+                        id: \.offset
+                    ) { index, page in
+                        categoryGrid(page)
+                            .containerRelativeFrame(.horizontal)
+                            .id(index)
+                    }
                 }
+                .scrollTargetLayout()
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: $categoryPage)
+            .scrollIndicators(.hidden)
             .frame(minHeight: 168, maxHeight: 264)
 
             if model.categoryPages.count > 1 {
-                PageDots(count: model.categoryPages.count, current: categoryPage)
+                PageDots(
+                    count: model.categoryPages.count,
+                    current: categoryPage ?? 0
+                )
             }
         }
     }
 
     var keypadDrawer: some View {
         VStack(spacing: 10) {
-            Button("完了") { setEnteringAmount(false) }
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(Palette.gold)
-                .frame(minWidth: 44, minHeight: 32)
-                .frame(maxWidth: .infinity, alignment: .trailing)
+            Button("完了") {
+                setEnteringAmount(false)
+            }
+            .font(.subheadline.weight(.bold))
+            .foregroundStyle(Palette.gold)
+            .frame(minWidth: 44, minHeight: 32)
+            .frame(maxWidth: .infinity, alignment: .trailing)
 
-            Keypad(activeTax: model.calculator.taxNote?.rate) { model.press($0) }
+            Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+                model.press(key)
+            }
 
             PrimaryButton(model.saveTitle) {
-                Task { await save() }
+                Task {
+                    await save()
+                }
             }
             .disabled(!model.canSave)
         }
@@ -196,10 +226,10 @@ private extension EntrySheet {
         .padding(.top, 8)
         .padding(.bottom, 8)
         .background {
-            UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
+            Self.drawerShape
                 .fill(Palette.drawer)
                 .overlay {
-                    UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
+                    Self.drawerShape
                         .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
@@ -228,12 +258,13 @@ private extension EntrySheet {
                 }
                 .padding(.horizontal, Self.memoCardInset)
             }
-            .transition(.scale(scale: 0.92, anchor: .bottom).combined(with: .opacity))
+            .transition(Self.memoTransition)
     }
 
     func dialFace(size: CGFloat) -> some View {
         let amountScale: CGFloat = model.amount < 100_000 ? 0.2 : 0.118
-        let note = model.expressionText ?? (isEnteringAmount ? "入力中" : "タップして入力")
+        let hint = isEnteringAmount ? "入力中" : "タップして入力"
+        let note = model.expressionText ?? hint
 
         return ZStack {
             DialFace(isActive: isEnteringAmount)
@@ -245,7 +276,13 @@ private extension EntrySheet {
                 .offset(y: -size * 0.19)
 
             Text(AmountText.text(model.amount))
-                .font(.system(size: size * amountScale, weight: .semibold, design: .serif))
+                .font(
+                    .system(
+                        size: size * amountScale,
+                        weight: .semibold,
+                        design: .serif
+                    )
+                )
                 .monospacedDigit()
                 .foregroundStyle(Palette.champagne)
                 .lineLimit(1)
@@ -284,6 +321,7 @@ private extension EntrySheet {
 
     func categoryButton(_ category: EntryCategory) -> some View {
         let isSelected = model.categoryId == category.id
+        let border = isSelected ? Palette.gold.opacity(0.55) : Color.clear
 
         return Button {
             setEnteringAmount(false)
@@ -304,7 +342,7 @@ private extension EntrySheet {
             )
             .overlay {
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(isSelected ? Palette.gold.opacity(0.55) : Color.clear, lineWidth: 1)
+                    .stroke(border, lineWidth: 1)
             }
             .contentShape(.rect)
         }
@@ -321,7 +359,9 @@ private extension EntrySheet {
             EntryDateSheet(model: model, today: today)
         case .delete:
             EntryDeleteSheet(model: model, today: today) {
-                Task { await delete() }
+                Task {
+                    await delete()
+                }
             }
         }
     }
@@ -345,8 +385,16 @@ private extension EntrySheet {
 
     static let coordinateSpace = "EntrySheet"
     static let memoCardInset: CGFloat = 12
+    static let drawerShape = UnevenRoundedRectangle(
+        topLeadingRadius: 28,
+        topTrailingRadius: 28
+    )
     static let categoryRows = 3
     static let categoryColumns = 4
+
+    static var memoTransition: AnyTransition {
+        .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
+    }
 
     var today: LocalDate {
         LocalDate(Date(), in: .current)
@@ -354,8 +402,12 @@ private extension EntrySheet {
 
     var typeBinding: Binding<Entry.Kind> {
         Binding(
-            get: { model.type },
-            set: { model.select($0) }
+            get: {
+                model.type
+            },
+            set: { type in
+                model.select(type)
+            }
         )
     }
 
@@ -383,7 +435,10 @@ private extension EntrySheet {
     }
 
     func load() async {
-        await model.load()
+        if !model.isLoaded {
+            await model.load()
+        }
+
         let page = model.categoryPages.firstIndex { page in
             page.contains { $0.id == model.categoryId }
         }

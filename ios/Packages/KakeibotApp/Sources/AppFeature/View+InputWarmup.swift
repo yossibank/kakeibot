@@ -2,12 +2,12 @@ import SwiftUI
 import UIKit
 
 extension View {
-    func warmsUpKeyboard() -> some View {
-        background(KeyboardWarmup())
+    func warmsUpInput() -> some View {
+        background(InputWarmup())
     }
 }
 
-private struct KeyboardWarmup: UIViewRepresentable {
+private struct InputWarmup: UIViewRepresentable {
     func makeUIView(context: Context) -> WarmupView {
         WarmupView()
     }
@@ -34,5 +34,7 @@ private final class WarmupView: UIView {
         field.becomeFirstResponder()
         field.resignFirstResponder()
         field.removeFromSuperview()
+        UISelectionFeedbackGenerator().prepare()
+        UIImpactFeedbackGenerator(style: .light).prepare()
     }
 }

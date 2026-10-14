@@ -8,7 +8,10 @@ struct EntryWriteTests {
     func savesNewEntry() async throws {
         let setup = try await Setup()
 
-        let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
+        let saved = try await setup.database.saveEntry(
+            setup.draft,
+            at: setup.now
+        )
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries == [saved])
@@ -21,8 +24,15 @@ struct EntryWriteTests {
         var edited = setup.draft
         edited.amount = 1500
 
-        let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
-        let updated = try await setup.database.saveEntry(edited, editing: saved.id, at: later)
+        let saved = try await setup.database.saveEntry(
+            setup.draft,
+            at: setup.now
+        )
+        let updated = try await setup.database.saveEntry(
+            edited,
+            editing: saved.id,
+            at: later
+        )
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries == [updated])
@@ -36,7 +46,11 @@ struct EntryWriteTests {
         let setup = try await Setup()
 
         await #expect(throws: AppDatabase.WriteError.entryNotFound) {
-            try await setup.database.saveEntry(setup.draft, editing: Entry.ID(), at: setup.now)
+            try await setup.database.saveEntry(
+                setup.draft,
+                editing: Entry.ID(),
+                at: setup.now
+            )
         }
     }
 
@@ -55,13 +69,18 @@ struct EntryWriteTests {
     func clearsNoSpendDayOnlyForExpense(type: Entry.Kind) async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
-        let categories = type == .expense ? options.expenseCategories : options.incomeCategories
+        let categories = type == .expense
+            ? options.expenseCategories
+            : options.incomeCategories
         var draft = setup.draft
         draft.type = type
         draft.categoryId = categories[0].id
         let noSpendDay = NoSpendDay(date: draft.date, createdAt: setup.now)
 
-        try await setup.database.writer.write { try noSpendDay.insert($0) }
+        try await setup.database.writer.write { db in
+            try noSpendDay.insert(db)
+        }
+
         try await setup.database.saveEntry(draft, at: setup.now)
         let snapshot = try setup.database.snapshot()
 
@@ -72,7 +91,10 @@ struct EntryWriteTests {
     func deletesEntry() async throws {
         let setup = try await Setup()
 
-        let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
+        let saved = try await setup.database.saveEntry(
+            setup.draft,
+            at: setup.now
+        )
         try await setup.database.deleteEntry(saved.id)
         let snapshot = try setup.database.snapshot()
 

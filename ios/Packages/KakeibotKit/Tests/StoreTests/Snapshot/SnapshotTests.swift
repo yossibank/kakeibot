@@ -21,7 +21,10 @@ struct SnapshotTests {
         let sample = try RecordTests.Sample()
         let export = try Self.export
 
-        try database.writer.write { try sample.insert(into: $0) }
+        try database.writer.write { db in
+            try sample.insert(into: db)
+        }
+
         try database.replace(with: export.data)
         let snapshot = try database.snapshot()
 

@@ -27,11 +27,26 @@ public struct Chip: View {
                 .foregroundStyle(Palette.mist)
         }
         .font(.caption)
-        .foregroundStyle(isHighlighted ? Palette.champagne : Palette.ink.opacity(0.85))
+        .foregroundStyle(foreground)
         .padding(.horizontal, 12)
         .padding(.vertical, 7)
-        .background(isHighlighted ? Palette.gold.opacity(0.12) : Color.clear, in: Capsule())
-        .overlay(Capsule().stroke(isHighlighted ? Palette.gold : Palette.line, lineWidth: 1))
+        .background(
+            isHighlighted ? Palette.gold.opacity(0.12) : Color.clear,
+            in: Capsule()
+        )
+        .overlay {
+            Capsule()
+                .stroke(
+                    isHighlighted ? Palette.gold : Palette.line,
+                    lineWidth: 1
+                )
+        }
+    }
+}
+
+private extension Chip {
+    var foreground: Color {
+        isHighlighted ? Palette.champagne : Palette.ink.opacity(0.85)
     }
 }
 

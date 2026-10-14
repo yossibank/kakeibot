@@ -45,7 +45,9 @@ struct DateDatabaseValueTests {
 private extension DateDatabaseValueTests {
     func makeDatabase() throws -> DatabaseQueue {
         let database = try DatabaseQueue()
-        try database.write { try $0.execute(sql: "CREATE TABLE sample (value TEXT)") }
+        try database.write { db in
+            try db.execute(sql: "CREATE TABLE sample (value TEXT)")
+        }
         return database
     }
 
@@ -54,7 +56,10 @@ private extension DateDatabaseValueTests {
         into database: DatabaseQueue
     ) throws {
         try database.write { db in
-            try db.execute(sql: "INSERT INTO sample (value) VALUES (?)", arguments: [value])
+            try db.execute(
+                sql: "INSERT INTO sample (value) VALUES (?)",
+                arguments: [value]
+            )
         }
     }
 
@@ -62,6 +67,8 @@ private extension DateDatabaseValueTests {
         _ type: Value.Type,
         from database: DatabaseQueue
     ) throws -> Value? {
-        try database.read { try type.fetchOne($0, sql: "SELECT value FROM sample") }
+        try database.read { db in
+            try type.fetchOne(db, sql: "SELECT value FROM sample")
+        }
     }
 }

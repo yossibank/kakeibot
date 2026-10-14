@@ -44,6 +44,10 @@ public extension EntryModel {
         editingId != nil
     }
 
+    var isLoaded: Bool {
+        options != nil
+    }
+
     var amount: Int {
         calculator.amount
     }
@@ -72,10 +76,11 @@ public extension EntryModel {
     }
 
     var categoryPages: [[EntryCategory]] {
-        stride(from: 0, to: categories.count, by: Self.categoriesPerPage).map { start in
-            let end = min(start + Self.categoriesPerPage, categories.count)
-            return Array(categories[start..<end])
-        }
+        stride(from: 0, to: categories.count, by: Self.categoriesPerPage)
+            .map { start in
+                let end = min(start + Self.categoriesPerPage, categories.count)
+                return Array(categories[start..<end])
+            }
     }
 
     var selectedCategory: EntryCategory? {
@@ -89,7 +94,9 @@ public extension EntryModel {
     var walletSections: [WalletSection] {
         Wallet.Kind.allCases.compactMap { kind in
             let wallets = wallets.filter { $0.kind == kind }
-            return wallets.isEmpty ? nil : WalletSection(kind: kind, wallets: wallets)
+            return wallets.isEmpty
+                ? nil
+                : WalletSection(kind: kind, wallets: wallets)
         }
     }
 
@@ -137,7 +144,8 @@ public extension EntryModel {
     func load() async {
         do {
             options = try await database.entryOptions()
-            recentMemos = try await database.recentMemos(limit: Self.recentMemoLimit)
+            let limit = Self.recentMemoLimit
+            recentMemos = try await database.recentMemos(limit: limit)
             try await loadEntry()
         } catch {
             errorMessage = Self.message(for: error)

@@ -34,6 +34,7 @@ struct EntryWalletSheet: View {
 private extension EntryWalletSheet {
     func walletRow(_ wallet: Wallet) -> some View {
         let isSelected = model.walletId == wallet.id
+        let nameColor = isSelected ? Palette.champagne : Palette.ink
 
         return Button {
             model.walletId = wallet.id
@@ -44,7 +45,7 @@ private extension EntryWalletSheet {
                     .foregroundStyle(isSelected ? Palette.gold : Palette.mist)
 
                 Text(wallet.name)
-                    .foregroundStyle(isSelected ? Palette.champagne : Palette.ink)
+                    .foregroundStyle(nameColor)
 
                 Spacer()
 
@@ -62,7 +63,10 @@ private extension EntryWalletSheet {
             )
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(isSelected ? Palette.gold : Palette.line, lineWidth: 1)
+                    .stroke(
+                        isSelected ? Palette.gold : Palette.line,
+                        lineWidth: 1
+                    )
             }
             .contentShape(.rect)
         }

@@ -24,16 +24,18 @@ public struct EntryRow: View {
 
     public var body: some View {
         HStack(spacing: 12) {
-            IconBadge(icon)
+            IconImage(icon, size: 15)
+                .foregroundStyle(Palette.gold)
 
-            VStack(alignment: .leading, spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(title)
-                    .font(.body)
+                    .font(.subheadline)
+                    .foregroundStyle(Palette.ink)
 
                 if let detail {
                     Text(detail)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Palette.mist)
                         .lineLimit(1)
                 }
             }
@@ -41,21 +43,56 @@ public struct EntryRow: View {
             Spacer(minLength: 8)
 
             AmountText(amount, type: type)
-                .font(.body.weight(.semibold))
+                .font(.system(size: 16, design: .serif))
         }
-        .padding(.vertical, 4)
+        .frame(minHeight: 48)
+        .contentShape(.rect)
         .accessibilityElement(children: .combine)
     }
 }
 
 #Preview {
     let now = Date()
-    let food = Icon(emoji: "🍙", text: nil, color: "#E07A5F", createdAt: now, updatedAt: now)
-    let salary = Icon(emoji: "💴", text: nil, color: "#2A9D8F", createdAt: now, updatedAt: now)
+    let food = Icon(
+        emoji: nil,
+        text: nil,
+        glyph: .food,
+        color: "#E07A5F",
+        createdAt: now,
+        updatedAt: now
+    )
+    let salary = Icon(
+        emoji: nil,
+        text: nil,
+        glyph: .salary,
+        color: "#2A9D8F",
+        createdAt: now,
+        updatedAt: now
+    )
 
-    List {
-        EntryRow(icon: food, title: "食費", detail: "ランチ・財布", amount: 980, type: .expense)
-        EntryRow(icon: salary, title: "給料", detail: "銀行", amount: 250_000, type: .income)
-        EntryRow(icon: nil, title: "その他", detail: nil, amount: 120, type: .expense)
+    VStack(spacing: 0) {
+        EntryRow(
+            icon: food,
+            title: "食費",
+            detail: "ランチ・財布",
+            amount: 980,
+            type: .expense
+        )
+        EntryRow(
+            icon: salary,
+            title: "給料",
+            detail: "銀行",
+            amount: 250_000,
+            type: .income
+        )
+        EntryRow(
+            icon: nil,
+            title: "その他",
+            detail: nil,
+            amount: 120,
+            type: .expense
+        )
     }
+    .padding()
+    .background(Palette.night)
 }

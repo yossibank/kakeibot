@@ -11,15 +11,30 @@ struct MigrationV2Tests {
         try migrator.migrate(queue, upTo: "v1")
 
         try queue.write { db in
-            try db.execute(sql: Self.insertIcon, arguments: [Self.foodIcon, "🍙"])
-            try db.execute(sql: Self.insertIcon, arguments: [Self.customIcon, "🎯"])
+            try db.execute(
+                sql: Self.insertIcon,
+                arguments: [Self.foodIcon, "🍙"]
+            )
+            try db.execute(
+                sql: Self.insertIcon,
+                arguments: [Self.customIcon, "🎯"]
+            )
             try db.execute(sql: Self.insertWallet, arguments: [Self.foodIcon])
         }
 
         try migrator.migrate(queue)
-        let food = try queue.read { try Icon.fetchOne($0, key: Self.foodIcon) }
-        let custom = try queue.read { try Icon.fetchOne($0, key: Self.customIcon) }
-        let brokenReferences = try queue.read { try Array($0.foreignKeyViolations()) }
+
+        let food = try queue.read { db in
+            try Icon.fetchOne(db, key: Self.foodIcon)
+        }
+
+        let custom = try queue.read { db in
+            try Icon.fetchOne(db, key: Self.customIcon)
+        }
+
+        let brokenReferences = try queue.read { db in
+            try Array(db.foreignKeyViolations())
+        }
 
         #expect(food?.glyph == .food)
         #expect(food?.emoji == nil)

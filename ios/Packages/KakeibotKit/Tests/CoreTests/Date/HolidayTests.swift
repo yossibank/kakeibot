@@ -4,7 +4,8 @@ import Testing
 struct HolidayTests {
     @Test(arguments: try cases)
     func namesHolidaysOfYear(fixture: YearCase) throws {
-        let first = try #require(LocalDate(year: fixture.year, month: 1, day: 1))
+        let newYear = LocalDate(year: fixture.year, month: 1, day: 1)
+        let first = try #require(newYear)
         let days = (0..<365).map { first.adding(days: $0) }
 
         let holidays = days.compactMap { date in

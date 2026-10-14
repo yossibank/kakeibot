@@ -25,13 +25,23 @@ public struct CapsulePicker<Value: Hashable>: View {
                 .offset(x: thumbX)
 
             HStack(spacing: 0) {
-                ForEach(Array(options.enumerated()), id: \.offset) { index, option in
+                ForEach(
+                    Array(options.enumerated()),
+                    id: \.offset
+                ) { index, option in
                     let isHighlighted = index == highlightedIndex
+                    let weight: Font.Weight = isHighlighted ? .bold : .regular
+                    let color = isHighlighted
+                        ? Palette.nightBottom
+                        : Palette.mist
 
                     Text(option.title)
-                        .font(.footnote.weight(isHighlighted ? .bold : .regular))
-                        .foregroundStyle(isHighlighted ? Palette.nightBottom : Palette.mist)
-                        .frame(width: Self.segmentWidth, height: Self.segmentHeight)
+                        .font(.footnote.weight(weight))
+                        .foregroundStyle(color)
+                        .frame(
+                            width: Self.segmentWidth,
+                            height: Self.segmentHeight
+                        )
                 }
             }
         }
@@ -115,11 +125,14 @@ private extension CapsulePicker {
                 let start = CGFloat(selectedIndex) * Self.segmentWidth
                 let touch = value.startLocation.x - Self.inset
 
-                guard (start...(start + Self.segmentWidth)).contains(touch) else {
+                let range = start...(start + Self.segmentWidth)
+
+                guard range.contains(touch) else {
                     return
                 }
 
-                thumbOffset = min(max(start + value.translation.width, 0), maxOffset)
+                let offset = start + value.translation.width
+                thumbOffset = min(max(offset, 0), maxOffset)
             }
             .onEnded { value in
                 let center = thumbOffset.map { $0 + Self.segmentWidth / 2 }

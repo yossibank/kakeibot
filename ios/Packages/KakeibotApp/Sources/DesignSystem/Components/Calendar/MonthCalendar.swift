@@ -38,10 +38,13 @@ public struct MonthCalendar: View {
             }
 
             HStack(spacing: 0) {
-                ForEach(Weekday.week(startingOn: weekStart), id: \.self) { weekday in
+                ForEach(
+                    Weekday.week(startingOn: weekStart),
+                    id: \.self
+                ) { weekday in
                     Text(weekday.shortName)
                         .font(.caption2)
-                        .foregroundStyle(Self.color(for: weekday) ?? Palette.mist)
+                        .foregroundStyle(Self.headerColor(for: weekday))
                         .frame(maxWidth: .infinity, minHeight: 24)
                 }
             }
@@ -49,7 +52,10 @@ public struct MonthCalendar: View {
             VStack(spacing: 6) {
                 ForEach(Array(weeks.enumerated()), id: \.offset) { _, week in
                     HStack(spacing: 0) {
-                        ForEach(Array(week.enumerated()), id: \.offset) { _, date in
+                        ForEach(
+                            Array(week.enumerated()),
+                            id: \.offset
+                        ) { _, date in
                             cell(for: date)
                         }
                     }
@@ -99,7 +105,10 @@ private extension MonthCalendar {
                         .font(.system(size: 17, weight: weight, design: .serif))
                         .foregroundStyle(foreground(for: date))
                         .frame(width: 32, height: 32)
-                        .background(isSelected ? Palette.gold : Color.clear, in: Circle())
+                        .background(
+                            isSelected ? Palette.gold : Color.clear,
+                            in: Circle()
+                        )
                         .overlay(Circle().stroke(ring, lineWidth: 1))
 
                     Text(holiday ?? "")
@@ -114,7 +123,7 @@ private extension MonthCalendar {
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(holiday.map { "\(date.day)日 \($0)" } ?? "\(date.day)日")
+            .accessibilityLabel(Self.label(for: date, holiday: holiday))
             .accessibilityAddTraits(isSelected ? .isSelected : [])
         } else {
             Color.clear
@@ -130,17 +139,14 @@ private extension MonthCalendar {
             .onEnded { value in
                 let width = value.translation.width
 
-                guard abs(width) > Self.swipeDistance,
-                      abs(width) > abs(value.translation.height) else {
+                guard
+                    abs(width) > Self.swipeDistance,
+                    abs(width) > abs(value.translation.height) else {
                     return
                 }
 
                 move(months: width < 0 ? 1 : -1)
             }
-    }
-
-    var monthTitle: String {
-        "\(month.year)年 \(month.month)月"
     }
 
     var weeks: [[LocalDate?]] {
@@ -150,9 +156,28 @@ private extension MonthCalendar {
         return weeks + Array(repeating: blank, count: missing)
     }
 
+    var monthTitle: String {
+        "\(month.year)年 \(month.month)月"
+    }
+
     static let rowCount = 6
     static let swipeDistance: CGFloat = 50
     static let cellHeight: CGFloat = 46
+
+    static func label(
+        for date: LocalDate,
+        holiday: String?
+    ) -> String {
+        guard let holiday else {
+            return "\(date.day)日"
+        }
+
+        return "\(date.day)日 \(holiday)"
+    }
+
+    static func headerColor(for weekday: Weekday) -> Color {
+        color(for: weekday) ?? Palette.mist
+    }
 
     static func color(for weekday: Weekday) -> Color? {
         switch weekday {

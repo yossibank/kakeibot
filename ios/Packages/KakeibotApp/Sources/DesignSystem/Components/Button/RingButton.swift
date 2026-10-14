@@ -64,7 +64,9 @@ private extension RingButton {
     }
 
     var fill: Color {
-        isEnabled && style == .prominent ? Palette.gold.opacity(0.14) : Color.clear
+        isEnabled && style == .prominent
+            ? Palette.gold.opacity(0.14)
+            : Color.clear
     }
 }
 

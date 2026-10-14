@@ -98,7 +98,11 @@ public extension ExportV1 {
     func json() throws -> Data {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+        encoder.outputFormatting = [
+            .prettyPrinted,
+            .sortedKeys,
+            .withoutEscapingSlashes
+        ]
         return try encoder.encode(self)
     }
 }

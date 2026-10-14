@@ -24,8 +24,9 @@ extension DebugMenuModel {
             try database.insertDefaultsIfEmpty(at: now)
             let options = try await database.entryOptions()
 
-            guard let wallet = options.wallets.first,
-                  let category = options.expenseCategories.first else {
+            guard
+                let wallet = options.wallets.first,
+                let category = options.expenseCategories.first else {
                 return
             }
 
