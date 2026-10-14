@@ -18,7 +18,7 @@ public struct RootView: View {
             .onChange(of: scenePhase) { _, phase in
                 model.changeScene(to: phase)
             }
-            .warmsUpKeyboard()
+            .warmsUpInput()
             .debugMenuOnShake()
     }
 }

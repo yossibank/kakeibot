@@ -9,6 +9,8 @@ public struct MainView: View {
     @State private var sheet: Sheet?
     @State private var home: HomeModel
     @State private var records: RecordsModel
+    @State private var draft: EntryModel
+    @State private var isWarmingEntry = true
 
     private let database: AppDatabase
 
@@ -26,6 +28,13 @@ public struct MainView: View {
             initialValue: RecordsModel(
                 database: database,
                 month: today.yearMonth
+            )
+        )
+
+        _draft = State(
+            initialValue: EntryModel(
+                database: database,
+                date: today
             )
         )
 
@@ -76,8 +85,13 @@ public struct MainView: View {
                 sheet = .new
             }
         }
+        .background {
+            if isWarmingEntry {
+                entryWarmup
+            }
+        }
         .preferredColorScheme(.dark)
-        .sheet(item: $sheet) { sheet in
+        .sheet(item: $sheet, onDismiss: prepareDraft) { sheet in
             sheetContent(for: sheet)
         }
         .task {
@@ -86,10 +100,14 @@ public struct MainView: View {
         .task {
             await records.observe()
         }
+        .task {
+            await draft.load()
+        }
         .onReceive(
             NotificationCenter.default.publisher(for: .NSCalendarDayChanged)
         ) { _ in
             home.today = LocalDate(Date(), in: .current)
+            prepareDraft()
         }
     }
 }
@@ -99,12 +117,7 @@ private extension MainView {
     func sheetContent(for sheet: Sheet) -> some View {
         switch sheet {
         case .new:
-            EntrySheet(
-                model: EntryModel(
-                    database: database,
-                    date: home.today
-                )
-            )
+            EntrySheet(model: draft)
         case let .edit(id):
             EntrySheet(
                 model: EntryModel(
@@ -147,6 +160,30 @@ private extension MainView {
         .init("振り返り", systemImage: "chart.pie", value: .review),
         .init("資産", systemImage: "building.columns", value: .assets)
     ]
+}
+
+private extension MainView {
+    var entryWarmup: some View {
+        EntrySheet(model: draft)
+            .opacity(0)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+            .task {
+                try? await Task.sleep(for: .milliseconds(500))
+                isWarmingEntry = false
+            }
+    }
+}
+
+private extension MainView {
+    func prepareDraft() {
+        let model = EntryModel(database: database, date: home.today)
+        draft = model
+
+        Task {
+            await model.load()
+        }
+    }
 }
 
 private extension View {

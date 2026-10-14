@@ -44,6 +44,10 @@ public extension EntryModel {
         editingId != nil
     }
 
+    var isLoaded: Bool {
+        options != nil
+    }
+
     var amount: Int {
         calculator.amount
     }

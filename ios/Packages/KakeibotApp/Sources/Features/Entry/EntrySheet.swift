@@ -7,7 +7,7 @@ public struct EntrySheet: View {
     @State private var model: EntryModel
     @State private var isEnteringAmount = false
     @State private var isEditingMemo = false
-    @State private var categoryPage = 0
+    @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
     @State private var memoChipFrame: CGRect = .zero
 
@@ -170,22 +170,28 @@ private extension EntrySheet {
 
     var categoryPager: some View {
         VStack(spacing: 8) {
-            TabView(selection: $categoryPage) {
-                ForEach(
-                    Array(model.categoryPages.enumerated()),
-                    id: \.offset
-                ) { index, page in
-                    categoryGrid(page)
-                        .tag(index)
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 0) {
+                    ForEach(
+                        Array(model.categoryPages.enumerated()),
+                        id: \.offset
+                    ) { index, page in
+                        categoryGrid(page)
+                            .containerRelativeFrame(.horizontal)
+                            .id(index)
+                    }
                 }
+                .scrollTargetLayout()
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            .scrollTargetBehavior(.paging)
+            .scrollPosition(id: $categoryPage)
+            .scrollIndicators(.hidden)
             .frame(minHeight: 168, maxHeight: 264)
 
             if model.categoryPages.count > 1 {
                 PageDots(
                     count: model.categoryPages.count,
-                    current: categoryPage
+                    current: categoryPage ?? 0
                 )
             }
         }
@@ -425,7 +431,10 @@ private extension EntrySheet {
     }
 
     func load() async {
-        await model.load()
+        if !model.isLoaded {
+            await model.load()
+        }
+
         let page = model.categoryPages.firstIndex { page in
             page.contains { $0.id == model.categoryId }
         }
