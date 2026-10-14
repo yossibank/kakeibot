@@ -158,7 +158,7 @@ private extension CategoryListView {
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("隠したカテゴリ（押すと戻せる）")
+            Text("隠したカテゴリ")
                 .font(.caption2)
                 .tracking(2)
                 .foregroundStyle(Palette.mist)

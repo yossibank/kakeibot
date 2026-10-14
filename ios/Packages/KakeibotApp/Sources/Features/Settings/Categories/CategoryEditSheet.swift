@@ -21,24 +21,24 @@ public struct CategoryEditSheet: View {
     }
 
     public var body: some View {
-        NavigationStack {
-            content
-                .toolbar(.hidden, for: .navigationBar)
-                .toolbar {
-                    ToolbarItemGroup(placement: .keyboard) {
-                        Spacer()
-
-                        Button("閉じる") {
-                            focus = nil
-                        }
-                        .foregroundStyle(Palette.gold)
-                    }
-                }
-        }
-        .preferredColorScheme(.dark)
-        .task {
-            await model.load()
-        }
+        content
+            .ignoresSafeArea(.keyboard)
+            .preferredColorScheme(.dark)
+            .onChange(of: model.markKind) {
+                focus = nil
+            }
+            .onChange(of: model.glyph) {
+                focus = nil
+            }
+            .onChange(of: model.emoji) {
+                focus = nil
+            }
+            .onChange(of: model.color) {
+                focus = nil
+            }
+            .task {
+                await model.load()
+            }
     }
 }
 
@@ -71,6 +71,10 @@ private extension CategoryEditSheet {
         .padding(.horizontal, 18)
         .padding(.top, 18)
         .padding(.bottom, 8)
+        .contentShape(.rect)
+        .onTapGesture {
+            focus = nil
+        }
         .background {
             Rectangle()
                 .fill(Palette.night)
@@ -142,23 +146,19 @@ private extension CategoryEditSheet {
     }
 
     var colors: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 6) {
-                ForEach(CategoryEditModel.colors, id: \.self) { hex in
-                    colorButton(hex)
-                }
-
-                ColorPicker(
-                    "ほかの色",
-                    selection: customColor,
-                    supportsOpacity: false
-                )
-                .labelsHidden()
-                .frame(width: 36, height: 36)
+        LazyVGrid(columns: Self.colorColumns, spacing: 4) {
+            ForEach(CategoryEditModel.colors, id: \.self) { hex in
+                colorButton(hex)
             }
-            .padding(.horizontal, 2)
+
+            ColorPicker(
+                "ほかの色",
+                selection: customColor,
+                supportsOpacity: false
+            )
+            .labelsHidden()
+            .frame(width: 30, height: 30)
         }
-        .scrollIndicators(.hidden)
     }
 
     @ViewBuilder
@@ -221,17 +221,21 @@ private extension CategoryEditSheet {
     }
 
     var hideButton: some View {
-        Button(model.isHidden ? "表示に戻す" : "このカテゴリを隠す") {
+        Button {
             Task {
                 await setHidden(!model.isHidden)
             }
-        }
-        .font(.subheadline)
-        .foregroundStyle(hideColor)
-        .frame(maxWidth: .infinity, minHeight: 46)
-        .overlay {
-            Capsule()
-                .stroke(Palette.mist.opacity(0.35), lineWidth: 1)
+        } label: {
+            Text(model.isHidden ? "表示に戻す" : "このカテゴリを隠す")
+                .font(.subheadline)
+                .foregroundStyle(hideColor)
+                .frame(maxWidth: .infinity, minHeight: 46)
+                .background(hideFill, in: Capsule())
+                .overlay {
+                    Capsule()
+                        .stroke(hideColor.opacity(0.6), lineWidth: 1)
+                }
+                .contentShape(Capsule())
         }
         .buttonStyle(.plain)
     }
@@ -267,8 +271,9 @@ private extension CategoryEditSheet {
         .background(Palette.drawer, in: .rect(cornerRadius: 14))
         .overlay {
             RoundedRectangle(cornerRadius: 14)
-                .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
+                .stroke(fieldStroke(for: field), lineWidth: 1)
         }
+        .animation(.snappy(duration: 0.2), value: focus)
     }
 
     func glyphButton(_ glyph: Icon.Glyph) -> some View {
@@ -340,7 +345,8 @@ private extension CategoryEditSheet {
                     Circle()
                         .stroke(ring, lineWidth: 1.5)
                 }
-                .frame(width: 36, height: 36)
+                .frame(width: 30, height: 30)
+                .frame(maxWidth: .infinity)
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -363,6 +369,11 @@ private extension CategoryEditSheet {
         .init("文字", value: .text)
     ]
 
+    static let colorColumns = Array(
+        repeating: GridItem(.flexible(), spacing: 2),
+        count: 11
+    )
+
     static let gridColumns = Array(
         repeating: GridItem(.flexible(), spacing: 6),
         count: 8
@@ -374,6 +385,14 @@ private extension CategoryEditSheet {
 
     var hideColor: Color {
         model.isHidden ? Palette.gold : Palette.mist
+    }
+
+    var hideFill: Color {
+        model.isHidden ? Palette.gold.opacity(0.1) : Color.clear
+    }
+
+    func fieldStroke(for field: Field) -> Color {
+        focus == field ? Palette.gold : Palette.gold.opacity(0.35)
     }
 
     var customColor: Binding<Color> {

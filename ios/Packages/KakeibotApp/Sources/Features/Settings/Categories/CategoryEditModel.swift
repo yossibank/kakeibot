@@ -73,55 +73,71 @@ public extension CategoryEditModel {
             title: "食べ物",
             emojis: [
                 "🍙", "🍣", "🍜", "🍛", "🍝", "🍔", "🍕", "🍞",
-                "🥗", "🍱", "🍰", "🍩", "🍎", "🥩", "🥚", "🍪"
+                "🥗", "🍱", "🍰", "🍩", "🍎", "🥩", "🥚", "🍪",
+                "🍤", "🍢", "🍡", "🥟", "🍳", "🧀", "🍇", "🍓",
+                "🍌", "🥐", "🍦", "🍫"
             ]
         ),
         EmojiSection(
             title: "飲み物",
             emojis: [
                 "☕️", "🍵", "🧋", "🥤", "🍺", "🍷", "🍶", "🍹",
-                "🥛", "🧃"
+                "🥛", "🧃", "🍸", "🥂", "🧉", "🫖"
             ]
         ),
         EmojiSection(
             title: "暮らし",
             emojis: [
                 "🏠", "🛒", "🧻", "🧴", "🧹", "🛁", "💡", "💧",
-                "🔥", "📦", "🧺", "🪴", "🛋️", "🔑"
+                "🔥", "📦", "🧺", "🪴", "🛋️", "🔑", "🧼", "🪥",
+                "🧽", "🪑", "🛏️", "🚿", "🔌", "📺"
             ]
         ),
         EmojiSection(
             title: "乗り物",
             emojis: [
                 "🚃", "🚌", "🚕", "🚗", "🚲", "✈️", "⛽️", "🚢",
-                "🛵", "🅿️"
+                "🛵", "🅿️", "🚄", "🚇", "🛻", "🛳️", "🚁", "🏍️"
             ]
         ),
         EmojiSection(
             title: "遊び",
             emojis: [
                 "🎮", "🎬", "🎤", "🎵", "🎨", "📚", "🎯", "🎳",
-                "⚽️", "⛳️", "🎢", "🎁", "🎉", "🏕️", "♨️", "📷"
+                "⚽️", "⛳️", "🎢", "🎁", "🎉", "🏕️", "♨️", "📷",
+                "🎸", "🎹", "🎲", "🧩", "🎟️", "🏀", "🎾", "🏊",
+                "🎿", "🎣", "🎪", "🏖️"
             ]
         ),
         EmojiSection(
             title: "からだ",
             emojis: [
                 "💊", "🏥", "🦷", "💇", "💄", "👕", "👟", "👜",
-                "💅", "🧖"
+                "💅", "🧖", "🩺", "🩹", "💉", "👓", "🕶️", "👗",
+                "👠", "🧢"
             ]
         ),
         EmojiSection(
             title: "人と動物",
             emojis: [
-                "👶", "🧒", "👪", "🐶", "🐱", "🐟", "🐦", "🌸"
+                "👶", "🧒", "👪", "🐶", "🐱", "🐟", "🐦", "🌸",
+                "👫", "👨‍👩‍👧", "🧸", "🐰", "🐹", "🐢", "🦜", "🌳",
+                "🌻"
             ]
         ),
         EmojiSection(
             title: "お金",
             emojis: [
                 "💰", "💴", "💳", "🏦", "📈", "🧾", "💼", "🏢",
-                "🎫", "✉️", "📱", "💻"
+                "🎫", "✉️", "📱", "💻", "💵", "🪙", "📉", "🏧",
+                "📝", "📮", "🧧", "💎"
+            ]
+        ),
+        EmojiSection(
+            title: "季節と記号",
+            emojis: [
+                "🎂", "🎄", "🎍", "🌙", "☀️", "⭐️", "❤️", "✨",
+                "🔔", "📅", "🎀", "🏆"
             ]
         )
     ]
@@ -130,8 +146,9 @@ public extension CategoryEditModel {
         GlyphSection(
             title: "食べる",
             glyphs: [
-                .food, .cafe, .drink, .cake, .snack, .grocery, .fish,
-                .cooking, .takeout, .bottle, .social
+                .food, .cafe, .drink, .cake, .snack, .grocery, .fish, .cooking,
+                .takeout, .bottle, .social, .dining, .hotdrink, .oven,
+                .microwave, .stove
             ]
         ),
         GlyphSection(
@@ -140,13 +157,15 @@ public extension CategoryEditModel {
                 .daily, .cart, .bag, .store, .delivery, .home, .bed, .sofa,
                 .bath, .toilet, .laundry, .cleaning, .trash, .fridge, .lamp,
                 .light, .utility, .water, .gas, .key, .lock, .tools, .repair,
-                .battery
+                .battery, .dishwasher, .aircon, .fan, .heater, .faucet, .plug,
+                .door, .chair, .floorlamp, .pipe, .apartment, .bathtub
             ]
         ),
         GlyphSection(
             title: "機械",
             glyphs: [
-                .phone, .wifi, .laptop, .computer, .tv, .audio, .printer
+                .phone, .wifi, .laptop, .computer, .tv, .audio, .printer,
+                .display, .keyboard, .video, .antenna, .media
             ]
         ),
         GlyphSection(
@@ -154,29 +173,34 @@ public extension CategoryEditModel {
             glyphs: [
                 .transit, .train, .bus, .car, .ev, .bicycle, .scooter,
                 .motorcycle, .airplane, .ferry, .boat, .fuel, .parking,
-                .highway, .walk, .map, .travel
+                .highway, .walk, .map, .travel, .carpool, .truck, .ropeway,
+                .subway, .signpost, .charger, .luggage, .flight
             ]
         ),
         GlyphSection(
             title: "楽しむ",
             glyphs: [
                 .hobby, .movie, .music, .karaoke, .guitar, .ticket, .party,
-                .balloon, .camera, .photo, .paint, .art, .theater, .book,
-                .news, .magazine, .puzzle, .dice, .star, .trophy
+                .balloon, .camera, .photo, .paint, .art, .theater, .book, .news,
+                .magazine, .puzzle, .dice, .star, .trophy, .notes, .piano,
+                .books, .fireworks, .dance, .crown, .laurel, .giftbox
             ]
         ),
         GlyphSection(
             title: "運動と外出",
             glyphs: [
                 .sports, .fitness, .yoga, .swim, .soccer, .baseball, .tennis,
-                .beach, .mountain, .tent, .binoculars
+                .beach, .mountain, .tent, .binoculars, .court, .ski, .hiking,
+                .golf, .fishing, .basketball, .football, .volleyball,
+                .skateboard, .surfing, .race, .medal, .training
             ]
         ),
         GlyphSection(
             title: "からだ",
             glyphs: [
                 .beauty, .haircut, .comb, .glasses, .clothes, .hanger, .shoe,
-                .handbag, .medical, .pill, .syringe, .bandage, .mask, .health
+                .handbag, .medical, .pill, .syringe, .bandage, .mask, .health,
+                .hospital, .checkup, .drip, .hearing, .eye, .sunglasses
             ]
         ),
         GlyphSection(
@@ -184,23 +208,27 @@ public extension CategoryEditModel {
             glyphs: [
                 .baby, .toy, .family, .parent, .friends, .person, .pet, .dog,
                 .cat, .bird, .rabbit, .tortoise, .school, .plant, .tree,
-                .flower
+                .flower, .couple, .group, .backpack, .pencil, .stationery,
+                .desk, .lizard, .insect, .ladybug
             ]
         ),
         GlyphSection(
             title: "お金",
             glyphs: [
-                .salary, .bonus, .cash, .bank, .card, .banknote, .coin,
-                .invest, .budget, .stats, .discount, .insurance, .tax,
-                .contract, .subscription, .work, .office, .goal, .target
+                .salary, .bonus, .cash, .bank, .card, .banknote, .coin, .invest,
+                .budget, .stats, .discount, .insurance, .tax, .contract,
+                .subscription, .work, .office, .goal, .target, .loss,
+                .walletPass, .barcode, .qrcode, .donation, .security, .document,
+                .clipboard, .tag
             ]
         ),
         GlyphSection(
             title: "ほか",
             glyphs: [
                 .mail, .calendar, .clock, .hourglass, .bell, .bookmark, .clip,
-                .sun, .moon, .rain, .snow, .umbrella, .globe, .question,
-                .other
+                .sun, .moon, .rain, .snow, .umbrella, .globe, .question, .other,
+                .cloud, .temperature, .wind, .sparkle, .like, .smile, .infinity,
+                .number
             ]
         )
     ]
