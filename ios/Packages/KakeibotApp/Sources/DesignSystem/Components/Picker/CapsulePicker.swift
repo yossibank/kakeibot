@@ -20,7 +20,12 @@ public struct CapsulePicker<Value: Hashable>: View {
     public var body: some View {
         ZStack(alignment: .leading) {
             Capsule()
-                .fill(Palette.gold)
+                .fill(Self.thumbFill)
+                .overlay {
+                    Capsule()
+                        .strokeBorder(Self.thumbRim, lineWidth: 0.8)
+                }
+                .shadow(color: Palette.gold.opacity(0.35), radius: 6)
                 .frame(width: Self.segmentWidth, height: Self.segmentHeight)
                 .offset(x: thumbX)
 
@@ -31,9 +36,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                 ) { index, option in
                     let isHighlighted = index == highlightedIndex
                     let weight: Font.Weight = isHighlighted ? .bold : .regular
-                    let color = isHighlighted
-                        ? Palette.nightBottom
-                        : Palette.mist
+                    let color = isHighlighted ? Palette.champagne : Palette.mist
 
                     Text(option.title)
                         .font(.footnote.weight(weight))
@@ -47,8 +50,15 @@ public struct CapsulePicker<Value: Hashable>: View {
         }
         .padding(Self.inset)
         .fixedSize()
-        .background(Palette.gold.opacity(0.08), in: Capsule())
-        .overlay(Capsule().stroke(Palette.gold.opacity(0.3), lineWidth: 1))
+        .background {
+            Capsule()
+                .fill(Self.sheen)
+        }
+        .overlay {
+            Capsule()
+                .strokeBorder(Self.rim, lineWidth: 1)
+        }
+        .glass(tint: nil, in: Capsule())
         .contentShape(Capsule())
         .gesture(dragGesture)
         .onAppear {
@@ -87,6 +97,38 @@ private extension CapsulePicker {
 
     static var inset: CGFloat {
         3
+    }
+
+    static var thumbFill: LinearGradient {
+        LinearGradient(
+            colors: [Palette.gold.opacity(0.42), Palette.gold.opacity(0.16)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    static var thumbRim: LinearGradient {
+        LinearGradient(
+            colors: [Palette.champagne.opacity(0.9), Palette.gold.opacity(0.3)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    static var sheen: LinearGradient {
+        LinearGradient(
+            colors: [.white.opacity(0.12), .white.opacity(0)],
+            startPoint: .top,
+            endPoint: .center
+        )
+    }
+
+    static var rim: LinearGradient {
+        LinearGradient(
+            colors: [Palette.gold.opacity(0.7), Palette.gold.opacity(0.2)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 
     static var spring: Animation {
