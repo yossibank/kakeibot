@@ -62,3 +62,13 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | --- | --- | --- |
 | `export-v1.json` | 読み込んで書き出すと同じ JSON になる。DB に入れて読み出しても同じになる | 書き出しの JSON そのもの |
 | `export-v1-header.json` | 読み込める `format` と `version` の判定 | `valid`、`invalid`（`format` と `version` のオブジェクト） |
+
+## wallet
+
+`spec/fixtures/wallet` のファイルは、次の表のとおりである。
+
+| ファイル | 試すこと | 項目 |
+| --- | --- | --- |
+| `wallet-balance.json` | 1 つの財布の、ある日までの残高 | `initialBalance`、`entries`（`type`・`amount`・`date`・`wallet`・`toWallet`）、`through`（空ならすべて）、`balance` |
+
+`wallet` と `toWallet` は、`self`（残高を出す財布）か `other`（ほかの財布）で書く。残高は、最初の残高に、収入と振替で入った額を足し、支出と振替で出した額を引く。
