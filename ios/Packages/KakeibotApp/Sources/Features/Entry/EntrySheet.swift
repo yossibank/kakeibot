@@ -175,7 +175,7 @@ private extension EntrySheet {
             }
         }
         .buttonStyle(.plain)
-        .frame(minHeight: 150, maxHeight: 270)
+        .frame(minHeight: 100, maxHeight: 270)
     }
 
     var details: some View {
@@ -353,7 +353,7 @@ private extension EntrySheet {
                 .foregroundStyle(Palette.mist)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-                .frame(width: size * 0.66)
+                .frame(width: size * 0.6)
                 .offset(y: size * 0.19)
         }
         .frame(width: size, height: size)

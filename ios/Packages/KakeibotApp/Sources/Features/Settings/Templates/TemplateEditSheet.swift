@@ -112,18 +112,22 @@ private extension TemplateEditSheet {
             Color.clear
                 .frame(height: 44)
 
-            preview
+            ScrollView {
+                VStack(spacing: 16) {
+                    preview
 
-            VStack(alignment: .leading, spacing: 8) {
-                rows
+                    VStack(alignment: .leading, spacing: 8) {
+                        rows
 
-                Text("金額を空にすると、使うときに入れる")
-                    .font(.caption2)
-                    .foregroundStyle(Palette.mist)
-                    .padding(.leading, 6)
+                        Text("金額を空にすると、使うときに入れる")
+                            .font(.caption2)
+                            .foregroundStyle(Palette.mist)
+                            .padding(.leading, 6)
+                    }
+                }
             }
-
-            Spacer(minLength: 0)
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.hidden)
 
             if model.isEditing {
                 deleteButton
@@ -149,6 +153,8 @@ private extension TemplateEditSheet {
                 .font(.system(size: 16, design: .serif))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
 
             Spacer()
 

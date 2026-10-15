@@ -21,7 +21,7 @@ public struct RootView: View {
                 }
             }
             .task {
-                model.open()
+                await model.open()
             }
             .onChange(of: scenePhase) { _, phase in
                 model.changeScene(to: phase)

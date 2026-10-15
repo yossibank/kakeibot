@@ -5,10 +5,10 @@ import Testing
 @MainActor
 struct AppModelTests {
     @Test
-    func opensDatabase() {
+    func opensDatabase() async {
         let model = AppModel(openDatabase: AppDatabase.inMemory)
 
-        model.open()
+        await model.open()
 
         guard case .ready = model.launch else {
             Issue.record("Expected ready, got \(model.launch)")
@@ -17,12 +17,12 @@ struct AppModelTests {
     }
 
     @Test
-    func reportsFailureToOpen() {
+    func reportsFailureToOpen() async {
         let model = AppModel {
             throw AppDatabase.SetupError.appGroupUnavailable
         }
 
-        model.open()
+        await model.open()
 
         guard case .failed = model.launch else {
             Issue.record("Expected failed, got \(model.launch)")

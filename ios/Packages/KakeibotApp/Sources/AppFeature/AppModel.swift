@@ -7,9 +7,9 @@ import SwiftUI
 final class AppModel {
     private(set) var launch: Launch = .opening
 
-    private let openDatabase: () throws -> AppDatabase
+    private let openDatabase: @Sendable () throws -> AppDatabase
 
-    init(openDatabase: @escaping () throws -> AppDatabase) {
+    init(openDatabase: @escaping @Sendable () throws -> AppDatabase) {
         self.openDatabase = openDatabase
     }
 }
@@ -29,13 +29,19 @@ extension AppModel {
         }
     }
 
-    func open() {
+    func open() async {
         guard case .opening = launch else {
             return
         }
 
+        let openDatabase = openDatabase
+
         do {
-            let database = try openDatabase()
+            let database = try await Task.detached {
+                try openDatabase()
+            }
+            .value
+
             launch = .ready(database)
         } catch {
             launch = .failed(String(describing: error))
