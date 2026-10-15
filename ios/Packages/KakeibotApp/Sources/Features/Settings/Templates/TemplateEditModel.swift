@@ -15,6 +15,7 @@ public final class TemplateEditModel {
     public private(set) var calculator: AmountCalculator
     public private(set) var options: EntryOptions?
     public private(set) var errorMessage: String?
+    public private(set) var errorCount = 0
 
     private var baseline: Snapshot?
 
@@ -138,13 +139,13 @@ public extension TemplateEditModel {
         } catch is CancellationError {
             return
         } catch {
-            errorMessage = Self.loadFailedMessage
+            report(Self.loadFailedMessage)
         }
     }
 
     func save() async -> EntryTemplate? {
         if let problem = draft.problems.first {
-            errorMessage = message(for: problem)
+            report(message(for: problem))
             return nil
         }
 
@@ -155,7 +156,7 @@ public extension TemplateEditModel {
                 at: Date()
             )
         } catch {
-            errorMessage = Self.saveFailedMessage
+            report(Self.saveFailedMessage)
             return nil
         }
     }
@@ -169,7 +170,7 @@ public extension TemplateEditModel {
             try await database.deleteTemplate(editingId)
             return true
         } catch {
-            errorMessage = Self.saveFailedMessage
+            report(Self.saveFailedMessage)
             return false
         }
     }
@@ -185,6 +186,11 @@ private extension TemplateEditModel {
 
     var snapshot: Snapshot {
         Snapshot(draft: draft)
+    }
+
+    func report(_ message: String) {
+        errorMessage = message
+        errorCount += 1
     }
 
     func message(for problem: EntryTemplateDraft.Problem) -> String {

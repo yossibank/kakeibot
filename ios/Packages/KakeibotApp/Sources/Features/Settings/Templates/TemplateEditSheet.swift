@@ -7,7 +7,6 @@ public struct TemplateEditSheet: View {
     @State private var model: TemplateEditModel
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
-    @State private var errorCount = 0
 
     @FocusState private var focus: Field?
 
@@ -66,7 +65,7 @@ public struct TemplateEditSheet: View {
                 }
             }
             .animation(.snappy, value: model.errorMessage)
-            .sensoryFeedback(.error, trigger: errorCount)
+            .sensoryFeedback(.error, trigger: model.errorCount)
             .background {
                 Rectangle()
                     .fill(Palette.night)
@@ -92,8 +91,8 @@ public struct TemplateEditSheet: View {
             .task {
                 await model.load()
             }
-            .task(id: errorCount) {
-                guard errorCount > 0 else {
+            .task(id: model.errorCount) {
+                guard model.errorCount > 0 else {
                     return
                 }
 
@@ -114,14 +113,15 @@ private extension TemplateEditSheet {
                 .frame(height: 44)
 
             preview
-            rows
 
-            Text("金額を空にすると、使うときに入れる")
-                .font(.caption2)
-                .foregroundStyle(Palette.mist)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 6)
-                .padding(.top, -8)
+            VStack(alignment: .leading, spacing: 8) {
+                rows
+
+                Text("金額を空にすると、使うときに入れる")
+                    .font(.caption2)
+                    .foregroundStyle(Palette.mist)
+                    .padding(.leading, 6)
+            }
 
             Spacer(minLength: 0)
 
@@ -340,7 +340,6 @@ private extension TemplateEditSheet {
         }
         .shadow(color: .black.opacity(0.45), radius: 20, y: 10)
         .task {
-            try? await Task.sleep(for: .milliseconds(250))
             focus = .memo
         }
     }
@@ -700,10 +699,8 @@ private extension TemplateEditSheet {
 
     func save() async {
         closePanel()
-        try? await Task.sleep(for: .milliseconds(80))
 
         guard let template = await model.save() else {
-            errorCount += 1
             return
         }
 
@@ -714,8 +711,6 @@ private extension TemplateEditSheet {
     func delete() async {
         if await model.delete() {
             dismiss()
-        } else {
-            errorCount += 1
         }
     }
 }

@@ -237,7 +237,6 @@ private extension HomeView {
                 detail: model.detail(for: template),
                 amount: template.amount
             )
-            .contentShape(.rect)
         }
         .buttonStyle(.plain)
     }

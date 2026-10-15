@@ -138,7 +138,6 @@ private extension TemplateListView {
             amount: template.amount
         )
         .frame(width: tileWidth)
-        .contentShape(.rect)
         .scaleEffect(scale)
         .shadow(color: shadow, radius: 16, y: 8)
         .position(position)

@@ -65,7 +65,7 @@ public struct NoticeBanner: View {
         .background {
             ZStack {
                 Capsule()
-                    .fill(Palette.drawer.opacity(0.92))
+                    .fill(Palette.drawer)
 
                 Capsule()
                     .fill(Self.sheen)
@@ -75,7 +75,6 @@ public struct NoticeBanner: View {
             Capsule()
                 .strokeBorder(rim, lineWidth: 0.8)
         }
-        .glass(tint: Palette.nightBottom.opacity(0.7), in: Capsule())
         .shadow(color: .black.opacity(0.5), radius: 20, y: 10)
     }
 }
