@@ -16,6 +16,7 @@ public struct EntrySheet: View {
 
     @AppStorage("entry.hasOpenedCategoryMenu") private var hasOpenedMenu = false
     @State private var sheetWidth: CGFloat = 0
+    @State private var drawerHeight: CGFloat = 0
 
     @FocusState private var isMemoFocused: Bool
 
@@ -49,6 +50,31 @@ public struct EntrySheet: View {
         ) { _, menu in
             menu != nil
         }
+        .overlay(alignment: .bottom) {
+            if let errorMessage = model.errorMessage {
+                NoticeBanner(
+                    errorMessage,
+                    systemImage: "exclamationmark",
+                    tone: .error
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, bannerBottom)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .animation(.snappy, value: model.errorMessage)
+        .sensoryFeedback(.error, trigger: model.errorCount)
+        .task(id: model.errorCount) {
+            guard model.errorCount > 0 else {
+                return
+            }
+
+            guard await (try? Task.sleep(for: .seconds(3))) != nil else {
+                return
+            }
+
+            model.clearError()
+        }
         .ignoresSafeArea(.keyboard)
         .background {
             Rectangle()
@@ -79,12 +105,6 @@ private extension EntrySheet {
             details
             templateRow
             categoryPager
-
-            if let errorMessage = model.errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(Palette.rose)
-            }
 
             PrimaryButton(model.saveTitle) {
                 Task {
@@ -259,6 +279,11 @@ private extension EntrySheet {
                         .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
+        }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.height
+        } action: { height in
+            drawerHeight = height
         }
     }
 
@@ -615,6 +640,10 @@ private extension EntrySheet {
 
     static var memoTransition: AnyTransition {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
+    }
+
+    var bannerBottom: CGFloat {
+        isEnteringAmount ? drawerHeight + 10 : 12
     }
 
     var today: LocalDate {

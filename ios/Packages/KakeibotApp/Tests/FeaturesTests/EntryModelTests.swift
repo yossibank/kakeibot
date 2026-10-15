@@ -181,6 +181,22 @@ struct EntryModelTests {
     }
 
     @Test
+    func ignoresCancelledLoad() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+
+        let task = Task {
+            await model.load()
+        }
+
+        task.cancel()
+        await task.value
+
+        #expect(model.errorMessage == nil)
+        #expect(model.errorCount == 0)
+    }
+
+    @Test
     func hidesSelectedCategoryAndSelectsNext() async throws {
         let model = try await Self.newModel()
         let food = try #require(model.selectedCategory)

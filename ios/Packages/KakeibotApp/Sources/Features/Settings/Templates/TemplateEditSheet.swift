@@ -65,7 +65,6 @@ public struct TemplateEditSheet: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .ignoresSafeArea(.keyboard)
         .animation(.snappy, value: model.errorMessage)
         .sensoryFeedback(.error, trigger: errorCount)
         .background {
@@ -104,6 +103,7 @@ public struct TemplateEditSheet: View {
 
             model.clearError()
         }
+        .ignoresSafeArea(.keyboard)
     }
 }
 

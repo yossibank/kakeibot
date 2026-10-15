@@ -135,6 +135,8 @@ public extension TemplateEditModel {
             }
 
             baseline = snapshot
+        } catch is CancellationError {
+            return
         } catch {
             errorMessage = Self.loadFailedMessage
         }

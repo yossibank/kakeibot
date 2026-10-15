@@ -17,6 +17,7 @@ public final class EntryModel {
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
     public private(set) var errorMessage: String?
+    public private(set) var errorCount = 0
 
     private var baseline: Snapshot?
     private var allTemplates: [EntryTemplate] = []
@@ -195,7 +196,7 @@ public extension EntryModel {
 
             baseline = snapshot
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
         }
     }
 
@@ -223,7 +224,7 @@ public extension EntryModel {
         do {
             allTemplates = try await database.templates()
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
         }
     }
 
@@ -265,7 +266,7 @@ public extension EntryModel {
                 categoryId = categories.first?.id
             }
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
         }
     }
 
@@ -279,8 +280,12 @@ public extension EntryModel {
 
             await reloadCategories()
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
         }
+    }
+
+    func clearError() {
+        errorMessage = nil
     }
 
     func press(_ key: AmountCalculator.Key) {
@@ -313,7 +318,7 @@ public extension EntryModel {
             try await database.saveEntry(draft, editing: editingId, at: Date())
             return true
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
             return false
         }
     }
@@ -327,7 +332,7 @@ public extension EntryModel {
             try await database.deleteEntry(editingId)
             return true
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
             return false
         }
     }
@@ -374,6 +379,15 @@ private extension EntryModel {
             walletId: walletId,
             memo: memo
         )
+    }
+
+    func report(_ error: any Error) {
+        guard !(error is CancellationError) else {
+            return
+        }
+
+        errorMessage = Self.message(for: error)
+        errorCount += 1
     }
 
     static func message(for error: any Error) -> String {
