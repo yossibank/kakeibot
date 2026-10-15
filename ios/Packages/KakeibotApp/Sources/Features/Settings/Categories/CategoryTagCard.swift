@@ -22,10 +22,7 @@ struct CategoryTagCard: View {
 
                 Spacer()
 
-                Button("やめる", action: onClose)
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.mist)
-                    .frame(minWidth: 44, minHeight: 32)
+                RingButton(systemImage: "xmark", action: onClose)
             }
 
             preview

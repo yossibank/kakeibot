@@ -101,35 +101,19 @@ public struct EntrySheet: View {
 
 private extension EntrySheet {
     var content: some View {
-        ViewThatFits(in: .vertical) {
-            form
-
-            ScrollView {
-                form
-            }
-            .scrollIndicators(.hidden)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .bottom) {
-            if isEnteringAmount {
-                keypadDrawer
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
-    }
-
-    var form: some View {
         VStack(spacing: 14) {
             header
-            dial
-            details
-            templateRow
-            categoryPager
 
-            TagLine(tagItems, selection: model.tagId) { id in
-                model.toggleTag(id)
-            } onAdd: {
-                editTags()
+            ViewThatFits(in: .vertical) {
+                form
+
+                ScrollView {
+                    form
+                        .padding(.vertical, Self.fade)
+                }
+                .scrollIndicators(.hidden)
+                .edgeFade(Self.fade)
+                .padding(.vertical, -Self.fade)
             }
 
             PrimaryButton(model.saveTitle) {
@@ -145,6 +129,28 @@ private extension EntrySheet {
         .contentShape(.rect)
         .onTapGesture {
             setEnteringAmount(false)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(alignment: .bottom) {
+            if isEnteringAmount {
+                keypadDrawer
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+    }
+
+    var form: some View {
+        VStack(spacing: 14) {
+            dial
+            details
+            templateRow
+            categoryPager
+
+            TagLine(tagItems, selection: model.tagId) { id in
+                model.toggleTag(id)
+            } onAdd: {
+                editTags()
+            }
         }
     }
 
@@ -186,7 +192,7 @@ private extension EntrySheet {
             }
         }
         .buttonStyle(.plain)
-        .frame(minHeight: 150, maxHeight: 270)
+        .frame(minHeight: Self.dialMinSize, maxHeight: 270)
     }
 
     var details: some View {
@@ -650,6 +656,8 @@ private extension EntrySheet {
         topLeadingRadius: 28,
         topTrailingRadius: 28
     )
+    static let dialMinSize: CGFloat = 240
+    static let fade: CGFloat = 20
     static let categoryRows = 3
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 5

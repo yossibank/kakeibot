@@ -13,7 +13,7 @@ public final class CategoryEditModel {
 
     public private(set) var emoji = ""
     public private(set) var text = ""
-    public private(set) var tags: [EntryTagDraft] = []
+    public private(set) var tags: [EditingTag] = []
     public private(set) var isHidden = false
     public private(set) var errorMessage: String?
 
@@ -40,6 +40,23 @@ public extension CategoryEditModel {
         case glyph
         case emoji
         case text
+    }
+
+    struct EditingTag: Identifiable, Hashable, Sendable {
+        public let id: UUID
+        public var draft: EntryTagDraft
+
+        init(
+            id: UUID,
+            draft: EntryTagDraft
+        ) {
+            self.id = id
+            self.draft = draft
+        }
+
+        init(_ tag: EntryTag) {
+            self.init(id: UUID(), draft: EntryTagDraft(tag))
+        }
     }
 
     struct GlyphSection: Identifiable {
@@ -275,45 +292,59 @@ public extension CategoryEditModel {
     }
 
     func addTag(_ name: String) -> Bool {
-        let tag = EntryTagDraft(name: name)
+        let draft = EntryTagDraft(name: name)
 
-        guard check(tag) else {
+        guard check(draft) else {
             return false
         }
 
-        tags.append(tag)
+        tags.append(EditingTag(id: UUID(), draft: draft))
         return true
     }
 
     func renameTag(
-        at index: Int,
+        _ id: UUID,
         to name: String
     ) -> Bool {
-        guard tags.indices.contains(index) else {
+        guard let index = tags.firstIndex(where: { $0.id == id }) else {
             return false
         }
 
-        var tag = tags[index]
-        tag.name = name
+        var draft = tags[index].draft
+        draft.name = name
 
-        guard check(tag) else {
+        guard check(draft) else {
             return false
         }
 
-        tags[index] = tag
+        tags[index].draft = draft
         return true
+    }
+
+    func moveTag(
+        _ id: UUID,
+        to index: Int
+    ) {
+        guard let from = tags.firstIndex(where: { $0.id == id }) else {
+            return
+        }
+
+        let to = min(max(index, 0), tags.count - 1)
+
+        guard from != to else {
+            return
+        }
+
+        let tag = tags.remove(at: from)
+        tags.insert(tag, at: to)
+    }
+
+    func removeTag(_ id: UUID) {
+        tags.removeAll { $0.id == id }
     }
 
     func clearError() {
         errorMessage = nil
-    }
-
-    func removeTag(at index: Int) {
-        guard tags.indices.contains(index) else {
-            return
-        }
-
-        tags.remove(at: index)
     }
 
     func load() async {
@@ -332,7 +363,7 @@ public extension CategoryEditModel {
 
             apply(CategoryDraft(category, icon: icon))
             let tags = list.tags.filter { $0.categoryId == editingId }
-            self.tags = tags.map(EntryTagDraft.init)
+            self.tags = tags.map(EditingTag.init)
             isHidden = category.archivedAt != nil
             baseline = snapshot
         } catch {
@@ -344,7 +375,7 @@ public extension CategoryEditModel {
         do {
             return try await database.saveCategory(
                 draft,
-                tags: tags,
+                tags: tags.map(\.draft),
                 editing: editingId,
                 at: Date()
             )
@@ -407,7 +438,7 @@ private extension CategoryEditModel {
             emoji: emoji,
             text: text,
             color: color,
-            tags: tags
+            tags: tags.map(\.draft)
         )
     }
 

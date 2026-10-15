@@ -7,6 +7,7 @@ public struct CategoryEditSheet: View {
     @State private var model: CategoryEditModel
     @State private var isConfirmingDiscard = false
     @State private var tagEdit: TagEdit?
+    @State private var isMovingTag = false
     @State private var tagName = ""
 
     @FocusState private var focus: Field?
@@ -70,18 +71,29 @@ private extension CategoryEditSheet {
     var content: some View {
         VStack(spacing: 16) {
             header
-            preview
-            field("名前", text: $model.name, font: .body, focus: .name)
-            tags
-            colors
-            CapsulePicker(selection: $model.markKind, options: Self.markOptions)
 
             ScrollView {
-                markChooser
-                    .padding(.bottom, 8)
+                VStack(spacing: 16) {
+                    preview
+                    field("名前", text: $model.name, font: .body, focus: .name)
+                    tags
+                    colors
+
+                    CapsulePicker(
+                        selection: $model.markKind,
+                        options: Self.markOptions
+                    )
+
+                    markChooser
+                        .padding(.bottom, 8)
+                }
+                .padding(.vertical, Self.fade)
             }
             .scrollIndicators(.hidden)
+            .edgeFade(Self.fade)
+            .padding(.vertical, -Self.fade)
             .scrollDismissesKeyboard(.interactively)
+            .scrollDisabled(isMovingTag)
 
             if let errorMessage = model.errorMessage {
                 Text(errorMessage)
@@ -170,12 +182,27 @@ private extension CategoryEditSheet {
 
     var tags: some View {
         VStack(alignment: .leading, spacing: 2) {
-            sectionTitle("タグ")
+            HStack {
+                sectionTitle("タグ")
 
-            TagLine(tagItems, selection: nil) { index in
-                editTag(at: index)
+                Spacer()
+
+                if model.tags.count > 1 {
+                    Text("長押しで並べ替え")
+                        .font(.caption2)
+                        .foregroundStyle(Palette.mist)
+                }
+            }
+
+            TagLine(tagItems, selection: nil) { id in
+                editTag(id)
             } onAdd: {
                 addTag()
+            } onMove: { id, index in
+                model.moveTag(id, to: index)
+            }
+            .onPreferenceChange(TagLineMovingKey.self) { isMoving in
+                isMovingTag = isMoving
             }
         }
     }
@@ -419,10 +446,12 @@ private extension CategoryEditSheet {
 
     enum TagEdit: Hashable {
         case add
-        case rename(Int)
+        case rename(UUID)
     }
 
     typealias MarkOption = CapsulePicker<CategoryEditModel.MarkKind>.Option
+
+    static let fade: CGFloat = 16
 
     static let markOptions: [MarkOption] = [
         .init("絵柄", value: .glyph),
@@ -440,10 +469,8 @@ private extension CategoryEditSheet {
         count: 8
     )
 
-    var tagItems: [TagLine<Int>.Item] {
-        model.tags.enumerated().map { index, tag in
-            TagLine.Item(id: index, name: tag.name)
-        }
+    var tagItems: [TagLine<UUID>.Item] {
+        model.tags.map { TagLine.Item(id: $0.id, name: $0.draft.name) }
     }
 
     static var tagTransition: AnyTransition {
@@ -451,12 +478,12 @@ private extension CategoryEditSheet {
     }
 
     func deleteAction(for edit: TagEdit) -> (() -> Void)? {
-        guard case let .rename(index) = edit else {
+        guard case let .rename(id) = edit else {
             return nil
         }
 
         return {
-            model.removeTag(at: index)
+            model.removeTag(id)
             closeTag()
         }
     }
@@ -511,8 +538,9 @@ private extension CategoryEditSheet {
         showTag(.add, name: "")
     }
 
-    func editTag(at index: Int) {
-        showTag(.rename(index), name: model.tags[index].name)
+    func editTag(_ id: UUID) {
+        let name = model.tags.first { $0.id == id }?.draft.name ?? ""
+        showTag(.rename(id), name: name)
     }
 
     func showTag(
@@ -539,7 +567,7 @@ private extension CategoryEditSheet {
     func commitTag() {
         let isDone = switch tagEdit {
         case .add: model.addTag(tagName)
-        case let .rename(index): model.renameTag(at: index, to: tagName)
+        case let .rename(id): model.renameTag(id, to: tagName)
         case nil: true
         }
 

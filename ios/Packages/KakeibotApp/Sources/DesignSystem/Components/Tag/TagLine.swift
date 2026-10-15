@@ -1,21 +1,28 @@
 import SwiftUI
 
 public struct TagLine<ID: Hashable>: View {
+    @State private var lift: Lift?
+    @State private var frames: [ID: CGRect] = [:]
+    @State private var liftCount = 0
+
     let tags: [Item]
     let selection: ID?
     let onSelect: (ID) -> Void
     let onAdd: (() -> Void)?
+    let onMove: ((ID, Int) -> Void)?
 
     public init(
         _ tags: [Item],
         selection: ID?,
         onSelect: @escaping (ID) -> Void,
-        onAdd: (() -> Void)? = nil
+        onAdd: (() -> Void)? = nil,
+        onMove: ((ID, Int) -> Void)? = nil
     ) {
         self.tags = tags
         self.selection = selection
         self.onSelect = onSelect
         self.onAdd = onAdd
+        self.onMove = onMove
     }
 
     public var body: some View {
@@ -23,7 +30,7 @@ public struct TagLine<ID: Hashable>: View {
             HStack(spacing: 0) {
                 ForEach(
                     Array(cards.enumerated()),
-                    id: \.offset
+                    id: \.element.id
                 ) { index, card in
                     if index > 0 {
                         Spacer(minLength: Self.spacing)
@@ -38,7 +45,7 @@ public struct TagLine<ID: Hashable>: View {
                 HStack(spacing: Self.spacing) {
                     ForEach(
                         Array(cards.enumerated()),
-                        id: \.offset
+                        id: \.element.id
                     ) { index, card in
                         hanging(card, at: index)
                     }
@@ -47,14 +54,18 @@ public struct TagLine<ID: Hashable>: View {
                 .padding(.bottom, Self.inset)
             }
             .scrollIndicators(.hidden)
+            .scrollDisabled(lift != nil)
         }
+        .coordinateSpace(.named(Self.space))
         .frame(height: Self.height, alignment: .top)
         .background(alignment: .top) {
             TagString()
                 .stroke(Palette.gold.opacity(0.55), lineWidth: 0.8)
                 .frame(height: Self.sag)
         }
+        .preference(key: TagLineMovingKey.self, value: lift != nil)
         .sensoryFeedback(.selection, trigger: selection)
+        .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .animation(.spring(duration: 0.35, bounce: 0.4), value: selection)
     }
 }
@@ -74,10 +85,92 @@ public extension TagLine {
     }
 }
 
+public struct TagLineMovingKey: PreferenceKey {
+    public static let defaultValue = false
+
+    public static func reduce(
+        value: inout Bool,
+        nextValue: () -> Bool
+    ) {
+        value = value || nextValue()
+    }
+}
+
 private extension TagLine {
-    enum Card {
+    func hanging(
+        _ card: Card,
+        at index: Int
+    ) -> some View {
+        let isLifted = card.tagId != nil && card.tagId == lift?.id
+        let isStraight = isSelected(card) || isLifted
+        let tilt = isStraight ? 0 : Self.tilts[index % Self.tilts.count]
+        let scale: CGFloat = isLifted ? 1.12 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+
+        return ZStack {
+            VStack(spacing: 0) {
+                Rectangle()
+                    .fill(Palette.gold.opacity(0.55))
+                    .frame(width: 0.8, height: drop(at: index))
+
+                TagCard(title(of: card), style: style(of: card))
+            }
+            .rotationEffect(.degrees(tilt), anchor: .top)
+            .scaleEffect(scale, anchor: .top)
+            .shadow(color: shadow, radius: 10, y: 6)
+            .offset(x: offset(of: card))
+        }
+        .padding(.top, Self.inset)
+        .contentShape(.rect)
+        .zIndex(isLifted ? 1 : 0)
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .named(Self.space))
+        } action: { frame in
+            if let id = card.tagId {
+                frames[id] = frame
+            }
+        }
+        .onTapGesture {
+            tap(card)
+        }
+        .gesture(reorderGesture(for: card), isEnabled: canMove(card))
+    }
+}
+
+private extension TagLine {
+    enum Card: Identifiable {
         case tag(Item)
         case add
+
+        var id: CardID {
+            switch self {
+            case let .tag(item): .tag(item.id)
+            case .add: .add
+            }
+        }
+
+        var tagId: ID? {
+            if case let .tag(item) = self {
+                item.id
+            } else {
+                nil
+            }
+        }
+    }
+
+    enum CardID: Hashable {
+        case tag(ID)
+        case add
+    }
+
+    struct Lift {
+        let id: ID
+        let start: CGFloat
+        var translation: CGFloat
+    }
+
+    static var space: String {
+        "TagLine"
     }
 
     static var height: CGFloat {
@@ -109,30 +202,6 @@ private extension TagLine {
         tags.isEmpty ? "＋ タグ" : "＋"
     }
 
-    func hanging(
-        _ card: Card,
-        at index: Int
-    ) -> some View {
-        let isSelected = isSelected(card)
-        let tilt = isSelected ? 0 : Self.tilts[index % Self.tilts.count]
-
-        return Button {
-            tap(card)
-        } label: {
-            VStack(spacing: 0) {
-                Rectangle()
-                    .fill(Palette.gold.opacity(0.55))
-                    .frame(width: 0.8, height: drop(at: index))
-
-                TagCard(title(of: card), style: style(of: card))
-            }
-            .rotationEffect(.degrees(tilt), anchor: .top)
-            .padding(.top, Self.inset)
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-    }
-
     func title(of card: Card) -> String {
         switch card {
         case let .tag(item): item.name
@@ -154,11 +223,20 @@ private extension TagLine {
     }
 
     func isSelected(_ card: Card) -> Bool {
-        if case let .tag(item) = card {
-            item.id == selection
-        } else {
-            false
+        card.tagId != nil && card.tagId == selection
+    }
+
+    func canMove(_ card: Card) -> Bool {
+        onMove != nil && card.tagId != nil
+    }
+
+    func offset(of card: Card) -> CGFloat {
+        guard let lift, card.tagId == lift.id else {
+            return 0
         }
+
+        let slot = frames[lift.id]?.midX ?? lift.start
+        return lift.start + lift.translation - slot
     }
 
     func tap(_ card: Card) {
@@ -167,6 +245,66 @@ private extension TagLine {
             onSelect(item.id)
         case .add:
             onAdd?()
+        }
+    }
+
+    func reorderGesture(for card: Card) -> some Gesture {
+        let drag = DragGesture(
+            minimumDistance: 0,
+            coordinateSpace: .named(Self.space)
+        )
+
+        return LongPressGesture(minimumDuration: 0.3)
+            .sequenced(before: drag)
+            .onChanged { value in
+                guard case let .second(true, drag) = value else {
+                    return
+                }
+
+                follow(card, by: drag?.translation.width ?? 0)
+            }
+            .onEnded { _ in
+                withAnimation(.snappy) {
+                    lift = nil
+                }
+            }
+    }
+
+    func follow(
+        _ card: Card,
+        by translation: CGFloat
+    ) {
+        guard let id = card.tagId else {
+            return
+        }
+
+        if lift == nil {
+            let start = frames[id]?.midX ?? 0
+
+            withAnimation(.snappy(duration: 0.2)) {
+                lift = Lift(id: id, start: start, translation: 0)
+            }
+
+            liftCount += 1
+        }
+
+        lift?.translation = translation
+
+        guard let lift, let onMove else {
+            return
+        }
+
+        let point = lift.start + lift.translation
+        let others = tags.filter { $0.id != id }
+        let target = others.count { (frames[$0.id]?.midX ?? 0) < point }
+        let current = tags.firstIndex { $0.id == id }
+
+        guard target != current else {
+            return
+        }
+
+        withAnimation(.snappy) {
+            onMove(id, target)
         }
     }
 }
@@ -186,18 +324,20 @@ private struct TagString: Shape {
 }
 
 #Preview {
-    @Previewable @State var selection: Int? = 1
+    @Previewable @State var names = ["朝ごはん", "昼ごはん", "夜ごはん", "おやつ"]
+    @Previewable @State var selection: String?
 
-    let tags = ["朝ごはん", "昼ごはん", "夜ごはん", "おやつ"].enumerated().map {
-        TagLine<Int>.Item(id: $0.offset, name: $0.element)
-    }
+    let tags = names.map { TagLine<String>.Item(id: $0, name: $0) }
 
     VStack(spacing: 24) {
         TagLine(tags, selection: selection) { id in
             selection = selection == id ? nil : id
-        } onAdd: {}
+        } onAdd: {} onMove: { id, index in
+            names.removeAll { $0 == id }
+            names.insert(id, at: index)
+        }
 
-        TagLine<Int>([], selection: nil) { _ in
+        TagLine<String>([], selection: nil) { _ in
         } onAdd: {}
     }
     .padding()
