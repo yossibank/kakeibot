@@ -153,8 +153,6 @@ private extension TemplateEditSheet {
                 .font(.system(size: 16, design: .serif))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
 
             Spacer()
 

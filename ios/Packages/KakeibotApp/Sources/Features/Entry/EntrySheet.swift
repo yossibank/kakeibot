@@ -101,6 +101,24 @@ public struct EntrySheet: View {
 
 private extension EntrySheet {
     var content: some View {
+        ViewThatFits(in: .vertical) {
+            form
+
+            ScrollView {
+                form
+            }
+            .scrollIndicators(.hidden)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(alignment: .bottom) {
+            if isEnteringAmount {
+                keypadDrawer
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+    }
+
+    var form: some View {
         VStack(spacing: 14) {
             header
             dial
@@ -127,13 +145,6 @@ private extension EntrySheet {
         .contentShape(.rect)
         .onTapGesture {
             setEnteringAmount(false)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .bottom) {
-            if isEnteringAmount {
-                keypadDrawer
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
         }
     }
 
@@ -175,7 +186,7 @@ private extension EntrySheet {
             }
         }
         .buttonStyle(.plain)
-        .frame(minHeight: 100, maxHeight: 270)
+        .frame(minHeight: 150, maxHeight: 270)
     }
 
     var details: some View {
@@ -353,7 +364,7 @@ private extension EntrySheet {
                 .foregroundStyle(Palette.mist)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-                .frame(width: size * 0.6)
+                .frame(width: size * 0.66)
                 .offset(y: size * 0.19)
         }
         .frame(width: size, height: size)

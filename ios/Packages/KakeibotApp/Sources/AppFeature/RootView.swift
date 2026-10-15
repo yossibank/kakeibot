@@ -12,22 +12,23 @@ public struct RootView: View {
     public init() {}
 
     public var body: some View {
-        content
-            .overlay {
-                if isLaunching {
-                    LaunchView(isReady: model.isOpened) {
-                        isLaunching = false
-                    }
+        ZStack {
+            content
+
+            if isLaunching {
+                LaunchView(isReady: model.isOpened) {
+                    isLaunching = false
                 }
             }
-            .task {
-                await model.open()
-            }
-            .onChange(of: scenePhase) { _, phase in
-                model.changeScene(to: phase)
-            }
-            .warmsUpInput()
-            .debugMenuOnShake()
+        }
+        .task {
+            await model.open()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            model.changeScene(to: phase)
+        }
+        .warmsUpInput()
+        .debugMenuOnShake()
     }
 }
 
