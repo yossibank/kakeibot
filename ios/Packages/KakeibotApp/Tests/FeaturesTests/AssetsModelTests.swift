@@ -38,6 +38,31 @@ struct AssetsModelTests {
         #expect(totals == [0, 0, 0, 0, 250_000, 249_020])
         #expect(model.monthTotals.last?.month == setup.today.yearMonth)
     }
+
+    @Test
+    func showsAndUndoesTransfer() async throws {
+        let setup = try await Setup()
+
+        let entry = try await setup.save(
+            .transfer,
+            3000,
+            on: "2026-10-10",
+            from: setup.bank,
+            to: setup.cash
+        )
+
+        let model = AssetsModel(database: setup.database, today: setup.today)
+        await model.load()
+
+        model.showTransfer(entry)
+        let message = model.transferred?.message
+        await model.undoTransfer()
+        let entries = try setup.database.snapshot().entries
+
+        #expect(message == "銀行 → 財布 ¥3,000 を振り替えた")
+        #expect(model.transferred == nil)
+        #expect(entries.isEmpty)
+    }
 }
 
 extension AssetsModelTests {
@@ -68,13 +93,14 @@ extension AssetsModelTests.Setup {
         )
     }
 
+    @discardableResult
     func save(
         _ type: Entry.Kind,
         _ amount: Int,
         on text: String,
         from wallet: Wallet.ID,
         to destination: Wallet.ID? = nil
-    ) async throws {
+    ) async throws -> Entry {
         let date = try #require(LocalDate(text))
 
         let category: EntryCategory.ID? = switch type {
@@ -92,6 +118,6 @@ extension AssetsModelTests.Setup {
             toWalletId: destination
         )
 
-        try await database.saveEntry(draft, at: Date())
+        return try await database.saveEntry(draft, at: Date())
     }
 }

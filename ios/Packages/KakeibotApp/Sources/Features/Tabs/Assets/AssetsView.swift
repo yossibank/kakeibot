@@ -29,6 +29,13 @@ struct AssetsView: View {
                 .fill(Palette.night)
                 .ignoresSafeArea()
         }
+        .recordedBanner(model.transferred) {
+            Task {
+                await model.undoTransfer()
+            }
+        } onClear: {
+            model.clearTransfer()
+        }
     }
 }
 

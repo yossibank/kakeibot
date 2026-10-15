@@ -54,8 +54,17 @@ private extension EntryWalletSheet {
                 IconImage(model.icon(for: wallet), size: 18)
                     .foregroundStyle(isSelected ? Palette.gold : Palette.mist)
 
-                Text(wallet.name)
-                    .foregroundStyle(nameColor)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(wallet.name)
+                        .foregroundStyle(nameColor)
+
+                    if let balance = model.balance(of: wallet) {
+                        Text("残高 \(AmountText.text(balance))")
+                            .font(.caption2)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.mist)
+                    }
+                }
 
                 Spacer()
 

@@ -34,35 +34,11 @@ struct HomeView: View {
                 .fill(Palette.night)
                 .ignoresSafeArea()
         }
-        .overlay(alignment: .bottom) {
-            if let recorded = model.recorded {
-                NoticeBanner(
-                    recorded.message,
-                    systemImage: "checkmark",
-                    actionTitle: "取り消す"
-                ) {
-                    Task {
-                        await model.undoRecorded()
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+        .recordedBanner(model.recorded) {
+            Task {
+                await model.undoRecorded()
             }
-        }
-        .animation(.snappy, value: model.recorded)
-        .sensoryFeedback(.success, trigger: model.recorded) { _, new in
-            new != nil
-        }
-        .task(id: model.recorded) {
-            guard model.recorded != nil else {
-                return
-            }
-
-            guard await (try? Task.sleep(for: .seconds(4))) != nil else {
-                return
-            }
-
+        } onClear: {
             model.clearRecorded()
         }
     }

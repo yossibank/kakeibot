@@ -164,7 +164,10 @@ private extension MainView {
                     database: database,
                     date: home.today,
                     type: .transfer
-                )
+                ),
+                onSave: { entry in
+                    assets.showTransfer(entry)
+                }
             )
         case .newTemplate:
             TemplateEditSheet(

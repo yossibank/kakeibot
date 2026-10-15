@@ -43,7 +43,7 @@ struct TemplateUseTests {
 
         #expect(applied == tag.id)
         #expect(tags == ["買い置き"])
-        #expect(saved)
+        #expect(saved?.tagId == tag.id)
         #expect(entry?.first?.tagId == tag.id)
         #expect(model.tagId == nil)
         #expect(!model.isApplied(stock))

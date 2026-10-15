@@ -379,17 +379,20 @@ public extension EntryModel {
         }
     }
 
-    func save() async -> Bool {
+    func save() async -> Entry? {
         guard let draft else {
-            return false
+            return nil
         }
 
         do {
-            try await database.saveEntry(draft, editing: editingId, at: Date())
-            return true
+            return try await database.saveEntry(
+                draft,
+                editing: editingId,
+                at: Date()
+            )
         } catch {
             report(error)
-            return false
+            return nil
         }
     }
 

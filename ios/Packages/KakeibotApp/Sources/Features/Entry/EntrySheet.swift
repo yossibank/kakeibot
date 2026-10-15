@@ -22,8 +22,14 @@ public struct EntrySheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    public init(model: EntryModel) {
+    private let onSave: (Entry) -> Void
+
+    public init(
+        model: EntryModel,
+        onSave: @escaping (Entry) -> Void = { _ in }
+    ) {
         _model = State(initialValue: model)
+        self.onSave = onSave
     }
 
     public var body: some View {
@@ -914,9 +920,12 @@ private extension EntrySheet {
     }
 
     func save() async {
-        if await model.save() {
-            dismiss()
+        guard let entry = await model.save() else {
+            return
         }
+
+        onSave(entry)
+        dismiss()
     }
 
     func delete() async {

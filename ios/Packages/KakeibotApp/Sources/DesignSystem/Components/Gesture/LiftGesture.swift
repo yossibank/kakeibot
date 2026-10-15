@@ -1,14 +1,23 @@
 import SwiftUI
 import UIKit
 
-struct TagLiftGesture: UIGestureRecognizerRepresentable {
-    let onMove: (CGFloat) -> Void
-    let onEnd: () -> Void
+public struct LiftGesture: UIGestureRecognizerRepresentable {
+    private let space: String
+    private let onMove: (CGPoint) -> Void
+    private let onEnd: () -> Void
 
-    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator {
-        Coordinator()
+    public init(
+        in space: String,
+        onMove: @escaping (CGPoint) -> Void,
+        onEnd: @escaping () -> Void
+    ) {
+        self.space = space
+        self.onMove = onMove
+        self.onEnd = onEnd
     }
+}
 
+public extension LiftGesture {
     func makeUIGestureRecognizer(
         context: Context
     ) -> UILongPressGestureRecognizer {
@@ -21,24 +30,15 @@ struct TagLiftGesture: UIGestureRecognizerRepresentable {
         _ recognizer: UILongPressGestureRecognizer,
         context: Context
     ) {
-        let x = recognizer.location(in: nil).x
+        let location = context.converter.location(in: .named(space))
 
         switch recognizer.state {
-        case .began:
-            context.coordinator.startX = x
-            onMove(0)
-        case .changed:
-            onMove(x - context.coordinator.startX)
+        case .began, .changed:
+            onMove(location)
         case .ended, .cancelled, .failed:
             onEnd()
         default:
             break
         }
-    }
-}
-
-extension TagLiftGesture {
-    final class Coordinator {
-        var startX: CGFloat = 0
     }
 }
