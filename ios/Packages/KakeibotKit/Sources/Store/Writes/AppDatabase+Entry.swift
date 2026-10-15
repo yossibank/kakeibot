@@ -5,6 +5,7 @@ import GRDB
 public extension AppDatabase {
     enum WriteError: Error, Equatable {
         case entryNotFound
+        case tagMismatch
     }
 
     @discardableResult
@@ -20,6 +21,17 @@ public extension AppDatabase {
                 in: db,
                 at: now
             )
+
+            let belongs = try Self.tag(
+                entry.tagId,
+                belongsTo: entry.categoryId,
+                in: db
+            )
+
+            guard belongs else {
+                throw WriteError.tagMismatch
+            }
+
             try entry.save(db)
 
             if entry.type == .expense {

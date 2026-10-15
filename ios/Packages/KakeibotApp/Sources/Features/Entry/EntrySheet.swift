@@ -108,6 +108,12 @@ private extension EntrySheet {
             templateRow
             categoryPager
 
+            TagLine(tagItems, selection: model.tagId) { id in
+                model.toggleTag(id)
+            } onAdd: {
+                editTags()
+            }
+
             PrimaryButton(model.saveTitle) {
                 Task {
                     await save()
@@ -652,6 +658,10 @@ private extension EntrySheet {
         LocalDate(Date(), in: .current)
     }
 
+    var tagItems: [TagLine<EntryTag.ID>.Item] {
+        model.tags.map { TagLine.Item(id: $0.id, name: $0.name) }
+    }
+
     var typeBinding: Binding<Entry.Kind> {
         Binding(
             get: {
@@ -680,6 +690,14 @@ private extension EntrySheet {
     func open(_ sheet: Sheet) {
         setEnteringAmount(false)
         self.sheet = sheet
+    }
+
+    func editTags() {
+        guard let category = model.selectedCategory else {
+            return
+        }
+
+        open(.editCategory(category))
     }
 
     func editMemo(_ isEditing: Bool) {

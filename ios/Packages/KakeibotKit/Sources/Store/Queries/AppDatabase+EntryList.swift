@@ -44,12 +44,14 @@ private extension AppDatabase {
         let entries = try Entry.fetchAll(db)
         let days = EntryDay.grouping(entries)
         let categories = try byID(EntryCategory.fetchAll(db))
+        let tags = try byID(EntryTag.fetchAll(db))
         let wallets = try byID(Wallet.fetchAll(db))
         let icons = try byID(Icon.fetchAll(db))
 
         return EntryList(
             days: days,
             categories: categories,
+            tags: tags,
             wallets: wallets,
             icons: icons
         )
@@ -57,6 +59,7 @@ private extension AppDatabase {
 
     static func entryOptions(in db: Database) throws -> EntryOptions {
         let categories = try EntryCategory.unarchivedInOrder().fetchAll(db)
+        let tags = try EntryTag.order(Column("sort_order")).fetchAll(db)
         let wallets = try Wallet.unarchivedInOrder().fetchAll(db)
         let expenseCategories = categories.filter { $0.kind == .expense }
         let incomeCategories = categories.filter { $0.kind == .income }
@@ -65,6 +68,7 @@ private extension AppDatabase {
         return EntryOptions(
             expenseCategories: expenseCategories,
             incomeCategories: incomeCategories,
+            tags: tags,
             wallets: wallets,
             icons: icons
         )

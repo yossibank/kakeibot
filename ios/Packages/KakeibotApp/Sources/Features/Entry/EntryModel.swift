@@ -8,10 +8,18 @@ import Store
 @Observable
 public final class EntryModel {
     public var date: LocalDate
-    public var categoryId: EntryCategory.ID?
     public var walletId: Wallet.ID?
     public var memo = ""
 
+    public var categoryId: EntryCategory.ID? {
+        didSet {
+            if categoryId != oldValue {
+                tagId = nil
+            }
+        }
+    }
+
+    public private(set) var tagId: EntryTag.ID?
     public private(set) var type: Entry.Kind = .expense
     public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
@@ -118,6 +126,15 @@ public extension EntryModel {
         categories.first { $0.id == categoryId }
     }
 
+    var tags: [EntryTag] {
+        let tags = options?.tags ?? []
+
+        return tags.filter { tag in
+            tag.categoryId == categoryId
+                && (tag.archivedAt == nil || tag.id == tagId)
+        }
+    }
+
     var wallets: [Wallet] {
         options?.wallets ?? []
     }
@@ -206,6 +223,7 @@ public extension EntryModel {
         return template.id == appliedTemplateId
             && template.type == type
             && template.categoryId == categoryId
+            && template.tagId == tagId
             && template.walletId == walletId
             && (template.memo ?? "") == memo
             && amountMatches
@@ -214,6 +232,7 @@ public extension EntryModel {
     func apply(_ template: EntryTemplate) {
         select(template.type)
         categoryId = template.categoryId
+        tagId = template.tagId
         walletId = template.walletId
         memo = template.memo ?? ""
         calculator = AmountCalculator(amount: template.amount ?? 0)
@@ -236,6 +255,7 @@ public extension EntryModel {
             type: templateType,
             amount: amount > 0 ? amount : nil,
             categoryId: categoryId,
+            tagId: tagId,
             walletId: walletId,
             memo: memo
         )
@@ -292,6 +312,10 @@ public extension EntryModel {
         calculator.press(key)
     }
 
+    func toggleTag(_ id: EntryTag.ID) {
+        tagId = tagId == id ? nil : id
+    }
+
     func select(_ type: Entry.Kind) {
         guard type != self.type else {
             return
@@ -344,6 +368,7 @@ private extension EntryModel {
         let calculator: AmountCalculator
         let date: LocalDate
         let categoryId: EntryCategory.ID?
+        let tagId: EntryTag.ID?
         let walletId: Wallet.ID?
         let memo: String
     }
@@ -354,6 +379,7 @@ private extension EntryModel {
             calculator: calculator,
             date: date,
             categoryId: categoryId,
+            tagId: tagId,
             walletId: walletId,
             memo: memo
         )
@@ -376,6 +402,7 @@ private extension EntryModel {
             amount: amount,
             date: date,
             categoryId: categoryId,
+            tagId: tagId,
             walletId: walletId,
             memo: memo
         )
@@ -422,6 +449,7 @@ private extension EntryModel {
         calculator = AmountCalculator(amount: entry.amount)
         date = entry.date
         categoryId = entry.categoryId
+        tagId = entry.tagId
         walletId = entry.walletId
         memo = entry.memo ?? ""
     }

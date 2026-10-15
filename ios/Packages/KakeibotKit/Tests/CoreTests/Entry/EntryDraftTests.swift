@@ -81,6 +81,7 @@ extension EntryDraftTests {
         let type: Entry.Kind
         let amount: Int
         let category: Bool
+        let tag: Bool
         let toWallet: Destination
         let problems: [EntryDraft.Problem]
     }
@@ -97,6 +98,7 @@ extension EntryDraftTests.DraftCase {
         let walletId = Wallet.ID()
         let date = try #require(LocalDate("2026-10-01"))
         let categoryId = category ? EntryCategory.ID() : nil
+        let tagId = tag ? EntryTag.ID() : nil
         let toWalletId = toWallet.walletId(from: walletId)
 
         return EntryDraft(
@@ -104,6 +106,7 @@ extension EntryDraftTests.DraftCase {
             amount: amount,
             date: date,
             categoryId: categoryId,
+            tagId: tagId,
             walletId: walletId,
             toWalletId: toWalletId
         )

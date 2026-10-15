@@ -13,6 +13,7 @@ public final class CategoryEditModel {
 
     public private(set) var emoji = ""
     public private(set) var text = ""
+    public private(set) var tags: [EntryTagDraft] = []
     public private(set) var isHidden = false
     public private(set) var errorMessage: String?
 
@@ -273,6 +274,38 @@ public extension CategoryEditModel {
         text = String(value.prefix(CategoryDraft.maxTextLength))
     }
 
+    func addTag(_ name: String) {
+        let tag = EntryTagDraft(name: name)
+
+        if check(tag) {
+            tags.append(tag)
+        }
+    }
+
+    func renameTag(
+        at index: Int,
+        to name: String
+    ) {
+        guard tags.indices.contains(index) else {
+            return
+        }
+
+        var tag = tags[index]
+        tag.name = name
+
+        if check(tag) {
+            tags[index] = tag
+        }
+    }
+
+    func removeTag(at index: Int) {
+        guard tags.indices.contains(index) else {
+            return
+        }
+
+        tags.remove(at: index)
+    }
+
     func load() async {
         guard let editingId else {
             return
@@ -288,6 +321,8 @@ public extension CategoryEditModel {
             }
 
             apply(CategoryDraft(category, icon: icon))
+            let tags = list.tags.filter { $0.categoryId == editingId }
+            self.tags = tags.map(EntryTagDraft.init)
             isHidden = category.archivedAt != nil
             baseline = snapshot
         } catch {
@@ -299,6 +334,7 @@ public extension CategoryEditModel {
         do {
             return try await database.saveCategory(
                 draft,
+                tags: tags,
                 editing: editingId,
                 at: Date()
             )
@@ -337,6 +373,7 @@ private extension CategoryEditModel {
         let emoji: String
         let text: String
         let color: String
+        let tags: [EntryTagDraft]
     }
 
     static let blank = Snapshot(
@@ -345,7 +382,8 @@ private extension CategoryEditModel {
         glyph: .food,
         emoji: "",
         text: "",
-        color: colors[0]
+        color: colors[0],
+        tags: []
     )
 
     static let loadFailedMessage = "カテゴリを読めませんでした"
@@ -358,7 +396,8 @@ private extension CategoryEditModel {
             glyph: glyph,
             emoji: emoji,
             text: text,
-            color: color
+            color: color,
+            tags: tags
         )
     }
 
@@ -379,6 +418,20 @@ private extension CategoryEditModel {
 
         return first.properties.isEmojiPresentation
             || (first.properties.isEmoji && scalars.count > 1)
+    }
+
+    func check(_ tag: EntryTagDraft) -> Bool {
+        switch tag.problems.first {
+        case .emptyName:
+            errorMessage = "タグの名前を入れてください"
+            return false
+        case .nameTooLong:
+            errorMessage = "タグは \(EntryTagDraft.maxNameLength) 文字までです"
+            return false
+        case nil:
+            errorMessage = nil
+            return true
+        }
     }
 
     func apply(_ draft: CategoryDraft) {

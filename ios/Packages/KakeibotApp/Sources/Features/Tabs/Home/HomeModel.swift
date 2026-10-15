@@ -100,8 +100,10 @@ public extension HomeModel {
 
     func detail(for template: EntryTemplate) -> String {
         let category = list?.categories[template.categoryId]?.name
+        let tag = template.tagId.flatMap { list?.tags[$0]?.name }
         let wallet = list?.wallets[template.walletId]?.name
-        return [category, wallet].compactMap(\.self).joined(separator: "・")
+        let parts = [category, tag, wallet]
+        return parts.compactMap(\.self).joined(separator: "・")
     }
 
     func observeTemplates() async {

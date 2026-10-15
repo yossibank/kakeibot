@@ -122,6 +122,7 @@ private extension RecordsView {
                     EntryRow(
                         icon: row.icon,
                         title: row.title,
+                        tag: row.tag,
                         detail: row.detail,
                         amount: row.amount,
                         type: row.type

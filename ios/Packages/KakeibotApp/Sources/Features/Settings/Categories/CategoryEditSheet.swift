@@ -6,6 +6,8 @@ import SwiftUI
 public struct CategoryEditSheet: View {
     @State private var model: CategoryEditModel
     @State private var isConfirmingDiscard = false
+    @State private var tagEdit: TagEdit?
+    @State private var tagName = ""
 
     @FocusState private var focus: Field?
 
@@ -43,6 +45,23 @@ public struct CategoryEditSheet: View {
             .onChange(of: model.color) {
                 focus = nil
             }
+            .alert(tagTitle, isPresented: isEditingTag) {
+                TextField("名前", text: $tagName)
+
+                Button(tagAction) {
+                    commitTag()
+                }
+
+                if case let .rename(index) = tagEdit {
+                    Button("削除", role: .destructive) {
+                        model.removeTag(at: index)
+                    }
+                }
+
+                Button("やめる", role: .cancel) {}
+            } message: {
+                Text("\(EntryTagDraft.maxNameLength) 文字まで")
+            }
             .task {
                 await model.load()
             }
@@ -55,6 +74,7 @@ private extension CategoryEditSheet {
             header
             preview
             field("名前", text: $model.name, font: .body, focus: .name)
+            tags
             colors
             CapsulePicker(selection: $model.markKind, options: Self.markOptions)
 
@@ -147,6 +167,18 @@ private extension CategoryEditSheet {
             }
             .font(.caption2)
             .foregroundStyle(Palette.mist)
+        }
+    }
+
+    var tags: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            sectionTitle("タグ")
+
+            TagLine(tagItems, selection: nil) { index in
+                editTag(at: index)
+            } onAdd: {
+                addTag()
+            }
         }
     }
 
@@ -361,6 +393,11 @@ private extension CategoryEditSheet {
         case text
     }
 
+    enum TagEdit: Hashable {
+        case add
+        case rename(Int)
+    }
+
     typealias MarkOption = CapsulePicker<CategoryEditModel.MarkKind>.Option
 
     static let markOptions: [MarkOption] = [
@@ -378,6 +415,33 @@ private extension CategoryEditSheet {
         repeating: GridItem(.flexible(), spacing: 6),
         count: 8
     )
+
+    var tagItems: [TagLine<Int>.Item] {
+        model.tags.enumerated().map { index, tag in
+            TagLine.Item(id: index, name: tag.name)
+        }
+    }
+
+    var tagTitle: String {
+        tagEdit == .add ? "タグを追加" : "タグを変更"
+    }
+
+    var tagAction: String {
+        tagEdit == .add ? "追加" : "変更"
+    }
+
+    var isEditingTag: Binding<Bool> {
+        Binding(
+            get: {
+                tagEdit != nil
+            },
+            set: { isPresented in
+                if !isPresented {
+                    tagEdit = nil
+                }
+            }
+        )
+    }
 
     var saveColor: Color {
         model.canSave ? Palette.gold : Palette.dusk
@@ -423,6 +487,29 @@ private extension CategoryEditSheet {
 
     func tileStroke(isSelected: Bool) -> Color {
         isSelected ? Palette.gold : Palette.gold.opacity(0.14)
+    }
+
+    func addTag() {
+        focus = nil
+        tagName = ""
+        tagEdit = .add
+    }
+
+    func editTag(at index: Int) {
+        focus = nil
+        tagName = model.tags[index].name
+        tagEdit = .rename(index)
+    }
+
+    func commitTag() {
+        switch tagEdit {
+        case .add:
+            model.addTag(tagName)
+        case let .rename(index):
+            model.renameTag(at: index, to: tagName)
+        case nil:
+            break
+        }
     }
 
     func close() {

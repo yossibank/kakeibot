@@ -6,6 +6,7 @@ public struct EntryTemplate: Hashable, Sendable {
     public var type: Entry.Kind
     public var amount: Int?
     public var categoryId: EntryCategory.ID
+    public var tagId: EntryTag.ID?
     public var walletId: Wallet.ID
     public var memo: String?
     public var sortOrder: Int
@@ -18,6 +19,7 @@ public struct EntryTemplate: Hashable, Sendable {
         type: Entry.Kind,
         amount: Int?,
         categoryId: EntryCategory.ID,
+        tagId: EntryTag.ID? = nil,
         walletId: Wallet.ID,
         memo: String? = nil,
         sortOrder: Int,
@@ -29,6 +31,7 @@ public struct EntryTemplate: Hashable, Sendable {
         self.type = type
         self.amount = amount
         self.categoryId = categoryId
+        self.tagId = tagId
         self.walletId = walletId
         self.memo = memo
         self.sortOrder = sortOrder
@@ -50,6 +53,7 @@ public extension EntryTemplate {
             amount: amount,
             date: date,
             categoryId: categoryId,
+            tagId: tagId,
             walletId: walletId,
             memo: memo ?? ""
         )
@@ -66,6 +70,7 @@ extension EntryTemplate: Codable {
         try container.encode(type, forKey: .type)
         try container.encodeOrNull(amount, forKey: .amount)
         try container.encode(categoryId, forKey: .categoryId)
+        try container.encodeOrNull(tagId, forKey: .tagId)
         try container.encode(walletId, forKey: .walletId)
         try container.encodeOrNull(memo, forKey: .memo)
         try container.encode(sortOrder, forKey: .sortOrder)

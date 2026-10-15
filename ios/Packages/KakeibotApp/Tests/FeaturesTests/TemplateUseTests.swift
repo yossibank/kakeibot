@@ -22,6 +22,34 @@ struct TemplateUseTests {
     }
 
     @Test
+    func appliesTagAndDropsItWithOtherCategory() async throws {
+        let setup = try await Setup()
+        let tag = try await setup.saveTag("買い置き")
+        let stock = try await setup.saveTemplate(
+            name: "買い置き",
+            amount: 1200,
+            tagId: tag.id
+        )
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        model.apply(stock)
+        let applied = model.tagId
+        let tags = model.tags.map(\.name)
+        let saved = await model.save()
+        let entry = try await setup.database.entryList().days.first?.entries
+
+        model.categoryId = model.categories.first?.id
+
+        #expect(applied == tag.id)
+        #expect(tags == ["買い置き"])
+        #expect(saved)
+        #expect(entry?.first?.tagId == tag.id)
+        #expect(model.tagId == nil)
+        #expect(!model.isApplied(stock))
+    }
+
+    @Test
     func highlightsOnlyTheAppliedTemplate() async throws {
         let setup = try await Setup()
         let pass = try await setup.saveTemplate(name: "定期", amount: nil)
@@ -158,11 +186,29 @@ extension TemplateUseTests.Setup {
         self.init(database: database, date: date)
     }
 
+    func saveTag(_ name: String) async throws -> EntryTag {
+        let list = try await database.categoryList()
+        let options = try await database.entryOptions()
+        let category = options.expenseCategories[1]
+        let icon = try #require(list.icons[category.iconId])
+
+        try await database.saveCategory(
+            CategoryDraft(category, icon: icon),
+            tags: [EntryTagDraft(name: name)],
+            editing: category.id,
+            at: Date()
+        )
+
+        let tags = try await database.categoryList().tags
+        return try #require(tags.first)
+    }
+
     @discardableResult
     func saveTemplate(
         name: String,
         amount: Int?,
-        type: Entry.Kind = .expense
+        type: Entry.Kind = .expense,
+        tagId: EntryTag.ID? = nil
     ) async throws -> EntryTemplate {
         let options = try await database.entryOptions()
 
@@ -175,6 +221,7 @@ extension TemplateUseTests.Setup {
             type: type,
             amount: amount,
             categoryId: categories[1].id,
+            tagId: tagId,
             walletId: options.wallets[0].id,
             memo: "社食"
         )

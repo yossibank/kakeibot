@@ -25,6 +25,17 @@ struct ExportV1Tests {
         #expect(!export.data.entries.isEmpty)
     }
 
+    @Test
+    func readsFileWithoutTags() throws {
+        let json = try Self.fixtureWithoutTags()
+
+        let export = try ExportV1(json: json)
+
+        #expect(export.data.tags.isEmpty)
+        #expect(export.data.entries.allSatisfy { $0.tagId == nil })
+        #expect(export.data.templates.allSatisfy { $0.tagId == nil })
+    }
+
     @Test(arguments: try headers.valid)
     func readsSupportedHeader(header: Header) throws {
         let json = try Self.fixture(with: header)
@@ -73,6 +84,22 @@ private extension ExportV1Tests {
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
         tables["templates"] = nil
+        object["data"] = tables
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixtureWithoutTags() throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+        tables["tags"] = nil
+
+        for key in ["entries", "templates"] {
+            let rows = try #require(tables[key] as? [[String: Any]])
+            tables[key] = rows.map { $0.filter { $0.key != "tagId" } }
+        }
+
         object["data"] = tables
         return try JSONSerialization.data(withJSONObject: object)
     }

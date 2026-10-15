@@ -6,20 +6,25 @@ public extension AppDatabase {
     enum CategoryWriteError: Error, Equatable {
         case categoryNotFound
         case iconNotFound
+        case tagNotFound
     }
 
     @discardableResult
     func saveCategory(
         _ draft: CategoryDraft,
+        tags: [EntryTagDraft],
         editing id: EntryCategory.ID? = nil,
         at now: Date
     ) async throws -> EntryCategory {
         try await writer.write { db in
-            guard let id else {
-                return try Self.insertCategory(draft, into: db, at: now)
+            let category = if let id {
+                try Self.updateCategory(id, with: draft, in: db, at: now)
+            } else {
+                try Self.insertCategory(draft, into: db, at: now)
             }
 
-            return try Self.updateCategory(id, with: draft, in: db, at: now)
+            try Self.saveTags(tags, for: category.id, in: db, at: now)
+            return category
         }
     }
 
@@ -101,6 +106,48 @@ private extension AppDatabase {
         try draft.applied(to: icon, at: now).update(db)
         try category.update(db)
         return category
+    }
+
+    static func saveTags(
+        _ drafts: [EntryTagDraft],
+        for categoryId: EntryCategory.ID,
+        in db: Database,
+        at now: Date
+    ) throws {
+        let existing = try EntryTag
+            .filter(Column("category_id") == categoryId)
+            .fetchAll(db)
+
+        let kept = Set(drafts.compactMap(\.id))
+
+        for var tag in existing where !kept.contains(tag.id) {
+            guard tag.archivedAt == nil else {
+                continue
+            }
+
+            tag.archivedAt = now
+            tag.updatedAt = now
+            try tag.update(db)
+        }
+
+        for (order, draft) in drafts.enumerated() {
+            guard let id = draft.id else {
+                let tag = try draft.newTag(
+                    categoryId: categoryId,
+                    sortOrder: order,
+                    at: now
+                )
+
+                try tag.insert(db)
+                continue
+            }
+
+            guard let tag = existing.first(where: { $0.id == id }) else {
+                throw CategoryWriteError.tagNotFound
+            }
+
+            try draft.applied(to: tag, sortOrder: order, at: now).update(db)
+        }
     }
 
     static func nextSortOrder(

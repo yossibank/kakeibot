@@ -5,6 +5,7 @@ import GRDB
 public extension AppDatabase {
     enum TemplateWriteError: Error, Equatable {
         case templateNotFound
+        case tagMismatch
     }
 
     @discardableResult
@@ -20,6 +21,16 @@ public extension AppDatabase {
                 in: db,
                 at: now
             )
+
+            let belongs = try Self.tag(
+                template.tagId,
+                belongsTo: template.categoryId,
+                in: db
+            )
+
+            guard belongs else {
+                throw TemplateWriteError.tagMismatch
+            }
 
             try template.save(db)
             return template

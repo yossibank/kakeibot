@@ -10,6 +10,7 @@ struct CategoryWriteTests {
 
         let saved = try await setup.database.saveCategory(
             setup.draft,
+            tags: [],
             at: setup.now
         )
         let list = try await setup.database.categoryList()
@@ -33,6 +34,7 @@ struct CategoryWriteTests {
 
         let updated = try await setup.database.saveCategory(
             draft,
+            tags: [],
             editing: food.id,
             at: later
         )
@@ -55,6 +57,7 @@ struct CategoryWriteTests {
         await #expect(throws: AppDatabase.CategoryWriteError.categoryNotFound) {
             try await setup.database.saveCategory(
                 setup.draft,
+                tags: [],
                 editing: EntryCategory.ID(),
                 at: setup.now
             )

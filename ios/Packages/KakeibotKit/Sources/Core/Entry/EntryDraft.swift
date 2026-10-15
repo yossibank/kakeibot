@@ -5,6 +5,7 @@ public struct EntryDraft: Hashable, Sendable {
     public var amount: Int
     public var date: LocalDate
     public var categoryId: EntryCategory.ID?
+    public var tagId: EntryTag.ID?
     public var walletId: Wallet.ID
     public var toWalletId: Wallet.ID?
     public var memo: String
@@ -14,6 +15,7 @@ public struct EntryDraft: Hashable, Sendable {
         amount: Int,
         date: LocalDate,
         categoryId: EntryCategory.ID?,
+        tagId: EntryTag.ID? = nil,
         walletId: Wallet.ID,
         toWalletId: Wallet.ID? = nil,
         memo: String = ""
@@ -22,6 +24,7 @@ public struct EntryDraft: Hashable, Sendable {
         self.amount = amount
         self.date = date
         self.categoryId = categoryId
+        self.tagId = tagId
         self.walletId = walletId
         self.toWalletId = toWalletId
         self.memo = memo
@@ -35,11 +38,17 @@ public extension EntryDraft {
         case categoryOnTransfer
         case missingDestination
         case sameWallet
+        case tagWithoutCategory
     }
 
     var problems: [Problem] {
         let amountProblems: [Problem] = amount < 1 ? [.amountNotPositive] : []
-        return amountProblems + typeProblems
+
+        let tagProblems: [Problem] = tagId != nil && categoryId == nil
+            ? [.tagWithoutCategory]
+            : []
+
+        return amountProblems + typeProblems + tagProblems
     }
 
     init(_ entry: Entry) {
@@ -48,6 +57,7 @@ public extension EntryDraft {
             amount: entry.amount,
             date: entry.date,
             categoryId: entry.categoryId,
+            tagId: entry.tagId,
             walletId: entry.walletId,
             toWalletId: entry.toWalletId,
             memo: entry.memo ?? ""
@@ -62,6 +72,7 @@ public extension EntryDraft {
             amount: amount,
             date: date,
             categoryId: categoryId,
+            tagId: tagId,
             walletId: walletId,
             toWalletId: destination,
             memo: trimmedMemo,
@@ -81,6 +92,7 @@ public extension EntryDraft {
         updated.amount = amount
         updated.date = date
         updated.categoryId = categoryId
+        updated.tagId = tagId
         updated.walletId = walletId
         updated.toWalletId = destination
         updated.memo = trimmedMemo

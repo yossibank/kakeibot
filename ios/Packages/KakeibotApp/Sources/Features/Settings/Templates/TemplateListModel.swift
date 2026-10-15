@@ -12,6 +12,7 @@ public final class TemplateListModel {
     public private(set) var templates: [EntryTemplate] = []
     public private(set) var movingOrder: [EntryTemplate.ID]?
     public private(set) var categories: CategoryList?
+    public private(set) var tags: [EntryTag] = []
     public private(set) var wallets: [Wallet] = []
     public private(set) var errorMessage: String?
 
@@ -42,8 +43,9 @@ public extension TemplateListModel {
 
     func detail(for template: EntryTemplate) -> String {
         let category = category(for: template)?.name
+        let tag = tags.first { $0.id == template.tagId }?.name
         let wallet = wallets.first { $0.id == template.walletId }?.name
-        let parts = [category, wallet]
+        let parts = [category, tag, wallet]
         return parts.compactMap(\.self).joined(separator: "・")
     }
 
@@ -119,6 +121,8 @@ private extension TemplateListModel {
 
     func loadNames() async throws {
         categories = try await database.categoryList()
-        wallets = try await database.entryOptions().wallets
+        let options = try await database.entryOptions()
+        tags = options.tags
+        wallets = options.wallets
     }
 }

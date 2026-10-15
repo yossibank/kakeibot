@@ -19,8 +19,14 @@ private extension AppDatabase {
             .order(Column("sort_order"))
             .fetchAll(db)
 
+        let tags = try EntryTag.unarchivedInOrder().fetchAll(db)
         let pairs = try Icon.fetchAll(db).map { ($0.id, $0) }
         let icons = Dictionary(uniqueKeysWithValues: pairs)
-        return CategoryList(categories: categories, icons: icons)
+
+        return CategoryList(
+            categories: categories,
+            tags: tags,
+            icons: icons
+        )
     }
 }

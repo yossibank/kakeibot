@@ -5,6 +5,7 @@ public struct EntryRowItem: Identifiable, Equatable {
     public let id: Entry.ID
     public let icon: Icon?
     public let title: String
+    public let tag: String?
     public let detail: String?
     public let amount: Int
     public let type: Entry.Kind
@@ -17,6 +18,7 @@ extension EntryRowItem {
         dayLabel: String? = nil
     ) {
         let category = entry.categoryId.flatMap { list.categories[$0] }
+        let tag = entry.tagId.flatMap { list.tags[$0] }
         let wallet = list.wallets[entry.walletId]
         let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
         let parts = [dayLabel, memo, wallet?.name].compactMap(\.self)
@@ -25,6 +27,7 @@ extension EntryRowItem {
             id: entry.id,
             icon: category.flatMap { list.icons[$0.iconId] },
             title: category?.name ?? Self.title(for: entry.type),
+            tag: tag?.name,
             detail: parts.isEmpty ? nil : parts.joined(separator: "・"),
             amount: entry.amount,
             type: entry.type
