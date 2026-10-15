@@ -37,6 +37,14 @@ public struct DebugMenu: View {
                     Button("カテゴリの編集（新規）") {
                         sheet = .newCategory
                     }
+
+                    Button("テンプレート") {
+                        sheet = .templates
+                    }
+
+                    Button("テンプレートの編集（新規）") {
+                        sheet = .newTemplate
+                    }
                 }
                 .disabled(model.database == nil)
 
@@ -69,6 +77,8 @@ private extension DebugMenu {
         case editEntry
         case categories
         case newCategory
+        case templates
+        case newTemplate
 
         var id: Self {
             self
@@ -106,6 +116,17 @@ private extension DebugMenu {
                     model: CategoryEditModel(
                         database: database,
                         kind: .expense
+                    )
+                )
+            case .templates:
+                NavigationStack {
+                    TemplateListView(database: database)
+                }
+            case .newTemplate:
+                TemplateEditSheet(
+                    model: TemplateEditModel(
+                        database: database,
+                        type: .expense
                     )
                 )
             }

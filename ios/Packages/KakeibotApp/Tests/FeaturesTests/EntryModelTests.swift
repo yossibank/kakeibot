@@ -132,8 +132,8 @@ struct EntryModelTests {
         model.select(.income)
         let incomePages = model.categoryPages
 
-        #expect(expensePages.map(\.count) == [12, 1])
-        #expect(expensePages.last == [.add])
+        #expect(expensePages.map(\.count) == [13])
+        #expect(expensePages[0].last == .add)
         #expect(incomePages.map(\.count) == [4])
         #expect(incomePages[0].last == .add)
     }
@@ -178,6 +178,22 @@ struct EntryModelTests {
         #expect(typed)
         #expect(!cleared)
         #expect(model.isChanged)
+    }
+
+    @Test
+    func ignoresCancelledLoad() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+
+        let task = Task {
+            await model.load()
+        }
+
+        task.cancel()
+        await task.value
+
+        #expect(model.errorMessage == nil)
+        #expect(model.errorCount == 0)
     }
 
     @Test

@@ -16,6 +16,7 @@ public struct EntrySheet: View {
 
     @AppStorage("entry.hasOpenedCategoryMenu") private var hasOpenedMenu = false
     @State private var sheetWidth: CGFloat = 0
+    @State private var drawerHeight: CGFloat = 0
 
     @FocusState private var isMemoFocused: Bool
 
@@ -26,48 +27,75 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .top) {
-            content
+        GeometryReader { _ in
+            ZStack(alignment: .top) {
+                content
 
-            if isEditingMemo {
-                memoLayer
-            }
+                if isEditingMemo {
+                    memoLayer
+                }
 
-            if let categoryMenu {
-                categoryMenuLayer(categoryMenu)
+                if let categoryMenu {
+                    categoryMenuLayer(categoryMenu)
+                }
             }
-        }
-        .coordinateSpace(.named(Self.coordinateSpace))
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            sheetWidth = width
-        }
-        .sensoryFeedback(
-            .impact(weight: .medium),
-            trigger: categoryMenu
-        ) { _, menu in
-            menu != nil
+            .coordinateSpace(.named(Self.coordinateSpace))
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.width
+            } action: { width in
+                sheetWidth = width
+            }
+            .sensoryFeedback(
+                .impact(weight: .medium),
+                trigger: categoryMenu
+            ) { _, menu in
+                menu != nil
+            }
+            .overlay(alignment: .bottom) {
+                if let errorMessage = model.errorMessage {
+                    NoticeBanner(
+                        errorMessage,
+                        systemImage: "exclamationmark",
+                        tone: .error
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, bannerBottom)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.snappy, value: model.errorMessage)
+            .sensoryFeedback(.error, trigger: model.errorCount)
+            .task(id: model.errorCount) {
+                guard model.errorCount > 0 else {
+                    return
+                }
+
+                guard await (try? Task.sleep(for: .seconds(3))) != nil else {
+                    return
+                }
+
+                model.clearError()
+            }
+            .background {
+                Rectangle()
+                    .fill(Palette.night)
+                    .ignoresSafeArea()
+            }
+            .preferredColorScheme(.dark)
+            .confirmsDiscard(
+                when: model.isChanged,
+                isPresented: $isConfirmingDiscard
+            ) {
+                dismiss()
+            }
+            .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
+                sheetContent(for: sheet)
+            }
+            .task {
+                await load()
+            }
         }
         .ignoresSafeArea(.keyboard)
-        .background {
-            Rectangle()
-                .fill(Palette.night)
-                .ignoresSafeArea()
-        }
-        .preferredColorScheme(.dark)
-        .confirmsDiscard(
-            when: model.isChanged,
-            isPresented: $isConfirmingDiscard
-        ) {
-            dismiss()
-        }
-        .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
-            sheetContent(for: sheet)
-        }
-        .task {
-            await load()
-        }
     }
 }
 
@@ -77,13 +105,8 @@ private extension EntrySheet {
             header
             dial
             details
+            templateRow
             categoryPager
-
-            if let errorMessage = model.errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(Palette.rose)
-            }
 
             PrimaryButton(model.saveTitle) {
                 Task {
@@ -210,7 +233,7 @@ private extension EntrySheet {
             .scrollTargetBehavior(.paging)
             .scrollPosition(id: $categoryPage)
             .scrollIndicators(.hidden)
-            .frame(minHeight: 168, maxHeight: 264)
+            .frame(height: Self.pagerHeight)
             .id(model.type)
 
             PageDots(
@@ -258,6 +281,11 @@ private extension EntrySheet {
                         .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
+        }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.height
+        } action: { height in
+            drawerHeight = height
         }
     }
 
@@ -327,7 +355,10 @@ private extension EntrySheet {
     }
 
     func categoryGrid(_ page: [EntryModel.CategoryCell]) -> some View {
-        Grid(horizontalSpacing: 6, verticalSpacing: 6) {
+        Grid(
+            horizontalSpacing: Self.categorySpacing,
+            verticalSpacing: Self.categorySpacing
+        ) {
             ForEach(0..<Self.categoryRows, id: \.self) { row in
                 GridRow {
                     ForEach(0..<Self.categoryColumns, id: \.self) { column in
@@ -344,6 +375,74 @@ private extension EntrySheet {
         }
     }
 
+    var templateRow: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 6) {
+                ForEach(model.templates) { template in
+                    templateButton(template)
+                }
+
+                Button {
+                    open(.newTemplate)
+                } label: {
+                    Label("今の入力を保存", systemImage: "plus")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Palette.gold)
+                        .padding(.horizontal, 12)
+                        .frame(height: Self.templateHeight)
+                        .overlay {
+                            Capsule()
+                                .stroke(
+                                    Palette.gold.opacity(0.5),
+                                    style: Self.dash
+                                )
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.vertical, 1)
+        }
+        .scrollIndicators(.hidden)
+        .frame(height: Self.templateHeight + 2)
+    }
+
+    func templateButton(_ template: EntryTemplate) -> some View {
+        let isApplied = model.isApplied(template)
+        let icon = model.icon(for: template)
+        let amount = template.amount.map { AmountText.text($0) } ?? "入力"
+        let amountColor = template.amount == nil
+            ? Palette.mist
+            : Palette.champagne
+
+        return Button {
+            useTemplate(template)
+        } label: {
+            HStack(spacing: 6) {
+                IconImage(icon, size: 12)
+                    .foregroundStyle(Palette.gold)
+
+                Text(template.name)
+                    .foregroundStyle(Palette.ink)
+
+                Text(amount)
+                    .font(.system(size: 11, design: .serif))
+                    .foregroundStyle(amountColor)
+            }
+            .font(.system(size: 11))
+            .padding(.leading, 6)
+            .padding(.trailing, 12)
+            .frame(height: Self.templateHeight)
+            .background(Self.categoryFill(isApplied), in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(templateStroke(isApplied), lineWidth: 1)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
     @ViewBuilder
     func categoryCell(_ cell: EntryModel.CategoryCell) -> some View {
         switch cell {
@@ -353,17 +452,17 @@ private extension EntrySheet {
             Button {
                 open(.newCategory)
             } label: {
-                VStack(spacing: 6) {
+                VStack(spacing: 4) {
                     Image(systemName: "plus")
-                        .font(.system(size: 20, weight: .ultraLight))
+                        .font(.system(size: 17, weight: .ultraLight))
 
                     Text("追加")
-                        .font(.system(size: 11))
+                        .font(.system(size: 10))
                 }
                 .foregroundStyle(Palette.gold)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 14)
+                    RoundedRectangle(cornerRadius: 12)
                         .stroke(Palette.gold.opacity(0.45), style: Self.dash)
                 }
                 .contentShape(.rect)
@@ -412,18 +511,18 @@ private extension EntrySheet {
         let border = isLit ? Palette.gold.opacity(0.55) : Color.clear
         let width: CGFloat = isLifted ? 1.2 : 1
 
-        return VStack(spacing: 6) {
-            IconImage(model.icon(for: category), size: 20)
+        return VStack(spacing: 4) {
+            IconImage(model.icon(for: category), size: 17)
 
             Text(category.name)
-                .font(.system(size: 11))
+                .font(.system(size: 10))
                 .lineLimit(1)
         }
         .foregroundStyle(color)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(fill, in: .rect(cornerRadius: 14))
+        .background(fill, in: .rect(cornerRadius: 12))
         .overlay {
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: 12)
                 .stroke(border, lineWidth: width)
         }
         .contentShape(.rect)
@@ -492,6 +591,8 @@ private extension EntrySheet {
             }
         case let .editCategory(category):
             CategoryEditSheet(model: model.editCategoryModel(category))
+        case .newTemplate:
+            TemplateEditSheet(model: model.newTemplateModel())
         }
     }
 }
@@ -508,6 +609,7 @@ private extension EntrySheet {
         case delete
         case newCategory
         case editCategory(EntryCategory)
+        case newTemplate
 
         var id: Self {
             self
@@ -526,12 +628,24 @@ private extension EntrySheet {
         topTrailingRadius: 28
     )
     static let categoryRows = 3
-    static let categoryColumns = 4
+    static let categoryColumns = 5
+    static let categorySpacing: CGFloat = 5
+    static let categoryHeight: CGFloat = 54
+    static let templateHeight: CGFloat = 34
     static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-    static let menuPressDuration = 0.25
+    static let menuPressDuration = 0.15
+
+    static var pagerHeight: CGFloat {
+        let rows = CGFloat(categoryRows)
+        return categoryHeight * rows + categorySpacing * (rows - 1)
+    }
 
     static var memoTransition: AnyTransition {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
+    }
+
+    var bannerBottom: CGFloat {
+        isEnteringAmount ? drawerHeight + 10 : 12
     }
 
     var today: LocalDate {
@@ -640,7 +754,21 @@ private extension EntrySheet {
     func reloadCategories() {
         Task {
             await model.reloadCategories()
+            await model.reloadTemplates()
         }
+    }
+
+    func templateStroke(_ isApplied: Bool) -> Color {
+        isApplied ? Palette.gold : Palette.gold.opacity(0.22)
+    }
+
+    func useTemplate(_ template: EntryTemplate) {
+        withAnimation(.snappy) {
+            model.apply(template)
+            showSelectedCategory()
+        }
+
+        setEnteringAmount(template.amount == nil)
     }
 
     func addCategory(_ category: EntryCategory) async {

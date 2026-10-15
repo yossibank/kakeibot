@@ -100,7 +100,7 @@ KakeibotKit/
 │       ├── Queries/         記録とカテゴリの一覧、入力の選択肢、月の要約・日ごとの合計、テンプレート
 │       ├── Records/         Core の型を GRDB で読み書きできるようにする
 │       ├── Snapshot/        書き出し用の全データの読み出し、読み込み用の全置き換え
-│       └── Writes/          記録の保存・更新・削除、カテゴリの保存・並べ替え・非表示
+│       └── Writes/          記録の保存・更新・削除、カテゴリとテンプレートの保存・並べ替え・非表示・削除
 └── Tests/
     ├── CoreTests/           Core と同じフォルダ分け
     └── StoreTests/          メモリ上の DB
@@ -146,6 +146,7 @@ KakeibotApp/
 │   │   │   ├── Menu/
 │   │   │   ├── Recurring/
 │   │   │   ├── Rewards/
+│   │   │   ├── Templates/
 │   │   │   └── Themes/
 │   │   └── Tabs/
 │   │       ├── Assets/

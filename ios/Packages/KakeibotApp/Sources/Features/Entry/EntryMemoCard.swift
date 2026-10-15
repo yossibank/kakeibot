@@ -57,7 +57,6 @@ struct EntryMemoCard: View {
         }
         .shadow(color: .black.opacity(0.45), radius: 20, y: 10)
         .task {
-            try? await Task.sleep(for: .milliseconds(250))
             isFocused.wrappedValue = true
         }
     }

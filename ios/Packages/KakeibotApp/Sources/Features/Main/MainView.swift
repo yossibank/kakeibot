@@ -54,6 +54,12 @@ public struct MainView: View {
                     },
                     onOpenSettings: {
                         sheet = .settings
+                    },
+                    onOpenTemplate: { template in
+                        sheet = .template(template)
+                    },
+                    onAddTemplate: {
+                        sheet = .newTemplate
                     }
                 )
                 .tabContent()
@@ -97,6 +103,9 @@ public struct MainView: View {
             await home.observe()
         }
         .task {
+            await home.observeTemplates()
+        }
+        .task {
             await records.observe()
         }
         .task {
@@ -127,6 +136,21 @@ private extension MainView {
             )
         case .settings:
             SettingsSheet(database: database)
+        case let .template(template):
+            EntrySheet(
+                model: EntryModel(
+                    database: database,
+                    date: home.today,
+                    template: template
+                )
+            )
+        case .newTemplate:
+            TemplateEditSheet(
+                model: TemplateEditModel(
+                    database: database,
+                    type: home.templateType
+                )
+            )
         }
     }
 }
@@ -143,12 +167,16 @@ private extension MainView {
         case new
         case edit(Entry.ID)
         case settings
+        case template(EntryTemplate)
+        case newTemplate
 
         var id: String {
             switch self {
             case .new: "new"
             case let .edit(id): "edit-\(id)"
             case .settings: "settings"
+            case let .template(template): "template-\(template.id)"
+            case .newTemplate: "new-template"
             }
         }
     }

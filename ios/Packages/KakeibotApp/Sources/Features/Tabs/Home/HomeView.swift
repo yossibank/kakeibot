@@ -8,12 +8,15 @@ struct HomeView: View {
     let onOpenEntry: (Entry.ID) -> Void
     let onShowRecords: () -> Void
     let onOpenSettings: () -> Void
+    let onOpenTemplate: (EntryTemplate) -> Void
+    let onAddTemplate: () -> Void
 
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
                 header
                 dialCard
+                templateCard
                 recentCard
 
                 if let errorMessage = model.errorMessage {
@@ -30,6 +33,37 @@ struct HomeView: View {
             Rectangle()
                 .fill(Palette.night)
                 .ignoresSafeArea()
+        }
+        .overlay(alignment: .bottom) {
+            if let recorded = model.recorded {
+                NoticeBanner(
+                    recorded.message,
+                    systemImage: "checkmark",
+                    actionTitle: "取り消す"
+                ) {
+                    Task {
+                        await model.undoRecorded()
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .animation(.snappy, value: model.recorded)
+        .sensoryFeedback(.success, trigger: model.recorded) { _, new in
+            new != nil
+        }
+        .task(id: model.recorded) {
+            guard model.recorded != nil else {
+                return
+            }
+
+            guard await (try? Task.sleep(for: .seconds(4))) != nil else {
+                return
+            }
+
+            model.clearRecorded()
         }
     }
 }
@@ -104,6 +138,50 @@ private extension HomeView {
         .card(cornerRadius: 24)
     }
 
+    var templateCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                SectionTitle("テンプレート")
+
+                Spacer()
+
+                CapsulePicker(
+                    selection: $model.templateType,
+                    options: Self.typeOptions
+                )
+            }
+
+            Text(templateHint)
+                .font(.caption2)
+                .foregroundStyle(Palette.mist)
+
+            LazyVGrid(columns: Self.templateColumns, spacing: 10) {
+                ForEach(model.templates) { template in
+                    templateButton(template)
+                }
+
+                Button(action: onAddTemplate) {
+                    Label("追加", systemImage: "plus")
+                        .font(.footnote)
+                        .foregroundStyle(Palette.gold)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: TemplateCardSize.regular.height)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(
+                                    Palette.gold.opacity(0.45),
+                                    style: Self.dash
+                                )
+                        }
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(14)
+        .card()
+    }
+
     var recentCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -149,6 +227,20 @@ private extension HomeView {
         .card()
     }
 
+    func templateButton(_ template: EntryTemplate) -> some View {
+        Button {
+            use(template)
+        } label: {
+            TemplateCard(
+                icon: model.icon(for: template),
+                name: template.name,
+                detail: model.detail(for: template),
+                amount: template.amount
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
     var divider: some View {
         Rectangle()
             .fill(Palette.gold.opacity(0.18))
@@ -173,5 +265,34 @@ private extension HomeView {
                 .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity)
+    }
+}
+
+private extension HomeView {
+    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
+
+    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
+        .init("支出", value: .expense),
+        .init("収入", value: .income)
+    ]
+
+    static let templateColumns = Array(
+        repeating: GridItem(.flexible(), spacing: 8),
+        count: 2
+    )
+
+    var templateHint: String {
+        model.templates.isEmpty ? "よく使う入力を 1 回で" : "押すとすぐ記録"
+    }
+
+    func use(_ template: EntryTemplate) {
+        guard template.amount != nil else {
+            onOpenTemplate(template)
+            return
+        }
+
+        Task {
+            await model.record(template)
+        }
     }
 }

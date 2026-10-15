@@ -18,6 +18,7 @@ kakeibot のデータを書き出すときの、JSON と CSV の形式を書く�
     "wallets": [],
     "categories": [],
     "entries": [],
+    "templates": [],
     "budgets": [],
     "recurrings": [],
     "rewardRules": [],
@@ -41,6 +42,7 @@ kakeibot のデータを書き出すときの、JSON と CSV の形式を書く�
 | 真偽 | `true` `false` |
 | 並び | 各配列は主キーの昇順 |
 | 読み込み方 | 全部置き換える。読み込む前に確認を出す |
+| `templates` | 無いファイルは、空として読む |
 
 古い版のファイルは、最新の版になるまで版を 1 つずつ上げてから読む。
 

@@ -17,21 +17,27 @@ public final class EntryModel {
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
     public private(set) var errorMessage: String?
+    public private(set) var errorCount = 0
 
     private var baseline: Snapshot?
+    private var allTemplates: [EntryTemplate] = []
     private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
+    private var appliedTemplateId: EntryTemplate.ID?
 
     private let database: AppDatabase
     private let editingId: Entry.ID?
+    private let startingTemplate: EntryTemplate?
 
     public init(
         database: AppDatabase,
         editing id: Entry.ID? = nil,
-        date: LocalDate
+        date: LocalDate,
+        template: EntryTemplate? = nil
     ) {
         self.database = database
         self.editingId = id
         self.date = date
+        self.startingTemplate = template
     }
 }
 
@@ -54,7 +60,7 @@ public extension EntryModel {
         public let wallets: [Wallet]
     }
 
-    static let categoriesPerPage = 12
+    static let categoriesPerPage = 15
 
     var isEditing: Bool {
         editingId != nil
@@ -95,6 +101,10 @@ public extension EntryModel {
         categories(for: type)
     }
 
+    var templates: [EntryTemplate] {
+        allTemplates.filter { $0.type == type }
+    }
+
     var categoryPages: [[CategoryCell]] {
         let cells = categories.map(CategoryCell.category) + [.add]
         let size = Self.categoriesPerPage
@@ -122,7 +132,11 @@ public extension EntryModel {
     }
 
     var walletName: String {
-        wallets.first { $0.id == walletId }?.name ?? "財布"
+        wallets.first { $0.id == walletId }?.name ?? walletTitle
+    }
+
+    var walletTitle: String {
+        type == .income ? "入金先" : "支払い元"
     }
 
     var canSave: Bool {
@@ -162,16 +176,71 @@ public extension EntryModel {
         options?.icons[wallet.iconId]
     }
 
+    func icon(for template: EntryTemplate) -> Icon? {
+        let categories = categories(for: template.type)
+        let category = categories.first { $0.id == template.categoryId }
+        return category.flatMap { options?.icons[$0.iconId] }
+    }
+
     func load() async {
         do {
             options = try await database.entryOptions()
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
+            allTemplates = try await database.templates()
             try await loadEntry()
+
+            if let startingTemplate {
+                apply(startingTemplate)
+            }
+
             baseline = snapshot
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
         }
+    }
+
+    func isApplied(_ template: EntryTemplate) -> Bool {
+        let amountMatches = template.amount.map { $0 == amount } ?? true
+
+        return template.id == appliedTemplateId
+            && template.type == type
+            && template.categoryId == categoryId
+            && template.walletId == walletId
+            && (template.memo ?? "") == memo
+            && amountMatches
+    }
+
+    func apply(_ template: EntryTemplate) {
+        select(template.type)
+        categoryId = template.categoryId
+        walletId = template.walletId
+        memo = template.memo ?? ""
+        calculator = AmountCalculator(amount: template.amount ?? 0)
+        appliedTemplateId = template.id
+    }
+
+    func reloadTemplates() async {
+        do {
+            allTemplates = try await database.templates()
+        } catch {
+            report(error)
+        }
+    }
+
+    func newTemplateModel() -> TemplateEditModel {
+        let templateType: Entry.Kind = type == .income ? .income : .expense
+
+        let draft = EntryTemplateDraft(
+            name: "",
+            type: templateType,
+            amount: amount > 0 ? amount : nil,
+            categoryId: categoryId,
+            walletId: walletId,
+            memo: memo
+        )
+
+        return TemplateEditModel(database: database, draft: draft)
     }
 
     func newCategoryModel() -> CategoryEditModel {
@@ -197,7 +266,7 @@ public extension EntryModel {
                 categoryId = categories.first?.id
             }
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
         }
     }
 
@@ -211,8 +280,12 @@ public extension EntryModel {
 
             await reloadCategories()
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
         }
+    }
+
+    func clearError() {
+        errorMessage = nil
     }
 
     func press(_ key: AmountCalculator.Key) {
@@ -245,7 +318,7 @@ public extension EntryModel {
             try await database.saveEntry(draft, editing: editingId, at: Date())
             return true
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
             return false
         }
     }
@@ -259,7 +332,7 @@ public extension EntryModel {
             try await database.deleteEntry(editingId)
             return true
         } catch {
-            errorMessage = Self.message(for: error)
+            report(error)
             return false
         }
     }
@@ -306,6 +379,15 @@ private extension EntryModel {
             walletId: walletId,
             memo: memo
         )
+    }
+
+    func report(_ error: any Error) {
+        guard !(error is CancellationError) else {
+            return
+        }
+
+        errorMessage = Self.message(for: error)
+        errorCount += 1
     }
 
     static func message(for error: any Error) -> String {

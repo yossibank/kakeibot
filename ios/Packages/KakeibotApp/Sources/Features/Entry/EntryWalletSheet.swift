@@ -10,7 +10,7 @@ struct EntryWalletSheet: View {
     var body: some View {
         FittedSheet {
             VStack(alignment: .leading, spacing: 20) {
-                Text("財布")
+                Text(model.walletTitle)
                     .font(.headline)
                     .foregroundStyle(Palette.champagne)
 

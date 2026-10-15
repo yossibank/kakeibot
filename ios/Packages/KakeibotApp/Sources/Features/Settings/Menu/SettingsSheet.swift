@@ -19,10 +19,22 @@ struct SettingsSheet: View {
                         .foregroundStyle(Palette.gold)
                         .padding(.leading, 6)
 
-                    NavigationLink {
-                        CategoryListView(database: database)
-                    } label: {
-                        row("カテゴリ", systemImage: "tag")
+                    VStack(spacing: 0) {
+                        NavigationLink {
+                            CategoryListView(database: database)
+                        } label: {
+                            row("カテゴリ", systemImage: "tag")
+                        }
+
+                        Rectangle()
+                            .fill(Palette.gold.opacity(0.1))
+                            .frame(height: 0.5)
+
+                        NavigationLink {
+                            TemplateListView(database: database)
+                        } label: {
+                            row("テンプレート", systemImage: "rectangle.stack")
+                        }
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 14)
