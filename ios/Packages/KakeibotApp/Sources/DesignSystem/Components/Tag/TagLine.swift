@@ -44,6 +44,7 @@ public struct TagLine<ID: Hashable>: View {
                     }
                 }
                 .padding(.horizontal, Self.inset)
+                .padding(.bottom, Self.inset)
             }
             .scrollIndicators(.hidden)
         }

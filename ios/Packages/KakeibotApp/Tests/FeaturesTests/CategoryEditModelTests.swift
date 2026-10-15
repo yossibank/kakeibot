@@ -102,18 +102,19 @@ struct CategoryEditModelTests {
         )
         await model.load()
 
-        model.addTag("朝ごはん")
-        model.addTag("昼ごはん")
-        model.addTag(" ")
+        let added = model.addTag("朝ごはん") && model.addTag("昼ごはん")
+        let blankAdded = model.addTag(" ")
         let blankError = model.errorMessage
-        model.renameTag(at: 1, to: "ランチ")
+        let renamed = model.renameTag(at: 1, to: "ランチ")
         model.removeTag(at: 0)
-        model.addTag("おやつ")
+        let snackAdded = model.addTag("おやつ")
 
         let changed = model.isChanged
         _ = await model.save()
         let saved = try await database.categoryList().tags
 
+        #expect(added && renamed && snackAdded)
+        #expect(!blankAdded)
         #expect(blankError == "タグの名前を入れてください")
         #expect(model.errorMessage == nil)
         #expect(changed)

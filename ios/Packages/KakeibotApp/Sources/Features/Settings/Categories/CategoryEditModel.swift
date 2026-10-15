@@ -274,28 +274,38 @@ public extension CategoryEditModel {
         text = String(value.prefix(CategoryDraft.maxTextLength))
     }
 
-    func addTag(_ name: String) {
+    func addTag(_ name: String) -> Bool {
         let tag = EntryTagDraft(name: name)
 
-        if check(tag) {
-            tags.append(tag)
+        guard check(tag) else {
+            return false
         }
+
+        tags.append(tag)
+        return true
     }
 
     func renameTag(
         at index: Int,
         to name: String
-    ) {
+    ) -> Bool {
         guard tags.indices.contains(index) else {
-            return
+            return false
         }
 
         var tag = tags[index]
         tag.name = name
 
-        if check(tag) {
-            tags[index] = tag
+        guard check(tag) else {
+            return false
         }
+
+        tags[index] = tag
+        return true
+    }
+
+    func clearError() {
+        errorMessage = nil
     }
 
     func removeTag(at index: Int) {

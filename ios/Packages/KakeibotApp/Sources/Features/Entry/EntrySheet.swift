@@ -597,6 +597,11 @@ private extension EntrySheet {
             }
         case let .editCategory(category):
             CategoryEditSheet(model: model.editCategoryModel(category))
+        case let .addTag(category):
+            CategoryEditSheet(
+                model: model.editCategoryModel(category),
+                startsAddingTag: true
+            )
         case .newTemplate:
             TemplateEditSheet(model: model.newTemplateModel())
         }
@@ -615,6 +620,7 @@ private extension EntrySheet {
         case delete
         case newCategory
         case editCategory(EntryCategory)
+        case addTag(EntryCategory)
         case newTemplate
 
         var id: Self {
@@ -697,7 +703,7 @@ private extension EntrySheet {
             return
         }
 
-        open(.editCategory(category))
+        open(.addTag(category))
     }
 
     func editMemo(_ isEditing: Bool) {
