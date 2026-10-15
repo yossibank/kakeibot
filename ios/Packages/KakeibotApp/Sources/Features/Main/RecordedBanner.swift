@@ -10,12 +10,14 @@ public struct RecordedNotice: Equatable {
 extension View {
     func recordedBanner(
         _ notice: RecordedNotice?,
+        above inset: CGFloat = 0,
         onUndo: @escaping () -> Void,
         onClear: @escaping () -> Void
     ) -> some View {
         modifier(
             RecordedBanner(
                 notice: notice,
+                inset: inset,
                 onUndo: onUndo,
                 onClear: onClear
             )
@@ -25,11 +27,14 @@ extension View {
 
 private struct RecordedBanner: ViewModifier {
     let notice: RecordedNotice?
+    let inset: CGFloat
     let onUndo: () -> Void
     let onClear: () -> Void
 
     func body(content: Content) -> some View {
-        content
+        let bottom = 12 + inset
+
+        return content
             .overlay(alignment: .bottom) {
                 if let notice {
                     NoticeBanner(
@@ -39,7 +44,7 @@ private struct RecordedBanner: ViewModifier {
                         action: onUndo
                     )
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 12)
+                    .padding(.bottom, bottom)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }

@@ -115,6 +115,7 @@ KakeibotApp/
 │   ├── DesignSystem/
 │   │   ├── Components/      表すものごとのフォルダ
 │   │   │   ├── Amount/      金額
+│   │   │   ├── Banner/      画面の下に出す知らせ
 │   │   │   ├── Card/        カードの見た目、見出し
 │   │   │   ├── Button/      輪のボタン、大きなボタン
 │   │   │   ├── Calendar/    月のカレンダー、曜日の名前
@@ -122,6 +123,7 @@ KakeibotApp/
 │   │   │   ├── Dial/        ダイヤルの面と目盛り、半円のダイヤル
 │   │   │   ├── Entry/       記録の 1 行
 │   │   │   ├── Gesture/     長押しで持ち上げて動かす
+│   │   │   ├── Glass/       ガラスの見た目
 │   │   │   ├── Icon/        アイコン、絵柄から SF Symbols への置き換え
 │   │   │   ├── Keypad/      テンキー
 │   │   │   ├── Pager/       ページの点
@@ -129,7 +131,8 @@ KakeibotApp/
 │   │   │   ├── Scroll/      送る領域の端をぼかす
 │   │   │   ├── Sheet/       中身の高さに合わせたシート
 │   │   │   ├── TabBar/      浮かせたタブの帯と ＋ ボタン
-│   │   │   └── Tag/         タグの札と、紐に下げて並べる列
+│   │   │   ├── Tag/         タグの札と、紐に下げて並べる列
+│   │   │   └── Template/    テンプレートのカードと、その大きさ
 │   │   ├── Resources/
 │   │   │   ├── Assets.xcassets
 │   │   │   └── Fonts/

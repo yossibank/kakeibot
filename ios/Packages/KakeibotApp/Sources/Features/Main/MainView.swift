@@ -92,6 +92,16 @@ public struct MainView: View {
                 .tabContent()
             }
         }
+        .recordedBanner(
+            assets.transferred,
+            above: FloatingTabBar<Int>.height
+        ) {
+            Task {
+                await assets.undoTransfer()
+            }
+        } onClear: {
+            assets.clearTransfer()
+        }
         .overlay(alignment: .bottom) {
             FloatingTabBar(
                 selection: $tab,
@@ -139,7 +149,7 @@ private extension MainView {
     func sheetContent(for sheet: Sheet) -> some View {
         switch sheet {
         case .new:
-            EntrySheet(model: draft)
+            EntrySheet(model: draft, onSave: showTransfer)
         case let .edit(id):
             EntrySheet(
                 model: EntryModel(
@@ -165,9 +175,7 @@ private extension MainView {
                     date: home.today,
                     type: .transfer
                 ),
-                onSave: { entry in
-                    assets.showTransfer(entry)
-                }
+                onSave: showTransfer
             )
         case .newTemplate:
             TemplateEditSheet(
@@ -229,6 +237,14 @@ private extension MainView {
 }
 
 private extension MainView {
+    func showTransfer(_ entry: Entry) {
+        guard entry.type == .transfer else {
+            return
+        }
+
+        assets.showTransfer(entry)
+    }
+
     func prepareDraft() {
         let model = EntryModel(database: database, date: home.today)
         draft = model
