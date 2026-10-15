@@ -43,6 +43,7 @@ extension EntryWalletSheet {
 private extension EntryWalletSheet {
     func walletRow(_ wallet: Wallet) -> some View {
         let isSelected = selectedId == wallet.id
+        let isTaken = takenId == wallet.id
         let nameColor = isSelected ? Palette.champagne : Palette.ink
 
         return Button {
@@ -62,6 +63,10 @@ private extension EntryWalletSheet {
                     Image(systemName: "checkmark")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(Palette.gold)
+                } else if isTaken {
+                    Text("\(takenTitle)に選択中")
+                        .font(.caption2)
+                        .foregroundStyle(Palette.mist)
                 }
             }
             .padding(.horizontal, 16)
@@ -80,6 +85,8 @@ private extension EntryWalletSheet {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+        .disabled(isTaken)
+        .opacity(isTaken ? 0.45 : 1)
     }
 }
 
@@ -88,6 +95,24 @@ private extension EntryWalletSheet {
         switch role {
         case .source: model.walletTitle
         case .destination: EntryModel.destinationTitle
+        }
+    }
+
+    var takenId: Wallet.ID? {
+        guard model.type == .transfer else {
+            return nil
+        }
+
+        switch role {
+        case .source: return model.toWalletId
+        case .destination: return model.walletId
+        }
+    }
+
+    var takenTitle: String {
+        switch role {
+        case .source: EntryModel.destinationTitle
+        case .destination: model.walletTitle
         }
     }
 

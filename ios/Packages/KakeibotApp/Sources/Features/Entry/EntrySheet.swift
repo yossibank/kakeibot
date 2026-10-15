@@ -115,7 +115,6 @@ private extension EntrySheet {
                 .edgeFade(Self.fade)
                 .padding(.vertical, -Self.fade)
             }
-            .frame(maxHeight: .infinity, alignment: .top)
 
             PrimaryButton(model.saveTitle) {
                 Task {
@@ -146,16 +145,27 @@ private extension EntrySheet {
             details
 
             if model.type == .transfer {
-                transferPanel
-            } else {
-                templateRow
-                categoryPager
+                ZStack(alignment: .top) {
+                    categoryArea
+                        .hidden()
 
-                TagLine(tagItems, selection: model.tagId) { id in
-                    model.toggleTag(id)
-                } onAdd: {
-                    editTags()
+                    transferPanel
                 }
+            } else {
+                categoryArea
+            }
+        }
+    }
+
+    var categoryArea: some View {
+        VStack(spacing: 14) {
+            templateRow
+            categoryPager
+
+            TagLine(tagItems, selection: model.tagId) { id in
+                model.toggleTag(id)
+            } onAdd: {
+                editTags()
             }
         }
     }
@@ -293,6 +303,15 @@ private extension EntrySheet {
                     .font(.subheadline)
                     .foregroundStyle(Palette.champagne)
                     .lineLimit(1)
+
+                if let balance = wallet.flatMap({ model.balance(of: $0) }) {
+                    Text("残高 \(AmountText.text(balance))")
+                        .font(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.mist)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
             }
             .padding(.horizontal, 8)
             .frame(maxWidth: .infinity, minHeight: 120)

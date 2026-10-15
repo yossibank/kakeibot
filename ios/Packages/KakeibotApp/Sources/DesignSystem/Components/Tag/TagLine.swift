@@ -64,6 +64,7 @@ public struct TagLine<ID: Hashable>: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil)
         }
+        .frame(maxWidth: .infinity)
         .frame(height: Self.height, alignment: .top)
         .background(alignment: .top) {
             TagString()

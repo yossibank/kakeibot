@@ -161,10 +161,12 @@ private extension RecordsView {
 
             Spacer(minLength: 8)
 
-            Text(Self.totalText(for: day))
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
-                .lineLimit(1)
+            if let total = Self.totalText(for: day) {
+                Text(total)
+                    .font(.caption)
+                    .foregroundStyle(Palette.mist)
+                    .lineLimit(1)
+            }
         }
         .padding(.top, 12)
         .padding(.bottom, 8)
@@ -180,13 +182,16 @@ private extension RecordsView {
         return date.weekday == .saturday ? Palette.saturday : Palette.mist
     }
 
-    static func totalText(for day: EntryDay) -> String {
-        let expense = AmountText.text(day.expenseTotal)
+    static func totalText(for day: EntryDay) -> String? {
+        let expense = day.expenseTotal > 0
+            ? AmountText.text(day.expenseTotal)
+            : nil
 
-        guard day.incomeTotal > 0 else {
-            return expense
-        }
+        let income = day.incomeTotal > 0
+            ? "収入 \(AmountText.text(day.incomeTotal))"
+            : nil
 
-        return "\(expense)・収入 \(AmountText.text(day.incomeTotal))"
+        let parts = [expense, income].compactMap(\.self)
+        return parts.isEmpty ? nil : parts.joined(separator: "・")
     }
 }

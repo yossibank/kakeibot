@@ -25,6 +25,7 @@ public final class EntryModel {
     public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
+    public private(set) var balances: [Wallet.ID: Int] = [:]
     public private(set) var errorMessage: String?
     public private(set) var errorCount = 0
 
@@ -184,6 +185,10 @@ public extension EntryModel {
             return "金額を入れてください"
         }
 
+        if type == .transfer, toWalletId == nil {
+            return "\(Self.destinationTitle)を選んでください"
+        }
+
         let action = type == .transfer ? "振り替える" : "記録する"
         return "\(AmountText.text(amount)) を\(action)"
     }
@@ -219,6 +224,10 @@ public extension EntryModel {
         wallets.first { $0.id == id }
     }
 
+    func balance(of wallet: Wallet) -> Int? {
+        balances[wallet.id]
+    }
+
     func icon(for template: EntryTemplate) -> Icon? {
         let categories = categories(for: template.type)
         let category = categories.first { $0.id == template.categoryId }
@@ -231,6 +240,7 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
             allTemplates = try await database.templates()
+            try await loadBalances()
             try await loadEntry()
 
             if let startingTemplate {
@@ -499,6 +509,17 @@ private extension EntryModel {
         walletId = entry.walletId
         toWalletId = entry.toWalletId
         memo = entry.memo ?? ""
+    }
+
+    func loadBalances() async throws {
+        let list = try await database.entryList()
+        let entries = list.days.flatMap(\.entries)
+
+        let pairs = wallets.map { wallet in
+            (wallet.id, wallet.balance(with: entries))
+        }
+
+        balances = Dictionary(uniqueKeysWithValues: pairs)
     }
 
     func chooseDestination() {

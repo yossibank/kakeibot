@@ -69,6 +69,36 @@ struct TransferEntryTests {
     }
 
     @Test
+    func showsBalancesAndMissingDestination() async throws {
+        let setup = try await Setup()
+        let date = try #require(LocalDate("2026-10-01"))
+
+        let income = EntryDraft(
+            type: .income,
+            amount: 5000,
+            date: date,
+            categoryId: setup.salary,
+            walletId: setup.bank
+        )
+
+        try await setup.database.saveEntry(income, at: Date())
+
+        let model = EntryModel(
+            database: setup.database,
+            date: setup.date,
+            type: .transfer
+        )
+        await model.load()
+        model.press(.digit(5))
+        let bank = try #require(model.wallet(setup.bank))
+        let balance = model.balance(of: bank)
+        model.toWalletId = nil
+
+        #expect(balance == 5000)
+        #expect(model.saveTitle == "振替先を選んでください")
+    }
+
+    @Test
     func reportsSameWallet() async throws {
         let setup = try await Setup()
 
@@ -91,6 +121,7 @@ extension TransferEntryTests {
         let date: LocalDate
         let cash: Wallet.ID
         let bank: Wallet.ID
+        let salary: EntryCategory.ID
     }
 }
 
@@ -105,7 +136,8 @@ extension TransferEntryTests.Setup {
             database: database,
             date: date,
             cash: options.wallets[0].id,
-            bank: options.wallets[1].id
+            bank: options.wallets[1].id,
+            salary: options.incomeCategories[0].id
         )
     }
 }
