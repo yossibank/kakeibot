@@ -9,6 +9,7 @@ public struct MainView: View {
     @State private var sheet: Sheet?
     @State private var home: HomeModel
     @State private var records: RecordsModel
+    @State private var assets: AssetsModel
     @State private var draft: EntryModel
     @State private var isWarmingEntry = true
 
@@ -28,6 +29,13 @@ public struct MainView: View {
             initialValue: RecordsModel(
                 database: database,
                 month: today.yearMonth
+            )
+        )
+
+        _assets = State(
+            initialValue: AssetsModel(
+                database: database,
+                today: today
             )
         )
 
@@ -78,7 +86,7 @@ public struct MainView: View {
             }
 
             Tab(value: MainTab.assets) {
-                ComingSoonView(title: "資産", systemImage: "building.columns")
+                AssetsView(model: assets)
                     .tabContent()
             }
         }
@@ -109,12 +117,16 @@ public struct MainView: View {
             await records.observe()
         }
         .task {
+            await assets.observe()
+        }
+        .task {
             await draft.load()
         }
         .onReceive(
             NotificationCenter.default.publisher(for: .NSCalendarDayChanged)
         ) { _ in
             home.today = LocalDate(Date(), in: .current)
+            assets.today = home.today
             prepareDraft()
         }
     }

@@ -1,0 +1,46 @@
+[
+  {
+    "initialBalance": 10000,
+    "entries": [],
+    "through": null,
+    "balance": 10000
+  },
+  {
+    "initialBalance": 10000,
+    "entries": [
+      { "type": "expense", "amount": 980, "date": "2026-10-01", "wallet": "self", "toWallet": null },
+      { "type": "income", "amount": 3000, "date": "2026-10-02", "wallet": "self", "toWallet": null },
+      { "type": "expense", "amount": 500, "date": "2026-10-02", "wallet": "other", "toWallet": null }
+    ],
+    "through": null,
+    "balance": 12020
+  },
+  {
+    "initialBalance": 0,
+    "entries": [
+      { "type": "transfer", "amount": 5000, "date": "2026-10-03", "wallet": "self", "toWallet": "other" },
+      { "type": "transfer", "amount": 2000, "date": "2026-10-04", "wallet": "other", "toWallet": "self" }
+    ],
+    "through": null,
+    "balance": -3000
+  },
+  {
+    "initialBalance": -24800,
+    "entries": [
+      { "type": "expense", "amount": 1200, "date": "2026-10-05", "wallet": "self", "toWallet": null },
+      { "type": "transfer", "amount": 24800, "date": "2026-10-27", "wallet": "other", "toWallet": "self" }
+    ],
+    "through": null,
+    "balance": -1200
+  },
+  {
+    "initialBalance": 1000,
+    "entries": [
+      { "type": "expense", "amount": 100, "date": "2026-09-30", "wallet": "self", "toWallet": null },
+      { "type": "expense", "amount": 200, "date": "2026-10-01", "wallet": "self", "toWallet": null },
+      { "type": "expense", "amount": 400, "date": "2026-10-02", "wallet": "self", "toWallet": null }
+    ],
+    "through": "2026-10-01",
+    "balance": 700
+  }
+]
