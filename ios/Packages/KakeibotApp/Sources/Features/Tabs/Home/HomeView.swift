@@ -36,8 +36,18 @@ struct HomeView: View {
         }
         .overlay(alignment: .bottom) {
             if let recorded = model.recorded {
-                recordedToast(recorded)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                NoticeBanner(
+                    recorded.message,
+                    systemImage: "checkmark",
+                    actionTitle: "取り消す"
+                ) {
+                    Task {
+                        await model.undoRecorded()
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .animation(.snappy, value: model.recorded)
@@ -230,50 +240,6 @@ private extension HomeView {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-    }
-
-    func recordedToast(_ recorded: HomeModel.Recorded) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: "checkmark")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(Palette.gold)
-
-            Text(recorded.message)
-                .font(.footnote)
-                .foregroundStyle(Palette.ink)
-                .lineLimit(1)
-
-            Spacer(minLength: 8)
-
-            Button {
-                Task {
-                    await model.undoRecorded()
-                }
-            } label: {
-                Text("取り消す")
-                    .font(.caption)
-                    .foregroundStyle(Palette.gold)
-                    .padding(.horizontal, 14)
-                    .frame(height: 34)
-                    .overlay {
-                        Capsule()
-                            .stroke(Palette.gold.opacity(0.45), lineWidth: 1)
-                    }
-                    .contentShape(Capsule())
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.leading, 18)
-        .padding(.trailing, 8)
-        .frame(height: 50)
-        .background(Palette.drawer, in: Capsule())
-        .overlay {
-            Capsule()
-                .stroke(Palette.gold.opacity(0.55), lineWidth: 0.8)
-        }
-        .shadow(color: .black.opacity(0.5), radius: 20, y: 10)
-        .padding(.horizontal, 16)
-        .padding(.bottom, 12)
     }
 
     var divider: some View {

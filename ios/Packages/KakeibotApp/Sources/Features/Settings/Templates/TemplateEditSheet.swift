@@ -7,6 +7,7 @@ public struct TemplateEditSheet: View {
     @State private var model: TemplateEditModel
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
+    @State private var errorCount = 0
 
     @FocusState private var focus: Field?
 
@@ -25,7 +26,6 @@ public struct TemplateEditSheet: View {
     public var body: some View {
         ZStack(alignment: .top) {
             content
-                .ignoresSafeArea(.keyboard)
 
             if let panel {
                 Color.black
@@ -53,6 +53,21 @@ public struct TemplateEditSheet: View {
                 .padding(.horizontal, 18)
                 .padding(.top, 18)
         }
+        .overlay(alignment: .bottom) {
+            if let errorMessage = model.errorMessage {
+                NoticeBanner(
+                    errorMessage,
+                    systemImage: "exclamationmark",
+                    tone: .error
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .ignoresSafeArea(.keyboard)
+        .animation(.snappy, value: model.errorMessage)
+        .sensoryFeedback(.error, trigger: errorCount)
         .background {
             Rectangle()
                 .fill(Palette.night)
@@ -78,6 +93,17 @@ public struct TemplateEditSheet: View {
         .task {
             await model.load()
         }
+        .task(id: errorCount) {
+            guard errorCount > 0 else {
+                return
+            }
+
+            guard await (try? Task.sleep(for: .seconds(3))) != nil else {
+                return
+            }
+
+            model.clearError()
+        }
     }
 }
 
@@ -96,12 +122,6 @@ private extension TemplateEditSheet {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 6)
                 .padding(.top, -8)
-
-            if let errorMessage = model.errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(Palette.rose)
-            }
 
             Spacer(minLength: 0)
 
@@ -565,7 +585,13 @@ private extension TemplateEditSheet {
     }
 
     var nameLine: Color {
-        focus == .name ? Palette.gold : Palette.gold.opacity(0.45)
+        if model.errorMessage != nil, model.name.isEmpty {
+            Palette.rose
+        } else if focus == .name {
+            Palette.gold
+        } else {
+            Palette.gold.opacity(0.45)
+        }
     }
 
     var previewName: String {
@@ -677,6 +703,7 @@ private extension TemplateEditSheet {
         try? await Task.sleep(for: .milliseconds(80))
 
         guard let template = await model.save() else {
+            errorCount += 1
             return
         }
 
@@ -687,6 +714,8 @@ private extension TemplateEditSheet {
     func delete() async {
         if await model.delete() {
             dismiss()
+        } else {
+            errorCount += 1
         }
     }
 }

@@ -113,6 +113,10 @@ public extension TemplateEditModel {
         options?.icons[wallet.iconId]
     }
 
+    func clearError() {
+        errorMessage = nil
+    }
+
     func press(_ key: AmountCalculator.Key) {
         calculator.press(key)
     }
