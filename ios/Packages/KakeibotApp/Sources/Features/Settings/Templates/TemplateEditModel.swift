@@ -7,10 +7,18 @@ import Store
 @Observable
 public final class TemplateEditModel {
     public var name: String
-    public var categoryId: EntryCategory.ID?
     public var walletId: Wallet.ID?
     public var memo: String
 
+    public var categoryId: EntryCategory.ID? {
+        didSet {
+            if categoryId != oldValue {
+                tagId = nil
+            }
+        }
+    }
+
+    public private(set) var tagId: EntryTag.ID?
     public private(set) var type: Entry.Kind
     public private(set) var calculator: AmountCalculator
     public private(set) var options: EntryOptions?
@@ -45,6 +53,7 @@ public final class TemplateEditModel {
         self.type = draft.type
         self.calculator = AmountCalculator(amount: draft.amount ?? 0)
         self.categoryId = draft.categoryId
+        self.tagId = draft.tagId
         self.walletId = draft.walletId
         self.memo = draft.memo
     }
@@ -73,6 +82,7 @@ public extension TemplateEditModel {
             type: type,
             amount: amount,
             categoryId: categoryId,
+            tagId: tagId,
             walletId: walletId,
             memo: memo
         )
@@ -106,6 +116,19 @@ public extension TemplateEditModel {
         wallets.first { $0.id == walletId }
     }
 
+    var tags: [EntryTag] {
+        let tags = options?.tags ?? []
+
+        return tags.filter { tag in
+            tag.categoryId == categoryId
+                && (tag.archivedAt == nil || tag.id == tagId)
+        }
+    }
+
+    var selectedTag: EntryTag? {
+        tags.first { $0.id == tagId }
+    }
+
     func icon(for category: EntryCategory) -> Icon? {
         options?.icons[category.iconId]
     }
@@ -120,6 +143,10 @@ public extension TemplateEditModel {
 
     func press(_ key: AmountCalculator.Key) {
         calculator.press(key)
+    }
+
+    func toggleTag(_ id: EntryTag.ID) {
+        tagId = tagId == id ? nil : id
     }
 
     func load() async {
@@ -219,6 +246,7 @@ private extension TemplateEditModel {
         type = draft.type
         calculator = AmountCalculator(amount: draft.amount ?? 0)
         categoryId = draft.categoryId
+        tagId = draft.tagId
         walletId = draft.walletId
         memo = draft.memo
     }

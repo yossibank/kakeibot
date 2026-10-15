@@ -20,8 +20,9 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
 | `category-draft.json` | カテゴリの入力の判定で出る問題 | `name`、`mark`（`kind` が `glyph`・`emoji`・`text`、`value`）、`color`、`problems` |
+| `entry-tag-draft.json` | タグの名前の判定で出る問題 | `name`、`problems` |
 
-名前と、絵文字・文字の前後の空白は除いてから判定する。文字は 3 文字まで、色は `#RRGGBB` にする。
+名前と、絵文字・文字の前後の空白は除いてから判定する。文字は 3 文字まで、色は `#RRGGBB` にする。タグの名前は 8 文字までにする。
 
 ## date
 
@@ -46,7 +47,7 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
-| `entry-draft.json` | 入力の判定で出る問題 | `type`、`amount`、`category`（真偽）、`toWallet`（`none`・`same`・`other`）、`problems` |
+| `entry-draft.json` | 入力の判定で出る問題 | `type`、`amount`、`category`・`tag`（真偽）、`toWallet`（`none`・`same`・`other`）、`problems` |
 | `entry-template-draft.json` | テンプレートの判定で出る問題 | `name`、`type`、`amount`（空でもよい）、`category`・`wallet`（真偽）、`problems` |
 | `amount-calculator.json` | 電卓のキーを順に押したときの金額と式。式は左から順に計算し、割り算と税込みは 1 円未満を切り捨てる | `keys`（`0`〜`9`・`00`・`del`・`ac`・`+`・`-`・`*`・`/`・`=`・`tax8`・`tax10`）、`amount`、`expression`（数と記号を空白で区切る） |
 | `entry-day.json` | 記録を日ごとにまとめ、支出と収入の合計を出す | `entries`（`id`・`type`・`amount`・`date`・`createdAt`）、`days`（`date`・`expense`・`income`・`entryIds`） |

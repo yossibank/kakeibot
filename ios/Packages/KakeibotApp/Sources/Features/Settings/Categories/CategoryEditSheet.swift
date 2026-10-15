@@ -6,46 +6,64 @@ import SwiftUI
 public struct CategoryEditSheet: View {
     @State private var model: CategoryEditModel
     @State private var isConfirmingDiscard = false
+    @State private var tagEdit: TagEdit?
+    @State private var isMovingTag = false
+    @State private var tagName = ""
 
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
 
+    let startsAddingTag: Bool
     let onSave: (EntryCategory) -> Void
 
     public init(
         model: CategoryEditModel,
+        startsAddingTag: Bool = false,
         onSave: @escaping (EntryCategory) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+        self.startsAddingTag = startsAddingTag
         self.onSave = onSave
     }
 
     public var body: some View {
-        content
-            .ignoresSafeArea(.keyboard)
-            .preferredColorScheme(.dark)
-            .confirmsDiscard(
-                when: model.isChanged,
-                isPresented: $isConfirmingDiscard
-            ) {
-                dismiss()
+        GeometryReader { _ in
+            ZStack {
+                content
+                    .ignoresSafeArea(.keyboard)
+
+                if let tagEdit {
+                    tagLayer(tagEdit)
+                }
             }
-            .onChange(of: model.markKind) {
-                focus = nil
+        }
+        .preferredColorScheme(.dark)
+        .confirmsDiscard(
+            when: model.isChanged,
+            isPresented: $isConfirmingDiscard
+        ) {
+            dismiss()
+        }
+        .onChange(of: model.markKind) {
+            focus = nil
+        }
+        .onChange(of: model.glyph) {
+            focus = nil
+        }
+        .onChange(of: model.emoji) {
+            focus = nil
+        }
+        .onChange(of: model.color) {
+            focus = nil
+        }
+        .task {
+            await model.load()
+
+            if startsAddingTag {
+                addTag()
             }
-            .onChange(of: model.glyph) {
-                focus = nil
-            }
-            .onChange(of: model.emoji) {
-                focus = nil
-            }
-            .onChange(of: model.color) {
-                focus = nil
-            }
-            .task {
-                await model.load()
-            }
+        }
     }
 }
 
@@ -53,17 +71,29 @@ private extension CategoryEditSheet {
     var content: some View {
         VStack(spacing: 16) {
             header
-            preview
-            field("名前", text: $model.name, font: .body, focus: .name)
-            colors
-            CapsulePicker(selection: $model.markKind, options: Self.markOptions)
 
             ScrollView {
-                markChooser
-                    .padding(.bottom, 8)
+                VStack(spacing: 16) {
+                    preview
+                    field("名前", text: $model.name, font: .body, focus: .name)
+                    tags
+                    colors
+
+                    CapsulePicker(
+                        selection: $model.markKind,
+                        options: Self.markOptions
+                    )
+
+                    markChooser
+                        .padding(.bottom, 8)
+                }
+                .padding(.vertical, Self.fade)
             }
             .scrollIndicators(.hidden)
+            .edgeFade(Self.fade)
+            .padding(.vertical, -Self.fade)
             .scrollDismissesKeyboard(.interactively)
+            .scrollDisabled(isMovingTag)
 
             if let errorMessage = model.errorMessage {
                 Text(errorMessage)
@@ -148,6 +178,59 @@ private extension CategoryEditSheet {
             .font(.caption2)
             .foregroundStyle(Palette.mist)
         }
+    }
+
+    var tags: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                sectionTitle("タグ")
+
+                Spacer()
+
+                if model.tags.count > 1 {
+                    Text("長押しで並べ替え")
+                        .font(.caption2)
+                        .foregroundStyle(Palette.mist)
+                }
+            }
+
+            TagLine(tagItems, selection: nil) { id in
+                editTag(id)
+            } onAdd: {
+                addTag()
+            } onMove: { id, index in
+                model.moveTag(id, to: index)
+            }
+            .onPreferenceChange(TagLineMovingKey.self) { isMoving in
+                isMovingTag = isMoving
+            }
+        }
+    }
+
+    @ViewBuilder
+    func tagLayer(_ edit: TagEdit) -> some View {
+        Color.black
+            .opacity(0.45)
+            .ignoresSafeArea()
+            .onTapGesture {
+                closeTag()
+            }
+            .transition(.opacity)
+
+        CategoryTagCard(
+            name: $tagName,
+            isAdding: edit == .add,
+            errorMessage: model.errorMessage,
+            onCommit: {
+                commitTag()
+            },
+            onDelete: deleteAction(for: edit),
+            onClose: {
+                closeTag()
+            }
+        )
+        .padding(.horizontal, 20)
+        .transition(Self.tagTransition)
     }
 
     var colors: some View {
@@ -361,7 +444,14 @@ private extension CategoryEditSheet {
         case text
     }
 
+    enum TagEdit: Hashable {
+        case add
+        case rename(UUID)
+    }
+
     typealias MarkOption = CapsulePicker<CategoryEditModel.MarkKind>.Option
+
+    static let fade: CGFloat = 16
 
     static let markOptions: [MarkOption] = [
         .init("絵柄", value: .glyph),
@@ -378,6 +468,25 @@ private extension CategoryEditSheet {
         repeating: GridItem(.flexible(), spacing: 6),
         count: 8
     )
+
+    var tagItems: [TagLine<UUID>.Item] {
+        model.tags.map { TagLine.Item(id: $0.id, name: $0.draft.name) }
+    }
+
+    static var tagTransition: AnyTransition {
+        .scale(scale: 0.95).combined(with: .opacity)
+    }
+
+    func deleteAction(for edit: TagEdit) -> (() -> Void)? {
+        guard case let .rename(id) = edit else {
+            return nil
+        }
+
+        return {
+            model.removeTag(id)
+            closeTag()
+        }
+    }
 
     var saveColor: Color {
         model.canSave ? Palette.gold : Palette.dusk
@@ -423,6 +532,48 @@ private extension CategoryEditSheet {
 
     func tileStroke(isSelected: Bool) -> Color {
         isSelected ? Palette.gold : Palette.gold.opacity(0.14)
+    }
+
+    func addTag() {
+        showTag(.add, name: "")
+    }
+
+    func editTag(_ id: UUID) {
+        let name = model.tags.first { $0.id == id }?.draft.name ?? ""
+        showTag(.rename(id), name: name)
+    }
+
+    func showTag(
+        _ edit: TagEdit,
+        name: String
+    ) {
+        focus = nil
+        tagName = name
+        model.clearError()
+
+        withAnimation(.snappy(duration: 0.25)) {
+            tagEdit = edit
+        }
+    }
+
+    func closeTag() {
+        model.clearError()
+
+        withAnimation(.snappy(duration: 0.2)) {
+            tagEdit = nil
+        }
+    }
+
+    func commitTag() {
+        let isDone = switch tagEdit {
+        case .add: model.addTag(tagName)
+        case let .rename(id): model.renameTag(id, to: tagName)
+        case nil: true
+        }
+
+        if isDone {
+            closeTag()
+        }
     }
 
     func close() {

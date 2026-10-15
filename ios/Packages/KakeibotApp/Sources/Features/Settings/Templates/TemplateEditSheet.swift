@@ -112,18 +112,22 @@ private extension TemplateEditSheet {
             Color.clear
                 .frame(height: 44)
 
-            preview
+            ScrollView {
+                VStack(spacing: 16) {
+                    preview
 
-            VStack(alignment: .leading, spacing: 8) {
-                rows
+                    VStack(alignment: .leading, spacing: 8) {
+                        rows
 
-                Text("金額を空にすると、使うときに入れる")
-                    .font(.caption2)
-                    .foregroundStyle(Palette.mist)
-                    .padding(.leading, 6)
+                        Text("金額を空にすると、使うときに入れる")
+                            .font(.caption2)
+                            .foregroundStyle(Palette.mist)
+                            .padding(.leading, 6)
+                    }
+                }
             }
-
-            Spacer(minLength: 0)
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.hidden)
 
             if model.isEditing {
                 deleteButton
@@ -427,6 +431,9 @@ private extension TemplateEditSheet {
                 categoryButton(category)
             }
             .padding(.bottom, 8)
+        case .tag:
+            tagChooser
+                .padding(.bottom, 8)
         case .wallet:
             tileGrid(model.wallets, columns: 3, spacing: 8) { wallet in
                 walletButton(wallet)
@@ -434,6 +441,20 @@ private extension TemplateEditSheet {
             .padding(.bottom, 8)
         case .memo:
             EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    var tagChooser: some View {
+        if model.tags.isEmpty {
+            Text("このカテゴリにタグはない。カテゴリの編集で足せる")
+                .font(.caption)
+                .foregroundStyle(Palette.mist)
+                .frame(maxWidth: .infinity, minHeight: 54)
+        } else {
+            TagLine(tagItems, selection: model.tagId) { id in
+                model.toggleTag(id)
+            }
         }
     }
 
@@ -529,6 +550,7 @@ private extension TemplateEditSheet {
     enum Panel: Hashable {
         case amount
         case category
+        case tag
         case wallet
         case memo
     }
@@ -579,8 +601,17 @@ private extension TemplateEditSheet {
     }
 
     var detail: String {
-        let parts = [model.selectedCategory?.name, model.selectedWallet?.name]
+        let parts = [
+            model.selectedCategory?.name,
+            model.selectedTag?.name,
+            model.selectedWallet?.name
+        ]
+
         return parts.compactMap(\.self).joined(separator: "・")
+    }
+
+    var tagItems: [TagLine<EntryTag.ID>.Item] {
+        model.tags.map { TagLine.Item(id: $0.id, name: $0.name) }
     }
 
     var nameLine: Color {
@@ -626,6 +657,13 @@ private extension TemplateEditSheet {
                 isEmpty: model.selectedCategory == nil
             ),
             RowItem(
+                panel: .tag,
+                systemImage: "tag",
+                title: "タグ",
+                value: model.selectedTag?.name ?? "なし",
+                isEmpty: model.selectedTag == nil
+            ),
+            RowItem(
                 panel: .wallet,
                 systemImage: "wallet.bifold",
                 title: model.walletTitle,
@@ -655,6 +693,7 @@ private extension TemplateEditSheet {
         switch panel {
         case .amount: "金額"
         case .category: "カテゴリ"
+        case .tag: "タグ"
         case .wallet: model.walletTitle
         case .memo: "メモ"
         }

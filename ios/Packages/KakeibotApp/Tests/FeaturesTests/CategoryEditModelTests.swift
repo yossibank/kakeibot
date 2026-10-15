@@ -88,6 +88,43 @@ struct CategoryEditModelTests {
         #expect(named)
         #expect(!cleared)
     }
+
+    @Test
+    func editsAndSavesTags() async throws {
+        let database = try Self.database()
+        let list = try await database.categoryList()
+        let food = try #require(list.categories.first { $0.name == "食費" })
+
+        let model = CategoryEditModel(
+            database: database,
+            kind: .expense,
+            editing: food.id
+        )
+        await model.load()
+
+        let added = model.addTag("朝ごはん") && model.addTag("昼ごはん")
+        let blankAdded = model.addTag(" ")
+        let blankError = model.errorMessage
+        let breakfast = try #require(model.tags.first)
+        let lunch = try #require(model.tags.last)
+        let renamed = model.renameTag(lunch.id, to: "ランチ")
+        model.removeTag(breakfast.id)
+        let snackAdded = model.addTag("おやつ")
+        let snack = try #require(model.tags.last)
+        model.moveTag(snack.id, to: 0)
+
+        let changed = model.isChanged
+        _ = await model.save()
+        let saved = try await database.categoryList().tags
+
+        #expect(added && renamed && snackAdded)
+        #expect(!blankAdded)
+        #expect(blankError == "タグの名前を入れてください")
+        #expect(model.errorMessage == nil)
+        #expect(changed)
+        #expect(saved.map(\.name) == ["おやつ", "ランチ"])
+        #expect(saved.allSatisfy { $0.categoryId == food.id })
+    }
 }
 
 private extension CategoryEditModelTests {

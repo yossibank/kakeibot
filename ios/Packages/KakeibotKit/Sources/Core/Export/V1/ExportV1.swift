@@ -44,6 +44,7 @@ public extension ExportV1 {
         public var icons: [Icon]
         public var wallets: [Wallet]
         public var categories: [EntryCategory]
+        public var tags: [EntryTag]
         public var entries: [Entry]
         public var templates: [EntryTemplate]
         public var budgets: [Budget]
@@ -60,6 +61,7 @@ public extension ExportV1 {
             icons: [Icon],
             wallets: [Wallet],
             categories: [EntryCategory],
+            tags: [EntryTag] = [],
             entries: [Entry],
             templates: [EntryTemplate] = [],
             budgets: [Budget],
@@ -75,6 +77,7 @@ public extension ExportV1 {
             self.icons = icons
             self.wallets = wallets
             self.categories = categories
+            self.tags = tags
             self.entries = entries
             self.templates = templates
             self.budgets = budgets
@@ -131,6 +134,10 @@ public extension ExportV1.Tables {
                 [EntryCategory].self,
                 forKey: .categories
             ),
+            tags: container.decodeIfPresent(
+                [EntryTag].self,
+                forKey: .tags
+            ) ?? [],
             entries: container.decode([Entry].self, forKey: .entries),
             templates: container.decodeIfPresent(
                 [EntryTemplate].self,

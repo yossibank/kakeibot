@@ -5,6 +5,7 @@ public struct EntryTemplateDraft: Hashable, Sendable {
     public var type: Entry.Kind
     public var amount: Int?
     public var categoryId: EntryCategory.ID?
+    public var tagId: EntryTag.ID?
     public var walletId: Wallet.ID?
     public var memo: String
 
@@ -13,6 +14,7 @@ public struct EntryTemplateDraft: Hashable, Sendable {
         type: Entry.Kind,
         amount: Int?,
         categoryId: EntryCategory.ID?,
+        tagId: EntryTag.ID? = nil,
         walletId: Wallet.ID?,
         memo: String = ""
     ) {
@@ -20,6 +22,7 @@ public struct EntryTemplateDraft: Hashable, Sendable {
         self.type = type
         self.amount = amount
         self.categoryId = categoryId
+        self.tagId = tagId
         self.walletId = walletId
         self.memo = memo
     }
@@ -66,6 +69,7 @@ public extension EntryTemplateDraft {
             type: template.type,
             amount: template.amount,
             categoryId: template.categoryId,
+            tagId: template.tagId,
             walletId: template.walletId,
             memo: template.memo ?? ""
         )
@@ -82,6 +86,7 @@ public extension EntryTemplateDraft {
             type: type,
             amount: amount,
             categoryId: fields.categoryId,
+            tagId: tagId,
             walletId: fields.walletId,
             memo: trimmedMemo,
             sortOrder: sortOrder,
@@ -101,6 +106,7 @@ public extension EntryTemplateDraft {
         updated.type = type
         updated.amount = amount
         updated.categoryId = fields.categoryId
+        updated.tagId = tagId
         updated.walletId = fields.walletId
         updated.memo = trimmedMemo
         updated.updatedAt = now

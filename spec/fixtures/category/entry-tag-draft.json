@@ -1,0 +1,8 @@
+[
+  { "name": "朝ごはん", "problems": [] },
+  { "name": "  昼ごはん  ", "problems": [] },
+  { "name": "おやつと夜食の分", "problems": [] },
+  { "name": "", "problems": ["emptyName"] },
+  { "name": "   ", "problems": ["emptyName"] },
+  { "name": "朝ごはんと昼ごはん", "problems": ["nameTooLong"] }
+]

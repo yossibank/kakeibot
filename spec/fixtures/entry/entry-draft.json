@@ -1,12 +1,15 @@
 [
-  { "type": "expense", "amount": 500, "category": true, "toWallet": "none", "problems": [] },
-  { "type": "income", "amount": 1, "category": true, "toWallet": "none", "problems": [] },
-  { "type": "transfer", "amount": 3000, "category": false, "toWallet": "other", "problems": [] },
-  { "type": "expense", "amount": 0, "category": true, "toWallet": "none", "problems": ["amountNotPositive"] },
-  { "type": "expense", "amount": -100, "category": true, "toWallet": "none", "problems": ["amountNotPositive"] },
-  { "type": "expense", "amount": 500, "category": false, "toWallet": "none", "problems": ["missingCategory"] },
-  { "type": "income", "amount": 0, "category": false, "toWallet": "none", "problems": ["amountNotPositive", "missingCategory"] },
-  { "type": "transfer", "amount": 3000, "category": true, "toWallet": "other", "problems": ["categoryOnTransfer"] },
-  { "type": "transfer", "amount": 3000, "category": false, "toWallet": "none", "problems": ["missingDestination"] },
-  { "type": "transfer", "amount": 3000, "category": false, "toWallet": "same", "problems": ["sameWallet"] }
+  { "type": "expense", "amount": 500, "category": true, "tag": false, "toWallet": "none", "problems": [] },
+  { "type": "income", "amount": 1, "category": true, "tag": false, "toWallet": "none", "problems": [] },
+  { "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "other", "problems": [] },
+  { "type": "expense", "amount": 500, "category": true, "tag": true, "toWallet": "none", "problems": [] },
+  { "type": "expense", "amount": 0, "category": true, "tag": false, "toWallet": "none", "problems": ["amountNotPositive"] },
+  { "type": "expense", "amount": -100, "category": true, "tag": false, "toWallet": "none", "problems": ["amountNotPositive"] },
+  { "type": "expense", "amount": 500, "category": false, "tag": false, "toWallet": "none", "problems": ["missingCategory"] },
+  { "type": "income", "amount": 0, "category": false, "tag": false, "toWallet": "none", "problems": ["amountNotPositive", "missingCategory"] },
+  { "type": "transfer", "amount": 3000, "category": true, "tag": false, "toWallet": "other", "problems": ["categoryOnTransfer"] },
+  { "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "none", "problems": ["missingDestination"] },
+  { "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "same", "problems": ["sameWallet"] },
+  { "type": "expense", "amount": 500, "category": false, "tag": true, "toWallet": "none", "problems": ["missingCategory", "tagWithoutCategory"] },
+  { "type": "transfer", "amount": 3000, "category": false, "tag": true, "toWallet": "other", "problems": ["tagWithoutCategory"] }
 ]

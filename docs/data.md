@@ -14,6 +14,9 @@ erDiagram
     icon ||--o{ calendar_stamp : "icon_id"
     wallet ||--o{ entry : "wallet_id・to_wallet_id"
     category |o--o{ entry : "category_id"
+    category ||--o{ tag : "category_id"
+    tag |o--o{ entry : "tag_id"
+    tag |o--o{ template : "tag_id"
     recurring |o--o{ entry : "recurring_id"
     wallet ||--o{ recurring : "wallet_id・to_wallet_id"
     category |o--o{ recurring : "category_id"
@@ -38,7 +41,7 @@ erDiagram
 - 通貨の列は持たない。円だけを扱う
 - 月は `YYYY-MM`。期間との対応は下の表
 - 日時は UTC の ISO 8601
-- 財布・カテゴリは消さずに `archived_at` でしまう
+- 財布・カテゴリ・タグは消さずに `archived_at` でしまう
 - 残高・貯金箱の残高は保存せず、記録から計算する
 
 月の始まりごとに、期間と月の呼び方を次の表に並べる。理由は [decisions.md の「期間の呼び方」](decisions.md#期間の呼び方)にある。
@@ -103,6 +106,17 @@ emoji・text・glyph のどれかは必須。
 | archived_at | TEXT | |
 | created_at / updated_at | TEXT | |
 
+### tag
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| id | TEXT | |
+| category_id | TEXT | どのカテゴリのタグか |
+| name | TEXT | 8 文字まで |
+| sort_order | INTEGER | カテゴリの中での並び |
+| archived_at | TEXT | |
+| created_at / updated_at | TEXT | |
+
 ### entry
 
 | 列 | 型 | 補足 |
@@ -112,6 +126,7 @@ emoji・text・glyph のどれかは必須。
 | amount | INTEGER | 1 以上 |
 | date | TEXT | |
 | category_id | TEXT | 振替は空、それ以外は必須 |
+| tag_id | TEXT | 空でもよい。入れるなら category_id のタグ |
 | wallet_id | TEXT | 振替では出す側 |
 | to_wallet_id | TEXT | 振替だけ。wallet_id と別 |
 | memo | TEXT | |
@@ -130,6 +145,7 @@ emoji・text・glyph のどれかは必須。
 | type | TEXT | `expense` `income` |
 | amount | INTEGER | 空なら使うときに入れる。入れるなら 1 以上 |
 | category_id | TEXT | |
+| tag_id | TEXT | 空でもよい。入れるなら category_id のタグ |
 | wallet_id | TEXT | |
 | memo | TEXT | |
 | sort_order | INTEGER | |

@@ -13,6 +13,7 @@ public final class CategoryEditModel {
 
     public private(set) var emoji = ""
     public private(set) var text = ""
+    public private(set) var tags: [EditingTag] = []
     public private(set) var isHidden = false
     public private(set) var errorMessage: String?
 
@@ -39,6 +40,23 @@ public extension CategoryEditModel {
         case glyph
         case emoji
         case text
+    }
+
+    struct EditingTag: Identifiable, Hashable, Sendable {
+        public let id: UUID
+        public var draft: EntryTagDraft
+
+        init(
+            id: UUID,
+            draft: EntryTagDraft
+        ) {
+            self.id = id
+            self.draft = draft
+        }
+
+        init(_ tag: EntryTag) {
+            self.init(id: UUID(), draft: EntryTagDraft(tag))
+        }
     }
 
     struct GlyphSection: Identifiable {
@@ -273,6 +291,62 @@ public extension CategoryEditModel {
         text = String(value.prefix(CategoryDraft.maxTextLength))
     }
 
+    func addTag(_ name: String) -> Bool {
+        let draft = EntryTagDraft(name: name)
+
+        guard check(draft) else {
+            return false
+        }
+
+        tags.append(EditingTag(id: UUID(), draft: draft))
+        return true
+    }
+
+    func renameTag(
+        _ id: UUID,
+        to name: String
+    ) -> Bool {
+        guard let index = tags.firstIndex(where: { $0.id == id }) else {
+            return false
+        }
+
+        var draft = tags[index].draft
+        draft.name = name
+
+        guard check(draft) else {
+            return false
+        }
+
+        tags[index].draft = draft
+        return true
+    }
+
+    func moveTag(
+        _ id: UUID,
+        to index: Int
+    ) {
+        guard let from = tags.firstIndex(where: { $0.id == id }) else {
+            return
+        }
+
+        let to = min(max(index, 0), tags.count - 1)
+
+        guard from != to else {
+            return
+        }
+
+        let tag = tags.remove(at: from)
+        tags.insert(tag, at: to)
+    }
+
+    func removeTag(_ id: UUID) {
+        tags.removeAll { $0.id == id }
+    }
+
+    func clearError() {
+        errorMessage = nil
+    }
+
     func load() async {
         guard let editingId else {
             return
@@ -288,6 +362,8 @@ public extension CategoryEditModel {
             }
 
             apply(CategoryDraft(category, icon: icon))
+            let tags = list.tags.filter { $0.categoryId == editingId }
+            self.tags = tags.map(EditingTag.init)
             isHidden = category.archivedAt != nil
             baseline = snapshot
         } catch {
@@ -299,6 +375,7 @@ public extension CategoryEditModel {
         do {
             return try await database.saveCategory(
                 draft,
+                tags: tags.map(\.draft),
                 editing: editingId,
                 at: Date()
             )
@@ -337,6 +414,7 @@ private extension CategoryEditModel {
         let emoji: String
         let text: String
         let color: String
+        let tags: [EntryTagDraft]
     }
 
     static let blank = Snapshot(
@@ -345,7 +423,8 @@ private extension CategoryEditModel {
         glyph: .food,
         emoji: "",
         text: "",
-        color: colors[0]
+        color: colors[0],
+        tags: []
     )
 
     static let loadFailedMessage = "カテゴリを読めませんでした"
@@ -358,7 +437,8 @@ private extension CategoryEditModel {
             glyph: glyph,
             emoji: emoji,
             text: text,
-            color: color
+            color: color,
+            tags: tags.map(\.draft)
         )
     }
 
@@ -379,6 +459,20 @@ private extension CategoryEditModel {
 
         return first.properties.isEmojiPresentation
             || (first.properties.isEmoji && scalars.count > 1)
+    }
+
+    func check(_ tag: EntryTagDraft) -> Bool {
+        switch tag.problems.first {
+        case .emptyName:
+            errorMessage = "タグの名前を入れてください"
+            return false
+        case .nameTooLong:
+            errorMessage = "タグは \(EntryTagDraft.maxNameLength) 文字までです"
+            return false
+        case nil:
+            errorMessage = nil
+            return true
+        }
     }
 
     func apply(_ draft: CategoryDraft) {

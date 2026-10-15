@@ -4,6 +4,7 @@ import SwiftUI
 public struct EntryRow: View {
     let icon: Icon?
     let title: String
+    let tag: String?
     let detail: String?
     let amount: Int
     let type: Entry.Kind
@@ -11,12 +12,14 @@ public struct EntryRow: View {
     public init(
         icon: Icon?,
         title: String,
+        tag: String? = nil,
         detail: String?,
         amount: Int,
         type: Entry.Kind
     ) {
         self.icon = icon
         self.title = title
+        self.tag = tag
         self.detail = detail
         self.amount = amount
         self.type = type
@@ -31,6 +34,10 @@ public struct EntryRow: View {
                 Text(title)
                     .font(.subheadline)
                     .foregroundStyle(Palette.ink)
+
+                if let tag {
+                    TagCard(tag, size: .small)
+                }
 
                 if let detail {
                     Text(detail)
@@ -73,6 +80,7 @@ public struct EntryRow: View {
         EntryRow(
             icon: food,
             title: "食費",
+            tag: "昼ごはん",
             detail: "ランチ・財布",
             amount: 980,
             type: .expense
