@@ -7,10 +7,12 @@ struct EntryWalletSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    let role: Role
+
     var body: some View {
         FittedSheet {
             VStack(alignment: .leading, spacing: 20) {
-                Text(model.walletTitle)
+                Text(title)
                     .font(.headline)
                     .foregroundStyle(Palette.champagne)
 
@@ -31,13 +33,20 @@ struct EntryWalletSheet: View {
     }
 }
 
+extension EntryWalletSheet {
+    enum Role: Hashable {
+        case source
+        case destination
+    }
+}
+
 private extension EntryWalletSheet {
     func walletRow(_ wallet: Wallet) -> some View {
-        let isSelected = model.walletId == wallet.id
+        let isSelected = selectedId == wallet.id
         let nameColor = isSelected ? Palette.champagne : Palette.ink
 
         return Button {
-            model.walletId = wallet.id
+            select(wallet)
             dismiss()
         } label: {
             HStack(spacing: 12) {
@@ -71,6 +80,31 @@ private extension EntryWalletSheet {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+}
+
+private extension EntryWalletSheet {
+    var title: String {
+        switch role {
+        case .source: model.walletTitle
+        case .destination: EntryModel.destinationTitle
+        }
+    }
+
+    var selectedId: Wallet.ID? {
+        switch role {
+        case .source: model.walletId
+        case .destination: model.toWalletId
+        }
+    }
+
+    func select(_ wallet: Wallet) {
+        switch role {
+        case .source:
+            model.walletId = wallet.id
+        case .destination:
+            model.toWalletId = wallet.id
+        }
     }
 }
 

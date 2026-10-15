@@ -115,6 +115,7 @@ private extension EntrySheet {
                 .edgeFade(Self.fade)
                 .padding(.vertical, -Self.fade)
             }
+            .frame(maxHeight: .infinity, alignment: .top)
 
             PrimaryButton(model.saveTitle) {
                 Task {
@@ -143,13 +144,18 @@ private extension EntrySheet {
         VStack(spacing: 14) {
             dial
             details
-            templateRow
-            categoryPager
 
-            TagLine(tagItems, selection: model.tagId) { id in
-                model.toggleTag(id)
-            } onAdd: {
-                editTags()
+            if model.type == .transfer {
+                transferPanel
+            } else {
+                templateRow
+                categoryPager
+
+                TagLine(tagItems, selection: model.tagId) { id in
+                    model.toggleTag(id)
+                } onAdd: {
+                    editTags()
+                }
             }
         }
     }
@@ -197,14 +203,16 @@ private extension EntrySheet {
 
     var details: some View {
         HStack(spacing: 8) {
-            Button {
-                open(.wallet)
-            } label: {
-                Chip(
-                    model.walletName,
-                    systemImage: "wallet.bifold",
-                    isHighlighted: model.walletId != nil
-                )
+            if model.type != .transfer {
+                Button {
+                    open(.wallet(.source))
+                } label: {
+                    Chip(
+                        model.walletName,
+                        systemImage: "wallet.bifold",
+                        isHighlighted: model.walletId != nil
+                    )
+                }
             }
 
             Button {
@@ -234,6 +242,62 @@ private extension EntrySheet {
             }
 
             Spacer(minLength: 0)
+        }
+        .buttonStyle(.plain)
+    }
+
+    var transferPanel: some View {
+        HStack(spacing: 10) {
+            transferCard(.source)
+
+            Button {
+                withAnimation(.snappy) {
+                    model.swapWallets()
+                }
+            } label: {
+                Image(systemName: "arrow.left.arrow.right")
+                    .font(.system(size: 14, weight: .light))
+                    .foregroundStyle(Palette.gold)
+                    .frame(width: 44, height: 44)
+                    .overlay {
+                        Circle()
+                            .stroke(Palette.gold.opacity(0.4), lineWidth: 1)
+                    }
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+
+            transferCard(.destination)
+        }
+        .sensoryFeedback(.selection, trigger: model.toWalletId)
+    }
+
+    func transferCard(_ role: EntryWalletSheet.Role) -> some View {
+        let id = role == .source ? model.walletId : model.toWalletId
+        let wallet = model.wallet(id)
+        let icon = wallet.flatMap { model.icon(for: $0) }
+
+        return Button {
+            open(.wallet(role))
+        } label: {
+            VStack(spacing: 10) {
+                Text(transferTitle(role))
+                    .font(.caption2)
+                    .tracking(3)
+                    .foregroundStyle(Palette.gold)
+
+                IconImage(icon, size: 24)
+                    .foregroundStyle(Palette.gold)
+
+                Text(wallet?.name ?? "選ぶ")
+                    .font(.subheadline)
+                    .foregroundStyle(Palette.champagne)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, minHeight: 120)
+            .card(cornerRadius: 18)
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
     }
@@ -345,7 +409,7 @@ private extension EntrySheet {
         return ZStack {
             DialFace(isActive: isEnteringAmount)
 
-            Text(model.type == .income ? "収入" : "支出")
+            Text(model.typeName)
                 .font(.system(size: 12, design: .serif))
                 .tracking(5)
                 .foregroundStyle(Palette.gold)
@@ -596,8 +660,8 @@ private extension EntrySheet {
     @ViewBuilder
     func sheetContent(for sheet: Sheet) -> some View {
         switch sheet {
-        case .wallet:
-            EntryWalletSheet(model: model)
+        case let .wallet(role):
+            EntryWalletSheet(model: model, role: role)
         case .date:
             EntryDateSheet(model: model, today: today)
         case .delete:
@@ -632,7 +696,7 @@ private extension EntrySheet {
     }
 
     enum Sheet: Hashable, Identifiable {
-        case wallet
+        case wallet(EntryWalletSheet.Role)
         case date
         case delete
         case newCategory
@@ -647,7 +711,8 @@ private extension EntrySheet {
 
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
-        .init("収入", value: .income)
+        .init("収入", value: .income),
+        .init("振替", value: .transfer)
     ]
 
     nonisolated static let coordinateSpace = "EntrySheet"
@@ -715,6 +780,13 @@ private extension EntrySheet {
     func open(_ sheet: Sheet) {
         setEnteringAmount(false)
         self.sheet = sheet
+    }
+
+    func transferTitle(_ role: EntryWalletSheet.Role) -> String {
+        switch role {
+        case .source: model.walletTitle
+        case .destination: EntryModel.destinationTitle
+        }
     }
 
     func editTags() {

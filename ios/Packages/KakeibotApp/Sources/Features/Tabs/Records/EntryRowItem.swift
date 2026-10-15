@@ -19,9 +19,9 @@ extension EntryRowItem {
     ) {
         let category = entry.categoryId.flatMap { list.categories[$0] }
         let tag = entry.tagId.flatMap { list.tags[$0] }
-        let wallet = list.wallets[entry.walletId]
         let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
-        let parts = [dayLabel, memo, wallet?.name].compactMap(\.self)
+        let wallets = Self.walletText(for: entry, in: list)
+        let parts = [dayLabel, memo, wallets].compactMap(\.self)
 
         self.init(
             id: entry.id,
@@ -36,6 +36,24 @@ extension EntryRowItem {
 }
 
 private extension EntryRowItem {
+    static func walletText(
+        for entry: Entry,
+        in list: EntryList
+    ) -> String? {
+        let source = list.wallets[entry.walletId]?.name
+
+        guard
+            entry.type == .transfer,
+            let destination = entry.toWalletId.flatMap({ list.wallets[$0] })
+        else {
+            return source
+        }
+
+        return [source, destination.name]
+            .compactMap(\.self)
+            .joined(separator: " → ")
+    }
+
     static func title(for type: Entry.Kind) -> String {
         switch type {
         case .transfer: "振替"

@@ -86,8 +86,10 @@ public struct MainView: View {
             }
 
             Tab(value: MainTab.assets) {
-                AssetsView(model: assets)
-                    .tabContent()
+                AssetsView(model: assets) {
+                    sheet = .transfer
+                }
+                .tabContent()
             }
         }
         .overlay(alignment: .bottom) {
@@ -156,6 +158,14 @@ private extension MainView {
                     template: template
                 )
             )
+        case .transfer:
+            EntrySheet(
+                model: EntryModel(
+                    database: database,
+                    date: home.today,
+                    type: .transfer
+                )
+            )
         case .newTemplate:
             TemplateEditSheet(
                 model: TemplateEditModel(
@@ -181,6 +191,7 @@ private extension MainView {
         case settings
         case template(EntryTemplate)
         case newTemplate
+        case transfer
 
         var id: String {
             switch self {
@@ -189,6 +200,7 @@ private extension MainView {
             case .settings: "settings"
             case let .template(template): "template-\(template.id)"
             case .newTemplate: "new-template"
+            case .transfer: "transfer"
             }
         }
     }
