@@ -27,73 +27,75 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .top) {
-            content
+        GeometryReader { _ in
+            ZStack(alignment: .top) {
+                content
 
-            if isEditingMemo {
-                memoLayer
-            }
+                if isEditingMemo {
+                    memoLayer
+                }
 
-            if let categoryMenu {
-                categoryMenuLayer(categoryMenu)
+                if let categoryMenu {
+                    categoryMenuLayer(categoryMenu)
+                }
             }
-        }
-        .coordinateSpace(.named(Self.coordinateSpace))
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            sheetWidth = width
-        }
-        .sensoryFeedback(
-            .impact(weight: .medium),
-            trigger: categoryMenu
-        ) { _, menu in
-            menu != nil
-        }
-        .overlay(alignment: .bottom) {
-            if let errorMessage = model.errorMessage {
-                NoticeBanner(
-                    errorMessage,
-                    systemImage: "exclamationmark",
-                    tone: .error
-                )
-                .padding(.horizontal, 16)
-                .padding(.bottom, bannerBottom)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+            .coordinateSpace(.named(Self.coordinateSpace))
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.width
+            } action: { width in
+                sheetWidth = width
             }
-        }
-        .animation(.snappy, value: model.errorMessage)
-        .sensoryFeedback(.error, trigger: model.errorCount)
-        .task(id: model.errorCount) {
-            guard model.errorCount > 0 else {
-                return
+            .sensoryFeedback(
+                .impact(weight: .medium),
+                trigger: categoryMenu
+            ) { _, menu in
+                menu != nil
             }
+            .overlay(alignment: .bottom) {
+                if let errorMessage = model.errorMessage {
+                    NoticeBanner(
+                        errorMessage,
+                        systemImage: "exclamationmark",
+                        tone: .error
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, bannerBottom)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.snappy, value: model.errorMessage)
+            .sensoryFeedback(.error, trigger: model.errorCount)
+            .task(id: model.errorCount) {
+                guard model.errorCount > 0 else {
+                    return
+                }
 
-            guard await (try? Task.sleep(for: .seconds(3))) != nil else {
-                return
-            }
+                guard await (try? Task.sleep(for: .seconds(3))) != nil else {
+                    return
+                }
 
-            model.clearError()
+                model.clearError()
+            }
+            .background {
+                Rectangle()
+                    .fill(Palette.night)
+                    .ignoresSafeArea()
+            }
+            .preferredColorScheme(.dark)
+            .confirmsDiscard(
+                when: model.isChanged,
+                isPresented: $isConfirmingDiscard
+            ) {
+                dismiss()
+            }
+            .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
+                sheetContent(for: sheet)
+            }
+            .task {
+                await load()
+            }
         }
         .ignoresSafeArea(.keyboard)
-        .background {
-            Rectangle()
-                .fill(Palette.night)
-                .ignoresSafeArea()
-        }
-        .preferredColorScheme(.dark)
-        .confirmsDiscard(
-            when: model.isChanged,
-            isPresented: $isConfirmingDiscard
-        ) {
-            dismiss()
-        }
-        .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
-            sheetContent(for: sheet)
-        }
-        .task {
-            await load()
-        }
     }
 }
 

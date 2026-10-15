@@ -24,86 +24,86 @@ public struct TemplateEditSheet: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .top) {
-            content
+        GeometryReader { _ in
+            ZStack(alignment: .bottom) {
+                content
 
-            if let panel {
-                Color.black
-                    .opacity(0.35)
+                if let panel {
+                    Color.black
+                        .opacity(0.35)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            closePanel()
+                        }
+                        .transition(.opacity)
+
+                    if panel == .memo {
+                        memoCard
+                            .padding(.horizontal, 14)
+                            .frame(maxHeight: .infinity)
+                            .transition(Self.memoTransition)
+                    } else {
+                        drawerView(panel)
+                            .transition(Self.drawerTransition)
+                    }
+                }
+            }
+            .overlay(alignment: .top) {
+                header
+                    .padding(.horizontal, 18)
+                    .padding(.top, 18)
+            }
+            .overlay(alignment: .bottom) {
+                if let errorMessage = model.errorMessage {
+                    NoticeBanner(
+                        errorMessage,
+                        systemImage: "exclamationmark",
+                        tone: .error
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.snappy, value: model.errorMessage)
+            .sensoryFeedback(.error, trigger: errorCount)
+            .background {
+                Rectangle()
+                    .fill(Palette.night)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        closePanel()
+                        focus = nil
                     }
-                    .transition(.opacity)
-
-                if panel == .memo {
-                    memoCard
-                        .padding(.horizontal, 14)
-                        .frame(maxHeight: .infinity)
-                        .transition(Self.memoTransition)
-                } else {
-                    drawerView(panel)
-                        .frame(maxHeight: .infinity, alignment: .bottom)
-                        .transition(Self.drawerTransition)
+            }
+            .preferredColorScheme(.dark)
+            .sensoryFeedback(.selection, trigger: model.categoryId)
+            .sensoryFeedback(.selection, trigger: model.walletId)
+            .confirmsDiscard(
+                when: model.isChanged,
+                isPresented: $isConfirmingDiscard
+            ) {
+                dismiss()
+            }
+            .onChange(of: focus) {
+                if focus == .name {
+                    hidePanel()
                 }
             }
-        }
-        .overlay(alignment: .top) {
-            header
-                .padding(.horizontal, 18)
-                .padding(.top, 18)
-        }
-        .overlay(alignment: .bottom) {
-            if let errorMessage = model.errorMessage {
-                NoticeBanner(
-                    errorMessage,
-                    systemImage: "exclamationmark",
-                    tone: .error
-                )
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+            .task {
+                await model.load()
             }
-        }
-        .animation(.snappy, value: model.errorMessage)
-        .sensoryFeedback(.error, trigger: errorCount)
-        .background {
-            Rectangle()
-                .fill(Palette.night)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    focus = nil
+            .task(id: errorCount) {
+                guard errorCount > 0 else {
+                    return
                 }
-        }
-        .preferredColorScheme(.dark)
-        .sensoryFeedback(.selection, trigger: model.categoryId)
-        .sensoryFeedback(.selection, trigger: model.walletId)
-        .confirmsDiscard(
-            when: model.isChanged,
-            isPresented: $isConfirmingDiscard
-        ) {
-            dismiss()
-        }
-        .onChange(of: focus) {
-            if focus == .name {
-                hidePanel()
-            }
-        }
-        .task {
-            await model.load()
-        }
-        .task(id: errorCount) {
-            guard errorCount > 0 else {
-                return
-            }
 
-            guard await (try? Task.sleep(for: .seconds(3))) != nil else {
-                return
-            }
+                guard await (try? Task.sleep(for: .seconds(3))) != nil else {
+                    return
+                }
 
-            model.clearError()
+                model.clearError()
+            }
         }
-        .ignoresSafeArea(.keyboard)
     }
 }
 
