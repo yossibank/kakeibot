@@ -39,6 +39,10 @@ public struct TagLine<ID: Hashable>: View {
                     hanging(card, at: index)
                 }
             }
+            .coordinateSpace(.named(Self.space))
+            .overlay(alignment: .topLeading) {
+                liftedCard
+            }
             .padding(.horizontal, Self.inset)
 
             ScrollView(.horizontal) {
@@ -50,13 +54,16 @@ public struct TagLine<ID: Hashable>: View {
                         hanging(card, at: index)
                     }
                 }
+                .coordinateSpace(.named(Self.space))
+                .overlay(alignment: .topLeading) {
+                    liftedCard
+                }
                 .padding(.horizontal, Self.inset)
                 .padding(.bottom, Self.inset)
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil)
         }
-        .coordinateSpace(.named(Self.space))
         .frame(height: Self.height, alignment: .top)
         .background(alignment: .top) {
             TagString()
@@ -97,43 +104,71 @@ public struct TagLineMovingKey: PreferenceKey {
 }
 
 private extension TagLine {
+    @ViewBuilder
+    var liftedCard: some View {
+        if let lift, let frame = frames[lift.id] {
+            let index = cards.firstIndex { $0.tagId == lift.id } ?? 0
+            let item = tags.first { $0.id == lift.id }
+
+            if let item {
+                face(.tag(item), at: index, tilt: 0)
+                    .scaleEffect(1.12, anchor: .top)
+                    .shadow(color: .black.opacity(0.5), radius: 10, y: 6)
+                    .padding(.top, Self.inset)
+                    .frame(
+                        width: frame.width,
+                        height: frame.height,
+                        alignment: .top
+                    )
+                    .position(x: lift.start + lift.translation, y: frame.midY)
+                    .allowsHitTesting(false)
+            }
+        }
+    }
+
     func hanging(
         _ card: Card,
         at index: Int
     ) -> some View {
         let isLifted = card.tagId != nil && card.tagId == lift?.id
-        let isStraight = isSelected(card) || isLifted
-        let tilt = isStraight ? 0 : Self.tilts[index % Self.tilts.count]
-        let scale: CGFloat = isLifted ? 1.12 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let tilt = isSelected(card) ? 0 : Self.tilts[index % Self.tilts.count]
 
-        return ZStack {
-            VStack(spacing: 0) {
-                Rectangle()
-                    .fill(Palette.gold.opacity(0.55))
-                    .frame(width: 0.8, height: drop(at: index))
+        return face(card, at: index, tilt: tilt)
+            .opacity(isLifted ? 0 : 1)
+            .padding(.top, Self.inset)
+            .contentShape(.rect)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .named(Self.space))
+            } action: { frame in
+                if let id = card.tagId {
+                    frames[id] = frame
+                }
+            }
+            .onTapGesture {
+                tap(card)
+            }
+            .gesture(
+                TagLiftGesture { translation in
+                    follow(card, by: translation)
+                } onEnd: {
+                    drop()
+                }
+            )
+    }
 
-                TagCard(title(of: card), style: style(of: card))
-            }
-            .rotationEffect(.degrees(tilt), anchor: .top)
-            .scaleEffect(scale, anchor: .top)
-            .shadow(color: shadow, radius: 10, y: 6)
-            .offset(x: offset(of: card))
+    func face(
+        _ card: Card,
+        at index: Int,
+        tilt: Double
+    ) -> some View {
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(Palette.gold.opacity(0.55))
+                .frame(width: 0.8, height: drop(at: index))
+
+            TagCard(title(of: card), style: style(of: card))
         }
-        .padding(.top, Self.inset)
-        .contentShape(.rect)
-        .zIndex(isLifted ? 1 : 0)
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .named(Self.space))
-        } action: { frame in
-            if let id = card.tagId {
-                frames[id] = frame
-            }
-        }
-        .onTapGesture {
-            tap(card)
-        }
-        .gesture(reorderGesture(for: card), isEnabled: canMove(card))
+        .rotationEffect(.degrees(tilt), anchor: .top)
     }
 }
 
@@ -230,15 +265,6 @@ private extension TagLine {
         onMove != nil && card.tagId != nil
     }
 
-    func offset(of card: Card) -> CGFloat {
-        guard let lift, card.tagId == lift.id else {
-            return 0
-        }
-
-        let slot = frames[lift.id]?.midX ?? lift.start
-        return lift.start + lift.translation - slot
-    }
-
     func tap(_ card: Card) {
         switch card {
         case let .tag(item):
@@ -248,33 +274,17 @@ private extension TagLine {
         }
     }
 
-    func reorderGesture(for card: Card) -> some Gesture {
-        let drag = DragGesture(
-            minimumDistance: 0,
-            coordinateSpace: .named(Self.space)
-        )
-
-        return LongPressGesture(minimumDuration: 0.3)
-            .sequenced(before: drag)
-            .onChanged { value in
-                guard case let .second(true, drag) = value else {
-                    return
-                }
-
-                follow(card, by: drag?.translation.width ?? 0)
-            }
-            .onEnded { _ in
-                withAnimation(.snappy) {
-                    lift = nil
-                }
-            }
+    func drop() {
+        withAnimation(.snappy) {
+            lift = nil
+        }
     }
 
     func follow(
         _ card: Card,
         by translation: CGFloat
     ) {
-        guard let id = card.tagId else {
+        guard canMove(card), let id = card.tagId else {
             return
         }
 
