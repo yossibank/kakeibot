@@ -30,6 +30,7 @@ public final class EntryModel {
     public private(set) var errorCount = 0
 
     private var baseline: Snapshot?
+    private var original: Entry?
     private var allTemplates: [EntryTemplate] = []
     private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
     private var appliedTemplateId: EntryTemplate.ID?
@@ -379,34 +380,46 @@ public extension EntryModel {
         }
     }
 
-    func save() async -> Entry? {
+    func save() async -> EntryChange? {
         guard let draft else {
             return nil
         }
 
         do {
-            return try await database.saveEntry(
+            let entry = try await database.saveEntry(
                 draft,
                 editing: editingId,
                 at: Date()
             )
+
+            let title = label(for: entry)
+
+            let kind: EntryChange.Kind = if let original {
+                .edited(previous: original)
+            } else {
+                .recorded
+            }
+
+            return EntryChange(kind: kind, entry: entry, label: title)
         } catch {
             report(error)
             return nil
         }
     }
 
-    func delete() async -> Bool {
-        guard let editingId else {
-            return false
+    func delete() async -> EntryChange? {
+        guard let original else {
+            return nil
         }
 
         do {
-            try await database.deleteEntry(editingId)
-            return true
+            try await database.deleteEntry(original.id)
+            let title = label(for: original)
+
+            return EntryChange(kind: .deleted, entry: original, label: title)
         } catch {
             report(error)
-            return false
+            return nil
         }
     }
 }
@@ -504,6 +517,7 @@ private extension EntryModel {
             throw AppDatabase.WriteError.entryNotFound
         }
 
+        original = entry
         type = entry.type
         calculator = AmountCalculator(amount: entry.amount)
         date = entry.date
@@ -523,6 +537,18 @@ private extension EntryModel {
         }
 
         balances = Dictionary(uniqueKeysWithValues: pairs)
+    }
+
+    func label(for entry: Entry) -> String {
+        guard entry.type == .transfer else {
+            let categories = categories(for: entry.type)
+            let category = categories.first { $0.id == entry.categoryId }
+            return category?.name ?? ""
+        }
+
+        let from = wallet(entry.walletId)?.name ?? ""
+        let to = wallet(entry.toWalletId)?.name ?? ""
+        return "\(from) → \(to)"
     }
 
     func chooseDestination() {

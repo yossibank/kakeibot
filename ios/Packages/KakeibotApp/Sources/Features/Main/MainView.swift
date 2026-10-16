@@ -11,6 +11,7 @@ public struct MainView: View {
     @State private var records: RecordsModel
     @State private var assets: AssetsModel
     @State private var draft: EntryModel
+    @State private var notice: EntryNoticeModel
     @State private var isWarmingEntry = true
 
     private let database: AppDatabase
@@ -46,6 +47,7 @@ public struct MainView: View {
             )
         )
 
+        _notice = State(initialValue: EntryNoticeModel(database: database))
         self.database = database
     }
 
@@ -68,6 +70,9 @@ public struct MainView: View {
                     },
                     onAddTemplate: {
                         sheet = .newTemplate
+                    },
+                    onRecord: { change in
+                        notice.show(change)
                     }
                 )
                 .tabContent()
@@ -92,16 +97,6 @@ public struct MainView: View {
                 .tabContent()
             }
         }
-        .recordedBanner(
-            assets.transferred,
-            above: FloatingTabBar<Int>.height
-        ) {
-            Task {
-                await assets.undoTransfer()
-            }
-        } onClear: {
-            assets.clearTransfer()
-        }
         .overlay(alignment: .bottom) {
             FloatingTabBar(
                 selection: $tab,
@@ -110,6 +105,7 @@ public struct MainView: View {
                 sheet = .new
             }
         }
+        .entryNotice(notice, above: FloatingTabBar<Int>.height)
         .background {
             if isWarmingEntry {
                 entryWarmup
@@ -149,14 +145,15 @@ private extension MainView {
     func sheetContent(for sheet: Sheet) -> some View {
         switch sheet {
         case .new:
-            EntrySheet(model: draft, onSave: showTransfer)
+            EntrySheet(model: draft, onChange: notice.show)
         case let .edit(id):
             EntrySheet(
                 model: EntryModel(
                     database: database,
                     editing: id,
                     date: home.today
-                )
+                ),
+                onChange: notice.show
             )
         case .settings:
             SettingsSheet(database: database)
@@ -166,7 +163,8 @@ private extension MainView {
                     database: database,
                     date: home.today,
                     template: template
-                )
+                ),
+                onChange: notice.show
             )
         case .transfer:
             EntrySheet(
@@ -175,7 +173,7 @@ private extension MainView {
                     date: home.today,
                     type: .transfer
                 ),
-                onSave: showTransfer
+                onChange: notice.show
             )
         case .newTemplate:
             TemplateEditSheet(
@@ -237,14 +235,6 @@ private extension MainView {
 }
 
 private extension MainView {
-    func showTransfer(_ entry: Entry) {
-        guard entry.type == .transfer else {
-            return
-        }
-
-        assets.showTransfer(entry)
-    }
-
     func prepareDraft() {
         let model = EntryModel(database: database, date: home.today)
         draft = model

@@ -10,6 +10,7 @@ struct HomeView: View {
     let onOpenSettings: () -> Void
     let onOpenTemplate: (EntryTemplate) -> Void
     let onAddTemplate: () -> Void
+    let onRecord: (EntryChange) -> Void
 
     var body: some View {
         ScrollView {
@@ -33,13 +34,6 @@ struct HomeView: View {
             Rectangle()
                 .fill(Palette.night)
                 .ignoresSafeArea()
-        }
-        .recordedBanner(model.recorded) {
-            Task {
-                await model.undoRecorded()
-            }
-        } onClear: {
-            model.clearRecorded()
         }
     }
 }
@@ -269,7 +263,9 @@ private extension HomeView {
         }
 
         Task {
-            await model.record(template)
+            if let change = await model.record(template) {
+                onRecord(change)
+            }
         }
     }
 }

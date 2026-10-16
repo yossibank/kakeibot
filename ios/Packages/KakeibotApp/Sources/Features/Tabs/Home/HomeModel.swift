@@ -11,7 +11,6 @@ public final class HomeModel {
     public var templateType: Entry.Kind = .expense
 
     public private(set) var list: EntryList?
-    public private(set) var recorded: RecordedNotice?
     public private(set) var errorMessage: String?
 
     private var allTemplates: [EntryTemplate] = []
@@ -111,40 +110,23 @@ public extension HomeModel {
         }
     }
 
-    func record(_ template: EntryTemplate) async {
+    func record(_ template: EntryTemplate) async -> EntryChange? {
         guard let draft = template.entryDraft(on: today) else {
-            return
+            return nil
         }
 
         do {
             let entry = try await database.saveEntry(draft, at: Date())
-            let amount = AmountText.text(entry.amount)
 
-            recorded = RecordedNotice(
-                entryId: entry.id,
-                message: "\(template.name) \(amount) を記録した"
+            return EntryChange(
+                kind: .recorded,
+                entry: entry,
+                label: template.name
             )
         } catch {
             errorMessage = Self.saveFailedMessage
+            return nil
         }
-    }
-
-    func undoRecorded() async {
-        guard let recorded else {
-            return
-        }
-
-        self.recorded = nil
-
-        do {
-            try await database.deleteEntry(recorded.entryId)
-        } catch {
-            errorMessage = Self.saveFailedMessage
-        }
-    }
-
-    func clearRecorded() {
-        recorded = nil
     }
 
     func observe() async {

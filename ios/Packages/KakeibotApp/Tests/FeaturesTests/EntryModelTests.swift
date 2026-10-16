@@ -53,7 +53,7 @@ struct EntryModelTests {
         let saved = await model.save()
         let entries = try setup.database.snapshot().entries
 
-        #expect(saved?.amount == 500)
+        #expect(saved?.entry.amount == 500)
         #expect(entries.map(\.amount) == [500])
         #expect(entries.map(\.memo) == ["ランチ"])
     }
@@ -84,7 +84,7 @@ struct EntryModelTests {
         let saved = await model.save()
         let stored = try await setup.database.entry(entry.id)
 
-        #expect(saved?.id == entry.id)
+        #expect(saved?.entry.id == entry.id)
         #expect(stored?.amount == 98)
         #expect(stored?.createdAt == entry.createdAt)
     }
@@ -265,7 +265,7 @@ struct EntryModelTests {
         let deleted = await model.delete()
         let stored = try await setup.database.entry(entry.id)
 
-        #expect(deleted)
+        #expect(deleted?.entry == entry)
         #expect(stored == nil)
     }
 }

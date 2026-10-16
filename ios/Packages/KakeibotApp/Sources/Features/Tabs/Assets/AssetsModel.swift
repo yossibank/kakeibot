@@ -1,5 +1,4 @@
 import Core
-import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -10,7 +9,6 @@ public final class AssetsModel {
     public var today: LocalDate
 
     public private(set) var list: EntryList?
-    public private(set) var transferred: RecordedNotice?
     public private(set) var errorMessage: String?
 
     private let database: AppDatabase
@@ -86,35 +84,6 @@ public extension AssetsModel {
         }
     }
 
-    func showTransfer(_ entry: Entry) {
-        let from = list?.wallets[entry.walletId]?.name ?? ""
-        let to = entry.toWalletId.flatMap { list?.wallets[$0]?.name } ?? ""
-        let amount = AmountText.text(entry.amount)
-
-        transferred = RecordedNotice(
-            entryId: entry.id,
-            message: "\(from) → \(to) \(amount) を振り替えた"
-        )
-    }
-
-    func undoTransfer() async {
-        guard let transferred else {
-            return
-        }
-
-        self.transferred = nil
-
-        do {
-            try await database.deleteEntry(transferred.entryId)
-        } catch {
-            errorMessage = Self.undoFailedMessage
-        }
-    }
-
-    func clearTransfer() {
-        transferred = nil
-    }
-
     func load() async {
         do {
             list = try await database.entryList()
@@ -136,7 +105,6 @@ public extension AssetsModel {
 
 private extension AssetsModel {
     static let loadFailedMessage = "残高を読めませんでした"
-    static let undoFailedMessage = "取り消せませんでした"
 
     static func lastDay(of month: YearMonth) -> LocalDate? {
         LocalDate(yearMonth: month, day: month.numberOfDays)

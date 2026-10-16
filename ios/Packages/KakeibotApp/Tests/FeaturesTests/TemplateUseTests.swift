@@ -43,7 +43,7 @@ struct TemplateUseTests {
 
         #expect(applied == tag.id)
         #expect(tags == ["買い置き"])
-        #expect(saved?.tagId == tag.id)
+        #expect(saved?.entry.tagId == tag.id)
         #expect(entry?.first?.tagId == tag.id)
         #expect(model.tagId == nil)
         #expect(!model.isApplied(stock))
@@ -155,19 +155,20 @@ struct TemplateUseTests {
         let setup = try await Setup()
         let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980)
         let home = HomeModel(database: setup.database, today: setup.date)
+        let notice = EntryNoticeModel(database: setup.database)
 
-        await home.record(lunch)
-        let recorded = home.recorded
+        let change = try #require(await home.record(lunch))
+        notice.show(change)
         let afterRecord = try await setup.database.entryList()
 
-        await home.undoRecorded()
+        await notice.undo()
         let afterUndo = try await setup.database.entryList()
 
-        #expect(recorded?.message == "ランチ ¥980 を記録した")
+        #expect(change.message == "ランチ ¥980 を記録した")
         #expect(afterRecord.days.first?.entries.first?.amount == 980)
         #expect(afterRecord.days.first?.date == setup.date)
         #expect(afterUndo.days.isEmpty)
-        #expect(home.recorded == nil)
+        #expect(notice.change == nil)
     }
 }
 

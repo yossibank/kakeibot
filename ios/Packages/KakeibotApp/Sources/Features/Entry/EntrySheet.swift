@@ -22,14 +22,14 @@ public struct EntrySheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    private let onSave: (Entry) -> Void
+    private let onChange: (EntryChange) -> Void
 
     public init(
         model: EntryModel,
-        onSave: @escaping (Entry) -> Void = { _ in }
+        onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
-        self.onSave = onSave
+        self.onChange = onChange
     }
 
     public var body: some View {
@@ -193,7 +193,9 @@ private extension EntrySheet {
                     systemImage: "trash",
                     style: .destructive
                 ) {
-                    open(.delete)
+                    Task {
+                        await delete()
+                    }
                 }
             } else {
                 Color.clear
@@ -689,12 +691,6 @@ private extension EntrySheet {
             EntryWalletSheet(model: model, role: role)
         case .date:
             EntryDateSheet(model: model, today: today)
-        case .delete:
-            EntryDeleteSheet(model: model, today: today) {
-                Task {
-                    await delete()
-                }
-            }
         case .newCategory:
             CategoryEditSheet(model: model.newCategoryModel()) { category in
                 Task {
@@ -723,7 +719,6 @@ private extension EntrySheet {
     enum Sheet: Hashable, Identifiable {
         case wallet(EntryWalletSheet.Role)
         case date
-        case delete
         case newCategory
         case editCategory(EntryCategory)
         case addTag(EntryCategory)
@@ -920,18 +915,21 @@ private extension EntrySheet {
     }
 
     func save() async {
-        guard let entry = await model.save() else {
+        guard let change = await model.save() else {
             return
         }
 
-        onSave(entry)
+        onChange(change)
         dismiss()
     }
 
     func delete() async {
-        if await model.delete() {
-            dismiss()
+        guard let change = await model.delete() else {
+            return
         }
+
+        onChange(change)
+        dismiss()
     }
 }
 

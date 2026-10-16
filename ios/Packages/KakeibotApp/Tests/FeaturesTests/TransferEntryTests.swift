@@ -44,7 +44,7 @@ struct TransferEntryTests {
         let entry = try setup.database.snapshot().entries.first
 
         #expect(title == "¥30,000 を振り替える")
-        #expect(saved?.id == entry?.id)
+        #expect(saved?.entry.id == entry?.id)
         #expect(entry?.type == .transfer)
         #expect(entry?.walletId == setup.bank)
         #expect(entry?.toWalletId == setup.cash)
