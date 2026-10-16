@@ -136,7 +136,7 @@ public extension WalletEditModel {
             self.isHidden = isHidden
             return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {
-            errorMessage = Self.lastWalletMessage
+            errorMessage = AppDatabase.WalletWriteError.lastShownMessage
             return false
         } catch {
             errorMessage = Self.saveFailedMessage
@@ -156,7 +156,6 @@ private extension WalletEditModel {
     static let defaultColor = "#C9A465"
     static let loadFailedMessage = "口座を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
-    static let lastWalletMessage = "最後の 1 つの口座は非表示にできません"
 
     static let blank = Snapshot(
         name: "",

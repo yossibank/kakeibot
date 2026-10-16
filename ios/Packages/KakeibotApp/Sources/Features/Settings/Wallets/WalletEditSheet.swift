@@ -56,13 +56,9 @@ public struct WalletEditSheet: View {
         ) {
             dismiss()
         }
-        .confirmation(
-            isPresented: $isConfirmingHide,
-            systemImage: "eye.slash",
-            title: "この口座を非表示にしますか",
-            message: hideMessage,
-            keepTitle: "やめる",
-            confirmTitle: "非表示にする"
+        .confirmsWalletHide(
+            balance: model.balance,
+            isPresented: $isConfirmingHide
         ) {
             Task {
                 await setHidden(true)
@@ -389,11 +385,6 @@ private extension WalletEditSheet {
 
     var hideTitle: String {
         model.isHidden ? "表示に戻す" : "この口座を非表示にする"
-    }
-
-    var hideMessage: String {
-        let balance = AmountText.text(model.balance)
-        return "残高 \(balance) は、資産タブの合計から外れます"
     }
 
     var hideColor: Color {

@@ -132,26 +132,12 @@ private extension CategoryListView {
     }
 
     var hideTarget: some View {
-        let color = isOverHideZone ? Palette.rose : Palette.mist
-
-        return HStack(spacing: 8) {
-            Image(systemName: "eye.slash")
-
-            Text("ここに置くと非表示になります")
-        }
-        .font(.subheadline)
-        .foregroundStyle(color)
-        .frame(maxWidth: .infinity, minHeight: Self.tileHeight)
-        .background(hideFill, in: Self.tileShape)
-        .overlay {
-            Self.tileShape
-                .stroke(color.opacity(0.6), style: Self.dash)
-        }
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .named(Self.space))
-        } action: { frame in
-            hideZone = frame
-        }
+        SettingsHideZone(isTargeted: isOverHideZone, height: Self.tileHeight)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .named(Self.space))
+            } action: { frame in
+                hideZone = frame
+            }
     }
 
     var hiddenSection: some View {
@@ -295,10 +281,6 @@ private extension CategoryListView {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-    }
-
-    var hideFill: Color {
-        isOverHideZone ? Palette.rose.opacity(0.12) : Color.clear
     }
 
     var tileWidth: CGFloat {

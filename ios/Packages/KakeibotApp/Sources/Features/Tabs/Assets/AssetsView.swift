@@ -43,19 +43,11 @@ private extension AssetsView {
 
             Spacer()
 
-            Button(action: onTransfer) {
-                Label("振替", systemImage: "arrow.left.arrow.right")
-                    .font(.caption)
-                    .foregroundStyle(Palette.gold)
-                    .padding(.horizontal, 16)
-                    .frame(minHeight: 44)
-                    .overlay {
-                        Capsule()
-                            .stroke(Palette.gold.opacity(0.3), lineWidth: 1)
-                    }
-                    .contentShape(Capsule())
-            }
-            .buttonStyle(.plain)
+            HeaderButton(
+                systemImage: "arrow.left.arrow.right",
+                title: "振替",
+                action: onTransfer
+            )
         }
     }
 

@@ -7,27 +7,30 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
     @State private var width: CGFloat = 0
 
     private let id: ID
+    private let role: Role
     private let onTap: () -> Void
-    private let onDelete: () -> Void
+    private let onAction: () -> Void
     private let content: Content
 
     public init(
         id: ID,
         openId: Binding<ID?>,
+        role: Role = .delete,
         onTap: @escaping () -> Void,
-        onDelete: @escaping () -> Void,
+        onAction: @escaping () -> Void,
         @ViewBuilder content: () -> Content
     ) {
         _openId = openId
         self.id = id
+        self.role = role
         self.onTap = onTap
-        self.onDelete = onDelete
+        self.onAction = onAction
         self.content = content()
     }
 
     public var body: some View {
         ZStack(alignment: .trailing) {
-            deleteButton
+            actionButton
 
             content
                 .contentShape(.rect)
@@ -60,24 +63,33 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
         }
         .sensoryFeedback(
             .impact(weight: .medium),
-            trigger: isPastDelete
+            trigger: isPastAction
         ) { _, isPast in
             isPast
         }
     }
 }
 
+public extension SwipeRow {
+    enum Role: Sendable {
+        case delete
+        case hide
+    }
+}
+
 private extension SwipeRow {
-    var deleteButton: some View {
+    var actionButton: some View {
         let buttonWidth = max(-offset, Self.actionWidth) - Self.gap
         let opacity = min(-offset / Self.actionWidth, 1)
 
-        return Button(action: onDelete) {
-            Image(systemName: "trash")
+        return Button {
+            act()
+        } label: {
+            Image(systemName: systemImage)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(Palette.cardBottom)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Self.fill, in: Self.shape)
+                .background(fill, in: Self.shape)
                 .overlay {
                     Self.shape
                         .fill(Self.sheen)
@@ -104,14 +116,6 @@ private extension SwipeRow {
         RoundedRectangle(cornerRadius: 14)
     }
 
-    static var fill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.rose, Palette.rose.opacity(0.78)],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
     static var sheen: LinearGradient {
         LinearGradient(
             colors: [.white.opacity(0.18), .white.opacity(0)],
@@ -124,8 +128,36 @@ private extension SwipeRow {
         openId == id
     }
 
-    var isPastDelete: Bool {
+    var isPastAction: Bool {
         width > 0 && -offset > width * 0.6
+    }
+
+    var systemImage: String {
+        switch role {
+        case .delete: "trash"
+        case .hide: "eye.slash"
+        }
+    }
+
+    var fill: LinearGradient {
+        let color = switch role {
+        case .delete: Palette.rose
+        case .hide: Palette.gold
+        }
+
+        return LinearGradient(
+            colors: [color, color.opacity(0.78)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    func act() {
+        onAction()
+
+        if role == .hide {
+            openId = nil
+        }
     }
 
     func tap() {
@@ -147,12 +179,14 @@ private extension SwipeRow {
     }
 
     func end() {
-        if isPastDelete {
+        if isPastAction {
+            let end: CGFloat = role == .delete ? -width : 0
+
             withAnimation(.snappy) {
-                offset = -width
+                offset = end
             }
 
-            onDelete()
+            act()
             return
         }
 

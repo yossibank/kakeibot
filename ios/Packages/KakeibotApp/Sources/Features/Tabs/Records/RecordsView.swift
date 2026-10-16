@@ -130,7 +130,7 @@ private extension RecordsView {
     func swipeRow(_ row: EntryRowItem) -> some View {
         SwipeRow(id: row.id, openId: $openId) {
             onOpenEntry(row.id)
-        } onDelete: {
+        } onAction: {
             onDelete(row.id)
         } content: {
             EntryRow(

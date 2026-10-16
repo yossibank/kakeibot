@@ -59,17 +59,7 @@ private extension HomeView {
 
             Spacer()
 
-            Button(action: onOpenSettings) {
-                Image(systemName: "gearshape")
-                    .font(.system(size: 17, weight: .light))
-                    .foregroundStyle(Palette.gold)
-                    .frame(width: 44, height: 44)
-                    .overlay {
-                        Circle()
-                            .stroke(Palette.gold.opacity(0.28), lineWidth: 1)
-                    }
-            }
-            .buttonStyle(.plain)
+            HeaderButton(systemImage: "gearshape", action: onOpenSettings)
         }
     }
 
@@ -243,7 +233,7 @@ private extension HomeView {
                 ForEach(model.recentRows) { row in
                     SwipeRow(id: row.id, openId: $openId) {
                         onOpenEntry(row.id)
-                    } onDelete: {
+                    } onAction: {
                         onDeleteEntry(row.id)
                     } content: {
                         EntryRow(

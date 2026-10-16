@@ -82,6 +82,23 @@ public extension WalletListModel {
         movingOrder = order
     }
 
+    func cancelMoving() {
+        movingOrder = nil
+    }
+
+    func hide(_ id: Wallet.ID) async {
+        movingOrder = nil
+
+        do {
+            try await database.setWalletHidden(id, isHidden: true, at: Date())
+            await load()
+        } catch AppDatabase.WalletWriteError.lastShownWallet {
+            errorMessage = AppDatabase.WalletWriteError.lastShownMessage
+        } catch {
+            errorMessage = Self.hideFailedMessage
+        }
+    }
+
     func finishMoving() async {
         guard let movingOrder else {
             return
@@ -103,6 +120,7 @@ public extension WalletListModel {
 private extension WalletListModel {
     static let loadFailedMessage = "口座を読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
+    static let hideFailedMessage = "非表示にできませんでした"
 
     func wallets(isHidden: Bool) -> [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []
