@@ -11,21 +11,21 @@ struct CategoryEditModelTests {
         let database = try Self.database()
         let model = CategoryEditModel(database: database, kind: .expense)
 
-        model.inputEmoji("ab🍙")
-        let emoji = model.emoji
+        model.icon.inputEmoji("ab🍙")
+        let emoji = model.icon.emoji
 
-        model.inputEmoji("🍙🐶")
-        let lastEmoji = model.emoji
+        model.icon.inputEmoji("🍙🐶")
+        let lastEmoji = model.icon.emoji
 
-        model.inputEmoji("abc")
-        let noEmoji = model.emoji
+        model.icon.inputEmoji("abc")
+        let noEmoji = model.icon.emoji
 
-        model.inputText("サブスク")
+        model.icon.inputText("サブスク")
 
         #expect(emoji == "🍙")
         #expect(lastEmoji == "🐶")
         #expect(noEmoji.isEmpty)
-        #expect(model.text == "サブス")
+        #expect(model.icon.text == "サブス")
     }
 
     @Test
@@ -33,7 +33,7 @@ struct CategoryEditModelTests {
         let database = try Self.database()
         let model = CategoryEditModel(database: database, kind: .income)
         model.name = "配当"
-        model.glyph = .invest
+        model.icon.glyph = .invest
         let canSaveBeforeName = CategoryEditModel(
             database: database,
             kind: .income
@@ -64,9 +64,9 @@ struct CategoryEditModelTests {
 
         #expect(model.isEditing)
         #expect(model.name == "食費")
-        #expect(model.markKind == .glyph)
-        #expect(model.glyph == .food)
-        #expect(model.color == "#E07A5F")
+        #expect(model.icon.markKind == .glyph)
+        #expect(model.icon.glyph == .food)
+        #expect(model.icon.color == "#E07A5F")
         #expect(!model.isHidden)
         #expect(!model.isChanged)
     }
@@ -83,7 +83,7 @@ struct CategoryEditModelTests {
         model.name = ""
         let cleared = model.isChanged
 
-        #expect(model.glyph == .food)
+        #expect(model.icon.glyph == .food)
         #expect(!start)
         #expect(named)
         #expect(!cleared)

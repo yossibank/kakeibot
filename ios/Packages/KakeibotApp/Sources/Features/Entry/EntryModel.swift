@@ -225,6 +225,18 @@ public extension EntryModel {
         wallets.first { $0.id == id }
     }
 
+    var isOverSourceBalance: Bool {
+        guard type == .transfer else {
+            return false
+        }
+
+        guard let balance = wallet(walletId).flatMap(balance(of:)) else {
+            return false
+        }
+
+        return amount > balance
+    }
+
     func balance(of wallet: Wallet) -> Int? {
         balances[wallet.id]
     }
@@ -530,7 +542,9 @@ private extension EntryModel {
 
     func loadBalances() async throws {
         let list = try await database.entryList()
-        let entries = list.days.flatMap(\.entries)
+        let entries = list.days
+            .flatMap(\.entries)
+            .filter { $0.id != editingId }
 
         let pairs = wallets.map { wallet in
             (wallet.id, wallet.balance(with: entries))

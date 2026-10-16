@@ -6,6 +6,7 @@ struct AssetsView: View {
     @Bindable var model: AssetsModel
 
     let onTransfer: () -> Void
+    let onOpenWallet: (Wallet.ID) -> Void
 
     var body: some View {
         ScrollView {
@@ -96,7 +97,12 @@ private extension AssetsView {
     var walletGrid: some View {
         LazyVGrid(columns: Self.columns, spacing: 8) {
             ForEach(model.rows) { row in
-                walletTile(row)
+                Button {
+                    onOpenWallet(row.wallet.id)
+                } label: {
+                    walletTile(row)
+                }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -125,6 +131,7 @@ private extension AssetsView {
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 74, alignment: .leading)
         .card(cornerRadius: 18)
+        .contentShape(.rect)
     }
 }
 
