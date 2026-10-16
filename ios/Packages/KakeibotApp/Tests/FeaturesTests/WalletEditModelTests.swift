@@ -61,9 +61,35 @@ struct WalletEditModelTests {
 
         #expect(loaded == "銀行")
         #expect(!isChanged)
+        #expect(!model.needsHideConfirmation)
         #expect(saved.id == bank.id)
         #expect(saved.name == "ゆうちょ")
         #expect(saved.initialBalance == 120_000)
+    }
+
+    @Test
+    func asksBeforeHidingWalletWithBalance() async throws {
+        let setup = try await Setup()
+        let bank = try await setup.wallet(named: "銀行")
+        let options = try await setup.database.entryOptions()
+        let salary = try #require(options.incomeCategories.first)
+        let date = try #require(LocalDate("2026-10-01"))
+
+        let income = EntryDraft(
+            type: .income,
+            amount: 5000,
+            date: date,
+            categoryId: salary.id,
+            walletId: bank.id
+        )
+
+        try await setup.database.saveEntry(income, at: Date())
+
+        let model = WalletEditModel(database: setup.database, editing: bank.id)
+        await model.load()
+
+        #expect(model.balance == 5000)
+        #expect(model.needsHideConfirmation)
     }
 
     @Test

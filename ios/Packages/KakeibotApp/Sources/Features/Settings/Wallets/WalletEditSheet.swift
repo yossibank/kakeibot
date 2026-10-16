@@ -7,6 +7,7 @@ public struct WalletEditSheet: View {
     @State private var model: WalletEditModel
     @State private var isConfirmingDiscard = false
     @State private var isEnteringAmount = false
+    @State private var isConfirmingHide = false
 
     @FocusState private var focus: Field?
 
@@ -54,6 +55,18 @@ public struct WalletEditSheet: View {
             isPresented: $isConfirmingDiscard
         ) {
             dismiss()
+        }
+        .confirmation(
+            isPresented: $isConfirmingHide,
+            systemImage: "eye.slash",
+            title: "この口座を非表示にしますか",
+            message: hideMessage,
+            keepTitle: "やめる",
+            confirmTitle: "非表示にする"
+        ) {
+            Task {
+                await setHidden(true)
+            }
         }
         .onChange(of: model.kind) {
             focus = nil
@@ -279,9 +292,7 @@ private extension WalletEditSheet {
 
     var hideButton: some View {
         Button {
-            Task {
-                await setHidden(!model.isHidden)
-            }
+            toggleHidden()
         } label: {
             Text(hideTitle)
                 .font(.subheadline)
@@ -380,6 +391,11 @@ private extension WalletEditSheet {
         model.isHidden ? "表示に戻す" : "この口座を非表示にする"
     }
 
+    var hideMessage: String {
+        let balance = AmountText.text(model.balance)
+        return "残高 \(balance) は、資産タブの合計から外れます"
+    }
+
     var hideColor: Color {
         model.isHidden ? Palette.gold : Palette.mist
     }
@@ -421,6 +437,19 @@ private extension WalletEditSheet {
 
         onSave(wallet)
         dismiss()
+    }
+
+    func toggleHidden() {
+        focus = nil
+
+        guard !model.needsHideConfirmation else {
+            isConfirmingHide = true
+            return
+        }
+
+        Task {
+            await setHidden(!model.isHidden)
+        }
     }
 
     func setHidden(_ isHidden: Bool) async {

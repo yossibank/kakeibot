@@ -16,6 +16,7 @@ public final class WalletEditModel {
     }
 
     public private(set) var calculator = AmountCalculator()
+    public private(set) var balance = 0
     public private(set) var isHidden = false
     public private(set) var errorMessage: String?
 
@@ -65,6 +66,10 @@ public extension WalletEditModel {
         draft.problems.isEmpty
     }
 
+    var needsHideConfirmation: Bool {
+        !isHidden && balance != 0
+    }
+
     static func glyph(for kind: Wallet.Kind) -> Icon.Glyph {
         switch kind {
         case .cash: .cash
@@ -95,6 +100,7 @@ public extension WalletEditModel {
             }
 
             apply(WalletDraft(wallet, icon: icon))
+            balance = wallet.balance(with: list.days.flatMap(\.entries))
             isHidden = wallet.archivedAt != nil
             baseline = snapshot
         } catch {
