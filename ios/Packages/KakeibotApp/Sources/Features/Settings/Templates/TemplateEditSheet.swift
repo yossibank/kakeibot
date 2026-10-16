@@ -26,6 +26,7 @@ public struct TemplateEditSheet: View {
         GeometryReader { _ in
             ZStack(alignment: .bottom) {
                 content
+                    .ignoresSafeArea(.keyboard)
 
                 if let panel {
                     Color.black
@@ -124,16 +125,16 @@ private extension TemplateEditSheet {
                             .foregroundStyle(Palette.mist)
                             .padding(.leading, 6)
                     }
+
+                    if !model.isEditing {
+                        capsulePreview
+                    }
                 }
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
 
-            if model.isEditing {
-                deleteButton
-            } else {
-                capsulePreview
-            }
+            saveButton
         }
         .padding(.horizontal, 18)
         .padding(.top, 18)
@@ -156,19 +157,32 @@ private extension TemplateEditSheet {
 
             Spacer()
 
-            Button {
-                Task {
-                    await save()
+            Group {
+                if model.isEditing {
+                    RingButton(
+                        systemImage: "trash",
+                        style: .destructive
+                    ) {
+                        Task {
+                            await delete()
+                        }
+                    }
+                } else {
+                    Color.clear
+                        .frame(width: 44, height: 44)
                 }
-            } label: {
-                Text("保存")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(saveColor)
-                    .frame(minWidth: 64, minHeight: 44)
-                    .contentShape(.rect)
             }
-            .buttonStyle(.plain)
+            .frame(width: 64, alignment: .trailing)
         }
+    }
+
+    var saveButton: some View {
+        PrimaryButton(model.saveTitle) {
+            Task {
+                await save()
+            }
+        }
+        .disabled(!model.canSave)
     }
 
     var preview: some View {
@@ -255,25 +269,6 @@ private extension TemplateEditSheet {
             Self.rowsShape
                 .stroke(Palette.gold.opacity(0.18), lineWidth: 1)
         }
-    }
-
-    var deleteButton: some View {
-        Button {
-            Task {
-                await delete()
-            }
-        } label: {
-            Text("このテンプレートを削除")
-                .font(.subheadline)
-                .foregroundStyle(Palette.rose)
-                .frame(maxWidth: .infinity, minHeight: 46)
-                .overlay {
-                    Capsule()
-                        .stroke(Palette.rose.opacity(0.45), lineWidth: 1)
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 
     var capsulePreview: some View {
@@ -397,8 +392,12 @@ private extension TemplateEditSheet {
     func drawerBody(_ panel: Panel) -> some View {
         switch panel {
         case .amount:
-            Keypad(activeTax: model.calculator.taxNote?.rate) { key in
-                model.press(key)
+            VStack(spacing: 10) {
+                Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+                    model.press(key)
+                }
+
+                saveButton
             }
         case .category:
             tileGrid(model.categories, columns: 5, spacing: 5) { category in
@@ -555,10 +554,6 @@ private extension TemplateEditSheet {
     var title: String {
         let action = model.isEditing ? "編集" : "追加"
         return "\(model.typeName)テンプレートを\(action)"
-    }
-
-    var saveColor: Color {
-        model.canSave ? Palette.gold : Palette.dusk
     }
 
     var categoryIcon: Icon? {

@@ -29,6 +29,31 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func namesWhatIsMissingOnSaveButton() async throws {
+        let setup = try await Setup()
+        let bank = try await setup.wallet(named: "銀行")
+        let model = WalletEditModel(database: setup.database)
+
+        let editing = WalletEditModel(
+            database: setup.database,
+            editing: bank.id
+        )
+
+        await editing.load()
+
+        let empty = model.saveTitle
+        model.name = "楽天カード"
+        let named = model.saveTitle
+        model.icon.markKind = .emoji
+        let noMark = model.saveTitle
+
+        #expect(empty == "名前を入れてください")
+        #expect(named == "追加する")
+        #expect(noMark == "アイコンを選んでください")
+        #expect(editing.saveTitle == "変更を保存")
+    }
+
+    @Test
     func keepsChosenGlyphWhenKindChanges() async throws {
         let setup = try await Setup()
         let model = WalletEditModel(database: setup.database)

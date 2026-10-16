@@ -79,8 +79,8 @@ private extension CategoryEditSheet {
                         focus: $focus,
                         textField: .text
                     )
-                    .padding(.bottom, 8)
                 }
+                .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)
             }
             .scrollIndicators(.hidden)
@@ -95,9 +95,12 @@ private extension CategoryEditSheet {
                     .foregroundStyle(Palette.rose)
             }
 
-            if model.isEditing {
-                hideButton
+            PrimaryButton(model.saveTitle) {
+                Task {
+                    await save()
+                }
             }
+            .disabled(!model.canSave)
         }
         .padding(.horizontal, 18)
         .padding(.top, 18)
@@ -128,15 +131,16 @@ private extension CategoryEditSheet {
 
             Spacer()
 
-            Button("保存") {
-                Task {
-                    await save()
+            if model.isEditing {
+                SettingsHideButton(isHidden: model.isHidden) {
+                    Task {
+                        await setHidden(!model.isHidden)
+                    }
                 }
+            } else {
+                Color.clear
+                    .frame(width: 44, height: 44)
             }
-            .font(.subheadline.weight(.bold))
-            .foregroundStyle(saveColor)
-            .frame(minWidth: 44, minHeight: 44)
-            .disabled(!model.canSave)
         }
     }
 
@@ -226,26 +230,6 @@ private extension CategoryEditSheet {
         .padding(.horizontal, 20)
         .transition(Self.tagTransition)
     }
-
-    var hideButton: some View {
-        Button {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-        } label: {
-            Text(model.isHidden ? "表示に戻す" : "このカテゴリを非表示にする")
-                .font(.subheadline)
-                .foregroundStyle(hideColor)
-                .frame(maxWidth: .infinity, minHeight: 46)
-                .background(hideFill, in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(hideColor.opacity(0.6), lineWidth: 1)
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-    }
 }
 
 private extension CategoryEditSheet {
@@ -278,18 +262,6 @@ private extension CategoryEditSheet {
             model.removeTag(id)
             closeTag()
         }
-    }
-
-    var saveColor: Color {
-        model.canSave ? Palette.gold : Palette.dusk
-    }
-
-    var hideColor: Color {
-        model.isHidden ? Palette.gold : Palette.mist
-    }
-
-    var hideFill: Color {
-        model.isHidden ? Palette.gold.opacity(0.1) : Color.clear
     }
 
     func addTag() {

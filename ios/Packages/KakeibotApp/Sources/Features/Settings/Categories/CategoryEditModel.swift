@@ -70,6 +70,13 @@ public extension CategoryEditModel {
         draft.problems.isEmpty
     }
 
+    var saveTitle: String {
+        SettingsSaveTitle.text(
+            problem: draft.problems.first?.message,
+            isEditing: isEditing
+        )
+    }
+
     func addTag(_ name: String) -> Bool {
         let draft = EntryTagDraft(name: name)
 
