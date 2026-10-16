@@ -213,7 +213,7 @@ struct EntryModelTests {
         model.select(.income)
         let editor = model.newCategoryModel()
         editor.name = "配当"
-        editor.glyph = .invest
+        editor.icon.glyph = .invest
 
         let saved = try #require(await editor.save())
         await model.reloadCategories(selecting: saved.id)

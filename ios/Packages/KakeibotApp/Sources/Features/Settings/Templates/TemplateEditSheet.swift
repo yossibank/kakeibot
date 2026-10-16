@@ -43,7 +43,7 @@ public struct TemplateEditSheet: View {
                             .transition(Self.memoTransition)
                     } else {
                         drawerView(panel)
-                            .transition(Self.drawerTransition)
+                            .transition(.settingsDrawer)
                     }
                 }
             }
@@ -386,36 +386,10 @@ private extension TemplateEditSheet {
     }
 
     func drawerView(_ panel: Panel) -> some View {
-        VStack(spacing: 12) {
-            HStack {
-                Text(title(for: panel))
-                    .font(.caption2)
-                    .tracking(3)
-                    .foregroundStyle(Palette.gold)
-
-                Spacer()
-
-                Button("完了") {
-                    closePanel()
-                }
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(Palette.gold)
-                .frame(minWidth: 44, minHeight: 32)
-            }
-
+        SettingsDrawer(title(for: panel)) {
+            closePanel()
+        } content: {
             drawerBody(panel)
-        }
-        .padding(.horizontal, 16)
-        .padding(.top, 12)
-        .padding(.bottom, 12)
-        .background {
-            Self.drawerShape
-                .fill(Palette.drawer)
-                .overlay {
-                    Self.drawerShape
-                        .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
-                }
-                .ignoresSafeArea(edges: .bottom)
         }
     }
 
@@ -566,21 +540,12 @@ private extension TemplateEditSheet {
     static let rowsShape = RoundedRectangle(cornerRadius: 20)
     static let amountFont = Font.system(size: 20, design: .serif)
 
-    static let drawerShape = UnevenRoundedRectangle(
-        topLeadingRadius: 28,
-        topTrailingRadius: 28
-    )
-
     static var cardFill: LinearGradient {
         LinearGradient(
             colors: [Palette.cardTop, Palette.cardBottom],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-    }
-
-    static var drawerTransition: AnyTransition {
-        .move(edge: .bottom).combined(with: .opacity)
     }
 
     static var memoTransition: AnyTransition {

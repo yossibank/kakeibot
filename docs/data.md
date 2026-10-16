@@ -87,7 +87,7 @@ emoji・text・glyph のどれかは必須。
 | --- | --- | --- |
 | id | TEXT | |
 | name | TEXT | |
-| kind | TEXT | `cash` `bank` `card` `emoney` `point` |
+| kind | TEXT | `cash` `bank` `card` `emoney` `point` `other` |
 | icon_id | TEXT | |
 | initial_balance | INTEGER | カードはマイナスでもよい |
 | sort_order | INTEGER | |

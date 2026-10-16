@@ -1,0 +1,50 @@
+[
+  {
+    "name": "財布",
+    "kind": "cash",
+    "mark": { "kind": "glyph", "value": "cash" },
+    "color": "#C9A96E",
+    "initialBalance": 12000,
+    "problems": []
+  },
+  {
+    "name": "  楽天カード  ",
+    "kind": "card",
+    "mark": { "kind": "text", "value": "楽" },
+    "color": "#BF4040",
+    "initialBalance": -38000,
+    "problems": []
+  },
+  {
+    "name": "   ",
+    "kind": "bank",
+    "mark": { "kind": "glyph", "value": "bank" },
+    "color": "#8DB0EA",
+    "initialBalance": 0,
+    "problems": ["emptyName"]
+  },
+  {
+    "name": "Suica",
+    "kind": "emoney",
+    "mark": { "kind": "emoji", "value": " " },
+    "color": "#81B29A",
+    "initialBalance": 2000,
+    "problems": ["emptyMark"]
+  },
+  {
+    "name": "ポイント",
+    "kind": "point",
+    "mark": { "kind": "text", "value": "ポイント" },
+    "color": "#C9A96E",
+    "initialBalance": 0,
+    "problems": ["textTooLong"]
+  },
+  {
+    "name": "",
+    "kind": "cash",
+    "mark": { "kind": "glyph", "value": "cash" },
+    "color": "C9A96E",
+    "initialBalance": 0,
+    "problems": ["emptyName", "invalidColor"]
+  }
+]

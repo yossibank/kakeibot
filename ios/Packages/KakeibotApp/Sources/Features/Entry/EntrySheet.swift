@@ -294,6 +294,9 @@ private extension EntrySheet {
         let id = role == .source ? model.walletId : model.toWalletId
         let wallet = model.wallet(id)
         let icon = wallet.flatMap { model.icon(for: $0) }
+        let isOver = role == .source && model.isOverSourceBalance
+        let balanceColor = isOver ? Palette.rose : Palette.mist
+        let overOpacity: Double = isOver ? 1 : 0
 
         return Button {
             open(.wallet(role))
@@ -313,15 +316,25 @@ private extension EntrySheet {
                     .lineLimit(1)
 
                 if let balance = wallet.flatMap({ model.balance(of: $0) }) {
-                    Text("残高 \(AmountText.text(balance))")
-                        .font(.caption2)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.mist)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    VStack(spacing: 2) {
+                        Text("残高 \(AmountText.text(balance))")
+                            .font(.caption2)
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+
+                        Text("残高を超えています")
+                            .font(.caption2)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .opacity(overOpacity)
+                    }
+                    .foregroundStyle(balanceColor)
+                    .animation(.snappy, value: isOver)
                 }
             }
             .padding(.horizontal, 8)
+            .padding(.vertical, 12)
             .frame(maxWidth: .infinity, minHeight: 120)
             .card(cornerRadius: 18)
             .contentShape(.rect)
