@@ -26,7 +26,7 @@ public struct CategoryListView: View {
             header
             CapsulePicker(selection: $model.kind, options: Self.kindOptions)
 
-            Text("長押しで動かす。下の枠に置くと非表示")
+            Text("長押しで動かせます。下の枠に置くと非表示になります")
                 .font(.caption)
                 .foregroundStyle(Palette.mist)
 
@@ -137,7 +137,7 @@ private extension CategoryListView {
         return HStack(spacing: 8) {
             Image(systemName: "eye.slash")
 
-            Text("ここに置いて非表示にする")
+            Text("ここに置くと非表示になります")
         }
         .font(.subheadline)
         .foregroundStyle(color)
@@ -192,7 +192,13 @@ private extension CategoryListView {
             .onTapGesture {
                 sheet = .edit(category.kind, category.id)
             }
-            .gesture(reorderGesture(for: category))
+            .gesture(
+                LiftGesture(in: Self.space) { location in
+                    follow(category, to: location)
+                } onEnd: {
+                    drop()
+                }
+            )
     }
 
     func tileFace(
@@ -337,29 +343,9 @@ private extension CategoryListView {
         return min(row * Self.columnCount + column, model.shown.count - 1)
     }
 
-    func reorderGesture(for category: EntryCategory) -> some Gesture {
-        let drag = DragGesture(
-            minimumDistance: 0,
-            coordinateSpace: .named(Self.space)
-        )
-
-        return LongPressGesture(minimumDuration: 0.3)
-            .sequenced(before: drag)
-            .onChanged { value in
-                guard case let .second(true, drag) = value else {
-                    return
-                }
-
-                follow(category, to: drag?.location)
-            }
-            .onEnded { _ in
-                drop()
-            }
-    }
-
     func follow(
         _ category: EntryCategory,
-        to location: CGPoint?
+        to location: CGPoint
     ) {
         if lift == nil {
             let index = model.shown.firstIndex(of: category) ?? 0
@@ -372,7 +358,7 @@ private extension CategoryListView {
             liftCount += 1
         }
 
-        guard let location, var current = lift else {
+        guard var current = lift else {
             return
         }
 

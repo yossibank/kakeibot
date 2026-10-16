@@ -9,6 +9,7 @@ import Store
 public final class EntryModel {
     public var date: LocalDate
     public var walletId: Wallet.ID?
+    public var toWalletId: Wallet.ID?
     public var memo = ""
 
     public var categoryId: EntryCategory.ID? {
@@ -20,14 +21,16 @@ public final class EntryModel {
     }
 
     public private(set) var tagId: EntryTag.ID?
-    public private(set) var type: Entry.Kind = .expense
+    public private(set) var type: Entry.Kind
     public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
+    public private(set) var balances: [Wallet.ID: Int] = [:]
     public private(set) var errorMessage: String?
     public private(set) var errorCount = 0
 
     private var baseline: Snapshot?
+    private var original: Entry?
     private var allTemplates: [EntryTemplate] = []
     private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
     private var appliedTemplateId: EntryTemplate.ID?
@@ -40,11 +43,13 @@ public final class EntryModel {
         database: AppDatabase,
         editing id: Entry.ID? = nil,
         date: LocalDate,
+        type: Entry.Kind = .expense,
         template: EntryTemplate? = nil
     ) {
         self.database = database
         self.editingId = id
         self.date = date
+        self.type = type
         self.startingTemplate = template
     }
 }
@@ -149,11 +154,23 @@ public extension EntryModel {
     }
 
     var walletName: String {
-        wallets.first { $0.id == walletId }?.name ?? walletTitle
+        wallet(walletId)?.name ?? walletTitle
     }
 
     var walletTitle: String {
-        type == .income ? "入金先" : "支払い元"
+        switch type {
+        case .expense: "支払い元"
+        case .income: "入金先"
+        case .transfer: "振替元"
+        }
+    }
+
+    var typeName: String {
+        switch type {
+        case .expense: "支出"
+        case .income: "収入"
+        case .transfer: "振替"
+        }
     }
 
     var canSave: Bool {
@@ -165,8 +182,19 @@ public extension EntryModel {
             return "変更を保存"
         }
 
-        return amount == 0 ? "金額を入れてください" : "\(AmountText.text(amount)) を記録する"
+        guard amount > 0 else {
+            return "金額を入れてください"
+        }
+
+        if type == .transfer, toWalletId == nil {
+            return "\(Self.destinationTitle)を選んでください"
+        }
+
+        let action = type == .transfer ? "振り替える" : "記録する"
+        return "\(AmountText.text(amount)) を\(action)"
     }
+
+    static let destinationTitle = "振替先"
 
     static func dateText(
         for date: LocalDate,
@@ -193,6 +221,14 @@ public extension EntryModel {
         options?.icons[wallet.iconId]
     }
 
+    func wallet(_ id: Wallet.ID?) -> Wallet? {
+        wallets.first { $0.id == id }
+    }
+
+    func balance(of wallet: Wallet) -> Int? {
+        balances[wallet.id]
+    }
+
     func icon(for template: EntryTemplate) -> Icon? {
         let categories = categories(for: template.type)
         let category = categories.first { $0.id == template.categoryId }
@@ -205,6 +241,7 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
             allTemplates = try await database.templates()
+            try await loadBalances()
             try await loadEntry()
 
             if let startingTemplate {
@@ -316,6 +353,12 @@ public extension EntryModel {
         tagId = tagId == id ? nil : id
     }
 
+    func swapWallets() {
+        let source = walletId
+        walletId = toWalletId
+        toWalletId = source
+    }
+
     func select(_ type: Entry.Kind) {
         guard type != self.type else {
             return
@@ -331,33 +374,52 @@ public extension EntryModel {
         } else if !categories.contains(where: { $0.id == categoryId }) {
             categoryId = categories.first?.id
         }
+
+        if type == .transfer {
+            chooseDestination()
+        }
     }
 
-    func save() async -> Bool {
+    func save() async -> EntryChange? {
         guard let draft else {
-            return false
+            return nil
         }
 
         do {
-            try await database.saveEntry(draft, editing: editingId, at: Date())
-            return true
+            let entry = try await database.saveEntry(
+                draft,
+                editing: editingId,
+                at: Date()
+            )
+
+            let title = label(for: entry)
+
+            let kind: EntryChange.Kind = if let original {
+                .edited(previous: original)
+            } else {
+                .recorded
+            }
+
+            return EntryChange(kind: kind, entry: entry, label: title)
         } catch {
             report(error)
-            return false
+            return nil
         }
     }
 
-    func delete() async -> Bool {
-        guard let editingId else {
-            return false
+    func delete() async -> EntryChange? {
+        guard let original else {
+            return nil
         }
 
         do {
-            try await database.deleteEntry(editingId)
-            return true
+            try await database.deleteEntry(original.id)
+            let title = label(for: original)
+
+            return EntryChange(kind: .deleted, entry: original, label: title)
         } catch {
             report(error)
-            return false
+            return nil
         }
     }
 }
@@ -370,6 +432,7 @@ private extension EntryModel {
         let categoryId: EntryCategory.ID?
         let tagId: EntryTag.ID?
         let walletId: Wallet.ID?
+        let toWalletId: Wallet.ID?
         let memo: String
     }
 
@@ -381,6 +444,7 @@ private extension EntryModel {
             categoryId: categoryId,
             tagId: tagId,
             walletId: walletId,
+            toWalletId: toWalletId,
             memo: memo
         )
     }
@@ -404,6 +468,7 @@ private extension EntryModel {
             categoryId: categoryId,
             tagId: tagId,
             walletId: walletId,
+            toWalletId: toWalletId,
             memo: memo
         )
     }
@@ -421,6 +486,8 @@ private extension EntryModel {
         switch error {
         case EntryDraft.Problem.amountNotPositive: "金額を入れてください"
         case EntryDraft.Problem.missingCategory: "カテゴリを選んでください"
+        case EntryDraft.Problem.missingDestination: "振替先を選んでください"
+        case EntryDraft.Problem.sameWallet: "振替元と振替先を別にしてください"
         case AppDatabase.WriteError.entryNotFound: "記録が見つかりませんでした"
         default: "保存できませんでした"
         }
@@ -438,6 +505,11 @@ private extension EntryModel {
         guard let editingId else {
             categoryId = categories.first?.id
             walletId = wallets.first?.id
+
+            if type == .transfer {
+                chooseDestination()
+            }
+
             return
         }
 
@@ -445,13 +517,44 @@ private extension EntryModel {
             throw AppDatabase.WriteError.entryNotFound
         }
 
+        original = entry
         type = entry.type
         calculator = AmountCalculator(amount: entry.amount)
         date = entry.date
         categoryId = entry.categoryId
         tagId = entry.tagId
         walletId = entry.walletId
+        toWalletId = entry.toWalletId
         memo = entry.memo ?? ""
+    }
+
+    func loadBalances() async throws {
+        let list = try await database.entryList()
+        let entries = list.days.flatMap(\.entries)
+
+        let pairs = wallets.map { wallet in
+            (wallet.id, wallet.balance(with: entries))
+        }
+
+        balances = Dictionary(uniqueKeysWithValues: pairs)
+    }
+
+    func label(for entry: Entry) -> String {
+        let categories = categories(for: entry.type)
+
+        return EntryChange.label(for: entry) { id in
+            categories.first { $0.id == id }
+        } wallet: { id in
+            wallet(id)
+        }
+    }
+
+    func chooseDestination() {
+        guard toWalletId == nil || toWalletId == walletId else {
+            return
+        }
+
+        toWalletId = wallets.first { $0.id != walletId }?.id
     }
 }
 

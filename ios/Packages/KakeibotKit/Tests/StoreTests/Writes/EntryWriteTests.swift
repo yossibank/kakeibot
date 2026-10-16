@@ -100,6 +100,33 @@ struct EntryWriteTests {
 
         #expect(snapshot.entries.isEmpty)
     }
+
+    @Test
+    func restoresDeletedAndEditedEntry() async throws {
+        let setup = try await Setup()
+        let later = setup.now.addingTimeInterval(60)
+        var edited = setup.draft
+        edited.amount = 1500
+
+        let saved = try await setup.database.saveEntry(
+            setup.draft,
+            at: setup.now
+        )
+        try await setup.database.deleteEntry(saved.id)
+        try await setup.database.restoreEntry(saved)
+        let restored = try setup.database.snapshot().entries
+
+        try await setup.database.saveEntry(
+            edited,
+            editing: saved.id,
+            at: later
+        )
+        try await setup.database.restoreEntry(saved)
+        let reverted = try setup.database.snapshot().entries
+
+        #expect(restored == [saved])
+        #expect(reverted == [saved])
+    }
 }
 
 extension EntryWriteTests {

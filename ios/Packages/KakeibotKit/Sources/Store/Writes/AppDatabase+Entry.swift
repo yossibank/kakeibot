@@ -42,6 +42,16 @@ public extension AppDatabase {
         }
     }
 
+    func restoreEntry(_ entry: Entry) async throws {
+        try await writer.write { db in
+            try entry.save(db)
+
+            if entry.type == .expense {
+                try NoSpendDay.deleteOne(db, key: entry.date)
+            }
+        }
+    }
+
     func deleteEntry(_ id: Entry.ID) async throws {
         try await writer.write { db in
             _ = try Entry.deleteOne(db, key: id)

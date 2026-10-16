@@ -119,7 +119,7 @@ private extension TemplateEditSheet {
                     VStack(alignment: .leading, spacing: 8) {
                         rows
 
-                        Text("金額を空にすると、使うときに入れる")
+                        Text("金額を空にすると、使うときに入れられます")
                             .font(.caption2)
                             .foregroundStyle(Palette.mist)
                             .padding(.leading, 6)
@@ -175,7 +175,7 @@ private extension TemplateEditSheet {
         VStack(spacing: 14) {
             card
 
-            Text("ホームでは、このカードで並ぶ")
+            Text("ホームでは、このカードで並びます")
                 .font(.caption2)
                 .tracking(1)
                 .foregroundStyle(Palette.mist)
@@ -447,7 +447,7 @@ private extension TemplateEditSheet {
     @ViewBuilder
     var tagChooser: some View {
         if model.tags.isEmpty {
-            Text("このカテゴリにタグはない。カテゴリの編集で足せる")
+            Text("このカテゴリにタグはありません。カテゴリの編集で足せます")
                 .font(.caption)
                 .foregroundStyle(Palette.mist)
                 .frame(maxWidth: .infinity, minHeight: 54)

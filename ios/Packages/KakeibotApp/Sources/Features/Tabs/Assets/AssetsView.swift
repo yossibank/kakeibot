@@ -5,6 +5,8 @@ import SwiftUI
 struct AssetsView: View {
     @Bindable var model: AssetsModel
 
+    let onTransfer: () -> Void
+
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
@@ -32,11 +34,28 @@ struct AssetsView: View {
 
 private extension AssetsView {
     var header: some View {
-        Text("資産")
-            .font(.system(size: 15, design: .serif))
-            .tracking(3)
-            .foregroundStyle(Palette.gold)
-            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+        HStack {
+            Text("資産")
+                .font(.system(size: 15, design: .serif))
+                .tracking(3)
+                .foregroundStyle(Palette.gold)
+
+            Spacer()
+
+            Button(action: onTransfer) {
+                Label("振替", systemImage: "arrow.left.arrow.right")
+                    .font(.caption)
+                    .foregroundStyle(Palette.gold)
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 44)
+                    .overlay {
+                        Capsule()
+                            .stroke(Palette.gold.opacity(0.3), lineWidth: 1)
+                    }
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     var totalCard: some View {

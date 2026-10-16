@@ -145,7 +145,13 @@ private extension TemplateListView {
         .onTapGesture {
             sheet = .edit(template.id)
         }
-        .gesture(reorderGesture(for: template))
+        .gesture(
+            LiftGesture(in: Self.space) { location in
+                follow(template, to: location)
+            } onEnd: {
+                drop()
+            }
+        )
     }
 }
 
@@ -186,9 +192,9 @@ private extension TemplateListView {
 
     var hint: String {
         if model.shown.isEmpty {
-            "よく使う入力を残しておくと、ホームと入力シートから 1 回で入れられる"
+            "よく使う入力を残しておくと、ホームと入力シートから 1 回で入れられます"
         } else {
-            "長押しで動かす。この順でホームと入力シートに出る"
+            "長押しで動かせます。この順でホームと入力シートに出ます"
         }
     }
 
@@ -234,29 +240,9 @@ private extension TemplateListView {
         return min(row * Self.columnCount + column, model.shown.count - 1)
     }
 
-    func reorderGesture(for template: EntryTemplate) -> some Gesture {
-        let drag = DragGesture(
-            minimumDistance: 0,
-            coordinateSpace: .named(Self.space)
-        )
-
-        return LongPressGesture(minimumDuration: 0.3)
-            .sequenced(before: drag)
-            .onChanged { value in
-                guard case let .second(true, drag) = value else {
-                    return
-                }
-
-                follow(template, to: drag?.location)
-            }
-            .onEnded { _ in
-                drop()
-            }
-    }
-
     func follow(
         _ template: EntryTemplate,
-        to location: CGPoint?
+        to location: CGPoint
     ) {
         if lift == nil {
             let index = model.shown.firstIndex(of: template) ?? 0
@@ -269,7 +255,7 @@ private extension TemplateListView {
             liftCount += 1
         }
 
-        guard let location, var current = lift else {
+        guard var current = lift else {
             return
         }
 

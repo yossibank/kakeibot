@@ -64,6 +64,7 @@ public struct TagLine<ID: Hashable>: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil)
         }
+        .frame(maxWidth: .infinity)
         .frame(height: Self.height, alignment: .top)
         .background(alignment: .top) {
             TagString()
@@ -148,8 +149,8 @@ private extension TagLine {
                 tap(card)
             }
             .gesture(
-                TagLiftGesture { translation in
-                    follow(card, by: translation)
+                LiftGesture(in: Self.space) { location in
+                    follow(card, to: location.x)
                 } onEnd: {
                     drop()
                 }
@@ -201,6 +202,7 @@ private extension TagLine {
     struct Lift {
         let id: ID
         let start: CGFloat
+        let origin: CGFloat
         var translation: CGFloat
     }
 
@@ -282,7 +284,7 @@ private extension TagLine {
 
     func follow(
         _ card: Card,
-        by translation: CGFloat
+        to x: CGFloat
     ) {
         guard canMove(card), let id = card.tagId else {
             return
@@ -292,13 +294,18 @@ private extension TagLine {
             let start = frames[id]?.midX ?? 0
 
             withAnimation(.snappy(duration: 0.2)) {
-                lift = Lift(id: id, start: start, translation: 0)
+                lift = Lift(
+                    id: id,
+                    start: start,
+                    origin: x,
+                    translation: 0
+                )
             }
 
             liftCount += 1
         }
 
-        lift?.translation = translation
+        lift?.translation = x - (lift?.origin ?? x)
 
         guard let lift, let onMove else {
             return

@@ -20,15 +20,80 @@ public struct PrimaryButton: View {
                 .font(.body.weight(.bold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-                .foregroundStyle(isEnabled ? Palette.nightBottom : Palette.mist)
+                .foregroundStyle(textColor)
                 .frame(maxWidth: .infinity, minHeight: 56)
-                .background(
-                    isEnabled ? Palette.gold : Palette.line,
-                    in: Capsule()
-                )
+                .background {
+                    face
+                }
+                .overlay {
+                    Capsule()
+                        .strokeBorder(rim, lineWidth: 1)
+                }
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .shadow(color: glow, radius: 14, y: 6)
+    }
+}
+
+private extension PrimaryButton {
+    @ViewBuilder
+    var face: some View {
+        if isEnabled {
+            Capsule()
+                .fill(Self.gold)
+                .overlay {
+                    Capsule()
+                        .fill(Self.sheen)
+                }
+        } else {
+            Capsule()
+                .fill(Palette.card)
+        }
+    }
+}
+
+private extension PrimaryButton {
+    static var gold: LinearGradient {
+        LinearGradient(
+            colors: [
+                Palette.gold.mix(with: Palette.champagne, by: 0.3),
+                Palette.gold,
+                Palette.gold.mix(with: Palette.bronze, by: 0.45)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    static var sheen: LinearGradient {
+        LinearGradient(
+            colors: [.white.opacity(0.22), .white.opacity(0)],
+            startPoint: .top,
+            endPoint: .center
+        )
+    }
+
+    var textColor: Color {
+        isEnabled ? Palette.nightBottom : Palette.mist
+    }
+
+    var rim: LinearGradient {
+        let colors = if isEnabled {
+            [Palette.champagne.opacity(0.7), Palette.gold.opacity(0.2)]
+        } else {
+            [Palette.gold.opacity(0.35), Palette.gold.opacity(0.1)]
+        }
+
+        return LinearGradient(
+            colors: colors,
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    var glow: Color {
+        isEnabled ? Palette.gold.opacity(0.28) : .clear
     }
 }
 

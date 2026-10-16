@@ -5,11 +5,15 @@ import SwiftUI
 struct HomeView: View {
     @Bindable var model: HomeModel
 
+    @State private var openId: Entry.ID?
+
     let onOpenEntry: (Entry.ID) -> Void
     let onShowRecords: () -> Void
     let onOpenSettings: () -> Void
     let onOpenTemplate: (EntryTemplate) -> Void
     let onAddTemplate: () -> Void
+    let onRecord: (EntryChange) -> Void
+    let onDeleteEntry: (Entry.ID) -> Void
 
     var body: some View {
         ScrollView {
@@ -33,37 +37,6 @@ struct HomeView: View {
             Rectangle()
                 .fill(Palette.night)
                 .ignoresSafeArea()
-        }
-        .overlay(alignment: .bottom) {
-            if let recorded = model.recorded {
-                NoticeBanner(
-                    recorded.message,
-                    systemImage: "checkmark",
-                    actionTitle: "取り消す"
-                ) {
-                    Task {
-                        await model.undoRecorded()
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
-        .animation(.snappy, value: model.recorded)
-        .sensoryFeedback(.success, trigger: model.recorded) { _, new in
-            new != nil
-        }
-        .task(id: model.recorded) {
-            guard model.recorded != nil else {
-                return
-            }
-
-            guard await (try? Task.sleep(for: .seconds(4))) != nil else {
-                return
-            }
-
-            model.clearRecorded()
         }
     }
 }
@@ -196,15 +169,17 @@ private extension HomeView {
             }
 
             if model.recentRows.isEmpty {
-                Text("まだ記録がありません。右下の ＋ から記録する")
+                Text("まだ記録がありません。右下の ＋ から記録できます")
                     .font(.footnote)
                     .foregroundStyle(Palette.mist)
                     .padding(.vertical, 16)
             } else {
                 ForEach(model.recentRows) { row in
-                    Button {
+                    SwipeRow(id: row.id, openId: $openId) {
                         onOpenEntry(row.id)
-                    } label: {
+                    } onDelete: {
+                        onDeleteEntry(row.id)
+                    } content: {
                         EntryRow(
                             icon: row.icon,
                             title: row.title,
@@ -214,7 +189,6 @@ private extension HomeView {
                             type: row.type
                         )
                     }
-                    .buttonStyle(.plain)
                     .overlay(alignment: .top) {
                         Rectangle()
                             .fill(Palette.gold.opacity(0.1))
@@ -293,7 +267,9 @@ private extension HomeView {
         }
 
         Task {
-            await model.record(template)
+            if let change = await model.record(template) {
+                onRecord(change)
+            }
         }
     }
 }

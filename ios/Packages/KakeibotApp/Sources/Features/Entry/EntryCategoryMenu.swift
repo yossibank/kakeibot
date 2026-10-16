@@ -37,7 +37,7 @@ struct EntryCategoryMenu: View {
 
             row(
                 "非表示にする",
-                note: "設定のカテゴリから戻せる",
+                note: "設定のカテゴリから戻せます",
                 systemImage: "eye.slash",
                 action: onHide
             )

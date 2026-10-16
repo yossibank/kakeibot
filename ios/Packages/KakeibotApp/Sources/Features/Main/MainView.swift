@@ -11,6 +11,7 @@ public struct MainView: View {
     @State private var records: RecordsModel
     @State private var assets: AssetsModel
     @State private var draft: EntryModel
+    @State private var notice: EntryNoticeModel
     @State private var isWarmingEntry = true
 
     private let database: AppDatabase
@@ -46,6 +47,7 @@ public struct MainView: View {
             )
         )
 
+        _notice = State(initialValue: EntryNoticeModel(database: database))
         self.database = database
     }
 
@@ -68,15 +70,31 @@ public struct MainView: View {
                     },
                     onAddTemplate: {
                         sheet = .newTemplate
+                    },
+                    onRecord: { change in
+                        notice.show(change)
+                    },
+                    onDeleteEntry: { id in
+                        Task {
+                            await notice.delete(id, in: home.list)
+                        }
                     }
                 )
                 .tabContent()
             }
 
             Tab(value: MainTab.records) {
-                RecordsView(model: records) { id in
-                    sheet = .edit(id)
-                }
+                RecordsView(
+                    model: records,
+                    onOpenEntry: { id in
+                        sheet = .edit(id)
+                    },
+                    onDelete: { id in
+                        Task {
+                            await notice.delete(id, in: records.list)
+                        }
+                    }
+                )
                 .tabContent()
             }
 
@@ -86,8 +104,10 @@ public struct MainView: View {
             }
 
             Tab(value: MainTab.assets) {
-                AssetsView(model: assets)
-                    .tabContent()
+                AssetsView(model: assets) {
+                    sheet = .transfer
+                }
+                .tabContent()
             }
         }
         .overlay(alignment: .bottom) {
@@ -98,6 +118,7 @@ public struct MainView: View {
                 sheet = .new
             }
         }
+        .entryNotice(notice, above: FloatingTabBar<Int>.height)
         .background {
             if isWarmingEntry {
                 entryWarmup
@@ -137,14 +158,15 @@ private extension MainView {
     func sheetContent(for sheet: Sheet) -> some View {
         switch sheet {
         case .new:
-            EntrySheet(model: draft)
+            EntrySheet(model: draft, onChange: notice.show)
         case let .edit(id):
             EntrySheet(
                 model: EntryModel(
                     database: database,
                     editing: id,
                     date: home.today
-                )
+                ),
+                onChange: notice.show
             )
         case .settings:
             SettingsSheet(database: database)
@@ -154,7 +176,17 @@ private extension MainView {
                     database: database,
                     date: home.today,
                     template: template
-                )
+                ),
+                onChange: notice.show
+            )
+        case .transfer:
+            EntrySheet(
+                model: EntryModel(
+                    database: database,
+                    date: home.today,
+                    type: .transfer
+                ),
+                onChange: notice.show
             )
         case .newTemplate:
             TemplateEditSheet(
@@ -181,6 +213,7 @@ private extension MainView {
         case settings
         case template(EntryTemplate)
         case newTemplate
+        case transfer
 
         var id: String {
             switch self {
@@ -189,6 +222,7 @@ private extension MainView {
             case .settings: "settings"
             case let .template(template): "template-\(template.id)"
             case .newTemplate: "new-template"
+            case .transfer: "transfer"
             }
         }
     }

@@ -302,7 +302,7 @@ private extension CategoryEditSheet {
                 focus: .text
             )
 
-            Text("「外」「推し」のように、短い文字をアイコンにする")
+            Text("「外」「推し」のように、短い文字をアイコンにできます")
                 .font(.caption)
                 .foregroundStyle(Palette.mist)
         }

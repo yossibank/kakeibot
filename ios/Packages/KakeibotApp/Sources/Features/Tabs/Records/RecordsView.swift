@@ -5,7 +5,10 @@ import SwiftUI
 struct RecordsView: View {
     @Bindable var model: RecordsModel
 
+    @State private var openId: Entry.ID?
+
     let onOpenEntry: (Entry.ID) -> Void
+    let onDelete: (Entry.ID) -> Void
 
     var body: some View {
         ScrollView {
@@ -116,29 +119,34 @@ private extension RecordsView {
             dayHeader(day)
 
             ForEach(model.rows(for: day)) { row in
-                Button {
-                    onOpenEntry(row.id)
-                } label: {
-                    EntryRow(
-                        icon: row.icon,
-                        title: row.title,
-                        tag: row.tag,
-                        detail: row.detail,
-                        amount: row.amount,
-                        type: row.type
-                    )
-                }
-                .buttonStyle(.plain)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(Palette.gold.opacity(0.1))
-                        .frame(height: 1)
-                }
+                swipeRow(row)
             }
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
         .card()
+    }
+
+    func swipeRow(_ row: EntryRowItem) -> some View {
+        SwipeRow(id: row.id, openId: $openId) {
+            onOpenEntry(row.id)
+        } onDelete: {
+            onDelete(row.id)
+        } content: {
+            EntryRow(
+                icon: row.icon,
+                title: row.title,
+                tag: row.tag,
+                detail: row.detail,
+                amount: row.amount,
+                type: row.type
+            )
+        }
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Palette.gold.opacity(0.1))
+                .frame(height: 1)
+        }
     }
 
     func dayHeader(_ day: EntryDay) -> some View {
@@ -161,10 +169,12 @@ private extension RecordsView {
 
             Spacer(minLength: 8)
 
-            Text(Self.totalText(for: day))
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
-                .lineLimit(1)
+            if let total = Self.totalText(for: day) {
+                Text(total)
+                    .font(.caption)
+                    .foregroundStyle(Palette.mist)
+                    .lineLimit(1)
+            }
         }
         .padding(.top, 12)
         .padding(.bottom, 8)
@@ -180,13 +190,16 @@ private extension RecordsView {
         return date.weekday == .saturday ? Palette.saturday : Palette.mist
     }
 
-    static func totalText(for day: EntryDay) -> String {
-        let expense = AmountText.text(day.expenseTotal)
+    static func totalText(for day: EntryDay) -> String? {
+        let expense = day.expenseTotal > 0
+            ? AmountText.text(day.expenseTotal)
+            : nil
 
-        guard day.incomeTotal > 0 else {
-            return expense
-        }
+        let income = day.incomeTotal > 0
+            ? "収入 \(AmountText.text(day.incomeTotal))"
+            : nil
 
-        return "\(expense)・収入 \(AmountText.text(day.incomeTotal))"
+        let parts = [expense, income].compactMap(\.self)
+        return parts.isEmpty ? nil : parts.joined(separator: "・")
     }
 }

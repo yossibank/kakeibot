@@ -27,8 +27,16 @@ public struct EntryRow: View {
 
     public var body: some View {
         HStack(spacing: 12) {
-            IconImage(icon, size: 15)
-                .foregroundStyle(Palette.gold)
+            Group {
+                if icon == nil, type == .transfer {
+                    Image(systemName: "arrow.left.arrow.right")
+                        .font(.system(size: 13, weight: .light))
+                        .frame(width: 21, height: 21)
+                } else {
+                    IconImage(icon, size: 15)
+                }
+            }
+            .foregroundStyle(Palette.gold)
 
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(title)
@@ -91,6 +99,13 @@ public struct EntryRow: View {
             detail: "銀行",
             amount: 250_000,
             type: .income
+        )
+        EntryRow(
+            icon: nil,
+            title: "振替",
+            detail: "銀行 → 財布",
+            amount: 20000,
+            type: .transfer
         )
         EntryRow(
             icon: nil,
