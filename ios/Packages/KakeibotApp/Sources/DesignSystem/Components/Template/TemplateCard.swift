@@ -25,18 +25,11 @@ public struct TemplateCard<Name: View, Amount: View>: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: size.spacing) {
             HStack(spacing: size.gap) {
-                IconImage(icon, size: size.iconSize)
-                    .foregroundStyle(Palette.gold)
-                    .frame(width: size.badgeSize, height: size.badgeSize)
-                    .background(Palette.gold.opacity(0.06), in: Circle())
-                    .overlay {
-                        Circle()
-                            .strokeBorder(Self.foil, lineWidth: 1)
-                    }
+                TemplateBadge(icon: icon, size: size)
 
                 VStack(alignment: .leading, spacing: size.textSpacing) {
                     name
-                        .lineLimit(1)
+                        .lineLimit(size.nameLines)
 
                     Text(detail)
                         .font(size.detailFont)
@@ -61,29 +54,9 @@ public struct TemplateCard<Name: View, Amount: View>: View {
         .padding(.horizontal, size.padding)
         .frame(maxWidth: .infinity)
         .frame(height: size.height)
-        .background {
-            ZStack {
-                Self.shape(size)
-                    .fill(Self.fill)
-
-                Self.shape(size)
-                    .fill(Self.gloss)
-            }
-        }
-        .overlay {
-            Self.shape(size)
-                .strokeBorder(Self.foil, lineWidth: 1.2)
-        }
-        .overlay {
-            Self.shape(size)
-                .inset(by: 4)
-                .strokeBorder(Palette.gold.opacity(0.1), lineWidth: 0.5)
-        }
-        .shadow(color: .black.opacity(0.35), radius: 3, y: 2)
-        .shadow(
-            color: .black.opacity(0.55),
-            radius: size.shadowRadius,
-            y: size.shadowRadius * 0.7
+        .templateCardFace(
+            cornerRadius: size.cornerRadius,
+            shadowRadius: size.shadowRadius
         )
     }
 }
@@ -103,41 +76,6 @@ public extension TemplateCard where Name == Text, Amount == TemplateCardAmount {
         } amount: {
             TemplateCardAmount(amount: amount, size: size)
         }
-    }
-}
-
-private extension TemplateCard {
-    static var fill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.cardTop, Palette.cardBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    static var gloss: LinearGradient {
-        LinearGradient(
-            colors: [.white.opacity(0.08), .white.opacity(0)],
-            startPoint: .topLeading,
-            endPoint: .center
-        )
-    }
-
-    static var foil: AngularGradient {
-        AngularGradient(
-            colors: [
-                Palette.champagne.opacity(0.9),
-                Palette.gold.opacity(0.6),
-                Palette.bronze.opacity(0.5),
-                Palette.gold.opacity(0.6),
-                Palette.champagne.opacity(0.9)
-            ],
-            center: .center
-        )
-    }
-
-    static func shape(_ size: TemplateCardSize) -> RoundedRectangle {
-        RoundedRectangle(cornerRadius: size.cornerRadius)
     }
 }
 
