@@ -169,6 +169,66 @@ struct TemplateUseTests {
     }
 
     @Test
+    func ordersTemplatesAndRemembersTheOrder() async throws {
+        let setup = try await Setup()
+        try await setup.saveTemplate(name: "洗剤", amount: 400)
+        try await setup.saveTemplate(name: "ティッシュ", amount: 900)
+        let options = try await setup.database.entryOptions()
+
+        let cafe = EntryTemplateDraft(
+            name: "駅前のカフェでモーニング",
+            type: .expense,
+            amount: 650,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            memo: ""
+        )
+
+        try await setup.database.saveTemplate(cafe, at: Date())
+        let defaults = try #require(UserDefaults(suiteName: UUID().uuidString))
+
+        let home = HomeModel(
+            database: setup.database,
+            today: setup.date,
+            defaults: defaults
+        )
+
+        let listTask = Task {
+            await home.observe()
+        }
+
+        let templateTask = Task {
+            await home.observeTemplates()
+        }
+
+        for _ in 0..<200 where home.templates.count < 3 || home.list == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let manual = home.templates.map(\.name)
+        home.templateOrder = .category
+        let category = home.templates.map(\.name)
+        home.templateOrder = .amount
+        let amount = home.templates.map(\.name)
+        home.templateOrder = .name
+        let name = home.templates.map(\.name)
+        listTask.cancel()
+        templateTask.cancel()
+
+        let reopened = HomeModel(
+            database: setup.database,
+            today: setup.date,
+            defaults: defaults
+        )
+
+        #expect(manual == ["洗剤", "ティッシュ", "駅前のカフェでモーニング"])
+        #expect(category == ["駅前のカフェでモーニング", "洗剤", "ティッシュ"])
+        #expect(amount == ["ティッシュ", "駅前のカフェでモーニング", "洗剤"])
+        #expect(name == ["ティッシュ", "洗剤", "駅前のカフェでモーニング"])
+        #expect(reopened.templateOrder == .name)
+    }
+
+    @Test
     func showsTemplatesOfSelectedTypeOnHome() async throws {
         let setup = try await Setup()
         try await setup.saveTemplate(name: "ランチ", amount: 980)

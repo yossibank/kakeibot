@@ -122,15 +122,46 @@ private extension HomeView {
                     selection: $model.templateType,
                     options: Self.typeOptions
                 )
+
+                Button("すべて", action: onShowAllTemplates)
+                    .font(.caption)
+                    .foregroundStyle(Palette.gold)
+                    .frame(minHeight: 44)
+                    .padding(.leading, 6)
             }
 
-            Text(templateHint)
-                .font(.caption2)
-                .foregroundStyle(Palette.mist)
+            HStack(spacing: 6) {
+                Text(templateHint)
+                    .font(.caption2)
+                    .foregroundStyle(Palette.mist)
 
-            templateShelf
+                Spacer()
+
+                if model.templates.count > 1 {
+                    Menu {
+                        Picker("並べ替え", selection: $model.templateOrder) {
+                            ForEach(TemplateOrder.allCases) { order in
+                                Text(order.title)
+                                    .tag(order)
+                            }
+                        }
+                    } label: {
+                        toolLabel("arrow.up.arrow.down")
+                    }
+                }
+
+                Button(action: onAddTemplate) {
+                    toolLabel("plus")
+                }
+                .buttonStyle(.plain)
+            }
+
+            if !model.templates.isEmpty {
+                templateShelf
+            }
         }
-        .padding(14)
+        .padding(.horizontal, 14)
+        .padding(.bottom, 14)
         .card()
     }
 
@@ -146,14 +177,6 @@ private extension HomeView {
                     templateButton(template)
                         .shelfWidth()
                 }
-
-                if showsAllButton {
-                    allButton
-                        .shelfWidth()
-                }
-
-                addButton
-                    .shelfWidth()
             }
             .scrollTargetLayout()
         }
@@ -163,48 +186,6 @@ private extension HomeView {
         .contentMargins(.vertical, 6, for: .scrollContent)
         .padding(.horizontal, -14)
         .padding(.vertical, -6)
-    }
-
-    var allButton: some View {
-        Button(action: onShowAllTemplates) {
-            VStack(spacing: 8) {
-                Image(systemName: "square.grid.2x2")
-                    .font(.system(size: 18, weight: .light))
-
-                Text("すべて（\(model.templates.count)）")
-                    .font(.footnote)
-            }
-            .foregroundStyle(Palette.gold)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                Palette.gold.opacity(0.06),
-                in: .rect(cornerRadius: 20)
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Palette.gold.opacity(0.45), lineWidth: 1)
-            }
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-    }
-
-    var addButton: some View {
-        Button(action: onAddTemplate) {
-            Label("追加", systemImage: "plus")
-                .font(.footnote)
-                .foregroundStyle(Palette.gold)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            Palette.gold.opacity(0.45),
-                            style: Self.dash
-                        )
-                }
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 
     var recentCard: some View {
@@ -268,6 +249,19 @@ private extension HomeView {
         .buttonStyle(.plain)
     }
 
+    func toolLabel(_ systemImage: String) -> some View {
+        Image(systemName: systemImage)
+            .font(.system(size: 13, weight: .light))
+            .foregroundStyle(Palette.gold)
+            .frame(width: 32, height: 32)
+            .overlay {
+                Circle()
+                    .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
+            }
+            .frame(width: 40, height: 40)
+            .contentShape(.rect)
+    }
+
     var divider: some View {
         Rectangle()
             .fill(Palette.gold.opacity(0.18))
@@ -296,23 +290,15 @@ private extension HomeView {
 }
 
 private extension HomeView {
-    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income)
     ]
 
     static let tileHeight = TemplateCardSize.regular.height
-    static let allButtonThreshold = 4
-
-    var showsAllButton: Bool {
-        model.templates.count > Self.allButtonThreshold
-    }
 
     var shelfRowCount: Int {
-        let count = model.templates.count + (showsAllButton ? 2 : 1)
-        return count > 2 ? 2 : 1
+        model.templates.count > 2 ? 2 : 1
     }
 
     var templateHint: String {

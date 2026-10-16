@@ -10,19 +10,30 @@ public final class HomeModel {
     public var today: LocalDate
     public var templateType: Entry.Kind = .expense
 
+    public var templateOrder: TemplateOrder {
+        didSet {
+            defaults.set(templateOrder.rawValue, forKey: Self.templateOrderKey)
+        }
+    }
+
     public private(set) var list: EntryList?
     public private(set) var errorMessage: String?
 
     private var allTemplates: [EntryTemplate] = []
 
     private let database: AppDatabase
+    private let defaults: UserDefaults
 
     public init(
         database: AppDatabase,
-        today: LocalDate
+        today: LocalDate,
+        defaults: UserDefaults = .standard
     ) {
+        let order = defaults.string(forKey: Self.templateOrderKey)
         self.database = database
         self.today = today
+        self.defaults = defaults
+        self.templateOrder = order.flatMap(TemplateOrder.init) ?? .manual
     }
 }
 
@@ -60,7 +71,9 @@ public extension HomeModel {
     }
 
     var templates: [EntryTemplate] {
-        allTemplates.filter { $0.type == templateType }
+        allTemplates
+            .filter { $0.type == templateType }
+            .sorted(by: isOrdered)
     }
 
     var recentRows: [EntryRowItem] {
@@ -176,6 +189,7 @@ public extension HomeModel {
 private extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "記録できませんでした"
+    static let templateOrderKey = "home.templateOrder"
 
     var monthDays: [EntryDay] {
         list?.days.filter { $0.date.yearMonth == month } ?? []
@@ -183,6 +197,42 @@ private extension HomeModel {
 
     func expense(on date: LocalDate) -> Int {
         list?.days.first { $0.date == date }?.expenseTotal ?? 0
+    }
+
+    func isOrdered(
+        _ lhs: EntryTemplate,
+        _ rhs: EntryTemplate
+    ) -> Bool {
+        switch templateOrder {
+        case .manual:
+            break
+        case .category:
+            let left = categoryOrder(of: lhs)
+            let right = categoryOrder(of: rhs)
+
+            if left != right {
+                return left < right
+            }
+        case .amount:
+            let left = lhs.amount ?? -1
+            let right = rhs.amount ?? -1
+
+            if left != right {
+                return left > right
+            }
+        case .name:
+            let result = lhs.name.localizedStandardCompare(rhs.name)
+
+            if result != .orderedSame {
+                return result == .orderedAscending
+            }
+        }
+
+        return lhs.sortOrder < rhs.sortOrder
+    }
+
+    func categoryOrder(of template: EntryTemplate) -> Int {
+        list?.categories[template.categoryId]?.sortOrder ?? .max
     }
 
     func dayLabel(for date: LocalDate) -> String {
