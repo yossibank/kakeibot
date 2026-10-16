@@ -13,14 +13,16 @@ struct WalletEditModelTests {
         model.name = "楽天カード"
         model.kind = .card
         model.isNegative = true
-        model.inputAmount("0038,000円")
+        model.press(.digit(3))
+        model.press(.digit(8))
+        model.press(.doubleZero)
+        model.press(.digit(0))
 
         let saved = try #require(await model.save())
         let list = try await setup.database.entryList()
         let icon = try #require(list.icons[saved.iconId])
 
-        #expect(model.amountText == "38000")
-        #expect(model.amountDisplay == "38,000")
+        #expect(model.calculator.amount == 38000)
         #expect(saved.initialBalance == -38000)
         #expect(saved.kind == .card)
         #expect(icon.glyph == .card)
@@ -50,7 +52,11 @@ struct WalletEditModelTests {
         let isChanged = model.isChanged
 
         model.name = "ゆうちょ"
-        model.inputAmount("120000")
+        model.press(.clear)
+        model.press(.digit(1))
+        model.press(.digit(2))
+        model.press(.doubleZero)
+        model.press(.doubleZero)
         let saved = try #require(await model.save())
 
         #expect(loaded == "銀行")
@@ -58,6 +64,24 @@ struct WalletEditModelTests {
         #expect(saved.id == bank.id)
         #expect(saved.name == "ゆうちょ")
         #expect(saved.initialBalance == 120_000)
+    }
+
+    @Test
+    func entrySheetSeesAddedWallet() async throws {
+        let setup = try await Setup()
+        let date = try #require(LocalDate("2026-10-12"))
+        let entry = EntryModel(database: setup.database, date: date)
+        await entry.load()
+
+        let editor = entry.newWalletModel()
+        editor.name = "楽天カード"
+        editor.kind = .card
+        let saved = try #require(await editor.save())
+        await entry.reloadWallets()
+        let wallet = try #require(entry.wallet(saved.id))
+
+        #expect(wallet.name == "楽天カード")
+        #expect(entry.balance(of: wallet) == 0)
     }
 
     @Test
@@ -80,7 +104,7 @@ struct WalletEditModelTests {
 
         #expect(hid)
         #expect(!refused)
-        #expect(cashModel.errorMessage == "最後の 1 つの財布は非表示にできません")
+        #expect(cashModel.errorMessage == "最後の 1 つの口座は非表示にできません")
     }
 }
 

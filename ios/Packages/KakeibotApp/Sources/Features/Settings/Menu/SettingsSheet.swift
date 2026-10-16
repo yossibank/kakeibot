@@ -23,7 +23,7 @@ struct SettingsSheet: View {
                         NavigationLink {
                             WalletListView(database: database)
                         } label: {
-                            row("財布", systemImage: "wallet.bifold")
+                            row("口座", systemImage: "building.columns")
                         }
 
                         Rectangle()

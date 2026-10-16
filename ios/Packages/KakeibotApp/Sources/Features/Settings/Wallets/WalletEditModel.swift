@@ -15,7 +15,7 @@ public final class WalletEditModel {
         }
     }
 
-    public private(set) var amountText = ""
+    public private(set) var calculator = AmountCalculator()
     public private(set) var isHidden = false
     public private(set) var errorMessage: String?
 
@@ -39,8 +39,6 @@ public final class WalletEditModel {
 }
 
 public extension WalletEditModel {
-    static let maxAmountDigits = 9
-
     var isEditing: Bool {
         editingId != nil
     }
@@ -50,12 +48,7 @@ public extension WalletEditModel {
     }
 
     var initialBalance: Int {
-        let amount = Int(amountText) ?? 0
-        return isNegative ? -amount : amount
-    }
-
-    var amountDisplay: String {
-        Int(amountText).map { $0.formatted(.number) } ?? ""
+        isNegative ? -calculator.amount : calculator.amount
     }
 
     var draft: WalletDraft {
@@ -79,13 +72,12 @@ public extension WalletEditModel {
         case .card: .card
         case .emoney: .walletPass
         case .point: .coin
+        case .other: .other
         }
     }
 
-    func inputAmount(_ value: String) {
-        let digits = value.filter { $0.isASCII && $0.isNumber }
-        let trimmed = digits.drop { $0 == "0" }
-        amountText = String(trimmed.prefix(Self.maxAmountDigits))
+    func press(_ key: AmountCalculator.Key) {
+        calculator.press(key)
     }
 
     func load() async {
@@ -156,9 +148,9 @@ private extension WalletEditModel {
     }
 
     static let defaultColor = "#C9A465"
-    static let loadFailedMessage = "財布を読めませんでした"
+    static let loadFailedMessage = "口座を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
-    static let lastWalletMessage = "最後の 1 つの財布は非表示にできません"
+    static let lastWalletMessage = "最後の 1 つの口座は非表示にできません"
 
     static let blank = Snapshot(
         name: "",
@@ -196,6 +188,6 @@ private extension WalletEditModel {
         kind = draft.kind
         icon.apply(draft.icon)
         isNegative = draft.initialBalance < 0
-        inputAmount(String(abs(draft.initialBalance)))
+        calculator = AmountCalculator(amount: abs(draft.initialBalance))
     }
 }

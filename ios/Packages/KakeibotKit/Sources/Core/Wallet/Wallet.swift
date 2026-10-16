@@ -43,6 +43,7 @@ public extension Wallet {
         case card
         case emoney
         case point
+        case other
     }
 }
 

@@ -6,19 +6,47 @@ import SwiftUI
 public struct WalletEditSheet: View {
     @State private var model: WalletEditModel
     @State private var isConfirmingDiscard = false
+    @State private var isEnteringAmount = false
 
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
 
-    public init(model: WalletEditModel) {
+    private let onSave: (Wallet) -> Void
+
+    public init(
+        model: WalletEditModel,
+        onSave: @escaping (Wallet) -> Void = { _ in }
+    ) {
         _model = State(initialValue: model)
+        self.onSave = onSave
     }
 
     public var body: some View {
         GeometryReader { _ in
-            content
-                .ignoresSafeArea(.keyboard)
+            ZStack(alignment: .bottom) {
+                content
+                    .ignoresSafeArea(.keyboard)
+
+                if isEnteringAmount {
+                    Color.black
+                        .opacity(0.35)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            closeAmount()
+                        }
+                        .transition(.opacity)
+
+                    SettingsDrawer("最初の残高") {
+                        closeAmount()
+                    } content: {
+                        Keypad(activeTax: activeTax) { key in
+                            model.press(key)
+                        }
+                    }
+                    .transition(.settingsDrawer)
+                }
+            }
         }
         .preferredColorScheme(.dark)
         .confirmsDiscard(
@@ -43,7 +71,10 @@ private extension WalletEditSheet {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    preview
+                    VStack(alignment: .leading, spacing: 8) {
+                        preview
+                        colorNote
+                    }
 
                     SettingsField(
                         "名前",
@@ -166,6 +197,19 @@ private extension WalletEditSheet {
         .card(cornerRadius: 20)
     }
 
+    var colorNote: some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(Color(hex: model.icon.color) ?? Palette.mist)
+                .frame(width: 10, height: 10)
+
+            Text("アイコンの色は、振り返りのグラフの色になります")
+        }
+        .font(.caption2)
+        .foregroundStyle(Palette.mist)
+        .padding(.leading, 4)
+    }
+
     var kindChooser: some View {
         VStack(alignment: .leading, spacing: 8) {
             SettingsSectionTitle("種類")
@@ -185,31 +229,27 @@ private extension WalletEditSheet {
             HStack(spacing: 10) {
                 signButton
 
-                HStack(spacing: 6) {
-                    Text("¥")
-                        .font(.system(size: 18, design: .serif))
-                        .foregroundStyle(Palette.mist)
+                Button {
+                    openAmount()
+                } label: {
+                    HStack(spacing: 8) {
+                        Text(AmountText.text(model.calculator.amount))
+                            .font(.system(size: 20, design: .serif))
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.ink)
 
-                    TextField(
-                        "0",
-                        text: amountBinding,
-                        prompt: Text("0").foregroundStyle(Palette.dusk)
-                    )
-                    .font(.system(size: 20, design: .serif))
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.ink)
-                    .tint(Palette.gold)
-                    .keyboardType(.numberPad)
-                    .focused($focus, equals: .amount)
+                        Spacer(minLength: 8)
+                    }
+                    .padding(.horizontal, 14)
+                    .frame(height: 46)
+                    .background(Palette.drawer, in: .rect(cornerRadius: 14))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(amountStroke, lineWidth: 1)
+                    }
+                    .contentShape(.rect)
                 }
-                .padding(.horizontal, 14)
-                .frame(height: 46)
-                .background(Palette.drawer, in: .rect(cornerRadius: 14))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(amountStroke, lineWidth: 1)
-                }
-                .animation(.snappy(duration: 0.2), value: focus)
+                .buttonStyle(.plain)
             }
 
             Text(balanceHint)
@@ -286,7 +326,6 @@ private extension WalletEditSheet {
 private extension WalletEditSheet {
     enum Field: Hashable {
         case name
-        case amount
         case text
     }
 
@@ -298,7 +337,7 @@ private extension WalletEditSheet {
     )
 
     var title: String {
-        model.isEditing ? "財布を編集" : "財布を追加"
+        model.isEditing ? "口座を編集" : "口座を追加"
     }
 
     var previewName: String {
@@ -330,11 +369,15 @@ private extension WalletEditSheet {
     }
 
     var amountStroke: Color {
-        focus == .amount ? Palette.gold : Palette.gold.opacity(0.35)
+        isEnteringAmount ? Palette.gold : Palette.gold.opacity(0.35)
+    }
+
+    var activeTax: AmountCalculator.TaxRate? {
+        model.calculator.taxNote?.rate
     }
 
     var hideTitle: String {
-        model.isHidden ? "表示に戻す" : "この財布を非表示にする"
+        model.isHidden ? "表示に戻す" : "この口座を非表示にする"
     }
 
     var hideColor: Color {
@@ -345,15 +388,18 @@ private extension WalletEditSheet {
         model.isHidden ? Palette.gold.opacity(0.1) : Color.clear
     }
 
-    var amountBinding: Binding<String> {
-        Binding(
-            get: {
-                model.amountDisplay
-            },
-            set: { value in
-                model.inputAmount(value)
-            }
-        )
+    func openAmount() {
+        focus = nil
+
+        withAnimation(.snappy(duration: 0.25)) {
+            isEnteringAmount = true
+        }
+    }
+
+    func closeAmount() {
+        withAnimation(.snappy(duration: 0.2)) {
+            isEnteringAmount = false
+        }
     }
 
     func close() {
@@ -369,9 +415,12 @@ private extension WalletEditSheet {
     func save() async {
         focus = nil
 
-        if await model.save() != nil {
-            dismiss()
+        guard let wallet = await model.save() else {
+            return
         }
+
+        onSave(wallet)
+        dismiss()
     }
 
     func setHidden(_ isHidden: Bool) async {

@@ -101,7 +101,7 @@ public extension WalletListModel {
 }
 
 private extension WalletListModel {
-    static let loadFailedMessage = "財布を読めませんでした"
+    static let loadFailedMessage = "口座を読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
 
     func wallets(isHidden: Bool) -> [Wallet] {

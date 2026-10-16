@@ -5,6 +5,9 @@ import SwiftUI
 struct EntryWalletSheet: View {
     @Bindable var model: EntryModel
 
+    @State private var isAdding = false
+    @State private var added: Wallet?
+
     @Environment(\.dismiss) private var dismiss
 
     let role: Role
@@ -12,9 +15,17 @@ struct EntryWalletSheet: View {
     var body: some View {
         FittedSheet {
             VStack(alignment: .leading, spacing: 20) {
-                Text(title)
-                    .font(.headline)
-                    .foregroundStyle(Palette.champagne)
+                HStack {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundStyle(Palette.champagne)
+
+                    Spacer()
+
+                    RingButton(systemImage: "plus") {
+                        isAdding = true
+                    }
+                }
 
                 ForEach(model.walletSections) { section in
                     VStack(alignment: .leading, spacing: 8) {
@@ -28,6 +39,11 @@ struct EntryWalletSheet: View {
                         }
                     }
                 }
+            }
+        }
+        .sheet(isPresented: $isAdding, onDismiss: chooseAdded) {
+            WalletEditSheet(model: model.newWalletModel()) { wallet in
+                added = wallet
             }
         }
     }
@@ -129,6 +145,20 @@ private extension EntryWalletSheet {
         switch role {
         case .source: model.walletId
         case .destination: model.toWalletId
+        }
+    }
+
+    func chooseAdded() {
+        guard let added else {
+            return
+        }
+
+        self.added = nil
+
+        Task {
+            await model.reloadWallets()
+            select(added)
+            dismiss()
         }
     }
 

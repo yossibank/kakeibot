@@ -317,6 +317,19 @@ public extension EntryModel {
         return CategoryEditModel(database: database, kind: kind)
     }
 
+    func newWalletModel() -> WalletEditModel {
+        WalletEditModel(database: database)
+    }
+
+    func reloadWallets() async {
+        do {
+            options = try await database.entryOptions()
+            try await loadBalances()
+        } catch {
+            report(error)
+        }
+    }
+
     func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
         CategoryEditModel(
             database: database,

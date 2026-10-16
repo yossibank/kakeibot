@@ -80,7 +80,7 @@ private extension WalletListView {
 
             Spacer()
 
-            Text("財布")
+            Text("口座")
                 .font(.system(size: 16, design: .serif))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
@@ -104,7 +104,7 @@ private extension WalletListView {
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SettingsSectionTitle("非表示の財布")
+            SettingsSectionTitle("非表示の口座")
 
             ForEach(model.hidden) { wallet in
                 Button {
@@ -122,7 +122,7 @@ private extension WalletListView {
         Button {
             sheet = .new
         } label: {
-            Label("財布を追加", systemImage: "plus")
+            Label("口座を追加", systemImage: "plus")
                 .font(.subheadline)
                 .foregroundStyle(Palette.gold)
                 .frame(maxWidth: .infinity, minHeight: 50)

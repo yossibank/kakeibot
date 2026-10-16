@@ -46,11 +46,11 @@ public struct DebugMenu: View {
                         sheet = .newTemplate
                     }
 
-                    Button("財布") {
+                    Button("口座") {
                         sheet = .wallets
                     }
 
-                    Button("財布の編集（新規）") {
+                    Button("口座の編集（新規）") {
                         sheet = .newWallet
                     }
                 }
