@@ -164,7 +164,7 @@ struct TemplateUseTests {
         await notice.undo()
         let afterUndo = try await setup.database.entryList()
 
-        #expect(change.message == "ランチ ¥980 を記録した")
+        #expect(change.message == "ランチ ¥980 を記録しました")
         #expect(afterRecord.days.first?.entries.first?.amount == 980)
         #expect(afterRecord.days.first?.date == setup.date)
         #expect(afterUndo.days.isEmpty)

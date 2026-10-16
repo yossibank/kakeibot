@@ -169,7 +169,7 @@ private extension HomeView {
             }
 
             if model.recentRows.isEmpty {
-                Text("まだ記録がありません。右下の ＋ から記録する")
+                Text("まだ記録がありません。右下の ＋ から記録できます")
                     .font(.footnote)
                     .foregroundStyle(Palette.mist)
                     .padding(.vertical, 16)

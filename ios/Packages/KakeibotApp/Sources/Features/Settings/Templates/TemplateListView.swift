@@ -192,9 +192,9 @@ private extension TemplateListView {
 
     var hint: String {
         if model.shown.isEmpty {
-            "よく使う入力を残しておくと、ホームと入力シートから 1 回で入れられる"
+            "よく使う入力を残しておくと、ホームと入力シートから 1 回で入れられます"
         } else {
-            "長押しで動かす。この順でホームと入力シートに出る"
+            "長押しで動かせます。この順でホームと入力シートに出ます"
         }
     }
 

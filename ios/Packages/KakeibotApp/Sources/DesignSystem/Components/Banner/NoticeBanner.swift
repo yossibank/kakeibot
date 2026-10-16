@@ -116,7 +116,7 @@ private extension NoticeBanner {
 #Preview {
     VStack(spacing: 16) {
         NoticeBanner(
-            "ランチ ¥980 を記録した",
+            "ランチ ¥980 を記録しました",
             systemImage: "checkmark",
             actionTitle: "取り消す"
         ) {}

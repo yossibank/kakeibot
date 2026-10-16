@@ -18,10 +18,10 @@ struct EntryNoticeModelTests {
         await setup.notice.undo()
         let entries = try setup.database.snapshot().entries
 
-        #expect(change.message == "食費 ¥500 を記録した")
+        #expect(change.message == "食費 ¥500 を記録しました")
         #expect(entries.isEmpty)
         #expect(setup.notice.notice == .undone)
-        #expect(setup.notice.notice?.message == "取り消した")
+        #expect(setup.notice.notice?.message == "取り消しました")
     }
 
     @Test
@@ -37,7 +37,7 @@ struct EntryNoticeModelTests {
         await setup.notice.undo()
         let entries = try setup.database.snapshot().entries
 
-        #expect(change.message == "食費 ¥98 を直した")
+        #expect(change.message == "食費 ¥98 を変更しました")
         #expect(edited.map(\.amount) == [98])
         #expect(entries.map(\.id) == [saved.id])
         #expect(entries.map(\.amount) == [980])
@@ -55,7 +55,7 @@ struct EntryNoticeModelTests {
         await setup.notice.undo()
         let entries = try setup.database.snapshot().entries
 
-        #expect(change.message == "食費 ¥980 を削除した")
+        #expect(change.message == "食費 ¥980 を削除しました")
         #expect(deleted.isEmpty)
         #expect(entries.map(\.id) == [saved.id])
         #expect(entries.map(\.amount) == [980])
@@ -73,7 +73,7 @@ struct EntryNoticeModelTests {
         await setup.notice.undo()
         let restored = try setup.database.snapshot().entries
 
-        #expect(message == "食費 ¥980 を削除した")
+        #expect(message == "食費 ¥980 を削除しました")
         #expect(deleted.isEmpty)
         #expect(restored.map(\.id) == [saved.id])
     }
@@ -88,7 +88,7 @@ struct EntryNoticeModelTests {
 
         let change = try #require(await model.save())
 
-        #expect(change.message == "財布 → 銀行 ¥3,000 を振り替えた")
+        #expect(change.message == "財布 → 銀行 ¥3,000 を振り替えました")
     }
 
     @Test

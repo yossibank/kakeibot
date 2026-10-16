@@ -91,7 +91,7 @@ public extension EntryNoticeModel.Notice {
     var message: String {
         switch self {
         case let .changed(change): change.message
-        case .undone: "取り消した"
+        case .undone: "取り消しました"
         case let .failed(message): message
         }
     }

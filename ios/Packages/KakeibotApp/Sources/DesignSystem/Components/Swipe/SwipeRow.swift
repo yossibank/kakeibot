@@ -73,22 +73,16 @@ private extension SwipeRow {
         let opacity = min(-offset / Self.actionWidth, 1)
 
         return Button(action: onDelete) {
-            VStack(spacing: 3) {
-                Image(systemName: "trash")
-                    .font(.system(size: 15, weight: .medium))
-
-                Text("削除")
-                    .font(.caption2.weight(.semibold))
-                    .tracking(1)
-            }
-            .foregroundStyle(Palette.cardBottom)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Self.fill, in: Self.shape)
-            .overlay {
-                Self.shape
-                    .fill(Self.sheen)
-            }
-            .contentShape(Self.shape)
+            Image(systemName: "trash")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(Palette.cardBottom)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Self.fill, in: Self.shape)
+                .overlay {
+                    Self.shape
+                        .fill(Self.sheen)
+                }
+                .contentShape(Self.shape)
         }
         .buttonStyle(.plain)
         .frame(width: buttonWidth)
@@ -99,7 +93,7 @@ private extension SwipeRow {
 
 private extension SwipeRow {
     static var actionWidth: CGFloat {
-        76
+        64
     }
 
     static var gap: CGFloat {
