@@ -48,7 +48,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | ブランチのワークツリーを Xcode で開く | `make open BRANCH=feat/...` |
 | iOS のビルド（シミュレーター） | `make build` |
 | シミュレーターを先に起動する | `make boot` |
-| テスト（Core と Store は `swift test`、残りはシミュレーター） | `make test` |
+| テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
 | Swift の整形 | `make format` |
 
 Debug のビルドでは、端末を振るとデバッグメニューが開き、画面を実機で確かめられる。シミュレーターでは `⌃⌘Z` で振る。

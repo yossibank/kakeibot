@@ -22,5 +22,4 @@ boot:
 	xcrun simctl list devices booted | grep -q $(SIMULATOR) || xcrun simctl boot $(SIMULATOR)
 
 test:
-	swift test --package-path ios/Packages/KakeibotKit
-	xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -skip-testing:CoreTests -skip-testing:StoreTests -destination 'id=$(SIMULATOR)' test
+	xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' test
