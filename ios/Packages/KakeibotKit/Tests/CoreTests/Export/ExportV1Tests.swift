@@ -23,6 +23,7 @@ struct ExportV1Tests {
 
         #expect(export.data.templates.isEmpty)
         #expect(!export.data.entries.isEmpty)
+        #expect(export.data.entries.allSatisfy { $0.templateId == nil })
     }
 
     @Test
@@ -84,6 +85,8 @@ private extension ExportV1Tests {
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
         tables["templates"] = nil
+        let entries = try #require(tables["entries"] as? [[String: Any]])
+        tables["entries"] = entries.map { $0.filter { $0.key != "templateId" } }
         object["data"] = tables
         return try JSONSerialization.data(withJSONObject: object)
     }

@@ -127,11 +127,11 @@ private extension TemplateListView {
         let isLifted = lift?.id == template.id
         let index = model.shown.firstIndex(of: template) ?? 0
         let position = isLifted ? liftedCenter : center(at: index)
-        let scale: CGFloat = isLifted ? 1.06 : 1
+        let scale: CGFloat = isLifted ? 1.03 : 1
         let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
-        return TemplateCard(
+        return TemplateRowCard(
             icon: model.icon(for: template),
             name: template.name,
             detail: model.detail(for: template),
@@ -177,9 +177,9 @@ private extension TemplateListView {
     ]
 
     nonisolated static let space = "TemplateBoard"
-    static let columnCount = 2
+    static let columnCount = 1
     static let spacing: CGFloat = 10
-    static let tileHeight = TemplateCardSize.regular.height
+    static let tileHeight = TemplateRowCard.height
     static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
 
     var typeName: String {

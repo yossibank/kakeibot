@@ -15,7 +15,7 @@ public extension TemplateCardSize {
 
     var height: CGFloat {
         switch self {
-        case .regular: 108
+        case .regular: 116
         case .large: 172
         }
     }
@@ -43,6 +43,13 @@ public extension TemplateCardSize {
 }
 
 extension TemplateCardSize {
+    var nameLines: Int {
+        switch self {
+        case .regular: 2
+        case .large: 1
+        }
+    }
+
     var detailFont: Font {
         switch self {
         case .regular: .system(size: 10)

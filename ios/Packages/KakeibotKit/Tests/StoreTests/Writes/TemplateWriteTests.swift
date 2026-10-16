@@ -71,6 +71,30 @@ struct TemplateWriteTests {
     }
 
     @Test
+    func clearsTemplateOfEntriesWhenDeleted() async throws {
+        let setup = try await Setup()
+
+        let template = try await setup.database.saveTemplate(
+            setup.draft,
+            at: setup.now
+        )
+        let today = try #require(LocalDate(year: 2026, month: 10, day: 3))
+        let draft = try #require(template.entryDraft(on: today))
+        let entry = try await setup.database.saveEntry(draft, at: setup.now)
+
+        try await setup.database.deleteTemplate(template.id)
+        let kept = try await setup.database.entry(entry.id)
+        try await setup.database.deleteEntry(entry.id)
+        try await setup.database.restoreEntry(entry)
+        let restored = try await setup.database.entry(entry.id)
+
+        #expect(entry.templateId == template.id)
+        #expect(kept?.amount == 980)
+        #expect(kept?.templateId == nil)
+        #expect(restored?.templateId == nil)
+    }
+
+    @Test
     func rejectsUnknownTemplate() async throws {
         let setup = try await Setup()
 

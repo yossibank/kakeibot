@@ -6,6 +6,7 @@ public struct EntryDraft: Hashable, Sendable {
     public var date: LocalDate
     public var categoryId: EntryCategory.ID?
     public var tagId: EntryTag.ID?
+    public var templateId: EntryTemplate.ID?
     public var walletId: Wallet.ID
     public var toWalletId: Wallet.ID?
     public var memo: String
@@ -16,6 +17,7 @@ public struct EntryDraft: Hashable, Sendable {
         date: LocalDate,
         categoryId: EntryCategory.ID?,
         tagId: EntryTag.ID? = nil,
+        templateId: EntryTemplate.ID? = nil,
         walletId: Wallet.ID,
         toWalletId: Wallet.ID? = nil,
         memo: String = ""
@@ -25,6 +27,7 @@ public struct EntryDraft: Hashable, Sendable {
         self.date = date
         self.categoryId = categoryId
         self.tagId = tagId
+        self.templateId = templateId
         self.walletId = walletId
         self.toWalletId = toWalletId
         self.memo = memo
@@ -58,6 +61,7 @@ public extension EntryDraft {
             date: entry.date,
             categoryId: entry.categoryId,
             tagId: entry.tagId,
+            templateId: entry.templateId,
             walletId: entry.walletId,
             toWalletId: entry.toWalletId,
             memo: entry.memo ?? ""
@@ -73,6 +77,7 @@ public extension EntryDraft {
             date: date,
             categoryId: categoryId,
             tagId: tagId,
+            templateId: templateId,
             walletId: walletId,
             toWalletId: destination,
             memo: trimmedMemo,
@@ -93,6 +98,7 @@ public extension EntryDraft {
         updated.date = date
         updated.categoryId = categoryId
         updated.tagId = tagId
+        updated.templateId = templateId
         updated.walletId = walletId
         updated.toWalletId = destination
         updated.memo = trimmedMemo

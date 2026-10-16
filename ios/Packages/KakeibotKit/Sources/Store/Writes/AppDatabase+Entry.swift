@@ -44,6 +44,14 @@ public extension AppDatabase {
 
     func restoreEntry(_ entry: Entry) async throws {
         try await writer.write { db in
+            var entry = entry
+
+            if
+                let templateId = entry.templateId,
+                try !EntryTemplate.exists(db, key: templateId) {
+                entry.templateId = nil
+            }
+
             try entry.save(db)
 
             if entry.type == .expense {
