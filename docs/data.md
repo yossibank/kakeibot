@@ -17,6 +17,7 @@ erDiagram
     category ||--o{ tag : "category_id"
     tag |o--o{ entry : "tag_id"
     tag |o--o{ template : "tag_id"
+    template |o--o{ entry : "template_id"
     recurring |o--o{ entry : "recurring_id"
     wallet ||--o{ recurring : "wallet_id・to_wallet_id"
     category |o--o{ recurring : "category_id"
@@ -127,6 +128,7 @@ emoji・text・glyph のどれかは必須。
 | date | TEXT | |
 | category_id | TEXT | 振替は空、それ以外は必須 |
 | tag_id | TEXT | 空でもよい。入れるなら category_id のタグ |
+| template_id | TEXT | テンプレートから作った記録だけ |
 | wallet_id | TEXT | 振替では出す側 |
 | to_wallet_id | TEXT | 振替だけ。wallet_id と別 |
 | memo | TEXT | |
@@ -151,7 +153,7 @@ emoji・text・glyph のどれかは必須。
 | sort_order | INTEGER | |
 | created_at / updated_at | TEXT | |
 
-テンプレートはしまわずに消す。どの記録からも参照されない。
+テンプレートはしまわずに消す。消すと、記録の `template_id` を空にする。
 
 ### budget
 

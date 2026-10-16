@@ -14,11 +14,13 @@ struct TemplateUseTests {
         await model.load()
 
         model.apply(lunch)
+        let saved = await model.save()
 
         #expect(model.amount == 980)
         #expect(model.memo == "社食")
         #expect(model.categoryId == lunch.categoryId)
         #expect(model.isApplied(lunch))
+        #expect(saved?.entry.templateId == lunch.id)
     }
 
     @Test
@@ -124,6 +126,151 @@ struct TemplateUseTests {
         #expect(stored.map(\.name) == ["定期", "ランチ", "給料"])
         #expect(income == ["給料"])
         #expect(model.movingOrder == nil)
+    }
+
+    @Test
+    func groupsAndSearchesTemplatesByCategory() async throws {
+        let setup = try await Setup()
+        try await setup.saveTemplate(name: "洗剤", amount: 400)
+        try await setup.saveTemplate(name: "ティッシュ", amount: 300)
+        let options = try await setup.database.entryOptions()
+
+        let cafe = EntryTemplateDraft(
+            name: "駅前のカフェでモーニング",
+            type: .expense,
+            amount: 650,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            memo: ""
+        )
+
+        try await setup.database.saveTemplate(cafe, at: Date())
+        let home = HomeModel(database: setup.database, today: setup.date)
+
+        let listTask = Task {
+            await home.observe()
+        }
+
+        let templateTask = Task {
+            await home.observeTemplates()
+        }
+
+        for _ in 0..<200 where home.templates.count < 3 || home.list == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let all = home.templateSections(matching: "")
+        let found = home.templateSections(matching: " カフェ ")
+        listTask.cancel()
+        templateTask.cancel()
+
+        #expect(all.map(\.title) == ["食費", "日用品"])
+        #expect(all.last?.templates.map(\.name) == ["洗剤", "ティッシュ"])
+        #expect(found.map(\.title) == ["食費"])
+        #expect(found.first?.templates.map(\.name) == ["駅前のカフェでモーニング"])
+    }
+
+    @Test
+    func ordersTemplatesAndRemembersTheOrder() async throws {
+        let setup = try await Setup()
+        try await setup.saveTemplate(name: "洗剤", amount: 400)
+        try await setup.saveTemplate(name: "ティッシュ", amount: 900)
+        let options = try await setup.database.entryOptions()
+
+        let cafe = EntryTemplateDraft(
+            name: "駅前のカフェでモーニング",
+            type: .expense,
+            amount: 650,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            memo: ""
+        )
+
+        try await setup.database.saveTemplate(cafe, at: Date())
+        let defaults = try #require(UserDefaults(suiteName: UUID().uuidString))
+
+        let home = HomeModel(
+            database: setup.database,
+            today: setup.date,
+            defaults: defaults
+        )
+
+        let listTask = Task {
+            await home.observe()
+        }
+
+        let templateTask = Task {
+            await home.observeTemplates()
+        }
+
+        for _ in 0..<200 where home.templates.count < 3 || home.list == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let manual = home.templates.map(\.name)
+        home.templateOrder = .category
+        let category = home.templates.map(\.name)
+        home.templateOrder = .amount
+        let amount = home.templates.map(\.name)
+        home.templateOrder = .name
+        let name = home.templates.map(\.name)
+        listTask.cancel()
+        templateTask.cancel()
+
+        let reopened = HomeModel(
+            database: setup.database,
+            today: setup.date,
+            defaults: defaults
+        )
+
+        #expect(manual == ["洗剤", "ティッシュ", "駅前のカフェでモーニング"])
+        #expect(category == ["駅前のカフェでモーニング", "洗剤", "ティッシュ"])
+        #expect(amount == ["ティッシュ", "駅前のカフェでモーニング", "洗剤"])
+        #expect(name == ["ティッシュ", "洗剤", "駅前のカフェでモーニング"])
+        #expect(reopened.templateOrder == .name)
+    }
+
+    @Test
+    func ordersTemplatesByUsesInNinetyDays() async throws {
+        let setup = try await Setup()
+        let soap = try await setup.saveTemplate(name: "洗剤", amount: 400)
+        let tissue = try await setup.saveTemplate(name: "ティッシュ", amount: 300)
+        let oldDate = setup.date.adding(days: -90)
+        let old = try #require(soap.entryDraft(on: oldDate))
+        try await setup.database.saveEntry(old, at: Date())
+        try await setup.database.saveEntry(old, at: Date())
+        let defaults = try #require(UserDefaults(suiteName: UUID().uuidString))
+
+        let home = HomeModel(
+            database: setup.database,
+            today: setup.date,
+            defaults: defaults
+        )
+
+        let listTask = Task {
+            await home.observe()
+        }
+
+        let templateTask = Task {
+            await home.observeTemplates()
+        }
+
+        for _ in 0..<200 where home.templates.count < 2 || home.list == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        _ = await home.record(tissue)
+
+        for _ in 0..<200 where home.list?.days.count ?? 0 < 2 {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        home.templateOrder = .frequent
+        let names = home.templates.map(\.name)
+        listTask.cancel()
+        templateTask.cancel()
+
+        #expect(names == ["ティッシュ", "洗剤"])
     }
 
     @Test

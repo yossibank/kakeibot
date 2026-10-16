@@ -54,6 +54,7 @@ public extension EntryTemplate {
             date: date,
             categoryId: categoryId,
             tagId: tagId,
+            templateId: id,
             walletId: walletId,
             memo: memo ?? ""
         )

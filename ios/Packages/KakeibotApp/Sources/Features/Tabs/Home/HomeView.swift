@@ -6,13 +6,15 @@ struct HomeView: View {
     @Bindable var model: HomeModel
 
     @State private var openId: Entry.ID?
+    @State private var orderButtonFrame: CGRect = .zero
 
     let onOpenEntry: (Entry.ID) -> Void
     let onShowRecords: () -> Void
     let onOpenSettings: () -> Void
-    let onOpenTemplate: (EntryTemplate) -> Void
+    let onUseTemplate: (EntryTemplate) -> Void
+    let onShowAllTemplates: () -> Void
+    let onOpenOrderMenu: (CGRect) -> Void
     let onAddTemplate: () -> Void
-    let onRecord: (EntryChange) -> Void
     let onDeleteEntry: (Entry.ID) -> Void
 
     var body: some View {
@@ -113,46 +115,110 @@ private extension HomeView {
 
     var templateCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                SectionTitle("テンプレート")
+            ZStack {
+                HStack {
+                    SectionTitle("テンプレート")
 
-                Spacer()
+                    Spacer()
+
+                    Button("すべて", action: onShowAllTemplates)
+                        .font(.caption)
+                        .foregroundStyle(Palette.gold)
+                        .frame(minHeight: 44)
+                }
 
                 CapsulePicker(
                     selection: $model.templateType,
                     options: Self.typeOptions
                 )
             }
+            .padding(.top, 8)
 
-            Text(templateHint)
-                .font(.caption2)
-                .foregroundStyle(Palette.mist)
+            HStack(spacing: 6) {
+                Text(templateHint)
+                    .font(.caption2)
+                    .foregroundStyle(Palette.mist)
 
-            LazyVGrid(columns: Self.templateColumns, spacing: 10) {
-                ForEach(model.templates) { template in
-                    templateButton(template)
+                Spacer()
+
+                if model.templates.count > 1 {
+                    orderButton
                 }
 
                 Button(action: onAddTemplate) {
-                    Label("追加", systemImage: "plus")
-                        .font(.footnote)
+                    Image(systemName: "plus")
+                        .font(.system(size: 13, weight: .light))
                         .foregroundStyle(Palette.gold)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: TemplateCardSize.regular.height)
+                        .frame(width: 32, height: 32)
                         .overlay {
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(
-                                    Palette.gold.opacity(0.45),
-                                    style: Self.dash
-                                )
+                            Circle()
+                                .stroke(Self.toolStroke, lineWidth: 1)
                         }
+                        .frame(width: 40, height: 40)
                         .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
             }
+
+            if !model.templates.isEmpty {
+                templateShelf
+            }
         }
-        .padding(14)
+        .padding(.horizontal, 14)
+        .padding(.bottom, 14)
         .card()
+    }
+
+    var orderButton: some View {
+        Button {
+            onOpenOrderMenu(orderButtonFrame)
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: "arrow.up.arrow.down")
+                    .font(.system(size: 11, weight: .light))
+
+                Text(model.templateOrder.title)
+                    .font(.caption2)
+            }
+            .foregroundStyle(Palette.gold)
+            .padding(.horizontal, 12)
+            .frame(height: 32)
+            .overlay {
+                Capsule()
+                    .stroke(Self.toolStroke, lineWidth: 1)
+            }
+            .frame(height: 40)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { frame in
+            orderButtonFrame = frame
+        }
+    }
+
+    var templateShelf: some View {
+        let rows = Array(
+            repeating: GridItem(.fixed(Self.tileHeight), spacing: 10),
+            count: shelfRowCount
+        )
+
+        return ScrollView(.horizontal) {
+            LazyHGrid(rows: rows, spacing: 10) {
+                ForEach(model.templates) { template in
+                    templateButton(template)
+                        .shelfWidth()
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .scrollIndicators(.hidden)
+        .scrollTargetBehavior(.viewAligned)
+        .contentMargins(.horizontal, 14, for: .scrollContent)
+        .contentMargins(.vertical, 6, for: .scrollContent)
+        .padding(.horizontal, -14)
+        .padding(.vertical, -6)
     }
 
     var recentCard: some View {
@@ -204,7 +270,7 @@ private extension HomeView {
 
     func templateButton(_ template: EntryTemplate) -> some View {
         Button {
-            use(template)
+            onUseTemplate(template)
         } label: {
             TemplateCard(
                 icon: model.icon(for: template),
@@ -244,32 +310,27 @@ private extension HomeView {
 }
 
 private extension HomeView {
-    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income)
     ]
 
-    static let templateColumns = Array(
-        repeating: GridItem(.flexible(), spacing: 8),
-        count: 2
-    )
+    static let tileHeight = TemplateCardSize.regular.height
+    static let toolStroke = Palette.gold.opacity(0.35)
+
+    var shelfRowCount: Int {
+        model.templates.count > 2 ? 2 : 1
+    }
 
     var templateHint: String {
         model.templates.isEmpty ? "よく使う入力を 1 回で" : "押すとすぐ記録"
     }
+}
 
-    func use(_ template: EntryTemplate) {
-        guard template.amount != nil else {
-            onOpenTemplate(template)
-            return
-        }
-
-        Task {
-            if let change = await model.record(template) {
-                onRecord(change)
-            }
+private extension View {
+    func shelfWidth() -> some View {
+        containerRelativeFrame(.horizontal) { width, _ in
+            width * 0.62
         }
     }
 }

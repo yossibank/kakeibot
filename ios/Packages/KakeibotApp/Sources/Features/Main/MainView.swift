@@ -13,6 +13,7 @@ public struct MainView: View {
     @State private var draft: EntryModel
     @State private var notice: EntryNoticeModel
     @State private var isWarmingEntry = true
+    @State private var orderMenuAnchor: CGRect?
 
     private let database: AppDatabase
 
@@ -65,14 +66,17 @@ public struct MainView: View {
                     onOpenSettings: {
                         sheet = .settings
                     },
-                    onOpenTemplate: { template in
-                        sheet = .template(template)
+                    onUseTemplate: useTemplate,
+                    onShowAllTemplates: {
+                        sheet = .templates
+                    },
+                    onOpenOrderMenu: { frame in
+                        withAnimation(.snappy(duration: 0.25)) {
+                            orderMenuAnchor = frame
+                        }
                     },
                     onAddTemplate: {
                         sheet = .newTemplate
-                    },
-                    onRecord: { change in
-                        notice.show(change)
                     },
                     onDeleteEntry: { id in
                         Task {
@@ -122,6 +126,19 @@ public struct MainView: View {
                 items: Self.tabItems
             ) {
                 sheet = .new
+            }
+        }
+        .overlay {
+            if let orderMenuAnchor {
+                TemplateOrderMenu(
+                    selection: $home.templateOrder,
+                    anchor: orderMenuAnchor
+                ) {
+                    withAnimation(.snappy(duration: 0.2)) {
+                        self.orderMenuAnchor = nil
+                    }
+                }
+                .transition(.opacity)
             }
         }
         .entryNotice(notice, above: FloatingTabBar<Int>.height)
@@ -194,6 +211,12 @@ private extension MainView {
                 ),
                 onChange: notice.show
             )
+        case .templates:
+            TemplateShelfSheet(
+                model: home,
+                database: database,
+                onUse: useTemplate
+            )
         case .newTemplate:
             TemplateEditSheet(
                 model: TemplateEditModel(
@@ -226,6 +249,7 @@ private extension MainView {
         case settings
         case template(EntryTemplate)
         case newTemplate
+        case templates
         case transfer
         case wallet(Wallet.ID)
 
@@ -236,6 +260,7 @@ private extension MainView {
             case .settings: "settings"
             case let .template(template): "template-\(template.id)"
             case .newTemplate: "new-template"
+            case .templates: "templates"
             case .transfer: "transfer"
             case let .wallet(id): "wallet-\(id)"
             }
@@ -263,6 +288,21 @@ private extension MainView {
 }
 
 private extension MainView {
+    func useTemplate(_ template: EntryTemplate) {
+        guard template.amount != nil else {
+            sheet = .template(template)
+            return
+        }
+
+        sheet = nil
+
+        Task {
+            if let change = await home.record(template) {
+                notice.show(change)
+            }
+        }
+    }
+
     func prepareDraft() {
         let model = EntryModel(database: database, date: home.today)
         draft = model

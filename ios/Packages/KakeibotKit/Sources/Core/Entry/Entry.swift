@@ -7,6 +7,7 @@ public struct Entry: Hashable, Sendable {
     public var date: LocalDate
     public var categoryId: EntryCategory.ID?
     public var tagId: EntryTag.ID?
+    public var templateId: EntryTemplate.ID?
     public var walletId: Wallet.ID
     public var toWalletId: Wallet.ID?
     public var memo: String?
@@ -22,6 +23,7 @@ public struct Entry: Hashable, Sendable {
         date: LocalDate,
         categoryId: EntryCategory.ID?,
         tagId: EntryTag.ID? = nil,
+        templateId: EntryTemplate.ID? = nil,
         walletId: Wallet.ID,
         toWalletId: Wallet.ID? = nil,
         memo: String? = nil,
@@ -36,6 +38,7 @@ public struct Entry: Hashable, Sendable {
         self.date = date
         self.categoryId = categoryId
         self.tagId = tagId
+        self.templateId = templateId
         self.walletId = walletId
         self.toWalletId = toWalletId
         self.memo = memo
@@ -67,6 +70,7 @@ extension Entry: Codable {
         try container.encode(date, forKey: .date)
         try container.encodeOrNull(categoryId, forKey: .categoryId)
         try container.encodeOrNull(tagId, forKey: .tagId)
+        try container.encodeOrNull(templateId, forKey: .templateId)
         try container.encode(walletId, forKey: .walletId)
         try container.encodeOrNull(toWalletId, forKey: .toWalletId)
         try container.encodeOrNull(memo, forKey: .memo)
