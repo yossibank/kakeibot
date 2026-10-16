@@ -45,4 +45,26 @@ struct WalletListModelTests {
         #expect(model.hidden.map(\.name) == ["銀行"])
         #expect(model.balance(of: cash) == 0)
     }
+
+    @Test
+    func hidesWalletButKeepsTheLastOne() async throws {
+        let database = try AppDatabase.inMemory()
+        try database.insertDefaultsIfEmpty(at: Date())
+        let model = WalletListModel(database: database)
+        await model.load()
+        let cash = try #require(model.shown.first)
+        let bank = try #require(model.shown.last)
+
+        model.move(bank.id, to: 0)
+        await model.hide(bank.id)
+        let shown = model.shown.map(\.name)
+        let hidden = model.hidden.map(\.name)
+        await model.hide(cash.id)
+
+        #expect(shown == ["財布"])
+        #expect(hidden == ["銀行"])
+        #expect(model.movingOrder == nil)
+        #expect(model.shown.map(\.name) == ["財布"])
+        #expect(model.errorMessage == "最後の 1 つの口座は非表示にできません")
+    }
 }
