@@ -295,11 +295,13 @@ DEBUG のビルドでは、端末を振るとデバッグメニュー（`DebugMe
 
 ## テスト
 
-テストターゲットは `ios/Kakeibot.xctestplan` にまとめ、`Kakeibot` スキームに付ける。`make test` と CI（`.github/workflows/verify.yml`）は、このテストプランを iOS シミュレーターで走らせる。パッケージは、プロジェクトのフォルダとしても登録する。こうしないと、スキームからパッケージのテストターゲットが見えない。
+テストターゲットは `ios/Kakeibot.xctestplan` にまとめ、`Kakeibot` スキームに付ける。パッケージは、プロジェクトのフォルダとしても登録する。こうしないと、スキームからパッケージのテストターゲットが見えない。
+
+`make test` は、KakeibotKit（Core と Store）を Mac の上の `swift test` で走らせる。残りは、テストプランから Core と Store を外して iOS シミュレーターで走らせる。CI（`.github/workflows/verify.yml`）は、先にシミュレーターを起動してから `make test` を走らせる。
 
 | 対象 | 方法 |
 | --- | --- |
-| Core | `make test`。Mac の上では `swift test` でも走る。fixtures を全部通し、`#filePath` からの相対パスで読む |
+| Core | fixtures を全部通し、`#filePath` からの相対パスで読む |
 | Store | メモリ上の DB で、表の形の変更・集計・書き出しの往復 |
 | Features | 処理のある画面のモデル |
 | AppFeature | SideEffects。通知の予約係だけテスト用に差し替える |

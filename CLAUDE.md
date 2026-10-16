@@ -4,7 +4,7 @@
 
 ## 作業の進め方
 
-変更したら `make build` と `make test` を通す。PR では CI が同じ 2 つを走らせる。
+変更したら `make build` と `make test` を通す。PR では CI が `make test` を走らせ、ビルドもそこで確かめる。
 
 画面を足したら、デバッグメニュー（`Features/Debug`）にも足す。部品は足さない。
 
