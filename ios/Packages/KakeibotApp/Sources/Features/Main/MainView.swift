@@ -79,9 +79,15 @@ public struct MainView: View {
             }
 
             Tab(value: MainTab.records) {
-                RecordsView(model: records) { id in
-                    sheet = .edit(id)
-                }
+                RecordsView(
+                    model: records,
+                    onOpenEntry: { id in
+                        sheet = .edit(id)
+                    },
+                    onDelete: { change in
+                        notice.show(change)
+                    }
+                )
                 .tabContent()
             }
 

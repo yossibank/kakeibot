@@ -27,6 +27,20 @@ public extension EntryChange {
     var message: String {
         "\(label) \(AmountText.text(entry.amount)) を\(verb)"
     }
+
+    static func label(
+        for entry: Entry,
+        category: (EntryCategory.ID) -> EntryCategory?,
+        wallet: (Wallet.ID) -> Wallet?
+    ) -> String {
+        guard entry.type == .transfer else {
+            return entry.categoryId.flatMap(category)?.name ?? ""
+        }
+
+        let from = wallet(entry.walletId)?.name ?? ""
+        let to = entry.toWalletId.flatMap(wallet)?.name ?? ""
+        return "\(from) → \(to)"
+    }
 }
 
 private extension EntryChange {

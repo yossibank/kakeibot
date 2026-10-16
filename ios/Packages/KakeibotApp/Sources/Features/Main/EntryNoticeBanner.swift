@@ -24,19 +24,21 @@ private struct EntryNoticeBanner: ViewModifier {
                 }
             )
             .overlay(alignment: .bottom) {
-                banner
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, bottom)
+                if let notice = model.notice {
+                    banner(notice)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, bottom)
+                        .onTapGesture {
+                            clear()
+                        }
+                        .transition(Self.transition)
+                }
             }
-            .animation(.snappy, value: model.change)
-            .animation(.snappy, value: model.errorMessage)
+            .animation(.snappy, value: model.notice)
             .sensoryFeedback(.success, trigger: model.change) { _, new in
                 new != nil
             }
-            .task(id: model.change) {
-                await clearLater()
-            }
-            .task(id: model.errorMessage) {
+            .task(id: model.notice) {
                 await clearLater()
             }
     }
@@ -44,10 +46,11 @@ private struct EntryNoticeBanner: ViewModifier {
 
 private extension EntryNoticeBanner {
     @ViewBuilder
-    var banner: some View {
-        if let change = model.change {
+    func banner(_ notice: EntryNoticeModel.Notice) -> some View {
+        switch notice {
+        case .changed:
             NoticeBanner(
-                change.message,
+                notice.message,
                 systemImage: "checkmark",
                 actionTitle: "取り消す"
             ) {
@@ -55,20 +58,17 @@ private extension EntryNoticeBanner {
                     await model.undo()
                 }
             }
-            .onTapGesture {
-                clear()
-            }
-            .transition(Self.transition)
-        } else if let errorMessage = model.errorMessage {
+        case .undone:
             NoticeBanner(
-                errorMessage,
+                notice.message,
+                systemImage: "arrow.uturn.backward"
+            )
+        case .undoFailed:
+            NoticeBanner(
+                notice.message,
                 systemImage: "exclamationmark",
                 tone: .error
             )
-            .onTapGesture {
-                clear()
-            }
-            .transition(Self.transition)
         }
     }
 }
@@ -78,7 +78,7 @@ private extension EntryNoticeBanner {
         .combined(with: .opacity)
 
     func clear() {
-        guard model.isShown else {
+        guard model.notice != nil else {
             return
         }
 
@@ -86,11 +86,13 @@ private extension EntryNoticeBanner {
     }
 
     func clearLater() async {
-        guard model.isShown else {
+        guard let notice = model.notice else {
             return
         }
 
-        guard await (try? Task.sleep(for: .seconds(4))) != nil else {
+        let duration = Duration.seconds(notice.seconds)
+
+        guard await (try? Task.sleep(for: duration)) != nil else {
             return
         }
 

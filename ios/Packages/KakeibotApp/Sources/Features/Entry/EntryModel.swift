@@ -540,15 +540,13 @@ private extension EntryModel {
     }
 
     func label(for entry: Entry) -> String {
-        guard entry.type == .transfer else {
-            let categories = categories(for: entry.type)
-            let category = categories.first { $0.id == entry.categoryId }
-            return category?.name ?? ""
-        }
+        let categories = categories(for: entry.type)
 
-        let from = wallet(entry.walletId)?.name ?? ""
-        let to = wallet(entry.toWalletId)?.name ?? ""
-        return "\(from) → \(to)"
+        return EntryChange.label(for: entry) { id in
+            categories.first { $0.id == id }
+        } wallet: { id in
+            wallet(id)
+        }
     }
 
     func chooseDestination() {

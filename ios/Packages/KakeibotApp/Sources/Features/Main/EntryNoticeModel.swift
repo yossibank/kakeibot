@@ -5,8 +5,7 @@ import Store
 @MainActor
 @Observable
 public final class EntryNoticeModel {
-    public private(set) var change: EntryChange?
-    public private(set) var errorMessage: String?
+    public private(set) var notice: Notice?
 
     private let database: AppDatabase
 
@@ -16,13 +15,22 @@ public final class EntryNoticeModel {
 }
 
 public extension EntryNoticeModel {
-    var isShown: Bool {
-        change != nil || errorMessage != nil
+    enum Notice: Hashable, Sendable {
+        case changed(EntryChange)
+        case undone
+        case undoFailed
+    }
+
+    var change: EntryChange? {
+        if case let .changed(change) = notice {
+            change
+        } else {
+            nil
+        }
     }
 
     func show(_ change: EntryChange) {
-        errorMessage = nil
-        self.change = change
+        notice = .changed(change)
     }
 
     func undo() async {
@@ -30,7 +38,7 @@ public extension EntryNoticeModel {
             return
         }
 
-        self.change = nil
+        notice = nil
 
         do {
             switch change.kind {
@@ -41,17 +49,31 @@ public extension EntryNoticeModel {
             case .deleted:
                 try await database.restoreEntry(change.entry)
             }
+
+            notice = .undone
         } catch {
-            errorMessage = Self.undoFailedMessage
+            notice = .undoFailed
         }
     }
 
     func clear() {
-        change = nil
-        errorMessage = nil
+        notice = nil
     }
 }
 
-private extension EntryNoticeModel {
-    static let undoFailedMessage = "取り消せませんでした"
+public extension EntryNoticeModel.Notice {
+    var message: String {
+        switch self {
+        case let .changed(change): change.message
+        case .undone: "取り消した"
+        case .undoFailed: "取り消せませんでした"
+        }
+    }
+
+    var seconds: Int {
+        switch self {
+        case .changed, .undoFailed: 4
+        case .undone: 2
+        }
+    }
 }

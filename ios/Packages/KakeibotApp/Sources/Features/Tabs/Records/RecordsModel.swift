@@ -46,6 +46,29 @@ public extension RecordsModel {
         month = month.adding(months: months)
     }
 
+    func delete(_ id: Entry.ID) async -> EntryChange? {
+        let entries = list?.days.flatMap(\.entries) ?? []
+
+        guard let list, let entry = entries.first(where: { $0.id == id }) else {
+            return nil
+        }
+
+        do {
+            try await database.deleteEntry(id)
+
+            let label = EntryChange.label(for: entry) { id in
+                list.categories[id]
+            } wallet: { id in
+                list.wallets[id]
+            }
+
+            return EntryChange(kind: .deleted, entry: entry, label: label)
+        } catch {
+            errorMessage = Self.deleteFailedMessage
+            return nil
+        }
+    }
+
     func load() async {
         do {
             list = try await database.entryList()
@@ -67,4 +90,5 @@ public extension RecordsModel {
 
 private extension RecordsModel {
     static let loadFailedMessage = "記録を読めませんでした"
+    static let deleteFailedMessage = "消せませんでした"
 }

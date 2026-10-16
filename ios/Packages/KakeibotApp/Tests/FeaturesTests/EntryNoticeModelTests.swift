@@ -20,7 +20,8 @@ struct EntryNoticeModelTests {
 
         #expect(change.message == "食費 ¥500 を記録した")
         #expect(entries.isEmpty)
-        #expect(setup.notice.change == nil)
+        #expect(setup.notice.notice == .undone)
+        #expect(setup.notice.notice?.message == "取り消した")
     }
 
     @Test
@@ -81,11 +82,11 @@ struct EntryNoticeModelTests {
 
         let change = try #require(await model.save())
         setup.notice.show(change)
-        let shown = setup.notice.isShown
+        let shown = setup.notice.notice
         setup.notice.clear()
 
-        #expect(shown)
-        #expect(!setup.notice.isShown)
+        #expect(shown == .changed(change))
+        #expect(setup.notice.notice == nil)
     }
 }
 
