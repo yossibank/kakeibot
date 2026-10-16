@@ -99,6 +99,38 @@ struct TransferEntryTests {
     }
 
     @Test
+    func flagsAmountOverSourceBalance() async throws {
+        let setup = try await Setup()
+        let date = try #require(LocalDate("2026-10-01"))
+
+        let income = EntryDraft(
+            type: .income,
+            amount: 3000,
+            date: date,
+            categoryId: setup.salary,
+            walletId: setup.cash
+        )
+
+        try await setup.database.saveEntry(income, at: Date())
+
+        let model = EntryModel(
+            database: setup.database,
+            date: setup.date,
+            type: .transfer
+        )
+        await model.load()
+        model.press(.digit(3))
+        model.press(.doubleZero)
+        model.press(.digit(0))
+        let atBalance = model.isOverSourceBalance
+        model.press(.digit(1))
+
+        #expect(!atBalance)
+        #expect(model.isOverSourceBalance)
+        #expect(model.canSave)
+    }
+
+    @Test
     func reportsSameWallet() async throws {
         let setup = try await Setup()
 

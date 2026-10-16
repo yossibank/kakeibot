@@ -1,0 +1,122 @@
+import Core
+import Foundation
+import GRDB
+
+public extension AppDatabase {
+    enum WalletWriteError: Error, Equatable {
+        case walletNotFound
+        case iconNotFound
+        case lastShownWallet
+    }
+
+    @discardableResult
+    func saveWallet(
+        _ draft: WalletDraft,
+        editing id: Wallet.ID? = nil,
+        at now: Date
+    ) async throws -> Wallet {
+        try await writer.write { db in
+            if let id {
+                try Self.updateWallet(id, with: draft, in: db, at: now)
+            } else {
+                try Self.insertWallet(draft, into: db, at: now)
+            }
+        }
+    }
+
+    func reorderWallets(
+        _ ids: [Wallet.ID],
+        at now: Date
+    ) async throws {
+        try await writer.write { db in
+            for (order, id) in ids.enumerated() {
+                guard var wallet = try Wallet.fetchOne(db, key: id) else {
+                    throw WalletWriteError.walletNotFound
+                }
+
+                guard wallet.sortOrder != order else {
+                    continue
+                }
+
+                wallet.sortOrder = order
+                wallet.updatedAt = now
+                try wallet.update(db)
+            }
+        }
+    }
+
+    func setWalletHidden(
+        _ id: Wallet.ID,
+        isHidden: Bool,
+        at now: Date
+    ) async throws {
+        try await writer.write { db in
+            guard var wallet = try Wallet.fetchOne(db, key: id) else {
+                throw WalletWriteError.walletNotFound
+            }
+
+            if isHidden, try Self.shownWalletCount(in: db) <= 1 {
+                throw WalletWriteError.lastShownWallet
+            }
+
+            wallet.archivedAt = isHidden ? now : nil
+            wallet.updatedAt = now
+            try wallet.update(db)
+        }
+    }
+}
+
+private extension AppDatabase {
+    static func insertWallet(
+        _ draft: WalletDraft,
+        into db: Database,
+        at now: Date
+    ) throws -> Wallet {
+        let icon = try draft.newIcon(at: now)
+        let sortOrder = try nextWalletSortOrder(in: db)
+
+        let wallet = try draft.newWallet(
+            iconId: icon.id,
+            sortOrder: sortOrder,
+            at: now
+        )
+
+        try icon.insert(db)
+        try wallet.insert(db)
+        return wallet
+    }
+
+    static func updateWallet(
+        _ id: Wallet.ID,
+        with draft: WalletDraft,
+        in db: Database,
+        at now: Date
+    ) throws -> Wallet {
+        guard let existing = try Wallet.fetchOne(db, key: id) else {
+            throw WalletWriteError.walletNotFound
+        }
+
+        guard let icon = try Icon.fetchOne(db, key: existing.iconId) else {
+            throw WalletWriteError.iconNotFound
+        }
+
+        let wallet = try draft.applied(to: existing, at: now)
+        try draft.applied(to: icon, at: now).update(db)
+        try wallet.update(db)
+        return wallet
+    }
+
+    static func shownWalletCount(in db: Database) throws -> Int {
+        try Wallet
+            .filter(Column("archived_at") == nil)
+            .fetchCount(db)
+    }
+
+    static func nextWalletSortOrder(in db: Database) throws -> Int {
+        let maxOrder = try Wallet
+            .select(max(Column("sort_order")), as: Int?.self)
+            .fetchOne(db)
+
+        return (maxOrder ?? nil).map { $0 + 1 } ?? 0
+    }
+}

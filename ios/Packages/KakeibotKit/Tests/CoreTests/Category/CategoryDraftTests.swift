@@ -78,18 +78,9 @@ struct CategoryDraftTests {
 extension CategoryDraftTests {
     struct DraftCase: Decodable, Sendable {
         let name: String
-        let mark: MarkCase
+        let mark: FixtureMark
         let color: String
         let problems: [CategoryDraft.Problem]
-    }
-
-    struct MarkCase: Decodable, Sendable {
-        let kind: String
-        let value: String
-    }
-
-    enum FixtureError: Error {
-        case unknownMark(String)
     }
 }
 
@@ -102,22 +93,6 @@ extension CategoryDraftTests.DraftCase {
             mark: mark,
             color: color
         )
-    }
-}
-
-extension CategoryDraftTests.MarkCase {
-    func mark() throws -> CategoryDraft.Mark {
-        switch kind {
-        case "glyph":
-            let glyph = try #require(Icon.Glyph(rawValue: value))
-            return .glyph(glyph)
-        case "emoji":
-            return .emoji(value)
-        case "text":
-            return .text(value)
-        default:
-            throw CategoryDraftTests.FixtureError.unknownMark(kind)
-        }
     }
 }
 

@@ -21,6 +21,16 @@ struct SettingsSheet: View {
 
                     VStack(spacing: 0) {
                         NavigationLink {
+                            WalletListView(database: database)
+                        } label: {
+                            row("口座", systemImage: "building.columns")
+                        }
+
+                        Rectangle()
+                            .fill(Palette.gold.opacity(0.1))
+                            .frame(height: 0.5)
+
+                        NavigationLink {
                             CategoryListView(database: database)
                         } label: {
                             row("カテゴリ", systemImage: "tag")

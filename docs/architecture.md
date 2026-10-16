@@ -86,14 +86,14 @@ KakeibotKit/
 │   │   ├── Export/
 │   │   │   ├── Upgrade/     古い版から新しい版への変換
 │   │   │   └── V1/
-│   │   ├── Icon/            アイコン、カレンダーのスタンプ
+│   │   ├── Icon/            アイコンと、その入力の判定、カレンダーのスタンプ
 │   │   ├── Identifier/      型付きの ID
 │   │   ├── Notification/    予約されているべき通知の計算
 │   │   ├── Recurring/       固定費の記録の作成、記録漏れの後追い
 │   │   ├── Reward/          決まり・記録・目標、貯金箱の残高
 │   │   ├── Setting/         設定の行
 │   │   ├── Theme/           テーマの型、読みやすさの判定
-│   │   └── Wallet/          財布の型、残高
+│   │   └── Wallet/          財布の型と、その入力の判定、残高
 │   └── Store/
 │       ├── Database/        App Group、DatabasePool、止められる前の対策、最初の財布とカテゴリ。止める通知は AppFeature が送る
 │       ├── Migrations/      版ごとに 1 ファイル
@@ -151,10 +151,12 @@ KakeibotApp/
 │   │   │   ├── Character/
 │   │   │   ├── Icons/
 │   │   │   ├── Menu/
+│   │   │   ├── Parts/       設定の画面で共有する入力欄と見出し
 │   │   │   ├── Recurring/
 │   │   │   ├── Rewards/
 │   │   │   ├── Templates/
-│   │   │   └── Themes/
+│   │   │   ├── Themes/
+│   │   │   └── Wallets/
 │   │   └── Tabs/
 │   │       ├── Assets/
 │   │       ├── Home/

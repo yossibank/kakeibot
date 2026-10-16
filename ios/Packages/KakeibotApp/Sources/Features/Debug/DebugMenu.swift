@@ -46,6 +46,14 @@ public struct DebugMenu: View {
                         sheet = .newTemplate
                     }
 
+                    Button("口座") {
+                        sheet = .wallets
+                    }
+
+                    Button("口座の編集（新規）") {
+                        sheet = .newWallet
+                    }
+
                     Button("テンプレート（すべて）") {
                         sheet = .allTemplates
                     }
@@ -83,6 +91,8 @@ private extension DebugMenu {
         case newCategory
         case templates
         case newTemplate
+        case wallets
+        case newWallet
         case allTemplates
 
         var id: Self {
@@ -134,6 +144,12 @@ private extension DebugMenu {
                         type: .expense
                     )
                 )
+            case .wallets:
+                NavigationStack {
+                    WalletListView(database: database)
+                }
+            case .newWallet:
+                WalletEditSheet(model: WalletEditModel(database: database))
             case .allTemplates:
                 TemplateShelfSheet(
                     model: HomeModel(

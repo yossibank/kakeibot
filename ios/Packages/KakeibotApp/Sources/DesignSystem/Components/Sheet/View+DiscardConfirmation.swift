@@ -13,113 +13,15 @@ public extension View {
                     isPresented.wrappedValue = true
                 }
             }
-            .overlay {
-                if isPresented.wrappedValue {
-                    DiscardCard(onDiscard: onDiscard) {
-                        isPresented.wrappedValue = false
-                    }
-                }
-            }
-            .animation(.snappy(duration: 0.25), value: isPresented.wrappedValue)
-            .sensoryFeedback(
-                .warning,
-                trigger: isPresented.wrappedValue
-            ) { _, new in
-                new
-            }
-    }
-}
-
-private struct DiscardCard: View {
-    @State private var isShown = false
-
-    let onDiscard: () -> Void
-    let onKeep: () -> Void
-
-    var body: some View {
-        ZStack {
-            Color.black
-                .opacity(0.55)
-                .ignoresSafeArea()
-                .onTapGesture(perform: onKeep)
-
-            card
-                .scaleEffect(isShown ? 1 : 0.94)
-        }
-        .transition(.opacity)
-        .onAppear {
-            withAnimation(.snappy(duration: 0.25)) {
-                isShown = true
-            }
-        }
-    }
-}
-
-private extension DiscardCard {
-    var card: some View {
-        VStack(spacing: 20) {
-            VStack(spacing: 10) {
-                Image(systemName: "pencil.slash")
-                    .font(.system(size: 22, weight: .ultraLight))
-                    .foregroundStyle(Palette.gold)
-                    .frame(width: 52, height: 52)
-                    .overlay {
-                        Circle()
-                            .stroke(Palette.gold.opacity(0.5), lineWidth: 0.8)
-                    }
-
-                Text("保存せずに閉じますか")
-                    .font(.system(size: 18, weight: .medium, design: .serif))
-                    .foregroundStyle(Palette.champagne)
-
-                Text("入力した内容は残りません")
-                    .font(.caption)
-                    .foregroundStyle(Palette.mist)
-            }
-
-            VStack(spacing: 10) {
-                Button(action: onKeep) {
-                    Text("入力に戻る")
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Palette.nightBottom)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                        .background(Self.keepFill, in: Capsule())
-                        .contentShape(Capsule())
-                }
-
-                Button(action: onDiscard) {
-                    Text("保存せずに閉じる")
-                        .font(.subheadline)
-                        .foregroundStyle(Palette.rose)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                        .overlay {
-                            Capsule()
-                                .stroke(
-                                    Palette.rose.opacity(0.45),
-                                    lineWidth: 1
-                                )
-                        }
-                        .contentShape(Capsule())
-                }
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(24)
-        .frame(maxWidth: 300)
-        .background(Palette.drawer, in: .rect(cornerRadius: 26))
-        .overlay {
-            RoundedRectangle(cornerRadius: 26)
-                .stroke(Palette.gold.opacity(0.45), lineWidth: 0.8)
-        }
-        .shadow(color: .black.opacity(0.5), radius: 30, y: 14)
-    }
-
-    static var keepFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.champagne, Palette.gold],
-            startPoint: .top,
-            endPoint: .bottom
-        )
+            .confirmation(
+                isPresented: isPresented,
+                systemImage: "pencil.slash",
+                title: "保存せずに閉じますか",
+                message: "入力した内容は残りません",
+                keepTitle: "入力に戻る",
+                confirmTitle: "保存せずに閉じる",
+                onConfirm: onDiscard
+            )
     }
 }
 

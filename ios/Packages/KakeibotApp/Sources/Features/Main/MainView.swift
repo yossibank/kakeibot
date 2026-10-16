@@ -102,9 +102,15 @@ public struct MainView: View {
             }
 
             Tab(value: MainTab.assets) {
-                AssetsView(model: assets) {
-                    sheet = .transfer
-                }
+                AssetsView(
+                    model: assets,
+                    onTransfer: {
+                        sheet = .transfer
+                    },
+                    onOpenWallet: { id in
+                        sheet = .wallet(id)
+                    }
+                )
                 .tabContent()
             }
         }
@@ -199,6 +205,13 @@ private extension MainView {
                     type: home.templateType
                 )
             )
+        case let .wallet(id):
+            WalletEditSheet(
+                model: WalletEditModel(
+                    database: database,
+                    editing: id
+                )
+            )
         }
     }
 }
@@ -219,6 +232,7 @@ private extension MainView {
         case newTemplate
         case templates
         case transfer
+        case wallet(Wallet.ID)
 
         var id: String {
             switch self {
@@ -229,6 +243,7 @@ private extension MainView {
             case .newTemplate: "new-template"
             case .templates: "templates"
             case .transfer: "transfer"
+            case let .wallet(id): "wallet-\(id)"
             }
         }
     }
