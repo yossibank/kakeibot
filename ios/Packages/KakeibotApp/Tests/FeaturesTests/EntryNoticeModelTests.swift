@@ -55,10 +55,27 @@ struct EntryNoticeModelTests {
         await setup.notice.undo()
         let entries = try setup.database.snapshot().entries
 
-        #expect(change.message == "食費 ¥980 を消した")
+        #expect(change.message == "食費 ¥980 を削除した")
         #expect(deleted.isEmpty)
         #expect(entries.map(\.id) == [saved.id])
         #expect(entries.map(\.amount) == [980])
+    }
+
+    @Test
+    func deletesFromListAndUndoes() async throws {
+        let setup = try await Setup()
+        let saved = try await setup.saveEntry()
+        let list = try await setup.database.entryList()
+
+        await setup.notice.delete(saved.id, in: list)
+        let message = setup.notice.notice?.message
+        let deleted = try setup.database.snapshot().entries
+        await setup.notice.undo()
+        let restored = try setup.database.snapshot().entries
+
+        #expect(message == "食費 ¥980 を削除した")
+        #expect(deleted.isEmpty)
+        #expect(restored.map(\.id) == [saved.id])
     }
 
     @Test

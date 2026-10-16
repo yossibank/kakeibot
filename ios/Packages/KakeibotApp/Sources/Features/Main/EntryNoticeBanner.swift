@@ -63,7 +63,7 @@ private extension EntryNoticeBanner {
                 notice.message,
                 systemImage: "arrow.uturn.backward"
             )
-        case .undoFailed:
+        case .failed:
             NoticeBanner(
                 notice.message,
                 systemImage: "exclamationmark",

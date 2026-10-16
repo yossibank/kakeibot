@@ -5,12 +5,15 @@ import SwiftUI
 struct HomeView: View {
     @Bindable var model: HomeModel
 
+    @State private var openId: Entry.ID?
+
     let onOpenEntry: (Entry.ID) -> Void
     let onShowRecords: () -> Void
     let onOpenSettings: () -> Void
     let onOpenTemplate: (EntryTemplate) -> Void
     let onAddTemplate: () -> Void
     let onRecord: (EntryChange) -> Void
+    let onDeleteEntry: (Entry.ID) -> Void
 
     var body: some View {
         ScrollView {
@@ -172,9 +175,11 @@ private extension HomeView {
                     .padding(.vertical, 16)
             } else {
                 ForEach(model.recentRows) { row in
-                    Button {
+                    SwipeRow(id: row.id, openId: $openId) {
                         onOpenEntry(row.id)
-                    } label: {
+                    } onDelete: {
+                        onDeleteEntry(row.id)
+                    } content: {
                         EntryRow(
                             icon: row.icon,
                             title: row.title,
@@ -184,7 +189,6 @@ private extension HomeView {
                             type: row.type
                         )
                     }
-                    .buttonStyle(.plain)
                     .overlay(alignment: .top) {
                         Rectangle()
                             .fill(Palette.gold.opacity(0.1))

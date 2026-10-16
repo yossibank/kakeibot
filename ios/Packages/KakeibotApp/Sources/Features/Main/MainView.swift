@@ -73,6 +73,11 @@ public struct MainView: View {
                     },
                     onRecord: { change in
                         notice.show(change)
+                    },
+                    onDeleteEntry: { id in
+                        Task {
+                            await notice.delete(id, in: home.list)
+                        }
                     }
                 )
                 .tabContent()
@@ -84,8 +89,10 @@ public struct MainView: View {
                     onOpenEntry: { id in
                         sheet = .edit(id)
                     },
-                    onDelete: { change in
-                        notice.show(change)
+                    onDelete: { id in
+                        Task {
+                            await notice.delete(id, in: records.list)
+                        }
                     }
                 )
                 .tabContent()

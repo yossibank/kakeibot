@@ -48,27 +48,6 @@ struct RecordsModelTests {
         #expect(rows.map(\.detail) == ["財布", "ランチ・財布"])
         #expect(rows.map(\.type) == [.expense, .expense])
     }
-
-    @Test
-    func deletesRowAndUndoes() async throws {
-        let setup = try await Setup()
-        try await setup.save(.expense, amount: 980, on: "2026-10-12")
-        let model = RecordsModel(database: setup.database, month: setup.month)
-        let notice = EntryNoticeModel(database: setup.database)
-        await model.load()
-        let day = try #require(model.days.first)
-        let row = try #require(model.rows(for: day).first)
-
-        let change = try #require(await model.delete(row.id))
-        let deleted = try setup.database.snapshot().entries
-        notice.show(change)
-        await notice.undo()
-        let restored = try setup.database.snapshot().entries
-
-        #expect(change.message == "食費 ¥980 を消した")
-        #expect(deleted.isEmpty)
-        #expect(restored.map(\.id) == [row.id])
-    }
 }
 
 extension RecordsModelTests {

@@ -1,11 +1,11 @@
 import SwiftUI
 import UIKit
 
-public struct SwipeGesture: UIGestureRecognizerRepresentable {
+struct SwipeGesture: UIGestureRecognizerRepresentable {
     private let onMove: (CGFloat) -> Void
     private let onEnd: (CGFloat) -> Void
 
-    public init(
+    init(
         onMove: @escaping (CGFloat) -> Void,
         onEnd: @escaping (CGFloat) -> Void
     ) {
@@ -14,9 +14,9 @@ public struct SwipeGesture: UIGestureRecognizerRepresentable {
     }
 }
 
-public extension SwipeGesture {
+extension SwipeGesture {
     final class Coordinator: NSObject, UIGestureRecognizerDelegate {
-        public func gestureRecognizerShouldBegin(
+        func gestureRecognizerShouldBegin(
             _ recognizer: UIGestureRecognizer
         ) -> Bool {
             guard let pan = recognizer as? UIPanGestureRecognizer else {

@@ -48,7 +48,7 @@ private extension EntryChange {
         switch kind {
         case .recorded: entry.type == .transfer ? "振り替えた" : "記録した"
         case .edited: "直した"
-        case .deleted: "消した"
+        case .deleted: "削除した"
         }
     }
 }

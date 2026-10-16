@@ -18,7 +18,7 @@ public extension EntryNoticeModel {
     enum Notice: Hashable, Sendable {
         case changed(EntryChange)
         case undone
-        case undoFailed
+        case failed(String)
     }
 
     var change: EntryChange? {
@@ -52,7 +52,33 @@ public extension EntryNoticeModel {
 
             notice = .undone
         } catch {
-            notice = .undoFailed
+            notice = .failed(Self.undoFailedMessage)
+        }
+    }
+
+    func delete(
+        _ id: Entry.ID,
+        in list: EntryList?
+    ) async {
+        let entries = list?.days.flatMap(\.entries) ?? []
+
+        guard let list, let entry = entries.first(where: { $0.id == id }) else {
+            return
+        }
+
+        do {
+            try await database.deleteEntry(id)
+
+            let label = EntryChange.label(for: entry) { id in
+                list.categories[id]
+            } wallet: { id in
+                list.wallets[id]
+            }
+
+            let change = EntryChange(kind: .deleted, entry: entry, label: label)
+            show(change)
+        } catch {
+            notice = .failed(Self.deleteFailedMessage)
         }
     }
 
@@ -66,14 +92,19 @@ public extension EntryNoticeModel.Notice {
         switch self {
         case let .changed(change): change.message
         case .undone: "取り消した"
-        case .undoFailed: "取り消せませんでした"
+        case let .failed(message): message
         }
     }
 
     var seconds: Int {
         switch self {
-        case .changed, .undoFailed: 4
+        case .changed, .failed: 4
         case .undone: 2
         }
     }
+}
+
+private extension EntryNoticeModel {
+    static let undoFailedMessage = "取り消せませんでした"
+    static let deleteFailedMessage = "削除できませんでした"
 }

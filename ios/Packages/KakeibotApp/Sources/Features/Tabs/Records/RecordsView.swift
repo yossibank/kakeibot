@@ -5,10 +5,10 @@ import SwiftUI
 struct RecordsView: View {
     @Bindable var model: RecordsModel
 
-    @State private var swipe: Swipe?
+    @State private var openId: Entry.ID?
 
     let onOpenEntry: (Entry.ID) -> Void
-    let onDelete: (EntryChange) -> Void
+    let onDelete: (Entry.ID) -> Void
 
     var body: some View {
         ScrollView {
@@ -128,51 +128,20 @@ private extension RecordsView {
     }
 
     func swipeRow(_ row: EntryRowItem) -> some View {
-        let offset = swipe?.id == row.id ? swipe?.offset ?? 0 : 0
-        let reveal = min(-offset / Self.deleteWidth, 1)
-
-        return ZStack(alignment: .trailing) {
-            Button {
-                Task {
-                    await delete(row)
-                }
-            } label: {
-                Text("消す")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(Palette.rose)
-                    .frame(width: Self.deleteWidth - 12, height: 40)
-                    .background(Palette.rose.opacity(0.12), in: Capsule())
-                    .overlay {
-                        Capsule()
-                            .stroke(Palette.rose.opacity(0.6), lineWidth: 1)
-                    }
-            }
-            .buttonStyle(.plain)
-            .opacity(reveal)
-
-            Button {
-                tap(row)
-            } label: {
-                EntryRow(
-                    icon: row.icon,
-                    title: row.title,
-                    tag: row.tag,
-                    detail: row.detail,
-                    amount: row.amount,
-                    type: row.type
-                )
-            }
-            .buttonStyle(.plain)
-            .offset(x: offset)
-            .gesture(
-                SwipeGesture { x in
-                    move(row, by: x)
-                } onEnd: { _ in
-                    end(row)
-                }
+        SwipeRow(id: row.id, openId: $openId) {
+            onOpenEntry(row.id)
+        } onDelete: {
+            onDelete(row.id)
+        } content: {
+            EntryRow(
+                icon: row.icon,
+                title: row.title,
+                tag: row.tag,
+                detail: row.detail,
+                amount: row.amount,
+                type: row.type
             )
         }
-        .clipped()
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(Palette.gold.opacity(0.1))
@@ -213,14 +182,6 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
-    struct Swipe {
-        let id: Entry.ID
-        let offset: CGFloat
-        let isOpen: Bool
-    }
-
-    static let deleteWidth: CGFloat = 76
-
     static func weekdayColor(for date: LocalDate) -> Color {
         if Holiday.contains(date) || date.weekday == .sunday {
             return Palette.holiday
@@ -240,53 +201,5 @@ private extension RecordsView {
 
         let parts = [expense, income].compactMap(\.self)
         return parts.isEmpty ? nil : parts.joined(separator: "・")
-    }
-}
-
-private extension RecordsView {
-    func tap(_ row: EntryRowItem) {
-        guard swipe == nil else {
-            withAnimation(.snappy) {
-                swipe = nil
-            }
-
-            return
-        }
-
-        onOpenEntry(row.id)
-    }
-
-    func move(
-        _ row: EntryRowItem,
-        by x: CGFloat
-    ) {
-        let isOpen = swipe?.id == row.id && swipe?.isOpen == true
-        let start = isOpen ? -Self.deleteWidth : 0
-        let raw = min(start + x, 0)
-        let over = min(raw + Self.deleteWidth, 0)
-        let offset = max(raw, -Self.deleteWidth) + over / 3
-
-        swipe = Swipe(id: row.id, offset: offset, isOpen: isOpen)
-    }
-
-    func end(_ row: EntryRowItem) {
-        let offset = swipe?.offset ?? 0
-        let opens = offset < -Self.deleteWidth / 2
-
-        withAnimation(.snappy) {
-            swipe = opens
-                ? Swipe(id: row.id, offset: -Self.deleteWidth, isOpen: true)
-                : nil
-        }
-    }
-
-    func delete(_ row: EntryRowItem) async {
-        withAnimation(.snappy) {
-            swipe = nil
-        }
-
-        if let change = await model.delete(row.id) {
-            onDelete(change)
-        }
     }
 }
