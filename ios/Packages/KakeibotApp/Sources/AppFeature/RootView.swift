@@ -28,7 +28,6 @@ public struct RootView: View {
             model.changeScene(to: phase)
         }
         .warmsUpInput()
-        .debugMenuOnShake()
     }
 }
 
