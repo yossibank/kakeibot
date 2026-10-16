@@ -295,7 +295,9 @@ DEBUG のビルドでは、端末を振るとデバッグメニュー（`DebugMe
 
 ## テスト
 
-テストターゲットは `ios/Kakeibot.xctestplan` にまとめ、`Kakeibot` スキームに付ける。`make test` と CI（`.github/workflows/verify.yml`）は、このテストプランを iOS シミュレーターで走らせる。パッケージは、プロジェクトのフォルダとしても登録する。こうしないと、スキームからパッケージのテストターゲットが見えない。
+テストターゲットは `ios/Kakeibot.xctestplan` にまとめ、`Kakeibot` スキームに付ける。パッケージは、プロジェクトのフォルダとしても登録する。こうしないと、スキームからパッケージのテストターゲットが見えない。
+
+`make test` は、このテストプランを iOS シミュレーターで走らせる。CI（`.github/workflows/verify.yml`）は、`make test` だけを走らせる。
 
 | 対象 | 方法 |
 | --- | --- |
