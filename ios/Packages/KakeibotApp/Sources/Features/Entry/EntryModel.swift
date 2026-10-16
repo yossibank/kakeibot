@@ -486,12 +486,17 @@ private extension EntryModel {
             return nil
         }
 
+        let templateId = allTemplates
+            .first { $0.id == appliedTemplateId && $0.type == type }?
+            .id
+
         return EntryDraft(
             type: type,
             amount: amount,
             date: date,
             categoryId: categoryId,
             tagId: tagId,
+            templateId: templateId,
             walletId: walletId,
             toWalletId: toWalletId,
             memo: memo
@@ -551,6 +556,7 @@ private extension EntryModel {
         walletId = entry.walletId
         toWalletId = entry.toWalletId
         memo = entry.memo ?? ""
+        appliedTemplateId = entry.templateId
     }
 
     func loadBalances() async throws {

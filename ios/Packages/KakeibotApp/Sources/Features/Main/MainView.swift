@@ -13,6 +13,7 @@ public struct MainView: View {
     @State private var draft: EntryModel
     @State private var notice: EntryNoticeModel
     @State private var isWarmingEntry = true
+    @State private var orderMenuAnchor: CGRect?
 
     private let database: AppDatabase
 
@@ -69,6 +70,11 @@ public struct MainView: View {
                     onShowAllTemplates: {
                         sheet = .templates
                     },
+                    onOpenOrderMenu: { frame in
+                        withAnimation(.snappy(duration: 0.25)) {
+                            orderMenuAnchor = frame
+                        }
+                    },
                     onAddTemplate: {
                         sheet = .newTemplate
                     },
@@ -120,6 +126,19 @@ public struct MainView: View {
                 items: Self.tabItems
             ) {
                 sheet = .new
+            }
+        }
+        .overlay {
+            if let orderMenuAnchor {
+                TemplateOrderMenu(
+                    selection: $home.templateOrder,
+                    anchor: orderMenuAnchor
+                ) {
+                    withAnimation(.snappy(duration: 0.2)) {
+                        self.orderMenuAnchor = nil
+                    }
+                }
+                .transition(.opacity)
             }
         }
         .entryNotice(notice, above: FloatingTabBar<Int>.height)

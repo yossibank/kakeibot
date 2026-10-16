@@ -71,9 +71,11 @@ public extension HomeModel {
     }
 
     var templates: [EntryTemplate] {
-        allTemplates
+        let uses = templateOrder == .frequent ? templateUses : [:]
+
+        return allTemplates
             .filter { $0.type == templateType }
-            .sorted(by: isOrdered)
+            .sorted { isOrdered($0, $1, uses: uses) }
     }
 
     var recentRows: [EntryRowItem] {
@@ -190,9 +192,24 @@ private extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "記録できませんでした"
     static let templateOrderKey = "home.templateOrder"
+    static let frequentDays = 90
 
     var monthDays: [EntryDay] {
         list?.days.filter { $0.date.yearMonth == month } ?? []
+    }
+
+    var templateUses: [EntryTemplate.ID: Int] {
+        let start = today.adding(days: 1 - Self.frequentDays)
+        let days = list?.days ?? []
+        var uses: [EntryTemplate.ID: Int] = [:]
+
+        for day in days where day.date >= start && day.date <= today {
+            for case let id? in day.entries.map(\.templateId) {
+                uses[id, default: 0] += 1
+            }
+        }
+
+        return uses
     }
 
     func expense(on date: LocalDate) -> Int {
@@ -201,11 +218,19 @@ private extension HomeModel {
 
     func isOrdered(
         _ lhs: EntryTemplate,
-        _ rhs: EntryTemplate
+        _ rhs: EntryTemplate,
+        uses: [EntryTemplate.ID: Int]
     ) -> Bool {
         switch templateOrder {
         case .manual:
             break
+        case .frequent:
+            let left = uses[lhs.id, default: 0]
+            let right = uses[rhs.id, default: 0]
+
+            if left != right {
+                return left > right
+            }
         case .category:
             let left = categoryOrder(of: lhs)
             let right = categoryOrder(of: rhs)

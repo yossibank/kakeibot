@@ -6,12 +6,14 @@ struct HomeView: View {
     @Bindable var model: HomeModel
 
     @State private var openId: Entry.ID?
+    @State private var orderButtonFrame: CGRect = .zero
 
     let onOpenEntry: (Entry.ID) -> Void
     let onShowRecords: () -> Void
     let onOpenSettings: () -> Void
     let onUseTemplate: (EntryTemplate) -> Void
     let onShowAllTemplates: () -> Void
+    let onOpenOrderMenu: (CGRect) -> Void
     let onAddTemplate: () -> Void
     let onDeleteEntry: (Entry.ID) -> Void
 
@@ -113,22 +115,24 @@ private extension HomeView {
 
     var templateCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                SectionTitle("テンプレート")
+            ZStack {
+                HStack {
+                    SectionTitle("テンプレート")
 
-                Spacer()
+                    Spacer()
+
+                    Button("すべて", action: onShowAllTemplates)
+                        .font(.caption)
+                        .foregroundStyle(Palette.gold)
+                        .frame(minHeight: 44)
+                }
 
                 CapsulePicker(
                     selection: $model.templateType,
                     options: Self.typeOptions
                 )
-
-                Button("すべて", action: onShowAllTemplates)
-                    .font(.caption)
-                    .foregroundStyle(Palette.gold)
-                    .frame(minHeight: 44)
-                    .padding(.leading, 6)
             }
+            .padding(.top, 8)
 
             HStack(spacing: 6) {
                 Text(templateHint)
@@ -138,20 +142,20 @@ private extension HomeView {
                 Spacer()
 
                 if model.templates.count > 1 {
-                    Menu {
-                        Picker("並べ替え", selection: $model.templateOrder) {
-                            ForEach(TemplateOrder.allCases) { order in
-                                Text(order.title)
-                                    .tag(order)
-                            }
-                        }
-                    } label: {
-                        toolLabel("arrow.up.arrow.down")
-                    }
+                    orderButton
                 }
 
                 Button(action: onAddTemplate) {
-                    toolLabel("plus")
+                    Image(systemName: "plus")
+                        .font(.system(size: 13, weight: .light))
+                        .foregroundStyle(Palette.gold)
+                        .frame(width: 32, height: 32)
+                        .overlay {
+                            Circle()
+                                .stroke(Self.toolStroke, lineWidth: 1)
+                        }
+                        .frame(width: 40, height: 40)
+                        .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
             }
@@ -163,6 +167,35 @@ private extension HomeView {
         .padding(.horizontal, 14)
         .padding(.bottom, 14)
         .card()
+    }
+
+    var orderButton: some View {
+        Button {
+            onOpenOrderMenu(orderButtonFrame)
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: "arrow.up.arrow.down")
+                    .font(.system(size: 11, weight: .light))
+
+                Text(model.templateOrder.title)
+                    .font(.caption2)
+            }
+            .foregroundStyle(Palette.gold)
+            .padding(.horizontal, 12)
+            .frame(height: 32)
+            .overlay {
+                Capsule()
+                    .stroke(Self.toolStroke, lineWidth: 1)
+            }
+            .frame(height: 40)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { frame in
+            orderButtonFrame = frame
+        }
     }
 
     var templateShelf: some View {
@@ -249,19 +282,6 @@ private extension HomeView {
         .buttonStyle(.plain)
     }
 
-    func toolLabel(_ systemImage: String) -> some View {
-        Image(systemName: systemImage)
-            .font(.system(size: 13, weight: .light))
-            .foregroundStyle(Palette.gold)
-            .frame(width: 32, height: 32)
-            .overlay {
-                Circle()
-                    .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
-            }
-            .frame(width: 40, height: 40)
-            .contentShape(.rect)
-    }
-
     var divider: some View {
         Rectangle()
             .fill(Palette.gold.opacity(0.18))
@@ -296,6 +316,7 @@ private extension HomeView {
     ]
 
     static let tileHeight = TemplateCardSize.regular.height
+    static let toolStroke = Palette.gold.opacity(0.35)
 
     var shelfRowCount: Int {
         model.templates.count > 2 ? 2 : 1
