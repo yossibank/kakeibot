@@ -45,6 +45,10 @@ public struct DebugMenu: View {
                     Button("テンプレートの編集（新規）") {
                         sheet = .newTemplate
                     }
+
+                    Button("テンプレート（すべて）") {
+                        sheet = .allTemplates
+                    }
                 }
                 .disabled(model.database == nil)
 
@@ -79,6 +83,7 @@ private extension DebugMenu {
         case newCategory
         case templates
         case newTemplate
+        case allTemplates
 
         var id: Self {
             self
@@ -129,6 +134,14 @@ private extension DebugMenu {
                         type: .expense
                     )
                 )
+            case .allTemplates:
+                TemplateShelfSheet(
+                    model: HomeModel(
+                        database: database,
+                        today: LocalDate(Date(), in: .current)
+                    ),
+                    database: database
+                ) { _ in }
             }
         }
     }

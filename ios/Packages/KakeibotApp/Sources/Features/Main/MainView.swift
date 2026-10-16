@@ -65,14 +65,12 @@ public struct MainView: View {
                     onOpenSettings: {
                         sheet = .settings
                     },
-                    onOpenTemplate: { template in
-                        sheet = .template(template)
+                    onUseTemplate: useTemplate,
+                    onShowAllTemplates: {
+                        sheet = .templates
                     },
                     onAddTemplate: {
                         sheet = .newTemplate
-                    },
-                    onRecord: { change in
-                        notice.show(change)
                     },
                     onDeleteEntry: { id in
                         Task {
@@ -188,6 +186,12 @@ private extension MainView {
                 ),
                 onChange: notice.show
             )
+        case .templates:
+            TemplateShelfSheet(
+                model: home,
+                database: database,
+                onUse: useTemplate
+            )
         case .newTemplate:
             TemplateEditSheet(
                 model: TemplateEditModel(
@@ -213,6 +217,7 @@ private extension MainView {
         case settings
         case template(EntryTemplate)
         case newTemplate
+        case templates
         case transfer
 
         var id: String {
@@ -222,6 +227,7 @@ private extension MainView {
             case .settings: "settings"
             case let .template(template): "template-\(template.id)"
             case .newTemplate: "new-template"
+            case .templates: "templates"
             case .transfer: "transfer"
             }
         }
@@ -248,6 +254,21 @@ private extension MainView {
 }
 
 private extension MainView {
+    func useTemplate(_ template: EntryTemplate) {
+        guard template.amount != nil else {
+            sheet = .template(template)
+            return
+        }
+
+        sheet = nil
+
+        Task {
+            if let change = await home.record(template) {
+                notice.show(change)
+            }
+        }
+    }
+
     func prepareDraft() {
         let model = EntryModel(database: database, date: home.today)
         draft = model

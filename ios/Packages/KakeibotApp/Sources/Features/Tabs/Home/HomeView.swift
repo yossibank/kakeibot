@@ -10,9 +10,9 @@ struct HomeView: View {
     let onOpenEntry: (Entry.ID) -> Void
     let onShowRecords: () -> Void
     let onOpenSettings: () -> Void
-    let onOpenTemplate: (EntryTemplate) -> Void
+    let onUseTemplate: (EntryTemplate) -> Void
+    let onShowAllTemplates: () -> Void
     let onAddTemplate: () -> Void
-    let onRecord: (EntryChange) -> Void
     let onDeleteEntry: (Entry.ID) -> Void
 
     var body: some View {
@@ -128,31 +128,83 @@ private extension HomeView {
                 .font(.caption2)
                 .foregroundStyle(Palette.mist)
 
-            LazyVGrid(columns: Self.templateColumns, spacing: 10) {
-                ForEach(model.templates) { template in
-                    templateButton(template)
-                }
-
-                Button(action: onAddTemplate) {
-                    Label("追加", systemImage: "plus")
-                        .font(.footnote)
-                        .foregroundStyle(Palette.gold)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: TemplateCardSize.regular.height)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(
-                                    Palette.gold.opacity(0.45),
-                                    style: Self.dash
-                                )
-                        }
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
+            templateShelf
         }
         .padding(14)
         .card()
+    }
+
+    var templateShelf: some View {
+        let rows = Array(
+            repeating: GridItem(.fixed(Self.tileHeight), spacing: 10),
+            count: shelfRowCount
+        )
+
+        return ScrollView(.horizontal) {
+            LazyHGrid(rows: rows, spacing: 10) {
+                ForEach(model.templates) { template in
+                    templateButton(template)
+                        .shelfWidth()
+                }
+
+                if showsAllButton {
+                    allButton
+                        .shelfWidth()
+                }
+
+                addButton
+                    .shelfWidth()
+            }
+            .scrollTargetLayout()
+        }
+        .scrollIndicators(.hidden)
+        .scrollTargetBehavior(.viewAligned)
+        .contentMargins(.horizontal, 14, for: .scrollContent)
+        .contentMargins(.vertical, 6, for: .scrollContent)
+        .padding(.horizontal, -14)
+        .padding(.vertical, -6)
+    }
+
+    var allButton: some View {
+        Button(action: onShowAllTemplates) {
+            VStack(spacing: 8) {
+                Image(systemName: "square.grid.2x2")
+                    .font(.system(size: 18, weight: .light))
+
+                Text("すべて（\(model.templates.count)）")
+                    .font(.footnote)
+            }
+            .foregroundStyle(Palette.gold)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                Palette.gold.opacity(0.06),
+                in: .rect(cornerRadius: 20)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Palette.gold.opacity(0.45), lineWidth: 1)
+            }
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
+    var addButton: some View {
+        Button(action: onAddTemplate) {
+            Label("追加", systemImage: "plus")
+                .font(.footnote)
+                .foregroundStyle(Palette.gold)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(
+                            Palette.gold.opacity(0.45),
+                            style: Self.dash
+                        )
+                }
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
     }
 
     var recentCard: some View {
@@ -204,7 +256,7 @@ private extension HomeView {
 
     func templateButton(_ template: EntryTemplate) -> some View {
         Button {
-            use(template)
+            onUseTemplate(template)
         } label: {
             TemplateCard(
                 icon: model.icon(for: template),
@@ -251,25 +303,27 @@ private extension HomeView {
         .init("収入", value: .income)
     ]
 
-    static let templateColumns = Array(
-        repeating: GridItem(.flexible(), spacing: 8),
-        count: 2
-    )
+    static let tileHeight = TemplateCardSize.regular.height
+    static let allButtonThreshold = 4
+
+    var showsAllButton: Bool {
+        model.templates.count > Self.allButtonThreshold
+    }
+
+    var shelfRowCount: Int {
+        let count = model.templates.count + (showsAllButton ? 2 : 1)
+        return count > 2 ? 2 : 1
+    }
 
     var templateHint: String {
         model.templates.isEmpty ? "よく使う入力を 1 回で" : "押すとすぐ記録"
     }
+}
 
-    func use(_ template: EntryTemplate) {
-        guard template.amount != nil else {
-            onOpenTemplate(template)
-            return
-        }
-
-        Task {
-            if let change = await model.record(template) {
-                onRecord(change)
-            }
+private extension View {
+    func shelfWidth() -> some View {
+        containerRelativeFrame(.horizontal) { width, _ in
+            width * 0.62
         }
     }
 }

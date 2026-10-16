@@ -127,6 +127,48 @@ struct TemplateUseTests {
     }
 
     @Test
+    func groupsAndSearchesTemplatesByCategory() async throws {
+        let setup = try await Setup()
+        try await setup.saveTemplate(name: "洗剤", amount: 400)
+        try await setup.saveTemplate(name: "ティッシュ", amount: 300)
+        let options = try await setup.database.entryOptions()
+
+        let cafe = EntryTemplateDraft(
+            name: "駅前のカフェでモーニング",
+            type: .expense,
+            amount: 650,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            memo: ""
+        )
+
+        try await setup.database.saveTemplate(cafe, at: Date())
+        let home = HomeModel(database: setup.database, today: setup.date)
+
+        let listTask = Task {
+            await home.observe()
+        }
+
+        let templateTask = Task {
+            await home.observeTemplates()
+        }
+
+        for _ in 0..<200 where home.templates.count < 3 || home.list == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let all = home.templateSections(matching: "")
+        let found = home.templateSections(matching: " カフェ ")
+        listTask.cancel()
+        templateTask.cancel()
+
+        #expect(all.map(\.title) == ["食費", "日用品"])
+        #expect(all.last?.templates.map(\.name) == ["洗剤", "ティッシュ"])
+        #expect(found.map(\.title) == ["食費"])
+        #expect(found.first?.templates.map(\.name) == ["駅前のカフェでモーニング"])
+    }
+
+    @Test
     func showsTemplatesOfSelectedTypeOnHome() async throws {
         let setup = try await Setup()
         try await setup.saveTemplate(name: "ランチ", amount: 980)
