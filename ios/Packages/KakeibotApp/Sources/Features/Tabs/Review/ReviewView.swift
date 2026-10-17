@@ -129,9 +129,9 @@ private extension ReviewView {
     var detailCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
-                Image(systemName: comparisonImage)
+                Image(systemName: Self.changeImage(model.change))
                     .font(.caption)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(selectedChangeColor)
 
                 Text(comparisonText)
                     .font(.footnote)
@@ -223,6 +223,7 @@ private extension ReviewView {
         let rim = isSelected ? Palette.gold : Palette.gold.opacity(0.2)
         let titleColor = isSelected ? Palette.gold : Palette.mist
         let amountColor = isSelected ? Palette.champagne : Palette.ink
+        let change = model.change(of: kind)
 
         return Button {
             withAnimation(.snappy) {
@@ -234,9 +235,17 @@ private extension ReviewView {
             }
         } label: {
             VStack(alignment: .leading, spacing: 4) {
-                Text(Self.title(of: kind))
-                    .font(.caption)
-                    .foregroundStyle(titleColor)
+                HStack(spacing: 4) {
+                    Text(Self.title(of: kind))
+                        .font(.caption)
+                        .foregroundStyle(titleColor)
+
+                    Spacer(minLength: 0)
+
+                    Image(systemName: Self.changeImage(change))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(Self.changeColor(change, of: kind))
+                }
 
                 Text(AmountText.text(model.total(of: kind)))
                     .font(.system(size: 17, design: .serif))
@@ -274,13 +283,15 @@ private extension ReviewView {
                     .padding(.vertical, 20)
             } else {
                 if showsChart {
-                    DonutChart(Self.slices(shares))
-                        .frame(width: 180, height: 180)
-                        .overlay {
-                            chartCenter
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
+                    DonutChart(Self.slices(shares)) { id in
+                        openShare = shares.first { $0.id == id }
+                    }
+                    .frame(width: 180, height: 180)
+                    .overlay {
+                        chartCenter
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
 
                     if let others = Self.otherShares(shares) {
                         HStack(spacing: 6) {
@@ -416,14 +427,8 @@ private extension ReviewView {
         Self.title(of: model.kind)
     }
 
-    var comparisonImage: String {
-        let change = model.change
-
-        if change > 0 {
-            return "arrow.up.right"
-        }
-
-        return change < 0 ? "arrow.down.right" : "equal"
+    var selectedChangeColor: Color {
+        Self.changeColor(model.change, of: model.kind)
     }
 
     var comparisonText: String {
@@ -440,6 +445,26 @@ private extension ReviewView {
         }
 
         return "\(previous)と同じ"
+    }
+
+    static func changeImage(_ change: Int) -> String {
+        if change > 0 {
+            return "arrow.up.right"
+        }
+
+        return change < 0 ? "arrow.down.right" : "equal"
+    }
+
+    static func changeColor(
+        _ change: Int,
+        of kind: ReviewKind
+    ) -> Color {
+        guard change != 0 else {
+            return Palette.mist
+        }
+
+        let isGood = kind == .expense ? change < 0 : change > 0
+        return isGood ? Palette.gold : Palette.rose
     }
 
     static func title(of kind: ReviewKind) -> String {

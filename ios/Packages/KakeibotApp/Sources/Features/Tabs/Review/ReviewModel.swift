@@ -68,7 +68,7 @@ public extension ReviewModel {
     }
 
     var change: Int {
-        total - total(of: kind, in: previousSummary)
+        change(of: kind)
     }
 
     var budgetUsage: BudgetUsage? {
@@ -123,6 +123,10 @@ public extension ReviewModel {
 
     func total(of kind: ReviewKind) -> Int {
         total(of: kind, in: summary)
+    }
+
+    func change(of kind: ReviewKind) -> Int {
+        total(of: kind) - total(of: kind, in: previousSummary)
     }
 
     func rows(for share: Share) -> [EntryRowItem] {

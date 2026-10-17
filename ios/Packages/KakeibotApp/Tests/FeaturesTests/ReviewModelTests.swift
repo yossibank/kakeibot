@@ -21,11 +21,13 @@ struct ReviewModelTests {
 
         let expense = model.total
         let expenseChange = model.change
+        let incomeChange = model.change(of: .income)
         model.setKind(.balance)
         let balance = model.total
 
         #expect(expense == 3980)
         #expect(expenseChange == -1020)
+        #expect(incomeChange == 250_000)
         #expect(balance == 246_020)
     }
 
