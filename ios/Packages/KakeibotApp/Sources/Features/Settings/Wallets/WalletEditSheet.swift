@@ -27,7 +27,6 @@ public struct WalletEditSheet: View {
         GeometryReader { _ in
             ZStack(alignment: .bottom) {
                 content
-                    .ignoresSafeArea(.keyboard)
 
                 if isEnteringAmount {
                     Color.black
@@ -41,8 +40,12 @@ public struct WalletEditSheet: View {
                     SettingsDrawer("最初の残高") {
                         closeAmount()
                     } content: {
-                        Keypad(activeTax: activeTax) { key in
-                            model.press(key)
+                        VStack(spacing: 10) {
+                            Keypad(activeTax: activeTax) { key in
+                                model.press(key)
+                            }
+
+                            saveButton
                         }
                     }
                     .transition(.settingsDrawer)
@@ -101,8 +104,8 @@ private extension WalletEditSheet {
                         focus: $focus,
                         textField: .text
                     )
-                    .padding(.bottom, 8)
                 }
+                .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)
             }
             .scrollIndicators(.hidden)
@@ -116,9 +119,7 @@ private extension WalletEditSheet {
                     .foregroundStyle(Palette.rose)
             }
 
-            if model.isEditing {
-                hideButton
-            }
+            saveButton
         }
         .padding(.horizontal, 18)
         .padding(.top, 18)
@@ -149,16 +150,24 @@ private extension WalletEditSheet {
 
             Spacer()
 
-            Button("保存") {
-                Task {
-                    await save()
+            if model.isEditing {
+                SettingsHideButton(isHidden: model.isHidden) {
+                    toggleHidden()
                 }
+            } else {
+                Color.clear
+                    .frame(width: 44, height: 44)
             }
-            .font(.subheadline.weight(.bold))
-            .foregroundStyle(saveColor)
-            .frame(minWidth: 44, minHeight: 44)
-            .disabled(!model.canSave)
         }
+    }
+
+    var saveButton: some View {
+        PrimaryButton(model.saveTitle) {
+            Task {
+                await save()
+            }
+        }
+        .disabled(!model.canSave)
     }
 
     var preview: some View {
@@ -264,6 +273,8 @@ private extension WalletEditSheet {
             Text(balanceHint)
                 .font(.caption)
                 .foregroundStyle(Palette.mist)
+                .contentTransition(.opacity)
+                .animation(.snappy, value: model.kind == .card)
         }
     }
 
@@ -284,24 +295,6 @@ private extension WalletEditSheet {
         }
         .buttonStyle(.plain)
         .sensoryFeedback(.selection, trigger: model.isNegative)
-    }
-
-    var hideButton: some View {
-        Button {
-            toggleHidden()
-        } label: {
-            Text(hideTitle)
-                .font(.subheadline)
-                .foregroundStyle(hideColor)
-                .frame(maxWidth: .infinity, minHeight: 46)
-                .background(hideFill, in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(hideColor.opacity(0.6), lineWidth: 1)
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 
     func kindButton(_ kind: Wallet.Kind) -> some View {
@@ -359,10 +352,6 @@ private extension WalletEditSheet {
         }
     }
 
-    var saveColor: Color {
-        model.canSave ? Palette.gold : Palette.dusk
-    }
-
     var signSymbol: String {
         model.isNegative ? "minus" : "plus"
     }
@@ -383,28 +372,16 @@ private extension WalletEditSheet {
         model.calculator.taxNote?.rate
     }
 
-    var hideTitle: String {
-        model.isHidden ? "表示に戻す" : "この口座を非表示にする"
-    }
-
-    var hideColor: Color {
-        model.isHidden ? Palette.gold : Palette.mist
-    }
-
-    var hideFill: Color {
-        model.isHidden ? Palette.gold.opacity(0.1) : Color.clear
-    }
-
     func openAmount() {
         focus = nil
 
-        withAnimation(.snappy(duration: 0.25)) {
+        withAnimation(.snappy) {
             isEnteringAmount = true
         }
     }
 
     func closeAmount() {
-        withAnimation(.snappy(duration: 0.2)) {
+        withAnimation(.snappy) {
             isEnteringAmount = false
         }
     }

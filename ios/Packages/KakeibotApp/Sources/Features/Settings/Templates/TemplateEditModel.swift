@@ -92,6 +92,13 @@ public extension TemplateEditModel {
         draft.problems.isEmpty
     }
 
+    var saveTitle: String {
+        SettingsSaveTitle.text(
+            problem: draft.problems.first.map(message),
+            isEditing: isEditing
+        )
+    }
+
     var isChanged: Bool {
         baseline.map { $0 != snapshot } ?? false
     }

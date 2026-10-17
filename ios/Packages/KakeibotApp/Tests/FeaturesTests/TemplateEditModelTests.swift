@@ -24,6 +24,19 @@ struct TemplateEditModelTests {
     }
 
     @Test
+    func namesWhatIsMissingOnSaveButton() async throws {
+        let database = try Self.database()
+        let model = TemplateEditModel(database: database, type: .expense)
+        await model.load()
+
+        let empty = model.saveTitle
+        model.name = "ランチ"
+
+        #expect(empty == "名前を入れてください")
+        #expect(model.saveTitle == "追加する")
+    }
+
+    @Test
     func savesNewTemplateWithDefaults() async throws {
         let database = try Self.database()
         let model = TemplateEditModel(database: database, type: .expense)

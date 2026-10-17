@@ -66,6 +66,13 @@ public extension WalletEditModel {
         draft.problems.isEmpty
     }
 
+    var saveTitle: String {
+        SettingsSaveTitle.text(
+            problem: draft.problems.first?.message,
+            isEditing: isEditing
+        )
+    }
+
     var needsHideConfirmation: Bool {
         !isHidden && balance != 0
     }

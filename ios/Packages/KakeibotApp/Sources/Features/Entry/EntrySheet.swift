@@ -191,7 +191,8 @@ private extension EntrySheet {
             if model.isEditing {
                 RingButton(
                     systemImage: "trash",
-                    style: .destructive
+                    style: .destructive,
+                    label: "削除"
                 ) {
                     Task {
                         await delete()
@@ -378,12 +379,9 @@ private extension EntrySheet {
 
     var keypadDrawer: some View {
         VStack(spacing: 10) {
-            Button("完了") {
+            RingButton(systemImage: "checkmark", style: .prominent) {
                 setEnteringAmount(false)
             }
-            .font(.subheadline.weight(.bold))
-            .foregroundStyle(Palette.gold)
-            .frame(minWidth: 44, minHeight: 32)
             .frame(maxWidth: .infinity, alignment: .trailing)
 
             Keypad(activeTax: model.calculator.taxNote?.rate) { key in

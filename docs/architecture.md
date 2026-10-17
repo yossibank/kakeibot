@@ -151,7 +151,7 @@ KakeibotApp/
 │   │   │   ├── Character/
 │   │   │   ├── Icons/
 │   │   │   ├── Menu/
-│   │   │   ├── Parts/       設定の画面で共有する入力欄、見出し、非表示にする枠
+│   │   │   ├── Parts/       設定の画面で共有する入力欄、見出し、非表示にする枠とボタン、保存のボタンの文字
 │   │   │   ├── Recurring/
 │   │   │   ├── Rewards/
 │   │   │   ├── Templates/
