@@ -3,6 +3,57 @@ import Foundation
 import GRDB
 
 public extension AppDatabase {
+    enum RecurringWriteError: Error, Equatable {
+        case recurringNotFound
+    }
+
+    @discardableResult
+    func saveRecurring(
+        _ draft: RecurringDraft,
+        editing id: Recurring.ID? = nil,
+        today: LocalDate,
+        at now: Date
+    ) async throws -> Recurring {
+        try await writer.write { db in
+            let recurring: Recurring
+
+            if let id {
+                guard let current = try Recurring.fetchOne(db, key: id) else {
+                    throw RecurringWriteError.recurringNotFound
+                }
+
+                recurring = try draft.applied(to: current, at: now)
+                try recurring.update(db)
+            } else {
+                recurring = try draft.newRecurring(at: now)
+                try recurring.insert(db)
+            }
+
+            try Self.generateEntries(
+                of: recurring,
+                through: today,
+                in: db,
+                at: now
+            )
+
+            return try Recurring.fetchOne(db, key: recurring.id) ?? recurring
+        }
+    }
+
+    func deleteRecurring(_ id: Recurring.ID) async throws {
+        try await writer.write { db in
+            try Entry
+                .filter(Column("recurring_id") == id)
+                .updateAll(
+                    db,
+                    Column("recurring_id").set(to: nil),
+                    Column("recurring_date").set(to: nil)
+                )
+
+            _ = try Recurring.deleteOne(db, key: id)
+        }
+    }
+
     func generateRecurringEntries(
         through today: LocalDate,
         at now: Date
