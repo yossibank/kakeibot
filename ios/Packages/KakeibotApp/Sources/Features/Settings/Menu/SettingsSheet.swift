@@ -8,6 +8,12 @@ struct SettingsSheet: View {
     @State private var launchScreen: LaunchScreen = .home
     @State private var weekStart: Weekday = .sunday
 
+    #if DEBUG
+    @State private var isConfirmingSample = false
+    @State private var isInsertingSample = false
+    @State private var sampleMessage: String?
+    #endif
+
     @Environment(\.dismiss) private var dismiss
 
     let database: AppDatabase
@@ -138,6 +144,10 @@ struct SettingsSheet: View {
                     .padding(.horizontal, 14)
                     .card()
                 }
+
+                #if DEBUG
+                sampleSection
+                #endif
             }
             .padding(.horizontal, 16)
             .padding(.top, 16)
@@ -261,6 +271,70 @@ private extension SettingsSheet {
         }
     }
 }
+
+#if DEBUG
+private extension SettingsSheet {
+    var sampleSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            sectionTitle("開発")
+
+            Button {
+                isConfirmingSample = true
+            } label: {
+                row("テストデータを入れる", systemImage: "wand.and.stars")
+            }
+            .buttonStyle(.plain)
+            .disabled(isInsertingSample)
+            .padding(.horizontal, 14)
+            .card()
+            .confirmationDialog(
+                "4 か月分の記録・予算・テンプレートを足します",
+                isPresented: $isConfirmingSample,
+                titleVisibility: .visible
+            ) {
+                Button("足す") {
+                    Task {
+                        await insertSample()
+                    }
+                }
+            }
+
+            if isInsertingSample {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            }
+
+            if let sampleMessage {
+                Text(sampleMessage)
+                    .font(.footnote)
+                    .foregroundStyle(Palette.mist)
+                    .padding(.leading, 6)
+            }
+        }
+    }
+}
+
+private extension SettingsSheet {
+    func insertSample() async {
+        isInsertingSample = true
+        sampleMessage = nil
+
+        do {
+            try await SampleData.insert(
+                into: database,
+                today: LocalDate(Date(), in: .current),
+                now: Date()
+            )
+
+            sampleMessage = "テストデータを入れました"
+        } catch {
+            sampleMessage = "テストデータを入れられませんでした"
+        }
+
+        isInsertingSample = false
+    }
+}
+#endif
 
 #Preview {
     if let database = try? AppDatabase.inMemory() {

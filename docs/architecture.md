@@ -159,6 +159,7 @@ KakeibotApp/
 │   │   │   ├── Period/      月の始まりの設定
 │   │   │   ├── Recurring/
 │   │   │   ├── Rewards/
+│   │   │   ├── Sample/      確かめ用のテストデータ（#if DEBUG）
 │   │   │   ├── Templates/
 │   │   │   ├── Themes/
 │   │   │   └── Wallets/

@@ -21,6 +21,21 @@ struct NoSpendDayWriteTests {
     }
 
     @Test
+    func marksSeveralDays() async throws {
+        let setup = try await Setup()
+        let next = setup.date.adding(days: 1)
+
+        try await setup.database.markNoSpendDays(
+            [setup.date, next],
+            at: setup.now
+        )
+
+        let snapshot = try setup.database.snapshot()
+
+        #expect(snapshot.noSpendDays.map(\.date) == [setup.date, next])
+    }
+
+    @Test
     func rejectsDayWithExpense() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()

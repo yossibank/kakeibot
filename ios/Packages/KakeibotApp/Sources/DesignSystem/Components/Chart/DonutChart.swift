@@ -1,6 +1,8 @@
 import SwiftUI
 
 public struct DonutChart<ID: Hashable>: View {
+    @State private var highlighted: ID?
+
     let slices: [Slice]
     let lineWidth: CGFloat
     let onSelect: ((ID) -> Void)?
@@ -22,9 +24,14 @@ public struct DonutChart<ID: Hashable>: View {
                     .stroke(Palette.line, lineWidth: lineWidth)
 
                 ForEach(segments) { segment in
+                    let isHighlighted = segment.id == highlighted
+                    let width = isHighlighted ? lineWidth + 8 : lineWidth
+                    let glow = isHighlighted ? segment.color : .clear
+
                     Circle()
                         .trim(from: segment.start, to: segment.end)
-                        .stroke(segment.color, lineWidth: lineWidth)
+                        .stroke(segment.color, lineWidth: width)
+                        .shadow(color: glow.opacity(0.7), radius: 8)
                         .rotationEffect(.degrees(-90))
                 }
             }
@@ -67,6 +74,10 @@ private extension DonutChart {
         0.006
     }
 
+    static var highlightDelay: Duration {
+        .milliseconds(240)
+    }
+
     func select(
         at location: CGPoint,
         in size: CGSize
@@ -93,8 +104,18 @@ private extension DonutChart {
             fraction >= segment.start && fraction < segment.end + gap
         }
 
-        if let segment {
+        guard let segment else {
+            return
+        }
+
+        withAnimation(.snappy(duration: 0.18)) {
+            highlighted = segment.id
+        }
+
+        Task {
+            try? await Task.sleep(for: Self.highlightDelay)
             onSelect(segment.id)
+            highlighted = nil
         }
     }
 
