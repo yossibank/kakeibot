@@ -52,6 +52,21 @@ struct SettingsSheet: View {
                         } label: {
                             row("テンプレート", systemImage: "rectangle.stack")
                         }
+
+                        Rectangle()
+                            .fill(Palette.gold.opacity(0.1))
+                            .frame(height: 0.5)
+
+                        NavigationLink {
+                            RecurringListView(
+                                model: RecurringListModel(
+                                    database: database,
+                                    today: LocalDate(Date(), in: .current)
+                                )
+                            )
+                        } label: {
+                            row("固定費", systemImage: "repeat")
+                        }
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 14)

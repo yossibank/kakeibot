@@ -74,6 +74,86 @@ struct RecurringWriteTests {
         #expect(snapshot.noSpendDays.isEmpty)
         #expect(snapshot.entries.count == 1)
     }
+
+    @Test
+    func savesAndGeneratesUpToToday() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let start = try #require(LocalDate("2026-02-01"))
+        let today = try #require(LocalDate("2026-03-31"))
+
+        let draft = RecurringDraft(
+            type: .income,
+            amount: 280_000,
+            categoryId: options.incomeCategories[0].id,
+            walletId: options.wallets[1].id,
+            memo: "給料",
+            frequency: .monthly,
+            month: 1,
+            day: 25,
+            startDate: start
+        )
+
+        let saved = try await setup.database.saveRecurring(
+            draft,
+            today: today,
+            at: setup.now
+        )
+
+        let incomes = try setup.database
+            .snapshot()
+            .entries
+            .filter { $0.recurringId == saved.id }
+
+        #expect(incomes.count == 2)
+        #expect(saved.generatedUntil == today)
+    }
+
+    @Test
+    func deletesRecurringButKeepsEntries() async throws {
+        let setup = try await Setup()
+        let today = try #require(LocalDate("2026-02-28"))
+
+        try await setup.database.generateRecurringEntries(
+            through: today,
+            at: setup.now
+        )
+
+        let id = try #require(setup.database.snapshot().recurrings.first?.id)
+        try await setup.database.deleteRecurring(id)
+        let snapshot = try setup.database.snapshot()
+
+        #expect(snapshot.recurrings.isEmpty)
+        #expect(snapshot.entries.count == 2)
+        #expect(snapshot.entries.allSatisfy { $0.recurringId == nil })
+    }
+
+    @Test
+    func rejectsUnknownRecurring() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let start = try #require(LocalDate("2026-02-01"))
+
+        let draft = RecurringDraft(
+            type: .expense,
+            amount: 4800,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            frequency: .monthly,
+            month: 1,
+            day: 10,
+            startDate: start
+        )
+
+        await #expect(throws: AppDatabase.RecurringWriteError.self) {
+            try await setup.database.saveRecurring(
+                draft,
+                editing: Recurring.ID(),
+                today: start,
+                at: setup.now
+            )
+        }
+    }
 }
 
 extension RecurringWriteTests {
