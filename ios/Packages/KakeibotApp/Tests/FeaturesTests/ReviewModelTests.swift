@@ -1,0 +1,118 @@
+import Core
+import Features
+import Foundation
+import Store
+import Testing
+
+@MainActor
+struct ReviewModelTests {
+    @Test
+    func comparesWithPreviousMonth() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-12")
+        try await setup.save(.expense, amount: 3000, on: "2026-10-05")
+        try await setup.save(.income, amount: 250_000, on: "2026-10-10")
+        try await setup.save(.expense, amount: 5000, on: "2026-09-20")
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        try await observe(model) {
+            model.list != nil
+        }
+
+        let expense = model.total
+        let expenseChange = model.change
+        model.setKind(.balance)
+        let balance = model.total
+
+        #expect(expense == 3980)
+        #expect(expenseChange == -1020)
+        #expect(balance == 246_020)
+    }
+
+    @Test
+    func ranksCategoriesByAmount() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let options = try await setup.database.entryOptions()
+        let food = options.expenseCategories[0]
+        let daily = options.expenseCategories[1]
+        try await setup.save(.expense, amount: 500, on: "2026-10-12")
+        try await setup.save(.expense, amount: 1500, on: "2026-10-13")
+        try await setup.saveDaily(amount: 6000, on: "2026-10-14")
+        let month = try #require(YearMonth("2026-10"))
+        try await setup.database.setBudget(4000, for: food.id, from: month)
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        try await observe(model) {
+            model.list != nil && !model.budgets.isEmpty
+        }
+
+        let shares = model.categoryShares
+
+        #expect(shares.map(\.name) == [daily.name, food.name])
+        #expect(shares.map(\.amount) == [6000, 2000])
+        #expect(shares.map(\.ratio) == [0.75, 0.25])
+        #expect(shares.last?.usage?.remaining == 2000)
+        #expect(shares.first?.usage == nil)
+    }
+
+    @Test
+    func movesOnlyUpToCurrentPeriod() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        model.move(by: 1)
+        let current = model.period.range
+        model.move(by: -2)
+        let earlier = model.period.range
+        model.setScale(.year)
+        let year = model.period.range
+
+        #expect(current.lowerBound.description == "2026-10-01")
+        #expect(earlier.lowerBound.description == "2026-08-01")
+        #expect(year.lowerBound.description == "2026-01-01")
+        #expect(!model.canMoveForward)
+    }
+}
+
+private extension ReviewModelTests {
+    func observe(
+        _ model: ReviewModel,
+        until isReady: () -> Bool
+    ) async throws {
+        let listTask = Task {
+            await model.observe()
+        }
+
+        let budgetTask = Task {
+            await model.observeBudgets()
+        }
+
+        for _ in 0..<200 where !isReady() {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        listTask.cancel()
+        budgetTask.cancel()
+    }
+}
+
+extension RecordsModelTests.Setup {
+    func saveDaily(
+        amount: Int,
+        on text: String
+    ) async throws {
+        let options = try await database.entryOptions()
+        let date = try #require(LocalDate(text))
+
+        let draft = EntryDraft(
+            type: .expense,
+            amount: amount,
+            date: date,
+            categoryId: options.expenseCategories[1].id,
+            walletId: options.wallets[0].id,
+            memo: ""
+        )
+
+        try await database.saveEntry(draft, at: Date())
+    }
+}

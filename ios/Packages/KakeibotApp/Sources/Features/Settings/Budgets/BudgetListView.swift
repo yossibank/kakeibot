@@ -197,7 +197,7 @@ private extension BudgetListView {
 
                 Spacer()
 
-                Text(Self.remainingText(usage))
+                Text(usage.remainingText)
                     .foregroundStyle(usage.tint)
             }
             .font(.caption2)
@@ -220,14 +220,6 @@ private extension BudgetListView {
         withAnimation(.snappy) {
             model.startEditing(target)
         }
-    }
-
-    static func remainingText(_ usage: BudgetUsage) -> String {
-        if usage.isOver {
-            return "\(AmountText.text(-usage.remaining)) 超え"
-        }
-
-        return "残り \(AmountText.text(usage.remaining))"
     }
 }
 

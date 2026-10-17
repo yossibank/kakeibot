@@ -9,6 +9,7 @@ public struct MainView: View {
     @State private var sheet: Sheet?
     @State private var home: HomeModel
     @State private var records: RecordsModel
+    @State private var review: ReviewModel
     @State private var assets: AssetsModel
     @State private var draft: EntryModel
     @State private var notice: EntryNoticeModel
@@ -29,6 +30,13 @@ public struct MainView: View {
 
         _records = State(
             initialValue: RecordsModel(
+                database: database,
+                today: today
+            )
+        )
+
+        _review = State(
+            initialValue: ReviewModel(
                 database: database,
                 today: today
             )
@@ -103,7 +111,7 @@ public struct MainView: View {
             }
 
             Tab(value: MainTab.review) {
-                ComingSoonView(title: "振り返り", systemImage: "chart.pie")
+                ReviewView(model: review)
                     .tabContent()
             }
 
@@ -182,6 +190,18 @@ public struct MainView: View {
             await records.loadLayout()
         }
         .task {
+            await review.observe()
+        }
+        .task {
+            await review.observeBudgets()
+        }
+        .task {
+            await review.observeMonthStartDay()
+        }
+        .task {
+            await review.observeWeekStart()
+        }
+        .task {
             await assets.observe()
         }
         .task {
@@ -193,6 +213,7 @@ public struct MainView: View {
             home.today = LocalDate(Date(), in: .current)
             assets.today = home.today
             records.today = home.today
+            review.today = home.today
             prepareDraft()
         }
     }
