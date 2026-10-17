@@ -9,6 +9,7 @@ import Store
 public final class HomeModel {
     public var today: LocalDate
     public var templateType: Entry.Kind = .expense
+    public var monthStartDay: MonthStartDay = .first
 
     public var templateOrder: TemplateOrder {
         didSet {
@@ -47,11 +48,15 @@ public extension HomeModel {
     static let recentLimit = 5
 
     var month: YearMonth {
-        today.yearMonth
+        today.periodMonth(startingOn: monthStartDay)
+    }
+
+    var period: ClosedRange<LocalDate> {
+        month.period(startingOn: monthStartDay)
     }
 
     var monthRangeText: String {
-        "\(month.month)/1〜\(month.month)/\(month.numberOfDays)"
+        PeriodText.range(period)
     }
 
     var monthExpense: Int {
@@ -195,7 +200,7 @@ private extension HomeModel {
     static let frequentDays = 90
 
     var monthDays: [EntryDay] {
-        list?.days.filter { $0.date.yearMonth == month } ?? []
+        list?.days.filter { period.contains($0.date) } ?? []
     }
 
     var templateUses: [EntryTemplate.ID: Int] {

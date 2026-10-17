@@ -10,6 +10,20 @@ public struct MonthStartDay: Hashable, Sendable {
     }
 }
 
+public extension MonthStartDay {
+    static var first: MonthStartDay {
+        MonthStartDay(validDay: 1)
+    }
+
+    static var allDays: [MonthStartDay] {
+        (1...31).map(MonthStartDay.init(validDay:))
+    }
+
+    var isLastDay: Bool {
+        day == 31
+    }
+}
+
 extension MonthStartDay {
     func date(in yearMonth: YearMonth) -> LocalDate {
         LocalDate(yearMonth: yearMonth, clampedDay: day)
@@ -19,6 +33,12 @@ extension MonthStartDay {
         let start = date(in: yearMonth)
         let end = date(in: yearMonth.adding(months: 1)).adding(days: -1)
         return start...end
+    }
+}
+
+private extension MonthStartDay {
+    init(validDay day: Int) {
+        self.day = day
     }
 }
 

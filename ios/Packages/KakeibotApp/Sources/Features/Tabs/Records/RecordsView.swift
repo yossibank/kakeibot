@@ -57,9 +57,16 @@ private extension RecordsView {
 
             monthButton(systemImage: "chevron.left", months: -1)
 
-            Text("\(String(model.month.year))年 \(model.month.month)月")
-                .font(.system(size: 15, design: .serif))
-                .foregroundStyle(Palette.champagne)
+            VStack(spacing: 1) {
+                Text("\(String(model.month.year))年 \(model.month.month)月")
+                    .font(.system(size: 15, design: .serif))
+                    .foregroundStyle(Palette.champagne)
+
+                Text(model.periodText)
+                    .font(.system(size: 10))
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.mist)
+            }
 
             monthButton(systemImage: "chevron.right", months: 1)
         }
