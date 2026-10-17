@@ -12,4 +12,11 @@ public extension AppDatabase {
             try setting.save(db)
         }
     }
+
+    func completeOnboarding() async throws {
+        try await writer.write { db in
+            let setting = Setting(key: .onboardingCompleted, value: "true")
+            try setting.save(db)
+        }
+    }
 }

@@ -13,6 +13,14 @@ public extension AppDatabase {
     func monthStartDay() async throws -> MonthStartDay {
         try await writer.read(Self.monthStartDay)
     }
+
+    func isOnboardingCompleted() async throws -> Bool {
+        try await writer.read { db in
+            let key = Setting.Key.onboardingCompleted
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting?.value == "true"
+        }
+    }
 }
 
 private extension AppDatabase {

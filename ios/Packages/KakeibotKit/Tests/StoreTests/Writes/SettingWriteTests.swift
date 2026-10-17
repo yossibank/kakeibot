@@ -34,4 +34,16 @@ struct SettingWriteTests {
         #expect(initial == .first)
         #expect(changed == payday)
     }
+
+    @Test
+    func completesOnboarding() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let before = try await database.isOnboardingCompleted()
+        try await database.completeOnboarding()
+        let after = try await database.isOnboardingCompleted()
+
+        #expect(!before)
+        #expect(after)
+    }
 }
