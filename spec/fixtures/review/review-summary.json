@@ -1,0 +1,53 @@
+[
+  {
+    "start": "2026-10-01",
+    "end": "2026-10-31",
+    "entries": [
+      { "type": "expense", "amount": 980, "date": "2026-10-03", "category": "food", "wallet": "cash" },
+      { "type": "expense", "amount": 3000, "date": "2026-10-05", "category": "daily", "wallet": "card" },
+      { "type": "expense", "amount": 500, "date": "2026-10-10", "category": "food", "wallet": "card" },
+      { "type": "income", "amount": 250000, "date": "2026-10-25", "category": "salary", "wallet": "bank" },
+      { "type": "transfer", "amount": 10000, "date": "2026-10-06", "category": null, "wallet": "bank" },
+      { "type": "expense", "amount": 700, "date": "2026-09-30", "category": "food", "wallet": "cash" },
+      { "type": "expense", "amount": 1200, "date": "2026-11-01", "category": "food", "wallet": "cash" }
+    ],
+    "expense": {
+      "total": 4480,
+      "categories": { "food": 1480, "daily": 3000 },
+      "wallets": { "cash": 980, "card": 3500 }
+    },
+    "income": {
+      "total": 250000,
+      "categories": { "salary": 250000 },
+      "wallets": { "bank": 250000 }
+    },
+    "balance": 245520
+  },
+  {
+    "start": "2026-10-01",
+    "end": "2026-10-31",
+    "entries": [
+      { "type": "expense", "amount": 3000, "date": "2026-10-01", "category": "food", "wallet": "cash" },
+      { "type": "expense", "amount": 2000, "date": "2026-10-31", "category": "food", "wallet": "cash" }
+    ],
+    "expense": {
+      "total": 5000,
+      "categories": { "food": 5000 },
+      "wallets": { "cash": 5000 }
+    },
+    "income": {
+      "total": 0,
+      "categories": {},
+      "wallets": {}
+    },
+    "balance": -5000
+  },
+  {
+    "start": "2026-10-01",
+    "end": "2026-10-31",
+    "entries": [],
+    "expense": { "total": 0, "categories": {}, "wallets": {} },
+    "income": { "total": 0, "categories": {}, "wallets": {} },
+    "balance": 0
+  }
+]

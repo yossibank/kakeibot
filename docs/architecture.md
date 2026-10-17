@@ -90,6 +90,7 @@ KakeibotKit/
 │   │   ├── Identifier/      型付きの ID
 │   │   ├── Notification/    予約されているべき通知の計算
 │   │   ├── Recurring/       固定費の記録の作成、記録漏れの後追い
+│   │   ├── Review/          振り返りの週・月・年の範囲、合計と内訳
 │   │   ├── Reward/          決まり・記録・目標、貯金箱の残高
 │   │   ├── Setting/         設定の行と選べる値
 │   │   ├── Theme/           テーマの型、読みやすさの判定
