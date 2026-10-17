@@ -8,6 +8,8 @@ import Store
 public final class OnboardingModel {
     public var launchScreen: LaunchScreen = .home
 
+    public private(set) var weekStart: Weekday = .sunday
+
     public private(set) var page: Page = .welcome
     public private(set) var isMovingForward = true
     public private(set) var errorMessage: String?
@@ -50,6 +52,22 @@ public extension OnboardingModel {
     func load() async {
         await monthStart.load()
         await budget.load()
+
+        do {
+            weekStart = try await database.weekStart()
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func chooseWeekStart(_ weekStart: Weekday) async {
+        self.weekStart = weekStart
+
+        do {
+            try await database.setWeekStart(weekStart)
+        } catch {
+            errorMessage = Self.saveFailedMessage
+        }
     }
 
     func next() {
@@ -89,5 +107,6 @@ public extension OnboardingModel {
 }
 
 private extension OnboardingModel {
+    static let loadFailedMessage = "設定を読めませんでした"
     static let saveFailedMessage = "設定を保存できませんでした"
 }

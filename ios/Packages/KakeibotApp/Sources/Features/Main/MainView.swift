@@ -105,6 +105,10 @@ public struct MainView: View {
                         Task {
                             await notice.delete(id, in: records.list)
                         }
+                    },
+                    onAddEntry: { date in
+                        draft.date = date
+                        sheet = .new
                     }
                 )
                 .tabContent()
@@ -191,6 +195,9 @@ public struct MainView: View {
         }
         .task {
             await review.observe()
+        }
+        .task {
+            await review.loadSelection()
         }
         .task {
             await review.observeBudgets()

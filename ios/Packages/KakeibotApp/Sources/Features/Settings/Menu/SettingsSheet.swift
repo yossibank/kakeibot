@@ -53,31 +53,6 @@ struct SettingsSheet: View {
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
-                    sectionTitle("使い方")
-
-                    HStack(spacing: 12) {
-                        Image(systemName: "iphone")
-                            .font(.system(size: 16, weight: .light))
-                            .foregroundStyle(Palette.gold)
-                            .frame(width: 22)
-
-                        Text("起動時に開く画面")
-                            .font(.subheadline)
-                            .foregroundStyle(Palette.ink)
-
-                        Spacer()
-
-                        CapsulePicker(
-                            selection: launchScreenBinding,
-                            options: Self.launchOptions
-                        )
-                    }
-                    .frame(minHeight: 52)
-                    .padding(.horizontal, 14)
-                    .card()
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
                     sectionTitle("期間と予算")
 
                     VStack(spacing: 0) {
@@ -129,12 +104,37 @@ struct SettingsSheet: View {
 
                             CapsulePicker(
                                 selection: weekStartBinding,
-                                options: Self.weekStartOptions
+                                options: Weekday.weekStartOptions
                             )
                         }
                         .frame(minHeight: 52)
                     }
                     .buttonStyle(.plain)
+                    .padding(.horizontal, 14)
+                    .card()
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    sectionTitle("使い方")
+
+                    HStack(spacing: 12) {
+                        Image(systemName: "iphone")
+                            .font(.system(size: 16, weight: .light))
+                            .foregroundStyle(Palette.gold)
+                            .frame(width: 22)
+
+                        Text("起動時に開く画面")
+                            .font(.subheadline)
+                            .foregroundStyle(Palette.ink)
+
+                        Spacer()
+
+                        CapsulePicker(
+                            selection: launchScreenBinding,
+                            options: Self.launchOptions
+                        )
+                    }
+                    .frame(minHeight: 52)
                     .padding(.horizontal, 14)
                     .card()
                 }
@@ -226,11 +226,6 @@ private extension SettingsSheet {
 private extension SettingsSheet {
     static let launchOptions: [CapsulePicker<LaunchScreen>.Option] =
         LaunchScreen.allCases.map { .init($0.title, value: $0) }
-
-    static let weekStartOptions: [CapsulePicker<Weekday>.Option] = [
-        .init("日曜", value: .sunday),
-        .init("月曜", value: .monday)
-    ]
 
     var launchScreenBinding: Binding<LaunchScreen> {
         Binding {

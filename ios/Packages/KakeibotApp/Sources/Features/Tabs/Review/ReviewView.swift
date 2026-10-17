@@ -5,6 +5,8 @@ import SwiftUI
 struct ReviewView: View {
     @Bindable var model: ReviewModel
 
+    @State private var openShare: ReviewModel.Share?
+
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
@@ -43,6 +45,13 @@ struct ReviewView: View {
             move(direction)
         }
         .sensoryFeedback(.selection, trigger: model.period)
+        .sheet(item: $openShare) { share in
+            ReviewShareSheet(
+                share: share,
+                periodTitle: periodTitle,
+                rows: model.rows(for: share)
+            )
+        }
         .background {
             Rectangle()
                 .fill(Palette.night)
@@ -233,6 +242,15 @@ private extension ReviewView {
     }
 
     func shareRow(_ share: ReviewModel.Share) -> some View {
+        Button {
+            openShare = share
+        } label: {
+            shareLabel(share)
+        }
+        .buttonStyle(.plain)
+    }
+
+    func shareLabel(_ share: ReviewModel.Share) -> some View {
         VStack(spacing: 6) {
             HStack(spacing: 10) {
                 IconBadge(share.icon, size: 30)
@@ -253,6 +271,10 @@ private extension ReviewView {
                     .font(.system(size: 15, design: .serif))
                     .monospacedDigit()
                     .foregroundStyle(Palette.champagne)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundStyle(Palette.dusk)
             }
 
             if let usage = share.usage {
@@ -264,7 +286,7 @@ private extension ReviewView {
 }
 
 private extension ReviewView {
-    static let kindOptions: [CapsulePicker<ReviewModel.Kind>.Option] = [
+    static let kindOptions: [CapsulePicker<ReviewKind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income),
         .init("収支", value: .balance)
@@ -276,11 +298,13 @@ private extension ReviewView {
         .init("年", value: .year)
     ]
 
-    var kindBinding: Binding<ReviewModel.Kind> {
+    var kindBinding: Binding<ReviewKind> {
         Binding {
             model.kind
         } set: { kind in
-            model.setKind(kind)
+            Task {
+                await model.setKind(kind)
+            }
         }
     }
 
@@ -288,7 +312,9 @@ private extension ReviewView {
         Binding {
             model.scale
         } set: { scale in
-            model.setScale(scale)
+            Task {
+                await model.setScale(scale)
+            }
         }
     }
 

@@ -10,7 +10,7 @@ public final class ReviewModel {
     public var today: LocalDate
 
     public private(set) var scale: ReviewPeriod.Scale = .month
-    public private(set) var kind: Kind = .expense
+    public private(set) var kind: ReviewKind = .expense
     public private(set) var offset = 0
     public private(set) var isMovingForward = true
     public private(set) var monthStartDay: MonthStartDay = .first
@@ -31,12 +31,6 @@ public final class ReviewModel {
 }
 
 public extension ReviewModel {
-    enum Kind: CaseIterable, Hashable, Sendable {
-        case expense
-        case income
-        case balance
-    }
-
     struct Share: Identifiable {
         public let id: AnyHashable
         public let name: String
@@ -127,13 +121,55 @@ public extension ReviewModel {
         return Self.sorted(ranked)
     }
 
-    func setScale(_ scale: ReviewPeriod.Scale) {
-        self.scale = scale
-        offset = 0
+    func rows(for share: Share) -> [EntryRowItem] {
+        guard let list, let type = entryType else {
+            return []
+        }
+
+        return entries
+            .filter { entry in
+                let category = entry.categoryId.map(AnyHashable.init)
+                let wallet = AnyHashable(entry.walletId)
+
+                return entry.type == type
+                    && period.range.contains(entry.date)
+                    && (category == share.id || wallet == share.id)
+            }
+            .sorted { $0.date > $1.date }
+            .map { entry in
+                let label = "\(entry.date.month)/\(entry.date.day)"
+                return EntryRowItem(entry, in: list, dayLabel: label)
+            }
     }
 
-    func setKind(_ kind: Kind) {
+    func loadSelection() async {
+        do {
+            scale = try await database.reviewScale()
+            kind = try await database.reviewKind()
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func setScale(_ scale: ReviewPeriod.Scale) async {
+        self.scale = scale
+        offset = 0
+
+        do {
+            try await database.setReviewScale(scale)
+        } catch {
+            errorMessage = Self.saveFailedMessage
+        }
+    }
+
+    func setKind(_ kind: ReviewKind) async {
         self.kind = kind
+
+        do {
+            try await database.setReviewKind(kind)
+        } catch {
+            errorMessage = Self.saveFailedMessage
+        }
     }
 
     func move(by count: Int) {
@@ -193,9 +229,18 @@ private extension ReviewModel {
     }
 
     static let loadFailedMessage = "記録を読めませんでした"
+    static let saveFailedMessage = "保存できませんでした"
 
     var entries: [Entry] {
         list?.days.flatMap(\.entries) ?? []
+    }
+
+    var entryType: Entry.Kind? {
+        switch kind {
+        case .expense: .expense
+        case .income: .income
+        case .balance: nil
+        }
     }
 
     var breakdown: ReviewSummary.Breakdown? {

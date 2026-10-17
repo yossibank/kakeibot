@@ -21,7 +21,7 @@ struct ReviewModelTests {
 
         let expense = model.total
         let expenseChange = model.change
-        model.setKind(.balance)
+        await model.setKind(.balance)
         let balance = model.total
 
         #expect(expense == 3980)
@@ -53,6 +53,12 @@ struct ReviewModelTests {
         #expect(shares.map(\.ratio) == [0.75, 0.25])
         #expect(shares.last?.usage?.remaining == 2000)
         #expect(shares.first?.usage == nil)
+
+        let foodRows = try model.rows(for: #require(shares.last))
+        let walletRows = try model.rows(for: #require(model.walletShares.first))
+
+        #expect(foodRows.map(\.amount) == [1500, 500])
+        #expect(walletRows.map(\.amount) == [6000, 1500, 500])
     }
 
     @Test
@@ -64,13 +70,27 @@ struct ReviewModelTests {
         let current = model.period.range
         model.move(by: -2)
         let earlier = model.period.range
-        model.setScale(.year)
+        await model.setScale(.year)
         let year = model.period.range
 
         #expect(current.lowerBound.description == "2026-10-01")
         #expect(earlier.lowerBound.description == "2026-08-01")
         #expect(year.lowerBound.description == "2026-01-01")
         #expect(!model.canMoveForward)
+    }
+
+    @Test
+    func remembersSelection() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        await model.setScale(.week)
+        await model.setKind(.income)
+        let reopened = ReviewModel(database: setup.database, today: setup.today)
+        await reopened.loadSelection()
+
+        #expect(reopened.scale == .week)
+        #expect(reopened.kind == .income)
     }
 }
 
