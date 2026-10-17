@@ -158,6 +158,9 @@ public struct MainView: View {
             await home.observeTemplates()
         }
         .task {
+            await observeMonthStartDay()
+        }
+        .task {
             await records.observe()
         }
         .task {
@@ -288,6 +291,18 @@ private extension MainView {
 }
 
 private extension MainView {
+    func observeMonthStartDay() async {
+        do {
+            for try await startDay in database.monthStartDayUpdates() {
+                home.monthStartDay = startDay
+                assets.monthStartDay = startDay
+                records.setMonthStartDay(startDay, today: home.today)
+            }
+        } catch {
+            return
+        }
+    }
+
     func useTemplate(_ template: EntryTemplate) {
         guard template.amount != nil else {
             sheet = .template(template)

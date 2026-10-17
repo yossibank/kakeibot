@@ -7,6 +7,7 @@ import Store
 @Observable
 public final class RecordsModel {
     public private(set) var month: YearMonth
+    public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var list: EntryList?
     public private(set) var errorMessage: String?
 
@@ -22,8 +23,16 @@ public final class RecordsModel {
 }
 
 public extension RecordsModel {
+    var period: ClosedRange<LocalDate> {
+        month.period(startingOn: monthStartDay)
+    }
+
+    var periodText: String {
+        PeriodText.range(period)
+    }
+
     var days: [EntryDay] {
-        list?.days.filter { $0.date.yearMonth == month } ?? []
+        list?.days.filter { period.contains($0.date) } ?? []
     }
 
     var expenseTotal: Int {
@@ -40,6 +49,14 @@ public extension RecordsModel {
         }
 
         return day.entries.map { EntryRowItem($0, in: list) }
+    }
+
+    func setMonthStartDay(
+        _ startDay: MonthStartDay,
+        today: LocalDate
+    ) {
+        monthStartDay = startDay
+        month = today.periodMonth(startingOn: startDay)
     }
 
     func move(months: Int) {

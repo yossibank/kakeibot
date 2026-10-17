@@ -140,7 +140,7 @@ private extension AssetsView {
     }
 
     func monthColor(_ month: YearMonth) -> Color {
-        month == model.today.yearMonth ? Palette.gold : Palette.dusk
+        month == model.currentMonth ? Palette.gold : Palette.dusk
     }
 }
 

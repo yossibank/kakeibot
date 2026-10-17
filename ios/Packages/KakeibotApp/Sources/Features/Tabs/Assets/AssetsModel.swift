@@ -7,6 +7,7 @@ import Store
 @Observable
 public final class AssetsModel {
     public var today: LocalDate
+    public var monthStartDay: MonthStartDay = .first
 
     public private(set) var list: EntryList?
     public private(set) var errorMessage: String?
@@ -44,13 +45,17 @@ public extension AssetsModel {
 
     static let monthCount = 6
 
+    var currentMonth: YearMonth {
+        today.periodMonth(startingOn: monthStartDay)
+    }
+
     var total: Int {
         Wallet.totalBalance(of: wallets, with: entries)
     }
 
     var changeFromLastMonth: Int {
-        let lastMonth = today.yearMonth.adding(months: -1)
-        let end = Self.lastDay(of: lastMonth)
+        let lastMonth = currentMonth.adding(months: -1)
+        let end = lastMonth.period(startingOn: monthStartDay).upperBound
         let previous = Wallet.totalBalance(
             of: wallets,
             with: entries,
@@ -72,8 +77,9 @@ public extension AssetsModel {
 
     var monthTotals: [MonthTotal] {
         (0..<Self.monthCount).reversed().map { offset in
-            let month = today.yearMonth.adding(months: -offset)
-            let end = offset == 0 ? today : Self.lastDay(of: month)
+            let month = currentMonth.adding(months: -offset)
+            let period = month.period(startingOn: monthStartDay)
+            let end = offset == 0 ? today : period.upperBound
             let total = Wallet.totalBalance(
                 of: wallets,
                 with: entries,
@@ -105,10 +111,6 @@ public extension AssetsModel {
 
 private extension AssetsModel {
     static let loadFailedMessage = "残高を読めませんでした"
-
-    static func lastDay(of month: YearMonth) -> LocalDate? {
-        LocalDate(yearMonth: month, day: month.numberOfDays)
-    }
 
     var wallets: [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []
