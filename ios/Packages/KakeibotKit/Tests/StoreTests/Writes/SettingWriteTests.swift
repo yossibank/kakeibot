@@ -46,4 +46,16 @@ struct SettingWriteTests {
         #expect(!before)
         #expect(after)
     }
+
+    @Test
+    func savesLaunchScreen() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let initial = try await database.launchScreen()
+        try await database.setLaunchScreen(.entry)
+        let saved = try await database.launchScreen()
+
+        #expect(initial == .home)
+        #expect(saved == .entry)
+    }
 }

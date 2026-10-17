@@ -37,6 +37,10 @@ struct RecordsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
+        .onPageSwipe { direction in
+            moveMonth(direction)
+        }
+        .sensoryFeedback(.selection, trigger: model.month)
         .background {
             Rectangle()
                 .fill(Palette.night)
@@ -90,9 +94,7 @@ private extension RecordsView {
         months: Int
     ) -> some View {
         Button {
-            withAnimation(.snappy) {
-                model.move(months: months)
-            }
+            move(months: months)
         } label: {
             Image(systemName: systemImage)
                 .font(.footnote.weight(.semibold))
@@ -208,5 +210,20 @@ private extension RecordsView {
 
         let parts = [expense, income].compactMap(\.self)
         return parts.isEmpty ? nil : parts.joined(separator: "・")
+    }
+
+    func moveMonth(_ direction: PageSwipeDirection) {
+        switch direction {
+        case .forward: move(months: 1)
+        case .backward: move(months: -1)
+        }
+    }
+
+    func move(months: Int) {
+        openId = nil
+
+        withAnimation(.snappy) {
+            model.move(months: months)
+        }
     }
 }

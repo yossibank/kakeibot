@@ -20,6 +20,7 @@ public extension Setting {
         case characterName = "character_name"
         case themeId = "theme_id"
         case onboardingCompleted = "onboarding_completed"
+        case launchScreen = "launch_screen"
     }
 }
 

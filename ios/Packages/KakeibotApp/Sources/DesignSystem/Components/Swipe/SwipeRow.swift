@@ -38,7 +38,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
                     tap()
                 }
                 .gesture(
-                    SwipeGesture { x in
+                    SwipeGesture(allowsRightward: isOpen) { x in
                         move(by: x)
                     } onEnd: { _ in
                         end()

@@ -87,14 +87,22 @@ private extension HomeView {
             .animation(.snappy, value: model.budgetUsage)
 
             if let usage = model.budgetUsage {
-                HStack(spacing: 14) {
-                    Text("予算 \(AmountText.text(usage.budget))")
+                VStack(spacing: 4) {
+                    if let warning = Self.warning(for: usage) {
+                        Text(warning)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(usage.tint)
+                    }
 
-                    Text("1 日あたり \(AmountText.text(usage.perDay))")
+                    HStack(spacing: 14) {
+                        Text("予算 \(AmountText.text(usage.budget))")
+
+                        Text("1 日あたり \(AmountText.text(usage.perDay))")
+                    }
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.mist)
                 }
-                .font(.caption)
-                .monospacedDigit()
-                .foregroundStyle(Palette.mist)
             } else {
                 Button(action: onOpenSettings) {
                     HStack(spacing: 4) {
@@ -349,7 +357,13 @@ private extension HomeView {
     }
 
     var dialAmountColor: Color {
-        model.budgetUsage?.isOver == true ? Palette.rose : Palette.champagne
+        guard let usage = model.budgetUsage else {
+            return Palette.champagne
+        }
+
+        return usage.isOver || usage.isNearLimit
+            ? usage.tint
+            : Palette.champagne
     }
 
     var middleTitle: String {
@@ -361,7 +375,15 @@ private extension HomeView {
     }
 
     var dialTint: Color {
-        model.budgetUsage?.isOver == true ? Palette.rose : Palette.gold
+        model.budgetUsage?.tint ?? Palette.gold
+    }
+
+    static func warning(for usage: BudgetUsage) -> String? {
+        if usage.isOver {
+            return "予算を超えています"
+        }
+
+        return usage.isNearLimit ? "予算の 8 割を使いました" : nil
     }
 
     var shelfRowCount: Int {

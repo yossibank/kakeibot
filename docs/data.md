@@ -274,8 +274,9 @@ emoji・text・glyph のどれかは必須。
 | character_name | |
 | theme_id | |
 | onboarding_completed | `true` `false` |
+| launch_screen | `home` `entry`。空ならホーム |
 
-列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。
+列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
 
 ## 表の形の変更
 

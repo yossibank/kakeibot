@@ -164,6 +164,9 @@ public struct MainView: View {
             await observeMonthStartDay()
         }
         .task {
+            await openLaunchScreen()
+        }
+        .task {
             await records.observe()
         }
         .task {
@@ -294,6 +297,14 @@ private extension MainView {
 }
 
 private extension MainView {
+    func openLaunchScreen() async {
+        guard await (try? database.launchScreen()) == .entry else {
+            return
+        }
+
+        sheet = .new
+    }
+
     func observeMonthStartDay() async {
         do {
             for try await startDay in database.monthStartDayUpdates() {
