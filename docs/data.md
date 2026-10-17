@@ -164,7 +164,7 @@ emoji・text・glyph のどれかは必須。
 | from_month | TEXT | この月から有効 |
 | amount | INTEGER | 空ならこの月から予算なし |
 
-ある月の予算は、`from_month` がその月以前でいちばん新しい行である。`(category_id, from_month)` は重複禁止（月全体は部分インデックスで防ぐ）。
+ある月の予算は、`from_month` がその月以前でいちばん新しい行である。`(category_id, from_month)` は重複禁止（月全体は部分インデックスで防ぐ）。額を前の月と同じに戻したら、その月の行を消す。
 
 月全体の予算に、次の行があるとする。
 

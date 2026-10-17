@@ -97,10 +97,10 @@ KakeibotKit/
 │   └── Store/
 │       ├── Database/        App Group、DatabasePool、止められる前の対策、最初の財布とカテゴリ。止める通知は AppFeature が送る
 │       ├── Migrations/      版ごとに 1 ファイル
-│       ├── Queries/         記録とカテゴリ・タグの一覧、入力の選択肢、月の要約・日ごとの合計、テンプレート、月の始まり
+│       ├── Queries/         記録とカテゴリ・タグの一覧、入力の選択肢、月の要約・日ごとの合計、テンプレート、月の始まり、予算
 │       ├── Records/         Core の型を GRDB で読み書きできるようにする
 │       ├── Snapshot/        書き出し用の全データの読み出し、読み込み用の全置き換え
-│       └── Writes/          記録の保存・更新・削除、カテゴリ（タグを含む）とテンプレートの保存・並べ替え・非表示・削除、月の始まりの保存
+│       └── Writes/          記録の保存・更新・削除、カテゴリ（タグを含む）とテンプレートの保存・並べ替え・非表示・削除、月の始まりと予算の保存
 └── Tests/
     ├── CoreTests/           Core と同じフォルダ分け
     └── StoreTests/          メモリ上の DB
@@ -147,7 +147,7 @@ KakeibotApp/
 │   │   ├── Period/          期間の範囲と月の始まりの書き方
 │   │   ├── Settings/
 │   │   │   ├── Backup/
-│   │   │   ├── Budgets/
+│   │   │   ├── Budgets/     予算の一覧と額の入力
 │   │   │   ├── Categories/
 │   │   │   ├── Character/
 │   │   │   ├── Icons/

@@ -21,6 +21,19 @@ public extension Budget {
     typealias ID = Identifier<Budget>
 }
 
+public extension [Budget] {
+    func amount(
+        for categoryId: EntryCategory.ID?,
+        in month: YearMonth
+    ) -> Int? {
+        let rows = filter { budget in
+            budget.categoryId == categoryId && budget.fromMonth <= month
+        }
+
+        return rows.max { $0.fromMonth < $1.fromMonth }?.amount
+    }
+}
+
 extension Budget: Identifiable {}
 
 extension Budget: Codable {
