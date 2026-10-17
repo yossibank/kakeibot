@@ -17,10 +17,11 @@ struct EntryMemoCard: View {
 
                 Spacer()
 
-                Button("完了", action: onDone)
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Palette.gold)
-                    .frame(minWidth: 44, minHeight: 32)
+                RingButton(
+                    systemImage: "checkmark",
+                    style: .prominent,
+                    action: onDone
+                )
             }
 
             TextField(

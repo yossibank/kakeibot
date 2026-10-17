@@ -312,12 +312,9 @@ private extension TemplateEditSheet {
 
                 Spacer()
 
-                Button("完了") {
+                RingButton(systemImage: "checkmark", style: .prominent) {
                     closePanel()
                 }
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(Palette.gold)
-                .frame(minWidth: 44, minHeight: 32)
             }
 
             TextField(

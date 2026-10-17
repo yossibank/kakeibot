@@ -273,6 +273,8 @@ private extension WalletEditSheet {
             Text(balanceHint)
                 .font(.caption)
                 .foregroundStyle(Palette.mist)
+                .contentTransition(.opacity)
+                .animation(.snappy, value: model.kind == .card)
         }
     }
 
