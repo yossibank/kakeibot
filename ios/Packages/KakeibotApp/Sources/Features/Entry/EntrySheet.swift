@@ -191,7 +191,8 @@ private extension EntrySheet {
             if model.isEditing {
                 RingButton(
                     systemImage: "trash",
-                    style: .destructive
+                    style: .destructive,
+                    label: "削除"
                 ) {
                     Task {
                         await delete()

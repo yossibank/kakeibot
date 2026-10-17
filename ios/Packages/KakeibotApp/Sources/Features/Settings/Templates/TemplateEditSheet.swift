@@ -26,7 +26,7 @@ public struct TemplateEditSheet: View {
         GeometryReader { _ in
             ZStack(alignment: .bottom) {
                 content
-                    .ignoresSafeArea(.keyboard)
+                    .ignoresSafeArea(keyboardRegions)
 
                 if let panel {
                     Color.black
@@ -161,7 +161,8 @@ private extension TemplateEditSheet {
                 if model.isEditing {
                     RingButton(
                         systemImage: "trash",
-                        style: .destructive
+                        style: .destructive,
+                        label: "削除"
                     ) {
                         Task {
                             await delete()
@@ -554,6 +555,10 @@ private extension TemplateEditSheet {
     var title: String {
         let action = model.isEditing ? "編集" : "追加"
         return "\(model.typeName)テンプレートを\(action)"
+    }
+
+    var keyboardRegions: SafeAreaRegions {
+        panel == .memo ? .keyboard : []
     }
 
     var categoryIcon: Icon? {

@@ -5,15 +5,18 @@ public struct RingButton: View {
 
     let systemImage: String
     let style: Style
+    let label: String?
     let action: () -> Void
 
     public init(
         systemImage: String,
         style: Style = .plain,
+        label: String? = nil,
         action: @escaping () -> Void
     ) {
         self.systemImage = systemImage
         self.style = style
+        self.label = label
         self.action = action
     }
 
@@ -29,6 +32,17 @@ public struct RingButton: View {
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
+        .overlay(alignment: .bottom) {
+            if let label {
+                Text(label)
+                    .font(.system(size: 9))
+                    .tracking(1)
+                    .foregroundStyle(foreground)
+                    .fixedSize()
+                    .offset(y: 11)
+                    .allowsHitTesting(false)
+            }
+        }
     }
 }
 
@@ -72,7 +86,11 @@ private extension RingButton {
 
         RingButton(systemImage: "checkmark", style: .prominent) {}
 
-        RingButton(systemImage: "trash", style: .destructive) {}
+        RingButton(
+            systemImage: "trash",
+            style: .destructive,
+            label: "削除"
+        ) {}
     }
     .padding()
     .background(Palette.night)

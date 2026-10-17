@@ -27,7 +27,6 @@ public struct WalletEditSheet: View {
         GeometryReader { _ in
             ZStack(alignment: .bottom) {
                 content
-                    .ignoresSafeArea(.keyboard)
 
                 if isEnteringAmount {
                     Color.black
@@ -374,13 +373,13 @@ private extension WalletEditSheet {
     func openAmount() {
         focus = nil
 
-        withAnimation(.snappy(duration: 0.25)) {
+        withAnimation(.snappy) {
             isEnteringAmount = true
         }
     }
 
     func closeAmount() {
-        withAnimation(.snappy(duration: 0.2)) {
+        withAnimation(.snappy) {
             isEnteringAmount = false
         }
     }

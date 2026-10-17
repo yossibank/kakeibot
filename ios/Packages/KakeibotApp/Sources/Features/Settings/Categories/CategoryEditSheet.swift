@@ -31,7 +31,7 @@ public struct CategoryEditSheet: View {
         GeometryReader { _ in
             ZStack {
                 content
-                    .ignoresSafeArea(.keyboard)
+                    .ignoresSafeArea(keyboardRegions)
 
                 if let tagEdit {
                     tagLayer(tagEdit)
@@ -244,6 +244,10 @@ private extension CategoryEditSheet {
     }
 
     static let fade: CGFloat = 16
+
+    var keyboardRegions: SafeAreaRegions {
+        tagEdit == nil ? [] : .keyboard
+    }
 
     var tagItems: [TagLine<UUID>.Item] {
         model.tags.map { TagLine.Item(id: $0.id, name: $0.draft.name) }
