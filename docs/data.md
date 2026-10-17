@@ -268,7 +268,7 @@ emoji・text・glyph のどれかは必須。
 | key | 値 |
 | --- | --- |
 | month_start_day | 1〜31。月末を超えたらその月の最終日 |
-| week_start | `monday`〜`sunday` |
+| week_start | `monday`〜`sunday`。空なら日曜 |
 | reminder_time | `HH:mm`。空なら知らせない |
 | character_id | 同梱キャラクターの ID |
 | character_name | |

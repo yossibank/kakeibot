@@ -14,6 +14,17 @@ public extension AppDatabase {
         try await writer.read(Self.monthStartDay)
     }
 
+    func weekStartUpdates() -> some AsyncSequence<Weekday, any Error> {
+        ValueObservation
+            .tracking(Self.weekStart)
+            .removeDuplicates()
+            .values(in: writer)
+    }
+
+    func weekStart() async throws -> Weekday {
+        try await writer.read(Self.weekStart)
+    }
+
     func launchScreen() async throws -> LaunchScreen {
         try await writer.read { db in
             let key = Setting.Key.launchScreen
@@ -54,5 +65,11 @@ private extension AppDatabase {
         let setting = try Setting.fetchOne(db, key: key)
         let day = setting.flatMap { Int($0.value) }
         return day.flatMap(MonthStartDay.init) ?? .first
+    }
+
+    static func weekStart(in db: Database) throws -> Weekday {
+        let key = Setting.Key.weekStart
+        let setting = try Setting.fetchOne(db, key: key)
+        return setting.flatMap { Weekday(rawValue: $0.value) } ?? .sunday
     }
 }

@@ -36,6 +36,21 @@ struct SettingWriteTests {
     }
 
     @Test
+    func savesWeekStart() async throws {
+        let database = try AppDatabase.inMemory()
+        var updates = database.weekStartUpdates().makeAsyncIterator()
+
+        let initial = try await updates.next()
+        try await database.setWeekStart(.monday)
+        let changed = try await updates.next()
+        let saved = try await database.weekStart()
+
+        #expect(initial == .sunday)
+        #expect(changed == .monday)
+        #expect(saved == .monday)
+    }
+
+    @Test
     func completesOnboarding() async throws {
         let database = try AppDatabase.inMemory()
 

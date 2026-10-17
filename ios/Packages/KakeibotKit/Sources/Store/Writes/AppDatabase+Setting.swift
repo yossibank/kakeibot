@@ -13,6 +13,13 @@ public extension AppDatabase {
         }
     }
 
+    func setWeekStart(_ weekStart: Weekday) async throws {
+        try await writer.write { db in
+            let setting = Setting(key: .weekStart, value: weekStart.rawValue)
+            try setting.save(db)
+        }
+    }
+
     func setLaunchScreen(_ screen: LaunchScreen) async throws {
         try await writer.write { db in
             let setting = Setting(key: .launchScreen, value: screen.rawValue)

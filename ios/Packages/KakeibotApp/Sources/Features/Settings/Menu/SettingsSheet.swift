@@ -6,6 +6,7 @@ import SwiftUI
 struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
     @State private var launchScreen: LaunchScreen = .home
+    @State private var weekStart: Weekday = .sunday
 
     @Environment(\.dismiss) private var dismiss
 
@@ -109,6 +110,29 @@ struct SettingsSheet: View {
                         } label: {
                             row("予算", systemImage: "chart.bar")
                         }
+
+                        Rectangle()
+                            .fill(Palette.gold.opacity(0.1))
+                            .frame(height: 0.5)
+
+                        HStack(spacing: 12) {
+                            Image(systemName: "calendar.day.timeline.left")
+                                .font(.system(size: 16, weight: .light))
+                                .foregroundStyle(Palette.gold)
+                                .frame(width: 22)
+
+                            Text("週の始まり")
+                                .font(.subheadline)
+                                .foregroundStyle(Palette.ink)
+
+                            Spacer()
+
+                            CapsulePicker(
+                                selection: weekStartBinding,
+                                options: Self.weekStartOptions
+                            )
+                        }
+                        .frame(minHeight: 52)
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 14)
@@ -128,6 +152,9 @@ struct SettingsSheet: View {
         .preferredColorScheme(.dark)
         .task {
             await observeMonthStartDay()
+        }
+        .task {
+            weekStart = await (try? database.weekStart()) ?? .sunday
         }
         .task {
             launchScreen = await (try? database.launchScreen()) ?? .home
@@ -200,6 +227,11 @@ private extension SettingsSheet {
     static let launchOptions: [CapsulePicker<LaunchScreen>.Option] =
         LaunchScreen.allCases.map { .init($0.title, value: $0) }
 
+    static let weekStartOptions: [CapsulePicker<Weekday>.Option] = [
+        .init("日曜", value: .sunday),
+        .init("月曜", value: .monday)
+    ]
+
     var launchScreenBinding: Binding<LaunchScreen> {
         Binding {
             launchScreen
@@ -208,6 +240,18 @@ private extension SettingsSheet {
 
             Task {
                 try? await database.setLaunchScreen(screen)
+            }
+        }
+    }
+
+    var weekStartBinding: Binding<Weekday> {
+        Binding {
+            weekStart
+        } set: { day in
+            weekStart = day
+
+            Task {
+                try? await database.setWeekStart(day)
             }
         }
     }
