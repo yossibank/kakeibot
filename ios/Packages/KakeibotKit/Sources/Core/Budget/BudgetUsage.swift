@@ -24,6 +24,10 @@ public extension BudgetUsage {
         spent > budget
     }
 
+    var isNearLimit: Bool {
+        !isOver && spent * 5 >= budget * 4
+    }
+
     var perDay: Int {
         max(remaining, 0) / daysLeft
     }

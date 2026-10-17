@@ -46,4 +46,40 @@ struct SettingWriteTests {
         #expect(!before)
         #expect(after)
     }
+
+    @Test
+    func savesLaunchScreen() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let initial = try await database.launchScreen()
+        try await database.setLaunchScreen(.entry)
+        let saved = try await database.launchScreen()
+
+        #expect(initial == .home)
+        #expect(saved == .entry)
+    }
+
+    @Test
+    func savesTemplateOrder() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let initial = try await database.templateOrder()
+        try await database.setTemplateOrder(.frequent)
+        let saved = try await database.templateOrder()
+
+        #expect(initial == .manual)
+        #expect(saved == .frequent)
+    }
+
+    @Test
+    func savesCategoryMenuOpened() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let before = try await database.hasOpenedCategoryMenu()
+        try await database.markCategoryMenuOpened()
+        let after = try await database.hasOpenedCategoryMenu()
+
+        #expect(!before)
+        #expect(after)
+    }
 }

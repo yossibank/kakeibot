@@ -20,11 +20,11 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
 | `budget-amount.json` | ある月に使う予算。`fromMonth` がその月以前でいちばん新しい行の額 | `budgets`（`category`・`fromMonth`・`amount`）、`category`、`month`、`amount` |
-| `budget-usage.json` | 予算の残りと、期間の終わりまでの 1 日あたりの額 | `budget`、`spent`、`today`、`periodEnd`、`remaining`、`perDay`、`isOver` |
+| `budget-usage.json` | 予算の残りと、期間の終わりまでの 1 日あたりの額、8 割を超えたか | `budget`、`spent`、`today`、`periodEnd`、`remaining`、`perDay`、`isOver`、`isNearLimit` |
 
 `category` が空なら月全体の予算を、名前ならそのカテゴリの予算を表す。月全体とカテゴリの予算は混ぜない。
 
-1 日あたりの額は、残りを今日から期間の終わりまでの日数（今日を含む）で割り、1 円未満を切り捨てる。残りが 0 以下なら 0 にする。
+1 日あたりの額は、残りを今日から期間の終わりまでの日数（今日を含む）で割り、1 円未満を切り捨てる。残りが 0 以下なら 0 にする。`isNearLimit` は、使った額が予算の 8 割以上で、超えていないときに真にする。
 
 ## category
 

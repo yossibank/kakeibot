@@ -65,4 +65,37 @@ struct BudgetListModelTests {
         #expect(current == 50000)
         #expect(model.totalAmount == nil)
     }
+
+    @Test
+    func savesWithDoneAndShowsSpending() async throws {
+        let setup = try await HomeModelTests.Setup()
+        try await setup.save(.expense, amount: 9000, daysAgo: 0)
+        try await setup.save(.income, amount: 50000, daysAgo: 0)
+
+        let model = BudgetListModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await model.load()
+        let food = try #require(model.categories.first)
+        model.startEditing(.category(food))
+        model.press(.digit(1))
+        model.press(.digit(0))
+        model.press(.doubleZero)
+        model.press(.digit(0))
+        await model.finishEditing()
+        let usage = try #require(model.usage(for: food.id))
+
+        model.startEditing(.total)
+        await model.finishEditing()
+
+        #expect(model.amount(for: food.id) == 10000)
+        #expect(usage.spent == 9000)
+        #expect(usage.remaining == 1000)
+        #expect(usage.isNearLimit)
+        #expect(model.spent(for: nil) == 9000)
+        #expect(model.totalAmount == nil)
+        #expect(model.editing == nil)
+    }
 }

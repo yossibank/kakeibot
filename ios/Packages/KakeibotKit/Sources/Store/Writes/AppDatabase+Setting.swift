@@ -13,6 +13,27 @@ public extension AppDatabase {
         }
     }
 
+    func setLaunchScreen(_ screen: LaunchScreen) async throws {
+        try await writer.write { db in
+            let setting = Setting(key: .launchScreen, value: screen.rawValue)
+            try setting.save(db)
+        }
+    }
+
+    func setTemplateOrder(_ order: TemplateOrder) async throws {
+        try await writer.write { db in
+            let setting = Setting(key: .templateOrder, value: order.rawValue)
+            try setting.save(db)
+        }
+    }
+
+    func markCategoryMenuOpened() async throws {
+        try await writer.write { db in
+            let setting = Setting(key: .categoryMenuOpened, value: "true")
+            try setting.save(db)
+        }
+    }
+
     func completeOnboarding() async throws {
         try await writer.write { db in
             let setting = Setting(key: .onboardingCompleted, value: "true")

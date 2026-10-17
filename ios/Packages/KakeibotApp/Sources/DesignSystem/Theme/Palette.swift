@@ -16,6 +16,7 @@ public extension Palette {
     static let cardTop = Color(rgb: 0x141C2F)
     static let cardBottom = Color(rgb: 0x090D18)
     static let rose = Color(rgb: 0xE3A3A3)
+    static let amber = Color(rgb: 0xE89B57)
     static let holiday = Color(rgb: 0xEE8A84)
     static let saturday = Color(rgb: 0x8DB0EA)
 

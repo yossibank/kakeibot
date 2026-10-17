@@ -14,6 +14,31 @@ public extension AppDatabase {
         try await writer.read(Self.monthStartDay)
     }
 
+    func launchScreen() async throws -> LaunchScreen {
+        try await writer.read { db in
+            let key = Setting.Key.launchScreen
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting.flatMap { LaunchScreen(rawValue: $0.value) } ?? .home
+        }
+    }
+
+    func templateOrder() async throws -> TemplateOrder {
+        try await writer.read { db in
+            let key = Setting.Key.templateOrder
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting.flatMap { TemplateOrder(rawValue: $0.value) }
+                ?? .manual
+        }
+    }
+
+    func hasOpenedCategoryMenu() async throws -> Bool {
+        try await writer.read { db in
+            let key = Setting.Key.categoryMenuOpened
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting?.value == "true"
+        }
+    }
+
     func isOnboardingCompleted() async throws -> Bool {
         try await writer.read { db in
             let key = Setting.Key.onboardingCompleted

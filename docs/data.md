@@ -274,8 +274,11 @@ emoji・text・glyph のどれかは必須。
 | character_name | |
 | theme_id | |
 | onboarding_completed | `true` `false` |
+| launch_screen | `home` `entry`。空ならホーム |
+| template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |
+| category_menu_opened | `true` `false`。`true` なら入力シートの長押しのヒントを出さない |
 
-列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。
+列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
 
 ## 表の形の変更
 

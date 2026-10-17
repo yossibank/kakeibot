@@ -5,6 +5,7 @@ import SwiftUI
 
 struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
+    @State private var launchScreen: LaunchScreen = .home
 
     @Environment(\.dismiss) private var dismiss
 
@@ -46,6 +47,31 @@ struct SettingsSheet: View {
                         }
                     }
                     .buttonStyle(.plain)
+                    .padding(.horizontal, 14)
+                    .card()
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    sectionTitle("使い方")
+
+                    HStack(spacing: 12) {
+                        Image(systemName: "iphone")
+                            .font(.system(size: 16, weight: .light))
+                            .foregroundStyle(Palette.gold)
+                            .frame(width: 22)
+
+                        Text("起動時に開く画面")
+                            .font(.subheadline)
+                            .foregroundStyle(Palette.ink)
+
+                        Spacer()
+
+                        CapsulePicker(
+                            selection: launchScreenBinding,
+                            options: Self.launchOptions
+                        )
+                    }
+                    .frame(minHeight: 52)
                     .padding(.horizontal, 14)
                     .card()
                 }
@@ -102,6 +128,9 @@ struct SettingsSheet: View {
         .preferredColorScheme(.dark)
         .task {
             await observeMonthStartDay()
+        }
+        .task {
+            launchScreen = await (try? database.launchScreen()) ?? .home
         }
     }
 }
@@ -168,6 +197,21 @@ private extension SettingsSheet {
 }
 
 private extension SettingsSheet {
+    static let launchOptions: [CapsulePicker<LaunchScreen>.Option] =
+        LaunchScreen.allCases.map { .init($0.title, value: $0) }
+
+    var launchScreenBinding: Binding<LaunchScreen> {
+        Binding {
+            launchScreen
+        } set: { screen in
+            launchScreen = screen
+
+            Task {
+                try? await database.setLaunchScreen(screen)
+            }
+        }
+    }
+
     func observeMonthStartDay() async {
         do {
             for try await startDay in database.monthStartDayUpdates() {

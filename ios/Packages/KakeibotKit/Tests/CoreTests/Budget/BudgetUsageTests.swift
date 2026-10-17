@@ -14,6 +14,7 @@ struct BudgetUsageTests {
         #expect(usage.remaining == fixture.remaining)
         #expect(usage.perDay == fixture.perDay)
         #expect(usage.isOver == fixture.isOver)
+        #expect(usage.isNearLimit == fixture.isNearLimit)
     }
 }
 
@@ -26,6 +27,7 @@ extension BudgetUsageTests {
         let remaining: Int
         let perDay: Int
         let isOver: Bool
+        let isNearLimit: Bool
     }
 }
 

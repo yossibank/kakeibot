@@ -6,6 +6,7 @@ struct RecordsView: View {
     @Bindable var model: RecordsModel
 
     @State private var openId: Entry.ID?
+    @State private var isMovingForward = true
 
     let onOpenEntry: (Entry.ID) -> Void
     let onDelete: (Entry.ID) -> Void
@@ -14,17 +15,11 @@ struct RecordsView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 header
-                summary
 
-                if model.days.isEmpty {
-                    Text("この月の記録はありません")
-                        .font(.footnote)
-                        .foregroundStyle(Palette.mist)
-                        .padding(.vertical, 40)
-                }
-
-                ForEach(model.days, id: \.date) { day in
-                    dayCard(day)
+                ZStack(alignment: .top) {
+                    monthContent
+                        .id(model.month)
+                        .transition(.page(forward: isMovingForward))
                 }
 
                 if let errorMessage = model.errorMessage {
@@ -37,6 +32,10 @@ struct RecordsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
+        .onPageSwipe { direction in
+            moveMonth(direction)
+        }
+        .sensoryFeedback(.selection, trigger: model.month)
         .background {
             Rectangle()
                 .fill(Palette.night)
@@ -61,14 +60,33 @@ private extension RecordsView {
                 Text("\(String(model.month.year))年 \(model.month.month)月")
                     .font(.system(size: 15, design: .serif))
                     .foregroundStyle(Palette.champagne)
+                    .contentTransition(monthTextTransition)
 
                 Text(model.periodText)
                     .font(.system(size: 10))
                     .monospacedDigit()
                     .foregroundStyle(Palette.mist)
+                    .contentTransition(monthTextTransition)
             }
 
             monthButton(systemImage: "chevron.right", months: 1)
+        }
+    }
+
+    var monthContent: some View {
+        VStack(spacing: 12) {
+            summary
+
+            if model.days.isEmpty {
+                Text("この月の記録はありません")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.mist)
+                    .padding(.vertical, 40)
+            }
+
+            ForEach(model.days, id: \.date) { day in
+                dayCard(day)
+            }
         }
     }
 
@@ -90,9 +108,7 @@ private extension RecordsView {
         months: Int
     ) -> some View {
         Button {
-            withAnimation(.snappy) {
-                model.move(months: months)
-            }
+            move(months: months)
         } label: {
             Image(systemName: systemImage)
                 .font(.footnote.weight(.semibold))
@@ -189,6 +205,10 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
+    var monthTextTransition: ContentTransition {
+        .numericText(countsDown: !isMovingForward)
+    }
+
     static func weekdayColor(for date: LocalDate) -> Color {
         if Holiday.contains(date) || date.weekday == .sunday {
             return Palette.holiday
@@ -208,5 +228,21 @@ private extension RecordsView {
 
         let parts = [expense, income].compactMap(\.self)
         return parts.isEmpty ? nil : parts.joined(separator: "・")
+    }
+
+    func moveMonth(_ direction: PageSwipeDirection) {
+        switch direction {
+        case .forward: move(months: 1)
+        case .backward: move(months: -1)
+        }
+    }
+
+    func move(months: Int) {
+        openId = nil
+        isMovingForward = months > 0
+
+        withAnimation(.snappy) {
+            model.move(months: months)
+        }
     }
 }

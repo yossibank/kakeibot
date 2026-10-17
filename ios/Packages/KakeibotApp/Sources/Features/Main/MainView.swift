@@ -131,7 +131,7 @@ public struct MainView: View {
         .overlay {
             if let orderMenuAnchor {
                 TemplateOrderMenu(
-                    selection: $home.templateOrder,
+                    selection: templateOrderBinding,
                     anchor: orderMenuAnchor
                 ) {
                     withAnimation(.snappy(duration: 0.2)) {
@@ -158,10 +158,16 @@ public struct MainView: View {
             await home.observeTemplates()
         }
         .task {
+            await home.loadTemplateOrder()
+        }
+        .task {
             await home.observeBudgets()
         }
         .task {
             await observeMonthStartDay()
+        }
+        .task {
+            await openLaunchScreen()
         }
         .task {
             await records.observe()
@@ -294,6 +300,24 @@ private extension MainView {
 }
 
 private extension MainView {
+    var templateOrderBinding: Binding<TemplateOrder> {
+        Binding {
+            home.templateOrder
+        } set: { order in
+            Task {
+                await home.setTemplateOrder(order)
+            }
+        }
+    }
+
+    func openLaunchScreen() async {
+        guard await (try? database.launchScreen()) == .entry else {
+            return
+        }
+
+        sheet = .new
+    }
+
     func observeMonthStartDay() async {
         do {
             for try await startDay in database.monthStartDayUpdates() {

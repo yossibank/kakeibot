@@ -13,29 +13,14 @@ public struct BudgetListView: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .bottom) {
-            content
-
-            if let editing = model.editing {
-                Color.black
-                    .opacity(0.35)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        closeDrawer()
-                    }
-                    .transition(.opacity)
-
-                drawer(editing)
-                    .transition(.settingsDrawer)
+        content
+            .budgetKeypad(model)
+            .toolbar(.hidden, for: .navigationBar)
+            .preferredColorScheme(.dark)
+            .sensoryFeedback(.selection, trigger: model.budgets)
+            .task {
+                await model.load()
             }
-        }
-        .animation(.snappy, value: model.editing)
-        .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
-        .sensoryFeedback(.selection, trigger: model.budgets)
-        .task {
-            await model.load()
-        }
     }
 }
 
@@ -140,9 +125,15 @@ private extension BudgetListView {
                     .monospacedDigit()
                     .foregroundStyle(amountColor(model.totalAmount))
 
-                Text("押して変えられます")
-                    .font(.caption2)
-                    .foregroundStyle(Palette.mist)
+                if let usage = model.usage(for: nil) {
+                    usageLine(usage)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 4)
+                } else {
+                    Text("押して変えられます")
+                        .font(.caption2)
+                        .foregroundStyle(Palette.mist)
+                }
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
@@ -154,66 +145,64 @@ private extension BudgetListView {
 
     func categoryRow(_ category: EntryCategory) -> some View {
         let amount = model.amount(for: category.id)
+        let usage = model.usage(for: category.id)
+        let spent = model.spent(for: category.id)
 
         return Button {
             openDrawer(.category(category))
         } label: {
-            HStack(spacing: 12) {
-                IconImage(model.icon(for: category), size: 16)
-                    .foregroundStyle(Palette.gold)
-                    .frame(width: 24)
+            VStack(spacing: 6) {
+                HStack(spacing: 12) {
+                    IconImage(model.icon(for: category), size: 16)
+                        .foregroundStyle(Palette.gold)
+                        .frame(width: 24)
 
-                Text(category.name)
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.ink)
+                    Text(category.name)
+                        .font(.subheadline)
+                        .foregroundStyle(Palette.ink)
 
-                Spacer()
+                    Spacer()
 
-                Text(amountText(amount))
-                    .font(.system(size: 16, design: .serif))
-                    .monospacedDigit()
-                    .foregroundStyle(amountColor(amount))
+                    Text(amountText(amount))
+                        .font(.system(size: 16, design: .serif))
+                        .monospacedDigit()
+                        .foregroundStyle(amountColor(amount))
+                }
+
+                if let usage {
+                    usageLine(usage)
+                        .padding(.leading, 36)
+                } else if spent > 0 {
+                    Text("使った額 \(AmountText.text(spent))")
+                        .font(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.mist)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.leading, 36)
+                }
             }
+            .padding(.vertical, 10)
             .frame(minHeight: 48)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
     }
 
-    func drawer(_ editing: BudgetListModel.Target) -> some View {
-        SettingsDrawer(model.editingTitle) {
-            closeDrawer()
-        } content: {
-            VStack(spacing: 10) {
-                Text(AmountText.text(model.calculator.amount))
-                    .font(.system(size: 30, weight: .bold, design: .serif))
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.champagne)
-                    .contentTransition(.numericText())
-                    .animation(.snappy, value: model.calculator.amount)
+    func usageLine(_ usage: BudgetUsage) -> some View {
+        VStack(spacing: 4) {
+            UsageBar(usage)
 
-                Keypad(activeTax: model.calculator.taxNote?.rate) { key in
-                    model.press(key)
-                }
+            HStack {
+                Text("使った額 \(AmountText.text(usage.spent))")
 
-                PrimaryButton(model.saveTitle) {
-                    Task {
-                        await model.save()
-                    }
-                }
-                .disabled(!model.canSave)
+                Spacer()
 
-                if model.editingAmount != nil {
-                    Button("予算をなくす") {
-                        Task {
-                            await model.clear()
-                        }
-                    }
-                    .font(.footnote)
-                    .foregroundStyle(Palette.rose)
-                    .frame(minHeight: 36)
-                }
+                Text(Self.remainingText(usage))
+                    .foregroundStyle(usage.tint)
             }
+            .font(.caption2)
+            .monospacedDigit()
+            .foregroundStyle(Palette.mist)
         }
     }
 }
@@ -233,10 +222,12 @@ private extension BudgetListView {
         }
     }
 
-    func closeDrawer() {
-        withAnimation(.snappy) {
-            model.cancelEditing()
+    static func remainingText(_ usage: BudgetUsage) -> String {
+        if usage.isOver {
+            return "\(AmountText.text(-usage.remaining)) 超え"
         }
+
+        return "残り \(AmountText.text(usage.remaining))"
     }
 }
 

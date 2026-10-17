@@ -10,6 +10,7 @@ public final class BudgetListModel {
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var budgets: [Budget] = []
     public private(set) var categoryList: CategoryList?
+    public private(set) var entryList: EntryList?
     public private(set) var editing: Target?
     public private(set) var calculator = AmountCalculator()
     public private(set) var errorMessage: String?
@@ -87,6 +88,32 @@ public extension BudgetListModel {
         budgets.amount(for: categoryId, in: month)
     }
 
+    func spent(for categoryId: EntryCategory.ID?) -> Int {
+        let period = month.period(startingOn: monthStartDay)
+        let days = entryList?.days.filter { period.contains($0.date) } ?? []
+
+        return days
+            .flatMap(\.entries)
+            .filter { entry in
+                entry.type == .expense
+                    && (categoryId == nil || entry.categoryId == categoryId)
+            }
+            .reduce(0) { $0 + $1.amount }
+    }
+
+    func usage(for categoryId: EntryCategory.ID?) -> BudgetUsage? {
+        guard let budget = amount(for: categoryId) else {
+            return nil
+        }
+
+        return BudgetUsage(
+            budget: budget,
+            spent: spent(for: categoryId),
+            today: today,
+            periodEnd: month.period(startingOn: monthStartDay).upperBound
+        )
+    }
+
     func icon(for category: EntryCategory) -> Icon? {
         categoryList?.icons[category.iconId]
     }
@@ -97,6 +124,7 @@ public extension BudgetListModel {
             month = today.periodMonth(startingOn: monthStartDay)
             budgets = try await database.budgets()
             categoryList = try await database.categoryList()
+            entryList = try await database.entryList()
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -118,6 +146,15 @@ public extension BudgetListModel {
 
     func save() async {
         guard canSave else {
+            return
+        }
+
+        await setBudget(calculator.amount)
+    }
+
+    func finishEditing() async {
+        guard canSave, calculator.amount != editingAmount else {
+            cancelEditing()
             return
         }
 

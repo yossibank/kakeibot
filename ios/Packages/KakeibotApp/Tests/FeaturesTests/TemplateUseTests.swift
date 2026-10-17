@@ -187,12 +187,10 @@ struct TemplateUseTests {
         )
 
         try await setup.database.saveTemplate(cafe, at: Date())
-        let defaults = try #require(UserDefaults(suiteName: UUID().uuidString))
 
         let home = HomeModel(
             database: setup.database,
-            today: setup.date,
-            defaults: defaults
+            today: setup.date
         )
 
         let listTask = Task {
@@ -208,20 +206,21 @@ struct TemplateUseTests {
         }
 
         let manual = home.templates.map(\.name)
-        home.templateOrder = .category
+        await home.setTemplateOrder(.category)
         let category = home.templates.map(\.name)
-        home.templateOrder = .amount
+        await home.setTemplateOrder(.amount)
         let amount = home.templates.map(\.name)
-        home.templateOrder = .name
+        await home.setTemplateOrder(.name)
         let name = home.templates.map(\.name)
         listTask.cancel()
         templateTask.cancel()
 
         let reopened = HomeModel(
             database: setup.database,
-            today: setup.date,
-            defaults: defaults
+            today: setup.date
         )
+
+        await reopened.loadTemplateOrder()
 
         #expect(manual == ["洗剤", "ティッシュ", "駅前のカフェでモーニング"])
         #expect(category == ["駅前のカフェでモーニング", "洗剤", "ティッシュ"])
@@ -239,12 +238,10 @@ struct TemplateUseTests {
         let old = try #require(soap.entryDraft(on: oldDate))
         try await setup.database.saveEntry(old, at: Date())
         try await setup.database.saveEntry(old, at: Date())
-        let defaults = try #require(UserDefaults(suiteName: UUID().uuidString))
 
         let home = HomeModel(
             database: setup.database,
-            today: setup.date,
-            defaults: defaults
+            today: setup.date
         )
 
         let listTask = Task {
@@ -265,7 +262,7 @@ struct TemplateUseTests {
             try await Task.sleep(for: .milliseconds(10))
         }
 
-        home.templateOrder = .frequent
+        await home.setTemplateOrder(.frequent)
         let names = home.templates.map(\.name)
         listTask.cancel()
         templateTask.cancel()

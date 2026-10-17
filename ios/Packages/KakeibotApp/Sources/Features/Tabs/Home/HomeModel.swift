@@ -11,12 +11,7 @@ public final class HomeModel {
     public var templateType: Entry.Kind = .expense
     public var monthStartDay: MonthStartDay = .first
 
-    public var templateOrder: TemplateOrder {
-        didSet {
-            defaults.set(templateOrder.rawValue, forKey: Self.templateOrderKey)
-        }
-    }
-
+    public private(set) var templateOrder: TemplateOrder = .manual
     public private(set) var list: EntryList?
     public private(set) var errorMessage: String?
 
@@ -24,18 +19,13 @@ public final class HomeModel {
     private var budgets: [Budget] = []
 
     private let database: AppDatabase
-    private let defaults: UserDefaults
 
     public init(
         database: AppDatabase,
-        today: LocalDate,
-        defaults: UserDefaults = .standard
+        today: LocalDate
     ) {
-        let order = defaults.string(forKey: Self.templateOrderKey)
         self.database = database
         self.today = today
-        self.defaults = defaults
-        self.templateOrder = order.flatMap(TemplateOrder.init) ?? .manual
     }
 }
 
@@ -124,6 +114,24 @@ public extension HomeModel {
             list = try await database.entryList()
         } catch {
             errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func loadTemplateOrder() async {
+        do {
+            templateOrder = try await database.templateOrder()
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func setTemplateOrder(_ order: TemplateOrder) async {
+        templateOrder = order
+
+        do {
+            try await database.setTemplateOrder(order)
+        } catch {
+            errorMessage = Self.orderSaveFailedMessage
         }
     }
 
@@ -220,7 +228,7 @@ public extension HomeModel {
 private extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "記録できませんでした"
-    static let templateOrderKey = "home.templateOrder"
+    static let orderSaveFailedMessage = "並べ順を保存できませんでした"
     static let frequentDays = 90
 
     var monthDays: [EntryDay] {
