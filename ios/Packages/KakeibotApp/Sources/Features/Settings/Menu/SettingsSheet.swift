@@ -51,21 +51,38 @@ struct SettingsSheet: View {
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
-                    sectionTitle("期間")
+                    sectionTitle("期間と予算")
 
-                    NavigationLink {
-                        MonthStartDayView(
-                            model: MonthStartDayModel(
-                                database: database,
-                                today: LocalDate(Date(), in: .current)
+                    VStack(spacing: 0) {
+                        NavigationLink {
+                            MonthStartDayView(
+                                model: MonthStartDayModel(
+                                    database: database,
+                                    today: LocalDate(Date(), in: .current)
+                                )
                             )
-                        )
-                    } label: {
-                        row(
-                            "月の始まり",
-                            systemImage: "calendar",
-                            value: PeriodText.startDay(monthStartDay)
-                        )
+                        } label: {
+                            row(
+                                "月の始まり",
+                                systemImage: "calendar",
+                                value: PeriodText.startDay(monthStartDay)
+                            )
+                        }
+
+                        Rectangle()
+                            .fill(Palette.gold.opacity(0.1))
+                            .frame(height: 0.5)
+
+                        NavigationLink {
+                            BudgetListView(
+                                model: BudgetListModel(
+                                    database: database,
+                                    today: LocalDate(Date(), in: .current)
+                                )
+                            )
+                        } label: {
+                            row("予算", systemImage: "chart.bar")
+                        }
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 14)

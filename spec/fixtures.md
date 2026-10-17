@@ -13,6 +13,16 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | 判定の fixtures | `valid` と `invalid` の 2 つの配列を持つオブジェクト。`valid` は受け付け、`invalid` は受け付けない |
 | 計算の fixtures | 入力と期待値を並べたオブジェクトの配列。1 つのオブジェクトが 1 つのテストになる |
 
+## budget
+
+`spec/fixtures/budget` のファイルは、次の表のとおりである。
+
+| ファイル | 試すこと | 項目 |
+| --- | --- | --- |
+| `budget-amount.json` | ある月に使う予算。`fromMonth` がその月以前でいちばん新しい行の額 | `budgets`（`category`・`fromMonth`・`amount`）、`category`、`month`、`amount` |
+
+`category` が空なら月全体の予算を、名前ならそのカテゴリの予算を表す。月全体とカテゴリの予算は混ぜない。
+
 ## category
 
 `spec/fixtures/category` のファイルは、次の表のとおりである。

@@ -1,0 +1,75 @@
+[
+  {
+    "budgets": [],
+    "category": null,
+    "month": "2026-10",
+    "amount": null
+  },
+  {
+    "budgets": [
+      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+      { "category": null, "fromMonth": "2026-04", "amount": 120000 },
+      { "category": null, "fromMonth": "2026-07", "amount": null }
+    ],
+    "category": null,
+    "month": "2025-12",
+    "amount": null
+  },
+  {
+    "budgets": [
+      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+      { "category": null, "fromMonth": "2026-04", "amount": 120000 },
+      { "category": null, "fromMonth": "2026-07", "amount": null }
+    ],
+    "category": null,
+    "month": "2026-03",
+    "amount": 100000
+  },
+  {
+    "budgets": [
+      { "category": null, "fromMonth": "2026-04", "amount": 120000 },
+      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+      { "category": null, "fromMonth": "2026-07", "amount": null }
+    ],
+    "category": null,
+    "month": "2026-04",
+    "amount": 120000
+  },
+  {
+    "budgets": [
+      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+      { "category": null, "fromMonth": "2026-04", "amount": 120000 },
+      { "category": null, "fromMonth": "2026-07", "amount": null }
+    ],
+    "category": null,
+    "month": "2026-08",
+    "amount": null
+  },
+  {
+    "budgets": [
+      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+      { "category": "food", "fromMonth": "2026-02", "amount": 30000 }
+    ],
+    "category": "food",
+    "month": "2026-01",
+    "amount": null
+  },
+  {
+    "budgets": [
+      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+      { "category": "food", "fromMonth": "2026-02", "amount": 30000 },
+      { "category": "daily", "fromMonth": "2026-02", "amount": 8000 }
+    ],
+    "category": "food",
+    "month": "2026-05",
+    "amount": 30000
+  },
+  {
+    "budgets": [
+      { "category": "food", "fromMonth": "2026-02", "amount": 30000 }
+    ],
+    "category": null,
+    "month": "2026-05",
+    "amount": null
+  }
+]
