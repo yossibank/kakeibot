@@ -115,8 +115,10 @@ public struct MainView: View {
             }
 
             Tab(value: MainTab.review) {
-                ReviewView(model: review)
-                    .tabContent()
+                ReviewView(model: review) { id in
+                    sheet = .edit(id)
+                }
+                .tabContent()
             }
 
             Tab(value: MainTab.assets) {

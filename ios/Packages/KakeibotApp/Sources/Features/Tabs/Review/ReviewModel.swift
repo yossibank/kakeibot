@@ -64,11 +64,11 @@ public extension ReviewModel {
     }
 
     var total: Int {
-        total(of: summary)
+        total(of: kind)
     }
 
     var change: Int {
-        total - total(of: previousSummary)
+        total - total(of: kind, in: previousSummary)
     }
 
     var budgetUsage: BudgetUsage? {
@@ -119,6 +119,10 @@ public extension ReviewModel {
         }
 
         return Self.sorted(ranked)
+    }
+
+    func total(of kind: ReviewKind) -> Int {
+        total(of: kind, in: summary)
     }
 
     func rows(for share: Share) -> [EntryRowItem] {
@@ -263,7 +267,10 @@ private extension ReviewModel {
             .map(\.share)
     }
 
-    func total(of summary: ReviewSummary) -> Int {
+    func total(
+        of kind: ReviewKind,
+        in summary: ReviewSummary
+    ) -> Int {
         switch kind {
         case .expense: summary.expense.total
         case .income: summary.income.total

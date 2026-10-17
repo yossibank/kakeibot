@@ -6,24 +6,15 @@ struct ReviewView: View {
     @Bindable var model: ReviewModel
 
     @State private var openShare: ReviewModel.Share?
+    @State private var pendingEntry: Entry.ID?
+
+    let onOpenEntry: (Entry.ID) -> Void
 
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
                 header
-
-                VStack(alignment: .leading, spacing: 8) {
-                    CapsulePicker(
-                        selection: kindBinding,
-                        options: Self.kindOptions
-                    )
-
-                    CapsulePicker(
-                        selection: scaleBinding,
-                        options: Self.scaleOptions
-                    )
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                periodBar
 
                 ZStack(alignment: .top) {
                     content
@@ -45,12 +36,16 @@ struct ReviewView: View {
             move(direction)
         }
         .sensoryFeedback(.selection, trigger: model.period)
-        .sheet(item: $openShare) { share in
+        .sensoryFeedback(.selection, trigger: model.kind)
+        .sheet(item: $openShare, onDismiss: openPendingEntry) { share in
             ReviewShareSheet(
                 share: share,
                 periodTitle: periodTitle,
                 rows: model.rows(for: share)
-            )
+            ) { id in
+                pendingEntry = id
+                openShare = nil
+            }
         }
         .background {
             Rectangle()
@@ -70,7 +65,18 @@ private extension ReviewView {
 
             Spacer()
 
+            CapsulePicker(
+                selection: scaleBinding,
+                options: Self.scaleOptions
+            )
+        }
+    }
+
+    var periodBar: some View {
+        HStack {
             periodButton(systemImage: "chevron.left", count: -1)
+
+            Spacer()
 
             VStack(spacing: 1) {
                 Text(periodTitle)
@@ -87,6 +93,8 @@ private extension ReviewView {
                 }
             }
 
+            Spacer()
+
             periodButton(systemImage: "chevron.right", count: 1)
                 .disabled(!model.canMoveForward)
         }
@@ -94,7 +102,13 @@ private extension ReviewView {
 
     var content: some View {
         VStack(spacing: 12) {
-            totalCard
+            HStack(spacing: 8) {
+                ForEach(ReviewKind.allCases, id: \.self) { kind in
+                    kindTile(kind)
+                }
+            }
+
+            detailCard
 
             if model.kind != .balance {
                 sharesCard(
@@ -112,25 +126,16 @@ private extension ReviewView {
         }
     }
 
-    var totalCard: some View {
+    var detailCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SectionTitle(totalTitle)
+            HStack(spacing: 6) {
+                Image(systemName: comparisonImage)
+                    .font(.caption)
+                    .foregroundStyle(Palette.gold)
 
-            Text(AmountText.text(model.total))
-                .font(.system(size: 32, weight: .bold, design: .serif))
-                .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
-
-            Text(comparisonText)
-                .font(.footnote)
-                .foregroundStyle(Palette.mist)
-
-            if model.kind == .balance {
-                VStack(spacing: 6) {
-                    balanceLine("収入", amount: model.summary.income.total)
-                    balanceLine("支出", amount: model.summary.expense.total)
-                }
-                .padding(.top, 4)
+                Text(comparisonText)
+                    .font(.footnote)
+                    .foregroundStyle(Palette.ink)
             }
 
             if let usage = model.budgetUsage {
@@ -172,22 +177,41 @@ private extension ReviewView {
         .buttonStyle(.plain)
     }
 
-    func balanceLine(
-        _ title: String,
-        amount: Int
-    ) -> some View {
-        HStack {
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
+    func kindTile(_ kind: ReviewKind) -> some View {
+        let isSelected = kind == model.kind
+        let fill = isSelected ? Palette.gold.opacity(0.14) : Color.clear
+        let rim = isSelected ? Palette.gold : Palette.gold.opacity(0.2)
+        let titleColor = isSelected ? Palette.gold : Palette.mist
+        let amountColor = isSelected ? Palette.champagne : Palette.ink
 
-            Spacer()
+        return Button {
+            Task {
+                await model.setKind(kind)
+            }
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(Self.title(of: kind))
+                    .font(.caption)
+                    .foregroundStyle(titleColor)
 
-            Text(AmountText.text(amount))
-                .font(.system(size: 15, design: .serif))
-                .monospacedDigit()
-                .foregroundStyle(Palette.ink)
+                Text(AmountText.text(model.total(of: kind)))
+                    .font(.system(size: 17, design: .serif))
+                    .monospacedDigit()
+                    .foregroundStyle(amountColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(fill, in: RoundedRectangle(cornerRadius: 16))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(rim, lineWidth: 1)
+            }
+            .contentShape(.rect)
         }
+        .buttonStyle(.plain)
     }
 
     func sharesCard(
@@ -213,6 +237,19 @@ private extension ReviewView {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 4)
+
+                    if let others = Self.otherShares(shares) {
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(Palette.dusk)
+                                .frame(width: 8, height: 8)
+
+                            Text("その他 \(others.count) 件")
+                                .font(.caption)
+                                .foregroundStyle(Palette.mist)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
                 }
 
                 ForEach(shares) { share in
@@ -286,27 +323,14 @@ private extension ReviewView {
 }
 
 private extension ReviewView {
-    static let kindOptions: [CapsulePicker<ReviewKind>.Option] = [
-        .init("支出", value: .expense),
-        .init("収入", value: .income),
-        .init("収支", value: .balance)
-    ]
+    static let chartLimit = 5
+    static let minorRatio = 0.05
 
     static let scaleOptions: [CapsulePicker<ReviewPeriod.Scale>.Option] = [
         .init("週", value: .week),
         .init("月", value: .month),
         .init("年", value: .year)
     ]
-
-    var kindBinding: Binding<ReviewKind> {
-        Binding {
-            model.kind
-        } set: { kind in
-            Task {
-                await model.setKind(kind)
-            }
-        }
-    }
 
     var scaleBinding: Binding<ReviewPeriod.Scale> {
         Binding {
@@ -341,11 +365,17 @@ private extension ReviewView {
     }
 
     var totalTitle: String {
-        switch model.kind {
-        case .expense: "支出の合計"
-        case .income: "収入の合計"
-        case .balance: "収支"
+        Self.title(of: model.kind)
+    }
+
+    var comparisonImage: String {
+        let change = model.change
+
+        if change > 0 {
+            return "arrow.up.right"
         }
+
+        return change < 0 ? "arrow.down.right" : "equal"
     }
 
     var comparisonText: String {
@@ -364,6 +394,14 @@ private extension ReviewView {
         return "\(previous)と同じ"
     }
 
+    static func title(of kind: ReviewKind) -> String {
+        switch kind {
+        case .expense: "支出"
+        case .income: "収入"
+        case .balance: "収支"
+        }
+    }
+
     static func previousName(of scale: ReviewPeriod.Scale) -> String {
         switch scale {
         case .week: "前の週"
@@ -376,18 +414,53 @@ private extension ReviewView {
         "\(Int((ratio * 100).rounded()))%"
     }
 
+    static func otherShares(
+        _ shares: [ReviewModel.Share]
+    ) -> [ReviewModel.Share]? {
+        let main = shares
+            .prefix(chartLimit)
+            .prefix(while: { $0.ratio >= minorRatio })
+
+        let others = Array(shares.dropFirst(main.count))
+        return others.count > 1 ? others : nil
+    }
+
     static func slices(
         _ shares: [ReviewModel.Share]
     ) -> [DonutChart<AnyHashable>.Slice] {
-        shares.map { share in
+        let others = otherShares(shares) ?? []
+        let main = shares.dropLast(others.count)
+
+        let slices = main.map { share in
             let color = share.icon.flatMap { Color(hex: $0.color) }
 
-            return DonutChart.Slice(
+            return DonutChart<AnyHashable>.Slice(
                 id: share.id,
                 value: share.amount,
                 color: color ?? Palette.gold
             )
         }
+
+        guard !others.isEmpty else {
+            return slices
+        }
+
+        let other = DonutChart<AnyHashable>.Slice(
+            id: "others",
+            value: others.reduce(0) { $0 + $1.amount },
+            color: Palette.dusk
+        )
+
+        return slices + [other]
+    }
+
+    func openPendingEntry() {
+        guard let pendingEntry else {
+            return
+        }
+
+        self.pendingEntry = nil
+        onOpenEntry(pendingEntry)
     }
 
     func move(_ direction: PageSwipeDirection) {

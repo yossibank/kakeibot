@@ -8,6 +8,7 @@ struct ReviewShareSheet: View {
     let share: ReviewModel.Share
     let periodTitle: String
     let rows: [EntryRowItem]
+    let onOpen: (Entry.ID) -> Void
 
     var body: some View {
         VStack(spacing: 14) {
@@ -47,14 +48,20 @@ struct ReviewShareSheet: View {
             ScrollView {
                 LazyVStack(spacing: 0) {
                     ForEach(rows) { row in
-                        EntryRow(
-                            icon: row.icon,
-                            title: row.title,
-                            tag: row.tag,
-                            detail: row.detail,
-                            amount: row.amount,
-                            type: row.type
-                        )
+                        Button {
+                            onOpen(row.id)
+                        } label: {
+                            EntryRow(
+                                icon: row.icon,
+                                title: row.title,
+                                tag: row.tag,
+                                detail: row.detail,
+                                amount: row.amount,
+                                type: row.type
+                            )
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                         .overlay(alignment: .top) {
                             Rectangle()
                                 .fill(Palette.gold.opacity(0.1))
