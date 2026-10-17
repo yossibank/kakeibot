@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import Notifications
 import Observation
 import Store
 import SwiftUI
@@ -10,9 +11,14 @@ final class AppModel {
     private(set) var launch: Launch = .opening
 
     private let openDatabase: @Sendable () throws -> AppDatabase
+    private let scheduler: NotificationScheduler
 
-    init(openDatabase: @escaping @Sendable () throws -> AppDatabase) {
+    init(
+        openDatabase: @escaping @Sendable () throws -> AppDatabase,
+        scheduler: NotificationScheduler = NotificationScheduler()
+    ) {
         self.openDatabase = openDatabase
+        self.scheduler = scheduler
     }
 }
 
@@ -72,13 +78,54 @@ extension AppModel {
         switch launch {
         case let .onboarding(database), let .ready(database):
             await Self.generateRecurring(in: database)
+            await scheduleNotifications(in: database)
         case .opening, .failed:
+            return
+        }
+    }
+
+    func observeNotifications(in database: AppDatabase) async {
+        let start = LocalDate(Date(), in: .current)
+
+        do {
+            for try await input in database.notificationInputUpdates(
+                from: start
+            ) {
+                await schedule(input)
+            }
+        } catch {
             return
         }
     }
 }
 
 private extension AppModel {
+    func scheduleNotifications(in database: AppDatabase) async {
+        let today = LocalDate(Date(), in: .current)
+
+        let input = try? await database.notificationInput(from: today)
+
+        guard let input else {
+            return
+        }
+
+        await schedule(input)
+    }
+
+    func schedule(_ input: NotificationInput) async {
+        let today = LocalDate(Date(), in: .current)
+
+        let plan = NotificationPlan.notifications(
+            today: today,
+            reminderTime: input.reminderTime,
+            recordedDates: input.recordedDates,
+            recurrings: input.recurrings,
+            names: input.names
+        )
+
+        await scheduler.apply(plan, now: Date(), timeZone: .current)
+    }
+
     static func generateRecurring(in database: AppDatabase) async {
         let today = LocalDate(Date(), in: .current)
         try? await database.generateRecurringEntries(through: today, at: Date())
