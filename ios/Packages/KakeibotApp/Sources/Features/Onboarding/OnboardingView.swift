@@ -30,6 +30,10 @@ public struct OnboardingView: View {
                     .transition(.page(forward: model.isMovingForward))
             }
             .frame(maxHeight: .infinity, alignment: .top)
+            .contentShape(.rect)
+            .onPageSwipe { direction in
+                turnPage(direction)
+            }
 
             if let errorMessage = model.errorMessage {
                 Text(errorMessage)
@@ -72,9 +76,7 @@ private extension OnboardingView {
                     .frame(width: 44, height: 44)
             } else {
                 RingButton(systemImage: "chevron.left") {
-                    withAnimation(.snappy) {
-                        model.back()
-                    }
+                    turnPage(.backward)
                 }
             }
 
@@ -316,14 +318,20 @@ private extension OnboardingView {
 
     func next() async {
         guard model.isLastPage else {
-            withAnimation(.snappy) {
-                model.next()
-            }
-
+            turnPage(.forward)
             return
         }
 
         await finish()
+    }
+
+    func turnPage(_ direction: PageSwipeDirection) {
+        withAnimation(.snappy) {
+            switch direction {
+            case .forward: model.next()
+            case .backward: model.back()
+            }
+        }
     }
 
     func finish() async {

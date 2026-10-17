@@ -60,11 +60,13 @@ private extension RecordsView {
                 Text("\(String(model.month.year))年 \(model.month.month)月")
                     .font(.system(size: 15, design: .serif))
                     .foregroundStyle(Palette.champagne)
+                    .contentTransition(monthTextTransition)
 
                 Text(model.periodText)
                     .font(.system(size: 10))
                     .monospacedDigit()
                     .foregroundStyle(Palette.mist)
+                    .contentTransition(monthTextTransition)
             }
 
             monthButton(systemImage: "chevron.right", months: 1)
@@ -203,6 +205,10 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
+    var monthTextTransition: ContentTransition {
+        .numericText(countsDown: !isMovingForward)
+    }
+
     static func weekdayColor(for date: LocalDate) -> Color {
         if Holiday.contains(date) || date.weekday == .sunday {
             return Palette.holiday
