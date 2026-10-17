@@ -119,8 +119,9 @@ KakeibotApp/
 │   │   │   ├── Banner/      画面の下に出す知らせ
 │   │   │   ├── Card/        カードの見た目、見出し
 │   │   │   ├── Button/      輪のボタン、大きなボタン、見出しの横のボタン
-│   │   │   ├── Budget/      予算の使い具合の色と棒
+│   │   │   ├── Budget/      予算の使い具合の色と棒、残りの文字
 │   │   │   ├── Calendar/    月のカレンダー、曜日の名前と色
+│   │   │   ├── Chart/       円グラフ、割合の棒
 │   │   │   ├── Chip/        財布・メモなどのチップ
 │   │   │   ├── Dial/        ダイヤルの面と目盛り、半円のダイヤル
 │   │   │   ├── Entry/       記録の 1 行
@@ -144,7 +145,7 @@ KakeibotApp/
 │   ├── Features/
 │   │   ├── Entry/
 │   │   ├── Launch/          起動の印の動き
-│   │   ├── Main/            タブの骨組みと、まだ作っていないタブの表示
+│   │   ├── Main/            タブの骨組み
 │   │   ├── Onboarding/      最初の設定のチュートリアル
 │   │   ├── Period/          期間の範囲と月の始まりの書き方、いまの期間のカード、日を選ぶマス
 │   │   ├── Settings/
@@ -158,6 +159,7 @@ KakeibotApp/
 │   │   │   ├── Period/      月の始まりの設定
 │   │   │   ├── Recurring/
 │   │   │   ├── Rewards/
+│   │   │   ├── Sample/      確かめ用のテストデータ（#if DEBUG）
 │   │   │   ├── Templates/
 │   │   │   ├── Themes/
 │   │   │   └── Wallets/

@@ -88,6 +88,32 @@ struct EntryWriteTests {
     }
 
     @Test
+    func savesEntriesTogetherOrNotAtAll() async throws {
+        let setup = try await Setup()
+        var invalid = setup.draft
+        invalid.amount = 0
+
+        try await setup.database.saveEntries(
+            [setup.draft, setup.draft],
+            at: setup.now
+        )
+
+        let saved = try setup.database.snapshot().entries.count
+
+        await #expect(throws: (any Error).self) {
+            try await setup.database.saveEntries(
+                [setup.draft, invalid],
+                at: setup.now
+            )
+        }
+
+        let after = try setup.database.snapshot().entries.count
+
+        #expect(saved == 2)
+        #expect(after == 2)
+    }
+
+    @Test
     func deletesEntry() async throws {
         let setup = try await Setup()
 

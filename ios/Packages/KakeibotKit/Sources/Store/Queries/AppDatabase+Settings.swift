@@ -51,6 +51,24 @@ public extension AppDatabase {
         }
     }
 
+    func reviewScale() async throws -> ReviewPeriod.Scale {
+        try await writer.read { db in
+            let key = Setting.Key.reviewScale
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting.flatMap { ReviewPeriod.Scale(rawValue: $0.value) }
+                ?? .month
+        }
+    }
+
+    func reviewKind() async throws -> ReviewKind {
+        try await writer.read { db in
+            let key = Setting.Key.reviewKind
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting.flatMap { ReviewKind(rawValue: $0.value) }
+                ?? .expense
+        }
+    }
+
     func hasOpenedCategoryMenu() async throws -> Bool {
         try await writer.read { db in
             let key = Setting.Key.categoryMenuOpened

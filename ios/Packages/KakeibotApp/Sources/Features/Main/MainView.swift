@@ -9,6 +9,7 @@ public struct MainView: View {
     @State private var sheet: Sheet?
     @State private var home: HomeModel
     @State private var records: RecordsModel
+    @State private var review: ReviewModel
     @State private var assets: AssetsModel
     @State private var draft: EntryModel
     @State private var notice: EntryNoticeModel
@@ -29,6 +30,13 @@ public struct MainView: View {
 
         _records = State(
             initialValue: RecordsModel(
+                database: database,
+                today: today
+            )
+        )
+
+        _review = State(
+            initialValue: ReviewModel(
                 database: database,
                 today: today
             )
@@ -97,14 +105,20 @@ public struct MainView: View {
                         Task {
                             await notice.delete(id, in: records.list)
                         }
+                    },
+                    onAddEntry: { date in
+                        draft.date = date
+                        sheet = .new
                     }
                 )
                 .tabContent()
             }
 
             Tab(value: MainTab.review) {
-                ComingSoonView(title: "振り返り", systemImage: "chart.pie")
-                    .tabContent()
+                ReviewView(model: review) { id in
+                    sheet = .edit(id)
+                }
+                .tabContent()
             }
 
             Tab(value: MainTab.assets) {
@@ -182,6 +196,21 @@ public struct MainView: View {
             await records.loadLayout()
         }
         .task {
+            await review.observe()
+        }
+        .task {
+            await review.loadSelection()
+        }
+        .task {
+            await review.observeBudgets()
+        }
+        .task {
+            await review.observeMonthStartDay()
+        }
+        .task {
+            await review.observeWeekStart()
+        }
+        .task {
             await assets.observe()
         }
         .task {
@@ -193,6 +222,7 @@ public struct MainView: View {
             home.today = LocalDate(Date(), in: .current)
             assets.today = home.today
             records.today = home.today
+            review.today = home.today
             prepareDraft()
         }
     }

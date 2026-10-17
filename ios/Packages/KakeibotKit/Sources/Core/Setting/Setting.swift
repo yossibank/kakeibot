@@ -24,6 +24,8 @@ public extension Setting {
         case templateOrder = "template_order"
         case categoryMenuOpened = "category_menu_opened"
         case recordsLayout = "records_layout"
+        case reviewScale = "review_scale"
+        case reviewKind = "review_kind"
     }
 }
 

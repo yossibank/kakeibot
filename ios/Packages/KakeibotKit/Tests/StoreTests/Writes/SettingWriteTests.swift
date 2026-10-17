@@ -99,6 +99,23 @@ struct SettingWriteTests {
     }
 
     @Test
+    func savesReviewSelection() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let initialScale = try await database.reviewScale()
+        let initialKind = try await database.reviewKind()
+        try await database.setReviewScale(.year)
+        try await database.setReviewKind(.balance)
+        let scale = try await database.reviewScale()
+        let kind = try await database.reviewKind()
+
+        #expect(initialScale == .month)
+        #expect(initialKind == .expense)
+        #expect(scale == .year)
+        #expect(kind == .balance)
+    }
+
+    @Test
     func savesCategoryMenuOpened() async throws {
         let database = try AppDatabase.inMemory()
 

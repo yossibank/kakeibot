@@ -15,30 +15,18 @@ public extension AppDatabase {
         at now: Date
     ) async throws -> Entry {
         try await writer.write { db in
-            let entry = try Self.entry(
-                from: draft,
-                editing: id,
-                in: db,
-                at: now
-            )
+            try Self.saveEntry(draft, editing: id, in: db, at: now)
+        }
+    }
 
-            let belongs = try Self.tag(
-                entry.tagId,
-                belongsTo: entry.categoryId,
-                in: db
-            )
-
-            guard belongs else {
-                throw WriteError.tagMismatch
+    func saveEntries(
+        _ drafts: [EntryDraft],
+        at now: Date
+    ) async throws {
+        try await writer.write { db in
+            for draft in drafts {
+                try Self.saveEntry(draft, editing: nil, in: db, at: now)
             }
-
-            try entry.save(db)
-
-            if entry.type == .expense {
-                try NoSpendDay.deleteOne(db, key: entry.date)
-            }
-
-            return entry
         }
     }
 
@@ -68,6 +56,39 @@ public extension AppDatabase {
 }
 
 private extension AppDatabase {
+    @discardableResult
+    static func saveEntry(
+        _ draft: EntryDraft,
+        editing id: Entry.ID?,
+        in db: Database,
+        at now: Date
+    ) throws -> Entry {
+        let entry = try Self.entry(
+            from: draft,
+            editing: id,
+            in: db,
+            at: now
+        )
+
+        let belongs = try Self.tag(
+            entry.tagId,
+            belongsTo: entry.categoryId,
+            in: db
+        )
+
+        guard belongs else {
+            throw WriteError.tagMismatch
+        }
+
+        try entry.save(db)
+
+        if entry.type == .expense {
+            try NoSpendDay.deleteOne(db, key: entry.date)
+        }
+
+        return entry
+    }
+
     static func entry(
         from draft: EntryDraft,
         editing id: Entry.ID?,

@@ -10,6 +10,7 @@ struct RecordsView: View {
 
     let onOpenEntry: (Entry.ID) -> Void
     let onDelete: (Entry.ID) -> Void
+    let onAddEntry: (LocalDate) -> Void
 
     var body: some View {
         ScrollView {
@@ -155,8 +156,23 @@ private extension RecordsView {
                     .padding(.bottom, 12)
             }
 
-            if model.canMarkNoSpend(on: date) {
-                noSpendButton(date)
+            HStack(spacing: 0) {
+                dayButton("この日に入力", systemImage: "plus") {
+                    onAddEntry(date)
+                }
+
+                if model.canMarkNoSpend(on: date) {
+                    Rectangle()
+                        .fill(Palette.gold.opacity(0.1))
+                        .frame(width: 1, height: 24)
+
+                    noSpendButton(date)
+                }
+            }
+            .overlay(alignment: .top) {
+                Rectangle()
+                    .fill(Palette.gold.opacity(0.1))
+                    .frame(height: 1)
             }
         }
         .padding(.horizontal, 16)
@@ -269,23 +285,26 @@ private extension RecordsView {
         let title = isMarked ? "支出なしの印を外す" : "支出なしの日にする"
         let image = isMarked ? "leaf.fill" : "leaf"
 
-        return Button {
+        return dayButton(title, systemImage: image) {
             Task {
                 await model.toggleNoSpendDay(on: date)
             }
-        } label: {
-            Label(title, systemImage: image)
+        }
+    }
+
+    func dayButton(
+        _ title: String,
+        systemImage: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
                 .font(.footnote)
                 .foregroundStyle(Palette.gold)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(Palette.gold.opacity(0.1))
-                .frame(height: 1)
-        }
     }
 
     func dayCard(_ day: EntryDay) -> some View {

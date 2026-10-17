@@ -41,6 +41,20 @@ public extension AppDatabase {
         }
     }
 
+    func setReviewScale(_ scale: ReviewPeriod.Scale) async throws {
+        try await writer.write { db in
+            let setting = Setting(key: .reviewScale, value: scale.rawValue)
+            try setting.save(db)
+        }
+    }
+
+    func setReviewKind(_ kind: ReviewKind) async throws {
+        try await writer.write { db in
+            let setting = Setting(key: .reviewKind, value: kind.rawValue)
+            try setting.save(db)
+        }
+    }
+
     func markCategoryMenuOpened() async throws {
         try await writer.write { db in
             let setting = Setting(key: .categoryMenuOpened, value: "true")

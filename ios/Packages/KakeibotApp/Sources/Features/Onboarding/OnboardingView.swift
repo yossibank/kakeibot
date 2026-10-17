@@ -130,7 +130,7 @@ private extension OnboardingView {
                 .multilineTextAlignment(.center)
 
             VStack(spacing: 0) {
-                stepRow("月の始まり", systemImage: "calendar")
+                stepRow("月と週の始まり", systemImage: "calendar")
                 hairline
                 stepRow("月の予算", systemImage: "chart.bar")
                 hairline
@@ -145,7 +145,7 @@ private extension OnboardingView {
         ScrollView {
             VStack(spacing: 18) {
                 pageHeader(
-                    "月の始まり",
+                    "月と週の始まり",
                     message: "給料日に合わせると、給料日から次の給料日の前の日までを 1 か月として数えます"
                 )
 
@@ -159,6 +159,22 @@ private extension OnboardingView {
                         await model.monthStart.choose(day)
                     }
                 }
+
+                HStack(spacing: 12) {
+                    Text("週の始まり")
+                        .font(.subheadline)
+                        .foregroundStyle(Palette.ink)
+
+                    Spacer()
+
+                    CapsulePicker(
+                        selection: weekStartBinding,
+                        options: Weekday.weekStartOptions
+                    )
+                }
+                .frame(minHeight: 52)
+                .padding(.horizontal, 14)
+                .card()
             }
             .padding(.vertical, 8)
         }
@@ -314,6 +330,16 @@ private extension OnboardingView {
 
     var budgetColor: Color {
         model.budget.totalAmount == nil ? Palette.dusk : Palette.champagne
+    }
+
+    var weekStartBinding: Binding<Weekday> {
+        Binding {
+            model.weekStart
+        } set: { weekStart in
+            Task {
+                await model.chooseWeekStart(weekStart)
+            }
+        }
     }
 
     func next() async {
