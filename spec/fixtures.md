@@ -77,6 +77,17 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | `export-v1.json` | 読み込んで書き出すと同じ JSON になる。DB に入れて読み出しても同じになる | 書き出しの JSON そのもの |
 | `export-v1-header.json` | 読み込める `format` と `version` の判定 | `valid`、`invalid`（`format` と `version` のオブジェクト） |
 
+## review
+
+`spec/fixtures/review` のファイルは、次の表のとおりである。
+
+| ファイル | 試すこと | 項目 |
+| --- | --- | --- |
+| `review-period.json` | 日付を含む週・月・年の範囲と、1 つ前の範囲 | `scale`（`week` `month` `year`）、`date`、`monthStartDay`、`weekStart`、`start`、`end`、`previousStart`、`previousEnd` |
+| `review-summary.json` | 範囲の中の支出と収入の合計、カテゴリと財布ごとの内訳 | `start`、`end`、`entries`（`type`・`amount`・`date`・`category`・`wallet`）、`expense`・`income`（`total`、名前ごとの `categories` と `wallets`）、`balance` |
+
+振替は、どちらの合計にも入れない。
+
 ## wallet
 
 `spec/fixtures/wallet` のファイルは、次の表のとおりである。
