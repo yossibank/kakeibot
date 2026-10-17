@@ -6,6 +6,7 @@ struct RecordsView: View {
     @Bindable var model: RecordsModel
 
     @State private var openId: Entry.ID?
+    @State private var isMovingForward = true
 
     let onOpenEntry: (Entry.ID) -> Void
     let onDelete: (Entry.ID) -> Void
@@ -14,17 +15,11 @@ struct RecordsView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 header
-                summary
 
-                if model.days.isEmpty {
-                    Text("この月の記録はありません")
-                        .font(.footnote)
-                        .foregroundStyle(Palette.mist)
-                        .padding(.vertical, 40)
-                }
-
-                ForEach(model.days, id: \.date) { day in
-                    dayCard(day)
+                ZStack(alignment: .top) {
+                    monthContent
+                        .id(model.month)
+                        .transition(.page(forward: isMovingForward))
                 }
 
                 if let errorMessage = model.errorMessage {
@@ -73,6 +68,23 @@ private extension RecordsView {
             }
 
             monthButton(systemImage: "chevron.right", months: 1)
+        }
+    }
+
+    var monthContent: some View {
+        VStack(spacing: 12) {
+            summary
+
+            if model.days.isEmpty {
+                Text("この月の記録はありません")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.mist)
+                    .padding(.vertical, 40)
+            }
+
+            ForEach(model.days, id: \.date) { day in
+                dayCard(day)
+            }
         }
     }
 
@@ -221,6 +233,7 @@ private extension RecordsView {
 
     func move(months: Int) {
         openId = nil
+        isMovingForward = months > 0
 
         withAnimation(.snappy) {
             model.move(months: months)

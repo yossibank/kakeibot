@@ -13,8 +13,6 @@ public struct EntrySheet: View {
     @State private var isConfirmingDiscard = false
     @State private var categoryMenu: CategoryMenu?
     @State private var pressingCategory: EntryCategory.ID?
-
-    @AppStorage("entry.hasOpenedCategoryMenu") private var hasOpenedMenu = false
     @State private var sheetWidth: CGFloat = 0
     @State private var drawerHeight: CGFloat = 0
 
@@ -369,7 +367,7 @@ private extension EntrySheet {
                 current: categoryPage ?? 0
             )
 
-            if !hasOpenedMenu {
+            if !model.hasOpenedCategoryMenu {
                 Label("長押しで編集・非表示", systemImage: "hand.tap")
                     .font(.caption2)
                     .foregroundStyle(Palette.mist)
@@ -884,7 +882,10 @@ private extension EntrySheet {
     ) {
         setEnteringAmount(false)
         pressingCategory = nil
-        hasOpenedMenu = true
+
+        Task {
+            await model.markCategoryMenuOpened()
+        }
 
         withAnimation(.snappy(duration: 0.25)) {
             categoryMenu = CategoryMenu(category: category, frame: frame)

@@ -26,6 +26,7 @@ public final class EntryModel {
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
     public private(set) var balances: [Wallet.ID: Int] = [:]
+    public private(set) var hasOpenedCategoryMenu = true
     public private(set) var errorMessage: String?
     public private(set) var errorCount = 0
 
@@ -253,6 +254,7 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
             allTemplates = try await database.templates()
+            hasOpenedCategoryMenu = try await database.hasOpenedCategoryMenu()
             try await loadBalances()
             try await loadEntry()
 
@@ -361,6 +363,20 @@ public extension EntryModel {
             )
 
             await reloadCategories()
+        } catch {
+            report(error)
+        }
+    }
+
+    func markCategoryMenuOpened() async {
+        guard !hasOpenedCategoryMenu else {
+            return
+        }
+
+        hasOpenedCategoryMenu = true
+
+        do {
+            try await database.markCategoryMenuOpened()
         } catch {
             report(error)
         }

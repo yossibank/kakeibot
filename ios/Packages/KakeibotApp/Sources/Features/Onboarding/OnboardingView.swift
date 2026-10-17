@@ -27,7 +27,7 @@ public struct OnboardingView: View {
             ZStack {
                 page
                     .id(model.page)
-                    .transition(pageTransition)
+                    .transition(.page(forward: model.isMovingForward))
             }
             .frame(maxHeight: .infinity, alignment: .top)
 
@@ -306,16 +306,6 @@ private extension OnboardingView {
 }
 
 private extension OnboardingView {
-    var pageTransition: AnyTransition {
-        let edge: Edge = model.isMovingForward ? .trailing : .leading
-        let removal: Edge = model.isMovingForward ? .leading : .trailing
-
-        return .asymmetric(
-            insertion: .move(edge: edge).combined(with: .opacity),
-            removal: .move(edge: removal).combined(with: .opacity)
-        )
-    }
-
     var budgetText: String {
         model.budget.totalAmount.map { AmountText.text($0) } ?? "なし"
     }

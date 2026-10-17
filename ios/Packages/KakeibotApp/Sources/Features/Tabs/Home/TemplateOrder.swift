@@ -1,18 +1,6 @@
-import Foundation
-
-public enum TemplateOrder: String, CaseIterable, Identifiable, Sendable {
-    case manual
-    case frequent
-    case category
-    case amount
-    case name
-}
+import Core
 
 public extension TemplateOrder {
-    var id: Self {
-        self
-    }
-
     var title: String {
         switch self {
         case .manual: "並べた順"

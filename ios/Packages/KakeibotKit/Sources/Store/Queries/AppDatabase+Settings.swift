@@ -22,6 +22,23 @@ public extension AppDatabase {
         }
     }
 
+    func templateOrder() async throws -> TemplateOrder {
+        try await writer.read { db in
+            let key = Setting.Key.templateOrder
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting.flatMap { TemplateOrder(rawValue: $0.value) }
+                ?? .manual
+        }
+    }
+
+    func hasOpenedCategoryMenu() async throws -> Bool {
+        try await writer.read { db in
+            let key = Setting.Key.categoryMenuOpened
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting?.value == "true"
+        }
+    }
+
     func isOnboardingCompleted() async throws -> Bool {
         try await writer.read { db in
             let key = Setting.Key.onboardingCompleted
