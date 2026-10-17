@@ -5,8 +5,29 @@ import Testing
 @MainActor
 struct AppModelTests {
     @Test
-    func opensDatabase() async {
+    func asksFirstSetupThenOpens() async {
         let model = AppModel(openDatabase: AppDatabase.inMemory)
+
+        await model.open()
+
+        guard case .onboarding = model.launch else {
+            Issue.record("Expected onboarding, got \(model.launch)")
+            return
+        }
+
+        model.finishOnboarding()
+
+        guard case .ready = model.launch else {
+            Issue.record("Expected ready, got \(model.launch)")
+            return
+        }
+    }
+
+    @Test
+    func opensDatabaseAfterFirstSetup() async throws {
+        let database = try AppDatabase.inMemory()
+        try await database.completeOnboarding()
+        let model = AppModel { database }
 
         await model.open()
 

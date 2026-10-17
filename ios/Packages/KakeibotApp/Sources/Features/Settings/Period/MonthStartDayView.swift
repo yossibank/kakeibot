@@ -23,11 +23,14 @@ public struct MonthStartDayView: View {
 
             ScrollView {
                 VStack(spacing: 18) {
-                    periodCard
+                    PeriodCard(
+                        periodText: model.periodText,
+                        month: model.month
+                    )
 
-                    LazyVGrid(columns: Self.columns, spacing: 8) {
-                        ForEach(MonthStartDay.allDays, id: \.day) { day in
-                            dayButton(day)
+                    MonthStartDayGrid(selection: model.startDay) { day in
+                        Task {
+                            await model.choose(day)
                         }
                     }
 
@@ -81,68 +84,6 @@ private extension MonthStartDayView {
             Color.clear
                 .frame(width: 44, height: 44)
         }
-    }
-
-    var periodCard: some View {
-        VStack(spacing: 6) {
-            Text("いまの期間")
-                .font(.caption2)
-                .tracking(3)
-                .foregroundStyle(Palette.gold)
-
-            Text(model.periodText)
-                .font(.system(size: 26, design: .serif))
-                .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
-                .contentTransition(.numericText())
-
-            Text("\(model.month.month)月として数えます")
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
-                .contentTransition(.numericText())
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 18)
-        .card(cornerRadius: 22)
-        .animation(.snappy, value: model.startDay)
-    }
-
-    func dayButton(_ day: MonthStartDay) -> some View {
-        let isSelected = model.startDay == day
-        let textColor = isSelected ? Palette.nightBottom : Palette.ink
-        let fill = isSelected ? Palette.gold : Palette.gold.opacity(0.04)
-        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(0.2)
-
-        return Button {
-            Task {
-                await model.choose(day)
-            }
-        } label: {
-            Text(Self.title(for: day))
-                .font(.system(size: 15, design: .serif))
-                .monospacedDigit()
-                .foregroundStyle(textColor)
-                .frame(maxWidth: .infinity, minHeight: 42)
-                .background(fill, in: Circle())
-                .overlay {
-                    Circle()
-                        .stroke(stroke, lineWidth: 1)
-                }
-                .contentShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .animation(.snappy(duration: 0.2), value: isSelected)
-    }
-}
-
-private extension MonthStartDayView {
-    static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 8),
-        count: 7
-    )
-
-    static func title(for day: MonthStartDay) -> String {
-        day.isLastDay ? "末日" : "\(day.day)"
     }
 }
 

@@ -17,6 +17,7 @@ final class AppModel {
 extension AppModel {
     enum Launch {
         case opening
+        case onboarding(AppDatabase)
         case ready(AppDatabase)
         case failed(String)
     }
@@ -42,10 +43,19 @@ extension AppModel {
             }
             .value
 
-            launch = .ready(database)
+            let completed = try await database.isOnboardingCompleted()
+            launch = completed ? .ready(database) : .onboarding(database)
         } catch {
             launch = .failed(String(describing: error))
         }
+    }
+
+    func finishOnboarding() {
+        guard case let .onboarding(database) = launch else {
+            return
+        }
+
+        launch = .ready(database)
     }
 
     func changeScene(to phase: ScenePhase) {

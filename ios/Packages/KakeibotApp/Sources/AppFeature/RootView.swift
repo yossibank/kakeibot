@@ -1,3 +1,4 @@
+import Core
 import Features
 import Notifications
 import Store
@@ -37,6 +38,16 @@ private extension RootView {
         switch model.launch {
         case .opening:
             ProgressView()
+        case let .onboarding(database):
+            OnboardingView(
+                database: database,
+                today: LocalDate(Date(), in: .current)
+            ) {
+                withAnimation(.snappy) {
+                    model.finishOnboarding()
+                }
+            }
+            .transition(.opacity)
         case let .ready(database):
             MainView(database: database)
         case let .failed(message):
