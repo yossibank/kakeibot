@@ -26,6 +26,32 @@ struct HomeModelTests {
     }
 
     @Test
+    func showsRemainingBudgetOfPeriod() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 45000, daysAgo: 0)
+        let model = HomeModel(database: setup.database, today: setup.today)
+        let month = setup.today.yearMonth
+        await model.load()
+        let before = model.budgetUsage
+
+        let budgetTask = Task {
+            await model.observeBudgets()
+        }
+
+        try await setup.database.setBudget(120_000, for: nil, from: month)
+
+        for _ in 0..<200 where model.budgetUsage == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        budgetTask.cancel()
+
+        #expect(before == nil)
+        #expect(model.budgetUsage?.remaining == 75000)
+        #expect(model.budgetUsage?.perDay == 3750)
+    }
+
+    @Test
     func listsRecentEntriesNewestFirst() async throws {
         let setup = try await Setup()
 

@@ -2,9 +2,14 @@ import SwiftUI
 
 public struct HalfDial: View {
     let progress: Double?
+    let tint: Color
 
-    public init(progress: Double? = nil) {
+    public init(
+        progress: Double? = nil,
+        tint: Color = Palette.gold
+    ) {
         self.progress = progress
+        self.tint = tint
     }
 
     public var body: some View {
@@ -15,7 +20,7 @@ public struct HalfDial: View {
             if let progress {
                 HalfArc(progress: min(max(progress, 0), 1))
                     .stroke(
-                        Palette.gold,
+                        tint,
                         style: StrokeStyle(lineWidth: 2, lineCap: .round)
                     )
             }

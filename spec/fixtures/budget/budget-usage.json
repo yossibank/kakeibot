@@ -1,0 +1,8 @@
+[
+  { "budget": 120000, "spent": 0, "today": "2026-10-01", "periodEnd": "2026-10-31", "remaining": 120000, "perDay": 3870, "isOver": false },
+  { "budget": 120000, "spent": 45000, "today": "2026-10-12", "periodEnd": "2026-10-31", "remaining": 75000, "perDay": 3750, "isOver": false },
+  { "budget": 120000, "spent": 120000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 0, "perDay": 0, "isOver": false },
+  { "budget": 120000, "spent": 123000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": -3000, "perDay": 0, "isOver": true },
+  { "budget": 50000, "spent": 10000, "today": "2026-10-24", "periodEnd": "2026-10-24", "remaining": 40000, "perDay": 40000, "isOver": false },
+  { "budget": 90000, "spent": 30000, "today": "2026-09-25", "periodEnd": "2026-10-24", "remaining": 60000, "perDay": 2000, "isOver": false }
+]
