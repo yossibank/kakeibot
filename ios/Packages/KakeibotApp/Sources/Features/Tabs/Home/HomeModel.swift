@@ -21,6 +21,7 @@ public final class HomeModel {
     public private(set) var errorMessage: String?
 
     private var allTemplates: [EntryTemplate] = []
+    private var budgets: [Budget] = []
 
     private let database: AppDatabase
     private let defaults: UserDefaults
@@ -73,6 +74,19 @@ public extension HomeModel {
 
     var yesterdayExpense: Int {
         expense(on: today.adding(days: -1))
+    }
+
+    var budgetUsage: BudgetUsage? {
+        guard let budget = budgets.amount(for: nil, in: month) else {
+            return nil
+        }
+
+        return BudgetUsage(
+            budget: budget,
+            spent: monthExpense,
+            today: today,
+            periodEnd: period.upperBound
+        )
     }
 
     var templates: [EntryTemplate] {
@@ -151,6 +165,16 @@ public extension HomeModel {
         let wallet = list?.wallets[template.walletId]?.name
         let parts = [category, tag, wallet]
         return parts.compactMap(\.self).joined(separator: "・")
+    }
+
+    func observeBudgets() async {
+        do {
+            for try await budgets in database.budgetUpdates() {
+                self.budgets = budgets
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
     }
 
     func observeTemplates() async {

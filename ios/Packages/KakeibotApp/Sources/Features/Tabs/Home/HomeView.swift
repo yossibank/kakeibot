@@ -66,28 +66,56 @@ private extension HomeView {
     var dialCard: some View {
         VStack(spacing: 14) {
             ZStack(alignment: .bottom) {
-                HalfDial()
+                HalfDial(progress: model.budgetUsage?.progress, tint: dialTint)
 
                 VStack(spacing: 2) {
-                    Text("今月の支出")
+                    Text(dialTitle)
                         .font(.system(size: 11))
                         .tracking(4)
                         .foregroundStyle(Palette.gold)
 
-                    Text(AmountText.text(model.monthExpense))
+                    Text(dialAmount)
                         .font(.system(size: 40, weight: .bold, design: .serif))
                         .monospacedDigit()
-                        .foregroundStyle(Palette.champagne)
+                        .foregroundStyle(dialAmountColor)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
+                        .contentTransition(.numericText())
                 }
             }
             .frame(maxWidth: 290)
+            .animation(.snappy, value: model.budgetUsage)
+
+            if let usage = model.budgetUsage {
+                HStack(spacing: 14) {
+                    Text("予算 \(AmountText.text(usage.budget))")
+
+                    Text("1 日あたり \(AmountText.text(usage.perDay))")
+                }
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.mist)
+            } else {
+                Button(action: onOpenSettings) {
+                    HStack(spacing: 4) {
+                        Text("予算を決めると、あといくら使えるかが出ます")
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 9, weight: .semibold))
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Palette.mist)
+                    .frame(minHeight: 32)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            }
 
             HStack(spacing: 0) {
                 stat("今日", amount: model.todayExpense, color: Palette.champagne)
                 divider
-                stat("昨日", amount: model.yesterdayExpense, color: Palette.ink)
+
+                stat(middleTitle, amount: middleAmount, color: Palette.ink)
                 divider
                 stat("今月の収入", amount: model.monthIncome, color: Palette.gold)
             }
@@ -307,6 +335,34 @@ private extension HomeView {
 
     static let tileHeight = TemplateCardSize.regular.height
     static let toolStroke = Palette.gold.opacity(0.35)
+
+    var dialTitle: String {
+        model.budgetUsage == nil ? "今月の支出" : "今月あといくら"
+    }
+
+    var dialAmount: String {
+        guard let usage = model.budgetUsage else {
+            return AmountText.text(model.monthExpense)
+        }
+
+        return AmountText.text(usage.remaining)
+    }
+
+    var dialAmountColor: Color {
+        model.budgetUsage?.isOver == true ? Palette.rose : Palette.champagne
+    }
+
+    var middleTitle: String {
+        model.budgetUsage == nil ? "昨日" : "今月の支出"
+    }
+
+    var middleAmount: Int {
+        model.budgetUsage == nil ? model.yesterdayExpense : model.monthExpense
+    }
+
+    var dialTint: Color {
+        model.budgetUsage?.isOver == true ? Palette.rose : Palette.gold
+    }
 
     var shelfRowCount: Int {
         model.templates.count > 2 ? 2 : 1

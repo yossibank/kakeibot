@@ -158,6 +158,9 @@ public struct MainView: View {
             await home.observeTemplates()
         }
         .task {
+            await home.observeBudgets()
+        }
+        .task {
             await observeMonthStartDay()
         }
         .task {
