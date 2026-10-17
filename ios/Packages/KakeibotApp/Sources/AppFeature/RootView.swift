@@ -63,6 +63,9 @@ private extension RootView {
             .transition(.opacity)
         case let .ready(database):
             MainView(database: database)
+                .task {
+                    await model.observeNotifications(in: database)
+                }
         case let .failed(message):
             ContentUnavailableView(
                 "データを開けませんでした",

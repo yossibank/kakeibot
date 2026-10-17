@@ -51,6 +51,22 @@ struct SettingWriteTests {
     }
 
     @Test
+    func savesAndClearsReminderTime() async throws {
+        let database = try AppDatabase.inMemory()
+        let time = try #require(ReminderTime("21:30"))
+
+        let initial = try await database.reminderTime()
+        try await database.setReminderTime(time)
+        let saved = try await database.reminderTime()
+        try await database.setReminderTime(nil)
+        let cleared = try await database.reminderTime()
+
+        #expect(initial == nil)
+        #expect(saved == time)
+        #expect(cleared == nil)
+    }
+
+    @Test
     func completesOnboarding() async throws {
         let database = try AppDatabase.inMemory()
 

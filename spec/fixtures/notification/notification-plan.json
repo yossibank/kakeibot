@@ -1,0 +1,49 @@
+[
+  {
+    "today": "2026-10-17",
+    "reminderTime": "21:00",
+    "recorded": ["2026-10-17", "2026-10-19"],
+    "recurrings": [],
+    "notifications": [
+      { "date": "2026-10-18", "time": "21:00", "title": "今日の記録はまだです", "body": "使ったお金か「支出なし」の印を入れておきましょう" },
+      { "date": "2026-10-20", "time": "21:00", "title": "今日の記録はまだです", "body": "使ったお金か「支出なし」の印を入れておきましょう" },
+      { "date": "2026-10-21", "time": "21:00", "title": "今日の記録はまだです", "body": "使ったお金か「支出なし」の印を入れておきましょう" },
+      { "date": "2026-10-22", "time": "21:00", "title": "今日の記録はまだです", "body": "使ったお金か「支出なし」の印を入れておきましょう" },
+      { "date": "2026-10-23", "time": "21:00", "title": "今日の記録はまだです", "body": "使ったお金か「支出なし」の印を入れておきましょう" }
+    ]
+  },
+  {
+    "today": "2026-10-17",
+    "reminderTime": null,
+    "recorded": [],
+    "recurrings": [
+      { "name": "家賃", "amount": 78000, "frequency": "monthly", "month": null, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 3 }
+    ],
+    "notifications": [
+      { "date": "2026-10-24", "time": "09:00", "title": "家賃", "body": "10/27 に ¥78,000 です" }
+    ]
+  },
+  {
+    "today": "2026-10-17",
+    "reminderTime": "21:00",
+    "recorded": ["2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23"],
+    "recurrings": [
+      { "name": "給料", "amount": 280000, "frequency": "monthly", "month": null, "day": 17, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 0 },
+      { "name": "保険", "amount": 12000, "frequency": "yearly", "month": 11, "day": 1, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 7 },
+      { "name": "スマホ", "amount": 4800, "frequency": "monthly", "month": null, "day": 20, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null }
+    ],
+    "notifications": [
+      { "date": "2026-10-17", "time": "21:00", "title": "給料", "body": "今日は ¥280,000 の日です" },
+      { "date": "2026-10-25", "time": "21:00", "title": "保険", "body": "11/1 に ¥12,000 です" }
+    ]
+  },
+  {
+    "today": "2026-10-17",
+    "reminderTime": null,
+    "recorded": [],
+    "recurrings": [
+      { "name": "スマホ", "amount": 4800, "frequency": "monthly", "month": null, "day": 20, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null }
+    ],
+    "notifications": []
+  }
+]
