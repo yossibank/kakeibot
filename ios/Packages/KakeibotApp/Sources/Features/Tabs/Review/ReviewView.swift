@@ -138,6 +138,23 @@ private extension ReviewView {
                     .foregroundStyle(Palette.ink)
             }
 
+            if model.kind == .balance {
+                VStack(spacing: 10) {
+                    balanceBar(
+                        "収入",
+                        amount: model.summary.income.total,
+                        tint: Palette.gold
+                    )
+
+                    balanceBar(
+                        "支出",
+                        amount: model.summary.expense.total,
+                        tint: Palette.rose
+                    )
+                }
+                .padding(.top, 6)
+            }
+
             if let usage = model.budgetUsage {
                 VStack(spacing: 6) {
                     HStack {
@@ -177,6 +194,29 @@ private extension ReviewView {
         .buttonStyle(.plain)
     }
 
+    func balanceBar(
+        _ title: String,
+        amount: Int,
+        tint: Color
+    ) -> some View {
+        VStack(spacing: 5) {
+            HStack {
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(Palette.mist)
+
+                Spacer()
+
+                Text(AmountText.text(amount))
+                    .font(.system(size: 15, design: .serif))
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.ink)
+            }
+
+            RatioBar(balanceRatio(of: amount), tint: tint, height: 6)
+        }
+    }
+
     func kindTile(_ kind: ReviewKind) -> some View {
         let isSelected = kind == model.kind
         let fill = isSelected ? Palette.gold.opacity(0.14) : Color.clear
@@ -185,8 +225,12 @@ private extension ReviewView {
         let amountColor = isSelected ? Palette.champagne : Palette.ink
 
         return Button {
+            withAnimation(.snappy) {
+                model.setKind(kind)
+            }
+
             Task {
-                await model.setKind(kind)
+                await model.saveSelection()
             }
         } label: {
             VStack(alignment: .leading, spacing: 4) {
@@ -336,8 +380,12 @@ private extension ReviewView {
         Binding {
             model.scale
         } set: { scale in
+            withAnimation(.snappy) {
+                model.setScale(scale)
+            }
+
             Task {
-                await model.setScale(scale)
+                await model.saveSelection()
             }
         }
     }
@@ -452,6 +500,13 @@ private extension ReviewView {
         )
 
         return slices + [other]
+    }
+
+    func balanceRatio(of amount: Int) -> Double {
+        let income = model.summary.income.total
+        let expense = model.summary.expense.total
+        let largest = max(income, expense)
+        return largest > 0 ? Double(amount) / Double(largest) : 0
     }
 
     func openPendingEntry() {

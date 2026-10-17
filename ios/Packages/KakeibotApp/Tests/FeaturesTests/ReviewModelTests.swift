@@ -21,7 +21,7 @@ struct ReviewModelTests {
 
         let expense = model.total
         let expenseChange = model.change
-        await model.setKind(.balance)
+        model.setKind(.balance)
         let balance = model.total
 
         #expect(expense == 3980)
@@ -70,7 +70,7 @@ struct ReviewModelTests {
         let current = model.period.range
         model.move(by: -2)
         let earlier = model.period.range
-        await model.setScale(.year)
+        model.setScale(.year)
         let year = model.period.range
 
         #expect(current.lowerBound.description == "2026-10-01")
@@ -84,8 +84,9 @@ struct ReviewModelTests {
         let setup = try await RecordsModelTests.Setup()
         let model = ReviewModel(database: setup.database, today: setup.today)
 
-        await model.setScale(.week)
-        await model.setKind(.income)
+        model.setScale(.week)
+        model.setKind(.income)
+        await model.saveSelection()
         let reopened = ReviewModel(database: setup.database, today: setup.today)
         await reopened.loadSelection()
 

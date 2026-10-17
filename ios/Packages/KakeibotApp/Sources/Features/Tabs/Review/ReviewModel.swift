@@ -155,21 +155,22 @@ public extension ReviewModel {
         }
     }
 
-    func setScale(_ scale: ReviewPeriod.Scale) async {
+    func setScale(_ scale: ReviewPeriod.Scale) {
+        let scales = ReviewPeriod.Scale.allCases
+        let from = scales.firstIndex(of: self.scale) ?? 0
+        let to = scales.firstIndex(of: scale) ?? 0
+        isMovingForward = to > from
         self.scale = scale
         offset = 0
-
-        do {
-            try await database.setReviewScale(scale)
-        } catch {
-            errorMessage = Self.saveFailedMessage
-        }
     }
 
-    func setKind(_ kind: ReviewKind) async {
+    func setKind(_ kind: ReviewKind) {
         self.kind = kind
+    }
 
+    func saveSelection() async {
         do {
+            try await database.setReviewScale(scale)
             try await database.setReviewKind(kind)
         } catch {
             errorMessage = Self.saveFailedMessage
