@@ -27,6 +27,7 @@ public final class EntryModel {
     public private(set) var recentMemos: [String] = []
     public private(set) var balances: [Wallet.ID: Int] = [:]
     public private(set) var hasOpenedCategoryMenu = true
+    public private(set) var weekStart: Weekday = .sunday
     public private(set) var errorMessage: String?
     public private(set) var errorCount = 0
 
@@ -255,6 +256,7 @@ public extension EntryModel {
             recentMemos = try await database.recentMemos(limit: limit)
             allTemplates = try await database.templates()
             hasOpenedCategoryMenu = try await database.hasOpenedCategoryMenu()
+            weekStart = try await database.weekStart()
             try await loadBalances()
             try await loadEntry()
 

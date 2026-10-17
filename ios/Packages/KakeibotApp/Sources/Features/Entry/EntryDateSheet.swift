@@ -22,7 +22,11 @@ struct EntryDateSheet: View {
                     }
                 }
 
-                MonthCalendar(selection: dateBinding, today: today)
+                MonthCalendar(
+                    selection: dateBinding,
+                    today: today,
+                    weekStart: model.weekStart
+                )
             }
         }
     }
