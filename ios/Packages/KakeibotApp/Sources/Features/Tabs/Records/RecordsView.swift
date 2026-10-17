@@ -16,6 +16,12 @@ struct RecordsView: View {
             LazyVStack(spacing: 12) {
                 header
 
+                CapsulePicker(
+                    selection: layoutBinding,
+                    options: Self.layoutOptions
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+
                 ZStack(alignment: .top) {
                     monthContent
                         .id(model.month)
@@ -36,6 +42,7 @@ struct RecordsView: View {
             moveMonth(direction)
         }
         .sensoryFeedback(.selection, trigger: model.month)
+        .sensoryFeedback(.selection, trigger: model.selectedDate)
         .background {
             Rectangle()
                 .fill(Palette.night)
@@ -77,17 +84,84 @@ private extension RecordsView {
         VStack(spacing: 12) {
             summary
 
-            if model.days.isEmpty {
-                Text("この月の記録はありません")
-                    .font(.footnote)
-                    .foregroundStyle(Palette.mist)
-                    .padding(.vertical, 40)
-            }
+            switch model.layout {
+            case .list:
+                if model.days.isEmpty {
+                    Text("この月の記録はありません")
+                        .font(.footnote)
+                        .foregroundStyle(Palette.mist)
+                        .padding(.vertical, 40)
+                }
 
-            ForEach(model.days, id: \.date) { day in
-                dayCard(day)
+                ForEach(model.days, id: \.date) { day in
+                    dayCard(day)
+                }
+            case .calendar:
+                calendar
+                shownDayCard
             }
         }
+    }
+
+    var calendar: some View {
+        VStack(spacing: 2) {
+            HStack(spacing: 0) {
+                ForEach(
+                    Weekday.week(startingOn: model.weekStart),
+                    id: \.self
+                ) { weekday in
+                    Text(weekday.shortName)
+                        .font(.caption2)
+                        .foregroundStyle(weekday.tint ?? Palette.mist)
+                        .frame(maxWidth: .infinity, minHeight: 22)
+                }
+            }
+
+            ForEach(
+                Array(model.weeks.enumerated()),
+                id: \.offset
+            ) { _, week in
+                HStack(spacing: 0) {
+                    ForEach(
+                        Array(week.enumerated()),
+                        id: \.offset
+                    ) { _, date in
+                        calendarCell(date)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 10)
+        .card()
+    }
+
+    var shownDayCard: some View {
+        let date = model.shownDate
+        let day = model.day(on: date)
+
+        return VStack(spacing: 0) {
+            dayHeader(date, total: day.flatMap(Self.totalText))
+
+            if let day {
+                ForEach(model.rows(for: day)) { row in
+                    swipeRow(row)
+                }
+            } else {
+                Text("この日の記録はありません")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.mist)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 12)
+            }
+
+            if model.canMarkNoSpend(on: date) {
+                noSpendButton(date)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 4)
+        .card()
     }
 
     var summary: some View {
@@ -137,9 +211,86 @@ private extension RecordsView {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    @ViewBuilder
+    func calendarCell(_ date: LocalDate?) -> some View {
+        if let date {
+            let isShown = date == model.shownDate
+            let fill = isShown ? Palette.gold : Color.clear
+            let ring = date == model.today && !isShown ? Palette.gold : .clear
+            let opacity = date > model.today && !isShown ? 0.45 : 1
+
+            Button {
+                model.selectedDate = date
+            } label: {
+                VStack(spacing: 3) {
+                    Text(String(date.day))
+                        .font(.system(size: 15, design: .serif))
+                        .foregroundStyle(dayColor(date, isShown: isShown))
+                        .frame(width: 30, height: 30)
+                        .background(fill, in: Circle())
+                        .overlay(Circle().stroke(ring, lineWidth: 1))
+
+                    dayMark(date)
+                        .frame(height: 12)
+                }
+                .opacity(opacity)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+        } else {
+            Color.clear
+                .frame(maxWidth: .infinity, minHeight: 50)
+        }
+    }
+
+    @ViewBuilder
+    func dayMark(_ date: LocalDate) -> some View {
+        let expense = model.day(on: date)?.expenseTotal ?? 0
+
+        if expense > 0 {
+            Text(AmountText.text(expense))
+                .font(.system(size: 9))
+                .monospacedDigit()
+                .foregroundStyle(Palette.champagne)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+        } else if model.noSpendDays.contains(date) {
+            Image(systemName: "leaf.fill")
+                .font(.system(size: 9))
+                .foregroundStyle(Palette.gold)
+        } else {
+            Color.clear
+        }
+    }
+
+    func noSpendButton(_ date: LocalDate) -> some View {
+        let isMarked = model.noSpendDays.contains(date)
+        let title = isMarked ? "支出なしの印を外す" : "支出なしの日にする"
+        let image = isMarked ? "leaf.fill" : "leaf"
+
+        return Button {
+            Task {
+                await model.toggleNoSpendDay(on: date)
+            }
+        } label: {
+            Label(title, systemImage: image)
+                .font(.footnote)
+                .foregroundStyle(Palette.gold)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Palette.gold.opacity(0.1))
+                .frame(height: 1)
+        }
+    }
+
     func dayCard(_ day: EntryDay) -> some View {
         VStack(spacing: 0) {
-            dayHeader(day)
+            dayHeader(day.date, total: Self.totalText(for: day))
 
             ForEach(model.rows(for: day)) { row in
                 swipeRow(row)
@@ -172,17 +323,20 @@ private extension RecordsView {
         }
     }
 
-    func dayHeader(_ day: EntryDay) -> some View {
-        let holiday = Holiday.name(of: day.date)
+    func dayHeader(
+        _ date: LocalDate,
+        total: String?
+    ) -> some View {
+        let holiday = Holiday.name(of: date)
 
         return HStack(alignment: .firstTextBaseline, spacing: 6) {
-            Text("\(day.date.month)/\(day.date.day)")
+            Text("\(date.month)/\(date.day)")
                 .font(.system(size: 18, design: .serif))
                 .foregroundStyle(Palette.champagne)
 
-            Text("（\(day.date.weekday.shortName)）")
+            Text("（\(date.weekday.shortName)）")
                 .font(.caption)
-                .foregroundStyle(Self.weekdayColor(for: day.date))
+                .foregroundStyle(Self.weekdayColor(for: date))
 
             if let holiday {
                 Text(holiday)
@@ -192,7 +346,7 @@ private extension RecordsView {
 
             Spacer(minLength: 8)
 
-            if let total = Self.totalText(for: day) {
+            if let total {
                 Text(total)
                     .font(.caption)
                     .foregroundStyle(Palette.mist)
@@ -205,6 +359,21 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
+    static let layoutOptions: [CapsulePicker<RecordsLayout>.Option] = [
+        .init("一覧", value: .list),
+        .init("カレンダー", value: .calendar)
+    ]
+
+    var layoutBinding: Binding<RecordsLayout> {
+        Binding {
+            model.layout
+        } set: { layout in
+            Task {
+                await model.setLayout(layout)
+            }
+        }
+    }
+
     var monthTextTransition: ContentTransition {
         .numericText(countsDown: !isMovingForward)
     }
@@ -214,7 +383,7 @@ private extension RecordsView {
             return Palette.holiday
         }
 
-        return date.weekday == .saturday ? Palette.saturday : Palette.mist
+        return date.weekday.tint ?? Palette.mist
     }
 
     static func totalText(for day: EntryDay) -> String? {
@@ -228,6 +397,21 @@ private extension RecordsView {
 
         let parts = [expense, income].compactMap(\.self)
         return parts.isEmpty ? nil : parts.joined(separator: "・")
+    }
+
+    func dayColor(
+        _ date: LocalDate,
+        isShown: Bool
+    ) -> Color {
+        if isShown {
+            return Palette.nightBottom
+        }
+
+        if Holiday.contains(date) {
+            return Palette.holiday
+        }
+
+        return date.weekday.tint ?? Palette.ink
     }
 
     func moveMonth(_ direction: PageSwipeDirection) {

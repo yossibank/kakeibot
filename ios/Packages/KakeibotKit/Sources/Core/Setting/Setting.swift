@@ -23,6 +23,7 @@ public extension Setting {
         case launchScreen = "launch_screen"
         case templateOrder = "template_order"
         case categoryMenuOpened = "category_menu_opened"
+        case recordsLayout = "records_layout"
     }
 }
 

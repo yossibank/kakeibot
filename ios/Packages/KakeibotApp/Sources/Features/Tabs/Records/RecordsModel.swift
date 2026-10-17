@@ -6,19 +6,26 @@ import Store
 @MainActor
 @Observable
 public final class RecordsModel {
+    public var today: LocalDate
+    public var selectedDate: LocalDate?
+
     public private(set) var month: YearMonth
     public private(set) var monthStartDay: MonthStartDay = .first
+    public private(set) var weekStart: Weekday = .sunday
+    public private(set) var layout: RecordsLayout = .list
     public private(set) var list: EntryList?
+    public private(set) var noSpendDays: Set<LocalDate> = []
     public private(set) var errorMessage: String?
 
     private let database: AppDatabase
 
     public init(
         database: AppDatabase,
-        month: YearMonth
+        today: LocalDate
     ) {
         self.database = database
-        self.month = month
+        self.today = today
+        self.month = today.yearMonth
     }
 }
 
@@ -43,6 +50,26 @@ public extension RecordsModel {
         days.reduce(0) { $0 + $1.incomeTotal }
     }
 
+    var weeks: [[LocalDate?]] {
+        period.weeks(startingOn: weekStart)
+    }
+
+    var shownDate: LocalDate {
+        if let selectedDate, period.contains(selectedDate) {
+            return selectedDate
+        }
+
+        return period.contains(today) ? today : period.lowerBound
+    }
+
+    func day(on date: LocalDate) -> EntryDay? {
+        days.first { $0.date == date }
+    }
+
+    func canMarkNoSpend(on date: LocalDate) -> Bool {
+        date <= today && (day(on: date)?.expenseTotal ?? 0) == 0
+    }
+
     func rows(for day: EntryDay) -> [EntryRowItem] {
         guard let list else {
             return []
@@ -61,6 +88,37 @@ public extension RecordsModel {
 
     func move(months: Int) {
         month = month.adding(months: months)
+        selectedDate = nil
+    }
+
+    func loadLayout() async {
+        do {
+            layout = try await database.recordsLayout()
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func setLayout(_ layout: RecordsLayout) async {
+        self.layout = layout
+
+        do {
+            try await database.setRecordsLayout(layout)
+        } catch {
+            errorMessage = Self.saveFailedMessage
+        }
+    }
+
+    func toggleNoSpendDay(on date: LocalDate) async {
+        do {
+            if noSpendDays.contains(date) {
+                try await database.unmarkNoSpendDay(date)
+            } else {
+                try await database.markNoSpendDay(date, at: Date())
+            }
+        } catch {
+            errorMessage = Self.saveFailedMessage
+        }
     }
 
     func load() async {
@@ -80,8 +138,29 @@ public extension RecordsModel {
             errorMessage = Self.loadFailedMessage
         }
     }
+
+    func observeNoSpendDays() async {
+        do {
+            for try await days in database.noSpendDayUpdates() {
+                noSpendDays = days
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeWeekStart() async {
+        do {
+            for try await weekStart in database.weekStartUpdates() {
+                self.weekStart = weekStart
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
 }
 
 private extension RecordsModel {
     static let loadFailedMessage = "記録を読めませんでした"
+    static let saveFailedMessage = "保存できませんでした"
 }

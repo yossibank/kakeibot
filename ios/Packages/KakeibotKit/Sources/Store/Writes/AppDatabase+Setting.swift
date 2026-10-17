@@ -34,6 +34,13 @@ public extension AppDatabase {
         }
     }
 
+    func setRecordsLayout(_ layout: RecordsLayout) async throws {
+        try await writer.write { db in
+            let setting = Setting(key: .recordsLayout, value: layout.rawValue)
+            try setting.save(db)
+        }
+    }
+
     func markCategoryMenuOpened() async throws {
         try await writer.write { db in
             let setting = Setting(key: .categoryMenuOpened, value: "true")

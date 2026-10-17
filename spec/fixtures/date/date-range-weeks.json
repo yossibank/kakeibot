@@ -1,0 +1,7 @@
+[
+  { "weekStart": "sunday", "start": "2026-09-25", "end": "2026-10-24", "leading": 5, "trailing": 0, "rows": 5 },
+  { "weekStart": "monday", "start": "2026-09-25", "end": "2026-10-24", "leading": 4, "trailing": 1, "rows": 5 },
+  { "weekStart": "monday", "start": "2026-10-31", "end": "2026-11-29", "leading": 5, "trailing": 0, "rows": 5 },
+  { "weekStart": "sunday", "start": "2026-10-31", "end": "2026-11-29", "leading": 6, "trailing": 6, "rows": 6 },
+  { "weekStart": "sunday", "start": "2026-10-17", "end": "2026-10-17", "leading": 6, "trailing": 0, "rows": 1 }
+]

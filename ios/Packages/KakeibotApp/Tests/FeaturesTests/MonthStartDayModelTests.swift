@@ -48,8 +48,7 @@ struct MonthStartDayModelTests {
         try await setup.save(.expense, amount: 500, daysAgo: 17)
         try await setup.save(.expense, amount: 3000, daysAgo: 18)
         let startDay = try #require(MonthStartDay(10))
-        let month = try #require(YearMonth(year: 2026, month: 10))
-        let model = RecordsModel(database: setup.database, month: month)
+        let model = RecordsModel(database: setup.database, today: setup.today)
 
         model.setMonthStartDay(startDay, today: setup.today)
         await model.load()

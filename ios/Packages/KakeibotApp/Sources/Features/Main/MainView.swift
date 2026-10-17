@@ -30,7 +30,7 @@ public struct MainView: View {
         _records = State(
             initialValue: RecordsModel(
                 database: database,
-                month: today.yearMonth
+                today: today
             )
         )
 
@@ -173,6 +173,15 @@ public struct MainView: View {
             await records.observe()
         }
         .task {
+            await records.observeNoSpendDays()
+        }
+        .task {
+            await records.observeWeekStart()
+        }
+        .task {
+            await records.loadLayout()
+        }
+        .task {
             await assets.observe()
         }
         .task {
@@ -183,6 +192,7 @@ public struct MainView: View {
         ) { _ in
             home.today = LocalDate(Date(), in: .current)
             assets.today = home.today
+            records.today = home.today
             prepareDraft()
         }
     }
