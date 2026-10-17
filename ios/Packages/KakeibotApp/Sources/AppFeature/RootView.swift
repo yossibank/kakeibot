@@ -27,6 +27,19 @@ public struct RootView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             model.changeScene(to: phase)
+
+            if phase == .active {
+                Task {
+                    await model.refreshDay()
+                }
+            }
+        }
+        .onReceive(
+            NotificationCenter.default.publisher(for: .NSCalendarDayChanged)
+        ) { _ in
+            Task {
+                await model.refreshDay()
+            }
         }
         .warmsUpInput()
     }

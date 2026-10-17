@@ -1,3 +1,5 @@
+import Core
+import Foundation
 import Observation
 import Store
 import SwiftUI
@@ -43,6 +45,7 @@ extension AppModel {
             }
             .value
 
+            await Self.generateRecurring(in: database)
             let completed = try await database.isOnboardingCompleted()
             launch = completed ? .ready(database) : .onboarding(database)
         } catch {
@@ -63,5 +66,21 @@ extension AppModel {
         case .background: AppDatabase.suspend()
         default: AppDatabase.resume()
         }
+    }
+
+    func refreshDay() async {
+        switch launch {
+        case let .onboarding(database), let .ready(database):
+            await Self.generateRecurring(in: database)
+        case .opening, .failed:
+            return
+        }
+    }
+}
+
+private extension AppModel {
+    static func generateRecurring(in database: AppDatabase) async {
+        let today = LocalDate(Date(), in: .current)
+        try? await database.generateRecurringEntries(through: today, at: Date())
     }
 }
