@@ -161,15 +161,7 @@ private extension MonthCalendar {
     static let cellHeight: CGFloat = 46
 
     static func headerColor(for weekday: Weekday) -> Color {
-        color(for: weekday) ?? Palette.mist
-    }
-
-    static func color(for weekday: Weekday) -> Color? {
-        switch weekday {
-        case .sunday: Palette.holiday
-        case .saturday: Palette.saturday
-        default: nil
-        }
+        weekday.tint ?? Palette.mist
     }
 
     func move(months: Int) {
@@ -189,7 +181,7 @@ private extension MonthCalendar {
             return Palette.holiday
         }
 
-        return Self.color(for: date.weekday) ?? Palette.ink
+        return date.weekday.tint ?? Palette.ink
     }
 }
 

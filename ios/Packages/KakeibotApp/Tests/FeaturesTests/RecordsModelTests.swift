@@ -13,7 +13,7 @@ struct RecordsModelTests {
         try await setup.save(.income, amount: 250_000, on: "2026-10-10")
         try await setup.save(.expense, amount: 3980, on: "2026-10-10")
         try await setup.save(.expense, amount: 500, on: "2026-09-30")
-        let model = RecordsModel(database: setup.database, month: setup.month)
+        let model = RecordsModel(database: setup.database, today: setup.today)
 
         await model.load()
         let dates = model.days.map(\.date.description)
@@ -39,7 +39,7 @@ struct RecordsModelTests {
             memo: "ランチ"
         )
         try await setup.save(.expense, amount: 220, on: "2026-10-12", memo: "")
-        let model = RecordsModel(database: setup.database, month: setup.month)
+        let model = RecordsModel(database: setup.database, today: setup.today)
 
         await model.load()
         let day = try #require(model.days.first)
@@ -48,12 +48,91 @@ struct RecordsModelTests {
         #expect(rows.map(\.detail) == ["財布", "ランチ・財布"])
         #expect(rows.map(\.type) == [.expense, .expense])
     }
+
+    @Test
+    func showsTodayUntilAnotherDayIsChosen() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        let chosen = try #require(LocalDate("2026-10-03"))
+
+        let initial = model.shownDate
+        model.selectedDate = chosen
+        let selected = model.shownDate
+        model.move(months: -1)
+        let moved = model.shownDate
+
+        #expect(initial == setup.today)
+        #expect(selected == chosen)
+        #expect(moved.description == "2026-09-01")
+    }
+
+    @Test
+    func marksOnlyPastDaysWithoutExpense() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-12")
+        try await setup.save(.income, amount: 3000, on: "2026-10-10")
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        let spent = try #require(LocalDate("2026-10-12"))
+        let income = try #require(LocalDate("2026-10-10"))
+        let future = setup.today.adding(days: 1)
+
+        await model.load()
+
+        #expect(!model.canMarkNoSpend(on: spent))
+        #expect(model.canMarkNoSpend(on: income))
+        #expect(model.canMarkNoSpend(on: setup.today))
+        #expect(!model.canMarkNoSpend(on: future))
+    }
+
+    @Test
+    func togglesNoSpendDay() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+
+        let task = Task {
+            await model.observeNoSpendDays()
+        }
+
+        await model.toggleNoSpendDay(on: setup.today)
+
+        for _ in 0..<200 where model.noSpendDays.isEmpty {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let marked = model.noSpendDays
+        await model.toggleNoSpendDay(on: setup.today)
+
+        for _ in 0..<200 where !model.noSpendDays.isEmpty {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let unmarked = model.noSpendDays
+        task.cancel()
+
+        #expect(marked == [setup.today])
+        #expect(unmarked.isEmpty)
+    }
+
+    @Test
+    func remembersLayout() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+
+        await model.setLayout(.calendar)
+        let reopened = RecordsModel(
+            database: setup.database,
+            today: setup.today
+        )
+        await reopened.loadLayout()
+
+        #expect(reopened.layout == .calendar)
+    }
 }
 
 extension RecordsModelTests {
     struct Setup {
         let database: AppDatabase
-        let month: YearMonth
+        let today: LocalDate
     }
 }
 
@@ -61,8 +140,8 @@ extension RecordsModelTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())
-        let month = try #require(YearMonth("2026-10"))
-        self.init(database: database, month: month)
+        let today = try #require(LocalDate("2026-10-17"))
+        self.init(database: database, today: today)
     }
 
     func save(

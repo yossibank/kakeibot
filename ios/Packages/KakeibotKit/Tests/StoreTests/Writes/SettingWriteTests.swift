@@ -87,6 +87,18 @@ struct SettingWriteTests {
     }
 
     @Test
+    func savesRecordsLayout() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let initial = try await database.recordsLayout()
+        try await database.setRecordsLayout(.calendar)
+        let saved = try await database.recordsLayout()
+
+        #expect(initial == .list)
+        #expect(saved == .calendar)
+    }
+
+    @Test
     func savesCategoryMenuOpened() async throws {
         let database = try AppDatabase.inMemory()
 

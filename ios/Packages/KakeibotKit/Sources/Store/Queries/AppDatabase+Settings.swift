@@ -42,6 +42,15 @@ public extension AppDatabase {
         }
     }
 
+    func recordsLayout() async throws -> RecordsLayout {
+        try await writer.read { db in
+            let key = Setting.Key.recordsLayout
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting.flatMap { RecordsLayout(rawValue: $0.value) }
+                ?? .list
+        }
+    }
+
     func hasOpenedCategoryMenu() async throws -> Bool {
         try await writer.read { db in
             let key = Setting.Key.categoryMenuOpened

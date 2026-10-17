@@ -43,6 +43,7 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
+| `date-range-weeks.json` | 期間のカレンダーのマス目 | `weekStart`、`start`、`end`、`leading`・`trailing`（前後の空きマスの数）、`rows`（週の数） |
 | `holiday-dates.json` | 1 年分の祝日と名前（振替休日・国民の休日を含む） | `year`、`holidays`（その年の祝日の `date` と `name` をすべて、日付の順に） |
 | `local-date-instant.json` | 時刻と時差から、その場所の日付を出す | `instant`、`timeZone`（IANA の名前）、`date` |
 | `local-date-text.json` | 日付の文字列の判定 | `valid`、`invalid`（文字列） |
