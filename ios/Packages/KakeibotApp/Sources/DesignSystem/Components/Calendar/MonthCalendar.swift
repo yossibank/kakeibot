@@ -137,7 +137,8 @@ private extension MonthCalendar {
 
                 guard
                     abs(width) > Self.swipeDistance,
-                    abs(width) > abs(value.translation.height) else {
+                    abs(width) > abs(value.translation.height)
+                else {
                     return
                 }
 

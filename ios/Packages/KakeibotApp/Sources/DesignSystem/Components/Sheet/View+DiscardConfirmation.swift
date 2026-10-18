@@ -50,7 +50,8 @@ private final class DismissAttemptController: UIViewController {
 
         guard
             let presentation = presentationController,
-            presentation.delegate !== self else {
+            presentation.delegate !== self
+        else {
             return
         }
 
