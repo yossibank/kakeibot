@@ -87,9 +87,10 @@ private extension DonutChart {
         let dy = location.y - size.height / 2
         let distance = (dx * dx + dy * dy).squareRoot()
 
-        guard let onSelect,
-              distance >= radius - lineWidth * 1.5,
-              distance <= radius + lineWidth / 2
+        guard
+            let onSelect,
+            distance >= radius - lineWidth * 1.5,
+            distance <= radius + lineWidth / 2
         else {
             return
         }

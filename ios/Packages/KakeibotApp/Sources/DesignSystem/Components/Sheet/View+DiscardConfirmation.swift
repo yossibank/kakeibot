@@ -48,8 +48,10 @@ private final class DismissAttemptController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        guard let presentation = presentationController,
-              presentation.delegate !== self else {
+        guard
+            let presentation = presentationController,
+            presentation.delegate !== self
+        else {
             return
         }
 

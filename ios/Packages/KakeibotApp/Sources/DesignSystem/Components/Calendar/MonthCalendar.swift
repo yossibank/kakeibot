@@ -135,8 +135,10 @@ private extension MonthCalendar {
             .onEnded { value in
                 let width = value.translation.width
 
-                guard abs(width) > Self.swipeDistance,
-                      abs(width) > abs(value.translation.height) else {
+                guard
+                    abs(width) > Self.swipeDistance,
+                    abs(width) > abs(value.translation.height)
+                else {
                     return
                 }
 

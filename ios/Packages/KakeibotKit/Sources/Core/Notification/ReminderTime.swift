@@ -22,10 +22,11 @@ public extension ReminderTime {
     init?(_ text: String) {
         let parts = text.split(separator: ":")
 
-        guard parts.count == 2,
-              parts.allSatisfy({ $0.count == 2 }),
-              let hour = Int(parts[0]),
-              let minute = Int(parts[1])
+        guard
+            parts.count == 2,
+            parts.allSatisfy({ $0.count == 2 }),
+            let hour = Int(parts[0]),
+            let minute = Int(parts[1])
         else {
             return nil
         }
