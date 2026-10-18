@@ -13,6 +13,7 @@ struct ReminderModelTests {
         let model = ReminderModel(
             database: database,
             today: LocalDate(Date(), in: .current),
+            time: nil,
             permission: client.permission
         )
         await model.load()
@@ -34,6 +35,7 @@ struct ReminderModelTests {
         let model = ReminderModel(
             database: database,
             today: LocalDate(Date(), in: .current),
+            time: nil,
             permission: client.permission
         )
         let time = try #require(ReminderTime("22:30"))
@@ -56,6 +58,7 @@ struct ReminderModelTests {
         let model = ReminderModel(
             database: database,
             today: LocalDate(Date(), in: .current),
+            time: nil,
             permission: client.permission
         )
 
@@ -94,6 +97,7 @@ extension ReminderModelTests {
         let model = ReminderModel(
             database: database,
             today: today,
+            time: nil,
             permission: client.permission
         )
 

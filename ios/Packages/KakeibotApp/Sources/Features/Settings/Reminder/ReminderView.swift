@@ -14,6 +14,7 @@ public struct ReminderView: View {
 
     public init(model: ReminderModel) {
         _model = State(initialValue: model)
+        _isPickingTime = State(initialValue: model.isCustom)
     }
 
     public var body: some View {
@@ -72,7 +73,6 @@ public struct ReminderView: View {
         }
         .task {
             await model.load()
-            isPickingTime = model.isCustom
         }
     }
 }
@@ -407,6 +407,7 @@ private extension ReminderView {
                 model: ReminderModel(
                     database: database,
                     today: LocalDate(Date(), in: .current),
+                    time: .evening,
                     permission: .allowed
                 )
             )

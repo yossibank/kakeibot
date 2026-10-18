@@ -29,6 +29,7 @@ public struct RecordsView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 header
+                    .monthSwipe(perform: moveMonth)
 
                 CapsulePicker(
                     selection: layoutBinding,
@@ -48,9 +49,6 @@ public struct RecordsView: View {
             .padding(.horizontal, 14)
             .padding(.top, 8)
             .padding(.bottom, 24)
-        }
-        .onPageSwipe { direction in
-            moveMonth(direction)
         }
         .sensoryFeedback(.selection, trigger: model.month)
         .sensoryFeedback(.selection, trigger: model.selectedDate)
@@ -94,6 +92,7 @@ private extension RecordsView {
     var monthContent: some View {
         VStack(spacing: 12) {
             summary
+                .monthSwipe(perform: moveMonth)
 
             switch model.layout {
             case .list:
@@ -109,6 +108,8 @@ private extension RecordsView {
                 }
             case .calendar:
                 calendar
+                    .monthSwipe(perform: moveMonth)
+
                 shownDayCard
             }
         }
@@ -458,5 +459,14 @@ private extension RecordsView {
         PageSlide.run($slide, forward: months > 0) {
             model.move(months: months)
         }
+    }
+}
+
+private extension View {
+    func monthSwipe(
+        perform action: @escaping (PageSwipeDirection) -> Void
+    ) -> some View {
+        contentShape(.rect)
+            .onPageSwipe(perform: action)
     }
 }

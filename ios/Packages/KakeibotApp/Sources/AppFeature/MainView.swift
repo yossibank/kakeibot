@@ -100,6 +100,9 @@ struct MainView: View {
                         Task {
                             await notice.delete(id, in: home.list)
                         }
+                    },
+                    onOpenRecurrings: {
+                        sheet = .recurrings
                     }
                 )
                 .tabContent()
@@ -125,9 +128,15 @@ struct MainView: View {
             }
 
             Tab(value: MainTab.review) {
-                ReviewView(model: review) { id in
-                    sheet = .edit(id)
-                }
+                ReviewView(
+                    model: review,
+                    onOpenEntry: { id in
+                        sheet = .edit(id)
+                    },
+                    onOpenRecurring: { id in
+                        sheet = .recurring(id)
+                    }
+                )
                 .tabContent()
             }
 
@@ -267,6 +276,15 @@ private extension MainView {
                     editing: id
                 )
             )
+        case .recurrings:
+            NavigationStack {
+                RecurringListView(
+                    model: RecurringListModel(
+                        database: database,
+                        today: today
+                    )
+                )
+            }
         case let .wallet(id):
             WalletEditSheet(
                 model: WalletEditModel(
@@ -296,6 +314,7 @@ private extension MainView {
         case transfer
         case wallet(Wallet.ID)
         case recurring(Recurring.ID)
+        case recurrings
 
         var id: Self {
             self

@@ -20,10 +20,13 @@ public final class ReminderModel {
     public init(
         database: AppDatabase,
         today: LocalDate,
+        time: ReminderTime?,
         permission: NotificationPermission
     ) {
         self.database = database
         self.today = today
+        self.time = time
+        self.lastTime = time ?? .evening
         self.permission = permission
     }
 }

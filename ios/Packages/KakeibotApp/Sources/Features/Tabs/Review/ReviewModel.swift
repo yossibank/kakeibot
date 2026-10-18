@@ -141,6 +141,29 @@ public extension ReviewModel {
         return total > 0 ? total : nil
     }
 
+    static let recurringShareId = AnyHashable("recurring")
+
+    var recurringShare: Share? {
+        guard let recurringTotal else {
+            return nil
+        }
+
+        let total = max(total(of: kind), 1)
+
+        return Share(
+            id: Self.recurringShareId,
+            name: "固定費",
+            icon: nil,
+            amount: recurringTotal,
+            ratio: Double(recurringTotal) / Double(total),
+            usage: nil
+        )
+    }
+
+    func recurringId(of id: Entry.ID) -> Recurring.ID? {
+        entries.first { $0.id == id }?.recurringId
+    }
+
     func change(of kind: ReviewKind) -> Int {
         total(of: kind) - total(of: kind, in: previousSummary)
     }
@@ -155,9 +178,16 @@ public extension ReviewModel {
                 let category = entry.categoryId.map(AnyHashable.init)
                 let wallet = AnyHashable(entry.walletId)
 
+                let isRecurring = share.id == Self.recurringShareId
+                    && entry.recurringId != nil
+
                 return entry.type == type
                     && period.range.contains(entry.date)
-                    && (category == share.id || wallet == share.id)
+                    && (
+                        category == share.id
+                            || wallet == share.id
+                            || isRecurring
+                    )
             }
             .sorted { $0.date > $1.date }
             .map { entry in
