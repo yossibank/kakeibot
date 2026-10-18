@@ -147,12 +147,8 @@ struct TemplateUseTests {
         try await setup.database.saveTemplate(cafe, at: Date())
         let home = HomeModel(database: setup.database, today: setup.date)
 
-        let listTask = Task {
-            await home.observe()
-        }
-
-        let templateTask = Task {
-            await home.observeTemplates()
+        let task = Task {
+            await home.run()
         }
 
         for _ in 0..<200 where home.templates.count < 3 || home.list == nil {
@@ -161,8 +157,7 @@ struct TemplateUseTests {
 
         let all = home.templateSections(matching: "")
         let found = home.templateSections(matching: " カフェ ")
-        listTask.cancel()
-        templateTask.cancel()
+        task.cancel()
 
         #expect(all.map(\.title) == ["食費", "日用品"])
         #expect(all.last?.templates.map(\.name) == ["洗剤", "ティッシュ"])
@@ -193,12 +188,8 @@ struct TemplateUseTests {
             today: setup.date
         )
 
-        let listTask = Task {
-            await home.observe()
-        }
-
-        let templateTask = Task {
-            await home.observeTemplates()
+        let task = Task {
+            await home.run()
         }
 
         for _ in 0..<200 where home.templates.count < 3 || home.list == nil {
@@ -212,8 +203,7 @@ struct TemplateUseTests {
         let amount = home.templates.map(\.name)
         await home.setTemplateOrder(.name)
         let name = home.templates.map(\.name)
-        listTask.cancel()
-        templateTask.cancel()
+        task.cancel()
 
         let reopened = HomeModel(
             database: setup.database,
@@ -244,12 +234,8 @@ struct TemplateUseTests {
             today: setup.date
         )
 
-        let listTask = Task {
-            await home.observe()
-        }
-
-        let templateTask = Task {
-            await home.observeTemplates()
+        let task = Task {
+            await home.run()
         }
 
         for _ in 0..<200 where home.templates.count < 2 || home.list == nil {
@@ -264,8 +250,7 @@ struct TemplateUseTests {
 
         await home.setTemplateOrder(.frequent)
         let names = home.templates.map(\.name)
-        listTask.cancel()
-        templateTask.cancel()
+        task.cancel()
 
         #expect(names == ["ティッシュ", "洗剤"])
     }
@@ -278,7 +263,7 @@ struct TemplateUseTests {
         let home = HomeModel(database: setup.database, today: setup.date)
 
         let task = Task {
-            await home.observeTemplates()
+            await home.run()
         }
 
         for _ in 0..<200 where home.templates.isEmpty {

@@ -2,22 +2,44 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct HomeView: View {
-    @Bindable var model: HomeModel
+public struct HomeView: View {
+    @Bindable private var model: HomeModel
 
     @State private var openId: Entry.ID?
     @State private var orderButtonFrame: CGRect = .zero
 
-    let onOpenEntry: (Entry.ID) -> Void
-    let onShowRecords: () -> Void
-    let onOpenSettings: () -> Void
-    let onUseTemplate: (EntryTemplate) -> Void
-    let onShowAllTemplates: () -> Void
-    let onOpenOrderMenu: (CGRect) -> Void
-    let onAddTemplate: () -> Void
-    let onDeleteEntry: (Entry.ID) -> Void
+    private let onOpenEntry: (Entry.ID) -> Void
+    private let onShowRecords: () -> Void
+    private let onOpenSettings: () -> Void
+    private let onUseTemplate: (EntryTemplate) -> Void
+    private let onShowAllTemplates: () -> Void
+    private let onOpenOrderMenu: (CGRect) -> Void
+    private let onAddTemplate: () -> Void
+    private let onDeleteEntry: (Entry.ID) -> Void
 
-    var body: some View {
+    public init(
+        model: HomeModel,
+        onOpenEntry: @escaping (Entry.ID) -> Void,
+        onShowRecords: @escaping () -> Void,
+        onOpenSettings: @escaping () -> Void,
+        onUseTemplate: @escaping (EntryTemplate) -> Void,
+        onShowAllTemplates: @escaping () -> Void,
+        onOpenOrderMenu: @escaping (CGRect) -> Void,
+        onAddTemplate: @escaping () -> Void,
+        onDeleteEntry: @escaping (Entry.ID) -> Void
+    ) {
+        self.model = model
+        self.onOpenEntry = onOpenEntry
+        self.onShowRecords = onShowRecords
+        self.onOpenSettings = onOpenSettings
+        self.onUseTemplate = onUseTemplate
+        self.onShowAllTemplates = onShowAllTemplates
+        self.onOpenOrderMenu = onOpenOrderMenu
+        self.onAddTemplate = onAddTemplate
+        self.onDeleteEntry = onDeleteEntry
+    }
+
+    public var body: some View {
         ScrollView {
             VStack(spacing: 12) {
                 header

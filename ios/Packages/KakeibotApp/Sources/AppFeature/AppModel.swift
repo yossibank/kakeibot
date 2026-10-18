@@ -9,6 +9,7 @@ import SwiftUI
 @Observable
 final class AppModel {
     private(set) var launch: Launch = .opening
+    private(set) var today: LocalDate
 
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let scheduler: NotificationScheduler
@@ -19,6 +20,7 @@ final class AppModel {
         scheduler: NotificationScheduler = NotificationScheduler(),
         router: NotificationRouter = .shared
     ) {
+        self.today = Self.currentDay()
         self.openDatabase = openDatabase
         self.scheduler = scheduler
         self.router = router
@@ -58,7 +60,7 @@ extension AppModel {
             }
             .value
 
-            await Self.generateRecurring(in: database)
+            await generateRecurring(in: database)
             let completed = try await database.isOnboardingCompleted()
             launch = completed ? .ready(database) : .onboarding(database)
         } catch {
@@ -86,9 +88,11 @@ extension AppModel {
     }
 
     func refreshDay() async {
+        today = Self.currentDay()
+
         switch launch {
         case let .onboarding(database), let .ready(database):
-            await Self.generateRecurring(in: database)
+            await generateRecurring(in: database)
             await scheduleNotifications(in: database)
         case .opening, .failed:
             return
@@ -96,11 +100,9 @@ extension AppModel {
     }
 
     func observeNotifications(in database: AppDatabase) async {
-        let start = LocalDate(Date(), in: .current)
-
         do {
             for try await input in database.notificationInputUpdates(
-                from: start
+                from: today
             ) {
                 await schedule(input)
             }
@@ -111,9 +113,11 @@ extension AppModel {
 }
 
 private extension AppModel {
-    func scheduleNotifications(in database: AppDatabase) async {
-        let today = LocalDate(Date(), in: .current)
+    static func currentDay() -> LocalDate {
+        LocalDate(Date(), in: .current)
+    }
 
+    func scheduleNotifications(in database: AppDatabase) async {
         let input = try? await database.notificationInput(from: today)
 
         guard let input else {
@@ -124,8 +128,6 @@ private extension AppModel {
     }
 
     func schedule(_ input: NotificationInput) async {
-        let today = LocalDate(Date(), in: .current)
-
         let plan = NotificationPlan.notifications(
             today: today,
             reminderTime: input.reminderTime,
@@ -137,8 +139,7 @@ private extension AppModel {
         await scheduler.apply(plan, now: Date(), timeZone: .current)
     }
 
-    static func generateRecurring(in database: AppDatabase) async {
-        let today = LocalDate(Date(), in: .current)
+    func generateRecurring(in database: AppDatabase) async {
         try? await database.generateRecurringEntries(through: today, at: Date())
     }
 }

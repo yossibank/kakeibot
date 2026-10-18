@@ -2,13 +2,23 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct AssetsView: View {
-    @Bindable var model: AssetsModel
+public struct AssetsView: View {
+    @Bindable private var model: AssetsModel
 
-    let onTransfer: () -> Void
-    let onOpenWallet: (Wallet.ID) -> Void
+    private let onTransfer: () -> Void
+    private let onOpenWallet: (Wallet.ID) -> Void
 
-    var body: some View {
+    public init(
+        model: AssetsModel,
+        onTransfer: @escaping () -> Void,
+        onOpenWallet: @escaping (Wallet.ID) -> Void
+    ) {
+        self.model = model
+        self.onTransfer = onTransfer
+        self.onOpenWallet = onOpenWallet
+    }
+
+    public var body: some View {
         ScrollView {
             VStack(spacing: 12) {
                 header
