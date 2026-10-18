@@ -39,12 +39,6 @@ public struct CategoryListView: View {
                     } else if !model.hidden.isEmpty {
                         hiddenSection
                     }
-
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(Palette.rose)
-                    }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
@@ -55,6 +49,9 @@ public struct CategoryListView: View {
         .padding(.horizontal, 18)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .background {
             Rectangle()
                 .fill(Palette.night)

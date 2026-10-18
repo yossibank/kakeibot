@@ -33,12 +33,6 @@ public struct OnboardingView: View {
                     turnPage(direction)
                 }
 
-            if let errorMessage = model.errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(Palette.rose)
-            }
-
             PrimaryButton(model.nextTitle) {
                 Task {
                     await next()
@@ -49,6 +43,9 @@ public struct OnboardingView: View {
         .padding(.top, 12)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .background {
             Rectangle()
                 .fill(Palette.night)

@@ -66,7 +66,7 @@ struct EntryModelTests {
 
         #expect(model.canSave == false)
         #expect(saved == nil)
-        #expect(model.errorMessage == "金額を入れてください")
+        #expect(model.errorNotice.message == "金額を入れてください")
     }
 
     @Test
@@ -192,8 +192,8 @@ struct EntryModelTests {
         task.cancel()
         await task.value
 
-        #expect(model.errorMessage == nil)
-        #expect(model.errorCount == 0)
+        #expect(model.errorNotice.message == nil)
+        #expect(model.errorNotice.count == 0)
     }
 
     @Test

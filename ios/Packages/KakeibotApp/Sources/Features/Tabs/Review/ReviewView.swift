@@ -31,12 +31,6 @@ public struct ReviewView: View {
 
                 content
                     .pageSlide(slide)
-
-                if let errorMessage = model.errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(Palette.rose)
-                }
             }
             .padding(.horizontal, 14)
             .padding(.top, 8)
@@ -55,6 +49,9 @@ public struct ReviewView: View {
             ) { id in
                 choose(id, in: share)
             }
+        }
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
         }
         .background {
             Rectangle()

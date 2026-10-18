@@ -104,7 +104,7 @@ struct CategoryEditModelTests {
 
         let added = model.addTag("朝ごはん") && model.addTag("昼ごはん")
         let blankAdded = model.addTag(" ")
-        let blankError = model.errorMessage
+        let blankError = model.tagProblem
         let breakfast = try #require(model.tags.first)
         let lunch = try #require(model.tags.last)
         let renamed = model.renameTag(lunch.id, to: "ランチ")
@@ -120,7 +120,7 @@ struct CategoryEditModelTests {
         #expect(added && renamed && snackAdded)
         #expect(!blankAdded)
         #expect(blankError == "タグの名前を入れてください")
-        #expect(model.errorMessage == nil)
+        #expect(model.tagProblem == nil)
         #expect(changed)
         #expect(saved.map(\.name) == ["おやつ", "ランチ"])
         #expect(saved.allSatisfy { $0.categoryId == food.id })

@@ -14,7 +14,8 @@ public final class TemplateListModel {
     public private(set) var categories: CategoryList?
     public private(set) var tags: [EntryTag] = []
     public private(set) var wallets: [Wallet] = []
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 
@@ -54,7 +55,7 @@ public extension TemplateListModel {
             templates = try await database.templates()
             try await loadNames()
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -67,7 +68,7 @@ public extension TemplateListModel {
                 try await loadNames()
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -104,7 +105,7 @@ public extension TemplateListModel {
             try await database.reorderTemplates(ids, at: Date())
             templates = try await database.templates()
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
 
         self.movingOrder = nil

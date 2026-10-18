@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -10,7 +11,9 @@ public final class CategoryEditModel {
 
     public private(set) var tags: [EditingTag] = []
     public private(set) var isHidden = false
-    public private(set) var errorMessage: String?
+    public private(set) var tagProblem: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     public let kind: EntryCategory.Kind
     public let icon = IconEditModel(glyph: .food)
@@ -130,8 +133,8 @@ public extension CategoryEditModel {
         tags.removeAll { $0.id == id }
     }
 
-    func clearError() {
-        errorMessage = nil
+    func clearTagProblem() {
+        tagProblem = nil
     }
 
     func load() async {
@@ -144,7 +147,7 @@ public extension CategoryEditModel {
             let category = list.categories.first { $0.id == editingId }
 
             guard let category, let icon = list.icons[category.iconId] else {
-                errorMessage = Self.loadFailedMessage
+                errorNotice.show(Self.loadFailedMessage)
                 return
             }
 
@@ -154,7 +157,7 @@ public extension CategoryEditModel {
             isHidden = category.archivedAt != nil
             baseline = snapshot
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -167,7 +170,7 @@ public extension CategoryEditModel {
                 at: Date()
             )
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
             return nil
         }
     }
@@ -187,7 +190,7 @@ public extension CategoryEditModel {
             self.isHidden = isHidden
             return true
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
             return false
         }
     }
@@ -212,13 +215,13 @@ private extension CategoryEditModel {
     func check(_ tag: EntryTagDraft) -> Bool {
         switch tag.problems.first {
         case .emptyName:
-            errorMessage = "タグの名前を入れてください"
+            tagProblem = "タグの名前を入れてください"
             return false
         case .nameTooLong:
-            errorMessage = "タグは \(EntryTagDraft.maxNameLength) 文字までです"
+            tagProblem = "タグは \(EntryTagDraft.maxNameLength) 文字までです"
             return false
         case nil:
-            errorMessage = nil
+            tagProblem = nil
             return true
         }
     }

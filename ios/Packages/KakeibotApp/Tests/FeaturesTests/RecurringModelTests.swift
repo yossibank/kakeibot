@@ -75,7 +75,7 @@ struct RecurringModelTests {
         let saved = await model.save()
 
         #expect(!saved)
-        #expect(model.errorMessage == "振替元と振替先を別にしてください")
+        #expect(model.errorNotice.message == "振替元と振替先を別にしてください")
     }
 
     @Test
@@ -90,7 +90,7 @@ struct RecurringModelTests {
         let saved = await model.save()
 
         #expect(!saved)
-        #expect(model.errorMessage == "金額を入れてください")
+        #expect(model.errorNotice.message == "金額を入れてください")
     }
 
     @Test

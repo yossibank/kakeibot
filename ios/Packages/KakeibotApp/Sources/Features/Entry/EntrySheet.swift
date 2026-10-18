@@ -56,11 +56,10 @@ public struct EntrySheet: View {
                 menu != nil
             }
             .errorBanner(
-                model.errorMessage,
-                count: model.errorCount,
+                model.errorNotice,
                 bottom: bannerBottom
             ) {
-                model.clearError()
+                model.errorNotice.clear()
             }
             .background {
                 Rectangle()

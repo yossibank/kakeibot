@@ -39,12 +39,6 @@ public struct RecordsView: View {
 
                 monthContent
                     .pageSlide(slide)
-
-                if let errorMessage = model.errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(Palette.rose)
-                }
             }
             .padding(.horizontal, 14)
             .padding(.top, 8)
@@ -52,6 +46,9 @@ public struct RecordsView: View {
         }
         .sensoryFeedback(.selection, trigger: model.month)
         .sensoryFeedback(.selection, trigger: model.selectedDate)
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .background {
             Rectangle()
                 .fill(Palette.night)

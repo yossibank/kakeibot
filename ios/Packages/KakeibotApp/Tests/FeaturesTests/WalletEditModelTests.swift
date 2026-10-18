@@ -176,7 +176,7 @@ struct WalletEditModelTests {
 
         #expect(hid)
         #expect(!refused)
-        #expect(cashModel.errorMessage == "最後の 1 つの口座は非表示にできません")
+        #expect(cashModel.errorNotice.message == "最後の 1 つの口座は非表示にできません")
     }
 }
 

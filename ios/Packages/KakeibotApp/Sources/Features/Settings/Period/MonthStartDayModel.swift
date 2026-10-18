@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -7,7 +8,8 @@ import Store
 @Observable
 public final class MonthStartDayModel {
     public private(set) var startDay: MonthStartDay = .first
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
     private let today: LocalDate
@@ -34,7 +36,7 @@ public extension MonthStartDayModel {
         do {
             startDay = try await database.setting(.monthStartDay)
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -46,7 +48,7 @@ public extension MonthStartDayModel {
             try await database.setSetting(.monthStartDay, to: startDay)
         } catch {
             self.startDay = previous
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 }

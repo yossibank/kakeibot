@@ -13,7 +13,8 @@ public final class HomeModel {
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var templateOrder: TemplateOrder = .manual
     public private(set) var list: EntryList?
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private var allTemplates: [EntryTemplate] = []
     private var budgets: [Budget] = []
@@ -144,7 +145,7 @@ public extension HomeModel {
         do {
             list = try await database.entryList()
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -152,7 +153,7 @@ public extension HomeModel {
         do {
             templateOrder = try await database.setting(.templateOrder)
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -162,7 +163,7 @@ public extension HomeModel {
         do {
             try await database.setSetting(.templateOrder, to: order)
         } catch {
-            errorMessage = Self.orderSaveFailedMessage
+            errorNotice.show(Self.orderSaveFailedMessage)
         }
     }
 
@@ -220,7 +221,7 @@ public extension HomeModel {
                 label: template.name
             )
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
             return nil
         }
     }
@@ -256,7 +257,7 @@ private extension HomeModel {
                 self.list = list
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -266,7 +267,7 @@ private extension HomeModel {
                 allTemplates = templates
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -276,7 +277,7 @@ private extension HomeModel {
                 self.recurrings = recurrings
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -286,7 +287,7 @@ private extension HomeModel {
                 self.budgets = budgets
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -296,7 +297,7 @@ private extension HomeModel {
                 monthStartDay = startDay
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 

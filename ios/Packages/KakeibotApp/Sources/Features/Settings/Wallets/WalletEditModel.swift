@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -18,7 +19,8 @@ public final class WalletEditModel {
     public private(set) var calculator = AmountCalculator()
     public private(set) var balance = 0
     public private(set) var isHidden = false
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     public let icon = IconEditModel(
         glyph: WalletEditModel.glyph(for: .cash),
@@ -103,7 +105,7 @@ public extension WalletEditModel {
             let wallet = list.wallets[editingId]
 
             guard let wallet, let icon = list.icons[wallet.iconId] else {
-                errorMessage = Self.loadFailedMessage
+                errorNotice.show(Self.loadFailedMessage)
                 return
             }
 
@@ -112,7 +114,7 @@ public extension WalletEditModel {
             isHidden = wallet.archivedAt != nil
             baseline = draft
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -124,7 +126,7 @@ public extension WalletEditModel {
                 at: Date()
             )
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
             return nil
         }
     }
@@ -144,10 +146,10 @@ public extension WalletEditModel {
             self.isHidden = isHidden
             return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {
-            errorMessage = AppDatabase.WalletWriteError.lastShownMessage
+            errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
             return false
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
             return false
         }
     }

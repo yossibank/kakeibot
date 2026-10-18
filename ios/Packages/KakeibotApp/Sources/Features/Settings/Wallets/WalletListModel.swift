@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -8,7 +9,8 @@ import Store
 public final class WalletListModel {
     public private(set) var list: EntryList?
     public private(set) var movingOrder: [Wallet.ID]?
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 
@@ -47,7 +49,7 @@ public extension WalletListModel {
         do {
             list = try await database.entryList()
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -57,7 +59,7 @@ public extension WalletListModel {
                 self.list = list
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -93,9 +95,9 @@ public extension WalletListModel {
             try await database.setWalletHidden(id, isHidden: true, at: Date())
             await load()
         } catch AppDatabase.WalletWriteError.lastShownWallet {
-            errorMessage = AppDatabase.WalletWriteError.lastShownMessage
+            errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
         } catch {
-            errorMessage = Self.hideFailedMessage
+            errorNotice.show(Self.hideFailedMessage)
         }
     }
 
@@ -110,7 +112,7 @@ public extension WalletListModel {
             try await database.reorderWallets(ids, at: Date())
             await load()
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
 
         self.movingOrder = nil

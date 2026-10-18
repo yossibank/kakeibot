@@ -2,15 +2,13 @@ import SwiftUI
 
 public extension View {
     func errorBanner(
-        _ message: String?,
-        count: Int,
+        _ notice: ErrorNotice,
         bottom: CGFloat = 12,
         onClear: @escaping () -> Void
     ) -> some View {
         modifier(
             ErrorBanner(
-                message: message,
-                count: count,
+                notice: notice,
                 bottom: bottom,
                 onClear: onClear
             )
@@ -19,15 +17,14 @@ public extension View {
 }
 
 private struct ErrorBanner: ViewModifier {
-    let message: String?
-    let count: Int
+    let notice: ErrorNotice
     let bottom: CGFloat
     let onClear: () -> Void
 
     func body(content: Content) -> some View {
         content
             .overlay(alignment: .bottom) {
-                if let message {
+                if let message = notice.message {
                     NoticeBanner(
                         message,
                         systemImage: "exclamationmark",
@@ -38,10 +35,10 @@ private struct ErrorBanner: ViewModifier {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .animation(.snappy, value: message)
-            .sensoryFeedback(.error, trigger: count)
-            .task(id: count) {
-                guard count > 0 else {
+            .animation(.snappy, value: notice.message)
+            .sensoryFeedback(.error, trigger: notice.count)
+            .task(id: notice.count) {
+                guard notice.count > 0 else {
                     return
                 }
 

@@ -53,11 +53,8 @@ public struct TemplateEditSheet: View {
                     .padding(.horizontal, 18)
                     .padding(.top, 18)
             }
-            .errorBanner(
-                model.errorMessage,
-                count: model.errorCount
-            ) {
-                model.clearError()
+            .errorBanner(model.errorNotice) {
+                model.errorNotice.clear()
             }
             .background {
                 Rectangle()
@@ -428,7 +425,7 @@ private extension TemplateEditSheet {
     }
 
     var nameLine: Color {
-        if model.errorMessage != nil, model.name.isEmpty {
+        if model.errorNotice.message != nil, model.name.isEmpty {
             Palette.rose
         } else if focus == .name {
             Palette.gold

@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -20,8 +21,8 @@ public final class RecurringEditModel {
     public private(set) var type: Entry.Kind = .expense
     public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
-    public private(set) var errorMessage: String?
-    public private(set) var errorCount = 0
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     let today: LocalDate
 
@@ -145,10 +146,6 @@ public extension RecurringEditModel {
         calculator.press(key)
     }
 
-    func clearError() {
-        errorMessage = nil
-    }
-
     func load() async {
         do {
             options = try await database.entryOptions()
@@ -166,13 +163,13 @@ public extension RecurringEditModel {
         } catch is CancellationError {
             return
         } catch {
-            report(Self.loadFailedMessage)
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func save() async -> Bool {
         if let problem = draft.problems.first {
-            report(message(for: problem))
+            errorNotice.show(message(for: problem))
             return false
         }
 
@@ -186,7 +183,7 @@ public extension RecurringEditModel {
 
             return true
         } catch {
-            report(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage)
             return false
         }
     }
@@ -200,7 +197,7 @@ public extension RecurringEditModel {
             try await database.deleteRecurring(editingId)
             return true
         } catch {
-            report(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage)
             return false
         }
     }
@@ -209,11 +206,6 @@ public extension RecurringEditModel {
 private extension RecurringEditModel {
     static let loadFailedMessage = "固定費を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
-
-    func report(_ message: String) {
-        errorMessage = message
-        errorCount += 1
-    }
 
     func message(for problem: RecurringDraft.Problem) -> String {
         switch problem {

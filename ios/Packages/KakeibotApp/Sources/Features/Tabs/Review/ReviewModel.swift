@@ -17,7 +17,8 @@ public final class ReviewModel {
     public private(set) var weekStart: Weekday = .sunday
     public private(set) var list: EntryList?
     public private(set) var budgets: [Budget] = []
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 
@@ -223,7 +224,7 @@ public extension ReviewModel {
             scale = try await database.setting(.reviewScale)
             kind = try await database.setting(.reviewKind)
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -245,7 +246,7 @@ public extension ReviewModel {
             try await database.setSetting(.reviewScale, to: scale)
             try await database.setSetting(.reviewKind, to: kind)
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 
@@ -350,7 +351,7 @@ private extension ReviewModel {
                 self.list = list
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -360,7 +361,7 @@ private extension ReviewModel {
                 self.budgets = budgets
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -370,7 +371,7 @@ private extension ReviewModel {
                 monthStartDay = startDay
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -380,7 +381,7 @@ private extension ReviewModel {
                 self.weekStart = weekStart
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 }

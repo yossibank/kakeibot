@@ -42,11 +42,8 @@ public struct RecurringEditSheet: View {
                 .padding(.horizontal, 18)
                 .padding(.top, 18)
         }
-        .errorBanner(
-            model.errorMessage,
-            count: model.errorCount
-        ) {
-            model.clearError()
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
         }
         .background {
             Rectangle()

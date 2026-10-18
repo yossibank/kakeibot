@@ -24,16 +24,13 @@ public struct AssetsView: View {
                 header
                 totalCard
                 walletGrid
-
-                if let errorMessage = model.errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(Palette.rose)
-                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
+        }
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
         }
         .background {
             Rectangle()
