@@ -2,81 +2,17 @@ import Core
 import GRDB
 
 public extension AppDatabase {
-    func setMonthStartDay(_ startDay: MonthStartDay) async throws {
+    func setSetting<Value>(
+        _ key: SettingKey<Value>,
+        to value: Value
+    ) async throws {
         try await writer.write { db in
-            let setting = Setting(
-                key: .monthStartDay,
-                value: String(startDay.day)
-            )
-
-            try setting.save(db)
-        }
-    }
-
-    func setWeekStart(_ weekStart: Weekday) async throws {
-        try await writer.write { db in
-            let setting = Setting(key: .weekStart, value: weekStart.rawValue)
-            try setting.save(db)
-        }
-    }
-
-    func setReminderTime(_ time: ReminderTime?) async throws {
-        try await writer.write { db in
-            guard let time else {
-                _ = try Setting.deleteOne(db, key: Setting.Key.reminderTime)
+            guard let text = key.encode(value) else {
+                _ = try Setting.deleteOne(db, key: key.key)
                 return
             }
 
-            let setting = Setting(key: .reminderTime, value: time.description)
-            try setting.save(db)
-        }
-    }
-
-    func setLaunchScreen(_ screen: LaunchScreen) async throws {
-        try await writer.write { db in
-            let setting = Setting(key: .launchScreen, value: screen.rawValue)
-            try setting.save(db)
-        }
-    }
-
-    func setTemplateOrder(_ order: TemplateOrder) async throws {
-        try await writer.write { db in
-            let setting = Setting(key: .templateOrder, value: order.rawValue)
-            try setting.save(db)
-        }
-    }
-
-    func setRecordsLayout(_ layout: RecordsLayout) async throws {
-        try await writer.write { db in
-            let setting = Setting(key: .recordsLayout, value: layout.rawValue)
-            try setting.save(db)
-        }
-    }
-
-    func setReviewScale(_ scale: ReviewPeriod.Scale) async throws {
-        try await writer.write { db in
-            let setting = Setting(key: .reviewScale, value: scale.rawValue)
-            try setting.save(db)
-        }
-    }
-
-    func setReviewKind(_ kind: ReviewKind) async throws {
-        try await writer.write { db in
-            let setting = Setting(key: .reviewKind, value: kind.rawValue)
-            try setting.save(db)
-        }
-    }
-
-    func markCategoryMenuOpened() async throws {
-        try await writer.write { db in
-            let setting = Setting(key: .categoryMenuOpened, value: "true")
-            try setting.save(db)
-        }
-    }
-
-    func completeOnboarding() async throws {
-        try await writer.write { db in
-            let setting = Setting(key: .onboardingCompleted, value: "true")
+            let setting = Setting(key: key.key, value: text)
             try setting.save(db)
         }
     }

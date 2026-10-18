@@ -30,8 +30,8 @@ struct OnboardingModelTests {
         model.launchScreen = .entry
         let title = model.nextTitle
         let finished = await model.finish()
-        let launchScreen = try await setup.database.launchScreen()
-        let completed = try await setup.database.isOnboardingCompleted()
+        let launchScreen = try await setup.database.setting(.launchScreen)
+        let completed = try await setup.database.setting(.onboardingCompleted)
 
         #expect(first)
         #expect(budgetMonth == YearMonth(year: 2026, month: 10))

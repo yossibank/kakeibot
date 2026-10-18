@@ -10,7 +10,7 @@ struct BudgetListModelTests {
     func setsTotalAndCategoryBudgetsFromPeriodMonth() async throws {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(10))
-        try await setup.database.setMonthStartDay(payday)
+        try await setup.database.setSetting(.monthStartDay, to: payday)
 
         let model = BudgetListModel(
             database: setup.database,

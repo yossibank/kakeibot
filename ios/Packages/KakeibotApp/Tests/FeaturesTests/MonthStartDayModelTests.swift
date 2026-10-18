@@ -19,7 +19,7 @@ struct MonthStartDayModelTests {
         await model.load()
         let initial = model.periodText
         await model.choose(payday)
-        let saved = try await setup.database.monthStartDay()
+        let saved = try await setup.database.setting(.monthStartDay)
 
         #expect(initial == "10/1〜10/31")
         #expect(model.periodText == "9/25〜10/24")
@@ -34,7 +34,7 @@ struct MonthStartDayModelTests {
         try await setup.save(.expense, amount: 500, daysAgo: 17)
         try await setup.save(.expense, amount: 3000, daysAgo: 18)
         let startDay = try #require(MonthStartDay(25))
-        try await setup.database.setMonthStartDay(startDay)
+        try await setup.database.setSetting(.monthStartDay, to: startDay)
         let model = HomeModel(database: setup.database, today: setup.today)
 
         let task = Task {
@@ -57,7 +57,7 @@ struct MonthStartDayModelTests {
         try await setup.save(.expense, amount: 500, daysAgo: 17)
         try await setup.save(.expense, amount: 3000, daysAgo: 18)
         let startDay = try #require(MonthStartDay(10))
-        try await setup.database.setMonthStartDay(startDay)
+        try await setup.database.setSetting(.monthStartDay, to: startDay)
         let model = RecordsModel(database: setup.database, today: setup.today)
 
         let task = Task {
@@ -84,7 +84,7 @@ struct MonthStartDayModelTests {
     func endsAssetMonthsAtPeriodEnd() async throws {
         let setup = try await HomeModelTests.Setup()
         let startDay = try #require(MonthStartDay(10))
-        try await setup.database.setMonthStartDay(startDay)
+        try await setup.database.setSetting(.monthStartDay, to: startDay)
         let model = AssetsModel(database: setup.database, today: setup.today)
 
         let task = Task {

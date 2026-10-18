@@ -20,18 +20,6 @@ public extension AppDatabase {
             try Self.notificationInput(from: start, in: db)
         }
     }
-
-    func reminderTimeUpdates()
-        -> some AsyncSequence<ReminderTime?, any Error> {
-        ValueObservation
-            .tracking(Self.reminderTime)
-            .removeDuplicates()
-            .values(in: writer)
-    }
-
-    func reminderTime() async throws -> ReminderTime? {
-        try await writer.read(Self.reminderTime)
-    }
 }
 
 private extension AppDatabase {
@@ -57,14 +45,8 @@ private extension AppDatabase {
         return try NotificationInput(
             recordedDates: Set(entryDates + markedDates),
             recurrings: recurrings(in: db),
-            reminderTime: reminderTime(in: db),
+            reminderTime: setting(.reminderTime, in: db),
             names: Dictionary(names, uniquingKeysWith: { first, _ in first })
         )
-    }
-
-    static func reminderTime(in db: Database) throws -> ReminderTime? {
-        let key = Setting.Key.reminderTime
-        let setting = try Setting.fetchOne(db, key: key)
-        return setting.flatMap { ReminderTime($0.value) }
     }
 }

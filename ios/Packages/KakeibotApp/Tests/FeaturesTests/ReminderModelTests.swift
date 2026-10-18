@@ -18,7 +18,7 @@ struct ReminderModelTests {
         await model.load()
 
         await model.setOn(true)
-        let saved = try await database.reminderTime()
+        let saved = try await database.setting(.reminderTime)
         let requested = await client.requested
 
         #expect(model.time == .evening)
@@ -41,7 +41,7 @@ struct ReminderModelTests {
 
         await model.choose(time)
         await model.setOn(false)
-        let cleared = try await database.reminderTime()
+        let cleared = try await database.setting(.reminderTime)
         await model.setOn(true)
 
         #expect(cleared == nil)

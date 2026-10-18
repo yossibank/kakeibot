@@ -28,7 +28,7 @@ struct AppModelTests {
     @Test
     func opensDatabaseAfterFirstSetup() async throws {
         let database = try AppDatabase.inMemory()
-        try await database.completeOnboarding()
+        try await database.setSetting(.onboardingCompleted, to: true)
         let model = AppModel { database }
 
         await model.open()
@@ -44,7 +44,7 @@ struct AppModelTests {
         let database = try AppDatabase.inMemory()
         let now = Date()
         try database.insertDefaultsIfEmpty(at: now)
-        try await database.completeOnboarding()
+        try await database.setSetting(.onboardingCompleted, to: true)
         let options = try await database.entryOptions()
         let today = LocalDate(now, in: .current)
 

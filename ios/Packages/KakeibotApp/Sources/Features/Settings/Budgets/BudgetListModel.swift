@@ -120,7 +120,7 @@ public extension BudgetListModel {
 
     func load() async {
         do {
-            monthStartDay = try await database.monthStartDay()
+            monthStartDay = try await database.setting(.monthStartDay)
             month = today.periodMonth(startingOn: monthStartDay)
             budgets = try await database.budgets()
             categoryList = try await database.categoryList()
