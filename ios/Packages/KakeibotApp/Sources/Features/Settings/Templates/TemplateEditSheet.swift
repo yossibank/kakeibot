@@ -417,7 +417,7 @@ private extension TemplateEditSheet {
             model.selectedWallet?.name
         ]
 
-        return parts.compactMap(\.self).joined(separator: "・")
+        return parts.rowDetail ?? ""
     }
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {

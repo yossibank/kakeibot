@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class WalletListModel {
+public final class WalletListModel: ScreenModel {
     public private(set) var list: EntryList?
     public private(set) var movingOrder: [Wallet.ID]?
 
@@ -54,12 +54,11 @@ public extension WalletListModel {
     }
 
     func observe() async {
-        do {
-            for try await list in database.entryListUpdates() {
-                self.list = list
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.entryListUpdates(),
+            failure: Self.loadFailedMessage
+        ) { list in
+            self.list = list
         }
     }
 

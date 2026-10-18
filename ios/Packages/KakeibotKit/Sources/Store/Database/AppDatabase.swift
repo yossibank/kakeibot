@@ -4,9 +4,15 @@ import GRDB
 public struct AppDatabase: Sendable {
     public let writer: any DatabaseWriter
 
+    let entryListObservation: SharedValueObservation<EntryList>
+
     public init(_ writer: any DatabaseWriter) throws {
         self.writer = writer
         try Self.migrator.migrate(writer)
+
+        self.entryListObservation = ValueObservation
+            .tracking(Self.entryList)
+            .shared(in: writer)
     }
 }
 

@@ -6,6 +6,10 @@ public enum TemplateOrder: String, CaseIterable, Codable, Sendable {
     case name
 }
 
+public extension TemplateOrder {
+    static let frequentDays = 90
+}
+
 extension TemplateOrder: Identifiable {
     public var id: Self {
         self

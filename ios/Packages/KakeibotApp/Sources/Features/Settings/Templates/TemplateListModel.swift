@@ -6,14 +6,12 @@ import Store
 
 @MainActor
 @Observable
-public final class TemplateListModel {
+public final class TemplateListModel: ScreenModel {
     public var type: Entry.Kind = .expense
 
     public private(set) var templates: [EntryTemplate] = []
     public private(set) var movingOrder: [EntryTemplate.ID]?
-    public private(set) var categories: CategoryList?
-    public private(set) var tags: [EntryTag] = []
-    public private(set) var wallets: [Wallet] = []
+    public private(set) var list: EntryList?
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -38,37 +36,31 @@ public extension TemplateListModel {
     }
 
     func icon(for template: EntryTemplate) -> Icon? {
-        let category = category(for: template)
-        return category.flatMap { categories?.icons[$0.iconId] }
+        list?.icon(for: template)
     }
 
     func detail(for template: EntryTemplate) -> String {
-        let category = category(for: template)?.name
-        let tag = tags.first { $0.id == template.tagId }?.name
-        let wallet = wallets.first { $0.id == template.walletId }?.name
-        let parts = [category, tag, wallet]
-        return parts.compactMap(\.self).joined(separator: "・")
+        list?.detail(for: template) ?? ""
     }
 
     func load() async {
         do {
             templates = try await database.templates()
-            try await loadNames()
+            list = try await database.entryList()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func observe() async {
-        do {
-            try await loadNames()
-
-            for try await templates in database.templateUpdates() {
-                self.templates = templates
-                try await loadNames()
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observeTemplates()
             }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+
+            group.addTask {
+                await self.observeList()
+            }
         }
     }
 
@@ -116,14 +108,21 @@ private extension TemplateListModel {
     static let loadFailedMessage = "テンプレートを読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
 
-    func category(for template: EntryTemplate) -> EntryCategory? {
-        categories?.categories.first { $0.id == template.categoryId }
+    func observeTemplates() async {
+        await observe(
+            database.templateUpdates(),
+            failure: Self.loadFailedMessage
+        ) { templates in
+            self.templates = templates
+        }
     }
 
-    func loadNames() async throws {
-        categories = try await database.categoryList()
-        let options = try await database.entryOptions()
-        tags = options.tags
-        wallets = options.wallets
+    func observeList() async {
+        await observe(
+            database.entryListUpdates(),
+            failure: Self.loadFailedMessage
+        ) { list in
+            self.list = list
+        }
     }
 }

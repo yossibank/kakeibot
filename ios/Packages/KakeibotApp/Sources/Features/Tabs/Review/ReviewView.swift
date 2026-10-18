@@ -117,16 +117,25 @@ private extension ReviewView {
             detailCard
 
             if model.kind != .balance {
-                sharesCard(
-                    "カテゴリごと",
+                ReviewSharesCard(
+                    title: "カテゴリごと",
                     shares: model.categoryShares,
-                    showsChart: true
+                    total: ReviewSharesCard.Total(
+                        title: totalTitle,
+                        amount: model.total
+                    ),
+                    onOpen: { share in
+                        openShare = share
+                    }
                 )
 
-                sharesCard(
-                    "口座ごと",
+                ReviewSharesCard(
+                    title: "口座ごと",
                     shares: model.walletShares,
-                    showsChart: false
+                    total: nil,
+                    onOpen: { share in
+                        openShare = share
+                    }
                 )
             }
         }
@@ -289,121 +298,9 @@ private extension ReviewView {
         }
         .buttonStyle(.plain)
     }
-
-    func sharesCard(
-        _ title: String,
-        shares: [ReviewModel.Share],
-        showsChart: Bool
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionTitle(title)
-
-            if shares.isEmpty {
-                Text("この期間の記録はありません")
-                    .font(.footnote)
-                    .foregroundStyle(Palette.mist)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 20)
-            } else {
-                if showsChart {
-                    DonutChart(Self.slices(shares)) { id in
-                        openShare = shares.first { $0.id == id }
-                    }
-                    .frame(width: 180, height: 180)
-                    .overlay {
-                        chartCenter
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 4)
-
-                    if let others = Self.otherShares(shares) {
-                        HStack(spacing: 6) {
-                            Circle()
-                                .fill(Palette.dusk)
-                                .frame(width: 8, height: 8)
-
-                            Text("その他 \(others.count) 件")
-                                .font(.caption)
-                                .foregroundStyle(Palette.mist)
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                }
-
-                ForEach(shares) { share in
-                    shareRow(share)
-                }
-            }
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .card()
-    }
-
-    var chartCenter: some View {
-        VStack(spacing: 2) {
-            Text(totalTitle)
-                .font(.caption2)
-                .foregroundStyle(Palette.mist)
-
-            Text(AmountText.text(model.total))
-                .font(.serif(.body))
-                .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-        }
-        .padding(.horizontal, 36)
-    }
-
-    func shareRow(_ share: ReviewModel.Share) -> some View {
-        Button {
-            openShare = share
-        } label: {
-            shareLabel(share)
-        }
-        .buttonStyle(.plain)
-    }
-
-    func shareLabel(_ share: ReviewModel.Share) -> some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 10) {
-                IconBadge(share.icon, size: 30)
-
-                Text(share.name)
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.ink)
-                    .lineLimit(1)
-
-                Text(Self.percentText(share.ratio))
-                    .font(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.mist)
-
-                Spacer(minLength: 8)
-
-                Text(AmountText.text(share.amount))
-                    .font(.serif(.body))
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.champagne)
-
-                Image(systemName: "chevron.right")
-                    .font(.caption2)
-                    .foregroundStyle(Palette.dusk)
-            }
-
-            if let usage = share.usage {
-                UsageBar(usage)
-                    .padding(.leading, 40)
-            }
-        }
-    }
 }
 
 private extension ReviewView {
-    static let chartLimit = 5
-    static let minorRatio = 0.05
-
     static let scaleOptions: [CapsulePicker<ReviewPeriod.Scale>.Option] = [
         .init("週", value: .week),
         .init("月", value: .month),
@@ -514,50 +411,6 @@ private extension ReviewView {
         case .month: "前の月"
         case .year: "前の年"
         }
-    }
-
-    static func percentText(_ ratio: Double) -> String {
-        "\(Int((ratio * 100).rounded()))%"
-    }
-
-    static func otherShares(
-        _ shares: [ReviewModel.Share]
-    ) -> [ReviewModel.Share]? {
-        let main = shares
-            .prefix(chartLimit)
-            .prefix(while: { $0.ratio >= minorRatio })
-
-        let others = Array(shares.dropFirst(main.count))
-        return others.count > 1 ? others : nil
-    }
-
-    static func slices(
-        _ shares: [ReviewModel.Share]
-    ) -> [DonutChart<AnyHashable>.Slice] {
-        let others = otherShares(shares) ?? []
-        let main = shares.dropLast(others.count)
-
-        let slices = main.map { share in
-            let color = share.icon.flatMap { Color(hex: $0.color) }
-
-            return DonutChart<AnyHashable>.Slice(
-                id: share.id,
-                value: share.amount,
-                color: color ?? Palette.gold
-            )
-        }
-
-        guard !others.isEmpty else {
-            return slices
-        }
-
-        let other = DonutChart<AnyHashable>.Slice(
-            id: "others",
-            value: others.reduce(0) { $0 + $1.amount },
-            color: Palette.dusk
-        )
-
-        return slices + [other]
     }
 
     func balanceRatio(of amount: Int) -> Double {

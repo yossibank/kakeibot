@@ -327,6 +327,9 @@ private extension MainView {
         .init("振り返り", systemImage: "chart.pie", value: .review),
         .init("資産", systemImage: "building.columns", value: .assets)
     ]
+
+    static let warmupDuration: Duration = .milliseconds(500)
+    static let sheetCloseDuration: Duration = .milliseconds(600)
 }
 
 private extension MainView {
@@ -335,7 +338,7 @@ private extension MainView {
             .opacity(0)
             .allowsHitTesting(false)
             .task {
-                try? await Task.sleep(for: .milliseconds(500))
+                try? await Task.sleep(for: Self.warmupDuration)
                 isWarmingEntry = false
             }
     }
@@ -370,7 +373,7 @@ private extension MainView {
         Task {
             if sheet != nil {
                 sheet = nil
-                try? await Task.sleep(for: .milliseconds(600))
+                try? await Task.sleep(for: Self.sheetCloseDuration)
             }
 
             switch route {

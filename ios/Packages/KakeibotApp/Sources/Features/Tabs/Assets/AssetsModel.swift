@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class AssetsModel {
+public final class AssetsModel: ScreenModel {
     public var today: LocalDate
 
     public private(set) var monthStartDay: MonthStartDay = .first
@@ -129,22 +129,20 @@ private extension AssetsModel {
     }
 
     func observe() async {
-        do {
-            for try await list in database.entryListUpdates() {
-                self.list = list
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.entryListUpdates(),
+            failure: Self.loadFailedMessage
+        ) { list in
+            self.list = list
         }
     }
 
     func observeMonthStartDay() async {
-        do {
-            for try await startDay in database.settingUpdates(.monthStartDay) {
-                monthStartDay = startDay
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.settingUpdates(.monthStartDay),
+            failure: Self.loadFailedMessage
+        ) { startDay in
+            monthStartDay = startDay
         }
     }
 }

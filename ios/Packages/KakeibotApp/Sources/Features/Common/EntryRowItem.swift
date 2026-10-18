@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Store
 
 public struct EntryRowItem: Identifiable, Equatable {
@@ -22,14 +23,13 @@ extension EntryRowItem {
         let tag = entry.tagId.flatMap { list.tags[$0] }
         let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
         let wallets = Self.walletText(for: entry, in: list)
-        let parts = [dayLabel, memo, wallets].compactMap(\.self)
 
         self.init(
             id: entry.id,
             icon: category.flatMap { list.icons[$0.iconId] },
             title: category?.name ?? Self.title(for: entry.type),
             tag: tag?.name,
-            detail: parts.isEmpty ? nil : parts.joined(separator: "・"),
+            detail: [dayLabel, memo, wallets].rowDetail,
             amount: entry.amount,
             type: entry.type,
             isRecurring: entry.recurringId != nil
