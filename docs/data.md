@@ -243,7 +243,7 @@ emoji・text・glyph のどれかは必須。
 | icon_id | TEXT | |
 | created_at | TEXT | |
 
-1 日に置ける数は未決。
+date ごとに 1 つまで。押し直すと置き換える。
 
 ### no_spend_day
 
