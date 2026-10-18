@@ -25,7 +25,7 @@ public final class TemplateEditModel {
     public private(set) var errorMessage: String?
     public private(set) var errorCount = 0
 
-    private var baseline: Snapshot?
+    private var baseline: EntryTemplateDraft?
 
     private let database: AppDatabase
     private let editingId: EntryTemplate.ID?
@@ -100,7 +100,7 @@ public extension TemplateEditModel {
     }
 
     var isChanged: Bool {
-        baseline.map { $0 != snapshot } ?? false
+        baseline.map { $0 != draft } ?? false
     }
 
     var categories: [EntryCategory] {
@@ -169,7 +169,7 @@ public extension TemplateEditModel {
                 walletId = wallets.first?.id
             }
 
-            baseline = snapshot
+            baseline = draft
         } catch is CancellationError {
             return
         } catch {
@@ -211,16 +211,8 @@ public extension TemplateEditModel {
 }
 
 private extension TemplateEditModel {
-    struct Snapshot: Equatable {
-        let draft: EntryTemplateDraft
-    }
-
     static let loadFailedMessage = "テンプレートを読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
-
-    var snapshot: Snapshot {
-        Snapshot(draft: draft)
-    }
 
     func report(_ message: String) {
         errorMessage = message

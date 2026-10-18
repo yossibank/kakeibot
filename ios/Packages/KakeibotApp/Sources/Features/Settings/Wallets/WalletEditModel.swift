@@ -25,7 +25,7 @@ public final class WalletEditModel {
         color: WalletEditModel.defaultColor
     )
 
-    private var baseline: Snapshot?
+    private var baseline: WalletDraft?
 
     private let database: AppDatabase
     private let editingId: Wallet.ID?
@@ -36,6 +36,7 @@ public final class WalletEditModel {
     ) {
         self.database = database
         self.editingId = id
+        self.baseline = draft
     }
 }
 
@@ -45,7 +46,7 @@ public extension WalletEditModel {
     }
 
     var isChanged: Bool {
-        snapshot != (baseline ?? Self.blank)
+        baseline.map { $0 != draft } ?? false
     }
 
     var initialBalance: Int {
@@ -109,7 +110,7 @@ public extension WalletEditModel {
             apply(WalletDraft(wallet, icon: icon))
             balance = wallet.balance(with: list.days.flatMap(\.entries))
             isHidden = wallet.archivedAt != nil
-            baseline = snapshot
+            baseline = draft
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -153,35 +154,9 @@ public extension WalletEditModel {
 }
 
 private extension WalletEditModel {
-    struct Snapshot: Equatable {
-        let name: String
-        let kind: Wallet.Kind
-        let initialBalance: Int
-        let icon: IconDraft
-    }
-
     static let defaultColor = "#C9A465"
     static let loadFailedMessage = "口座を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
-
-    static let blank = Snapshot(
-        name: "",
-        kind: .cash,
-        initialBalance: 0,
-        icon: IconDraft(
-            mark: .glyph(glyph(for: .cash)),
-            color: defaultColor
-        )
-    )
-
-    var snapshot: Snapshot {
-        Snapshot(
-            name: name,
-            kind: kind,
-            initialBalance: initialBalance,
-            icon: icon.draft
-        )
-    }
 
     func followKind(from oldKind: Wallet.Kind) {
         guard icon.markKind == .glyph else {
