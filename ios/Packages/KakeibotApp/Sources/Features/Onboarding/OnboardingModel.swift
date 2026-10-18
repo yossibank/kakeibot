@@ -11,7 +11,6 @@ public final class OnboardingModel {
     public private(set) var weekStart: Weekday = .sunday
 
     public private(set) var page: Page = .welcome
-    public private(set) var isMovingForward = true
     public private(set) var errorMessage: String?
 
     public let monthStart: MonthStartDayModel
@@ -70,12 +69,16 @@ public extension OnboardingModel {
         }
     }
 
+    func canTurn(forward: Bool) -> Bool {
+        let offset = forward ? 1 : -1
+        return Page(rawValue: page.rawValue + offset) != nil
+    }
+
     func next() {
         guard let next = Page(rawValue: page.rawValue + 1) else {
             return
         }
 
-        isMovingForward = true
         page = next
     }
 
@@ -90,7 +93,6 @@ public extension OnboardingModel {
             return
         }
 
-        isMovingForward = false
         page = previous
     }
 

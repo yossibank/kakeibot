@@ -8,6 +8,8 @@ public struct RecurringListView: View {
     @State private var sheet: Sheet?
     @State private var lift: Lift?
     @State private var liftCount = 0
+    @State private var openId: Recurring.ID?
+    @State private var deleting: Recurring.ID?
 
     @Environment(\.dismiss) private var dismiss
 
@@ -66,6 +68,20 @@ public struct RecurringListView: View {
         .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
+        .confirmation(
+            isPresented: deleteBinding,
+            systemImage: "trash",
+            title: "この固定費を消しますか",
+            message: "これまでに作った記録は残ります",
+            keepTitle: "やめる",
+            confirmTitle: "消す"
+        ) {
+            if let deleting {
+                Task {
+                    await model.delete(deleting)
+                }
+            }
+        }
         .sheet(item: $sheet) { sheet in
             RecurringEditSheet(model: model.editModel(for: sheet.editingId))
         }
@@ -169,22 +185,25 @@ private extension RecurringListView {
         let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
-        return rowCard(row)
-            .frame(height: Self.rowHeight)
-            .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
-            .offset(y: y - Self.rowHeight / 2)
-            .zIndex(layer)
-            .onTapGesture {
-                sheet = .edit(row.id)
+        return SwipeRow(id: row.id, openId: $openId) {
+            sheet = .edit(row.id)
+        } onAction: {
+            deleting = row.id
+        } content: {
+            rowCard(row)
+        }
+        .frame(height: Self.rowHeight)
+        .scaleEffect(scale)
+        .shadow(color: shadow, radius: 16, y: 8)
+        .offset(y: y - Self.rowHeight / 2)
+        .zIndex(layer)
+        .gesture(
+            LiftGesture(in: Self.space) { location in
+                follow(row, at: index, to: location)
+            } onEnd: {
+                drop()
             }
-            .gesture(
-                LiftGesture(in: Self.space) { location in
-                    follow(row, at: index, to: location)
-                } onEnd: {
-                    drop()
-                }
-            )
+        )
     }
 
     func rowCard(_ row: RecurringListModel.Row) -> some View {
@@ -244,6 +263,16 @@ private extension RecurringListView {
             "決まった日に、記録をひとりでに入れます。長押しで動かせます"
         } else {
             "決まった日に、記録をひとりでに入れます"
+        }
+    }
+
+    var deleteBinding: Binding<Bool> {
+        Binding {
+            deleting != nil
+        } set: { isPresented in
+            if !isPresented {
+                deleting = nil
+            }
         }
     }
 

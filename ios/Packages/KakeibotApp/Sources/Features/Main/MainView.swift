@@ -186,6 +186,9 @@ public struct MainView: View {
             await home.observeBudgets()
         }
         .task {
+            await home.observeRecurrings()
+        }
+        .task {
             await observeMonthStartDay()
         }
         .task {

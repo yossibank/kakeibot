@@ -72,6 +72,39 @@ struct RecurringScheduleTests {
         #expect(next?.description == "2026-04-25")
         #expect(none == nil)
     }
+
+    @Test
+    func totalsTypeInRange() throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        let start = try #require(LocalDate("2026-01-01"))
+        let from = try #require(LocalDate("2026-10-01"))
+        let through = try #require(LocalDate("2026-10-31"))
+
+        let rent = Recurring(
+            type: .expense,
+            amount: 78000,
+            categoryId: EntryCategory.ID(),
+            walletId: Wallet.ID(),
+            frequency: .monthly,
+            day: 27,
+            startDate: start,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        var insurance = rent
+        insurance.amount = 12000
+        insurance.frequency = .yearly
+        insurance.month = 4
+
+        var salary = rent
+        salary.type = .income
+
+        let recurrings = [rent, insurance, salary]
+
+        #expect(recurrings.total(of: .expense, in: from...through) == 78000)
+        #expect(recurrings.total(of: .income, in: from...through) == 78000)
+    }
 }
 
 extension RecurringScheduleTests {

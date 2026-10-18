@@ -17,6 +17,7 @@ public final class HomeModel {
 
     private var allTemplates: [EntryTemplate] = []
     private var budgets: [Budget] = []
+    private var recurrings: [Recurring] = []
 
     private let database: AppDatabase
 
@@ -52,6 +53,10 @@ public extension HomeModel {
 
     var monthExpense: Int {
         monthDays.reduce(0) { $0 + $1.expenseTotal }
+    }
+
+    var recurringExpense: Int {
+        recurrings.total(of: .expense, in: period)
     }
 
     var monthIncome: Int {
@@ -179,6 +184,16 @@ public extension HomeModel {
         do {
             for try await budgets in database.budgetUpdates() {
                 self.budgets = budgets
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeRecurrings() async {
+        do {
+            for try await recurrings in database.recurringUpdates() {
+                self.recurrings = recurrings
             }
         } catch {
             errorMessage = Self.loadFailedMessage
