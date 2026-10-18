@@ -78,12 +78,26 @@ public extension RecordsModel {
         return day.entries.map { EntryRowItem($0, in: list) }
     }
 
-    func setMonthStartDay(
-        _ startDay: MonthStartDay,
-        today: LocalDate
-    ) {
-        monthStartDay = startDay
-        month = today.periodMonth(startingOn: startDay)
+    func run() async {
+        await loadLayout()
+
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observe()
+            }
+
+            group.addTask {
+                await self.observeNoSpendDays()
+            }
+
+            group.addTask {
+                await self.observeWeekStart()
+            }
+
+            group.addTask {
+                await self.observeMonthStartDay()
+            }
+        }
     }
 
     func move(months: Int) {
@@ -128,6 +142,11 @@ public extension RecordsModel {
             errorMessage = Self.loadFailedMessage
         }
     }
+}
+
+private extension RecordsModel {
+    static let loadFailedMessage = "記録を読めませんでした"
+    static let saveFailedMessage = "保存できませんでした"
 
     func observe() async {
         do {
@@ -158,9 +177,15 @@ public extension RecordsModel {
             errorMessage = Self.loadFailedMessage
         }
     }
-}
 
-private extension RecordsModel {
-    static let loadFailedMessage = "記録を読めませんでした"
-    static let saveFailedMessage = "保存できませんでした"
+    func observeMonthStartDay() async {
+        do {
+            for try await startDay in database.monthStartDayUpdates() {
+                monthStartDay = startDay
+                month = today.periodMonth(startingOn: startDay)
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
 }

@@ -2,16 +2,24 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct ReviewView: View {
-    @Bindable var model: ReviewModel
+public struct ReviewView: View {
+    @Bindable private var model: ReviewModel
 
     @State private var openShare: ReviewModel.Share?
     @State private var pendingEntry: Entry.ID?
     @State private var slide = PageSlide()
 
-    let onOpenEntry: (Entry.ID) -> Void
+    private let onOpenEntry: (Entry.ID) -> Void
 
-    var body: some View {
+    public init(
+        model: ReviewModel,
+        onOpenEntry: @escaping (Entry.ID) -> Void
+    ) {
+        self.model = model
+        self.onOpenEntry = onOpenEntry
+    }
+
+    public var body: some View {
         ScrollView {
             VStack(spacing: 12) {
                 header

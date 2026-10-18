@@ -90,7 +90,7 @@ struct RecordsModelTests {
         let model = RecordsModel(database: setup.database, today: setup.today)
 
         let task = Task {
-            await model.observeNoSpendDays()
+            await model.run()
         }
 
         await model.toggleNoSpendDay(on: setup.today)

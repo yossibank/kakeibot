@@ -112,7 +112,7 @@ KakeibotKit/
 ```
 KakeibotApp/
 ├── Sources/
-│   ├── AppFeature/          AppModel、DeepLink、RootView、Routes、SideEffects
+│   ├── AppFeature/          AppModel、RootView、MainView（タブとシート）、通知の許可、入力の準備
 │   ├── DesignSystem/
 │   │   ├── Components/      表すものごとのフォルダ
 │   │   │   ├── Amount/      金額
@@ -144,8 +144,8 @@ KakeibotApp/
 │   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）、色の文字列の読み取り
 │   ├── Features/
 │   │   ├── Entry/
+│   │   ├── EntryNotice/     記録・削除の知らせと取り消し
 │   │   ├── Launch/          起動の印の動き
-│   │   ├── Main/            タブの骨組み
 │   │   ├── Onboarding/      最初の設定のチュートリアル
 │   │   ├── Period/          期間の範囲と月の始まりの書き方、いまの期間のカード、日を選ぶマス
 │   │   ├── Settings/
@@ -239,6 +239,7 @@ flowchart TB
 - 作るときに `AppDatabase`・`LocalDate`・ほかの画面を開く関数を引数で受け取る
 - ほかの画面を開く関数は Core の型だけを使う（`openNewEntry(LocalDate)`、`openEntry(Entry.ID)`）
 - DB は `ValueObservation` で見張る。保存すると、見張っている画面が自動で変わる
+- 見張りと最初の読み込みは `run()` にまとめる。1 回だけ読む値を先に読み、見張りは並べて動かす
 - 計算は Core に任せる。書き込みは DB に書くだけ
 - 設定の一覧は項目の enum を持ち、移る先は AppFeature が決める
 
@@ -246,11 +247,16 @@ flowchart TB
 
 | 持つもの | 中身 |
 | --- | --- |
-| 今日 | 日付が変わったらタブのモデルに知らせる |
-| タブのモデル | Home・Calendar・Review・Wallets。アプリが動いている間ずっと持つ |
-| 入力シート | 新規（日付つき）か編集（記録の ID）か。空なら閉じる |
-| 移動先 | タブごとの `NavigationStack` の path |
-| 最初の設定 | 済んでいなければ Onboarding を出す |
+| 起動の状態 | DB を開いている途中、最初の設定、準備済み、失敗。最初の設定が済んでいなければ Onboarding を出す |
+| 今日 | アプリで 1 つだけ持つ。RootView が MainView と Onboarding に渡す |
+| 通知の行き先 | 押された通知の行き先。MainView が開いたら消す |
+
+### MainView
+
+| 持つもの | 中身 |
+| --- | --- |
+| タブのモデル | Home・Records・Review・Assets。アプリが動いている間ずっと持ち、今日が変わったら渡し直す |
+| シート | 新規・編集・設定・テンプレート・振替・口座・固定費など。空なら閉じる |
 
 ### 保存から反映まで
 
@@ -260,21 +266,16 @@ sequenceDiagram
     participant HM as HomeModel
     participant S as Store
     participant M as 各画面のモデル
-    participant SE as SideEffects
+    participant AM as AppModel
 
     U->>HM: テンプレートをタップ
     HM->>S: 記録を書く
     S-->>M: ValueObservation で変更を知らせる
-    S-->>SE: ValueObservation で変更を知らせる
-    SE->>SE: 記録忘れの通知を予約し直す
-    SE->>SE: ウィジェットに更新を頼む
+    S-->>AM: ValueObservation で変更を知らせる
+    AM->>AM: 通知を予約し直す
 ```
 
-| SideEffects が見張るもの | すること |
-| --- | --- |
-| 今日の記録、今日の支出なしの印 | 記録忘れの通知を予約し直す |
-| 固定費 | 更新前の通知を予約し直す |
-| DB のどこか | ウィジェットに更新を頼む（まとめて 1 回） |
+AppModel は、今日からの記録と支出なしの印、通知の時刻、固定費を見張る。どれかが変わると、記録忘れの通知と固定費の更新前の通知を予約し直す。
 
 ### 起動と画面復帰
 
@@ -283,9 +284,9 @@ sequenceDiagram
 | 処理 | 起動 | 前面に戻る | 日付が変わる |
 | --- | --- | --- | --- |
 | DB を開き、表の形を最新にする | する | | |
+| 今日を決める | する | する | する |
 | 固定費の記録漏れを作る | する | する | する |
 | 通知を予約し直す | する | する | する |
-| ウィジェットに更新を頼む | する | する | する |
 
 裏に回ると `AppDatabase.suspend()` で DB を止め、裏から戻ると `AppDatabase.resume()` で再開する。実機で、書き込みの最中に裏に回しても `0xdead10cc` で終了しないことを確かめた。
 
@@ -316,7 +317,7 @@ sequenceDiagram
 | Core | `make test`。Mac の上では `swift test` でも走る。fixtures を全部通し、`#filePath` からの相対パスで読む |
 | Store | メモリ上の DB で、表の形の変更・集計・書き出しの往復 |
 | Features | 処理のある画面のモデル |
-| AppFeature | SideEffects。通知の予約係だけテスト用に差し替える |
+| AppFeature | AppModel と通知の予約。通知の予約係だけテスト用に差し替える |
 | 見た目 | プレビューで目で確かめる。UI テストは書かない |
 
 ## 未検証

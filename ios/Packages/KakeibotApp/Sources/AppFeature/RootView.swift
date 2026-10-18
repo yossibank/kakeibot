@@ -55,7 +55,7 @@ private extension RootView {
         case let .onboarding(database):
             OnboardingView(
                 database: database,
-                today: LocalDate(Date(), in: .current)
+                today: model.today
             ) {
                 withAnimation(.snappy) {
                     model.finishOnboarding()
@@ -63,7 +63,11 @@ private extension RootView {
             }
             .transition(.opacity)
         case let .ready(database):
-            MainView(database: database, route: model.route) {
+            MainView(
+                database: database,
+                today: model.today,
+                route: model.route
+            ) {
                 model.finishRoute()
             }
             .task {

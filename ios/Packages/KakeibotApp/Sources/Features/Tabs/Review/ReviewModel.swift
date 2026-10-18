@@ -166,6 +166,28 @@ public extension ReviewModel {
             }
     }
 
+    func run() async {
+        await loadSelection()
+
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observe()
+            }
+
+            group.addTask {
+                await self.observeBudgets()
+            }
+
+            group.addTask {
+                await self.observeMonthStartDay()
+            }
+
+            group.addTask {
+                await self.observeWeekStart()
+            }
+        }
+    }
+
     func loadSelection() async {
         do {
             scale = try await database.reviewScale()
@@ -208,46 +230,6 @@ public extension ReviewModel {
 
         isMovingForward = count > 0
         offset += count
-    }
-
-    func observe() async {
-        do {
-            for try await list in database.entryListUpdates() {
-                self.list = list
-            }
-        } catch {
-            errorMessage = Self.loadFailedMessage
-        }
-    }
-
-    func observeBudgets() async {
-        do {
-            for try await budgets in database.budgetUpdates() {
-                self.budgets = budgets
-            }
-        } catch {
-            errorMessage = Self.loadFailedMessage
-        }
-    }
-
-    func observeMonthStartDay() async {
-        do {
-            for try await startDay in database.monthStartDayUpdates() {
-                monthStartDay = startDay
-            }
-        } catch {
-            errorMessage = Self.loadFailedMessage
-        }
-    }
-
-    func observeWeekStart() async {
-        do {
-            for try await weekStart in database.weekStartUpdates() {
-                self.weekStart = weekStart
-            }
-        } catch {
-            errorMessage = Self.loadFailedMessage
-        }
     }
 }
 
@@ -330,5 +312,45 @@ private extension ReviewModel {
             today: today,
             periodEnd: period.range.upperBound
         )
+    }
+
+    func observe() async {
+        do {
+            for try await list in database.entryListUpdates() {
+                self.list = list
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeBudgets() async {
+        do {
+            for try await budgets in database.budgetUpdates() {
+                self.budgets = budgets
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeMonthStartDay() async {
+        do {
+            for try await startDay in database.monthStartDayUpdates() {
+                monthStartDay = startDay
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeWeekStart() async {
+        do {
+            for try await weekStart in database.weekStartUpdates() {
+                self.weekStart = weekStart
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
     }
 }

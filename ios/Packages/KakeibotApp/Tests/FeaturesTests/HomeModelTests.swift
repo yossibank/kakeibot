@@ -34,8 +34,8 @@ struct HomeModelTests {
         await model.load()
         let before = model.budgetUsage
 
-        let budgetTask = Task {
-            await model.observeBudgets()
+        let task = Task {
+            await model.run()
         }
 
         try await setup.database.setBudget(120_000, for: nil, from: month)
@@ -44,7 +44,7 @@ struct HomeModelTests {
             try await Task.sleep(for: .milliseconds(10))
         }
 
-        budgetTask.cancel()
+        task.cancel()
 
         #expect(before == nil)
         #expect(model.budgetUsage?.remaining == 75000)
