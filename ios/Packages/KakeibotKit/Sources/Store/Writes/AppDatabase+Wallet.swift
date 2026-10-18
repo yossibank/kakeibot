@@ -29,19 +29,12 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
-            for (order, id) in ids.enumerated() {
-                guard var wallet = try Wallet.fetchOne(db, key: id) else {
-                    throw WalletWriteError.walletNotFound
-                }
-
-                guard wallet.sortOrder != order else {
-                    continue
-                }
-
-                wallet.sortOrder = order
-                wallet.updatedAt = now
-                try wallet.update(db)
-            }
+            try Wallet.reorder(
+                ids,
+                orThrow: WalletWriteError.walletNotFound,
+                in: db,
+                at: now
+            )
         }
     }
 
@@ -73,7 +66,7 @@ private extension AppDatabase {
         at now: Date
     ) throws -> Wallet {
         let icon = try draft.newIcon(at: now)
-        let sortOrder = try nextWalletSortOrder(in: db)
+        let sortOrder = try Wallet.nextSortOrder(in: db)
 
         let wallet = try draft.newWallet(
             iconId: icon.id,
@@ -110,13 +103,5 @@ private extension AppDatabase {
         try Wallet
             .filter(Column("archived_at") == nil)
             .fetchCount(db)
-    }
-
-    static func nextWalletSortOrder(in db: Database) throws -> Int {
-        let maxOrder = try Wallet
-            .select(max(Column("sort_order")), as: Int?.self)
-            .fetchOne(db)
-
-        return (maxOrder ?? nil).map { $0 + 1 } ?? 0
     }
 }

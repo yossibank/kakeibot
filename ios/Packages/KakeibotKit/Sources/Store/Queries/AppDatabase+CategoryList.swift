@@ -16,7 +16,7 @@ public extension AppDatabase {
 private extension AppDatabase {
     static func categoryList(in db: Database) throws -> CategoryList {
         let categories = try EntryCategory
-            .order(Column("sort_order"))
+            .order(EntryCategory.sortOrder)
             .fetchAll(db)
 
         let tags = try EntryTag.unarchivedInOrder().fetchAll(db)

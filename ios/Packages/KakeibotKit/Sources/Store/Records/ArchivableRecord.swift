@@ -1,6 +1,6 @@
 import GRDB
 
-protocol ArchivableRecord: StoreRecord {}
+protocol ArchivableRecord: SortableRecord {}
 
 extension ArchivableRecord {
     static func unarchivedInOrder() -> QueryInterfaceRequest<Self> {
@@ -11,9 +11,5 @@ extension ArchivableRecord {
 private extension ArchivableRecord {
     static var archivedAt: Column {
         Column("archived_at")
-    }
-
-    static var sortOrder: Column {
-        Column("sort_order")
     }
 }
