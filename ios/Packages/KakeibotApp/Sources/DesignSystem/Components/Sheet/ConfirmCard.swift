@@ -93,16 +93,19 @@ private extension ConfirmCard {
         VStack(spacing: 20) {
             VStack(spacing: 10) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 22, weight: .ultraLight))
+                    .font(.sans(.headline, weight: .ultraLight))
                     .foregroundStyle(Palette.gold)
                     .frame(width: 52, height: 52)
                     .overlay {
                         Circle()
-                            .stroke(Palette.gold.opacity(0.5), lineWidth: 0.8)
+                            .stroke(
+                                Palette.gold.opacity(.medium),
+                                lineWidth: 0.8
+                            )
                     }
 
                 Text(title)
-                    .font(.system(size: 18, weight: .medium, design: .serif))
+                    .font(.serif(.headline, weight: .medium))
                     .foregroundStyle(Palette.champagne)
                     .multilineTextAlignment(.center)
 
@@ -130,7 +133,7 @@ private extension ConfirmCard {
                         .overlay {
                             Capsule()
                                 .stroke(
-                                    Palette.rose.opacity(0.45),
+                                    Palette.rose.opacity(.medium),
                                     lineWidth: 1
                                 )
                         }
@@ -144,7 +147,7 @@ private extension ConfirmCard {
         .background(Palette.drawer, in: .rect(cornerRadius: 26))
         .overlay {
             RoundedRectangle(cornerRadius: 26)
-                .stroke(Palette.gold.opacity(0.45), lineWidth: 0.8)
+                .stroke(Palette.gold.opacity(.medium), lineWidth: 0.8)
         }
         .shadow(color: .black.opacity(0.5), radius: 30, y: 14)
     }

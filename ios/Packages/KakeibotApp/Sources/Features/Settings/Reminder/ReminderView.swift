@@ -84,7 +84,7 @@ private extension ReminderView {
             Spacer()
 
             Text("通知")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -98,10 +98,10 @@ private extension ReminderView {
     var hero: some View {
         VStack(spacing: 14) {
             Image(systemName: bellImage)
-                .font(.system(size: 20, weight: .light))
+                .font(.sans(.headline, weight: .light))
                 .foregroundStyle(Palette.gold)
                 .frame(width: 48, height: 48)
-                .background(Palette.gold.opacity(0.1), in: Circle())
+                .background(Palette.gold.opacity(.subtle), in: Circle())
                 .contentTransition(.symbolEffect(.replace))
 
             VStack(spacing: 6) {
@@ -111,7 +111,7 @@ private extension ReminderView {
                     .foregroundStyle(Palette.gold)
 
                 Text(timeText)
-                    .font(.system(size: 40, design: .serif))
+                    .font(.serif(.display))
                     .monospacedDigit()
                     .foregroundStyle(timeColor)
                     .contentTransition(.numericText())
@@ -147,10 +147,10 @@ private extension ReminderView {
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(Palette.champagne)
                     .frame(maxWidth: .infinity, minHeight: 40)
-                    .background(Palette.rose.opacity(0.12), in: Capsule())
+                    .background(Palette.rose.opacity(.subtle), in: Capsule())
                     .overlay {
                         Capsule()
-                            .stroke(Palette.rose.opacity(0.6), lineWidth: 1)
+                            .stroke(Palette.rose.opacity(.medium), lineWidth: 1)
                     }
                     .contentShape(Capsule())
             }
@@ -158,10 +158,10 @@ private extension ReminderView {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Palette.rose.opacity(0.06), in: Self.cardShape)
+        .background(Palette.rose.opacity(.faint), in: Self.cardShape)
         .overlay {
             Self.cardShape
-                .stroke(Palette.rose.opacity(0.35), lineWidth: 1)
+                .stroke(Palette.rose.opacity(.muted), lineWidth: 1)
         }
     }
 
@@ -210,7 +210,7 @@ private extension ReminderView {
 
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "yensign")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.sans(.body, weight: .medium))
                     .foregroundStyle(Palette.cardBottom)
                     .frame(width: 38, height: 38)
                     .background(Palette.gold, in: .rect(cornerRadius: 9))
@@ -235,14 +235,14 @@ private extension ReminderView {
 
                     Text(NotificationPlan.reminderBody)
                         .font(.footnote)
-                        .foregroundStyle(Palette.ink.opacity(0.8))
+                        .foregroundStyle(Palette.ink.opacity(.strong))
                 }
             }
             .padding(14)
-            .background(Palette.ink.opacity(0.08), in: Self.cardShape)
+            .background(Palette.ink.opacity(.faint), in: Self.cardShape)
             .overlay {
                 Self.cardShape
-                    .stroke(Palette.ink.opacity(0.12), lineWidth: 1)
+                    .stroke(Palette.ink.opacity(.subtle), lineWidth: 1)
             }
 
             Text("記録か「支出なし」の印がある日は届きません")
@@ -258,10 +258,10 @@ private extension ReminderView {
 
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "repeat")
-                    .font(.system(size: 13))
+                    .font(.sans(.small))
                     .foregroundStyle(Palette.gold)
                     .frame(width: 28, height: 28)
-                    .background(Palette.gold.opacity(0.1), in: Circle())
+                    .background(Palette.gold.opacity(.subtle), in: Circle())
 
                 Text(recurringText)
                     .font(.footnote)

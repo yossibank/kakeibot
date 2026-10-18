@@ -23,7 +23,7 @@ public struct RingButton: View {
     public var body: some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.system(size: 15, weight: .light))
+                .font(.sans(.body, weight: .light))
                 .foregroundStyle(foreground)
                 .frame(width: 38, height: 38)
                 .background(fill, in: Circle())
@@ -35,7 +35,7 @@ public struct RingButton: View {
         .overlay(alignment: .bottom) {
             if let label {
                 Text(label)
-                    .font(.system(size: 9))
+                    .font(.sans(.micro))
                     .tracking(1)
                     .foregroundStyle(foreground)
                     .fixedSize()
@@ -67,15 +67,15 @@ private extension RingButton {
     var stroke: Color {
         switch (isEnabled, style) {
         case (false, _): Palette.line
-        case (true, .plain): Palette.gold.opacity(0.35)
+        case (true, .plain): Palette.gold.opacity(.muted)
         case (true, .prominent): Palette.gold
-        case (true, .destructive): Palette.rose.opacity(0.6)
+        case (true, .destructive): Palette.rose.opacity(.medium)
         }
     }
 
     var fill: Color {
         isEnabled && style == .prominent
-            ? Palette.gold.opacity(0.14)
+            ? Palette.gold.opacity(.subtle)
             : Color.clear
     }
 }

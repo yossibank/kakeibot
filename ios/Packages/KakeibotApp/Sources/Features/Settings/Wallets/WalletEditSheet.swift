@@ -141,7 +141,7 @@ private extension WalletEditSheet {
             Spacer()
 
             Text(title)
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -173,7 +173,7 @@ private extension WalletEditSheet {
                 .foregroundStyle(Palette.gold)
                 .frame(width: 48, height: 48)
                 .background(
-                    Palette.gold.opacity(0.12),
+                    Palette.gold.opacity(.subtle),
                     in: .rect(cornerRadius: 14)
                 )
                 .overlay {
@@ -201,7 +201,7 @@ private extension WalletEditSheet {
                     .foregroundStyle(Palette.mist)
 
                 Text(AmountText.text(model.initialBalance))
-                    .font(.system(size: 20, design: .serif))
+                    .font(.serif(.headline))
                     .monospacedDigit()
                     .foregroundStyle(Palette.champagne)
                     .lineLimit(1)
@@ -249,7 +249,7 @@ private extension WalletEditSheet {
                 } label: {
                     HStack(spacing: 8) {
                         Text(AmountText.text(model.calculator.amount))
-                            .font(.system(size: 20, design: .serif))
+                            .font(.serif(.headline))
                             .monospacedDigit()
                             .foregroundStyle(Palette.ink)
 
@@ -280,7 +280,7 @@ private extension WalletEditSheet {
             model.isNegative.toggle()
         } label: {
             Image(systemName: signSymbol)
-                .font(.system(size: 15, weight: .semibold))
+                .font(.sans(.body, weight: .semibold))
                 .foregroundStyle(signColor)
                 .frame(width: 46, height: 46)
                 .background(signFill, in: .rect(cornerRadius: 14))
@@ -297,8 +297,8 @@ private extension WalletEditSheet {
     func kindButton(_ kind: Wallet.Kind) -> some View {
         let isSelected = model.kind == kind
         let textColor = isSelected ? Palette.champagne : Palette.mist
-        let fill = isSelected ? Palette.gold.opacity(0.14) : Color.clear
-        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(0.2)
+        let fill = isSelected ? Palette.gold.opacity(.subtle) : Color.clear
+        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(.soft)
 
         return Button {
             model.kind = kind
@@ -362,7 +362,7 @@ private extension WalletEditSheet {
     }
 
     var amountStroke: Color {
-        isEnteringAmount ? Palette.gold : Palette.gold.opacity(0.35)
+        isEnteringAmount ? Palette.gold : Palette.gold.opacity(.muted)
     }
 
     var activeTax: AmountCalculator.TaxRate? {

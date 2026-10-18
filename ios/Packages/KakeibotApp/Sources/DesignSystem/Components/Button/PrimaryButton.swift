@@ -80,9 +80,9 @@ private extension PrimaryButton {
 
     var rim: LinearGradient {
         let colors = if isEnabled {
-            [Palette.champagne.opacity(0.7), Palette.gold.opacity(0.2)]
+            [Palette.champagne.opacity(.strong), Palette.gold.opacity(.soft)]
         } else {
-            [Palette.gold.opacity(0.35), Palette.gold.opacity(0.1)]
+            [Palette.gold.opacity(.muted), Palette.gold.opacity(.subtle)]
         }
 
         return LinearGradient(
@@ -93,7 +93,7 @@ private extension PrimaryButton {
     }
 
     var glow: Color {
-        isEnabled ? Palette.gold.opacity(0.28) : .clear
+        isEnabled ? Palette.gold.opacity(.muted) : .clear
     }
 }
 

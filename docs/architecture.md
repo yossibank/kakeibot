@@ -142,7 +142,7 @@ KakeibotApp/
 │   │   ├── Resources/
 │   │   │   ├── Assets.xcassets
 │   │   │   └── Fonts/
-│   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）、色の文字列の読み取り、点線
+│   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）と濃さの段階、文字の大きさの段階、色の文字列の読み取り、点線
 │   ├── Features/
 │   │   ├── Entry/
 │   │   ├── EntryNotice/     記録・削除の知らせと取り消し

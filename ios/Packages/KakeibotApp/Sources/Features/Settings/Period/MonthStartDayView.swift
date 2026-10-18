@@ -72,7 +72,7 @@ private extension MonthStartDayView {
             Spacer()
 
             Text("月の始まり")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 

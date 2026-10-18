@@ -20,7 +20,7 @@ struct ReviewShareSheet: View {
                 Spacer()
 
                 Text(periodTitle)
-                    .font(.system(size: 15, design: .serif))
+                    .font(.serif(.body))
                     .foregroundStyle(Palette.gold)
 
                 Spacer()
@@ -39,7 +39,7 @@ struct ReviewShareSheet: View {
                 Spacer()
 
                 Text(AmountText.text(share.amount))
-                    .font(.system(size: 22, design: .serif))
+                    .font(.serif(.headline))
                     .monospacedDigit()
                     .foregroundStyle(Palette.champagne)
             }

@@ -129,7 +129,7 @@ private extension TemplateEditSheet {
             Spacer()
 
             Text(title)
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -177,7 +177,7 @@ private extension TemplateEditSheet {
         .frame(maxWidth: .infinity)
         .background {
             EllipticalGradient(
-                colors: [Palette.gold.opacity(0.16), .clear],
+                colors: [Palette.gold.opacity(.soft), .clear],
                 center: .center,
                 startRadiusFraction: 0,
                 endRadiusFraction: 0.5
@@ -220,7 +220,7 @@ private extension TemplateEditSheet {
             }
             .buttonStyle(.plain)
         }
-        .shadow(color: Palette.gold.opacity(0.12), radius: 30)
+        .shadow(color: Palette.gold.opacity(.subtle), radius: 30)
         .background(alignment: .bottom) {
             Ellipse()
                 .fill(.black.opacity(0.55))
@@ -250,10 +250,10 @@ private extension TemplateEditSheet {
                     .foregroundStyle(Palette.ink)
 
                 Text(capsuleAmount)
-                    .font(.system(size: 11, design: .serif))
+                    .font(.serif(.caption))
                     .foregroundStyle(Palette.champagne)
             }
-            .font(.system(size: 11))
+            .font(.sans(.caption))
             .lineLimit(1)
             .fixedSize()
             .padding(.leading, 8)
@@ -261,7 +261,7 @@ private extension TemplateEditSheet {
             .frame(height: 30)
             .overlay {
                 Capsule()
-                    .stroke(Palette.gold.opacity(0.4), lineWidth: 1)
+                    .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
             }
         }
         .frame(minHeight: 46)
@@ -430,7 +430,7 @@ private extension TemplateEditSheet {
         } else if focus == .name {
             Palette.gold
         } else {
-            Palette.gold.opacity(0.45)
+            Palette.gold.opacity(.medium)
         }
     }
 

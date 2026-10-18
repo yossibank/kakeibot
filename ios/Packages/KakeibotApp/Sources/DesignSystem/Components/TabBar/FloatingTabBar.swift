@@ -79,12 +79,12 @@ private extension FloatingTabBar {
             Capsule()
                 .strokeBorder(Self.rim, lineWidth: 1)
         }
-        .glass(tint: Palette.nightBottom.opacity(0.6), in: Capsule())
+        .glass(tint: Palette.nightBottom.opacity(.medium), in: Capsule())
     }
 
     var indicator: some View {
         let isDragging = dragX != nil
-        let fill = Palette.gold.opacity(isDragging ? 0.2 : 0.12)
+        let fill = Palette.gold.opacity(isDragging ? .soft : .subtle)
         let scale: CGFloat = isDragging ? 1.08 : 1
         let opacity: Double = barWidth > 0 ? 1 : 0
 
@@ -107,11 +107,11 @@ private extension FloatingTabBar {
         } label: {
             ZStack {
                 DialTicks(count: 12, length: 4)
-                    .stroke(Palette.gold.opacity(0.7), lineWidth: 1)
+                    .stroke(Palette.gold.opacity(.strong), lineWidth: 1)
                     .padding(8)
 
                 Image(systemName: "plus")
-                    .font(.system(size: 22, weight: .ultraLight))
+                    .font(.sans(.headline, weight: .ultraLight))
                     .foregroundStyle(Palette.champagne)
             }
             .frame(width: Self.height, height: Self.height)
@@ -126,8 +126,8 @@ private extension FloatingTabBar {
             .contentShape(Circle())
         }
         .buttonStyle(PressStyle())
-        .glass(tint: Palette.nightBottom.opacity(0.75), in: Circle())
-        .shadow(color: Palette.gold.opacity(0.3), radius: 14, y: 4)
+        .glass(tint: Palette.nightBottom.opacity(.strong), in: Circle())
+        .shadow(color: Palette.gold.opacity(.muted), radius: 14, y: 4)
         .sensoryFeedback(.impact(weight: .light), trigger: addCount)
     }
 
@@ -140,11 +140,11 @@ private extension FloatingTabBar {
 
         return VStack(spacing: 3) {
             Image(systemName: item.systemImage)
-                .font(.system(size: 19, weight: .light))
+                .font(.sans(.headline, weight: .light))
                 .foregroundStyle(iconColor)
 
             Text(item.title)
-                .font(.system(size: 10))
+                .font(.sans(.caption))
                 .tracking(0.6)
                 .foregroundStyle(titleColor)
         }
@@ -164,7 +164,10 @@ private extension FloatingTabBar {
 
     static var rim: LinearGradient {
         LinearGradient(
-            colors: [Palette.gold.opacity(0.85), Palette.gold.opacity(0.3)],
+            colors: [
+                Palette.gold.opacity(.strong),
+                Palette.gold.opacity(.muted)
+            ],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -173,8 +176,8 @@ private extension FloatingTabBar {
     static var indicatorRim: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.champagne.opacity(0.7),
-                Palette.gold.opacity(0.25)
+                Palette.champagne.opacity(.strong),
+                Palette.gold.opacity(.soft)
             ],
             startPoint: .top,
             endPoint: .bottom

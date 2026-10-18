@@ -44,7 +44,7 @@ private extension DialTicks {
 #Preview {
     ZStack {
         DialTicks(count: 60, length: 8)
-            .stroke(Palette.gold.opacity(0.8), lineWidth: 1)
+            .stroke(Palette.gold.opacity(.strong), lineWidth: 1)
 
         DialTicks(count: 12, length: 13)
             .stroke(Palette.champagne, lineWidth: 1.5)

@@ -41,7 +41,7 @@ private extension BudgetKeypadLayer {
         } content: {
             VStack(spacing: 10) {
                 Text(AmountText.text(model.calculator.amount))
-                    .font(.system(size: 30, weight: .bold, design: .serif))
+                    .font(.serif(.largeTitle, weight: .bold))
                     .monospacedDigit()
                     .foregroundStyle(Palette.champagne)
                     .contentTransition(.numericText())

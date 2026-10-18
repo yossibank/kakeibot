@@ -101,7 +101,7 @@ private extension IconEditor {
             SettingsField(
                 "3 文字まで",
                 text: textBinding,
-                font: .system(size: 20, design: .serif),
+                font: .serif(.headline),
                 focus: focus,
                 field: textField
             )
@@ -120,7 +120,7 @@ private extension IconEditor {
             model.glyph = glyph
         } label: {
             Image(systemName: glyph.symbolName)
-                .font(.system(size: 18, weight: .light))
+                .font(.sans(.headline, weight: .light))
                 .foregroundStyle(color)
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(
@@ -206,11 +206,11 @@ private extension IconEditor {
     }
 
     static func tileFill(isSelected: Bool) -> Color {
-        isSelected ? Palette.gold.opacity(0.14) : Color.clear
+        isSelected ? Palette.gold.opacity(.subtle) : Color.clear
     }
 
     static func tileStroke(isSelected: Bool) -> Color {
-        isSelected ? Palette.gold : Palette.gold.opacity(0.14)
+        isSelected ? Palette.gold : Palette.gold.opacity(.subtle)
     }
 
     var customColor: Binding<Color> {

@@ -19,14 +19,14 @@ private extension MonthStartDayGrid {
     func dayButton(_ day: MonthStartDay) -> some View {
         let isSelected = selection == day
         let textColor = isSelected ? Palette.nightBottom : Palette.ink
-        let fill = isSelected ? Palette.gold : Palette.gold.opacity(0.04)
-        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(0.2)
+        let fill = isSelected ? Palette.gold : Palette.gold.opacity(.faint)
+        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(.soft)
 
         return Button {
             onSelect(day)
         } label: {
             Text(Self.title(for: day))
-                .font(.system(size: 15, design: .serif))
+                .font(.serif(.body))
                 .monospacedDigit()
                 .foregroundStyle(textColor)
                 .frame(maxWidth: .infinity, minHeight: 42)

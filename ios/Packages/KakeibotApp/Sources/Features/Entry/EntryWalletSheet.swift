@@ -97,7 +97,7 @@ private extension EntryWalletSheet {
             .padding(.horizontal, 16)
             .frame(minHeight: 52)
             .background(
-                isSelected ? Palette.gold.opacity(0.1) : Color.clear,
+                isSelected ? Palette.gold.opacity(.subtle) : Color.clear,
                 in: .rect(cornerRadius: 16)
             )
             .overlay {

@@ -45,7 +45,7 @@ struct CategoryTagCard: View {
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .overlay {
                                 Capsule()
-                                    .stroke(Palette.rose.opacity(0.45))
+                                    .stroke(Palette.rose.opacity(.medium))
                             }
                             .contentShape(Capsule())
                     }

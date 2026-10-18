@@ -24,7 +24,7 @@ public struct NoticeBanner: View {
     public var body: some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.sans(.caption, weight: .semibold))
                 .foregroundStyle(tone.color)
                 .frame(width: 30, height: 30)
                 .background(tone.color.opacity(0.12), in: Circle())
@@ -50,7 +50,7 @@ public struct NoticeBanner: View {
                         .overlay {
                             Capsule()
                                 .strokeBorder(
-                                    Palette.gold.opacity(0.45),
+                                    Palette.gold.opacity(.medium),
                                     lineWidth: 0.8
                                 )
                         }

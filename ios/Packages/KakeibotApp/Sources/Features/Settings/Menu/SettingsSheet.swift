@@ -122,7 +122,7 @@ public struct SettingsSheet: View {
                                     Image(
                                         systemName: "calendar.day.timeline.left"
                                     )
-                                    .font(.system(size: 16, weight: .light))
+                                    .font(.sans(.body, weight: .light))
                                     .foregroundStyle(Palette.gold)
                                     .frame(width: 22)
 
@@ -173,7 +173,7 @@ public struct SettingsSheet: View {
 
                             HStack(spacing: 12) {
                                 Image(systemName: "iphone")
-                                    .font(.system(size: 16, weight: .light))
+                                    .font(.sans(.body, weight: .light))
                                     .foregroundStyle(Palette.gold)
                                     .frame(width: 22)
 
@@ -236,7 +236,7 @@ private extension SettingsSheet {
             Spacer()
 
             Text("設定")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -263,7 +263,7 @@ private extension SettingsSheet {
     ) -> some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
-                .font(.system(size: 16, weight: .light))
+                .font(.sans(.body, weight: .light))
                 .foregroundStyle(Palette.gold)
                 .frame(width: 22)
 

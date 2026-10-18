@@ -26,7 +26,7 @@ public struct HalfDial: View {
             }
 
             HalfTicks(count: 30, step: 1, length: 6, inset: 10)
-                .stroke(Palette.gold.opacity(0.5), lineWidth: 0.7)
+                .stroke(Palette.gold.opacity(.medium), lineWidth: 0.7)
 
             HalfTicks(count: 30, step: 5, length: 13, inset: 10)
                 .stroke(Palette.gold, lineWidth: 1.4)

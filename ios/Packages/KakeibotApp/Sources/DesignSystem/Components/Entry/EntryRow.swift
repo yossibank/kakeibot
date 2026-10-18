@@ -33,7 +33,7 @@ public struct EntryRow: View {
             Group {
                 if icon == nil, type == .transfer {
                     Image(systemName: "arrow.left.arrow.right")
-                        .font(.system(size: 13, weight: .light))
+                        .font(.sans(.small, weight: .light))
                         .frame(width: 21, height: 21)
                 } else {
                     IconImage(icon, size: 15)
@@ -48,8 +48,8 @@ public struct EntryRow: View {
 
                 if isRecurring {
                     Image(systemName: "repeat")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(Palette.gold.opacity(0.75))
+                        .font(.sans(.caption, weight: .semibold))
+                        .foregroundStyle(Palette.gold.opacity(.strong))
                 }
 
                 if let tag {
@@ -67,7 +67,7 @@ public struct EntryRow: View {
             Spacer(minLength: 8)
 
             AmountText(amount, type: type)
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
         }
         .frame(minHeight: 48)
         .contentShape(.rect)

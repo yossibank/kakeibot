@@ -61,7 +61,7 @@ private extension RecordsView {
     var header: some View {
         HStack {
             Text("記録")
-                .font(.system(size: 15, design: .serif))
+                .font(.serif(.body))
                 .tracking(3)
                 .foregroundStyle(Palette.gold)
 
@@ -71,12 +71,12 @@ private extension RecordsView {
 
             VStack(spacing: 1) {
                 Text("\(String(model.month.year))年 \(model.month.month)月")
-                    .font(.system(size: 15, design: .serif))
+                    .font(.serif(.body))
                     .foregroundStyle(Palette.champagne)
                     .contentTransition(monthTextTransition)
 
                 Text(model.periodText)
-                    .font(.system(size: 10))
+                    .font(.sans(.caption))
                     .monospacedDigit()
                     .foregroundStyle(Palette.mist)
                     .contentTransition(monthTextTransition)
@@ -195,7 +195,7 @@ private extension RecordsView {
         .padding(.vertical, 10)
         .overlay {
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Palette.gold.opacity(0.2), lineWidth: 1)
+                .strokeBorder(Palette.gold.opacity(.soft), lineWidth: 1)
         }
     }
 
@@ -226,7 +226,7 @@ private extension RecordsView {
                 .foregroundStyle(Palette.mist)
 
             Text(AmountText.text(amount))
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .monospacedDigit()
                 .foregroundStyle(color)
         }
@@ -246,7 +246,7 @@ private extension RecordsView {
             } label: {
                 VStack(spacing: 3) {
                     Text(String(date.day))
-                        .font(.system(size: 15, design: .serif))
+                        .font(.serif(.body))
                         .foregroundStyle(dayColor(date, isShown: isShown))
                         .frame(width: 30, height: 30)
                         .background(fill, in: Circle())
@@ -272,14 +272,14 @@ private extension RecordsView {
 
         if expense > 0 {
             Text(AmountText.text(expense))
-                .font(.system(size: 9))
+                .font(.sans(.micro))
                 .monospacedDigit()
                 .foregroundStyle(Palette.champagne)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         } else if model.noSpendDays.contains(date) {
             Image(systemName: "leaf.fill")
-                .font(.system(size: 9))
+                .font(.sans(.micro))
                 .foregroundStyle(Palette.gold)
         } else {
             Color.clear
@@ -355,7 +355,7 @@ private extension RecordsView {
 
         return HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text("\(date.month)/\(date.day)")
-                .font(.system(size: 18, design: .serif))
+                .font(.serif(.headline))
                 .foregroundStyle(Palette.champagne)
 
             Text("（\(date.weekday.shortName)）")

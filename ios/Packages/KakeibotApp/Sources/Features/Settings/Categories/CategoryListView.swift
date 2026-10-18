@@ -80,7 +80,7 @@ private extension CategoryListView {
             Spacer()
 
             Text("カテゴリ")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -115,7 +115,7 @@ private extension CategoryListView {
             sheet = .new(model.kind)
         } label: {
             Image(systemName: "plus")
-                .font(.system(size: 22, weight: .ultraLight))
+                .font(.sans(.headline, weight: .ultraLight))
                 .foregroundStyle(Palette.gold)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Palette.faint, in: Self.tileShape)
@@ -197,7 +197,7 @@ private extension CategoryListView {
                 .foregroundStyle(Palette.gold)
 
             Text(category.name)
-                .font(.system(size: 11))
+                .font(.sans(.caption))
                 .foregroundStyle(Palette.ink)
                 .lineLimit(1)
         }
@@ -228,10 +228,10 @@ private extension CategoryListView {
     func tileBorder(isHidden: Bool) -> some View {
         if isHidden {
             Self.tileShape
-                .stroke(Palette.mist.opacity(0.4), style: .dashed)
+                .stroke(Palette.mist.opacity(.muted), style: .dashed)
         } else {
             Self.tileShape
-                .stroke(Palette.gold.opacity(0.22), lineWidth: 1)
+                .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
         }
     }
 }

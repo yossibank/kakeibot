@@ -100,7 +100,7 @@ private extension RecurringListView {
             Spacer()
 
             Text("固定費")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -116,7 +116,7 @@ private extension RecurringListView {
             totalColumn("今月の支出", amount: model.monthTotal.expense)
 
             Rectangle()
-                .fill(Palette.gold.opacity(0.18))
+                .fill(Palette.gold.opacity(.soft))
                 .frame(width: 1, height: 34)
 
             totalColumn("今月の収入", amount: model.monthTotal.income)
@@ -148,7 +148,7 @@ private extension RecurringListView {
                 .foregroundStyle(Palette.gold)
 
             Text(AmountText.text(amount))
-                .font(.system(size: 20, design: .serif))
+                .font(.serif(.headline))
                 .monospacedDigit()
                 .foregroundStyle(Palette.champagne)
         }

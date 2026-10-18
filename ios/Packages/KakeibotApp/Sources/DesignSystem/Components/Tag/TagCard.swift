@@ -67,16 +67,16 @@ private extension TagCard {
     var fill: Color {
         switch style {
         case .plain: Palette.drawer
-        case .selected: Palette.gold.opacity(0.16)
+        case .selected: Palette.gold.opacity(.soft)
         case .add: Color.clear
         }
     }
 
     var stroke: Color {
         switch style {
-        case .plain: Palette.gold.opacity(0.4)
+        case .plain: Palette.gold.opacity(.muted)
         case .selected: Palette.gold
-        case .add: Palette.gold.opacity(0.5)
+        case .add: Palette.gold.opacity(.medium)
         }
     }
 

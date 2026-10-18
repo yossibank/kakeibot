@@ -254,12 +254,12 @@ private extension EntrySheet {
                 }
             } label: {
                 Image(systemName: "arrow.left.arrow.right")
-                    .font(.system(size: 14, weight: .light))
+                    .font(.sans(.small, weight: .light))
                     .foregroundStyle(Palette.gold)
                     .frame(width: 44, height: 44)
                     .overlay {
                         Circle()
-                            .stroke(Palette.gold.opacity(0.4), lineWidth: 1)
+                            .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
                     }
                     .contentShape(Circle())
             }
@@ -382,7 +382,7 @@ private extension EntrySheet {
                 .fill(Palette.drawer)
                 .overlay {
                     Self.drawerShape
-                        .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
+                        .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
         }
@@ -427,7 +427,7 @@ private extension EntrySheet {
             DialFace(isActive: isEnteringAmount)
 
             Text(model.typeName)
-                .font(.system(size: 12, design: .serif))
+                .font(.serif(.caption))
                 .tracking(5)
                 .foregroundStyle(Palette.gold)
                 .offset(y: -size * 0.19)
@@ -490,14 +490,14 @@ private extension EntrySheet {
                     open(.newTemplate)
                 } label: {
                     Label("今の入力を保存", systemImage: "plus")
-                        .font(.system(size: 11))
+                        .font(.sans(.caption))
                         .foregroundStyle(Palette.gold)
                         .padding(.horizontal, 12)
                         .frame(height: Self.templateHeight)
                         .overlay {
                             Capsule()
                                 .stroke(
-                                    Palette.gold.opacity(0.5),
+                                    Palette.gold.opacity(.medium),
                                     style: .dashed
                                 )
                         }
@@ -530,10 +530,10 @@ private extension EntrySheet {
                     .foregroundStyle(Palette.ink)
 
                 Text(amount)
-                    .font(.system(size: 11, design: .serif))
+                    .font(.serif(.caption))
                     .foregroundStyle(amountColor)
             }
-            .font(.system(size: 11))
+            .font(.sans(.caption))
             .padding(.leading, 6)
             .padding(.trailing, 12)
             .frame(height: Self.templateHeight)
@@ -558,16 +558,16 @@ private extension EntrySheet {
             } label: {
                 VStack(spacing: 4) {
                     Image(systemName: "plus")
-                        .font(.system(size: 17, weight: .ultraLight))
+                        .font(.sans(.body, weight: .ultraLight))
 
                     Text("追加")
-                        .font(.system(size: 10))
+                        .font(.sans(.caption))
                 }
                 .foregroundStyle(Palette.gold)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Palette.gold.opacity(0.45), style: .dashed)
+                        .stroke(Palette.gold.opacity(.medium), style: .dashed)
                 }
                 .contentShape(.rect)
             }
@@ -619,7 +619,7 @@ private extension EntrySheet {
             IconImage(model.icon(for: category), size: 17)
 
             Text(category.name)
-                .font(.system(size: 10))
+                .font(.sans(.caption))
                 .lineLimit(1)
         }
         .foregroundStyle(color)
@@ -645,7 +645,7 @@ private extension EntrySheet {
         categoryFace(menu.category, isLifted: true)
             .frame(width: menu.frame.width, height: menu.frame.height)
             .scaleEffect(1.06)
-            .shadow(color: Palette.gold.opacity(0.35), radius: 12)
+            .shadow(color: Palette.gold.opacity(.muted), radius: 12)
             .position(x: menu.frame.midX, y: menu.frame.midY)
             .allowsHitTesting(false)
             .transition(.opacity)
@@ -841,7 +841,7 @@ private extension EntrySheet {
     }
 
     static func categoryFill(_ isSelected: Bool) -> Color {
-        isSelected ? Palette.gold.opacity(0.12) : Color.clear
+        isSelected ? Palette.gold.opacity(.subtle) : Color.clear
     }
 
     func menuX(for menu: CategoryMenu) -> CGFloat {
@@ -886,7 +886,7 @@ private extension EntrySheet {
     }
 
     func templateStroke(_ isApplied: Bool) -> Color {
-        isApplied ? Palette.gold : Palette.gold.opacity(0.22)
+        isApplied ? Palette.gold : Palette.gold.opacity(.soft)
     }
 
     func useTemplate(_ template: EntryTemplate) {

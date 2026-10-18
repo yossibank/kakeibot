@@ -109,7 +109,7 @@ private extension OnboardingView {
         VStack(spacing: 22) {
             VStack(spacing: 10) {
                 Text("ようこそ")
-                    .font(.system(size: 26, design: .serif))
+                    .font(.serif(.title))
                     .tracking(8)
                     .foregroundStyle(Palette.gold)
 
@@ -195,7 +195,7 @@ private extension OnboardingView {
                         .foregroundStyle(Palette.gold)
 
                     Text(budgetText)
-                        .font(.system(size: 30, weight: .bold, design: .serif))
+                        .font(.serif(.largeTitle, weight: .bold))
                         .monospacedDigit()
                         .foregroundStyle(budgetColor)
 
@@ -240,7 +240,7 @@ private extension OnboardingView {
     ) -> some View {
         VStack(spacing: 8) {
             Text(title)
-                .font(.system(size: 20, design: .serif))
+                .font(.serif(.headline))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -258,7 +258,7 @@ private extension OnboardingView {
     ) -> some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
-                .font(.system(size: 16, weight: .light))
+                .font(.sans(.body, weight: .light))
                 .foregroundStyle(Palette.gold)
                 .frame(width: 22)
 
@@ -273,8 +273,8 @@ private extension OnboardingView {
 
     func launchOption(_ screen: LaunchScreen) -> some View {
         let isSelected = model.launchScreen == screen
-        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(0.2)
-        let fill = isSelected ? Palette.gold.opacity(0.1) : Color.clear
+        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(.soft)
+        let fill = isSelected ? Palette.gold.opacity(.subtle) : Color.clear
         let mark = isSelected ? "checkmark.circle.fill" : "circle"
 
         return Button {
@@ -284,7 +284,7 @@ private extension OnboardingView {
         } label: {
             HStack(spacing: 14) {
                 Image(systemName: screen.systemImage)
-                    .font(.system(size: 20, weight: .light))
+                    .font(.sans(.headline, weight: .light))
                     .foregroundStyle(Palette.gold)
                     .frame(width: 32)
 
@@ -301,7 +301,7 @@ private extension OnboardingView {
                 Spacer()
 
                 Image(systemName: mark)
-                    .font(.system(size: 18))
+                    .font(.sans(.headline))
                     .foregroundStyle(Palette.gold)
             }
             .padding(16)

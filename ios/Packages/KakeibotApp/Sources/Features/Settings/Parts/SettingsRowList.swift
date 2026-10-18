@@ -19,7 +19,7 @@ struct SettingsRowList<Panel: Hashable>: View {
         .background(Self.cardFill.opacity(0.7), in: Self.shape)
         .overlay {
             Self.shape
-                .stroke(Palette.gold.opacity(0.18), lineWidth: 1)
+                .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
         }
     }
 }
@@ -62,10 +62,10 @@ private extension SettingsRowList {
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: item.systemImage)
-                    .font(.system(size: 13))
+                    .font(.sans(.small))
                     .foregroundStyle(Palette.gold)
                     .frame(width: 28, height: 28)
-                    .background(Palette.gold.opacity(0.1), in: Circle())
+                    .background(Palette.gold.opacity(.subtle), in: Circle())
 
                 Text(item.title)
                     .font(.subheadline)
@@ -80,7 +80,7 @@ private extension SettingsRowList {
 
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundStyle(Palette.gold.opacity(0.6))
+                    .foregroundStyle(Palette.gold.opacity(.medium))
             }
             .padding(.horizontal, 16)
             .frame(height: 56)
@@ -96,7 +96,7 @@ private extension SettingsRowList {
     }
 
     static var amountFont: Font {
-        .system(size: 20, design: .serif)
+        .serif(.headline)
     }
 
     static var cardFill: LinearGradient {

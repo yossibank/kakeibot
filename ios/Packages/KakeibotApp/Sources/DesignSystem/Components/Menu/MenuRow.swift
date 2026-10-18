@@ -25,7 +25,7 @@ public struct MenuRow: View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 15, weight: .light))
+                    .font(.sans(.body, weight: .light))
                     .foregroundStyle(Palette.gold)
                     .frame(width: 22)
 
@@ -45,7 +45,7 @@ public struct MenuRow: View {
 
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.sans(.small, weight: .semibold))
                         .foregroundStyle(Palette.gold)
                 }
             }
@@ -64,6 +64,6 @@ private extension MenuRow {
     }
 
     var selectionFill: Color {
-        isSelected ? Palette.gold.opacity(0.08) : Color.clear
+        isSelected ? Palette.gold.opacity(.faint) : Color.clear
     }
 }

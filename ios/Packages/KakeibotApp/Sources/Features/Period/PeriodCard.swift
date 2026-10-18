@@ -14,7 +14,7 @@ struct PeriodCard: View {
                 .foregroundStyle(Palette.gold)
 
             Text(periodText)
-                .font(.system(size: 26, design: .serif))
+                .font(.serif(.title))
                 .monospacedDigit()
                 .foregroundStyle(Palette.champagne)
                 .contentTransition(.numericText())

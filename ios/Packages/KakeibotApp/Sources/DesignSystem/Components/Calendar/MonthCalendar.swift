@@ -29,7 +29,7 @@ public struct MonthCalendar: View {
                 Spacer()
 
                 Text(monthTitle)
-                    .font(.system(size: 20, weight: .medium, design: .serif))
+                    .font(.serif(.headline, weight: .medium))
                     .foregroundStyle(Palette.champagne)
 
                 Spacer()
@@ -100,7 +100,7 @@ private extension MonthCalendar {
             } label: {
                 VStack(spacing: 1) {
                     Text(String(date.day))
-                        .font(.system(size: 17, weight: weight, design: .serif))
+                        .font(.serif(.body, weight: weight))
                         .foregroundStyle(foreground(for: date))
                         .frame(width: 32, height: 32)
                         .background(
@@ -110,7 +110,7 @@ private extension MonthCalendar {
                         .overlay(Circle().stroke(ring, lineWidth: 1))
 
                     Text(holiday ?? "")
-                        .font(.system(size: 8))
+                        .font(.sans(.micro))
                         .foregroundStyle(Palette.holiday)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)

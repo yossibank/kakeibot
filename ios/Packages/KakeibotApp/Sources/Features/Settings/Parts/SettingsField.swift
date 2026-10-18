@@ -54,6 +54,6 @@ private extension SettingsField {
     }
 
     var stroke: Color {
-        isFocused ? Palette.gold : Palette.gold.opacity(0.35)
+        isFocused ? Palette.gold : Palette.gold.opacity(.muted)
     }
 }

@@ -23,7 +23,7 @@ public struct Chip: View {
                 .lineLimit(1)
 
             Image(systemName: "chevron.down")
-                .font(.system(size: 9, weight: .semibold))
+                .font(.sans(.micro, weight: .semibold))
                 .foregroundStyle(Palette.mist)
         }
         .font(.caption)
@@ -31,7 +31,7 @@ public struct Chip: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 7)
         .background(
-            isHighlighted ? Palette.gold.opacity(0.12) : Color.clear,
+            isHighlighted ? Palette.gold.opacity(.subtle) : Color.clear,
             in: Capsule()
         )
         .overlay {
@@ -46,7 +46,7 @@ public struct Chip: View {
 
 private extension Chip {
     var foreground: Color {
-        isHighlighted ? Palette.champagne : Palette.ink.opacity(0.85)
+        isHighlighted ? Palette.champagne : Palette.ink.opacity(.strong)
     }
 }
 

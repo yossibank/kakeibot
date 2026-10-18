@@ -97,7 +97,7 @@ private extension WalletListView {
             Spacer()
 
             Text("口座")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -181,12 +181,12 @@ private extension WalletListView {
                 .foregroundStyle(Palette.gold)
                 .frame(width: 40, height: 40)
                 .background(
-                    Palette.gold.opacity(0.1),
+                    Palette.gold.opacity(.subtle),
                     in: .rect(cornerRadius: 12)
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
+                        .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
                 }
 
             VStack(alignment: .leading, spacing: 3) {
@@ -204,7 +204,7 @@ private extension WalletListView {
             Spacer(minLength: 8)
 
             Text(AmountText.text(balance))
-                .font(.system(size: 17, design: .serif))
+                .font(.serif(.body))
                 .monospacedDigit()
                 .foregroundStyle(balanceColor)
                 .lineLimit(1)
