@@ -255,8 +255,9 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
             allTemplates = try await database.templates()
-            hasOpenedCategoryMenu = try await database.hasOpenedCategoryMenu()
-            weekStart = try await database.weekStart()
+            hasOpenedCategoryMenu = try await database
+                .setting(.categoryMenuOpened)
+            weekStart = try await database.setting(.weekStart)
             try await loadBalances()
             try await loadEntry()
 
@@ -378,7 +379,7 @@ public extension EntryModel {
         hasOpenedCategoryMenu = true
 
         do {
-            try await database.markCategoryMenuOpened()
+            try await database.setSetting(.categoryMenuOpened, to: true)
         } catch {
             report(error)
         }

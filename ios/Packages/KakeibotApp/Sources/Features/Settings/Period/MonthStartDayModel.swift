@@ -32,7 +32,7 @@ public extension MonthStartDayModel {
 
     func load() async {
         do {
-            startDay = try await database.monthStartDay()
+            startDay = try await database.setting(.monthStartDay)
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -43,7 +43,7 @@ public extension MonthStartDayModel {
         self.startDay = startDay
 
         do {
-            try await database.setMonthStartDay(startDay)
+            try await database.setSetting(.monthStartDay, to: startDay)
         } catch {
             self.startDay = previous
             errorMessage = Self.saveFailedMessage

@@ -190,8 +190,8 @@ public extension ReviewModel {
 
     func loadSelection() async {
         do {
-            scale = try await database.reviewScale()
-            kind = try await database.reviewKind()
+            scale = try await database.setting(.reviewScale)
+            kind = try await database.setting(.reviewKind)
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -212,8 +212,8 @@ public extension ReviewModel {
 
     func saveSelection() async {
         do {
-            try await database.setReviewScale(scale)
-            try await database.setReviewKind(kind)
+            try await database.setSetting(.reviewScale, to: scale)
+            try await database.setSetting(.reviewKind, to: kind)
         } catch {
             errorMessage = Self.saveFailedMessage
         }
@@ -336,7 +336,7 @@ private extension ReviewModel {
 
     func observeMonthStartDay() async {
         do {
-            for try await startDay in database.monthStartDayUpdates() {
+            for try await startDay in database.settingUpdates(.monthStartDay) {
                 monthStartDay = startDay
             }
         } catch {
@@ -346,7 +346,7 @@ private extension ReviewModel {
 
     func observeWeekStart() async {
         do {
-            for try await weekStart in database.weekStartUpdates() {
+            for try await weekStart in database.settingUpdates(.weekStart) {
                 self.weekStart = weekStart
             }
         } catch {

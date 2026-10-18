@@ -61,7 +61,7 @@ extension AppModel {
             .value
 
             await generateRecurring(in: database)
-            let completed = try await database.isOnboardingCompleted()
+            let completed = try await database.setting(.onboardingCompleted)
             launch = completed ? .ready(database) : .onboarding(database)
         } catch {
             launch = .failed(String(describing: error))

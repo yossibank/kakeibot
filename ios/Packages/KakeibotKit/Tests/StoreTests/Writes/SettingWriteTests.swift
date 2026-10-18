@@ -10,11 +10,11 @@ struct SettingWriteTests {
         let payday = try #require(MonthStartDay(25))
         let last = try #require(MonthStartDay(31))
 
-        let initial = try await database.monthStartDay()
-        try await database.setMonthStartDay(payday)
-        let saved = try await database.monthStartDay()
-        try await database.setMonthStartDay(last)
-        let changed = try await database.monthStartDay()
+        let initial = try await database.setting(.monthStartDay)
+        try await database.setSetting(.monthStartDay, to: payday)
+        let saved = try await database.setting(.monthStartDay)
+        try await database.setSetting(.monthStartDay, to: last)
+        let changed = try await database.setting(.monthStartDay)
 
         #expect(initial == .first)
         #expect(saved == payday)
@@ -25,10 +25,11 @@ struct SettingWriteTests {
     func announcesMonthStartDay() async throws {
         let database = try AppDatabase.inMemory()
         let payday = try #require(MonthStartDay(25))
-        var updates = database.monthStartDayUpdates().makeAsyncIterator()
+        var updates = database.settingUpdates(.monthStartDay)
+            .makeAsyncIterator()
 
         let initial = try await updates.next()
-        try await database.setMonthStartDay(payday)
+        try await database.setSetting(.monthStartDay, to: payday)
         let changed = try await updates.next()
 
         #expect(initial == .first)
@@ -38,12 +39,12 @@ struct SettingWriteTests {
     @Test
     func savesWeekStart() async throws {
         let database = try AppDatabase.inMemory()
-        var updates = database.weekStartUpdates().makeAsyncIterator()
+        var updates = database.settingUpdates(.weekStart).makeAsyncIterator()
 
         let initial = try await updates.next()
-        try await database.setWeekStart(.monday)
+        try await database.setSetting(.weekStart, to: .monday)
         let changed = try await updates.next()
-        let saved = try await database.weekStart()
+        let saved = try await database.setting(.weekStart)
 
         #expect(initial == .sunday)
         #expect(changed == .monday)
@@ -55,11 +56,11 @@ struct SettingWriteTests {
         let database = try AppDatabase.inMemory()
         let time = try #require(ReminderTime("21:30"))
 
-        let initial = try await database.reminderTime()
-        try await database.setReminderTime(time)
-        let saved = try await database.reminderTime()
-        try await database.setReminderTime(nil)
-        let cleared = try await database.reminderTime()
+        let initial = try await database.setting(.reminderTime)
+        try await database.setSetting(.reminderTime, to: time)
+        let saved = try await database.setting(.reminderTime)
+        try await database.setSetting(.reminderTime, to: nil)
+        let cleared = try await database.setting(.reminderTime)
 
         #expect(initial == nil)
         #expect(saved == time)
@@ -70,10 +71,10 @@ struct SettingWriteTests {
     func announcesReminderTime() async throws {
         let database = try AppDatabase.inMemory()
         let time = try #require(ReminderTime("20:00"))
-        var updates = database.reminderTimeUpdates().makeAsyncIterator()
+        var updates = database.settingUpdates(.reminderTime).makeAsyncIterator()
 
         let initial = try await updates.next()
-        try await database.setReminderTime(time)
+        try await database.setSetting(.reminderTime, to: time)
         let changed = try await updates.next()
 
         #expect(initial == .some(nil))
@@ -84,9 +85,9 @@ struct SettingWriteTests {
     func completesOnboarding() async throws {
         let database = try AppDatabase.inMemory()
 
-        let before = try await database.isOnboardingCompleted()
-        try await database.completeOnboarding()
-        let after = try await database.isOnboardingCompleted()
+        let before = try await database.setting(.onboardingCompleted)
+        try await database.setSetting(.onboardingCompleted, to: true)
+        let after = try await database.setting(.onboardingCompleted)
 
         #expect(!before)
         #expect(after)
@@ -96,9 +97,9 @@ struct SettingWriteTests {
     func savesLaunchScreen() async throws {
         let database = try AppDatabase.inMemory()
 
-        let initial = try await database.launchScreen()
-        try await database.setLaunchScreen(.entry)
-        let saved = try await database.launchScreen()
+        let initial = try await database.setting(.launchScreen)
+        try await database.setSetting(.launchScreen, to: .entry)
+        let saved = try await database.setting(.launchScreen)
 
         #expect(initial == .home)
         #expect(saved == .entry)
@@ -108,9 +109,9 @@ struct SettingWriteTests {
     func savesTemplateOrder() async throws {
         let database = try AppDatabase.inMemory()
 
-        let initial = try await database.templateOrder()
-        try await database.setTemplateOrder(.frequent)
-        let saved = try await database.templateOrder()
+        let initial = try await database.setting(.templateOrder)
+        try await database.setSetting(.templateOrder, to: .frequent)
+        let saved = try await database.setting(.templateOrder)
 
         #expect(initial == .manual)
         #expect(saved == .frequent)
@@ -120,9 +121,9 @@ struct SettingWriteTests {
     func savesRecordsLayout() async throws {
         let database = try AppDatabase.inMemory()
 
-        let initial = try await database.recordsLayout()
-        try await database.setRecordsLayout(.calendar)
-        let saved = try await database.recordsLayout()
+        let initial = try await database.setting(.recordsLayout)
+        try await database.setSetting(.recordsLayout, to: .calendar)
+        let saved = try await database.setting(.recordsLayout)
 
         #expect(initial == .list)
         #expect(saved == .calendar)
@@ -132,12 +133,12 @@ struct SettingWriteTests {
     func savesReviewSelection() async throws {
         let database = try AppDatabase.inMemory()
 
-        let initialScale = try await database.reviewScale()
-        let initialKind = try await database.reviewKind()
-        try await database.setReviewScale(.year)
-        try await database.setReviewKind(.balance)
-        let scale = try await database.reviewScale()
-        let kind = try await database.reviewKind()
+        let initialScale = try await database.setting(.reviewScale)
+        let initialKind = try await database.setting(.reviewKind)
+        try await database.setSetting(.reviewScale, to: .year)
+        try await database.setSetting(.reviewKind, to: .balance)
+        let scale = try await database.setting(.reviewScale)
+        let kind = try await database.setting(.reviewKind)
 
         #expect(initialScale == .month)
         #expect(initialKind == .expense)
@@ -149,9 +150,9 @@ struct SettingWriteTests {
     func savesCategoryMenuOpened() async throws {
         let database = try AppDatabase.inMemory()
 
-        let before = try await database.hasOpenedCategoryMenu()
-        try await database.markCategoryMenuOpened()
-        let after = try await database.hasOpenedCategoryMenu()
+        let before = try await database.setting(.categoryMenuOpened)
+        try await database.setSetting(.categoryMenuOpened, to: true)
+        let after = try await database.setting(.categoryMenuOpened)
 
         #expect(!before)
         #expect(after)

@@ -107,7 +107,7 @@ public extension RecordsModel {
 
     func loadLayout() async {
         do {
-            layout = try await database.recordsLayout()
+            layout = try await database.setting(.recordsLayout)
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -117,7 +117,7 @@ public extension RecordsModel {
         self.layout = layout
 
         do {
-            try await database.setRecordsLayout(layout)
+            try await database.setSetting(.recordsLayout, to: layout)
         } catch {
             errorMessage = Self.saveFailedMessage
         }
@@ -170,7 +170,7 @@ private extension RecordsModel {
 
     func observeWeekStart() async {
         do {
-            for try await weekStart in database.weekStartUpdates() {
+            for try await weekStart in database.settingUpdates(.weekStart) {
                 self.weekStart = weekStart
             }
         } catch {
@@ -180,7 +180,7 @@ private extension RecordsModel {
 
     func observeMonthStartDay() async {
         do {
-            for try await startDay in database.monthStartDayUpdates() {
+            for try await startDay in database.settingUpdates(.monthStartDay) {
                 monthStartDay = startDay
                 month = today.periodMonth(startingOn: startDay)
             }
