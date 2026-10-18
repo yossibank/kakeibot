@@ -303,7 +303,7 @@ private extension SettingsSheet {
             .padding(.horizontal, 14)
             .card()
             .confirmationDialog(
-                "4 か月分の記録・予算・テンプレートを足します",
+                "4 か月分の記録・予算・テンプレート・固定費を足します",
                 isPresented: $isConfirmingSample,
                 titleVisibility: .visible
             ) {

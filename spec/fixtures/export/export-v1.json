@@ -240,6 +240,7 @@
         "endDate": null,
         "remindDaysBefore": 1,
         "generatedUntil": "2026-09-27",
+        "sortOrder": 0,
         "createdAt": "2026-01-01T00:00:00Z",
         "updatedAt": "2026-09-27T00:00:00Z"
       },
@@ -258,6 +259,7 @@
         "endDate": "2030-12-31",
         "remindDaysBefore": null,
         "generatedUntil": null,
+        "sortOrder": 1,
         "createdAt": "2026-01-01T00:00:00Z",
         "updatedAt": "2026-01-01T00:00:00Z"
       }

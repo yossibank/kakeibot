@@ -16,7 +16,7 @@ public extension AppDatabase {
 extension AppDatabase {
     static func recurrings(in db: Database) throws -> [Recurring] {
         try Recurring
-            .order(Column("day"), Column("created_at"))
+            .order(Column("sort_order"), Column("created_at"))
             .fetchAll(db)
     }
 }

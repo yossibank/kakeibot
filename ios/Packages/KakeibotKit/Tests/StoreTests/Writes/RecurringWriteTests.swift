@@ -144,6 +144,41 @@ struct RecurringWriteTests {
     }
 
     @Test
+    func addsAtEndAndReorders() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let start = try #require(LocalDate("2026-02-01"))
+
+        let draft = RecurringDraft(
+            type: .expense,
+            amount: 4800,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            frequency: .monthly,
+            month: 1,
+            day: 1,
+            startDate: start
+        )
+
+        let added = try await setup.database.saveRecurring(
+            draft,
+            today: start,
+            at: setup.now
+        )
+
+        let before = try await setup.database.recurrings().map(\.id)
+        try await setup.database.reorderRecurrings(
+            before.reversed(),
+            at: setup.now
+        )
+        let after = try await setup.database.recurrings().map(\.id)
+
+        #expect(added.sortOrder == 1)
+        #expect(before.last == added.id)
+        #expect(after == before.reversed())
+    }
+
+    @Test
     func deletesRecurringButKeepsEntries() async throws {
         let setup = try await Setup()
         let today = try #require(LocalDate("2026-02-28"))

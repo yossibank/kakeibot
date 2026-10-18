@@ -37,6 +37,12 @@ extension SampleData {
         try await database.markNoSpendDays(noSpendDays, at: now)
         try await insertBudgets(book: book, today: today, into: database)
         try await insertTemplates(book: book, into: database, now: now)
+        try await insertRecurrings(
+            book: book,
+            today: today,
+            into: database,
+            now: now
+        )
     }
 }
 
@@ -177,26 +183,12 @@ private extension SampleData {
             drafts.append(draft)
         }
 
-        let salary = try book.category("給料", in: book.income)
         let bonus = try book.category("臨時収入", in: book.income)
-        let home = try book.category("住まい", in: book.expense)
         let utility = try book.category("光熱費", in: book.expense)
-        let phone = try book.category("通信", in: book.expense)
         let utilityAmount = 6200 + date.month % 3 * 900
 
-        switch date.day {
-        case 10:
-            add(.expense, phone, 4800, from: book.card, "スマホ")
-        case 15:
+        if date.day == 15 {
             add(.expense, utility, utilityAmount, from: book.bank, "電気・ガス")
-        case 25:
-            add(.income, salary, 280_000, from: book.bank, "給料")
-        case 26:
-            add(.transfer, nil, 45000, from: book.bank, to: book.card, "カード")
-        case 27:
-            add(.expense, home, 78000, from: book.bank, "家賃")
-        default:
-            break
         }
 
         if date.weekday == .monday {
@@ -231,6 +223,71 @@ private extension SampleData {
             }
 
             try await database.setBudget(amount, for: category, from: month)
+        }
+    }
+
+    static func insertRecurrings(
+        book: Book,
+        today: LocalDate,
+        into database: AppDatabase,
+        now: Date
+    ) async throws {
+        let start = today.adding(days: -(dayCount - 1))
+        let salary = try book.category("給料", in: book.income)
+        let home = try book.category("住まい", in: book.expense)
+        let phone = try book.category("通信", in: book.expense)
+
+        func draft(
+            _ type: Entry.Kind,
+            _ category: EntryCategory.ID?,
+            _ amount: Int,
+            from wallet: Wallet.ID,
+            to destination: Wallet.ID? = nil,
+            day: Int,
+            remind: Int? = nil,
+            _ memo: String
+        ) -> RecurringDraft {
+            RecurringDraft(
+                type: type,
+                amount: amount,
+                categoryId: category,
+                walletId: wallet,
+                toWalletId: destination,
+                memo: memo,
+                frequency: .monthly,
+                month: start.month,
+                day: day,
+                startDate: start,
+                remindDaysBefore: remind
+            )
+        }
+
+        let drafts = [
+            draft(.expense, phone, 4800, from: book.card, day: 10, "スマホ"),
+            draft(.income, salary, 280_000, from: book.bank, day: 25, "給料"),
+            draft(
+                .transfer,
+                nil,
+                45000,
+                from: book.bank,
+                to: book.card,
+                day: 26,
+                remind: 1,
+                "カード"
+            ),
+            draft(
+                .expense,
+                home,
+                78000,
+                from: book.bank,
+                day: 27,
+                remind: 3,
+                "家賃"
+            )
+        ]
+
+        for draft in drafts {
+            try await database.saveRecurring(draft, today: today, at: now)
         }
     }
 

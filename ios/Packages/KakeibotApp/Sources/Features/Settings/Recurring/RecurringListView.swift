@@ -6,6 +6,8 @@ import SwiftUI
 public struct RecurringListView: View {
     @State private var model: RecurringListModel
     @State private var sheet: Sheet?
+    @State private var lift: Lift?
+    @State private var liftCount = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -17,15 +19,19 @@ public struct RecurringListView: View {
         VStack(spacing: 14) {
             header
 
-            Text("決まった日に、記録をひとりでに入れます")
+            Text(hint)
                 .font(.caption)
                 .foregroundStyle(Palette.mist)
+                .multilineTextAlignment(.center)
 
             ScrollView {
-                VStack(spacing: 10) {
-                    ForEach(model.rows) { row in
-                        rowButton(row)
+                VStack(spacing: 14) {
+                    if !model.rows.isEmpty {
+                        totalCard
                     }
+
+                    board
+                        .coordinateSpace(.named(Self.space))
 
                     if model.rows.isEmpty {
                         Text("家賃や給料などを足すと、ここに並びます")
@@ -43,6 +49,7 @@ public struct RecurringListView: View {
                 .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
+            .scrollDisabled(lift != nil)
 
             addButton
         }
@@ -57,6 +64,8 @@ public struct RecurringListView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .preferredColorScheme(.dark)
+        .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
+        .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sheet(item: $sheet) { sheet in
             RecurringEditSheet(model: model.editModel(for: sheet.editingId))
         }
@@ -105,10 +114,81 @@ private extension RecurringListView {
         .buttonStyle(.plain)
     }
 
-    func rowButton(_ row: RecurringListModel.Row) -> some View {
-        Button {
-            sheet = .edit(row.id)
-        } label: {
+    var totalCard: some View {
+        HStack(spacing: 0) {
+            totalColumn("今月の支出", amount: model.monthTotal.expense)
+
+            Rectangle()
+                .fill(Palette.gold.opacity(0.18))
+                .frame(width: 1, height: 34)
+
+            totalColumn("今月の収入", amount: model.monthTotal.income)
+        }
+        .padding(.vertical, 14)
+        .card()
+    }
+
+    var board: some View {
+        let rows = model.rows
+
+        return ZStack(alignment: .top) {
+            ForEach(rows) { row in
+                movableRow(row, in: rows)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: boardHeight(count: rows.count), alignment: .top)
+    }
+
+    func totalColumn(
+        _ title: String,
+        amount: Int
+    ) -> some View {
+        VStack(spacing: 4) {
+            Text(title)
+                .font(.caption2)
+                .tracking(2)
+                .foregroundStyle(Palette.gold)
+
+            Text(AmountText.text(amount))
+                .font(.system(size: 20, design: .serif))
+                .monospacedDigit()
+                .foregroundStyle(Palette.champagne)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    func movableRow(
+        _ row: RecurringListModel.Row,
+        in rows: [RecurringListModel.Row]
+    ) -> some View {
+        let isLifted = lift?.id == row.id
+        let index = rows.firstIndex { $0.id == row.id } ?? 0
+        let y = isLifted ? liftedCenterY : centerY(at: index)
+        let scale: CGFloat = isLifted ? 1.03 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let layer: Double = isLifted ? 1 : 0
+
+        return rowCard(row)
+            .frame(height: Self.rowHeight)
+            .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
+            .offset(y: y - Self.rowHeight / 2)
+            .zIndex(layer)
+            .onTapGesture {
+                sheet = .edit(row.id)
+            }
+            .gesture(
+                LiftGesture(in: Self.space) { location in
+                    follow(row, at: index, to: location)
+                } onEnd: {
+                    drop()
+                }
+            )
+    }
+
+    func rowCard(_ row: RecurringListModel.Row) -> some View {
+        Group {
             HStack(spacing: 12) {
                 IconBadge(row.icon, size: 38)
 
@@ -135,21 +215,105 @@ private extension RecurringListView {
                 }
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .frame(maxHeight: .infinity)
             .contentShape(.rect)
         }
-        .buttonStyle(.plain)
         .card()
     }
 }
 
 private extension RecurringListView {
+    struct Lift {
+        let id: Recurring.ID
+        var location: CGFloat
+        var grab: CGFloat?
+    }
+
     enum Sheet: Identifiable {
         case new
         case edit(Recurring.ID)
     }
 
     static let dash = StrokeStyle(lineWidth: 1, dash: [5, 4])
+    static let rowHeight: CGFloat = 64
+    static let spacing: CGFloat = 10
+    nonisolated static let space = "RecurringBoard"
+
+    var hint: String {
+        if model.rows.count > 1 {
+            "決まった日に、記録をひとりでに入れます。長押しで動かせます"
+        } else {
+            "決まった日に、記録をひとりでに入れます"
+        }
+    }
+
+    var liftedCenterY: CGFloat {
+        guard let lift else {
+            return 0
+        }
+
+        return lift.location + (lift.grab ?? 0)
+    }
+
+    func boardHeight(count: Int) -> CGFloat {
+        let gaps = Self.spacing * CGFloat(max(count - 1, 0))
+        return Self.rowHeight * CGFloat(count) + gaps
+    }
+
+    func centerY(at index: Int) -> CGFloat {
+        (Self.rowHeight + Self.spacing) * CGFloat(index) + Self.rowHeight / 2
+    }
+
+    func index(at y: CGFloat) -> Int {
+        let step = Self.rowHeight + Self.spacing
+        let index = max(Int(y / step), 0)
+        return min(index, model.rows.count - 1)
+    }
+
+    func follow(
+        _ row: RecurringListModel.Row,
+        at index: Int,
+        to location: CGPoint
+    ) {
+        if lift == nil {
+            withAnimation(.snappy(duration: 0.2)) {
+                lift = Lift(id: row.id, location: centerY(at: index))
+            }
+
+            liftCount += 1
+        }
+
+        guard var current = lift else {
+            return
+        }
+
+        if current.grab == nil {
+            current.grab = current.location - location.y
+        }
+
+        current.location = location.y
+        lift = current
+
+        let target = self.index(at: liftedCenterY)
+
+        withAnimation(.snappy) {
+            model.move(row.id, to: target)
+        }
+    }
+
+    func drop() {
+        guard lift != nil else {
+            return
+        }
+
+        withAnimation(.snappy) {
+            lift = nil
+        }
+
+        Task {
+            await model.finishMoving()
+        }
+    }
 
     static func nextText(_ date: LocalDate?) -> String {
         guard let date else {

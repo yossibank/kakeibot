@@ -136,5 +136,7 @@ struct RecurringModelTests {
         #expect(row.title == "家賃")
         #expect(row.detail == "毎月 27 日・財布")
         #expect(row.next?.description == "2026-10-27")
+        #expect(model.monthTotal.expense == 78000)
+        #expect(model.monthTotal.income == 0)
     }
 }

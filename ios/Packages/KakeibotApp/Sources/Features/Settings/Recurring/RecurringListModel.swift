@@ -7,6 +7,7 @@ import Store
 @Observable
 public final class RecurringListModel {
     public private(set) var recurrings: [Recurring] = []
+    public private(set) var movingOrder: [Recurring.ID]?
     public private(set) var options: EntryOptions?
     public private(set) var errorMessage: String?
 
@@ -34,8 +35,67 @@ public extension RecurringListModel {
         public let next: LocalDate?
     }
 
+    struct MonthTotal: Equatable {
+        public let expense: Int
+        public let income: Int
+    }
+
     var rows: [Row] {
-        recurrings.map(row(for:))
+        shown.map(row(for:))
+    }
+
+    var monthTotal: MonthTotal {
+        let month = today.yearMonth.period(startingOn: .first)
+
+        let totals = recurrings.map { recurring in
+            let count = recurring.dates(
+                from: month.lowerBound,
+                through: month.upperBound
+            )
+            .count
+
+            return (recurring.type, recurring.amount * count)
+        }
+
+        return MonthTotal(
+            expense: Self.sum(totals, of: .expense),
+            income: Self.sum(totals, of: .income)
+        )
+    }
+
+    func move(
+        _ id: Recurring.ID,
+        to index: Int
+    ) {
+        var order = movingOrder ?? recurrings.map(\.id)
+
+        guard let from = order.firstIndex(of: id) else {
+            return
+        }
+
+        let to = min(max(index, 0), order.count - 1)
+
+        guard from != to else {
+            return
+        }
+
+        order.remove(at: from)
+        order.insert(id, at: to)
+        movingOrder = order
+    }
+
+    func finishMoving() async {
+        guard let movingOrder else {
+            return
+        }
+
+        do {
+            try await database.reorderRecurrings(movingOrder, at: Date())
+        } catch {
+            errorMessage = Self.saveFailedMessage
+        }
+
+        self.movingOrder = nil
     }
 
     func editModel(for id: Recurring.ID?) -> RecurringEditModel {
@@ -58,6 +118,24 @@ public extension RecurringListModel {
 
 private extension RecurringListModel {
     static let loadFailedMessage = "固定費を読めませんでした"
+    static let saveFailedMessage = "並びを保存できませんでした"
+
+    var shown: [Recurring] {
+        guard let movingOrder else {
+            return recurrings
+        }
+
+        return movingOrder.compactMap { id in
+            recurrings.first { $0.id == id }
+        }
+    }
+
+    static func sum(
+        _ totals: [(Entry.Kind, Int)],
+        of type: Entry.Kind
+    ) -> Int {
+        totals.filter { $0.0 == type }.reduce(0) { $0 + $1.1 }
+    }
 
     static func title(of type: Entry.Kind) -> String {
         type == .transfer ? "振替" : "固定費"
