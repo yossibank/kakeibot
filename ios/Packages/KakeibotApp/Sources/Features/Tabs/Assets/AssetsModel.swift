@@ -7,8 +7,8 @@ import Store
 @Observable
 public final class AssetsModel {
     public var today: LocalDate
-    public var monthStartDay: MonthStartDay = .first
 
+    public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var list: EntryList?
     public private(set) var errorMessage: String?
 
@@ -90,19 +90,21 @@ public extension AssetsModel {
         }
     }
 
-    func load() async {
-        do {
-            list = try await database.entryList()
-        } catch {
-            errorMessage = Self.loadFailedMessage
+    func run() async {
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observe()
+            }
+
+            group.addTask {
+                await self.observeMonthStartDay()
+            }
         }
     }
 
-    func observe() async {
+    func load() async {
         do {
-            for try await list in database.entryListUpdates() {
-                self.list = list
-            }
+            list = try await database.entryList()
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -122,5 +124,25 @@ private extension AssetsModel {
 
     var entries: [Entry] {
         list?.days.flatMap(\.entries) ?? []
+    }
+
+    func observe() async {
+        do {
+            for try await list in database.entryListUpdates() {
+                self.list = list
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeMonthStartDay() async {
+        do {
+            for try await startDay in database.monthStartDayUpdates() {
+                monthStartDay = startDay
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
     }
 }

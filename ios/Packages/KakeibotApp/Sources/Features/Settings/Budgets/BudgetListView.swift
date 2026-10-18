@@ -37,6 +37,14 @@ private extension BudgetListView {
                 Text("変えた額はこの月から使い、前の月はそのまま残ります")
                     .font(.caption2)
                     .foregroundStyle(Palette.mist)
+
+                if model.recurringExpense > 0 {
+                    Label(recurringText, systemImage: "repeat")
+                        .font(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.gold)
+                        .padding(.top, 4)
+                }
             }
 
             ScrollView {
@@ -208,6 +216,11 @@ private extension BudgetListView {
 }
 
 private extension BudgetListView {
+    var recurringText: String {
+        let amount = AmountText.text(model.recurringExpense)
+        return "この月の固定費は \(amount)。予算の目安にできます"
+    }
+
     func amountText(_ amount: Int?) -> String {
         amount.map { AmountText.text($0) } ?? "なし"
     }

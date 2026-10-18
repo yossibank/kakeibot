@@ -3,8 +3,8 @@ import DesignSystem
 import Store
 import SwiftUI
 
-struct TemplateShelfSheet: View {
-    @Bindable var model: HomeModel
+public struct TemplateShelfSheet: View {
+    @Bindable private var model: HomeModel
 
     @State private var query = ""
     @State private var isEditing = false
@@ -13,10 +13,20 @@ struct TemplateShelfSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    let database: AppDatabase
-    let onUse: (EntryTemplate) -> Void
+    private let database: AppDatabase
+    private let onUse: (EntryTemplate) -> Void
 
-    var body: some View {
+    public init(
+        model: HomeModel,
+        database: AppDatabase,
+        onUse: @escaping (EntryTemplate) -> Void
+    ) {
+        self.model = model
+        self.database = database
+        self.onUse = onUse
+    }
+
+    public var body: some View {
         NavigationStack {
             VStack(spacing: 14) {
                 header

@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 import SwiftUI
 
-struct SettingsSheet: View {
+public struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
     @State private var launchScreen: LaunchScreen = .home
     @State private var weekStart: Weekday = .sunday
@@ -18,9 +18,18 @@ struct SettingsSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.notificationPermission) private var permission
 
-    let database: AppDatabase
+    private let database: AppDatabase
+    private let today: LocalDate
 
-    var body: some View {
+    public init(
+        database: AppDatabase,
+        today: LocalDate
+    ) {
+        self.database = database
+        self.today = today
+    }
+
+    public var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
                 header
@@ -68,10 +77,7 @@ struct SettingsSheet: View {
                                     RecurringListView(
                                         model: RecurringListModel(
                                             database: database,
-                                            today: LocalDate(
-                                                Date(),
-                                                in: .current
-                                            )
+                                            today: today
                                         )
                                     )
                                 } label: {
@@ -91,10 +97,7 @@ struct SettingsSheet: View {
                                     MonthStartDayView(
                                         model: MonthStartDayModel(
                                             database: database,
-                                            today: LocalDate(
-                                                Date(),
-                                                in: .current
-                                            )
+                                            today: today
                                         )
                                     )
                                 } label: {
@@ -114,10 +117,7 @@ struct SettingsSheet: View {
                                     BudgetListView(
                                         model: BudgetListModel(
                                             database: database,
-                                            today: LocalDate(
-                                                Date(),
-                                                in: .current
-                                            )
+                                            today: today
                                         )
                                     )
                                 } label: {
@@ -161,10 +161,7 @@ struct SettingsSheet: View {
                                 ReminderView(
                                     model: ReminderModel(
                                         database: database,
-                                        today: LocalDate(
-                                            Date(),
-                                            in: .current
-                                        ),
+                                        today: today,
                                         permission: permission
                                     )
                                 )
@@ -399,7 +396,7 @@ private extension SettingsSheet {
         do {
             try await SampleData.insert(
                 into: database,
-                today: LocalDate(Date(), in: .current),
+                today: today,
                 now: Date()
             )
 
@@ -416,6 +413,9 @@ private extension SettingsSheet {
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
-        SettingsSheet(database: database)
+        SettingsSheet(
+            database: database,
+            today: LocalDate(Date(), in: .current)
+        )
     }
 }

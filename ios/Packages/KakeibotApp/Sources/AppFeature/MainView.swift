@@ -1,10 +1,11 @@
 import Core
 import DesignSystem
+import Features
 import Foundation
 import Store
 import SwiftUI
 
-public struct MainView: View {
+struct MainView: View {
     @State private var tab: MainTab = .home
     @State private var sheet: Sheet?
     @State private var home: HomeModel
@@ -17,16 +18,16 @@ public struct MainView: View {
     @State private var orderMenuAnchor: CGRect?
 
     private let database: AppDatabase
+    private let today: LocalDate
     private let route: PlannedNotification.Route?
     private let onRouteOpened: () -> Void
 
-    public init(
+    init(
         database: AppDatabase,
+        today: LocalDate,
         route: PlannedNotification.Route? = nil,
         onRouteOpened: @escaping () -> Void = {}
     ) {
-        let today = LocalDate(Date(), in: .current)
-
         _home = State(
             initialValue: HomeModel(
                 database: database,
@@ -64,11 +65,12 @@ public struct MainView: View {
 
         _notice = State(initialValue: EntryNoticeModel(database: database))
         self.database = database
+        self.today = today
         self.route = route
         self.onRouteOpened = onRouteOpened
     }
 
-    public var body: some View {
+    var body: some View {
         TabView(selection: $tab) {
             Tab(value: MainTab.home) {
                 HomeView(
@@ -174,71 +176,33 @@ public struct MainView: View {
             sheetContent(for: sheet)
         }
         .task {
-            await home.observe()
+            await home.run()
         }
         .task {
-            await home.observeTemplates()
+            await records.run()
         }
         .task {
-            await home.loadTemplateOrder()
+            await review.run()
         }
         .task {
-            await home.observeBudgets()
-        }
-        .task {
-            await home.observeRecurrings()
-        }
-        .task {
-            await observeMonthStartDay()
-        }
-        .task {
-            await openLaunchScreen()
-        }
-        .task {
-            await records.observe()
-        }
-        .task {
-            await records.observeNoSpendDays()
-        }
-        .task {
-            await records.observeWeekStart()
-        }
-        .task {
-            await records.loadLayout()
-        }
-        .task {
-            await review.observe()
-        }
-        .task {
-            await review.loadSelection()
-        }
-        .task {
-            await review.observeBudgets()
-        }
-        .task {
-            await review.observeMonthStartDay()
-        }
-        .task {
-            await review.observeWeekStart()
-        }
-        .task {
-            await assets.observe()
+            await assets.run()
         }
         .task {
             await draft.load()
+        }
+        .task {
+            await openLaunchScreen()
         }
         .onChange(of: route, initial: true) { _, route in
             if let route {
                 open(route)
             }
         }
-        .onReceive(
-            NotificationCenter.default.publisher(for: .NSCalendarDayChanged)
-        ) { _ in
-            home.today = LocalDate(Date(), in: .current)
-            assets.today = home.today
-            records.today = home.today
-            review.today = home.today
+        .onChange(of: today) { _, today in
+            home.today = today
+            records.today = today
+            review.today = today
+            assets.today = today
             prepareDraft()
         }
     }
@@ -255,17 +219,20 @@ private extension MainView {
                 model: EntryModel(
                     database: database,
                     editing: id,
-                    date: home.today
+                    date: today
                 ),
                 onChange: notice.show
             )
         case .settings:
-            SettingsSheet(database: database)
+            SettingsSheet(
+                database: database,
+                today: today
+            )
         case let .template(template):
             EntrySheet(
                 model: EntryModel(
                     database: database,
-                    date: home.today,
+                    date: today,
                     template: template
                 ),
                 onChange: notice.show
@@ -274,7 +241,7 @@ private extension MainView {
             EntrySheet(
                 model: EntryModel(
                     database: database,
-                    date: home.today,
+                    date: today,
                     type: .transfer
                 ),
                 onChange: notice.show
@@ -296,7 +263,7 @@ private extension MainView {
             RecurringEditSheet(
                 model: RecurringEditModel(
                     database: database,
-                    today: home.today,
+                    today: today,
                     editing: id
                 )
             )
@@ -319,7 +286,7 @@ private extension MainView {
         case assets
     }
 
-    enum Sheet: Identifiable {
+    enum Sheet: Hashable, Identifiable {
         case new
         case edit(Entry.ID)
         case settings
@@ -330,18 +297,8 @@ private extension MainView {
         case wallet(Wallet.ID)
         case recurring(Recurring.ID)
 
-        var id: String {
-            switch self {
-            case .new: "new"
-            case let .edit(id): "edit-\(id)"
-            case .settings: "settings"
-            case let .template(template): "template-\(template.id)"
-            case .newTemplate: "new-template"
-            case .templates: "templates"
-            case .transfer: "transfer"
-            case let .wallet(id): "wallet-\(id)"
-            case let .recurring(id): "recurring-\(id)"
-            }
+        var id: Self {
+            self
         }
     }
 
@@ -408,18 +365,6 @@ private extension MainView {
         }
     }
 
-    func observeMonthStartDay() async {
-        do {
-            for try await startDay in database.monthStartDayUpdates() {
-                home.monthStartDay = startDay
-                assets.monthStartDay = startDay
-                records.setMonthStartDay(startDay, today: home.today)
-            }
-        } catch {
-            return
-        }
-    }
-
     func useTemplate(_ template: EntryTemplate) {
         guard template.amount != nil else {
             sheet = .template(template)
@@ -436,7 +381,7 @@ private extension MainView {
     }
 
     func prepareDraft() {
-        let model = EntryModel(database: database, date: home.today)
+        let model = EntryModel(database: database, date: today)
         draft = model
 
         Task {
@@ -455,6 +400,10 @@ private extension View {
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
-        MainView(database: database)
+
+        MainView(
+            database: database,
+            today: LocalDate(Date(), in: .current)
+        )
     }
 }

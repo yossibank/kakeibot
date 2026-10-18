@@ -24,8 +24,10 @@ let package = Package(
         .target(
             name: "AppFeature",
             dependencies: [
+                "DesignSystem",
                 "Features",
                 "Notifications",
+                .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
         ),

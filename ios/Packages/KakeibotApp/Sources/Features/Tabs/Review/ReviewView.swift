@@ -2,16 +2,24 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct ReviewView: View {
-    @Bindable var model: ReviewModel
+public struct ReviewView: View {
+    @Bindable private var model: ReviewModel
 
     @State private var openShare: ReviewModel.Share?
     @State private var pendingEntry: Entry.ID?
     @State private var slide = PageSlide()
 
-    let onOpenEntry: (Entry.ID) -> Void
+    private let onOpenEntry: (Entry.ID) -> Void
 
-    var body: some View {
+    public init(
+        model: ReviewModel,
+        onOpenEntry: @escaping (Entry.ID) -> Void
+    ) {
+        self.model = model
+        self.onOpenEntry = onOpenEntry
+    }
+
+    public var body: some View {
         ScrollView {
             VStack(spacing: 12) {
                 header
@@ -134,6 +142,13 @@ private extension ReviewView {
                 Text(comparisonText)
                     .font(.footnote)
                     .foregroundStyle(Palette.ink)
+            }
+
+            if let recurring = model.recurringTotal {
+                Label(recurringText(recurring), systemImage: "repeat")
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.mist)
             }
 
             if model.kind == .balance {
@@ -429,6 +444,12 @@ private extension ReviewView {
 
     var selectedChangeColor: Color {
         Self.changeColor(model.change, of: model.kind)
+    }
+
+    func recurringText(_ recurring: Int) -> String {
+        let other = model.total(of: model.kind) - recurring
+        let fixed = "固定費 \(AmountText.text(recurring))"
+        return "\(fixed)・それ以外 \(AmountText.text(other))"
     }
 
     var comparisonText: String {

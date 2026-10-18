@@ -14,6 +14,7 @@ public final class BudgetListModel {
     public private(set) var editing: Target?
     public private(set) var calculator = AmountCalculator()
     public private(set) var errorMessage: String?
+    public private(set) var recurrings: [Recurring] = []
 
     private let database: AppDatabase
     private let today: LocalDate
@@ -43,6 +44,11 @@ public extension BudgetListModel {
             case let .category(category): category.id
             }
         }
+    }
+
+    var recurringExpense: Int {
+        let period = month.period(startingOn: monthStartDay)
+        return recurrings.total(of: .expense, in: period)
     }
 
     var periodText: String {
@@ -125,6 +131,7 @@ public extension BudgetListModel {
             budgets = try await database.budgets()
             categoryList = try await database.categoryList()
             entryList = try await database.entryList()
+            recurrings = try await database.recurrings()
         } catch {
             errorMessage = Self.loadFailedMessage
         }

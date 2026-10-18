@@ -9,8 +9,8 @@ import Store
 public final class HomeModel {
     public var today: LocalDate
     public var templateType: Entry.Kind = .expense
-    public var monthStartDay: MonthStartDay = .first
 
+    public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var templateOrder: TemplateOrder = .manual
     public private(set) var list: EntryList?
     public private(set) var errorMessage: String?
@@ -114,6 +114,32 @@ public extension HomeModel {
         return rows
     }
 
+    func run() async {
+        await loadTemplateOrder()
+
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observe()
+            }
+
+            group.addTask {
+                await self.observeTemplates()
+            }
+
+            group.addTask {
+                await self.observeBudgets()
+            }
+
+            group.addTask {
+                await self.observeRecurrings()
+            }
+
+            group.addTask {
+                await self.observeMonthStartDay()
+            }
+        }
+    }
+
     func load() async {
         do {
             list = try await database.entryList()
@@ -180,36 +206,6 @@ public extension HomeModel {
         return parts.compactMap(\.self).joined(separator: "・")
     }
 
-    func observeBudgets() async {
-        do {
-            for try await budgets in database.budgetUpdates() {
-                self.budgets = budgets
-            }
-        } catch {
-            errorMessage = Self.loadFailedMessage
-        }
-    }
-
-    func observeRecurrings() async {
-        do {
-            for try await recurrings in database.recurringUpdates() {
-                self.recurrings = recurrings
-            }
-        } catch {
-            errorMessage = Self.loadFailedMessage
-        }
-    }
-
-    func observeTemplates() async {
-        do {
-            for try await templates in database.templateUpdates() {
-                allTemplates = templates
-            }
-        } catch {
-            errorMessage = Self.loadFailedMessage
-        }
-    }
-
     func record(_ template: EntryTemplate) async -> EntryChange? {
         guard let draft = template.entryDraft(on: today) else {
             return nil
@@ -226,16 +222,6 @@ public extension HomeModel {
         } catch {
             errorMessage = Self.saveFailedMessage
             return nil
-        }
-    }
-
-    func observe() async {
-        do {
-            for try await list in database.entryListUpdates() {
-                self.list = list
-            }
-        } catch {
-            errorMessage = Self.loadFailedMessage
         }
     }
 }
@@ -262,6 +248,56 @@ private extension HomeModel {
         }
 
         return uses
+    }
+
+    func observe() async {
+        do {
+            for try await list in database.entryListUpdates() {
+                self.list = list
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeTemplates() async {
+        do {
+            for try await templates in database.templateUpdates() {
+                allTemplates = templates
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeRecurrings() async {
+        do {
+            for try await recurrings in database.recurringUpdates() {
+                self.recurrings = recurrings
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeBudgets() async {
+        do {
+            for try await budgets in database.budgetUpdates() {
+                self.budgets = budgets
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
+    }
+
+    func observeMonthStartDay() async {
+        do {
+            for try await startDay in database.monthStartDayUpdates() {
+                monthStartDay = startDay
+            }
+        } catch {
+            errorMessage = Self.loadFailedMessage
+        }
     }
 
     func expense(on date: LocalDate) -> Int {

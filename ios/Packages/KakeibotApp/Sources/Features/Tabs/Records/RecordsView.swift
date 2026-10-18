@@ -2,18 +2,30 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct RecordsView: View {
-    @Bindable var model: RecordsModel
+public struct RecordsView: View {
+    @Bindable private var model: RecordsModel
 
     @State private var openId: Entry.ID?
     @State private var isMovingForward = true
     @State private var slide = PageSlide()
 
-    let onOpenEntry: (Entry.ID) -> Void
-    let onDelete: (Entry.ID) -> Void
-    let onAddEntry: (LocalDate) -> Void
+    private let onOpenEntry: (Entry.ID) -> Void
+    private let onDelete: (Entry.ID) -> Void
+    private let onAddEntry: (LocalDate) -> Void
 
-    var body: some View {
+    public init(
+        model: RecordsModel,
+        onOpenEntry: @escaping (Entry.ID) -> Void,
+        onDelete: @escaping (Entry.ID) -> Void,
+        onAddEntry: @escaping (LocalDate) -> Void
+    ) {
+        self.model = model
+        self.onOpenEntry = onOpenEntry
+        self.onDelete = onDelete
+        self.onAddEntry = onAddEntry
+    }
+
+    public var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 header
