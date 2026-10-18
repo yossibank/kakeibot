@@ -70,7 +70,7 @@ public extension ReminderModel {
 
     func load() async {
         do {
-            time = try await database.reminderTime()
+            time = try await database.setting(.reminderTime)
             lastTime = time ?? lastTime
             input = try await database.notificationInput(from: today)
         } catch {
@@ -90,7 +90,7 @@ public extension ReminderModel {
         errorMessage = nil
 
         do {
-            try await database.setReminderTime(time)
+            try await database.setSetting(.reminderTime, to: time)
         } catch {
             errorMessage = Self.saveFailedMessage
         }

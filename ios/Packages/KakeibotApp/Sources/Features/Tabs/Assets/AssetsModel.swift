@@ -138,7 +138,7 @@ private extension AssetsModel {
 
     func observeMonthStartDay() async {
         do {
-            for try await startDay in database.monthStartDayUpdates() {
+            for try await startDay in database.settingUpdates(.monthStartDay) {
                 monthStartDay = startDay
             }
         } catch {

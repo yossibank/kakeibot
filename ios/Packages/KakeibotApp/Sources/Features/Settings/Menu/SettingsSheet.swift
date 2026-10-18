@@ -225,13 +225,13 @@ public struct SettingsSheet: View {
             await observeMonthStartDay()
         }
         .task {
-            weekStart = await (try? database.weekStart()) ?? .sunday
+            weekStart = await (try? database.setting(.weekStart)) ?? .sunday
         }
         .task {
             await observeReminderTime()
         }
         .task {
-            launchScreen = await (try? database.launchScreen()) ?? .home
+            launchScreen = await (try? database.setting(.launchScreen)) ?? .home
         }
     }
 }
@@ -308,7 +308,7 @@ private extension SettingsSheet {
             launchScreen = screen
 
             Task {
-                try? await database.setLaunchScreen(screen)
+                try? await database.setSetting(.launchScreen, to: screen)
             }
         }
     }
@@ -320,14 +320,14 @@ private extension SettingsSheet {
             weekStart = day
 
             Task {
-                try? await database.setWeekStart(day)
+                try? await database.setSetting(.weekStart, to: day)
             }
         }
     }
 
     func observeReminderTime() async {
         do {
-            for try await time in database.reminderTimeUpdates() {
+            for try await time in database.settingUpdates(.reminderTime) {
                 reminderTime = time
             }
         } catch {
@@ -337,7 +337,7 @@ private extension SettingsSheet {
 
     func observeMonthStartDay() async {
         do {
-            for try await startDay in database.monthStartDayUpdates() {
+            for try await startDay in database.settingUpdates(.monthStartDay) {
                 monthStartDay = startDay
             }
         } catch {

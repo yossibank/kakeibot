@@ -150,7 +150,7 @@ public extension HomeModel {
 
     func loadTemplateOrder() async {
         do {
-            templateOrder = try await database.templateOrder()
+            templateOrder = try await database.setting(.templateOrder)
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -160,7 +160,7 @@ public extension HomeModel {
         templateOrder = order
 
         do {
-            try await database.setTemplateOrder(order)
+            try await database.setSetting(.templateOrder, to: order)
         } catch {
             errorMessage = Self.orderSaveFailedMessage
         }
@@ -292,7 +292,7 @@ private extension HomeModel {
 
     func observeMonthStartDay() async {
         do {
-            for try await startDay in database.monthStartDayUpdates() {
+            for try await startDay in database.settingUpdates(.monthStartDay) {
                 monthStartDay = startDay
             }
         } catch {

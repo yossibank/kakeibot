@@ -334,7 +334,7 @@ private extension MainView {
     }
 
     func openLaunchScreen() async {
-        guard await (try? database.launchScreen()) == .entry else {
+        guard await (try? database.setting(.launchScreen)) == .entry else {
             return
         }
 

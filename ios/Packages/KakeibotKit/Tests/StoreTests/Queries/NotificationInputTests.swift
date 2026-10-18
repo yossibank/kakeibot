@@ -28,7 +28,7 @@ struct NotificationInputTests {
         }
 
         try await database.markNoSpendDay(marked, at: now)
-        try await database.setReminderTime(time)
+        try await database.setSetting(.reminderTime, to: time)
         let input = try await database.notificationInput(from: today)
         let food = options.expenseCategories[0]
 

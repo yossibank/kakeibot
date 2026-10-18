@@ -53,7 +53,7 @@ public extension OnboardingModel {
         await budget.load()
 
         do {
-            weekStart = try await database.weekStart()
+            weekStart = try await database.setting(.weekStart)
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -63,7 +63,7 @@ public extension OnboardingModel {
         self.weekStart = weekStart
 
         do {
-            try await database.setWeekStart(weekStart)
+            try await database.setSetting(.weekStart, to: weekStart)
         } catch {
             errorMessage = Self.saveFailedMessage
         }
@@ -98,8 +98,8 @@ public extension OnboardingModel {
 
     func finish() async -> Bool {
         do {
-            try await database.setLaunchScreen(launchScreen)
-            try await database.completeOnboarding()
+            try await database.setSetting(.launchScreen, to: launchScreen)
+            try await database.setSetting(.onboardingCompleted, to: true)
             return true
         } catch {
             errorMessage = Self.saveFailedMessage
