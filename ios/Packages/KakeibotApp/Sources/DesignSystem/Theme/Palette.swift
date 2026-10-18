@@ -19,6 +19,9 @@ public extension Palette {
     static let amber = Color(rgb: 0xE89B57)
     static let holiday = Color(rgb: 0xEE8A84)
     static let saturday = Color(rgb: 0x8DB0EA)
+    static let hairline = gold.opacity(0.1)
+    static let outline = gold.opacity(0.55)
+    static let faint = gold.opacity(0.06)
 
     static var night: LinearGradient {
         LinearGradient(

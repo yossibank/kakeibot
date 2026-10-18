@@ -11,9 +11,7 @@ struct SettingsRowList<Panel: Hashable>: View {
                 rowButton(item)
                     .overlay(alignment: .top) {
                         if index > 0 {
-                            Rectangle()
-                                .fill(Palette.gold.opacity(0.1))
-                                .frame(height: 1)
+                            Hairline(thickness: 1)
                         }
                     }
             }

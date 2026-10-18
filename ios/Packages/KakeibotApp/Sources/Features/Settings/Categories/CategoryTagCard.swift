@@ -67,7 +67,7 @@ struct CategoryTagCard: View {
         .background(Palette.drawer, in: .rect(cornerRadius: 20))
         .overlay {
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+                .stroke(Palette.outline, lineWidth: 1)
         }
         .shadow(color: .black.opacity(0.45), radius: 20, y: 10)
         .task {
@@ -80,7 +80,7 @@ private extension CategoryTagCard {
     var preview: some View {
         VStack(spacing: 0) {
             Rectangle()
-                .fill(Palette.gold.opacity(0.55))
+                .fill(Palette.outline)
                 .frame(width: 0.8, height: 14)
 
             TagCard(previewName, style: .selected)
@@ -90,7 +90,7 @@ private extension CategoryTagCard {
         .frame(maxWidth: .infinity)
         .background(alignment: .top) {
             Rectangle()
-                .fill(Palette.gold.opacity(0.55))
+                .fill(Palette.outline)
                 .frame(width: 120, height: 0.8)
         }
         .animation(.snappy(duration: 0.2), value: name)
@@ -141,6 +141,6 @@ private extension CategoryTagCard {
     }
 
     var fieldStroke: Color {
-        errorMessage == nil ? Palette.gold.opacity(0.55) : Palette.rose
+        errorMessage == nil ? Palette.outline : Palette.rose
     }
 }

@@ -171,16 +171,14 @@ private extension RecordsView {
 
                 if model.canMarkNoSpend(on: date) {
                     Rectangle()
-                        .fill(Palette.gold.opacity(0.1))
+                        .fill(Palette.hairline)
                         .frame(width: 1, height: 24)
 
                     noSpendButton(date)
                 }
             }
             .overlay(alignment: .top) {
-                Rectangle()
-                    .fill(Palette.gold.opacity(0.1))
-                    .frame(height: 1)
+                Hairline(thickness: 1)
             }
         }
         .padding(.horizontal, 16)
@@ -345,9 +343,7 @@ private extension RecordsView {
             )
         }
         .overlay(alignment: .top) {
-            Rectangle()
-                .fill(Palette.gold.opacity(0.1))
-                .frame(height: 1)
+            Hairline(thickness: 1)
         }
     }
 

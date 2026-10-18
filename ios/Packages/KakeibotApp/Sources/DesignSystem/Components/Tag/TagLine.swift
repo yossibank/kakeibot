@@ -68,7 +68,7 @@ public struct TagLine<ID: Hashable>: View {
         .frame(height: Self.height, alignment: .top)
         .background(alignment: .top) {
             TagString()
-                .stroke(Palette.gold.opacity(0.55), lineWidth: 0.8)
+                .stroke(Palette.outline, lineWidth: 0.8)
                 .frame(height: Self.sag)
         }
         .preference(key: TagLineMovingKey.self, value: lift != nil)
@@ -164,7 +164,7 @@ private extension TagLine {
     ) -> some View {
         VStack(spacing: 0) {
             Rectangle()
-                .fill(Palette.gold.opacity(0.55))
+                .fill(Palette.outline)
                 .frame(width: 0.8, height: drop(at: index))
 
             TagCard(title(of: card), style: style(of: card))

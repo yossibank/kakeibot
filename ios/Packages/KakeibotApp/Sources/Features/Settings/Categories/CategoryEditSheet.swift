@@ -156,7 +156,7 @@ private extension CategoryEditSheet {
             .background(Palette.gold.opacity(0.12), in: .rect(cornerRadius: 18))
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
-                    .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+                    .stroke(Palette.outline, lineWidth: 1)
             }
 
             VStack(alignment: .leading, spacing: 6) {

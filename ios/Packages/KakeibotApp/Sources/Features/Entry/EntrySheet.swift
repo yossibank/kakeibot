@@ -498,7 +498,7 @@ private extension EntrySheet {
                             Capsule()
                                 .stroke(
                                     Palette.gold.opacity(0.5),
-                                    style: Self.dash
+                                    style: .dashed
                                 )
                         }
                         .contentShape(Capsule())
@@ -567,7 +567,7 @@ private extension EntrySheet {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Palette.gold.opacity(0.45), style: Self.dash)
+                        .stroke(Palette.gold.opacity(0.45), style: .dashed)
                 }
                 .contentShape(.rect)
             }
@@ -612,7 +612,7 @@ private extension EntrySheet {
         let isLit = isSelected || isLifted
         let color = isLit ? Palette.champagne : Palette.mist
         let fill = isLifted ? Palette.drawer : Self.categoryFill(isLit)
-        let border = isLit ? Palette.gold.opacity(0.55) : Color.clear
+        let border = isLit ? Palette.outline : Color.clear
         let width: CGFloat = isLifted ? 1.2 : 1
 
         return VStack(spacing: 4) {
@@ -738,7 +738,6 @@ private extension EntrySheet {
     static let categorySpacing: CGFloat = 5
     static let categoryHeight: CGFloat = 54
     static let templateHeight: CGFloat = 34
-    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
     static let menuPressDuration = 0.15
 
     static var pagerHeight: CGFloat {

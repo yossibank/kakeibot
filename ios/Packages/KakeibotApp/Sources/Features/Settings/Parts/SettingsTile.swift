@@ -9,6 +9,6 @@ extension SettingsTile {
     }
 
     static func stroke(isSelected: Bool) -> Color {
-        isSelected ? Palette.gold.opacity(0.55) : Palette.gold.opacity(0.12)
+        isSelected ? Palette.outline : Palette.gold.opacity(0.12)
     }
 }

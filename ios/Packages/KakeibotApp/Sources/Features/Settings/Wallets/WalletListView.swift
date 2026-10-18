@@ -48,7 +48,9 @@ public struct WalletListView: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil)
 
-            addButton
+            AddButton("口座を追加") {
+                sheet = .new
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -139,24 +141,6 @@ private extension WalletListView {
                 .buttonStyle(.plain)
             }
         }
-    }
-
-    var addButton: some View {
-        Button {
-            sheet = .new
-        } label: {
-            Label("口座を追加", systemImage: "plus")
-                .font(.subheadline)
-                .foregroundStyle(Palette.gold)
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Palette.gold.opacity(0.06), in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(Palette.gold.opacity(0.55), style: Self.dash)
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 
     func movableRow(_ wallet: Wallet) -> some View {
@@ -252,8 +236,6 @@ private extension WalletListView {
     nonisolated static let space = "WalletBoard"
     static let rowHeight: CGFloat = 68
     static let spacing: CGFloat = 10
-    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-
     var boardHeight: CGFloat {
         let count = CGFloat(model.shown.count)
         let gaps = Self.spacing * max(count - 1, 0)

@@ -178,7 +178,7 @@ private extension WalletEditSheet {
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: 14)
-                        .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+                        .stroke(Palette.outline, lineWidth: 1)
                 }
 
             VStack(alignment: .leading, spacing: 4) {

@@ -231,9 +231,7 @@ private extension OnboardingView {
     }
 
     var hairline: some View {
-        Rectangle()
-            .fill(Palette.gold.opacity(0.1))
-            .frame(height: 0.5)
+        Hairline()
     }
 
     func pageHeader(

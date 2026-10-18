@@ -51,7 +51,7 @@ struct EntryMemoCard: View {
         .background(Palette.drawer, in: .rect(cornerRadius: 20))
         .overlay {
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+                .stroke(Palette.outline, lineWidth: 1)
         }
         .overlay(alignment: .bottomLeading) {
             pointer
@@ -74,7 +74,7 @@ private extension EntryMemoCard {
                 .fill(Palette.drawer)
 
             BalloonPointer(isClosed: false)
-                .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+                .stroke(Palette.outline, lineWidth: 1)
         }
         .frame(width: size.width, height: size.height)
         .offset(x: pointerX - size.width / 2, y: size.height - 1)

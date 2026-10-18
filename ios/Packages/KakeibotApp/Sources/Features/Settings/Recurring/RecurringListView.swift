@@ -47,7 +47,9 @@ public struct RecurringListView: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil)
 
-            addButton
+            AddButton("固定費を追加") {
+                sheet = .new
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -107,24 +109,6 @@ private extension RecurringListView {
             Color.clear
                 .frame(width: 44, height: 44)
         }
-    }
-
-    var addButton: some View {
-        Button {
-            sheet = .new
-        } label: {
-            Label("固定費を追加", systemImage: "plus")
-                .font(.subheadline)
-                .foregroundStyle(Palette.gold)
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Palette.gold.opacity(0.06), in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(Palette.gold.opacity(0.55), style: Self.dash)
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 
     var totalCard: some View {
@@ -250,7 +234,6 @@ private extension RecurringListView {
         case edit(Recurring.ID)
     }
 
-    static let dash = StrokeStyle(lineWidth: 1, dash: [5, 4])
     static let rowHeight: CGFloat = 64
     static let spacing: CGFloat = 10
     nonisolated static let space = "RecurringBoard"

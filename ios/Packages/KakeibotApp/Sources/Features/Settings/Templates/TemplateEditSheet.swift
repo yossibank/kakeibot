@@ -297,7 +297,7 @@ private extension TemplateEditSheet {
         .background(Palette.drawer, in: .rect(cornerRadius: 20))
         .overlay {
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+                .stroke(Palette.outline, lineWidth: 1)
         }
         .shadow(color: .black.opacity(0.45), radius: 20, y: 10)
         .task {

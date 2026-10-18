@@ -71,9 +71,7 @@ private extension BudgetListView {
                                 categoryRow(category)
 
                                 if category.id != model.categories.last?.id {
-                                    Rectangle()
-                                        .fill(Palette.gold.opacity(0.1))
-                                        .frame(height: 0.5)
+                                    Hairline()
                                 }
                             }
                         }

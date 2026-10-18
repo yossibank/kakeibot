@@ -322,9 +322,7 @@ private extension HomeView {
                         )
                     }
                     .overlay(alignment: .top) {
-                        Rectangle()
-                            .fill(Palette.gold.opacity(0.1))
-                            .frame(height: 1)
+                        Hairline(thickness: 1)
                     }
                 }
             }
