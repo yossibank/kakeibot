@@ -54,6 +54,27 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func tracksChangesFromStart() async throws {
+        let setup = try await Setup()
+        let model = WalletEditModel(database: setup.database)
+        let start = model.isChanged
+
+        model.name = "楽天カード"
+        let named = model.isChanged
+
+        model.name = ""
+        let cleared = model.isChanged
+
+        model.kind = .bank
+        let kindChanged = model.isChanged
+
+        #expect(!start)
+        #expect(named)
+        #expect(!cleared)
+        #expect(kindChanged)
+    }
+
+    @Test
     func keepsChosenGlyphWhenKindChanges() async throws {
         let setup = try await Setup()
         let model = WalletEditModel(database: setup.database)

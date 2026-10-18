@@ -28,6 +28,7 @@ public final class CategoryEditModel {
         self.database = database
         self.kind = kind
         self.editingId = id
+        self.baseline = snapshot
     }
 }
 
@@ -54,7 +55,7 @@ public extension CategoryEditModel {
     }
 
     var isChanged: Bool {
-        snapshot != (baseline ?? Self.blank)
+        baseline.map { $0 != snapshot } ?? false
     }
 
     var draft: CategoryDraft {
@@ -194,24 +195,16 @@ public extension CategoryEditModel {
 
 private extension CategoryEditModel {
     struct Snapshot: Equatable {
-        let name: String
-        let icon: IconDraft
+        let draft: CategoryDraft
         let tags: [EntryTagDraft]
     }
-
-    static let blank = Snapshot(
-        name: "",
-        icon: IconDraft(mark: .glyph(.food), color: IconEditModel.colors[0]),
-        tags: []
-    )
 
     static let loadFailedMessage = "カテゴリを読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
 
     var snapshot: Snapshot {
         Snapshot(
-            name: name,
-            icon: icon.draft,
+            draft: draft,
             tags: tags.map(\.draft)
         )
     }
