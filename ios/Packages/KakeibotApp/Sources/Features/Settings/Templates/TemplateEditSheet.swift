@@ -330,7 +330,7 @@ private extension TemplateEditSheet {
                 columns: 5,
                 spacing: 5
             ) { category in
-                CategoryTile(
+                SettingsCategoryTile(
                     category: category,
                     icon: model.icon(for: category),
                     isSelected: model.categoryId == category.id
@@ -349,7 +349,7 @@ private extension TemplateEditSheet {
                 columns: 3,
                 spacing: 8
             ) { wallet in
-                WalletTile(
+                SettingsWalletTile(
                     wallet: wallet,
                     icon: model.icon(for: wallet),
                     isSelected: model.walletId == wallet.id

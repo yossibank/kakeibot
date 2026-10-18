@@ -12,6 +12,8 @@ pre-commit の整形で commit が止まったら、差分を確かめてから�
 
 VoiceOver などのアクセシビリティの対応は入れない。`accessibility` で始まるモディファイアや、読み上げのためだけの値や引数を書かない。
 
+ファイルとフォルダの置き場所と名前は、[architecture の「名前の決まり」](docs/architecture.md#名前の決まり)に従う。
+
 ## 文書
 
 作業ごとに、先に読む文書と、終えたら直す文書が決まっている。
@@ -19,7 +21,7 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 | 作業 | 先に読む | 終えたら直す |
 | --- | --- | --- |
 | 機能・画面を足す | [overview](docs/overview.md)、[roadmap](docs/roadmap.md) | overview、roadmap |
-| ターゲット・依存・フォルダを変える | [architecture](docs/architecture.md) | architecture |
+| ターゲット・依存・フォルダを変える、ファイルを足す・名前を変える | [architecture](docs/architecture.md) | architecture |
 | 表の形を変える | [data](docs/data.md) | data。書き出しに響くなら export-format も |
 | 書き出しの形式を変える | [export-format](spec/export-format.md) | export-format |
 | fixtures を足す・変える | [fixtures](spec/fixtures.md) | fixtures |

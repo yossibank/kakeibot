@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct WalletTile: View {
+struct SettingsWalletTile: View {
     let wallet: Wallet
     let icon: Icon?
     let isSelected: Bool

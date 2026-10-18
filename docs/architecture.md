@@ -80,11 +80,9 @@ KakeibotKit/
 │   ├── Core/
 │   │   ├── Budget/          予算の型、「この月から」、残り、消化
 │   │   ├── Category/        記録のカテゴリ（EntryCategory）とタグ、その入力の判定
-│   │   ├── Character/       一言の文と選び方
 │   │   ├── Date/            LocalDate、期間の区切りと呼び方、週の始まり、月と期間のマス目、祝日
 │   │   ├── Entry/           記録の型、入力の判定、金額の電卓、日ごとのまとめ、支出なしの日
 │   │   ├── Export/
-│   │   │   ├── Upgrade/     古い版から新しい版への変換
 │   │   │   └── V1/
 │   │   ├── Icon/            アイコンと、その入力の判定、カレンダーのスタンプ
 │   │   ├── Identifier/      型付きの ID
@@ -92,8 +90,7 @@ KakeibotKit/
 │   │   ├── Recurring/       固定費の日付、入力の判定、記録漏れの後追い
 │   │   ├── Review/          振り返りの週・月・年の範囲、合計と内訳
 │   │   ├── Reward/          決まり・記録・目標、貯金箱の残高
-│   │   ├── Setting/         設定の行と選べる値
-│   │   ├── Theme/           テーマの型、読みやすさの判定
+│   │   ├── Setting/         設定の行と選べる値、テーマの型
 │   │   └── Wallet/          財布の型と、その入力の判定、残高
 │   └── Store/
 │       ├── Database/        App Group、DatabasePool、止められる前の対策、最初の財布とカテゴリ。止める通知は AppFeature が送る
@@ -112,58 +109,31 @@ KakeibotKit/
 ```
 KakeibotApp/
 ├── Sources/
-│   ├── AppFeature/          AppModel、RootView、MainView（タブとシート）、通知の許可、入力の準備
+│   ├── AppFeature/          AppModel、RootView、MainView（タブとシート）、起動の印の動き、通知の許可、入力の準備
 │   ├── DesignSystem/
-│   │   ├── Components/      表すものごとのフォルダ
-│   │   │   ├── Amount/      金額
-│   │   │   ├── Banner/      画面の下に出す知らせ、3 秒で消えるエラーの知らせとその状態
-│   │   │   ├── Card/        カードの見た目、見出し
-│   │   │   ├── Button/      輪のボタン、大きなボタン、見出しの横のボタン、点線の追加のボタン
-│   │   │   ├── Budget/      予算の使い具合の色と棒、残りの文字
-│   │   │   ├── Calendar/    月のカレンダー、曜日の名前と色
-│   │   │   ├── Chart/       円グラフ、割合の棒
-│   │   │   ├── Chip/        財布・メモなどのチップ
-│   │   │   ├── Dial/        ダイヤルの面と目盛り、半円のダイヤル
-│   │   │   ├── Divider/     区切り線
-│   │   │   ├── Entry/       記録の 1 行
-│   │   │   ├── Gesture/     長押しで持ち上げて動かす、横に払う、左右に払って送る、バーを隠してもスワイプで戻る
-│   │   │   ├── Glass/       ガラスの見た目
-│   │   │   ├── Icon/        アイコン、絵柄から SF Symbols への置き換え
-│   │   │   ├── Keypad/      テンキー
-│   │   │   ├── Menu/        長押しなどで開くメニューの面、見出し、行
-│   │   │   ├── Pager/       ページの点とすべり
-│   │   │   ├── Picker/      カプセルの切り替え
-│   │   │   ├── Scroll/      送る領域の端をぼかす
-│   │   │   ├── Sheet/       中身の高さに合わせたシート
-│   │   │   ├── Swipe/       横に払うと削除か非表示のボタンを出す行
-│   │   │   ├── TabBar/      浮かせたタブの帯と ＋ ボタン
-│   │   │   ├── Tag/         タグの札と、紐に下げて並べる列
-│   │   │   └── Template/    テンプレートのカードと、その大きさ
-│   │   ├── Resources/
-│   │   │   ├── Assets.xcassets
-│   │   │   └── Fonts/
-│   │   └── Theme/           テーマを画面全体に渡す仕組み、フォントの登録、色（Palette）と濃さの段階、文字の大きさの段階、色の文字列の読み取り、点線
+│   │   ├── Components/      役割ごとのフォルダ
+│   │   │   ├── Buttons/     輪・大きな・見出しの横・点線の追加のボタン、チップ、カプセルの切り替え、テンキー
+│   │   │   ├── Gestures/    持ち上げて動かす、横に払う、左右に払って送る、スワイプで戻る、払うとボタンを出す行、端をぼかす
+│   │   │   ├── Money/       金額、予算の使い具合、円グラフと割合の棒、ダイヤル
+│   │   │   ├── Navigation/  浮かせたタブの帯、ページの点とすべり、月のカレンダーと曜日
+│   │   │   ├── Rows/        記録の 1 行、タグ、テンプレートのカード、アイコン
+│   │   │   └── Surfaces/    カード、ガラス、シート、知らせとエラーのバナー、メニュー、区切り線
+│   │   └── Theme/           色（Palette）と濃さの段階、文字の大きさの段階、色の文字列の読み取り、点線
 │   ├── Features/
 │   │   ├── Entry/
 │   │   ├── EntryNotice/     記録・削除の知らせと取り消し
-│   │   ├── Launch/          起動の印の動き
 │   │   ├── Onboarding/      最初の設定のチュートリアル
 │   │   ├── Period/          期間の範囲と月の始まりの書き方、いまの期間のカード、日を選ぶマス
 │   │   ├── Settings/
-│   │   │   ├── Backup/
 │   │   │   ├── Budgets/     予算の一覧と額の入力
 │   │   │   ├── Categories/
-│   │   │   ├── Character/
 │   │   │   ├── Icons/
-│   │   │   ├── Menu/
+│   │   │   ├── Menu/        設定の入口、起動画面の名前、確かめ用のテストデータ（#if DEBUG）
 │   │   │   ├── Parts/       設定の画面で共有する入力欄、見出し、行の一覧、カテゴリと口座のタイル、非表示にする枠とボタン、保存のボタンの文字、選ぶボタン
 │   │   │   ├── Period/      月の始まりの設定
 │   │   │   ├── Recurring/   固定費の一覧と編集
 │   │   │   ├── Reminder/    記録忘れの通知の設定と、通知の許可を確かめる関数
-│   │   │   ├── Rewards/
-│   │   │   ├── Sample/      確かめ用のテストデータ（#if DEBUG）
 │   │   │   ├── Templates/
-│   │   │   ├── Themes/
 │   │   │   └── Wallets/
 │   │   └── Tabs/
 │   │       ├── Assets/
@@ -218,9 +188,14 @@ flowchart TB
 
 - 同じ役割のものは 1 つの親フォルダにまとめる
 - Core は概念ごとのフォルダに、型と計算を一緒に入れる
+- Store は役割ごとのフォルダ（Queries・Writes・Records など）に分ける
+- DesignSystem の部品は、Components の下の役割ごとのフォルダに入れる
 - Features は画面の名前。一覧の画面は複数形
 - 1 つのフォルダには、ファイルかサブフォルダのどちらかだけを入れる
-- ファイル名の頭に画面の名前を付ける（`HomeView`、`HomeModel`）
+- ファイルが 1 つだけのフォルダは作らず、近いフォルダに入れる。ターゲットの直下と、入れる先のない `Core/Identifier` だけ例外にする
+- ファイル名は、中の型の名前にする。拡張は `型名+役割` にする（`TemplateOrder+Title`）
+- Features のフォルダでは、ファイル名の頭を、その画面か、その画面が扱う型の名前にそろえる（`WalletListView`、`WalletKind+Title`）
+- `View+役割` の名前は、DesignSystem の画面をまたいで使うモディファイアだけに付ける。画面ごとのモディファイアは、画面の名前で始める（`WalletHideConfirmation`）
 - fixtures のファイル名の頭に、試す型の名前を kebab-case で付ける（`local-date-week.json`）
 
 ## Features と AppFeature

@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct CategoryTile: View {
+struct SettingsCategoryTile: View {
     let category: EntryCategory
     let icon: Icon?
     let isSelected: Bool
