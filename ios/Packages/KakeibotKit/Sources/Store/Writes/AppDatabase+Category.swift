@@ -33,21 +33,12 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
-            for (order, id) in ids.enumerated() {
-                let found = try EntryCategory.fetchOne(db, key: id)
-
-                guard var category = found else {
-                    throw CategoryWriteError.categoryNotFound
-                }
-
-                guard category.sortOrder != order else {
-                    continue
-                }
-
-                category.sortOrder = order
-                category.updatedAt = now
-                try category.update(db)
-            }
+            try EntryCategory.reorder(
+                ids,
+                orThrow: CategoryWriteError.categoryNotFound,
+                in: db,
+                at: now
+            )
         }
     }
 
@@ -75,7 +66,11 @@ private extension AppDatabase {
         at now: Date
     ) throws -> EntryCategory {
         let icon = try draft.newIcon(at: now)
-        let sortOrder = try nextSortOrder(for: draft.kind, in: db)
+
+        let sameKind = EntryCategory
+            .filter(Column("kind") == draft.kind.rawValue)
+
+        let sortOrder = try EntryCategory.nextSortOrder(of: sameKind, in: db)
 
         let category = try draft.newCategory(
             iconId: icon.id,
@@ -148,17 +143,5 @@ private extension AppDatabase {
 
             try draft.applied(to: tag, sortOrder: order, at: now).update(db)
         }
-    }
-
-    static func nextSortOrder(
-        for kind: EntryCategory.Kind,
-        in db: Database
-    ) throws -> Int {
-        let maxOrder = try EntryCategory
-            .filter(Column("kind") == kind.rawValue)
-            .select(max(Column("sort_order")), as: Int?.self)
-            .fetchOne(db)
-
-        return (maxOrder ?? nil).map { $0 + 1 } ?? 0
     }
 }

@@ -16,7 +16,7 @@ public extension AppDatabase {
 private extension AppDatabase {
     static func templates(in db: Database) throws -> [EntryTemplate] {
         try EntryTemplate
-            .order(Column("sort_order"), Column("created_at"))
+            .order(EntryTemplate.sortOrder, Column("created_at"))
             .fetchAll(db)
     }
 }

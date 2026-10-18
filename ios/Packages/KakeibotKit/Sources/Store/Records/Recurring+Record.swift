@@ -6,3 +6,5 @@ extension Recurring: StoreRecord {
 }
 
 extension Recurring.Frequency: DatabaseValueConvertible {}
+
+extension Recurring: SortableRecord {}

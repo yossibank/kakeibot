@@ -48,21 +48,12 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
-            for (order, id) in ids.enumerated() {
-                let found = try EntryTemplate.fetchOne(db, key: id)
-
-                guard var template = found else {
-                    throw TemplateWriteError.templateNotFound
-                }
-
-                guard template.sortOrder != order else {
-                    continue
-                }
-
-                template.sortOrder = order
-                template.updatedAt = now
-                try template.update(db)
-            }
+            try EntryTemplate.reorder(
+                ids,
+                orThrow: TemplateWriteError.templateNotFound,
+                in: db,
+                at: now
+            )
         }
     }
 }
@@ -75,7 +66,7 @@ private extension AppDatabase {
         at now: Date
     ) throws -> EntryTemplate {
         guard let id else {
-            let sortOrder = try nextTemplateOrder(in: db)
+            let sortOrder = try EntryTemplate.nextSortOrder(in: db)
             return try draft.newTemplate(sortOrder: sortOrder, at: now)
         }
 
@@ -84,13 +75,5 @@ private extension AppDatabase {
         }
 
         return try draft.applied(to: existing, at: now)
-    }
-
-    static func nextTemplateOrder(in db: Database) throws -> Int {
-        let maxOrder = try EntryTemplate
-            .select(max(Column("sort_order")), as: Int?.self)
-            .fetchOne(db)
-
-        return (maxOrder ?? nil).map { $0 + 1 } ?? 0
     }
 }

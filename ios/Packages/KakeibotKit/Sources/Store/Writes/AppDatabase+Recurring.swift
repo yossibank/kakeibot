@@ -26,7 +26,7 @@ public extension AppDatabase {
                 try recurring.update(db)
             } else {
                 recurring = try draft.newRecurring(at: now)
-                recurring.sortOrder = try Self.nextRecurringOrder(in: db)
+                recurring.sortOrder = try Recurring.nextSortOrder(in: db)
                 try recurring.insert(db)
             }
 
@@ -60,21 +60,12 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
-            for (order, id) in ids.enumerated() {
-                let found = try Recurring.fetchOne(db, key: id)
-
-                guard var recurring = found else {
-                    throw RecurringWriteError.recurringNotFound
-                }
-
-                guard recurring.sortOrder != order else {
-                    continue
-                }
-
-                recurring.sortOrder = order
-                recurring.updatedAt = now
-                try recurring.update(db)
-            }
+            try Recurring.reorder(
+                ids,
+                orThrow: RecurringWriteError.recurringNotFound,
+                in: db,
+                at: now
+            )
         }
     }
 
@@ -96,14 +87,6 @@ public extension AppDatabase {
 }
 
 private extension AppDatabase {
-    static func nextRecurringOrder(in db: Database) throws -> Int {
-        let maxOrder = try Recurring
-            .select(max(Column("sort_order")), as: Int?.self)
-            .fetchOne(db)
-
-        return (maxOrder ?? nil).map { $0 + 1 } ?? 0
-    }
-
     static func generateEntries(
         of recurring: Recurring,
         through today: LocalDate,
