@@ -303,9 +303,16 @@ private extension RecurringEditSheet {
 
     var endChooser: some View {
         VStack(spacing: 12) {
-            SettingsChoice("終わりなし", isSelected: model.endDate == nil) {
-                model.endDate = nil
-                closePanel()
+            HStack(spacing: 8) {
+                SettingsChoice("終わりなし", isSelected: model.endDate == nil) {
+                    model.endDate = nil
+                    closePanel()
+                }
+
+                SettingsChoice("今日で終える", isSelected: isEndingToday) {
+                    model.endDate = model.today
+                    closePanel()
+                }
             }
 
             MonthCalendar(selection: endBinding, today: model.today)
@@ -379,6 +386,10 @@ private extension RecurringEditSheet {
         } set: { type in
             model.select(type)
         }
+    }
+
+    var isEndingToday: Bool {
+        model.endDate == model.today
     }
 
     var endBinding: Binding<LocalDate> {

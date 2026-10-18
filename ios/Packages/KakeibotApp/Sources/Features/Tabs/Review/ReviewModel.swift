@@ -125,6 +125,22 @@ public extension ReviewModel {
         total(of: kind, in: summary)
     }
 
+    var recurringTotal: Int? {
+        guard let type = entryType else {
+            return nil
+        }
+
+        let total = entries
+            .filter { entry in
+                entry.type == type
+                    && entry.recurringId != nil
+                    && period.range.contains(entry.date)
+            }
+            .reduce(0) { $0 + $1.amount }
+
+        return total > 0 ? total : nil
+    }
+
     func change(of kind: ReviewKind) -> Int {
         total(of: kind) - total(of: kind, in: previousSummary)
     }
