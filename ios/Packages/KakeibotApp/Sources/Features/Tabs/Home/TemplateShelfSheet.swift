@@ -7,6 +7,7 @@ struct TemplateShelfSheet: View {
     @Bindable var model: HomeModel
 
     @State private var query = ""
+    @State private var isEditing = false
 
     @FocusState private var isSearching: Bool
 
@@ -55,6 +56,9 @@ struct TemplateShelfSheet: View {
                     .ignoresSafeArea()
             }
             .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(isPresented: $isEditing) {
+                TemplateListView(database: database)
+            }
         }
         .preferredColorScheme(.dark)
     }
@@ -76,13 +80,9 @@ private extension TemplateShelfSheet {
 
             Spacer()
 
-            NavigationLink {
-                TemplateListView(database: database)
-            } label: {
-                Text("編集")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Palette.gold)
-                    .frame(minWidth: 44, minHeight: 44)
+            RingButton(systemImage: "slider.horizontal.3", label: "編集") {
+                isSearching = false
+                isEditing = true
             }
         }
     }

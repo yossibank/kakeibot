@@ -115,13 +115,16 @@ struct EntryModelTests {
     }
 
     @Test
-    func groupsWalletsByKind() async throws {
-        let model = try await Self.newModel()
+    func ordersWalletsLikeSettings() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let ids = options.wallets.map(\.id).reversed()
+        try await setup.database.reorderWallets(Array(ids), at: Date())
+        let model = EntryModel(database: setup.database, date: setup.date)
 
-        let sections = model.walletSections
+        await model.load()
 
-        #expect(sections.map(\.kind) == [.cash, .bank])
-        #expect(sections.map { $0.wallets.map(\.name) } == [["財布"], ["銀行"]])
+        #expect(model.wallets.map(\.name) == ["銀行", "財布"])
     }
 
     @Test
