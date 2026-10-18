@@ -253,22 +253,8 @@ private extension TemplateEditSheet {
     }
 
     var rows: some View {
-        VStack(spacing: 0) {
-            ForEach(Array(rowItems.enumerated()), id: \.offset) { index, item in
-                rowButton(item)
-                    .overlay(alignment: .top) {
-                        if index > 0 {
-                            Rectangle()
-                                .fill(Palette.gold.opacity(0.1))
-                                .frame(height: 1)
-                        }
-                    }
-            }
-        }
-        .background(Self.cardFill.opacity(0.7), in: Self.rowsShape)
-        .overlay {
-            Self.rowsShape
-                .stroke(Palette.gold.opacity(0.18), lineWidth: 1)
+        SettingsRowList(items: rowItems) { panel in
+            open(panel)
         }
     }
 
@@ -341,43 +327,6 @@ private extension TemplateEditSheet {
         }
     }
 
-    func rowButton(_ item: RowItem) -> some View {
-        let isAmount = item.panel == .amount && !item.isEmpty
-        let font: Font = isAmount ? Self.amountFont : .subheadline
-        let color = item.isEmpty ? Palette.dusk : Palette.champagne
-
-        return Button {
-            open(item.panel)
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: item.systemImage)
-                    .font(.system(size: 13))
-                    .foregroundStyle(Palette.gold)
-                    .frame(width: 28, height: 28)
-                    .background(Palette.gold.opacity(0.1), in: Circle())
-
-                Text(item.title)
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.mist)
-
-                Spacer(minLength: 12)
-
-                Text(item.value)
-                    .font(font)
-                    .foregroundStyle(color)
-                    .lineLimit(1)
-
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(Palette.gold.opacity(0.6))
-            }
-            .padding(.horizontal, 16)
-            .frame(height: 56)
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-    }
-
     func drawerView(_ panel: Panel) -> some View {
         SettingsDrawer(title(for: panel)) {
             closePanel()
@@ -398,16 +347,38 @@ private extension TemplateEditSheet {
                 saveButton
             }
         case .category:
-            tileGrid(model.categories, columns: 5, spacing: 5) { category in
-                categoryButton(category)
+            SettingsTileGrid(
+                items: model.categories,
+                columns: 5,
+                spacing: 5
+            ) { category in
+                CategoryTile(
+                    category: category,
+                    icon: model.icon(for: category),
+                    isSelected: model.categoryId == category.id
+                ) {
+                    model.categoryId = category.id
+                    closePanel()
+                }
             }
             .padding(.bottom, 8)
         case .tag:
             tagChooser
                 .padding(.bottom, 8)
         case .wallet:
-            tileGrid(model.wallets, columns: 3, spacing: 8) { wallet in
-                walletButton(wallet)
+            SettingsTileGrid(
+                items: model.wallets,
+                columns: 3,
+                spacing: 8
+            ) { wallet in
+                WalletTile(
+                    wallet: wallet,
+                    icon: model.icon(for: wallet),
+                    isSelected: model.walletId == wallet.id
+                ) {
+                    model.walletId = wallet.id
+                    closePanel()
+                }
             }
             .padding(.bottom, 8)
         case .memo:
@@ -428,88 +399,6 @@ private extension TemplateEditSheet {
             }
         }
     }
-
-    func tileGrid<Item: Identifiable>(
-        _ items: [Item],
-        columns: Int,
-        spacing: CGFloat,
-        @ViewBuilder tile: @escaping (Item) -> some View
-    ) -> some View {
-        let rows = Self.rows(of: items, size: columns)
-
-        return Grid(horizontalSpacing: spacing, verticalSpacing: spacing) {
-            ForEach(rows.indices, id: \.self) { index in
-                GridRow {
-                    ForEach(rows[index]) { item in
-                        tile(item)
-                    }
-
-                    ForEach(rows[index].count..<columns, id: \.self) { _ in
-                        Color.clear
-                            .gridCellUnsizedAxes(.vertical)
-                    }
-                }
-            }
-        }
-    }
-
-    func categoryButton(_ category: EntryCategory) -> some View {
-        let isSelected = model.categoryId == category.id
-        let color = isSelected ? Palette.champagne : Palette.mist
-
-        return Button {
-            model.categoryId = category.id
-            closePanel()
-        } label: {
-            VStack(spacing: 4) {
-                IconImage(model.icon(for: category), size: 17)
-
-                Text(category.name)
-                    .font(.system(size: 10))
-                    .lineLimit(1)
-            }
-            .foregroundStyle(color)
-            .frame(maxWidth: .infinity, minHeight: 54)
-            .background(
-                tileFill(isSelected: isSelected),
-                in: .rect(cornerRadius: 12)
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(tileStroke(isSelected: isSelected), lineWidth: 1)
-            }
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-    }
-
-    func walletButton(_ wallet: Wallet) -> some View {
-        let isSelected = model.walletId == wallet.id
-        let color = isSelected ? Palette.champagne : Palette.mist
-
-        return Button {
-            model.walletId = wallet.id
-            closePanel()
-        } label: {
-            HStack(spacing: 6) {
-                IconImage(model.icon(for: wallet), size: 13)
-
-                Text(wallet.name)
-                    .font(.caption)
-                    .lineLimit(1)
-            }
-            .foregroundStyle(color)
-            .padding(.horizontal, 12)
-            .frame(maxWidth: .infinity, minHeight: 40)
-            .background(tileFill(isSelected: isSelected), in: Capsule())
-            .overlay {
-                Capsule()
-                    .stroke(tileStroke(isSelected: isSelected), lineWidth: 1)
-            }
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-    }
 }
 
 private extension TemplateEditSheet {
@@ -524,25 +413,6 @@ private extension TemplateEditSheet {
         case tag
         case wallet
         case memo
-    }
-
-    struct RowItem {
-        let panel: Panel
-        let systemImage: String
-        let title: String
-        let value: String
-        let isEmpty: Bool
-    }
-
-    static let rowsShape = RoundedRectangle(cornerRadius: 20)
-    static let amountFont = Font.system(size: 20, design: .serif)
-
-    static var cardFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.cardTop, Palette.cardBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
     }
 
     static var memoTransition: AnyTransition {
@@ -602,37 +472,38 @@ private extension TemplateEditSheet {
         model.memo.isEmpty ? "なし" : model.memo
     }
 
-    var rowItems: [RowItem] {
+    var rowItems: [SettingsRowList<Panel>.Item] {
         [
-            RowItem(
+            .init(
                 panel: .amount,
                 systemImage: "yensign",
                 title: "金額",
                 value: amountValue,
-                isEmpty: model.amount == nil
+                isEmpty: model.amount == nil,
+                isAmount: true
             ),
-            RowItem(
+            .init(
                 panel: .category,
                 systemImage: "square.grid.2x2",
                 title: "カテゴリ",
                 value: model.selectedCategory?.name ?? "選ぶ",
                 isEmpty: model.selectedCategory == nil
             ),
-            RowItem(
+            .init(
                 panel: .tag,
                 systemImage: "tag",
                 title: "タグ",
                 value: model.selectedTag?.name ?? "なし",
                 isEmpty: model.selectedTag == nil
             ),
-            RowItem(
+            .init(
                 panel: .wallet,
                 systemImage: "wallet.bifold",
                 title: model.walletTitle,
                 value: model.selectedWallet?.name ?? "選ぶ",
                 isEmpty: model.selectedWallet == nil
             ),
-            RowItem(
+            .init(
                 panel: .memo,
                 systemImage: "square.and.pencil",
                 title: "メモ",
@@ -640,15 +511,6 @@ private extension TemplateEditSheet {
                 isEmpty: model.memo.isEmpty
             )
         ]
-    }
-
-    static func rows<Item>(
-        of items: [Item],
-        size: Int
-    ) -> [[Item]] {
-        stride(from: 0, to: items.count, by: size).map { start in
-            Array(items[start..<min(start + size, items.count)])
-        }
     }
 
     func title(for panel: Panel) -> String {
@@ -659,14 +521,6 @@ private extension TemplateEditSheet {
         case .wallet: model.walletTitle
         case .memo: "メモ"
         }
-    }
-
-    func tileFill(isSelected: Bool) -> Color {
-        isSelected ? Palette.gold.opacity(0.12) : Color.clear
-    }
-
-    func tileStroke(isSelected: Bool) -> Color {
-        isSelected ? Palette.gold.opacity(0.55) : Palette.gold.opacity(0.12)
     }
 
     func open(_ panel: Panel) {

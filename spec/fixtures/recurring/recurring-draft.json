@@ -1,0 +1,15 @@
+[
+  { "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 3, "problems": [] },
+  { "type": "income", "amount": 280000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 25, "startDate": "2026-01-01", "endDate": "2026-12-31", "remindDaysBefore": null, "problems": [] },
+  { "type": "expense", "amount": 12000, "category": true, "wallet": true, "frequency": "yearly", "month": 4, "day": 1, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 7, "problems": [] },
+  { "type": "transfer", "amount": 45000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 26, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["transfer"] },
+  { "type": "expense", "amount": 0, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["amountNotPositive"] },
+  { "type": "expense", "amount": 78000, "category": false, "wallet": false, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["missingCategory", "missingWallet"] },
+  { "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 32, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["dayOutOfRange"] },
+  { "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 0, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["dayOutOfRange"] },
+  { "type": "expense", "amount": 12000, "category": true, "wallet": true, "frequency": "yearly", "month": 13, "day": 1, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["monthOutOfRange"] },
+  { "type": "expense", "amount": 12000, "category": true, "wallet": true, "frequency": "monthly", "month": 13, "day": 1, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": [] },
+  { "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-05-01", "endDate": "2026-04-30", "remindDaysBefore": null, "problems": ["endBeforeStart"] },
+  { "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": "2026-01-01", "remindDaysBefore": 0, "problems": [] },
+  { "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 31, "problems": ["remindOutOfRange"] }
+]

@@ -83,6 +83,7 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
+| `recurring-draft.json` | 固定費の入力の判定で出る問題 | `type`、`amount`、`category`・`wallet`（入っているか）、`frequency`、`month`、`day`、`startDate`、`endDate`、`remindDaysBefore`、`problems` |
 | `recurring-dates.json` | 固定費の、範囲の中で記録を作る日 | `frequency`（`monthly` `yearly`）、`month`（yearly だけ）、`day`、`startDate`、`endDate`、`from`、`through`、`dates` |
 
 月末を超える `day` は、その月の最終日にする。`startDate` より前と `endDate` より後の日は入れない。
