@@ -20,6 +20,18 @@ public extension AppDatabase {
         }
     }
 
+    func setReminderTime(_ time: ReminderTime?) async throws {
+        try await writer.write { db in
+            guard let time else {
+                _ = try Setting.deleteOne(db, key: Setting.Key.reminderTime)
+                return
+            }
+
+            let setting = Setting(key: .reminderTime, value: time.description)
+            try setting.save(db)
+        }
+    }
+
     func setLaunchScreen(_ screen: LaunchScreen) async throws {
         try await writer.write { db in
             let setting = Setting(key: .launchScreen, value: screen.rawValue)

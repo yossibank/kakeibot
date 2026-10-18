@@ -77,6 +77,16 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | `export-v1.json` | 読み込んで書き出すと同じ JSON になる。DB に入れて読み出しても同じになる | 書き出しの JSON そのもの |
 | `export-v1-header.json` | 読み込める `format` と `version` の判定 | `valid`、`invalid`（`format` と `version` のオブジェクト） |
 
+## notification
+
+`spec/fixtures/notification` のファイルは、次の表のとおりである。
+
+| ファイル | 試すこと | 項目 |
+| --- | --- | --- |
+| `notification-plan.json` | 予約されているべき通知の日・時刻・見出し・本文 | `today`、`reminderTime`（空なら記録忘れを知らせない）、`recorded`（記録か支出なしの印がある日）、`recurrings`（`name`・`amount`・`frequency`・`month`・`day`・`startDate`・`endDate`・`remindDaysBefore`）、`notifications` |
+
+通知は、日・時刻・識別の順に並べる。
+
 ## recurring
 
 `spec/fixtures/recurring` のファイルは、次の表のとおりである。
