@@ -88,7 +88,7 @@ KakeibotKit/
 │   │   │   └── V1/
 │   │   ├── Icon/            アイコンと、その入力の判定、カレンダーのスタンプ
 │   │   ├── Identifier/      型付きの ID
-│   │   ├── Notification/    予約されているべき通知の計算
+│   │   ├── Notification/    予約されているべき通知の計算、通知の行き先、通知の許可の状態
 │   │   ├── Recurring/       固定費の日付、入力の判定、記録漏れの後追い
 │   │   ├── Review/          振り返りの週・月・年の範囲、合計と内訳
 │   │   ├── Reward/          決まり・記録・目標、貯金箱の残高
@@ -155,9 +155,10 @@ KakeibotApp/
 │   │   │   ├── Character/
 │   │   │   ├── Icons/
 │   │   │   ├── Menu/
-│   │   │   ├── Parts/       設定の画面で共有する入力欄、見出し、行の一覧、カテゴリと口座のタイル、非表示にする枠とボタン、保存のボタンの文字
+│   │   │   ├── Parts/       設定の画面で共有する入力欄、見出し、行の一覧、カテゴリと口座のタイル、非表示にする枠とボタン、保存のボタンの文字、選ぶボタン
 │   │   │   ├── Period/      月の始まりの設定
 │   │   │   ├── Recurring/   固定費の一覧と編集
+│   │   │   ├── Reminder/    記録忘れの通知の設定と、通知の許可を確かめる関数
 │   │   │   ├── Rewards/
 │   │   │   ├── Sample/      確かめ用のテストデータ（#if DEBUG）
 │   │   │   ├── Templates/
@@ -168,7 +169,7 @@ KakeibotApp/
 │   │       ├── Home/
 │   │       ├── Records/
 │   │       └── Review/
-│   ├── Notifications/       予約されているべき通知と今の予約の差を OS に反映
+│   ├── Notifications/       予約されているべき通知と今の予約の差を OS に反映、押された通知の行き先を受ける
 │   └── WidgetFeature/
 └── Tests/
     ├── AppFeatureTests/

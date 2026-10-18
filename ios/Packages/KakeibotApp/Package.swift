@@ -60,6 +60,7 @@ let package = Package(
             name: "AppFeatureTests",
             dependencies: [
                 "AppFeature",
+                "Notifications",
                 .product(name: "Store", package: "KakeibotKit")
             ]
         ),

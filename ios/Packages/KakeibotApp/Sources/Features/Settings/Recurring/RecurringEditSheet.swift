@@ -282,7 +282,7 @@ private extension RecurringEditSheet {
             if model.frequency == .yearly {
                 LazyVGrid(columns: Self.monthColumns, spacing: 6) {
                     ForEach(1...12, id: \.self) { month in
-                        choiceButton(
+                        SettingsChoice(
                             "\(month) 月",
                             isSelected: model.month == month
                         ) {
@@ -303,7 +303,7 @@ private extension RecurringEditSheet {
 
     var endChooser: some View {
         VStack(spacing: 12) {
-            choiceButton("終わりなし", isSelected: model.endDate == nil) {
+            SettingsChoice("終わりなし", isSelected: model.endDate == nil) {
                 model.endDate = nil
                 closePanel()
             }
@@ -318,7 +318,7 @@ private extension RecurringEditSheet {
                 RecurringEditModel.remindChoices,
                 id: \.self
             ) { days in
-                choiceButton(
+                SettingsChoice(
                     RecurringText.remind(days),
                     isSelected: model.remindDaysBefore == days
                 ) {
@@ -328,34 +328,6 @@ private extension RecurringEditSheet {
             }
         }
         .padding(.bottom, 8)
-    }
-
-    func choiceButton(
-        _ title: String,
-        isSelected: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        let color = isSelected ? Palette.champagne : Palette.mist
-
-        return Button(action: action) {
-            Text(title)
-                .font(.footnote)
-                .foregroundStyle(color)
-                .frame(maxWidth: .infinity, minHeight: 40)
-                .background(
-                    SettingsTile.fill(isSelected: isSelected),
-                    in: Capsule()
-                )
-                .overlay {
-                    Capsule()
-                        .stroke(
-                            SettingsTile.stroke(isSelected: isSelected),
-                            lineWidth: 1
-                        )
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 }
 
