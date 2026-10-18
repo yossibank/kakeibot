@@ -181,8 +181,12 @@ public extension ReviewModel {
         }
     }
 
+    func canMove(by count: Int) -> Bool {
+        offset + count <= 0
+    }
+
     func move(by count: Int) {
-        guard offset + count <= 0 else {
+        guard canMove(by: count) else {
             return
         }
 

@@ -7,6 +7,7 @@ struct RecordsView: View {
 
     @State private var openId: Entry.ID?
     @State private var isMovingForward = true
+    @State private var slide = PageSlide()
 
     let onOpenEntry: (Entry.ID) -> Void
     let onDelete: (Entry.ID) -> Void
@@ -23,11 +24,8 @@ struct RecordsView: View {
                 )
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                ZStack(alignment: .top) {
-                    monthContent
-                        .id(model.month)
-                        .transition(.page(forward: isMovingForward))
-                }
+                monthContent
+                    .pageSlide(slide)
 
                 if let errorMessage = model.errorMessage {
                     Text(errorMessage)
@@ -444,7 +442,7 @@ private extension RecordsView {
         openId = nil
         isMovingForward = months > 0
 
-        withAnimation(.snappy) {
+        PageSlide.run($slide, forward: months > 0) {
             model.move(months: months)
         }
     }
