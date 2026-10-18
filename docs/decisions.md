@@ -12,7 +12,7 @@ Swift で先に作り、fixtures で Kotlin 版とそろえる。
 
 | 理由 | 選ばなかった案 |
 | --- | --- |
-| Swift が得意で iPhone を毎日使う。Android に取りかかるのは 6 番。AI の段階は Swift 専用 | Kotlin Multiplatform、Compose Multiplatform、Flutter、Swift SDK for Android |
+| Swift が得意で iPhone を毎日使う。iOS をストアに出してから、11 番で Android に取りかかる。AI の段階は Swift 専用 | Kotlin Multiplatform、Compose Multiplatform、Flutter、Swift SDK for Android |
 
 ### リポジトリ
 
@@ -475,7 +475,7 @@ DB を開いたときに、決まった財布とカテゴリを入れる。
 
 ### 入力シートのスタイル
 
-設定で選べるようにする。既定は夜のダイヤルで、スクロールなしの 1 画面に収める。金額を目盛りで囲み、電卓のテンキーは金額を押したときに下から出す。カードと円形のカテゴリは 8 番で足す。
+設定で選べるようにする。既定は夜のダイヤルで、スクロールなしの 1 画面に収める。金額を目盛りで囲み、電卓のテンキーは金額を押したときに下から出す。カードと円形のカテゴリは 7 番で足す。
 
 金額を入れる欄は、入力シートのほかでも同じ電卓のテンキーを下から出す。
 
