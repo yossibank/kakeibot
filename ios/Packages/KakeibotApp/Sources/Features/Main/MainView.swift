@@ -17,8 +17,14 @@ public struct MainView: View {
     @State private var orderMenuAnchor: CGRect?
 
     private let database: AppDatabase
+    private let route: PlannedNotification.Route?
+    private let onRouteOpened: () -> Void
 
-    public init(database: AppDatabase) {
+    public init(
+        database: AppDatabase,
+        route: PlannedNotification.Route? = nil,
+        onRouteOpened: @escaping () -> Void = {}
+    ) {
         let today = LocalDate(Date(), in: .current)
 
         _home = State(
@@ -58,6 +64,8 @@ public struct MainView: View {
 
         _notice = State(initialValue: EntryNoticeModel(database: database))
         self.database = database
+        self.route = route
+        self.onRouteOpened = onRouteOpened
     }
 
     public var body: some View {
@@ -216,6 +224,11 @@ public struct MainView: View {
         .task {
             await draft.load()
         }
+        .onChange(of: route, initial: true) { _, route in
+            if let route {
+                open(route)
+            }
+        }
         .onReceive(
             NotificationCenter.default.publisher(for: .NSCalendarDayChanged)
         ) { _ in
@@ -276,6 +289,14 @@ private extension MainView {
                     type: home.templateType
                 )
             )
+        case let .recurring(id):
+            RecurringEditSheet(
+                model: RecurringEditModel(
+                    database: database,
+                    today: home.today,
+                    editing: id
+                )
+            )
         case let .wallet(id):
             WalletEditSheet(
                 model: WalletEditModel(
@@ -304,6 +325,7 @@ private extension MainView {
         case templates
         case transfer
         case wallet(Wallet.ID)
+        case recurring(Recurring.ID)
 
         var id: String {
             switch self {
@@ -315,6 +337,7 @@ private extension MainView {
             case .templates: "templates"
             case .transfer: "transfer"
             case let .wallet(id): "wallet-\(id)"
+            case let .recurring(id): "recurring-\(id)"
             }
         }
     }
@@ -355,7 +378,31 @@ private extension MainView {
             return
         }
 
+        guard route == nil else {
+            return
+        }
+
         sheet = .new
+    }
+
+    func open(_ route: PlannedNotification.Route) {
+        onRouteOpened()
+
+        Task {
+            if sheet != nil {
+                sheet = nil
+                try? await Task.sleep(for: .milliseconds(600))
+            }
+
+            switch route {
+            case let .entry(date):
+                tab = .home
+                draft.date = date
+                sheet = .new
+            case let .recurring(id):
+                sheet = .recurring(id)
+            }
+        }
     }
 
     func observeMonthStartDay() async {

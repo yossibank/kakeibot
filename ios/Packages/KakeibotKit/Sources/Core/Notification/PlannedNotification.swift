@@ -34,3 +34,37 @@ public extension PlannedNotification {
             .joined(separator: "|")
     }
 }
+
+public extension PlannedNotification.Route {
+    init?(link: String) {
+        let parts = link.split(separator: "/", maxSplits: 1).map(String.init)
+
+        guard parts.count == 2 else {
+            return nil
+        }
+
+        switch parts[0] {
+        case "entry":
+            guard let date = LocalDate(parts[1]) else {
+                return nil
+            }
+
+            self = .entry(date)
+        case "recurring":
+            guard let id = Recurring.ID(parts[1]) else {
+                return nil
+            }
+
+            self = .recurring(id)
+        default:
+            return nil
+        }
+    }
+
+    var link: String {
+        switch self {
+        case let .entry(date): "entry/\(date)"
+        case let .recurring(id): "recurring/\(id)"
+        }
+    }
+}

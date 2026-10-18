@@ -12,13 +12,16 @@ final class AppModel {
 
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let scheduler: NotificationScheduler
+    private let router: NotificationRouter
 
     init(
         openDatabase: @escaping @Sendable () throws -> AppDatabase,
-        scheduler: NotificationScheduler = NotificationScheduler()
+        scheduler: NotificationScheduler = NotificationScheduler(),
+        router: NotificationRouter = .shared
     ) {
         self.openDatabase = openDatabase
         self.scheduler = scheduler
+        self.router = router
     }
 }
 
@@ -28,6 +31,10 @@ extension AppModel {
         case onboarding(AppDatabase)
         case ready(AppDatabase)
         case failed(String)
+    }
+
+    var route: PlannedNotification.Route? {
+        router.route
     }
 
     var isOpened: Bool {
@@ -57,6 +64,10 @@ extension AppModel {
         } catch {
             launch = .failed(String(describing: error))
         }
+    }
+
+    func finishRoute() {
+        router.finish()
     }
 
     func finishOnboarding() {

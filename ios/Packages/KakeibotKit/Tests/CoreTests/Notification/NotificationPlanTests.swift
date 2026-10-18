@@ -55,6 +55,21 @@ struct NotificationPlanTests {
         #expect(ReminderTime("7:05") == nil)
         #expect(ReminderTime("24:00") == nil)
     }
+
+    @Test
+    func readsAndWritesLink() throws {
+        let date = try #require(LocalDate("2026-10-18"))
+        let id = Recurring.ID()
+        let entry = PlannedNotification.Route.entry(date)
+        let recurring = PlannedNotification.Route.recurring(id)
+
+        #expect(entry.link == "entry/2026-10-18")
+        #expect(PlannedNotification.Route(link: entry.link) == entry)
+        #expect(PlannedNotification.Route(link: recurring.link) == recurring)
+        #expect(PlannedNotification.Route(link: "entry/2026-13-01") == nil)
+        #expect(PlannedNotification.Route(link: "budget/1") == nil)
+        #expect(PlannedNotification.Route(link: "entry") == nil)
+    }
 }
 
 extension NotificationPlanTests {

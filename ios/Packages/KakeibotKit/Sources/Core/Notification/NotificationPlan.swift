@@ -3,6 +3,8 @@ public enum NotificationPlan {}
 public extension NotificationPlan {
     static let reminderDays = 7
     static let recurringDays = 31
+    static let reminderTitle = "今日の記録はまだです"
+    static let reminderBody = "使ったお金か「支出なし」の印を入れておきましょう"
 
     static func notifications(
         today: LocalDate,
@@ -52,8 +54,8 @@ private extension NotificationPlan {
                     key: "reminder",
                     date: date,
                     time: time,
-                    title: "今日の記録はまだです",
-                    body: "使ったお金か「支出なし」の印を入れておきましょう",
+                    title: reminderTitle,
+                    body: reminderBody,
                     route: .entry(date)
                 )
             }

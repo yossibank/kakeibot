@@ -21,6 +21,14 @@ public extension AppDatabase {
         }
     }
 
+    func reminderTimeUpdates()
+        -> some AsyncSequence<ReminderTime?, any Error> {
+        ValueObservation
+            .tracking(Self.reminderTime)
+            .removeDuplicates()
+            .values(in: writer)
+    }
+
     func reminderTime() async throws -> ReminderTime? {
         try await writer.read(Self.reminderTime)
     }

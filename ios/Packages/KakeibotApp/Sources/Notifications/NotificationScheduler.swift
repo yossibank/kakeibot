@@ -23,7 +23,9 @@ public extension NotificationScheduler {
             Self.fireDate(of: notification, in: timeZone) > now
         }
 
-        if !upcoming.isEmpty, await client.needsAuthorization() {
+        if
+            !upcoming.isEmpty,
+            await client.authorization() == .notDetermined {
             _ = await client.requestAuthorization()
         }
 
@@ -47,6 +49,7 @@ public extension NotificationScheduler {
                 identifier: identifier,
                 title: notification.title,
                 body: notification.body,
+                link: notification.route.link,
                 at: Self.components(of: notification, in: timeZone)
             )
         }

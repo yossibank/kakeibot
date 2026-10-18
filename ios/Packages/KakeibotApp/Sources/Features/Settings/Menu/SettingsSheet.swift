@@ -156,44 +156,20 @@ struct SettingsSheet: View {
                         VStack(alignment: .leading, spacing: 6) {
                             sectionTitle("通知")
 
-                            VStack(spacing: 0) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "bell")
-                                        .font(.system(size: 16, weight: .light))
-                                        .foregroundStyle(Palette.gold)
-                                        .frame(width: 22)
-
-                                    Toggle("記録忘れの通知", isOn: reminderOnBinding)
-                                        .font(.subheadline)
-                                        .foregroundStyle(Palette.ink)
-                                        .tint(Palette.gold)
-                                }
-                                .frame(minHeight: 52)
-
-                                if reminderTime != nil {
-                                    Rectangle()
-                                        .fill(Palette.gold.opacity(0.1))
-                                        .frame(height: 0.5)
-
-                                    DatePicker(
-                                        "時刻",
-                                        selection: reminderDateBinding,
-                                        displayedComponents: .hourAndMinute
-                                    )
-                                    .font(.subheadline)
-                                    .foregroundStyle(Palette.ink)
-                                    .tint(Palette.gold)
-                                    .padding(.leading, 34)
-                                    .frame(minHeight: 52)
-                                }
+                            NavigationLink {
+                                ReminderView(
+                                    model: ReminderModel(database: database)
+                                )
+                            } label: {
+                                row(
+                                    "記録忘れの通知",
+                                    systemImage: "bell",
+                                    value: reminderTime?.description ?? "オフ"
+                                )
                             }
+                            .buttonStyle(.plain)
                             .padding(.horizontal, 14)
                             .card()
-
-                            Text("決めた時刻までに、記録も「支出なし」の印もない日に知らせます")
-                                .font(.caption2)
-                                .foregroundStyle(Palette.mist)
-                                .padding(.leading, 6)
                         }
 
                         VStack(alignment: .leading, spacing: 6) {
@@ -247,7 +223,7 @@ struct SettingsSheet: View {
             weekStart = await (try? database.weekStart()) ?? .sunday
         }
         .task {
-            reminderTime = try? await database.reminderTime()
+            await observeReminderTime()
         }
         .task {
             launchScreen = await (try? database.launchScreen()) ?? .home
@@ -332,39 +308,6 @@ private extension SettingsSheet {
         }
     }
 
-    var reminderOnBinding: Binding<Bool> {
-        Binding {
-            reminderTime != nil
-        } set: { isOn in
-            saveReminder(isOn ? .evening : nil)
-        }
-    }
-
-    var reminderDateBinding: Binding<Date> {
-        Binding {
-            let time = reminderTime ?? .evening
-
-            let components = DateComponents(
-                hour: time.hour,
-                minute: time.minute
-            )
-
-            return Calendar.current.date(from: components) ?? Date()
-        } set: { date in
-            let parts = Calendar.current.dateComponents(
-                [.hour, .minute],
-                from: date
-            )
-
-            let time = ReminderTime(
-                hour: parts.hour ?? 21,
-                minute: parts.minute ?? 0
-            )
-
-            saveReminder(time)
-        }
-    }
-
     var weekStartBinding: Binding<Weekday> {
         Binding {
             weekStart
@@ -377,13 +320,13 @@ private extension SettingsSheet {
         }
     }
 
-    func saveReminder(_ time: ReminderTime?) {
-        withAnimation(.snappy) {
-            reminderTime = time
-        }
-
-        Task {
-            try? await database.setReminderTime(time)
+    func observeReminderTime() async {
+        do {
+            for try await time in database.reminderTimeUpdates() {
+                reminderTime = time
+            }
+        } catch {
+            reminderTime = nil
         }
     }
 

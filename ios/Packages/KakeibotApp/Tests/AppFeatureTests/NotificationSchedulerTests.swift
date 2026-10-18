@@ -26,6 +26,7 @@ struct NotificationSchedulerTests {
         #expect(state.removed == ["kakeibot.old"])
         #expect(state.added.count == 1)
         #expect(state.added.first?.hasSuffix(suffix) == true)
+        #expect(state.links == ["entry/2026-10-17"])
         #expect(state.requested)
     }
 
@@ -54,6 +55,7 @@ extension NotificationSchedulerTests {
             var pending: [String]
             var added: [String] = []
             var removed: [String] = []
+            var links: [String] = []
             var requested = false
         }
 
@@ -71,17 +73,19 @@ extension NotificationSchedulerTests {
             identifier: String,
             title: String,
             body: String,
+            link: String,
             at components: DateComponents
         ) async throws {
             state.added.append(identifier)
+            state.links.append(link)
         }
 
         func remove(_ identifiers: [String]) async {
             state.removed += identifiers
         }
 
-        func needsAuthorization() async -> Bool {
-            true
+        func authorization() async -> NotificationAuthorization {
+            .notDetermined
         }
 
         func requestAuthorization() async -> Bool {
