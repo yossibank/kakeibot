@@ -7,6 +7,7 @@ struct ReviewView: View {
 
     @State private var openShare: ReviewModel.Share?
     @State private var pendingEntry: Entry.ID?
+    @State private var slide = PageSlide()
 
     let onOpenEntry: (Entry.ID) -> Void
 
@@ -16,11 +17,8 @@ struct ReviewView: View {
                 header
                 periodBar
 
-                ZStack(alignment: .top) {
-                    content
-                        .id(model.period)
-                        .transition(.page(forward: model.isMovingForward))
-                }
+                content
+                    .pageSlide(slide)
 
                 if let errorMessage = model.errorMessage {
                     Text(errorMessage)
@@ -181,9 +179,7 @@ private extension ReviewView {
         count: Int
     ) -> some View {
         Button {
-            withAnimation(.snappy) {
-                model.move(by: count)
-            }
+            move(by: count)
         } label: {
             Image(systemName: systemImage)
                 .font(.footnote.weight(.semibold))
@@ -391,7 +387,11 @@ private extension ReviewView {
         Binding {
             model.scale
         } set: { scale in
-            withAnimation(.snappy) {
+            let scales = ReviewPeriod.Scale.allCases
+            let from = scales.firstIndex(of: model.scale) ?? 0
+            let to = scales.firstIndex(of: scale) ?? 0
+
+            PageSlide.run($slide, forward: to > from) {
                 model.setScale(scale)
             }
 
@@ -544,9 +544,15 @@ private extension ReviewView {
     }
 
     func move(_ direction: PageSwipeDirection) {
-        let count = direction == .forward ? 1 : -1
+        move(by: direction == .forward ? 1 : -1)
+    }
 
-        withAnimation(.snappy) {
+    func move(by count: Int) {
+        guard model.canMove(by: count) else {
+            return
+        }
+
+        PageSlide.run($slide, forward: count > 0) {
             model.move(by: count)
         }
     }
