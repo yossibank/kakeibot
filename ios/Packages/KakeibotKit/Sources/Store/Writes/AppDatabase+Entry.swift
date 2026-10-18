@@ -34,9 +34,8 @@ public extension AppDatabase {
         try await writer.write { db in
             var entry = entry
 
-            if
-                let templateId = entry.templateId,
-                try !EntryTemplate.exists(db, key: templateId) {
+            if let templateId = entry.templateId,
+               try !EntryTemplate.exists(db, key: templateId) {
                 entry.templateId = nil
             }
 

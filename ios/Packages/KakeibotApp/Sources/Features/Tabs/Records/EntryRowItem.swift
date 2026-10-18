@@ -44,9 +44,8 @@ private extension EntryRowItem {
     ) -> String? {
         let source = list.wallets[entry.walletId]?.name
 
-        guard
-            entry.type == .transfer,
-            let destination = entry.toWalletId.flatMap({ list.wallets[$0] })
+        guard entry.type == .transfer,
+              let destination = entry.toWalletId.flatMap({ list.wallets[$0] })
         else {
             return source
         }

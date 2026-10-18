@@ -15,9 +15,8 @@ public struct YearMonth: Hashable, Sendable {
     }
 
     public init?(_ text: String) {
-        guard
-            let numbers = DateText.numbers(in: text, digits: [4, 2]),
-            DateText.yearRange.contains(numbers[0])
+        guard let numbers = DateText.numbers(in: text, digits: [4, 2]),
+              DateText.yearRange.contains(numbers[0])
         else {
             return nil
         }
