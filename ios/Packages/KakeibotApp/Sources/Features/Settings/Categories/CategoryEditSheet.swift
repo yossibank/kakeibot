@@ -38,6 +38,9 @@ public struct CategoryEditSheet: View {
                 }
             }
         }
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .preferredColorScheme(.dark)
         .confirmsDiscard(
             when: model.isChanged,
@@ -88,12 +91,6 @@ private extension CategoryEditSheet {
             .padding(.vertical, -Self.fade)
             .scrollDismissesKeyboard(.interactively)
             .scrollDisabled(isMovingTag)
-
-            if let errorMessage = model.errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(Palette.rose)
-            }
 
             PrimaryButton(model.saveTitle) {
                 Task {
@@ -218,7 +215,7 @@ private extension CategoryEditSheet {
         CategoryTagCard(
             name: $tagName,
             isAdding: edit == .add,
-            errorMessage: model.errorMessage,
+            errorMessage: model.tagProblem,
             onCommit: {
                 commitTag()
             },
@@ -283,7 +280,7 @@ private extension CategoryEditSheet {
     ) {
         focus = nil
         tagName = name
-        model.clearError()
+        model.clearTagProblem()
 
         withAnimation(.snappy(duration: 0.25)) {
             tagEdit = edit
@@ -291,7 +288,7 @@ private extension CategoryEditSheet {
     }
 
     func closeTag() {
-        model.clearError()
+        model.clearTagProblem()
 
         withAnimation(.snappy(duration: 0.2)) {
             tagEdit = nil

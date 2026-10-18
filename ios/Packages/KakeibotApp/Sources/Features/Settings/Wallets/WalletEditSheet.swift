@@ -52,6 +52,9 @@ public struct WalletEditSheet: View {
                 }
             }
         }
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .preferredColorScheme(.dark)
         .confirmsDiscard(
             when: model.isChanged,
@@ -112,12 +115,6 @@ private extension WalletEditSheet {
             .edgeFade(Self.fade)
             .padding(.vertical, -Self.fade)
             .scrollDismissesKeyboard(.interactively)
-
-            if let errorMessage = model.errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(Palette.rose)
-            }
 
             saveButton
         }

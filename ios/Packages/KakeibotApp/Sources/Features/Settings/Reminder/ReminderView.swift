@@ -39,12 +39,6 @@ public struct ReminderView: View {
                     }
 
                     recurringNote
-
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(Palette.rose)
-                    }
                 }
                 .padding(.vertical, 8)
             }
@@ -53,6 +47,9 @@ public struct ReminderView: View {
         .padding(.horizontal, 18)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .background {
             Rectangle()
                 .fill(Palette.night)

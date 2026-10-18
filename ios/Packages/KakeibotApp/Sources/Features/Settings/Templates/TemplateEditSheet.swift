@@ -53,20 +53,9 @@ public struct TemplateEditSheet: View {
                     .padding(.horizontal, 18)
                     .padding(.top, 18)
             }
-            .overlay(alignment: .bottom) {
-                if let errorMessage = model.errorMessage {
-                    NoticeBanner(
-                        errorMessage,
-                        systemImage: "exclamationmark",
-                        tone: .error
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 12)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
+            .errorBanner(model.errorNotice) {
+                model.errorNotice.clear()
             }
-            .animation(.snappy, value: model.errorMessage)
-            .sensoryFeedback(.error, trigger: model.errorCount)
             .background {
                 Rectangle()
                     .fill(Palette.night)
@@ -91,17 +80,6 @@ public struct TemplateEditSheet: View {
             }
             .task {
                 await model.load()
-            }
-            .task(id: model.errorCount) {
-                guard model.errorCount > 0 else {
-                    return
-                }
-
-                guard await (try? Task.sleep(for: .seconds(3))) != nil else {
-                    return
-                }
-
-                model.clearError()
             }
         }
     }
@@ -447,7 +425,7 @@ private extension TemplateEditSheet {
     }
 
     var nameLine: Color {
-        if model.errorMessage != nil, model.name.isEmpty {
+        if model.errorNotice.message != nil, model.name.isEmpty {
             Palette.rose
         } else if focus == .name {
             Palette.gold

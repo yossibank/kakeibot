@@ -41,12 +41,6 @@ public struct WalletListView: View {
                     } else if !model.hidden.isEmpty {
                         hiddenSection
                     }
-
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(Palette.rose)
-                    }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
@@ -60,6 +54,9 @@ public struct WalletListView: View {
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .background {
             Rectangle()
                 .fill(Palette.night)

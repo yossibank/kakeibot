@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -11,7 +12,8 @@ public final class OnboardingModel {
     public private(set) var weekStart: Weekday = .sunday
 
     public private(set) var page: Page = .welcome
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     public let monthStart: MonthStartDayModel
     public let budget: BudgetListModel
@@ -55,7 +57,7 @@ public extension OnboardingModel {
         do {
             weekStart = try await database.setting(.weekStart)
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -65,7 +67,7 @@ public extension OnboardingModel {
         do {
             try await database.setSetting(.weekStart, to: weekStart)
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 
@@ -102,7 +104,7 @@ public extension OnboardingModel {
             try await database.setSetting(.onboardingCompleted, to: true)
             return true
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
             return false
         }
     }

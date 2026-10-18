@@ -32,12 +32,6 @@ public struct TemplateListView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     board
-
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(Palette.rose)
-                    }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
@@ -51,6 +45,9 @@ public struct TemplateListView: View {
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .background {
             Rectangle()
                 .fill(Palette.night)

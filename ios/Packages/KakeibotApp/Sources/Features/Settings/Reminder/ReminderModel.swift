@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -8,7 +9,8 @@ import Store
 public final class ReminderModel {
     public private(set) var time: ReminderTime?
     public private(set) var authorization: NotificationAuthorization = .allowed
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private var lastTime: ReminderTime = .evening
     private var input: NotificationInput?
@@ -77,7 +79,7 @@ public extension ReminderModel {
             lastTime = time ?? lastTime
             input = try await database.notificationInput(from: today)
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
 
         authorization = await permission.authorization()
@@ -90,12 +92,12 @@ public extension ReminderModel {
     func choose(_ time: ReminderTime?) async {
         self.time = time
         lastTime = time ?? lastTime
-        errorMessage = nil
+        errorNotice.clear()
 
         do {
             try await database.setSetting(.reminderTime, to: time)
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
 
         guard time != nil else {

@@ -49,16 +49,13 @@ public struct HomeView: View {
                 dialCard
                 templateCard
                 recentCard
-
-                if let errorMessage = model.errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(Palette.rose)
-                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
+        }
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
         }
         .background {
             Rectangle()

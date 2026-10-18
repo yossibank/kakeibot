@@ -37,12 +37,6 @@ public struct MonthStartDayView: View {
                     Text("29〜31 日を選ぶと、その日がない月は月末から始まります")
                         .font(.caption2)
                         .foregroundStyle(Palette.mist)
-
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(Palette.rose)
-                    }
                 }
                 .padding(.vertical, 8)
             }
@@ -51,6 +45,9 @@ public struct MonthStartDayView: View {
         .padding(.horizontal, 18)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .background {
             Rectangle()
                 .fill(Palette.night)

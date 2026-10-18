@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -13,8 +14,9 @@ public final class BudgetListModel {
     public private(set) var entryList: EntryList?
     public private(set) var editing: Target?
     public private(set) var calculator = AmountCalculator()
-    public private(set) var errorMessage: String?
     public private(set) var recurrings: [Recurring] = []
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
     private let today: LocalDate
@@ -133,7 +135,7 @@ public extension BudgetListModel {
             entryList = try await database.entryList()
             recurrings = try await database.recurrings()
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -192,7 +194,7 @@ private extension BudgetListModel {
             budgets = try await database.budgets()
             self.editing = nil
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 }

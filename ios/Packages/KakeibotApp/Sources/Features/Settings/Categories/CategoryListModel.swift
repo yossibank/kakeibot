@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -10,7 +11,8 @@ public final class CategoryListModel {
 
     public private(set) var list: CategoryList?
     public private(set) var movingOrder: [EntryCategory.ID]?
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 
@@ -44,7 +46,7 @@ public extension CategoryListModel {
         do {
             list = try await database.categoryList()
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -54,7 +56,7 @@ public extension CategoryListModel {
                 self.list = list
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -95,7 +97,7 @@ public extension CategoryListModel {
 
             await load()
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 
@@ -110,7 +112,7 @@ public extension CategoryListModel {
             try await database.reorderCategories(ids, at: Date())
             await load()
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
 
         self.movingOrder = nil

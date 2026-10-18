@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -15,7 +16,8 @@ public final class RecordsModel {
     public private(set) var layout: RecordsLayout = .list
     public private(set) var list: EntryList?
     public private(set) var noSpendDays: Set<LocalDate> = []
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 
@@ -109,7 +111,7 @@ public extension RecordsModel {
         do {
             layout = try await database.setting(.recordsLayout)
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -119,7 +121,7 @@ public extension RecordsModel {
         do {
             try await database.setSetting(.recordsLayout, to: layout)
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 
@@ -131,7 +133,7 @@ public extension RecordsModel {
                 try await database.markNoSpendDay(date, at: Date())
             }
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 
@@ -139,7 +141,7 @@ public extension RecordsModel {
         do {
             list = try await database.entryList()
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 }
@@ -154,7 +156,7 @@ private extension RecordsModel {
                 self.list = list
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -164,7 +166,7 @@ private extension RecordsModel {
                 noSpendDays = days
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -174,7 +176,7 @@ private extension RecordsModel {
                 self.weekStart = weekStart
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -185,7 +187,7 @@ private extension RecordsModel {
                 month = today.periodMonth(startingOn: startDay)
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 }

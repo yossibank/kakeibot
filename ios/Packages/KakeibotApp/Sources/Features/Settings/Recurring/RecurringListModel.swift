@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -9,7 +10,8 @@ public final class RecurringListModel {
     public private(set) var recurrings: [Recurring] = []
     public private(set) var movingOrder: [Recurring.ID]?
     public private(set) var options: EntryOptions?
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     let today: LocalDate
 
@@ -78,7 +80,7 @@ public extension RecurringListModel {
         do {
             try await database.deleteRecurring(id)
         } catch {
-            errorMessage = Self.deleteFailedMessage
+            errorNotice.show(Self.deleteFailedMessage)
         }
     }
 
@@ -90,7 +92,7 @@ public extension RecurringListModel {
         do {
             try await database.reorderRecurrings(movingOrder, at: Date())
         } catch {
-            errorMessage = Self.saveFailedMessage
+            errorNotice.show(Self.saveFailedMessage)
         }
 
         self.movingOrder = nil
@@ -109,7 +111,7 @@ public extension RecurringListModel {
                 options = try await database.entryOptions()
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 }

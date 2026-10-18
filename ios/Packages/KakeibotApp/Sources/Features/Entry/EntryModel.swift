@@ -28,8 +28,8 @@ public final class EntryModel {
     public private(set) var balances: [Wallet.ID: Int] = [:]
     public private(set) var hasOpenedCategoryMenu = true
     public private(set) var weekStart: Weekday = .sunday
-    public private(set) var errorMessage: String?
-    public private(set) var errorCount = 0
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private var baseline: Snapshot?
     private var original: Entry?
@@ -385,10 +385,6 @@ public extension EntryModel {
         }
     }
 
-    func clearError() {
-        errorMessage = nil
-    }
-
     func press(_ key: AmountCalculator.Key) {
         calculator.press(key)
     }
@@ -527,8 +523,7 @@ private extension EntryModel {
             return
         }
 
-        errorMessage = Self.message(for: error)
-        errorCount += 1
+        errorNotice.show(Self.message(for: error))
     }
 
     static func message(for error: any Error) -> String {

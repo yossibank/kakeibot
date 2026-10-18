@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -22,8 +23,8 @@ public final class TemplateEditModel {
     public private(set) var type: Entry.Kind
     public private(set) var calculator: AmountCalculator
     public private(set) var options: EntryOptions?
-    public private(set) var errorMessage: String?
-    public private(set) var errorCount = 0
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private var baseline: EntryTemplateDraft?
 
@@ -144,10 +145,6 @@ public extension TemplateEditModel {
         options?.icons[wallet.iconId]
     }
 
-    func clearError() {
-        errorMessage = nil
-    }
-
     func press(_ key: AmountCalculator.Key) {
         calculator.press(key)
     }
@@ -173,13 +170,13 @@ public extension TemplateEditModel {
         } catch is CancellationError {
             return
         } catch {
-            report(Self.loadFailedMessage)
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func save() async -> EntryTemplate? {
         if let problem = draft.problems.first {
-            report(message(for: problem))
+            errorNotice.show(message(for: problem))
             return nil
         }
 
@@ -190,7 +187,7 @@ public extension TemplateEditModel {
                 at: Date()
             )
         } catch {
-            report(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage)
             return nil
         }
     }
@@ -204,7 +201,7 @@ public extension TemplateEditModel {
             try await database.deleteTemplate(editingId)
             return true
         } catch {
-            report(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage)
             return false
         }
     }
@@ -213,11 +210,6 @@ public extension TemplateEditModel {
 private extension TemplateEditModel {
     static let loadFailedMessage = "テンプレートを読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
-
-    func report(_ message: String) {
-        errorMessage = message
-        errorCount += 1
-    }
 
     func message(for problem: EntryTemplateDraft.Problem) -> String {
         switch problem {

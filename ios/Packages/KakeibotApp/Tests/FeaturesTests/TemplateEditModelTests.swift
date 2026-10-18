@@ -43,7 +43,7 @@ struct TemplateEditModelTests {
         await model.load()
         let canSaveWithoutName = model.canSave
         let refused = await model.save()
-        let refusal = model.errorMessage
+        let refusal = model.errorNotice.message
         model.name = "ランチ"
         model.press(.digit(9))
         model.press(.digit(8))

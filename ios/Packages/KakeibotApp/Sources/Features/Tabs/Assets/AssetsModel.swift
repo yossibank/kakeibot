@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 import Observation
 import Store
@@ -10,7 +11,8 @@ public final class AssetsModel {
 
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var list: EntryList?
-    public private(set) var errorMessage: String?
+
+    public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 
@@ -106,7 +108,7 @@ public extension AssetsModel {
         do {
             list = try await database.entryList()
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 }
@@ -132,7 +134,7 @@ private extension AssetsModel {
                 self.list = list
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -142,7 +144,7 @@ private extension AssetsModel {
                 monthStartDay = startDay
             }
         } catch {
-            errorMessage = Self.loadFailedMessage
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 }

@@ -14,6 +14,9 @@ public struct BudgetListView: View {
 
     public var body: some View {
         content
+            .errorBanner(model.errorNotice) {
+                model.errorNotice.clear()
+            }
             .budgetKeypad(model)
             .toolbar(.hidden, for: .navigationBar)
             .preferredColorScheme(.dark)
@@ -76,12 +79,6 @@ private extension BudgetListView {
                         }
                         .padding(.horizontal, 14)
                         .card()
-                    }
-
-                    if let errorMessage = model.errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(Palette.rose)
                     }
                 }
                 .padding(.vertical, 8)

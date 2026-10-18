@@ -65,6 +65,6 @@ struct WalletListModelTests {
         #expect(hidden == ["銀行"])
         #expect(model.movingOrder == nil)
         #expect(model.shown.map(\.name) == ["財布"])
-        #expect(model.errorMessage == "最後の 1 つの口座は非表示にできません")
+        #expect(model.errorNotice.message == "最後の 1 つの口座は非表示にできません")
     }
 }
