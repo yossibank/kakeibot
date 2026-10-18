@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 import SwiftUI
 
-struct RecurringEditSheet: View {
+public struct RecurringEditSheet: View {
     @State private var model: RecurringEditModel
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
@@ -12,11 +12,11 @@ struct RecurringEditSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    init(model: RecurringEditModel) {
+    public init(model: RecurringEditModel) {
         _model = State(initialValue: model)
     }
 
-    var body: some View {
+    public var body: some View {
         ZStack(alignment: .bottom) {
             content
 

@@ -102,20 +102,15 @@ private extension ReviewModelTests {
         _ model: ReviewModel,
         until isReady: () -> Bool
     ) async throws {
-        let listTask = Task {
-            await model.observe()
-        }
-
-        let budgetTask = Task {
-            await model.observeBudgets()
+        let task = Task {
+            await model.run()
         }
 
         for _ in 0..<200 where !isReady() {
             try await Task.sleep(for: .milliseconds(10))
         }
 
-        listTask.cancel()
-        budgetTask.cancel()
+        task.cancel()
     }
 }
 

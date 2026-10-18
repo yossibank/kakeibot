@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-extension View {
+public extension View {
     func entryNotice(
         _ model: EntryNoticeModel,
         above inset: CGFloat

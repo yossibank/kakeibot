@@ -2,13 +2,23 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct TemplateOrderMenu: View {
-    @Binding var selection: TemplateOrder
+public struct TemplateOrderMenu: View {
+    @Binding private var selection: TemplateOrder
 
-    let anchor: CGRect
-    let onClose: () -> Void
+    private let anchor: CGRect
+    private let onClose: () -> Void
 
-    var body: some View {
+    public init(
+        selection: Binding<TemplateOrder>,
+        anchor: CGRect,
+        onClose: @escaping () -> Void
+    ) {
+        _selection = selection
+        self.anchor = anchor
+        self.onClose = onClose
+    }
+
+    public var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .topLeading) {
                 Color.black
