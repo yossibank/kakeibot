@@ -77,6 +77,16 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | `export-v1.json` | 読み込んで書き出すと同じ JSON になる。DB に入れて読み出しても同じになる | 書き出しの JSON そのもの |
 | `export-v1-header.json` | 読み込める `format` と `version` の判定 | `valid`、`invalid`（`format` と `version` のオブジェクト） |
 
+## recurring
+
+`spec/fixtures/recurring` のファイルは、次の表のとおりである。
+
+| ファイル | 試すこと | 項目 |
+| --- | --- | --- |
+| `recurring-dates.json` | 固定費の、範囲の中で記録を作る日 | `frequency`（`monthly` `yearly`）、`month`（yearly だけ）、`day`、`startDate`、`endDate`、`from`、`through`、`dates` |
+
+月末を超える `day` は、その月の最終日にする。`startDate` より前と `endDate` より後の日は入れない。
+
 ## review
 
 `spec/fixtures/review` のファイルは、次の表のとおりである。
