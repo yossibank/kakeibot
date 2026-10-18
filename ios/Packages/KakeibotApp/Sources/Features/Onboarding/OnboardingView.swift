@@ -5,6 +5,7 @@ import SwiftUI
 
 public struct OnboardingView: View {
     @State private var model: OnboardingModel
+    @State private var slide = PageSlide()
 
     private let onFinish: () -> Void
 
@@ -24,16 +25,13 @@ public struct OnboardingView: View {
         VStack(spacing: 18) {
             topBar
 
-            ZStack {
-                page
-                    .id(model.page)
-                    .transition(.page(forward: model.isMovingForward))
-            }
-            .frame(maxHeight: .infinity, alignment: .top)
-            .contentShape(.rect)
-            .onPageSwipe { direction in
-                turnPage(direction)
-            }
+            page
+                .pageSlide(slide)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .contentShape(.rect)
+                .onPageSwipe { direction in
+                    turnPage(direction)
+                }
 
             if let errorMessage = model.errorMessage {
                 Text(errorMessage)
@@ -352,7 +350,13 @@ private extension OnboardingView {
     }
 
     func turnPage(_ direction: PageSwipeDirection) {
-        withAnimation(.snappy) {
+        let forward = direction == .forward
+
+        guard model.canTurn(forward: forward) else {
+            return
+        }
+
+        PageSlide.run($slide, forward: forward) {
             switch direction {
             case .forward: model.next()
             case .backward: model.back()

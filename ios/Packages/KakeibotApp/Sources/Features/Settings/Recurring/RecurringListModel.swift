@@ -47,19 +47,9 @@ public extension RecurringListModel {
     var monthTotal: MonthTotal {
         let month = today.yearMonth.period(startingOn: .first)
 
-        let totals = recurrings.map { recurring in
-            let count = recurring.dates(
-                from: month.lowerBound,
-                through: month.upperBound
-            )
-            .count
-
-            return (recurring.type, recurring.amount * count)
-        }
-
         return MonthTotal(
-            expense: Self.sum(totals, of: .expense),
-            income: Self.sum(totals, of: .income)
+            expense: recurrings.total(of: .expense, in: month),
+            income: recurrings.total(of: .income, in: month)
         )
     }
 
@@ -82,6 +72,14 @@ public extension RecurringListModel {
         order.remove(at: from)
         order.insert(id, at: to)
         movingOrder = order
+    }
+
+    func delete(_ id: Recurring.ID) async {
+        do {
+            try await database.deleteRecurring(id)
+        } catch {
+            errorMessage = Self.deleteFailedMessage
+        }
     }
 
     func finishMoving() async {
@@ -119,6 +117,7 @@ public extension RecurringListModel {
 private extension RecurringListModel {
     static let loadFailedMessage = "固定費を読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
+    static let deleteFailedMessage = "固定費を消せませんでした"
 
     var shown: [Recurring] {
         guard let movingOrder else {
@@ -128,13 +127,6 @@ private extension RecurringListModel {
         return movingOrder.compactMap { id in
             recurrings.first { $0.id == id }
         }
-    }
-
-    static func sum(
-        _ totals: [(Entry.Kind, Int)],
-        of type: Entry.Kind
-    ) -> Int {
-        totals.filter { $0.0 == type }.reduce(0) { $0 + $1.1 }
     }
 
     static func title(of type: Entry.Kind) -> String {

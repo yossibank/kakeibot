@@ -144,6 +144,13 @@ private extension ReviewView {
                     .foregroundStyle(Palette.ink)
             }
 
+            if let recurring = model.recurringTotal {
+                Label(recurringText(recurring), systemImage: "repeat")
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.mist)
+            }
+
             if model.kind == .balance {
                 VStack(spacing: 10) {
                     balanceBar(
@@ -437,6 +444,12 @@ private extension ReviewView {
 
     var selectedChangeColor: Color {
         Self.changeColor(model.change, of: model.kind)
+    }
+
+    func recurringText(_ recurring: Int) -> String {
+        let other = model.total(of: model.kind) - recurring
+        let fixed = "固定費 \(AmountText.text(recurring))"
+        return "\(fixed)・それ以外 \(AmountText.text(other))"
     }
 
     var comparisonText: String {

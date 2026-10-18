@@ -141,6 +141,16 @@ private extension HomeView {
                 .buttonStyle(.plain)
             }
 
+            if model.recurringExpense > 0 {
+                Label(
+                    "今月の固定費 \(AmountText.text(model.recurringExpense))",
+                    systemImage: "repeat"
+                )
+                .font(.caption2)
+                .monospacedDigit()
+                .foregroundStyle(Palette.mist)
+            }
+
             HStack(spacing: 0) {
                 stat("今日", amount: model.todayExpense, color: Palette.champagne)
                 divider
