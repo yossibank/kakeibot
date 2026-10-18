@@ -141,6 +141,8 @@ public extension ReviewModel {
         return total > 0 ? total : nil
     }
 
+    static let recurringShareId = AnyHashable("recurring")
+
     var recurringShare: Share? {
         guard let recurringTotal else {
             return nil
@@ -156,6 +158,10 @@ public extension ReviewModel {
             ratio: Double(recurringTotal) / Double(total),
             usage: nil
         )
+    }
+
+    func recurringId(of id: Entry.ID) -> Recurring.ID? {
+        entries.first { $0.id == id }?.recurringId
     }
 
     func change(of kind: ReviewKind) -> Int {
@@ -263,7 +269,6 @@ private extension ReviewModel {
         let sortOrder: Int
     }
 
-    static let recurringShareId = AnyHashable("recurring")
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
 

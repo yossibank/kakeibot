@@ -128,9 +128,15 @@ struct MainView: View {
             }
 
             Tab(value: MainTab.review) {
-                ReviewView(model: review) { id in
-                    sheet = .edit(id)
-                }
+                ReviewView(
+                    model: review,
+                    onOpenEntry: { id in
+                        sheet = .edit(id)
+                    },
+                    onOpenRecurring: { id in
+                        sheet = .recurring(id)
+                    }
+                )
                 .tabContent()
             }
 

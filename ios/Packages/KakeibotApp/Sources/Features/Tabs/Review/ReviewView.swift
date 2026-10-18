@@ -7,16 +7,20 @@ public struct ReviewView: View {
 
     @State private var openShare: ReviewModel.Share?
     @State private var pendingEntry: Entry.ID?
+    @State private var pendingRecurring: Recurring.ID?
     @State private var slide = PageSlide()
 
     private let onOpenEntry: (Entry.ID) -> Void
+    private let onOpenRecurring: (Recurring.ID) -> Void
 
     public init(
         model: ReviewModel,
-        onOpenEntry: @escaping (Entry.ID) -> Void
+        onOpenEntry: @escaping (Entry.ID) -> Void,
+        onOpenRecurring: @escaping (Recurring.ID) -> Void
     ) {
         self.model = model
         self.onOpenEntry = onOpenEntry
+        self.onOpenRecurring = onOpenRecurring
     }
 
     public var body: some View {
@@ -49,8 +53,7 @@ public struct ReviewView: View {
                 periodTitle: periodTitle,
                 rows: model.rows(for: share)
             ) { id in
-                pendingEntry = id
-                openShare = nil
+                choose(id, in: share)
             }
         }
         .background {
@@ -567,7 +570,28 @@ private extension ReviewView {
         return largest > 0 ? Double(amount) / Double(largest) : 0
     }
 
+    func choose(
+        _ id: Entry.ID,
+        in share: ReviewModel.Share
+    ) {
+        let isRecurring = share.id == ReviewModel.recurringShareId
+
+        if isRecurring, let recurringId = model.recurringId(of: id) {
+            pendingRecurring = recurringId
+        } else {
+            pendingEntry = id
+        }
+
+        openShare = nil
+    }
+
     func openPendingEntry() {
+        if let pendingRecurring {
+            self.pendingRecurring = nil
+            onOpenRecurring(pendingRecurring)
+            return
+        }
+
         guard let pendingEntry else {
             return
         }
