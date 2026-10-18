@@ -55,29 +55,11 @@ public struct EntrySheet: View {
             ) { _, menu in
                 menu != nil
             }
-            .overlay(alignment: .bottom) {
-                if let errorMessage = model.errorMessage {
-                    NoticeBanner(
-                        errorMessage,
-                        systemImage: "exclamationmark",
-                        tone: .error
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, bannerBottom)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
-            }
-            .animation(.snappy, value: model.errorMessage)
-            .sensoryFeedback(.error, trigger: model.errorCount)
-            .task(id: model.errorCount) {
-                guard model.errorCount > 0 else {
-                    return
-                }
-
-                guard await (try? Task.sleep(for: .seconds(3))) != nil else {
-                    return
-                }
-
+            .errorBanner(
+                model.errorMessage,
+                count: model.errorCount,
+                bottom: bannerBottom
+            ) {
                 model.clearError()
             }
             .background {
