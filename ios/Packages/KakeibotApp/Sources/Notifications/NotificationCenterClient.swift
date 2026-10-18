@@ -1,3 +1,4 @@
+import Core
 import Foundation
 import UserNotifications
 
@@ -15,12 +16,6 @@ public protocol NotificationCenterClient: Sendable {
     func remove(_ identifiers: [String]) async
     func authorization() async -> NotificationAuthorization
     func requestAuthorization() async -> Bool
-}
-
-public enum NotificationAuthorization: Sendable {
-    case notDetermined
-    case denied
-    case allowed
 }
 
 public struct LiveNotificationCenter: NotificationCenterClient {

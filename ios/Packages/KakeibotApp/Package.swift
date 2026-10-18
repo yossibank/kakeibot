@@ -40,7 +40,6 @@ let package = Package(
             name: "Features",
             dependencies: [
                 "DesignSystem",
-                "Notifications",
                 .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
@@ -69,7 +68,6 @@ let package = Package(
             name: "FeaturesTests",
             dependencies: [
                 "Features",
-                "Notifications",
                 .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]

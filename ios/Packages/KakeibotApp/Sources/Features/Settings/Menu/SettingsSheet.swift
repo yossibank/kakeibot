@@ -16,6 +16,7 @@ struct SettingsSheet: View {
     #endif
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.notificationPermission) private var permission
 
     let database: AppDatabase
 
@@ -158,7 +159,10 @@ struct SettingsSheet: View {
 
                             NavigationLink {
                                 ReminderView(
-                                    model: ReminderModel(database: database)
+                                    model: ReminderModel(
+                                        database: database,
+                                        permission: permission
+                                    )
                                 )
                             } label: {
                                 row(

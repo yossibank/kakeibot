@@ -370,7 +370,12 @@ private extension ReminderView {
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         NavigationStack {
-            ReminderView(model: ReminderModel(database: database))
+            ReminderView(
+                model: ReminderModel(
+                    database: database,
+                    permission: .allowed
+                )
+            )
         }
     }
 }

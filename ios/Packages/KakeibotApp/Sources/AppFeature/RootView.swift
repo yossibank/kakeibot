@@ -41,6 +41,7 @@ public struct RootView: View {
                 await model.refreshDay()
             }
         }
+        .environment(\.notificationPermission, .live)
         .warmsUpInput()
     }
 }

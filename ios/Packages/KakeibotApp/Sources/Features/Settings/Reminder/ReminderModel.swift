@@ -1,6 +1,5 @@
 import Core
 import Foundation
-import Notifications
 import Observation
 import Store
 
@@ -14,14 +13,14 @@ public final class ReminderModel {
     private var lastTime: ReminderTime = .evening
 
     private let database: AppDatabase
-    private let client: any NotificationCenterClient
+    private let permission: NotificationPermission
 
     public init(
         database: AppDatabase,
-        client: any NotificationCenterClient = LiveNotificationCenter()
+        permission: NotificationPermission
     ) {
         self.database = database
-        self.client = client
+        self.permission = permission
     }
 }
 
@@ -49,7 +48,7 @@ public extension ReminderModel {
             errorMessage = Self.loadFailedMessage
         }
 
-        authorization = await client.authorization()
+        authorization = await permission.authorization()
     }
 
     func setOn(_ isOn: Bool) async {
@@ -71,15 +70,15 @@ public extension ReminderModel {
             return
         }
 
-        if await client.authorization() == .notDetermined {
-            _ = await client.requestAuthorization()
+        if await permission.authorization() == .notDetermined {
+            _ = await permission.request()
         }
 
-        authorization = await client.authorization()
+        authorization = await permission.authorization()
     }
 
     func refreshAuthorization() async {
-        authorization = await client.authorization()
+        authorization = await permission.authorization()
     }
 }
 

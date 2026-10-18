@@ -1,7 +1,6 @@
 import Core
 import Features
 import Foundation
-import Notifications
 import Store
 import Testing
 
@@ -10,8 +9,11 @@ struct ReminderModelTests {
     @Test
     func turnsOnAtEveningAndAsksPermission() async throws {
         let database = try AppDatabase.inMemory()
-        let client = FakeCenter(authorization: .notDetermined)
-        let model = ReminderModel(database: database, client: client)
+        let client = FakePermission(authorization: .notDetermined)
+        let model = ReminderModel(
+            database: database,
+            permission: client.permission
+        )
         await model.load()
 
         await model.setOn(true)
@@ -27,8 +29,11 @@ struct ReminderModelTests {
     @Test
     func keepsChosenTimeWhenTurnedBackOn() async throws {
         let database = try AppDatabase.inMemory()
-        let client = FakeCenter(authorization: .allowed)
-        let model = ReminderModel(database: database, client: client)
+        let client = FakePermission(authorization: .allowed)
+        let model = ReminderModel(
+            database: database,
+            permission: client.permission
+        )
         let time = try #require(ReminderTime("22:30"))
         await model.load()
 
@@ -45,8 +50,11 @@ struct ReminderModelTests {
     @Test
     func showsDeniedOnlyWhenOn() async throws {
         let database = try AppDatabase.inMemory()
-        let client = FakeCenter(authorization: .denied)
-        let model = ReminderModel(database: database, client: client)
+        let client = FakePermission(authorization: .denied)
+        let model = ReminderModel(
+            database: database,
+            permission: client.permission
+        )
 
         await model.load()
         let deniedWhileOff = model.isDenied
@@ -58,37 +66,31 @@ struct ReminderModelTests {
 }
 
 extension ReminderModelTests {
-    actor FakeCenter: NotificationCenterClient {
+    actor FakePermission {
         private(set) var requested = false
 
         private var status: NotificationAuthorization
+
+        nonisolated var permission: NotificationPermission {
+            NotificationPermission {
+                await self.status
+            } request: {
+                await self.request()
+            }
+        }
 
         init(authorization: NotificationAuthorization) {
             self.status = authorization
         }
 
-        func pendingIdentifiers() async -> [String] {
-            []
-        }
-
-        func add(
-            identifier: String,
-            title: String,
-            body: String,
-            link: String,
-            at components: DateComponents
-        ) async throws {}
-
-        func remove(_ identifiers: [String]) async {}
-
-        func authorization() async -> NotificationAuthorization {
-            status
-        }
-
-        func requestAuthorization() async -> Bool {
+        func request() -> Bool {
             requested = true
-            status = .allowed
-            return true
+
+            if status == .notDetermined {
+                status = .allowed
+            }
+
+            return status == .allowed
         }
     }
 }
