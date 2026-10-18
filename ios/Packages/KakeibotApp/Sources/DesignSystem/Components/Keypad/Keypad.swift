@@ -63,43 +63,43 @@ private extension Keypad {
             digitText("00")
         case .delete:
             Image(systemName: "delete.left")
-                .font(.system(size: 20, weight: .light))
+                .font(.sans(.headline, weight: .light))
                 .foregroundStyle(Palette.ink)
         case .clear:
             Text("AC")
-                .font(.system(size: 15, weight: .medium, design: .serif))
+                .font(.serif(.body, weight: .medium))
                 .tracking(3)
                 .foregroundStyle(Palette.gold)
         case let .tax(rate):
             VStack(spacing: 0) {
                 Text("税込")
-                    .font(.system(size: 9))
+                    .font(.sans(.micro))
                     .tracking(3)
                     .foregroundStyle(isActive ? Palette.gold : Palette.mist)
 
                 HStack(alignment: .firstTextBaseline, spacing: 1) {
                     Text(String(rate.rawValue))
-                        .font(.system(size: 20, design: .serif))
+                        .font(.serif(.headline))
 
                     Text("%")
-                        .font(.system(size: 11, design: .serif))
+                        .font(.serif(.caption))
                 }
                 .foregroundStyle(isActive ? Palette.champagne : Palette.ink)
             }
         case let .operation(operation):
             Text(operation.symbol)
-                .font(.system(size: 22))
+                .font(.sans(.headline))
                 .foregroundStyle(Palette.champagne)
         case .equals:
             Text("＝")
-                .font(.system(size: 22, weight: .semibold))
+                .font(.sans(.headline, weight: .semibold))
                 .foregroundStyle(Palette.nightBottom)
         }
     }
 
     func digitText(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 28, design: .serif))
+            .font(.serif(.title))
             .foregroundStyle(Palette.ink)
     }
 }
@@ -119,8 +119,8 @@ private extension Keypad {
     ) -> Color {
         switch key {
         case .digit, .doubleZero, .delete, .clear: Color.clear
-        case .tax: isActive ? Palette.gold.opacity(0.1) : Color.clear
-        case .operation: Palette.gold.opacity(0.12)
+        case .tax: isActive ? Palette.gold.opacity(.subtle) : Color.clear
+        case .operation: Palette.gold.opacity(.subtle)
         case .equals: Palette.gold
         }
     }
@@ -130,8 +130,8 @@ private extension Keypad {
         isActive: Bool
     ) -> Color {
         switch key {
-        case .clear: Palette.gold.opacity(0.3)
-        case .tax: isActive ? Palette.gold : Palette.gold.opacity(0.3)
+        case .clear: Palette.gold.opacity(.muted)
+        case .tax: isActive ? Palette.gold : Palette.gold.opacity(.muted)
         default: Color.clear
         }
     }

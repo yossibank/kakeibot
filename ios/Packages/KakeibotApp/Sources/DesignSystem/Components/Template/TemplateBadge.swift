@@ -9,7 +9,7 @@ struct TemplateBadge: View {
         IconImage(icon, size: size.iconSize)
             .foregroundStyle(Palette.gold)
             .frame(width: size.badgeSize, height: size.badgeSize)
-            .background(Palette.gold.opacity(0.06), in: Circle())
+            .background(Palette.faint, in: Circle())
             .overlay {
                 Circle()
                     .strokeBorder(TemplateCardStyle.foil, lineWidth: 1)

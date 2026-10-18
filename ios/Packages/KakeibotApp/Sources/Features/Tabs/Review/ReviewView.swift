@@ -65,7 +65,7 @@ private extension ReviewView {
     var header: some View {
         HStack {
             Text("振り返り")
-                .font(.system(size: 15, design: .serif))
+                .font(.serif(.body))
                 .tracking(3)
                 .foregroundStyle(Palette.gold)
 
@@ -86,13 +86,13 @@ private extension ReviewView {
 
             VStack(spacing: 1) {
                 Text(periodTitle)
-                    .font(.system(size: 15, design: .serif))
+                    .font(.serif(.body))
                     .foregroundStyle(Palette.champagne)
                     .contentTransition(periodTextTransition)
 
                 if let periodSubtitle {
                     Text(periodSubtitle)
-                        .font(.system(size: 10))
+                        .font(.sans(.caption))
                         .monospacedDigit()
                         .foregroundStyle(Palette.mist)
                         .contentTransition(periodTextTransition)
@@ -152,7 +152,7 @@ private extension ReviewView {
                         Label(recurringText(recurring), systemImage: "repeat")
 
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 9, weight: .semibold))
+                            .font(.sans(.micro, weight: .semibold))
                     }
                     .font(.caption)
                     .monospacedDigit()
@@ -231,7 +231,7 @@ private extension ReviewView {
                 Spacer()
 
                 Text(AmountText.text(amount))
-                    .font(.system(size: 15, design: .serif))
+                    .font(.serif(.body))
                     .monospacedDigit()
                     .foregroundStyle(Palette.ink)
             }
@@ -242,8 +242,8 @@ private extension ReviewView {
 
     func kindTile(_ kind: ReviewKind) -> some View {
         let isSelected = kind == model.kind
-        let fill = isSelected ? Palette.gold.opacity(0.14) : Color.clear
-        let rim = isSelected ? Palette.gold : Palette.gold.opacity(0.2)
+        let fill = isSelected ? Palette.gold.opacity(.subtle) : Color.clear
+        let rim = isSelected ? Palette.gold : Palette.gold.opacity(.soft)
         let titleColor = isSelected ? Palette.gold : Palette.mist
         let amountColor = isSelected ? Palette.champagne : Palette.ink
         let change = model.change(of: kind)
@@ -271,7 +271,7 @@ private extension ReviewView {
                 }
 
                 Text(AmountText.text(model.total(of: kind)))
-                    .font(.system(size: 17, design: .serif))
+                    .font(.serif(.body))
                     .monospacedDigit()
                     .foregroundStyle(amountColor)
                     .lineLimit(1)
@@ -347,7 +347,7 @@ private extension ReviewView {
                 .foregroundStyle(Palette.mist)
 
             Text(AmountText.text(model.total))
-                .font(.system(size: 17, design: .serif))
+                .font(.serif(.body))
                 .monospacedDigit()
                 .foregroundStyle(Palette.champagne)
                 .lineLimit(1)
@@ -383,7 +383,7 @@ private extension ReviewView {
                 Spacer(minLength: 8)
 
                 Text(AmountText.text(share.amount))
-                    .font(.system(size: 15, design: .serif))
+                    .font(.serif(.body))
                     .monospacedDigit()
                     .foregroundStyle(Palette.champagne)
 

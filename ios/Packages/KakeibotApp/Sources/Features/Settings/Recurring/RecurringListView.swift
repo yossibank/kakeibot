@@ -47,7 +47,9 @@ public struct RecurringListView: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil)
 
-            addButton
+            AddButton("固定費を追加") {
+                sheet = .new
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -98,7 +100,7 @@ private extension RecurringListView {
             Spacer()
 
             Text("固定費")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -109,30 +111,12 @@ private extension RecurringListView {
         }
     }
 
-    var addButton: some View {
-        Button {
-            sheet = .new
-        } label: {
-            Label("固定費を追加", systemImage: "plus")
-                .font(.subheadline)
-                .foregroundStyle(Palette.gold)
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Palette.gold.opacity(0.06), in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(Palette.gold.opacity(0.55), style: Self.dash)
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-    }
-
     var totalCard: some View {
         HStack(spacing: 0) {
             totalColumn("今月の支出", amount: model.monthTotal.expense)
 
             Rectangle()
-                .fill(Palette.gold.opacity(0.18))
+                .fill(Palette.gold.opacity(.soft))
                 .frame(width: 1, height: 34)
 
             totalColumn("今月の収入", amount: model.monthTotal.income)
@@ -164,7 +148,7 @@ private extension RecurringListView {
                 .foregroundStyle(Palette.gold)
 
             Text(AmountText.text(amount))
-                .font(.system(size: 20, design: .serif))
+                .font(.serif(.headline))
                 .monospacedDigit()
                 .foregroundStyle(Palette.champagne)
         }
@@ -250,7 +234,6 @@ private extension RecurringListView {
         case edit(Recurring.ID)
     }
 
-    static let dash = StrokeStyle(lineWidth: 1, dash: [5, 4])
     static let rowHeight: CGFloat = 64
     static let spacing: CGFloat = 10
     nonisolated static let space = "RecurringBoard"

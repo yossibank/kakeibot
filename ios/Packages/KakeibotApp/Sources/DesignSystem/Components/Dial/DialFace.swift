@@ -10,20 +10,27 @@ public struct DialFace: View {
     public var body: some View {
         ZStack {
             Circle()
-                .stroke(Palette.gold.opacity(isActive ? 1 : 0.55), lineWidth: 1)
-                .shadow(
-                    color: Palette.gold.opacity(isActive ? 0.3 : 0),
-                    radius: 16
-                )
+                .stroke(ringColor, lineWidth: 1)
+                .shadow(color: glowColor, radius: 16)
 
             DialTicks(count: 60, length: 9)
-                .stroke(Palette.gold.opacity(0.8), lineWidth: 1)
+                .stroke(Palette.gold.opacity(.strong), lineWidth: 1)
                 .padding(12)
 
             DialTicks(count: 12, length: 14)
                 .stroke(Palette.champagne, lineWidth: 1.5)
                 .padding(12)
         }
+    }
+}
+
+private extension DialFace {
+    var ringColor: Color {
+        isActive ? Palette.gold : Palette.outline
+    }
+
+    var glowColor: Color {
+        isActive ? Palette.gold.opacity(.muted) : .clear
     }
 }
 

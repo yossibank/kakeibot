@@ -122,7 +122,7 @@ private extension CategoryEditSheet {
             Spacer()
 
             Text(model.isEditing ? "カテゴリを編集" : "カテゴリを追加")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -148,15 +148,18 @@ private extension CategoryEditSheet {
                     .foregroundStyle(Palette.gold)
 
                 Text(model.name.isEmpty ? "名前" : model.name)
-                    .font(.system(size: 12))
+                    .font(.sans(.caption))
                     .lineLimit(1)
             }
             .foregroundStyle(Palette.champagne)
             .frame(width: 86, height: 86)
-            .background(Palette.gold.opacity(0.12), in: .rect(cornerRadius: 18))
+            .background(
+                Palette.gold.opacity(.subtle),
+                in: .rect(cornerRadius: 18)
+            )
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
-                    .stroke(Palette.gold.opacity(0.55), lineWidth: 1)
+                    .stroke(Palette.outline, lineWidth: 1)
             }
 
             VStack(alignment: .leading, spacing: 6) {

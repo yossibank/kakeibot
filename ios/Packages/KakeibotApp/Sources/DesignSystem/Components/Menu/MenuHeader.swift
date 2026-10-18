@@ -18,7 +18,7 @@ public struct MenuHeader<Leading: View>: View {
                 .foregroundStyle(Palette.gold)
 
             Text(title)
-                .font(.system(size: 14, design: .serif))
+                .font(.serif(.small))
                 .tracking(1)
                 .foregroundStyle(Palette.champagne)
                 .lineLimit(1)

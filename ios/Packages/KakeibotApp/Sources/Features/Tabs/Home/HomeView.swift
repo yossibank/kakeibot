@@ -70,7 +70,7 @@ private extension HomeView {
         HStack {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("\(model.month.month)月")
-                    .font(.system(size: 15, design: .serif))
+                    .font(.serif(.body))
                     .tracking(3)
                     .foregroundStyle(Palette.gold)
 
@@ -92,12 +92,12 @@ private extension HomeView {
 
                 VStack(spacing: 2) {
                     Text(dialTitle)
-                        .font(.system(size: 11))
+                        .font(.sans(.caption))
                         .tracking(4)
                         .foregroundStyle(Palette.gold)
 
                     Text(dialAmount)
-                        .font(.system(size: 40, weight: .bold, design: .serif))
+                        .font(.serif(.display, weight: .bold))
                         .monospacedDigit()
                         .foregroundStyle(dialAmountColor)
                         .lineLimit(1)
@@ -131,7 +131,7 @@ private extension HomeView {
                         Text("予算を決めると、あといくら使えるかが出ます")
 
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 9, weight: .semibold))
+                            .font(.sans(.micro, weight: .semibold))
                     }
                     .font(.caption)
                     .foregroundStyle(Palette.mist)
@@ -147,7 +147,7 @@ private extension HomeView {
                         Label(recurringText, systemImage: "repeat")
 
                         Image(systemName: "chevron.right")
-                            .font(.system(size: 8, weight: .semibold))
+                            .font(.sans(.micro, weight: .semibold))
                     }
                     .font(.caption2)
                     .monospacedDigit()
@@ -169,7 +169,7 @@ private extension HomeView {
             .padding(.top, 12)
             .overlay(alignment: .top) {
                 Rectangle()
-                    .fill(Palette.gold.opacity(0.18))
+                    .fill(Palette.gold.opacity(.soft))
                     .frame(height: 1)
             }
         }
@@ -212,7 +212,7 @@ private extension HomeView {
 
                 Button(action: onAddTemplate) {
                     Image(systemName: "plus")
-                        .font(.system(size: 13, weight: .light))
+                        .font(.sans(.small, weight: .light))
                         .foregroundStyle(Palette.gold)
                         .frame(width: 32, height: 32)
                         .overlay {
@@ -240,7 +240,7 @@ private extension HomeView {
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: "arrow.up.arrow.down")
-                    .font(.system(size: 11, weight: .light))
+                    .font(.sans(.caption, weight: .light))
 
                 Text(model.templateOrder.title)
                     .font(.caption2)
@@ -322,9 +322,7 @@ private extension HomeView {
                         )
                     }
                     .overlay(alignment: .top) {
-                        Rectangle()
-                            .fill(Palette.gold.opacity(0.1))
-                            .frame(height: 1)
+                        Hairline(thickness: 1)
                     }
                 }
             }
@@ -350,7 +348,7 @@ private extension HomeView {
 
     var divider: some View {
         Rectangle()
-            .fill(Palette.gold.opacity(0.18))
+            .fill(Palette.gold.opacity(.soft))
             .frame(width: 1, height: 32)
     }
 
@@ -365,7 +363,7 @@ private extension HomeView {
                 .foregroundStyle(Palette.mist)
 
             Text(AmountText.text(amount))
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .monospacedDigit()
                 .foregroundStyle(color)
                 .lineLimit(1)
@@ -382,7 +380,7 @@ private extension HomeView {
     ]
 
     static let tileHeight = TemplateCardSize.regular.height
-    static let toolStroke = Palette.gold.opacity(0.35)
+    static let toolStroke = Palette.gold.opacity(.muted)
 
     var dialTitle: String {
         model.budgetUsage == nil ? "今月の支出" : "今月あといくら"

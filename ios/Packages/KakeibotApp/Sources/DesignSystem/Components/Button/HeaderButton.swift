@@ -19,11 +19,11 @@ public struct HeaderButton: View {
         Button(action: action) {
             HStack(spacing: 7) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 16, weight: .light))
+                    .font(.sans(.body, weight: .light))
 
                 if let title {
                     Text(title)
-                        .font(.system(size: 15, design: .serif))
+                        .font(.serif(.body))
                         .tracking(2)
                 }
             }
@@ -47,7 +47,10 @@ private extension HeaderButton {
 
     static var fill: LinearGradient {
         LinearGradient(
-            colors: [Palette.gold.opacity(0.14), Palette.gold.opacity(0.04)],
+            colors: [
+                Palette.gold.opacity(.subtle),
+                Palette.gold.opacity(.faint)
+            ],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -55,7 +58,10 @@ private extension HeaderButton {
 
     static var stroke: LinearGradient {
         LinearGradient(
-            colors: [Palette.gold.opacity(0.6), Palette.gold.opacity(0.25)],
+            colors: [
+                Palette.gold.opacity(.medium),
+                Palette.gold.opacity(.soft)
+            ],
             startPoint: .top,
             endPoint: .bottom
         )

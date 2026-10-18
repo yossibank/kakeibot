@@ -20,7 +20,7 @@ public struct MenuPanel<Content: View>: View {
         .background(Palette.drawer, in: .rect(cornerRadius: 18))
         .overlay {
             RoundedRectangle(cornerRadius: 18)
-                .stroke(Palette.gold.opacity(0.45), lineWidth: 0.8)
+                .stroke(Palette.gold.opacity(.medium), lineWidth: 0.8)
         }
         .shadow(color: .black.opacity(0.5), radius: 24, y: 12)
     }

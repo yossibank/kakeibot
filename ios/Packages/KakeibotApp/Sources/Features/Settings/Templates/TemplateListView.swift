@@ -39,7 +39,9 @@ public struct TemplateListView: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil)
 
-            addButton
+            AddButton(addTitle) {
+                sheet = .new(model.type)
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -76,7 +78,7 @@ private extension TemplateListView {
             Spacer()
 
             Text("テンプレート")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -100,24 +102,6 @@ private extension TemplateListView {
         } action: { width in
             boardWidth = width
         }
-    }
-
-    var addButton: some View {
-        Button {
-            sheet = .new(model.type)
-        } label: {
-            Label(addTitle, systemImage: "plus")
-                .font(.subheadline)
-                .foregroundStyle(Palette.gold)
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Palette.gold.opacity(0.06), in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(Palette.gold.opacity(0.55), style: Self.dash)
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 
     func movableCard(_ template: EntryTemplate) -> some View {
@@ -177,8 +161,6 @@ private extension TemplateListView {
     static let columnCount = 1
     static let spacing: CGFloat = 10
     static let tileHeight = TemplateRowCard.height
-    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-
     var typeName: String {
         model.type == .income ? "収入" : "支出"
     }

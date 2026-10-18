@@ -22,22 +22,22 @@ public extension TemplateCardSize {
 
     var nameFont: Font {
         switch self {
-        case .regular: .system(size: 15, weight: .medium, design: .serif)
-        case .large: .system(size: 19, weight: .medium, design: .serif)
+        case .regular: .serif(.body, weight: .medium)
+        case .large: .serif(.headline, weight: .medium)
         }
     }
 
     var amountFont: Font {
         switch self {
-        case .regular: .system(size: 22, weight: .medium, design: .serif)
-        case .large: .system(size: 34, weight: .medium, design: .serif)
+        case .regular: .serif(.headline, weight: .medium)
+        case .large: .serif(.largeTitle, weight: .medium)
         }
     }
 
     var emptyAmountFont: Font {
         switch self {
-        case .regular: .system(size: 13, design: .serif)
-        case .large: .system(size: 16, design: .serif)
+        case .regular: .serif(.small)
+        case .large: .serif(.body)
         }
     }
 }
@@ -52,7 +52,7 @@ extension TemplateCardSize {
 
     var detailFont: Font {
         switch self {
-        case .regular: .system(size: 10)
+        case .regular: .sans(.caption)
         case .large: .caption
         }
     }

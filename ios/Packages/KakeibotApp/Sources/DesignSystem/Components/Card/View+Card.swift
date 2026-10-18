@@ -14,7 +14,7 @@ private struct CardBackground: ViewModifier {
             .background(Palette.card, in: .rect(cornerRadius: cornerRadius))
             .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .strokeBorder(Palette.gold.opacity(0.28), lineWidth: 1)
+                    .strokeBorder(Palette.gold.opacity(.muted), lineWidth: 1)
             }
     }
 }

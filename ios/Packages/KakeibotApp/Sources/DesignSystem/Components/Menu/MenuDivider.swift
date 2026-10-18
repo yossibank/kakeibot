@@ -5,7 +5,7 @@ public struct MenuDivider: View {
 
     public var body: some View {
         Rectangle()
-            .fill(Palette.gold.opacity(0.16))
+            .fill(Palette.gold.opacity(.soft))
             .frame(height: 0.5)
             .padding(.horizontal, 12)
     }

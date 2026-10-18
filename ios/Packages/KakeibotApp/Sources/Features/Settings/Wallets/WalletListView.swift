@@ -48,7 +48,9 @@ public struct WalletListView: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil)
 
-            addButton
+            AddButton("口座を追加") {
+                sheet = .new
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -95,7 +97,7 @@ private extension WalletListView {
             Spacer()
 
             Text("口座")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -141,24 +143,6 @@ private extension WalletListView {
         }
     }
 
-    var addButton: some View {
-        Button {
-            sheet = .new
-        } label: {
-            Label("口座を追加", systemImage: "plus")
-                .font(.subheadline)
-                .foregroundStyle(Palette.gold)
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Palette.gold.opacity(0.06), in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(Palette.gold.opacity(0.55), style: Self.dash)
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-    }
-
     func movableRow(_ wallet: Wallet) -> some View {
         let isLifted = lift?.id == wallet.id
         let index = model.shown.firstIndex(of: wallet) ?? 0
@@ -197,12 +181,12 @@ private extension WalletListView {
                 .foregroundStyle(Palette.gold)
                 .frame(width: 40, height: 40)
                 .background(
-                    Palette.gold.opacity(0.1),
+                    Palette.gold.opacity(.subtle),
                     in: .rect(cornerRadius: 12)
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
+                        .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
                 }
 
             VStack(alignment: .leading, spacing: 3) {
@@ -220,7 +204,7 @@ private extension WalletListView {
             Spacer(minLength: 8)
 
             Text(AmountText.text(balance))
-                .font(.system(size: 17, design: .serif))
+                .font(.serif(.body))
                 .monospacedDigit()
                 .foregroundStyle(balanceColor)
                 .lineLimit(1)
@@ -252,8 +236,6 @@ private extension WalletListView {
     nonisolated static let space = "WalletBoard"
     static let rowHeight: CGFloat = 68
     static let spacing: CGFloat = 10
-    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-
     var boardHeight: CGFloat {
         let count = CGFloat(model.shown.count)
         let gaps = Self.spacing * max(count - 1, 0)

@@ -19,16 +19,14 @@ struct SettingsHideZone: View {
         .background(fill, in: Self.shape)
         .overlay {
             Self.shape
-                .stroke(color.opacity(0.6), style: Self.dash)
+                .stroke(color.opacity(0.6), style: .dashed)
         }
     }
 }
 
 private extension SettingsHideZone {
     static let shape = RoundedRectangle(cornerRadius: 16)
-    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-
     var fill: Color {
-        isTargeted ? Palette.rose.opacity(0.12) : Color.clear
+        isTargeted ? Palette.rose.opacity(.subtle) : Color.clear
     }
 }

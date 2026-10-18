@@ -45,7 +45,7 @@ private extension EntryDateSheet {
         .padding(.horizontal, 16)
         .frame(minHeight: 40)
         .background(
-            isSelected ? Palette.gold.opacity(0.12) : Color.clear,
+            isSelected ? Palette.gold.opacity(.subtle) : Color.clear,
             in: Capsule()
         )
         .overlay {

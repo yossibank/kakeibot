@@ -71,9 +71,7 @@ private extension BudgetListView {
                                 categoryRow(category)
 
                                 if category.id != model.categories.last?.id {
-                                    Rectangle()
-                                        .fill(Palette.gold.opacity(0.1))
-                                        .frame(height: 0.5)
+                                    Hairline()
                                 }
                             }
                         }
@@ -104,7 +102,7 @@ private extension BudgetListView {
             Spacer()
 
             Text("予算")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -126,7 +124,7 @@ private extension BudgetListView {
                     .foregroundStyle(Palette.gold)
 
                 Text(amountText(model.totalAmount))
-                    .font(.system(size: 30, weight: .bold, design: .serif))
+                    .font(.serif(.largeTitle, weight: .bold))
                     .monospacedDigit()
                     .foregroundStyle(amountColor(model.totalAmount))
 
@@ -169,7 +167,7 @@ private extension BudgetListView {
                     Spacer()
 
                     Text(amountText(amount))
-                        .font(.system(size: 16, design: .serif))
+                        .font(.serif(.body))
                         .monospacedDigit()
                         .foregroundStyle(amountColor(amount))
                 }

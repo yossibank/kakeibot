@@ -44,7 +44,7 @@ private extension AssetsView {
     var header: some View {
         HStack {
             Text("資産")
-                .font(.system(size: 15, design: .serif))
+                .font(.serif(.body))
                 .tracking(3)
                 .foregroundStyle(Palette.gold)
 
@@ -64,7 +64,7 @@ private extension AssetsView {
 
             HStack(alignment: .firstTextBaseline) {
                 Text(AmountText.text(model.total))
-                    .font(.system(size: 32, weight: .bold, design: .serif))
+                    .font(.serif(.largeTitle, weight: .bold))
                     .monospacedDigit()
                     .foregroundStyle(Palette.champagne)
                     .lineLimit(1)
@@ -83,7 +83,7 @@ private extension AssetsView {
             HStack(spacing: 0) {
                 ForEach(model.monthTotals) { total in
                     Text("\(total.month.month)月")
-                        .font(.system(size: 9))
+                        .font(.sans(.micro))
                         .foregroundStyle(monthColor(total.month))
                         .frame(maxWidth: .infinity)
                 }
@@ -121,7 +121,7 @@ private extension AssetsView {
             }
 
             Text(AmountText.text(row.balance))
-                .font(.system(size: 18, design: .serif))
+                .font(.serif(.headline))
                 .monospacedDigit()
                 .foregroundStyle(color)
                 .lineLimit(1)

@@ -80,7 +80,7 @@ private extension CategoryListView {
             Spacer()
 
             Text("カテゴリ")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -115,13 +115,13 @@ private extension CategoryListView {
             sheet = .new(model.kind)
         } label: {
             Image(systemName: "plus")
-                .font(.system(size: 22, weight: .ultraLight))
+                .font(.sans(.headline, weight: .ultraLight))
                 .foregroundStyle(Palette.gold)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Palette.gold.opacity(0.06), in: Self.tileShape)
+                .background(Palette.faint, in: Self.tileShape)
                 .overlay {
                     Self.tileShape
-                        .stroke(Palette.gold.opacity(0.55), style: Self.dash)
+                        .stroke(Palette.outline, style: .dashed)
                 }
                 .contentShape(.rect)
         }
@@ -197,7 +197,7 @@ private extension CategoryListView {
                 .foregroundStyle(Palette.gold)
 
             Text(category.name)
-                .font(.system(size: 11))
+                .font(.sans(.caption))
                 .foregroundStyle(Palette.ink)
                 .lineLimit(1)
         }
@@ -228,10 +228,10 @@ private extension CategoryListView {
     func tileBorder(isHidden: Bool) -> some View {
         if isHidden {
             Self.tileShape
-                .stroke(Palette.mist.opacity(0.4), style: Self.dash)
+                .stroke(Palette.mist.opacity(.muted), style: .dashed)
         } else {
             Self.tileShape
-                .stroke(Palette.gold.opacity(0.22), lineWidth: 1)
+                .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
         }
     }
 }
@@ -265,8 +265,6 @@ private extension CategoryListView {
     static let spacing: CGFloat = 8
     static let tileHeight: CGFloat = 78
     static let tileShape = RoundedRectangle(cornerRadius: 16)
-    static let dash = StrokeStyle(lineWidth: 1, dash: [4, 3])
-
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: spacing),
         count: columnCount

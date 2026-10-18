@@ -84,7 +84,7 @@ private extension TemplateShelfSheet {
             Spacer()
 
             Text("テンプレート")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -100,7 +100,7 @@ private extension TemplateShelfSheet {
     var searchField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 14, weight: .light))
+                .font(.sans(.small, weight: .light))
                 .foregroundStyle(Palette.mist)
 
             TextField(
@@ -162,7 +162,7 @@ private extension TemplateShelfSheet {
     }
 
     var searchStroke: Color {
-        isSearching ? Palette.gold : Palette.gold.opacity(0.35)
+        isSearching ? Palette.gold : Palette.gold.opacity(.muted)
     }
 
     func use(_ template: EntryTemplate) {

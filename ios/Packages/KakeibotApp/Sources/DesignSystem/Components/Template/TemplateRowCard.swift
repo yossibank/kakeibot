@@ -39,7 +39,7 @@ public struct TemplateRowCard: View {
             Spacer(minLength: 8)
 
             Rectangle()
-                .fill(Palette.gold.opacity(0.18))
+                .fill(Palette.gold.opacity(.soft))
                 .frame(width: 0.5, height: 36)
 
             TemplateCardAmount(amount: amount, size: .regular)

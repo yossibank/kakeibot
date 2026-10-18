@@ -86,7 +86,7 @@ private extension SwipeRow {
             act()
         } label: {
             Image(systemName: systemImage)
-                .font(.system(size: 16, weight: .medium))
+                .font(.sans(.body, weight: .medium))
                 .foregroundStyle(Palette.cardBottom)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(fill, in: Self.shape)

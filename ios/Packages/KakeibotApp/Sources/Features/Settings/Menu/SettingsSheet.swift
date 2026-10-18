@@ -46,9 +46,7 @@ public struct SettingsSheet: View {
                                     row("口座", systemImage: "building.columns")
                                 }
 
-                                Rectangle()
-                                    .fill(Palette.gold.opacity(0.1))
-                                    .frame(height: 0.5)
+                                Hairline()
 
                                 NavigationLink {
                                     CategoryListView(database: database)
@@ -56,9 +54,7 @@ public struct SettingsSheet: View {
                                     row("カテゴリ", systemImage: "tag")
                                 }
 
-                                Rectangle()
-                                    .fill(Palette.gold.opacity(0.1))
-                                    .frame(height: 0.5)
+                                Hairline()
 
                                 NavigationLink {
                                     TemplateListView(database: database)
@@ -69,9 +65,7 @@ public struct SettingsSheet: View {
                                     )
                                 }
 
-                                Rectangle()
-                                    .fill(Palette.gold.opacity(0.1))
-                                    .frame(height: 0.5)
+                                Hairline()
 
                                 NavigationLink {
                                     RecurringListView(
@@ -109,9 +103,7 @@ public struct SettingsSheet: View {
                                     )
                                 }
 
-                                Rectangle()
-                                    .fill(Palette.gold.opacity(0.1))
-                                    .frame(height: 0.5)
+                                Hairline()
 
                                 NavigationLink {
                                     BudgetListView(
@@ -124,15 +116,13 @@ public struct SettingsSheet: View {
                                     row("予算", systemImage: "chart.bar")
                                 }
 
-                                Rectangle()
-                                    .fill(Palette.gold.opacity(0.1))
-                                    .frame(height: 0.5)
+                                Hairline()
 
                                 HStack(spacing: 12) {
                                     Image(
                                         systemName: "calendar.day.timeline.left"
                                     )
-                                    .font(.system(size: 16, weight: .light))
+                                    .font(.sans(.body, weight: .light))
                                     .foregroundStyle(Palette.gold)
                                     .frame(width: 22)
 
@@ -183,7 +173,7 @@ public struct SettingsSheet: View {
 
                             HStack(spacing: 12) {
                                 Image(systemName: "iphone")
-                                    .font(.system(size: 16, weight: .light))
+                                    .font(.sans(.body, weight: .light))
                                     .foregroundStyle(Palette.gold)
                                     .frame(width: 22)
 
@@ -246,7 +236,7 @@ private extension SettingsSheet {
             Spacer()
 
             Text("設定")
-                .font(.system(size: 16, design: .serif))
+                .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
 
@@ -273,7 +263,7 @@ private extension SettingsSheet {
     ) -> some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
-                .font(.system(size: 16, weight: .light))
+                .font(.sans(.body, weight: .light))
                 .foregroundStyle(Palette.gold)
                 .frame(width: 22)
 

@@ -43,7 +43,7 @@ struct SettingsDrawer<Content: View>: View {
                 .fill(Palette.drawer)
                 .overlay {
                     Self.shape
-                        .stroke(Palette.gold.opacity(0.35), lineWidth: 1)
+                        .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
         }

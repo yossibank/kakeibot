@@ -25,7 +25,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                     Capsule()
                         .strokeBorder(Self.thumbRim, lineWidth: 0.8)
                 }
-                .shadow(color: Palette.gold.opacity(0.35), radius: 6)
+                .shadow(color: Palette.gold.opacity(.muted), radius: 6)
                 .frame(width: Self.segmentWidth, height: Self.segmentHeight)
                 .offset(x: thumbX)
 
@@ -58,7 +58,7 @@ public struct CapsulePicker<Value: Hashable>: View {
             Capsule()
                 .strokeBorder(Self.rim, lineWidth: 1)
         }
-        .glass(tint: Palette.nightBottom.opacity(0.6), in: Capsule())
+        .glass(tint: Palette.nightBottom.opacity(.medium), in: Capsule())
         .contentShape(Capsule())
         .gesture(dragGesture)
         .onAppear {
@@ -101,7 +101,7 @@ private extension CapsulePicker {
 
     static var thumbFill: LinearGradient {
         LinearGradient(
-            colors: [Palette.gold.opacity(0.42), Palette.gold.opacity(0.16)],
+            colors: [Palette.gold.opacity(.muted), Palette.gold.opacity(.soft)],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -109,7 +109,10 @@ private extension CapsulePicker {
 
     static var thumbRim: LinearGradient {
         LinearGradient(
-            colors: [Palette.champagne.opacity(0.9), Palette.gold.opacity(0.3)],
+            colors: [
+                Palette.champagne.opacity(.strong),
+                Palette.gold.opacity(.muted)
+            ],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -125,7 +128,10 @@ private extension CapsulePicker {
 
     static var rim: LinearGradient {
         LinearGradient(
-            colors: [Palette.gold.opacity(0.7), Palette.gold.opacity(0.2)],
+            colors: [
+                Palette.gold.opacity(.strong),
+                Palette.gold.opacity(.soft)
+            ],
             startPoint: .top,
             endPoint: .bottom
         )
