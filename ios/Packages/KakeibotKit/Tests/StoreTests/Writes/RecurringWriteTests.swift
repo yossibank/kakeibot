@@ -110,6 +110,40 @@ struct RecurringWriteTests {
     }
 
     @Test
+    func generatesTransferBetweenWallets() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let today = try #require(LocalDate("2026-01-26"))
+        try await setup.database.markNoSpendDay(today, at: setup.now)
+
+        let draft = RecurringDraft(
+            type: .transfer,
+            amount: 30000,
+            categoryId: nil,
+            walletId: options.wallets[1].id,
+            toWalletId: options.wallets[0].id,
+            frequency: .monthly,
+            month: 1,
+            day: 26,
+            startDate: today
+        )
+
+        let saved = try await setup.database.saveRecurring(
+            draft,
+            today: today,
+            at: setup.now
+        )
+
+        let snapshot = try setup.database.snapshot()
+        let transfers = snapshot.entries.filter { $0.recurringId == saved.id }
+
+        #expect(transfers.map(\.type) == [.transfer])
+        #expect(transfers.first?.toWalletId == options.wallets[0].id)
+        #expect(transfers.first?.categoryId == nil)
+        #expect(snapshot.noSpendDays.map(\.date) == [today])
+    }
+
+    @Test
     func deletesRecurringButKeepsEntries() async throws {
         let setup = try await Setup()
         let today = try #require(LocalDate("2026-02-28"))

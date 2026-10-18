@@ -59,6 +59,10 @@ public extension RecurringListModel {
 private extension RecurringListModel {
     static let loadFailedMessage = "固定費を読めませんでした"
 
+    static func title(of type: Entry.Kind) -> String {
+        type == .transfer ? "振替" : "固定費"
+    }
+
     func row(for recurring: Recurring) -> Row {
         let categories = (options?.expenseCategories ?? [])
             + (options?.incomeCategories ?? [])
@@ -73,17 +77,30 @@ private extension RecurringListModel {
             day: recurring.day
         )
 
-        let detail = [schedule, wallet?.name]
+        let destination = options?.wallets
+            .first { $0.id == recurring.toWalletId }
+
+        let route = [wallet?.name, destination?.name]
+            .compactMap(\.self)
+            .joined(separator: " → ")
+
+        let place = recurring.type == .transfer ? route : wallet?.name
+
+        let detail = [schedule, place]
             .compactMap(\.self)
             .joined(separator: "・")
 
+        let iconId = recurring.type == .transfer
+            ? wallet?.iconId
+            : category?.iconId
+
         return Row(
             id: recurring.id,
-            title: memo ?? category?.name ?? "固定費",
+            title: memo ?? category?.name ?? Self.title(of: recurring.type),
             detail: detail,
             amount: recurring.amount,
             type: recurring.type,
-            icon: category.flatMap { options?.icons[$0.iconId] },
+            icon: iconId.flatMap { options?.icons[$0] },
             next: recurring.nextDate(onOrAfter: today)
         )
     }

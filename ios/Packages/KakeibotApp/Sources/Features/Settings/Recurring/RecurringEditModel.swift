@@ -8,6 +8,7 @@ import Store
 public final class RecurringEditModel {
     public var categoryId: EntryCategory.ID?
     public var walletId: Wallet.ID?
+    public var toWalletId: Wallet.ID?
     public var memo = ""
     public var frequency: Recurring.Frequency = .monthly
     public var month: Int
@@ -45,6 +46,7 @@ public final class RecurringEditModel {
 
 public extension RecurringEditModel {
     static let remindChoices: [Int?] = [nil, 0, 1, 3, 7]
+    static let destinationTitle = "振替先"
 
     var isEditing: Bool {
         editingId != nil
@@ -55,7 +57,11 @@ public extension RecurringEditModel {
     }
 
     var walletTitle: String {
-        type == .income ? "入金先" : "支払い元"
+        switch type {
+        case .expense: "支払い元"
+        case .income: "入金先"
+        case .transfer: "振替元"
+        }
     }
 
     var draft: RecurringDraft {
@@ -64,6 +70,7 @@ public extension RecurringEditModel {
             amount: amount,
             categoryId: categoryId,
             walletId: walletId,
+            toWalletId: toWalletId,
             memo: memo,
             frequency: frequency,
             month: month,
@@ -109,6 +116,10 @@ public extension RecurringEditModel {
         wallets.first { $0.id == walletId }
     }
 
+    var selectedDestination: Wallet? {
+        wallets.first { $0.id == toWalletId }
+    }
+
     func icon(for category: EntryCategory) -> Icon? {
         options?.icons[category.iconId]
     }
@@ -124,6 +135,10 @@ public extension RecurringEditModel {
 
         self.type = type
         categoryId = categories.first?.id
+
+        if type == .transfer, toWalletId == nil {
+            toWalletId = wallets.first { $0.id != walletId }?.id
+        }
     }
 
     func press(_ key: AmountCalculator.Key) {
@@ -205,8 +220,11 @@ private extension RecurringEditModel {
         case .amountNotPositive: "金額を入れてください"
         case .missingCategory: "カテゴリを選んでください"
         case .missingWallet: "\(walletTitle)を選んでください"
+        case .missingDestination: "\(Self.destinationTitle)を選んでください"
+        case .sameWallet: "振替元と振替先を別にしてください"
         case .endBeforeStart: "終わりを始まりより後にしてください"
-        case .transfer, .dayOutOfRange, .monthOutOfRange, .remindOutOfRange:
+        case .categoryOnTransfer, .dayOutOfRange, .monthOutOfRange,
+             .remindOutOfRange:
             Self.saveFailedMessage
         }
     }
@@ -228,6 +246,7 @@ private extension RecurringEditModel {
         calculator = AmountCalculator(amount: draft.amount)
         categoryId = draft.categoryId
         walletId = draft.walletId
+        toWalletId = draft.toWalletId
         memo = draft.memo
         frequency = draft.frequency
         month = draft.month

@@ -245,6 +245,22 @@ private extension RecurringEditSheet {
                 }
             }
             .padding(.bottom, 8)
+        case .destination:
+            SettingsTileGrid(
+                items: model.wallets,
+                columns: 3,
+                spacing: 8
+            ) { wallet in
+                WalletTile(
+                    wallet: wallet,
+                    icon: model.icon(for: wallet),
+                    isSelected: model.toWalletId == wallet.id
+                ) {
+                    model.toWalletId = wallet.id
+                    closePanel()
+                }
+            }
+            .padding(.bottom, 8)
         case .schedule:
             scheduleChooser
         case .start:
@@ -348,6 +364,7 @@ private extension RecurringEditSheet {
         case amount
         case category
         case wallet
+        case destination
         case schedule
         case start
         case end
@@ -356,7 +373,8 @@ private extension RecurringEditSheet {
 
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
-        .init("収入", value: .income)
+        .init("収入", value: .income),
+        .init("振替", value: .transfer)
     ]
 
     static let frequencyOptions: [CapsulePicker<Recurring.Frequency>.Option] =
@@ -408,21 +426,43 @@ private extension RecurringEditSheet {
     }
 
     var rowItems: [SettingsRowList<Panel>.Item] {
-        [
-            .init(
+        moneyItems + scheduleItems
+    }
+
+    var moneyItems: [SettingsRowList<Panel>.Item] {
+        let wallet = SettingsRowList<Panel>.Item(
+            panel: .wallet,
+            systemImage: "wallet.bifold",
+            title: model.walletTitle,
+            value: model.selectedWallet?.name ?? "選ぶ",
+            isEmpty: model.selectedWallet == nil
+        )
+
+        guard model.type == .transfer else {
+            let category = SettingsRowList<Panel>.Item(
                 panel: .category,
                 systemImage: "square.grid.2x2",
                 title: "カテゴリ",
                 value: model.selectedCategory?.name ?? "選ぶ",
                 isEmpty: model.selectedCategory == nil
-            ),
-            .init(
-                panel: .wallet,
-                systemImage: "wallet.bifold",
-                title: model.walletTitle,
-                value: model.selectedWallet?.name ?? "選ぶ",
-                isEmpty: model.selectedWallet == nil
-            ),
+            )
+
+            return [category, wallet]
+        }
+
+        let destination = SettingsRowList<Panel>.Item(
+            panel: .destination,
+            systemImage: "arrow.right.circle",
+            title: RecurringEditModel.destinationTitle,
+            value: model.selectedDestination?.name ?? "選ぶ",
+            isEmpty: model.selectedDestination == nil
+        )
+
+        return [wallet, destination]
+    }
+
+    var scheduleItems: [SettingsRowList<Panel>.Item] {
+        [
             .init(
                 panel: .schedule,
                 systemImage: "repeat",
@@ -459,6 +499,7 @@ private extension RecurringEditSheet {
         case .amount: "金額"
         case .category: "カテゴリ"
         case .wallet: model.walletTitle
+        case .destination: RecurringEditModel.destinationTitle
         case .schedule: "繰り返し"
         case .start: "始まり"
         case .end: "終わり"

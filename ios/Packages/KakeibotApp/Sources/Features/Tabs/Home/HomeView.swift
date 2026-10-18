@@ -278,7 +278,8 @@ private extension HomeView {
                             tag: row.tag,
                             detail: row.detail,
                             amount: row.amount,
-                            type: row.type
+                            type: row.type,
+                            isRecurring: row.isRecurring
                         )
                     }
                     .overlay(alignment: .top) {

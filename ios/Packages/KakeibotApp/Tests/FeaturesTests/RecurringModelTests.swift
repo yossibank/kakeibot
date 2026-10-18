@@ -33,6 +33,52 @@ struct RecurringModelTests {
     }
 
     @Test
+    func savesTransferBetweenWallets() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let start = try #require(LocalDate("2026-09-01"))
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await model.load()
+        model.select(.transfer)
+        model.press(.digit(3))
+        model.press(.digit(0))
+        model.press(.doubleZero)
+        model.press(.digit(0))
+        model.day = 26
+        model.startDate = start
+        let saved = await model.save()
+        let entry = try #require(setup.database.snapshot().entries.first)
+
+        #expect(saved)
+        #expect(model.walletTitle == "振替元")
+        #expect(entry.type == .transfer)
+        #expect(entry.categoryId == nil)
+        #expect(entry.toWalletId != nil)
+        #expect(entry.toWalletId != entry.walletId)
+    }
+
+    @Test
+    func refusesSameWalletTransfer() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await model.load()
+        model.select(.transfer)
+        model.press(.digit(5))
+        model.toWalletId = model.walletId
+        let saved = await model.save()
+
+        #expect(!saved)
+        #expect(model.errorMessage == "振替元と振替先を別にしてください")
+    }
+
+    @Test
     func refusesEmptyAmount() async throws {
         let setup = try await RecordsModelTests.Setup()
         let model = RecurringEditModel(

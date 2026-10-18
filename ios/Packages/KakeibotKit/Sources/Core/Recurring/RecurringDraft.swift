@@ -5,6 +5,7 @@ public struct RecurringDraft: Hashable, Sendable {
     public var amount: Int
     public var categoryId: EntryCategory.ID?
     public var walletId: Wallet.ID?
+    public var toWalletId: Wallet.ID?
     public var memo: String
     public var frequency: Recurring.Frequency
     public var month: Int
@@ -18,6 +19,7 @@ public struct RecurringDraft: Hashable, Sendable {
         amount: Int,
         categoryId: EntryCategory.ID?,
         walletId: Wallet.ID?,
+        toWalletId: Wallet.ID? = nil,
         memo: String = "",
         frequency: Recurring.Frequency,
         month: Int,
@@ -30,6 +32,7 @@ public struct RecurringDraft: Hashable, Sendable {
         self.amount = amount
         self.categoryId = categoryId
         self.walletId = walletId
+        self.toWalletId = toWalletId
         self.memo = memo
         self.frequency = frequency
         self.month = month
@@ -42,10 +45,12 @@ public struct RecurringDraft: Hashable, Sendable {
 
 public extension RecurringDraft {
     enum Problem: String, CaseIterable, Codable, Error, Sendable {
-        case transfer
         case amountNotPositive
         case missingCategory
+        case categoryOnTransfer
         case missingWallet
+        case missingDestination
+        case sameWallet
         case dayOutOfRange
         case monthOutOfRange
         case endBeforeStart
@@ -57,21 +62,17 @@ public extension RecurringDraft {
     var problems: [Problem] {
         var problems: [Problem] = []
 
-        if type == .transfer {
-            problems.append(.transfer)
-        }
-
         if amount < 1 {
             problems.append(.amountNotPositive)
         }
 
-        if categoryId == nil {
-            problems.append(.missingCategory)
-        }
+        problems += categoryProblems
 
         if walletId == nil {
             problems.append(.missingWallet)
         }
+
+        problems += destinationProblems
 
         if !(1...31).contains(day) {
             problems.append(.dayOutOfRange)
@@ -98,6 +99,7 @@ public extension RecurringDraft {
             amount: recurring.amount,
             categoryId: recurring.categoryId,
             walletId: recurring.walletId,
+            toWalletId: recurring.toWalletId,
             memo: recurring.memo ?? "",
             frequency: recurring.frequency,
             month: recurring.month ?? recurring.startDate.month,
@@ -116,6 +118,7 @@ public extension RecurringDraft {
             amount: amount,
             categoryId: fields.categoryId,
             walletId: fields.walletId,
+            toWalletId: destination,
             memo: trimmedMemo,
             frequency: frequency,
             month: yearlyMonth,
@@ -139,6 +142,7 @@ public extension RecurringDraft {
         updated.amount = amount
         updated.categoryId = fields.categoryId
         updated.walletId = fields.walletId
+        updated.toWalletId = destination
         updated.memo = trimmedMemo
         updated.frequency = frequency
         updated.month = yearlyMonth
@@ -152,6 +156,31 @@ public extension RecurringDraft {
 }
 
 private extension RecurringDraft {
+    var categoryProblems: [Problem] {
+        switch type {
+        case .expense, .income:
+            categoryId == nil ? [.missingCategory] : []
+        case .transfer:
+            categoryId == nil ? [] : [.categoryOnTransfer]
+        }
+    }
+
+    var destinationProblems: [Problem] {
+        guard type == .transfer else {
+            return []
+        }
+
+        guard let toWalletId else {
+            return [.missingDestination]
+        }
+
+        return toWalletId == walletId ? [.sameWallet] : []
+    }
+
+    var destination: Wallet.ID? {
+        type == .transfer ? toWalletId : nil
+    }
+
     var yearlyMonth: Int? {
         frequency == .yearly ? month : nil
     }
@@ -162,15 +191,15 @@ private extension RecurringDraft {
     }
 
     func validated() throws -> (
-        categoryId: EntryCategory.ID,
+        categoryId: EntryCategory.ID?,
         walletId: Wallet.ID
     ) {
         if let problem = problems.first {
             throw problem
         }
 
-        guard let categoryId, let walletId else {
-            throw Problem.missingCategory
+        guard let walletId else {
+            throw Problem.missingWallet
         }
 
         return (categoryId, walletId)
