@@ -70,6 +70,11 @@ public extension EntryModel {
         }
     }
 
+    struct WalletSection {
+        public let kind: Wallet.Kind
+        public let wallets: [Wallet]
+    }
+
     static let categoriesPerPage = 15
 
     var isEditing: Bool {
@@ -139,6 +144,15 @@ public extension EntryModel {
 
     var wallets: [Wallet] {
         options?.wallets ?? []
+    }
+
+    var walletSections: [WalletSection] {
+        Wallet.Kind.allCases.compactMap { kind in
+            let wallets = wallets.filter { $0.kind == kind }
+            return wallets.isEmpty
+                ? nil
+                : WalletSection(kind: kind, wallets: wallets)
+        }
     }
 
     var walletName: String {
@@ -592,5 +606,11 @@ private extension EntryModel {
         }
 
         toWalletId = wallets.first { $0.id != walletId }?.id
+    }
+}
+
+extension EntryModel.WalletSection: Identifiable {
+    public var id: Wallet.Kind {
+        kind
     }
 }

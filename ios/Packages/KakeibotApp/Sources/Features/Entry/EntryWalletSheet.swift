@@ -27,9 +27,16 @@ struct EntryWalletSheet: View {
                     }
                 }
 
-                VStack(spacing: 8) {
-                    ForEach(model.wallets) { wallet in
-                        walletRow(wallet)
+                ForEach(model.walletSections) { section in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(section.kind.title)
+                            .font(.caption)
+                            .tracking(2)
+                            .foregroundStyle(Palette.mist)
+
+                        ForEach(section.wallets) { wallet in
+                            walletRow(wallet)
+                        }
                     }
                 }
             }
