@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct FittedSheet<Content: View>: View {
-    @State private var contentHeight: CGFloat = 0
+    @State private var detent: PresentationDetent = .height(Self.minHeight)
 
     let content: Content
 
@@ -18,13 +18,19 @@ public struct FittedSheet<Content: View>: View {
                 .onGeometryChange(for: CGFloat.self) { proxy in
                     proxy.size.height
                 } action: { height in
-                    contentHeight = height
+                    detent = .height(max(height, Self.minHeight))
                 }
         }
         .scrollBounceBehavior(.basedOnSize)
-        .presentationDetents([.height(max(contentHeight, 120))])
+        .presentationDetents([detent], selection: $detent)
         .presentationDragIndicator(.visible)
         .presentationBackground(Palette.drawer)
         .preferredColorScheme(.dark)
+    }
+}
+
+private extension FittedSheet {
+    static var minHeight: CGFloat {
+        120
     }
 }

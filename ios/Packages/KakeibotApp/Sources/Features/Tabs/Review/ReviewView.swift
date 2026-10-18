@@ -145,10 +145,22 @@ private extension ReviewView {
             }
 
             if let recurring = model.recurringTotal {
-                Label(recurringText(recurring), systemImage: "repeat")
+                Button {
+                    openShare = model.recurringShare
+                } label: {
+                    HStack(spacing: 4) {
+                        Label(recurringText(recurring), systemImage: "repeat")
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 9, weight: .semibold))
+                    }
                     .font(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.mist)
+                    .frame(minHeight: 28)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
             }
 
             if model.kind == .balance {

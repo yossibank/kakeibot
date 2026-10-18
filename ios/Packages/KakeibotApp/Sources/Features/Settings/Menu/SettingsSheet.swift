@@ -162,6 +162,7 @@ public struct SettingsSheet: View {
                                     model: ReminderModel(
                                         database: database,
                                         today: today,
+                                        time: reminderTime,
                                         permission: permission
                                     )
                                 )

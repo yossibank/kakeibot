@@ -16,6 +16,7 @@ public struct HomeView: View {
     private let onOpenOrderMenu: (CGRect) -> Void
     private let onAddTemplate: () -> Void
     private let onDeleteEntry: (Entry.ID) -> Void
+    private let onOpenRecurrings: () -> Void
 
     public init(
         model: HomeModel,
@@ -26,7 +27,8 @@ public struct HomeView: View {
         onShowAllTemplates: @escaping () -> Void,
         onOpenOrderMenu: @escaping (CGRect) -> Void,
         onAddTemplate: @escaping () -> Void,
-        onDeleteEntry: @escaping (Entry.ID) -> Void
+        onDeleteEntry: @escaping (Entry.ID) -> Void,
+        onOpenRecurrings: @escaping () -> Void
     ) {
         self.model = model
         self.onOpenEntry = onOpenEntry
@@ -37,6 +39,7 @@ public struct HomeView: View {
         self.onOpenOrderMenu = onOpenOrderMenu
         self.onAddTemplate = onAddTemplate
         self.onDeleteEntry = onDeleteEntry
+        self.onOpenRecurrings = onOpenRecurrings
     }
 
     public var body: some View {
@@ -142,13 +145,20 @@ private extension HomeView {
             }
 
             if model.recurringExpense > 0 {
-                Label(
-                    "今月の固定費 \(AmountText.text(model.recurringExpense))",
-                    systemImage: "repeat"
-                )
-                .font(.caption2)
-                .monospacedDigit()
-                .foregroundStyle(Palette.mist)
+                Button(action: onOpenRecurrings) {
+                    HStack(spacing: 4) {
+                        Label(recurringText, systemImage: "repeat")
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 8, weight: .semibold))
+                    }
+                    .font(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.mist)
+                    .frame(minHeight: 28)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
             }
 
             HStack(spacing: 0) {
@@ -405,6 +415,10 @@ private extension HomeView {
 
     var middleAmount: Int {
         model.budgetUsage == nil ? model.yesterdayExpense : model.monthExpense
+    }
+
+    var recurringText: String {
+        "今月の固定費 \(AmountText.text(model.recurringExpense))"
     }
 
     var dialTint: Color {

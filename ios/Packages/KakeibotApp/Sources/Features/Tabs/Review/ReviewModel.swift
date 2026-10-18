@@ -141,6 +141,23 @@ public extension ReviewModel {
         return total > 0 ? total : nil
     }
 
+    var recurringShare: Share? {
+        guard let recurringTotal else {
+            return nil
+        }
+
+        let total = max(total(of: kind), 1)
+
+        return Share(
+            id: Self.recurringShareId,
+            name: "固定費",
+            icon: nil,
+            amount: recurringTotal,
+            ratio: Double(recurringTotal) / Double(total),
+            usage: nil
+        )
+    }
+
     func change(of kind: ReviewKind) -> Int {
         total(of: kind) - total(of: kind, in: previousSummary)
     }
@@ -155,9 +172,16 @@ public extension ReviewModel {
                 let category = entry.categoryId.map(AnyHashable.init)
                 let wallet = AnyHashable(entry.walletId)
 
+                let isRecurring = share.id == Self.recurringShareId
+                    && entry.recurringId != nil
+
                 return entry.type == type
                     && period.range.contains(entry.date)
-                    && (category == share.id || wallet == share.id)
+                    && (
+                        category == share.id
+                            || wallet == share.id
+                            || isRecurring
+                    )
             }
             .sorted { $0.date > $1.date }
             .map { entry in
@@ -239,6 +263,7 @@ private extension ReviewModel {
         let sortOrder: Int
     }
 
+    static let recurringShareId = AnyHashable("recurring")
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
 
