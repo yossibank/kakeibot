@@ -12,6 +12,7 @@ struct ReminderModelTests {
         let client = FakePermission(authorization: .notDetermined)
         let model = ReminderModel(
             database: database,
+            today: LocalDate(Date(), in: .current),
             permission: client.permission
         )
         await model.load()
@@ -32,6 +33,7 @@ struct ReminderModelTests {
         let client = FakePermission(authorization: .allowed)
         let model = ReminderModel(
             database: database,
+            today: LocalDate(Date(), in: .current),
             permission: client.permission
         )
         let time = try #require(ReminderTime("22:30"))
@@ -53,6 +55,7 @@ struct ReminderModelTests {
         let client = FakePermission(authorization: .denied)
         let model = ReminderModel(
             database: database,
+            today: LocalDate(Date(), in: .current),
             permission: client.permission
         )
 
@@ -62,6 +65,45 @@ struct ReminderModelTests {
 
         #expect(!deniedWhileOff)
         #expect(model.isDenied)
+    }
+}
+
+extension ReminderModelTests {
+    @Test
+    func listsUpcomingRecurringNotices() async throws {
+        let database = try AppDatabase.inMemory()
+        try database.insertDefaultsIfEmpty(at: Date())
+        let options = try await database.entryOptions()
+        let today = try #require(LocalDate("2026-10-18"))
+        let client = FakePermission(authorization: .allowed)
+
+        let draft = RecurringDraft(
+            type: .expense,
+            amount: 78000,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            memo: "家賃",
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: today,
+            remindDaysBefore: 3
+        )
+
+        try await database.saveRecurring(draft, today: today, at: Date())
+        let model = ReminderModel(
+            database: database,
+            today: today,
+            permission: client.permission
+        )
+
+        await model.load()
+        let notice = try #require(model.upcomingNotices.first)
+
+        #expect(model.upcomingNotices.count == 1)
+        #expect(notice.title == "家賃")
+        #expect(notice.date.description == "2026-10-24")
+        #expect(notice.time == .morning)
     }
 }
 

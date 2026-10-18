@@ -274,7 +274,40 @@ private extension ReminderView {
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
             .card(cornerRadius: 18)
+
+            if !model.upcomingNotices.isEmpty {
+                VStack(spacing: 0) {
+                    ForEach(model.upcomingNotices, id: \.self) { notice in
+                        noticeRow(notice)
+                    }
+                }
+                .padding(.horizontal, 14)
+                .card(cornerRadius: 18)
+            }
         }
+    }
+
+    func noticeRow(_ notice: PlannedNotification) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text("\(notice.date.month)/\(notice.date.day) \(notice.time)")
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.gold)
+                .frame(width: 84, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(notice.title)
+                    .font(.subheadline)
+                    .foregroundStyle(Palette.ink)
+
+                Text(notice.body)
+                    .font(.caption)
+                    .foregroundStyle(Palette.mist)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 12)
     }
 }
 
@@ -373,6 +406,7 @@ private extension ReminderView {
             ReminderView(
                 model: ReminderModel(
                     database: database,
+                    today: LocalDate(Date(), in: .current),
                     permission: .allowed
                 )
             )

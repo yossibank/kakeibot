@@ -11,15 +11,19 @@ public final class ReminderModel {
     public private(set) var errorMessage: String?
 
     private var lastTime: ReminderTime = .evening
+    private var input: NotificationInput?
 
     private let database: AppDatabase
+    private let today: LocalDate
     private let permission: NotificationPermission
 
     public init(
         database: AppDatabase,
+        today: LocalDate,
         permission: NotificationPermission
     ) {
         self.database = database
+        self.today = today
         self.permission = permission
     }
 }
@@ -36,6 +40,30 @@ public extension ReminderModel {
         isOn && authorization == .denied
     }
 
+    var upcomingNotices: [PlannedNotification] {
+        guard let input else {
+            return []
+        }
+
+        let plan = NotificationPlan.notifications(
+            today: today,
+            reminderTime: time,
+            recordedDates: input.recordedDates,
+            recurrings: input.recurrings,
+            names: input.names
+        )
+
+        let notices = plan.filter { notification in
+            if case .recurring = notification.route {
+                true
+            } else {
+                false
+            }
+        }
+
+        return Array(notices.prefix(Self.noticeCount))
+    }
+
     var isCustom: Bool {
         time.map { !Self.presets.contains($0) } ?? false
     }
@@ -44,6 +72,7 @@ public extension ReminderModel {
         do {
             time = try await database.reminderTime()
             lastTime = time ?? lastTime
+            input = try await database.notificationInput(from: today)
         } catch {
             errorMessage = Self.loadFailedMessage
         }
@@ -83,6 +112,7 @@ public extension ReminderModel {
 }
 
 private extension ReminderModel {
+    static let noticeCount = 3
     static let loadFailedMessage = "通知の設定を読み込めませんでした"
     static let saveFailedMessage = "通知の設定を保存できませんでした"
 }

@@ -2,13 +2,12 @@ import Core
 import SwiftUI
 
 public struct NotificationPermission: Sendable {
-    public let authorization: @Sendable () async -> NotificationAuthorization
-    public let request: @Sendable () async -> Bool
+    public let authorization: Check
+    public let request: Request
 
     public init(
-        authorization: @escaping @Sendable () async
-            -> NotificationAuthorization,
-        request: @escaping @Sendable () async -> Bool
+        authorization: @escaping Check,
+        request: @escaping Request
     ) {
         self.authorization = authorization
         self.request = request
@@ -16,6 +15,9 @@ public struct NotificationPermission: Sendable {
 }
 
 public extension NotificationPermission {
+    typealias Check = @Sendable () async -> NotificationAuthorization
+    typealias Request = @Sendable () async -> Bool
+
     static let allowed = Self {
         .allowed
     } request: {

@@ -161,6 +161,10 @@ struct SettingsSheet: View {
                                 ReminderView(
                                     model: ReminderModel(
                                         database: database,
+                                        today: LocalDate(
+                                            Date(),
+                                            in: .current
+                                        ),
                                         permission: permission
                                     )
                                 )
