@@ -43,6 +43,23 @@ struct RecurringDraftTests {
         #expect(updated.createdAt == created)
         #expect(updated.updatedAt == now)
     }
+
+    @Test
+    func keepsDestinationOnlyForTransfer() throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        let card = Wallet.ID()
+        var draft = try Self.rentDraft()
+        draft.toWalletId = card
+
+        let expense = try draft.newRecurring(at: now)
+        draft.type = .transfer
+        draft.categoryId = nil
+        let transfer = try draft.newRecurring(at: now)
+
+        #expect(expense.toWalletId == nil)
+        #expect(transfer.toWalletId == card)
+        #expect(transfer.categoryId == nil)
+    }
 }
 
 extension RecurringDraftTests {
@@ -51,6 +68,7 @@ extension RecurringDraftTests {
         let amount: Int
         let category: Bool
         let wallet: Bool
+        let toWallet: String?
         let frequency: Recurring.Frequency
         let month: Int
         let day: Int
@@ -60,11 +78,20 @@ extension RecurringDraftTests {
         let problems: [RecurringDraft.Problem]
 
         func draft() -> RecurringDraft {
-            RecurringDraft(
+            let walletId = Wallet.ID()
+
+            let toWalletId: Wallet.ID? = switch toWallet {
+            case "same": walletId
+            case "other": Wallet.ID()
+            default: nil
+            }
+
+            return RecurringDraft(
                 type: type,
                 amount: amount,
                 categoryId: category ? EntryCategory.ID() : nil,
-                walletId: wallet ? Wallet.ID() : nil,
+                walletId: wallet ? walletId : nil,
+                toWalletId: toWalletId,
                 frequency: frequency,
                 month: month,
                 day: day,

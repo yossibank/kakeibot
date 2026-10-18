@@ -194,6 +194,7 @@ emoji・text・glyph のどれかは必須。
 | start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |
+| sort_order | INTEGER | 設定の一覧の並び |
 | created_at / updated_at | TEXT | |
 
 ### reward_rule

@@ -8,6 +8,7 @@ public struct EntryRow: View {
     let detail: String?
     let amount: Int
     let type: Entry.Kind
+    let isRecurring: Bool
 
     public init(
         icon: Icon?,
@@ -15,7 +16,8 @@ public struct EntryRow: View {
         tag: String? = nil,
         detail: String?,
         amount: Int,
-        type: Entry.Kind
+        type: Entry.Kind,
+        isRecurring: Bool = false
     ) {
         self.icon = icon
         self.title = title
@@ -23,6 +25,7 @@ public struct EntryRow: View {
         self.detail = detail
         self.amount = amount
         self.type = type
+        self.isRecurring = isRecurring
     }
 
     public var body: some View {
@@ -42,6 +45,12 @@ public struct EntryRow: View {
                 Text(title)
                     .font(.subheadline)
                     .foregroundStyle(Palette.ink)
+
+                if isRecurring {
+                    Image(systemName: "repeat")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundStyle(Palette.gold.opacity(0.75))
+                }
 
                 if let tag {
                     TagCard(tag, size: .small)
@@ -98,7 +107,8 @@ public struct EntryRow: View {
             title: "給料",
             detail: "銀行",
             amount: 250_000,
-            type: .income
+            type: .income,
+            isRecurring: true
         )
         EntryRow(
             icon: nil,

@@ -33,6 +33,8 @@ struct SampleDataTests {
         #expect(snapshot.budgets.count == 5)
         #expect(snapshot.templates.count == 4)
         #expect(snapshot.wallets.count == 3)
+        #expect(snapshot.recurrings.count == 4)
+        #expect(snapshot.entries.contains { $0.recurringId != nil })
     }
 }
 #endif

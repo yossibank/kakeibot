@@ -9,6 +9,7 @@ public struct EntryRowItem: Identifiable, Equatable {
     public let detail: String?
     public let amount: Int
     public let type: Entry.Kind
+    public let isRecurring: Bool
 }
 
 extension EntryRowItem {
@@ -30,7 +31,8 @@ extension EntryRowItem {
             tag: tag?.name,
             detail: parts.isEmpty ? nil : parts.joined(separator: "・"),
             amount: entry.amount,
-            type: entry.type
+            type: entry.type,
+            isRecurring: entry.recurringId != nil
         )
     }
 }
