@@ -3,9 +3,7 @@ import GRDB
 
 public extension AppDatabase {
     func entryListUpdates() -> some AsyncSequence<EntryList, any Error> {
-        ValueObservation
-            .tracking(Self.entryList)
-            .values(in: writer)
+        entryListObservation.values()
     }
 
     func entryList() async throws -> EntryList {
@@ -31,15 +29,7 @@ public extension AppDatabase {
     }
 }
 
-private extension AppDatabase {
-    static let recentMemosSQL = """
-    SELECT memo FROM entry
-    WHERE memo IS NOT NULL AND memo <> ''
-    GROUP BY memo
-    ORDER BY MAX(created_at) DESC
-    LIMIT ?
-    """
-
+extension AppDatabase {
     static func entryList(in db: Database) throws -> EntryList {
         let entries = try Entry.fetchAll(db)
         let days = EntryDay.grouping(entries)
@@ -56,6 +46,16 @@ private extension AppDatabase {
             icons: icons
         )
     }
+}
+
+private extension AppDatabase {
+    static let recentMemosSQL = """
+    SELECT memo FROM entry
+    WHERE memo IS NOT NULL AND memo <> ''
+    GROUP BY memo
+    ORDER BY MAX(created_at) DESC
+    LIMIT ?
+    """
 
     static func entryOptions(in db: Database) throws -> EntryOptions {
         let categories = try EntryCategory.unarchivedInOrder().fetchAll(db)

@@ -84,6 +84,12 @@ public struct EntrySheet: View {
     }
 }
 
+extension EntrySheet {
+    static func categoryFill(_ isSelected: Bool) -> Color {
+        isSelected ? Palette.gold.opacity(.subtle) : Color.clear
+    }
+}
+
 private extension EntrySheet {
     var content: some View {
         VStack(spacing: 14) {
@@ -134,7 +140,9 @@ private extension EntrySheet {
                     categoryArea
                         .hidden()
 
-                    transferPanel
+                    EntryTransferPanel(model: model) { role in
+                        open(.wallet(role))
+                    }
                 }
             } else {
                 categoryArea
@@ -144,7 +152,16 @@ private extension EntrySheet {
 
     var categoryArea: some View {
         VStack(spacing: 14) {
-            templateRow
+            EntryTemplateRow(
+                model: model,
+                onUse: { template in
+                    useTemplate(template)
+                },
+                onAdd: {
+                    open(.newTemplate)
+                }
+            )
+
             categoryPager
 
             TagLine(tagItems, selection: model.tagId) { id in
@@ -191,8 +208,12 @@ private extension EntrySheet {
             GeometryReader { proxy in
                 let size = min(proxy.size.width, proxy.size.height)
 
-                dialFace(size: size)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                EntryDialFace(
+                    model: model,
+                    isActive: isEnteringAmount,
+                    size: size
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .buttonStyle(.plain)
@@ -240,84 +261,6 @@ private extension EntrySheet {
             }
 
             Spacer(minLength: 0)
-        }
-        .buttonStyle(.plain)
-    }
-
-    var transferPanel: some View {
-        HStack(spacing: 10) {
-            transferCard(.source)
-
-            Button {
-                withAnimation(.snappy) {
-                    model.swapWallets()
-                }
-            } label: {
-                Image(systemName: "arrow.left.arrow.right")
-                    .font(.sans(.small, weight: .light))
-                    .foregroundStyle(Palette.gold)
-                    .frame(width: 44, height: 44)
-                    .overlay {
-                        Circle()
-                            .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
-                    }
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-
-            transferCard(.destination)
-        }
-        .sensoryFeedback(.selection, trigger: model.toWalletId)
-    }
-
-    func transferCard(_ role: EntryWalletSheet.Role) -> some View {
-        let id = role == .source ? model.walletId : model.toWalletId
-        let wallet = model.wallet(id)
-        let icon = wallet.flatMap { model.icon(for: $0) }
-        let isOver = role == .source && model.isOverSourceBalance
-        let balanceColor = isOver ? Palette.rose : Palette.mist
-        let overOpacity: Double = isOver ? 1 : 0
-
-        return Button {
-            open(.wallet(role))
-        } label: {
-            VStack(spacing: 10) {
-                Text(transferTitle(role))
-                    .font(.caption2)
-                    .tracking(3)
-                    .foregroundStyle(Palette.gold)
-
-                IconImage(icon, size: 24)
-                    .foregroundStyle(Palette.gold)
-
-                Text(wallet?.name ?? "選ぶ")
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.champagne)
-                    .lineLimit(1)
-
-                if let balance = wallet.flatMap({ model.balance(of: $0) }) {
-                    VStack(spacing: 2) {
-                        Text("残高 \(AmountText.text(balance))")
-                            .font(.caption2)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-
-                        Text("残高を超えています")
-                            .font(.caption2)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .opacity(overOpacity)
-                    }
-                    .foregroundStyle(balanceColor)
-                    .animation(.snappy, value: isOver)
-                }
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 12)
-            .frame(maxWidth: .infinity, minHeight: 120)
-            .card(cornerRadius: 18)
-            .contentShape(.rect)
         }
         .buttonStyle(.plain)
     }
@@ -418,46 +361,6 @@ private extension EntrySheet {
             .transition(Self.memoTransition)
     }
 
-    func dialFace(size: CGFloat) -> some View {
-        let amountScale: CGFloat = model.amount < 100_000 ? 0.2 : 0.118
-        let hint = isEnteringAmount ? "入力中" : "タップして入力"
-        let note = model.expressionText ?? hint
-
-        return ZStack {
-            DialFace(isActive: isEnteringAmount)
-
-            Text(model.typeName)
-                .font(.serif(.caption))
-                .tracking(5)
-                .foregroundStyle(Palette.gold)
-                .offset(y: -size * 0.19)
-
-            Text(AmountText.text(model.amount))
-                .font(
-                    .system(
-                        size: size * amountScale,
-                        weight: .semibold,
-                        design: .serif
-                    )
-                )
-                .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
-                .lineLimit(1)
-                .minimumScaleFactor(0.85)
-                .frame(width: size * 0.7, height: size * 0.26)
-
-            Text(note)
-                .font(.caption2)
-                .foregroundStyle(Palette.mist)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .frame(width: size * 0.66)
-                .offset(y: size * 0.19)
-        }
-        .frame(width: size, height: size)
-        .contentShape(Circle())
-    }
-
     func categoryGrid(_ page: [EntryModel.CategoryCell]) -> some View {
         Grid(
             horizontalSpacing: Self.categorySpacing,
@@ -477,74 +380,6 @@ private extension EntrySheet {
                 }
             }
         }
-    }
-
-    var templateRow: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 6) {
-                ForEach(model.templates) { template in
-                    templateButton(template)
-                }
-
-                Button {
-                    open(.newTemplate)
-                } label: {
-                    Label("今の入力を保存", systemImage: "plus")
-                        .font(.sans(.caption))
-                        .foregroundStyle(Palette.gold)
-                        .padding(.horizontal, 12)
-                        .frame(height: Self.templateHeight)
-                        .overlay {
-                            Capsule()
-                                .stroke(
-                                    Palette.gold.opacity(.medium),
-                                    style: .dashed
-                                )
-                        }
-                        .contentShape(Capsule())
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.vertical, 1)
-        }
-        .scrollIndicators(.hidden)
-        .frame(height: Self.templateHeight + 2)
-    }
-
-    func templateButton(_ template: EntryTemplate) -> some View {
-        let isApplied = model.isApplied(template)
-        let icon = model.icon(for: template)
-        let amount = template.amount.map { AmountText.text($0) } ?? "入力"
-        let amountColor = template.amount == nil
-            ? Palette.mist
-            : Palette.champagne
-
-        return Button {
-            useTemplate(template)
-        } label: {
-            HStack(spacing: 6) {
-                IconImage(icon, size: 12)
-                    .foregroundStyle(Palette.gold)
-
-                Text(template.name)
-                    .foregroundStyle(Palette.ink)
-
-                Text(amount)
-                    .font(.serif(.caption))
-                    .foregroundStyle(amountColor)
-            }
-            .font(.sans(.caption))
-            .padding(.leading, 6)
-            .padding(.trailing, 12)
-            .frame(height: Self.templateHeight)
-            .background(Self.categoryFill(isApplied), in: Capsule())
-            .overlay {
-                Capsule()
-                    .stroke(templateStroke(isApplied), lineWidth: 1)
-            }
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -737,7 +572,6 @@ private extension EntrySheet {
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 5
     static let categoryHeight: CGFloat = 54
-    static let templateHeight: CGFloat = 34
     static let menuPressDuration = 0.15
 
     static var pagerHeight: CGFloat {
@@ -791,13 +625,6 @@ private extension EntrySheet {
         self.sheet = sheet
     }
 
-    func transferTitle(_ role: EntryWalletSheet.Role) -> String {
-        switch role {
-        case .source: model.walletTitle
-        case .destination: EntryModel.destinationTitle
-        }
-    }
-
     func editTags() {
         guard let category = model.selectedCategory else {
             return
@@ -840,10 +667,6 @@ private extension EntrySheet {
         categoryPage = page ?? 0
     }
 
-    static func categoryFill(_ isSelected: Bool) -> Color {
-        isSelected ? Palette.gold.opacity(.subtle) : Color.clear
-    }
-
     func menuX(for menu: CategoryMenu) -> CGFloat {
         let width = EntryCategoryMenu.width
         let inset = Self.memoCardInset
@@ -883,10 +706,6 @@ private extension EntrySheet {
             await model.reloadCategories()
             await model.reloadTemplates()
         }
-    }
-
-    func templateStroke(_ isApplied: Bool) -> Color {
-        isApplied ? Palette.gold : Palette.gold.opacity(.soft)
     }
 
     func useTemplate(_ template: EntryTemplate) {

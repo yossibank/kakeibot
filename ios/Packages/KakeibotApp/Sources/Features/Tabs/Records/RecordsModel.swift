@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class RecordsModel {
+public final class RecordsModel: ScreenModel {
     public var today: LocalDate
     public var selectedDate: LocalDate?
 
@@ -151,43 +151,39 @@ private extension RecordsModel {
     static let saveFailedMessage = "保存できませんでした"
 
     func observe() async {
-        do {
-            for try await list in database.entryListUpdates() {
-                self.list = list
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.entryListUpdates(),
+            failure: Self.loadFailedMessage
+        ) { list in
+            self.list = list
         }
     }
 
     func observeNoSpendDays() async {
-        do {
-            for try await days in database.noSpendDayUpdates() {
-                noSpendDays = days
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.noSpendDayUpdates(),
+            failure: Self.loadFailedMessage
+        ) { days in
+            noSpendDays = days
         }
     }
 
     func observeWeekStart() async {
-        do {
-            for try await weekStart in database.settingUpdates(.weekStart) {
-                self.weekStart = weekStart
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.settingUpdates(.weekStart),
+            failure: Self.loadFailedMessage
+        ) { weekStart in
+            self.weekStart = weekStart
         }
     }
 
     func observeMonthStartDay() async {
-        do {
-            for try await startDay in database.settingUpdates(.monthStartDay) {
-                monthStartDay = startDay
-                month = today.periodMonth(startingOn: startDay)
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.settingUpdates(.monthStartDay),
+            failure: Self.loadFailedMessage
+        ) { startDay in
+            monthStartDay = startDay
+            month = today.periodMonth(startingOn: startDay)
         }
     }
 }

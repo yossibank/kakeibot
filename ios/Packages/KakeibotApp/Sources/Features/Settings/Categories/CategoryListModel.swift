@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class CategoryListModel {
+public final class CategoryListModel: ScreenModel {
     public var kind: EntryCategory.Kind = .expense
 
     public private(set) var list: CategoryList?
@@ -51,12 +51,11 @@ public extension CategoryListModel {
     }
 
     func observe() async {
-        do {
-            for try await list in database.categoryListUpdates() {
-                self.list = list
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.categoryListUpdates(),
+            failure: Self.loadFailedMessage
+        ) { list in
+            self.list = list
         }
     }
 

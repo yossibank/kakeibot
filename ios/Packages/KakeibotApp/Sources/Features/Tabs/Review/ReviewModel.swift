@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class ReviewModel {
+public final class ReviewModel: ScreenModel {
     public var today: LocalDate
 
     public private(set) var scale: ReviewPeriod.Scale = .month
@@ -346,42 +346,38 @@ private extension ReviewModel {
     }
 
     func observe() async {
-        do {
-            for try await list in database.entryListUpdates() {
-                self.list = list
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.entryListUpdates(),
+            failure: Self.loadFailedMessage
+        ) { list in
+            self.list = list
         }
     }
 
     func observeBudgets() async {
-        do {
-            for try await budgets in database.budgetUpdates() {
-                self.budgets = budgets
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.budgetUpdates(),
+            failure: Self.loadFailedMessage
+        ) { budgets in
+            self.budgets = budgets
         }
     }
 
     func observeMonthStartDay() async {
-        do {
-            for try await startDay in database.settingUpdates(.monthStartDay) {
-                monthStartDay = startDay
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.settingUpdates(.monthStartDay),
+            failure: Self.loadFailedMessage
+        ) { startDay in
+            monthStartDay = startDay
         }
     }
 
     func observeWeekStart() async {
-        do {
-            for try await weekStart in database.settingUpdates(.weekStart) {
-                self.weekStart = weekStart
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.settingUpdates(.weekStart),
+            failure: Self.loadFailedMessage
+        ) { weekStart in
+            self.weekStart = weekStart
         }
     }
 }

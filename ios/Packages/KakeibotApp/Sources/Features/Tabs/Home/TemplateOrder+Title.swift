@@ -14,7 +14,7 @@ public extension TemplateOrder {
     var note: String? {
         switch self {
         case .manual: "設定で並べ替えられます"
-        case .frequent: "この 90 日に記録した回数の順です"
+        case .frequent: "この \(Self.frequentDays) 日に記録した回数の順です"
         case .category, .amount, .name: nil
         }
     }

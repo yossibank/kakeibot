@@ -6,10 +6,10 @@ import Store
 
 @MainActor
 @Observable
-public final class RecurringListModel {
+public final class RecurringListModel: ScreenModel {
     public private(set) var recurrings: [Recurring] = []
     public private(set) var movingOrder: [Recurring.ID]?
-    public private(set) var options: EntryOptions?
+    public private(set) var list: EntryList?
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -103,15 +103,14 @@ public extension RecurringListModel {
     }
 
     func observe() async {
-        do {
-            options = try await database.entryOptions()
-
-            for try await recurrings in database.recurringUpdates() {
-                self.recurrings = recurrings
-                options = try await database.entryOptions()
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observeRecurrings()
             }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+
+            group.addTask {
+                await self.observeList()
+            }
         }
     }
 }
@@ -135,12 +134,27 @@ private extension RecurringListModel {
         type == .transfer ? "振替" : "固定費"
     }
 
-    func row(for recurring: Recurring) -> Row {
-        let categories = (options?.expenseCategories ?? [])
-            + (options?.incomeCategories ?? [])
+    func observeRecurrings() async {
+        await observe(
+            database.recurringUpdates(),
+            failure: Self.loadFailedMessage
+        ) { recurrings in
+            self.recurrings = recurrings
+        }
+    }
 
-        let category = categories.first { $0.id == recurring.categoryId }
-        let wallet = options?.wallets.first { $0.id == recurring.walletId }
+    func observeList() async {
+        await observe(
+            database.entryListUpdates(),
+            failure: Self.loadFailedMessage
+        ) { list in
+            self.list = list
+        }
+    }
+
+    func row(for recurring: Recurring) -> Row {
+        let category = recurring.categoryId.flatMap { list?.categories[$0] }
+        let wallet = list?.wallets[recurring.walletId]
         let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
 
         let schedule = RecurringText.schedule(
@@ -149,18 +163,13 @@ private extension RecurringListModel {
             day: recurring.day
         )
 
-        let destination = options?.wallets
-            .first { $0.id == recurring.toWalletId }
+        let destination = recurring.toWalletId.flatMap { list?.wallets[$0] }
 
         let route = [wallet?.name, destination?.name]
             .compactMap(\.self)
             .joined(separator: " → ")
 
         let place = recurring.type == .transfer ? route : wallet?.name
-
-        let detail = [schedule, place]
-            .compactMap(\.self)
-            .joined(separator: "・")
 
         let iconId = recurring.type == .transfer
             ? wallet?.iconId
@@ -169,10 +178,10 @@ private extension RecurringListModel {
         return Row(
             id: recurring.id,
             title: memo ?? category?.name ?? Self.title(of: recurring.type),
-            detail: detail,
+            detail: [schedule, place].rowDetail ?? "",
             amount: recurring.amount,
             type: recurring.type,
-            icon: iconId.flatMap { options?.icons[$0] },
+            icon: iconId.flatMap { list?.icons[$0] },
             next: recurring.nextDate(onOrAfter: today)
         )
     }

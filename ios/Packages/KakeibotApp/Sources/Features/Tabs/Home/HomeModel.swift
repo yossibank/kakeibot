@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class HomeModel {
+public final class HomeModel: ScreenModel {
     public var today: LocalDate
     public var templateType: Entry.Kind = .expense
 
@@ -168,8 +168,7 @@ public extension HomeModel {
     }
 
     func icon(for template: EntryTemplate) -> Icon? {
-        let category = list?.categories[template.categoryId]
-        return category.flatMap { list?.icons[$0.iconId] }
+        list?.icon(for: template)
     }
 
     func templateSections(matching query: String) -> [TemplateSection] {
@@ -200,11 +199,7 @@ public extension HomeModel {
     }
 
     func detail(for template: EntryTemplate) -> String {
-        let category = list?.categories[template.categoryId]?.name
-        let tag = template.tagId.flatMap { list?.tags[$0]?.name }
-        let wallet = list?.wallets[template.walletId]?.name
-        let parts = [category, tag, wallet]
-        return parts.compactMap(\.self).joined(separator: "・")
+        list?.detail(for: template) ?? ""
     }
 
     func record(_ template: EntryTemplate) async -> EntryChange? {
@@ -231,14 +226,13 @@ private extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "記録できませんでした"
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
-    static let frequentDays = 90
 
     var monthDays: [EntryDay] {
         list?.days.filter { period.contains($0.date) } ?? []
     }
 
     var templateUses: [EntryTemplate.ID: Int] {
-        let start = today.adding(days: 1 - Self.frequentDays)
+        let start = today.adding(days: 1 - TemplateOrder.frequentDays)
         let days = list?.days ?? []
         var uses: [EntryTemplate.ID: Int] = [:]
 
@@ -252,52 +246,47 @@ private extension HomeModel {
     }
 
     func observe() async {
-        do {
-            for try await list in database.entryListUpdates() {
-                self.list = list
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.entryListUpdates(),
+            failure: Self.loadFailedMessage
+        ) { list in
+            self.list = list
         }
     }
 
     func observeTemplates() async {
-        do {
-            for try await templates in database.templateUpdates() {
-                allTemplates = templates
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.templateUpdates(),
+            failure: Self.loadFailedMessage
+        ) { templates in
+            allTemplates = templates
         }
     }
 
     func observeRecurrings() async {
-        do {
-            for try await recurrings in database.recurringUpdates() {
-                self.recurrings = recurrings
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.recurringUpdates(),
+            failure: Self.loadFailedMessage
+        ) { recurrings in
+            self.recurrings = recurrings
         }
     }
 
     func observeBudgets() async {
-        do {
-            for try await budgets in database.budgetUpdates() {
-                self.budgets = budgets
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.budgetUpdates(),
+            failure: Self.loadFailedMessage
+        ) { budgets in
+            self.budgets = budgets
         }
     }
 
     func observeMonthStartDay() async {
-        do {
-            for try await startDay in database.settingUpdates(.monthStartDay) {
-                monthStartDay = startDay
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.settingUpdates(.monthStartDay),
+            failure: Self.loadFailedMessage
+        ) { startDay in
+            monthStartDay = startDay
         }
     }
 

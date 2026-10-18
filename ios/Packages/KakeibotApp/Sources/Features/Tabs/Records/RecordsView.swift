@@ -419,8 +419,7 @@ private extension RecordsView {
             ? "収入 \(AmountText.text(day.incomeTotal))"
             : nil
 
-        let parts = [expense, income].compactMap(\.self)
-        return parts.isEmpty ? nil : parts.joined(separator: "・")
+        return [expense, income].rowDetail
     }
 
     func dayColor(
