@@ -43,7 +43,11 @@ public extension RecurringListModel {
     }
 
     var rows: [Row] {
-        shown.map(row(for:))
+        guard let list else {
+            return []
+        }
+
+        return shown.map { row(for: $0, in: list) }
     }
 
     var monthTotal: MonthTotal {
@@ -152,9 +156,12 @@ private extension RecurringListModel {
         }
     }
 
-    func row(for recurring: Recurring) -> Row {
-        let category = recurring.categoryId.flatMap { list?.categories[$0] }
-        let wallet = list?.wallets[recurring.walletId]
+    func row(
+        for recurring: Recurring,
+        in list: EntryList
+    ) -> Row {
+        let category = recurring.categoryId.flatMap { list.categories[$0] }
+        let wallet = list.wallets[recurring.walletId]
         let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
 
         let schedule = RecurringText.schedule(
@@ -163,7 +170,7 @@ private extension RecurringListModel {
             day: recurring.day
         )
 
-        let destination = recurring.toWalletId.flatMap { list?.wallets[$0] }
+        let destination = recurring.toWalletId.flatMap { list.wallets[$0] }
 
         let route = [wallet?.name, destination?.name]
             .compactMap(\.self)
@@ -181,7 +188,7 @@ private extension RecurringListModel {
             detail: [schedule, place].rowDetail ?? "",
             amount: recurring.amount,
             type: recurring.type,
-            icon: iconId.flatMap { list?.icons[$0] },
+            icon: iconId.flatMap { list.icons[$0] },
             next: recurring.nextDate(onOrAfter: today)
         )
     }
