@@ -48,6 +48,13 @@ public extension AppIconChoice {
         }
     }
 
+    var isLight: Bool {
+        switch self {
+        case .ivory, .white, .sky, .sage, .rose, .gold: true
+        default: false
+        }
+    }
+
     var alternateName: String? {
         switch self {
         case .navy: nil

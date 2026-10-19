@@ -15,10 +15,10 @@ public struct AppIconListView: View {
             header
 
             ScrollView {
-                LazyVGrid(columns: Self.columns, spacing: 18) {
-                    ForEach(AppIconChoice.allCases, id: \.self) { choice in
-                        tile(choice)
-                    }
+                VStack(alignment: .leading, spacing: 24) {
+                    section("ダーク", isLight: false)
+
+                    section("ライト", isLight: true)
                 }
                 .padding(.vertical, 8)
             }
@@ -62,40 +62,31 @@ private extension AppIconListView {
         }
     }
 
-    func tile(_ choice: AppIconChoice) -> some View {
-        let isCurrent = choice == model.current
-        let ring = isCurrent ? Palette.gold : Color.clear
-        let titleColor = isCurrent ? Palette.champagne : Palette.mist
+    func section(
+        _ title: String,
+        isLight: Bool
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.caption2)
+                .tracking(3)
+                .foregroundStyle(Palette.gold)
+                .padding(.leading, 6)
 
-        return Button {
-            Task {
-                await model.select(choice)
-            }
-        } label: {
-            VStack(spacing: 8) {
-                AppIconPreview(choice: choice, size: 76)
-                    .padding(4)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 22, style: .continuous)
-                            .stroke(ring, lineWidth: 2)
-                    }
-                    .overlay(alignment: .bottomTrailing) {
-                        if isCurrent {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.title3)
-                                .foregroundStyle(Palette.gold, Palette.night)
-                                .offset(x: 6, y: 6)
+            LazyVGrid(columns: Self.columns, spacing: 18) {
+                ForEach(choices(isLight: isLight), id: \.self) { choice in
+                    AppIconTile(
+                        choice: choice,
+                        isCurrent: choice == model.current,
+                        onSelect: {
+                            Task {
+                                await model.select(choice)
+                            }
                         }
-                    }
-
-                Text(choice.title)
-                    .font(.footnote)
-                    .foregroundStyle(titleColor)
+                    )
+                }
             }
-            .frame(maxWidth: .infinity)
-            .contentShape(.rect)
         }
-        .buttonStyle(.plain)
     }
 }
 
@@ -104,4 +95,8 @@ private extension AppIconListView {
         repeating: GridItem(.flexible(), spacing: 12),
         count: 3
     )
+
+    func choices(isLight: Bool) -> [AppIconChoice] {
+        AppIconChoice.allCases.filter { $0.isLight == isLight }
+    }
 }

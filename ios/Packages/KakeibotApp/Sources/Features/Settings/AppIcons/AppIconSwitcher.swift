@@ -19,6 +19,7 @@ public extension AppIconSwitcher {
             UIApplication.shared.alternateIconName
         },
         setName: { name in
+            try await Task.sleep(for: .seconds(0.5))
             try await UIApplication.shared.setAlternateIconName(name)
         }
     )
