@@ -260,7 +260,7 @@ emoji・text・glyph のどれかは必須。
 | icon_id | TEXT | |
 | created_at | TEXT | |
 
-date ごとに 1 つまで。押し直すと置き換える。
+date ごとに 1 つまで（date に一意の索引を付ける）。押し直すと置き換える。
 
 ### no_spend_day
 

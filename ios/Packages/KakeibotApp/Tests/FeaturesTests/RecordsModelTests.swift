@@ -128,6 +128,63 @@ struct RecordsModelTests {
 
         #expect(reopened.layout == .calendar)
     }
+
+    @Test
+    func opensDayInCalendar() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        let date = try #require(LocalDate("2026-08-03"))
+
+        model.open(date)
+
+        #expect(model.month.description == "2026-08")
+        #expect(model.shownDate == date)
+        #expect(model.layout == .calendar)
+    }
+
+    @Test
+    func stampsAndRemovesWithShownChoices() async throws {
+        let setup = try await Setup()
+        try setup.database.insertShelfIfEmpty(at: Date())
+        let shelf = try await setup.database.iconShelf()
+        let hidden = try #require(shelf.shelfIcons.last)
+        try await setup.database.setShelfIconHidden(
+            hidden.id,
+            isHidden: true,
+            at: Date()
+        )
+        let today = setup.today
+        let model = RecordsModel(database: setup.database, today: today)
+
+        let task = Task {
+            await model.run()
+        }
+
+        for _ in 0..<200 where model.stampChoices.isEmpty {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let choices = model.stampChoices
+        let star = try #require(choices.first)
+        let party = try #require(choices.dropFirst().first)
+
+        await model.stamp(star, on: today)
+        await model.stamp(party, on: today)
+
+        for _ in 0..<200 where model.stampIcon(on: today)?.id != party.id {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let stamped = model.stampIcon(on: today)
+        await model.removeStamp(on: today)
+        let calendar = try await setup.database.stampCalendar()
+        task.cancel()
+
+        #expect(choices.count == 7)
+        #expect(!choices.contains { $0.id == hidden.iconId })
+        #expect(stamped?.glyph == .party)
+        #expect(calendar.stamps.isEmpty)
+    }
 }
 
 extension RecordsModelTests {

@@ -95,6 +95,38 @@ struct ReviewModelTests {
         #expect(reopened.scale == .week)
         #expect(reopened.kind == .income)
     }
+
+    @Test
+    func listsDaysOfStamp() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        try setup.database.insertShelfIfEmpty(at: Date())
+        let shelf = try await setup.database.iconShelf().shelfIcons
+        let star = try #require(shelf.first?.iconId)
+        let party = try #require(shelf.dropFirst().first?.iconId)
+        let stamps = [
+            (star, "2026-10-05"),
+            (party, "2026-10-10"),
+            (star, "2026-10-12"),
+            (star, "2026-09-20")
+        ]
+
+        for (icon, text) in stamps {
+            let date = try #require(LocalDate(text))
+            try await setup.database.stamp(icon, on: date, at: Date())
+        }
+
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        try await observe(model) {
+            !model.stampTallies.isEmpty
+        }
+
+        let tally = try #require(model.stampTallies.first)
+        let days = model.stampDays(of: tally).map(\.description)
+
+        #expect(tally.count == 2)
+        #expect(days == ["2026-10-12", "2026-10-05"])
+    }
 }
 
 private extension ReviewModelTests {
