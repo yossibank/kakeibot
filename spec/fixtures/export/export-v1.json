@@ -197,6 +197,7 @@
         "walletId": "20000000-0000-4000-8000-000000000001",
         "memo": "社食",
         "sortOrder": 0,
+        "archivedAt": null,
         "createdAt": "2026-09-01T00:00:00Z",
         "updatedAt": "2026-09-01T00:00:00Z"
       },
@@ -210,6 +211,7 @@
         "walletId": "20000000-0000-4000-8000-000000000001",
         "memo": null,
         "sortOrder": 1,
+        "archivedAt": null,
         "createdAt": "2026-09-01T00:00:00Z",
         "updatedAt": "2026-09-01T00:00:00Z"
       }
@@ -251,6 +253,7 @@
         "remindDaysBefore": 1,
         "generatedUntil": "2026-09-27",
         "sortOrder": 0,
+        "archivedAt": null,
         "createdAt": "2026-01-01T00:00:00Z",
         "updatedAt": "2026-09-27T00:00:00Z"
       },
@@ -270,6 +273,7 @@
         "remindDaysBefore": null,
         "generatedUntil": null,
         "sortOrder": 1,
+        "archivedAt": null,
         "createdAt": "2026-01-01T00:00:00Z",
         "updatedAt": "2026-01-01T00:00:00Z"
       }

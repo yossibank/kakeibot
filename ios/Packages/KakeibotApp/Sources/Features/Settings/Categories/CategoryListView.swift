@@ -11,6 +11,9 @@ public struct CategoryListView: View {
     @State private var boardWidth: CGFloat = 0
     @State private var hideZone: CGRect = .zero
     @State private var isOverHideZone = false
+    @State private var hiddenLift: SettingsHiddenLift<EntryCategory.ID>?
+    @State private var showZone: CGRect = .zero
+    @State private var isOverShowZone = false
     @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
@@ -45,7 +48,7 @@ public struct CategoryListView: View {
                 .coordinateSpace(.named(Self.space))
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(lift != nil)
+            .scrollDisabled(lift != nil || hiddenLift != nil)
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -105,10 +108,16 @@ private extension CategoryListView {
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            boardWidth = width
+        .overlay {
+            if hiddenLift != nil {
+                SettingsShowZone(isTargeted: isOverShowZone)
+            }
+        }
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .named(Self.space))
+        } action: { frame in
+            boardWidth = frame.width
+            showZone = frame
         }
     }
 
@@ -145,17 +154,35 @@ private extension CategoryListView {
 
             LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
                 ForEach(model.hidden) { category in
-                    tileFace(category, isHidden: true)
-                        .frame(height: Self.tileHeight)
-                        .onTapGesture {
-                            sheet = .edit(category.kind, category.id)
-                        }
-                        .onLongPressGesture {
-                            show(category.id)
-                        }
+                    hiddenTile(category)
                 }
             }
         }
+    }
+
+    func hiddenTile(_ category: EntryCategory) -> some View {
+        let isLifted = hiddenLift?.id == category.id
+        let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
+        let scale: CGFloat = isLifted ? 1.1 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let layer: Double = isLifted ? 1 : 0
+
+        return tileFace(category, isHidden: true)
+            .frame(height: Self.tileHeight)
+            .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
+            .offset(offset)
+            .zIndex(layer)
+            .onTapGesture {
+                sheet = .edit(category.kind, category.id)
+            }
+            .gesture(
+                LiftGesture(in: Self.space) { location in
+                    followHidden(category.id, to: location)
+                } onEnd: {
+                    dropHidden()
+                }
+            )
     }
 
     func movableTile(_ category: EntryCategory) -> some View {
@@ -392,11 +419,46 @@ private extension CategoryListView {
         }
     }
 
-    func show(_ id: EntryCategory.ID) {
+    func followHidden(
+        _ id: EntryCategory.ID,
+        to location: CGPoint
+    ) {
+        if hiddenLift == nil {
+            withAnimation(.snappy(duration: 0.2)) {
+                hiddenLift = SettingsHiddenLift(
+                    id: id,
+                    start: location,
+                    location: location
+                )
+            }
+
+            liftCount += 1
+        }
+
+        hiddenLift?.location = location
+        isOverShowZone = showZone.contains(location)
+    }
+
+    func dropHidden() {
+        guard let hiddenLift else {
+            return
+        }
+
+        let isShowing = isOverShowZone
+
+        withAnimation(.snappy) {
+            self.hiddenLift = nil
+            isOverShowZone = false
+        }
+
+        guard isShowing else {
+            return
+        }
+
         showCount += 1
 
         Task {
-            await model.show(id)
+            await model.show(hiddenLift.id)
         }
     }
 

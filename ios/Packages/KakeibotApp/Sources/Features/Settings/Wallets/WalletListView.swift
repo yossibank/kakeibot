@@ -13,6 +13,9 @@ public struct WalletListView: View {
     @State private var isOverHideZone = false
     @State private var hiding: Wallet?
     @State private var isConfirmingHide = false
+    @State private var hiddenLift: SettingsHiddenLift<Wallet.ID>?
+    @State private var showZone: CGRect = .zero
+    @State private var isOverShowZone = false
     @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
@@ -47,7 +50,7 @@ public struct WalletListView: View {
                 .coordinateSpace(.named(Self.space))
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(lift != nil)
+            .scrollDisabled(lift != nil || hiddenLift != nil)
 
             AddButton("口座を追加") {
                 sheet = .new
@@ -118,6 +121,16 @@ private extension WalletListView {
         }
         .frame(maxWidth: .infinity)
         .frame(height: boardHeight, alignment: .top)
+        .overlay {
+            if hiddenLift != nil {
+                SettingsShowZone(isTargeted: isOverShowZone)
+            }
+        }
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .named(Self.space))
+        } action: { frame in
+            showZone = frame
+        }
     }
 
     var hideTarget: some View {
@@ -134,17 +147,36 @@ private extension WalletListView {
             SettingsHiddenTitle("非表示の口座")
 
             ForEach(model.hidden) { wallet in
-                row(wallet)
-                    .opacity(0.5)
-                    .contentShape(.rect)
-                    .onTapGesture {
-                        sheet = .edit(wallet.id)
-                    }
-                    .onLongPressGesture {
-                        show(wallet.id)
-                    }
+                hiddenRow(wallet)
             }
         }
+    }
+
+    func hiddenRow(_ wallet: Wallet) -> some View {
+        let isLifted = hiddenLift?.id == wallet.id
+        let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
+        let scale: CGFloat = isLifted ? 1.03 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let opacity: Double = isLifted ? 1 : 0.5
+        let layer: Double = isLifted ? 1 : 0
+
+        return row(wallet)
+            .opacity(opacity)
+            .contentShape(.rect)
+            .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
+            .offset(offset)
+            .zIndex(layer)
+            .onTapGesture {
+                sheet = .edit(wallet.id)
+            }
+            .gesture(
+                LiftGesture(in: Self.space) { location in
+                    followHidden(wallet.id, to: location)
+                } onEnd: {
+                    dropHidden()
+                }
+            )
     }
 
     func movableRow(_ wallet: Wallet) -> some View {
@@ -349,11 +381,46 @@ private extension WalletListView {
         }
     }
 
-    func show(_ id: Wallet.ID) {
+    func followHidden(
+        _ id: Wallet.ID,
+        to location: CGPoint
+    ) {
+        if hiddenLift == nil {
+            withAnimation(.snappy(duration: 0.2)) {
+                hiddenLift = SettingsHiddenLift(
+                    id: id,
+                    start: location,
+                    location: location
+                )
+            }
+
+            liftCount += 1
+        }
+
+        hiddenLift?.location = location
+        isOverShowZone = showZone.contains(location)
+    }
+
+    func dropHidden() {
+        guard let hiddenLift else {
+            return
+        }
+
+        let isShowing = isOverShowZone
+
+        withAnimation(.snappy) {
+            self.hiddenLift = nil
+            isOverShowZone = false
+        }
+
+        guard isShowing else {
+            return
+        }
+
         showCount += 1
 
         Task {
-            await model.show(id)
+            await model.show(hiddenLift.id)
         }
     }
 

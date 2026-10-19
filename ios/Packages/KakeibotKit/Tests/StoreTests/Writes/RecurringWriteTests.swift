@@ -223,6 +223,54 @@ struct RecurringWriteTests {
             )
         }
     }
+
+    @Test
+    func pausesWhileHiddenWithoutBackfill() async throws {
+        let setup = try await Setup()
+        let january = try #require(LocalDate("2026-01-31"))
+        let february = try #require(LocalDate("2026-02-01"))
+        let april = try #require(LocalDate("2026-04-30"))
+        let may = try #require(LocalDate("2026-05-25"))
+        try await setup.database.generateRecurringEntries(
+            through: january,
+            at: setup.now
+        )
+        let recurring = try #require(
+            try setup.database.snapshot().recurrings.first
+        )
+
+        try await setup.database.setRecurringHidden(
+            recurring.id,
+            isHidden: true,
+            today: february,
+            at: setup.now
+        )
+        try await setup.database.generateRecurringEntries(
+            through: april,
+            at: setup.now
+        )
+        let shownWhileHidden = try await setup.database.recurrings()
+        let allWhileHidden = try await setup.database.recurrings(
+            includingHidden: true
+        )
+
+        try await setup.database.setRecurringHidden(
+            recurring.id,
+            isHidden: false,
+            today: may,
+            at: setup.now
+        )
+        let dates = try setup.database
+            .snapshot()
+            .entries
+            .compactMap(\.recurringDate)
+            .sorted()
+            .map(\.description)
+
+        #expect(shownWhileHidden.isEmpty)
+        #expect(allWhileHidden.count == 1)
+        #expect(dates == ["2026-01-25", "2026-05-25"])
+    }
 }
 
 extension RecurringWriteTests {

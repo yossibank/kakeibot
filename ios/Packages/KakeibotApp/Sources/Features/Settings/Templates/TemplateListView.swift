@@ -9,6 +9,12 @@ public struct TemplateListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var boardWidth: CGFloat = 0
+    @State private var hideZone: CGRect = .zero
+    @State private var isOverHideZone = false
+    @State private var hiddenLift: SettingsHiddenLift<EntryTemplate.ID>?
+    @State private var showZone: CGRect = .zero
+    @State private var isOverShowZone = false
+    @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -30,14 +36,20 @@ public struct TemplateListView: View {
                 .multilineTextAlignment(.center)
 
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 20) {
                     board
+
+                    if lift != nil {
+                        hideTarget
+                    } else if !model.hidden.isEmpty {
+                        hiddenSection
+                    }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(lift != nil)
+            .scrollDisabled(lift != nil || hiddenLift != nil)
 
             AddButton(addTitle) {
                 sheet = .new(model.type)
@@ -59,6 +71,7 @@ public struct TemplateListView: View {
         .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
+        .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
             TemplateEditSheet(model: editModel(for: sheet))
         }
@@ -97,11 +110,71 @@ private extension TemplateListView {
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            boardWidth = width
+        .overlay {
+            if hiddenLift != nil {
+                SettingsShowZone(isTargeted: isOverShowZone)
+            }
         }
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .named(Self.space))
+        } action: { frame in
+            boardWidth = frame.width
+            showZone = frame
+        }
+    }
+
+    var hideTarget: some View {
+        SettingsHideZone(isTargeted: isOverHideZone, height: Self.tileHeight)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .named(Self.space))
+            } action: { frame in
+                hideZone = frame
+            }
+    }
+
+    var hiddenSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SettingsHiddenTitle("非表示のテンプレート")
+
+            ForEach(model.hidden) { template in
+                hiddenCard(template)
+            }
+        }
+    }
+
+    func card(_ template: EntryTemplate) -> some View {
+        TemplateRowCard(
+            icon: model.icon(for: template),
+            name: template.name,
+            detail: model.detail(for: template),
+            amount: template.amount
+        )
+    }
+
+    func hiddenCard(_ template: EntryTemplate) -> some View {
+        let isLifted = hiddenLift?.id == template.id
+        let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
+        let scale: CGFloat = isLifted ? 1.03 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let opacity: Double = isLifted ? 1 : 0.5
+        let layer: Double = isLifted ? 1 : 0
+
+        return card(template)
+            .opacity(opacity)
+            .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
+            .offset(offset)
+            .zIndex(layer)
+            .onTapGesture {
+                sheet = .edit(template.id)
+            }
+            .gesture(
+                LiftGesture(in: Self.space) { location in
+                    followHidden(template.id, to: location)
+                } onEnd: {
+                    dropHidden()
+                }
+            )
     }
 
     func movableCard(_ template: EntryTemplate) -> some View {
@@ -112,27 +185,22 @@ private extension TemplateListView {
         let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
-        return TemplateRowCard(
-            icon: model.icon(for: template),
-            name: template.name,
-            detail: model.detail(for: template),
-            amount: template.amount
-        )
-        .frame(width: tileWidth)
-        .scaleEffect(scale)
-        .shadow(color: shadow, radius: 16, y: 8)
-        .position(position)
-        .zIndex(layer)
-        .onTapGesture {
-            sheet = .edit(template.id)
-        }
-        .gesture(
-            LiftGesture(in: Self.space) { location in
-                follow(template, to: location)
-            } onEnd: {
-                drop()
+        return card(template)
+            .frame(width: tileWidth)
+            .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
+            .position(position)
+            .zIndex(layer)
+            .onTapGesture {
+                sheet = .edit(template.id)
             }
-        )
+            .gesture(
+                LiftGesture(in: Self.space) { location in
+                    follow(template, to: location)
+                } onEnd: {
+                    drop()
+                }
+            )
     }
 }
 
@@ -173,7 +241,7 @@ private extension TemplateListView {
         if model.shown.isEmpty {
             "よく使う入力を残しておくと、ホームと入力シートから 1 回で入れられます"
         } else {
-            "長押しで動かせます。この順でホームと入力シートに出ます"
+            "長押しで動かせます。この順でホームと入力シートに出ます。下の枠に置くと非表示になります"
         }
     }
 
@@ -183,7 +251,7 @@ private extension TemplateListView {
     }
 
     var boardHeight: CGFloat {
-        let count = model.shown.count
+        let count = max(model.shown.count, hiddenLift == nil ? 0 : 1)
         let rows = (count + Self.columnCount - 1) / Self.columnCount
         let gaps = Self.spacing * CGFloat(max(rows - 1, 0))
         return Self.tileHeight * CGFloat(rows) + gaps
@@ -249,6 +317,11 @@ private extension TemplateListView {
 
         current.location = location
         lift = current
+        isOverHideZone = hideZone.contains(location)
+
+        guard !isOverHideZone else {
+            return
+        }
 
         let target = index(at: liftedCenter)
 
@@ -258,16 +331,74 @@ private extension TemplateListView {
     }
 
     func drop() {
-        guard lift != nil else {
+        guard let lift else {
+            return
+        }
+
+        if isOverHideZone {
+            let id = lift.id
+
+            withAnimation(.snappy) {
+                self.lift = nil
+                isOverHideZone = false
+            }
+
+            Task {
+                await model.hide(id)
+            }
+
             return
         }
 
         withAnimation(.snappy) {
-            lift = nil
+            self.lift = nil
         }
 
         Task {
             await model.finishMoving()
+        }
+    }
+
+    func followHidden(
+        _ id: EntryTemplate.ID,
+        to location: CGPoint
+    ) {
+        if hiddenLift == nil {
+            withAnimation(.snappy(duration: 0.2)) {
+                hiddenLift = SettingsHiddenLift(
+                    id: id,
+                    start: location,
+                    location: location
+                )
+            }
+
+            liftCount += 1
+        }
+
+        hiddenLift?.location = location
+        isOverShowZone = showZone.contains(location)
+    }
+
+    func dropHidden() {
+        guard let hiddenLift else {
+            return
+        }
+
+        let isShowing = isOverShowZone
+
+        withAnimation(.snappy) {
+            self.hiddenLift = nil
+            isOverShowZone = false
+        }
+
+        guard isShowing else {
+            return
+        }
+
+        showCount += 1
+
+        Task {
+            await model.show(hiddenLift.id)
         }
     }
 

@@ -226,7 +226,7 @@ private extension RecurringEditModel {
             return
         }
 
-        let recurrings = try await database.recurrings()
+        let recurrings = try await database.recurrings(includingHidden: true)
         let recurring = recurrings.first { $0.id == editingId }
 
         guard let recurring else {

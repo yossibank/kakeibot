@@ -50,12 +50,20 @@ public extension RecurringListModel {
         return shown.map { row(for: $0, in: list) }
     }
 
+    var hiddenRows: [Row] {
+        guard let list else {
+            return []
+        }
+
+        return hidden.map { row(for: $0, in: list) }
+    }
+
     var monthTotal: MonthTotal {
         let month = today.yearMonth.period(startingOn: .first)
 
         return MonthTotal(
-            expense: recurrings.total(of: .expense, in: month),
-            income: recurrings.total(of: .income, in: month)
+            expense: visible.total(of: .expense, in: month),
+            income: visible.total(of: .income, in: month)
         )
     }
 
@@ -63,7 +71,7 @@ public extension RecurringListModel {
         _ id: Recurring.ID,
         to index: Int
     ) {
-        var order = movingOrder ?? recurrings.map(\.id)
+        var order = movingOrder ?? visible.map(\.id)
 
         guard let from = order.firstIndex(of: id) else {
             return
@@ -88,13 +96,23 @@ public extension RecurringListModel {
         }
     }
 
+    func hide(_ id: Recurring.ID) async {
+        movingOrder = nil
+        await setHidden(id, isHidden: true, failure: Self.hideFailedMessage)
+    }
+
+    func show(_ id: Recurring.ID) async {
+        await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
+    }
+
     func finishMoving() async {
         guard let movingOrder else {
             return
         }
 
         do {
-            try await database.reorderRecurrings(movingOrder, at: Date())
+            let ids = movingOrder + hidden.map(\.id)
+            try await database.reorderRecurrings(ids, at: Date())
         } catch {
             errorNotice.show(Self.saveFailedMessage)
         }
@@ -123,14 +141,41 @@ private extension RecurringListModel {
     static let loadFailedMessage = "固定費を読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
     static let deleteFailedMessage = "固定費を消せませんでした"
+    static let hideFailedMessage = "非表示にできませんでした"
+    static let showFailedMessage = "表示に戻せませんでした"
+
+    var visible: [Recurring] {
+        recurrings.filter { $0.archivedAt == nil }
+    }
+
+    var hidden: [Recurring] {
+        recurrings.filter { $0.archivedAt != nil }
+    }
 
     var shown: [Recurring] {
         guard let movingOrder else {
-            return recurrings
+            return visible
         }
 
         return movingOrder.compactMap { id in
-            recurrings.first { $0.id == id }
+            visible.first { $0.id == id }
+        }
+    }
+
+    func setHidden(
+        _ id: Recurring.ID,
+        isHidden: Bool,
+        failure: String
+    ) async {
+        do {
+            try await database.setRecurringHidden(
+                id,
+                isHidden: isHidden,
+                today: today,
+                at: Date()
+            )
+        } catch {
+            errorNotice.show(failure)
         }
     }
 
@@ -140,7 +185,7 @@ private extension RecurringListModel {
 
     func observeRecurrings() async {
         await observe(
-            database.recurringUpdates(),
+            database.recurringUpdates(includingHidden: true),
             failure: Self.loadFailedMessage
         ) { recurrings in
             self.recurrings = recurrings

@@ -14,7 +14,7 @@ struct SettingsHiddenTitle: View {
 
             Spacer()
 
-            Text("長押しで表示に戻せます")
+            Text("長押しで上に動かすと表示に戻せます")
                 .font(.caption2)
                 .foregroundStyle(Palette.mist)
         }

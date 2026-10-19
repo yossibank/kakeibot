@@ -41,6 +41,37 @@ public extension AppDatabase {
         }
     }
 
+    func setRecurringHidden(
+        _ id: Recurring.ID,
+        isHidden: Bool,
+        today: LocalDate,
+        at now: Date
+    ) async throws {
+        try await writer.write { db in
+            guard var recurring = try Recurring.fetchOne(db, key: id) else {
+                throw RecurringWriteError.recurringNotFound
+            }
+
+            recurring.archivedAt = isHidden ? now : nil
+            recurring.updatedAt = now
+
+            if !isHidden {
+                let yesterday = today.adding(days: -1)
+                let generated = recurring.generatedUntil ?? yesterday
+                recurring.generatedUntil = max(generated, yesterday)
+            }
+
+            try recurring.update(db)
+
+            try Self.generateEntries(
+                of: recurring,
+                through: today,
+                in: db,
+                at: now
+            )
+        }
+    }
+
     func deleteRecurring(_ id: Recurring.ID) async throws {
         try await writer.write { db in
             try Entry
@@ -93,7 +124,9 @@ private extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws {
-        let dates = recurring.pendingDates(through: today)
+        let dates = recurring.archivedAt == nil
+            ? recurring.pendingDates(through: today)
+            : []
 
         for date in dates {
             let exists = try Entry

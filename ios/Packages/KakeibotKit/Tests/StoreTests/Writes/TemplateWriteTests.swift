@@ -23,6 +23,34 @@ struct TemplateWriteTests {
     }
 
     @Test
+    func hidesAndShowsTemplate() async throws {
+        let setup = try await Setup()
+        let saved = try await setup.database.saveTemplate(
+            setup.draft,
+            at: setup.now
+        )
+
+        try await setup.database.setTemplateHidden(
+            saved.id,
+            isHidden: true,
+            at: setup.now
+        )
+        let shown = try await setup.database.templates()
+        let all = try await setup.database.templates(includingHidden: true)
+
+        try await setup.database.setTemplateHidden(
+            saved.id,
+            isHidden: false,
+            at: setup.now
+        )
+        let restored = try await setup.database.templates()
+
+        #expect(shown.isEmpty)
+        #expect(all.first?.archivedAt == setup.now)
+        #expect(restored.map(\.id) == [saved.id])
+    }
+
+    @Test
     func updatesAndDeletesTemplate() async throws {
         let setup = try await Setup()
         let later = setup.now.addingTimeInterval(60)

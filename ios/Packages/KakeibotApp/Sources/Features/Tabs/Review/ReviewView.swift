@@ -316,10 +316,10 @@ private extension ReviewView {
 
             PageSlide.run($slide, forward: to > from) {
                 model.setScale(scale)
-            }
 
-            Task {
-                await model.saveSelection()
+                Task {
+                    await model.saveSelection()
+                }
             }
         }
     }

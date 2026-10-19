@@ -10,6 +10,7 @@ public struct EntryTemplate: Hashable, Sendable {
     public var walletId: Wallet.ID
     public var memo: String?
     public var sortOrder: Int
+    public var archivedAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
 
@@ -23,6 +24,7 @@ public struct EntryTemplate: Hashable, Sendable {
         walletId: Wallet.ID,
         memo: String? = nil,
         sortOrder: Int,
+        archivedAt: Date? = nil,
         createdAt: Date,
         updatedAt: Date
     ) {
@@ -35,6 +37,7 @@ public struct EntryTemplate: Hashable, Sendable {
         self.walletId = walletId
         self.memo = memo
         self.sortOrder = sortOrder
+        self.archivedAt = archivedAt
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -75,6 +78,7 @@ extension EntryTemplate: Codable {
         try container.encode(walletId, forKey: .walletId)
         try container.encodeOrNull(memo, forKey: .memo)
         try container.encode(sortOrder, forKey: .sortOrder)
+        try container.encodeOrNull(archivedAt, forKey: .archivedAt)
         try container.encode(createdAt, forKey: .createdAt)
         try container.encode(updatedAt, forKey: .updatedAt)
     }

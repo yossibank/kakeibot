@@ -139,4 +139,64 @@ struct RecurringModelTests {
         #expect(model.monthTotal.expense == 78000)
         #expect(model.monthTotal.income == 0)
     }
+
+    @Test
+    func hidesAndShowsRecurring() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let options = try await setup.database.entryOptions()
+        let start = try #require(LocalDate("2026-10-01"))
+
+        let draft = RecurringDraft(
+            type: .expense,
+            amount: 78000,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            memo: "家賃",
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: start
+        )
+
+        let saved = try await setup.database.saveRecurring(
+            draft,
+            today: setup.today,
+            at: Date()
+        )
+
+        let model = RecurringListModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        let task = Task {
+            await model.observe()
+        }
+
+        for _ in 0..<200 where model.rows.isEmpty {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        await model.hide(saved.id)
+
+        for _ in 0..<200 where model.hiddenRows.isEmpty {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        let shownWhileHidden = model.rows.count
+        let totalWhileHidden = model.monthTotal.expense
+
+        await model.show(saved.id)
+
+        for _ in 0..<200 where model.rows.isEmpty {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        task.cancel()
+
+        #expect(shownWhileHidden == 0)
+        #expect(totalWhileHidden == 0)
+        #expect(model.hiddenRows.isEmpty)
+        #expect(model.rows.first?.title == "家賃")
+    }
 }

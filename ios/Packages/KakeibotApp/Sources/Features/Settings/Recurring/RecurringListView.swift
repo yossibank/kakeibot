@@ -10,6 +10,13 @@ public struct RecurringListView: View {
     @State private var liftCount = 0
     @State private var openId: Recurring.ID?
     @State private var deleting: Recurring.ID?
+    @State private var boardOrigin: CGFloat = 0
+    @State private var hideZone: CGRect = .zero
+    @State private var isOverHideZone = false
+    @State private var hiddenLift: SettingsHiddenLift<Recurring.ID>?
+    @State private var showZone: CGRect = .zero
+    @State private var isOverShowZone = false
+    @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -41,11 +48,18 @@ public struct RecurringListView: View {
                             .foregroundStyle(Palette.mist)
                             .padding(.vertical, 40)
                     }
+
+                    if lift != nil {
+                        hideTarget
+                    } else if !model.hiddenRows.isEmpty {
+                        hiddenSection
+                    }
                 }
                 .padding(.vertical, 8)
+                .coordinateSpace(.named(Self.listSpace))
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(lift != nil)
+            .scrollDisabled(lift != nil || hiddenLift != nil)
 
             AddButton("固定費を追加") {
                 sheet = .new
@@ -67,6 +81,7 @@ public struct RecurringListView: View {
         .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
+        .sensoryFeedback(.success, trigger: showCount)
         .confirmation(
             isPresented: deleteBinding,
             systemImage: "trash",
@@ -127,6 +142,7 @@ private extension RecurringListView {
 
     var board: some View {
         let rows = model.rows
+        let count = max(rows.count, hiddenLift == nil ? 0 : 1)
 
         return ZStack(alignment: .top) {
             ForEach(rows) { row in
@@ -134,7 +150,64 @@ private extension RecurringListView {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: boardHeight(count: rows.count), alignment: .top)
+        .frame(height: boardHeight(count: count), alignment: .top)
+        .overlay {
+            if hiddenLift != nil {
+                SettingsShowZone(isTargeted: isOverShowZone)
+            }
+        }
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .named(Self.listSpace))
+        } action: { frame in
+            boardOrigin = frame.minY
+            showZone = frame
+        }
+    }
+
+    var hideTarget: some View {
+        SettingsHideZone(isTargeted: isOverHideZone, height: Self.rowHeight)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .named(Self.listSpace))
+            } action: { frame in
+                hideZone = frame
+            }
+    }
+
+    var hiddenSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            SettingsHiddenTitle("非表示の固定費")
+
+            ForEach(model.hiddenRows) { row in
+                hiddenRow(row)
+            }
+        }
+    }
+
+    func hiddenRow(_ row: RecurringListModel.Row) -> some View {
+        let isLifted = hiddenLift?.id == row.id
+        let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
+        let scale: CGFloat = isLifted ? 1.03 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let opacity: Double = isLifted ? 1 : 0.5
+        let layer: Double = isLifted ? 1 : 0
+
+        return rowCard(row)
+            .frame(height: Self.rowHeight)
+            .opacity(opacity)
+            .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
+            .offset(offset)
+            .zIndex(layer)
+            .onTapGesture {
+                sheet = .edit(row.id)
+            }
+            .gesture(
+                LiftGesture(in: Self.listSpace) { location in
+                    followHidden(row.id, to: location)
+                } onEnd: {
+                    dropHidden()
+                }
+            )
     }
 
     func totalColumn(
@@ -237,10 +310,11 @@ private extension RecurringListView {
     static let rowHeight: CGFloat = 64
     static let spacing: CGFloat = 10
     nonisolated static let space = "RecurringBoard"
+    nonisolated static let listSpace = "RecurringList"
 
     var hint: String {
-        if model.rows.count > 1 {
-            "決まった日に、記録をひとりでに入れます。長押しで動かせます"
+        if !model.rows.isEmpty {
+            "決まった日に、記録をひとりでに入れます。長押しで動かせます。下の枠に置くと止めて非表示にします"
         } else {
             "決まった日に、記録をひとりでに入れます"
         }
@@ -303,6 +377,13 @@ private extension RecurringListView {
         current.location = location.y
         lift = current
 
+        let listLocation = CGPoint(x: location.x, y: location.y + boardOrigin)
+        isOverHideZone = hideZone.contains(listLocation)
+
+        guard !isOverHideZone else {
+            return
+        }
+
         let target = self.index(at: liftedCenterY)
 
         withAnimation(.snappy) {
@@ -311,16 +392,74 @@ private extension RecurringListView {
     }
 
     func drop() {
-        guard lift != nil else {
+        guard let lift else {
+            return
+        }
+
+        if isOverHideZone {
+            let id = lift.id
+
+            withAnimation(.snappy) {
+                self.lift = nil
+                isOverHideZone = false
+            }
+
+            Task {
+                await model.hide(id)
+            }
+
             return
         }
 
         withAnimation(.snappy) {
-            lift = nil
+            self.lift = nil
         }
 
         Task {
             await model.finishMoving()
+        }
+    }
+
+    func followHidden(
+        _ id: Recurring.ID,
+        to location: CGPoint
+    ) {
+        if hiddenLift == nil {
+            withAnimation(.snappy(duration: 0.2)) {
+                hiddenLift = SettingsHiddenLift(
+                    id: id,
+                    start: location,
+                    location: location
+                )
+            }
+
+            liftCount += 1
+        }
+
+        hiddenLift?.location = location
+        isOverShowZone = showZone.contains(location)
+    }
+
+    func dropHidden() {
+        guard let hiddenLift else {
+            return
+        }
+
+        let isShowing = isOverShowZone
+
+        withAnimation(.snappy) {
+            self.hiddenLift = nil
+            isOverShowZone = false
+        }
+
+        guard isShowing else {
+            return
+        }
+
+        showCount += 1
+
+        Task {
+            await model.show(hiddenLift.id)
         }
     }
 
