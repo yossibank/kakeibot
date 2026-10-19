@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Features
 import Notifications
 import Store
@@ -24,6 +25,7 @@ public struct RootView: View {
         }
         .task {
             await model.open()
+            await model.observeTheme()
         }
         .onChange(of: scenePhase) { _, phase in
             model.changeScene(to: phase)
@@ -42,6 +44,7 @@ public struct RootView: View {
             }
         }
         .environment(\.notificationPermission, .live)
+        .environment(\.palette, model.theme.palette)
         .warmsUpInput()
     }
 }

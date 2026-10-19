@@ -90,7 +90,7 @@ KakeibotKit/
 │   │   ├── Recurring/       固定費の日付、入力の判定、記録漏れの後追い
 │   │   ├── Review/          振り返りの週・月・年の範囲、合計と内訳
 │   │   ├── Reward/          決まり・記録・目標、貯金箱の残高
-│   │   ├── Setting/         設定の行と選べる値、テーマの型、描く色の組と読みやすさの判定
+│   │   ├── Setting/         設定の行と選べる値、テーマの型、描く色の組と読みやすさの判定、用意したテーマ
 │   │   └── Wallet/          財布の型と、その入力の判定、残高
 │   └── Store/
 │       ├── Database/        App Group、DatabasePool、止められる前の対策、最初の財布とカテゴリ。止める通知は AppFeature が送る
@@ -147,6 +147,7 @@ KakeibotApp/
 │   │   │   ├── Reminder/    記録忘れの通知の設定と、通知の許可を確かめる関数
 │   │   │   ├── Stamps/      スタンプの一覧と編集
 │   │   │   ├── Templates/
+│   │   │   ├── Themes/      テーマを選ぶ画面と見本
 │   │   │   └── Wallets/
 │   │   └── Tabs/
 │   │       ├── Assets/

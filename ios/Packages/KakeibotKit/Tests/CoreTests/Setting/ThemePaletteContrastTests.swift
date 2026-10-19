@@ -20,9 +20,9 @@ struct ThemePaletteContrastTests {
         #expect(theme.unreadableRoles == fixture.unreadable)
     }
 
-    @Test
-    func keepsNightReadable() {
-        #expect(ThemePalette.night.unreadableRoles.isEmpty)
+    @Test(arguments: ThemePreset.allCases)
+    func keepsPresetsReadable(preset: ThemePreset) {
+        #expect(preset.palette.unreadableRoles.isEmpty)
     }
 }
 

@@ -9,6 +9,7 @@ public struct SettingsSheet: View {
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
     @State private var closedHints: Set<SettingsScreen> = []
+    @State private var theme: ThemePreset = .navy
     @State private var appIcon = AppIconListModel()
 
     #if DEBUG
@@ -186,14 +187,28 @@ public struct SettingsSheet: View {
                         VStack(alignment: .leading, spacing: 6) {
                             sectionTitle("見た目")
 
-                            NavigationLink {
-                                AppIconListView(model: appIcon)
-                            } label: {
-                                row(
-                                    "アプリアイコン",
-                                    systemImage: "app.badge",
-                                    value: appIcon.current.title
-                                )
+                            VStack(spacing: 0) {
+                                NavigationLink {
+                                    ThemeListView(database: database)
+                                } label: {
+                                    row(
+                                        "テーマ",
+                                        systemImage: "paintpalette",
+                                        value: theme.title
+                                    )
+                                }
+
+                                Hairline()
+
+                                NavigationLink {
+                                    AppIconListView(model: appIcon)
+                                } label: {
+                                    row(
+                                        "アプリアイコン",
+                                        systemImage: "app.badge",
+                                        value: appIcon.current.title
+                                    )
+                                }
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14)
@@ -267,6 +282,9 @@ public struct SettingsSheet: View {
         }
         .task {
             await observeClosedHints()
+        }
+        .task {
+            await observeTheme()
         }
         .task {
             launchScreen = await (try? database.setting(.launchScreen)) ?? .home
@@ -410,6 +428,16 @@ private extension SettingsSheet {
             }
         } catch {
             reminderTime = nil
+        }
+    }
+
+    func observeTheme() async {
+        do {
+            for try await theme in database.settingUpdates(.theme) {
+                self.theme = theme
+            }
+        } catch {
+            theme = .navy
         }
     }
 
