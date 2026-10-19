@@ -9,6 +9,7 @@ public struct SettingsSheet: View {
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
     @State private var closedHints: Set<SettingsScreen> = []
+    @State private var appIcon = AppIconListModel()
 
     #if DEBUG
     @State private var isConfirmingSample = false
@@ -175,6 +176,23 @@ public struct SettingsSheet: View {
                                     "記録忘れの通知",
                                     systemImage: "bell",
                                     value: reminderTime?.description ?? "オフ"
+                                )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 14)
+                            .card()
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            sectionTitle("見た目")
+
+                            NavigationLink {
+                                AppIconListView(model: appIcon)
+                            } label: {
+                                row(
+                                    "アプリアイコン",
+                                    systemImage: "app.badge",
+                                    value: appIcon.current.title
                                 )
                             }
                             .buttonStyle(.plain)

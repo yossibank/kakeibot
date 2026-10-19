@@ -56,7 +56,7 @@ ios/
 | ターゲット | `Kakeibot` | `KakeibotWidgetExtension` |
 | Bundle ID | `com.yossibank.kakeibot` | `com.yossibank.kakeibot.widget` |
 | App Group | `group.com.yossibank.kakeibot` | 同じ |
-| アプリアイコン | Icon Composer の `AppIcon.icon`。設定で選べる色違いは `AppIcon-Black`・`AppIcon-Forest`・`AppIcon-Silver`・`AppIcon-Ivory`・`AppIcon-White`・`AppIcon-Gold` | |
+| アプリアイコン | Icon Composer の `AppIcon.icon`。設定で選べる色違いは `AppIcon-Black`・`AppIcon-Forest`・`AppIcon-Silver`・`AppIcon-Ivory`・`AppIcon-White`・`AppIcon-Gold`。設定の見本を描くため、同じ絵を `Assets.xcassets` の `AppIconYen`・`AppIconDial` に写して持つ | |
 
 ### 署名
 
@@ -136,6 +136,7 @@ KakeibotApp/
 │   │   ├── Onboarding/      最初の設定のチュートリアル
 │   │   ├── Period/          期間の範囲と月の始まりの書き方、いまの期間のカード、日を選ぶマス
 │   │   ├── Settings/
+│   │   │   ├── AppIcons/    アプリアイコンの色違いを選ぶ画面と見本
 │   │   │   ├── Budgets/     予算の一覧と額の入力
 │   │   │   ├── Categories/
 │   │   │   ├── Icons/
