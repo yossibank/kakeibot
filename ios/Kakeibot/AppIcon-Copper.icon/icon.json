@@ -1,0 +1,79 @@
+{
+  "fill-specializations": [
+    {
+      "value": {
+        "linear-gradient": [
+          "srgb:0.11373,0.11373,0.12549,1.00000",
+          "srgb:0.01961,0.01961,0.02353,1.00000"
+        ]
+      }
+    }
+  ],
+  "groups": [
+    {
+      "name": "Yen",
+      "layers": [
+        {
+          "name": "Yen",
+          "image-name": "yen.svg",
+          "fill-specializations": [
+            {
+              "value": {
+                "linear-gradient": [
+                  "srgb:0.96471,0.81176,0.68235,1.00000",
+                  "srgb:0.61176,0.35686,0.21176,1.00000"
+                ]
+              }
+            }
+          ],
+          "glass": false
+        }
+      ],
+      "lighting": "individual",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.45
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      }
+    },
+    {
+      "name": "Dial",
+      "layers": [
+        {
+          "name": "Dial",
+          "image-name": "dial.svg",
+          "fill-specializations": [
+            {
+              "value": {
+                "linear-gradient": [
+                  "srgb:0.96471,0.81176,0.68235,1.00000",
+                  "srgb:0.61176,0.35686,0.21176,1.00000"
+                ]
+              }
+            }
+          ],
+          "glass": false
+        }
+      ],
+      "lighting": "individual",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.45
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      }
+    }
+  ],
+  "supported-platforms": {
+    "squares": [
+      "iOS"
+    ]
+  }
+}
