@@ -17,6 +17,7 @@ public final class ReviewModel: ScreenModel {
     public private(set) var weekStart: Weekday = .sunday
     public private(set) var list: EntryList?
     public private(set) var budgets: [Budget] = []
+    public private(set) var stampCalendar: StampCalendar?
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -197,6 +198,10 @@ public extension ReviewModel {
             }
     }
 
+    var stampTallies: [StampCalendar.Tally] {
+        stampCalendar?.tallies(in: period.range) ?? []
+    }
+
     func run() async {
         await loadSelection()
 
@@ -207,6 +212,10 @@ public extension ReviewModel {
 
             group.addTask {
                 await self.observeBudgets()
+            }
+
+            group.addTask {
+                await self.observeStamps()
             }
 
             group.addTask {
@@ -351,6 +360,15 @@ private extension ReviewModel {
             failure: Self.loadFailedMessage
         ) { list in
             self.list = list
+        }
+    }
+
+    func observeStamps() async {
+        await observe(
+            database.stampCalendarUpdates(),
+            failure: Self.loadFailedMessage
+        ) { calendar in
+            stampCalendar = calendar
         }
     }
 

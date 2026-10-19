@@ -139,7 +139,33 @@ private extension ReviewView {
                     }
                 )
             }
+
+            if !model.stampTallies.isEmpty {
+                stampCard
+            }
         }
+    }
+
+    var stampCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionTitle("押したスタンプ")
+
+            LazyVGrid(columns: Self.stampColumns, alignment: .leading) {
+                ForEach(model.stampTallies) { tally in
+                    HStack(spacing: 6) {
+                        IconSeal(tally.icon, size: 28)
+
+                        Text("×\(tally.count)")
+                            .font(.serif(.body))
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.champagne)
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
     }
 
     var detailCard: some View {
@@ -300,6 +326,10 @@ private extension ReviewView {
 }
 
 private extension ReviewView {
+    static let stampColumns = [
+        GridItem(.adaptive(minimum: 72), spacing: 12, alignment: .leading)
+    ]
+
     static let scaleOptions: [CapsulePicker<ReviewPeriod.Scale>.Option] = [
         .init("週", value: .week),
         .init("月", value: .month),

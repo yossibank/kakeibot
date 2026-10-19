@@ -57,6 +57,33 @@ struct CalendarStampWriteTests {
 
         #expect(calendar.icon(on: setup.day)?.glyph == .star)
     }
+
+    @Test
+    func talliesStampsInRange() async throws {
+        let setup = try await Setup()
+        let star = try #require(setup.shelf.first)
+        let party = try #require(setup.shelf.dropFirst().first)
+        let cake = try #require(setup.shelf.dropFirst(3).first)
+        let start = setup.day
+        let end = start.adding(days: 6)
+        let stamps = [
+            (star, start),
+            (party, start.adding(days: 1)),
+            (star, start.adding(days: 2)),
+            (cake, start.adding(days: 3)),
+            (star, end.adding(days: 1))
+        ]
+
+        for (icon, date) in stamps {
+            try await setup.database.stamp(icon, on: date, at: setup.now)
+        }
+
+        let calendar = try await setup.database.stampCalendar()
+        let tallies = calendar.tallies(in: start...end)
+
+        #expect(tallies.map(\.icon.glyph) == [.star, .cake, .party])
+        #expect(tallies.map(\.count) == [2, 1, 1])
+    }
 }
 
 extension CalendarStampWriteTests {
