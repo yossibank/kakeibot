@@ -8,6 +8,7 @@ public struct RecordsView: View {
     @State private var openId: Entry.ID?
     @State private var isMovingForward = true
     @State private var slide = PageSlide()
+    @State private var isPickingStamp = false
 
     private let onOpenEntry: (Entry.ID) -> Void
     private let onDelete: (Entry.ID) -> Void
@@ -48,6 +49,9 @@ public struct RecordsView: View {
         .sensoryFeedback(.selection, trigger: model.selectedDate)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
+        }
+        .sheet(isPresented: $isPickingStamp) {
+            stampSheet
         }
         .background {
             Rectangle()
@@ -150,7 +154,9 @@ private extension RecordsView {
         let day = model.day(on: date)
 
         return VStack(spacing: 0) {
-            dayHeader(date, day: day)
+            dayHeader(date, day: day) {
+                isPickingStamp = true
+            }
 
             if let day {
                 ForEach(model.rows(for: day)) { row in
@@ -251,6 +257,12 @@ private extension RecordsView {
                         .frame(width: 30, height: 30)
                         .background(fill, in: Circle())
                         .overlay(Circle().stroke(ring, lineWidth: 1))
+                        .overlay(alignment: .topTrailing) {
+                            if let stamp = model.stampIcon(on: date) {
+                                IconBadge(stamp, size: 16)
+                                    .offset(x: 8, y: -6)
+                            }
+                        }
 
                     dayMark(date)
                         .frame(height: 24, alignment: .top)
@@ -357,9 +369,28 @@ private extension RecordsView {
         }
     }
 
+    var stampSheet: some View {
+        let date = model.shownDate
+
+        return RecordsStampSheet(
+            date: date,
+            choices: model.stampChoices,
+            current: model.stampIcon(on: date)
+        ) { icon in
+            Task {
+                await model.stamp(icon, on: date)
+            }
+        } onRemove: {
+            Task {
+                await model.removeStamp(on: date)
+            }
+        }
+    }
+
     func dayHeader(
         _ date: LocalDate,
-        day: EntryDay?
+        day: EntryDay?,
+        onStamp: (() -> Void)? = nil
     ) -> some View {
         let holiday = Holiday.name(of: date)
 
@@ -383,9 +414,35 @@ private extension RecordsView {
             if let day {
                 dayTotals(day)
             }
+
+            if let onStamp {
+                Button(action: onStamp) {
+                    stampButtonLabel(on: date)
+                }
+                .buttonStyle(.plain)
+                .alignmentGuide(.firstTextBaseline) { dimensions in
+                    dimensions[VerticalAlignment.center]
+                }
+            }
         }
         .padding(.top, 12)
         .padding(.bottom, 8)
+    }
+
+    @ViewBuilder
+    func stampButtonLabel(on date: LocalDate) -> some View {
+        if let stamp = model.stampIcon(on: date) {
+            IconBadge(stamp, size: 30)
+        } else {
+            Image(systemName: "seal")
+                .font(.footnote)
+                .foregroundStyle(Palette.mist)
+                .frame(width: 30, height: 30)
+                .overlay {
+                    Circle()
+                        .stroke(Palette.mist.opacity(.muted), style: .dashed)
+                }
+        }
     }
 
     func dayTotals(_ day: EntryDay) -> some View {

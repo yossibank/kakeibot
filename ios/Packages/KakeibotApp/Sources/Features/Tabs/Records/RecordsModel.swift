@@ -16,6 +16,8 @@ public final class RecordsModel: ScreenModel {
     public private(set) var layout: RecordsLayout = .list
     public private(set) var list: EntryList?
     public private(set) var noSpendDays: Set<LocalDate> = []
+    public private(set) var stampCalendar: StampCalendar?
+    public private(set) var stampShelf: IconShelf?
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -68,6 +70,39 @@ public extension RecordsModel {
         days.first { $0.date == date }
     }
 
+    var stampChoices: [Icon] {
+        guard let stampShelf else {
+            return []
+        }
+
+        return stampShelf.shelfIcons
+            .filter { $0.archivedAt == nil }
+            .compactMap { stampShelf.icons[$0.iconId] }
+    }
+
+    func stampIcon(on date: LocalDate) -> Icon? {
+        stampCalendar?.icon(on: date)
+    }
+
+    func stamp(
+        _ icon: Icon,
+        on date: LocalDate
+    ) async {
+        do {
+            try await database.stamp(icon.id, on: date, at: Date())
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+        }
+    }
+
+    func removeStamp(on date: LocalDate) async {
+        do {
+            try await database.removeStamp(on: date)
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+        }
+    }
+
     func canMarkNoSpend(on date: LocalDate) -> Bool {
         date <= today && (day(on: date)?.expenseTotal ?? 0) == 0
     }
@@ -90,6 +125,14 @@ public extension RecordsModel {
 
             group.addTask {
                 await self.observeNoSpendDays()
+            }
+
+            group.addTask {
+                await self.observeStamps()
+            }
+
+            group.addTask {
+                await self.observeStampShelf()
             }
 
             group.addTask {
@@ -167,6 +210,24 @@ private extension RecordsModel {
             failure: Self.loadFailedMessage
         ) { days in
             noSpendDays = days
+        }
+    }
+
+    func observeStamps() async {
+        await observe(
+            database.stampCalendarUpdates(),
+            failure: Self.loadFailedMessage
+        ) { calendar in
+            stampCalendar = calendar
+        }
+    }
+
+    func observeStampShelf() async {
+        await observe(
+            database.iconShelfUpdates(),
+            failure: Self.loadFailedMessage
+        ) { shelf in
+            stampShelf = shelf
         }
     }
 
