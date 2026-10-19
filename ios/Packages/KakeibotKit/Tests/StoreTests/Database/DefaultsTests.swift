@@ -63,4 +63,36 @@ struct DefaultsTests {
         #expect(options.wallets.count == 1)
         #expect(options.expenseCategories.count == 1)
     }
+
+    @Test
+    func insertsShelfOnce() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+
+        try database.insertShelfIfEmpty(at: now)
+        try database.insertShelfIfEmpty(at: now)
+        let shelf = try await database.iconShelf()
+        let glyphs = shelf.shelfIcons.map { shelf.icons[$0.iconId]?.glyph }
+
+        #expect(shelf.shelfIcons.map(\.sortOrder) == Array(0..<8))
+        #expect(glyphs.first == .star)
+        #expect(glyphs.allSatisfy { $0 != nil })
+    }
+
+    @Test
+    func skipsShelfWhenAllAreRemoved() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertShelfIfEmpty(at: now)
+        let inserted = try await database.iconShelf()
+
+        for shelfIcon in inserted.shelfIcons {
+            try await database.removeShelfIcon(shelfIcon.id, at: now)
+        }
+
+        try database.insertShelfIfEmpty(at: now)
+        let shelf = try await database.iconShelf()
+
+        #expect(shelf.shelfIcons.isEmpty)
+    }
 }

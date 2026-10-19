@@ -30,7 +30,9 @@ public extension AppDatabase {
         let path = url.path(percentEncoded: false)
         let pool = try DatabasePool(path: path, configuration: configuration)
         let database = try AppDatabase(pool)
-        try database.insertDefaultsIfEmpty(at: Date())
+        let now = Date()
+        try database.insertDefaultsIfEmpty(at: now)
+        try database.insertShelfIfEmpty(at: now)
         return database
     }
 
@@ -65,6 +67,7 @@ extension AppDatabase {
         migrator.registerMigration("v6", migrate: MigrationV6.migrate)
         migrator.registerMigration("v7", migrate: MigrationV7.migrate)
         migrator.registerMigration("v8", migrate: MigrationV8.migrate)
+        migrator.registerMigration("v9", migrate: MigrationV9.migrate)
         return migrator
     }
 }

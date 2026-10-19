@@ -5,6 +5,7 @@ extension ExportV1.Tables {
     init(fetchingFrom db: Database) throws {
         try self.init(
             icons: Icon.orderByPrimaryKey().fetchAll(db),
+            shelfIcons: ShelfIcon.orderByPrimaryKey().fetchAll(db),
             wallets: Wallet.orderByPrimaryKey().fetchAll(db),
             categories: EntryCategory.orderByPrimaryKey().fetchAll(db),
             tags: EntryTag.orderByPrimaryKey().fetchAll(db),
@@ -38,6 +39,7 @@ extension ExportV1.Tables {
 private extension ExportV1.Tables {
     static let recordTypes: [any StoreRecord.Type] = [
         Icon.self,
+        ShelfIcon.self,
         Wallet.self,
         EntryCategory.self,
         EntryTag.self,
@@ -57,6 +59,7 @@ private extension ExportV1.Tables {
     var records: [any StoreRecord] {
         let tables: [[any StoreRecord]] = [
             icons,
+            shelfIcons,
             wallets,
             categories,
             tags,

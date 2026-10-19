@@ -42,6 +42,7 @@ public extension ExportV1 {
 
     struct Tables: Codable, Hashable, Sendable {
         public var icons: [Icon]
+        public var shelfIcons: [ShelfIcon]
         public var wallets: [Wallet]
         public var categories: [EntryCategory]
         public var tags: [EntryTag]
@@ -59,6 +60,7 @@ public extension ExportV1 {
 
         public init(
             icons: [Icon],
+            shelfIcons: [ShelfIcon] = [],
             wallets: [Wallet],
             categories: [EntryCategory],
             tags: [EntryTag] = [],
@@ -75,6 +77,7 @@ public extension ExportV1 {
             settings: [Setting]
         ) {
             self.icons = icons
+            self.shelfIcons = shelfIcons
             self.wallets = wallets
             self.categories = categories
             self.tags = tags
@@ -129,6 +132,10 @@ public extension ExportV1.Tables {
 
         try self.init(
             icons: container.decode([Icon].self, forKey: .icons),
+            shelfIcons: container.decodeIfPresent(
+                [ShelfIcon].self,
+                forKey: .shelfIcons
+            ) ?? [],
             wallets: container.decode([Wallet].self, forKey: .wallets),
             categories: container.decode(
                 [EntryCategory].self,
