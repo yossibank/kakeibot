@@ -13,6 +13,7 @@ public struct RecurringListView: View {
     @State private var boardOrigin: CGPoint = .zero
     @State private var listOrigin: CGPoint = .zero
     @State private var zones = SettingsDropZones()
+    @State private var autoScroll = SettingsAutoScroll()
     @State private var isOverHideZone = false
     @State private var hiddenLift: SettingsHiddenLift<Recurring.ID>?
     @State private var isOverShowZone = false
@@ -60,6 +61,7 @@ public struct RecurringListView: View {
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
                 hiding: lift == nil ? nil : isOverHideZone,
@@ -378,6 +380,14 @@ private extension RecurringListView {
 
         isOverHideZone = zones.isOverHide(location, from: boardOrigin)
 
+        autoScroll.follow(
+            y: location.y + boardOrigin.y,
+            bottom: zones.hide.isEmpty ? nil : zones.hide.minY
+        ) { delta in
+            let shifted = CGPoint(x: location.x, y: location.y + delta)
+            follow(row, at: index, to: shifted)
+        }
+
         guard !isOverHideZone else {
             return
         }
@@ -390,6 +400,8 @@ private extension RecurringListView {
     }
 
     func drop() {
+        autoScroll.stop()
+
         guard let lift else {
             return
         }

@@ -10,6 +10,7 @@ public struct CategoryListView: View {
     @State private var liftCount = 0
     @State private var boardWidth: CGFloat = 0
     @State private var zones = SettingsDropZones()
+    @State private var autoScroll = SettingsAutoScroll()
     @State private var contentOrigin: CGPoint = .zero
     @State private var isOverHideZone = false
     @State private var hiddenLift: SettingsHiddenLift<EntryCategory.ID>?
@@ -53,6 +54,7 @@ public struct CategoryListView: View {
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
                 hiding: lift == nil ? nil : isOverHideZone,
@@ -373,6 +375,14 @@ private extension CategoryListView {
         lift = current
         isOverHideZone = zones.isOverHide(location, from: contentOrigin)
 
+        autoScroll.follow(
+            y: location.y + contentOrigin.y,
+            bottom: zones.hide.isEmpty ? nil : zones.hide.minY
+        ) { delta in
+            let shifted = CGPoint(x: location.x, y: location.y + delta)
+            follow(category, to: shifted)
+        }
+
         guard !isOverHideZone else {
             return
         }
@@ -385,6 +395,8 @@ private extension CategoryListView {
     }
 
     func drop() {
+        autoScroll.stop()
+
         guard let lift else {
             return
         }

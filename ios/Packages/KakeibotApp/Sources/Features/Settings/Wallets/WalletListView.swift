@@ -10,6 +10,7 @@ public struct WalletListView: View {
     @State private var liftCount = 0
     @State private var openId: Wallet.ID?
     @State private var zones = SettingsDropZones()
+    @State private var autoScroll = SettingsAutoScroll()
     @State private var contentOrigin: CGPoint = .zero
     @State private var isOverHideZone = false
     @State private var hiding: Wallet?
@@ -54,6 +55,7 @@ public struct WalletListView: View {
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
                 hiding: lift == nil ? nil : isOverHideZone,
@@ -317,6 +319,14 @@ private extension WalletListView {
         lift = current
         isOverHideZone = zones.isOverHide(location, from: contentOrigin)
 
+        autoScroll.follow(
+            y: location.y + contentOrigin.y,
+            bottom: zones.hide.isEmpty ? nil : zones.hide.minY
+        ) { delta in
+            let shifted = CGPoint(x: location.x, y: location.y + delta)
+            follow(wallet, to: shifted)
+        }
+
         guard !isOverHideZone else {
             return
         }
@@ -329,6 +339,8 @@ private extension WalletListView {
     }
 
     func drop() {
+        autoScroll.stop()
+
         guard let lift else {
             return
         }
