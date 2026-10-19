@@ -9,10 +9,10 @@ public struct StampListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var boardWidth: CGFloat = 0
-    @State private var hideZone: CGRect = .zero
+    @State private var zones = SettingsDropZones()
+    @State private var contentOrigin: CGPoint = .zero
     @State private var isOverHideZone = false
     @State private var hiddenLift: SettingsHiddenLift<ShelfIcon.ID>?
-    @State private var showZone: CGRect = .zero
     @State private var isOverShowZone = false
     @State private var showCount = 0
 
@@ -29,23 +29,34 @@ public struct StampListView: View {
         VStack(spacing: 14) {
             header
 
-            SettingsHint("カレンダーに押すスタンプです", SettingsHint.moveAndHide)
+            SettingsHint(
+                model: SettingsHintModel(database: database, hint: .stamps),
+                lines: ["カレンダーに押すスタンプです", SettingsHint.moveAndHide]
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     board
 
-                    if lift != nil {
-                        hideTarget
-                    } else if !model.hidden.isEmpty {
+                    if !model.hidden.isEmpty {
                         hiddenSection
                     }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
+                .onGeometryChange(for: CGPoint.self) { proxy in
+                    proxy.frame(in: .global).origin
+                } action: { origin in
+                    contentOrigin = origin
+                }
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsDropZones(
+                $zones,
+                hiding: lift == nil ? nil : isOverHideZone,
+                showing: hiddenLift == nil ? nil : isOverShowZone
+            )
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -105,16 +116,10 @@ private extension StampListView {
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
-        .overlay {
-            if hiddenLift != nil {
-                SettingsShowZone(isTargeted: isOverShowZone)
-            }
-        }
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .named(Self.space))
-        } action: { frame in
-            boardWidth = frame.width
-            showZone = frame
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            boardWidth = width
         }
     }
 
@@ -134,15 +139,6 @@ private extension StampListView {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-    }
-
-    var hideTarget: some View {
-        SettingsHideZone(isTargeted: isOverHideZone, height: Self.tileHeight)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .named(Self.space))
-            } action: { frame in
-                hideZone = frame
-            }
     }
 
     var hiddenSection: some View {
@@ -353,7 +349,7 @@ private extension StampListView {
 
         current.location = location
         lift = current
-        isOverHideZone = hideZone.contains(location)
+        isOverHideZone = zones.isOverHide(location, from: contentOrigin)
 
         guard !isOverHideZone else {
             return
@@ -412,7 +408,7 @@ private extension StampListView {
         }
 
         hiddenLift?.location = location
-        isOverShowZone = showZone.contains(location)
+        isOverShowZone = zones.isOverShow(location, from: contentOrigin)
     }
 
     func dropHidden() {

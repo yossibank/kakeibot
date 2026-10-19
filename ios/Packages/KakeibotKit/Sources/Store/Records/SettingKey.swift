@@ -65,6 +65,26 @@ public extension SettingKey where Value == ReviewKind {
     }
 }
 
+public extension SettingKey where Value == Set<ScreenHint> {
+    static var closedHints: Self {
+        Self(
+            .closedHints,
+            default: [],
+            decode: { text in
+                let hints = text.split(separator: ",").compactMap { name in
+                    ScreenHint(rawValue: String(name))
+                }
+
+                return Set(hints)
+            },
+            encode: { hints in
+                let names = hints.map(\.rawValue).sorted()
+                return names.isEmpty ? nil : names.joined(separator: ",")
+            }
+        )
+    }
+}
+
 public extension SettingKey where Value == Bool {
     static var categoryMenuOpened: Self {
         Self(flag: .categoryMenuOpened)

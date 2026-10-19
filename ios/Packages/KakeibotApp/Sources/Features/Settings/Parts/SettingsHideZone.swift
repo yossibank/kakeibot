@@ -16,7 +16,13 @@ struct SettingsHideZone: View {
         .font(.subheadline)
         .foregroundStyle(color)
         .frame(maxWidth: .infinity, minHeight: height)
-        .background(fill, in: Self.shape)
+        .background {
+            Self.shape
+                .fill(Palette.nightBottom.opacity(.strong))
+
+            Self.shape
+                .fill(fill)
+        }
         .overlay {
             Self.shape
                 .stroke(color.opacity(0.6), style: .dashed)

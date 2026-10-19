@@ -126,6 +126,10 @@ public extension BudgetListModel {
         categoryList?.icons[category.iconId]
     }
 
+    func hintModel() -> SettingsHintModel {
+        SettingsHintModel(database: database, hint: .budgets)
+    }
+
     func load() async {
         do {
             monthStartDay = try await database.setting(.monthStartDay)

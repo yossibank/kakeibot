@@ -120,6 +120,10 @@ public extension RecurringListModel {
         self.movingOrder = nil
     }
 
+    func hintModel() -> SettingsHintModel {
+        SettingsHintModel(database: database, hint: .recurrings)
+    }
+
     func editModel(for id: Recurring.ID?) -> RecurringEditModel {
         RecurringEditModel(database: database, today: today, editing: id)
     }

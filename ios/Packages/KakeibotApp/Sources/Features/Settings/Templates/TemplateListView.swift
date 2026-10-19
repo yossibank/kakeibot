@@ -9,10 +9,10 @@ public struct TemplateListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var boardWidth: CGFloat = 0
-    @State private var hideZone: CGRect = .zero
+    @State private var zones = SettingsDropZones()
+    @State private var contentOrigin: CGPoint = .zero
     @State private var isOverHideZone = false
     @State private var hiddenLift: SettingsHiddenLift<EntryTemplate.ID>?
-    @State private var showZone: CGRect = .zero
     @State private var isOverShowZone = false
     @State private var showCount = 0
 
@@ -30,23 +30,34 @@ public struct TemplateListView: View {
             header
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
 
-            SettingsHint(lines: hint)
+            SettingsHint(
+                model: SettingsHintModel(database: database, hint: .templates),
+                lines: hint
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     board
 
-                    if lift != nil {
-                        hideTarget
-                    } else if !model.hidden.isEmpty {
+                    if !model.hidden.isEmpty {
                         hiddenSection
                     }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
+                .onGeometryChange(for: CGPoint.self) { proxy in
+                    proxy.frame(in: .global).origin
+                } action: { origin in
+                    contentOrigin = origin
+                }
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsDropZones(
+                $zones,
+                hiding: lift == nil ? nil : isOverHideZone,
+                showing: hiddenLift == nil ? nil : isOverShowZone
+            )
 
             AddButton(addTitle) {
                 sheet = .new(model.type)
@@ -107,26 +118,11 @@ private extension TemplateListView {
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
-        .overlay {
-            if hiddenLift != nil {
-                SettingsShowZone(isTargeted: isOverShowZone)
-            }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            boardWidth = width
         }
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .named(Self.space))
-        } action: { frame in
-            boardWidth = frame.width
-            showZone = frame
-        }
-    }
-
-    var hideTarget: some View {
-        SettingsHideZone(isTargeted: isOverHideZone, height: Self.tileHeight)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .named(Self.space))
-            } action: { frame in
-                hideZone = frame
-            }
     }
 
     var hiddenSection: some View {
@@ -248,7 +244,7 @@ private extension TemplateListView {
     }
 
     var boardHeight: CGFloat {
-        let count = max(model.shown.count, hiddenLift == nil ? 0 : 1)
+        let count = model.shown.count
         let rows = (count + Self.columnCount - 1) / Self.columnCount
         let gaps = Self.spacing * CGFloat(max(rows - 1, 0))
         return Self.tileHeight * CGFloat(rows) + gaps
@@ -314,7 +310,7 @@ private extension TemplateListView {
 
         current.location = location
         lift = current
-        isOverHideZone = hideZone.contains(location)
+        isOverHideZone = zones.isOverHide(location, from: contentOrigin)
 
         guard !isOverHideZone else {
             return
@@ -373,7 +369,7 @@ private extension TemplateListView {
         }
 
         hiddenLift?.location = location
-        isOverShowZone = showZone.contains(location)
+        isOverShowZone = zones.isOverShow(location, from: contentOrigin)
     }
 
     func dropHidden() {

@@ -9,12 +9,12 @@ public struct WalletListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var openId: Wallet.ID?
-    @State private var hideZone: CGRect = .zero
+    @State private var zones = SettingsDropZones()
+    @State private var contentOrigin: CGPoint = .zero
     @State private var isOverHideZone = false
     @State private var hiding: Wallet?
     @State private var isConfirmingHide = false
     @State private var hiddenLift: SettingsHiddenLift<Wallet.ID>?
-    @State private var showZone: CGRect = .zero
     @State private var isOverShowZone = false
     @State private var showCount = 0
 
@@ -32,25 +32,33 @@ public struct WalletListView: View {
             header
 
             SettingsHint(
-                SettingsHint.moveAndHide,
-                "行を横に払っても非表示にできます"
+                model: SettingsHintModel(database: database, hint: .wallets),
+                lines: [SettingsHint.moveAndHide, "行を横に払っても非表示にできます"]
             )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     board
 
-                    if lift != nil {
-                        hideTarget
-                    } else if !model.hidden.isEmpty {
+                    if !model.hidden.isEmpty {
                         hiddenSection
                     }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
+                .onGeometryChange(for: CGPoint.self) { proxy in
+                    proxy.frame(in: .global).origin
+                } action: { origin in
+                    contentOrigin = origin
+                }
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsDropZones(
+                $zones,
+                hiding: lift == nil ? nil : isOverHideZone,
+                showing: hiddenLift == nil ? nil : isOverShowZone
+            )
 
             AddButton("口座を追加") {
                 sheet = .new
@@ -121,25 +129,6 @@ private extension WalletListView {
         }
         .frame(maxWidth: .infinity)
         .frame(height: boardHeight, alignment: .top)
-        .overlay {
-            if hiddenLift != nil {
-                SettingsShowZone(isTargeted: isOverShowZone)
-            }
-        }
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .named(Self.space))
-        } action: { frame in
-            showZone = frame
-        }
-    }
-
-    var hideTarget: some View {
-        SettingsHideZone(isTargeted: isOverHideZone, height: Self.rowHeight)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .named(Self.space))
-            } action: { frame in
-                hideZone = frame
-            }
     }
 
     var hiddenSection: some View {
@@ -326,7 +315,7 @@ private extension WalletListView {
 
         current.y = location.y
         lift = current
-        isOverHideZone = hideZone.contains(location)
+        isOverHideZone = zones.isOverHide(location, from: contentOrigin)
 
         guard !isOverHideZone else {
             return
@@ -398,7 +387,7 @@ private extension WalletListView {
         }
 
         hiddenLift?.location = location
-        isOverShowZone = showZone.contains(location)
+        isOverShowZone = zones.isOverShow(location, from: contentOrigin)
     }
 
     func dropHidden() {

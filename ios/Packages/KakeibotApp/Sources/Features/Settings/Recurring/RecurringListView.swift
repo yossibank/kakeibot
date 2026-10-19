@@ -10,11 +10,11 @@ public struct RecurringListView: View {
     @State private var liftCount = 0
     @State private var openId: Recurring.ID?
     @State private var deleting: Recurring.ID?
-    @State private var boardOrigin: CGFloat = 0
-    @State private var hideZone: CGRect = .zero
+    @State private var boardOrigin: CGPoint = .zero
+    @State private var listOrigin: CGPoint = .zero
+    @State private var zones = SettingsDropZones()
     @State private var isOverHideZone = false
     @State private var hiddenLift: SettingsHiddenLift<Recurring.ID>?
-    @State private var showZone: CGRect = .zero
     @State private var isOverShowZone = false
     @State private var showCount = 0
 
@@ -28,7 +28,7 @@ public struct RecurringListView: View {
         VStack(spacing: 14) {
             header
 
-            SettingsHint(lines: hint)
+            SettingsHint(model: model.hintModel(), lines: hint)
 
             ScrollView {
                 VStack(spacing: 14) {
@@ -46,17 +46,25 @@ public struct RecurringListView: View {
                             .padding(.vertical, 40)
                     }
 
-                    if lift != nil {
-                        hideTarget
-                    } else if !model.hiddenRows.isEmpty {
+                    if !model.hiddenRows.isEmpty {
                         hiddenSection
                     }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.listSpace))
+                .onGeometryChange(for: CGPoint.self) { proxy in
+                    proxy.frame(in: .global).origin
+                } action: { origin in
+                    listOrigin = origin
+                }
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsDropZones(
+                $zones,
+                hiding: lift == nil ? nil : isOverHideZone,
+                showing: hiddenLift == nil ? nil : isOverShowZone
+            )
 
             AddButton("固定費を追加") {
                 sheet = .new
@@ -139,7 +147,6 @@ private extension RecurringListView {
 
     var board: some View {
         let rows = model.rows
-        let count = max(rows.count, hiddenLift == nil ? 0 : 1)
 
         return ZStack(alignment: .top) {
             ForEach(rows) { row in
@@ -147,27 +154,12 @@ private extension RecurringListView {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: boardHeight(count: count), alignment: .top)
-        .overlay {
-            if hiddenLift != nil {
-                SettingsShowZone(isTargeted: isOverShowZone)
-            }
+        .frame(height: boardHeight(count: rows.count), alignment: .top)
+        .onGeometryChange(for: CGPoint.self) { proxy in
+            proxy.frame(in: .global).origin
+        } action: { origin in
+            boardOrigin = origin
         }
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .named(Self.listSpace))
-        } action: { frame in
-            boardOrigin = frame.minY
-            showZone = frame
-        }
-    }
-
-    var hideTarget: some View {
-        SettingsHideZone(isTargeted: isOverHideZone, height: Self.rowHeight)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .named(Self.listSpace))
-            } action: { frame in
-                hideZone = frame
-            }
     }
 
     var hiddenSection: some View {
@@ -384,8 +376,7 @@ private extension RecurringListView {
         current.location = location.y
         lift = current
 
-        let listLocation = CGPoint(x: location.x, y: location.y + boardOrigin)
-        isOverHideZone = hideZone.contains(listLocation)
+        isOverHideZone = zones.isOverHide(location, from: boardOrigin)
 
         guard !isOverHideZone else {
             return
@@ -444,7 +435,7 @@ private extension RecurringListView {
         }
 
         hiddenLift?.location = location
-        isOverShowZone = showZone.contains(location)
+        isOverShowZone = zones.isOverShow(location, from: listOrigin)
     }
 
     func dropHidden() {

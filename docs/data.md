@@ -298,6 +298,7 @@ date ごとに 1 つまで。押し直すと置き換える。
 | records_layout | `list` `calendar`。空なら一覧 |
 | review_scale | `week` `month` `year`。空なら月 |
 | review_kind | `expense` `income` `balance`。空なら支出 |
+| closed_hints | 説明を閉じた設定の画面を `,` でつないだもの（`categories` `wallets` `templates` `recurrings` `stamps` `budgets`）。空ならすべて出す |
 
 列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
 
