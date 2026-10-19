@@ -1,0 +1,106 @@
+{
+  "fill-specializations": [
+    {
+      "value": {
+        "linear-gradient": [
+          "srgb:0.87451,0.90588,0.84706,1.00000",
+          "srgb:0.63922,0.70588,0.60392,1.00000"
+        ]
+      }
+    },
+    {
+      "appearance": "dark",
+      "value": {
+        "linear-gradient": [
+          "srgb:0.09412,0.09804,0.11373,1.00000",
+          "srgb:0.02353,0.02353,0.02745,1.00000"
+        ]
+      }
+    }
+  ],
+  "groups": [
+    {
+      "name": "Yen",
+      "layers": [
+        {
+          "name": "Yen",
+          "image-name": "yen.svg",
+          "fill-specializations": [
+            {
+              "value": {
+                "linear-gradient": [
+                  "srgb:0.07843,0.23529,0.19608,1.00000",
+                  "srgb:0.03922,0.14118,0.11373,1.00000"
+                ]
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "linear-gradient": [
+                  "srgb:0.95686,0.90196,0.75686,1.00000",
+                  "srgb:0.56078,0.42353,0.21961,1.00000"
+                ]
+              }
+            }
+          ],
+          "glass": false
+        }
+      ],
+      "lighting": "individual",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.45
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      }
+    },
+    {
+      "name": "Dial",
+      "layers": [
+        {
+          "name": "Dial",
+          "image-name": "dial.svg",
+          "fill-specializations": [
+            {
+              "value": {
+                "linear-gradient": [
+                  "srgb:0.07843,0.23529,0.19608,1.00000",
+                  "srgb:0.03922,0.14118,0.11373,1.00000"
+                ]
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "linear-gradient": [
+                  "srgb:0.95686,0.90196,0.75686,1.00000",
+                  "srgb:0.56078,0.42353,0.21961,1.00000"
+                ]
+              }
+            }
+          ],
+          "glass": false
+        }
+      ],
+      "lighting": "individual",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.45
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      }
+    }
+  ],
+  "supported-platforms": {
+    "squares": [
+      "iOS"
+    ]
+  }
+}

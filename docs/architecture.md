@@ -56,7 +56,7 @@ ios/
 | ターゲット | `Kakeibot` | `KakeibotWidgetExtension` |
 | Bundle ID | `com.yossibank.kakeibot` | `com.yossibank.kakeibot.widget` |
 | App Group | `group.com.yossibank.kakeibot` | 同じ |
-| アプリアイコン | Icon Composer の `AppIcon.icon`。設定で選べる色違いは `AppIcon-Black`・`AppIcon-Forest`・`AppIcon-Silver`・`AppIcon-Ivory`・`AppIcon-White`・`AppIcon-Gold`。設定の見本を描くため、同じ絵を `Assets.xcassets` の `AppIconYen`・`AppIconDial` に写して持つ | |
+| アプリアイコン | Icon Composer の `AppIcon.icon`。設定で選べる色違いは、同じフォルダの `AppIcon-<色>.icon`。設定の見本を描くため、同じ絵を `Assets.xcassets` の `AppIconYen`・`AppIconDial` に写して持つ | |
 
 ### 署名
 
