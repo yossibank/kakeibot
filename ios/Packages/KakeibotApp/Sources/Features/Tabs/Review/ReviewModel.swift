@@ -202,6 +202,20 @@ public extension ReviewModel {
         stampCalendar?.tallies(in: period.range) ?? []
     }
 
+    func stampDays(of tally: StampCalendar.Tally) -> [LocalDate] {
+        let stamps = stampCalendar.map { Array($0.stamps.values) } ?? []
+
+        return stamps
+            .filter { $0.iconId == tally.icon.id }
+            .map(\.date)
+            .filter { period.range.contains($0) }
+            .sorted(by: >)
+    }
+
+    func day(on date: LocalDate) -> EntryDay? {
+        list?.days.first { $0.date == date }
+    }
+
     func run() async {
         await loadSelection()
 

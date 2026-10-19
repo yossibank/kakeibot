@@ -135,6 +135,10 @@ struct MainView: View {
                     },
                     onOpenRecurring: { id in
                         sheet = .recurring(id)
+                    },
+                    onOpenDay: { date in
+                        records.open(date)
+                        tab = .records
                     }
                 )
                 .tabContent()

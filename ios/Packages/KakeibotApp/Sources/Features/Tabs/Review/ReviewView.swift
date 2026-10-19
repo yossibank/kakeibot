@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Store
 import SwiftUI
 
 public struct ReviewView: View {
@@ -8,19 +9,24 @@ public struct ReviewView: View {
     @State private var openShare: ReviewModel.Share?
     @State private var pendingEntry: Entry.ID?
     @State private var pendingRecurring: Recurring.ID?
+    @State private var openStamp: StampCalendar.Tally?
+    @State private var pendingDay: LocalDate?
     @State private var slide = PageSlide()
 
     private let onOpenEntry: (Entry.ID) -> Void
     private let onOpenRecurring: (Recurring.ID) -> Void
+    private let onOpenDay: (LocalDate) -> Void
 
     public init(
         model: ReviewModel,
         onOpenEntry: @escaping (Entry.ID) -> Void,
-        onOpenRecurring: @escaping (Recurring.ID) -> Void
+        onOpenRecurring: @escaping (Recurring.ID) -> Void,
+        onOpenDay: @escaping (LocalDate) -> Void
     ) {
         self.model = model
         self.onOpenEntry = onOpenEntry
         self.onOpenRecurring = onOpenRecurring
+        self.onOpenDay = onOpenDay
     }
 
     public var body: some View {
@@ -48,6 +54,17 @@ public struct ReviewView: View {
                 rows: model.rows(for: share)
             ) { id in
                 choose(id, in: share)
+            }
+        }
+        .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in
+            ReviewStampSheet(
+                tally: tally,
+                periodTitle: periodTitle,
+                days: model.stampDays(of: tally),
+                entryDay: model.day(on:)
+            ) { date in
+                pendingDay = date
+                openStamp = nil
             }
         }
         .errorBanner(model.errorNotice) {
@@ -152,14 +169,20 @@ private extension ReviewView {
 
             LazyVGrid(columns: Self.stampColumns, alignment: .leading) {
                 ForEach(model.stampTallies) { tally in
-                    HStack(spacing: 6) {
-                        IconSeal(tally.icon, size: 28)
+                    Button {
+                        openStamp = tally
+                    } label: {
+                        HStack(spacing: 6) {
+                            IconSeal(tally.icon, size: 28)
 
-                        Text("×\(tally.count)")
-                            .font(.serif(.body))
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.champagne)
+                            Text("×\(tally.count)")
+                                .font(.serif(.body))
+                                .monospacedDigit()
+                                .foregroundStyle(Palette.champagne)
+                        }
+                        .contentShape(.rect)
                     }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -462,6 +485,15 @@ private extension ReviewView {
         }
 
         openShare = nil
+    }
+
+    func openPendingDay() {
+        guard let pendingDay else {
+            return
+        }
+
+        self.pendingDay = nil
+        onOpenDay(pendingDay)
     }
 
     func openPendingEntry() {

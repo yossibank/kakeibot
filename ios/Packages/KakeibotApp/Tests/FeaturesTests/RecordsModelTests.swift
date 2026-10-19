@@ -130,6 +130,19 @@ struct RecordsModelTests {
     }
 
     @Test
+    func opensDayInCalendar() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        let date = try #require(LocalDate("2026-08-03"))
+
+        model.open(date)
+
+        #expect(model.month.description == "2026-08")
+        #expect(model.shownDate == date)
+        #expect(model.layout == .calendar)
+    }
+
+    @Test
     func stampsAndRemovesWithShownChoices() async throws {
         let setup = try await Setup()
         try setup.database.insertShelfIfEmpty(at: Date())

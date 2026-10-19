@@ -145,6 +145,12 @@ public extension RecordsModel {
         }
     }
 
+    func open(_ date: LocalDate) {
+        month = date.periodMonth(startingOn: monthStartDay)
+        selectedDate = date
+        layout = .calendar
+    }
+
     func move(months: Int) {
         month = month.adding(months: months)
         selectedDate = nil
