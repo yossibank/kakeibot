@@ -115,9 +115,11 @@ public extension RecordsModel {
         }
     }
 
-    func setLayout(_ layout: RecordsLayout) async {
+    func setLayout(_ layout: RecordsLayout) {
         self.layout = layout
+    }
 
+    func saveLayout() async {
         do {
             try await database.setSetting(.recordsLayout, to: layout)
         } catch {

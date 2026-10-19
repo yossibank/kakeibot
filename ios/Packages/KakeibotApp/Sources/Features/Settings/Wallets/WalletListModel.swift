@@ -87,16 +87,29 @@ public extension WalletListModel {
         movingOrder = nil
     }
 
-    func hide(_ id: Wallet.ID) async {
+    @discardableResult
+    func hide(_ id: Wallet.ID) async -> Bool {
         movingOrder = nil
 
         do {
             try await database.setWalletHidden(id, isHidden: true, at: Date())
             await load()
+            return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {
             errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
+            return false
         } catch {
             errorNotice.show(Self.hideFailedMessage)
+            return false
+        }
+    }
+
+    func show(_ id: Wallet.ID) async {
+        do {
+            try await database.setWalletHidden(id, isHidden: false, at: Date())
+            await load()
+        } catch {
+            errorNotice.show(Self.showFailedMessage)
         }
     }
 
@@ -122,6 +135,7 @@ private extension WalletListModel {
     static let loadFailedMessage = "口座を読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
     static let hideFailedMessage = "非表示にできませんでした"
+    static let showFailedMessage = "表示に戻せませんでした"
 
     func wallets(isHidden: Bool) -> [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []

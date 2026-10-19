@@ -36,19 +36,26 @@ private extension BudgetListView {
                 Text("\(model.month.month)月（\(model.periodText)）から使う額")
                     .font(.caption)
                     .foregroundStyle(Palette.champagne)
-
-                Text("変えた額はこの月から使い、前の月はそのまま残ります")
-                    .font(.caption2)
-                    .foregroundStyle(Palette.mist)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
 
                 if model.recurringExpense > 0 {
                     Label(recurringText, systemImage: "repeat")
                         .font(.caption2)
                         .monospacedDigit()
                         .foregroundStyle(Palette.gold)
-                        .padding(.top, 4)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.85)
                 }
             }
+
+            SettingsHint(
+                flag: model.hintFlag(),
+                lines: [
+                    .init("calendar", "変えた額はこの月から使います"),
+                    .init("clock.arrow.circlepath", "前の月の額はそのまま残ります")
+                ]
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {

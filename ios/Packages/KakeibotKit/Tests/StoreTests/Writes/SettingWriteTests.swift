@@ -22,6 +22,25 @@ struct SettingWriteTests {
     }
 
     @Test
+    func savesClosedHints() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let initial = try await database.setting(.closedHints)
+        try await database.setSetting(.closedHints, to: [.wallets, .budgets])
+        let saved = try await database.setting(.closedHints)
+        let text = try await database.writer.read { db in
+            try String.fetchOne(
+                db,
+                sql: "SELECT value FROM setting WHERE key = 'closed_hints'"
+            )
+        }
+
+        #expect(initial.isEmpty)
+        #expect(saved == [.wallets, .budgets])
+        #expect(text == "budgets,wallets")
+    }
+
+    @Test
     func announcesMonthStartDay() async throws {
         let database = try AppDatabase.inMemory()
         let payday = try #require(MonthStartDay(25))

@@ -6,7 +6,6 @@ import SwiftUI
 public struct StampEditSheet: View {
     @State private var model: StampEditModel
     @State private var isConfirmingDiscard = false
-    @State private var isConfirmingRemove = false
 
     @FocusState private var focus: Field?
 
@@ -67,11 +66,6 @@ public struct StampEditSheet: View {
         ) {
             dismiss()
         }
-        .confirmsStampDelete(isPresented: $isConfirmingRemove) {
-            Task {
-                await remove()
-            }
-        }
         .task {
             await model.load()
         }
@@ -95,9 +89,10 @@ private extension StampEditSheet {
             Spacer()
 
             if model.isEditing {
-                RingButton(systemImage: "trash", label: "消す") {
-                    focus = nil
-                    isConfirmingRemove = true
+                SettingsHideButton(isHidden: model.isHidden) {
+                    Task {
+                        await setHidden(!model.isHidden)
+                    }
                 }
             } else {
                 Color.clear
@@ -132,8 +127,10 @@ private extension StampEditSheet {
         }
     }
 
-    func remove() async {
-        if await model.remove() {
+    func setHidden(_ isHidden: Bool) async {
+        focus = nil
+
+        if await model.setHidden(isHidden) {
             dismiss()
         }
     }

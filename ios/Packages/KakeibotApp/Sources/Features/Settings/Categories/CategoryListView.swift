@@ -9,8 +9,15 @@ public struct CategoryListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var boardWidth: CGFloat = 0
-    @State private var hideZone: CGRect = .zero
-    @State private var isOverHideZone = false
+    @State private var zones = SettingsDropZones()
+    @State private var autoScroll = SettingsAutoScroll()
+    @State private var contentOrigin: CGPoint = .zero
+    @State private var hideHover = SettingsHideHover()
+    @State private var hiddenId: EntryCategory.ID?
+    @State private var hiddenList: SettingsScreenFlag
+    @State private var hiddenLift: SettingsHiddenLift<EntryCategory.ID>?
+    @State private var isOverShowZone = false
+    @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -18,6 +25,11 @@ public struct CategoryListView: View {
 
     public init(database: AppDatabase) {
         _model = State(initialValue: CategoryListModel(database: database))
+        let hiddenList = SettingsScreenFlag.openHiddenList(
+            .categories,
+            in: database
+        )
+        _hiddenList = State(initialValue: hiddenList)
         self.database = database
     }
 
@@ -26,25 +38,42 @@ public struct CategoryListView: View {
             header
             CapsulePicker(selection: $model.kind, options: Self.kindOptions)
 
-            Text("長押しで動かせます。下の枠に置くと非表示になります")
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
+            SettingsHint(
+                flag: .closedHint(.categories, in: database),
+                lines: [.move, .hide]
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     board
 
-                    if lift != nil {
-                        hideTarget
-                    } else if !model.hidden.isEmpty {
+                    if !model.hidden.isEmpty {
                         hiddenSection
                     }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
+                .onGeometryChange(for: CGPoint.self) { proxy in
+                    proxy.frame(in: .global).origin
+                } action: { origin in
+                    contentOrigin = origin
+                }
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(lift != nil)
+            .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsAutoScroll(autoScroll)
+            .settingsDropZones(
+                $zones,
+                showing: hiddenLift == nil ? nil : isOverShowZone
+            )
+            .settingsHideNotice($hiddenId) { id in
+                show(id)
+            }
+
+            if lift != nil {
+                SettingsHideTarget(zones: $zones, state: hideHover.state)
+                    .padding(.bottom, 8)
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -61,6 +90,7 @@ public struct CategoryListView: View {
         .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
+        .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
             CategoryEditSheet(model: editModel(for: sheet))
         }
@@ -128,34 +158,47 @@ private extension CategoryListView {
         .buttonStyle(.plain)
     }
 
-    var hideTarget: some View {
-        SettingsHideZone(isTargeted: isOverHideZone, height: Self.tileHeight)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .named(Self.space))
-            } action: { frame in
-                hideZone = frame
-            }
-    }
-
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("非表示のカテゴリ")
-                .font(.caption2)
-                .tracking(2)
-                .foregroundStyle(Palette.mist)
+            SettingsHiddenTitle(
+                flag: hiddenList,
+                title: "非表示のカテゴリ",
+                count: model.hidden.count
+            )
 
-            LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
-                ForEach(model.hidden) { category in
-                    Button {
-                        sheet = .edit(category.kind, category.id)
-                    } label: {
-                        tileFace(category, isHidden: true)
-                            .frame(height: Self.tileHeight)
+            if hiddenList.isOn {
+                LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
+                    ForEach(model.hidden) { category in
+                        hiddenTile(category)
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }
+    }
+
+    func hiddenTile(_ category: EntryCategory) -> some View {
+        let isLifted = hiddenLift?.id == category.id
+        let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
+        let scale: CGFloat = isLifted ? 1.1 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let layer: Double = isLifted ? 1 : 0
+
+        return tileFace(category, isHidden: true)
+            .frame(height: Self.tileHeight)
+            .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
+            .offset(offset)
+            .zIndex(layer)
+            .onTapGesture {
+                sheet = .edit(category.kind, category.id)
+            }
+            .gesture(
+                LiftGesture(in: Self.space) { location in
+                    followHidden(category.id, to: location)
+                } onEnd: {
+                    dropHidden()
+                }
+            )
     }
 
     func movableTile(_ category: EntryCategory) -> some View {
@@ -350,9 +393,18 @@ private extension CategoryListView {
 
         current.location = location
         lift = current
-        isOverHideZone = hideZone.contains(location)
+        let isInside = zones.isOverHide(location, from: contentOrigin)
+        hideHover.update(isInside: isInside)
 
-        guard !isOverHideZone else {
+        autoScroll.follow(
+            y: location.y + contentOrigin.y,
+            bottom: zones.hide.isEmpty ? nil : zones.hide.minY
+        ) { delta in
+            let shifted = CGPoint(x: location.x, y: location.y + delta)
+            follow(category, to: shifted)
+        }
+
+        guard !hideHover.isInside else {
             return
         }
 
@@ -364,24 +416,26 @@ private extension CategoryListView {
     }
 
     func drop() {
+        autoScroll.stop()
+
         guard let lift else {
             return
         }
 
-        if isOverHideZone {
+        if hideHover.isArmed {
             let id = lift.id
 
             withAnimation(.snappy) {
                 self.lift = nil
-                isOverHideZone = false
+                hideHover.reset()
             }
 
-            Task {
-                await model.hide(id)
-            }
+            hide(id)
 
             return
         }
+
+        hideHover.reset()
 
         withAnimation(.snappy) {
             self.lift = nil
@@ -389,6 +443,63 @@ private extension CategoryListView {
 
         Task {
             await model.finishMoving()
+        }
+    }
+
+    func followHidden(
+        _ id: EntryCategory.ID,
+        to location: CGPoint
+    ) {
+        if hiddenLift == nil {
+            withAnimation(.snappy(duration: 0.2)) {
+                hiddenLift = SettingsHiddenLift(
+                    id: id,
+                    start: location,
+                    location: location
+                )
+            }
+
+            liftCount += 1
+        }
+
+        hiddenLift?.location = location
+        isOverShowZone = zones.isOverShow(location, from: contentOrigin)
+    }
+
+    func dropHidden() {
+        guard let hiddenLift else {
+            return
+        }
+
+        let isShowing = isOverShowZone
+
+        withAnimation(.snappy) {
+            self.hiddenLift = nil
+            isOverShowZone = false
+        }
+
+        guard isShowing else {
+            return
+        }
+
+        showCount += 1
+
+        Task {
+            await model.show(hiddenLift.id)
+        }
+    }
+
+    func hide(_ id: EntryCategory.ID) {
+        Task {
+            if await model.hide(id) {
+                hiddenId = id
+            }
+        }
+    }
+
+    func show(_ id: EntryCategory.ID) {
+        Task {
+            await model.show(id)
         }
     }
 

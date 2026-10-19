@@ -21,15 +21,19 @@ public final class StampListModel: ScreenModel {
 
 public extension StampListModel {
     var shown: [ShelfIcon] {
-        let shelfIcons = shelf?.shelfIcons ?? []
+        let stamps = stamps(isHidden: false)
 
         guard let movingOrder else {
-            return shelfIcons
+            return stamps
         }
 
         return movingOrder.compactMap { id in
-            shelfIcons.first { $0.id == id }
+            stamps.first { $0.id == id }
         }
+    }
+
+    var hidden: [ShelfIcon] {
+        stamps(isHidden: true)
     }
 
     func icon(for shelfIcon: ShelfIcon) -> Icon? {
@@ -78,15 +82,15 @@ public extension StampListModel {
         movingOrder = nil
     }
 
-    func remove(_ id: ShelfIcon.ID) async {
+    @discardableResult
+    func hide(_ id: ShelfIcon.ID) async -> Bool {
         movingOrder = nil
+        let failure = Self.hideFailedMessage
+        return await setHidden(id, isHidden: true, failure: failure)
+    }
 
-        do {
-            try await database.removeShelfIcon(id, at: Date())
-            await load()
-        } catch {
-            errorNotice.show(Self.removeFailedMessage)
-        }
+    func show(_ id: ShelfIcon.ID) async {
+        await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
     }
 
     func finishMoving() async {
@@ -94,8 +98,10 @@ public extension StampListModel {
             return
         }
 
+        let ids = movingOrder + hidden.map(\.id)
+
         do {
-            try await database.reorderShelfIcons(movingOrder, at: Date())
+            try await database.reorderShelfIcons(ids, at: Date())
             await load()
         } catch {
             errorNotice.show(Self.saveFailedMessage)
@@ -106,7 +112,35 @@ public extension StampListModel {
 }
 
 private extension StampListModel {
-    static let saveFailedMessage = "並びを保存できませんでした"
     static let loadFailedMessage = "スタンプを読めませんでした"
-    static let removeFailedMessage = "スタンプを消せませんでした"
+    static let saveFailedMessage = "並びを保存できませんでした"
+    static let hideFailedMessage = "非表示にできませんでした"
+    static let showFailedMessage = "表示に戻せませんでした"
+
+    func stamps(isHidden: Bool) -> [ShelfIcon] {
+        let stamps = shelf?.shelfIcons ?? []
+        return stamps.filter { ($0.archivedAt != nil) == isHidden }
+    }
+
+    @discardableResult
+    func setHidden(
+        _ id: ShelfIcon.ID,
+        isHidden: Bool,
+        failure: String
+    ) async -> Bool {
+        do {
+            try await database.setShelfIconHidden(
+                id,
+                isHidden: isHidden,
+                at: Date()
+            )
+
+            await load()
+
+            return true
+        } catch {
+            errorNotice.show(failure)
+            return false
+        }
+    }
 }

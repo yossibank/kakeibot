@@ -126,6 +126,10 @@ public extension BudgetListModel {
         categoryList?.icons[category.iconId]
     }
 
+    func hintFlag() -> SettingsScreenFlag {
+        .closedHint(.budgets, in: database)
+    }
+
     func load() async {
         do {
             monthStartDay = try await database.setting(.monthStartDay)

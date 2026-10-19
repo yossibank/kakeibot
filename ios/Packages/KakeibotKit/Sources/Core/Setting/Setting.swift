@@ -26,6 +26,8 @@ public extension Setting {
         case recordsLayout = "records_layout"
         case reviewScale = "review_scale"
         case reviewKind = "review_kind"
+        case closedHints = "closed_hints"
+        case openHiddenLists = "open_hidden_lists"
     }
 }
 

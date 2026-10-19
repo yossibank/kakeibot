@@ -47,6 +47,18 @@ struct ExportV1Tests {
         #expect(!export.data.icons.isEmpty)
     }
 
+    @Test
+    func readsTemplatesAndRecurringsWithoutArchivedAt() throws {
+        let json = try Self.fixtureWithoutArchivedAt()
+
+        let export = try ExportV1(json: json)
+
+        #expect(!export.data.templates.isEmpty)
+        #expect(export.data.templates.allSatisfy { $0.archivedAt == nil })
+        #expect(!export.data.recurrings.isEmpty)
+        #expect(export.data.recurrings.allSatisfy { $0.archivedAt == nil })
+    }
+
     @Test(arguments: try headers.valid)
     func readsSupportedHeader(header: Header) throws {
         let json = try Self.fixture(with: header)
@@ -123,6 +135,21 @@ private extension ExportV1Tests {
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
         tables["shelfIcons"] = nil
+        object["data"] = tables
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixtureWithoutArchivedAt() throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+
+        for key in ["templates", "recurrings"] {
+            let rows = try #require(tables[key] as? [[String: Any]])
+            tables[key] = rows.map { $0.filter { $0.key != "archivedAt" } }
+        }
+
         object["data"] = tables
         return try JSONSerialization.data(withJSONObject: object)
     }

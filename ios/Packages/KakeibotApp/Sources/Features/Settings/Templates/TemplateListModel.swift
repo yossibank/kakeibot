@@ -24,7 +24,7 @@ public final class TemplateListModel: ScreenModel {
 
 public extension TemplateListModel {
     var shown: [EntryTemplate] {
-        let templates = templates.filter { $0.type == type }
+        let templates = templates(isHidden: false)
 
         guard let movingOrder else {
             return templates
@@ -33,6 +33,10 @@ public extension TemplateListModel {
         return movingOrder.compactMap { id in
             templates.first { $0.id == id }
         }
+    }
+
+    var hidden: [EntryTemplate] {
+        templates(isHidden: true)
     }
 
     func icon(for template: EntryTemplate) -> Icon? {
@@ -45,7 +49,7 @@ public extension TemplateListModel {
 
     func load() async {
         do {
-            templates = try await database.templates()
+            templates = try await database.templates(includingHidden: true)
             list = try await database.entryList()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
@@ -85,17 +89,32 @@ public extension TemplateListModel {
         movingOrder = order
     }
 
+    func cancelMoving() {
+        movingOrder = nil
+    }
+
+    @discardableResult
+    func hide(_ id: EntryTemplate.ID) async -> Bool {
+        movingOrder = nil
+        let failure = Self.hideFailedMessage
+        return await setHidden(id, isHidden: true, failure: failure)
+    }
+
+    func show(_ id: EntryTemplate.ID) async {
+        await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
+    }
+
     func finishMoving() async {
         guard let movingOrder else {
             return
         }
 
-        let others = templates.filter { $0.type != type }.map(\.id)
+        let others = templates.map(\.id).filter { !movingOrder.contains($0) }
         let ids = movingOrder + others
 
         do {
             try await database.reorderTemplates(ids, at: Date())
-            templates = try await database.templates()
+            templates = try await database.templates(includingHidden: true)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
         }
@@ -107,10 +126,40 @@ public extension TemplateListModel {
 private extension TemplateListModel {
     static let loadFailedMessage = "テンプレートを読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
+    static let hideFailedMessage = "非表示にできませんでした"
+    static let showFailedMessage = "表示に戻せませんでした"
+
+    func templates(isHidden: Bool) -> [EntryTemplate] {
+        templates.filter { template in
+            template.type == type && (template.archivedAt != nil) == isHidden
+        }
+    }
+
+    @discardableResult
+    func setHidden(
+        _ id: EntryTemplate.ID,
+        isHidden: Bool,
+        failure: String
+    ) async -> Bool {
+        do {
+            try await database.setTemplateHidden(
+                id,
+                isHidden: isHidden,
+                at: Date()
+            )
+
+            templates = try await database.templates(includingHidden: true)
+
+            return true
+        } catch {
+            errorNotice.show(failure)
+            return false
+        }
+    }
 
     func observeTemplates() async {
         await observe(
-            database.templateUpdates(),
+            database.templateUpdates(includingHidden: true),
             failure: Self.loadFailedMessage
         ) { templates in
             self.templates = templates

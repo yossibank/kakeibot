@@ -118,7 +118,8 @@ struct RecordsModelTests {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)
 
-        await model.setLayout(.calendar)
+        model.setLayout(.calendar)
+        await model.saveLayout()
         let reopened = RecordsModel(
             database: setup.database,
             today: setup.today

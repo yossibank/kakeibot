@@ -57,16 +57,18 @@ struct StampEditModelTests {
     }
 
     @Test
-    func removesShelfIcon() async throws {
+    func hidesStamp() async throws {
         let database = try Self.database()
         let first = try await Self.firstShelfIcon(in: database)
         let model = StampEditModel(database: database, editing: first.id)
+        await model.load()
 
-        let isRemoved = await model.remove()
+        let isHidden = await model.setHidden(true)
         let shelf = try await database.iconShelf()
 
-        #expect(isRemoved)
-        #expect(!shelf.shelfIcons.contains { $0.id == first.id })
+        #expect(isHidden)
+        #expect(model.isHidden)
+        #expect(shelf.shelfIcons.first?.archivedAt != nil)
     }
 }
 

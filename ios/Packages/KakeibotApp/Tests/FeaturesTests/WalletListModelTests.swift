@@ -67,4 +67,19 @@ struct WalletListModelTests {
         #expect(model.shown.map(\.name) == ["財布"])
         #expect(model.errorNotice.message == "最後の 1 つの口座は非表示にできません")
     }
+
+    @Test
+    func showsHiddenWallet() async throws {
+        let database = try AppDatabase.inMemory()
+        try database.insertDefaultsIfEmpty(at: Date())
+        let model = WalletListModel(database: database)
+        await model.load()
+        let bank = try #require(model.shown.last)
+        await model.hide(bank.id)
+
+        await model.show(bank.id)
+
+        #expect(model.hidden.isEmpty)
+        #expect(model.shown.map(\.name) == ["財布", "銀行"])
+    }
 }

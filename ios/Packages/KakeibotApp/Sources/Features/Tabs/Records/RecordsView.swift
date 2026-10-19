@@ -150,7 +150,7 @@ private extension RecordsView {
         let day = model.day(on: date)
 
         return VStack(spacing: 0) {
-            dayHeader(date, total: day.flatMap(Self.totalText))
+            dayHeader(date, day: day)
 
             if let day {
                 ForEach(model.rows(for: day)) { row in
@@ -253,37 +253,47 @@ private extension RecordsView {
                         .overlay(Circle().stroke(ring, lineWidth: 1))
 
                     dayMark(date)
-                        .frame(height: 12)
+                        .frame(height: 24, alignment: .top)
                 }
                 .opacity(opacity)
-                .frame(maxWidth: .infinity, minHeight: 50)
+                .frame(maxWidth: .infinity, minHeight: 62)
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
         } else {
             Color.clear
-                .frame(maxWidth: .infinity, minHeight: 50)
+                .frame(maxWidth: .infinity, minHeight: 62)
         }
     }
 
-    @ViewBuilder
     func dayMark(_ date: LocalDate) -> some View {
-        let expense = model.day(on: date)?.expenseTotal ?? 0
+        let day = model.day(on: date)
+        let expense = day?.expenseTotal ?? 0
+        let income = day?.incomeTotal ?? 0
 
-        if expense > 0 {
-            Text(AmountText.text(expense))
-                .font(.sans(.micro))
-                .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-        } else if model.noSpendDays.contains(date) {
-            Image(systemName: "leaf.fill")
-                .font(.sans(.micro))
-                .foregroundStyle(Palette.gold)
-        } else {
-            Color.clear
+        return VStack(spacing: 0) {
+            if expense > 0 {
+                markAmount(expense, type: .expense)
+            } else if model.noSpendDays.contains(date) {
+                Image(systemName: "leaf.fill")
+                    .font(.sans(.micro))
+                    .foregroundStyle(Palette.gold)
+            }
+
+            if income > 0 {
+                markAmount(income, type: .income)
+            }
         }
+    }
+
+    func markAmount(
+        _ amount: Int,
+        type: Entry.Kind
+    ) -> some View {
+        AmountText(amount, type: type)
+            .font(.sans(.micro))
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
     }
 
     func noSpendButton(_ date: LocalDate) -> some View {
@@ -315,7 +325,7 @@ private extension RecordsView {
 
     func dayCard(_ day: EntryDay) -> some View {
         VStack(spacing: 0) {
-            dayHeader(day.date, total: Self.totalText(for: day))
+            dayHeader(day.date, day: day)
 
             ForEach(model.rows(for: day)) { row in
                 swipeRow(row)
@@ -349,7 +359,7 @@ private extension RecordsView {
 
     func dayHeader(
         _ date: LocalDate,
-        total: String?
+        day: EntryDay?
     ) -> some View {
         let holiday = Holiday.name(of: date)
 
@@ -370,15 +380,26 @@ private extension RecordsView {
 
             Spacer(minLength: 8)
 
-            if let total {
-                Text(total)
-                    .font(.caption)
-                    .foregroundStyle(Palette.mist)
-                    .lineLimit(1)
+            if let day {
+                dayTotals(day)
             }
         }
         .padding(.top, 12)
         .padding(.bottom, 8)
+    }
+
+    func dayTotals(_ day: EntryDay) -> some View {
+        HStack(spacing: 8) {
+            if day.expenseTotal > 0 {
+                AmountText(day.expenseTotal, type: .expense)
+            }
+
+            if day.incomeTotal > 0 {
+                AmountText(day.incomeTotal, type: .income)
+            }
+        }
+        .font(.caption)
+        .lineLimit(1)
     }
 }
 
@@ -392,8 +413,16 @@ private extension RecordsView {
         Binding {
             model.layout
         } set: { layout in
-            Task {
-                await model.setLayout(layout)
+            let layouts = RecordsLayout.allCases
+            let from = layouts.firstIndex(of: model.layout) ?? 0
+            let to = layouts.firstIndex(of: layout) ?? 0
+
+            PageSlide.run($slide, forward: to > from) {
+                model.setLayout(layout)
+
+                Task {
+                    await model.saveLayout()
+                }
             }
         }
     }
@@ -408,18 +437,6 @@ private extension RecordsView {
         }
 
         return date.weekday.tint ?? Palette.mist
-    }
-
-    static func totalText(for day: EntryDay) -> String? {
-        let expense = day.expenseTotal > 0
-            ? AmountText.text(day.expenseTotal)
-            : nil
-
-        let income = day.incomeTotal > 0
-            ? "収入 \(AmountText.text(day.incomeTotal))"
-            : nil
-
-        return [expense, income].rowDetail
     }
 
     func dayColor(

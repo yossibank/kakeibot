@@ -8,6 +8,7 @@ public struct SettingsSheet: View {
     @State private var launchScreen: LaunchScreen = .home
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
+    @State private var closedHints: Set<SettingsScreen> = []
 
     #if DEBUG
     @State private var isConfirmingSample = false
@@ -52,14 +53,6 @@ public struct SettingsSheet: View {
                                     CategoryListView(database: database)
                                 } label: {
                                     row("カテゴリ", systemImage: "tag")
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    StampListView(database: database)
-                                } label: {
-                                    row("スタンプ", systemImage: "seal")
                                 }
 
                                 Hairline()
@@ -153,6 +146,19 @@ public struct SettingsSheet: View {
                         }
 
                         VStack(alignment: .leading, spacing: 6) {
+                            sectionTitle("カレンダー")
+
+                            NavigationLink {
+                                StampListView(database: database)
+                            } label: {
+                                row("スタンプ", systemImage: "seal")
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 14)
+                            .card()
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
                             sectionTitle("通知")
 
                             NavigationLink {
@@ -199,6 +205,18 @@ public struct SettingsSheet: View {
                             .frame(minHeight: 52)
                             .padding(.horizontal, 14)
                             .card()
+
+                            Button {
+                                Task {
+                                    await showHintsAgain()
+                                }
+                            } label: {
+                                hintsRow
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(closedHints.isEmpty)
+                            .padding(.horizontal, 14)
+                            .card()
                         }
 
                         #if DEBUG
@@ -228,6 +246,9 @@ public struct SettingsSheet: View {
         }
         .task {
             await observeReminderTime()
+        }
+        .task {
+            await observeClosedHints()
         }
         .task {
             launchScreen = await (try? database.setting(.launchScreen)) ?? .home
@@ -262,6 +283,32 @@ private extension SettingsSheet {
             .tracking(3)
             .foregroundStyle(Palette.gold)
             .padding(.leading, 6)
+    }
+
+    var hintsRow: some View {
+        let color = closedHints.isEmpty ? Palette.dusk : Palette.ink
+        let value = closedHints.isEmpty
+            ? "すべて出ています"
+            : "閉じた説明 \(closedHints.count)"
+
+        return HStack(spacing: 12) {
+            Image(systemName: "text.bubble")
+                .font(.sans(.body, weight: .light))
+                .foregroundStyle(Palette.gold)
+                .frame(width: 22)
+
+            Text("説明をもう一度出す")
+                .font(.subheadline)
+                .foregroundStyle(color)
+
+            Spacer()
+
+            Text(value)
+                .font(.footnote)
+                .foregroundStyle(Palette.mist)
+        }
+        .frame(minHeight: 48)
+        .contentShape(.rect)
     }
 
     func row(
@@ -322,6 +369,20 @@ private extension SettingsSheet {
                 try? await database.setSetting(.weekStart, to: day)
             }
         }
+    }
+
+    func observeClosedHints() async {
+        do {
+            for try await hints in database.settingUpdates(.closedHints) {
+                closedHints = hints
+            }
+        } catch {
+            closedHints = []
+        }
+    }
+
+    func showHintsAgain() async {
+        try? await database.setSetting(.closedHints, to: [])
     }
 
     func observeReminderTime() async {

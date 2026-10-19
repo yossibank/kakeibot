@@ -37,6 +37,22 @@ public extension AppDatabase {
         }
     }
 
+    func setTemplateHidden(
+        _ id: EntryTemplate.ID,
+        isHidden: Bool,
+        at now: Date
+    ) async throws {
+        try await writer.write { db in
+            guard var template = try EntryTemplate.fetchOne(db, key: id) else {
+                throw TemplateWriteError.templateNotFound
+            }
+
+            template.archivedAt = isHidden ? now : nil
+            template.updatedAt = now
+            try template.update(db)
+        }
+    }
+
     func deleteTemplate(_ id: EntryTemplate.ID) async throws {
         try await writer.write { db in
             _ = try EntryTemplate.deleteOne(db, key: id)

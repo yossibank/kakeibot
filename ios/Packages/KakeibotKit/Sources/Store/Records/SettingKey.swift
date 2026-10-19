@@ -65,6 +65,16 @@ public extension SettingKey where Value == ReviewKind {
     }
 }
 
+public extension SettingKey where Value == Set<SettingsScreen> {
+    static var closedHints: Self {
+        Self(screens: .closedHints)
+    }
+
+    static var openHiddenLists: Self {
+        Self(screens: .openHiddenLists)
+    }
+}
+
 public extension SettingKey where Value == Bool {
     static var categoryMenuOpened: Self {
         Self(flag: .categoryMenuOpened)
@@ -99,6 +109,26 @@ extension SettingKey where Value: RawRepresentable, Value.RawValue == String {
             default: defaultValue,
             decode: { Value(rawValue: $0) },
             encode: { $0.rawValue }
+        )
+    }
+}
+
+extension SettingKey where Value == Set<SettingsScreen> {
+    init(screens key: Setting.Key) {
+        self.init(
+            key,
+            default: [],
+            decode: { text in
+                let screens = text.split(separator: ",").compactMap { name in
+                    SettingsScreen(rawValue: String(name))
+                }
+
+                return Set(screens)
+            },
+            encode: { screens in
+                let names = screens.map(\.rawValue).sorted()
+                return names.isEmpty ? nil : names.joined(separator: ",")
+            }
         )
     }
 }

@@ -7,6 +7,8 @@ import Store
 @MainActor
 @Observable
 public final class StampEditModel {
+    public private(set) var isHidden = false
+
     public internal(set) var errorNotice = ErrorNotice()
 
     public let icon = IconEditModel(glyph: .star)
@@ -64,6 +66,7 @@ public extension StampEditModel {
             }
 
             icon.apply(saved)
+            isHidden = shelfIcon.archivedAt != nil
             baseline = icon.draft
         } catch {
             errorNotice.show(Self.loadFailedMessage)
@@ -85,16 +88,22 @@ public extension StampEditModel {
         }
     }
 
-    func remove() async -> Bool {
+    func setHidden(_ isHidden: Bool) async -> Bool {
         guard let editingId else {
             return false
         }
 
         do {
-            try await database.removeShelfIcon(editingId, at: Date())
+            try await database.setShelfIconHidden(
+                editingId,
+                isHidden: isHidden,
+                at: Date()
+            )
+
+            self.isHidden = isHidden
             return true
         } catch {
-            errorNotice.show(Self.removeFailedMessage)
+            errorNotice.show(Self.saveFailedMessage)
             return false
         }
     }
@@ -103,5 +112,4 @@ public extension StampEditModel {
 private extension StampEditModel {
     static let saveFailedMessage = "保存できませんでした"
     static let loadFailedMessage = "スタンプを読めませんでした"
-    static let removeFailedMessage = "スタンプを消せませんでした"
 }

@@ -166,9 +166,10 @@ emoji・text・glyph のどれかは必須。
 | wallet_id | TEXT | |
 | memo | TEXT | |
 | sort_order | INTEGER | |
+| archived_at | TEXT | |
 | created_at / updated_at | TEXT | |
 
-テンプレートはしまわずに消す。消すと、記録の `template_id` を空にする。
+テンプレートは `archived_at` でしまうか、消す。消すと、記録の `template_id` を空にする。
 
 ### budget
 
@@ -210,6 +211,7 @@ emoji・text・glyph のどれかは必須。
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |
 | sort_order | INTEGER | 設定の一覧の並び |
+| archived_at | TEXT | しまっている間は記録を作らない |
 | created_at / updated_at | TEXT | |
 
 ### reward_rule
@@ -296,6 +298,8 @@ date ごとに 1 つまで。押し直すと置き換える。
 | records_layout | `list` `calendar`。空なら一覧 |
 | review_scale | `week` `month` `year`。空なら月 |
 | review_kind | `expense` `income` `balance`。空なら支出 |
+| closed_hints | 説明を閉じた設定の画面を `,` でつないだもの（`categories` `wallets` `templates` `recurrings` `stamps` `budgets`）。空ならすべて出す |
+| open_hidden_lists | 非表示の項目を開いている設定の画面。書き方は closed_hints と同じ。空ならすべてたたむ |
 
 列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
 

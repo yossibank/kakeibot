@@ -2,20 +2,35 @@ import Core
 import GRDB
 
 public extension AppDatabase {
-    func templateUpdates() -> some AsyncSequence<[EntryTemplate], any Error> {
+    func templateUpdates(
+        includingHidden: Bool = false
+    ) -> some AsyncSequence<[EntryTemplate], any Error> {
         ValueObservation
-            .tracking(Self.templates)
+            .tracking { db in
+                try Self.templates(in: db, includingHidden: includingHidden)
+            }
             .values(in: writer)
     }
 
-    func templates() async throws -> [EntryTemplate] {
-        try await writer.read(Self.templates)
+    func templates(
+        includingHidden: Bool = false
+    ) async throws -> [EntryTemplate] {
+        try await writer.read { db in
+            try Self.templates(in: db, includingHidden: includingHidden)
+        }
     }
 }
 
 private extension AppDatabase {
-    static func templates(in db: Database) throws -> [EntryTemplate] {
-        try EntryTemplate
+    static func templates(
+        in db: Database,
+        includingHidden: Bool
+    ) throws -> [EntryTemplate] {
+        let request = includingHidden
+            ? EntryTemplate.all()
+            : EntryTemplate.filter(Column("archived_at") == nil)
+
+        return try request
             .order(EntryTemplate.sortOrder, Column("created_at"))
             .fetchAll(db)
     }

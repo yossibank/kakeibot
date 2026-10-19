@@ -37,8 +37,9 @@ public extension AppDatabase {
         }
     }
 
-    func removeShelfIcon(
+    func setShelfIconHidden(
         _ id: ShelfIcon.ID,
+        isHidden: Bool,
         at now: Date
     ) async throws {
         try await writer.write { db in
@@ -46,7 +47,7 @@ public extension AppDatabase {
                 throw ShelfIconWriteError.shelfIconNotFound
             }
 
-            shelfIcon.archivedAt = now
+            shelfIcon.archivedAt = isHidden ? now : nil
             shelfIcon.updatedAt = now
             try shelfIcon.update(db)
         }

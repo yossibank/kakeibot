@@ -9,10 +9,17 @@ public struct WalletListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var openId: Wallet.ID?
-    @State private var hideZone: CGRect = .zero
-    @State private var isOverHideZone = false
+    @State private var zones = SettingsDropZones()
+    @State private var autoScroll = SettingsAutoScroll()
+    @State private var contentOrigin: CGPoint = .zero
+    @State private var hideHover = SettingsHideHover()
+    @State private var hiddenId: Wallet.ID?
+    @State private var hiddenList: SettingsScreenFlag
     @State private var hiding: Wallet?
     @State private var isConfirmingHide = false
+    @State private var hiddenLift: SettingsHiddenLift<Wallet.ID>?
+    @State private var isOverShowZone = false
+    @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -20,6 +27,11 @@ public struct WalletListView: View {
 
     public init(database: AppDatabase) {
         _model = State(initialValue: WalletListModel(database: database))
+        let hiddenList = SettingsScreenFlag.openHiddenList(
+            .wallets,
+            in: database
+        )
+        _hiddenList = State(initialValue: hiddenList)
         self.database = database
     }
 
@@ -27,29 +39,44 @@ public struct WalletListView: View {
         VStack(spacing: 14) {
             header
 
-            Text("長押しで動かせます。下の枠に置くか、横に払うと非表示になります")
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
-                .multilineTextAlignment(.center)
+            SettingsHint(
+                flag: .closedHint(.wallets, in: database),
+                lines: [.move, .hide, .swipeHide]
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     board
 
-                    if lift != nil {
-                        hideTarget
-                    } else if !model.hidden.isEmpty {
+                    if !model.hidden.isEmpty {
                         hiddenSection
                     }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
+                .onGeometryChange(for: CGPoint.self) { proxy in
+                    proxy.frame(in: .global).origin
+                } action: { origin in
+                    contentOrigin = origin
+                }
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(lift != nil)
+            .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsAutoScroll(autoScroll)
+            .settingsDropZones(
+                $zones,
+                showing: hiddenLift == nil ? nil : isOverShowZone
+            )
+            .settingsHideNotice($hiddenId) { id in
+                show(id)
+            }
 
-            AddButton("口座を追加") {
-                sheet = .new
+            if lift != nil {
+                SettingsHideTarget(zones: $zones, state: hideHover.state)
+            } else {
+                AddButton("口座を追加") {
+                    sheet = .new
+                }
             }
         }
         .padding(.horizontal, 18)
@@ -68,6 +95,7 @@ public struct WalletListView: View {
         .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
+        .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
             WalletEditSheet(model: editModel(for: sheet))
         }
@@ -76,9 +104,7 @@ public struct WalletListView: View {
             isPresented: $isConfirmingHide
         ) {
             if let hiding {
-                Task {
-                    await model.hide(hiding.id)
-                }
+                hide(hiding.id)
             }
         }
         .task {
@@ -118,29 +144,47 @@ private extension WalletListView {
         .frame(height: boardHeight, alignment: .top)
     }
 
-    var hideTarget: some View {
-        SettingsHideZone(isTargeted: isOverHideZone, height: Self.rowHeight)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .named(Self.space))
-            } action: { frame in
-                hideZone = frame
-            }
-    }
-
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SettingsSectionTitle("非表示の口座")
+            SettingsHiddenTitle(
+                flag: hiddenList,
+                title: "非表示の口座",
+                count: model.hidden.count
+            )
 
-            ForEach(model.hidden) { wallet in
-                Button {
-                    sheet = .edit(wallet.id)
-                } label: {
-                    row(wallet)
-                        .opacity(0.5)
+            if hiddenList.isOn {
+                ForEach(model.hidden) { wallet in
+                    hiddenRow(wallet)
                 }
-                .buttonStyle(.plain)
             }
         }
+    }
+
+    func hiddenRow(_ wallet: Wallet) -> some View {
+        let isLifted = hiddenLift?.id == wallet.id
+        let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
+        let scale: CGFloat = isLifted ? 1.03 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let opacity: Double = isLifted ? 1 : 0.5
+        let layer: Double = isLifted ? 1 : 0
+
+        return row(wallet)
+            .opacity(opacity)
+            .contentShape(.rect)
+            .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
+            .offset(offset)
+            .zIndex(layer)
+            .onTapGesture {
+                sheet = .edit(wallet.id)
+            }
+            .gesture(
+                LiftGesture(in: Self.space) { location in
+                    followHidden(wallet.id, to: location)
+                } onEnd: {
+                    dropHidden()
+                }
+            )
     }
 
     func movableRow(_ wallet: Wallet) -> some View {
@@ -290,9 +334,18 @@ private extension WalletListView {
 
         current.y = location.y
         lift = current
-        isOverHideZone = hideZone.contains(location)
+        let isInside = zones.isOverHide(location, from: contentOrigin)
+        hideHover.update(isInside: isInside)
 
-        guard !isOverHideZone else {
+        autoScroll.follow(
+            y: location.y + contentOrigin.y,
+            bottom: zones.hide.isEmpty ? nil : zones.hide.minY
+        ) { delta in
+            let shifted = CGPoint(x: location.x, y: location.y + delta)
+            follow(wallet, to: shifted)
+        }
+
+        guard !hideHover.isInside else {
             return
         }
 
@@ -304,16 +357,18 @@ private extension WalletListView {
     }
 
     func drop() {
+        autoScroll.stop()
+
         guard let lift else {
             return
         }
 
-        if isOverHideZone {
+        if hideHover.isArmed {
             let wallet = model.shown.first { $0.id == lift.id }
 
             withAnimation(.snappy) {
                 self.lift = nil
-                isOverHideZone = false
+                hideHover.reset()
                 model.cancelMoving()
             }
 
@@ -323,6 +378,8 @@ private extension WalletListView {
 
             return
         }
+
+        hideHover.reset()
 
         withAnimation(.snappy) {
             self.lift = nil
@@ -340,8 +397,63 @@ private extension WalletListView {
             return
         }
 
+        hide(wallet.id)
+    }
+
+    func followHidden(
+        _ id: Wallet.ID,
+        to location: CGPoint
+    ) {
+        if hiddenLift == nil {
+            withAnimation(.snappy(duration: 0.2)) {
+                hiddenLift = SettingsHiddenLift(
+                    id: id,
+                    start: location,
+                    location: location
+                )
+            }
+
+            liftCount += 1
+        }
+
+        hiddenLift?.location = location
+        isOverShowZone = zones.isOverShow(location, from: contentOrigin)
+    }
+
+    func dropHidden() {
+        guard let hiddenLift else {
+            return
+        }
+
+        let isShowing = isOverShowZone
+
+        withAnimation(.snappy) {
+            self.hiddenLift = nil
+            isOverShowZone = false
+        }
+
+        guard isShowing else {
+            return
+        }
+
+        showCount += 1
+
         Task {
-            await model.hide(wallet.id)
+            await model.show(hiddenLift.id)
+        }
+    }
+
+    func hide(_ id: Wallet.ID) {
+        Task {
+            if await model.hide(id) {
+                hiddenId = id
+            }
+        }
+    }
+
+    func show(_ id: Wallet.ID) {
+        Task {
+            await model.show(id)
         }
     }
 

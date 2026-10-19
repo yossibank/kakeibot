@@ -225,7 +225,7 @@ private extension TemplateEditModel {
             return
         }
 
-        let templates = try await database.templates()
+        let templates = try await database.templates(includingHidden: true)
         let template = templates.first { $0.id == editingId }
 
         guard let template else {

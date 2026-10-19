@@ -9,10 +9,15 @@ public struct StampListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var boardWidth: CGFloat = 0
-    @State private var removeZone: CGRect = .zero
-    @State private var isOverRemoveZone = false
-    @State private var removingId: ShelfIcon.ID?
-    @State private var isConfirmingRemove = false
+    @State private var zones = SettingsDropZones()
+    @State private var autoScroll = SettingsAutoScroll()
+    @State private var contentOrigin: CGPoint = .zero
+    @State private var hideHover = SettingsHideHover()
+    @State private var hiddenId: ShelfIcon.ID?
+    @State private var hiddenList: SettingsScreenFlag
+    @State private var hiddenLift: SettingsHiddenLift<ShelfIcon.ID>?
+    @State private var isOverShowZone = false
+    @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -20,6 +25,11 @@ public struct StampListView: View {
 
     public init(database: AppDatabase) {
         _model = State(initialValue: StampListModel(database: database))
+        let hiddenList = SettingsScreenFlag.openHiddenList(
+            .stamps,
+            in: database
+        )
+        _hiddenList = State(initialValue: hiddenList)
         self.database = database
     }
 
@@ -27,24 +37,42 @@ public struct StampListView: View {
         VStack(spacing: 14) {
             header
 
-            Text("カレンダーに押すスタンプです。長押しで動かせます")
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
-                .multilineTextAlignment(.center)
+            SettingsHint(
+                flag: .closedHint(.stamps, in: database),
+                lines: [.init("seal", "カレンダーに押すスタンプです"), .move, .hide]
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     board
 
-                    if lift != nil {
-                        removeTarget
+                    if !model.hidden.isEmpty {
+                        hiddenSection
                     }
                 }
                 .padding(.vertical, 8)
                 .coordinateSpace(.named(Self.space))
+                .onGeometryChange(for: CGPoint.self) { proxy in
+                    proxy.frame(in: .global).origin
+                } action: { origin in
+                    contentOrigin = origin
+                }
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(lift != nil)
+            .scrollDisabled(lift != nil || hiddenLift != nil)
+            .settingsAutoScroll(autoScroll)
+            .settingsDropZones(
+                $zones,
+                showing: hiddenLift == nil ? nil : isOverShowZone
+            )
+            .settingsHideNotice($hiddenId) { id in
+                show(id)
+            }
+
+            if lift != nil {
+                SettingsHideTarget(zones: $zones, state: hideHover.state)
+                    .padding(.bottom, 8)
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -61,12 +89,7 @@ public struct StampListView: View {
         .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
-        .confirmsStampDelete(isPresented: $isConfirmingRemove) {
-            confirmRemove()
-        }
-        .onChange(of: isConfirmingRemove) {
-            keepIfNotRemoved()
-        }
+        .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
             StampEditSheet(model: editModel(for: sheet))
         }
@@ -134,18 +157,47 @@ private extension StampListView {
         .buttonStyle(.plain)
     }
 
-    var removeTarget: some View {
-        SettingsHideZone(
-            isTargeted: isOverRemoveZone,
-            height: Self.tileHeight,
-            title: "ここに置くと消します",
-            systemImage: "trash"
-        )
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .named(Self.space))
-        } action: { frame in
-            removeZone = frame
+    var hiddenSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsHiddenTitle(
+                flag: hiddenList,
+                title: "非表示のスタンプ",
+                count: model.hidden.count
+            )
+
+            if hiddenList.isOn {
+                LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
+                    ForEach(model.hidden) { shelfIcon in
+                        hiddenTile(shelfIcon)
+                    }
+                }
+            }
         }
+    }
+
+    func hiddenTile(_ shelfIcon: ShelfIcon) -> some View {
+        let isLifted = hiddenLift?.id == shelfIcon.id
+        let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
+        let scale: CGFloat = isLifted ? 1.1 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let layer: Double = isLifted ? 1 : 0
+
+        return tileFace(shelfIcon, isHidden: true)
+            .frame(height: Self.tileHeight)
+            .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
+            .offset(offset)
+            .zIndex(layer)
+            .onTapGesture {
+                sheet = .edit(shelfIcon.id)
+            }
+            .gesture(
+                LiftGesture(in: Self.space) { location in
+                    followHidden(shelfIcon.id, to: location)
+                } onEnd: {
+                    dropHidden()
+                }
+            )
     }
 
     func movableTile(_ shelfIcon: ShelfIcon) -> some View {
@@ -156,7 +208,7 @@ private extension StampListView {
         let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
-        return tileFace(shelfIcon)
+        return tileFace(shelfIcon, isHidden: false)
             .frame(width: tileWidth, height: Self.tileHeight)
             .scaleEffect(scale)
             .shadow(color: shadow, radius: 16, y: 8)
@@ -174,15 +226,39 @@ private extension StampListView {
             )
     }
 
-    func tileFace(_ shelfIcon: ShelfIcon) -> some View {
-        IconBadge(model.icon(for: shelfIcon), size: 44)
+    func tileFace(
+        _ shelfIcon: ShelfIcon,
+        isHidden: Bool
+    ) -> some View {
+        let opacity: Double = isHidden ? 0.6 : 1
+
+        return IconBadge(model.icon(for: shelfIcon), size: 44)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Self.tileFill, in: Self.tileShape)
+            .background(tileBackground(isHidden: isHidden))
             .overlay {
-                Self.tileShape
-                    .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
+                tileBorder(isHidden: isHidden)
             }
+            .opacity(opacity)
             .contentShape(.rect)
+    }
+
+    @ViewBuilder
+    func tileBackground(isHidden: Bool) -> some View {
+        if !isHidden {
+            Self.tileShape
+                .fill(Self.tileFill)
+        }
+    }
+
+    @ViewBuilder
+    func tileBorder(isHidden: Bool) -> some View {
+        if isHidden {
+            Self.tileShape
+                .stroke(Palette.mist.opacity(.muted), style: .dashed)
+        } else {
+            Self.tileShape
+                .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
+        }
     }
 }
 
@@ -210,6 +286,10 @@ private extension StampListView {
     static let spacing: CGFloat = 8
     static let tileHeight: CGFloat = 78
     static let tileShape = RoundedRectangle(cornerRadius: 16)
+    static let columns = Array(
+        repeating: GridItem(.flexible(), spacing: spacing),
+        count: columnCount
+    )
 
     static var tileFill: LinearGradient {
         LinearGradient(
@@ -291,9 +371,18 @@ private extension StampListView {
 
         current.location = location
         lift = current
-        isOverRemoveZone = removeZone.contains(location)
+        let isInside = zones.isOverHide(location, from: contentOrigin)
+        hideHover.update(isInside: isInside)
 
-        guard !isOverRemoveZone else {
+        autoScroll.follow(
+            y: location.y + contentOrigin.y,
+            bottom: zones.hide.isEmpty ? nil : zones.hide.minY
+        ) { delta in
+            let shifted = CGPoint(x: location.x, y: location.y + delta)
+            follow(shelfIcon, to: shifted)
+        }
+
+        guard !hideHover.isInside else {
             return
         }
 
@@ -305,20 +394,26 @@ private extension StampListView {
     }
 
     func drop() {
+        autoScroll.stop()
+
         guard let lift else {
             return
         }
 
-        if isOverRemoveZone {
+        if hideHover.isArmed {
+            let id = lift.id
+
             withAnimation(.snappy) {
                 self.lift = nil
-                isOverRemoveZone = false
+                hideHover.reset()
             }
 
-            removingId = lift.id
-            isConfirmingRemove = true
+            hide(id)
+
             return
         }
+
+        hideHover.reset()
 
         withAnimation(.snappy) {
             self.lift = nil
@@ -329,30 +424,60 @@ private extension StampListView {
         }
     }
 
-    func confirmRemove() {
-        guard let removingId else {
+    func followHidden(
+        _ id: ShelfIcon.ID,
+        to location: CGPoint
+    ) {
+        if hiddenLift == nil {
+            withAnimation(.snappy(duration: 0.2)) {
+                hiddenLift = SettingsHiddenLift(
+                    id: id,
+                    start: location,
+                    location: location
+                )
+            }
+
+            liftCount += 1
+        }
+
+        hiddenLift?.location = location
+        isOverShowZone = zones.isOverShow(location, from: contentOrigin)
+    }
+
+    func dropHidden() {
+        guard let hiddenLift else {
             return
         }
 
-        self.removingId = nil
+        let isShowing = isOverShowZone
+
+        withAnimation(.snappy) {
+            self.hiddenLift = nil
+            isOverShowZone = false
+        }
+
+        guard isShowing else {
+            return
+        }
+
+        showCount += 1
 
         Task {
-            await model.remove(removingId)
+            await model.show(hiddenLift.id)
         }
     }
 
-    func keepIfNotRemoved() {
-        guard
-            !isConfirmingRemove,
-            removingId != nil
-        else {
-            return
+    func hide(_ id: ShelfIcon.ID) {
+        Task {
+            if await model.hide(id) {
+                hiddenId = id
+            }
         }
+    }
 
-        removingId = nil
-
-        withAnimation(.snappy) {
-            model.cancelMoving()
+    func show(_ id: ShelfIcon.ID) {
+        Task {
+            await model.show(id)
         }
     }
 

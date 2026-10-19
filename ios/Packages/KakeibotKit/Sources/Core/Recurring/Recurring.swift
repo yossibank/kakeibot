@@ -16,6 +16,7 @@ public struct Recurring: Hashable, Sendable {
     public var remindDaysBefore: Int?
     public var generatedUntil: LocalDate?
     public var sortOrder: Int
+    public var archivedAt: Date?
     public var createdAt: Date
     public var updatedAt: Date
 
@@ -35,6 +36,7 @@ public struct Recurring: Hashable, Sendable {
         remindDaysBefore: Int? = nil,
         generatedUntil: LocalDate? = nil,
         sortOrder: Int = 0,
+        archivedAt: Date? = nil,
         createdAt: Date,
         updatedAt: Date
     ) {
@@ -53,6 +55,7 @@ public struct Recurring: Hashable, Sendable {
         self.remindDaysBefore = remindDaysBefore
         self.generatedUntil = generatedUntil
         self.sortOrder = sortOrder
+        self.archivedAt = archivedAt
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -87,6 +90,7 @@ extension Recurring: Codable {
         try container.encodeOrNull(remindDaysBefore, forKey: .remindDaysBefore)
         try container.encodeOrNull(generatedUntil, forKey: .generatedUntil)
         try container.encode(sortOrder, forKey: .sortOrder)
+        try container.encodeOrNull(archivedAt, forKey: .archivedAt)
         try container.encode(createdAt, forKey: .createdAt)
         try container.encode(updatedAt, forKey: .updatedAt)
     }

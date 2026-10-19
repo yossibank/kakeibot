@@ -48,16 +48,22 @@ struct StampListModelTests {
     }
 
     @Test
-    func removesFromShelf() async throws {
+    func hidesAndShowsStamp() async throws {
         let database = try Self.database()
         let model = StampListModel(database: database)
         await model.load()
         let first = try #require(model.shown.first)
 
-        await model.remove(first.id)
+        await model.hide(first.id)
+        let shown = model.shown.map(\.id)
+        let hidden = model.hidden.map(\.id)
 
-        #expect(model.shown.count == 7)
-        #expect(!model.shown.contains { $0.id == first.id })
+        await model.show(first.id)
+
+        #expect(shown.count == 7)
+        #expect(hidden == [first.id])
+        #expect(model.hidden.isEmpty)
+        #expect(model.shown.first?.id == first.id)
     }
 }
 
