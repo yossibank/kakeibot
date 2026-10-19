@@ -117,6 +117,7 @@ private extension ReviewSharesCard {
                     .padding(.leading, 40)
             }
         }
+        .contentShape(.rect)
     }
 }
 

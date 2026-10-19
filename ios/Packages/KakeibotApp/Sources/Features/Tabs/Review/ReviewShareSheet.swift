@@ -30,7 +30,7 @@ struct ReviewShareSheet: View {
             }
 
             HStack(spacing: 12) {
-                IconBadge(share.icon, size: 40)
+                badge
 
                 Text(share.name)
                     .font(.headline)
@@ -82,5 +82,16 @@ struct ReviewShareSheet: View {
                 .ignoresSafeArea()
         }
         .preferredColorScheme(.dark)
+    }
+}
+
+private extension ReviewShareSheet {
+    @ViewBuilder
+    var badge: some View {
+        if share.id == ReviewModel.recurringShareId {
+            IconBadge(systemImage: "repeat", size: 40)
+        } else {
+            IconBadge(share.icon, size: 40)
+        }
     }
 }

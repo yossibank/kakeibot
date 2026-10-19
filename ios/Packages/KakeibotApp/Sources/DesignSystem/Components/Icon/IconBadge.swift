@@ -3,6 +3,7 @@ import SwiftUI
 
 public struct IconBadge: View {
     let icon: Icon?
+    let systemImage: String?
     let size: CGFloat
 
     public init(
@@ -10,6 +11,16 @@ public struct IconBadge: View {
         size: CGFloat = 40
     ) {
         self.icon = icon
+        self.systemImage = nil
+        self.size = size
+    }
+
+    public init(
+        systemImage: String,
+        size: CGFloat = 40
+    ) {
+        self.icon = nil
+        self.systemImage = systemImage
         self.size = size
     }
 
@@ -18,15 +29,29 @@ public struct IconBadge: View {
             .fill(tint.opacity(0.18))
             .frame(width: size, height: size)
             .overlay {
-                IconImage(icon, size: size * 0.45)
+                mark
                     .foregroundStyle(tint)
             }
     }
 }
 
 private extension IconBadge {
+    @ViewBuilder
+    var mark: some View {
+        if let systemImage {
+            Image(systemName: systemImage)
+                .font(.system(size: size * 0.45, weight: .light))
+        } else {
+            IconImage(icon, size: size * 0.45)
+        }
+    }
+
     var tint: Color {
-        icon.flatMap { Color(hex: $0.color) } ?? .secondary
+        if systemImage != nil {
+            return Palette.gold
+        }
+
+        return icon.flatMap { Color(hex: $0.color) } ?? .secondary
     }
 }
 
