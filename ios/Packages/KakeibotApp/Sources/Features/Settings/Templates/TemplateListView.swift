@@ -16,6 +16,9 @@ public struct TemplateListView: View {
     @State private var hiddenLift: SettingsHiddenLift<EntryTemplate.ID>?
     @State private var isOverShowZone = false
     @State private var showCount = 0
+    @State private var isHiddenOpen = false
+    @State private var boardFrame: CGRect = .zero
+    @State private var hiddenFrames: [EntryTemplate.ID: CGRect] = [:]
 
     @Environment(\.dismiss) private var dismiss
 
@@ -60,6 +63,12 @@ public struct TemplateListView: View {
                 hiding: lift == nil ? nil : isOverHideZone,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
+            .settingsLiftPreview(
+                at: liftPreviewCenter,
+                in: autoScroll.viewport
+            ) {
+                liftPreview
+            }
 
             AddButton(addTitle) {
                 sheet = .new(model.type)
@@ -120,19 +129,26 @@ private extension TemplateListView {
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            boardWidth = width
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { frame in
+            boardFrame = frame
+            boardWidth = frame.width
         }
     }
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SettingsHiddenTitle("非表示のテンプレート")
+            SettingsHiddenTitle(
+                isOpen: $isHiddenOpen,
+                title: "非表示のテンプレート",
+                count: model.hidden.count
+            )
 
-            ForEach(model.hidden) { template in
-                hiddenCard(template)
+            if isHiddenOpen {
+                ForEach(model.hidden) { template in
+                    hiddenCard(template)
+                }
             }
         }
     }
@@ -150,14 +166,17 @@ private extension TemplateListView {
         let isLifted = hiddenLift?.id == template.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let opacity: Double = isLifted ? 1 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
         return card(template)
             .opacity(opacity)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .global)
+            } action: { frame in
+                hiddenFrames[template.id] = frame
+            }
             .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
@@ -172,18 +191,33 @@ private extension TemplateListView {
             )
     }
 
+    @ViewBuilder
+    var liftPreview: some View {
+        if let lift,
+           let template = model.shown.first(where: { $0.id == lift.id }) {
+            card(template)
+                .frame(width: tileWidth)
+                .scaleEffect(1.03)
+        } else if let hiddenLift,
+                  let template = model.hidden
+                  .first(where: { $0.id == hiddenLift.id }),
+                  let frame = hiddenFrames[hiddenLift.id] {
+            card(template)
+                .frame(width: frame.width)
+                .scaleEffect(1.03)
+        }
+    }
+
     func movableCard(_ template: EntryTemplate) -> some View {
         let isLifted = lift?.id == template.id
         let index = model.shown.firstIndex(of: template) ?? 0
         let position = isLifted ? liftedCenter : center(at: index)
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return card(template)
             .frame(width: tileWidth)
             .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
             .position(position)
             .zIndex(layer)
             .onTapGesture {
@@ -250,6 +284,27 @@ private extension TemplateListView {
         let rows = (count + Self.columnCount - 1) / Self.columnCount
         let gaps = Self.spacing * CGFloat(max(rows - 1, 0))
         return Self.tileHeight * CGFloat(rows) + gaps
+    }
+
+    var liftPreviewCenter: CGPoint? {
+        if lift != nil {
+            return CGPoint(
+                x: boardFrame.minX + liftedCenter.x,
+                y: boardFrame.minY + liftedCenter.y
+            )
+        }
+
+        guard
+            let hiddenLift,
+            let frame = hiddenFrames[hiddenLift.id]
+        else {
+            return nil
+        }
+
+        return CGPoint(
+            x: frame.midX + hiddenLift.offset.width,
+            y: frame.midY + hiddenLift.offset.height
+        )
     }
 
     var liftedCenter: CGPoint {

@@ -15,7 +15,7 @@ struct SettingsHint: View {
     }
 
     var body: some View {
-        Group {
+        VStack(spacing: 0) {
             if !model.isClosed {
                 HStack(alignment: .top, spacing: 8) {
                     VStack(alignment: .leading, spacing: 2) {

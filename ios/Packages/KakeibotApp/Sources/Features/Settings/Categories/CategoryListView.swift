@@ -16,6 +16,9 @@ public struct CategoryListView: View {
     @State private var hiddenLift: SettingsHiddenLift<EntryCategory.ID>?
     @State private var isOverShowZone = false
     @State private var showCount = 0
+    @State private var isHiddenOpen = false
+    @State private var boardFrame: CGRect = .zero
+    @State private var hiddenFrames: [EntryCategory.ID: CGRect] = [:]
 
     @Environment(\.dismiss) private var dismiss
 
@@ -60,6 +63,12 @@ public struct CategoryListView: View {
                 hiding: lift == nil ? nil : isOverHideZone,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
+            .settingsLiftPreview(
+                at: liftPreviewCenter,
+                in: autoScroll.viewport
+            ) {
+                liftPreview
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -119,10 +128,11 @@ private extension CategoryListView {
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            boardWidth = width
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { frame in
+            boardFrame = frame
+            boardWidth = frame.width
         }
     }
 
@@ -146,11 +156,17 @@ private extension CategoryListView {
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SettingsHiddenTitle("非表示のカテゴリ")
+            SettingsHiddenTitle(
+                isOpen: $isHiddenOpen,
+                title: "非表示のカテゴリ",
+                count: model.hidden.count
+            )
 
-            LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
-                ForEach(model.hidden) { category in
-                    hiddenTile(category)
+            if isHiddenOpen {
+                LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
+                    ForEach(model.hidden) { category in
+                        hiddenTile(category)
+                    }
                 }
             }
         }
@@ -160,13 +176,16 @@ private extension CategoryListView {
         let isLifted = hiddenLift?.id == category.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.1 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return tileFace(category, isHidden: true)
             .frame(height: Self.tileHeight)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .global)
+            } action: { frame in
+                hiddenFrames[category.id] = frame
+            }
             .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
@@ -181,18 +200,33 @@ private extension CategoryListView {
             )
     }
 
+    @ViewBuilder
+    var liftPreview: some View {
+        if let lift,
+           let category = model.shown.first(where: { $0.id == lift.id }) {
+            tileFace(category, isHidden: false)
+                .frame(width: tileWidth, height: Self.tileHeight)
+                .scaleEffect(1.1)
+        } else if let hiddenLift,
+                  let category = model.hidden
+                  .first(where: { $0.id == hiddenLift.id }),
+                  let frame = hiddenFrames[hiddenLift.id] {
+            tileFace(category, isHidden: true)
+                .frame(width: frame.width, height: Self.tileHeight)
+                .scaleEffect(1.1)
+        }
+    }
+
     func movableTile(_ category: EntryCategory) -> some View {
         let isLifted = lift?.id == category.id
         let index = model.shown.firstIndex(of: category) ?? 0
         let position = isLifted ? liftedCenter : center(at: index)
         let scale: CGFloat = isLifted ? 1.1 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return tileFace(category, isHidden: false)
             .frame(width: tileWidth, height: Self.tileHeight)
             .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
             .position(position)
             .zIndex(layer)
             .onTapGesture {
@@ -311,6 +345,27 @@ private extension CategoryListView {
         let rows = (slots + Self.columnCount - 1) / Self.columnCount
         let gaps = Self.spacing * CGFloat(max(rows - 1, 0))
         return Self.tileHeight * CGFloat(rows) + gaps
+    }
+
+    var liftPreviewCenter: CGPoint? {
+        if lift != nil {
+            return CGPoint(
+                x: boardFrame.minX + liftedCenter.x,
+                y: boardFrame.minY + liftedCenter.y
+            )
+        }
+
+        guard
+            let hiddenLift,
+            let frame = hiddenFrames[hiddenLift.id]
+        else {
+            return nil
+        }
+
+        return CGPoint(
+            x: frame.midX + hiddenLift.offset.width,
+            y: frame.midY + hiddenLift.offset.height
+        )
     }
 
     var liftedCenter: CGPoint {

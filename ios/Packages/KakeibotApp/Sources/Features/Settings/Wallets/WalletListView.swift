@@ -18,6 +18,9 @@ public struct WalletListView: View {
     @State private var hiddenLift: SettingsHiddenLift<Wallet.ID>?
     @State private var isOverShowZone = false
     @State private var showCount = 0
+    @State private var isHiddenOpen = false
+    @State private var boardFrame: CGRect = .zero
+    @State private var hiddenFrames: [Wallet.ID: CGRect] = [:]
 
     @Environment(\.dismiss) private var dismiss
 
@@ -61,6 +64,12 @@ public struct WalletListView: View {
                 hiding: lift == nil ? nil : isOverHideZone,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
+            .settingsLiftPreview(
+                at: liftPreviewCenter,
+                in: autoScroll.viewport
+            ) {
+                liftPreview
+            }
 
             AddButton("口座を追加") {
                 sheet = .new
@@ -131,14 +140,25 @@ private extension WalletListView {
         }
         .frame(maxWidth: .infinity)
         .frame(height: boardHeight, alignment: .top)
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { frame in
+            boardFrame = frame
+        }
     }
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SettingsHiddenTitle("非表示の口座")
+            SettingsHiddenTitle(
+                isOpen: $isHiddenOpen,
+                title: "非表示の口座",
+                count: model.hidden.count
+            )
 
-            ForEach(model.hidden) { wallet in
-                hiddenRow(wallet)
+            if isHiddenOpen {
+                ForEach(model.hidden) { wallet in
+                    hiddenRow(wallet)
+                }
             }
         }
     }
@@ -147,15 +167,18 @@ private extension WalletListView {
         let isLifted = hiddenLift?.id == wallet.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let opacity: Double = isLifted ? 1 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
         return row(wallet)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .global)
+            } action: { frame in
+                hiddenFrames[wallet.id] = frame
+            }
             .opacity(opacity)
             .contentShape(.rect)
             .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
@@ -170,12 +193,28 @@ private extension WalletListView {
             )
     }
 
+    @ViewBuilder
+    var liftPreview: some View {
+        if let lift,
+           let wallet = model.shown.first(where: { $0.id == lift.id }) {
+            row(wallet)
+                .frame(width: boardFrame.width)
+                .scaleEffect(1.03)
+        } else if let hiddenLift,
+                  let wallet = model.hidden
+                  .first(where: { $0.id == hiddenLift.id }),
+                  let frame = hiddenFrames[hiddenLift.id] {
+            row(wallet)
+                .frame(width: frame.width)
+                .scaleEffect(1.03)
+        }
+    }
+
     func movableRow(_ wallet: Wallet) -> some View {
         let isLifted = lift?.id == wallet.id
         let index = model.shown.firstIndex(of: wallet) ?? 0
         let y = isLifted ? liftedCenterY : centerY(at: index)
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: wallet.id, openId: $openId, role: .hide) {
@@ -187,7 +226,6 @@ private extension WalletListView {
         }
         .frame(height: Self.rowHeight)
         .scaleEffect(scale)
-        .shadow(color: shadow, radius: 16, y: 8)
         .offset(y: y - Self.rowHeight / 2)
         .zIndex(layer)
         .gesture(
@@ -271,6 +309,27 @@ private extension WalletListView {
 
     var hidingBalance: Int {
         hiding.map { model.balance(of: $0) } ?? 0
+    }
+
+    var liftPreviewCenter: CGPoint? {
+        if lift != nil {
+            return CGPoint(
+                x: boardFrame.midX,
+                y: boardFrame.minY + liftedCenterY
+            )
+        }
+
+        guard
+            let hiddenLift,
+            let frame = hiddenFrames[hiddenLift.id]
+        else {
+            return nil
+        }
+
+        return CGPoint(
+            x: frame.midX + hiddenLift.offset.width,
+            y: frame.midY + hiddenLift.offset.height
+        )
     }
 
     var liftedCenterY: CGFloat {
