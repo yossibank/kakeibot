@@ -29,10 +29,7 @@ public struct StampListView: View {
         VStack(spacing: 14) {
             header
 
-            Text("カレンダーに押すスタンプです。長押しで動かせます。下の枠に置くと非表示になります")
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
-                .multilineTextAlignment(.center)
+            SettingsHint("カレンダーに押すスタンプです", SettingsHint.moveAndHide)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {

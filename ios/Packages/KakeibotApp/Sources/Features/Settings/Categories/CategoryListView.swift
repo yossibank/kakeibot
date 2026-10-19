@@ -30,9 +30,7 @@ public struct CategoryListView: View {
             header
             CapsulePicker(selection: $model.kind, options: Self.kindOptions)
 
-            Text("長押しで動かせます。下の枠に置くと非表示になります")
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
+            SettingsHint(SettingsHint.moveAndHide)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {

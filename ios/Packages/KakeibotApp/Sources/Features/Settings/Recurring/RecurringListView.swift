@@ -28,10 +28,7 @@ public struct RecurringListView: View {
         VStack(spacing: 14) {
             header
 
-            Text(hint)
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
-                .multilineTextAlignment(.center)
+            SettingsHint(lines: hint)
 
             ScrollView {
                 VStack(spacing: 14) {
@@ -191,7 +188,7 @@ private extension RecurringListView {
         let opacity: Double = isLifted ? 1 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
-        return rowCard(row)
+        return rowCard(row, isPaused: true)
             .frame(height: Self.rowHeight)
             .opacity(opacity)
             .scaleEffect(scale)
@@ -244,7 +241,7 @@ private extension RecurringListView {
         } onAction: {
             deleting = row.id
         } content: {
-            rowCard(row)
+            rowCard(row, isPaused: false)
         }
         .frame(height: Self.rowHeight)
         .scaleEffect(scale)
@@ -260,7 +257,10 @@ private extension RecurringListView {
         )
     }
 
-    func rowCard(_ row: RecurringListModel.Row) -> some View {
+    func rowCard(
+        _ row: RecurringListModel.Row,
+        isPaused: Bool
+    ) -> some View {
         Group {
             HStack(spacing: 12) {
                 IconBadge(row.icon, size: 38)
@@ -282,9 +282,15 @@ private extension RecurringListView {
                 VStack(alignment: .trailing, spacing: 3) {
                     AmountText(row.amount, type: row.type)
 
-                    Text(Self.nextText(row.next))
-                        .font(.caption2)
-                        .foregroundStyle(Palette.mist)
+                    if isPaused {
+                        Label("止めています", systemImage: "pause.circle")
+                            .font(.caption2)
+                            .foregroundStyle(Palette.amber)
+                    } else {
+                        Text(Self.nextText(row.next))
+                            .font(.caption2)
+                            .foregroundStyle(Palette.mist)
+                    }
                 }
             }
             .padding(.horizontal, 14)
@@ -311,12 +317,13 @@ private extension RecurringListView {
     static let spacing: CGFloat = 10
     nonisolated static let space = "RecurringBoard"
     nonisolated static let listSpace = "RecurringList"
+    static let purpose = "決まった日に、記録をひとりでに入れます"
 
-    var hint: String {
-        if !model.rows.isEmpty {
-            "決まった日に、記録をひとりでに入れます。長押しで動かせます。下の枠に置くと止めて非表示にします"
+    var hint: [String] {
+        if model.rows.isEmpty {
+            [Self.purpose]
         } else {
-            "決まった日に、記録をひとりでに入れます"
+            [Self.purpose, "長押しで並べ替え、下の枠に置くと止められます"]
         }
     }
 

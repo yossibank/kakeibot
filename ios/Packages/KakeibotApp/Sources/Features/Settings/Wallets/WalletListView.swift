@@ -31,10 +31,10 @@ public struct WalletListView: View {
         VStack(spacing: 14) {
             header
 
-            Text("長押しで動かせます。下の枠に置くか、横に払うと非表示になります")
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
-                .multilineTextAlignment(.center)
+            SettingsHint(
+                SettingsHint.moveAndHide,
+                "行を横に払っても非表示にできます"
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {

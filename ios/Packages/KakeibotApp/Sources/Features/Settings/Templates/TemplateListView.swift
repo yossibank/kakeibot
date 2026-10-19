@@ -30,10 +30,7 @@ public struct TemplateListView: View {
             header
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
 
-            Text(hint)
-                .font(.caption)
-                .foregroundStyle(Palette.mist)
-                .multilineTextAlignment(.center)
+            SettingsHint(lines: hint)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
@@ -237,11 +234,11 @@ private extension TemplateListView {
         "\(typeName)のテンプレートを追加"
     }
 
-    var hint: String {
+    var hint: [String] {
         if model.shown.isEmpty {
-            "よく使う入力を残しておくと、ホームと入力シートから 1 回で入れられます"
+            ["よく使う入力を残しておけます", "ホームと入力シートから 1 回で入れられます"]
         } else {
-            "長押しで動かせます。この順でホームと入力シートに出ます。下の枠に置くと非表示になります"
+            ["この順でホームと入力シートに出ます", SettingsHint.moveAndHide]
         }
     }
 
