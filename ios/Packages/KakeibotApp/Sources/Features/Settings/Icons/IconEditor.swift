@@ -11,6 +11,10 @@ struct IconEditor<Field: Hashable>: View {
 
     var body: some View {
         VStack(spacing: 16) {
+            if !model.shelf.isEmpty {
+                shelf
+            }
+
             colors
 
             CapsulePicker(
@@ -36,6 +40,26 @@ struct IconEditor<Field: Hashable>: View {
 }
 
 private extension IconEditor {
+    var shelf: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionTitle("棚から選ぶ")
+
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    ForEach(model.shelf, id: \.id) { icon in
+                        Button {
+                            model.apply(icon)
+                        } label: {
+                            IconBadge(icon, size: 40)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .scrollIndicators(.hidden)
+        }
+    }
+
     var colors: some View {
         LazyVGrid(columns: Self.colorColumns, spacing: 4) {
             ForEach(IconEditModel.colors, id: \.self) { hex in

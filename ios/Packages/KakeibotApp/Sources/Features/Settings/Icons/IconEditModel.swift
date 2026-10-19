@@ -1,6 +1,7 @@
 import Core
 import Foundation
 import Observation
+import Store
 
 @MainActor
 @Observable
@@ -11,6 +12,7 @@ public final class IconEditModel {
 
     public private(set) var emoji = ""
     public private(set) var text = ""
+    public private(set) var shelf: [Icon] = []
 
     public init(
         glyph: Icon.Glyph,
@@ -45,6 +47,8 @@ public extension IconEditModel {
             title
         }
     }
+
+    static let shelfLoadFailedMessage = "アイコンの棚を読めませんでした"
 
     static let colors = [
         "#E07A5F", "#E76F51", "#F28482", "#F4A261",
@@ -254,6 +258,18 @@ public extension IconEditModel {
 
     func inputText(_ value: String) {
         text = String(value.prefix(IconDraft.maxTextLength))
+    }
+
+    func apply(_ icon: Icon) {
+        apply(IconDraft(icon))
+    }
+
+    func loadShelf(from database: AppDatabase) async throws {
+        let iconShelf = try await database.iconShelf()
+
+        shelf = iconShelf.shelfIcons.compactMap { shelfIcon in
+            iconShelf.icons[shelfIcon.iconId]
+        }
     }
 
     func apply(_ draft: IconDraft) {

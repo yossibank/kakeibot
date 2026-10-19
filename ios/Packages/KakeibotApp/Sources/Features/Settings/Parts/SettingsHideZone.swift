@@ -4,14 +4,16 @@ import SwiftUI
 struct SettingsHideZone: View {
     let isTargeted: Bool
     let height: CGFloat
+    var title = "ここに置くと非表示になります"
+    var systemImage = "eye.slash"
 
     var body: some View {
         let color = isTargeted ? Palette.rose : Palette.mist
 
         HStack(spacing: 8) {
-            Image(systemName: "eye.slash")
+            Image(systemName: systemImage)
 
-            Text("ここに置くと非表示になります")
+            Text(title)
         }
         .font(.subheadline)
         .foregroundStyle(color)
