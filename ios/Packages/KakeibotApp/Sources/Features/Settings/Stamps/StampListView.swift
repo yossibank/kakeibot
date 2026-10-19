@@ -3,8 +3,8 @@ import DesignSystem
 import Store
 import SwiftUI
 
-public struct ShelfIconListView: View {
-    @State private var model: ShelfIconListModel
+public struct StampListView: View {
+    @State private var model: StampListModel
     @State private var sheet: Sheet?
     @State private var lift: Lift?
     @State private var liftCount = 0
@@ -19,7 +19,7 @@ public struct ShelfIconListView: View {
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
-        _model = State(initialValue: ShelfIconListModel(database: database))
+        _model = State(initialValue: StampListModel(database: database))
         self.database = database
     }
 
@@ -27,7 +27,7 @@ public struct ShelfIconListView: View {
         VStack(spacing: 14) {
             header
 
-            Text("カテゴリ・口座・スタンプで使えます。長押しで動かせます")
+            Text("カレンダーに押すスタンプです。長押しで動かせます")
                 .font(.caption)
                 .foregroundStyle(Palette.mist)
                 .multilineTextAlignment(.center)
@@ -61,14 +61,14 @@ public struct ShelfIconListView: View {
         .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
-        .confirmsShelfIconDelete(isPresented: $isConfirmingRemove) {
+        .confirmsStampDelete(isPresented: $isConfirmingRemove) {
             confirmRemove()
         }
         .onChange(of: isConfirmingRemove) {
             keepIfNotRemoved()
         }
         .sheet(item: $sheet) { sheet in
-            ShelfIconEditSheet(model: editModel(for: sheet))
+            StampEditSheet(model: editModel(for: sheet))
         }
         .task {
             await model.observe()
@@ -76,7 +76,7 @@ public struct ShelfIconListView: View {
     }
 }
 
-private extension ShelfIconListView {
+private extension StampListView {
     var header: some View {
         HStack {
             RingButton(systemImage: "chevron.left") {
@@ -85,7 +85,7 @@ private extension ShelfIconListView {
 
             Spacer()
 
-            Text("アイコンの棚")
+            Text("スタンプ")
                 .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
@@ -138,7 +138,7 @@ private extension ShelfIconListView {
         SettingsHideZone(
             isTargeted: isOverRemoveZone,
             height: Self.tileHeight,
-            title: "ここに置くと棚から消します",
+            title: "ここに置くと消します",
             systemImage: "trash"
         )
         .onGeometryChange(for: CGRect.self) { proxy in
@@ -186,7 +186,7 @@ private extension ShelfIconListView {
     }
 }
 
-private extension ShelfIconListView {
+private extension StampListView {
     struct Lift {
         let id: ShelfIcon.ID
         var location: CGPoint
@@ -205,7 +205,7 @@ private extension ShelfIconListView {
         }
     }
 
-    nonisolated static let space = "ShelfIconBoard"
+    nonisolated static let space = "StampBoard"
     static let columnCount = 4
     static let spacing: CGFloat = 8
     static let tileHeight: CGFloat = 78
@@ -356,12 +356,12 @@ private extension ShelfIconListView {
         }
     }
 
-    func editModel(for sheet: Sheet) -> ShelfIconEditModel {
+    func editModel(for sheet: Sheet) -> StampEditModel {
         switch sheet {
         case .new:
-            ShelfIconEditModel(database: database)
+            StampEditModel(database: database)
         case let .edit(id):
-            ShelfIconEditModel(database: database, editing: id)
+            StampEditModel(database: database, editing: id)
         }
     }
 }
@@ -371,7 +371,7 @@ private extension ShelfIconListView {
         let _ = try? database.insertShelfIfEmpty(at: Date())
 
         NavigationStack {
-            ShelfIconListView(database: database)
+            StampListView(database: database)
         }
     }
 }

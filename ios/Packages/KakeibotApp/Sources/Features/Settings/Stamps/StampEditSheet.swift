@@ -3,8 +3,8 @@ import DesignSystem
 import Store
 import SwiftUI
 
-public struct ShelfIconEditSheet: View {
-    @State private var model: ShelfIconEditModel
+public struct StampEditSheet: View {
+    @State private var model: StampEditModel
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingRemove = false
 
@@ -12,7 +12,7 @@ public struct ShelfIconEditSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    public init(model: ShelfIconEditModel) {
+    public init(model: StampEditModel) {
         _model = State(initialValue: model)
     }
 
@@ -67,7 +67,7 @@ public struct ShelfIconEditSheet: View {
         ) {
             dismiss()
         }
-        .confirmsShelfIconDelete(isPresented: $isConfirmingRemove) {
+        .confirmsStampDelete(isPresented: $isConfirmingRemove) {
             Task {
                 await remove()
             }
@@ -78,7 +78,7 @@ public struct ShelfIconEditSheet: View {
     }
 }
 
-private extension ShelfIconEditSheet {
+private extension StampEditSheet {
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
@@ -87,7 +87,7 @@ private extension ShelfIconEditSheet {
 
             Spacer()
 
-            Text(model.isEditing ? "アイコンを編集" : "アイコンを追加")
+            Text(model.isEditing ? "スタンプを編集" : "スタンプを追加")
                 .font(.serif(.body))
                 .tracking(4)
                 .foregroundStyle(Palette.gold)
@@ -107,7 +107,7 @@ private extension ShelfIconEditSheet {
     }
 }
 
-private extension ShelfIconEditSheet {
+private extension StampEditSheet {
     enum Field: Hashable {
         case text
     }
@@ -141,6 +141,6 @@ private extension ShelfIconEditSheet {
 
 #Preview {
     if let database = try? AppDatabase.inMemory() {
-        ShelfIconEditSheet(model: ShelfIconEditModel(database: database))
+        StampEditSheet(model: StampEditModel(database: database))
     }
 }

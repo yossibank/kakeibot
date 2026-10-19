@@ -5,11 +5,11 @@ import Store
 import Testing
 
 @MainActor
-struct ShelfIconListModelTests {
+struct StampListModelTests {
     @Test
     func showsShelfInOrder() async throws {
         let database = try Self.database()
-        let model = ShelfIconListModel(database: database)
+        let model = StampListModel(database: database)
 
         await model.load()
         let glyphs = model.shown.map { model.icon(for: $0)?.glyph }
@@ -22,7 +22,7 @@ struct ShelfIconListModelTests {
     @Test
     func savesMovedOrder() async throws {
         let database = try Self.database()
-        let model = ShelfIconListModel(database: database)
+        let model = StampListModel(database: database)
         await model.load()
         let first = try #require(model.shown.first)
 
@@ -37,7 +37,7 @@ struct ShelfIconListModelTests {
     @Test
     func cancelsMovedOrder() async throws {
         let database = try Self.database()
-        let model = ShelfIconListModel(database: database)
+        let model = StampListModel(database: database)
         await model.load()
         let ids = model.shown.map(\.id)
 
@@ -50,7 +50,7 @@ struct ShelfIconListModelTests {
     @Test
     func removesFromShelf() async throws {
         let database = try Self.database()
-        let model = ShelfIconListModel(database: database)
+        let model = StampListModel(database: database)
         await model.load()
         let first = try #require(model.shown.first)
 
@@ -61,7 +61,7 @@ struct ShelfIconListModelTests {
     }
 }
 
-private extension ShelfIconListModelTests {
+private extension StampListModelTests {
     static func database() throws -> AppDatabase {
         let database = try AppDatabase.inMemory()
         try database.insertShelfIfEmpty(at: Date())

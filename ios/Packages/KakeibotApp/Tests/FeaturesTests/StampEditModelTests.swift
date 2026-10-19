@@ -5,11 +5,11 @@ import Store
 import Testing
 
 @MainActor
-struct ShelfIconEditModelTests {
+struct StampEditModelTests {
     @Test
     func addsShelfIcon() async throws {
         let database = try Self.database()
-        let model = ShelfIconEditModel(database: database)
+        let model = StampEditModel(database: database)
         model.icon.markKind = .emoji
         model.icon.inputEmoji("🎉")
 
@@ -25,7 +25,7 @@ struct ShelfIconEditModelTests {
     @Test
     func cannotSaveWithoutMark() throws {
         let database = try Self.database()
-        let model = ShelfIconEditModel(database: database)
+        let model = StampEditModel(database: database)
 
         model.icon.markKind = .text
 
@@ -37,7 +37,7 @@ struct ShelfIconEditModelTests {
     func editsExistingShelfIcon() async throws {
         let database = try Self.database()
         let first = try await Self.firstShelfIcon(in: database)
-        let model = ShelfIconEditModel(database: database, editing: first.id)
+        let model = StampEditModel(database: database, editing: first.id)
 
         await model.load()
         let loadedGlyph = model.icon.glyph
@@ -60,7 +60,7 @@ struct ShelfIconEditModelTests {
     func removesShelfIcon() async throws {
         let database = try Self.database()
         let first = try await Self.firstShelfIcon(in: database)
-        let model = ShelfIconEditModel(database: database, editing: first.id)
+        let model = StampEditModel(database: database, editing: first.id)
 
         let isRemoved = await model.remove()
         let shelf = try await database.iconShelf()
@@ -68,26 +68,9 @@ struct ShelfIconEditModelTests {
         #expect(isRemoved)
         #expect(!shelf.shelfIcons.contains { $0.id == first.id })
     }
-
-    @Test
-    func categoryPicksIconFromShelf() async throws {
-        let database = try Self.database()
-        try database.insertDefaultsIfEmpty(at: Date())
-        let model = CategoryEditModel(database: database, kind: .expense)
-
-        await model.load()
-        let shelf = model.icon.shelf
-        let trophy = try #require(shelf.first { $0.glyph == .trophy })
-        model.icon.apply(trophy)
-
-        #expect(shelf.count == 8)
-        #expect(model.icon.markKind == .glyph)
-        #expect(model.icon.glyph == .trophy)
-        #expect(model.icon.color == trophy.color)
-    }
 }
 
-private extension ShelfIconEditModelTests {
+private extension StampEditModelTests {
     static func database() throws -> AppDatabase {
         let database = try AppDatabase.inMemory()
         try database.insertShelfIfEmpty(at: Date())

@@ -138,12 +138,6 @@ public extension CategoryEditModel {
     }
 
     func load() async {
-        do {
-            try await icon.loadShelf(from: database)
-        } catch {
-            errorNotice.show(IconEditModel.shelfLoadFailedMessage)
-        }
-
         guard let editingId else {
             return
         }

@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class ShelfIconEditModel {
+public final class StampEditModel {
     public internal(set) var errorNotice = ErrorNotice()
 
     public let icon = IconEditModel(glyph: .star)
@@ -26,7 +26,7 @@ public final class ShelfIconEditModel {
     }
 }
 
-public extension ShelfIconEditModel {
+public extension StampEditModel {
     var isEditing: Bool {
         editingId != nil
     }
@@ -59,14 +59,14 @@ public extension ShelfIconEditModel {
                 let shelfIcon,
                 let saved = shelf.icons[shelfIcon.iconId]
             else {
-                errorNotice.show(IconEditModel.shelfLoadFailedMessage)
+                errorNotice.show(Self.loadFailedMessage)
                 return
             }
 
             icon.apply(saved)
             baseline = icon.draft
         } catch {
-            errorNotice.show(IconEditModel.shelfLoadFailedMessage)
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -100,7 +100,8 @@ public extension ShelfIconEditModel {
     }
 }
 
-private extension ShelfIconEditModel {
+private extension StampEditModel {
     static let saveFailedMessage = "保存できませんでした"
-    static let removeFailedMessage = "棚から消せませんでした"
+    static let loadFailedMessage = "スタンプを読めませんでした"
+    static let removeFailedMessage = "スタンプを消せませんでした"
 }

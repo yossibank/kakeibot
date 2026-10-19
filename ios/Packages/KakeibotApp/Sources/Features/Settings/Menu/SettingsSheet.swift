@@ -57,12 +57,9 @@ public struct SettingsSheet: View {
                                 Hairline()
 
                                 NavigationLink {
-                                    ShelfIconListView(database: database)
+                                    StampListView(database: database)
                                 } label: {
-                                    row(
-                                        "アイコンの棚",
-                                        systemImage: "square.grid.2x2"
-                                    )
+                                    row("スタンプ", systemImage: "seal")
                                 }
 
                                 Hairline()

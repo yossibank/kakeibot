@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class ShelfIconListModel: ScreenModel {
+public final class StampListModel: ScreenModel {
     public private(set) var shelf: IconShelf?
     public private(set) var movingOrder: [ShelfIcon.ID]?
 
@@ -19,7 +19,7 @@ public final class ShelfIconListModel: ScreenModel {
     }
 }
 
-public extension ShelfIconListModel {
+public extension StampListModel {
     var shown: [ShelfIcon] {
         let shelfIcons = shelf?.shelfIcons ?? []
 
@@ -40,14 +40,14 @@ public extension ShelfIconListModel {
         do {
             shelf = try await database.iconShelf()
         } catch {
-            errorNotice.show(IconEditModel.shelfLoadFailedMessage)
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func observe() async {
         await observe(
             database.iconShelfUpdates(),
-            failure: IconEditModel.shelfLoadFailedMessage
+            failure: Self.loadFailedMessage
         ) { shelf in
             self.shelf = shelf
         }
@@ -105,7 +105,8 @@ public extension ShelfIconListModel {
     }
 }
 
-private extension ShelfIconListModel {
+private extension StampListModel {
     static let saveFailedMessage = "並びを保存できませんでした"
-    static let removeFailedMessage = "棚から消せませんでした"
+    static let loadFailedMessage = "スタンプを読めませんでした"
+    static let removeFailedMessage = "スタンプを消せませんでした"
 }
