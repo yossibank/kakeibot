@@ -13,6 +13,7 @@ public struct WalletListView: View {
     @State private var autoScroll = SettingsAutoScroll()
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
+    @State private var hiddenId: Wallet.ID?
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiding: Wallet?
     @State private var isConfirmingHide = false
@@ -64,12 +65,18 @@ public struct WalletListView: View {
             .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
-                hiding: lift == nil ? nil : hideHover.state,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
+            .settingsHideNotice($hiddenId) { id in
+                show(id)
+            }
 
-            AddButton("口座を追加") {
-                sheet = .new
+            if lift != nil {
+                SettingsHideTarget(zones: $zones, state: hideHover.state)
+            } else {
+                AddButton("口座を追加") {
+                    sheet = .new
+                }
             }
         }
         .padding(.horizontal, 18)
@@ -97,9 +104,7 @@ public struct WalletListView: View {
             isPresented: $isConfirmingHide
         ) {
             if let hiding {
-                Task {
-                    await model.hide(hiding.id)
-                }
+                hide(hiding.id)
             }
         }
         .task {
@@ -392,9 +397,7 @@ private extension WalletListView {
             return
         }
 
-        Task {
-            await model.hide(wallet.id)
-        }
+        hide(wallet.id)
     }
 
     func followHidden(
@@ -437,6 +440,20 @@ private extension WalletListView {
 
         Task {
             await model.show(hiddenLift.id)
+        }
+    }
+
+    func hide(_ id: Wallet.ID) {
+        Task {
+            if await model.hide(id) {
+                hiddenId = id
+            }
+        }
+    }
+
+    func show(_ id: Wallet.ID) {
+        Task {
+            await model.show(id)
         }
     }
 

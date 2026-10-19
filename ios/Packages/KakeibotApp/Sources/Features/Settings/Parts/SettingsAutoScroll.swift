@@ -46,31 +46,23 @@ extension SettingsAutoScroll {
 }
 
 private extension SettingsAutoScroll {
-    static let topBand: CGFloat = 80
-    static let bottomBand: CGFloat = 140
-    static let maxSpeed: CGFloat = 20
-    static let fullSpeedDepth: CGFloat = 2 / 3
+    static let band: CGFloat = 56
+    static let maxSpeed: CGFloat = 9
 
     static func speed(
         y: CGFloat,
         top: CGFloat,
         bottom: CGFloat
     ) -> CGFloat {
-        if y < top + topBand {
-            let depth = (top + topBand - y) / topBand
-            return -maxSpeed * ramp(depth)
+        if y < top + band {
+            return -maxSpeed * min((top + band - y) / band, 1)
         }
 
-        if y > bottom - bottomBand, y < bottom {
-            let depth = (y - (bottom - bottomBand)) / bottomBand
-            return maxSpeed * ramp(depth)
+        if y > bottom - band, y < bottom {
+            return maxSpeed * (y - (bottom - band)) / band
         }
 
         return 0
-    }
-
-    static func ramp(_ depth: CGFloat) -> CGFloat {
-        min(depth / fullSpeedDepth, 1)
     }
 
     func run() async {

@@ -13,6 +13,7 @@ public struct TemplateListView: View {
     @State private var autoScroll = SettingsAutoScroll()
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
+    @State private var hiddenId: EntryTemplate.ID?
     @State private var openId: EntryTemplate.ID?
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<EntryTemplate.ID>?
@@ -64,12 +65,18 @@ public struct TemplateListView: View {
             .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
-                hiding: lift == nil ? nil : hideHover.state,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
+            .settingsHideNotice($hiddenId) { id in
+                show(id)
+            }
 
-            AddButton(addTitle) {
-                sheet = .new(model.type)
+            if lift != nil {
+                SettingsHideTarget(zones: $zones, state: hideHover.state)
+            } else {
+                AddButton(addTitle) {
+                    sheet = .new(model.type)
+                }
             }
         }
         .padding(.horizontal, 18)
@@ -196,9 +203,7 @@ private extension TemplateListView {
         return SwipeRow(id: template.id, openId: $openId, role: .hide) {
             sheet = .edit(template.id)
         } onAction: {
-            Task {
-                await model.hide(template.id)
-            }
+            hide(template.id)
         } content: {
             card(template)
         }
@@ -375,9 +380,7 @@ private extension TemplateListView {
                 hideHover.reset()
             }
 
-            Task {
-                await model.hide(id)
-            }
+            hide(id)
 
             return
         }
@@ -433,6 +436,20 @@ private extension TemplateListView {
 
         Task {
             await model.show(hiddenLift.id)
+        }
+    }
+
+    func hide(_ id: EntryTemplate.ID) {
+        Task {
+            if await model.hide(id) {
+                hiddenId = id
+            }
+        }
+    }
+
+    func show(_ id: EntryTemplate.ID) {
+        Task {
+            await model.show(id)
         }
     }
 

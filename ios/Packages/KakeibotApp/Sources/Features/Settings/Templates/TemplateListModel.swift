@@ -93,9 +93,11 @@ public extension TemplateListModel {
         movingOrder = nil
     }
 
-    func hide(_ id: EntryTemplate.ID) async {
+    @discardableResult
+    func hide(_ id: EntryTemplate.ID) async -> Bool {
         movingOrder = nil
-        await setHidden(id, isHidden: true, failure: Self.hideFailedMessage)
+        let failure = Self.hideFailedMessage
+        return await setHidden(id, isHidden: true, failure: failure)
     }
 
     func show(_ id: EntryTemplate.ID) async {
@@ -133,11 +135,12 @@ private extension TemplateListModel {
         }
     }
 
+    @discardableResult
     func setHidden(
         _ id: EntryTemplate.ID,
         isHidden: Bool,
         failure: String
-    ) async {
+    ) async -> Bool {
         do {
             try await database.setTemplateHidden(
                 id,
@@ -146,8 +149,11 @@ private extension TemplateListModel {
             )
 
             templates = try await database.templates(includingHidden: true)
+
+            return true
         } catch {
             errorNotice.show(failure)
+            return false
         }
     }
 

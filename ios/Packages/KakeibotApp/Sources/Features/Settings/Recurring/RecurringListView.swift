@@ -14,6 +14,7 @@ public struct RecurringListView: View {
     @State private var zones = SettingsDropZones()
     @State private var autoScroll = SettingsAutoScroll()
     @State private var hideHover = SettingsHideHover()
+    @State private var hiddenId: Recurring.ID?
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<Recurring.ID>?
     @State private var isOverShowZone = false
@@ -65,12 +66,18 @@ public struct RecurringListView: View {
             .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
-                hiding: lift == nil ? nil : hideHover.state,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
+            .settingsHideNotice($hiddenId, message: "止めて非表示にしました") { id in
+                show(id)
+            }
 
-            AddButton("固定費を追加") {
-                sheet = .new
+            if lift != nil {
+                SettingsHideTarget(zones: $zones, state: hideHover.state)
+            } else {
+                AddButton("固定費を追加") {
+                    sheet = .new
+                }
             }
         }
         .padding(.horizontal, 18)
@@ -226,9 +233,7 @@ private extension RecurringListView {
         return SwipeRow(id: row.id, openId: $openId, role: .hide) {
             sheet = .edit(row.id)
         } onAction: {
-            Task {
-                await model.hide(row.id)
-            }
+            hide(row.id)
         } content: {
             rowCard(row, isPaused: false)
         }
@@ -409,9 +414,7 @@ private extension RecurringListView {
                 hideHover.reset()
             }
 
-            Task {
-                await model.hide(id)
-            }
+            hide(id)
 
             return
         }
@@ -424,6 +427,20 @@ private extension RecurringListView {
 
         Task {
             await model.finishMoving()
+        }
+    }
+
+    func hide(_ id: Recurring.ID) {
+        Task {
+            if await model.hide(id) {
+                hiddenId = id
+            }
+        }
+    }
+
+    func show(_ id: Recurring.ID) {
+        Task {
+            await model.show(id)
         }
     }
 

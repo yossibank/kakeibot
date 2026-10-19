@@ -33,21 +33,9 @@ private extension SettingsDropZones {
 extension View {
     func settingsDropZones(
         _ zones: Binding<SettingsDropZones>,
-        hiding: SettingsHideHover.State?,
         showing: Bool?
     ) -> some View {
-        overlay(alignment: .bottom) {
-            if let hiding {
-                SettingsHideZone(state: hiding, height: 64)
-                    .onGeometryChange(for: CGRect.self) { proxy in
-                        proxy.frame(in: .global)
-                    } action: { frame in
-                        zones.wrappedValue.hide = frame
-                    }
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
-        .overlay(alignment: .top) {
+        overlay(alignment: .top) {
             if let showing {
                 SettingsShowZone(isTargeted: showing)
                     .frame(height: 64)
@@ -58,9 +46,6 @@ extension View {
                     }
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
-        }
-        .sensoryFeedback(.impact(weight: .heavy), trigger: hiding) { _, new in
-            new == .armed
         }
     }
 }

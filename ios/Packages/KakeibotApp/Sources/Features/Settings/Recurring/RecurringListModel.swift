@@ -88,9 +88,11 @@ public extension RecurringListModel {
         movingOrder = order
     }
 
-    func hide(_ id: Recurring.ID) async {
+    @discardableResult
+    func hide(_ id: Recurring.ID) async -> Bool {
         movingOrder = nil
-        await setHidden(id, isHidden: true, failure: Self.hideFailedMessage)
+        let failure = Self.hideFailedMessage
+        return await setHidden(id, isHidden: true, failure: failure)
     }
 
     func show(_ id: Recurring.ID) async {
@@ -161,11 +163,12 @@ private extension RecurringListModel {
         }
     }
 
+    @discardableResult
     func setHidden(
         _ id: Recurring.ID,
         isHidden: Bool,
         failure: String
-    ) async {
+    ) async -> Bool {
         do {
             try await database.setRecurringHidden(
                 id,
@@ -173,8 +176,11 @@ private extension RecurringListModel {
                 today: today,
                 at: Date()
             )
+
+            return true
         } catch {
             errorNotice.show(failure)
+            return false
         }
     }
 

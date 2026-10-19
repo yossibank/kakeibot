@@ -49,8 +49,16 @@ public extension SettingsScreenFlag {
     }
 
     func load() async {
+        await apply(storedValue())
+    }
+
+    func storedValue() async -> Bool {
         let screens = try? await database.setting(key)
-        isOn = screens?.contains(screen) ?? false
+        return screens?.contains(screen) ?? false
+    }
+
+    func apply(_ isOn: Bool) {
+        self.isOn = isOn
     }
 
     @discardableResult

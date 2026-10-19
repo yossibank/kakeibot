@@ -82,9 +82,11 @@ public extension StampListModel {
         movingOrder = nil
     }
 
-    func hide(_ id: ShelfIcon.ID) async {
+    @discardableResult
+    func hide(_ id: ShelfIcon.ID) async -> Bool {
         movingOrder = nil
-        await setHidden(id, isHidden: true, failure: Self.hideFailedMessage)
+        let failure = Self.hideFailedMessage
+        return await setHidden(id, isHidden: true, failure: failure)
     }
 
     func show(_ id: ShelfIcon.ID) async {
@@ -120,11 +122,12 @@ private extension StampListModel {
         return stamps.filter { ($0.archivedAt != nil) == isHidden }
     }
 
+    @discardableResult
     func setHidden(
         _ id: ShelfIcon.ID,
         isHidden: Bool,
         failure: String
-    ) async {
+    ) async -> Bool {
         do {
             try await database.setShelfIconHidden(
                 id,
@@ -133,8 +136,11 @@ private extension StampListModel {
             )
 
             await load()
+
+            return true
         } catch {
             errorNotice.show(failure)
+            return false
         }
     }
 }

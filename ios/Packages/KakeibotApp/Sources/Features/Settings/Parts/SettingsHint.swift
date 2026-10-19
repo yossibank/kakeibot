@@ -21,9 +21,12 @@ struct SettingsHint: View {
                     .transition(Self.transition)
             }
         }
-        .animation(.snappy, value: flag.isOn)
         .task {
-            await flag.load()
+            let isClosed = await flag.storedValue()
+
+            withAnimation(.snappy) {
+                flag.apply(isClosed)
+            }
         }
     }
 }
@@ -57,7 +60,10 @@ private extension SettingsHint {
     static let shape = RoundedRectangle(cornerRadius: 16)
 
     static var transition: AnyTransition {
-        .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
+        .asymmetric(
+            insertion: .opacity.combined(with: .offset(y: 12)),
+            removal: .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
+        )
     }
 
     static var fill: LinearGradient {

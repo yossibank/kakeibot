@@ -84,7 +84,8 @@ public extension CategoryListModel {
         movingOrder = nil
     }
 
-    func hide(_ id: EntryCategory.ID) async {
+    @discardableResult
+    func hide(_ id: EntryCategory.ID) async -> Bool {
         movingOrder = nil
 
         do {
@@ -95,8 +96,10 @@ public extension CategoryListModel {
             )
 
             await load()
+            return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+            return false
         }
     }
 

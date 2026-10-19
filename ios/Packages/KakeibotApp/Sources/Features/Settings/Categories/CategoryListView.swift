@@ -13,6 +13,7 @@ public struct CategoryListView: View {
     @State private var autoScroll = SettingsAutoScroll()
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
+    @State private var hiddenId: EntryCategory.ID?
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<EntryCategory.ID>?
     @State private var isOverShowZone = false
@@ -63,9 +64,16 @@ public struct CategoryListView: View {
             .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
-                hiding: lift == nil ? nil : hideHover.state,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
+            .settingsHideNotice($hiddenId) { id in
+                show(id)
+            }
+
+            if lift != nil {
+                SettingsHideTarget(zones: $zones, state: hideHover.state)
+                    .padding(.bottom, 8)
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -422,9 +430,7 @@ private extension CategoryListView {
                 hideHover.reset()
             }
 
-            Task {
-                await model.hide(id)
-            }
+            hide(id)
 
             return
         }
@@ -480,6 +486,20 @@ private extension CategoryListView {
 
         Task {
             await model.show(hiddenLift.id)
+        }
+    }
+
+    func hide(_ id: EntryCategory.ID) {
+        Task {
+            if await model.hide(id) {
+                hiddenId = id
+            }
+        }
+    }
+
+    func show(_ id: EntryCategory.ID) {
+        Task {
+            await model.show(id)
         }
     }
 

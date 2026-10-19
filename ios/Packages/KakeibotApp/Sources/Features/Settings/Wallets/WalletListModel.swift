@@ -87,16 +87,20 @@ public extension WalletListModel {
         movingOrder = nil
     }
 
-    func hide(_ id: Wallet.ID) async {
+    @discardableResult
+    func hide(_ id: Wallet.ID) async -> Bool {
         movingOrder = nil
 
         do {
             try await database.setWalletHidden(id, isHidden: true, at: Date())
             await load()
+            return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {
             errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
+            return false
         } catch {
             errorNotice.show(Self.hideFailedMessage)
+            return false
         }
     }
 

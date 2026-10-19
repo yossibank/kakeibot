@@ -13,6 +13,7 @@ public struct StampListView: View {
     @State private var autoScroll = SettingsAutoScroll()
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
+    @State private var hiddenId: ShelfIcon.ID?
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<ShelfIcon.ID>?
     @State private var isOverShowZone = false
@@ -62,9 +63,16 @@ public struct StampListView: View {
             .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
-                hiding: lift == nil ? nil : hideHover.state,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
+            .settingsHideNotice($hiddenId) { id in
+                show(id)
+            }
+
+            if lift != nil {
+                SettingsHideTarget(zones: $zones, state: hideHover.state)
+                    .padding(.bottom, 8)
+            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -400,9 +408,7 @@ private extension StampListView {
                 hideHover.reset()
             }
 
-            Task {
-                await model.hide(id)
-            }
+            hide(id)
 
             return
         }
@@ -458,6 +464,20 @@ private extension StampListView {
 
         Task {
             await model.show(hiddenLift.id)
+        }
+    }
+
+    func hide(_ id: ShelfIcon.ID) {
+        Task {
+            if await model.hide(id) {
+                hiddenId = id
+            }
+        }
+    }
+
+    func show(_ id: ShelfIcon.ID) {
+        Task {
+            await model.show(id)
         }
     }
 
