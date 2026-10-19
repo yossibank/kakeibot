@@ -43,6 +43,7 @@ private extension AppDatabaseTests {
         "reward_log",
         "reward_rule",
         "setting",
+        "shelf_icon",
         "tag",
         "template",
         "theme",

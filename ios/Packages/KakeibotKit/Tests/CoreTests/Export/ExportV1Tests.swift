@@ -37,6 +37,16 @@ struct ExportV1Tests {
         #expect(export.data.templates.allSatisfy { $0.tagId == nil })
     }
 
+    @Test
+    func readsFileWithoutShelfIcons() throws {
+        let json = try Self.fixtureWithoutShelfIcons()
+
+        let export = try ExportV1(json: json)
+
+        #expect(export.data.shelfIcons.isEmpty)
+        #expect(!export.data.icons.isEmpty)
+    }
+
     @Test(arguments: try headers.valid)
     func readsSupportedHeader(header: Header) throws {
         let json = try Self.fixture(with: header)
@@ -103,6 +113,16 @@ private extension ExportV1Tests {
             tables[key] = rows.map { $0.filter { $0.key != "tagId" } }
         }
 
+        object["data"] = tables
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixtureWithoutShelfIcons() throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+        tables["shelfIcons"] = nil
         object["data"] = tables
         return try JSONSerialization.data(withJSONObject: object)
     }

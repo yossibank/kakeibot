@@ -15,6 +15,16 @@ public extension AppDatabase {
             try Self.insertDefaults(into: db, at: now)
         }
     }
+
+    func insertShelfIfEmpty(at now: Date) throws {
+        try writer.write { db in
+            guard try ShelfIcon.fetchCount(db) == 0 else {
+                return
+            }
+
+            try Self.insertShelf(into: db, at: now)
+        }
+    }
 }
 
 private extension AppDatabase {
@@ -48,6 +58,17 @@ private extension AppDatabase {
         Seed(name: "給料", glyph: .salary, color: "#2A9D8F"),
         Seed(name: "臨時収入", glyph: .bonus, color: "#E9C46A"),
         Seed(name: "その他", glyph: .other, color: "#8D99AE")
+    ]
+
+    static let shelf: [(Icon.Glyph, String)] = [
+        (.star, "#C9A465"),
+        (.party, "#E07A5F"),
+        (.trophy, "#E9C46A"),
+        (.cake, "#E5989B"),
+        (.fitness, "#6CBF84"),
+        (.travel, "#5FA8D3"),
+        (.sun, "#F4A261"),
+        (.moon, "#577590")
     ]
 
     static func insertDefaults(
@@ -101,16 +122,53 @@ private extension AppDatabase {
         }
     }
 
+    static func insertShelf(
+        into db: Database,
+        at now: Date
+    ) throws {
+        for (order, (glyph, color)) in shelf.enumerated() {
+            let icon = try insertIcon(
+                glyph: glyph,
+                color: color,
+                into: db,
+                at: now
+            )
+
+            let shelfIcon = ShelfIcon(
+                iconId: icon.id,
+                sortOrder: order,
+                createdAt: now,
+                updatedAt: now
+            )
+
+            try shelfIcon.insert(db)
+        }
+    }
+
     static func insertIcon(
         for seed: Seed,
+        into db: Database,
+        at now: Date
+    ) throws -> Icon {
+        try insertIcon(
+            glyph: seed.glyph,
+            color: seed.color,
+            into: db,
+            at: now
+        )
+    }
+
+    static func insertIcon(
+        glyph: Icon.Glyph,
+        color: String,
         into db: Database,
         at now: Date
     ) throws -> Icon {
         let icon = Icon(
             emoji: nil,
             text: nil,
-            glyph: seed.glyph,
-            color: seed.color,
+            glyph: glyph,
+            color: color,
             createdAt: now,
             updatedAt: now
         )

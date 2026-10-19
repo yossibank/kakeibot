@@ -98,6 +98,7 @@ extension RecordTests {
 
     struct Tables: Equatable {
         let icons: Set<Icon>
+        let shelfIcons: Set<ShelfIcon>
         let wallets: Set<Wallet>
         let categories: Set<EntryCategory>
         let recurrings: Set<Recurring>
@@ -115,6 +116,7 @@ extension RecordTests {
     struct Sample {
         let now: Date
         let icon: Icon
+        let shelfIcon: ShelfIcon
         let cash: Wallet
         let bank: Wallet
         let category: EntryCategory
@@ -205,6 +207,7 @@ extension RecordTests.Tables {
     init(fetchingFrom db: Database) throws {
         try self.init(
             icons: Set(Icon.fetchAll(db)),
+            shelfIcons: Set(ShelfIcon.fetchAll(db)),
             wallets: Set(Wallet.fetchAll(db)),
             categories: Set(EntryCategory.fetchAll(db)),
             recurrings: Set(Recurring.fetchAll(db)),
@@ -225,6 +228,7 @@ extension RecordTests.Sample {
     var tables: RecordTests.Tables {
         RecordTests.Tables(
             icons: [icon],
+            shelfIcons: [shelfIcon],
             wallets: [cash, bank],
             categories: [category],
             recurrings: [recurring],
@@ -252,6 +256,13 @@ extension RecordTests.Sample {
             emoji: "🍙",
             text: nil,
             color: "#FF8800",
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let shelfIcon = ShelfIcon(
+            iconId: icon.id,
+            sortOrder: 0,
             createdAt: now,
             updatedAt: now
         )
@@ -398,6 +409,7 @@ extension RecordTests.Sample {
         self.init(
             now: now,
             icon: icon,
+            shelfIcon: shelfIcon,
             cash: cash,
             bank: bank,
             category: category,
@@ -419,6 +431,7 @@ extension RecordTests.Sample {
     func insert(into db: Database) throws {
         let records: [any PersistableRecord] = [
             icon,
+            shelfIcon,
             cash,
             bank,
             category,

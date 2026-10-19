@@ -12,6 +12,7 @@ erDiagram
     icon ||--o{ category : "icon_id"
     icon ||--o{ reward_rule : "icon_id"
     icon ||--o{ calendar_stamp : "icon_id"
+    icon ||--o{ shelf_icon : "icon_id"
     wallet ||--o{ entry : "wallet_id・to_wallet_id"
     category |o--o{ entry : "category_id"
     category ||--o{ tag : "category_id"
@@ -42,7 +43,7 @@ erDiagram
 - 通貨の列は持たない。円だけを扱う
 - 月は `YYYY-MM`。期間との対応は下の表
 - 日時は UTC の ISO 8601
-- 財布・カテゴリ・タグは消さずに `archived_at` でしまう
+- 財布・カテゴリ・タグ・棚のアイコンは消さずに `archived_at` でしまう
 - 残高・貯金箱の残高は保存せず、記録から計算する
 
 月の始まりごとに、期間と月の呼び方を次の表に並べる。理由は [decisions.md の「期間の呼び方」](decisions.md#期間の呼び方)にある。
@@ -65,6 +66,8 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 どれにも、絵柄（`glyph`）と色の icon を 1 つずつ付ける。
 
+棚のアイコンが 1 つも無ければ（しまったものも数える）、`star`・`party`・`trophy`・`cake`・`fitness`・`travel`・`sun`・`moon` の絵柄の shelf_icon を、この順で入れる。
+
 ## 表
 
 表ごとに、列と型と補足を書く。型は SQLite の型で書く。
@@ -81,6 +84,18 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 | created_at / updated_at | TEXT | |
 
 emoji・text・glyph のどれかは必須。
+
+### shelf_icon
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| id | TEXT | |
+| icon_id | TEXT | |
+| sort_order | INTEGER | |
+| archived_at | TEXT | |
+| created_at / updated_at | TEXT | |
+
+カテゴリと財布は、棚のアイコンを指さずに、中身を写した自分の icon を持つ。
 
 ### wallet
 
