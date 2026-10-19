@@ -57,6 +57,14 @@ public struct SettingsSheet: View {
                                 Hairline()
 
                                 NavigationLink {
+                                    StampListView(database: database)
+                                } label: {
+                                    row("スタンプ", systemImage: "seal")
+                                }
+
+                                Hairline()
+
+                                NavigationLink {
                                     TemplateListView(database: database)
                                 } label: {
                                     row(

@@ -256,6 +256,10 @@ public extension IconEditModel {
         text = String(value.prefix(IconDraft.maxTextLength))
     }
 
+    func apply(_ icon: Icon) {
+        apply(IconDraft(icon))
+    }
+
     func apply(_ draft: IconDraft) {
         color = draft.color
 
