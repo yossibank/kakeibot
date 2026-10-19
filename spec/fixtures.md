@@ -109,6 +109,17 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 振替は、どちらの合計にも入れない。
 
+## setting
+
+`spec/fixtures/setting` のファイルは、次の表のとおりである。色は `#RRGGBB` で書く。
+
+| ファイル | 試すこと | 項目 |
+| --- | --- | --- |
+| `theme-palette-contrast.json` | 2 色のコントラスト比。小数第 2 位に丸める | `first`、`second`、`ratio` |
+| `theme-palette-readable.json` | 地の色に対して読みにくい色 | `theme`（役割ごとの色）、`unreadable`（役割の名前） |
+
+基準は [decisions.md の「テーマの読みやすさ」](../docs/decisions.md#テーマの読みやすさ)にある。`unreadable` は `accent`・`accentLight`・`text`・`subtext`・`hint` の順に並べる。
+
 ## wallet
 
 `spec/fixtures/wallet` のファイルは、次の表のとおりである。

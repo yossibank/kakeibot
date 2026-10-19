@@ -1,0 +1,138 @@
+[
+  {
+    "theme": {
+      "backgroundTop": "#16223D",
+      "backgroundBottom": "#080C16",
+      "panel": "#0E1628",
+      "cardTop": "#141C2F",
+      "cardBottom": "#090D18",
+      "line": "#26314A",
+      "accent": "#CDAA6B",
+      "accentDeep": "#8F6C38",
+      "accentLight": "#F4E6C1",
+      "text": "#EDE6D6",
+      "subtext": "#8C97AE",
+      "hint": "#7E89A0"
+    },
+    "unreadable": []
+  },
+  {
+    "theme": {
+      "backgroundTop": "#FAF7F0",
+      "backgroundBottom": "#EFE9DC",
+      "panel": "#F4EFE4",
+      "cardTop": "#FFFFFF",
+      "cardBottom": "#F3EEE3",
+      "line": "#DDD4C2",
+      "accent": "#8A6420",
+      "accentDeep": "#5E4313",
+      "accentLight": "#3E2C0C",
+      "text": "#1F1B16",
+      "subtext": "#6A6256",
+      "hint": "#7D7466"
+    },
+    "unreadable": []
+  },
+  {
+    "theme": {
+      "backgroundTop": "#16223D",
+      "backgroundBottom": "#080C16",
+      "panel": "#0E1628",
+      "cardTop": "#141C2F",
+      "cardBottom": "#090D18",
+      "line": "#26314A",
+      "accent": "#CDAA6B",
+      "accentDeep": "#8F6C38",
+      "accentLight": "#F4E6C1",
+      "text": "#3A4458",
+      "subtext": "#8C97AE",
+      "hint": "#7E89A0"
+    },
+    "unreadable": [
+      "text"
+    ]
+  },
+  {
+    "theme": {
+      "backgroundTop": "#16223D",
+      "backgroundBottom": "#080C16",
+      "panel": "#0E1628",
+      "cardTop": "#141C2F",
+      "cardBottom": "#090D18",
+      "line": "#26314A",
+      "accent": "#CDAA6B",
+      "accentDeep": "#8F6C38",
+      "accentLight": "#F4E6C1",
+      "text": "#EDE6D6",
+      "subtext": "#3C465C",
+      "hint": "#2E3648"
+    },
+    "unreadable": [
+      "subtext",
+      "hint"
+    ]
+  },
+  {
+    "theme": {
+      "backgroundTop": "#16223D",
+      "backgroundBottom": "#080C16",
+      "panel": "#0E1628",
+      "cardTop": "#8C97AE",
+      "cardBottom": "#090D18",
+      "line": "#26314A",
+      "accent": "#CDAA6B",
+      "accentDeep": "#8F6C38",
+      "accentLight": "#F4E6C1",
+      "text": "#EDE6D6",
+      "subtext": "#8C97AE",
+      "hint": "#7E89A0"
+    },
+    "unreadable": [
+      "accent",
+      "accentLight",
+      "text",
+      "subtext",
+      "hint"
+    ]
+  },
+  {
+    "theme": {
+      "backgroundTop": "#FAF7F0",
+      "backgroundBottom": "#EFE9DC",
+      "panel": "#F4EFE4",
+      "cardTop": "#FFFFFF",
+      "cardBottom": "#F3EEE3",
+      "line": "#DDD4C2",
+      "accent": "#CDAA6B",
+      "accentDeep": "#5E4313",
+      "accentLight": "#F4E6C1",
+      "text": "#EDE6D6",
+      "subtext": "#6A6256",
+      "hint": "#7D7466"
+    },
+    "unreadable": [
+      "accent",
+      "accentLight",
+      "text"
+    ]
+  },
+  {
+    "theme": {
+      "backgroundTop": "#16223D",
+      "backgroundBottom": "#080C16",
+      "panel": "#0E1628",
+      "cardTop": "#141C2F",
+      "cardBottom": "#090D18",
+      "line": "#26314A",
+      "accent": "#5A4A2E",
+      "accentDeep": "#8F6C38",
+      "accentLight": "#A89A80",
+      "text": "#EDE6D6",
+      "subtext": "#8C97AE",
+      "hint": "#7E89A0"
+    },
+    "unreadable": [
+      "accent"
+    ]
+  }
+]
