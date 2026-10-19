@@ -52,7 +52,7 @@ public struct ReminderView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -86,7 +86,7 @@ private extension ReminderView {
             Text("通知")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -99,16 +99,16 @@ private extension ReminderView {
         VStack(spacing: 14) {
             Image(systemName: bellImage)
                 .font(.sans(.headline, weight: .light))
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(width: 48, height: 48)
-                .background(Palette.gold.opacity(.subtle), in: Circle())
+                .background(Palette.accent.opacity(.subtle), in: Circle())
                 .contentTransition(.symbolEffect(.replace))
 
             VStack(spacing: 6) {
                 Text("記録忘れの通知")
                     .font(.caption2)
                     .tracking(3)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Text(timeText)
                     .font(.serif(.display))
@@ -118,7 +118,7 @@ private extension ReminderView {
 
                 Text(summaryText)
                     .font(.caption)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .multilineTextAlignment(.center)
             }
 
@@ -138,14 +138,14 @@ private extension ReminderView {
 
             Text("設定アプリで Kakeibot の通知を許可すると届きます")
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
 
             Button {
                 openSettings()
             } label: {
                 Text("設定アプリを開く")
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .frame(maxWidth: .infinity, minHeight: 40)
                     .background(Palette.rose.opacity(.subtle), in: Capsule())
                     .overlay {
@@ -213,41 +213,41 @@ private extension ReminderView {
                     .font(.sans(.body, weight: .medium))
                     .foregroundStyle(Palette.cardBottom)
                     .frame(width: 38, height: 38)
-                    .background(Palette.gold, in: .rect(cornerRadius: 9))
+                    .background(Palette.accent, in: .rect(cornerRadius: 9))
 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         Text("Kakeibot")
                             .font(.caption2)
-                            .foregroundStyle(Palette.mist)
+                            .foregroundStyle(Palette.subtext)
 
                         Spacer()
 
                         Text(timeText)
                             .font(.caption2)
                             .monospacedDigit()
-                            .foregroundStyle(Palette.mist)
+                            .foregroundStyle(Palette.subtext)
                     }
 
                     Text(NotificationPlan.reminderTitle)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Palette.ink)
+                        .foregroundStyle(Palette.text)
 
                     Text(NotificationPlan.reminderBody)
                         .font(.footnote)
-                        .foregroundStyle(Palette.ink.opacity(.strong))
+                        .foregroundStyle(Palette.text.opacity(.strong))
                 }
             }
             .padding(14)
-            .background(Palette.ink.opacity(.faint), in: Self.cardShape)
+            .background(Palette.text.opacity(.faint), in: Self.cardShape)
             .overlay {
                 Self.cardShape
-                    .stroke(Palette.ink.opacity(.subtle), lineWidth: 1)
+                    .stroke(Palette.text.opacity(.subtle), lineWidth: 1)
             }
 
             Text("記録か「支出なし」の印がある日は届きません")
                 .font(.caption2)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .padding(.leading, 6)
         }
     }
@@ -259,13 +259,13 @@ private extension ReminderView {
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "repeat")
                     .font(.sans(.small))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
                     .frame(width: 28, height: 28)
-                    .background(Palette.gold.opacity(.subtle), in: Circle())
+                    .background(Palette.accent.opacity(.subtle), in: Circle())
 
                 Text(recurringText)
                     .font(.footnote)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(14)
@@ -289,17 +289,17 @@ private extension ReminderView {
             Text("\(notice.date.month)/\(notice.date.day) \(notice.time)")
                 .font(.caption)
                 .monospacedDigit()
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(width: 84, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(notice.title)
                     .font(.subheadline)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.text)
 
                 Text(notice.body)
                     .font(.caption)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
             }
 
             Spacer(minLength: 0)
@@ -332,7 +332,7 @@ private extension ReminderView {
     }
 
     var timeColor: Color {
-        model.isOn ? Palette.champagne : Palette.dusk
+        model.isOn ? Palette.accentLight : Palette.hint
     }
 
     var summaryText: String {

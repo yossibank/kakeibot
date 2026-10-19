@@ -24,20 +24,20 @@ public struct Chip: View {
 
             Image(systemName: "chevron.down")
                 .font(.sans(.micro, weight: .semibold))
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
         }
         .font(.caption)
         .foregroundStyle(foreground)
         .padding(.horizontal, 12)
         .padding(.vertical, 7)
         .background(
-            isHighlighted ? Palette.gold.opacity(.subtle) : Color.clear,
+            isHighlighted ? Palette.accent.opacity(.subtle) : Color.clear,
             in: Capsule()
         )
         .overlay {
             Capsule()
                 .stroke(
-                    isHighlighted ? Palette.gold : Palette.line,
+                    isHighlighted ? Palette.accent : Palette.line,
                     lineWidth: 1
                 )
         }
@@ -46,7 +46,7 @@ public struct Chip: View {
 
 private extension Chip {
     var foreground: Color {
-        isHighlighted ? Palette.champagne : Palette.ink.opacity(.strong)
+        isHighlighted ? Palette.accentLight : Palette.text.opacity(.strong)
     }
 }
 
@@ -56,5 +56,5 @@ private extension Chip {
         Chip("9/10（木）", systemImage: "calendar", isHighlighted: true)
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

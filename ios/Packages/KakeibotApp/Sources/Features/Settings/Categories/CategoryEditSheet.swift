@@ -108,7 +108,7 @@ private extension CategoryEditSheet {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
     }
@@ -124,7 +124,7 @@ private extension CategoryEditSheet {
             Text(model.isEditing ? "カテゴリを編集" : "カテゴリを追加")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -145,16 +145,16 @@ private extension CategoryEditSheet {
         HStack(spacing: 18) {
             VStack(spacing: 6) {
                 IconImage(model.icon.preview, size: 24)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Text(model.name.isEmpty ? "名前" : model.name)
                     .font(.sans(.caption))
                     .lineLimit(1)
             }
-            .foregroundStyle(Palette.champagne)
+            .foregroundStyle(Palette.accentLight)
             .frame(width: 86, height: 86)
             .background(
-                Palette.gold.opacity(.subtle),
+                Palette.accent.opacity(.subtle),
                 in: .rect(cornerRadius: 18)
             )
             .overlay {
@@ -167,14 +167,14 @@ private extension CategoryEditSheet {
 
                 HStack(spacing: 6) {
                     Circle()
-                        .fill(Color(hex: model.icon.color) ?? Palette.mist)
+                        .fill(Color(hex: model.icon.color) ?? Palette.subtext)
                         .frame(width: 10, height: 10)
 
                     Text("振り返りのグラフの色")
                 }
             }
             .font(.caption2)
-            .foregroundStyle(Palette.mist)
+            .foregroundStyle(Palette.subtext)
         }
     }
 
@@ -188,7 +188,7 @@ private extension CategoryEditSheet {
                 if model.tags.count > 1 {
                     Text("長押しで並べ替え")
                         .font(.caption2)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                 }
             }
 

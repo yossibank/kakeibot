@@ -19,7 +19,7 @@ struct SettingsRowList<Panel: Hashable>: View {
         .background(Self.cardFill.opacity(0.7), in: Self.shape)
         .overlay {
             Self.shape
-                .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
+                .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
 }
@@ -55,7 +55,7 @@ private extension SettingsRowList {
     func rowButton(_ item: Item) -> some View {
         let isAmount = item.isAmount && !item.isEmpty
         let font: Font = isAmount ? Self.amountFont : .subheadline
-        let color = item.isEmpty ? Palette.dusk : Palette.champagne
+        let color = item.isEmpty ? Palette.hint : Palette.accentLight
 
         return Button {
             onOpen(item.panel)
@@ -63,13 +63,13 @@ private extension SettingsRowList {
             HStack(spacing: 12) {
                 Image(systemName: item.systemImage)
                     .font(.sans(.small))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
                     .frame(width: 28, height: 28)
-                    .background(Palette.gold.opacity(.subtle), in: Circle())
+                    .background(Palette.accent.opacity(.subtle), in: Circle())
 
                 Text(item.title)
                     .font(.subheadline)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
 
                 Spacer(minLength: 12)
 
@@ -80,7 +80,7 @@ private extension SettingsRowList {
 
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundStyle(Palette.gold.opacity(.medium))
+                    .foregroundStyle(Palette.accent.opacity(.medium))
             }
             .padding(.horizontal, 16)
             .frame(height: 56)

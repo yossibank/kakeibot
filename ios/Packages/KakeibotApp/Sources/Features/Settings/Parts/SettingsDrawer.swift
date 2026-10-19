@@ -22,7 +22,7 @@ struct SettingsDrawer<Content: View>: View {
                 Text(title)
                     .font(.caption2)
                     .tracking(3)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Spacer()
 
@@ -40,10 +40,10 @@ struct SettingsDrawer<Content: View>: View {
         .padding(.bottom, 12)
         .background {
             Self.shape
-                .fill(Palette.drawer)
+                .fill(Palette.panel)
                 .overlay {
                     Self.shape
-                        .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
+                        .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
         }

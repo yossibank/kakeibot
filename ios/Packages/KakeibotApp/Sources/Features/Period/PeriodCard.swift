@@ -11,17 +11,17 @@ struct PeriodCard: View {
             Text("いまの期間")
                 .font(.caption2)
                 .tracking(3)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Text(periodText)
                 .font(.serif(.title))
                 .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
+                .foregroundStyle(Palette.accentLight)
                 .contentTransition(.numericText())
 
             Text("\(month.month)月として数えます")
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .contentTransition(.numericText())
         }
         .frame(maxWidth: .infinity)

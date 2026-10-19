@@ -18,13 +18,13 @@ public struct TemplateCardAmount: View {
             Text(AmountText.text(amount))
                 .font(size.amountFont)
                 .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
+                .foregroundStyle(Palette.accentLight)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         } else {
             Text("毎回入れる")
                 .font(size.emptyAmountFont)
-                .foregroundStyle(Palette.dusk)
+                .foregroundStyle(Palette.hint)
         }
     }
 }

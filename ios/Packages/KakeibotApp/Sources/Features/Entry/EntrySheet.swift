@@ -63,7 +63,7 @@ public struct EntrySheet: View {
             }
             .background {
                 Rectangle()
-                    .fill(Palette.night)
+                    .fill(Palette.background)
                     .ignoresSafeArea()
             }
             .preferredColorScheme(.dark)
@@ -86,7 +86,7 @@ public struct EntrySheet: View {
 
 extension EntrySheet {
     static func categoryFill(_ isSelected: Bool) -> Color {
-        isSelected ? Palette.gold.opacity(.subtle) : Color.clear
+        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
     }
 }
 
@@ -294,7 +294,7 @@ private extension EntrySheet {
             if !model.hasOpenedCategoryMenu {
                 Label("長押しで編集・非表示", systemImage: "hand.tap")
                     .font(.caption2)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
             }
         }
     }
@@ -322,10 +322,10 @@ private extension EntrySheet {
         .padding(.bottom, 8)
         .background {
             Self.drawerShape
-                .fill(Palette.drawer)
+                .fill(Palette.panel)
                 .overlay {
                     Self.drawerShape
-                        .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
+                        .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
         }
@@ -398,11 +398,11 @@ private extension EntrySheet {
                     Text("追加")
                         .font(.sans(.caption))
                 }
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Palette.gold.opacity(.medium), style: .dashed)
+                        .stroke(Palette.accent.opacity(.medium), style: .dashed)
                 }
                 .contentShape(.rect)
             }
@@ -445,8 +445,8 @@ private extension EntrySheet {
     ) -> some View {
         let isSelected = model.categoryId == category.id
         let isLit = isSelected || isLifted
-        let color = isLit ? Palette.champagne : Palette.mist
-        let fill = isLifted ? Palette.drawer : Self.categoryFill(isLit)
+        let color = isLit ? Palette.accentLight : Palette.subtext
+        let fill = isLifted ? Palette.panel : Self.categoryFill(isLit)
         let border = isLit ? Palette.outline : Color.clear
         let width: CGFloat = isLifted ? 1.2 : 1
 
@@ -480,7 +480,7 @@ private extension EntrySheet {
         categoryFace(menu.category, isLifted: true)
             .frame(width: menu.frame.width, height: menu.frame.height)
             .scaleEffect(1.06)
-            .shadow(color: Palette.gold.opacity(.muted), radius: 12)
+            .shadow(color: Palette.accent.opacity(.muted), radius: 12)
             .position(x: menu.frame.midX, y: menu.frame.midY)
             .allowsHitTesting(false)
             .transition(.opacity)

@@ -67,6 +67,12 @@ let package = Package(
             ]
         ),
         .testTarget(
+            name: "DesignSystemTests",
+            dependencies: [
+                "DesignSystem"
+            ]
+        ),
+        .testTarget(
             name: "FeaturesTests",
             dependencies: [
                 "Features",

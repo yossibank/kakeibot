@@ -30,7 +30,7 @@ public struct MonthCalendar: View {
 
                 Text(monthTitle)
                     .font(.serif(.headline, weight: .medium))
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
 
                 Spacer()
 
@@ -80,7 +80,7 @@ private extension MonthCalendar {
         } label: {
             Image(systemName: systemImage)
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .frame(width: 44, height: 36)
                 .contentShape(.rect)
         }
@@ -92,7 +92,9 @@ private extension MonthCalendar {
         if let date {
             let isSelected = date == selection
             let weight: Font.Weight = isSelected ? .semibold : .regular
-            let ring = date == today && !isSelected ? Palette.gold : Color.clear
+            let ring = date == today && !isSelected
+                ? Palette.accent
+                : Color.clear
             let holiday = Holiday.name(of: date)
 
             Button {
@@ -104,7 +106,7 @@ private extension MonthCalendar {
                         .foregroundStyle(foreground(for: date))
                         .frame(width: 32, height: 32)
                         .background(
-                            isSelected ? Palette.gold : Color.clear,
+                            isSelected ? Palette.accent : Color.clear,
                             in: Circle()
                         )
                         .overlay(Circle().stroke(ring, lineWidth: 1))
@@ -162,7 +164,7 @@ private extension MonthCalendar {
     static let cellHeight: CGFloat = 46
 
     static func headerColor(for weekday: Weekday) -> Color {
-        weekday.tint ?? Palette.mist
+        weekday.tint ?? Palette.subtext
     }
 
     func move(months: Int) {
@@ -175,14 +177,14 @@ private extension MonthCalendar {
 
     func foreground(for date: LocalDate) -> Color {
         if date == selection {
-            return Palette.nightBottom
+            return Palette.backgroundBottom
         }
 
         if Holiday.contains(date) {
             return Palette.holiday
         }
 
-        return date.weekday.tint ?? Palette.ink
+        return date.weekday.tint ?? Palette.text
     }
 }
 
@@ -191,5 +193,5 @@ private extension MonthCalendar {
 
     MonthCalendar(selection: $selection, today: LocalDate(Date(), in: .current))
         .padding()
-        .background(Palette.night)
+        .background(Palette.background)
 }

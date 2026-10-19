@@ -34,7 +34,7 @@ public struct AssetsView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
     }
@@ -46,7 +46,7 @@ private extension AssetsView {
             Text("資産")
                 .font(.serif(.body))
                 .tracking(3)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -66,7 +66,7 @@ private extension AssetsView {
                 Text(AmountText.text(model.total))
                     .font(.serif(.largeTitle, weight: .bold))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
 
@@ -74,7 +74,7 @@ private extension AssetsView {
 
                 Text(changeText)
                     .font(.caption)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
             }
 
             BalanceTrend(totals: model.monthTotals.map(\.total))
@@ -107,16 +107,16 @@ private extension AssetsView {
     }
 
     func walletTile(_ row: AssetsModel.WalletRow) -> some View {
-        let color = row.balance < 0 ? Palette.rose : Palette.champagne
+        let color = row.balance < 0 ? Palette.rose : Palette.accentLight
 
         return VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
                 IconImage(row.icon, size: 15)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Text(row.wallet.name)
                     .font(.caption)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.text)
                     .lineLimit(1)
             }
 
@@ -147,7 +147,7 @@ private extension AssetsView {
     }
 
     func monthColor(_ month: YearMonth) -> Color {
-        month == model.currentMonth ? Palette.gold : Palette.dusk
+        month == model.currentMonth ? Palette.accent : Palette.hint
     }
 }
 
@@ -163,14 +163,14 @@ private struct BalanceTrend: View {
                     path.addLines(points)
                 }
                 .stroke(
-                    Palette.gold,
+                    Palette.accent,
                     style: StrokeStyle(lineWidth: 1.6, lineJoin: .round)
                 )
 
                 ForEach(points.indices, id: \.self) { index in
                     let isLast = index == points.count - 1
                     let size: CGFloat = isLast ? 8 : 4
-                    let color = isLast ? Palette.champagne : Palette.gold
+                    let color = isLast ? Palette.accentLight : Palette.accent
 
                     Circle()
                         .fill(color)

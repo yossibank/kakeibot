@@ -83,7 +83,7 @@ public struct CategoryListView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -112,7 +112,7 @@ private extension CategoryListView {
             Text("カテゴリ")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -146,7 +146,7 @@ private extension CategoryListView {
         } label: {
             Image(systemName: "plus")
                 .font(.sans(.headline, weight: .ultraLight))
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Palette.faint, in: Self.tileShape)
                 .overlay {
@@ -232,16 +232,16 @@ private extension CategoryListView {
         isHidden: Bool
     ) -> some View {
         let icon = model.icon(for: category)
-        let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.mist
+        let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.subtext
         let opacity: Double = isHidden ? 0.6 : 1
 
         return VStack(spacing: 6) {
             IconImage(icon, size: 20)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Text(category.name)
                 .font(.sans(.caption))
-                .foregroundStyle(Palette.ink)
+                .foregroundStyle(Palette.text)
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -271,10 +271,10 @@ private extension CategoryListView {
     func tileBorder(isHidden: Bool) -> some View {
         if isHidden {
             Self.tileShape
-                .stroke(Palette.mist.opacity(.muted), style: .dashed)
+                .stroke(Palette.subtext.opacity(.muted), style: .dashed)
         } else {
             Self.tileShape
-                .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
+                .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
 }

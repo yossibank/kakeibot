@@ -9,7 +9,7 @@ struct SettingsWalletTile: View {
     let action: () -> Void
 
     var body: some View {
-        let color = isSelected ? Palette.champagne : Palette.mist
+        let color = isSelected ? Palette.accentLight : Palette.subtext
 
         Button(action: action) {
             HStack(spacing: 6) {

@@ -26,20 +26,20 @@ public struct TemplateRowCard: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(name)
                     .font(TemplateCardSize.regular.nameFont)
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .lineLimit(2)
 
                 Text(detail)
                     .font(TemplateCardSize.regular.detailFont)
                     .tracking(1)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
             }
 
             Spacer(minLength: 8)
 
             Rectangle()
-                .fill(Palette.gold.opacity(.soft))
+                .fill(Palette.accent.opacity(.soft))
                 .frame(width: 0.5, height: 36)
 
             TemplateCardAmount(amount: amount, size: .regular)
@@ -80,5 +80,5 @@ public extension TemplateRowCard {
         )
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

@@ -47,7 +47,7 @@ public struct RecurringEditSheet: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
                 .onTapGesture {
                     isNameFocused = false
@@ -115,7 +115,7 @@ private extension RecurringEditSheet {
             Text(headerTitle)
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -157,18 +157,18 @@ private extension RecurringEditSheet {
                 "名前",
                 text: $model.memo,
                 prompt: Text("名前（家賃・給料など）")
-                    .foregroundStyle(Palette.dusk)
+                    .foregroundStyle(Palette.hint)
             )
             .multilineTextAlignment(.center)
             .font(.serif(.body))
-            .foregroundStyle(Palette.champagne)
-            .tint(Palette.gold)
+            .foregroundStyle(Palette.accentLight)
+            .tint(Palette.accent)
             .submitLabel(.done)
             .focused($isNameFocused)
             .padding(.bottom, 8)
             .overlay(alignment: .bottom) {
                 Rectangle()
-                    .fill(Palette.gold.opacity(.medium))
+                    .fill(Palette.accent.opacity(.medium))
                     .frame(height: 1)
             }
             .padding(.horizontal, 40)
@@ -355,7 +355,7 @@ private extension RecurringEditSheet {
     }
 
     var amountColor: Color {
-        model.amount > 0 ? Palette.champagne : Palette.dusk
+        model.amount > 0 ? Palette.accentLight : Palette.hint
     }
 
     var typeBinding: Binding<Entry.Kind> {

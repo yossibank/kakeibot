@@ -35,7 +35,7 @@ public struct NoticeBanner: View {
 
             Text(message)
                 .font(.footnote)
-                .foregroundStyle(Palette.ink)
+                .foregroundStyle(Palette.text)
                 .lineLimit(2)
 
             Spacer(minLength: 8)
@@ -44,13 +44,13 @@ public struct NoticeBanner: View {
                 Button(action: action) {
                     Text(actionTitle)
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
                         .padding(.horizontal, 14)
                         .frame(height: 34)
                         .overlay {
                             Capsule()
                                 .strokeBorder(
-                                    Palette.gold.opacity(.medium),
+                                    Palette.accent.opacity(.medium),
                                     lineWidth: 0.8
                                 )
                         }
@@ -65,7 +65,7 @@ public struct NoticeBanner: View {
         .background {
             ZStack {
                 Capsule()
-                    .fill(Palette.drawer)
+                    .fill(Palette.panel)
 
                 Capsule()
                     .fill(Self.sheen)
@@ -89,7 +89,7 @@ public extension NoticeBanner {
 extension NoticeBanner.Tone {
     var color: Color {
         switch self {
-        case .info: Palette.gold
+        case .info: Palette.accent
         case .error: Palette.rose
         }
     }
@@ -128,5 +128,5 @@ private extension NoticeBanner {
         )
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

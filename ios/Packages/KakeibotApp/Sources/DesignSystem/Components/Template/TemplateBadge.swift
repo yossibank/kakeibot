@@ -7,7 +7,7 @@ struct TemplateBadge: View {
 
     var body: some View {
         IconImage(icon, size: size.iconSize)
-            .foregroundStyle(Palette.gold)
+            .foregroundStyle(Palette.accent)
             .frame(width: size.badgeSize, height: size.badgeSize)
             .background(Palette.faint, in: Circle())
             .overlay {

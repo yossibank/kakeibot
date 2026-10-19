@@ -125,12 +125,12 @@ public struct SettingsSheet: View {
                                         systemName: "calendar.day.timeline.left"
                                     )
                                     .font(.sans(.body, weight: .light))
-                                    .foregroundStyle(Palette.gold)
+                                    .foregroundStyle(Palette.accent)
                                     .frame(width: 22)
 
                                     Text("週の始まり")
                                         .font(.subheadline)
-                                        .foregroundStyle(Palette.ink)
+                                        .foregroundStyle(Palette.text)
 
                                     Spacer()
 
@@ -206,12 +206,12 @@ public struct SettingsSheet: View {
                             HStack(spacing: 12) {
                                 Image(systemName: "iphone")
                                     .font(.sans(.body, weight: .light))
-                                    .foregroundStyle(Palette.gold)
+                                    .foregroundStyle(Palette.accent)
                                     .frame(width: 22)
 
                                 Text("起動時に開く画面")
                                     .font(.subheadline)
-                                    .foregroundStyle(Palette.ink)
+                                    .foregroundStyle(Palette.text)
 
                                 Spacer()
 
@@ -250,7 +250,7 @@ public struct SettingsSheet: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background {
                 Rectangle()
-                    .fill(Palette.night)
+                    .fill(Palette.background)
                     .ignoresSafeArea()
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -285,7 +285,7 @@ private extension SettingsSheet {
             Text("設定")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -299,12 +299,12 @@ private extension SettingsSheet {
         Text(title)
             .font(.caption2)
             .tracking(3)
-            .foregroundStyle(Palette.gold)
+            .foregroundStyle(Palette.accent)
             .padding(.leading, 6)
     }
 
     var hintsRow: some View {
-        let color = closedHints.isEmpty ? Palette.dusk : Palette.ink
+        let color = closedHints.isEmpty ? Palette.hint : Palette.text
         let value = closedHints.isEmpty
             ? "すべて出ています"
             : "閉じた説明 \(closedHints.count)"
@@ -312,7 +312,7 @@ private extension SettingsSheet {
         return HStack(spacing: 12) {
             Image(systemName: "text.bubble")
                 .font(.sans(.body, weight: .light))
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(width: 22)
 
             Text("説明をもう一度出す")
@@ -323,7 +323,7 @@ private extension SettingsSheet {
 
             Text(value)
                 .font(.footnote)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
         }
         .frame(minHeight: 48)
         .contentShape(.rect)
@@ -337,24 +337,24 @@ private extension SettingsSheet {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
                 .font(.sans(.body, weight: .light))
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(width: 22)
 
             Text(title)
                 .font(.subheadline)
-                .foregroundStyle(Palette.ink)
+                .foregroundStyle(Palette.text)
 
             Spacer()
 
             if let value {
                 Text(value)
                     .font(.footnote)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
             }
 
             Image(systemName: "chevron.right")
                 .font(.footnote)
-                .foregroundStyle(Palette.dusk)
+                .foregroundStyle(Palette.hint)
         }
         .frame(minHeight: 48)
         .contentShape(.rect)
@@ -459,7 +459,7 @@ private extension SettingsSheet {
             if let sampleMessage {
                 Text(sampleMessage)
                     .font(.footnote)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .padding(.leading, 6)
             }
         }

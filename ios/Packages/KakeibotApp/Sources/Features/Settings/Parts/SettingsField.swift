@@ -27,11 +27,11 @@ struct SettingsField<Field: Hashable>: View {
         TextField(
             prompt,
             text: $text,
-            prompt: Text(prompt).foregroundStyle(Palette.dusk)
+            prompt: Text(prompt).foregroundStyle(Palette.hint)
         )
         .font(font)
-        .foregroundStyle(Palette.ink)
-        .tint(Palette.gold)
+        .foregroundStyle(Palette.text)
+        .tint(Palette.accent)
         .submitLabel(.done)
         .focused(focus, equals: field)
         .onSubmit {
@@ -39,7 +39,7 @@ struct SettingsField<Field: Hashable>: View {
         }
         .padding(.horizontal, 14)
         .frame(height: 46)
-        .background(Palette.drawer, in: .rect(cornerRadius: 14))
+        .background(Palette.panel, in: .rect(cornerRadius: 14))
         .overlay {
             RoundedRectangle(cornerRadius: 14)
                 .stroke(stroke, lineWidth: 1)
@@ -54,6 +54,6 @@ private extension SettingsField {
     }
 
     var stroke: Color {
-        isFocused ? Palette.gold : Palette.gold.opacity(.muted)
+        isFocused ? Palette.accent : Palette.accent.opacity(.muted)
     }
 }

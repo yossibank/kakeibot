@@ -32,7 +32,7 @@ public struct AppIconListView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -53,7 +53,7 @@ private extension AppIconListView {
             Text("アプリアイコン")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -70,7 +70,7 @@ private extension AppIconListView {
             Text(title)
                 .font(.caption2)
                 .tracking(3)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .padding(.leading, 6)
 
             LazyVGrid(columns: Self.columns, spacing: 18) {

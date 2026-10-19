@@ -19,7 +19,7 @@ struct SettingsHideZone: View {
         .frame(maxWidth: .infinity, minHeight: height)
         .background {
             Self.shape
-                .fill(Palette.nightBottom.opacity(.strong))
+                .fill(Palette.backgroundBottom.opacity(.strong))
 
             GeometryReader { proxy in
                 Rectangle()
@@ -43,7 +43,7 @@ private extension SettingsHideZone {
 
     var color: Color {
         switch state {
-        case .outside: Palette.mist
+        case .outside: Palette.subtext
         case .waiting: Palette.amber
         case .armed: Palette.rose
         }

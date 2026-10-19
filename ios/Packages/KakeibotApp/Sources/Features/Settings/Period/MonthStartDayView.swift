@@ -18,7 +18,7 @@ public struct MonthStartDayView: View {
 
             Text("給料日に合わせると、その日から次の給料日の前の日までを 1 か月として数えます")
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
 
             ScrollView {
@@ -36,7 +36,7 @@ public struct MonthStartDayView: View {
 
                     Text("29〜31 日を選ぶと、その日がない月は月末から始まります")
                         .font(.caption2)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                 }
                 .padding(.vertical, 8)
             }
@@ -50,7 +50,7 @@ public struct MonthStartDayView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -74,7 +74,7 @@ private extension MonthStartDayView {
             Text("月の始まり")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 

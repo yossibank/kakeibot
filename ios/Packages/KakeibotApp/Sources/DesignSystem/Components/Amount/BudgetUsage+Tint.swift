@@ -7,6 +7,6 @@ public extension BudgetUsage {
             return Palette.rose
         }
 
-        return isNearLimit ? Palette.amber : Palette.gold
+        return isNearLimit ? Palette.amber : Palette.accent
     }
 }

@@ -16,7 +16,7 @@ public struct PageDots: View {
         HStack(spacing: 6) {
             ForEach(0..<count, id: \.self) { index in
                 Capsule()
-                    .fill(index == current ? Palette.gold : Palette.line)
+                    .fill(index == current ? Palette.accent : Palette.line)
                     .frame(width: index == current ? 16 : 6, height: 6)
             }
         }
@@ -31,5 +31,5 @@ public struct PageDots: View {
         PageDots(count: 3, current: 2)
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

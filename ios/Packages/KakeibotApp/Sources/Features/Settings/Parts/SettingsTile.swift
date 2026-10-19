@@ -5,10 +5,10 @@ enum SettingsTile {}
 
 extension SettingsTile {
     static func fill(isSelected: Bool) -> Color {
-        isSelected ? Palette.gold.opacity(.subtle) : Color.clear
+        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
     }
 
     static func stroke(isSelected: Bool) -> Color {
-        isSelected ? Palette.outline : Palette.gold.opacity(.subtle)
+        isSelected ? Palette.outline : Palette.accent.opacity(.subtle)
     }
 }

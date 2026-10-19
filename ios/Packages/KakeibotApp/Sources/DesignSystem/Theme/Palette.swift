@@ -3,29 +3,29 @@ import SwiftUI
 public enum Palette {}
 
 public extension Palette {
-    static let nightTop = Color(rgb: 0x16223D)
-    static let nightBottom = Color(rgb: 0x080C16)
-    static let gold = Color(rgb: 0xCDAA6B)
-    static let bronze = Color(rgb: 0x8F6C38)
-    static let champagne = Color(rgb: 0xF4E6C1)
-    static let ink = Color(rgb: 0xEDE6D6)
-    static let mist = Color(rgb: 0x8C97AE)
-    static let dusk = Color(rgb: 0x7E89A0)
-    static let line = Color(rgb: 0x26314A)
-    static let drawer = Color(rgb: 0x0E1628)
-    static let cardTop = Color(rgb: 0x141C2F)
-    static let cardBottom = Color(rgb: 0x090D18)
+    static let backgroundTop = Color(themed: \.backgroundTop)
+    static let backgroundBottom = Color(themed: \.backgroundBottom)
+    static let panel = Color(themed: \.panel)
+    static let cardTop = Color(themed: \.cardTop)
+    static let cardBottom = Color(themed: \.cardBottom)
+    static let line = Color(themed: \.line)
+    static let accent = Color(themed: \.accent)
+    static let accentDeep = Color(themed: \.accentDeep)
+    static let accentLight = Color(themed: \.accentLight)
+    static let text = Color(themed: \.text)
+    static let subtext = Color(themed: \.subtext)
+    static let hint = Color(themed: \.hint)
     static let rose = Color(rgb: 0xE3A3A3)
     static let amber = Color(rgb: 0xE89B57)
     static let holiday = Color(rgb: 0xEE8A84)
     static let saturday = Color(rgb: 0x8DB0EA)
-    static let hairline = gold.opacity(.subtle)
-    static let outline = gold.opacity(.medium)
-    static let faint = gold.opacity(.faint)
+    static let hairline = accent.opacity(.subtle)
+    static let outline = accent.opacity(.medium)
+    static let faint = accent.opacity(.faint)
 
-    static var night: LinearGradient {
+    static var background: LinearGradient {
         LinearGradient(
-            colors: [nightTop, nightBottom],
+            colors: [backgroundTop, backgroundBottom],
             startPoint: .top,
             endPoint: .bottom
         )

@@ -44,12 +44,12 @@ private extension DialTicks {
 #Preview {
     ZStack {
         DialTicks(count: 60, length: 8)
-            .stroke(Palette.gold.opacity(.strong), lineWidth: 1)
+            .stroke(Palette.accent.opacity(.strong), lineWidth: 1)
 
         DialTicks(count: 12, length: 13)
-            .stroke(Palette.champagne, lineWidth: 1.5)
+            .stroke(Palette.accentLight, lineWidth: 1.5)
     }
     .frame(width: 214, height: 214)
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

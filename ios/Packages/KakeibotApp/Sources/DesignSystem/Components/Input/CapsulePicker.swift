@@ -25,7 +25,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                     Capsule()
                         .strokeBorder(Self.thumbRim, lineWidth: 0.8)
                 }
-                .shadow(color: Palette.gold.opacity(.muted), radius: 6)
+                .shadow(color: Palette.accent.opacity(.muted), radius: 6)
                 .frame(width: Self.segmentWidth, height: Self.segmentHeight)
                 .offset(x: thumbX)
 
@@ -36,7 +36,9 @@ public struct CapsulePicker<Value: Hashable>: View {
                 ) { index, option in
                     let isHighlighted = index == highlightedIndex
                     let weight: Font.Weight = isHighlighted ? .bold : .regular
-                    let color = isHighlighted ? Palette.champagne : Palette.mist
+                    let color = isHighlighted
+                        ? Palette.accentLight
+                        : Palette.subtext
 
                     Text(option.title)
                         .font(.footnote.weight(weight))
@@ -58,7 +60,7 @@ public struct CapsulePicker<Value: Hashable>: View {
             Capsule()
                 .strokeBorder(Self.rim, lineWidth: 1)
         }
-        .glass(tint: Palette.nightBottom.opacity(.medium), in: Capsule())
+        .glass(tint: Palette.backgroundBottom.opacity(.medium), in: Capsule())
         .contentShape(Capsule())
         .gesture(dragGesture)
         .onAppear {
@@ -101,7 +103,10 @@ private extension CapsulePicker {
 
     static var thumbFill: LinearGradient {
         LinearGradient(
-            colors: [Palette.gold.opacity(.muted), Palette.gold.opacity(.soft)],
+            colors: [
+                Palette.accent.opacity(.muted),
+                Palette.accent.opacity(.soft)
+            ],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -110,8 +115,8 @@ private extension CapsulePicker {
     static var thumbRim: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.champagne.opacity(.strong),
-                Palette.gold.opacity(.muted)
+                Palette.accentLight.opacity(.strong),
+                Palette.accent.opacity(.muted)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -129,8 +134,8 @@ private extension CapsulePicker {
     static var rim: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.gold.opacity(.strong),
-                Palette.gold.opacity(.soft)
+                Palette.accent.opacity(.strong),
+                Palette.accent.opacity(.soft)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -201,5 +206,5 @@ private extension CapsulePicker {
         ]
     )
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

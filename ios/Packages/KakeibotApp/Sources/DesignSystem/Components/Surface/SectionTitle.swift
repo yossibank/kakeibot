@@ -11,12 +11,12 @@ public struct SectionTitle: View {
         Text(title)
             .font(.sans(.caption))
             .tracking(3)
-            .foregroundStyle(Palette.gold)
+            .foregroundStyle(Palette.accent)
     }
 }
 
 #Preview {
     SectionTitle("最近の記録")
         .padding()
-        .background(Palette.night)
+        .background(Palette.background)
 }

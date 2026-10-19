@@ -94,24 +94,24 @@ private extension ConfirmCard {
             VStack(spacing: 10) {
                 Image(systemName: systemImage)
                     .font(.sans(.headline, weight: .ultraLight))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
                     .frame(width: 52, height: 52)
                     .overlay {
                         Circle()
                             .stroke(
-                                Palette.gold.opacity(.medium),
+                                Palette.accent.opacity(.medium),
                                 lineWidth: 0.8
                             )
                     }
 
                 Text(title)
                     .font(.serif(.headline, weight: .medium))
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .multilineTextAlignment(.center)
 
                 Text(message)
                     .font(.caption)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .multilineTextAlignment(.center)
             }
 
@@ -119,7 +119,7 @@ private extension ConfirmCard {
                 Button(action: onKeep) {
                     Text(keepTitle)
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Palette.nightBottom)
+                        .foregroundStyle(Palette.backgroundBottom)
                         .frame(maxWidth: .infinity, minHeight: 48)
                         .background(Self.keepFill, in: Capsule())
                         .contentShape(Capsule())
@@ -144,17 +144,17 @@ private extension ConfirmCard {
         }
         .padding(24)
         .frame(maxWidth: 300)
-        .background(Palette.drawer, in: .rect(cornerRadius: 26))
+        .background(Palette.panel, in: .rect(cornerRadius: 26))
         .overlay {
             RoundedRectangle(cornerRadius: 26)
-                .stroke(Palette.gold.opacity(.medium), lineWidth: 0.8)
+                .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
         }
         .shadow(color: .black.opacity(0.5), radius: 30, y: 14)
     }
 
     static var keepFill: LinearGradient {
         LinearGradient(
-            colors: [Palette.champagne, Palette.gold],
+            colors: [Palette.accentLight, Palette.accent],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -171,5 +171,5 @@ private extension ConfirmCard {
         onConfirm: {},
         onKeep: {}
     )
-    .background(Palette.night)
+    .background(Palette.background)
 }

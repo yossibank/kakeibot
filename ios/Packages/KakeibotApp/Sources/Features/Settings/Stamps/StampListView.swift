@@ -82,7 +82,7 @@ public struct StampListView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -111,7 +111,7 @@ private extension StampListView {
             Text("スタンプ")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -145,7 +145,7 @@ private extension StampListView {
         } label: {
             Image(systemName: "plus")
                 .font(.sans(.headline, weight: .ultraLight))
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Palette.faint, in: Self.tileShape)
                 .overlay {
@@ -254,10 +254,10 @@ private extension StampListView {
     func tileBorder(isHidden: Bool) -> some View {
         if isHidden {
             Self.tileShape
-                .stroke(Palette.mist.opacity(.muted), style: .dashed)
+                .stroke(Palette.subtext.opacity(.muted), style: .dashed)
         } else {
             Self.tileShape
-                .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
+                .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
 }

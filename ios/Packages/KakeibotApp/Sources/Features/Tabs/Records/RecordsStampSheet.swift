@@ -18,7 +18,7 @@ struct RecordsStampSheet: View {
             if choices.isEmpty {
                 Text("設定の「スタンプ」で作ると、ここから押せます")
                     .font(.footnote)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .frame(maxWidth: .infinity, minHeight: 120)
             } else {
                 ScrollView {
@@ -52,7 +52,7 @@ struct RecordsStampSheet: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .preferredColorScheme(.dark)
@@ -72,7 +72,7 @@ private extension RecordsStampSheet {
             Text("\(date.month)/\(date.day) のスタンプ")
                 .font(.serif(.body))
                 .tracking(2)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -83,7 +83,7 @@ private extension RecordsStampSheet {
 
     func choice(_ icon: Icon) -> some View {
         let isCurrent = current?.id == icon.id
-        let ring = isCurrent ? Palette.gold : Color.clear
+        let ring = isCurrent ? Palette.accent : Color.clear
 
         return Button {
             onPick(icon)

@@ -22,7 +22,7 @@ public struct LaunchView: View {
         let scale: CGFloat = isLeaving ? 1.12 : 1
 
         ZStack {
-            Palette.drawer
+            Palette.panel
 
             mark
                 .scaleEffect(scale)
@@ -46,14 +46,14 @@ private extension LaunchView {
 
             RingSweep(progress: sweep, length: Self.sweepLength)
                 .stroke(
-                    Palette.champagne,
+                    Palette.accentLight,
                     style: StrokeStyle(lineWidth: 2.4, lineCap: .round)
                 )
                 .frame(width: Self.ringSize, height: Self.ringSize)
-                .shadow(color: Palette.gold, radius: 6)
+                .shadow(color: Palette.accent, radius: 6)
         }
         .frame(width: Self.markSize, height: Self.markSize)
-        .shadow(color: Palette.gold.opacity(glow), radius: 24)
+        .shadow(color: Palette.accent.opacity(glow), radius: 24)
     }
 }
 

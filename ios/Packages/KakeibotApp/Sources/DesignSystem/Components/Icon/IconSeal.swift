@@ -19,11 +19,14 @@ public struct IconSeal: View {
             .frame(width: size, height: size)
             .overlay {
                 IconImage(icon, size: size * 0.42)
-                    .foregroundStyle(Palette.nightBottom)
+                    .foregroundStyle(Palette.backgroundBottom)
             }
             .overlay {
                 Circle()
-                    .strokeBorder(Palette.nightBottom, lineWidth: size * 0.08)
+                    .strokeBorder(
+                        Palette.backgroundBottom,
+                        lineWidth: size * 0.08
+                    )
             }
             .shadow(color: tint.opacity(0.5), radius: size * 0.2)
     }
@@ -31,7 +34,7 @@ public struct IconSeal: View {
 
 private extension IconSeal {
     var tint: Color {
-        Color(hex: icon.color) ?? Palette.gold
+        Color(hex: icon.color) ?? Palette.accent
     }
 }
 
@@ -59,5 +62,5 @@ private extension IconSeal {
         IconSeal(star, size: 30)
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

@@ -58,25 +58,25 @@ private extension TagCard {
 
     var foreground: Color {
         switch style {
-        case .plain: Palette.mist
-        case .selected: Palette.champagne
-        case .add: Palette.gold
+        case .plain: Palette.subtext
+        case .selected: Palette.accentLight
+        case .add: Palette.accent
         }
     }
 
     var fill: Color {
         switch style {
-        case .plain: Palette.drawer
-        case .selected: Palette.gold.opacity(.soft)
+        case .plain: Palette.panel
+        case .selected: Palette.accent.opacity(.soft)
         case .add: Color.clear
         }
     }
 
     var stroke: Color {
         switch style {
-        case .plain: Palette.gold.opacity(.muted)
-        case .selected: Palette.gold
-        case .add: Palette.gold.opacity(.medium)
+        case .plain: Palette.accent.opacity(.muted)
+        case .selected: Palette.accent
+        case .add: Palette.accent.opacity(.medium)
         }
     }
 
@@ -153,5 +153,5 @@ private extension TagCard.Size {
         TagCard("夜ごはん", size: .small)
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

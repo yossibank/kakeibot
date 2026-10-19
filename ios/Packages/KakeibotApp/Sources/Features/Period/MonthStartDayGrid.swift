@@ -18,9 +18,9 @@ struct MonthStartDayGrid: View {
 private extension MonthStartDayGrid {
     func dayButton(_ day: MonthStartDay) -> some View {
         let isSelected = selection == day
-        let textColor = isSelected ? Palette.nightBottom : Palette.ink
-        let fill = isSelected ? Palette.gold : Palette.gold.opacity(.faint)
-        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(.soft)
+        let textColor = isSelected ? Palette.backgroundBottom : Palette.text
+        let fill = isSelected ? Palette.accent : Palette.accent.opacity(.faint)
+        let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
 
         return Button {
             onSelect(day)

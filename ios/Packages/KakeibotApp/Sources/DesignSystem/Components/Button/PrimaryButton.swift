@@ -57,9 +57,9 @@ private extension PrimaryButton {
     static var gold: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.gold.mix(with: Palette.champagne, by: 0.3),
-                Palette.gold,
-                Palette.gold.mix(with: Palette.bronze, by: 0.45)
+                Palette.accent.mix(with: Palette.accentLight, by: 0.3),
+                Palette.accent,
+                Palette.accent.mix(with: Palette.accentDeep, by: 0.45)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -75,14 +75,17 @@ private extension PrimaryButton {
     }
 
     var textColor: Color {
-        isEnabled ? Palette.nightBottom : Palette.mist
+        isEnabled ? Palette.backgroundBottom : Palette.subtext
     }
 
     var rim: LinearGradient {
         let colors = if isEnabled {
-            [Palette.champagne.opacity(.strong), Palette.gold.opacity(.soft)]
+            [
+                Palette.accentLight.opacity(.strong),
+                Palette.accent.opacity(.soft)
+            ]
         } else {
-            [Palette.gold.opacity(.muted), Palette.gold.opacity(.subtle)]
+            [Palette.accent.opacity(.muted), Palette.accent.opacity(.subtle)]
         }
 
         return LinearGradient(
@@ -93,7 +96,7 @@ private extension PrimaryButton {
     }
 
     var glow: Color {
-        isEnabled ? Palette.gold.opacity(.muted) : .clear
+        isEnabled ? Palette.accent.opacity(.muted) : .clear
     }
 }
 
@@ -105,5 +108,5 @@ private extension PrimaryButton {
             .disabled(true)
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

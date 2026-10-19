@@ -14,7 +14,7 @@ struct EntryDateSheet: View {
             VStack(alignment: .leading, spacing: 16) {
                 Text("日付")
                     .font(.headline)
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
 
                 HStack(spacing: 8) {
                     ForEach(Self.quickDays, id: \.offset) { quickDay in
@@ -41,16 +41,19 @@ private extension EntryDateSheet {
             dateBinding.wrappedValue = date
         }
         .font(.subheadline)
-        .foregroundStyle(isSelected ? Palette.champagne : Palette.ink)
+        .foregroundStyle(isSelected ? Palette.accentLight : Palette.text)
         .padding(.horizontal, 16)
         .frame(minHeight: 40)
         .background(
-            isSelected ? Palette.gold.opacity(.subtle) : Color.clear,
+            isSelected ? Palette.accent.opacity(.subtle) : Color.clear,
             in: Capsule()
         )
         .overlay {
             Capsule()
-                .stroke(isSelected ? Palette.gold : Palette.line, lineWidth: 1)
+                .stroke(
+                    isSelected ? Palette.accent : Palette.line,
+                    lineWidth: 1
+                )
         }
         .buttonStyle(.plain)
     }

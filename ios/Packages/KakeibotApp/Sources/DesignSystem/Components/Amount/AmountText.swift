@@ -48,9 +48,9 @@ private extension AmountText {
 
     var color: Color {
         switch type {
-        case .income: Palette.gold
-        case .transfer: Palette.mist
-        case .expense, nil: Palette.champagne
+        case .income: Palette.accent
+        case .transfer: Palette.subtext
+        case .expense, nil: Palette.accentLight
         }
     }
 }
@@ -64,5 +64,5 @@ private extension AmountText {
         AmountText(-24800)
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

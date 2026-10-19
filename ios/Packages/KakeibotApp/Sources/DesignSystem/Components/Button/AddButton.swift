@@ -16,7 +16,7 @@ public struct AddButton: View {
         Button(action: action) {
             Label(title, systemImage: "plus")
                 .font(.subheadline)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background(Palette.faint, in: Capsule())
                 .overlay {
@@ -32,5 +32,5 @@ public struct AddButton: View {
 #Preview {
     AddButton("口座を追加") {}
         .padding()
-        .background(Palette.night)
+        .background(Palette.background)
 }
