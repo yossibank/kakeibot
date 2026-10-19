@@ -1,4 +1,5 @@
-@testable import DesignSystem
+import Core
+import DesignSystem
 import SwiftUI
 import Testing
 
@@ -16,7 +17,7 @@ struct PaletteTests {
     @Test
     func followsTheme() {
         var environment = EnvironmentValues()
-        environment.theme = Self.forest
+        environment.palette = Self.forest
 
         let accent = Palette.accent.resolve(in: environment)
         let text = Palette.text.resolve(in: environment)
@@ -30,7 +31,7 @@ struct PaletteTests {
         let content = Rectangle()
             .fill(Palette.accent)
             .frame(width: 1, height: 1)
-            .environment(\.theme, Self.forest)
+            .environment(\.palette, Self.forest)
 
         let pixel = ImageRenderer(content: content).cgImage.flatMap(rgb)
 
@@ -40,7 +41,7 @@ struct PaletteTests {
     @Test
     func keepsFixedColors() {
         var environment = EnvironmentValues()
-        environment.theme = Self.forest
+        environment.palette = Self.forest
 
         let rose = Palette.rose.resolve(in: environment)
 
@@ -49,7 +50,7 @@ struct PaletteTests {
 }
 
 private extension PaletteTests {
-    static let forest = Theme(
+    static let forest = ThemePalette(
         backgroundTop: 0x143C32,
         backgroundBottom: 0x04130E,
         panel: 0x0B2620,

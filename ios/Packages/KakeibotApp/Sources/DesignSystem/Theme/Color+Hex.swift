@@ -1,3 +1,4 @@
+import Core
 import SwiftUI
 import UIKit
 
@@ -35,9 +36,9 @@ extension Color {
         self.init(red: red, green: green, blue: blue)
     }
 
-    init(themed role: KeyPath<Theme, UInt32> & Sendable) {
+    init(themed role: KeyPath<ThemePalette, UInt32> & Sendable) {
         let color = UIColor { traits in
-            UIColor(rgb: traits[ThemeTrait.self][keyPath: role])
+            UIColor(rgb: traits[PaletteTrait.self][keyPath: role])
         }
         self.init(uiColor: color)
     }

@@ -69,7 +69,8 @@ let package = Package(
         .testTarget(
             name: "DesignSystemTests",
             dependencies: [
-                "DesignSystem"
+                "DesignSystem",
+                .product(name: "Core", package: "KakeibotKit")
             ]
         ),
         .testTarget(

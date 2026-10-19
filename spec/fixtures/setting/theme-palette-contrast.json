@@ -1,0 +1,37 @@
+[
+  {
+    "first": "#000000",
+    "second": "#FFFFFF",
+    "ratio": 21.0
+  },
+  {
+    "first": "#FFFFFF",
+    "second": "#000000",
+    "ratio": 21.0
+  },
+  {
+    "first": "#777777",
+    "second": "#777777",
+    "ratio": 1.0
+  },
+  {
+    "first": "#767676",
+    "second": "#FFFFFF",
+    "ratio": 4.54
+  },
+  {
+    "first": "#EDE6D6",
+    "second": "#16223D",
+    "ratio": 12.7
+  },
+  {
+    "first": "#CDAA6B",
+    "second": "#080C16",
+    "ratio": 8.9
+  },
+  {
+    "first": "#7E89A0",
+    "second": "#16223D",
+    "ratio": 4.49
+  }
+]
