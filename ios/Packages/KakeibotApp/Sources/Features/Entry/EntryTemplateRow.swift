@@ -19,13 +19,13 @@ struct EntryTemplateRow: View {
                 } label: {
                     Label("今の入力を保存", systemImage: "plus")
                         .font(.sans(.caption))
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
                         .padding(.horizontal, 12)
                         .frame(height: Self.height)
                         .overlay {
                             Capsule()
                                 .stroke(
-                                    Palette.gold.opacity(.medium),
+                                    Palette.accent.opacity(.medium),
                                     style: .dashed
                                 )
                         }
@@ -46,18 +46,18 @@ private extension EntryTemplateRow {
         let icon = model.icon(for: template)
         let amount = template.amount.map { AmountText.text($0) } ?? "入力"
         let amountColor = template.amount == nil
-            ? Palette.mist
-            : Palette.champagne
+            ? Palette.subtext
+            : Palette.accentLight
 
         return Button {
             onUse(template)
         } label: {
             HStack(spacing: 6) {
                 IconImage(icon, size: 12)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Text(template.name)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.text)
 
                 Text(amount)
                     .font(.serif(.caption))
@@ -82,6 +82,6 @@ private extension EntryTemplateRow {
     static let height: CGFloat = 34
 
     static func stroke(_ isApplied: Bool) -> Color {
-        isApplied ? Palette.gold : Palette.gold.opacity(.soft)
+        isApplied ? Palette.accent : Palette.accent.opacity(.soft)
     }
 }

@@ -34,13 +34,13 @@ public struct TemplateCard<Name: View, Amount: View>: View {
                     Text(detail)
                         .font(size.detailFont)
                         .tracking(1)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
                 }
             }
 
             Rectangle()
-                .fill(Palette.gold.opacity(.soft))
+                .fill(Palette.accent.opacity(.soft))
                 .frame(height: 0.5)
 
             amount
@@ -72,7 +72,7 @@ public extension TemplateCard where Name == Text, Amount == TemplateCardAmount {
         self.init(icon: icon, detail: detail, size: size) {
             Text(name)
                 .font(size.nameFont)
-                .foregroundStyle(Palette.champagne)
+                .foregroundStyle(Palette.accentLight)
         } amount: {
             TemplateCardAmount(amount: amount, size: size)
         }
@@ -106,5 +106,5 @@ public extension TemplateCard where Name == Text, Amount == TemplateCardAmount {
         }
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

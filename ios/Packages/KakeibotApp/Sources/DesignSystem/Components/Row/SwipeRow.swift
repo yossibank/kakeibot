@@ -142,7 +142,7 @@ private extension SwipeRow {
     var fill: LinearGradient {
         let color = switch role {
         case .delete: Palette.rose
-        case .hide: Palette.gold
+        case .hide: Palette.accent
         }
 
         return LinearGradient(

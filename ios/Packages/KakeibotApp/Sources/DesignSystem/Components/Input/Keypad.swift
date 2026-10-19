@@ -64,18 +64,20 @@ private extension Keypad {
         case .delete:
             Image(systemName: "delete.left")
                 .font(.sans(.headline, weight: .light))
-                .foregroundStyle(Palette.ink)
+                .foregroundStyle(Palette.text)
         case .clear:
             Text("AC")
                 .font(.serif(.body, weight: .medium))
                 .tracking(3)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
         case let .tax(rate):
+            let labelColor = isActive ? Palette.accent : Palette.subtext
+
             VStack(spacing: 0) {
                 Text("税込")
                     .font(.sans(.micro))
                     .tracking(3)
-                    .foregroundStyle(isActive ? Palette.gold : Palette.mist)
+                    .foregroundStyle(labelColor)
 
                 HStack(alignment: .firstTextBaseline, spacing: 1) {
                     Text(String(rate.rawValue))
@@ -84,23 +86,23 @@ private extension Keypad {
                     Text("%")
                         .font(.serif(.caption))
                 }
-                .foregroundStyle(isActive ? Palette.champagne : Palette.ink)
+                .foregroundStyle(isActive ? Palette.accentLight : Palette.text)
             }
         case let .operation(operation):
             Text(operation.symbol)
                 .font(.sans(.headline))
-                .foregroundStyle(Palette.champagne)
+                .foregroundStyle(Palette.accentLight)
         case .equals:
             Text("＝")
                 .font(.sans(.headline, weight: .semibold))
-                .foregroundStyle(Palette.nightBottom)
+                .foregroundStyle(Palette.backgroundBottom)
         }
     }
 
     func digitText(_ text: String) -> some View {
         Text(text)
             .font(.serif(.title))
-            .foregroundStyle(Palette.ink)
+            .foregroundStyle(Palette.text)
     }
 }
 
@@ -119,9 +121,9 @@ private extension Keypad {
     ) -> Color {
         switch key {
         case .digit, .doubleZero, .delete, .clear: Color.clear
-        case .tax: isActive ? Palette.gold.opacity(.subtle) : Color.clear
-        case .operation: Palette.gold.opacity(.subtle)
-        case .equals: Palette.gold
+        case .tax: isActive ? Palette.accent.opacity(.subtle) : Color.clear
+        case .operation: Palette.accent.opacity(.subtle)
+        case .equals: Palette.accent
         }
     }
 
@@ -130,8 +132,8 @@ private extension Keypad {
         isActive: Bool
     ) -> Color {
         switch key {
-        case .clear: Palette.gold.opacity(.muted)
-        case .tax: isActive ? Palette.gold : Palette.gold.opacity(.muted)
+        case .clear: Palette.accent.opacity(.muted)
+        case .tax: isActive ? Palette.accent : Palette.accent.opacity(.muted)
         default: Color.clear
         }
     }
@@ -151,5 +153,5 @@ public extension AmountCalculator.Operation {
 #Preview {
     Keypad(activeTax: .standard) { _ in }
         .padding()
-        .background(Palette.night)
+        .background(Palette.background)
 }

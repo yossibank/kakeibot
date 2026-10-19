@@ -88,7 +88,7 @@ public struct TemplateListView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -117,7 +117,7 @@ private extension TemplateListView {
             Text("テンプレート")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 

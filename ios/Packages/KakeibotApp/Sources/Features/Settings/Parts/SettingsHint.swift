@@ -90,7 +90,7 @@ private extension SettingsHint {
             } label: {
                 Image(systemName: "xmark")
                     .font(.caption2.weight(.bold))
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .frame(width: 24, height: 24)
                     .background(Palette.line, in: Circle())
                     .frame(width: 32, height: 32)
@@ -104,7 +104,7 @@ private extension SettingsHint {
         .background(Self.fill, in: Self.shape)
         .overlay {
             Self.shape
-                .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
+                .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
 
@@ -112,13 +112,13 @@ private extension SettingsHint {
         HStack(spacing: 10) {
             Image(systemName: line.systemImage)
                 .font(.caption.weight(.medium))
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(width: 26, height: 26)
-                .background(Palette.gold.opacity(.subtle), in: Circle())
+                .background(Palette.accent.opacity(.subtle), in: Circle())
 
             Text(line.text)
                 .font(.footnote)
-                .foregroundStyle(Palette.ink)
+                .foregroundStyle(Palette.text)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }

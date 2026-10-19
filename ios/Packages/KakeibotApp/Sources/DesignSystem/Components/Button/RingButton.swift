@@ -57,9 +57,9 @@ public extension RingButton {
 private extension RingButton {
     var foreground: Color {
         switch (isEnabled, style) {
-        case (false, _): Palette.dusk
-        case (true, .plain): Palette.mist
-        case (true, .prominent): Palette.champagne
+        case (false, _): Palette.hint
+        case (true, .plain): Palette.subtext
+        case (true, .prominent): Palette.accentLight
         case (true, .destructive): Palette.rose
         }
     }
@@ -67,15 +67,15 @@ private extension RingButton {
     var stroke: Color {
         switch (isEnabled, style) {
         case (false, _): Palette.line
-        case (true, .plain): Palette.gold.opacity(.muted)
-        case (true, .prominent): Palette.gold
+        case (true, .plain): Palette.accent.opacity(.muted)
+        case (true, .prominent): Palette.accent
         case (true, .destructive): Palette.rose.opacity(.medium)
         }
     }
 
     var fill: Color {
         isEnabled && style == .prominent
-            ? Palette.gold.opacity(.subtle)
+            ? Palette.accent.opacity(.subtle)
             : Color.clear
     }
 }
@@ -93,5 +93,5 @@ private extension RingButton {
         ) {}
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

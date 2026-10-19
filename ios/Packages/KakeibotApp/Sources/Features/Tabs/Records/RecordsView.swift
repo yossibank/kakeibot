@@ -57,7 +57,7 @@ public struct RecordsView: View {
         .sensoryFeedback(.success, trigger: stampCount)
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
     }
@@ -69,7 +69,7 @@ private extension RecordsView {
             Text("記録")
                 .font(.serif(.body))
                 .tracking(3)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -78,13 +78,13 @@ private extension RecordsView {
             VStack(spacing: 1) {
                 Text("\(String(model.month.year))年 \(model.month.month)月")
                     .font(.serif(.body))
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .contentTransition(monthTextTransition)
 
                 Text(model.periodText)
                     .font(.sans(.caption))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .contentTransition(monthTextTransition)
             }
 
@@ -102,7 +102,7 @@ private extension RecordsView {
                 if model.days.isEmpty {
                     Text("この月の記録はありません")
                         .font(.footnote)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                         .padding(.vertical, 40)
                 }
 
@@ -127,7 +127,7 @@ private extension RecordsView {
                 ) { weekday in
                     Text(weekday.shortName)
                         .font(.caption2)
-                        .foregroundStyle(weekday.tint ?? Palette.mist)
+                        .foregroundStyle(weekday.tint ?? Palette.subtext)
                         .frame(maxWidth: .infinity, minHeight: 22)
                 }
             }
@@ -165,7 +165,7 @@ private extension RecordsView {
             } else {
                 Text("この日の記録はありません")
                     .font(.footnote)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom, 12)
             }
@@ -194,14 +194,14 @@ private extension RecordsView {
 
     var summary: some View {
         HStack(spacing: 0) {
-            total("支出", amount: model.expenseTotal, color: Palette.champagne)
-            total("収入", amount: model.incomeTotal, color: Palette.gold)
+            total("支出", amount: model.expenseTotal, color: Palette.accentLight)
+            total("収入", amount: model.incomeTotal, color: Palette.accent)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .overlay {
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Palette.gold.opacity(.soft), lineWidth: 1)
+                .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
 
@@ -214,7 +214,7 @@ private extension RecordsView {
         } label: {
             Image(systemName: systemImage)
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .frame(width: 40, height: 44)
                 .contentShape(.rect)
         }
@@ -229,7 +229,7 @@ private extension RecordsView {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text(title)
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
 
             Text(AmountText.text(amount))
                 .font(.serif(.body))
@@ -243,8 +243,8 @@ private extension RecordsView {
     func calendarCell(_ date: LocalDate?) -> some View {
         if let date {
             let isShown = date == model.shownDate
-            let fill = isShown ? Palette.gold : Color.clear
-            let ring = date == model.today && !isShown ? Palette.gold : .clear
+            let fill = isShown ? Palette.accent : Color.clear
+            let ring = date == model.today && !isShown ? Palette.accent : .clear
             let opacity = date > model.today && !isShown ? 0.45 : 1
 
             Button {
@@ -295,7 +295,7 @@ private extension RecordsView {
             } else if model.noSpendDays.contains(date) {
                 Image(systemName: "leaf.fill")
                     .font(.sans(.micro))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
             }
 
             if income > 0 {
@@ -334,7 +334,7 @@ private extension RecordsView {
         Button(action: action) {
             Label(title, systemImage: systemImage)
                 .font(.footnote)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .contentShape(.rect)
         }
@@ -403,7 +403,7 @@ private extension RecordsView {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text("\(date.month)/\(date.day)")
                     .font(.serif(.headline))
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
 
                 Text("（\(date.weekday.shortName)）")
                     .font(.caption)
@@ -440,11 +440,11 @@ private extension RecordsView {
         } else {
             Image(systemName: "seal")
                 .font(.footnote)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .frame(width: 26, height: 26)
                 .overlay {
                     Circle()
-                        .stroke(Palette.mist.opacity(.muted), style: .dashed)
+                        .stroke(Palette.subtext.opacity(.muted), style: .dashed)
                 }
         }
     }
@@ -513,7 +513,7 @@ private extension RecordsView {
             return Palette.holiday
         }
 
-        return date.weekday.tint ?? Palette.mist
+        return date.weekday.tint ?? Palette.subtext
     }
 
     func dayColor(
@@ -521,14 +521,14 @@ private extension RecordsView {
         isShown: Bool
     ) -> Color {
         if isShown {
-            return Palette.nightBottom
+            return Palette.backgroundBottom
         }
 
         if Holiday.contains(date) {
             return Palette.holiday
         }
 
-        return date.weekday.tint ?? Palette.ink
+        return date.weekday.tint ?? Palette.text
     }
 
     func moveMonth(_ direction: PageSwipeDirection) {

@@ -72,7 +72,7 @@ public struct ReviewView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
     }
@@ -84,7 +84,7 @@ private extension ReviewView {
             Text("振り返り")
                 .font(.serif(.body))
                 .tracking(3)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -104,14 +104,14 @@ private extension ReviewView {
             VStack(spacing: 1) {
                 Text(periodTitle)
                     .font(.serif(.body))
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .contentTransition(periodTextTransition)
 
                 if let periodSubtitle {
                     Text(periodSubtitle)
                         .font(.sans(.caption))
                         .monospacedDigit()
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                         .contentTransition(periodTextTransition)
                 }
             }
@@ -178,7 +178,7 @@ private extension ReviewView {
                             Text("×\(tally.count)")
                                 .font(.serif(.body))
                                 .monospacedDigit()
-                                .foregroundStyle(Palette.champagne)
+                                .foregroundStyle(Palette.accentLight)
                         }
                         .contentShape(.rect)
                     }
@@ -200,7 +200,7 @@ private extension ReviewView {
 
                 Text(comparisonText)
                     .font(.footnote)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.text)
             }
 
             if let recurring = model.recurringTotal {
@@ -215,7 +215,7 @@ private extension ReviewView {
                     }
                     .font(.caption)
                     .monospacedDigit()
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .frame(minHeight: 28)
                     .contentShape(.rect)
                 }
@@ -227,7 +227,7 @@ private extension ReviewView {
                     balanceBar(
                         "収入",
                         amount: model.summary.income.total,
-                        tint: Palette.gold
+                        tint: Palette.accent
                     )
 
                     balanceBar(
@@ -248,7 +248,7 @@ private extension ReviewView {
                     }
                     .font(.caption)
                     .monospacedDigit()
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
 
                     UsageBar(usage)
                 }
@@ -269,7 +269,7 @@ private extension ReviewView {
         } label: {
             Image(systemName: systemImage)
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .frame(width: 40, height: 44)
                 .contentShape(.rect)
         }
@@ -285,14 +285,14 @@ private extension ReviewView {
             HStack {
                 Text(title)
                     .font(.caption)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
 
                 Spacer()
 
                 Text(AmountText.text(amount))
                     .font(.serif(.body))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.text)
             }
 
             RatioBar(balanceRatio(of: amount), tint: tint, height: 6)
@@ -301,10 +301,10 @@ private extension ReviewView {
 
     func kindTile(_ kind: ReviewKind) -> some View {
         let isSelected = kind == model.kind
-        let fill = isSelected ? Palette.gold.opacity(.subtle) : Color.clear
-        let rim = isSelected ? Palette.gold : Palette.gold.opacity(.soft)
-        let titleColor = isSelected ? Palette.gold : Palette.mist
-        let amountColor = isSelected ? Palette.champagne : Palette.ink
+        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let rim = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
+        let titleColor = isSelected ? Palette.accent : Palette.subtext
+        let amountColor = isSelected ? Palette.accentLight : Palette.text
         let change = model.change(of: kind)
 
         return Button {
@@ -442,11 +442,11 @@ private extension ReviewView {
         of kind: ReviewKind
     ) -> Color {
         guard change != 0 else {
-            return Palette.mist
+            return Palette.subtext
         }
 
         let isGood = kind == .expense ? change < 0 : change > 0
-        return isGood ? Palette.gold : Palette.rose
+        return isGood ? Palette.accent : Palette.rose
     }
 
     static func title(of kind: ReviewKind) -> String {

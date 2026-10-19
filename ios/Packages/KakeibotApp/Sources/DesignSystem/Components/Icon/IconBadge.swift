@@ -48,7 +48,7 @@ private extension IconBadge {
 
     var tint: Color {
         if systemImage != nil {
-            return Palette.gold
+            return Palette.accent
         }
 
         return icon.flatMap { Color(hex: $0.color) } ?? .secondary

@@ -15,12 +15,12 @@ public struct MenuHeader<Leading: View>: View {
     public var body: some View {
         HStack(spacing: 10) {
             leading
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Text(title)
                 .font(.serif(.small))
                 .tracking(1)
-                .foregroundStyle(Palette.champagne)
+                .foregroundStyle(Palette.accentLight)
                 .lineLimit(1)
 
             Spacer(minLength: 0)

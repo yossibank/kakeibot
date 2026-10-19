@@ -12,6 +12,6 @@ struct SettingsSectionTitle: View {
         Text(title)
             .font(.caption2)
             .tracking(3)
-            .foregroundStyle(Palette.gold)
+            .foregroundStyle(Palette.accent)
     }
 }

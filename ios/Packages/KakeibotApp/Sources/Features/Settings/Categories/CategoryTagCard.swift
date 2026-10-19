@@ -18,7 +18,7 @@ struct CategoryTagCard: View {
             HStack {
                 Label(title, systemImage: "tag")
                     .font(.caption)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Spacer()
 
@@ -55,16 +55,16 @@ struct CategoryTagCard: View {
                 Button(action: onCommit) {
                     Text(commitTitle)
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Palette.night)
+                        .foregroundStyle(Palette.background)
                         .frame(maxWidth: .infinity, minHeight: 44)
-                        .background(Palette.gold, in: Capsule())
+                        .background(Palette.accent, in: Capsule())
                         .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
             }
         }
         .padding(16)
-        .background(Palette.drawer, in: .rect(cornerRadius: 20))
+        .background(Palette.panel, in: .rect(cornerRadius: 20))
         .overlay {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Palette.outline, lineWidth: 1)
@@ -100,17 +100,17 @@ private extension CategoryTagCard {
         TextField(
             "名前",
             text: $name,
-            prompt: Text("朝ごはん など").foregroundStyle(Palette.dusk)
+            prompt: Text("朝ごはん など").foregroundStyle(Palette.hint)
         )
         .font(.body)
-        .foregroundStyle(Palette.ink)
-        .tint(Palette.gold)
+        .foregroundStyle(Palette.text)
+        .tint(Palette.accent)
         .submitLabel(.done)
         .focused($isFocused)
         .onSubmit(onCommit)
         .padding(.horizontal, 14)
         .frame(height: 46)
-        .background(Palette.night, in: .rect(cornerRadius: 14))
+        .background(Palette.background, in: .rect(cornerRadius: 14))
         .overlay {
             RoundedRectangle(cornerRadius: 14)
                 .stroke(fieldStroke, lineWidth: 1)
@@ -137,7 +137,7 @@ private extension CategoryTagCard {
     }
 
     var noteColor: Color {
-        errorMessage == nil ? Palette.mist : Palette.rose
+        errorMessage == nil ? Palette.subtext : Palette.rose
     }
 
     var fieldStroke: Color {

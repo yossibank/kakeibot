@@ -358,5 +358,5 @@ private struct TagString: Shape {
         } onAdd: {}
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

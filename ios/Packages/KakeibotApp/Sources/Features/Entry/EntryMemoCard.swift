@@ -13,7 +13,7 @@ struct EntryMemoCard: View {
             HStack {
                 Label("メモ", systemImage: "square.and.pencil")
                     .font(.caption)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Spacer()
 
@@ -27,13 +27,13 @@ struct EntryMemoCard: View {
             TextField(
                 "メモ",
                 text: $model.memo,
-                prompt: Text("メモを書く").foregroundStyle(Palette.dusk),
+                prompt: Text("メモを書く").foregroundStyle(Palette.hint),
                 axis: .vertical
             )
             .lineLimit(1...4)
             .font(.subheadline)
-            .foregroundStyle(Palette.ink)
-            .tint(Palette.gold)
+            .foregroundStyle(Palette.text)
+            .tint(Palette.accent)
             .focused(isFocused)
 
             if !model.recentMemos.isEmpty {
@@ -48,7 +48,7 @@ struct EntryMemoCard: View {
             }
         }
         .padding(14)
-        .background(Palette.drawer, in: .rect(cornerRadius: 20))
+        .background(Palette.panel, in: .rect(cornerRadius: 20))
         .overlay {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Palette.outline, lineWidth: 1)
@@ -71,7 +71,7 @@ private extension EntryMemoCard {
 
         return ZStack {
             BalloonPointer(isClosed: true)
-                .fill(Palette.drawer)
+                .fill(Palette.panel)
 
             BalloonPointer(isClosed: false)
                 .stroke(Palette.outline, lineWidth: 1)
@@ -85,7 +85,7 @@ private extension EntryMemoCard {
             model.memo = memo
         }
         .font(.caption)
-        .foregroundStyle(Palette.ink)
+        .foregroundStyle(Palette.text)
         .lineLimit(1)
         .padding(.horizontal, 12)
         .frame(minHeight: 32)

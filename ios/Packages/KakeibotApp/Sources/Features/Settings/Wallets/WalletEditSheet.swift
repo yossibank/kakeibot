@@ -127,7 +127,7 @@ private extension WalletEditSheet {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
     }
@@ -143,7 +143,7 @@ private extension WalletEditSheet {
             Text(title)
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -170,10 +170,10 @@ private extension WalletEditSheet {
     var preview: some View {
         HStack(spacing: 14) {
             IconImage(model.icon.preview, size: 22)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(width: 48, height: 48)
                 .background(
-                    Palette.gold.opacity(.subtle),
+                    Palette.accent.opacity(.subtle),
                     in: .rect(cornerRadius: 14)
                 )
                 .overlay {
@@ -184,13 +184,13 @@ private extension WalletEditSheet {
             VStack(alignment: .leading, spacing: 4) {
                 Text(previewName)
                     .font(.subheadline)
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .lineLimit(1)
 
                 Text(model.kind.title)
                     .font(.caption2)
                     .tracking(1)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
             }
 
             Spacer(minLength: 8)
@@ -198,12 +198,12 @@ private extension WalletEditSheet {
             VStack(alignment: .trailing, spacing: 4) {
                 Text("最初の残高")
                     .font(.caption2)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
 
                 Text(AmountText.text(model.initialBalance))
                     .font(.serif(.headline))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
@@ -215,13 +215,13 @@ private extension WalletEditSheet {
     var colorNote: some View {
         HStack(spacing: 6) {
             Circle()
-                .fill(Color(hex: model.icon.color) ?? Palette.mist)
+                .fill(Color(hex: model.icon.color) ?? Palette.subtext)
                 .frame(width: 10, height: 10)
 
             Text("アイコンの色は、振り返りのグラフの色になります")
         }
         .font(.caption2)
-        .foregroundStyle(Palette.mist)
+        .foregroundStyle(Palette.subtext)
         .padding(.leading, 4)
     }
 
@@ -251,13 +251,13 @@ private extension WalletEditSheet {
                         Text(AmountText.text(model.calculator.amount))
                             .font(.serif(.headline))
                             .monospacedDigit()
-                            .foregroundStyle(Palette.ink)
+                            .foregroundStyle(Palette.text)
 
                         Spacer(minLength: 8)
                     }
                     .padding(.horizontal, 14)
                     .frame(height: 46)
-                    .background(Palette.drawer, in: .rect(cornerRadius: 14))
+                    .background(Palette.panel, in: .rect(cornerRadius: 14))
                     .overlay {
                         RoundedRectangle(cornerRadius: 14)
                             .stroke(amountStroke, lineWidth: 1)
@@ -269,7 +269,7 @@ private extension WalletEditSheet {
 
             Text(balanceHint)
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .contentTransition(.opacity)
                 .animation(.snappy, value: model.kind == .card)
         }
@@ -296,9 +296,9 @@ private extension WalletEditSheet {
 
     func kindButton(_ kind: Wallet.Kind) -> some View {
         let isSelected = model.kind == kind
-        let textColor = isSelected ? Palette.champagne : Palette.mist
-        let fill = isSelected ? Palette.gold.opacity(.subtle) : Color.clear
-        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(.soft)
+        let textColor = isSelected ? Palette.accentLight : Palette.subtext
+        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
 
         return Button {
             model.kind = kind
@@ -354,7 +354,7 @@ private extension WalletEditSheet {
     }
 
     var signColor: Color {
-        model.isNegative ? Palette.rose : Palette.gold
+        model.isNegative ? Palette.rose : Palette.accent
     }
 
     var signFill: Color {
@@ -362,7 +362,7 @@ private extension WalletEditSheet {
     }
 
     var amountStroke: Color {
-        isEnteringAmount ? Palette.gold : Palette.gold.opacity(.muted)
+        isEnteringAmount ? Palette.accent : Palette.accent.opacity(.muted)
     }
 
     var activeTax: AmountCalculator.TaxRate? {

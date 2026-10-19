@@ -39,17 +39,17 @@ public struct EntryRow: View {
                     IconImage(icon, size: 15)
                 }
             }
-            .foregroundStyle(Palette.gold)
+            .foregroundStyle(Palette.accent)
 
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(title)
                     .font(.subheadline)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.text)
 
                 if isRecurring {
                     Image(systemName: "repeat")
                         .font(.sans(.caption, weight: .semibold))
-                        .foregroundStyle(Palette.gold.opacity(.strong))
+                        .foregroundStyle(Palette.accent.opacity(.strong))
                 }
 
                 if let tag {
@@ -59,7 +59,7 @@ public struct EntryRow: View {
                 if let detail {
                     Text(detail)
                         .font(.caption)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
                 }
             }
@@ -126,5 +126,5 @@ public struct EntryRow: View {
         )
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

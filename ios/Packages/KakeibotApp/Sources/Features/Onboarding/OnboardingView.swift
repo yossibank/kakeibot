@@ -48,7 +48,7 @@ public struct OnboardingView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .budgetKeypad(model.budget)
@@ -90,7 +90,7 @@ private extension OnboardingView {
                 }
             }
             .font(.footnote)
-            .foregroundStyle(Palette.mist)
+            .foregroundStyle(Palette.subtext)
             .frame(minWidth: 44, minHeight: 44)
         }
     }
@@ -111,17 +111,17 @@ private extension OnboardingView {
                 Text("ようこそ")
                     .font(.serif(.title))
                     .tracking(8)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Text("毎日の記録を、すばやく、心地よく")
                     .font(.subheadline)
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
             }
             .padding(.top, 36)
 
             Text("はじめに、次のことを決めます。どれも、あとで設定から変えられます")
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
 
             VStack(spacing: 0) {
@@ -158,7 +158,7 @@ private extension OnboardingView {
                 HStack(spacing: 12) {
                     Text("週の始まり")
                         .font(.subheadline)
-                        .foregroundStyle(Palette.ink)
+                        .foregroundStyle(Palette.text)
 
                     Spacer()
 
@@ -192,7 +192,7 @@ private extension OnboardingView {
                     Text("\(model.budget.month.month)月の予算")
                         .font(.caption2)
                         .tracking(3)
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
 
                     Text(budgetText)
                         .font(.serif(.largeTitle, weight: .bold))
@@ -201,7 +201,7 @@ private extension OnboardingView {
 
                     Text("押して入れられます")
                         .font(.caption2)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 22)
@@ -212,7 +212,7 @@ private extension OnboardingView {
 
             Text("決めなくても始められます。カテゴリごとの予算は、設定の「予算」から入れられます")
                 .font(.caption2)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
         }
     }
@@ -242,11 +242,11 @@ private extension OnboardingView {
             Text(title)
                 .font(.serif(.headline))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Text(message)
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 8)
@@ -259,12 +259,12 @@ private extension OnboardingView {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
                 .font(.sans(.body, weight: .light))
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(width: 22)
 
             Text(title)
                 .font(.subheadline)
-                .foregroundStyle(Palette.ink)
+                .foregroundStyle(Palette.text)
 
             Spacer()
         }
@@ -273,8 +273,8 @@ private extension OnboardingView {
 
     func launchOption(_ screen: LaunchScreen) -> some View {
         let isSelected = model.launchScreen == screen
-        let stroke = isSelected ? Palette.gold : Palette.gold.opacity(.soft)
-        let fill = isSelected ? Palette.gold.opacity(.subtle) : Color.clear
+        let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
+        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
         let mark = isSelected ? "checkmark.circle.fill" : "circle"
 
         return Button {
@@ -285,24 +285,24 @@ private extension OnboardingView {
             HStack(spacing: 14) {
                 Image(systemName: screen.systemImage)
                     .font(.sans(.headline, weight: .light))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
                     .frame(width: 32)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(screen.title)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Palette.champagne)
+                        .foregroundStyle(Palette.accentLight)
 
                     Text(screen.note)
                         .font(.caption)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                 }
 
                 Spacer()
 
                 Image(systemName: mark)
                     .font(.sans(.headline))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
             }
             .padding(16)
             .background(fill, in: .rect(cornerRadius: 20))
@@ -322,7 +322,7 @@ private extension OnboardingView {
     }
 
     var budgetColor: Color {
-        model.budget.totalAmount == nil ? Palette.dusk : Palette.champagne
+        model.budget.totalAmount == nil ? Palette.hint : Palette.accentLight
     }
 
     var weekStartBinding: Binding<Weekday> {

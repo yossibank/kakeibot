@@ -24,7 +24,7 @@ public struct FittedSheet<Content: View>: View {
         .scrollBounceBehavior(.basedOnSize)
         .presentationDetents([.height(max(contentHeight, 120))])
         .presentationDragIndicator(.visible)
-        .presentationBackground(Palette.drawer)
+        .presentationBackground(Palette.panel)
         .preferredColorScheme(.dark)
     }
 }

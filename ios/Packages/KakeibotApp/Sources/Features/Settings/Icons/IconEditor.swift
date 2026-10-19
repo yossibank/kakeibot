@@ -108,13 +108,13 @@ private extension IconEditor {
 
             Text("「外」「推し」のように、短い文字をアイコンにできます")
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
         }
     }
 
     func glyphButton(_ glyph: Icon.Glyph) -> some View {
         let isSelected = model.glyph == glyph
-        let color = isSelected ? Palette.champagne : Palette.mist
+        let color = isSelected ? Palette.accentLight : Palette.subtext
 
         return Button {
             model.glyph = glyph
@@ -166,13 +166,13 @@ private extension IconEditor {
 
     func colorButton(_ hex: String) -> some View {
         let isSelected = model.color == hex
-        let ring = isSelected ? Palette.champagne : Color.clear
+        let ring = isSelected ? Palette.accentLight : Color.clear
 
         return Button {
             model.color = hex
         } label: {
             Circle()
-                .fill(Color(hex: hex) ?? Palette.mist)
+                .fill(Color(hex: hex) ?? Palette.subtext)
                 .padding(3)
                 .overlay {
                     Circle()
@@ -206,17 +206,17 @@ private extension IconEditor {
     }
 
     static func tileFill(isSelected: Bool) -> Color {
-        isSelected ? Palette.gold.opacity(.subtle) : Color.clear
+        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
     }
 
     static func tileStroke(isSelected: Bool) -> Color {
-        isSelected ? Palette.gold : Palette.gold.opacity(.subtle)
+        isSelected ? Palette.accent : Palette.accent.opacity(.subtle)
     }
 
     var customColor: Binding<Color> {
         Binding(
             get: {
-                Color(hex: model.color) ?? Palette.mist
+                Color(hex: model.color) ?? Palette.subtext
             },
             set: { color in
                 model.color = color.hex

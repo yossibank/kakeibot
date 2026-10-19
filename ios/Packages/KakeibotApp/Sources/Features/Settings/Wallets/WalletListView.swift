@@ -88,7 +88,7 @@ public struct WalletListView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -125,7 +125,7 @@ private extension WalletListView {
             Text("口座")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -218,31 +218,31 @@ private extension WalletListView {
 
     func row(_ wallet: Wallet) -> some View {
         let balance = model.balance(of: wallet)
-        let balanceColor = balance < 0 ? Palette.rose : Palette.champagne
+        let balanceColor = balance < 0 ? Palette.rose : Palette.accentLight
 
         return HStack(spacing: 14) {
             IconImage(model.icon(for: wallet), size: 18)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
                 .frame(width: 40, height: 40)
                 .background(
-                    Palette.gold.opacity(.subtle),
+                    Palette.accent.opacity(.subtle),
                     in: .rect(cornerRadius: 12)
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
+                        .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(wallet.name)
                     .font(.subheadline)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.text)
                     .lineLimit(1)
 
                 Text(wallet.kind.title)
                     .font(.caption2)
                     .tracking(1)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
             }
 
             Spacer(minLength: 8)

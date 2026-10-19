@@ -17,10 +17,10 @@ public struct MenuPanel<Content: View>: View {
             content
         }
         .frame(width: width)
-        .background(Palette.drawer, in: .rect(cornerRadius: 18))
+        .background(Palette.panel, in: .rect(cornerRadius: 18))
         .overlay {
             RoundedRectangle(cornerRadius: 18)
-                .stroke(Palette.gold.opacity(.medium), lineWidth: 0.8)
+                .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
         }
         .shadow(color: .black.opacity(0.5), radius: 24, y: 12)
     }
@@ -39,5 +39,5 @@ public struct MenuPanel<Content: View>: View {
         MenuRow("名前順", systemImage: "textformat") {}
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

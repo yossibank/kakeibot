@@ -26,7 +26,7 @@ public struct MenuRow: View {
             HStack(spacing: 12) {
                 Image(systemName: systemImage)
                     .font(.sans(.body, weight: .light))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
                     .frame(width: 22)
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -37,7 +37,7 @@ public struct MenuRow: View {
                     if let note {
                         Text(note)
                             .font(.caption2)
-                            .foregroundStyle(Palette.mist)
+                            .foregroundStyle(Palette.subtext)
                     }
                 }
 
@@ -46,7 +46,7 @@ public struct MenuRow: View {
                 if isSelected {
                     Image(systemName: "checkmark")
                         .font(.sans(.small, weight: .semibold))
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
                 }
             }
             .padding(.horizontal, 16)
@@ -60,10 +60,10 @@ public struct MenuRow: View {
 
 private extension MenuRow {
     var titleColor: Color {
-        isSelected ? Palette.champagne : Palette.ink
+        isSelected ? Palette.accentLight : Palette.text
     }
 
     var selectionFill: Color {
-        isSelected ? Palette.gold.opacity(.faint) : Color.clear
+        isSelected ? Palette.accent.opacity(.faint) : Color.clear
     }
 }

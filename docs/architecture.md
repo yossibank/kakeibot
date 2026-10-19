@@ -128,7 +128,7 @@ KakeibotApp/
 │   │   │   ├── Surface/     カードとガラスの見た目、見出し、区切り線、端をぼかす
 │   │   │   ├── Tag/         タグの札と、紐に下げて並べる列
 │   │   │   └── Template/    テンプレートのカードと、その大きさ
-│   │   └── Theme/           色（Palette）と濃さの段階、文字の大きさの段階、色の文字列の読み取り、点線
+│   │   └── Theme/           テーマ（Theme）と、それで決まる色（Palette）、濃さの段階、文字の大きさの段階、色の文字列の読み取り、点線
 │   ├── Features/
 │   │   ├── Common/          画面のモデルの見張りの形、複数の画面で使う記録の行とテンプレートの説明
 │   │   ├── Entry/
@@ -157,6 +157,7 @@ KakeibotApp/
 │   └── WidgetFeature/
 └── Tests/
     ├── AppFeatureTests/
+    ├── DesignSystemTests/
     └── FeaturesTests/
 ```
 

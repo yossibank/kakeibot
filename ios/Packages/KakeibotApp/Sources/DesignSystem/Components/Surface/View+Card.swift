@@ -14,7 +14,7 @@ private struct CardBackground: ViewModifier {
             .background(Palette.card, in: .rect(cornerRadius: cornerRadius))
             .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .strokeBorder(Palette.gold.opacity(.muted), lineWidth: 1)
+                    .strokeBorder(Palette.accent.opacity(.muted), lineWidth: 1)
             }
     }
 }
@@ -22,15 +22,15 @@ private struct CardBackground: ViewModifier {
 #Preview {
     VStack(spacing: 16) {
         Text("今月の支出")
-            .foregroundStyle(Palette.ink)
+            .foregroundStyle(Palette.text)
             .frame(maxWidth: .infinity, minHeight: 120)
             .card(cornerRadius: 24)
 
         Text("最近の記録")
-            .foregroundStyle(Palette.ink)
+            .foregroundStyle(Palette.text)
             .frame(maxWidth: .infinity, minHeight: 80)
             .card()
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

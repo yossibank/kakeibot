@@ -35,7 +35,7 @@ private extension BudgetListView {
             VStack(spacing: 4) {
                 Text("\(model.month.month)月（\(model.periodText)）から使う額")
                     .font(.caption)
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
 
@@ -43,7 +43,7 @@ private extension BudgetListView {
                     Label(recurringText, systemImage: "repeat")
                         .font(.caption2)
                         .monospacedDigit()
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
                 }
@@ -70,7 +70,7 @@ private extension BudgetListView {
                             Text("合計 \(AmountText.text(model.categoriesTotal))")
                                 .font(.caption2)
                                 .monospacedDigit()
-                                .foregroundStyle(Palette.mist)
+                                .foregroundStyle(Palette.subtext)
                         }
 
                         VStack(spacing: 0) {
@@ -95,7 +95,7 @@ private extension BudgetListView {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
     }
@@ -111,7 +111,7 @@ private extension BudgetListView {
             Text("予算")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -128,7 +128,7 @@ private extension BudgetListView {
                 Text("月全体")
                     .font(.caption2)
                     .tracking(3)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Text(amountText(model.totalAmount))
                     .font(.serif(.largeTitle, weight: .bold))
@@ -142,7 +142,7 @@ private extension BudgetListView {
                 } else {
                     Text("押して変えられます")
                         .font(.caption2)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -164,12 +164,12 @@ private extension BudgetListView {
             VStack(spacing: 6) {
                 HStack(spacing: 12) {
                     IconImage(model.icon(for: category), size: 16)
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
                         .frame(width: 24)
 
                     Text(category.name)
                         .font(.subheadline)
-                        .foregroundStyle(Palette.ink)
+                        .foregroundStyle(Palette.text)
 
                     Spacer()
 
@@ -186,7 +186,7 @@ private extension BudgetListView {
                     Text("使った額 \(AmountText.text(spent))")
                         .font(.caption2)
                         .monospacedDigit()
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.leading, 36)
                 }
@@ -212,7 +212,7 @@ private extension BudgetListView {
             }
             .font(.caption2)
             .monospacedDigit()
-            .foregroundStyle(Palette.mist)
+            .foregroundStyle(Palette.subtext)
         }
     }
 }
@@ -228,7 +228,7 @@ private extension BudgetListView {
     }
 
     func amountColor(_ amount: Int?) -> Color {
-        amount == nil ? Palette.dusk : Palette.champagne
+        amount == nil ? Palette.hint : Palette.accentLight
     }
 
     func openDrawer(_ target: BudgetListModel.Target) {

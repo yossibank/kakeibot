@@ -27,7 +27,7 @@ public struct HeaderButton: View {
                         .tracking(2)
                 }
             }
-            .foregroundStyle(Palette.gold)
+            .foregroundStyle(Palette.accent)
             .padding(.horizontal, horizontalPadding)
             .frame(minWidth: Self.height, minHeight: Self.height)
             .background(Self.fill, in: Capsule())
@@ -48,8 +48,8 @@ private extension HeaderButton {
     static var fill: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.gold.opacity(.subtle),
-                Palette.gold.opacity(.faint)
+                Palette.accent.opacity(.subtle),
+                Palette.accent.opacity(.faint)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -59,8 +59,8 @@ private extension HeaderButton {
     static var stroke: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.gold.opacity(.medium),
-                Palette.gold.opacity(.soft)
+                Palette.accent.opacity(.medium),
+                Palette.accent.opacity(.soft)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -82,5 +82,5 @@ private extension HeaderButton {
         ) {}
     }
     .padding()
-    .background(Palette.night)
+    .background(Palette.background)
 }

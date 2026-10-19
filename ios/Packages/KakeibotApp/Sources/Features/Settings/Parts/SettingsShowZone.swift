@@ -5,7 +5,7 @@ struct SettingsShowZone: View {
     let isTargeted: Bool
 
     var body: some View {
-        let color = isTargeted ? Palette.gold : Palette.mist
+        let color = isTargeted ? Palette.accent : Palette.subtext
 
         HStack(spacing: 8) {
             Image(systemName: "eye")
@@ -17,7 +17,7 @@ struct SettingsShowZone: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             Self.shape
-                .fill(Palette.nightBottom.opacity(.strong))
+                .fill(Palette.backgroundBottom.opacity(.strong))
 
             Self.shape
                 .fill(fill)
@@ -33,6 +33,6 @@ private extension SettingsShowZone {
     static let shape = RoundedRectangle(cornerRadius: 16)
 
     var fill: Color {
-        isTargeted ? Palette.gold.opacity(.subtle) : Color.clear
+        isTargeted ? Palette.accent.opacity(.subtle) : Color.clear
     }
 }

@@ -47,7 +47,7 @@ public struct TemplateShelfSheet: View {
                         if sections.isEmpty {
                             Text(emptyText)
                                 .font(.footnote)
-                                .foregroundStyle(Palette.mist)
+                                .foregroundStyle(Palette.subtext)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 40)
                         }
@@ -62,7 +62,7 @@ public struct TemplateShelfSheet: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background {
                 Rectangle()
-                    .fill(Palette.night)
+                    .fill(Palette.background)
                     .ignoresSafeArea()
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -86,7 +86,7 @@ private extension TemplateShelfSheet {
             Text("テンプレート")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -101,22 +101,22 @@ private extension TemplateShelfSheet {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .font(.sans(.small, weight: .light))
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
 
             TextField(
                 "名前で探す",
                 text: $query,
-                prompt: Text("名前で探す").foregroundStyle(Palette.dusk)
+                prompt: Text("名前で探す").foregroundStyle(Palette.hint)
             )
             .font(.subheadline)
-            .foregroundStyle(Palette.ink)
-            .tint(Palette.gold)
+            .foregroundStyle(Palette.text)
+            .tint(Palette.accent)
             .submitLabel(.search)
             .focused($isSearching)
         }
         .padding(.horizontal, 14)
         .frame(height: 42)
-        .background(Palette.drawer, in: Capsule())
+        .background(Palette.panel, in: Capsule())
         .overlay {
             Capsule()
                 .stroke(searchStroke, lineWidth: 1)
@@ -162,7 +162,7 @@ private extension TemplateShelfSheet {
     }
 
     var searchStroke: Color {
-        isSearching ? Palette.gold : Palette.gold.opacity(.muted)
+        isSearching ? Palette.accent : Palette.accent.opacity(.muted)
     }
 
     func use(_ template: EntryTemplate) {

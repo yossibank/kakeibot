@@ -45,7 +45,7 @@ public struct RecurringListView: View {
                     if model.rows.isEmpty {
                         Text("家賃や給料などを足すと、ここに並びます")
                             .font(.footnote)
-                            .foregroundStyle(Palette.mist)
+                            .foregroundStyle(Palette.subtext)
                             .padding(.vertical, 40)
                     }
 
@@ -89,7 +89,7 @@ public struct RecurringListView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -118,7 +118,7 @@ private extension RecurringListView {
             Text("固定費")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -132,7 +132,7 @@ private extension RecurringListView {
             totalColumn("今月の支出", amount: model.monthTotal.expense)
 
             Rectangle()
-                .fill(Palette.gold.opacity(.soft))
+                .fill(Palette.accent.opacity(.soft))
                 .frame(width: 1, height: 34)
 
             totalColumn("今月の収入", amount: model.monthTotal.income)
@@ -209,12 +209,12 @@ private extension RecurringListView {
             Text(title)
                 .font(.caption2)
                 .tracking(2)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Text(AmountText.text(amount))
                 .font(.serif(.headline))
                 .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
+                .foregroundStyle(Palette.accentLight)
         }
         .frame(maxWidth: .infinity)
     }
@@ -262,12 +262,12 @@ private extension RecurringListView {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(row.title)
                         .font(.subheadline)
-                        .foregroundStyle(Palette.ink)
+                        .foregroundStyle(Palette.text)
                         .lineLimit(1)
 
                     Text(row.detail)
                         .font(.caption)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
                 }
 
@@ -283,7 +283,7 @@ private extension RecurringListView {
                     } else {
                         Text(Self.nextText(row.next))
                             .font(.caption2)
-                            .foregroundStyle(Palette.mist)
+                            .foregroundStyle(Palette.subtext)
                     }
                 }
             }

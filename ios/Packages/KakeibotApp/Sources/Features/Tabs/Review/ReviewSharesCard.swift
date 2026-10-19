@@ -14,7 +14,7 @@ struct ReviewSharesCard: View {
             if shares.isEmpty {
                 Text("この期間の記録はありません")
                     .font(.footnote)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
             } else {
@@ -34,12 +34,12 @@ struct ReviewSharesCard: View {
                     if let others = Self.otherShares(shares) {
                         HStack(spacing: 6) {
                             Circle()
-                                .fill(Palette.dusk)
+                                .fill(Palette.hint)
                                 .frame(width: 8, height: 8)
 
                             Text("その他 \(others.count) 件")
                                 .font(.caption)
-                                .foregroundStyle(Palette.mist)
+                                .foregroundStyle(Palette.subtext)
                         }
                         .frame(maxWidth: .infinity)
                     }
@@ -73,12 +73,12 @@ private extension ReviewSharesCard {
         VStack(spacing: 2) {
             Text(total.title)
                 .font(.caption2)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
 
             Text(AmountText.text(total.amount))
                 .font(.serif(.body))
                 .monospacedDigit()
-                .foregroundStyle(Palette.champagne)
+                .foregroundStyle(Palette.accentLight)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         }
@@ -92,24 +92,24 @@ private extension ReviewSharesCard {
 
                 Text(share.name)
                     .font(.subheadline)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.text)
                     .lineLimit(1)
 
                 Text(Self.percentText(share.ratio))
                     .font(.caption)
                     .monospacedDigit()
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
 
                 Spacer(minLength: 8)
 
                 Text(AmountText.text(share.amount))
                     .font(.serif(.body))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
 
                 Image(systemName: "chevron.right")
                     .font(.caption2)
-                    .foregroundStyle(Palette.dusk)
+                    .foregroundStyle(Palette.hint)
             }
 
             if let usage = share.usage {
@@ -152,7 +152,7 @@ private extension ReviewSharesCard {
             return DonutChart<AnyHashable>.Slice(
                 id: share.id,
                 value: share.amount,
-                color: color ?? Palette.gold
+                color: color ?? Palette.accent
             )
         }
 
@@ -163,7 +163,7 @@ private extension ReviewSharesCard {
         let other = DonutChart<AnyHashable>.Slice(
             id: "others",
             value: others.reduce(0) { $0 + $1.amount },
-            color: Palette.dusk
+            color: Palette.hint
         )
 
         return slices + [other]

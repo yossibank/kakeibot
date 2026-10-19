@@ -9,8 +9,8 @@ struct AppIconTile: View {
     let onSelect: () -> Void
 
     var body: some View {
-        let ring = isCurrent ? Palette.gold : Color.clear
-        let titleColor = isCurrent ? Palette.champagne : Palette.mist
+        let ring = isCurrent ? Palette.accent : Color.clear
+        let titleColor = isCurrent ? Palette.accentLight : Palette.subtext
 
         Button {
             guard !isCurrent else {
@@ -31,7 +31,10 @@ struct AppIconTile: View {
                         if isCurrent {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.title3)
-                                .foregroundStyle(Palette.gold, Palette.night)
+                                .foregroundStyle(
+                                    Palette.accent,
+                                    Palette.background
+                                )
                                 .offset(x: 6, y: 6)
                                 .transition(.scale.combined(with: .opacity))
                         }
@@ -66,7 +69,7 @@ private extension AppIconTile {
                     .scaleEffect(pop.scale)
                     .background {
                         RoundedRectangle(cornerRadius: 22, style: .continuous)
-                            .stroke(Palette.gold, lineWidth: 2)
+                            .stroke(Palette.accent, lineWidth: 2)
                             .scaleEffect(pop.ring)
                             .opacity(pop.glow)
                     }

@@ -79,12 +79,12 @@ private extension FloatingTabBar {
             Capsule()
                 .strokeBorder(Self.rim, lineWidth: 1)
         }
-        .glass(tint: Palette.nightBottom.opacity(.medium), in: Capsule())
+        .glass(tint: Palette.backgroundBottom.opacity(.medium), in: Capsule())
     }
 
     var indicator: some View {
         let isDragging = dragX != nil
-        let fill = Palette.gold.opacity(isDragging ? .soft : .subtle)
+        let fill = Palette.accent.opacity(isDragging ? .soft : .subtle)
         let scale: CGFloat = isDragging ? 1.08 : 1
         let opacity: Double = barWidth > 0 ? 1 : 0
 
@@ -107,12 +107,12 @@ private extension FloatingTabBar {
         } label: {
             ZStack {
                 DialTicks(count: 12, length: 4)
-                    .stroke(Palette.gold.opacity(.strong), lineWidth: 1)
+                    .stroke(Palette.accent.opacity(.strong), lineWidth: 1)
                     .padding(8)
 
                 Image(systemName: "plus")
                     .font(.sans(.headline, weight: .ultraLight))
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
             }
             .frame(width: Self.height, height: Self.height)
             .background {
@@ -126,8 +126,8 @@ private extension FloatingTabBar {
             .contentShape(Circle())
         }
         .buttonStyle(PressStyle())
-        .glass(tint: Palette.nightBottom.opacity(.strong), in: Circle())
-        .shadow(color: Palette.gold.opacity(.muted), radius: 14, y: 4)
+        .glass(tint: Palette.backgroundBottom.opacity(.strong), in: Circle())
+        .shadow(color: Palette.accent.opacity(.muted), radius: 14, y: 4)
         .sensoryFeedback(.impact(weight: .light), trigger: addCount)
     }
 
@@ -135,8 +135,8 @@ private extension FloatingTabBar {
         _ item: Item,
         isHighlighted: Bool
     ) -> some View {
-        let iconColor = isHighlighted ? Palette.gold : Palette.mist
-        let titleColor = isHighlighted ? Palette.champagne : Palette.mist
+        let iconColor = isHighlighted ? Palette.accent : Palette.subtext
+        let titleColor = isHighlighted ? Palette.accentLight : Palette.subtext
 
         return VStack(spacing: 3) {
             Image(systemName: item.systemImage)
@@ -165,8 +165,8 @@ private extension FloatingTabBar {
     static var rim: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.gold.opacity(.strong),
-                Palette.gold.opacity(.muted)
+                Palette.accent.opacity(.strong),
+                Palette.accent.opacity(.muted)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -176,8 +176,8 @@ private extension FloatingTabBar {
     static var indicatorRim: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.champagne.opacity(.strong),
-                Palette.gold.opacity(.soft)
+                Palette.accentLight.opacity(.strong),
+                Palette.accent.opacity(.soft)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -187,11 +187,11 @@ private extension FloatingTabBar {
     static var goldRing: AngularGradient {
         AngularGradient(
             colors: [
-                Palette.champagne,
-                Palette.gold,
-                Palette.bronze,
-                Palette.gold,
-                Palette.champagne
+                Palette.accentLight,
+                Palette.accent,
+                Palette.accentDeep,
+                Palette.accent,
+                Palette.accentLight
             ],
             center: .center
         )
@@ -282,5 +282,5 @@ private struct PressStyle: ButtonStyle {
             items: items
         ) {}
     }
-    .background(Palette.night)
+    .background(Palette.background)
 }

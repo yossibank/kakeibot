@@ -21,7 +21,7 @@ struct ReviewShareSheet: View {
 
                 Text(periodTitle)
                     .font(.serif(.body))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Spacer()
 
@@ -34,14 +34,14 @@ struct ReviewShareSheet: View {
 
                 Text(share.name)
                     .font(.headline)
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
 
                 Spacer()
 
                 Text(AmountText.text(share.amount))
                     .font(.serif(.headline))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
             }
             .padding(.horizontal, 4)
 
@@ -78,7 +78,7 @@ struct ReviewShareSheet: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .preferredColorScheme(.dark)

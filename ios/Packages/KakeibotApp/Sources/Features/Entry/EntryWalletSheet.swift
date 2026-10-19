@@ -18,7 +18,7 @@ struct EntryWalletSheet: View {
                 HStack {
                     Text(title)
                         .font(.headline)
-                        .foregroundStyle(Palette.champagne)
+                        .foregroundStyle(Palette.accentLight)
 
                     Spacer()
 
@@ -32,7 +32,7 @@ struct EntryWalletSheet: View {
                         Text(section.kind.title)
                             .font(.caption)
                             .tracking(2)
-                            .foregroundStyle(Palette.mist)
+                            .foregroundStyle(Palette.subtext)
 
                         ForEach(section.wallets) { wallet in
                             walletRow(wallet)
@@ -60,7 +60,8 @@ private extension EntryWalletSheet {
     func walletRow(_ wallet: Wallet) -> some View {
         let isSelected = selectedId == wallet.id
         let isTaken = takenId == wallet.id
-        let nameColor = isSelected ? Palette.champagne : Palette.ink
+        let nameColor = isSelected ? Palette.accentLight : Palette.text
+        let iconColor = isSelected ? Palette.accent : Palette.subtext
 
         return Button {
             select(wallet)
@@ -68,7 +69,7 @@ private extension EntryWalletSheet {
         } label: {
             HStack(spacing: 12) {
                 IconImage(model.icon(for: wallet), size: 18)
-                    .foregroundStyle(isSelected ? Palette.gold : Palette.mist)
+                    .foregroundStyle(iconColor)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(wallet.name)
@@ -78,7 +79,7 @@ private extension EntryWalletSheet {
                         Text("残高 \(AmountText.text(balance))")
                             .font(.caption2)
                             .monospacedDigit()
-                            .foregroundStyle(Palette.mist)
+                            .foregroundStyle(Palette.subtext)
                     }
                 }
 
@@ -87,23 +88,23 @@ private extension EntryWalletSheet {
                 if isSelected {
                     Image(systemName: "checkmark")
                         .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
                 } else if isTaken {
                     Text("\(takenTitle)に選択中")
                         .font(.caption2)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                 }
             }
             .padding(.horizontal, 16)
             .frame(minHeight: 52)
             .background(
-                isSelected ? Palette.gold.opacity(.subtle) : Color.clear,
+                isSelected ? Palette.accent.opacity(.subtle) : Color.clear,
                 in: .rect(cornerRadius: 16)
             )
             .overlay {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
-                        isSelected ? Palette.gold : Palette.line,
+                        isSelected ? Palette.accent : Palette.line,
                         lineWidth: 1
                     )
             }

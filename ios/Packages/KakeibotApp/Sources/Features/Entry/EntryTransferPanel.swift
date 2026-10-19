@@ -17,11 +17,14 @@ struct EntryTransferPanel: View {
             } label: {
                 Image(systemName: "arrow.left.arrow.right")
                     .font(.sans(.small, weight: .light))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
                     .frame(width: 44, height: 44)
                     .overlay {
                         Circle()
-                            .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
+                            .stroke(
+                                Palette.accent.opacity(.muted),
+                                lineWidth: 1
+                            )
                     }
                     .contentShape(Circle())
             }
@@ -39,7 +42,7 @@ private extension EntryTransferPanel {
         let wallet = model.wallet(id)
         let icon = wallet.flatMap { model.icon(for: $0) }
         let isOver = role == .source && model.isOverSourceBalance
-        let balanceColor = isOver ? Palette.rose : Palette.mist
+        let balanceColor = isOver ? Palette.rose : Palette.subtext
         let overOpacity: Double = isOver ? 1 : 0
 
         return Button {
@@ -49,14 +52,14 @@ private extension EntryTransferPanel {
                 Text(title(role))
                     .font(.caption2)
                     .tracking(3)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 IconImage(icon, size: 24)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Text(wallet?.name ?? "選ぶ")
                     .font(.subheadline)
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
                     .lineLimit(1)
 
                 if let balance = wallet.flatMap({ model.balance(of: $0) }) {

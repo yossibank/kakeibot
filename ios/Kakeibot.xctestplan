@@ -36,6 +36,13 @@
     {
       "target" : {
         "containerPath" : "container:Packages\/KakeibotApp",
+        "identifier" : "DesignSystemTests",
+        "name" : "DesignSystemTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/KakeibotApp",
         "identifier" : "FeaturesTests",
         "name" : "FeaturesTests"
       }

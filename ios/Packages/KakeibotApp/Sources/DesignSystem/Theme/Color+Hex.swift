@@ -34,4 +34,20 @@ extension Color {
         let blue = Double(value & 0xFF) / 255
         self.init(red: red, green: green, blue: blue)
     }
+
+    init(themed role: KeyPath<Theme, UInt32> & Sendable) {
+        let color = UIColor { traits in
+            UIColor(rgb: traits[ThemeTrait.self][keyPath: role])
+        }
+        self.init(uiColor: color)
+    }
+}
+
+extension UIColor {
+    convenience init(rgb value: UInt32) {
+        let red = CGFloat((value >> 16) & 0xFF) / 255
+        let green = CGFloat((value >> 8) & 0xFF) / 255
+        let blue = CGFloat(value & 0xFF) / 255
+        self.init(red: red, green: green, blue: blue, alpha: 1)
+    }
 }

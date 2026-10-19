@@ -58,7 +58,7 @@ public struct TemplateEditSheet: View {
             }
             .background {
                 Rectangle()
-                    .fill(Palette.night)
+                    .fill(Palette.background)
                     .ignoresSafeArea()
                     .onTapGesture {
                         focus = nil
@@ -100,7 +100,7 @@ private extension TemplateEditSheet {
 
                         Text("金額を空にすると、使うときに入れられます")
                             .font(.caption2)
-                            .foregroundStyle(Palette.mist)
+                            .foregroundStyle(Palette.subtext)
                             .padding(.leading, 6)
                     }
 
@@ -131,7 +131,7 @@ private extension TemplateEditSheet {
             Text(title)
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 
@@ -171,13 +171,13 @@ private extension TemplateEditSheet {
             Text("ホームでは、このカードで並びます")
                 .font(.caption2)
                 .tracking(1)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
         }
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity)
         .background {
             EllipticalGradient(
-                colors: [Palette.gold.opacity(.soft), .clear],
+                colors: [Palette.accent.opacity(.soft), .clear],
                 center: .center,
                 startRadiusFraction: 0,
                 endRadiusFraction: 0.5
@@ -194,11 +194,11 @@ private extension TemplateEditSheet {
             TextField(
                 "名前",
                 text: $model.name,
-                prompt: Text("名前を入れる").foregroundStyle(Palette.dusk)
+                prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
             )
             .font(TemplateCardSize.large.nameFont)
-            .foregroundStyle(Palette.champagne)
-            .tint(Palette.gold)
+            .foregroundStyle(Palette.accentLight)
+            .tint(Palette.accent)
             .submitLabel(.done)
             .focused($focus, equals: .name)
             .onSubmit {
@@ -220,7 +220,7 @@ private extension TemplateEditSheet {
             }
             .buttonStyle(.plain)
         }
-        .shadow(color: Palette.gold.opacity(.subtle), radius: 30)
+        .shadow(color: Palette.accent.opacity(.subtle), radius: 30)
         .background(alignment: .bottom) {
             Ellipse()
                 .fill(.black.opacity(0.55))
@@ -240,18 +240,18 @@ private extension TemplateEditSheet {
         HStack(spacing: 8) {
             Text("入力シートでは")
                 .font(.caption2)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
 
             HStack(spacing: 6) {
                 IconImage(categoryIcon, size: 12)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Text(previewName)
-                    .foregroundStyle(Palette.ink)
+                    .foregroundStyle(Palette.text)
 
                 Text(capsuleAmount)
                     .font(.serif(.caption))
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
             }
             .font(.sans(.caption))
             .lineLimit(1)
@@ -261,7 +261,7 @@ private extension TemplateEditSheet {
             .frame(height: 30)
             .overlay {
                 Capsule()
-                    .stroke(Palette.gold.opacity(.muted), lineWidth: 1)
+                    .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
             }
         }
         .frame(minHeight: 46)
@@ -272,7 +272,7 @@ private extension TemplateEditSheet {
             HStack {
                 Label("メモ", systemImage: "square.and.pencil")
                     .font(.caption)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Spacer()
 
@@ -284,17 +284,17 @@ private extension TemplateEditSheet {
             TextField(
                 "メモ",
                 text: $model.memo,
-                prompt: Text("メモを書く").foregroundStyle(Palette.dusk),
+                prompt: Text("メモを書く").foregroundStyle(Palette.hint),
                 axis: .vertical
             )
             .lineLimit(1...4)
             .font(.subheadline)
-            .foregroundStyle(Palette.ink)
-            .tint(Palette.gold)
+            .foregroundStyle(Palette.text)
+            .tint(Palette.accent)
             .focused($focus, equals: .memo)
         }
         .padding(14)
-        .background(Palette.drawer, in: .rect(cornerRadius: 20))
+        .background(Palette.panel, in: .rect(cornerRadius: 20))
         .overlay {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Palette.outline, lineWidth: 1)
@@ -369,7 +369,7 @@ private extension TemplateEditSheet {
         if model.tags.isEmpty {
             Text("このカテゴリにタグはありません。カテゴリの編集で足せます")
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
                 .frame(maxWidth: .infinity, minHeight: 54)
         } else {
             TagLine(tagItems, selection: model.tagId) { id in
@@ -428,9 +428,9 @@ private extension TemplateEditSheet {
         if model.errorNotice.message != nil, model.name.isEmpty {
             Palette.rose
         } else if focus == .name {
-            Palette.gold
+            Palette.accent
         } else {
-            Palette.gold.opacity(.medium)
+            Palette.accent.opacity(.medium)
         }
     }
 

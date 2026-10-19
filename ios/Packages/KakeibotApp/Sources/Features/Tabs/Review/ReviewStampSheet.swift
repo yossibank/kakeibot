@@ -23,7 +23,7 @@ struct ReviewStampSheet: View {
 
                 Text(periodTitle)
                     .font(.serif(.body))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Spacer()
 
@@ -36,14 +36,14 @@ struct ReviewStampSheet: View {
 
                 Text("押した日")
                     .font(.headline)
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
 
                 Spacer()
 
                 Text("×\(tally.count)")
                     .font(.serif(.headline))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.champagne)
+                    .foregroundStyle(Palette.accentLight)
             }
             .padding(.horizontal, 4)
 
@@ -71,7 +71,7 @@ struct ReviewStampSheet: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .preferredColorScheme(.dark)
@@ -85,11 +85,11 @@ private extension ReviewStampSheet {
         return HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text("\(date.month)/\(date.day)")
                 .font(.serif(.body))
-                .foregroundStyle(Palette.champagne)
+                .foregroundStyle(Palette.accentLight)
 
             Text("（\(date.weekday.shortName)）")
                 .font(.caption)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
 
             Spacer(minLength: 8)
 
@@ -105,7 +105,7 @@ private extension ReviewStampSheet {
 
             Image(systemName: "chevron.right")
                 .font(.caption2)
-                .foregroundStyle(Palette.dusk)
+                .foregroundStyle(Palette.hint)
         }
         .frame(minHeight: 48)
         .contentShape(.rect)

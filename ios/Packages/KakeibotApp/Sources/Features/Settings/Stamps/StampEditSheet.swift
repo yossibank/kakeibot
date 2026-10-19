@@ -53,7 +53,7 @@ public struct StampEditSheet: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
         .errorBanner(model.errorNotice) {
@@ -84,7 +84,7 @@ private extension StampEditSheet {
             Text(model.isEditing ? "スタンプを編集" : "スタンプを追加")
                 .font(.serif(.body))
                 .tracking(4)
-                .foregroundStyle(Palette.gold)
+                .foregroundStyle(Palette.accent)
 
             Spacer()
 

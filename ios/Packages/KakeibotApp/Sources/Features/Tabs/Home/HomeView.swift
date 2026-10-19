@@ -59,7 +59,7 @@ public struct HomeView: View {
         }
         .background {
             Rectangle()
-                .fill(Palette.night)
+                .fill(Palette.background)
                 .ignoresSafeArea()
         }
     }
@@ -72,11 +72,11 @@ private extension HomeView {
                 Text("\(model.month.month)月")
                     .font(.serif(.body))
                     .tracking(3)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
 
                 Text(model.monthRangeText)
                     .font(.caption)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
             }
 
             Spacer()
@@ -94,7 +94,7 @@ private extension HomeView {
                     Text(dialTitle)
                         .font(.sans(.caption))
                         .tracking(4)
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
 
                     Text(dialAmount)
                         .font(.serif(.display, weight: .bold))
@@ -123,7 +123,7 @@ private extension HomeView {
                     }
                     .font(.caption)
                     .monospacedDigit()
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                 }
             } else {
                 Button(action: onOpenSettings) {
@@ -134,7 +134,7 @@ private extension HomeView {
                             .font(.sans(.micro, weight: .semibold))
                     }
                     .font(.caption)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .frame(minHeight: 32)
                     .contentShape(.rect)
                 }
@@ -151,7 +151,7 @@ private extension HomeView {
                     }
                     .font(.caption2)
                     .monospacedDigit()
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .frame(minHeight: 28)
                     .contentShape(.rect)
                 }
@@ -159,17 +159,32 @@ private extension HomeView {
             }
 
             HStack(spacing: 0) {
-                stat("今日", amount: model.todayExpense, color: Palette.champagne)
+                stat(
+                    "今日",
+                    amount: model.todayExpense,
+                    color: Palette.accentLight
+                )
+
                 divider
 
-                stat(middleTitle, amount: middleAmount, color: Palette.ink)
+                stat(
+                    middleTitle,
+                    amount: middleAmount,
+                    color: Palette.text
+                )
+
                 divider
-                stat("今月の収入", amount: model.monthIncome, color: Palette.gold)
+
+                stat(
+                    "今月の収入",
+                    amount: model.monthIncome,
+                    color: Palette.accent
+                )
             }
             .padding(.top, 12)
             .overlay(alignment: .top) {
                 Rectangle()
-                    .fill(Palette.gold.opacity(.soft))
+                    .fill(Palette.accent.opacity(.soft))
                     .frame(height: 1)
             }
         }
@@ -188,7 +203,7 @@ private extension HomeView {
 
                     Button("すべて", action: onShowAllTemplates)
                         .font(.caption)
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
                         .frame(minHeight: 44)
                 }
 
@@ -202,7 +217,7 @@ private extension HomeView {
             HStack(spacing: 6) {
                 Text(templateHint)
                     .font(.caption2)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
 
                 Spacer()
 
@@ -213,7 +228,7 @@ private extension HomeView {
                 Button(action: onAddTemplate) {
                     Image(systemName: "plus")
                         .font(.sans(.small, weight: .light))
-                        .foregroundStyle(Palette.gold)
+                        .foregroundStyle(Palette.accent)
                         .frame(width: 32, height: 32)
                         .overlay {
                             Circle()
@@ -245,7 +260,7 @@ private extension HomeView {
                 Text(model.templateOrder.title)
                     .font(.caption2)
             }
-            .foregroundStyle(Palette.gold)
+            .foregroundStyle(Palette.accent)
             .padding(.horizontal, 12)
             .frame(height: 32)
             .overlay {
@@ -295,14 +310,14 @@ private extension HomeView {
 
                 Button("すべて", action: onShowRecords)
                     .font(.caption)
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
                     .frame(minHeight: 44)
             }
 
             if model.recentRows.isEmpty {
                 Text("まだ記録がありません。右下の ＋ から記録できます")
                     .font(.footnote)
-                    .foregroundStyle(Palette.mist)
+                    .foregroundStyle(Palette.subtext)
                     .padding(.vertical, 16)
             } else {
                 ForEach(model.recentRows) { row in
@@ -348,7 +363,7 @@ private extension HomeView {
 
     var divider: some View {
         Rectangle()
-            .fill(Palette.gold.opacity(.soft))
+            .fill(Palette.accent.opacity(.soft))
             .frame(width: 1, height: 32)
     }
 
@@ -360,7 +375,7 @@ private extension HomeView {
         VStack(spacing: 2) {
             Text(title)
                 .font(.caption2)
-                .foregroundStyle(Palette.mist)
+                .foregroundStyle(Palette.subtext)
 
             Text(AmountText.text(amount))
                 .font(.serif(.body))
@@ -380,7 +395,7 @@ private extension HomeView {
     ]
 
     static let tileHeight = TemplateCardSize.regular.height
-    static let toolStroke = Palette.gold.opacity(.muted)
+    static let toolStroke = Palette.accent.opacity(.muted)
 
     var dialTitle: String {
         model.budgetUsage == nil ? "今月の支出" : "今月あといくら"
@@ -396,12 +411,12 @@ private extension HomeView {
 
     var dialAmountColor: Color {
         guard let usage = model.budgetUsage else {
-            return Palette.champagne
+            return Palette.accentLight
         }
 
         return usage.isOver || usage.isNearLimit
             ? usage.tint
-            : Palette.champagne
+            : Palette.accentLight
     }
 
     var middleTitle: String {
@@ -417,7 +432,7 @@ private extension HomeView {
     }
 
     var dialTint: Color {
-        model.budgetUsage?.tint ?? Palette.gold
+        model.budgetUsage?.tint ?? Palette.accent
     }
 
     static func warning(for usage: BudgetUsage) -> String? {

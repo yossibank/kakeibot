@@ -15,7 +15,7 @@ struct SettingsHiddenTitle: View {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Image(systemName: "chevron.right")
                     .font(.caption2.weight(.semibold))
-                    .foregroundStyle(Palette.gold)
+                    .foregroundStyle(Palette.accent)
                     .rotationEffect(.degrees(flag.isOn ? 90 : 0))
 
                 SettingsSectionTitle("\(title)（\(count)）")
@@ -25,7 +25,7 @@ struct SettingsHiddenTitle: View {
                 if flag.isOn {
                     Text("長押しで上に動かすと戻せます")
                         .font(.caption2)
-                        .foregroundStyle(Palette.mist)
+                        .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
                 }
             }
