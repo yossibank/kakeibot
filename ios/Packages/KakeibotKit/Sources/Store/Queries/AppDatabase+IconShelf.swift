@@ -15,7 +15,10 @@ public extension AppDatabase {
 
 private extension AppDatabase {
     static func iconShelf(in db: Database) throws -> IconShelf {
-        let shelfIcons = try ShelfIcon.unarchivedInOrder().fetchAll(db)
+        let shelfIcons = try ShelfIcon
+            .order(ShelfIcon.sortOrder)
+            .fetchAll(db)
+
         let iconIds = shelfIcons.map(\.iconId)
         let pairs = try Icon.fetchAll(db, keys: iconIds).map { ($0.id, $0) }
         let icons = Dictionary(uniqueKeysWithValues: pairs)

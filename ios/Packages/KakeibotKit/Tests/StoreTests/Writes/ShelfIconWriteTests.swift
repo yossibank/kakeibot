@@ -58,17 +58,29 @@ struct ShelfIconWriteTests {
     }
 
     @Test
-    func removesShelfIconButKeepsItsIcon() async throws {
+    func hidesAndShowsShelfIcon() async throws {
         let setup = try await Setup()
         let first = try await setup.firstShelfIcon()
 
-        try await setup.database.removeShelfIcon(first.id, at: setup.now)
-        let shelf = try await setup.database.iconShelf()
+        try await setup.database.setShelfIconHidden(
+            first.id,
+            isHidden: true,
+            at: setup.now
+        )
+        let hidden = try await setup.database.iconShelf()
         let list = try await setup.database.entryList()
 
-        #expect(!shelf.shelfIcons.contains { $0.id == first.id })
-        #expect(shelf.shelfIcons.count == 7)
+        try await setup.database.setShelfIconHidden(
+            first.id,
+            isHidden: false,
+            at: setup.now
+        )
+        let shown = try await setup.database.iconShelf()
+
+        #expect(hidden.shelfIcons.first?.archivedAt == setup.now)
+        #expect(hidden.shelfIcons.count == 8)
         #expect(list.icons[first.iconId] != nil)
+        #expect(shown.shelfIcons.first?.archivedAt == nil)
     }
 
     @Test
@@ -85,8 +97,9 @@ struct ShelfIconWriteTests {
         }
 
         await #expect(throws: error) {
-            try await setup.database.removeShelfIcon(
+            try await setup.database.setShelfIconHidden(
                 ShelfIcon.ID(),
+                isHidden: true,
                 at: setup.now
             )
         }

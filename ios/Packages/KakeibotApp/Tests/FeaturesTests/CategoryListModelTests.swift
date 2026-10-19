@@ -64,6 +64,20 @@ struct CategoryListModelTests {
         #expect(model.shown.first?.name == "日用品")
         #expect(model.movingOrder == nil)
     }
+
+    @Test
+    func showsHiddenCategory() async throws {
+        let database = try Self.database()
+        let model = CategoryListModel(database: database)
+        await model.load()
+        let first = try #require(model.shown.first)
+        await model.hide(first.id)
+
+        await model.show(first.id)
+
+        #expect(model.hidden.isEmpty)
+        #expect(model.shown.first?.name == "食費")
+    }
 }
 
 private extension CategoryListModelTests {

@@ -80,19 +80,24 @@ struct DefaultsTests {
     }
 
     @Test
-    func skipsShelfWhenAllAreRemoved() async throws {
+    func skipsShelfWhenAllAreHidden() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         try database.insertShelfIfEmpty(at: now)
         let inserted = try await database.iconShelf()
 
         for shelfIcon in inserted.shelfIcons {
-            try await database.removeShelfIcon(shelfIcon.id, at: now)
+            try await database.setShelfIconHidden(
+                shelfIcon.id,
+                isHidden: true,
+                at: now
+            )
         }
 
         try database.insertShelfIfEmpty(at: now)
         let shelf = try await database.iconShelf()
 
-        #expect(shelf.shelfIcons.isEmpty)
+        #expect(shelf.shelfIcons.count == 8)
+        #expect(shelf.shelfIcons.allSatisfy { $0.archivedAt != nil })
     }
 }

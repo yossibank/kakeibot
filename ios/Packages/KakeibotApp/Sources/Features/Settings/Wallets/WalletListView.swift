@@ -13,6 +13,7 @@ public struct WalletListView: View {
     @State private var isOverHideZone = false
     @State private var hiding: Wallet?
     @State private var isConfirmingHide = false
+    @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -68,6 +69,7 @@ public struct WalletListView: View {
         .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
+        .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
             WalletEditSheet(model: editModel(for: sheet))
         }
@@ -129,16 +131,18 @@ private extension WalletListView {
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SettingsSectionTitle("非表示の口座")
+            SettingsHiddenTitle("非表示の口座")
 
             ForEach(model.hidden) { wallet in
-                Button {
-                    sheet = .edit(wallet.id)
-                } label: {
-                    row(wallet)
-                        .opacity(0.5)
-                }
-                .buttonStyle(.plain)
+                row(wallet)
+                    .opacity(0.5)
+                    .contentShape(.rect)
+                    .onTapGesture {
+                        sheet = .edit(wallet.id)
+                    }
+                    .onLongPressGesture {
+                        show(wallet.id)
+                    }
             }
         }
     }
@@ -342,6 +346,14 @@ private extension WalletListView {
 
         Task {
             await model.hide(wallet.id)
+        }
+    }
+
+    func show(_ id: Wallet.ID) {
+        showCount += 1
+
+        Task {
+            await model.show(id)
         }
     }
 

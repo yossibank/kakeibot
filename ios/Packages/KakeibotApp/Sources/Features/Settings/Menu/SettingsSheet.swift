@@ -57,14 +57,6 @@ public struct SettingsSheet: View {
                                 Hairline()
 
                                 NavigationLink {
-                                    StampListView(database: database)
-                                } label: {
-                                    row("スタンプ", systemImage: "seal")
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
                                     TemplateListView(database: database)
                                 } label: {
                                     row(
@@ -146,6 +138,19 @@ public struct SettingsSheet: View {
                                     )
                                 }
                                 .frame(minHeight: 52)
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 14)
+                            .card()
+                        }
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            sectionTitle("カレンダー")
+
+                            NavigationLink {
+                                StampListView(database: database)
+                            } label: {
+                                row("スタンプ", systemImage: "seal")
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14)

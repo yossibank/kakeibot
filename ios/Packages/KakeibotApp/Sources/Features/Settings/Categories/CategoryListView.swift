@@ -11,6 +11,7 @@ public struct CategoryListView: View {
     @State private var boardWidth: CGFloat = 0
     @State private var hideZone: CGRect = .zero
     @State private var isOverHideZone = false
+    @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -61,6 +62,7 @@ public struct CategoryListView: View {
         .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
+        .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
             CategoryEditSheet(model: editModel(for: sheet))
         }
@@ -139,20 +141,18 @@ private extension CategoryListView {
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("非表示のカテゴリ")
-                .font(.caption2)
-                .tracking(2)
-                .foregroundStyle(Palette.mist)
+            SettingsHiddenTitle("非表示のカテゴリ")
 
             LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
                 ForEach(model.hidden) { category in
-                    Button {
-                        sheet = .edit(category.kind, category.id)
-                    } label: {
-                        tileFace(category, isHidden: true)
-                            .frame(height: Self.tileHeight)
-                    }
-                    .buttonStyle(.plain)
+                    tileFace(category, isHidden: true)
+                        .frame(height: Self.tileHeight)
+                        .onTapGesture {
+                            sheet = .edit(category.kind, category.id)
+                        }
+                        .onLongPressGesture {
+                            show(category.id)
+                        }
                 }
             }
         }
@@ -389,6 +389,14 @@ private extension CategoryListView {
 
         Task {
             await model.finishMoving()
+        }
+    }
+
+    func show(_ id: EntryCategory.ID) {
+        showCount += 1
+
+        Task {
+            await model.show(id)
         }
     }
 

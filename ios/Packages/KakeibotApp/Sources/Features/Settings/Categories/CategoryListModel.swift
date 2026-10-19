@@ -100,6 +100,20 @@ public extension CategoryListModel {
         }
     }
 
+    func show(_ id: EntryCategory.ID) async {
+        do {
+            try await database.setCategoryHidden(
+                id,
+                isHidden: false,
+                at: Date()
+            )
+
+            await load()
+        } catch {
+            errorNotice.show(Self.showFailedMessage)
+        }
+    }
+
     func finishMoving() async {
         guard let movingOrder else {
             return
@@ -121,6 +135,7 @@ public extension CategoryListModel {
 private extension CategoryListModel {
     static let loadFailedMessage = "カテゴリを読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
+    static let showFailedMessage = "表示に戻せませんでした"
 
     func categories(isHidden: Bool) -> [EntryCategory] {
         let categories = list?.categories ?? []

@@ -413,8 +413,16 @@ private extension RecordsView {
         Binding {
             model.layout
         } set: { layout in
-            Task {
-                await model.setLayout(layout)
+            let layouts = RecordsLayout.allCases
+            let from = layouts.firstIndex(of: model.layout) ?? 0
+            let to = layouts.firstIndex(of: layout) ?? 0
+
+            PageSlide.run($slide, forward: to > from) {
+                model.setLayout(layout)
+
+                Task {
+                    await model.saveLayout()
+                }
             }
         }
     }
