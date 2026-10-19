@@ -50,8 +50,11 @@ private extension BudgetListView {
             }
 
             SettingsHint(
-                model: model.hintModel(),
-                lines: ["変えた額はこの月から使い、前の月はそのまま残ります"]
+                flag: model.hintFlag(),
+                lines: [
+                    .init("calendar", "変えた額はこの月から使います"),
+                    .init("clock.arrow.circlepath", "前の月の額はそのまま残ります")
+                ]
             )
 
             ScrollView {

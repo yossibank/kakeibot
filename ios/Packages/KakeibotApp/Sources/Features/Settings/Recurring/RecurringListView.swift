@@ -9,29 +9,28 @@ public struct RecurringListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var openId: Recurring.ID?
-    @State private var deleting: Recurring.ID?
-    @State private var boardFrame: CGRect = .zero
+    @State private var boardOrigin: CGPoint = .zero
     @State private var listOrigin: CGPoint = .zero
     @State private var zones = SettingsDropZones()
     @State private var autoScroll = SettingsAutoScroll()
-    @State private var isOverHideZone = false
+    @State private var hideHover = SettingsHideHover()
+    @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<Recurring.ID>?
     @State private var isOverShowZone = false
     @State private var showCount = 0
-    @State private var isHiddenOpen = false
-    @State private var hiddenFrames: [Recurring.ID: CGRect] = [:]
 
     @Environment(\.dismiss) private var dismiss
 
     public init(model: RecurringListModel) {
         _model = State(initialValue: model)
+        _hiddenList = State(initialValue: model.hiddenListFlag())
     }
 
     public var body: some View {
         VStack(spacing: 14) {
             header
 
-            SettingsHint(model: model.hintModel(), lines: hint)
+            SettingsHint(flag: model.hintFlag(), lines: hint)
 
             ScrollView {
                 VStack(spacing: 14) {
@@ -66,15 +65,9 @@ public struct RecurringListView: View {
             .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
-                hiding: lift == nil ? nil : isOverHideZone,
+                hiding: lift == nil ? nil : hideHover.state,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
-            .settingsLiftPreview(
-                at: liftPreviewCenter,
-                in: autoScroll.viewport
-            ) {
-                liftPreview
-            }
 
             AddButton("固定費を追加") {
                 sheet = .new
@@ -97,20 +90,6 @@ public struct RecurringListView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
-        .confirmation(
-            isPresented: deleteBinding,
-            systemImage: "trash",
-            title: "この固定費を消しますか",
-            message: "これまでに作った記録は残ります",
-            keepTitle: "やめる",
-            confirmTitle: "消す"
-        ) {
-            if let deleting {
-                Task {
-                    await model.delete(deleting)
-                }
-            }
-        }
         .sheet(item: $sheet) { sheet in
             RecurringEditSheet(model: model.editModel(for: sheet.editingId))
         }
@@ -165,22 +144,22 @@ private extension RecurringListView {
         }
         .frame(maxWidth: .infinity)
         .frame(height: boardHeight(count: rows.count), alignment: .top)
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .global)
-        } action: { frame in
-            boardFrame = frame
+        .onGeometryChange(for: CGPoint.self) { proxy in
+            proxy.frame(in: .global).origin
+        } action: { origin in
+            boardOrigin = origin
         }
     }
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             SettingsHiddenTitle(
-                isOpen: $isHiddenOpen,
+                flag: hiddenList,
                 title: "非表示の固定費",
                 count: model.hiddenRows.count
             )
 
-            if isHiddenOpen {
+            if hiddenList.isOn {
                 ForEach(model.hiddenRows) { row in
                     hiddenRow(row)
                 }
@@ -192,18 +171,15 @@ private extension RecurringListView {
         let isLifted = hiddenLift?.id == row.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.03 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let opacity: Double = isLifted ? 1 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
         return rowCard(row, isPaused: true)
             .frame(height: Self.rowHeight)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .global)
-            } action: { frame in
-                hiddenFrames[row.id] = frame
-            }
             .opacity(opacity)
             .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
@@ -236,23 +212,6 @@ private extension RecurringListView {
         .frame(maxWidth: .infinity)
     }
 
-    @ViewBuilder
-    var liftPreview: some View {
-        if let lift,
-           let row = model.rows.first(where: { $0.id == lift.id }) {
-            rowCard(row, isPaused: false)
-                .frame(width: boardFrame.width, height: Self.rowHeight)
-                .scaleEffect(1.03)
-        } else if let hiddenLift,
-                  let row = model.hiddenRows
-                  .first(where: { $0.id == hiddenLift.id }),
-                  let frame = hiddenFrames[hiddenLift.id] {
-            rowCard(row, isPaused: true)
-                .frame(width: frame.width, height: Self.rowHeight)
-                .scaleEffect(1.03)
-        }
-    }
-
     func movableRow(
         _ row: RecurringListModel.Row,
         in rows: [RecurringListModel.Row]
@@ -261,17 +220,21 @@ private extension RecurringListView {
         let index = rows.firstIndex { $0.id == row.id } ?? 0
         let y = isLifted ? liftedCenterY : centerY(at: index)
         let scale: CGFloat = isLifted ? 1.03 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
-        return SwipeRow(id: row.id, openId: $openId) {
+        return SwipeRow(id: row.id, openId: $openId, role: .hide) {
             sheet = .edit(row.id)
         } onAction: {
-            deleting = row.id
+            Task {
+                await model.hide(row.id)
+            }
         } content: {
             rowCard(row, isPaused: false)
         }
         .frame(height: Self.rowHeight)
         .scaleEffect(scale)
+        .shadow(color: shadow, radius: 16, y: 8)
         .offset(y: y - Self.rowHeight / 2)
         .zIndex(layer)
         .gesture(
@@ -343,45 +306,22 @@ private extension RecurringListView {
     static let spacing: CGFloat = 10
     nonisolated static let space = "RecurringBoard"
     nonisolated static let listSpace = "RecurringList"
-    static let purpose = "決まった日に、記録をひとりでに入れます"
+    static let purpose = SettingsHint.Line(
+        "calendar.badge.clock",
+        "決まった日に、記録をひとりでに入れます"
+    )
 
-    var hint: [String] {
+    var hint: [SettingsHint.Line] {
         if model.rows.isEmpty {
             [Self.purpose]
         } else {
-            [Self.purpose, "長押しで並べ替え、下の枠に置くと止められます"]
+            [
+                Self.purpose,
+                .move,
+                .init("pause.circle", "下の枠で少し待つと止められます"),
+                .init("hand.point.left", "横に払っても止められます")
+            ]
         }
-    }
-
-    var deleteBinding: Binding<Bool> {
-        Binding {
-            deleting != nil
-        } set: { isPresented in
-            if !isPresented {
-                deleting = nil
-            }
-        }
-    }
-
-    var liftPreviewCenter: CGPoint? {
-        if lift != nil {
-            return CGPoint(
-                x: boardFrame.midX,
-                y: boardFrame.minY + liftedCenterY
-            )
-        }
-
-        guard
-            let hiddenLift,
-            let frame = hiddenFrames[hiddenLift.id]
-        else {
-            return nil
-        }
-
-        return CGPoint(
-            x: frame.midX + hiddenLift.offset.width,
-            y: frame.midY + hiddenLift.offset.height
-        )
     }
 
     var liftedCenterY: CGFloat {
@@ -431,17 +371,19 @@ private extension RecurringListView {
         current.location = location.y
         lift = current
 
-        isOverHideZone = zones.isOverHide(location, from: boardFrame.origin)
+        let isInside = zones.isOverHide(location, from: boardOrigin)
+
+        hideHover.update(isInside: isInside)
 
         autoScroll.follow(
-            y: location.y + boardFrame.origin.y,
+            y: location.y + boardOrigin.y,
             bottom: zones.hide.isEmpty ? nil : zones.hide.minY
         ) { delta in
             let shifted = CGPoint(x: location.x, y: location.y + delta)
             follow(row, at: index, to: shifted)
         }
 
-        guard !isOverHideZone else {
+        guard !hideHover.isInside else {
             return
         }
 
@@ -459,12 +401,12 @@ private extension RecurringListView {
             return
         }
 
-        if isOverHideZone {
+        if hideHover.isArmed {
             let id = lift.id
 
             withAnimation(.snappy) {
                 self.lift = nil
-                isOverHideZone = false
+                hideHover.reset()
             }
 
             Task {
@@ -473,6 +415,8 @@ private extension RecurringListView {
 
             return
         }
+
+        hideHover.reset()
 
         withAnimation(.snappy) {
             self.lift = nil

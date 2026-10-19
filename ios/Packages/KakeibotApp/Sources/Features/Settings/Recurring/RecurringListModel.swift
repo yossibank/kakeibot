@@ -88,14 +88,6 @@ public extension RecurringListModel {
         movingOrder = order
     }
 
-    func delete(_ id: Recurring.ID) async {
-        do {
-            try await database.deleteRecurring(id)
-        } catch {
-            errorNotice.show(Self.deleteFailedMessage)
-        }
-    }
-
     func hide(_ id: Recurring.ID) async {
         movingOrder = nil
         await setHidden(id, isHidden: true, failure: Self.hideFailedMessage)
@@ -120,8 +112,12 @@ public extension RecurringListModel {
         self.movingOrder = nil
     }
 
-    func hintModel() -> SettingsHintModel {
-        SettingsHintModel(database: database, hint: .recurrings)
+    func hintFlag() -> SettingsScreenFlag {
+        .closedHint(.recurrings, in: database)
+    }
+
+    func hiddenListFlag() -> SettingsScreenFlag {
+        .openHiddenList(.recurrings, in: database)
     }
 
     func editModel(for id: Recurring.ID?) -> RecurringEditModel {
@@ -144,7 +140,6 @@ public extension RecurringListModel {
 private extension RecurringListModel {
     static let loadFailedMessage = "固定費を読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
-    static let deleteFailedMessage = "固定費を消せませんでした"
     static let hideFailedMessage = "非表示にできませんでした"
     static let showFailedMessage = "表示に戻せませんでした"
 

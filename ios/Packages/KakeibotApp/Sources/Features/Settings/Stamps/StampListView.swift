@@ -12,13 +12,11 @@ public struct StampListView: View {
     @State private var zones = SettingsDropZones()
     @State private var autoScroll = SettingsAutoScroll()
     @State private var contentOrigin: CGPoint = .zero
-    @State private var isOverHideZone = false
+    @State private var hideHover = SettingsHideHover()
+    @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<ShelfIcon.ID>?
     @State private var isOverShowZone = false
     @State private var showCount = 0
-    @State private var isHiddenOpen = false
-    @State private var boardFrame: CGRect = .zero
-    @State private var hiddenFrames: [ShelfIcon.ID: CGRect] = [:]
 
     @Environment(\.dismiss) private var dismiss
 
@@ -26,6 +24,11 @@ public struct StampListView: View {
 
     public init(database: AppDatabase) {
         _model = State(initialValue: StampListModel(database: database))
+        let hiddenList = SettingsScreenFlag.openHiddenList(
+            .stamps,
+            in: database
+        )
+        _hiddenList = State(initialValue: hiddenList)
         self.database = database
     }
 
@@ -34,8 +37,8 @@ public struct StampListView: View {
             header
 
             SettingsHint(
-                model: SettingsHintModel(database: database, hint: .stamps),
-                lines: ["カレンダーに押すスタンプです", SettingsHint.moveAndHide]
+                flag: .closedHint(.stamps, in: database),
+                lines: [.init("seal", "カレンダーに押すスタンプです"), .move, .hide]
             )
 
             ScrollView {
@@ -59,15 +62,9 @@ public struct StampListView: View {
             .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
-                hiding: lift == nil ? nil : isOverHideZone,
+                hiding: lift == nil ? nil : hideHover.state,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
-            .settingsLiftPreview(
-                at: liftPreviewCenter,
-                in: autoScroll.viewport
-            ) {
-                liftPreview
-            }
         }
         .padding(.horizontal, 18)
         .padding(.top, 16)
@@ -127,11 +124,10 @@ private extension StampListView {
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .global)
-        } action: { frame in
-            boardFrame = frame
-            boardWidth = frame.width
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            boardWidth = width
         }
     }
 
@@ -156,12 +152,12 @@ private extension StampListView {
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             SettingsHiddenTitle(
-                isOpen: $isHiddenOpen,
+                flag: hiddenList,
                 title: "非表示のスタンプ",
                 count: model.hidden.count
             )
 
-            if isHiddenOpen {
+            if hiddenList.isOn {
                 LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
                     ForEach(model.hidden) { shelfIcon in
                         hiddenTile(shelfIcon)
@@ -175,16 +171,13 @@ private extension StampListView {
         let isLifted = hiddenLift?.id == shelfIcon.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.1 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return tileFace(shelfIcon, isHidden: true)
             .frame(height: Self.tileHeight)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .global)
-            } action: { frame in
-                hiddenFrames[shelfIcon.id] = frame
-            }
             .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
@@ -199,33 +192,18 @@ private extension StampListView {
             )
     }
 
-    @ViewBuilder
-    var liftPreview: some View {
-        if let lift,
-           let shelfIcon = model.shown.first(where: { $0.id == lift.id }) {
-            tileFace(shelfIcon, isHidden: false)
-                .frame(width: tileWidth, height: Self.tileHeight)
-                .scaleEffect(1.1)
-        } else if let hiddenLift,
-                  let shelfIcon = model.hidden
-                  .first(where: { $0.id == hiddenLift.id }),
-                  let frame = hiddenFrames[hiddenLift.id] {
-            tileFace(shelfIcon, isHidden: true)
-                .frame(width: frame.width, height: Self.tileHeight)
-                .scaleEffect(1.1)
-        }
-    }
-
     func movableTile(_ shelfIcon: ShelfIcon) -> some View {
         let isLifted = lift?.id == shelfIcon.id
         let index = model.shown.firstIndex(of: shelfIcon) ?? 0
         let position = isLifted ? liftedCenter : center(at: index)
         let scale: CGFloat = isLifted ? 1.1 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return tileFace(shelfIcon, isHidden: false)
             .frame(width: tileWidth, height: Self.tileHeight)
             .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
             .position(position)
             .zIndex(layer)
             .onTapGesture {
@@ -325,27 +303,6 @@ private extension StampListView {
         return Self.tileHeight * CGFloat(rows) + gaps
     }
 
-    var liftPreviewCenter: CGPoint? {
-        if lift != nil {
-            return CGPoint(
-                x: boardFrame.minX + liftedCenter.x,
-                y: boardFrame.minY + liftedCenter.y
-            )
-        }
-
-        guard
-            let hiddenLift,
-            let frame = hiddenFrames[hiddenLift.id]
-        else {
-            return nil
-        }
-
-        return CGPoint(
-            x: frame.midX + hiddenLift.offset.width,
-            y: frame.midY + hiddenLift.offset.height
-        )
-    }
-
     var liftedCenter: CGPoint {
         guard let lift else {
             return .zero
@@ -406,7 +363,8 @@ private extension StampListView {
 
         current.location = location
         lift = current
-        isOverHideZone = zones.isOverHide(location, from: contentOrigin)
+        let isInside = zones.isOverHide(location, from: contentOrigin)
+        hideHover.update(isInside: isInside)
 
         autoScroll.follow(
             y: location.y + contentOrigin.y,
@@ -416,7 +374,7 @@ private extension StampListView {
             follow(shelfIcon, to: shifted)
         }
 
-        guard !isOverHideZone else {
+        guard !hideHover.isInside else {
             return
         }
 
@@ -434,12 +392,12 @@ private extension StampListView {
             return
         }
 
-        if isOverHideZone {
+        if hideHover.isArmed {
             let id = lift.id
 
             withAnimation(.snappy) {
                 self.lift = nil
-                isOverHideZone = false
+                hideHover.reset()
             }
 
             Task {
@@ -448,6 +406,8 @@ private extension StampListView {
 
             return
         }
+
+        hideHover.reset()
 
         withAnimation(.snappy) {
             self.lift = nil

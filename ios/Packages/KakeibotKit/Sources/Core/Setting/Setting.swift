@@ -27,6 +27,7 @@ public extension Setting {
         case reviewScale = "review_scale"
         case reviewKind = "review_kind"
         case closedHints = "closed_hints"
+        case openHiddenLists = "open_hidden_lists"
     }
 }
 

@@ -12,13 +12,12 @@ public struct TemplateListView: View {
     @State private var zones = SettingsDropZones()
     @State private var autoScroll = SettingsAutoScroll()
     @State private var contentOrigin: CGPoint = .zero
-    @State private var isOverHideZone = false
+    @State private var hideHover = SettingsHideHover()
+    @State private var openId: EntryTemplate.ID?
+    @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<EntryTemplate.ID>?
     @State private var isOverShowZone = false
     @State private var showCount = 0
-    @State private var isHiddenOpen = false
-    @State private var boardFrame: CGRect = .zero
-    @State private var hiddenFrames: [EntryTemplate.ID: CGRect] = [:]
 
     @Environment(\.dismiss) private var dismiss
 
@@ -26,6 +25,11 @@ public struct TemplateListView: View {
 
     public init(database: AppDatabase) {
         _model = State(initialValue: TemplateListModel(database: database))
+        let hiddenList = SettingsScreenFlag.openHiddenList(
+            .templates,
+            in: database
+        )
+        _hiddenList = State(initialValue: hiddenList)
         self.database = database
     }
 
@@ -35,7 +39,7 @@ public struct TemplateListView: View {
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
 
             SettingsHint(
-                model: SettingsHintModel(database: database, hint: .templates),
+                flag: .closedHint(.templates, in: database),
                 lines: hint
             )
 
@@ -60,15 +64,9 @@ public struct TemplateListView: View {
             .settingsAutoScroll(autoScroll)
             .settingsDropZones(
                 $zones,
-                hiding: lift == nil ? nil : isOverHideZone,
+                hiding: lift == nil ? nil : hideHover.state,
                 showing: hiddenLift == nil ? nil : isOverShowZone
             )
-            .settingsLiftPreview(
-                at: liftPreviewCenter,
-                in: autoScroll.viewport
-            ) {
-                liftPreview
-            }
 
             AddButton(addTitle) {
                 sheet = .new(model.type)
@@ -129,23 +127,22 @@ private extension TemplateListView {
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .global)
-        } action: { frame in
-            boardFrame = frame
-            boardWidth = frame.width
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            boardWidth = width
         }
     }
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             SettingsHiddenTitle(
-                isOpen: $isHiddenOpen,
+                flag: hiddenList,
                 title: "非表示のテンプレート",
                 count: model.hidden.count
             )
 
-            if isHiddenOpen {
+            if hiddenList.isOn {
                 ForEach(model.hidden) { template in
                     hiddenCard(template)
                 }
@@ -166,17 +163,14 @@ private extension TemplateListView {
         let isLifted = hiddenLift?.id == template.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.03 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let opacity: Double = isLifted ? 1 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
         return card(template)
             .opacity(opacity)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .global)
-            } action: { frame in
-                hiddenFrames[template.id] = frame
-            }
             .scaleEffect(scale)
+            .shadow(color: shadow, radius: 16, y: 8)
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
@@ -191,45 +185,35 @@ private extension TemplateListView {
             )
     }
 
-    @ViewBuilder
-    var liftPreview: some View {
-        if let lift,
-           let template = model.shown.first(where: { $0.id == lift.id }) {
-            card(template)
-                .frame(width: tileWidth)
-                .scaleEffect(1.03)
-        } else if let hiddenLift,
-                  let template = model.hidden
-                  .first(where: { $0.id == hiddenLift.id }),
-                  let frame = hiddenFrames[hiddenLift.id] {
-            card(template)
-                .frame(width: frame.width)
-                .scaleEffect(1.03)
-        }
-    }
-
     func movableCard(_ template: EntryTemplate) -> some View {
         let isLifted = lift?.id == template.id
         let index = model.shown.firstIndex(of: template) ?? 0
         let position = isLifted ? liftedCenter : center(at: index)
         let scale: CGFloat = isLifted ? 1.03 : 1
+        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
-        return card(template)
-            .frame(width: tileWidth)
-            .scaleEffect(scale)
-            .position(position)
-            .zIndex(layer)
-            .onTapGesture {
-                sheet = .edit(template.id)
+        return SwipeRow(id: template.id, openId: $openId, role: .hide) {
+            sheet = .edit(template.id)
+        } onAction: {
+            Task {
+                await model.hide(template.id)
             }
-            .gesture(
-                LiftGesture(in: Self.space) { location in
-                    follow(template, to: location)
-                } onEnd: {
-                    drop()
-                }
-            )
+        } content: {
+            card(template)
+        }
+        .frame(width: tileWidth)
+        .scaleEffect(scale)
+        .shadow(color: shadow, radius: 16, y: 8)
+        .position(position)
+        .zIndex(layer)
+        .gesture(
+            LiftGesture(in: Self.space) { location in
+                follow(template, to: location)
+            } onEnd: {
+                drop()
+            }
+        )
     }
 }
 
@@ -266,11 +250,19 @@ private extension TemplateListView {
         "\(typeName)のテンプレートを追加"
     }
 
-    var hint: [String] {
+    var hint: [SettingsHint.Line] {
         if model.shown.isEmpty {
-            ["よく使う入力を残しておけます", "ホームと入力シートから 1 回で入れられます"]
+            [
+                .init("tray.and.arrow.down", "よく使う入力を残しておけます"),
+                .init("bolt", "ホームと入力シートからすぐ入れられます")
+            ]
         } else {
-            ["この順でホームと入力シートに出ます", SettingsHint.moveAndHide]
+            [
+                .init("list.number", "この順でホームと入力シートに出ます"),
+                .move,
+                .hide,
+                .swipeHide
+            ]
         }
     }
 
@@ -284,27 +276,6 @@ private extension TemplateListView {
         let rows = (count + Self.columnCount - 1) / Self.columnCount
         let gaps = Self.spacing * CGFloat(max(rows - 1, 0))
         return Self.tileHeight * CGFloat(rows) + gaps
-    }
-
-    var liftPreviewCenter: CGPoint? {
-        if lift != nil {
-            return CGPoint(
-                x: boardFrame.minX + liftedCenter.x,
-                y: boardFrame.minY + liftedCenter.y
-            )
-        }
-
-        guard
-            let hiddenLift,
-            let frame = hiddenFrames[hiddenLift.id]
-        else {
-            return nil
-        }
-
-        return CGPoint(
-            x: frame.midX + hiddenLift.offset.width,
-            y: frame.midY + hiddenLift.offset.height
-        )
     }
 
     var liftedCenter: CGPoint {
@@ -367,7 +338,8 @@ private extension TemplateListView {
 
         current.location = location
         lift = current
-        isOverHideZone = zones.isOverHide(location, from: contentOrigin)
+        let isInside = zones.isOverHide(location, from: contentOrigin)
+        hideHover.update(isInside: isInside)
 
         autoScroll.follow(
             y: location.y + contentOrigin.y,
@@ -377,7 +349,7 @@ private extension TemplateListView {
             follow(template, to: shifted)
         }
 
-        guard !isOverHideZone else {
+        guard !hideHover.isInside else {
             return
         }
 
@@ -395,12 +367,12 @@ private extension TemplateListView {
             return
         }
 
-        if isOverHideZone {
+        if hideHover.isArmed {
             let id = lift.id
 
             withAnimation(.snappy) {
                 self.lift = nil
-                isOverHideZone = false
+                hideHover.reset()
             }
 
             Task {
@@ -409,6 +381,8 @@ private extension TemplateListView {
 
             return
         }
+
+        hideHover.reset()
 
         withAnimation(.snappy) {
             self.lift = nil

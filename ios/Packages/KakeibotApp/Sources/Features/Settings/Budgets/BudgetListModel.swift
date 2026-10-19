@@ -126,8 +126,8 @@ public extension BudgetListModel {
         categoryList?.icons[category.iconId]
     }
 
-    func hintModel() -> SettingsHintModel {
-        SettingsHintModel(database: database, hint: .budgets)
+    func hintFlag() -> SettingsScreenFlag {
+        .closedHint(.budgets, in: database)
     }
 
     func load() async {

@@ -1,4 +1,4 @@
-public enum ScreenHint: String, CaseIterable, Codable, Sendable {
+public enum SettingsScreen: String, CaseIterable, Codable, Sendable {
     case categories
     case wallets
     case templates

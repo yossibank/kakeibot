@@ -65,23 +65,13 @@ public extension SettingKey where Value == ReviewKind {
     }
 }
 
-public extension SettingKey where Value == Set<ScreenHint> {
+public extension SettingKey where Value == Set<SettingsScreen> {
     static var closedHints: Self {
-        Self(
-            .closedHints,
-            default: [],
-            decode: { text in
-                let hints = text.split(separator: ",").compactMap { name in
-                    ScreenHint(rawValue: String(name))
-                }
+        Self(screens: .closedHints)
+    }
 
-                return Set(hints)
-            },
-            encode: { hints in
-                let names = hints.map(\.rawValue).sorted()
-                return names.isEmpty ? nil : names.joined(separator: ",")
-            }
-        )
+    static var openHiddenLists: Self {
+        Self(screens: .openHiddenLists)
     }
 }
 
@@ -119,6 +109,26 @@ extension SettingKey where Value: RawRepresentable, Value.RawValue == String {
             default: defaultValue,
             decode: { Value(rawValue: $0) },
             encode: { $0.rawValue }
+        )
+    }
+}
+
+extension SettingKey where Value == Set<SettingsScreen> {
+    init(screens key: Setting.Key) {
+        self.init(
+            key,
+            default: [],
+            decode: { text in
+                let screens = text.split(separator: ",").compactMap { name in
+                    SettingsScreen(rawValue: String(name))
+                }
+
+                return Set(screens)
+            },
+            encode: { screens in
+                let names = screens.map(\.rawValue).sorted()
+                return names.isEmpty ? nil : names.joined(separator: ",")
+            }
         )
     }
 }

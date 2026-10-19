@@ -2,62 +2,119 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsHint: View {
-    @State private var model: SettingsHintModel
+    @State private var flag: SettingsScreenFlag
 
-    private let lines: [String]
+    private let lines: [Line]
 
     init(
-        model: SettingsHintModel,
-        lines: [String]
+        flag: SettingsScreenFlag,
+        lines: [Line]
     ) {
-        _model = State(initialValue: model)
+        _flag = State(initialValue: flag)
         self.lines = lines
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            if !model.isClosed {
-                HStack(alignment: .top, spacing: 8) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        ForEach(lines, id: \.self) { line in
-                            Text(line)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.85)
-                        }
-                    }
-                    .font(.caption)
-                    .foregroundStyle(Palette.mist)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                    Button {
-                        Task {
-                            await model.close()
-                        }
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(Palette.dusk)
-                            .frame(width: 28, height: 28)
-                            .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(.leading, 12)
-                .padding(.vertical, 6)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Palette.hairline, lineWidth: 1)
-                }
-                .transition(.opacity)
+            if !flag.isOn {
+                card
+                    .transition(Self.transition)
             }
         }
-        .animation(.snappy, value: model.isClosed)
+        .animation(.snappy, value: flag.isOn)
         .task {
-            await model.load()
+            await flag.load()
         }
     }
 }
 
 extension SettingsHint {
-    static let moveAndHide = "長押しで並べ替え、下の枠に置くと非表示にできます"
+    struct Line: Identifiable {
+        let systemImage: String
+        let text: String
+
+        var id: String {
+            text
+        }
+
+        init(
+            _ systemImage: String,
+            _ text: String
+        ) {
+            self.systemImage = systemImage
+            self.text = text
+        }
+    }
+}
+
+extension SettingsHint.Line {
+    static let move = Self("hand.draw", "長押しで並べ替えられます")
+    static let hide = Self("eye.slash", "下の枠で少し待つと非表示にできます")
+    static let swipeHide = Self("hand.point.left", "横に払っても非表示にできます")
+}
+
+private extension SettingsHint {
+    static let shape = RoundedRectangle(cornerRadius: 16)
+
+    static var transition: AnyTransition {
+        .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
+    }
+
+    static var fill: LinearGradient {
+        LinearGradient(
+            colors: [Palette.cardTop, Palette.cardBottom],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    var card: some View {
+        HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(lines) { line in
+                    row(line)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button {
+                Task {
+                    await flag.set(true)
+                }
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(Palette.mist)
+                    .frame(width: 24, height: 24)
+                    .background(Palette.line, in: Circle())
+                    .frame(width: 32, height: 32)
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.leading, 12)
+        .padding(.trailing, 6)
+        .padding(.vertical, 10)
+        .background(Self.fill, in: Self.shape)
+        .overlay {
+            Self.shape
+                .stroke(Palette.gold.opacity(.soft), lineWidth: 1)
+        }
+    }
+
+    func row(_ line: Line) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: line.systemImage)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(Palette.gold)
+                .frame(width: 26, height: 26)
+                .background(Palette.gold.opacity(.subtle), in: Circle())
+
+            Text(line.text)
+                .font(.footnote)
+                .foregroundStyle(Palette.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+    }
 }

@@ -8,7 +8,7 @@ public struct SettingsSheet: View {
     @State private var launchScreen: LaunchScreen = .home
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
-    @State private var closedHints: Set<ScreenHint> = []
+    @State private var closedHints: Set<SettingsScreen> = []
 
     #if DEBUG
     @State private var isConfirmingSample = false
