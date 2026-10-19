@@ -15,7 +15,7 @@ struct SettingsScreenFlagTests {
         await wallets.load()
         let openedFirst = !wallets.isOn
 
-        await wallets.set(true)
+        await wallets.set(true).value
         let reopened = SettingsScreenFlag.closedHint(.wallets, in: database)
         await reopened.load()
         await budgets.load()
@@ -36,7 +36,7 @@ struct SettingsScreenFlagTests {
         await templates.load()
         let closedFirst = !templates.isOn
 
-        await templates.set(true)
+        await templates.set(true).value
         let reopened = SettingsScreenFlag.openHiddenList(
             .templates,
             in: database
@@ -44,7 +44,7 @@ struct SettingsScreenFlagTests {
         await reopened.load()
         let openedAgain = reopened.isOn
 
-        await reopened.set(false)
+        await reopened.set(false).value
         let closedAgain = SettingsScreenFlag.openHiddenList(
             .templates,
             in: database

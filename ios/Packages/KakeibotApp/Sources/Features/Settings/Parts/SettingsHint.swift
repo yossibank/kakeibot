@@ -78,8 +78,8 @@ private extension SettingsHint {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Button {
-                Task {
-                    await flag.set(true)
+                withAnimation(.snappy) {
+                    flag.set(true)
                 }
             } label: {
                 Image(systemName: "xmark")

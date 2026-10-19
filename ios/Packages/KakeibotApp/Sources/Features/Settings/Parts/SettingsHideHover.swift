@@ -16,7 +16,7 @@ extension SettingsHideHover {
         case armed
     }
 
-    static let delay: TimeInterval = 0.6
+    static let delay: TimeInterval = 0.4
 
     var isInside: Bool {
         state != .outside

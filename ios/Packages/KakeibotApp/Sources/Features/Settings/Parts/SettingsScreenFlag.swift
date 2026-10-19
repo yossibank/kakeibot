@@ -53,9 +53,18 @@ public extension SettingsScreenFlag {
         isOn = screens?.contains(screen) ?? false
     }
 
-    func set(_ isOn: Bool) async {
+    @discardableResult
+    func set(_ isOn: Bool) -> Task<Void, Never> {
         self.isOn = isOn
 
+        return Task {
+            await save(isOn)
+        }
+    }
+}
+
+private extension SettingsScreenFlag {
+    func save(_ isOn: Bool) async {
         var screens = await (try? database.setting(key)) ?? []
 
         if isOn {

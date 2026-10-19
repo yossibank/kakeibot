@@ -8,8 +8,8 @@ struct SettingsHiddenTitle: View {
 
     var body: some View {
         Button {
-            Task {
-                await flag.set(!flag.isOn)
+            withAnimation(.snappy) {
+                flag.set(!flag.isOn)
             }
         } label: {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
