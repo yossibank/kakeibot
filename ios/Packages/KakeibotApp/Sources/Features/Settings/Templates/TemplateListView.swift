@@ -207,7 +207,7 @@ private extension TemplateListView {
         } content: {
             card(template)
         }
-        .frame(width: tileWidth)
+        .frame(width: tileWidth, height: Self.tileHeight)
         .scaleEffect(scale)
         .shadow(color: shadow, radius: 16, y: 8)
         .position(position)
