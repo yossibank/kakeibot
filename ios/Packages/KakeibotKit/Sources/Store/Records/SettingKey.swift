@@ -41,6 +41,12 @@ public extension SettingKey where Value == LaunchScreen {
     }
 }
 
+public extension SettingKey where Value == ThemePreset {
+    static var theme: Self {
+        Self(.themeId, default: .navy)
+    }
+}
+
 public extension SettingKey where Value == TemplateOrder {
     static var templateOrder: Self {
         Self(.templateOrder, default: .manual)

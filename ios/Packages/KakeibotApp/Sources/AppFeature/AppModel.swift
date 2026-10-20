@@ -10,6 +10,7 @@ import SwiftUI
 final class AppModel {
     private(set) var launch: Launch = .opening
     private(set) var today: LocalDate
+    private(set) var theme: ThemePreset = .navy
 
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let scheduler: NotificationScheduler
@@ -61,6 +62,7 @@ extension AppModel {
             .value
 
             await generateRecurring(in: database)
+            theme = await (try? database.setting(.theme)) ?? .navy
             let completed = try await database.setting(.onboardingCompleted)
             launch = completed ? .ready(database) : .onboarding(database)
         } catch {
@@ -94,6 +96,21 @@ extension AppModel {
         case let .onboarding(database), let .ready(database):
             await generateRecurring(in: database)
             await scheduleNotifications(in: database)
+        case .opening, .failed:
+            return
+        }
+    }
+
+    func observeTheme() async {
+        switch launch {
+        case let .onboarding(database), let .ready(database):
+            do {
+                for try await theme in database.settingUpdates(.theme) {
+                    self.theme = theme
+                }
+            } catch {
+                return
+            }
         case .opening, .failed:
             return
         }

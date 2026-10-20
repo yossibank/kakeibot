@@ -41,7 +41,6 @@ public struct CategoryEditSheet: View {
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
-        .preferredColorScheme(.dark)
         .confirmsDiscard(
             when: model.isChanged,
             isPresented: $isConfirmingDiscard
@@ -151,7 +150,7 @@ private extension CategoryEditSheet {
                     .font(.sans(.caption))
                     .lineLimit(1)
             }
-            .foregroundStyle(Palette.accentLight)
+            .foregroundStyle(Palette.accentStrong)
             .frame(width: 86, height: 86)
             .background(
                 Palette.accent.opacity(.subtle),
@@ -207,7 +206,7 @@ private extension CategoryEditSheet {
 
     @ViewBuilder
     func tagLayer(_ edit: TagEdit) -> some View {
-        Color.black
+        Palette.scrim
             .opacity(0.45)
             .ignoresSafeArea()
             .onTapGesture {

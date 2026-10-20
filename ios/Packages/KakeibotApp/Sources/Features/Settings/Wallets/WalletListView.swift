@@ -92,7 +92,6 @@ public struct WalletListView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
@@ -164,7 +163,7 @@ private extension WalletListView {
         let isLifted = hiddenLift?.id == wallet.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let opacity: Double = isLifted ? 1 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
@@ -192,7 +191,7 @@ private extension WalletListView {
         let index = model.shown.firstIndex(of: wallet) ?? 0
         let y = isLifted ? liftedCenterY : centerY(at: index)
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: wallet.id, openId: $openId, role: .hide) {
@@ -218,7 +217,7 @@ private extension WalletListView {
 
     func row(_ wallet: Wallet) -> some View {
         let balance = model.balance(of: wallet)
-        let balanceColor = balance < 0 ? Palette.rose : Palette.accentLight
+        let balanceColor = balance < 0 ? Palette.rose : Palette.accentStrong
 
         return HStack(spacing: 14) {
             IconImage(model.icon(for: wallet), size: 18)

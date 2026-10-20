@@ -36,14 +36,14 @@ struct ReviewStampSheet: View {
 
                 Text("押した日")
                     .font(.headline)
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
 
                 Spacer()
 
                 Text("×\(tally.count)")
                     .font(.serif(.headline))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
             }
             .padding(.horizontal, 4)
 
@@ -74,7 +74,6 @@ struct ReviewStampSheet: View {
                 .fill(Palette.background)
                 .ignoresSafeArea()
         }
-        .preferredColorScheme(.dark)
     }
 }
 
@@ -85,7 +84,7 @@ private extension ReviewStampSheet {
         return HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text("\(date.month)/\(date.day)")
                 .font(.serif(.body))
-                .foregroundStyle(Palette.accentLight)
+                .foregroundStyle(Palette.accentStrong)
 
             Text("（\(date.weekday.shortName)）")
                 .font(.caption)

@@ -20,7 +20,7 @@ public struct MenuHeader<Leading: View>: View {
             Text(title)
                 .font(.serif(.small))
                 .tracking(1)
-                .foregroundStyle(Palette.accentLight)
+                .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
 
             Spacer(minLength: 0)

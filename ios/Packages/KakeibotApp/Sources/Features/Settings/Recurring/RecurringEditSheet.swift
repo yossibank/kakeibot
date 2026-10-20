@@ -21,7 +21,7 @@ public struct RecurringEditSheet: View {
             content
 
             if let panel {
-                Color.black
+                Palette.scrim
                     .opacity(0.35)
                     .ignoresSafeArea()
                     .onTapGesture {
@@ -53,7 +53,6 @@ public struct RecurringEditSheet: View {
                     isNameFocused = false
                 }
         }
-        .preferredColorScheme(.dark)
         .confirmsDiscard(
             when: model.isChanged,
             isPresented: $isConfirmingDiscard
@@ -161,7 +160,7 @@ private extension RecurringEditSheet {
             )
             .multilineTextAlignment(.center)
             .font(.serif(.body))
-            .foregroundStyle(Palette.accentLight)
+            .foregroundStyle(Palette.accentStrong)
             .tint(Palette.accent)
             .submitLabel(.done)
             .focused($isNameFocused)
@@ -355,7 +354,7 @@ private extension RecurringEditSheet {
     }
 
     var amountColor: Color {
-        model.amount > 0 ? Palette.accentLight : Palette.hint
+        model.amount > 0 ? Palette.accentStrong : Palette.hint
     }
 
     var typeBinding: Binding<Entry.Kind> {

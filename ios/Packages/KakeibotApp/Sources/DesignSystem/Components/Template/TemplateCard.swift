@@ -72,7 +72,7 @@ public extension TemplateCard where Name == Text, Amount == TemplateCardAmount {
         self.init(icon: icon, detail: detail, size: size) {
             Text(name)
                 .font(size.nameFont)
-                .foregroundStyle(Palette.accentLight)
+                .foregroundStyle(Palette.accentStrong)
         } amount: {
             TemplateCardAmount(amount: amount, size: size)
         }

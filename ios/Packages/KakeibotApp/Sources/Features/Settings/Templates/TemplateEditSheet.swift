@@ -29,7 +29,7 @@ public struct TemplateEditSheet: View {
                     .ignoresSafeArea(keyboardRegions)
 
                 if let panel {
-                    Color.black
+                    Palette.scrim
                         .opacity(0.35)
                         .ignoresSafeArea()
                         .onTapGesture {
@@ -64,7 +64,6 @@ public struct TemplateEditSheet: View {
                         focus = nil
                     }
             }
-            .preferredColorScheme(.dark)
             .sensoryFeedback(.selection, trigger: model.categoryId)
             .sensoryFeedback(.selection, trigger: model.walletId)
             .confirmsDiscard(
@@ -197,7 +196,7 @@ private extension TemplateEditSheet {
                 prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
             )
             .font(TemplateCardSize.large.nameFont)
-            .foregroundStyle(Palette.accentLight)
+            .foregroundStyle(Palette.accentStrong)
             .tint(Palette.accent)
             .submitLabel(.done)
             .focused($focus, equals: .name)
@@ -220,7 +219,7 @@ private extension TemplateEditSheet {
             }
             .buttonStyle(.plain)
         }
-        .shadow(color: Palette.accent.opacity(.subtle), radius: 30)
+        .shadow(color: Palette.glow.opacity(.subtle), radius: 30)
         .background(alignment: .bottom) {
             Ellipse()
                 .fill(.black.opacity(0.55))
@@ -251,7 +250,7 @@ private extension TemplateEditSheet {
 
                 Text(capsuleAmount)
                     .font(.serif(.caption))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
             }
             .font(.sans(.caption))
             .lineLimit(1)
@@ -299,7 +298,7 @@ private extension TemplateEditSheet {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Palette.outline, lineWidth: 1)
         }
-        .shadow(color: .black.opacity(0.45), radius: 20, y: 10)
+        .shadow(color: Palette.shadow.opacity(0.45), radius: 20, y: 10)
         .task {
             focus = .memo
         }

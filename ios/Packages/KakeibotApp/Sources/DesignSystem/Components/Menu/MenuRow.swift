@@ -60,7 +60,7 @@ public struct MenuRow: View {
 
 private extension MenuRow {
     var titleColor: Color {
-        isSelected ? Palette.accentLight : Palette.text
+        isSelected ? Palette.accentStrong : Palette.text
     }
 
     var selectionFill: Color {

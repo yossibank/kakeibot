@@ -52,7 +52,6 @@ public struct OnboardingView: View {
                 .ignoresSafeArea()
         }
         .budgetKeypad(model.budget)
-        .preferredColorScheme(.dark)
         .sensoryFeedback(.selection, trigger: model.page)
         .task {
             await model.load()
@@ -115,7 +114,7 @@ private extension OnboardingView {
 
                 Text("毎日の記録を、すばやく、心地よく")
                     .font(.subheadline)
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
             }
             .padding(.top, 36)
 
@@ -291,7 +290,7 @@ private extension OnboardingView {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(screen.title)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Palette.accentLight)
+                        .foregroundStyle(Palette.accentStrong)
 
                     Text(screen.note)
                         .font(.caption)
@@ -322,7 +321,7 @@ private extension OnboardingView {
     }
 
     var budgetColor: Color {
-        model.budget.totalAmount == nil ? Palette.hint : Palette.accentLight
+        model.budget.totalAmount == nil ? Palette.hint : Palette.accentStrong
     }
 
     var weekStartBinding: Binding<Weekday> {

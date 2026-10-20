@@ -54,7 +54,6 @@ public struct MonthStartDayView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
         .sensoryFeedback(.selection, trigger: model.startDay)
         .task {
             await model.load()

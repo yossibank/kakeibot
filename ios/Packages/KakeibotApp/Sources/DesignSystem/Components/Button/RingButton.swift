@@ -59,7 +59,7 @@ private extension RingButton {
         switch (isEnabled, style) {
         case (false, _): Palette.hint
         case (true, .plain): Palette.subtext
-        case (true, .prominent): Palette.accentLight
+        case (true, .prominent): Palette.accentStrong
         case (true, .destructive): Palette.rose
         }
     }

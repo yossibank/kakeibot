@@ -56,7 +56,7 @@ struct EntryMemoCard: View {
         .overlay(alignment: .bottomLeading) {
             pointer
         }
-        .shadow(color: .black.opacity(0.45), radius: 20, y: 10)
+        .shadow(color: Palette.shadow.opacity(0.45), radius: 20, y: 10)
         .task {
             isFocused.wrappedValue = true
         }

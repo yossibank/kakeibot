@@ -104,7 +104,7 @@ private extension ReviewView {
             VStack(spacing: 1) {
                 Text(periodTitle)
                     .font(.serif(.body))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .contentTransition(periodTextTransition)
 
                 if let periodSubtitle {
@@ -178,7 +178,7 @@ private extension ReviewView {
                             Text("×\(tally.count)")
                                 .font(.serif(.body))
                                 .monospacedDigit()
-                                .foregroundStyle(Palette.accentLight)
+                                .foregroundStyle(Palette.accentStrong)
                         }
                         .contentShape(.rect)
                     }
@@ -304,7 +304,7 @@ private extension ReviewView {
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
         let rim = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
         let titleColor = isSelected ? Palette.accent : Palette.subtext
-        let amountColor = isSelected ? Palette.accentLight : Palette.text
+        let amountColor = isSelected ? Palette.accentStrong : Palette.text
         let change = model.change(of: kind)
 
         return Button {

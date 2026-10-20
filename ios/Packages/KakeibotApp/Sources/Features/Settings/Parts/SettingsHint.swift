@@ -22,11 +22,7 @@ struct SettingsHint: View {
             }
         }
         .task {
-            let isClosed = await flag.storedValue()
-
-            withAnimation(.snappy) {
-                flag.apply(isClosed)
-            }
+            await flag.load()
         }
     }
 }
@@ -61,7 +57,7 @@ private extension SettingsHint {
 
     static var transition: AnyTransition {
         .asymmetric(
-            insertion: .opacity.combined(with: .offset(y: 12)),
+            insertion: .identity,
             removal: .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
         )
     }

@@ -55,7 +55,7 @@ private extension SettingsRowList {
     func rowButton(_ item: Item) -> some View {
         let isAmount = item.isAmount && !item.isEmpty
         let font: Font = isAmount ? Self.amountFont : .subheadline
-        let color = item.isEmpty ? Palette.hint : Palette.accentLight
+        let color = item.isEmpty ? Palette.hint : Palette.accentStrong
 
         return Button {
             onOpen(item.panel)

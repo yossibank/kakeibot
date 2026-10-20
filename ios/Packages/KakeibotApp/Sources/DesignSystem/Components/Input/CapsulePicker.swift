@@ -25,7 +25,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                     Capsule()
                         .strokeBorder(Self.thumbRim, lineWidth: 0.8)
                 }
-                .shadow(color: Palette.accent.opacity(.muted), radius: 6)
+                .shadow(color: Palette.glow.opacity(.muted), radius: 6)
                 .frame(width: Self.segmentWidth, height: Self.segmentHeight)
                 .offset(x: thumbX)
 
@@ -37,7 +37,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                     let isHighlighted = index == highlightedIndex
                     let weight: Font.Weight = isHighlighted ? .bold : .regular
                     let color = isHighlighted
-                        ? Palette.accentLight
+                        ? Palette.accentStrong
                         : Palette.subtext
 
                     Text(option.title)
@@ -115,7 +115,7 @@ private extension CapsulePicker {
     static var thumbRim: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.accentLight.opacity(.strong),
+                Palette.accentStrong.opacity(.strong),
                 Palette.accent.opacity(.muted)
             ],
             startPoint: .top,

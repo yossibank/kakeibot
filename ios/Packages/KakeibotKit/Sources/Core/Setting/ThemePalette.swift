@@ -7,7 +7,7 @@ public struct ThemePalette: Hashable, Sendable {
     public var line: UInt32
     public var accent: UInt32
     public var accentDeep: UInt32
-    public var accentLight: UInt32
+    public var accentStrong: UInt32
     public var text: UInt32
     public var subtext: UInt32
     public var hint: UInt32
@@ -21,7 +21,7 @@ public struct ThemePalette: Hashable, Sendable {
         line: UInt32,
         accent: UInt32,
         accentDeep: UInt32,
-        accentLight: UInt32,
+        accentStrong: UInt32,
         text: UInt32,
         subtext: UInt32,
         hint: UInt32
@@ -34,7 +34,7 @@ public struct ThemePalette: Hashable, Sendable {
         self.line = line
         self.accent = accent
         self.accentDeep = accentDeep
-        self.accentLight = accentLight
+        self.accentStrong = accentStrong
         self.text = text
         self.subtext = subtext
         self.hint = hint
@@ -51,7 +51,7 @@ public extension ThemePalette {
         case line
         case accent
         case accentDeep
-        case accentLight
+        case accentStrong
         case text
         case subtext
         case hint
@@ -66,7 +66,7 @@ public extension ThemePalette {
         line: 0x26314A,
         accent: 0xCDAA6B,
         accentDeep: 0x8F6C38,
-        accentLight: 0xF4E6C1,
+        accentStrong: 0xF4E6C1,
         text: 0xEDE6D6,
         subtext: 0x8C97AE,
         hint: 0x7E89A0
@@ -82,7 +82,7 @@ public extension ThemePalette {
         case .line: line
         case .accent: accent
         case .accentDeep: accentDeep
-        case .accentLight: accentLight
+        case .accentStrong: accentStrong
         case .text: text
         case .subtext: subtext
         case .hint: hint

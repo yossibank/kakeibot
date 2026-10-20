@@ -112,7 +112,7 @@ private extension FloatingTabBar {
 
                 Image(systemName: "plus")
                     .font(.sans(.headline, weight: .ultraLight))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
             }
             .frame(width: Self.height, height: Self.height)
             .background {
@@ -127,7 +127,7 @@ private extension FloatingTabBar {
         }
         .buttonStyle(PressStyle())
         .glass(tint: Palette.backgroundBottom.opacity(.strong), in: Circle())
-        .shadow(color: Palette.accent.opacity(.muted), radius: 14, y: 4)
+        .shadow(color: Palette.glow.opacity(.muted), radius: 14, y: 4)
         .sensoryFeedback(.impact(weight: .light), trigger: addCount)
     }
 
@@ -136,7 +136,7 @@ private extension FloatingTabBar {
         isHighlighted: Bool
     ) -> some View {
         let iconColor = isHighlighted ? Palette.accent : Palette.subtext
-        let titleColor = isHighlighted ? Palette.accentLight : Palette.subtext
+        let titleColor = isHighlighted ? Palette.accentStrong : Palette.subtext
 
         return VStack(spacing: 3) {
             Image(systemName: item.systemImage)
@@ -176,7 +176,7 @@ private extension FloatingTabBar {
     static var indicatorRim: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.accentLight.opacity(.strong),
+                Palette.accentStrong.opacity(.strong),
                 Palette.accent.opacity(.soft)
             ],
             startPoint: .top,
@@ -187,11 +187,11 @@ private extension FloatingTabBar {
     static var goldRing: AngularGradient {
         AngularGradient(
             colors: [
-                Palette.accentLight,
+                Palette.accentStrong,
                 Palette.accent,
                 Palette.accentDeep,
                 Palette.accent,
-                Palette.accentLight
+                Palette.accentStrong
             ],
             center: .center
         )

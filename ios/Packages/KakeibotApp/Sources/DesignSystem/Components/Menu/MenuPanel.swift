@@ -22,7 +22,7 @@ public struct MenuPanel<Content: View>: View {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
         }
-        .shadow(color: .black.opacity(0.5), radius: 24, y: 12)
+        .shadow(color: Palette.shadow.opacity(0.5), radius: 24, y: 12)
     }
 }
 

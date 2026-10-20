@@ -59,7 +59,7 @@ private extension TagCard {
     var foreground: Color {
         switch style {
         case .plain: Palette.subtext
-        case .selected: Palette.accentLight
+        case .selected: Palette.accentStrong
         case .add: Palette.accent
         }
     }

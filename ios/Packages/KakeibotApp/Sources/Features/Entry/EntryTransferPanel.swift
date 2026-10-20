@@ -59,7 +59,7 @@ private extension EntryTransferPanel {
 
                 Text(wallet?.name ?? "選ぶ")
                     .font(.subheadline)
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
 
                 if let balance = wallet.flatMap({ model.balance(of: $0) }) {

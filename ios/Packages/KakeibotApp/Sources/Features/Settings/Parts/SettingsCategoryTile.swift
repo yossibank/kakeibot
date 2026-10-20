@@ -9,7 +9,7 @@ struct SettingsCategoryTile: View {
     let action: () -> Void
 
     var body: some View {
-        let color = isSelected ? Palette.accentLight : Palette.subtext
+        let color = isSelected ? Palette.accentStrong : Palette.subtext
 
         Button(action: action) {
             VStack(spacing: 4) {

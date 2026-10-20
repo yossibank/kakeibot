@@ -78,7 +78,7 @@ private extension ReviewSharesCard {
             Text(AmountText.text(total.amount))
                 .font(.serif(.body))
                 .monospacedDigit()
-                .foregroundStyle(Palette.accentLight)
+                .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         }
@@ -105,7 +105,7 @@ private extension ReviewSharesCard {
                 Text(AmountText.text(share.amount))
                     .font(.serif(.body))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
 
                 Image(systemName: "chevron.right")
                     .font(.caption2)

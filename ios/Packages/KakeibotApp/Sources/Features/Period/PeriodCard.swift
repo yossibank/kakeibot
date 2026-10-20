@@ -16,7 +16,7 @@ struct PeriodCard: View {
             Text(periodText)
                 .font(.serif(.title))
                 .monospacedDigit()
-                .foregroundStyle(Palette.accentLight)
+                .foregroundStyle(Palette.accentStrong)
                 .contentTransition(.numericText())
 
             Text("\(month.month)月として数えます")

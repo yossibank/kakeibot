@@ -56,7 +56,6 @@ public struct ReminderView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
         .animation(.snappy, value: model.time)
         .animation(.snappy, value: model.isDenied)
         .animation(.snappy, value: isPickingTime)
@@ -145,7 +144,7 @@ private extension ReminderView {
             } label: {
                 Text("設定アプリを開く")
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .frame(maxWidth: .infinity, minHeight: 40)
                     .background(Palette.rose.opacity(.subtle), in: Capsule())
                     .overlay {
@@ -332,7 +331,7 @@ private extension ReminderView {
     }
 
     var timeColor: Color {
-        model.isOn ? Palette.accentLight : Palette.hint
+        model.isOn ? Palette.accentStrong : Palette.hint
     }
 
     var summaryText: String {

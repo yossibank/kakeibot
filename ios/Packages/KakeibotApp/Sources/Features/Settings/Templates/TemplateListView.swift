@@ -61,6 +61,8 @@ public struct TemplateListView: View {
                 }
             }
             .scrollIndicators(.hidden)
+            .contentMargins(.horizontal, 18, for: .scrollContent)
+            .padding(.horizontal, -18)
             .scrollDisabled(lift != nil || hiddenLift != nil)
             .settingsAutoScroll(autoScroll)
             .settingsDropZones(
@@ -92,7 +94,6 @@ public struct TemplateListView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
@@ -170,7 +171,7 @@ private extension TemplateListView {
         let isLifted = hiddenLift?.id == template.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let opacity: Double = isLifted ? 1 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
@@ -197,7 +198,7 @@ private extension TemplateListView {
         let index = model.shown.firstIndex(of: template) ?? 0
         let position = isLifted ? liftedCenter : center(at: index)
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: template.id, openId: $openId, role: .hide) {

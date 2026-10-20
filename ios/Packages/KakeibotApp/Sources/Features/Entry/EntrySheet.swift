@@ -66,7 +66,6 @@ public struct EntrySheet: View {
                     .fill(Palette.background)
                     .ignoresSafeArea()
             }
-            .preferredColorScheme(.dark)
             .confirmsDiscard(
                 when: model.isChanged,
                 isPresented: $isConfirmingDiscard
@@ -338,7 +337,7 @@ private extension EntrySheet {
 
     @ViewBuilder
     var memoLayer: some View {
-        Color.black
+        Palette.scrim
             .opacity(0.35)
             .ignoresSafeArea()
             .onTapGesture {
@@ -445,7 +444,7 @@ private extension EntrySheet {
     ) -> some View {
         let isSelected = model.categoryId == category.id
         let isLit = isSelected || isLifted
-        let color = isLit ? Palette.accentLight : Palette.subtext
+        let color = isLit ? Palette.accentStrong : Palette.subtext
         let fill = isLifted ? Palette.panel : Self.categoryFill(isLit)
         let border = isLit ? Palette.outline : Color.clear
         let width: CGFloat = isLifted ? 1.2 : 1
@@ -469,7 +468,7 @@ private extension EntrySheet {
 
     @ViewBuilder
     func categoryMenuLayer(_ menu: CategoryMenu) -> some View {
-        Color.black
+        Palette.scrim
             .opacity(0.45)
             .ignoresSafeArea()
             .onTapGesture {
@@ -480,7 +479,7 @@ private extension EntrySheet {
         categoryFace(menu.category, isLifted: true)
             .frame(width: menu.frame.width, height: menu.frame.height)
             .scaleEffect(1.06)
-            .shadow(color: Palette.accent.opacity(.muted), radius: 12)
+            .shadow(color: Palette.glow.opacity(.muted), radius: 12)
             .position(x: menu.frame.midX, y: menu.frame.midY)
             .allowsHitTesting(false)
             .transition(.opacity)

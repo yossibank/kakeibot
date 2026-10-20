@@ -19,7 +19,6 @@ public struct BudgetListView: View {
             }
             .budgetKeypad(model)
             .toolbar(.hidden, for: .navigationBar)
-            .preferredColorScheme(.dark)
             .sensoryFeedback(.selection, trigger: model.budgets)
             .task {
                 await model.load()
@@ -35,7 +34,7 @@ private extension BudgetListView {
             VStack(spacing: 4) {
                 Text("\(model.month.month)月（\(model.periodText)）から使う額")
                     .font(.caption)
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
 
@@ -228,7 +227,7 @@ private extension BudgetListView {
     }
 
     func amountColor(_ amount: Int?) -> Color {
-        amount == nil ? Palette.hint : Palette.accentLight
+        amount == nil ? Palette.hint : Palette.accentStrong
     }
 
     func openDrawer(_ target: BudgetListModel.Target) {

@@ -86,12 +86,12 @@ private extension Keypad {
                     Text("%")
                         .font(.serif(.caption))
                 }
-                .foregroundStyle(isActive ? Palette.accentLight : Palette.text)
+                .foregroundStyle(isActive ? Palette.accentStrong : Palette.text)
             }
         case let .operation(operation):
             Text(operation.symbol)
                 .font(.sans(.headline))
-                .foregroundStyle(Palette.accentLight)
+                .foregroundStyle(Palette.accentStrong)
         case .equals:
             Text("＝")
                 .font(.sans(.headline, weight: .semibold))

@@ -10,7 +10,7 @@ struct AppIconTile: View {
 
     var body: some View {
         let ring = isCurrent ? Palette.accent : Color.clear
-        let titleColor = isCurrent ? Palette.accentLight : Palette.subtext
+        let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
 
         Button {
             guard !isCurrent else {

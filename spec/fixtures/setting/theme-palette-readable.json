@@ -9,7 +9,7 @@
       "line": "#26314A",
       "accent": "#CDAA6B",
       "accentDeep": "#8F6C38",
-      "accentLight": "#F4E6C1",
+      "accentStrong": "#F4E6C1",
       "text": "#EDE6D6",
       "subtext": "#8C97AE",
       "hint": "#7E89A0"
@@ -26,7 +26,7 @@
       "line": "#DDD4C2",
       "accent": "#8A6420",
       "accentDeep": "#5E4313",
-      "accentLight": "#3E2C0C",
+      "accentStrong": "#3E2C0C",
       "text": "#1F1B16",
       "subtext": "#6A6256",
       "hint": "#7D7466"
@@ -43,7 +43,7 @@
       "line": "#26314A",
       "accent": "#CDAA6B",
       "accentDeep": "#8F6C38",
-      "accentLight": "#F4E6C1",
+      "accentStrong": "#F4E6C1",
       "text": "#3A4458",
       "subtext": "#8C97AE",
       "hint": "#7E89A0"
@@ -62,7 +62,7 @@
       "line": "#26314A",
       "accent": "#CDAA6B",
       "accentDeep": "#8F6C38",
-      "accentLight": "#F4E6C1",
+      "accentStrong": "#F4E6C1",
       "text": "#EDE6D6",
       "subtext": "#3C465C",
       "hint": "#2E3648"
@@ -82,14 +82,14 @@
       "line": "#26314A",
       "accent": "#CDAA6B",
       "accentDeep": "#8F6C38",
-      "accentLight": "#F4E6C1",
+      "accentStrong": "#F4E6C1",
       "text": "#EDE6D6",
       "subtext": "#8C97AE",
       "hint": "#7E89A0"
     },
     "unreadable": [
       "accent",
-      "accentLight",
+      "accentStrong",
       "text",
       "subtext",
       "hint"
@@ -105,14 +105,14 @@
       "line": "#DDD4C2",
       "accent": "#CDAA6B",
       "accentDeep": "#5E4313",
-      "accentLight": "#F4E6C1",
+      "accentStrong": "#F4E6C1",
       "text": "#EDE6D6",
       "subtext": "#6A6256",
       "hint": "#7D7466"
     },
     "unreadable": [
       "accent",
-      "accentLight",
+      "accentStrong",
       "text"
     ]
   },
@@ -126,7 +126,7 @@
       "line": "#26314A",
       "accent": "#5A4A2E",
       "accentDeep": "#8F6C38",
-      "accentLight": "#A89A80",
+      "accentStrong": "#A89A80",
       "text": "#EDE6D6",
       "subtext": "#8C97AE",
       "hint": "#7E89A0"

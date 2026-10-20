@@ -78,7 +78,7 @@ private extension RecordsView {
             VStack(spacing: 1) {
                 Text("\(String(model.month.year))年 \(model.month.month)月")
                     .font(.serif(.body))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .contentTransition(monthTextTransition)
 
                 Text(model.periodText)
@@ -194,7 +194,7 @@ private extension RecordsView {
 
     var summary: some View {
         HStack(spacing: 0) {
-            total("支出", amount: model.expenseTotal, color: Palette.accentLight)
+            total("支出", amount: model.expenseTotal, color: Palette.accentStrong)
             total("収入", amount: model.incomeTotal, color: Palette.accent)
         }
         .padding(.horizontal, 14)
@@ -403,7 +403,7 @@ private extension RecordsView {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text("\(date.month)/\(date.day)")
                     .font(.serif(.headline))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
 
                 Text("（\(date.weekday.shortName)）")
                     .font(.caption)

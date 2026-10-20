@@ -55,7 +55,6 @@ struct RecordsStampSheet: View {
                 .fill(Palette.background)
                 .ignoresSafeArea()
         }
-        .preferredColorScheme(.dark)
         .presentationDetents([.medium])
     }
 }

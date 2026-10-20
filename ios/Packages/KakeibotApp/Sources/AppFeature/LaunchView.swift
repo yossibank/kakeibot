@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -8,13 +9,16 @@ public struct LaunchView: View {
     @State private var isLeaving = false
 
     let isReady: Bool
+    let onLeave: () -> Void
     let onFinish: () -> Void
 
     public init(
         isReady: Bool,
+        onLeave: @escaping () -> Void,
         onFinish: @escaping () -> Void
     ) {
         self.isReady = isReady
+        self.onLeave = onLeave
         self.onFinish = onFinish
     }
 
@@ -28,6 +32,7 @@ public struct LaunchView: View {
                 .scaleEffect(scale)
         }
         .ignoresSafeArea()
+        .environment(\.palette, .night)
         .opacity(isLeaving ? 0 : 1)
         .allowsHitTesting(!isLeaving)
         .task {
@@ -46,7 +51,7 @@ private extension LaunchView {
 
             RingSweep(progress: sweep, length: Self.sweepLength)
                 .stroke(
-                    Palette.accentLight,
+                    Palette.accentStrong,
                     style: StrokeStyle(lineWidth: 2.4, lineCap: .round)
                 )
                 .frame(width: Self.ringSize, height: Self.ringSize)
@@ -80,6 +85,8 @@ private extension LaunchView {
     }
 
     func leave() {
+        onLeave()
+
         withAnimation(.easeOut(duration: 0.45)) {
             isLeaving = true
         } completion: {
@@ -123,5 +130,5 @@ private struct RingSweep: Shape {
 }
 
 #Preview {
-    LaunchView(isReady: true) {}
+    LaunchView(isReady: true) {} onFinish: {}
 }

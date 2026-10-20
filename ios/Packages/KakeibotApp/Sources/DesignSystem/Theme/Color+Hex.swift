@@ -36,9 +36,38 @@ extension Color {
         self.init(red: red, green: green, blue: blue)
     }
 
-    init(themed role: KeyPath<ThemePalette, UInt32> & Sendable) {
+    init(
+        light: UInt32,
+        dark: UInt32
+    ) {
         let color = UIColor { traits in
-            UIColor(rgb: traits[PaletteTrait.self][keyPath: role])
+            let isLight = traits.userInterfaceStyle == .light
+            return UIColor(rgb: isLight ? light : dark)
+        }
+        self.init(uiColor: color)
+    }
+
+    init(
+        themed role: KeyPath<ThemePalette, UInt32> & Sendable,
+        lightOpacity: CGFloat = 1
+    ) {
+        let color = UIColor { traits in
+            let rgb = traits[PaletteTrait.self][keyPath: role]
+            let isLight = traits.userInterfaceStyle == .light
+            let alpha = isLight ? lightOpacity : 1
+            return UIColor(rgb: rgb).withAlphaComponent(alpha)
+        }
+        self.init(uiColor: color)
+    }
+
+    init(
+        rgb value: UInt32,
+        lightOpacity: CGFloat
+    ) {
+        let color = UIColor { traits in
+            let isLight = traits.userInterfaceStyle == .light
+            let alpha = isLight ? lightOpacity : 1
+            return UIColor(rgb: value).withAlphaComponent(alpha)
         }
         self.init(uiColor: color)
     }

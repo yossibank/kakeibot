@@ -29,7 +29,7 @@ public struct WalletEditSheet: View {
                 content
 
                 if isEnteringAmount {
-                    Color.black
+                    Palette.scrim
                         .opacity(0.35)
                         .ignoresSafeArea()
                         .onTapGesture {
@@ -55,7 +55,6 @@ public struct WalletEditSheet: View {
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
-        .preferredColorScheme(.dark)
         .confirmsDiscard(
             when: model.isChanged,
             isPresented: $isConfirmingDiscard
@@ -184,7 +183,7 @@ private extension WalletEditSheet {
             VStack(alignment: .leading, spacing: 4) {
                 Text(previewName)
                     .font(.subheadline)
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
 
                 Text(model.kind.title)
@@ -203,7 +202,7 @@ private extension WalletEditSheet {
                 Text(AmountText.text(model.initialBalance))
                     .font(.serif(.headline))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
@@ -296,7 +295,7 @@ private extension WalletEditSheet {
 
     func kindButton(_ kind: Wallet.Kind) -> some View {
         let isSelected = model.kind == kind
-        let textColor = isSelected ? Palette.accentLight : Palette.subtext
+        let textColor = isSelected ? Palette.accentStrong : Palette.subtext
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
         let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
 

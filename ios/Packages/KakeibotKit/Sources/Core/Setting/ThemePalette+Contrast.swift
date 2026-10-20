@@ -11,6 +11,12 @@ public extension ThemePalette {
         }
     }
 
+    var isLight: Bool {
+        let onBlack = Self.contrast(backgroundTop, 0x000000)
+        let onWhite = Self.contrast(backgroundTop, 0xFFFFFF)
+        return onBlack > onWhite
+    }
+
     static func contrast(
         _ first: UInt32,
         _ second: UInt32
@@ -32,7 +38,7 @@ private extension ThemePalette {
 
     static let readableRoles: [(Role, Double)] = [
         (.accent, 3),
-        (.accentLight, 4.5),
+        (.accentStrong, 4.5),
         (.text, 4.5),
         (.subtext, 3),
         (.hint, 3)

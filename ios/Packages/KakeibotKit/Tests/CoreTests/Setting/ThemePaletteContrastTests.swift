@@ -20,9 +20,16 @@ struct ThemePaletteContrastTests {
         #expect(theme.unreadableRoles == fixture.unreadable)
     }
 
+    @Test(arguments: ThemePreset.allCases)
+    func keepsPresetsReadable(preset: ThemePreset) {
+        #expect(preset.palette.unreadableRoles.isEmpty)
+    }
+
     @Test
-    func keepsNightReadable() {
-        #expect(ThemePalette.night.unreadableRoles.isEmpty)
+    func tellsLightBackground() {
+        let light = ThemePreset.allCases.filter(\.palette.isLight)
+
+        #expect(light == [.ivory, .white, .sky, .sage, .rose, .gold])
     }
 }
 
@@ -70,7 +77,7 @@ private extension ThemePaletteContrastTests {
             line: color(.line),
             accent: color(.accent),
             accentDeep: color(.accentDeep),
-            accentLight: color(.accentLight),
+            accentStrong: color(.accentStrong),
             text: color(.text),
             subtext: color(.subtext),
             hint: color(.hint)

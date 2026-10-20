@@ -75,7 +75,7 @@ public struct NoticeBanner: View {
             Capsule()
                 .strokeBorder(rim, lineWidth: 0.8)
         }
-        .shadow(color: .black.opacity(0.5), radius: 20, y: 10)
+        .shadow(color: Palette.shadow.opacity(0.5), radius: 20, y: 10)
     }
 }
 

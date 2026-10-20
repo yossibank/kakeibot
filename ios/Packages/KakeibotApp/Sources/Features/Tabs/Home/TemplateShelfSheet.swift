@@ -55,6 +55,8 @@ public struct TemplateShelfSheet: View {
                     .padding(.vertical, 8)
                 }
                 .scrollIndicators(.hidden)
+                .contentMargins(.horizontal, 18, for: .scrollContent)
+                .padding(.horizontal, -18)
                 .scrollDismissesKeyboard(.interactively)
             }
             .padding(.horizontal, 18)
@@ -70,7 +72,6 @@ public struct TemplateShelfSheet: View {
                 TemplateListView(database: database)
             }
         }
-        .preferredColorScheme(.dark)
     }
 }
 

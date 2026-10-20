@@ -93,7 +93,6 @@ public struct RecurringListView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
@@ -178,7 +177,7 @@ private extension RecurringListView {
         let isLifted = hiddenLift?.id == row.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let opacity: Double = isLifted ? 1 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
@@ -214,7 +213,7 @@ private extension RecurringListView {
             Text(AmountText.text(amount))
                 .font(.serif(.headline))
                 .monospacedDigit()
-                .foregroundStyle(Palette.accentLight)
+                .foregroundStyle(Palette.accentStrong)
         }
         .frame(maxWidth: .infinity)
     }
@@ -227,7 +226,7 @@ private extension RecurringListView {
         let index = rows.firstIndex { $0.id == row.id } ?? 0
         let y = isLifted ? liftedCenterY : centerY(at: index)
         let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: row.id, openId: $openId, role: .hide) {
