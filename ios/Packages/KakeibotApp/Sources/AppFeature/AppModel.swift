@@ -62,6 +62,7 @@ extension AppModel {
             .value
 
             await generateRecurring(in: database)
+            theme = await (try? database.setting(.theme)) ?? .navy
             let completed = try await database.setting(.onboardingCompleted)
             launch = completed ? .ready(database) : .onboarding(database)
         } catch {

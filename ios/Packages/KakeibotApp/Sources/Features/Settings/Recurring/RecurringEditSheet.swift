@@ -21,7 +21,7 @@ public struct RecurringEditSheet: View {
             content
 
             if let panel {
-                Color.black
+                Palette.scrim
                     .opacity(0.35)
                     .ignoresSafeArea()
                     .onTapGesture {

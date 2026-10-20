@@ -30,7 +30,7 @@ private extension DialFace {
     }
 
     var glowColor: Color {
-        isActive ? Palette.accent.opacity(.muted) : .clear
+        isActive ? Palette.glow.opacity(.muted) : .clear
     }
 }
 

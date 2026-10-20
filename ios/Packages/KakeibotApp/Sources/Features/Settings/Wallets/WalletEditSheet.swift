@@ -29,7 +29,7 @@ public struct WalletEditSheet: View {
                 content
 
                 if isEnteringAmount {
-                    Color.black
+                    Palette.scrim
                         .opacity(0.35)
                         .ignoresSafeArea()
                         .onTapGesture {

@@ -127,7 +127,7 @@ private extension FloatingTabBar {
         }
         .buttonStyle(PressStyle())
         .glass(tint: Palette.backgroundBottom.opacity(.strong), in: Circle())
-        .shadow(color: Palette.accent.opacity(.muted), radius: 14, y: 4)
+        .shadow(color: Palette.glow.opacity(.muted), radius: 14, y: 4)
         .sensoryFeedback(.impact(weight: .light), trigger: addCount)
     }
 

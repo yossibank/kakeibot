@@ -1,3 +1,5 @@
+import Core
+
 public enum AppIconChoice: CaseIterable, Sendable {
     case navy
     case black
@@ -21,6 +23,27 @@ public extension AppIconChoice {
         let background: [String]
         let yen: [String]
         let dial: [String]
+    }
+
+    init(_ preset: ThemePreset) {
+        self =
+            switch preset {
+            case .navy: .navy
+            case .black: .black
+            case .midnight: .midnight
+            case .forest: .forest
+            case .teal: .teal
+            case .wine: .wine
+            case .plum: .plum
+            case .silver: .silver
+            case .copper: .copper
+            case .ivory: .ivory
+            case .white: .white
+            case .sky: .sky
+            case .sage: .sage
+            case .rose: .rose
+            case .gold: .gold
+            }
     }
 
     init(alternateName: String?) {

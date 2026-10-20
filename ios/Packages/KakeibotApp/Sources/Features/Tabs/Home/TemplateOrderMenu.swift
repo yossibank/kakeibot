@@ -21,7 +21,7 @@ public struct TemplateOrderMenu: View {
     public var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .topLeading) {
-                Color.black
+                Palette.scrim
                     .opacity(0.45)
                     .onTapGesture(perform: onClose)
 

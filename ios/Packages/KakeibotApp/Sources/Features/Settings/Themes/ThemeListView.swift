@@ -8,8 +8,15 @@ public struct ThemeListView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    public init(database: AppDatabase) {
-        _model = State(initialValue: ThemeListModel(database: database))
+    private let appIcon: AppIconListModel
+
+    public init(
+        database: AppDatabase,
+        appIcon: AppIconListModel
+    ) {
+        let model = ThemeListModel(database: database, appIcon: appIcon)
+        _model = State(initialValue: model)
+        self.appIcon = appIcon
     }
 
     public var body: some View {
@@ -31,6 +38,22 @@ public struct ThemeListView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
+        }
+        .errorBanner(appIcon.errorNotice) {
+            appIcon.errorNotice.clear()
+        }
+        .confirmation(
+            isPresented: isSuggestingIcon,
+            systemImage: "app.badge",
+            title: "アイコンもそろえますか",
+            message: suggestionMessage,
+            keepTitle: "そのまま",
+            confirmTitle: "そろえる",
+            role: .suggestion
+        ) { [icon = model.suggestedIcon] in
+            Task {
+                await model.use(icon)
+            }
         }
         .background {
             Rectangle()
@@ -128,6 +151,23 @@ private extension ThemeListView {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+}
+
+private extension ThemeListView {
+    var isSuggestingIcon: Binding<Bool> {
+        Binding {
+            model.suggestedIcon != nil
+        } set: { isShown in
+            if !isShown {
+                model.dismissSuggestion()
+            }
+        }
+    }
+
+    var suggestionMessage: String {
+        let title = model.suggestedIcon?.title ?? ""
+        return "アプリアイコンも\(title)にできます"
     }
 }
 

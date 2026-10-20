@@ -8,6 +8,7 @@ public struct ConfirmCard: View {
     private let message: String
     private let keepTitle: String
     private let confirmTitle: String
+    private let role: Role
     private let onConfirm: () -> Void
     private let onKeep: () -> Void
 
@@ -17,6 +18,7 @@ public struct ConfirmCard: View {
         message: String,
         keepTitle: String,
         confirmTitle: String,
+        role: Role = .destructive,
         onConfirm: @escaping () -> Void,
         onKeep: @escaping () -> Void
     ) {
@@ -25,6 +27,7 @@ public struct ConfirmCard: View {
         self.message = message
         self.keepTitle = keepTitle
         self.confirmTitle = confirmTitle
+        self.role = role
         self.onConfirm = onConfirm
         self.onKeep = onKeep
     }
@@ -33,7 +36,7 @@ public struct ConfirmCard: View {
         let scale: CGFloat = isShown ? 1 : 0.94
 
         return ZStack {
-            Color.black
+            Palette.scrim
                 .opacity(0.55)
                 .ignoresSafeArea()
                 .onTapGesture(perform: onKeep)
@@ -50,6 +53,13 @@ public struct ConfirmCard: View {
     }
 }
 
+public extension ConfirmCard {
+    enum Role: Sendable {
+        case destructive
+        case suggestion
+    }
+}
+
 public extension View {
     func confirmation(
         isPresented: Binding<Bool>,
@@ -58,6 +68,7 @@ public extension View {
         message: String,
         keepTitle: String,
         confirmTitle: String,
+        role: ConfirmCard.Role = .destructive,
         onConfirm: @escaping () -> Void
     ) -> some View {
         overlay {
@@ -68,6 +79,7 @@ public extension View {
                     message: message,
                     keepTitle: keepTitle,
                     confirmTitle: confirmTitle,
+                    role: role,
                     onConfirm: {
                         isPresented.wrappedValue = false
                         onConfirm()
@@ -80,7 +92,7 @@ public extension View {
         }
         .animation(.snappy(duration: 0.25), value: isPresented.wrappedValue)
         .sensoryFeedback(
-            .warning,
+            role == .destructive ? .warning : .selection,
             trigger: isPresented.wrappedValue
         ) { _, new in
             new
@@ -116,28 +128,21 @@ private extension ConfirmCard {
             }
 
             VStack(spacing: 10) {
-                Button(action: onKeep) {
-                    Text(keepTitle)
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Palette.backgroundBottom)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                        .background(Self.keepFill, in: Capsule())
-                        .contentShape(Capsule())
-                }
-
-                Button(action: onConfirm) {
-                    Text(confirmTitle)
-                        .font(.subheadline)
-                        .foregroundStyle(Palette.rose)
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                        .overlay {
-                            Capsule()
-                                .stroke(
-                                    Palette.rose.opacity(.medium),
-                                    lineWidth: 1
-                                )
-                        }
-                        .contentShape(Capsule())
+                switch role {
+                case .destructive:
+                    filledButton(keepTitle, action: onKeep)
+                    outlinedButton(
+                        confirmTitle,
+                        color: Palette.rose,
+                        action: onConfirm
+                    )
+                case .suggestion:
+                    filledButton(confirmTitle, action: onConfirm)
+                    outlinedButton(
+                        keepTitle,
+                        color: Palette.subtext,
+                        action: onKeep
+                    )
                 }
             }
             .buttonStyle(.plain)
@@ -152,7 +157,39 @@ private extension ConfirmCard {
         .shadow(color: Palette.shadow.opacity(0.5), radius: 30, y: 14)
     }
 
-    static var keepFill: LinearGradient {
+    func filledButton(
+        _ title: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Palette.backgroundBottom)
+                .frame(maxWidth: .infinity, minHeight: 48)
+                .background(Self.filledFill, in: Capsule())
+                .contentShape(Capsule())
+        }
+    }
+
+    func outlinedButton(
+        _ title: String,
+        color: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline)
+                .foregroundStyle(color)
+                .frame(maxWidth: .infinity, minHeight: 48)
+                .overlay {
+                    Capsule()
+                        .stroke(color.opacity(.medium), lineWidth: 1)
+                }
+                .contentShape(Capsule())
+        }
+    }
+
+    static var filledFill: LinearGradient {
         LinearGradient(
             colors: [Palette.accentStrong, Palette.accent],
             startPoint: .top,

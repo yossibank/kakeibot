@@ -337,7 +337,7 @@ private extension EntrySheet {
 
     @ViewBuilder
     var memoLayer: some View {
-        Color.black
+        Palette.scrim
             .opacity(0.35)
             .ignoresSafeArea()
             .onTapGesture {
@@ -468,7 +468,7 @@ private extension EntrySheet {
 
     @ViewBuilder
     func categoryMenuLayer(_ menu: CategoryMenu) -> some View {
-        Color.black
+        Palette.scrim
             .opacity(0.45)
             .ignoresSafeArea()
             .onTapGesture {
@@ -479,7 +479,7 @@ private extension EntrySheet {
         categoryFace(menu.category, isLifted: true)
             .frame(width: menu.frame.width, height: menu.frame.height)
             .scaleEffect(1.06)
-            .shadow(color: Palette.accent.opacity(.muted), radius: 12)
+            .shadow(color: Palette.glow.opacity(.muted), radius: 12)
             .position(x: menu.frame.midX, y: menu.frame.midY)
             .allowsHitTesting(false)
             .transition(.opacity)

@@ -29,7 +29,7 @@ public struct TemplateEditSheet: View {
                     .ignoresSafeArea(keyboardRegions)
 
                 if let panel {
-                    Color.black
+                    Palette.scrim
                         .opacity(0.35)
                         .ignoresSafeArea()
                         .onTapGesture {
@@ -219,7 +219,7 @@ private extension TemplateEditSheet {
             }
             .buttonStyle(.plain)
         }
-        .shadow(color: Palette.accent.opacity(.subtle), radius: 30)
+        .shadow(color: Palette.glow.opacity(.subtle), radius: 30)
         .background(alignment: .bottom) {
             Ellipse()
                 .fill(.black.opacity(0.55))

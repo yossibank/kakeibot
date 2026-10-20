@@ -96,7 +96,7 @@ private extension PrimaryButton {
     }
 
     var glow: Color {
-        isEnabled ? Palette.accent.opacity(.muted) : .clear
+        isEnabled ? Palette.glow.opacity(.muted) : .clear
     }
 }
 

@@ -7,13 +7,19 @@ import Store
 @Observable
 public final class ThemeListModel {
     public private(set) var current: ThemePreset = .navy
+    public private(set) var suggestedIcon: AppIconChoice?
 
     public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
+    private let appIcon: AppIconListModel
 
-    public init(database: AppDatabase) {
+    public init(
+        database: AppDatabase,
+        appIcon: AppIconListModel
+    ) {
         self.database = database
+        self.appIcon = appIcon
     }
 }
 
@@ -39,7 +45,25 @@ public extension ThemeListModel {
         } catch {
             current = previous
             errorNotice.show(Self.saveFailedMessage)
+            return
         }
+
+        let icon = AppIconChoice(preset)
+        suggestedIcon = icon == appIcon.current ? nil : icon
+    }
+
+    func use(_ icon: AppIconChoice?) async {
+        suggestedIcon = nil
+
+        guard let icon else {
+            return
+        }
+
+        await appIcon.select(icon)
+    }
+
+    func dismissSuggestion() {
+        suggestedIcon = nil
     }
 }
 

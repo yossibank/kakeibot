@@ -189,7 +189,10 @@ public struct SettingsSheet: View {
 
                             VStack(spacing: 0) {
                                 NavigationLink {
-                                    ThemeListView(database: database)
+                                    ThemeListView(
+                                        database: database,
+                                        appIcon: appIcon
+                                    )
                                 } label: {
                                     row(
                                         "テーマ",

@@ -164,10 +164,10 @@ public extension ThemePreset {
         case .ivory:
             ThemePalette(
                 backgroundTop: 0xF8F4EB,
-                backgroundBottom: 0xE9E1D0,
+                backgroundBottom: 0xF2ECE0,
                 panel: 0xF1EBDF,
                 cardTop: 0xFFFFFF,
-                cardBottom: 0xF5EFE3,
+                cardBottom: 0xFBF9F4,
                 line: 0xDCD2BF,
                 accent: 0x8A6420,
                 accentDeep: 0xB89657,
@@ -179,10 +179,10 @@ public extension ThemePreset {
         case .white:
             ThemePalette(
                 backgroundTop: 0xFFFFFF,
-                backgroundBottom: 0xEEEEF2,
+                backgroundBottom: 0xF8F8FA,
                 panel: 0xF5F5F8,
                 cardTop: 0xFFFFFF,
-                cardBottom: 0xF6F6F9,
+                cardBottom: 0xFBFBFD,
                 line: 0xDEDEE4,
                 accent: 0x8A6420,
                 accentDeep: 0xB89657,
@@ -194,10 +194,10 @@ public extension ThemePreset {
         case .sky:
             ThemePalette(
                 backgroundTop: 0xEEF4FA,
-                backgroundBottom: 0xDCE6F1,
+                backgroundBottom: 0xE7EEF6,
                 panel: 0xE5EDF6,
                 cardTop: 0xFFFFFF,
-                cardBottom: 0xF0F5FA,
+                cardBottom: 0xF9FBFD,
                 line: 0xC9D6E5,
                 accent: 0x2F5A8C,
                 accentDeep: 0x8AA8CC,
@@ -209,10 +209,10 @@ public extension ThemePreset {
         case .sage:
             ThemePalette(
                 backgroundTop: 0xEEF3EA,
-                backgroundBottom: 0xDCE6D5,
+                backgroundBottom: 0xE7EEE2,
                 panel: 0xE6EDE1,
                 cardTop: 0xFFFFFF,
-                cardBottom: 0xF2F6EF,
+                cardBottom: 0xFAFBF9,
                 line: 0xCAD8C2,
                 accent: 0x2F6A55,
                 accentDeep: 0x8FB3A2,
@@ -224,10 +224,10 @@ public extension ThemePreset {
         case .rose:
             ThemePalette(
                 backgroundTop: 0xF8EEEC,
-                backgroundBottom: 0xEEDCD8,
+                backgroundBottom: 0xF4E7E4,
                 panel: 0xF3E5E2,
                 cardTop: 0xFFFFFF,
-                cardBottom: 0xF8EEEB,
+                cardBottom: 0xFCF8F7,
                 line: 0xE3CDC8,
                 accent: 0x9C3D52,
                 accentDeep: 0xC98A97,
@@ -239,10 +239,10 @@ public extension ThemePreset {
         case .gold:
             ThemePalette(
                 backgroundTop: 0xF4E8C8,
-                backgroundBottom: 0xE2CC94,
+                backgroundBottom: 0xEDDDB3,
                 panel: 0xEEDFB6,
                 cardTop: 0xFFF8E6,
-                cardBottom: 0xF3E6C2,
+                cardBottom: 0xFAF1D8,
                 line: 0xD8C189,
                 accent: 0x6E4E1C,
                 accentDeep: 0xA88545,

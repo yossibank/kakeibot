@@ -8,6 +8,7 @@ import SwiftUI
 public struct RootView: View {
     @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
     @State private var isLaunching = true
+    @State private var isRevealed = false
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -19,6 +20,8 @@ public struct RootView: View {
 
             if isLaunching {
                 LaunchView(isReady: model.isOpened) {
+                    isRevealed = true
+                } onFinish: {
                     isLaunching = false
                 }
             }
@@ -44,7 +47,7 @@ public struct RootView: View {
             }
         }
         .environment(\.notificationPermission, .live)
-        .palette(model.theme.palette)
+        .palette(isRevealed ? model.theme.palette : .night)
         .warmsUpInput()
     }
 }

@@ -206,7 +206,7 @@ private extension CategoryEditSheet {
 
     @ViewBuilder
     func tagLayer(_ edit: TagEdit) -> some View {
-        Color.black
+        Palette.scrim
             .opacity(0.45)
             .ignoresSafeArea()
             .onTapGesture {

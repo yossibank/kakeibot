@@ -16,7 +16,7 @@ private struct BudgetKeypadLayer: ViewModifier {
             content
 
             if model.editing != nil {
-                Color.black
+                Palette.scrim
                     .opacity(0.35)
                     .ignoresSafeArea()
                     .onTapGesture {
