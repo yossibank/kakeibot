@@ -41,7 +41,7 @@ kakeibot/
 
 ```
 ios/
-├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）、アプリアイコン、起動画面
+├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）、アプリアイコン、起動画面、同梱のフォント
 ├── Kakeibot.xcodeproj       アプリとウィジェットのターゲット
 ├── Kakeibot.xctestplan      テストターゲットをまとめたテストプラン
 ├── Kakeibot.xcworkspace     プロジェクトと 2 つのパッケージを並べる。Xcode ではこれを開く
@@ -57,6 +57,7 @@ ios/
 | Bundle ID | `com.yossibank.kakeibot` | `com.yossibank.kakeibot.widget` |
 | App Group | `group.com.yossibank.kakeibot` | 同じ |
 | アプリアイコン | Icon Composer の `AppIcon.icon`。設定で選べる色違いは、同じフォルダの `AppIcon-<色>.icon`。設定の見本を描くため、同じ絵を `Assets.xcassets` の `AppIconYen`・`AppIconDial` に写して持つ | |
+| 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | 入れない |
 
 ### 署名
 
@@ -140,7 +141,8 @@ KakeibotApp/
 │   │   │   ├── Budgets/     予算の一覧と額の入力
 │   │   │   ├── Categories/
 │   │   │   ├── Icons/
-│   │   │   ├── Menu/        設定の入口、起動画面の名前、確かめ用のテストデータ（#if DEBUG）
+│   │   │   ├── Launch/      起動時に開く画面を選ぶ画面と、その行と見本
+│   │   │   ├── Menu/        設定の入口、確かめ用のテストデータ（#if DEBUG）
 │   │   │   ├── Parts/       設定の画面で共有する入力欄、見出し、行の一覧、カテゴリと口座のタイル、非表示にする枠・表示に戻す枠とボタン、非表示の見出し、保存のボタンの文字、選ぶボタン
 │   │   │   ├── Period/      月の始まりの設定
 │   │   │   ├── Recurring/   固定費の一覧と編集

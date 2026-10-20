@@ -4,8 +4,6 @@ import Store
 import SwiftUI
 
 public struct OnboardingView: View {
-    @Environment(\.themeStyle.corner) private var corner
-
     @State private var model: OnboardingModel
     @State private var slide = PageSlide()
 
@@ -226,7 +224,14 @@ private extension OnboardingView {
             )
 
             ForEach(LaunchScreen.allCases, id: \.self) { screen in
-                launchOption(screen)
+                LaunchScreenOption(
+                    screen: screen,
+                    isSelected: model.launchScreen == screen
+                ) {
+                    withAnimation(.snappy(duration: 0.2)) {
+                        model.launchScreen = screen
+                    }
+                }
             }
         }
     }
@@ -270,50 +275,6 @@ private extension OnboardingView {
             Spacer()
         }
         .frame(minHeight: 48)
-    }
-
-    func launchOption(_ screen: LaunchScreen) -> some View {
-        let isSelected = model.launchScreen == screen
-        let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
-        let mark = isSelected ? "checkmark.circle.fill" : "circle"
-
-        return Button {
-            withAnimation(.snappy(duration: 0.2)) {
-                model.launchScreen = screen
-            }
-        } label: {
-            HStack(spacing: 14) {
-                Image(systemName: screen.systemImage)
-                    .font(.sans(.headline, weight: .light))
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 32)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(screen.title)
-                        .textFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(Palette.accentStrong)
-
-                    Text(screen.note)
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-                }
-
-                Spacer()
-
-                Image(systemName: mark)
-                    .font(.sans(.headline))
-                    .foregroundStyle(Palette.accent)
-            }
-            .padding(16)
-            .background(fill, in: .rect(cornerRadius: corner.radius(20)))
-            .overlay {
-                RoundedRectangle(cornerRadius: corner.radius(20))
-                    .stroke(stroke, lineWidth: 1)
-            }
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 }
 

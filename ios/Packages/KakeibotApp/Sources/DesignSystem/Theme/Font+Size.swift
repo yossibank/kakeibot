@@ -15,14 +15,12 @@ public extension Font {
         weight: Weight = .regular,
         in font: ThemeFont
     ) -> Font {
-        switch font {
-        case .mincho:
-            .system(size: size, weight: weight, design: .serif)
-        case .gothic:
-            .system(size: size, weight: weight)
-        case .rounded:
-            .custom(roundedName, fixedSize: size)
+        if let name = font.customName {
+            return .custom(name, fixedSize: size)
         }
+
+        let design: Design = font == .mincho ? .serif : .default
+        return .system(size: size, weight: weight, design: design)
     }
 
     static func text(
@@ -30,15 +28,10 @@ public extension Font {
         weight: Weight? = nil,
         in font: ThemeFont
     ) -> Font {
-        let base: Font =
-            switch font {
-            case .mincho:
-                .system(style, design: .serif)
-            case .gothic:
-                .system(style)
-            case .rounded:
-                .custom(roundedName, size: style.baseSize, relativeTo: style)
-            }
+        let design: Design = font == .mincho ? .serif : .default
+        let base: Font = font.customName.map { name in
+            .custom(name, size: style.baseSize, relativeTo: style)
+        } ?? .system(style, design: design)
 
         guard let weight else {
             return base
@@ -63,8 +56,15 @@ public extension Font {
     }
 }
 
-private extension Font {
-    static let roundedName = "HiraMaruProN-W4"
+private extension ThemeFont {
+    var customName: String? {
+        switch self {
+        case .mincho, .gothic: nil
+        case .rounded: "HiraMaruProN-W4"
+        case .handwriting: "KleeOne-Regular"
+        case .dot: "DotGothic16-Regular"
+        }
+    }
 }
 
 private extension Font.TextStyle {

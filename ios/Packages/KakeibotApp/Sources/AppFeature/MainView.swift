@@ -359,15 +359,19 @@ private extension MainView {
     }
 
     func openLaunchScreen() async {
-        guard await (try? database.setting(.launchScreen)) == .entry else {
-            return
-        }
+        let screen = await (try? database.setting(.launchScreen)) ?? .home
 
         guard route == nil else {
             return
         }
 
-        sheet = .new
+        switch screen {
+        case .home: tab = .home
+        case .records: tab = .records
+        case .review: tab = .review
+        case .assets: tab = .assets
+        case .entry: sheet = .new
+        }
     }
 
     func open(_ route: PlannedNotification.Route) {

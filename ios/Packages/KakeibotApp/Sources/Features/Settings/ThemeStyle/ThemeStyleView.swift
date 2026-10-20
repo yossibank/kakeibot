@@ -5,51 +5,58 @@ import SwiftUI
 
 public struct ThemeStyleView: View {
     @State private var model: ThemeStyleModel
+    @State private var openedStyle: ThemeStyle?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle) private var appStyle
+    @Environment(\.themeStyle.corner) private var corner
 
     public init(model: ThemeStyleModel) {
         _model = State(initialValue: model)
     }
 
     public var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 14) {
             header
 
-            Text("どのテーマでも、画面の角の丸みと字体が変わります")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .multilineTextAlignment(.center)
+            preview
+                .environment(\.themeStyle, model.style)
+                .font(.text(.body, in: model.style.textFont))
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    preview
-                        .environment(\.themeStyle, model.style)
+                    Text("画面の角の丸みと、文字の字体を選べます")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+                        .frame(maxWidth: .infinity)
 
-                    choiceRow(
-                        "角の丸み",
-                        selection: cornerBinding,
-                        options: Self.cornerOptions
-                    )
+                    cornerRow
 
-                    choiceRow(
+                    fontRow(
                         "見出しと金額の字体",
                         selection: displayFontBinding,
-                        options: Self.fontOptions
-                    )
+                        sample: AmountText.text(Self.sampleAmount)
+                    ) { font in
+                        .display(.headline, in: font)
+                    }
 
-                    choiceRow(
+                    fontRow(
                         "本文の字体",
                         selection: textFontBinding,
-                        options: Self.fontOptions
-                    )
+                        sample: Self.sampleText
+                    ) { font in
+                        .text(.subheadline, in: font)
+                    }
                 }
-                .padding(.vertical, 8)
             }
             .contentMargins(.horizontal, 18, for: .scrollContent)
+            .contentMargins(.vertical, Self.fade, for: .scrollContent)
+            .edgeFade(Self.fade)
             .padding(.horizontal, -18)
             .scrollIndicators(.hidden)
         }
+        .environment(\.themeStyle, shownStyle)
+        .font(.text(.body, in: shownStyle.textFont))
         .padding(.horizontal, 18)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -63,6 +70,9 @@ public struct ThemeStyleView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: model.style)
+        .onAppear {
+            openedStyle = openedStyle ?? appStyle
+        }
         .task {
             await model.load()
         }
@@ -107,8 +117,11 @@ private extension ThemeStyleView {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.subtext)
             }
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+            .padding(.horizontal, 16)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
+            .frame(height: Self.restCardHeight)
             .card()
 
             HStack(spacing: 12) {
@@ -125,20 +138,106 @@ private extension ThemeStyleView {
         .animation(.snappy(duration: 0.25), value: model.style)
     }
 
-    func choiceRow<Value: Hashable>(
+    func fontRow(
         _ title: String,
-        selection: Binding<Value>,
-        options: [CapsulePicker<Value>.Option]
+        selection: Binding<ThemeFont>,
+        sample: String,
+        font: @escaping (ThemeFont) -> Font
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .textFont(.caption2)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
-                .padding(.leading, 6)
+            rowTitle(title)
 
-            CapsulePicker(selection: selection, options: options)
+            LazyVGrid(columns: Self.fontColumns, spacing: 10) {
+                ForEach(ThemeFont.allCases, id: \.self) { choice in
+                    tile(
+                        choice.title,
+                        isSelected: choice == selection.wrappedValue
+                    ) {
+                        selection.wrappedValue = choice
+                    } content: {
+                        Text(sample)
+                            .font(font(choice))
+                            .foregroundStyle(Palette.text)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                    }
+                }
+            }
         }
+    }
+
+    func cornerMark(_ option: ThemeCorner) -> some View {
+        let isSelected = option == model.style.corner
+        let color = isSelected ? Palette.accent : Palette.subtext
+        let size = Self.cornerMarkSize
+        let radius = option.radius(Self.cornerMarkRadius)
+
+        return RoundedRectangle(cornerRadius: radius)
+            .stroke(color, lineWidth: 2.5)
+            .frame(width: size * 2, height: size * 2)
+            .frame(width: size, height: size, alignment: .topLeading)
+            .offset(x: size * 0.15, y: size * 0.15)
+            .frame(width: size, height: size)
+            .clipped()
+    }
+
+    func tile(
+        _ title: String,
+        isSelected: Bool,
+        action: @escaping () -> Void,
+        @ViewBuilder content: () -> some View
+    ) -> some View {
+        let ring = isSelected ? Palette.accent : Palette.line
+        let titleColor = isSelected ? Palette.accentStrong : Palette.subtext
+        let ringWidth: CGFloat = isSelected ? 1.5 : 1
+
+        return Button(action: action) {
+            VStack(spacing: 6) {
+                content()
+
+                Text(title)
+                    .textFont(.caption2)
+                    .foregroundStyle(titleColor)
+            }
+            .frame(maxWidth: .infinity, minHeight: 64)
+            .padding(.horizontal, 6)
+            .background(Palette.panel, in: tileShape)
+            .overlay {
+                tileShape
+                    .stroke(ring, lineWidth: ringWidth)
+            }
+            .contentShape(tileShape)
+        }
+        .buttonStyle(.plain)
+    }
+
+    var cornerRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            rowTitle("角の丸み")
+
+            HStack(spacing: 10) {
+                ForEach(ThemeCorner.allCases, id: \.self) { option in
+                    tile(
+                        option.title,
+                        isSelected: option == model.style.corner
+                    ) {
+                        Task {
+                            await model.choose(option)
+                        }
+                    } content: {
+                        cornerMark(option)
+                    }
+                }
+            }
+        }
+    }
+
+    func rowTitle(_ title: String) -> some View {
+        Text(title)
+            .textFont(.caption2)
+            .tracking(3)
+            .foregroundStyle(Palette.accent)
+            .padding(.leading, 6)
     }
 }
 
@@ -165,22 +264,23 @@ private extension ThemeStyleView {
             amount: 440
         )
     ]
-    static let cornerOptions = ThemeCorner.allCases.map { corner in
-        CapsulePicker<ThemeCorner>.Option(corner.title, value: corner)
+    static let fade: CGFloat = 16
+    static let restCardHeight: CGFloat = 108
+    static let cornerMarkSize: CGFloat = 30
+    static let cornerMarkRadius: CGFloat = 18
+    static let sampleAmount = 1280
+    static let sampleText = "食費・財布"
+    static let fontColumns = Array(
+        repeating: GridItem(.flexible(), spacing: 10),
+        count: 3
+    )
+
+    var shownStyle: ThemeStyle {
+        openedStyle ?? appStyle
     }
 
-    static let fontOptions = ThemeFont.allCases.map { font in
-        CapsulePicker<ThemeFont>.Option(font.title, value: font)
-    }
-
-    var cornerBinding: Binding<ThemeCorner> {
-        Binding {
-            model.style.corner
-        } set: { corner in
-            Task {
-                await model.choose(corner)
-            }
-        }
+    var tileShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(14))
     }
 
     var displayFontBinding: Binding<ThemeFont> {

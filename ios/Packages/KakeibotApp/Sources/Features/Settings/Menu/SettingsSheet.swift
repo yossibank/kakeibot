@@ -240,24 +240,20 @@ public struct SettingsSheet: View {
                         VStack(alignment: .leading, spacing: 6) {
                             sectionTitle("使い方")
 
-                            HStack(spacing: 12) {
-                                Image(systemName: "iphone")
-                                    .font(.sans(.body, weight: .light))
-                                    .foregroundStyle(Palette.accent)
-                                    .frame(width: 22)
-
-                                Text("起動時に開く画面")
-                                    .textFont(.subheadline)
-                                    .foregroundStyle(Palette.text)
-
-                                Spacer()
-
-                                CapsulePicker(
-                                    selection: launchScreenBinding,
-                                    options: Self.launchOptions
+                            NavigationLink {
+                                LaunchScreenView(
+                                    model: LaunchScreenModel(
+                                        database: database
+                                    )
+                                )
+                            } label: {
+                                row(
+                                    "起動時に開く画面",
+                                    systemImage: "iphone",
+                                    value: launchScreen.title
                                 )
                             }
-                            .frame(minHeight: 52)
+                            .buttonStyle(.plain)
                             .padding(.horizontal, 14)
                             .card()
 
@@ -332,7 +328,7 @@ public struct SettingsSheet: View {
             await observeCustomThemes()
         }
         .task {
-            launchScreen = await (try? database.setting(.launchScreen)) ?? .home
+            await observeLaunchScreen()
         }
         .task {
             let starts = try? await database.setting(.entryStartsWithAmount)
@@ -429,9 +425,6 @@ private extension SettingsSheet {
 }
 
 private extension SettingsSheet {
-    static let launchOptions: [CapsulePicker<LaunchScreen>.Option] =
-        LaunchScreen.allCases.map { .init($0.title, value: $0) }
-
     static let startOptions: [CapsulePicker<Bool>.Option] = [
         .init("する", value: true),
         .init("しない", value: false)
@@ -448,18 +441,6 @@ private extension SettingsSheet {
                     .entryStartsWithAmount,
                     to: starts
                 )
-            }
-        }
-    }
-
-    var launchScreenBinding: Binding<LaunchScreen> {
-        Binding {
-            launchScreen
-        } set: { screen in
-            launchScreen = screen
-
-            Task {
-                try? await database.setSetting(.launchScreen, to: screen)
             }
         }
     }
@@ -488,6 +469,16 @@ private extension SettingsSheet {
 
     func showHintsAgain() async {
         try? await database.setSetting(.closedHints, to: [])
+    }
+
+    func observeLaunchScreen() async {
+        do {
+            for try await screen in database.settingUpdates(.launchScreen) {
+                launchScreen = screen
+            }
+        } catch {
+            launchScreen = .home
+        }
     }
 
     func observeReminderTime() async {
