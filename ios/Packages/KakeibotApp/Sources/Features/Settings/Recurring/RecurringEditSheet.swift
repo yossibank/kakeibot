@@ -28,6 +28,7 @@ public struct RecurringEditSheet: View {
                         closePanel()
                     }
                     .transition(.opacity)
+                    .zIndex(1)
 
                 SettingsDrawer(title(for: panel)) {
                     closePanel()
@@ -35,6 +36,7 @@ public struct RecurringEditSheet: View {
                     drawerBody(panel)
                 }
                 .transition(.settingsDrawer)
+                .zIndex(1)
             }
         }
         .overlay(alignment: .top) {
@@ -269,6 +271,7 @@ private extension RecurringEditSheet {
                         }
                     }
                 }
+                .transition(Self.monthTransition)
             }
 
             MonthStartDayGrid(
@@ -376,6 +379,13 @@ private extension RecurringEditSheet {
         repeating: GridItem(.flexible(), spacing: 6),
         count: 3
     )
+
+    static var monthTransition: AnyTransition {
+        .asymmetric(
+            insertion: .opacity.animation(.snappy.delay(0.15)),
+            removal: .identity
+        )
+    }
 
     var headerTitle: String {
         model.isEditing ? "固定費を編集" : "固定費を追加"

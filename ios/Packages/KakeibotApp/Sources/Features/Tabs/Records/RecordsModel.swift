@@ -92,9 +92,7 @@ public extension RecordsModel {
     }
 
     func title(of recurring: Recurring) -> String {
-        let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
-        let category = recurring.categoryId.flatMap { list?.categories[$0] }
-        return memo ?? category?.name ?? Self.recurringTitle
+        RecurringText.title(of: recurring, in: list) ?? Self.recurringTitle
     }
 
     func stampIcon(on date: LocalDate) -> Icon? {

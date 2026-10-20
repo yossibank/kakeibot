@@ -212,7 +212,6 @@ private extension RecurringListModel {
     ) -> Row {
         let category = recurring.categoryId.flatMap { list.categories[$0] }
         let wallet = list.wallets[recurring.walletId]
-        let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
 
         let schedule = RecurringText.schedule(
             recurring.frequency,
@@ -235,7 +234,8 @@ private extension RecurringListModel {
 
         return Row(
             id: recurring.id,
-            title: memo ?? category?.name ?? Self.title(of: recurring.type),
+            title: RecurringText.title(of: recurring, in: list)
+                ?? Self.title(of: recurring.type),
             detail: [schedule, holiday, place].rowDetail ?? "",
             amount: recurring.amount,
             type: recurring.type,

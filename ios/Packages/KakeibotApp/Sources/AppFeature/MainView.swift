@@ -102,7 +102,9 @@ struct MainView: View {
                         }
                     },
                     onOpenRecurrings: {
-                        sheet = .recurrings
+                        sheet = home.upcomingRecurrings.isEmpty
+                            ? .recurrings
+                            : .upcomingRecurrings
                     }
                 )
                 .tabContent()
@@ -282,6 +284,16 @@ private extension MainView {
                     editing: id
                 )
             )
+        case .upcomingRecurrings:
+            UpcomingRecurringSheet(
+                model: home,
+                onOpenRecurring: { id in
+                    self.sheet = .recurring(id)
+                },
+                onOpenAll: {
+                    self.sheet = .recurrings
+                }
+            )
         case .recurrings:
             NavigationStack {
                 RecurringListView(
@@ -321,6 +333,7 @@ private extension MainView {
         case wallet(Wallet.ID)
         case recurring(Recurring.ID)
         case recurrings
+        case upcomingRecurrings
 
         var id: Self {
             self

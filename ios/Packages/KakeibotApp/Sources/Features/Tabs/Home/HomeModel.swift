@@ -38,6 +38,11 @@ public extension HomeModel {
         public let templates: [EntryTemplate]
     }
 
+    struct UpcomingRecurring: Hashable {
+        public let date: LocalDate
+        public let recurring: Recurring
+    }
+
     static let recentLimit = 5
 
     var month: YearMonth {
@@ -60,17 +65,25 @@ public extension HomeModel {
         recurrings.total(of: .expense, in: period)
     }
 
-    var upcomingRecurringExpense: Int {
+    var upcomingRecurrings: [UpcomingRecurring] {
         let tomorrow = today.adding(days: 1)
 
         guard tomorrow <= period.upperBound else {
-            return 0
+            return []
         }
 
-        return recurrings.total(
-            of: .expense,
-            in: tomorrow...period.upperBound
-        )
+        return recurrings
+            .filter { $0.type == .expense }
+            .flatMap { recurring in
+                recurring
+                    .dates(from: tomorrow, through: period.upperBound)
+                    .map { UpcomingRecurring(date: $0, recurring: recurring) }
+            }
+            .sorted { $0.date < $1.date }
+    }
+
+    var upcomingRecurringExpense: Int {
+        upcomingRecurrings.reduce(0) { $0 + $1.recurring.amount }
     }
 
     var monthIncome: Int {
@@ -93,6 +106,7 @@ public extension HomeModel {
         return BudgetUsage(
             budget: budget,
             spent: monthExpense,
+            upcoming: upcomingRecurringExpense,
             today: today,
             periodEnd: period.upperBound
         )
@@ -181,6 +195,10 @@ public extension HomeModel {
         }
     }
 
+    func title(of recurring: Recurring) -> String {
+        RecurringText.title(of: recurring, in: list) ?? Self.recurringTitle
+    }
+
     func icon(for template: EntryTemplate) -> Icon? {
         list?.icon(for: template)
     }
@@ -240,6 +258,7 @@ private extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "記録できませんでした"
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
+    static let recurringTitle = "固定費"
 
     var monthDays: [EntryDay] {
         list?.days.filter { period.contains($0.date) } ?? []

@@ -7,6 +7,7 @@ struct BudgetUsageTests {
         let usage = BudgetUsage(
             budget: fixture.budget,
             spent: fixture.spent,
+            upcoming: fixture.upcoming ?? 0,
             today: fixture.today,
             periodEnd: fixture.periodEnd
         )
@@ -22,6 +23,7 @@ extension BudgetUsageTests {
     struct UsageCase: Decodable, Sendable {
         let budget: Int
         let spent: Int
+        let upcoming: Int?
         let today: LocalDate
         let periodEnd: LocalDate
         let remaining: Int
