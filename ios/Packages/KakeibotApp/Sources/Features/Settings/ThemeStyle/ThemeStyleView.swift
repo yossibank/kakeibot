@@ -7,6 +7,7 @@ public struct ThemeStyleView: View {
     @State private var model: ThemeStyleModel
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     public init(model: ThemeStyleModel) {
         _model = State(initialValue: model)
@@ -32,17 +33,23 @@ public struct ThemeStyleView: View {
                         options: Self.cornerOptions
                     )
 
-                    choiceRow(
+                    fontRow(
                         "見出しと金額の字体",
                         selection: displayFontBinding,
-                        options: Self.fontOptions
-                    )
+                        fonts: ThemeFont.allCases,
+                        sample: AmountText.text(Self.sampleAmount)
+                    ) { font in
+                        .display(.headline, in: font)
+                    }
 
-                    choiceRow(
+                    fontRow(
                         "本文の字体",
                         selection: textFontBinding,
-                        options: Self.fontOptions
-                    )
+                        fonts: Self.textFonts,
+                        sample: Self.sampleText
+                    ) { font in
+                        .text(.subheadline, in: font)
+                    }
                 }
                 .padding(.vertical, 8)
             }
@@ -131,14 +138,78 @@ private extension ThemeStyleView {
         options: [CapsulePicker<Value>.Option]
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .textFont(.caption2)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
-                .padding(.leading, 6)
+            rowTitle(title)
 
             CapsulePicker(selection: selection, options: options)
         }
+    }
+
+    func fontRow(
+        _ title: String,
+        selection: Binding<ThemeFont>,
+        fonts: [ThemeFont],
+        sample: String,
+        font: @escaping (ThemeFont) -> Font
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            rowTitle(title)
+
+            LazyVGrid(columns: Self.fontColumns, spacing: 10) {
+                ForEach(fonts, id: \.self) { choice in
+                    fontTile(
+                        choice,
+                        isSelected: choice == selection.wrappedValue,
+                        sample: sample,
+                        font: font(choice)
+                    ) {
+                        selection.wrappedValue = choice
+                    }
+                }
+            }
+        }
+    }
+
+    func fontTile(
+        _ choice: ThemeFont,
+        isSelected: Bool,
+        sample: String,
+        font: Font,
+        action: @escaping () -> Void
+    ) -> some View {
+        let ring = isSelected ? Palette.accent : Palette.line
+        let titleColor = isSelected ? Palette.accentStrong : Palette.subtext
+        let ringWidth: CGFloat = isSelected ? 1.5 : 1
+
+        return Button(action: action) {
+            VStack(spacing: 6) {
+                Text(sample)
+                    .font(font)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+
+                Text(choice.title)
+                    .textFont(.caption2)
+                    .foregroundStyle(titleColor)
+            }
+            .frame(maxWidth: .infinity, minHeight: 64)
+            .padding(.horizontal, 6)
+            .background(Palette.panel, in: tileShape)
+            .overlay {
+                tileShape
+                    .stroke(ring, lineWidth: ringWidth)
+            }
+            .contentShape(tileShape)
+        }
+        .buttonStyle(.plain)
+    }
+
+    func rowTitle(_ title: String) -> some View {
+        Text(title)
+            .textFont(.caption2)
+            .tracking(3)
+            .foregroundStyle(Palette.accent)
+            .padding(.leading, 6)
     }
 }
 
@@ -169,8 +240,21 @@ private extension ThemeStyleView {
         CapsulePicker<ThemeCorner>.Option(corner.title, value: corner)
     }
 
-    static let fontOptions = ThemeFont.allCases.map { font in
-        CapsulePicker<ThemeFont>.Option(font.title, value: font)
+    static let sampleAmount = 1280
+    static let sampleText = "食費・財布"
+    static let textFonts: [ThemeFont] = [
+        .mincho,
+        .gothic,
+        .rounded,
+        .handwriting
+    ]
+    static let fontColumns = Array(
+        repeating: GridItem(.flexible(), spacing: 10),
+        count: 3
+    )
+
+    var tileShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(14))
     }
 
     var cornerBinding: Binding<ThemeCorner> {

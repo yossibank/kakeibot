@@ -22,6 +22,8 @@ extension ThemeFont {
         case .mincho: "明朝"
         case .gothic: "ゴシック"
         case .rounded: "丸ゴシック"
+        case .handwriting: "手書き"
+        case .dot: "ドット"
         }
     }
 }

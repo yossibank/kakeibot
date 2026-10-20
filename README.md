@@ -49,3 +49,12 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | iOS のビルド（シミュレーター） | `make build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
 | Swift の整形 | `make format` |
+
+## 出典
+
+アプリに同梱するフォントは、どれも [SIL Open Font License 1.1](https://openfontlicense.org/) で配られている。使う文字だけに絞って入れ、ライセンスの文を `ios/Kakeibot/Fonts` に置く。
+
+| フォント | 著作権者 | 使い道 |
+| --- | --- | --- |
+| [Klee One](https://github.com/fontworks-fonts/Klee) | The Klee Project Authors | 字体の「手書き」 |
+| [DotGothic16](https://github.com/fontworks-fonts/DotGothic16) | The DotGothic16 Project Authors | 字体の「ドット」 |
