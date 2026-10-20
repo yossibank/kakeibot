@@ -11,18 +11,23 @@ public struct PageSlide: Equatable, Sendable {
 
 public extension PageSlide {
     static let distance: CGFloat = 56
+    static let outDuration = 0.12
 
     @MainActor
     static func run(
         _ slide: Binding<PageSlide>,
         forward: Bool,
-        change: @escaping () -> Void
+        change: @escaping @MainActor () -> Void
     ) {
         let out = forward ? -distance : distance
 
-        withAnimation(.easeIn(duration: 0.12)) {
+        withAnimation(.easeIn(duration: outDuration)) {
             slide.wrappedValue = PageSlide(offset: out, opacity: 0)
-        } completion: {
+        }
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(outDuration))
+
             var transaction = Transaction()
             transaction.disablesAnimations = true
 

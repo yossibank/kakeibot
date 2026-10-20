@@ -9,6 +9,7 @@ public struct CategoryEditSheet: View {
     @State private var tagEdit: TagEdit?
     @State private var isMovingTag = false
     @State private var tagName = ""
+    @State private var ignoresKeyboard = false
 
     @FocusState private var focus: Field?
 
@@ -46,6 +47,11 @@ public struct CategoryEditSheet: View {
             isPresented: $isConfirmingDiscard
         ) {
             dismiss()
+        }
+        .onChange(of: focus) {
+            if focus != nil {
+                ignoresKeyboard = false
+            }
         }
         .task {
             await model.load()
@@ -245,7 +251,7 @@ private extension CategoryEditSheet {
     static let fade: CGFloat = 16
 
     var keyboardRegions: SafeAreaRegions {
-        tagEdit == nil ? [] : .keyboard
+        ignoresKeyboard ? .keyboard : []
     }
 
     var tagItems: [TagLine<UUID>.Item] {
@@ -282,6 +288,7 @@ private extension CategoryEditSheet {
     ) {
         focus = nil
         tagName = name
+        ignoresKeyboard = true
         model.clearTagProblem()
 
         withAnimation(.snappy(duration: 0.25)) {
