@@ -12,6 +12,7 @@ public struct Recurring: Hashable, Sendable {
     public var month: Int?
     public var day: Int
     public var holidayShift: HolidayShift
+    public var closingDay: Int?
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -33,6 +34,7 @@ public struct Recurring: Hashable, Sendable {
         month: Int? = nil,
         day: Int,
         holidayShift: HolidayShift = .none,
+        closingDay: Int? = nil,
         startDate: LocalDate,
         endDate: LocalDate? = nil,
         remindDaysBefore: Int? = nil,
@@ -53,6 +55,7 @@ public struct Recurring: Hashable, Sendable {
         self.month = month
         self.day = day
         self.holidayShift = holidayShift
+        self.closingDay = closingDay
         self.startDate = startDate
         self.endDate = endDate
         self.remindDaysBefore = remindDaysBefore
@@ -94,6 +97,7 @@ extension Recurring: Codable {
         case month
         case day
         case holidayShift
+        case closingDay
         case startDate
         case endDate
         case remindDaysBefore
@@ -129,6 +133,10 @@ extension Recurring: Codable {
             month: container.decodeIfPresent(Int.self, forKey: .month),
             day: container.decode(Int.self, forKey: .day),
             holidayShift: shift ?? .none,
+            closingDay: container.decodeIfPresent(
+                Int.self,
+                forKey: .closingDay
+            ),
             startDate: container.decode(LocalDate.self, forKey: .startDate),
             endDate: container.decodeIfPresent(
                 LocalDate.self,
@@ -165,6 +173,7 @@ extension Recurring: Codable {
         try container.encodeOrNull(month, forKey: .month)
         try container.encode(day, forKey: .day)
         try container.encode(holidayShift, forKey: .holidayShift)
+        try container.encodeOrNull(closingDay, forKey: .closingDay)
         try container.encode(startDate, forKey: .startDate)
         try container.encodeOrNull(endDate, forKey: .endDate)
         try container.encodeOrNull(remindDaysBefore, forKey: .remindDaysBefore)

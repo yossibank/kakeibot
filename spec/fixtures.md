@@ -93,7 +93,8 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
-| `recurring-draft.json` | 固定費の入力の判定で出る問題 | `type`、`amount`、`category`・`wallet`（入っているか）、`toWallet`（`other` か `same`。無ければ空）、`frequency`、`month`、`day`、`startDate`、`endDate`、`remindDaysBefore`、`problems` |
+| `recurring-draft.json` | 固定費の入力の判定で出る問題 | `type`、`amount`、`category`・`wallet`（入っているか）、`toWallet`（`other` か `same`。無ければ空）、`frequency`、`month`、`day`、`closingDay`（無ければ空）、`startDate`、`endDate`、`remindDaysBefore`、`problems` |
+| `card-bill-period.json` | カードの引き落とし日に払う、利用分の期間 | `closingDay`、`paidOn`、`from`、`through` |
 | `recurring-dates.json` | 固定費の、範囲の中で記録を作る日 | `frequency`（`monthly` `yearly`）、`month`（yearly だけ）、`day`、`holidayShift`（`none` `previous` `next`。無ければ `none`）、`startDate`、`endDate`、`from`、`through`、`dates` |
 
 月末を超える `day` は、その月の最終日にする。`holidayShift` が `none` でなければ、土日・祝日・12/31〜1/3 に当たった日を前か次の平日にずらす。`startDate` より前と `endDate` より後の日は、ずらした後の日で比べて入れない。

@@ -66,7 +66,7 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 どれにも、絵柄（`glyph`）と色の icon を 1 つずつ付ける。
 
-スタンプの一覧が 1 つも無ければ（しまったものも数える）、`star`・`party`・`trophy`・`cake`・`fitness`・`travel`・`sun`・`moon` の絵柄の shelf_icon を、この順で入れる。
+スタンプの一覧が 1 つも無ければ（しまったものも数える）、shelf_icon を入れる。絵柄は `star`・`party`・`trophy`・`cake`・`fitness`・`travel`・`sun`・`moon` の順にする。
 
 ## 表
 
@@ -208,6 +208,7 @@ emoji・text・glyph のどれかは必須。
 | month | INTEGER | yearly だけ |
 | day | INTEGER | 1〜31。月末を超えたらその月の最終日 |
 | holiday_shift | TEXT | `none` `previous` `next`。休日に当たったら、そのまま・前の平日・次の平日にする |
+| closing_day | INTEGER | 振替だけ。1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にする。amount は 0 にする |
 | start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |

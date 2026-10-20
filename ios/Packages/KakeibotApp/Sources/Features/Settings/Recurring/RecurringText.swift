@@ -32,6 +32,18 @@ extension RecurringText {
         }
     }
 
+    static func closingDay(_ day: Int?) -> String {
+        guard let day else {
+            return "決まった額"
+        }
+
+        return "利用分（\(closingNote(day))）"
+    }
+
+    static func closingNote(_ day: Int) -> String {
+        day >= 31 ? "末日締め" : "\(day) 日締め"
+    }
+
     static func remind(_ days: Int?) -> String {
         switch days {
         case nil: "知らせない"

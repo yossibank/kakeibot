@@ -217,16 +217,18 @@ private extension RecurringListModel {
         )
 
         let holiday = RecurringText.holidayNote(recurring.holidayShift)
+        let closing = recurring.closingDay.map(RecurringText.closingNote)
         let place = list.place(of: recurring)
+        let next = recurring.nextDate(onOrAfter: today)
 
         return Row(
             id: recurring.id,
             title: list.title(of: recurring) ?? Self.title(of: recurring.type),
-            detail: [schedule, holiday, place].rowDetail ?? "",
-            amount: recurring.amount,
+            detail: [schedule, closing, holiday, place].rowDetail ?? "",
+            amount: list.amount(of: recurring, on: next ?? today),
             type: recurring.type,
             icon: list.icon(of: recurring),
-            next: recurring.nextDate(onOrAfter: today)
+            next: next
         )
     }
 }

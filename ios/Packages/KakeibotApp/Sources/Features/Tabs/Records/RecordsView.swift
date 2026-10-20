@@ -172,7 +172,7 @@ private extension RecordsView {
             let upcoming = model.upcomingRecurrings(on: date)
 
             if !upcoming.isEmpty {
-                upcomingList(upcoming)
+                upcomingList(upcoming, on: date)
             } else if day == nil {
                 Text("この日の記録はありません")
                     .textFont(.footnote)
@@ -329,7 +329,10 @@ private extension RecordsView {
             .minimumScaleFactor(0.6)
     }
 
-    func upcomingList(_ recurrings: [Recurring]) -> some View {
+    func upcomingList(
+        _ recurrings: [Recurring],
+        on date: LocalDate
+    ) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("予定の固定費")
                 .textFont(.caption2)
@@ -341,7 +344,7 @@ private extension RecordsView {
                 Button {
                     onOpenRecurring(recurring.id)
                 } label: {
-                    upcomingRow(recurring)
+                    upcomingRow(recurring, on: date)
                 }
                 .buttonStyle(.plain)
             }
@@ -350,7 +353,10 @@ private extension RecordsView {
         .padding(.bottom, 8)
     }
 
-    func upcomingRow(_ recurring: Recurring) -> some View {
+    func upcomingRow(
+        _ recurring: Recurring,
+        on date: LocalDate
+    ) -> some View {
         HStack(spacing: 10) {
             Image(systemName: "repeat")
                 .font(.sans(.small, weight: .light))
@@ -362,9 +368,12 @@ private extension RecordsView {
 
             Spacer()
 
-            AmountText(recurring.amount, type: recurring.type)
-                .textFont(.subheadline)
-                .opacity(0.6)
+            AmountText(
+                model.amount(of: recurring, on: date),
+                type: recurring.type
+            )
+            .textFont(.subheadline)
+            .opacity(0.6)
 
             Image(systemName: "chevron.right")
                 .font(.footnote)

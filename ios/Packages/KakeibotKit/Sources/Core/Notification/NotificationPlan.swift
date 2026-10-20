@@ -76,6 +76,7 @@ private extension NotificationPlan {
         let name = memo ?? category ?? "固定費"
         let start = today.adding(days: daysBefore)
         let end = start.adding(days: recurringDays - 1)
+        let amount = recurring.closingDay == nil ? recurring.amount : nil
 
         return recurring.dates(from: start, through: end).map { date in
             PlannedNotification(
@@ -84,7 +85,7 @@ private extension NotificationPlan {
                 time: time,
                 title: name,
                 body: body(
-                    amount: recurring.amount,
+                    amount: amount,
                     on: date,
                     daysBefore: daysBefore
                 ),
@@ -94,10 +95,16 @@ private extension NotificationPlan {
     }
 
     static func body(
-        amount: Int,
+        amount: Int?,
         on date: LocalDate,
         daysBefore: Int
     ) -> String {
+        guard let amount else {
+            return daysBefore == 0
+                ? "今日は引き落としの日です"
+                : "\(date.month)/\(date.day) に引き落としがあります"
+        }
+
         let yen = "¥\(grouped(amount))"
 
         if daysBefore == 0 {

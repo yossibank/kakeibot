@@ -11,6 +11,7 @@ public struct RecurringDraft: Hashable, Sendable {
     public var month: Int
     public var day: Int
     public var holidayShift: Recurring.HolidayShift
+    public var closingDay: Int?
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -26,6 +27,7 @@ public struct RecurringDraft: Hashable, Sendable {
         month: Int,
         day: Int,
         holidayShift: Recurring.HolidayShift = .none,
+        closingDay: Int? = nil,
         startDate: LocalDate,
         endDate: LocalDate? = nil,
         remindDaysBefore: Int? = nil
@@ -40,6 +42,7 @@ public struct RecurringDraft: Hashable, Sendable {
         self.month = month
         self.day = day
         self.holidayShift = holidayShift
+        self.closingDay = closingDay
         self.startDate = startDate
         self.endDate = endDate
         self.remindDaysBefore = remindDaysBefore
@@ -55,6 +58,7 @@ public extension RecurringDraft {
         case missingDestination
         case sameWallet
         case dayOutOfRange
+        case closingDayOutOfRange
         case monthOutOfRange
         case endBeforeStart
         case remindOutOfRange
@@ -65,7 +69,7 @@ public extension RecurringDraft {
     var problems: [Problem] {
         var problems: [Problem] = []
 
-        if amount < 1 {
+        if amount < 1, cardClosingDay == nil {
             problems.append(.amountNotPositive)
         }
 
@@ -79,6 +83,10 @@ public extension RecurringDraft {
 
         if !(1...31).contains(day) {
             problems.append(.dayOutOfRange)
+        }
+
+        if let closingDay = cardClosingDay, !(1...31).contains(closingDay) {
+            problems.append(.closingDayOutOfRange)
         }
 
         if frequency == .yearly, !(1...12).contains(month) {
@@ -108,6 +116,7 @@ public extension RecurringDraft {
             month: recurring.month ?? recurring.startDate.month,
             day: recurring.day,
             holidayShift: recurring.holidayShift,
+            closingDay: recurring.closingDay,
             startDate: recurring.startDate,
             endDate: recurring.endDate,
             remindDaysBefore: recurring.remindDaysBefore
@@ -119,7 +128,7 @@ public extension RecurringDraft {
 
         return Recurring(
             type: type,
-            amount: amount,
+            amount: savedAmount,
             categoryId: fields.categoryId,
             walletId: fields.walletId,
             toWalletId: destination,
@@ -128,6 +137,7 @@ public extension RecurringDraft {
             month: yearlyMonth,
             day: day,
             holidayShift: holidayShift,
+            closingDay: cardClosingDay,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore,
@@ -144,7 +154,7 @@ public extension RecurringDraft {
 
         var updated = recurring
         updated.type = type
-        updated.amount = amount
+        updated.amount = savedAmount
         updated.categoryId = fields.categoryId
         updated.walletId = fields.walletId
         updated.toWalletId = destination
@@ -153,6 +163,7 @@ public extension RecurringDraft {
         updated.month = yearlyMonth
         updated.day = day
         updated.holidayShift = holidayShift
+        updated.closingDay = cardClosingDay
         updated.startDate = startDate
         updated.endDate = endDate
         updated.remindDaysBefore = remindDaysBefore
@@ -185,6 +196,14 @@ private extension RecurringDraft {
 
     var destination: Wallet.ID? {
         type == .transfer ? toWalletId : nil
+    }
+
+    var cardClosingDay: Int? {
+        type == .transfer ? closingDay : nil
+    }
+
+    var savedAmount: Int {
+        cardClosingDay == nil ? amount : 0
     }
 
     var yearlyMonth: Int? {

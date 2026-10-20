@@ -176,13 +176,15 @@ private extension AppDatabase {
             .filter(Column("recurring_date") <= latest)
             .fetchCount(db) > 0
 
-        guard !exists else {
+        let amount = try billAmount(of: recurring, on: date, in: db)
+
+        guard !exists, amount > 0 else {
             return nil
         }
 
         let entry = Entry(
             type: recurring.type,
-            amount: recurring.amount,
+            amount: amount,
             date: date,
             categoryId: recurring.categoryId,
             walletId: recurring.walletId,
@@ -201,5 +203,26 @@ private extension AppDatabase {
         }
 
         return entry
+    }
+
+    static func billAmount(
+        of recurring: Recurring,
+        on date: LocalDate,
+        in db: Database
+    ) throws -> Int {
+        guard
+            let period = recurring.billingPeriod(paidOn: date),
+            let card = recurring.toWalletId
+        else {
+            return recurring.amount
+        }
+
+        let entries = try Entry
+            .filter(Column("wallet_id") == card)
+            .filter(Column("date") >= period.lowerBound)
+            .filter(Column("date") <= period.upperBound)
+            .fetchAll(db)
+
+        return recurring.amount(paidOn: date, entries: entries)
     }
 }

@@ -1,0 +1,8 @@
+[
+  { "closingDay": 15, "paidOn": "2026-11-10", "from": "2026-09-16", "through": "2026-10-15" },
+  { "closingDay": 31, "paidOn": "2026-11-27", "from": "2026-10-01", "through": "2026-10-31" },
+  { "closingDay": 31, "paidOn": "2026-03-27", "from": "2026-02-01", "through": "2026-02-28" },
+  { "closingDay": 15, "paidOn": "2026-10-15", "from": "2026-08-16", "through": "2026-09-15" },
+  { "closingDay": 10, "paidOn": "2026-10-27", "from": "2026-09-11", "through": "2026-10-10" },
+  { "closingDay": 30, "paidOn": "2026-03-10", "from": "2026-01-31", "through": "2026-02-28" }
+]

@@ -143,9 +143,9 @@ private extension RecurringEditSheet {
     var hero: some View {
         VStack(spacing: 14) {
             Button {
-                open(.amount)
+                open(amountPanel)
             } label: {
-                Text(AmountText.text(model.amount))
+                Text(amountText)
                     .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(amountColor)
@@ -248,6 +248,8 @@ private extension RecurringEditSheet {
             endChooser
         case .holiday:
             holidayChooser
+        case .closing:
+            closingChooser
         case .remind:
             remindChooser
         }
@@ -326,6 +328,31 @@ private extension RecurringEditSheet {
         .padding(.bottom, 8)
     }
 
+    var closingChooser: some View {
+        VStack(spacing: 12) {
+            Text("締め日までのカードの利用分を、引き落とし日に振り替えます")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+
+            SettingsChoice(
+                RecurringText.closingDay(nil),
+                isSelected: model.closingDay == nil
+            ) {
+                model.closingDay = nil
+                closePanel()
+            }
+
+            MonthStartDayGrid(
+                selection: model.closingDay.flatMap(MonthStartDay.init)
+            ) { day in
+                model.closingDay = day.day
+                closePanel()
+            }
+        }
+        .padding(.bottom, 8)
+    }
+
     var remindChooser: some View {
         LazyVGrid(columns: Self.remindColumns, spacing: 6) {
             ForEach(
@@ -355,6 +382,7 @@ private extension RecurringEditSheet {
         case start
         case end
         case holiday
+        case closing
         case remind
     }
 
@@ -392,7 +420,16 @@ private extension RecurringEditSheet {
     }
 
     var amountColor: Color {
-        model.amount > 0 ? Palette.accentStrong : Palette.hint
+        let isSet = model.amount > 0 || model.isCardBill
+        return isSet ? Palette.accentStrong : Palette.hint
+    }
+
+    var amountText: String {
+        model.isCardBill ? "カードの利用分" : AmountText.text(model.amount)
+    }
+
+    var amountPanel: Panel {
+        model.isCardBill ? .closing : .amount
     }
 
     var typeBinding: Binding<Entry.Kind> {
@@ -456,7 +493,19 @@ private extension RecurringEditSheet {
             isEmpty: model.selectedDestination == nil
         )
 
-        return [wallet, destination]
+        guard model.canUseClosingDay else {
+            return [wallet, destination]
+        }
+
+        let closing = SettingsRowList<Panel>.Item(
+            panel: .closing,
+            systemImage: "creditcard",
+            title: "金額の決め方",
+            value: RecurringText.closingDay(model.closingDay),
+            isEmpty: model.closingDay == nil
+        )
+
+        return [wallet, destination, closing]
     }
 
     var scheduleItems: [SettingsRowList<Panel>.Item] {
@@ -509,6 +558,7 @@ private extension RecurringEditSheet {
         case .start: "始まり"
         case .end: "終わり"
         case .holiday: "休日なら"
+        case .closing: "金額の決め方"
         case .remind: "前に知らせる"
         }
     }

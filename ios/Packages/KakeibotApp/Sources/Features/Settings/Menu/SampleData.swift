@@ -244,6 +244,7 @@ private extension SampleData {
             from wallet: Wallet.ID,
             to destination: Wallet.ID? = nil,
             day: Int,
+            closing: Int? = nil,
             remind: Int? = nil,
             _ memo: String
         ) -> RecurringDraft {
@@ -257,6 +258,7 @@ private extension SampleData {
                 frequency: .monthly,
                 month: start.month,
                 day: day,
+                closingDay: closing,
                 startDate: start,
                 remindDaysBefore: remind
             )
@@ -268,10 +270,11 @@ private extension SampleData {
             draft(
                 .transfer,
                 nil,
-                45000,
+                0,
                 from: book.bank,
                 to: book.card,
                 day: 26,
+                closing: 15,
                 remind: 1,
                 "カード"
             ),

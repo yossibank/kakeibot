@@ -3,7 +3,7 @@ import DesignSystem
 import SwiftUI
 
 struct MonthStartDayGrid: View {
-    let selection: MonthStartDay
+    let selection: MonthStartDay?
     let onSelect: (MonthStartDay) -> Void
 
     var body: some View {
