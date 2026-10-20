@@ -13,7 +13,7 @@ struct EntryDateSheet: View {
         FittedSheet {
             VStack(alignment: .leading, spacing: 16) {
                 Text("日付")
-                    .font(.headline)
+                    .textFont(.headline)
                     .foregroundStyle(Palette.accentStrong)
 
                 HStack(spacing: 8) {
@@ -40,7 +40,7 @@ private extension EntryDateSheet {
         return Button(quickDay.title) {
             dateBinding.wrappedValue = date
         }
-        .font(.subheadline)
+        .textFont(.subheadline)
         .foregroundStyle(isSelected ? Palette.accentStrong : Palette.text)
         .padding(.horizontal, 16)
         .frame(minHeight: 40)

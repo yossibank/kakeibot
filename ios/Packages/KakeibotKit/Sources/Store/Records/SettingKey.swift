@@ -62,6 +62,10 @@ public extension SettingKey where Value == ThemeFont {
     static var fontStyle: Self {
         Self(.fontStyle, default: .mincho)
     }
+
+    static var textFontStyle: Self {
+        Self(.textFontStyle, default: .gothic)
+    }
 }
 
 public extension SettingKey where Value == TemplateOrder {

@@ -75,7 +75,7 @@ private extension HomeView {
                     .foregroundStyle(Palette.accent)
 
                 Text(model.monthRangeText)
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
             }
 
@@ -92,7 +92,7 @@ private extension HomeView {
 
                 VStack(spacing: 2) {
                     Text(dialTitle)
-                        .font(.sans(.caption))
+                        .textFont(size: .caption)
                         .tracking(4)
                         .foregroundStyle(Palette.accent)
 
@@ -112,7 +112,7 @@ private extension HomeView {
                 VStack(spacing: 4) {
                     if let warning = Self.warning(for: usage) {
                         Text(warning)
-                            .font(.caption.weight(.semibold))
+                            .textFont(.caption, weight: .semibold)
                             .foregroundStyle(usage.tint)
                     }
 
@@ -121,7 +121,7 @@ private extension HomeView {
 
                         Text("1 日あたり \(AmountText.text(usage.perDay))")
                     }
-                    .font(.caption)
+                    .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
                 }
@@ -133,7 +133,7 @@ private extension HomeView {
                         Image(systemName: "chevron.right")
                             .font(.sans(.micro, weight: .semibold))
                     }
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .frame(minHeight: 32)
                     .contentShape(.rect)
@@ -149,7 +149,7 @@ private extension HomeView {
                         Image(systemName: "chevron.right")
                             .font(.sans(.micro, weight: .semibold))
                     }
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
                     .frame(minHeight: 28)
@@ -202,7 +202,7 @@ private extension HomeView {
                     Spacer()
 
                     Button("すべて", action: onShowAllTemplates)
-                        .font(.caption)
+                        .textFont(.caption)
                         .foregroundStyle(Palette.accent)
                         .frame(minHeight: 44)
                 }
@@ -216,7 +216,7 @@ private extension HomeView {
 
             HStack(spacing: 6) {
                 Text(templateHint)
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
 
                 Spacer()
@@ -258,7 +258,7 @@ private extension HomeView {
                     .font(.sans(.caption, weight: .light))
 
                 Text(model.templateOrder.title)
-                    .font(.caption2)
+                    .textFont(.caption2)
             }
             .foregroundStyle(Palette.accent)
             .padding(.horizontal, 12)
@@ -314,14 +314,14 @@ private extension HomeView {
                 Spacer()
 
                 Button("すべて", action: onShowRecords)
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.accent)
                     .frame(minHeight: 44)
             }
 
             if model.recentRows.isEmpty {
                 Text("まだ記録がありません。右下の ＋ から記録できます")
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .padding(.vertical, 16)
             } else {
@@ -379,7 +379,7 @@ private extension HomeView {
     ) -> some View {
         VStack(spacing: 2) {
             Text(title)
-                .font(.caption2)
+                .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
             Text(AmountText.text(amount))

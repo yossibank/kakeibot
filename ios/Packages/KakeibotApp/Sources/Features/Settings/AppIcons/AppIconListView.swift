@@ -67,7 +67,7 @@ private extension AppIconListView {
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
-                .font(.caption2)
+                .textFont(.caption2)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
                 .padding(.leading, 6)

@@ -33,14 +33,14 @@ private extension BudgetListView {
 
             VStack(spacing: 4) {
                 Text("\(model.month.month)月（\(model.periodText)）から使う額")
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
 
                 if model.recurringExpense > 0 {
                     Label(recurringText, systemImage: "repeat")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .monospacedDigit()
                         .foregroundStyle(Palette.accent)
                         .lineLimit(1)
@@ -67,7 +67,7 @@ private extension BudgetListView {
                             Spacer()
 
                             Text("合計 \(AmountText.text(model.categoriesTotal))")
-                                .font(.caption2)
+                                .textFont(.caption2)
                                 .monospacedDigit()
                                 .foregroundStyle(Palette.subtext)
                         }
@@ -125,7 +125,7 @@ private extension BudgetListView {
         } label: {
             VStack(spacing: 6) {
                 Text("月全体")
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .tracking(3)
                     .foregroundStyle(Palette.accent)
 
@@ -140,7 +140,7 @@ private extension BudgetListView {
                         .padding(.top, 4)
                 } else {
                     Text("押して変えられます")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                 }
             }
@@ -167,7 +167,7 @@ private extension BudgetListView {
                         .frame(width: 24)
 
                     Text(category.name)
-                        .font(.subheadline)
+                        .textFont(.subheadline)
                         .foregroundStyle(Palette.text)
 
                     Spacer()
@@ -183,7 +183,7 @@ private extension BudgetListView {
                         .padding(.leading, 36)
                 } else if spent > 0 {
                     Text("使った額 \(AmountText.text(spent))")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -209,7 +209,7 @@ private extension BudgetListView {
                 Text(usage.remainingText)
                     .foregroundStyle(usage.tint)
             }
-            .font(.caption2)
+            .textFont(.caption2)
             .monospacedDigit()
             .foregroundStyle(Palette.subtext)
         }

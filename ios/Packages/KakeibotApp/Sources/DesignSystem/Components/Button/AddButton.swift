@@ -15,7 +15,7 @@ public struct AddButton: View {
     public var body: some View {
         Button(action: action) {
             Label(title, systemImage: "plus")
-                .font(.subheadline)
+                .textFont(.subheadline)
                 .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background(Palette.faint, in: Capsule())

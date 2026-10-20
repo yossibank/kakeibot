@@ -18,7 +18,7 @@ struct SettingsCategoryTile: View {
                 IconImage(icon, size: 17)
 
                 Text(category.name)
-                    .font(.sans(.caption))
+                    .textFont(size: .caption)
                     .lineLimit(1)
             }
             .foregroundStyle(color)

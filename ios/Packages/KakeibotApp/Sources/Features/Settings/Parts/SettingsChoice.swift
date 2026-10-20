@@ -21,7 +21,7 @@ struct SettingsChoice: View {
 
         Button(action: action) {
             Text(title)
-                .font(.footnote)
+                .textFont(.footnote)
                 .monospacedDigit()
                 .foregroundStyle(color)
                 .frame(maxWidth: .infinity, minHeight: 40)

@@ -111,7 +111,7 @@ private extension ReviewView {
 
                 if let periodSubtitle {
                     Text(periodSubtitle)
-                        .font(.sans(.caption))
+                        .textFont(size: .caption)
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
                         .contentTransition(periodTextTransition)
@@ -201,7 +201,7 @@ private extension ReviewView {
                     .foregroundStyle(selectedChangeColor)
 
                 Text(comparisonText)
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.text)
             }
 
@@ -215,7 +215,7 @@ private extension ReviewView {
                         Image(systemName: "chevron.right")
                             .font(.sans(.micro, weight: .semibold))
                     }
-                    .font(.caption)
+                    .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
                     .frame(minHeight: 28)
@@ -248,7 +248,7 @@ private extension ReviewView {
                         Spacer()
                         Text(usage.remainingText)
                     }
-                    .font(.caption)
+                    .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
 
@@ -286,7 +286,7 @@ private extension ReviewView {
         VStack(spacing: 5) {
             HStack {
                 Text(title)
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
 
                 Spacer()
@@ -319,7 +319,7 @@ private extension ReviewView {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
                     Text(Self.title(of: kind))
-                        .font(.caption)
+                        .textFont(.caption)
                         .foregroundStyle(titleColor)
 
                     Spacer(minLength: 0)

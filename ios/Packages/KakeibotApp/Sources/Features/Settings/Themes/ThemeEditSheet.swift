@@ -29,7 +29,6 @@ public struct ThemeEditSheet: View {
                     SettingsField(
                         "名前",
                         text: $model.draft.name,
-                        font: .body,
                         focus: $focus,
                         field: .name
                     )
@@ -120,7 +119,7 @@ private extension ThemeEditSheet {
     func colorRow(_ slot: ThemeEditModel.Slot) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(slot.title)
-                .font(.caption2)
+                .textFont(.caption2)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
                 .padding(.leading, 6)

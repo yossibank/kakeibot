@@ -43,7 +43,7 @@ public struct MonthCalendar: View {
                     id: \.self
                 ) { weekday in
                     Text(weekday.shortName)
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(Self.headerColor(for: weekday))
                         .frame(maxWidth: .infinity, minHeight: 24)
                 }
@@ -112,7 +112,7 @@ private extension MonthCalendar {
                         .overlay(Circle().stroke(ring, lineWidth: 1))
 
                     Text(holiday ?? "")
-                        .font(.sans(.micro))
+                        .textFont(size: .micro)
                         .foregroundStyle(Palette.holiday)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)

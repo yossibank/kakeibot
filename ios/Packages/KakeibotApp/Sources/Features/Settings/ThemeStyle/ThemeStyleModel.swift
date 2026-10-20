@@ -38,12 +38,24 @@ public extension ThemeStyleModel {
         }
     }
 
-    func choose(_ font: ThemeFont) async {
+    func choose(displayFont font: ThemeFont) async {
         let previous = style
-        style.font = font
+        style.displayFont = font
 
         do {
             try await database.setSetting(.fontStyle, to: font)
+        } catch {
+            style = previous
+            errorNotice.show(Self.saveFailedMessage)
+        }
+    }
+
+    func choose(textFont font: ThemeFont) async {
+        let previous = style
+        style.textFont = font
+
+        do {
+            try await database.setSetting(.textFontStyle, to: font)
         } catch {
             style = previous
             errorNotice.show(Self.saveFailedMessage)

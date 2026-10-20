@@ -2,7 +2,7 @@ import Core
 
 extension ThemeStyle {
     var title: String {
-        "\(corner.title)・\(font.title)"
+        "\(corner.title)・\(displayFont.title)・\(textFont.title)"
     }
 }
 

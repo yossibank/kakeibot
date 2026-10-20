@@ -12,7 +12,7 @@ public struct TemplateEditSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
-    @Environment(\.themeStyle.font) private var themeFont
+    @Environment(\.themeStyle.displayFont) private var themeFont
 
     let onSave: (EntryTemplate) -> Void
 
@@ -100,7 +100,7 @@ private extension TemplateEditSheet {
                         rows
 
                         Text("金額を空にすると、使うときに入れられます")
-                            .font(.caption2)
+                            .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
                             .padding(.leading, 6)
                     }
@@ -174,7 +174,7 @@ private extension TemplateEditSheet {
             card
 
             Text("ホームでは、このカードで並びます")
-                .font(.caption2)
+                .textFont(.caption2)
                 .tracking(1)
                 .foregroundStyle(Palette.subtext)
         }
@@ -244,7 +244,7 @@ private extension TemplateEditSheet {
     var capsulePreview: some View {
         HStack(spacing: 8) {
             Text("入力シートでは")
-                .font(.caption2)
+                .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
             HStack(spacing: 6) {
@@ -258,7 +258,7 @@ private extension TemplateEditSheet {
                     .displayFont(.caption)
                     .foregroundStyle(Palette.accentStrong)
             }
-            .font(.sans(.caption))
+            .textFont(size: .caption)
             .lineLimit(1)
             .fixedSize()
             .padding(.leading, 8)
@@ -276,7 +276,7 @@ private extension TemplateEditSheet {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Label("メモ", systemImage: "square.and.pencil")
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.accent)
 
                 Spacer()
@@ -293,7 +293,7 @@ private extension TemplateEditSheet {
                 axis: .vertical
             )
             .lineLimit(1...4)
-            .font(.subheadline)
+            .textFont(.subheadline)
             .foregroundStyle(Palette.text)
             .tint(Palette.accent)
             .focused($focus, equals: .memo)
@@ -373,7 +373,7 @@ private extension TemplateEditSheet {
     var tagChooser: some View {
         if model.tags.isEmpty {
             Text("このカテゴリにタグはありません。カテゴリの編集で足せます")
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .frame(maxWidth: .infinity, minHeight: 54)
         } else {

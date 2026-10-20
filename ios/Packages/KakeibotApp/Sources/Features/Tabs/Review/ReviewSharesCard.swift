@@ -13,7 +13,7 @@ struct ReviewSharesCard: View {
 
             if shares.isEmpty {
                 Text("この期間の記録はありません")
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
@@ -38,7 +38,7 @@ struct ReviewSharesCard: View {
                                 .frame(width: 8, height: 8)
 
                             Text("その他 \(others.count) 件")
-                                .font(.caption)
+                                .textFont(.caption)
                                 .foregroundStyle(Palette.subtext)
                         }
                         .frame(maxWidth: .infinity)
@@ -72,7 +72,7 @@ private extension ReviewSharesCard {
     func center(_ total: Total) -> some View {
         VStack(spacing: 2) {
             Text(total.title)
-                .font(.caption2)
+                .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
             Text(AmountText.text(total.amount))
@@ -91,12 +91,12 @@ private extension ReviewSharesCard {
                 IconBadge(share.icon, size: 30)
 
                 Text(share.name)
-                    .font(.subheadline)
+                    .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
 
                 Text(Self.percentText(share.ratio))
-                    .font(.caption)
+                    .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
 

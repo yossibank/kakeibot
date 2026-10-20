@@ -144,7 +144,7 @@ private extension FloatingTabBar {
                 .foregroundStyle(iconColor)
 
             Text(item.title)
-                .font(.sans(.caption))
+                .textFont(size: .caption)
                 .tracking(0.6)
                 .foregroundStyle(titleColor)
         }

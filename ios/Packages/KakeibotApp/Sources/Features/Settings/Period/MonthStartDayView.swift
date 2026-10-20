@@ -17,7 +17,7 @@ public struct MonthStartDayView: View {
             header
 
             Text("給料日に合わせると、その日から次の給料日の前の日までを 1 か月として数えます")
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
 
@@ -35,7 +35,7 @@ public struct MonthStartDayView: View {
                     }
 
                     Text("29〜31 日を選ぶと、その日がない月は月末から始まります")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                 }
                 .padding(.vertical, 8)

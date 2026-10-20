@@ -43,7 +43,7 @@ public struct EntryRow: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(title)
-                    .font(.subheadline)
+                    .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
 
                 if isRecurring {
@@ -58,7 +58,7 @@ public struct EntryRow: View {
 
                 if let detail {
                     Text(detail)
-                        .font(.caption)
+                        .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
                 }

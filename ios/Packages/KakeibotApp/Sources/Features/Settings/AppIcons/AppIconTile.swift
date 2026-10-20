@@ -42,7 +42,7 @@ struct AppIconTile: View {
                     .animation(.spring(duration: 0.3), value: isCurrent)
 
                 Text(choice.title)
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(titleColor)
             }
             .frame(maxWidth: .infinity)

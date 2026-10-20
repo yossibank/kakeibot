@@ -31,12 +31,12 @@ public struct MenuRow: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.subheadline)
+                        .textFont(.subheadline)
                         .foregroundStyle(titleColor)
 
                     if let note {
                         Text(note)
-                            .font(.caption2)
+                            .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
                     }
                 }

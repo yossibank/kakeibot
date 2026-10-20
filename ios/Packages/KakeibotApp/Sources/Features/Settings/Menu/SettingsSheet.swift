@@ -128,12 +128,12 @@ public struct SettingsSheet: View {
                                     Image(
                                         systemName: "calendar.day.timeline.left"
                                     )
-                                    .font(.sans(.body, weight: .light))
+                                    .textFont(size: .body, weight: .light)
                                     .foregroundStyle(Palette.accent)
                                     .frame(width: 22)
 
                                     Text("週の始まり")
-                                        .font(.subheadline)
+                                        .textFont(.subheadline)
                                         .foregroundStyle(Palette.text)
 
                                     Spacer()
@@ -247,7 +247,7 @@ public struct SettingsSheet: View {
                                     .frame(width: 22)
 
                                 Text("起動時に開く画面")
-                                    .font(.subheadline)
+                                    .textFont(.subheadline)
                                     .foregroundStyle(Palette.text)
 
                                 Spacer()
@@ -268,7 +268,7 @@ public struct SettingsSheet: View {
                                     .frame(width: 22)
 
                                 Text("金額から入力")
-                                    .font(.subheadline)
+                                    .textFont(.subheadline)
                                     .foregroundStyle(Palette.text)
 
                                 Spacer()
@@ -364,7 +364,7 @@ private extension SettingsSheet {
 
     func sectionTitle(_ title: String) -> some View {
         Text(title)
-            .font(.caption2)
+            .textFont(.caption2)
             .tracking(3)
             .foregroundStyle(Palette.accent)
             .padding(.leading, 6)
@@ -383,13 +383,13 @@ private extension SettingsSheet {
                 .frame(width: 22)
 
             Text("説明をもう一度出す")
-                .font(.subheadline)
+                .textFont(.subheadline)
                 .foregroundStyle(color)
 
             Spacer()
 
             Text(value)
-                .font(.footnote)
+                .textFont(.footnote)
                 .foregroundStyle(Palette.subtext)
         }
         .frame(minHeight: 48)
@@ -408,14 +408,14 @@ private extension SettingsSheet {
                 .frame(width: 22)
 
             Text(title)
-                .font(.subheadline)
+                .textFont(.subheadline)
                 .foregroundStyle(Palette.text)
 
             Spacer()
 
             if let value {
                 Text(value)
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
             }
 
@@ -565,7 +565,7 @@ private extension SettingsSheet {
 
             if let sampleMessage {
                 Text(sampleMessage)
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .padding(.leading, 6)
             }

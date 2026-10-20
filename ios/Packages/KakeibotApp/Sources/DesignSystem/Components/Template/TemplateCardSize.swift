@@ -51,10 +51,10 @@ extension TemplateCardSize {
         }
     }
 
-    var detailFont: Font {
+    func detailFont(in font: ThemeFont) -> Font {
         switch self {
-        case .regular: .sans(.caption)
-        case .large: .caption
+        case .regular: .text(size: .caption, in: font)
+        case .large: .text(.caption, in: font)
         }
     }
 

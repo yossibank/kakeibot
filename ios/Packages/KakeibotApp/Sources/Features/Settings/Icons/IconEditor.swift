@@ -5,7 +5,7 @@ import SwiftUI
 struct IconEditor<Field: Hashable>: View {
     @Bindable var model: IconEditModel
 
-    @Environment(\.themeStyle.font) private var themeFont
+    @Environment(\.themeStyle.displayFont) private var themeFont
     @Environment(\.themeStyle.corner) private var corner
 
     var focus: FocusState<Field?>.Binding
@@ -110,7 +110,7 @@ private extension IconEditor {
             )
 
             Text("「外」「推し」のように、短い文字をアイコンにできます")
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
         }
     }
@@ -149,7 +149,7 @@ private extension IconEditor {
             model.inputEmoji(emoji)
         } label: {
             Text(emoji)
-                .font(.title3)
+                .textFont(.title3)
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(
                     Self.tileFill(isSelected: isSelected),

@@ -14,7 +14,7 @@ struct EntryMemoCard: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Label("メモ", systemImage: "square.and.pencil")
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.accent)
 
                 Spacer()
@@ -33,7 +33,7 @@ struct EntryMemoCard: View {
                 axis: .vertical
             )
             .lineLimit(1...4)
-            .font(.subheadline)
+            .textFont(.subheadline)
             .foregroundStyle(Palette.text)
             .tint(Palette.accent)
             .focused(isFocused)
@@ -86,7 +86,7 @@ private extension EntryMemoCard {
         Button(memo) {
             model.memo = memo
         }
-        .font(.caption)
+        .textFont(.caption)
         .foregroundStyle(Palette.text)
         .lineLimit(1)
         .padding(.horizontal, 12)

@@ -16,7 +16,7 @@ struct SettingsWalletTile: View {
                 IconImage(icon, size: 13)
 
                 Text(wallet.name)
-                    .font(.caption)
+                    .textFont(.caption)
                     .lineLimit(1)
             }
             .foregroundStyle(color)

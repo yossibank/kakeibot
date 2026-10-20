@@ -16,8 +16,8 @@ public struct ThemeStyleView: View {
         VStack(spacing: 18) {
             header
 
-            Text("どのテーマでも、画面の角の丸みと、見出しと金額の字体が変わります")
-                .font(.caption)
+            Text("どのテーマでも、画面の角の丸みと字体が変わります")
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
 
@@ -33,8 +33,14 @@ public struct ThemeStyleView: View {
                     )
 
                     choiceRow(
-                        "字体",
-                        selection: fontBinding,
+                        "見出しと金額の字体",
+                        selection: displayFontBinding,
+                        options: Self.fontOptions
+                    )
+
+                    choiceRow(
+                        "本文の字体",
+                        selection: textFontBinding,
                         options: Self.fontOptions
                     )
                 }
@@ -88,7 +94,7 @@ private extension ThemeStyleView {
         VStack(spacing: 12) {
             VStack(spacing: 4) {
                 Text("今月あといくら")
-                    .font(.sans(.caption))
+                    .textFont(size: .caption)
                     .tracking(4)
                     .foregroundStyle(Palette.accent)
 
@@ -96,6 +102,10 @@ private extension ThemeStyleView {
                     .displayFont(.title, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+
+                Text("予算 ¥200,000　1 日あたり ¥10,463")
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.subtext)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
@@ -122,7 +132,7 @@ private extension ThemeStyleView {
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.caption2)
+                .textFont(.caption2)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
                 .padding(.leading, 6)
@@ -173,12 +183,22 @@ private extension ThemeStyleView {
         }
     }
 
-    var fontBinding: Binding<ThemeFont> {
+    var displayFontBinding: Binding<ThemeFont> {
         Binding {
-            model.style.font
+            model.style.displayFont
         } set: { font in
             Task {
-                await model.choose(font)
+                await model.choose(displayFont: font)
+            }
+        }
+    }
+
+    var textFontBinding: Binding<ThemeFont> {
+        Binding {
+            model.style.textFont
+        } set: { font in
+            Task {
+                await model.choose(textFont: font)
             }
         }
     }

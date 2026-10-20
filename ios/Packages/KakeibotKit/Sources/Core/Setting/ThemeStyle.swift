@@ -1,16 +1,23 @@
 public struct ThemeStyle: Hashable, Sendable {
     public var corner: ThemeCorner
-    public var font: ThemeFont
+    public var displayFont: ThemeFont
+    public var textFont: ThemeFont
 
     public init(
         corner: ThemeCorner,
-        font: ThemeFont
+        displayFont: ThemeFont,
+        textFont: ThemeFont
     ) {
         self.corner = corner
-        self.font = font
+        self.displayFont = displayFont
+        self.textFont = textFont
     }
 }
 
 public extension ThemeStyle {
-    static let standard = ThemeStyle(corner: .standard, font: .mincho)
+    static let standard = ThemeStyle(
+        corner: .standard,
+        displayFont: .mincho,
+        textFont: .gothic
+    )
 }

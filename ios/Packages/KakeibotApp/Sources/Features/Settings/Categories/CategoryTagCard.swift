@@ -19,7 +19,7 @@ struct CategoryTagCard: View {
         VStack(spacing: 16) {
             HStack {
                 Label(title, systemImage: "tag")
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.accent)
 
                 Spacer()
@@ -33,7 +33,7 @@ struct CategoryTagCard: View {
                 field
 
                 Text(note)
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .foregroundStyle(noteColor)
                     .padding(.leading, 4)
             }
@@ -42,7 +42,7 @@ struct CategoryTagCard: View {
                 if let onDelete {
                     Button(action: onDelete) {
                         Text("削除")
-                            .font(.subheadline)
+                            .textFont(.subheadline)
                             .foregroundStyle(Palette.rose)
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .overlay {
@@ -56,7 +56,7 @@ struct CategoryTagCard: View {
 
                 Button(action: onCommit) {
                     Text(commitTitle)
-                        .font(.subheadline.weight(.bold))
+                        .textFont(.subheadline, weight: .bold)
                         .foregroundStyle(Palette.background)
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .background(Palette.accent, in: Capsule())
@@ -104,7 +104,7 @@ private extension CategoryTagCard {
             text: $name,
             prompt: Text("朝ごはん など").foregroundStyle(Palette.hint)
         )
-        .font(.body)
+        .textFont(.body)
         .foregroundStyle(Palette.text)
         .tint(Palette.accent)
         .submitLabel(.done)

@@ -18,7 +18,7 @@ struct EntryWalletSheet: View {
             VStack(alignment: .leading, spacing: 20) {
                 HStack {
                     Text(title)
-                        .font(.headline)
+                        .textFont(.headline)
                         .foregroundStyle(Palette.accentStrong)
 
                     Spacer()
@@ -31,7 +31,7 @@ struct EntryWalletSheet: View {
                 ForEach(model.walletSections) { section in
                     VStack(alignment: .leading, spacing: 8) {
                         Text(section.kind.title)
-                            .font(.caption)
+                            .textFont(.caption)
                             .tracking(2)
                             .foregroundStyle(Palette.subtext)
 
@@ -78,7 +78,7 @@ private extension EntryWalletSheet {
 
                     if let balance = model.balance(of: wallet) {
                         Text("残高 \(AmountText.text(balance))")
-                            .font(.caption2)
+                            .textFont(.caption2)
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
                     }
@@ -92,7 +92,7 @@ private extension EntryWalletSheet {
                         .foregroundStyle(Palette.accent)
                 } else if isTaken {
                     Text("\(takenTitle)に選択中")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                 }
             }

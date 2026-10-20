@@ -56,7 +56,8 @@ private extension AppDatabase {
     static func style(in db: Database) throws -> ThemeStyle {
         try ThemeStyle(
             corner: setting(.cornerStyle, in: db),
-            font: setting(.fontStyle, in: db)
+            displayFont: setting(.fontStyle, in: db),
+            textFont: setting(.textFontStyle, in: db)
         )
     }
 }

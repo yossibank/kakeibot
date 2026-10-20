@@ -240,7 +240,7 @@ private extension CategoryListView {
                 .foregroundStyle(Palette.accent)
 
             Text(category.name)
-                .font(.sans(.caption))
+                .textFont(size: .caption)
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
         }

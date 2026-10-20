@@ -124,7 +124,7 @@ private extension ConfirmCard {
                     .multilineTextAlignment(.center)
 
                 Text(message)
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .multilineTextAlignment(.center)
             }
@@ -165,7 +165,7 @@ private extension ConfirmCard {
     ) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.subheadline.weight(.bold))
+                .textFont(.subheadline, weight: .bold)
                 .foregroundStyle(Palette.backgroundBottom)
                 .frame(maxWidth: .infinity, minHeight: 48)
                 .background(Self.filledFill, in: Capsule())
@@ -180,7 +180,7 @@ private extension ConfirmCard {
     ) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.subheadline)
+                .textFont(.subheadline)
                 .foregroundStyle(color)
                 .frame(maxWidth: .infinity, minHeight: 48)
                 .overlay {

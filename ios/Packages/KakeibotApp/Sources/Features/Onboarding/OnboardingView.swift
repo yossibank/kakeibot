@@ -90,7 +90,7 @@ private extension OnboardingView {
                     await finish()
                 }
             }
-            .font(.footnote)
+            .textFont(.footnote)
             .foregroundStyle(Palette.subtext)
             .frame(minWidth: 44, minHeight: 44)
         }
@@ -115,13 +115,13 @@ private extension OnboardingView {
                     .foregroundStyle(Palette.accent)
 
                 Text("毎日の記録を、すばやく、心地よく")
-                    .font(.subheadline)
+                    .textFont(.subheadline)
                     .foregroundStyle(Palette.accentStrong)
             }
             .padding(.top, 36)
 
             Text("はじめに、次のことを決めます。どれも、あとで設定から変えられます")
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
 
@@ -158,7 +158,7 @@ private extension OnboardingView {
 
                 HStack(spacing: 12) {
                     Text("週の始まり")
-                        .font(.subheadline)
+                        .textFont(.subheadline)
                         .foregroundStyle(Palette.text)
 
                     Spacer()
@@ -191,7 +191,7 @@ private extension OnboardingView {
             } label: {
                 VStack(spacing: 6) {
                     Text("\(model.budget.month.month)月の予算")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .tracking(3)
                         .foregroundStyle(Palette.accent)
 
@@ -201,7 +201,7 @@ private extension OnboardingView {
                         .foregroundStyle(budgetColor)
 
                     Text("押して入れられます")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                 }
                 .frame(maxWidth: .infinity)
@@ -212,7 +212,7 @@ private extension OnboardingView {
             .buttonStyle(.plain)
 
             Text("決めなくても始められます。カテゴリごとの予算は、設定の「予算」から入れられます")
-                .font(.caption2)
+                .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
         }
@@ -246,7 +246,7 @@ private extension OnboardingView {
                 .foregroundStyle(Palette.accent)
 
             Text(message)
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
         }
@@ -264,7 +264,7 @@ private extension OnboardingView {
                 .frame(width: 22)
 
             Text(title)
-                .font(.subheadline)
+                .textFont(.subheadline)
                 .foregroundStyle(Palette.text)
 
             Spacer()
@@ -291,11 +291,11 @@ private extension OnboardingView {
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(screen.title)
-                        .font(.subheadline.weight(.semibold))
+                        .textFont(.subheadline, weight: .semibold)
                         .foregroundStyle(Palette.accentStrong)
 
                     Text(screen.note)
-                        .font(.caption)
+                        .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                 }
 

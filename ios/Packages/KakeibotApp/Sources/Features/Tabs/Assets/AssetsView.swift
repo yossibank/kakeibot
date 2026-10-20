@@ -73,7 +73,7 @@ private extension AssetsView {
                 Spacer(minLength: 8)
 
                 Text(changeText)
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.accent)
             }
 
@@ -83,7 +83,7 @@ private extension AssetsView {
             HStack(spacing: 0) {
                 ForEach(model.monthTotals) { total in
                     Text("\(total.month.month)月")
-                        .font(.sans(.micro))
+                        .textFont(size: .micro)
                         .foregroundStyle(monthColor(total.month))
                         .frame(maxWidth: .infinity)
                 }
@@ -115,7 +115,7 @@ private extension AssetsView {
                     .foregroundStyle(Palette.accent)
 
                 Text(row.wallet.name)
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
             }

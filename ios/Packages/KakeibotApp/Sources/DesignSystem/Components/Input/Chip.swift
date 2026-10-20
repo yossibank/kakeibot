@@ -26,7 +26,7 @@ public struct Chip: View {
                 .font(.sans(.micro, weight: .semibold))
                 .foregroundStyle(Palette.subtext)
         }
-        .font(.caption)
+        .textFont(.caption)
         .foregroundStyle(foreground)
         .padding(.horizontal, 12)
         .padding(.vertical, 7)

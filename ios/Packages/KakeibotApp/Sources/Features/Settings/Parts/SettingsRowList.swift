@@ -2,7 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsRowList<Panel: Hashable>: View {
-    @Environment(\.themeStyle.font) private var themeFont
+    @Environment(\.themeStyle.displayFont) private var themeFont
+    @Environment(\.themeStyle.textFont) private var textFont
     @Environment(\.themeStyle.corner) private var corner
 
     let items: [Item]
@@ -58,7 +59,8 @@ private extension SettingsRowList {
     func rowButton(_ item: Item) -> some View {
         let isAmount = item.isAmount && !item.isEmpty
         let amountFont = Font.display(.headline, in: themeFont)
-        let font: Font = isAmount ? amountFont : .subheadline
+        let textFont = Font.text(.subheadline, in: textFont)
+        let font = isAmount ? amountFont : textFont
         let color = item.isEmpty ? Palette.hint : Palette.accentStrong
 
         return Button {
@@ -72,7 +74,7 @@ private extension SettingsRowList {
                     .background(Palette.accent.opacity(.subtle), in: Circle())
 
                 Text(item.title)
-                    .font(.subheadline)
+                    .textFont(.subheadline)
                     .foregroundStyle(Palette.subtext)
 
                 Spacer(minLength: 12)

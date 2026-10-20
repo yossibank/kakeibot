@@ -35,7 +35,7 @@ struct ReviewStampSheet: View {
                 IconSeal(tally.icon, size: 40)
 
                 Text("押した日")
-                    .font(.headline)
+                    .textFont(.headline)
                     .foregroundStyle(Palette.accentStrong)
 
                 Spacer()
@@ -87,19 +87,19 @@ private extension ReviewStampSheet {
                 .foregroundStyle(Palette.accentStrong)
 
             Text("（\(date.weekday.shortName)）")
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
 
             Spacer(minLength: 8)
 
             if let day, day.expenseTotal > 0 {
                 AmountText(day.expenseTotal, type: .expense)
-                    .font(.caption)
+                    .textFont(.caption)
             }
 
             if let day, day.incomeTotal > 0 {
                 AmountText(day.incomeTotal, type: .income)
-                    .font(.caption)
+                    .textFont(.caption)
             }
 
             Image(systemName: "chevron.right")

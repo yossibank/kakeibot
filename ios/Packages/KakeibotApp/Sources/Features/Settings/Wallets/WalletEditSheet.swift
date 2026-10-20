@@ -94,7 +94,6 @@ private extension WalletEditSheet {
                     SettingsField(
                         "名前",
                         text: $model.name,
-                        font: .body,
                         focus: $focus,
                         field: .name
                     )
@@ -183,12 +182,12 @@ private extension WalletEditSheet {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(previewName)
-                    .font(.subheadline)
+                    .textFont(.subheadline)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
 
                 Text(model.kind.title)
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .tracking(1)
                     .foregroundStyle(Palette.subtext)
             }
@@ -197,7 +196,7 @@ private extension WalletEditSheet {
 
             VStack(alignment: .trailing, spacing: 4) {
                 Text("最初の残高")
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
 
                 Text(AmountText.text(model.initialBalance))
@@ -220,7 +219,7 @@ private extension WalletEditSheet {
 
             Text("アイコンの色は、振り返りのグラフの色になります")
         }
-        .font(.caption2)
+        .textFont(.caption2)
         .foregroundStyle(Palette.subtext)
         .padding(.leading, 4)
     }
@@ -271,7 +270,7 @@ private extension WalletEditSheet {
             }
 
             Text(balanceHint)
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .contentTransition(.opacity)
                 .animation(.snappy, value: model.kind == .card)
@@ -310,7 +309,7 @@ private extension WalletEditSheet {
             model.kind = kind
         } label: {
             Text(kind.title)
-                .font(.footnote)
+                .textFont(.footnote)
                 .foregroundStyle(textColor)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, minHeight: 40)

@@ -15,7 +15,7 @@ struct SettingsHideZone: View {
 
             Text(title)
         }
-        .font(.subheadline)
+        .textFont(.subheadline)
         .foregroundStyle(color)
         .contentTransition(.opacity)
         .frame(maxWidth: .infinity, minHeight: height)

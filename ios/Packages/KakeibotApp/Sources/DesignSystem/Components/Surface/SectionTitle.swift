@@ -9,7 +9,7 @@ public struct SectionTitle: View {
 
     public var body: some View {
         Text(title)
-            .font(.sans(.caption))
+            .textFont(size: .caption)
             .tracking(3)
             .foregroundStyle(Palette.accent)
     }

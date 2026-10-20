@@ -21,6 +21,7 @@ public extension Setting {
         case themeId = "theme_id"
         case cornerStyle = "corner_style"
         case fontStyle = "font_style"
+        case textFontStyle = "text_font_style"
         case onboardingCompleted = "onboarding_completed"
         case launchScreen = "launch_screen"
         case entryStartsWithAmount = "entry_starts_with_amount"

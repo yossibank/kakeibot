@@ -77,7 +77,7 @@ private extension Keypad {
 
             VStack(spacing: 0) {
                 Text("税込")
-                    .font(.sans(.micro))
+                    .textFont(size: .micro)
                     .tracking(3)
                     .foregroundStyle(labelColor)
 
@@ -92,11 +92,11 @@ private extension Keypad {
             }
         case let .operation(operation):
             Text(operation.symbol)
-                .font(.sans(.headline))
+                .textFont(size: .headline)
                 .foregroundStyle(Palette.accentStrong)
         case .equals:
             Text("＝")
-                .font(.sans(.headline, weight: .semibold))
+                .textFont(size: .headline, weight: .semibold)
                 .foregroundStyle(Palette.backgroundBottom)
         }
     }

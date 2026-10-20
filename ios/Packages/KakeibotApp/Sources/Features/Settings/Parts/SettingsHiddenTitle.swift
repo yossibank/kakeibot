@@ -24,7 +24,7 @@ struct SettingsHiddenTitle: View {
 
                 if flag.isOn {
                     Text("長押しで上に動かすと戻せます")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
                 }

@@ -293,7 +293,7 @@ private extension EntrySheet {
 
             if !model.hasOpenedCategoryMenu {
                 Label("長押しで編集・非表示", systemImage: "hand.tap")
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
             }
         }
@@ -396,7 +396,7 @@ private extension EntrySheet {
                         .font(.sans(.body, weight: .ultraLight))
 
                     Text("追加")
-                        .font(.sans(.caption))
+                        .textFont(size: .caption)
                 }
                 .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -454,7 +454,7 @@ private extension EntrySheet {
             IconImage(model.icon(for: category), size: 17)
 
             Text(category.name)
-                .font(.sans(.caption))
+                .textFont(size: .caption)
                 .lineLimit(1)
         }
         .foregroundStyle(color)

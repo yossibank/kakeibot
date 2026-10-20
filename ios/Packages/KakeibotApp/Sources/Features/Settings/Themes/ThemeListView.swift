@@ -163,7 +163,7 @@ private extension ThemeListView {
                     .padding(4)
 
                 Text("つくる")
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.accent)
             }
             .frame(maxWidth: .infinity)
@@ -198,7 +198,7 @@ private extension ThemeListView {
 
     func sectionTitle(_ title: String) -> some View {
         Text(title)
-            .font(.caption2)
+            .textFont(.caption2)
             .tracking(3)
             .foregroundStyle(Palette.accent)
             .padding(.leading, 6)
@@ -245,7 +245,7 @@ private extension ThemeListView {
                 }
 
             Text(title)
-                .font(.footnote)
+                .textFont(.footnote)
                 .foregroundStyle(titleColor)
                 .lineLimit(1)
         }

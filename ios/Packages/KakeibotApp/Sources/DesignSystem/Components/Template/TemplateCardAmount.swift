@@ -2,7 +2,7 @@ import Core
 import SwiftUI
 
 public struct TemplateCardAmount: View {
-    @Environment(\.themeStyle.font) private var themeFont
+    @Environment(\.themeStyle.displayFont) private var themeFont
 
     let amount: Int?
     let size: TemplateCardSize

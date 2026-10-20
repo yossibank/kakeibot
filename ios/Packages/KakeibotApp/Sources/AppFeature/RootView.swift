@@ -49,6 +49,7 @@ public struct RootView: View {
         .environment(\.notificationPermission, .live)
         .palette(shownPalette)
         .environment(\.themeStyle, shownStyle)
+        .font(.text(.body, in: shownStyle.textFont))
         .warmsUpInput()
     }
 }
