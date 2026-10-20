@@ -23,9 +23,11 @@ private struct BudgetKeypadLayer: ViewModifier {
                         model.cancelEditing()
                     }
                     .transition(.opacity)
+                    .zIndex(1)
 
                 drawer
                     .transition(.settingsDrawer)
+                    .zIndex(1)
             }
         }
         .animation(.snappy, value: model.editing)

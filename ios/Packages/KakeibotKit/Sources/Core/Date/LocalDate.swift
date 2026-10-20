@@ -68,6 +68,10 @@ public extension LocalDate {
         LocalDate(dayNumber: dayNumber + days)
     }
 
+    func days(until date: LocalDate) -> Int {
+        date.dayNumber - dayNumber
+    }
+
     func startOfDay(in timeZone: TimeZone) -> Date {
         let localDays = dayNumber - Self.unixEpochDayNumber
         let localSeconds = TimeInterval(localDays * Self.secondsPerDay)

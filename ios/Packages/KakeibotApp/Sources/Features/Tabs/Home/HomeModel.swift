@@ -38,6 +38,23 @@ public extension HomeModel {
         public let templates: [EntryTemplate]
     }
 
+    struct PeriodRecurring: Hashable {
+        public let date: LocalDate
+        public let recurring: Recurring
+        public let entry: Entry?
+        public let status: Status
+
+        public var amount: Int {
+            entry?.amount ?? recurring.amount
+        }
+    }
+
+    enum Status: Hashable {
+        case done
+        case upcoming
+        case missing
+    }
+
     static let recentLimit = 5
 
     var month: YearMonth {
@@ -56,8 +73,54 @@ public extension HomeModel {
         monthDays.reduce(0) { $0 + $1.expenseTotal }
     }
 
+    var periodRecurrings: [PeriodRecurring] {
+        let entries = list?.days
+            .flatMap(\.entries)
+            .filter { $0.recurringId != nil } ?? []
+
+        return recurrings
+            .flatMap { recurring in
+                recurring
+                    .dates(from: period.lowerBound, through: period.upperBound)
+                    .map { date in
+                        let entry = entries.first { entry in
+                            recurring.isRecorded(by: entry, on: date)
+                        }
+
+                        return PeriodRecurring(
+                            date: date,
+                            recurring: recurring,
+                            entry: entry,
+                            status: status(of: date, entry: entry)
+                        )
+                    }
+            }
+            .sorted { $0.date < $1.date }
+    }
+
     var recurringExpense: Int {
-        recurrings.total(of: .expense, in: period)
+        recurringTotal(of: .expense)
+    }
+
+    var recurringIncome: Int {
+        recurringTotal(of: .income)
+    }
+
+    var paidRecurringExpense: Int {
+        recurringTotal(of: .expense) { $0 == .done }
+    }
+
+    var upcomingRecurringExpense: Int {
+        recurringTotal(of: .expense) { $0 == .upcoming }
+    }
+
+    var paidRecurringRatio: Double {
+        guard recurringExpense > 0 else {
+            return 0
+        }
+
+        let ratio = Double(paidRecurringExpense) / Double(recurringExpense)
+        return min(ratio, 1)
     }
 
     var monthIncome: Int {
@@ -80,6 +143,7 @@ public extension HomeModel {
         return BudgetUsage(
             budget: budget,
             spent: monthExpense,
+            upcoming: upcomingRecurringExpense,
             today: today,
             periodEnd: period.upperBound
         )
@@ -144,6 +208,7 @@ public extension HomeModel {
     func load() async {
         do {
             list = try await database.entryList()
+            recurrings = try await database.recurrings()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
@@ -165,6 +230,18 @@ public extension HomeModel {
         } catch {
             errorNotice.show(Self.orderSaveFailedMessage)
         }
+    }
+
+    func title(of recurring: Recurring) -> String {
+        list?.title(of: recurring) ?? Self.recurringTitle
+    }
+
+    func place(of recurring: Recurring) -> String? {
+        list?.place(of: recurring)
+    }
+
+    func icon(of recurring: Recurring) -> Icon? {
+        list?.icon(of: recurring)
     }
 
     func icon(for template: EntryTemplate) -> Icon? {
@@ -202,6 +279,18 @@ public extension HomeModel {
         list?.detail(for: template) ?? ""
     }
 
+    func record(_ item: PeriodRecurring) async {
+        do {
+            try await database.recordRecurring(
+                item.recurring.id,
+                on: item.date,
+                at: Date()
+            )
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+        }
+    }
+
     func record(_ template: EntryTemplate) async -> EntryChange? {
         guard let draft = template.entryDraft(on: today) else {
             return nil
@@ -226,6 +315,27 @@ private extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "記録できませんでした"
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
+    static let recurringTitle = "固定費"
+
+    func status(
+        of date: LocalDate,
+        entry: Entry?
+    ) -> Status {
+        if entry != nil {
+            return .done
+        }
+
+        return date > today ? .upcoming : .missing
+    }
+
+    func recurringTotal(
+        of type: Entry.Kind,
+        where isIncluded: (Status) -> Bool = { _ in true }
+    ) -> Int {
+        periodRecurrings
+            .filter { $0.recurring.type == type && isIncluded($0.status) }
+            .reduce(0) { $0 + $1.amount }
+    }
 
     var monthDays: [EntryDay] {
         list?.days.filter { period.contains($0.date) } ?? []

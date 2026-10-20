@@ -20,11 +20,11 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
 | `budget-amount.json` | ある月に使う予算。`fromMonth` がその月以前でいちばん新しい行の額 | `budgets`（`category`・`fromMonth`・`amount`）、`category`、`month`、`amount` |
-| `budget-usage.json` | 予算の残りと、期間の終わりまでの 1 日あたりの額、8 割を超えたか | `budget`、`spent`、`today`、`periodEnd`、`remaining`、`perDay`、`isOver`、`isNearLimit` |
+| `budget-usage.json` | 予算の残りと、期間の終わりまでの 1 日あたりの額、8 割を超えたか | `budget`、`spent`、`upcoming`、`today`、`periodEnd`、`remaining`、`perDay`、`isOver`、`isNearLimit` |
 
 `category` が空なら月全体の予算を、名前ならそのカテゴリの予算を表す。月全体とカテゴリの予算は混ぜない。
 
-1 日あたりの額は、残りを今日から期間の終わりまでの日数（今日を含む）で割り、1 円未満を切り捨てる。残りが 0 以下なら 0 にする。`isNearLimit` は、使った額が予算の 8 割以上で、超えていないときに真にする。
+1 日あたりの額は、残りから `upcoming` を引き、今日から期間の終わりまでの日数（今日を含む）で割る。1 円未満は切り捨て、0 以下なら 0 にする。`upcoming` は、明日から期間の終わりまでに来る固定費の支出で、無ければ 0 とする。`isNearLimit` は、使った額が予算の 8 割以上で、超えていないときに真にする。
 
 ## category
 
@@ -94,9 +94,9 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
 | `recurring-draft.json` | 固定費の入力の判定で出る問題 | `type`、`amount`、`category`・`wallet`（入っているか）、`toWallet`（`other` か `same`。無ければ空）、`frequency`、`month`、`day`、`startDate`、`endDate`、`remindDaysBefore`、`problems` |
-| `recurring-dates.json` | 固定費の、範囲の中で記録を作る日 | `frequency`（`monthly` `yearly`）、`month`（yearly だけ）、`day`、`startDate`、`endDate`、`from`、`through`、`dates` |
+| `recurring-dates.json` | 固定費の、範囲の中で記録を作る日 | `frequency`（`monthly` `yearly`）、`month`（yearly だけ）、`day`、`holidayShift`（`none` `previous` `next`。無ければ `none`）、`startDate`、`endDate`、`from`、`through`、`dates` |
 
-月末を超える `day` は、その月の最終日にする。`startDate` より前と `endDate` より後の日は入れない。
+月末を超える `day` は、その月の最終日にする。`holidayShift` が `none` でなければ、土日・祝日・12/31〜1/3 に当たった日を前か次の平日にずらす。`startDate` より前と `endDate` より後の日は、ずらした後の日で比べて入れない。
 
 ## review
 

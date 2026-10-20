@@ -143,15 +143,19 @@ private extension HomeView {
 
             if model.recurringExpense > 0 {
                 Button(action: onOpenRecurrings) {
-                    HStack(spacing: 4) {
-                        Label(recurringText, systemImage: "repeat")
+                    VStack(spacing: 6) {
+                        HStack(spacing: 4) {
+                            Label(recurringText, systemImage: "repeat")
 
-                        Image(systemName: "chevron.right")
-                            .font(.sans(.micro, weight: .semibold))
+                            Image(systemName: "chevron.right")
+                                .font(.sans(.micro, weight: .semibold))
+                        }
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+
+                        recurringProgress
                     }
-                    .textFont(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
                     .frame(minHeight: 28)
                     .contentShape(.rect)
                 }
@@ -372,6 +376,17 @@ private extension HomeView {
             .frame(width: 1, height: 32)
     }
 
+    var recurringProgress: some View {
+        Capsule()
+            .fill(Palette.faint)
+            .frame(width: 120, height: 3)
+            .overlay(alignment: .leading) {
+                Capsule()
+                    .fill(Palette.accent)
+                    .frame(width: 120 * model.paidRecurringRatio)
+            }
+    }
+
     func stat(
         _ title: String,
         amount: Int,
@@ -434,7 +449,14 @@ private extension HomeView {
     }
 
     var recurringText: String {
-        "今月の固定費 \(AmountText.text(model.recurringExpense))"
+        let total = "今月の固定費 \(AmountText.text(model.recurringExpense))"
+        let upcoming = model.upcomingRecurringExpense
+
+        guard upcoming > 0 else {
+            return total
+        }
+
+        return "\(total)・これから \(AmountText.text(upcoming))"
     }
 
     var dialTint: Color {

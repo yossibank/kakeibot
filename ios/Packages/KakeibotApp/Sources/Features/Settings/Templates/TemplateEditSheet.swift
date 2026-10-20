@@ -38,15 +38,18 @@ public struct TemplateEditSheet: View {
                             closePanel()
                         }
                         .transition(.opacity)
+                        .zIndex(1)
 
                     if panel == .memo {
                         memoCard
                             .padding(.horizontal, 14)
                             .frame(maxHeight: .infinity)
                             .transition(Self.memoTransition)
+                            .zIndex(1)
                     } else {
                         drawerView(panel)
                             .transition(.settingsDrawer)
+                            .zIndex(1)
                     }
                 }
             }

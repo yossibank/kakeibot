@@ -37,6 +37,7 @@ public struct WalletEditSheet: View {
                             closeAmount()
                         }
                         .transition(.opacity)
+                        .zIndex(1)
 
                     SettingsDrawer("最初の残高") {
                         closeAmount()
@@ -50,6 +51,7 @@ public struct WalletEditSheet: View {
                         }
                     }
                     .transition(.settingsDrawer)
+                    .zIndex(1)
                 }
             }
         }

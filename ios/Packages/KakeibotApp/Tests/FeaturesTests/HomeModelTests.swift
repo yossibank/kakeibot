@@ -26,6 +26,69 @@ struct HomeModelTests {
     }
 
     @Test
+    func sumsUpcomingRecurringExpense() async throws {
+        let setup = try await Setup()
+        try await setup.saveRecurring(amount: 4800, day: 5)
+        try await setup.saveRecurring(amount: 78000, day: 27)
+        let model = HomeModel(database: setup.database, today: setup.today)
+
+        await model.load()
+
+        #expect(model.recurringExpense == 82800)
+        #expect(model.upcomingRecurringExpense == 78000)
+        #expect(model.periodRecurrings.map(\.date.day) == [5, 27])
+        #expect(model.periodRecurrings.map(\.status) == [.done, .upcoming])
+    }
+
+    @Test
+    func marksAndRecordsMissingRecurring() async throws {
+        let setup = try await Setup()
+        try await setup.saveRecurring(amount: 4800, day: 5)
+        try await setup.saveRecurring(amount: 78000, day: 27)
+        let model = HomeModel(database: setup.database, today: setup.today)
+        await model.load()
+        let entry = try #require(model.periodRecurrings.first?.entry)
+
+        try await setup.database.deleteEntry(entry.id)
+        await model.load()
+
+        #expect(model.periodRecurrings.map(\.status) == [.missing, .upcoming])
+        #expect(model.paidRecurringExpense == 0)
+        #expect(model.recurringExpense == 82800)
+
+        let missing = try #require(model.periodRecurrings.first)
+        await model.record(missing)
+        await model.load()
+
+        #expect(model.periodRecurrings.map(\.status) == [.done, .upcoming])
+    }
+
+    @Test
+    func leavesUpcomingRecurringOutOfPerDay() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 45000, daysAgo: 0)
+        try await setup.saveRecurring(amount: 30000, day: 27)
+        let model = HomeModel(database: setup.database, today: setup.today)
+        let month = setup.today.yearMonth
+        await model.load()
+
+        let task = Task {
+            await model.run()
+        }
+
+        try await setup.database.setBudget(120_000, for: nil, from: month)
+
+        for _ in 0..<200 where model.budgetUsage == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        task.cancel()
+
+        #expect(model.budgetUsage?.remaining == 75000)
+        #expect(model.budgetUsage?.perDay == 2250)
+    }
+
+    @Test
     func showsRemainingBudgetOfPeriod() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 45000, daysAgo: 0)
@@ -93,6 +156,26 @@ extension HomeModelTests.Setup {
         try database.insertDefaultsIfEmpty(at: Date())
         let today = try #require(LocalDate("2026-10-12"))
         self.init(database: database, today: today)
+    }
+
+    func saveRecurring(
+        amount: Int,
+        day: Int
+    ) async throws {
+        let options = try await database.entryOptions()
+        let start = try #require(LocalDate("2026-10-01"))
+        let draft = RecurringDraft(
+            type: .expense,
+            amount: amount,
+            categoryId: options.expenseCategories.first?.id,
+            walletId: options.wallets.first?.id,
+            frequency: .monthly,
+            month: 1,
+            day: day,
+            startDate: start
+        )
+
+        _ = try await database.saveRecurring(draft, today: today, at: Date())
     }
 
     func save(

@@ -7,5 +7,10 @@
   { "frequency": "monthly", "month": null, "day": 10, "startDate": "2026-01-01", "endDate": null, "from": "2026-02-10", "through": "2026-02-10", "dates": ["2026-02-10"] },
   { "frequency": "yearly", "month": 2, "day": 29, "startDate": "2025-01-01", "endDate": null, "from": "2025-01-01", "through": "2028-12-31", "dates": ["2025-02-28", "2026-02-28", "2027-02-28", "2028-02-29"] },
   { "frequency": "yearly", "month": 12, "day": 1, "startDate": "2026-12-02", "endDate": null, "from": "2026-01-01", "through": "2028-12-31", "dates": ["2027-12-01", "2028-12-01"] },
-  { "frequency": "monthly", "month": null, "day": 1, "startDate": "2026-06-01", "endDate": null, "from": "2026-01-01", "through": "2026-05-31", "dates": [] }
+  { "frequency": "monthly", "month": null, "day": 1, "startDate": "2026-06-01", "endDate": null, "from": "2026-01-01", "through": "2026-05-31", "dates": [] },
+  { "frequency": "monthly", "month": null, "day": 25, "holidayShift": "next", "startDate": "2026-01-01", "endDate": null, "from": "2026-01-01", "through": "2026-06-30", "dates": ["2026-01-26", "2026-02-25", "2026-03-25", "2026-04-27", "2026-05-25", "2026-06-25"] },
+  { "frequency": "monthly", "month": null, "day": 25, "holidayShift": "previous", "startDate": "2026-01-01", "endDate": null, "from": "2026-01-01", "through": "2026-06-30", "dates": ["2026-01-23", "2026-02-25", "2026-03-25", "2026-04-24", "2026-05-25", "2026-06-25"] },
+  { "frequency": "monthly", "month": null, "day": 3, "holidayShift": "next", "startDate": "2026-01-01", "endDate": null, "from": "2026-05-01", "through": "2026-05-31", "dates": ["2026-05-07"] },
+  { "frequency": "monthly", "month": null, "day": 31, "holidayShift": "next", "startDate": "2026-01-01", "endDate": null, "from": "2026-12-01", "through": "2027-01-31", "dates": ["2027-01-04"] },
+  { "frequency": "monthly", "month": null, "day": 1, "holidayShift": "previous", "startDate": "2026-01-01", "endDate": null, "from": "2026-10-01", "through": "2026-10-31", "dates": ["2026-10-01", "2026-10-30"] }
 ]

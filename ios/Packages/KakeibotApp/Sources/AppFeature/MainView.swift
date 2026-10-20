@@ -102,7 +102,7 @@ struct MainView: View {
                         }
                     },
                     onOpenRecurrings: {
-                        sheet = .recurrings
+                        sheet = .periodRecurrings
                     }
                 )
                 .tabContent()
@@ -122,6 +122,9 @@ struct MainView: View {
                     onAddEntry: { date in
                         draft.date = date
                         sheet = .new
+                    },
+                    onOpenRecurring: { id in
+                        sheet = .recurring(id)
                     }
                 )
                 .tabContent()
@@ -279,15 +282,13 @@ private extension MainView {
                     editing: id
                 )
             )
-        case .recurrings:
-            NavigationStack {
-                RecurringListView(
-                    model: RecurringListModel(
-                        database: database,
-                        today: today
-                    )
-                )
-            }
+        case .periodRecurrings:
+            PeriodRecurringSheet(
+                model: home,
+                onOpenRecurring: { id in
+                    self.sheet = .recurring(id)
+                }
+            )
         case let .wallet(id):
             WalletEditSheet(
                 model: WalletEditModel(
@@ -317,7 +318,7 @@ private extension MainView {
         case transfer
         case wallet(Wallet.ID)
         case recurring(Recurring.ID)
-        case recurrings
+        case periodRecurrings
 
         var id: Self {
             self

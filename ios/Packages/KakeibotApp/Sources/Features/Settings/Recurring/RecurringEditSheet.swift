@@ -28,6 +28,7 @@ public struct RecurringEditSheet: View {
                         closePanel()
                     }
                     .transition(.opacity)
+                    .zIndex(1)
 
                 SettingsDrawer(title(for: panel)) {
                     closePanel()
@@ -35,6 +36,7 @@ public struct RecurringEditSheet: View {
                     drawerBody(panel)
                 }
                 .transition(.settingsDrawer)
+                .zIndex(1)
             }
         }
         .overlay(alignment: .top) {
@@ -201,7 +203,7 @@ private extension RecurringEditSheet {
                     icon: model.icon(for: category),
                     isSelected: model.categoryId == category.id
                 ) {
-                    model.categoryId = category.id
+                    model.select(category: category.id)
                     closePanel()
                 }
             }
@@ -244,6 +246,8 @@ private extension RecurringEditSheet {
             MonthCalendar(selection: $model.startDate, today: model.today)
         case .end:
             endChooser
+        case .holiday:
+            holidayChooser
         case .remind:
             remindChooser
         }
@@ -267,6 +271,7 @@ private extension RecurringEditSheet {
                         }
                     }
                 }
+                .transition(Self.monthTransition)
             }
 
             MonthStartDayGrid(
@@ -294,6 +299,31 @@ private extension RecurringEditSheet {
 
             MonthCalendar(selection: endBinding, today: model.today)
         }
+    }
+
+    var holidayChooser: some View {
+        VStack(spacing: 12) {
+            Text("土日・祝日・年末年始（12/31〜1/3）に当たったときに、日をずらします")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: 8) {
+                ForEach(
+                    Recurring.HolidayShift.allCases,
+                    id: \.self
+                ) { shift in
+                    SettingsChoice(
+                        RecurringText.holidayShift(shift),
+                        isSelected: model.holidayShift == shift
+                    ) {
+                        model.choose(shift)
+                        closePanel()
+                    }
+                }
+            }
+        }
+        .padding(.bottom, 8)
     }
 
     var remindChooser: some View {
@@ -324,6 +354,7 @@ private extension RecurringEditSheet {
         case schedule
         case start
         case end
+        case holiday
         case remind
     }
 
@@ -348,6 +379,13 @@ private extension RecurringEditSheet {
         repeating: GridItem(.flexible(), spacing: 6),
         count: 3
     )
+
+    static var monthTransition: AnyTransition {
+        .asymmetric(
+            insertion: .opacity.animation(.snappy.delay(0.15)),
+            removal: .identity
+        )
+    }
 
     var headerTitle: String {
         model.isEditing ? "固定費を編集" : "固定費を追加"
@@ -445,6 +483,13 @@ private extension RecurringEditSheet {
                 isEmpty: model.endDate == nil
             ),
             .init(
+                panel: .holiday,
+                systemImage: "calendar.badge.exclamationmark",
+                title: "休日なら",
+                value: RecurringText.holidayShift(model.holidayShift),
+                isEmpty: model.holidayShift == .none
+            ),
+            .init(
                 panel: .remind,
                 systemImage: "bell",
                 title: "前に知らせる",
@@ -463,6 +508,7 @@ private extension RecurringEditSheet {
         case .schedule: "繰り返し"
         case .start: "始まり"
         case .end: "終わり"
+        case .holiday: "休日なら"
         case .remind: "前に知らせる"
         }
     }

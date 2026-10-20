@@ -59,6 +59,17 @@ struct ExportV1Tests {
         #expect(export.data.recurrings.allSatisfy { $0.archivedAt == nil })
     }
 
+    @Test
+    func readsRecurringsWithoutHolidayShift() throws {
+        let json = try Self.fixtureWithoutHolidayShift()
+
+        let export = try ExportV1(json: json)
+        let shifts = export.data.recurrings.map(\.holidayShift)
+
+        #expect(!shifts.isEmpty)
+        #expect(shifts.allSatisfy { $0 == .none })
+    }
+
     @Test(arguments: try headers.valid)
     func readsSupportedHeader(header: Header) throws {
         let json = try Self.fixture(with: header)
@@ -150,6 +161,18 @@ private extension ExportV1Tests {
             tables[key] = rows.map { $0.filter { $0.key != "archivedAt" } }
         }
 
+        object["data"] = tables
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixtureWithoutHolidayShift() throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+        let rows = try #require(tables["recurrings"] as? [[String: Any]])
+        let key = "holidayShift"
+        tables["recurrings"] = rows.map { $0.filter { $0.key != key } }
         object["data"] = tables
         return try JSONSerialization.data(withJSONObject: object)
     }

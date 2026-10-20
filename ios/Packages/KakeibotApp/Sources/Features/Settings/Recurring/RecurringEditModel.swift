@@ -14,6 +14,7 @@ public final class RecurringEditModel {
     public var frequency: Recurring.Frequency = .monthly
     public var month: Int
     public var day: Int
+    public private(set) var holidayShift: Recurring.HolidayShift = .none
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -27,6 +28,7 @@ public final class RecurringEditModel {
     let today: LocalDate
 
     private var baseline: RecurringDraft?
+    private var isHolidayShiftChosen = false
 
     private let database: AppDatabase
     private let editingId: Recurring.ID?
@@ -76,6 +78,7 @@ public extension RecurringEditModel {
             frequency: frequency,
             month: month,
             day: day,
+            holidayShift: holidayShift,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore
@@ -140,6 +143,18 @@ public extension RecurringEditModel {
         if type == .transfer, toWalletId == nil {
             toWalletId = wallets.first { $0.id != walletId }?.id
         }
+
+        suggestHolidayShift()
+    }
+
+    func select(category id: EntryCategory.ID) {
+        categoryId = id
+        suggestHolidayShift()
+    }
+
+    func choose(_ shift: Recurring.HolidayShift) {
+        holidayShift = shift
+        isHolidayShiftChosen = true
     }
 
     func press(_ key: AmountCalculator.Key) {
@@ -154,6 +169,8 @@ public extension RecurringEditModel {
             if categoryId == nil {
                 categoryId = categories.first?.id
             }
+
+            suggestHolidayShift()
 
             if walletId == nil {
                 walletId = wallets.first?.id
@@ -204,6 +221,28 @@ public extension RecurringEditModel {
 }
 
 private extension RecurringEditModel {
+    var suggestedHolidayShift: Recurring.HolidayShift {
+        guard type != .transfer else {
+            return .next
+        }
+
+        let glyph = selectedCategory.flatMap { icon(for: $0) }?.glyph
+
+        switch glyph {
+        case .salary, .bonus: return .previous
+        case .home, .utility, .phone: return .next
+        default: return .none
+        }
+    }
+
+    func suggestHolidayShift() {
+        guard !isEditing, !isHolidayShiftChosen else {
+            return
+        }
+
+        holidayShift = suggestedHolidayShift
+    }
+
     static let loadFailedMessage = "固定費を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
 
@@ -243,6 +282,7 @@ private extension RecurringEditModel {
         frequency = draft.frequency
         month = draft.month
         day = draft.day
+        holidayShift = draft.holidayShift
         startDate = draft.startDate
         endDate = draft.endDate
         remindDaysBefore = draft.remindDaysBefore

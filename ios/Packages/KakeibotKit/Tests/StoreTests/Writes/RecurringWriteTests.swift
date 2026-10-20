@@ -34,6 +34,90 @@ struct RecurringWriteTests {
     }
 
     @Test
+    func generatesOnShiftedDate() async throws {
+        let setup = try await Setup()
+        let today = try #require(LocalDate("2026-04-30"))
+        try await setup.shiftHoliday(to: .next)
+
+        try await setup.database.generateRecurringEntries(
+            through: today,
+            at: setup.now
+        )
+
+        let dates = try setup.database
+            .snapshot()
+            .entries
+            .compactMap(\.recurringDate)
+            .sorted()
+            .map(\.description)
+
+        #expect(dates == [
+            "2026-01-26",
+            "2026-02-25",
+            "2026-03-25",
+            "2026-04-27"
+        ])
+    }
+
+    @Test
+    func keepsOneEntryAfterChangingShift() async throws {
+        let setup = try await Setup()
+        let saturday = try #require(LocalDate("2026-04-25"))
+        let may = try #require(LocalDate("2026-05-31"))
+
+        try await setup.database.generateRecurringEntries(
+            through: saturday,
+            at: setup.now
+        )
+
+        try await setup.shiftHoliday(to: .next)
+
+        try await setup.database.generateRecurringEntries(
+            through: may,
+            at: setup.now
+        )
+
+        let dates = try setup.database
+            .snapshot()
+            .entries
+            .compactMap(\.recurringDate)
+            .sorted()
+            .map(\.description)
+
+        #expect(dates == [
+            "2026-01-25",
+            "2026-02-25",
+            "2026-03-25",
+            "2026-04-25",
+            "2026-05-25"
+        ])
+    }
+
+    @Test
+    func recordsOneEntryOnRequestedDate() async throws {
+        let setup = try await Setup()
+        let recurrings = try await setup.database.recurrings()
+        let recurring = try #require(recurrings.first)
+        let date = try #require(LocalDate("2026-03-25"))
+
+        let first = try await setup.database.recordRecurring(
+            recurring.id,
+            on: date,
+            at: setup.now
+        )
+
+        let second = try await setup.database.recordRecurring(
+            recurring.id,
+            on: date,
+            at: setup.now
+        )
+
+        #expect(first?.recurringDate == date)
+        #expect(second == nil)
+        #expect(try setup.database.snapshot().entries.count == 1)
+    }
+
+    @Test
     func continuesFromGeneratedDate() async throws {
         let setup = try await Setup()
         let march = try #require(LocalDate("2026-03-01"))
@@ -260,6 +344,7 @@ struct RecurringWriteTests {
             today: may,
             at: setup.now
         )
+
         let dates = try setup.database
             .snapshot()
             .entries
@@ -305,5 +390,16 @@ extension RecurringWriteTests.Setup {
         }
 
         self.init(database: database, now: now)
+    }
+}
+
+private extension RecurringWriteTests.Setup {
+    func shiftHoliday(to shift: Recurring.HolidayShift) async throws {
+        try await database.writer.write { db in
+            for var recurring in try Recurring.fetchAll(db) {
+                recurring.holidayShift = shift
+                try recurring.update(db)
+            }
+        }
     }
 }

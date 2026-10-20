@@ -7,9 +7,13 @@ struct MonthStartDayGrid: View {
     let onSelect: (MonthStartDay) -> Void
 
     var body: some View {
-        LazyVGrid(columns: Self.columns, spacing: 8) {
-            ForEach(MonthStartDay.allDays, id: \.day) { day in
-                dayButton(day)
+        Grid(horizontalSpacing: 8, verticalSpacing: 8) {
+            ForEach(Self.rows, id: \.self) { row in
+                GridRow {
+                    ForEach(row, id: \.day) { day in
+                        dayButton(day)
+                    }
+                }
             }
         }
     }
@@ -43,10 +47,13 @@ private extension MonthStartDayGrid {
 }
 
 private extension MonthStartDayGrid {
-    static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 8),
-        count: 7
-    )
+    static let rows: [[MonthStartDay]] = {
+        let days = MonthStartDay.allDays
+
+        return stride(from: 0, to: days.count, by: 7).map { start in
+            Array(days[start..<min(start + 7, days.count)])
+        }
+    }()
 
     static func title(for day: MonthStartDay) -> String {
         day.isLastDay ? "末日" : "\(day.day)"

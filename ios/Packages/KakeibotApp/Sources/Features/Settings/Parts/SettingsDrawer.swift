@@ -35,6 +35,7 @@ struct SettingsDrawer<Content: View>: View {
 
             content
         }
+        .geometryGroup()
         .padding(.horizontal, 16)
         .padding(.top, 12)
         .padding(.bottom, 12)
