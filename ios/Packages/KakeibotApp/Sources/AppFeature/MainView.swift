@@ -122,6 +122,9 @@ struct MainView: View {
                     onAddEntry: { date in
                         draft.date = date
                         sheet = .new
+                    },
+                    onOpenRecurring: { id in
+                        sheet = .recurring(id)
                     }
                 )
                 .tabContent()

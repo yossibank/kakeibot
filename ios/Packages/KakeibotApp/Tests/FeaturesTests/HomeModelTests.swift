@@ -26,6 +26,19 @@ struct HomeModelTests {
     }
 
     @Test
+    func sumsUpcomingRecurringExpense() async throws {
+        let setup = try await Setup()
+        try await setup.saveRecurring(amount: 4800, day: 5)
+        try await setup.saveRecurring(amount: 78000, day: 27)
+        let model = HomeModel(database: setup.database, today: setup.today)
+
+        await model.load()
+
+        #expect(model.recurringExpense == 82800)
+        #expect(model.upcomingRecurringExpense == 78000)
+    }
+
+    @Test
     func showsRemainingBudgetOfPeriod() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 45000, daysAgo: 0)
@@ -93,6 +106,26 @@ extension HomeModelTests.Setup {
         try database.insertDefaultsIfEmpty(at: Date())
         let today = try #require(LocalDate("2026-10-12"))
         self.init(database: database, today: today)
+    }
+
+    func saveRecurring(
+        amount: Int,
+        day: Int
+    ) async throws {
+        let options = try await database.entryOptions()
+        let start = try #require(LocalDate("2026-10-01"))
+        let draft = RecurringDraft(
+            type: .expense,
+            amount: amount,
+            categoryId: options.expenseCategories.first?.id,
+            walletId: options.wallets.first?.id,
+            frequency: .monthly,
+            month: 1,
+            day: day,
+            startDate: start
+        )
+
+        _ = try await database.saveRecurring(draft, today: today, at: Date())
     }
 
     func save(

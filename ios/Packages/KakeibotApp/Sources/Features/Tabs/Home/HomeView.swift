@@ -434,7 +434,14 @@ private extension HomeView {
     }
 
     var recurringText: String {
-        "今月の固定費 \(AmountText.text(model.recurringExpense))"
+        let total = "今月の固定費 \(AmountText.text(model.recurringExpense))"
+        let upcoming = model.upcomingRecurringExpense
+
+        guard upcoming > 0 else {
+            return total
+        }
+
+        return "\(total)・これから \(AmountText.text(upcoming))"
     }
 
     var dialTint: Color {

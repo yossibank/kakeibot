@@ -16,17 +16,20 @@ public struct RecordsView: View {
     private let onOpenEntry: (Entry.ID) -> Void
     private let onDelete: (Entry.ID) -> Void
     private let onAddEntry: (LocalDate) -> Void
+    private let onOpenRecurring: (Recurring.ID) -> Void
 
     public init(
         model: RecordsModel,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onDelete: @escaping (Entry.ID) -> Void,
-        onAddEntry: @escaping (LocalDate) -> Void
+        onAddEntry: @escaping (LocalDate) -> Void,
+        onOpenRecurring: @escaping (Recurring.ID) -> Void
     ) {
         self.model = model
         self.onOpenEntry = onOpenEntry
         self.onDelete = onDelete
         self.onAddEntry = onAddEntry
+        self.onOpenRecurring = onOpenRecurring
     }
 
     public var body: some View {
@@ -335,26 +338,40 @@ private extension RecordsView {
                 .padding(.bottom, 4)
 
             ForEach(recurrings, id: \.id) { recurring in
-                HStack(spacing: 10) {
-                    Image(systemName: "repeat")
-                        .font(.sans(.small, weight: .light))
-                        .foregroundStyle(Palette.hint)
-
-                    Text(model.title(of: recurring))
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.subtext)
-
-                    Spacer()
-
-                    AmountText(recurring.amount, type: recurring.type)
-                        .textFont(.subheadline)
-                        .opacity(0.6)
+                Button {
+                    onOpenRecurring(recurring.id)
+                } label: {
+                    upcomingRow(recurring)
                 }
-                .padding(.vertical, 8)
+                .buttonStyle(.plain)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 8)
+    }
+
+    func upcomingRow(_ recurring: Recurring) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "repeat")
+                .font(.sans(.small, weight: .light))
+                .foregroundStyle(Palette.hint)
+
+            Text(model.title(of: recurring))
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.subtext)
+
+            Spacer()
+
+            AmountText(recurring.amount, type: recurring.type)
+                .textFont(.subheadline)
+                .opacity(0.6)
+
+            Image(systemName: "chevron.right")
+                .font(.footnote)
+                .foregroundStyle(Palette.hint)
+        }
+        .padding(.vertical, 8)
+        .contentShape(.rect)
     }
 
     func noSpendButton(_ date: LocalDate) -> some View {

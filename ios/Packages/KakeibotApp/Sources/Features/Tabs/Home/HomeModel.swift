@@ -60,6 +60,19 @@ public extension HomeModel {
         recurrings.total(of: .expense, in: period)
     }
 
+    var upcomingRecurringExpense: Int {
+        let tomorrow = today.adding(days: 1)
+
+        guard tomorrow <= period.upperBound else {
+            return 0
+        }
+
+        return recurrings.total(
+            of: .expense,
+            in: tomorrow...period.upperBound
+        )
+    }
+
     var monthIncome: Int {
         monthDays.reduce(0) { $0 + $1.incomeTotal }
     }
@@ -144,6 +157,7 @@ public extension HomeModel {
     func load() async {
         do {
             list = try await database.entryList()
+            recurrings = try await database.recurrings()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
