@@ -16,6 +16,14 @@ extension RecurringText {
         }
     }
 
+    static func holidayShift(_ shift: Recurring.HolidayShift) -> String {
+        switch shift {
+        case .none: "そのまま"
+        case .previous: "前の平日"
+        case .next: "次の平日"
+        }
+    }
+
     static func remind(_ days: Int?) -> String {
         switch days {
         case nil: "知らせない"

@@ -207,6 +207,7 @@ emoji・text・glyph のどれかは必須。
 | frequency | TEXT | `monthly` `yearly` |
 | month | INTEGER | yearly だけ |
 | day | INTEGER | 1〜31。月末を超えたらその月の最終日 |
+| holiday_shift | TEXT | `none` `previous` `next`。休日に当たったら、そのまま・前の平日・次の平日にする |
 | start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |

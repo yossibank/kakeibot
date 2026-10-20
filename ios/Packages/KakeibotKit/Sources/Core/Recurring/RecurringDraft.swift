@@ -10,6 +10,7 @@ public struct RecurringDraft: Hashable, Sendable {
     public var frequency: Recurring.Frequency
     public var month: Int
     public var day: Int
+    public var holidayShift: Recurring.HolidayShift
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -24,6 +25,7 @@ public struct RecurringDraft: Hashable, Sendable {
         frequency: Recurring.Frequency,
         month: Int,
         day: Int,
+        holidayShift: Recurring.HolidayShift = .none,
         startDate: LocalDate,
         endDate: LocalDate? = nil,
         remindDaysBefore: Int? = nil
@@ -37,6 +39,7 @@ public struct RecurringDraft: Hashable, Sendable {
         self.frequency = frequency
         self.month = month
         self.day = day
+        self.holidayShift = holidayShift
         self.startDate = startDate
         self.endDate = endDate
         self.remindDaysBefore = remindDaysBefore
@@ -104,6 +107,7 @@ public extension RecurringDraft {
             frequency: recurring.frequency,
             month: recurring.month ?? recurring.startDate.month,
             day: recurring.day,
+            holidayShift: recurring.holidayShift,
             startDate: recurring.startDate,
             endDate: recurring.endDate,
             remindDaysBefore: recurring.remindDaysBefore
@@ -123,6 +127,7 @@ public extension RecurringDraft {
             frequency: frequency,
             month: yearlyMonth,
             day: day,
+            holidayShift: holidayShift,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore,
@@ -147,6 +152,7 @@ public extension RecurringDraft {
         updated.frequency = frequency
         updated.month = yearlyMonth
         updated.day = day
+        updated.holidayShift = holidayShift
         updated.startDate = startDate
         updated.endDate = endDate
         updated.remindDaysBefore = remindDaysBefore

@@ -244,6 +244,8 @@ private extension RecurringEditSheet {
             MonthCalendar(selection: $model.startDate, today: model.today)
         case .end:
             endChooser
+        case .holiday:
+            holidayChooser
         case .remind:
             remindChooser
         }
@@ -296,6 +298,31 @@ private extension RecurringEditSheet {
         }
     }
 
+    var holidayChooser: some View {
+        VStack(spacing: 12) {
+            Text("土日・祝日・年末年始（12/31〜1/3）に当たったときに、日をずらします")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: 8) {
+                ForEach(
+                    Recurring.HolidayShift.allCases,
+                    id: \.self
+                ) { shift in
+                    SettingsChoice(
+                        RecurringText.holidayShift(shift),
+                        isSelected: model.holidayShift == shift
+                    ) {
+                        model.holidayShift = shift
+                        closePanel()
+                    }
+                }
+            }
+        }
+        .padding(.bottom, 8)
+    }
+
     var remindChooser: some View {
         LazyVGrid(columns: Self.remindColumns, spacing: 6) {
             ForEach(
@@ -324,6 +351,7 @@ private extension RecurringEditSheet {
         case schedule
         case start
         case end
+        case holiday
         case remind
     }
 
@@ -445,6 +473,13 @@ private extension RecurringEditSheet {
                 isEmpty: model.endDate == nil
             ),
             .init(
+                panel: .holiday,
+                systemImage: "calendar.badge.exclamationmark",
+                title: "休日なら",
+                value: RecurringText.holidayShift(model.holidayShift),
+                isEmpty: model.holidayShift == .none
+            ),
+            .init(
                 panel: .remind,
                 systemImage: "bell",
                 title: "前に知らせる",
@@ -463,6 +498,7 @@ private extension RecurringEditSheet {
         case .schedule: "繰り返し"
         case .start: "始まり"
         case .end: "終わり"
+        case .holiday: "休日なら"
         case .remind: "前に知らせる"
         }
     }

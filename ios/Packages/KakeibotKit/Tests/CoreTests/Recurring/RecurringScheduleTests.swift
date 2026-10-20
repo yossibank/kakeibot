@@ -5,13 +5,14 @@ import Testing
 struct RecurringScheduleTests {
     @Test(arguments: try datesCases)
     func findsDatesInRange(fixture: DatesCase) {
-        let recurring = Self.recurring(
+        var recurring = Self.recurring(
             frequency: fixture.frequency,
             month: fixture.month,
             day: fixture.day,
             startDate: fixture.startDate,
             endDate: fixture.endDate
         )
+        recurring.holidayShift = fixture.holidayShift ?? .none
 
         let dates = recurring.dates(
             from: fixture.from,
@@ -112,6 +113,7 @@ extension RecurringScheduleTests {
         let frequency: Recurring.Frequency
         let month: Int?
         let day: Int
+        let holidayShift: Recurring.HolidayShift?
         let startDate: LocalDate
         let endDate: LocalDate?
         let from: LocalDate

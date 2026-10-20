@@ -118,6 +118,8 @@ public extension AppDatabase {
 }
 
 private extension AppDatabase {
+    static let sameDateMargin = 10
+
     static func generateEntries(
         of recurring: Recurring,
         through today: LocalDate,
@@ -129,9 +131,12 @@ private extension AppDatabase {
             : []
 
         for date in dates {
+            let earliest = date.adding(days: -sameDateMargin)
+            let latest = date.adding(days: sameDateMargin)
             let exists = try Entry
                 .filter(Column("recurring_id") == recurring.id)
-                .filter(Column("recurring_date") == date)
+                .filter(Column("recurring_date") >= earliest)
+                .filter(Column("recurring_date") <= latest)
                 .fetchCount(db) > 0
 
             guard !exists else {

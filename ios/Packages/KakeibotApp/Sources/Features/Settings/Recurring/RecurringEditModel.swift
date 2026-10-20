@@ -14,6 +14,7 @@ public final class RecurringEditModel {
     public var frequency: Recurring.Frequency = .monthly
     public var month: Int
     public var day: Int
+    public var holidayShift: Recurring.HolidayShift = .none
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -76,6 +77,7 @@ public extension RecurringEditModel {
             frequency: frequency,
             month: month,
             day: day,
+            holidayShift: holidayShift,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore
@@ -243,6 +245,7 @@ private extension RecurringEditModel {
         frequency = draft.frequency
         month = draft.month
         day = draft.day
+        holidayShift = draft.holidayShift
         startDate = draft.startDate
         endDate = draft.endDate
         remindDaysBefore = draft.remindDaysBefore

@@ -22,6 +22,13 @@ public extension Holiday {
     static func contains(_ date: LocalDate) -> Bool {
         name(of: date) != nil
     }
+
+    static func isDayOff(_ date: LocalDate) -> Bool {
+        let isWeekend = date.weekday == .saturday || date.weekday == .sunday
+        let isYearEnd = (date.month, date.day) == (12, 31)
+            || (date.month == 1 && date.day <= 3)
+        return isWeekend || isYearEnd || contains(date)
+    }
 }
 
 private extension Holiday {
