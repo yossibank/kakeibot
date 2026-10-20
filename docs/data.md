@@ -295,7 +295,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | launch_screen | `home` `entry`。空ならホーム |
 | corner_style | `small`・`standard`・`large`。空なら `standard` |
 | font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `mincho` |
-| text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`。空なら `gothic` |
+| text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `gothic` |
 | entry_starts_with_amount | `true` なら、新しく記録するとき入力シートをテンキーを出して開く |
 | template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |
 | category_menu_opened | `true` `false`。`true` なら入力シートの長押しのヒントを出さない |

@@ -36,7 +36,6 @@ public struct ThemeStyleView: View {
                     fontRow(
                         "見出しと金額の字体",
                         selection: displayFontBinding,
-                        fonts: ThemeFont.allCases,
                         sample: AmountText.text(Self.sampleAmount)
                     ) { font in
                         .display(.headline, in: font)
@@ -45,7 +44,6 @@ public struct ThemeStyleView: View {
                     fontRow(
                         "本文の字体",
                         selection: textFontBinding,
-                        fonts: Self.textFonts,
                         sample: Self.sampleText
                     ) { font in
                         .text(.subheadline, in: font)
@@ -147,7 +145,6 @@ private extension ThemeStyleView {
     func fontRow(
         _ title: String,
         selection: Binding<ThemeFont>,
-        fonts: [ThemeFont],
         sample: String,
         font: @escaping (ThemeFont) -> Font
     ) -> some View {
@@ -155,7 +152,7 @@ private extension ThemeStyleView {
             rowTitle(title)
 
             LazyVGrid(columns: Self.fontColumns, spacing: 10) {
-                ForEach(fonts, id: \.self) { choice in
+                ForEach(ThemeFont.allCases, id: \.self) { choice in
                     fontTile(
                         choice,
                         isSelected: choice == selection.wrappedValue,
@@ -242,12 +239,6 @@ private extension ThemeStyleView {
 
     static let sampleAmount = 1280
     static let sampleText = "食費・財布"
-    static let textFonts: [ThemeFont] = [
-        .mincho,
-        .gothic,
-        .rounded,
-        .handwriting
-    ]
     static let fontColumns = Array(
         repeating: GridItem(.flexible(), spacing: 10),
         count: 3
