@@ -1,0 +1,86 @@
+[
+  {
+    "background": "#16223D",
+    "surface": "#141C2F",
+    "text": "#EDE6D6",
+    "subtext": "#8C97AE",
+    "accent": "#CDAA6B",
+    "palette": {
+      "backgroundTop": "#16223D",
+      "backgroundBottom": "#090E18",
+      "panel": "#0E1628",
+      "cardTop": "#141C2F",
+      "cardBottom": "#090D15",
+      "line": "#2E3443",
+      "accent": "#CDAA6B",
+      "accentDeep": "#856F46",
+      "accentStrong": "#EBDDC4",
+      "text": "#EDE6D6",
+      "subtext": "#8C97AE",
+      "hint": "#7E89A0"
+    }
+  },
+  {
+    "background": "#12302C",
+    "surface": "#173A35",
+    "text": "#EAF4F1",
+    "subtext": "#8FB3A9",
+    "accent": "#7FD1B9",
+    "palette": {
+      "backgroundTop": "#12302C",
+      "backgroundBottom": "#071312",
+      "panel": "#0C1F1D",
+      "cardTop": "#173A35",
+      "cardBottom": "#0A1A18",
+      "line": "#30504C",
+      "accent": "#7FD1B9",
+      "accentDeep": "#538878",
+      "accentStrong": "#CCEDE3",
+      "text": "#EAF4F1",
+      "subtext": "#8FB3A9",
+      "hint": "#80A39A"
+    }
+  },
+  {
+    "background": "#F8F4EB",
+    "surface": "#FFFFFF",
+    "text": "#2A2418",
+    "subtext": "#6B6152",
+    "accent": "#8A6420",
+    "palette": {
+      "backgroundTop": "#F8F4EB",
+      "backgroundBottom": "#EEEAE2",
+      "panel": "#F3EFE6",
+      "cardTop": "#FFFFFF",
+      "cardBottom": "#FCFAF5",
+      "line": "#E5E5E3",
+      "accent": "#8A6420",
+      "accentDeep": "#B39A6E",
+      "accentStrong": "#4C3712",
+      "text": "#2A2418",
+      "subtext": "#6B6152",
+      "hint": "#7C7364"
+    }
+  },
+  {
+    "background": "#EEF4FA",
+    "surface": "#FFFFFF",
+    "text": "#17233A",
+    "subtext": "#54627A",
+    "accent": "#2F5A8C",
+    "palette": {
+      "backgroundTop": "#EEF4FA",
+      "backgroundBottom": "#E4EAF0",
+      "panel": "#E9EFF5",
+      "cardTop": "#FFFFFF",
+      "cardBottom": "#F7FAFD",
+      "line": "#E3E5E7",
+      "accent": "#2F5A8C",
+      "accentDeep": "#7894B4",
+      "accentStrong": "#1A324D",
+      "text": "#17233A",
+      "subtext": "#54627A",
+      "hint": "#667489"
+    }
+  }
+]

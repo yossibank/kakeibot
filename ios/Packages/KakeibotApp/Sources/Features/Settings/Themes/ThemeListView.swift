@@ -5,9 +5,11 @@ import SwiftUI
 
 public struct ThemeListView: View {
     @State private var model: ThemeListModel
+    @State private var editing: EditTarget?
 
     @Environment(\.dismiss) private var dismiss
 
+    private let database: AppDatabase
     private let appIcon: AppIconListModel
 
     public init(
@@ -16,6 +18,7 @@ public struct ThemeListView: View {
     ) {
         let model = ThemeListModel(database: database, appIcon: appIcon)
         _model = State(initialValue: model)
+        self.database = database
         self.appIcon = appIcon
     }
 
@@ -25,6 +28,8 @@ public struct ThemeListView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
+                    customSection
+
                     section("ダーク", isLight: false)
 
                     section("ライト", isLight: true)
@@ -62,6 +67,15 @@ public struct ThemeListView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: model.current)
+        .sheet(item: $editing, onDismiss: reload) { target in
+            ThemeEditSheet(
+                model: ThemeEditModel(
+                    database: database,
+                    editing: target.theme,
+                    base: model.currentPalette
+                )
+            )
+        }
         .task {
             await model.load()
         }
@@ -89,6 +103,45 @@ private extension ThemeListView {
         }
     }
 
+    var customSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("つくったテーマ")
+
+            LazyVGrid(columns: Self.columns, spacing: 18) {
+                ForEach(model.customThemes) { theme in
+                    customTile(theme)
+                }
+
+                newTile
+            }
+        }
+    }
+
+    var newTile: some View {
+        Button {
+            editing = .new
+        } label: {
+            VStack(spacing: 8) {
+                RoundedRectangle(cornerRadius: 14)
+                    .strokeBorder(Palette.outline, style: .dashed)
+                    .frame(height: 132)
+                    .overlay {
+                        Image(systemName: "plus")
+                            .font(.sans(.headline, weight: .light))
+                            .foregroundStyle(Palette.accent)
+                    }
+                    .padding(4)
+
+                Text("つくる")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.accent)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
     func section(
         _ title: String,
         isLight: Bool
@@ -98,63 +151,122 @@ private extension ThemeListView {
         }
 
         return VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(.caption2)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
-                .padding(.leading, 6)
+            sectionTitle(title)
 
             LazyVGrid(columns: Self.columns, spacing: 18) {
                 ForEach(presets, id: \.self) { preset in
-                    tile(preset)
+                    VStack(spacing: 8) {
+                        previewButton(.preset(preset), palette: preset.palette)
+
+                        tileTitle(
+                            preset.title,
+                            isCurrent: isCurrent(.preset(preset))
+                        )
+                    }
                 }
             }
         }
     }
 
-    func tile(_ preset: ThemePreset) -> some View {
-        let isCurrent = preset == model.current
+    func sectionTitle(_ title: String) -> some View {
+        Text(title)
+            .font(.caption2)
+            .tracking(3)
+            .foregroundStyle(Palette.accent)
+            .padding(.leading, 6)
+    }
+
+    func customTile(_ theme: Theme) -> some View {
+        VStack(spacing: 8) {
+            previewButton(.custom(theme.id), palette: theme.palette)
+
+            Button {
+                editing = .edit(theme)
+            } label: {
+                HStack(spacing: 4) {
+                    tileTitle(
+                        theme.name,
+                        isCurrent: isCurrent(.custom(theme.id))
+                    )
+
+                    Image(systemName: "pencil")
+                        .font(.caption2)
+                        .foregroundStyle(Palette.accent)
+                }
+                .frame(minHeight: 28)
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    func previewButton(
+        _ choice: ThemeChoice,
+        palette: ThemePalette
+    ) -> some View {
+        let isCurrent = isCurrent(choice)
         let ring = isCurrent ? Palette.accent : Color.clear
-        let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
 
         return Button {
             Task {
-                await model.select(preset)
+                await model.select(choice)
             }
         } label: {
-            VStack(spacing: 8) {
-                ThemePreview(preset: preset)
-                    .padding(4)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 18)
-                            .stroke(ring, lineWidth: 2)
+            ThemePreview(palette: palette)
+                .padding(4)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(ring, lineWidth: 2)
+                }
+                .overlay(alignment: .bottomTrailing) {
+                    if isCurrent {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(Palette.accent, Palette.background)
+                            .offset(x: 6, y: 6)
+                            .transition(.scale.combined(with: .opacity))
                     }
-                    .overlay(alignment: .bottomTrailing) {
-                        if isCurrent {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.title3)
-                                .foregroundStyle(
-                                    Palette.accent,
-                                    Palette.background
-                                )
-                                .offset(x: 6, y: 6)
-                                .transition(.scale.combined(with: .opacity))
-                        }
-                    }
-                    .animation(.spring(duration: 0.3), value: isCurrent)
-
-                Text(preset.title)
-                    .font(.footnote)
-                    .foregroundStyle(titleColor)
-            }
-            .frame(maxWidth: .infinity)
-            .contentShape(.rect)
+                }
+                .animation(.spring(duration: 0.3), value: isCurrent)
+                .frame(maxWidth: .infinity)
+                .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+
+    func tileTitle(
+        _ title: String,
+        isCurrent: Bool
+    ) -> some View {
+        let color = isCurrent ? Palette.accentStrong : Palette.subtext
+
+        return Text(title)
+            .font(.footnote)
+            .foregroundStyle(color)
+            .lineLimit(1)
     }
 }
 
 private extension ThemeListView {
+    enum EditTarget: Identifiable {
+        case new
+        case edit(Theme)
+
+        var id: String {
+            switch self {
+            case .new: "new"
+            case let .edit(theme): theme.id.description
+            }
+        }
+
+        var theme: Theme? {
+            switch self {
+            case .new: nil
+            case let .edit(theme): theme
+            }
+        }
+    }
+
     var isSuggestingIcon: Binding<Bool> {
         Binding {
             model.suggestedIcon != nil
@@ -168,6 +280,16 @@ private extension ThemeListView {
     var suggestionMessage: String {
         let title = model.suggestedIcon?.title ?? ""
         return "アプリアイコンも\(title)にできます"
+    }
+
+    func isCurrent(_ choice: ThemeChoice) -> Bool {
+        choice == model.current
+    }
+
+    func reload() {
+        Task {
+            await model.load()
+        }
     }
 }
 

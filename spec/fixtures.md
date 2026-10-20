@@ -117,8 +117,22 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | --- | --- | --- |
 | `theme-palette-contrast.json` | 2 色のコントラスト比。小数第 2 位に丸める | `first`、`second`、`ratio` |
 | `theme-palette-readable.json` | 地の色に対して読みにくい色 | `theme`（役割ごとの色）、`unreadable`（役割の名前） |
+| `theme-palette-base.json` | 手で選ぶ 5 色から作る、描く色の組 | `background`、`surface`、`text`、`subtext`、`accent`、`palette`（役割ごとの色） |
+| `theme-draft.json` | 手で作るテーマの判定で出る問題 | `name`、`background`、`surface`、`text`、`subtext`、`accent`、`problems` |
 
-基準は [decisions.md の「テーマの読みやすさ」](../docs/decisions.md#テーマの読みやすさ)にある。`unreadable` は `accent`・`accentStrong`・`text`・`subtext`・`hint` の順に並べる。
+基準は [decisions.md の「テーマの読みやすさ」](../docs/decisions.md#テーマの読みやすさ)にある。テーマの名前は、前後の空白を除いて 12 文字までにする。
+
+描く色の組は、地が明るいかで混ぜ方を変える。混ぜた値は、色の成分ごとに四捨五入する。
+
+| 色 | 暗い地 | 明るい地 |
+| --- | --- | --- |
+| `backgroundBottom` | 地に黒を 6 割 | 地に黒を 4 分 |
+| `panel` | 地に黒を 3 割 5 分 | 地に黒を 2 分 |
+| `cardBottom` | カードに黒を 5 割 5 分 | カードに地を 5 割 |
+| `line` | カードに文字を 1 割 2 分 | 同じ |
+| `accentDeep` | 強調に黒を 3 割 5 分 | 強調に白を 3 割 5 分 |
+| `accentStrong` | 強調に白を 6 割 | 強調に黒を 4 割 5 分 |
+| `hint` | 控えめな文字に地を 1 割 2 分 | 同じ |`unreadable` は `accent`・`accentStrong`・`text`・`subtext`・`hint` の順に並べる。
 
 ## wallet
 

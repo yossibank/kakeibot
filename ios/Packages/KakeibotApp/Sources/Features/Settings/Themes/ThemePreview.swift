@@ -3,7 +3,7 @@ import DesignSystem
 import SwiftUI
 
 struct ThemePreview: View {
-    let preset: ThemePreset
+    let palette: ThemePalette
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -51,7 +51,7 @@ struct ThemePreview: View {
         .padding(8)
         .frame(height: 132)
         .background(Palette.background, in: .rect(cornerRadius: 14))
-        .environment(\.palette, preset.palette)
+        .environment(\.palette, palette)
     }
 }
 

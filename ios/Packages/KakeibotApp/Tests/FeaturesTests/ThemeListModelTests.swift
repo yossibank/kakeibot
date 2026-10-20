@@ -8,12 +8,12 @@ struct ThemeListModelTests {
     @Test
     func startsFromSavedTheme() async throws {
         let setup = try await HomeModelTests.Setup()
-        try await setup.database.setSetting(.theme, to: .wine)
+        try await setup.database.setSetting(.theme, to: .preset(.wine))
         let model = Self.model(database: setup.database)
 
         await model.load()
 
-        #expect(model.current == .wine)
+        #expect(model.current == .preset(.wine))
     }
 
     @Test
@@ -23,12 +23,12 @@ struct ThemeListModelTests {
 
         await model.load()
         let initial = model.current
-        await model.select(.forest)
+        await model.select(.preset(.forest))
         let saved = try await setup.database.setting(.theme)
 
-        #expect(initial == .navy)
-        #expect(model.current == .forest)
-        #expect(saved == .forest)
+        #expect(initial == .preset(.navy))
+        #expect(model.current == .preset(.forest))
+        #expect(saved == .preset(.forest))
     }
 
     @Test
@@ -38,7 +38,7 @@ struct ThemeListModelTests {
         let appIcon = AppIconListModel(switcher: switcher.client)
         let model = ThemeListModel(database: setup.database, appIcon: appIcon)
 
-        await model.select(.sage)
+        await model.select(.preset(.sage))
         let suggested = model.suggestedIcon
         await model.use(suggested)
 
@@ -54,7 +54,7 @@ struct ThemeListModelTests {
         let appIcon = AppIconListModel(switcher: switcher.client)
         let model = ThemeListModel(database: setup.database, appIcon: appIcon)
 
-        await model.select(.wine)
+        await model.select(.preset(.wine))
 
         #expect(model.suggestedIcon == nil)
     }

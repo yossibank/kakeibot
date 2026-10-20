@@ -147,7 +147,7 @@ KakeibotApp/
 │   │   │   ├── Reminder/    記録忘れの通知の設定と、通知の許可を確かめる関数
 │   │   │   ├── Stamps/      スタンプの一覧と編集
 │   │   │   ├── Templates/
-│   │   │   ├── Themes/      テーマを選ぶ画面と見本
+│   │   │   ├── Themes/      テーマを選ぶ画面と見本、手で作る画面
 │   │   │   └── Wallets/
 │   │   └── Tabs/
 │   │       ├── Assets/

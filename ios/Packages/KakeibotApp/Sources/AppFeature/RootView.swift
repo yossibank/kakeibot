@@ -47,7 +47,7 @@ public struct RootView: View {
             }
         }
         .environment(\.notificationPermission, .live)
-        .palette(isRevealed ? model.theme.palette : .night)
+        .palette(isRevealed ? model.palette : .night)
         .warmsUpInput()
     }
 }

@@ -6,7 +6,8 @@ import Store
 @MainActor
 @Observable
 public final class ThemeListModel {
-    public private(set) var current: ThemePreset = .navy
+    public private(set) var current: ThemeChoice = .preset(.navy)
+    public private(set) var customThemes: [Theme] = []
     public private(set) var suggestedIcon: AppIconChoice?
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -24,27 +25,43 @@ public final class ThemeListModel {
 }
 
 public extension ThemeListModel {
+    var currentPalette: ThemePalette {
+        switch current {
+        case let .preset(preset):
+            return preset.palette
+        case let .custom(id):
+            let theme = customThemes.first { $0.id == id }
+            return theme?.palette ?? .night
+        }
+    }
+
     func load() async {
         do {
             current = try await database.setting(.theme)
+            customThemes = try await database.customThemes()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
     }
 
-    func select(_ preset: ThemePreset) async {
-        guard preset != current else {
+    func select(_ choice: ThemeChoice) async {
+        guard choice != current else {
             return
         }
 
         let previous = current
-        current = preset
+        current = choice
 
         do {
-            try await database.setSetting(.theme, to: preset)
+            try await database.setSetting(.theme, to: choice)
         } catch {
             current = previous
             errorNotice.show(Self.saveFailedMessage)
+            return
+        }
+
+        guard case let .preset(preset) = choice else {
+            suggestedIcon = nil
             return
         }
 

@@ -9,7 +9,8 @@ public struct SettingsSheet: View {
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
     @State private var closedHints: Set<SettingsScreen> = []
-    @State private var theme: ThemePreset = .navy
+    @State private var theme: ThemeChoice = .preset(.navy)
+    @State private var customThemes: [Theme] = []
     @State private var appIcon = AppIconListModel()
 
     #if DEBUG
@@ -197,7 +198,7 @@ public struct SettingsSheet: View {
                                     row(
                                         "テーマ",
                                         systemImage: "paintpalette",
-                                        value: theme.title
+                                        value: theme.title(in: customThemes)
                                     )
                                 }
 
@@ -287,6 +288,9 @@ public struct SettingsSheet: View {
         }
         .task {
             await observeTheme()
+        }
+        .task {
+            await observeCustomThemes()
         }
         .task {
             launchScreen = await (try? database.setting(.launchScreen)) ?? .home
@@ -439,7 +443,17 @@ private extension SettingsSheet {
                 self.theme = theme
             }
         } catch {
-            theme = .navy
+            theme = .preset(.navy)
+        }
+    }
+
+    func observeCustomThemes() async {
+        do {
+            for try await themes in database.customThemeUpdates() {
+                customThemes = themes
+            }
+        } catch {
+            customThemes = []
         }
     }
 

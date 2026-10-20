@@ -3,4 +3,6 @@ public enum DraftProblem: String, CaseIterable, Codable, Error, Sendable {
     case emptyMark
     case textTooLong
     case invalidColor
+    case nameTooLong
+    case unreadableColors
 }
