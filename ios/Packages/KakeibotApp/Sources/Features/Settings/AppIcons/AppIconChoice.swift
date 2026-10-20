@@ -134,7 +134,7 @@ public extension AppIconChoice {
             Look(
                 background: ["#FFFFFF", "#E6E6EA"],
                 yen: Self.deepGoldMark,
-                dial: Self.goldMark
+                dial: Self.deepGoldMark
             )
         case .sky:
             Look(
