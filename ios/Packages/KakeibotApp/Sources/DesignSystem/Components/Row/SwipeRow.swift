@@ -46,7 +46,11 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
                 )
                 .offset(x: offset)
         }
-        .clipped()
+        .mask {
+            Rectangle()
+                .padding(.leading, offset == 0 ? -Self.shadowRoom : 0)
+                .padding([.vertical, .trailing], -Self.shadowRoom)
+        }
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
         } action: { width in
@@ -104,6 +108,10 @@ private extension SwipeRow {
 }
 
 private extension SwipeRow {
+    static var shadowRoom: CGFloat {
+        32
+    }
+
     static var actionWidth: CGFloat {
         64
     }

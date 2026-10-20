@@ -18,7 +18,7 @@ public struct TemplateCardAmount: View {
             Text(AmountText.text(amount))
                 .font(size.amountFont)
                 .monospacedDigit()
-                .foregroundStyle(Palette.accentLight)
+                .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         } else {

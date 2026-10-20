@@ -34,14 +34,14 @@ struct ReviewShareSheet: View {
 
                 Text(share.name)
                     .font(.headline)
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
 
                 Spacer()
 
                 Text(AmountText.text(share.amount))
                     .font(.serif(.headline))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
             }
             .padding(.horizontal, 4)
 

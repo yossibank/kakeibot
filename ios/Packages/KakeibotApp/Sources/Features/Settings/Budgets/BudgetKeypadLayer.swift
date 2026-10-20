@@ -43,7 +43,7 @@ private extension BudgetKeypadLayer {
                 Text(AmountText.text(model.calculator.amount))
                     .font(.serif(.largeTitle, weight: .bold))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .contentTransition(.numericText())
                     .animation(.snappy, value: model.calculator.amount)
 

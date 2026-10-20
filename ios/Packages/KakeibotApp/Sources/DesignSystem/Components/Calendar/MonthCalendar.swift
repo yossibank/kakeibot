@@ -30,7 +30,7 @@ public struct MonthCalendar: View {
 
                 Text(monthTitle)
                     .font(.serif(.headline, weight: .medium))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
 
                 Spacer()
 

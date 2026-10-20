@@ -57,7 +57,7 @@ private extension PrimaryButton {
     static var gold: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.accent.mix(with: Palette.accentLight, by: 0.3),
+                Palette.accent.mix(with: Palette.accentStrong, by: 0.3),
                 Palette.accent,
                 Palette.accent.mix(with: Palette.accentDeep, by: 0.45)
             ],
@@ -81,7 +81,7 @@ private extension PrimaryButton {
     var rim: LinearGradient {
         let colors = if isEnabled {
             [
-                Palette.accentLight.opacity(.strong),
+                Palette.accentStrong.opacity(.strong),
                 Palette.accent.opacity(.soft)
             ]
         } else {

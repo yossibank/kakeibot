@@ -47,7 +47,7 @@ private extension DialTicks {
             .stroke(Palette.accent.opacity(.strong), lineWidth: 1)
 
         DialTicks(count: 12, length: 13)
-            .stroke(Palette.accentLight, lineWidth: 1.5)
+            .stroke(Palette.accentStrong, lineWidth: 1.5)
     }
     .frame(width: 214, height: 214)
     .padding()

@@ -65,7 +65,7 @@ private extension PaletteTests {
         line: 0x1F4A3E,
         accent: 0x7FD1A8,
         accentDeep: 0x3F7A5C,
-        accentLight: 0xD8F2E4,
+        accentStrong: 0xD8F2E4,
         text: 0xF0F5F2,
         subtext: 0x8FB3A5,
         hint: 0x7A9C8F

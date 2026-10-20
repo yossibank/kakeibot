@@ -50,7 +50,7 @@ private extension AmountText {
         switch type {
         case .income: Palette.accent
         case .transfer: Palette.subtext
-        case .expense, nil: Palette.accentLight
+        case .expense, nil: Palette.accentStrong
         }
     }
 }

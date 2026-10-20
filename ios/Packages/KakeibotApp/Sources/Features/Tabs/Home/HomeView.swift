@@ -162,7 +162,7 @@ private extension HomeView {
                 stat(
                     "今日",
                     amount: model.todayExpense,
-                    color: Palette.accentLight
+                    color: Palette.accentStrong
                 )
 
                 divider
@@ -297,6 +297,11 @@ private extension HomeView {
         .scrollTargetBehavior(.viewAligned)
         .contentMargins(.horizontal, 14, for: .scrollContent)
         .contentMargins(.vertical, 6, for: .scrollContent)
+        .scrollClipDisabled()
+        .mask {
+            Rectangle()
+                .padding(.vertical, -Self.shadowRoom)
+        }
         .padding(.horizontal, -14)
         .padding(.vertical, -6)
     }
@@ -395,6 +400,7 @@ private extension HomeView {
     ]
 
     static let tileHeight = TemplateCardSize.regular.height
+    static let shadowRoom: CGFloat = 32
     static let toolStroke = Palette.accent.opacity(.muted)
 
     var dialTitle: String {
@@ -411,12 +417,12 @@ private extension HomeView {
 
     var dialAmountColor: Color {
         guard let usage = model.budgetUsage else {
-            return Palette.accentLight
+            return Palette.accentStrong
         }
 
         return usage.isOver || usage.isNearLimit
             ? usage.tint
-            : Palette.accentLight
+            : Palette.accentStrong
     }
 
     var middleTitle: String {

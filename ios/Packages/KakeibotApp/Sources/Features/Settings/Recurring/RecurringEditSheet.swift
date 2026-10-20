@@ -160,7 +160,7 @@ private extension RecurringEditSheet {
             )
             .multilineTextAlignment(.center)
             .font(.serif(.body))
-            .foregroundStyle(Palette.accentLight)
+            .foregroundStyle(Palette.accentStrong)
             .tint(Palette.accent)
             .submitLabel(.done)
             .focused($isNameFocused)
@@ -354,7 +354,7 @@ private extension RecurringEditSheet {
     }
 
     var amountColor: Color {
-        model.amount > 0 ? Palette.accentLight : Palette.hint
+        model.amount > 0 ? Palette.accentStrong : Palette.hint
     }
 
     var typeBinding: Binding<Entry.Kind> {

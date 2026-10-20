@@ -106,7 +106,7 @@ private extension ConfirmCard {
 
                 Text(title)
                     .font(.serif(.headline, weight: .medium))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .multilineTextAlignment(.center)
 
                 Text(message)
@@ -149,12 +149,12 @@ private extension ConfirmCard {
             RoundedRectangle(cornerRadius: 26)
                 .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
         }
-        .shadow(color: .black.opacity(0.5), radius: 30, y: 14)
+        .shadow(color: Palette.shadow.opacity(0.5), radius: 30, y: 14)
     }
 
     static var keepFill: LinearGradient {
         LinearGradient(
-            colors: [Palette.accentLight, Palette.accent],
+            colors: [Palette.accentStrong, Palette.accent],
             startPoint: .top,
             endPoint: .bottom
         )

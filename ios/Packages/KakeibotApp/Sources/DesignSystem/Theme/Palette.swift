@@ -11,7 +11,7 @@ public extension Palette {
     static let line = Color(themed: \.line)
     static let accent = Color(themed: \.accent)
     static let accentDeep = Color(themed: \.accentDeep)
-    static let accentLight = Color(themed: \.accentLight)
+    static let accentStrong = Color(themed: \.accentStrong)
     static let text = Color(themed: \.text)
     static let subtext = Color(themed: \.subtext)
     static let hint = Color(themed: \.hint)
@@ -19,6 +19,10 @@ public extension Palette {
     static let amber = Color(light: 0xA8581A, dark: 0xE89B57)
     static let holiday = Color(light: 0xC0392B, dark: 0xEE8A84)
     static let saturday = Color(light: 0x2D63B5, dark: 0x8DB0EA)
+    static let shadow = Color(uiColor: UIColor { traits in
+        let isLight = traits.userInterfaceStyle == .light
+        return UIColor(white: 0, alpha: isLight ? 0.3 : 1)
+    })
     static let hairline = accent.opacity(.subtle)
     static let outline = accent.opacity(.medium)
     static let faint = accent.opacity(.faint)

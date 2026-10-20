@@ -66,7 +66,7 @@ private extension AssetsView {
                 Text(AmountText.text(model.total))
                     .font(.serif(.largeTitle, weight: .bold))
                     .monospacedDigit()
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
 
@@ -107,7 +107,7 @@ private extension AssetsView {
     }
 
     func walletTile(_ row: AssetsModel.WalletRow) -> some View {
-        let color = row.balance < 0 ? Palette.rose : Palette.accentLight
+        let color = row.balance < 0 ? Palette.rose : Palette.accentStrong
 
         return VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
@@ -170,7 +170,7 @@ private struct BalanceTrend: View {
                 ForEach(points.indices, id: \.self) { index in
                     let isLast = index == points.count - 1
                     let size: CGFloat = isLast ? 8 : 4
-                    let color = isLast ? Palette.accentLight : Palette.accent
+                    let color = isLast ? Palette.accentStrong : Palette.accent
 
                     Circle()
                         .fill(color)

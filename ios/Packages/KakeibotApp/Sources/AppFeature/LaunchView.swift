@@ -46,7 +46,7 @@ private extension LaunchView {
 
             RingSweep(progress: sweep, length: Self.sweepLength)
                 .stroke(
-                    Palette.accentLight,
+                    Palette.accentStrong,
                     style: StrokeStyle(lineWidth: 2.4, lineCap: .round)
                 )
                 .frame(width: Self.ringSize, height: Self.ringSize)

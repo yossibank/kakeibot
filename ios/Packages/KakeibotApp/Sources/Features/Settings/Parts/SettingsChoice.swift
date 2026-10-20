@@ -17,7 +17,7 @@ struct SettingsChoice: View {
     }
 
     var body: some View {
-        let color = isSelected ? Palette.accentLight : Palette.subtext
+        let color = isSelected ? Palette.accentStrong : Palette.subtext
 
         Button(action: action) {
             Text(title)

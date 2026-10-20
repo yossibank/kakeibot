@@ -18,7 +18,7 @@ public struct DialFace: View {
                 .padding(12)
 
             DialTicks(count: 12, length: 14)
-                .stroke(Palette.accentLight, lineWidth: 1.5)
+                .stroke(Palette.accentStrong, lineWidth: 1.5)
                 .padding(12)
         }
     }

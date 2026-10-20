@@ -19,7 +19,7 @@ struct EntryDialFace: View {
             Text(AmountText.text(model.amount))
                 .font(amountFont)
                 .monospacedDigit()
-                .foregroundStyle(Palette.accentLight)
+                .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.85)
                 .frame(width: size * 0.7, height: size * 0.26)

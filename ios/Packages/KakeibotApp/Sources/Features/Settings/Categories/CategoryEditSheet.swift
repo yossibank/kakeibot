@@ -150,7 +150,7 @@ private extension CategoryEditSheet {
                     .font(.sans(.caption))
                     .lineLimit(1)
             }
-            .foregroundStyle(Palette.accentLight)
+            .foregroundStyle(Palette.accentStrong)
             .frame(width: 86, height: 86)
             .background(
                 Palette.accent.opacity(.subtle),

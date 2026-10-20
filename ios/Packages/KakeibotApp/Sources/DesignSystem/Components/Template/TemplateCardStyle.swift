@@ -23,11 +23,11 @@ extension TemplateCardStyle {
     static var foil: AngularGradient {
         AngularGradient(
             colors: [
-                Palette.accentLight.opacity(.strong),
+                Palette.accentStrong.opacity(.strong),
                 Palette.accent.opacity(.medium),
                 Palette.accentDeep.opacity(.medium),
                 Palette.accent.opacity(.medium),
-                Palette.accentLight.opacity(.strong)
+                Palette.accentStrong.opacity(.strong)
             ],
             center: .center
         )
@@ -59,9 +59,9 @@ extension View {
                 .inset(by: 4)
                 .strokeBorder(Palette.accent.opacity(.subtle), lineWidth: 0.5)
         }
-        .shadow(color: .black.opacity(0.35), radius: 3, y: 2)
+        .shadow(color: Palette.shadow.opacity(0.35), radius: 3, y: 2)
         .shadow(
-            color: .black.opacity(0.55),
+            color: Palette.shadow.opacity(0.55),
             radius: shadowRadius,
             y: shadowRadius * 0.7
         )

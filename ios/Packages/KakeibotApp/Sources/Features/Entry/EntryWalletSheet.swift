@@ -18,7 +18,7 @@ struct EntryWalletSheet: View {
                 HStack {
                     Text(title)
                         .font(.headline)
-                        .foregroundStyle(Palette.accentLight)
+                        .foregroundStyle(Palette.accentStrong)
 
                     Spacer()
 
@@ -60,7 +60,7 @@ private extension EntryWalletSheet {
     func walletRow(_ wallet: Wallet) -> some View {
         let isSelected = selectedId == wallet.id
         let isTaken = takenId == wallet.id
-        let nameColor = isSelected ? Palette.accentLight : Palette.text
+        let nameColor = isSelected ? Palette.accentStrong : Palette.text
         let iconColor = isSelected ? Palette.accent : Palette.subtext
 
         return Button {

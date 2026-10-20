@@ -231,7 +231,7 @@ Core に置く。
 
 | 色 | 地のどれとも満たす比 |
 | --- | --- |
-| `text`・`accentLight` | 4.5 以上 |
+| `text`・`accentStrong` | 4.5 以上 |
 | `accent`・`subtext`・`hint` | 3 以上 |
 
 満たさない色があるテーマは保存させない。

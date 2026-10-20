@@ -17,10 +17,10 @@ public struct ThemeListView: View {
             header
 
             ScrollView {
-                LazyVGrid(columns: Self.columns, spacing: 18) {
-                    ForEach(ThemePreset.allCases, id: \.self) { preset in
-                        tile(preset)
-                    }
+                VStack(alignment: .leading, spacing: 24) {
+                    section("ダーク", isLight: false)
+
+                    section("ライト", isLight: true)
                 }
                 .padding(.vertical, 8)
             }
@@ -66,10 +66,33 @@ private extension ThemeListView {
         }
     }
 
+    func section(
+        _ title: String,
+        isLight: Bool
+    ) -> some View {
+        let presets = ThemePreset.allCases.filter { preset in
+            preset.palette.isLight == isLight
+        }
+
+        return VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.caption2)
+                .tracking(3)
+                .foregroundStyle(Palette.accent)
+                .padding(.leading, 6)
+
+            LazyVGrid(columns: Self.columns, spacing: 18) {
+                ForEach(presets, id: \.self) { preset in
+                    tile(preset)
+                }
+            }
+        }
+    }
+
     func tile(_ preset: ThemePreset) -> some View {
         let isCurrent = preset == model.current
         let ring = isCurrent ? Palette.accent : Color.clear
-        let titleColor = isCurrent ? Palette.accentLight : Palette.subtext
+        let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
 
         return Button {
             Task {

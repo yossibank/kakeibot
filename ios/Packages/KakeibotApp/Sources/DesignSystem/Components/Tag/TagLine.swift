@@ -114,7 +114,11 @@ private extension TagLine {
             if let item {
                 face(.tag(item), at: index, tilt: 0)
                     .scaleEffect(1.12, anchor: .top)
-                    .shadow(color: .black.opacity(0.5), radius: 10, y: 6)
+                    .shadow(
+                        color: Palette.shadow.opacity(0.5),
+                        radius: 10,
+                        y: 6
+                    )
                     .padding(.top, Self.inset)
                     .frame(
                         width: frame.width,

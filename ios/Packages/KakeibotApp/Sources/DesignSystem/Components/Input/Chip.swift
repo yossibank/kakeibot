@@ -46,7 +46,7 @@ public struct Chip: View {
 
 private extension Chip {
     var foreground: Color {
-        isHighlighted ? Palette.accentLight : Palette.text.opacity(.strong)
+        isHighlighted ? Palette.accentStrong : Palette.text.opacity(.strong)
     }
 }
 

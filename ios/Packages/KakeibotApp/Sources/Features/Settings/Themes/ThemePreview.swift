@@ -14,7 +14,7 @@ struct ThemePreview: View {
 
                 Text("¥1,280")
                     .font(.serif(.small))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
 
                 Capsule()
                     .fill(Palette.accent)

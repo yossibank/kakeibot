@@ -444,7 +444,7 @@ private extension EntrySheet {
     ) -> some View {
         let isSelected = model.categoryId == category.id
         let isLit = isSelected || isLifted
-        let color = isLit ? Palette.accentLight : Palette.subtext
+        let color = isLit ? Palette.accentStrong : Palette.subtext
         let fill = isLifted ? Palette.panel : Self.categoryFill(isLit)
         let border = isLit ? Palette.outline : Color.clear
         let width: CGFloat = isLifted ? 1.2 : 1

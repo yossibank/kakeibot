@@ -26,7 +26,7 @@ public struct TemplateRowCard: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(name)
                     .font(TemplateCardSize.regular.nameFont)
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
                     .lineLimit(2)
 
                 Text(detail)

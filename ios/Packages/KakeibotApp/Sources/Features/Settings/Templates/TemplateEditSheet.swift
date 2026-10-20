@@ -196,7 +196,7 @@ private extension TemplateEditSheet {
                 prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
             )
             .font(TemplateCardSize.large.nameFont)
-            .foregroundStyle(Palette.accentLight)
+            .foregroundStyle(Palette.accentStrong)
             .tint(Palette.accent)
             .submitLabel(.done)
             .focused($focus, equals: .name)
@@ -250,7 +250,7 @@ private extension TemplateEditSheet {
 
                 Text(capsuleAmount)
                     .font(.serif(.caption))
-                    .foregroundStyle(Palette.accentLight)
+                    .foregroundStyle(Palette.accentStrong)
             }
             .font(.sans(.caption))
             .lineLimit(1)
@@ -298,7 +298,7 @@ private extension TemplateEditSheet {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Palette.outline, lineWidth: 1)
         }
-        .shadow(color: .black.opacity(0.45), radius: 20, y: 10)
+        .shadow(color: Palette.shadow.opacity(0.45), radius: 20, y: 10)
         .task {
             focus = .memo
         }

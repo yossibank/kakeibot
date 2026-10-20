@@ -38,7 +38,7 @@ private extension ThemePalette {
 
     static let readableRoles: [(Role, Double)] = [
         (.accent, 3),
-        (.accentLight, 4.5),
+        (.accentStrong, 4.5),
         (.text, 4.5),
         (.subtext, 3),
         (.hint, 3)

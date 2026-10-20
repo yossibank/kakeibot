@@ -114,7 +114,7 @@ private extension IconEditor {
 
     func glyphButton(_ glyph: Icon.Glyph) -> some View {
         let isSelected = model.glyph == glyph
-        let color = isSelected ? Palette.accentLight : Palette.subtext
+        let color = isSelected ? Palette.accentStrong : Palette.subtext
 
         return Button {
             model.glyph = glyph
@@ -166,7 +166,7 @@ private extension IconEditor {
 
     func colorButton(_ hex: String) -> some View {
         let isSelected = model.color == hex
-        let ring = isSelected ? Palette.accentLight : Color.clear
+        let ring = isSelected ? Palette.accentStrong : Color.clear
 
         return Button {
             model.color = hex

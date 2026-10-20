@@ -178,7 +178,7 @@ private extension StampListView {
         let isLifted = hiddenLift?.id == shelfIcon.id
         let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
         let scale: CGFloat = isLifted ? 1.1 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return tileFace(shelfIcon, isHidden: true)
@@ -204,7 +204,7 @@ private extension StampListView {
         let index = model.shown.firstIndex(of: shelfIcon) ?? 0
         let position = isLifted ? liftedCenter : center(at: index)
         let scale: CGFloat = isLifted ? 1.1 : 1
-        let shadow = Color.black.opacity(isLifted ? 0.5 : 0)
+        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return tileFace(shelfIcon, isHidden: false)
