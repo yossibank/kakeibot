@@ -33,6 +33,30 @@ struct RecurringModelTests {
     }
 
     @Test
+    func suggestsHolidayShiftFromCategory() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await model.load()
+        model.select(.income)
+        let salary = model.holidayShift
+
+        model.select(.transfer)
+        let transfer = model.holidayShift
+
+        model.choose(.none)
+        model.select(.income)
+        let chosen = model.holidayShift
+
+        #expect(salary == .previous)
+        #expect(transfer == .next)
+        #expect(chosen == .none)
+    }
+
+    @Test
     func savesTransferBetweenWallets() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))

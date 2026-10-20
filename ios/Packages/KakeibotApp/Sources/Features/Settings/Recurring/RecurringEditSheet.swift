@@ -201,7 +201,7 @@ private extension RecurringEditSheet {
                     icon: model.icon(for: category),
                     isSelected: model.categoryId == category.id
                 ) {
-                    model.categoryId = category.id
+                    model.select(category: category.id)
                     closePanel()
                 }
             }
@@ -314,7 +314,7 @@ private extension RecurringEditSheet {
                         RecurringText.holidayShift(shift),
                         isSelected: model.holidayShift == shift
                     ) {
-                        model.holidayShift = shift
+                        model.choose(shift)
                         closePanel()
                     }
                 }

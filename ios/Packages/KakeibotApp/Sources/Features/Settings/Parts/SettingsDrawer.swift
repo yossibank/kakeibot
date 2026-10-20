@@ -47,6 +47,7 @@ struct SettingsDrawer<Content: View>: View {
                 }
                 .ignoresSafeArea(edges: .bottom)
         }
+        .geometryGroup()
     }
 }
 

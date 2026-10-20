@@ -18,6 +18,7 @@ public final class RecordsModel: ScreenModel {
     public private(set) var noSpendDays: Set<LocalDate> = []
     public private(set) var stampCalendar: StampCalendar?
     public private(set) var stampShelf: IconShelf?
+    public private(set) var recurrings: [Recurring] = []
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -80,6 +81,22 @@ public extension RecordsModel {
             .compactMap { stampShelf.icons[$0.iconId] }
     }
 
+    func upcomingRecurrings(on date: LocalDate) -> [Recurring] {
+        guard date > today else {
+            return []
+        }
+
+        return recurrings.filter { recurring in
+            !recurring.dates(from: date, through: date).isEmpty
+        }
+    }
+
+    func title(of recurring: Recurring) -> String {
+        let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
+        let category = recurring.categoryId.flatMap { list?.categories[$0] }
+        return memo ?? category?.name ?? Self.recurringTitle
+    }
+
     func stampIcon(on date: LocalDate) -> Icon? {
         stampCalendar?.icon(on: date)
     }
@@ -133,6 +150,10 @@ public extension RecordsModel {
 
             group.addTask {
                 await self.observeStampShelf()
+            }
+
+            group.addTask {
+                await self.observeRecurrings()
             }
 
             group.addTask {
@@ -191,6 +212,7 @@ public extension RecordsModel {
     func load() async {
         do {
             list = try await database.entryList()
+            recurrings = try await database.recurrings()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
@@ -200,6 +222,7 @@ public extension RecordsModel {
 private extension RecordsModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
+    static let recurringTitle = "固定費"
 
     func observe() async {
         await observe(
@@ -234,6 +257,15 @@ private extension RecordsModel {
             failure: Self.loadFailedMessage
         ) { shelf in
             stampShelf = shelf
+        }
+    }
+
+    func observeRecurrings() async {
+        await observe(
+            database.recurringUpdates(),
+            failure: Self.loadFailedMessage
+        ) { recurrings in
+            self.recurrings = recurrings
         }
     }
 

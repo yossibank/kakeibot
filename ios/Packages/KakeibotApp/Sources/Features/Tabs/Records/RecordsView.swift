@@ -164,7 +164,13 @@ private extension RecordsView {
                 ForEach(model.rows(for: day)) { row in
                     swipeRow(row)
                 }
-            } else {
+            }
+
+            let upcoming = model.upcomingRecurrings(on: date)
+
+            if !upcoming.isEmpty {
+                upcomingList(upcoming)
+            } else if day == nil {
                 Text("この日の記録はありません")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
@@ -298,6 +304,10 @@ private extension RecordsView {
                 Image(systemName: "leaf.fill")
                     .font(.sans(.micro))
                     .foregroundStyle(Palette.accent)
+            } else if !model.upcomingRecurrings(on: date).isEmpty {
+                Image(systemName: "repeat")
+                    .font(.sans(.micro))
+                    .foregroundStyle(Palette.hint)
             }
 
             if income > 0 {
@@ -314,6 +324,37 @@ private extension RecordsView {
             .textFont(size: .micro)
             .lineLimit(1)
             .minimumScaleFactor(0.6)
+    }
+
+    func upcomingList(_ recurrings: [Recurring]) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("予定の固定費")
+                .textFont(.caption2)
+                .tracking(2)
+                .foregroundStyle(Palette.hint)
+                .padding(.bottom, 4)
+
+            ForEach(recurrings, id: \.id) { recurring in
+                HStack(spacing: 10) {
+                    Image(systemName: "repeat")
+                        .font(.sans(.small, weight: .light))
+                        .foregroundStyle(Palette.hint)
+
+                    Text(model.title(of: recurring))
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.subtext)
+
+                    Spacer()
+
+                    AmountText(recurring.amount, type: recurring.type)
+                        .textFont(.subheadline)
+                        .opacity(0.6)
+                }
+                .padding(.vertical, 8)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.bottom, 8)
     }
 
     func noSpendButton(_ date: LocalDate) -> some View {

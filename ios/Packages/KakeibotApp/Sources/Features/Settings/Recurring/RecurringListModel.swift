@@ -220,6 +220,7 @@ private extension RecurringListModel {
             day: recurring.day
         )
 
+        let holiday = RecurringText.holidayNote(recurring.holidayShift)
         let destination = recurring.toWalletId.flatMap { list.wallets[$0] }
 
         let route = [wallet?.name, destination?.name]
@@ -235,7 +236,7 @@ private extension RecurringListModel {
         return Row(
             id: recurring.id,
             title: memo ?? category?.name ?? Self.title(of: recurring.type),
-            detail: [schedule, place].rowDetail ?? "",
+            detail: [schedule, holiday, place].rowDetail ?? "",
             amount: recurring.amount,
             type: recurring.type,
             icon: iconId.flatMap { list.icons[$0] },
