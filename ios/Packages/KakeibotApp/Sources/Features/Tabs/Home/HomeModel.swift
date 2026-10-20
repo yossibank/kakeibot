@@ -38,9 +38,10 @@ public extension HomeModel {
         public let templates: [EntryTemplate]
     }
 
-    struct UpcomingRecurring: Hashable {
+    struct PeriodRecurring: Hashable {
         public let date: LocalDate
         public let recurring: Recurring
+        public let isDone: Bool
     }
 
     static let recentLimit = 5
@@ -65,25 +66,26 @@ public extension HomeModel {
         recurrings.total(of: .expense, in: period)
     }
 
-    var upcomingRecurrings: [UpcomingRecurring] {
-        let tomorrow = today.adding(days: 1)
-
-        guard tomorrow <= period.upperBound else {
-            return []
-        }
-
-        return recurrings
-            .filter { $0.type == .expense }
+    var periodRecurrings: [PeriodRecurring] {
+        recurrings
             .flatMap { recurring in
                 recurring
-                    .dates(from: tomorrow, through: period.upperBound)
-                    .map { UpcomingRecurring(date: $0, recurring: recurring) }
+                    .dates(from: period.lowerBound, through: period.upperBound)
+                    .map { date in
+                        PeriodRecurring(
+                            date: date,
+                            recurring: recurring,
+                            isDone: date <= today
+                        )
+                    }
             }
             .sorted { $0.date < $1.date }
     }
 
     var upcomingRecurringExpense: Int {
-        upcomingRecurrings.reduce(0) { $0 + $1.recurring.amount }
+        periodRecurrings
+            .filter { !$0.isDone && $0.recurring.type == .expense }
+            .reduce(0) { $0 + $1.recurring.amount }
     }
 
     var monthIncome: Int {

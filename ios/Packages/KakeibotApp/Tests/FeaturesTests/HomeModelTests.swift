@@ -36,7 +36,8 @@ struct HomeModelTests {
 
         #expect(model.recurringExpense == 82800)
         #expect(model.upcomingRecurringExpense == 78000)
-        #expect(model.upcomingRecurrings.map(\.date.day) == [27])
+        #expect(model.periodRecurrings.map(\.date.day) == [5, 27])
+        #expect(model.periodRecurrings.map(\.isDone) == [true, false])
     }
 
     @Test

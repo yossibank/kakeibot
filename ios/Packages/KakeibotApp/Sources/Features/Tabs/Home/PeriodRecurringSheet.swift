@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-public struct UpcomingRecurringSheet: View {
+public struct PeriodRecurringSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     private let model: HomeModel
@@ -27,7 +27,7 @@ public struct UpcomingRecurringSheet: View {
                 VStack(alignment: .leading, spacing: 8) {
                     SectionTitle(model.monthRangeText)
 
-                    ForEach(model.upcomingRecurrings, id: \.self) { item in
+                    ForEach(model.periodRecurrings, id: \.self) { item in
                         Button {
                             onOpenRecurring(item.recurring.id)
                         } label: {
@@ -36,7 +36,7 @@ public struct UpcomingRecurringSheet: View {
                         .buttonStyle(.plain)
                     }
 
-                    totalRow
+                    totals
                 }
                 .padding(.vertical, 8)
             }
@@ -55,7 +55,7 @@ public struct UpcomingRecurringSheet: View {
     }
 }
 
-private extension UpcomingRecurringSheet {
+private extension PeriodRecurringSheet {
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
@@ -64,7 +64,7 @@ private extension UpcomingRecurringSheet {
 
             Spacer()
 
-            Text("これからの固定費")
+            Text("今月の固定費")
                 .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
@@ -77,28 +77,38 @@ private extension UpcomingRecurringSheet {
         }
     }
 
-    var totalRow: some View {
-        HStack {
-            Text("合計")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-
-            Spacer()
-
-            AmountText(model.upcomingRecurringExpense, type: .expense)
-                .textFont(.subheadline)
+    var totals: some View {
+        VStack(spacing: 6) {
+            totalRow("支出の合計", amount: model.recurringExpense)
+            totalRow("これから", amount: model.upcomingRecurringExpense)
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
     }
 
-    func row(_ item: HomeModel.UpcomingRecurring) -> some View {
+    func totalRow(
+        _ title: String,
+        amount: Int
+    ) -> some View {
+        HStack {
+            Text(title)
+                .textFont(.footnote)
+                .foregroundStyle(Palette.subtext)
+
+            Spacer()
+
+            AmountText(amount, type: .expense)
+                .textFont(.subheadline)
+        }
+    }
+
+    func row(_ item: HomeModel.PeriodRecurring) -> some View {
         HStack(spacing: 12) {
-            Text("\(item.date.month)/\(item.date.day)")
+            Text(Self.dateText(item.date))
                 .textFont(.subheadline)
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)
-                .frame(width: 48, alignment: .leading)
+                .frame(width: 76, alignment: .leading)
 
             Text(model.title(of: item.recurring))
                 .textFont(.subheadline)
@@ -116,6 +126,17 @@ private extension UpcomingRecurringSheet {
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
         .card()
+        .opacity(Self.opacity(isDone: item.isDone))
         .contentShape(.rect)
+    }
+}
+
+private extension PeriodRecurringSheet {
+    static func dateText(_ date: LocalDate) -> String {
+        "\(date.month)/\(date.day)（\(date.weekday.shortName)）"
+    }
+
+    static func opacity(isDone: Bool) -> Double {
+        isDone ? 0.45 : 1
     }
 }

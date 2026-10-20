@@ -102,9 +102,7 @@ struct MainView: View {
                         }
                     },
                     onOpenRecurrings: {
-                        sheet = home.upcomingRecurrings.isEmpty
-                            ? .recurrings
-                            : .upcomingRecurrings
+                        sheet = .periodRecurrings
                     }
                 )
                 .tabContent()
@@ -284,8 +282,8 @@ private extension MainView {
                     editing: id
                 )
             )
-        case .upcomingRecurrings:
-            UpcomingRecurringSheet(
+        case .periodRecurrings:
+            PeriodRecurringSheet(
                 model: home,
                 onOpenRecurring: { id in
                     self.sheet = .recurring(id)
@@ -333,7 +331,7 @@ private extension MainView {
         case wallet(Wallet.ID)
         case recurring(Recurring.ID)
         case recurrings
-        case upcomingRecurrings
+        case periodRecurrings
 
         var id: Self {
             self
