@@ -7,16 +7,13 @@ public struct PeriodRecurringSheet: View {
 
     private let model: HomeModel
     private let onOpenRecurring: (Recurring.ID) -> Void
-    private let onOpenAll: () -> Void
 
     public init(
         model: HomeModel,
-        onOpenRecurring: @escaping (Recurring.ID) -> Void,
-        onOpenAll: @escaping () -> Void
+        onOpenRecurring: @escaping (Recurring.ID) -> Void
     ) {
         self.model = model
         self.onOpenRecurring = onOpenRecurring
-        self.onOpenAll = onOpenAll
     }
 
     public var body: some View {
@@ -24,19 +21,9 @@ public struct PeriodRecurringSheet: View {
             header
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 8) {
-                    SectionTitle(model.monthRangeText)
-
-                    ForEach(model.periodRecurrings, id: \.self) { item in
-                        Button {
-                            onOpenRecurring(item.recurring.id)
-                        } label: {
-                            row(item)
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    totals
+                VStack(spacing: 14) {
+                    summaryCard
+                    timelineCard
                 }
                 .padding(.vertical, 8)
             }
@@ -57,86 +44,249 @@ public struct PeriodRecurringSheet: View {
 
 private extension PeriodRecurringSheet {
     var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                dismiss()
-            }
-
-            Spacer()
-
+        ZStack {
             Text("今月の固定費")
                 .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
-            Spacer()
+            HStack {
+                RingButton(systemImage: "xmark") {
+                    dismiss()
+                }
 
-            RingButton(systemImage: "list.bullet", label: "すべて") {
-                onOpenAll()
+                Spacer()
             }
         }
     }
 
-    var totals: some View {
-        VStack(spacing: 6) {
-            totalRow("支出の合計", amount: model.recurringExpense)
-            totalRow("これから", amount: model.upcomingRecurringExpense)
+    var summaryCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text(model.monthRangeText)
+                .textFont(.caption2)
+                .tracking(2)
+                .foregroundStyle(Palette.accent)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("これから出ていく")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+
+                Text(AmountText.text(model.upcomingRecurringExpense))
+                    .displayFont(.largeTitle, weight: .bold)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+            }
+
+            progressBar
+
+            HStack(spacing: 0) {
+                stat(
+                    "支払った",
+                    amount: model.paidRecurringExpense,
+                    type: .expense
+                )
+
+                divider
+
+                stat(
+                    "支出の合計",
+                    amount: model.recurringExpense,
+                    type: .expense
+                )
+
+                divider
+
+                stat(
+                    "収入の合計",
+                    amount: model.recurringIncome,
+                    type: .income
+                )
+            }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
     }
 
-    func totalRow(
+    var progressBar: some View {
+        GeometryReader { proxy in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Palette.faint)
+
+                Capsule()
+                    .fill(Palette.accent)
+                    .frame(width: proxy.size.width * paidRatio)
+            }
+        }
+        .frame(height: 6)
+    }
+
+    var divider: some View {
+        Rectangle()
+            .fill(Palette.hairline)
+            .frame(width: 1, height: 28)
+    }
+
+    var timelineCard: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(items.enumerated()), id: \.element) { index, item in
+                if index == todayIndex {
+                    todayMarker
+                }
+
+                Button {
+                    onOpenRecurring(item.recurring.id)
+                } label: {
+                    row(item)
+                }
+                .buttonStyle(.plain)
+            }
+
+            if todayIndex == items.count {
+                todayMarker
+            }
+        }
+        .padding(.vertical, 6)
+        .card()
+    }
+
+    var todayMarker: some View {
+        HStack(spacing: 8) {
+            Rectangle()
+                .fill(Palette.accent.opacity(.muted))
+                .frame(height: 1)
+
+            Text("今日 \(model.today.month)/\(model.today.day)")
+                .textFont(.caption2)
+                .tracking(1)
+                .foregroundStyle(Palette.accent)
+
+            Rectangle()
+                .fill(Palette.accent.opacity(.muted))
+                .frame(height: 1)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+    }
+
+    func stat(
         _ title: String,
-        amount: Int
+        amount: Int,
+        type: Entry.Kind
     ) -> some View {
-        HStack {
+        VStack(spacing: 4) {
             Text(title)
-                .textFont(.footnote)
+                .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
-            Spacer()
-
-            AmountText(amount, type: .expense)
+            AmountText(amount, type: type)
                 .textFont(.subheadline)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
+        .frame(maxWidth: .infinity)
     }
 
     func row(_ item: HomeModel.PeriodRecurring) -> some View {
         HStack(spacing: 12) {
-            Text(Self.dateText(item.date))
-                .textFont(.subheadline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-                .frame(width: 76, alignment: .leading)
+            VStack(spacing: 0) {
+                Text("\(item.date.day)")
+                    .displayFont(.headline)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.text)
 
-            Text(model.title(of: item.recurring))
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
+                Text(item.date.weekday.shortName)
+                    .textFont(.caption2)
+                    .foregroundStyle(Self.weekdayTint(item.date))
+            }
+            .frame(width: 30)
 
-            Spacer()
+            IconBadge(model.icon(of: item.recurring), size: 36)
 
-            AmountText(item.recurring.amount, type: item.recurring.type)
-                .textFont(.subheadline)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(model.title(of: item.recurring))
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
 
-            Image(systemName: "chevron.right")
-                .font(.footnote)
-                .foregroundStyle(Palette.hint)
+                if let place = model.place(of: item.recurring) {
+                    Text(place)
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer(minLength: 8)
+
+            VStack(alignment: .trailing, spacing: 3) {
+                AmountText(item.amount, type: item.recurring.type)
+                    .textFont(.subheadline)
+
+                statusLabel(item)
+            }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .card()
-        .opacity(Self.opacity(isDone: item.isDone))
+        .padding(.vertical, 12)
+        .opacity(Self.opacity(of: item.status))
         .contentShape(.rect)
+    }
+
+    @ViewBuilder
+    func statusLabel(_ item: HomeModel.PeriodRecurring) -> some View {
+        switch item.status {
+        case .done:
+            Label("済み", systemImage: "checkmark")
+                .textFont(.caption2)
+                .foregroundStyle(Palette.subtext)
+        case .upcoming:
+            Text(daysText(until: item.date))
+                .textFont(.caption2)
+                .foregroundStyle(Palette.accent)
+        case .missing:
+            Label("記録がありません", systemImage: "exclamationmark.circle")
+                .textFont(.caption2)
+                .foregroundStyle(Palette.amber)
+        }
     }
 }
 
 private extension PeriodRecurringSheet {
-    static func dateText(_ date: LocalDate) -> String {
-        "\(date.month)/\(date.day)（\(date.weekday.shortName)）"
+    var items: [HomeModel.PeriodRecurring] {
+        model.periodRecurrings
     }
 
-    static func opacity(isDone: Bool) -> Double {
-        isDone ? 0.45 : 1
+    var todayIndex: Int {
+        items.firstIndex { $0.date > model.today } ?? items.count
+    }
+
+    var paidRatio: CGFloat {
+        guard model.recurringExpense > 0 else {
+            return 0
+        }
+
+        let ratio = Double(model.paidRecurringExpense)
+            / Double(model.recurringExpense)
+        return CGFloat(min(ratio, 1))
+    }
+
+    static func weekdayTint(_ date: LocalDate) -> Color {
+        if Holiday.contains(date) {
+            return Palette.holiday
+        }
+
+        return date.weekday.tint ?? Palette.subtext
+    }
+
+    static func opacity(of status: HomeModel.Status) -> Double {
+        status == .done ? 0.5 : 1
+    }
+
+    func daysText(until date: LocalDate) -> String {
+        let days = model.today.days(until: date)
+        return days == 1 ? "明日" : "あと \(days) 日"
     }
 }

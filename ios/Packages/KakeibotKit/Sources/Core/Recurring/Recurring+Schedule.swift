@@ -1,4 +1,6 @@
 public extension Recurring {
+    static let sameDateMargin = 10
+
     func dates(
         from start: LocalDate,
         through end: LocalDate
@@ -26,6 +28,20 @@ public extension Recurring {
     func nextDate(onOrAfter date: LocalDate) -> LocalDate? {
         let horizon = date.adding(days: Self.searchDays)
         return dates(from: date, through: horizon).first
+    }
+
+    func isRecorded(
+        by entry: Entry,
+        on date: LocalDate
+    ) -> Bool {
+        guard
+            entry.recurringId == id,
+            let recordedDate = entry.recurringDate
+        else {
+            return false
+        }
+
+        return abs(date.days(until: recordedDate)) <= Self.sameDateMargin
     }
 }
 

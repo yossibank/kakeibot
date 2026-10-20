@@ -210,9 +210,6 @@ private extension RecurringListModel {
         for recurring: Recurring,
         in list: EntryList
     ) -> Row {
-        let category = recurring.categoryId.flatMap { list.categories[$0] }
-        let wallet = list.wallets[recurring.walletId]
-
         let schedule = RecurringText.schedule(
             recurring.frequency,
             month: recurring.month ?? recurring.startDate.month,
@@ -220,26 +217,15 @@ private extension RecurringListModel {
         )
 
         let holiday = RecurringText.holidayNote(recurring.holidayShift)
-        let destination = recurring.toWalletId.flatMap { list.wallets[$0] }
-
-        let route = [wallet?.name, destination?.name]
-            .compactMap(\.self)
-            .joined(separator: " → ")
-
-        let place = recurring.type == .transfer ? route : wallet?.name
-
-        let iconId = recurring.type == .transfer
-            ? wallet?.iconId
-            : category?.iconId
+        let place = list.place(of: recurring)
 
         return Row(
             id: recurring.id,
-            title: RecurringText.title(of: recurring, in: list)
-                ?? Self.title(of: recurring.type),
+            title: list.title(of: recurring) ?? Self.title(of: recurring.type),
             detail: [schedule, holiday, place].rowDetail ?? "",
             amount: recurring.amount,
             type: recurring.type,
-            icon: iconId.flatMap { list.icons[$0] },
+            icon: list.icon(of: recurring),
             next: recurring.nextDate(onOrAfter: today)
         )
     }

@@ -1,5 +1,4 @@
 import Core
-import Store
 
 enum RecurringText {}
 
@@ -40,15 +39,6 @@ extension RecurringText {
         case 1: "前日"
         case let days?: "\(days) 日前"
         }
-    }
-
-    static func title(
-        of recurring: Recurring,
-        in list: EntryList?
-    ) -> String? {
-        let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
-        let category = recurring.categoryId.flatMap { list?.categories[$0] }
-        return memo ?? category?.name
     }
 
     static func date(_ date: LocalDate) -> String {

@@ -287,20 +287,8 @@ private extension MainView {
                 model: home,
                 onOpenRecurring: { id in
                     self.sheet = .recurring(id)
-                },
-                onOpenAll: {
-                    self.sheet = .recurrings
                 }
             )
-        case .recurrings:
-            NavigationStack {
-                RecurringListView(
-                    model: RecurringListModel(
-                        database: database,
-                        today: today
-                    )
-                )
-            }
         case let .wallet(id):
             WalletEditSheet(
                 model: WalletEditModel(
@@ -330,7 +318,6 @@ private extension MainView {
         case transfer
         case wallet(Wallet.ID)
         case recurring(Recurring.ID)
-        case recurrings
         case periodRecurrings
 
         var id: Self {

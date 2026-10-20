@@ -92,7 +92,7 @@ public extension RecordsModel {
     }
 
     func title(of recurring: Recurring) -> String {
-        RecurringText.title(of: recurring, in: list) ?? Self.recurringTitle
+        list?.title(of: recurring) ?? Self.recurringTitle
     }
 
     func stampIcon(on date: LocalDate) -> Icon? {
