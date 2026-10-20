@@ -64,7 +64,7 @@ private extension BudgetKeypadLayer {
                             await model.clear()
                         }
                     }
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.rose)
                     .frame(minHeight: 36)
                 }

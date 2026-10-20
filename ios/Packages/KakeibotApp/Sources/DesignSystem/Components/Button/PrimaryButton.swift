@@ -17,7 +17,7 @@ public struct PrimaryButton: View {
     public var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.body.weight(.bold))
+                .textFont(.body, weight: .bold)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .foregroundStyle(textColor)

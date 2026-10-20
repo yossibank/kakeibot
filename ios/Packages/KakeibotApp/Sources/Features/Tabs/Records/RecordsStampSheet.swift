@@ -18,7 +18,7 @@ struct RecordsStampSheet: View {
 
             if choices.isEmpty {
                 Text("設定の「スタンプ」で作ると、ここから押せます")
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .frame(maxWidth: .infinity, minHeight: 120)
             } else {
@@ -39,7 +39,7 @@ struct RecordsStampSheet: View {
                     dismiss()
                 } label: {
                     Label("スタンプを外す", systemImage: "xmark.circle")
-                        .font(.subheadline)
+                        .textFont(.subheadline)
                         .foregroundStyle(Palette.rose)
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .contentShape(.rect)

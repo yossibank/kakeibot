@@ -18,7 +18,7 @@ struct EntryTemplateRow: View {
                     onAdd()
                 } label: {
                     Label("今の入力を保存", systemImage: "plus")
-                        .font(.sans(.caption))
+                        .textFont(size: .caption)
                         .foregroundStyle(Palette.accent)
                         .padding(.horizontal, 12)
                         .frame(height: Self.height)
@@ -63,7 +63,7 @@ private extension EntryTemplateRow {
                     .displayFont(.caption)
                     .foregroundStyle(amountColor)
             }
-            .font(.sans(.caption))
+            .textFont(size: .caption)
             .padding(.leading, 6)
             .padding(.trailing, 12)
             .frame(height: Self.height)

@@ -3,18 +3,19 @@ import SwiftUI
 
 struct SettingsField<Field: Hashable>: View {
     @Environment(\.themeStyle.corner) private var corner
+    @Environment(\.themeStyle.textFont) private var textFont
 
     @Binding private var text: String
 
     private let prompt: String
-    private let font: Font
+    private let font: Font?
     private let focus: FocusState<Field?>.Binding
     private let field: Field
 
     init(
         _ prompt: String,
         text: Binding<String>,
-        font: Font,
+        font: Font? = nil,
         focus: FocusState<Field?>.Binding,
         field: Field
     ) {
@@ -31,7 +32,7 @@ struct SettingsField<Field: Hashable>: View {
             text: $text,
             prompt: Text(prompt).foregroundStyle(Palette.hint)
         )
-        .font(font)
+        .font(font ?? .text(.body, in: textFont))
         .foregroundStyle(Palette.text)
         .tint(Palette.accent)
         .submitLabel(.done)

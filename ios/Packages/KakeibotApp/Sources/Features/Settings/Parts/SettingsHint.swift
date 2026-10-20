@@ -117,7 +117,7 @@ private extension SettingsHint {
                 .background(Palette.accent.opacity(.subtle), in: Circle())
 
             Text(line.text)
-                .font(.footnote)
+                .textFont(.footnote)
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)

@@ -14,7 +14,7 @@ struct SettingsShowZone: View {
 
             Text("ここに置くと表示に戻ります")
         }
-        .font(.subheadline)
+        .textFont(.subheadline)
         .foregroundStyle(color)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {

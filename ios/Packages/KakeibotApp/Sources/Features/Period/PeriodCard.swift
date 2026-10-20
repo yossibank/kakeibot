@@ -9,7 +9,7 @@ struct PeriodCard: View {
     var body: some View {
         VStack(spacing: 6) {
             Text("いまの期間")
-                .font(.caption2)
+                .textFont(.caption2)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
 
@@ -20,7 +20,7 @@ struct PeriodCard: View {
                 .contentTransition(.numericText())
 
             Text("\(month.month)月として数えます")
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .contentTransition(.numericText())
         }

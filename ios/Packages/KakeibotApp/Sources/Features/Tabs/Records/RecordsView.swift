@@ -84,7 +84,7 @@ private extension RecordsView {
                     .contentTransition(monthTextTransition)
 
                 Text(model.periodText)
-                    .font(.sans(.caption))
+                    .textFont(size: .caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
                     .contentTransition(monthTextTransition)
@@ -103,7 +103,7 @@ private extension RecordsView {
             case .list:
                 if model.days.isEmpty {
                     Text("この月の記録はありません")
-                        .font(.footnote)
+                        .textFont(.footnote)
                         .foregroundStyle(Palette.subtext)
                         .padding(.vertical, 40)
                 }
@@ -128,7 +128,7 @@ private extension RecordsView {
                     id: \.self
                 ) { weekday in
                     Text(weekday.shortName)
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(weekday.tint ?? Palette.subtext)
                         .frame(maxWidth: .infinity, minHeight: 22)
                 }
@@ -166,7 +166,7 @@ private extension RecordsView {
                 }
             } else {
                 Text("この日の記録はありません")
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom, 12)
@@ -230,7 +230,7 @@ private extension RecordsView {
     ) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text(title)
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
 
             Text(AmountText.text(amount))
@@ -311,7 +311,7 @@ private extension RecordsView {
         type: Entry.Kind
     ) -> some View {
         AmountText(amount, type: type)
-            .font(.sans(.micro))
+            .textFont(size: .micro)
             .lineLimit(1)
             .minimumScaleFactor(0.6)
     }
@@ -335,7 +335,7 @@ private extension RecordsView {
     ) -> some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
-                .font(.footnote)
+                .textFont(.footnote)
                 .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .contentShape(.rect)
@@ -408,12 +408,12 @@ private extension RecordsView {
                     .foregroundStyle(Palette.accentStrong)
 
                 Text("（\(date.weekday.shortName)）")
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Self.weekdayColor(for: date))
 
                 if let holiday {
                     Text(holiday)
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(Palette.holiday)
                 }
 
@@ -461,7 +461,7 @@ private extension RecordsView {
                 AmountText(day.incomeTotal, type: .income)
             }
         }
-        .font(.caption)
+        .textFont(.caption)
         .lineLimit(1)
     }
 }

@@ -235,12 +235,12 @@ private extension WalletListView {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(wallet.name)
-                    .font(.subheadline)
+                    .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
 
                 Text(wallet.kind.title)
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .tracking(1)
                     .foregroundStyle(Palette.subtext)
             }

@@ -34,7 +34,7 @@ public struct NoticeBanner: View {
                 }
 
             Text(message)
-                .font(.footnote)
+                .textFont(.footnote)
                 .foregroundStyle(Palette.text)
                 .lineLimit(2)
 
@@ -43,7 +43,7 @@ public struct NoticeBanner: View {
             if let actionTitle, let action {
                 Button(action: action) {
                     Text(actionTitle)
-                        .font(.caption.weight(.semibold))
+                        .textFont(.caption, weight: .semibold)
                         .foregroundStyle(Palette.accent)
                         .padding(.horizontal, 14)
                         .frame(height: 34)

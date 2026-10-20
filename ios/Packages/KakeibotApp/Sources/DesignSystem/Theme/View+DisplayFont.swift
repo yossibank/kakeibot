@@ -10,7 +10,7 @@ public extension View {
 }
 
 private struct DisplayFont: ViewModifier {
-    @Environment(\.themeStyle.font) private var font
+    @Environment(\.themeStyle.displayFont) private var font
 
     let size: FontSize
     let weight: Font.Weight

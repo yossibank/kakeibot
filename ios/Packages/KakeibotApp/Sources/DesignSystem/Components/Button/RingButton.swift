@@ -35,7 +35,7 @@ public struct RingButton: View {
         .overlay(alignment: .bottom) {
             if let label {
                 Text(label)
-                    .font(.sans(.micro))
+                    .textFont(size: .micro)
                     .tracking(1)
                     .foregroundStyle(foreground)
                     .fixedSize()

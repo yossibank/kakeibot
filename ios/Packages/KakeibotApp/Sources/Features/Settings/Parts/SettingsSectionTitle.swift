@@ -10,7 +10,7 @@ struct SettingsSectionTitle: View {
 
     var body: some View {
         Text(title)
-            .font(.caption2)
+            .textFont(.caption2)
             .tracking(3)
             .foregroundStyle(Palette.accent)
     }

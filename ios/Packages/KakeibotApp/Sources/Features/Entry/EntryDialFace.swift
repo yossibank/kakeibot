@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct EntryDialFace: View {
-    @Environment(\.themeStyle.font) private var themeFont
+    @Environment(\.themeStyle.displayFont) private var themeFont
 
     let model: EntryModel
     let isActive: Bool
@@ -27,7 +27,7 @@ struct EntryDialFace: View {
                 .frame(width: size * 0.7, height: size * 0.26)
 
             Text(note)
-                .font(.caption2)
+                .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)

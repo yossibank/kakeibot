@@ -76,7 +76,6 @@ private extension CategoryEditSheet {
                     SettingsField(
                         "名前",
                         text: $model.name,
-                        font: .body,
                         focus: $focus,
                         field: .name
                     )
@@ -154,7 +153,7 @@ private extension CategoryEditSheet {
                     .foregroundStyle(Palette.accent)
 
                 Text(model.name.isEmpty ? "名前" : model.name)
-                    .font(.sans(.caption))
+                    .textFont(size: .caption)
                     .lineLimit(1)
             }
             .foregroundStyle(Palette.accentStrong)
@@ -179,7 +178,7 @@ private extension CategoryEditSheet {
                     Text("振り返りのグラフの色")
                 }
             }
-            .font(.caption2)
+            .textFont(.caption2)
             .foregroundStyle(Palette.subtext)
         }
     }
@@ -193,7 +192,7 @@ private extension CategoryEditSheet {
 
                 if model.tags.count > 1 {
                     Text("長押しで並べ替え")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                 }
             }

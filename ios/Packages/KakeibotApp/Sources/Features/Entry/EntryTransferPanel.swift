@@ -50,7 +50,7 @@ private extension EntryTransferPanel {
         } label: {
             VStack(spacing: 10) {
                 Text(title(role))
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .tracking(3)
                     .foregroundStyle(Palette.accent)
 
@@ -58,20 +58,20 @@ private extension EntryTransferPanel {
                     .foregroundStyle(Palette.accent)
 
                 Text(wallet?.name ?? "選ぶ")
-                    .font(.subheadline)
+                    .textFont(.subheadline)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
 
                 if let balance = wallet.flatMap({ model.balance(of: $0) }) {
                     VStack(spacing: 2) {
                         Text("残高 \(AmountText.text(balance))")
-                            .font(.caption2)
+                            .textFont(.caption2)
                             .monospacedDigit()
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
 
                         Text("残高を超えています")
-                            .font(.caption2)
+                            .textFont(.caption2)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
                             .opacity(overOpacity)

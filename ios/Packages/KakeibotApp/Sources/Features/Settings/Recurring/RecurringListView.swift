@@ -44,7 +44,7 @@ public struct RecurringListView: View {
 
                     if model.rows.isEmpty {
                         Text("家賃や給料などを足すと、ここに並びます")
-                            .font(.footnote)
+                            .textFont(.footnote)
                             .foregroundStyle(Palette.subtext)
                             .padding(.vertical, 40)
                     }
@@ -206,7 +206,7 @@ private extension RecurringListView {
     ) -> some View {
         VStack(spacing: 4) {
             Text(title)
-                .font(.caption2)
+                .textFont(.caption2)
                 .tracking(2)
                 .foregroundStyle(Palette.accent)
 
@@ -260,12 +260,12 @@ private extension RecurringListView {
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(row.title)
-                        .font(.subheadline)
+                        .textFont(.subheadline)
                         .foregroundStyle(Palette.text)
                         .lineLimit(1)
 
                     Text(row.detail)
-                        .font(.caption)
+                        .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
                 }
@@ -277,11 +277,11 @@ private extension RecurringListView {
 
                     if isPaused {
                         Label("止めています", systemImage: "pause.circle")
-                            .font(.caption2)
+                            .textFont(.caption2)
                             .foregroundStyle(Palette.amber)
                     } else {
                         Text(Self.nextText(row.next))
-                            .font(.caption2)
+                            .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
                     }
                 }

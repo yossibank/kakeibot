@@ -41,7 +41,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                         : Palette.subtext
 
                     Text(option.title)
-                        .font(.footnote.weight(weight))
+                        .textFont(.footnote, weight: weight)
                         .foregroundStyle(color)
                         .frame(
                             width: Self.segmentWidth,

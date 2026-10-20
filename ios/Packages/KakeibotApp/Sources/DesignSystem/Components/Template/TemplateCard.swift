@@ -2,6 +2,8 @@ import Core
 import SwiftUI
 
 public struct TemplateCard<Name: View, Amount: View>: View {
+    @Environment(\.themeStyle.textFont) private var textFont
+
     let icon: Icon?
     let detail: String
     let size: TemplateCardSize
@@ -32,7 +34,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
                         .lineLimit(size.nameLines)
 
                     Text(detail)
-                        .font(size.detailFont)
+                        .font(size.detailFont(in: textFont))
                         .tracking(1)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)

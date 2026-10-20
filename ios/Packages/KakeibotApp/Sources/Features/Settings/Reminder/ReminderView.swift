@@ -106,7 +106,7 @@ private extension ReminderView {
 
             VStack(spacing: 6) {
                 Text("記録忘れの通知")
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .tracking(3)
                     .foregroundStyle(Palette.accent)
 
@@ -117,7 +117,7 @@ private extension ReminderView {
                     .contentTransition(.numericText())
 
                 Text(summaryText)
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .multilineTextAlignment(.center)
             }
@@ -133,18 +133,18 @@ private extension ReminderView {
     var deniedCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             Label("通知が許可されていません", systemImage: "bell.slash")
-                .font(.subheadline.weight(.semibold))
+                .textFont(.subheadline, weight: .semibold)
                 .foregroundStyle(Palette.rose)
 
             Text("設定アプリで Kakeibot の通知を許可すると届きます")
-                .font(.caption)
+                .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
 
             Button {
                 openSettings()
             } label: {
                 Text("設定アプリを開く")
-                    .font(.footnote.weight(.semibold))
+                    .textFont(.footnote, weight: .semibold)
                     .foregroundStyle(Palette.accentStrong)
                     .frame(maxWidth: .infinity, minHeight: 40)
                     .background(Palette.rose.opacity(.subtle), in: Capsule())
@@ -221,23 +221,23 @@ private extension ReminderView {
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         Text("Kakeibot")
-                            .font(.caption2)
+                            .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
 
                         Spacer()
 
                         Text(timeText)
-                            .font(.caption2)
+                            .textFont(.caption2)
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
                     }
 
                     Text(NotificationPlan.reminderTitle)
-                        .font(.subheadline.weight(.semibold))
+                        .textFont(.subheadline, weight: .semibold)
                         .foregroundStyle(Palette.text)
 
                     Text(NotificationPlan.reminderBody)
-                        .font(.footnote)
+                        .textFont(.footnote)
                         .foregroundStyle(Palette.text.opacity(.strong))
                 }
             }
@@ -249,7 +249,7 @@ private extension ReminderView {
             }
 
             Text("記録か「支出なし」の印がある日は届きません")
-                .font(.caption2)
+                .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
                 .padding(.leading, 6)
         }
@@ -267,7 +267,7 @@ private extension ReminderView {
                     .background(Palette.accent.opacity(.subtle), in: Circle())
 
                 Text(recurringText)
-                    .font(.footnote)
+                    .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -290,18 +290,18 @@ private extension ReminderView {
     func noticeRow(_ notice: PlannedNotification) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text("\(notice.date.month)/\(notice.date.day) \(notice.time)")
-                .font(.caption)
+                .textFont(.caption)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accent)
                 .frame(width: 84, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(notice.title)
-                    .font(.subheadline)
+                    .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
 
                 Text(notice.body)
-                    .font(.caption)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
             }
 

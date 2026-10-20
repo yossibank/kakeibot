@@ -20,7 +20,7 @@ struct SettingsDrawer<Content: View>: View {
         VStack(spacing: 12) {
             HStack {
                 Text(title)
-                    .font(.caption2)
+                    .textFont(.caption2)
                     .tracking(3)
                     .foregroundStyle(Palette.accent)
 

@@ -22,9 +22,15 @@ struct ThemeWriteTests {
 
         try await database.setSetting(.cornerStyle, to: .large)
         try await database.setSetting(.fontStyle, to: .rounded)
+        try await database.setSetting(.textFontStyle, to: .mincho)
         let style = try await database.style()
+        let expected = ThemeStyle(
+            corner: .large,
+            displayFont: .rounded,
+            textFont: .mincho
+        )
 
-        #expect(style == ThemeStyle(corner: .large, font: .rounded))
+        #expect(style == expected)
     }
 
     @Test

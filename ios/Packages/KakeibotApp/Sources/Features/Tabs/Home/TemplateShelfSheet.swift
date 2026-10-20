@@ -46,7 +46,7 @@ public struct TemplateShelfSheet: View {
 
                         if sections.isEmpty {
                             Text(emptyText)
-                                .font(.footnote)
+                                .textFont(.footnote)
                                 .foregroundStyle(Palette.subtext)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 40)
@@ -109,7 +109,7 @@ private extension TemplateShelfSheet {
                 text: $query,
                 prompt: Text("名前で探す").foregroundStyle(Palette.hint)
             )
-            .font(.subheadline)
+            .textFont(.subheadline)
             .foregroundStyle(Palette.text)
             .tint(Palette.accent)
             .submitLabel(.search)

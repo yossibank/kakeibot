@@ -33,7 +33,7 @@ struct ReviewShareSheet: View {
                 badge
 
                 Text(share.name)
-                    .font(.headline)
+                    .textFont(.headline)
                     .foregroundStyle(Palette.accentStrong)
 
                 Spacer()
