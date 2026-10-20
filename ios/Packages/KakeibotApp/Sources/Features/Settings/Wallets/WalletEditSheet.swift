@@ -8,6 +8,7 @@ public struct WalletEditSheet: View {
     @State private var isConfirmingDiscard = false
     @State private var isEnteringAmount = false
     @State private var isConfirmingHide = false
+    @State private var isEditingBill = false
 
     @FocusState private var focus: Field?
 
@@ -75,6 +76,13 @@ public struct WalletEditSheet: View {
         .onChange(of: model.kind) {
             focus = nil
         }
+        .sheet(isPresented: $isEditingBill) {
+            Task {
+                await model.loadCardBill()
+            }
+        } content: {
+            RecurringEditSheet(model: model.cardBillModel())
+        }
         .task {
             await model.load()
         }
@@ -102,6 +110,12 @@ private extension WalletEditSheet {
 
                     kindChooser
                     balanceField
+
+                    if model.showsCardBill {
+                        SettingsRowList(items: billItems) { _ in
+                            isEditingBill = true
+                        }
+                    }
 
                     IconEditor(
                         model: model.icon,
@@ -333,6 +347,10 @@ private extension WalletEditSheet {
         case text
     }
 
+    enum Panel: Hashable {
+        case bill
+    }
+
     static let fade: CGFloat = 16
 
     static let kindColumns = Array(
@@ -342,6 +360,18 @@ private extension WalletEditSheet {
 
     var title: String {
         model.isEditing ? "口座を編集" : "口座を追加"
+    }
+
+    var billItems: [SettingsRowList<Panel>.Item] {
+        [
+            .init(
+                panel: .bill,
+                systemImage: "creditcard",
+                title: "引き落とし",
+                value: model.cardBillText,
+                isEmpty: model.cardBill == nil
+            )
+        ]
     }
 
     var previewName: String {

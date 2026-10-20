@@ -157,31 +157,30 @@ private extension AssetsView {
             IconBadge(bill.icon, size: 34)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(bill.title)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
-                    .lineLimit(1)
+                HStack(alignment: .firstTextBaseline) {
+                    Text(bill.title)
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.text)
+                        .lineLimit(1)
 
-                if let route = bill.route {
-                    Text(route)
+                    Spacer(minLength: 8)
+
+                    AmountText(bill.amount, type: .transfer)
+                        .textFont(.subheadline)
+                }
+
+                if let period = bill.period {
+                    Text("\(RecurringText.period(period)) の利用分")
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
                 }
-            }
 
-            Spacer(minLength: 8)
-
-            VStack(alignment: .trailing, spacing: 3) {
-                AmountText(bill.amount, type: .transfer)
-                    .textFont(.subheadline)
-
-                if let period = bill.period {
-                    Text("\(RecurringText.period(period)) の利用分")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.hint)
-                        .lineLimit(1)
-                }
+                Text(balanceText(bill))
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(balanceColor(bill))
+                    .lineLimit(1)
             }
         }
         .padding(.vertical, 8)
@@ -226,6 +225,20 @@ private extension AssetsView {
         let change = model.changeFromLastMonth
         let sign = change > 0 ? "+" : ""
         return "先月末より \(sign)\(AmountText.text(change))"
+    }
+
+    func balanceText(_ bill: AssetsModel.UpcomingBill) -> String {
+        let amount = AmountText.text(bill.balanceAfter)
+
+        guard let source = bill.source else {
+            return "引き落とし後 \(amount)"
+        }
+
+        return "引き落とし後の\(source) \(amount)"
+    }
+
+    func balanceColor(_ bill: AssetsModel.UpcomingBill) -> Color {
+        bill.balanceAfter < 0 ? Palette.rose : Palette.hint
     }
 
     func monthColor(_ month: YearMonth) -> Color {

@@ -91,7 +91,6 @@ extension RecurringDraftTests {
         let month: Int
         let day: Int
         let closingDay: Int?
-        let paysAfterClosings: Int?
         let startDate: LocalDate
         let endDate: LocalDate?
         let remindDaysBefore: Int?
@@ -116,7 +115,6 @@ extension RecurringDraftTests {
                 month: month,
                 day: day,
                 closingDay: closingDay,
-                paysAfterClosings: paysAfterClosings ?? 1,
                 startDate: startDate,
                 endDate: endDate,
                 remindDaysBefore: remindDaysBefore

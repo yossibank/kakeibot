@@ -30,7 +30,8 @@ public extension RecurringListModel {
     struct Row: Identifiable {
         public let id: Recurring.ID
         public let title: String
-        public let detail: String
+        public let schedule: String
+        public let place: String?
         public let amount: Int
         public let type: Entry.Kind
         public let icon: Icon?
@@ -218,19 +219,15 @@ private extension RecurringListModel {
         )
 
         let holiday = RecurringText.holidayNote(recurring.holidayShift)
-        let closing = recurring.closingDay.map { day in
-            RecurringText.closingNote(
-                day,
-                paysAfter: recurring.paysAfterClosings
-            )
-        }
+        let closing = recurring.closingDay.map(RecurringText.closingNote)
         let place = list.place(of: recurring)
         let next = recurring.nextDate(onOrAfter: today)
 
         return Row(
             id: recurring.id,
             title: list.title(of: recurring) ?? Self.title(of: recurring.type),
-            detail: [schedule, holiday, place].rowDetail ?? "",
+            schedule: [schedule, holiday].rowDetail ?? schedule,
+            place: place,
             amount: list.amount(of: recurring, on: next ?? today),
             type: recurring.type,
             icon: list.icon(of: recurring),

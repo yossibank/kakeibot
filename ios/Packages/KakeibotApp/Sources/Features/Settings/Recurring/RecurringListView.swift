@@ -259,30 +259,41 @@ private extension RecurringListView {
                 IconBadge(row.icon, size: 38)
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(row.title)
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.text)
-                        .lineLimit(1)
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(row.title)
+                            .textFont(.subheadline)
+                            .foregroundStyle(Palette.text)
+                            .lineLimit(1)
 
-                    Text(row.detail)
+                        Spacer(minLength: 8)
+
+                        AmountText(row.amount, type: row.type)
+                    }
+
+                    Text(row.schedule)
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
-                }
 
-                Spacer(minLength: 8)
+                    HStack(alignment: .firstTextBaseline) {
+                        if let place = row.place {
+                            Text(place)
+                                .textFont(.caption)
+                                .foregroundStyle(Palette.subtext)
+                                .lineLimit(1)
+                        }
 
-                VStack(alignment: .trailing, spacing: 3) {
-                    AmountText(row.amount, type: row.type)
+                        Spacer(minLength: 8)
 
-                    if isPaused {
-                        Label("止めています", systemImage: "pause.circle")
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.amber)
-                    } else {
-                        Text(Self.nextText(row))
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
+                        if isPaused {
+                            Label("止めています", systemImage: "pause.circle")
+                                .textFont(.caption2)
+                                .foregroundStyle(Palette.amber)
+                        } else {
+                            Text(Self.nextText(row))
+                                .textFont(.caption2)
+                                .foregroundStyle(Palette.subtext)
+                        }
                     }
                 }
             }
@@ -306,7 +317,7 @@ private extension RecurringListView {
         case edit(Recurring.ID)
     }
 
-    static let rowHeight: CGFloat = 64
+    static let rowHeight: CGFloat = 84
     static let spacing: CGFloat = 10
     nonisolated static let space = "RecurringBoard"
     nonisolated static let listSpace = "RecurringList"

@@ -57,6 +57,39 @@ struct RecurringModelTests {
     }
 
     @Test
+    func presetsCardBillFromCard() async throws {
+        let setup = try await RecordsModelTests.Setup()
+
+        let card = try await setup.database.saveWallet(
+            WalletDraft(
+                kind: .card,
+                name: "カード",
+                mark: .glyph(.card),
+                color: "#4A6FA5",
+                initialBalance: 0
+            ),
+            at: Date()
+        )
+
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today,
+            billing: card.id
+        )
+
+        await model.load()
+
+        #expect(model.type == .transfer)
+        #expect(model.toWalletId == card.id)
+        #expect(model.selectedWallet?.kind == .bank)
+        #expect(model.isCardBill)
+        #expect(model.closingDay == 31)
+        #expect(model.day == 27)
+        #expect(model.memo == "カード")
+        #expect(model.canSave)
+    }
+
+    @Test
     func savesTransferBetweenWallets() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
@@ -158,7 +191,8 @@ struct RecurringModelTests {
         let row = try #require(model.rows.first)
 
         #expect(row.title == "家賃")
-        #expect(row.detail == "毎月 27 日・財布")
+        #expect(row.schedule == "毎月 27 日")
+        #expect(row.place == "財布")
         #expect(row.next?.description == "2026-10-27")
         #expect(model.monthTotal.expense == 78000)
         #expect(model.monthTotal.income == 0)

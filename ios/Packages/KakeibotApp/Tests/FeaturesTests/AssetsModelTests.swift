@@ -86,6 +86,8 @@ struct AssetsModelTests {
         #expect(bill.amount == 42000)
         #expect(bill.period == from...through)
         #expect(model.upcomingBillTotal == 42000)
+        #expect(bill.source == "銀行")
+        #expect(bill.balanceAfter == -42000)
     }
 }
 

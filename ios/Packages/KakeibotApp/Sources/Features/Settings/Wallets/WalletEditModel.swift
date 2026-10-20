@@ -19,6 +19,7 @@ public final class WalletEditModel {
     public private(set) var calculator = AmountCalculator()
     public private(set) var balance = 0
     public private(set) var isHidden = false
+    public private(set) var cardBill: Recurring?
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -76,6 +77,25 @@ public extension WalletEditModel {
         )
     }
 
+    var showsCardBill: Bool {
+        isEditing && kind == .card
+    }
+
+    var cardBillText: String {
+        guard let cardBill else {
+            return "決めていません"
+        }
+
+        let schedule = RecurringText.schedule(
+            cardBill.frequency,
+            month: cardBill.month ?? cardBill.startDate.month,
+            day: cardBill.day
+        )
+
+        let closing = cardBill.closingDay.map(RecurringText.closingNote)
+        return [schedule, closing].compactMap(\.self).joined(separator: "・")
+    }
+
     var needsHideConfirmation: Bool {
         !isHidden && balance != 0
     }
@@ -113,9 +133,35 @@ public extension WalletEditModel {
             balance = wallet.balance(with: list.days.flatMap(\.entries))
             isHidden = wallet.archivedAt != nil
             baseline = draft
+            await loadCardBill()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
+    }
+
+    func loadCardBill() async {
+        guard let editingId else {
+            return
+        }
+
+        do {
+            cardBill = try await database.recurrings().first { recurring in
+                recurring.type == .transfer && recurring.toWalletId == editingId
+            }
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
+    }
+
+    func cardBillModel() -> RecurringEditModel {
+        let today = LocalDate(Date(), in: .current)
+
+        return RecurringEditModel(
+            database: database,
+            today: today,
+            editing: cardBill?.id,
+            billing: editingId
+        )
     }
 
     func save() async -> Wallet? {
