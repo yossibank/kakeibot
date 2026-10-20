@@ -207,6 +207,18 @@ public struct SettingsSheet: View {
                                 Hairline()
 
                                 NavigationLink {
+                                    AppIconListView(model: appIcon)
+                                } label: {
+                                    row(
+                                        "アプリアイコン",
+                                        systemImage: "app.badge",
+                                        value: appIcon.current.title
+                                    )
+                                }
+
+                                Hairline()
+
+                                NavigationLink {
                                     ThemeStyleView(
                                         model: ThemeStyleModel(
                                             database: database
@@ -217,18 +229,6 @@ public struct SettingsSheet: View {
                                         "角の丸みと字体",
                                         systemImage: "textformat",
                                         value: themeStyle.title
-                                    )
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    AppIconListView(model: appIcon)
-                                } label: {
-                                    row(
-                                        "アプリアイコン",
-                                        systemImage: "app.badge",
-                                        value: appIcon.current.title
                                     )
                                 }
                             }
