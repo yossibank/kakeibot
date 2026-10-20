@@ -5,6 +5,9 @@ import SwiftUI
 struct IconEditor<Field: Hashable>: View {
     @Bindable var model: IconEditModel
 
+    @Environment(\.themeStyle.font) private var themeFont
+    @Environment(\.themeStyle.corner) private var corner
+
     var focus: FocusState<Field?>.Binding
 
     let textField: Field
@@ -101,7 +104,7 @@ private extension IconEditor {
             SettingsField(
                 "3 文字まで",
                 text: textBinding,
-                font: .serif(.headline),
+                font: .display(.headline, in: themeFont),
                 focus: focus,
                 field: textField
             )
@@ -125,10 +128,10 @@ private extension IconEditor {
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(
                     Self.tileFill(isSelected: isSelected),
-                    in: .rect(cornerRadius: 12)
+                    in: .rect(cornerRadius: corner.radius(12))
                 )
                 .overlay {
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: corner.radius(12))
                         .stroke(
                             Self.tileStroke(isSelected: isSelected),
                             lineWidth: 1
@@ -150,10 +153,10 @@ private extension IconEditor {
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(
                     Self.tileFill(isSelected: isSelected),
-                    in: .rect(cornerRadius: 12)
+                    in: .rect(cornerRadius: corner.radius(12))
                 )
                 .overlay {
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: corner.radius(12))
                         .stroke(
                             Self.tileStroke(isSelected: isSelected),
                             lineWidth: 1

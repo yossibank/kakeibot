@@ -11,6 +11,8 @@ public struct TemplateEditSheet: View {
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
+    @Environment(\.themeStyle.font) private var themeFont
 
     let onSave: (EntryTemplate) -> Void
 
@@ -132,7 +134,7 @@ private extension TemplateEditSheet {
             Spacer()
 
             Text(title)
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -199,7 +201,7 @@ private extension TemplateEditSheet {
                 text: $model.name,
                 prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
             )
-            .font(TemplateCardSize.large.nameFont)
+            .font(TemplateCardSize.large.nameFont(in: themeFont))
             .foregroundStyle(Palette.accentStrong)
             .tint(Palette.accent)
             .submitLabel(.done)
@@ -253,7 +255,7 @@ private extension TemplateEditSheet {
                     .foregroundStyle(Palette.text)
 
                 Text(capsuleAmount)
-                    .font(.serif(.caption))
+                    .displayFont(.caption)
                     .foregroundStyle(Palette.accentStrong)
             }
             .font(.sans(.caption))
@@ -297,9 +299,9 @@ private extension TemplateEditSheet {
             .focused($focus, equals: .memo)
         }
         .padding(14)
-        .background(Palette.panel, in: .rect(cornerRadius: 20))
+        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(20)))
         .overlay {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: corner.radius(20))
                 .stroke(Palette.outline, lineWidth: 1)
         }
         .shadow(color: Palette.shadow.opacity(0.45), radius: 20, y: 10)

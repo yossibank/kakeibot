@@ -1,13 +1,10 @@
 public enum ThemePreset: String, CaseIterable, Codable, Sendable {
     case navy
     case black
-    case midnight
     case forest
     case teal
     case wine
     case plum
-    case silver
-    case copper
     case ivory
     case white
     case sky
@@ -21,13 +18,10 @@ public extension ThemePreset {
         switch self {
         case .navy: "ネイビー"
         case .black: "ブラック"
-        case .midnight: "ミッドナイト"
         case .forest: "フォレスト"
         case .teal: "ティール"
         case .wine: "ワイン"
         case .plum: "プラム"
-        case .silver: "シルバー"
-        case .copper: "カッパー"
         case .ivory: "アイボリー"
         case .white: "ホワイト"
         case .sky: "スカイ"
@@ -55,21 +49,6 @@ public extension ThemePreset {
                 text: 0xEDE6D6,
                 subtext: 0x9A9CA3,
                 hint: 0x878A92
-            )
-        case .midnight:
-            ThemePalette(
-                backgroundTop: 0x16223D,
-                backgroundBottom: 0x080C16,
-                panel: 0x0E1628,
-                cardTop: 0x141C2F,
-                cardBottom: 0x090D18,
-                line: 0x26314A,
-                accent: 0xC9CCD2,
-                accentDeep: 0x7D8188,
-                accentStrong: 0xF2F2F0,
-                text: 0xECECEA,
-                subtext: 0x8C97AE,
-                hint: 0x7E89A0
             )
         case .forest:
             ThemePalette(
@@ -130,36 +109,6 @@ public extension ThemePreset {
                 text: 0xEDE6D6,
                 subtext: 0xA99AB5,
                 hint: 0x958AA3
-            )
-        case .silver:
-            ThemePalette(
-                backgroundTop: 0x1D1D20,
-                backgroundBottom: 0x050506,
-                panel: 0x111114,
-                cardTop: 0x18181B,
-                cardBottom: 0x08080A,
-                line: 0x2C2C31,
-                accent: 0xC9CCD2,
-                accentDeep: 0x7D8188,
-                accentStrong: 0xF2F2F0,
-                text: 0xECECEA,
-                subtext: 0x9A9CA3,
-                hint: 0x878A92
-            )
-        case .copper:
-            ThemePalette(
-                backgroundTop: 0x1D1D20,
-                backgroundBottom: 0x050506,
-                panel: 0x111114,
-                cardTop: 0x18181B,
-                cardBottom: 0x08080A,
-                line: 0x2C2C31,
-                accent: 0xD9966A,
-                accentDeep: 0x9C5B36,
-                accentStrong: 0xF6CFAE,
-                text: 0xEDE4DC,
-                subtext: 0x9A9CA3,
-                hint: 0x878A92
             )
         case .ivory:
             ThemePalette(

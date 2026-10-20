@@ -115,7 +115,7 @@ private extension RecurringListView {
             Spacer()
 
             Text("固定費")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -211,7 +211,7 @@ private extension RecurringListView {
                 .foregroundStyle(Palette.accent)
 
             Text(AmountText.text(amount))
-                .font(.serif(.headline))
+                .displayFont(.headline)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
         }

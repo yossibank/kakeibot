@@ -18,7 +18,7 @@ public struct MenuHeader<Leading: View>: View {
                 .foregroundStyle(Palette.accent)
 
             Text(title)
-                .font(.serif(.small))
+                .displayFont(.small)
                 .tracking(1)
                 .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)

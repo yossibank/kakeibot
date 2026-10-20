@@ -3,6 +3,8 @@ import DesignSystem
 import SwiftUI
 
 public struct RecordsView: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     @Bindable private var model: RecordsModel
 
     @State private var openId: Entry.ID?
@@ -67,7 +69,7 @@ private extension RecordsView {
     var header: some View {
         HStack {
             Text("記録")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
 
@@ -77,7 +79,7 @@ private extension RecordsView {
 
             VStack(spacing: 1) {
                 Text("\(String(model.month.year))年 \(model.month.month)月")
-                    .font(.serif(.body))
+                    .displayFont(.body)
                     .foregroundStyle(Palette.accentStrong)
                     .contentTransition(monthTextTransition)
 
@@ -200,7 +202,7 @@ private extension RecordsView {
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .overlay {
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: corner.radius(18))
                 .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
@@ -232,7 +234,7 @@ private extension RecordsView {
                 .foregroundStyle(Palette.subtext)
 
             Text(AmountText.text(amount))
-                .font(.serif(.body))
+                .displayFont(.body)
                 .monospacedDigit()
                 .foregroundStyle(color)
         }
@@ -252,7 +254,7 @@ private extension RecordsView {
             } label: {
                 VStack(spacing: 3) {
                     Text(String(date.day))
-                        .font(.serif(.body))
+                        .displayFont(.body)
                         .foregroundStyle(dayColor(date, isShown: isShown))
                         .frame(width: 30, height: 30)
                         .background(fill, in: Circle())
@@ -402,7 +404,7 @@ private extension RecordsView {
         return HStack(spacing: 10) {
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text("\(date.month)/\(date.day)")
-                    .font(.serif(.headline))
+                    .displayFont(.headline)
                     .foregroundStyle(Palette.accentStrong)
 
                 Text("（\(date.weekday.shortName)）")

@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsField<Field: Hashable>: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     @Binding private var text: String
 
     private let prompt: String
@@ -39,9 +41,9 @@ struct SettingsField<Field: Hashable>: View {
         }
         .padding(.horizontal, 14)
         .frame(height: 46)
-        .background(Palette.panel, in: .rect(cornerRadius: 14))
+        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(14)))
         .overlay {
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: corner.radius(14))
                 .stroke(stroke, lineWidth: 1)
         }
         .animation(.snappy(duration: 0.2), value: isFocused)

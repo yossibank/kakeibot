@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsShowZone: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let isTargeted: Bool
 
     var body: some View {
@@ -16,21 +18,23 @@ struct SettingsShowZone: View {
         .foregroundStyle(color)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
-            Self.shape
+            shape
                 .fill(Palette.backgroundBottom.opacity(.strong))
 
-            Self.shape
+            shape
                 .fill(fill)
         }
         .overlay {
-            Self.shape
+            shape
                 .stroke(color.opacity(0.6), style: .dashed)
         }
     }
 }
 
 private extension SettingsShowZone {
-    static let shape = RoundedRectangle(cornerRadius: 16)
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
 
     var fill: Color {
         isTargeted ? Palette.accent.opacity(.subtle) : Color.clear

@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct EntryDialFace: View {
+    @Environment(\.themeStyle.font) private var themeFont
+
     let model: EntryModel
     let isActive: Bool
     let size: CGFloat
@@ -11,7 +13,7 @@ struct EntryDialFace: View {
             DialFace(isActive: isActive)
 
             Text(model.typeName)
-                .font(.serif(.caption))
+                .displayFont(.caption)
                 .tracking(5)
                 .foregroundStyle(Palette.accent)
                 .offset(y: -size * 0.19)
@@ -40,7 +42,7 @@ struct EntryDialFace: View {
 private extension EntryDialFace {
     var amountFont: Font {
         let scale: CGFloat = model.amount < 100_000 ? 0.2 : 0.118
-        return .system(size: size * scale, weight: .semibold, design: .serif)
+        return .display(size: size * scale, weight: .semibold, in: themeFont)
     }
 
     var note: String {

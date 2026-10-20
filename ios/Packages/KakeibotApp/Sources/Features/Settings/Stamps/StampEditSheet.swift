@@ -81,7 +81,7 @@ private extension StampEditSheet {
             Spacer()
 
             Text(model.isEditing ? "スタンプを編集" : "スタンプを追加")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 

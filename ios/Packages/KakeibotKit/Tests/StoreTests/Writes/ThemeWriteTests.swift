@@ -17,6 +17,26 @@ struct ThemeWriteTests {
     }
 
     @Test
+    func readsChosenStyle() async throws {
+        let database = try AppDatabase.inMemory()
+
+        try await database.setSetting(.cornerStyle, to: .large)
+        try await database.setSetting(.fontStyle, to: .rounded)
+        let style = try await database.style()
+
+        #expect(style == ThemeStyle(corner: .large, font: .rounded))
+    }
+
+    @Test
+    func usesStandardStyleByDefault() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let style = try await database.style()
+
+        #expect(style == .standard)
+    }
+
+    @Test
     func updatesTheme() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 0)

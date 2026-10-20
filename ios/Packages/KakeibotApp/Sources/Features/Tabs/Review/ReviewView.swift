@@ -4,6 +4,8 @@ import Store
 import SwiftUI
 
 public struct ReviewView: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     @Bindable private var model: ReviewModel
 
     @State private var openShare: ReviewModel.Share?
@@ -82,7 +84,7 @@ private extension ReviewView {
     var header: some View {
         HStack {
             Text("振り返り")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
 
@@ -103,7 +105,7 @@ private extension ReviewView {
 
             VStack(spacing: 1) {
                 Text(periodTitle)
-                    .font(.serif(.body))
+                    .displayFont(.body)
                     .foregroundStyle(Palette.accentStrong)
                     .contentTransition(periodTextTransition)
 
@@ -176,7 +178,7 @@ private extension ReviewView {
                             IconSeal(tally.icon, size: 28)
 
                             Text("×\(tally.count)")
-                                .font(.serif(.body))
+                                .displayFont(.body)
                                 .monospacedDigit()
                                 .foregroundStyle(Palette.accentStrong)
                         }
@@ -290,7 +292,7 @@ private extension ReviewView {
                 Spacer()
 
                 Text(AmountText.text(amount))
-                    .font(.serif(.body))
+                    .displayFont(.body)
                     .monospacedDigit()
                     .foregroundStyle(Palette.text)
             }
@@ -328,7 +330,7 @@ private extension ReviewView {
                 }
 
                 Text(AmountText.text(model.total(of: kind)))
-                    .font(.serif(.body))
+                    .displayFont(.body)
                     .monospacedDigit()
                     .foregroundStyle(amountColor)
                     .lineLimit(1)
@@ -337,9 +339,12 @@ private extension ReviewView {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
-            .background(fill, in: RoundedRectangle(cornerRadius: 16))
+            .background(
+                fill,
+                in: RoundedRectangle(cornerRadius: corner.radius(16))
+            )
             .overlay {
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: corner.radius(16))
                     .strokeBorder(rim, lineWidth: 1)
             }
             .contentShape(.rect)

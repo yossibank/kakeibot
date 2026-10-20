@@ -22,6 +22,7 @@ public struct SettingsSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.notificationPermission) private var permission
+    @Environment(\.themeStyle) private var themeStyle
 
     private let database: AppDatabase
     private let today: LocalDate
@@ -214,6 +215,22 @@ public struct SettingsSheet: View {
                                         value: appIcon.current.title
                                     )
                                 }
+
+                                Hairline()
+
+                                NavigationLink {
+                                    ThemeStyleView(
+                                        model: ThemeStyleModel(
+                                            database: database
+                                        )
+                                    )
+                                } label: {
+                                    row(
+                                        "角の丸みと字体",
+                                        systemImage: "textformat",
+                                        value: themeStyle.title
+                                    )
+                                }
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14)
@@ -333,7 +350,7 @@ private extension SettingsSheet {
             Spacer()
 
             Text("設定")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 

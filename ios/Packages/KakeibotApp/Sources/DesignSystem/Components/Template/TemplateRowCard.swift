@@ -24,9 +24,7 @@ public struct TemplateRowCard: View {
             TemplateBadge(icon: icon, size: .regular)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(name)
-                    .font(TemplateCardSize.regular.nameFont)
-                    .foregroundStyle(Palette.accentStrong)
+                TemplateCardName(name: name, size: .regular)
                     .lineLimit(2)
 
                 Text(detail)

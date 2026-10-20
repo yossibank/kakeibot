@@ -5,6 +5,8 @@ import SwiftUI
 struct CategoryTagCard: View {
     @Binding var name: String
 
+    @Environment(\.themeStyle.corner) private var corner
+
     @FocusState private var isFocused: Bool
 
     let isAdding: Bool
@@ -64,9 +66,9 @@ struct CategoryTagCard: View {
             }
         }
         .padding(16)
-        .background(Palette.panel, in: .rect(cornerRadius: 20))
+        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(20)))
         .overlay {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: corner.radius(20))
                 .stroke(Palette.outline, lineWidth: 1)
         }
         .shadow(color: Palette.shadow.opacity(0.45), radius: 20, y: 10)
@@ -110,9 +112,12 @@ private extension CategoryTagCard {
         .onSubmit(onCommit)
         .padding(.horizontal, 14)
         .frame(height: 46)
-        .background(Palette.background, in: .rect(cornerRadius: 14))
+        .background(
+            Palette.background,
+            in: .rect(cornerRadius: corner.radius(14))
+        )
         .overlay {
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: corner.radius(14))
                 .stroke(fieldStroke, lineWidth: 1)
         }
     }

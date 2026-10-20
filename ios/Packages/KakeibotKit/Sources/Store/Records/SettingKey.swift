@@ -52,6 +52,18 @@ public extension SettingKey where Value == ThemeChoice {
     }
 }
 
+public extension SettingKey where Value == ThemeCorner {
+    static var cornerStyle: Self {
+        Self(.cornerStyle, default: .standard)
+    }
+}
+
+public extension SettingKey where Value == ThemeFont {
+    static var fontStyle: Self {
+        Self(.fontStyle, default: .mincho)
+    }
+}
+
 public extension SettingKey where Value == TemplateOrder {
     static var templateOrder: Self {
         Self(.templateOrder, default: .manual)

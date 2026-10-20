@@ -1,6 +1,8 @@
 import SwiftUI
 
 public struct MenuPanel<Content: View>: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let width: CGFloat
     let content: Content
 
@@ -17,9 +19,9 @@ public struct MenuPanel<Content: View>: View {
             content
         }
         .frame(width: width)
-        .background(Palette.panel, in: .rect(cornerRadius: 18))
+        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(18)))
         .overlay {
-            RoundedRectangle(cornerRadius: 18)
+            RoundedRectangle(cornerRadius: corner.radius(18))
                 .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
         }
         .shadow(color: Palette.shadow.opacity(0.5), radius: 24, y: 12)

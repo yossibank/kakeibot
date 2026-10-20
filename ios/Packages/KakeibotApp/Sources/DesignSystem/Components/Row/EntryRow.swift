@@ -67,7 +67,7 @@ public struct EntryRow: View {
             Spacer(minLength: 8)
 
             AmountText(amount, type: type)
-                .font(.serif(.body))
+                .displayFont(.body)
         }
         .frame(minHeight: 48)
         .contentShape(.rect)

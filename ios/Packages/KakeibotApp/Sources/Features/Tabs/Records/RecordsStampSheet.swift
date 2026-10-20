@@ -4,6 +4,7 @@ import SwiftUI
 
 struct RecordsStampSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     let date: LocalDate
     let choices: [Icon]
@@ -69,7 +70,7 @@ private extension RecordsStampSheet {
             Spacer()
 
             Text("\(date.month)/\(date.day) のスタンプ")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(2)
                 .foregroundStyle(Palette.accent)
 
@@ -91,7 +92,7 @@ private extension RecordsStampSheet {
             IconBadge(icon, size: 52)
                 .padding(4)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: corner.radius(20))
                         .stroke(ring, lineWidth: 1.5)
                 }
                 .frame(maxWidth: .infinity)

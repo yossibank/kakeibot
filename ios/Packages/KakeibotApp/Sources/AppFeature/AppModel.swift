@@ -11,6 +11,7 @@ final class AppModel {
     private(set) var launch: Launch = .opening
     private(set) var today: LocalDate
     private(set) var palette: ThemePalette = .night
+    private(set) var style: ThemeStyle = .standard
 
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let scheduler: NotificationScheduler
@@ -63,6 +64,7 @@ extension AppModel {
 
             await generateRecurring(in: database)
             palette = await (try? database.palette()) ?? .night
+            style = await (try? database.style()) ?? .standard
             let completed = try await database.setting(.onboardingCompleted)
             launch = completed ? .ready(database) : .onboarding(database)
         } catch {
@@ -104,12 +106,14 @@ extension AppModel {
     func observeTheme() async {
         switch launch {
         case let .onboarding(database), let .ready(database):
-            do {
-                for try await palette in database.paletteUpdates() {
-                    self.palette = palette
+            await withDiscardingTaskGroup { group in
+                group.addTask {
+                    await self.observePalette(in: database)
                 }
-            } catch {
-                return
+
+                group.addTask {
+                    await self.observeStyle(in: database)
+                }
             }
         case .opening, .failed:
             return
@@ -130,6 +134,26 @@ extension AppModel {
 }
 
 private extension AppModel {
+    func observePalette(in database: AppDatabase) async {
+        do {
+            for try await palette in database.paletteUpdates() {
+                self.palette = palette
+            }
+        } catch {
+            return
+        }
+    }
+
+    func observeStyle(in database: AppDatabase) async {
+        do {
+            for try await style in database.styleUpdates() {
+                self.style = style
+            }
+        } catch {
+            return
+        }
+    }
+
     static func currentDay() -> LocalDate {
         LocalDate(Date(), in: .current)
     }

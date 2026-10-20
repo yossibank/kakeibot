@@ -20,6 +20,7 @@ public struct StampListView: View {
     @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     private let database: AppDatabase
 
@@ -108,7 +109,7 @@ private extension StampListView {
             Spacer()
 
             Text("スタンプ")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -146,9 +147,9 @@ private extension StampListView {
                 .font(.sans(.headline, weight: .ultraLight))
                 .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Palette.faint, in: Self.tileShape)
+                .background(Palette.faint, in: tileShape)
                 .overlay {
-                    Self.tileShape
+                    tileShape
                         .stroke(Palette.outline, style: .dashed)
                 }
                 .contentShape(.rect)
@@ -244,7 +245,7 @@ private extension StampListView {
     @ViewBuilder
     func tileBackground(isHidden: Bool) -> some View {
         if !isHidden {
-            Self.tileShape
+            tileShape
                 .fill(Self.tileFill)
         }
     }
@@ -252,10 +253,10 @@ private extension StampListView {
     @ViewBuilder
     func tileBorder(isHidden: Bool) -> some View {
         if isHidden {
-            Self.tileShape
+            tileShape
                 .stroke(Palette.subtext.opacity(.muted), style: .dashed)
         } else {
-            Self.tileShape
+            tileShape
                 .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
@@ -284,7 +285,11 @@ private extension StampListView {
     static let columnCount = 4
     static let spacing: CGFloat = 8
     static let tileHeight: CGFloat = 78
-    static let tileShape = RoundedRectangle(cornerRadius: 16)
+
+    var tileShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
+
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: spacing),
         count: columnCount

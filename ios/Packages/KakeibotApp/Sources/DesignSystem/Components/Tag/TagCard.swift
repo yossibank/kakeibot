@@ -1,6 +1,8 @@
 import SwiftUI
 
 public struct TagCard: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let title: String
     let style: Style
     let size: Size
@@ -53,7 +55,7 @@ public extension TagCard {
 
 private extension TagCard {
     var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: size.radius)
+        RoundedRectangle(cornerRadius: corner.radius(size.radius))
     }
 
     var foreground: Color {

@@ -11,6 +11,7 @@ public struct ThemeListView: View {
     @State private var width: CGFloat = 0
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     private let database: AppDatabase
     private let appIcon: AppIconListModel
@@ -116,7 +117,7 @@ private extension ThemeListView {
             Spacer()
 
             Text("テーマ")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -151,7 +152,7 @@ private extension ThemeListView {
             editing = .new(base: nil)
         } label: {
             VStack(spacing: 8) {
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: corner.radius(14))
                     .strokeBorder(Palette.outline, style: .dashed)
                     .frame(height: 132)
                     .overlay {
@@ -259,7 +260,7 @@ private extension ThemeListView {
         return ThemePreview(palette: palette)
             .padding(4)
             .overlay {
-                RoundedRectangle(cornerRadius: 18)
+                RoundedRectangle(cornerRadius: corner.radius(18))
                     .stroke(ring, lineWidth: 2)
             }
             .overlay(alignment: .bottomTrailing) {

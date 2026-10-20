@@ -19,6 +19,7 @@ public struct EntrySheet: View {
     @FocusState private var isMemoFocused: Bool
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     private let onChange: (EntryChange) -> Void
 
@@ -400,7 +401,7 @@ private extension EntrySheet {
                 .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: corner.radius(12))
                         .stroke(Palette.accent.opacity(.medium), style: .dashed)
                 }
                 .contentShape(.rect)
@@ -458,9 +459,9 @@ private extension EntrySheet {
         }
         .foregroundStyle(color)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(fill, in: .rect(cornerRadius: 12))
+        .background(fill, in: .rect(cornerRadius: corner.radius(12)))
         .overlay {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: corner.radius(12))
                 .stroke(border, lineWidth: width)
         }
         .contentShape(.rect)

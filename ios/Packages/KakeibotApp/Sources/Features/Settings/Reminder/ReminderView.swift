@@ -11,6 +11,7 @@ public struct ReminderView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.themeStyle.corner) private var corner
 
     public init(model: ReminderModel) {
         _model = State(initialValue: model)
@@ -83,7 +84,7 @@ private extension ReminderView {
             Spacer()
 
             Text("通知")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -110,7 +111,7 @@ private extension ReminderView {
                     .foregroundStyle(Palette.accent)
 
                 Text(timeText)
-                    .font(.serif(.display))
+                    .displayFont(.display)
                     .monospacedDigit()
                     .foregroundStyle(timeColor)
                     .contentTransition(.numericText())
@@ -157,9 +158,9 @@ private extension ReminderView {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Palette.rose.opacity(.faint), in: Self.cardShape)
+        .background(Palette.rose.opacity(.faint), in: cardShape)
         .overlay {
-            Self.cardShape
+            cardShape
                 .stroke(Palette.rose.opacity(.muted), lineWidth: 1)
         }
     }
@@ -212,7 +213,10 @@ private extension ReminderView {
                     .font(.sans(.body, weight: .medium))
                     .foregroundStyle(Palette.cardBottom)
                     .frame(width: 38, height: 38)
-                    .background(Palette.accent, in: .rect(cornerRadius: 9))
+                    .background(
+                        Palette.accent,
+                        in: .rect(cornerRadius: corner.radius(9))
+                    )
 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
@@ -238,9 +242,9 @@ private extension ReminderView {
                 }
             }
             .padding(14)
-            .background(Palette.text.opacity(.faint), in: Self.cardShape)
+            .background(Palette.text.opacity(.faint), in: cardShape)
             .overlay {
-                Self.cardShape
+                cardShape
                     .stroke(Palette.text.opacity(.subtle), lineWidth: 1)
             }
 
@@ -318,8 +322,8 @@ private extension ReminderView {
         count: 3
     )
 
-    static var cardShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 18)
+    var cardShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(18))
     }
 
     var bellImage: String {

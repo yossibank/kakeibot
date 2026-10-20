@@ -61,7 +61,8 @@ public struct TemplateCard<Name: View, Amount: View>: View {
     }
 }
 
-public extension TemplateCard where Name == Text, Amount == TemplateCardAmount {
+public extension TemplateCard
+    where Name == TemplateCardName, Amount == TemplateCardAmount {
     init(
         icon: Icon?,
         name: String,
@@ -70,9 +71,7 @@ public extension TemplateCard where Name == Text, Amount == TemplateCardAmount {
         size: TemplateCardSize = .regular
     ) {
         self.init(icon: icon, detail: detail, size: size) {
-            Text(name)
-                .font(size.nameFont)
-                .foregroundStyle(Palette.accentStrong)
+            TemplateCardName(name: name, size: size)
         } amount: {
             TemplateCardAmount(amount: amount, size: size)
         }

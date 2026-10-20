@@ -9,6 +9,7 @@ struct EntryWalletSheet: View {
     @State private var added: Wallet?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     let role: Role
 
@@ -99,10 +100,10 @@ private extension EntryWalletSheet {
             .frame(minHeight: 52)
             .background(
                 isSelected ? Palette.accent.opacity(.subtle) : Color.clear,
-                in: .rect(cornerRadius: 16)
+                in: .rect(cornerRadius: corner.radius(16))
             )
             .overlay {
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: corner.radius(16))
                     .stroke(
                         isSelected ? Palette.accent : Palette.line,
                         lineWidth: 1

@@ -3,6 +3,8 @@ import DesignSystem
 import SwiftUI
 
 struct ThemePreview: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let palette: ThemePalette
 
     var body: some View {
@@ -13,7 +15,7 @@ struct ThemePreview: View {
                     .frame(width: 24, height: 3)
 
                 Text("¥1,280")
-                    .font(.serif(.small))
+                    .displayFont(.small)
                     .foregroundStyle(Palette.accentStrong)
 
                 Capsule()
@@ -22,9 +24,9 @@ struct ThemePreview: View {
             }
             .padding(8)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Palette.card, in: .rect(cornerRadius: 8))
+            .background(Palette.card, in: .rect(cornerRadius: corner.radius(8)))
             .overlay {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: corner.radius(8))
                     .stroke(Palette.outline, lineWidth: 0.5)
             }
 
@@ -50,7 +52,10 @@ struct ThemePreview: View {
         }
         .padding(8)
         .frame(height: 132)
-        .background(Palette.background, in: .rect(cornerRadius: 14))
+        .background(
+            Palette.background,
+            in: .rect(cornerRadius: corner.radius(14))
+        )
         .environment(\.palette, palette)
     }
 }

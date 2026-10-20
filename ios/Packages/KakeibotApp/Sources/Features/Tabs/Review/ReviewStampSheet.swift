@@ -22,7 +22,7 @@ struct ReviewStampSheet: View {
                 Spacer()
 
                 Text(periodTitle)
-                    .font(.serif(.body))
+                    .displayFont(.body)
                     .foregroundStyle(Palette.accent)
 
                 Spacer()
@@ -41,7 +41,7 @@ struct ReviewStampSheet: View {
                 Spacer()
 
                 Text("×\(tally.count)")
-                    .font(.serif(.headline))
+                    .displayFont(.headline)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
             }
@@ -83,7 +83,7 @@ private extension ReviewStampSheet {
 
         return HStack(alignment: .firstTextBaseline, spacing: 6) {
             Text("\(date.month)/\(date.day)")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .foregroundStyle(Palette.accentStrong)
 
             Text("（\(date.weekday.shortName)）")

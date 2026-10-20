@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsHint: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     @State private var flag: SettingsScreenFlag
 
     private let lines: [Line]
@@ -53,7 +55,9 @@ extension SettingsHint.Line {
 }
 
 private extension SettingsHint {
-    static let shape = RoundedRectangle(cornerRadius: 16)
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
 
     static var transition: AnyTransition {
         .asymmetric(
@@ -97,9 +101,9 @@ private extension SettingsHint {
         .padding(.leading, 12)
         .padding(.trailing, 6)
         .padding(.vertical, 10)
-        .background(Self.fill, in: Self.shape)
+        .background(Self.fill, in: shape)
         .overlay {
-            Self.shape
+            shape
                 .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }

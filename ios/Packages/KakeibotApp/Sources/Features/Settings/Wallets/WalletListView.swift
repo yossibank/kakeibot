@@ -22,6 +22,7 @@ public struct WalletListView: View {
     @State private var showCount = 0
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     private let database: AppDatabase
 
@@ -122,7 +123,7 @@ private extension WalletListView {
             Spacer()
 
             Text("口座")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -225,10 +226,10 @@ private extension WalletListView {
                 .frame(width: 40, height: 40)
                 .background(
                     Palette.accent.opacity(.subtle),
-                    in: .rect(cornerRadius: 12)
+                    in: .rect(cornerRadius: corner.radius(12))
                 )
                 .overlay {
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: corner.radius(12))
                         .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
 
@@ -247,7 +248,7 @@ private extension WalletListView {
             Spacer(minLength: 8)
 
             Text(AmountText.text(balance))
-                .font(.serif(.body))
+                .displayFont(.body)
                 .monospacedDigit()
                 .foregroundStyle(balanceColor)
                 .lineLimit(1)

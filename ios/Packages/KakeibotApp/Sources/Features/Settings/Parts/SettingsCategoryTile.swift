@@ -3,6 +3,8 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsCategoryTile: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let category: EntryCategory
     let icon: Icon?
     let isSelected: Bool
@@ -23,10 +25,10 @@ struct SettingsCategoryTile: View {
             .frame(maxWidth: .infinity, minHeight: 54)
             .background(
                 SettingsTile.fill(isSelected: isSelected),
-                in: .rect(cornerRadius: 12)
+                in: .rect(cornerRadius: corner.radius(12))
             )
             .overlay {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: corner.radius(12))
                     .stroke(
                         SettingsTile.stroke(isSelected: isSelected),
                         lineWidth: 1

@@ -44,7 +44,7 @@ private extension AssetsView {
     var header: some View {
         HStack {
             Text("資産")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
 
@@ -64,7 +64,7 @@ private extension AssetsView {
 
             HStack(alignment: .firstTextBaseline) {
                 Text(AmountText.text(model.total))
-                    .font(.serif(.largeTitle, weight: .bold))
+                    .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
@@ -121,7 +121,7 @@ private extension AssetsView {
             }
 
             Text(AmountText.text(row.balance))
-                .font(.serif(.headline))
+                .displayFont(.headline)
                 .monospacedDigit()
                 .foregroundStyle(color)
                 .lineLimit(1)

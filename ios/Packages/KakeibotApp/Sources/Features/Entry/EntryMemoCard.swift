@@ -4,6 +4,8 @@ import SwiftUI
 struct EntryMemoCard: View {
     @Bindable var model: EntryModel
 
+    @Environment(\.themeStyle.corner) private var corner
+
     let isFocused: FocusState<Bool>.Binding
     let pointerX: CGFloat
     let onDone: () -> Void
@@ -48,9 +50,9 @@ struct EntryMemoCard: View {
             }
         }
         .padding(14)
-        .background(Palette.panel, in: .rect(cornerRadius: 20))
+        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(20)))
         .overlay {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: corner.radius(20))
                 .stroke(Palette.outline, lineWidth: 1)
         }
         .overlay(alignment: .bottomLeading) {

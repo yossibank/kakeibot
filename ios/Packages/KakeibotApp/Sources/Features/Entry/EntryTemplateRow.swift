@@ -60,7 +60,7 @@ private extension EntryTemplateRow {
                     .foregroundStyle(Palette.text)
 
                 Text(amount)
-                    .font(.serif(.caption))
+                    .displayFont(.caption)
                     .foregroundStyle(amountColor)
             }
             .font(.sans(.caption))

@@ -22,6 +22,17 @@ public extension AppDatabase {
     func palette() async throws -> ThemePalette {
         try await writer.read(Self.palette)
     }
+
+    func styleUpdates() -> some AsyncSequence<ThemeStyle, any Error> {
+        ValueObservation
+            .tracking(Self.style)
+            .removeDuplicates()
+            .values(in: writer)
+    }
+
+    func style() async throws -> ThemeStyle {
+        try await writer.read(Self.style)
+    }
 }
 
 private extension AppDatabase {
@@ -40,5 +51,12 @@ private extension AppDatabase {
             let theme = try Theme.fetchOne(db, key: id)
             return theme?.palette ?? .night
         }
+    }
+
+    static func style(in db: Database) throws -> ThemeStyle {
+        try ThemeStyle(
+            corner: setting(.cornerStyle, in: db),
+            font: setting(.fontStyle, in: db)
+        )
     }
 }

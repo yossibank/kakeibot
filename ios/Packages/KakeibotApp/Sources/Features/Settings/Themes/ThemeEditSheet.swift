@@ -99,7 +99,7 @@ private extension ThemeEditSheet {
             Spacer()
 
             Text(model.isEditing ? "テーマを編集" : "テーマをつくる")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
