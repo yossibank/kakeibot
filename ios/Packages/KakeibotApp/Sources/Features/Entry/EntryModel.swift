@@ -28,6 +28,7 @@ public final class EntryModel {
     public private(set) var balances: [Wallet.ID: Int] = [:]
     public private(set) var hasOpenedCategoryMenu = true
     public private(set) var weekStart: Weekday = .sunday
+    public private(set) var opensKeypad = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -79,6 +80,10 @@ public extension EntryModel {
 
     var isEditing: Bool {
         editingId != nil
+    }
+
+    var startsWithKeypad: Bool {
+        opensKeypad && !isEditing && amount == 0
     }
 
     var isLoaded: Bool {
@@ -258,6 +263,7 @@ public extension EntryModel {
             hasOpenedCategoryMenu = try await database
                 .setting(.categoryMenuOpened)
             weekStart = try await database.setting(.weekStart)
+            opensKeypad = try await database.setting(.entryOpensKeypad)
             try await loadBalances()
             try await loadEntry()
 

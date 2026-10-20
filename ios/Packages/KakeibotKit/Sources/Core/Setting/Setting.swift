@@ -21,6 +21,7 @@ public extension Setting {
         case themeId = "theme_id"
         case onboardingCompleted = "onboarding_completed"
         case launchScreen = "launch_screen"
+        case entryOpensKeypad = "entry_opens_keypad"
         case templateOrder = "template_order"
         case categoryMenuOpened = "category_menu_opened"
         case recordsLayout = "records_layout"

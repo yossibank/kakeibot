@@ -22,6 +22,13 @@ struct EntryModelTests {
     }
 
     @Test
+    func startsNewEntryWithKeypad() async throws {
+        let model = try await Self.newModel()
+
+        #expect(model.startsWithKeypad)
+    }
+
+    @Test
     func capsAmountAtNineDigits() async throws {
         let model = try await Self.newModel()
 

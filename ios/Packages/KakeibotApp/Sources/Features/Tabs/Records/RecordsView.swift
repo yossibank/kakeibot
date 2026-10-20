@@ -259,8 +259,8 @@ private extension RecordsView {
                         .overlay(Circle().stroke(ring, lineWidth: 1))
                         .overlay(alignment: .topTrailing) {
                             if let stamp = model.stampIcon(on: date) {
-                                IconSeal(stamp, size: 18)
-                                    .offset(x: 9, y: -7)
+                                IconSeal(stamp, size: 22)
+                                    .offset(x: 11, y: -9)
                                     .id(stamp.id)
                                     .transition(Self.stampTransition)
                             }

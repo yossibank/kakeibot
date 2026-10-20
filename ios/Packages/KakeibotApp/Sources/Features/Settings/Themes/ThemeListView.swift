@@ -6,6 +6,9 @@ import SwiftUI
 public struct ThemeListView: View {
     @State private var model: ThemeListModel
     @State private var editing: EditTarget?
+    @State private var menu: Menu?
+    @State private var pressing: ThemeChoice?
+    @State private var width: CGFloat = 0
 
     @Environment(\.dismiss) private var dismiss
 
@@ -23,24 +26,42 @@ public struct ThemeListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
-            header
+        ZStack(alignment: .topLeading) {
+            VStack(spacing: 14) {
+                header
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    customSection
+                SettingsHint(
+                    flag: .closedHint(.themes, in: database),
+                    lines: Self.hint
+                )
 
-                    section("ダーク", isLight: false)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        customSection
 
-                    section("ライト", isLight: true)
+                        section("ダーク", isLight: false)
+
+                        section("ライト", isLight: true)
+                    }
+                    .padding(.vertical, 8)
                 }
-                .padding(.vertical, 8)
+                .scrollIndicators(.hidden)
+                .scrollDisabled(menu != nil)
             }
-            .scrollIndicators(.hidden)
+            .padding(.horizontal, 18)
+            .padding(.top, 16)
+
+            if let menu {
+                menuLayer(menu)
+            }
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 16)
+        .coordinateSpace(.named(Self.space))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            self.width = width
+        }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -67,6 +88,9 @@ public struct ThemeListView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: model.current)
+        .sensoryFeedback(.impact(weight: .medium), trigger: menu) { _, new in
+            new != nil
+        }
         .sheet(item: $editing, onDismiss: reload) { target in
             ThemeEditSheet(
                 model: ThemeEditModel(
@@ -109,7 +133,12 @@ private extension ThemeListView {
 
             LazyVGrid(columns: Self.columns, spacing: 18) {
                 ForEach(model.customThemes) { theme in
-                    customTile(theme)
+                    tile(
+                        .custom(theme.id),
+                        palette: theme.palette,
+                        title: theme.name,
+                        theme: theme
+                    )
                 }
 
                 newTile
@@ -155,14 +184,12 @@ private extension ThemeListView {
 
             LazyVGrid(columns: Self.columns, spacing: 18) {
                 ForEach(presets, id: \.self) { preset in
-                    VStack(spacing: 8) {
-                        previewButton(.preset(preset), palette: preset.palette)
-
-                        tileTitle(
-                            preset.title,
-                            isCurrent: isCurrent(.preset(preset))
-                        )
-                    }
+                    tile(
+                        .preset(preset),
+                        palette: preset.palette,
+                        title: preset.title,
+                        theme: nil
+                    )
                 }
             }
         }
@@ -176,83 +203,140 @@ private extension ThemeListView {
             .padding(.leading, 6)
     }
 
-    func customTile(_ theme: Theme) -> some View {
-        VStack(spacing: 8) {
-            previewButton(.custom(theme.id), palette: theme.palette)
-
-            Button {
-                editing = .edit(theme)
-            } label: {
-                HStack(spacing: 4) {
-                    tileTitle(
-                        theme.name,
-                        isCurrent: isCurrent(.custom(theme.id))
-                    )
-
-                    Image(systemName: "pencil")
-                        .font(.caption2)
-                        .foregroundStyle(Palette.accent)
-                }
-                .frame(minHeight: 28)
-                .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    func previewButton(
+    func tile(
         _ choice: ThemeChoice,
-        palette: ThemePalette
+        palette: ThemePalette,
+        title: String,
+        theme: Theme?
     ) -> some View {
-        let isCurrent = isCurrent(choice)
-        let ring = isCurrent ? Palette.accent : Color.clear
+        let isCurrent = choice == model.current
+        let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
+        let scale: CGFloat = pressing == choice ? 0.94 : 1
 
-        return Button {
-            Task {
-                await model.select(choice)
-            }
-        } label: {
-            ThemePreview(palette: palette)
-                .padding(4)
+        return VStack(spacing: 8) {
+            preview(palette, isCurrent: isCurrent)
+                .scaleEffect(scale)
+                .animation(.snappy(duration: 0.2), value: scale)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 18)
-                        .stroke(ring, lineWidth: 2)
-                }
-                .overlay(alignment: .bottomTrailing) {
-                    if isCurrent {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.title3)
-                            .foregroundStyle(Palette.accent, Palette.background)
-                            .offset(x: 6, y: 6)
-                            .transition(.scale.combined(with: .opacity))
+                    GeometryReader { proxy in
+                        Color.clear
+                            .contentShape(.rect)
+                            .onTapGesture {
+                                select(choice)
+                            }
+                            .onLongPressGesture(
+                                minimumDuration: Self.menuPressDuration
+                            ) {
+                                let space = CoordinateSpace.named(Self.space)
+                                let menu = Menu(
+                                    choice: choice,
+                                    palette: palette,
+                                    title: title,
+                                    theme: theme,
+                                    frame: proxy.frame(in: space)
+                                )
+
+                                openMenu(menu)
+                            } onPressingChanged: { isPressing in
+                                pressing = isPressing ? choice : nil
+                            }
                     }
                 }
-                .animation(.spring(duration: 0.3), value: isCurrent)
-                .frame(maxWidth: .infinity)
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .contextMenu {
-            Button("これをもとにつくる", systemImage: "plus.square.on.square") {
-                editing = .new(base: palette)
-            }
+
+            Text(title)
+                .font(.footnote)
+                .foregroundStyle(titleColor)
+                .lineLimit(1)
         }
     }
 
-    func tileTitle(
-        _ title: String,
+    func preview(
+        _ palette: ThemePalette,
         isCurrent: Bool
     ) -> some View {
-        let color = isCurrent ? Palette.accentStrong : Palette.subtext
+        let ring = isCurrent ? Palette.accent : Color.clear
 
-        return Text(title)
-            .font(.footnote)
-            .foregroundStyle(color)
-            .lineLimit(1)
+        return ThemePreview(palette: palette)
+            .padding(4)
+            .overlay {
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(ring, lineWidth: 2)
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if isCurrent {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(Palette.accent, Palette.background)
+                        .offset(x: 6, y: 6)
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
+            .animation(.spring(duration: 0.3), value: isCurrent)
+    }
+
+    @ViewBuilder
+    func menuLayer(_ menu: Menu) -> some View {
+        Palette.scrim
+            .opacity(0.45)
+            .ignoresSafeArea()
+            .onTapGesture {
+                closeMenu()
+            }
+            .transition(.opacity)
+
+        preview(menu.palette, isCurrent: menu.choice == model.current)
+            .frame(width: menu.frame.width, height: menu.frame.height)
+            .scaleEffect(1.04)
+            .shadow(color: Palette.glow.opacity(.muted), radius: 12)
+            .position(x: menu.frame.midX, y: menu.frame.midY)
+            .allowsHitTesting(false)
+            .transition(.opacity)
+
+        MenuPanel(width: Self.menuWidth) {
+            MenuHeader(menu.title) {
+                Circle()
+                    .fill(Palette.accent)
+                    .frame(width: 12, height: 12)
+                    .environment(\.palette, menu.palette)
+            }
+
+            MenuDivider()
+
+            MenuRow(
+                "これをもとにつくる",
+                note: "この色から新しくつくります",
+                systemImage: "plus.square.on.square"
+            ) {
+                closeMenu()
+                editing = .new(base: menu.palette)
+            }
+
+            if let theme = menu.theme {
+                MenuDivider()
+
+                MenuRow(
+                    "このテーマを編集",
+                    systemImage: "square.and.pencil"
+                ) {
+                    closeMenu()
+                    editing = .edit(theme)
+                }
+            }
+        }
+        .offset(x: menuX(for: menu), y: menu.frame.maxY + 10)
+        .transition(.opacity.combined(with: .scale(scale: 0.96, anchor: .top)))
     }
 }
 
 private extension ThemeListView {
+    struct Menu: Equatable {
+        let choice: ThemeChoice
+        let palette: ThemePalette
+        let title: String
+        let theme: Theme?
+        let frame: CGRect
+    }
+
     enum EditTarget: Identifiable {
         case new(base: ThemePalette?)
         case edit(Theme)
@@ -294,8 +378,30 @@ private extension ThemeListView {
         return "アプリアイコンも\(title)にできます"
     }
 
-    func isCurrent(_ choice: ThemeChoice) -> Bool {
-        choice == model.current
+    func select(_ choice: ThemeChoice) {
+        Task {
+            await model.select(choice)
+        }
+    }
+
+    func openMenu(_ menu: Menu) {
+        pressing = nil
+
+        withAnimation(.snappy(duration: 0.25)) {
+            self.menu = menu
+        }
+    }
+
+    func closeMenu() {
+        withAnimation(.snappy(duration: 0.2)) {
+            menu = nil
+        }
+    }
+
+    func menuX(for menu: Menu) -> CGFloat {
+        let preferred = menu.frame.midX - Self.menuWidth / 2
+        let limit = width - Self.menuWidth - Self.menuInset
+        return min(max(preferred, Self.menuInset), limit)
     }
 
     func reload() {
@@ -306,8 +412,16 @@ private extension ThemeListView {
 }
 
 private extension ThemeListView {
+    static let space = "themes"
+    static let menuWidth: CGFloat = 236
+    static let menuInset: CGFloat = 18
+    static let menuPressDuration = 0.4
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: 12),
         count: 3
     )
+    static let hint: [SettingsHint.Line] = [
+        .init("hand.tap", "押すと、そのテーマに切り替わります"),
+        .init("plus.square.on.square", "長押しで、その色をもとにつくれます")
+    ]
 }

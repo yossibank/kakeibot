@@ -87,6 +87,15 @@ public extension SettingKey where Value == Set<SettingsScreen> {
 }
 
 public extension SettingKey where Value == Bool {
+    static var entryOpensKeypad: Self {
+        Self(
+            .entryOpensKeypad,
+            default: true,
+            decode: { $0 == "true" },
+            encode: { $0 ? nil : "false" }
+        )
+    }
+
     static var categoryMenuOpened: Self {
         Self(flag: .categoryMenuOpened)
     }
