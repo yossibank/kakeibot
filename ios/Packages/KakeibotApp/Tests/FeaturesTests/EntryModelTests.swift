@@ -22,6 +22,20 @@ struct EntryModelTests {
     }
 
     @Test
+    func opensKeypadFirstWhenChosen() async throws {
+        let setup = try await Setup()
+        let initial = EntryModel(database: setup.database, date: setup.date)
+        await initial.load()
+        try await setup.database.setSetting(.entryStartsWithAmount, to: true)
+        let model = EntryModel(database: setup.database, date: setup.date)
+
+        await model.load()
+
+        #expect(!initial.opensKeypadFirst)
+        #expect(model.opensKeypadFirst)
+    }
+
+    @Test
     func capsAmountAtNineDigits() async throws {
         let model = try await Self.newModel()
 

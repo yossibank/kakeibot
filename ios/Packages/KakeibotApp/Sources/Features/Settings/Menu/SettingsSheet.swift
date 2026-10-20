@@ -6,10 +6,12 @@ import SwiftUI
 public struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
     @State private var launchScreen: LaunchScreen = .home
+    @State private var startsWithAmount = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
     @State private var closedHints: Set<SettingsScreen> = []
-    @State private var theme: ThemePreset = .navy
+    @State private var theme: ThemeChoice = .preset(.navy)
+    @State private var customThemes: [Theme] = []
     @State private var appIcon = AppIconListModel()
 
     #if DEBUG
@@ -197,7 +199,7 @@ public struct SettingsSheet: View {
                                     row(
                                         "テーマ",
                                         systemImage: "paintpalette",
-                                        value: theme.title
+                                        value: theme.title(in: customThemes)
                                     )
                                 }
 
@@ -236,6 +238,27 @@ public struct SettingsSheet: View {
                                 CapsulePicker(
                                     selection: launchScreenBinding,
                                     options: Self.launchOptions
+                                )
+                            }
+                            .frame(minHeight: 52)
+                            .padding(.horizontal, 14)
+                            .card()
+
+                            HStack(spacing: 12) {
+                                Image(systemName: "yensign")
+                                    .font(.sans(.body, weight: .light))
+                                    .foregroundStyle(Palette.accent)
+                                    .frame(width: 22)
+
+                                Text("金額から入力")
+                                    .font(.subheadline)
+                                    .foregroundStyle(Palette.text)
+
+                                Spacer()
+
+                                CapsulePicker(
+                                    selection: startsWithAmountBinding,
+                                    options: Self.startOptions
                                 )
                             }
                             .frame(minHeight: 52)
@@ -289,7 +312,14 @@ public struct SettingsSheet: View {
             await observeTheme()
         }
         .task {
+            await observeCustomThemes()
+        }
+        .task {
             launchScreen = await (try? database.setting(.launchScreen)) ?? .home
+        }
+        .task {
+            let starts = try? await database.setting(.entryStartsWithAmount)
+            startsWithAmount = starts ?? false
         }
     }
 }
@@ -385,6 +415,26 @@ private extension SettingsSheet {
     static let launchOptions: [CapsulePicker<LaunchScreen>.Option] =
         LaunchScreen.allCases.map { .init($0.title, value: $0) }
 
+    static let startOptions: [CapsulePicker<Bool>.Option] = [
+        .init("する", value: true),
+        .init("しない", value: false)
+    ]
+
+    var startsWithAmountBinding: Binding<Bool> {
+        Binding {
+            startsWithAmount
+        } set: { starts in
+            startsWithAmount = starts
+
+            Task {
+                try? await database.setSetting(
+                    .entryStartsWithAmount,
+                    to: starts
+                )
+            }
+        }
+    }
+
     var launchScreenBinding: Binding<LaunchScreen> {
         Binding {
             launchScreen
@@ -439,7 +489,17 @@ private extension SettingsSheet {
                 self.theme = theme
             }
         } catch {
-            theme = .navy
+            theme = .preset(.navy)
+        }
+    }
+
+    func observeCustomThemes() async {
+        do {
+            for try await themes in database.customThemeUpdates() {
+                customThemes = themes
+            }
+        } catch {
+            customThemes = []
         }
     }
 

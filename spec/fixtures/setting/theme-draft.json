@@ -1,0 +1,76 @@
+[
+  {
+    "name": "ミント",
+    "background": "#12302C",
+    "surface": "#173A35",
+    "text": "#EAF4F1",
+    "subtext": "#8FB3A9",
+    "accent": "#7FD1B9",
+    "problems": []
+  },
+  {
+    "name": "  夜のミント  ",
+    "background": "#12302C",
+    "surface": "#173A35",
+    "text": "#EAF4F1",
+    "subtext": "#8FB3A9",
+    "accent": "#7FD1B9",
+    "problems": []
+  },
+  {
+    "name": "   ",
+    "background": "#12302C",
+    "surface": "#173A35",
+    "text": "#EAF4F1",
+    "subtext": "#8FB3A9",
+    "accent": "#7FD1B9",
+    "problems": [
+      "emptyName"
+    ]
+  },
+  {
+    "name": "とても長いテーマの名前です",
+    "background": "#12302C",
+    "surface": "#173A35",
+    "text": "#EAF4F1",
+    "subtext": "#8FB3A9",
+    "accent": "#7FD1B9",
+    "problems": [
+      "nameTooLong"
+    ]
+  },
+  {
+    "name": "ミント",
+    "background": "#12302C",
+    "surface": "#173A35",
+    "text": "#EAF4F1",
+    "subtext": "#8FB3A9",
+    "accent": "#7FD1B",
+    "problems": [
+      "invalidColor"
+    ]
+  },
+  {
+    "name": "ミント",
+    "background": "#12302C",
+    "surface": "#173A35",
+    "text": "#12302C",
+    "subtext": "#8FB3A9",
+    "accent": "#7FD1B9",
+    "problems": [
+      "unreadableColors"
+    ]
+  },
+  {
+    "name": "",
+    "background": "#12302C",
+    "surface": "#173A35",
+    "text": "#EAF4F1",
+    "subtext": "#2A4A44",
+    "accent": "#7FD1B9",
+    "problems": [
+      "emptyName",
+      "unreadableColors"
+    ]
+  }
+]

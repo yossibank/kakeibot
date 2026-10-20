@@ -2,6 +2,8 @@ import Core
 import SwiftUI
 
 public struct IconSeal: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let icon: Icon
     let size: CGFloat
 
@@ -28,13 +30,17 @@ public struct IconSeal: View {
                         lineWidth: size * 0.08
                     )
             }
-            .shadow(color: tint.opacity(0.5), radius: size * 0.2)
+            .shadow(color: tint.opacity(glow), radius: size * 0.2)
     }
 }
 
 private extension IconSeal {
     var tint: Color {
         Color(hex: icon.color) ?? Palette.accent
+    }
+
+    var glow: Double {
+        colorScheme == .light ? 0.25 : 0.5
     }
 }
 

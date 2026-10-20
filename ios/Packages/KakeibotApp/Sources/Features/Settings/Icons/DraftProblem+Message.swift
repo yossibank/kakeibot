@@ -7,6 +7,8 @@ extension DraftProblem {
         case .emptyMark: "アイコンを選んでください"
         case .textTooLong: "アイコンの文字は \(IconDraft.maxTextLength) 文字までです"
         case .invalidColor: "色を選んでください"
+        case .nameTooLong: "名前は \(ThemeDraft.maxNameLength) 文字までです"
+        case .unreadableColors: "文字が読みにくい色です"
         }
     }
 }

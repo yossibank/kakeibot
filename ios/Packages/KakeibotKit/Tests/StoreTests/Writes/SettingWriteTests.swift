@@ -22,6 +22,18 @@ struct SettingWriteTests {
     }
 
     @Test
+    func savesEntryStart() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let initial = try await database.setting(.entryStartsWithAmount)
+        try await database.setSetting(.entryStartsWithAmount, to: true)
+        let saved = try await database.setting(.entryStartsWithAmount)
+
+        #expect(!initial)
+        #expect(saved)
+    }
+
+    @Test
     func savesClosedHints() async throws {
         let database = try AppDatabase.inMemory()
 

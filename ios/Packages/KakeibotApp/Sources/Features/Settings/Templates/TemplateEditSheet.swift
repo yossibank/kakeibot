@@ -110,6 +110,10 @@ private extension TemplateEditSheet {
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
+            .contentMargins(.horizontal, 18, for: .scrollContent)
+            .contentMargins(.vertical, Self.fade, for: .scrollContent)
+            .edgeFade(Self.fade)
+            .padding(.horizontal, -18)
 
             saveButton
         }
@@ -222,7 +226,7 @@ private extension TemplateEditSheet {
         .shadow(color: Palette.glow.opacity(.subtle), radius: 30)
         .background(alignment: .bottom) {
             Ellipse()
-                .fill(.black.opacity(0.55))
+                .fill(Palette.shadow.opacity(0.55))
                 .frame(width: 260, height: 22)
                 .blur(radius: 14)
                 .offset(y: 26)
@@ -391,6 +395,8 @@ private extension TemplateEditSheet {
         case wallet
         case memo
     }
+
+    static let fade: CGFloat = 16
 
     static var memoTransition: AnyTransition {
         .scale(scale: 0.95).combined(with: .opacity)

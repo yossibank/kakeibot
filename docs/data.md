@@ -275,7 +275,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | --- | --- | --- |
 | id | TEXT | |
 | name | TEXT | |
-| background / surface / text_primary / text_secondary / accent / expense / income | TEXT | `#RRGGBB` |
+| background / surface / text_primary / text_secondary / accent / expense / income | TEXT | `#RRGGBB`。地・カード・文字・控えめな文字・強調と、支出・収入の色 |
 | corner_radius | INTEGER | |
 | font_id | TEXT | 同梱フォントから選ぶ |
 | is_builtin | INTEGER | |
@@ -290,9 +290,10 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | reminder_time | `HH:mm`。空なら知らせない |
 | character_id | 同梱キャラクターの ID |
 | character_name | |
-| theme_id | 用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）。空ならネイビー |
+| theme_id | 用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空ならネイビー |
 | onboarding_completed | `true` `false` |
 | launch_screen | `home` `entry`。空ならホーム |
+| entry_starts_with_amount | `true` なら、新しく記録するとき入力シートをテンキーを出して開く |
 | template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |
 | category_menu_opened | `true` `false`。`true` なら入力シートの長押しのヒントを出さない |
 | records_layout | `list` `calendar`。空なら一覧 |

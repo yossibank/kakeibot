@@ -5,4 +5,5 @@ public enum SettingsScreen: String, CaseIterable, Codable, Sendable {
     case recurrings
     case stamps
     case budgets
+    case themes
 }
