@@ -39,13 +39,19 @@ struct PaletteTests {
     }
 
     @Test
-    func keepsFixedColors() {
+    func changesMeaningColorsByBrightness() {
         var environment = EnvironmentValues()
         environment.palette = Self.forest
+        environment.colorScheme = .dark
 
-        let rose = Palette.rose.resolve(in: environment)
+        let dark = Palette.rose.resolve(in: environment)
 
-        #expect(rgb(rose) == 0xE3A3A3)
+        environment.colorScheme = .light
+
+        let light = Palette.rose.resolve(in: environment)
+
+        #expect(rgb(dark) == 0xE3A3A3)
+        #expect(rgb(light) == 0xB04A4A)
     }
 }
 

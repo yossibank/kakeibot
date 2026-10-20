@@ -64,7 +64,6 @@ public struct TemplateEditSheet: View {
                         focus = nil
                     }
             }
-            .preferredColorScheme(.dark)
             .sensoryFeedback(.selection, trigger: model.categoryId)
             .sensoryFeedback(.selection, trigger: model.walletId)
             .confirmsDiscard(

@@ -270,7 +270,6 @@ public struct SettingsSheet: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
-        .preferredColorScheme(.dark)
         .task {
             await observeMonthStartDay()
         }

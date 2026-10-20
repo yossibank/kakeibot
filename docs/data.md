@@ -290,7 +290,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | reminder_time | `HH:mm`。空なら知らせない |
 | character_id | 同梱キャラクターの ID |
 | character_name | |
-| theme_id | 用意したテーマ（`navy`・`forest`・`wine`・`plum`・`charcoal`）。空ならネイビー |
+| theme_id | 用意したテーマ（`navy`・`forest`・`wine`・`plum`・`charcoal`・`ivory`・`sky`・`rose`）。空ならネイビー |
 | onboarding_completed | `true` `false` |
 | launch_screen | `home` `entry`。空ならホーム |
 | template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |

@@ -4,6 +4,9 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
     case wine
     case plum
     case charcoal
+    case ivory
+    case sky
+    case rose
 }
 
 public extension ThemePreset {
@@ -14,6 +17,9 @@ public extension ThemePreset {
         case .wine: "ワイン"
         case .plum: "プラム"
         case .charcoal: "チャコール"
+        case .ivory: "アイボリー"
+        case .sky: "スカイ"
+        case .rose: "ローズ"
         }
     }
 
@@ -80,6 +86,51 @@ public extension ThemePreset {
                 text: 0xECECEA,
                 subtext: 0x9A9CA3,
                 hint: 0x878A92
+            )
+        case .ivory:
+            ThemePalette(
+                backgroundTop: 0xF8F4EB,
+                backgroundBottom: 0xE9E1D0,
+                panel: 0xF1EBDF,
+                cardTop: 0xFFFFFF,
+                cardBottom: 0xF5EFE3,
+                line: 0xDCD2BF,
+                accent: 0x8A6420,
+                accentDeep: 0xB89657,
+                accentLight: 0x4A340C,
+                text: 0x2A2418,
+                subtext: 0x6B6152,
+                hint: 0x7A705F
+            )
+        case .sky:
+            ThemePalette(
+                backgroundTop: 0xEEF4FA,
+                backgroundBottom: 0xDCE6F1,
+                panel: 0xE5EDF6,
+                cardTop: 0xFFFFFF,
+                cardBottom: 0xF0F5FA,
+                line: 0xC9D6E5,
+                accent: 0x2F5A8C,
+                accentDeep: 0x8AA8CC,
+                accentLight: 0x14315A,
+                text: 0x17233A,
+                subtext: 0x54627A,
+                hint: 0x637089
+            )
+        case .rose:
+            ThemePalette(
+                backgroundTop: 0xF8EEEC,
+                backgroundBottom: 0xEEDCD8,
+                panel: 0xF3E5E2,
+                cardTop: 0xFFFFFF,
+                cardBottom: 0xF8EEEB,
+                line: 0xE3CDC8,
+                accent: 0x9C3D52,
+                accentDeep: 0xC98A97,
+                accentLight: 0x5A1A2A,
+                text: 0x2E1C1E,
+                subtext: 0x6E5559,
+                hint: 0x7C6266
             )
         }
     }

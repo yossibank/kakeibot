@@ -92,7 +92,6 @@ public struct WalletListView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
         .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)

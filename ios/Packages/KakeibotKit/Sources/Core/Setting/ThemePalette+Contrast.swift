@@ -11,6 +11,12 @@ public extension ThemePalette {
         }
     }
 
+    var isLight: Bool {
+        let onBlack = Self.contrast(backgroundTop, 0x000000)
+        let onWhite = Self.contrast(backgroundTop, 0xFFFFFF)
+        return onBlack > onWhite
+    }
+
     static func contrast(
         _ first: UInt32,
         _ second: UInt32

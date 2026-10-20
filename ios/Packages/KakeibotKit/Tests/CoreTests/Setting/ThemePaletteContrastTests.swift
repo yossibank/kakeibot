@@ -24,6 +24,13 @@ struct ThemePaletteContrastTests {
     func keepsPresetsReadable(preset: ThemePreset) {
         #expect(preset.palette.unreadableRoles.isEmpty)
     }
+
+    @Test
+    func tellsLightBackground() {
+        let light = ThemePreset.allCases.filter(\.palette.isLight)
+
+        #expect(light == [.ivory, .sky, .rose])
+    }
 }
 
 extension ThemePaletteContrastTests {

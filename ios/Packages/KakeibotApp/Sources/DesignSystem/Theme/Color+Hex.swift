@@ -36,6 +36,17 @@ extension Color {
         self.init(red: red, green: green, blue: blue)
     }
 
+    init(
+        light: UInt32,
+        dark: UInt32
+    ) {
+        let color = UIColor { traits in
+            let isLight = traits.userInterfaceStyle == .light
+            return UIColor(rgb: isLight ? light : dark)
+        }
+        self.init(uiColor: color)
+    }
+
     init(themed role: KeyPath<ThemePalette, UInt32> & Sendable) {
         let color = UIColor { traits in
             UIColor(rgb: traits[PaletteTrait.self][keyPath: role])

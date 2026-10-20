@@ -66,7 +66,6 @@ public struct EntrySheet: View {
                     .fill(Palette.background)
                     .ignoresSafeArea()
             }
-            .preferredColorScheme(.dark)
             .confirmsDiscard(
                 when: model.isChanged,
                 isPresented: $isConfirmingDiscard

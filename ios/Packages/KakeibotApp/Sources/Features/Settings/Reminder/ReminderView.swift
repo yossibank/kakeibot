@@ -56,7 +56,6 @@ public struct ReminderView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
         .animation(.snappy, value: model.time)
         .animation(.snappy, value: model.isDenied)
         .animation(.snappy, value: isPickingTime)

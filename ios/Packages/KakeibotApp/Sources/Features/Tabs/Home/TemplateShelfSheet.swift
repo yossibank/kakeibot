@@ -70,7 +70,6 @@ public struct TemplateShelfSheet: View {
                 TemplateListView(database: database)
             }
         }
-        .preferredColorScheme(.dark)
     }
 }
 

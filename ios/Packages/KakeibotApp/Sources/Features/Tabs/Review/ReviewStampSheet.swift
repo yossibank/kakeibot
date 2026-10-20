@@ -74,7 +74,6 @@ struct ReviewStampSheet: View {
                 .fill(Palette.background)
                 .ignoresSafeArea()
         }
-        .preferredColorScheme(.dark)
     }
 }
 

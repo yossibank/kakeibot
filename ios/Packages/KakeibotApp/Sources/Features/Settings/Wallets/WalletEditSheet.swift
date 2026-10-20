@@ -55,7 +55,6 @@ public struct WalletEditSheet: View {
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
-        .preferredColorScheme(.dark)
         .confirmsDiscard(
             when: model.isChanged,
             isPresented: $isConfirmingDiscard

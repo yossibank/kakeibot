@@ -25,6 +25,5 @@ public struct FittedSheet<Content: View>: View {
         .presentationDetents([.height(max(contentHeight, 120))])
         .presentationDragIndicator(.visible)
         .presentationBackground(Palette.panel)
-        .preferredColorScheme(.dark)
     }
 }

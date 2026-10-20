@@ -81,7 +81,6 @@ struct ReviewShareSheet: View {
                 .fill(Palette.background)
                 .ignoresSafeArea()
         }
-        .preferredColorScheme(.dark)
     }
 }
 

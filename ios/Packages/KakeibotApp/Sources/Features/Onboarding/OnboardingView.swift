@@ -52,7 +52,6 @@ public struct OnboardingView: View {
                 .ignoresSafeArea()
         }
         .budgetKeypad(model.budget)
-        .preferredColorScheme(.dark)
         .sensoryFeedback(.selection, trigger: model.page)
         .task {
             await model.load()

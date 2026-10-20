@@ -44,7 +44,7 @@ public struct RootView: View {
             }
         }
         .environment(\.notificationPermission, .live)
-        .environment(\.palette, model.theme.palette)
+        .palette(model.theme.palette)
         .warmsUpInput()
     }
 }

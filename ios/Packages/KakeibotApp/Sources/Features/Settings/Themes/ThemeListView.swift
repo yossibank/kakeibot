@@ -38,7 +38,6 @@ public struct ThemeListView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
         .sensoryFeedback(.selection, trigger: model.current)
         .task {
             await model.load()

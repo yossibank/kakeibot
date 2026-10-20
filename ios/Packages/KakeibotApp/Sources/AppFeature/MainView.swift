@@ -184,7 +184,6 @@ struct MainView: View {
                 entryWarmup
             }
         }
-        .preferredColorScheme(.dark)
         .sheet(item: $sheet, onDismiss: prepareDraft) { sheet in
             sheetContent(for: sheet)
         }

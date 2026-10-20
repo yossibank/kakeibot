@@ -53,7 +53,6 @@ public struct RecurringEditSheet: View {
                     isNameFocused = false
                 }
         }
-        .preferredColorScheme(.dark)
         .confirmsDiscard(
             when: model.isChanged,
             isPresented: $isConfirmingDiscard

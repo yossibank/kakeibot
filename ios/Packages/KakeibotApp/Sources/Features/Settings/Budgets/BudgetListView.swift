@@ -19,7 +19,6 @@ public struct BudgetListView: View {
             }
             .budgetKeypad(model)
             .toolbar(.hidden, for: .navigationBar)
-            .preferredColorScheme(.dark)
             .sensoryFeedback(.selection, trigger: model.budgets)
             .task {
                 await model.load()
