@@ -143,15 +143,19 @@ private extension HomeView {
 
             if model.recurringExpense > 0 {
                 Button(action: onOpenRecurrings) {
-                    HStack(spacing: 4) {
-                        Label(recurringText, systemImage: "repeat")
+                    VStack(spacing: 6) {
+                        HStack(spacing: 4) {
+                            Label(recurringText, systemImage: "repeat")
 
-                        Image(systemName: "chevron.right")
-                            .font(.sans(.micro, weight: .semibold))
+                            Image(systemName: "chevron.right")
+                                .font(.sans(.micro, weight: .semibold))
+                        }
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+
+                        recurringProgress
                     }
-                    .textFont(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
                     .frame(minHeight: 28)
                     .contentShape(.rect)
                 }
@@ -370,6 +374,17 @@ private extension HomeView {
         Rectangle()
             .fill(Palette.accent.opacity(.soft))
             .frame(width: 1, height: 32)
+    }
+
+    var recurringProgress: some View {
+        Capsule()
+            .fill(Palette.faint)
+            .frame(width: 120, height: 3)
+            .overlay(alignment: .leading) {
+                Capsule()
+                    .fill(Palette.accent)
+                    .frame(width: 120 * model.paidRecurringRatio)
+            }
     }
 
     func stat(

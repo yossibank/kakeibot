@@ -94,6 +94,30 @@ struct RecurringWriteTests {
     }
 
     @Test
+    func recordsOneEntryOnRequestedDate() async throws {
+        let setup = try await Setup()
+        let recurrings = try await setup.database.recurrings()
+        let recurring = try #require(recurrings.first)
+        let date = try #require(LocalDate("2026-03-25"))
+
+        let first = try await setup.database.recordRecurring(
+            recurring.id,
+            on: date,
+            at: setup.now
+        )
+
+        let second = try await setup.database.recordRecurring(
+            recurring.id,
+            on: date,
+            at: setup.now
+        )
+
+        #expect(first?.recurringDate == date)
+        #expect(second == nil)
+        #expect(try setup.database.snapshot().entries.count == 1)
+    }
+
+    @Test
     func continuesFromGeneratedDate() async throws {
         let setup = try await Setup()
         let march = try #require(LocalDate("2026-03-01"))

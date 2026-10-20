@@ -41,7 +41,7 @@ struct HomeModelTests {
     }
 
     @Test
-    func marksRecurringWithoutEntryAsMissing() async throws {
+    func marksAndRecordsMissingRecurring() async throws {
         let setup = try await Setup()
         try await setup.saveRecurring(amount: 4800, day: 5)
         try await setup.saveRecurring(amount: 78000, day: 27)
@@ -55,6 +55,12 @@ struct HomeModelTests {
         #expect(model.periodRecurrings.map(\.status) == [.missing, .upcoming])
         #expect(model.paidRecurringExpense == 0)
         #expect(model.recurringExpense == 82800)
+
+        let missing = try #require(model.periodRecurrings.first)
+        await model.record(missing)
+        await model.load()
+
+        #expect(model.periodRecurrings.map(\.status) == [.done, .upcoming])
     }
 
     @Test

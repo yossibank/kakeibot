@@ -100,6 +100,26 @@ public extension AppDatabase {
         }
     }
 
+    @discardableResult
+    func recordRecurring(
+        _ id: Recurring.ID,
+        on date: LocalDate,
+        at now: Date
+    ) async throws -> Entry? {
+        try await writer.write { db in
+            guard let recurring = try Recurring.fetchOne(db, key: id) else {
+                return nil
+            }
+
+            return try Self.insertEntry(
+                of: recurring,
+                on: date,
+                in: db,
+                at: now
+            )
+        }
+    }
+
     func generateRecurringEntries(
         through today: LocalDate,
         at now: Date
@@ -129,37 +149,7 @@ private extension AppDatabase {
             : []
 
         for date in dates {
-            let earliest = date.adding(days: -Recurring.sameDateMargin)
-            let latest = date.adding(days: Recurring.sameDateMargin)
-            let exists = try Entry
-                .filter(Column("recurring_id") == recurring.id)
-                .filter(Column("recurring_date") >= earliest)
-                .filter(Column("recurring_date") <= latest)
-                .fetchCount(db) > 0
-
-            guard !exists else {
-                continue
-            }
-
-            let entry = Entry(
-                type: recurring.type,
-                amount: recurring.amount,
-                date: date,
-                categoryId: recurring.categoryId,
-                walletId: recurring.walletId,
-                toWalletId: recurring.toWalletId,
-                memo: recurring.memo,
-                recurringId: recurring.id,
-                recurringDate: date,
-                createdAt: now,
-                updatedAt: now
-            )
-
-            try entry.insert(db)
-
-            if entry.type == .expense {
-                try NoSpendDay.deleteOne(db, key: date)
-            }
+            try insertEntry(of: recurring, on: date, in: db, at: now)
         }
 
         guard recurring.startDate <= today else {
@@ -169,5 +159,47 @@ private extension AppDatabase {
         var updated = recurring
         updated.generatedUntil = today
         try updated.update(db)
+    }
+
+    @discardableResult
+    static func insertEntry(
+        of recurring: Recurring,
+        on date: LocalDate,
+        in db: Database,
+        at now: Date
+    ) throws -> Entry? {
+        let earliest = date.adding(days: -Recurring.sameDateMargin)
+        let latest = date.adding(days: Recurring.sameDateMargin)
+        let exists = try Entry
+            .filter(Column("recurring_id") == recurring.id)
+            .filter(Column("recurring_date") >= earliest)
+            .filter(Column("recurring_date") <= latest)
+            .fetchCount(db) > 0
+
+        guard !exists else {
+            return nil
+        }
+
+        let entry = Entry(
+            type: recurring.type,
+            amount: recurring.amount,
+            date: date,
+            categoryId: recurring.categoryId,
+            walletId: recurring.walletId,
+            toWalletId: recurring.toWalletId,
+            memo: recurring.memo,
+            recurringId: recurring.id,
+            recurringDate: date,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try entry.insert(db)
+
+        if entry.type == .expense {
+            try NoSpendDay.deleteOne(db, key: date)
+        }
+
+        return entry
     }
 }

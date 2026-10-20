@@ -117,7 +117,7 @@ private extension PeriodRecurringSheet {
 
                 Capsule()
                     .fill(Palette.accent)
-                    .frame(width: proxy.size.width * paidRatio)
+                    .frame(width: proxy.size.width * model.paidRecurringRatio)
             }
         }
         .frame(height: 6)
@@ -136,12 +136,18 @@ private extension PeriodRecurringSheet {
                     todayMarker
                 }
 
-                Button {
-                    onOpenRecurring(item.recurring.id)
-                } label: {
-                    row(item)
+                VStack(spacing: 0) {
+                    Button {
+                        onOpenRecurring(item.recurring.id)
+                    } label: {
+                        row(item)
+                    }
+                    .buttonStyle(.plain)
+
+                    if item.status == .missing {
+                        recordButton(item)
+                    }
                 }
-                .buttonStyle(.plain)
             }
 
             if todayIndex == items.count {
@@ -235,6 +241,29 @@ private extension PeriodRecurringSheet {
         .contentShape(.rect)
     }
 
+    func recordButton(_ item: HomeModel.PeriodRecurring) -> some View {
+        Button {
+            Task {
+                await model.record(item)
+            }
+        } label: {
+            Label("この日の分を記録", systemImage: "plus")
+                .textFont(.caption)
+                .foregroundStyle(Palette.accentStrong)
+                .padding(.horizontal, 12)
+                .frame(height: 30)
+                .background(Palette.faint, in: Capsule())
+                .overlay {
+                    Capsule()
+                        .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 12)
+    }
+
     @ViewBuilder
     func statusLabel(_ item: HomeModel.PeriodRecurring) -> some View {
         switch item.status {
@@ -261,16 +290,6 @@ private extension PeriodRecurringSheet {
 
     var todayIndex: Int {
         items.firstIndex { $0.date > model.today } ?? items.count
-    }
-
-    var paidRatio: CGFloat {
-        guard model.recurringExpense > 0 else {
-            return 0
-        }
-
-        let ratio = Double(model.paidRecurringExpense)
-            / Double(model.recurringExpense)
-        return CGFloat(min(ratio, 1))
     }
 
     static func weekdayTint(_ date: LocalDate) -> Color {

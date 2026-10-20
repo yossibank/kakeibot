@@ -114,6 +114,15 @@ public extension HomeModel {
         recurringTotal(of: .expense) { $0 == .upcoming }
     }
 
+    var paidRecurringRatio: Double {
+        guard recurringExpense > 0 else {
+            return 0
+        }
+
+        let ratio = Double(paidRecurringExpense) / Double(recurringExpense)
+        return min(ratio, 1)
+    }
+
     var monthIncome: Int {
         monthDays.reduce(0) { $0 + $1.incomeTotal }
     }
@@ -268,6 +277,18 @@ public extension HomeModel {
 
     func detail(for template: EntryTemplate) -> String {
         list?.detail(for: template) ?? ""
+    }
+
+    func record(_ item: PeriodRecurring) async {
+        do {
+            try await database.recordRecurring(
+                item.recurring.id,
+                on: item.date,
+                at: Date()
+            )
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+        }
     }
 
     func record(_ template: EntryTemplate) async -> EntryChange? {
