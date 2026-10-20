@@ -1,11 +1,15 @@
-public enum ThemeCorner: Int, CaseIterable, Codable, Sendable {
-    case small = 60
-    case standard = 100
-    case large = 140
+public enum ThemeCorner: String, CaseIterable, Codable, Sendable {
+    case small
+    case standard
+    case large
 }
 
 public extension ThemeCorner {
     var scale: Double {
-        Double(rawValue) / 100
+        switch self {
+        case .small: 0.6
+        case .standard: 1
+        case .large: 1.4
+        }
     }
 }

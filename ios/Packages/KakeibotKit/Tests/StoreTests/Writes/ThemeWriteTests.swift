@@ -17,24 +17,20 @@ struct ThemeWriteTests {
     }
 
     @Test
-    func usesChosenCustomThemeStyle() async throws {
+    func readsChosenStyle() async throws {
         let database = try AppDatabase.inMemory()
-        let style = ThemeStyle(corner: .large, font: .rounded)
-        var draft = Self.mint
-        draft.style = style
 
-        let theme = try await database.saveTheme(draft, at: Date())
-        try await database.setSetting(.theme, to: .custom(theme.id))
-        let saved = try await database.style()
+        try await database.setSetting(.cornerStyle, to: .large)
+        try await database.setSetting(.fontStyle, to: .rounded)
+        let style = try await database.style()
 
-        #expect(saved == style)
+        #expect(style == ThemeStyle(corner: .large, font: .rounded))
     }
 
     @Test
-    func usesStandardStyleForPreset() async throws {
+    func usesStandardStyleByDefault() async throws {
         let database = try AppDatabase.inMemory()
 
-        try await database.setSetting(.theme, to: .preset(.forest))
         let style = try await database.style()
 
         #expect(style == .standard)

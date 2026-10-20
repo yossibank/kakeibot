@@ -19,6 +19,8 @@ public extension Setting {
         case characterId = "character_id"
         case characterName = "character_name"
         case themeId = "theme_id"
+        case cornerStyle = "corner_style"
+        case fontStyle = "font_style"
         case onboardingCompleted = "onboarding_completed"
         case launchScreen = "launch_screen"
         case entryStartsWithAmount = "entry_starts_with_amount"

@@ -22,12 +22,9 @@ public struct ThemeEditSheet: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    ThemePreview(
-                        palette: model.palette,
-                        style: model.draft.style
-                    )
-                    .frame(width: 150)
-                    .frame(maxWidth: .infinity)
+                    ThemePreview(palette: model.palette)
+                        .frame(width: 150)
+                        .frame(maxWidth: .infinity)
 
                     SettingsField(
                         "名前",
@@ -40,18 +37,6 @@ public struct ThemeEditSheet: View {
                     ForEach(ThemeEditModel.Slot.allCases, id: \.self) { slot in
                         colorRow(slot)
                     }
-
-                    choiceRow(
-                        "角の丸み",
-                        selection: $model.draft.style.corner,
-                        options: Self.cornerOptions
-                    )
-
-                    choiceRow(
-                        "字体",
-                        selection: $model.draft.style.font,
-                        options: Self.fontOptions
-                    )
                 }
                 .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)
@@ -134,7 +119,11 @@ private extension ThemeEditSheet {
 
     func colorRow(_ slot: ThemeEditModel.Slot) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            rowTitle(slot.title)
+            Text(slot.title)
+                .font(.caption2)
+                .tracking(3)
+                .foregroundStyle(Palette.accent)
+                .padding(.leading, 6)
 
             LazyVGrid(columns: Self.swatchColumns, spacing: 8) {
                 ForEach(slot.swatches, id: \.self) { hex in
@@ -150,26 +139,6 @@ private extension ThemeEditSheet {
                 .frame(width: 36, height: 36)
             }
         }
-    }
-
-    func choiceRow<Value: Hashable>(
-        _ title: String,
-        selection: Binding<Value>,
-        options: [CapsulePicker<Value>.Option]
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            rowTitle(title)
-
-            CapsulePicker(selection: selection, options: options)
-        }
-    }
-
-    func rowTitle(_ title: String) -> some View {
-        Text(title)
-            .font(.caption2)
-            .tracking(3)
-            .foregroundStyle(Palette.accent)
-            .padding(.leading, 6)
     }
 
     func swatch(
@@ -213,16 +182,6 @@ private extension ThemeEditSheet {
     static let fade: CGFloat = 16
     static let swatchColumns = [
         GridItem(.adaptive(minimum: 36), spacing: 8)
-    ]
-    static let cornerOptions: [CapsulePicker<ThemeCorner>.Option] = [
-        .init("小さめ", value: .small),
-        .init("ふつう", value: .standard),
-        .init("大きめ", value: .large)
-    ]
-    static let fontOptions: [CapsulePicker<ThemeFont>.Option] = [
-        .init("明朝", value: .mincho),
-        .init("ゴシック", value: .gothic),
-        .init("丸ゴシック", value: .rounded)
     ]
 
     func colorBinding(_ slot: ThemeEditModel.Slot) -> Binding<Color> {

@@ -54,12 +54,9 @@ private extension AppDatabase {
     }
 
     static func style(in db: Database) throws -> ThemeStyle {
-        switch try setting(.theme, in: db) {
-        case .preset:
-            return .standard
-        case let .custom(id):
-            let theme = try Theme.fetchOne(db, key: id)
-            return theme?.style ?? .standard
-        }
+        try ThemeStyle(
+            corner: setting(.cornerStyle, in: db),
+            font: setting(.fontStyle, in: db)
+        )
     }
 }

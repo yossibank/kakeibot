@@ -3,8 +3,9 @@ import DesignSystem
 import SwiftUI
 
 struct ThemePreview: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let palette: ThemePalette
-    let style: ThemeStyle
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -23,9 +24,9 @@ struct ThemePreview: View {
             }
             .padding(8)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Palette.card, in: cardShape)
+            .background(Palette.card, in: .rect(cornerRadius: corner.radius(8)))
             .overlay {
-                cardShape
+                RoundedRectangle(cornerRadius: corner.radius(8))
                     .stroke(Palette.outline, lineWidth: 0.5)
             }
 
@@ -51,20 +52,14 @@ struct ThemePreview: View {
         }
         .padding(8)
         .frame(height: 132)
-        .background(Palette.background, in: backgroundShape)
+        .background(
+            Palette.background,
+            in: .rect(cornerRadius: corner.radius(14))
+        )
         .environment(\.palette, palette)
-        .environment(\.themeStyle, style)
     }
 }
 
 private extension ThemePreview {
     static let rows: [CGFloat] = [28, 20, 34]
-
-    var cardShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: style.corner.radius(8))
-    }
-
-    var backgroundShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: style.corner.radius(14))
-    }
 }

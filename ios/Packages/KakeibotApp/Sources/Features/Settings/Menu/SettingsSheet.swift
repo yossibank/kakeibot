@@ -22,6 +22,7 @@ public struct SettingsSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.notificationPermission) private var permission
+    @Environment(\.themeStyle) private var themeStyle
 
     private let database: AppDatabase
     private let today: LocalDate
@@ -200,6 +201,22 @@ public struct SettingsSheet: View {
                                         "テーマ",
                                         systemImage: "paintpalette",
                                         value: theme.title(in: customThemes)
+                                    )
+                                }
+
+                                Hairline()
+
+                                NavigationLink {
+                                    ThemeStyleView(
+                                        model: ThemeStyleModel(
+                                            database: database
+                                        )
+                                    )
+                                } label: {
+                                    row(
+                                        "角の丸みと字体",
+                                        systemImage: "textformat",
+                                        value: themeStyle.title
                                     )
                                 }
 
