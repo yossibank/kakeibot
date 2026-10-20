@@ -5,8 +5,10 @@ import SwiftUI
 
 public struct ThemeStyleView: View {
     @State private var model: ThemeStyleModel
+    @State private var openedStyle: ThemeStyle?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle) private var appStyle
     @Environment(\.themeStyle.corner) private var corner
 
     public init(model: ThemeStyleModel) {
@@ -14,18 +16,19 @@ public struct ThemeStyleView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 14) {
             header
 
-            Text("画面の角の丸みと、文字の字体を選べます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .multilineTextAlignment(.center)
+            preview
+                .environment(\.themeStyle, model.style)
+                .font(.text(.body, in: model.style.textFont))
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    preview
-                        .environment(\.themeStyle, model.style)
+                    Text("画面の角の丸みと、文字の字体を選べます")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+                        .frame(maxWidth: .infinity)
 
                     cornerRow
 
@@ -45,12 +48,15 @@ public struct ThemeStyleView: View {
                         .text(.subheadline, in: font)
                     }
                 }
-                .padding(.vertical, 8)
             }
             .contentMargins(.horizontal, 18, for: .scrollContent)
+            .contentMargins(.vertical, Self.fade, for: .scrollContent)
+            .edgeFade(Self.fade)
             .padding(.horizontal, -18)
             .scrollIndicators(.hidden)
         }
+        .environment(\.themeStyle, shownStyle)
+        .font(.text(.body, in: shownStyle.textFont))
         .padding(.horizontal, 18)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -64,6 +70,9 @@ public struct ThemeStyleView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: model.style)
+        .onAppear {
+            openedStyle = openedStyle ?? appStyle
+        }
         .task {
             await model.load()
         }
@@ -108,8 +117,11 @@ private extension ThemeStyleView {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.subtext)
             }
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+            .padding(.horizontal, 16)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
+            .frame(height: Self.restCardHeight)
             .card()
 
             HStack(spacing: 12) {
@@ -252,6 +264,8 @@ private extension ThemeStyleView {
             amount: 440
         )
     ]
+    static let fade: CGFloat = 16
+    static let restCardHeight: CGFloat = 108
     static let cornerMarkSize: CGFloat = 30
     static let cornerMarkRadius: CGFloat = 18
     static let sampleAmount = 1280
@@ -260,6 +274,10 @@ private extension ThemeStyleView {
         repeating: GridItem(.flexible(), spacing: 10),
         count: 3
     )
+
+    var shownStyle: ThemeStyle {
+        openedStyle ?? appStyle
+    }
 
     var tileShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(14))
