@@ -125,23 +125,19 @@ private extension ThemeEditSheet {
                 .foregroundStyle(Palette.accent)
                 .padding(.leading, 6)
 
-            ScrollView(.horizontal) {
-                HStack(spacing: 10) {
-                    ForEach(slot.swatches, id: \.self) { hex in
-                        swatch(hex, in: slot)
-                    }
-
-                    ColorPicker(
-                        slot.title,
-                        selection: colorBinding(slot),
-                        supportsOpacity: false
-                    )
-                    .labelsHidden()
+            LazyVGrid(columns: Self.swatchColumns, spacing: 8) {
+                ForEach(slot.swatches, id: \.self) { hex in
+                    swatch(hex, in: slot)
                 }
-                .padding(.horizontal, 6)
-                .padding(.vertical, 4)
+
+                ColorPicker(
+                    slot.title,
+                    selection: colorBinding(slot),
+                    supportsOpacity: false
+                )
+                .labelsHidden()
+                .frame(width: 36, height: 36)
             }
-            .scrollIndicators(.hidden)
         }
     }
 
@@ -150,10 +146,11 @@ private extension ThemeEditSheet {
         in slot: ThemeEditModel.Slot
     ) -> some View {
         let isSelected = model.draft[keyPath: slot.keyPath] == hex
+        let isAvailable = model.isAvailable(hex, for: slot)
         let ring = isSelected ? Palette.accent : Palette.line
 
         return Button {
-            model.draft[keyPath: slot.keyPath] = hex
+            model.choose(hex, for: slot)
         } label: {
             Circle()
                 .fill(Color(hex: hex) ?? .clear)
@@ -163,8 +160,17 @@ private extension ThemeEditSheet {
                     Circle()
                         .stroke(ring, lineWidth: isSelected ? 2 : 1)
                 }
+                .overlay {
+                    if !isAvailable {
+                        Image(systemName: "line.diagonal")
+                            .font(.sans(.body, weight: .light))
+                            .foregroundStyle(Palette.hint)
+                    }
+                }
+                .opacity(isAvailable ? 1 : 0.35)
         }
         .buttonStyle(.plain)
+        .disabled(!isAvailable)
     }
 }
 
@@ -174,12 +180,15 @@ private extension ThemeEditSheet {
     }
 
     static let fade: CGFloat = 16
+    static let swatchColumns = [
+        GridItem(.adaptive(minimum: 36), spacing: 8)
+    ]
 
     func colorBinding(_ slot: ThemeEditModel.Slot) -> Binding<Color> {
         Binding {
             Color(hex: model.draft[keyPath: slot.keyPath]) ?? .clear
         } set: { color in
-            model.draft[keyPath: slot.keyPath] = color.hex
+            model.choose(color.hex, for: slot)
         }
     }
 

@@ -61,6 +61,46 @@ public extension ThemeEditModel {
         draft.palette ?? .night
     }
 
+    func isAvailable(
+        _ hex: String,
+        for slot: Slot
+    ) -> Bool {
+        if slot == .surface {
+            return Self.isLight(hex) == Self.isLight(draft.background)
+        }
+
+        var draft = draft
+        draft[keyPath: slot.keyPath] = hex
+        return Self.isReadable(draft, slot)
+    }
+
+    func choose(
+        _ hex: String,
+        for slot: Slot
+    ) {
+        var next = draft
+        next[keyPath: slot.keyPath] = hex
+
+        if slot == .background,
+           Self.isLight(next.surface) != Self.isLight(hex) {
+            next.surface = Self.pairedSurface(for: hex)
+        }
+
+        for other in Slot.allCases where !Self.isReadable(next, other) {
+            let readable = other.swatches.first { swatch in
+                var candidate = next
+                candidate[keyPath: other.keyPath] = swatch
+                return Self.isReadable(candidate, other)
+            }
+
+            if let readable {
+                next[keyPath: other.keyPath] = readable
+            }
+        }
+
+        draft = next
+    }
+
     func save() async -> Bool {
         do {
             let theme = try await database.saveTheme(
@@ -98,11 +138,20 @@ public extension ThemeEditModel {
 public extension ThemeEditModel.Slot {
     var title: String {
         switch self {
-        case .background: "地"
+        case .background: "背景"
         case .surface: "カード"
         case .text: "文字"
-        case .subtext: "控えめな文字"
-        case .accent: "強調"
+        case .subtext: "補足の文字"
+        case .accent: "アクセント"
+        }
+    }
+
+    var roles: Set<ThemePalette.Role> {
+        switch self {
+        case .background, .surface: []
+        case .text: [.text]
+        case .subtext: [.subtext, .hint]
+        case .accent: [.accent, .accentStrong]
         }
     }
 
@@ -140,6 +189,38 @@ public extension ThemeEditModel.Slot {
                 "#8A6420", "#2F5A8C", "#2F6A55", "#9C3D52", "#6E4E1C"
             ]
         }
+    }
+}
+
+private extension ThemeEditModel {
+    static func isLight(_ hex: String) -> Bool {
+        let rgb = UInt32(hex.dropFirst(), radix: 16) ?? 0
+        let onBlack = ThemePalette.contrast(rgb, 0x000000)
+        let onWhite = ThemePalette.contrast(rgb, 0xFFFFFF)
+        return onBlack > onWhite
+    }
+
+    static func pairedSurface(for background: String) -> String {
+        let backgrounds = Slot.background.swatches
+        let surfaces = Slot.surface.swatches
+
+        if let index = backgrounds.firstIndex(of: background) {
+            return surfaces[index]
+        }
+
+        let isLight = isLight(background)
+        return surfaces.first { Self.isLight($0) == isLight } ?? background
+    }
+
+    static func isReadable(
+        _ draft: ThemeDraft,
+        _ slot: Slot
+    ) -> Bool {
+        guard let palette = draft.palette else {
+            return false
+        }
+
+        return slot.roles.isDisjoint(with: palette.unreadableRoles)
     }
 }
 

@@ -72,7 +72,7 @@ public struct ThemeListView: View {
                 model: ThemeEditModel(
                     database: database,
                     editing: target.theme,
-                    base: model.currentPalette
+                    base: target.base ?? model.currentPalette
                 )
             )
         }
@@ -119,7 +119,7 @@ private extension ThemeListView {
 
     var newTile: some View {
         Button {
-            editing = .new
+            editing = .new(base: nil)
         } label: {
             VStack(spacing: 8) {
                 RoundedRectangle(cornerRadius: 14)
@@ -232,6 +232,11 @@ private extension ThemeListView {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            Button("これをもとにつくる", systemImage: "plus.square.on.square") {
+                editing = .new(base: palette)
+            }
+        }
     }
 
     func tileTitle(
@@ -249,7 +254,7 @@ private extension ThemeListView {
 
 private extension ThemeListView {
     enum EditTarget: Identifiable {
-        case new
+        case new(base: ThemePalette?)
         case edit(Theme)
 
         var id: String {
@@ -263,6 +268,13 @@ private extension ThemeListView {
             switch self {
             case .new: nil
             case let .edit(theme): theme
+            }
+        }
+
+        var base: ThemePalette? {
+            switch self {
+            case let .new(base): base
+            case .edit: nil
             }
         }
     }

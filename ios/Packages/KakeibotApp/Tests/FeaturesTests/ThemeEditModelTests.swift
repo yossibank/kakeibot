@@ -25,6 +25,37 @@ struct ThemeEditModelTests {
     }
 
     @Test
+    func keepsTextReadableWhenBackgroundChanges() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = ThemeEditModel(
+            database: setup.database,
+            editing: nil,
+            base: .night
+        )
+
+        model.choose("#FFFFFF", for: .background)
+
+        #expect(model.draft.background == "#FFFFFF")
+        #expect(model.palette.unreadableRoles.isEmpty)
+    }
+
+    @Test
+    func disablesUnreadableSwatches() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = ThemeEditModel(
+            database: setup.database,
+            editing: nil,
+            base: .night
+        )
+
+        let dark = model.isAvailable("#1E1E22", for: .text)
+        let light = model.isAvailable("#EDE6D6", for: .text)
+
+        #expect(!dark)
+        #expect(light)
+    }
+
+    @Test
     func blocksUnreadableColors() async throws {
         let setup = try await HomeModelTests.Setup()
         let model = ThemeEditModel(
