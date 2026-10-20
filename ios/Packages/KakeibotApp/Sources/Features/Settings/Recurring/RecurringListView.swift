@@ -280,7 +280,7 @@ private extension RecurringListView {
                             .textFont(.caption2)
                             .foregroundStyle(Palette.amber)
                     } else {
-                        Text(Self.nextText(row.next))
+                        Text(Self.nextText(row))
                             .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
                     }
@@ -486,12 +486,13 @@ private extension RecurringListView {
         }
     }
 
-    static func nextText(_ date: LocalDate?) -> String {
-        guard let date else {
+    static func nextText(_ row: RecurringListModel.Row) -> String {
+        guard let date = row.next else {
             return "終わりました"
         }
 
-        return "次は \(date.month)/\(date.day)"
+        let next = "次は \(date.month)/\(date.day)"
+        return [row.closing, next].compactMap(\.self).joined(separator: "・")
     }
 }
 

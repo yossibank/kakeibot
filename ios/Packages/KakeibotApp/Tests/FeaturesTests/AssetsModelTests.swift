@@ -38,6 +38,55 @@ struct AssetsModelTests {
         #expect(totals == [0, 0, 0, 0, 250_000, 249_020])
         #expect(model.monthTotals.last?.month == setup.today.yearMonth)
     }
+
+    @Test
+    func listsUpcomingCardBills() async throws {
+        let setup = try await Setup()
+
+        let card = try await setup.database.saveWallet(
+            WalletDraft(
+                kind: .card,
+                name: "カード",
+                mark: .glyph(.card),
+                color: "#4A6FA5",
+                initialBalance: 0
+            ),
+            at: Date()
+        )
+
+        try await setup.save(.expense, 30000, on: "2026-09-20", from: card.id)
+        try await setup.save(.expense, 12000, on: "2026-10-10", from: card.id)
+
+        let draft = try RecurringDraft(
+            type: .transfer,
+            amount: 0,
+            categoryId: nil,
+            walletId: setup.bank,
+            toWalletId: card.id,
+            frequency: .monthly,
+            month: 1,
+            day: 26,
+            closingDay: 15,
+            startDate: #require(LocalDate("2026-10-01"))
+        )
+
+        try await setup.database.saveRecurring(
+            draft,
+            today: setup.today,
+            at: Date()
+        )
+
+        let model = AssetsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let bill = try #require(model.upcomingBills.first)
+        let from = try #require(LocalDate("2026-09-16"))
+        let through = try #require(LocalDate("2026-10-15"))
+
+        #expect(bill.date == LocalDate("2026-10-26"))
+        #expect(bill.amount == 42000)
+        #expect(bill.period == from...through)
+        #expect(model.upcomingBillTotal == 42000)
+    }
 }
 
 extension AssetsModelTests {

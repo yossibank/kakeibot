@@ -155,6 +155,9 @@ struct MainView: View {
                     },
                     onOpenWallet: { id in
                         sheet = .wallet(id)
+                    },
+                    onOpenRecurring: { id in
+                        sheet = .recurring(id)
                     }
                 )
                 .tabContent()

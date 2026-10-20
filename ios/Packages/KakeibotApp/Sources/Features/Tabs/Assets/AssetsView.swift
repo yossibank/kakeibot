@@ -7,15 +7,18 @@ public struct AssetsView: View {
 
     private let onTransfer: () -> Void
     private let onOpenWallet: (Wallet.ID) -> Void
+    private let onOpenRecurring: (Recurring.ID) -> Void
 
     public init(
         model: AssetsModel,
         onTransfer: @escaping () -> Void,
-        onOpenWallet: @escaping (Wallet.ID) -> Void
+        onOpenWallet: @escaping (Wallet.ID) -> Void,
+        onOpenRecurring: @escaping (Recurring.ID) -> Void
     ) {
         self.model = model
         self.onTransfer = onTransfer
         self.onOpenWallet = onOpenWallet
+        self.onOpenRecurring = onOpenRecurring
     }
 
     public var body: some View {
@@ -23,6 +26,11 @@ public struct AssetsView: View {
             VStack(spacing: 12) {
                 header
                 totalCard
+
+                if !model.upcomingBills.isEmpty {
+                    billCard
+                }
+
                 walletGrid
             }
             .padding(.horizontal, 16)
@@ -93,6 +101,32 @@ private extension AssetsView {
         .card(cornerRadius: 24)
     }
 
+    var billCard: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline) {
+                SectionTitle("これからの引き落とし")
+
+                Spacer()
+
+                Text("合計 \(AmountText.text(model.upcomingBillTotal))")
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+            }
+
+            ForEach(model.upcomingBills) { bill in
+                Button {
+                    onOpenRecurring(bill.recurring.id)
+                } label: {
+                    billRow(bill)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(16)
+        .card(cornerRadius: 24)
+    }
+
     var walletGrid: some View {
         LazyVGrid(columns: Self.columns, spacing: 8) {
             ForEach(model.rows) { row in
@@ -104,6 +138,54 @@ private extension AssetsView {
                 .buttonStyle(.plain)
             }
         }
+    }
+
+    func billRow(_ bill: AssetsModel.UpcomingBill) -> some View {
+        HStack(spacing: 12) {
+            VStack(spacing: 0) {
+                Text("\(bill.date.month)/\(bill.date.day)")
+                    .textFont(.subheadline)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.text)
+
+                Text(bill.date.weekday.shortName)
+                    .textFont(.caption2)
+                    .foregroundStyle(bill.date.tint ?? Palette.subtext)
+            }
+            .frame(width: 44)
+
+            IconBadge(bill.icon, size: 34)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(bill.title)
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+
+                if let route = bill.route {
+                    Text(route)
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer(minLength: 8)
+
+            VStack(alignment: .trailing, spacing: 3) {
+                AmountText(bill.amount, type: .transfer)
+                    .textFont(.subheadline)
+
+                if let period = bill.period {
+                    Text("\(RecurringText.period(period)) の利用分")
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.hint)
+                        .lineLimit(1)
+                }
+            }
+        }
+        .padding(.vertical, 8)
+        .contentShape(.rect)
     }
 
     func walletTile(_ row: AssetsModel.WalletRow) -> some View {

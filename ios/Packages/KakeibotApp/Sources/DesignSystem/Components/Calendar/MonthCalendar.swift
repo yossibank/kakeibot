@@ -180,11 +180,7 @@ private extension MonthCalendar {
             return Palette.backgroundBottom
         }
 
-        if Holiday.contains(date) {
-            return Palette.holiday
-        }
-
-        return date.weekday.tint ?? Palette.text
+        return date.tint ?? Palette.text
     }
 }
 

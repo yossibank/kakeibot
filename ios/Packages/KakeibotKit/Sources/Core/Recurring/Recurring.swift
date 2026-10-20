@@ -13,6 +13,7 @@ public struct Recurring: Hashable, Sendable {
     public var day: Int
     public var holidayShift: HolidayShift
     public var closingDay: Int?
+    public var paysAfterClosings: Int
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -35,6 +36,7 @@ public struct Recurring: Hashable, Sendable {
         day: Int,
         holidayShift: HolidayShift = .none,
         closingDay: Int? = nil,
+        paysAfterClosings: Int = 1,
         startDate: LocalDate,
         endDate: LocalDate? = nil,
         remindDaysBefore: Int? = nil,
@@ -56,6 +58,7 @@ public struct Recurring: Hashable, Sendable {
         self.day = day
         self.holidayShift = holidayShift
         self.closingDay = closingDay
+        self.paysAfterClosings = paysAfterClosings
         self.startDate = startDate
         self.endDate = endDate
         self.remindDaysBefore = remindDaysBefore
@@ -98,6 +101,7 @@ extension Recurring: Codable {
         case day
         case holidayShift
         case closingDay
+        case paysAfterClosings
         case startDate
         case endDate
         case remindDaysBefore
@@ -113,6 +117,11 @@ extension Recurring: Codable {
         let shift = try container.decodeIfPresent(
             HolidayShift.self,
             forKey: .holidayShift
+        )
+
+        let paysAfter = try container.decodeIfPresent(
+            Int.self,
+            forKey: .paysAfterClosings
         )
 
         try self.init(
@@ -137,6 +146,7 @@ extension Recurring: Codable {
                 Int.self,
                 forKey: .closingDay
             ),
+            paysAfterClosings: paysAfter ?? 1,
             startDate: container.decode(LocalDate.self, forKey: .startDate),
             endDate: container.decodeIfPresent(
                 LocalDate.self,
@@ -174,6 +184,7 @@ extension Recurring: Codable {
         try container.encode(day, forKey: .day)
         try container.encode(holidayShift, forKey: .holidayShift)
         try container.encodeOrNull(closingDay, forKey: .closingDay)
+        try container.encode(paysAfterClosings, forKey: .paysAfterClosings)
         try container.encode(startDate, forKey: .startDate)
         try container.encodeOrNull(endDate, forKey: .endDate)
         try container.encodeOrNull(remindDaysBefore, forKey: .remindDaysBefore)

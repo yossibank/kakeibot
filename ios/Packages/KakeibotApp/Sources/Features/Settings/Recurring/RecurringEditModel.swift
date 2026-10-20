@@ -16,6 +16,7 @@ public final class RecurringEditModel {
     public var day: Int
     public private(set) var holidayShift: Recurring.HolidayShift = .none
     public var closingDay: Int?
+    public var paysAfterClosings = 1
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -81,6 +82,7 @@ public extension RecurringEditModel {
             day: day,
             holidayShift: holidayShift,
             closingDay: canUseClosingDay ? closingDay : nil,
+            paysAfterClosings: paysAfterClosings,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore
@@ -265,7 +267,7 @@ private extension RecurringEditModel {
         case .sameWallet: "振替元と振替先を別にしてください"
         case .endBeforeStart: "終わりを始まりより後にしてください"
         case .categoryOnTransfer, .dayOutOfRange, .closingDayOutOfRange,
-             .monthOutOfRange, .remindOutOfRange:
+             .paysAfterClosingsOutOfRange, .monthOutOfRange, .remindOutOfRange:
             Self.saveFailedMessage
         }
     }
@@ -294,6 +296,7 @@ private extension RecurringEditModel {
         day = draft.day
         holidayShift = draft.holidayShift
         closingDay = draft.closingDay
+        paysAfterClosings = draft.paysAfterClosings
         startDate = draft.startDate
         endDate = draft.endDate
         remindDaysBefore = draft.remindDaysBefore

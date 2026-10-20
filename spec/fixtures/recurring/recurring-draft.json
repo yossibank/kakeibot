@@ -18,5 +18,6 @@
   { "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 31, "problems": ["remindOutOfRange"] },
   { "type": "transfer", "amount": 0, "category": false, "wallet": true, "toWallet": "other", "frequency": "monthly", "month": 1, "day": 27, "closingDay": 15, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": [] },
   { "type": "transfer", "amount": 0, "category": false, "wallet": true, "toWallet": "other", "frequency": "monthly", "month": 1, "day": 27, "closingDay": 32, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["closingDayOutOfRange"] },
+  { "type": "transfer", "amount": 0, "category": false, "wallet": true, "toWallet": "other", "frequency": "monthly", "month": 1, "day": 27, "closingDay": 15, "paysAfterClosings": 3, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["paysAfterClosingsOutOfRange"] },
   { "type": "expense", "amount": 0, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "closingDay": 15, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["amountNotPositive"] }
 ]

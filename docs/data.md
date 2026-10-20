@@ -209,6 +209,7 @@ emoji・text・glyph のどれかは必須。
 | day | INTEGER | 1〜31。月末を超えたらその月の最終日 |
 | holiday_shift | TEXT | `none` `previous` `next`。休日に当たったら、そのまま・前の平日・次の平日にする |
 | closing_day | INTEGER | 振替だけ。1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にする。amount は 0 にする |
+| pays_after_closings | INTEGER | 1 か 2。締めの後、何回目の引き落とし日に払うか。翌々月払いは 2 |
 | start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |

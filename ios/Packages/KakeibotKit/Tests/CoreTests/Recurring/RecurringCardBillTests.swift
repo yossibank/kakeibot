@@ -5,7 +5,8 @@ import Testing
 struct RecurringCardBillTests {
     @Test(arguments: try periodCases)
     func findsBillingPeriod(fixture: PeriodCase) throws {
-        let bill = try Self.bill(closingDay: fixture.closingDay)
+        var bill = try Self.bill(closingDay: fixture.closingDay)
+        bill.paysAfterClosings = fixture.paysAfterClosings ?? 1
         let period = bill.billingPeriod(paidOn: fixture.paidOn)
         #expect(period == fixture.from...fixture.through)
     }
@@ -41,6 +42,7 @@ struct RecurringCardBillTests {
 extension RecurringCardBillTests {
     struct PeriodCase: Decodable, Sendable {
         let closingDay: Int
+        let paysAfterClosings: Int?
         let paidOn: LocalDate
         let from: LocalDate
         let through: LocalDate

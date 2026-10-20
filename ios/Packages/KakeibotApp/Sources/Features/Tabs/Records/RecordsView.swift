@@ -578,11 +578,7 @@ private extension RecordsView {
     }
 
     static func weekdayColor(for date: LocalDate) -> Color {
-        if Holiday.contains(date) || date.weekday == .sunday {
-            return Palette.holiday
-        }
-
-        return date.weekday.tint ?? Palette.subtext
+        date.tint ?? Palette.subtext
     }
 
     func dayColor(
@@ -593,11 +589,7 @@ private extension RecordsView {
             return Palette.backgroundBottom
         }
 
-        if Holiday.contains(date) {
-            return Palette.holiday
-        }
-
-        return date.weekday.tint ?? Palette.text
+        return date.tint ?? Palette.text
     }
 
     func moveMonth(_ direction: PageSwipeDirection) {

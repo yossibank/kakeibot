@@ -9,12 +9,13 @@ public extension Recurring {
             clampedDay: closingDay
         )
 
-        let closing = thisMonth < date
-            ? thisMonth
-            : LocalDate(
-                yearMonth: date.yearMonth.adding(months: -1),
-                clampedDay: closingDay
-            )
+        let latest = thisMonth < date ? 0 : -1
+        let months = latest - (paysAfterClosings - 1)
+
+        let closing = LocalDate(
+            yearMonth: date.yearMonth.adding(months: months),
+            clampedDay: closingDay
+        )
 
         let previous = LocalDate(
             yearMonth: closing.yearMonth.adding(months: -1),

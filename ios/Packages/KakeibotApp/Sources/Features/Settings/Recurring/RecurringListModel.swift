@@ -35,6 +35,7 @@ public extension RecurringListModel {
         public let type: Entry.Kind
         public let icon: Icon?
         public let next: LocalDate?
+        public let closing: String?
     }
 
     struct MonthTotal: Equatable {
@@ -217,18 +218,24 @@ private extension RecurringListModel {
         )
 
         let holiday = RecurringText.holidayNote(recurring.holidayShift)
-        let closing = recurring.closingDay.map(RecurringText.closingNote)
+        let closing = recurring.closingDay.map { day in
+            RecurringText.closingNote(
+                day,
+                paysAfter: recurring.paysAfterClosings
+            )
+        }
         let place = list.place(of: recurring)
         let next = recurring.nextDate(onOrAfter: today)
 
         return Row(
             id: recurring.id,
             title: list.title(of: recurring) ?? Self.title(of: recurring.type),
-            detail: [schedule, closing, holiday, place].rowDetail ?? "",
+            detail: [schedule, holiday, place].rowDetail ?? "",
             amount: list.amount(of: recurring, on: next ?? today),
             type: recurring.type,
             icon: list.icon(of: recurring),
-            next: next
+            next: next,
+            closing: closing
         )
     }
 }

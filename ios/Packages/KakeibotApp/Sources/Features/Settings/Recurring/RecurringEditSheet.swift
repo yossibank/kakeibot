@@ -335,8 +335,20 @@ private extension RecurringEditSheet {
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
 
+            VStack(spacing: 6) {
+                CapsulePicker(
+                    selection: $model.paysAfterClosings,
+                    options: Self.paysAfterOptions
+                )
+
+                Text("締めの後、何回目の引き落とし日に払うか。翌々月払いは 2 回目です")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.hint)
+                    .multilineTextAlignment(.center)
+            }
+
             SettingsChoice(
-                RecurringText.closingDay(nil),
+                RecurringText.closingDay(nil, paysAfter: 1),
                 isSelected: model.closingDay == nil
             ) {
                 model.closingDay = nil
@@ -397,6 +409,11 @@ private extension RecurringEditSheet {
             .init("毎月", value: .monthly),
             .init("毎年", value: .yearly)
         ]
+
+    static let paysAfterOptions: [CapsulePicker<Int>.Option] = [
+        .init("1 回目", value: 1),
+        .init("2 回目", value: 2)
+    ]
 
     static let monthColumns = Array(
         repeating: GridItem(.flexible(), spacing: 6),
@@ -501,7 +518,10 @@ private extension RecurringEditSheet {
             panel: .closing,
             systemImage: "creditcard",
             title: "金額の決め方",
-            value: RecurringText.closingDay(model.closingDay),
+            value: RecurringText.closingDay(
+                model.closingDay,
+                paysAfter: model.paysAfterClosings
+            ),
             isEmpty: model.closingDay == nil
         )
 
