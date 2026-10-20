@@ -655,7 +655,7 @@ private extension EntrySheet {
             await model.load()
         }
 
-        isEnteringAmount = model.startsWithKeypad
+        isEnteringAmount = model.opensKeypadFirst
 
         showSelectedCategory()
     }

@@ -293,7 +293,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | theme_id | 用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空ならネイビー |
 | onboarding_completed | `true` `false` |
 | launch_screen | `home` `entry`。空ならホーム |
-| entry_opens_keypad | `false` なら、入力シートを開いたときにテンキーを出さない。空なら出す |
+| entry_starts_with_amount | `true` なら、新しく記録するとき入力シートをテンキーを出して開く |
 | template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |
 | category_menu_opened | `true` `false`。`true` なら入力シートの長押しのヒントを出さない |
 | records_layout | `list` `calendar`。空なら一覧 |

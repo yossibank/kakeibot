@@ -6,7 +6,7 @@ import SwiftUI
 public struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
     @State private var launchScreen: LaunchScreen = .home
-    @State private var opensKeypad = true
+    @State private var startsWithAmount = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
     @State private var closedHints: Set<SettingsScreen> = []
@@ -245,20 +245,20 @@ public struct SettingsSheet: View {
                             .card()
 
                             HStack(spacing: 12) {
-                                Image(systemName: "keyboard")
+                                Image(systemName: "yensign")
                                     .font(.sans(.body, weight: .light))
                                     .foregroundStyle(Palette.accent)
                                     .frame(width: 22)
 
-                                Text("テンキーを開いておく")
+                                Text("金額から入力")
                                     .font(.subheadline)
                                     .foregroundStyle(Palette.text)
 
                                 Spacer()
 
                                 CapsulePicker(
-                                    selection: opensKeypadBinding,
-                                    options: Self.keypadOptions
+                                    selection: startsWithAmountBinding,
+                                    options: Self.startOptions
                                 )
                             }
                             .frame(minHeight: 52)
@@ -318,8 +318,8 @@ public struct SettingsSheet: View {
             launchScreen = await (try? database.setting(.launchScreen)) ?? .home
         }
         .task {
-            let opens = try? await database.setting(.entryOpensKeypad)
-            opensKeypad = opens ?? true
+            let starts = try? await database.setting(.entryStartsWithAmount)
+            startsWithAmount = starts ?? false
         }
     }
 }
@@ -415,19 +415,22 @@ private extension SettingsSheet {
     static let launchOptions: [CapsulePicker<LaunchScreen>.Option] =
         LaunchScreen.allCases.map { .init($0.title, value: $0) }
 
-    static let keypadOptions: [CapsulePicker<Bool>.Option] = [
+    static let startOptions: [CapsulePicker<Bool>.Option] = [
         .init("する", value: true),
         .init("しない", value: false)
     ]
 
-    var opensKeypadBinding: Binding<Bool> {
+    var startsWithAmountBinding: Binding<Bool> {
         Binding {
-            opensKeypad
-        } set: { opens in
-            opensKeypad = opens
+            startsWithAmount
+        } set: { starts in
+            startsWithAmount = starts
 
             Task {
-                try? await database.setSetting(.entryOpensKeypad, to: opens)
+                try? await database.setSetting(
+                    .entryStartsWithAmount,
+                    to: starts
+                )
             }
         }
     }

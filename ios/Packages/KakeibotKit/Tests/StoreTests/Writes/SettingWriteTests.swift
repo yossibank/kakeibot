@@ -22,15 +22,15 @@ struct SettingWriteTests {
     }
 
     @Test
-    func savesKeypadChoice() async throws {
+    func savesEntryStart() async throws {
         let database = try AppDatabase.inMemory()
 
-        let initial = try await database.setting(.entryOpensKeypad)
-        try await database.setSetting(.entryOpensKeypad, to: false)
-        let saved = try await database.setting(.entryOpensKeypad)
+        let initial = try await database.setting(.entryStartsWithAmount)
+        try await database.setSetting(.entryStartsWithAmount, to: true)
+        let saved = try await database.setting(.entryStartsWithAmount)
 
-        #expect(initial)
-        #expect(!saved)
+        #expect(!initial)
+        #expect(saved)
     }
 
     @Test

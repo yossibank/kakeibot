@@ -295,8 +295,12 @@ private extension ThemeListView {
         MenuPanel(width: Self.menuWidth) {
             MenuHeader(menu.title) {
                 Circle()
-                    .fill(Palette.accent)
-                    .frame(width: 12, height: 12)
+                    .fill(Palette.backgroundTop)
+                    .overlay {
+                        Circle()
+                            .strokeBorder(Palette.accent, lineWidth: 2)
+                    }
+                    .frame(width: 16, height: 16)
                     .environment(\.palette, menu.palette)
             }
 

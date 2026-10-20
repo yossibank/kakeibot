@@ -22,10 +22,17 @@ struct EntryModelTests {
     }
 
     @Test
-    func startsNewEntryWithKeypad() async throws {
-        let model = try await Self.newModel()
+    func opensKeypadFirstWhenChosen() async throws {
+        let setup = try await Setup()
+        let initial = EntryModel(database: setup.database, date: setup.date)
+        await initial.load()
+        try await setup.database.setSetting(.entryStartsWithAmount, to: true)
+        let model = EntryModel(database: setup.database, date: setup.date)
 
-        #expect(model.startsWithKeypad)
+        await model.load()
+
+        #expect(!initial.opensKeypadFirst)
+        #expect(model.opensKeypadFirst)
     }
 
     @Test
