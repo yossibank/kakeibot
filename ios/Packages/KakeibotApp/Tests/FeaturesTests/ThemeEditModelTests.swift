@@ -11,7 +11,8 @@ struct ThemeEditModelTests {
         let model = ThemeEditModel(
             database: setup.database,
             editing: nil,
-            base: ThemePreset.forest.palette
+            base: ThemePreset.forest.palette,
+            style: .standard
         )
         model.draft.name = "森の夜"
 
@@ -25,12 +26,31 @@ struct ThemeEditModelTests {
     }
 
     @Test
+    func savesChosenStyle() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = ThemeEditModel(
+            database: setup.database,
+            editing: nil,
+            base: .night,
+            style: ThemeStyle(corner: .large, font: .gothic)
+        )
+        model.draft.name = "丸い夜"
+        model.draft.style.font = .rounded
+
+        _ = await model.save()
+        let style = try await setup.database.style()
+
+        #expect(style == ThemeStyle(corner: .large, font: .rounded))
+    }
+
+    @Test
     func keepsTextReadableWhenBackgroundChanges() async throws {
         let setup = try await HomeModelTests.Setup()
         let model = ThemeEditModel(
             database: setup.database,
             editing: nil,
-            base: .night
+            base: .night,
+            style: .standard
         )
 
         model.choose("#FFFFFF", for: .background)
@@ -45,7 +65,8 @@ struct ThemeEditModelTests {
         let model = ThemeEditModel(
             database: setup.database,
             editing: nil,
-            base: .night
+            base: .night,
+            style: .standard
         )
 
         let dark = model.isAvailable("#1E1E22", for: .text)
@@ -61,7 +82,8 @@ struct ThemeEditModelTests {
         let model = ThemeEditModel(
             database: setup.database,
             editing: nil,
-            base: .night
+            base: .night,
+            style: .standard
         )
         model.draft.name = "読めない"
         model.draft.text = model.draft.background

@@ -4,6 +4,8 @@ import Store
 import SwiftUI
 
 public struct OnboardingView: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     @State private var model: OnboardingModel
     @State private var slide = PageSlide()
 
@@ -108,7 +110,7 @@ private extension OnboardingView {
         VStack(spacing: 22) {
             VStack(spacing: 10) {
                 Text("ようこそ")
-                    .font(.serif(.title))
+                    .displayFont(.title)
                     .tracking(8)
                     .foregroundStyle(Palette.accent)
 
@@ -194,7 +196,7 @@ private extension OnboardingView {
                         .foregroundStyle(Palette.accent)
 
                     Text(budgetText)
-                        .font(.serif(.largeTitle, weight: .bold))
+                        .displayFont(.largeTitle, weight: .bold)
                         .monospacedDigit()
                         .foregroundStyle(budgetColor)
 
@@ -239,7 +241,7 @@ private extension OnboardingView {
     ) -> some View {
         VStack(spacing: 8) {
             Text(title)
-                .font(.serif(.headline))
+                .displayFont(.headline)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -304,9 +306,9 @@ private extension OnboardingView {
                     .foregroundStyle(Palette.accent)
             }
             .padding(16)
-            .background(fill, in: .rect(cornerRadius: 20))
+            .background(fill, in: .rect(cornerRadius: corner.radius(20)))
             .overlay {
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: corner.radius(20))
                     .stroke(stroke, lineWidth: 1)
             }
             .contentShape(.rect)

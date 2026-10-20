@@ -7,13 +7,18 @@ public extension View {
 }
 
 private struct CardBackground: ViewModifier {
+    @Environment(\.themeStyle.corner) private var corner
+
     let cornerRadius: CGFloat
 
     func body(content: Content) -> some View {
         content
-            .background(Palette.card, in: .rect(cornerRadius: cornerRadius))
+            .background(
+                Palette.card,
+                in: .rect(cornerRadius: corner.radius(cornerRadius))
+            )
             .overlay {
-                RoundedRectangle(cornerRadius: cornerRadius)
+                RoundedRectangle(cornerRadius: corner.radius(cornerRadius))
                     .strokeBorder(Palette.accent.opacity(.muted), lineWidth: 1)
             }
     }

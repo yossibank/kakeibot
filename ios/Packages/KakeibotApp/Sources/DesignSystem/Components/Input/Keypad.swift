@@ -2,6 +2,8 @@ import Core
 import SwiftUI
 
 public struct Keypad: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let activeTax: AmountCalculator.TaxRate?
     let onKey: (AmountCalculator.Key) -> Void
 
@@ -37,10 +39,10 @@ private extension Keypad {
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background(
                     Self.background(for: key, isActive: isActive),
-                    in: .rect(cornerRadius: 14)
+                    in: .rect(cornerRadius: corner.radius(14))
                 )
                 .overlay {
-                    RoundedRectangle(cornerRadius: 14)
+                    RoundedRectangle(cornerRadius: corner.radius(14))
                         .stroke(
                             Self.stroke(for: key, isActive: isActive),
                             lineWidth: 0.75
@@ -67,7 +69,7 @@ private extension Keypad {
                 .foregroundStyle(Palette.text)
         case .clear:
             Text("AC")
-                .font(.serif(.body, weight: .medium))
+                .displayFont(.body, weight: .medium)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
         case let .tax(rate):
@@ -81,10 +83,10 @@ private extension Keypad {
 
                 HStack(alignment: .firstTextBaseline, spacing: 1) {
                     Text(String(rate.rawValue))
-                        .font(.serif(.headline))
+                        .displayFont(.headline)
 
                     Text("%")
-                        .font(.serif(.caption))
+                        .displayFont(.caption)
                 }
                 .foregroundStyle(isActive ? Palette.accentStrong : Palette.text)
             }
@@ -101,7 +103,7 @@ private extension Keypad {
 
     func digitText(_ text: String) -> some View {
         Text(text)
-            .font(.serif(.title))
+            .displayFont(.title)
             .foregroundStyle(Palette.text)
     }
 }

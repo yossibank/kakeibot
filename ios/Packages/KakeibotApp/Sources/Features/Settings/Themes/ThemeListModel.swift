@@ -35,6 +35,16 @@ public extension ThemeListModel {
         }
     }
 
+    var currentStyle: ThemeStyle {
+        switch current {
+        case .preset:
+            return .standard
+        case let .custom(id):
+            let theme = customThemes.first { $0.id == id }
+            return theme?.style ?? .standard
+        }
+    }
+
     func load() async {
         do {
             current = try await database.setting(.theme)

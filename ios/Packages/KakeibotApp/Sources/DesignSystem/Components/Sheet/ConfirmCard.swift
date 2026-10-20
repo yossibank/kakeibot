@@ -1,6 +1,8 @@
 import SwiftUI
 
 public struct ConfirmCard: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     @State private var isShown = false
 
     private let systemImage: String
@@ -117,7 +119,7 @@ private extension ConfirmCard {
                     }
 
                 Text(title)
-                    .font(.serif(.headline, weight: .medium))
+                    .displayFont(.headline, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
                     .multilineTextAlignment(.center)
 
@@ -149,9 +151,9 @@ private extension ConfirmCard {
         }
         .padding(24)
         .frame(maxWidth: 300)
-        .background(Palette.panel, in: .rect(cornerRadius: 26))
+        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(26)))
         .overlay {
-            RoundedRectangle(cornerRadius: 26)
+            RoundedRectangle(cornerRadius: corner.radius(26))
                 .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
         }
         .shadow(color: Palette.shadow.opacity(0.5), radius: 30, y: 14)

@@ -1,6 +1,8 @@
 import SwiftUI
 
 public struct SwipeRow<ID: Hashable, Content: View>: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     @Binding private var openId: ID?
 
     @State private var offset: CGFloat = 0
@@ -93,12 +95,12 @@ private extension SwipeRow {
                 .font(.sans(.body, weight: .medium))
                 .foregroundStyle(Palette.cardBottom)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(fill, in: Self.shape)
+                .background(fill, in: shape)
                 .overlay {
-                    Self.shape
+                    shape
                         .fill(Self.sheen)
                 }
-                .contentShape(Self.shape)
+                .contentShape(shape)
         }
         .buttonStyle(.plain)
         .frame(width: buttonWidth)
@@ -120,8 +122,8 @@ private extension SwipeRow {
         8
     }
 
-    static var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 14)
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(14))
     }
 
     static var sheen: LinearGradient {

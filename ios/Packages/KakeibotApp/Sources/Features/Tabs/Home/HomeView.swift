@@ -70,7 +70,7 @@ private extension HomeView {
         HStack {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("\(model.month.month)月")
-                    .font(.serif(.body))
+                    .displayFont(.body)
                     .tracking(3)
                     .foregroundStyle(Palette.accent)
 
@@ -97,7 +97,7 @@ private extension HomeView {
                         .foregroundStyle(Palette.accent)
 
                     Text(dialAmount)
-                        .font(.serif(.display, weight: .bold))
+                        .displayFont(.display, weight: .bold)
                         .monospacedDigit()
                         .foregroundStyle(dialAmountColor)
                         .lineLimit(1)
@@ -383,7 +383,7 @@ private extension HomeView {
                 .foregroundStyle(Palette.subtext)
 
             Text(AmountText.text(amount))
-                .font(.serif(.body))
+                .displayFont(.body)
                 .monospacedDigit()
                 .foregroundStyle(color)
                 .lineLimit(1)

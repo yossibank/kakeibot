@@ -85,7 +85,7 @@ private extension TemplateShelfSheet {
             Spacer()
 
             Text("テンプレート")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 

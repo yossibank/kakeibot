@@ -26,7 +26,7 @@ private extension MonthStartDayGrid {
             onSelect(day)
         } label: {
             Text(Self.title(for: day))
-                .font(.serif(.body))
+                .displayFont(.body)
                 .monospacedDigit()
                 .foregroundStyle(textColor)
                 .frame(maxWidth: .infinity, minHeight: 42)

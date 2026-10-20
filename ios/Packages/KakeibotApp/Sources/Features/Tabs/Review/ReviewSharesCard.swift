@@ -76,7 +76,7 @@ private extension ReviewSharesCard {
                 .foregroundStyle(Palette.subtext)
 
             Text(AmountText.text(total.amount))
-                .font(.serif(.body))
+                .displayFont(.body)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
@@ -103,7 +103,7 @@ private extension ReviewSharesCard {
                 Spacer(minLength: 8)
 
                 Text(AmountText.text(share.amount))
-                    .font(.serif(.body))
+                    .displayFont(.body)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
 

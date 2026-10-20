@@ -23,7 +23,7 @@ public struct HeaderButton: View {
 
                 if let title {
                     Text(title)
-                        .font(.serif(.body))
+                        .displayFont(.body)
                         .tracking(2)
                 }
             }

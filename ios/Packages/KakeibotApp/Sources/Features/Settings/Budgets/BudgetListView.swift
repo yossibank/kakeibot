@@ -108,7 +108,7 @@ private extension BudgetListView {
             Spacer()
 
             Text("予算")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -130,7 +130,7 @@ private extension BudgetListView {
                     .foregroundStyle(Palette.accent)
 
                 Text(amountText(model.totalAmount))
-                    .font(.serif(.largeTitle, weight: .bold))
+                    .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(amountColor(model.totalAmount))
 
@@ -173,7 +173,7 @@ private extension BudgetListView {
                     Spacer()
 
                     Text(amountText(amount))
-                        .font(.serif(.body))
+                        .displayFont(.body)
                         .monospacedDigit()
                         .foregroundStyle(amountColor(amount))
                 }

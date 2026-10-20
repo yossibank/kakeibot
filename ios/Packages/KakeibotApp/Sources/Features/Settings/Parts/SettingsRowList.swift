@@ -2,6 +2,9 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsRowList<Panel: Hashable>: View {
+    @Environment(\.themeStyle.font) private var themeFont
+    @Environment(\.themeStyle.corner) private var corner
+
     let items: [Item]
     let onOpen: (Panel) -> Void
 
@@ -16,9 +19,9 @@ struct SettingsRowList<Panel: Hashable>: View {
                     }
             }
         }
-        .background(Self.cardFill.opacity(0.7), in: Self.shape)
+        .background(Self.cardFill.opacity(0.7), in: shape)
         .overlay {
-            Self.shape
+            shape
                 .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
@@ -54,7 +57,8 @@ extension SettingsRowList {
 private extension SettingsRowList {
     func rowButton(_ item: Item) -> some View {
         let isAmount = item.isAmount && !item.isEmpty
-        let font: Font = isAmount ? Self.amountFont : .subheadline
+        let amountFont = Font.display(.headline, in: themeFont)
+        let font: Font = isAmount ? amountFont : .subheadline
         let color = item.isEmpty ? Palette.hint : Palette.accentStrong
 
         return Button {
@@ -91,12 +95,8 @@ private extension SettingsRowList {
 }
 
 private extension SettingsRowList {
-    static var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 20)
-    }
-
-    static var amountFont: Font {
-        .serif(.headline)
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(20))
     }
 
     static var cardFill: LinearGradient {

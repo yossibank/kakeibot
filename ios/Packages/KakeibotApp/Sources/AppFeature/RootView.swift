@@ -47,7 +47,8 @@ public struct RootView: View {
             }
         }
         .environment(\.notificationPermission, .live)
-        .palette(isRevealed ? model.palette : .night)
+        .palette(shownPalette)
+        .environment(\.themeStyle, shownStyle)
         .warmsUpInput()
     }
 }
@@ -91,4 +92,14 @@ private extension RootView {
 
 #Preview {
     RootView()
+}
+
+private extension RootView {
+    var shownPalette: ThemePalette {
+        isRevealed ? model.palette : .night
+    }
+
+    var shownStyle: ThemeStyle {
+        isRevealed ? model.style : .standard
+    }
 }

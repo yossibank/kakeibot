@@ -11,6 +11,7 @@ public struct ThemeListView: View {
     @State private var width: CGFloat = 0
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     private let database: AppDatabase
     private let appIcon: AppIconListModel
@@ -96,7 +97,8 @@ public struct ThemeListView: View {
                 model: ThemeEditModel(
                     database: database,
                     editing: target.theme,
-                    base: target.base ?? model.currentPalette
+                    base: target.palette,
+                    style: target.style
                 )
             )
         }
@@ -116,7 +118,7 @@ private extension ThemeListView {
             Spacer()
 
             Text("テーマ")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -136,6 +138,7 @@ private extension ThemeListView {
                     tile(
                         .custom(theme.id),
                         palette: theme.palette,
+                        style: theme.style,
                         title: theme.name,
                         theme: theme
                     )
@@ -148,10 +151,13 @@ private extension ThemeListView {
 
     var newTile: some View {
         Button {
-            editing = .new(base: nil)
+            editing = .new(
+                palette: model.currentPalette,
+                style: model.currentStyle
+            )
         } label: {
             VStack(spacing: 8) {
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: corner.radius(14))
                     .strokeBorder(Palette.outline, style: .dashed)
                     .frame(height: 132)
                     .overlay {
@@ -187,6 +193,7 @@ private extension ThemeListView {
                     tile(
                         .preset(preset),
                         palette: preset.palette,
+                        style: .standard,
                         title: preset.title,
                         theme: nil
                     )
@@ -206,6 +213,7 @@ private extension ThemeListView {
     func tile(
         _ choice: ThemeChoice,
         palette: ThemePalette,
+        style: ThemeStyle,
         title: String,
         theme: Theme?
     ) -> some View {
@@ -214,7 +222,7 @@ private extension ThemeListView {
         let scale: CGFloat = pressing == choice ? 0.94 : 1
 
         return VStack(spacing: 8) {
-            preview(palette, isCurrent: isCurrent)
+            preview(palette, style: style, isCurrent: isCurrent)
                 .scaleEffect(scale)
                 .animation(.snappy(duration: 0.2), value: scale)
                 .overlay {
@@ -231,6 +239,7 @@ private extension ThemeListView {
                                 let menu = Menu(
                                     choice: choice,
                                     palette: palette,
+                                    style: style,
                                     title: title,
                                     theme: theme,
                                     frame: proxy.frame(in: space)
@@ -252,14 +261,15 @@ private extension ThemeListView {
 
     func preview(
         _ palette: ThemePalette,
+        style: ThemeStyle,
         isCurrent: Bool
     ) -> some View {
         let ring = isCurrent ? Palette.accent : Color.clear
 
-        return ThemePreview(palette: palette)
+        return ThemePreview(palette: palette, style: style)
             .padding(4)
             .overlay {
-                RoundedRectangle(cornerRadius: 18)
+                RoundedRectangle(cornerRadius: style.corner.radius(18))
                     .stroke(ring, lineWidth: 2)
             }
             .overlay(alignment: .bottomTrailing) {
@@ -284,13 +294,17 @@ private extension ThemeListView {
             }
             .transition(.opacity)
 
-        preview(menu.palette, isCurrent: menu.choice == model.current)
-            .frame(width: menu.frame.width, height: menu.frame.height)
-            .scaleEffect(1.04)
-            .shadow(color: Palette.glow.opacity(.muted), radius: 12)
-            .position(x: menu.frame.midX, y: menu.frame.midY)
-            .allowsHitTesting(false)
-            .transition(.opacity)
+        preview(
+            menu.palette,
+            style: menu.style,
+            isCurrent: menu.choice == model.current
+        )
+        .frame(width: menu.frame.width, height: menu.frame.height)
+        .scaleEffect(1.04)
+        .shadow(color: Palette.glow.opacity(.muted), radius: 12)
+        .position(x: menu.frame.midX, y: menu.frame.midY)
+        .allowsHitTesting(false)
+        .transition(.opacity)
 
         MenuPanel(width: Self.menuWidth) {
             MenuHeader(menu.title) {
@@ -312,7 +326,7 @@ private extension ThemeListView {
                 systemImage: "plus.square.on.square"
             ) {
                 closeMenu()
-                editing = .new(base: menu.palette)
+                editing = .new(palette: menu.palette, style: menu.style)
             }
 
             if let theme = menu.theme {
@@ -336,13 +350,14 @@ private extension ThemeListView {
     struct Menu: Equatable {
         let choice: ThemeChoice
         let palette: ThemePalette
+        let style: ThemeStyle
         let title: String
         let theme: Theme?
         let frame: CGRect
     }
 
     enum EditTarget: Identifiable {
-        case new(base: ThemePalette?)
+        case new(palette: ThemePalette, style: ThemeStyle)
         case edit(Theme)
 
         var id: String {
@@ -359,10 +374,17 @@ private extension ThemeListView {
             }
         }
 
-        var base: ThemePalette? {
+        var palette: ThemePalette {
             switch self {
-            case let .new(base): base
-            case .edit: nil
+            case let .new(palette, _): palette
+            case let .edit(theme): theme.palette
+            }
+        }
+
+        var style: ThemeStyle {
+            switch self {
+            case let .new(_, style): style
+            case let .edit(theme): theme.style
             }
         }
     }

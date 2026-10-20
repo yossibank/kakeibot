@@ -18,10 +18,11 @@ public final class ThemeEditModel {
     public init(
         database: AppDatabase,
         editing theme: Theme?,
-        base palette: ThemePalette
+        base palette: ThemePalette,
+        style: ThemeStyle
     ) {
         let draft = theme.map(ThemeDraft.init)
-            ?? ThemeDraft(name: "", palette: palette)
+            ?? ThemeDraft(name: "", palette: palette, style: style)
         self.draft = draft
         self.baseline = draft
         self.database = database

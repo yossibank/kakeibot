@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsHideZone: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     @State private var progress: CGFloat = 0
 
     let state: SettingsHideHover.State
@@ -18,7 +20,7 @@ struct SettingsHideZone: View {
         .contentTransition(.opacity)
         .frame(maxWidth: .infinity, minHeight: height)
         .background {
-            Self.shape
+            shape
                 .fill(Palette.backgroundBottom.opacity(.strong))
 
             GeometryReader { proxy in
@@ -26,10 +28,10 @@ struct SettingsHideZone: View {
                     .fill(color.opacity(.subtle))
                     .frame(width: proxy.size.width * progress)
             }
-            .clipShape(Self.shape)
+            .clipShape(shape)
         }
         .overlay {
-            Self.shape
+            shape
                 .stroke(color.opacity(0.6), style: .dashed)
         }
         .onChange(of: state, initial: true) {
@@ -39,7 +41,9 @@ struct SettingsHideZone: View {
 }
 
 private extension SettingsHideZone {
-    static let shape = RoundedRectangle(cornerRadius: 16)
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
 
     var color: Color {
         switch state {

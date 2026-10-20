@@ -12,6 +12,7 @@ public struct WalletEditSheet: View {
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     private let onSave: (Wallet) -> Void
 
@@ -140,7 +141,7 @@ private extension WalletEditSheet {
             Spacer()
 
             Text(title)
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -173,10 +174,10 @@ private extension WalletEditSheet {
                 .frame(width: 48, height: 48)
                 .background(
                     Palette.accent.opacity(.subtle),
-                    in: .rect(cornerRadius: 14)
+                    in: .rect(cornerRadius: corner.radius(14))
                 )
                 .overlay {
-                    RoundedRectangle(cornerRadius: 14)
+                    RoundedRectangle(cornerRadius: corner.radius(14))
                         .stroke(Palette.outline, lineWidth: 1)
                 }
 
@@ -200,7 +201,7 @@ private extension WalletEditSheet {
                     .foregroundStyle(Palette.subtext)
 
                 Text(AmountText.text(model.initialBalance))
-                    .font(.serif(.headline))
+                    .displayFont(.headline)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
@@ -248,7 +249,7 @@ private extension WalletEditSheet {
                 } label: {
                     HStack(spacing: 8) {
                         Text(AmountText.text(model.calculator.amount))
-                            .font(.serif(.headline))
+                            .displayFont(.headline)
                             .monospacedDigit()
                             .foregroundStyle(Palette.text)
 
@@ -256,9 +257,12 @@ private extension WalletEditSheet {
                     }
                     .padding(.horizontal, 14)
                     .frame(height: 46)
-                    .background(Palette.panel, in: .rect(cornerRadius: 14))
+                    .background(
+                        Palette.panel,
+                        in: .rect(cornerRadius: corner.radius(14))
+                    )
                     .overlay {
-                        RoundedRectangle(cornerRadius: 14)
+                        RoundedRectangle(cornerRadius: corner.radius(14))
                             .stroke(amountStroke, lineWidth: 1)
                     }
                     .contentShape(.rect)
@@ -282,9 +286,12 @@ private extension WalletEditSheet {
                 .font(.sans(.body, weight: .semibold))
                 .foregroundStyle(signColor)
                 .frame(width: 46, height: 46)
-                .background(signFill, in: .rect(cornerRadius: 14))
+                .background(
+                    signFill,
+                    in: .rect(cornerRadius: corner.radius(14))
+                )
                 .overlay {
-                    RoundedRectangle(cornerRadius: 14)
+                    RoundedRectangle(cornerRadius: corner.radius(14))
                         .stroke(signColor.opacity(0.6), lineWidth: 1)
                 }
                 .contentShape(.rect)

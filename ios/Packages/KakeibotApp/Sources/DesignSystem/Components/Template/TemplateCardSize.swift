@@ -1,3 +1,4 @@
+import Core
 import SwiftUI
 
 public enum TemplateCardSize: Sendable {
@@ -20,24 +21,24 @@ public extension TemplateCardSize {
         }
     }
 
-    var nameFont: Font {
+    func nameFont(in font: ThemeFont) -> Font {
         switch self {
-        case .regular: .serif(.body, weight: .medium)
-        case .large: .serif(.headline, weight: .medium)
+        case .regular: .display(.body, weight: .medium, in: font)
+        case .large: .display(.headline, weight: .medium, in: font)
         }
     }
 
-    var amountFont: Font {
+    func amountFont(in font: ThemeFont) -> Font {
         switch self {
-        case .regular: .serif(.headline, weight: .medium)
-        case .large: .serif(.largeTitle, weight: .medium)
+        case .regular: .display(.headline, weight: .medium, in: font)
+        case .large: .display(.largeTitle, weight: .medium, in: font)
         }
     }
 
-    var emptyAmountFont: Font {
+    func emptyAmountFont(in font: ThemeFont) -> Font {
         switch self {
-        case .regular: .serif(.small)
-        case .large: .serif(.body)
+        case .regular: .display(.small, in: font)
+        case .large: .display(.body, in: font)
         }
     }
 }

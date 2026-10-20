@@ -333,7 +333,7 @@ private extension SettingsSheet {
             Spacer()
 
             Text("設定")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 

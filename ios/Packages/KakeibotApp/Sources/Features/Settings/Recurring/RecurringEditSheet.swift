@@ -112,7 +112,7 @@ private extension RecurringEditSheet {
             Spacer()
 
             Text(headerTitle)
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -144,7 +144,7 @@ private extension RecurringEditSheet {
                 open(.amount)
             } label: {
                 Text(AmountText.text(model.amount))
-                    .font(.serif(.largeTitle, weight: .bold))
+                    .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(amountColor)
                     .frame(maxWidth: .infinity)
@@ -159,7 +159,7 @@ private extension RecurringEditSheet {
                     .foregroundStyle(Palette.hint)
             )
             .multilineTextAlignment(.center)
-            .font(.serif(.body))
+            .displayFont(.body)
             .foregroundStyle(Palette.accentStrong)
             .tint(Palette.accent)
             .submitLabel(.done)

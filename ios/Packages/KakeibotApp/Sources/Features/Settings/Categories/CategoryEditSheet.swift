@@ -14,6 +14,7 @@ public struct CategoryEditSheet: View {
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     let startsAddingTag: Bool
     let onSave: (EntryCategory) -> Void
@@ -127,7 +128,7 @@ private extension CategoryEditSheet {
             Spacer()
 
             Text(model.isEditing ? "カテゴリを編集" : "カテゴリを追加")
-                .font(.serif(.body))
+                .displayFont(.body)
                 .tracking(4)
                 .foregroundStyle(Palette.accent)
 
@@ -160,10 +161,10 @@ private extension CategoryEditSheet {
             .frame(width: 86, height: 86)
             .background(
                 Palette.accent.opacity(.subtle),
-                in: .rect(cornerRadius: 18)
+                in: .rect(cornerRadius: corner.radius(18))
             )
             .overlay {
-                RoundedRectangle(cornerRadius: 18)
+                RoundedRectangle(cornerRadius: corner.radius(18))
                     .stroke(Palette.outline, lineWidth: 1)
             }
 

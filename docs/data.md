@@ -276,8 +276,8 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | id | TEXT | |
 | name | TEXT | |
 | background / surface / text_primary / text_secondary / accent / expense / income | TEXT | `#RRGGBB`。地・カード・文字・控えめな文字・強調と、支出・収入の色 |
-| corner_radius | INTEGER | |
-| font_id | TEXT | 同梱フォントから選ぶ |
+| corner_radius | INTEGER | 角の丸みの倍率（%）。`60`・`100`・`140`。ほかの値は `100` として読む |
+| font_id | TEXT | `mincho`・`gothic`・`rounded`。ほかの値は `mincho` として読む |
 | is_builtin | INTEGER | |
 | created_at / updated_at | TEXT | |
 

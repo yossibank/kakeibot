@@ -1,4 +1,5 @@
 import Core
+import Foundation
 import Testing
 
 struct ThemeDraftTests {
@@ -38,6 +39,30 @@ struct ThemeDraftTests {
 
         #expect(draft.palette?.backgroundTop == preset.palette.backgroundTop)
         #expect(draft.palette?.accent == preset.palette.accent)
+    }
+
+    @Test
+    func keepsStyleInTheme() throws {
+        let style = ThemeStyle(corner: .small, font: .gothic)
+        let draft = ThemeDraft(
+            name: "テーマ",
+            palette: ThemePreset.navy.palette,
+            style: style
+        )
+
+        let theme = try draft.newTheme(at: Date())
+
+        #expect(theme.style == style)
+    }
+
+    @Test
+    func readsUnknownStyleAsStandard() throws {
+        let draft = ThemeDraft(name: "テーマ", palette: ThemePreset.navy.palette)
+        var theme = try draft.newTheme(at: Date())
+        theme.cornerRadius = 16
+        theme.fontId = "system"
+
+        #expect(theme.style == .standard)
     }
 }
 

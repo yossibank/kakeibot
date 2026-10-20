@@ -7,6 +7,7 @@ public struct ThemeDraft: Hashable, Sendable {
     public var text: String
     public var subtext: String
     public var accent: String
+    public var style: ThemeStyle
 
     public init(
         name: String,
@@ -14,7 +15,8 @@ public struct ThemeDraft: Hashable, Sendable {
         surface: String,
         text: String,
         subtext: String,
-        accent: String
+        accent: String,
+        style: ThemeStyle = .standard
     ) {
         self.name = name
         self.background = background
@@ -22,6 +24,7 @@ public struct ThemeDraft: Hashable, Sendable {
         self.text = text
         self.subtext = subtext
         self.accent = accent
+        self.style = style
     }
 }
 
@@ -58,7 +61,8 @@ public extension ThemeDraft {
 
     init(
         name: String,
-        palette: ThemePalette
+        palette: ThemePalette,
+        style: ThemeStyle = .standard
     ) {
         self.init(
             name: name,
@@ -66,7 +70,8 @@ public extension ThemeDraft {
             surface: ThemeHex.text(palette.cardTop),
             text: ThemeHex.text(palette.text),
             subtext: ThemeHex.text(palette.subtext),
-            accent: ThemeHex.text(palette.accent)
+            accent: ThemeHex.text(palette.accent),
+            style: style
         )
     }
 
@@ -77,7 +82,8 @@ public extension ThemeDraft {
             surface: theme.surface,
             text: theme.textPrimary,
             subtext: theme.textSecondary,
-            accent: theme.accent
+            accent: theme.accent,
+            style: theme.style
         )
     }
 
@@ -93,8 +99,8 @@ public extension ThemeDraft {
             accent: accent,
             expense: Self.expenseColor,
             income: accent,
-            cornerRadius: Self.cornerRadius,
-            fontId: Self.fontId,
+            cornerRadius: style.corner.rawValue,
+            fontId: style.font.rawValue,
             isBuiltin: false,
             createdAt: now,
             updatedAt: now
@@ -115,6 +121,8 @@ public extension ThemeDraft {
         updated.textSecondary = subtext
         updated.accent = accent
         updated.income = accent
+        updated.cornerRadius = style.corner.rawValue
+        updated.fontId = style.font.rawValue
         updated.updatedAt = now
         return updated
     }
@@ -122,8 +130,6 @@ public extension ThemeDraft {
 
 private extension ThemeDraft {
     static let expenseColor = "#E3A3A3"
-    static let cornerRadius = 16
-    static let fontId = "system"
 
     var trimmedName: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines)
