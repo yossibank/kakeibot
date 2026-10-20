@@ -17,7 +17,7 @@ public struct ThemeStyleView: View {
         VStack(spacing: 18) {
             header
 
-            Text("どのテーマでも、画面の角の丸みと字体が変わります")
+            Text("画面の角の丸みと、文字の字体を選べます")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
@@ -27,11 +27,7 @@ public struct ThemeStyleView: View {
                     preview
                         .environment(\.themeStyle, model.style)
 
-                    choiceRow(
-                        "角の丸み",
-                        selection: cornerBinding,
-                        options: Self.cornerOptions
-                    )
+                    cornerRow
 
                     fontRow(
                         "見出しと金額の字体",
@@ -130,18 +126,6 @@ private extension ThemeStyleView {
         .animation(.snappy(duration: 0.25), value: model.style)
     }
 
-    func choiceRow<Value: Hashable>(
-        _ title: String,
-        selection: Binding<Value>,
-        options: [CapsulePicker<Value>.Option]
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            rowTitle(title)
-
-            CapsulePicker(selection: selection, options: options)
-        }
-    }
-
     func fontRow(
         _ title: String,
         selection: Binding<ThemeFont>,
@@ -153,25 +137,43 @@ private extension ThemeStyleView {
 
             LazyVGrid(columns: Self.fontColumns, spacing: 10) {
                 ForEach(ThemeFont.allCases, id: \.self) { choice in
-                    fontTile(
-                        choice,
-                        isSelected: choice == selection.wrappedValue,
-                        sample: sample,
-                        font: font(choice)
+                    tile(
+                        choice.title,
+                        isSelected: choice == selection.wrappedValue
                     ) {
                         selection.wrappedValue = choice
+                    } content: {
+                        Text(sample)
+                            .font(font(choice))
+                            .foregroundStyle(Palette.text)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                     }
                 }
             }
         }
     }
 
-    func fontTile(
-        _ choice: ThemeFont,
+    func cornerMark(_ option: ThemeCorner) -> some View {
+        let isSelected = option == model.style.corner
+        let color = isSelected ? Palette.accent : Palette.subtext
+        let size = Self.cornerMarkSize
+        let radius = option.radius(Self.cornerMarkRadius)
+
+        return RoundedRectangle(cornerRadius: radius)
+            .stroke(color, lineWidth: 2.5)
+            .frame(width: size * 2, height: size * 2)
+            .frame(width: size, height: size, alignment: .topLeading)
+            .offset(x: size * 0.15, y: size * 0.15)
+            .frame(width: size, height: size)
+            .clipped()
+    }
+
+    func tile(
+        _ title: String,
         isSelected: Bool,
-        sample: String,
-        font: Font,
-        action: @escaping () -> Void
+        action: @escaping () -> Void,
+        @ViewBuilder content: () -> some View
     ) -> some View {
         let ring = isSelected ? Palette.accent : Palette.line
         let titleColor = isSelected ? Palette.accentStrong : Palette.subtext
@@ -179,13 +181,9 @@ private extension ThemeStyleView {
 
         return Button(action: action) {
             VStack(spacing: 6) {
-                Text(sample)
-                    .font(font)
-                    .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                content()
 
-                Text(choice.title)
+                Text(title)
                     .textFont(.caption2)
                     .foregroundStyle(titleColor)
             }
@@ -199,6 +197,27 @@ private extension ThemeStyleView {
             .contentShape(tileShape)
         }
         .buttonStyle(.plain)
+    }
+
+    var cornerRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            rowTitle("角の丸み")
+
+            HStack(spacing: 10) {
+                ForEach(ThemeCorner.allCases, id: \.self) { option in
+                    tile(
+                        option.title,
+                        isSelected: option == model.style.corner
+                    ) {
+                        Task {
+                            await model.choose(option)
+                        }
+                    } content: {
+                        cornerMark(option)
+                    }
+                }
+            }
+        }
     }
 
     func rowTitle(_ title: String) -> some View {
@@ -233,10 +252,8 @@ private extension ThemeStyleView {
             amount: 440
         )
     ]
-    static let cornerOptions = ThemeCorner.allCases.map { corner in
-        CapsulePicker<ThemeCorner>.Option(corner.title, value: corner)
-    }
-
+    static let cornerMarkSize: CGFloat = 30
+    static let cornerMarkRadius: CGFloat = 18
     static let sampleAmount = 1280
     static let sampleText = "食費・財布"
     static let fontColumns = Array(
@@ -246,16 +263,6 @@ private extension ThemeStyleView {
 
     var tileShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(14))
-    }
-
-    var cornerBinding: Binding<ThemeCorner> {
-        Binding {
-            model.style.corner
-        } set: { corner in
-            Task {
-                await model.choose(corner)
-            }
-        }
     }
 
     var displayFontBinding: Binding<ThemeFont> {

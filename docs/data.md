@@ -292,8 +292,8 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | character_name | |
 | theme_id | 用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空ならネイビー |
 | onboarding_completed | `true` `false` |
-| launch_screen | `home` `entry`。空ならホーム |
-| corner_style | `small`・`standard`・`large`。空なら `standard` |
+| launch_screen | `home`・`records`・`review`・`assets`・`entry`。空ならホーム |
+| corner_style | `square`・`small`・`standard`・`large`。`square` は角を丸めない。空なら `standard` |
 | font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `mincho` |
 | text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `gothic` |
 | entry_starts_with_amount | `true` なら、新しく記録するとき入力シートをテンキーを出して開く |
