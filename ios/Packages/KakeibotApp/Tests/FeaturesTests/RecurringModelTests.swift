@@ -74,7 +74,7 @@ struct RecurringModelTests {
         let model = RecurringEditModel(
             database: setup.database,
             today: setup.today,
-            billing: card.id
+            paying: card.id
         )
 
         await model.load()
@@ -87,6 +87,37 @@ struct RecurringModelTests {
         #expect(model.day == 27)
         #expect(model.memo == "カード")
         #expect(model.canSave)
+    }
+
+    @Test
+    func presetsLoanRepaymentFromLoan() async throws {
+        let setup = try await RecordsModelTests.Setup()
+
+        let loan = try await setup.database.saveWallet(
+            WalletDraft(
+                kind: .loan,
+                name: "奨学金",
+                mark: .glyph(.contract),
+                color: "#4A6FA5",
+                initialBalance: -1_200_000
+            ),
+            at: Date()
+        )
+
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today,
+            paying: loan.id
+        )
+
+        await model.load()
+
+        #expect(model.type == .transfer)
+        #expect(model.toWalletId == loan.id)
+        #expect(!model.isCardBill)
+        #expect(model.closingDay == nil)
+        #expect(model.memo == "奨学金の返済")
+        #expect(!model.canSave)
     }
 
     @Test

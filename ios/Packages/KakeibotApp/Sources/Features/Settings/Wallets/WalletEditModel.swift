@@ -19,7 +19,7 @@ public final class WalletEditModel {
     public private(set) var calculator = AmountCalculator()
     public private(set) var balance = 0
     public private(set) var isHidden = false
-    public private(set) var cardBill: Recurring?
+    public private(set) var payment: Recurring?
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -77,23 +77,29 @@ public extension WalletEditModel {
         )
     }
 
-    var showsCardBill: Bool {
-        isEditing && kind == .card
+    var showsPayment: Bool {
+        isEditing && (kind == .card || kind == .loan)
     }
 
-    var cardBillText: String {
-        guard let cardBill else {
+    var paymentTitle: String {
+        kind == .loan ? "毎月の返済" : "引き落とし"
+    }
+
+    var paymentText: String {
+        guard let payment else {
             return "決めていません"
         }
 
         let schedule = RecurringText.schedule(
-            cardBill.frequency,
-            month: cardBill.month ?? cardBill.startDate.month,
-            day: cardBill.day
+            payment.frequency,
+            month: payment.month ?? payment.startDate.month,
+            day: payment.day
         )
 
-        let closing = cardBill.closingDay.map(RecurringText.closingNote)
-        return [schedule, closing].compactMap(\.self).joined(separator: "・")
+        let closing = payment.closingDay.map(RecurringText.closingNote)
+        let amount = payment.amount > 0 ? AmountText.text(payment.amount) : nil
+        let detail = closing ?? amount
+        return [schedule, detail].compactMap(\.self).joined(separator: "・")
     }
 
     var needsHideConfirmation: Bool {
@@ -135,19 +141,19 @@ public extension WalletEditModel {
             balance = wallet.balance(with: list.days.flatMap(\.entries))
             isHidden = wallet.archivedAt != nil
             baseline = draft
-            await loadCardBill()
+            await loadPayment()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
     }
 
-    func loadCardBill() async {
+    func loadPayment() async {
         guard let editingId else {
             return
         }
 
         do {
-            cardBill = try await database.recurrings().first { recurring in
+            payment = try await database.recurrings().first { recurring in
                 recurring.type == .transfer && recurring.toWalletId == editingId
             }
         } catch {
@@ -155,14 +161,14 @@ public extension WalletEditModel {
         }
     }
 
-    func cardBillModel() -> RecurringEditModel {
+    func paymentModel() -> RecurringEditModel {
         let today = LocalDate(Date(), in: .current)
 
         return RecurringEditModel(
             database: database,
             today: today,
-            editing: cardBill?.id,
-            billing: editingId
+            editing: payment?.id,
+            paying: editingId
         )
     }
 

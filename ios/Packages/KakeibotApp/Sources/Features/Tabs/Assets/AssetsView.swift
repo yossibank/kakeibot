@@ -72,11 +72,11 @@ private extension AssetsView {
 
     var totalCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
                 SectionTitle("手元のお金")
 
                 Text("未払いを引いた額")
-                    .textFont(.caption2)
+                    .textFont(size: .micro)
                     .foregroundStyle(Palette.hint)
             }
 
@@ -106,8 +106,15 @@ private extension AssetsView {
                 netWorthRow
             }
 
-            BalanceTrend(totals: model.monthTotals.map(\.total))
-                .frame(height: 70)
+            BalanceTrend(
+                totals: model.monthTotals.map(\.total),
+                netWorths: netWorths
+            )
+            .frame(height: 70)
+
+            if model.showsNetWorth {
+                trendLegend
+            }
 
             HStack(spacing: 0) {
                 ForEach(model.monthTotals) { total in
@@ -148,6 +155,35 @@ private extension AssetsView {
         }
         .padding(16)
         .card(cornerRadius: 24)
+    }
+
+    var trendLegend: some View {
+        HStack(spacing: 14) {
+            legend("手元のお金", dash: [])
+            legend("純資産", dash: BalanceTrend.netWorthDash)
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+
+    func legend(
+        _ title: String,
+        dash: [CGFloat]
+    ) -> some View {
+        HStack(spacing: 6) {
+            Path { path in
+                path.move(to: CGPoint(x: 0, y: 1))
+                path.addLine(to: CGPoint(x: 16, y: 1))
+            }
+            .stroke(
+                Palette.accent,
+                style: StrokeStyle(lineWidth: 1.6, dash: dash)
+            )
+            .frame(width: 16, height: 2)
+
+            Text(title)
+                .textFont(size: .micro)
+                .foregroundStyle(Palette.subtext)
+        }
     }
 
     var netWorthRow: some View {
@@ -324,14 +360,12 @@ private extension AssetsView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
-            if let next = row.nextBill {
-                Text(nextBillText(next))
-                    .textFont(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
+            Text(row.nextBill.map(nextBillText) ?? " ")
+                .textFont(.caption2)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 74, alignment: .leading)
@@ -377,6 +411,10 @@ private extension AssetsView {
         case .onHand, .investment:
             row.balance < 0 ? Palette.rose : Palette.accentStrong
         }
+    }
+
+    var netWorths: [Int]? {
+        model.showsNetWorth ? model.monthTotals.map(\.netWorth) : nil
     }
 
     var breakdownText: String {
@@ -442,13 +480,34 @@ private extension AssetsView {
 }
 
 private struct BalanceTrend: View {
+    static let netWorthDash: [CGFloat] = [4, 3]
+
     let totals: [Int]
+    let netWorths: [Int]?
 
     var body: some View {
         GeometryReader { proxy in
-            let points = points(in: proxy.size)
+            let points = points(of: totals, in: proxy.size)
+
+            let netWorthPoints = netWorths.map { values in
+                self.points(of: values, in: proxy.size)
+            }
 
             ZStack {
+                if let netWorthPoints {
+                    Path { path in
+                        path.addLines(netWorthPoints)
+                    }
+                    .stroke(
+                        Palette.accent.opacity(.strong),
+                        style: StrokeStyle(
+                            lineWidth: 1.2,
+                            lineJoin: .round,
+                            dash: Self.netWorthDash
+                        )
+                    )
+                }
+
                 Path { path in
                     path.addLines(points)
                 }
@@ -471,14 +530,18 @@ private struct BalanceTrend: View {
         }
     }
 
-    func points(in size: CGSize) -> [CGPoint] {
-        let low = totals.min() ?? 0
-        let high = totals.max() ?? 0
+    func points(
+        of values: [Int],
+        in size: CGSize
+    ) -> [CGPoint] {
+        let all = totals + (netWorths ?? [])
+        let low = all.min() ?? 0
+        let high = all.max() ?? 0
         let range = CGFloat(max(high - low, 1))
-        let step = size.width / CGFloat(max(totals.count, 1))
+        let step = size.width / CGFloat(max(values.count, 1))
         let inset: CGFloat = 6
 
-        return totals.enumerated().map { index, total in
+        return values.enumerated().map { index, total in
             let ratio = high == low ? 0.5 : CGFloat(total - low) / range
             let x = step * (CGFloat(index) + 0.5)
             let y = inset + (size.height - inset * 2) * (1 - ratio)

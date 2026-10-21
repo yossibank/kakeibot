@@ -51,6 +51,7 @@ public extension AssetsModel {
     struct MonthTotal: Identifiable, Equatable {
         public let month: YearMonth
         public let total: Int
+        public let netWorth: Int
 
         public var id: YearMonth {
             month
@@ -161,7 +162,11 @@ public extension AssetsModel {
                 through: end
             )
 
-            return MonthTotal(month: month, total: holdings.available)
+            return MonthTotal(
+                month: month,
+                total: holdings.available,
+                netWorth: holdings.netWorth
+            )
         }
     }
 

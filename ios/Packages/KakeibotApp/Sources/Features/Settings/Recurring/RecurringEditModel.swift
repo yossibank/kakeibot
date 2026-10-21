@@ -33,18 +33,18 @@ public final class RecurringEditModel {
 
     private let database: AppDatabase
     private let editingId: Recurring.ID?
-    private let billedCard: Wallet.ID?
+    private let paidWallet: Wallet.ID?
 
     public init(
         database: AppDatabase,
         today: LocalDate,
         editing id: Recurring.ID? = nil,
-        billing card: Wallet.ID? = nil
+        paying wallet: Wallet.ID? = nil
     ) {
         self.database = database
         self.today = today
         self.editingId = id
-        self.billedCard = card
+        self.paidWallet = wallet
         self.month = today.month
         self.day = today.day
         self.startDate = today
@@ -178,7 +178,7 @@ public extension RecurringEditModel {
         do {
             options = try await database.entryOptions()
             try await loadRecurring()
-            presetCardBill()
+            presetPayment()
 
             if categoryId == nil {
                 categoryId = categories.first?.id
@@ -252,20 +252,27 @@ private extension RecurringEditModel {
     static let billClosingDay = 31
     static let billPaymentDay = 27
 
-    func presetCardBill() {
-        guard !isEditing, let card = billedCard else {
+    func presetPayment() {
+        guard !isEditing, let target = paidWallet else {
             return
         }
 
-        let bank = wallets.first { $0.kind == .bank && $0.id != card }
-        let other = wallets.first { $0.id != card }
+        let bank = wallets.first { $0.kind == .bank && $0.id != target }
+        let other = wallets.first { $0.id != target }
         type = .transfer
         categoryId = nil
-        toWalletId = card
+        toWalletId = target
         walletId = (bank ?? other)?.id
-        closingDay = Self.billClosingDay
         day = Self.billPaymentDay
-        memo = selectedDestination?.name ?? ""
+
+        let name = selectedDestination?.name ?? ""
+
+        if selectedDestination?.kind == .card {
+            closingDay = Self.billClosingDay
+            memo = name
+        } else {
+            memo = "\(name)の返済"
+        }
     }
 
     func suggestHolidayShift() {
