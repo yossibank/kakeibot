@@ -14,6 +14,7 @@ public struct CategoryListView: View {
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: EntryCategory.ID?
+    @State private var deletion: Deletion?
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<EntryCategory.ID>?
     @State private var isOverShowZone = false
@@ -70,6 +71,13 @@ public struct CategoryListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
+            .settingsHideNotice(
+                $deletion,
+                message: "削除しました",
+                systemImage: "trash"
+            ) { deletion in
+                restore(deletion)
+            }
 
             if lift != nil {
                 SettingsHideTarget(zones: $zones, state: hideHover.state)
@@ -92,7 +100,10 @@ public struct CategoryListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
-            CategoryEditSheet(model: editModel(for: sheet))
+            CategoryEditSheet(model: editModel(for: sheet)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
         }
         .task {
             await model.observe()
@@ -498,6 +509,12 @@ private extension CategoryListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
         }
     }
 

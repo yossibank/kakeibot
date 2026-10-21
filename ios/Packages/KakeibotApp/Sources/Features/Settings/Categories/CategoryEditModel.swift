@@ -195,20 +195,19 @@ public extension CategoryEditModel {
         }
     }
 
-    func delete() async -> Bool {
+    func delete() async -> Deletion? {
         guard let editingId else {
-            return false
+            return nil
         }
 
         do {
-            try await database.deleteCategory(editingId)
-            return true
+            return try await database.deleteCategory(editingId)
         } catch AppDatabase.CategoryWriteError.hasEntries {
             errorNotice.show(Self.inUseMessage)
-            return false
+            return nil
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
-            return false
+            return nil
         }
     }
 }

@@ -29,7 +29,9 @@ public struct OnboardingView: View {
                 .pageSlide(slide)
                 .frame(maxHeight: .infinity, alignment: .top)
                 .contentShape(.rect)
-                .onPageSwipe { direction in
+                .onPageSwipe(following: $slide) { direction in
+                    model.canTurn(forward: direction == .forward)
+                } perform: { direction in
                     turnPage(direction)
                 }
 

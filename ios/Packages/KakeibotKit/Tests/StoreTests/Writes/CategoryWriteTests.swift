@@ -85,10 +85,14 @@ struct CategoryWriteTests {
         let setup = try await Setup()
         let food = try await setup.category(named: "食費")
 
-        try await setup.database.deleteCategory(food.id)
+        let deletion = try await setup.database.deleteCategory(food.id)
         let categories = try await setup.expenseCategories()
 
+        try await setup.database.restore(deletion)
+        let restored = try await setup.category(named: "食費")
+
         #expect(!categories.contains { $0.id == food.id })
+        #expect(restored == food)
     }
 
     @Test

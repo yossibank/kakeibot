@@ -108,17 +108,16 @@ public extension StampEditModel {
         }
     }
 
-    func delete() async -> Bool {
+    func delete() async -> Deletion? {
         guard let editingId else {
-            return false
+            return nil
         }
 
         do {
-            try await database.deleteShelfIcon(editingId)
-            return true
+            return try await database.deleteShelfIcon(editingId)
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
-            return false
+            return nil
         }
     }
 }

@@ -142,13 +142,20 @@ struct WalletWriteTests {
             at: setup.now
         )
 
-        try await setup.database.deleteWallet(card.id)
+        let deletion = try await setup.database.deleteWallet(card.id)
         let list = try await setup.database.entryList()
         let recurrings = try await setup.database.recurrings()
+
+        try await setup.database.restore(deletion)
+        let restored = try await setup.database.entryList()
+        let restoredRecurrings = try await setup.database.recurrings()
 
         #expect(list.wallets[card.id] == nil)
         #expect(list.valuations.isEmpty)
         #expect(recurrings.isEmpty)
+        #expect(restored.wallets[card.id] == card)
+        #expect(restored.valuations.count == 1)
+        #expect(restoredRecurrings.count == 1)
     }
 
     @Test

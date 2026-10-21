@@ -21,13 +21,16 @@ public struct WalletEditSheet: View {
     @Environment(\.themeStyle.corner) private var corner
 
     private let onSave: (Wallet) -> Void
+    private let onDelete: (Deletion) -> Void
 
     public init(
         model: WalletEditModel,
-        onSave: @escaping (Wallet) -> Void = { _ in }
+        onSave: @escaping (Wallet) -> Void = { _ in },
+        onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
         self.onSave = onSave
+        self.onDelete = onDelete
     }
 
     public var body: some View {
@@ -658,7 +661,8 @@ private extension WalletEditSheet {
     }
 
     func delete() async {
-        if await model.delete() {
+        if let deletion = await model.delete() {
+            onDelete(deletion)
             dismiss()
         }
     }

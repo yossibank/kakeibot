@@ -103,6 +103,15 @@ public extension CategoryListModel {
         }
     }
 
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await database.restore(deletion)
+            await load()
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage)
+        }
+    }
+
     func show(_ id: EntryCategory.ID) async {
         do {
             try await database.setCategoryHidden(
@@ -139,6 +148,7 @@ private extension CategoryListModel {
     static let loadFailedMessage = "カテゴリを読めませんでした"
     static let saveFailedMessage = "並びを保存できませんでした"
     static let showFailedMessage = "表示に戻せませんでした"
+    static let restoreFailedMessage = "元に戻せませんでした"
 
     func categories(isHidden: Bool) -> [EntryCategory] {
         let categories = list?.categories ?? []

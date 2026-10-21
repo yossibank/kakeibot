@@ -19,15 +19,18 @@ public struct CategoryEditSheet: View {
 
     let startsAddingTag: Bool
     let onSave: (EntryCategory) -> Void
+    let onDelete: (Deletion) -> Void
 
     public init(
         model: CategoryEditModel,
         startsAddingTag: Bool = false,
-        onSave: @escaping (EntryCategory) -> Void = { _ in }
+        onSave: @escaping (EntryCategory) -> Void = { _ in },
+        onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
         self.startsAddingTag = startsAddingTag
         self.onSave = onSave
+        self.onDelete = onDelete
     }
 
     public var body: some View {
@@ -360,7 +363,8 @@ private extension CategoryEditSheet {
     }
 
     func delete() async {
-        if await model.delete() {
+        if let deletion = await model.delete() {
+            onDelete(deletion)
             dismiss()
         }
     }

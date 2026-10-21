@@ -59,7 +59,8 @@ public extension AppDatabase {
         }
     }
 
-    func deleteCategory(_ id: EntryCategory.ID) async throws {
+    @discardableResult
+    func deleteCategory(_ id: EntryCategory.ID) async throws -> Deletion {
         try await writer.write { db in
             guard let category = try EntryCategory.fetchOne(db, key: id) else {
                 throw CategoryWriteError.categoryNotFound
@@ -71,15 +72,25 @@ public extension AppDatabase {
                 throw CategoryWriteError.hasEntries
             }
 
-            try Self.deleteRecurrings(
-                Recurring.filter(column == id),
-                in: db
+            let recurrings = Recurring.filter(column == id)
+            let templates = EntryTemplate.filter(column == id)
+            let budgets = Budget.filter(column == id)
+            let tags = EntryTag.filter(column == id)
+
+            let deletion = try Deletion(
+                categories: [category],
+                tags: tags.fetchAll(db),
+                recurrings: recurrings.fetchAll(db),
+                templates: templates.fetchAll(db),
+                budgets: budgets.fetchAll(db)
             )
 
-            try EntryTemplate.filter(column == id).deleteAll(db)
-            try Budget.filter(column == id).deleteAll(db)
-            try EntryTag.filter(column == id).deleteAll(db)
+            try Self.deleteRecurrings(recurrings, in: db)
+            try templates.deleteAll(db)
+            try budgets.deleteAll(db)
+            try tags.deleteAll(db)
             try category.delete(db)
+            return deletion
         }
     }
 }

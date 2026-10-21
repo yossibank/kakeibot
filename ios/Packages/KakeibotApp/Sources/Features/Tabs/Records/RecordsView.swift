@@ -36,7 +36,7 @@ public struct RecordsView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 header
-                    .monthSwipe(perform: moveMonth)
+                    .monthSwipe(following: $slide, perform: moveMonth)
 
                 CapsulePicker(
                     selection: layoutBinding,
@@ -102,7 +102,7 @@ private extension RecordsView {
     @ViewBuilder
     var monthContent: some View {
         summary
-            .monthSwipe(perform: moveMonth)
+            .monthSwipe(following: $slide, perform: moveMonth)
 
         switch model.layout {
         case .list:
@@ -118,7 +118,7 @@ private extension RecordsView {
             }
         case .calendar:
             calendar
-                .monthSwipe(perform: moveMonth)
+                .monthSwipe(following: $slide, perform: moveMonth)
 
             shownDayCard
         }
@@ -612,9 +612,10 @@ private extension RecordsView {
 
 private extension View {
     func monthSwipe(
+        following slide: Binding<PageSlide>,
         perform action: @escaping (PageSwipeDirection) -> Void
     ) -> some View {
         contentShape(.rect)
-            .onPageSwipe(perform: action)
+            .onPageSwipe(following: slide, perform: action)
     }
 }

@@ -14,6 +14,7 @@ public struct WalletListView: View {
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: Wallet.ID?
+    @State private var deletion: Deletion?
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiding: Wallet?
     @State private var isConfirmingHide = false
@@ -73,6 +74,13 @@ public struct WalletListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
+            .settingsHideNotice(
+                $deletion,
+                message: "削除しました",
+                systemImage: "trash"
+            ) { deletion in
+                restore(deletion)
+            }
 
             if lift != nil {
                 SettingsHideTarget(zones: $zones, state: hideHover.state)
@@ -99,7 +107,10 @@ public struct WalletListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
-            WalletEditSheet(model: editModel(for: sheet))
+            WalletEditSheet(model: editModel(for: sheet)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
         }
         .confirmsWalletHide(
             balance: hidingBalance,
@@ -406,7 +417,7 @@ private extension WalletListView {
 
     func delete(_ id: Wallet.ID) {
         Task {
-            await model.delete(id)
+            deletion = await model.delete(id)
         }
     }
 
@@ -468,6 +479,12 @@ private extension WalletListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
         }
     }
 

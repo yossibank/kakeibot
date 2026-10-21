@@ -105,15 +105,26 @@ public extension WalletListModel {
         }
     }
 
-    func delete(_ id: Wallet.ID) async {
+    func delete(_ id: Wallet.ID) async -> Deletion? {
         movingOrder = nil
 
         do {
-            try await database.deleteWallet(id)
+            let deletion = try await database.deleteWallet(id)
             await load()
+            return deletion
         } catch {
             let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
             errorNotice.show(message)
+            return nil
+        }
+    }
+
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await database.restore(deletion)
+            await load()
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage)
         }
     }
 
@@ -149,6 +160,7 @@ private extension WalletListModel {
     static let saveFailedMessage = "並びを保存できませんでした"
     static let hideFailedMessage = "非表示にできませんでした"
     static let showFailedMessage = "表示に戻せませんでした"
+    static let restoreFailedMessage = "元に戻せませんでした"
 
     func wallets(isHidden: Bool) -> [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []

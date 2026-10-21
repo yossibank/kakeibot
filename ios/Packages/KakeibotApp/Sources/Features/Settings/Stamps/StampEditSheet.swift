@@ -12,8 +12,14 @@ public struct StampEditSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    public init(model: StampEditModel) {
+    private let onDelete: (Deletion) -> Void
+
+    public init(
+        model: StampEditModel,
+        onDelete: @escaping (Deletion) -> Void = { _ in }
+    ) {
         _model = State(initialValue: model)
+        self.onDelete = onDelete
     }
 
     public var body: some View {
@@ -151,7 +157,8 @@ private extension StampEditSheet {
     }
 
     func delete() async {
-        if await model.delete() {
+        if let deletion = await model.delete() {
+            onDelete(deletion)
             dismiss()
         }
     }

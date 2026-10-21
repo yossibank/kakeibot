@@ -272,18 +272,17 @@ public extension WalletEditModel {
         }
     }
 
-    func delete() async -> Bool {
+    func delete() async -> Deletion? {
         guard let editingId else {
-            return false
+            return nil
         }
 
         do {
-            try await database.deleteWallet(editingId)
-            return true
+            return try await database.deleteWallet(editingId)
         } catch {
             let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
             errorNotice.show(message)
-            return false
+            return nil
         }
     }
 }

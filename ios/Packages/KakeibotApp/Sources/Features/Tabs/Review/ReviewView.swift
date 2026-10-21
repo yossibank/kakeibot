@@ -44,7 +44,7 @@ public struct ReviewView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .onPageSwipe { direction in
+        .onPageSwipe(following: $slide, canMove: canMove) { direction in
             move(direction)
         }
         .sensoryFeedback(.selection, trigger: model.period)
@@ -517,7 +517,15 @@ private extension ReviewView {
     }
 
     func move(_ direction: PageSwipeDirection) {
-        move(by: direction == .forward ? 1 : -1)
+        move(by: Self.count(of: direction))
+    }
+
+    func canMove(_ direction: PageSwipeDirection) -> Bool {
+        model.canMove(by: Self.count(of: direction))
+    }
+
+    static func count(of direction: PageSwipeDirection) -> Int {
+        direction == .forward ? 1 : -1
     }
 
     func move(by count: Int) {

@@ -59,7 +59,8 @@ public extension AppDatabase {
         }
     }
 
-    func deleteWallet(_ id: Wallet.ID) async throws {
+    @discardableResult
+    func deleteWallet(_ id: Wallet.ID) async throws -> Deletion {
         try await writer.write { db in
             guard let wallet = try Wallet.fetchOne(db, key: id) else {
                 throw WalletWriteError.walletNotFound
@@ -82,17 +83,21 @@ public extension AppDatabase {
                 Column("wallet_id") == id || Column("to_wallet_id") == id
             )
 
+            let templates = EntryTemplate.filter(Column("wallet_id") == id)
+            let valuations = Valuation.filter(Column("wallet_id") == id)
+
+            let deletion = try Deletion(
+                wallets: [wallet],
+                recurrings: recurrings.fetchAll(db),
+                templates: templates.fetchAll(db),
+                valuations: valuations.fetchAll(db)
+            )
+
             try Self.deleteRecurrings(recurrings, in: db)
-
-            try EntryTemplate
-                .filter(Column("wallet_id") == id)
-                .deleteAll(db)
-
-            try Valuation
-                .filter(Column("wallet_id") == id)
-                .deleteAll(db)
-
+            try templates.deleteAll(db)
+            try valuations.deleteAll(db)
             try wallet.delete(db)
+            return deletion
         }
     }
 }
