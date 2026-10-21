@@ -7,6 +7,7 @@ public struct RecurringEditSheet: View {
     @State private var model: RecurringEditModel
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingDelete = false
 
     @FocusState private var isNameFocused: Bool
 
@@ -61,6 +62,18 @@ public struct RecurringEditSheet: View {
         ) {
             dismiss()
         }
+        .confirmation(
+            isPresented: $isConfirmingDelete,
+            systemImage: "trash",
+            title: "この固定費を削除しますか",
+            message: "これまでに作った記録は残ります",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            Task {
+                await delete()
+            }
+        }
         .task {
             await model.load()
         }
@@ -109,34 +122,30 @@ private extension RecurringEditSheet {
             RingButton(systemImage: "xmark") {
                 close()
             }
-            .frame(width: 64, alignment: .leading)
+            .frame(width: SettingsEditActions.width, alignment: .leading)
 
             Spacer()
 
             Text(headerTitle)
                 .displayFont(.body)
                 .tracking(4)
+                .multilineTextAlignment(.center)
                 .foregroundStyle(Palette.accent)
 
             Spacer()
 
-            Group {
+            ZStack {
                 if model.isEditing {
-                    RingButton(
-                        systemImage: "trash",
-                        style: .destructive,
-                        label: "削除"
-                    ) {
+                    SettingsEditActions(isHidden: model.isHidden) {
                         Task {
-                            await delete()
+                            await setHidden(!model.isHidden)
                         }
+                    } onDelete: {
+                        isConfirmingDelete = true
                     }
-                } else {
-                    Color.clear
-                        .frame(width: 44, height: 44)
                 }
             }
-            .frame(width: 64, alignment: .trailing)
+            .frame(width: SettingsEditActions.width, alignment: .trailing)
         }
     }
 
@@ -605,6 +614,12 @@ private extension RecurringEditSheet {
 
     func delete() async {
         if await model.delete() {
+            dismiss()
+        }
+    }
+
+    func setHidden(_ isHidden: Bool) async {
+        if await model.setHidden(isHidden) {
             dismiss()
         }
     }

@@ -7,6 +7,7 @@ public struct TemplateEditSheet: View {
     @State private var model: TemplateEditModel
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
 
@@ -77,6 +78,18 @@ public struct TemplateEditSheet: View {
             ) {
                 dismiss()
             }
+            .confirmation(
+                isPresented: $isConfirmingDelete,
+                systemImage: "trash",
+                title: "このテンプレートを削除しますか",
+                message: "このテンプレートで記録したものは残ります",
+                keepTitle: "やめる",
+                confirmTitle: "削除する"
+            ) {
+                Task {
+                    await delete()
+                }
+            }
             .onChange(of: focus) {
                 if focus == .name {
                     hidePanel()
@@ -132,34 +145,30 @@ private extension TemplateEditSheet {
             RingButton(systemImage: "xmark") {
                 close()
             }
-            .frame(width: 64, alignment: .leading)
+            .frame(width: SettingsEditActions.width, alignment: .leading)
 
             Spacer()
 
             Text(title)
                 .displayFont(.body)
                 .tracking(4)
+                .multilineTextAlignment(.center)
                 .foregroundStyle(Palette.accent)
 
             Spacer()
 
-            Group {
+            ZStack {
                 if model.isEditing {
-                    RingButton(
-                        systemImage: "trash",
-                        style: .destructive,
-                        label: "削除"
-                    ) {
+                    SettingsEditActions(isHidden: model.isHidden) {
                         Task {
-                            await delete()
+                            await setHidden(!model.isHidden)
                         }
+                    } onDelete: {
+                        isConfirmingDelete = true
                     }
-                } else {
-                    Color.clear
-                        .frame(width: 44, height: 44)
                 }
             }
-            .frame(width: 64, alignment: .trailing)
+            .frame(width: SettingsEditActions.width, alignment: .trailing)
         }
     }
 
@@ -553,6 +562,12 @@ private extension TemplateEditSheet {
 
     func delete() async {
         if await model.delete() {
+            dismiss()
+        }
+    }
+
+    func setHidden(_ isHidden: Bool) async {
+        if await model.setHidden(isHidden) {
             dismiss()
         }
     }

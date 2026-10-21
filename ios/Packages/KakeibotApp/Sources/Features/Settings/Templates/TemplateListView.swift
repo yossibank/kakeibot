@@ -15,6 +15,8 @@ public struct TemplateListView: View {
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: EntryTemplate.ID?
     @State private var openId: EntryTemplate.ID?
+    @State private var deleting: EntryTemplate.ID?
+    @State private var isConfirmingDelete = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<EntryTemplate.ID>?
     @State private var isOverShowZone = false
@@ -99,6 +101,18 @@ public struct TemplateListView: View {
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
             TemplateEditSheet(model: editModel(for: sheet))
+        }
+        .confirmation(
+            isPresented: $isConfirmingDelete,
+            systemImage: "trash",
+            title: "このテンプレートを削除しますか",
+            message: "このテンプレートで記録したものは残ります",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            if let deleting {
+                delete(deleting)
+            }
         }
         .task {
             await model.observe()
@@ -205,6 +219,8 @@ private extension TemplateListView {
             sheet = .edit(template.id)
         } onAction: {
             hide(template.id)
+        } onDelete: {
+            requestDelete(template.id)
         } content: {
             card(template)
         }
@@ -267,7 +283,7 @@ private extension TemplateListView {
                 .init("list.number", "この順でホームと入力シートに出ます"),
                 .move,
                 .hide,
-                .swipeHide
+                .swipeDelete
             ]
         }
     }
@@ -445,6 +461,17 @@ private extension TemplateListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func requestDelete(_ id: EntryTemplate.ID) {
+        deleting = id
+        isConfirmingDelete = true
+    }
+
+    func delete(_ id: EntryTemplate.ID) {
+        Task {
+            await model.delete(id)
         }
     }
 

@@ -9,6 +9,8 @@ public struct RecurringListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var openId: Recurring.ID?
+    @State private var deleting: Recurring.ID?
+    @State private var isConfirmingDelete = false
     @State private var boardOrigin: CGPoint = .zero
     @State private var listOrigin: CGPoint = .zero
     @State private var zones = SettingsDropZones()
@@ -98,6 +100,18 @@ public struct RecurringListView: View {
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
             RecurringEditSheet(model: model.editModel(for: sheet.editingId))
+        }
+        .confirmation(
+            isPresented: $isConfirmingDelete,
+            systemImage: "trash",
+            title: "この固定費を削除しますか",
+            message: "これまでに作った記録は残ります",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            if let deleting {
+                delete(deleting)
+            }
         }
         .task {
             await model.observe()
@@ -233,6 +247,8 @@ private extension RecurringListView {
             sheet = .edit(row.id)
         } onAction: {
             hide(row.id)
+        } onDelete: {
+            requestDelete(row.id)
         } content: {
             rowCard(row, isPaused: false)
         }
@@ -334,7 +350,7 @@ private extension RecurringListView {
                 Self.purpose,
                 .move,
                 .init("pause.circle", "下の枠で少し待つと止められます"),
-                .init("hand.point.left", "横に払っても止められます")
+                .init("hand.point.left", "横に払うと、止めると削除のボタンが出ます")
             ]
         }
     }
@@ -445,6 +461,17 @@ private extension RecurringListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func requestDelete(_ id: Recurring.ID) {
+        deleting = id
+        isConfirmingDelete = true
+    }
+
+    func delete(_ id: Recurring.ID) {
+        Task {
+            await model.delete(id)
         }
     }
 

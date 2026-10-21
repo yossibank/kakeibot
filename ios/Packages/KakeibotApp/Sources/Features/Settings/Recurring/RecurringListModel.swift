@@ -97,6 +97,16 @@ public extension RecurringListModel {
         return await setHidden(id, isHidden: true, failure: failure)
     }
 
+    func delete(_ id: Recurring.ID) async {
+        movingOrder = nil
+
+        do {
+            try await database.deleteRecurring(id)
+        } catch {
+            errorNotice.show(Self.deleteFailedMessage)
+        }
+    }
+
     func show(_ id: Recurring.ID) async {
         await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
     }
@@ -146,6 +156,7 @@ private extension RecurringListModel {
     static let saveFailedMessage = "並びを保存できませんでした"
     static let hideFailedMessage = "非表示にできませんでした"
     static let showFailedMessage = "表示に戻せませんでした"
+    static let deleteFailedMessage = "削除できませんでした"
 
     var visible: [Recurring] {
         recurrings.filter { $0.archivedAt == nil }

@@ -103,6 +103,7 @@ private extension StampEditSheet {
             Text(model.isEditing ? "スタンプを編集" : "スタンプを追加")
                 .displayFont(.body)
                 .tracking(4)
+                .multilineTextAlignment(.center)
                 .foregroundStyle(Palette.accent)
 
             Spacer()

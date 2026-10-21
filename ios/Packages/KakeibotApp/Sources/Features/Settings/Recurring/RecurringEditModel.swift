@@ -23,6 +23,7 @@ public final class RecurringEditModel {
     public private(set) var type: Entry.Kind = .expense
     public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
+    public private(set) var isHidden = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -232,6 +233,27 @@ public extension RecurringEditModel {
             return false
         }
     }
+
+    func setHidden(_ isHidden: Bool) async -> Bool {
+        guard let editingId else {
+            return false
+        }
+
+        do {
+            try await database.setRecurringHidden(
+                editingId,
+                isHidden: isHidden,
+                today: today,
+                at: Date()
+            )
+
+            self.isHidden = isHidden
+            return true
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+            return false
+        }
+    }
 }
 
 private extension RecurringEditModel {
@@ -311,6 +333,8 @@ private extension RecurringEditModel {
         guard let recurring else {
             throw AppDatabase.RecurringWriteError.recurringNotFound
         }
+
+        isHidden = recurring.archivedAt != nil
 
         let draft = RecurringDraft(recurring)
         type = draft.type
