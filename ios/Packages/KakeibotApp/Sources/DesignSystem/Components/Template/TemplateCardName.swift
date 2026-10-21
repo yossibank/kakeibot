@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct TemplateCardName: View {
-    @Environment(\.themeStyle.displayFont) private var themeFont
+    @Environment(\.themeStyle) private var themeStyle
 
     let name: String
     let size: TemplateCardSize
@@ -16,7 +16,7 @@ public struct TemplateCardName: View {
 
     public var body: some View {
         Text(name)
-            .font(size.nameFont(in: themeFont))
+            .font(size.nameFont(in: themeStyle))
             .foregroundStyle(Palette.accentStrong)
     }
 }

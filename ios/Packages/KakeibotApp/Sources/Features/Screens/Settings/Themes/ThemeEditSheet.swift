@@ -159,7 +159,7 @@ private extension ThemeEditSheet {
                 .overlay {
                     if !isAvailable {
                         Image(systemName: "line.diagonal")
-                            .font(.sans(.body, weight: .light))
+                            .sansFont(.body, weight: .light)
                             .foregroundStyle(Palette.hint)
                     }
                 }

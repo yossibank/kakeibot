@@ -460,7 +460,7 @@ private extension EntrySheet {
             } label: {
                 VStack(spacing: 4) {
                     Image(systemName: "plus")
-                        .font(.sans(.body, weight: .ultraLight))
+                        .sansFont(.body, weight: .ultraLight)
 
                     Text("追加")
                         .textFont(size: .caption)

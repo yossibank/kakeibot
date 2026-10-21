@@ -6,6 +6,7 @@ struct IconEditor<Field: Hashable>: View {
     @Bindable var model: IconEditModel
 
     @Environment(\.themeStyle.displayFont) private var themeFont
+    @Environment(\.themeStyle.textSize.scale) private var textScale
     @Environment(\.themeStyle.corner) private var corner
 
     var focus: FocusState<Field?>.Binding
@@ -104,7 +105,7 @@ private extension IconEditor {
             SettingsField(
                 "3 文字まで",
                 text: textBinding,
-                font: .display(.headline, in: themeFont),
+                font: .display(.headline, in: themeFont, scale: textScale),
                 focus: focus,
                 field: textField
             )
@@ -123,7 +124,7 @@ private extension IconEditor {
             model.glyph = glyph
         } label: {
             Image(systemName: glyph.symbolName)
-                .font(.sans(.headline, weight: .light))
+                .sansFont(.headline, weight: .light)
                 .foregroundStyle(color)
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(

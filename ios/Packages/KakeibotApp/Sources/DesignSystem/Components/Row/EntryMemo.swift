@@ -41,7 +41,7 @@ struct EntryMemo: View {
 
             if canExpand {
                 Image(systemName: "chevron.down")
-                    .font(.sans(.micro, weight: .bold))
+                    .sansFont(.micro, weight: .bold)
                     .foregroundStyle(Palette.accent)
                     .rotationEffect(.degrees(angle))
             }

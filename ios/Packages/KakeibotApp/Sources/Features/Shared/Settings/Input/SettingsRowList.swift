@@ -4,6 +4,7 @@ import SwiftUI
 struct SettingsRowList<Panel: Hashable>: View {
     @Environment(\.themeStyle.displayFont) private var themeFont
     @Environment(\.themeStyle.textFont) private var textFont
+    @Environment(\.themeStyle.textSize.scale) private var textScale
     @Environment(\.themeStyle.corner) private var corner
 
     let items: [Item]
@@ -58,8 +59,13 @@ extension SettingsRowList {
 private extension SettingsRowList {
     func rowButton(_ item: Item) -> some View {
         let isAmount = item.isAmount && !item.isEmpty
-        let amountFont = Font.display(.headline, in: themeFont)
-        let textFont = Font.text(.subheadline, in: textFont)
+        let amountFont = Font.display(
+            .headline,
+            in: themeFont,
+            scale: textScale
+        )
+
+        let textFont = Font.text(.subheadline, in: textFont, scale: textScale)
         let font = isAmount ? amountFont : textFont
         let color = item.isEmpty ? Palette.hint : Palette.accentStrong
 
@@ -68,7 +74,7 @@ private extension SettingsRowList {
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: item.systemImage)
-                    .font(.sans(.small))
+                    .sansFont(.small)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 28, height: 28)
                     .background(Palette.accent.opacity(.subtle), in: Circle())

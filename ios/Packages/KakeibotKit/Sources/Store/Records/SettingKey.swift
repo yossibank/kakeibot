@@ -68,6 +68,12 @@ public extension SettingKey where Value == ThemeFont {
     }
 }
 
+public extension SettingKey where Value == ThemeTextSize {
+    static var textSize: Self {
+        Self(.textSize, default: .standard)
+    }
+}
+
 public extension SettingKey where Value == TemplateOrder {
     static var templateOrder: Self {
         Self(.templateOrder, default: .manual)

@@ -13,7 +13,7 @@ public struct TemplateEditSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
-    @Environment(\.themeStyle.displayFont) private var themeFont
+    @Environment(\.themeStyle) private var themeStyle
 
     let onSave: (EntryTemplate) -> Void
     let onDelete: (Deletion) -> Void
@@ -200,7 +200,7 @@ private extension TemplateEditSheet {
                 text: $model.name,
                 prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
             )
-            .font(TemplateCardSize.large.nameFont(in: themeFont))
+            .font(TemplateCardSize.large.nameFont(in: themeStyle))
             .foregroundStyle(Palette.accentStrong)
             .tint(Palette.accent)
             .submitLabel(.done)

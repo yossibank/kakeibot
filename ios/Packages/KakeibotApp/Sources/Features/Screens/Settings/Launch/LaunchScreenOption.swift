@@ -17,7 +17,7 @@ struct LaunchScreenOption: View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: screen.systemImage)
-                    .font(.sans(.headline, weight: .light))
+                    .sansFont(.headline, weight: .light)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 32)
 
@@ -34,7 +34,7 @@ struct LaunchScreenOption: View {
                 Spacer()
 
                 Image(systemName: mark)
-                    .font(.sans(.headline))
+                    .sansFont(.headline)
                     .foregroundStyle(Palette.accent)
             }
             .padding(16)

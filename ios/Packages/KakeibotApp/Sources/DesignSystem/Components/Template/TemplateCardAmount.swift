@@ -2,7 +2,7 @@ import Core
 import SwiftUI
 
 public struct TemplateCardAmount: View {
-    @Environment(\.themeStyle.displayFont) private var themeFont
+    @Environment(\.themeStyle) private var themeStyle
 
     let amount: Int?
     let size: TemplateCardSize
@@ -18,14 +18,14 @@ public struct TemplateCardAmount: View {
     public var body: some View {
         if let amount {
             Text(AmountText.text(amount))
-                .font(size.amountFont(in: themeFont))
+                .font(size.amountFont(in: themeStyle))
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         } else {
             Text("毎回入れる")
-                .font(size.emptyAmountFont(in: themeFont))
+                .font(size.emptyAmountFont(in: themeStyle))
                 .foregroundStyle(Palette.hint)
         }
     }

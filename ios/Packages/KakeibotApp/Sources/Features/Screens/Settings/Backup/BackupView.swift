@@ -155,7 +155,7 @@ private extension BackupView {
     ) -> some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
-                .font(.sans(.body, weight: .light))
+                .sansFont(.body, weight: .light)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 22)
 

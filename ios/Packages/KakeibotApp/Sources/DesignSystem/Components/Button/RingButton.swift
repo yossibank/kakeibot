@@ -23,7 +23,7 @@ public struct RingButton: View {
     public var body: some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.sans(.body, weight: .light))
+                .sansFont(.body, weight: .light)
                 .foregroundStyle(foreground)
                 .frame(width: 38, height: 38)
                 .background(fill, in: Circle())

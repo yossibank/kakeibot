@@ -131,7 +131,7 @@ private extension HomeView {
                         Text("予算を決めると、あといくら使えるかが出ます")
 
                         Image(systemName: "chevron.right")
-                            .font(.sans(.micro, weight: .semibold))
+                            .sansFont(.micro, weight: .semibold)
                     }
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
@@ -148,7 +148,7 @@ private extension HomeView {
                             Label(recurringText, systemImage: "repeat")
 
                             Image(systemName: "chevron.right")
-                                .font(.sans(.micro, weight: .semibold))
+                                .sansFont(.micro, weight: .semibold)
                         }
                         .textFont(.caption2)
                         .monospacedDigit()
@@ -231,7 +231,7 @@ private extension HomeView {
 
                 Button(action: onAddTemplate) {
                     Image(systemName: "plus")
-                        .font(.sans(.small, weight: .light))
+                        .sansFont(.small, weight: .light)
                         .foregroundStyle(Palette.accent)
                         .frame(width: 32, height: 32)
                         .overlay {
@@ -259,7 +259,7 @@ private extension HomeView {
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: "arrow.up.arrow.down")
-                    .font(.sans(.caption, weight: .light))
+                    .sansFont(.caption, weight: .light)
 
                 Text(model.templateOrder.title)
                     .textFont(.caption2)

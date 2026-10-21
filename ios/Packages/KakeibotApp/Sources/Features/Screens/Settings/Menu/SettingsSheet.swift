@@ -123,26 +123,15 @@ public struct SettingsSheet: View {
 
                                 Hairline()
 
-                                HStack(spacing: 12) {
-                                    Image(
-                                        systemName: "calendar.day.timeline.left"
-                                    )
-                                    .textFont(size: .body, weight: .light)
-                                    .foregroundStyle(Palette.accent)
-                                    .frame(width: 22)
-
-                                    Text("週の始まり")
-                                        .textFont(.subheadline)
-                                        .foregroundStyle(Palette.text)
-
-                                    Spacer()
-
+                                pickerRow(
+                                    "週の始まり",
+                                    systemImage: "calendar.day.timeline.left"
+                                ) {
                                     CapsulePicker(
                                         selection: weekStartBinding,
                                         options: Weekday.weekStartOptions
                                     )
                                 }
-                                .frame(minHeight: 52)
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14)
@@ -225,9 +214,10 @@ public struct SettingsSheet: View {
                                     )
                                 } label: {
                                     row(
-                                        "角の丸みと字体",
+                                        "文字と角の丸み",
                                         systemImage: "textformat",
-                                        value: themeStyle.title
+                                        value: themeStyle.title,
+                                        shortValue: themeStyle.shortTitle
                                     )
                                 }
                             }
@@ -256,24 +246,12 @@ public struct SettingsSheet: View {
                             .padding(.horizontal, 14)
                             .card()
 
-                            HStack(spacing: 12) {
-                                Image(systemName: "yensign")
-                                    .font(.sans(.body, weight: .light))
-                                    .foregroundStyle(Palette.accent)
-                                    .frame(width: 22)
-
-                                Text("金額から入力")
-                                    .textFont(.subheadline)
-                                    .foregroundStyle(Palette.text)
-
-                                Spacer()
-
+                            pickerRow("金額から入力", systemImage: "yensign") {
                                 CapsulePicker(
                                     selection: startsWithAmountBinding,
                                     options: Self.startOptions
                                 )
                             }
-                            .frame(minHeight: 52)
                             .padding(.horizontal, 14)
                             .card()
                         }
@@ -301,7 +279,7 @@ public struct SettingsSheet: View {
 
                             HStack(spacing: 12) {
                                 Image(systemName: "info.circle")
-                                    .font(.sans(.body, weight: .light))
+                                    .sansFont(.body, weight: .light)
                                     .foregroundStyle(Palette.accent)
                                     .frame(width: 22)
 
@@ -393,27 +371,78 @@ private extension SettingsSheet {
             .padding(.leading, 6)
     }
 
-    func row(
+    func pickerRow(
         _ title: String,
         systemImage: String,
-        value: String? = nil
+        @ViewBuilder picker: () -> some View
     ) -> some View {
-        HStack(spacing: 12) {
+        let picker = picker()
+
+        let label = HStack(spacing: 12) {
             Image(systemName: systemImage)
-                .font(.sans(.body, weight: .light))
+                .sansFont(.body, weight: .light)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 22)
 
             Text(title)
                 .textFont(.subheadline)
                 .foregroundStyle(Palette.text)
+                .lineLimit(1)
+                .fixedSize()
+        }
+
+        return ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) {
+                label
+
+                Spacer(minLength: 8)
+
+                picker
+            }
+            .frame(minHeight: 52)
+
+            VStack(alignment: .leading, spacing: 8) {
+                label
+
+                picker
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .padding(.vertical, 10)
+        }
+    }
+
+    func row(
+        _ title: String,
+        systemImage: String,
+        value: String? = nil,
+        shortValue: String? = nil
+    ) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .sansFont(.body, weight: .light)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 22)
+
+            Text(title)
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+                .lineLimit(1)
+                .layoutPriority(1)
 
             Spacer()
 
             if let value {
-                Text(value)
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
+                ViewThatFits(in: .horizontal) {
+                    Text(value)
+                        .lineLimit(1)
+                        .fixedSize()
+
+                    Text(shortValue ?? value)
+                        .lineLimit(1)
+                        .minimumScaleFactor(Self.valueScale)
+                }
+                .textFont(.footnote)
+                .foregroundStyle(Palette.subtext)
             }
 
             Image(systemName: "chevron.right")
@@ -426,6 +455,8 @@ private extension SettingsSheet {
 }
 
 private extension SettingsSheet {
+    static let valueScale: CGFloat = 0.7
+
     static let startOptions: [CapsulePicker<Bool>.Option] = [
         .init("する", value: true),
         .init("しない", value: false)

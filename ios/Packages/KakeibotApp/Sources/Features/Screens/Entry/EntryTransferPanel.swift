@@ -16,7 +16,7 @@ struct EntryTransferPanel: View {
                 }
             } label: {
                 Image(systemName: "arrow.left.arrow.right")
-                    .font(.sans(.small, weight: .light))
+                    .sansFont(.small, weight: .light)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 44, height: 44)
                     .overlay {

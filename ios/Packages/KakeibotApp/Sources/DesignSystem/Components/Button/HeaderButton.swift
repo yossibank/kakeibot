@@ -19,7 +19,7 @@ public struct HeaderButton: View {
         Button(action: action) {
             HStack(spacing: 7) {
                 Image(systemName: systemImage)
-                    .font(.sans(.body, weight: .light))
+                    .sansFont(.body, weight: .light)
 
                 if let title {
                     Text(title)

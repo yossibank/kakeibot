@@ -126,7 +126,7 @@ private extension SwipeRow {
         fill: LinearGradient
     ) -> some View {
         Image(systemName: systemImage)
-            .font(.sans(.body, weight: .medium))
+            .sansFont(.body, weight: .medium)
             .foregroundStyle(Palette.cardBottom)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(fill, in: shape)

@@ -2,11 +2,33 @@ import Core
 
 extension ThemeStyle {
     var title: String {
-        guard displayFont != textFont else {
-            return "\(corner.title)・\(displayFont.title)"
+        let fonts = displayFont == textFont
+            ? displayFont.title
+            : "\(displayFont.title)と\(textFont.title)"
+
+        guard textSize == .standard else {
+            return "文字\(textSize.title)・\(fonts)"
         }
 
-        return "\(corner.title)・\(displayFont.title)と\(textFont.title)"
+        return "\(fonts)・角\(corner.title)"
+    }
+
+    var shortTitle: String {
+        guard textSize == .standard else {
+            return "文字\(textSize.title)"
+        }
+
+        return title
+    }
+}
+
+extension ThemeTextSize {
+    var title: String {
+        switch self {
+        case .small: "小さめ"
+        case .standard: "ふつう"
+        case .large: "大きめ"
+        }
     }
 }
 

@@ -57,7 +57,8 @@ private extension AppDatabase {
         try ThemeStyle(
             corner: setting(.cornerStyle, in: db),
             displayFont: setting(.fontStyle, in: db),
-            textFont: setting(.textFontStyle, in: db)
+            textFont: setting(.textFontStyle, in: db),
+            textSize: setting(.textSize, in: db)
         )
     }
 }

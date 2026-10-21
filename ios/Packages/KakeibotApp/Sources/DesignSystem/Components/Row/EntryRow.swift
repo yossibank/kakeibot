@@ -36,7 +36,7 @@ public struct EntryRow: View {
             Group {
                 if icon == nil, type == .transfer {
                     Image(systemName: "arrow.left.arrow.right")
-                        .font(.sans(.small, weight: .light))
+                        .sansFont(.small, weight: .light)
                         .frame(width: 21, height: 21)
                 } else {
                     IconImage(icon, size: 15)
@@ -53,7 +53,7 @@ public struct EntryRow: View {
 
                     if isRecurring {
                         Image(systemName: "repeat")
-                            .font(.sans(.caption, weight: .semibold))
+                            .sansFont(.caption, weight: .semibold)
                             .foregroundStyle(Palette.accent.opacity(.strong))
                     }
 

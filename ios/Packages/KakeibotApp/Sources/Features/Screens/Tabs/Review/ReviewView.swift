@@ -213,7 +213,7 @@ private extension ReviewView {
                         Label(recurringText(recurring), systemImage: "repeat")
 
                         Image(systemName: "chevron.right")
-                            .font(.sans(.micro, weight: .semibold))
+                            .sansFont(.micro, weight: .semibold)
                     }
                     .textFont(.caption)
                     .monospacedDigit()
