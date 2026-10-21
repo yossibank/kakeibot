@@ -141,7 +141,7 @@ private extension StampListView {
             destination = .new
         } label: {
             Image(systemName: "plus")
-                .font(.sans(.headline, weight: .ultraLight))
+                .sansFont(.headline, weight: .ultraLight)
                 .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Palette.faint, in: tileShape)

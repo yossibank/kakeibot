@@ -16,27 +16,27 @@ public struct ThemeStyleView: View {
 
     public var body: some View {
         VStack(spacing: 14) {
-            SettingsBackHeader("角の丸みと字体")
+            SettingsBackHeader("文字と角の丸み")
 
             preview
                 .environment(\.themeStyle, model.style)
-                .font(.text(.body, in: model.style.textFont))
+                .font(model.style.bodyFont)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    Text("画面の角の丸みと、文字の字体を選べます")
+                    Text("文字の大きさと字体、画面の角の丸みを選べます")
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .frame(maxWidth: .infinity)
 
-                    cornerRow
+                    textSizeRow
 
                     fontRow(
                         "見出しと金額の字体",
                         selection: displayFontBinding,
                         sample: AmountText.text(Self.sampleAmount)
                     ) { font in
-                        .display(.headline, in: font)
+                        .display(.headline, in: font, scale: 1)
                     }
 
                     fontRow(
@@ -44,8 +44,10 @@ public struct ThemeStyleView: View {
                         selection: textFontBinding,
                         sample: Self.sampleText
                     ) { font in
-                        .text(.subheadline, in: font)
+                        .text(.subheadline, in: font, scale: 1)
                     }
+
+                    cornerRow
                 }
             }
             .contentMargins(.horizontal, 18, for: .scrollContent)
@@ -55,7 +57,7 @@ public struct ThemeStyleView: View {
             .scrollIndicators(.hidden)
         }
         .environment(\.themeStyle, shownStyle)
-        .font(.text(.body, in: shownStyle.textFont))
+        .font(shownStyle.bodyFont)
         .padding(.horizontal, 18)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -211,6 +213,30 @@ private extension ThemeStyleView {
         }
     }
 
+    var textSizeRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            rowTitle("文字の大きさ")
+
+            HStack(spacing: 10) {
+                ForEach(ThemeTextSize.allCases, id: \.self) { option in
+                    tile(
+                        option.title,
+                        isSelected: option == model.style.textSize
+                    ) {
+                        Task {
+                            await model.choose(option)
+                        }
+                    } content: {
+                        Text("あ")
+                            .font(sizeSampleFont(option))
+                            .foregroundStyle(Palette.text)
+                            .frame(height: Self.sizeSampleHeight)
+                    }
+                }
+            }
+        }
+    }
+
     func rowTitle(_ title: String) -> some View {
         Text(title)
             .textFont(.caption2)
@@ -247,6 +273,7 @@ private extension ThemeStyleView {
     static let restCardHeight: CGFloat = 108
     static let cornerMarkSize: CGFloat = 30
     static let cornerMarkRadius: CGFloat = 18
+    static let sizeSampleHeight: CGFloat = 30
     static let sampleAmount = 1280
     static let sampleText = "食費・財布"
     static let fontColumns = Array(
@@ -256,6 +283,10 @@ private extension ThemeStyleView {
 
     var shownStyle: ThemeStyle {
         openedStyle ?? appStyle
+    }
+
+    func sizeSampleFont(_ size: ThemeTextSize) -> Font {
+        .text(.headline, in: model.style.textFont, scale: size.scale)
     }
 
     var tileShape: RoundedRectangle {

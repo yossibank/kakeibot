@@ -8,6 +8,8 @@ public struct CapsulePicker<Value: Hashable>: View {
     @State private var pendingIndex: Int?
     @State private var feedback = UISelectionFeedbackGenerator()
 
+    @Environment(\.themeStyle.textSize.scale) private var textScale
+
     let options: [Option]
 
     public init(
@@ -27,7 +29,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                         .strokeBorder(Self.thumbRim, lineWidth: 0.8)
                 }
                 .shadow(color: Palette.glow.opacity(.muted), radius: 6)
-                .frame(width: Self.segmentWidth, height: Self.segmentHeight)
+                .frame(width: segmentWidth, height: segmentHeight)
                 .offset(x: thumbX)
 
             HStack(spacing: 0) {
@@ -45,8 +47,8 @@ public struct CapsulePicker<Value: Hashable>: View {
                         .textFont(.footnote, weight: weight)
                         .foregroundStyle(color)
                         .frame(
-                            width: Self.segmentWidth,
-                            height: Self.segmentHeight
+                            width: segmentWidth,
+                            height: segmentHeight
                         )
                 }
             }
@@ -93,12 +95,12 @@ public extension CapsulePicker {
 }
 
 private extension CapsulePicker {
-    static var segmentWidth: CGFloat {
-        72
+    var segmentWidth: CGFloat {
+        72 * textScale
     }
 
-    static var segmentHeight: CGFloat {
-        30
+    var segmentHeight: CGFloat {
+        30 * textScale
     }
 
     static var inset: CGFloat {
@@ -155,7 +157,7 @@ private extension CapsulePicker {
     }
 
     var maxOffset: CGFloat {
-        CGFloat(options.count - 1) * Self.segmentWidth
+        CGFloat(options.count - 1) * segmentWidth
     }
 
     var shownIndex: Int {
@@ -163,21 +165,21 @@ private extension CapsulePicker {
     }
 
     var thumbX: CGFloat {
-        thumbOffset ?? CGFloat(shownIndex) * Self.segmentWidth
+        thumbOffset ?? CGFloat(shownIndex) * segmentWidth
     }
 
     var highlightedIndex: Int {
-        index(at: thumbX + Self.segmentWidth / 2)
+        index(at: thumbX + segmentWidth / 2)
     }
 
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
                 feedback.prepare()
-                let start = CGFloat(shownIndex) * Self.segmentWidth
+                let start = CGFloat(shownIndex) * segmentWidth
                 let touch = value.startLocation.x - Self.inset
 
-                let range = start...(start + Self.segmentWidth)
+                let range = start...(start + segmentWidth)
 
                 guard range.contains(touch) else {
                     return
@@ -187,7 +189,7 @@ private extension CapsulePicker {
                 thumbOffset = min(max(offset, 0), maxOffset)
             }
             .onEnded { value in
-                let center = thumbOffset.map { $0 + Self.segmentWidth / 2 }
+                let center = thumbOffset.map { $0 + segmentWidth / 2 }
                 let index = index(at: center ?? value.location.x - Self.inset)
 
                 withAnimation(Self.spring) {
@@ -199,7 +201,7 @@ private extension CapsulePicker {
     }
 
     func index(at x: CGFloat) -> Int {
-        let index = Int((x / Self.segmentWidth).rounded(.down))
+        let index = Int((x / segmentWidth).rounded(.down))
         return min(max(index, 0), options.count - 1)
     }
 }

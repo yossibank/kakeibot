@@ -415,7 +415,7 @@ private extension WalletEditSheet {
             model.isNegative.toggle()
         } label: {
             Image(systemName: signSymbol)
-                .font(.sans(.body, weight: .semibold))
+                .sansFont(.body, weight: .semibold)
                 .foregroundStyle(signColor)
                 .frame(width: 46, height: 46)
                 .background(

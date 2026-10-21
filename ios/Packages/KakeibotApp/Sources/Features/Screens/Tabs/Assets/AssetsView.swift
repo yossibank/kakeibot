@@ -267,10 +267,10 @@ private extension AssetsView {
                                         moves,
                                         systemImage: "arrow.uturn.right"
                                     )
-                                    .lineLimit(1)
+                                    .lineLimit(2)
 
                                     Image(systemName: "chevron.right")
-                                        .font(.sans(.micro, weight: .bold))
+                                        .sansFont(.micro, weight: .bold)
                                 }
                                 .textFont(.caption2)
                                 .foregroundStyle(Palette.accent)

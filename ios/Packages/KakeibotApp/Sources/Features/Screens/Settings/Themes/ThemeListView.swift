@@ -139,7 +139,7 @@ private extension ThemeListView {
                     .frame(height: 132)
                     .overlay {
                         Image(systemName: "plus")
-                            .font(.sans(.headline, weight: .light))
+                            .sansFont(.headline, weight: .light)
                             .foregroundStyle(Palette.accent)
                     }
                     .padding(4)

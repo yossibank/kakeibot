@@ -4,6 +4,7 @@ import SwiftUI
 struct SettingsField<Field: Hashable>: View {
     @Environment(\.themeStyle.corner) private var corner
     @Environment(\.themeStyle.textFont) private var textFont
+    @Environment(\.themeStyle.textSize.scale) private var textScale
 
     @Binding private var text: String
 
@@ -32,7 +33,7 @@ struct SettingsField<Field: Hashable>: View {
             text: $text,
             prompt: Text(prompt).foregroundStyle(Palette.hint)
         )
-        .font(font ?? .text(.body, in: textFont))
+        .font(font ?? .text(.body, in: textFont, scale: textScale))
         .foregroundStyle(Palette.text)
         .tint(Palette.accent)
         .submitLabel(.done)

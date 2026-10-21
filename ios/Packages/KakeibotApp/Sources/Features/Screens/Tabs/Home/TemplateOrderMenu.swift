@@ -28,7 +28,7 @@ public struct TemplateOrderMenu: View {
                 MenuPanel(width: Self.width) {
                     MenuHeader("並べ替え") {
                         Image(systemName: "arrow.up.arrow.down")
-                            .font(.sans(.small, weight: .light))
+                            .sansFont(.small, weight: .light)
                     }
 
                     ForEach(TemplateOrder.allCases) { order in

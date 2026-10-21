@@ -111,7 +111,7 @@ private extension FloatingTabBar {
                     .padding(8)
 
                 Image(systemName: "plus")
-                    .font(.sans(.headline, weight: .ultraLight))
+                    .sansFont(.headline, weight: .ultraLight)
                     .foregroundStyle(Palette.accentStrong)
             }
             .frame(width: Self.height, height: Self.height)
@@ -140,7 +140,7 @@ private extension FloatingTabBar {
 
         return VStack(spacing: 3) {
             Image(systemName: item.systemImage)
-                .font(.sans(.headline, weight: .light))
+                .sansFont(.headline, weight: .light)
                 .foregroundStyle(iconColor)
 
             Text(item.title)

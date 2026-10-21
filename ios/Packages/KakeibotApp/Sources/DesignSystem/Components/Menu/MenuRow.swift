@@ -25,7 +25,7 @@ public struct MenuRow: View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: systemImage)
-                    .font(.sans(.body, weight: .light))
+                    .sansFont(.body, weight: .light)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 22)
 
@@ -45,7 +45,7 @@ public struct MenuRow: View {
 
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .font(.sans(.small, weight: .semibold))
+                        .sansFont(.small, weight: .semibold)
                         .foregroundStyle(Palette.accent)
                 }
             }

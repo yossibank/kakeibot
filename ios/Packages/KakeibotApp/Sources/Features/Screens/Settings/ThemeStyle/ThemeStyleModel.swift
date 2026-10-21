@@ -50,6 +50,18 @@ public extension ThemeStyleModel {
         }
     }
 
+    func choose(_ size: ThemeTextSize) async {
+        let previous = style
+        style.textSize = size
+
+        do {
+            try await database.setSetting(.textSize, to: size)
+        } catch {
+            style = previous
+            errorNotice.show(Self.saveFailedMessage)
+        }
+    }
+
     func choose(textFont font: ThemeFont) async {
         let previous = style
         style.textFont = font

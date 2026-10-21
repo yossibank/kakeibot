@@ -22,6 +22,7 @@ public extension Setting {
         case cornerStyle = "corner_style"
         case fontStyle = "font_style"
         case textFontStyle = "text_font_style"
+        case textSize = "text_size"
         case onboardingCompleted = "onboarding_completed"
         case launchScreen = "launch_screen"
         case entryStartsWithAmount = "entry_starts_with_amount"

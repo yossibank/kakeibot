@@ -65,7 +65,7 @@ private extension Keypad {
             digitText("00")
         case .delete:
             Image(systemName: "delete.left")
-                .font(.sans(.headline, weight: .light))
+                .sansFont(.headline, weight: .light)
                 .foregroundStyle(Palette.text)
         case .clear:
             Text("AC")

@@ -25,7 +25,7 @@ public struct Chip: View {
             }
 
             Image(systemName: "chevron.down")
-                .font(.sans(.micro, weight: .semibold))
+                .sansFont(.micro, weight: .semibold)
                 .foregroundStyle(Palette.subtext)
         }
         .textFont(.caption)

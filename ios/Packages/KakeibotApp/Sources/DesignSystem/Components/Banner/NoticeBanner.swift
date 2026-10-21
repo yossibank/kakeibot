@@ -24,7 +24,7 @@ public struct NoticeBanner: View {
     public var body: some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
-                .font(.sans(.caption, weight: .semibold))
+                .sansFont(.caption, weight: .semibold)
                 .foregroundStyle(tone.color)
                 .frame(width: 30, height: 30)
                 .background(tone.color.opacity(0.12), in: Circle())

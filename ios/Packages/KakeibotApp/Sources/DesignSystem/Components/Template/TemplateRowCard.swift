@@ -3,6 +3,7 @@ import SwiftUI
 
 public struct TemplateRowCard: View {
     @Environment(\.themeStyle.textFont) private var textFont
+    @Environment(\.themeStyle) private var themeStyle
 
     let icon: Icon?
     let name: String
@@ -30,7 +31,7 @@ public struct TemplateRowCard: View {
                     .lineLimit(2)
 
                 Text(detail)
-                    .font(TemplateCardSize.regular.detailFont(in: textFont))
+                    .font(TemplateCardSize.regular.detailFont(in: themeStyle))
                     .tracking(1)
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)

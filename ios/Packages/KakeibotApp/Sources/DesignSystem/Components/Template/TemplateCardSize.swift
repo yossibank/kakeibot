@@ -21,25 +21,19 @@ public extension TemplateCardSize {
         }
     }
 
-    func nameFont(in font: ThemeFont) -> Font {
-        switch self {
-        case .regular: .display(.body, weight: .medium, in: font)
-        case .large: .display(.headline, weight: .medium, in: font)
-        }
+    func nameFont(in style: ThemeStyle) -> Font {
+        let size: FontSize = self == .regular ? .body : .headline
+        return display(size, weight: .medium, in: style)
     }
 
-    func amountFont(in font: ThemeFont) -> Font {
-        switch self {
-        case .regular: .display(.headline, weight: .medium, in: font)
-        case .large: .display(.largeTitle, weight: .medium, in: font)
-        }
+    func amountFont(in style: ThemeStyle) -> Font {
+        let size: FontSize = self == .regular ? .headline : .largeTitle
+        return display(size, weight: .medium, in: style)
     }
 
-    func emptyAmountFont(in font: ThemeFont) -> Font {
-        switch self {
-        case .regular: .display(.small, in: font)
-        case .large: .display(.body, in: font)
-        }
+    func emptyAmountFont(in style: ThemeStyle) -> Font {
+        let size: FontSize = self == .regular ? .small : .body
+        return display(size, weight: .regular, in: style)
     }
 }
 
@@ -51,10 +45,13 @@ extension TemplateCardSize {
         }
     }
 
-    func detailFont(in font: ThemeFont) -> Font {
+    func detailFont(in style: ThemeStyle) -> Font {
+        let font = style.textFont
+        let scale = style.textSize.scale
+
         switch self {
-        case .regular: .text(size: .caption, in: font)
-        case .large: .text(.caption, in: font)
+        case .regular: return .text(size: .caption, in: font, scale: scale)
+        case .large: return .text(.caption, in: font, scale: scale)
         }
     }
 
@@ -112,5 +109,20 @@ extension TemplateCardSize {
         case .regular: 12
         case .large: 24
         }
+    }
+}
+
+private extension TemplateCardSize {
+    func display(
+        _ size: FontSize,
+        weight: Font.Weight,
+        in style: ThemeStyle
+    ) -> Font {
+        .display(
+            size,
+            weight: weight,
+            in: style.displayFont,
+            scale: style.textSize.scale
+        )
     }
 }

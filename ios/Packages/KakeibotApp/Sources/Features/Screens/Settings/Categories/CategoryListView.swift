@@ -143,7 +143,7 @@ private extension CategoryListView {
             destination = .new(model.kind)
         } label: {
             Image(systemName: "plus")
-                .font(.sans(.headline, weight: .ultraLight))
+                .sansFont(.headline, weight: .ultraLight)
                 .foregroundStyle(Palette.accent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Palette.faint, in: tileShape)

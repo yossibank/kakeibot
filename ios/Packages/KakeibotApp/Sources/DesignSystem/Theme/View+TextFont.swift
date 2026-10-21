@@ -19,11 +19,12 @@ public extension View {
 
 private struct TextFont: ViewModifier {
     @Environment(\.themeStyle.textFont) private var font
+    @Environment(\.themeStyle.textSize.scale) private var scale
 
     let spec: Spec
 
     func body(content: Content) -> some View {
-        content.font(spec.font(in: font))
+        content.font(spec.font(in: font, scale: scale))
     }
 }
 
@@ -35,12 +36,15 @@ private extension TextFont {
 }
 
 private extension TextFont.Spec {
-    func font(in font: ThemeFont) -> Font {
+    func font(
+        in font: ThemeFont,
+        scale: Double
+    ) -> Font {
         switch self {
         case let .style(style, weight):
-            .text(style, weight: weight, in: font)
+            .text(style, weight: weight, in: font, scale: scale)
         case let .size(size, weight):
-            .text(size: size, weight: weight, in: font)
+            .text(size: size, weight: weight, in: font, scale: scale)
         }
     }
 }

@@ -77,7 +77,7 @@ private extension ReminderView {
     var hero: some View {
         VStack(spacing: 14) {
             Image(systemName: bellImage)
-                .font(.sans(.headline, weight: .light))
+                .sansFont(.headline, weight: .light)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 48, height: 48)
                 .background(Palette.accent.opacity(.subtle), in: Circle())
@@ -189,7 +189,7 @@ private extension ReminderView {
 
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "yensign")
-                    .font(.sans(.body, weight: .medium))
+                    .sansFont(.body, weight: .medium)
                     .foregroundStyle(Palette.cardBottom)
                     .frame(width: 38, height: 38)
                     .background(
@@ -240,7 +240,7 @@ private extension ReminderView {
 
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "repeat")
-                    .font(.sans(.small))
+                    .sansFont(.small)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 28, height: 28)
                     .background(Palette.accent.opacity(.subtle), in: Circle())

@@ -11,11 +11,12 @@ public extension View {
 
 private struct DisplayFont: ViewModifier {
     @Environment(\.themeStyle.displayFont) private var font
+    @Environment(\.themeStyle.textSize.scale) private var scale
 
     let size: FontSize
     let weight: Font.Weight
 
     func body(content: Content) -> some View {
-        content.font(.display(size, weight: weight, in: font))
+        content.font(.display(size, weight: weight, in: font, scale: scale))
     }
 }

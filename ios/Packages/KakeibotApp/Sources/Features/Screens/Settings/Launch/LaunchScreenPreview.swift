@@ -33,7 +33,7 @@ private extension LaunchScreenPreview {
         let scale: CGFloat = isSelected ? 1.08 : 1
 
         return Image(systemName: "plus")
-            .font(.sans(.body, weight: .light))
+            .sansFont(.body, weight: .light)
             .foregroundStyle(color)
             .frame(width: 48, height: 48)
             .background(fill, in: Circle())
@@ -51,7 +51,7 @@ private extension LaunchScreenPreview {
 
         return VStack(spacing: 2) {
             Image(systemName: screen.systemImage)
-                .font(.sans(.small, weight: .light))
+                .sansFont(.small, weight: .light)
 
             Text(screen.title)
                 .textFont(size: .micro)

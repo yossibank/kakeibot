@@ -23,7 +23,7 @@ struct SettingsSheetTitle: View {
 private extension SettingsSheetTitle {
     static let tracking: CGFloat = 4
     static let wrappedTracking: CGFloat = 2
-    static let wrappedScale: CGFloat = 0.8
+    static let wrappedScale: CGFloat = 0.6
 
     var wrapped: String {
         text.replacingOccurrences(of: "を", with: "を\n")

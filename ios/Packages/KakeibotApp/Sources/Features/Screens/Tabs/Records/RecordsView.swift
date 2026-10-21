@@ -551,11 +551,11 @@ private extension RecordsView {
                 markAmount(expense, type: .expense)
             } else if model.noSpendDays.contains(date) {
                 Image(systemName: "leaf.fill")
-                    .font(.sans(.micro))
+                    .sansFont(.micro)
                     .foregroundStyle(Palette.accent)
             } else if !model.upcomingRecurrings(on: date).isEmpty {
                 Image(systemName: "repeat")
-                    .font(.sans(.micro))
+                    .sansFont(.micro)
                     .foregroundStyle(Palette.hint)
             }
 
@@ -605,7 +605,7 @@ private extension RecordsView {
     ) -> some View {
         HStack(spacing: 10) {
             Image(systemName: "repeat")
-                .font(.sans(.small, weight: .light))
+                .sansFont(.small, weight: .light)
                 .foregroundStyle(Palette.hint)
 
             Text(model.title(of: recurring))

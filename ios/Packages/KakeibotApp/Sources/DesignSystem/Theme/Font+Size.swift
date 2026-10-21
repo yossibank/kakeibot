@@ -5,9 +5,10 @@ public extension Font {
     static func display(
         _ size: FontSize,
         weight: Weight = .regular,
-        in font: ThemeFont
+        in font: ThemeFont,
+        scale: Double
     ) -> Font {
-        display(size: size.rawValue, weight: weight, in: font)
+        display(size: size.rawValue * scale, weight: weight, in: font)
     }
 
     static func display(
@@ -26,12 +27,14 @@ public extension Font {
     static func text(
         _ style: TextStyle,
         weight: Weight? = nil,
-        in font: ThemeFont
+        in font: ThemeFont,
+        scale: Double
     ) -> Font {
+        let size = style.baseSize * scale
         let design: Design = font == .mincho ? .serif : .default
         let base: Font = font.customName.map { name in
-            .custom(name, size: style.baseSize, relativeTo: style)
-        } ?? .system(style, design: design)
+            .custom(name, fixedSize: size)
+        } ?? .system(size: size, design: design)
 
         guard let weight else {
             return base
@@ -43,16 +46,18 @@ public extension Font {
     static func text(
         size: FontSize,
         weight: Weight = .regular,
-        in font: ThemeFont
+        in font: ThemeFont,
+        scale: Double
     ) -> Font {
-        display(size: size.rawValue, weight: weight, in: font)
+        display(size: size.rawValue * scale, weight: weight, in: font)
     }
 
     static func sans(
         _ size: FontSize,
-        weight: Weight = .regular
+        weight: Weight = .regular,
+        scale: Double
     ) -> Font {
-        .system(size: size.rawValue, weight: weight)
+        .system(size: size.rawValue * scale, weight: weight)
     }
 }
 

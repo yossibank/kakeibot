@@ -109,7 +109,7 @@ private extension ConfirmCard {
         VStack(spacing: 20) {
             VStack(spacing: 10) {
                 Image(systemName: systemImage)
-                    .font(.sans(.headline, weight: .ultraLight))
+                    .sansFont(.headline, weight: .ultraLight)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 52, height: 52)
                     .overlay {

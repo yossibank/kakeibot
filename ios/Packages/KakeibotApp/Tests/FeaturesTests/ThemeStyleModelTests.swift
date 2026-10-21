@@ -14,11 +14,13 @@ struct ThemeStyleModelTests {
         await model.choose(ThemeCorner.small)
         await model.choose(displayFont: .gothic)
         await model.choose(textFont: .rounded)
+        await model.choose(ThemeTextSize.large)
         let style = try await setup.database.style()
         let expected = ThemeStyle(
             corner: .small,
             displayFont: .gothic,
-            textFont: .rounded
+            textFont: .rounded,
+            textSize: .large
         )
 
         #expect(model.style == expected)

@@ -101,7 +101,7 @@ private extension TemplateShelfSheet {
     var searchField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .font(.sans(.small, weight: .light))
+                .sansFont(.small, weight: .light)
                 .foregroundStyle(Palette.subtext)
 
             TextField(
