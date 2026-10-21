@@ -5,9 +5,14 @@ struct SettingsBackHeader: View {
     @Environment(\.dismiss) private var dismiss
 
     private let title: String
+    private let hint: SettingsScreenFlag?
 
-    init(_ title: String) {
+    init(
+        _ title: String,
+        hint: SettingsScreenFlag? = nil
+    ) {
         self.title = title
+        self.hint = hint
     }
 
     var body: some View {
@@ -25,8 +30,19 @@ struct SettingsBackHeader: View {
 
             Spacer()
 
-            Color.clear
-                .frame(width: 44, height: 44)
+            ZStack {
+                if let hint,
+                   hint.isLoaded,
+                   hint.isOn {
+                    RingButton(systemImage: "questionmark") {
+                        withAnimation(.snappy) {
+                            hint.set(false)
+                        }
+                    }
+                    .transition(.opacity)
+                }
+            }
+            .frame(width: 44, height: 44)
         }
     }
 }

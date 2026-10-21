@@ -5,9 +5,12 @@ import SwiftUI
 
 public struct BudgetListView: View {
     @State private var model: BudgetListModel
+    @State private var hintFlag: SettingsScreenFlag
 
     public init(model: BudgetListModel) {
         _model = State(initialValue: model)
+        let hintFlag = model.hintFlag()
+        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
@@ -27,7 +30,7 @@ public struct BudgetListView: View {
 private extension BudgetListView {
     var content: some View {
         VStack(spacing: 16) {
-            SettingsBackHeader("予算")
+            SettingsBackHeader("予算", hint: hintFlag)
 
             VStack(spacing: 4) {
                 Text("\(model.month.month)月（\(model.periodText)）から使う額")
@@ -47,7 +50,7 @@ private extension BudgetListView {
             }
 
             SettingsHint(
-                flag: model.hintFlag(),
+                flag: hintFlag,
                 lines: [
                     .init("calendar", "変えた額はこの月から使います"),
                     .init("clock.arrow.circlepath", "前の月の額はそのまま残ります")

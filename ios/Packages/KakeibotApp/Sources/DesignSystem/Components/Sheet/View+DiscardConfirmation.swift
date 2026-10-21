@@ -9,7 +9,7 @@ public extension View {
     ) -> some View {
         interactiveDismissDisabled(isChanged)
             .background {
-                DismissAttemptReader {
+                DismissAttemptReader(isChanged: isChanged) {
                     isPresented.wrappedValue = true
                 }
             }
@@ -26,6 +26,7 @@ public extension View {
 }
 
 private struct DismissAttemptReader: UIViewControllerRepresentable {
+    let isChanged: Bool
     let onAttempt: () -> Void
 
     func makeUIViewController(context: Context) -> DismissAttemptController {
@@ -36,11 +37,13 @@ private struct DismissAttemptReader: UIViewControllerRepresentable {
         _ controller: DismissAttemptController,
         context: Context
     ) {
+        controller.isChanged = isChanged
         controller.onAttempt = onAttempt
     }
 }
 
-private final class DismissAttemptController: UIViewController {
+final class DismissAttemptController: UIViewController {
+    var isChanged = false
     var onAttempt: () -> Void = {}
 
     private var original: (any UIAdaptivePresentationControllerDelegate)?
@@ -57,6 +60,36 @@ private final class DismissAttemptController: UIViewController {
 
         original = presentation.delegate
         presentation.delegate = self
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        guard
+            let presentation = presentationController,
+            presentation.delegate === self
+        else {
+            return
+        }
+
+        presentation.delegate = original
+    }
+}
+
+extension DismissAttemptController {
+    static func changed(in controller: UIViewController) -> Self? {
+        if let attempt = controller as? Self,
+           attempt.isChanged {
+            return attempt
+        }
+
+        for child in controller.children {
+            if let attempt = changed(in: child) {
+                return attempt
+            }
+        }
+
+        return nil
     }
 }
 

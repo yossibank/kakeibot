@@ -4,15 +4,14 @@ import SwiftUI
 struct SettingsHint: View {
     @Environment(\.themeStyle.corner) private var corner
 
-    @State private var flag: SettingsScreenFlag
-
+    private let flag: SettingsScreenFlag
     private let lines: [Line]
 
     init(
         flag: SettingsScreenFlag,
         lines: [Line]
     ) {
-        _flag = State(initialValue: flag)
+        self.flag = flag
         self.lines = lines
     }
 
@@ -64,10 +63,7 @@ private extension SettingsHint {
     }
 
     static var transition: AnyTransition {
-        .asymmetric(
-            insertion: .identity,
-            removal: .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
-        )
+        .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
     }
 
     static var fill: LinearGradient {

@@ -6,7 +6,8 @@ import SwiftUI
 public struct CategoryListView: View {
     @State private var drag = SettingsDrag<EntryCategory.ID>()
     @State private var model: CategoryListModel
-    @State private var sheet: Sheet?
+    @State private var hintFlag: SettingsScreenFlag
+    @State private var destination: Destination?
     @State private var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
@@ -23,6 +24,8 @@ public struct CategoryListView: View {
 
     public init(database: AppDatabase) {
         _model = State(initialValue: CategoryListModel(database: database))
+        let hintFlag = SettingsScreenFlag.closedHint(.categories, in: database)
+        _hintFlag = State(initialValue: hintFlag)
         let hiddenList = SettingsScreenFlag.openHiddenList(
             .categories,
             in: database
@@ -33,11 +36,11 @@ public struct CategoryListView: View {
 
     public var body: some View {
         VStack(spacing: 14) {
-            SettingsBackHeader("カテゴリ")
+            SettingsBackHeader("カテゴリ", hint: hintFlag)
             CapsulePicker(selection: $model.kind, options: Self.kindOptions)
 
             SettingsHint(
-                flag: .closedHint(.categories, in: database),
+                flag: hintFlag,
                 lines: [.move, .hide]
             )
 
@@ -91,11 +94,13 @@ public struct CategoryListView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: drag.liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
-        .sheet(item: $sheet) { sheet in
-            CategoryEditSheet(model: editModel(for: sheet)) { _ in
+        .navigationDestination(item: $destination) { destination in
+            CategoryEditSheet(model: editModel(for: destination)) { _ in
             } onDelete: { deletion in
                 self.deletion = deletion
             }
+            .toolbar(.hidden, for: .navigationBar)
+            .environment(\.isSettingsEditPushed, true)
         }
         .confirmation(
             isPresented: $isConfirmingDeleteHidden,
@@ -135,7 +140,7 @@ private extension CategoryListView {
 
     var addTile: some View {
         Button {
-            sheet = .new(model.kind)
+            destination = .new(model.kind)
         } label: {
             Image(systemName: "plus")
                 .font(.sans(.headline, weight: .ultraLight))
@@ -186,7 +191,7 @@ private extension CategoryListView {
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
-                sheet = .edit(category.kind, category.id)
+                destination = .edit(category.kind, category.id)
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
@@ -212,7 +217,7 @@ private extension CategoryListView {
             .position(position)
             .zIndex(layer)
             .onTapGesture {
-                sheet = .edit(category.kind, category.id)
+                destination = .edit(category.kind, category.id)
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
@@ -276,16 +281,9 @@ private extension CategoryListView {
 }
 
 private extension CategoryListView {
-    enum Sheet: Identifiable {
+    enum Destination: Hashable {
         case new(EntryCategory.Kind)
         case edit(EntryCategory.Kind, EntryCategory.ID)
-
-        var id: String {
-            switch self {
-            case let .new(kind): "new-\(kind.rawValue)"
-            case let .edit(_, id): "edit-\(id)"
-            }
-        }
     }
 
     static let kindOptions: [CapsulePicker<EntryCategory.Kind>.Option] = [
@@ -396,8 +394,8 @@ private extension CategoryListView {
         }
     }
 
-    func editModel(for sheet: Sheet) -> CategoryEditModel {
-        switch sheet {
+    func editModel(for destination: Destination) -> CategoryEditModel {
+        switch destination {
         case let .new(kind):
             CategoryEditModel(database: database, kind: kind)
         case let .edit(kind, id):
