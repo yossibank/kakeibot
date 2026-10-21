@@ -148,6 +148,32 @@ struct WalletEditModelTests {
         #expect(isSaved)
         #expect(reloaded.balance == 120_000)
         #expect(reloaded.initialBalance == 100_000)
+        #expect(reloaded.valuations.map(\.amount) == [120_000])
+    }
+
+    @Test
+    func deletesValuationAndCountsFromStart() async throws {
+        let setup = try await Setup()
+        let adding = WalletEditModel(database: setup.database)
+        adding.name = "つみたて"
+        adding.kind = .investment
+        adding.press(.digit(5))
+        adding.press(.doubleZero)
+        let saved = try #require(await adding.save())
+
+        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        await model.load()
+        model.startValuation()
+        model.pressValuation(.digit(9))
+        _ = await model.saveValuation()
+        let valued = model.balance
+        let id = try #require(model.valuations.first?.id)
+
+        await model.deleteValuation(id)
+
+        #expect(valued == 9)
+        #expect(model.valuations.isEmpty)
+        #expect(model.balance == 500)
     }
 
     @Test

@@ -17,6 +17,8 @@ public struct WalletListView: View {
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiding: Wallet?
     @State private var isConfirmingHide = false
+    @State private var deleting: Wallet?
+    @State private var isConfirmingDelete = false
     @State private var hiddenLift: SettingsHiddenLift<Wallet.ID>?
     @State private var isOverShowZone = false
     @State private var showCount = 0
@@ -42,7 +44,7 @@ public struct WalletListView: View {
 
             SettingsHint(
                 flag: .closedHint(.wallets, in: database),
-                lines: [.move, .hide, .swipeHide]
+                lines: [.move, .hide, .swipeDelete]
             )
 
             ScrollView {
@@ -105,6 +107,11 @@ public struct WalletListView: View {
         ) {
             if let hiding {
                 hide(hiding.id)
+            }
+        }
+        .confirmsWalletDelete(isPresented: $isConfirmingDelete) {
+            if let deleting {
+                delete(deleting.id)
             }
         }
         .task {
@@ -199,6 +206,8 @@ private extension WalletListView {
             sheet = .edit(wallet.id)
         } onAction: {
             requestHide(wallet)
+        } onDelete: {
+            requestDelete(wallet)
         } content: {
             row(wallet)
         }
@@ -387,6 +396,17 @@ private extension WalletListView {
 
         Task {
             await model.finishMoving()
+        }
+    }
+
+    func requestDelete(_ wallet: Wallet) {
+        deleting = wallet
+        isConfirmingDelete = true
+    }
+
+    func delete(_ id: Wallet.ID) {
+        Task {
+            await model.delete(id)
         }
     }
 

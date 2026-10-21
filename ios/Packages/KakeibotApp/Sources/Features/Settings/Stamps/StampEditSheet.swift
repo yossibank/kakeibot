@@ -6,6 +6,7 @@ import SwiftUI
 public struct StampEditSheet: View {
     @State private var model: StampEditModel
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
 
@@ -65,6 +66,18 @@ public struct StampEditSheet: View {
         ) {
             dismiss()
         }
+        .confirmation(
+            isPresented: $isConfirmingDelete,
+            systemImage: "trash",
+            title: "このスタンプを削除しますか",
+            message: "カレンダーに押したスタンプは残ります",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            Task {
+                await delete()
+            }
+        }
         .task {
             await model.load()
         }
@@ -77,6 +90,7 @@ private extension StampEditSheet {
             RingButton(systemImage: "xmark") {
                 close()
             }
+            .frame(width: SettingsEditActions.width, alignment: .leading)
 
             Spacer()
 
@@ -87,16 +101,18 @@ private extension StampEditSheet {
 
             Spacer()
 
-            if model.isEditing {
-                SettingsHideButton(isHidden: model.isHidden) {
-                    Task {
-                        await setHidden(!model.isHidden)
+            ZStack {
+                if model.isEditing {
+                    SettingsEditActions(isHidden: model.isHidden) {
+                        Task {
+                            await setHidden(!model.isHidden)
+                        }
+                    } onDelete: {
+                        isConfirmingDelete = true
                     }
                 }
-            } else {
-                Color.clear
-                    .frame(width: 44, height: 44)
             }
+            .frame(width: SettingsEditActions.width, alignment: .trailing)
         }
     }
 }
@@ -130,6 +146,12 @@ private extension StampEditSheet {
         focus = nil
 
         if await model.setHidden(isHidden) {
+            dismiss()
+        }
+    }
+
+    func delete() async {
+        if await model.delete() {
             dismiss()
         }
     }

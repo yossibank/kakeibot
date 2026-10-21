@@ -84,6 +84,18 @@ struct ShelfIconWriteTests {
     }
 
     @Test
+    func deletesShelfIcon() async throws {
+        let setup = try await Setup()
+        let first = try await setup.firstShelfIcon()
+
+        try await setup.database.deleteShelfIcon(first.id)
+        let shelf = try await setup.database.iconShelf()
+
+        #expect(shelf.shelfIcons.count == 7)
+        #expect(!shelf.shelfIcons.contains { $0.id == first.id })
+    }
+
+    @Test
     func rejectsUnknownShelfIcon() async throws {
         let setup = try await Setup()
         let error = AppDatabase.ShelfIconWriteError.shelfIconNotFound

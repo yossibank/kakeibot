@@ -74,15 +74,7 @@ public extension AppDatabase {
 
     func deleteRecurring(_ id: Recurring.ID) async throws {
         try await writer.write { db in
-            try Entry
-                .filter(Column("recurring_id") == id)
-                .updateAll(
-                    db,
-                    Column("recurring_id").set(to: nil),
-                    Column("recurring_date").set(to: nil)
-                )
-
-            _ = try Recurring.deleteOne(db, key: id)
+            try Self.deleteRecurrings(Recurring.filter(id: id), in: db)
         }
     }
 

@@ -140,14 +140,45 @@ private extension EntrySheet {
                     categoryArea
                         .hidden()
 
-                    EntryTransferPanel(model: model) { role in
-                        open(.wallet(role))
+                    VStack(spacing: 12) {
+                        EntryTransferPanel(model: model) { role in
+                            open(.wallet(role))
+                        }
+
+                        if let remaining = model.loanRemaining,
+                           remaining != model.amount {
+                            payOffButton(remaining)
+                        }
                     }
                 }
             } else {
                 categoryArea
             }
         }
+    }
+
+    func payOffButton(_ remaining: Int) -> some View {
+        Button {
+            withAnimation(.snappy) {
+                model.payOffLoan()
+            }
+        } label: {
+            Label(
+                "残り \(AmountText.text(remaining)) をまとめて返す",
+                systemImage: "checkmark.seal"
+            )
+            .textFont(.footnote)
+            .foregroundStyle(Palette.accent)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 40)
+            .overlay {
+                Capsule()
+                    .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .transition(.opacity)
     }
 
     var categoryArea: some View {

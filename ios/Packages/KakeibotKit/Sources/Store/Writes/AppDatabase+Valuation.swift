@@ -28,4 +28,10 @@ public extension AppDatabase {
             return valuation
         }
     }
+
+    func deleteValuation(_ id: Valuation.ID) async throws {
+        try await writer.write { db in
+            _ = try Valuation.deleteOne(db, key: id)
+        }
+    }
 }

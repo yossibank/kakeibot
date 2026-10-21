@@ -6,6 +6,7 @@ import SwiftUI
 public struct CategoryEditSheet: View {
     @State private var model: CategoryEditModel
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingDelete = false
     @State private var tagEdit: TagEdit?
     @State private var isMovingTag = false
     @State private var tagName = ""
@@ -48,6 +49,18 @@ public struct CategoryEditSheet: View {
             isPresented: $isConfirmingDiscard
         ) {
             dismiss()
+        }
+        .confirmation(
+            isPresented: $isConfirmingDelete,
+            systemImage: "trash",
+            title: "このカテゴリを削除しますか",
+            message: "使っている固定費・テンプレート・予算・タグも消えます。元に戻せません",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            Task {
+                await delete()
+            }
         }
         .onChange(of: focus) {
             if focus != nil {
@@ -123,6 +136,7 @@ private extension CategoryEditSheet {
             RingButton(systemImage: "xmark") {
                 close()
             }
+            .frame(width: SettingsEditActions.width, alignment: .leading)
 
             Spacer()
 
@@ -133,16 +147,18 @@ private extension CategoryEditSheet {
 
             Spacer()
 
-            if model.isEditing {
-                SettingsHideButton(isHidden: model.isHidden) {
-                    Task {
-                        await setHidden(!model.isHidden)
+            ZStack {
+                if model.isEditing {
+                    SettingsEditActions(isHidden: model.isHidden) {
+                        Task {
+                            await setHidden(!model.isHidden)
+                        }
+                    } onDelete: {
+                        isConfirmingDelete = true
                     }
                 }
-            } else {
-                Color.clear
-                    .frame(width: 44, height: 44)
             }
+            .frame(width: SettingsEditActions.width, alignment: .trailing)
         }
     }
 
@@ -339,6 +355,12 @@ private extension CategoryEditSheet {
 
     func setHidden(_ isHidden: Bool) async {
         if await model.setHidden(isHidden) {
+            dismiss()
+        }
+    }
+
+    func delete() async {
+        if await model.delete() {
             dismiss()
         }
     }

@@ -53,6 +53,7 @@ extension WalletBalanceTests {
     struct ValuationCase: Decodable, Sendable {
         let date: LocalDate
         let amount: Int
+        let createdAt: Date?
     }
 
     struct EntryCase: Decodable, Sendable {
@@ -61,6 +62,7 @@ extension WalletBalanceTests {
         let date: LocalDate
         let wallet: Side
         let toWallet: Side?
+        let createdAt: Date?
     }
 
     enum Side: String, Decodable, Sendable {
@@ -70,6 +72,9 @@ extension WalletBalanceTests {
 }
 
 extension WalletBalanceTests.BalanceCase {
+    static let recordedAt = Date(timeIntervalSince1970: 0)
+    static let valuedAt = Date(timeIntervalSince1970: 1)
+
     static func wallet(initialBalance: Int) -> Wallet {
         Wallet(
             name: "財布",
@@ -92,7 +97,7 @@ extension WalletBalanceTests.BalanceCase {
                 walletId: wallet,
                 date: valuation.date,
                 amount: valuation.amount,
-                createdAt: Date(),
+                createdAt: valuation.createdAt ?? Self.valuedAt,
                 updatedAt: Date()
             )
         }
@@ -114,7 +119,7 @@ extension WalletBalanceTests.BalanceCase {
                 categoryId: category,
                 walletId: from,
                 toWalletId: to,
-                createdAt: Date(),
+                createdAt: entry.createdAt ?? Self.recordedAt,
                 updatedAt: Date()
             )
         }

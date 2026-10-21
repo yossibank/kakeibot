@@ -131,6 +131,43 @@ struct TransferEntryTests {
     }
 
     @Test
+    func paysOffLoanAtOnce() async throws {
+        let setup = try await Setup()
+
+        let loan = try await setup.database.saveWallet(
+            WalletDraft(
+                kind: .loan,
+                name: "奨学金",
+                mark: .glyph(.contract),
+                color: "#4A6FA5",
+                initialBalance: -100_000
+            ),
+            at: Date()
+        )
+
+        let model = EntryModel(
+            database: setup.database,
+            date: setup.date,
+            type: .transfer
+        )
+
+        await model.load()
+        model.walletId = setup.bank
+        model.toWalletId = loan.id
+        let remaining = model.loanRemaining
+        model.press(.digit(3))
+        model.press(.doubleZero)
+        model.press(.doubleZero)
+        let partial = model.destinationNote
+        model.payOffLoan()
+
+        #expect(remaining == 100_000)
+        #expect(partial == "返したあと ¥70,000")
+        #expect(model.amount == 100_000)
+        #expect(model.destinationNote == "返したあと ¥0")
+    }
+
+    @Test
     func reportsSameWallet() async throws {
         let setup = try await Setup()
 

@@ -43,7 +43,8 @@ private extension EntryTransferPanel {
         let icon = wallet.flatMap { model.icon(for: $0) }
         let isOver = role == .source && model.isOverSourceBalance
         let balanceColor = isOver ? Palette.rose : Palette.subtext
-        let overOpacity: Double = isOver ? 1 : 0
+        let caption = isOver ? Self.overNote : note(for: role)
+        let captionOpacity: Double = caption == nil ? 0 : 1
 
         return Button {
             onPick(role)
@@ -62,22 +63,24 @@ private extension EntryTransferPanel {
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
 
-                if let balance = wallet.flatMap({ model.balance(of: $0) }) {
+                if let balance = wallet.flatMap(model.balanceText) {
                     VStack(spacing: 2) {
-                        Text("残高 \(AmountText.text(balance))")
+                        Text(balance)
                             .textFont(.caption2)
                             .monospacedDigit()
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
 
-                        Text("残高を超えています")
+                        Text(caption ?? " ")
                             .textFont(.caption2)
+                            .monospacedDigit()
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
-                            .opacity(overOpacity)
+                            .contentTransition(.numericText())
+                            .opacity(captionOpacity)
                     }
                     .foregroundStyle(balanceColor)
-                    .animation(.snappy, value: isOver)
+                    .animation(.snappy, value: caption)
                 }
             }
             .padding(.horizontal, 8)
@@ -91,6 +94,12 @@ private extension EntryTransferPanel {
 }
 
 private extension EntryTransferPanel {
+    static let overNote = "残高を超えています"
+
+    func note(for role: EntryWalletSheet.Role) -> String? {
+        role == .destination ? model.destinationNote : nil
+    }
+
     func title(_ role: EntryWalletSheet.Role) -> String {
         switch role {
         case .source: model.walletTitle

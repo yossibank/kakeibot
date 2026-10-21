@@ -8,7 +8,9 @@ public struct WalletEditSheet: View {
     @State private var isConfirmingDiscard = false
     @State private var isEnteringAmount = false
     @State private var isEnteringValuation = false
+    @State private var openValuationId: Valuation.ID?
     @State private var isConfirmingHide = false
+    @State private var isConfirmingDelete = false
     @State private var isEditingPayment = false
     @State private var isAskingPayment = false
     @State private var addedLoan: Wallet?
@@ -69,7 +71,9 @@ public struct WalletEditSheet: View {
                         .zIndex(1)
 
                     SettingsDrawer("今の評価額") {
-                        closeValuation()
+                        Task {
+                            await saveValuation()
+                        }
                     } content: {
                         VStack(spacing: 10) {
                             Text(AmountText.text(model.valuation.amount))
@@ -107,6 +111,11 @@ public struct WalletEditSheet: View {
         ) {
             dismiss()
         }
+        .confirmsWalletDelete(isPresented: $isConfirmingDelete) {
+            Task {
+                await delete()
+            }
+        }
         .confirmsWalletHide(
             balance: model.balance,
             isPresented: $isConfirmingHide
@@ -123,16 +132,17 @@ public struct WalletEditSheet: View {
         } content: {
             RecurringEditSheet(model: model.paymentModel(for: addedLoan?.id))
         }
-        .alert("毎月の返済も決めますか", isPresented: $isAskingPayment) {
-            Button("あとで", role: .cancel) {
-                finishAddedLoan()
-            }
-
-            Button("決める") {
-                isEditingPayment = true
-            }
-        } message: {
-            Text("固定費として、返済の日と額を決められます")
+        .confirmation(
+            isPresented: $isAskingPayment,
+            systemImage: "repeat",
+            title: "毎月の返済も決めますか",
+            message: "固定費として、返済の日と額を決められます",
+            keepTitle: "あとで",
+            confirmTitle: "決める",
+            role: .suggestion,
+            onKeep: finishAddedLoan
+        ) {
+            isEditingPayment = true
         }
         .task {
             await model.load()
@@ -207,6 +217,7 @@ private extension WalletEditSheet {
             RingButton(systemImage: "xmark") {
                 close()
             }
+            .frame(width: SettingsEditActions.width, alignment: .leading)
 
             Spacer()
 
@@ -217,14 +228,17 @@ private extension WalletEditSheet {
 
             Spacer()
 
-            if model.isEditing {
-                SettingsHideButton(isHidden: model.isHidden) {
-                    toggleHidden()
+            ZStack {
+                if model.isEditing {
+                    SettingsEditActions(isHidden: model.isHidden) {
+                        toggleHidden()
+                    } onDelete: {
+                        focus = nil
+                        isConfirmingDelete = true
+                    }
                 }
-            } else {
-                Color.clear
-                    .frame(width: 44, height: 44)
             }
+            .frame(width: SettingsEditActions.width, alignment: .trailing)
         }
     }
 
@@ -357,7 +371,55 @@ private extension WalletEditSheet {
             Text("値動きの分は、収入や支出に入れず、残高だけを合わせます")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
+
+            if !model.valuations.isEmpty {
+                valuationHistory
+            }
         }
+    }
+
+    var valuationHistory: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            SettingsSectionTitle("これまでの評価額")
+                .padding(.top, 10)
+
+            ForEach(model.valuations) { valuation in
+                SwipeRow(id: valuation.id, openId: $openValuationId) {
+                    openValuationId = nil
+                } onAction: {
+                    Task {
+                        await model.deleteValuation(valuation.id)
+                    }
+                } content: {
+                    valuationRow(valuation)
+                }
+            }
+
+            Text("横に払うと消せます。消すと、前の評価額から数え直します")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+        }
+    }
+
+    func valuationRow(_ valuation: Valuation) -> some View {
+        let date = valuation.date
+
+        return HStack {
+            Text("\(String(date.year))/\(date.month)/\(date.day)")
+                .textFont(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+
+            Spacer(minLength: 8)
+
+            Text(AmountText.text(valuation.amount))
+                .displayFont(.body)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+        }
+        .padding(.horizontal, 16)
+        .frame(height: 48)
+        .card(cornerRadius: 14)
     }
 
     var signButton: some View {
@@ -591,6 +653,12 @@ private extension WalletEditSheet {
 
     func setHidden(_ isHidden: Bool) async {
         if await model.setHidden(isHidden) {
+            dismiss()
+        }
+    }
+
+    func delete() async {
+        if await model.delete() {
             dismiss()
         }
     }

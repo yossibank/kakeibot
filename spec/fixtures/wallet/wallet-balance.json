@@ -68,5 +68,17 @@
     ],
     "through": "2026-10-04",
     "balance": 140000
+  },
+  {
+    "initialBalance": 100000,
+    "entries": [
+      { "type": "income", "amount": 3000, "date": "2026-10-05", "wallet": "self", "toWallet": null, "createdAt": "2026-10-05T09:00:00Z" },
+      { "type": "income", "amount": 2000, "date": "2026-10-05", "wallet": "self", "toWallet": null, "createdAt": "2026-10-05T15:00:00Z" }
+    ],
+    "valuations": [
+      { "date": "2026-10-05", "amount": 180000, "createdAt": "2026-10-05T12:00:00Z" }
+    ],
+    "through": null,
+    "balance": 182000
   }
 ]

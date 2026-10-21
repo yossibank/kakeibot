@@ -29,7 +29,7 @@ public extension Wallet {
                 return balance
             }
 
-            if let valuation, entry.date <= valuation.date {
+            if let valuation, valuation.includes(entry) {
                 return balance
             }
 

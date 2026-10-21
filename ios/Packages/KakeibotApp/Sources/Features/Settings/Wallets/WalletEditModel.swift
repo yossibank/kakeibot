@@ -19,6 +19,7 @@ public final class WalletEditModel {
     public private(set) var calculator = AmountCalculator()
     public private(set) var valuation = AmountCalculator()
     public private(set) var balance = 0
+    public private(set) var valuations: [Valuation] = []
     public private(set) var isHidden = false
     public private(set) var payment: Recurring?
 
@@ -151,11 +152,38 @@ public extension WalletEditModel {
                 at: Date()
             )
 
-            balance = amount
+            await loadBalance()
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
             return false
+        }
+    }
+
+    func deleteValuation(_ id: Valuation.ID) async {
+        do {
+            try await database.deleteValuation(id)
+            await loadBalance()
+        } catch {
+            errorNotice.show(Self.deleteFailedMessage)
+        }
+    }
+
+    func loadBalance() async {
+        guard let editingId else {
+            return
+        }
+
+        do {
+            let list = try await database.entryList()
+
+            guard let wallet = list.wallets[editingId] else {
+                return
+            }
+
+            apply(list, to: wallet)
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -174,10 +202,7 @@ public extension WalletEditModel {
             }
 
             apply(WalletDraft(wallet, icon: icon))
-            balance = wallet.balance(
-                with: list.days.flatMap(\.entries),
-                valuations: list.valuations
-            )
+            apply(list, to: wallet)
             isHidden = wallet.archivedAt != nil
             baseline = draft
             await loadPayment()
@@ -246,12 +271,28 @@ public extension WalletEditModel {
             return false
         }
     }
+
+    func delete() async -> Bool {
+        guard let editingId else {
+            return false
+        }
+
+        do {
+            try await database.deleteWallet(editingId)
+            return true
+        } catch {
+            let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
+            errorNotice.show(message)
+            return false
+        }
+    }
 }
 
 private extension WalletEditModel {
     static let defaultColor = "#C9A465"
     static let loadFailedMessage = "口座を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
+    static let deleteFailedMessage = "削除できませんでした"
 
     func followKind(from oldKind: Wallet.Kind) {
         guard icon.markKind == .glyph else {
@@ -263,6 +304,20 @@ private extension WalletEditModel {
         }
 
         icon.glyph = Self.glyph(for: kind)
+    }
+
+    func apply(
+        _ list: EntryList,
+        to wallet: Wallet
+    ) {
+        balance = wallet.balance(
+            with: list.days.flatMap(\.entries),
+            valuations: list.valuations
+        )
+
+        valuations = list.valuations
+            .filter { $0.walletId == wallet.id }
+            .sorted { $0.date > $1.date }
     }
 
     func apply(_ draft: WalletDraft) {

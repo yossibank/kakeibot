@@ -145,8 +145,8 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
 | `wallet-draft.json` | 財布の入力の判定で出る問題 | `name`、`kind`、`mark`（`category-draft.json` と同じ形）、`color`、`initialBalance`、`problems` |
-| `wallet-balance.json` | 1 つの財布の、ある日までの残高 | `initialBalance`、`entries`（`type`・`amount`・`date`・`wallet`・`toWallet`）、`valuations`（`date`・`amount`。無ければ空）、`through`（空ならすべて）、`balance` |
+| `wallet-balance.json` | 1 つの財布の、ある日までの残高 | `initialBalance`、`entries`（`type`・`amount`・`date`・`wallet`・`toWallet`）、`valuations`（`date`・`amount`・`createdAt`。無ければ空）、`through`（空ならすべて）、`balance` |
 
 財布の名前とアイコンは、カテゴリと同じ決まりで判定する。最初の残高は、マイナスでもよい。
 
-`wallet` と `toWallet` は、`self`（残高を出す財布）か `other`（ほかの財布）で書く。残高は、最初の残高に、収入と振替で入った額を足し、支出と振替で出した額を引く。`through` までに評価額があれば、いちばん新しい評価額から、その日より後の記録だけを足し引きする。
+`wallet` と `toWallet` は、`self`（残高を出す財布）か `other`（ほかの財布）で書く。残高は、最初の残高に、収入と振替で入った額を足し、支出と振替で出した額を引く。`through` までに評価額があれば、いちばん新しい評価額から、その日より後の記録だけを足し引きする。評価額と同じ日の記録は、評価額より後に作ったものだけを足し引きする。記録と評価額に `createdAt` が無ければ、記録を先に作ったものとする。

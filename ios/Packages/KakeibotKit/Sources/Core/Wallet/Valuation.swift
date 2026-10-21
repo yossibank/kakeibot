@@ -27,6 +27,14 @@ public struct Valuation: Hashable, Sendable {
 
 public extension Valuation {
     typealias ID = Identifier<Valuation>
+
+    func includes(_ entry: Entry) -> Bool {
+        if entry.date == date {
+            return entry.createdAt <= createdAt
+        }
+
+        return entry.date < date
+    }
 }
 
 extension Valuation: Identifiable {}

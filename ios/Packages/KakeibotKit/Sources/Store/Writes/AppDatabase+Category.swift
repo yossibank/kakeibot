@@ -7,6 +7,7 @@ public extension AppDatabase {
         case categoryNotFound
         case iconNotFound
         case tagNotFound
+        case hasEntries
     }
 
     @discardableResult
@@ -55,6 +56,30 @@ public extension AppDatabase {
             category.archivedAt = isHidden ? now : nil
             category.updatedAt = now
             try category.update(db)
+        }
+    }
+
+    func deleteCategory(_ id: EntryCategory.ID) async throws {
+        try await writer.write { db in
+            guard let category = try EntryCategory.fetchOne(db, key: id) else {
+                throw CategoryWriteError.categoryNotFound
+            }
+
+            let column = Column("category_id")
+
+            if try Entry.filter(column == id).fetchCount(db) > 0 {
+                throw CategoryWriteError.hasEntries
+            }
+
+            try Self.deleteRecurrings(
+                Recurring.filter(column == id),
+                in: db
+            )
+
+            try EntryTemplate.filter(column == id).deleteAll(db)
+            try Budget.filter(column == id).deleteAll(db)
+            try EntryTag.filter(column == id).deleteAll(db)
+            try category.delete(db)
         }
     }
 }

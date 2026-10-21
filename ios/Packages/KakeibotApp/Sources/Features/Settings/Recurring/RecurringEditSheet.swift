@@ -157,7 +157,7 @@ private extension RecurringEditSheet {
             TextField(
                 "名前",
                 text: $model.memo,
-                prompt: Text("名前（家賃・給料など）")
+                prompt: Text(namePrompt)
                     .foregroundStyle(Palette.hint)
             )
             .multilineTextAlignment(.center)
@@ -397,6 +397,14 @@ private extension RecurringEditSheet {
             .init("毎月", value: .monthly),
             .init("毎年", value: .yearly)
         ]
+
+    var namePrompt: String {
+        switch model.type {
+        case .expense: "名前（家賃・サブスクなど）"
+        case .income: "名前（給料・年金など）"
+        case .transfer: "名前（カードの引き落とし・積立など）"
+        }
+    }
 
     static let monthColumns = Array(
         repeating: GridItem(.flexible(), spacing: 6),

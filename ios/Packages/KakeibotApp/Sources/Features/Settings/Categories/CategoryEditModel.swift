@@ -194,6 +194,23 @@ public extension CategoryEditModel {
             return false
         }
     }
+
+    func delete() async -> Bool {
+        guard let editingId else {
+            return false
+        }
+
+        do {
+            try await database.deleteCategory(editingId)
+            return true
+        } catch AppDatabase.CategoryWriteError.hasEntries {
+            errorNotice.show(Self.inUseMessage)
+            return false
+        } catch {
+            errorNotice.show(Self.deleteFailedMessage)
+            return false
+        }
+    }
 }
 
 private extension CategoryEditModel {
@@ -204,6 +221,8 @@ private extension CategoryEditModel {
 
     static let loadFailedMessage = "カテゴリを読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
+    static let deleteFailedMessage = "削除できませんでした"
+    static let inUseMessage = "記録があるので削除できません。非表示にできます"
 
     var snapshot: Snapshot {
         Snapshot(

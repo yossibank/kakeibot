@@ -248,6 +248,62 @@ public extension EntryModel {
         balances[wallet.id]
     }
 
+    var loanRemaining: Int? {
+        guard
+            type == .transfer,
+            let wallet = wallet(toWalletId),
+            wallet.kind == .loan,
+            let balance = balance(of: wallet),
+            balance < 0
+        else {
+            return nil
+        }
+
+        return -balance
+    }
+
+    func balanceText(of wallet: Wallet) -> String? {
+        guard let balance = balance(of: wallet) else {
+            return nil
+        }
+
+        switch wallet.kind.role {
+        case .loan: return "残り \(AmountText.text(max(-balance, 0)))"
+        case .investment: return "評価額 \(AmountText.text(balance))"
+        case .onHand, .card: return "残高 \(AmountText.text(balance))"
+        }
+    }
+
+    var destinationNote: String? {
+        guard
+            type == .transfer,
+            amount > 0,
+            let wallet = wallet(toWalletId),
+            let balance = balance(of: wallet)
+        else {
+            return nil
+        }
+
+        let after = balance + amount
+
+        switch wallet.kind.role {
+        case .loan:
+            return "返したあと \(AmountText.text(max(-after, 0)))"
+        case .investment:
+            return "積み立てたあと \(AmountText.text(after))"
+        case .onHand, .card:
+            return nil
+        }
+    }
+
+    func payOffLoan() {
+        guard let loanRemaining else {
+            return
+        }
+
+        calculator = AmountCalculator(amount: loanRemaining)
+    }
+
     func icon(for template: EntryTemplate) -> Icon? {
         let categories = categories(for: template.type)
         let category = categories.first { $0.id == template.categoryId }

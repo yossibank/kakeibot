@@ -52,6 +52,14 @@ public extension AppDatabase {
             try shelfIcon.update(db)
         }
     }
+
+    func deleteShelfIcon(_ id: ShelfIcon.ID) async throws {
+        try await writer.write { db in
+            guard try ShelfIcon.deleteOne(db, key: id) else {
+                throw ShelfIconWriteError.shelfIconNotFound
+            }
+        }
+    }
 }
 
 private extension AppDatabase {
