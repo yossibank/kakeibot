@@ -28,7 +28,6 @@ extension ThemeTextSize {
         case .small: "小さめ"
         case .standard: "ふつう"
         case .large: "大きめ"
-        case .larger: "特大"
         }
     }
 }
