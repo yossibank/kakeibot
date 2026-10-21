@@ -32,6 +32,35 @@ struct ReviewModelTests {
     }
 
     @Test
+    func totalsOnlyFilteredEntries() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let options = try await setup.database.entryOptions()
+        let food = options.expenseCategories[0]
+        try await setup.save(.expense, amount: 980, on: "2026-10-12")
+        try await setup.saveDaily(amount: 6000, on: "2026-10-14")
+        let month = try #require(YearMonth("2026-10"))
+        try await setup.database.setBudget(20000, for: nil, from: month)
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        try await observe(model) {
+            model.list != nil && model.budgetUsage != nil
+        }
+
+        let all = model.total
+        let usage = model.budgetUsage
+        model.filter = EntryFilter(categoryIds: [food.id])
+        let filtered = model.total
+        let shares = model.categoryShares.map(\.name)
+
+        #expect(all == 6980)
+        #expect(usage?.budget == 20000)
+        #expect(filtered == 980)
+        #expect(model.budgetUsage == nil)
+        #expect(shares == [food.name])
+        #expect(model.filterTitle == food.name)
+    }
+
+    @Test
     func ranksCategoriesByAmount() async throws {
         let setup = try await RecordsModelTests.Setup()
         let options = try await setup.database.entryOptions()

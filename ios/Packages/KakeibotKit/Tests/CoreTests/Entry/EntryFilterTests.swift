@@ -4,8 +4,12 @@ import Testing
 
 struct EntryFilterTests {
     @Test(arguments: try cases)
-    func keepsChosenCategories(fixture: FilterCase) {
-        let filter = EntryFilter(categoryIds: Set(fixture.categories))
+    func keepsChosenEntries(fixture: FilterCase) {
+        let filter = EntryFilter(
+            categoryIds: Set(fixture.categories),
+            walletIds: Set(fixture.wallets)
+        )
+
         let days = EntryDay.grouping(fixture.entries.map(\.entry))
 
         let kept = filter.apply(to: days).flatMap(\.entries)
@@ -17,6 +21,7 @@ struct EntryFilterTests {
 extension EntryFilterTests {
     struct FilterCase: Decodable, Sendable {
         let categories: [EntryCategory.ID]
+        let wallets: [Wallet.ID]
         let entries: [EntryItem]
         let keptIds: [Entry.ID]
     }
@@ -24,6 +29,8 @@ extension EntryFilterTests {
     struct EntryItem: Decodable, Sendable {
         let id: Entry.ID
         let category: EntryCategory.ID?
+        let wallet: Wallet.ID
+        let toWallet: Wallet.ID?
         let date: LocalDate
     }
 }
@@ -38,7 +45,8 @@ extension EntryFilterTests.EntryItem {
             amount: 100,
             date: date,
             categoryId: category,
-            walletId: Wallet.ID(),
+            walletId: wallet,
+            toWalletId: toWallet,
             createdAt: createdAt,
             updatedAt: createdAt
         )

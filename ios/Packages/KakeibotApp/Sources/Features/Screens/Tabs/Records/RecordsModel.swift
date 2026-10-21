@@ -98,46 +98,8 @@ public extension RecordsModel {
         )
     }
 
-    var filterCategories: [EntryCategory] {
-        let categories = list.map { Array($0.categories.values) } ?? []
-
-        return categories
-            .filter { $0.archivedAt == nil }
-            .sorted { lhs, rhs in
-                if lhs.kind != rhs.kind {
-                    return lhs.kind == .expense
-                }
-
-                return lhs.sortOrder < rhs.sortOrder
-            }
-    }
-
     var filterTitle: String? {
-        guard !filter.isEmpty else {
-            return nil
-        }
-
-        let names = filterCategories
-            .filter { filter.categoryIds.contains($0.id) }
-            .map(\.name)
-
-        return names.joined(separator: "・")
-    }
-
-    func icon(of category: EntryCategory) -> Icon? {
-        list?.icons[category.iconId]
-    }
-
-    func toggleFilter(_ id: EntryCategory.ID) {
-        if filter.categoryIds.contains(id) {
-            filter.categoryIds.remove(id)
-        } else {
-            filter.categoryIds.insert(id)
-        }
-    }
-
-    func clearFilter() {
-        filter = EntryFilter()
+        list?.title(of: filter)
     }
 
     func rememberSearch(_ text: String) async {

@@ -91,18 +91,19 @@ struct RecordsModelTests {
             memo: "ランチ"
         )
 
+        let options = try await setup.database.entryOptions()
+        let food = try #require(options.expenseCategories.first)
         let model = RecordsModel(database: setup.database, today: setup.today)
         await model.load()
-        let food = try #require(model.filterCategories.first)
 
         model.searchText = "ランチ"
         let summary = model.searchSummary
 
-        model.toggleFilter(food.id)
+        model.filter = EntryFilter(categoryIds: [food.id])
         let filtered = model.days.map(\.date.description)
         let title = model.filterTitle
 
-        model.clearFilter()
+        model.filter = EntryFilter()
 
         #expect(summary?.count == 2)
         #expect(summary?.expenseTotal == 1480)

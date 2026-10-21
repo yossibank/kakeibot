@@ -14,6 +14,7 @@ public struct ReviewView: View {
     @State private var openStamp: StampCalendar.Tally?
     @State private var pendingDay: LocalDate?
     @State private var slide = PageSlide()
+    @State private var isFiltering = false
 
     private let onOpenEntry: (Entry.ID) -> Void
     private let onOpenRecurring: (Recurring.ID) -> Void
@@ -35,6 +36,17 @@ public struct ReviewView: View {
         ScrollView {
             VStack(spacing: 12) {
                 header
+
+                if let title = model.filterTitle {
+                    EntryFilterLine(title: title) {
+                        isFiltering = true
+                    } onClear: {
+                        withAnimation(.snappy) {
+                            model.filter = EntryFilter()
+                        }
+                    }
+                }
+
                 periodBar
 
                 content
@@ -69,6 +81,9 @@ public struct ReviewView: View {
                 openStamp = nil
             }
         }
+        .sheet(isPresented: $isFiltering) {
+            EntryFilterSheet(filter: $model.filter, list: model.list)
+        }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -94,6 +109,13 @@ private extension ReviewView {
                 selection: scaleBinding,
                 options: Self.scaleOptions
             )
+
+            ToolButton(
+                systemImage: "line.3.horizontal.decrease",
+                isOn: !model.filter.isEmpty
+            ) {
+                isFiltering = true
+            }
         }
     }
 

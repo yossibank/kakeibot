@@ -58,7 +58,7 @@ public struct RecordsView: View {
 
                         filterButton
 
-                        toolButton(systemImage: "magnifyingglass") {
+                        ToolButton(systemImage: "magnifyingglass") {
                             openSearch()
                         }
                     }
@@ -85,7 +85,7 @@ public struct RecordsView: View {
             stampSheet(on: target.date)
         }
         .sheet(isPresented: $isFiltering) {
-            RecordsFilterSheet(model: model)
+            EntryFilterSheet(filter: $model.filter, list: model.list)
         }
         .sensoryFeedback(.success, trigger: stampCount)
         .background {
@@ -212,15 +212,22 @@ private extension RecordsView {
 
                 Spacer()
 
-                Button("消す") {
+                Button {
                     Task {
                         await model.clearRecentSearches()
                     }
+                } label: {
+                    Text("消す")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+                        .padding(.horizontal, 8)
+                        .frame(minHeight: 36)
+                        .contentShape(.rect)
                 }
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
+                .buttonStyle(.plain)
             }
-            .padding(.vertical, 8)
+            .padding(.top, 10)
+            .padding(.bottom, 6)
 
             ForEach(model.recentSearches, id: \.self) { word in
                 Button {
@@ -292,7 +299,7 @@ private extension RecordsView {
     }
 
     var filterButton: some View {
-        toolButton(
+        ToolButton(
             systemImage: "line.3.horizontal.decrease",
             isOn: !model.filter.isEmpty
         ) {
@@ -303,62 +310,14 @@ private extension RecordsView {
     @ViewBuilder
     var filterLine: some View {
         if let title = model.filterTitle {
-            HStack(spacing: 8) {
-                Image(systemName: "line.3.horizontal.decrease")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Palette.accent)
-
-                Text(title)
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-
-                Spacer()
-
-                Button {
-                    withAnimation(.snappy) {
-                        model.clearFilter()
-                    }
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(Palette.hint)
-                        .frame(width: 32, height: 32)
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.leading, 12)
-            .background(Palette.accent.opacity(.subtle), in: Capsule())
-            .contentShape(.rect)
-            .onTapGesture {
+            EntryFilterLine(title: title) {
                 isFiltering = true
-            }
-            .transition(.opacity)
-        }
-    }
-
-    func toolButton(
-        systemImage: String,
-        isOn: Bool = false,
-        action: @escaping () -> Void
-    ) -> some View {
-        let fill = isOn ? Palette.accent.opacity(.subtle) : Color.clear
-        let ring = isOn ? Palette.accent : Palette.line
-
-        return Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(Palette.accent)
-                .frame(width: 36, height: 36)
-                .background(fill, in: Circle())
-                .overlay {
-                    Circle()
-                        .stroke(ring, lineWidth: 1)
+            } onClear: {
+                withAnimation(.snappy) {
+                    model.filter = EntryFilter()
                 }
-                .frame(width: 44, height: 44)
-                .contentShape(.rect)
+            }
         }
-        .buttonStyle(.plain)
     }
 
     @ViewBuilder

@@ -9,6 +9,12 @@ import Store
 public final class ReviewModel: ScreenModel {
     public var today: LocalDate
 
+    public var filter = EntryFilter() {
+        didSet {
+            summaries = [:]
+        }
+    }
+
     public private(set) var scale: ReviewPeriod.Scale = .month
     public private(set) var kind: ReviewKind = .expense
     public private(set) var offset = 0
@@ -55,6 +61,10 @@ public extension ReviewModel {
         )
 
         return current.adding(offset)
+    }
+
+    var filterTitle: String? {
+        list?.title(of: filter)
     }
 
     var canMoveForward: Bool {
@@ -301,7 +311,8 @@ private extension ReviewModel {
     static let saveFailedMessage = "保存できませんでした"
 
     var entries: [Entry] {
-        list?.days.flatMap(\.entries) ?? []
+        let entries = list?.days.flatMap(\.entries) ?? []
+        return entries.filter(filter.includes)
     }
 
     var entryType: Entry.Kind? {
@@ -364,7 +375,12 @@ private extension ReviewModel {
         for categoryId: EntryCategory.ID?,
         spent: Int
     ) -> BudgetUsage? {
-        guard scale == .month, kind == .expense else {
+        guard
+            scale == .month,
+            kind == .expense,
+            filter.walletIds.isEmpty,
+            categoryId != nil || filter.categoryIds.isEmpty
+        else {
             return nil
         }
 

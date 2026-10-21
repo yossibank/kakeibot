@@ -60,7 +60,7 @@ public struct BackupView: View {
                         Hairline()
 
                         Button {
-                            isImporting = true
+                            importFile()
                         } label: {
                             action(
                                 "読み込む",
@@ -70,7 +70,6 @@ public struct BackupView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .disabled(model.isWorking)
                     .padding(.horizontal, 14)
                     .card()
 
@@ -191,9 +190,21 @@ private extension BackupView {
     }
 
     func exportFile(_ kind: BackupModel.FileKind) {
+        guard !model.isWorking else {
+            return
+        }
+
         Task {
             isExporting = await model.makeFile(kind, at: Date())
         }
+    }
+
+    func importFile() {
+        guard !model.isWorking else {
+            return
+        }
+
+        isImporting = true
     }
 }
 
