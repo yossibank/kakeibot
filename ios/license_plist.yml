@@ -1,0 +1,7 @@
+manual:
+  - name: DotGothic16
+    source: https://github.com/fontworks-fonts/DotGothic16
+    file: Kakeibot/Fonts/DotGothic16-OFL.txt
+  - name: Klee One
+    source: https://github.com/fontworks-fonts/Klee
+    file: Kakeibot/Fonts/KleeOne-OFL.txt
