@@ -108,6 +108,8 @@ public extension WalletEditModel {
         case .emoney: .walletPass
         case .point: .coin
         case .other: .other
+        case .investment: .invest
+        case .loan: .contract
         }
     }
 

@@ -32,10 +32,19 @@ public extension AssetsModel {
         public let wallet: Wallet
         public let icon: Icon?
         public let balance: Int
-        public let nextBill: Int?
+        public let nextBill: CardBill?
 
         public var id: Wallet.ID {
             wallet.id
+        }
+    }
+
+    struct WalletSection: Identifiable, Equatable {
+        public let role: Wallet.Kind.Role
+        public let rows: [WalletRow]
+
+        public var id: Wallet.Kind.Role {
+            role
         }
     }
 
@@ -65,20 +74,28 @@ public extension AssetsModel {
         today.periodMonth(startingOn: monthStartDay)
     }
 
+    var holdings: Holdings {
+        Holdings(wallets: wallets, entries: entries)
+    }
+
     var total: Int {
-        Wallet.totalBalance(of: wallets, with: entries)
+        holdings.available
+    }
+
+    var showsNetWorth: Bool {
+        wallets.contains { [.investment, .loan].contains($0.kind.role) }
     }
 
     var changeFromLastMonth: Int {
         let lastMonth = currentMonth.adding(months: -1)
         let end = lastMonth.period(startingOn: monthStartDay).upperBound
-        let previous = Wallet.totalBalance(
-            of: wallets,
-            with: entries,
+        let previous = Holdings(
+            wallets: wallets,
+            entries: entries,
             through: end
         )
 
-        return total - previous
+        return total - previous.available
     }
 
     var rows: [WalletRow] {
@@ -91,8 +108,19 @@ public extension AssetsModel {
                 wallet: wallet,
                 icon: list?.icons[wallet.iconId],
                 balance: wallet.balance(with: entries),
-                nextBill: next?.bill.amount
+                nextBill: next?.bill
             )
+        }
+    }
+
+    var sections: [WalletSection] {
+        let rows = rows
+
+        return Wallet.Kind.Role.allCases.compactMap { role in
+            let members = rows.filter { $0.wallet.kind.role == role }
+            return members.isEmpty
+                ? nil
+                : WalletSection(role: role, rows: members)
         }
     }
 
@@ -127,13 +155,13 @@ public extension AssetsModel {
             let month = currentMonth.adding(months: -offset)
             let period = month.period(startingOn: monthStartDay)
             let end = offset == 0 ? today : period.upperBound
-            let total = Wallet.totalBalance(
-                of: wallets,
-                with: entries,
+            let holdings = Holdings(
+                wallets: wallets,
+                entries: entries,
                 through: end
             )
 
-            return MonthTotal(month: month, total: total)
+            return MonthTotal(month: month, total: holdings.available)
         }
     }
 

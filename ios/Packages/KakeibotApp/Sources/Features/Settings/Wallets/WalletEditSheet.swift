@@ -379,10 +379,10 @@ private extension WalletEditSheet {
     }
 
     var balanceHint: String {
-        if model.kind == .card {
-            "カードは、まだ引き落とされていない額をマイナスで入れます"
-        } else {
-            "記録を始める前の、いまの残高を入れます"
+        switch model.kind {
+        case .card: "カードは、まだ引き落とされていない額をマイナスで入れます"
+        case .loan: "借入は、まだ返していない額をマイナスで入れます"
+        default: "記録を始める前の、いまの残高を入れます"
         }
     }
 

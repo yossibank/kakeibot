@@ -33,7 +33,9 @@ public struct AssetsView: View {
                     billCard
                 }
 
-                walletGrid
+                ForEach(model.sections) { section in
+                    walletSection(section)
+                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
@@ -70,7 +72,13 @@ private extension AssetsView {
 
     var totalCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SectionTitle("残高の合計")
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                SectionTitle("手元のお金")
+
+                Text("未払いを引いた額")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.hint)
+            }
 
             HStack(alignment: .firstTextBaseline) {
                 Text(AmountText.text(model.total))
@@ -85,6 +93,17 @@ private extension AssetsView {
                 Text(changeText)
                     .textFont(.caption)
                     .foregroundStyle(Palette.accent)
+            }
+
+            Text(breakdownText)
+                .textFont(.caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            if model.showsNetWorth {
+                netWorthRow
             }
 
             BalanceTrend(totals: model.monthTotals.map(\.total))
@@ -131,15 +150,50 @@ private extension AssetsView {
         .card(cornerRadius: 24)
     }
 
-    var walletGrid: some View {
-        LazyVGrid(columns: Self.columns, spacing: 8) {
-            ForEach(model.rows) { row in
-                Button {
-                    onOpenWallet(row.wallet.id)
-                } label: {
-                    walletTile(row)
+    var netWorthRow: some View {
+        HStack(alignment: .firstTextBaseline) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("純資産")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.text)
+
+                Text("投資と借入も入れた額")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.hint)
+            }
+
+            Spacer(minLength: 8)
+
+            Text(AmountText.text(model.holdings.netWorth))
+                .displayFont(.headline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .background(
+            Palette.accent.opacity(.faint),
+            in: .rect(cornerRadius: corner.radius(14))
+        )
+    }
+
+    func walletSection(_ section: AssetsModel.WalletSection) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionTitle(Self.title(of: section.role))
+                .padding(.horizontal, 4)
+                .padding(.top, 4)
+
+            LazyVGrid(columns: Self.columns, spacing: 8) {
+                ForEach(section.rows) { row in
+                    Button {
+                        onOpenWallet(row.wallet.id)
+                    } label: {
+                        walletTile(row)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
     }
@@ -243,9 +297,7 @@ private extension AssetsView {
     }
 
     func walletTile(_ row: AssetsModel.WalletRow) -> some View {
-        let color = row.balance < 0 ? Palette.rose : Palette.accentStrong
-
-        return VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
                 IconImage(row.icon, size: 15)
                     .foregroundStyle(Palette.accent)
@@ -254,17 +306,26 @@ private extension AssetsView {
                     .textFont(.caption)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+
+                Spacer(minLength: 4)
+
+                if let label = Self.label(of: row) {
+                    Text(label)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                }
             }
 
-            Text(AmountText.text(row.balance))
+            Text(AmountText.text(Self.shownAmount(of: row)))
                 .displayFont(.headline)
                 .monospacedDigit()
-                .foregroundStyle(color)
+                .foregroundStyle(Self.amountColor(of: row))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
             if let next = row.nextBill {
-                Text("次の引き落とし \(AmountText.text(next))")
+                Text(nextBillText(next))
                     .textFont(.caption2)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
@@ -284,6 +345,59 @@ private extension AssetsView {
         repeating: GridItem(.flexible(), spacing: 8),
         count: 2
     )
+
+    static func title(of role: Wallet.Kind.Role) -> String {
+        switch role {
+        case .onHand: "手持ち"
+        case .card: "カードの未払い"
+        case .investment: "投資"
+        case .loan: "借入"
+        }
+    }
+
+    static func label(of row: AssetsModel.WalletRow) -> String? {
+        switch row.wallet.kind.role {
+        case .card: row.balance > 0 ? "返ってくる額" : "未払い"
+        case .loan: "残り"
+        case .onHand, .investment: nil
+        }
+    }
+
+    static func shownAmount(of row: AssetsModel.WalletRow) -> Int {
+        switch row.wallet.kind.role {
+        case .card, .loan: abs(row.balance)
+        case .onHand, .investment: row.balance
+        }
+    }
+
+    static func amountColor(of row: AssetsModel.WalletRow) -> Color {
+        switch row.wallet.kind.role {
+        case .card: row.balance > 0 ? Palette.accent : Palette.accentStrong
+        case .loan: Palette.text
+        case .onHand, .investment:
+            row.balance < 0 ? Palette.rose : Palette.accentStrong
+        }
+    }
+
+    var breakdownText: String {
+        let holdings = model.holdings
+        let onHand = "手持ち \(AmountText.text(holdings.onHand))"
+
+        if holdings.unpaid > 0 {
+            return "\(onHand)・未払い \(AmountText.text(holdings.unpaid))"
+        }
+
+        if holdings.refund > 0 {
+            return "\(onHand)・返ってくる額 \(AmountText.text(holdings.refund))"
+        }
+
+        return onHand
+    }
+
+    func nextBillText(_ bill: CardBill) -> String {
+        let date = "\(bill.date.month)/\(bill.date.day)"
+        return "\(date) に \(AmountText.text(bill.amount)) 引き落とし"
+    }
 
     var changeText: String {
         let change = model.changeFromLastMonth

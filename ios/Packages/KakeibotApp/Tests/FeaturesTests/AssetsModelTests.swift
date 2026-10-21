@@ -90,7 +90,9 @@ struct AssetsModelTests {
         #expect(row.source == "銀行")
         #expect(bill.balanceAfter == -42000)
         #expect(bill.shortage == 42000)
-        #expect(model.rows.last?.nextBill == 42000)
+        #expect(model.rows.last?.nextBill?.amount == 42000)
+        #expect(model.holdings.unpaid == 42000)
+        #expect(model.sections.map(\.role) == [.onHand, .card])
     }
 }
 

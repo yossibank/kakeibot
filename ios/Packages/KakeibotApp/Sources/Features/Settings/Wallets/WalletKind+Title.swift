@@ -9,6 +9,8 @@ extension Wallet.Kind {
         case .emoney: "電子マネー"
         case .point: "ポイント"
         case .other: "その他"
+        case .investment: "投資"
+        case .loan: "借入"
         }
     }
 }
