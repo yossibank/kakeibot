@@ -29,6 +29,7 @@ private extension LicenseTests {
             .temporaryDirectory
             .appending(path: UUID().uuidString)
             .appending(path: "Licenses.bundle")
+
         let folder = bundle.appending(path: "com.mono0926.LicensePlist")
 
         try FileManager.default.createDirectory(
@@ -48,10 +49,12 @@ private extension LicenseTests {
             index,
             to: bundle.appending(path: "com.mono0926.LicensePlist.plist")
         )
+
         try write(
             page("MIT text"),
             to: folder.appending(path: "GRDB.swift.plist")
         )
+
         try write(
             page("OFL text"),
             to: folder.appending(path: "Klee One.plist")

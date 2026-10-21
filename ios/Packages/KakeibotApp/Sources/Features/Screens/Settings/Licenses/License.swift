@@ -31,14 +31,12 @@ public extension License {
     }
 
     static var bundled: [License] {
-        guard let url = Bundle.main.url(
+        let url = Bundle.main.url(
             forResource: "Licenses",
             withExtension: "bundle"
-        ) else {
-            return []
-        }
+        )
 
-        return load(in: url)
+        return url.map(load(in:)) ?? []
     }
 }
 
