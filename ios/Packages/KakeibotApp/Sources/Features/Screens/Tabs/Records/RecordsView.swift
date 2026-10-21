@@ -611,6 +611,7 @@ private extension RecordsView {
             Text(model.title(of: recurring))
                 .textFont(.subheadline)
                 .foregroundStyle(Palette.subtext)
+                .lineLimit(2)
 
             Spacer()
 
@@ -680,6 +681,7 @@ private extension RecordsView {
                 title: row.title,
                 tag: row.tag,
                 detail: row.detail,
+                memo: row.memo,
                 amount: row.amount,
                 type: row.type,
                 isRecurring: row.isRecurring

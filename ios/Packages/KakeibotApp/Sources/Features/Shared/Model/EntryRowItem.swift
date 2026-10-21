@@ -8,6 +8,7 @@ public struct EntryRowItem: Identifiable, Equatable {
     public let title: String
     public let tag: String?
     public let detail: String?
+    public let memo: String?
     public let amount: Int
     public let type: Entry.Kind
     public let isRecurring: Bool
@@ -29,7 +30,8 @@ extension EntryRowItem {
             icon: category.flatMap { list.icons[$0.iconId] },
             title: category?.name ?? Self.title(for: entry.type),
             tag: tag?.name,
-            detail: [dayLabel, memo, wallets].rowDetail,
+            detail: [dayLabel, wallets].rowDetail,
+            memo: memo,
             amount: entry.amount,
             type: entry.type,
             isRecurring: entry.recurringId != nil

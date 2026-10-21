@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 public struct TagCard: View {
     @Environment(\.themeStyle.corner) private var corner
@@ -50,6 +51,17 @@ public extension TagCard {
     enum Size: Hashable, Sendable {
         case regular
         case small
+    }
+}
+
+extension TagCard {
+    static func width(
+        of title: String,
+        size: Size = .regular
+    ) -> CGFloat {
+        let font = UIFont.systemFont(ofSize: size.fontSize)
+        let text = (title as NSString).size(withAttributes: [.font: font])
+        return max(ceil(text.width) + size.padding * 2, size.minWidth)
     }
 }
 

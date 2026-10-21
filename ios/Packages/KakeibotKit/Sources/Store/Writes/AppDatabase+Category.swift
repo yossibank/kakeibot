@@ -29,6 +29,16 @@ public extension AppDatabase {
         }
     }
 
+    func saveTags(
+        _ drafts: [EntryTagDraft],
+        for categoryId: EntryCategory.ID,
+        at now: Date
+    ) async throws -> [EntryTag] {
+        try await writer.write { db in
+            try Self.saveTags(drafts, for: categoryId, in: db, at: now)
+        }
+    }
+
     func reorderCategories(
         _ ids: [EntryCategory.ID],
         at now: Date
@@ -139,12 +149,13 @@ private extension AppDatabase {
         return category
     }
 
+    @discardableResult
     static func saveTags(
         _ drafts: [EntryTagDraft],
         for categoryId: EntryCategory.ID,
         in db: Database,
         at now: Date
-    ) throws {
+    ) throws -> [EntryTag] {
         let existing = try EntryTag
             .filter(Column("category_id") == categoryId)
             .fetchAll(db)
@@ -161,7 +172,7 @@ private extension AppDatabase {
             try tag.update(db)
         }
 
-        for (order, draft) in drafts.enumerated() {
+        return try drafts.enumerated().map { order, draft in
             guard let id = draft.id else {
                 let tag = try draft.newTag(
                     categoryId: categoryId,
@@ -170,14 +181,16 @@ private extension AppDatabase {
                 )
 
                 try tag.insert(db)
-                continue
+                return tag
             }
 
             guard let tag = existing.first(where: { $0.id == id }) else {
                 throw CategoryWriteError.tagNotFound
             }
 
-            try draft.applied(to: tag, sortOrder: order, at: now).update(db)
+            let saved = try draft.applied(to: tag, sortOrder: order, at: now)
+            try saved.update(db)
+            return saved
         }
     }
 }

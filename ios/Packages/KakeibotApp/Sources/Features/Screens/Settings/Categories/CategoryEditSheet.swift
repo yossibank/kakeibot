@@ -13,6 +13,7 @@ public struct CategoryEditSheet: View {
     @State private var ignoresKeyboard = false
 
     @FocusState private var focus: Field?
+    @FocusState private var isTagFocused: Bool
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
@@ -211,6 +212,11 @@ private extension CategoryEditSheet {
             .onPreferenceChange(TagLineMovingKey.self) { isMoving in
                 isMovingTag = isMoving
             }
+            .onChange(of: isMovingTag) {
+                if !isMovingTag {
+                    storeTags()
+                }
+            }
         }
     }
 
@@ -226,6 +232,7 @@ private extension CategoryEditSheet {
 
         CategoryTagCard(
             name: $tagName,
+            isFocused: $isTagFocused,
             isAdding: edit == .add,
             errorMessage: model.tagProblem,
             onCommit: {
@@ -274,6 +281,7 @@ private extension CategoryEditSheet {
         return {
             model.removeTag(id)
             closeTag()
+            storeTags()
         }
     }
 
@@ -300,7 +308,14 @@ private extension CategoryEditSheet {
         }
     }
 
+    func storeTags() {
+        Task {
+            await model.storeTags()
+        }
+    }
+
     func closeTag() {
+        isTagFocused = false
         model.clearTagProblem()
 
         withAnimation(.snappy(duration: 0.2)) {
@@ -317,6 +332,7 @@ private extension CategoryEditSheet {
 
         if isDone {
             closeTag()
+            storeTags()
         }
     }
 

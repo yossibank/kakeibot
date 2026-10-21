@@ -177,7 +177,8 @@ struct RecordsModelTests {
         let day = try #require(model.days.first)
         let rows = model.rows(for: day)
 
-        #expect(rows.map(\.detail) == ["財布", "ランチ・財布"])
+        #expect(rows.map(\.detail) == ["財布", "財布"])
+        #expect(rows.map(\.memo) == [nil, "ランチ"])
         #expect(rows.map(\.type) == [.expense, .expense])
     }
 

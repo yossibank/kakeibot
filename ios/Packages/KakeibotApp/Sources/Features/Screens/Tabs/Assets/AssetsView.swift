@@ -238,7 +238,7 @@ private extension AssetsView {
                         Text(row.title)
                             .textFont(.subheadline)
                             .foregroundStyle(Palette.text)
-                            .lineLimit(1)
+                            .lineLimit(2)
 
                         if let period = row.bill.period {
                             Text("\(RecurringText.period(period)) の利用分")

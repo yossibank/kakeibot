@@ -41,7 +41,7 @@ kakeibot/
 
 ```
 ios/
-├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）、アプリアイコン、起動画面、同梱のフォント、ライセンスの一覧
+├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）、アプリアイコン、起動画面、同梱のフォント、設定アプリに出すライセンス
 ├── Kakeibot.xcodeproj       アプリとウィジェットのターゲット
 ├── Kakeibot.xctestplan      テストターゲットをまとめたテストプラン
 ├── Kakeibot.xcworkspace     プロジェクトと 2 つのパッケージを並べる。Xcode ではこれを開く
@@ -59,7 +59,7 @@ ios/
 | App Group | `group.com.yossibank.kakeibot` | 同じ |
 | アプリアイコン | Icon Composer の `AppIcon.icon`。設定で選べる色違いは、同じフォルダの `AppIcon-<色>.icon`。設定の見本を描くため、同じ絵を `Assets.xcassets` の `AppIconYen`・`AppIconDial` に写して持つ | |
 | 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | 入れない |
-| ライセンスの一覧 | `Kakeibot/Licenses.bundle`。`make licenses` で LicensePlist が作り、設定の「ライセンス」で読む | 入れない |
+| ライセンスの一覧 | `Kakeibot/Settings.bundle`。`make licenses` で LicensePlist が作り、設定アプリに出す | 入れない |
 
 ### 署名
 
@@ -129,7 +129,7 @@ KakeibotApp/
 │   │   │   ├── Row/         記録の 1 行、払うと削除か非表示のボタンを出す行、行の説明の文
 │   │   │   ├── Sheet/       確かめのカード、中身の高さに合わせたシート、閉じる前の確かめ
 │   │   │   ├── Surface/     カードとガラスの見た目、見出し、区切り線、端をぼかす
-│   │   │   ├── Tag/         タグの札と、紐に下げて並べる列
+│   │   │   ├── Tag/         タグの札と、紐に下げて並べる列と、幅で折り返す複数の列
 │   │   │   └── Template/    テンプレートのカードと、その大きさ
 │   │   └── Theme/           色の組をシーンに入れるモディファイアと、それで決まる色（Palette）、角の丸みと字体、濃さの段階、文字の大きさの段階、色の文字列の読み取り、点線
 │   ├── Features/
@@ -142,7 +142,6 @@ KakeibotApp/
 │   │   │   │   ├── Budgets/     予算の一覧と額の入力
 │   │   │   │   ├── Categories/
 │   │   │   │   ├── Launch/      起動時に開く画面を選ぶ画面と、その行と見本
-│   │   │   │   ├── Licenses/    使っている部品とフォントのライセンスの一覧と本文、配布元
 │   │   │   │   ├── Menu/        設定の入口、確かめ用のテストデータ（#if DEBUG）
 │   │   │   │   ├── MonthStartDay/ 月の始まりの設定
 │   │   │   │   ├── Recurring/   固定費の一覧と編集

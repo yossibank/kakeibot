@@ -6,7 +6,7 @@ public struct TagLine<ID: Hashable>: View {
     @State private var liftCount = 0
 
     let tags: [Item]
-    let selection: ID?
+    let selection: Set<ID>
     let onSelect: (ID) -> Void
     let onAdd: (() -> Void)?
     let onMove: ((ID, Int) -> Void)?
@@ -14,6 +14,22 @@ public struct TagLine<ID: Hashable>: View {
     public init(
         _ tags: [Item],
         selection: ID?,
+        onSelect: @escaping (ID) -> Void,
+        onAdd: (() -> Void)? = nil,
+        onMove: ((ID, Int) -> Void)? = nil
+    ) {
+        self.init(
+            tags,
+            selection: Set([selection].compactMap(\.self)),
+            onSelect: onSelect,
+            onAdd: onAdd,
+            onMove: onMove
+        )
+    }
+
+    public init(
+        _ tags: [Item],
+        selection: Set<ID>,
         onSelect: @escaping (ID) -> Void,
         onAdd: (() -> Void)? = nil,
         onMove: ((ID, Int) -> Void)? = nil
@@ -90,6 +106,17 @@ public extension TagLine {
             self.id = id
             self.name = name
         }
+    }
+}
+
+extension TagLine {
+    static func fits(
+        _ names: [String],
+        in width: CGFloat
+    ) -> Bool {
+        let cards = names.map { TagCard.width(of: $0) }.reduce(0, +)
+        let gaps = spacing * CGFloat(max(names.count - 1, 0))
+        return cards + gaps + inset * 2 <= width
     }
 }
 
@@ -264,7 +291,7 @@ private extension TagLine {
     }
 
     func isSelected(_ card: Card) -> Bool {
-        card.tagId != nil && card.tagId == selection
+        card.tagId.map(selection.contains) ?? false
     }
 
     func canMove(_ card: Card) -> Bool {
