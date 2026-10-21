@@ -55,7 +55,8 @@ public extension ReminderModel {
             reminderTime: time,
             recordedDates: input.recordedDates,
             recurrings: input.recurrings,
-            names: input.names
+            names: input.names,
+            shortages: input.shortages
         )
 
         let notices = plan.filter { notification in

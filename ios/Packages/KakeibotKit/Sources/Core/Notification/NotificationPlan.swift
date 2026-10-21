@@ -1,6 +1,25 @@
 public enum NotificationPlan {}
 
 public extension NotificationPlan {
+    struct Shortage: Hashable, Sendable {
+        public let recurringId: Recurring.ID
+        public let date: LocalDate
+        public let walletName: String
+        public let amount: Int
+
+        public init(
+            recurringId: Recurring.ID,
+            date: LocalDate,
+            walletName: String,
+            amount: Int
+        ) {
+            self.recurringId = recurringId
+            self.date = date
+            self.walletName = walletName
+            self.amount = amount
+        }
+    }
+
     static let reminderDays = 7
     static let recurringDays = 31
     static let reminderTitle = "今日の記録はまだです"
@@ -11,7 +30,8 @@ public extension NotificationPlan {
         reminderTime: ReminderTime?,
         recordedDates: Set<LocalDate>,
         recurrings: [Recurring],
-        names: [EntryCategory.ID: String]
+        names: [EntryCategory.ID: String],
+        shortages: [Shortage] = []
     ) -> [PlannedNotification] {
         let reminders = reminderTime.map { time in
             self.reminders(today: today, time: time, recorded: recordedDates)
@@ -22,7 +42,8 @@ public extension NotificationPlan {
                 of: recurring,
                 today: today,
                 time: reminderTime ?? .morning,
-                names: names
+                names: names,
+                shortages: shortages
             )
         }
 
@@ -65,7 +86,8 @@ private extension NotificationPlan {
         of recurring: Recurring,
         today: LocalDate,
         time: ReminderTime,
-        names: [EntryCategory.ID: String]
+        names: [EntryCategory.ID: String],
+        shortages: [Shortage]
     ) -> [PlannedNotification] {
         guard let daysBefore = recurring.remindDaysBefore else {
             return []
@@ -79,7 +101,11 @@ private extension NotificationPlan {
         let amount = recurring.closingDay == nil ? recurring.amount : nil
 
         return recurring.dates(from: start, through: end).map { date in
-            PlannedNotification(
+            let shortage = shortages.first { shortage in
+                shortage.recurringId == recurring.id && shortage.date == date
+            }
+
+            return PlannedNotification(
                 key: "recurring-\(recurring.id)",
                 date: date.adding(days: -daysBefore),
                 time: time,
@@ -87,7 +113,8 @@ private extension NotificationPlan {
                 body: body(
                     amount: amount,
                     on: date,
-                    daysBefore: daysBefore
+                    daysBefore: daysBefore,
+                    shortage: shortage
                 ),
                 route: .recurring(recurring.id)
             )
@@ -97,12 +124,20 @@ private extension NotificationPlan {
     static func body(
         amount: Int?,
         on date: LocalDate,
-        daysBefore: Int
+        daysBefore: Int,
+        shortage: Shortage?
     ) -> String {
         guard let amount else {
-            return daysBefore == 0
+            let bill = daysBefore == 0
                 ? "今日は引き落としの日です"
                 : "\(date.month)/\(date.day) に引き落としがあります"
+
+            guard let shortage else {
+                return bill
+            }
+
+            let lack = "¥\(grouped(shortage.amount))"
+            return "\(bill)。\(shortage.walletName)が \(lack) 足りません"
         }
 
         let yen = "¥\(grouped(amount))"

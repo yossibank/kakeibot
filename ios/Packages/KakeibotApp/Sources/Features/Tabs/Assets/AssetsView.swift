@@ -5,6 +5,8 @@ import SwiftUI
 public struct AssetsView: View {
     @Bindable private var model: AssetsModel
 
+    @Environment(\.themeStyle.corner) private var corner
+
     private let onTransfer: () -> Void
     private let onOpenWallet: (Wallet.ID) -> Void
     private let onOpenRecurring: (Recurring.ID) -> Void
@@ -102,7 +104,7 @@ private extension AssetsView {
     }
 
     var billCard: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 SectionTitle("これからの引き落とし")
 
@@ -114,13 +116,15 @@ private extension AssetsView {
                     .foregroundStyle(Palette.subtext)
             }
 
-            ForEach(model.upcomingBills) { bill in
-                Button {
-                    onOpenRecurring(bill.recurring.id)
-                } label: {
-                    billRow(bill)
+            VStack(spacing: 10) {
+                ForEach(model.upcomingBills) { row in
+                    Button {
+                        onOpenRecurring(row.id)
+                    } label: {
+                        billRow(row)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
         .padding(16)
@@ -140,51 +144,102 @@ private extension AssetsView {
         }
     }
 
-    func billRow(_ bill: AssetsModel.UpcomingBill) -> some View {
-        HStack(spacing: 12) {
-            VStack(spacing: 0) {
-                Text("\(bill.date.month)/\(bill.date.day)")
-                    .textFont(.subheadline)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.text)
+    func billRow(_ row: AssetsModel.UpcomingBill) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            dateChip(row.bill.date)
 
-                Text(bill.date.weekday.shortName)
-                    .textFont(.caption2)
-                    .foregroundStyle(bill.date.tint ?? Palette.subtext)
-            }
-            .frame(width: 44)
-
-            IconBadge(bill.icon, size: 34)
-
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text(bill.title)
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.text)
-                        .lineLimit(1)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(row.title)
+                            .textFont(.subheadline)
+                            .foregroundStyle(Palette.text)
+                            .lineLimit(1)
+
+                        if let period = row.bill.period {
+                            Text("\(RecurringText.period(period)) の利用分")
+                                .textFont(.caption2)
+                                .foregroundStyle(Palette.subtext)
+                                .lineLimit(1)
+                        }
+                    }
 
                     Spacer(minLength: 8)
 
-                    AmountText(bill.amount, type: .transfer)
-                        .textFont(.subheadline)
-                }
-
-                if let period = bill.period {
-                    Text("\(RecurringText.period(period)) の利用分")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
+                    Text(AmountText.text(row.bill.amount))
+                        .displayFont(.headline)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accentStrong)
                         .lineLimit(1)
                 }
 
-                Text(balanceText(bill))
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(balanceColor(bill))
-                    .lineLimit(1)
+                balanceBar(row.bill)
+
+                HStack(alignment: .firstTextBaseline) {
+                    Text(balanceText(row))
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(balanceColor(row.bill))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+
+                    Spacer(minLength: 8)
+
+                    Text(daysText(until: row.bill.date))
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.accent)
+                }
             }
         }
-        .padding(.vertical, 8)
+        .padding(12)
+        .background(
+            Palette.accent.opacity(.faint),
+            in: .rect(cornerRadius: corner.radius(18))
+        )
         .contentShape(.rect)
+    }
+
+    func dateChip(_ date: LocalDate) -> some View {
+        VStack(spacing: 0) {
+            Text("\(date.month)月")
+                .textFont(.caption2)
+                .foregroundStyle(Palette.backgroundBottom)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 2)
+                .background(Palette.accent)
+
+            Text("\(date.day)")
+                .displayFont(.title)
+                .monospacedDigit()
+                .foregroundStyle(Palette.text)
+                .padding(.top, 2)
+
+            Text(date.weekday.shortName)
+                .textFont(.caption2)
+                .foregroundStyle(date.tint ?? Palette.subtext)
+                .padding(.bottom, 4)
+        }
+        .frame(width: 52)
+        .background(Palette.panel)
+        .clipShape(.rect(cornerRadius: corner.radius(12)))
+        .overlay {
+            RoundedRectangle(cornerRadius: corner.radius(12))
+                .stroke(Palette.outline, lineWidth: 1)
+        }
+    }
+
+    func balanceBar(_ bill: CardBill) -> some View {
+        GeometryReader { proxy in
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Palette.accent.opacity(.soft))
+
+                Capsule()
+                    .fill(balanceColor(bill))
+                    .frame(width: proxy.size.width * Self.share(of: bill))
+            }
+        }
+        .frame(height: 4)
     }
 
     func walletTile(_ row: AssetsModel.WalletRow) -> some View {
@@ -207,6 +262,15 @@ private extension AssetsView {
                 .foregroundStyle(color)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+
+            if let next = row.nextBill {
+                Text("次の引き落とし \(AmountText.text(next))")
+                    .textFont(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 74, alignment: .leading)
@@ -227,18 +291,35 @@ private extension AssetsView {
         return "先月末より \(sign)\(AmountText.text(change))"
     }
 
-    func balanceText(_ bill: AssetsModel.UpcomingBill) -> String {
-        let amount = AmountText.text(bill.balanceAfter)
-
-        guard let source = bill.source else {
-            return "引き落とし後 \(amount)"
+    static func share(of bill: CardBill) -> CGFloat {
+        guard bill.balanceBefore > 0 else {
+            return 1
         }
 
-        return "引き落とし後の\(source) \(amount)"
+        let share = Double(bill.amount) / Double(bill.balanceBefore)
+        return CGFloat(min(share, 1))
     }
 
-    func balanceColor(_ bill: AssetsModel.UpcomingBill) -> Color {
-        bill.balanceAfter < 0 ? Palette.rose : Palette.hint
+    func balanceText(_ row: AssetsModel.UpcomingBill) -> String {
+        let source = row.source ?? "口座"
+        let bill = row.bill
+
+        guard bill.shortage == 0 else {
+            return "\(source)が \(AmountText.text(bill.shortage)) 足りません"
+        }
+
+        let before = AmountText.text(bill.balanceBefore)
+        let after = AmountText.text(bill.balanceAfter)
+        return "\(source) \(before) → \(after)"
+    }
+
+    func balanceColor(_ bill: CardBill) -> Color {
+        bill.shortage > 0 ? Palette.rose : Palette.accent
+    }
+
+    func daysText(until date: LocalDate) -> String {
+        let days = model.today.days(until: date)
+        return days == 1 ? "明日" : "あと \(days) 日"
     }
 
     func monthColor(_ month: YearMonth) -> Color {

@@ -78,7 +78,8 @@ struct AssetsModelTests {
 
         let model = AssetsModel(database: setup.database, today: setup.today)
         await model.load()
-        let bill = try #require(model.upcomingBills.first)
+        let row = try #require(model.upcomingBills.first)
+        let bill = row.bill
         let from = try #require(LocalDate("2026-09-16"))
         let through = try #require(LocalDate("2026-10-15"))
 
@@ -86,8 +87,10 @@ struct AssetsModelTests {
         #expect(bill.amount == 42000)
         #expect(bill.period == from...through)
         #expect(model.upcomingBillTotal == 42000)
-        #expect(bill.source == "銀行")
+        #expect(row.source == "銀行")
         #expect(bill.balanceAfter == -42000)
+        #expect(bill.shortage == 42000)
+        #expect(model.rows.last?.nextBill == 42000)
     }
 }
 

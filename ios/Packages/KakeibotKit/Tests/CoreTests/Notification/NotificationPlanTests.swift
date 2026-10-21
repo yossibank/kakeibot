@@ -8,15 +8,19 @@ struct NotificationPlanTests {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
 
         let recurrings = fixture.recurrings.map { row in
-            Recurring(
-                type: .expense,
+            let isBill = row.closingDay != nil
+
+            return Recurring(
+                type: isBill ? .transfer : .expense,
                 amount: row.amount,
-                categoryId: EntryCategory.ID(),
+                categoryId: isBill ? nil : EntryCategory.ID(),
                 walletId: Wallet.ID(),
+                toWalletId: isBill ? Wallet.ID() : nil,
                 memo: row.name,
                 frequency: row.frequency,
                 month: row.month,
                 day: row.day,
+                closingDay: row.closingDay,
                 startDate: row.startDate,
                 endDate: row.endDate,
                 remindDaysBefore: row.remindDaysBefore,
@@ -30,7 +34,8 @@ struct NotificationPlanTests {
             reminderTime: fixture.reminderTime,
             recordedDates: Set(fixture.recorded),
             recurrings: recurrings,
-            names: [:]
+            names: [:],
+            shortages: Self.shortages(of: fixture, recurrings: recurrings)
         )
 
         let rows = notifications.map { notification in
@@ -87,9 +92,17 @@ extension NotificationPlanTests {
         let frequency: Recurring.Frequency
         let month: Int?
         let day: Int
+        let closingDay: Int?
         let startDate: LocalDate
         let endDate: LocalDate?
         let remindDaysBefore: Int?
+        let shortage: ShortageRow?
+    }
+
+    struct ShortageRow: Decodable, Sendable {
+        let date: LocalDate
+        let wallet: String
+        let amount: Int
     }
 
     struct Expected: Decodable, Equatable, Sendable {
@@ -104,6 +117,22 @@ private extension NotificationPlanTests {
     static var planCases: [PlanCase] {
         get throws {
             try Fixture.load("notification/notification-plan.json")
+        }
+    }
+
+    static func shortages(
+        of fixture: PlanCase,
+        recurrings: [Recurring]
+    ) -> [NotificationPlan.Shortage] {
+        zip(fixture.recurrings, recurrings).compactMap { row, recurring in
+            row.shortage.map { shortage in
+                NotificationPlan.Shortage(
+                    recurringId: recurring.id,
+                    date: shortage.date,
+                    walletName: shortage.wallet,
+                    amount: shortage.amount
+                )
+            }
         }
     }
 }

@@ -174,7 +174,8 @@ private extension AppModel {
             reminderTime: input.reminderTime,
             recordedDates: input.recordedDates,
             recurrings: input.recurrings,
-            names: input.names
+            names: input.names,
+            shortages: input.shortages
         )
 
         await scheduler.apply(plan, now: Date(), timeZone: .current)

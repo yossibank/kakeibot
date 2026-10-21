@@ -83,7 +83,9 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
-| `notification-plan.json` | 予約されているべき通知の日・時刻・見出し・本文 | `today`、`reminderTime`（空なら記録忘れを知らせない）、`recorded`（記録か支出なしの印がある日）、`recurrings`（`name`・`amount`・`frequency`・`month`・`day`・`startDate`・`endDate`・`remindDaysBefore`）、`notifications` |
+| `notification-plan.json` | 予約されているべき通知の日・時刻・見出し・本文 | `today`、`reminderTime`（空なら記録忘れを知らせない）、`recorded`（記録か支出なしの印がある日）、`recurrings`（`name`・`amount`・`frequency`・`month`・`day`・`closingDay`・`startDate`・`endDate`・`remindDaysBefore`・`shortage`）、`notifications` |
+
+`closingDay` があれば、カードへの利用分の振替として、額を入れずに知らせる。`shortage`（`date`・`wallet`・`amount`）があれば、その日の知らせに、口座の足りない額を添える。
 
 通知は、日・時刻・識別の順に並べる。
 

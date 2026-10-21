@@ -32,6 +32,7 @@ public extension AssetsModel {
         public let wallet: Wallet
         public let icon: Icon?
         public let balance: Int
+        public let nextBill: Int?
 
         public var id: Wallet.ID {
             wallet.id
@@ -48,17 +49,13 @@ public extension AssetsModel {
     }
 
     struct UpcomingBill: Identifiable, Equatable {
-        public let recurring: Recurring
-        public let date: LocalDate
-        public let amount: Int
+        public let bill: CardBill
         public let title: String
         public let icon: Icon?
-        public let period: ClosedRange<LocalDate>?
         public let source: String?
-        public let balanceAfter: Int
 
         public var id: Recurring.ID {
-            recurring.id
+            bill.recurring.id
         }
     }
 
@@ -85,11 +82,16 @@ public extension AssetsModel {
     }
 
     var rows: [WalletRow] {
-        wallets.map { wallet in
-            WalletRow(
+        let bills = upcomingBills
+
+        return wallets.map { wallet in
+            let next = bills.first { $0.bill.recurring.toWalletId == wallet.id }
+
+            return WalletRow(
                 wallet: wallet,
                 icon: list?.icons[wallet.iconId],
-                balance: wallet.balance(with: entries)
+                balance: wallet.balance(with: entries),
+                nextBill: next?.bill.amount
             )
         }
     }
@@ -99,36 +101,25 @@ public extension AssetsModel {
             return []
         }
 
-        let tomorrow = today.adding(days: 1)
-        var balances: [Wallet.ID: Int] = [:]
+        let bills = CardBill.upcoming(
+            recurrings: recurrings,
+            wallets: Array(list.wallets.values),
+            entries: entries,
+            after: today
+        )
 
-        return recurrings
-            .filter { isCardBill($0, in: list) }
-            .compactMap { recurring in
-                recurring.nextDate(onOrAfter: tomorrow).map { (recurring, $0) }
-            }
-            .sorted { $0.1 < $1.1 }
-            .map { recurring, date in
-                let amount = list.amount(of: recurring, on: date)
-                let source = recurring.walletId
-                let before = balances[source] ?? balance(of: source)
-                balances[source] = before - amount
-
-                return UpcomingBill(
-                    recurring: recurring,
-                    date: date,
-                    amount: amount,
-                    title: list.title(of: recurring) ?? Self.billTitle,
-                    icon: list.icon(of: recurring),
-                    period: recurring.billingPeriod(paidOn: date),
-                    source: list.wallets[source]?.name,
-                    balanceAfter: before - amount
-                )
-            }
+        return bills.map { bill in
+            UpcomingBill(
+                bill: bill,
+                title: list.title(of: bill.recurring) ?? Self.billTitle,
+                icon: list.icon(of: bill.recurring),
+                source: list.wallets[bill.recurring.walletId]?.name
+            )
+        }
     }
 
     var upcomingBillTotal: Int {
-        upcomingBills.reduce(0) { $0 + $1.amount }
+        upcomingBills.reduce(0) { $0 + $1.bill.amount }
     }
 
     var monthTotals: [MonthTotal] {
@@ -195,18 +186,6 @@ private extension AssetsModel {
         ) { list in
             self.list = list
         }
-    }
-
-    func isCardBill(
-        _ recurring: Recurring,
-        in list: EntryList
-    ) -> Bool {
-        let destination = recurring.toWalletId.flatMap { list.wallets[$0] }
-        return recurring.type == .transfer && destination?.kind == .card
-    }
-
-    func balance(of id: Wallet.ID) -> Int {
-        list?.wallets[id]?.balance(with: entries) ?? 0
     }
 
     func observeRecurrings() async {
