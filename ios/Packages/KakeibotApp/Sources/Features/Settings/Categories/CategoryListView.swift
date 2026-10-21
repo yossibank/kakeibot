@@ -14,6 +14,8 @@ public struct CategoryListView: View {
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: EntryCategory.ID?
+    @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<EntryCategory.ID>?
     @State private var isOverShowZone = false
@@ -70,6 +72,9 @@ public struct CategoryListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
+            .deletionNotice($deletion) { deletion in
+                restore(deletion)
+            }
 
             if lift != nil {
                 SettingsHideTarget(zones: $zones, state: hideHover.state)
@@ -92,7 +97,20 @@ public struct CategoryListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
-            CategoryEditSheet(model: editModel(for: sheet))
+            CategoryEditSheet(model: editModel(for: sheet)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示のカテゴリをまとめて削除しますか",
+            message: "記録があるカテゴリは残ります。使っている固定費・テンプレート・予算・タグも消えます",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
         }
         .task {
             await model.observe()
@@ -164,7 +182,9 @@ private extension CategoryListView {
                 flag: hiddenList,
                 title: "非表示のカテゴリ",
                 count: model.hidden.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
@@ -498,6 +518,18 @@ private extension CategoryListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
         }
     }
 

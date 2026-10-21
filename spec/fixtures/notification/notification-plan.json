@@ -45,5 +45,36 @@
       { "name": "スマホ", "amount": 4800, "frequency": "monthly", "month": null, "day": 20, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null }
     ],
     "notifications": []
+  },
+  {
+    "today": "2026-10-17",
+    "reminderTime": null,
+    "recorded": [],
+    "recurrings": [
+      {
+        "name": "カード",
+        "amount": 0,
+        "frequency": "monthly",
+        "month": null,
+        "day": 26,
+        "closingDay": 15,
+        "startDate": "2026-01-01",
+        "endDate": null,
+        "remindDaysBefore": 1,
+        "shortage": {
+          "date": "2026-10-26",
+          "wallet": "銀行",
+          "amount": 12000
+        }
+      }
+    ],
+    "notifications": [
+      {
+        "date": "2026-10-25",
+        "time": "09:00",
+        "title": "カード",
+        "body": "10/26 に引き落としがあります。銀行が ¥12,000 足りません"
+      }
+    ]
   }
 ]

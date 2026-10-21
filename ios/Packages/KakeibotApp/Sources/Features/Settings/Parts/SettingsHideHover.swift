@@ -5,18 +5,13 @@ import Observation
 @Observable
 final class SettingsHideHover {
     private(set) var state: State = .outside
-
-    private var task: Task<Void, Never>?
 }
 
 extension SettingsHideHover {
     enum State: Equatable {
         case outside
-        case waiting
         case armed
     }
-
-    static let delay: TimeInterval = 0.4
 
     var isInside: Bool {
         state != .outside
@@ -27,31 +22,10 @@ extension SettingsHideHover {
     }
 
     func update(isInside: Bool) {
-        guard isInside else {
-            reset()
-            return
-        }
-
-        guard state == .outside else {
-            return
-        }
-
-        state = .waiting
-
-        task = Task {
-            try? await Task.sleep(for: .seconds(Self.delay))
-
-            guard !Task.isCancelled else {
-                return
-            }
-
-            state = .armed
-        }
+        state = isInside ? .armed : .outside
     }
 
     func reset() {
-        task?.cancel()
-        task = nil
         state = .outside
     }
 }

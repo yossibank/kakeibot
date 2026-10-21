@@ -14,9 +14,13 @@ public struct WalletListView: View {
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: Wallet.ID?
+    @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiding: Wallet?
     @State private var isConfirmingHide = false
+    @State private var deleting: Wallet?
+    @State private var isConfirmingDelete = false
     @State private var hiddenLift: SettingsHiddenLift<Wallet.ID>?
     @State private var isOverShowZone = false
     @State private var showCount = 0
@@ -42,7 +46,7 @@ public struct WalletListView: View {
 
             SettingsHint(
                 flag: .closedHint(.wallets, in: database),
-                lines: [.move, .hide, .swipeHide]
+                lines: [.move, .hide, .swipeDelete]
             )
 
             ScrollView {
@@ -71,6 +75,9 @@ public struct WalletListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
+            .deletionNotice($deletion) { deletion in
+                restore(deletion)
+            }
 
             if lift != nil {
                 SettingsHideTarget(zones: $zones, state: hideHover.state)
@@ -97,7 +104,10 @@ public struct WalletListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
-            WalletEditSheet(model: editModel(for: sheet))
+            WalletEditSheet(model: editModel(for: sheet)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
         }
         .confirmsWalletHide(
             balance: hidingBalance,
@@ -106,6 +116,21 @@ public struct WalletListView: View {
             if let hiding {
                 hide(hiding.id)
             }
+        }
+        .confirmsWalletDelete(isPresented: $isConfirmingDelete) {
+            if let deleting {
+                delete(deleting.id)
+            }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示の口座をまとめて削除しますか",
+            message: "記録がある口座は残ります。使っている固定費・テンプレート・評価額も消えます",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
         }
         .task {
             await model.observe()
@@ -150,7 +175,9 @@ private extension WalletListView {
                 flag: hiddenList,
                 title: "非表示の口座",
                 count: model.hidden.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 ForEach(model.hidden) { wallet in
@@ -199,6 +226,8 @@ private extension WalletListView {
             sheet = .edit(wallet.id)
         } onAction: {
             requestHide(wallet)
+        } onDelete: {
+            requestDelete(wallet)
         } content: {
             row(wallet)
         }
@@ -390,6 +419,17 @@ private extension WalletListView {
         }
     }
 
+    func requestDelete(_ wallet: Wallet) {
+        deleting = wallet
+        isConfirmingDelete = true
+    }
+
+    func delete(_ id: Wallet.ID) {
+        Task {
+            deletion = await model.delete(id)
+        }
+    }
+
     func requestHide(_ wallet: Wallet) {
         guard model.balance(of: wallet) == 0 else {
             hiding = wallet
@@ -448,6 +488,18 @@ private extension WalletListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
         }
     }
 

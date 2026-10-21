@@ -44,6 +44,8 @@ public extension Wallet {
         case emoney
         case point
         case other
+        case investment
+        case loan
     }
 }
 

@@ -14,6 +14,7 @@ erDiagram
     icon ||--o{ calendar_stamp : "icon_id"
     icon ||--o{ shelf_icon : "icon_id"
     wallet ||--o{ entry : "wallet_id・to_wallet_id"
+    wallet ||--o{ valuation : "wallet_id"
     category |o--o{ entry : "category_id"
     category ||--o{ tag : "category_id"
     tag |o--o{ entry : "tag_id"
@@ -43,8 +44,9 @@ erDiagram
 - 通貨の列は持たない。円だけを扱う
 - 月は `YYYY-MM`。期間との対応は下の表
 - 日時は UTC の ISO 8601
-- 財布・カテゴリ・タグ・スタンプの一覧のアイコンは消さずに `archived_at` でしまう
-- 残高・貯金箱の残高は保存せず、記録から計算する
+- 財布・カテゴリ・タグ・スタンプの一覧のアイコンは、ふだんは `archived_at` でしまう
+- 財布とカテゴリは、記録が無いときだけ消せる。使っている固定費・テンプレート・評価額・予算・タグも一緒に消す
+- 残高・貯金箱の残高は保存せず、記録と評価額から計算する
 
 月の始まりごとに、期間と月の呼び方を次の表に並べる。理由は [decisions.md の「期間の呼び方」](decisions.md#期間の呼び方)にある。
 
@@ -66,7 +68,7 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 どれにも、絵柄（`glyph`）と色の icon を 1 つずつ付ける。
 
-スタンプの一覧が 1 つも無ければ（しまったものも数える）、`star`・`party`・`trophy`・`cake`・`fitness`・`travel`・`sun`・`moon` の絵柄の shelf_icon を、この順で入れる。
+スタンプの一覧が 1 つも無ければ（しまったものも数える）、shelf_icon を入れる。絵柄は `star`・`party`・`trophy`・`cake`・`fitness`・`travel`・`sun`・`moon` の順にする。
 
 ## 表
 
@@ -103,12 +105,28 @@ emoji・text・glyph のどれかは必須。
 | --- | --- | --- |
 | id | TEXT | |
 | name | TEXT | |
-| kind | TEXT | `cash` `bank` `card` `emoney` `point` `other` |
+| kind | TEXT | `cash` `bank` `card` `emoney` `point` `other` `investment` `loan` |
 | icon_id | TEXT | |
 | initial_balance | INTEGER | カードはマイナスでもよい |
 | sort_order | INTEGER | |
 | archived_at | TEXT | |
 | created_at / updated_at | TEXT | |
+
+### valuation
+
+投資の口座の、ある日の評価額。
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| id | TEXT | |
+| wallet_id | TEXT | |
+| date | TEXT | |
+| amount | INTEGER | その日の終わりの残高 |
+| created_at / updated_at | TEXT | |
+
+`(wallet_id, date)` は重複禁止。同じ日に入れ直したら置き換える。
+
+財布の残高は、いちばん新しい評価額から数える。評価額があれば、その額に、評価額の日より後の記録を足し引きする。同じ日の記録は、評価額より後に作ったものだけを足し引きする。無ければ、最初の残高に、すべての記録を足し引きする。ある日の時点の残高は、その日までの評価額だけを使う。
 
 ### category
 
@@ -208,7 +226,7 @@ emoji・text・glyph のどれかは必須。
 | month | INTEGER | yearly だけ |
 | day | INTEGER | 1〜31。月末を超えたらその月の最終日 |
 | holiday_shift | TEXT | `none` `previous` `next`。休日に当たったら、そのまま・前の平日・次の平日にする |
-| start_date / end_date | TEXT | end_date は空でもよい |
+| closing_day | INTEGER | 振替だけ。1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にする。amount は 0 にする || start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |
 | sort_order | INTEGER | 設定の一覧の並び |
@@ -304,7 +322,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | review_scale | `week` `month` `year`。空なら月 |
 | review_kind | `expense` `income` `balance`。空なら支出 |
 | closed_hints | 説明を閉じた設定の画面を `,` でつないだもの（`categories` `wallets` `templates` `recurrings` `stamps` `budgets`）。空ならすべて出す |
-| open_hidden_lists | 非表示の項目を開いている設定の画面。書き方は closed_hints と同じ。空ならすべてたたむ |
+| open_hidden_lists | 非表示の項目を開いている設定の画面。書き方は closed_hints と同じ。行が無ければすべて開き、空ならすべてたたむ |
 
 列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
 

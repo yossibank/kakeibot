@@ -15,6 +15,7 @@ public final class RecurringEditModel {
     public var month: Int
     public var day: Int
     public private(set) var holidayShift: Recurring.HolidayShift = .none
+    public var closingDay: Int?
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -22,6 +23,7 @@ public final class RecurringEditModel {
     public private(set) var type: Entry.Kind = .expense
     public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
+    public private(set) var isHidden = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -32,15 +34,18 @@ public final class RecurringEditModel {
 
     private let database: AppDatabase
     private let editingId: Recurring.ID?
+    private let paidWallet: Wallet.ID?
 
     public init(
         database: AppDatabase,
         today: LocalDate,
-        editing id: Recurring.ID? = nil
+        editing id: Recurring.ID? = nil,
+        paying wallet: Wallet.ID? = nil
     ) {
         self.database = database
         self.today = today
         self.editingId = id
+        self.paidWallet = wallet
         self.month = today.month
         self.day = today.day
         self.startDate = today
@@ -79,10 +84,19 @@ public extension RecurringEditModel {
             month: month,
             day: day,
             holidayShift: holidayShift,
+            closingDay: canUseClosingDay ? closingDay : nil,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore
         )
+    }
+
+    var canUseClosingDay: Bool {
+        type == .transfer && selectedDestination?.kind == .card
+    }
+
+    var isCardBill: Bool {
+        canUseClosingDay && closingDay != nil
     }
 
     var canSave: Bool {
@@ -165,6 +179,7 @@ public extension RecurringEditModel {
         do {
             options = try await database.entryOptions()
             try await loadRecurring()
+            presetPayment()
 
             if categoryId == nil {
                 categoryId = categories.first?.id
@@ -205,13 +220,33 @@ public extension RecurringEditModel {
         }
     }
 
-    func delete() async -> Bool {
+    func delete() async -> Deletion? {
+        guard let editingId else {
+            return nil
+        }
+
+        do {
+            return try await database.deleteRecurring(editingId)
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+            return nil
+        }
+    }
+
+    func setHidden(_ isHidden: Bool) async -> Bool {
         guard let editingId else {
             return false
         }
 
         do {
-            try await database.deleteRecurring(editingId)
+            try await database.setRecurringHidden(
+                editingId,
+                isHidden: isHidden,
+                today: today,
+                at: Date()
+            )
+
+            self.isHidden = isHidden
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
@@ -235,6 +270,32 @@ private extension RecurringEditModel {
         }
     }
 
+    static let billClosingDay = 31
+    static let billPaymentDay = 27
+
+    func presetPayment() {
+        guard !isEditing, let target = paidWallet else {
+            return
+        }
+
+        let bank = wallets.first { $0.kind == .bank && $0.id != target }
+        let other = wallets.first { $0.id != target }
+        type = .transfer
+        categoryId = nil
+        toWalletId = target
+        walletId = (bank ?? other)?.id
+        day = Self.billPaymentDay
+
+        let name = selectedDestination?.name ?? ""
+
+        if selectedDestination?.kind == .card {
+            closingDay = Self.billClosingDay
+            memo = name
+        } else {
+            memo = "\(name)の返済"
+        }
+    }
+
     func suggestHolidayShift() {
         guard !isEditing, !isHolidayShiftChosen else {
             return
@@ -254,8 +315,8 @@ private extension RecurringEditModel {
         case .missingDestination: "\(Self.destinationTitle)を選んでください"
         case .sameWallet: "振替元と振替先を別にしてください"
         case .endBeforeStart: "終わりを始まりより後にしてください"
-        case .categoryOnTransfer, .dayOutOfRange, .monthOutOfRange,
-             .remindOutOfRange:
+        case .categoryOnTransfer, .dayOutOfRange, .closingDayOutOfRange,
+             .monthOutOfRange, .remindOutOfRange:
             Self.saveFailedMessage
         }
     }
@@ -272,6 +333,8 @@ private extension RecurringEditModel {
             throw AppDatabase.RecurringWriteError.recurringNotFound
         }
 
+        isHidden = recurring.archivedAt != nil
+
         let draft = RecurringDraft(recurring)
         type = draft.type
         calculator = AmountCalculator(amount: draft.amount)
@@ -283,6 +346,7 @@ private extension RecurringEditModel {
         month = draft.month
         day = draft.day
         holidayShift = draft.holidayShift
+        closingDay = draft.closingDay
         startDate = draft.startDate
         endDate = draft.endDate
         remindDaysBefore = draft.remindDaysBefore

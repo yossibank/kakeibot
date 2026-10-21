@@ -42,7 +42,8 @@ public extension WalletListModel {
 
     func balance(of wallet: Wallet) -> Int {
         let entries = list?.days.flatMap(\.entries) ?? []
-        return wallet.balance(with: entries)
+        let valuations = list?.valuations ?? []
+        return wallet.balance(with: entries, valuations: valuations)
     }
 
     func load() async {
@@ -104,6 +105,48 @@ public extension WalletListModel {
         }
     }
 
+    func delete(_ id: Wallet.ID) async -> Deletion? {
+        movingOrder = nil
+
+        do {
+            let deletion = try await database.deleteWallet(id)
+            await load()
+            return deletion
+        } catch {
+            let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
+            errorNotice.show(message)
+            return nil
+        }
+    }
+
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await database.restore(deletion)
+            await load()
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage)
+        }
+    }
+
+    func deleteHidden() async -> Deletion? {
+        movingOrder = nil
+        let ids = hidden.map(\.id)
+
+        let result = await SettingsBulkDelete.run(ids) { id in
+            try await database.deleteWallet(id)
+        } isInUse: { error in
+            error as? AppDatabase.WalletWriteError == .hasEntries
+        }
+
+        await load()
+
+        if let message = result.message {
+            errorNotice.show(message)
+        }
+
+        return result.deletion
+    }
+
     func show(_ id: Wallet.ID) async {
         do {
             try await database.setWalletHidden(id, isHidden: false, at: Date())
@@ -136,6 +179,7 @@ private extension WalletListModel {
     static let saveFailedMessage = "並びを保存できませんでした"
     static let hideFailedMessage = "非表示にできませんでした"
     static let showFailedMessage = "表示に戻せませんでした"
+    static let restoreFailedMessage = "元に戻せませんでした"
 
     func wallets(isHidden: Bool) -> [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []

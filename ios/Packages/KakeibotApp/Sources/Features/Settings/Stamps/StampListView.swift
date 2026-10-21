@@ -14,6 +14,8 @@ public struct StampListView: View {
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: ShelfIcon.ID?
+    @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<ShelfIcon.ID>?
     @State private var isOverShowZone = false
@@ -69,6 +71,9 @@ public struct StampListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
+            .deletionNotice($deletion) { deletion in
+                restore(deletion)
+            }
 
             if lift != nil {
                 SettingsHideTarget(zones: $zones, state: hideHover.state)
@@ -91,7 +96,19 @@ public struct StampListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
-            StampEditSheet(model: editModel(for: sheet))
+            StampEditSheet(model: editModel(for: sheet)) { deletion in
+                self.deletion = deletion
+            }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示のスタンプをまとめて削除しますか",
+            message: "カレンダーに押したスタンプは残ります",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
         }
         .task {
             await model.observe()
@@ -163,7 +180,9 @@ private extension StampListView {
                 flag: hiddenList,
                 title: "非表示のスタンプ",
                 count: model.hidden.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
@@ -476,6 +495,18 @@ private extension StampListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
         }
     }
 

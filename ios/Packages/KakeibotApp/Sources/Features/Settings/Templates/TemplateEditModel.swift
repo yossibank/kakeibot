@@ -23,6 +23,7 @@ public final class TemplateEditModel {
     public private(set) var type: Entry.Kind
     public private(set) var calculator: AmountCalculator
     public private(set) var options: EntryOptions?
+    public private(set) var isHidden = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -192,13 +193,32 @@ public extension TemplateEditModel {
         }
     }
 
-    func delete() async -> Bool {
+    func delete() async -> Deletion? {
+        guard let editingId else {
+            return nil
+        }
+
+        do {
+            return try await database.deleteTemplate(editingId)
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+            return nil
+        }
+    }
+
+    func setHidden(_ isHidden: Bool) async -> Bool {
         guard let editingId else {
             return false
         }
 
         do {
-            try await database.deleteTemplate(editingId)
+            try await database.setTemplateHidden(
+                editingId,
+                isHidden: isHidden,
+                at: Date()
+            )
+
+            self.isHidden = isHidden
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
@@ -231,6 +251,8 @@ private extension TemplateEditModel {
         guard let template else {
             throw AppDatabase.TemplateWriteError.templateNotFound
         }
+
+        isHidden = template.archivedAt != nil
 
         let draft = EntryTemplateDraft(template)
         name = draft.name

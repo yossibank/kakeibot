@@ -123,6 +123,28 @@ struct TemplateWriteTests {
     }
 
     @Test
+    func restoresDeletedTemplateWithItsEntries() async throws {
+        let setup = try await Setup()
+
+        let template = try await setup.database.saveTemplate(
+            setup.draft,
+            at: setup.now
+        )
+
+        let today = try #require(LocalDate(year: 2026, month: 10, day: 3))
+        let draft = try #require(template.entryDraft(on: today))
+        let entry = try await setup.database.saveEntry(draft, at: setup.now)
+
+        let deletion = try await setup.database.deleteTemplate(template.id)
+        try await setup.database.restore(deletion)
+        let templates = try await setup.database.templates()
+        let restored = try await setup.database.entry(entry.id)
+
+        #expect(templates.map(\.id) == [template.id])
+        #expect(restored?.templateId == template.id)
+    }
+
+    @Test
     func rejectsUnknownTemplate() async throws {
         let setup = try await Setup()
 

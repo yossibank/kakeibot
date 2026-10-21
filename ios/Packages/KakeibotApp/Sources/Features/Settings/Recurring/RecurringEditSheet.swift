@@ -7,13 +7,20 @@ public struct RecurringEditSheet: View {
     @State private var model: RecurringEditModel
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingDelete = false
 
     @FocusState private var isNameFocused: Bool
 
     @Environment(\.dismiss) private var dismiss
 
-    public init(model: RecurringEditModel) {
+    private let onDelete: (Deletion) -> Void
+
+    public init(
+        model: RecurringEditModel,
+        onDelete: @escaping (Deletion) -> Void = { _ in }
+    ) {
         _model = State(initialValue: model)
+        self.onDelete = onDelete
     }
 
     public var body: some View {
@@ -60,6 +67,18 @@ public struct RecurringEditSheet: View {
             isPresented: $isConfirmingDiscard
         ) {
             dismiss()
+        }
+        .confirmation(
+            isPresented: $isConfirmingDelete,
+            systemImage: "trash",
+            title: "この固定費を削除しますか",
+            message: "これまでに作った記録は残ります",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            Task {
+                await delete()
+            }
         }
         .task {
             await model.load()
@@ -109,43 +128,35 @@ private extension RecurringEditSheet {
             RingButton(systemImage: "xmark") {
                 close()
             }
-            .frame(width: 64, alignment: .leading)
+            .frame(width: SettingsEditActions.width, alignment: .leading)
 
             Spacer()
 
-            Text(headerTitle)
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
+            SettingsSheetTitle(headerTitle)
 
             Spacer()
 
-            Group {
+            ZStack {
                 if model.isEditing {
-                    RingButton(
-                        systemImage: "trash",
-                        style: .destructive,
-                        label: "削除"
-                    ) {
+                    SettingsEditActions(isHidden: model.isHidden) {
                         Task {
-                            await delete()
+                            await setHidden(!model.isHidden)
                         }
+                    } onDelete: {
+                        isConfirmingDelete = true
                     }
-                } else {
-                    Color.clear
-                        .frame(width: 44, height: 44)
                 }
             }
-            .frame(width: 64, alignment: .trailing)
+            .frame(width: SettingsEditActions.width, alignment: .trailing)
         }
     }
 
     var hero: some View {
         VStack(spacing: 14) {
             Button {
-                open(.amount)
+                open(amountPanel)
             } label: {
-                Text(AmountText.text(model.amount))
+                Text(amountText)
                     .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(amountColor)
@@ -157,7 +168,7 @@ private extension RecurringEditSheet {
             TextField(
                 "名前",
                 text: $model.memo,
-                prompt: Text("名前（家賃・給料など）")
+                prompt: Text(namePrompt)
                     .foregroundStyle(Palette.hint)
             )
             .multilineTextAlignment(.center)
@@ -248,6 +259,8 @@ private extension RecurringEditSheet {
             endChooser
         case .holiday:
             holidayChooser
+        case .closing:
+            closingChooser
         case .remind:
             remindChooser
         }
@@ -326,6 +339,31 @@ private extension RecurringEditSheet {
         .padding(.bottom, 8)
     }
 
+    var closingChooser: some View {
+        VStack(spacing: 12) {
+            Text("締め日までのカードの利用分を、引き落とし日に振り替えます")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+
+            SettingsChoice(
+                RecurringText.closingDay(nil),
+                isSelected: model.closingDay == nil
+            ) {
+                model.closingDay = nil
+                closePanel()
+            }
+
+            MonthStartDayGrid(
+                selection: model.closingDay.flatMap(MonthStartDay.init)
+            ) { day in
+                model.closingDay = day.day
+                closePanel()
+            }
+        }
+        .padding(.bottom, 8)
+    }
+
     var remindChooser: some View {
         LazyVGrid(columns: Self.remindColumns, spacing: 6) {
             ForEach(
@@ -355,6 +393,7 @@ private extension RecurringEditSheet {
         case start
         case end
         case holiday
+        case closing
         case remind
     }
 
@@ -369,6 +408,14 @@ private extension RecurringEditSheet {
             .init("毎月", value: .monthly),
             .init("毎年", value: .yearly)
         ]
+
+    var namePrompt: String {
+        switch model.type {
+        case .expense: "名前（家賃・サブスクなど）"
+        case .income: "名前（給料・年金など）"
+        case .transfer: "名前（カードの引き落とし・積立など）"
+        }
+    }
 
     static let monthColumns = Array(
         repeating: GridItem(.flexible(), spacing: 6),
@@ -392,7 +439,16 @@ private extension RecurringEditSheet {
     }
 
     var amountColor: Color {
-        model.amount > 0 ? Palette.accentStrong : Palette.hint
+        let isSet = model.amount > 0 || model.isCardBill
+        return isSet ? Palette.accentStrong : Palette.hint
+    }
+
+    var amountText: String {
+        model.isCardBill ? "カードの利用分" : AmountText.text(model.amount)
+    }
+
+    var amountPanel: Panel {
+        model.isCardBill ? .closing : .amount
     }
 
     var typeBinding: Binding<Entry.Kind> {
@@ -456,7 +512,19 @@ private extension RecurringEditSheet {
             isEmpty: model.selectedDestination == nil
         )
 
-        return [wallet, destination]
+        guard model.canUseClosingDay else {
+            return [wallet, destination]
+        }
+
+        let closing = SettingsRowList<Panel>.Item(
+            panel: .closing,
+            systemImage: "creditcard",
+            title: "金額の決め方",
+            value: RecurringText.closingDay(model.closingDay),
+            isEmpty: model.closingDay == nil
+        )
+
+        return [wallet, destination, closing]
     }
 
     var scheduleItems: [SettingsRowList<Panel>.Item] {
@@ -509,6 +577,7 @@ private extension RecurringEditSheet {
         case .start: "始まり"
         case .end: "終わり"
         case .holiday: "休日なら"
+        case .closing: "金額の決め方"
         case .remind: "前に知らせる"
         }
     }
@@ -546,7 +615,14 @@ private extension RecurringEditSheet {
     }
 
     func delete() async {
-        if await model.delete() {
+        if let deletion = await model.delete() {
+            onDelete(deletion)
+            dismiss()
+        }
+    }
+
+    func setHidden(_ isHidden: Bool) async {
+        if await model.setHidden(isHidden) {
             dismiss()
         }
     }

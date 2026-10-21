@@ -71,6 +71,7 @@ public extension View {
         keepTitle: String,
         confirmTitle: String,
         role: ConfirmCard.Role = .destructive,
+        onKeep: @escaping () -> Void = {},
         onConfirm: @escaping () -> Void
     ) -> some View {
         overlay {
@@ -88,6 +89,7 @@ public extension View {
                     },
                     onKeep: {
                         isPresented.wrappedValue = false
+                        onKeep()
                     }
                 )
             }
@@ -127,6 +129,7 @@ private extension ConfirmCard {
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             VStack(spacing: 10) {

@@ -72,17 +72,11 @@ public extension AppDatabase {
         }
     }
 
-    func deleteRecurring(_ id: Recurring.ID) async throws {
+    @discardableResult
+    func deleteRecurring(_ id: Recurring.ID) async throws -> Deletion {
         try await writer.write { db in
-            try Entry
-                .filter(Column("recurring_id") == id)
-                .updateAll(
-                    db,
-                    Column("recurring_id").set(to: nil),
-                    Column("recurring_date").set(to: nil)
-                )
-
-            _ = try Recurring.deleteOne(db, key: id)
+            let recurrings = Recurring.filter(id: id)
+            return try Self.deleteRecurrings(recurrings, in: db)
         }
     }
 
@@ -176,13 +170,15 @@ private extension AppDatabase {
             .filter(Column("recurring_date") <= latest)
             .fetchCount(db) > 0
 
-        guard !exists else {
+        let amount = try billAmount(of: recurring, on: date, in: db)
+
+        guard !exists, amount > 0 else {
             return nil
         }
 
         let entry = Entry(
             type: recurring.type,
-            amount: recurring.amount,
+            amount: amount,
             date: date,
             categoryId: recurring.categoryId,
             walletId: recurring.walletId,
@@ -201,5 +197,26 @@ private extension AppDatabase {
         }
 
         return entry
+    }
+
+    static func billAmount(
+        of recurring: Recurring,
+        on date: LocalDate,
+        in db: Database
+    ) throws -> Int {
+        guard
+            let period = recurring.billingPeriod(paidOn: date),
+            let card = recurring.toWalletId
+        else {
+            return recurring.amount
+        }
+
+        let entries = try Entry
+            .filter(Column("wallet_id") == card)
+            .filter(Column("date") >= period.lowerBound)
+            .filter(Column("date") <= period.upperBound)
+            .fetchAll(db)
+
+        return recurring.amount(paidOn: date, entries: entries)
     }
 }

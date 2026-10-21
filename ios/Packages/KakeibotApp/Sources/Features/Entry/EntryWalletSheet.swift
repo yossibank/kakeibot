@@ -76,8 +76,8 @@ private extension EntryWalletSheet {
                     Text(wallet.name)
                         .foregroundStyle(nameColor)
 
-                    if let balance = model.balance(of: wallet) {
-                        Text("残高 \(AmountText.text(balance))")
+                    if let balance = model.balanceText(of: wallet) {
+                        Text(balance)
                             .textFont(.caption2)
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)

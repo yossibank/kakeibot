@@ -98,7 +98,7 @@ public extension SettingKey where Value == Set<SettingsScreen> {
     }
 
     static var openHiddenLists: Self {
-        Self(screens: .openHiddenLists)
+        Self(screens: .openHiddenLists, default: Set(SettingsScreen.allCases))
     }
 }
 
@@ -145,10 +145,13 @@ extension SettingKey where Value: RawRepresentable, Value.RawValue == String {
 }
 
 extension SettingKey where Value == Set<SettingsScreen> {
-    init(screens key: Setting.Key) {
+    init(
+        screens key: Setting.Key,
+        default defaultValue: Value = []
+    ) {
         self.init(
             key,
-            default: [],
+            default: defaultValue,
             decode: { text in
                 let screens = text.split(separator: ",").compactMap { name in
                     SettingsScreen(rawValue: String(name))

@@ -60,6 +60,24 @@ struct RecurringDraftTests {
         #expect(transfer.toWalletId == card)
         #expect(transfer.categoryId == nil)
     }
+
+    @Test
+    func keepsClosingDayOnlyForTransfer() throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        var draft = try Self.rentDraft()
+        draft.closingDay = 15
+
+        let expense = try draft.newRecurring(at: now)
+        draft.type = .transfer
+        draft.categoryId = nil
+        draft.toWalletId = Wallet.ID()
+        let bill = try draft.newRecurring(at: now)
+
+        #expect(expense.closingDay == nil)
+        #expect(expense.amount == 78000)
+        #expect(bill.closingDay == 15)
+        #expect(bill.amount == 0)
+    }
 }
 
 extension RecurringDraftTests {
@@ -72,6 +90,7 @@ extension RecurringDraftTests {
         let frequency: Recurring.Frequency
         let month: Int
         let day: Int
+        let closingDay: Int?
         let startDate: LocalDate
         let endDate: LocalDate?
         let remindDaysBefore: Int?
@@ -95,6 +114,7 @@ extension RecurringDraftTests {
                 frequency: frequency,
                 month: month,
                 day: day,
+                closingDay: closingDay,
                 startDate: startDate,
                 endDate: endDate,
                 remindDaysBefore: remindDaysBefore

@@ -5,6 +5,7 @@ public struct CapsulePicker<Value: Hashable>: View {
     @Binding var selection: Value
 
     @State private var thumbOffset: CGFloat?
+    @State private var pendingIndex: Int?
     @State private var feedback = UISelectionFeedbackGenerator()
 
     let options: [Option]
@@ -69,6 +70,9 @@ public struct CapsulePicker<Value: Hashable>: View {
         .onChange(of: highlightedIndex) {
             feedback.selectionChanged()
             feedback.prepare()
+        }
+        .onChange(of: selection) {
+            pendingIndex = nil
         }
     }
 }
@@ -154,8 +158,12 @@ private extension CapsulePicker {
         CGFloat(options.count - 1) * Self.segmentWidth
     }
 
+    var shownIndex: Int {
+        pendingIndex ?? selectedIndex
+    }
+
     var thumbX: CGFloat {
-        thumbOffset ?? CGFloat(selectedIndex) * Self.segmentWidth
+        thumbOffset ?? CGFloat(shownIndex) * Self.segmentWidth
     }
 
     var highlightedIndex: Int {
@@ -166,7 +174,7 @@ private extension CapsulePicker {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
                 feedback.prepare()
-                let start = CGFloat(selectedIndex) * Self.segmentWidth
+                let start = CGFloat(shownIndex) * Self.segmentWidth
                 let touch = value.startLocation.x - Self.inset
 
                 let range = start...(start + Self.segmentWidth)
@@ -184,6 +192,7 @@ private extension CapsulePicker {
 
                 withAnimation(Self.spring) {
                     thumbOffset = nil
+                    pendingIndex = index == selectedIndex ? nil : index
                     selection = options[index].value
                 }
             }

@@ -114,6 +114,69 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func setsInvestmentValuation() async throws {
+        let setup = try await Setup()
+        let adding = WalletEditModel(database: setup.database)
+        adding.name = "つみたて"
+        adding.kind = .investment
+        adding.press(.digit(1))
+        adding.press(.doubleZero)
+        adding.press(.doubleZero)
+        adding.press(.digit(0))
+        let saved = try #require(await adding.save())
+
+        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        await model.load()
+        model.startValuation()
+        let start = model.valuation.amount
+        model.pressValuation(.clear)
+        model.pressValuation(.digit(1))
+        model.pressValuation(.digit(2))
+        model.pressValuation(.doubleZero)
+        model.pressValuation(.doubleZero)
+        let isSaved = await model.saveValuation()
+
+        let reloaded = WalletEditModel(
+            database: setup.database,
+            editing: saved.id
+        )
+
+        await reloaded.load()
+
+        #expect(model.showsValuation)
+        #expect(start == 100_000)
+        #expect(isSaved)
+        #expect(reloaded.balance == 120_000)
+        #expect(reloaded.initialBalance == 100_000)
+        #expect(reloaded.valuations.map(\.amount) == [120_000])
+    }
+
+    @Test
+    func deletesValuationAndCountsFromStart() async throws {
+        let setup = try await Setup()
+        let adding = WalletEditModel(database: setup.database)
+        adding.name = "つみたて"
+        adding.kind = .investment
+        adding.press(.digit(5))
+        adding.press(.doubleZero)
+        let saved = try #require(await adding.save())
+
+        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        await model.load()
+        model.startValuation()
+        model.pressValuation(.digit(9))
+        _ = await model.saveValuation()
+        let valued = model.balance
+        let id = try #require(model.valuations.first?.id)
+
+        await model.deleteValuation(id)
+
+        #expect(valued == 9)
+        #expect(model.valuations.isEmpty)
+        #expect(model.balance == 500)
+    }
+
+    @Test
     func asksBeforeHidingWalletWithBalance() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")

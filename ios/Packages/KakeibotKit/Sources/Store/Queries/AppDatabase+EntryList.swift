@@ -36,6 +36,7 @@ extension AppDatabase {
         let categories = try byID(EntryCategory.fetchAll(db))
         let tags = try byID(EntryTag.fetchAll(db))
         let wallets = try byID(Wallet.fetchAll(db))
+        let valuations = try Valuation.fetchAll(db)
         let icons = try byID(Icon.fetchAll(db))
 
         return EntryList(
@@ -43,6 +44,7 @@ extension AppDatabase {
             categories: categories,
             tags: tags,
             wallets: wallets,
+            valuations: valuations,
             icons: icons
         )
     }

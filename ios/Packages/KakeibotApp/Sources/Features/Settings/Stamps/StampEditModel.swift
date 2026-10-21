@@ -107,9 +107,23 @@ public extension StampEditModel {
             return false
         }
     }
+
+    func delete() async -> Deletion? {
+        guard let editingId else {
+            return nil
+        }
+
+        do {
+            return try await database.deleteShelfIcon(editingId)
+        } catch {
+            errorNotice.show(Self.deleteFailedMessage)
+            return nil
+        }
+    }
 }
 
 private extension StampEditModel {
     static let saveFailedMessage = "保存できませんでした"
+    static let deleteFailedMessage = "削除できませんでした"
     static let loadFailedMessage = "スタンプを読めませんでした"
 }

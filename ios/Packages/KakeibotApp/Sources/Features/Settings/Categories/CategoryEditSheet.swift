@@ -6,6 +6,7 @@ import SwiftUI
 public struct CategoryEditSheet: View {
     @State private var model: CategoryEditModel
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingDelete = false
     @State private var tagEdit: TagEdit?
     @State private var isMovingTag = false
     @State private var tagName = ""
@@ -18,15 +19,18 @@ public struct CategoryEditSheet: View {
 
     let startsAddingTag: Bool
     let onSave: (EntryCategory) -> Void
+    let onDelete: (Deletion) -> Void
 
     public init(
         model: CategoryEditModel,
         startsAddingTag: Bool = false,
-        onSave: @escaping (EntryCategory) -> Void = { _ in }
+        onSave: @escaping (EntryCategory) -> Void = { _ in },
+        onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
         self.startsAddingTag = startsAddingTag
         self.onSave = onSave
+        self.onDelete = onDelete
     }
 
     public var body: some View {
@@ -48,6 +52,18 @@ public struct CategoryEditSheet: View {
             isPresented: $isConfirmingDiscard
         ) {
             dismiss()
+        }
+        .confirmation(
+            isPresented: $isConfirmingDelete,
+            systemImage: "trash",
+            title: "このカテゴリを削除しますか",
+            message: "使っている固定費・テンプレート・予算・タグも消えます。元に戻せません",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            Task {
+                await delete()
+            }
         }
         .onChange(of: focus) {
             if focus != nil {
@@ -123,26 +139,26 @@ private extension CategoryEditSheet {
             RingButton(systemImage: "xmark") {
                 close()
             }
+            .frame(width: SettingsEditActions.width, alignment: .leading)
 
             Spacer()
 
-            Text(model.isEditing ? "カテゴリを編集" : "カテゴリを追加")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
+            SettingsSheetTitle(model.isEditing ? "カテゴリを編集" : "カテゴリを追加")
 
             Spacer()
 
-            if model.isEditing {
-                SettingsHideButton(isHidden: model.isHidden) {
-                    Task {
-                        await setHidden(!model.isHidden)
+            ZStack {
+                if model.isEditing {
+                    SettingsEditActions(isHidden: model.isHidden) {
+                        Task {
+                            await setHidden(!model.isHidden)
+                        }
+                    } onDelete: {
+                        isConfirmingDelete = true
                     }
                 }
-            } else {
-                Color.clear
-                    .frame(width: 44, height: 44)
             }
+            .frame(width: SettingsEditActions.width, alignment: .trailing)
         }
     }
 
@@ -339,6 +355,13 @@ private extension CategoryEditSheet {
 
     func setHidden(_ isHidden: Bool) async {
         if await model.setHidden(isHidden) {
+            dismiss()
+        }
+    }
+
+    func delete() async {
+        if let deletion = await model.delete() {
+            onDelete(deletion)
             dismiss()
         }
     }

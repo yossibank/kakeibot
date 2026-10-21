@@ -81,6 +81,44 @@ struct CategoryWriteTests {
     }
 
     @Test
+    func deletesUnusedCategory() async throws {
+        let setup = try await Setup()
+        let food = try await setup.category(named: "食費")
+
+        let deletion = try await setup.database.deleteCategory(food.id)
+        let categories = try await setup.expenseCategories()
+
+        try await setup.database.restore(deletion)
+        let restored = try await setup.category(named: "食費")
+
+        #expect(!categories.contains { $0.id == food.id })
+        #expect(restored == food)
+    }
+
+    @Test
+    func keepsCategoryWithEntries() async throws {
+        let setup = try await Setup()
+        let food = try await setup.category(named: "食費")
+        let options = try await setup.database.entryOptions()
+        let wallet = try #require(options.wallets.first)
+        let day = try #require(LocalDate("2026-11-01"))
+
+        let entry = EntryDraft(
+            type: .expense,
+            amount: 500,
+            date: day,
+            categoryId: food.id,
+            walletId: wallet.id
+        )
+
+        try await setup.database.saveEntry(entry, at: setup.now)
+
+        await #expect(throws: AppDatabase.CategoryWriteError.hasEntries) {
+            try await setup.database.deleteCategory(food.id)
+        }
+    }
+
+    @Test
     func hidesAndShowsCategory() async throws {
         let setup = try await Setup()
         let food = try await setup.category(named: "食費")

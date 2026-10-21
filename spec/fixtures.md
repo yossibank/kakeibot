@@ -83,7 +83,9 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
-| `notification-plan.json` | 予約されているべき通知の日・時刻・見出し・本文 | `today`、`reminderTime`（空なら記録忘れを知らせない）、`recorded`（記録か支出なしの印がある日）、`recurrings`（`name`・`amount`・`frequency`・`month`・`day`・`startDate`・`endDate`・`remindDaysBefore`）、`notifications` |
+| `notification-plan.json` | 予約されているべき通知の日・時刻・見出し・本文 | `today`、`reminderTime`（空なら記録忘れを知らせない）、`recorded`（記録か支出なしの印がある日）、`recurrings`（`name`・`amount`・`frequency`・`month`・`day`・`closingDay`・`startDate`・`endDate`・`remindDaysBefore`・`shortage`）、`notifications` |
+
+`closingDay` があれば、カードへの利用分の振替として、額を入れずに知らせる。`shortage`（`date`・`wallet`・`amount`）があれば、その日の知らせに、口座の足りない額を添える。
 
 通知は、日・時刻・識別の順に並べる。
 
@@ -93,7 +95,9 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
-| `recurring-draft.json` | 固定費の入力の判定で出る問題 | `type`、`amount`、`category`・`wallet`（入っているか）、`toWallet`（`other` か `same`。無ければ空）、`frequency`、`month`、`day`、`startDate`、`endDate`、`remindDaysBefore`、`problems` |
+| `recurring-draft.json` | 固定費の入力の判定で出る問題 | `type`、`amount`、`category`・`wallet`（入っているか）、`toWallet`（`other` か `same`。無ければ空）、`frequency`、`month`、`day`、`closingDay`（無ければ空）、`startDate`、`endDate`、`remindDaysBefore`、`problems` |
+| `card-bill-period.json` | カードの引き落とし日に払う、利用分の期間 | `closingDay`、`paidOn`、`from`、`through` |
+| `loan-payoff.json` | 借入を返し終える回数と最後の日 | `balance`、`today`、`repayments`（`amount`・`day`・`endDate`）、`count`、`lastDate`（返し終わらなければ空） |
 | `recurring-dates.json` | 固定費の、範囲の中で記録を作る日 | `frequency`（`monthly` `yearly`）、`month`（yearly だけ）、`day`、`holidayShift`（`none` `previous` `next`。無ければ `none`）、`startDate`、`endDate`、`from`、`through`、`dates` |
 
 月末を超える `day` は、その月の最終日にする。`holidayShift` が `none` でなければ、土日・祝日・12/31〜1/3 に当たった日を前か次の平日にずらす。`startDate` より前と `endDate` より後の日は、ずらした後の日で比べて入れない。
@@ -141,8 +145,8 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
 | `wallet-draft.json` | 財布の入力の判定で出る問題 | `name`、`kind`、`mark`（`category-draft.json` と同じ形）、`color`、`initialBalance`、`problems` |
-| `wallet-balance.json` | 1 つの財布の、ある日までの残高 | `initialBalance`、`entries`（`type`・`amount`・`date`・`wallet`・`toWallet`）、`through`（空ならすべて）、`balance` |
+| `wallet-balance.json` | 1 つの財布の、ある日までの残高 | `initialBalance`、`entries`（`type`・`amount`・`date`・`wallet`・`toWallet`）、`valuations`（`date`・`amount`・`createdAt`。無ければ空）、`through`（空ならすべて）、`balance` |
 
 財布の名前とアイコンは、カテゴリと同じ決まりで判定する。最初の残高は、マイナスでもよい。
 
-`wallet` と `toWallet` は、`self`（残高を出す財布）か `other`（ほかの財布）で書く。残高は、最初の残高に、収入と振替で入った額を足し、支出と振替で出した額を引く。
+`wallet` と `toWallet` は、`self`（残高を出す財布）か `other`（ほかの財布）で書く。残高は、最初の残高に、収入と振替で入った額を足し、支出と振替で出した額を引く。`through` までに評価額があれば、いちばん新しい評価額から、その日より後の記録だけを足し引きする。評価額と同じ日の記録は、評価額より後に作ったものだけを足し引きする。記録と評価額に `createdAt` が無ければ、記録を先に作ったものとする。

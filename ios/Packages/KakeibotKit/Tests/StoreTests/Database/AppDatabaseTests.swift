@@ -47,6 +47,7 @@ private extension AppDatabaseTests {
         "tag",
         "template",
         "theme",
+        "valuation",
         "wallet"
     ]
 }

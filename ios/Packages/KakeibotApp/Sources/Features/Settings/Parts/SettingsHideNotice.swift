@@ -5,19 +5,21 @@ extension View {
     func settingsHideNotice<ID: Hashable>(
         _ id: Binding<ID?>,
         message: String = "非表示にしました",
+        systemImage: String = "eye.slash",
+        bottom: CGFloat = 12,
         onUndo: @escaping (ID) -> Void
     ) -> some View {
         overlay(alignment: .bottom) {
             if let hiddenId = id.wrappedValue {
                 NoticeBanner(
                     message,
-                    systemImage: "eye.slash",
+                    systemImage: systemImage,
                     actionTitle: "取り消す"
                 ) {
                     id.wrappedValue = nil
                     onUndo(hiddenId)
                 }
-                .padding(.bottom, 12)
+                .padding(.bottom, bottom)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .task(id: hiddenId) {
                     try? await Task.sleep(for: .seconds(4))

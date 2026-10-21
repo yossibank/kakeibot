@@ -9,12 +9,16 @@ public struct RecurringListView: View {
     @State private var lift: Lift?
     @State private var liftCount = 0
     @State private var openId: Recurring.ID?
+    @State private var deleting: Recurring.ID?
+    @State private var isConfirmingDelete = false
     @State private var boardOrigin: CGPoint = .zero
     @State private var listOrigin: CGPoint = .zero
     @State private var zones = SettingsDropZones()
     @State private var autoScroll = SettingsAutoScroll()
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: Recurring.ID?
+    @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<Recurring.ID>?
     @State private var isOverShowZone = false
@@ -71,6 +75,9 @@ public struct RecurringListView: View {
             .settingsHideNotice($hiddenId, message: "止めて非表示にしました") { id in
                 show(id)
             }
+            .deletionNotice($deletion) { deletion in
+                restore(deletion)
+            }
 
             if lift != nil {
                 SettingsHideTarget(zones: $zones, state: hideHover.state)
@@ -97,7 +104,33 @@ public struct RecurringListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
-            RecurringEditSheet(model: model.editModel(for: sheet.editingId))
+            RecurringEditSheet(
+                model: model.editModel(for: sheet.editingId)
+            ) { deletion in
+                self.deletion = deletion
+            }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDelete,
+            systemImage: "trash",
+            title: "この固定費を削除しますか",
+            message: "これまでに作った記録は残ります",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            if let deleting {
+                delete(deleting)
+            }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示の固定費をまとめて削除しますか",
+            message: "これまでに作った記録は残ります",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
         }
         .task {
             await model.observe()
@@ -163,7 +196,9 @@ private extension RecurringListView {
                 flag: hiddenList,
                 title: "非表示の固定費",
                 count: model.hiddenRows.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 ForEach(model.hiddenRows) { row in
@@ -233,6 +268,8 @@ private extension RecurringListView {
             sheet = .edit(row.id)
         } onAction: {
             hide(row.id)
+        } onDelete: {
+            requestDelete(row.id)
         } content: {
             rowCard(row, isPaused: false)
         }
@@ -259,30 +296,41 @@ private extension RecurringListView {
                 IconBadge(row.icon, size: 38)
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(row.title)
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.text)
-                        .lineLimit(1)
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(row.title)
+                            .textFont(.subheadline)
+                            .foregroundStyle(Palette.text)
+                            .lineLimit(1)
 
-                    Text(row.detail)
+                        Spacer(minLength: 8)
+
+                        AmountText(row.amount, type: row.type)
+                    }
+
+                    Text(row.schedule)
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
-                }
 
-                Spacer(minLength: 8)
+                    HStack(alignment: .firstTextBaseline) {
+                        if let place = row.place {
+                            Text(place)
+                                .textFont(.caption)
+                                .foregroundStyle(Palette.subtext)
+                                .lineLimit(1)
+                        }
 
-                VStack(alignment: .trailing, spacing: 3) {
-                    AmountText(row.amount, type: row.type)
+                        Spacer(minLength: 8)
 
-                    if isPaused {
-                        Label("止めています", systemImage: "pause.circle")
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.amber)
-                    } else {
-                        Text(Self.nextText(row.next))
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
+                        if isPaused {
+                            Label("止めています", systemImage: "pause.circle")
+                                .textFont(.caption2)
+                                .foregroundStyle(Palette.amber)
+                        } else {
+                            Text(Self.nextText(row))
+                                .textFont(.caption2)
+                                .foregroundStyle(Palette.subtext)
+                        }
                     }
                 }
             }
@@ -306,7 +354,7 @@ private extension RecurringListView {
         case edit(Recurring.ID)
     }
 
-    static let rowHeight: CGFloat = 64
+    static let rowHeight: CGFloat = 84
     static let spacing: CGFloat = 10
     nonisolated static let space = "RecurringBoard"
     nonisolated static let listSpace = "RecurringList"
@@ -322,8 +370,8 @@ private extension RecurringListView {
             [
                 Self.purpose,
                 .move,
-                .init("pause.circle", "下の枠で少し待つと止められます"),
-                .init("hand.point.left", "横に払っても止められます")
+                .init("pause.circle", "下の枠に置くと止められます"),
+                .init("hand.point.left", "横に払うと、止めると削除のボタンが出ます")
             ]
         }
     }
@@ -437,6 +485,29 @@ private extension RecurringListView {
         }
     }
 
+    func requestDelete(_ id: Recurring.ID) {
+        deleting = id
+        isConfirmingDelete = true
+    }
+
+    func delete(_ id: Recurring.ID) {
+        Task {
+            deletion = await model.delete(id)
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
+        }
+    }
+
     func show(_ id: Recurring.ID) {
         Task {
             await model.show(id)
@@ -486,12 +557,13 @@ private extension RecurringListView {
         }
     }
 
-    static func nextText(_ date: LocalDate?) -> String {
-        guard let date else {
+    static func nextText(_ row: RecurringListModel.Row) -> String {
+        guard let date = row.next else {
             return "終わりました"
         }
 
-        return "次は \(date.month)/\(date.day)"
+        let next = "次は \(date.month)/\(date.day)"
+        return [row.closing, next].compactMap(\.self).joined(separator: "・")
     }
 }
 

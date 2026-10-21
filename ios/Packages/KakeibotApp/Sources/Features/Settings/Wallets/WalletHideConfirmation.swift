@@ -19,4 +19,19 @@ extension View {
             onConfirm: onConfirm
         )
     }
+
+    func confirmsWalletDelete(
+        isPresented: Binding<Bool>,
+        onConfirm: @escaping () -> Void
+    ) -> some View {
+        confirmation(
+            isPresented: isPresented,
+            systemImage: "trash",
+            title: "この口座を削除しますか",
+            message: "使っている固定費・テンプレート・評価額も消えます。元に戻せません",
+            keepTitle: "やめる",
+            confirmTitle: "削除する",
+            onConfirm: onConfirm
+        )
+    }
 }

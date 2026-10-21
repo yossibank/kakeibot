@@ -22,6 +22,14 @@ extension EntryList {
             .joined(separator: " → ")
     }
 
+    func amount(
+        of recurring: Recurring,
+        on date: LocalDate
+    ) -> Int {
+        let entries = days.flatMap(\.entries)
+        return recurring.amount(paidOn: date, entries: entries)
+    }
+
     func icon(of recurring: Recurring) -> Icon? {
         let category = recurring.categoryId.flatMap { categories[$0] }
 

@@ -206,7 +206,7 @@ private extension PeriodRecurringSheet {
 
                 Text(item.date.weekday.shortName)
                     .textFont(.caption2)
-                    .foregroundStyle(Self.weekdayTint(item.date))
+                    .foregroundStyle(item.date.tint ?? Palette.subtext)
             }
             .frame(width: 30)
 
@@ -290,14 +290,6 @@ private extension PeriodRecurringSheet {
 
     var todayIndex: Int {
         items.firstIndex { $0.date > model.today } ?? items.count
-    }
-
-    static func weekdayTint(_ date: LocalDate) -> Color {
-        if Holiday.contains(date) {
-            return Palette.holiday
-        }
-
-        return date.weekday.tint ?? Palette.subtext
     }
 
     static func opacity(of status: HomeModel.Status) -> Double {

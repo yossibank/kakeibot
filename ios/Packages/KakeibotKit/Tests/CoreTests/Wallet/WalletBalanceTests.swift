@@ -8,8 +8,13 @@ struct WalletBalanceTests {
         let other = Wallet.ID()
         let wallet = fixture.wallet()
         let entries = fixture.entries(wallet: wallet.id, other: other)
+        let valuations = fixture.valuations(wallet: wallet.id)
 
-        let balance = wallet.balance(with: entries, through: fixture.through)
+        let balance = wallet.balance(
+            with: entries,
+            valuations: valuations,
+            through: fixture.through
+        )
 
         #expect(balance == fixture.balance)
     }
@@ -40,8 +45,15 @@ extension WalletBalanceTests {
     struct BalanceCase: Decodable, Sendable {
         let initialBalance: Int
         let entries: [EntryCase]
+        let valuations: [ValuationCase]?
         let through: LocalDate?
         let balance: Int
+    }
+
+    struct ValuationCase: Decodable, Sendable {
+        let date: LocalDate
+        let amount: Int
+        let createdAt: Date?
     }
 
     struct EntryCase: Decodable, Sendable {
@@ -50,6 +62,7 @@ extension WalletBalanceTests {
         let date: LocalDate
         let wallet: Side
         let toWallet: Side?
+        let createdAt: Date?
     }
 
     enum Side: String, Decodable, Sendable {
@@ -59,6 +72,9 @@ extension WalletBalanceTests {
 }
 
 extension WalletBalanceTests.BalanceCase {
+    static let recordedAt = Date(timeIntervalSince1970: 0)
+    static let valuedAt = Date(timeIntervalSince1970: 1)
+
     static func wallet(initialBalance: Int) -> Wallet {
         Wallet(
             name: "財布",
@@ -73,6 +89,18 @@ extension WalletBalanceTests.BalanceCase {
 
     func wallet() -> Wallet {
         Self.wallet(initialBalance: initialBalance)
+    }
+
+    func valuations(wallet: Wallet.ID) -> [Valuation] {
+        (valuations ?? []).map { valuation in
+            Valuation(
+                walletId: wallet,
+                date: valuation.date,
+                amount: valuation.amount,
+                createdAt: valuation.createdAt ?? Self.valuedAt,
+                updatedAt: Date()
+            )
+        }
     }
 
     func entries(
@@ -91,7 +119,7 @@ extension WalletBalanceTests.BalanceCase {
                 categoryId: category,
                 walletId: from,
                 toWalletId: to,
-                createdAt: Date(),
+                createdAt: entry.createdAt ?? Self.recordedAt,
                 updatedAt: Date()
             )
         }

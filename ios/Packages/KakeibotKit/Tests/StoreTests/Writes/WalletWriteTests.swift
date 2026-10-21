@@ -110,6 +110,102 @@ struct WalletWriteTests {
     }
 
     @Test
+    func deletesWalletWithItsRecurringsAndValuations() async throws {
+        let setup = try await Setup()
+        let bank = try await setup.wallet(named: "銀行")
+        let card = try await setup.database.saveWallet(
+            setup.draft,
+            at: setup.now
+        )
+
+        let day = try #require(LocalDate("2026-11-01"))
+
+        let draft = RecurringDraft(
+            type: .transfer,
+            amount: 0,
+            categoryId: nil,
+            walletId: bank.id,
+            toWalletId: card.id,
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            closingDay: 31,
+            startDate: day
+        )
+
+        try await setup.database.saveRecurring(draft, today: day, at: setup.now)
+
+        try await setup.database.saveValuation(
+            0,
+            of: card.id,
+            on: day,
+            at: setup.now
+        )
+
+        let deletion = try await setup.database.deleteWallet(card.id)
+        let list = try await setup.database.entryList()
+        let recurrings = try await setup.database.recurrings()
+
+        try await setup.database.restore(deletion)
+        let restored = try await setup.database.entryList()
+        let restoredRecurrings = try await setup.database.recurrings()
+
+        #expect(list.wallets[card.id] == nil)
+        #expect(list.valuations.isEmpty)
+        #expect(recurrings.isEmpty)
+        #expect(restored.wallets[card.id] == card)
+        #expect(restored.valuations.count == 1)
+        #expect(restoredRecurrings.count == 1)
+    }
+
+    @Test
+    func restoresMergedDeletions() async throws {
+        let setup = try await Setup()
+        let first = try await setup.database.saveWallet(
+            setup.draft,
+            at: setup.now
+        )
+
+        var draft = setup.draft
+        draft.name = "PayPay"
+        let second = try await setup.database.saveWallet(draft, at: setup.now)
+
+        let deletions = try await [
+            setup.database.deleteWallet(first.id),
+            setup.database.deleteWallet(second.id)
+        ]
+
+        try await setup.database.restore(Deletion(merging: deletions))
+        let list = try await setup.database.entryList()
+
+        #expect(list.wallets[first.id] == first)
+        #expect(list.wallets[second.id] == second)
+    }
+
+    @Test
+    func keepsWalletWithEntries() async throws {
+        let setup = try await Setup()
+        let cash = try await setup.wallet(named: "財布")
+        let options = try await setup.database.entryOptions()
+        let food = try #require(options.expenseCategories.first)
+        let day = try #require(LocalDate("2026-11-01"))
+
+        let entry = EntryDraft(
+            type: .expense,
+            amount: 500,
+            date: day,
+            categoryId: food.id,
+            walletId: cash.id
+        )
+
+        try await setup.database.saveEntry(entry, at: setup.now)
+
+        await #expect(throws: AppDatabase.WalletWriteError.hasEntries) {
+            try await setup.database.deleteWallet(cash.id)
+        }
+    }
+
+    @Test
     func rejectsUnknownWallet() async throws {
         let setup = try await Setup()
 

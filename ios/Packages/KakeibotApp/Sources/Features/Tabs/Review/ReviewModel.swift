@@ -21,6 +21,10 @@ public final class ReviewModel: ScreenModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
+    @ObservationIgnored private var summaries: [
+        ClosedRange<LocalDate>: ReviewSummary
+    ] = [:]
+
     private let database: AppDatabase
 
     public init(
@@ -58,11 +62,11 @@ public extension ReviewModel {
     }
 
     var summary: ReviewSummary {
-        ReviewSummary(entries: entries, in: period.range)
+        summary(in: period.range)
     }
 
     var previousSummary: ReviewSummary {
-        ReviewSummary(entries: entries, in: period.previous.range)
+        summary(in: period.previous.range)
     }
 
     var total: Int {
@@ -316,6 +320,16 @@ private extension ReviewModel {
         }
     }
 
+    func summary(in range: ClosedRange<LocalDate>) -> ReviewSummary {
+        if let summary = summaries[range] {
+            return summary
+        }
+
+        let summary = ReviewSummary(entries: entries, in: range)
+        summaries[range] = summary
+        return summary
+    }
+
     static func sorted(_ ranked: [Ranked]) -> [Share] {
         ranked
             .sorted { lhs, rhs in
@@ -374,6 +388,7 @@ private extension ReviewModel {
             failure: Self.loadFailedMessage
         ) { list in
             self.list = list
+            summaries = [:]
         }
     }
 

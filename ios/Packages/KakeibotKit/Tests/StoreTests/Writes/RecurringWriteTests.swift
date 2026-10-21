@@ -94,6 +94,70 @@ struct RecurringWriteTests {
     }
 
     @Test
+    func paysCardUsageUntilClosingDay() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let bank = options.wallets[0].id
+        let card = options.wallets[1].id
+        let category = options.expenseCategories[0].id
+        let paidOn = try #require(LocalDate("2026-11-10"))
+
+        let usage = [
+            ("2026-09-15", 7000),
+            ("2026-09-16", 30000),
+            ("2026-10-15", 12000),
+            ("2026-10-16", 9000)
+        ]
+
+        let entries = try usage.map { date, amount in
+            try Entry(
+                type: .expense,
+                amount: amount,
+                date: #require(LocalDate(date)),
+                categoryId: category,
+                walletId: card,
+                createdAt: setup.now,
+                updatedAt: setup.now
+            )
+        }
+
+        let bill = try Recurring(
+            type: .transfer,
+            amount: 0,
+            categoryId: nil,
+            walletId: bank,
+            toWalletId: card,
+            frequency: .monthly,
+            day: 10,
+            closingDay: 15,
+            startDate: #require(LocalDate("2026-11-01")),
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
+        try await setup.database.writer.write { db in
+            for entry in entries {
+                try entry.insert(db)
+            }
+
+            try bill.insert(db)
+        }
+
+        try await setup.database.generateRecurringEntries(
+            through: paidOn,
+            at: setup.now
+        )
+
+        let payment = try setup.database
+            .snapshot()
+            .entries
+            .first { $0.recurringId == bill.id }
+
+        #expect(payment?.amount == 42000)
+        #expect(payment?.date == paidOn)
+    }
+
+    @Test
     func recordsOneEntryOnRequestedDate() async throws {
         let setup = try await Setup()
         let recurrings = try await setup.database.recurrings()
@@ -273,12 +337,17 @@ struct RecurringWriteTests {
         )
 
         let id = try #require(setup.database.snapshot().recurrings.first?.id)
-        try await setup.database.deleteRecurring(id)
+        let deletion = try await setup.database.deleteRecurring(id)
         let snapshot = try setup.database.snapshot()
+
+        try await setup.database.restore(deletion)
+        let restored = try setup.database.snapshot()
 
         #expect(snapshot.recurrings.isEmpty)
         #expect(snapshot.entries.count == 2)
         #expect(snapshot.entries.allSatisfy { $0.recurringId == nil })
+        #expect(restored.recurrings.map(\.id) == [id])
+        #expect(restored.entries.allSatisfy { $0.recurringId == id })
     }
 
     @Test

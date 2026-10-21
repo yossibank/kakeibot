@@ -91,6 +91,13 @@ public extension RecordsModel {
         }
     }
 
+    func amount(
+        of recurring: Recurring,
+        on date: LocalDate
+    ) -> Int {
+        list?.amount(of: recurring, on: date) ?? recurring.amount
+    }
+
     func title(of recurring: Recurring) -> String {
         list?.title(of: recurring) ?? Self.recurringTitle
     }

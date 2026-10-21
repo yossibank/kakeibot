@@ -34,25 +34,25 @@ struct SettingsScreenFlagTests {
         )
 
         await templates.load()
-        let closedFirst = !templates.isOn
+        let openedFirst = templates.isOn
 
-        await templates.set(true).value
+        await templates.set(false).value
         let reopened = SettingsScreenFlag.openHiddenList(
             .templates,
             in: database
         )
         await reopened.load()
-        let openedAgain = reopened.isOn
+        let closedAgain = !reopened.isOn
 
-        await reopened.set(false).value
-        let closedAgain = SettingsScreenFlag.openHiddenList(
+        await reopened.set(true).value
+        let openedAgain = SettingsScreenFlag.openHiddenList(
             .templates,
             in: database
         )
-        await closedAgain.load()
+        await openedAgain.load()
 
-        #expect(closedFirst)
-        #expect(openedAgain)
-        #expect(!closedAgain.isOn)
+        #expect(openedFirst)
+        #expect(closedAgain)
+        #expect(openedAgain.isOn)
     }
 }

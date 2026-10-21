@@ -30,11 +30,13 @@ public extension RecurringListModel {
     struct Row: Identifiable {
         public let id: Recurring.ID
         public let title: String
-        public let detail: String
+        public let schedule: String
+        public let place: String?
         public let amount: Int
         public let type: Entry.Kind
         public let icon: Icon?
         public let next: LocalDate?
+        public let closing: String?
     }
 
     struct MonthTotal: Equatable {
@@ -95,6 +97,40 @@ public extension RecurringListModel {
         return await setHidden(id, isHidden: true, failure: failure)
     }
 
+    func delete(_ id: Recurring.ID) async -> Deletion? {
+        movingOrder = nil
+
+        do {
+            return try await database.deleteRecurring(id)
+        } catch {
+            errorNotice.show(Self.deleteFailedMessage)
+            return nil
+        }
+    }
+
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await database.restore(deletion)
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage)
+        }
+    }
+
+    func deleteHidden() async -> Deletion? {
+        movingOrder = nil
+        let ids = hidden.map(\.id)
+
+        let result = await SettingsBulkDelete.run(ids) { id in
+            try await database.deleteRecurring(id)
+        }
+
+        if let message = result.message {
+            errorNotice.show(message)
+        }
+
+        return result.deletion
+    }
+
     func show(_ id: Recurring.ID) async {
         await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
     }
@@ -144,6 +180,8 @@ private extension RecurringListModel {
     static let saveFailedMessage = "並びを保存できませんでした"
     static let hideFailedMessage = "非表示にできませんでした"
     static let showFailedMessage = "表示に戻せませんでした"
+    static let deleteFailedMessage = "削除できませんでした"
+    static let restoreFailedMessage = "元に戻せませんでした"
 
     var visible: [Recurring] {
         recurrings.filter { $0.archivedAt == nil }
@@ -217,16 +255,20 @@ private extension RecurringListModel {
         )
 
         let holiday = RecurringText.holidayNote(recurring.holidayShift)
+        let closing = recurring.closingDay.map(RecurringText.closingNote)
         let place = list.place(of: recurring)
+        let next = recurring.nextDate(onOrAfter: today)
 
         return Row(
             id: recurring.id,
             title: list.title(of: recurring) ?? Self.title(of: recurring.type),
-            detail: [schedule, holiday, place].rowDetail ?? "",
-            amount: recurring.amount,
+            schedule: [schedule, holiday].rowDetail ?? schedule,
+            place: place,
+            amount: list.amount(of: recurring, on: next ?? today),
             type: recurring.type,
             icon: list.icon(of: recurring),
-            next: recurring.nextDate(onOrAfter: today)
+            next: next,
+            closing: closing
         )
     }
 }

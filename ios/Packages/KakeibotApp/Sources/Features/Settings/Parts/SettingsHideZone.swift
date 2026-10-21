@@ -4,8 +4,6 @@ import SwiftUI
 struct SettingsHideZone: View {
     @Environment(\.themeStyle.corner) private var corner
 
-    @State private var progress: CGFloat = 0
-
     let state: SettingsHideHover.State
     let height: CGFloat
 
@@ -23,20 +21,14 @@ struct SettingsHideZone: View {
             shape
                 .fill(Palette.backgroundBottom.opacity(.strong))
 
-            GeometryReader { proxy in
-                Rectangle()
-                    .fill(color.opacity(.subtle))
-                    .frame(width: proxy.size.width * progress)
-            }
-            .clipShape(shape)
+            shape
+                .fill(fill)
         }
         .overlay {
             shape
                 .stroke(color.opacity(0.6), style: .dashed)
         }
-        .onChange(of: state, initial: true) {
-            fill()
-        }
+        .animation(.snappy(duration: 0.2), value: state)
     }
 }
 
@@ -48,9 +40,12 @@ private extension SettingsHideZone {
     var color: Color {
         switch state {
         case .outside: Palette.subtext
-        case .waiting: Palette.amber
         case .armed: Palette.rose
         }
+    }
+
+    var fill: Color {
+        state == .armed ? color.opacity(.subtle) : .clear
     }
 
     var systemImage: String {
@@ -59,24 +54,8 @@ private extension SettingsHideZone {
 
     var title: String {
         switch state {
-        case .outside: "ここで少し待つと非表示にできます"
-        case .waiting: "そのまま待ってください"
+        case .outside: "ここに置くと非表示にできます"
         case .armed: "離すと非表示になります"
-        }
-    }
-
-    func fill() {
-        switch state {
-        case .outside:
-            progress = 0
-        case .waiting:
-            progress = 0
-
-            withAnimation(.linear(duration: SettingsHideHover.delay)) {
-                progress = 1
-            }
-        case .armed:
-            progress = 1
         }
     }
 }

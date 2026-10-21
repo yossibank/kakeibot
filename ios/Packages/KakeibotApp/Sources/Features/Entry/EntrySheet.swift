@@ -15,6 +15,7 @@ public struct EntrySheet: View {
     @State private var pressingCategory: EntryCategory.ID?
     @State private var sheetWidth: CGFloat = 0
     @State private var drawerHeight: CGFloat = 0
+    @State private var deletion: Deletion?
 
     @FocusState private var isMemoFocused: Bool
 
@@ -61,6 +62,11 @@ public struct EntrySheet: View {
                 bottom: bannerBottom
             ) {
                 model.errorNotice.clear()
+            }
+            .deletionNotice($deletion, bottom: bannerBottom) { deletion in
+                Task {
+                    await model.restore(deletion)
+                }
             }
             .background {
                 Rectangle()
@@ -140,14 +146,45 @@ private extension EntrySheet {
                     categoryArea
                         .hidden()
 
-                    EntryTransferPanel(model: model) { role in
-                        open(.wallet(role))
+                    VStack(spacing: 12) {
+                        EntryTransferPanel(model: model) { role in
+                            open(.wallet(role))
+                        }
+
+                        if let remaining = model.loanRemaining,
+                           remaining != model.amount {
+                            payOffButton(remaining)
+                        }
                     }
                 }
             } else {
                 categoryArea
             }
         }
+    }
+
+    func payOffButton(_ remaining: Int) -> some View {
+        Button {
+            withAnimation(.snappy) {
+                model.payOffLoan()
+            }
+        } label: {
+            Label(
+                "残り \(AmountText.text(remaining)) をまとめて返す",
+                systemImage: "checkmark.seal"
+            )
+            .textFont(.footnote)
+            .foregroundStyle(Palette.accent)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 40)
+            .overlay {
+                Capsule()
+                    .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .transition(.opacity)
     }
 
     var categoryArea: some View {
@@ -523,7 +560,10 @@ private extension EntrySheet {
                 }
             }
         case let .editCategory(category):
-            CategoryEditSheet(model: model.editCategoryModel(category))
+            CategoryEditSheet(model: model.editCategoryModel(category)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
         case let .addTag(category):
             CategoryEditSheet(
                 model: model.editCategoryModel(category),

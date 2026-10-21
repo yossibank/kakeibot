@@ -89,6 +89,32 @@ public extension StampListModel {
         return await setHidden(id, isHidden: true, failure: failure)
     }
 
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await database.restore(deletion)
+            await load()
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage)
+        }
+    }
+
+    func deleteHidden() async -> Deletion? {
+        movingOrder = nil
+        let ids = hidden.map(\.id)
+
+        let result = await SettingsBulkDelete.run(ids) { id in
+            try await database.deleteShelfIcon(id)
+        }
+
+        await load()
+
+        if let message = result.message {
+            errorNotice.show(message)
+        }
+
+        return result.deletion
+    }
+
     func show(_ id: ShelfIcon.ID) async {
         await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
     }
@@ -116,6 +142,7 @@ private extension StampListModel {
     static let saveFailedMessage = "並びを保存できませんでした"
     static let hideFailedMessage = "非表示にできませんでした"
     static let showFailedMessage = "表示に戻せませんでした"
+    static let restoreFailedMessage = "元に戻せませんでした"
 
     func stamps(isHidden: Bool) -> [ShelfIcon] {
         let stamps = shelf?.shelfIcons ?? []

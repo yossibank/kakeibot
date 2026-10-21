@@ -12,6 +12,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
     private let role: Role
     private let onTap: () -> Void
     private let onAction: () -> Void
+    private let onDelete: (() -> Void)?
     private let content: Content
 
     public init(
@@ -20,6 +21,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
         role: Role = .delete,
         onTap: @escaping () -> Void,
         onAction: @escaping () -> Void,
+        onDelete: (() -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) {
         _openId = openId
@@ -27,12 +29,19 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
         self.role = role
         self.onTap = onTap
         self.onAction = onAction
+        self.onDelete = onDelete
         self.content = content()
     }
 
     public var body: some View {
         ZStack(alignment: .trailing) {
-            actionButton
+            HStack(spacing: 0) {
+                if onDelete != nil {
+                    deleteButton
+                }
+
+                actionButton
+            }
 
             content
                 .contentShape(.rect)
@@ -85,27 +94,47 @@ public extension SwipeRow {
 
 private extension SwipeRow {
     var actionButton: some View {
-        let buttonWidth = max(-offset, Self.actionWidth) - Self.gap
-        let opacity = min(-offset / Self.actionWidth, 1)
+        let reach = -offset - deleteWidth
+        let buttonWidth = max(reach, Self.actionWidth) - Self.gap
 
         return Button {
             act()
         } label: {
-            Image(systemName: systemImage)
-                .font(.sans(.body, weight: .medium))
-                .foregroundStyle(Palette.cardBottom)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(fill, in: shape)
-                .overlay {
-                    shape
-                        .fill(Self.sheen)
-                }
-                .contentShape(shape)
+            actionLabel(systemImage, fill: fill)
         }
         .buttonStyle(.plain)
         .frame(width: buttonWidth)
         .padding(.vertical, 6)
         .opacity(opacity)
+    }
+
+    var deleteButton: some View {
+        Button {
+            delete()
+        } label: {
+            actionLabel("trash", fill: Self.gradient(Palette.rose))
+        }
+        .buttonStyle(.plain)
+        .frame(width: Self.actionWidth - Self.gap)
+        .padding(.trailing, Self.gap)
+        .padding(.vertical, 6)
+        .opacity(opacity)
+    }
+
+    func actionLabel(
+        _ systemImage: String,
+        fill: LinearGradient
+    ) -> some View {
+        Image(systemName: systemImage)
+            .font(.sans(.body, weight: .medium))
+            .foregroundStyle(Palette.cardBottom)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(fill, in: shape)
+            .overlay {
+                shape
+                    .fill(Self.sheen)
+            }
+            .contentShape(shape)
     }
 }
 
@@ -138,6 +167,18 @@ private extension SwipeRow {
         openId == id
     }
 
+    var deleteWidth: CGFloat {
+        onDelete == nil ? 0 : Self.actionWidth
+    }
+
+    var openWidth: CGFloat {
+        Self.actionWidth + deleteWidth
+    }
+
+    var opacity: Double {
+        min(-offset / openWidth, 1)
+    }
+
     var isPastAction: Bool {
         width > 0 && -offset > width * 0.6
     }
@@ -150,16 +191,23 @@ private extension SwipeRow {
     }
 
     var fill: LinearGradient {
-        let color = switch role {
-        case .delete: Palette.rose
-        case .hide: Palette.accent
+        switch role {
+        case .delete: Self.gradient(Palette.rose)
+        case .hide: Self.gradient(Palette.accent)
         }
+    }
 
-        return LinearGradient(
+    static func gradient(_ color: Color) -> LinearGradient {
+        LinearGradient(
             colors: [color, color.opacity(0.78)],
             startPoint: .top,
             endPoint: .bottom
         )
+    }
+
+    func delete() {
+        openId = nil
+        onDelete?()
     }
 
     func act() {
@@ -184,7 +232,7 @@ private extension SwipeRow {
             openId = nil
         }
 
-        let start = isOpen ? -Self.actionWidth : 0
+        let start = isOpen ? -openWidth : 0
         offset = min(start + x, 0)
     }
 
@@ -200,10 +248,10 @@ private extension SwipeRow {
             return
         }
 
-        let opens = -offset > Self.actionWidth / 2
+        let opens = -offset > openWidth / 2
 
         withAnimation(.snappy) {
-            offset = opens ? -Self.actionWidth : 0
+            offset = opens ? -openWidth : 0
         }
 
         if opens {

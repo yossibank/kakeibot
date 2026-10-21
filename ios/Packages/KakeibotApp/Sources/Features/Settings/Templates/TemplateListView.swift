@@ -14,7 +14,11 @@ public struct TemplateListView: View {
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: EntryTemplate.ID?
+    @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var openId: EntryTemplate.ID?
+    @State private var deleting: EntryTemplate.ID?
+    @State private var isConfirmingDelete = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<EntryTemplate.ID>?
     @State private var isOverShowZone = false
@@ -72,6 +76,9 @@ public struct TemplateListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
+            .deletionNotice($deletion) { deletion in
+                restore(deletion)
+            }
 
             if lift != nil {
                 SettingsHideTarget(zones: $zones, state: hideHover.state)
@@ -98,7 +105,32 @@ public struct TemplateListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
-            TemplateEditSheet(model: editModel(for: sheet))
+            TemplateEditSheet(model: editModel(for: sheet)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDelete,
+            systemImage: "trash",
+            title: "このテンプレートを削除しますか",
+            message: "このテンプレートで記録したものは残ります",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            if let deleting {
+                delete(deleting)
+            }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示のテンプレートをまとめて削除しますか",
+            message: "テンプレートで記録したものは残ります",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
         }
         .task {
             await model.observe()
@@ -148,7 +180,9 @@ private extension TemplateListView {
                 flag: hiddenList,
                 title: "非表示のテンプレート",
                 count: model.hidden.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 ForEach(model.hidden) { template in
@@ -205,6 +239,8 @@ private extension TemplateListView {
             sheet = .edit(template.id)
         } onAction: {
             hide(template.id)
+        } onDelete: {
+            requestDelete(template.id)
         } content: {
             card(template)
         }
@@ -267,7 +303,7 @@ private extension TemplateListView {
                 .init("list.number", "この順でホームと入力シートに出ます"),
                 .move,
                 .hide,
-                .swipeHide
+                .swipeDelete
             ]
         }
     }
@@ -445,6 +481,29 @@ private extension TemplateListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func requestDelete(_ id: EntryTemplate.ID) {
+        deleting = id
+        isConfirmingDelete = true
+    }
+
+    func delete(_ id: EntryTemplate.ID) {
+        Task {
+            deletion = await model.delete(id)
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
         }
     }
 

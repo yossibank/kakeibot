@@ -7,6 +7,7 @@ public extension AppDatabase {
         case walletNotFound
         case iconNotFound
         case lastShownWallet
+        case hasEntries
     }
 
     @discardableResult
@@ -55,6 +56,48 @@ public extension AppDatabase {
             wallet.archivedAt = isHidden ? now : nil
             wallet.updatedAt = now
             try wallet.update(db)
+        }
+    }
+
+    @discardableResult
+    func deleteWallet(_ id: Wallet.ID) async throws -> Deletion {
+        try await writer.write { db in
+            guard let wallet = try Wallet.fetchOne(db, key: id) else {
+                throw WalletWriteError.walletNotFound
+            }
+
+            let entries = Entry.filter(
+                Column("wallet_id") == id || Column("to_wallet_id") == id
+            )
+
+            if try entries.fetchCount(db) > 0 {
+                throw WalletWriteError.hasEntries
+            }
+
+            if wallet.archivedAt == nil,
+               try Self.shownWalletCount(in: db) <= 1 {
+                throw WalletWriteError.lastShownWallet
+            }
+
+            let recurrings = Recurring.filter(
+                Column("wallet_id") == id || Column("to_wallet_id") == id
+            )
+
+            let templates = EntryTemplate.filter(Column("wallet_id") == id)
+            let valuations = Valuation.filter(Column("wallet_id") == id)
+
+            let deletion = try Deletion(
+                wallets: [wallet],
+                recurrings: recurrings.fetchAll(db),
+                templates: templates.fetchAll(db),
+                valuations: valuations.fetchAll(db)
+            )
+
+            try Self.deleteRecurrings(recurrings, in: db)
+            try templates.deleteAll(db)
+            try valuations.deleteAll(db)
+            try wallet.delete(db)
+            return deletion
         }
     }
 }

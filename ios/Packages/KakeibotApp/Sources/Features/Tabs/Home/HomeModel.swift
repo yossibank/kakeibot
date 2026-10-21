@@ -43,10 +43,7 @@ public extension HomeModel {
         public let recurring: Recurring
         public let entry: Entry?
         public let status: Status
-
-        public var amount: Int {
-            entry?.amount ?? recurring.amount
-        }
+        public let amount: Int
     }
 
     enum Status: Hashable {
@@ -82,16 +79,25 @@ public extension HomeModel {
             .flatMap { recurring in
                 recurring
                     .dates(from: period.lowerBound, through: period.upperBound)
-                    .map { date in
+                    .compactMap { date in
                         let entry = entries.first { entry in
                             recurring.isRecorded(by: entry, on: date)
+                        }
+
+                        let amount = entry?.amount
+                            ?? list?.amount(of: recurring, on: date)
+                            ?? recurring.amount
+
+                        guard entry != nil || amount > 0 else {
+                            return nil
                         }
 
                         return PeriodRecurring(
                             date: date,
                             recurring: recurring,
                             entry: entry,
-                            status: status(of: date, entry: entry)
+                            status: status(of: date, entry: entry),
+                            amount: amount
                         )
                     }
             }
