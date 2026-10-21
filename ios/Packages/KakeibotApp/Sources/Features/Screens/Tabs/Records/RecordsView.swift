@@ -13,6 +13,8 @@ public struct RecordsView: View {
     @State private var stampTarget: StampTarget?
     @State private var stampCount = 0
 
+    @FocusState private var isSearchFocused: Bool
+
     private let onOpenEntry: (Entry.ID) -> Void
     private let onDelete: (Entry.ID) -> Void
     private let onAddEntry: (LocalDate) -> Void
@@ -35,24 +37,31 @@ public struct RecordsView: View {
     public var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                header
-                    .monthSwipe(following: $slide, perform: moveMonth)
+                if model.isSearching {
+                    searchBar
 
-                CapsulePicker(
-                    selection: layoutBinding,
-                    options: Self.layoutOptions
-                )
-                .frame(maxWidth: .infinity, alignment: .leading)
+                    searchContent
+                } else {
+                    header
+                        .monthSwipe(following: $slide, perform: moveMonth)
 
-                Group {
-                    monthContent
+                    CapsulePicker(
+                        selection: layoutBinding,
+                        options: Self.layoutOptions
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Group {
+                        monthContent
+                    }
+                    .pageSlide(slide)
                 }
-                .pageSlide(slide)
             }
             .padding(.horizontal, 14)
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
+        .scrollDismissesKeyboard(.interactively)
         .sensoryFeedback(.selection, trigger: model.month)
         .sensoryFeedback(.selection, trigger: model.selectedDate)
         .errorBanner(model.errorNotice) {
@@ -78,6 +87,17 @@ private extension RecordsView {
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
 
+            Button {
+                openSearch()
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 40, height: 44)
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+
             Spacer()
 
             monthButton(systemImage: "chevron.left", months: -1)
@@ -96,6 +116,80 @@ private extension RecordsView {
             }
 
             monthButton(systemImage: "chevron.right", months: 1)
+        }
+    }
+
+    var searchBar: some View {
+        HStack(spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Palette.subtext)
+
+                TextField(
+                    "メモ・カテゴリ・口座・金額",
+                    text: $model.searchText,
+                    prompt: Text("メモ・カテゴリ・口座・金額")
+                        .foregroundStyle(Palette.hint)
+                )
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+                .tint(Palette.accent)
+                .submitLabel(.search)
+                .focused($isSearchFocused)
+
+                if !model.searchText.isEmpty {
+                    Button {
+                        model.searchText = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(Palette.hint)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 14)
+            .frame(height: 44)
+            .background(Palette.faint, in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(Palette.outline, lineWidth: 1)
+            }
+
+            Button("閉じる") {
+                closeSearch()
+            }
+            .textFont(.subheadline)
+            .foregroundStyle(Palette.accent)
+        }
+    }
+
+    @ViewBuilder
+    var searchContent: some View {
+        let days = model.searchDays
+        let count = days.reduce(0) { $0 + $1.entries.count }
+
+        if model.searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+            Text("メモ・カテゴリ・タグ・口座の名前や、金額で探せます")
+                .textFont(.footnote)
+                .foregroundStyle(Palette.subtext)
+                .padding(.vertical, 40)
+        } else if days.isEmpty {
+            Text("見つかりませんでした")
+                .textFont(.footnote)
+                .foregroundStyle(Palette.subtext)
+                .padding(.vertical, 40)
+        } else {
+            Text("\(count) 件")
+                .textFont(.caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 4)
+
+            ForEach(days, id: \.self) { day in
+                dayCard(day)
+            }
         }
     }
 
@@ -591,6 +685,26 @@ private extension RecordsView {
         }
 
         return date.tint ?? Palette.text
+    }
+
+    func openSearch() {
+        openId = nil
+
+        withAnimation(.snappy) {
+            model.isSearching = true
+        }
+
+        isSearchFocused = true
+    }
+
+    func closeSearch() {
+        isSearchFocused = false
+        openId = nil
+
+        withAnimation(.snappy) {
+            model.isSearching = false
+            model.searchText = ""
+        }
     }
 
     func moveMonth(_ direction: PageSwipeDirection) {

@@ -9,6 +9,8 @@ import Store
 public final class RecordsModel: ScreenModel {
     public var today: LocalDate
     public var selectedDate: LocalDate?
+    public var isSearching = false
+    public var searchText = ""
 
     public private(set) var month: YearMonth
     public private(set) var monthStartDay: MonthStartDay = .first
@@ -53,6 +55,19 @@ public extension RecordsModel {
 
     var incomeTotal: Int {
         days.reduce(0) { $0 + $1.incomeTotal }
+    }
+
+    var searchDays: [EntryDay] {
+        let search = EntrySearch(searchText)
+
+        guard
+            !search.isEmpty,
+            let list
+        else {
+            return []
+        }
+
+        return list.days(matching: search)
     }
 
     var weeks: [[LocalDate?]] {

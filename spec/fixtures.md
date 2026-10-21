@@ -65,8 +65,11 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | `entry-template-draft.json` | テンプレートの判定で出る問題 | `name`、`type`、`amount`（空でもよい）、`category`・`wallet`（真偽）、`problems` |
 | `amount-calculator.json` | 電卓のキーを順に押したときの金額と式。式は左から順に計算し、割り算と税込みは 1 円未満を切り捨てる | `keys`（`0`〜`9`・`00`・`del`・`ac`・`+`・`-`・`*`・`/`・`=`・`tax8`・`tax10`）、`amount`、`expression`（数と記号を空白で区切る） |
 | `entry-day.json` | 記録を日ごとにまとめ、支出と収入の合計を出す | `entries`（`id`・`type`・`amount`・`date`・`createdAt`）、`days`（`date`・`expense`・`income`・`entryIds`） |
+| `entry-search.json` | 検索の言葉に記録が当てはまるか | `query`、`amount`、`texts`（メモ・カテゴリ・タグ・口座の名前）、`matches` |
 
 `entry-day.json` の日は新しい順に並べる。同じ日の記録は `createdAt` の新しい順にし、同じ時刻なら `id` の小さい順にする。
+
+`entry-search.json` の `query` は空白（全角も含む）で言葉に分け、すべての言葉が当てはまれば真にする。言葉は `texts` のどれかに含まれるか、`¥`・`\`・`,`・`円` を除いた数が `amount` と同じなら当てはまる。大文字と小文字、全角と半角は区別しない。言葉が無ければ真にする。
 
 ## export
 
