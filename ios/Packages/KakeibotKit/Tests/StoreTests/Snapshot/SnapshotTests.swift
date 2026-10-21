@@ -1,4 +1,5 @@
 import Core
+import Foundation
 import GRDB
 import Store
 import Testing
@@ -47,6 +48,24 @@ struct SnapshotTests {
         let snapshot = try database.snapshot()
 
         #expect(snapshot == export.data)
+    }
+
+    @Test
+    func restoresWhatItBacksUp() async throws {
+        let database = try AppDatabase.inMemory()
+        let restored = try AppDatabase.inMemory()
+        let export = try Self.export
+        let date = Date(timeIntervalSince1970: 1_791_000_000)
+        let app = ExportV1.App(platform: .ios, version: "1.0")
+
+        try database.replace(with: export.data)
+        let json = try await database.backup(at: date, app: app)
+        let backup = try ExportV1(json: json)
+        try await restored.restoreBackup(backup)
+
+        #expect(backup.exportedAt == date)
+        #expect(backup.app == app)
+        #expect(try restored.snapshot() == export.data)
     }
 }
 

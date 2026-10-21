@@ -1,4 +1,5 @@
 import Core
+import Foundation
 import GRDB
 
 public extension AppDatabase {
@@ -10,8 +11,35 @@ public extension AppDatabase {
 
     func replace(with tables: ExportV1.Tables) throws {
         try writer.write { db in
-            try ExportV1.Tables.deleteAll(in: db)
-            try tables.insert(into: db)
+            try Self.replace(with: tables, in: db)
         }
+    }
+
+    func backup(
+        at date: Date,
+        app: ExportV1.App
+    ) async throws -> Data {
+        let tables = try await writer.read { db in
+            try ExportV1.Tables(fetchingFrom: db)
+        }
+
+        let export = ExportV1(exportedAt: date, app: app, data: tables)
+        return try export.json()
+    }
+
+    func restoreBackup(_ export: ExportV1) async throws {
+        try await writer.write { db in
+            try Self.replace(with: export.data, in: db)
+        }
+    }
+}
+
+private extension AppDatabase {
+    static func replace(
+        with tables: ExportV1.Tables,
+        in db: Database
+    ) throws {
+        try ExportV1.Tables.deleteAll(in: db)
+        try tables.insert(into: db)
     }
 }
