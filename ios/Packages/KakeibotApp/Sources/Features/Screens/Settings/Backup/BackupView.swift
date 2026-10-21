@@ -36,7 +36,7 @@ public struct BackupView: View {
 
                     VStack(spacing: 0) {
                         Button {
-                            exportFile()
+                            exportFile(.json)
                         } label: {
                             action(
                                 "書き出す",
@@ -48,7 +48,19 @@ public struct BackupView: View {
                         Hairline()
 
                         Button {
-                            isImporting = true
+                            exportFile(.csv)
+                        } label: {
+                            action(
+                                "表計算用に書き出す",
+                                systemImage: "tablecells",
+                                detail: "記録を CSV で保存します。読み込みには使えません"
+                            )
+                        }
+
+                        Hairline()
+
+                        Button {
+                            importFile()
                         } label: {
                             action(
                                 "読み込む",
@@ -58,7 +70,6 @@ public struct BackupView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .disabled(model.isWorking)
                     .padding(.horizontal, 14)
                     .card()
 
@@ -91,7 +102,7 @@ public struct BackupView: View {
         .fileExporter(
             isPresented: $isExporting,
             document: document,
-            contentType: .json,
+            contentType: exportType,
             defaultFilename: model.file?.name
         ) { result in
             model.finishExport(result)
@@ -174,10 +185,26 @@ private extension BackupView {
         model.file.map { BackupDocument(data: $0.data) }
     }
 
-    func exportFile() {
-        Task {
-            isExporting = await model.makeFile(at: Date())
+    var exportType: UTType {
+        model.file?.kind == .csv ? .commaSeparatedText : .json
+    }
+
+    func exportFile(_ kind: BackupModel.FileKind) {
+        guard !model.isWorking else {
+            return
         }
+
+        Task {
+            isExporting = await model.makeFile(kind, at: Date())
+        }
+    }
+
+    func importFile() {
+        guard !model.isWorking else {
+            return
+        }
+
+        isImporting = true
     }
 }
 

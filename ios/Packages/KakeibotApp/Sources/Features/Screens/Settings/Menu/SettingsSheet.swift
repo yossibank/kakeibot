@@ -9,7 +9,6 @@ public struct SettingsSheet: View {
     @State private var startsWithAmount = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
-    @State private var closedHints: Set<SettingsScreen> = []
     @State private var theme: ThemeChoice = .preset(.navy)
     @State private var customThemes: [Theme] = []
     @State private var appIcon = AppIconListModel()
@@ -277,18 +276,6 @@ public struct SettingsSheet: View {
                             .frame(minHeight: 52)
                             .padding(.horizontal, 14)
                             .card()
-
-                            Button {
-                                Task {
-                                    await showHintsAgain()
-                                }
-                            } label: {
-                                hintsRow
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(closedHints.isEmpty)
-                            .padding(.horizontal, 14)
-                            .card()
                         }
 
                         VStack(alignment: .leading, spacing: 6) {
@@ -337,9 +324,6 @@ public struct SettingsSheet: View {
             await observeReminderTime()
         }
         .task {
-            await observeClosedHints()
-        }
-        .task {
             await observeTheme()
         }
         .task {
@@ -382,32 +366,6 @@ private extension SettingsSheet {
             .tracking(3)
             .foregroundStyle(Palette.accent)
             .padding(.leading, 6)
-    }
-
-    var hintsRow: some View {
-        let color = closedHints.isEmpty ? Palette.hint : Palette.text
-        let value = closedHints.isEmpty
-            ? "すべて出ています"
-            : "閉じた説明 \(closedHints.count)"
-
-        return HStack(spacing: 12) {
-            Image(systemName: "text.bubble")
-                .font(.sans(.body, weight: .light))
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
-
-            Text("説明をもう一度出す")
-                .textFont(.subheadline)
-                .foregroundStyle(color)
-
-            Spacer()
-
-            Text(value)
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-        }
-        .frame(minHeight: 48)
-        .contentShape(.rect)
     }
 
     func row(
@@ -473,20 +431,6 @@ private extension SettingsSheet {
                 try? await database.setSetting(.weekStart, to: day)
             }
         }
-    }
-
-    func observeClosedHints() async {
-        do {
-            for try await hints in database.settingUpdates(.closedHints) {
-                closedHints = hints
-            }
-        } catch {
-            closedHints = []
-        }
-    }
-
-    func showHintsAgain() async {
-        try? await database.setSetting(.closedHints, to: [])
     }
 
     func observeLaunchScreen() async {

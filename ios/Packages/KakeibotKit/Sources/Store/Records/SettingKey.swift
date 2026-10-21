@@ -102,6 +102,21 @@ public extension SettingKey where Value == Set<SettingsScreen> {
     }
 }
 
+public extension SettingKey where Value == [String] {
+    static var recentSearches: Self {
+        Self(
+            .recentSearches,
+            default: [],
+            decode: { text in
+                text.split(separator: "\n").map(String.init)
+            },
+            encode: { words in
+                words.isEmpty ? nil : words.joined(separator: "\n")
+            }
+        )
+    }
+}
+
 public extension SettingKey where Value == Bool {
     static var entryStartsWithAmount: Self {
         Self(flag: .entryStartsWithAmount)

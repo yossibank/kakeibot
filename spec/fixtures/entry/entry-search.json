@@ -1,0 +1,15 @@
+[
+  { "query": "ランチ", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
+  { "query": "食費", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
+  { "query": "980", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
+  { "query": "¥1,200", "amount": 1200, "texts": ["食費"], "matches": true },
+  { "query": "１２００円", "amount": 1200, "texts": ["食費"], "matches": true },
+  { "query": "1200", "amount": 120, "texts": ["食費"], "matches": false },
+  { "query": "ランチ 財布", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
+  { "query": "ランチ　銀行", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": false },
+  { "query": "amazon", "amount": 3200, "texts": ["Amazon で本", "趣味", "カード"], "matches": true },
+  { "query": "ＡＭＡＺＯＮ", "amount": 3200, "texts": ["Amazon で本", "趣味", "カード"], "matches": true },
+  { "query": "本 3200", "amount": 3200, "texts": ["Amazon で本", "趣味", "カード"], "matches": true },
+  { "query": "給料", "amount": 280000, "texts": ["給与", "銀行"], "matches": false },
+  { "query": "", "amount": 980, "texts": ["ランチ"], "matches": true }
+]

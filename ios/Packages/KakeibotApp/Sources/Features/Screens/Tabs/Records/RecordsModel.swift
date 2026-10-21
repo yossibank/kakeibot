@@ -9,6 +9,9 @@ import Store
 public final class RecordsModel: ScreenModel {
     public var today: LocalDate
     public var selectedDate: LocalDate?
+    public var isSearching = false
+    public var searchText = ""
+    public var filter = EntryFilter()
 
     public private(set) var month: YearMonth
     public private(set) var monthStartDay: MonthStartDay = .first
@@ -19,6 +22,7 @@ public final class RecordsModel: ScreenModel {
     public private(set) var stampCalendar: StampCalendar?
     public private(set) var stampShelf: IconShelf?
     public private(set) var recurrings: [Recurring] = []
+    public private(set) var recentSearches: [String] = []
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -43,8 +47,16 @@ public extension RecordsModel {
         PeriodText.range(period)
     }
 
+    struct SearchSummary: Equatable {
+        public let count: Int
+        public let expenseTotal: Int
+        public let incomeTotal: Int
+        public let range: ClosedRange<LocalDate>
+    }
+
     var days: [EntryDay] {
-        list?.days.filter { period.contains($0.date) } ?? []
+        let days = list?.days.filter { period.contains($0.date) } ?? []
+        return filter.apply(to: days)
     }
 
     var expenseTotal: Int {
@@ -53,6 +65,57 @@ public extension RecordsModel {
 
     var incomeTotal: Int {
         days.reduce(0) { $0 + $1.incomeTotal }
+    }
+
+    var searchDays: [EntryDay] {
+        let search = EntrySearch(searchText)
+
+        guard
+            !search.isEmpty,
+            let list
+        else {
+            return []
+        }
+
+        return filter.apply(to: list.days(matching: search))
+    }
+
+    var searchSummary: SearchSummary? {
+        let days = searchDays
+
+        guard
+            let first = days.last?.date,
+            let last = days.first?.date
+        else {
+            return nil
+        }
+
+        return SearchSummary(
+            count: days.reduce(0) { $0 + $1.entries.count },
+            expenseTotal: days.reduce(0) { $0 + $1.expenseTotal },
+            incomeTotal: days.reduce(0) { $0 + $1.incomeTotal },
+            range: first...last
+        )
+    }
+
+    var filterTitle: String? {
+        list?.title(of: filter)
+    }
+
+    func rememberSearch(_ text: String) async {
+        let words = EntrySearch.remembering(text, in: recentSearches)
+
+        guard words != recentSearches else {
+            return
+        }
+
+        recentSearches = words
+        await saveRecentSearches()
+    }
+
+    func clearRecentSearches() async {
+        recentSearches = []
+        await saveRecentSearches()
     }
 
     var weeks: [[LocalDate?]] {
@@ -168,6 +231,10 @@ public extension RecordsModel {
             group.addTask {
                 await self.observeMonthStartDay()
             }
+
+            group.addTask {
+                await self.observeRecentSearches()
+            }
         }
     }
 
@@ -271,6 +338,23 @@ private extension RecordsModel {
             failure: Self.loadFailedMessage
         ) { recurrings in
             self.recurrings = recurrings
+        }
+    }
+
+    func observeRecentSearches() async {
+        await observe(
+            database.settingUpdates(.recentSearches),
+            failure: Self.loadFailedMessage
+        ) { words in
+            recentSearches = words
+        }
+    }
+
+    func saveRecentSearches() async {
+        do {
+            try await database.setSetting(.recentSearches, to: recentSearches)
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 

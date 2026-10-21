@@ -11,7 +11,7 @@ struct BackupModelTests {
         let setup = try Setup()
         let model = BackupModel(database: setup.source, appVersion: "1.2")
 
-        let isMade = await model.makeFile(at: setup.now)
+        let isMade = await model.makeFile(.json, at: setup.now)
         let file = try #require(model.file)
         let export = try ExportV1(json: file.data)
 
@@ -21,11 +21,24 @@ struct BackupModelTests {
     }
 
     @Test
+    func writesSpreadsheet() async throws {
+        let setup = try Setup()
+        let model = BackupModel(database: setup.source)
+
+        await model.makeFile(.csv, at: setup.now)
+        let file = try #require(model.file)
+        let text = String(decoding: file.data, as: UTF8.self)
+
+        #expect(file.name == "kakeibot-2026-10-03.csv")
+        #expect(text == "\u{FEFF}日付,種類,金額,カテゴリ,タグ,財布,振替先,メモ\r\n")
+    }
+
+    @Test
     func restoresAfterConfirming() async throws {
         let setup = try Setup()
         let source = BackupModel(database: setup.source)
         let target = BackupModel(database: setup.target)
-        await source.makeFile(at: setup.now)
+        await source.makeFile(.json, at: setup.now)
         let file = try #require(source.file)
 
         let isRead = target.read(file.data)
@@ -44,7 +57,7 @@ struct BackupModelTests {
         let setup = try Setup()
         let source = BackupModel(database: setup.source)
         let target = BackupModel(database: setup.target)
-        await source.makeFile(at: setup.now)
+        await source.makeFile(.json, at: setup.now)
         let file = try #require(source.file)
 
         target.read(file.data)
