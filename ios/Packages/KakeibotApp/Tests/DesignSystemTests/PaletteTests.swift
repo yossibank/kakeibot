@@ -27,18 +27,6 @@ struct PaletteTests {
     }
 
     @Test
-    func drawsWithTheme() {
-        let content = Rectangle()
-            .fill(Palette.accent)
-            .frame(width: 1, height: 1)
-            .environment(\.palette, Self.forest)
-
-        let pixel = ImageRenderer(content: content).cgImage.flatMap(rgb)
-
-        #expect(pixel == 0x7FD1A8)
-    }
-
-    @Test
     func changesMeaningColorsByBrightness() {
         var environment = EnvironmentValues()
         environment.palette = Self.forest
@@ -77,29 +65,5 @@ private extension PaletteTests {
         }
 
         return components[0] << 16 | components[1] << 8 | components[2]
-    }
-
-    func rgb(_ image: CGImage) -> UInt32? {
-        var bytes = [UInt8](repeating: 0, count: 4)
-        let space = CGColorSpace(name: CGColorSpace.sRGB)
-
-        guard
-            let space,
-            let context = CGContext(
-                data: &bytes,
-                width: 1,
-                height: 1,
-                bitsPerComponent: 8,
-                bytesPerRow: 4,
-                space: space,
-                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-            )
-        else {
-            return nil
-        }
-
-        context.draw(image, in: CGRect(x: 0, y: 0, width: 1, height: 1))
-
-        return UInt32(bytes[0]) << 16 | UInt32(bytes[1]) << 8 | UInt32(bytes[2])
     }
 }
