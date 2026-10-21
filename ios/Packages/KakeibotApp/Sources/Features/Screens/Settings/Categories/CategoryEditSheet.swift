@@ -211,6 +211,11 @@ private extension CategoryEditSheet {
             .onPreferenceChange(TagLineMovingKey.self) { isMoving in
                 isMovingTag = isMoving
             }
+            .onChange(of: isMovingTag) {
+                if !isMovingTag {
+                    storeTags()
+                }
+            }
         }
     }
 
@@ -274,6 +279,7 @@ private extension CategoryEditSheet {
         return {
             model.removeTag(id)
             closeTag()
+            storeTags()
         }
     }
 
@@ -300,6 +306,12 @@ private extension CategoryEditSheet {
         }
     }
 
+    func storeTags() {
+        Task {
+            await model.storeTags()
+        }
+    }
+
     func closeTag() {
         model.clearTagProblem()
 
@@ -317,6 +329,7 @@ private extension CategoryEditSheet {
 
         if isDone {
             closeTag()
+            storeTags()
         }
     }
 

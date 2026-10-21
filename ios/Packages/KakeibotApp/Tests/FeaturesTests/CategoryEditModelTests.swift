@@ -125,6 +125,49 @@ struct CategoryEditModelTests {
         #expect(saved.map(\.name) == ["おやつ", "ランチ"])
         #expect(saved.allSatisfy { $0.categoryId == food.id })
     }
+
+    @Test
+    func storesTagsWithoutSavingCategory() async throws {
+        let database = try Self.database()
+        let list = try await database.categoryList()
+        let food = try #require(list.categories.first { $0.name == "食費" })
+
+        let model = CategoryEditModel(
+            database: database,
+            kind: .expense,
+            editing: food.id
+        )
+        await model.load()
+        model.name = "外食"
+
+        _ = model.addTag(" 朝ごはん ")
+        await model.storeTags()
+        _ = model.addTag("昼ごはん")
+        await model.storeTags()
+        let stored = try await database.categoryList()
+
+        #expect(stored.tags.map(\.name) == ["朝ごはん", "昼ごはん"])
+        #expect(stored.categories.contains { $0.name == "食費" })
+        #expect(model.tags.allSatisfy { $0.draft.id != nil })
+        #expect(model.isChanged)
+
+        model.name = "食費"
+
+        #expect(!model.isChanged)
+    }
+
+    @Test
+    func keepsTagsOfNewCategoryUntilSaved() async throws {
+        let database = try Self.database()
+        let model = CategoryEditModel(database: database, kind: .expense)
+
+        _ = model.addTag("朝ごはん")
+        await model.storeTags()
+        let stored = try await database.categoryList()
+
+        #expect(stored.tags.isEmpty)
+        #expect(model.isChanged)
+    }
 }
 
 private extension CategoryEditModelTests {

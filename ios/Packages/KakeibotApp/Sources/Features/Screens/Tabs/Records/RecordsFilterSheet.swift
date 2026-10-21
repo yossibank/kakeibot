@@ -19,21 +19,28 @@ struct RecordsFilterSheet: View {
 
             CapsulePicker(selection: $tab, options: tabOptions)
 
-            let items = items(in: tab)
-
-            if items.isEmpty {
+            if isEmpty {
                 Text(emptyText)
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .frame(maxWidth: .infinity, minHeight: 120)
             } else {
                 ScrollView {
-                    LazyVGrid(columns: Self.columns, spacing: 10) {
-                        ForEach(items) { item in
-                            choice(item)
+                    if tab == .tag {
+                        VStack(alignment: .leading, spacing: 14) {
+                            ForEach(tagGroups) { group in
+                                tagGroup(group)
+                            }
                         }
+                        .padding(.vertical, 4)
+                    } else {
+                        LazyVGrid(columns: Self.columns, spacing: 10) {
+                            ForEach(items(in: tab)) { item in
+                                choice(item)
+                            }
+                        }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -66,6 +73,16 @@ private extension RecordsFilterSheet {
         let icon: Icon?
         let isOn: Bool
         let toggle: () -> Void
+    }
+
+    struct TagGroup: Identifiable {
+        let category: EntryCategory
+        let icon: Icon?
+        let tags: [TagLine<EntryTag.ID>.Item]
+
+        var id: EntryCategory.ID {
+            category.id
+        }
     }
 
     var header: some View {
@@ -102,6 +119,25 @@ private extension RecordsFilterSheet {
                 }
             }
             .frame(width: Self.sideWidth, alignment: .trailing)
+        }
+    }
+
+    func tagGroup(_ group: TagGroup) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 6) {
+                IconBadge(group.icon, size: 22)
+
+                Text(group.category.name)
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+            }
+            .padding(.leading, 6)
+
+            TagRows(group.tags, selection: filter.tagIds) { id in
+                withAnimation(.snappy) {
+                    toggle(id, in: \.tagIds)
+                }
+            }
         }
     }
 
@@ -178,32 +214,56 @@ private extension RecordsFilterSheet {
         case .expense: categoryItems(.expense)
         case .income: categoryItems(.income)
         case .wallet: walletItems
-        case .tag: tagItems
+        case .tag: []
+        }
+    }
+
+    var isEmpty: Bool {
+        switch tab {
+        case .tag: tagGroups.isEmpty
+        case .expense, .income, .wallet: items(in: tab).isEmpty
         }
     }
 
     var emptyText: String {
         switch tab {
-        case .tag: "カテゴリの編集でタグを足すと、ここで選べます"
-        case .expense, .income, .wallet: "選べるものがありません"
+        case .tag where !filter.categoryIds.isEmpty:
+            "選んだカテゴリにはタグがありません"
+        case .tag:
+            "カテゴリの編集でタグを足すと、ここで選べます"
+        case .expense, .income, .wallet:
+            "選べるものがありません"
         }
     }
 
-    var tagItems: [Item] {
+    var tagGroups: [TagGroup] {
         let tags = list?.filterTags ?? []
 
-        return tags.map { tag in
-            let category = list?.categories[tag.categoryId]
+        return shownCategories.compactMap { category in
+            let items = tags
+                .filter { $0.categoryId == category.id }
+                .map { TagLine.Item(id: $0.id, name: $0.name) }
 
-            return Item(
-                id: tag.id,
-                name: tag.name,
-                icon: category.flatMap { list?.icons[$0.iconId] },
-                isOn: filter.tagIds.contains(tag.id)
-            ) {
-                toggle(tag.id, in: \.tagIds)
+            guard !items.isEmpty else {
+                return nil
             }
+
+            return TagGroup(
+                category: category,
+                icon: list?.icons[category.iconId],
+                tags: items
+            )
         }
+    }
+
+    var shownCategories: [EntryCategory] {
+        let categories = list?.filterCategories ?? []
+
+        guard !filter.categoryIds.isEmpty else {
+            return categories
+        }
+
+        return categories.filter { filter.categoryIds.contains($0.id) }
     }
 
     func categoryItems(_ kind: EntryCategory.Kind) -> [Item] {
@@ -219,6 +279,7 @@ private extension RecordsFilterSheet {
                     isOn: filter.categoryIds.contains(category.id)
                 ) {
                     toggle(category.id, in: \.categoryIds)
+                    keepShownTags()
                 }
             }
     }
@@ -236,6 +297,11 @@ private extension RecordsFilterSheet {
                 toggle(wallet.id, in: \.walletIds)
             }
         }
+    }
+
+    func keepShownTags() {
+        let shown = Set(tagGroups.flatMap { $0.tags.map(\.id) })
+        filter.tagIds.formIntersection(shown)
     }
 
     func toggle<ID: Hashable>(

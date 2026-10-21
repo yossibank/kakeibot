@@ -19,6 +19,7 @@ public final class CategoryEditModel {
     public let icon = IconEditModel(glyph: .food)
 
     private var baseline: Snapshot?
+    private var tagWrite: Task<Void, Never>?
 
     private let database: AppDatabase
     private let editingId: EntryCategory.ID?
@@ -161,6 +162,18 @@ public extension CategoryEditModel {
         }
     }
 
+    func storeTags() async {
+        let previous = tagWrite
+
+        let write = Task {
+            await previous?.value
+            await writeTags()
+        }
+
+        tagWrite = write
+        await write.value
+    }
+
     func save() async -> EntryCategory? {
         do {
             return try await database.saveCategory(
@@ -241,6 +254,40 @@ private extension CategoryEditModel {
         case nil:
             tagProblem = nil
             return true
+        }
+    }
+
+    func writeTags() async {
+        guard let editingId else {
+            return
+        }
+
+        let sent = tags
+
+        do {
+            let saved = try await database.saveTags(
+                sent.map(\.draft),
+                for: editingId,
+                at: Date()
+            )
+
+            let drafts = zip(sent, saved).map { editing, tag in
+                var draft = editing.draft
+                draft.id = tag.id
+                return draft
+            }
+
+            for (editing, draft) in zip(sent, drafts) {
+                let index = tags.firstIndex { $0.id == editing.id }
+
+                if let index {
+                    tags[index].draft.id = draft.id
+                }
+            }
+
+            baseline = baseline.map { Snapshot(draft: $0.draft, tags: drafts) }
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 

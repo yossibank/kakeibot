@@ -299,35 +299,24 @@ public struct SettingsSheet: View {
                         VStack(alignment: .leading, spacing: 6) {
                             sectionTitle("このアプリ")
 
-                            VStack(spacing: 0) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "info.circle")
-                                        .font(.sans(.body, weight: .light))
-                                        .foregroundStyle(Palette.accent)
-                                        .frame(width: 22)
+                            HStack(spacing: 12) {
+                                Image(systemName: "info.circle")
+                                    .font(.sans(.body, weight: .light))
+                                    .foregroundStyle(Palette.accent)
+                                    .frame(width: 22)
 
-                                    Text("バージョン")
-                                        .textFont(.subheadline)
-                                        .foregroundStyle(Palette.text)
+                                Text("バージョン")
+                                    .textFont(.subheadline)
+                                    .foregroundStyle(Palette.text)
 
-                                    Spacer()
+                                Spacer()
 
-                                    Text(Self.versionText)
-                                        .textFont(.footnote)
-                                        .monospacedDigit()
-                                        .foregroundStyle(Palette.subtext)
-                                }
-                                .frame(minHeight: 48)
-
-                                Hairline()
-
-                                NavigationLink {
-                                    LicenseListView()
-                                } label: {
-                                    row("ライセンス", systemImage: "doc.text")
-                                }
+                                Text(Bundle.main.shortVersion)
+                                    .textFont(.footnote)
+                                    .monospacedDigit()
+                                    .foregroundStyle(Palette.subtext)
                             }
-                            .buttonStyle(.plain)
+                            .frame(minHeight: 48)
                             .padding(.horizontal, 14)
                             .card()
                         }
@@ -437,10 +426,6 @@ private extension SettingsSheet {
 }
 
 private extension SettingsSheet {
-    static var versionText: String {
-        "\(Bundle.main.shortVersion)（\(Bundle.main.buildNumber)）"
-    }
-
     static let startOptions: [CapsulePicker<Bool>.Option] = [
         .init("する", value: true),
         .init("しない", value: false)

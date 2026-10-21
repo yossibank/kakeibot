@@ -37,6 +37,26 @@ struct TagWriteTests {
     }
 
     @Test
+    func savesOnlyTagsOfCategory() async throws {
+        let setup = try await Setup()
+        let food = try await setup.category(named: "食費")
+        let drafts = [EntryTagDraft(name: "朝ごはん")]
+
+        let saved = try await setup.database.saveTags(
+            drafts,
+            for: food.id,
+            at: setup.now
+        )
+
+        let tags = try await setup.foodTags()
+        let category = try await setup.category(named: "食費")
+
+        #expect(saved.map(\.id) == tags.map(\.id))
+        #expect(tags.map(\.name) == ["朝ごはん"])
+        #expect(category == food)
+    }
+
+    @Test
     func rejectsUnknownTag() async throws {
         let setup = try await Setup()
         let drafts = [EntryTagDraft(id: EntryTag.ID(), name: "朝ごはん")]
