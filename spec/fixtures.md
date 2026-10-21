@@ -67,13 +67,13 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | `entry-day.json` | 記録を日ごとにまとめ、支出と収入の合計を出す | `entries`（`id`・`type`・`amount`・`date`・`createdAt`）、`days`（`date`・`expense`・`income`・`entryIds`） |
 | `entry-search.json` | 検索の言葉に記録が当てはまるか | `query`、`amount`、`texts`（メモ・カテゴリ・タグ・口座の名前）、`matches` |
 | `entry-search-recent.json` | 探した言葉を覚えたときの並び | `recent`、`text`、`result` |
-| `entry-filter.json` | カテゴリと口座で絞り込んだときに残る記録 | `categories`、`wallets`、`entries`（`id`・`category`・`wallet`・`toWallet`・`date`）、`keptIds` |
+| `entry-filter.json` | カテゴリ・口座・タグで絞り込んだときに残る記録 | `categories`、`wallets`、`tags`、`entries`（`id`・`category`・`wallet`・`toWallet`・`tag`・`date`）、`keptIds` |
 
 `entry-day.json` の日は新しい順に並べる。同じ日の記録は `createdAt` の新しい順にし、同じ時刻なら `id` の小さい順にする。
 
 `entry-search.json` の `query` は空白（全角も含む）で言葉に分け、すべての言葉が当てはまれば真にする。言葉は `texts` のどれかに含まれるか、`¥`・`\`・`,`・`円` を除いた数が `amount` と同じなら当てはまる。大文字と小文字、全角と半角は区別しない。言葉が無ければ真にする。
 
-`entry-search-recent.json` は、`text` の前後の空白を除いて先頭に足し、同じ言葉は前のものを消す。5 つを超えたら古いものから消す。空なら `recent` のままにする。`entry-filter.json` は、`categories` と `wallets` が空ならすべてを残す。`categories` を選んでいれば、そのカテゴリの記録だけを残し、カテゴリの無い記録は外す。`wallets` を選んでいれば、`wallet` か `toWallet` がそのどれかの記録だけを残す。両方を選んでいれば、両方に当てはまる記録を残す。残る記録は `entry-day.json` と同じ順にする。
+`entry-search-recent.json` は、`text` の前後の空白を除いて先頭に足し、同じ言葉は前のものを消す。5 つを超えたら古いものから消す。空なら `recent` のままにする。`entry-filter.json` は、`categories`・`wallets`・`tags` が空ならすべてを残す。`categories` を選んでいれば、そのカテゴリの記録だけを残し、カテゴリの無い記録は外す。`wallets` を選んでいれば、`wallet` か `toWallet` がそのどれかの記録だけを残す。`tags` を選んでいれば、そのタグの記録だけを残し、タグの無い記録は外す。いくつかを選んでいれば、すべてに当てはまる記録を残す。残る記録は `entry-day.json` と同じ順にする。
 
 ## export
 

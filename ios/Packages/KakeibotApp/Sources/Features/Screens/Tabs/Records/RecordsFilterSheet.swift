@@ -19,15 +19,24 @@ struct RecordsFilterSheet: View {
 
             CapsulePicker(selection: $tab, options: tabOptions)
 
-            ScrollView {
-                LazyVGrid(columns: Self.columns, spacing: 10) {
-                    ForEach(items(in: tab)) { item in
-                        choice(item)
+            let items = items(in: tab)
+
+            if items.isEmpty {
+                Text(emptyText)
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .frame(maxWidth: .infinity, minHeight: 120)
+            } else {
+                ScrollView {
+                    LazyVGrid(columns: Self.columns, spacing: 10) {
+                        ForEach(items) { item in
+                            choice(item)
+                        }
                     }
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
         }
         .padding(.horizontal, 18)
         .padding(.top, 18)
@@ -48,6 +57,7 @@ private extension RecordsFilterSheet {
         case expense
         case income
         case wallet
+        case tag
     }
 
     struct Item: Identifiable {
@@ -138,11 +148,13 @@ private extension RecordsFilterSheet {
         let expense = tabTitle("支出", count: count(of: .expense))
         let income = tabTitle("収入", count: count(of: .income))
         let wallet = tabTitle("口座", count: filter.walletIds.count)
+        let tag = tabTitle("タグ", count: filter.tagIds.count)
 
         return [
             .init(expense, value: .expense),
             .init(income, value: .income),
-            .init(wallet, value: .wallet)
+            .init(wallet, value: .wallet),
+            .init(tag, value: .tag)
         ]
     }
 
@@ -166,6 +178,31 @@ private extension RecordsFilterSheet {
         case .expense: categoryItems(.expense)
         case .income: categoryItems(.income)
         case .wallet: walletItems
+        case .tag: tagItems
+        }
+    }
+
+    var emptyText: String {
+        switch tab {
+        case .tag: "カテゴリの編集でタグを足すと、ここで選べます"
+        case .expense, .income, .wallet: "選べるものがありません"
+        }
+    }
+
+    var tagItems: [Item] {
+        let tags = list?.filterTags ?? []
+
+        return tags.map { tag in
+            let category = list?.categories[tag.categoryId]
+
+            return Item(
+                id: tag.id,
+                name: tag.name,
+                icon: category.flatMap { list?.icons[$0.iconId] },
+                isOn: filter.tagIds.contains(tag.id)
+            ) {
+                toggle(tag.id, in: \.tagIds)
+            }
         }
     }
 

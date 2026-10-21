@@ -7,7 +7,8 @@ struct EntryFilterTests {
     func keepsChosenEntries(fixture: FilterCase) {
         let filter = EntryFilter(
             categoryIds: Set(fixture.categories),
-            walletIds: Set(fixture.wallets)
+            walletIds: Set(fixture.wallets),
+            tagIds: Set(fixture.tags)
         )
 
         let days = EntryDay.grouping(fixture.entries.map(\.entry))
@@ -22,6 +23,7 @@ extension EntryFilterTests {
     struct FilterCase: Decodable, Sendable {
         let categories: [EntryCategory.ID]
         let wallets: [Wallet.ID]
+        let tags: [EntryTag.ID]
         let entries: [EntryItem]
         let keptIds: [Entry.ID]
     }
@@ -31,6 +33,7 @@ extension EntryFilterTests {
         let category: EntryCategory.ID?
         let wallet: Wallet.ID
         let toWallet: Wallet.ID?
+        let tag: EntryTag.ID?
         let date: LocalDate
     }
 }
@@ -45,6 +48,7 @@ extension EntryFilterTests.EntryItem {
             amount: 100,
             date: date,
             categoryId: category,
+            tagId: tag,
             walletId: wallet,
             toWalletId: toWallet,
             createdAt: createdAt,

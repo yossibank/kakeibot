@@ -1,23 +1,28 @@
 public struct EntryFilter: Hashable, Sendable {
     public var categoryIds: Set<EntryCategory.ID>
     public var walletIds: Set<Wallet.ID>
+    public var tagIds: Set<EntryTag.ID>
 
     public init(
         categoryIds: Set<EntryCategory.ID> = [],
-        walletIds: Set<Wallet.ID> = []
+        walletIds: Set<Wallet.ID> = [],
+        tagIds: Set<EntryTag.ID> = []
     ) {
         self.categoryIds = categoryIds
         self.walletIds = walletIds
+        self.tagIds = tagIds
     }
 }
 
 public extension EntryFilter {
     var isEmpty: Bool {
-        categoryIds.isEmpty && walletIds.isEmpty
+        categoryIds.isEmpty && walletIds.isEmpty && tagIds.isEmpty
     }
 
     func includes(_ entry: Entry) -> Bool {
-        includesCategory(of: entry) && includesWallet(of: entry)
+        includesCategory(of: entry)
+            && includesWallet(of: entry)
+            && includesTag(of: entry)
     }
 
     func apply(to days: [EntryDay]) -> [EntryDay] {
@@ -41,6 +46,18 @@ private extension EntryFilter {
         }
 
         return categoryIds.contains(categoryId)
+    }
+
+    func includesTag(of entry: Entry) -> Bool {
+        guard !tagIds.isEmpty else {
+            return true
+        }
+
+        guard let tagId = entry.tagId else {
+            return false
+        }
+
+        return tagIds.contains(tagId)
     }
 
     func includesWallet(of entry: Entry) -> Bool {
