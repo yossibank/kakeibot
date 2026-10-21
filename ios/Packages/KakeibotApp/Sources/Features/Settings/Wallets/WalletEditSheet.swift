@@ -9,6 +9,8 @@ public struct WalletEditSheet: View {
     @State private var isEnteringAmount = false
     @State private var isConfirmingHide = false
     @State private var isEditingPayment = false
+    @State private var isAskingPayment = false
+    @State private var addedLoan: Wallet?
 
     @FocusState private var focus: Field?
 
@@ -77,11 +79,20 @@ public struct WalletEditSheet: View {
             focus = nil
         }
         .sheet(isPresented: $isEditingPayment) {
-            Task {
-                await model.loadPayment()
-            }
+            closePayment()
         } content: {
-            RecurringEditSheet(model: model.paymentModel())
+            RecurringEditSheet(model: model.paymentModel(for: addedLoan?.id))
+        }
+        .alert("毎月の返済も決めますか", isPresented: $isAskingPayment) {
+            Button("あとで", role: .cancel) {
+                finishAddedLoan()
+            }
+
+            Button("決める") {
+                isEditingPayment = true
+            }
+        } message: {
+            Text("固定費として、返済の日と額を決められます")
         }
         .task {
             await model.load()
@@ -437,7 +448,33 @@ private extension WalletEditSheet {
             return
         }
 
-        onSave(wallet)
+        guard !model.isEditing, wallet.kind == .loan else {
+            onSave(wallet)
+            dismiss()
+            return
+        }
+
+        addedLoan = wallet
+        isAskingPayment = true
+    }
+
+    func closePayment() {
+        guard addedLoan == nil else {
+            finishAddedLoan()
+            return
+        }
+
+        Task {
+            await model.loadPayment()
+        }
+    }
+
+    func finishAddedLoan() {
+        guard let addedLoan else {
+            return
+        }
+
+        onSave(addedLoan)
         dismiss()
     }
 

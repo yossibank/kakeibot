@@ -72,13 +72,7 @@ private extension AssetsView {
 
     var totalCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
-                SectionTitle("手元のお金")
-
-                Text("未払いを引いた額")
-                    .textFont(size: .micro)
-                    .foregroundStyle(Palette.hint)
-            }
+            SectionTitle("手元のお金")
 
             HStack(alignment: .firstTextBaseline) {
                 Text(AmountText.text(model.total))
@@ -360,12 +354,14 @@ private extension AssetsView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
-            Text(row.nextBill.map(nextBillText) ?? " ")
-                .textFont(.caption2)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+            if row.wallet.kind == .card {
+                Text(row.nextBill.map(nextBillText) ?? "引き落としは未設定")
+                    .textFont(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 74, alignment: .leading)

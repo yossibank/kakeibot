@@ -1,9 +1,9 @@
 import Core
 import GRDB
 
-enum MigrationV14 {}
+enum MigrationV15 {}
 
-extension MigrationV14 {
+extension MigrationV15 {
     static func migrate(_ db: Database) throws {
         try db.create(table: "new_wallet") { table in
             table.primaryKey("id", .text)
@@ -25,7 +25,7 @@ extension MigrationV14 {
     }
 }
 
-private extension MigrationV14 {
+private extension MigrationV15 {
     static let columns = """
     id, name, kind, icon_id, initial_balance, sort_order, archived_at,
     created_at, updated_at

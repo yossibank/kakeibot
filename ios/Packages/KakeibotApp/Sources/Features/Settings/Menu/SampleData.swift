@@ -18,8 +18,15 @@ extension SampleData {
         now: Date
     ) async throws {
         let card = try await database.saveWallet(cardDraft, at: now)
+        _ = try await database.saveWallet(investmentDraft, at: now)
+        let loan = try await database.saveWallet(loanDraft, at: now)
         let options = try await database.entryOptions()
-        let book = try Book(options: options, card: card.id)
+
+        let book = try Book(
+            options: options,
+            card: card.id,
+            loan: loan.id
+        )
         var drafts: [EntryDraft] = []
         var noSpendDays: [LocalDate] = []
 
@@ -58,6 +65,7 @@ private extension SampleData {
         let cash: Wallet.ID
         let bank: Wallet.ID
         let card: Wallet.ID
+        let loan: Wallet.ID
     }
 
     static var cardDraft: WalletDraft {
@@ -67,6 +75,26 @@ private extension SampleData {
             mark: .glyph(.card),
             color: "#7E89A0",
             initialBalance: 0
+        )
+    }
+
+    static var investmentDraft: WalletDraft {
+        WalletDraft(
+            kind: .investment,
+            name: "つみたて",
+            mark: .glyph(.invest),
+            color: "#5C9A7A",
+            initialBalance: 360_000
+        )
+    }
+
+    static var loanDraft: WalletDraft {
+        WalletDraft(
+            kind: .loan,
+            name: "奨学金",
+            mark: .glyph(.contract),
+            color: "#8A7FA8",
+            initialBalance: -1_200_000
         )
     }
 
@@ -286,6 +314,15 @@ private extension SampleData {
                 day: 27,
                 remind: 3,
                 "家賃"
+            ),
+            draft(
+                .transfer,
+                nil,
+                15000,
+                from: book.bank,
+                to: book.loan,
+                day: 27,
+                "奨学金の返済"
             )
         ]
 
@@ -342,7 +379,8 @@ private extension SampleData {
 private extension SampleData.Book {
     init(
         options: EntryOptions,
-        card: Wallet.ID
+        card: Wallet.ID,
+        loan: Wallet.ID
     ) throws {
         let expense = Dictionary(
             options.expenseCategories.map { ($0.name, $0.id) },
@@ -372,7 +410,8 @@ private extension SampleData.Book {
             income: income,
             cash: cash,
             bank: bank,
-            card: card
+            card: card,
+            loan: loan
         )
     }
 

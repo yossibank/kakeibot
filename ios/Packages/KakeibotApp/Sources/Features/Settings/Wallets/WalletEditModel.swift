@@ -161,14 +161,14 @@ public extension WalletEditModel {
         }
     }
 
-    func paymentModel() -> RecurringEditModel {
+    func paymentModel(for id: Wallet.ID? = nil) -> RecurringEditModel {
         let today = LocalDate(Date(), in: .current)
 
         return RecurringEditModel(
             database: database,
             today: today,
             editing: payment?.id,
-            paying: editingId
+            paying: id ?? editingId
         )
     }
 
