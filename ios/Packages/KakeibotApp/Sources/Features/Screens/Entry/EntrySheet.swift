@@ -284,11 +284,19 @@ private extension EntrySheet {
             Button {
                 editMemo(true)
             } label: {
-                Chip(
-                    model.memo.isEmpty ? "メモ" : model.memo,
-                    systemImage: "square.and.pencil",
-                    isHighlighted: !model.memo.isEmpty
-                )
+                ViewThatFits(in: .horizontal) {
+                    Chip(
+                        memoTitle,
+                        systemImage: "square.and.pencil",
+                        isHighlighted: !model.memo.isEmpty
+                    )
+
+                    Chip(
+                        "",
+                        systemImage: "square.and.pencil",
+                        isHighlighted: !model.memo.isEmpty
+                    )
+                }
             }
             .layoutPriority(-1)
             .onGeometryChange(for: CGRect.self) { proxy in
@@ -629,6 +637,10 @@ private extension EntrySheet {
 
     var today: LocalDate {
         LocalDate(Date(), in: .current)
+    }
+
+    var memoTitle: String {
+        model.memo.isEmpty ? "メモ" : model.memo
     }
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {
