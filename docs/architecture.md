@@ -136,6 +136,7 @@ KakeibotApp/
 │   │   │   ├── Onboarding/  最初の設定のチュートリアル
 │   │   │   ├── Settings/
 │   │   │   │   ├── AppIcons/    アプリアイコンの色違いを選ぶ画面と見本
+│   │   │   │   ├── Backup/      全データの書き出しと読み込み
 │   │   │   │   ├── Budgets/     予算の一覧と額の入力
 │   │   │   │   ├── Categories/
 │   │   │   │   ├── Launch/      起動時に開く画面を選ぶ画面と、その行と見本

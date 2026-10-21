@@ -291,6 +291,24 @@ public struct SettingsSheet: View {
                             .card()
                         }
 
+                        VStack(alignment: .leading, spacing: 6) {
+                            sectionTitle("データ")
+
+                            NavigationLink {
+                                BackupView(
+                                    model: BackupModel(database: database)
+                                )
+                            } label: {
+                                row(
+                                    "バックアップ",
+                                    systemImage: "externaldrive"
+                                )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 14)
+                            .card()
+                        }
+
                         #if DEBUG
                         sampleSection
                         #endif
