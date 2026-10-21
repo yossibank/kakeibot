@@ -97,11 +97,7 @@ private extension ThemeEditSheet {
 
             Spacer()
 
-            Text(model.isEditing ? "テーマを編集" : "テーマをつくる")
-                .displayFont(.body)
-                .tracking(4)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Palette.accent)
+            SettingsSheetTitle(model.isEditing ? "テーマを編集" : "テーマをつくる")
 
             Spacer()
 

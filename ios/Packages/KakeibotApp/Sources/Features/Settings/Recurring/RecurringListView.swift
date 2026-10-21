@@ -17,6 +17,7 @@ public struct RecurringListView: View {
     @State private var autoScroll = SettingsAutoScroll()
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: Recurring.ID?
+    @State private var deletion: Deletion?
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<Recurring.ID>?
     @State private var isOverShowZone = false
@@ -73,6 +74,13 @@ public struct RecurringListView: View {
             .settingsHideNotice($hiddenId, message: "止めて非表示にしました") { id in
                 show(id)
             }
+            .settingsHideNotice(
+                $deletion,
+                message: "削除しました",
+                systemImage: "trash"
+            ) { deletion in
+                restore(deletion)
+            }
 
             if lift != nil {
                 SettingsHideTarget(zones: $zones, state: hideHover.state)
@@ -99,7 +107,11 @@ public struct RecurringListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
-            RecurringEditSheet(model: model.editModel(for: sheet.editingId))
+            RecurringEditSheet(
+                model: model.editModel(for: sheet.editingId)
+            ) { deletion in
+                self.deletion = deletion
+            }
         }
         .confirmation(
             isPresented: $isConfirmingDelete,
@@ -471,7 +483,13 @@ private extension RecurringListView {
 
     func delete(_ id: Recurring.ID) {
         Task {
-            await model.delete(id)
+            deletion = await model.delete(id)
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
         }
     }
 

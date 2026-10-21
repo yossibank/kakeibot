@@ -337,12 +337,17 @@ struct RecurringWriteTests {
         )
 
         let id = try #require(setup.database.snapshot().recurrings.first?.id)
-        try await setup.database.deleteRecurring(id)
+        let deletion = try await setup.database.deleteRecurring(id)
         let snapshot = try setup.database.snapshot()
+
+        try await setup.database.restore(deletion)
+        let restored = try setup.database.snapshot()
 
         #expect(snapshot.recurrings.isEmpty)
         #expect(snapshot.entries.count == 2)
         #expect(snapshot.entries.allSatisfy { $0.recurringId == nil })
+        #expect(restored.recurrings.map(\.id) == [id])
+        #expect(restored.entries.allSatisfy { $0.recurringId == id })
     }
 
     @Test

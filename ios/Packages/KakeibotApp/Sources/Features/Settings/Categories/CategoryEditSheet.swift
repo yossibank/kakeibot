@@ -143,11 +143,7 @@ private extension CategoryEditSheet {
 
             Spacer()
 
-            Text(model.isEditing ? "カテゴリを編集" : "カテゴリを追加")
-                .displayFont(.body)
-                .tracking(4)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Palette.accent)
+            SettingsSheetTitle(model.isEditing ? "カテゴリを編集" : "カテゴリを追加")
 
             Spacer()
 

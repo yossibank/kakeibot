@@ -72,9 +72,11 @@ public extension AppDatabase {
         }
     }
 
-    func deleteRecurring(_ id: Recurring.ID) async throws {
+    @discardableResult
+    func deleteRecurring(_ id: Recurring.ID) async throws -> Deletion {
         try await writer.write { db in
-            try Self.deleteRecurrings(Recurring.filter(id: id), in: db)
+            let recurrings = Recurring.filter(id: id)
+            return try Self.deleteRecurrings(recurrings, in: db)
         }
     }
 

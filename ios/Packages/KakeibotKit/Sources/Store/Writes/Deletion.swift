@@ -12,4 +12,5 @@ public struct Deletion: Hashable, Sendable, Identifiable {
     var budgets: [Budget] = []
     var valuations: [Valuation] = []
     var shelfIcons: [ShelfIcon] = []
+    var entries: [Entry] = []
 }

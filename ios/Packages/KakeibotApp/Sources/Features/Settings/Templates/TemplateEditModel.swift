@@ -193,17 +193,16 @@ public extension TemplateEditModel {
         }
     }
 
-    func delete() async -> Bool {
+    func delete() async -> Deletion? {
         guard let editingId else {
-            return false
+            return nil
         }
 
         do {
-            try await database.deleteTemplate(editingId)
-            return true
+            return try await database.deleteTemplate(editingId)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-            return false
+            return nil
         }
     }
 

@@ -224,11 +224,7 @@ private extension WalletEditSheet {
 
             Spacer()
 
-            Text(title)
-                .displayFont(.body)
-                .tracking(4)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Palette.accent)
+            SettingsSheetTitle(title)
 
             Spacer()
 

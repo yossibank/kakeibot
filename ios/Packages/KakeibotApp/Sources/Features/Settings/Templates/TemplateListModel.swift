@@ -100,13 +100,23 @@ public extension TemplateListModel {
         return await setHidden(id, isHidden: true, failure: failure)
     }
 
-    func delete(_ id: EntryTemplate.ID) async {
+    func delete(_ id: EntryTemplate.ID) async -> Deletion? {
         movingOrder = nil
 
         do {
-            try await database.deleteTemplate(id)
+            return try await database.deleteTemplate(id)
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
+            return nil
+        }
+    }
+
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await database.restore(deletion)
+            await load()
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage)
         }
     }
 
@@ -139,6 +149,7 @@ private extension TemplateListModel {
     static let hideFailedMessage = "非表示にできませんでした"
     static let showFailedMessage = "表示に戻せませんでした"
     static let deleteFailedMessage = "削除できませんでした"
+    static let restoreFailedMessage = "元に戻せませんでした"
 
     func templates(isHidden: Bool) -> [EntryTemplate] {
         templates.filter { template in

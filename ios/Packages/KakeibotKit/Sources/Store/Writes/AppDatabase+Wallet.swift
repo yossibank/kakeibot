@@ -102,25 +102,6 @@ public extension AppDatabase {
     }
 }
 
-extension AppDatabase {
-    static func deleteRecurrings(
-        _ recurrings: QueryInterfaceRequest<Recurring>,
-        in db: Database
-    ) throws {
-        let ids = try recurrings.fetchAll(db).map(\.id)
-
-        try Entry
-            .filter(ids.contains(Column("recurring_id")))
-            .updateAll(
-                db,
-                Column("recurring_id").set(to: nil),
-                Column("recurring_date").set(to: nil)
-            )
-
-        try recurrings.deleteAll(db)
-    }
-}
-
 private extension AppDatabase {
     static func insertWallet(
         _ draft: WalletDraft,

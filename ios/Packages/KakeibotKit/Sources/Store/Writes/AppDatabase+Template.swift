@@ -53,9 +53,19 @@ public extension AppDatabase {
         }
     }
 
-    func deleteTemplate(_ id: EntryTemplate.ID) async throws {
+    @discardableResult
+    func deleteTemplate(_ id: EntryTemplate.ID) async throws -> Deletion {
         try await writer.write { db in
-            _ = try EntryTemplate.deleteOne(db, key: id)
+            let templates = EntryTemplate.filter(id: id)
+            let entries = Entry.filter(Column("template_id") == id)
+
+            let deletion = try Deletion(
+                templates: templates.fetchAll(db),
+                entries: entries.fetchAll(db)
+            )
+
+            try templates.deleteAll(db)
+            return deletion
         }
     }
 

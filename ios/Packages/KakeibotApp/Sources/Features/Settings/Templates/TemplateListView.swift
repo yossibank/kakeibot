@@ -14,6 +14,7 @@ public struct TemplateListView: View {
     @State private var contentOrigin: CGPoint = .zero
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: EntryTemplate.ID?
+    @State private var deletion: Deletion?
     @State private var openId: EntryTemplate.ID?
     @State private var deleting: EntryTemplate.ID?
     @State private var isConfirmingDelete = false
@@ -74,6 +75,13 @@ public struct TemplateListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
+            .settingsHideNotice(
+                $deletion,
+                message: "削除しました",
+                systemImage: "trash"
+            ) { deletion in
+                restore(deletion)
+            }
 
             if lift != nil {
                 SettingsHideTarget(zones: $zones, state: hideHover.state)
@@ -100,7 +108,10 @@ public struct TemplateListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: showCount)
         .sheet(item: $sheet) { sheet in
-            TemplateEditSheet(model: editModel(for: sheet))
+            TemplateEditSheet(model: editModel(for: sheet)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
         }
         .confirmation(
             isPresented: $isConfirmingDelete,
@@ -471,7 +482,13 @@ private extension TemplateListView {
 
     func delete(_ id: EntryTemplate.ID) {
         Task {
-            await model.delete(id)
+            deletion = await model.delete(id)
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
         }
     }
 

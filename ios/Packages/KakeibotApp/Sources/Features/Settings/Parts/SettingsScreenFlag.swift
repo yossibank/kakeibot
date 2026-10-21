@@ -44,7 +44,8 @@ public extension SettingsScreenFlag {
         SettingsScreenFlag(
             database: database,
             key: .openHiddenLists,
-            screen: screen
+            screen: screen,
+            isOn: true
         )
     }
 

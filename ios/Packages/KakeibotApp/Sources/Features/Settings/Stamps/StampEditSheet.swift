@@ -100,11 +100,7 @@ private extension StampEditSheet {
 
             Spacer()
 
-            Text(model.isEditing ? "スタンプを編集" : "スタンプを追加")
-                .displayFont(.body)
-                .tracking(4)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Palette.accent)
+            SettingsSheetTitle(model.isEditing ? "スタンプを編集" : "スタンプを追加")
 
             Spacer()
 

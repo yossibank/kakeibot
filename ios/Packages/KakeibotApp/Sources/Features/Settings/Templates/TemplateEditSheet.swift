@@ -16,13 +16,16 @@ public struct TemplateEditSheet: View {
     @Environment(\.themeStyle.displayFont) private var themeFont
 
     let onSave: (EntryTemplate) -> Void
+    let onDelete: (Deletion) -> Void
 
     public init(
         model: TemplateEditModel,
-        onSave: @escaping (EntryTemplate) -> Void = { _ in }
+        onSave: @escaping (EntryTemplate) -> Void = { _ in },
+        onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
         self.onSave = onSave
+        self.onDelete = onDelete
     }
 
     public var body: some View {
@@ -149,11 +152,7 @@ private extension TemplateEditSheet {
 
             Spacer()
 
-            Text(title)
-                .displayFont(.body)
-                .tracking(4)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Palette.accent)
+            SettingsSheetTitle(title)
 
             Spacer()
 
@@ -561,7 +560,8 @@ private extension TemplateEditSheet {
     }
 
     func delete() async {
-        if await model.delete() {
+        if let deletion = await model.delete() {
+            onDelete(deletion)
             dismiss()
         }
     }

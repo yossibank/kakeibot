@@ -220,17 +220,16 @@ public extension RecurringEditModel {
         }
     }
 
-    func delete() async -> Bool {
+    func delete() async -> Deletion? {
         guard let editingId else {
-            return false
+            return nil
         }
 
         do {
-            try await database.deleteRecurring(editingId)
-            return true
+            return try await database.deleteRecurring(editingId)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-            return false
+            return nil
         }
     }
 

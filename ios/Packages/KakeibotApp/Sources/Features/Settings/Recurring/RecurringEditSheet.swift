@@ -13,8 +13,14 @@ public struct RecurringEditSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    public init(model: RecurringEditModel) {
+    private let onDelete: (Deletion) -> Void
+
+    public init(
+        model: RecurringEditModel,
+        onDelete: @escaping (Deletion) -> Void = { _ in }
+    ) {
         _model = State(initialValue: model)
+        self.onDelete = onDelete
     }
 
     public var body: some View {
@@ -126,11 +132,7 @@ private extension RecurringEditSheet {
 
             Spacer()
 
-            Text(headerTitle)
-                .displayFont(.body)
-                .tracking(4)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Palette.accent)
+            SettingsSheetTitle(headerTitle)
 
             Spacer()
 
@@ -613,7 +615,8 @@ private extension RecurringEditSheet {
     }
 
     func delete() async {
-        if await model.delete() {
+        if let deletion = await model.delete() {
+            onDelete(deletion)
             dismiss()
         }
     }
