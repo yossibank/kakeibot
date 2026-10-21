@@ -5,6 +5,7 @@ import SwiftUI
 
 public struct ThemeListView: View {
     @State private var model: ThemeListModel
+    @State private var hintFlag: SettingsScreenFlag
     @State private var editing: EditTarget?
     @State private var menu: Menu?
     @State private var pressing: ThemeChoice?
@@ -21,6 +22,8 @@ public struct ThemeListView: View {
     ) {
         let model = ThemeListModel(database: database, appIcon: appIcon)
         _model = State(initialValue: model)
+        let hintFlag = SettingsScreenFlag.closedHint(.themes, in: database)
+        _hintFlag = State(initialValue: hintFlag)
         self.database = database
         self.appIcon = appIcon
     }
@@ -28,10 +31,10 @@ public struct ThemeListView: View {
     public var body: some View {
         ZStack(alignment: .topLeading) {
             VStack(spacing: 14) {
-                SettingsBackHeader("テーマ")
+                SettingsBackHeader("テーマ", hint: hintFlag)
 
                 SettingsHint(
-                    flag: .closedHint(.themes, in: database),
+                    flag: hintFlag,
                     lines: Self.hint
                 )
 

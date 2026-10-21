@@ -6,7 +6,8 @@ import SwiftUI
 public struct WalletListView: View {
     @State private var drag = SettingsDrag<Wallet.ID>()
     @State private var model: WalletListModel
-    @State private var sheet: Sheet?
+    @State private var hintFlag: SettingsScreenFlag
+    @State private var destination: Destination?
     @State private var openId: Wallet.ID?
     @State private var hiddenId: Wallet.ID?
     @State private var deletion: Deletion?
@@ -23,6 +24,8 @@ public struct WalletListView: View {
 
     public init(database: AppDatabase) {
         _model = State(initialValue: WalletListModel(database: database))
+        let hintFlag = SettingsScreenFlag.closedHint(.wallets, in: database)
+        _hintFlag = State(initialValue: hintFlag)
         let hiddenList = SettingsScreenFlag.openHiddenList(
             .wallets,
             in: database
@@ -33,10 +36,10 @@ public struct WalletListView: View {
 
     public var body: some View {
         VStack(spacing: 14) {
-            SettingsBackHeader("口座")
+            SettingsBackHeader("口座", hint: hintFlag)
 
             SettingsHint(
-                flag: .closedHint(.wallets, in: database),
+                flag: hintFlag,
                 lines: [.move, .hide, .swipeDelete]
             )
 
@@ -74,7 +77,7 @@ public struct WalletListView: View {
                 )
             } else {
                 AddButton("口座を追加") {
-                    sheet = .new
+                    destination = .new
                 }
             }
         }
@@ -94,11 +97,13 @@ public struct WalletListView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: drag.liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
-        .sheet(item: $sheet) { sheet in
-            WalletEditSheet(model: editModel(for: sheet)) { _ in
+        .navigationDestination(item: $destination) { destination in
+            WalletEditSheet(model: editModel(for: destination)) { _ in
             } onDelete: { deletion in
                 self.deletion = deletion
             }
+            .toolbar(.hidden, for: .navigationBar)
+            .environment(\.isSettingsEditPushed, true)
         }
         .confirmsWalletHide(
             balance: hidingBalance,
@@ -175,7 +180,7 @@ private extension WalletListView {
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
-                sheet = .edit(wallet.id)
+                destination = .edit(wallet.id)
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
@@ -195,7 +200,7 @@ private extension WalletListView {
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: wallet.id, openId: $openId, role: .hide) {
-            sheet = .edit(wallet.id)
+            destination = .edit(wallet.id)
         } onAction: {
             requestHide(wallet)
         } onDelete: {
@@ -263,13 +268,9 @@ private extension WalletListView {
 }
 
 private extension WalletListView {
-    enum Sheet: Hashable, Identifiable {
+    enum Destination: Hashable {
         case new
         case edit(Wallet.ID)
-
-        var id: Self {
-            self
-        }
     }
 
     nonisolated static let space = "WalletBoard"
@@ -393,8 +394,8 @@ private extension WalletListView {
         }
     }
 
-    func editModel(for sheet: Sheet) -> WalletEditModel {
-        switch sheet {
+    func editModel(for destination: Destination) -> WalletEditModel {
+        switch destination {
         case .new:
             WalletEditModel(database: database)
         case let .edit(id):

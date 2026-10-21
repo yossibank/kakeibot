@@ -6,6 +6,7 @@ import Store
 @Observable
 public final class SettingsScreenFlag {
     public private(set) var isOn: Bool
+    public private(set) var isLoaded = false
 
     private let database: AppDatabase
     private let key: SettingKey<Set<SettingsScreen>>
@@ -52,6 +53,7 @@ public extension SettingsScreenFlag {
     func load() async {
         let screens = try? await database.setting(key)
         isOn = screens?.contains(screen) ?? false
+        isLoaded = true
     }
 
     @discardableResult

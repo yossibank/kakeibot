@@ -6,7 +6,8 @@ import SwiftUI
 public struct TemplateListView: View {
     @State private var drag = SettingsDrag<EntryTemplate.ID>()
     @State private var model: TemplateListModel
-    @State private var sheet: Sheet?
+    @State private var hintFlag: SettingsScreenFlag
+    @State private var destination: Destination?
     @State private var grid = SettingsBoardGrid(
         columns: 1,
         itemHeight: TemplateRowCard.height,
@@ -24,6 +25,8 @@ public struct TemplateListView: View {
 
     public init(database: AppDatabase) {
         _model = State(initialValue: TemplateListModel(database: database))
+        let hintFlag = SettingsScreenFlag.closedHint(.templates, in: database)
+        _hintFlag = State(initialValue: hintFlag)
         let hiddenList = SettingsScreenFlag.openHiddenList(
             .templates,
             in: database
@@ -34,11 +37,11 @@ public struct TemplateListView: View {
 
     public var body: some View {
         VStack(spacing: 14) {
-            SettingsBackHeader("テンプレート")
+            SettingsBackHeader("テンプレート", hint: hintFlag)
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
 
             SettingsHint(
-                flag: .closedHint(.templates, in: database),
+                flag: hintFlag,
                 lines: hint
             )
 
@@ -78,7 +81,7 @@ public struct TemplateListView: View {
                 )
             } else {
                 AddButton(addTitle) {
-                    sheet = .new(model.type)
+                    destination = .new(model.type)
                 }
             }
         }
@@ -98,11 +101,13 @@ public struct TemplateListView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: drag.liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
-        .sheet(item: $sheet) { sheet in
-            TemplateEditSheet(model: editModel(for: sheet)) { _ in
+        .navigationDestination(item: $destination) { destination in
+            TemplateEditSheet(model: editModel(for: destination)) { _ in
             } onDelete: { deletion in
                 self.deletion = deletion
             }
+            .toolbar(.hidden, for: .navigationBar)
+            .environment(\.isSettingsEditPushed, true)
         }
         .confirmation(
             isPresented: $isConfirmingDelete,
@@ -191,7 +196,7 @@ private extension TemplateListView {
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
-                sheet = .edit(template.id)
+                destination = .edit(template.id)
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
@@ -211,7 +216,7 @@ private extension TemplateListView {
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: template.id, openId: $openId, role: .hide) {
-            sheet = .edit(template.id)
+            destination = .edit(template.id)
         } onAction: {
             hide(template.id)
         } onDelete: {
@@ -235,13 +240,9 @@ private extension TemplateListView {
 }
 
 private extension TemplateListView {
-    enum Sheet: Hashable, Identifiable {
+    enum Destination: Hashable {
         case new(Entry.Kind)
         case edit(EntryTemplate.ID)
-
-        var id: Self {
-            self
-        }
     }
 
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
@@ -367,8 +368,8 @@ private extension TemplateListView {
         }
     }
 
-    func editModel(for sheet: Sheet) -> TemplateEditModel {
-        switch sheet {
+    func editModel(for destination: Destination) -> TemplateEditModel {
+        switch destination {
         case let .new(type):
             TemplateEditModel(database: database, type: type)
         case let .edit(id):

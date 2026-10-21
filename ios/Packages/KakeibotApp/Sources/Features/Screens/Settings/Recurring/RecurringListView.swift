@@ -6,7 +6,8 @@ import SwiftUI
 public struct RecurringListView: View {
     @State private var drag = SettingsDrag<Recurring.ID>()
     @State private var model: RecurringListModel
-    @State private var sheet: Sheet?
+    @State private var hintFlag: SettingsScreenFlag
+    @State private var destination: Destination?
     @State private var openId: Recurring.ID?
     @State private var deleting: Recurring.ID?
     @State private var isConfirmingDelete = false
@@ -17,14 +18,16 @@ public struct RecurringListView: View {
 
     public init(model: RecurringListModel) {
         _model = State(initialValue: model)
+        let hintFlag = model.hintFlag()
+        _hintFlag = State(initialValue: hintFlag)
         _hiddenList = State(initialValue: model.hiddenListFlag())
     }
 
     public var body: some View {
         VStack(spacing: 14) {
-            SettingsBackHeader("固定費")
+            SettingsBackHeader("固定費", hint: hintFlag)
 
-            SettingsHint(flag: model.hintFlag(), lines: hint)
+            SettingsHint(flag: hintFlag, lines: hint)
 
             ScrollView {
                 VStack(spacing: 14) {
@@ -71,7 +74,7 @@ public struct RecurringListView: View {
                 )
             } else {
                 AddButton("固定費を追加") {
-                    sheet = .new
+                    destination = .new
                 }
             }
         }
@@ -91,12 +94,14 @@ public struct RecurringListView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: drag.liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
-        .sheet(item: $sheet) { sheet in
+        .navigationDestination(item: $destination) { destination in
             RecurringEditSheet(
-                model: model.editModel(for: sheet.editingId)
+                model: model.editModel(for: destination.editingId)
             ) { deletion in
                 self.deletion = deletion
             }
+            .toolbar(.hidden, for: .navigationBar)
+            .environment(\.isSettingsEditPushed, true)
         }
         .confirmation(
             isPresented: $isConfirmingDelete,
@@ -188,7 +193,7 @@ private extension RecurringListView {
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
-                sheet = .edit(row.id)
+                destination = .edit(row.id)
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
@@ -229,7 +234,7 @@ private extension RecurringListView {
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: row.id, openId: $openId, role: .hide) {
-            sheet = .edit(row.id)
+            destination = .edit(row.id)
         } onAction: {
             hide(row.id)
         } onDelete: {
@@ -307,7 +312,7 @@ private extension RecurringListView {
 }
 
 private extension RecurringListView {
-    enum Sheet: Identifiable {
+    enum Destination: Hashable {
         case new
         case edit(Recurring.ID)
     }
@@ -439,14 +444,7 @@ private extension RecurringListView {
     }
 }
 
-private extension RecurringListView.Sheet {
-    var id: String {
-        switch self {
-        case .new: "new"
-        case let .edit(id): id.description
-        }
-    }
-
+private extension RecurringListView.Destination {
     var editingId: Recurring.ID? {
         switch self {
         case .new: nil

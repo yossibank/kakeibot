@@ -9,6 +9,18 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
     public func gestureRecognizerShouldBegin(
         _ gestureRecognizer: UIGestureRecognizer
     ) -> Bool {
-        viewControllers.count > 1
+        guard viewControllers.count > 1 else {
+            return false
+        }
+
+        guard
+            let top = topViewController,
+            let attempt = DismissAttemptController.changed(in: top)
+        else {
+            return true
+        }
+
+        attempt.onAttempt()
+        return false
     }
 }

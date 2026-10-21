@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsEditHeader: View {
+    @Environment(\.isSettingsEditPushed) private var isPushed
+
     let title: String
     let isEditing: Bool
     let isHidden: Bool
@@ -11,7 +13,7 @@ struct SettingsEditHeader: View {
 
     var body: some View {
         HStack {
-            RingButton(systemImage: "xmark", action: onClose)
+            RingButton(systemImage: closeImage, action: onClose)
                 .frame(width: Self.sideWidth, alignment: .leading)
 
             Spacer()
@@ -39,6 +41,14 @@ struct SettingsEditHeader: View {
     }
 }
 
+extension EnvironmentValues {
+    @Entry var isSettingsEditPushed = false
+}
+
 private extension SettingsEditHeader {
     static let sideWidth: CGFloat = 104
+
+    var closeImage: String {
+        isPushed ? "chevron.left" : "xmark"
+    }
 }

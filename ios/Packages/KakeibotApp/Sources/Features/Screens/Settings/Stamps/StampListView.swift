@@ -6,7 +6,8 @@ import SwiftUI
 public struct StampListView: View {
     @State private var drag = SettingsDrag<ShelfIcon.ID>()
     @State private var model: StampListModel
-    @State private var sheet: Sheet?
+    @State private var hintFlag: SettingsScreenFlag
+    @State private var destination: Destination?
     @State private var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
@@ -23,6 +24,8 @@ public struct StampListView: View {
 
     public init(database: AppDatabase) {
         _model = State(initialValue: StampListModel(database: database))
+        let hintFlag = SettingsScreenFlag.closedHint(.stamps, in: database)
+        _hintFlag = State(initialValue: hintFlag)
         let hiddenList = SettingsScreenFlag.openHiddenList(
             .stamps,
             in: database
@@ -33,10 +36,10 @@ public struct StampListView: View {
 
     public var body: some View {
         VStack(spacing: 14) {
-            SettingsBackHeader("スタンプ")
+            SettingsBackHeader("スタンプ", hint: hintFlag)
 
             SettingsHint(
-                flag: .closedHint(.stamps, in: database),
+                flag: hintFlag,
                 lines: [.init("seal", "カレンダーに押すスタンプです"), .move, .hide]
             )
 
@@ -90,10 +93,12 @@ public struct StampListView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: drag.liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
-        .sheet(item: $sheet) { sheet in
-            StampEditSheet(model: editModel(for: sheet)) { deletion in
+        .navigationDestination(item: $destination) { destination in
+            StampEditSheet(model: editModel(for: destination)) { deletion in
                 self.deletion = deletion
             }
+            .toolbar(.hidden, for: .navigationBar)
+            .environment(\.isSettingsEditPushed, true)
         }
         .confirmation(
             isPresented: $isConfirmingDeleteHidden,
@@ -133,7 +138,7 @@ private extension StampListView {
 
     var addTile: some View {
         Button {
-            sheet = .new
+            destination = .new
         } label: {
             Image(systemName: "plus")
                 .font(.sans(.headline, weight: .ultraLight))
@@ -184,7 +189,7 @@ private extension StampListView {
             .offset(offset)
             .zIndex(layer)
             .onTapGesture {
-                sheet = .edit(shelfIcon.id)
+                destination = .edit(shelfIcon.id)
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
@@ -210,7 +215,7 @@ private extension StampListView {
             .position(position)
             .zIndex(layer)
             .onTapGesture {
-                sheet = .edit(shelfIcon.id)
+                destination = .edit(shelfIcon.id)
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
@@ -258,16 +263,9 @@ private extension StampListView {
 }
 
 private extension StampListView {
-    enum Sheet: Identifiable {
+    enum Destination: Hashable {
         case new
         case edit(ShelfIcon.ID)
-
-        var id: String {
-            switch self {
-            case .new: "new"
-            case let .edit(id): "edit-\(id)"
-            }
-        }
     }
 
     nonisolated static let space = "StampBoard"
@@ -373,8 +371,8 @@ private extension StampListView {
         }
     }
 
-    func editModel(for sheet: Sheet) -> StampEditModel {
-        switch sheet {
+    func editModel(for destination: Destination) -> StampEditModel {
+        switch destination {
         case .new:
             StampEditModel(database: database)
         case let .edit(id):
