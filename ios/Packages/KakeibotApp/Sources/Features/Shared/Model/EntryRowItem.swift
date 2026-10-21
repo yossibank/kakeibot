@@ -50,7 +50,8 @@ private extension EntryRowItem {
             entry.type == .transfer,
             let destination = entry.toWalletId.flatMap({ list.wallets[$0] })
         else {
-            return source
+            let bill = entry.billMonth.map { "（\($0.month)月払い）" } ?? ""
+            return source.map { $0 + bill }
         }
 
         return [source, destination.name]

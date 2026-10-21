@@ -70,6 +70,17 @@ struct ExportV1Tests {
         #expect(shifts.allSatisfy { $0 == .none })
     }
 
+    @Test
+    func readsEntriesWithoutBillMonth() throws {
+        let json = try Self.fixtureWithoutBillMonth()
+
+        let export = try ExportV1(json: json)
+        let months = export.data.entries.map(\.billMonth)
+
+        #expect(!months.isEmpty)
+        #expect(months.allSatisfy { $0 == nil })
+    }
+
     @Test(arguments: try headers.valid)
     func readsSupportedHeader(header: Header) throws {
         let json = try Self.fixture(with: header)
@@ -173,6 +184,17 @@ private extension ExportV1Tests {
         let rows = try #require(tables["recurrings"] as? [[String: Any]])
         let key = "holidayShift"
         tables["recurrings"] = rows.map { $0.filter { $0.key != key } }
+        object["data"] = tables
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixtureWithoutBillMonth() throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+        let rows = try #require(tables["entries"] as? [[String: Any]])
+        tables["entries"] = rows.map { $0.filter { $0.key != "billMonth" } }
         object["data"] = tables
         return try JSONSerialization.data(withJSONObject: object)
     }

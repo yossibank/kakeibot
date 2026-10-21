@@ -29,6 +29,56 @@ struct RecurringCardBillTests {
     }
 
     @Test
+    func countsMovedUsageInChosenMonth() throws {
+        let bill = try Self.bill(closingDay: 31)
+        let card = try #require(bill.toWalletId)
+        let october = try #require(LocalDate("2026-10-10"))
+        let november = try #require(LocalDate("2026-11-10"))
+
+        var late = try Self.entry(
+            .expense,
+            3000,
+            on: "2026-08-31",
+            wallet: card
+        )
+
+        late.billMonth = november.yearMonth
+
+        var moved = try Self.entry(
+            .expense,
+            500,
+            on: "2026-09-20",
+            wallet: card
+        )
+
+        moved.billMonth = november.yearMonth
+
+        let entries = try [
+            late,
+            moved,
+            Self.entry(.expense, 9000, on: "2026-09-05", wallet: card),
+            Self.entry(.expense, 7000, on: "2026-10-05", wallet: card)
+        ]
+
+        #expect(bill.amount(paidOn: october, entries: entries) == 9000)
+        #expect(bill.amount(paidOn: november, entries: entries) == 10500)
+    }
+
+    @Test
+    func listsBillDatesFromUsualOne() throws {
+        let bill = try Self.bill(closingDay: 31)
+        let used = try #require(LocalDate("2026-08-31"))
+
+        let dates = bill.billDates(for: used, count: 3)
+
+        #expect(dates.map(\.description) == [
+            "2026-09-10",
+            "2026-10-10",
+            "2026-11-10"
+        ])
+    }
+
+    @Test
     func keepsFixedAmountWithoutClosingDay() throws {
         var bill = try Self.bill(closingDay: 15)
         bill.closingDay = nil

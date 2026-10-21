@@ -5,22 +5,28 @@ import SwiftUI
 public struct AssetsView: View {
     @Bindable private var model: AssetsModel
 
+    @State private var movedBill: AssetsModel.UpcomingBill?
+    @State private var pendingEntry: Entry.ID?
+
     @Environment(\.themeStyle.corner) private var corner
 
     private let onTransfer: () -> Void
     private let onOpenWallet: (Wallet.ID) -> Void
     private let onOpenRecurring: (Recurring.ID) -> Void
+    private let onOpenEntry: (Entry.ID) -> Void
 
     public init(
         model: AssetsModel,
         onTransfer: @escaping () -> Void,
         onOpenWallet: @escaping (Wallet.ID) -> Void,
-        onOpenRecurring: @escaping (Recurring.ID) -> Void
+        onOpenRecurring: @escaping (Recurring.ID) -> Void,
+        onOpenEntry: @escaping (Entry.ID) -> Void
     ) {
         self.model = model
         self.onTransfer = onTransfer
         self.onOpenWallet = onOpenWallet
         self.onOpenRecurring = onOpenRecurring
+        self.onOpenEntry = onOpenEntry
     }
 
     public var body: some View {
@@ -43,6 +49,11 @@ public struct AssetsView: View {
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
+        }
+        .sheet(item: $movedBill, onDismiss: openPendingEntry) { bill in
+            AssetsMovedSheet(row: bill) { id in
+                pendingEntry = id
+            }
         }
         .background {
             Rectangle()
@@ -230,7 +241,7 @@ private extension AssetsView {
 
     func billRow(_ row: AssetsModel.UpcomingBill) -> some View {
         HStack(alignment: .top, spacing: 14) {
-            dateChip(row.bill.date)
+            FlipDate(row.bill.date)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .firstTextBaseline) {
@@ -245,6 +256,28 @@ private extension AssetsView {
                                 .textFont(.caption2)
                                 .foregroundStyle(Palette.subtext)
                                 .lineLimit(1)
+                        }
+
+                        if let moves = Self.movesText(of: row) {
+                            Button {
+                                movedBill = row
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Label(
+                                        moves,
+                                        systemImage: "arrow.uturn.right"
+                                    )
+                                    .lineLimit(1)
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.sans(.micro, weight: .bold))
+                                }
+                                .textFont(.caption2)
+                                .foregroundStyle(Palette.accent)
+                                .padding(.vertical, 4)
+                                .contentShape(.rect)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
 
@@ -281,35 +314,6 @@ private extension AssetsView {
             in: .rect(cornerRadius: corner.radius(18))
         )
         .contentShape(.rect)
-    }
-
-    func dateChip(_ date: LocalDate) -> some View {
-        VStack(spacing: 0) {
-            Text("\(date.month)月")
-                .textFont(.caption2)
-                .foregroundStyle(Palette.backgroundBottom)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 2)
-                .background(Palette.accent)
-
-            Text("\(date.day)")
-                .displayFont(.title)
-                .monospacedDigit()
-                .foregroundStyle(Palette.text)
-                .padding(.top, 2)
-
-            Text(date.weekday.shortName)
-                .textFont(.caption2)
-                .foregroundStyle(date.tint ?? Palette.subtext)
-                .padding(.bottom, 4)
-        }
-        .frame(width: 52)
-        .background(Palette.panel)
-        .clipShape(.rect(cornerRadius: corner.radius(12)))
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(12))
-                .stroke(Palette.outline, lineWidth: 1)
-        }
     }
 
     func balanceBar(_ bill: CardBill) -> some View {
@@ -463,6 +467,24 @@ private extension AssetsView {
         let change = model.changeFromLastMonth
         let sign = change > 0 ? "+" : ""
         return "先月末より \(sign)\(AmountText.text(change))"
+    }
+
+    static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
+        let movedIn = row.movedIn.count
+        let movedOut = row.movedOut.count
+        let inText = movedIn > 0 ? ["前から \(movedIn) 件"] : []
+        let outText = movedOut > 0 ? ["後へ \(movedOut) 件"] : []
+        let parts = inText + outText
+        return parts.isEmpty ? nil : parts.joined(separator: "・")
+    }
+
+    func openPendingEntry() {
+        guard let pendingEntry else {
+            return
+        }
+
+        self.pendingEntry = nil
+        onOpenEntry(pendingEntry)
     }
 
     static func share(of bill: CardBill) -> CGFloat {

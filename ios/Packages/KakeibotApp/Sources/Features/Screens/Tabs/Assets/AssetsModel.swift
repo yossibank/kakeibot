@@ -71,6 +71,8 @@ public extension AssetsModel {
         public let title: String
         public let icon: Icon?
         public let source: String?
+        public let movedIn: [EntryRowItem]
+        public let movedOut: [EntryRowItem]
 
         public var id: Recurring.ID {
             bill.recurring.id
@@ -148,11 +150,27 @@ public extension AssetsModel {
         )
 
         return bills.map { bill in
-            UpcomingBill(
+            let card = bill.recurring.toWalletId
+            let month = bill.date.yearMonth
+
+            let moved = entries
+                .filter { $0.walletId == card && $0.billMonth != nil }
+                .sorted { $0.date < $1.date }
+
+            let movedIn = moved.filter { $0.billMonth == month }
+
+            let movedOut = moved.filter { entry in
+                entry.billMonth != month
+                    && bill.period?.contains(entry.date) == true
+            }
+
+            return UpcomingBill(
                 bill: bill,
                 title: list.title(of: bill.recurring) ?? Self.billTitle,
                 icon: list.icon(of: bill.recurring),
-                source: list.wallets[bill.recurring.walletId]?.name
+                source: list.wallets[bill.recurring.walletId]?.name,
+                movedIn: movedIn.map { Self.row(of: $0, in: list) },
+                movedOut: movedOut.map { Self.row(of: $0, in: list) }
             )
         }
     }
@@ -210,6 +228,14 @@ public extension AssetsModel {
 private extension AssetsModel {
     static let loadFailedMessage = "残高を読めませんでした"
     static let billTitle = "引き落とし"
+
+    static func row(
+        of entry: Entry,
+        in list: EntryList
+    ) -> EntryRowItem {
+        let day = "\(entry.date.month)/\(entry.date.day)"
+        return EntryRowItem(entry, in: list, dayLabel: day)
+    }
 
     var wallets: [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []

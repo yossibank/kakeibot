@@ -10,6 +10,7 @@ public struct EntryDraft: Hashable, Sendable {
     public var walletId: Wallet.ID
     public var toWalletId: Wallet.ID?
     public var memo: String
+    public var billMonth: YearMonth?
 
     public init(
         type: Entry.Kind,
@@ -20,7 +21,8 @@ public struct EntryDraft: Hashable, Sendable {
         templateId: EntryTemplate.ID? = nil,
         walletId: Wallet.ID,
         toWalletId: Wallet.ID? = nil,
-        memo: String = ""
+        memo: String = "",
+        billMonth: YearMonth? = nil
     ) {
         self.type = type
         self.amount = amount
@@ -31,6 +33,7 @@ public struct EntryDraft: Hashable, Sendable {
         self.walletId = walletId
         self.toWalletId = toWalletId
         self.memo = memo
+        self.billMonth = billMonth
     }
 }
 
@@ -64,7 +67,8 @@ public extension EntryDraft {
             templateId: entry.templateId,
             walletId: entry.walletId,
             toWalletId: entry.toWalletId,
-            memo: entry.memo ?? ""
+            memo: entry.memo ?? "",
+            billMonth: entry.billMonth
         )
     }
 
@@ -81,6 +85,7 @@ public extension EntryDraft {
             walletId: walletId,
             toWalletId: destination,
             memo: trimmedMemo,
+            billMonth: billMonth,
             createdAt: now,
             updatedAt: now
         )
@@ -102,6 +107,7 @@ public extension EntryDraft {
         updated.walletId = walletId
         updated.toWalletId = destination
         updated.memo = trimmedMemo
+        updated.billMonth = billMonth
         updated.updatedAt = now
         return updated
     }

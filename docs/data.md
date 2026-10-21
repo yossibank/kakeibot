@@ -167,6 +167,7 @@ emoji・text・glyph のどれかは必須。
 | memo | TEXT | |
 | recurring_id | TEXT | 固定費から作った記録 |
 | recurring_date | TEXT | どの回の分か |
+| bill_month | TEXT | カードの引き落としの月（`2026-11`）。空なら締め日で決める |
 | created_at / updated_at | TEXT | |
 
 `recurring_id` と `recurring_date` は、そろって入るか、どちらも空にする。`(recurring_id, recurring_date)` は重複禁止。支出を記録した日の `no_spend_day` は消す。

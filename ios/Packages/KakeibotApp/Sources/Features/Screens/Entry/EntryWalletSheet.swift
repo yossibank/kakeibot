@@ -40,6 +40,11 @@ struct EntryWalletSheet: View {
                         }
                     }
                 }
+
+                if showsBills {
+                    billSection
+                        .transition(Self.billTransition)
+                }
             }
         }
         .sheet(isPresented: $isAdding, onDismiss: chooseAdded) {
@@ -65,8 +70,13 @@ private extension EntryWalletSheet {
         let iconColor = isSelected ? Palette.accent : Palette.subtext
 
         return Button {
-            select(wallet)
-            dismiss()
+            withAnimation(.snappy) {
+                select(wallet)
+            }
+
+            if !showsBills {
+                dismiss()
+            }
         } label: {
             HStack(spacing: 12) {
                 IconImage(model.icon(for: wallet), size: 18)
@@ -118,6 +128,96 @@ private extension EntryWalletSheet {
 }
 
 private extension EntryWalletSheet {
+    var billSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("請求")
+                .textFont(.caption)
+                .tracking(2)
+                .foregroundStyle(Palette.subtext)
+
+            HStack(spacing: 10) {
+                ForEach(model.billChoices) { choice in
+                    billButton(choice)
+                }
+            }
+
+            if let billNote {
+                Text(billNote)
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 4)
+            }
+        }
+        .sensoryFeedback(.selection, trigger: model.billMonth)
+    }
+
+    func billButton(_ choice: EntryModel.BillChoice) -> some View {
+        let isSelected = model.selectedBillDate == choice.date
+        let titleColor = isSelected ? Palette.accentStrong : Palette.subtext
+        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let ring = isSelected ? Palette.accent : Palette.line
+        let shape = RoundedRectangle(cornerRadius: corner.radius(16))
+
+        return Button {
+            withAnimation(.snappy) {
+                model.selectBill(choice.date)
+            }
+
+            Task {
+                try? await Task.sleep(for: Self.closeDelay)
+                dismiss()
+            }
+        } label: {
+            VStack(spacing: 6) {
+                FlipDate(choice.date, isSelected: isSelected)
+
+                Text(choice.title)
+                    .textFont(.caption2)
+                    .foregroundStyle(titleColor)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(fill, in: shape)
+            .overlay {
+                shape
+                    .stroke(ring, lineWidth: 1)
+            }
+            .contentShape(shape)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private extension EntryWalletSheet {
+    static let closeDelay = Duration.milliseconds(300)
+
+    static var billTransition: AnyTransition {
+        .opacity.combined(with: .move(edge: .bottom))
+    }
+
+    var showsBills: Bool {
+        role == .source && !model.billChoices.isEmpty
+    }
+
+    var billNote: String? {
+        let choices = model.billChoices
+        let chosen = choices.first { $0.date == model.selectedBillDate }
+
+        guard let chosen else {
+            return nil
+        }
+
+        let day = "\(chosen.date.month)/\(chosen.date.day)"
+
+        guard chosen.date == choices.first?.date else {
+            return "カード会社の確定が遅れた分として、\(day) の引き落としに入れます"
+        }
+
+        let period = chosen.period.map(RecurringText.period) ?? ""
+        return "\(period) の利用分として、\(day) に引き落とされます"
+    }
+
     var title: String {
         switch role {
         case .source: model.walletTitle

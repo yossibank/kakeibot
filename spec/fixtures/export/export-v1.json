@@ -144,6 +144,7 @@
         "memo": "動画",
         "recurringId": "40000000-0000-4000-8000-000000000001",
         "recurringDate": "2026-09-27",
+        "billMonth": "2026-11",
         "createdAt": "2026-09-27T00:00:00Z",
         "updatedAt": "2026-09-27T00:00:00Z"
       },
@@ -160,6 +161,7 @@
         "memo": null,
         "recurringId": null,
         "recurringDate": null,
+        "billMonth": null,
         "createdAt": "2026-09-25T01:00:00Z",
         "updatedAt": "2026-09-25T01:00:00Z"
       },
@@ -176,6 +178,7 @@
         "memo": "おろす",
         "recurringId": null,
         "recurringDate": null,
+        "billMonth": null,
         "createdAt": "2026-09-28T03:00:00Z",
         "updatedAt": "2026-09-28T03:00:00Z"
       },
@@ -192,6 +195,7 @@
         "memo": "靴",
         "recurringId": null,
         "recurringDate": null,
+        "billMonth": null,
         "createdAt": "2026-10-01T10:00:00Z",
         "updatedAt": "2026-10-01T10:00:00Z"
       }

@@ -121,6 +121,17 @@ struct RecurringWriteTests {
             )
         }
 
+        let late = try Entry(
+            type: .expense,
+            amount: 500,
+            date: #require(LocalDate("2026-08-20")),
+            categoryId: category,
+            walletId: card,
+            billMonth: paidOn.yearMonth,
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
         let bill = try Recurring(
             type: .transfer,
             amount: 0,
@@ -136,7 +147,7 @@ struct RecurringWriteTests {
         )
 
         try await setup.database.writer.write { db in
-            for entry in entries {
+            for entry in entries + [late] {
                 try entry.insert(db)
             }
 
@@ -153,7 +164,7 @@ struct RecurringWriteTests {
             .entries
             .first { $0.recurringId == bill.id }
 
-        #expect(payment?.amount == 42000)
+        #expect(payment?.amount == 42500)
         #expect(payment?.date == paidOn)
     }
 

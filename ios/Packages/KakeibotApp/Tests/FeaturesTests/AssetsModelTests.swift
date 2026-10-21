@@ -57,6 +57,22 @@ struct AssetsModelTests {
         try await setup.save(.expense, 30000, on: "2026-09-20", from: card.id)
         try await setup.save(.expense, 12000, on: "2026-10-10", from: card.id)
 
+        try await setup.save(
+            .expense,
+            500,
+            on: "2026-09-10",
+            from: card.id,
+            billMonth: YearMonth("2026-10")
+        )
+
+        try await setup.save(
+            .expense,
+            800,
+            on: "2026-10-12",
+            from: card.id,
+            billMonth: YearMonth("2026-11")
+        )
+
         let draft = try RecurringDraft(
             type: .transfer,
             amount: 0,
@@ -84,14 +100,16 @@ struct AssetsModelTests {
         let through = try #require(LocalDate("2026-10-15"))
 
         #expect(bill.date == LocalDate("2026-10-26"))
-        #expect(bill.amount == 42000)
+        #expect(bill.amount == 42500)
         #expect(bill.period == from...through)
-        #expect(model.upcomingBillTotal == 42000)
+        #expect(model.upcomingBillTotal == 42500)
         #expect(row.source == "銀行")
-        #expect(bill.balanceAfter == -42000)
-        #expect(bill.shortage == 42000)
-        #expect(model.rows.last?.nextBill?.amount == 42000)
-        #expect(model.holdings.unpaid == 42000)
+        #expect(row.movedIn.map(\.amount) == [500])
+        #expect(row.movedOut.map(\.amount) == [800])
+        #expect(bill.balanceAfter == -42500)
+        #expect(bill.shortage == 42500)
+        #expect(model.rows.last?.nextBill?.amount == 42500)
+        #expect(model.holdings.unpaid == 43300)
         #expect(model.sections.map(\.role) == [.onHand, .card])
     }
 
@@ -172,7 +190,8 @@ extension AssetsModelTests.Setup {
         _ amount: Int,
         on text: String,
         from wallet: Wallet.ID,
-        to destination: Wallet.ID? = nil
+        to destination: Wallet.ID? = nil,
+        billMonth: YearMonth? = nil
     ) async throws {
         let date = try #require(LocalDate(text))
 
@@ -188,7 +207,8 @@ extension AssetsModelTests.Setup {
             date: date,
             categoryId: category,
             walletId: wallet,
-            toWalletId: destination
+            toWalletId: destination,
+            billMonth: billMonth
         )
 
         try await database.saveEntry(draft, at: Date())

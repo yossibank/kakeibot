@@ -7,6 +7,7 @@ public struct EntrySheet: View {
     @State private var model: EntryModel
     @State private var isEnteringAmount = false
     @State private var isEditingMemo = false
+    @State private var isPeekingMemo = false
     @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
     @State private var memoChipFrame: CGRect = .zero
@@ -282,14 +283,32 @@ private extension EntrySheet {
             }
 
             Button {
-                editMemo(true)
+                if !isPeekingMemo {
+                    editMemo(true)
+                }
             } label: {
-                Chip(
-                    model.memo.isEmpty ? "メモ" : model.memo,
-                    systemImage: "square.and.pencil",
-                    isHighlighted: !model.memo.isEmpty
-                )
+                ViewThatFits(in: .horizontal) {
+                    Chip(
+                        memoTitle,
+                        systemImage: "square.and.pencil",
+                        isHighlighted: !model.memo.isEmpty
+                    )
+
+                    Chip(
+                        "",
+                        systemImage: "square.and.pencil",
+                        isHighlighted: !model.memo.isEmpty
+                    )
+                }
             }
+            .simultaneousGesture(memoPeekGesture)
+            .background {
+                Color.clear
+                    .popover(isPresented: $isPeekingMemo) {
+                        memoPeek
+                    }
+            }
+            .sensoryFeedback(.impact(weight: .light), trigger: isPeekingMemo)
             .layoutPriority(-1)
             .onGeometryChange(for: CGRect.self) { proxy in
                 proxy.frame(in: .named(Self.coordinateSpace))
@@ -300,6 +319,17 @@ private extension EntrySheet {
             Spacer(minLength: 0)
         }
         .buttonStyle(.plain)
+    }
+
+    var memoPeek: some View {
+        Text(model.memo)
+            .textFont(.footnote)
+            .foregroundStyle(Palette.text)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: Self.peekWidth, alignment: .leading)
+            .padding(14)
+            .presentationCompactAdaptation(.popover)
+            .presentationBackground(Palette.panel)
     }
 
     var categoryPager: some View {
@@ -613,6 +643,8 @@ private extension EntrySheet {
     static let categorySpacing: CGFloat = 5
     static let categoryHeight: CGFloat = 54
     static let menuPressDuration = 0.15
+    static let peekDuration = 0.35
+    static let peekWidth: CGFloat = 260
 
     static var pagerHeight: CGFloat {
         let rows = CGFloat(categoryRows)
@@ -629,6 +661,17 @@ private extension EntrySheet {
 
     var today: LocalDate {
         LocalDate(Date(), in: .current)
+    }
+
+    var memoPeekGesture: some Gesture {
+        LongPressGesture(minimumDuration: Self.peekDuration)
+            .onEnded { _ in
+                isPeekingMemo = !model.memo.isEmpty
+            }
+    }
+
+    var memoTitle: String {
+        model.memo.isEmpty ? "メモ" : model.memo
     }
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {
