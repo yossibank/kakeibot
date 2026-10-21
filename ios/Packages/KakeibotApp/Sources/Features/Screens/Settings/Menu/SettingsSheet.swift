@@ -83,6 +83,14 @@ public struct SettingsSheet: View {
                                 } label: {
                                     row("固定費", systemImage: "repeat")
                                 }
+
+                                Hairline()
+
+                                NavigationLink {
+                                    StampListView(database: database)
+                                } label: {
+                                    row("スタンプ", systemImage: "seal")
+                                }
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14)
@@ -133,43 +141,6 @@ public struct SettingsSheet: View {
                                         options: Weekday.weekStartOptions
                                     )
                                 }
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal, 14)
-                            .card()
-                        }
-
-                        VStack(alignment: .leading, spacing: 6) {
-                            sectionTitle("カレンダー")
-
-                            NavigationLink {
-                                StampListView(database: database)
-                            } label: {
-                                row("スタンプ", systemImage: "seal")
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal, 14)
-                            .card()
-                        }
-
-                        VStack(alignment: .leading, spacing: 6) {
-                            sectionTitle("通知")
-
-                            NavigationLink {
-                                ReminderView(
-                                    model: ReminderModel(
-                                        database: database,
-                                        today: today,
-                                        time: reminderTime,
-                                        permission: permission
-                                    )
-                                )
-                            } label: {
-                                row(
-                                    "記録忘れの通知",
-                                    systemImage: "bell",
-                                    value: reminderTime?.description ?? "オフ"
-                                )
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14)
@@ -260,60 +231,63 @@ public struct SettingsSheet: View {
                                         value: entryStyle.title
                                     )
                                 }
+
+                                Hairline()
+
+                                pickerRow(
+                                    "金額から入力",
+                                    systemImage: "yensign"
+                                ) {
+                                    CapsulePicker(
+                                        selection: startsWithAmountBinding,
+                                        options: Self.startOptions
+                                    )
+                                }
+
+                                Hairline()
+
+                                NavigationLink {
+                                    ReminderView(
+                                        model: ReminderModel(
+                                            database: database,
+                                            today: today,
+                                            time: reminderTime,
+                                            permission: permission
+                                        )
+                                    )
+                                } label: {
+                                    row(
+                                        "記録忘れの通知",
+                                        systemImage: "bell",
+                                        value: reminderText
+                                    )
+                                }
                             }
                             .buttonStyle(.plain)
-                            .padding(.horizontal, 14)
-                            .card()
-
-                            pickerRow("金額から入力", systemImage: "yensign") {
-                                CapsulePicker(
-                                    selection: startsWithAmountBinding,
-                                    options: Self.startOptions
-                                )
-                            }
                             .padding(.horizontal, 14)
                             .card()
                         }
 
                         VStack(alignment: .leading, spacing: 6) {
-                            sectionTitle("データ")
+                            sectionTitle("データとアプリ")
 
-                            NavigationLink {
-                                BackupView(
-                                    model: BackupModel(database: database)
-                                )
-                            } label: {
-                                row(
-                                    "バックアップ",
-                                    systemImage: "externaldrive"
-                                )
+                            VStack(spacing: 0) {
+                                NavigationLink {
+                                    BackupView(
+                                        model: BackupModel(database: database)
+                                    )
+                                } label: {
+                                    row(
+                                        "バックアップ",
+                                        systemImage: "externaldrive"
+                                    )
+                                }
+
+                                Hairline()
+
+                                versionRow
                             }
                             .buttonStyle(.plain)
-                            .padding(.horizontal, 14)
-                            .card()
-                        }
-
-                        VStack(alignment: .leading, spacing: 6) {
-                            sectionTitle("このアプリ")
-
-                            HStack(spacing: 12) {
-                                Image(systemName: "info.circle")
-                                    .sansFont(.body, weight: .light)
-                                    .foregroundStyle(Palette.accent)
-                                    .frame(width: 22)
-
-                                Text("バージョン")
-                                    .textFont(.subheadline)
-                                    .foregroundStyle(Palette.text)
-
-                                Spacer()
-
-                                Text(Bundle.main.shortVersion)
-                                    .textFont(.footnote)
-                                    .monospacedDigit()
-                                    .foregroundStyle(Palette.subtext)
-                            }
-                            .frame(minHeight: 48)
                             .padding(.horizontal, 14)
                             .card()
                         }
@@ -383,6 +357,27 @@ private extension SettingsSheet {
                 dismiss()
             }
         }
+    }
+
+    var versionRow: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "info.circle")
+                .sansFont(.body, weight: .light)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 22)
+
+            Text("バージョン")
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+
+            Spacer()
+
+            Text(Bundle.main.shortVersion)
+                .textFont(.footnote)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+        }
+        .frame(minHeight: 48)
     }
 
     func sectionTitle(_ title: String) -> some View {
@@ -483,6 +478,10 @@ private extension SettingsSheet {
         .init("する", value: true),
         .init("しない", value: false)
     ]
+
+    var reminderText: String {
+        reminderTime?.description ?? "オフ"
+    }
 
     var startsWithAmountBinding: Binding<Bool> {
         Binding {

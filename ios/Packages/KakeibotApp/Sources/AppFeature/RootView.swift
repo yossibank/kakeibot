@@ -19,11 +19,15 @@ public struct RootView: View {
             content
 
             if isLaunching {
-                LaunchView(isReady: model.isOpened) {
+                LaunchView(
+                    isThemed: isThemed,
+                    isReady: model.isOpened
+                ) {
                     isRevealed = true
                 } onFinish: {
                     isLaunching = false
                 }
+                .animation(.easeOut(duration: 0.3), value: model.palette)
             }
         }
         .task {
@@ -96,8 +100,12 @@ private extension RootView {
 }
 
 private extension RootView {
+    var isThemed: Bool {
+        model.palette != nil
+    }
+
     var shownPalette: ThemePalette {
-        isRevealed ? model.palette : .night
+        model.palette ?? .night
     }
 
     var shownStyle: ThemeStyle {

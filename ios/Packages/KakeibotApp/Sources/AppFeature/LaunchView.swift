@@ -8,15 +8,18 @@ public struct LaunchView: View {
     @State private var hasSwept = false
     @State private var isLeaving = false
 
+    let isThemed: Bool
     let isReady: Bool
     let onLeave: () -> Void
     let onFinish: () -> Void
 
     public init(
+        isThemed: Bool,
         isReady: Bool,
         onLeave: @escaping () -> Void,
         onFinish: @escaping () -> Void
     ) {
+        self.isThemed = isThemed
         self.isReady = isReady
         self.onLeave = onLeave
         self.onFinish = onFinish
@@ -32,10 +35,13 @@ public struct LaunchView: View {
                 .scaleEffect(scale)
         }
         .ignoresSafeArea()
-        .environment(\.palette, .night)
         .opacity(isLeaving ? 0 : 1)
         .allowsHitTesting(!isLeaving)
-        .task {
+        .task(id: isThemed) {
+            guard isThemed else {
+                return
+            }
+
             await sweepRing()
         }
         .onChange(of: canLeave) {
@@ -47,7 +53,13 @@ public struct LaunchView: View {
 private extension LaunchView {
     var mark: some View {
         ZStack {
-            Image("LaunchMark", bundle: .main)
+            Image("AppIconDial", bundle: .main)
+                .resizable()
+                .foregroundStyle(Palette.accent)
+
+            Image("AppIconYen", bundle: .main)
+                .resizable()
+                .foregroundStyle(Palette.accentStrong)
 
             RingSweep(progress: sweep, length: Self.sweepLength)
                 .stroke(
@@ -130,5 +142,5 @@ private struct RingSweep: Shape {
 }
 
 #Preview {
-    LaunchView(isReady: true) {} onFinish: {}
+    LaunchView(isThemed: true, isReady: true) {} onFinish: {}
 }
