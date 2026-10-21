@@ -6,6 +6,7 @@ import SwiftUI
 public struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
     @State private var launchScreen: LaunchScreen = .home
+    @State private var entryStyle: EntryStyle = .dial
     @State private var startsWithAmount = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
@@ -229,18 +230,36 @@ public struct SettingsSheet: View {
                         VStack(alignment: .leading, spacing: 6) {
                             sectionTitle("使い方")
 
-                            NavigationLink {
-                                LaunchScreenView(
-                                    model: LaunchScreenModel(
-                                        database: database
+                            VStack(spacing: 0) {
+                                NavigationLink {
+                                    LaunchScreenView(
+                                        model: LaunchScreenModel(
+                                            database: database
+                                        )
                                     )
-                                )
-                            } label: {
-                                row(
-                                    "起動時に開く画面",
-                                    systemImage: "iphone",
-                                    value: launchScreen.title
-                                )
+                                } label: {
+                                    row(
+                                        "起動時に開く画面",
+                                        systemImage: "iphone",
+                                        value: launchScreen.title
+                                    )
+                                }
+
+                                Hairline()
+
+                                NavigationLink {
+                                    EntryStyleView(
+                                        model: EntryStyleModel(
+                                            database: database
+                                        )
+                                    )
+                                } label: {
+                                    row(
+                                        "入力シートの見た目",
+                                        systemImage: "square.and.pencil",
+                                        value: entryStyle.title
+                                    )
+                                }
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14)
@@ -334,6 +353,9 @@ public struct SettingsSheet: View {
         }
         .task {
             await observeLaunchScreen()
+        }
+        .task {
+            await observeEntryStyle()
         }
         .task {
             let starts = try? await database.setting(.entryStartsWithAmount)
@@ -496,6 +518,16 @@ private extension SettingsSheet {
             }
         } catch {
             launchScreen = .home
+        }
+    }
+
+    func observeEntryStyle() async {
+        do {
+            for try await style in database.settingUpdates(.entryStyle) {
+                entryStyle = style
+            }
+        } catch {
+            entryStyle = .dial
         }
     }
 

@@ -74,6 +74,12 @@ public extension SettingKey where Value == ThemeTextSize {
     }
 }
 
+public extension SettingKey where Value == EntryStyle {
+    static var entryStyle: Self {
+        Self(.entryStyle, default: .dial)
+    }
+}
+
 public extension SettingKey where Value == TemplateOrder {
     static var templateOrder: Self {
         Self(.templateOrder, default: .manual)
