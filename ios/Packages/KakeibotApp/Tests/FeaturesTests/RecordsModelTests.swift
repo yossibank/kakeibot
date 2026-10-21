@@ -72,6 +72,63 @@ struct RecordsModelTests {
     }
 
     @Test
+    func filtersByCategoryAndSumsSearch() async throws {
+        let setup = try await Setup()
+
+        try await setup.save(
+            .expense,
+            amount: 980,
+            on: "2026-10-12",
+            memo: "ランチ"
+        )
+
+        try await setup.save(.income, amount: 250_000, on: "2026-10-10")
+
+        try await setup.save(
+            .expense,
+            amount: 500,
+            on: "2026-09-30",
+            memo: "ランチ"
+        )
+
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let food = try #require(model.filterCategories.first)
+
+        model.searchText = "ランチ"
+        let summary = model.searchSummary
+
+        model.toggleFilter(food.id)
+        let filtered = model.days.map(\.date.description)
+        let title = model.filterTitle
+
+        model.clearFilter()
+
+        #expect(summary?.count == 2)
+        #expect(summary?.expenseTotal == 1480)
+        #expect(summary?.range.lowerBound.description == "2026-09-30")
+        #expect(summary?.range.upperBound.description == "2026-10-12")
+        #expect(filtered == ["2026-10-12"])
+        #expect(title == food.name)
+        #expect(model.days.count == 2)
+    }
+
+    @Test
+    func remembersSearchedWords() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+
+        await model.rememberSearch("ランチ")
+        await model.rememberSearch("本")
+        let saved = try await setup.database.setting(.recentSearches)
+
+        await model.clearRecentSearches()
+
+        #expect(saved == ["本", "ランチ"])
+        #expect(model.recentSearches.isEmpty)
+    }
+
+    @Test
     func showsUpcomingRecurringOnFutureDays() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()

@@ -28,8 +28,14 @@ public final class BackupModel {
 
 public extension BackupModel {
     struct BackupFile: Equatable, Sendable {
+        public let kind: FileKind
         public let data: Data
         public let name: String
+    }
+
+    enum FileKind: String, Sendable {
+        case json
+        case csv
     }
 
     nonisolated static var bundleVersion: String {
@@ -50,7 +56,10 @@ public extension BackupModel {
     }
 
     @discardableResult
-    func makeFile(at date: Date) async -> Bool {
+    func makeFile(
+        _ kind: FileKind,
+        at date: Date
+    ) async -> Bool {
         isWorking = true
         doneMessage = nil
 
@@ -58,11 +67,10 @@ public extension BackupModel {
             isWorking = false
         }
 
-        let app = ExportV1.App(platform: .ios, version: appVersion)
-
         do {
-            let data = try await database.backup(at: date, app: app)
-            file = BackupFile(data: data, name: Self.fileName(at: date))
+            let data = try await data(of: kind, at: date)
+            let name = Self.fileName(of: kind, at: date)
+            file = BackupFile(kind: kind, data: data, name: name)
             return true
         } catch {
             errorNotice.show(Self.exportFailedMessage)
@@ -159,11 +167,27 @@ private extension BackupModel {
         }
     }
 
-    static func fileName(at date: Date) -> String {
+    static func fileName(
+        of kind: FileKind,
+        at date: Date
+    ) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
-        return "kakeibot-\(formatter.string(from: date)).json"
+        return "kakeibot-\(formatter.string(from: date)).\(kind.rawValue)"
+    }
+
+    func data(
+        of kind: FileKind,
+        at date: Date
+    ) async throws -> Data {
+        switch kind {
+        case .json:
+            let app = ExportV1.App(platform: .ios, version: appVersion)
+            return try await database.backup(at: date, app: app)
+        case .csv:
+            return try await database.spreadsheet()
+        }
     }
 
     static func dayText(_ date: Date) -> String {

@@ -12,6 +12,7 @@ public struct RecordsView: View {
     @State private var slide = PageSlide()
     @State private var stampTarget: StampTarget?
     @State private var stampCount = 0
+    @State private var isFiltering = false
 
     @FocusState private var isSearchFocused: Bool
 
@@ -40,16 +41,29 @@ public struct RecordsView: View {
                 if model.isSearching {
                     searchBar
 
+                    filterLine
+
                     searchContent
                 } else {
                     header
                         .monthSwipe(following: $slide, perform: moveMonth)
 
-                    CapsulePicker(
-                        selection: layoutBinding,
-                        options: Self.layoutOptions
-                    )
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack(spacing: 8) {
+                        CapsulePicker(
+                            selection: layoutBinding,
+                            options: Self.layoutOptions
+                        )
+
+                        Spacer()
+
+                        filterButton
+
+                        toolButton(systemImage: "magnifyingglass") {
+                            openSearch()
+                        }
+                    }
+
+                    filterLine
 
                     Group {
                         monthContent
@@ -70,6 +84,9 @@ public struct RecordsView: View {
         .sheet(item: $stampTarget) { target in
             stampSheet(on: target.date)
         }
+        .sheet(isPresented: $isFiltering) {
+            RecordsFilterSheet(model: model)
+        }
         .sensoryFeedback(.success, trigger: stampCount)
         .background {
             Rectangle()
@@ -86,17 +103,6 @@ private extension RecordsView {
                 .displayFont(.body)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
-
-            Button {
-                openSearch()
-            } label: {
-                Image(systemName: "magnifyingglass")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 40, height: 44)
-                    .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
 
             Spacer()
 
@@ -137,6 +143,9 @@ private extension RecordsView {
                 .tint(Palette.accent)
                 .submitLabel(.search)
                 .focused($isSearchFocused)
+                .onSubmit {
+                    rememberSearch()
+                }
 
                 if !model.searchText.isEmpty {
                     Button {
@@ -156,6 +165,8 @@ private extension RecordsView {
                     .stroke(Palette.outline, lineWidth: 1)
             }
 
+            filterButton
+
             Button("閉じる") {
                 closeSearch()
             }
@@ -167,30 +178,187 @@ private extension RecordsView {
     @ViewBuilder
     var searchContent: some View {
         let days = model.searchDays
-        let count = days.reduce(0) { $0 + $1.entries.count }
 
-        if model.searchText.trimmingCharacters(in: .whitespaces).isEmpty {
-            Text("メモ・カテゴリ・タグ・口座の名前や、金額で探せます")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-                .padding(.vertical, 40)
-        } else if days.isEmpty {
-            Text("見つかりませんでした")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-                .padding(.vertical, 40)
-        } else {
-            Text("\(count) 件")
-                .textFont(.caption)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 4)
+        if EntrySearch(model.searchText).isEmpty {
+            if model.recentSearches.isEmpty {
+                Text("メモ・カテゴリ・タグ・口座の名前や、金額で探せます")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .padding(.vertical, 40)
+            } else {
+                recentList
+            }
+        } else if let summary = model.searchSummary {
+            searchSummary(summary)
 
             ForEach(days, id: \.self) { day in
                 dayCard(day)
             }
+        } else {
+            Text("見つかりませんでした")
+                .textFont(.footnote)
+                .foregroundStyle(Palette.subtext)
+                .padding(.vertical, 40)
         }
+    }
+
+    var recentList: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("最近探した言葉")
+                    .textFont(.caption2)
+                    .tracking(2)
+                    .foregroundStyle(Palette.accent)
+
+                Spacer()
+
+                Button("消す") {
+                    Task {
+                        await model.clearRecentSearches()
+                    }
+                }
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+            }
+            .padding(.vertical, 8)
+
+            ForEach(model.recentSearches, id: \.self) { word in
+                Button {
+                    model.searchText = word
+                    rememberSearch()
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.footnote)
+                            .foregroundStyle(Palette.subtext)
+
+                        Text(word)
+                            .textFont(.subheadline)
+                            .foregroundStyle(Palette.text)
+                            .lineLimit(1)
+
+                        Spacer()
+                    }
+                    .frame(minHeight: 44)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .overlay(alignment: .top) {
+                    Hairline(thickness: 1)
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 4)
+        .card()
+    }
+
+    func searchSummary(_ summary: RecordsModel.SearchSummary) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("\(summary.count) 件")
+                    .textFont(.subheadline)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+
+                Spacer()
+
+                Text(PeriodText.range(summary.range))
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+            }
+
+            HStack(spacing: 0) {
+                total(
+                    "支出",
+                    amount: summary.expenseTotal,
+                    color: Palette.accentStrong
+                )
+
+                total(
+                    "収入",
+                    amount: summary.incomeTotal,
+                    color: Palette.accent
+                )
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .overlay {
+            RoundedRectangle(cornerRadius: corner.radius(18))
+                .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
+        }
+    }
+
+    var filterButton: some View {
+        toolButton(
+            systemImage: "line.3.horizontal.decrease",
+            isOn: !model.filter.isEmpty
+        ) {
+            isFiltering = true
+        }
+    }
+
+    @ViewBuilder
+    var filterLine: some View {
+        if let title = model.filterTitle {
+            HStack(spacing: 8) {
+                Image(systemName: "line.3.horizontal.decrease")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Palette.accent)
+
+                Text(title)
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+
+                Spacer()
+
+                Button {
+                    withAnimation(.snappy) {
+                        model.clearFilter()
+                    }
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(Palette.hint)
+                        .frame(width: 32, height: 32)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.leading, 12)
+            .background(Palette.accent.opacity(.subtle), in: Capsule())
+            .contentShape(.rect)
+            .onTapGesture {
+                isFiltering = true
+            }
+            .transition(.opacity)
+        }
+    }
+
+    func toolButton(
+        systemImage: String,
+        isOn: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        let fill = isOn ? Palette.accent.opacity(.subtle) : Color.clear
+        let ring = isOn ? Palette.accent : Palette.line
+
+        return Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Palette.accent)
+                .frame(width: 36, height: 36)
+                .background(fill, in: Circle())
+                .overlay {
+                    Circle()
+                        .stroke(ring, lineWidth: 1)
+                }
+                .frame(width: 44, height: 44)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -697,9 +865,21 @@ private extension RecordsView {
         isSearchFocused = true
     }
 
+    func rememberSearch() {
+        let text = model.searchText
+
+        Task {
+            await model.rememberSearch(text)
+        }
+    }
+
     func closeSearch() {
         isSearchFocused = false
         openId = nil
+
+        if model.searchSummary != nil {
+            rememberSearch()
+        }
 
         withAnimation(.snappy) {
             model.isSearching = false

@@ -1,0 +1,7 @@
+[
+  { "recent": [], "text": "ランチ", "result": ["ランチ"] },
+  { "recent": ["ランチ", "本"], "text": "  本 ", "result": ["本", "ランチ"] },
+  { "recent": ["ランチ"], "text": "   ", "result": ["ランチ"] },
+  { "recent": ["a", "b", "c", "d", "e"], "text": "f", "result": ["f", "a", "b", "c", "d"] },
+  { "recent": ["a", "b", "c", "d", "e"], "text": "c", "result": ["c", "a", "b", "d", "e"] }
+]

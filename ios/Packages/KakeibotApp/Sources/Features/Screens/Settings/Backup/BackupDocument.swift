@@ -3,7 +3,7 @@ import UniformTypeIdentifiers
 
 struct BackupDocument: FileDocument {
     static var readableContentTypes: [UTType] {
-        [.json]
+        [.json, .commaSeparatedText]
     }
 
     let data: Data

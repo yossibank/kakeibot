@@ -32,6 +32,7 @@ public extension Setting {
         case reviewKind = "review_kind"
         case closedHints = "closed_hints"
         case openHiddenLists = "open_hidden_lists"
+        case recentSearches = "recent_searches"
     }
 }
 

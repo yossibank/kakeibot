@@ -14,6 +14,13 @@ struct EntrySearchTests {
         #expect(matches == fixture.matches)
     }
 
+    @Test(arguments: try recentCases)
+    func remembersRecentWords(fixture: RecentCase) {
+        let result = EntrySearch.remembering(fixture.text, in: fixture.recent)
+
+        #expect(result == fixture.result)
+    }
+
     @Test
     func splitsOnAnySpace() {
         let search = EntrySearch("  ランチ　財布 ")
@@ -30,12 +37,24 @@ extension EntrySearchTests {
         let texts: [String]
         let matches: Bool
     }
+
+    struct RecentCase: Decodable, Sendable {
+        let recent: [String]
+        let text: String
+        let result: [String]
+    }
 }
 
 private extension EntrySearchTests {
     static var cases: [SearchCase] {
         get throws {
             try Fixture.load("entry/entry-search.json")
+        }
+    }
+
+    static var recentCases: [RecentCase] {
+        get throws {
+            try Fixture.load("entry/entry-search-recent.json")
         }
     }
 }

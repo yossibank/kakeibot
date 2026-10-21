@@ -36,12 +36,24 @@ public struct BackupView: View {
 
                     VStack(spacing: 0) {
                         Button {
-                            exportFile()
+                            exportFile(.json)
                         } label: {
                             action(
                                 "書き出す",
                                 systemImage: "square.and.arrow.up",
                                 detail: "ファイルに保存します"
+                            )
+                        }
+
+                        Hairline()
+
+                        Button {
+                            exportFile(.csv)
+                        } label: {
+                            action(
+                                "表計算用に書き出す",
+                                systemImage: "tablecells",
+                                detail: "記録を CSV で保存します。読み込みには使えません"
                             )
                         }
 
@@ -91,7 +103,7 @@ public struct BackupView: View {
         .fileExporter(
             isPresented: $isExporting,
             document: document,
-            contentType: .json,
+            contentType: exportType,
             defaultFilename: model.file?.name
         ) { result in
             model.finishExport(result)
@@ -174,9 +186,13 @@ private extension BackupView {
         model.file.map { BackupDocument(data: $0.data) }
     }
 
-    func exportFile() {
+    var exportType: UTType {
+        model.file?.kind == .csv ? .commaSeparatedText : .json
+    }
+
+    func exportFile(_ kind: BackupModel.FileKind) {
         Task {
-            isExporting = await model.makeFile(at: Date())
+            isExporting = await model.makeFile(kind, at: Date())
         }
     }
 }

@@ -11,6 +11,8 @@ public struct EntrySearch: Hashable, Sendable {
 }
 
 public extension EntrySearch {
+    static let recentLimit = 5
+
     var isEmpty: Bool {
         words.isEmpty
     }
@@ -28,6 +30,22 @@ public extension EntrySearch {
 
             return folded.contains { $0.contains(word) }
         }
+    }
+}
+
+public extension EntrySearch {
+    static func remembering(
+        _ text: String,
+        in recent: [String]
+    ) -> [String] {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmed.isEmpty else {
+            return recent
+        }
+
+        let others = recent.filter { $0 != trimmed }
+        return Array(([trimmed] + others).prefix(recentLimit))
     }
 }
 
