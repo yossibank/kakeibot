@@ -71,6 +71,8 @@ public extension AssetsModel {
         public let title: String
         public let icon: Icon?
         public let source: String?
+        public let movedIn: Int
+        public let movedOut: Int
 
         public var id: Recurring.ID {
             bill.recurring.id
@@ -148,11 +150,25 @@ public extension AssetsModel {
         )
 
         return bills.map { bill in
-            UpcomingBill(
+            let card = bill.recurring.toWalletId
+            let month = bill.date.yearMonth
+
+            let moved = entries.filter { entry in
+                entry.walletId == card && entry.billMonth != nil
+            }
+
+            let movedOut = moved.count { entry in
+                entry.billMonth != month
+                    && bill.period?.contains(entry.date) == true
+            }
+
+            return UpcomingBill(
                 bill: bill,
                 title: list.title(of: bill.recurring) ?? Self.billTitle,
                 icon: list.icon(of: bill.recurring),
-                source: list.wallets[bill.recurring.walletId]?.name
+                source: list.wallets[bill.recurring.walletId]?.name,
+                movedIn: moved.count { $0.billMonth == month },
+                movedOut: movedOut
             )
         }
     }

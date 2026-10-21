@@ -211,10 +211,12 @@ private extension AppDatabase {
             return recurring.amount
         }
 
+        let inPeriod = Column("date") >= period.lowerBound
+            && Column("date") <= period.upperBound
+
         let entries = try Entry
             .filter(Column("wallet_id") == card)
-            .filter(Column("date") >= period.lowerBound)
-            .filter(Column("date") <= period.upperBound)
+            .filter(inPeriod || Column("bill_month") == date.yearMonth)
             .fetchAll(db)
 
         return recurring.amount(paidOn: date, entries: entries)

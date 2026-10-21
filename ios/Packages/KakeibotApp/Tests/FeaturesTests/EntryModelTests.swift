@@ -282,6 +282,30 @@ struct EntryModelTests {
         #expect(deleted?.entry == entry)
         #expect(stored == nil)
     }
+
+    @Test
+    func movesCardUsageToLaterBill() async throws {
+        let setup = try await Setup()
+        let card = try await setup.cardWithBill()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        model.press(.digit(5))
+        model.walletId = card.id
+
+        let dates = model.billChoices.map(\.date.description)
+        let later = try #require(model.billChoices.last?.date)
+        model.selectBill(later)
+        let name = model.walletName
+        let change = await model.save()
+
+        #expect(dates == ["2026-11-27", "2026-12-27", "2027-01-27"])
+        #expect(name == "カード → 1/27")
+        #expect(change?.entry.billMonth == later.yearMonth)
+
+        model.date = try #require(LocalDate("2026-10-13"))
+
+        #expect(model.billMonth == nil)
+    }
 }
 
 extension EntryModelTests {
@@ -314,6 +338,41 @@ extension EntryModelTests.Setup {
 
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         return try await database.saveEntry(draft, at: now)
+    }
+
+    func cardWithBill() async throws -> Wallet {
+        let options = try await database.entryOptions()
+        let bank = options.wallets.first { $0.kind == .bank }
+
+        let card = try await database.saveWallet(
+            WalletDraft(
+                kind: .card,
+                name: "カード",
+                mark: .glyph(.card),
+                color: "#4A6FA5",
+                initialBalance: 0
+            ),
+            at: Date()
+        )
+
+        _ = try await database.saveRecurring(
+            RecurringDraft(
+                type: .transfer,
+                amount: 0,
+                categoryId: nil,
+                walletId: bank?.id,
+                toWalletId: card.id,
+                frequency: .monthly,
+                month: 1,
+                day: 27,
+                closingDay: 31,
+                startDate: date
+            ),
+            today: date,
+            at: Date()
+        )
+
+        return card
     }
 }
 

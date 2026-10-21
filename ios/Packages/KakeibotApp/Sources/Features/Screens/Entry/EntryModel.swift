@@ -7,8 +7,22 @@ import Store
 @MainActor
 @Observable
 public final class EntryModel {
-    public var date: LocalDate
-    public var walletId: Wallet.ID?
+    public var date: LocalDate {
+        didSet {
+            if date != oldValue {
+                billMonth = nil
+            }
+        }
+    }
+
+    public var walletId: Wallet.ID? {
+        didSet {
+            if walletId != oldValue {
+                billMonth = nil
+            }
+        }
+    }
+
     public var toWalletId: Wallet.ID?
     public var memo = ""
 
@@ -21,6 +35,7 @@ public final class EntryModel {
     }
 
     public private(set) var tagId: EntryTag.ID?
+    public private(set) var billMonth: YearMonth?
     public private(set) var type: Entry.Kind
     public private(set) var calculator = AmountCalculator()
     public private(set) var options: EntryOptions?
@@ -37,6 +52,7 @@ public final class EntryModel {
     private var allTemplates: [EntryTemplate] = []
     private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
     private var appliedTemplateId: EntryTemplate.ID?
+    private var cardBills: [Recurring] = []
 
     private let database: AppDatabase
     private let editingId: Entry.ID?
@@ -74,6 +90,16 @@ public extension EntryModel {
     struct WalletSection {
         public let kind: Wallet.Kind
         public let wallets: [Wallet]
+    }
+
+    struct BillChoice: Identifiable, Hashable {
+        public let date: LocalDate
+        public let title: String
+        public let period: ClosedRange<LocalDate>?
+
+        public var id: LocalDate {
+            date
+        }
     }
 
     static let categoriesPerPage = 15
@@ -161,7 +187,39 @@ public extension EntryModel {
     }
 
     var walletName: String {
-        wallet(walletId)?.name ?? walletTitle
+        let name = wallet(walletId)?.name ?? walletTitle
+
+        guard billMonth != nil, let date = selectedBillDate else {
+            return name
+        }
+
+        return "\(name) → \(date.month)/\(date.day)"
+    }
+
+    var billChoices: [BillChoice] {
+        guard
+            type != .transfer,
+            let walletId,
+            let bill = cardBills.first(where: { $0.toWalletId == walletId })
+        else {
+            return []
+        }
+
+        let dates = bill.billDates(for: date, count: Self.billTitles.count)
+
+        return zip(dates, Self.billTitles).map { date, title in
+            BillChoice(
+                date: date,
+                title: title,
+                period: bill.billingPeriod(paidOn: date)
+            )
+        }
+    }
+
+    var selectedBillDate: LocalDate? {
+        let choices = billChoices
+        let chosen = choices.first { $0.date.yearMonth == billMonth }
+        return chosen?.date ?? choices.first?.date
     }
 
     var walletTitle: String {
@@ -316,6 +374,8 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
             recentMemos = try await database.recentMemos(limit: limit)
             allTemplates = try await database.templates()
+            cardBills = try await database.recurrings()
+                .filter { $0.type == .transfer && $0.closingDay != nil }
             hasOpenedCategoryMenu = try await database
                 .setting(.categoryMenuOpened)
             weekStart = try await database.setting(.weekStart)
@@ -467,6 +527,11 @@ public extension EntryModel {
         tagId = tagId == id ? nil : id
     }
 
+    func selectBill(_ date: LocalDate) {
+        let isUsual = date == billChoices.first?.date
+        billMonth = isUsual ? nil : date.yearMonth
+    }
+
     func swapWallets() {
         let source = walletId
         walletId = toWalletId
@@ -550,6 +615,7 @@ private extension EntryModel {
         let walletId: Wallet.ID?
         let toWalletId: Wallet.ID?
         let memo: String
+        let billMonth: YearMonth?
     }
 
     var snapshot: Snapshot {
@@ -561,11 +627,13 @@ private extension EntryModel {
             tagId: tagId,
             walletId: walletId,
             toWalletId: toWalletId,
-            memo: memo
+            memo: memo,
+            billMonth: billMonth
         )
     }
 
     static let recentMemoLimit = 6
+    static let billTitles = ["いつもどおり", "次に回す", "2 回先"]
     static let numberLocale = Locale(identifier: "ja_JP")
 
     static func number(_ value: Int) -> String {
@@ -581,6 +649,8 @@ private extension EntryModel {
             .first { $0.id == appliedTemplateId && $0.type == type }?
             .id
 
+        let billMonth = billChoices.isEmpty ? nil : billMonth
+
         return EntryDraft(
             type: type,
             amount: amount,
@@ -590,7 +660,8 @@ private extension EntryModel {
             templateId: templateId,
             walletId: walletId,
             toWalletId: toWalletId,
-            memo: memo
+            memo: memo,
+            billMonth: billMonth
         )
     }
 
@@ -647,6 +718,7 @@ private extension EntryModel {
         toWalletId = entry.toWalletId
         memo = entry.memo ?? ""
         appliedTemplateId = entry.templateId
+        billMonth = entry.billMonth
     }
 
     func loadBalances() async throws {

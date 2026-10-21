@@ -36,14 +36,52 @@ public extension Recurring {
         }
 
         let used = entries
-            .filter { $0.walletId == card && period.contains($0.date) }
+            .filter { $0.walletId == card }
+            .filter { Self.isBilled($0, paidOn: date, in: period) }
             .reduce(0) { $0 + Self.usage(of: $1) }
 
         return max(used, 0)
     }
+
+    func billDates(
+        for used: LocalDate,
+        count: Int
+    ) -> [LocalDate] {
+        guard closingDay != nil else {
+            return []
+        }
+
+        var dates: [LocalDate] = []
+        var cursor = used
+
+        while dates.count < count,
+              let next = nextDate(onOrAfter: cursor) {
+            let closing = billingPeriod(paidOn: next)?.upperBound ?? next
+
+            if !dates.isEmpty || used <= closing {
+                dates.append(next)
+            }
+
+            cursor = next.adding(days: 1)
+        }
+
+        return dates
+    }
 }
 
 private extension Recurring {
+    static func isBilled(
+        _ entry: Entry,
+        paidOn date: LocalDate,
+        in period: ClosedRange<LocalDate>
+    ) -> Bool {
+        guard let month = entry.billMonth else {
+            return period.contains(entry.date)
+        }
+
+        return month == date.yearMonth
+    }
+
     static func usage(of entry: Entry) -> Int {
         switch entry.type {
         case .expense: entry.amount
