@@ -46,7 +46,7 @@ ios/
 ├── Kakeibot.xctestplan      テストターゲットをまとめたテストプラン
 ├── Kakeibot.xcworkspace     プロジェクトと 2 つのパッケージを並べる。Xcode ではこれを開く
 ├── KakeibotWidget/          ウィジェット（@main で WidgetFeature を呼ぶだけ）
-├── license_plist.yml        LicensePlist に手で足すライセンス（同梱のフォント）
+├── license_plist.yml        LicensePlist に手で足すライセンス（同梱のフォントと配布元）
 └── Packages/
     ├── KakeibotApp/         iOS 専用。Xcode でテスト
     └── KakeibotKit/         iOS と macOS。Mac の上で swift test
@@ -142,7 +142,7 @@ KakeibotApp/
 │   │   │   │   ├── Budgets/     予算の一覧と額の入力
 │   │   │   │   ├── Categories/
 │   │   │   │   ├── Launch/      起動時に開く画面を選ぶ画面と、その行と見本
-│   │   │   │   ├── Licenses/    使っている部品とフォントのライセンスの一覧と本文
+│   │   │   │   ├── Licenses/    使っている部品とフォントのライセンスの一覧と本文、配布元
 │   │   │   │   ├── Menu/        設定の入口、確かめ用のテストデータ（#if DEBUG）
 │   │   │   │   ├── MonthStartDay/ 月の始まりの設定
 │   │   │   │   ├── Recurring/   固定費の一覧と編集
@@ -158,7 +158,7 @@ KakeibotApp/
 │   │   │       ├── Records/
 │   │   │       └── Review/
 │   │   └── Shared/
-│   │       ├── Model/       画面のモデルの見張りの形、複数の画面で使う記録の行とテンプレートの説明、記録の検索
+│   │       ├── Model/       画面のモデルの見張りの形、複数の画面で使う記録の行とテンプレートの説明、記録の検索、アプリのバージョン
 │   │       ├── Notice/      記録・削除の知らせと取り消し
 │   │       ├── Period/      期間の範囲と月の始まりの書き方、いまの期間のカード、日を選ぶマス
 │   │       └── Settings/

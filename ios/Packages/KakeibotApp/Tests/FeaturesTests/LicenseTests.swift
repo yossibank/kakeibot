@@ -11,6 +11,8 @@ struct LicenseTests {
 
         #expect(licenses.map(\.title) == ["GRDB.swift (7.11.1)", "Klee One"])
         #expect(licenses.map(\.text) == ["MIT text", "OFL text"])
+        #expect(licenses.first?.source?.absoluteString == Self.grdbSource)
+        #expect(licenses.last?.source == nil)
     }
 
     @Test
@@ -51,7 +53,7 @@ private extension LicenseTests {
         )
 
         try write(
-            page("MIT text"),
+            page("MIT text", source: grdbSource),
             to: folder.appending(path: "GRDB.swift.plist")
         )
 
@@ -74,8 +76,17 @@ private extension LicenseTests {
         ]
     }
 
-    static func page(_ text: String) -> [String: Any] {
-        ["PreferenceSpecifiers": [["FooterText": text]]]
+    static let grdbSource = "https://github.com/groue/GRDB.swift"
+
+    static func page(
+        _ text: String,
+        source: String? = nil
+    ) -> [String: Any] {
+        let sourceItems: [[String: Any]] = source.map { url in
+            [["Title": "Source", "DefaultValue": url]]
+        } ?? []
+
+        return ["PreferenceSpecifiers": sourceItems + [["FooterText": text]]]
     }
 
     static func write(

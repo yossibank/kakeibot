@@ -299,10 +299,33 @@ public struct SettingsSheet: View {
                         VStack(alignment: .leading, spacing: 6) {
                             sectionTitle("このアプリ")
 
-                            NavigationLink {
-                                LicenseListView()
-                            } label: {
-                                row("ライセンス", systemImage: "doc.text")
+                            VStack(spacing: 0) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "info.circle")
+                                        .font(.sans(.body, weight: .light))
+                                        .foregroundStyle(Palette.accent)
+                                        .frame(width: 22)
+
+                                    Text("バージョン")
+                                        .textFont(.subheadline)
+                                        .foregroundStyle(Palette.text)
+
+                                    Spacer()
+
+                                    Text(Self.versionText)
+                                        .textFont(.footnote)
+                                        .monospacedDigit()
+                                        .foregroundStyle(Palette.subtext)
+                                }
+                                .frame(minHeight: 48)
+
+                                Hairline()
+
+                                NavigationLink {
+                                    LicenseListView()
+                                } label: {
+                                    row("ライセンス", systemImage: "doc.text")
+                                }
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14)
@@ -414,6 +437,10 @@ private extension SettingsSheet {
 }
 
 private extension SettingsSheet {
+    static var versionText: String {
+        "\(Bundle.main.shortVersion)（\(Bundle.main.buildNumber)）"
+    }
+
     static let startOptions: [CapsulePicker<Bool>.Option] = [
         .init("する", value: true),
         .init("しない", value: false)

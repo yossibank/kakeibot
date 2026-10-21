@@ -5,6 +5,16 @@
 	<key>PreferenceSpecifiers</key>
 	<array>
 		<dict>
+			<key>DefaultValue</key>
+			<string>https://github.com/fontworks-fonts/Klee</string>
+			<key>Key</key>
+			<string>Klee One-source</string>
+			<key>Title</key>
+			<string>Source</string>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+		</dict>
+		<dict>
 			<key>FooterText</key>
 			<string>Copyright 2020 The Klee Project Authors (https://github.com/fontworks-fonts/Klee)
 
@@ -102,6 +112,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 </string>
 			<key>License</key>
 			<string>unknown</string>
+			<key>Source</key>
+			<string>https://github.com/fontworks-fonts/Klee</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>

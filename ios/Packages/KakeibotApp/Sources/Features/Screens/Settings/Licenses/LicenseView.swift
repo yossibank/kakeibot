@@ -9,14 +9,29 @@ struct LicenseView: View {
             SettingsBackHeader(license.title)
 
             ScrollView {
-                Text(license.text)
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.text)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
-                    .card()
-                    .padding(.vertical, 8)
+                VStack(alignment: .leading, spacing: 12) {
+                    if let source = license.source {
+                        Link(destination: source) {
+                            Label(
+                                "配布元を開く",
+                                systemImage: "arrow.up.right.square"
+                            )
+                            .textFont(.footnote)
+                            .foregroundStyle(Palette.accent)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .card()
+                        }
+                    }
+
+                    Text(license.text)
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.text)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .card()
+                }
+                .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
         }

@@ -5,6 +5,16 @@
 	<key>PreferenceSpecifiers</key>
 	<array>
 		<dict>
+			<key>DefaultValue</key>
+			<string>https://github.com/groue/GRDB.swift</string>
+			<key>Key</key>
+			<string>GRDB.swift-source</string>
+			<key>Title</key>
+			<string>Source</string>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+		</dict>
+		<dict>
 			<key>FooterText</key>
 			<string>Copyright (C) 2015-2025 Gwendal Roué
 
@@ -16,6 +26,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </string>
 			<key>License</key>
 			<string>MIT</string>
+			<key>Source</key>
+			<string>https://github.com/groue/GRDB.swift</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>

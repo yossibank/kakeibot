@@ -16,7 +16,7 @@ format:
 	mint run swiftformat .
 
 licenses:
-	cd ios && mint run --mintfile ../Mintfile LicensePlist --xcworkspace-path Kakeibot.xcworkspace --config-path license_plist.yml --output-path Kakeibot/Licenses.bundle --add-version-numbers --suppress-opening-directory --fail-if-missing-license --force
+	cd ios && mint run --mintfile ../Mintfile LicensePlist --xcworkspace-path Kakeibot.xcworkspace --config-path license_plist.yml --output-path Kakeibot/Licenses.bundle --add-version-numbers --add-sources --suppress-opening-directory --fail-if-missing-license --force
 	rm -f ios/Kakeibot/Licenses.bundle/com.mono0926.LicensePlist.latest_result.txt
 
 build:

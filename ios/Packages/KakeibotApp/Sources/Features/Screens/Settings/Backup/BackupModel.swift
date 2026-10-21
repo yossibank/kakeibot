@@ -19,7 +19,7 @@ public final class BackupModel {
 
     public init(
         database: AppDatabase,
-        appVersion: String = BackupModel.bundleVersion
+        appVersion: String = Bundle.main.shortVersion
     ) {
         self.database = database
         self.appVersion = appVersion
@@ -36,11 +36,6 @@ public extension BackupModel {
     enum FileKind: String, Sendable {
         case json
         case csv
-    }
-
-    nonisolated static var bundleVersion: String {
-        let info = Bundle.main.infoDictionary
-        return info?["CFBundleShortVersionString"] as? String ?? "0"
     }
 
     var pendingSummary: String? {

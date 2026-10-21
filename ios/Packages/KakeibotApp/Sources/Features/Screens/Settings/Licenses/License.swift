@@ -3,6 +3,7 @@ import Foundation
 public struct License: Identifiable, Hashable, Sendable {
     public let id: String
     public let title: String
+    public let source: URL?
     public let text: String
 }
 
@@ -19,12 +20,18 @@ public extension License {
             }
 
             let url = bundle.appending(path: file + ".plist")
-            let texts = specifiers(at: url)
-                .compactMap { $0["FooterText"] as? String }
+            let page = specifiers(at: url)
+            let texts = page.compactMap { $0["FooterText"] as? String }
+
+            let source = page
+                .first { $0["Title"] as? String == sourceTitle }
+                .flatMap { $0["DefaultValue"] as? String }
+                .flatMap(URL.init(string:))
 
             return License(
                 id: file,
                 title: title,
+                source: source,
                 text: texts.joined(separator: "\n\n")
             )
         }
@@ -42,6 +49,7 @@ public extension License {
 
 private extension License {
     static let indexName = "com.mono0926.LicensePlist"
+    static let sourceTitle = "Source"
 
     static func specifiers(at url: URL) -> [[String: Any]] {
         guard

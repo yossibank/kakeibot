@@ -57,9 +57,18 @@ public struct LicenseListView: View {
 private extension LicenseListView {
     func row(_ license: License) -> some View {
         HStack(spacing: 12) {
-            Text(license.title)
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(license.title)
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.text)
+
+                if let source = license.source {
+                    Text(Self.sourceText(source))
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                }
+            }
 
             Spacer()
 
@@ -67,8 +76,13 @@ private extension LicenseListView {
                 .font(.footnote)
                 .foregroundStyle(Palette.hint)
         }
-        .frame(minHeight: 52)
+        .frame(minHeight: 56)
         .contentShape(.rect)
+    }
+
+    static func sourceText(_ url: URL) -> String {
+        let host = url.host() ?? ""
+        return host + url.path()
     }
 }
 
@@ -76,8 +90,13 @@ private extension LicenseListView {
     NavigationStack {
         LicenseListView(
             licenses: [
-                License(id: "a", title: "GRDB.swift (7.11.1)", text: "MIT"),
-                License(id: "b", title: "Klee One", text: "OFL")
+                License(
+                    id: "a",
+                    title: "GRDB.swift (7.11.1)",
+                    source: URL(string: "https://github.com/groue/GRDB.swift"),
+                    text: "MIT"
+                ),
+                License(id: "b", title: "Klee One", source: nil, text: "OFL")
             ]
         )
     }
