@@ -70,17 +70,7 @@ public struct EntryRow: View {
                 }
 
                 if let memo {
-                    Text(memo)
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.leading, 8)
-                        .overlay(alignment: .leading) {
-                            Capsule()
-                                .fill(Palette.accent.opacity(.medium))
-                                .frame(width: 2)
-                        }
+                    EntryMemo(memo)
                 }
             }
             .padding(.vertical, 6)
