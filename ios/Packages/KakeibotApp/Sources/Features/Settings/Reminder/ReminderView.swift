@@ -8,7 +8,6 @@ public struct ReminderView: View {
     @State private var model: ReminderModel
     @State private var isPickingTime = false
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.themeStyle.corner) private var corner
@@ -20,7 +19,7 @@ public struct ReminderView: View {
 
     public var body: some View {
         VStack(spacing: 18) {
-            header
+            SettingsBackHeader("通知")
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
@@ -75,26 +74,6 @@ public struct ReminderView: View {
 }
 
 private extension ReminderView {
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "chevron.left") {
-                dismiss()
-            }
-
-            Spacer()
-
-            Text("通知")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
-        }
-    }
-
     var hero: some View {
         VStack(spacing: 14) {
             Image(systemName: bellImage)

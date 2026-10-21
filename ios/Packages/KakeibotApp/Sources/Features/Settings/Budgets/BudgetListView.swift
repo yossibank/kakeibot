@@ -6,8 +6,6 @@ import SwiftUI
 public struct BudgetListView: View {
     @State private var model: BudgetListModel
 
-    @Environment(\.dismiss) private var dismiss
-
     public init(model: BudgetListModel) {
         _model = State(initialValue: model)
     }
@@ -29,7 +27,7 @@ public struct BudgetListView: View {
 private extension BudgetListView {
     var content: some View {
         VStack(spacing: 16) {
-            header
+            SettingsBackHeader("予算")
 
             VStack(spacing: 4) {
                 Text("\(model.month.month)月（\(model.periodText)）から使う額")
@@ -96,26 +94,6 @@ private extension BudgetListView {
             Rectangle()
                 .fill(Palette.background)
                 .ignoresSafeArea()
-        }
-    }
-
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "chevron.left") {
-                dismiss()
-            }
-
-            Spacer()
-
-            Text("予算")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
         }
     }
 

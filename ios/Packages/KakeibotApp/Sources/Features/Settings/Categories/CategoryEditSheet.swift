@@ -135,30 +135,18 @@ private extension CategoryEditSheet {
     }
 
     var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                close()
+        SettingsEditHeader(
+            title: model.isEditing ? "カテゴリを編集" : "カテゴリを追加",
+            isEditing: model.isEditing,
+            isHidden: model.isHidden
+        ) {
+            close()
+        } onHide: {
+            Task {
+                await setHidden(!model.isHidden)
             }
-            .frame(width: SettingsEditActions.width, alignment: .leading)
-
-            Spacer()
-
-            SettingsSheetTitle(model.isEditing ? "カテゴリを編集" : "カテゴリを追加")
-
-            Spacer()
-
-            ZStack {
-                if model.isEditing {
-                    SettingsEditActions(isHidden: model.isHidden) {
-                        Task {
-                            await setHidden(!model.isHidden)
-                        }
-                    } onDelete: {
-                        isConfirmingDelete = true
-                    }
-                }
-            }
-            .frame(width: SettingsEditActions.width, alignment: .trailing)
+        } onDelete: {
+            isConfirmingDelete = true
         }
     }
 

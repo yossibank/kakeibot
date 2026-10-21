@@ -4,15 +4,14 @@ import Store
 import SwiftUI
 
 public struct TemplateListView: View {
+    @State private var drag = SettingsDrag<EntryTemplate.ID>()
     @State private var model: TemplateListModel
     @State private var sheet: Sheet?
-    @State private var lift: Lift?
-    @State private var liftCount = 0
-    @State private var boardWidth: CGFloat = 0
-    @State private var zones = SettingsDropZones()
-    @State private var autoScroll = SettingsAutoScroll()
-    @State private var contentOrigin: CGPoint = .zero
-    @State private var hideHover = SettingsHideHover()
+    @State private var grid = SettingsBoardGrid(
+        columns: 1,
+        itemHeight: TemplateRowCard.height,
+        spacing: 10
+    )
     @State private var hiddenId: EntryTemplate.ID?
     @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
@@ -20,11 +19,6 @@ public struct TemplateListView: View {
     @State private var deleting: EntryTemplate.ID?
     @State private var isConfirmingDelete = false
     @State private var hiddenList: SettingsScreenFlag
-    @State private var hiddenLift: SettingsHiddenLift<EntryTemplate.ID>?
-    @State private var isOverShowZone = false
-    @State private var showCount = 0
-
-    @Environment(\.dismiss) private var dismiss
 
     private let database: AppDatabase
 
@@ -40,7 +34,7 @@ public struct TemplateListView: View {
 
     public var body: some View {
         VStack(spacing: 14) {
-            header
+            SettingsBackHeader("テンプレート")
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
 
             SettingsHint(
@@ -61,18 +55,15 @@ public struct TemplateListView: View {
                 .onGeometryChange(for: CGPoint.self) { proxy in
                     proxy.frame(in: .global).origin
                 } action: { origin in
-                    contentOrigin = origin
+                    drag.origin = origin
                 }
             }
             .scrollIndicators(.hidden)
             .contentMargins(.horizontal, 18, for: .scrollContent)
             .padding(.horizontal, -18)
-            .scrollDisabled(lift != nil || hiddenLift != nil)
-            .settingsAutoScroll(autoScroll)
-            .settingsDropZones(
-                $zones,
-                showing: hiddenLift == nil ? nil : isOverShowZone
-            )
+            .scrollDisabled(drag.isLifting)
+            .settingsAutoScroll(drag.autoScroll)
+            .settingsDropZones($drag.zones, showing: drag.showZone)
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
@@ -80,8 +71,11 @@ public struct TemplateListView: View {
                 restore(deletion)
             }
 
-            if lift != nil {
-                SettingsHideTarget(zones: $zones, state: hideHover.state)
+            if drag.lift != nil {
+                SettingsHideTarget(
+                    zones: $drag.zones,
+                    isArmed: drag.isOverHide
+                )
             } else {
                 AddButton(addTitle) {
                     sheet = .new(model.type)
@@ -101,9 +95,9 @@ public struct TemplateListView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
+        .sensoryFeedback(.impact(weight: .medium), trigger: drag.liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
-        .sensoryFeedback(.success, trigger: showCount)
+        .sensoryFeedback(.success, trigger: drag.showCount)
         .sheet(item: $sheet) { sheet in
             TemplateEditSheet(model: editModel(for: sheet)) { _ in
             } onDelete: { deletion in
@@ -139,26 +133,6 @@ public struct TemplateListView: View {
 }
 
 private extension TemplateListView {
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "chevron.left") {
-                dismiss()
-            }
-
-            Spacer()
-
-            Text("テンプレート")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
-        }
-    }
-
     var board: some View {
         ZStack(alignment: .topLeading) {
             ForEach(model.shown) { template in
@@ -170,7 +144,7 @@ private extension TemplateListView {
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
         } action: { width in
-            boardWidth = width
+            grid.width = width
         }
     }
 
@@ -202,8 +176,9 @@ private extension TemplateListView {
     }
 
     func hiddenCard(_ template: EntryTemplate) -> some View {
-        let isLifted = hiddenLift?.id == template.id
-        let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
+        let lifted = drag.hiddenOffset(of: template.id)
+        let isLifted = lifted != nil
+        let offset = lifted ?? .zero
         let scale: CGFloat = isLifted ? 1.03 : 1
         let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let opacity: Double = isLifted ? 1 : 0.5
@@ -228,9 +203,9 @@ private extension TemplateListView {
     }
 
     func movableCard(_ template: EntryTemplate) -> some View {
-        let isLifted = lift?.id == template.id
+        let isLifted = drag.isLifted(template.id)
         let index = model.shown.firstIndex(of: template) ?? 0
-        let position = isLifted ? liftedCenter : center(at: index)
+        let position = isLifted ? drag.liftedCenter : grid.center(at: index)
         let scale: CGFloat = isLifted ? 1.03 : 1
         let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
@@ -244,7 +219,7 @@ private extension TemplateListView {
         } content: {
             card(template)
         }
-        .frame(width: tileWidth, height: Self.tileHeight)
+        .frame(width: grid.itemWidth, height: grid.itemHeight)
         .scaleEffect(scale)
         .shadow(color: shadow, radius: 16, y: 8)
         .position(position)
@@ -260,12 +235,6 @@ private extension TemplateListView {
 }
 
 private extension TemplateListView {
-    struct Lift {
-        let id: EntryTemplate.ID
-        var location: CGPoint
-        var grab: CGSize?
-    }
-
     enum Sheet: Hashable, Identifiable {
         case new(Entry.Kind)
         case edit(EntryTemplate.ID)
@@ -281,9 +250,7 @@ private extension TemplateListView {
     ]
 
     nonisolated static let space = "TemplateBoard"
-    static let columnCount = 1
-    static let spacing: CGFloat = 10
-    static let tileHeight = TemplateRowCard.height
+
     var typeName: String {
         model.type == .income ? "収入" : "支出"
     }
@@ -308,94 +275,27 @@ private extension TemplateListView {
         }
     }
 
-    var tileWidth: CGFloat {
-        let gaps = Self.spacing * CGFloat(Self.columnCount - 1)
-        return max((boardWidth - gaps) / CGFloat(Self.columnCount), 0)
-    }
-
     var boardHeight: CGFloat {
-        let count = model.shown.count
-        let rows = (count + Self.columnCount - 1) / Self.columnCount
-        let gaps = Self.spacing * CGFloat(max(rows - 1, 0))
-        return Self.tileHeight * CGFloat(rows) + gaps
-    }
-
-    var liftedCenter: CGPoint {
-        guard let lift else {
-            return .zero
-        }
-
-        let grab = lift.grab ?? .zero
-
-        return CGPoint(
-            x: lift.location.x + grab.width,
-            y: lift.location.y + grab.height
-        )
-    }
-
-    func center(at index: Int) -> CGPoint {
-        let column = index % Self.columnCount
-        let row = index / Self.columnCount
-        let x = (tileWidth + Self.spacing) * CGFloat(column) + tileWidth / 2
-        let y = (Self.tileHeight + Self.spacing) * CGFloat(row)
-
-        return CGPoint(x: x, y: y + Self.tileHeight / 2)
-    }
-
-    func index(at point: CGPoint) -> Int {
-        let width = tileWidth + Self.spacing
-        let height = Self.tileHeight + Self.spacing
-        let column = min(max(Int(point.x / width), 0), Self.columnCount - 1)
-        let row = max(Int(point.y / height), 0)
-        return min(row * Self.columnCount + column, model.shown.count - 1)
+        grid.height(slots: model.shown.count)
     }
 
     func follow(
         _ template: EntryTemplate,
         to location: CGPoint
     ) {
-        if lift == nil {
-            let index = model.shown.firstIndex(of: template) ?? 0
-            let start = center(at: index)
+        let index = model.shown.firstIndex(of: template) ?? 0
+        let start = grid.center(at: index)
 
-            withAnimation(.snappy(duration: 0.2)) {
-                lift = Lift(id: template.id, location: start)
+        let center = drag
+            .follow(template.id, from: start, to: location) { next in
+                follow(template, to: next)
             }
 
-            liftCount += 1
-        }
-
-        guard var current = lift else {
+        guard let center else {
             return
         }
 
-        if current.grab == nil {
-            let start = current.location
-
-            current.grab = CGSize(
-                width: start.x - location.x,
-                height: start.y - location.y
-            )
-        }
-
-        current.location = location
-        lift = current
-        let isInside = zones.isOverHide(location, from: contentOrigin)
-        hideHover.update(isInside: isInside)
-
-        autoScroll.follow(
-            y: location.y + contentOrigin.y,
-            bottom: zones.hide.isEmpty ? nil : zones.hide.minY
-        ) { delta in
-            let shifted = CGPoint(x: location.x, y: location.y + delta)
-            follow(template, to: shifted)
-        }
-
-        guard !hideHover.isInside else {
-            return
-        }
-
-        let target = index(at: liftedCenter)
+        let target = grid.index(at: center, count: model.shown.count)
 
         withAnimation(.snappy) {
             model.move(template.id, to: target)
@@ -403,33 +303,15 @@ private extension TemplateListView {
     }
 
     func drop() {
-        autoScroll.stop()
-
-        guard let lift else {
-            return
-        }
-
-        if hideHover.isArmed {
-            let id = lift.id
-
-            withAnimation(.snappy) {
-                self.lift = nil
-                hideHover.reset()
-            }
-
+        switch drag.drop() {
+        case let .hide(id):
             hide(id)
-
-            return
-        }
-
-        hideHover.reset()
-
-        withAnimation(.snappy) {
-            self.lift = nil
-        }
-
-        Task {
-            await model.finishMoving()
+        case .move:
+            Task {
+                await model.finishMoving()
+            }
+        case nil:
+            break
         }
     }
 
@@ -437,43 +319,15 @@ private extension TemplateListView {
         _ id: EntryTemplate.ID,
         to location: CGPoint
     ) {
-        if hiddenLift == nil {
-            withAnimation(.snappy(duration: 0.2)) {
-                hiddenLift = SettingsHiddenLift(
-                    id: id,
-                    start: location,
-                    location: location
-                )
-            }
-
-            liftCount += 1
-        }
-
-        hiddenLift?.location = location
-        isOverShowZone = zones.isOverShow(location, from: contentOrigin)
+        drag.followHidden(id, to: location)
     }
 
     func dropHidden() {
-        guard let hiddenLift else {
+        guard let id = drag.dropHidden() else {
             return
         }
 
-        let isShowing = isOverShowZone
-
-        withAnimation(.snappy) {
-            self.hiddenLift = nil
-            isOverShowZone = false
-        }
-
-        guard isShowing else {
-            return
-        }
-
-        showCount += 1
-
-        Task {
-            await model.show(hiddenLift.id)
-        }
+        show(id)
     }
 
     func hide(_ id: EntryTemplate.ID) {

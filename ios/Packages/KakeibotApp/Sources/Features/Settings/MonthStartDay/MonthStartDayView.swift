@@ -6,15 +6,13 @@ import SwiftUI
 public struct MonthStartDayView: View {
     @State private var model: MonthStartDayModel
 
-    @Environment(\.dismiss) private var dismiss
-
     public init(model: MonthStartDayModel) {
         _model = State(initialValue: model)
     }
 
     public var body: some View {
         VStack(spacing: 18) {
-            header
+            SettingsBackHeader("月の始まり")
 
             Text("給料日に合わせると、その日から次の給料日の前の日までを 1 か月として数えます")
                 .textFont(.caption)
@@ -57,28 +55,6 @@ public struct MonthStartDayView: View {
         .sensoryFeedback(.selection, trigger: model.startDay)
         .task {
             await model.load()
-        }
-    }
-}
-
-private extension MonthStartDayView {
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "chevron.left") {
-                dismiss()
-            }
-
-            Spacer()
-
-            Text("月の始まり")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
         }
     }
 }

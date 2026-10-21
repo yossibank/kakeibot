@@ -8,10 +8,10 @@ import Store
 @Observable
 public final class RecurringListModel: ScreenModel {
     public private(set) var recurrings: [Recurring] = []
-    public private(set) var movingOrder: [Recurring.ID]?
+    public var movingOrder: [Recurring.ID]?
     public private(set) var list: EntryList?
 
-    public internal(set) var errorNotice = ErrorNotice()
+    public var errorNotice = ErrorNotice()
 
     let today: LocalDate
 
@@ -44,6 +44,14 @@ public extension RecurringListModel {
         public let income: Int
     }
 
+    var visible: [Recurring] {
+        recurrings.filter { $0.archivedAt == nil }
+    }
+
+    var hidden: [Recurring] {
+        recurrings.filter { $0.archivedAt != nil }
+    }
+
     var rows: [Row] {
         guard let list else {
             return []
@@ -67,87 +75,6 @@ public extension RecurringListModel {
             expense: visible.total(of: .expense, in: month),
             income: visible.total(of: .income, in: month)
         )
-    }
-
-    func move(
-        _ id: Recurring.ID,
-        to index: Int
-    ) {
-        var order = movingOrder ?? visible.map(\.id)
-
-        guard let from = order.firstIndex(of: id) else {
-            return
-        }
-
-        let to = min(max(index, 0), order.count - 1)
-
-        guard from != to else {
-            return
-        }
-
-        order.remove(at: from)
-        order.insert(id, at: to)
-        movingOrder = order
-    }
-
-    @discardableResult
-    func hide(_ id: Recurring.ID) async -> Bool {
-        movingOrder = nil
-        let failure = Self.hideFailedMessage
-        return await setHidden(id, isHidden: true, failure: failure)
-    }
-
-    func delete(_ id: Recurring.ID) async -> Deletion? {
-        movingOrder = nil
-
-        do {
-            return try await database.deleteRecurring(id)
-        } catch {
-            errorNotice.show(Self.deleteFailedMessage)
-            return nil
-        }
-    }
-
-    func restore(_ deletion: Deletion) async {
-        do {
-            try await database.restore(deletion)
-        } catch {
-            errorNotice.show(Self.restoreFailedMessage)
-        }
-    }
-
-    func deleteHidden() async -> Deletion? {
-        movingOrder = nil
-        let ids = hidden.map(\.id)
-
-        let result = await SettingsBulkDelete.run(ids) { id in
-            try await database.deleteRecurring(id)
-        }
-
-        if let message = result.message {
-            errorNotice.show(message)
-        }
-
-        return result.deletion
-    }
-
-    func show(_ id: Recurring.ID) async {
-        await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
-    }
-
-    func finishMoving() async {
-        guard let movingOrder else {
-            return
-        }
-
-        do {
-            let ids = movingOrder + hidden.map(\.id)
-            try await database.reorderRecurrings(ids, at: Date())
-        } catch {
-            errorNotice.show(Self.saveFailedMessage)
-        }
-
-        self.movingOrder = nil
     }
 
     func hintFlag() -> SettingsScreenFlag {
@@ -177,50 +104,6 @@ public extension RecurringListModel {
 
 private extension RecurringListModel {
     static let loadFailedMessage = "固定費を読めませんでした"
-    static let saveFailedMessage = "並びを保存できませんでした"
-    static let hideFailedMessage = "非表示にできませんでした"
-    static let showFailedMessage = "表示に戻せませんでした"
-    static let deleteFailedMessage = "削除できませんでした"
-    static let restoreFailedMessage = "元に戻せませんでした"
-
-    var visible: [Recurring] {
-        recurrings.filter { $0.archivedAt == nil }
-    }
-
-    var hidden: [Recurring] {
-        recurrings.filter { $0.archivedAt != nil }
-    }
-
-    var shown: [Recurring] {
-        guard let movingOrder else {
-            return visible
-        }
-
-        return movingOrder.compactMap { id in
-            visible.first { $0.id == id }
-        }
-    }
-
-    @discardableResult
-    func setHidden(
-        _ id: Recurring.ID,
-        isHidden: Bool,
-        failure: String
-    ) async -> Bool {
-        do {
-            try await database.setRecurringHidden(
-                id,
-                isHidden: isHidden,
-                today: today,
-                at: Date()
-            )
-
-            return true
-        } catch {
-            errorNotice.show(failure)
-            return false
-        }
-    }
 
     static func title(of type: Entry.Kind) -> String {
         type == .transfer ? "振替" : "固定費"
@@ -270,5 +153,40 @@ private extension RecurringListModel {
             next: next,
             closing: closing
         )
+    }
+}
+
+extension RecurringListModel: SettingsBoardModel {
+    public func reload() async {
+        do {
+            recurrings = try await database.recurrings(includingHidden: true)
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
+    }
+
+    public func saveOrder(_ ids: [Recurring.ID]) async throws {
+        let ids = ids + hidden.map(\.id)
+        try await database.reorderRecurrings(ids, at: Date())
+    }
+
+    public func saveHidden(
+        _ id: Recurring.ID,
+        isHidden: Bool
+    ) async throws {
+        try await database.setRecurringHidden(
+            id,
+            isHidden: isHidden,
+            today: today,
+            at: Date()
+        )
+    }
+
+    public func remove(_ id: Recurring.ID) async throws -> Deletion {
+        try await database.deleteRecurring(id)
+    }
+
+    public func restoreRemoved(_ deletion: Deletion) async throws {
+        try await database.restore(deletion)
     }
 }

@@ -10,10 +10,10 @@ public final class TemplateListModel: ScreenModel {
     public var type: Entry.Kind = .expense
 
     public private(set) var templates: [EntryTemplate] = []
-    public private(set) var movingOrder: [EntryTemplate.ID]?
+    public var movingOrder: [EntryTemplate.ID]?
     public private(set) var list: EntryList?
 
-    public internal(set) var errorNotice = ErrorNotice()
+    public var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 
@@ -23,16 +23,8 @@ public final class TemplateListModel: ScreenModel {
 }
 
 public extension TemplateListModel {
-    var shown: [EntryTemplate] {
-        let templates = templates(isHidden: false)
-
-        guard let movingOrder else {
-            return templates
-        }
-
-        return movingOrder.compactMap { id in
-            templates.first { $0.id == id }
-        }
+    var visible: [EntryTemplate] {
+        templates(isHidden: false)
     }
 
     var hidden: [EntryTemplate] {
@@ -67,132 +59,14 @@ public extension TemplateListModel {
             }
         }
     }
-
-    func move(
-        _ id: EntryTemplate.ID,
-        to index: Int
-    ) {
-        var order = movingOrder ?? shown.map(\.id)
-
-        guard let from = order.firstIndex(of: id) else {
-            return
-        }
-
-        let to = min(max(index, 0), order.count - 1)
-
-        guard from != to else {
-            return
-        }
-
-        order.remove(at: from)
-        order.insert(id, at: to)
-        movingOrder = order
-    }
-
-    func cancelMoving() {
-        movingOrder = nil
-    }
-
-    @discardableResult
-    func hide(_ id: EntryTemplate.ID) async -> Bool {
-        movingOrder = nil
-        let failure = Self.hideFailedMessage
-        return await setHidden(id, isHidden: true, failure: failure)
-    }
-
-    func delete(_ id: EntryTemplate.ID) async -> Deletion? {
-        movingOrder = nil
-
-        do {
-            return try await database.deleteTemplate(id)
-        } catch {
-            errorNotice.show(Self.deleteFailedMessage)
-            return nil
-        }
-    }
-
-    func restore(_ deletion: Deletion) async {
-        do {
-            try await database.restore(deletion)
-            await load()
-        } catch {
-            errorNotice.show(Self.restoreFailedMessage)
-        }
-    }
-
-    func deleteHidden() async -> Deletion? {
-        movingOrder = nil
-        let ids = hidden.map(\.id)
-
-        let result = await SettingsBulkDelete.run(ids) { id in
-            try await database.deleteTemplate(id)
-        }
-
-        await load()
-
-        if let message = result.message {
-            errorNotice.show(message)
-        }
-
-        return result.deletion
-    }
-
-    func show(_ id: EntryTemplate.ID) async {
-        await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
-    }
-
-    func finishMoving() async {
-        guard let movingOrder else {
-            return
-        }
-
-        let others = templates.map(\.id).filter { !movingOrder.contains($0) }
-        let ids = movingOrder + others
-
-        do {
-            try await database.reorderTemplates(ids, at: Date())
-            templates = try await database.templates(includingHidden: true)
-        } catch {
-            errorNotice.show(Self.saveFailedMessage)
-        }
-
-        self.movingOrder = nil
-    }
 }
 
 private extension TemplateListModel {
     static let loadFailedMessage = "テンプレートを読めませんでした"
-    static let saveFailedMessage = "並びを保存できませんでした"
-    static let hideFailedMessage = "非表示にできませんでした"
-    static let showFailedMessage = "表示に戻せませんでした"
-    static let deleteFailedMessage = "削除できませんでした"
-    static let restoreFailedMessage = "元に戻せませんでした"
 
     func templates(isHidden: Bool) -> [EntryTemplate] {
         templates.filter { template in
             template.type == type && (template.archivedAt != nil) == isHidden
-        }
-    }
-
-    @discardableResult
-    func setHidden(
-        _ id: EntryTemplate.ID,
-        isHidden: Bool,
-        failure: String
-    ) async -> Bool {
-        do {
-            try await database.setTemplateHidden(
-                id,
-                isHidden: isHidden,
-                at: Date()
-            )
-
-            templates = try await database.templates(includingHidden: true)
-
-            return true
-        } catch {
-            errorNotice.show(failure)
-            return false
         }
     }
 
@@ -212,5 +86,39 @@ private extension TemplateListModel {
         ) { list in
             self.list = list
         }
+    }
+}
+
+extension TemplateListModel: SettingsBoardModel {
+    public func reload() async {
+        do {
+            templates = try await database.templates(includingHidden: true)
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
+    }
+
+    public func saveOrder(_ ids: [EntryTemplate.ID]) async throws {
+        let others = templates.map(\.id).filter { !ids.contains($0) }
+        try await database.reorderTemplates(ids + others, at: Date())
+    }
+
+    public func saveHidden(
+        _ id: EntryTemplate.ID,
+        isHidden: Bool
+    ) async throws {
+        try await database.setTemplateHidden(
+            id,
+            isHidden: isHidden,
+            at: Date()
+        )
+    }
+
+    public func remove(_ id: EntryTemplate.ID) async throws -> Deletion {
+        try await database.deleteTemplate(id)
+    }
+
+    public func restoreRemoved(_ deletion: Deletion) async throws {
+        try await database.restore(deletion)
     }
 }

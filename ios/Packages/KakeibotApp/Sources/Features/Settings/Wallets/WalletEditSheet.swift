@@ -216,29 +216,17 @@ private extension WalletEditSheet {
     }
 
     var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                close()
-            }
-            .frame(width: SettingsEditActions.width, alignment: .leading)
-
-            Spacer()
-
-            SettingsSheetTitle(title)
-
-            Spacer()
-
-            ZStack {
-                if model.isEditing {
-                    SettingsEditActions(isHidden: model.isHidden) {
-                        toggleHidden()
-                    } onDelete: {
-                        focus = nil
-                        isConfirmingDelete = true
-                    }
-                }
-            }
-            .frame(width: SettingsEditActions.width, alignment: .trailing)
+        SettingsEditHeader(
+            title: title,
+            isEditing: model.isEditing,
+            isHidden: model.isHidden
+        ) {
+            close()
+        } onHide: {
+            toggleHidden()
+        } onDelete: {
+            focus = nil
+            isConfirmingDelete = true
         }
     }
 

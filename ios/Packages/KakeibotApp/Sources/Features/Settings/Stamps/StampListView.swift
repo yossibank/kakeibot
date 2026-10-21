@@ -4,24 +4,19 @@ import Store
 import SwiftUI
 
 public struct StampListView: View {
+    @State private var drag = SettingsDrag<ShelfIcon.ID>()
     @State private var model: StampListModel
     @State private var sheet: Sheet?
-    @State private var lift: Lift?
-    @State private var liftCount = 0
-    @State private var boardWidth: CGFloat = 0
-    @State private var zones = SettingsDropZones()
-    @State private var autoScroll = SettingsAutoScroll()
-    @State private var contentOrigin: CGPoint = .zero
-    @State private var hideHover = SettingsHideHover()
+    @State private var grid = SettingsBoardGrid(
+        columns: Self.columnCount,
+        itemHeight: Self.tileHeight,
+        spacing: Self.spacing
+    )
     @State private var hiddenId: ShelfIcon.ID?
     @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
-    @State private var hiddenLift: SettingsHiddenLift<ShelfIcon.ID>?
-    @State private var isOverShowZone = false
-    @State private var showCount = 0
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
 
     private let database: AppDatabase
@@ -38,7 +33,7 @@ public struct StampListView: View {
 
     public var body: some View {
         VStack(spacing: 14) {
-            header
+            SettingsBackHeader("スタンプ")
 
             SettingsHint(
                 flag: .closedHint(.stamps, in: database),
@@ -58,16 +53,13 @@ public struct StampListView: View {
                 .onGeometryChange(for: CGPoint.self) { proxy in
                     proxy.frame(in: .global).origin
                 } action: { origin in
-                    contentOrigin = origin
+                    drag.origin = origin
                 }
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(lift != nil || hiddenLift != nil)
-            .settingsAutoScroll(autoScroll)
-            .settingsDropZones(
-                $zones,
-                showing: hiddenLift == nil ? nil : isOverShowZone
-            )
+            .scrollDisabled(drag.isLifting)
+            .settingsAutoScroll(drag.autoScroll)
+            .settingsDropZones($drag.zones, showing: drag.showZone)
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
@@ -75,9 +67,12 @@ public struct StampListView: View {
                 restore(deletion)
             }
 
-            if lift != nil {
-                SettingsHideTarget(zones: $zones, state: hideHover.state)
-                    .padding(.bottom, 8)
+            if drag.lift != nil {
+                SettingsHideTarget(
+                    zones: $drag.zones,
+                    isArmed: drag.isOverHide
+                )
+                .padding(.bottom, 8)
             }
         }
         .padding(.horizontal, 18)
@@ -92,9 +87,9 @@ public struct StampListView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
+        .sensoryFeedback(.impact(weight: .medium), trigger: drag.liftCount)
         .sensoryFeedback(.selection, trigger: model.movingOrder)
-        .sensoryFeedback(.success, trigger: showCount)
+        .sensoryFeedback(.success, trigger: drag.showCount)
         .sheet(item: $sheet) { sheet in
             StampEditSheet(model: editModel(for: sheet)) { deletion in
                 self.deletion = deletion
@@ -117,26 +112,6 @@ public struct StampListView: View {
 }
 
 private extension StampListView {
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "chevron.left") {
-                dismiss()
-            }
-
-            Spacer()
-
-            Text("スタンプ")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
-        }
-    }
-
     var board: some View {
         ZStack(alignment: .topLeading) {
             ForEach(model.shown) { shelfIcon in
@@ -144,15 +119,15 @@ private extension StampListView {
             }
 
             addTile
-                .frame(width: tileWidth, height: Self.tileHeight)
-                .position(center(at: model.shown.count))
+                .frame(width: grid.itemWidth, height: Self.tileHeight)
+                .position(grid.center(at: model.shown.count))
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
         } action: { width in
-            boardWidth = width
+            grid.width = width
         }
     }
 
@@ -195,8 +170,9 @@ private extension StampListView {
     }
 
     func hiddenTile(_ shelfIcon: ShelfIcon) -> some View {
-        let isLifted = hiddenLift?.id == shelfIcon.id
-        let offset = isLifted ? hiddenLift?.offset ?? .zero : .zero
+        let lifted = drag.hiddenOffset(of: shelfIcon.id)
+        let isLifted = lifted != nil
+        let offset = lifted ?? .zero
         let scale: CGFloat = isLifted ? 1.1 : 1
         let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
@@ -220,15 +196,15 @@ private extension StampListView {
     }
 
     func movableTile(_ shelfIcon: ShelfIcon) -> some View {
-        let isLifted = lift?.id == shelfIcon.id
+        let isLifted = drag.isLifted(shelfIcon.id)
         let index = model.shown.firstIndex(of: shelfIcon) ?? 0
-        let position = isLifted ? liftedCenter : center(at: index)
+        let position = isLifted ? drag.liftedCenter : grid.center(at: index)
         let scale: CGFloat = isLifted ? 1.1 : 1
         let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
         let layer: Double = isLifted ? 1 : 0
 
         return tileFace(shelfIcon, isHidden: false)
-            .frame(width: tileWidth, height: Self.tileHeight)
+            .frame(width: grid.itemWidth, height: Self.tileHeight)
             .scaleEffect(scale)
             .shadow(color: shadow, radius: 16, y: 8)
             .position(position)
@@ -282,12 +258,6 @@ private extension StampListView {
 }
 
 private extension StampListView {
-    struct Lift {
-        let id: ShelfIcon.ID
-        var location: CGPoint
-        var grab: CGSize?
-    }
-
     enum Sheet: Identifiable {
         case new
         case edit(ShelfIcon.ID)
@@ -322,94 +292,27 @@ private extension StampListView {
         )
     }
 
-    var tileWidth: CGFloat {
-        let gaps = Self.spacing * CGFloat(Self.columnCount - 1)
-        return max((boardWidth - gaps) / CGFloat(Self.columnCount), 0)
-    }
-
     var boardHeight: CGFloat {
-        let slots = model.shown.count + 1
-        let rows = (slots + Self.columnCount - 1) / Self.columnCount
-        let gaps = Self.spacing * CGFloat(max(rows - 1, 0))
-        return Self.tileHeight * CGFloat(rows) + gaps
-    }
-
-    var liftedCenter: CGPoint {
-        guard let lift else {
-            return .zero
-        }
-
-        let grab = lift.grab ?? .zero
-
-        return CGPoint(
-            x: lift.location.x + grab.width,
-            y: lift.location.y + grab.height
-        )
-    }
-
-    func center(at index: Int) -> CGPoint {
-        let column = index % Self.columnCount
-        let row = index / Self.columnCount
-        let x = (tileWidth + Self.spacing) * CGFloat(column) + tileWidth / 2
-        let y = (Self.tileHeight + Self.spacing) * CGFloat(row)
-
-        return CGPoint(x: x, y: y + Self.tileHeight / 2)
-    }
-
-    func index(at point: CGPoint) -> Int {
-        let width = tileWidth + Self.spacing
-        let height = Self.tileHeight + Self.spacing
-        let column = min(max(Int(point.x / width), 0), Self.columnCount - 1)
-        let row = max(Int(point.y / height), 0)
-        return min(row * Self.columnCount + column, model.shown.count - 1)
+        grid.height(slots: model.shown.count + 1)
     }
 
     func follow(
         _ shelfIcon: ShelfIcon,
         to location: CGPoint
     ) {
-        if lift == nil {
-            let index = model.shown.firstIndex(of: shelfIcon) ?? 0
-            let start = center(at: index)
+        let index = model.shown.firstIndex(of: shelfIcon) ?? 0
+        let start = grid.center(at: index)
 
-            withAnimation(.snappy(duration: 0.2)) {
-                lift = Lift(id: shelfIcon.id, location: start)
+        let center = drag
+            .follow(shelfIcon.id, from: start, to: location) { next in
+                follow(shelfIcon, to: next)
             }
 
-            liftCount += 1
-        }
-
-        guard var current = lift else {
+        guard let center else {
             return
         }
 
-        if current.grab == nil {
-            let start = current.location
-
-            current.grab = CGSize(
-                width: start.x - location.x,
-                height: start.y - location.y
-            )
-        }
-
-        current.location = location
-        lift = current
-        let isInside = zones.isOverHide(location, from: contentOrigin)
-        hideHover.update(isInside: isInside)
-
-        autoScroll.follow(
-            y: location.y + contentOrigin.y,
-            bottom: zones.hide.isEmpty ? nil : zones.hide.minY
-        ) { delta in
-            let shifted = CGPoint(x: location.x, y: location.y + delta)
-            follow(shelfIcon, to: shifted)
-        }
-
-        guard !hideHover.isInside else {
-            return
-        }
-
-        let target = index(at: liftedCenter)
+        let target = grid.index(at: center, count: model.shown.count)
 
         withAnimation(.snappy) {
             model.move(shelfIcon.id, to: target)
@@ -417,33 +320,15 @@ private extension StampListView {
     }
 
     func drop() {
-        autoScroll.stop()
-
-        guard let lift else {
-            return
-        }
-
-        if hideHover.isArmed {
-            let id = lift.id
-
-            withAnimation(.snappy) {
-                self.lift = nil
-                hideHover.reset()
-            }
-
+        switch drag.drop() {
+        case let .hide(id):
             hide(id)
-
-            return
-        }
-
-        hideHover.reset()
-
-        withAnimation(.snappy) {
-            self.lift = nil
-        }
-
-        Task {
-            await model.finishMoving()
+        case .move:
+            Task {
+                await model.finishMoving()
+            }
+        case nil:
+            break
         }
     }
 
@@ -451,43 +336,15 @@ private extension StampListView {
         _ id: ShelfIcon.ID,
         to location: CGPoint
     ) {
-        if hiddenLift == nil {
-            withAnimation(.snappy(duration: 0.2)) {
-                hiddenLift = SettingsHiddenLift(
-                    id: id,
-                    start: location,
-                    location: location
-                )
-            }
-
-            liftCount += 1
-        }
-
-        hiddenLift?.location = location
-        isOverShowZone = zones.isOverShow(location, from: contentOrigin)
+        drag.followHidden(id, to: location)
     }
 
     func dropHidden() {
-        guard let hiddenLift else {
+        guard let id = drag.dropHidden() else {
             return
         }
 
-        let isShowing = isOverShowZone
-
-        withAnimation(.snappy) {
-            self.hiddenLift = nil
-            isOverShowZone = false
-        }
-
-        guard isShowing else {
-            return
-        }
-
-        showCount += 1
-
-        Task {
-            await model.show(hiddenLift.id)
-        }
+        show(id)
     }
 
     func hide(_ id: ShelfIcon.ID) {

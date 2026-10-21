@@ -5,15 +5,13 @@ import SwiftUI
 public struct LaunchScreenView: View {
     @State private var model: LaunchScreenModel
 
-    @Environment(\.dismiss) private var dismiss
-
     public init(model: LaunchScreenModel) {
         _model = State(initialValue: model)
     }
 
     public var body: some View {
         VStack(spacing: 18) {
-            header
+            SettingsBackHeader("起動時に開く画面")
 
             Text("アプリを開いたときに、最初に出す画面を選べます")
                 .textFont(.caption)
@@ -59,24 +57,4 @@ public struct LaunchScreenView: View {
     }
 }
 
-private extension LaunchScreenView {
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "chevron.left") {
-                dismiss()
-            }
-
-            Spacer()
-
-            Text("起動時に開く画面")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
-        }
-    }
-}
+private extension LaunchScreenView {}

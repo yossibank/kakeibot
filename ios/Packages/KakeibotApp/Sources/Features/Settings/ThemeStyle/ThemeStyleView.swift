@@ -7,7 +7,6 @@ public struct ThemeStyleView: View {
     @State private var model: ThemeStyleModel
     @State private var openedStyle: ThemeStyle?
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle) private var appStyle
     @Environment(\.themeStyle.corner) private var corner
 
@@ -17,7 +16,7 @@ public struct ThemeStyleView: View {
 
     public var body: some View {
         VStack(spacing: 14) {
-            header
+            SettingsBackHeader("角の丸みと字体")
 
             preview
                 .environment(\.themeStyle, model.style)
@@ -80,26 +79,6 @@ public struct ThemeStyleView: View {
 }
 
 private extension ThemeStyleView {
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "chevron.left") {
-                dismiss()
-            }
-
-            Spacer()
-
-            Text("角の丸みと字体")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
-        }
-    }
-
     var preview: some View {
         VStack(spacing: 12) {
             VStack(spacing: 4) {

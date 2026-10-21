@@ -1,11 +1,12 @@
 import DesignSystem
 import SwiftUI
 
-struct SettingsHideZone: View {
+struct SettingsHideTarget: View {
+    @Binding var zones: SettingsDropZones
+
     @Environment(\.themeStyle.corner) private var corner
 
-    let state: SettingsHideHover.State
-    let height: CGFloat
+    let isArmed: Bool
 
     var body: some View {
         HStack(spacing: 8) {
@@ -16,7 +17,7 @@ struct SettingsHideZone: View {
         .textFont(.subheadline)
         .foregroundStyle(color)
         .contentTransition(.opacity)
-        .frame(maxWidth: .infinity, minHeight: height)
+        .frame(maxWidth: .infinity, minHeight: 50)
         .background {
             shape
                 .fill(Palette.backgroundBottom.opacity(.strong))
@@ -28,34 +29,40 @@ struct SettingsHideZone: View {
             shape
                 .stroke(color.opacity(0.6), style: .dashed)
         }
-        .animation(.snappy(duration: 0.2), value: state)
+        .animation(.snappy(duration: 0.2), value: isArmed)
+        .onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .global)
+        } action: { frame in
+            zones.hide = frame
+        }
+        .transition(.opacity)
+        .sensoryFeedback(
+            .impact(weight: .heavy),
+            trigger: isArmed
+        ) { _, new in
+            new
+        }
     }
 }
 
-private extension SettingsHideZone {
+private extension SettingsHideTarget {
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     var color: Color {
-        switch state {
-        case .outside: Palette.subtext
-        case .armed: Palette.rose
-        }
+        isArmed ? Palette.rose : Palette.subtext
     }
 
     var fill: Color {
-        state == .armed ? color.opacity(.subtle) : .clear
+        isArmed ? color.opacity(.subtle) : .clear
     }
 
     var systemImage: String {
-        state == .armed ? "eye.slash.fill" : "eye.slash"
+        isArmed ? "eye.slash.fill" : "eye.slash"
     }
 
     var title: String {
-        switch state {
-        case .outside: "ここに置くと非表示にできます"
-        case .armed: "離すと非表示になります"
-        }
+        isArmed ? "離すと非表示になります" : "ここに置くと非表示にできます"
     }
 }

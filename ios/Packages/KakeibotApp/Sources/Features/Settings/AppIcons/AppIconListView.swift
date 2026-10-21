@@ -4,15 +4,13 @@ import SwiftUI
 public struct AppIconListView: View {
     @Bindable private var model: AppIconListModel
 
-    @Environment(\.dismiss) private var dismiss
-
     public init(model: AppIconListModel) {
         self.model = model
     }
 
     public var body: some View {
         VStack(spacing: 14) {
-            header
+            SettingsBackHeader("アプリアイコン")
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
@@ -41,26 +39,6 @@ public struct AppIconListView: View {
 }
 
 private extension AppIconListView {
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "chevron.left") {
-                dismiss()
-            }
-
-            Spacer()
-
-            Text("アプリアイコン")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
-        }
-    }
-
     func section(
         _ title: String,
         isLight: Bool

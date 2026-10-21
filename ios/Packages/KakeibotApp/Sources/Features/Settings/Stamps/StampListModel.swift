@@ -8,9 +8,9 @@ import Store
 @Observable
 public final class StampListModel: ScreenModel {
     public private(set) var shelf: IconShelf?
-    public private(set) var movingOrder: [ShelfIcon.ID]?
+    public var movingOrder: [ShelfIcon.ID]?
 
-    public internal(set) var errorNotice = ErrorNotice()
+    public var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 
@@ -20,16 +20,8 @@ public final class StampListModel: ScreenModel {
 }
 
 public extension StampListModel {
-    var shown: [ShelfIcon] {
-        let stamps = stamps(isHidden: false)
-
-        guard let movingOrder else {
-            return stamps
-        }
-
-        return movingOrder.compactMap { id in
-            stamps.first { $0.id == id }
-        }
+    var visible: [ShelfIcon] {
+        stamps(isHidden: false)
     }
 
     var hidden: [ShelfIcon] {
@@ -56,118 +48,43 @@ public extension StampListModel {
             self.shelf = shelf
         }
     }
-
-    func move(
-        _ id: ShelfIcon.ID,
-        to index: Int
-    ) {
-        var order = movingOrder ?? shown.map(\.id)
-
-        guard let from = order.firstIndex(of: id) else {
-            return
-        }
-
-        let to = min(max(index, 0), order.count - 1)
-
-        guard from != to else {
-            return
-        }
-
-        order.remove(at: from)
-        order.insert(id, at: to)
-        movingOrder = order
-    }
-
-    func cancelMoving() {
-        movingOrder = nil
-    }
-
-    @discardableResult
-    func hide(_ id: ShelfIcon.ID) async -> Bool {
-        movingOrder = nil
-        let failure = Self.hideFailedMessage
-        return await setHidden(id, isHidden: true, failure: failure)
-    }
-
-    func restore(_ deletion: Deletion) async {
-        do {
-            try await database.restore(deletion)
-            await load()
-        } catch {
-            errorNotice.show(Self.restoreFailedMessage)
-        }
-    }
-
-    func deleteHidden() async -> Deletion? {
-        movingOrder = nil
-        let ids = hidden.map(\.id)
-
-        let result = await SettingsBulkDelete.run(ids) { id in
-            try await database.deleteShelfIcon(id)
-        }
-
-        await load()
-
-        if let message = result.message {
-            errorNotice.show(message)
-        }
-
-        return result.deletion
-    }
-
-    func show(_ id: ShelfIcon.ID) async {
-        await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
-    }
-
-    func finishMoving() async {
-        guard let movingOrder else {
-            return
-        }
-
-        let ids = movingOrder + hidden.map(\.id)
-
-        do {
-            try await database.reorderShelfIcons(ids, at: Date())
-            await load()
-        } catch {
-            errorNotice.show(Self.saveFailedMessage)
-        }
-
-        self.movingOrder = nil
-    }
 }
 
 private extension StampListModel {
     static let loadFailedMessage = "スタンプを読めませんでした"
-    static let saveFailedMessage = "並びを保存できませんでした"
-    static let hideFailedMessage = "非表示にできませんでした"
-    static let showFailedMessage = "表示に戻せませんでした"
-    static let restoreFailedMessage = "元に戻せませんでした"
 
     func stamps(isHidden: Bool) -> [ShelfIcon] {
         let stamps = shelf?.shelfIcons ?? []
         return stamps.filter { ($0.archivedAt != nil) == isHidden }
     }
+}
 
-    @discardableResult
-    func setHidden(
+extension StampListModel: SettingsBoardModel {
+    public func reload() async {
+        await load()
+    }
+
+    public func saveOrder(_ ids: [ShelfIcon.ID]) async throws {
+        let ids = ids + hidden.map(\.id)
+        try await database.reorderShelfIcons(ids, at: Date())
+    }
+
+    public func saveHidden(
         _ id: ShelfIcon.ID,
-        isHidden: Bool,
-        failure: String
-    ) async -> Bool {
-        do {
-            try await database.setShelfIconHidden(
-                id,
-                isHidden: isHidden,
-                at: Date()
-            )
+        isHidden: Bool
+    ) async throws {
+        try await database.setShelfIconHidden(
+            id,
+            isHidden: isHidden,
+            at: Date()
+        )
+    }
 
-            await load()
+    public func remove(_ id: ShelfIcon.ID) async throws -> Deletion {
+        try await database.deleteShelfIcon(id)
+    }
 
-            return true
-        } catch {
-            errorNotice.show(failure)
-            return false
-        }
+    public func restoreRemoved(_ deletion: Deletion) async throws {
+        try await database.restore(deletion)
     }
 }

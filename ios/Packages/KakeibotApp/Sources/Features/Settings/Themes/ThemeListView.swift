@@ -10,7 +10,6 @@ public struct ThemeListView: View {
     @State private var pressing: ThemeChoice?
     @State private var width: CGFloat = 0
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
 
     private let database: AppDatabase
@@ -29,7 +28,7 @@ public struct ThemeListView: View {
     public var body: some View {
         ZStack(alignment: .topLeading) {
             VStack(spacing: 14) {
-                header
+                SettingsBackHeader("テーマ")
 
                 SettingsHint(
                     flag: .closedHint(.themes, in: database),
@@ -108,26 +107,6 @@ public struct ThemeListView: View {
 }
 
 private extension ThemeListView {
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "chevron.left") {
-                dismiss()
-            }
-
-            Spacer()
-
-            Text("テーマ")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
-        }
-    }
-
     var customSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("つくったテーマ")
