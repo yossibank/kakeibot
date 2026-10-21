@@ -269,7 +269,7 @@ private extension RecurringListView {
                         Text(row.title)
                             .textFont(.subheadline)
                             .foregroundStyle(Palette.text)
-                            .lineLimit(1)
+                            .lineLimit(2)
 
                         Spacer(minLength: 8)
 

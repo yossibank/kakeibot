@@ -137,9 +137,10 @@ struct HomeModelTests {
         #expect(rows.count == HomeModel.recentLimit)
         #expect(rows.map(\.amount) == [100, 101, 102, 103, 104])
         #expect(rows.first?.title == "食費")
-        #expect(rows.first?.detail == "今日・メモ0・財布")
-        #expect(rows[1].detail == "昨日・メモ1・財布")
-        #expect(rows[2].detail == "10/10・メモ2・財布")
+        #expect(rows.first?.detail == "今日・財布")
+        #expect(rows[1].detail == "昨日・財布")
+        #expect(rows[2].detail == "10/10・財布")
+        #expect(rows.first?.memo == "メモ0")
     }
 }
 

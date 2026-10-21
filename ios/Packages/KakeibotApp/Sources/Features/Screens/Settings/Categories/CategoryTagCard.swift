@@ -7,7 +7,7 @@ struct CategoryTagCard: View {
 
     @Environment(\.themeStyle.corner) private var corner
 
-    @FocusState private var isFocused: Bool
+    var isFocused: FocusState<Bool>.Binding
 
     let isAdding: Bool
     let errorMessage: String?
@@ -73,7 +73,7 @@ struct CategoryTagCard: View {
         }
         .shadow(color: Palette.shadow.opacity(0.45), radius: 20, y: 10)
         .task {
-            isFocused = true
+            isFocused.wrappedValue = true
         }
     }
 }
@@ -108,7 +108,7 @@ private extension CategoryTagCard {
         .foregroundStyle(Palette.text)
         .tint(Palette.accent)
         .submitLabel(.done)
-        .focused($isFocused)
+        .focused(isFocused)
         .onSubmit(onCommit)
         .padding(.horizontal, 14)
         .frame(height: 46)

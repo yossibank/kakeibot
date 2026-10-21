@@ -13,6 +13,7 @@ public struct CategoryEditSheet: View {
     @State private var ignoresKeyboard = false
 
     @FocusState private var focus: Field?
+    @FocusState private var isTagFocused: Bool
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
@@ -231,6 +232,7 @@ private extension CategoryEditSheet {
 
         CategoryTagCard(
             name: $tagName,
+            isFocused: $isTagFocused,
             isAdding: edit == .add,
             errorMessage: model.tagProblem,
             onCommit: {
@@ -313,6 +315,7 @@ private extension CategoryEditSheet {
     }
 
     func closeTag() {
+        isTagFocused = false
         model.clearTagProblem()
 
         withAnimation(.snappy(duration: 0.2)) {

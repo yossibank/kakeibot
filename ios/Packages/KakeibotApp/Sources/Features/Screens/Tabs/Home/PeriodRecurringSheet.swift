@@ -216,7 +216,7 @@ private extension PeriodRecurringSheet {
                 Text(model.title(of: item.recurring))
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
+                    .lineLimit(2)
 
                 if let place = model.place(of: item.recurring) {
                     Text(place)

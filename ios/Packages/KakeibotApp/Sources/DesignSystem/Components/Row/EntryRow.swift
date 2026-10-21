@@ -6,6 +6,7 @@ public struct EntryRow: View {
     let title: String
     let tag: String?
     let detail: String?
+    let memo: String?
     let amount: Int
     let type: Entry.Kind
     let isRecurring: Bool
@@ -15,6 +16,7 @@ public struct EntryRow: View {
         title: String,
         tag: String? = nil,
         detail: String?,
+        memo: String? = nil,
         amount: Int,
         type: Entry.Kind,
         isRecurring: Bool = false
@@ -23,6 +25,7 @@ public struct EntryRow: View {
         self.title = title
         self.tag = tag
         self.detail = detail
+        self.memo = memo
         self.amount = amount
         self.type = type
         self.isRecurring = isRecurring
@@ -41,28 +44,46 @@ public struct EntryRow: View {
             }
             .foregroundStyle(Palette.accent)
 
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(title)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(title)
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.text)
+                        .layoutPriority(1)
 
-                if isRecurring {
-                    Image(systemName: "repeat")
-                        .font(.sans(.caption, weight: .semibold))
-                        .foregroundStyle(Palette.accent.opacity(.strong))
+                    if isRecurring {
+                        Image(systemName: "repeat")
+                            .font(.sans(.caption, weight: .semibold))
+                            .foregroundStyle(Palette.accent.opacity(.strong))
+                    }
+
+                    if let tag {
+                        TagCard(tag, size: .small)
+                    }
+
+                    if let detail {
+                        Text(detail)
+                            .textFont(.caption)
+                            .foregroundStyle(Palette.subtext)
+                            .lineLimit(1)
+                    }
                 }
 
-                if let tag {
-                    TagCard(tag, size: .small)
-                }
-
-                if let detail {
-                    Text(detail)
+                if let memo {
+                    Text(memo)
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
-                        .lineLimit(1)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.leading, 8)
+                        .overlay(alignment: .leading) {
+                            Capsule()
+                                .fill(Palette.accent.opacity(.medium))
+                                .frame(width: 2)
+                        }
                 }
             }
+            .padding(.vertical, 6)
 
             Spacer(minLength: 8)
 
@@ -98,7 +119,8 @@ public struct EntryRow: View {
             icon: food,
             title: "食費",
             tag: "昼ごはん",
-            detail: "ランチ・財布",
+            detail: "財布",
+            memo: "同僚と駅前の新しいイタリアンでランチ。パスタとサラダのセット",
             amount: 980,
             type: .expense
         )

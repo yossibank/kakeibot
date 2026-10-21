@@ -340,6 +340,7 @@ private extension HomeView {
                             title: row.title,
                             tag: row.tag,
                             detail: row.detail,
+                            memo: row.memo,
                             amount: row.amount,
                             type: row.type,
                             isRecurring: row.isRecurring
