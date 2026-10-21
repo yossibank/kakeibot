@@ -58,7 +58,7 @@ public struct RecordsView: View {
 
                         filterButton
 
-                        ToolButton(systemImage: "magnifyingglass") {
+                        toolButton(systemImage: "magnifyingglass") {
                             openSearch()
                         }
                     }
@@ -85,7 +85,7 @@ public struct RecordsView: View {
             stampSheet(on: target.date)
         }
         .sheet(isPresented: $isFiltering) {
-            EntryFilterSheet(filter: $model.filter, list: model.list)
+            RecordsFilterSheet(filter: $model.filter, list: model.list)
         }
         .sensoryFeedback(.success, trigger: stampCount)
         .background {
@@ -299,7 +299,7 @@ private extension RecordsView {
     }
 
     var filterButton: some View {
-        ToolButton(
+        toolButton(
             systemImage: "line.3.horizontal.decrease",
             isOn: !model.filter.isEmpty
         ) {
@@ -310,7 +310,7 @@ private extension RecordsView {
     @ViewBuilder
     var filterLine: some View {
         if let title = model.filterTitle {
-            EntryFilterLine(title: title) {
+            RecordsFilterLine(title: title) {
                 isFiltering = true
             } onClear: {
                 withAnimation(.snappy) {
@@ -318,6 +318,30 @@ private extension RecordsView {
                 }
             }
         }
+    }
+
+    func toolButton(
+        systemImage: String,
+        isOn: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        let fill = isOn ? Palette.accent.opacity(.subtle) : Color.clear
+        let ring = isOn ? Palette.accent : Palette.line
+
+        return Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Palette.accent)
+                .frame(width: 36, height: 36)
+                .background(fill, in: Circle())
+                .overlay {
+                    Circle()
+                        .stroke(ring, lineWidth: 1)
+                }
+                .frame(width: 44, height: 44)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder

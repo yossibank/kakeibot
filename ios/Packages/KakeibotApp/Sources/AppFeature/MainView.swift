@@ -226,12 +226,6 @@ struct MainView: View {
                 open(route)
             }
         }
-        .onChange(of: records.filter) { _, filter in
-            review.filter = filter
-        }
-        .onChange(of: review.filter) { _, filter in
-            records.filter = filter
-        }
         .onChange(of: today) { _, today in
             home.today = today
             records.today = today

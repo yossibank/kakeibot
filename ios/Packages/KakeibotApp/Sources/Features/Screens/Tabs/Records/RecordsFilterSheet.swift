@@ -3,8 +3,10 @@ import DesignSystem
 import Store
 import SwiftUI
 
-struct EntryFilterSheet: View {
+struct RecordsFilterSheet: View {
     @Binding var filter: EntryFilter
+
+    @State private var tab: Tab = .expense
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
@@ -15,13 +17,13 @@ struct EntryFilterSheet: View {
         VStack(spacing: 18) {
             header
 
+            CapsulePicker(selection: $tab, options: tabOptions)
+
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    section("支出", items: categoryItems(.expense))
-
-                    section("収入", items: categoryItems(.income))
-
-                    section("口座", items: walletItems)
+                LazyVGrid(columns: Self.columns, spacing: 10) {
+                    ForEach(items(in: tab)) { item in
+                        choice(item)
+                    }
                 }
                 .padding(.vertical, 4)
             }
@@ -41,7 +43,13 @@ struct EntryFilterSheet: View {
     }
 }
 
-private extension EntryFilterSheet {
+private extension RecordsFilterSheet {
+    enum Tab: Hashable {
+        case expense
+        case income
+        case wallet
+    }
+
     struct Item: Identifiable {
         let id: AnyHashable
         let name: String
@@ -87,28 +95,6 @@ private extension EntryFilterSheet {
         }
     }
 
-    @ViewBuilder
-    func section(
-        _ title: String,
-        items: [Item]
-    ) -> some View {
-        if !items.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(title)
-                    .textFont(.caption2)
-                    .tracking(3)
-                    .foregroundStyle(Palette.accent)
-                    .padding(.leading, 4)
-
-                LazyVGrid(columns: Self.columns, spacing: 10) {
-                    ForEach(items) { item in
-                        choice(item)
-                    }
-                }
-            }
-        }
-    }
-
     func choice(_ item: Item) -> some View {
         let ring = item.isOn ? Palette.accent : Palette.line
         let fill = item.isOn ? Palette.accent.opacity(.subtle) : Color.clear
@@ -140,13 +126,48 @@ private extension EntryFilterSheet {
     }
 }
 
-private extension EntryFilterSheet {
+private extension RecordsFilterSheet {
     static let sideWidth: CGFloat = 88
 
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: 10),
         count: 4
     )
+
+    var tabOptions: [CapsulePicker<Tab>.Option] {
+        let expense = tabTitle("支出", count: count(of: .expense))
+        let income = tabTitle("収入", count: count(of: .income))
+        let wallet = tabTitle("口座", count: filter.walletIds.count)
+
+        return [
+            .init(expense, value: .expense),
+            .init(income, value: .income),
+            .init(wallet, value: .wallet)
+        ]
+    }
+
+    func tabTitle(
+        _ title: String,
+        count: Int
+    ) -> String {
+        count > 0 ? "\(title) \(count)" : title
+    }
+
+    func count(of kind: EntryCategory.Kind) -> Int {
+        let categories = list?.filterCategories ?? []
+
+        return categories
+            .filter { $0.kind == kind && filter.categoryIds.contains($0.id) }
+            .count
+    }
+
+    func items(in tab: Tab) -> [Item] {
+        switch tab {
+        case .expense: categoryItems(.expense)
+        case .income: categoryItems(.income)
+        case .wallet: walletItems
+        }
+    }
 
     func categoryItems(_ kind: EntryCategory.Kind) -> [Item] {
         let categories = list?.filterCategories ?? []

@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct EntryFilterLine: View {
+struct RecordsFilterLine: View {
     let title: String
     let onOpen: () -> Void
     let onClear: () -> Void
