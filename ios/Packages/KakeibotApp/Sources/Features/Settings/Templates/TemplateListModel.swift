@@ -120,6 +120,23 @@ public extension TemplateListModel {
         }
     }
 
+    func deleteHidden() async -> Deletion? {
+        movingOrder = nil
+        let ids = hidden.map(\.id)
+
+        let result = await SettingsBulkDelete.run(ids) { id in
+            try await database.deleteTemplate(id)
+        }
+
+        await load()
+
+        if let message = result.message {
+            errorNotice.show(message)
+        }
+
+        return result.deletion
+    }
+
     func show(_ id: EntryTemplate.ID) async {
         await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
     }

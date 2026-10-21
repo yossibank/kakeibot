@@ -159,6 +159,30 @@ struct WalletWriteTests {
     }
 
     @Test
+    func restoresMergedDeletions() async throws {
+        let setup = try await Setup()
+        let first = try await setup.database.saveWallet(
+            setup.draft,
+            at: setup.now
+        )
+
+        var draft = setup.draft
+        draft.name = "PayPay"
+        let second = try await setup.database.saveWallet(draft, at: setup.now)
+
+        let deletions = try await [
+            setup.database.deleteWallet(first.id),
+            setup.database.deleteWallet(second.id)
+        ]
+
+        try await setup.database.restore(Deletion(merging: deletions))
+        let list = try await setup.database.entryList()
+
+        #expect(list.wallets[first.id] == first)
+        #expect(list.wallets[second.id] == second)
+    }
+
+    @Test
     func keepsWalletWithEntries() async throws {
         let setup = try await Setup()
         let cash = try await setup.wallet(named: "財布")

@@ -15,6 +15,7 @@ public struct StampListView: View {
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: ShelfIcon.ID?
     @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<ShelfIcon.ID>?
     @State private var isOverShowZone = false
@@ -70,11 +71,7 @@ public struct StampListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
-            .settingsHideNotice(
-                $deletion,
-                message: "削除しました",
-                systemImage: "trash"
-            ) { deletion in
+            .deletionNotice($deletion) { deletion in
                 restore(deletion)
             }
 
@@ -102,6 +99,16 @@ public struct StampListView: View {
             StampEditSheet(model: editModel(for: sheet)) { deletion in
                 self.deletion = deletion
             }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示のスタンプをまとめて削除しますか",
+            message: "カレンダーに押したスタンプは残ります",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
         }
         .task {
             await model.observe()
@@ -173,7 +180,9 @@ private extension StampListView {
                 flag: hiddenList,
                 title: "非表示のスタンプ",
                 count: model.hidden.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
@@ -486,6 +495,12 @@ private extension StampListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
         }
     }
 

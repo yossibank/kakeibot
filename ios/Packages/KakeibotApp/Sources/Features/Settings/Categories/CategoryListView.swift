@@ -15,6 +15,7 @@ public struct CategoryListView: View {
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: EntryCategory.ID?
     @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<EntryCategory.ID>?
     @State private var isOverShowZone = false
@@ -71,11 +72,7 @@ public struct CategoryListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
-            .settingsHideNotice(
-                $deletion,
-                message: "削除しました",
-                systemImage: "trash"
-            ) { deletion in
+            .deletionNotice($deletion) { deletion in
                 restore(deletion)
             }
 
@@ -104,6 +101,16 @@ public struct CategoryListView: View {
             } onDelete: { deletion in
                 self.deletion = deletion
             }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示のカテゴリをまとめて削除しますか",
+            message: "記録があるカテゴリは残ります。使っている固定費・テンプレート・予算・タグも消えます",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
         }
         .task {
             await model.observe()
@@ -175,7 +182,9 @@ private extension CategoryListView {
                 flag: hiddenList,
                 title: "非表示のカテゴリ",
                 count: model.hidden.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
@@ -509,6 +518,12 @@ private extension CategoryListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
         }
     }
 

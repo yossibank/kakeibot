@@ -15,6 +15,7 @@ public struct TemplateListView: View {
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: EntryTemplate.ID?
     @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var openId: EntryTemplate.ID?
     @State private var deleting: EntryTemplate.ID?
     @State private var isConfirmingDelete = false
@@ -75,11 +76,7 @@ public struct TemplateListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
-            .settingsHideNotice(
-                $deletion,
-                message: "削除しました",
-                systemImage: "trash"
-            ) { deletion in
+            .deletionNotice($deletion) { deletion in
                 restore(deletion)
             }
 
@@ -124,6 +121,16 @@ public struct TemplateListView: View {
             if let deleting {
                 delete(deleting)
             }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示のテンプレートをまとめて削除しますか",
+            message: "テンプレートで記録したものは残ります",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
         }
         .task {
             await model.observe()
@@ -173,7 +180,9 @@ private extension TemplateListView {
                 flag: hiddenList,
                 title: "非表示のテンプレート",
                 count: model.hidden.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 ForEach(model.hidden) { template in
@@ -483,6 +492,12 @@ private extension TemplateListView {
     func delete(_ id: EntryTemplate.ID) {
         Task {
             deletion = await model.delete(id)
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
         }
     }
 

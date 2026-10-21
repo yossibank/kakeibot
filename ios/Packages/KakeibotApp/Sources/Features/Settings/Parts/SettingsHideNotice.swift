@@ -6,6 +6,7 @@ extension View {
         _ id: Binding<ID?>,
         message: String = "非表示にしました",
         systemImage: String = "eye.slash",
+        bottom: CGFloat = 12,
         onUndo: @escaping (ID) -> Void
     ) -> some View {
         overlay(alignment: .bottom) {
@@ -18,7 +19,7 @@ extension View {
                     id.wrappedValue = nil
                     onUndo(hiddenId)
                 }
-                .padding(.bottom, 12)
+                .padding(.bottom, bottom)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .task(id: hiddenId) {
                     try? await Task.sleep(for: .seconds(4))

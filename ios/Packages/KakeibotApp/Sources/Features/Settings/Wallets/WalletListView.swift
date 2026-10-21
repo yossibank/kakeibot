@@ -15,6 +15,7 @@ public struct WalletListView: View {
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: Wallet.ID?
     @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiding: Wallet?
     @State private var isConfirmingHide = false
@@ -74,11 +75,7 @@ public struct WalletListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
-            .settingsHideNotice(
-                $deletion,
-                message: "削除しました",
-                systemImage: "trash"
-            ) { deletion in
+            .deletionNotice($deletion) { deletion in
                 restore(deletion)
             }
 
@@ -125,6 +122,16 @@ public struct WalletListView: View {
                 delete(deleting.id)
             }
         }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示の口座をまとめて削除しますか",
+            message: "記録がある口座は残ります。使っている固定費・テンプレート・評価額も消えます",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
+        }
         .task {
             await model.observe()
         }
@@ -168,7 +175,9 @@ private extension WalletListView {
                 flag: hiddenList,
                 title: "非表示の口座",
                 count: model.hidden.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 ForEach(model.hidden) { wallet in
@@ -479,6 +488,12 @@ private extension WalletListView {
             if await model.hide(id) {
                 hiddenId = id
             }
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
         }
     }
 

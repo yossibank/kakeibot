@@ -407,6 +407,16 @@ public extension EntryModel {
         )
     }
 
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await database.restore(deletion)
+            await reloadCategories()
+            await reloadTemplates()
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage)
+        }
+    }
+
     func reloadCategories(selecting id: EntryCategory.ID? = nil) async {
         do {
             options = try await database.entryOptions()
@@ -529,6 +539,8 @@ public extension EntryModel {
 }
 
 private extension EntryModel {
+    static let restoreFailedMessage = "元に戻せませんでした"
+
     struct Snapshot: Equatable {
         let type: Entry.Kind
         let calculator: AmountCalculator

@@ -116,6 +116,21 @@ public extension RecurringListModel {
         }
     }
 
+    func deleteHidden() async -> Deletion? {
+        movingOrder = nil
+        let ids = hidden.map(\.id)
+
+        let result = await SettingsBulkDelete.run(ids) { id in
+            try await database.deleteRecurring(id)
+        }
+
+        if let message = result.message {
+            errorNotice.show(message)
+        }
+
+        return result.deletion
+    }
+
     func show(_ id: Recurring.ID) async {
         await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
     }

@@ -98,6 +98,23 @@ public extension StampListModel {
         }
     }
 
+    func deleteHidden() async -> Deletion? {
+        movingOrder = nil
+        let ids = hidden.map(\.id)
+
+        let result = await SettingsBulkDelete.run(ids) { id in
+            try await database.deleteShelfIcon(id)
+        }
+
+        await load()
+
+        if let message = result.message {
+            errorNotice.show(message)
+        }
+
+        return result.deletion
+    }
+
     func show(_ id: ShelfIcon.ID) async {
         await setHidden(id, isHidden: false, failure: Self.showFailedMessage)
     }

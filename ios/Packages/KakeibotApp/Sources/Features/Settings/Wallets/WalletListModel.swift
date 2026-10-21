@@ -128,6 +128,25 @@ public extension WalletListModel {
         }
     }
 
+    func deleteHidden() async -> Deletion? {
+        movingOrder = nil
+        let ids = hidden.map(\.id)
+
+        let result = await SettingsBulkDelete.run(ids) { id in
+            try await database.deleteWallet(id)
+        } isInUse: { error in
+            error as? AppDatabase.WalletWriteError == .hasEntries
+        }
+
+        await load()
+
+        if let message = result.message {
+            errorNotice.show(message)
+        }
+
+        return result.deletion
+    }
+
     func show(_ id: Wallet.ID) async {
         do {
             try await database.setWalletHidden(id, isHidden: false, at: Date())

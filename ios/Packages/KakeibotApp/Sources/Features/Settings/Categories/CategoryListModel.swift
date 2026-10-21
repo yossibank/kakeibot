@@ -112,6 +112,25 @@ public extension CategoryListModel {
         }
     }
 
+    func deleteHidden() async -> Deletion? {
+        movingOrder = nil
+        let ids = hidden.map(\.id)
+
+        let result = await SettingsBulkDelete.run(ids) { id in
+            try await database.deleteCategory(id)
+        } isInUse: { error in
+            error as? AppDatabase.CategoryWriteError == .hasEntries
+        }
+
+        await load()
+
+        if let message = result.message {
+            errorNotice.show(message)
+        }
+
+        return result.deletion
+    }
+
     func show(_ id: EntryCategory.ID) async {
         do {
             try await database.setCategoryHidden(

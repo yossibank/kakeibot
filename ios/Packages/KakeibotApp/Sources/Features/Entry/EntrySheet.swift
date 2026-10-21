@@ -15,6 +15,7 @@ public struct EntrySheet: View {
     @State private var pressingCategory: EntryCategory.ID?
     @State private var sheetWidth: CGFloat = 0
     @State private var drawerHeight: CGFloat = 0
+    @State private var deletion: Deletion?
 
     @FocusState private var isMemoFocused: Bool
 
@@ -61,6 +62,11 @@ public struct EntrySheet: View {
                 bottom: bannerBottom
             ) {
                 model.errorNotice.clear()
+            }
+            .deletionNotice($deletion, bottom: bannerBottom) { deletion in
+                Task {
+                    await model.restore(deletion)
+                }
             }
             .background {
                 Rectangle()
@@ -554,7 +560,10 @@ private extension EntrySheet {
                 }
             }
         case let .editCategory(category):
-            CategoryEditSheet(model: model.editCategoryModel(category))
+            CategoryEditSheet(model: model.editCategoryModel(category)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
         case let .addTag(category):
             CategoryEditSheet(
                 model: model.editCategoryModel(category),

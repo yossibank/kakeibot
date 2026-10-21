@@ -14,6 +14,7 @@ struct MainView: View {
     @State private var assets: AssetsModel
     @State private var draft: EntryModel
     @State private var notice: EntryNoticeModel
+    @State private var undo: DeletionUndo
     @State private var isWarmingEntry = true
     @State private var orderMenuAnchor: CGRect?
 
@@ -64,6 +65,7 @@ struct MainView: View {
         )
 
         _notice = State(initialValue: EntryNoticeModel(database: database))
+        _undo = State(initialValue: DeletionUndo(database: database))
         self.database = database
         self.today = today
         self.route = route
@@ -185,6 +187,14 @@ struct MainView: View {
             }
         }
         .entryNotice(notice, above: FloatingTabBar<Int>.height)
+        .deletionNotice($undo.deletion, bottom: Self.noticeBottom) { deletion in
+            Task {
+                await undo.restore(deletion)
+            }
+        }
+        .errorBanner(undo.errorNotice, bottom: Self.noticeBottom) {
+            undo.errorNotice.clear()
+        }
         .background {
             if isWarmingEntry {
                 entryWarmup
@@ -284,7 +294,9 @@ private extension MainView {
                     today: today,
                     editing: id
                 )
-            )
+            ) { deletion in
+                undo.deletion = deletion
+            }
         case .periodRecurrings:
             PeriodRecurringSheet(
                 model: home,
@@ -298,7 +310,10 @@ private extension MainView {
                     database: database,
                     editing: id
                 )
-            )
+            ) { _ in
+            } onDelete: { deletion in
+                undo.deletion = deletion
+            }
         }
     }
 }
@@ -327,6 +342,8 @@ private extension MainView {
             self
         }
     }
+
+    static let noticeBottom = FloatingTabBar<Int>.height + 24
 
     static let tabItems: [FloatingTabBar<MainTab>.Item] = [
         .init("ホーム", systemImage: "house", value: .home),

@@ -18,6 +18,7 @@ public struct RecurringListView: View {
     @State private var hideHover = SettingsHideHover()
     @State private var hiddenId: Recurring.ID?
     @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
     @State private var hiddenLift: SettingsHiddenLift<Recurring.ID>?
     @State private var isOverShowZone = false
@@ -74,11 +75,7 @@ public struct RecurringListView: View {
             .settingsHideNotice($hiddenId, message: "止めて非表示にしました") { id in
                 show(id)
             }
-            .settingsHideNotice(
-                $deletion,
-                message: "削除しました",
-                systemImage: "trash"
-            ) { deletion in
+            .deletionNotice($deletion) { deletion in
                 restore(deletion)
             }
 
@@ -124,6 +121,16 @@ public struct RecurringListView: View {
             if let deleting {
                 delete(deleting)
             }
+        }
+        .confirmation(
+            isPresented: $isConfirmingDeleteHidden,
+            systemImage: "trash",
+            title: "非表示の固定費をまとめて削除しますか",
+            message: "これまでに作った記録は残ります",
+            keepTitle: "やめる",
+            confirmTitle: "まとめて削除する"
+        ) {
+            deleteHidden()
         }
         .task {
             await model.observe()
@@ -189,7 +196,9 @@ private extension RecurringListView {
                 flag: hiddenList,
                 title: "非表示の固定費",
                 count: model.hiddenRows.count
-            )
+            ) {
+                isConfirmingDeleteHidden = true
+            }
 
             if hiddenList.isOn {
                 ForEach(model.hiddenRows) { row in
@@ -361,7 +370,7 @@ private extension RecurringListView {
             [
                 Self.purpose,
                 .move,
-                .init("pause.circle", "下の枠で少し待つと止められます"),
+                .init("pause.circle", "下の枠に置くと止められます"),
                 .init("hand.point.left", "横に払うと、止めると削除のボタンが出ます")
             ]
         }
@@ -484,6 +493,12 @@ private extension RecurringListView {
     func delete(_ id: Recurring.ID) {
         Task {
             deletion = await model.delete(id)
+        }
+    }
+
+    func deleteHidden() {
+        Task {
+            deletion = await model.deleteHidden()
         }
     }
 
