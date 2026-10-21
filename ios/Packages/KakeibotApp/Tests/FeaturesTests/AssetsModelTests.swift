@@ -94,6 +94,49 @@ struct AssetsModelTests {
         #expect(model.holdings.unpaid == 42000)
         #expect(model.sections.map(\.role) == [.onHand, .card])
     }
+
+    @Test
+    func estimatesLoanPayoff() async throws {
+        let setup = try await Setup()
+
+        let loan = try await setup.database.saveWallet(
+            WalletDraft(
+                kind: .loan,
+                name: "奨学金",
+                mark: .glyph(.contract),
+                color: "#4A6FA5",
+                initialBalance: -100_000
+            ),
+            at: Date()
+        )
+
+        let draft = try RecurringDraft(
+            type: .transfer,
+            amount: 30000,
+            categoryId: nil,
+            walletId: setup.bank,
+            toWalletId: loan.id,
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: #require(LocalDate("2026-10-16"))
+        )
+
+        try await setup.database.saveRecurring(
+            draft,
+            today: setup.today,
+            at: Date()
+        )
+
+        let model = AssetsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let row = try #require(model.rows.first { $0.wallet.id == loan.id })
+        let lastDate = try #require(LocalDate("2027-01-27"))
+        let payoff = LoanPayoff(count: 4, lastDate: lastDate)
+
+        #expect(row.repayment == .until(payoff))
+        #expect(model.rows.first?.repayment == nil)
+    }
 }
 
 extension AssetsModelTests {

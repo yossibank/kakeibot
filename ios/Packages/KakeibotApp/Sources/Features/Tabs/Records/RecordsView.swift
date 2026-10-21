@@ -44,8 +44,10 @@ public struct RecordsView: View {
                 )
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                monthContent
-                    .pageSlide(slide)
+                Group {
+                    monthContent
+                }
+                .pageSlide(slide)
             }
             .padding(.horizontal, 14)
             .padding(.top, 8)
@@ -97,29 +99,28 @@ private extension RecordsView {
         }
     }
 
+    @ViewBuilder
     var monthContent: some View {
-        VStack(spacing: 12) {
-            summary
+        summary
+            .monthSwipe(perform: moveMonth)
+
+        switch model.layout {
+        case .list:
+            if model.days.isEmpty {
+                Text("この月の記録はありません")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .padding(.vertical, 40)
+            }
+
+            ForEach(model.days, id: \.date) { day in
+                dayCard(day)
+            }
+        case .calendar:
+            calendar
                 .monthSwipe(perform: moveMonth)
 
-            switch model.layout {
-            case .list:
-                if model.days.isEmpty {
-                    Text("この月の記録はありません")
-                        .textFont(.footnote)
-                        .foregroundStyle(Palette.subtext)
-                        .padding(.vertical, 40)
-                }
-
-                ForEach(model.days, id: \.date) { day in
-                    dayCard(day)
-                }
-            case .calendar:
-                calendar
-                    .monthSwipe(perform: moveMonth)
-
-                shownDayCard
-            }
+            shownDayCard
         }
     }
 

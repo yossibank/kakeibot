@@ -14,6 +14,7 @@ erDiagram
     icon ||--o{ calendar_stamp : "icon_id"
     icon ||--o{ shelf_icon : "icon_id"
     wallet ||--o{ entry : "wallet_id・to_wallet_id"
+    wallet ||--o{ valuation : "wallet_id"
     category |o--o{ entry : "category_id"
     category ||--o{ tag : "category_id"
     tag |o--o{ entry : "tag_id"
@@ -44,7 +45,7 @@ erDiagram
 - 月は `YYYY-MM`。期間との対応は下の表
 - 日時は UTC の ISO 8601
 - 財布・カテゴリ・タグ・スタンプの一覧のアイコンは消さずに `archived_at` でしまう
-- 残高・貯金箱の残高は保存せず、記録から計算する
+- 残高・貯金箱の残高は保存せず、記録と評価額から計算する
 
 月の始まりごとに、期間と月の呼び方を次の表に並べる。理由は [decisions.md の「期間の呼び方」](decisions.md#期間の呼び方)にある。
 
@@ -109,6 +110,22 @@ emoji・text・glyph のどれかは必須。
 | sort_order | INTEGER | |
 | archived_at | TEXT | |
 | created_at / updated_at | TEXT | |
+
+### valuation
+
+投資の口座の、ある日の評価額。
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| id | TEXT | |
+| wallet_id | TEXT | |
+| date | TEXT | |
+| amount | INTEGER | その日の終わりの残高 |
+| created_at / updated_at | TEXT | |
+
+`(wallet_id, date)` は重複禁止。同じ日に入れ直したら置き換える。
+
+財布の残高は、いちばん新しい評価額から数える。評価額があれば、その額に、評価額の日より後の記録を足し引きする。無ければ、最初の残高に、すべての記録を足し引きする。ある日の時点の残高は、その日までの評価額だけを使う。
 
 ### category
 

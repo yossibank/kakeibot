@@ -2,19 +2,34 @@ public extension Wallet {
     static func totalBalance(
         of wallets: [Wallet],
         with entries: [Entry],
+        valuations: [Valuation] = [],
         through date: LocalDate? = nil
     ) -> Int {
         wallets.reduce(0) { total, wallet in
-            total + wallet.balance(with: entries, through: date)
+            let balance = wallet.balance(
+                with: entries,
+                valuations: valuations,
+                through: date
+            )
+
+            return total + balance
         }
     }
 
     func balance(
         with entries: [Entry],
+        valuations: [Valuation] = [],
         through date: LocalDate? = nil
     ) -> Int {
-        entries.reduce(initialBalance) { balance, entry in
+        let valuation = latestValuation(in: valuations, through: date)
+        let start = valuation?.amount ?? initialBalance
+
+        return entries.reduce(start) { balance, entry in
             if let date, date < entry.date {
+                return balance
+            }
+
+            if let valuation, entry.date <= valuation.date {
                 return balance
             }
 
@@ -24,6 +39,18 @@ public extension Wallet {
 }
 
 private extension Wallet {
+    func latestValuation(
+        in valuations: [Valuation],
+        through date: LocalDate?
+    ) -> Valuation? {
+        valuations
+            .filter { valuation in
+                valuation.walletId == id
+                    && date.map { valuation.date <= $0 } ?? true
+            }
+            .max { $0.date < $1.date }
+    }
+
     func change(by entry: Entry) -> Int {
         switch entry.type {
         case .expense:

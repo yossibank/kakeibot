@@ -17,6 +17,7 @@ public final class WalletEditModel {
     }
 
     public private(set) var calculator = AmountCalculator()
+    public private(set) var valuation = AmountCalculator()
     public private(set) var balance = 0
     public private(set) var isHidden = false
     public private(set) var payment: Recurring?
@@ -81,6 +82,10 @@ public extension WalletEditModel {
         isEditing && (kind == .card || kind == .loan)
     }
 
+    var showsValuation: Bool {
+        isEditing && kind == .investment
+    }
+
     var paymentTitle: String {
         kind == .loan ? "毎月の返済" : "引き落とし"
     }
@@ -123,6 +128,37 @@ public extension WalletEditModel {
         calculator.press(key)
     }
 
+    func pressValuation(_ key: AmountCalculator.Key) {
+        valuation.press(key)
+    }
+
+    func startValuation() {
+        valuation = AmountCalculator(amount: max(balance, 0))
+    }
+
+    func saveValuation() async -> Bool {
+        guard let editingId else {
+            return false
+        }
+
+        let amount = valuation.amount
+
+        do {
+            try await database.saveValuation(
+                amount,
+                of: editingId,
+                on: LocalDate(Date(), in: .current),
+                at: Date()
+            )
+
+            balance = amount
+            return true
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+            return false
+        }
+    }
+
     func load() async {
         guard let editingId else {
             return
@@ -138,7 +174,10 @@ public extension WalletEditModel {
             }
 
             apply(WalletDraft(wallet, icon: icon))
-            balance = wallet.balance(with: list.days.flatMap(\.entries))
+            balance = wallet.balance(
+                with: list.days.flatMap(\.entries),
+                valuations: list.valuations
+            )
             isHidden = wallet.archivedAt != nil
             baseline = draft
             await loadPayment()

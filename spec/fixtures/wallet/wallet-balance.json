@@ -42,5 +42,31 @@
     ],
     "through": "2026-10-01",
     "balance": 700
+  },
+  {
+    "initialBalance": 100000,
+    "entries": [
+      { "type": "transfer", "amount": 50000, "date": "2026-10-01", "wallet": "other", "toWallet": "self" },
+      { "type": "transfer", "amount": 20000, "date": "2026-10-05", "wallet": "other", "toWallet": "self" },
+      { "type": "transfer", "amount": 10000, "date": "2026-10-10", "wallet": "other", "toWallet": "self" }
+    ],
+    "valuations": [
+      { "date": "2026-10-05", "amount": 180000 }
+    ],
+    "through": null,
+    "balance": 190000
+  },
+  {
+    "initialBalance": 100000,
+    "entries": [
+      { "type": "transfer", "amount": 50000, "date": "2026-10-01", "wallet": "other", "toWallet": "self" },
+      { "type": "transfer", "amount": 10000, "date": "2026-10-10", "wallet": "other", "toWallet": "self" }
+    ],
+    "valuations": [
+      { "date": "2026-09-20", "amount": 90000 },
+      { "date": "2026-10-05", "amount": 180000 }
+    ],
+    "through": "2026-10-04",
+    "balance": 140000
   }
 ]

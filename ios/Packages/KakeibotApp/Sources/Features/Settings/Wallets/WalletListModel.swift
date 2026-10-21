@@ -42,7 +42,8 @@ public extension WalletListModel {
 
     func balance(of wallet: Wallet) -> Int {
         let entries = list?.days.flatMap(\.entries) ?? []
-        return wallet.balance(with: entries)
+        let valuations = list?.valuations ?? []
+        return wallet.balance(with: entries, valuations: valuations)
     }
 
     func load() async {

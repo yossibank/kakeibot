@@ -354,8 +354,8 @@ private extension AssetsView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
-            if row.wallet.kind == .card {
-                Text(row.nextBill.map(nextBillText) ?? "引き落としは未設定")
+            if let note = note(of: row) {
+                Text(note)
                     .textFont(.caption2)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
@@ -426,6 +426,32 @@ private extension AssetsView {
         }
 
         return onHand
+    }
+
+    static func repaymentText(_ repayment: AssetsModel.Repayment) -> String {
+        switch repayment {
+        case .unset: "返済は未設定"
+        case .finished: "返し終わりました"
+        case .open: "返し終わる時期は未定"
+        case let .until(payoff): payoffText(payoff)
+        }
+    }
+
+    static func payoffText(_ payoff: LoanPayoff) -> String {
+        let date = payoff.lastDate
+        return "あと \(payoff.count) 回・\(String(date.year))/\(date.month) まで"
+    }
+
+    func note(of row: AssetsModel.WalletRow) -> String? {
+        if let repayment = row.repayment {
+            return Self.repaymentText(repayment)
+        }
+
+        guard row.wallet.kind == .card else {
+            return nil
+        }
+
+        return row.nextBill.map(nextBillText) ?? "引き落としは未設定"
     }
 
     func nextBillText(_ bill: CardBill) -> String {

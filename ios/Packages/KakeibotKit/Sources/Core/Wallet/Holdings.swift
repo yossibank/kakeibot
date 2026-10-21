@@ -37,6 +37,7 @@ public extension Holdings {
     init(
         wallets: [Wallet],
         entries: [Entry],
+        valuations: [Valuation] = [],
         through date: LocalDate? = nil
     ) {
         func total(_ role: Wallet.Kind.Role) -> Int {
@@ -44,6 +45,7 @@ public extension Holdings {
             return Wallet.totalBalance(
                 of: wallets,
                 with: entries,
+                valuations: valuations,
                 through: date
             )
         }

@@ -587,8 +587,10 @@ private extension EntryModel {
             .flatMap(\.entries)
             .filter { $0.id != editingId }
 
+        let valuations = list.valuations
+
         let pairs = wallets.map { wallet in
-            (wallet.id, wallet.balance(with: entries))
+            (wallet.id, wallet.balance(with: entries, valuations: valuations))
         }
 
         balances = Dictionary(uniqueKeysWithValues: pairs)

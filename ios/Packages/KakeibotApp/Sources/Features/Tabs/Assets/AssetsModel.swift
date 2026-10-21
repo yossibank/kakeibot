@@ -33,10 +33,18 @@ public extension AssetsModel {
         public let icon: Icon?
         public let balance: Int
         public let nextBill: CardBill?
+        public let repayment: Repayment?
 
         public var id: Wallet.ID {
             wallet.id
         }
+    }
+
+    enum Repayment: Equatable {
+        case unset
+        case finished
+        case open
+        case until(LoanPayoff)
     }
 
     struct WalletSection: Identifiable, Equatable {
@@ -76,7 +84,7 @@ public extension AssetsModel {
     }
 
     var holdings: Holdings {
-        Holdings(wallets: wallets, entries: entries)
+        Holdings(wallets: wallets, entries: entries, valuations: valuations)
     }
 
     var total: Int {
@@ -93,6 +101,7 @@ public extension AssetsModel {
         let previous = Holdings(
             wallets: wallets,
             entries: entries,
+            valuations: valuations,
             through: end
         )
 
@@ -108,8 +117,9 @@ public extension AssetsModel {
             return WalletRow(
                 wallet: wallet,
                 icon: list?.icons[wallet.iconId],
-                balance: wallet.balance(with: entries),
-                nextBill: next?.bill
+                balance: balance(of: wallet),
+                nextBill: next?.bill,
+                repayment: repayment(of: wallet)
             )
         }
     }
@@ -159,6 +169,7 @@ public extension AssetsModel {
             let holdings = Holdings(
                 wallets: wallets,
                 entries: entries,
+                valuations: valuations,
                 through: end
             )
 
@@ -210,6 +221,42 @@ private extension AssetsModel {
 
     var entries: [Entry] {
         list?.days.flatMap(\.entries) ?? []
+    }
+
+    var valuations: [Valuation] {
+        list?.valuations ?? []
+    }
+
+    func balance(of wallet: Wallet) -> Int {
+        wallet.balance(with: entries, valuations: valuations)
+    }
+
+    func repayment(of wallet: Wallet) -> Repayment? {
+        guard wallet.kind == .loan else {
+            return nil
+        }
+
+        let balance = balance(of: wallet)
+
+        let repayments = recurrings.filter { recurring in
+            recurring.type == .transfer && recurring.toWalletId == wallet.id
+        }
+
+        if balance >= 0 {
+            return .finished
+        }
+
+        if repayments.isEmpty {
+            return .unset
+        }
+
+        let payoff = LoanPayoff(
+            balance: balance,
+            repayments: repayments,
+            after: today
+        )
+
+        return payoff.map(Repayment.until) ?? .open
     }
 
     func observe() async {

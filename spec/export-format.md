@@ -17,6 +17,7 @@ kakeibot のデータを書き出すときの、JSON と CSV の形式を書く�
     "icons": [],
     "shelfIcons": [],
     "wallets": [],
+    "valuations": [],
     "categories": [],
     "tags": [],
     "entries": [],
@@ -48,7 +49,9 @@ kakeibot のデータを書き出すときの、JSON と CSV の形式を書く�
 | `shelfIcons` | 無いファイルは、空として読む |
 | `archivedAt`（`templates`・`recurrings`） | 無ければ、空として読む |
 | `holidayShift`（`recurrings`） | 無ければ、`none` として読む |
-| `closingDay`（`recurrings`） | 無ければ、空として読む || `tags` | 無いファイルは、空として読む。記録とテンプレートの `tagId` も、無ければ空として読む |
+| `closingDay`（`recurrings`） | 無ければ、空として読む |
+| `valuations` | 無いファイルは、空として読む |
+| `tags` | 無いファイルは、空として読む。記録とテンプレートの `tagId` も、無ければ空として読む |
 
 古い版のファイルは、最新の版になるまで版を 1 つずつ上げてから読む。
 

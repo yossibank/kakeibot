@@ -7,6 +7,7 @@ public struct WalletEditSheet: View {
     @State private var model: WalletEditModel
     @State private var isConfirmingDiscard = false
     @State private var isEnteringAmount = false
+    @State private var isEnteringValuation = false
     @State private var isConfirmingHide = false
     @State private var isEditingPayment = false
     @State private var isAskingPayment = false
@@ -51,6 +52,45 @@ public struct WalletEditSheet: View {
                             }
 
                             saveButton
+                        }
+                    }
+                    .transition(.settingsDrawer)
+                    .zIndex(1)
+                }
+
+                if isEnteringValuation {
+                    Palette.scrim
+                        .opacity(0.35)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            closeValuation()
+                        }
+                        .transition(.opacity)
+                        .zIndex(1)
+
+                    SettingsDrawer("今の評価額") {
+                        closeValuation()
+                    } content: {
+                        VStack(spacing: 10) {
+                            Text(AmountText.text(model.valuation.amount))
+                                .displayFont(.largeTitle, weight: .bold)
+                                .monospacedDigit()
+                                .foregroundStyle(Palette.accentStrong)
+                                .contentTransition(.numericText())
+                                .animation(
+                                    .snappy,
+                                    value: model.valuation.amount
+                                )
+
+                            Keypad(activeTax: valuationTax) { key in
+                                model.pressValuation(key)
+                            }
+
+                            PrimaryButton("評価額を保存") {
+                                Task {
+                                    await saveValuation()
+                                }
+                            }
                         }
                     }
                     .transition(.settingsDrawer)
@@ -121,6 +161,10 @@ private extension WalletEditSheet {
 
                     kindChooser
                     balanceField
+
+                    if model.showsValuation {
+                        valuationField
+                    }
 
                     if model.showsPayment {
                         SettingsRowList(items: paymentItems) { _ in
@@ -304,6 +348,18 @@ private extension WalletEditSheet {
         }
     }
 
+    var valuationField: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsRowList(items: valuationItems) { _ in
+                openValuation()
+            }
+
+            Text("値動きの分は、収入や支出に入れず、残高だけを合わせます")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+        }
+    }
+
     var signButton: some View {
         Button {
             model.isNegative.toggle()
@@ -360,6 +416,7 @@ private extension WalletEditSheet {
 
     enum Panel: Hashable {
         case payment
+        case valuation
     }
 
     static let fade: CGFloat = 16
@@ -381,6 +438,22 @@ private extension WalletEditSheet {
                 title: model.paymentTitle,
                 value: model.paymentText,
                 isEmpty: model.payment == nil
+            )
+        ]
+    }
+
+    var valuationItems: [SettingsRowList<Panel>.Item] {
+        let amount = isEnteringValuation
+            ? model.valuation.amount
+            : model.balance
+
+        return [
+            .init(
+                panel: .valuation,
+                systemImage: "chart.line.uptrend.xyaxis",
+                title: "今の評価額",
+                value: AmountText.text(amount),
+                isEmpty: false
             )
         ]
     }
@@ -417,6 +490,10 @@ private extension WalletEditSheet {
         model.calculator.taxNote?.rate
     }
 
+    var valuationTax: AmountCalculator.TaxRate? {
+        model.valuation.taxNote?.rate
+    }
+
     func openAmount() {
         focus = nil
 
@@ -428,6 +505,27 @@ private extension WalletEditSheet {
     func closeAmount() {
         withAnimation(.snappy) {
             isEnteringAmount = false
+        }
+    }
+
+    func openValuation() {
+        focus = nil
+        model.startValuation()
+
+        withAnimation(.snappy) {
+            isEnteringValuation = true
+        }
+    }
+
+    func closeValuation() {
+        withAnimation(.snappy) {
+            isEnteringValuation = false
+        }
+    }
+
+    func saveValuation() async {
+        if await model.saveValuation() {
+            closeValuation()
         }
     }
 
