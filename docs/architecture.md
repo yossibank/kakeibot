@@ -31,8 +31,8 @@ kakeibot/
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
 ├── Brewfile                 Mint と pre-commit
-├── Makefile                 準備・開く・整形・ビルド・テストのコマンド
-└── Mintfile                 SwiftFormat の版
+├── Makefile                 準備・開く・整形・ライセンスの作り直し・ビルド・テストのコマンド
+└── Mintfile                 SwiftFormat と LicensePlist の版
 ```
 
 ## ios
@@ -41,11 +41,12 @@ kakeibot/
 
 ```
 ios/
-├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）、アプリアイコン、起動画面、同梱のフォント
+├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）、アプリアイコン、起動画面、同梱のフォント、ライセンスの一覧
 ├── Kakeibot.xcodeproj       アプリとウィジェットのターゲット
 ├── Kakeibot.xctestplan      テストターゲットをまとめたテストプラン
 ├── Kakeibot.xcworkspace     プロジェクトと 2 つのパッケージを並べる。Xcode ではこれを開く
 ├── KakeibotWidget/          ウィジェット（@main で WidgetFeature を呼ぶだけ）
+├── license_plist.yml        LicensePlist に手で足すライセンス（同梱のフォント）
 └── Packages/
     ├── KakeibotApp/         iOS 専用。Xcode でテスト
     └── KakeibotKit/         iOS と macOS。Mac の上で swift test
@@ -58,6 +59,7 @@ ios/
 | App Group | `group.com.yossibank.kakeibot` | 同じ |
 | アプリアイコン | Icon Composer の `AppIcon.icon`。設定で選べる色違いは、同じフォルダの `AppIcon-<色>.icon`。設定の見本を描くため、同じ絵を `Assets.xcassets` の `AppIconYen`・`AppIconDial` に写して持つ | |
 | 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | 入れない |
+| ライセンスの一覧 | `Kakeibot/Licenses.bundle`。`make licenses` で LicensePlist が作り、設定の「ライセンス」で読む | 入れない |
 
 ### 署名
 
@@ -140,6 +142,7 @@ KakeibotApp/
 │   │   │   │   ├── Budgets/     予算の一覧と額の入力
 │   │   │   │   ├── Categories/
 │   │   │   │   ├── Launch/      起動時に開く画面を選ぶ画面と、その行と見本
+│   │   │   │   ├── Licenses/    使っている部品とフォントのライセンスの一覧と本文
 │   │   │   │   ├── Menu/        設定の入口、確かめ用のテストデータ（#if DEBUG）
 │   │   │   │   ├── MonthStartDay/ 月の始まりの設定
 │   │   │   │   ├── Recurring/   固定費の一覧と編集

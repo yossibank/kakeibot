@@ -1,4 +1,4 @@
-.PHONY: setup open format build test
+.PHONY: setup open format licenses build test
 
 SIMULATOR ?= $(shell xcrun simctl list devices available iPhone | awk -F '[()]' '/iPhone/ { print $$2; exit }')
 CHECKOUT = $(if $(BRANCH),$(shell git worktree list --porcelain | awk '/^worktree / { path = substr($$0, 10) } $$0 == "branch refs/heads/$(BRANCH)" { print path }'),.)
@@ -14,6 +14,10 @@ open:
 
 format:
 	mint run swiftformat .
+
+licenses:
+	cd ios && mint run --mintfile ../Mintfile LicensePlist --xcworkspace-path Kakeibot.xcworkspace --config-path license_plist.yml --output-path Kakeibot/Licenses.bundle --add-version-numbers --suppress-opening-directory --fail-if-missing-license --force
+	rm -f ios/Kakeibot/Licenses.bundle/com.mono0926.LicensePlist.latest_result.txt
 
 build:
 	xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build

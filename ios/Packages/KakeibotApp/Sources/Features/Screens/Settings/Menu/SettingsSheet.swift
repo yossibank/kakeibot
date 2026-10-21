@@ -296,6 +296,19 @@ public struct SettingsSheet: View {
                             .card()
                         }
 
+                        VStack(alignment: .leading, spacing: 6) {
+                            sectionTitle("このアプリ")
+
+                            NavigationLink {
+                                LicenseListView()
+                            } label: {
+                                row("ライセンス", systemImage: "doc.text")
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 14)
+                            .card()
+                        }
+
                         #if DEBUG
                         sampleSection
                         #endif

@@ -33,7 +33,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 
 | 道具 | 使い道 |
 | --- | --- |
-| [Mint](https://github.com/yonaskolb/Mint) | SwiftFormat の版をそろえる（`Mintfile`） |
+| [Mint](https://github.com/yonaskolb/Mint) | SwiftFormat と LicensePlist の版をそろえる（`Mintfile`） |
 | [pre-commit](https://pre-commit.com/) | commit の前の確認を動かす |
 
 > [!NOTE]
@@ -49,6 +49,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | iOS のビルド（シミュレーター） | `make build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
 | Swift の整形 | `make format` |
+| ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
 
 ## 出典
 
