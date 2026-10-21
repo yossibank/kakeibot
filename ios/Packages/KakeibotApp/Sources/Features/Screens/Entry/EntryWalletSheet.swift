@@ -41,8 +41,9 @@ struct EntryWalletSheet: View {
                     }
                 }
 
-                if role == .source, !model.billChoices.isEmpty {
+                if showsBills {
                     billSection
+                        .transition(Self.billTransition)
                 }
             }
         }
@@ -69,8 +70,13 @@ private extension EntryWalletSheet {
         let iconColor = isSelected ? Palette.accent : Palette.subtext
 
         return Button {
-            select(wallet)
-            dismiss()
+            withAnimation(.snappy) {
+                select(wallet)
+            }
+
+            if !showsBills {
+                dismiss()
+            }
         } label: {
             HStack(spacing: 12) {
                 IconImage(model.icon(for: wallet), size: 18)
@@ -157,6 +163,11 @@ private extension EntryWalletSheet {
             withAnimation(.snappy) {
                 model.selectBill(choice.date)
             }
+
+            Task {
+                try? await Task.sleep(for: Self.closeDelay)
+                dismiss()
+            }
         } label: {
             VStack(spacing: 6) {
                 FlipDate(choice.date, isSelected: isSelected)
@@ -179,6 +190,16 @@ private extension EntryWalletSheet {
 }
 
 private extension EntryWalletSheet {
+    static let closeDelay = Duration.milliseconds(300)
+
+    static var billTransition: AnyTransition {
+        .opacity.combined(with: .move(edge: .bottom))
+    }
+
+    var showsBills: Bool {
+        role == .source && !model.billChoices.isEmpty
+    }
+
     var billNote: String? {
         let choices = model.billChoices
         let chosen = choices.first { $0.date == model.selectedBillDate }

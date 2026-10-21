@@ -160,6 +160,9 @@ struct MainView: View {
                     },
                     onOpenRecurring: { id in
                         sheet = .recurring(id)
+                    },
+                    onOpenEntry: { id in
+                        sheet = .edit(id)
                     }
                 )
                 .tabContent()

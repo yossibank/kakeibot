@@ -5,22 +5,28 @@ import SwiftUI
 public struct AssetsView: View {
     @Bindable private var model: AssetsModel
 
+    @State private var movedBill: AssetsModel.UpcomingBill?
+    @State private var pendingEntry: Entry.ID?
+
     @Environment(\.themeStyle.corner) private var corner
 
     private let onTransfer: () -> Void
     private let onOpenWallet: (Wallet.ID) -> Void
     private let onOpenRecurring: (Recurring.ID) -> Void
+    private let onOpenEntry: (Entry.ID) -> Void
 
     public init(
         model: AssetsModel,
         onTransfer: @escaping () -> Void,
         onOpenWallet: @escaping (Wallet.ID) -> Void,
-        onOpenRecurring: @escaping (Recurring.ID) -> Void
+        onOpenRecurring: @escaping (Recurring.ID) -> Void,
+        onOpenEntry: @escaping (Entry.ID) -> Void
     ) {
         self.model = model
         self.onTransfer = onTransfer
         self.onOpenWallet = onOpenWallet
         self.onOpenRecurring = onOpenRecurring
+        self.onOpenEntry = onOpenEntry
     }
 
     public var body: some View {
@@ -43,6 +49,11 @@ public struct AssetsView: View {
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
+        }
+        .sheet(item: $movedBill, onDismiss: openPendingEntry) { bill in
+            AssetsMovedSheet(row: bill) { id in
+                pendingEntry = id
+            }
         }
         .background {
             Rectangle()
@@ -248,10 +259,25 @@ private extension AssetsView {
                         }
 
                         if let moves = Self.movesText(of: row) {
-                            Label(moves, systemImage: "arrow.uturn.right")
+                            Button {
+                                movedBill = row
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Label(
+                                        moves,
+                                        systemImage: "arrow.uturn.right"
+                                    )
+                                    .lineLimit(1)
+
+                                    Image(systemName: "chevron.right")
+                                        .font(.sans(.micro, weight: .bold))
+                                }
                                 .textFont(.caption2)
                                 .foregroundStyle(Palette.accent)
-                                .lineLimit(2)
+                                .padding(.vertical, 4)
+                                .contentShape(.rect)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
 
@@ -444,10 +470,21 @@ private extension AssetsView {
     }
 
     static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
-        let movedIn = row.movedIn > 0 ? ["前から回した \(row.movedIn) 件を含む"] : []
-        let movedOut = row.movedOut > 0 ? ["\(row.movedOut) 件は後に回した"] : []
-        let parts = movedIn + movedOut
+        let movedIn = row.movedIn.count
+        let movedOut = row.movedOut.count
+        let inText = movedIn > 0 ? ["前から \(movedIn) 件"] : []
+        let outText = movedOut > 0 ? ["後へ \(movedOut) 件"] : []
+        let parts = inText + outText
         return parts.isEmpty ? nil : parts.joined(separator: "・")
+    }
+
+    func openPendingEntry() {
+        guard let pendingEntry else {
+            return
+        }
+
+        self.pendingEntry = nil
+        onOpenEntry(pendingEntry)
     }
 
     static func share(of bill: CardBill) -> CGFloat {

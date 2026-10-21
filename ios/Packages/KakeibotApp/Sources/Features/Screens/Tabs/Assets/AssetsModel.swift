@@ -71,8 +71,8 @@ public extension AssetsModel {
         public let title: String
         public let icon: Icon?
         public let source: String?
-        public let movedIn: Int
-        public let movedOut: Int
+        public let movedIn: [EntryRowItem]
+        public let movedOut: [EntryRowItem]
 
         public var id: Recurring.ID {
             bill.recurring.id
@@ -153,11 +153,13 @@ public extension AssetsModel {
             let card = bill.recurring.toWalletId
             let month = bill.date.yearMonth
 
-            let moved = entries.filter { entry in
-                entry.walletId == card && entry.billMonth != nil
-            }
+            let moved = entries
+                .filter { $0.walletId == card && $0.billMonth != nil }
+                .sorted { $0.date < $1.date }
 
-            let movedOut = moved.count { entry in
+            let movedIn = moved.filter { $0.billMonth == month }
+
+            let movedOut = moved.filter { entry in
                 entry.billMonth != month
                     && bill.period?.contains(entry.date) == true
             }
@@ -167,8 +169,8 @@ public extension AssetsModel {
                 title: list.title(of: bill.recurring) ?? Self.billTitle,
                 icon: list.icon(of: bill.recurring),
                 source: list.wallets[bill.recurring.walletId]?.name,
-                movedIn: moved.count { $0.billMonth == month },
-                movedOut: movedOut
+                movedIn: movedIn.map { Self.row(of: $0, in: list) },
+                movedOut: movedOut.map { Self.row(of: $0, in: list) }
             )
         }
     }
@@ -226,6 +228,14 @@ public extension AssetsModel {
 private extension AssetsModel {
     static let loadFailedMessage = "残高を読めませんでした"
     static let billTitle = "引き落とし"
+
+    static func row(
+        of entry: Entry,
+        in list: EntryList
+    ) -> EntryRowItem {
+        let day = "\(entry.date.month)/\(entry.date.day)"
+        return EntryRowItem(entry, in: list, dayLabel: day)
+    }
 
     var wallets: [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []
