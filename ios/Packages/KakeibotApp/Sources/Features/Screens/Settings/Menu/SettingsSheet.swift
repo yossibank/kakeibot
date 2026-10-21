@@ -216,7 +216,8 @@ public struct SettingsSheet: View {
                                     row(
                                         "文字と角の丸み",
                                         systemImage: "textformat",
-                                        value: themeStyle.title
+                                        value: themeStyle.title,
+                                        shortValue: themeStyle.shortTitle
                                     )
                                 }
                             }
@@ -413,7 +414,8 @@ private extension SettingsSheet {
     func row(
         _ title: String,
         systemImage: String,
-        value: String? = nil
+        value: String? = nil,
+        shortValue: String? = nil
     ) -> some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
@@ -430,11 +432,17 @@ private extension SettingsSheet {
             Spacer()
 
             if let value {
-                Text(value)
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(Self.valueScale)
+                ViewThatFits(in: .horizontal) {
+                    Text(value)
+                        .lineLimit(1)
+                        .fixedSize()
+
+                    Text(shortValue ?? value)
+                        .lineLimit(1)
+                        .minimumScaleFactor(Self.valueScale)
+                }
+                .textFont(.footnote)
+                .foregroundStyle(Palette.subtext)
             }
 
             Image(systemName: "chevron.right")

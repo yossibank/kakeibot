@@ -2,13 +2,23 @@ import Core
 
 extension ThemeStyle {
     var title: String {
-        let size = textSize == .standard ? [] : ["文字\(textSize.title)"]
-
         let fonts = displayFont == textFont
             ? displayFont.title
             : "\(displayFont.title)と\(textFont.title)"
 
-        return (size + [fonts, "角\(corner.title)"]).joined(separator: "・")
+        guard textSize == .standard else {
+            return "文字\(textSize.title)・\(fonts)"
+        }
+
+        return "\(fonts)・角\(corner.title)"
+    }
+
+    var shortTitle: String {
+        guard textSize == .standard else {
+            return "文字\(textSize.title)"
+        }
+
+        return title
     }
 }
 
