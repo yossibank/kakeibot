@@ -30,8 +30,6 @@ struct RecordsRewardSheet: View {
                         ForEach(model.rewardRules) { rule in
                             row(rule)
                         }
-
-                        addButton
                     }
 
                     total
@@ -61,27 +59,15 @@ private extension RecordsRewardSheet {
 
             Spacer()
 
-            Color.clear
-                .frame(width: 44, height: 44)
-        }
-    }
-
-    var addButton: some View {
-        Button {
-            isAddingRule = true
-        } label: {
-            Label("ごほうびを足す", systemImage: "plus")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.accent)
-                .frame(maxWidth: .infinity, minHeight: 48)
-                .background(Palette.faint, in: shape)
-                .overlay {
-                    shape
-                        .stroke(Palette.outline, style: .dashed)
+            if model.rewardRules.isEmpty {
+                Color.clear
+                    .frame(width: 44, height: 44)
+            } else {
+                RingButton(systemImage: "plus") {
+                    isAddingRule = true
                 }
-                .contentShape(.rect)
+            }
         }
-        .buttonStyle(.plain)
     }
 
     var total: some View {
