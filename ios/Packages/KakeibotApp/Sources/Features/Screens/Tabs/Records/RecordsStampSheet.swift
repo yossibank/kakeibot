@@ -75,8 +75,14 @@ private extension RecordsStampSheet {
 
             Spacer()
 
-            Color.clear
-                .frame(width: 44, height: 44)
+            if choices.isEmpty {
+                Color.clear
+                    .frame(width: 44, height: 44)
+            } else {
+                RingButton(systemImage: "plus") {
+                    isAddingStamp = true
+                }
+            }
         }
     }
 
