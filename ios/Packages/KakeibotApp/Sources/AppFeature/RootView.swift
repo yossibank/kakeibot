@@ -20,7 +20,10 @@ public struct RootView: View {
             content
 
             if isLaunching {
-                LaunchView(isReady: isLaunchReady) {
+                LaunchView(
+                    palette: model.palette,
+                    isReady: isLaunchReady
+                ) {
                     isRevealed = true
                 } onFinish: {
                     isLaunching = false
