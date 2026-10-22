@@ -6,6 +6,8 @@ struct EntryMemo: View {
     @State private var shownHeight: CGFloat = 0
     @State private var lineHeight: CGFloat = 0
 
+    @Namespace private var toggleSpace
+
     let text: String
 
     init(_ text: String) {
@@ -35,12 +37,12 @@ struct EntryMemo: View {
                 }
                 .overlay(alignment: .bottomTrailing) {
                     if isTruncated {
-                        toggleLabel("続き", systemImage: "chevron.down")
+                        toggleMark
                     }
                 }
 
             if isExpanded {
-                toggleLabel("閉じる", systemImage: "chevron.up")
+                toggleMark
             }
         }
         .padding(.leading, 8)
@@ -92,7 +94,7 @@ private extension EntryMemo {
                 LinearGradient(
                     stops: [
                         .init(color: .black, location: 0),
-                        .init(color: .clear, location: 0.6)
+                        .init(color: .clear, location: 0.55)
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
@@ -103,24 +105,27 @@ private extension EntryMemo {
         }
     }
 
-    func toggleLabel(
-        _ title: String,
-        systemImage: String
-    ) -> some View {
-        HStack(spacing: 3) {
-            Text(title)
-                .textFont(.caption, weight: .semibold)
+    var toggleMark: some View {
+        let angle = isExpanded ? 180.0 : 0
 
-            Image(systemName: systemImage)
-                .sansFont(.micro, weight: .bold)
-        }
-        .foregroundStyle(Palette.accent)
+        return Image(systemName: "chevron.down")
+            .sansFont(.micro, weight: .bold)
+            .foregroundStyle(Palette.accent)
+            .rotationEffect(.degrees(angle))
+            .frame(width: 26, height: 16)
+            .background(Palette.accent.opacity(.subtle), in: .capsule)
+            .overlay {
+                Capsule()
+                    .stroke(Palette.outline, lineWidth: 0.5)
+            }
+            .matchedGeometryEffect(id: Self.toggleID, in: toggleSpace)
     }
 }
 
 private extension EntryMemo {
     static let lineLimit = 2
-    static let fadeWidth: CGFloat = 96
+    static let fadeWidth: CGFloat = 84
+    static let toggleID = "toggle"
 
     var isTruncated: Bool {
         !isExpanded && fullHeight > shownHeight + 1
