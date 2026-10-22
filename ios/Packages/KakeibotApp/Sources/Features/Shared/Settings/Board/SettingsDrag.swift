@@ -52,7 +52,7 @@ extension SettingsDrag {
             let row = rowFrames[lift.id]
             let center = CGPoint(
                 x: row?.midX ?? liftedCenter.x,
-                y: liftedCenter.y
+                y: (row?.minY ?? 0) + liftedCenter.y
             )
 
             return Floating(id: lift.id, center: center, size: row?.size)
