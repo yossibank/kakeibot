@@ -11,6 +11,7 @@ public final class AssetsModel: ScreenModel {
 
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var list: EntryList?
+    public private(set) var rewardBank: RewardBank?
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -199,6 +200,22 @@ public extension AssetsModel {
         }
     }
 
+    var rewardBalance: Int {
+        rewardBank?.balance ?? 0
+    }
+
+    var recentRewards: [RewardLog] {
+        Array((rewardBank?.logs ?? []).prefix(Self.recentRewardCount))
+    }
+
+    func rewardRule(for log: RewardLog) -> RewardRule? {
+        rewardBank?.rule(for: log)
+    }
+
+    func rewardIcon(for rule: RewardRule) -> Icon? {
+        rewardBank?.icon(for: rule)
+    }
+
     func run() async {
         await withDiscardingTaskGroup { group in
             group.addTask {
@@ -211,6 +228,10 @@ public extension AssetsModel {
 
             group.addTask {
                 await self.observeRecurrings()
+            }
+
+            group.addTask {
+                await self.observeRewardBank()
             }
         }
     }
@@ -227,6 +248,7 @@ public extension AssetsModel {
 
 private extension AssetsModel {
     static let loadFailedMessage = "残高を読めませんでした"
+    static let recentRewardCount = 3
     static let billTitle = "引き落とし"
 
     static func row(
@@ -291,6 +313,15 @@ private extension AssetsModel {
             failure: Self.loadFailedMessage
         ) { list in
             self.list = list
+        }
+    }
+
+    func observeRewardBank() async {
+        await observe(
+            database.rewardBankUpdates(),
+            failure: Self.loadFailedMessage
+        ) { bank in
+            rewardBank = bank
         }
     }
 
