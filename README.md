@@ -47,6 +47,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | Xcode でワークスペースを開く | `make open` |
 | ブランチのワークツリーを Xcode で開く | `make open BRANCH=feat/...` |
 | iOS のビルド（シミュレーター） | `make build` |
+| テストのコンパイルだけ（走らせない） | `make test-build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
 | Swift の整形 | `make format` |
 | ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |

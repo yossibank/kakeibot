@@ -31,7 +31,7 @@ kakeibot/
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
 ├── Brewfile                 Mint と pre-commit
-├── Makefile                 準備・開く・整形・ライセンスの作り直し・ビルド・テストのコマンド
+├── Makefile                 準備・開く・整形・ライセンスの作り直し・ビルド・テストのコンパイル・テストのコマンド
 └── Mintfile                 SwiftFormat と LicensePlist の版
 ```
 
@@ -317,7 +317,7 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 
 テストターゲットは `ios/Kakeibot.xctestplan` にまとめ、`Kakeibot` スキームに付ける。パッケージは、プロジェクトのフォルダとしても登録する。こうしないと、スキームからパッケージのテストターゲットが見えない。
 
-`make test` は、このテストプランを iOS シミュレーターで走らせる。CI（`.github/workflows/verify.yml`）は、`make test` だけを走らせる。
+`make test` は、このテストプランを iOS シミュレーターで走らせる。`make test-build` は、走らせずにコンパイルだけする。CI（`.github/workflows/verify.yml`）は、`make test` だけを走らせる。
 
 | 対象 | 方法 |
 | --- | --- |
