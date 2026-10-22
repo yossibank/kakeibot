@@ -42,9 +42,9 @@ public struct ThemeListView: View {
                     VStack(alignment: .leading, spacing: 24) {
                         customSection
 
-                        section("ダーク", isLight: false)
-
                         section("ライト", isLight: true)
+
+                        section("ダーク", isLight: false)
                     }
                     .padding(.vertical, 8)
                 }

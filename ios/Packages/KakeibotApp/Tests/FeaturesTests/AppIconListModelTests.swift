@@ -20,11 +20,11 @@ struct AppIconListModelTests {
         await model.select(.gold)
         let gold = switcher.name
 
-        await model.select(.navy)
+        await model.select(.white)
 
         #expect(gold == "AppIcon-Gold")
         #expect(switcher.name == nil)
-        #expect(model.current == .navy)
+        #expect(model.current == .white)
     }
 
     @Test
@@ -34,7 +34,7 @@ struct AppIconListModelTests {
 
         await model.select(.black)
 
-        #expect(model.current == .navy)
+        #expect(model.current == .white)
         #expect(model.errorNotice.message == "アイコンを変えられませんでした")
     }
 }

@@ -29,7 +29,7 @@ struct ThemePaletteContrastTests {
     func tellsLightBackground() {
         let light = ThemePreset.allCases.filter(\.palette.isLight)
 
-        #expect(light == [.ivory, .white, .sky, .sage, .rose, .gold])
+        #expect(light == [.white, .ivory, .sky, .sage, .rose, .gold])
     }
 }
 

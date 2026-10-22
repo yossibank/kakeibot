@@ -1,18 +1,18 @@
 import Core
 
 public enum AppIconChoice: CaseIterable, Sendable {
-    case navy
-    case black
-    case forest
-    case teal
-    case wine
-    case plum
-    case ivory
     case white
+    case ivory
     case sky
     case sage
     case rose
     case gold
+    case black
+    case navy
+    case forest
+    case teal
+    case wine
+    case plum
 }
 
 public extension AppIconChoice {
@@ -42,7 +42,7 @@ public extension AppIconChoice {
 
     init(alternateName: String?) {
         let choice = Self.allCases.first { $0.alternateName == alternateName }
-        self = choice ?? .navy
+        self = choice ?? .white
     }
 
     var title: String {
@@ -71,14 +71,14 @@ public extension AppIconChoice {
 
     var alternateName: String? {
         switch self {
-        case .navy: nil
+        case .white: nil
+        case .navy: "AppIcon-Navy"
         case .black: "AppIcon-Black"
         case .forest: "AppIcon-Forest"
         case .teal: "AppIcon-Teal"
         case .wine: "AppIcon-Wine"
         case .plum: "AppIcon-Plum"
         case .ivory: "AppIcon-Ivory"
-        case .white: "AppIcon-White"
         case .sky: "AppIcon-Sky"
         case .sage: "AppIcon-Sage"
         case .rose: "AppIcon-Rose"

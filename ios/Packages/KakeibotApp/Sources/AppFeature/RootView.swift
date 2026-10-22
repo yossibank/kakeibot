@@ -20,10 +20,7 @@ public struct RootView: View {
             content
 
             if isLaunching {
-                LaunchView(
-                    palette: model.palette,
-                    isReady: isLaunchReady
-                ) {
+                LaunchView(isReady: isLaunchReady) {
                     isRevealed = true
                 } onFinish: {
                     isLaunching = false
@@ -111,8 +108,8 @@ private extension RootView {
         }
     }
 
-    var shownPalette: ThemePalette {
-        isRevealed ? model.palette : .night
+    var shownPalette: ThemePalette? {
+        isRevealed ? model.palette : nil
     }
 
     var shownStyle: ThemeStyle {
