@@ -90,10 +90,9 @@ private extension SettingsLiftLayer {
         let dock = dockArea
         let isDocked = dock != nil
         let tileScale = dock.map { fitScale(tileSize, in: $0) } ?? scale
-        let height = tileSize.height * tileScale
         let natural = CGPoint(
             x: floating.center.x + drag.origin.x - origin.x,
-            y: floatingY(floating, height: height)
+            y: floating.center.y + drag.origin.y - origin.y
         )
         let center = dock.map { CGPoint(x: $0.midX, y: $0.midY) } ?? natural
 
@@ -121,38 +120,9 @@ private extension SettingsLiftLayer {
         let height = area.height / tileSize.height
         return min(scale, width, height)
     }
-
-    func floatingY(
-        _ floating: SettingsDrag<ID>.Floating,
-        height: CGFloat
-    ) -> CGFloat {
-        let natural = floating.center.y + drag.origin.y - origin.y
-        let hide = drag.zones.hide
-        let show = drag.zones.show
-
-        if drag.lift != nil,
-           !hide.isEmpty {
-            let edge = hide.maxY - SettingsDropZones.hideHeight
-            let limit = edge - origin.y - Self.zoneGap - height / 2
-            return min(natural, limit)
-        }
-
-        if drag.hiddenLift != nil,
-           !show.isEmpty {
-            let edge = show.minY + SettingsDropZones.showHeight
-            let limit = edge - origin.y + Self.zoneGap + height / 2
-            return max(natural, limit)
-        }
-
-        return natural
-    }
 }
 
 private extension SettingsLiftLayer {
-    static var zoneGap: CGFloat {
-        8
-    }
-
     static var dockInset: CGFloat {
         10
     }

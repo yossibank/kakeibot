@@ -10,19 +10,34 @@ extension SettingsDropZones {
     static let showHeight: CGFloat = 64
     static let openHeight: CGFloat = 136
     static let labelHeight: CGFloat = 44
+    static let reach: CGFloat = 40
 
     func isOverHide(
         _ location: CGPoint,
         from origin: CGPoint
     ) -> Bool {
-        hide.contains(Self.global(location, from: origin))
+        let area = CGRect(
+            x: hide.minX,
+            y: hide.minY - Self.reach,
+            width: hide.width,
+            height: hide.height + Self.reach
+        )
+
+        return area.contains(Self.global(location, from: origin))
     }
 
     func isOverShow(
         _ location: CGPoint,
         from origin: CGPoint
     ) -> Bool {
-        show.contains(Self.global(location, from: origin))
+        let area = CGRect(
+            x: show.minX,
+            y: show.minY,
+            width: show.width,
+            height: show.height + Self.reach
+        )
+
+        return area.contains(Self.global(location, from: origin))
     }
 }
 
@@ -42,13 +57,7 @@ extension View {
     ) -> some View {
         overlay(alignment: .top) {
             if let showing {
-                let height = showing
-                    ? SettingsDropZones.openHeight
-                    : SettingsDropZones.showHeight
-
                 SettingsShowZone(isTargeted: showing)
-                    .frame(height: height)
-                    .animation(.smooth(duration: 0.35), value: showing)
                     .onGeometryChange(for: CGRect.self) { proxy in
                         proxy.frame(in: .global)
                     } action: { frame in
