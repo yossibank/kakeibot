@@ -27,7 +27,7 @@ struct OnboardingModelTests {
         let back = model.page
         model.next()
         model.next()
-        model.launchScreen = .entry
+        model.launchScreen = .review
         let title = model.nextTitle
         let finished = await model.finish()
         let launchScreen = try await setup.database.setting(.launchScreen)
@@ -39,7 +39,7 @@ struct OnboardingModelTests {
         #expect(model.isLastPage)
         #expect(title == "はじめる")
         #expect(finished)
-        #expect(launchScreen == .entry)
+        #expect(launchScreen == .review)
         #expect(completed)
     }
 }

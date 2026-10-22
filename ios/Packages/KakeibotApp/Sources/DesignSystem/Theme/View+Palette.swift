@@ -3,15 +3,15 @@ import SwiftUI
 import UIKit
 
 public extension View {
-    func palette(_ palette: ThemePalette) -> some View {
+    func palette(_ look: ThemeLook?) -> some View {
         background {
-            PaletteScene(palette: palette)
+            PaletteScene(look: look)
         }
     }
 }
 
 private struct PaletteScene: UIViewRepresentable {
-    let palette: ThemePalette
+    let look: ThemeLook?
 
     func makeUIView(context: Context) -> PaletteSceneView {
         PaletteSceneView()
@@ -21,19 +21,22 @@ private struct PaletteScene: UIViewRepresentable {
         _ view: PaletteSceneView,
         context: Context
     ) {
-        view.palette = palette
+        view.look = look
     }
 }
 
 private final class PaletteSceneView: UIView {
-    var palette = ThemePalette.night {
+    var look: ThemeLook? {
         didSet {
             apply()
         }
     }
 
+    private var styleChange: (any UITraitChangeRegistration)?
+
     override func didMoveToWindow() {
         super.didMoveToWindow()
+        observeStyle()
         apply()
     }
 
@@ -42,8 +45,31 @@ private final class PaletteSceneView: UIView {
             return
         }
 
-        let style: UIUserInterfaceStyle = palette.isLight ? .light : .dark
-        scene.traitOverrides[PaletteTrait.self] = palette
-        scene.traitOverrides.userInterfaceStyle = style
+        switch look {
+        case nil:
+            scene.traitOverrides.remove(PaletteTrait.self)
+            scene.traitOverrides.remove(UITraitUserInterfaceStyle.self)
+        case let .fixed(palette):
+            let style: UIUserInterfaceStyle = palette.isLight ? .light : .dark
+            scene.traitOverrides[PaletteTrait.self] = palette
+            scene.traitOverrides.userInterfaceStyle = style
+        case let .system(light, dark):
+            let style = scene.screen.traitCollection.userInterfaceStyle
+            let palette = style == .dark ? dark : light
+            scene.traitOverrides.remove(UITraitUserInterfaceStyle.self)
+            scene.traitOverrides[PaletteTrait.self] = palette
+        }
+    }
+
+    func observeStyle() {
+        guard styleChange == nil else {
+            return
+        }
+
+        styleChange = registerForTraitChanges(
+            [UITraitUserInterfaceStyle.self]
+        ) { (view: PaletteSceneView, _) in
+            view.apply()
+        }
     }
 }

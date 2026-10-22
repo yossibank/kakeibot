@@ -11,9 +11,32 @@ struct ThemeWriteTests {
 
         let theme = try await database.saveTheme(Self.mint, at: now)
         try await database.setSetting(.theme, to: .custom(theme.id))
-        let palette = try await database.palette()
+        let look = try await database.themeLook()
+        let palette = try #require(Self.mint.palette)
 
-        #expect(palette == Self.mint.palette)
+        #expect(look == .fixed(palette))
+    }
+
+    @Test
+    func followsDeviceByDefault() async throws {
+        let database = try AppDatabase.inMemory()
+
+        let look = try await database.themeLook()
+
+        #expect(look == .followsDevice)
+    }
+
+    @Test
+    func savesFollowingDevice() async throws {
+        let database = try AppDatabase.inMemory()
+
+        try await database.setSetting(.theme, to: .preset(.black))
+        try await database.setSetting(.theme, to: .system)
+        let choice = try await database.setting(.theme)
+        let look = try await database.themeLook()
+
+        #expect(choice == .system)
+        #expect(look == .followsDevice)
     }
 
     @Test
@@ -62,7 +85,7 @@ struct ThemeWriteTests {
     }
 
     @Test
-    func fallsBackToNavyAfterDeletingChosenTheme() async throws {
+    func followsDeviceAfterDeletingChosenTheme() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 0)
         let theme = try await database.saveTheme(Self.mint, at: now)
@@ -72,7 +95,7 @@ struct ThemeWriteTests {
         let choice = try await database.setting(.theme)
         let themes = try await database.customThemes()
 
-        #expect(choice == .preset(.navy))
+        #expect(choice == .system)
         #expect(themes.isEmpty)
     }
 

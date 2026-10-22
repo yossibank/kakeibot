@@ -375,7 +375,7 @@
 		78875D403079D363005422E3 /* Debug configuration for PBXNativeTarget "Kakeibot" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Black AppIcon-Forest AppIcon-Teal AppIcon-Wine AppIcon-Plum AppIcon-Ivory AppIcon-White AppIcon-Sky AppIcon-Sage AppIcon-Rose AppIcon-Gold";
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Ivory AppIcon-Sky AppIcon-Sage AppIcon-Rose AppIcon-Gold AppIcon-Black AppIcon-Navy AppIcon-Forest AppIcon-Teal AppIcon-Wine AppIcon-Plum";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Kakeibot/Kakeibot.entitlements;
@@ -389,7 +389,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "かけいぼっと";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -415,7 +415,7 @@
 		78875D413079D363005422E3 /* Release configuration for PBXNativeTarget "Kakeibot" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Black AppIcon-Forest AppIcon-Teal AppIcon-Wine AppIcon-Plum AppIcon-Ivory AppIcon-White AppIcon-Sky AppIcon-Sage AppIcon-Rose AppIcon-Gold";
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Ivory AppIcon-Sky AppIcon-Sage AppIcon-Rose AppIcon-Gold AppIcon-Black AppIcon-Navy AppIcon-Forest AppIcon-Teal AppIcon-Wine AppIcon-Plum";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Kakeibot/Kakeibot.entitlements;
@@ -429,7 +429,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "かけいぼっと";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;

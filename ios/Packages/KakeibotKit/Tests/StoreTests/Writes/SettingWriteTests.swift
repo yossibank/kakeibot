@@ -129,11 +129,11 @@ struct SettingWriteTests {
         let database = try AppDatabase.inMemory()
 
         let initial = try await database.setting(.launchScreen)
-        try await database.setSetting(.launchScreen, to: .entry)
+        try await database.setSetting(.launchScreen, to: .records)
         let saved = try await database.setting(.launchScreen)
 
-        #expect(initial == .home)
-        #expect(saved == .entry)
+        #expect(initial == .entry)
+        #expect(saved == .records)
     }
 
     @Test
@@ -153,11 +153,11 @@ struct SettingWriteTests {
         let database = try AppDatabase.inMemory()
 
         let initial = try await database.setting(.recordsLayout)
-        try await database.setSetting(.recordsLayout, to: .calendar)
+        try await database.setSetting(.recordsLayout, to: .list)
         let saved = try await database.setting(.recordsLayout)
 
-        #expect(initial == .list)
-        #expect(saved == .calendar)
+        #expect(initial == .calendar)
+        #expect(saved == .list)
     }
 
     @Test

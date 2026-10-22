@@ -37,7 +37,7 @@ public extension SettingKey where Value == ReminderTime? {
 
 public extension SettingKey where Value == LaunchScreen {
     static var launchScreen: Self {
-        Self(.launchScreen, default: .home)
+        Self(.launchScreen, default: .entry)
     }
 }
 
@@ -45,7 +45,7 @@ public extension SettingKey where Value == ThemeChoice {
     static var theme: Self {
         Self(
             .themeId,
-            default: .preset(.navy),
+            default: .system,
             decode: { ThemeChoice($0) },
             encode: { $0.text }
         )
@@ -82,7 +82,7 @@ public extension SettingKey where Value == TemplateOrder {
 
 public extension SettingKey where Value == RecordsLayout {
     static var recordsLayout: Self {
-        Self(.recordsLayout, default: .list)
+        Self(.recordsLayout, default: .calendar)
     }
 }
 

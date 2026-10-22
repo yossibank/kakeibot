@@ -1,16 +1,16 @@
 public enum ThemePreset: String, CaseIterable, Codable, Sendable {
-    case navy
-    case black
-    case forest
-    case teal
-    case wine
-    case plum
-    case ivory
     case white
+    case ivory
     case sky
     case sage
     case rose
     case gold
+    case black
+    case navy
+    case forest
+    case teal
+    case wine
+    case plum
 }
 
 public extension ThemePreset {

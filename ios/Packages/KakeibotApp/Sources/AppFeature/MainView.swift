@@ -21,13 +21,17 @@ struct MainView: View {
     private let database: AppDatabase
     private let today: LocalDate
     private let route: PlannedNotification.Route?
+    private let isRevealed: Bool
     private let onRouteOpened: () -> Void
+    private let onLoad: () -> Void
 
     init(
         database: AppDatabase,
         today: LocalDate,
         route: PlannedNotification.Route? = nil,
-        onRouteOpened: @escaping () -> Void = {}
+        isRevealed: Bool = true,
+        onRouteOpened: @escaping () -> Void = {},
+        onLoad: @escaping () -> Void = {}
     ) {
         _home = State(
             initialValue: HomeModel(
@@ -69,7 +73,9 @@ struct MainView: View {
         self.database = database
         self.today = today
         self.route = route
+        self.isRevealed = isRevealed
         self.onRouteOpened = onRouteOpened
+        self.onLoad = onLoad
     }
 
     var body: some View {
@@ -221,8 +227,17 @@ struct MainView: View {
         .task {
             await draft.load()
         }
-        .task {
+        .task(id: isRevealed) {
+            guard isRevealed else {
+                return
+            }
+
             await openLaunchScreen()
+        }
+        .onChange(of: isLoaded, initial: true) {
+            if isLoaded {
+                onLoad()
+            }
         }
         .onChange(of: route, initial: true) { _, route in
             if let route {
@@ -372,6 +387,10 @@ private extension MainView {
 }
 
 private extension MainView {
+    var isLoaded: Bool {
+        home.list != nil || home.errorNotice.message != nil
+    }
+
     var templateOrderBinding: Binding<TemplateOrder> {
         Binding {
             home.templateOrder
@@ -383,7 +402,7 @@ private extension MainView {
     }
 
     func openLaunchScreen() async {
-        let screen = await (try? database.setting(.launchScreen)) ?? .home
+        let screen = await (try? database.setting(.launchScreen)) ?? .entry
 
         guard route == nil else {
             return

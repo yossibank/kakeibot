@@ -310,9 +310,9 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | reminder_time | `HH:mm`。空なら知らせない |
 | character_id | 同梱キャラクターの ID |
 | character_name | |
-| theme_id | 用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空ならネイビー |
+| theme_id | `system`（iPhone に合わせる）か、用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空なら `system` |
 | onboarding_completed | `true` `false` |
-| launch_screen | `home`・`records`・`review`・`assets`・`entry`。空ならホーム |
+| launch_screen | `home`・`records`・`review`・`assets`・`entry`。空なら入力シート |
 | corner_style | `square`・`small`・`standard`・`large`。`square` は角を丸めない。空なら `standard` |
 | font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `mincho` |
 | text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `gothic` |
@@ -320,7 +320,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | entry_starts_with_amount | `true` なら、新しく記録するとき入力シートをテンキーを出して開く |
 | template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |
 | category_menu_opened | `true` `false`。`true` なら入力シートの長押しのヒントを出さない |
-| records_layout | `list` `calendar`。空なら一覧 |
+| records_layout | `calendar` `list`。空ならカレンダー |
 | review_scale | `week` `month` `year`。空なら月 |
 | review_kind | `expense` `income` `balance`。空なら支出 |
 | closed_hints | 説明を閉じた設定の画面を `,` でつないだもの（`categories` `wallets` `templates` `recurrings` `stamps` `budgets`）。空ならすべて出す |

@@ -40,11 +40,13 @@ public struct ThemeListView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
-                        customSection
+                        section("ライト", isLight: true)
 
                         section("ダーク", isLight: false)
 
-                        section("ライト", isLight: true)
+                        systemSection
+
+                        customSection
                     }
                     .padding(.vertical, 8)
                 }
@@ -110,6 +112,47 @@ public struct ThemeListView: View {
 }
 
 private extension ThemeListView {
+    var systemSection: some View {
+        let isCurrent = model.current == .system
+        let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
+
+        return VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("自動")
+
+            LazyVGrid(columns: Self.columns, spacing: 18) {
+                Button {
+                    select(.system)
+                } label: {
+                    VStack(spacing: 8) {
+                        framed(systemPreview, isCurrent: isCurrent)
+
+                        Text(ThemeChoice.systemTitle)
+                            .textFont(.footnote)
+                            .foregroundStyle(titleColor)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    var systemPreview: some View {
+        ThemePreview(palette: ThemePreset.white.palette)
+            .overlay {
+                ThemePreview(palette: ThemePreset.black.palette)
+                    .mask {
+                        HStack(spacing: 0) {
+                            Color.clear
+
+                            Color.black
+                        }
+                    }
+            }
+    }
+
     var customSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("つくったテーマ")
@@ -237,9 +280,16 @@ private extension ThemeListView {
         _ palette: ThemePalette,
         isCurrent: Bool
     ) -> some View {
+        framed(ThemePreview(palette: palette), isCurrent: isCurrent)
+    }
+
+    func framed(
+        _ content: some View,
+        isCurrent: Bool
+    ) -> some View {
         let ring = isCurrent ? Palette.accent : Color.clear
 
-        return ThemePreview(palette: palette)
+        return content
             .padding(4)
             .overlay {
                 RoundedRectangle(cornerRadius: corner.radius(18))

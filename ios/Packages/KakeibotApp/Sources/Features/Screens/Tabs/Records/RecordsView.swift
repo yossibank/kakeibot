@@ -791,8 +791,8 @@ private extension RecordsView {
     }
 
     static let layoutOptions: [CapsulePicker<RecordsLayout>.Option] = [
-        .init("一覧", value: .list),
-        .init("カレンダー", value: .calendar)
+        .init("カレンダー", value: .calendar),
+        .init("一覧", value: .list)
     ]
 
     var layoutBinding: Binding<RecordsLayout> {

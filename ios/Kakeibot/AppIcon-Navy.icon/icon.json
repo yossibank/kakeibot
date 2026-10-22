@@ -3,17 +3,8 @@
     {
       "value": {
         "linear-gradient": [
-          "srgb:1.00000,1.00000,1.00000,1.00000",
-          "srgb:0.90196,0.90196,0.91765,1.00000"
-        ]
-      }
-    },
-    {
-      "appearance": "dark",
-      "value": {
-        "linear-gradient": [
-          "srgb:0.09412,0.09804,0.11373,1.00000",
-          "srgb:0.02353,0.02353,0.02745,1.00000"
+          "srgb:0.09412,0.14510,0.24706,1.00000",
+          "srgb:0.02353,0.04314,0.08627,1.00000"
         ]
       }
     }
@@ -27,15 +18,6 @@
           "image-name": "yen.svg",
           "fill-specializations": [
             {
-              "value": {
-                "linear-gradient": [
-                  "srgb:0.65882,0.47843,0.20784,1.00000",
-                  "srgb:0.36863,0.25490,0.08627,1.00000"
-                ]
-              }
-            },
-            {
-              "appearance": "dark",
               "value": {
                 "linear-gradient": [
                   "srgb:0.95686,0.90196,0.75686,1.00000",
@@ -66,15 +48,6 @@
           "image-name": "dial.svg",
           "fill-specializations": [
             {
-              "value": {
-                "linear-gradient": [
-                  "srgb:0.65882,0.47843,0.20784,1.00000",
-                  "srgb:0.36863,0.25490,0.08627,1.00000"
-                ]
-              }
-            },
-            {
-              "appearance": "dark",
               "value": {
                 "linear-gradient": [
                   "srgb:0.95686,0.90196,0.75686,1.00000",

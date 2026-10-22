@@ -4,7 +4,7 @@
 
 ## 作業の進め方
 
-変更したら `make build` と `make test` を通す。PR では CI が `make test` を走らせ、ビルドもそこで確かめる。
+変更したら `make build` を通す。push の前に `make test-build` で、テストがコンパイルできることを確かめる。テストは、PR で CI が走らせる `make test` で確かめる。テストが通ったと報告するのは、CI の結果を見てからにする。
 
 pre-commit の整形で commit が止まったら、差分を確かめてからステージし直す。止まる仕組みは [README の「動かし方」](README.md#動かし方)にある。`--no-verify` で飛ばさない。
 

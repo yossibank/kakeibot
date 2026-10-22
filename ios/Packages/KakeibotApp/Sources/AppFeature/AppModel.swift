@@ -10,7 +10,7 @@ import SwiftUI
 final class AppModel {
     private(set) var launch: Launch = .opening
     private(set) var today: LocalDate
-    private(set) var palette: ThemePalette = .night
+    private(set) var look: ThemeLook = .followsDevice
     private(set) var style: ThemeStyle = .standard
 
     private let openDatabase: @Sendable () throws -> AppDatabase
@@ -41,14 +41,6 @@ extension AppModel {
         router.route
     }
 
-    var isOpened: Bool {
-        if case .opening = launch {
-            false
-        } else {
-            true
-        }
-    }
-
     func open() async {
         guard case .opening = launch else {
             return
@@ -63,7 +55,7 @@ extension AppModel {
             .value
 
             await generateRecurring(in: database)
-            palette = await (try? database.palette()) ?? .night
+            look = await (try? database.themeLook()) ?? .followsDevice
             style = await (try? database.style()) ?? .standard
             let completed = try await database.setting(.onboardingCompleted)
             launch = completed ? .ready(database) : .onboarding(database)
@@ -108,7 +100,7 @@ extension AppModel {
         case let .onboarding(database), let .ready(database):
             await withDiscardingTaskGroup { group in
                 group.addTask {
-                    await self.observePalette(in: database)
+                    await self.observeLook(in: database)
                 }
 
                 group.addTask {
@@ -134,10 +126,10 @@ extension AppModel {
 }
 
 private extension AppModel {
-    func observePalette(in database: AppDatabase) async {
+    func observeLook(in database: AppDatabase) async {
         do {
-            for try await palette in database.paletteUpdates() {
-                self.palette = palette
+            for try await look in database.themeLookUpdates() {
+                self.look = look
             }
         } catch {
             return

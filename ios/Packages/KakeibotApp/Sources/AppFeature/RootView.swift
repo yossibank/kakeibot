@@ -9,8 +9,10 @@ public struct RootView: View {
     @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
     @State private var isLaunching = true
     @State private var isRevealed = false
+    @State private var isHomeLoaded = false
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
 
     public init() {}
 
@@ -19,7 +21,10 @@ public struct RootView: View {
             content
 
             if isLaunching {
-                LaunchView(isReady: model.isOpened) {
+                LaunchView(
+                    palette: themePalette,
+                    isReady: isLaunchReady
+                ) {
                     isRevealed = true
                 } onFinish: {
                     isLaunching = false
@@ -47,7 +52,8 @@ public struct RootView: View {
             }
         }
         .environment(\.notificationPermission, .live)
-        .palette(shownPalette)
+        .palette(shownLook)
+        .environment(\.palette, shownPalette)
         .environment(\.themeStyle, shownStyle)
         .font(shownStyle.bodyFont)
         .warmsUpInput()
@@ -74,9 +80,12 @@ private extension RootView {
             MainView(
                 database: database,
                 today: model.today,
-                route: model.route
+                route: model.route,
+                isRevealed: !isLaunching
             ) {
                 model.finishRoute()
+            } onLoad: {
+                isHomeLoaded = true
             }
             .task {
                 await model.observeNotifications(in: database)
@@ -96,8 +105,26 @@ private extension RootView {
 }
 
 private extension RootView {
+    var isLaunchReady: Bool {
+        switch model.launch {
+        case .opening: false
+        case .ready: isHomeLoaded
+        case .onboarding, .failed: true
+        }
+    }
+
+    var shownLook: ThemeLook? {
+        isRevealed ? model.look : nil
+    }
+
+    var themePalette: ThemePalette {
+        let isDark = colorScheme == .dark
+        return model.look.palette(isDark: isDark)
+    }
+
     var shownPalette: ThemePalette {
-        isRevealed ? model.palette : .night
+        let isDark = colorScheme == .dark
+        return shownLook?.palette(isDark: isDark) ?? .night
     }
 
     var shownStyle: ThemeStyle {

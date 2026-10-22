@@ -6,7 +6,7 @@ import Store
 @MainActor
 @Observable
 public final class ThemeListModel {
-    public private(set) var current: ThemeChoice = .preset(.navy)
+    public private(set) var current: ThemeChoice = .system
     public private(set) var customThemes: [Theme] = []
     public private(set) var suggestedIcon: AppIconChoice?
 
@@ -27,11 +27,13 @@ public final class ThemeListModel {
 public extension ThemeListModel {
     var currentPalette: ThemePalette {
         switch current {
+        case .system:
+            return ThemePreset.white.palette
         case let .preset(preset):
             return preset.palette
         case let .custom(id):
             let theme = customThemes.first { $0.id == id }
-            return theme?.palette ?? .night
+            return theme?.palette ?? ThemePreset.white.palette
         }
     }
 
@@ -60,12 +62,11 @@ public extension ThemeListModel {
             return
         }
 
-        guard case let .preset(preset) = choice else {
+        guard let icon = AppIconChoice(choice) else {
             suggestedIcon = nil
             return
         }
 
-        let icon = AppIconChoice(preset)
         suggestedIcon = icon == appIcon.current ? nil : icon
     }
 

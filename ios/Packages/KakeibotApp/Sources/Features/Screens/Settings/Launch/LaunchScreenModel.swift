@@ -6,7 +6,7 @@ import Store
 @MainActor
 @Observable
 public final class LaunchScreenModel {
-    public private(set) var screen: LaunchScreen = .home
+    public private(set) var screen: LaunchScreen = .entry
 
     public internal(set) var errorNotice = ErrorNotice()
 
