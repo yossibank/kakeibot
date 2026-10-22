@@ -9,6 +9,7 @@ public struct RootView: View {
     @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
     @State private var isLaunching = true
     @State private var isRevealed = false
+    @State private var isHomeLoaded = false
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -19,15 +20,11 @@ public struct RootView: View {
             content
 
             if isLaunching {
-                LaunchView(
-                    isThemed: isThemed,
-                    isReady: model.isOpened
-                ) {
+                LaunchView(isReady: isLaunchReady) {
                     isRevealed = true
                 } onFinish: {
                     isLaunching = false
                 }
-                .animation(.easeOut(duration: 0.3), value: model.palette)
             }
         }
         .task {
@@ -78,9 +75,12 @@ private extension RootView {
             MainView(
                 database: database,
                 today: model.today,
-                route: model.route
+                route: model.route,
+                isRevealed: isRevealed
             ) {
                 model.finishRoute()
+            } onLoad: {
+                isHomeLoaded = true
             }
             .task {
                 await model.observeNotifications(in: database)
@@ -100,12 +100,16 @@ private extension RootView {
 }
 
 private extension RootView {
-    var isThemed: Bool {
-        model.palette != nil
+    var isLaunchReady: Bool {
+        switch model.launch {
+        case .opening: false
+        case .ready: isHomeLoaded
+        case .onboarding, .failed: true
+        }
     }
 
     var shownPalette: ThemePalette {
-        model.palette ?? .night
+        isRevealed ? model.palette : .night
     }
 
     var shownStyle: ThemeStyle {

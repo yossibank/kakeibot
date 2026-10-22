@@ -26,7 +26,6 @@ public extension Setting {
         case onboardingCompleted = "onboarding_completed"
         case launchScreen = "launch_screen"
         case entryStartsWithAmount = "entry_starts_with_amount"
-        case entryStyle = "entry_style"
         case templateOrder = "template_order"
         case categoryMenuOpened = "category_menu_opened"
         case recordsLayout = "records_layout"

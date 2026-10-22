@@ -112,19 +112,14 @@ private extension EntryMemo {
             .sansFont(.micro, weight: .bold)
             .foregroundStyle(Palette.accent)
             .rotationEffect(.degrees(angle))
-            .frame(width: 26, height: 16)
-            .background(Palette.accent.opacity(.subtle), in: .capsule)
-            .overlay {
-                Capsule()
-                    .stroke(Palette.outline, lineWidth: 0.5)
-            }
+            .frame(width: 20, height: 16)
             .matchedGeometryEffect(id: Self.toggleID, in: toggleSpace)
     }
 }
 
 private extension EntryMemo {
     static let lineLimit = 2
-    static let fadeWidth: CGFloat = 84
+    static let fadeWidth: CGFloat = 72
     static let toggleID = "toggle"
 
     var isTruncated: Bool {

@@ -10,7 +10,7 @@ import SwiftUI
 final class AppModel {
     private(set) var launch: Launch = .opening
     private(set) var today: LocalDate
-    private(set) var palette: ThemePalette?
+    private(set) var palette: ThemePalette = .night
     private(set) var style: ThemeStyle = .standard
 
     private let openDatabase: @Sendable () throws -> AppDatabase
@@ -41,14 +41,6 @@ extension AppModel {
         router.route
     }
 
-    var isOpened: Bool {
-        if case .opening = launch {
-            false
-        } else {
-            true
-        }
-    }
-
     func open() async {
         guard case .opening = launch else {
             return
@@ -62,13 +54,12 @@ extension AppModel {
             }
             .value
 
+            await generateRecurring(in: database)
             palette = await (try? database.palette()) ?? .night
             style = await (try? database.style()) ?? .standard
-            await generateRecurring(in: database)
             let completed = try await database.setting(.onboardingCompleted)
             launch = completed ? .ready(database) : .onboarding(database)
         } catch {
-            palette = palette ?? .night
             launch = .failed(String(describing: error))
         }
     }

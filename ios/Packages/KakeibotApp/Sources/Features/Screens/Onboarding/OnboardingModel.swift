@@ -7,7 +7,7 @@ import Store
 @MainActor
 @Observable
 public final class OnboardingModel {
-    public var launchScreen: LaunchScreen = .home
+    public var launchScreen: LaunchScreen = .entry
 
     public private(set) var weekStart: Weekday = .sunday
 

@@ -16,7 +16,7 @@ public final class RecordsModel: ScreenModel {
     public private(set) var month: YearMonth
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var weekStart: Weekday = .sunday
-    public private(set) var layout: RecordsLayout = .list
+    public private(set) var layout: RecordsLayout = .calendar
     public private(set) var list: EntryList?
     public private(set) var noSpendDays: Set<LocalDate> = []
     public private(set) var stampCalendar: StampCalendar?

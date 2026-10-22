@@ -5,8 +5,7 @@ import SwiftUI
 
 public struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
-    @State private var launchScreen: LaunchScreen = .home
-    @State private var entryStyle: EntryStyle = .dial
+    @State private var launchScreen: LaunchScreen = .entry
     @State private var startsWithAmount = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
@@ -218,22 +217,6 @@ public struct SettingsSheet: View {
 
                                 Hairline()
 
-                                NavigationLink {
-                                    EntryStyleView(
-                                        model: EntryStyleModel(
-                                            database: database
-                                        )
-                                    )
-                                } label: {
-                                    row(
-                                        "入力シートの見た目",
-                                        systemImage: "square.and.pencil",
-                                        value: entryStyle.title
-                                    )
-                                }
-
-                                Hairline()
-
                                 pickerRow(
                                     "金額から入力",
                                     systemImage: "yensign"
@@ -327,9 +310,6 @@ public struct SettingsSheet: View {
         }
         .task {
             await observeLaunchScreen()
-        }
-        .task {
-            await observeEntryStyle()
         }
         .task {
             let starts = try? await database.setting(.entryStartsWithAmount)
@@ -516,17 +496,7 @@ private extension SettingsSheet {
                 launchScreen = screen
             }
         } catch {
-            launchScreen = .home
-        }
-    }
-
-    func observeEntryStyle() async {
-        do {
-            for try await style in database.settingUpdates(.entryStyle) {
-                entryStyle = style
-            }
-        } catch {
-            entryStyle = .dial
+            launchScreen = .entry
         }
     }
 

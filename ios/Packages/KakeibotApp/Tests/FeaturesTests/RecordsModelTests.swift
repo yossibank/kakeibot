@@ -251,7 +251,7 @@ struct RecordsModelTests {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)
 
-        model.setLayout(.calendar)
+        model.setLayout(.list)
         await model.saveLayout()
         let reopened = RecordsModel(
             database: setup.database,
@@ -259,7 +259,7 @@ struct RecordsModelTests {
         )
         await reopened.loadLayout()
 
-        #expect(reopened.layout == .calendar)
+        #expect(reopened.layout == .list)
     }
 
     @Test
@@ -267,6 +267,7 @@ struct RecordsModelTests {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)
         let date = try #require(LocalDate("2026-08-03"))
+        model.setLayout(.list)
 
         model.open(date)
 
