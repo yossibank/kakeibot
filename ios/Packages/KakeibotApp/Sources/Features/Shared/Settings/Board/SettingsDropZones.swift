@@ -6,6 +6,11 @@ struct SettingsDropZones: Equatable {
 }
 
 extension SettingsDropZones {
+    static let hideHeight: CGFloat = 50
+    static let showHeight: CGFloat = 64
+    static let openHeight: CGFloat = 136
+    static let labelHeight: CGFloat = 44
+
     func isOverHide(
         _ location: CGPoint,
         from origin: CGPoint
@@ -37,8 +42,13 @@ extension View {
     ) -> some View {
         overlay(alignment: .top) {
             if let showing {
+                let height = showing
+                    ? SettingsDropZones.openHeight
+                    : SettingsDropZones.showHeight
+
                 SettingsShowZone(isTargeted: showing)
-                    .frame(height: 64)
+                    .frame(height: height)
+                    .animation(.smooth(duration: 0.35), value: showing)
                     .onGeometryChange(for: CGRect.self) { proxy in
                         proxy.frame(in: .global)
                     } action: { frame in

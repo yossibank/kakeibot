@@ -9,15 +9,44 @@ struct SettingsHideTarget: View {
     let isArmed: Bool
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: systemImage)
+        Color.clear
+            .frame(maxWidth: .infinity, minHeight: SettingsDropZones.hideHeight)
+            .overlay(alignment: .bottom) {
+                box
+            }
+            .transition(.opacity)
+            .sensoryFeedback(
+                .impact(weight: .heavy),
+                trigger: isArmed
+            ) { _, new in
+                new
+            }
+    }
+}
 
-            Text(title)
+private extension SettingsHideTarget {
+    var box: some View {
+        let height = isArmed
+            ? SettingsDropZones.openHeight
+            : SettingsDropZones.hideHeight
+        let labelHeight = isArmed
+            ? SettingsDropZones.labelHeight
+            : SettingsDropZones.hideHeight
+
+        return VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                Image(systemName: systemImage)
+
+                Text(title)
+            }
+            .contentTransition(.opacity)
+            .frame(maxWidth: .infinity, minHeight: labelHeight)
+
+            Spacer(minLength: 0)
         }
         .textFont(.subheadline)
         .foregroundStyle(color)
-        .contentTransition(.opacity)
-        .frame(maxWidth: .infinity, minHeight: 50)
+        .frame(height: height, alignment: .top)
         .background {
             shape
                 .fill(Palette.backgroundBottom.opacity(.strong))
@@ -29,23 +58,14 @@ struct SettingsHideTarget: View {
             shape
                 .stroke(color.opacity(0.6), style: .dashed)
         }
-        .animation(.snappy(duration: 0.2), value: isArmed)
+        .animation(.smooth(duration: 0.35), value: isArmed)
         .onGeometryChange(for: CGRect.self) { proxy in
             proxy.frame(in: .global)
         } action: { frame in
             zones.hide = frame
         }
-        .transition(.opacity)
-        .sensoryFeedback(
-            .impact(weight: .heavy),
-            trigger: isArmed
-        ) { _, new in
-            new
-        }
     }
-}
 
-private extension SettingsHideTarget {
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
     }

@@ -8,15 +8,26 @@ struct SettingsShowZone: View {
 
     var body: some View {
         let color = isTargeted ? Palette.accent : Palette.subtext
+        let labelHeight = isTargeted
+            ? SettingsDropZones.labelHeight
+            : CGFloat.infinity
 
-        HStack(spacing: 8) {
-            Image(systemName: "eye")
+        VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                Image(systemName: "eye")
 
-            Text("ここに置くと表示に戻ります")
+                Text(title)
+            }
+            .contentTransition(.opacity)
+            .frame(maxWidth: .infinity, maxHeight: labelHeight)
+
+            if isTargeted {
+                Spacer(minLength: 0)
+            }
         }
         .textFont(.subheadline)
         .foregroundStyle(color)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             shape
                 .fill(Palette.backgroundBottom.opacity(.strong))
@@ -38,5 +49,9 @@ private extension SettingsShowZone {
 
     var fill: Color {
         isTargeted ? Palette.accent.opacity(.subtle) : Color.clear
+    }
+
+    var title: String {
+        isTargeted ? "離すと表示に戻ります" : "ここに置くと表示に戻ります"
     }
 }
