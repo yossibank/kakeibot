@@ -1,4 +1,5 @@
 import Core
+import Foundation
 
 public struct RewardBank: Equatable, Sendable {
     public let rules: [RewardRule]
@@ -28,12 +29,41 @@ public extension RewardBank {
         rules.filter(\.isActive)
     }
 
+    var waitingGoals: [RewardGoal] {
+        goals
+            .filter { $0.purchasedAt == nil }
+            .sorted { $0.createdAt < $1.createdAt }
+    }
+
+    var boughtGoals: [RewardGoal] {
+        goals
+            .filter { $0.purchasedAt != nil }
+            .sorted { left, right in
+                let leftDate = left.purchasedAt ?? .distantPast
+                let rightDate = right.purchasedAt ?? .distantPast
+                return leftDate > rightDate
+            }
+    }
+
     func rule(for log: RewardLog) -> RewardRule? {
         rules.first { $0.id == log.ruleId }
     }
 
     func icon(for rule: RewardRule) -> Icon? {
         icons[rule.iconId]
+    }
+
+    func remaining(to goal: RewardGoal) -> Int {
+        max(goal.targetAmount - balance, 0)
+    }
+
+    func progress(to goal: RewardGoal) -> Double {
+        guard goal.targetAmount > 0 else {
+            return 0
+        }
+
+        let ratio = Double(balance) / Double(goal.targetAmount)
+        return min(max(ratio, 0), 1)
     }
 
     func logs(on date: LocalDate) -> [RewardLog] {

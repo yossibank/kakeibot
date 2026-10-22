@@ -32,6 +32,10 @@ public extension RewardRuleListModel {
         list?.icons[rule.iconId]
     }
 
+    func total(for rule: RewardRule) -> RewardRuleList.Total? {
+        list?.total(of: rule)
+    }
+
     func load() async {
         do {
             list = try await database.rewardRuleList()

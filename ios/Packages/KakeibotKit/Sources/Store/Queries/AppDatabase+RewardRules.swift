@@ -26,6 +26,34 @@ private extension AppDatabase {
         let pairs = try Icon.fetchAll(db, keys: iconIds).map { ($0.id, $0) }
         let icons = Dictionary(uniqueKeysWithValues: pairs)
 
-        return RewardRuleList(rules: rules, icons: icons)
+        return try RewardRuleList(
+            rules: rules,
+            icons: icons,
+            totals: rewardTotals(in: db)
+        )
+    }
+
+    static func rewardTotals(
+        in db: Database
+    ) throws -> [RewardRule.ID: RewardRuleList.Total] {
+        let rows = try Row.fetchAll(
+            db,
+            sql: """
+            SELECT rule_id, COUNT(*) AS count, SUM(amount) AS amount
+            FROM reward_log
+            GROUP BY rule_id
+            """
+        )
+
+        let pairs = rows.map { row in
+            let total = RewardRuleList.Total(
+                count: row["count"],
+                amount: row["amount"]
+            )
+
+            return (row["rule_id"] as RewardRule.ID, total)
+        }
+
+        return Dictionary(uniqueKeysWithValues: pairs)
     }
 }

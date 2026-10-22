@@ -22,6 +22,18 @@ struct RewardLogWriteTests {
     }
 
     @Test
+    func countsAchievementsPerRule() async throws {
+        let setup = try await Setup()
+
+        try await setup.achieve(true)
+        let list = try await setup.database.rewardRuleList()
+        let total = try #require(list.total(of: setup.rule))
+
+        #expect(total.count == 1)
+        #expect(total.amount == 500)
+    }
+
+    @Test
     func keepsAmountAtAchievement() async throws {
         let setup = try await Setup()
         try await setup.achieve(true)
