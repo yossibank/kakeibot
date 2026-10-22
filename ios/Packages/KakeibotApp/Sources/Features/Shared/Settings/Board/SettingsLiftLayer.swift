@@ -75,7 +75,7 @@ private extension SettingsLiftLayer {
             .scaleEffect(tileScale)
             .shadow(color: Palette.shadow.opacity(0.5), radius: 16, y: 8)
             .position(center)
-            .animation(.snappy(duration: 0.2), value: isOverZone)
+            .animation(.smooth(duration: 0.35), value: isOverZone)
             .transition(.identity)
     }
 
@@ -83,15 +83,23 @@ private extension SettingsLiftLayer {
         _ floating: SettingsDrag<ID>.Floating,
         height: CGFloat
     ) -> CGFloat {
-        if drag.isOverHide {
-            return drag.zones.hide.minY - origin.y - Self.zoneGap - height / 2
+        let natural = floating.center.y + drag.origin.y - origin.y
+        let hide = drag.zones.hide
+        let show = drag.zones.show
+
+        if drag.lift != nil,
+           !hide.isEmpty {
+            let limit = hide.minY - origin.y - Self.zoneGap - height / 2
+            return min(natural, limit)
         }
 
-        if drag.isOverShow {
-            return drag.zones.show.maxY - origin.y + Self.zoneGap + height / 2
+        if drag.hiddenLift != nil,
+           !show.isEmpty {
+            let limit = show.maxY - origin.y + Self.zoneGap + height / 2
+            return max(natural, limit)
         }
 
-        return floating.center.y + drag.origin.y - origin.y
+        return natural
     }
 }
 
