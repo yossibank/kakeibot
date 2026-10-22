@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 public extension View {
-    func palette(_ palette: ThemePalette) -> some View {
+    func palette(_ palette: ThemePalette?) -> some View {
         background {
             PaletteScene(palette: palette)
         }
@@ -11,7 +11,7 @@ public extension View {
 }
 
 private struct PaletteScene: UIViewRepresentable {
-    let palette: ThemePalette
+    let palette: ThemePalette?
 
     func makeUIView(context: Context) -> PaletteSceneView {
         PaletteSceneView()
@@ -26,7 +26,7 @@ private struct PaletteScene: UIViewRepresentable {
 }
 
 private final class PaletteSceneView: UIView {
-    var palette = ThemePalette.night {
+    var palette: ThemePalette? {
         didSet {
             apply()
         }
@@ -39,6 +39,12 @@ private final class PaletteSceneView: UIView {
 
     func apply() {
         guard let scene = window?.windowScene else {
+            return
+        }
+
+        guard let palette else {
+            scene.traitOverrides.remove(PaletteTrait.self)
+            scene.traitOverrides.userInterfaceStyle = .unspecified
             return
         }
 

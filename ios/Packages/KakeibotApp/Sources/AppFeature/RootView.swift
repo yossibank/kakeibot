@@ -11,6 +11,7 @@ public struct RootView: View {
     @State private var isRevealed = false
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
 
     public init() {}
 
@@ -27,6 +28,7 @@ public struct RootView: View {
                 } onFinish: {
                     isLaunching = false
                 }
+                .environment(\.palette, launchPalette)
                 .animation(.easeOut(duration: 0.3), value: model.palette)
             }
         }
@@ -51,7 +53,7 @@ public struct RootView: View {
             }
         }
         .environment(\.notificationPermission, .live)
-        .palette(shownPalette)
+        .palette(model.palette)
         .environment(\.themeStyle, shownStyle)
         .font(shownStyle.bodyFont)
         .warmsUpInput()
@@ -104,8 +106,15 @@ private extension RootView {
         model.palette != nil
     }
 
-    var shownPalette: ThemePalette {
-        model.palette ?? .night
+    var launchPalette: ThemePalette {
+        if let palette = model.palette {
+            return palette
+        }
+
+        switch colorScheme {
+        case .light: return ThemePreset.ivory.palette
+        default: return .night
+        }
     }
 
     var shownStyle: ThemeStyle {
