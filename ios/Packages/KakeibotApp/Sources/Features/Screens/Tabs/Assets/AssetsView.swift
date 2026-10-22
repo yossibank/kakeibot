@@ -42,6 +42,8 @@ public struct AssetsView: View {
                 ForEach(model.sections) { section in
                     walletSection(section)
                 }
+
+                rewardCard
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
@@ -132,6 +134,75 @@ private extension AssetsView {
         }
         .padding(16)
         .card(cornerRadius: 24)
+    }
+
+    var rewardCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                SectionTitle("ごほうび貯金箱")
+
+                Spacer()
+
+                Image(systemName: "gift")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.accent)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("頑張りで浮いた分")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+
+                Text(AmountText.text(model.rewardBalance))
+                    .displayFont(.title)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+
+                Text("本物の口座のお金とは別に数えます")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.hint)
+            }
+
+            if model.recentRewards.isEmpty {
+                Text("記録の日の見出しの贈り物のボタンから、達成を付けられます")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(model.recentRewards) { log in
+                        rewardRow(log)
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .card()
+    }
+
+    func rewardRow(_ log: RewardLog) -> some View {
+        let rule = model.rewardRule(for: log)
+        let icon = rule.flatMap { model.rewardIcon(for: $0) }
+
+        return HStack(spacing: 10) {
+            IconBadge(icon, size: 26)
+
+            Text(rule?.name ?? "")
+                .textFont(.footnote)
+                .foregroundStyle(Palette.text)
+                .lineLimit(1)
+
+            Spacer(minLength: 8)
+
+            Text("\(log.date.month)/\(log.date.day)")
+                .textFont(.caption2)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+
+            Text("＋\(AmountText.text(log.amount))")
+                .textFont(.footnote)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accent)
+        }
     }
 
     var billCard: some View {

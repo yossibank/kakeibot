@@ -21,6 +21,7 @@ public final class RecordsModel: ScreenModel {
     public private(set) var noSpendDays: Set<LocalDate> = []
     public private(set) var stampCalendar: StampCalendar?
     public private(set) var stampShelf: IconShelf?
+    public private(set) var rewardBank: RewardBank?
     public private(set) var recurrings: [Recurring] = []
     public private(set) var recentSearches: [String] = []
 
@@ -188,6 +189,44 @@ public extension RecordsModel {
         }
     }
 
+    var rewardRules: [RewardRule] {
+        rewardBank?.activeRules ?? []
+    }
+
+    func rewardIcon(for rule: RewardRule) -> Icon? {
+        rewardBank?.icon(for: rule)
+    }
+
+    func rewardTotal(on date: LocalDate) -> Int {
+        rewardBank?.total(on: date) ?? 0
+    }
+
+    func isAchieved(
+        _ rule: RewardRule,
+        on date: LocalDate
+    ) -> Bool {
+        let logs = rewardBank?.logs(on: date) ?? []
+        return logs.contains { $0.ruleId == rule.id }
+    }
+
+    func toggleReward(
+        _ rule: RewardRule,
+        on date: LocalDate
+    ) async {
+        let isAchieved = !isAchieved(rule, on: date)
+
+        do {
+            try await database.setReward(
+                rule.id,
+                isAchieved: isAchieved,
+                on: date,
+                at: Date()
+            )
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+        }
+    }
+
     func canMarkNoSpend(on date: LocalDate) -> Bool {
         date <= today && (day(on: date)?.expenseTotal ?? 0) == 0
     }
@@ -218,6 +257,10 @@ public extension RecordsModel {
 
             group.addTask {
                 await self.observeStampShelf()
+            }
+
+            group.addTask {
+                await self.observeRewardBank()
             }
 
             group.addTask {
@@ -329,6 +372,15 @@ private extension RecordsModel {
             failure: Self.loadFailedMessage
         ) { shelf in
             stampShelf = shelf
+        }
+    }
+
+    func observeRewardBank() async {
+        await observe(
+            database.rewardBankUpdates(),
+            failure: Self.loadFailedMessage
+        ) { bank in
+            rewardBank = bank
         }
     }
 

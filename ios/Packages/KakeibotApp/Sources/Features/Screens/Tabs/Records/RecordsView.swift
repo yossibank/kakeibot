@@ -11,6 +11,7 @@ public struct RecordsView: View {
     @State private var isMovingForward = true
     @State private var slide = PageSlide()
     @State private var stampTarget: StampTarget?
+    @State private var rewardTarget: StampTarget?
     @State private var stampCount = 0
     @State private var isFiltering = false
 
@@ -83,6 +84,9 @@ public struct RecordsView: View {
         }
         .sheet(item: $stampTarget) { target in
             stampSheet(on: target.date)
+        }
+        .sheet(item: $rewardTarget) { target in
+            RecordsRewardSheet(model: model, date: target.date)
         }
         .sheet(isPresented: $isFiltering) {
             RecordsFilterSheet(filter: $model.filter, list: model.list)
@@ -740,6 +744,13 @@ private extension RecordsView {
             }
 
             Button {
+                rewardTarget = StampTarget(date: date)
+            } label: {
+                rewardButtonLabel(on: date)
+            }
+            .buttonStyle(.plain)
+
+            Button {
                 stampTarget = StampTarget(date: date)
             } label: {
                 stampButtonLabel(on: date)
@@ -748,6 +759,26 @@ private extension RecordsView {
         }
         .padding(.top, 12)
         .padding(.bottom, 8)
+    }
+
+    @ViewBuilder
+    func rewardButtonLabel(on date: LocalDate) -> some View {
+        if model.rewardTotal(on: date) > 0 {
+            Image(systemName: "gift.fill")
+                .font(.footnote)
+                .foregroundStyle(Palette.background)
+                .frame(width: 26, height: 26)
+                .background(Palette.accent, in: .circle)
+        } else {
+            Image(systemName: "gift")
+                .font(.footnote)
+                .foregroundStyle(Palette.subtext)
+                .frame(width: 26, height: 26)
+                .overlay {
+                    Circle()
+                        .stroke(Palette.subtext.opacity(.muted), style: .dashed)
+                }
+        }
     }
 
     @ViewBuilder
