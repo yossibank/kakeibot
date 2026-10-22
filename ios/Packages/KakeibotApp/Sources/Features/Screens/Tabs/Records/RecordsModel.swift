@@ -213,6 +213,10 @@ public extension RecordsModel {
         RewardRuleEditModel(database: database)
     }
 
+    func stampEditModel() -> StampEditModel {
+        StampEditModel(database: database)
+    }
+
     func toggleReward(
         _ rule: RewardRule,
         on date: LocalDate

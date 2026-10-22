@@ -89,6 +89,13 @@ public struct TemplateListView: View {
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .settingsLiftLayer(
+            drag,
+            size: CGSize(width: grid.itemWidth, height: grid.itemHeight),
+            scale: 1.03
+        ) { id in
+            floatingTile(id)
+        }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -184,16 +191,19 @@ private extension TemplateListView {
         let lifted = drag.hiddenOffset(of: template.id)
         let isLifted = lifted != nil
         let offset = lifted ?? .zero
-        let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
-        let opacity: Double = isLifted ? 1 : 0.5
+        let opacity: Double = isLifted ? 0 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
         return card(template)
             .opacity(opacity)
-            .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
+            .animation(nil, value: isLifted)
             .offset(offset)
+            .settingsLiftFrame(
+                drag,
+                \.hiddenFrames,
+                id: template.id,
+                in: Self.space
+            )
             .zIndex(layer)
             .onTapGesture {
                 destination = .edit(template.id)
@@ -207,12 +217,20 @@ private extension TemplateListView {
             )
     }
 
+    @ViewBuilder
+    func floatingTile(_ id: EntryTemplate.ID) -> some View {
+        let items = model.shown + model.hidden
+
+        if let template = items.first(where: { $0.id == id }) {
+            card(template)
+        }
+    }
+
     func movableCard(_ template: EntryTemplate) -> some View {
         let isLifted = drag.isLifted(template.id)
         let index = model.shown.firstIndex(of: template) ?? 0
         let position = isLifted ? drag.liftedCenter : grid.center(at: index)
-        let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
+        let opacity: Double = isLifted ? 0 : 1
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: template.id, openId: $openId, role: .hide) {
@@ -225,8 +243,8 @@ private extension TemplateListView {
             card(template)
         }
         .frame(width: grid.itemWidth, height: grid.itemHeight)
-        .scaleEffect(scale)
-        .shadow(color: shadow, radius: 16, y: 8)
+        .opacity(opacity)
+        .animation(nil, value: isLifted)
         .position(position)
         .zIndex(layer)
         .gesture(

@@ -3,26 +3,33 @@ import DesignSystem
 import SwiftUI
 
 struct RecordsStampSheet: View {
+    @State private var isAddingStamp = false
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
 
     let date: LocalDate
     let choices: [Icon]
     let current: Icon?
+    let editModel: () -> StampEditModel
     let onPick: (Icon) -> Void
     let onRemove: () -> Void
 
     var body: some View {
-        VStack(spacing: 18) {
-            header
+        FittedSheet {
+            VStack(spacing: 18) {
+                header
 
-            if choices.isEmpty {
-                Text("設定の「スタンプ」で作ると、ここから押せます")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .frame(maxWidth: .infinity, minHeight: 120)
-            } else {
-                ScrollView {
+                if choices.isEmpty {
+                    RecordsSheetEmpty(
+                        systemImage: "seal",
+                        title: "スタンプがまだありません",
+                        message: "スタンプを作ると、ここから押せます",
+                        actionTitle: "スタンプを作る"
+                    ) {
+                        isAddingStamp = true
+                    }
+                } else {
                     LazyVGrid(columns: Self.columns, spacing: 12) {
                         ForEach(choices, id: \.id) { icon in
                             choice(icon)
@@ -30,33 +37,25 @@ struct RecordsStampSheet: View {
                     }
                     .padding(.vertical, 4)
                 }
-                .scrollIndicators(.hidden)
-            }
 
-            if current != nil {
-                Button {
-                    onRemove()
-                    dismiss()
-                } label: {
-                    Label("スタンプを外す", systemImage: "xmark.circle")
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.rose)
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                        .contentShape(.rect)
+                if current != nil {
+                    Button {
+                        onRemove()
+                        dismiss()
+                    } label: {
+                        Label("スタンプを外す", systemImage: "xmark.circle")
+                            .textFont(.subheadline)
+                            .foregroundStyle(Palette.rose)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
-        .padding(.bottom, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background {
-            Rectangle()
-                .fill(Palette.background)
-                .ignoresSafeArea()
+        .sheet(isPresented: $isAddingStamp) {
+            StampEditSheet(model: editModel())
         }
-        .presentationDetents([.medium])
     }
 }
 
@@ -76,8 +75,14 @@ private extension RecordsStampSheet {
 
             Spacer()
 
-            Color.clear
-                .frame(width: 44, height: 44)
+            if choices.isEmpty {
+                Color.clear
+                    .frame(width: 44, height: 44)
+            } else {
+                RingButton(systemImage: "plus") {
+                    isAddingStamp = true
+                }
+            }
         }
     }
 

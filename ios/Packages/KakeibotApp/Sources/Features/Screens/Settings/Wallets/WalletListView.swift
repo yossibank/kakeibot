@@ -85,6 +85,12 @@ public struct WalletListView: View {
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .settingsLiftLayer(
+            drag,
+            scale: 1.03
+        ) { id in
+            floatingTile(id)
+        }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -167,17 +173,20 @@ private extension WalletListView {
         let lifted = drag.hiddenOffset(of: wallet.id)
         let isLifted = lifted != nil
         let offset = lifted ?? .zero
-        let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
-        let opacity: Double = isLifted ? 1 : 0.5
+        let opacity: Double = isLifted ? 0 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
         return row(wallet)
             .opacity(opacity)
+            .animation(nil, value: isLifted)
             .contentShape(.rect)
-            .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
             .offset(offset)
+            .settingsLiftFrame(
+                drag,
+                \.hiddenFrames,
+                id: wallet.id,
+                in: Self.space
+            )
             .zIndex(layer)
             .onTapGesture {
                 destination = .edit(wallet.id)
@@ -191,12 +200,20 @@ private extension WalletListView {
             )
     }
 
+    @ViewBuilder
+    func floatingTile(_ id: Wallet.ID) -> some View {
+        let items = model.shown + model.hidden
+
+        if let wallet = items.first(where: { $0.id == id }) {
+            row(wallet)
+        }
+    }
+
     func movableRow(_ wallet: Wallet) -> some View {
         let isLifted = drag.isLifted(wallet.id)
         let index = model.shown.firstIndex(of: wallet) ?? 0
         let center = isLifted ? drag.liftedCenter : Self.grid.center(at: index)
-        let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
+        let opacity: Double = isLifted ? 0 : 1
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: wallet.id, openId: $openId, role: .hide) {
@@ -209,9 +226,15 @@ private extension WalletListView {
             row(wallet)
         }
         .frame(height: Self.rowHeight)
-        .scaleEffect(scale)
-        .shadow(color: shadow, radius: 16, y: 8)
+        .opacity(opacity)
+        .animation(nil, value: isLifted)
         .offset(y: center.y - Self.rowHeight / 2)
+        .settingsLiftFrame(
+            drag,
+            \.rowFrames,
+            id: wallet.id,
+            in: Self.space
+        )
         .zIndex(layer)
         .gesture(
             LiftGesture(in: Self.space) { location in

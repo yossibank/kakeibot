@@ -103,8 +103,8 @@ public extension SettingKey where Value == Set<SettingsScreen> {
         Self(screens: .closedHints)
     }
 
-    static var openHiddenLists: Self {
-        Self(screens: .openHiddenLists, default: Set(SettingsScreen.allCases))
+    static var closedHiddenLists: Self {
+        Self(screens: .closedHiddenLists)
     }
 }
 

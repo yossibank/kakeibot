@@ -6,6 +6,8 @@ import SwiftUI
 final class SettingsDrag<ID: Hashable> {
     var zones = SettingsDropZones()
     var origin: CGPoint = .zero
+    var hiddenFrames: [ID: CGRect] = [:]
+    var rowFrames: [ID: CGRect] = [:]
 
     let autoScroll = SettingsAutoScroll()
 
@@ -30,6 +32,12 @@ extension SettingsDrag {
         var location: CGPoint
     }
 
+    struct Floating {
+        let id: ID
+        let center: CGPoint
+        let size: CGSize?
+    }
+
     enum Drop {
         case hide(ID)
         case move
@@ -37,6 +45,36 @@ extension SettingsDrag {
 
     var isLifting: Bool {
         lift != nil || hiddenLift != nil
+    }
+
+    var floating: Floating? {
+        if let lift {
+            let row = rowFrames[lift.id]
+            let center = CGPoint(
+                x: row?.midX ?? liftedCenter.x,
+                y: (row?.minY ?? 0) + liftedCenter.y
+            )
+
+            return Floating(id: lift.id, center: center, size: row?.size)
+        }
+
+        guard
+            let hiddenLift,
+            let frame = hiddenFrames[hiddenLift.id]
+        else {
+            return nil
+        }
+
+        let center = CGPoint(
+            x: frame.midX + hiddenLift.location.x - hiddenLift.start.x,
+            y: frame.midY + hiddenLift.location.y - hiddenLift.start.y
+        )
+
+        return Floating(
+            id: hiddenLift.id,
+            center: center,
+            size: frame.size
+        )
     }
 
     var showZone: Bool? {

@@ -81,6 +81,13 @@ public struct RewardRuleListView: View {
         .padding(.horizontal, 18)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .settingsLiftLayer(
+            drag,
+            size: CGSize(width: grid.itemWidth, height: Self.tileHeight),
+            scale: 1.1
+        ) { id in
+            floatingTile(id)
+        }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -185,15 +192,20 @@ private extension RewardRuleListView {
         let lifted = drag.hiddenOffset(of: rule.id)
         let isLifted = lifted != nil
         let offset = lifted ?? .zero
-        let scale: CGFloat = isLifted ? 1.1 : 1
-        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
+        let opacity: Double = isLifted ? 0 : 1
         let layer: Double = isLifted ? 1 : 0
 
         return tileFace(rule, isHidden: true)
             .frame(height: Self.tileHeight)
-            .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
+            .opacity(opacity)
+            .animation(nil, value: isLifted)
             .offset(offset)
+            .settingsLiftFrame(
+                drag,
+                \.hiddenFrames,
+                id: rule.id,
+                in: Self.space
+            )
             .zIndex(layer)
             .onTapGesture {
                 destination = .edit(rule.id)
@@ -207,18 +219,26 @@ private extension RewardRuleListView {
             )
     }
 
+    @ViewBuilder
+    func floatingTile(_ id: RewardRule.ID) -> some View {
+        let items = model.shown + model.hidden
+
+        if let rule = items.first(where: { $0.id == id }) {
+            tileFace(rule, isHidden: false)
+        }
+    }
+
     func movableTile(_ rule: RewardRule) -> some View {
         let isLifted = drag.isLifted(rule.id)
         let index = model.shown.firstIndex(of: rule) ?? 0
         let position = isLifted ? drag.liftedCenter : grid.center(at: index)
-        let scale: CGFloat = isLifted ? 1.1 : 1
-        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
+        let opacity: Double = isLifted ? 0 : 1
         let layer: Double = isLifted ? 1 : 0
 
         return tileFace(rule, isHidden: false)
             .frame(width: grid.itemWidth, height: Self.tileHeight)
-            .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
+            .opacity(opacity)
+            .animation(nil, value: isLifted)
             .position(position)
             .zIndex(layer)
             .onTapGesture {
