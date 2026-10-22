@@ -46,6 +46,16 @@ public struct HomeView: View {
         ScrollView {
             VStack(spacing: 12) {
                 header
+
+                if let buddy = model.buddy.buddy {
+                    BuddyBubble(
+                        buddy,
+                        name: model.buddy.name,
+                        line: model.buddyLine
+                    )
+                    .padding(.horizontal, 4)
+                }
+
                 dialCard
                 templateCard
                 recentCard

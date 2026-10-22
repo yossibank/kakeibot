@@ -41,6 +41,38 @@ public extension SettingKey where Value == LaunchScreen {
     }
 }
 
+public extension SettingKey where Value == Buddy? {
+    static var buddy: Self {
+        Self(
+            .characterId,
+            default: .dial,
+            decode: { text in
+                guard text != Self.noBuddy else {
+                    return .some(nil)
+                }
+
+                return Buddy(rawValue: text).map { .some($0) }
+            },
+            encode: { $0?.rawValue ?? Self.noBuddy }
+        )
+    }
+
+    private static var noBuddy: String {
+        "none"
+    }
+}
+
+public extension SettingKey where Value == String {
+    static var buddyName: Self {
+        Self(
+            .characterName,
+            default: "",
+            decode: { $0 },
+            encode: { $0.isEmpty ? nil : $0 }
+        )
+    }
+}
+
 public extension SettingKey where Value == ThemeChoice {
     static var theme: Self {
         Self(
