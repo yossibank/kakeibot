@@ -17,6 +17,8 @@ final class SettingsDrag<ID: Hashable> {
     private(set) var isOverShow = false
     private(set) var liftCount = 0
     private(set) var showCount = 0
+
+    private var armTask: Task<Void, Never>?
 }
 
 extension SettingsDrag {
@@ -139,11 +141,11 @@ extension SettingsDrag {
 
         current.location = location
         lift = current
-        isOverHide = zones.isOverHide(location, from: origin)
+        arm(zones.isOverHide(location, from: origin), flag: \.isOverHide)
 
         autoScroll.follow(
             y: location.y + origin.y,
-            bottom: zones.hide.isEmpty ? nil : zones.hide.minY
+            bottom: zones.hide.isEmpty ? nil : zones.hideTop
         ) { delta in
             onScroll(CGPoint(x: location.x, y: location.y + delta))
         }
@@ -157,6 +159,7 @@ extension SettingsDrag {
 
     func drop() -> Drop? {
         autoScroll.stop()
+        disarm()
 
         guard let lift else {
             return nil
@@ -189,10 +192,12 @@ extension SettingsDrag {
         }
 
         hiddenLift?.location = location
-        isOverShow = zones.isOverShow(location, from: origin)
+        arm(zones.isOverShow(location, from: origin), flag: \.isOverShow)
     }
 
     func dropHidden() -> ID? {
+        disarm()
+
         guard let hiddenLift else {
             return nil
         }
@@ -210,5 +215,49 @@ extension SettingsDrag {
 
         showCount += 1
         return hiddenLift.id
+    }
+}
+
+private extension SettingsDrag {
+    static var armDelay: Duration {
+        .milliseconds(150)
+    }
+
+    func arm(
+        _ isInside: Bool,
+        flag: ReferenceWritableKeyPath<SettingsDrag, Bool>
+    ) {
+        guard isInside else {
+            disarm()
+
+            if self[keyPath: flag] {
+                self[keyPath: flag] = false
+            }
+
+            return
+        }
+
+        guard
+            !self[keyPath: flag],
+            armTask == nil
+        else {
+            return
+        }
+
+        armTask = Task {
+            try? await Task.sleep(for: Self.armDelay)
+
+            guard !Task.isCancelled else {
+                return
+            }
+
+            self[keyPath: flag] = true
+            armTask = nil
+        }
+    }
+
+    func disarm() {
+        armTask?.cancel()
+        armTask = nil
     }
 }

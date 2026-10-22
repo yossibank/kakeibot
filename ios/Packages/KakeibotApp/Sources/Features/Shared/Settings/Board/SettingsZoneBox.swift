@@ -74,7 +74,7 @@ private extension SettingsZoneBox {
             return
         }
 
-        withAnimation(.smooth(duration: 0.3)) {
+        withAnimation(.spring(duration: 0.4, bounce: 0.35)) {
             isOpen = true
         } completion: {
             showsOnLabel = isOn

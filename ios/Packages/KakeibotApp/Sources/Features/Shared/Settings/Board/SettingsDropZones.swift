@@ -10,7 +10,10 @@ extension SettingsDropZones {
     static let showHeight: CGFloat = 64
     static let openHeight: CGFloat = 136
     static let labelHeight: CGFloat = 44
-    static let reach: CGFloat = 40
+
+    var hideTop: CGFloat {
+        hide.maxY - Self.hideHeight
+    }
 
     func isOverHide(
         _ location: CGPoint,
@@ -18,9 +21,9 @@ extension SettingsDropZones {
     ) -> Bool {
         let area = CGRect(
             x: hide.minX,
-            y: hide.minY - Self.reach,
+            y: hideTop,
             width: hide.width,
-            height: hide.height + Self.reach
+            height: Self.hideHeight
         )
 
         return area.contains(Self.global(location, from: origin))
@@ -34,7 +37,7 @@ extension SettingsDropZones {
             x: show.minX,
             y: show.minY,
             width: show.width,
-            height: show.height + Self.reach
+            height: Self.showHeight
         )
 
         return area.contains(Self.global(location, from: origin))

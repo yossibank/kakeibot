@@ -101,7 +101,7 @@ private extension SettingsLiftLayer {
             .scaleEffect(tileScale)
             .shadow(color: Palette.shadow.opacity(0.5), radius: 16, y: 8)
             .position(center)
-            .animation(.smooth(duration: 0.35), value: isDocked)
+            .animation(.spring(duration: 0.4, bounce: 0.2), value: isDocked)
             .transition(.identity)
     }
 
