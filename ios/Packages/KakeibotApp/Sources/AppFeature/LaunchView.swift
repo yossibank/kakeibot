@@ -6,32 +6,39 @@ public struct LaunchView: View {
     @State private var sweep: CGFloat = 0
     @State private var glow: Double = 0
     @State private var hasSwept = false
+    @State private var revealSize: CGFloat = 0
     @State private var isLeaving = false
 
     @Environment(\.colorScheme) private var colorScheme
 
+    let palette: ThemePalette
     let isReady: Bool
     let onLeave: () -> Void
     let onFinish: () -> Void
 
     public init(
+        palette: ThemePalette,
         isReady: Bool,
         onLeave: @escaping () -> Void,
         onFinish: @escaping () -> Void
     ) {
+        self.palette = palette
         self.isReady = isReady
         self.onLeave = onLeave
         self.onFinish = onFinish
     }
 
     public var body: some View {
-        let scale: CGFloat = isLeaving ? 1.12 : 1
-
         ZStack {
             Color(uiColor: .systemBackground)
 
             mark
-                .scaleEffect(scale)
+
+            themed
+                .mask {
+                    Circle()
+                        .frame(width: revealSize, height: revealSize)
+                }
         }
         .ignoresSafeArea()
         .opacity(isLeaving ? 0 : 1)
@@ -39,8 +46,8 @@ public struct LaunchView: View {
         .task {
             await sweepRing()
         }
-        .onChange(of: canLeave) {
-            leave()
+        .onChange(of: canReveal) {
+            revealTheme()
         }
     }
 }
@@ -65,12 +72,32 @@ private extension LaunchView {
         .shadow(color: Palette.accent.opacity(glow), radius: 24)
         .environment(\.palette, sweepPalette)
     }
+
+    var themed: some View {
+        ZStack {
+            Rectangle()
+                .fill(Palette.background)
+
+            ZStack {
+                Image("AppIconDial", bundle: .main)
+                    .resizable()
+                    .foregroundStyle(Palette.accent)
+
+                Image("AppIconYen", bundle: .main)
+                    .resizable()
+                    .foregroundStyle(Palette.accentStrong)
+            }
+            .frame(width: Self.markSize, height: Self.markSize)
+        }
+        .environment(\.palette, palette)
+    }
 }
 
 private extension LaunchView {
     static let markSize: CGFloat = 160
     static let ringSize: CGFloat = 160 * 694 / 1024
     static let sweepLength: CGFloat = 0.22
+    static let revealSize: CGFloat = 1100
 
     var sweepPalette: ThemePalette {
         switch colorScheme {
@@ -79,7 +106,7 @@ private extension LaunchView {
         }
     }
 
-    var canLeave: Bool {
+    var canReveal: Bool {
         hasSwept && isReady
     }
 
@@ -96,10 +123,18 @@ private extension LaunchView {
         hasSwept = true
     }
 
+    func revealTheme() {
+        withAnimation(.easeIn(duration: 0.4)) {
+            revealSize = Self.revealSize
+        } completion: {
+            leave()
+        }
+    }
+
     func leave() {
         onLeave()
 
-        withAnimation(.easeOut(duration: 0.45)) {
+        withAnimation(.easeOut(duration: 0.25)) {
             isLeaving = true
         } completion: {
             onFinish()
@@ -142,5 +177,5 @@ private struct RingSweep: Shape {
 }
 
 #Preview {
-    LaunchView(isReady: true) {} onFinish: {}
+    LaunchView(palette: .night, isReady: true) {} onFinish: {}
 }

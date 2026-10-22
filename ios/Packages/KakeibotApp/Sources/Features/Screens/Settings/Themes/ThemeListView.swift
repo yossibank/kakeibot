@@ -40,13 +40,13 @@ public struct ThemeListView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
-                        systemSection
-
-                        customSection
-
                         section("ライト", isLight: true)
 
                         section("ダーク", isLight: false)
+
+                        systemSection
+
+                        customSection
                     }
                     .padding(.vertical, 8)
                 }
