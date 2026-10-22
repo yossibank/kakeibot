@@ -12,8 +12,9 @@ struct ThemeWriteTests {
         let theme = try await database.saveTheme(Self.mint, at: now)
         try await database.setSetting(.theme, to: .custom(theme.id))
         let look = try await database.themeLook()
+        let palette = try #require(Self.mint.palette)
 
-        #expect(look == .fixed(Self.mint.palette))
+        #expect(look == .fixed(palette))
     }
 
     @Test
