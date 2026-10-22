@@ -48,6 +48,15 @@ public extension AssetsModel {
         case until(LoanPayoff)
     }
 
+    struct RewardMonth: Identifiable, Equatable {
+        public let month: YearMonth
+        public let logs: [RewardLog]
+
+        public var id: YearMonth {
+            month
+        }
+    }
+
     struct WalletSection: Identifiable, Equatable {
         public let role: Wallet.Kind.Role
         public let rows: [WalletRow]
@@ -208,6 +217,72 @@ public extension AssetsModel {
         Array((rewardBank?.logs ?? []).prefix(Self.recentRewardCount))
     }
 
+    var rewardGoal: RewardGoal? {
+        rewardBank?.waitingGoals.first
+    }
+
+    var isRewardGoalReached: Bool {
+        rewardGoal.map { remaining(to: $0) == 0 } ?? false
+    }
+
+    var waitingGoals: [RewardGoal] {
+        rewardBank?.waitingGoals ?? []
+    }
+
+    var boughtGoals: [RewardGoal] {
+        rewardBank?.boughtGoals ?? []
+    }
+
+    var rewardHistory: [RewardMonth] {
+        var months: [RewardMonth] = []
+
+        for log in rewardBank?.logs ?? [] {
+            let month = log.date.yearMonth
+
+            if let last = months.last, last.month == month {
+                months[months.count - 1] = RewardMonth(
+                    month: month,
+                    logs: last.logs + [log]
+                )
+            } else {
+                months.append(RewardMonth(month: month, logs: [log]))
+            }
+        }
+
+        return months
+    }
+
+    func remaining(to goal: RewardGoal) -> Int {
+        rewardBank?.remaining(to: goal) ?? goal.targetAmount
+    }
+
+    func progress(to goal: RewardGoal) -> Double {
+        rewardBank?.progress(to: goal) ?? 0
+    }
+
+    func goalEditModel(editing goal: RewardGoal?) -> AssetsGoalEditModel {
+        AssetsGoalEditModel(database: database, editing: goal)
+    }
+
+    @discardableResult
+    func setPurchased(
+        _ id: RewardGoal.ID,
+        isPurchased: Bool
+    ) async -> Bool {
+        do {
+            try await database.setRewardGoalPurchased(
+                id,
+                isPurchased: isPurchased,
+                at: Date()
+            )
+
+            return true
+        } catch {
+            errorNotice.show(Self.goalFailedMessage)
+            return false
+        }
+    }
+
     func rewardRule(for log: RewardLog) -> RewardRule? {
         rewardBank?.rule(for: log)
     }
@@ -249,6 +324,7 @@ public extension AssetsModel {
 private extension AssetsModel {
     static let loadFailedMessage = "残高を読めませんでした"
     static let recentRewardCount = 3
+    static let goalFailedMessage = "目標を保存できませんでした"
     static let billTitle = "引き落とし"
 
     static func row(

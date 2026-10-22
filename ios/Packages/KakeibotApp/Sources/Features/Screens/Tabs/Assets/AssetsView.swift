@@ -7,6 +7,7 @@ public struct AssetsView: View {
 
     @State private var movedBill: AssetsModel.UpcomingBill?
     @State private var pendingEntry: Entry.ID?
+    @State private var isShowingReward = false
 
     @Environment(\.themeStyle.corner) private var corner
 
@@ -51,6 +52,9 @@ public struct AssetsView: View {
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
+        }
+        .sheet(isPresented: $isShowingReward) {
+            AssetsRewardSheet(model: model)
         }
         .sheet(item: $movedBill, onDismiss: openPendingEntry) { bill in
             AssetsMovedSheet(row: bill) { id in
@@ -137,15 +141,39 @@ private extension AssetsView {
     }
 
     var rewardCard: some View {
+        Button {
+            isShowingReward = true
+        } label: {
+            rewardCardBody
+        }
+        .buttonStyle(.plain)
+    }
+
+    var rewardCardBody: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
+            HStack(spacing: 8) {
+                Image(systemName: "gift.fill")
+                    .sansFont(.small)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 26, height: 26)
+                    .background(Palette.accent.opacity(.subtle), in: Circle())
+
                 SectionTitle("ごほうび貯金箱")
 
                 Spacer()
 
-                Image(systemName: "gift")
+                if model.isRewardGoalReached {
+                    Text("目標に届きました")
+                        .textFont(.caption2, weight: .semibold)
+                        .foregroundStyle(Palette.background)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Palette.accent, in: .capsule)
+                }
+
+                Image(systemName: "chevron.right")
                     .font(.footnote)
-                    .foregroundStyle(Palette.accent)
+                    .foregroundStyle(Palette.hint)
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -163,6 +191,10 @@ private extension AssetsView {
                     .foregroundStyle(Palette.hint)
             }
 
+            if let goal = model.rewardGoal {
+                goalLine(goal)
+            }
+
             if model.recentRewards.isEmpty {
                 Text("記録の日の見出しの贈り物のボタンから、達成を付けられます")
                     .textFont(.caption)
@@ -177,6 +209,50 @@ private extension AssetsView {
         }
         .padding(16)
         .card()
+        .overlay {
+            if model.isRewardGoalReached {
+                reachedGlow
+            }
+        }
+    }
+
+    var reachedGlow: some View {
+        RoundedRectangle(cornerRadius: corner.radius(22))
+            .strokeBorder(Palette.accent, lineWidth: 1.5)
+            .shadow(color: Palette.accent, radius: 10)
+            .phaseAnimator([false, true]) { content, isLit in
+                let opacity = isLit ? 1 : 0.3
+
+                content
+                    .opacity(opacity)
+            } animation: { _ in
+                .easeInOut(duration: 1.4)
+            }
+            .allowsHitTesting(false)
+    }
+
+    func goalLine(_ goal: RewardGoal) -> some View {
+        let remaining = model.remaining(to: goal)
+        let progress = model.progress(to: goal)
+        let note = remaining > 0 ? "あと \(AmountText.text(remaining))" : "届きました"
+
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("\(goal.name) まで")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+
+                Spacer(minLength: 8)
+
+                Text(note)
+                    .textFont(.caption, weight: .semibold)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accent)
+            }
+
+            RatioBar(progress, tint: Palette.accent, height: 6)
+        }
     }
 
     func rewardRow(_ log: RewardLog) -> some View {

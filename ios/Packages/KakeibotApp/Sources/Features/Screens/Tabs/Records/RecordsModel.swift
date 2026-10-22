@@ -209,6 +209,10 @@ public extension RecordsModel {
         return logs.contains { $0.ruleId == rule.id }
     }
 
+    func rewardRuleEditModel() -> RewardRuleEditModel {
+        RewardRuleEditModel(database: database)
+    }
+
     func toggleReward(
         _ rule: RewardRule,
         on date: LocalDate

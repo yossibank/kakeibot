@@ -142,16 +142,21 @@ private extension RewardRuleListView {
         Button {
             destination = .new
         } label: {
-            Image(systemName: "plus")
-                .sansFont(.headline, weight: .ultraLight)
-                .foregroundStyle(Palette.accent)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Palette.faint, in: tileShape)
-                .overlay {
-                    tileShape
-                        .stroke(Palette.outline, style: .dashed)
-                }
-                .contentShape(.rect)
+            VStack(spacing: 8) {
+                Image(systemName: "plus")
+                    .sansFont(.title, weight: .ultraLight)
+
+                Text("ごほうびを足す")
+                    .textFont(.footnote)
+            }
+            .foregroundStyle(Palette.accent)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Palette.faint, in: tileShape)
+            .overlay {
+                tileShape
+                    .stroke(Palette.outline, style: .dashed)
+            }
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
     }
@@ -234,27 +239,82 @@ private extension RewardRuleListView {
     ) -> some View {
         let opacity: Double = isHidden ? 0.6 : 1
 
-        return VStack(spacing: 6) {
-            IconBadge(model.icon(for: rule), size: 36)
+        let icon = model.icon(for: rule)
+
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                IconBadge(icon, size: 46)
+
+                Spacer(minLength: 6)
+
+                if let total = model.total(for: rule) {
+                    totalBadge(total)
+                }
+            }
 
             Text(rule.name)
-                .textFont(.caption)
-                .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .textFont(.subheadline, weight: .semibold)
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
 
-            Text(AmountText.text(rule.amount))
-                .textFont(.caption2)
-                .foregroundStyle(Palette.accent)
+            Spacer(minLength: 0)
+
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text("達成で")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+
+                Text("＋\(AmountText.text(rule.amount))")
+                    .displayFont(.headline)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accent)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
         }
-        .padding(.horizontal, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(14)
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .topLeading
+        )
+        .background(alignment: .topTrailing) {
+            glow(icon)
+        }
+        .clipShape(tileShape)
         .background(tileBackground(isHidden: isHidden))
         .overlay {
             tileBorder(isHidden: isHidden)
         }
         .opacity(opacity)
         .contentShape(.rect)
+    }
+
+    func totalBadge(_ total: RewardRuleList.Total) -> some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            Text("これまで \(total.count) 回")
+                .textFont(.caption2, weight: .semibold)
+                .foregroundStyle(Palette.accent)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Palette.accent.opacity(.subtle), in: .capsule)
+
+            Text("計 \(AmountText.text(total.amount))")
+                .textFont(.caption2)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+        }
+    }
+
+    func glow(_ icon: Icon?) -> some View {
+        let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.accent
+
+        return Circle()
+            .fill(color.opacity(0.18))
+            .frame(width: 120, height: 120)
+            .blur(radius: 24)
+            .offset(x: 36, y: -36)
     }
 
     @ViewBuilder
@@ -284,9 +344,9 @@ private extension RewardRuleListView {
     }
 
     nonisolated static let space = "RewardBoard"
-    static let columnCount = 3
-    static let spacing: CGFloat = 8
-    static let tileHeight: CGFloat = 108
+    static let columnCount = 2
+    static let spacing: CGFloat = 12
+    static let tileHeight: CGFloat = 156
 
     var tileShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
