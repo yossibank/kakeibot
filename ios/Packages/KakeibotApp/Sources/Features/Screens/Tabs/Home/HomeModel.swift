@@ -13,6 +13,7 @@ public final class HomeModel: ScreenModel {
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var templateOrder: TemplateOrder = .manual
     public private(set) var list: EntryList?
+    public private(set) var buddy = BuddyProfile(buddy: .dial, customName: "")
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -141,6 +142,10 @@ public extension HomeModel {
         expense(on: today.adding(days: -1))
     }
 
+    var buddyLine: BuddyLine {
+        .budget(budgetUsage)
+    }
+
     var budgetUsage: BudgetUsage? {
         guard let budget = budgets.amount(for: nil, in: month) else {
             return nil
@@ -207,6 +212,10 @@ public extension HomeModel {
 
             group.addTask {
                 await self.observeMonthStartDay()
+            }
+
+            group.addTask {
+                await self.observeBuddy()
             }
         }
     }
@@ -394,6 +403,15 @@ private extension HomeModel {
             failure: Self.loadFailedMessage
         ) { budgets in
             self.budgets = budgets
+        }
+    }
+
+    func observeBuddy() async {
+        await observe(
+            database.buddyProfileUpdates(),
+            failure: Self.loadFailedMessage
+        ) { profile in
+            buddy = profile
         }
     }
 

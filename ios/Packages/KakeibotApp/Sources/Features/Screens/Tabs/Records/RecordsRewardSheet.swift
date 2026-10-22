@@ -26,6 +26,14 @@ struct RecordsRewardSheet: View {
                         isAddingRule = true
                     }
                 } else {
+                    if let buddy = model.buddy.buddy {
+                        BuddyBubble(
+                            buddy,
+                            name: model.buddy.name,
+                            line: model.rewardLine(on: date)
+                        )
+                    }
+
                     VStack(spacing: 8) {
                         ForEach(model.rewardRules) { rule in
                             row(rule)
