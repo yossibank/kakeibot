@@ -9,7 +9,7 @@ public struct SettingsSheet: View {
     @State private var startsWithAmount = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
-    @State private var theme: ThemeChoice = .preset(.navy)
+    @State private var theme: ThemeChoice = .system
     @State private var customThemes: [Theme] = []
     @State private var appIcon = AppIconListModel()
 
@@ -516,7 +516,7 @@ private extension SettingsSheet {
                 self.theme = theme
             }
         } catch {
-            theme = .preset(.navy)
+            theme = .system
         }
     }
 

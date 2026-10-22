@@ -12,6 +12,7 @@ public struct RootView: View {
     @State private var isHomeLoaded = false
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
 
     public init() {}
 
@@ -48,7 +49,8 @@ public struct RootView: View {
             }
         }
         .environment(\.notificationPermission, .live)
-        .palette(shownPalette)
+        .palette(shownLook)
+        .environment(\.palette, shownPalette)
         .environment(\.themeStyle, shownStyle)
         .font(shownStyle.bodyFont)
         .warmsUpInput()
@@ -76,7 +78,7 @@ private extension RootView {
                 database: database,
                 today: model.today,
                 route: model.route,
-                isRevealed: isRevealed
+                isRevealed: !isLaunching
             ) {
                 model.finishRoute()
             } onLoad: {
@@ -108,8 +110,13 @@ private extension RootView {
         }
     }
 
-    var shownPalette: ThemePalette? {
-        isRevealed ? model.palette : nil
+    var shownLook: ThemeLook? {
+        isRevealed ? model.look : nil
+    }
+
+    var shownPalette: ThemePalette {
+        let isDark = colorScheme == .dark
+        return shownLook?.palette(isDark: isDark) ?? .night
     }
 
     var shownStyle: ThemeStyle {

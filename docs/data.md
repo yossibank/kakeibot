@@ -310,7 +310,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | reminder_time | `HH:mm`。空なら知らせない |
 | character_id | 同梱キャラクターの ID |
 | character_name | |
-| theme_id | 用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空ならネイビー |
+| theme_id | `system`（iPhone に合わせる）か、用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空なら `system` |
 | onboarding_completed | `true` `false` |
 | launch_screen | `home`・`records`・`review`・`assets`・`entry`。空なら入力シート |
 | corner_style | `square`・`small`・`standard`・`large`。`square` は角を丸めない。空なら `standard` |

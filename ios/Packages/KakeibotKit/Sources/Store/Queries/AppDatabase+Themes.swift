@@ -12,15 +12,15 @@ public extension AppDatabase {
         try await writer.read(Self.customThemes)
     }
 
-    func paletteUpdates() -> some AsyncSequence<ThemePalette, any Error> {
+    func themeLookUpdates() -> some AsyncSequence<ThemeLook, any Error> {
         ValueObservation
-            .tracking(Self.palette)
+            .tracking(Self.themeLook)
             .removeDuplicates()
             .values(in: writer)
     }
 
-    func palette() async throws -> ThemePalette {
-        try await writer.read(Self.palette)
+    func themeLook() async throws -> ThemeLook {
+        try await writer.read(Self.themeLook)
     }
 
     func styleUpdates() -> some AsyncSequence<ThemeStyle, any Error> {
@@ -43,13 +43,16 @@ private extension AppDatabase {
             .fetchAll(db)
     }
 
-    static func palette(in db: Database) throws -> ThemePalette {
+    static func themeLook(in db: Database) throws -> ThemeLook {
         switch try setting(.theme, in: db) {
+        case .system:
+            return .followsDevice
         case let .preset(preset):
-            return preset.palette
+            return .fixed(preset.palette)
         case let .custom(id):
             let theme = try Theme.fetchOne(db, key: id)
-            return theme?.palette ?? .night
+            let palette = theme?.palette
+            return palette.map(ThemeLook.fixed) ?? .followsDevice
         }
     }
 

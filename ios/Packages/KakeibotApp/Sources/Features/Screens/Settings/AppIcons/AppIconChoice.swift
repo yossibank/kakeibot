@@ -40,6 +40,14 @@ public extension AppIconChoice {
             }
     }
 
+    init?(_ choice: ThemeChoice) {
+        switch choice {
+        case .system: self = .white
+        case let .preset(preset): self.init(preset)
+        case .custom: return nil
+        }
+    }
+
     init(alternateName: String?) {
         let choice = Self.allCases.first { $0.alternateName == alternateName }
         self = choice ?? .white

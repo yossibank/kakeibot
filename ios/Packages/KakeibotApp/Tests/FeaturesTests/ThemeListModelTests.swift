@@ -26,7 +26,7 @@ struct ThemeListModelTests {
         await model.select(.preset(.forest))
         let saved = try await setup.database.setting(.theme)
 
-        #expect(initial == .preset(.navy))
+        #expect(initial == .system)
         #expect(model.current == .preset(.forest))
         #expect(saved == .preset(.forest))
     }

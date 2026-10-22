@@ -45,7 +45,7 @@ public extension SettingKey where Value == ThemeChoice {
     static var theme: Self {
         Self(
             .themeId,
-            default: .preset(.navy),
+            default: .system,
             decode: { ThemeChoice($0) },
             encode: { $0.text }
         )
