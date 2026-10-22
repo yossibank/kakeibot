@@ -47,7 +47,9 @@ private extension Deletion {
             templates,
             budgets,
             valuations,
-            shelfIcons
+            shelfIcons,
+            rewardRules,
+            rewardLogs
         ]
 
         return tables.flatMap(\.self)
