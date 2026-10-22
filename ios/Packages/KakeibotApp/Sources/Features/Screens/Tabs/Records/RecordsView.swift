@@ -700,7 +700,8 @@ private extension RecordsView {
         RecordsStampSheet(
             date: date,
             choices: model.stampChoices,
-            current: model.stampIcon(on: date)
+            current: model.stampIcon(on: date),
+            editModel: model.stampEditModel
         ) { icon in
             stampCount += 1
 

@@ -11,17 +11,20 @@ public final class SettingsScreenFlag {
     private let database: AppDatabase
     private let key: SettingKey<Set<SettingsScreen>>
     private let screen: SettingsScreen
+    private let savesOn: Bool
 
     public init(
         database: AppDatabase,
         key: SettingKey<Set<SettingsScreen>>,
         screen: SettingsScreen,
-        isOn: Bool = false
+        isOn: Bool = false,
+        savesOn: Bool = true
     ) {
         self.database = database
         self.key = key
         self.screen = screen
         self.isOn = isOn
+        self.savesOn = savesOn
     }
 }
 
@@ -44,15 +47,17 @@ public extension SettingsScreenFlag {
     ) -> SettingsScreenFlag {
         SettingsScreenFlag(
             database: database,
-            key: .openHiddenLists,
+            key: .closedHiddenLists,
             screen: screen,
-            isOn: true
+            isOn: true,
+            savesOn: false
         )
     }
 
     func load() async {
         let screens = try? await database.setting(key)
-        isOn = screens?.contains(screen) ?? false
+        let isSaved = screens?.contains(screen) ?? false
+        isOn = isSaved == savesOn
         isLoaded = true
     }
 
@@ -70,7 +75,7 @@ private extension SettingsScreenFlag {
     func save(_ isOn: Bool) async {
         var screens = await (try? database.setting(key)) ?? []
 
-        if isOn {
+        if isOn == savesOn {
             screens.insert(screen)
         } else {
             screens.remove(screen)

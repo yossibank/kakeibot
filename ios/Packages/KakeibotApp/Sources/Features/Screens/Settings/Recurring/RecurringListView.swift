@@ -82,6 +82,12 @@ public struct RecurringListView: View {
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .settingsLiftLayer(
+            drag,
+            scale: 1.03
+        ) { id in
+            floatingTile(id)
+        }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -180,17 +186,20 @@ private extension RecurringListView {
         let lifted = drag.hiddenOffset(of: row.id)
         let isLifted = lifted != nil
         let offset = lifted ?? .zero
-        let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
-        let opacity: Double = isLifted ? 1 : 0.5
+        let opacity: Double = isLifted ? 0 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
         return rowCard(row, isPaused: true)
             .frame(height: Self.rowHeight)
             .opacity(opacity)
-            .scaleEffect(scale)
-            .shadow(color: shadow, radius: 16, y: 8)
+            .animation(nil, value: isLifted)
             .offset(offset)
+            .settingsLiftFrame(
+                drag,
+                \.hiddenFrames,
+                id: row.id,
+                in: Self.space
+            )
             .zIndex(layer)
             .onTapGesture {
                 destination = .edit(row.id)
@@ -222,6 +231,15 @@ private extension RecurringListView {
         .frame(maxWidth: .infinity)
     }
 
+    @ViewBuilder
+    func floatingTile(_ id: Recurring.ID) -> some View {
+        let items = model.rows + model.hiddenRows
+
+        if let row = items.first(where: { $0.id == id }) {
+            rowCard(row, isPaused: false)
+        }
+    }
+
     func movableRow(
         _ row: RecurringListModel.Row,
         in rows: [RecurringListModel.Row]
@@ -229,8 +247,7 @@ private extension RecurringListView {
         let isLifted = drag.isLifted(row.id)
         let index = rows.firstIndex { $0.id == row.id } ?? 0
         let center = isLifted ? drag.liftedCenter : Self.grid.center(at: index)
-        let scale: CGFloat = isLifted ? 1.03 : 1
-        let shadow = Palette.shadow.opacity(isLifted ? 0.5 : 0)
+        let opacity: Double = isLifted ? 0 : 1
         let layer: Double = isLifted ? 1 : 0
 
         return SwipeRow(id: row.id, openId: $openId, role: .hide) {
@@ -243,9 +260,15 @@ private extension RecurringListView {
             rowCard(row, isPaused: false)
         }
         .frame(height: Self.rowHeight)
-        .scaleEffect(scale)
-        .shadow(color: shadow, radius: 16, y: 8)
+        .opacity(opacity)
+        .animation(nil, value: isLifted)
         .offset(y: center.y - Self.rowHeight / 2)
+        .settingsLiftFrame(
+            drag,
+            \.rowFrames,
+            id: row.id,
+            in: Self.space
+        )
         .zIndex(layer)
         .gesture(
             LiftGesture(in: Self.space) { location in

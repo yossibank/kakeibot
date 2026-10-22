@@ -324,7 +324,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | review_scale | `week` `month` `year`。空なら月 |
 | review_kind | `expense` `income` `balance`。空なら支出 |
 | closed_hints | 説明を閉じた設定の画面を `,` でつないだもの（`categories` `wallets` `templates` `recurrings` `stamps` `rewards` `budgets` `themes`）。空ならすべて出す |
-| open_hidden_lists | 非表示の項目を開いている設定の画面。書き方は closed_hints と同じ。行が無ければすべて開き、空ならすべてたたむ |
+| closed_hidden_lists | 非表示の項目をたたんだ設定の画面。書き方は closed_hints と同じ。空ならすべて開く |
 | recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで |
 
 列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。

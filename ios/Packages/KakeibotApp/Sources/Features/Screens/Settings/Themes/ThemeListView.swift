@@ -9,7 +9,8 @@ public struct ThemeListView: View {
     @State private var editing: EditTarget?
     @State private var menu: Menu?
     @State private var pressing: ThemeChoice?
-    @State private var width: CGFloat = 0
+    @State private var size: CGSize = .zero
+    @State private var menuHeight: CGFloat = 0
 
     @Environment(\.themeStyle.corner) private var corner
 
@@ -44,9 +45,9 @@ public struct ThemeListView: View {
 
                         section("ダーク", isLight: false)
 
-                        systemSection
-
                         customSection
+
+                        systemSection
                     }
                     .padding(.vertical, 8)
                 }
@@ -62,10 +63,10 @@ public struct ThemeListView: View {
         }
         .coordinateSpace(.named(Self.space))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            self.width = width
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { size in
+            self.size = size
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -360,8 +361,13 @@ private extension ThemeListView {
                 }
             }
         }
-        .offset(x: menuX(for: menu), y: menu.frame.maxY + 10)
-        .transition(.opacity.combined(with: .scale(scale: 0.96, anchor: .top)))
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.height
+        } action: { height in
+            menuHeight = height
+        }
+        .offset(x: menuX(for: menu), y: menuY(for: menu))
+        .transition(.opacity.combined(with: .scale(scale: 0.96)))
     }
 }
 
@@ -437,8 +443,19 @@ private extension ThemeListView {
 
     func menuX(for menu: Menu) -> CGFloat {
         let preferred = menu.frame.midX - Self.menuWidth / 2
-        let limit = width - Self.menuWidth - Self.menuInset
+        let limit = size.width - Self.menuWidth - Self.menuInset
         return min(max(preferred, Self.menuInset), limit)
+    }
+
+    func menuY(for menu: Menu) -> CGFloat {
+        let below = menu.frame.maxY + Self.menuGap
+        let fitsBelow = below + menuHeight <= size.height - Self.menuInset
+
+        guard !fitsBelow else {
+            return below
+        }
+
+        return menu.frame.minY - Self.menuGap - menuHeight
     }
 
     func reload() {
@@ -452,6 +469,7 @@ private extension ThemeListView {
     static let space = "themes"
     static let menuWidth: CGFloat = 236
     static let menuInset: CGFloat = 18
+    static let menuGap: CGFloat = 10
     static let menuPressDuration = 0.4
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: 12),

@@ -102,7 +102,11 @@ private extension ThemeEditSheet {
             Spacer()
 
             if model.isEditing {
-                RingButton(systemImage: "trash") {
+                RingButton(
+                    systemImage: "trash",
+                    style: .destructive,
+                    label: "削除"
+                ) {
                     focus = nil
                     isConfirmingDelete = true
                 }

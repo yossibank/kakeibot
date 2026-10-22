@@ -12,39 +12,36 @@ struct RecordsRewardSheet: View {
     let date: LocalDate
 
     var body: some View {
-        VStack(spacing: 18) {
-            header
+        FittedSheet {
+            VStack(spacing: 18) {
+                header
 
-            if model.rewardRules.isEmpty {
-                empty
-            } else {
-                ScrollView {
+                if model.rewardRules.isEmpty {
+                    RecordsSheetEmpty(
+                        systemImage: "gift",
+                        title: "ごほうびの決まりがまだありません",
+                        message: "決まりを作ると、ここで達成を付けられます",
+                        actionTitle: "ごほうびを作る"
+                    ) {
+                        isAddingRule = true
+                    }
+                } else {
                     VStack(spacing: 8) {
                         ForEach(model.rewardRules) { rule in
                             row(rule)
                         }
-                    }
-                    .padding(.vertical, 4)
-                }
-                .scrollIndicators(.hidden)
 
-                total
+                        addButton
+                    }
+
+                    total
+                }
             }
-        }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
-        .padding(.bottom, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background {
-            Rectangle()
-                .fill(Palette.background)
-                .ignoresSafeArea()
         }
         .sheet(isPresented: $isAddingRule) {
             RewardRuleEditSheet(model: model.rewardRuleEditModel())
         }
         .sensoryFeedback(.success, trigger: model.rewardTotal(on: date))
-        .presentationDetents([.medium, .large])
     }
 }
 
@@ -69,32 +66,22 @@ private extension RecordsRewardSheet {
         }
     }
 
-    var empty: some View {
-        VStack(spacing: 14) {
-            Image(systemName: "gift")
-                .sansFont(.title, weight: .light)
+    var addButton: some View {
+        Button {
+            isAddingRule = true
+        } label: {
+            Label("ごほうびを足す", systemImage: "plus")
+                .textFont(.footnote)
                 .foregroundStyle(Palette.accent)
-                .frame(width: 64, height: 64)
-                .background(Palette.accent.opacity(.subtle), in: Circle())
-
-            VStack(spacing: 6) {
-                Text("ごほうびの決まりがまだありません")
-                    .textFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(Palette.text)
-
-                Text("決まりを作ると、ここで達成を付けられます")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-            }
-            .multilineTextAlignment(.center)
-
-            PrimaryButton("ごほうびを作る") {
-                isAddingRule = true
-            }
-            .padding(.top, 6)
+                .frame(maxWidth: .infinity, minHeight: 48)
+                .background(Palette.faint, in: shape)
+                .overlay {
+                    shape
+                        .stroke(Palette.outline, style: .dashed)
+                }
+                .contentShape(.rect)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 12)
+        .buttonStyle(.plain)
     }
 
     var total: some View {
@@ -112,6 +99,10 @@ private extension RecordsRewardSheet {
                 .animation(.snappy, value: model.rewardTotal(on: date))
         }
         .padding(.horizontal, 6)
+    }
+
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     func row(_ rule: RewardRule) -> some View {
@@ -153,9 +144,5 @@ private extension RecordsRewardSheet {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-    }
-
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 }
