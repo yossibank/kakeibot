@@ -5,6 +5,7 @@ import SwiftUI
 
 struct AssetsRewardSheet: View {
     @State private var goalTarget: GoalTarget?
+    @State private var boughtId: RewardGoal.ID?
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
@@ -41,7 +42,15 @@ struct AssetsRewardSheet: View {
         .sheet(item: $goalTarget) { target in
             AssetsGoalSheet(model: model.goalEditModel(editing: target.goal))
         }
-        .sensoryFeedback(.success, trigger: model.boughtGoals.count)
+        .settingsHideNotice(
+            $boughtId,
+            message: "買ったものに移しました",
+            systemImage: "bag"
+        ) { id in
+            Task {
+                await model.setPurchased(id, isPurchased: false)
+            }
+        }
     }
 }
 
@@ -185,7 +194,7 @@ private extension AssetsRewardSheet {
                 if remaining == 0 {
                     Button {
                         Task {
-                            await model.setPurchased(goal, isPurchased: true)
+                            await buy(goal)
                         }
                     } label: {
                         Text("買った")
@@ -233,19 +242,31 @@ private extension AssetsRewardSheet {
                 .textFont(.footnote)
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)
-        }
-        .padding(.horizontal, 14)
-        .frame(minHeight: 52)
-        .card()
-        .contextMenu {
+
             Button {
                 Task {
-                    await model.setPurchased(goal, isPurchased: false)
+                    await model.setPurchased(goal.id, isPurchased: false)
                 }
             } label: {
-                Label("買ったのを取り消す", systemImage: "arrow.uturn.backward")
+                Label("戻す", systemImage: "arrow.uturn.backward")
+                    .textFont(.caption, weight: .semibold)
+                    .foregroundStyle(Palette.accent)
+                    .padding(.horizontal, 12)
+                    .frame(height: 30)
+                    .overlay {
+                        Capsule()
+                            .strokeBorder(
+                                Palette.accent.opacity(.medium),
+                                lineWidth: 0.8
+                            )
+                    }
+                    .contentShape(Capsule())
             }
+            .buttonStyle(.plain)
         }
+        .padding(.horizontal, 14)
+        .frame(minHeight: 56)
+        .card()
     }
 
     func monthBlock(_ month: AssetsModel.RewardMonth) -> some View {
@@ -298,6 +319,14 @@ private extension AssetsRewardSheet {
                 .textFont(.footnote)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accent)
+        }
+    }
+}
+
+private extension AssetsRewardSheet {
+    func buy(_ goal: RewardGoal) async {
+        if await model.setPurchased(goal.id, isPurchased: true) {
+            boughtId = goal.id
         }
     }
 }

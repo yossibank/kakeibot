@@ -3,6 +3,8 @@ import DesignSystem
 import SwiftUI
 
 struct RecordsRewardSheet: View {
+    @State private var isAddingRule = false
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
 
@@ -14,11 +16,7 @@ struct RecordsRewardSheet: View {
             header
 
             if model.rewardRules.isEmpty {
-                Text("設定の「ごほうび」で決まりを作ると、ここで達成を付けられます")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity, minHeight: 120)
+                empty
             } else {
                 ScrollView {
                     VStack(spacing: 8) {
@@ -41,6 +39,9 @@ struct RecordsRewardSheet: View {
             Rectangle()
                 .fill(Palette.background)
                 .ignoresSafeArea()
+        }
+        .sheet(isPresented: $isAddingRule) {
+            RewardRuleEditSheet(model: model.rewardRuleEditModel())
         }
         .sensoryFeedback(.success, trigger: model.rewardTotal(on: date))
         .presentationDetents([.medium, .large])
@@ -66,6 +67,34 @@ private extension RecordsRewardSheet {
             Color.clear
                 .frame(width: 44, height: 44)
         }
+    }
+
+    var empty: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "gift")
+                .sansFont(.title, weight: .light)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 64, height: 64)
+                .background(Palette.accent.opacity(.subtle), in: Circle())
+
+            VStack(spacing: 6) {
+                Text("ごほうびの決まりがまだありません")
+                    .textFont(.subheadline, weight: .semibold)
+                    .foregroundStyle(Palette.text)
+
+                Text("決まりを作ると、ここで達成を付けられます")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+            }
+            .multilineTextAlignment(.center)
+
+            PrimaryButton("ごほうびを作る") {
+                isAddingRule = true
+            }
+            .padding(.top, 6)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 12)
     }
 
     var total: some View {

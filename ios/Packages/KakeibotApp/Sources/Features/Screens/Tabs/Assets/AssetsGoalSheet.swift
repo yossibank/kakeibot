@@ -107,7 +107,11 @@ private extension AssetsGoalSheet {
             Spacer()
 
             if model.isEditing {
-                RingButton(systemImage: "trash") {
+                RingButton(
+                    systemImage: "trash",
+                    style: .destructive,
+                    label: "削除"
+                ) {
                     isConfirmingDelete = true
                 }
             } else {

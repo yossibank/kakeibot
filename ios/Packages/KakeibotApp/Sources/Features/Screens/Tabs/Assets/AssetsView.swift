@@ -151,10 +151,25 @@ private extension AssetsView {
 
     var rewardCardBody: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
+            HStack(spacing: 8) {
+                Image(systemName: "gift.fill")
+                    .sansFont(.small)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 26, height: 26)
+                    .background(Palette.accent.opacity(.subtle), in: Circle())
+
                 SectionTitle("ごほうび貯金箱")
 
                 Spacer()
+
+                if model.isRewardGoalReached {
+                    Text("目標に届きました")
+                        .textFont(.caption2, weight: .semibold)
+                        .foregroundStyle(Palette.background)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Palette.accent, in: .capsule)
+                }
 
                 Image(systemName: "chevron.right")
                     .font(.footnote)
@@ -194,6 +209,26 @@ private extension AssetsView {
         }
         .padding(16)
         .card()
+        .overlay {
+            if model.isRewardGoalReached {
+                reachedGlow
+            }
+        }
+    }
+
+    var reachedGlow: some View {
+        RoundedRectangle(cornerRadius: corner.radius(22))
+            .strokeBorder(Palette.accent, lineWidth: 1.5)
+            .shadow(color: Palette.accent, radius: 10)
+            .phaseAnimator([false, true]) { content, isLit in
+                let opacity = isLit ? 1 : 0.3
+
+                content
+                    .opacity(opacity)
+            } animation: { _ in
+                .easeInOut(duration: 1.4)
+            }
+            .allowsHitTesting(false)
     }
 
     func goalLine(_ goal: RewardGoal) -> some View {

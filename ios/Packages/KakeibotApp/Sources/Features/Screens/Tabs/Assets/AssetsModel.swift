@@ -221,6 +221,10 @@ public extension AssetsModel {
         rewardBank?.waitingGoals.first
     }
 
+    var isRewardGoalReached: Bool {
+        rewardGoal.map { remaining(to: $0) == 0 } ?? false
+    }
+
     var waitingGoals: [RewardGoal] {
         rewardBank?.waitingGoals ?? []
     }
@@ -260,18 +264,22 @@ public extension AssetsModel {
         AssetsGoalEditModel(database: database, editing: goal)
     }
 
+    @discardableResult
     func setPurchased(
-        _ goal: RewardGoal,
+        _ id: RewardGoal.ID,
         isPurchased: Bool
-    ) async {
+    ) async -> Bool {
         do {
             try await database.setRewardGoalPurchased(
-                goal.id,
+                id,
                 isPurchased: isPurchased,
                 at: Date()
             )
+
+            return true
         } catch {
             errorNotice.show(Self.goalFailedMessage)
+            return false
         }
     }
 
