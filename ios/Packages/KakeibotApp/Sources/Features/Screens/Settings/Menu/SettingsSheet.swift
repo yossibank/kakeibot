@@ -131,6 +131,14 @@ public struct SettingsSheet: View {
 
                                 Hairline()
 
+                                NavigationLink {
+                                    RewardRuleListView(database: database)
+                                } label: {
+                                    row("ごほうび", systemImage: "gift")
+                                }
+
+                                Hairline()
+
                                 pickerRow(
                                     "週の始まり",
                                     systemImage: "calendar.day.timeline.left"

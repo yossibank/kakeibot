@@ -146,6 +146,7 @@ KakeibotApp/
 │   │   │   │   ├── MonthStartDay/ 月の始まりの設定
 │   │   │   │   ├── Recurring/   固定費の一覧と編集
 │   │   │   │   ├── Reminder/    記録忘れの通知の設定と、通知の許可を確かめる関数
+│   │   │   │   ├── Rewards/     ごほうびの決まりの一覧と編集
 │   │   │   │   ├── Stamps/      スタンプの一覧と編集
 │   │   │   │   ├── Templates/
 │   │   │   │   ├── ThemeStyle/  文字の大きさ・字体・角の丸みを選ぶ画面と見本
