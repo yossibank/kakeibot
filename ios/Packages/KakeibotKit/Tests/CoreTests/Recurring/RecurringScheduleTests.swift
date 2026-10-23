@@ -12,6 +12,7 @@ struct RecurringScheduleTests {
             startDate: fixture.startDate,
             endDate: fixture.endDate
         )
+
         recurring.holidayShift = fixture.holidayShift ?? .none
 
         let dates = recurring.dates(

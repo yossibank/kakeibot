@@ -73,6 +73,7 @@ public extension OnboardingModel {
 
     func canTurn(forward: Bool) -> Bool {
         let offset = forward ? 1 : -1
+
         return Page(rawValue: page.rawValue + offset) != nil
     }
 
@@ -102,9 +103,11 @@ public extension OnboardingModel {
         do {
             try await database.setSetting(.launchScreen, to: launchScreen)
             try await database.setSetting(.onboardingCompleted, to: true)
+
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }

@@ -87,6 +87,7 @@ public struct EntryRow: View {
 
 #Preview {
     let now = Date()
+
     let food = Icon(
         emoji: nil,
         text: nil,
@@ -95,6 +96,7 @@ public struct EntryRow: View {
         createdAt: now,
         updatedAt: now
     )
+
     let salary = Icon(
         emoji: nil,
         text: nil,
@@ -114,6 +116,7 @@ public struct EntryRow: View {
             amount: 980,
             type: .expense
         )
+
         EntryRow(
             icon: salary,
             title: "給料",
@@ -122,6 +125,7 @@ public struct EntryRow: View {
             type: .income,
             isRecurring: true
         )
+
         EntryRow(
             icon: nil,
             title: "振替",
@@ -129,6 +133,7 @@ public struct EntryRow: View {
             amount: 20000,
             type: .transfer
         )
+
         EntryRow(
             icon: nil,
             title: "その他",

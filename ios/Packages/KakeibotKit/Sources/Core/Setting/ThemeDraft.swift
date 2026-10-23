@@ -53,6 +53,7 @@ public extension ThemeDraft {
         }
 
         let isReadable = palette.unreadableRoles.isEmpty
+
         return nameProblems + (isReadable ? [] : [.unreadableColors])
     }
 
@@ -108,6 +109,7 @@ public extension ThemeDraft {
         try validate()
 
         var updated = theme
+
         updated.name = trimmedName
         updated.background = background
         updated.surface = surface
@@ -116,6 +118,7 @@ public extension ThemeDraft {
         updated.accent = accent
         updated.income = accent
         updated.updatedAt = now
+
         return updated
     }
 }

@@ -41,9 +41,7 @@ public struct RecordsView: View {
             LazyVStack(spacing: 12) {
                 if model.isSearching {
                     searchBar
-
                     filterLine
-
                     searchContent
                 } else {
                     header
@@ -56,7 +54,6 @@ public struct RecordsView: View {
                         )
 
                         Spacer()
-
                         filterButton
 
                         toolButton(systemImage: "magnifyingglass") {
@@ -109,7 +106,6 @@ private extension RecordsView {
                 .foregroundStyle(Palette.accent)
 
             Spacer()
-
             monthButton(systemImage: "chevron.left", months: -1)
 
             VStack(spacing: 1) {
@@ -236,6 +232,7 @@ private extension RecordsView {
             ForEach(model.recentSearches, id: \.self) { word in
                 Button {
                     model.searchText = word
+
                     rememberSearch()
                 } label: {
                     HStack(spacing: 10) {
@@ -264,44 +261,6 @@ private extension RecordsView {
         .card()
     }
 
-    func searchSummary(_ summary: RecordsModel.SearchSummary) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("\(summary.count) 件")
-                    .textFont(.subheadline)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-
-                Spacer()
-
-                Text(PeriodText.range(summary.range))
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-            }
-
-            HStack(spacing: 0) {
-                total(
-                    "支出",
-                    amount: summary.expenseTotal,
-                    color: Palette.accentStrong
-                )
-
-                total(
-                    "収入",
-                    amount: summary.incomeTotal,
-                    color: Palette.accent
-                )
-            }
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(18))
-                .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
-        }
-    }
-
     var filterButton: some View {
         toolButton(
             systemImage: "line.3.horizontal.decrease",
@@ -322,30 +281,6 @@ private extension RecordsView {
                 }
             }
         }
-    }
-
-    func toolButton(
-        systemImage: String,
-        isOn: Bool = false,
-        action: @escaping () -> Void
-    ) -> some View {
-        let fill = isOn ? Palette.accent.opacity(.subtle) : Color.clear
-        let ring = isOn ? Palette.accent : Palette.line
-
-        return Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(Palette.accent)
-                .frame(width: 36, height: 36)
-                .background(fill, in: Circle())
-                .overlay {
-                    Circle()
-                        .stroke(ring, lineWidth: 1)
-                }
-                .frame(width: 44, height: 44)
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -464,6 +399,68 @@ private extension RecordsView {
             RoundedRectangle(cornerRadius: corner.radius(18))
                 .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
         }
+    }
+
+    func searchSummary(_ summary: RecordsModel.SearchSummary) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("\(summary.count) 件")
+                    .textFont(.subheadline)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+
+                Spacer()
+
+                Text(PeriodText.range(summary.range))
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+            }
+
+            HStack(spacing: 0) {
+                total(
+                    "支出",
+                    amount: summary.expenseTotal,
+                    color: Palette.accentStrong
+                )
+
+                total(
+                    "収入",
+                    amount: summary.incomeTotal,
+                    color: Palette.accent
+                )
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .overlay {
+            RoundedRectangle(cornerRadius: corner.radius(18))
+                .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
+        }
+    }
+
+    func toolButton(
+        systemImage: String,
+        isOn: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        let fill = isOn ? Palette.accent.opacity(.subtle) : Color.clear
+        let ring = isOn ? Palette.accent : Palette.line
+
+        return Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Palette.accent)
+                .frame(width: 36, height: 36)
+                .background(fill, in: Circle())
+                .overlay {
+                    Circle()
+                        .stroke(ring, lineWidth: 1)
+                }
+                .frame(width: 44, height: 44)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
     }
 
     func monthButton(
@@ -827,6 +824,14 @@ private extension RecordsView {
         .init("一覧", value: .list)
     ]
 
+    static var stampTransition: AnyTransition {
+        .scale(scale: 0.2).combined(with: .opacity)
+    }
+
+    static var stampAnimation: Animation {
+        .bouncy(duration: 0.45, extraBounce: 0.25)
+    }
+
     var layoutBinding: Binding<RecordsLayout> {
         Binding {
             model.layout
@@ -847,14 +852,6 @@ private extension RecordsView {
 
     var monthTextTransition: ContentTransition {
         .numericText(countsDown: !isMovingForward)
-    }
-
-    static var stampTransition: AnyTransition {
-        .scale(scale: 0.2).combined(with: .opacity)
-    }
-
-    static var stampAnimation: Animation {
-        .bouncy(duration: 0.45, extraBounce: 0.25)
     }
 
     static func weekdayColor(for date: LocalDate) -> Color {

@@ -159,7 +159,6 @@ private extension AssetsView {
                     .background(Palette.accent.opacity(.subtle), in: Circle())
 
                 SectionTitle("ごほうび貯金箱")
-
                 Spacer()
 
                 if model.isRewardGoalReached {
@@ -231,6 +230,70 @@ private extension AssetsView {
             .allowsHitTesting(false)
     }
 
+    var billCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                SectionTitle("これからの引き落とし")
+                Spacer()
+
+                Text("合計 \(AmountText.text(model.upcomingBillTotal))")
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+            }
+
+            VStack(spacing: 10) {
+                ForEach(model.upcomingBills) { row in
+                    Button {
+                        onOpenRecurring(row.id)
+                    } label: {
+                        billRow(row)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .padding(16)
+        .card(cornerRadius: 24)
+    }
+
+    var trendLegend: some View {
+        HStack(spacing: 14) {
+            legend("手元のお金", dash: [])
+            legend("純資産", dash: BalanceTrend.netWorthDash)
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+
+    var netWorthRow: some View {
+        HStack(alignment: .firstTextBaseline) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("純資産")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.text)
+
+                Text("投資と借入も入れた額")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.hint)
+            }
+
+            Spacer(minLength: 8)
+
+            Text(AmountText.text(model.holdings.netWorth))
+                .displayFont(.headline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .background(
+            Palette.accent.opacity(.faint),
+            in: .rect(cornerRadius: corner.radius(14))
+        )
+    }
+
     func goalLine(_ goal: RewardGoal) -> some View {
         let remaining = model.remaining(to: goal)
         let progress = model.progress(to: goal)
@@ -281,42 +344,6 @@ private extension AssetsView {
         }
     }
 
-    var billCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
-                SectionTitle("これからの引き落とし")
-
-                Spacer()
-
-                Text("合計 \(AmountText.text(model.upcomingBillTotal))")
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-            }
-
-            VStack(spacing: 10) {
-                ForEach(model.upcomingBills) { row in
-                    Button {
-                        onOpenRecurring(row.id)
-                    } label: {
-                        billRow(row)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-        .padding(16)
-        .card(cornerRadius: 24)
-    }
-
-    var trendLegend: some View {
-        HStack(spacing: 14) {
-            legend("手元のお金", dash: [])
-            legend("純資産", dash: BalanceTrend.netWorthDash)
-        }
-        .frame(maxWidth: .infinity, alignment: .trailing)
-    }
-
     func legend(
         _ title: String,
         dash: [CGFloat]
@@ -336,35 +363,6 @@ private extension AssetsView {
                 .textFont(size: .micro)
                 .foregroundStyle(Palette.subtext)
         }
-    }
-
-    var netWorthRow: some View {
-        HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("純資産")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.text)
-
-                Text("投資と借入も入れた額")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.hint)
-            }
-
-            Spacer(minLength: 8)
-
-            Text(AmountText.text(model.holdings.netWorth))
-                .displayFont(.headline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-        }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 12)
-        .background(
-            Palette.accent.opacity(.faint),
-            in: .rect(cornerRadius: corner.radius(14))
-        )
     }
 
     func walletSection(_ section: AssetsModel.WalletSection) -> some View {
@@ -527,6 +525,32 @@ private extension AssetsView {
         count: 2
     )
 
+    var netWorths: [Int]? {
+        model.showsNetWorth ? model.monthTotals.map(\.netWorth) : nil
+    }
+
+    var breakdownText: String {
+        let holdings = model.holdings
+        let onHand = "手持ち \(AmountText.text(holdings.onHand))"
+
+        if holdings.unpaid > 0 {
+            return "\(onHand)・未払い \(AmountText.text(holdings.unpaid))"
+        }
+
+        if holdings.refund > 0 {
+            return "\(onHand)・返ってくる額 \(AmountText.text(holdings.refund))"
+        }
+
+        return onHand
+    }
+
+    var changeText: String {
+        let change = model.changeFromLastMonth
+        let sign = change > 0 ? "+" : ""
+
+        return "先月末より \(sign)\(AmountText.text(change))"
+    }
+
     static func title(of role: Wallet.Kind.Role) -> String {
         switch role {
         case .onHand: "手持ち"
@@ -560,25 +584,6 @@ private extension AssetsView {
         }
     }
 
-    var netWorths: [Int]? {
-        model.showsNetWorth ? model.monthTotals.map(\.netWorth) : nil
-    }
-
-    var breakdownText: String {
-        let holdings = model.holdings
-        let onHand = "手持ち \(AmountText.text(holdings.onHand))"
-
-        if holdings.unpaid > 0 {
-            return "\(onHand)・未払い \(AmountText.text(holdings.unpaid))"
-        }
-
-        if holdings.refund > 0 {
-            return "\(onHand)・返ってくる額 \(AmountText.text(holdings.refund))"
-        }
-
-        return onHand
-    }
-
     static func repaymentText(_ repayment: AssetsModel.Repayment) -> String {
         switch repayment {
         case .unset: "返済は未設定"
@@ -590,7 +595,28 @@ private extension AssetsView {
 
     static func payoffText(_ payoff: LoanPayoff) -> String {
         let date = payoff.lastDate
+
         return "あと \(payoff.count) 回・\(String(date.year))/\(date.month) まで"
+    }
+
+    static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
+        let movedIn = row.movedIn.count
+        let movedOut = row.movedOut.count
+        let inText = movedIn > 0 ? ["前から \(movedIn) 件"] : []
+        let outText = movedOut > 0 ? ["後へ \(movedOut) 件"] : []
+        let parts = inText + outText
+
+        return parts.isEmpty ? nil : parts.joined(separator: "・")
+    }
+
+    static func share(of bill: CardBill) -> CGFloat {
+        guard bill.balanceBefore > 0 else {
+            return 1
+        }
+
+        let share = Double(bill.amount) / Double(bill.balanceBefore)
+
+        return CGFloat(min(share, 1))
     }
 
     func note(of row: AssetsModel.WalletRow) -> String? {
@@ -607,22 +633,8 @@ private extension AssetsView {
 
     func nextBillText(_ bill: CardBill) -> String {
         let date = "\(bill.date.month)/\(bill.date.day)"
+
         return "\(date) に \(AmountText.text(bill.amount)) 引き落とし"
-    }
-
-    var changeText: String {
-        let change = model.changeFromLastMonth
-        let sign = change > 0 ? "+" : ""
-        return "先月末より \(sign)\(AmountText.text(change))"
-    }
-
-    static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
-        let movedIn = row.movedIn.count
-        let movedOut = row.movedOut.count
-        let inText = movedIn > 0 ? ["前から \(movedIn) 件"] : []
-        let outText = movedOut > 0 ? ["後へ \(movedOut) 件"] : []
-        let parts = inText + outText
-        return parts.isEmpty ? nil : parts.joined(separator: "・")
     }
 
     func openPendingEntry() {
@@ -631,16 +643,8 @@ private extension AssetsView {
         }
 
         self.pendingEntry = nil
+
         onOpenEntry(pendingEntry)
-    }
-
-    static func share(of bill: CardBill) -> CGFloat {
-        guard bill.balanceBefore > 0 else {
-            return 1
-        }
-
-        let share = Double(bill.amount) / Double(bill.balanceBefore)
-        return CGFloat(min(share, 1))
     }
 
     func balanceText(_ row: AssetsModel.UpcomingBill) -> String {
@@ -653,6 +657,7 @@ private extension AssetsView {
 
         let before = AmountText.text(bill.balanceBefore)
         let after = AmountText.text(bill.balanceAfter)
+
         return "\(source) \(before) → \(after)"
     }
 
@@ -662,6 +667,7 @@ private extension AssetsView {
 
     func daysText(until date: LocalDate) -> String {
         let days = model.today.days(until: date)
+
         return days == 1 ? "明日" : "あと \(days) 日"
     }
 
@@ -736,6 +742,7 @@ private struct BalanceTrend: View {
             let ratio = high == low ? 0.5 : CGFloat(total - low) / range
             let x = step * (CGFloat(index) + 0.5)
             let y = inset + (size.height - inset * 2) * (1 - ratio)
+
             return CGPoint(x: x, y: y)
         }
     }

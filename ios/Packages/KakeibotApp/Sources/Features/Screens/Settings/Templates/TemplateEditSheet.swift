@@ -24,6 +24,7 @@ public struct TemplateEditSheet: View {
         onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+
         self.onSave = onSave
         self.onDelete = onDelete
     }
@@ -309,6 +310,20 @@ private extension TemplateEditSheet {
         }
     }
 
+    @ViewBuilder
+    var tagChooser: some View {
+        if model.tags.isEmpty {
+            Text("このカテゴリにタグはありません。カテゴリの編集で足せます")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .frame(maxWidth: .infinity, minHeight: 54)
+        } else {
+            TagLine(tagItems, selection: model.tagId) { id in
+                model.toggleTag(id)
+            }
+        }
+    }
+
     func drawerView(_ panel: Panel) -> some View {
         SettingsDrawer(title(for: panel)) {
             closePanel()
@@ -340,6 +355,7 @@ private extension TemplateEditSheet {
                     isSelected: model.categoryId == category.id
                 ) {
                     model.categoryId = category.id
+
                     closePanel()
                 }
             }
@@ -359,26 +375,13 @@ private extension TemplateEditSheet {
                     isSelected: model.walletId == wallet.id
                 ) {
                     model.walletId = wallet.id
+
                     closePanel()
                 }
             }
             .padding(.bottom, 8)
         case .memo:
             EmptyView()
-        }
-    }
-
-    @ViewBuilder
-    var tagChooser: some View {
-        if model.tags.isEmpty {
-            Text("このカテゴリにタグはありません。カテゴリの編集で足せます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .frame(maxWidth: .infinity, minHeight: 54)
-        } else {
-            TagLine(tagItems, selection: model.tagId) { id in
-                model.toggleTag(id)
-            }
         }
     }
 }
@@ -405,6 +408,7 @@ private extension TemplateEditSheet {
 
     var title: String {
         let action = model.isEditing ? "編集" : "追加"
+
         return "\(model.typeName)テンプレートを\(action)"
     }
 
@@ -523,6 +527,7 @@ private extension TemplateEditSheet {
 
     func closePanel() {
         focus = nil
+
         hidePanel()
     }
 

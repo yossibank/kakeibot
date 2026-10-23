@@ -73,6 +73,7 @@ struct TemplateEditModelTests {
             type: .expense,
             editing: saved.id
         )
+
         await model.load()
         let loaded = model.isChanged
 

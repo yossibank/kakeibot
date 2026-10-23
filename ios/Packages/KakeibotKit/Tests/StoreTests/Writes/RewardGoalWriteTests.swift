@@ -11,11 +11,13 @@ struct RewardGoalWriteTests {
         let shoes = RewardGoalDraft(name: " 新しい靴 ", targetAmount: 8000)
 
         let goal = try await database.saveRewardGoal(shoes, at: now)
+
         let edited = try await database.saveRewardGoal(
             RewardGoalDraft(name: "靴", targetAmount: 6000),
             editing: goal.id,
             at: now
         )
+
         let bank = try await database.rewardBank()
 
         #expect(goal.name == "新しい靴")

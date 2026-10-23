@@ -8,11 +8,13 @@ public struct RewardRuleListView: View {
     @State private var model: RewardRuleListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
+
     @State private var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
         spacing: Self.spacing
     )
+
     @State private var hiddenId: RewardRule.ID?
     @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
@@ -23,14 +25,13 @@ public struct RewardRuleListView: View {
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
-        _model = State(initialValue: RewardRuleListModel(database: database))
         let hintFlag = SettingsScreenFlag.closedHint(.rewards, in: database)
+        let hiddenList = SettingsScreenFlag.openHiddenList(.rewards, in: database)
+
+        _model = State(initialValue: RewardRuleListModel(database: database))
         _hintFlag = State(initialValue: hintFlag)
-        let hiddenList = SettingsScreenFlag.openHiddenList(
-            .rewards,
-            in: database
-        )
         _hiddenList = State(initialValue: hiddenList)
+
         self.database = database
     }
 
@@ -258,13 +259,11 @@ private extension RewardRuleListView {
         isHidden: Bool
     ) -> some View {
         let opacity: Double = isHidden ? 0.6 : 1
-
         let icon = model.icon(for: rule)
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top) {
                 IconBadge(icon, size: 46)
-
                 Spacer(minLength: 6)
 
                 if let total = model.total(for: rule) {
@@ -364,13 +363,10 @@ private extension RewardRuleListView {
     }
 
     nonisolated static let space = "RewardBoard"
+
     static let columnCount = 2
     static let spacing: CGFloat = 12
     static let tileHeight: CGFloat = 156
-
-    var tileShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
 
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: spacing),
@@ -383,6 +379,10 @@ private extension RewardRuleListView {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    var tileShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     var boardHeight: CGFloat {

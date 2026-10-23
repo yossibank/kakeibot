@@ -1,5 +1,6 @@
 public struct Setting: Hashable, Sendable {
     public let key: Key
+
     public var value: String
 
     public init(

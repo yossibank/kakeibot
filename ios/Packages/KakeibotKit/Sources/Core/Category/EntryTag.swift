@@ -2,6 +2,7 @@ import Foundation
 
 public struct EntryTag: Hashable, Sendable {
     public let id: ID
+
     public var categoryId: EntryCategory.ID
     public var name: String
     public var sortOrder: Int
@@ -37,6 +38,7 @@ extension EntryTag: Identifiable {}
 extension EntryTag: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
         try container.encode(id, forKey: .id)
         try container.encode(categoryId, forKey: .categoryId)
         try container.encode(name, forKey: .name)

@@ -5,6 +5,7 @@ struct SettingsHiddenTitle: View {
     let flag: SettingsScreenFlag
     let title: String
     let count: Int
+
     var onDeleteAll: (() -> Void)?
 
     var body: some View {

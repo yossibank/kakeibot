@@ -37,6 +37,7 @@ public struct LiveNotificationCenter: NotificationCenterClient {
         at components: DateComponents
     ) async throws {
         let content = UNMutableNotificationContent()
+
         content.title = title
         content.body = body
         content.sound = .default

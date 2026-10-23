@@ -12,6 +12,7 @@ struct CategoryDraftTests {
     @Test
     func makesIconWithOnlyTheChosenMark() throws {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
+
         let draft = CategoryDraft(
             kind: .expense,
             name: " 推し ",
@@ -20,6 +21,7 @@ struct CategoryDraftTests {
         )
 
         let icon = try draft.newIcon(at: now)
+
         let category = try draft.newCategory(
             iconId: icon.id,
             sortOrder: 12,

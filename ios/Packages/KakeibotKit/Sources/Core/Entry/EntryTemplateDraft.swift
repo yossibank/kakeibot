@@ -102,6 +102,7 @@ public extension EntryTemplateDraft {
         let fields = try validated()
 
         var updated = template
+
         updated.name = trimmedName
         updated.type = type
         updated.amount = amount
@@ -110,6 +111,7 @@ public extension EntryTemplateDraft {
         updated.walletId = fields.walletId
         updated.memo = trimmedMemo
         updated.updatedAt = now
+
         return updated
     }
 }
@@ -121,6 +123,7 @@ private extension EntryTemplateDraft {
 
     var trimmedMemo: String? {
         let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
+
         return trimmed.isEmpty ? nil : trimmed
     }
 

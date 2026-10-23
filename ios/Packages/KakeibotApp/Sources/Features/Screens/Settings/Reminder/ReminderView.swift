@@ -328,6 +328,7 @@ private extension ReminderView {
     var recurringText: String {
         let time = model.time ?? .morning
         let head = "固定費ごとに「前に知らせる」を決めると届きます。"
+
         return head + "時刻は \(time) です"
     }
 

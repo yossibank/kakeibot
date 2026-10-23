@@ -23,10 +23,12 @@ public extension AppDatabase {
                 }
 
                 recurring = try draft.applied(to: current, at: now)
+
                 try recurring.update(db)
             } else {
                 recurring = try draft.newRecurring(at: now)
                 recurring.sortOrder = try Recurring.nextSortOrder(in: db)
+
                 try recurring.insert(db)
             }
 
@@ -58,6 +60,7 @@ public extension AppDatabase {
             if !isHidden {
                 let yesterday = today.adding(days: -1)
                 let generated = recurring.generatedUntil ?? yesterday
+
                 recurring.generatedUntil = max(generated, yesterday)
             }
 
@@ -76,6 +79,7 @@ public extension AppDatabase {
     func deleteRecurring(_ id: Recurring.ID) async throws -> Deletion {
         try await writer.write { db in
             let recurrings = Recurring.filter(id: id)
+
             return try Self.deleteRecurrings(recurrings, in: db)
         }
     }
@@ -151,7 +155,9 @@ private extension AppDatabase {
         }
 
         var updated = recurring
+
         updated.generatedUntil = today
+
         try updated.update(db)
     }
 
@@ -164,6 +170,7 @@ private extension AppDatabase {
     ) throws -> Entry? {
         let earliest = date.adding(days: -Recurring.sameDateMargin)
         let latest = date.adding(days: Recurring.sameDateMargin)
+
         let exists = try Entry
             .filter(Column("recurring_id") == recurring.id)
             .filter(Column("recurring_date") >= earliest)

@@ -49,6 +49,7 @@ public extension AppDatabase {
 
             shelfIcon.archivedAt = isHidden ? now : nil
             shelfIcon.updatedAt = now
+
             try shelfIcon.update(db)
         }
     }
@@ -61,6 +62,7 @@ public extension AppDatabase {
             }
 
             try shelfIcon.delete(db)
+
             return Deletion(shelfIcons: [shelfIcon])
         }
     }
@@ -83,6 +85,7 @@ private extension AppDatabase {
 
         try icon.insert(db)
         try shelfIcon.insert(db)
+
         return shelfIcon
     }
 
@@ -101,8 +104,11 @@ private extension AppDatabase {
         }
 
         try draft.applied(to: icon, at: now).update(db)
+
         shelfIcon.updatedAt = now
+
         try shelfIcon.update(db)
+
         return shelfIcon
     }
 }

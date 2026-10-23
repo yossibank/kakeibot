@@ -24,6 +24,7 @@ public extension IconDraft {
 
     var problems: [DraftProblem] {
         let colorProblems: [DraftProblem] = isValidColor ? [] : [.invalidColor]
+
         return markProblems + colorProblems
     }
 
@@ -51,11 +52,13 @@ public extension IconDraft {
         try validate()
 
         var updated = icon
+
         updated.emoji = emoji
         updated.text = text
         updated.glyph = glyph
         updated.color = color
         updated.updatedAt = now
+
         return updated
     }
 }

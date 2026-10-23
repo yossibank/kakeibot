@@ -25,6 +25,7 @@ public extension AppDatabase {
             }
 
             try Self.saveTags(tags, for: category.id, in: db, at: now)
+
             return category
         }
     }
@@ -65,6 +66,7 @@ public extension AppDatabase {
 
             category.archivedAt = isHidden ? now : nil
             category.updatedAt = now
+
             try category.update(db)
         }
     }
@@ -100,6 +102,7 @@ public extension AppDatabase {
             try budgets.deleteAll(db)
             try tags.deleteAll(db)
             try category.delete(db)
+
             return deletion
         }
     }
@@ -126,6 +129,7 @@ private extension AppDatabase {
 
         try icon.insert(db)
         try category.insert(db)
+
         return category
     }
 
@@ -144,8 +148,10 @@ private extension AppDatabase {
         }
 
         let category = try draft.applied(to: existing, at: now)
+
         try draft.applied(to: icon, at: now).update(db)
         try category.update(db)
+
         return category
     }
 
@@ -169,6 +175,7 @@ private extension AppDatabase {
 
             tag.archivedAt = now
             tag.updatedAt = now
+
             try tag.update(db)
         }
 
@@ -181,6 +188,7 @@ private extension AppDatabase {
                 )
 
                 try tag.insert(db)
+
                 return tag
             }
 
@@ -189,7 +197,9 @@ private extension AppDatabase {
             }
 
             let saved = try draft.applied(to: tag, sortOrder: order, at: now)
+
             try saved.update(db)
+
             return saved
         }
     }

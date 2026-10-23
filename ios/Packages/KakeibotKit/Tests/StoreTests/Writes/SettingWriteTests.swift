@@ -40,6 +40,7 @@ struct SettingWriteTests {
         let initial = try await database.setting(.closedHints)
         try await database.setSetting(.closedHints, to: [.wallets, .budgets])
         let saved = try await database.setting(.closedHints)
+
         let text = try await database.writer.read { db in
             try String.fetchOne(
                 db,

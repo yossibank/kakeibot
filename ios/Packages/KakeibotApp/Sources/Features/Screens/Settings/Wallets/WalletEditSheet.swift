@@ -29,6 +29,7 @@ public struct WalletEditSheet: View {
         onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+
         self.onSave = onSave
         self.onDelete = onDelete
     }
@@ -389,27 +390,6 @@ private extension WalletEditSheet {
         }
     }
 
-    func valuationRow(_ valuation: Valuation) -> some View {
-        let date = valuation.date
-
-        return HStack {
-            Text("\(String(date.year))/\(date.month)/\(date.day)")
-                .textFont(.subheadline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-
-            Spacer(minLength: 8)
-
-            Text(AmountText.text(valuation.amount))
-                .displayFont(.body)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-        }
-        .padding(.horizontal, 16)
-        .frame(height: 48)
-        .card(cornerRadius: 14)
-    }
-
     var signButton: some View {
         Button {
             model.isNegative.toggle()
@@ -430,6 +410,27 @@ private extension WalletEditSheet {
         }
         .buttonStyle(.plain)
         .sensoryFeedback(.selection, trigger: model.isNegative)
+    }
+
+    func valuationRow(_ valuation: Valuation) -> some View {
+        let date = valuation.date
+
+        return HStack {
+            Text("\(String(date.year))/\(date.month)/\(date.day)")
+                .textFont(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+
+            Spacer(minLength: 8)
+
+            Text(AmountText.text(valuation.amount))
+                .displayFont(.body)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+        }
+        .padding(.horizontal, 16)
+        .frame(height: 48)
+        .card(cornerRadius: 14)
     }
 
     func kindButton(_ kind: Wallet.Kind) -> some View {
@@ -560,6 +561,7 @@ private extension WalletEditSheet {
 
     func openValuation() {
         focus = nil
+
         model.startValuation()
 
         withAnimation(.snappy) {
@@ -599,6 +601,7 @@ private extension WalletEditSheet {
         guard !model.isEditing, wallet.kind == .loan else {
             onSave(wallet)
             dismiss()
+
             return
         }
 
@@ -609,6 +612,7 @@ private extension WalletEditSheet {
     func closePayment() {
         guard addedLoan == nil else {
             finishAddedLoan()
+
             return
         }
 
@@ -631,6 +635,7 @@ private extension WalletEditSheet {
 
         guard !model.needsHideConfirmation else {
             isConfirmingHide = true
+
             return
         }
 
@@ -656,6 +661,7 @@ private extension WalletEditSheet {
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
+
         WalletEditSheet(model: WalletEditModel(database: database))
     }
 }

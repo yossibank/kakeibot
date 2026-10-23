@@ -399,6 +399,7 @@ struct RecurringWriteTests {
             through: january,
             at: setup.now
         )
+
         let recurring = try #require(
             try setup.database.snapshot().recurrings.first
         )
@@ -414,6 +415,7 @@ struct RecurringWriteTests {
             at: setup.now
         )
         let shownWhileHidden = try await setup.database.recurrings()
+
         let allWhileHidden = try await setup.database.recurrings(
             includingHidden: true
         )

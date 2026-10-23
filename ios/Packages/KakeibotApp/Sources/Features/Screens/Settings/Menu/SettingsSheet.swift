@@ -275,7 +275,6 @@ public struct SettingsSheet: View {
                                 }
 
                                 Hairline()
-
                                 versionRow
                             }
                             .buttonStyle(.plain)
@@ -321,6 +320,7 @@ public struct SettingsSheet: View {
         }
         .task {
             let starts = try? await database.setting(.entryStartsWithAmount)
+
             startsWithAmount = starts ?? false
         }
     }
@@ -399,9 +399,7 @@ private extension SettingsSheet {
         return ViewThatFits(in: .horizontal) {
             HStack(spacing: 12) {
                 label
-
                 Spacer(minLength: 8)
-
                 picker
             }
             .frame(minHeight: 52)
@@ -616,6 +614,7 @@ private extension SettingsSheet {
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
+
         SettingsSheet(
             database: database,
             today: LocalDate(Date(), in: .current)

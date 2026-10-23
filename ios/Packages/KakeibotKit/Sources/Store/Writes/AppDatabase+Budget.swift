@@ -39,6 +39,7 @@ public extension AppDatabase {
             )
 
             budget.amount = amount
+
             try budget.save(db)
         }
     }

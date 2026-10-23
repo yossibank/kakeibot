@@ -103,6 +103,7 @@ public extension MonthOverview {
         }
 
         let ratio = Double(paidRecurringExpense) / Double(recurringExpense)
+
         return min(ratio, 1)
     }
 
@@ -146,6 +147,7 @@ private extension MonthOverview {
     ) -> Int? {
         list.map { list in
             let entries = list.days.flatMap(\.entries)
+
             return recurring.amount(paidOn: date, entries: entries)
         }
     }

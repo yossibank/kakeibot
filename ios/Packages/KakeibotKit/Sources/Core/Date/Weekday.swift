@@ -29,6 +29,7 @@ extension Weekday {
 
     init(daysSinceMonday days: Int) {
         let index = (days % 7 + 7) % 7
+
         self = Self.allCases[index]
     }
 }

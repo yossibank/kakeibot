@@ -31,6 +31,7 @@ public extension CategoryDraft {
 
     var problems: [Problem] {
         let nameProblems: [Problem] = trimmedName.isEmpty ? [.emptyName] : []
+
         return nameProblems + icon.problems
     }
 
@@ -48,6 +49,7 @@ public extension CategoryDraft {
 
     func newIcon(at now: Date) throws -> Icon {
         try validate()
+
         return try icon.newIcon(at: now)
     }
 
@@ -73,6 +75,7 @@ public extension CategoryDraft {
         at now: Date
     ) throws -> Icon {
         try validate()
+
         return try self.icon.applied(to: icon, at: now)
     }
 
@@ -83,8 +86,10 @@ public extension CategoryDraft {
         try validate()
 
         var updated = category
+
         updated.name = trimmedName
         updated.updatedAt = now
+
         return updated
     }
 }

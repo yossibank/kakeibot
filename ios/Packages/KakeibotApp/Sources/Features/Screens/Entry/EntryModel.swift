@@ -104,6 +104,8 @@ public extension EntryModel {
 
     static let categoriesPerPage = 15
 
+    static let destinationTitle = "振替先"
+
     var isEditing: Bool {
         editingId != nil
     }
@@ -180,6 +182,7 @@ public extension EntryModel {
     var walletSections: [WalletSection] {
         Wallet.Kind.allCases.compactMap { kind in
             let wallets = wallets.filter { $0.kind == kind }
+
             return wallets.isEmpty
                 ? nil
                 : WalletSection(kind: kind, wallets: wallets)
@@ -219,6 +222,7 @@ public extension EntryModel {
     var selectedBillDate: LocalDate? {
         let choices = billChoices
         let chosen = choices.first { $0.date.yearMonth == billMonth }
+
         return chosen?.date ?? choices.first?.date
     }
 
@@ -256,10 +260,57 @@ public extension EntryModel {
         }
 
         let action = type == .transfer ? "振り替える" : "記録する"
+
         return "\(AmountText.text(amount)) を\(action)"
     }
 
-    static let destinationTitle = "振替先"
+    var isOverSourceBalance: Bool {
+        guard type == .transfer else {
+            return false
+        }
+
+        guard let balance = wallet(walletId).flatMap(balance(of:)) else {
+            return false
+        }
+
+        return amount > balance
+    }
+
+    var loanRemaining: Int? {
+        guard
+            type == .transfer,
+            let wallet = wallet(toWalletId),
+            wallet.kind == .loan,
+            let balance = balance(of: wallet),
+            balance < 0
+        else {
+            return nil
+        }
+
+        return -balance
+    }
+
+    var destinationNote: String? {
+        guard
+            type == .transfer,
+            amount > 0,
+            let wallet = wallet(toWalletId),
+            let balance = balance(of: wallet)
+        else {
+            return nil
+        }
+
+        let after = balance + amount
+
+        switch wallet.kind.role {
+        case .loan:
+            return "返したあと \(AmountText.text(max(-after, 0)))"
+        case .investment:
+            return "積み立てたあと \(AmountText.text(after))"
+        case .onHand, .card:
+            return nil
+        }
+    }
 
     static func dateText(
         for date: LocalDate,
@@ -290,34 +341,8 @@ public extension EntryModel {
         wallets.first { $0.id == id }
     }
 
-    var isOverSourceBalance: Bool {
-        guard type == .transfer else {
-            return false
-        }
-
-        guard let balance = wallet(walletId).flatMap(balance(of:)) else {
-            return false
-        }
-
-        return amount > balance
-    }
-
     func balance(of wallet: Wallet) -> Int? {
         balances[wallet.id]
-    }
-
-    var loanRemaining: Int? {
-        guard
-            type == .transfer,
-            let wallet = wallet(toWalletId),
-            wallet.kind == .loan,
-            let balance = balance(of: wallet),
-            balance < 0
-        else {
-            return nil
-        }
-
-        return -balance
     }
 
     func balanceText(of wallet: Wallet) -> String? {
@@ -332,28 +357,6 @@ public extension EntryModel {
         }
     }
 
-    var destinationNote: String? {
-        guard
-            type == .transfer,
-            amount > 0,
-            let wallet = wallet(toWalletId),
-            let balance = balance(of: wallet)
-        else {
-            return nil
-        }
-
-        let after = balance + amount
-
-        switch wallet.kind.role {
-        case .loan:
-            return "返したあと \(AmountText.text(max(-after, 0)))"
-        case .investment:
-            return "積み立てたあと \(AmountText.text(after))"
-        case .onHand, .card:
-            return nil
-        }
-    }
-
     func payOffLoan() {
         guard let loanRemaining else {
             return
@@ -365,23 +368,30 @@ public extension EntryModel {
     func icon(for template: EntryTemplate) -> Icon? {
         let categories = categories(for: template.type)
         let category = categories.first { $0.id == template.categoryId }
+
         return category.flatMap { options?.icons[$0.iconId] }
     }
 
     func load() async {
         do {
-            options = try await database.entryOptions()
             let limit = Self.recentMemoLimit
+
+            options = try await database.entryOptions()
             recentMemos = try await database.recentMemos(limit: limit)
             allTemplates = try await database.templates()
+
             cardBills = try await database.recurrings()
                 .filter { $0.type == .transfer && $0.closingDay != nil }
+
             hasOpenedCategoryMenu = try await database
                 .setting(.categoryMenuOpened)
+
             weekStart = try await database.setting(.weekStart)
+
             startsWithAmount = try await database.setting(
                 .entryStartsWithAmount
             )
+
             try await loadBalances()
             try await loadEntry()
 
@@ -409,6 +419,7 @@ public extension EntryModel {
 
     func apply(_ template: EntryTemplate) {
         select(template.type)
+
         categoryId = template.categoryId
         tagId = template.tagId
         walletId = template.walletId
@@ -443,6 +454,7 @@ public extension EntryModel {
 
     func newCategoryModel() -> CategoryEditModel {
         let kind: EntryCategory.Kind = type == .income ? .income : .expense
+
         return CategoryEditModel(database: database, kind: kind)
     }
 
@@ -453,6 +465,7 @@ public extension EntryModel {
     func reloadWallets() async {
         do {
             options = try await database.entryOptions()
+
             try await loadBalances()
         } catch {
             report(error)
@@ -529,11 +542,13 @@ public extension EntryModel {
 
     func selectBill(_ date: LocalDate) {
         let isUsual = date == billChoices.first?.date
+
         billMonth = isUsual ? nil : date.yearMonth
     }
 
     func swapWallets() {
         let source = walletId
+
         walletId = toWalletId
         toWalletId = source
     }
@@ -582,6 +597,7 @@ public extension EntryModel {
             return EntryChange(kind: kind, entry: entry, label: title)
         } catch {
             report(error)
+
             return nil
         }
     }
@@ -593,19 +609,19 @@ public extension EntryModel {
 
         do {
             try await database.deleteEntry(original.id)
+
             let title = label(for: original)
 
             return EntryChange(kind: .deleted, entry: original, label: title)
         } catch {
             report(error)
+
             return nil
         }
     }
 }
 
 private extension EntryModel {
-    static let restoreFailedMessage = "元に戻せませんでした"
-
     struct Snapshot: Equatable {
         let type: Entry.Kind
         let calculator: AmountCalculator
@@ -617,6 +633,12 @@ private extension EntryModel {
         let memo: String
         let billMonth: YearMonth?
     }
+
+    static let restoreFailedMessage = "元に戻せませんでした"
+
+    static let recentMemoLimit = 6
+    static let billTitles = ["いつもどおり", "次に回す", "2 回先"]
+    static let numberLocale = Locale(identifier: "ja_JP")
 
     var snapshot: Snapshot {
         Snapshot(
@@ -630,14 +652,6 @@ private extension EntryModel {
             memo: memo,
             billMonth: billMonth
         )
-    }
-
-    static let recentMemoLimit = 6
-    static let billTitles = ["いつもどおり", "次に回す", "2 回先"]
-    static let numberLocale = Locale(identifier: "ja_JP")
-
-    static func number(_ value: Int) -> String {
-        value.formatted(.number.locale(numberLocale))
     }
 
     var draft: EntryDraft? {
@@ -665,12 +679,8 @@ private extension EntryModel {
         )
     }
 
-    func report(_ error: any Error) {
-        guard !(error is CancellationError) else {
-            return
-        }
-
-        errorNotice.show(Self.message(for: error))
+    static func number(_ value: Int) -> String {
+        value.formatted(.number.locale(numberLocale))
     }
 
     static func message(for error: any Error) -> String {
@@ -682,6 +692,14 @@ private extension EntryModel {
         case AppDatabase.WriteError.entryNotFound: "記録が見つかりませんでした"
         default: "保存できませんでした"
         }
+    }
+
+    func report(_ error: any Error) {
+        guard !(error is CancellationError) else {
+            return
+        }
+
+        errorNotice.show(Self.message(for: error))
     }
 
     func categories(for type: Entry.Kind) -> [EntryCategory] {
@@ -723,6 +741,7 @@ private extension EntryModel {
 
     func loadBalances() async throws {
         let list = try await database.entryList()
+
         let entries = list.days
             .flatMap(\.entries)
             .filter { $0.id != editingId }

@@ -18,6 +18,7 @@ public extension LoanPayoff {
         after today: LocalDate
     ) {
         let repayments = repayments.filter { $0.amount > 0 }
+
         var remaining = -balance
 
         guard remaining > 0, !repayments.isEmpty else {
@@ -43,6 +44,7 @@ public extension LoanPayoff {
 
                 if remaining <= 0 {
                     self.init(count: count, lastDate: payment.date)
+
                     return
                 }
             }

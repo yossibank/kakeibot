@@ -4,9 +4,11 @@ enum MigrationV5 {
     static func migrate(_ db: Database) throws {
         try db.create(table: "tag") { table in
             table.primaryKey("id", .text)
+
             table.column("category_id", .text)
                 .notNull()
                 .references("category")
+
             table.column("name", .text).notNull()
             table.column("sort_order", .integer).notNull()
             table.column("archived_at", .text)

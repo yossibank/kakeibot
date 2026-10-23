@@ -29,6 +29,7 @@ extension SortableRecord {
 
             record.sortOrder = order
             record.updatedAt = now
+
             try record.update(db)
         }
     }

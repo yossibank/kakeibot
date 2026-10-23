@@ -25,6 +25,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
         @ViewBuilder content: () -> Content
     ) {
         _openId = openId
+
         self.id = id
         self.role = role
         self.onTap = onTap
@@ -151,16 +152,16 @@ private extension SwipeRow {
         8
     }
 
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(14))
-    }
-
     static var sheen: LinearGradient {
         LinearGradient(
             colors: [.white.opacity(0.18), .white.opacity(0)],
             startPoint: .top,
             endPoint: .center
         )
+    }
+
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(14))
     }
 
     var isOpen: Bool {
@@ -207,6 +208,7 @@ private extension SwipeRow {
 
     func delete() {
         openId = nil
+
         onDelete?()
     }
 
@@ -221,6 +223,7 @@ private extension SwipeRow {
     func tap() {
         guard openId == nil else {
             openId = nil
+
             return
         }
 
@@ -233,6 +236,7 @@ private extension SwipeRow {
         }
 
         let start = isOpen ? -openWidth : 0
+
         offset = min(start + x, 0)
     }
 
@@ -245,6 +249,7 @@ private extension SwipeRow {
             }
 
             act()
+
             return
         }
 

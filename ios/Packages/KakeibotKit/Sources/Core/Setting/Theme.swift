@@ -2,6 +2,7 @@ import Foundation
 
 public struct Theme: Hashable, Sendable {
     public let id: ID
+
     public var name: String
     public var background: String
     public var surface: String

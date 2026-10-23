@@ -21,6 +21,7 @@ struct SettingsField<Field: Hashable>: View {
         field: Field
     ) {
         _text = text
+
         self.prompt = prompt
         self.font = font
         self.focus = focus

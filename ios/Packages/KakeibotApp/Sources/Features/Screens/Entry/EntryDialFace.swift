@@ -42,6 +42,7 @@ struct EntryDialFace: View {
 private extension EntryDialFace {
     var amountFont: Font {
         let scale: CGFloat = model.amount < 100_000 ? 0.2 : 0.118
+
         return .display(size: size * scale, weight: .semibold, in: themeFont)
     }
 

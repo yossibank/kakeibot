@@ -33,6 +33,7 @@ extension AppDatabase {
         )
 
         try recurrings.deleteAll(db)
+
         return Deletion(recurrings: deleted, entries: entries)
     }
 }

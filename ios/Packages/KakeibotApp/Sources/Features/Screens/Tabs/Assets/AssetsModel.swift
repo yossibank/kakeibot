@@ -110,6 +110,7 @@ public extension AssetsModel {
     var changeFromLastMonth: Int {
         let lastMonth = currentMonth.adding(months: -1)
         let end = lastMonth.period(startingOn: monthStartDay).upperBound
+
         let previous = Holdings(
             wallets: wallets,
             entries: entries,
@@ -141,6 +142,7 @@ public extension AssetsModel {
 
         return Wallet.Kind.Role.allCases.compactMap { role in
             let members = rows.filter { $0.wallet.kind.role == role }
+
             return members.isEmpty
                 ? nil
                 : WalletSection(role: role, rows: members)
@@ -194,6 +196,7 @@ public extension AssetsModel {
             let month = currentMonth.adding(months: -offset)
             let period = month.period(startingOn: monthStartDay)
             let end = offset == 0 ? today : period.upperBound
+
             let holdings = Holdings(
                 wallets: wallets,
                 entries: entries,
@@ -279,6 +282,7 @@ public extension AssetsModel {
             return true
         } catch {
             errorNotice.show(Self.goalFailedMessage)
+
             return false
         }
     }
@@ -327,14 +331,6 @@ private extension AssetsModel {
     static let goalFailedMessage = "目標を保存できませんでした"
     static let billTitle = "引き落とし"
 
-    static func row(
-        of entry: Entry,
-        in list: EntryList
-    ) -> EntryRowItem {
-        let day = "\(entry.date.month)/\(entry.date.day)"
-        return EntryRowItem(entry, in: list, dayLabel: day)
-    }
-
     var wallets: [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []
 
@@ -349,6 +345,15 @@ private extension AssetsModel {
 
     var valuations: [Valuation] {
         list?.valuations ?? []
+    }
+
+    static func row(
+        of entry: Entry,
+        in list: EntryList
+    ) -> EntryRowItem {
+        let day = "\(entry.date.month)/\(entry.date.day)"
+
+        return EntryRowItem(entry, in: list, dayLabel: day)
     }
 
     func balance(of wallet: Wallet) -> Int {

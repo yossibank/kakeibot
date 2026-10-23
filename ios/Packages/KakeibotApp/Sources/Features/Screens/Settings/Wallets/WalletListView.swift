@@ -23,14 +23,13 @@ public struct WalletListView: View {
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
-        _model = State(initialValue: WalletListModel(database: database))
         let hintFlag = SettingsScreenFlag.closedHint(.wallets, in: database)
+        let hiddenList = SettingsScreenFlag.openHiddenList(.wallets, in: database)
+
+        _model = State(initialValue: WalletListModel(database: database))
         _hintFlag = State(initialValue: hintFlag)
-        let hiddenList = SettingsScreenFlag.openHiddenList(
-            .wallets,
-            in: database
-        )
         _hiddenList = State(initialValue: hiddenList)
+
         self.database = database
     }
 
@@ -297,7 +296,9 @@ private extension WalletListView {
     }
 
     nonisolated static let space = "WalletBoard"
+
     static let rowHeight: CGFloat = 68
+
     static let grid = SettingsBoardGrid(
         columns: 1,
         itemHeight: rowHeight,
@@ -370,6 +371,7 @@ private extension WalletListView {
         guard model.balance(of: wallet) == 0 else {
             hiding = wallet
             isConfirmingHide = true
+
             return
         }
 

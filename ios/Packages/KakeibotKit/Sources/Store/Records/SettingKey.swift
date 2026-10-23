@@ -182,6 +182,7 @@ extension SettingKey where Value == Set<SettingsScreen> {
             },
             encode: { screens in
                 let names = screens.map(\.rawValue).sorted()
+
                 return names.isEmpty ? nil : names.joined(separator: ",")
             }
         )

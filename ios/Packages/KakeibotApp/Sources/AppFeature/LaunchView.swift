@@ -31,7 +31,6 @@ public struct LaunchView: View {
     public var body: some View {
         ZStack {
             Color(uiColor: .systemBackground)
-
             mark
 
             themed
@@ -120,6 +119,7 @@ private extension LaunchView {
         }
 
         try? await Task.sleep(for: .milliseconds(850))
+
         hasSwept = true
     }
 
@@ -144,6 +144,7 @@ private extension LaunchView {
 
 private struct RingSweep: Shape {
     var progress: CGFloat
+
     let length: CGFloat
 
     var animatableData: CGFloat {
@@ -158,6 +159,7 @@ private struct RingSweep: Shape {
     func path(in rect: CGRect) -> Path {
         let start = min(max(progress - length, 0), 1)
         let end = min(max(progress, 0), 1)
+
         var path = Path()
 
         guard end > start else {

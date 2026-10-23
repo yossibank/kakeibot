@@ -57,10 +57,12 @@ public extension EntryTagDraft {
         try validate()
 
         var updated = tag
+
         updated.name = trimmedName
         updated.sortOrder = sortOrder
         updated.archivedAt = nil
         updated.updatedAt = now
+
         return updated
     }
 }

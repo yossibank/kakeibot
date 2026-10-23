@@ -16,6 +16,7 @@ public extension EntryDay {
         Dictionary(grouping: entries, by: \.date)
             .map { date, entries in
                 let sorted = entries.sorted(by: isNewer)
+
                 return EntryDay(date: date, entries: sorted)
             }
             .sorted { $0.date > $1.date }

@@ -2,6 +2,7 @@ import Foundation
 
 public struct ShelfIcon: Hashable, Sendable {
     public let id: ID
+
     public var iconId: Icon.ID
     public var sortOrder: Int
     public var archivedAt: Date?
@@ -34,6 +35,7 @@ extension ShelfIcon: Identifiable {}
 extension ShelfIcon: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
         try container.encode(id, forKey: .id)
         try container.encode(iconId, forKey: .iconId)
         try container.encode(sortOrder, forKey: .sortOrder)

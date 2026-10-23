@@ -45,6 +45,7 @@ public extension EntrySearch {
         }
 
         let others = recent.filter { $0 != trimmed }
+
         return Array(([trimmed] + others).prefix(recentLimit))
     }
 }

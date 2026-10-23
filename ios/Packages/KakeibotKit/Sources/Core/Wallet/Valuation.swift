@@ -2,6 +2,7 @@ import Foundation
 
 public struct Valuation: Hashable, Sendable {
     public let id: ID
+
     public var walletId: Wallet.ID
     public var date: LocalDate
     public var amount: Int

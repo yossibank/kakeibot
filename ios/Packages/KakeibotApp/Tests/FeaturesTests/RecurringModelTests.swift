@@ -10,6 +10,7 @@ struct RecurringModelTests {
     func savesRecurringAndGeneratesEntries() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
+
         let model = RecurringEditModel(
             database: setup.database,
             today: setup.today
@@ -35,6 +36,7 @@ struct RecurringModelTests {
     @Test
     func suggestsHolidayShiftFromCategory() async throws {
         let setup = try await RecordsModelTests.Setup()
+
         let model = RecurringEditModel(
             database: setup.database,
             today: setup.today
@@ -124,6 +126,7 @@ struct RecurringModelTests {
     func savesTransferBetweenWallets() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
+
         let model = RecurringEditModel(
             database: setup.database,
             today: setup.today
@@ -151,6 +154,7 @@ struct RecurringModelTests {
     @Test
     func refusesSameWalletTransfer() async throws {
         let setup = try await RecordsModelTests.Setup()
+
         let model = RecurringEditModel(
             database: setup.database,
             today: setup.today
@@ -169,6 +173,7 @@ struct RecurringModelTests {
     @Test
     func refusesEmptyAmount() async throws {
         let setup = try await RecordsModelTests.Setup()
+
         let model = RecurringEditModel(
             database: setup.database,
             today: setup.today

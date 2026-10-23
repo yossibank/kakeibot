@@ -2,6 +2,7 @@ import Foundation
 
 public struct Icon: Hashable, Sendable {
     public let id: ID
+
     public var emoji: String?
     public var text: String?
     public var glyph: Glyph?
@@ -277,6 +278,7 @@ extension Icon: Identifiable {}
 extension Icon: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
         try container.encode(id, forKey: .id)
         try container.encodeOrNull(emoji, forKey: .emoji)
         try container.encodeOrNull(text, forKey: .text)

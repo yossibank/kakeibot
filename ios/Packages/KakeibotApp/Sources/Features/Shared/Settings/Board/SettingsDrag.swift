@@ -24,6 +24,7 @@ final class SettingsDrag<ID: Hashable> {
 extension SettingsDrag {
     struct Lift {
         let id: ID
+
         var location: CGPoint
         var grab: CGSize?
     }
@@ -31,6 +32,7 @@ extension SettingsDrag {
     struct HiddenLift {
         let id: ID
         let start: CGPoint
+
         var location: CGPoint
     }
 
@@ -52,6 +54,7 @@ extension SettingsDrag {
     var floating: Floating? {
         if let lift {
             let row = rowFrames[lift.id]
+
             let center = CGPoint(
                 x: row?.midX ?? liftedCenter.x,
                 y: (row?.minY ?? 0) + liftedCenter.y
@@ -141,6 +144,7 @@ extension SettingsDrag {
 
         current.location = location
         lift = current
+
         arm(zones.isOverHide(location, from: origin), flag: \.isOverHide)
 
         autoScroll.follow(
@@ -214,6 +218,7 @@ extension SettingsDrag {
         }
 
         showCount += 1
+
         return hiddenLift.id
     }
 }
@@ -258,6 +263,7 @@ private extension SettingsDrag {
 
     func disarm() {
         armTask?.cancel()
+
         armTask = nil
     }
 }

@@ -41,6 +41,14 @@ public struct IconBadge: View {
 }
 
 private extension IconBadge {
+    var tint: Color {
+        if systemImage != nil {
+            return Palette.accent
+        }
+
+        return icon.flatMap { Color(hex: $0.color) } ?? .secondary
+    }
+
     @ViewBuilder
     var mark: some View {
         if let systemImage {
@@ -50,18 +58,11 @@ private extension IconBadge {
             IconImage(icon, size: size * 0.45)
         }
     }
-
-    var tint: Color {
-        if systemImage != nil {
-            return Palette.accent
-        }
-
-        return icon.flatMap { Color(hex: $0.color) } ?? .secondary
-    }
 }
 
 #Preview {
     let now = Date()
+
     let emoji = Icon(
         emoji: "🍙",
         text: nil,
@@ -69,6 +70,7 @@ private extension IconBadge {
         createdAt: now,
         updatedAt: now
     )
+
     let text = Icon(
         emoji: nil,
         text: "給料",

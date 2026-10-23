@@ -17,6 +17,7 @@ struct BudgetWidgetProvider: TimelineProvider {
         Task {
             let now = Date()
             let timeline = await Self.timeline(at: now, isPreview: isPreview)
+
             completion(timeline.entries.first ?? .sample(at: now))
         }
     }
@@ -49,6 +50,7 @@ private extension BudgetWidgetProvider {
             let entry: BudgetWidgetEntry = isPreview
                 ? .sample(at: now)
                 : .empty(at: now)
+
             let retry = now.addingTimeInterval(retryInterval)
 
             return Timeline(entries: [entry], policy: .after(retry))
@@ -80,6 +82,7 @@ private extension BudgetWidgetProvider {
     static func nextMidnight(after date: Date) -> Date? {
         let calendar = Calendar.current
         let start = calendar.startOfDay(for: date)
+
         return calendar.date(byAdding: .day, value: 1, to: start)
     }
 }

@@ -6,6 +6,7 @@ public struct AmountCalculator: Hashable, Sendable {
 
     public init(amount: Int = 0) {
         let isPositive = amount > 0
+
         self.tokens = isPositive ? [.number(amount)] : []
         self.taxNote = nil
         self.isShowingResult = isPositive
@@ -154,6 +155,7 @@ private extension AmountCalculator {
         }
 
         let amount = amount
+
         tokens = amount > 0 ? [.number(amount)] : []
         isShowingResult = true
     }
@@ -166,6 +168,7 @@ private extension AmountCalculator {
         }
 
         let taxed = min(base * (100 + rate.rawValue) / 100, Self.maxValue)
+
         tokens = [.number(taxed)]
         taxNote = TaxNote(base: base, rate: rate)
     }
@@ -184,6 +187,7 @@ private extension AmountCalculator.Operation {
         }
 
         let limit = AmountCalculator.maxValue
+
         return min(max(result, -limit), limit)
     }
 }

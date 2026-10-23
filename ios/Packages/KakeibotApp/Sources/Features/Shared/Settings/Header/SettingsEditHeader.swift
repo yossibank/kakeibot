@@ -17,9 +17,7 @@ struct SettingsEditHeader: View {
                 .frame(width: Self.sideWidth, alignment: .leading)
 
             Spacer()
-
             SettingsSheetTitle(title)
-
             Spacer()
 
             ZStack {

@@ -71,6 +71,7 @@ private struct HalfTicks: Shape {
                 let angle = Double.pi + Double(index) / Double(count) * .pi
                 let start = Self.point(from: center, at: angle, radius: inner)
                 let end = Self.point(from: center, at: angle, radius: outer)
+
                 path.move(to: start)
                 path.addLine(to: end)
             }
@@ -86,6 +87,7 @@ private extension HalfTicks {
     ) -> CGPoint {
         let x = center.x + cos(angle) * radius
         let y = center.y + sin(angle) * radius
+
         return CGPoint(x: x, y: y)
     }
 }

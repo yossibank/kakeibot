@@ -21,6 +21,7 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
         }
 
         attempt.onAttempt()
+
         return false
     }
 }

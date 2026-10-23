@@ -43,6 +43,7 @@ extension AppIconListModelTests {
     @MainActor
     final class Switcher {
         var name: String?
+
         let fails: Bool
 
         var client: AppIconSwitcher {

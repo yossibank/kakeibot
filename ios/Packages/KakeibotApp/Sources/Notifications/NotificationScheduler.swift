@@ -76,6 +76,7 @@ private extension NotificationScheduler {
         in timeZone: TimeZone
     ) -> Date {
         let components = components(of: notification, in: timeZone)
+
         return components.date ?? .distantPast
     }
 }

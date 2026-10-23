@@ -12,6 +12,7 @@ extension AppDatabase {
         }
 
         let tag = try EntryTag.fetchOne(db, key: id)
+
         return tag?.categoryId == categoryId
     }
 }

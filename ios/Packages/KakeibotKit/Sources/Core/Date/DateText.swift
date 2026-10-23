@@ -24,6 +24,7 @@ enum DateText {
         let text = String(value.magnitude)
         let padding = String(repeating: "0", count: max(0, digits - text.count))
         let sign = value < 0 ? "-" : ""
+
         return sign + padding + text
     }
 }

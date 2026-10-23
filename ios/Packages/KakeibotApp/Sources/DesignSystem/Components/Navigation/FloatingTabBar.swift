@@ -16,6 +16,7 @@ public struct FloatingTabBar<Value: Hashable>: View {
         onAdd: @escaping () -> Void
     ) {
         _selection = selection
+
         self.items = items
         self.onAdd = onAdd
     }
@@ -103,6 +104,7 @@ private extension FloatingTabBar {
     var addButton: some View {
         Button {
             addCount += 1
+
             onAdd()
         } label: {
             ZStack {
@@ -215,6 +217,7 @@ private extension FloatingTabBar {
         }
 
         let maxX = barWidth - itemWidth
+
         return min(max(dragX - itemWidth / 2, 0), maxX)
     }
 
@@ -241,6 +244,7 @@ private extension FloatingTabBar {
         }
 
         let index = Int((x / itemWidth).rounded(.down))
+
         return min(max(index, 0), items.count - 1)
     }
 }

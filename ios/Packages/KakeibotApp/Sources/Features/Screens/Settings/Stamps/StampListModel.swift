@@ -55,6 +55,7 @@ private extension StampListModel {
 
     func stamps(isHidden: Bool) -> [ShelfIcon] {
         let stamps = shelf?.shelfIcons ?? []
+
         return stamps.filter { ($0.archivedAt != nil) == isHidden }
     }
 }
@@ -66,6 +67,7 @@ extension StampListModel: SettingsBoardModel {
 
     public func saveOrder(_ ids: [ShelfIcon.ID]) async throws {
         let ids = ids + hidden.map(\.id)
+
         try await database.reorderShelfIcons(ids, at: Date())
     }
 

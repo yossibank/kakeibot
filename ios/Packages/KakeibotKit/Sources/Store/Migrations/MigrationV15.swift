@@ -6,9 +6,11 @@ enum MigrationV15 {
         try db.create(table: "new_wallet") { table in
             table.primaryKey("id", .text)
             table.column("name", .text).notNull()
+
             table.column("kind", .text)
                 .notNull()
                 .check { Wallet.Kind.allCases.contains($0) }
+
             table.column("icon_id", .text).notNull().references("icon")
             table.column("initial_balance", .integer).notNull()
             table.column("sort_order", .integer).notNull()

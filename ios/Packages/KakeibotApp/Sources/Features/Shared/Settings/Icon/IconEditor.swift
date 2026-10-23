@@ -209,14 +209,6 @@ private extension IconEditor {
         Array(repeating: GridItem(.flexible(), spacing: 6), count: 8)
     }
 
-    static func tileFill(isSelected: Bool) -> Color {
-        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
-    }
-
-    static func tileStroke(isSelected: Bool) -> Color {
-        isSelected ? Palette.accent : Palette.accent.opacity(.subtle)
-    }
-
     var customColor: Binding<Color> {
         Binding(
             get: {
@@ -237,5 +229,13 @@ private extension IconEditor {
                 model.inputText(value)
             }
         )
+    }
+
+    static func tileFill(isSelected: Bool) -> Color {
+        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+    }
+
+    static func tileStroke(isSelected: Bool) -> Color {
+        isSelected ? Palette.accent : Palette.accent.opacity(.subtle)
     }
 }

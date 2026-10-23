@@ -7,6 +7,7 @@ public struct ReviewSummary: Hashable, Sendable {
         in range: ClosedRange<LocalDate>
     ) {
         let inRange = entries.filter { range.contains($0.date) }
+
         self.expense = Breakdown(inRange.filter { $0.type == .expense })
         self.income = Breakdown(inRange.filter { $0.type == .income })
     }

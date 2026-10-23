@@ -45,6 +45,7 @@ public extension BudgetUsage {
 
     func todayRemaining(spentToday: Int) -> Int {
         let usable = max(remaining + spentToday - upcoming, 0)
+
         return usable / daysLeft - spentToday
     }
 }

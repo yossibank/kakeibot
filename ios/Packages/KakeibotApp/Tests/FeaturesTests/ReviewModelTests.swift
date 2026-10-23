@@ -103,6 +103,7 @@ struct ReviewModelTests {
         let shelf = try await setup.database.iconShelf().shelfIcons
         let star = try #require(shelf.first?.iconId)
         let party = try #require(shelf.dropFirst().first?.iconId)
+
         let stamps = [
             (star, "2026-10-05"),
             (party, "2026-10-10"),

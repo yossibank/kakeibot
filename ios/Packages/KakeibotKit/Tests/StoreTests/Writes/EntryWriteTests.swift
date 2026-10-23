@@ -12,6 +12,7 @@ struct EntryWriteTests {
             setup.draft,
             at: setup.now
         )
+
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries == [saved])
@@ -28,11 +29,13 @@ struct EntryWriteTests {
             setup.draft,
             at: setup.now
         )
+
         let updated = try await setup.database.saveEntry(
             edited,
             editing: saved.id,
             at: later
         )
+
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries == [updated])
@@ -121,6 +124,7 @@ struct EntryWriteTests {
             setup.draft,
             at: setup.now
         )
+
         try await setup.database.deleteEntry(saved.id)
         let snapshot = try setup.database.snapshot()
 
@@ -138,6 +142,7 @@ struct EntryWriteTests {
             setup.draft,
             at: setup.now
         )
+
         try await setup.database.deleteEntry(saved.id)
         try await setup.database.restoreEntry(saved)
         let restored = try setup.database.snapshot().entries

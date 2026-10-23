@@ -32,6 +32,7 @@ extension SettingsBulkDelete {
         for id in ids {
             do {
                 let deletion = try await delete(id)
+
                 deletions.append(deletion)
             } catch where isInUse(error) {
                 keptCount += 1

@@ -39,6 +39,7 @@ public extension EntryChange {
 
         let from = wallet(entry.walletId)?.name ?? ""
         let to = entry.toWalletId.flatMap(wallet)?.name ?? ""
+
         return "\(from) → \(to)"
     }
 }

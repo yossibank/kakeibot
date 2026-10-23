@@ -12,6 +12,7 @@ struct TemplateWriteTests {
             setup.draft,
             at: setup.now
         )
+
         var coffee = setup.draft
         coffee.name = "コーヒー"
         let saved = try await setup.database.saveTemplate(coffee, at: setup.now)
@@ -25,6 +26,7 @@ struct TemplateWriteTests {
     @Test
     func hidesAndShowsTemplate() async throws {
         let setup = try await Setup()
+
         let saved = try await setup.database.saveTemplate(
             setup.draft,
             at: setup.now
@@ -61,11 +63,13 @@ struct TemplateWriteTests {
             setup.draft,
             at: setup.now
         )
+
         let updated = try await setup.database.saveTemplate(
             edited,
             editing: saved.id,
             at: later
         )
+
         let afterUpdate = try await setup.database.templates()
 
         try await setup.database.deleteTemplate(saved.id)
@@ -106,6 +110,7 @@ struct TemplateWriteTests {
             setup.draft,
             at: setup.now
         )
+
         let today = try #require(LocalDate(year: 2026, month: 10, day: 3))
         let draft = try #require(template.entryDraft(on: today))
         let entry = try await setup.database.saveEntry(draft, at: setup.now)

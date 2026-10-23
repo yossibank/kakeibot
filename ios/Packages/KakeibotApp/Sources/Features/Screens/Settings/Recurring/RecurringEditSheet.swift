@@ -20,6 +20,7 @@ public struct RecurringEditSheet: View {
         onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+
         self.onDelete = onDelete
     }
 
@@ -178,82 +179,6 @@ private extension RecurringEditSheet {
         .card()
     }
 
-    @ViewBuilder
-    func drawerBody(_ panel: Panel) -> some View {
-        switch panel {
-        case .amount:
-            VStack(spacing: 10) {
-                Keypad(activeTax: model.calculator.taxNote?.rate) { key in
-                    model.press(key)
-                }
-
-                PrimaryButton("決める") {
-                    closePanel()
-                }
-            }
-        case .category:
-            SettingsTileGrid(
-                items: model.categories,
-                columns: 5,
-                spacing: 5
-            ) { category in
-                SettingsCategoryTile(
-                    category: category,
-                    icon: model.icon(for: category),
-                    isSelected: model.categoryId == category.id
-                ) {
-                    model.select(category: category.id)
-                    closePanel()
-                }
-            }
-            .padding(.bottom, 8)
-        case .wallet:
-            SettingsTileGrid(
-                items: model.wallets,
-                columns: 3,
-                spacing: 8
-            ) { wallet in
-                SettingsWalletTile(
-                    wallet: wallet,
-                    icon: model.icon(for: wallet),
-                    isSelected: model.walletId == wallet.id
-                ) {
-                    model.walletId = wallet.id
-                    closePanel()
-                }
-            }
-            .padding(.bottom, 8)
-        case .destination:
-            SettingsTileGrid(
-                items: model.wallets,
-                columns: 3,
-                spacing: 8
-            ) { wallet in
-                SettingsWalletTile(
-                    wallet: wallet,
-                    icon: model.icon(for: wallet),
-                    isSelected: model.toWalletId == wallet.id
-                ) {
-                    model.toWalletId = wallet.id
-                    closePanel()
-                }
-            }
-            .padding(.bottom, 8)
-        case .schedule:
-            scheduleChooser
-        case .start:
-            MonthCalendar(selection: $model.startDate, today: model.today)
-        case .end:
-            endChooser
-        case .holiday:
-            holidayChooser
-        case .closing:
-            closingChooser
-        case .remind:
-            remindChooser
-        }
-    }
-
     var scheduleChooser: some View {
         VStack(spacing: 14) {
             CapsulePicker(
@@ -289,11 +214,13 @@ private extension RecurringEditSheet {
             HStack(spacing: 8) {
                 SettingsChoice("終わりなし", isSelected: model.endDate == nil) {
                     model.endDate = nil
+
                     closePanel()
                 }
 
                 SettingsChoice("今日で終える", isSelected: isEndingToday) {
                     model.endDate = model.today
+
                     closePanel()
                 }
             }
@@ -339,6 +266,7 @@ private extension RecurringEditSheet {
                 isSelected: model.closingDay == nil
             ) {
                 model.closingDay = nil
+
                 closePanel()
             }
 
@@ -346,6 +274,7 @@ private extension RecurringEditSheet {
                 selection: model.closingDay.flatMap(MonthStartDay.init)
             ) { day in
                 model.closingDay = day.day
+
                 closePanel()
             }
         }
@@ -363,11 +292,90 @@ private extension RecurringEditSheet {
                     isSelected: model.remindDaysBefore == days
                 ) {
                     model.remindDaysBefore = days
+
                     closePanel()
                 }
             }
         }
         .padding(.bottom, 8)
+    }
+
+    @ViewBuilder
+    func drawerBody(_ panel: Panel) -> some View {
+        switch panel {
+        case .amount:
+            VStack(spacing: 10) {
+                Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+                    model.press(key)
+                }
+
+                PrimaryButton("決める") {
+                    closePanel()
+                }
+            }
+        case .category:
+            SettingsTileGrid(
+                items: model.categories,
+                columns: 5,
+                spacing: 5
+            ) { category in
+                SettingsCategoryTile(
+                    category: category,
+                    icon: model.icon(for: category),
+                    isSelected: model.categoryId == category.id
+                ) {
+                    model.select(category: category.id)
+                    closePanel()
+                }
+            }
+            .padding(.bottom, 8)
+        case .wallet:
+            SettingsTileGrid(
+                items: model.wallets,
+                columns: 3,
+                spacing: 8
+            ) { wallet in
+                SettingsWalletTile(
+                    wallet: wallet,
+                    icon: model.icon(for: wallet),
+                    isSelected: model.walletId == wallet.id
+                ) {
+                    model.walletId = wallet.id
+
+                    closePanel()
+                }
+            }
+            .padding(.bottom, 8)
+        case .destination:
+            SettingsTileGrid(
+                items: model.wallets,
+                columns: 3,
+                spacing: 8
+            ) { wallet in
+                SettingsWalletTile(
+                    wallet: wallet,
+                    icon: model.icon(for: wallet),
+                    isSelected: model.toWalletId == wallet.id
+                ) {
+                    model.toWalletId = wallet.id
+
+                    closePanel()
+                }
+            }
+            .padding(.bottom, 8)
+        case .schedule:
+            scheduleChooser
+        case .start:
+            MonthCalendar(selection: $model.startDate, today: model.today)
+        case .end:
+            endChooser
+        case .holiday:
+            holidayChooser
+        case .closing:
+            closingChooser
+        case .remind:
+            remindChooser
+        }
     }
 }
 
@@ -397,14 +405,6 @@ private extension RecurringEditSheet {
             .init("毎年", value: .yearly)
         ]
 
-    var namePrompt: String {
-        switch model.type {
-        case .expense: "名前（家賃・サブスクなど）"
-        case .income: "名前（給料・年金など）"
-        case .transfer: "名前（カードの引き落とし・積立など）"
-        }
-    }
-
     static let monthColumns = Array(
         repeating: GridItem(.flexible(), spacing: 6),
         count: 4
@@ -422,12 +422,21 @@ private extension RecurringEditSheet {
         )
     }
 
+    var namePrompt: String {
+        switch model.type {
+        case .expense: "名前（家賃・サブスクなど）"
+        case .income: "名前（給料・年金など）"
+        case .transfer: "名前（カードの引き落とし・積立など）"
+        }
+    }
+
     var headerTitle: String {
         model.isEditing ? "固定費を編集" : "固定費を追加"
     }
 
     var amountColor: Color {
         let isSet = model.amount > 0 || model.isCardBill
+
         return isSet ? Palette.accentStrong : Palette.hint
     }
 

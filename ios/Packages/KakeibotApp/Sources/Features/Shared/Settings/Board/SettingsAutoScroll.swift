@@ -22,6 +22,7 @@ extension SettingsAutoScroll {
         onStep: @escaping (CGFloat) -> Void
     ) {
         let lower = min(bottom ?? viewport.maxY, viewport.maxY)
+
         speed = Self.speed(y: y, top: viewport.minY, bottom: lower)
         self.onStep = onStep
 
@@ -40,7 +41,9 @@ extension SettingsAutoScroll {
     func stop() {
         speed = 0
         onStep = nil
+
         task?.cancel()
+
         task = nil
     }
 }
@@ -72,6 +75,7 @@ private extension SettingsAutoScroll {
 
             if delta != 0 {
                 offset = target
+
                 position.scrollTo(y: target)
                 onStep?(delta)
             }

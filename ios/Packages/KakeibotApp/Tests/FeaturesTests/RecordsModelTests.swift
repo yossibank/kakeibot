@@ -136,6 +136,7 @@ struct RecordsModelTests {
         let start = try #require(LocalDate("2026-09-01"))
         let past = try #require(LocalDate("2026-09-27"))
         let future = try #require(LocalDate("2026-10-27"))
+
         let draft = RecurringDraft(
             type: .expense,
             amount: 78000,
@@ -147,6 +148,7 @@ struct RecordsModelTests {
             day: 27,
             startDate: start
         )
+
         _ = try await setup.database.saveRecurring(
             draft,
             today: setup.today,
@@ -253,10 +255,12 @@ struct RecordsModelTests {
 
         model.setLayout(.list)
         await model.saveLayout()
+
         let reopened = RecordsModel(
             database: setup.database,
             today: setup.today
         )
+
         await reopened.loadLayout()
 
         #expect(reopened.layout == .list)

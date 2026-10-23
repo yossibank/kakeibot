@@ -65,10 +65,13 @@ public extension BackupModel {
         do {
             let data = try await data(of: kind, at: date)
             let name = Self.fileName(of: kind, at: date)
+
             file = BackupFile(kind: kind, data: data, name: name)
+
             return true
         } catch {
             errorNotice.show(Self.exportFailedMessage)
+
             return false
         }
     }
@@ -89,6 +92,7 @@ public extension BackupModel {
 
         guard case let .success(url) = result else {
             errorNotice.show(Self.readFailedMessage)
+
             return false
         }
 
@@ -102,6 +106,7 @@ public extension BackupModel {
 
         guard let data = try? Data(contentsOf: url) else {
             errorNotice.show(Self.readFailedMessage)
+
             return false
         }
 
@@ -112,9 +117,11 @@ public extension BackupModel {
     func read(_ data: Data) -> Bool {
         do {
             pending = try ExportV1(json: data)
+
             return true
         } catch {
             errorNotice.show(Self.readMessage(for: error))
+
             return false
         }
     }
@@ -136,6 +143,7 @@ public extension BackupModel {
 
         do {
             try await database.restoreBackup(pending)
+
             doneMessage = Self.restoredMessage
         } catch {
             errorNotice.show(Self.restoreFailedMessage)
@@ -167,9 +175,20 @@ private extension BackupModel {
         at date: Date
     ) -> String {
         let formatter = DateFormatter()
+
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
+
         return "kakeibot-\(formatter.string(from: date)).\(kind.rawValue)"
+    }
+
+    static func dayText(_ date: Date) -> String {
+        let formatter = DateFormatter()
+
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.dateFormat = "yyyy/M/d"
+
+        return formatter.string(from: date)
     }
 
     func data(
@@ -183,12 +202,5 @@ private extension BackupModel {
         case .csv:
             return try await database.spreadsheet()
         }
-    }
-
-    static func dayText(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ja_JP")
-        formatter.dateFormat = "yyyy/M/d"
-        return formatter.string(from: date)
     }
 }

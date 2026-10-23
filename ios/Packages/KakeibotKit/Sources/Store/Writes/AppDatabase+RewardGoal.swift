@@ -16,7 +16,9 @@ public extension AppDatabase {
         try await writer.write { db in
             guard let id else {
                 let goal = try draft.newGoal(at: now)
+
                 try goal.insert(db)
+
                 return goal
             }
 
@@ -25,7 +27,9 @@ public extension AppDatabase {
             }
 
             let updated = try draft.applied(to: goal, at: now)
+
             try updated.update(db)
+
             return updated
         }
     }
@@ -42,6 +46,7 @@ public extension AppDatabase {
 
             goal.purchasedAt = isPurchased ? now : nil
             goal.updatedAt = now
+
             try goal.update(db)
         }
     }

@@ -105,6 +105,7 @@ public extension WalletEditModel {
         let closing = payment.closingDay.map(RecurringText.closingNote)
         let amount = payment.amount > 0 ? AmountText.text(payment.amount) : nil
         let detail = closing ?? amount
+
         return [schedule, detail].compactMap(\.self).joined(separator: "・")
     }
 
@@ -153,9 +154,11 @@ public extension WalletEditModel {
             )
 
             await loadBalance()
+
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -198,13 +201,16 @@ public extension WalletEditModel {
 
             guard let wallet, let icon = list.icons[wallet.iconId] else {
                 errorNotice.show(Self.loadFailedMessage)
+
                 return
             }
 
             apply(WalletDraft(wallet, icon: icon))
             apply(list, to: wallet)
+
             isHidden = wallet.archivedAt != nil
             baseline = draft
+
             await loadPayment()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
@@ -245,6 +251,7 @@ public extension WalletEditModel {
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return nil
         }
     }
@@ -262,12 +269,15 @@ public extension WalletEditModel {
             )
 
             self.isHidden = isHidden
+
             return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {
             errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
+
             return false
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -281,7 +291,9 @@ public extension WalletEditModel {
             return try await database.deleteWallet(editingId)
         } catch {
             let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
+
             errorNotice.show(message)
+
             return nil
         }
     }
@@ -322,7 +334,9 @@ private extension WalletEditModel {
     func apply(_ draft: WalletDraft) {
         name = draft.name
         kind = draft.kind
+
         icon.apply(draft.icon)
+
         isNegative = draft.initialBalance < 0
         calculator = AmountCalculator(amount: abs(draft.initialBalance))
     }

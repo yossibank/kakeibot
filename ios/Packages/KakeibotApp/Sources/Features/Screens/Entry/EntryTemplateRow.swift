@@ -45,6 +45,7 @@ private extension EntryTemplateRow {
         let isApplied = model.isApplied(template)
         let icon = model.icon(for: template)
         let amount = template.amount.map { AmountText.text($0) } ?? "入力"
+
         let amountColor = template.amount == nil
             ? Palette.subtext
             : Palette.accentStrong

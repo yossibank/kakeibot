@@ -5,6 +5,7 @@ extension EntryList {
     func title(of recurring: Recurring) -> String? {
         let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
         let category = recurring.categoryId.flatMap { categories[$0] }
+
         return memo ?? category?.name
     }
 
@@ -27,6 +28,7 @@ extension EntryList {
         on date: LocalDate
     ) -> Int {
         let entries = days.flatMap(\.entries)
+
         return recurring.amount(paidOn: date, entries: entries)
     }
 

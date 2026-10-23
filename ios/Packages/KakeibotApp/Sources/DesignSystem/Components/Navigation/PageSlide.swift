@@ -24,6 +24,7 @@ public extension PageSlide {
         let fade = Double(abs(x) / fadeDistance)
 
         var transaction = Transaction()
+
         transaction.disablesAnimations = true
 
         withTransaction(transaction) {
@@ -65,6 +66,7 @@ public extension PageSlide {
 
             withTransaction(transaction) {
                 change()
+
                 slide.wrappedValue = PageSlide(offset: entry, opacity: 0)
             }
 

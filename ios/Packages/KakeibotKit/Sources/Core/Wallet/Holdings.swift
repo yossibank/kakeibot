@@ -42,6 +42,7 @@ public extension Holdings {
     ) {
         func total(_ role: Wallet.Kind.Role) -> Int {
             let wallets = wallets.filter { $0.kind.role == role }
+
             return Wallet.totalBalance(
                 of: wallets,
                 with: entries,

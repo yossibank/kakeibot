@@ -8,11 +8,13 @@ struct ThemeEditModelTests {
     @Test
     func choosesNewTheme() async throws {
         let setup = try await HomeModelTests.Setup()
+
         let model = ThemeEditModel(
             database: setup.database,
             editing: nil,
             base: ThemePreset.forest.palette
         )
+
         model.draft.name = "森の夜"
 
         let isSaved = await model.save()
@@ -27,6 +29,7 @@ struct ThemeEditModelTests {
     @Test
     func keepsTextReadableWhenBackgroundChanges() async throws {
         let setup = try await HomeModelTests.Setup()
+
         let model = ThemeEditModel(
             database: setup.database,
             editing: nil,
@@ -42,6 +45,7 @@ struct ThemeEditModelTests {
     @Test
     func disablesUnreadableSwatches() async throws {
         let setup = try await HomeModelTests.Setup()
+
         let model = ThemeEditModel(
             database: setup.database,
             editing: nil,
@@ -58,11 +62,13 @@ struct ThemeEditModelTests {
     @Test
     func blocksUnreadableColors() async throws {
         let setup = try await HomeModelTests.Setup()
+
         let model = ThemeEditModel(
             database: setup.database,
             editing: nil,
             base: .night
         )
+
         model.draft.name = "読めない"
         model.draft.text = model.draft.background
 

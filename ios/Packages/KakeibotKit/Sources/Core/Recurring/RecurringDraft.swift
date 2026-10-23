@@ -153,6 +153,7 @@ public extension RecurringDraft {
         let fields = try validated()
 
         var updated = recurring
+
         updated.type = type
         updated.amount = savedAmount
         updated.categoryId = fields.categoryId
@@ -168,6 +169,7 @@ public extension RecurringDraft {
         updated.endDate = endDate
         updated.remindDaysBefore = remindDaysBefore
         updated.updatedAt = now
+
         return updated
     }
 }
@@ -212,6 +214,7 @@ private extension RecurringDraft {
 
     var trimmedMemo: String? {
         let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
+
         return trimmed.isEmpty ? nil : trimmed
     }
 

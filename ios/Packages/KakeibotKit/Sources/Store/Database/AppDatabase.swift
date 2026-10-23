@@ -23,15 +23,20 @@ public extension AppDatabase {
         let pool = try DatabasePool(path: path, configuration: configuration)
         let database = try AppDatabase(pool)
         let now = Date()
+
         try database.insertDefaultsIfEmpty(at: now)
         try database.insertShelfIfEmpty(at: now)
+
         return database
     }
 
     static func appGroupForReading() throws -> AppDatabase {
         var configuration = configuration
-        configuration.readonly = true
+
         let path = try groupPath()
+
+        configuration.readonly = true
+
         let pool = try DatabasePool(path: path, configuration: configuration)
 
         let isMigrated = try pool.read { db in
@@ -47,6 +52,7 @@ public extension AppDatabase {
 
     static func inMemory() throws -> AppDatabase {
         let queue = try DatabaseQueue(configuration: configuration)
+
         return try AppDatabase(queue)
     }
 
@@ -68,6 +74,7 @@ public extension AppDatabase {
 extension AppDatabase {
     static var migrator: DatabaseMigrator {
         var migrator = DatabaseMigrator()
+
         migrator.registerMigration("v1", migrate: MigrationV1.migrate)
         migrator.registerMigration("v2", migrate: MigrationV2.migrate)
         migrator.registerMigration("v3", migrate: MigrationV3.migrate)
@@ -86,6 +93,7 @@ extension AppDatabase {
         migrator.registerMigration("v17", migrate: MigrationV17.migrate)
         migrator.registerMigration("v18", migrate: MigrationV18.migrate)
         migrator.registerMigration("v19", migrate: MigrationV19.migrate)
+
         return migrator
     }
 }
@@ -104,7 +112,9 @@ private extension AppDatabase {
 
     static var configuration: Configuration {
         var configuration = Configuration()
+
         configuration.observesSuspensionNotifications = true
+
         return configuration
     }
 
@@ -122,6 +132,7 @@ private extension AppDatabase {
         }
 
         let url = directory.appending(path: fileName)
+
         return url.path(percentEncoded: false)
     }
 }

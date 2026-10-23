@@ -83,7 +83,6 @@ private extension RingButton {
 #Preview {
     HStack(spacing: 24) {
         RingButton(systemImage: "xmark") {}
-
         RingButton(systemImage: "checkmark", style: .prominent) {}
 
         RingButton(

@@ -41,6 +41,7 @@ public extension RewardBank {
             .sorted { left, right in
                 let leftDate = left.purchasedAt ?? .distantPast
                 let rightDate = right.purchasedAt ?? .distantPast
+
                 return leftDate > rightDate
             }
     }
@@ -63,6 +64,7 @@ public extension RewardBank {
         }
 
         let ratio = Double(balance) / Double(goal.targetAmount)
+
         return min(max(ratio, 0), 1)
     }
 

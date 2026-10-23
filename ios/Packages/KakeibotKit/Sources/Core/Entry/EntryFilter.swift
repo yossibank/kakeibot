@@ -31,6 +31,7 @@ public extension EntryFilter {
         }
 
         let entries = days.flatMap(\.entries).filter(includes)
+
         return EntryDay.grouping(entries)
     }
 }

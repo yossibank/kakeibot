@@ -11,7 +11,9 @@ enum MigrationV2 {
             table.column("color", .text).notNull()
             table.column("created_at", .text).notNull()
             table.column("updated_at", .text).notNull()
+
             let hasLook = "emoji IS NOT NULL OR text IS NOT NULL OR glyph IS NOT NULL"
+
             table.check(sql: hasLook)
         }
 

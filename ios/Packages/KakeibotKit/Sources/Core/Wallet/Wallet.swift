@@ -2,6 +2,7 @@ import Foundation
 
 public struct Wallet: Hashable, Sendable {
     public let id: ID
+
     public var name: String
     public var kind: Kind
     public var iconId: Icon.ID
@@ -54,6 +55,7 @@ extension Wallet: Identifiable {}
 extension Wallet: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(kind, forKey: .kind)

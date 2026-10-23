@@ -2,6 +2,7 @@ import Foundation
 
 public struct EntryCategory: Hashable, Sendable {
     public let id: ID
+
     public var kind: Kind
     public var name: String
     public var iconId: Icon.ID
@@ -45,6 +46,7 @@ extension EntryCategory: Identifiable {}
 extension EntryCategory: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
         try container.encode(id, forKey: .id)
         try container.encode(kind, forKey: .kind)
         try container.encode(name, forKey: .name)

@@ -17,8 +17,9 @@ public struct RecurringListView: View {
     @State private var hiddenList: SettingsScreenFlag
 
     public init(model: RecurringListModel) {
-        _model = State(initialValue: model)
         let hintFlag = model.hintFlag()
+
+        _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
         _hiddenList = State(initialValue: model.hiddenListFlag())
     }
@@ -26,7 +27,6 @@ public struct RecurringListView: View {
     public var body: some View {
         VStack(spacing: 14) {
             SettingsBackHeader("固定費", hint: hintFlag)
-
             SettingsHint(flag: hintFlag, lines: hint)
 
             ScrollView {
@@ -295,7 +295,6 @@ private extension RecurringListView {
                             .lineLimit(2)
 
                         Spacer(minLength: 8)
-
                         AmountText(row.amount, type: row.type)
                     }
 
@@ -340,8 +339,10 @@ private extension RecurringListView {
         case edit(Recurring.ID)
     }
 
-    static let rowHeight: CGFloat = 84
     nonisolated static let space = "RecurringList"
+
+    static let rowHeight: CGFloat = 84
+
     static let grid = SettingsBoardGrid(
         columns: 1,
         itemHeight: rowHeight,
@@ -364,6 +365,16 @@ private extension RecurringListView {
                 .init("hand.point.left", "横に払うと、止めると削除のボタンが出ます")
             ]
         }
+    }
+
+    static func nextText(_ row: RecurringListModel.Row) -> String {
+        guard let date = row.next else {
+            return "終わりました"
+        }
+
+        let next = "次は \(date.month)/\(date.day)"
+
+        return [row.closing, next].compactMap(\.self).joined(separator: "・")
     }
 
     func boardHeight(count: Int) -> CGFloat {
@@ -455,15 +466,6 @@ private extension RecurringListView {
         }
 
         show(id)
-    }
-
-    static func nextText(_ row: RecurringListModel.Row) -> String {
-        guard let date = row.next else {
-            return "終わりました"
-        }
-
-        let next = "次は \(date.month)/\(date.day)"
-        return [row.closing, next].compactMap(\.self).joined(separator: "・")
     }
 }
 

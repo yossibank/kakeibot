@@ -100,7 +100,6 @@ private extension ReviewView {
     var periodBar: some View {
         HStack {
             periodButton(systemImage: "chevron.left", count: -1)
-
             Spacer()
 
             VStack(spacing: 1) {
@@ -412,12 +411,6 @@ private extension ReviewView {
         Self.changeColor(model.change, of: model.kind)
     }
 
-    func recurringText(_ recurring: Int) -> String {
-        let other = model.total(of: model.kind) - recurring
-        let fixed = "固定費 \(AmountText.text(recurring))"
-        return "\(fixed)・それ以外 \(AmountText.text(other))"
-    }
-
     var comparisonText: String {
         let previous = Self.previousName(of: model.scale)
         let change = model.change
@@ -451,6 +444,7 @@ private extension ReviewView {
         }
 
         let isGood = kind == .expense ? change < 0 : change > 0
+
         return isGood ? Palette.accent : Palette.rose
     }
 
@@ -470,10 +464,22 @@ private extension ReviewView {
         }
     }
 
+    static func count(of direction: PageSwipeDirection) -> Int {
+        direction == .forward ? 1 : -1
+    }
+
+    func recurringText(_ recurring: Int) -> String {
+        let other = model.total(of: model.kind) - recurring
+        let fixed = "固定費 \(AmountText.text(recurring))"
+
+        return "\(fixed)・それ以外 \(AmountText.text(other))"
+    }
+
     func balanceRatio(of amount: Int) -> Double {
         let income = model.summary.income.total
         let expense = model.summary.expense.total
         let largest = max(income, expense)
+
         return largest > 0 ? Double(amount) / Double(largest) : 0
     }
 
@@ -498,13 +504,16 @@ private extension ReviewView {
         }
 
         self.pendingDay = nil
+
         onOpenDay(pendingDay)
     }
 
     func openPendingEntry() {
         if let pendingRecurring {
             self.pendingRecurring = nil
+
             onOpenRecurring(pendingRecurring)
+
             return
         }
 
@@ -513,6 +522,7 @@ private extension ReviewView {
         }
 
         self.pendingEntry = nil
+
         onOpenEntry(pendingEntry)
     }
 
@@ -522,10 +532,6 @@ private extension ReviewView {
 
     func canMove(_ direction: PageSwipeDirection) -> Bool {
         model.canMove(by: Self.count(of: direction))
-    }
-
-    static func count(of direction: PageSwipeDirection) -> Int {
-        direction == .forward ? 1 : -1
     }
 
     func move(by count: Int) {

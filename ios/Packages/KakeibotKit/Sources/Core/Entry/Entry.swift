@@ -2,6 +2,7 @@ import Foundation
 
 public struct Entry: Hashable, Sendable {
     public let id: ID
+
     public var type: Kind
     public var amount: Int
     public var date: LocalDate
@@ -67,6 +68,7 @@ extension Entry: Identifiable {}
 extension Entry: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
         try container.encode(id, forKey: .id)
         try container.encode(type, forKey: .type)
         try container.encode(amount, forKey: .amount)

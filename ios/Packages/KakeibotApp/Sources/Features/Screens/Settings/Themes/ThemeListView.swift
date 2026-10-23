@@ -22,9 +22,11 @@ public struct ThemeListView: View {
         appIcon: AppIconListModel
     ) {
         let model = ThemeListModel(database: database, appIcon: appIcon)
-        _model = State(initialValue: model)
         let hintFlag = SettingsScreenFlag.closedHint(.themes, in: database)
+
+        _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
+
         self.database = database
         self.appIcon = appIcon
     }
@@ -42,11 +44,8 @@ public struct ThemeListView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
                         section("ライト", isLight: true)
-
                         section("ダーク", isLight: false)
-
                         customSection
-
                         systemSection
                     }
                     .padding(.vertical, 8)
@@ -147,7 +146,6 @@ private extension ThemeListView {
                     .mask {
                         HStack(spacing: 0) {
                             Color.clear
-
                             Color.black
                         }
                     }
@@ -255,6 +253,7 @@ private extension ThemeListView {
                                 minimumDuration: Self.menuPressDuration
                             ) {
                                 let space = CoordinateSpace.named(Self.space)
+
                                 let menu = Menu(
                                     choice: choice,
                                     palette: palette,
@@ -346,6 +345,7 @@ private extension ThemeListView {
                 systemImage: "plus.square.on.square"
             ) {
                 closeMenu()
+
                 editing = .new(base: menu.palette)
             }
 
@@ -357,6 +357,7 @@ private extension ThemeListView {
                     systemImage: "square.and.pencil"
                 ) {
                     closeMenu()
+
                     editing = .edit(theme)
                 }
             }
@@ -418,6 +419,7 @@ private extension ThemeListView {
 
     var suggestionMessage: String {
         let title = model.suggestedIcon?.title ?? ""
+
         return "アプリアイコンも\(title)にできます"
     }
 
@@ -444,6 +446,7 @@ private extension ThemeListView {
     func menuX(for menu: Menu) -> CGFloat {
         let preferred = menu.frame.midX - Self.menuWidth / 2
         let limit = size.width - Self.menuWidth - Self.menuInset
+
         return min(max(preferred, Self.menuInset), limit)
     }
 
@@ -471,10 +474,12 @@ private extension ThemeListView {
     static let menuInset: CGFloat = 18
     static let menuGap: CGFloat = 10
     static let menuPressDuration = 0.4
+
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: 12),
         count: 3
     )
+
     static let hint: [SettingsHint.Line] = [
         .init("hand.tap", "押すと、そのテーマに切り替わります"),
         .init("plus.square.on.square", "長押しで、その色をもとにつくれます")

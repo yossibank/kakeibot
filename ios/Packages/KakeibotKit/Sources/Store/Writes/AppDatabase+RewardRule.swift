@@ -49,6 +49,7 @@ public extension AppDatabase {
 
             rule.isActive = !isHidden
             rule.updatedAt = now
+
             try rule.update(db)
         }
     }
@@ -69,6 +70,7 @@ public extension AppDatabase {
 
             try logs.deleteAll(db)
             try rule.delete(db)
+
             return deletion
         }
     }
@@ -90,6 +92,7 @@ private extension AppDatabase {
 
         try icon.insert(db)
         try rule.insert(db)
+
         return rule
     }
 
@@ -108,8 +111,11 @@ private extension AppDatabase {
         }
 
         try draft.applied(to: icon, at: now).update(db)
+
         let updated = try draft.applied(to: rule, at: now)
+
         try updated.update(db)
+
         return updated
     }
 }

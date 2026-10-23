@@ -97,6 +97,7 @@ private extension AppDatabase {
             into: db,
             at: now
         )
+
         try insertCategories(incomeCategories, kind: .income, into: db, at: now)
     }
 
@@ -174,6 +175,7 @@ private extension AppDatabase {
         )
 
         try icon.insert(db)
+
         return icon
     }
 }

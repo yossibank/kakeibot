@@ -168,6 +168,7 @@ private extension TemplateShelfSheet {
 
     func use(_ template: EntryTemplate) {
         isSearching = false
+
         onUse(template)
     }
 }

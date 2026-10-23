@@ -17,6 +17,7 @@ public struct MonthCalendar: View {
     ) {
         _selection = selection
         _month = State(initialValue: selection.wrappedValue.yearMonth)
+
         self.today = today
         self.weekStart = weekStart
     }
@@ -25,7 +26,6 @@ public struct MonthCalendar: View {
         VStack(spacing: 6) {
             HStack {
                 monthButton(systemImage: "chevron.left", months: -1)
-
                 Spacer()
 
                 Text(monthTitle)
@@ -33,7 +33,6 @@ public struct MonthCalendar: View {
                     .foregroundStyle(Palette.accentStrong)
 
                 Spacer()
-
                 monthButton(systemImage: "chevron.right", months: 1)
             }
 
@@ -92,9 +91,11 @@ private extension MonthCalendar {
         if let date {
             let isSelected = date == selection
             let weight: Font.Weight = isSelected ? .semibold : .regular
+
             let ring = date == today && !isSelected
                 ? Palette.accent
                 : Color.clear
+
             let holiday = Holiday.name(of: date)
 
             Button {
@@ -132,6 +133,10 @@ private extension MonthCalendar {
 }
 
 private extension MonthCalendar {
+    static let rowCount = 6
+    static let swipeDistance: CGFloat = 50
+    static let cellHeight: CGFloat = 46
+
     var swipe: some Gesture {
         DragGesture(minimumDistance: 20)
             .onEnded { value in
@@ -152,16 +157,13 @@ private extension MonthCalendar {
         let weeks = month.weeks(startingOn: weekStart)
         let blank = [LocalDate?](repeating: nil, count: 7)
         let missing = max(Self.rowCount - weeks.count, 0)
+
         return weeks + Array(repeating: blank, count: missing)
     }
 
     var monthTitle: String {
         "\(month.year)年 \(month.month)月"
     }
-
-    static let rowCount = 6
-    static let swipeDistance: CGFloat = 50
-    static let cellHeight: CGFloat = 46
 
     static func headerColor(for weekday: Weekday) -> Color {
         weekday.tint ?? Palette.subtext
