@@ -117,7 +117,13 @@ private extension HomeView {
 
                     HStack(spacing: 16) {
                         Text("予算 \(AmountText.text(usage.budget))")
-                        Text("1 日あたり \(AmountText.text(usage.perDay))")
+
+                        if usage.isOver {
+                            Text(usage.remainingText)
+                                .foregroundStyle(usage.tint)
+                        } else {
+                            Text("1 日あたり \(AmountText.text(usage.perDay))")
+                        }
                     }
                     .textFont(.caption)
                     .monospacedDigit()

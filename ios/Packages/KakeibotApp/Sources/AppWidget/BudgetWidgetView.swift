@@ -79,10 +79,10 @@ private extension BudgetWidgetView {
             .frame(maxWidth: .infinity)
 
             VStack(alignment: .leading, spacing: 0) {
-                let focus = focus(of: summary)
+                let today = summary.today
 
                 HStack(alignment: .firstTextBaseline) {
-                    Text(focus.title)
+                    Text(today.title)
                         .textFont(size: .caption)
                         .foregroundStyle(Palette.subtext)
 
@@ -90,21 +90,18 @@ private extension BudgetWidgetView {
                     days(of: summary)
                 }
 
-                Text(AmountText.text(focus.amount))
+                Text(today.text)
                     .displayFont(.title, weight: .bold)
                     .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
+                    .foregroundStyle(todayColor(today, otherwise: Palette.accentStrong))
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
                     .privacySensitive()
 
-                Spacer(minLength: 8)
-
                 Rectangle()
                     .fill(Palette.line)
                     .frame(height: 1)
-
-                Spacer(minLength: 8)
+                    .padding(.vertical, 12)
 
                 VStack(spacing: 8) {
                     ForEach(rows(of: summary)) { row in
@@ -125,6 +122,8 @@ private extension BudgetWidgetView {
                         }
                     }
                 }
+
+                Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity)
         }
@@ -178,19 +177,19 @@ private extension BudgetWidgetView {
                 .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity)
         } else {
-            let focus = focus(of: summary)
+            let today = summary.today
 
             HStack(alignment: .firstTextBaseline) {
-                Text(focus.title)
+                Text(today.title)
                     .textFont(size: .caption)
                     .foregroundStyle(Palette.subtext)
 
                 Spacer(minLength: 4)
 
-                Text(AmountText.text(focus.amount))
+                Text(today.text)
                     .textFont(size: .small, weight: .semibold)
                     .monospacedDigit()
-                    .foregroundStyle(Palette.text)
+                    .foregroundStyle(todayColor(today, otherwise: Palette.text))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                     .privacySensitive()
@@ -235,14 +234,11 @@ private extension BudgetWidgetView {
         return usage.tint
     }
 
-    func focus(of summary: BudgetWidgetSummary) -> Row {
-        guard let usage = summary.usage else {
-            return Row(title: "今日の支出", amount: summary.todayExpense)
-        }
-
-        let left = usage.todayRemaining(spentToday: summary.todayExpense)
-
-        return Row(title: "今日あと", amount: left)
+    func todayColor(
+        _ today: BudgetWidgetSummary.Today,
+        otherwise color: Color
+    ) -> Color {
+        today.isOver ? Palette.rose : color
     }
 
     func rows(of summary: BudgetWidgetSummary) -> [Row] {

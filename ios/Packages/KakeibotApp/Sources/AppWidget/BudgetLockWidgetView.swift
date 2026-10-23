@@ -132,13 +132,9 @@ private extension BudgetLockWidgetView {
     }
 
     func detail(of summary: BudgetWidgetSummary) -> String {
-        guard let usage = summary.usage else {
-            return "今日の支出 \(AmountText.text(summary.todayExpense))"
-        }
+        let today = summary.today
 
-        let left = usage.todayRemaining(spentToday: summary.todayExpense)
-
-        return "今日あと \(AmountText.text(left))"
+        return "\(today.title) \(today.text)"
     }
 
     func shortAmount(_ amount: Int) -> String {
