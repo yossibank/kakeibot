@@ -440,8 +440,19 @@ private extension MainView {
                 sheet = .new
             case let .recurring(id):
                 sheet = .recurring(id)
+            case let .template(id):
+                tab = .home
+                sheet = await templateSheet(id)
             }
         }
+    }
+
+    func templateSheet(_ id: EntryTemplate.ID) async -> Sheet? {
+        let templates = await (try? database.templates()) ?? []
+
+        return templates
+            .first { $0.id == id }
+            .map { .template($0) }
     }
 
     func useTemplate(_ template: EntryTemplate) {

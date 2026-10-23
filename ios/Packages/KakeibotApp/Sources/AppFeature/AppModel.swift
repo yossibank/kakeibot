@@ -120,12 +120,18 @@ extension AppModel {
     }
 
     func observeWidgets(in database: AppDatabase) async {
-        do {
-            for try await _ in database.monthOverviewUpdates(on: today) {
-                reloadWidgets()
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observeOverviewForWidgets(in: database)
             }
-        } catch {
-            return
+
+            group.addTask {
+                await self.observeTemplatesForWidgets(in: database)
+            }
+
+            group.addTask {
+                await self.observeTemplateOrderForWidgets(in: database)
+            }
         }
     }
 
@@ -164,6 +170,36 @@ private extension AppModel {
             for try await style in database.styleUpdates() {
                 self.style = style
 
+                reloadWidgets()
+            }
+        } catch {
+            return
+        }
+    }
+
+    func observeOverviewForWidgets(in database: AppDatabase) async {
+        do {
+            for try await _ in database.monthOverviewUpdates(on: today) {
+                reloadWidgets()
+            }
+        } catch {
+            return
+        }
+    }
+
+    func observeTemplatesForWidgets(in database: AppDatabase) async {
+        do {
+            for try await _ in database.templateUpdates() {
+                reloadWidgets()
+            }
+        } catch {
+            return
+        }
+    }
+
+    func observeTemplateOrderForWidgets(in database: AppDatabase) async {
+        do {
+            for try await _ in database.settingUpdates(.templateOrder) {
                 reloadWidgets()
             }
         } catch {

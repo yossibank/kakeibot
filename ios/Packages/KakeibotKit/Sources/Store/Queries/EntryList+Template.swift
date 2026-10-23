@@ -7,6 +7,14 @@ public extension EntryList {
         return category.flatMap { icons[$0.iconId] }
     }
 
+    func detailParts(for template: EntryTemplate) -> [String?] {
+        let category = categories[template.categoryId]?.name
+        let tag = template.tagId.flatMap { tags[$0]?.name }
+        let wallet = wallets[template.walletId]?.name
+
+        return [category, tag, wallet]
+    }
+
     func ordered(
         _ templates: [EntryTemplate],
         by order: TemplateOrder,

@@ -28,6 +28,7 @@ public extension PlannedNotification {
         case home
         case entry(LocalDate)
         case recurring(Recurring.ID)
+        case template(EntryTemplate.ID)
     }
 
     var identifier: String {
@@ -42,6 +43,7 @@ public extension PlannedNotification.Route {
         case .home: "home"
         case let .entry(date): "entry/\(date)"
         case let .recurring(id): "recurring/\(id)"
+        case let .template(id): "template/\(id)"
         }
     }
 
@@ -71,6 +73,12 @@ public extension PlannedNotification.Route {
             }
 
             self = .recurring(id)
+        case "template":
+            guard let id = EntryTemplate.ID(parts[1]) else {
+                return nil
+            }
+
+            self = .template(id)
         default:
             return nil
         }

@@ -67,10 +67,13 @@ struct NotificationPlanTests {
         let id = Recurring.ID()
         let entry = PlannedNotification.Route.entry(date)
         let recurring = PlannedNotification.Route.recurring(id)
+        let template = PlannedNotification.Route.template(EntryTemplate.ID())
 
         #expect(entry.link == "entry/2026-10-18")
         #expect(PlannedNotification.Route(link: entry.link) == entry)
         #expect(PlannedNotification.Route(link: recurring.link) == recurring)
+        #expect(PlannedNotification.Route(link: template.link) == template)
+        #expect(PlannedNotification.Route(link: "template/x") == nil)
         #expect(PlannedNotification.Route(link: "entry/2026-13-01") == nil)
         #expect(PlannedNotification.Route(link: "budget/1") == nil)
         #expect(PlannedNotification.Route(link: "entry") == nil)
