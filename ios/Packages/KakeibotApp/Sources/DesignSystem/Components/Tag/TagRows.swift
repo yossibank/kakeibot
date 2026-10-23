@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct TagRows<ID: Hashable>: View {
+public struct TagRows<ID: Hashable & Sendable>: View {
     @State private var width: CGFloat = 0
 
     let tags: [TagLine<ID>.Item]

@@ -62,7 +62,6 @@ public extension SettingsScreenFlag {
         isLoaded = true
     }
 
-    @discardableResult
     func set(_ isOn: Bool) -> Task<Void, Never> {
         self.isOn = isOn
 

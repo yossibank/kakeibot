@@ -21,7 +21,7 @@ public struct AmountText: View {
 }
 
 public extension AmountText {
-    static func text(
+    nonisolated static func text(
         _ amount: Int,
         type: Entry.Kind? = nil
     ) -> String {
@@ -32,7 +32,7 @@ public extension AmountText {
 }
 
 private extension AmountText {
-    static let locale = Locale(identifier: "ja_JP")
+    nonisolated static let locale = Locale(identifier: "ja_JP")
 
     var color: Color {
         switch type {
@@ -42,7 +42,7 @@ private extension AmountText {
         }
     }
 
-    static func sign(
+    nonisolated static func sign(
         of amount: Int,
         type: Entry.Kind?
     ) -> String {

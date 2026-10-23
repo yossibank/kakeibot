@@ -268,7 +268,7 @@ private extension ReminderView {
 
     func noticeRow(_ notice: PlannedNotification) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text("\(notice.date.month)/\(notice.date.day) \(notice.time)")
+            Text("\(notice.date.month)/\(notice.date.day) \(notice.time.description)")
                 .textFont(.caption)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accent)

@@ -1,3 +1,4 @@
+import Core
 import SwiftUI
 
 public struct SwipeRow<ID: Hashable, Content: View>: View {
