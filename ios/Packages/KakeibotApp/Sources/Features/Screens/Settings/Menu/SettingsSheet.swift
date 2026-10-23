@@ -12,7 +12,6 @@ public struct SettingsSheet: View {
     @State private var theme: ThemeChoice = .system
     @State private var customThemes: [Theme] = []
     @State private var appIcon = AppIconListModel()
-    @State private var buddy = BuddyProfile(buddy: .dial, customName: "")
 
     #if DEBUG
     @State private var isConfirmingSample = false
@@ -200,20 +199,6 @@ public struct SettingsSheet: View {
                                         shortValue: themeStyle.shortTitle
                                     )
                                 }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    BuddyView(
-                                        model: BuddyModel(database: database)
-                                    )
-                                } label: {
-                                    row(
-                                        "キャラクター",
-                                        systemImage: "face.smiling",
-                                        value: buddyTitle
-                                    )
-                                }
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14)
@@ -333,9 +318,6 @@ public struct SettingsSheet: View {
         }
         .task {
             await observeLaunchScreen()
-        }
-        .task {
-            await observeBuddy()
         }
         .task {
             let starts = try? await database.setting(.entryStartsWithAmount)
@@ -489,10 +471,6 @@ private extension SettingsSheet {
         reminderTime?.description ?? "オフ"
     }
 
-    var buddyTitle: String {
-        buddy.buddy == nil ? "出さない" : buddy.name
-    }
-
     var startsWithAmountBinding: Binding<Bool> {
         Binding {
             startsWithAmount
@@ -517,16 +495,6 @@ private extension SettingsSheet {
             Task {
                 try? await database.setSetting(.weekStart, to: day)
             }
-        }
-    }
-
-    func observeBuddy() async {
-        do {
-            for try await profile in database.buddyProfileUpdates() {
-                buddy = profile
-            }
-        } catch {
-            buddy = BuddyProfile(buddy: .dial, customName: "")
         }
     }
 
