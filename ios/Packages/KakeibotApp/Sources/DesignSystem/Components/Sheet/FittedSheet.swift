@@ -64,6 +64,7 @@ final class FittedDetentController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
         isAppeared = true
     }
 }
@@ -75,6 +76,7 @@ private extension FittedDetentController {
         }
 
         let height = height
+
         let change = {
             sheet.detents = [.custom { _ in height }]
         }

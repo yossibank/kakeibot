@@ -21,6 +21,7 @@ public extension AppDatabase {
             )
 
             try stamp.insert(db)
+
             return stamp
         }
     }

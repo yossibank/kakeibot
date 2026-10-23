@@ -2,6 +2,7 @@ import Foundation
 
 public struct NoSpendDay: Hashable, Sendable {
     public let date: LocalDate
+
     public var createdAt: Date
 
     public init(

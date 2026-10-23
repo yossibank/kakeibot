@@ -215,6 +215,7 @@ private extension EntryWalletSheet {
         }
 
         let period = chosen.period.map(RecurringText.period) ?? ""
+
         return "\(period) の利用分として、\(day) に引き落とされます"
     }
 

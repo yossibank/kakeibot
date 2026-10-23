@@ -42,12 +42,14 @@ public extension MonthStartDayModel {
 
     func choose(_ startDay: MonthStartDay) async {
         let previous = self.startDay
+
         self.startDay = startDay
 
         do {
             try await database.setSetting(.monthStartDay, to: startDay)
         } catch {
             self.startDay = previous
+
             errorNotice.show(Self.saveFailedMessage)
         }
     }

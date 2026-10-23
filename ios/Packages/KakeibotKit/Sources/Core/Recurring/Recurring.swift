@@ -2,6 +2,7 @@ import Foundation
 
 public struct Recurring: Hashable, Sendable {
     public let id: ID
+
     public var type: Entry.Kind
     public var amount: Int
     public var categoryId: EntryCategory.ID?
@@ -110,6 +111,7 @@ extension Recurring: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
         let shift = try container.decodeIfPresent(
             HolidayShift.self,
             forKey: .holidayShift
@@ -162,6 +164,7 @@ extension Recurring: Codable {
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
         try container.encode(id, forKey: .id)
         try container.encode(type, forKey: .type)
         try container.encode(amount, forKey: .amount)

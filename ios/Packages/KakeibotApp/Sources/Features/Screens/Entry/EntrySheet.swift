@@ -30,6 +30,7 @@ public struct EntrySheet: View {
         onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+
         self.onChange = onChange
     }
 
@@ -164,30 +165,6 @@ private extension EntrySheet {
         }
     }
 
-    func payOffButton(_ remaining: Int) -> some View {
-        Button {
-            withAnimation(.snappy) {
-                model.payOffLoan()
-            }
-        } label: {
-            Label(
-                "残り \(AmountText.text(remaining)) をまとめて返す",
-                systemImage: "checkmark.seal"
-            )
-            .textFont(.footnote)
-            .foregroundStyle(Palette.accent)
-            .padding(.horizontal, 16)
-            .frame(minHeight: 40)
-            .overlay {
-                Capsule()
-                    .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
-            }
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .transition(.opacity)
-    }
-
     var categoryArea: some View {
         VStack(spacing: 14) {
             EntryTemplateRow(
@@ -217,9 +194,7 @@ private extension EntrySheet {
             }
 
             Spacer()
-
             CapsulePicker(selection: typeBinding, options: Self.typeOptions)
-
             Spacer()
 
             if model.isEditing {
@@ -428,6 +403,30 @@ private extension EntrySheet {
             .transition(Self.memoTransition)
     }
 
+    func payOffButton(_ remaining: Int) -> some View {
+        Button {
+            withAnimation(.snappy) {
+                model.payOffLoan()
+            }
+        } label: {
+            Label(
+                "残り \(AmountText.text(remaining)) をまとめて返す",
+                systemImage: "checkmark.seal"
+            )
+            .textFont(.footnote)
+            .foregroundStyle(Palette.accent)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 40)
+            .overlay {
+                Capsule()
+                    .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .transition(.opacity)
+    }
+
     func categoryGrid(_ page: [EntryModel.CategoryCell]) -> some View {
         Grid(
             horizontalSpacing: Self.categorySpacing,
@@ -624,18 +623,21 @@ private extension EntrySheet {
         }
     }
 
+    nonisolated static let coordinateSpace = "EntrySheet"
+
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income),
         .init("振替", value: .transfer)
     ]
 
-    nonisolated static let coordinateSpace = "EntrySheet"
     static let memoCardInset: CGFloat = 12
+
     static let drawerShape = UnevenRoundedRectangle(
         topLeadingRadius: 28,
         topTrailingRadius: 28
     )
+
     static let dialMinSize: CGFloat = 240
     static let fade: CGFloat = 20
     static let categoryRows = 3
@@ -648,6 +650,7 @@ private extension EntrySheet {
 
     static var pagerHeight: CGFloat {
         let rows = CGFloat(categoryRows)
+
         return categoryHeight * rows + categorySpacing * (rows - 1)
     }
 
@@ -685,6 +688,7 @@ private extension EntrySheet {
             },
             set: { type in
                 var transaction = Transaction()
+
                 transaction.disablesAnimations = true
 
                 withTransaction(transaction) {
@@ -705,6 +709,7 @@ private extension EntrySheet {
 
     func open(_ sheet: Sheet) {
         setEnteringAmount(false)
+
         self.sheet = sheet
     }
 
@@ -756,11 +761,13 @@ private extension EntrySheet {
         let width = EntryCategoryMenu.width
         let inset = Self.memoCardInset
         let preferred = menu.frame.midX - width / 2
+
         return min(max(preferred, inset), sheetWidth - width - inset)
     }
 
     func select(_ category: EntryCategory) {
         setEnteringAmount(false)
+
         model.categoryId = category.id
     }
 
@@ -769,6 +776,7 @@ private extension EntrySheet {
         at frame: CGRect
     ) {
         setEnteringAmount(false)
+
         pressingCategory = nil
 
         Task {
@@ -835,6 +843,7 @@ private extension EntrySheet {
 
     if let database {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
+
         EntrySheet(model: EntryModel(database: database, date: today))
     }
 }

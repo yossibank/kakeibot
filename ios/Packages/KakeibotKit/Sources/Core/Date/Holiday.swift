@@ -23,8 +23,10 @@ public enum Holiday {
 
     public static func isDayOff(_ date: LocalDate) -> Bool {
         let isWeekend = date.weekday == .saturday || date.weekday == .sunday
+
         let isYearEnd = (date.month, date.day) == (12, 31)
             || (date.month == 1 && date.day <= 3)
+
         return isWeekend || isYearEnd || contains(date)
     }
 }
@@ -99,6 +101,7 @@ private extension Holiday {
     ) -> Int {
         let years = year - 1980
         let day = base + 0.242194 * Double(years)
+
         return Int(day.rounded(.down)) - years / 4
     }
 }

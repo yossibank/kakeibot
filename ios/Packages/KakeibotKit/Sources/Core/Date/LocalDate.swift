@@ -80,6 +80,7 @@ public extension LocalDate {
         let estimatedOffset = TimeInterval(offsetSeconds)
         let estimate = localStart.addingTimeInterval(-estimatedOffset)
         let offset = TimeInterval(timeZone.secondsFromGMT(for: estimate))
+
         return localStart.addingTimeInterval(-offset)
     }
 
@@ -91,6 +92,7 @@ public extension LocalDate {
         let difference = weekday.daysSinceMonday - weekStart.daysSinceMonday
         let offset = (difference + 7) % 7
         let start = adding(days: -offset)
+
         return start...start.adding(days: 6)
     }
 }
@@ -171,6 +173,7 @@ extension LocalDate: Codable {
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
+
         try container.encode(description)
     }
 }

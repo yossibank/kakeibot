@@ -1,5 +1,6 @@
 public struct Budget: Hashable, Sendable {
     public let id: ID
+
     public var categoryId: EntryCategory.ID?
     public var fromMonth: YearMonth
     public var amount: Int?
@@ -39,6 +40,7 @@ extension Budget: Identifiable {}
 extension Budget: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
         try container.encode(id, forKey: .id)
         try container.encodeOrNull(categoryId, forKey: .categoryId)
         try container.encode(fromMonth, forKey: .fromMonth)

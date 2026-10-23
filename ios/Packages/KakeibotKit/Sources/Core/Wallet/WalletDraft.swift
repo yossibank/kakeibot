@@ -50,6 +50,7 @@ public extension WalletDraft {
 
     func newIcon(at now: Date) throws -> Icon {
         try validate()
+
         return try icon.newIcon(at: now)
     }
 
@@ -76,6 +77,7 @@ public extension WalletDraft {
         at now: Date
     ) throws -> Icon {
         try validate()
+
         return try self.icon.applied(to: icon, at: now)
     }
 
@@ -86,10 +88,12 @@ public extension WalletDraft {
         try validate()
 
         var updated = wallet
+
         updated.name = trimmedName
         updated.kind = kind
         updated.initialBalance = initialBalance
         updated.updatedAt = now
+
         return updated
     }
 }

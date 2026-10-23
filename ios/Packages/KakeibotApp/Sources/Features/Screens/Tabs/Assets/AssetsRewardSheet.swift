@@ -19,7 +19,6 @@ struct AssetsRewardSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
                     balanceCard
-
                     goalSection
 
                     if !model.boughtGoals.isEmpty {
@@ -103,7 +102,6 @@ private extension AssetsRewardSheet {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 SectionTitle("目標")
-
                 Spacer()
 
                 Button {

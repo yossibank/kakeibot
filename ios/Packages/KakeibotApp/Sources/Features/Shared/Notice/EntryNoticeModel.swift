@@ -76,6 +76,7 @@ public extension EntryNoticeModel {
             }
 
             let change = EntryChange(kind: .deleted, entry: entry, label: label)
+
             show(change)
         } catch {
             notice = .failed(Self.deleteFailedMessage)

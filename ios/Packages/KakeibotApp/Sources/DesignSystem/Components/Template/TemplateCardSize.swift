@@ -23,16 +23,19 @@ public extension TemplateCardSize {
 
     func nameFont(in style: ThemeStyle) -> Font {
         let size: FontSize = self == .regular ? .body : .headline
+
         return display(size, weight: .medium, in: style)
     }
 
     func amountFont(in style: ThemeStyle) -> Font {
         let size: FontSize = self == .regular ? .headline : .largeTitle
+
         return display(size, weight: .medium, in: style)
     }
 
     func emptyAmountFont(in style: ThemeStyle) -> Font {
         let size: FontSize = self == .regular ? .small : .body
+
         return display(size, weight: .regular, in: style)
     }
 }
@@ -42,16 +45,6 @@ extension TemplateCardSize {
         switch self {
         case .regular: 2
         case .large: 1
-        }
-    }
-
-    func detailFont(in style: ThemeStyle) -> Font {
-        let font = style.textFont
-        let scale = style.textSize.scale
-
-        switch self {
-        case .regular: return .text(size: .caption, in: font, scale: scale)
-        case .large: return .text(.caption, in: font, scale: scale)
         }
     }
 
@@ -108,6 +101,16 @@ extension TemplateCardSize {
         switch self {
         case .regular: 12
         case .large: 24
+        }
+    }
+
+    func detailFont(in style: ThemeStyle) -> Font {
+        let font = style.textFont
+        let scale = style.textSize.scale
+
+        switch self {
+        case .regular: return .text(size: .caption, in: font, scale: scale)
+        case .large: return .text(.caption, in: font, scale: scale)
         }
     }
 }

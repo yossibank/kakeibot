@@ -15,6 +15,7 @@ enum ThemeHex {
 
     static func text(_ rgb: UInt32) -> String {
         let digits = String(rgb, radix: 16, uppercase: true)
+
         return "#" + String(repeating: "0", count: 6 - digits.count) + digits
     }
 }

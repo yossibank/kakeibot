@@ -5,9 +5,11 @@ enum MigrationV13 {
     static func migrate(_ db: Database) throws {
         try db.create(table: "new_recurring") { table in
             table.primaryKey("id", .text)
+
             table.column("type", .text)
                 .notNull()
                 .check { Entry.Kind.allCases.contains($0) }
+
             table.column("amount", .integer).notNull().check { $0 >= 0 }
             table.column("category_id", .text).references("category")
             table.column("wallet_id", .text).notNull().references("wallet")
@@ -19,14 +21,18 @@ enum MigrationV13 {
                 .check { Recurring.Frequency.allCases.contains($0) }
 
             table.column("month", .integer).check { (1...12).contains($0) }
+
             table.column("day", .integer)
                 .notNull()
                 .check { (1...31).contains($0) }
+
             table.column("holiday_shift", .text)
                 .notNull()
                 .defaults(to: "none")
+
             table.column("closing_day", .integer)
                 .check { (1...31).contains($0) }
+
             table.column("start_date", .text).notNull()
             table.column("end_date", .text)
             table.column("remind_days_before", .integer).check { $0 >= 0 }
@@ -35,10 +41,11 @@ enum MigrationV13 {
             table.column("archived_at", .text)
             table.column("created_at", .text).notNull()
             table.column("updated_at", .text).notNull()
-
             table.check(sql: "(type = 'transfer') = (category_id IS NULL)")
             table.check(sql: "(type = 'transfer') = (to_wallet_id IS NOT NULL)")
+
             let distinctWallets = "to_wallet_id IS NULL OR to_wallet_id <> wallet_id"
+
             table.check(sql: distinctWallets)
             table.check(sql: "(frequency = 'yearly') = (month IS NOT NULL)")
             table.check(sql: "closing_day IS NULL OR type = 'transfer'")

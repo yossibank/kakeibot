@@ -93,6 +93,7 @@ public extension ReminderModel {
     func choose(_ time: ReminderTime?) async {
         self.time = time
         lastTime = time ?? lastTime
+
         errorNotice.clear()
 
         do {

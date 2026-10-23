@@ -57,6 +57,7 @@ public extension SettingsScreenFlag {
     func load() async {
         let screens = try? await database.setting(key)
         let isSaved = screens?.contains(screen) ?? false
+
         isOn = isSaved == savesOn
         isLoaded = true
     }

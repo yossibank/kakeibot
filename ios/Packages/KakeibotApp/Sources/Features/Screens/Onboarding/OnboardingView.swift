@@ -302,6 +302,7 @@ private extension OnboardingView {
     func next() async {
         guard model.isLastPage else {
             turnPage(.forward)
+
             return
         }
 

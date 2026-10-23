@@ -12,6 +12,7 @@ struct WalletWriteTests {
             setup.draft,
             at: setup.now
         )
+
         let list = try await setup.database.entryList()
         let icon = try #require(list.icons[saved.iconId])
 
@@ -38,6 +39,7 @@ struct WalletWriteTests {
             editing: bank.id,
             at: later
         )
+
         let list = try await setup.database.entryList()
         let icon = try #require(list.icons[updated.iconId])
 
@@ -113,6 +115,7 @@ struct WalletWriteTests {
     func deletesWalletWithItsRecurringsAndValuations() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
+
         let card = try await setup.database.saveWallet(
             setup.draft,
             at: setup.now
@@ -161,6 +164,7 @@ struct WalletWriteTests {
     @Test
     func restoresMergedDeletions() async throws {
         let setup = try await Setup()
+
         let first = try await setup.database.saveWallet(
             setup.draft,
             at: setup.now

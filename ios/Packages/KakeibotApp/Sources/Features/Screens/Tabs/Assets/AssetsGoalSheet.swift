@@ -43,6 +43,7 @@ struct AssetsGoalSheet: View {
 
             Keypad(activeTax: model.calculator.taxNote?.rate) { key in
                 focus = nil
+
                 model.press(key)
             }
 

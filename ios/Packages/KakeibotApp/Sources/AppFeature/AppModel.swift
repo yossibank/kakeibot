@@ -52,13 +52,14 @@ extension AppModel {
         do {
             let database = try await Task.detached {
                 try openDatabase()
-            }
-            .value
+            }.value
 
             await generateRecurring(in: database)
+
+            let completed = try await database.setting(.onboardingCompleted)
+
             look = await (try? database.themeLook()) ?? .followsDevice
             style = await (try? database.style()) ?? .standard
-            let completed = try await database.setting(.onboardingCompleted)
             launch = completed ? .ready(database) : .onboarding(database)
         } catch {
             launch = .failed(String(describing: error))
@@ -141,10 +142,15 @@ extension AppModel {
 }
 
 private extension AppModel {
+    static func currentDay() -> LocalDate {
+        LocalDate(Date(), in: .current)
+    }
+
     func observeLook(in database: AppDatabase) async {
         do {
             for try await look in database.themeLookUpdates() {
                 self.look = look
+
                 reloadWidgets()
             }
         } catch {
@@ -164,10 +170,6 @@ private extension AppModel {
 
     func reloadWidgets() {
         WidgetCenter.shared.reloadAllTimelines()
-    }
-
-    static func currentDay() -> LocalDate {
-        LocalDate(Date(), in: .current)
     }
 
     func scheduleNotifications(in database: AppDatabase) async {

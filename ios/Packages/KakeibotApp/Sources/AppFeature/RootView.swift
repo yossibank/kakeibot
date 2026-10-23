@@ -121,11 +121,13 @@ private extension RootView {
 
     var themePalette: ThemePalette {
         let isDark = colorScheme == .dark
+
         return model.look.palette(isDark: isDark)
     }
 
     var shownPalette: ThemePalette {
         let isDark = colorScheme == .dark
+
         return shownLook?.palette(isDark: isDark) ?? .night
     }
 

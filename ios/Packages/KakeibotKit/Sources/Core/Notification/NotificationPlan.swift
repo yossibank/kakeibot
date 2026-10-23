@@ -135,6 +135,7 @@ private extension NotificationPlan {
             }
 
             let lack = "¥\(grouped(shortage.amount))"
+
             return "\(bill)。\(shortage.walletName)が \(lack) 足りません"
         }
 
@@ -149,6 +150,7 @@ private extension NotificationPlan {
 
     static func grouped(_ amount: Int) -> String {
         let digits = Array(String(abs(amount)))
+
         var text = ""
 
         for (index, digit) in digits.enumerated() {

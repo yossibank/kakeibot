@@ -43,6 +43,7 @@ extension ReminderTime: CustomStringConvertible {
     public var description: String {
         let hour = hour < 10 ? "0\(hour)" : "\(hour)"
         let minute = minute < 10 ? "0\(minute)" : "\(minute)"
+
         return "\(hour):\(minute)"
     }
 }
@@ -64,6 +65,7 @@ extension ReminderTime: Codable {
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
+
         try container.encode(description)
     }
 }

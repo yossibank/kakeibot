@@ -3,6 +3,21 @@ import SwiftUI
 import UIKit
 
 public extension Color {
+    var hex: String {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+
+        UIColor(self).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+
+        let values = [red, green, blue].map { value in
+            Int((min(max(value, 0), 1) * 255).rounded())
+        }
+
+        return "#" + values.map { String(format: "%02X", $0) }.joined()
+    }
+
     init?(hex: String) {
         let digits = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
 
@@ -11,20 +26,6 @@ public extension Color {
         }
 
         self.init(rgb: value)
-    }
-
-    var hex: String {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-        UIColor(self).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-
-        let values = [red, green, blue].map { value in
-            Int((min(max(value, 0), 1) * 255).rounded())
-        }
-
-        return "#" + values.map { String(format: "%02X", $0) }.joined()
     }
 }
 
@@ -42,8 +43,10 @@ extension Color {
     ) {
         let color = UIColor { traits in
             let isLight = traits.userInterfaceStyle == .light
+
             return UIColor(rgb: isLight ? light : dark)
         }
+
         self.init(uiColor: color)
     }
 
@@ -55,8 +58,10 @@ extension Color {
             let rgb = traits[PaletteTrait.self][keyPath: role]
             let isLight = traits.userInterfaceStyle == .light
             let alpha = isLight ? lightOpacity : 1
+
             return UIColor(rgb: rgb).withAlphaComponent(alpha)
         }
+
         self.init(uiColor: color)
     }
 
@@ -67,8 +72,10 @@ extension Color {
         let color = UIColor { traits in
             let isLight = traits.userInterfaceStyle == .light
             let alpha = isLight ? lightOpacity : 1
+
             return UIColor(rgb: value).withAlphaComponent(alpha)
         }
+
         self.init(uiColor: color)
     }
 }

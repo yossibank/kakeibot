@@ -30,6 +30,7 @@ extension SwipeGesture {
 
             let velocity = pan.velocity(in: pan.view)
             let isHorizontal = abs(velocity.x) > abs(velocity.y)
+
             return isHorizontal && (allowsRightward || velocity.x < 0)
         }
     }
@@ -49,7 +50,9 @@ extension SwipeGesture {
         context: Context
     ) -> UIPanGestureRecognizer {
         let recognizer = UIPanGestureRecognizer()
+
         recognizer.delegate = context.coordinator
+
         return recognizer
     }
 

@@ -157,6 +157,7 @@ public extension TemplateEditModel {
     func load() async {
         do {
             options = try await database.entryOptions()
+
             try await loadTemplate()
 
             if categoryId == nil {
@@ -178,6 +179,7 @@ public extension TemplateEditModel {
     func save() async -> EntryTemplate? {
         if let problem = draft.problems.first {
             errorNotice.show(message(for: problem))
+
             return nil
         }
 
@@ -189,6 +191,7 @@ public extension TemplateEditModel {
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return nil
         }
     }
@@ -202,6 +205,7 @@ public extension TemplateEditModel {
             return try await database.deleteTemplate(editingId)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return nil
         }
     }
@@ -219,9 +223,11 @@ public extension TemplateEditModel {
             )
 
             self.isHidden = isHidden
+
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -252,9 +258,9 @@ private extension TemplateEditModel {
             throw AppDatabase.TemplateWriteError.templateNotFound
         }
 
-        isHidden = template.archivedAt != nil
-
         let draft = EntryTemplateDraft(template)
+
+        isHidden = template.archivedAt != nil
         name = draft.name
         type = draft.type
         calculator = AmountCalculator(amount: draft.amount ?? 0)

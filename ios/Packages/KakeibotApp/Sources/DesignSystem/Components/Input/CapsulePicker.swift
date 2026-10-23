@@ -17,6 +17,7 @@ public struct CapsulePicker<Value: Hashable>: View {
         options: [Option]
     ) {
         _selection = selection
+
         self.options = options
     }
 
@@ -39,6 +40,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                 ) { index, option in
                     let isHighlighted = index == highlightedIndex
                     let weight: Font.Weight = isHighlighted ? .bold : .regular
+
                     let color = isHighlighted
                         ? Palette.accentStrong
                         : Palette.subtext
@@ -95,14 +97,6 @@ public extension CapsulePicker {
 }
 
 private extension CapsulePicker {
-    var segmentWidth: CGFloat {
-        72 * textScale
-    }
-
-    var segmentHeight: CGFloat {
-        30 * textScale
-    }
-
     static var inset: CGFloat {
         3
     }
@@ -152,6 +146,14 @@ private extension CapsulePicker {
         .spring(response: 0.32, dampingFraction: 0.78)
     }
 
+    var segmentWidth: CGFloat {
+        72 * textScale
+    }
+
+    var segmentHeight: CGFloat {
+        30 * textScale
+    }
+
     var selectedIndex: Int {
         options.firstIndex { $0.value == selection } ?? 0
     }
@@ -176,9 +178,9 @@ private extension CapsulePicker {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
                 feedback.prepare()
+
                 let start = CGFloat(shownIndex) * segmentWidth
                 let touch = value.startLocation.x - Self.inset
-
                 let range = start...(start + segmentWidth)
 
                 guard range.contains(touch) else {
@@ -186,6 +188,7 @@ private extension CapsulePicker {
                 }
 
                 let offset = start + value.translation.width
+
                 thumbOffset = min(max(offset, 0), maxOffset)
             }
             .onEnded { value in
@@ -202,6 +205,7 @@ private extension CapsulePicker {
 
     func index(at x: CGFloat) -> Int {
         let index = Int((x / segmentWidth).rounded(.down))
+
         return min(max(index, 0), options.count - 1)
     }
 }

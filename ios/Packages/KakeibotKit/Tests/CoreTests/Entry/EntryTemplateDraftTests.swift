@@ -28,6 +28,7 @@ struct EntryTemplateDraftTests {
     func keepsIdentityWhenApplied() throws {
         let created = Date(timeIntervalSince1970: 1_790_000_000)
         let now = Date(timeIntervalSince1970: 1_791_000_000)
+
         let original = try Self.lunchDraft().newTemplate(
             sortOrder: 3,
             at: created

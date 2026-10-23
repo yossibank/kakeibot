@@ -22,6 +22,7 @@ public struct DialTicks: Shape {
                 let angle = Double(index) / Double(count) * 2 * .pi
                 let start = Self.point(from: center, at: angle, radius: inner)
                 let end = Self.point(from: center, at: angle, radius: outer)
+
                 path.move(to: start)
                 path.addLine(to: end)
             }
@@ -37,6 +38,7 @@ private extension DialTicks {
     ) -> CGPoint {
         let x = center.x + sin(angle) * radius
         let y = center.y - cos(angle) * radius
+
         return CGPoint(x: x, y: y)
     }
 }

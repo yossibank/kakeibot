@@ -23,12 +23,14 @@ public extension AppIconListModel {
         }
 
         let previous = current
+
         current = choice
 
         do {
             try await switcher.setName(choice.alternateName)
         } catch {
             current = previous
+
             errorNotice.show(Self.changeFailedMessage)
         }
     }

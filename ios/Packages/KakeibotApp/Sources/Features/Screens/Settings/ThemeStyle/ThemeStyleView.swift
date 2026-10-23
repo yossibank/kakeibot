@@ -119,6 +119,51 @@ private extension ThemeStyleView {
         .animation(.snappy(duration: 0.25), value: model.style)
     }
 
+    var cornerRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            rowTitle("角の丸み")
+
+            HStack(spacing: 10) {
+                ForEach(ThemeCorner.allCases, id: \.self) { option in
+                    tile(
+                        option.title,
+                        isSelected: option == model.style.corner
+                    ) {
+                        Task {
+                            await model.choose(option)
+                        }
+                    } content: {
+                        cornerMark(option)
+                    }
+                }
+            }
+        }
+    }
+
+    var textSizeRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            rowTitle("文字の大きさ")
+
+            HStack(spacing: 10) {
+                ForEach(ThemeTextSize.allCases, id: \.self) { option in
+                    tile(
+                        option.title,
+                        isSelected: option == model.style.textSize
+                    ) {
+                        Task {
+                            await model.choose(option)
+                        }
+                    } content: {
+                        Text("あ")
+                            .font(sizeSampleFont(option))
+                            .foregroundStyle(Palette.text)
+                            .frame(height: Self.sizeSampleHeight)
+                    }
+                }
+            }
+        }
+    }
+
     func fontRow(
         _ title: String,
         selection: Binding<ThemeFont>,
@@ -192,51 +237,6 @@ private extension ThemeStyleView {
         .buttonStyle(.plain)
     }
 
-    var cornerRow: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            rowTitle("角の丸み")
-
-            HStack(spacing: 10) {
-                ForEach(ThemeCorner.allCases, id: \.self) { option in
-                    tile(
-                        option.title,
-                        isSelected: option == model.style.corner
-                    ) {
-                        Task {
-                            await model.choose(option)
-                        }
-                    } content: {
-                        cornerMark(option)
-                    }
-                }
-            }
-        }
-    }
-
-    var textSizeRow: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            rowTitle("文字の大きさ")
-
-            HStack(spacing: 10) {
-                ForEach(ThemeTextSize.allCases, id: \.self) { option in
-                    tile(
-                        option.title,
-                        isSelected: option == model.style.textSize
-                    ) {
-                        Task {
-                            await model.choose(option)
-                        }
-                    } content: {
-                        Text("あ")
-                            .font(sizeSampleFont(option))
-                            .foregroundStyle(Palette.text)
-                            .frame(height: Self.sizeSampleHeight)
-                    }
-                }
-            }
-        }
-    }
-
     func rowTitle(_ title: String) -> some View {
         Text(title)
             .textFont(.caption2)
@@ -255,6 +255,7 @@ private extension ThemeStyleView {
     }
 
     static let sampleRest = 125_560
+
     static let samples = [
         Sample(
             icon: sampleIcon(.food),
@@ -269,6 +270,7 @@ private extension ThemeStyleView {
             amount: 440
         )
     ]
+
     static let fade: CGFloat = 16
     static let restCardHeight: CGFloat = 108
     static let cornerMarkSize: CGFloat = 30
@@ -276,6 +278,7 @@ private extension ThemeStyleView {
     static let sizeSampleHeight: CGFloat = 30
     static let sampleAmount = 1280
     static let sampleText = "食費・財布"
+
     static let fontColumns = Array(
         repeating: GridItem(.flexible(), spacing: 10),
         count: 3
@@ -283,10 +286,6 @@ private extension ThemeStyleView {
 
     var shownStyle: ThemeStyle {
         openedStyle ?? appStyle
-    }
-
-    func sizeSampleFont(_ size: ThemeTextSize) -> Font {
-        .text(.headline, in: model.style.textFont, scale: size.scale)
     }
 
     var tileShape: RoundedRectangle {
@@ -322,5 +321,9 @@ private extension ThemeStyleView {
             createdAt: .distantPast,
             updatedAt: .distantPast
         )
+    }
+
+    func sizeSampleFont(_ size: ThemeTextSize) -> Font {
+        .text(.headline, in: model.style.textFont, scale: size.scale)
     }
 }

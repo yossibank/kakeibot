@@ -44,6 +44,10 @@ struct RecordsRewardSheet: View {
 }
 
 private extension RecordsRewardSheet {
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
+
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
@@ -85,10 +89,6 @@ private extension RecordsRewardSheet {
                 .animation(.snappy, value: model.rewardTotal(on: date))
         }
         .padding(.horizontal, 6)
-    }
-
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     func row(_ rule: RewardRule) -> some View {

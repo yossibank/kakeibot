@@ -39,6 +39,7 @@ public final class CategoryEditModel {
 public extension CategoryEditModel {
     struct EditingTag: Identifiable, Hashable, Sendable {
         public let id: UUID
+
         public var draft: EntryTagDraft
 
         init(
@@ -90,6 +91,7 @@ public extension CategoryEditModel {
         }
 
         tags.append(EditingTag(id: UUID(), draft: draft))
+
         return true
     }
 
@@ -102,6 +104,7 @@ public extension CategoryEditModel {
         }
 
         var draft = tags[index].draft
+
         draft.name = name
 
         guard check(draft) else {
@@ -109,6 +112,7 @@ public extension CategoryEditModel {
         }
 
         tags[index].draft = draft
+
         return true
     }
 
@@ -127,6 +131,7 @@ public extension CategoryEditModel {
         }
 
         let tag = tags.remove(at: from)
+
         tags.insert(tag, at: to)
     }
 
@@ -149,11 +154,14 @@ public extension CategoryEditModel {
 
             guard let category, let icon = list.icons[category.iconId] else {
                 errorNotice.show(Self.loadFailedMessage)
+
                 return
             }
 
             apply(CategoryDraft(category, icon: icon))
+
             let tags = list.tags.filter { $0.categoryId == editingId }
+
             self.tags = tags.map(EditingTag.init)
             isHidden = category.archivedAt != nil
             baseline = snapshot
@@ -171,6 +179,7 @@ public extension CategoryEditModel {
         }
 
         tagWrite = write
+
         await write.value
     }
 
@@ -184,6 +193,7 @@ public extension CategoryEditModel {
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return nil
         }
     }
@@ -201,9 +211,11 @@ public extension CategoryEditModel {
             )
 
             self.isHidden = isHidden
+
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -217,9 +229,11 @@ public extension CategoryEditModel {
             return try await database.deleteCategory(editingId)
         } catch AppDatabase.CategoryWriteError.hasEntries {
             errorNotice.show(Self.inUseMessage)
+
             return nil
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
+
             return nil
         }
     }
@@ -273,7 +287,9 @@ private extension CategoryEditModel {
 
             let drafts = zip(sent, saved).map { editing, tag in
                 var draft = editing.draft
+
                 draft.id = tag.id
+
                 return draft
             }
 
@@ -293,6 +309,7 @@ private extension CategoryEditModel {
 
     func apply(_ draft: CategoryDraft) {
         name = draft.name
+
         icon.apply(draft.icon)
     }
 }

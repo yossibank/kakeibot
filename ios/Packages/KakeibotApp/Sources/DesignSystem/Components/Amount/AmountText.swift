@@ -26,12 +26,21 @@ public extension AmountText {
         type: Entry.Kind? = nil
     ) -> String {
         let number = abs(amount).formatted(.number.locale(locale))
+
         return "\(sign(of: amount, type: type))¥\(number)"
     }
 }
 
 private extension AmountText {
     static let locale = Locale(identifier: "ja_JP")
+
+    var color: Color {
+        switch type {
+        case .income: Palette.accent
+        case .transfer: Palette.subtext
+        case .expense, nil: Palette.accentStrong
+        }
+    }
 
     static func sign(
         of amount: Int,
@@ -43,14 +52,6 @@ private extension AmountText {
             "+"
         } else {
             ""
-        }
-    }
-
-    var color: Color {
-        switch type {
-        case .income: Palette.accent
-        case .transfer: Palette.subtext
-        case .expense, nil: Palette.accentStrong
         }
     }
 }

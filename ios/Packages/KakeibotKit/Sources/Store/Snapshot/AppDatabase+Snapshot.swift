@@ -21,6 +21,7 @@ public extension AppDatabase {
     ) async throws -> Data {
         let tables = try await tables()
         let export = ExportV1(exportedAt: date, app: app, data: tables)
+
         return try export.json()
     }
 
@@ -36,17 +37,17 @@ public extension AppDatabase {
 }
 
 private extension AppDatabase {
-    func tables() async throws -> ExportV1.Tables {
-        try await writer.read { db in
-            try ExportV1.Tables(fetchingFrom: db)
-        }
-    }
-
     static func replace(
         with tables: ExportV1.Tables,
         in db: Database
     ) throws {
         try ExportV1.Tables.deleteAll(in: db)
         try tables.insert(into: db)
+    }
+
+    func tables() async throws -> ExportV1.Tables {
+        try await writer.read { db in
+            try ExportV1.Tables(fetchingFrom: db)
+        }
     }
 }

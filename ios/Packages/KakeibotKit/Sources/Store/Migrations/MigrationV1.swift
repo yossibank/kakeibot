@@ -45,9 +45,11 @@ private extension MigrationV1 {
         try db.create(table: "wallet") { table in
             table.primaryKey("id", .text)
             table.column("name", .text).notNull()
+
             table.column("kind", .text)
                 .notNull()
                 .check { Wallet.Kind.allCases.contains($0) }
+
             table.column("icon_id", .text).notNull().references("icon")
             table.column("initial_balance", .integer).notNull()
             table.column("sort_order", .integer).notNull()
@@ -59,9 +61,11 @@ private extension MigrationV1 {
     static func createCategory(_ db: Database) throws {
         try db.create(table: "category") { table in
             table.primaryKey("id", .text)
+
             table.column("kind", .text)
                 .notNull()
                 .check { EntryCategory.Kind.allCases.contains($0) }
+
             table.column("name", .text).notNull()
             table.column("icon_id", .text).notNull().references("icon")
             table.column("sort_order", .integer).notNull()
@@ -80,9 +84,11 @@ private extension MigrationV1 {
                 .check { Recurring.Frequency.allCases.contains($0) }
 
             table.column("month", .integer).check { (1...12).contains($0) }
+
             table.column("day", .integer)
                 .notNull()
                 .check { (1...31).contains($0) }
+
             table.column("start_date", .text).notNull()
             table.column("end_date", .text)
             table.column("remind_days_before", .integer).check { $0 >= 0 }
@@ -101,7 +107,9 @@ private extension MigrationV1 {
             table.column("recurring_date", .text)
             addTimestamps(to: table)
             table.uniqueKey(["recurring_id", "recurring_date"])
+
             let recurringPair = "(recurring_id IS NULL) = (recurring_date IS NULL)"
+
             table.check(sql: recurringPair)
         }
     }
@@ -194,6 +202,7 @@ private extension MigrationV1 {
         try db.create(table: "setting") { table in
             table.primaryKey("key", .text)
                 .check { Setting.Key.allCases.contains($0) }
+
             table.column("value", .text).notNull()
         }
     }
@@ -202,6 +211,7 @@ private extension MigrationV1 {
         table.column("type", .text)
             .notNull()
             .check { Entry.Kind.allCases.contains($0) }
+
         table.column("amount", .integer).notNull().check { $0 >= 1 }
         table.column("category_id", .text).references("category")
         table.column("wallet_id", .text).notNull().references("wallet")

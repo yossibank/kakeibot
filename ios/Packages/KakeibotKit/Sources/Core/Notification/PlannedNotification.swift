@@ -37,9 +37,18 @@ public extension PlannedNotification {
 }
 
 public extension PlannedNotification.Route {
+    var link: String {
+        switch self {
+        case .home: "home"
+        case let .entry(date): "entry/\(date)"
+        case let .recurring(id): "recurring/\(id)"
+        }
+    }
+
     init?(link: String) {
         if link == "home" {
             self = .home
+
             return
         }
 
@@ -64,14 +73,6 @@ public extension PlannedNotification.Route {
             self = .recurring(id)
         default:
             return nil
-        }
-    }
-
-    var link: String {
-        switch self {
-        case .home: "home"
-        case let .entry(date): "entry/\(date)"
-        case let .recurring(id): "recurring/\(id)"
         }
     }
 }

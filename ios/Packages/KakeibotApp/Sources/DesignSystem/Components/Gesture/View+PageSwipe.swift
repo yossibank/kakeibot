@@ -15,6 +15,7 @@ public extension View {
             SwipeGesture { x in
                 let direction: PageSwipeDirection = x < 0 ? .forward : .backward
                 let reach = canMove(direction) ? x : x * pageSwipeResistance
+
                 PageSlide.follow(slide, by: reach)
             } onEnd: { x in
                 if let direction = PageSwipeDirection(swipe: x) {

@@ -22,11 +22,13 @@ public extension Recurring {
 
     func pendingDates(through today: LocalDate) -> [LocalDate] {
         let start = generatedUntil.map { $0.adding(days: 1) } ?? startDate
+
         return dates(from: start, through: today)
     }
 
     func nextDate(onOrAfter date: LocalDate) -> LocalDate? {
         let horizon = date.adding(days: Self.searchDays)
+
         return dates(from: date, through: horizon).first
     }
 

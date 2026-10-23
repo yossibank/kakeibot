@@ -23,7 +23,6 @@ struct CategoryTagCard: View {
                     .foregroundStyle(Palette.accent)
 
                 Spacer()
-
                 RingButton(systemImage: "xmark", action: onClose)
             }
 
@@ -134,6 +133,7 @@ private extension CategoryTagCard {
 
     var previewName: String {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
+
         return trimmed.isEmpty ? "名前" : trimmed
     }
 

@@ -18,6 +18,7 @@ struct AppIconTile: View {
             }
 
             taps += 1
+
             onSelect()
         } label: {
             VStack(spacing: 8) {
@@ -79,10 +80,12 @@ private extension AppIconTile {
                     SpringKeyframe(1.08, duration: 0.18)
                     SpringKeyframe(1, duration: 0.25)
                 }
+
                 KeyframeTrack(\.ring) {
                     LinearKeyframe(1, duration: 0.12)
                     CubicKeyframe(1.45, duration: 0.45)
                 }
+
                 KeyframeTrack(\.glow) {
                     LinearKeyframe(1, duration: 0.12)
                     CubicKeyframe(0, duration: 0.45)

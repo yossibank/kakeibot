@@ -12,6 +12,7 @@ struct ShelfIconWriteTests {
             setup.draft,
             at: setup.now
         )
+
         let shelf = try await setup.database.iconShelf()
         let icon = try #require(shelf.icons[saved.iconId])
 
@@ -33,6 +34,7 @@ struct ShelfIconWriteTests {
             editing: first.id,
             at: later
         )
+
         let shelf = try await setup.database.iconShelf()
         let icon = try #require(shelf.icons[updated.iconId])
 

@@ -137,6 +137,7 @@ private extension ReviewSharesCard {
             .prefix(while: { $0.ratio >= minorRatio })
 
         let others = Array(shares.dropFirst(main.count))
+
         return others.count > 1 ? others : nil
     }
 

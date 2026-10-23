@@ -23,6 +23,7 @@ public extension RewardRuleDraft {
             : []
 
         let amountProblems: [DraftProblem] = amount > 0 ? [] : [.emptyAmount]
+
         return nameProblems + amountProblems + icon.problems
     }
 
@@ -39,6 +40,7 @@ public extension RewardRuleDraft {
 
     func newIcon(at now: Date) throws -> Icon {
         try validate()
+
         return try icon.newIcon(at: now)
     }
 
@@ -65,6 +67,7 @@ public extension RewardRuleDraft {
         at now: Date
     ) throws -> Icon {
         try validate()
+
         return try self.icon.applied(to: icon, at: now)
     }
 
@@ -75,9 +78,11 @@ public extension RewardRuleDraft {
         try validate()
 
         var updated = rule
+
         updated.name = trimmedName
         updated.amount = amount
         updated.updatedAt = now
+
         return updated
     }
 }

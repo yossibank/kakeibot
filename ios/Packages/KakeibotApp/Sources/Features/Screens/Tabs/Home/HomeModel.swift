@@ -263,6 +263,7 @@ public extension HomeModel {
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return nil
         }
     }
@@ -277,6 +278,7 @@ private extension HomeModel {
     var templateUses: [EntryTemplate.ID: Int] {
         let start = today.adding(days: 1 - TemplateOrder.frequentDays)
         let days = list?.days ?? []
+
         var uses: [EntryTemplate.ID: Int] = [:]
 
         for day in days where day.date >= start && day.date <= today {

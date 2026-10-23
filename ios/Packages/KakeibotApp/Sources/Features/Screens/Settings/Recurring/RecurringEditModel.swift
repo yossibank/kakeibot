@@ -163,6 +163,7 @@ public extension RecurringEditModel {
 
     func select(category id: EntryCategory.ID) {
         categoryId = id
+
         suggestHolidayShift()
     }
 
@@ -178,6 +179,7 @@ public extension RecurringEditModel {
     func load() async {
         do {
             options = try await database.entryOptions()
+
             try await loadRecurring()
             presetPayment()
 
@@ -202,6 +204,7 @@ public extension RecurringEditModel {
     func save() async -> Bool {
         if let problem = draft.problems.first {
             errorNotice.show(message(for: problem))
+
             return false
         }
 
@@ -216,6 +219,7 @@ public extension RecurringEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -229,6 +233,7 @@ public extension RecurringEditModel {
             return try await database.deleteRecurring(editingId)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return nil
         }
     }
@@ -247,15 +252,23 @@ public extension RecurringEditModel {
             )
 
             self.isHidden = isHidden
+
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
 }
 
 private extension RecurringEditModel {
+    static let billClosingDay = 31
+    static let billPaymentDay = 27
+
+    static let loadFailedMessage = "固定費を読めませんでした"
+    static let saveFailedMessage = "保存できませんでした"
+
     var suggestedHolidayShift: Recurring.HolidayShift {
         guard type != .transfer else {
             return .next
@@ -270,9 +283,6 @@ private extension RecurringEditModel {
         }
     }
 
-    static let billClosingDay = 31
-    static let billPaymentDay = 27
-
     func presetPayment() {
         guard !isEditing, let target = paidWallet else {
             return
@@ -280,6 +290,7 @@ private extension RecurringEditModel {
 
         let bank = wallets.first { $0.kind == .bank && $0.id != target }
         let other = wallets.first { $0.id != target }
+
         type = .transfer
         categoryId = nil
         toWalletId = target
@@ -303,9 +314,6 @@ private extension RecurringEditModel {
 
         holidayShift = suggestedHolidayShift
     }
-
-    static let loadFailedMessage = "固定費を読めませんでした"
-    static let saveFailedMessage = "保存できませんでした"
 
     func message(for problem: RecurringDraft.Problem) -> String {
         switch problem {
@@ -333,9 +341,9 @@ private extension RecurringEditModel {
             throw AppDatabase.RecurringWriteError.recurringNotFound
         }
 
-        isHidden = recurring.archivedAt != nil
-
         let draft = RecurringDraft(recurring)
+
+        isHidden = recurring.archivedAt != nil
         type = draft.type
         calculator = AmountCalculator(amount: draft.amount)
         categoryId = draft.categoryId

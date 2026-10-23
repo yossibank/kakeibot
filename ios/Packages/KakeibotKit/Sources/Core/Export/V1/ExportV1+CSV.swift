@@ -42,6 +42,7 @@ private extension ExportV1.Tables {
         }
 
         let doubled = field.replacingOccurrences(of: "\"", with: "\"\"")
+
         return "\"\(doubled)\""
     }
 

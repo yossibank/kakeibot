@@ -45,6 +45,7 @@ enum RecurringText {
     static func period(_ period: ClosedRange<LocalDate>) -> String {
         let from = period.lowerBound
         let through = period.upperBound
+
         return "\(from.month)/\(from.day)〜\(through.month)/\(through.day)"
     }
 

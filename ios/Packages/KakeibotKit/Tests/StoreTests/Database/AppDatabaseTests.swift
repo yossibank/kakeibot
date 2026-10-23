@@ -6,6 +6,7 @@ struct AppDatabaseTests {
     @Test
     func createsEveryTable() throws {
         let database = try AppDatabase.inMemory()
+
         let tables = try database.writer.read { db in
             try String.fetchSet(db, sql: Self.tableQuery)
         }
@@ -17,6 +18,7 @@ struct AppDatabaseTests {
     func completesEveryMigration() throws {
         let database = try AppDatabase.inMemory()
         let migrator = AppDatabase.migrator
+
         let completed = try database.writer.read { db in
             try migrator.hasCompletedMigrations(db)
         }

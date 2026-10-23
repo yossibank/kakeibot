@@ -46,7 +46,6 @@ public struct HomeView: View {
         ScrollView {
             VStack(spacing: 12) {
                 header
-
                 dialCard
                 templateCard
                 recentCard
@@ -81,7 +80,6 @@ private extension HomeView {
             }
 
             Spacer()
-
             HeaderButton(systemImage: "gearshape", action: onOpenSettings)
         }
     }
@@ -119,7 +117,6 @@ private extension HomeView {
 
                     HStack(spacing: 14) {
                         Text("予算 \(AmountText.text(usage.budget))")
-
                         Text("1 日あたり \(AmountText.text(usage.perDay))")
                     }
                     .textFont(.caption)
@@ -203,7 +200,6 @@ private extension HomeView {
             ZStack {
                 HStack {
                     SectionTitle("テンプレート")
-
                     Spacer()
 
                     Button("すべて", action: onShowAllTemplates)
@@ -315,7 +311,6 @@ private extension HomeView {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 SectionTitle("最近の記録")
-
                 Spacer()
 
                 Button("すべて", action: onShowRecords)
@@ -358,20 +353,6 @@ private extension HomeView {
         .card()
     }
 
-    func templateButton(_ template: EntryTemplate) -> some View {
-        Button {
-            onUseTemplate(template)
-        } label: {
-            TemplateCard(
-                icon: model.icon(for: template),
-                name: template.name,
-                detail: model.detail(for: template),
-                amount: template.amount
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
     var divider: some View {
         Rectangle()
             .fill(Palette.accent.opacity(.soft))
@@ -387,6 +368,20 @@ private extension HomeView {
                     .fill(Palette.accent)
                     .frame(width: 120 * model.paidRecurringRatio)
             }
+    }
+
+    func templateButton(_ template: EntryTemplate) -> some View {
+        Button {
+            onUseTemplate(template)
+        } label: {
+            TemplateCard(
+                icon: model.icon(for: template),
+                name: template.name,
+                detail: model.detail(for: template),
+                amount: template.amount
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     func stat(

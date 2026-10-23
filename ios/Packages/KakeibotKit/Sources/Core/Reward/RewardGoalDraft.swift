@@ -48,9 +48,11 @@ public extension RewardGoalDraft {
         try validate()
 
         var updated = goal
+
         updated.name = trimmedName
         updated.targetAmount = targetAmount
         updated.updatedAt = now
+
         return updated
     }
 }

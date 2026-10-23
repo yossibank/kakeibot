@@ -28,12 +28,14 @@ public extension LaunchScreenModel {
 
     func choose(_ screen: LaunchScreen) async {
         let previous = self.screen
+
         self.screen = screen
 
         do {
             try await database.setSetting(.launchScreen, to: screen)
         } catch {
             self.screen = previous
+
             errorNotice.show(Self.saveFailedMessage)
         }
     }

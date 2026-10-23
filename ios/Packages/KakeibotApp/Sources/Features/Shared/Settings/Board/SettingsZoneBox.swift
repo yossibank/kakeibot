@@ -23,7 +23,6 @@ struct SettingsZoneBox: View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
                 Image(systemName: label.systemImage)
-
                 Text(label.title)
             }
             .frame(maxWidth: .infinity, minHeight: labelHeight)

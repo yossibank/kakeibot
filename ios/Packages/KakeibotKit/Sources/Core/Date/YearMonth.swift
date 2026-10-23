@@ -42,6 +42,7 @@ public extension YearMonth {
     func weeks(startingOn weekStart: Weekday) -> [[LocalDate?]] {
         let first = LocalDate(yearMonth: self, clampedDay: 1)
         let last = first.adding(days: numberOfDays - 1)
+
         return (first...last).weeks(startingOn: weekStart)
     }
 
@@ -68,6 +69,7 @@ extension YearMonth {
         let leapDayThisYear = month > 2 && isLeapYear ? 1 : 0
         let commonDays = Self.daysBeforeMonthInCommonYear[month - 1]
         let daysBeforeMonth = commonDays + leapDayThisYear
+
         return daysBeforeYear + daysBeforeMonth
     }
 
@@ -96,6 +98,7 @@ private extension YearMonth {
     var isLeapYear: Bool {
         let isFourth = year.isMultiple(of: 4)
         let isCentury = year.isMultiple(of: 100)
+
         return isFourth && (!isCentury || year.isMultiple(of: 400))
     }
 
@@ -109,6 +112,7 @@ private extension YearMonth {
     ) -> Int {
         let result = value.quotientAndRemainder(dividingBy: divisor)
         let (quotient, remainder) = result
+
         return remainder < 0 ? quotient - 1 : quotient
     }
 }
@@ -123,6 +127,7 @@ extension YearMonth: CustomStringConvertible {
     public var description: String {
         let yearText = DateText.padded(year, digits: 4)
         let monthText = DateText.padded(month, digits: 2)
+
         return "\(yearText)-\(monthText)"
     }
 }
@@ -144,6 +149,7 @@ extension YearMonth: Codable {
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
+
         try container.encode(description)
     }
 }

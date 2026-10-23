@@ -229,12 +229,14 @@ struct WalletEditModelTests {
             database: setup.database,
             editing: bank.id
         )
+
         let hid = await bankModel.setHidden(true)
 
         let cashModel = WalletEditModel(
             database: setup.database,
             editing: cash.id
         )
+
         let refused = await cashModel.setHidden(true)
 
         #expect(hid)

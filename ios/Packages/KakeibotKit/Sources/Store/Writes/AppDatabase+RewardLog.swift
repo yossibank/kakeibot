@@ -20,6 +20,7 @@ public extension AppDatabase {
 
             guard isAchieved else {
                 try saved.deleteAll(db)
+
                 return
             }
 

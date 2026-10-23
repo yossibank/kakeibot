@@ -98,6 +98,7 @@ public extension EntryDraft {
         try validate()
 
         var updated = entry
+
         updated.type = type
         updated.amount = amount
         updated.date = date
@@ -109,6 +110,7 @@ public extension EntryDraft {
         updated.memo = trimmedMemo
         updated.billMonth = billMonth
         updated.updatedAt = now
+
         return updated
     }
 }
@@ -140,6 +142,7 @@ private extension EntryDraft {
 
     var trimmedMemo: String? {
         let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
+
         return trimmed.isEmpty ? nil : trimmed
     }
 

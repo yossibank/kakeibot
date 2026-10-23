@@ -165,6 +165,7 @@ extension HomeModelTests.Setup {
     ) async throws {
         let options = try await database.entryOptions()
         let start = try #require(LocalDate("2026-10-01"))
+
         let draft = RecurringDraft(
             type: .expense,
             amount: amount,

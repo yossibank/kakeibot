@@ -28,48 +28,56 @@ public extension ThemeStyleModel {
 
     func choose(_ corner: ThemeCorner) async {
         let previous = style
+
         style.corner = corner
 
         do {
             try await database.setSetting(.cornerStyle, to: corner)
         } catch {
             style = previous
+
             errorNotice.show(Self.saveFailedMessage)
         }
     }
 
     func choose(displayFont font: ThemeFont) async {
         let previous = style
+
         style.displayFont = font
 
         do {
             try await database.setSetting(.fontStyle, to: font)
         } catch {
             style = previous
+
             errorNotice.show(Self.saveFailedMessage)
         }
     }
 
     func choose(_ size: ThemeTextSize) async {
         let previous = style
+
         style.textSize = size
 
         do {
             try await database.setSetting(.textSize, to: size)
         } catch {
             style = previous
+
             errorNotice.show(Self.saveFailedMessage)
         }
     }
 
     func choose(textFont font: ThemeFont) async {
         let previous = style
+
         style.textFont = font
 
         do {
             try await database.setSetting(.textFontStyle, to: font)
         } catch {
             style = previous
+
             errorNotice.show(Self.saveFailedMessage)
         }
     }

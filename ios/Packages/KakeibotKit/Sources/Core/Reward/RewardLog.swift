@@ -2,6 +2,7 @@ import Foundation
 
 public struct RewardLog: Hashable, Sendable {
     public let id: ID
+
     public var ruleId: RewardRule.ID
     public var date: LocalDate
     public var amount: Int

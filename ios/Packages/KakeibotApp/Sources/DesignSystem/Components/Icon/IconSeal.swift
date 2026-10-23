@@ -46,6 +46,7 @@ private extension IconSeal {
 
 #Preview {
     let now = Date()
+
     let star = Icon(
         emoji: nil,
         text: nil,
@@ -54,6 +55,7 @@ private extension IconSeal {
         createdAt: now,
         updatedAt: now
     )
+
     let cake = Icon(
         emoji: "🎂",
         text: nil,

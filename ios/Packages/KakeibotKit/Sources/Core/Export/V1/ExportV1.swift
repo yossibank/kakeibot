@@ -109,12 +109,15 @@ public extension ExportV1 {
 
     func json() throws -> Data {
         let encoder = JSONEncoder()
+
         encoder.dateEncodingStrategy = .iso8601
+
         encoder.outputFormatting = [
             .prettyPrinted,
             .sortedKeys,
             .withoutEscapingSlashes
         ]
+
         return try encoder.encode(self)
     }
 }
@@ -215,6 +218,7 @@ extension ExportV1: Codable {
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+
         try container.encode(Self.format, forKey: .format)
         try container.encode(Self.version, forKey: .version)
         try container.encode(exportedAt, forKey: .exportedAt)

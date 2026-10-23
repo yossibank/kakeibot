@@ -16,7 +16,9 @@ enum SampleData {
         now: Date
     ) async throws {
         let card = try await database.saveWallet(cardDraft, at: now)
+
         _ = try await database.saveWallet(investmentDraft, at: now)
+
         let loan = try await database.saveWallet(loanDraft, at: now)
         let options = try await database.entryOptions()
 
@@ -25,12 +27,14 @@ enum SampleData {
             card: card.id,
             loan: loan.id
         )
+
         var drafts: [EntryDraft] = []
         var noSpendDays: [LocalDate] = []
 
         for offset in (0..<dayCount).reversed() {
             let date = today.adding(days: -offset)
             let day = try plan(date, today: today, book: book)
+
             drafts += day.drafts
 
             if day.isNoSpend {
@@ -42,6 +46,7 @@ enum SampleData {
         try await database.markNoSpendDays(noSpendDays, at: now)
         try await insertBudgets(book: book, today: today, into: database)
         try await insertTemplates(book: book, into: database, now: now)
+
         try await insertRecurrings(
             book: book,
             today: today,
@@ -103,6 +108,7 @@ private extension SampleData {
     ) throws -> Day {
         let seed = date.year * 400 + date.month * 32 + date.day
         let isNoSpend = seed % 9 == 0
+
         var drafts = try fixedDrafts(on: date, today: today, book: book)
 
         if !isNoSpend {
@@ -110,6 +116,7 @@ private extension SampleData {
         }
 
         let hasExpense = drafts.contains { $0.type == .expense }
+
         return Day(drafts: drafts, isNoSpend: isNoSpend && !hasExpense)
     }
 
@@ -119,6 +126,7 @@ private extension SampleData {
         book: Book
     ) throws -> [EntryDraft] {
         let isWeekday = date.weekday != .saturday && date.weekday != .sunday
+
         var drafts: [EntryDraft] = []
 
         func add(

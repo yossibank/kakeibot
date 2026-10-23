@@ -37,6 +37,7 @@ struct RewardLogWriteTests {
     func keepsAmountAtAchievement() async throws {
         let setup = try await Setup()
         try await setup.achieve(true)
+
         let draft = RewardRuleDraft(
             name: "自炊した日",
             amount: 800,
@@ -57,6 +58,7 @@ struct RewardLogWriteTests {
     func subtractsBoughtGoals() async throws {
         let setup = try await Setup()
         try await setup.achieve(true)
+
         let bought = RewardGoal(
             name: "靴",
             targetAmount: 300,
@@ -64,12 +66,14 @@ struct RewardLogWriteTests {
             createdAt: setup.now,
             updatedAt: setup.now
         )
+
         let waiting = RewardGoal(
             name: "鞄",
             targetAmount: 1000,
             createdAt: setup.now,
             updatedAt: setup.now
         )
+
         try await setup.database.writer.write { db in
             try bought.insert(db)
             try waiting.insert(db)
@@ -91,6 +95,7 @@ private extension RewardLogWriteTests {
 
         init() async throws {
             let database = try AppDatabase.inMemory()
+
             let draft = RewardRuleDraft(
                 name: "自炊した日",
                 amount: 500,

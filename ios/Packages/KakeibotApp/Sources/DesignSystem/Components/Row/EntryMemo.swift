@@ -140,6 +140,7 @@ private extension EntryMemo {
 #Preview {
     VStack(alignment: .leading, spacing: 16) {
         EntryMemo("ランチ")
+
         EntryMemo(
             "同僚と駅前の新しいイタリアンでランチ。パスタとサラダのセットに、"
                 + "食後のコーヒーとデザートも付けた。次は夜に来てみたい"

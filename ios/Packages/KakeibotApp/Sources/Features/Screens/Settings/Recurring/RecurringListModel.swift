@@ -167,6 +167,7 @@ extension RecurringListModel: SettingsBoardModel {
 
     public func saveOrder(_ ids: [Recurring.ID]) async throws {
         let ids = ids + hidden.map(\.id)
+
         try await database.reorderRecurrings(ids, at: Date())
     }
 

@@ -47,6 +47,7 @@ struct ThemeWriteTests {
         try await database.setSetting(.fontStyle, to: .rounded)
         try await database.setSetting(.textFontStyle, to: .mincho)
         let style = try await database.style()
+
         let expected = ThemeStyle(
             corner: .large,
             displayFont: .rounded,
@@ -78,6 +79,7 @@ struct ThemeWriteTests {
             editing: theme.id,
             at: now.addingTimeInterval(60)
         )
+
         let themes = try await database.customThemes()
 
         #expect(updated.id == theme.id)

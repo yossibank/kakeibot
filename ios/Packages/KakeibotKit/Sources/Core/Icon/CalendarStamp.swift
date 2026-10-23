@@ -2,6 +2,7 @@ import Foundation
 
 public struct CalendarStamp: Hashable, Sendable {
     public let id: ID
+
     public var date: LocalDate
     public var iconId: Icon.ID
     public var createdAt: Date

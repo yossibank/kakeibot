@@ -33,6 +33,7 @@ public extension AppDatabase {
             }
 
             try template.save(db)
+
             return template
         }
     }
@@ -49,6 +50,7 @@ public extension AppDatabase {
 
             template.archivedAt = isHidden ? now : nil
             template.updatedAt = now
+
             try template.update(db)
         }
     }
@@ -65,6 +67,7 @@ public extension AppDatabase {
             )
 
             try templates.deleteAll(db)
+
             return deletion
         }
     }
@@ -93,6 +96,7 @@ private extension AppDatabase {
     ) throws -> EntryTemplate {
         guard let id else {
             let sortOrder = try EntryTemplate.nextSortOrder(in: db)
+
             return try draft.newTemplate(sortOrder: sortOrder, at: now)
         }
 

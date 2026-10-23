@@ -29,6 +29,7 @@ public struct CategoryEditSheet: View {
         onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+
         self.startsAddingTag = startsAddingTag
         self.onSave = onSave
         self.onDelete = onDelete
@@ -192,7 +193,6 @@ private extension CategoryEditSheet {
         VStack(alignment: .leading, spacing: 2) {
             HStack {
                 SettingsSectionTitle("タグ")
-
                 Spacer()
 
                 if model.tags.count > 1 {
@@ -261,16 +261,16 @@ private extension CategoryEditSheet {
 
     static let fade: CGFloat = 16
 
+    static var tagTransition: AnyTransition {
+        .scale(scale: 0.95).combined(with: .opacity)
+    }
+
     var keyboardRegions: SafeAreaRegions {
         ignoresKeyboard ? .keyboard : []
     }
 
     var tagItems: [TagLine<UUID>.Item] {
         model.tags.map { TagLine.Item(id: $0.id, name: $0.draft.name) }
-    }
-
-    static var tagTransition: AnyTransition {
-        .scale(scale: 0.95).combined(with: .opacity)
     }
 
     func deleteAction(for edit: TagEdit) -> (() -> Void)? {
@@ -291,6 +291,7 @@ private extension CategoryEditSheet {
 
     func editTag(_ id: UUID) {
         let name = model.tags.first { $0.id == id }?.draft.name ?? ""
+
         showTag(.rename(id), name: name)
     }
 
@@ -301,6 +302,7 @@ private extension CategoryEditSheet {
         focus = nil
         tagName = name
         ignoresKeyboard = true
+
         model.clearTagProblem()
 
         withAnimation(.snappy(duration: 0.25)) {
@@ -316,6 +318,7 @@ private extension CategoryEditSheet {
 
     func closeTag() {
         isTagFocused = false
+
         model.clearTagProblem()
 
         withAnimation(.snappy(duration: 0.2)) {

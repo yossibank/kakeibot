@@ -16,7 +16,9 @@ public extension AppDatabase {
         try await writer.write { db in
             guard let id else {
                 let theme = try draft.newTheme(at: now)
+
                 try theme.insert(db)
+
                 return theme
             }
 
@@ -25,7 +27,9 @@ public extension AppDatabase {
             }
 
             let updated = try draft.applied(to: theme, at: now)
+
             try updated.update(db)
+
             return updated
         }
     }

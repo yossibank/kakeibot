@@ -1,20 +1,21 @@
 --swift-version 6.4
 
 --disable wrapMultilineStatementBraces
+--disable wrapMultilineFunctionChains
 --enable blankLinesAfterGuardStatements
 --enable blankLinesBetweenImports
 --enable wrapIfStatementBodies
 --enable wrapGuardStatementBodies
 --enable wrapIfExpressionBodies
---enable wrapMultilineFunctionChains
 --enable organizeDeclarations
 
 --header strip
 --ifdef no-indent
 --line-between-guards true
 --mark-categories false
---max-width 80
+--max-width 100
 --organization-mode type
+--organize-types class,actor,struct,enum,extension
 --ranges no-space
 --redundant-type inferred
 --self init-only

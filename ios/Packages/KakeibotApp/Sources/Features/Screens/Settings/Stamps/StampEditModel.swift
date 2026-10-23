@@ -62,10 +62,12 @@ public extension StampEditModel {
                 let saved = shelf.icons[shelfIcon.iconId]
             else {
                 errorNotice.show(Self.loadFailedMessage)
+
                 return
             }
 
             icon.apply(saved)
+
             isHidden = shelfIcon.archivedAt != nil
             baseline = icon.draft
         } catch {
@@ -84,6 +86,7 @@ public extension StampEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -101,9 +104,11 @@ public extension StampEditModel {
             )
 
             self.isHidden = isHidden
+
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -117,6 +122,7 @@ public extension StampEditModel {
             return try await database.deleteShelfIcon(editingId)
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
+
             return nil
         }
     }

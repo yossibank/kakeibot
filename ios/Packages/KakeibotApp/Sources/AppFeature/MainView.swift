@@ -70,6 +70,7 @@ struct MainView: View {
 
         _notice = State(initialValue: EntryNoticeModel(database: database))
         _undo = State(initialValue: DeletionUndo(database: database))
+
         self.database = database
         self.today = today
         self.route = route
@@ -149,6 +150,7 @@ struct MainView: View {
                     },
                     onOpenDay: { date in
                         records.open(date)
+
                         tab = .records
                     }
                 )
@@ -249,6 +251,7 @@ struct MainView: View {
             records.today = today
             review.today = today
             assets.today = today
+
             prepareDraft()
         }
     }
@@ -381,6 +384,7 @@ private extension MainView {
             .allowsHitTesting(false)
             .task {
                 try? await Task.sleep(for: Self.warmupDuration)
+
                 isWarmingEntry = false
             }
     }
@@ -423,6 +427,7 @@ private extension MainView {
         Task {
             if sheet != nil {
                 sheet = nil
+
                 try? await Task.sleep(for: Self.sheetCloseDuration)
             }
 
@@ -442,6 +447,7 @@ private extension MainView {
     func useTemplate(_ template: EntryTemplate) {
         guard template.amount != nil else {
             sheet = .template(template)
+
             return
         }
 
@@ -456,6 +462,7 @@ private extension MainView {
 
     func prepareDraft() {
         let model = EntryModel(database: database, date: today)
+
         draft = model
 
         Task {

@@ -80,12 +80,15 @@ public extension RewardRuleEditModel {
                 let saved = list.icons[rule.iconId]
             else {
                 errorNotice.show(Self.loadFailedMessage)
+
                 return
             }
 
             name = rule.name
             calculator = AmountCalculator(amount: rule.amount)
+
             icon.apply(saved)
+
             isHidden = !rule.isActive
             baseline = draft
         } catch {
@@ -104,6 +107,7 @@ public extension RewardRuleEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -121,9 +125,11 @@ public extension RewardRuleEditModel {
             )
 
             self.isHidden = isHidden
+
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -137,6 +143,7 @@ public extension RewardRuleEditModel {
             return try await database.deleteRewardRule(editingId)
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
+
             return nil
         }
     }

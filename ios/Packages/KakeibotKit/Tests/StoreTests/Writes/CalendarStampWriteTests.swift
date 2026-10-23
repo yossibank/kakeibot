@@ -66,6 +66,7 @@ struct CalendarStampWriteTests {
         let cake = try #require(setup.shelf.dropFirst(3).first)
         let start = setup.day
         let end = start.adding(days: 6)
+
         let stamps = [
             (star, start),
             (party, start.adding(days: 1)),

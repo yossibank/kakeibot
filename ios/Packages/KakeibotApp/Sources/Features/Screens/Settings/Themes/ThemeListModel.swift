@@ -52,18 +52,22 @@ public extension ThemeListModel {
         }
 
         let previous = current
+
         current = choice
 
         do {
             try await database.setSetting(.theme, to: choice)
         } catch {
             current = previous
+
             errorNotice.show(Self.saveFailedMessage)
+
             return
         }
 
         guard let icon = AppIconChoice(choice) else {
             suggestedIcon = nil
+
             return
         }
 

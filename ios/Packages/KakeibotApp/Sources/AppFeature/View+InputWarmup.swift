@@ -28,8 +28,10 @@ private final class WarmupView: UIView {
             return
         }
 
-        isWarmedUp = true
         let field = UITextField()
+
+        isWarmedUp = true
+
         window.addSubview(field)
         field.becomeFirstResponder()
         field.resignFirstResponder()

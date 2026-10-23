@@ -55,6 +55,7 @@ public extension AppDatabase {
 
             wallet.archivedAt = isHidden ? now : nil
             wallet.updatedAt = now
+
             try wallet.update(db)
         }
     }
@@ -97,6 +98,7 @@ public extension AppDatabase {
             try templates.deleteAll(db)
             try valuations.deleteAll(db)
             try wallet.delete(db)
+
             return deletion
         }
     }
@@ -119,6 +121,7 @@ private extension AppDatabase {
 
         try icon.insert(db)
         try wallet.insert(db)
+
         return wallet
     }
 
@@ -137,8 +140,10 @@ private extension AppDatabase {
         }
 
         let wallet = try draft.applied(to: existing, at: now)
+
         try draft.applied(to: icon, at: now).update(db)
         try wallet.update(db)
+
         return wallet
     }
 

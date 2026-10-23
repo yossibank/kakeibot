@@ -87,11 +87,13 @@ struct EntryModelTests {
     func editsExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
+
         let model = EntryModel(
             database: setup.database,
             editing: entry.id,
             date: setup.date
         )
+
         await model.load()
 
         model.press(.delete)
@@ -269,11 +271,13 @@ struct EntryModelTests {
     func deletesExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
+
         let model = EntryModel(
             database: setup.database,
             editing: entry.id,
             date: setup.date
         )
+
         await model.load()
 
         let deleted = await model.delete()

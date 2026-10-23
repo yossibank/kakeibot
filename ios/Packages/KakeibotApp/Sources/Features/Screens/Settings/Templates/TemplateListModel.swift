@@ -100,6 +100,7 @@ extension TemplateListModel: SettingsBoardModel {
 
     public func saveOrder(_ ids: [EntryTemplate.ID]) async throws {
         let others = templates.map(\.id).filter { !ids.contains($0) }
+
         try await database.reorderTemplates(ids + others, at: Date())
     }
 

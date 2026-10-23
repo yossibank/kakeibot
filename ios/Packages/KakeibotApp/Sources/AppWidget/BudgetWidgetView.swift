@@ -48,18 +48,13 @@ private extension BudgetWidgetView {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .firstTextBaseline) {
                 title(of: summary)
-
                 Spacer(minLength: 4)
-
                 days(of: summary)
             }
 
             Spacer(minLength: 4)
-
             dial(summary)
-
             Spacer(minLength: 6)
-
             footer(of: summary)
         }
     }
@@ -68,11 +63,8 @@ private extension BudgetWidgetView {
         HStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 0) {
                 title(of: summary)
-
                 Spacer(minLength: 4)
-
                 dial(summary)
-
                 Spacer(minLength: 6)
 
                 Text(budgetNote(of: summary))
@@ -95,7 +87,6 @@ private extension BudgetWidgetView {
                         .foregroundStyle(Palette.subtext)
 
                     Spacer(minLength: 4)
-
                     days(of: summary)
                 }
 
@@ -250,6 +241,7 @@ private extension BudgetWidgetView {
         }
 
         let left = usage.todayRemaining(spentToday: summary.todayExpense)
+
         return Row(title: "今日あと", amount: left)
     }
 

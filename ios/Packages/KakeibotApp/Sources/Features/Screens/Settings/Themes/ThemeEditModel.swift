@@ -70,7 +70,9 @@ public extension ThemeEditModel {
         }
 
         var draft = draft
+
         draft[keyPath: slot.keyPath] = hex
+
         return Self.isReadable(draft, slot)
     }
 
@@ -79,6 +81,7 @@ public extension ThemeEditModel {
         for slot: Slot
     ) {
         var next = draft
+
         next[keyPath: slot.keyPath] = hex
 
         if slot == .background,
@@ -89,7 +92,9 @@ public extension ThemeEditModel {
         for other in Slot.allCases where !Self.isReadable(next, other) {
             let readable = other.swatches.first { swatch in
                 var candidate = next
+
                 candidate[keyPath: other.keyPath] = swatch
+
                 return Self.isReadable(candidate, other)
             }
 
@@ -116,6 +121,7 @@ public extension ThemeEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
+
             return false
         }
     }
@@ -127,9 +133,11 @@ public extension ThemeEditModel {
 
         do {
             try await database.deleteTheme(editingId)
+
             return true
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
+
             return false
         }
     }
@@ -197,6 +205,7 @@ private extension ThemeEditModel {
         let rgb = UInt32(hex.dropFirst(), radix: 16) ?? 0
         let onBlack = ThemePalette.contrast(rgb, 0x000000)
         let onWhite = ThemePalette.contrast(rgb, 0xFFFFFF)
+
         return onBlack > onWhite
     }
 
@@ -209,6 +218,7 @@ private extension ThemeEditModel {
         }
 
         let isLight = isLight(background)
+
         return surfaces.first { Self.isLight($0) == isLight } ?? background
     }
 

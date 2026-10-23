@@ -66,6 +66,7 @@ public extension SettingsBoardModel {
 
         order.remove(at: from)
         order.insert(id, at: to)
+
         movingOrder = order
     }
 
@@ -95,10 +96,13 @@ public extension SettingsBoardModel {
         do {
             try await saveHidden(id, isHidden: true)
             await reload()
+
             return true
         } catch {
             let message = hideFailedMessage(for: error) ?? Self.hideFailedText
+
             errorNotice.show(message)
+
             return false
         }
     }
@@ -117,19 +121,23 @@ public extension SettingsBoardModel {
 
         do {
             let deletion = try await remove(id)
+
             await reload()
+
             return deletion
         } catch {
             let message = deleteFailedMessage(for: error)
                 ?? Self.deleteFailedText
 
             errorNotice.show(message)
+
             return nil
         }
     }
 
     func deleteHidden() async -> Deletion? {
         movingOrder = nil
+
         let ids = hidden.map(\.id)
 
         let result = await SettingsBulkDelete.run(ids) { id in

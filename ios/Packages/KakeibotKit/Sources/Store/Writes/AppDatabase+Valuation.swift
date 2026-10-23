@@ -25,6 +25,7 @@ public extension AppDatabase {
             )
 
             try valuation.insert(db)
+
             return valuation
         }
     }
