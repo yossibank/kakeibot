@@ -3,10 +3,14 @@ import DesignSystem
 import SwiftUI
 
 struct HomeCustomizeCard: View {
+    @State private var changed: SetupItem?
+    @State private var glowing: SetupItem?
+
     @Environment(\.themeStyle) private var themeStyle
 
     let model: SetupModel
     let appIcon: AppIconListModel
+    let isSheetOpen: Bool
     let onOpen: (SetupItem) -> Void
 
     var body: some View {
@@ -26,6 +30,11 @@ struct HomeCustomizeCard: View {
                             tile(item)
                         }
                         .buttonStyle(.plain)
+                        .onChange(of: value(for: item)) {
+                            if isSheetOpen {
+                                changed = item
+                            }
+                        }
                     }
                 }
             }
@@ -43,12 +52,39 @@ struct HomeCustomizeCard: View {
         .padding(.horizontal, 16)
         .padding(.bottom, 16)
         .card()
+        .onChange(of: isSheetOpen) { _, isOpen in
+            guard
+                !isOpen,
+                let changed
+            else {
+                return
+            }
+
+            self.changed = nil
+
+            glow(changed)
+        }
+        .task(id: glowing) {
+            guard glowing != nil else {
+                return
+            }
+
+            try? await Task.sleep(for: Self.glowDuration)
+
+            withAnimation(.easeOut(duration: 0.6)) {
+                glowing = nil
+            }
+        }
     }
 }
 
 private extension HomeCustomizeCard {
     func tile(_ item: SetupItem) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        let shape = RoundedRectangle(
+            cornerRadius: themeStyle.corner.radius(Self.cornerRadius)
+        )
+
+        return VStack(alignment: .leading, spacing: 4) {
             Image(systemName: item.systemImage)
                 .sansFont(.body, weight: .light)
                 .foregroundStyle(Palette.accent)
@@ -70,15 +106,23 @@ private extension HomeCustomizeCard {
         }
         .padding(12)
         .frame(width: Self.tileSize.width, height: Self.tileSize.height, alignment: .leading)
-        .templateCardFace(cornerRadius: 18, shadowRadius: 12)
+        .templateCardFace(cornerRadius: Self.cornerRadius, shadowRadius: 12)
+        .overlay {
+            shape
+                .strokeBorder(Palette.accentStrong, lineWidth: 1.6)
+                .shadow(color: Palette.glow, radius: 10)
+                .opacity(glowOpacity(item))
+        }
         .contentShape(.rect)
     }
 }
 
 private extension HomeCustomizeCard {
     static let tileSize = CGSize(width: 116, height: 96)
+    static let cornerRadius: CGFloat = 18
     static let textScale: CGFloat = 0.7
     static let shadowRoom: CGFloat = 32
+    static let glowDuration: Duration = .milliseconds(1200)
 
     func value(for item: SetupItem) -> String {
         switch item {
@@ -91,12 +135,24 @@ private extension HomeCustomizeCard {
         }
     }
 
+    func glowOpacity(_ item: SetupItem) -> Double {
+        glowing == item ? 1 : 0
+    }
+
+    func glow(_ item: SetupItem) {
+        withAnimation(.easeOut(duration: 0.25)) {
+            glowing = item
+        }
+    }
+
     func open(_ item: SetupItem) {
         guard item.isToggle else {
             onOpen(item)
 
             return
         }
+
+        glow(item)
 
         Task {
             await model.setStartsWithAmount(!model.startsWithAmount)

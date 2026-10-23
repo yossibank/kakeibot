@@ -11,6 +11,7 @@ public struct HomeView: View {
     private let setup: SetupModel
     private let appIcon: AppIconListModel
     private let isRevealed: Bool
+    private let isSheetOpen: Bool
     private let onOpenEntry: (Entry.ID) -> Void
     private let onShowRecords: () -> Void
     private let onOpenSettings: () -> Void
@@ -27,6 +28,7 @@ public struct HomeView: View {
         setup: SetupModel,
         appIcon: AppIconListModel,
         isRevealed: Bool,
+        isSheetOpen: Bool,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onShowRecords: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
@@ -42,6 +44,7 @@ public struct HomeView: View {
         self.setup = setup
         self.appIcon = appIcon
         self.isRevealed = isRevealed
+        self.isSheetOpen = isSheetOpen
         self.onOpenEntry = onOpenEntry
         self.onShowRecords = onShowRecords
         self.onOpenSettings = onOpenSettings
@@ -69,6 +72,7 @@ public struct HomeView: View {
                     HomeCustomizeCard(
                         model: setup,
                         appIcon: appIcon,
+                        isSheetOpen: isSheetOpen,
                         onOpen: onOpenSetup
                     )
                     .transition(Self.cardTransition)

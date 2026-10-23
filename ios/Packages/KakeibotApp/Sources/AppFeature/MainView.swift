@@ -91,6 +91,7 @@ struct MainView: View {
                     setup: setup,
                     appIcon: appIcon,
                     isRevealed: isRevealed,
+                    isSheetOpen: sheet != nil,
                     onOpenEntry: { id in
                         sheet = .edit(id)
                     },

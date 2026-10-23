@@ -171,7 +171,7 @@ private extension OnboardingView {
                 routeButton(
                     .full,
                     title: "しっかり決めて始める",
-                    detail: "口座・固定費・通知なども",
+                    detail: "口座・固定費・通知・見た目なども",
                     duration: "5 分"
                 )
             }
