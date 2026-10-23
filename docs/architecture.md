@@ -27,6 +27,9 @@ kakeibot/
 │   ├── export-format.md
 │   ├── fixtures.md
 │   └── fixtures/            Core のフォルダ名の小文字にそろえる
+├── .claude/
+│   ├── rules/               文書の役割
+│   └── skills/              ウィジェットを描いて PNG にする widget-snapshot
 ├── .github/                 CI（ビルドとテスト）
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
