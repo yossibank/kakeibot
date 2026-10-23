@@ -182,7 +182,7 @@ private extension OnboardingView {
             VStack(spacing: 20) {
                 pageHeader(
                     "月と週の始まり",
-                    message: "給料日に合わせると、給料日から次の給料日の前の日までを 1 か月として数えます"
+                    message: "給料日に合わせると、給料日から\n次の給料日の前の日までを 1 か月として数えます"
                 )
 
                 PeriodCard(
@@ -221,7 +221,7 @@ private extension OnboardingView {
         VStack(spacing: 20) {
             pageHeader(
                 "月の予算",
-                message: "1 か月に使う額を決めると、ホームで「あといくら」が分かります"
+                message: "1 か月に使う額を決めると、\nホームで「あといくら」が分かります"
             )
 
             Button {
@@ -251,7 +251,7 @@ private extension OnboardingView {
             }
             .buttonStyle(.plain)
 
-            Text("決めなくても始められます。カテゴリごとの予算は、設定の「予算」から入れられます")
+            Text("決めなくても始められます。\nカテゴリごとの予算は、設定の「予算」から入れられます")
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
@@ -263,7 +263,7 @@ private extension OnboardingView {
             VStack(spacing: 20) {
                 pageHeader(
                     "ほかに決めること",
-                    message: "押すと設定の画面が開きます。あとからでも、設定で変えられます"
+                    message: "押すと設定の画面が開きます。\nあとからでも、設定で変えられます"
                 )
 
                 SetupList(SetupItem.onboarding, model: model.setup) { item in
