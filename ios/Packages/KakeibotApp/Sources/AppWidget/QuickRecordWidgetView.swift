@@ -28,7 +28,7 @@ private extension QuickRecordWidgetView {
                     .frame(height: Self.headerHeight)
 
                 if summary.tiles.isEmpty {
-                    Text("テンプレートを作ると、ここから記録できます")
+                    Text("金額を決めたテンプレートを作ると、ここから記録できます")
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .multilineTextAlignment(.center)
@@ -123,20 +123,11 @@ private extension QuickRecordWidgetView {
         }
     }
 
-    @ViewBuilder
     func tileButton(_ tile: QuickRecordWidgetSummary.Tile) -> some View {
-        if tile.amount != nil {
-            Button(intent: RecordTemplateIntent(tile.id)) {
-                tileFace(tile)
-            }
-            .buttonStyle(.plain)
-        } else if let url = PlannedNotification.Route.template(tile.id).url {
-            Link(destination: url) {
-                tileFace(tile)
-            }
-        } else {
+        Button(intent: RecordTemplateIntent(tile.id)) {
             tileFace(tile)
         }
+        .buttonStyle(.plain)
     }
 
     func tileFace(_ tile: QuickRecordWidgetSummary.Tile) -> some View {
@@ -164,23 +155,17 @@ private extension QuickRecordWidgetView {
             Spacer(minLength: 2)
 
             HStack(spacing: 4) {
-                if let amount = tile.amount {
-                    Text(AmountText.text(amount))
-                        .displayFont(.body, weight: .medium)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                        .privacySensitive()
-                } else {
-                    Text("毎回入れる")
-                        .textFont(size: .micro)
-                        .foregroundStyle(Palette.hint)
-                }
+                Text(AmountText.text(tile.amount))
+                    .displayFont(.body, weight: .medium)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .privacySensitive()
 
                 Spacer(minLength: 0)
 
-                Image(systemName: tile.amount == nil ? "pencil" : "plus")
+                Image(systemName: "plus")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(Palette.backgroundTop)
                     .frame(width: Self.markSize, height: Self.markSize)
@@ -268,7 +253,7 @@ private extension QuickRecordWidgetView {
     }
 
     var rowCount: Int {
-        isLarge ? 4 : 2
+        isLarge ? 3 : 2
     }
 
     func amountText(of record: QuickRecordWidgetSummary.Record) -> String {

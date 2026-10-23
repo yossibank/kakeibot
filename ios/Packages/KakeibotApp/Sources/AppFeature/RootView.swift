@@ -116,8 +116,8 @@ private extension RootView {
         }
     }
 
-    var shownLook: ThemeLook? {
-        isRevealed ? model.look : nil
+    var shownLook: ThemeLook {
+        isRevealed ? model.look : .followsDevice
     }
 
     var themePalette: ThemePalette {
@@ -129,7 +129,7 @@ private extension RootView {
     var shownPalette: ThemePalette {
         let isDark = colorScheme == .dark
 
-        return shownLook?.palette(isDark: isDark) ?? .night
+        return shownLook.palette(isDark: isDark)
     }
 
     var shownStyle: ThemeStyle {

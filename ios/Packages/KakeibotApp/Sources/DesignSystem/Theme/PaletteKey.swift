@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 struct PaletteKey: EnvironmentKey {
-    static let defaultValue = ThemePalette.night
+    static let defaultValue = ThemePreset.white.palette
 }
 
 extension PaletteKey: UITraitBridgedEnvironmentKey {
@@ -20,6 +20,6 @@ extension PaletteKey: UITraitBridgedEnvironmentKey {
 }
 
 struct PaletteTrait: UITraitDefinition {
-    static let defaultValue = ThemePalette.night
+    static let defaultValue = ThemePreset.white.palette
     static let affectsColorAppearance = true
 }
