@@ -12,6 +12,7 @@ public struct BudgetWidget: Widget {
         .configurationDisplayName("あといくら")
         .description("今月あといくら使えるかと、今日の支出を出します")
         .supportedFamilies([.systemSmall, .systemMedium])
+        .contentMarginsDisabled()
     }
 
     public init() {}

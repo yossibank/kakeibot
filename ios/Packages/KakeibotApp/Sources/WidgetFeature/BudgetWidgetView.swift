@@ -10,6 +10,8 @@ struct BudgetWidgetView: View {
 
     var body: some View {
         content
+            .padding(14)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .widgetURL(PlannedNotification.Route.home.url)
             .widgetTheme(entry.look)
     }
@@ -32,7 +34,7 @@ private extension BudgetWidgetView {
             case .systemMedium:
                 medium(summary)
             default:
-                dial(summary)
+                small(summary)
             }
         } else {
             Text("アプリを開くと、ここに出ます")
@@ -42,83 +44,172 @@ private extension BudgetWidgetView {
         }
     }
 
-    func dial(_ summary: BudgetWidgetSummary) -> some View {
-        let usage = summary.usage
+    func small(_ summary: BudgetWidgetSummary) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .firstTextBaseline) {
+                title(of: summary)
 
-        return VStack(spacing: 6) {
-            Text(title(of: summary))
-                .textFont(size: .caption)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
+                Spacer(minLength: 4)
 
-            ZStack(alignment: .bottom) {
-                HalfDial(
-                    progress: usage?.progress,
-                    tint: usage?.tint ?? Palette.accent
-                )
-
-                VStack(spacing: 0) {
-                    if let usage {
-                        Text("あと \(usage.daysLeft) 日")
-                            .textFont(size: .micro)
-                            .foregroundStyle(Palette.subtext)
-                    }
-
-                    Text(amount(of: summary))
-                        .displayFont(.headline, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(amountColor(of: summary))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                        .privacySensitive()
-                }
+                days(of: summary)
             }
 
-            Text(note(of: summary))
-                .textFont(size: .caption)
-                .monospacedDigit()
-                .foregroundStyle(noteColor(of: summary))
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .privacySensitive()
+            Spacer(minLength: 4)
+
+            dial(summary)
+
+            Spacer(minLength: 6)
+
+            footer(of: summary)
         }
     }
 
     func medium(_ summary: BudgetWidgetSummary) -> some View {
-        HStack(spacing: 16) {
-            dial(summary)
-                .frame(maxWidth: .infinity)
+        HStack(spacing: 18) {
+            VStack(alignment: .leading, spacing: 0) {
+                title(of: summary)
 
-            Rectangle()
-                .fill(Palette.line)
-                .frame(width: 1)
+                Spacer(minLength: 4)
 
-            VStack(alignment: .leading, spacing: 10) {
-                ForEach(rows(of: summary)) { row in
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(row.title)
-                            .textFont(size: .caption)
-                            .foregroundStyle(Palette.subtext)
+                dial(summary)
 
-                        Spacer(minLength: 8)
+                Spacer(minLength: 6)
 
-                        Text(AmountText.text(row.amount))
-                            .textFont(size: .body, weight: .medium)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
-                            .privacySensitive()
+                Text(budgetNote(of: summary))
+                    .textFont(size: .caption)
+                    .monospacedDigit()
+                    .foregroundStyle(noteColor(of: summary))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .frame(maxWidth: .infinity)
+                    .privacySensitive()
+            }
+            .frame(maxWidth: .infinity)
+
+            VStack(alignment: .leading, spacing: 0) {
+                let focus = focus(of: summary)
+
+                HStack(alignment: .firstTextBaseline) {
+                    Text(focus.title)
+                        .textFont(size: .caption)
+                        .foregroundStyle(Palette.subtext)
+
+                    Spacer(minLength: 4)
+
+                    days(of: summary)
+                }
+
+                Text(AmountText.text(focus.amount))
+                    .displayFont(.title, weight: .bold)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .privacySensitive()
+
+                Spacer(minLength: 8)
+
+                Rectangle()
+                    .fill(Palette.line)
+                    .frame(height: 1)
+
+                Spacer(minLength: 8)
+
+                VStack(spacing: 6) {
+                    ForEach(rows(of: summary)) { row in
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(row.title)
+                                .textFont(size: .caption)
+                                .foregroundStyle(Palette.subtext)
+
+                            Spacer(minLength: 8)
+
+                            Text(AmountText.text(row.amount))
+                                .textFont(size: .small, weight: .medium)
+                                .monospacedDigit()
+                                .foregroundStyle(Palette.text)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                                .privacySensitive()
+                        }
                     }
                 }
             }
             .frame(maxWidth: .infinity)
         }
     }
+
+    func title(of summary: BudgetWidgetSummary) -> some View {
+        Text(titleText(of: summary))
+            .textFont(size: .caption)
+            .tracking(1)
+            .foregroundStyle(Palette.accent)
+            .lineLimit(1)
+    }
+
+    @ViewBuilder
+    func days(of summary: BudgetWidgetSummary) -> some View {
+        if let usage = summary.usage {
+            Text("あと \(usage.daysLeft) 日")
+                .textFont(size: .micro)
+                .foregroundStyle(Palette.subtext)
+        }
+    }
+
+    func dial(_ summary: BudgetWidgetSummary) -> some View {
+        let usage = summary.usage
+
+        return ZStack(alignment: .bottom) {
+            HalfDial(
+                progress: usage?.progress,
+                tint: usage?.tint ?? Palette.accent
+            )
+
+            Text(amount(of: summary))
+                .displayFont(.title, weight: .bold)
+                .monospacedDigit()
+                .foregroundStyle(amountColor(of: summary))
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.horizontal, 26)
+                .privacySensitive()
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    func footer(of summary: BudgetWidgetSummary) -> some View {
+        if let warning = summary.usage?.warningText {
+            Text(warning)
+                .textFont(size: .caption, weight: .semibold)
+                .foregroundStyle(noteColor(of: summary))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity)
+        } else {
+            let focus = focus(of: summary)
+
+            HStack(alignment: .firstTextBaseline) {
+                Text(focus.title)
+                    .textFont(size: .caption)
+                    .foregroundStyle(Palette.subtext)
+
+                Spacer(minLength: 4)
+
+                Text(AmountText.text(focus.amount))
+                    .textFont(size: .small, weight: .semibold)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .privacySensitive()
+            }
+        }
+    }
 }
 
 private extension BudgetWidgetView {
-    func title(of summary: BudgetWidgetSummary) -> String {
+    func titleText(of summary: BudgetWidgetSummary) -> String {
         summary.usage == nil ? "今月の支出" : "今月あといくら"
     }
 
@@ -134,13 +225,12 @@ private extension BudgetWidgetView {
         summary.usage?.amountTint ?? Palette.accentStrong
     }
 
-    func note(of summary: BudgetWidgetSummary) -> String {
+    func budgetNote(of summary: BudgetWidgetSummary) -> String {
         guard let usage = summary.usage else {
-            return "今日 \(AmountText.text(summary.todayExpense))"
+            return "予算は決めていません"
         }
 
-        let left = usage.todayRemaining(spentToday: summary.todayExpense)
-        return usage.warningText ?? "今日あと \(AmountText.text(left))"
+        return usage.warningText ?? "予算 \(AmountText.text(usage.budget))"
     }
 
     func noteColor(of summary: BudgetWidgetSummary) -> Color {
@@ -154,18 +244,21 @@ private extension BudgetWidgetView {
         return usage.tint
     }
 
-    func rows(of summary: BudgetWidgetSummary) -> [Row] {
+    func focus(of summary: BudgetWidgetSummary) -> Row {
         guard let usage = summary.usage else {
-            return [
-                Row(title: "今日", amount: summary.todayExpense),
-                Row(title: "昨日", amount: summary.yesterdayExpense)
-            ]
+            return Row(title: "今日の支出", amount: summary.todayExpense)
         }
 
         let left = usage.todayRemaining(spentToday: summary.todayExpense)
+        return Row(title: "今日あと", amount: left)
+    }
+
+    func rows(of summary: BudgetWidgetSummary) -> [Row] {
+        guard let usage = summary.usage else {
+            return [Row(title: "昨日の支出", amount: summary.yesterdayExpense)]
+        }
 
         return [
-            Row(title: "今日あと", amount: left),
             Row(title: "今日の支出", amount: summary.todayExpense),
             Row(title: "今月の支出", amount: usage.spent)
         ]

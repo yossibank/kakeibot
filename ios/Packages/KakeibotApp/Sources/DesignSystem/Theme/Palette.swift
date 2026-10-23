@@ -35,6 +35,14 @@ public extension Palette {
         )
     }
 
+    static var card: LinearGradient {
+        LinearGradient(
+            colors: [cardTop, cardBottom],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
     static func background(of palette: ThemePalette) -> LinearGradient {
         LinearGradient(
             colors: [
@@ -43,14 +51,6 @@ public extension Palette {
             ],
             startPoint: .top,
             endPoint: .bottom
-        )
-    }
-
-    static var card: LinearGradient {
-        LinearGradient(
-            colors: [cardTop, cardBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
         )
     }
 }
