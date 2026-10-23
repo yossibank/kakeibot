@@ -94,7 +94,7 @@ private extension ThemeStyleView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
 
-                Text("予算 ¥200,000　1 日あたり ¥10,463")
+                Text("予算 ¥200,000")
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.subtext)
             }

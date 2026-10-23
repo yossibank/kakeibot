@@ -149,9 +149,7 @@ private extension BudgetLockWidgetView {
     }
 
     func detail(of summary: BudgetWidgetSummary) -> String {
-        let focus = summary.focus
-
-        return "\(focus.title) \(focus.text)"
+        "今日の支出 \(AmountText.text(summary.todayExpense))"
     }
 
     func shortAmount(_ amount: Int) -> String {

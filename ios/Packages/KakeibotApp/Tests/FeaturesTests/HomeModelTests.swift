@@ -64,31 +64,6 @@ struct HomeModelTests {
     }
 
     @Test
-    func leavesUpcomingRecurringOutOfPerDay() async throws {
-        let setup = try await Setup()
-        try await setup.save(.expense, amount: 45000, daysAgo: 0)
-        try await setup.saveRecurring(amount: 30000, day: 27)
-        let model = HomeModel(database: setup.database, today: setup.today)
-        let month = setup.today.yearMonth
-        await model.load()
-
-        let task = Task {
-            await model.run()
-        }
-
-        try await setup.database.setBudget(120_000, for: nil, from: month)
-
-        for _ in 0..<200 where model.budgetUsage == nil {
-            try await Task.sleep(for: .milliseconds(10))
-        }
-
-        task.cancel()
-
-        #expect(model.budgetUsage?.remaining == 75000)
-        #expect(model.budgetUsage?.perDay == 2250)
-    }
-
-    @Test
     func showsRemainingBudgetOfPeriod() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 45000, daysAgo: 0)
@@ -111,7 +86,6 @@ struct HomeModelTests {
 
         #expect(before == nil)
         #expect(model.budgetUsage?.remaining == 75000)
-        #expect(model.budgetUsage?.perDay == 3750)
     }
 
     @Test

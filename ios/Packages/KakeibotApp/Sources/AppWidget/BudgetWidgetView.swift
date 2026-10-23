@@ -79,10 +79,8 @@ private extension BudgetWidgetView {
             .frame(maxWidth: .infinity)
 
             VStack(alignment: .leading, spacing: 0) {
-                let focus = summary.focus
-
                 HStack(alignment: .firstTextBaseline) {
-                    Text(focus.title)
+                    Text("今日の支出")
                         .textFont(size: .caption)
                         .foregroundStyle(Palette.subtext)
 
@@ -90,10 +88,10 @@ private extension BudgetWidgetView {
                     days(of: summary)
                 }
 
-                Text(focus.text)
+                Text(AmountText.text(summary.todayExpense))
                     .displayFont(.title, weight: .bold)
                     .monospacedDigit()
-                    .foregroundStyle(focusColor(focus, otherwise: Palette.accentStrong))
+                    .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
                     .privacySensitive()
@@ -177,22 +175,21 @@ private extension BudgetWidgetView {
                 .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity)
         } else {
-            let focus = summary.focus
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(focus.title)
-                    .textFont(size: .micro)
+            HStack(alignment: .firstTextBaseline) {
+                Text("今日の支出")
+                    .textFont(size: .caption)
                     .foregroundStyle(Palette.subtext)
 
-                Text(focus.text)
+                Spacer(minLength: 4)
+
+                Text(AmountText.text(summary.todayExpense))
                     .textFont(size: .small, weight: .semibold)
                     .monospacedDigit()
-                    .foregroundStyle(focusColor(focus, otherwise: Palette.text))
+                    .foregroundStyle(Palette.text)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                     .privacySensitive()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
@@ -233,30 +230,19 @@ private extension BudgetWidgetView {
         return usage.tint
     }
 
-    func focusColor(
-        _ focus: BudgetWidgetSummary.Focus,
-        otherwise color: Color
-    ) -> Color {
-        focus.isShort ? Palette.rose : color
-    }
-
     func rows(of summary: BudgetWidgetSummary) -> [Row] {
-        let day = summary.usage == nil
-            ? Row(title: "昨日の支出", amount: summary.yesterdayExpense)
-            : Row(title: "今日の支出", amount: summary.todayExpense)
-
         let week = Row(title: "今週の支出", amount: summary.weekExpense)
 
-        if let next = summary.nextRecurring {
-            let title = "\(next.title) \(next.date.month)/\(next.date.day)"
+        let spending = summary.usage == nil
+            ? [Row(title: "昨日の支出", amount: summary.yesterdayExpense), week]
+            : [week, Row(title: "今月の支出", amount: summary.monthExpense)]
 
-            return [day, week, Row(title: title, amount: next.amount)]
+        guard let next = summary.nextRecurring else {
+            return spending
         }
 
-        guard summary.usage != nil else {
-            return [day, week]
-        }
+        let title = "\(next.title) \(next.date.month)/\(next.date.day)"
 
-        return [day, week, Row(title: "今月の支出", amount: summary.monthExpense)]
+        return spending + [Row(title: title, amount: next.amount)]
     }
 }

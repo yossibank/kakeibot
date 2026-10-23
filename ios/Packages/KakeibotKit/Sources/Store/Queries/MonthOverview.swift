@@ -115,23 +115,9 @@ public extension MonthOverview {
         return BudgetUsage(
             budget: budget,
             spent: monthExpense,
-            upcoming: upcomingRecurringExpense,
             today: today,
             periodEnd: period.upperBound
         )
-    }
-
-    var budgetPace: BudgetPace? {
-        budgetUsage.map { usage in
-            BudgetPace(
-                budget: usage.budget,
-                spent: usage.spent,
-                fixedSpent: paidRecurringExpense,
-                upcoming: usage.upcoming,
-                today: today,
-                period: period
-            )
-        }
     }
 
     var nextRecurringExpense: PeriodRecurring? {

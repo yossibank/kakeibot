@@ -115,17 +115,10 @@ private extension HomeView {
                             .foregroundStyle(usage.tint)
                     }
 
-                    HStack(spacing: 16) {
-                        Text("予算 \(AmountText.text(usage.budget))")
-
-                        if let pace = model.budgetPace {
-                            Text("このペースだと \(pace.leftText)")
-                                .foregroundStyle(paceColor(of: pace))
-                        }
-                    }
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
+                    Text("予算 \(AmountText.text(usage.budget))")
+                        .textFont(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
                 }
             } else {
                 Button(action: onOpenSettings) {
@@ -464,10 +457,6 @@ private extension HomeView {
 
     var templateHint: String {
         model.templates.isEmpty ? "よく使う入力を 1 回で" : "押すとすぐ記録"
-    }
-
-    func paceColor(of pace: BudgetPace) -> Color {
-        pace.isShort ? Palette.rose : Palette.subtext
     }
 }
 

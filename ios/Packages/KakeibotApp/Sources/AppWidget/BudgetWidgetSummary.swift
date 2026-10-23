@@ -1,10 +1,8 @@
 import Core
-import DesignSystem
 import Store
 
 struct BudgetWidgetSummary: Hashable, Sendable {
     let usage: BudgetUsage?
-    let pace: BudgetPace?
     let monthExpense: Int
     let todayExpense: Int
     let yesterdayExpense: Int
@@ -17,22 +15,6 @@ extension BudgetWidgetSummary {
         let title: String
         let date: LocalDate
         let amount: Int
-    }
-
-    struct Focus: Hashable {
-        let title: String
-        let text: String
-        let isShort: Bool
-    }
-
-    var focus: Focus {
-        guard let pace else {
-            let text = AmountText.text(todayExpense)
-
-            return Focus(title: "今日の支出", text: text, isShort: false)
-        }
-
-        return Focus(title: "このペースだと", text: pace.leftText, isShort: pace.isShort)
     }
 
     init(
@@ -53,7 +35,6 @@ extension BudgetWidgetSummary {
 
         self.init(
             usage: overview.budgetUsage,
-            pace: overview.budgetPace,
             monthExpense: overview.monthExpense,
             todayExpense: overview.todayExpense,
             yesterdayExpense: overview.yesterdayExpense,
@@ -63,23 +44,11 @@ extension BudgetWidgetSummary {
     }
 
     static func sample(on today: LocalDate) -> BudgetWidgetSummary {
-        let periodEnd = today.adding(days: 8)
-        let period = today.adding(days: -21)...periodEnd
-
         let usage = BudgetUsage(
             budget: 90000,
             spent: 58000,
             today: today,
-            periodEnd: periodEnd
-        )
-
-        let pace = BudgetPace(
-            budget: usage.budget,
-            spent: usage.spent,
-            fixedSpent: 30000,
-            upcoming: 0,
-            today: today,
-            period: period
+            periodEnd: today.adding(days: 8)
         )
 
         let next = NextRecurring(
@@ -90,7 +59,6 @@ extension BudgetWidgetSummary {
 
         return BudgetWidgetSummary(
             usage: usage,
-            pace: pace,
             monthExpense: usage.spent,
             todayExpense: 1120,
             yesterdayExpense: 2300,
