@@ -16,8 +16,6 @@ public extension Setting {
         case monthStartDay = "month_start_day"
         case weekStart = "week_start"
         case reminderTime = "reminder_time"
-        case characterId = "character_id"
-        case characterName = "character_name"
         case themeId = "theme_id"
         case cornerStyle = "corner_style"
         case fontStyle = "font_style"

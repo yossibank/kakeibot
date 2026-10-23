@@ -22,7 +22,6 @@ public final class RecordsModel: ScreenModel {
     public private(set) var stampCalendar: StampCalendar?
     public private(set) var stampShelf: IconShelf?
     public private(set) var rewardBank: RewardBank?
-    public private(set) var buddy = BuddyProfile(buddy: .dial, customName: "")
     public private(set) var recurrings: [Recurring] = []
     public private(set) var recentSearches: [String] = []
 
@@ -198,11 +197,6 @@ public extension RecordsModel {
         rewardBank?.icon(for: rule)
     }
 
-    func rewardLine(on date: LocalDate) -> BuddyLine {
-        let count = rewardBank?.logs(on: date).count ?? 0
-        return .reward(count: count)
-    }
-
     func rewardTotal(on date: LocalDate) -> Int {
         rewardBank?.total(on: date) ?? 0
     }
@@ -275,10 +269,6 @@ public extension RecordsModel {
 
             group.addTask {
                 await self.observeRewardBank()
-            }
-
-            group.addTask {
-                await self.observeBuddy()
             }
 
             group.addTask {
@@ -399,15 +389,6 @@ private extension RecordsModel {
             failure: Self.loadFailedMessage
         ) { bank in
             rewardBank = bank
-        }
-    }
-
-    func observeBuddy() async {
-        await observe(
-            database.buddyProfileUpdates(),
-            failure: Self.loadFailedMessage
-        ) { profile in
-            buddy = profile
         }
     }
 
