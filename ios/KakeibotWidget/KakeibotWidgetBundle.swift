@@ -1,5 +1,5 @@
+import AppWidget
 import SwiftUI
-import WidgetFeature
 import WidgetKit
 
 @main

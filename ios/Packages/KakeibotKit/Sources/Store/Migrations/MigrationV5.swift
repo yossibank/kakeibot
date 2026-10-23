@@ -1,8 +1,6 @@
 import GRDB
 
-enum MigrationV5 {}
-
-extension MigrationV5 {
+enum MigrationV5 {
     static func migrate(_ db: Database) throws {
         try db.create(table: "tag") { table in
             table.primaryKey("id", .text)

@@ -1,8 +1,6 @@
 import Core
 
-enum RecurringText {}
-
-extension RecurringText {
+enum RecurringText {
     static func schedule(
         _ frequency: Recurring.Frequency,
         month: Int,

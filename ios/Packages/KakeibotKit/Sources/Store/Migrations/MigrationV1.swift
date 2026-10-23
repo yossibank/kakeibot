@@ -1,9 +1,7 @@
 import Core
 import GRDB
 
-enum MigrationV1 {}
-
-extension MigrationV1 {
+enum MigrationV1 {
     static func migrate(_ db: Database) throws {
         try createIcon(db)
         try createWallet(db)

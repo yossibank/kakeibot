@@ -1,8 +1,6 @@
 import GRDB
 
-enum MigrationV19 {}
-
-extension MigrationV19 {
+enum MigrationV19 {
     static func migrate(_ db: Database) throws {
         try db.execute(
             sql: """

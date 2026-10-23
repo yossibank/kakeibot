@@ -1,9 +1,7 @@
 import Core
 import SwiftUI
 
-enum TemplateCardStyle {}
-
-extension TemplateCardStyle {
+enum TemplateCardStyle {
     static var fill: LinearGradient {
         LinearGradient(
             colors: [Palette.cardTop, Palette.cardBottom],

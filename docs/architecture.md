@@ -45,7 +45,7 @@ ios/
 ├── Kakeibot.xcodeproj       アプリとウィジェットのターゲット
 ├── Kakeibot.xctestplan      テストターゲットをまとめたテストプラン
 ├── Kakeibot.xcworkspace     プロジェクトと 2 つのパッケージを並べる。Xcode ではこれを開く
-├── KakeibotWidget/          ウィジェット（@main で WidgetFeature を呼ぶだけ）
+├── KakeibotWidget/          ウィジェット（@main で AppWidget を呼ぶだけ）
 ├── license_plist.yml        LicensePlist に手で足すライセンス（同梱のフォントと配布元）
 └── Packages/
     ├── KakeibotApp/         iOS 専用。Xcode でテスト
@@ -113,6 +113,7 @@ KakeibotKit/
 KakeibotApp/
 ├── Sources/
 │   ├── AppFeature/          AppModel、RootView、MainView（タブとシート）、起動の印の動き、通知の許可、入力の準備
+│   ├── AppWidget/           ウィジェットの見た目、タイムライン、テーマの色の当て方
 │   ├── DesignSystem/
 │   │   ├── Components/      部品の種類ごとのフォルダ
 │   │   │   ├── Amount/      金額、予算の使い具合の色と棒、残りの文字
@@ -168,8 +169,7 @@ KakeibotApp/
 │   │           ├── Icon/    アイコンの絵柄・絵文字・文字と色を選ぶ部品
 │   │           ├── Input/   入力欄、選ぶボタン、引き出し、行の一覧、保存のボタンの文字
 │   │           └── Tile/    カテゴリと口座のタイルと、その並べ方
-│   ├── Notifications/       予約されているべき通知と今の予約の差を OS に反映、押された通知の行き先を受ける
-│   └── WidgetFeature/       ウィジェットの見た目、タイムライン、テーマの色の当て方
+│   └── Notifications/       予約されているべき通知と今の予約の差を OS に反映、押された通知の行き先を受ける
 └── Tests/
     ├── AppFeatureTests/
     ├── DesignSystemTests/
@@ -186,7 +186,7 @@ flowchart TB
     end
     subgraph app["KakeibotApp（iOS 専用）"]
         AppFeature
-        WidgetFeature
+        AppWidget
         Features
         Notifications
         DesignSystem
@@ -198,11 +198,11 @@ flowchart TB
     GRDB[("GRDB")]
 
     App --> AppFeature
-    Widget --> WidgetFeature
+    Widget --> AppWidget
     AppFeature --> Features
     AppFeature --> Notifications
-    WidgetFeature --> Store
-    WidgetFeature --> DesignSystem
+    AppWidget --> Store
+    AppWidget --> DesignSystem
     Features --> Store
     Features --> DesignSystem
     Notifications --> Core
@@ -314,7 +314,7 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 | --- | --- |
 | 記録忘れの通知 | 数日先まで予約し、当日の記録か支出なしの印ができたら当日分を取り消す |
 | 固定費の更新前の通知 | 更新日の N 日前で予約する |
-| iOS のウィジェット | WidgetFeature が `AppDatabase.appGroupForReading()` で DB を読むだけで開き、ホームと同じ `MonthOverview` を使う。背景は、テーマの色の値から作った色で描く。表の形が最新でなければ読まない。AppModel が記録・予算・固定費・テーマの変化を見張って更新し、日付が変わるときはタイムラインで切り替える |
+| iOS のウィジェット | AppWidget が `AppDatabase.appGroupForReading()` で DB を読むだけで開き、ホームと同じ `MonthOverview` を使う。背景は、テーマの色の値から作った色で描く。表の形が最新でなければ読まない。AppModel が記録・予算・固定費・テーマの変化を見張って更新し、日付が変わるときはタイムラインで切り替える |
 
 ## テスト
 

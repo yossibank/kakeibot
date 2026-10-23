@@ -1,8 +1,6 @@
 import GRDB
 
-enum MigrationV10 {}
-
-extension MigrationV10 {
+enum MigrationV10 {
     static func migrate(_ db: Database) throws {
         try db.alter(table: "template") { table in
             table.add(column: "archived_at", .text)

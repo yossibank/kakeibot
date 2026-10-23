@@ -1,9 +1,7 @@
 import Core
 import GRDB
 
-enum MigrationV13 {}
-
-extension MigrationV13 {
+enum MigrationV13 {
     static func migrate(_ db: Database) throws {
         try db.create(table: "new_recurring") { table in
             table.primaryKey("id", .text)

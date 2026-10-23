@@ -106,10 +106,6 @@ private extension RootView {
     }
 }
 
-#Preview {
-    RootView()
-}
-
 private extension RootView {
     var isLaunchReady: Bool {
         switch model.launch {
@@ -136,4 +132,8 @@ private extension RootView {
     var shownStyle: ThemeStyle {
         isRevealed ? model.style : .standard
     }
+}
+
+#Preview {
+    RootView()
 }

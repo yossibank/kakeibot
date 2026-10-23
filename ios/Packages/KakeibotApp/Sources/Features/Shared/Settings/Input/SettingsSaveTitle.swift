@@ -1,6 +1,4 @@
-enum SettingsSaveTitle {}
-
-extension SettingsSaveTitle {
+enum SettingsSaveTitle {
     static func text(
         problem: String?,
         isEditing: Bool

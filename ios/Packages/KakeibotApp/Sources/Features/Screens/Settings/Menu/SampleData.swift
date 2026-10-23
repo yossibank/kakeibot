@@ -3,9 +3,7 @@ import Core
 import Foundation
 import Store
 
-enum SampleData {}
-
-extension SampleData {
+enum SampleData {
     enum SampleError: Error {
         case missingDefault(String)
     }

@@ -1,9 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-enum SettingsTile {}
-
-extension SettingsTile {
+enum SettingsTile {
     static func fill(isSelected: Bool) -> Color {
         isSelected ? Palette.accent.opacity(.subtle) : Color.clear
     }

@@ -1,6 +1,4 @@
-enum ThemeHex {}
-
-extension ThemeHex {
+enum ThemeHex {
     static func rgb(_ text: String) -> UInt32? {
         let digits = text.dropFirst()
 

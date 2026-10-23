@@ -1,7 +1,5 @@
-public enum NotificationPlan {}
-
-public extension NotificationPlan {
-    struct Shortage: Hashable, Sendable {
+public enum NotificationPlan {
+    public struct Shortage: Hashable, Sendable {
         public let recurringId: Recurring.ID
         public let date: LocalDate
         public let walletName: String
@@ -20,12 +18,12 @@ public extension NotificationPlan {
         }
     }
 
-    static let reminderDays = 7
-    static let recurringDays = 31
-    static let reminderTitle = "今日の記録はまだです"
-    static let reminderBody = "使ったお金か「支出なし」の印を入れておきましょう"
+    public static let reminderDays = 7
+    public static let recurringDays = 31
+    public static let reminderTitle = "今日の記録はまだです"
+    public static let reminderBody = "使ったお金か「支出なし」の印を入れておきましょう"
 
-    static func notifications(
+    public static func notifications(
         today: LocalDate,
         reminderTime: ReminderTime?,
         recordedDates: Set<LocalDate>,
