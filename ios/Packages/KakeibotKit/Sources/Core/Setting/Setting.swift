@@ -23,6 +23,7 @@ public extension Setting {
         case textFontStyle = "text_font_style"
         case textSize = "text_size"
         case onboardingCompleted = "onboarding_completed"
+        case setupCardClosed = "setup_card_closed"
         case launchScreen = "launch_screen"
         case entryStartsWithAmount = "entry_starts_with_amount"
         case templateOrder = "template_order"

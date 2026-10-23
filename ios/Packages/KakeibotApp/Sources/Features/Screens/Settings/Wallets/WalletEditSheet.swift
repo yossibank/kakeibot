@@ -515,8 +515,8 @@ private extension WalletEditSheet {
 
     var balanceHint: String {
         switch model.kind {
-        case .card: "カードは、まだ引き落とされていない額をマイナスで入れます"
-        case .loan: "借入は、まだ返していない額をマイナスで入れます"
+        case .card: "まだ引き落とされていない額を入れます。自動でマイナスにします"
+        case .loan: "まだ返していない額を入れます。自動でマイナスにします"
         default: "記録を始める前の、いまの残高を入れます"
         }
     }

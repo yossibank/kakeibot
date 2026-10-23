@@ -12,6 +12,7 @@ struct MainView: View {
     @State private var records: RecordsModel
     @State private var review: ReviewModel
     @State private var assets: AssetsModel
+    @State private var setup: SetupModel
     @State private var draft: EntryModel
     @State private var notice: EntryNoticeModel
     @State private var undo: DeletionUndo
@@ -61,6 +62,8 @@ struct MainView: View {
             )
         )
 
+        _setup = State(initialValue: SetupModel(database: database))
+
         _draft = State(
             initialValue: EntryModel(
                 database: database,
@@ -84,6 +87,7 @@ struct MainView: View {
             Tab(value: MainTab.home) {
                 HomeView(
                     model: home,
+                    setup: setup,
                     onOpenEntry: { id in
                         sheet = .edit(id)
                     },
@@ -112,6 +116,9 @@ struct MainView: View {
                     },
                     onOpenRecurrings: {
                         sheet = .periodRecurrings
+                    },
+                    onOpenSetup: { item in
+                        sheet = .setup(item)
                     }
                 )
                 .tabContent()
@@ -227,6 +234,9 @@ struct MainView: View {
             await assets.run()
         }
         .task {
+            await setup.run()
+        }
+        .task {
             await draft.load()
         }
         .task(id: isRevealed) {
@@ -323,6 +333,11 @@ private extension MainView {
             ) { deletion in
                 undo.deletion = deletion
             }
+        case let .setup(item):
+            NavigationStack {
+                SetupDestination(item, database: database, today: today)
+                    .toolbar(.hidden, for: .navigationBar)
+            }
         case .periodRecurrings:
             PeriodRecurringSheet(
                 model: home,
@@ -363,6 +378,7 @@ private extension MainView {
         case wallet(Wallet.ID)
         case recurring(Recurring.ID)
         case periodRecurrings
+        case setup(SetupItem)
 
         var id: Self {
             self

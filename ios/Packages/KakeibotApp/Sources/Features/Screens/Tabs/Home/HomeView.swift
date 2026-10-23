@@ -8,6 +8,7 @@ public struct HomeView: View {
     @State private var openId: Entry.ID?
     @State private var orderButtonFrame: CGRect = .zero
 
+    private let setup: SetupModel
     private let onOpenEntry: (Entry.ID) -> Void
     private let onShowRecords: () -> Void
     private let onOpenSettings: () -> Void
@@ -17,9 +18,11 @@ public struct HomeView: View {
     private let onAddTemplate: () -> Void
     private let onDeleteEntry: (Entry.ID) -> Void
     private let onOpenRecurrings: () -> Void
+    private let onOpenSetup: (SetupItem) -> Void
 
     public init(
         model: HomeModel,
+        setup: SetupModel,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onShowRecords: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
@@ -28,9 +31,11 @@ public struct HomeView: View {
         onOpenOrderMenu: @escaping (CGRect) -> Void,
         onAddTemplate: @escaping () -> Void,
         onDeleteEntry: @escaping (Entry.ID) -> Void,
-        onOpenRecurrings: @escaping () -> Void
+        onOpenRecurrings: @escaping () -> Void,
+        onOpenSetup: @escaping (SetupItem) -> Void
     ) {
         self.model = model
+        self.setup = setup
         self.onOpenEntry = onOpenEntry
         self.onShowRecords = onShowRecords
         self.onOpenSettings = onOpenSettings
@@ -40,6 +45,7 @@ public struct HomeView: View {
         self.onAddTemplate = onAddTemplate
         self.onDeleteEntry = onDeleteEntry
         self.onOpenRecurrings = onOpenRecurrings
+        self.onOpenSetup = onOpenSetup
     }
 
     public var body: some View {
@@ -47,12 +53,19 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
                 dialCard
+
+                if setup.showsCard {
+                    HomeSetupCard(model: setup, onOpen: onOpenSetup)
+                        .transition(.opacity)
+                }
+
                 templateCard
                 recentCard
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
+            .animation(.snappy, value: setup.showsCard)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()

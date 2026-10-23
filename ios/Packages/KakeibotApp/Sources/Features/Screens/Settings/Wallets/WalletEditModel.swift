@@ -305,7 +305,15 @@ private extension WalletEditModel {
     static let saveFailedMessage = "保存できませんでした"
     static let deleteFailedMessage = "削除できませんでした"
 
+    static func isDebt(_ kind: Wallet.Kind) -> Bool {
+        kind == .card || kind == .loan
+    }
+
     func followKind(from oldKind: Wallet.Kind) {
+        if isNegative == Self.isDebt(oldKind) {
+            isNegative = Self.isDebt(kind)
+        }
+
         guard icon.markKind == .glyph else {
             return
         }

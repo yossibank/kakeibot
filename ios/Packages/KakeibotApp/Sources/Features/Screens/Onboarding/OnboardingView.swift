@@ -6,7 +6,10 @@ import SwiftUI
 public struct OnboardingView: View {
     @State private var model: OnboardingModel
     @State private var slide = PageSlide()
+    @State private var path: [SetupItem] = []
 
+    private let database: AppDatabase
+    private let today: LocalDate
     private let onFinish: () -> Void
 
     public init(
@@ -18,10 +21,33 @@ public struct OnboardingView: View {
             initialValue: OnboardingModel(database: database, today: today)
         )
 
+        self.database = database
+        self.today = today
         self.onFinish = onFinish
     }
 
     public var body: some View {
+        NavigationStack(path: $path) {
+            content
+                .toolbar(.hidden, for: .navigationBar)
+                .navigationDestination(for: SetupItem.self) { item in
+                    SetupDestination(item, database: database, today: today)
+                }
+        }
+        .task {
+            await model.load()
+        }
+        .task {
+            await model.setup.run()
+        }
+        .task(id: model.page) {
+            await model.refreshPage()
+        }
+    }
+}
+
+private extension OnboardingView {
+    var content: some View {
         VStack(spacing: 20) {
             topBar
 
@@ -35,9 +61,11 @@ public struct OnboardingView: View {
                     turnPage(direction)
                 }
 
-            PrimaryButton(model.nextTitle) {
-                Task {
-                    await next()
+            if !model.isFirstPage {
+                PrimaryButton(model.nextTitle) {
+                    Task {
+                        await next()
+                    }
                 }
             }
         }
@@ -55,16 +83,8 @@ public struct OnboardingView: View {
         }
         .budgetKeypad(model.budget)
         .sensoryFeedback(.selection, trigger: model.page)
-        .task {
-            await model.load()
-        }
-        .task(id: model.page) {
-            await model.refreshPage()
-        }
     }
-}
 
-private extension OnboardingView {
     var topBar: some View {
         HStack {
             if model.isFirstPage {
@@ -78,21 +98,28 @@ private extension OnboardingView {
 
             Spacer()
 
-            PageDots(
-                count: OnboardingModel.Page.allCases.count,
-                current: model.page.rawValue
-            )
+            if !model.isFirstPage {
+                PageDots(
+                    count: model.pages.count,
+                    current: model.pages.firstIndex(of: model.page) ?? 0
+                )
+            }
 
             Spacer()
 
-            Button("スキップ") {
-                Task {
-                    await finish()
+            if model.isFirstPage {
+                Color.clear
+                    .frame(width: 44, height: 44)
+            } else {
+                Button("スキップ") {
+                    Task {
+                        await finish()
+                    }
                 }
+                .textFont(.footnote)
+                .foregroundStyle(Palette.subtext)
+                .frame(minWidth: 44, minHeight: 44)
             }
-            .textFont(.footnote)
-            .foregroundStyle(Palette.subtext)
-            .frame(minWidth: 44, minHeight: 44)
         }
     }
 
@@ -102,7 +129,7 @@ private extension OnboardingView {
         case .welcome: welcomePage
         case .monthStart: monthStartPage
         case .budget: budgetPage
-        case .launchScreen: launchScreenPage
+        case .setup: setupPage
         }
     }
 
@@ -120,20 +147,33 @@ private extension OnboardingView {
             }
             .padding(.top, 36)
 
-            Text("はじめに、次のことを決めます。どれも、あとで設定から変えられます")
+            VStack(spacing: 12) {
+                PrimaryButton("すぐ始める") {
+                    Task {
+                        model.choose(.quick)
+                        await finish()
+                    }
+                }
+
+                routeButton(
+                    .minimal,
+                    title: "予算だけ決めて始める",
+                    detail: "月の始まりと予算",
+                    duration: "1 分"
+                )
+
+                routeButton(
+                    .full,
+                    title: "しっかり決めて始める",
+                    detail: "口座・固定費・通知なども",
+                    duration: "5 分"
+                )
+            }
+
+            Text("どれも、あとで設定から変えられます")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
-
-            VStack(spacing: 0) {
-                stepRow("月と週の始まり", systemImage: "calendar")
-                hairline
-                stepRow("月の予算", systemImage: "chart.bar")
-                hairline
-                stepRow("起動時に開く画面", systemImage: "iphone")
-            }
-            .padding(.horizontal, 16)
-            .card()
         }
     }
 
@@ -218,28 +258,23 @@ private extension OnboardingView {
         }
     }
 
-    var launchScreenPage: some View {
-        VStack(spacing: 20) {
-            pageHeader(
-                "起動時に開く画面",
-                message: "アプリを開いたときに、最初に出す画面を選びます"
-            )
+    var setupPage: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                pageHeader(
+                    "ほかに決めること",
+                    message: "押すと設定の画面が開きます。あとからでも、設定で変えられます"
+                )
 
-            ForEach(LaunchScreen.allCases, id: \.self) { screen in
-                LaunchScreenOption(
-                    screen: screen,
-                    isSelected: model.launchScreen == screen
-                ) {
-                    withAnimation(.snappy(duration: 0.2)) {
-                        model.launchScreen = screen
-                    }
+                SetupList(SetupItem.onboarding, model: model.setup) { item in
+                    path.append(item)
                 }
+                .padding(.horizontal, 16)
+                .card()
             }
+            .padding(.vertical, 8)
         }
-    }
-
-    var hairline: some View {
-        Hairline()
+        .scrollIndicators(.hidden)
     }
 
     func pageHeader(
@@ -260,23 +295,44 @@ private extension OnboardingView {
         .padding(.top, 8)
     }
 
-    func stepRow(
-        _ title: String,
-        systemImage: String
+    func routeButton(
+        _ route: OnboardingModel.Route,
+        title: String,
+        detail: String,
+        duration: String
     ) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
+        Button {
+            model.choose(route)
+            turnPage(.forward)
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.text)
 
-            Text(title)
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
+                    Text(detail)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                }
 
-            Spacer()
+                Spacer()
+
+                Text(duration)
+                    .textFont(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.hint)
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.hint)
+            }
+            .frame(minHeight: 56)
+            .padding(.horizontal, 16)
+            .card()
+            .contentShape(.rect)
         }
-        .frame(minHeight: 48)
+        .buttonStyle(.plain)
     }
 }
 

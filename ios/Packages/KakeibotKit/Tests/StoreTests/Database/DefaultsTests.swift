@@ -20,6 +20,19 @@ struct DefaultsTests {
     }
 
     @Test
+    func addsStarterTemplatesOnlyWhenEmpty() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+
+        try await database.insertTemplatesIfEmpty(at: now)
+        try await database.insertTemplatesIfEmpty(at: now)
+        let templates = try await database.templates()
+
+        #expect(templates.count == 4)
+    }
+
+    @Test
     func skipsWhenWalletsExist() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)

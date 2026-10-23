@@ -146,6 +146,10 @@ public extension SettingKey where Value == Bool {
     static var onboardingCompleted: Self {
         Self(flag: .onboardingCompleted)
     }
+
+    static var setupCardClosed: Self {
+        Self(flag: .setupCardClosed)
+    }
 }
 
 extension SettingKey {

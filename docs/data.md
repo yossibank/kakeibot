@@ -68,6 +68,15 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 どれにも、絵柄（`glyph`）と色の icon を 1 つずつ付ける。
 
+最初の設定を開いたときにテンプレートが 1 つも無ければ、支出のテンプレートを入れる。金額は空にし、口座は最初の現金の口座にする。
+
+| 名前 | カテゴリ |
+| --- | --- |
+| コンビニ | 食費 |
+| ランチ | 食費 |
+| 電車 | 交通 |
+| 日用品 | 日用品 |
+
 スタンプの一覧が 1 つも無ければ（しまったものも数える）、shelf_icon を入れる。絵柄は `star`・`party`・`trophy`・`cake`・`fitness`・`travel`・`sun`・`moon` の順にする。
 
 ## 表
@@ -310,6 +319,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | reminder_time | `HH:mm`。空なら知らせない |
 | theme_id | `system`（iPhone に合わせる）か、用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空なら `system` |
 | onboarding_completed | `true` `false` |
+| setup_card_closed | `true` なら、ホームの残りの設定のカードを出さない |
 | launch_screen | `home`・`records`・`review`・`assets`・`entry`。空なら入力シート |
 | corner_style | `square`・`small`・`standard`・`large`。`square` は角を丸めない。空なら `standard` |
 | font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `mincho` |
