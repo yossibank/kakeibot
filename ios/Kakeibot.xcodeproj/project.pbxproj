@@ -9,9 +9,11 @@
 /* Begin PBXBuildFile section */
 		78875D493079D3CE005422E3 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78875D483079D3CD005422E3 /* WidgetKit.framework */; };
 		78875D4B3079D3CE005422E3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78875D4A3079D3CE005422E3 /* SwiftUI.framework */; };
+		78875D793079D400005422E3 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 78875D783079D400005422E3 /* AppIntents.framework */; };
 		78875D5A3079D3D2005422E3 /* KakeibotWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 78875D463079D3CD005422E3 /* KakeibotWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		78875D743079D400005422E3 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 78875D723079D400005422E3 /* AppFeature */; };
 		78875D753079D400005422E3 /* AppWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 78875D733079D400005422E3 /* AppWidget */; };
+		78875D773079D400005422E3 /* AppWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 78875D763079D400005422E3 /* AppWidget */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +43,7 @@
 		78875D463079D3CD005422E3 /* KakeibotWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KakeibotWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		78875D483079D3CD005422E3 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		78875D4A3079D3CE005422E3 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		78875D783079D400005422E3 /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -84,6 +87,8 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				78875D743079D400005422E3 /* AppFeature in Frameworks */,
+				78875D793079D400005422E3 /* AppIntents.framework in Frameworks */,
+				78875D773079D400005422E3 /* AppWidget in Frameworks */,
 			);
 		};
 		78875D433079D3CD005422E3 /* Frameworks */ = {
@@ -121,6 +126,7 @@
 			children = (
 				78875D483079D3CD005422E3 /* WidgetKit.framework */,
 				78875D4A3079D3CE005422E3 /* SwiftUI.framework */,
+				78875D783079D400005422E3 /* AppIntents.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -148,6 +154,7 @@
 			name = Kakeibot;
 			packageProductDependencies = (
 				78875D723079D400005422E3 /* AppFeature */,
+				78875D763079D400005422E3 /* AppWidget */,
 			);
 			productName = Kakeibot;
 			productReference = 78875D343079D362005422E3 /* Kakeibot.app */;
@@ -568,6 +575,10 @@
 			productName = AppFeature;
 		};
 		78875D733079D400005422E3 /* AppWidget */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppWidget;
+		};
+		78875D763079D400005422E3 /* AppWidget */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppWidget;
 		};

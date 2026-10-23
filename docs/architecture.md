@@ -117,7 +117,7 @@ KakeibotKit/
 KakeibotApp/
 ├── Sources/
 │   ├── AppFeature/          AppModel、RootView、MainView（タブとシート）、起動の印の動き、通知の許可、入力の準備
-│   ├── AppWidget/           ウィジェットの見た目、タイムライン、テーマの色の当て方、すぐ記録の記録と取り消し（AppIntent）
+│   ├── AppWidget/           ウィジェットの見た目、タイムライン、テーマの色の当て方、すぐ記録の記録と取り消し、コントロールの「記録する」（AppIntent）
 │   ├── DesignSystem/
 │   │   ├── Components/      部品の種類ごとのフォルダ
 │   │   │   ├── Amount/      金額、予算の使い具合の色と棒、残りの文字
@@ -202,6 +202,7 @@ flowchart TB
     GRDB[("GRDB")]
 
     App --> AppFeature
+    App --> AppWidget
     Widget --> AppWidget
     AppFeature --> Features
     AppFeature --> Notifications
@@ -310,10 +311,13 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 | --- | --- |
 | ウィジェット | ホーム |
 | すぐ記録の金額を決めていないテンプレート | 入力シート（そのテンプレート） |
+| コントロールの「記録する」 | 入力シート（今日） |
 | 記録忘れの通知 | 入力シート（今日） |
 | 固定費の更新前の通知 | 設定 → 固定費 → その固定費 |
 
 行き先は、通知と同じ `PlannedNotification.Route` で表す。ウィジェットからは、`kakeibot://home` のように、行き先の文字列を `kakeibot` の URL にして渡す。起動したときは、起動画面が消えてから行き先を開き、起動時に開く画面は開かない。
+
+コントロールの「記録する」は、AppIntent をアプリの中で動かし、`NotificationRouter` に行き先を渡す。このインテントを入れるため、`Kakeibot` も AppWidget と AppIntents.framework をつなぐ。
 
 ## 通知とウィジェット
 

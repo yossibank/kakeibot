@@ -8,6 +8,7 @@ struct KakeibotWidgetBundle: WidgetBundle {
         BudgetWidget()
         BudgetLockWidget()
         QuickRecordWidget()
+        RecordEntryControl()
     }
 
     init() {
