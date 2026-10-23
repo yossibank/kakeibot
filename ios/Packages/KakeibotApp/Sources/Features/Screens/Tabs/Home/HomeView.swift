@@ -9,6 +9,7 @@ public struct HomeView: View {
     @State private var orderButtonFrame: CGRect = .zero
 
     private let setup: SetupModel
+    private let appIcon: AppIconListModel
     private let isRevealed: Bool
     private let onOpenEntry: (Entry.ID) -> Void
     private let onShowRecords: () -> Void
@@ -24,6 +25,7 @@ public struct HomeView: View {
     public init(
         model: HomeModel,
         setup: SetupModel,
+        appIcon: AppIconListModel,
         isRevealed: Bool,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onShowRecords: @escaping () -> Void,
@@ -38,6 +40,7 @@ public struct HomeView: View {
     ) {
         self.model = model
         self.setup = setup
+        self.appIcon = appIcon
         self.isRevealed = isRevealed
         self.onOpenEntry = onOpenEntry
         self.onShowRecords = onShowRecords
@@ -59,7 +62,16 @@ public struct HomeView: View {
 
                 if showsSetupCard {
                     HomeSetupCard(model: setup, onOpen: onOpenSetup)
-                        .transition(.offset(y: 16).combined(with: .opacity))
+                        .transition(Self.cardTransition)
+                }
+
+                if showsCustomizeCard {
+                    HomeCustomizeCard(
+                        model: setup,
+                        appIcon: appIcon,
+                        onOpen: onOpenSetup
+                    )
+                    .transition(Self.cardTransition)
                 }
 
                 templateCard
@@ -69,6 +81,7 @@ public struct HomeView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
             .animation(.snappy, value: showsSetupCard)
+            .animation(.snappy, value: showsCustomizeCard)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -432,8 +445,16 @@ private extension HomeView {
     static let shadowRoom: CGFloat = 32
     static let toolStroke = Palette.accent.opacity(.muted)
 
+    static var cardTransition: AnyTransition {
+        .offset(y: 16).combined(with: .opacity)
+    }
+
     var showsSetupCard: Bool {
         isRevealed && setup.showsCard
+    }
+
+    var showsCustomizeCard: Bool {
+        isRevealed && setup.showsCustomizeCard
     }
 
     var dialTitle: String {

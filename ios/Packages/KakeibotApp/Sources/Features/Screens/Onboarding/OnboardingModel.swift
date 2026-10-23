@@ -75,6 +75,7 @@ public extension OnboardingModel {
 
         do {
             try await database.insertTemplatesIfEmpty(at: Date())
+            try await database.setSetting(.entryStartsWithAmount, to: true)
             weekStart = try await database.setting(.weekStart)
         } catch {
             errorNotice.show(Self.loadFailedMessage)
@@ -123,7 +124,6 @@ public extension OnboardingModel {
 
     func finish() async -> Bool {
         do {
-            try await database.setSetting(.entryStartsWithAmount, to: true)
             try await database.setSetting(.onboardingCompleted, to: true)
 
             return true

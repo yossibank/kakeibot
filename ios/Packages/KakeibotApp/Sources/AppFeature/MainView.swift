@@ -13,6 +13,7 @@ struct MainView: View {
     @State private var review: ReviewModel
     @State private var assets: AssetsModel
     @State private var setup: SetupModel
+    @State private var appIcon = AppIconListModel()
     @State private var draft: EntryModel
     @State private var notice: EntryNoticeModel
     @State private var undo: DeletionUndo
@@ -88,6 +89,7 @@ struct MainView: View {
                 HomeView(
                     model: home,
                     setup: setup,
+                    appIcon: appIcon,
                     isRevealed: isRevealed,
                     onOpenEntry: { id in
                         sheet = .edit(id)
@@ -297,7 +299,8 @@ private extension MainView {
         case .settings:
             SettingsSheet(
                 database: database,
-                today: today
+                today: today,
+                appIcon: appIcon
             )
         case let .template(template):
             EntrySheet(
@@ -342,8 +345,13 @@ private extension MainView {
             }
         case let .setup(item):
             NavigationStack {
-                SetupDestination(item, database: database, today: today)
-                    .toolbar(.hidden, for: .navigationBar)
+                SetupDestination(
+                    item,
+                    database: database,
+                    today: today,
+                    appIcon: appIcon
+                )
+                .toolbar(.hidden, for: .navigationBar)
             }
         case .periodRecurrings:
             PeriodRecurringSheet(

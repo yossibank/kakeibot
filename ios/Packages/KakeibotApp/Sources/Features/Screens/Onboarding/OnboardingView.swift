@@ -7,6 +7,7 @@ public struct OnboardingView: View {
     @State private var model: OnboardingModel
     @State private var slide = PageSlide()
     @State private var path: [SetupItem] = []
+    @State private var appIcon = AppIconListModel()
 
     private let database: AppDatabase
     private let today: LocalDate
@@ -31,7 +32,12 @@ public struct OnboardingView: View {
             content
                 .toolbar(.hidden, for: .navigationBar)
                 .navigationDestination(for: SetupItem.self) { item in
-                    SetupDestination(item, database: database, today: today)
+                    SetupDestination(
+                        item,
+                        database: database,
+                        today: today,
+                        appIcon: appIcon
+                    )
                 }
         }
         .task {
@@ -266,15 +272,31 @@ private extension OnboardingView {
                     message: "押すと設定の画面が開きます。\nあとからでも、設定で変えられます"
                 )
 
-                SetupList(SetupItem.onboarding, model: model.setup) { item in
-                    path.append(item)
-                }
-                .padding(.horizontal, 16)
-                .card()
+                setupSection("記録の準備", items: SetupItem.onboarding)
+                setupSection("自分好みに", items: SetupItem.customize)
             }
             .padding(.vertical, 8)
         }
         .scrollIndicators(.hidden)
+    }
+
+    func setupSection(
+        _ title: String,
+        items: [SetupItem]
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .textFont(.caption2)
+                .tracking(3)
+                .foregroundStyle(Palette.accent)
+                .padding(.leading, 8)
+
+            SetupList(items, model: model.setup) { item in
+                path.append(item)
+            }
+            .padding(.horizontal, 16)
+            .card()
+        }
     }
 
     func pageHeader(

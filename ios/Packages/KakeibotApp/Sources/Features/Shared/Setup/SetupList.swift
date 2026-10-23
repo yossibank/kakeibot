@@ -23,10 +23,14 @@ public struct SetupList: View {
                     Hairline()
                 }
 
-                Button {
-                    onOpen(item)
-                } label: {
-                    row(item)
+                if item.isToggle {
+                    toggleRow(item)
+                } else {
+                    Button {
+                        onOpen(item)
+                    } label: {
+                        row(item)
+                    }
                 }
             }
         }
@@ -35,6 +39,28 @@ public struct SetupList: View {
 }
 
 private extension SetupList {
+    func toggleRow(_ item: SetupItem) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: item.systemImage)
+                .sansFont(.body, weight: .light)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 22)
+
+            Text(item.title)
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+                .lineLimit(1)
+
+            Spacer()
+
+            CapsulePicker(
+                selection: startsWithAmountBinding,
+                options: Self.startOptions
+            )
+        }
+        .frame(minHeight: 52)
+    }
+
     func row(_ item: SetupItem) -> some View {
         HStack(spacing: 12) {
             Image(systemName: item.systemImage)
@@ -63,5 +89,22 @@ private extension SetupList {
         .frame(minHeight: 48)
         .contentShape(.rect)
         .animation(.snappy, value: model.isDone(item))
+    }
+}
+
+private extension SetupList {
+    static let startOptions: [CapsulePicker<Bool>.Option] = [
+        .init("する", value: true),
+        .init("しない", value: false)
+    ]
+
+    var startsWithAmountBinding: Binding<Bool> {
+        Binding {
+            model.startsWithAmount
+        } set: { starts in
+            Task {
+                await model.setStartsWithAmount(starts)
+            }
+        }
     }
 }

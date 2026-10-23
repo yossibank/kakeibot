@@ -151,6 +151,10 @@ public extension SettingKey where Value == Bool {
         Self(flag: .setupCardClosed)
     }
 
+    static var customizeCardClosed: Self {
+        Self(flag: .customizeCardClosed)
+    }
+
     static var entryOpened: Self {
         Self(flag: .entryOpened)
     }

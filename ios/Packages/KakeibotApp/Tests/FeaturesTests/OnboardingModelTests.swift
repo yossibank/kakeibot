@@ -65,6 +65,25 @@ struct OnboardingModelTests {
     }
 
     @Test
+    func keepsAmountChoiceAfterFinish() async throws {
+        let setup = try await HomeModelTests.Setup()
+
+        let model = OnboardingModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await model.load()
+        let initial = try await setup.database.setting(.entryStartsWithAmount)
+        await model.setup.setStartsWithAmount(false)
+        _ = await model.finish()
+        let saved = try await setup.database.setting(.entryStartsWithAmount)
+
+        #expect(initial)
+        #expect(!saved)
+    }
+
+    @Test
     func addsStarterTemplatesOnce() async throws {
         let setup = try await HomeModelTests.Setup()
 

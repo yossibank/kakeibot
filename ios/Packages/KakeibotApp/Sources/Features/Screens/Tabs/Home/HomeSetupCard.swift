@@ -7,30 +7,11 @@ struct HomeSetupCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text("あと \(model.cardItems.count) つで準備がそろいます")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.accentStrong)
-                    .contentTransition(.numericText())
-
-                Spacer()
-
-                Button {
-                    Task {
-                        await model.closeCard()
-                    }
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(Palette.subtext)
-                        .frame(width: 24, height: 24)
-                        .background(Palette.line, in: Circle())
-                        .frame(width: 32, height: 32)
-                        .contentShape(.rect)
+            HomeCardHeader(title: "あと \(model.cardItems.count) つで準備がそろいます") {
+                Task {
+                    await model.closeCard()
                 }
-                .buttonStyle(.plain)
             }
-            .padding(.top, 8)
 
             SetupList(model.cardItems, model: model, onOpen: onOpen)
         }

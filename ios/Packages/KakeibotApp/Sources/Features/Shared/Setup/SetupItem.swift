@@ -7,15 +7,26 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
     case recurrings
     case templates
     case reminder
+    case launchScreen
+    case startsWithAmount
     case theme
+    case appIcon
+    case themeStyle
 
     public static let onboarding: [Self] = [
         .wallets,
         .categories,
         .recurrings,
         .templates,
-        .reminder,
-        .theme
+        .reminder
+    ]
+
+    public static let customize: [Self] = [
+        .launchScreen,
+        .startsWithAmount,
+        .theme,
+        .appIcon,
+        .themeStyle
     ]
 
     public static let home: [Self] = [.budget, .wallets, .recurrings]
@@ -32,7 +43,11 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .recurrings: "固定費（家賃・通信など）"
         case .templates: "テンプレート"
         case .reminder: "記録忘れの通知"
+        case .launchScreen: "起動時に開く画面"
+        case .startsWithAmount: "金額から入力"
         case .theme: "テーマ"
+        case .appIcon: "アプリアイコン"
+        case .themeStyle: "文字と角の丸み"
         }
     }
 
@@ -44,8 +59,16 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .recurrings: "repeat"
         case .templates: "rectangle.stack"
         case .reminder: "bell"
+        case .launchScreen: "iphone"
+        case .startsWithAmount: "yensign"
         case .theme: "paintpalette"
+        case .appIcon: "app.badge"
+        case .themeStyle: "textformat"
         }
+    }
+
+    public var isToggle: Bool {
+        self == .startsWithAmount
     }
 
     public func isDone(in progress: SetupProgress) -> Bool {
@@ -55,7 +78,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .recurrings: progress.hasRecurring
         case .reminder: progress.hasReminder
         case .theme: progress.hasTheme
-        case .categories, .templates: false
+        case .categories, .templates, .launchScreen, .startsWithAmount, .appIcon, .themeStyle: false
         }
     }
 }

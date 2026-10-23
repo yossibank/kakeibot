@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import Observation
 import Store
@@ -7,8 +8,13 @@ import Store
 public final class SetupModel: ScreenModel {
     public private(set) var progress: SetupProgress?
     public private(set) var isCardClosed = true
+    public private(set) var isCustomizeCardClosed = true
     public private(set) var isEntryOpened = true
     public private(set) var isSettingsOpened = true
+    public private(set) var launchScreen: LaunchScreen = .home
+    public private(set) var startsWithAmount = true
+    public private(set) var theme: ThemeChoice = .system
+    public private(set) var customThemes: [Theme] = []
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -32,6 +38,18 @@ public extension SetupModel {
         !isCardClosed && !cardItems.isEmpty
     }
 
+    var showsCustomizeCard: Bool {
+        !isCustomizeCardClosed
+    }
+
+    var startsWithAmountTitle: String {
+        startsWithAmount ? "する" : "しない"
+    }
+
+    var themeTitle: String {
+        theme.title(in: customThemes)
+    }
+
     func isDone(_ item: SetupItem) -> Bool {
         progress.map(item.isDone) ?? false
     }
@@ -47,13 +65,39 @@ public extension SetupModel {
             }
 
             group.addTask {
+                await self.observeCustomizeCardClosed()
+            }
+
+            group.addTask {
                 await self.observeEntryOpened()
             }
 
             group.addTask {
                 await self.observeSettingsOpened()
             }
+
+            group.addTask {
+                await self.observeLaunchScreen()
+            }
+
+            group.addTask {
+                await self.observeStartsWithAmount()
+            }
+
+            group.addTask {
+                await self.observeTheme()
+            }
+
+            group.addTask {
+                await self.observeCustomThemes()
+            }
         }
+    }
+
+    func setStartsWithAmount(_ starts: Bool) async {
+        startsWithAmount = starts
+
+        await save(.entryStartsWithAmount, to: starts)
     }
 
     func markEntryOpened() async {
@@ -63,7 +107,7 @@ public extension SetupModel {
 
         isEntryOpened = true
 
-        await save(.entryOpened)
+        await save(.entryOpened, to: true)
     }
 
     func markSettingsOpened() async {
@@ -73,13 +117,19 @@ public extension SetupModel {
 
         isSettingsOpened = true
 
-        await save(.settingsOpened)
+        await save(.settingsOpened, to: true)
     }
 
     func closeCard() async {
         isCardClosed = true
 
-        await save(.setupCardClosed)
+        await save(.setupCardClosed, to: true)
+    }
+
+    func closeCustomizeCard() async {
+        isCustomizeCardClosed = true
+
+        await save(.customizeCardClosed, to: true)
     }
 }
 
@@ -105,6 +155,15 @@ private extension SetupModel {
         }
     }
 
+    func observeCustomizeCardClosed() async {
+        await observe(
+            database.settingUpdates(.customizeCardClosed),
+            failure: Self.loadFailedMessage
+        ) { isClosed in
+            isCustomizeCardClosed = isClosed
+        }
+    }
+
     func observeEntryOpened() async {
         await observe(
             database.settingUpdates(.entryOpened),
@@ -123,9 +182,48 @@ private extension SetupModel {
         }
     }
 
-    func save(_ key: SettingKey<Bool>) async {
+    func observeLaunchScreen() async {
+        await observe(
+            database.settingUpdates(.launchScreen),
+            failure: Self.loadFailedMessage
+        ) { screen in
+            launchScreen = screen
+        }
+    }
+
+    func observeStartsWithAmount() async {
+        await observe(
+            database.settingUpdates(.entryStartsWithAmount),
+            failure: Self.loadFailedMessage
+        ) { starts in
+            startsWithAmount = starts
+        }
+    }
+
+    func observeTheme() async {
+        await observe(
+            database.settingUpdates(.theme),
+            failure: Self.loadFailedMessage
+        ) { theme in
+            self.theme = theme
+        }
+    }
+
+    func observeCustomThemes() async {
+        await observe(
+            database.customThemeUpdates(),
+            failure: Self.loadFailedMessage
+        ) { themes in
+            customThemes = themes
+        }
+    }
+
+    func save(
+        _ key: SettingKey<Bool>,
+        to value: Bool
+    ) async {
         do {
-            try await database.setSetting(key, to: true)
+            try await database.setSetting(key, to: value)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
         }

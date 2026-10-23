@@ -320,6 +320,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | theme_id | `system`（iPhone に合わせる）か、用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空なら `system` |
 | onboarding_completed | `true` `false` |
 | setup_card_closed | `true` なら、ホームの残りの設定のカードを出さない |
+| customize_card_closed | `true` なら、ホームの自分好みにカスタマイズのカードを出さない |
 | entry_opened | `true` `false`。入力シートを一度開くと `true` にし、入力の ＋ に光を回さない |
 | settings_opened | `true` `false`。設定を一度開くと `true` にし、ホームの設定のボタンに金の点を出さない |
 | launch_screen | `home`・`records`・`review`・`assets`・`entry`。空ならホーム |
