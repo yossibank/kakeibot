@@ -85,7 +85,7 @@ struct ThemeWriteTests {
     }
 
     @Test
-    func followsDeviceAfterDeletingChosenTheme() async throws {
+    func returnsToWhiteAfterDeletingChosenTheme() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 0)
         let theme = try await database.saveTheme(Self.mint, at: now)
@@ -95,7 +95,7 @@ struct ThemeWriteTests {
         let choice = try await database.setting(.theme)
         let themes = try await database.customThemes()
 
-        #expect(choice == .system)
+        #expect(choice == .preset(.white))
         #expect(themes.isEmpty)
     }
 
