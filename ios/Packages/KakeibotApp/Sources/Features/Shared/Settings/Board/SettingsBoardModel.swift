@@ -136,9 +136,9 @@ public extension SettingsBoardModel {
     }
 
     func deleteHidden() async -> Deletion? {
-        let ids = hidden.map(\.id)
-
         movingOrder = nil
+
+        let ids = hidden.map(\.id)
 
         let result = await SettingsBulkDelete.run(ids) { id in
             try await remove(id)

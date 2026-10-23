@@ -34,7 +34,6 @@ extension Color {
         let red = Double((value >> 16) & 0xFF) / 255
         let green = Double((value >> 8) & 0xFF) / 255
         let blue = Double(value & 0xFF) / 255
-
         self.init(red: red, green: green, blue: blue)
     }
 
@@ -86,7 +85,6 @@ extension UIColor {
         let red = CGFloat((value >> 16) & 0xFF) / 255
         let green = CGFloat((value >> 8) & 0xFF) / 255
         let blue = CGFloat(value & 0xFF) / 255
-
         self.init(red: red, green: green, blue: blue, alpha: 1)
     }
 }

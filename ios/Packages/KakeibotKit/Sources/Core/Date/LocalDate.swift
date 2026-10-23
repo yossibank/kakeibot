@@ -47,7 +47,6 @@ public struct LocalDate: Hashable, Sendable {
         let localSeconds = date.timeIntervalSince1970 + offset
         let dayLength = TimeInterval(Self.secondsPerDay)
         let days = Int((localSeconds / dayLength).rounded(.down))
-
         self.init(dayNumber: Self.unixEpochDayNumber + days)
     }
 }
@@ -113,7 +112,6 @@ extension LocalDate {
 
     init(dayNumber: Int) {
         let estimatedYear = dayNumber * 400 / Self.daysPer400Years + 1
-
         var yearMonth = YearMonth(monthIndex: estimatedYear * 12)
 
         while yearMonth.firstDayNumber > dayNumber {

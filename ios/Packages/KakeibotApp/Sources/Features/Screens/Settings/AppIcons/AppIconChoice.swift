@@ -168,7 +168,6 @@ public extension AppIconChoice {
 
     init(alternateName: String?) {
         let choice = Self.allCases.first { $0.alternateName == alternateName }
-
         self = choice ?? .white
     }
 }

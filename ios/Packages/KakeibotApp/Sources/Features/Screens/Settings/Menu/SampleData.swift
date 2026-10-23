@@ -16,10 +16,11 @@ enum SampleData {
         now: Date
     ) async throws {
         let card = try await database.saveWallet(cardDraft, at: now)
-        let loan = try await database.saveWallet(loanDraft, at: now)
-        let options = try await database.entryOptions()
 
         _ = try await database.saveWallet(investmentDraft, at: now)
+
+        let loan = try await database.saveWallet(loanDraft, at: now)
+        let options = try await database.entryOptions()
 
         let book = try Book(
             options: options,

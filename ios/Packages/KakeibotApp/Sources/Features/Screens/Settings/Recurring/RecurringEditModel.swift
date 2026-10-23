@@ -290,13 +290,14 @@ private extension RecurringEditModel {
 
         let bank = wallets.first { $0.kind == .bank && $0.id != target }
         let other = wallets.first { $0.id != target }
-        let name = selectedDestination?.name ?? ""
 
         type = .transfer
         categoryId = nil
         toWalletId = target
         walletId = (bank ?? other)?.id
         day = Self.billPaymentDay
+
+        let name = selectedDestination?.name ?? ""
 
         if selectedDestination?.kind == .card {
             closingDay = Self.billClosingDay

@@ -11,7 +11,6 @@ public extension PlannedNotification.Route {
         }
 
         let host = url.host() ?? ""
-
         self.init(link: host + url.path())
     }
 }

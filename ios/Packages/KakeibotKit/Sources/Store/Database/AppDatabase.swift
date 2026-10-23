@@ -33,10 +33,9 @@ public extension AppDatabase {
     static func appGroupForReading() throws -> AppDatabase {
         var configuration = configuration
 
-        let path = try groupPath()
-
         configuration.readonly = true
 
+        let path = try groupPath()
         let pool = try DatabasePool(path: path, configuration: configuration)
 
         let isMigrated = try pool.read { db in

@@ -103,7 +103,6 @@ public extension ExportV1 {
 
     init(json: Data) throws {
         let decoder = JSONDecoder()
-
         decoder.dateDecodingStrategy = .iso8601
         self = try decoder.decode(Self.self, from: json)
     }

@@ -22,7 +22,6 @@ public final class ThemeEditModel {
     ) {
         let draft = theme.map(ThemeDraft.init)
             ?? ThemeDraft(name: "", palette: palette)
-
         self.draft = draft
         self.baseline = draft
         self.database = database
