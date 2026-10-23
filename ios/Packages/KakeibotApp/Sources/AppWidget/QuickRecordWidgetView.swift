@@ -28,7 +28,7 @@ private extension QuickRecordWidgetView {
                     .frame(height: Self.headerHeight)
 
                 if summary.tiles.isEmpty {
-                    Text("金額を決めたテンプレートを作ると、ここから記録できます")
+                    Text("テンプレートを作ると、ここから記録できます")
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .multilineTextAlignment(.center)
@@ -123,11 +123,20 @@ private extension QuickRecordWidgetView {
         }
     }
 
+    @ViewBuilder
     func tileButton(_ tile: QuickRecordWidgetSummary.Tile) -> some View {
-        Button(intent: RecordTemplateIntent(tile.id)) {
+        if tile.amount != nil {
+            Button(intent: RecordTemplateIntent(tile.id)) {
+                tileFace(tile)
+            }
+            .buttonStyle(.plain)
+        } else if let url = PlannedNotification.Route.template(tile.id).url {
+            Link(destination: url) {
+                tileFace(tile)
+            }
+        } else {
             tileFace(tile)
         }
-        .buttonStyle(.plain)
     }
 
     func tileFace(_ tile: QuickRecordWidgetSummary.Tile) -> some View {
@@ -142,30 +151,36 @@ private extension QuickRecordWidgetView {
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .layoutPriority(1)
-
-                if isLarge {
-                    Text(tile.detail)
-                        .textFont(size: .micro)
-                        .foregroundStyle(Palette.subtext)
-                        .lineLimit(1)
-                }
             }
 
-            Spacer(minLength: 2)
+            if isLarge {
+                Text(tile.detail)
+                    .textFont(size: .micro)
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .padding(.leading, Self.badgeSize + 6)
+            }
+
+            Spacer(minLength: 0)
 
             HStack(spacing: 4) {
-                Text(AmountText.text(tile.amount))
-                    .displayFont(.body, weight: .medium)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                    .privacySensitive()
+                if let amount = tile.amount {
+                    Text(AmountText.text(amount))
+                        .displayFont(.body, weight: .medium)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accentStrong)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .privacySensitive()
+                } else {
+                    Text("毎回入れる")
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.hint)
+                }
 
                 Spacer(minLength: 0)
 
-                Image(systemName: "plus")
+                Image(systemName: tile.amount == nil ? "pencil" : "plus")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(Palette.backgroundTop)
                     .frame(width: Self.markSize, height: Self.markSize)

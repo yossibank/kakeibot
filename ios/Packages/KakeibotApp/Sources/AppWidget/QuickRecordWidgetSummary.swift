@@ -16,7 +16,7 @@ extension QuickRecordWidgetSummary {
         let id: EntryTemplate.ID
         let name: String
         let detail: String
-        let amount: Int
+        let amount: Int?
         let icon: Icon?
     }
 
@@ -47,20 +47,18 @@ extension QuickRecordWidgetSummary {
         recordedId: Entry.ID?
     ) {
         let list = overview.list
-        let usable = templates.filter { $0.type == .expense && $0.amount != nil }
-        let ordered = list?.ordered(usable, by: order, today: overview.today) ?? usable
+        let expenses = templates.filter { $0.type == .expense }
+        let ordered = list?.ordered(expenses, by: order, today: overview.today) ?? expenses
         let today = list?.days.first { $0.date == overview.today }
 
-        let tiles = ordered.prefix(Self.limit).compactMap { template in
-            template.amount.map { amount in
-                Tile(
-                    id: template.id,
-                    name: template.name,
-                    detail: list?.detailParts(for: template).rowDetail ?? "",
-                    amount: amount,
-                    icon: list?.icon(for: template)
-                )
-            }
+        let tiles = ordered.prefix(Self.limit).map { template in
+            Tile(
+                id: template.id,
+                name: template.name,
+                detail: list?.detailParts(for: template).rowDetail ?? "",
+                amount: template.amount,
+                icon: list?.icon(for: template)
+            )
         }
 
         let todayEntries = today?.entries ?? []
@@ -110,10 +108,10 @@ extension QuickRecordWidgetSummary {
 
     static func sample() -> QuickRecordWidgetSummary {
         let tiles = [
-            ("コーヒー", "カフェ・財布", 450),
+            ("駅前のカフェでモーニング", "カフェ・財布", 650),
             ("ランチ", "食費・財布", 980),
             ("電車", "交通・カード", 220),
-            ("外食", "食費・カード", 1800),
+            ("外食", "食費・カード", nil),
             ("本", "趣味・カード", 1500),
             ("ジム", "健康・銀行", 800),
             ("おやつ", "食費・財布", 300),
