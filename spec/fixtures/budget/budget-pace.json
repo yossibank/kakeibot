@@ -1,0 +1,9 @@
+[
+  {"budget": 90000, "spent": 0, "today": "2026-10-01", "periodStart": "2026-10-01", "periodEnd": "2026-10-31", "projectedLeft": 90000},
+  {"budget": 90000, "spent": 20000, "today": "2026-10-10", "periodStart": "2026-10-01", "periodEnd": "2026-10-31", "projectedLeft": 28000},
+  {"budget": 90000, "spent": 30000, "today": "2026-10-10", "periodStart": "2026-10-01", "periodEnd": "2026-10-31", "projectedLeft": -3000},
+  {"budget": 90000, "spent": 30000, "fixedSpent": 10000, "upcoming": 15000, "today": "2026-10-10", "periodStart": "2026-10-01", "periodEnd": "2026-10-31", "projectedLeft": 3000},
+  {"budget": 90000, "spent": 95000, "today": "2026-10-31", "periodStart": "2026-10-01", "periodEnd": "2026-10-31", "projectedLeft": -5000},
+  {"budget": 90000, "spent": 3000, "today": "2026-09-25", "periodStart": "2026-09-25", "periodEnd": "2026-10-24", "projectedLeft": 0},
+  {"budget": 90000, "spent": 50000, "fixedSpent": 60000, "today": "2026-10-05", "periodStart": "2026-10-01", "periodEnd": "2026-10-31", "projectedLeft": 40000}
+]

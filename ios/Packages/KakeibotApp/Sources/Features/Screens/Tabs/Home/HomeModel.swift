@@ -106,6 +106,10 @@ public extension HomeModel {
         overview.budgetUsage
     }
 
+    var budgetPace: BudgetPace? {
+        overview.budgetPace
+    }
+
     var templates: [EntryTemplate] {
         let uses = templateOrder == .frequent ? templateUses : [:]
 

@@ -21,10 +21,13 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | --- | --- | --- |
 | `budget-amount.json` | ある月に使う予算。`fromMonth` がその月以前でいちばん新しい行の額 | `budgets`（`category`・`fromMonth`・`amount`）、`category`、`month`、`amount` |
 | `budget-usage.json` | 予算の残りと、期間の終わりまでの 1 日あたりの額、8 割を超えたか、今日あといくら使えるか | `budget`、`spent`、`upcoming`、`today`、`periodEnd`、`remaining`、`perDay`、`isOver`、`isNearLimit`、`spentToday`、`todayRemaining` |
+| `budget-pace.json` | 今のペースで使ったとき、期間の終わりに予算がいくら余るか | `budget`、`spent`、`fixedSpent`、`upcoming`、`today`、`periodStart`、`periodEnd`、`projectedLeft` |
 
 `category` が空なら月全体の予算を、名前ならそのカテゴリの予算を表す。月全体とカテゴリの予算は混ぜない。
 
 1 日あたりの額は、残りから `upcoming` を引き、今日から期間の終わりまでの日数（今日を含む）で割る。1 円未満は切り捨て、0 以下なら 0 にする。`upcoming` は、明日から期間の終わりまでに来る固定費の支出で、無ければ 0 とする。`isNearLimit` は、使った額が予算の 8 割以上で、超えていないときに真にする。今日あといくらは、残りに `spentToday` を足して `upcoming` を引く。0 未満なら 0 にして日数で割り、1 円未満は切り捨てる。そこから `spentToday` を引き、負の値も残す。`spentToday` は今日の支出で、無ければ 0 とする。
+
+期間の終わりの見通しは、`spent` から `fixedSpent` を引いた額（0 未満なら 0）を、期間の始まりから今日までの日数（今日を含む）で割ったペースで出す。そのペースに明日から期間の終わりまでの日数を掛け、`spent` と `upcoming` に足した額を予算から引く。掛けてから割り、1 円未満は切り捨てる。負の値は足りない額を表す。`fixedSpent` は今の期間に記録した固定費の支出で、無ければ 0 とする。
 
 ## category
 

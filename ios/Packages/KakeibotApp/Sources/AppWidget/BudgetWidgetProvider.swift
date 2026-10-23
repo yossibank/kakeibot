@@ -57,13 +57,14 @@ private extension BudgetWidgetProvider {
         }
 
         let look = await (try? database.themeLook()) ?? .followsDevice
+        let weekStart = await (try? database.setting(.weekStart)) ?? .sunday
         var style = await (try? database.style()) ?? .standard
 
         style.textSize = .standard
 
         let current = BudgetWidgetEntry(
             date: now,
-            summary: BudgetWidgetSummary(overview),
+            summary: BudgetWidgetSummary(overview, weekStart: weekStart),
             look: look,
             style: style
         )
@@ -76,7 +77,7 @@ private extension BudgetWidgetProvider {
 
         let next = BudgetWidgetEntry(
             date: midnight,
-            summary: BudgetWidgetSummary(tomorrow),
+            summary: BudgetWidgetSummary(tomorrow, weekStart: weekStart),
             look: look,
             style: style
         )

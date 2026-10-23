@@ -121,6 +121,31 @@ public extension MonthOverview {
         )
     }
 
+    var budgetPace: BudgetPace? {
+        budgetUsage.map { usage in
+            BudgetPace(
+                budget: usage.budget,
+                spent: usage.spent,
+                fixedSpent: paidRecurringExpense,
+                upcoming: usage.upcoming,
+                today: today,
+                period: period
+            )
+        }
+    }
+
+    var nextRecurringExpense: PeriodRecurring? {
+        periodRecurrings.first { item in
+            item.recurring.type == .expense && item.status == .upcoming
+        }
+    }
+
+    func expense(in range: ClosedRange<LocalDate>) -> Int {
+        list?.days
+            .filter { range.contains($0.date) }
+            .reduce(0) { $0 + $1.expenseTotal } ?? 0
+    }
+
     func moved(to day: LocalDate) -> MonthOverview {
         MonthOverview(
             list: list,

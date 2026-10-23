@@ -118,8 +118,9 @@ private extension HomeView {
                     HStack(spacing: 16) {
                         Text("予算 \(AmountText.text(usage.budget))")
 
-                        if !usage.isOver {
-                            Text("1 日あたり \(AmountText.text(usage.perDay))")
+                        if let pace = model.budgetPace {
+                            Text("このペースだと \(pace.leftText)")
+                                .foregroundStyle(paceColor(of: pace))
                         }
                     }
                     .textFont(.caption)
@@ -463,6 +464,10 @@ private extension HomeView {
 
     var templateHint: String {
         model.templates.isEmpty ? "よく使う入力を 1 回で" : "押すとすぐ記録"
+    }
+
+    func paceColor(of pace: BudgetPace) -> Color {
+        pace.isShort ? Palette.rose : Palette.subtext
     }
 }
 
