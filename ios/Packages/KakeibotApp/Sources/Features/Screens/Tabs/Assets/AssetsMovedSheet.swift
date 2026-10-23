@@ -10,8 +10,8 @@ struct AssetsMovedSheet: View {
 
     var body: some View {
         FittedSheet {
-            VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .top, spacing: 14) {
+            VStack(alignment: .leading, spacing: 20) {
+                HStack(alignment: .top, spacing: 16) {
                     FlipDate(row.bill.date)
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -42,7 +42,7 @@ private extension AssetsMovedSheet {
         _ title: String,
         rows: [EntryRowItem]
     ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .textFont(.caption)
                 .tracking(2)
@@ -73,7 +73,7 @@ private extension AssetsMovedSheet {
                     }
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .card()
         }
     }

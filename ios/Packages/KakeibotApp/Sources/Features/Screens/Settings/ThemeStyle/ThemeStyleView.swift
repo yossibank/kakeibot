@@ -15,7 +15,7 @@ public struct ThemeStyleView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             SettingsBackHeader("文字と角の丸み")
 
             preview
@@ -53,12 +53,12 @@ public struct ThemeStyleView: View {
             .contentMargins(.horizontal, 18, for: .scrollContent)
             .contentMargins(.vertical, Self.fade, for: .scrollContent)
             .edgeFade(Self.fade)
-            .padding(.horizontal, -18)
+            .padding(.horizontal, -20)
             .scrollIndicators(.hidden)
         }
         .environment(\.themeStyle, shownStyle)
         .font(shownStyle.bodyFont)
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {
@@ -123,7 +123,7 @@ private extension ThemeStyleView {
         VStack(alignment: .leading, spacing: 8) {
             rowTitle("角の丸み")
 
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 ForEach(ThemeCorner.allCases, id: \.self) { option in
                     tile(
                         option.title,
@@ -144,7 +144,7 @@ private extension ThemeStyleView {
         VStack(alignment: .leading, spacing: 8) {
             rowTitle("文字の大きさ")
 
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 ForEach(ThemeTextSize.allCases, id: \.self) { option in
                     tile(
                         option.title,
@@ -173,7 +173,7 @@ private extension ThemeStyleView {
         VStack(alignment: .leading, spacing: 8) {
             rowTitle(title)
 
-            LazyVGrid(columns: Self.fontColumns, spacing: 10) {
+            LazyVGrid(columns: Self.fontColumns, spacing: 12) {
                 ForEach(ThemeFont.allCases, id: \.self) { choice in
                     tile(
                         choice.title,
@@ -218,7 +218,7 @@ private extension ThemeStyleView {
         let ringWidth: CGFloat = isSelected ? 1.5 : 1
 
         return Button(action: action) {
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 content()
 
                 Text(title)
@@ -226,7 +226,7 @@ private extension ThemeStyleView {
                     .foregroundStyle(titleColor)
             }
             .frame(maxWidth: .infinity, minHeight: 64)
-            .padding(.horizontal, 6)
+            .padding(.horizontal, 8)
             .background(Palette.panel, in: tileShape)
             .overlay {
                 tileShape
@@ -242,7 +242,7 @@ private extension ThemeStyleView {
             .textFont(.caption2)
             .tracking(3)
             .foregroundStyle(Palette.accent)
-            .padding(.leading, 6)
+            .padding(.leading, 8)
     }
 }
 
@@ -274,13 +274,13 @@ private extension ThemeStyleView {
     static let fade: CGFloat = 16
     static let restCardHeight: CGFloat = 108
     static let cornerMarkSize: CGFloat = 30
-    static let cornerMarkRadius: CGFloat = 18
+    static let cornerMarkRadius: CGFloat = 20
     static let sizeSampleHeight: CGFloat = 30
     static let sampleAmount = 1280
     static let sampleText = "食費・財布"
 
     static let fontColumns = Array(
-        repeating: GridItem(.flexible(), spacing: 10),
+        repeating: GridItem(.flexible(), spacing: 12),
         count: 3
     )
 
@@ -289,7 +289,7 @@ private extension ThemeStyleView {
     }
 
     var tileShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(14))
+        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     var displayFontBinding: Binding<ThemeFont> {

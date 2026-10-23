@@ -12,7 +12,7 @@ public struct TemplateListView: View {
     @State private var grid = SettingsBoardGrid(
         columns: 1,
         itemHeight: TemplateRowCard.height,
-        spacing: 10
+        spacing: 12
     )
 
     @State private var hiddenId: EntryTemplate.ID?
@@ -37,7 +37,7 @@ public struct TemplateListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             SettingsBackHeader("テンプレート", hint: hintFlag)
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
 
@@ -64,7 +64,7 @@ public struct TemplateListView: View {
             }
             .scrollIndicators(.hidden)
             .contentMargins(.horizontal, 18, for: .scrollContent)
-            .padding(.horizontal, -18)
+            .padding(.horizontal, -20)
             .scrollDisabled(drag.isLifting)
             .settingsAutoScroll(drag.autoScroll)
             .settingsDropZones($drag.zones, showing: drag.showZone)
@@ -86,7 +86,7 @@ public struct TemplateListView: View {
                 }
             }
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -162,7 +162,7 @@ private extension TemplateListView {
     }
 
     var hiddenSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             SettingsHiddenTitle(
                 flag: hiddenList,
                 title: "非表示のテンプレート",

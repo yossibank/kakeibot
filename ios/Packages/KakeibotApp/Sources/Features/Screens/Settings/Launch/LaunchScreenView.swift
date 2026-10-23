@@ -10,7 +10,7 @@ public struct LaunchScreenView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 20) {
             SettingsBackHeader("起動時に開く画面")
 
             Text("アプリを開いたときに、最初に出す画面を選べます")
@@ -38,7 +38,7 @@ public struct LaunchScreenView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {

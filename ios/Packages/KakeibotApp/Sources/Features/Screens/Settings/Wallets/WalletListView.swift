@@ -34,7 +34,7 @@ public struct WalletListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             SettingsBackHeader("口座", hint: hintFlag)
 
             SettingsHint(
@@ -80,7 +80,7 @@ public struct WalletListView: View {
                 }
             }
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -151,7 +151,7 @@ private extension WalletListView {
     }
 
     var hiddenSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             SettingsHiddenTitle(
                 flag: hiddenList,
                 title: "非表示の口座",
@@ -248,7 +248,7 @@ private extension WalletListView {
         let balance = model.balance(of: wallet)
         let balanceColor = balance < 0 ? Palette.rose : Palette.accentStrong
 
-        return HStack(spacing: 14) {
+        return HStack(spacing: 16) {
             IconImage(model.icon(for: wallet), size: 18)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 40, height: 40)
@@ -261,7 +261,7 @@ private extension WalletListView {
                         .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(wallet.name)
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
@@ -284,7 +284,7 @@ private extension WalletListView {
         }
         .padding(.horizontal, 16)
         .frame(height: Self.rowHeight)
-        .card(cornerRadius: 18)
+        .card(cornerRadius: 20)
         .contentShape(.rect)
     }
 }
@@ -302,7 +302,7 @@ private extension WalletListView {
     static let grid = SettingsBoardGrid(
         columns: 1,
         itemHeight: rowHeight,
-        spacing: 10
+        spacing: 12
     )
 
     var boardHeight: CGFloat {

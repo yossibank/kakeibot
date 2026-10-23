@@ -9,7 +9,7 @@ struct EntryTemplateRow: View {
 
     var body: some View {
         ScrollView(.horizontal) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 ForEach(model.templates) { template in
                     button(template)
                 }
@@ -53,7 +53,7 @@ private extension EntryTemplateRow {
         return Button {
             onUse(template)
         } label: {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 IconImage(icon, size: 12)
                     .foregroundStyle(Palette.accent)
 
@@ -65,7 +65,7 @@ private extension EntryTemplateRow {
                     .foregroundStyle(amountColor)
             }
             .textFont(size: .caption)
-            .padding(.leading, 6)
+            .padding(.leading, 8)
             .padding(.trailing, 12)
             .frame(height: Self.height)
             .background(EntrySheet.categoryFill(isApplied), in: Capsule())

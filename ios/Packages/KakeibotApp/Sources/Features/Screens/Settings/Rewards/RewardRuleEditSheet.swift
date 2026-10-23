@@ -45,8 +45,8 @@ public struct RewardRuleEditSheet: View {
         }
         .overlay(alignment: .top) {
             header
-                .padding(.horizontal, 18)
-                .padding(.top, 18)
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
         }
         .background {
             Rectangle()
@@ -113,7 +113,7 @@ private extension RewardRuleEditSheet {
                         Text("達成した日に、この額を貯金箱に貯めます")
                             .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
-                            .padding(.leading, 6)
+                            .padding(.leading, 8)
                     }
 
                     IconEditor(
@@ -132,8 +132,8 @@ private extension RewardRuleEditSheet {
 
             saveButton
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .padding(.bottom, 8)
     }
 
@@ -166,7 +166,7 @@ private extension RewardRuleEditSheet {
         SettingsDrawer("貯める額") {
             closePanel()
         } content: {
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 Keypad(activeTax: model.calculator.taxNote?.rate) { key in
                     model.press(key)
                 }

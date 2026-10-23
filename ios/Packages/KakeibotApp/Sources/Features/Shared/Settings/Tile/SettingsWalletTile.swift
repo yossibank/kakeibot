@@ -12,7 +12,7 @@ struct SettingsWalletTile: View {
         let color = isSelected ? Palette.accentStrong : Palette.subtext
 
         Button(action: action) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 IconImage(icon, size: 13)
 
                 Text(wallet.name)

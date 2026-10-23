@@ -16,7 +16,7 @@ struct AssetsGoalSheet: View {
     }
 
     var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 20) {
             header
 
             SettingsField(
@@ -54,8 +54,8 @@ struct AssetsGoalSheet: View {
             }
             .disabled(!model.canSave)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .padding(.bottom, 8)
         .background {
             Rectangle()

@@ -13,7 +13,7 @@ public struct MenuHeader<Leading: View>: View {
     }
 
     public var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             leading
                 .foregroundStyle(Palette.accent)
 

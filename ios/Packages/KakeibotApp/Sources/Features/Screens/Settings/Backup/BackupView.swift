@@ -14,7 +14,7 @@ public struct BackupView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             SettingsBackHeader("バックアップ")
 
             ScrollView {
@@ -30,7 +30,7 @@ public struct BackupView: View {
                             "機種変更の前に書き出すと、新しい端末で戻せます"
                         )
                     }
-                    .padding(14)
+                    .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .card()
 
@@ -70,14 +70,14 @@ public struct BackupView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .padding(.horizontal, 14)
+                    .padding(.horizontal, 16)
                     .card()
 
                     if let message = model.doneMessage {
                         Label(message, systemImage: "checkmark.circle")
                             .textFont(.footnote)
                             .foregroundStyle(Palette.accent)
-                            .padding(.leading, 6)
+                            .padding(.leading, 8)
                             .transition(.opacity)
                     }
                 }
@@ -85,7 +85,7 @@ public struct BackupView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -135,7 +135,7 @@ private extension BackupView {
         _ systemImage: String,
         _ text: String
     ) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
             Image(systemName: systemImage)
                 .font(.caption.weight(.medium))
                 .foregroundStyle(Palette.accent)

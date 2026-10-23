@@ -23,7 +23,7 @@ public struct MonthCalendar: View {
     }
 
     public var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             HStack {
                 monthButton(systemImage: "chevron.left", months: -1)
                 Spacer()
@@ -48,7 +48,7 @@ public struct MonthCalendar: View {
                 }
             }
 
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 ForEach(Array(weeks.enumerated()), id: \.offset) { _, week in
                     HStack(spacing: 0) {
                         ForEach(

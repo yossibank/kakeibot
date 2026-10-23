@@ -11,7 +11,7 @@ struct ReviewShareSheet: View {
     let onOpen: (Entry.ID) -> Void
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             HStack {
                 RingButton(systemImage: "xmark") {
                     dismiss()
@@ -74,8 +74,8 @@ struct ReviewShareSheet: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             Rectangle()

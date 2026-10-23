@@ -28,7 +28,7 @@ struct CategoryTagCard: View {
 
             preview
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 field
 
                 Text(note)
@@ -37,7 +37,7 @@ struct CategoryTagCard: View {
                     .padding(.leading, 4)
             }
 
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 if let onDelete {
                     Button(action: onDelete) {
                         Text("削除")
@@ -109,14 +109,14 @@ private extension CategoryTagCard {
         .submitLabel(.done)
         .focused(isFocused)
         .onSubmit(onCommit)
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .frame(height: 46)
         .background(
             Palette.background,
-            in: .rect(cornerRadius: corner.radius(14))
+            in: .rect(cornerRadius: corner.radius(16))
         )
         .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(14))
+            RoundedRectangle(cornerRadius: corner.radius(16))
                 .stroke(fieldStroke, lineWidth: 1)
         }
     }

@@ -20,7 +20,7 @@ public struct FlipDate: View {
         let ring = isSelected ? Palette.accent : Palette.outline
         let width: CGFloat = isSelected ? 1.5 : 1
 
-        VStack(spacing: 3) {
+        VStack(spacing: 4) {
             Text("\(date.month)月")
                 .textFont(.caption2)
                 .tracking(1)
@@ -39,8 +39,8 @@ public struct FlipDate: View {
                 .textFont(.caption2)
                 .foregroundStyle(date.tint ?? Palette.subtext)
         }
-        .padding(.top, 10)
-        .padding(.bottom, 6)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
         .frame(width: 52)
         .background(Palette.panel, in: shape)
         .overlay {
@@ -48,7 +48,7 @@ public struct FlipDate: View {
                 .stroke(ring, lineWidth: width)
         }
         .overlay(alignment: .top) {
-            HStack(spacing: 18) {
+            HStack(spacing: 20) {
                 binding
                 binding
             }

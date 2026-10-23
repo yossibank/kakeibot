@@ -25,7 +25,7 @@ struct AppIconTile: View {
                 preview
                     .padding(4)
                     .overlay {
-                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
                             .stroke(ring, lineWidth: 2)
                     }
                     .overlay(alignment: .bottomTrailing) {
@@ -69,7 +69,7 @@ private extension AppIconTile {
                 content
                     .scaleEffect(pop.scale)
                     .background {
-                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
                             .stroke(Palette.accent, lineWidth: 2)
                             .scaleEffect(pop.ring)
                             .opacity(pop.glow)

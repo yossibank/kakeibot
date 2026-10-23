@@ -13,7 +13,7 @@ struct ReviewStampSheet: View {
     let onOpen: (LocalDate) -> Void
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             HStack {
                 RingButton(systemImage: "xmark") {
                     dismiss()
@@ -66,8 +66,8 @@ struct ReviewStampSheet: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             Rectangle()
@@ -81,7 +81,7 @@ private extension ReviewStampSheet {
     func row(_ date: LocalDate) -> some View {
         let day = entryDay(date)
 
-        return HStack(alignment: .firstTextBaseline, spacing: 6) {
+        return HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text("\(date.month)/\(date.day)")
                 .displayFont(.body)
                 .foregroundStyle(Palette.accentStrong)

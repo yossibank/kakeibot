@@ -105,7 +105,7 @@ private extension SwipeRow {
         }
         .buttonStyle(.plain)
         .frame(width: buttonWidth)
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
         .opacity(opacity)
     }
 
@@ -118,7 +118,7 @@ private extension SwipeRow {
         .buttonStyle(.plain)
         .frame(width: Self.actionWidth - Self.gap)
         .padding(.trailing, Self.gap)
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
         .opacity(opacity)
     }
 
@@ -161,7 +161,7 @@ private extension SwipeRow {
     }
 
     var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(14))
+        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     var isOpen: Bool {

@@ -33,7 +33,7 @@ public struct ThemeListView: View {
 
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            VStack(spacing: 14) {
+            VStack(spacing: 16) {
                 SettingsBackHeader("テーマ", hint: hintFlag)
 
                 SettingsHint(
@@ -53,7 +53,7 @@ public struct ThemeListView: View {
                 .scrollIndicators(.hidden)
                 .scrollDisabled(menu != nil)
             }
-            .padding(.horizontal, 18)
+            .padding(.horizontal, 20)
             .padding(.top, 16)
 
             if let menu {
@@ -119,7 +119,7 @@ private extension ThemeListView {
         return VStack(alignment: .leading, spacing: 12) {
             sectionTitle("自動")
 
-            LazyVGrid(columns: Self.columns, spacing: 18) {
+            LazyVGrid(columns: Self.columns, spacing: 20) {
                 Button {
                     select(.system)
                 } label: {
@@ -156,7 +156,7 @@ private extension ThemeListView {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("つくったテーマ")
 
-            LazyVGrid(columns: Self.columns, spacing: 18) {
+            LazyVGrid(columns: Self.columns, spacing: 20) {
                 ForEach(model.customThemes) { theme in
                     tile(
                         .custom(theme.id),
@@ -176,7 +176,7 @@ private extension ThemeListView {
             editing = .new(base: nil)
         } label: {
             VStack(spacing: 8) {
-                RoundedRectangle(cornerRadius: corner.radius(14))
+                RoundedRectangle(cornerRadius: corner.radius(16))
                     .strokeBorder(Palette.outline, style: .dashed)
                     .frame(height: 132)
                     .overlay {
@@ -207,7 +207,7 @@ private extension ThemeListView {
         return VStack(alignment: .leading, spacing: 12) {
             sectionTitle(title)
 
-            LazyVGrid(columns: Self.columns, spacing: 18) {
+            LazyVGrid(columns: Self.columns, spacing: 20) {
                 ForEach(presets, id: \.self) { preset in
                     tile(
                         .preset(preset),
@@ -225,7 +225,7 @@ private extension ThemeListView {
             .textFont(.caption2)
             .tracking(3)
             .foregroundStyle(Palette.accent)
-            .padding(.leading, 6)
+            .padding(.leading, 8)
     }
 
     func tile(
@@ -292,7 +292,7 @@ private extension ThemeListView {
         return content
             .padding(4)
             .overlay {
-                RoundedRectangle(cornerRadius: corner.radius(18))
+                RoundedRectangle(cornerRadius: corner.radius(20))
                     .stroke(ring, lineWidth: 2)
             }
             .overlay(alignment: .bottomTrailing) {
@@ -471,8 +471,8 @@ private extension ThemeListView {
 private extension ThemeListView {
     static let space = "themes"
     static let menuWidth: CGFloat = 236
-    static let menuInset: CGFloat = 18
-    static let menuGap: CGFloat = 10
+    static let menuInset: CGFloat = 20
+    static let menuGap: CGFloat = 12
     static let menuPressDuration = 0.4
 
     static let columns = Array(

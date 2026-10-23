@@ -52,7 +52,7 @@ public struct WalletEditSheet: View {
                     SettingsDrawer("最初の残高") {
                         closeAmount()
                     } content: {
-                        VStack(spacing: 10) {
+                        VStack(spacing: 12) {
                             Keypad(activeTax: activeTax) { key in
                                 model.press(key)
                             }
@@ -79,7 +79,7 @@ public struct WalletEditSheet: View {
                             await saveValuation()
                         }
                     } content: {
-                        VStack(spacing: 10) {
+                        VStack(spacing: 12) {
                             Text(AmountText.text(model.valuation.amount))
                                 .displayFont(.largeTitle, weight: .bold)
                                 .monospacedDigit()
@@ -160,7 +160,7 @@ private extension WalletEditSheet {
             header
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 8) {
                         preview
                         colorNote
@@ -202,8 +202,8 @@ private extension WalletEditSheet {
 
             saveButton
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {
@@ -241,16 +241,16 @@ private extension WalletEditSheet {
     }
 
     var preview: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 16) {
             IconImage(model.icon.preview, size: 22)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 48, height: 48)
                 .background(
                     Palette.accent.opacity(.subtle),
-                    in: .rect(cornerRadius: corner.radius(14))
+                    in: .rect(cornerRadius: corner.radius(16))
                 )
                 .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(14))
+                    RoundedRectangle(cornerRadius: corner.radius(16))
                         .stroke(Palette.outline, lineWidth: 1)
                 }
 
@@ -286,7 +286,7 @@ private extension WalletEditSheet {
     }
 
     var colorNote: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             Circle()
                 .fill(Color(hex: model.icon.color) ?? Palette.subtext)
                 .frame(width: 10, height: 10)
@@ -314,7 +314,7 @@ private extension WalletEditSheet {
         VStack(alignment: .leading, spacing: 8) {
             SettingsSectionTitle("最初の残高")
 
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 signButton
 
                 Button {
@@ -328,14 +328,14 @@ private extension WalletEditSheet {
 
                         Spacer(minLength: 8)
                     }
-                    .padding(.horizontal, 14)
+                    .padding(.horizontal, 16)
                     .frame(height: 46)
                     .background(
                         Palette.panel,
-                        in: .rect(cornerRadius: corner.radius(14))
+                        in: .rect(cornerRadius: corner.radius(16))
                     )
                     .overlay {
-                        RoundedRectangle(cornerRadius: corner.radius(14))
+                        RoundedRectangle(cornerRadius: corner.radius(16))
                             .stroke(amountStroke, lineWidth: 1)
                     }
                     .contentShape(.rect)
@@ -368,9 +368,9 @@ private extension WalletEditSheet {
     }
 
     var valuationHistory: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             SettingsSectionTitle("これまでの評価額")
-                .padding(.top, 10)
+                .padding(.top, 12)
 
             ForEach(model.valuations) { valuation in
                 SwipeRow(id: valuation.id, openId: $openValuationId) {
@@ -400,10 +400,10 @@ private extension WalletEditSheet {
                 .frame(width: 46, height: 46)
                 .background(
                     signFill,
-                    in: .rect(cornerRadius: corner.radius(14))
+                    in: .rect(cornerRadius: corner.radius(16))
                 )
                 .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(14))
+                    RoundedRectangle(cornerRadius: corner.radius(16))
                         .stroke(signColor.opacity(0.6), lineWidth: 1)
                 }
                 .contentShape(.rect)
@@ -430,7 +430,7 @@ private extension WalletEditSheet {
         }
         .padding(.horizontal, 16)
         .frame(height: 48)
-        .card(cornerRadius: 14)
+        .card(cornerRadius: 16)
     }
 
     func kindButton(_ kind: Wallet.Kind) -> some View {

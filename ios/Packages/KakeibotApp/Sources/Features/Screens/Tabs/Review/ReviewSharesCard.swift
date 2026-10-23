@@ -32,7 +32,7 @@ struct ReviewSharesCard: View {
                     .padding(.vertical, 4)
 
                     if let others = Self.otherShares(shares) {
-                        HStack(spacing: 6) {
+                        HStack(spacing: 8) {
                             Circle()
                                 .fill(Palette.hint)
                                 .frame(width: 8, height: 8)
@@ -86,8 +86,8 @@ private extension ReviewSharesCard {
     }
 
     func label(_ share: ReviewModel.Share) -> some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 10) {
+        VStack(spacing: 8) {
+            HStack(spacing: 12) {
                 IconBadge(share.icon, size: 30)
 
                 Text(share.name)

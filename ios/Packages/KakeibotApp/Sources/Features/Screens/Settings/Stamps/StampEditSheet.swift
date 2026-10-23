@@ -52,8 +52,8 @@ public struct StampEditSheet: View {
             }
             .disabled(!model.canSave)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {

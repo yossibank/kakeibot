@@ -88,7 +88,7 @@ private extension AssetsView {
     }
 
     var totalCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             SectionTitle("手元のお金")
 
             HStack(alignment: .firstTextBaseline) {
@@ -165,7 +165,7 @@ private extension AssetsView {
                     Text("目標に届きました")
                         .textFont(.caption2, weight: .semibold)
                         .foregroundStyle(Palette.background)
-                        .padding(.horizontal, 10)
+                        .padding(.horizontal, 12)
                         .padding(.vertical, 4)
                         .background(Palette.accent, in: .capsule)
                 }
@@ -216,7 +216,7 @@ private extension AssetsView {
     }
 
     var reachedGlow: some View {
-        RoundedRectangle(cornerRadius: corner.radius(22))
+        RoundedRectangle(cornerRadius: corner.radius(24))
             .strokeBorder(Palette.accent, lineWidth: 1.5)
             .shadow(color: Palette.accent, radius: 10)
             .phaseAnimator([false, true]) { content, isLit in
@@ -242,7 +242,7 @@ private extension AssetsView {
                     .foregroundStyle(Palette.subtext)
             }
 
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 ForEach(model.upcomingBills) { row in
                     Button {
                         onOpenRecurring(row.id)
@@ -258,7 +258,7 @@ private extension AssetsView {
     }
 
     var trendLegend: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 16) {
             legend("手元のお金", dash: [])
             legend("純資産", dash: BalanceTrend.netWorthDash)
         }
@@ -286,11 +286,11 @@ private extension AssetsView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 12)
         .padding(.horizontal, 12)
         .background(
             Palette.accent.opacity(.faint),
-            in: .rect(cornerRadius: corner.radius(14))
+            in: .rect(cornerRadius: corner.radius(16))
         )
     }
 
@@ -299,7 +299,7 @@ private extension AssetsView {
         let progress = model.progress(to: goal)
         let note = remaining > 0 ? "あと \(AmountText.text(remaining))" : "届きました"
 
-        return VStack(alignment: .leading, spacing: 6) {
+        return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
                 Text("\(goal.name) まで")
                     .textFont(.caption)
@@ -322,7 +322,7 @@ private extension AssetsView {
         let rule = model.rewardRule(for: log)
         let icon = rule.flatMap { model.rewardIcon(for: $0) }
 
-        return HStack(spacing: 10) {
+        return HStack(spacing: 12) {
             IconBadge(icon, size: 26)
 
             Text(rule?.name ?? "")
@@ -348,7 +348,7 @@ private extension AssetsView {
         _ title: String,
         dash: [CGFloat]
     ) -> some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             Path { path in
                 path.move(to: CGPoint(x: 0, y: 1))
                 path.addLine(to: CGPoint(x: 16, y: 1))
@@ -385,7 +385,7 @@ private extension AssetsView {
     }
 
     func billRow(_ row: AssetsModel.UpcomingBill) -> some View {
-        HStack(alignment: .top, spacing: 14) {
+        HStack(alignment: .top, spacing: 16) {
             FlipDate(row.bill.date)
 
             VStack(alignment: .leading, spacing: 8) {
@@ -456,7 +456,7 @@ private extension AssetsView {
         .padding(12)
         .background(
             Palette.accent.opacity(.faint),
-            in: .rect(cornerRadius: corner.radius(18))
+            in: .rect(cornerRadius: corner.radius(20))
         )
         .contentShape(.rect)
     }
@@ -477,7 +477,7 @@ private extension AssetsView {
 
     func walletTile(_ row: AssetsModel.WalletRow) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 IconImage(row.icon, size: 15)
                     .foregroundStyle(Palette.accent)
 
@@ -514,7 +514,7 @@ private extension AssetsView {
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 74, alignment: .leading)
-        .card(cornerRadius: 18)
+        .card(cornerRadius: 20)
         .contentShape(.rect)
     }
 }

@@ -41,7 +41,7 @@ private extension BudgetKeypadLayer {
                 await model.finishEditing()
             }
         } content: {
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 Text(AmountText.text(model.calculator.amount))
                     .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()

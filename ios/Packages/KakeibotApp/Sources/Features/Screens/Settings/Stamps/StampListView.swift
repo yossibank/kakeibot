@@ -36,7 +36,7 @@ public struct StampListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             SettingsBackHeader("スタンプ", hint: hintFlag)
 
             SettingsHint(
@@ -79,7 +79,7 @@ public struct StampListView: View {
                 .padding(.bottom, 8)
             }
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .settingsLiftLayer(

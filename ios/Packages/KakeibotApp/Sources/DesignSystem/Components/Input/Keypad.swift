@@ -39,10 +39,10 @@ private extension Keypad {
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background(
                     Self.background(for: key, isActive: isActive),
-                    in: .rect(cornerRadius: corner.radius(14))
+                    in: .rect(cornerRadius: corner.radius(16))
                 )
                 .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(14))
+                    RoundedRectangle(cornerRadius: corner.radius(16))
                         .stroke(
                             Self.stroke(for: key, isActive: isActive),
                             lineWidth: 0.75

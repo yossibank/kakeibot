@@ -26,7 +26,7 @@ public struct TemplateRowCard: View {
         HStack(spacing: 12) {
             TemplateBadge(icon: icon, size: .regular)
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 TemplateCardName(name: name, size: .regular)
                     .lineLimit(2)
 
@@ -46,10 +46,10 @@ public struct TemplateRowCard: View {
             TemplateCardAmount(amount: amount, size: .regular)
                 .frame(minWidth: 76, alignment: .trailing)
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .frame(height: Self.height)
-        .templateCardFace(cornerRadius: 18, shadowRadius: 8)
+        .templateCardFace(cornerRadius: 20, shadowRadius: 8)
     }
 }
 
@@ -58,7 +58,7 @@ public extension TemplateRowCard {
 }
 
 #Preview {
-    VStack(spacing: 10) {
+    VStack(spacing: 12) {
         TemplateRowCard(
             icon: nil,
             name: "ランチ",

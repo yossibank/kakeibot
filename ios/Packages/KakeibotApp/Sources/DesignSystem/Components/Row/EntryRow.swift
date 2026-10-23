@@ -73,7 +73,7 @@ public struct EntryRow: View {
                     EntryMemo(memo)
                 }
             }
-            .padding(.vertical, 6)
+            .padding(.vertical, 8)
 
             Spacer(minLength: 8)
 

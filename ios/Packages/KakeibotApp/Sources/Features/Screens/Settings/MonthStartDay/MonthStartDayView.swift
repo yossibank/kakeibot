@@ -11,7 +11,7 @@ public struct MonthStartDayView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 20) {
             SettingsBackHeader("月の始まり")
 
             Text("給料日に合わせると、その日から次の給料日の前の日までを 1 か月として数えます")
@@ -20,7 +20,7 @@ public struct MonthStartDayView: View {
                 .multilineTextAlignment(.center)
 
             ScrollView {
-                VStack(spacing: 18) {
+                VStack(spacing: 20) {
                     PeriodCard(
                         periodText: model.periodText,
                         month: model.month
@@ -40,7 +40,7 @@ public struct MonthStartDayView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {

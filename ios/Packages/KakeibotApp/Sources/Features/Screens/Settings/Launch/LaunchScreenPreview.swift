@@ -6,7 +6,7 @@ struct LaunchScreenPreview: View {
     let selection: LaunchScreen
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             HStack(spacing: 2) {
                 ForEach(Self.tabs, id: \.self) { screen in
                     tab(screen)

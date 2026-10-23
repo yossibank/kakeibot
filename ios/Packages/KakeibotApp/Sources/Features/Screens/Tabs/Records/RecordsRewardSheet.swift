@@ -13,7 +13,7 @@ struct RecordsRewardSheet: View {
 
     var body: some View {
         FittedSheet {
-            VStack(spacing: 18) {
+            VStack(spacing: 20) {
                 header
 
                 if model.rewardRules.isEmpty {
@@ -88,7 +88,7 @@ private extension RecordsRewardSheet {
                 .contentTransition(.numericText())
                 .animation(.snappy, value: model.rewardTotal(on: date))
         }
-        .padding(.horizontal, 6)
+        .padding(.horizontal, 8)
     }
 
     func row(_ rule: RewardRule) -> some View {
@@ -120,7 +120,7 @@ private extension RecordsRewardSheet {
                     .foregroundStyle(Palette.accent)
                     .contentTransition(.symbolEffect(.replace))
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .frame(minHeight: 56)
             .background(Palette.panel, in: shape)
             .overlay {

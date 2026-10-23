@@ -85,7 +85,7 @@ private extension HomeView {
     }
 
     var dialCard: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             ZStack(alignment: .bottom) {
                 HalfDial(progress: model.budgetUsage?.progress, tint: dialTint)
 
@@ -115,7 +115,7 @@ private extension HomeView {
                             .foregroundStyle(usage.tint)
                     }
 
-                    HStack(spacing: 14) {
+                    HStack(spacing: 16) {
                         Text("予算 \(AmountText.text(usage.budget))")
                         Text("1 日あたり \(AmountText.text(usage.perDay))")
                     }
@@ -141,7 +141,7 @@ private extension HomeView {
 
             if model.recurringExpense > 0 {
                 Button(action: onOpenRecurrings) {
-                    VStack(spacing: 6) {
+                    VStack(spacing: 8) {
                         HStack(spacing: 4) {
                             Label(recurringText, systemImage: "repeat")
 
@@ -196,7 +196,7 @@ private extension HomeView {
     }
 
     var templateCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             ZStack {
                 HStack {
                     SectionTitle("テンプレート")
@@ -215,7 +215,7 @@ private extension HomeView {
             }
             .padding(.top, 8)
 
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 Text(templateHint)
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
@@ -245,8 +245,8 @@ private extension HomeView {
                 templateShelf
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.bottom, 14)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
         .card()
     }
 
@@ -254,7 +254,7 @@ private extension HomeView {
         Button {
             onOpenOrderMenu(orderButtonFrame)
         } label: {
-            HStack(spacing: 5) {
+            HStack(spacing: 4) {
                 Image(systemName: "arrow.up.arrow.down")
                     .sansFont(.caption, weight: .light)
 
@@ -281,12 +281,12 @@ private extension HomeView {
 
     var templateShelf: some View {
         let rows = Array(
-            repeating: GridItem(.fixed(Self.tileHeight), spacing: 10),
+            repeating: GridItem(.fixed(Self.tileHeight), spacing: 12),
             count: shelfRowCount
         )
 
         return ScrollView(.horizontal) {
-            LazyHGrid(rows: rows, spacing: 10) {
+            LazyHGrid(rows: rows, spacing: 12) {
                 ForEach(model.templates) { template in
                     templateButton(template)
                         .shelfWidth()
@@ -303,8 +303,8 @@ private extension HomeView {
             Rectangle()
                 .padding(.vertical, -Self.shadowRoom)
         }
-        .padding(.horizontal, -14)
-        .padding(.vertical, -6)
+        .padding(.horizontal, -16)
+        .padding(.vertical, -8)
     }
 
     var recentCard: some View {
@@ -349,7 +349,7 @@ private extension HomeView {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.bottom, 6)
+        .padding(.bottom, 8)
         .card()
     }
 

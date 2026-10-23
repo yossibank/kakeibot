@@ -28,7 +28,7 @@ public struct TemplateShelfSheet: View {
 
     public var body: some View {
         NavigationStack {
-            VStack(spacing: 14) {
+            VStack(spacing: 16) {
                 header
 
                 CapsulePicker(
@@ -39,7 +39,7 @@ public struct TemplateShelfSheet: View {
                 searchField
 
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 18) {
+                    LazyVStack(alignment: .leading, spacing: 20) {
                         ForEach(sections) { section in
                             sectionView(section)
                         }
@@ -56,11 +56,11 @@ public struct TemplateShelfSheet: View {
                 }
                 .scrollIndicators(.hidden)
                 .contentMargins(.horizontal, 18, for: .scrollContent)
-                .padding(.horizontal, -18)
+                .padding(.horizontal, -20)
                 .scrollDismissesKeyboard(.interactively)
             }
-            .padding(.horizontal, 18)
-            .padding(.top, 18)
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background {
                 Rectangle()
@@ -115,7 +115,7 @@ private extension TemplateShelfSheet {
             .submitLabel(.search)
             .focused($isSearching)
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .frame(height: 42)
         .background(Palette.panel, in: Capsule())
         .overlay {

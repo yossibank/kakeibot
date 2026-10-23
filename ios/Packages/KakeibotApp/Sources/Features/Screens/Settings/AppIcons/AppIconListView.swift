@@ -9,7 +9,7 @@ public struct AppIconListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             SettingsBackHeader("アプリアイコン")
 
             ScrollView {
@@ -21,7 +21,7 @@ public struct AppIconListView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {
@@ -47,9 +47,9 @@ private extension AppIconListView {
                 .textFont(.caption2)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
-                .padding(.leading, 6)
+                .padding(.leading, 8)
 
-            LazyVGrid(columns: Self.columns, spacing: 18) {
+            LazyVGrid(columns: Self.columns, spacing: 20) {
                 ForEach(choices(isLight: isLight), id: \.self) { choice in
                     AppIconTile(
                         choice: choice,

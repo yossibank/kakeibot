@@ -100,7 +100,7 @@ extension EntrySheet {
 
 private extension EntrySheet {
     var content: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             header
 
             ViewThatFits(in: .vertical) {
@@ -123,7 +123,7 @@ private extension EntrySheet {
             .disabled(!model.canSave)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 18)
+        .padding(.top, 20)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {
@@ -139,7 +139,7 @@ private extension EntrySheet {
     }
 
     var form: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             dial
             details
 
@@ -166,7 +166,7 @@ private extension EntrySheet {
     }
 
     var categoryArea: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             EntryTemplateRow(
                 model: model,
                 onUse: { template in
@@ -302,7 +302,7 @@ private extension EntrySheet {
             .foregroundStyle(Palette.text)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: Self.peekWidth, alignment: .leading)
-            .padding(14)
+            .padding(16)
             .presentationCompactAdaptation(.popover)
             .presentationBackground(Palette.panel)
     }
@@ -342,7 +342,7 @@ private extension EntrySheet {
     }
 
     var keypadDrawer: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             RingButton(systemImage: "checkmark", style: .prominent) {
                 setEnteringAmount(false)
             }
@@ -642,7 +642,7 @@ private extension EntrySheet {
     static let fade: CGFloat = 20
     static let categoryRows = 3
     static let categoryColumns = 5
-    static let categorySpacing: CGFloat = 5
+    static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
     static let menuPressDuration = 0.15
     static let peekDuration = 0.35

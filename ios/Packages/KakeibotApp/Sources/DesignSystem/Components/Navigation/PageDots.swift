@@ -13,7 +13,7 @@ public struct PageDots: View {
     }
 
     public var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             ForEach(0..<count, id: \.self) { index in
                 Capsule()
                     .fill(index == current ? Palette.accent : Palette.line)

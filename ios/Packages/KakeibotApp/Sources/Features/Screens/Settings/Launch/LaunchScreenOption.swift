@@ -15,7 +15,7 @@ struct LaunchScreenOption: View {
         let mark = isSelected ? "checkmark.circle.fill" : "circle"
 
         Button(action: action) {
-            HStack(spacing: 14) {
+            HStack(spacing: 16) {
                 Image(systemName: screen.systemImage)
                     .sansFont(.headline, weight: .light)
                     .foregroundStyle(Palette.accent)
