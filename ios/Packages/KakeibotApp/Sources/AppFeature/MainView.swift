@@ -234,15 +234,20 @@ struct MainView: View {
                 return
             }
 
-            await openLaunchScreen()
+            if let route {
+                open(route)
+            } else {
+                await openLaunchScreen()
+            }
         }
         .onChange(of: isLoaded, initial: true) {
             if isLoaded {
                 onLoad()
             }
         }
-        .onChange(of: route, initial: true) { _, route in
-            if let route {
+        .onChange(of: route) { _, route in
+            if isRevealed,
+               let route {
                 open(route)
             }
         }
@@ -440,8 +445,19 @@ private extension MainView {
                 sheet = .new
             case let .recurring(id):
                 sheet = .recurring(id)
+            case let .template(id):
+                tab = .home
+                sheet = await templateSheet(id)
             }
         }
+    }
+
+    func templateSheet(_ id: EntryTemplate.ID) async -> Sheet? {
+        let templates = await (try? database.templates()) ?? []
+
+        return templates
+            .first { $0.id == id }
+            .map { .template($0) }
     }
 
     func useTemplate(_ template: EntryTemplate) {

@@ -35,6 +35,7 @@ let package = Package(
             name: "AppWidget",
             dependencies: [
                 "DesignSystem",
+                "Notifications",
                 .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]

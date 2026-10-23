@@ -6,12 +6,12 @@ import Testing
 @MainActor
 struct PaletteTests {
     @Test
-    func usesNightByDefault() {
+    func usesWhiteByDefault() {
         let environment = EnvironmentValues()
 
         let accent = Palette.accent.resolve(in: environment)
 
-        #expect(rgb(accent) == 0xCDAA6B)
+        #expect(rgb(accent) == ThemePreset.white.palette.accent)
     }
 
     @Test

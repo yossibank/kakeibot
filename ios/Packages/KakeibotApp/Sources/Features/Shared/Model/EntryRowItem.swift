@@ -28,7 +28,7 @@ extension EntryRowItem {
         self.init(
             id: entry.id,
             icon: category.flatMap { list.icons[$0.iconId] },
-            title: category?.name ?? Self.title(for: entry.type),
+            title: list.title(of: entry),
             tag: tag?.name,
             detail: [dayLabel, wallets].rowDetail,
             memo: memo,
@@ -58,12 +58,5 @@ private extension EntryRowItem {
         return [source, destination.name]
             .compactMap(\.self)
             .joined(separator: " → ")
-    }
-
-    static func title(for type: Entry.Kind) -> String {
-        switch type {
-        case .transfer: "振替"
-        case .expense, .income: "未分類"
-        }
     }
 }

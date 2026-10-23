@@ -35,8 +35,6 @@ struct BudgetWidgetProvider: TimelineProvider {
 }
 
 private extension BudgetWidgetProvider {
-    static let retryInterval: TimeInterval = 30 * 60
-
     static func timeline(
         at now: Date,
         isPreview: Bool
@@ -51,16 +49,14 @@ private extension BudgetWidgetProvider {
                 ? .sample(at: now)
                 : .empty(at: now)
 
-            let retry = now.addingTimeInterval(retryInterval)
+            let retry = now.addingTimeInterval(WidgetTimeline.retryInterval)
 
             return Timeline(entries: [entry], policy: .after(retry))
         }
 
-        let look = await (try? database.themeLook()) ?? .followsDevice
+        let look = await database.widgetLook()
         let weekStart = await (try? database.setting(.weekStart)) ?? .sunday
-        var style = await (try? database.style()) ?? .standard
-
-        style.textSize = .standard
+        let style = await database.widgetStyle()
 
         let current = BudgetWidgetEntry(
             date: now,
@@ -69,7 +65,7 @@ private extension BudgetWidgetProvider {
             style: style
         )
 
-        guard let midnight = nextMidnight(after: now) else {
+        guard let midnight = WidgetTimeline.nextMidnight(after: now) else {
             return Timeline(entries: [current], policy: .never)
         }
 
@@ -83,12 +79,5 @@ private extension BudgetWidgetProvider {
         )
 
         return Timeline(entries: [current, next], policy: .atEnd)
-    }
-
-    static func nextMidnight(after date: Date) -> Date? {
-        let calendar = Calendar.current
-        let start = calendar.startOfDay(for: date)
-
-        return calendar.date(byAdding: .day, value: 1, to: start)
     }
 }

@@ -21,3 +21,16 @@ public struct NotificationInput: Equatable, Sendable {
         self.shortages = shortages
     }
 }
+
+public extension NotificationInput {
+    func plan(today: LocalDate) -> [PlannedNotification] {
+        NotificationPlan.notifications(
+            today: today,
+            reminderTime: reminderTime,
+            recordedDates: recordedDates,
+            recurrings: recurrings,
+            names: names,
+            shortages: shortages
+        )
+    }
+}

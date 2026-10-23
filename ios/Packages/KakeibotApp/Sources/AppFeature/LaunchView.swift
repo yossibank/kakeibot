@@ -110,21 +110,21 @@ private extension LaunchView {
     }
 
     func sweepRing() async {
-        withAnimation(.easeInOut(duration: 0.8)) {
+        withAnimation(.easeInOut(duration: 0.45)) {
             sweep = 1 + Self.sweepLength
         }
 
-        withAnimation(.easeOut(duration: 0.5).delay(0.45)) {
+        withAnimation(.easeOut(duration: 0.25).delay(0.25)) {
             glow = 0.7
         }
 
-        try? await Task.sleep(for: .milliseconds(850))
+        try? await Task.sleep(for: .milliseconds(450))
 
         hasSwept = true
     }
 
     func revealTheme() {
-        withAnimation(.easeIn(duration: 0.4)) {
+        withAnimation(.easeIn(duration: 0.25)) {
             revealSize = Self.revealSize
         } completion: {
             leave()
@@ -134,7 +134,7 @@ private extension LaunchView {
     func leave() {
         onLeave()
 
-        withAnimation(.easeOut(duration: 0.25)) {
+        withAnimation(.easeOut(duration: 0.15)) {
             isLeaving = true
         } completion: {
             onFinish()

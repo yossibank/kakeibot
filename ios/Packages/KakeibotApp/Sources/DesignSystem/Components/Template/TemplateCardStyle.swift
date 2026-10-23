@@ -32,7 +32,7 @@ enum TemplateCardStyle {
     }
 }
 
-extension View {
+public extension View {
     func templateCardFace(
         cornerRadius: CGFloat,
         shadowRadius: CGFloat

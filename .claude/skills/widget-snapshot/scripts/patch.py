@@ -2,8 +2,12 @@ import sys
 
 package = sys.argv[1]
 
-FAMILY = "    @Environment(\\.widgetFamily) private var family\n\n    let entry: BudgetWidgetEntry\n"
-INJECTED = "    let entry: BudgetWidgetEntry\n    var family: WidgetFamily = .systemSmall\n"
+FAMILY = "    @Environment(\\.widgetFamily) private var family\n"
+VIEWS = {
+    "BudgetWidgetView": "BudgetWidgetEntry",
+    "BudgetLockWidgetView": "BudgetWidgetEntry",
+    "QuickRecordWidgetView": "QuickRecordWidgetEntry",
+}
 ANCHOR = '        .testTarget(\n            name: "AppFeatureTests",'
 TARGET = """        .testTarget(
             name: "AppWidgetSnapshotTests",
@@ -23,7 +27,10 @@ def replace(path, old, new):
     open(path, "w", encoding="utf-8").write(text.replace(old, new, 1))
 
 
-for view in ("BudgetWidgetView", "BudgetLockWidgetView"):
-    replace(f"{package}/Sources/AppWidget/{view}.swift", FAMILY, INJECTED)
+for view, entry in VIEWS.items():
+    path = f"{package}/Sources/AppWidget/{view}.swift"
+    stored = f"    let entry: {entry}\n"
+    replace(path, FAMILY, "")
+    replace(path, stored, stored + "    var family: WidgetFamily = .systemSmall\n")
 
 replace(f"{package}/Package.swift", ANCHOR, TARGET + ANCHOR)

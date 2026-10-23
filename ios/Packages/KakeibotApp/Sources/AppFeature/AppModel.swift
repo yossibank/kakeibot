@@ -94,6 +94,7 @@ extension AppModel {
 
         switch launch {
         case let .onboarding(database), let .ready(database):
+            try? await database.reloadAfterOtherProcesses()
             await generateRecurring(in: database)
             await scheduleNotifications(in: database)
         case .opening, .failed:
@@ -119,12 +120,18 @@ extension AppModel {
     }
 
     func observeWidgets(in database: AppDatabase) async {
-        do {
-            for try await _ in database.monthOverviewUpdates(on: today) {
-                reloadWidgets()
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observeOverviewForWidgets(in: database)
             }
-        } catch {
-            return
+
+            group.addTask {
+                await self.observeTemplatesForWidgets(in: database)
+            }
+
+            group.addTask {
+                await self.observeTemplateOrderForWidgets(in: database)
+            }
         }
     }
 
@@ -170,6 +177,36 @@ private extension AppModel {
         }
     }
 
+    func observeOverviewForWidgets(in database: AppDatabase) async {
+        do {
+            for try await _ in database.monthOverviewUpdates(on: today) {
+                reloadWidgets()
+            }
+        } catch {
+            return
+        }
+    }
+
+    func observeTemplatesForWidgets(in database: AppDatabase) async {
+        do {
+            for try await _ in database.templateUpdates() {
+                reloadWidgets()
+            }
+        } catch {
+            return
+        }
+    }
+
+    func observeTemplateOrderForWidgets(in database: AppDatabase) async {
+        do {
+            for try await _ in database.settingUpdates(.templateOrder) {
+                reloadWidgets()
+            }
+        } catch {
+            return
+        }
+    }
+
     func reloadWidgets() {
         WidgetCenter.shared.reloadAllTimelines()
     }
@@ -185,14 +222,7 @@ private extension AppModel {
     }
 
     func schedule(_ input: NotificationInput) async {
-        let plan = NotificationPlan.notifications(
-            today: today,
-            reminderTime: input.reminderTime,
-            recordedDates: input.recordedDates,
-            recurrings: input.recurrings,
-            names: input.names,
-            shortages: input.shortages
-        )
+        let plan = input.plan(today: today)
 
         await scheduler.apply(plan, now: Date(), timeZone: .current)
     }
