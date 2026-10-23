@@ -1,6 +1,8 @@
 .PHONY: setup open format licenses build test-build test
 
 SIMULATOR ?= $(shell xcrun simctl list devices available iPhone | awk -F '[()]' '/iPhone/ { print $$2; exit }')
+XCBEAUTIFY = $(shell command -v xcbeautify)
+BEAUTIFY = $(if $(XCBEAUTIFY),| xcbeautify $(XCBEAUTIFY_FLAGS))
 CHECKOUT = $(if $(BRANCH),$(shell git worktree list --porcelain | awk '/^worktree / { path = substr($$0, 10) } $$0 == "branch refs/heads/$(BRANCH)" { print path }'),.)
 
 setup:
@@ -20,10 +22,10 @@ licenses:
 	rm -f ios/Kakeibot/Settings.bundle/com.mono0926.LicensePlist.latest_result.txt
 
 build:
-	xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build
+	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build $(BEAUTIFY)
 
 test-build:
-	xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' build-for-testing
+	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' build-for-testing $(BEAUTIFY)
 
 test:
-	xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' test
+	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' test $(BEAUTIFY)
