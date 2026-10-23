@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -86,7 +87,7 @@ private extension SettingsHint {
 
             Button {
                 withAnimation(.snappy) {
-                    flag.set(true)
+                    _ = flag.set(true)
                 }
             } label: {
                 Image(systemName: "xmark")

@@ -13,7 +13,7 @@ struct SettingsHiddenTitle: View {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Button {
                     withAnimation(.snappy) {
-                        flag.set(!flag.isOn)
+                        _ = flag.set(!flag.isOn)
                     }
                 } label: {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {

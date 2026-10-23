@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct TagLine<ID: Hashable>: View {
+public struct TagLine<ID: Hashable & Sendable>: View {
     @State private var lift: Lift?
     @State private var frames: [ID: CGRect] = [:]
     @State private var liftCount = 0
@@ -239,7 +239,7 @@ private extension TagLine {
         var translation: CGFloat
     }
 
-    static var space: String {
+    nonisolated static var space: String {
         "TagLine"
     }
 

@@ -36,7 +36,7 @@ struct SettingsBackHeader: View {
                    hint.isOn {
                     RingButton(systemImage: "questionmark") {
                         withAnimation(.snappy) {
-                            hint.set(false)
+                            _ = hint.set(false)
                         }
                     }
                     .transition(.opacity)
