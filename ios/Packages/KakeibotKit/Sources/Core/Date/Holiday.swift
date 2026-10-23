@@ -1,9 +1,7 @@
-public enum Holiday {}
+public enum Holiday {
+    public static let supportedYears = 2022...2099
 
-public extension Holiday {
-    static let supportedYears = 2022...2099
-
-    static func name(of date: LocalDate) -> String? {
+    public static func name(of date: LocalDate) -> String? {
         guard supportedYears.contains(date.year) else {
             return nil
         }
@@ -19,11 +17,11 @@ public extension Holiday {
         return isBetweenHolidays(date) ? "国民の休日" : nil
     }
 
-    static func contains(_ date: LocalDate) -> Bool {
+    public static func contains(_ date: LocalDate) -> Bool {
         name(of: date) != nil
     }
 
-    static func isDayOff(_ date: LocalDate) -> Bool {
+    public static func isDayOff(_ date: LocalDate) -> Bool {
         let isWeekend = date.weekday == .saturday || date.weekday == .sunday
         let isYearEnd = (date.month, date.day) == (12, 31)
             || (date.month == 1 && date.day <= 3)

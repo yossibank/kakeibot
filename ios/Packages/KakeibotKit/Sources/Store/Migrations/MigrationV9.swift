@@ -1,8 +1,6 @@
 import GRDB
 
-enum MigrationV9 {}
-
-extension MigrationV9 {
+enum MigrationV9 {
     static func migrate(_ db: Database) throws {
         try db.create(table: "shelf_icon") { table in
             table.primaryKey("id", .text)

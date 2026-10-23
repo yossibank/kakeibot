@@ -1,10 +1,8 @@
 import Notifications
 
-public enum AppLaunch {}
-
-public extension AppLaunch {
+public enum AppLaunch {
     @MainActor
-    static func prepare() {
+    public static func prepare() {
         NotificationRouter.shared.listen()
     }
 }

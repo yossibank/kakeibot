@@ -1,8 +1,6 @@
 import Core
 
-enum PeriodText {}
-
-extension PeriodText {
+enum PeriodText {
     static func range(_ period: ClosedRange<LocalDate>) -> String {
         "\(date(period.lowerBound))〜\(date(period.upperBound))"
     }

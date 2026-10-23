@@ -1,8 +1,6 @@
 import GRDB
 
-enum MigrationV8 {}
-
-extension MigrationV8 {
+enum MigrationV8 {
     static func migrate(_ db: Database) throws {
         try db.alter(table: "recurring") { table in
             table.add(column: "sort_order", .integer).notNull().defaults(to: 0)

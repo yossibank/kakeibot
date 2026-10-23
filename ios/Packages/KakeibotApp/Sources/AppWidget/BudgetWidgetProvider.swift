@@ -3,7 +3,35 @@ import Foundation
 import Store
 import WidgetKit
 
-struct BudgetWidgetProvider {}
+struct BudgetWidgetProvider: TimelineProvider {
+    func placeholder(in context: Context) -> BudgetWidgetEntry {
+        .sample(at: Date())
+    }
+
+    func getSnapshot(
+        in context: Context,
+        completion: @escaping @Sendable (BudgetWidgetEntry) -> Void
+    ) {
+        let isPreview = context.isPreview
+
+        Task {
+            let now = Date()
+            let timeline = await Self.timeline(at: now, isPreview: isPreview)
+            completion(timeline.entries.first ?? .sample(at: now))
+        }
+    }
+
+    func getTimeline(
+        in context: Context,
+        completion: @escaping @Sendable (Timeline<BudgetWidgetEntry>) -> Void
+    ) {
+        let isPreview = context.isPreview
+
+        Task {
+            await completion(Self.timeline(at: Date(), isPreview: isPreview))
+        }
+    }
+}
 
 private extension BudgetWidgetProvider {
     static let retryInterval: TimeInterval = 30 * 60
@@ -53,35 +81,5 @@ private extension BudgetWidgetProvider {
         let calendar = Calendar.current
         let start = calendar.startOfDay(for: date)
         return calendar.date(byAdding: .day, value: 1, to: start)
-    }
-}
-
-extension BudgetWidgetProvider: TimelineProvider {
-    func placeholder(in context: Context) -> BudgetWidgetEntry {
-        .sample(at: Date())
-    }
-
-    func getSnapshot(
-        in context: Context,
-        completion: @escaping @Sendable (BudgetWidgetEntry) -> Void
-    ) {
-        let isPreview = context.isPreview
-
-        Task {
-            let now = Date()
-            let timeline = await Self.timeline(at: now, isPreview: isPreview)
-            completion(timeline.entries.first ?? .sample(at: now))
-        }
-    }
-
-    func getTimeline(
-        in context: Context,
-        completion: @escaping @Sendable (Timeline<BudgetWidgetEntry>) -> Void
-    ) {
-        let isPreview = context.isPreview
-
-        Task {
-            await completion(Self.timeline(at: Date(), isPreview: isPreview))
-        }
     }
 }

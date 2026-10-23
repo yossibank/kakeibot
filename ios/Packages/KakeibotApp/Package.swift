@@ -13,8 +13,8 @@ let package = Package(
             targets: ["AppFeature"]
         ),
         .library(
-            name: "WidgetFeature",
-            targets: ["WidgetFeature"]
+            name: "AppWidget",
+            targets: ["AppWidget"]
         )
     ],
     dependencies: [
@@ -32,7 +32,7 @@ let package = Package(
             ]
         ),
         .target(
-            name: "WidgetFeature",
+            name: "AppWidget",
             dependencies: [
                 "DesignSystem",
                 .product(name: "Core", package: "KakeibotKit"),

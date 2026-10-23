@@ -1,7 +1,5 @@
-public enum RewardBalance {}
-
-public extension RewardBalance {
-    static func amount(
+public enum RewardBalance {
+    public static func amount(
         logs: [RewardLog],
         goals: [RewardGoal]
     ) -> Int {

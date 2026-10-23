@@ -1,6 +1,4 @@
-enum DateText {}
-
-extension DateText {
+enum DateText {
     static let yearRange = 1...9999
 
     static func numbers(

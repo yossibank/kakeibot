@@ -1,8 +1,6 @@
 import Foundation
 
-enum Fixture {}
-
-extension Fixture {
+enum Fixture {
     static func data(_ path: String) throws -> Data {
         try Data(contentsOf: root.appending(path: path))
     }

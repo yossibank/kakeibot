@@ -1,8 +1,6 @@
 import GRDB
 
-enum MigrationV11 {}
-
-extension MigrationV11 {
+enum MigrationV11 {
     static func migrate(_ db: Database) throws {
         try db.execute(sql: keepLatestPerDay)
 
