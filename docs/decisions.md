@@ -12,7 +12,7 @@ Swift で先に作り、fixtures で Kotlin 版とそろえる。
 
 | 理由 | 選ばなかった案 |
 | --- | --- |
-| Swift が得意で iPhone を毎日使う。iOS をストアに出してから、11 番で Android に取りかかる。AI の段階は Swift 専用 | Kotlin Multiplatform、Compose Multiplatform、Flutter、Swift SDK for Android |
+| Swift が得意で iPhone を毎日使う。iOS をストアに出してから、13 番で Android に取りかかる。AI の段階は Swift 専用 | Kotlin Multiplatform、Compose Multiplatform、Flutter、Swift SDK for Android |
 
 ### リポジトリ
 
@@ -177,7 +177,15 @@ Core に置く。
 
 | 理由 | 選ばなかった案 |
 | --- | --- |
-| サーバーを使わずに、機種変更でも自分でデータを戻せる | iCloud で自動で同期する、今のデータに足して読み込む |
+| 無料で、サーバーを使わずに、機種変更でも自分でデータを戻せる | iCloud の同期だけに任せる、今のデータに足して読み込む |
+
+### Pro の中身と売り方
+
+Pro は、サブスクと買い切りの両方で売る。端末間の同期と家族との共有を Pro に含め、どちらも最初のリリースから出す。毎日の入力、予算、振り返り、バックアップは無料のまま使える。同期と共有の形は [overview](overview.md) にある。
+
+| 理由 | 選ばなかった案 |
+| --- | --- |
+| 家族との共有と機種をまたぐ同期は、お金を払う理由になりやすい。サブスクを嫌う人も買える | 同期と共有を無料にする、サブスクだけ、買い切りだけ、リリースの後に足す |
 
 ### ライセンスの表示
 
