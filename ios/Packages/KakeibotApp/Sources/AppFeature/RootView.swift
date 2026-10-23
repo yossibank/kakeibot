@@ -4,6 +4,7 @@ import Features
 import Notifications
 import Store
 import SwiftUI
+import UIKit
 
 public struct RootView: View {
     @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
@@ -133,6 +134,54 @@ private extension RootView {
 
     var shownStyle: ThemeStyle {
         isRevealed ? model.style : .standard
+    }
+}
+
+extension NotificationPermission {
+    static let live = Self {
+        await LiveNotificationCenter().authorization()
+    } request: {
+        await LiveNotificationCenter().requestAuthorization()
+    }
+}
+
+extension View {
+    func warmsUpInput() -> some View {
+        background(InputWarmup())
+    }
+}
+
+private struct InputWarmup: UIViewRepresentable {
+    func makeUIView(context: Context) -> WarmupView {
+        WarmupView()
+    }
+
+    func updateUIView(
+        _ uiView: WarmupView,
+        context: Context
+    ) {}
+}
+
+private final class WarmupView: UIView {
+    private var isWarmedUp = false
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+
+        guard let window, !isWarmedUp else {
+            return
+        }
+
+        let field = UITextField()
+
+        isWarmedUp = true
+
+        window.addSubview(field)
+        field.becomeFirstResponder()
+        field.resignFirstResponder()
+        field.removeFromSuperview()
+        UISelectionFeedbackGenerator().prepare()
+        UIImpactFeedbackGenerator(style: .light).prepare()
     }
 }
 
