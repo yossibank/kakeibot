@@ -10,7 +10,9 @@ struct QuickRecordWidgetView: View {
 
     var body: some View {
         content
-            .padding(16)
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 18)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .widgetURL(PlannedNotification.Route.home.url)
             .widgetTheme(entry.look, style: entry.style)
@@ -21,7 +23,7 @@ private extension QuickRecordWidgetView {
     @ViewBuilder
     var content: some View {
         if let summary = entry.summary {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 header(of: summary)
                     .frame(height: Self.headerHeight)
 
@@ -192,11 +194,23 @@ private extension QuickRecordWidgetView {
     }
 
     func todayRecords(of summary: QuickRecordWidgetSummary) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("今日の記録")
-                .textFont(size: .micro)
-                .tracking(1)
-                .foregroundStyle(Palette.accent)
+        let others = summary.todayCount - summary.todayRecords.count
+
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("今日の記録 \(summary.todayCount) 件")
+                    .textFont(size: .micro)
+                    .tracking(1)
+                    .foregroundStyle(Palette.accent)
+
+                Spacer(minLength: 4)
+
+                if others > 0 {
+                    Text("ほか \(others) 件")
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.subtext)
+                }
+            }
 
             if summary.todayRecords.isEmpty {
                 Text("今日はまだ記録していません")
@@ -204,31 +218,47 @@ private extension QuickRecordWidgetView {
                     .foregroundStyle(Palette.hint)
             } else {
                 ForEach(summary.todayRecords) { record in
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(record.title)
-                            .textFont(size: .caption)
-                            .foregroundStyle(Palette.text)
-                            .lineLimit(1)
-
-                        Spacer(minLength: 8)
-
-                        Text(amountText(of: record))
-                            .textFont(size: .caption, weight: .medium)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.text)
-                            .lineLimit(1)
-                            .privacySensitive()
-                    }
+                    recordRow(record)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+
+    func recordRow(_ record: QuickRecordWidgetSummary.Record) -> some View {
+        HStack(spacing: 8) {
+            IconImage(record.icon, size: 11)
+                .foregroundStyle(Palette.accent)
+                .frame(width: Self.badgeSize, height: Self.badgeSize)
+                .background(Palette.faint, in: Circle())
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(record.title)
+                    .textFont(size: .caption, weight: .medium)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+
+                Text(record.detail)
+                    .textFont(size: .micro)
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 8)
+
+            Text(amountText(of: record))
+                .displayFont(.small, weight: .medium)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .privacySensitive()
+        }
+    }
 }
 
 private extension QuickRecordWidgetView {
     static let columns = 2
-    static let headerHeight: CGFloat = 24
+    static let headerHeight: CGFloat = 20
     static let tileRadius: CGFloat = 14
     static let badgeSize: CGFloat = 20
     static let markSize: CGFloat = 20

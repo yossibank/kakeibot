@@ -7,6 +7,7 @@ struct QuickRecordWidgetSummary: Hashable, Sendable {
     let todayExpense: Int
     let tiles: [Tile]
     let todayRecords: [Record]
+    let todayCount: Int
     let recorded: Recorded?
 }
 
@@ -22,8 +23,10 @@ extension QuickRecordWidgetSummary {
     struct Record: Hashable, Identifiable, Sendable {
         let id: Entry.ID
         let title: String
+        let detail: String
         let amount: Int
         let type: Entry.Kind
+        let icon: Icon?
     }
 
     struct Recorded: Hashable, Sendable {
@@ -58,12 +61,21 @@ extension QuickRecordWidgetSummary {
             )
         }
 
-        let records = (today?.entries ?? []).prefix(Self.recordLimit).map { entry in
-            Record(
+        let todayEntries = today?.entries ?? []
+
+        let records = todayEntries.prefix(Self.recordLimit).map { entry in
+            let template = templates.first { $0.id == entry.templateId }
+            let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
+            let wallet = list?.wallets[entry.walletId]?.name
+            let category = entry.categoryId.flatMap { list?.categories[$0] }
+
+            return Record(
                 id: entry.id,
                 title: list?.title(of: entry) ?? "",
+                detail: [template?.name ?? memo, wallet].rowDetail ?? "",
                 amount: entry.amount,
-                type: entry.type
+                type: entry.type,
+                icon: category.flatMap { list?.icons[$0.iconId] }
             )
         }
 
@@ -89,6 +101,7 @@ extension QuickRecordWidgetSummary {
             todayExpense: overview.todayExpense,
             tiles: Array(tiles),
             todayRecords: Array(records),
+            todayCount: todayEntries.count,
             recorded: recorded
         )
     }
@@ -114,14 +127,29 @@ extension QuickRecordWidgetSummary {
         }
 
         let records = [
-            Record(id: Entry.ID(), title: "食費", amount: 980, type: .expense),
-            Record(id: Entry.ID(), title: "カフェ", amount: 140, type: .expense)
+            Record(
+                id: Entry.ID(),
+                title: "食費",
+                detail: "ランチ・財布",
+                amount: 980,
+                type: .expense,
+                icon: nil
+            ),
+            Record(
+                id: Entry.ID(),
+                title: "カフェ",
+                detail: "コーヒー・カード",
+                amount: 140,
+                type: .expense,
+                icon: nil
+            )
         ]
 
         return QuickRecordWidgetSummary(
             todayExpense: 1120,
             tiles: tiles,
             todayRecords: records,
+            todayCount: 3,
             recorded: nil
         )
     }
@@ -135,6 +163,7 @@ extension QuickRecordWidgetSummary {
             todayExpense: todayExpense,
             tiles: tiles,
             todayRecords: todayRecords,
+            todayCount: todayCount,
             recorded: nil
         )
     }

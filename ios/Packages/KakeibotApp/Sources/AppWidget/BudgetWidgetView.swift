@@ -99,7 +99,7 @@ private extension BudgetWidgetView {
                 Rectangle()
                     .fill(Palette.line)
                     .frame(height: 1)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 8)
 
                 VStack(spacing: 8) {
                     ForEach(rows(of: summary)) { row in
@@ -111,7 +111,7 @@ private extension BudgetWidgetView {
                             Spacer(minLength: 8)
 
                             Text(AmountText.text(row.amount))
-                                .textFont(size: .small, weight: .medium)
+                                .displayFont(.body, weight: .medium)
                                 .monospacedDigit()
                                 .foregroundStyle(Palette.text)
                                 .lineLimit(1)
