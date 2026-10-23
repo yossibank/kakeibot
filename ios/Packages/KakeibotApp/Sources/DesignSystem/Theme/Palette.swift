@@ -1,3 +1,4 @@
+import Core
 import SwiftUI
 
 public enum Palette {}
@@ -29,6 +30,17 @@ public extension Palette {
     static var background: LinearGradient {
         LinearGradient(
             colors: [backgroundTop, backgroundBottom],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    static func background(of palette: ThemePalette) -> LinearGradient {
+        LinearGradient(
+            colors: [
+                Color(rgb: palette.backgroundTop),
+                Color(rgb: palette.backgroundBottom)
+            ],
             startPoint: .top,
             endPoint: .bottom
         )

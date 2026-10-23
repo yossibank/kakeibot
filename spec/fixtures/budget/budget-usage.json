@@ -1,12 +1,12 @@
 [
-  {"budget": 120000, "spent": 0, "today": "2026-10-01", "periodEnd": "2026-10-31", "remaining": 120000, "perDay": 3870, "isOver": false, "isNearLimit": false},
-  {"budget": 120000, "spent": 45000, "today": "2026-10-12", "periodEnd": "2026-10-31", "remaining": 75000, "perDay": 3750, "isOver": false, "isNearLimit": false},
-  {"budget": 120000, "spent": 120000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 0, "perDay": 0, "isOver": false, "isNearLimit": true},
-  {"budget": 120000, "spent": 123000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": -3000, "perDay": 0, "isOver": true, "isNearLimit": false},
-  {"budget": 50000, "spent": 10000, "today": "2026-10-24", "periodEnd": "2026-10-24", "remaining": 40000, "perDay": 40000, "isOver": false, "isNearLimit": false},
-  {"budget": 90000, "spent": 30000, "today": "2026-09-25", "periodEnd": "2026-10-24", "remaining": 60000, "perDay": 2000, "isOver": false, "isNearLimit": false},
-  {"budget": 100000, "spent": 79999, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 20001, "perDay": 1666, "isOver": false, "isNearLimit": false},
-  {"budget": 100000, "spent": 80000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 20000, "perDay": 1666, "isOver": false, "isNearLimit": true},
-  {"budget": 120000, "spent": 45000, "upcoming": 30000, "today": "2026-10-12", "periodEnd": "2026-10-31", "remaining": 75000, "perDay": 2250, "isOver": false, "isNearLimit": false},
-  {"budget": 120000, "spent": 45000, "upcoming": 80000, "today": "2026-10-12", "periodEnd": "2026-10-31", "remaining": 75000, "perDay": 0, "isOver": false, "isNearLimit": false}
+  {"budget": 120000, "spent": 0, "today": "2026-10-01", "periodEnd": "2026-10-31", "remaining": 120000, "perDay": 3870, "isOver": false, "isNearLimit": false, "todayRemaining": 3870},
+  {"budget": 120000, "spent": 45000, "today": "2026-10-12", "periodEnd": "2026-10-31", "remaining": 75000, "perDay": 3750, "isOver": false, "isNearLimit": false, "spentToday": 1500, "todayRemaining": 2325},
+  {"budget": 120000, "spent": 120000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 0, "perDay": 0, "isOver": false, "isNearLimit": true, "todayRemaining": 0},
+  {"budget": 120000, "spent": 123000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": -3000, "perDay": 0, "isOver": true, "isNearLimit": false, "spentToday": 3000, "todayRemaining": -3000},
+  {"budget": 50000, "spent": 10000, "today": "2026-10-24", "periodEnd": "2026-10-24", "remaining": 40000, "perDay": 40000, "isOver": false, "isNearLimit": false, "spentToday": 10000, "todayRemaining": 40000},
+  {"budget": 90000, "spent": 30000, "today": "2026-09-25", "periodEnd": "2026-10-24", "remaining": 60000, "perDay": 2000, "isOver": false, "isNearLimit": false, "todayRemaining": 2000},
+  {"budget": 100000, "spent": 79999, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 20001, "perDay": 1666, "isOver": false, "isNearLimit": false, "todayRemaining": 1666},
+  {"budget": 100000, "spent": 80000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 20000, "perDay": 1666, "isOver": false, "isNearLimit": true, "todayRemaining": 1666},
+  {"budget": 120000, "spent": 45000, "upcoming": 30000, "today": "2026-10-12", "periodEnd": "2026-10-31", "remaining": 75000, "perDay": 2250, "isOver": false, "isNearLimit": false, "todayRemaining": 2250},
+  {"budget": 120000, "spent": 45000, "upcoming": 80000, "today": "2026-10-12", "periodEnd": "2026-10-31", "remaining": 75000, "perDay": 0, "isOver": false, "isNearLimit": false, "spentToday": 2000, "todayRemaining": -2000}
 ]

@@ -1,6 +1,7 @@
 import Core
 import DesignSystem
 import SwiftUI
+import WidgetKit
 
 struct WidgetTheme: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
@@ -11,6 +12,9 @@ struct WidgetTheme: ViewModifier {
         let palette = look.palette(isDark: colorScheme == .dark)
 
         content
+            .containerBackground(for: .widget) {
+                Palette.background(of: palette)
+            }
             .environment(\.palette, palette)
             .environment(\.colorScheme, palette.isLight ? .light : .dark)
     }

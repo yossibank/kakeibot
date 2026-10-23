@@ -10,9 +10,6 @@ struct BudgetWidgetView: View {
 
     var body: some View {
         content
-            .containerBackground(for: .widget) {
-                Palette.background
-            }
             .widgetURL(PlannedNotification.Route.home.url)
             .widgetTheme(entry.look)
     }
@@ -60,13 +57,21 @@ private extension BudgetWidgetView {
                     tint: usage?.tint ?? Palette.accent
                 )
 
-                Text(amount(of: summary))
-                    .displayFont(.headline, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(usage?.amountTint ?? Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-                    .privacySensitive()
+                VStack(spacing: 0) {
+                    if let usage {
+                        Text("あと \(usage.daysLeft) 日")
+                            .textFont(size: .micro)
+                            .foregroundStyle(Palette.subtext)
+                    }
+
+                    Text(amount(of: summary))
+                        .displayFont(.headline, weight: .bold)
+                        .monospacedDigit()
+                        .foregroundStyle(amountColor(of: summary))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                        .privacySensitive()
+                }
             }
 
             Text(note(of: summary))
@@ -125,9 +130,17 @@ private extension BudgetWidgetView {
         return AmountText.text(usage.remaining)
     }
 
+    func amountColor(of summary: BudgetWidgetSummary) -> Color {
+        summary.usage?.amountTint ?? Palette.accentStrong
+    }
+
     func note(of summary: BudgetWidgetSummary) -> String {
-        let today = "今日 \(AmountText.text(summary.todayExpense))"
-        return summary.usage?.warningText ?? today
+        guard let usage = summary.usage else {
+            return "今日 \(AmountText.text(summary.todayExpense))"
+        }
+
+        let left = usage.todayRemaining(spentToday: summary.todayExpense)
+        return usage.warningText ?? "今日あと \(AmountText.text(left))"
     }
 
     func noteColor(of summary: BudgetWidgetSummary) -> Color {
@@ -142,19 +155,19 @@ private extension BudgetWidgetView {
     }
 
     func rows(of summary: BudgetWidgetSummary) -> [Row] {
-        let today = Row(title: "今日", amount: summary.todayExpense)
-
         guard let usage = summary.usage else {
             return [
-                today,
+                Row(title: "今日", amount: summary.todayExpense),
                 Row(title: "昨日", amount: summary.yesterdayExpense)
             ]
         }
 
+        let left = usage.todayRemaining(spentToday: summary.todayExpense)
+
         return [
-            today,
-            Row(title: "今月の支出", amount: usage.spent),
-            Row(title: "1 日あたり", amount: usage.perDay)
+            Row(title: "今日あと", amount: left),
+            Row(title: "今日の支出", amount: summary.todayExpense),
+            Row(title: "今月の支出", amount: usage.spent)
         ]
     }
 }
