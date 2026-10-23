@@ -9,7 +9,7 @@ import Store
 public final class BuddyModel {
     public var customName = ""
 
-    public private(set) var buddy: Buddy? = .dial
+    public private(set) var buddy: Buddy? = .rabbit
 
     public internal(set) var errorNotice = ErrorNotice()
 

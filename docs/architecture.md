@@ -41,7 +41,7 @@ kakeibot/
 
 ```
 ios/
-├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）、アプリアイコン、起動画面、同梱のフォント、設定アプリに出すライセンス
+├── Kakeibot/                アプリ（@main で AppFeature を呼ぶだけ）、アプリアイコン、起動画面、キャラクターの絵、同梱のフォント、設定アプリに出すライセンス
 ├── Kakeibot.xcodeproj       アプリとウィジェットのターゲット
 ├── Kakeibot.xctestplan      テストターゲットをまとめたテストプラン
 ├── Kakeibot.xcworkspace     プロジェクトと 2 つのパッケージを並べる。Xcode ではこれを開く
@@ -58,6 +58,7 @@ ios/
 | Bundle ID | `com.yossibank.kakeibot` | `com.yossibank.kakeibot.widget` |
 | App Group | `group.com.yossibank.kakeibot` | 同じ |
 | アプリアイコン | Icon Composer の `AppIcon.icon`（ホワイト）。設定で選べる色違いは、同じフォルダの `AppIcon-<色>.icon`。設定の見本を描くため、同じ絵を `Assets.xcassets` の `AppIconYen`・`AppIconDial` に写して持つ | |
+| キャラクターの絵 | `Assets.xcassets` の `Buddy<動物>`。Kenney の Animal Pack（CC0）の丸型の SVG を、動物ごとに切り分けたもの | 入れない |
 | 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | 入れない |
 | ライセンスの一覧 | `Kakeibot/Settings.bundle`。`make licenses` で LicensePlist が作り、設定アプリに出す | 入れない |
 
@@ -81,7 +82,7 @@ ios/
 KakeibotKit/
 ├── Sources/
 │   ├── Core/
-│   │   ├── Buddy/           キャラクターの種類と名前、表情、場面ごとの一言
+│   │   ├── Buddy/           キャラクターの種類と名前、場面ごとの一言
 │   │   ├── Budget/          予算の型、「この月から」、残り、消化
 │   │   ├── Category/        記録のカテゴリ（EntryCategory）とタグ、その入力の判定
 │   │   ├── Date/            LocalDate、期間の区切りと呼び方、週の始まり、月と期間のマス目、祝日
@@ -118,7 +119,7 @@ KakeibotApp/
 │   │   ├── Components/      部品の種類ごとのフォルダ
 │   │   │   ├── Amount/      金額、予算の使い具合の色と棒、残りの文字
 │   │   │   ├── Banner/      画面の下に出す知らせ、3 秒で消えるエラーの知らせとその状態
-│   │   │   ├── Buddy/       コードで描くキャラクターの顔と、一言の吹き出し
+│   │   │   ├── Buddy/       キャラクターの顔の絵と、一言の吹き出し
 │   │   │   ├── Button/      輪・大きな・見出しの横・点線の追加のボタン
 │   │   │   ├── Calendar/    月のカレンダー、めくりカレンダーの日付、曜日の名前と色
 │   │   │   ├── Chart/       円グラフ、割合の棒

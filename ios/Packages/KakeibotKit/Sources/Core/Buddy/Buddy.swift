@@ -1,19 +1,31 @@
 import Foundation
 
 public enum Buddy: String, CaseIterable, Sendable {
-    case dial
-    case cat
     case rabbit
-    case bear
+    case panda
+    case pig
+    case penguin
+    case monkey
+    case elephant
+    case giraffe
+    case hippo
+    case parrot
+    case snake
 }
 
 public extension Buddy {
     var defaultName: String {
         switch self {
-        case .dial: "まる"
-        case .cat: "たま"
-        case .rabbit: "うさ"
-        case .bear: "くま"
+        case .rabbit: "うさぎ"
+        case .panda: "パンダ"
+        case .pig: "ぶた"
+        case .penguin: "ペンギン"
+        case .monkey: "さる"
+        case .elephant: "ぞう"
+        case .giraffe: "きりん"
+        case .hippo: "かば"
+        case .parrot: "オウム"
+        case .snake: "へび"
         }
     }
 

@@ -45,7 +45,7 @@ public extension SettingKey where Value == Buddy? {
     static var buddy: Self {
         Self(
             .characterId,
-            default: .dial,
+            default: .rabbit,
             decode: { text in
                 guard text != Self.noBuddy else {
                     return .some(nil)

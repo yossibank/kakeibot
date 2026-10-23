@@ -106,8 +106,7 @@ private extension BuddyView {
 
 private extension BuddyView {
     static let greeting = BuddyLine(
-        mood: .smile,
-        text: "予算の残りや、ごほうびの達成でひとこと話します"
+        "予算の残りや、ごほうびの達成でひとこと話します"
     )
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: 12),

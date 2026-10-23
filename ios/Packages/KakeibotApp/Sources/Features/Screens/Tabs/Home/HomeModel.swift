@@ -13,7 +13,7 @@ public final class HomeModel: ScreenModel {
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var templateOrder: TemplateOrder = .manual
     public private(set) var list: EntryList?
-    public private(set) var buddy = BuddyProfile(buddy: .dial, customName: "")
+    public private(set) var buddy = BuddyProfile(buddy: .rabbit, customName: "")
 
     public internal(set) var errorNotice = ErrorNotice()
 

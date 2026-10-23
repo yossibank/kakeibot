@@ -308,7 +308,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | month_start_day | 1〜31。月末を超えたらその月の最終日 |
 | week_start | `monday`〜`sunday`。空なら日曜 |
 | reminder_time | `HH:mm`。空なら知らせない |
-| character_id | `dial` `cat` `rabbit` `bear` `none`。`none` なら出さない。空なら `dial` |
+| character_id | `rabbit` `panda` `pig` `penguin` `monkey` `elephant` `giraffe` `hippo` `parrot` `snake` `none`。`none` なら出さない。空か、どれにも当たらなければ `rabbit` |
 | character_name | キャラクターに付けた名前。空なら種類ごとの名前 |
 | theme_id | `system`（iPhone に合わせる）か、用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空なら `system` |
 | onboarding_completed | `true` `false` |

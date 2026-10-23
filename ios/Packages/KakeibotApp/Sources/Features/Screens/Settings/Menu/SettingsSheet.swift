@@ -12,7 +12,7 @@ public struct SettingsSheet: View {
     @State private var theme: ThemeChoice = .system
     @State private var customThemes: [Theme] = []
     @State private var appIcon = AppIconListModel()
-    @State private var buddy = BuddyProfile(buddy: .dial, customName: "")
+    @State private var buddy = BuddyProfile(buddy: .rabbit, customName: "")
 
     #if DEBUG
     @State private var isConfirmingSample = false
@@ -526,7 +526,7 @@ private extension SettingsSheet {
                 buddy = profile
             }
         } catch {
-            buddy = BuddyProfile(buddy: .dial, customName: "")
+            buddy = BuddyProfile(buddy: .rabbit, customName: "")
         }
     }
 

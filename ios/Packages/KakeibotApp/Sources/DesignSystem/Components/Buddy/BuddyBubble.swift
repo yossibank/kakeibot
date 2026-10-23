@@ -20,7 +20,7 @@ public struct BuddyBubble: View {
 
     public var body: some View {
         HStack(alignment: .center, spacing: 10) {
-            BuddyFace(buddy, mood: line.mood, size: 52)
+            BuddyFace(buddy, size: 52)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(name)
@@ -80,14 +80,14 @@ private struct BubbleTail: Shape {
 #Preview {
     VStack(spacing: 16) {
         BuddyBubble(
-            .cat,
-            name: "たま",
+            .rabbit,
+            name: "うさぎ",
             line: .budget(nil)
         )
 
         BuddyBubble(
-            .bear,
-            name: "くま",
+            .panda,
+            name: "パンダ",
             line: .reward(count: 2)
         )
     }

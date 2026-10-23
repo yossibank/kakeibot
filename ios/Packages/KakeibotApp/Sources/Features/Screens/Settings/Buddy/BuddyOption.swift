@@ -41,7 +41,7 @@ private extension BuddyOption {
     @ViewBuilder
     var face: some View {
         if let buddy {
-            BuddyFace(buddy, mood: .smile, size: 64)
+            BuddyFace(buddy, size: 64)
         } else {
             Image(systemName: "eye.slash")
                 .sansFont(.title, weight: .ultraLight)

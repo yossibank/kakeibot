@@ -22,7 +22,7 @@ public final class RecordsModel: ScreenModel {
     public private(set) var stampCalendar: StampCalendar?
     public private(set) var stampShelf: IconShelf?
     public private(set) var rewardBank: RewardBank?
-    public private(set) var buddy = BuddyProfile(buddy: .dial, customName: "")
+    public private(set) var buddy = BuddyProfile(buddy: .rabbit, customName: "")
     public private(set) var recurrings: [Recurring] = []
     public private(set) var recentSearches: [String] = []
 

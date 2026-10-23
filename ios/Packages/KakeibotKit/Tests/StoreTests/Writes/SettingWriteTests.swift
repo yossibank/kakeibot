@@ -38,15 +38,15 @@ struct SettingWriteTests {
         let database = try AppDatabase.inMemory()
 
         let initial = try await database.setting(.buddy)
-        try await database.setSetting(.buddy, to: .cat)
-        let cat = try await database.setting(.buddy)
+        try await database.setSetting(.buddy, to: .panda)
+        let panda = try await database.setting(.buddy)
         try await database.setSetting(.buddy, to: nil)
         let hidden = try await database.setting(.buddy)
         try await database.setSetting(.buddyName, to: "ミケ")
         let name = try await database.setting(.buddyName)
 
-        #expect(initial == .dial)
-        #expect(cat == .cat)
+        #expect(initial == .rabbit)
+        #expect(panda == .panda)
         #expect(hidden == nil)
         #expect(name == "ミケ")
     }
