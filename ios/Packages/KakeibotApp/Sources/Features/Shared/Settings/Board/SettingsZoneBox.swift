@@ -22,17 +22,22 @@ struct SettingsZoneBox: View {
         let label = showsOnLabel ? onLabel : offLabel
 
         VStack(spacing: 0) {
-            HStack(spacing: 8) {
-                Image(systemName: label.systemImage)
-                Text(label.title)
+            ZStack {
+                HStack(spacing: 8) {
+                    Image(systemName: label.systemImage)
+                    Text(label.title)
+                }
+                .foregroundStyle(color)
+                .id(isOn)
+                .transition(.opacity)
             }
             .frame(maxWidth: .infinity, minHeight: labelHeight)
 
             Spacer(minLength: 0)
         }
         .textFont(.subheadline)
-        .foregroundStyle(color)
         .frame(height: height, alignment: .top)
+        .clipShape(shape)
         .background {
             shape
                 .fill(Palette.backgroundBottom.opacity(.strong))
