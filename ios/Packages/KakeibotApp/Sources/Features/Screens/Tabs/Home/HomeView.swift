@@ -115,13 +115,10 @@ private extension HomeView {
                             .foregroundStyle(usage.tint)
                     }
 
-                    HStack(spacing: 16) {
-                        Text("予算 \(AmountText.text(usage.budget))")
-                        Text("1 日あたり \(AmountText.text(usage.perDay))")
-                    }
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
+                    Text("予算 \(AmountText.text(usage.budget))")
+                        .textFont(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
                 }
             } else {
                 Button(action: onOpenSettings) {
@@ -416,7 +413,7 @@ private extension HomeView {
     static let toolStroke = Palette.accent.opacity(.muted)
 
     var dialTitle: String {
-        model.budgetUsage == nil ? "今月の支出" : "今月あといくら"
+        model.budgetUsage?.remainingTitle ?? "今月の支出"
     }
 
     var dialAmount: String {
@@ -424,7 +421,7 @@ private extension HomeView {
             return AmountText.text(model.monthExpense)
         }
 
-        return AmountText.text(usage.remaining)
+        return usage.remainingAmountText
     }
 
     var dialAmountColor: Color {

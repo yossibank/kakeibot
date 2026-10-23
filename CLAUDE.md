@@ -8,6 +8,8 @@
 
 pre-commit の整形で commit が止まったら、差分を確かめてからステージし直す。止まる仕組みは [README の「動かし方」](README.md#動かし方)にある。`--no-verify` で飛ばさない。
 
+ウィジェットの見た目を変えたら、`widget-snapshot` のスキルで描いて確かめる。動きの不具合は、claude-config の `sim-record` のスキルで録画して確かめる。
+
 ## コードの書き方
 
 VoiceOver などのアクセシビリティの対応は入れない。`accessibility` で始まるモディファイアや、読み上げのためだけの値や引数を書かない。

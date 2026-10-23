@@ -13,7 +13,7 @@ struct BudgetWidgetView: View {
             .padding(16)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .widgetURL(PlannedNotification.Route.home.url)
-            .widgetTheme(entry.look)
+            .widgetTheme(entry.look, style: entry.style)
     }
 }
 
@@ -79,10 +79,8 @@ private extension BudgetWidgetView {
             .frame(maxWidth: .infinity)
 
             VStack(alignment: .leading, spacing: 0) {
-                let focus = focus(of: summary)
-
                 HStack(alignment: .firstTextBaseline) {
-                    Text(focus.title)
+                    Text("今日の支出")
                         .textFont(size: .caption)
                         .foregroundStyle(Palette.subtext)
 
@@ -90,7 +88,7 @@ private extension BudgetWidgetView {
                     days(of: summary)
                 }
 
-                Text(AmountText.text(focus.amount))
+                Text(AmountText.text(summary.todayExpense))
                     .displayFont(.title, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
@@ -98,13 +96,10 @@ private extension BudgetWidgetView {
                     .minimumScaleFactor(0.6)
                     .privacySensitive()
 
-                Spacer(minLength: 8)
-
                 Rectangle()
                     .fill(Palette.line)
                     .frame(height: 1)
-
-                Spacer(minLength: 8)
+                    .padding(.vertical, 12)
 
                 VStack(spacing: 8) {
                     ForEach(rows(of: summary)) { row in
@@ -125,6 +120,8 @@ private extension BudgetWidgetView {
                         }
                     }
                 }
+
+                Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity)
         }
@@ -178,16 +175,14 @@ private extension BudgetWidgetView {
                 .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity)
         } else {
-            let focus = focus(of: summary)
-
             HStack(alignment: .firstTextBaseline) {
-                Text(focus.title)
+                Text("今日の支出")
                     .textFont(size: .caption)
                     .foregroundStyle(Palette.subtext)
 
                 Spacer(minLength: 4)
 
-                Text(AmountText.text(focus.amount))
+                Text(AmountText.text(summary.todayExpense))
                     .textFont(size: .small, weight: .semibold)
                     .monospacedDigit()
                     .foregroundStyle(Palette.text)
@@ -201,7 +196,7 @@ private extension BudgetWidgetView {
 
 private extension BudgetWidgetView {
     func titleText(of summary: BudgetWidgetSummary) -> String {
-        summary.usage == nil ? "今月の支出" : "今月あといくら"
+        summary.usage?.remainingTitle ?? "今月の支出"
     }
 
     func amount(of summary: BudgetWidgetSummary) -> String {
@@ -209,7 +204,7 @@ private extension BudgetWidgetView {
             return AmountText.text(summary.monthExpense)
         }
 
-        return AmountText.text(usage.remaining)
+        return usage.remainingAmountText
     }
 
     func amountColor(of summary: BudgetWidgetSummary) -> Color {
@@ -235,24 +230,19 @@ private extension BudgetWidgetView {
         return usage.tint
     }
 
-    func focus(of summary: BudgetWidgetSummary) -> Row {
-        guard let usage = summary.usage else {
-            return Row(title: "今日の支出", amount: summary.todayExpense)
-        }
-
-        let left = usage.todayRemaining(spentToday: summary.todayExpense)
-
-        return Row(title: "今日あと", amount: left)
-    }
-
     func rows(of summary: BudgetWidgetSummary) -> [Row] {
-        guard let usage = summary.usage else {
-            return [Row(title: "昨日の支出", amount: summary.yesterdayExpense)]
+        let week = Row(title: "今週の支出", amount: summary.weekExpense)
+
+        let spending = summary.usage == nil
+            ? [Row(title: "昨日の支出", amount: summary.yesterdayExpense), week]
+            : [week, Row(title: "今月の支出", amount: summary.monthExpense)]
+
+        guard let next = summary.nextRecurring else {
+            return spending
         }
 
-        return [
-            Row(title: "今日の支出", amount: summary.todayExpense),
-            Row(title: "今月の支出", amount: usage.spent)
-        ]
+        let title = "\(next.title) \(next.date.month)/\(next.date.day)"
+
+        return spending + [Row(title: title, amount: next.amount)]
     }
 }

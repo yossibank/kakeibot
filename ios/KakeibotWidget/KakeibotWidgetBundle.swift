@@ -6,5 +6,10 @@ import WidgetKit
 struct KakeibotWidgetBundle: WidgetBundle {
     var body: some Widget {
         BudgetWidget()
+        BudgetLockWidget()
+    }
+
+    init() {
+        WidgetFonts.register()
     }
 }

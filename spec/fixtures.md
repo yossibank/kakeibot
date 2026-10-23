@@ -20,11 +20,11 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | ファイル | 試すこと | 項目 |
 | --- | --- | --- |
 | `budget-amount.json` | ある月に使う予算。`fromMonth` がその月以前でいちばん新しい行の額 | `budgets`（`category`・`fromMonth`・`amount`）、`category`、`month`、`amount` |
-| `budget-usage.json` | 予算の残りと、期間の終わりまでの 1 日あたりの額、8 割を超えたか、今日あといくら使えるか | `budget`、`spent`、`upcoming`、`today`、`periodEnd`、`remaining`、`perDay`、`isOver`、`isNearLimit`、`spentToday`、`todayRemaining` |
+| `budget-usage.json` | 予算の残りと、期間の終わりまでの日数、8 割を超えたか | `budget`、`spent`、`today`、`periodEnd`、`remaining`、`daysLeft`、`isOver`、`isNearLimit` |
 
 `category` が空なら月全体の予算を、名前ならそのカテゴリの予算を表す。月全体とカテゴリの予算は混ぜない。
 
-1 日あたりの額は、残りから `upcoming` を引き、今日から期間の終わりまでの日数（今日を含む）で割る。1 円未満は切り捨て、0 以下なら 0 にする。`upcoming` は、明日から期間の終わりまでに来る固定費の支出で、無ければ 0 とする。`isNearLimit` は、使った額が予算の 8 割以上で、超えていないときに真にする。今日あといくらは、残りに `spentToday` を足して `upcoming` を引く。0 未満なら 0 にして日数で割り、1 円未満は切り捨てる。そこから `spentToday` を引き、負の値も残す。`spentToday` は今日の支出で、無ければ 0 とする。
+期間の終わりまでの日数は、今日を含めて数え、1 より小さくしない。`isNearLimit` は、使った額が予算の 8 割以上で、超えていないときに真にする。
 
 ## category
 

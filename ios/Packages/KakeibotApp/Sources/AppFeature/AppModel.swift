@@ -162,6 +162,8 @@ private extension AppModel {
         do {
             for try await style in database.styleUpdates() {
                 self.style = style
+
+                reloadWidgets()
             }
         } catch {
             return

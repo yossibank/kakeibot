@@ -1,19 +1,23 @@
 import Core
 
 public extension BudgetUsage {
+    var remainingTitle: String {
+        isOver ? "予算オーバー" : "今月あといくら"
+    }
+
+    var remainingAmountText: String {
+        AmountText.text(abs(remaining))
+    }
+
     var remainingText: String {
         if isOver {
-            return "\(AmountText.text(-remaining)) 超え"
+            return "オーバー \(AmountText.text(-remaining))"
         }
 
         return "残り \(AmountText.text(remaining))"
     }
 
     var warningText: String? {
-        if isOver {
-            return "予算を超えています"
-        }
-
-        return isNearLimit ? "予算の 8 割を使いました" : nil
+        isNearLimit ? "予算の 8 割を使いました" : nil
     }
 }

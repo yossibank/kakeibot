@@ -1,7 +1,6 @@
 import Core
-import Store
 
-extension EntryList {
+public extension EntryList {
     func title(of recurring: Recurring) -> String? {
         let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
         let category = recurring.categoryId.flatMap { categories[$0] }

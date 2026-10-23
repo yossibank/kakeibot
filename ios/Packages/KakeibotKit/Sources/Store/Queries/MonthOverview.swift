@@ -115,10 +115,21 @@ public extension MonthOverview {
         return BudgetUsage(
             budget: budget,
             spent: monthExpense,
-            upcoming: upcomingRecurringExpense,
             today: today,
             periodEnd: period.upperBound
         )
+    }
+
+    var nextRecurringExpense: PeriodRecurring? {
+        periodRecurrings.first { item in
+            item.recurring.type == .expense && item.status == .upcoming
+        }
+    }
+
+    func expense(in range: ClosedRange<LocalDate>) -> Int {
+        list?.days
+            .filter { range.contains($0.date) }
+            .reduce(0) { $0 + $1.expenseTotal } ?? 0
     }
 
     func moved(to day: LocalDate) -> MonthOverview {

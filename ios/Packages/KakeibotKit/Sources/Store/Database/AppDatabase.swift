@@ -113,6 +113,7 @@ private extension AppDatabase {
         var configuration = Configuration()
 
         configuration.observesSuspensionNotifications = true
+        configuration.persistentReadOnlyConnections = true
 
         return configuration
     }
