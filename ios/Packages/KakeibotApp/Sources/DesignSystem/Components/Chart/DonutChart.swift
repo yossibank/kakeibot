@@ -78,6 +78,31 @@ private extension DonutChart {
         .milliseconds(240)
     }
 
+    var segments: [Segment] {
+        let total = slices.reduce(0) { $0 + max($1.value, 0) }
+
+        guard total > 0 else {
+            return []
+        }
+
+        let gap = slices.count > 1 ? Self.gap : 0
+        var start: CGFloat = 0
+
+        return slices.map { slice in
+            let share = CGFloat(max(slice.value, 0)) / CGFloat(total)
+            let end = start + share
+            let trimmedEnd = max(start, end - gap)
+            defer { start = end }
+
+            return Segment(
+                id: slice.id,
+                start: start,
+                end: trimmedEnd,
+                color: slice.color
+            )
+        }
+    }
+
     func select(
         at location: CGPoint,
         in size: CGSize
@@ -116,31 +141,6 @@ private extension DonutChart {
             try? await Task.sleep(for: Self.highlightDelay)
             onSelect(segment.id)
             highlighted = nil
-        }
-    }
-
-    var segments: [Segment] {
-        let total = slices.reduce(0) { $0 + max($1.value, 0) }
-
-        guard total > 0 else {
-            return []
-        }
-
-        let gap = slices.count > 1 ? Self.gap : 0
-        var start: CGFloat = 0
-
-        return slices.map { slice in
-            let share = CGFloat(max(slice.value, 0)) / CGFloat(total)
-            let end = start + share
-            let trimmedEnd = max(start, end - gap)
-            defer { start = end }
-
-            return Segment(
-                id: slice.id,
-                start: start,
-                end: trimmedEnd,
-                color: slice.color
-            )
         }
     }
 }

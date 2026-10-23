@@ -40,19 +40,19 @@ public final class RecordsModel: ScreenModel {
 }
 
 public extension RecordsModel {
+    struct SearchSummary: Equatable {
+        public let count: Int
+        public let expenseTotal: Int
+        public let incomeTotal: Int
+        public let range: ClosedRange<LocalDate>
+    }
+
     var period: ClosedRange<LocalDate> {
         month.period(startingOn: monthStartDay)
     }
 
     var periodText: String {
         PeriodText.range(period)
-    }
-
-    struct SearchSummary: Equatable {
-        public let count: Int
-        public let expenseTotal: Int
-        public let incomeTotal: Int
-        public let range: ClosedRange<LocalDate>
     }
 
     var days: [EntryDay] {
@@ -103,6 +103,32 @@ public extension RecordsModel {
         list?.title(of: filter)
     }
 
+    var weeks: [[LocalDate?]] {
+        period.weeks(startingOn: weekStart)
+    }
+
+    var shownDate: LocalDate {
+        if let selectedDate, period.contains(selectedDate) {
+            return selectedDate
+        }
+
+        return period.contains(today) ? today : period.lowerBound
+    }
+
+    var stampChoices: [Icon] {
+        guard let stampShelf else {
+            return []
+        }
+
+        return stampShelf.shelfIcons
+            .filter { $0.archivedAt == nil }
+            .compactMap { stampShelf.icons[$0.iconId] }
+    }
+
+    var rewardRules: [RewardRule] {
+        rewardBank?.activeRules ?? []
+    }
+
     func rememberSearch(_ text: String) async {
         let words = EntrySearch.remembering(text, in: recentSearches)
 
@@ -119,30 +145,8 @@ public extension RecordsModel {
         await saveRecentSearches()
     }
 
-    var weeks: [[LocalDate?]] {
-        period.weeks(startingOn: weekStart)
-    }
-
-    var shownDate: LocalDate {
-        if let selectedDate, period.contains(selectedDate) {
-            return selectedDate
-        }
-
-        return period.contains(today) ? today : period.lowerBound
-    }
-
     func day(on date: LocalDate) -> EntryDay? {
         days.first { $0.date == date }
-    }
-
-    var stampChoices: [Icon] {
-        guard let stampShelf else {
-            return []
-        }
-
-        return stampShelf.shelfIcons
-            .filter { $0.archivedAt == nil }
-            .compactMap { stampShelf.icons[$0.iconId] }
     }
 
     func upcomingRecurrings(on date: LocalDate) -> [Recurring] {
@@ -187,10 +191,6 @@ public extension RecordsModel {
         } catch {
             errorNotice.show(Self.saveFailedMessage)
         }
-    }
-
-    var rewardRules: [RewardRule] {
-        rewardBank?.activeRules ?? []
     }
 
     func rewardIcon(for rule: RewardRule) -> Icon? {

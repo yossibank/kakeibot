@@ -309,6 +309,20 @@ private extension TemplateEditSheet {
         }
     }
 
+    @ViewBuilder
+    var tagChooser: some View {
+        if model.tags.isEmpty {
+            Text("このカテゴリにタグはありません。カテゴリの編集で足せます")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .frame(maxWidth: .infinity, minHeight: 54)
+        } else {
+            TagLine(tagItems, selection: model.tagId) { id in
+                model.toggleTag(id)
+            }
+        }
+    }
+
     func drawerView(_ panel: Panel) -> some View {
         SettingsDrawer(title(for: panel)) {
             closePanel()
@@ -365,20 +379,6 @@ private extension TemplateEditSheet {
             .padding(.bottom, 8)
         case .memo:
             EmptyView()
-        }
-    }
-
-    @ViewBuilder
-    var tagChooser: some View {
-        if model.tags.isEmpty {
-            Text("このカテゴリにタグはありません。カテゴリの編集で足せます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .frame(maxWidth: .infinity, minHeight: 54)
-        } else {
-            TagLine(tagItems, selection: model.tagId) { id in
-                model.toggleTag(id)
-            }
         }
     }
 }

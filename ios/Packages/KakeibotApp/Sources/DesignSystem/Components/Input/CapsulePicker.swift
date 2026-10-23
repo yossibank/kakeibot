@@ -95,14 +95,6 @@ public extension CapsulePicker {
 }
 
 private extension CapsulePicker {
-    var segmentWidth: CGFloat {
-        72 * textScale
-    }
-
-    var segmentHeight: CGFloat {
-        30 * textScale
-    }
-
     static var inset: CGFloat {
         3
     }
@@ -150,6 +142,14 @@ private extension CapsulePicker {
 
     static var spring: Animation {
         .spring(response: 0.32, dampingFraction: 0.78)
+    }
+
+    var segmentWidth: CGFloat {
+        72 * textScale
+    }
+
+    var segmentHeight: CGFloat {
+        30 * textScale
     }
 
     var selectedIndex: Int {

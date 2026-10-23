@@ -389,27 +389,6 @@ private extension WalletEditSheet {
         }
     }
 
-    func valuationRow(_ valuation: Valuation) -> some View {
-        let date = valuation.date
-
-        return HStack {
-            Text("\(String(date.year))/\(date.month)/\(date.day)")
-                .textFont(.subheadline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-
-            Spacer(minLength: 8)
-
-            Text(AmountText.text(valuation.amount))
-                .displayFont(.body)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-        }
-        .padding(.horizontal, 16)
-        .frame(height: 48)
-        .card(cornerRadius: 14)
-    }
-
     var signButton: some View {
         Button {
             model.isNegative.toggle()
@@ -430,6 +409,27 @@ private extension WalletEditSheet {
         }
         .buttonStyle(.plain)
         .sensoryFeedback(.selection, trigger: model.isNegative)
+    }
+
+    func valuationRow(_ valuation: Valuation) -> some View {
+        let date = valuation.date
+
+        return HStack {
+            Text("\(String(date.year))/\(date.month)/\(date.day)")
+                .textFont(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+
+            Spacer(minLength: 8)
+
+            Text(AmountText.text(valuation.amount))
+                .displayFont(.body)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+        }
+        .padding(.horizontal, 16)
+        .frame(height: 48)
+        .card(cornerRadius: 14)
     }
 
     func kindButton(_ kind: Wallet.Kind) -> some View {

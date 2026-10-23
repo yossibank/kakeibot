@@ -172,6 +172,13 @@ private extension BackupModel {
         return "kakeibot-\(formatter.string(from: date)).\(kind.rawValue)"
     }
 
+    static func dayText(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.dateFormat = "yyyy/M/d"
+        return formatter.string(from: date)
+    }
+
     func data(
         of kind: FileKind,
         at date: Date
@@ -183,12 +190,5 @@ private extension BackupModel {
         case .csv:
             return try await database.spreadsheet()
         }
-    }
-
-    static func dayText(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ja_JP")
-        formatter.dateFormat = "yyyy/M/d"
-        return formatter.string(from: date)
     }
 }

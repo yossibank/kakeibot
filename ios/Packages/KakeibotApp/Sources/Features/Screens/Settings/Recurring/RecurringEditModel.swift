@@ -256,6 +256,12 @@ public extension RecurringEditModel {
 }
 
 private extension RecurringEditModel {
+    static let billClosingDay = 31
+    static let billPaymentDay = 27
+
+    static let loadFailedMessage = "固定費を読めませんでした"
+    static let saveFailedMessage = "保存できませんでした"
+
     var suggestedHolidayShift: Recurring.HolidayShift {
         guard type != .transfer else {
             return .next
@@ -269,9 +275,6 @@ private extension RecurringEditModel {
         default: return .none
         }
     }
-
-    static let billClosingDay = 31
-    static let billPaymentDay = 27
 
     func presetPayment() {
         guard !isEditing, let target = paidWallet else {
@@ -303,9 +306,6 @@ private extension RecurringEditModel {
 
         holidayShift = suggestedHolidayShift
     }
-
-    static let loadFailedMessage = "固定費を読めませんでした"
-    static let saveFailedMessage = "保存できませんでした"
 
     func message(for problem: RecurringDraft.Problem) -> String {
         switch problem {

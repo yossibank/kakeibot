@@ -412,12 +412,6 @@ private extension ReviewView {
         Self.changeColor(model.change, of: model.kind)
     }
 
-    func recurringText(_ recurring: Int) -> String {
-        let other = model.total(of: model.kind) - recurring
-        let fixed = "固定費 \(AmountText.text(recurring))"
-        return "\(fixed)・それ以外 \(AmountText.text(other))"
-    }
-
     var comparisonText: String {
         let previous = Self.previousName(of: model.scale)
         let change = model.change
@@ -468,6 +462,16 @@ private extension ReviewView {
         case .month: "前の月"
         case .year: "前の年"
         }
+    }
+
+    static func count(of direction: PageSwipeDirection) -> Int {
+        direction == .forward ? 1 : -1
+    }
+
+    func recurringText(_ recurring: Int) -> String {
+        let other = model.total(of: model.kind) - recurring
+        let fixed = "固定費 \(AmountText.text(recurring))"
+        return "\(fixed)・それ以外 \(AmountText.text(other))"
     }
 
     func balanceRatio(of amount: Int) -> Double {
@@ -522,10 +526,6 @@ private extension ReviewView {
 
     func canMove(_ direction: PageSwipeDirection) -> Bool {
         model.canMove(by: Self.count(of: direction))
-    }
-
-    static func count(of direction: PageSwipeDirection) -> Int {
-        direction == .forward ? 1 : -1
     }
 
     func move(by count: Int) {

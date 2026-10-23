@@ -5,6 +5,14 @@ public enum ThemeChoice: Hashable, Sendable {
 }
 
 public extension ThemeChoice {
+    var text: String {
+        switch self {
+        case .system: Self.systemText
+        case let .preset(preset): preset.rawValue
+        case let .custom(id): id.description
+        }
+    }
+
     init?(_ text: String) {
         if text == Self.systemText {
             self = .system
@@ -14,14 +22,6 @@ public extension ThemeChoice {
             self = .custom(id)
         } else {
             return nil
-        }
-    }
-
-    var text: String {
-        switch self {
-        case .system: Self.systemText
-        case let .preset(preset): preset.rawValue
-        case let .custom(id): id.description
         }
     }
 }

@@ -58,10 +58,6 @@ extension SettingsHint.Line {
 }
 
 private extension SettingsHint {
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
-
     static var transition: AnyTransition {
         .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
     }
@@ -72,6 +68,10 @@ private extension SettingsHint {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     var card: some View {

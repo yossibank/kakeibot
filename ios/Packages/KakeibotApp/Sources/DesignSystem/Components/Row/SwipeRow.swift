@@ -151,16 +151,16 @@ private extension SwipeRow {
         8
     }
 
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(14))
-    }
-
     static var sheen: LinearGradient {
         LinearGradient(
             colors: [.white.opacity(0.18), .white.opacity(0)],
             startPoint: .top,
             endPoint: .center
         )
+    }
+
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(14))
     }
 
     var isOpen: Bool {

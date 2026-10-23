@@ -366,6 +366,15 @@ private extension RecurringListView {
         }
     }
 
+    static func nextText(_ row: RecurringListModel.Row) -> String {
+        guard let date = row.next else {
+            return "終わりました"
+        }
+
+        let next = "次は \(date.month)/\(date.day)"
+        return [row.closing, next].compactMap(\.self).joined(separator: "・")
+    }
+
     func boardHeight(count: Int) -> CGFloat {
         Self.grid.height(slots: count)
     }
@@ -455,15 +464,6 @@ private extension RecurringListView {
         }
 
         show(id)
-    }
-
-    static func nextText(_ row: RecurringListModel.Row) -> String {
-        guard let date = row.next else {
-            return "終わりました"
-        }
-
-        let next = "次は \(date.month)/\(date.day)"
-        return [row.closing, next].compactMap(\.self).joined(separator: "・")
     }
 }
 

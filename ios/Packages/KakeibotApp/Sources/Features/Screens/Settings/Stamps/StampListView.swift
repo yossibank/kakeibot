@@ -293,10 +293,6 @@ private extension StampListView {
     static let spacing: CGFloat = 8
     static let tileHeight: CGFloat = 78
 
-    var tileShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
-
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: spacing),
         count: columnCount
@@ -308,6 +304,10 @@ private extension StampListView {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    var tileShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     var boardHeight: CGFloat {

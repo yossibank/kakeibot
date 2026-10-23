@@ -164,30 +164,6 @@ private extension EntrySheet {
         }
     }
 
-    func payOffButton(_ remaining: Int) -> some View {
-        Button {
-            withAnimation(.snappy) {
-                model.payOffLoan()
-            }
-        } label: {
-            Label(
-                "残り \(AmountText.text(remaining)) をまとめて返す",
-                systemImage: "checkmark.seal"
-            )
-            .textFont(.footnote)
-            .foregroundStyle(Palette.accent)
-            .padding(.horizontal, 16)
-            .frame(minHeight: 40)
-            .overlay {
-                Capsule()
-                    .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
-            }
-            .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .transition(.opacity)
-    }
-
     var categoryArea: some View {
         VStack(spacing: 14) {
             EntryTemplateRow(
@@ -426,6 +402,30 @@ private extension EntrySheet {
                 .padding(.horizontal, Self.memoCardInset)
             }
             .transition(Self.memoTransition)
+    }
+
+    func payOffButton(_ remaining: Int) -> some View {
+        Button {
+            withAnimation(.snappy) {
+                model.payOffLoan()
+            }
+        } label: {
+            Label(
+                "残り \(AmountText.text(remaining)) をまとめて返す",
+                systemImage: "checkmark.seal"
+            )
+            .textFont(.footnote)
+            .foregroundStyle(Palette.accent)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 40)
+            .overlay {
+                Capsule()
+                    .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .transition(.opacity)
     }
 
     func categoryGrid(_ page: [EntryModel.CategoryCell]) -> some View {

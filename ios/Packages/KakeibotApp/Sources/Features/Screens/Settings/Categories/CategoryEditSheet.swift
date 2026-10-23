@@ -261,16 +261,16 @@ private extension CategoryEditSheet {
 
     static let fade: CGFloat = 16
 
+    static var tagTransition: AnyTransition {
+        .scale(scale: 0.95).combined(with: .opacity)
+    }
+
     var keyboardRegions: SafeAreaRegions {
         ignoresKeyboard ? .keyboard : []
     }
 
     var tagItems: [TagLine<UUID>.Item] {
         model.tags.map { TagLine.Item(id: $0.id, name: $0.draft.name) }
-    }
-
-    static var tagTransition: AnyTransition {
-        .scale(scale: 0.95).combined(with: .opacity)
     }
 
     func deleteAction(for edit: TagEdit) -> (() -> Void)? {

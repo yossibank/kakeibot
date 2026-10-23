@@ -46,6 +46,8 @@ public extension ReviewModel {
         public let usage: BudgetUsage?
     }
 
+    static let recurringShareId = AnyHashable("recurring")
+
     var period: ReviewPeriod {
         let current = ReviewPeriod(
             scale: scale,
@@ -127,10 +129,6 @@ public extension ReviewModel {
         return Self.sorted(ranked)
     }
 
-    func total(of kind: ReviewKind) -> Int {
-        total(of: kind, in: summary)
-    }
-
     var recurringTotal: Int? {
         guard let type = entryType else {
             return nil
@@ -147,8 +145,6 @@ public extension ReviewModel {
         return total > 0 ? total : nil
     }
 
-    static let recurringShareId = AnyHashable("recurring")
-
     var recurringShare: Share? {
         guard let recurringTotal else {
             return nil
@@ -164,6 +160,14 @@ public extension ReviewModel {
             ratio: Double(recurringTotal) / Double(total),
             usage: nil
         )
+    }
+
+    var stampTallies: [StampCalendar.Tally] {
+        stampCalendar?.tallies(in: period.range) ?? []
+    }
+
+    func total(of kind: ReviewKind) -> Int {
+        total(of: kind, in: summary)
     }
 
     func recurringId(of id: Entry.ID) -> Recurring.ID? {
@@ -200,10 +204,6 @@ public extension ReviewModel {
                 let label = "\(entry.date.month)/\(entry.date.day)"
                 return EntryRowItem(entry, in: list, dayLabel: label)
             }
-    }
-
-    var stampTallies: [StampCalendar.Tally] {
-        stampCalendar?.tallies(in: period.range) ?? []
     }
 
     func stampDays(of tally: StampCalendar.Tally) -> [LocalDate] {
@@ -320,16 +320,6 @@ private extension ReviewModel {
         }
     }
 
-    func summary(in range: ClosedRange<LocalDate>) -> ReviewSummary {
-        if let summary = summaries[range] {
-            return summary
-        }
-
-        let summary = ReviewSummary(entries: entries, in: range)
-        summaries[range] = summary
-        return summary
-    }
-
     static func sorted(_ ranked: [Ranked]) -> [Share] {
         ranked
             .sorted { lhs, rhs in
@@ -340,6 +330,16 @@ private extension ReviewModel {
                 return lhs.sortOrder < rhs.sortOrder
             }
             .map(\.share)
+    }
+
+    func summary(in range: ClosedRange<LocalDate>) -> ReviewSummary {
+        if let summary = summaries[range] {
+            return summary
+        }
+
+        let summary = ReviewSummary(entries: entries, in: range)
+        summaries[range] = summary
+        return summary
     }
 
     func total(

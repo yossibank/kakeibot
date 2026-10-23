@@ -141,6 +141,10 @@ extension AppModel {
 }
 
 private extension AppModel {
+    static func currentDay() -> LocalDate {
+        LocalDate(Date(), in: .current)
+    }
+
     func observeLook(in database: AppDatabase) async {
         do {
             for try await look in database.themeLookUpdates() {
@@ -164,10 +168,6 @@ private extension AppModel {
 
     func reloadWidgets() {
         WidgetCenter.shared.reloadAllTimelines()
-    }
-
-    static func currentDay() -> LocalDate {
-        LocalDate(Date(), in: .current)
     }
 
     func scheduleNotifications(in database: AppDatabase) async {

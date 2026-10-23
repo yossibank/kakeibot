@@ -132,6 +132,10 @@ private extension MonthCalendar {
 }
 
 private extension MonthCalendar {
+    static let rowCount = 6
+    static let swipeDistance: CGFloat = 50
+    static let cellHeight: CGFloat = 46
+
     var swipe: some Gesture {
         DragGesture(minimumDistance: 20)
             .onEnded { value in
@@ -158,10 +162,6 @@ private extension MonthCalendar {
     var monthTitle: String {
         "\(month.year)年 \(month.month)月"
     }
-
-    static let rowCount = 6
-    static let swipeDistance: CGFloat = 50
-    static let cellHeight: CGFloat = 46
 
     static func headerColor(for weekday: Weekday) -> Color {
         weekday.tint ?? Palette.subtext

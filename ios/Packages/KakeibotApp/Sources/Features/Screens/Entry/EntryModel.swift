@@ -104,6 +104,8 @@ public extension EntryModel {
 
     static let categoriesPerPage = 15
 
+    static let destinationTitle = "振替先"
+
     var isEditing: Bool {
         editingId != nil
     }
@@ -259,7 +261,53 @@ public extension EntryModel {
         return "\(AmountText.text(amount)) を\(action)"
     }
 
-    static let destinationTitle = "振替先"
+    var isOverSourceBalance: Bool {
+        guard type == .transfer else {
+            return false
+        }
+
+        guard let balance = wallet(walletId).flatMap(balance(of:)) else {
+            return false
+        }
+
+        return amount > balance
+    }
+
+    var loanRemaining: Int? {
+        guard
+            type == .transfer,
+            let wallet = wallet(toWalletId),
+            wallet.kind == .loan,
+            let balance = balance(of: wallet),
+            balance < 0
+        else {
+            return nil
+        }
+
+        return -balance
+    }
+
+    var destinationNote: String? {
+        guard
+            type == .transfer,
+            amount > 0,
+            let wallet = wallet(toWalletId),
+            let balance = balance(of: wallet)
+        else {
+            return nil
+        }
+
+        let after = balance + amount
+
+        switch wallet.kind.role {
+        case .loan:
+            return "返したあと \(AmountText.text(max(-after, 0)))"
+        case .investment:
+            return "積み立てたあと \(AmountText.text(after))"
+        case .onHand, .card:
+            return nil
+        }
+    }
 
     static func dateText(
         for date: LocalDate,
@@ -290,34 +338,8 @@ public extension EntryModel {
         wallets.first { $0.id == id }
     }
 
-    var isOverSourceBalance: Bool {
-        guard type == .transfer else {
-            return false
-        }
-
-        guard let balance = wallet(walletId).flatMap(balance(of:)) else {
-            return false
-        }
-
-        return amount > balance
-    }
-
     func balance(of wallet: Wallet) -> Int? {
         balances[wallet.id]
-    }
-
-    var loanRemaining: Int? {
-        guard
-            type == .transfer,
-            let wallet = wallet(toWalletId),
-            wallet.kind == .loan,
-            let balance = balance(of: wallet),
-            balance < 0
-        else {
-            return nil
-        }
-
-        return -balance
     }
 
     func balanceText(of wallet: Wallet) -> String? {
@@ -329,28 +351,6 @@ public extension EntryModel {
         case .loan: return "残り \(AmountText.text(max(-balance, 0)))"
         case .investment: return "評価額 \(AmountText.text(balance))"
         case .onHand, .card: return "残高 \(AmountText.text(balance))"
-        }
-    }
-
-    var destinationNote: String? {
-        guard
-            type == .transfer,
-            amount > 0,
-            let wallet = wallet(toWalletId),
-            let balance = balance(of: wallet)
-        else {
-            return nil
-        }
-
-        let after = balance + amount
-
-        switch wallet.kind.role {
-        case .loan:
-            return "返したあと \(AmountText.text(max(-after, 0)))"
-        case .investment:
-            return "積み立てたあと \(AmountText.text(after))"
-        case .onHand, .card:
-            return nil
         }
     }
 
@@ -604,8 +604,6 @@ public extension EntryModel {
 }
 
 private extension EntryModel {
-    static let restoreFailedMessage = "元に戻せませんでした"
-
     struct Snapshot: Equatable {
         let type: Entry.Kind
         let calculator: AmountCalculator
@@ -617,6 +615,12 @@ private extension EntryModel {
         let memo: String
         let billMonth: YearMonth?
     }
+
+    static let restoreFailedMessage = "元に戻せませんでした"
+
+    static let recentMemoLimit = 6
+    static let billTitles = ["いつもどおり", "次に回す", "2 回先"]
+    static let numberLocale = Locale(identifier: "ja_JP")
 
     var snapshot: Snapshot {
         Snapshot(
@@ -630,14 +634,6 @@ private extension EntryModel {
             memo: memo,
             billMonth: billMonth
         )
-    }
-
-    static let recentMemoLimit = 6
-    static let billTitles = ["いつもどおり", "次に回す", "2 回先"]
-    static let numberLocale = Locale(identifier: "ja_JP")
-
-    static func number(_ value: Int) -> String {
-        value.formatted(.number.locale(numberLocale))
     }
 
     var draft: EntryDraft? {
@@ -665,12 +661,8 @@ private extension EntryModel {
         )
     }
 
-    func report(_ error: any Error) {
-        guard !(error is CancellationError) else {
-            return
-        }
-
-        errorNotice.show(Self.message(for: error))
+    static func number(_ value: Int) -> String {
+        value.formatted(.number.locale(numberLocale))
     }
 
     static func message(for error: any Error) -> String {
@@ -682,6 +674,14 @@ private extension EntryModel {
         case AppDatabase.WriteError.entryNotFound: "記録が見つかりませんでした"
         default: "保存できませんでした"
         }
+    }
+
+    func report(_ error: any Error) {
+        guard !(error is CancellationError) else {
+            return
+        }
+
+        errorNotice.show(Self.message(for: error))
     }
 
     func categories(for type: Entry.Kind) -> [EntryCategory] {

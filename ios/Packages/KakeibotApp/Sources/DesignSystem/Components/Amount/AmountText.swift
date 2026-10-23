@@ -33,6 +33,14 @@ public extension AmountText {
 private extension AmountText {
     static let locale = Locale(identifier: "ja_JP")
 
+    var color: Color {
+        switch type {
+        case .income: Palette.accent
+        case .transfer: Palette.subtext
+        case .expense, nil: Palette.accentStrong
+        }
+    }
+
     static func sign(
         of amount: Int,
         type: Entry.Kind?
@@ -43,14 +51,6 @@ private extension AmountText {
             "+"
         } else {
             ""
-        }
-    }
-
-    var color: Color {
-        switch type {
-        case .income: Palette.accent
-        case .transfer: Palette.subtext
-        case .expense, nil: Palette.accentStrong
         }
     }
 }

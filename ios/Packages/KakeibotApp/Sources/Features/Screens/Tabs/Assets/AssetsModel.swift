@@ -327,14 +327,6 @@ private extension AssetsModel {
     static let goalFailedMessage = "目標を保存できませんでした"
     static let billTitle = "引き落とし"
 
-    static func row(
-        of entry: Entry,
-        in list: EntryList
-    ) -> EntryRowItem {
-        let day = "\(entry.date.month)/\(entry.date.day)"
-        return EntryRowItem(entry, in: list, dayLabel: day)
-    }
-
     var wallets: [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []
 
@@ -349,6 +341,14 @@ private extension AssetsModel {
 
     var valuations: [Valuation] {
         list?.valuations ?? []
+    }
+
+    static func row(
+        of entry: Entry,
+        in list: EntryList
+    ) -> EntryRowItem {
+        let day = "\(entry.date.month)/\(entry.date.day)"
+        return EntryRowItem(entry, in: list, dayLabel: day)
     }
 
     func balance(of wallet: Wallet) -> Int {

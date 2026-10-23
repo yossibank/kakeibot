@@ -3,16 +3,6 @@ import SwiftUI
 import UIKit
 
 public extension Color {
-    init?(hex: String) {
-        let digits = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
-
-        guard digits.count == 6, let value = UInt32(digits, radix: 16) else {
-            return nil
-        }
-
-        self.init(rgb: value)
-    }
-
     var hex: String {
         var red: CGFloat = 0
         var green: CGFloat = 0
@@ -25,6 +15,16 @@ public extension Color {
         }
 
         return "#" + values.map { String(format: "%02X", $0) }.joined()
+    }
+
+    init?(hex: String) {
+        let digits = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
+
+        guard digits.count == 6, let value = UInt32(digits, radix: 16) else {
+            return nil
+        }
+
+        self.init(rgb: value)
     }
 }
 

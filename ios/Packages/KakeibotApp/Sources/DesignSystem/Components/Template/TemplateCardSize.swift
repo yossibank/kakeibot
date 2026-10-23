@@ -45,16 +45,6 @@ extension TemplateCardSize {
         }
     }
 
-    func detailFont(in style: ThemeStyle) -> Font {
-        let font = style.textFont
-        let scale = style.textSize.scale
-
-        switch self {
-        case .regular: return .text(size: .caption, in: font, scale: scale)
-        case .large: return .text(.caption, in: font, scale: scale)
-        }
-    }
-
     var iconSize: CGFloat {
         switch self {
         case .regular: 16
@@ -108,6 +98,16 @@ extension TemplateCardSize {
         switch self {
         case .regular: 12
         case .large: 24
+        }
+    }
+
+    func detailFont(in style: ThemeStyle) -> Font {
+        let font = style.textFont
+        let scale = style.textSize.scale
+
+        switch self {
+        case .regular: return .text(size: .caption, in: font, scale: scale)
+        case .large: return .text(.caption, in: font, scale: scale)
         }
     }
 }

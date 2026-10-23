@@ -103,15 +103,15 @@ private extension SettingsRowList {
 }
 
 private extension SettingsRowList {
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(20))
-    }
-
     static var cardFill: LinearGradient {
         LinearGradient(
             colors: [Palette.cardTop, Palette.cardBottom],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(20))
     }
 }

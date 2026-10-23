@@ -368,10 +368,6 @@ private extension RewardRuleListView {
     static let spacing: CGFloat = 12
     static let tileHeight: CGFloat = 156
 
-    var tileShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
-
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: spacing),
         count: columnCount
@@ -383,6 +379,10 @@ private extension RewardRuleListView {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    var tileShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     var boardHeight: CGFloat {

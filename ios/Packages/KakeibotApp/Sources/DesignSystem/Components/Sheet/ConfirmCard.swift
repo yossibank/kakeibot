@@ -105,6 +105,14 @@ public extension View {
 }
 
 private extension ConfirmCard {
+    static var filledFill: LinearGradient {
+        LinearGradient(
+            colors: [Palette.accentStrong, Palette.accent],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
     var card: some View {
         VStack(spacing: 20) {
             VStack(spacing: 10) {
@@ -192,14 +200,6 @@ private extension ConfirmCard {
                 }
                 .contentShape(Capsule())
         }
-    }
-
-    static var filledFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accentStrong, Palette.accent],
-            startPoint: .top,
-            endPoint: .bottom
-        )
     }
 }
 

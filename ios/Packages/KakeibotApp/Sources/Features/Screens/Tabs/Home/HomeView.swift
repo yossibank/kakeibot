@@ -358,20 +358,6 @@ private extension HomeView {
         .card()
     }
 
-    func templateButton(_ template: EntryTemplate) -> some View {
-        Button {
-            onUseTemplate(template)
-        } label: {
-            TemplateCard(
-                icon: model.icon(for: template),
-                name: template.name,
-                detail: model.detail(for: template),
-                amount: template.amount
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
     var divider: some View {
         Rectangle()
             .fill(Palette.accent.opacity(.soft))
@@ -387,6 +373,20 @@ private extension HomeView {
                     .fill(Palette.accent)
                     .frame(width: 120 * model.paidRecurringRatio)
             }
+    }
+
+    func templateButton(_ template: EntryTemplate) -> some View {
+        Button {
+            onUseTemplate(template)
+        } label: {
+            TemplateCard(
+                icon: model.icon(for: template),
+                name: template.name,
+                detail: model.detail(for: template),
+                amount: template.amount
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     func stat(

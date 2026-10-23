@@ -194,30 +194,6 @@ private extension RecordsFilterSheet {
         ]
     }
 
-    func tabTitle(
-        _ title: String,
-        count: Int
-    ) -> String {
-        count > 0 ? "\(title) \(count)" : title
-    }
-
-    func count(of kind: EntryCategory.Kind) -> Int {
-        let categories = list?.filterCategories ?? []
-
-        return categories
-            .filter { $0.kind == kind && filter.categoryIds.contains($0.id) }
-            .count
-    }
-
-    func items(in tab: Tab) -> [Item] {
-        switch tab {
-        case .expense: categoryItems(.expense)
-        case .income: categoryItems(.income)
-        case .wallet: walletItems
-        case .tag: []
-        }
-    }
-
     var isEmpty: Bool {
         switch tab {
         case .tag: tagGroups.isEmpty
@@ -266,6 +242,45 @@ private extension RecordsFilterSheet {
         return categories.filter { filter.categoryIds.contains($0.id) }
     }
 
+    var walletItems: [Item] {
+        let wallets = list?.filterWallets ?? []
+
+        return wallets.map { wallet in
+            Item(
+                id: wallet.id,
+                name: wallet.name,
+                icon: list?.icons[wallet.iconId],
+                isOn: filter.walletIds.contains(wallet.id)
+            ) {
+                toggle(wallet.id, in: \.walletIds)
+            }
+        }
+    }
+
+    func tabTitle(
+        _ title: String,
+        count: Int
+    ) -> String {
+        count > 0 ? "\(title) \(count)" : title
+    }
+
+    func count(of kind: EntryCategory.Kind) -> Int {
+        let categories = list?.filterCategories ?? []
+
+        return categories
+            .filter { $0.kind == kind && filter.categoryIds.contains($0.id) }
+            .count
+    }
+
+    func items(in tab: Tab) -> [Item] {
+        switch tab {
+        case .expense: categoryItems(.expense)
+        case .income: categoryItems(.income)
+        case .wallet: walletItems
+        case .tag: []
+        }
+    }
+
     func categoryItems(_ kind: EntryCategory.Kind) -> [Item] {
         let categories = list?.filterCategories ?? []
 
@@ -282,21 +297,6 @@ private extension RecordsFilterSheet {
                     keepShownTags()
                 }
             }
-    }
-
-    var walletItems: [Item] {
-        let wallets = list?.filterWallets ?? []
-
-        return wallets.map { wallet in
-            Item(
-                id: wallet.id,
-                name: wallet.name,
-                icon: list?.icons[wallet.iconId],
-                isOn: filter.walletIds.contains(wallet.id)
-            ) {
-                toggle(wallet.id, in: \.walletIds)
-            }
-        }
     }
 
     func keepShownTags() {

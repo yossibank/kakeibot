@@ -15,6 +15,7 @@
 --mark-categories false
 --max-width 80
 --organization-mode type
+--organize-types class,actor,struct,enum,extension
 --ranges no-space
 --redundant-type inferred
 --self init-only
