@@ -77,7 +77,7 @@ public struct ThemeEditSheet: View {
             isPresented: $isConfirmingDelete,
             systemImage: "trash",
             title: "このテーマを削除しますか",
-            message: "選んでいるときは、ネイビーに戻ります",
+            message: "選んでいるときは、ホワイトに戻ります",
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {

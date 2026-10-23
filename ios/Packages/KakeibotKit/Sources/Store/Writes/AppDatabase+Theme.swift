@@ -39,7 +39,7 @@ public extension AppDatabase {
             let choice = try Self.setting(.theme, in: db)
 
             if choice == .custom(id) {
-                try Self.setSetting(.theme, to: .system, in: db)
+                try Self.setSetting(.theme, to: .preset(.white), in: db)
             }
         }
     }
