@@ -1,6 +1,5 @@
 import Core
 import DesignSystem
-import Store
 import SwiftUI
 import WidgetKit
 
@@ -31,12 +30,12 @@ private extension BudgetWidgetView {
 
     @ViewBuilder
     var content: some View {
-        if let overview = entry.overview {
+        if let summary = entry.summary {
             switch family {
             case .systemMedium:
-                medium(overview)
+                medium(summary)
             default:
-                dial(overview)
+                dial(summary)
             }
         } else {
             Text("アプリを開くと、ここに出ます")
@@ -46,11 +45,11 @@ private extension BudgetWidgetView {
         }
     }
 
-    func dial(_ overview: MonthOverview) -> some View {
-        let usage = overview.budgetUsage
+    func dial(_ summary: BudgetWidgetSummary) -> some View {
+        let usage = summary.usage
 
         return VStack(spacing: 6) {
-            Text(title(of: overview))
+            Text(title(of: summary))
                 .textFont(size: .caption)
                 .tracking(2)
                 .foregroundStyle(Palette.accent)
@@ -61,7 +60,7 @@ private extension BudgetWidgetView {
                     tint: usage?.tint ?? Palette.accent
                 )
 
-                Text(amount(of: overview))
+                Text(amount(of: summary))
                     .displayFont(.headline, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(usage?.amountTint ?? Palette.accentStrong)
@@ -70,19 +69,19 @@ private extension BudgetWidgetView {
                     .privacySensitive()
             }
 
-            Text(note(of: overview))
+            Text(note(of: summary))
                 .textFont(size: .caption)
                 .monospacedDigit()
-                .foregroundStyle(noteColor(of: overview))
+                .foregroundStyle(noteColor(of: summary))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .privacySensitive()
         }
     }
 
-    func medium(_ overview: MonthOverview) -> some View {
+    func medium(_ summary: BudgetWidgetSummary) -> some View {
         HStack(spacing: 16) {
-            dial(overview)
+            dial(summary)
                 .frame(maxWidth: .infinity)
 
             Rectangle()
@@ -90,7 +89,7 @@ private extension BudgetWidgetView {
                 .frame(width: 1)
 
             VStack(alignment: .leading, spacing: 10) {
-                ForEach(rows(of: overview)) { row in
+                ForEach(rows(of: summary)) { row in
                     HStack(alignment: .firstTextBaseline) {
                         Text(row.title)
                             .textFont(size: .caption)
@@ -114,26 +113,26 @@ private extension BudgetWidgetView {
 }
 
 private extension BudgetWidgetView {
-    func title(of overview: MonthOverview) -> String {
-        overview.budgetUsage == nil ? "今月の支出" : "今月あといくら"
+    func title(of summary: BudgetWidgetSummary) -> String {
+        summary.usage == nil ? "今月の支出" : "今月あといくら"
     }
 
-    func amount(of overview: MonthOverview) -> String {
-        guard let usage = overview.budgetUsage else {
-            return AmountText.text(overview.monthExpense)
+    func amount(of summary: BudgetWidgetSummary) -> String {
+        guard let usage = summary.usage else {
+            return AmountText.text(summary.monthExpense)
         }
 
         return AmountText.text(usage.remaining)
     }
 
-    func note(of overview: MonthOverview) -> String {
-        let today = "今日 \(AmountText.text(overview.todayExpense))"
-        return overview.budgetUsage?.warningText ?? today
+    func note(of summary: BudgetWidgetSummary) -> String {
+        let today = "今日 \(AmountText.text(summary.todayExpense))"
+        return summary.usage?.warningText ?? today
     }
 
-    func noteColor(of overview: MonthOverview) -> Color {
+    func noteColor(of summary: BudgetWidgetSummary) -> Color {
         guard
-            let usage = overview.budgetUsage,
+            let usage = summary.usage,
             usage.warningText != nil
         else {
             return Palette.subtext
@@ -142,13 +141,13 @@ private extension BudgetWidgetView {
         return usage.tint
     }
 
-    func rows(of overview: MonthOverview) -> [Row] {
-        let today = Row(title: "今日", amount: overview.todayExpense)
+    func rows(of summary: BudgetWidgetSummary) -> [Row] {
+        let today = Row(title: "今日", amount: summary.todayExpense)
 
-        guard let usage = overview.budgetUsage else {
+        guard let usage = summary.usage else {
             return [
                 today,
-                Row(title: "昨日", amount: overview.yesterdayExpense)
+                Row(title: "昨日", amount: summary.yesterdayExpense)
             ]
         }
 
