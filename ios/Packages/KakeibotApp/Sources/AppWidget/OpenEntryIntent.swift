@@ -1,8 +1,11 @@
 import AppIntents
 import Core
 import Foundation
+import Notifications
 
 struct OpenEntryIntent: AppIntent {
+    static let openAppWhenRun = true
+
     static var title: LocalizedStringResource {
         "入力シートを開く"
     }
@@ -11,13 +14,12 @@ struct OpenEntryIntent: AppIntent {
         false
     }
 
-    func perform() async throws -> some IntentResult & OpensIntent {
+    @MainActor
+    func perform() async throws -> some IntentResult {
         let today = LocalDate(Date(), in: .current)
 
-        guard let url = PlannedNotification.Route.entry(today).url else {
-            throw URLError(.badURL)
-        }
+        NotificationRouter.shared.open(.entry(today))
 
-        return .result(opensIntent: OpenURLIntent(url))
+        return .result()
     }
 }

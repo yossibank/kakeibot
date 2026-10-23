@@ -202,6 +202,7 @@ flowchart TB
     GRDB[("GRDB")]
 
     App --> AppFeature
+    App --> AppWidget
     Widget --> AppWidget
     AppFeature --> Features
     AppFeature --> Notifications
@@ -316,6 +317,8 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 
 行き先は、通知と同じ `PlannedNotification.Route` で表す。ウィジェットからは、`kakeibot://home` のように、行き先の文字列を `kakeibot` の URL にして渡す。起動したときは、起動画面が消えてから行き先を開き、起動時に開く画面は開かない。
 
+コントロールの「記録する」は、AppIntent をアプリの中で動かし、`NotificationRouter` に行き先を渡す。このインテントを入れるため、`Kakeibot` も AppWidget をつなぎ、`AppIntents` を読み込む。
+
 ## 通知とウィジェット
 
 | 対象 | 方式 |
@@ -344,4 +347,4 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 > - パッケージの中のフォントを、起動時の登録で使えるか（DesignSystem を作るとき）
 > - 配布用の証明書を Xcode がクラウドで管理するか（12 番で確かめる）
 > - すぐ記録を押したとき、ウィジェットの拡張から DB に書け、アプリを前面に戻すと画面に出るか（ホーム画面で押して確かめる）
-> - コントロールの「記録する」を押したとき、アプリが開いて今日の入力シートが出るか（コントロールセンターに足して確かめる）
+> - 実機でコントロールの「記録する」を押したとき、アプリが開いて今日の入力シートが出るか

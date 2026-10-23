@@ -12,6 +12,7 @@
 		78875D5A3079D3D2005422E3 /* KakeibotWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 78875D463079D3CD005422E3 /* KakeibotWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		78875D743079D400005422E3 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 78875D723079D400005422E3 /* AppFeature */; };
 		78875D753079D400005422E3 /* AppWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 78875D733079D400005422E3 /* AppWidget */; };
+		78875D773079D400005422E3 /* AppWidget in Frameworks */ = {isa = PBXBuildFile; productRef = 78875D763079D400005422E3 /* AppWidget */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				78875D743079D400005422E3 /* AppFeature in Frameworks */,
+				78875D773079D400005422E3 /* AppWidget in Frameworks */,
 			);
 		};
 		78875D433079D3CD005422E3 /* Frameworks */ = {
@@ -148,6 +150,7 @@
 			name = Kakeibot;
 			packageProductDependencies = (
 				78875D723079D400005422E3 /* AppFeature */,
+				78875D763079D400005422E3 /* AppWidget */,
 			);
 			productName = Kakeibot;
 			productReference = 78875D343079D362005422E3 /* Kakeibot.app */;
@@ -568,6 +571,10 @@
 			productName = AppFeature;
 		};
 		78875D733079D400005422E3 /* AppWidget */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppWidget;
+		};
+		78875D763079D400005422E3 /* AppWidget */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppWidget;
 		};

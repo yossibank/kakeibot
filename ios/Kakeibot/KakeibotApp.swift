@@ -1,4 +1,5 @@
 import AppFeature
+import AppIntents
 import SwiftUI
 
 @main
