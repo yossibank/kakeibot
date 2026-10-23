@@ -7,33 +7,42 @@ public struct AppDatabase: Sendable {
     let entryListObservation: SharedValueObservation<EntryList>
 
     public init(_ writer: any DatabaseWriter) throws {
-        self.writer = writer
         try Self.migrator.migrate(writer)
-
-        self.entryListObservation = ValueObservation
-            .tracking(Self.entryList)
-            .shared(in: writer)
+        self.init(migrated: writer)
     }
 }
 
 public extension AppDatabase {
     enum SetupError: Error {
         case appGroupUnavailable
+        case notMigrated
     }
 
     static func appGroup() throws -> AppDatabase {
-        guard let directory = groupContainer else {
-            throw SetupError.appGroupUnavailable
-        }
-
-        let url = directory.appending(path: fileName)
-        let path = url.path(percentEncoded: false)
+        let path = try groupPath()
         let pool = try DatabasePool(path: path, configuration: configuration)
         let database = try AppDatabase(pool)
         let now = Date()
         try database.insertDefaultsIfEmpty(at: now)
         try database.insertShelfIfEmpty(at: now)
         return database
+    }
+
+    static func appGroupForReading() throws -> AppDatabase {
+        var configuration = configuration
+        configuration.readonly = true
+        let path = try groupPath()
+        let pool = try DatabasePool(path: path, configuration: configuration)
+
+        let isMigrated = try pool.read { db in
+            try migrator.hasCompletedMigrations(db)
+        }
+
+        guard isMigrated else {
+            throw SetupError.notMigrated
+        }
+
+        return AppDatabase(migrated: pool)
     }
 
     static func inMemory() throws -> AppDatabase {
@@ -97,5 +106,22 @@ private extension AppDatabase {
         var configuration = Configuration()
         configuration.observesSuspensionNotifications = true
         return configuration
+    }
+
+    init(migrated writer: any DatabaseWriter) {
+        self.writer = writer
+
+        self.entryListObservation = ValueObservation
+            .tracking(Self.entryList)
+            .shared(in: writer)
+    }
+
+    static func groupPath() throws -> String {
+        guard let directory = groupContainer else {
+            throw SetupError.appGroupUnavailable
+        }
+
+        let url = directory.appending(path: fileName)
+        return url.path(percentEncoded: false)
     }
 }

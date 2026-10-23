@@ -20,6 +20,12 @@ public extension NotificationRouter {
         self.route = route
     }
 
+    func open(_ url: URL) {
+        if let route = PlannedNotification.Route(url: url) {
+            open(route)
+        }
+    }
+
     func finish() {
         route = nil
     }

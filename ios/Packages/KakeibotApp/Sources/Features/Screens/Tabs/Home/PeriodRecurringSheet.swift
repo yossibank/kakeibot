@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Store
 import SwiftUI
 
 public struct PeriodRecurringSheet: View {
@@ -196,7 +197,7 @@ private extension PeriodRecurringSheet {
         .frame(maxWidth: .infinity)
     }
 
-    func row(_ item: HomeModel.PeriodRecurring) -> some View {
+    func row(_ item: PeriodRecurring) -> some View {
         HStack(spacing: 12) {
             VStack(spacing: 0) {
                 Text("\(item.date.day)")
@@ -241,7 +242,7 @@ private extension PeriodRecurringSheet {
         .contentShape(.rect)
     }
 
-    func recordButton(_ item: HomeModel.PeriodRecurring) -> some View {
+    func recordButton(_ item: PeriodRecurring) -> some View {
         Button {
             Task {
                 await model.record(item)
@@ -265,7 +266,7 @@ private extension PeriodRecurringSheet {
     }
 
     @ViewBuilder
-    func statusLabel(_ item: HomeModel.PeriodRecurring) -> some View {
+    func statusLabel(_ item: PeriodRecurring) -> some View {
         switch item.status {
         case .done:
             Label("済み", systemImage: "checkmark")
@@ -284,7 +285,7 @@ private extension PeriodRecurringSheet {
 }
 
 private extension PeriodRecurringSheet {
-    var items: [HomeModel.PeriodRecurring] {
+    var items: [PeriodRecurring] {
         model.periodRecurrings
     }
 
@@ -292,7 +293,7 @@ private extension PeriodRecurringSheet {
         items.firstIndex { $0.date > model.today } ?? items.count
     }
 
-    static func opacity(of status: HomeModel.Status) -> Double {
+    static func opacity(of status: PeriodRecurring.Status) -> Double {
         status == .done ? 0.5 : 1
     }
 

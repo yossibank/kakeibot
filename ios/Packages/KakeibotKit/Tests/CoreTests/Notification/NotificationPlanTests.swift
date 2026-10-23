@@ -75,6 +75,22 @@ struct NotificationPlanTests {
         #expect(PlannedNotification.Route(link: "budget/1") == nil)
         #expect(PlannedNotification.Route(link: "entry") == nil)
     }
+
+    @Test
+    func readsAndWritesURL() throws {
+        let date = try #require(LocalDate("2026-10-18"))
+        let home = PlannedNotification.Route.home
+        let entry = PlannedNotification.Route.entry(date)
+        let homeURL = try #require(home.url)
+        let entryURL = try #require(entry.url)
+        let other = try #require(URL(string: "https://example.com/home"))
+
+        #expect(homeURL.absoluteString == "kakeibot://home")
+        #expect(entryURL.absoluteString == "kakeibot://entry/2026-10-18")
+        #expect(PlannedNotification.Route(url: homeURL) == home)
+        #expect(PlannedNotification.Route(url: entryURL) == entry)
+        #expect(PlannedNotification.Route(url: other) == nil)
+    }
 }
 
 extension NotificationPlanTests {

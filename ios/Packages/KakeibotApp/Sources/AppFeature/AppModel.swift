@@ -4,6 +4,7 @@ import Notifications
 import Observation
 import Store
 import SwiftUI
+import WidgetKit
 
 @MainActor
 @Observable
@@ -64,6 +65,10 @@ extension AppModel {
         }
     }
 
+    func open(_ url: URL) {
+        router.open(url)
+    }
+
     func finishRoute() {
         router.finish()
     }
@@ -112,6 +117,16 @@ extension AppModel {
         }
     }
 
+    func observeWidgets(in database: AppDatabase) async {
+        do {
+            for try await _ in database.monthOverviewUpdates(on: today) {
+                reloadWidgets()
+            }
+        } catch {
+            return
+        }
+    }
+
     func observeNotifications(in database: AppDatabase) async {
         do {
             for try await input in database.notificationInputUpdates(
@@ -130,6 +145,7 @@ private extension AppModel {
         do {
             for try await look in database.themeLookUpdates() {
                 self.look = look
+                reloadWidgets()
             }
         } catch {
             return
@@ -144,6 +160,10 @@ private extension AppModel {
         } catch {
             return
         }
+    }
+
+    func reloadWidgets() {
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     static func currentDay() -> LocalDate {

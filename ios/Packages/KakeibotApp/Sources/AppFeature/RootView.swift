@@ -35,6 +35,9 @@ public struct RootView: View {
             await model.open()
             await model.observeTheme()
         }
+        .onOpenURL { url in
+            model.open(url)
+        }
         .onChange(of: scenePhase) { _, phase in
             model.changeScene(to: phase)
 
@@ -89,6 +92,9 @@ private extension RootView {
             }
             .task {
                 await model.observeNotifications(in: database)
+            }
+            .task {
+                await model.observeWidgets(in: database)
             }
         case let .failed(message):
             ContentUnavailableView(

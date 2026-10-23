@@ -25,6 +25,7 @@ public struct PlannedNotification: Hashable, Sendable {
 
 public extension PlannedNotification {
     enum Route: Hashable, Sendable {
+        case home
         case entry(LocalDate)
         case recurring(Recurring.ID)
     }
@@ -37,6 +38,11 @@ public extension PlannedNotification {
 
 public extension PlannedNotification.Route {
     init?(link: String) {
+        if link == "home" {
+            self = .home
+            return
+        }
+
         let parts = link.split(separator: "/", maxSplits: 1).map(String.init)
 
         guard parts.count == 2 else {
@@ -63,6 +69,7 @@ public extension PlannedNotification.Route {
 
     var link: String {
         switch self {
+        case .home: "home"
         case let .entry(date): "entry/\(date)"
         case let .recurring(id): "recurring/\(id)"
         }

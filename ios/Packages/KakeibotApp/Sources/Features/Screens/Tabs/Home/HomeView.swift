@@ -111,7 +111,7 @@ private extension HomeView {
 
             if let usage = model.budgetUsage {
                 VStack(spacing: 4) {
-                    if let warning = Self.warning(for: usage) {
+                    if let warning = usage.warningText {
                         Text(warning)
                             .textFont(.caption, weight: .semibold)
                             .foregroundStyle(usage.tint)
@@ -433,13 +433,7 @@ private extension HomeView {
     }
 
     var dialAmountColor: Color {
-        guard let usage = model.budgetUsage else {
-            return Palette.accentStrong
-        }
-
-        return usage.isOver || usage.isNearLimit
-            ? usage.tint
-            : Palette.accentStrong
+        model.budgetUsage?.amountTint ?? Palette.accentStrong
     }
 
     var middleTitle: String {
@@ -463,14 +457,6 @@ private extension HomeView {
 
     var dialTint: Color {
         model.budgetUsage?.tint ?? Palette.accent
-    }
-
-    static func warning(for usage: BudgetUsage) -> String? {
-        if usage.isOver {
-            return "予算を超えています"
-        }
-
-        return usage.isNearLimit ? "予算の 8 割を使いました" : nil
     }
 
     var shelfRowCount: Int {

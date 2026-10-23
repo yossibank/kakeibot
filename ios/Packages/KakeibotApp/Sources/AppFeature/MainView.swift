@@ -427,6 +427,8 @@ private extension MainView {
             }
 
             switch route {
+            case .home:
+                tab = .home
             case let .entry(date):
                 tab = .home
                 draft.date = date

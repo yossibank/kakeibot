@@ -5,6 +5,6 @@ import WidgetKit
 @main
 struct KakeibotWidgetBundle: WidgetBundle {
     var body: some Widget {
-        KakeibotWidget()
+        BudgetWidget()
     }
 }
