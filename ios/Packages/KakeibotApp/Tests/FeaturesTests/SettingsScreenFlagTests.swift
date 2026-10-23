@@ -28,6 +28,7 @@ struct SettingsScreenFlagTests {
     @Test
     func remembersOpenHiddenList() async throws {
         let database = try AppDatabase.inMemory()
+
         let templates = SettingsScreenFlag.openHiddenList(
             .templates,
             in: database
@@ -37,18 +38,22 @@ struct SettingsScreenFlagTests {
         let openedFirst = templates.isOn
 
         await templates.set(false).value
+
         let reopened = SettingsScreenFlag.openHiddenList(
             .templates,
             in: database
         )
+
         await reopened.load()
         let closedAgain = !reopened.isOn
 
         await reopened.set(true).value
+
         let openedAgain = SettingsScreenFlag.openHiddenList(
             .templates,
             in: database
         )
+
         await openedAgain.load()
 
         #expect(openedFirst)

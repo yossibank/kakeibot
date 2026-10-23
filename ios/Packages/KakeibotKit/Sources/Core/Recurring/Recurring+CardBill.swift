@@ -55,6 +55,7 @@ public extension Recurring {
         var cursor = used
 
         while dates.count < count,
+
               let next = nextDate(onOrAfter: cursor) {
             let closing = billingPeriod(paidOn: next)?.upperBound ?? next
 

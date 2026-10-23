@@ -29,6 +29,7 @@ public struct WalletEditSheet: View {
         onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+
         self.onSave = onSave
         self.onDelete = onDelete
     }

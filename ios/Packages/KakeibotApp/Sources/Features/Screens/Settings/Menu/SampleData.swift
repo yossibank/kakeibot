@@ -27,6 +27,7 @@ extension SampleData {
             card: card.id,
             loan: loan.id
         )
+
         var drafts: [EntryDraft] = []
         var noSpendDays: [LocalDate] = []
 

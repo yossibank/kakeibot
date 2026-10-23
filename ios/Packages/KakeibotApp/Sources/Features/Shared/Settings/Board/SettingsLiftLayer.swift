@@ -90,10 +90,12 @@ private extension SettingsLiftLayer {
         let dock = dockArea
         let isDocked = dock != nil
         let tileScale = dock.map { fitScale(tileSize, in: $0) } ?? scale
+
         let natural = CGPoint(
             x: floating.center.x + drag.origin.x - origin.x,
             y: floating.center.y + drag.origin.y - origin.y
         )
+
         let center = dock.map { CGPoint(x: $0.midX, y: $0.midY) } ?? natural
 
         return tile(floating.id)

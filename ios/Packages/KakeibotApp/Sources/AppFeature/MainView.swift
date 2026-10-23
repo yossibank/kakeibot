@@ -70,6 +70,7 @@ struct MainView: View {
 
         _notice = State(initialValue: EntryNoticeModel(database: database))
         _undo = State(initialValue: DeletionUndo(database: database))
+
         self.database = database
         self.today = today
         self.route = route

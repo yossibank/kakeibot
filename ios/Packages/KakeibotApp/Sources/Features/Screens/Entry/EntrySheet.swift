@@ -30,6 +30,7 @@ public struct EntrySheet: View {
         onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+
         self.onChange = onChange
     }
 
@@ -624,18 +625,21 @@ private extension EntrySheet {
         }
     }
 
+    nonisolated static let coordinateSpace = "EntrySheet"
+
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income),
         .init("振替", value: .transfer)
     ]
 
-    nonisolated static let coordinateSpace = "EntrySheet"
     static let memoCardInset: CGFloat = 12
+
     static let drawerShape = UnevenRoundedRectangle(
         topLeadingRadius: 28,
         topTrailingRadius: 28
     )
+
     static let dialMinSize: CGFloat = 240
     static let fade: CGFloat = 20
     static let categoryRows = 3

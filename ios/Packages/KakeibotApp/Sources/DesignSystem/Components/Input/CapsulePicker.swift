@@ -17,6 +17,7 @@ public struct CapsulePicker<Value: Hashable>: View {
         options: [Option]
     ) {
         _selection = selection
+
         self.options = options
     }
 

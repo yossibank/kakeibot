@@ -17,8 +17,9 @@ public struct RecurringListView: View {
     @State private var hiddenList: SettingsScreenFlag
 
     public init(model: RecurringListModel) {
-        _model = State(initialValue: model)
         let hintFlag = model.hintFlag()
+
+        _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
         _hiddenList = State(initialValue: model.hiddenListFlag())
     }
@@ -340,8 +341,10 @@ private extension RecurringListView {
         case edit(Recurring.ID)
     }
 
-    static let rowHeight: CGFloat = 84
     nonisolated static let space = "RecurringList"
+
+    static let rowHeight: CGFloat = 84
+
     static let grid = SettingsBoardGrid(
         columns: 1,
         itemHeight: rowHeight,

@@ -110,6 +110,7 @@ extension Recurring: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
         let shift = try container.decodeIfPresent(
             HolidayShift.self,
             forKey: .holidayShift

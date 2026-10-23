@@ -53,6 +53,7 @@ extension AppModel {
             let database = try await Task.detached {
                 try openDatabase()
             }
+
             .value
 
             await generateRecurring(in: database)

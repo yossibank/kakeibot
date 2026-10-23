@@ -10,12 +10,14 @@ struct ReminderModelTests {
     func turnsOnAtEveningAndAsksPermission() async throws {
         let database = try AppDatabase.inMemory()
         let client = FakePermission(authorization: .notDetermined)
+
         let model = ReminderModel(
             database: database,
             today: LocalDate(Date(), in: .current),
             time: nil,
             permission: client.permission
         )
+
         await model.load()
 
         await model.setOn(true)
@@ -32,12 +34,14 @@ struct ReminderModelTests {
     func keepsChosenTimeWhenTurnedBackOn() async throws {
         let database = try AppDatabase.inMemory()
         let client = FakePermission(authorization: .allowed)
+
         let model = ReminderModel(
             database: database,
             today: LocalDate(Date(), in: .current),
             time: nil,
             permission: client.permission
         )
+
         let time = try #require(ReminderTime("22:30"))
         await model.load()
 
@@ -55,6 +59,7 @@ struct ReminderModelTests {
     func showsDeniedOnlyWhenOn() async throws {
         let database = try AppDatabase.inMemory()
         let client = FakePermission(authorization: .denied)
+
         let model = ReminderModel(
             database: database,
             today: LocalDate(Date(), in: .current),
@@ -94,6 +99,7 @@ extension ReminderModelTests {
         )
 
         try await database.saveRecurring(draft, today: today, at: Date())
+
         let model = ReminderModel(
             database: database,
             today: today,

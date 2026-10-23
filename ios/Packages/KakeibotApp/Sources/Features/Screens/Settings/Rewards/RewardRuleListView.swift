@@ -8,11 +8,13 @@ public struct RewardRuleListView: View {
     @State private var model: RewardRuleListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
+
     @State private var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
         spacing: Self.spacing
     )
+
     @State private var hiddenId: RewardRule.ID?
     @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
@@ -23,14 +25,13 @@ public struct RewardRuleListView: View {
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
-        _model = State(initialValue: RewardRuleListModel(database: database))
         let hintFlag = SettingsScreenFlag.closedHint(.rewards, in: database)
+        let hiddenList = SettingsScreenFlag.openHiddenList(.rewards, in: database)
+
+        _model = State(initialValue: RewardRuleListModel(database: database))
         _hintFlag = State(initialValue: hintFlag)
-        let hiddenList = SettingsScreenFlag.openHiddenList(
-            .rewards,
-            in: database
-        )
         _hiddenList = State(initialValue: hiddenList)
+
         self.database = database
     }
 
@@ -364,6 +365,7 @@ private extension RewardRuleListView {
     }
 
     nonisolated static let space = "RewardBoard"
+
     static let columnCount = 2
     static let spacing: CGFloat = 12
     static let tileHeight: CGFloat = 156

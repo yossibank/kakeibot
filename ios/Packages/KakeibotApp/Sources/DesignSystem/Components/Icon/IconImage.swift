@@ -45,6 +45,7 @@ private extension IconImage {
 
 #Preview {
     let now = Date()
+
     let glyph = Icon(
         emoji: nil,
         text: nil,

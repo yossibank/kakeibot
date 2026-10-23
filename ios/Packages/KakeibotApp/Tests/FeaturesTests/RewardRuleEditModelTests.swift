@@ -37,11 +37,13 @@ struct RewardRuleEditModelTests {
     @Test
     func editsSavedRule() async throws {
         let database = try AppDatabase.inMemory()
+
         let draft = RewardRuleDraft(
             name: "自炊した日",
             amount: 500,
             icon: IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         )
+
         let rule = try await database.saveRewardRule(draft, at: Date())
         let model = RewardRuleEditModel(database: database, editing: rule.id)
         await model.load()

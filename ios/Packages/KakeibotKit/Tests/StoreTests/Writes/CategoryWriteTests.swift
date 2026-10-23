@@ -13,6 +13,7 @@ struct CategoryWriteTests {
             tags: [],
             at: setup.now
         )
+
         let list = try await setup.database.categoryList()
         let icon = try #require(list.icons[saved.iconId])
 
@@ -38,6 +39,7 @@ struct CategoryWriteTests {
             editing: food.id,
             at: later
         )
+
         let list = try await setup.database.categoryList()
         let icon = try #require(list.icons[updated.iconId])
 

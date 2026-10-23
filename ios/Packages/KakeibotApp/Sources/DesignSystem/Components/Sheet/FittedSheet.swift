@@ -75,6 +75,7 @@ private extension FittedDetentController {
         }
 
         let height = height
+
         let change = {
             sheet.detents = [.custom { _ in height }]
         }

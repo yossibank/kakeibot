@@ -255,6 +255,7 @@ private extension ThemeStyleView {
     }
 
     static let sampleRest = 125_560
+
     static let samples = [
         Sample(
             icon: sampleIcon(.food),
@@ -269,6 +270,7 @@ private extension ThemeStyleView {
             amount: 440
         )
     ]
+
     static let fade: CGFloat = 16
     static let restCardHeight: CGFloat = 108
     static let cornerMarkSize: CGFloat = 30
@@ -276,6 +278,7 @@ private extension ThemeStyleView {
     static let sizeSampleHeight: CGFloat = 30
     static let sampleAmount = 1280
     static let sampleText = "食費・財布"
+
     static let fontColumns = Array(
         repeating: GridItem(.flexible(), spacing: 10),
         count: 3

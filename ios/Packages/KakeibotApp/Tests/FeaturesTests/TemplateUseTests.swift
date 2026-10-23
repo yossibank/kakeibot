@@ -27,11 +27,13 @@ struct TemplateUseTests {
     func appliesTagAndDropsItWithOtherCategory() async throws {
         let setup = try await Setup()
         let tag = try await setup.saveTag("買い置き")
+
         let stock = try await setup.saveTemplate(
             name: "買い置き",
             amount: 1200,
             tagId: tag.id
         )
+
         let model = EntryModel(database: setup.database, date: setup.date)
         await model.load()
 
@@ -76,6 +78,7 @@ struct TemplateUseTests {
             date: setup.date,
             template: pass
         )
+
         await model.load()
 
         #expect(model.amount == 0)

@@ -8,11 +8,13 @@ public struct TemplateListView: View {
     @State private var model: TemplateListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
+
     @State private var grid = SettingsBoardGrid(
         columns: 1,
         itemHeight: TemplateRowCard.height,
         spacing: 10
     )
+
     @State private var hiddenId: EntryTemplate.ID?
     @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
@@ -24,14 +26,13 @@ public struct TemplateListView: View {
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
-        _model = State(initialValue: TemplateListModel(database: database))
         let hintFlag = SettingsScreenFlag.closedHint(.templates, in: database)
+        let hiddenList = SettingsScreenFlag.openHiddenList(.templates, in: database)
+
+        _model = State(initialValue: TemplateListModel(database: database))
         _hintFlag = State(initialValue: hintFlag)
-        let hiddenList = SettingsScreenFlag.openHiddenList(
-            .templates,
-            in: database
-        )
         _hiddenList = State(initialValue: hiddenList)
+
         self.database = database
     }
 
@@ -263,12 +264,12 @@ private extension TemplateListView {
         case edit(EntryTemplate.ID)
     }
 
+    nonisolated static let space = "TemplateBoard"
+
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income)
     ]
-
-    nonisolated static let space = "TemplateBoard"
 
     var typeName: String {
         model.type == .income ? "収入" : "支出"

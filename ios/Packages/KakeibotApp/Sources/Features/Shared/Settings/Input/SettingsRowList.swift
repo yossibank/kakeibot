@@ -59,6 +59,7 @@ extension SettingsRowList {
 private extension SettingsRowList {
     func rowButton(_ item: Item) -> some View {
         let isAmount = item.isAmount && !item.isEmpty
+
         let amountFont = Font.display(
             .headline,
             in: themeFont,

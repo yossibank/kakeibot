@@ -16,6 +16,7 @@ public struct FloatingTabBar<Value: Hashable>: View {
         onAdd: @escaping () -> Void
     ) {
         _selection = selection
+
         self.items = items
         self.onAdd = onAdd
     }

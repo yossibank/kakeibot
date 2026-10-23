@@ -25,6 +25,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
         @ViewBuilder content: () -> Content
     ) {
         _openId = openId
+
         self.id = id
         self.role = role
         self.onTap = onTap

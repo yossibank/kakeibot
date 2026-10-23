@@ -8,8 +8,9 @@ public struct BudgetListView: View {
     @State private var hintFlag: SettingsScreenFlag
 
     public init(model: BudgetListModel) {
-        _model = State(initialValue: model)
         let hintFlag = model.hintFlag()
+
+        _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
     }
 

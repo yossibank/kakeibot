@@ -8,11 +8,13 @@ public struct CategoryListView: View {
     @State private var model: CategoryListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
+
     @State private var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
         spacing: Self.spacing
     )
+
     @State private var hiddenId: EntryCategory.ID?
     @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
@@ -23,14 +25,13 @@ public struct CategoryListView: View {
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
-        _model = State(initialValue: CategoryListModel(database: database))
         let hintFlag = SettingsScreenFlag.closedHint(.categories, in: database)
+        let hiddenList = SettingsScreenFlag.openHiddenList(.categories, in: database)
+
+        _model = State(initialValue: CategoryListModel(database: database))
         _hintFlag = State(initialValue: hintFlag)
-        let hiddenList = SettingsScreenFlag.openHiddenList(
-            .categories,
-            in: database
-        )
         _hiddenList = State(initialValue: hiddenList)
+
         self.database = database
     }
 
@@ -306,12 +307,13 @@ private extension CategoryListView {
         case edit(EntryCategory.Kind, EntryCategory.ID)
     }
 
+    nonisolated static let space = "CategoryBoard"
+
     static let kindOptions: [CapsulePicker<EntryCategory.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income)
     ]
 
-    nonisolated static let space = "CategoryBoard"
     static let columnCount = 4
     static let spacing: CGFloat = 8
     static let tileHeight: CGFloat = 78

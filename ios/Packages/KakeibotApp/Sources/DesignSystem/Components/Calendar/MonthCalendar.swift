@@ -17,6 +17,7 @@ public struct MonthCalendar: View {
     ) {
         _selection = selection
         _month = State(initialValue: selection.wrappedValue.yearMonth)
+
         self.today = today
         self.weekStart = weekStart
     }

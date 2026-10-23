@@ -22,6 +22,7 @@ struct WalletDraftTests {
         )
 
         let icon = try draft.newIcon(at: now)
+
         let wallet = try draft.newWallet(
             iconId: icon.id,
             sortOrder: 4,

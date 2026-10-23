@@ -32,6 +32,7 @@ public extension Font {
     ) -> Font {
         let size = style.baseSize * scale
         let design: Design = font == .mincho ? .serif : .default
+
         let base: Font = font.customName.map { name in
             .custom(name, fixedSize: size)
         } ?? .system(size: size, design: design)

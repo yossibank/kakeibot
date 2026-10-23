@@ -87,6 +87,7 @@ public struct EntryRow: View {
 
 #Preview {
     let now = Date()
+
     let food = Icon(
         emoji: nil,
         text: nil,
@@ -95,6 +96,7 @@ public struct EntryRow: View {
         createdAt: now,
         updatedAt: now
     )
+
     let salary = Icon(
         emoji: nil,
         text: nil,

@@ -14,6 +14,7 @@ public struct TemplateOrderMenu: View {
         onClose: @escaping () -> Void
     ) {
         _selection = selection
+
         self.anchor = anchor
         self.onClose = onClose
     }

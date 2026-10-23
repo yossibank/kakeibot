@@ -44,6 +44,7 @@ extension Color {
             let isLight = traits.userInterfaceStyle == .light
             return UIColor(rgb: isLight ? light : dark)
         }
+
         self.init(uiColor: color)
     }
 
@@ -57,6 +58,7 @@ extension Color {
             let alpha = isLight ? lightOpacity : 1
             return UIColor(rgb: rgb).withAlphaComponent(alpha)
         }
+
         self.init(uiColor: color)
     }
 
@@ -69,6 +71,7 @@ extension Color {
             let alpha = isLight ? lightOpacity : 1
             return UIColor(rgb: value).withAlphaComponent(alpha)
         }
+
         self.init(uiColor: color)
     }
 }

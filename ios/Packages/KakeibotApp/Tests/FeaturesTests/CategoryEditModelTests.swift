@@ -34,6 +34,7 @@ struct CategoryEditModelTests {
         let model = CategoryEditModel(database: database, kind: .income)
         model.name = "配当"
         model.icon.glyph = .invest
+
         let canSaveBeforeName = CategoryEditModel(
             database: database,
             kind: .income
@@ -60,6 +61,7 @@ struct CategoryEditModelTests {
             kind: .expense,
             editing: food.id
         )
+
         await model.load()
 
         #expect(model.isEditing)
@@ -100,6 +102,7 @@ struct CategoryEditModelTests {
             kind: .expense,
             editing: food.id
         )
+
         await model.load()
 
         let added = model.addTag("朝ごはん") && model.addTag("昼ごはん")
@@ -137,6 +140,7 @@ struct CategoryEditModelTests {
             kind: .expense,
             editing: food.id
         )
+
         await model.load()
         model.name = "外食"
 

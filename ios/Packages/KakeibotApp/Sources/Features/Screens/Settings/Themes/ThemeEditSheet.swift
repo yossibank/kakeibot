@@ -180,6 +180,7 @@ private extension ThemeEditSheet {
     }
 
     static let fade: CGFloat = 16
+
     static let swatchColumns = [
         GridItem(.adaptive(minimum: 36), spacing: 8)
     ]

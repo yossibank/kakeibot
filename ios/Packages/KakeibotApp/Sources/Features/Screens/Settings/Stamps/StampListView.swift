@@ -8,11 +8,13 @@ public struct StampListView: View {
     @State private var model: StampListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
+
     @State private var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
         spacing: Self.spacing
     )
+
     @State private var hiddenId: ShelfIcon.ID?
     @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
@@ -23,14 +25,13 @@ public struct StampListView: View {
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
-        _model = State(initialValue: StampListModel(database: database))
         let hintFlag = SettingsScreenFlag.closedHint(.stamps, in: database)
+        let hiddenList = SettingsScreenFlag.openHiddenList(.stamps, in: database)
+
+        _model = State(initialValue: StampListModel(database: database))
         _hintFlag = State(initialValue: hintFlag)
-        let hiddenList = SettingsScreenFlag.openHiddenList(
-            .stamps,
-            in: database
-        )
         _hiddenList = State(initialValue: hiddenList)
+
         self.database = database
     }
 
@@ -289,6 +290,7 @@ private extension StampListView {
     }
 
     nonisolated static let space = "StampBoard"
+
     static let columnCount = 4
     static let spacing: CGFloat = 8
     static let tileHeight: CGFloat = 78

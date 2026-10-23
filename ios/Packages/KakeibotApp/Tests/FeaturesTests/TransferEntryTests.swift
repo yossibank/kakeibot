@@ -15,6 +15,7 @@ struct TransferEntryTests {
             date: setup.date,
             type: .transfer
         )
+
         await model.load()
 
         #expect(model.walletId == setup.cash)
@@ -33,6 +34,7 @@ struct TransferEntryTests {
             date: setup.date,
             type: .transfer
         )
+
         await model.load()
         model.press(.digit(3))
         model.press(.doubleZero)
@@ -88,6 +90,7 @@ struct TransferEntryTests {
             date: setup.date,
             type: .transfer
         )
+
         await model.load()
         model.press(.digit(5))
         let bank = try #require(model.wallet(setup.bank))
@@ -118,6 +121,7 @@ struct TransferEntryTests {
             date: setup.date,
             type: .transfer
         )
+
         await model.load()
         model.press(.digit(3))
         model.press(.doubleZero)
@@ -176,6 +180,7 @@ struct TransferEntryTests {
             date: setup.date,
             type: .transfer
         )
+
         await model.load()
         model.press(.digit(5))
         model.toWalletId = model.walletId

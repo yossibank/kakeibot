@@ -6,6 +6,7 @@ public struct AmountCalculator: Hashable, Sendable {
 
     public init(amount: Int = 0) {
         let isPositive = amount > 0
+
         self.tokens = isPositive ? [.number(amount)] : []
         self.taxNote = nil
         self.isShowingResult = isPositive

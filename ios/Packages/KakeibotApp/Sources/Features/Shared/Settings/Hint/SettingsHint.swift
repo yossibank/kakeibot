@@ -51,6 +51,7 @@ extension SettingsHint.Line {
     static let move = Self("hand.draw", "長押しで並べ替えられます")
     static let hide = Self("eye.slash", "下の枠に置くと非表示にできます")
     static let swipeHide = Self("hand.point.left", "横に払っても非表示にできます")
+
     static let swipeDelete = Self(
         "hand.point.left",
         "横に払うと、非表示と削除のボタンが出ます"

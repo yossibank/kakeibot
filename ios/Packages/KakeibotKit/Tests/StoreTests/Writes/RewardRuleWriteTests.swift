@@ -26,6 +26,7 @@ struct RewardRuleWriteTests {
         let setup = try Setup()
         let rule = try await setup.save("自炊した日")
         let later = setup.now.addingTimeInterval(60)
+
         let draft = RewardRuleDraft(
             name: " お弁当の日 ",
             amount: 300,
@@ -37,6 +38,7 @@ struct RewardRuleWriteTests {
             editing: rule.id,
             at: later
         )
+
         let list = try await setup.database.rewardRuleList()
         let icon = try #require(list.icons[updated.iconId])
 
@@ -50,6 +52,7 @@ struct RewardRuleWriteTests {
     @Test
     func rejectsRuleWithoutAmount() async throws {
         let setup = try Setup()
+
         let draft = RewardRuleDraft(
             name: "自炊した日",
             amount: 0,
@@ -104,12 +107,14 @@ struct RewardRuleWriteTests {
         let setup = try Setup()
         let rule = try await setup.save("自炊した日")
         let date = try #require(LocalDate("2026-10-22"))
+
         let log = RewardLog(
             ruleId: rule.id,
             date: date,
             amount: rule.amount,
             createdAt: setup.now
         )
+
         try await setup.database.writer.write { db in
             try log.insert(db)
         }

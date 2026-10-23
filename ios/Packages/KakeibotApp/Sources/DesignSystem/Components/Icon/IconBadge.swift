@@ -62,6 +62,7 @@ private extension IconBadge {
 
 #Preview {
     let now = Date()
+
     let emoji = Icon(
         emoji: "🍙",
         text: nil,
@@ -69,6 +70,7 @@ private extension IconBadge {
         createdAt: now,
         updatedAt: now
     )
+
     let text = Icon(
         emoji: nil,
         text: "給料",

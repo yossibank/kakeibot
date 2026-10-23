@@ -20,6 +20,7 @@ public struct RewardRuleEditSheet: View {
         onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+
         self.onDelete = onDelete
     }
 

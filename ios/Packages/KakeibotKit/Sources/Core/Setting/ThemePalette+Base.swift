@@ -45,6 +45,7 @@ private extension ThemePalette {
         _ target: (UInt32, Double)
     ) -> UInt32 {
         let (other, ratio) = target
+
         let channels = [UInt32(16), 8, 0].map { shift in
             let from = Double((color >> shift) & 0xFF)
             let to = Double((other >> shift) & 0xFF)
