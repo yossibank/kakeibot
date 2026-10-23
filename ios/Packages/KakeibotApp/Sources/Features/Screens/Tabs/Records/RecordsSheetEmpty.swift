@@ -9,14 +9,14 @@ struct RecordsSheetEmpty: View {
     let action: () -> Void
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             Image(systemName: systemImage)
                 .sansFont(.title, weight: .light)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 64, height: 64)
                 .background(Palette.accent.opacity(.subtle), in: Circle())
 
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Text(title)
                     .textFont(.subheadline, weight: .semibold)
                     .foregroundStyle(Palette.text)
@@ -28,7 +28,7 @@ struct RecordsSheetEmpty: View {
             .multilineTextAlignment(.center)
 
             PrimaryButton(actionTitle, action: action)
-                .padding(.top, 6)
+                .padding(.top, 8)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 12)

@@ -42,11 +42,11 @@ struct SettingsField<Field: Hashable>: View {
         .onSubmit {
             focus.wrappedValue = nil
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .frame(height: 46)
-        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(14)))
+        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(16)))
         .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(14))
+            RoundedRectangle(cornerRadius: corner.radius(16))
                 .stroke(stroke, lineWidth: 1)
         }
         .animation(.snappy(duration: 0.2), value: isFocused)

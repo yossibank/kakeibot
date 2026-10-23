@@ -10,7 +10,7 @@ struct BudgetWidgetView: View {
 
     var body: some View {
         content
-            .padding(14)
+            .padding(16)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .widgetURL(PlannedNotification.Route.home.url)
             .widgetTheme(entry.look)
@@ -60,7 +60,7 @@ private extension BudgetWidgetView {
     }
 
     func medium(_ summary: BudgetWidgetSummary) -> some View {
-        HStack(spacing: 18) {
+        HStack(spacing: 20) {
             VStack(alignment: .leading, spacing: 0) {
                 title(of: summary)
                 Spacer(minLength: 4)
@@ -106,7 +106,7 @@ private extension BudgetWidgetView {
 
                 Spacer(minLength: 8)
 
-                VStack(spacing: 6) {
+                VStack(spacing: 8) {
                     ForEach(rows(of: summary)) { row in
                         HStack(alignment: .firstTextBaseline) {
                             Text(row.title)
@@ -162,7 +162,7 @@ private extension BudgetWidgetView {
                 .foregroundStyle(amountColor(of: summary))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
-                .padding(.horizontal, 26)
+                .padding(.horizontal, 28)
                 .privacySensitive()
         }
         .frame(maxWidth: .infinity)

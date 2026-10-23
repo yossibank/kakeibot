@@ -17,7 +17,7 @@ struct RecordsStampSheet: View {
 
     var body: some View {
         FittedSheet {
-            VStack(spacing: 18) {
+            VStack(spacing: 20) {
                 header
 
                 if choices.isEmpty {

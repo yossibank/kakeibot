@@ -49,8 +49,8 @@ public struct RecurringEditSheet: View {
         }
         .overlay(alignment: .top) {
             header
-                .padding(.horizontal, 18)
-                .padding(.top, 18)
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -94,7 +94,7 @@ private extension RecurringEditSheet {
                 .frame(height: 44)
 
             ScrollView {
-                VStack(spacing: 18) {
+                VStack(spacing: 20) {
                     if !model.isEditing {
                         CapsulePicker(
                             selection: typeBinding,
@@ -119,8 +119,8 @@ private extension RecurringEditSheet {
             }
             .disabled(!model.canSave)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .padding(.bottom, 8)
     }
 
@@ -141,7 +141,7 @@ private extension RecurringEditSheet {
     }
 
     var hero: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             Button {
                 open(amountPanel)
             } label: {
@@ -180,14 +180,14 @@ private extension RecurringEditSheet {
     }
 
     var scheduleChooser: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             CapsulePicker(
                 selection: $model.frequency,
                 options: Self.frequencyOptions
             )
 
             if model.frequency == .yearly {
-                LazyVGrid(columns: Self.monthColumns, spacing: 6) {
+                LazyVGrid(columns: Self.monthColumns, spacing: 8) {
                     ForEach(1...12, id: \.self) { month in
                         SettingsChoice(
                             "\(month) 月",
@@ -282,7 +282,7 @@ private extension RecurringEditSheet {
     }
 
     var remindChooser: some View {
-        LazyVGrid(columns: Self.remindColumns, spacing: 6) {
+        LazyVGrid(columns: Self.remindColumns, spacing: 8) {
             ForEach(
                 RecurringEditModel.remindChoices,
                 id: \.self
@@ -304,7 +304,7 @@ private extension RecurringEditSheet {
     func drawerBody(_ panel: Panel) -> some View {
         switch panel {
         case .amount:
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 Keypad(activeTax: model.calculator.taxNote?.rate) { key in
                     model.press(key)
                 }
@@ -317,7 +317,7 @@ private extension RecurringEditSheet {
             SettingsTileGrid(
                 items: model.categories,
                 columns: 5,
-                spacing: 5
+                spacing: 4
             ) { category in
                 SettingsCategoryTile(
                     category: category,
@@ -406,12 +406,12 @@ private extension RecurringEditSheet {
         ]
 
     static let monthColumns = Array(
-        repeating: GridItem(.flexible(), spacing: 6),
+        repeating: GridItem(.flexible(), spacing: 8),
         count: 4
     )
 
     static let remindColumns = Array(
-        repeating: GridItem(.flexible(), spacing: 6),
+        repeating: GridItem(.flexible(), spacing: 8),
         count: 3
     )
 

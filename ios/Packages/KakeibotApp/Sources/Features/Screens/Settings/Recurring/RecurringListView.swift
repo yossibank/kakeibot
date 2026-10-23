@@ -25,12 +25,12 @@ public struct RecurringListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             SettingsBackHeader("固定費", hint: hintFlag)
             SettingsHint(flag: hintFlag, lines: hint)
 
             ScrollView {
-                VStack(spacing: 14) {
+                VStack(spacing: 16) {
                     if !model.rows.isEmpty {
                         totalCard
                     }
@@ -78,7 +78,7 @@ public struct RecurringListView: View {
                 }
             }
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -148,7 +148,7 @@ private extension RecurringListView {
 
             totalColumn("今月の収入", amount: model.monthTotal.income)
         }
-        .padding(.vertical, 14)
+        .padding(.vertical, 16)
         .card()
     }
 
@@ -165,7 +165,7 @@ private extension RecurringListView {
     }
 
     var hiddenSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             SettingsHiddenTitle(
                 flag: hiddenList,
                 title: "非表示の固定費",
@@ -287,7 +287,7 @@ private extension RecurringListView {
             HStack(spacing: 12) {
                 IconBadge(row.icon, size: 38)
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .firstTextBaseline) {
                         Text(row.title)
                             .textFont(.subheadline)
@@ -325,7 +325,7 @@ private extension RecurringListView {
                     }
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .frame(maxHeight: .infinity)
             .contentShape(.rect)
         }
@@ -346,7 +346,7 @@ private extension RecurringListView {
     static let grid = SettingsBoardGrid(
         columns: 1,
         itemHeight: rowHeight,
-        spacing: 10
+        spacing: 12
     )
 
     static let purpose = SettingsHint.Line(

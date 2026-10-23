@@ -18,11 +18,11 @@ public struct ReminderView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 20) {
             SettingsBackHeader("通知")
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
+                VStack(alignment: .leading, spacing: 24) {
                     hero
 
                     if model.isDenied {
@@ -44,7 +44,7 @@ public struct ReminderView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {
@@ -75,7 +75,7 @@ public struct ReminderView: View {
 
 private extension ReminderView {
     var hero: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             Image(systemName: bellImage)
                 .sansFont(.headline, weight: .light)
                 .foregroundStyle(Palette.accent)
@@ -83,7 +83,7 @@ private extension ReminderView {
                 .background(Palette.accent.opacity(.subtle), in: Circle())
                 .contentTransition(.symbolEffect(.replace))
 
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Text("記録忘れの通知")
                     .textFont(.caption2)
                     .tracking(3)
@@ -106,11 +106,11 @@ private extension ReminderView {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
         .padding(.horizontal, 16)
-        .card(cornerRadius: 22)
+        .card(cornerRadius: 24)
     }
 
     var deniedCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Label("通知が許可されていません", systemImage: "bell.slash")
                 .textFont(.subheadline, weight: .semibold)
                 .foregroundStyle(Palette.rose)
@@ -145,7 +145,7 @@ private extension ReminderView {
     }
 
     var timeSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             SettingsSectionTitle("時刻")
 
             LazyVGrid(columns: Self.columns, spacing: 8) {
@@ -177,14 +177,14 @@ private extension ReminderView {
                 .frame(maxWidth: .infinity)
                 .frame(height: 160)
                 .clipped()
-                .card(cornerRadius: 22)
+                .card(cornerRadius: 24)
                 .transition(.opacity)
             }
         }
     }
 
     var previewSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             SettingsSectionTitle("届く通知")
 
             HStack(alignment: .top, spacing: 12) {
@@ -194,10 +194,10 @@ private extension ReminderView {
                     .frame(width: 38, height: 38)
                     .background(
                         Palette.accent,
-                        in: .rect(cornerRadius: corner.radius(9))
+                        in: .rect(cornerRadius: corner.radius(8))
                     )
 
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Text("Kakeibot")
                             .textFont(.caption2)
@@ -220,7 +220,7 @@ private extension ReminderView {
                         .foregroundStyle(Palette.text.opacity(.strong))
                 }
             }
-            .padding(14)
+            .padding(16)
             .background(Palette.text.opacity(.faint), in: cardShape)
             .overlay {
                 cardShape
@@ -230,12 +230,12 @@ private extension ReminderView {
             Text("記録か「支出なし」の印がある日は届きません")
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
-                .padding(.leading, 6)
+                .padding(.leading, 8)
         }
     }
 
     var recurringNote: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             SettingsSectionTitle("固定費の通知")
 
             HStack(alignment: .top, spacing: 12) {
@@ -250,9 +250,9 @@ private extension ReminderView {
                     .foregroundStyle(Palette.subtext)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(14)
+            .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .card(cornerRadius: 18)
+            .card(cornerRadius: 20)
 
             if !model.upcomingNotices.isEmpty {
                 VStack(spacing: 0) {
@@ -260,8 +260,8 @@ private extension ReminderView {
                         noticeRow(notice)
                     }
                 }
-                .padding(.horizontal, 14)
-                .card(cornerRadius: 18)
+                .padding(.horizontal, 16)
+                .card(cornerRadius: 20)
             }
         }
     }
@@ -302,7 +302,7 @@ private extension ReminderView {
     )
 
     var cardShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(18))
+        RoundedRectangle(cornerRadius: corner.radius(20))
     }
 
     var bellImage: String {

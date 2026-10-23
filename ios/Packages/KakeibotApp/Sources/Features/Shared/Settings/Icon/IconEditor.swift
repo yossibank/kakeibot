@@ -69,12 +69,12 @@ private extension IconEditor {
     }
 
     var glyphChooser: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             ForEach(IconEditModel.glyphSections) { section in
                 VStack(alignment: .leading, spacing: 8) {
                     SettingsSectionTitle(section.title)
 
-                    LazyVGrid(columns: Self.gridColumns, spacing: 6) {
+                    LazyVGrid(columns: Self.gridColumns, spacing: 8) {
                         ForEach(section.glyphs, id: \.self) { glyph in
                             glyphButton(glyph)
                         }
@@ -85,12 +85,12 @@ private extension IconEditor {
     }
 
     var emojiChooser: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             ForEach(IconEditModel.emojiSections) { section in
                 VStack(alignment: .leading, spacing: 8) {
                     SettingsSectionTitle(section.title)
 
-                    LazyVGrid(columns: Self.gridColumns, spacing: 6) {
+                    LazyVGrid(columns: Self.gridColumns, spacing: 8) {
                         ForEach(section.emojis, id: \.self) { emoji in
                             emojiButton(emoji)
                         }
@@ -177,7 +177,7 @@ private extension IconEditor {
         } label: {
             Circle()
                 .fill(Color(hex: hex) ?? Palette.subtext)
-                .padding(3)
+                .padding(4)
                 .overlay {
                     Circle()
                         .stroke(ring, lineWidth: 1.5)
@@ -206,7 +206,7 @@ private extension IconEditor {
     }
 
     static var gridColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 6), count: 8)
+        Array(repeating: GridItem(.flexible(), spacing: 8), count: 8)
     }
 
     var customColor: Binding<Color> {

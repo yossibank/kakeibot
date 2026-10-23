@@ -47,7 +47,7 @@ public struct TemplateEditSheet: View {
 
                     if panel == .memo {
                         memoCard
-                            .padding(.horizontal, 14)
+                            .padding(.horizontal, 16)
                             .frame(maxHeight: .infinity)
                             .transition(Self.memoTransition)
                             .zIndex(1)
@@ -60,8 +60,8 @@ public struct TemplateEditSheet: View {
             }
             .overlay(alignment: .top) {
                 header
-                    .padding(.horizontal, 18)
-                    .padding(.top, 18)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
             }
             .errorBanner(model.errorNotice) {
                 model.errorNotice.clear()
@@ -122,7 +122,7 @@ private extension TemplateEditSheet {
                         Text("金額を空にすると、使うときに入れられます")
                             .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
-                            .padding(.leading, 6)
+                            .padding(.leading, 8)
                     }
 
                     if !model.isEditing {
@@ -135,12 +135,12 @@ private extension TemplateEditSheet {
             .contentMargins(.horizontal, 18, for: .scrollContent)
             .contentMargins(.vertical, Self.fade, for: .scrollContent)
             .edgeFade(Self.fade)
-            .padding(.horizontal, -18)
+            .padding(.horizontal, -20)
 
             saveButton
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .padding(.bottom, 8)
     }
 
@@ -170,7 +170,7 @@ private extension TemplateEditSheet {
     }
 
     var preview: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             card
 
             Text("ホームでは、このカードで並びます")
@@ -247,7 +247,7 @@ private extension TemplateEditSheet {
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 IconImage(categoryIcon, size: 12)
                     .foregroundStyle(Palette.accent)
 
@@ -273,7 +273,7 @@ private extension TemplateEditSheet {
     }
 
     var memoCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("メモ", systemImage: "square.and.pencil")
                     .textFont(.caption)
@@ -298,7 +298,7 @@ private extension TemplateEditSheet {
             .tint(Palette.accent)
             .focused($focus, equals: .memo)
         }
-        .padding(14)
+        .padding(16)
         .background(Palette.panel, in: .rect(cornerRadius: corner.radius(20)))
         .overlay {
             RoundedRectangle(cornerRadius: corner.radius(20))
@@ -336,7 +336,7 @@ private extension TemplateEditSheet {
     func drawerBody(_ panel: Panel) -> some View {
         switch panel {
         case .amount:
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 Keypad(activeTax: model.calculator.taxNote?.rate) { key in
                     model.press(key)
                 }
@@ -347,7 +347,7 @@ private extension TemplateEditSheet {
             SettingsTileGrid(
                 items: model.categories,
                 columns: 5,
-                spacing: 5
+                spacing: 4
             ) { category in
                 SettingsCategoryTile(
                     category: category,

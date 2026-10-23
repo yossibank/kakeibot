@@ -7,7 +7,7 @@ struct PeriodCard: View {
     let month: YearMonth
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             Text("いまの期間")
                 .textFont(.caption2)
                 .tracking(3)
@@ -25,8 +25,8 @@ struct PeriodCard: View {
                 .contentTransition(.numericText())
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 18)
-        .card(cornerRadius: 22)
+        .padding(.vertical, 20)
+        .card(cornerRadius: 24)
         .animation(.snappy, value: periodText)
     }
 }

@@ -19,9 +19,9 @@ public struct MenuPanel<Content: View>: View {
             content
         }
         .frame(width: width)
-        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(18)))
+        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(20)))
         .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(18))
+            RoundedRectangle(cornerRadius: corner.radius(20))
                 .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
         }
         .shadow(color: Palette.shadow.opacity(0.5), radius: 24, y: 12)

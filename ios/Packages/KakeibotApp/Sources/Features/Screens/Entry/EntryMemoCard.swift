@@ -11,7 +11,7 @@ struct EntryMemoCard: View {
     let onDone: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("メモ", systemImage: "square.and.pencil")
                     .textFont(.caption)
@@ -40,7 +40,7 @@ struct EntryMemoCard: View {
 
             if !model.recentMemos.isEmpty {
                 ScrollView(.horizontal) {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         ForEach(model.recentMemos, id: \.self) { memo in
                             suggestionButton(memo)
                         }
@@ -49,7 +49,7 @@ struct EntryMemoCard: View {
                 .scrollIndicators(.hidden)
             }
         }
-        .padding(14)
+        .padding(16)
         .background(Palette.panel, in: .rect(cornerRadius: corner.radius(20)))
         .overlay {
             RoundedRectangle(cornerRadius: corner.radius(20))

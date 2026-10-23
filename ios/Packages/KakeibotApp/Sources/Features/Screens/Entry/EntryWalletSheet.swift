@@ -135,7 +135,7 @@ private extension EntryWalletSheet {
                 .tracking(2)
                 .foregroundStyle(Palette.subtext)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 ForEach(model.billChoices) { choice in
                     billButton(choice)
                 }
@@ -169,7 +169,7 @@ private extension EntryWalletSheet {
                 dismiss()
             }
         } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 FlipDate(choice.date, isSelected: isSelected)
 
                 Text(choice.title)
@@ -177,7 +177,7 @@ private extension EntryWalletSheet {
                     .foregroundStyle(titleColor)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
+            .padding(.vertical, 12)
             .background(fill, in: shape)
             .overlay {
                 shape

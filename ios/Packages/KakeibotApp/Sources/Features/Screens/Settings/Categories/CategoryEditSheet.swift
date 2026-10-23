@@ -122,8 +122,8 @@ private extension CategoryEditSheet {
             }
             .disabled(!model.canSave)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {
@@ -153,8 +153,8 @@ private extension CategoryEditSheet {
     }
 
     var preview: some View {
-        HStack(spacing: 18) {
-            VStack(spacing: 6) {
+        HStack(spacing: 20) {
+            VStack(spacing: 8) {
                 IconImage(model.icon.preview, size: 24)
                     .foregroundStyle(Palette.accent)
 
@@ -166,17 +166,17 @@ private extension CategoryEditSheet {
             .frame(width: 86, height: 86)
             .background(
                 Palette.accent.opacity(.subtle),
-                in: .rect(cornerRadius: corner.radius(18))
+                in: .rect(cornerRadius: corner.radius(20))
             )
             .overlay {
-                RoundedRectangle(cornerRadius: corner.radius(18))
+                RoundedRectangle(cornerRadius: corner.radius(20))
                     .stroke(Palette.outline, lineWidth: 1)
             }
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text("入力シートでの見え方")
 
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Circle()
                         .fill(Color(hex: model.icon.color) ?? Palette.subtext)
                         .frame(width: 10, height: 10)

@@ -18,3 +18,8 @@ extension PaletteKey: UITraitBridgedEnvironmentKey {
         mutableTraits[PaletteTrait.self] = value
     }
 }
+
+struct PaletteTrait: UITraitDefinition {
+    static let defaultValue = ThemePalette.night
+    static let affectsColorAppearance = true
+}

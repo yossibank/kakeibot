@@ -69,7 +69,7 @@ public struct RecordsView: View {
                     .pageSlide(slide)
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
@@ -126,7 +126,7 @@ private extension RecordsView {
     }
 
     var searchBar: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
                     .font(.footnote.weight(.semibold))
@@ -157,7 +157,7 @@ private extension RecordsView {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .frame(height: 44)
             .background(Palette.faint, in: Capsule())
             .overlay {
@@ -226,8 +226,8 @@ private extension RecordsView {
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.top, 10)
-            .padding(.bottom, 6)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
 
             ForEach(model.recentSearches, id: \.self) { word in
                 Button {
@@ -235,7 +235,7 @@ private extension RecordsView {
 
                     rememberSearch()
                 } label: {
-                    HStack(spacing: 10) {
+                    HStack(spacing: 12) {
                         Image(systemName: "clock.arrow.circlepath")
                             .font(.footnote)
                             .foregroundStyle(Palette.subtext)
@@ -336,8 +336,8 @@ private extension RecordsView {
                 }
             }
         }
-        .padding(.horizontal, 6)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 12)
         .card()
     }
 
@@ -393,16 +393,16 @@ private extension RecordsView {
             total("支出", amount: model.expenseTotal, color: Palette.accentStrong)
             total("収入", amount: model.incomeTotal, color: Palette.accent)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
         .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(18))
+            RoundedRectangle(cornerRadius: corner.radius(20))
                 .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
 
     func searchSummary(_ summary: RecordsModel.SearchSummary) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
                 Text("\(summary.count) 件")
                     .textFont(.subheadline)
@@ -431,10 +431,10 @@ private extension RecordsView {
                 )
             }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
         .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(18))
+            RoundedRectangle(cornerRadius: corner.radius(20))
                 .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
         }
     }
@@ -484,7 +484,7 @@ private extension RecordsView {
         amount: Int,
         color: Color
     ) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 6) {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text(title)
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
@@ -508,7 +508,7 @@ private extension RecordsView {
             Button {
                 model.selectedDate = date
             } label: {
-                VStack(spacing: 3) {
+                VStack(spacing: 4) {
                     Text(String(date.day))
                         .displayFont(.body)
                         .foregroundStyle(dayColor(date, isShown: isShown))
@@ -604,7 +604,7 @@ private extension RecordsView {
         _ recurring: Recurring,
         on date: LocalDate
     ) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Image(systemName: "repeat")
                 .sansFont(.small, weight: .light)
                 .foregroundStyle(Palette.hint)
@@ -718,8 +718,8 @@ private extension RecordsView {
     ) -> some View {
         let holiday = Holiday.name(of: date)
 
-        return HStack(spacing: 10) {
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
+        return HStack(spacing: 12) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text("\(date.month)/\(date.day)")
                     .displayFont(.headline)
                     .foregroundStyle(Palette.accentStrong)

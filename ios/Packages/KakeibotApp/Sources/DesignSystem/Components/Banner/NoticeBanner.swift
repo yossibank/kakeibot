@@ -45,7 +45,7 @@ public struct NoticeBanner: View {
                     Text(actionTitle)
                         .textFont(.caption, weight: .semibold)
                         .foregroundStyle(Palette.accent)
-                        .padding(.horizontal, 14)
+                        .padding(.horizontal, 16)
                         .frame(height: 34)
                         .overlay {
                             Capsule()
@@ -59,8 +59,8 @@ public struct NoticeBanner: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.leading, 11)
-        .padding(.trailing, 9)
+        .padding(.leading, 12)
+        .padding(.trailing, 8)
         .frame(minHeight: 54)
         .background {
             ZStack {

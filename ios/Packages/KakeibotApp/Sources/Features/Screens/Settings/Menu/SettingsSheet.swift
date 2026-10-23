@@ -41,7 +41,7 @@ public struct SettingsSheet: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 8) {
                             sectionTitle("入力")
 
                             VStack(spacing: 0) {
@@ -92,11 +92,11 @@ public struct SettingsSheet: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .padding(.horizontal, 14)
+                            .padding(.horizontal, 16)
                             .card()
                         }
 
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 8) {
                             sectionTitle("期間と予算")
 
                             VStack(spacing: 0) {
@@ -150,11 +150,11 @@ public struct SettingsSheet: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .padding(.horizontal, 14)
+                            .padding(.horizontal, 16)
                             .card()
                         }
 
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 8) {
                             sectionTitle("見た目")
 
                             VStack(spacing: 0) {
@@ -201,11 +201,11 @@ public struct SettingsSheet: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .padding(.horizontal, 14)
+                            .padding(.horizontal, 16)
                             .card()
                         }
 
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 8) {
                             sectionTitle("使い方")
 
                             VStack(spacing: 0) {
@@ -255,11 +255,11 @@ public struct SettingsSheet: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .padding(.horizontal, 14)
+                            .padding(.horizontal, 16)
                             .card()
                         }
 
-                        VStack(alignment: .leading, spacing: 6) {
+                        VStack(alignment: .leading, spacing: 8) {
                             sectionTitle("データとアプリ")
 
                             VStack(spacing: 0) {
@@ -278,7 +278,7 @@ public struct SettingsSheet: View {
                                 versionRow
                             }
                             .buttonStyle(.plain)
-                            .padding(.horizontal, 14)
+                            .padding(.horizontal, 16)
                             .card()
                         }
 
@@ -373,7 +373,7 @@ private extension SettingsSheet {
             .textFont(.caption2)
             .tracking(3)
             .foregroundStyle(Palette.accent)
-            .padding(.leading, 6)
+            .padding(.leading, 8)
     }
 
     func pickerRow(
@@ -410,7 +410,7 @@ private extension SettingsSheet {
                 picker
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .padding(.vertical, 10)
+            .padding(.vertical, 12)
         }
     }
 
@@ -550,7 +550,7 @@ private extension SettingsSheet {
 #if DEBUG
 private extension SettingsSheet {
     var sampleSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             sectionTitle("開発")
 
             Button {
@@ -560,7 +560,7 @@ private extension SettingsSheet {
             }
             .buttonStyle(.plain)
             .disabled(isInsertingSample)
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .card()
             .confirmationDialog(
                 "4 か月分の記録・予算・テンプレート・固定費を足します",
@@ -583,7 +583,7 @@ private extension SettingsSheet {
                 Text(sampleMessage)
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
-                    .padding(.leading, 6)
+                    .padding(.leading, 8)
             }
         }
     }

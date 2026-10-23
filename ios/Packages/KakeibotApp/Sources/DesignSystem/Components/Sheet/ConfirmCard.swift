@@ -117,7 +117,7 @@ private extension ConfirmCard {
 
     var card: some View {
         VStack(spacing: 20) {
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 Image(systemName: systemImage)
                     .sansFont(.headline, weight: .ultraLight)
                     .foregroundStyle(Palette.accent)
@@ -142,7 +142,7 @@ private extension ConfirmCard {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 switch role {
                 case .destructive:
                     filledButton(keepTitle, action: onKeep)
@@ -164,9 +164,9 @@ private extension ConfirmCard {
         }
         .padding(24)
         .frame(maxWidth: 300)
-        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(26)))
+        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(28)))
         .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(26))
+            RoundedRectangle(cornerRadius: corner.radius(28))
                 .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
         }
         .shadow(color: Palette.shadow.opacity(0.5), radius: 30, y: 14)

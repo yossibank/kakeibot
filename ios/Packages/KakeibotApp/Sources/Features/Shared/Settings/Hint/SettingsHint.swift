@@ -100,8 +100,8 @@ private extension SettingsHint {
             .buttonStyle(.plain)
         }
         .padding(.leading, 12)
-        .padding(.trailing, 6)
-        .padding(.vertical, 10)
+        .padding(.trailing, 8)
+        .padding(.vertical, 12)
         .background(Self.fill, in: shape)
         .overlay {
             shape
@@ -110,7 +110,7 @@ private extension SettingsHint {
     }
 
     func row(_ line: Line) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Image(systemName: line.systemImage)
                 .font(.caption.weight(.medium))
                 .foregroundStyle(Palette.accent)

@@ -57,3 +57,9 @@ public extension Theme {
 extension Theme: Identifiable {}
 
 extension Theme: Codable {}
+
+public extension Theme {
+    var palette: ThemePalette {
+        ThemeDraft(self).palette ?? .night
+    }
+}

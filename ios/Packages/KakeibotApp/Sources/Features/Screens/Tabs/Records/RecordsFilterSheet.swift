@@ -14,7 +14,7 @@ struct RecordsFilterSheet: View {
     let list: EntryList?
 
     var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 20) {
             header
             CapsulePicker(selection: $tab, options: tabOptions)
 
@@ -26,14 +26,14 @@ struct RecordsFilterSheet: View {
             } else {
                 ScrollView {
                     if tab == .tag {
-                        VStack(alignment: .leading, spacing: 14) {
+                        VStack(alignment: .leading, spacing: 16) {
                             ForEach(tagGroups) { group in
                                 tagGroup(group)
                             }
                         }
                         .padding(.vertical, 4)
                     } else {
-                        LazyVGrid(columns: Self.columns, spacing: 10) {
+                        LazyVGrid(columns: Self.columns, spacing: 12) {
                             ForEach(items(in: tab)) { item in
                                 choice(item)
                             }
@@ -44,8 +44,8 @@ struct RecordsFilterSheet: View {
                 .scrollIndicators(.hidden)
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
@@ -123,14 +123,14 @@ private extension RecordsFilterSheet {
 
     func tagGroup(_ group: TagGroup) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 IconBadge(group.icon, size: 22)
 
                 Text(group.category.name)
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
             }
-            .padding(.leading, 6)
+            .padding(.leading, 8)
 
             TagRows(group.tags, selection: filter.tagIds) { id in
                 withAnimation(.snappy) {
@@ -143,14 +143,14 @@ private extension RecordsFilterSheet {
     func choice(_ item: Item) -> some View {
         let ring = item.isOn ? Palette.accent : Palette.line
         let fill = item.isOn ? Palette.accent.opacity(.subtle) : Color.clear
-        let shape = RoundedRectangle(cornerRadius: corner.radius(14))
+        let shape = RoundedRectangle(cornerRadius: corner.radius(16))
 
         return Button {
             withAnimation(.snappy) {
                 item.toggle()
             }
         } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 IconBadge(item.icon, size: 34)
 
                 Text(item.name)
@@ -175,7 +175,7 @@ private extension RecordsFilterSheet {
     static let sideWidth: CGFloat = 88
 
     static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 10),
+        repeating: GridItem(.flexible(), spacing: 12),
         count: 4
     )
 

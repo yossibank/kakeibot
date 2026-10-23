@@ -40,7 +40,7 @@ public struct ReviewView: View {
                 content
                     .pageSlide(slide)
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
@@ -173,7 +173,7 @@ private extension ReviewView {
                     Button {
                         openStamp = tally
                     } label: {
-                        HStack(spacing: 6) {
+                        HStack(spacing: 8) {
                             IconSeal(tally.icon, size: 28)
 
                             Text("×\(tally.count)")
@@ -194,7 +194,7 @@ private extension ReviewView {
 
     var detailCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 Image(systemName: Self.changeImage(model.change))
                     .font(.caption)
                     .foregroundStyle(selectedChangeColor)
@@ -224,7 +224,7 @@ private extension ReviewView {
             }
 
             if model.kind == .balance {
-                VStack(spacing: 10) {
+                VStack(spacing: 12) {
                     balanceBar(
                         "収入",
                         amount: model.summary.income.total,
@@ -237,11 +237,11 @@ private extension ReviewView {
                         tint: Palette.rose
                     )
                 }
-                .padding(.top, 6)
+                .padding(.top, 8)
             }
 
             if let usage = model.budgetUsage {
-                VStack(spacing: 6) {
+                VStack(spacing: 8) {
                     HStack {
                         Text("予算 \(AmountText.text(usage.budget))")
                         Spacer()
@@ -282,7 +282,7 @@ private extension ReviewView {
         amount: Int,
         tint: Color
     ) -> some View {
-        VStack(spacing: 5) {
+        VStack(spacing: 4) {
             HStack {
                 Text(title)
                     .textFont(.caption)
@@ -337,7 +337,7 @@ private extension ReviewView {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.vertical, 12)
             .background(
                 fill,
                 in: RoundedRectangle(cornerRadius: corner.radius(16))

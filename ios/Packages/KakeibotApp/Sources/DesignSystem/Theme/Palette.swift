@@ -1,5 +1,6 @@
 import Core
 import SwiftUI
+import UIKit
 
 public enum Palette {
     public static let backgroundTop = Color(themed: \.backgroundTop)
@@ -50,5 +51,16 @@ public enum Palette {
             startPoint: .top,
             endPoint: .bottom
         )
+    }
+}
+
+public extension EnvironmentValues {
+    var palette: ThemePalette {
+        get {
+            self[PaletteKey.self]
+        }
+        set {
+            self[PaletteKey.self] = newValue
+        }
     }
 }

@@ -18,11 +18,11 @@ public struct PeriodRecurringSheet: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             header
 
             ScrollView {
-                VStack(spacing: 14) {
+                VStack(spacing: 16) {
                     summaryCard
                     timelineCard
                 }
@@ -30,10 +30,10 @@ public struct PeriodRecurringSheet: View {
             }
             .scrollIndicators(.hidden)
             .contentMargins(.horizontal, 18, for: .scrollContent)
-            .padding(.horizontal, -18)
+            .padding(.horizontal, -20)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
             Rectangle()
@@ -62,7 +62,7 @@ private extension PeriodRecurringSheet {
     }
 
     var summaryCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             Text(model.monthRangeText)
                 .textFont(.caption2)
                 .tracking(2)
@@ -105,7 +105,7 @@ private extension PeriodRecurringSheet {
                 )
             }
         }
-        .padding(18)
+        .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
     }
@@ -155,7 +155,7 @@ private extension PeriodRecurringSheet {
                 todayMarker
             }
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
         .card()
     }
 
@@ -175,7 +175,7 @@ private extension PeriodRecurringSheet {
                 .frame(height: 1)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
     }
 
     func stat(
@@ -213,7 +213,7 @@ private extension PeriodRecurringSheet {
 
             IconBadge(model.icon(of: item.recurring), size: 36)
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(model.title(of: item.recurring))
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
@@ -229,7 +229,7 @@ private extension PeriodRecurringSheet {
 
             Spacer(minLength: 8)
 
-            VStack(alignment: .trailing, spacing: 3) {
+            VStack(alignment: .trailing, spacing: 4) {
                 AmountText(item.amount, type: item.recurring.type)
                     .textFont(.subheadline)
 

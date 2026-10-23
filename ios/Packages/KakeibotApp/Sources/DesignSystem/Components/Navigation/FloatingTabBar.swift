@@ -71,7 +71,7 @@ private extension FloatingTabBar {
         .contentShape(Capsule())
         .gesture(dragGesture)
         .sensoryFeedback(.selection, trigger: highlightedIndex)
-        .padding(6)
+        .padding(8)
         .background {
             Capsule()
                 .fill(Self.sheen)
@@ -140,7 +140,7 @@ private extension FloatingTabBar {
         let iconColor = isHighlighted ? Palette.accent : Palette.subtext
         let titleColor = isHighlighted ? Palette.accentStrong : Palette.subtext
 
-        return VStack(spacing: 3) {
+        return VStack(spacing: 4) {
             Image(systemName: item.systemImage)
                 .sansFont(.headline, weight: .light)
                 .foregroundStyle(iconColor)

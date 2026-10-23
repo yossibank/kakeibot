@@ -17,7 +17,7 @@ public struct HeaderButton: View {
 
     public var body: some View {
         Button(action: action) {
-            HStack(spacing: 7) {
+            HStack(spacing: 8) {
                 Image(systemName: systemImage)
                     .sansFont(.body, weight: .light)
 

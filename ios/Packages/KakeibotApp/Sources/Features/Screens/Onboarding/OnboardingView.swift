@@ -22,7 +22,7 @@ public struct OnboardingView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 20) {
             topBar
 
             page
@@ -107,8 +107,8 @@ private extension OnboardingView {
     }
 
     var welcomePage: some View {
-        VStack(spacing: 22) {
-            VStack(spacing: 10) {
+        VStack(spacing: 24) {
+            VStack(spacing: 12) {
                 Text("ようこそ")
                     .displayFont(.title)
                     .tracking(8)
@@ -132,14 +132,14 @@ private extension OnboardingView {
                 hairline
                 stepRow("起動時に開く画面", systemImage: "iphone")
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 16)
             .card()
         }
     }
 
     var monthStartPage: some View {
         ScrollView {
-            VStack(spacing: 18) {
+            VStack(spacing: 20) {
                 pageHeader(
                     "月と週の始まり",
                     message: "給料日に合わせると、給料日から次の給料日の前の日までを 1 か月として数えます"
@@ -169,7 +169,7 @@ private extension OnboardingView {
                     )
                 }
                 .frame(minHeight: 52)
-                .padding(.horizontal, 14)
+                .padding(.horizontal, 16)
                 .card()
             }
             .padding(.vertical, 8)
@@ -178,7 +178,7 @@ private extension OnboardingView {
     }
 
     var budgetPage: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 20) {
             pageHeader(
                 "月の予算",
                 message: "1 か月に使う額を決めると、ホームで「あといくら」が分かります"
@@ -189,7 +189,7 @@ private extension OnboardingView {
                     model.budget.startEditing(.total)
                 }
             } label: {
-                VStack(spacing: 6) {
+                VStack(spacing: 8) {
                     Text("\(model.budget.month.month)月の予算")
                         .textFont(.caption2)
                         .tracking(3)
@@ -205,8 +205,8 @@ private extension OnboardingView {
                         .foregroundStyle(Palette.subtext)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 22)
-                .card(cornerRadius: 22)
+                .padding(.vertical, 24)
+                .card(cornerRadius: 24)
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
@@ -219,7 +219,7 @@ private extension OnboardingView {
     }
 
     var launchScreenPage: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 20) {
             pageHeader(
                 "起動時に開く画面",
                 message: "アプリを開いたときに、最初に出す画面を選びます"

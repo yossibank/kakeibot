@@ -21,7 +21,7 @@ public struct ThemeEditSheet: View {
             header
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 20) {
                     ThemePreview(palette: model.palette)
                         .frame(width: 150)
                         .frame(maxWidth: .infinity)
@@ -52,8 +52,8 @@ public struct ThemeEditSheet: View {
             }
             .disabled(!model.canSave)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {
@@ -121,7 +121,7 @@ private extension ThemeEditSheet {
                 .textFont(.caption2)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
-                .padding(.leading, 6)
+                .padding(.leading, 8)
 
             LazyVGrid(columns: Self.swatchColumns, spacing: 8) {
                 ForEach(slot.swatches, id: \.self) { hex in
@@ -153,7 +153,7 @@ private extension ThemeEditSheet {
             Circle()
                 .fill(Color(hex: hex) ?? .clear)
                 .frame(width: 30, height: 30)
-                .padding(3)
+                .padding(4)
                 .overlay {
                     Circle()
                         .stroke(ring, lineWidth: isSelected ? 2 : 1)

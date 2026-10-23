@@ -59,7 +59,7 @@ private extension BudgetListView {
             )
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 20) {
                     totalCard
 
                     VStack(alignment: .leading, spacing: 8) {
@@ -82,7 +82,7 @@ private extension BudgetListView {
                                 }
                             }
                         }
-                        .padding(.horizontal, 14)
+                        .padding(.horizontal, 16)
                         .card()
                     }
                 }
@@ -90,7 +90,7 @@ private extension BudgetListView {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
@@ -104,7 +104,7 @@ private extension BudgetListView {
         Button {
             openDrawer(.total)
         } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Text("月全体")
                     .textFont(.caption2)
                     .tracking(3)
@@ -126,8 +126,8 @@ private extension BudgetListView {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
-            .card(cornerRadius: 22)
+            .padding(.vertical, 20)
+            .card(cornerRadius: 24)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -141,7 +141,7 @@ private extension BudgetListView {
         return Button {
             openDrawer(.category(category))
         } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 HStack(spacing: 12) {
                     IconImage(model.icon(for: category), size: 16)
                         .foregroundStyle(Palette.accent)
@@ -171,7 +171,7 @@ private extension BudgetListView {
                         .padding(.leading, 36)
                 }
             }
-            .padding(.vertical, 10)
+            .padding(.vertical, 12)
             .frame(minHeight: 48)
             .contentShape(.rect)
         }

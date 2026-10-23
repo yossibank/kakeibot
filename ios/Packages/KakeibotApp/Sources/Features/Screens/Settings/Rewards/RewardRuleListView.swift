@@ -36,7 +36,7 @@ public struct RewardRuleListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             SettingsBackHeader("ごほうび", hint: hintFlag)
 
             SettingsHint(
@@ -79,7 +79,7 @@ public struct RewardRuleListView: View {
                 .padding(.bottom, 8)
             }
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .settingsLiftLayer(
@@ -261,7 +261,7 @@ private extension RewardRuleListView {
         let opacity: Double = isHidden ? 0.6 : 1
         let icon = model.icon(for: rule)
 
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
                 IconBadge(icon, size: 46)
                 Spacer(minLength: 6)
@@ -292,7 +292,7 @@ private extension RewardRuleListView {
                     .minimumScaleFactor(0.7)
             }
         }
-        .padding(14)
+        .padding(16)
         .frame(
             maxWidth: .infinity,
             maxHeight: .infinity,
@@ -316,7 +316,7 @@ private extension RewardRuleListView {
                 .textFont(.caption2, weight: .semibold)
                 .foregroundStyle(Palette.accent)
                 .padding(.horizontal, 8)
-                .padding(.vertical, 3)
+                .padding(.vertical, 4)
                 .background(Palette.accent.opacity(.subtle), in: .capsule)
 
             Text("計 \(AmountText.text(total.amount))")

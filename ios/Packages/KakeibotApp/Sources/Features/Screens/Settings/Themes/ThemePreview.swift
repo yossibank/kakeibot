@@ -9,7 +9,7 @@ struct ThemePreview: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 Capsule()
                     .fill(Palette.subtext)
                     .frame(width: 24, height: 3)
@@ -31,7 +31,7 @@ struct ThemePreview: View {
             }
 
             ForEach(Self.rows, id: \.self) { width in
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Circle()
                         .fill(Palette.accent.opacity(.muted))
                         .frame(width: 10, height: 10)
@@ -54,7 +54,7 @@ struct ThemePreview: View {
         .frame(height: 132)
         .background(
             Palette.background,
-            in: .rect(cornerRadius: corner.radius(14))
+            in: .rect(cornerRadius: corner.radius(16))
         )
         .environment(\.palette, palette)
     }

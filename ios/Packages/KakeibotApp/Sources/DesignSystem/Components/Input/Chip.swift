@@ -16,7 +16,7 @@ public struct Chip: View {
     }
 
     public var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             Image(systemName: systemImage)
 
             if !title.isEmpty {
@@ -31,7 +31,7 @@ public struct Chip: View {
         .textFont(.caption)
         .foregroundStyle(foreground)
         .padding(.horizontal, 12)
-        .padding(.vertical, 7)
+        .padding(.vertical, 8)
         .background(
             isHighlighted ? Palette.accent.opacity(.subtle) : Color.clear,
             in: Capsule()

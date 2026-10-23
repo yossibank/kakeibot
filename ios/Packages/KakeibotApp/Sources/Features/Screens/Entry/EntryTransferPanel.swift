@@ -7,7 +7,7 @@ struct EntryTransferPanel: View {
     let onPick: (EntryWalletSheet.Role) -> Void
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             card(.source)
 
             Button {
@@ -49,7 +49,7 @@ private extension EntryTransferPanel {
         return Button {
             onPick(role)
         } label: {
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 Text(title(role))
                     .textFont(.caption2)
                     .tracking(3)
@@ -86,7 +86,7 @@ private extension EntryTransferPanel {
             .padding(.horizontal, 8)
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity, minHeight: 120)
-            .card(cornerRadius: 18)
+            .card(cornerRadius: 20)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)

@@ -17,7 +17,7 @@ struct AssetsRewardSheet: View {
             header
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
+                VStack(alignment: .leading, spacing: 24) {
                     balanceCard
                     goalSection
 
@@ -31,8 +31,8 @@ struct AssetsRewardSheet: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 18)
-        .padding(.top, 18)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
         .background {
             Rectangle()
                 .fill(Palette.background)
@@ -75,7 +75,7 @@ private extension AssetsRewardSheet {
     }
 
     var balanceCard: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             Image(systemName: "gift")
                 .sansFont(.title, weight: .light)
                 .foregroundStyle(Palette.accent)
@@ -99,7 +99,7 @@ private extension AssetsRewardSheet {
     }
 
     var goalSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 SectionTitle("目標")
                 Spacer()
@@ -118,7 +118,7 @@ private extension AssetsRewardSheet {
                 Text("欲しい物と額を決めると、あといくらで届くか分かります")
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
-                    .padding(.leading, 6)
+                    .padding(.leading, 8)
             } else {
                 ForEach(model.waitingGoals) { goal in
                     goalRow(goal)
@@ -128,7 +128,7 @@ private extension AssetsRewardSheet {
     }
 
     var boughtSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             SectionTitle("買ったもの")
 
             ForEach(model.boughtGoals) { goal in
@@ -138,14 +138,14 @@ private extension AssetsRewardSheet {
     }
 
     var historySection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             SectionTitle("達成の履歴")
 
             if model.rewardHistory.isEmpty {
                 Text("記録の日の見出しの贈り物のボタンから、達成を付けられます")
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
-                    .padding(.leading, 6)
+                    .padding(.leading, 8)
             } else {
                 ForEach(model.rewardHistory) { month in
                     monthBlock(month)
@@ -158,7 +158,7 @@ private extension AssetsRewardSheet {
         let remaining = model.remaining(to: goal)
         let progress = model.progress(to: goal)
 
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 Text(goal.name)
                     .textFont(.subheadline, weight: .semibold)
@@ -198,15 +198,15 @@ private extension AssetsRewardSheet {
                         Text("買った")
                             .textFont(.caption, weight: .semibold)
                             .foregroundStyle(Palette.background)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 6)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
                             .background(Palette.accent, in: .capsule)
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
-        .padding(14)
+        .padding(16)
         .card()
         .contentShape(.rect)
         .onTapGesture {
@@ -217,7 +217,7 @@ private extension AssetsRewardSheet {
     func boughtRow(_ goal: RewardGoal) -> some View {
         let date = goal.purchasedAt ?? goal.updatedAt
 
-        return HStack(spacing: 10) {
+        return HStack(spacing: 12) {
             Image(systemName: "bag.fill")
                 .font(.footnote)
                 .foregroundStyle(Palette.accent)
@@ -262,7 +262,7 @@ private extension AssetsRewardSheet {
             }
             .buttonStyle(.plain)
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .frame(minHeight: 56)
         .card()
     }
@@ -289,7 +289,7 @@ private extension AssetsRewardSheet {
                     logRow(log)
                 }
             }
-            .padding(14)
+            .padding(16)
             .card()
         }
     }
@@ -298,7 +298,7 @@ private extension AssetsRewardSheet {
         let rule = model.rewardRule(for: log)
         let icon = rule.flatMap { model.rewardIcon(for: $0) }
 
-        return HStack(spacing: 10) {
+        return HStack(spacing: 12) {
             IconBadge(icon, size: 26)
 
             Text(rule?.name ?? "")

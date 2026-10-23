@@ -36,7 +36,7 @@ public struct CategoryListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             SettingsBackHeader("カテゴリ", hint: hintFlag)
             CapsulePicker(selection: $model.kind, options: Self.kindOptions)
 
@@ -80,7 +80,7 @@ public struct CategoryListView: View {
                 .padding(.bottom, 8)
             }
         }
-        .padding(.horizontal, 18)
+        .padding(.horizontal, 20)
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .settingsLiftLayer(
@@ -257,7 +257,7 @@ private extension CategoryListView {
         let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.subtext
         let opacity: Double = isHidden ? 0.6 : 1
 
-        return VStack(spacing: 6) {
+        return VStack(spacing: 8) {
             IconImage(icon, size: 20)
                 .foregroundStyle(Palette.accent)
 
@@ -271,7 +271,7 @@ private extension CategoryListView {
             Capsule()
                 .fill(color)
                 .frame(width: 24, height: 2)
-                .padding(.bottom, 7)
+                .padding(.bottom, 8)
         }
         .background(tileBackground(isHidden: isHidden))
         .overlay {
