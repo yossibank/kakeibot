@@ -56,7 +56,11 @@ public enum Palette {
 
 public extension EnvironmentValues {
     var palette: ThemePalette {
-        get { self[PaletteKey.self] }
-        set { self[PaletteKey.self] = newValue }
+        get {
+            self[PaletteKey.self]
+        }
+        set {
+            self[PaletteKey.self] = newValue
+        }
     }
 }
