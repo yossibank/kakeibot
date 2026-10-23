@@ -7,6 +7,7 @@ struct KakeibotWidgetBundle: WidgetBundle {
     var body: some Widget {
         BudgetWidget()
         BudgetLockWidget()
+        QuickRecordWidget()
     }
 
     init() {

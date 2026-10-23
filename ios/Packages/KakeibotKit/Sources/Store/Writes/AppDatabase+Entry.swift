@@ -54,7 +54,7 @@ public extension AppDatabase {
     }
 }
 
-private extension AppDatabase {
+extension AppDatabase {
     @discardableResult
     static func saveEntry(
         _ draft: EntryDraft,
@@ -87,7 +87,9 @@ private extension AppDatabase {
 
         return entry
     }
+}
 
+private extension AppDatabase {
     static func entry(
         from draft: EntryDraft,
         editing id: Entry.ID?,

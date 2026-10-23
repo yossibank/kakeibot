@@ -107,11 +107,13 @@ public extension HomeModel {
     }
 
     var templates: [EntryTemplate] {
-        let uses = templateOrder == .frequent ? templateUses : [:]
+        let shown = allTemplates.filter { $0.type == templateType }
 
-        return allTemplates
-            .filter { $0.type == templateType }
-            .sorted { isOrdered($0, $1, uses: uses) }
+        guard let list else {
+            return shown
+        }
+
+        return list.ordered(shown, by: templateOrder, today: today)
     }
 
     var recentRows: [EntryRowItem] {
@@ -275,21 +277,6 @@ private extension HomeModel {
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
     static let recurringTitle = "固定費"
 
-    var templateUses: [EntryTemplate.ID: Int] {
-        let start = today.adding(days: 1 - TemplateOrder.frequentDays)
-        let days = list?.days ?? []
-
-        var uses: [EntryTemplate.ID: Int] = [:]
-
-        for day in days where day.date >= start && day.date <= today {
-            for case let id? in day.entries.map(\.templateId) {
-                uses[id, default: 0] += 1
-            }
-        }
-
-        return uses
-    }
-
     func observe() async {
         await observe(
             database.entryListUpdates(),
@@ -333,50 +320,6 @@ private extension HomeModel {
         ) { startDay in
             monthStartDay = startDay
         }
-    }
-
-    func isOrdered(
-        _ lhs: EntryTemplate,
-        _ rhs: EntryTemplate,
-        uses: [EntryTemplate.ID: Int]
-    ) -> Bool {
-        switch templateOrder {
-        case .manual:
-            break
-        case .frequent:
-            let left = uses[lhs.id, default: 0]
-            let right = uses[rhs.id, default: 0]
-
-            if left != right {
-                return left > right
-            }
-        case .category:
-            let left = categoryOrder(of: lhs)
-            let right = categoryOrder(of: rhs)
-
-            if left != right {
-                return left < right
-            }
-        case .amount:
-            let left = lhs.amount ?? -1
-            let right = rhs.amount ?? -1
-
-            if left != right {
-                return left > right
-            }
-        case .name:
-            let result = lhs.name.localizedStandardCompare(rhs.name)
-
-            if result != .orderedSame {
-                return result == .orderedAscending
-            }
-        }
-
-        return lhs.sortOrder < rhs.sortOrder
-    }
-
-    func categoryOrder(of template: EntryTemplate) -> Int {
-        list?.categories[template.categoryId]?.sortOrder ?? .max
     }
 
     func dayLabel(for date: LocalDate) -> String {

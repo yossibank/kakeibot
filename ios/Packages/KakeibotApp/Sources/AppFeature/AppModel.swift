@@ -94,6 +94,7 @@ extension AppModel {
 
         switch launch {
         case let .onboarding(database), let .ready(database):
+            try? await database.reloadAfterOtherProcesses()
             await generateRecurring(in: database)
             await scheduleNotifications(in: database)
         case .opening, .failed:
@@ -185,14 +186,7 @@ private extension AppModel {
     }
 
     func schedule(_ input: NotificationInput) async {
-        let plan = NotificationPlan.notifications(
-            today: today,
-            reminderTime: input.reminderTime,
-            recordedDates: input.recordedDates,
-            recurrings: input.recurrings,
-            names: input.names,
-            shortages: input.shortages
-        )
+        let plan = input.plan(today: today)
 
         await scheduler.apply(plan, now: Date(), timeZone: .current)
     }

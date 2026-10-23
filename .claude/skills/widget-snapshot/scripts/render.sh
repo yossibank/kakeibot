@@ -15,6 +15,7 @@ files=(
     "$package/Package.swift"
     "$package/Sources/AppWidget/BudgetWidgetView.swift"
     "$package/Sources/AppWidget/BudgetLockWidgetView.swift"
+    "$package/Sources/AppWidget/QuickRecordWidgetView.swift"
 )
 
 restore() {

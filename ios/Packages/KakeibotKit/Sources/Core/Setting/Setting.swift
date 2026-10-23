@@ -33,6 +33,7 @@ public extension Setting {
         case closedHints = "closed_hints"
         case closedHiddenLists = "closed_hidden_lists"
         case recentSearches = "recent_searches"
+        case widgetEntry = "widget_entry"
     }
 }
 

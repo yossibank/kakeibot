@@ -324,6 +324,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | closed_hints | 説明を閉じた設定の画面を `,` でつないだもの（`categories` `wallets` `templates` `recurrings` `stamps` `rewards` `budgets` `themes`）。空ならすべて出す |
 | closed_hidden_lists | 非表示の項目をたたんだ設定の画面。書き方は closed_hints と同じ。空ならすべて開く |
 | recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで |
+| widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。取り消すと消す |
 
 列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
 

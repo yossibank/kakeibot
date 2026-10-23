@@ -123,6 +123,17 @@ public extension SettingKey where Value == [String] {
     }
 }
 
+public extension SettingKey where Value == Entry.ID? {
+    static var widgetEntry: Self {
+        Self(
+            .widgetEntry,
+            default: nil,
+            decode: { Entry.ID($0) },
+            encode: { $0?.description }
+        )
+    }
+}
+
 public extension SettingKey where Value == Bool {
     static var entryStartsWithAmount: Self {
         Self(flag: .entryStartsWithAmount)

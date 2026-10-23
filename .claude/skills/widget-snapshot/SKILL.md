@@ -1,6 +1,6 @@
 ---
 name: widget-snapshot
-description: kakeibot のウィジェット（小・中・ロック画面の丸・横長・1 行）を、シミュレーターでテストとして描いて PNG にする。ウィジェットの見た目・余白・色・字体を変えたときや、確かめたいときに使う。
+description: kakeibot のウィジェット（あといくらの小・中、すぐ記録の中・大、ロック画面の丸・横長・1 行）を、シミュレーターでテストとして描いて PNG にする。ウィジェットの見た目・余白・色・字体を変えたときや、確かめたいときに使う。
 argument-hint: "<出力先のフォルダ> [ひな形の Swift]"
 allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/render.sh *)
 ---
@@ -21,7 +21,7 @@ ${CLAUDE_SKILL_DIR}/scripts/render.sh <出力先のフォルダ> [ひな形の S
 
 `render.sh` は、次を自動で行い、終わると必ず元に戻す。
 
-- `BudgetWidgetView`・`BudgetLockWidgetView` の `widgetFamily` を、外から渡せる値に差し替える
+- `BudgetWidgetView`・`BudgetLockWidgetView`・`QuickRecordWidgetView` の `widgetFamily` を、外から渡せる値に差し替える
 - `KakeibotApp` の Package.swift に、一時のテストのターゲット `AppWidgetSnapshotTests` を足す
 - シミュレーターでそのテストだけを動かし、`<場合>-<形>.png` を出力先に書く
 

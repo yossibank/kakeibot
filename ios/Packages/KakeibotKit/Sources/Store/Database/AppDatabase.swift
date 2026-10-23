@@ -31,22 +31,11 @@ public extension AppDatabase {
     }
 
     static func appGroupForReading() throws -> AppDatabase {
-        var configuration = configuration
+        try appGroupMigrated(readonly: true)
+    }
 
-        configuration.readonly = true
-
-        let path = try groupPath()
-        let pool = try DatabasePool(path: path, configuration: configuration)
-
-        let isMigrated = try pool.read { db in
-            try migrator.hasCompletedMigrations(db)
-        }
-
-        guard isMigrated else {
-            throw SetupError.notMigrated
-        }
-
-        return AppDatabase(migrated: pool)
+    static func appGroupForWriting() throws -> AppDatabase {
+        try appGroupMigrated(readonly: false)
     }
 
     static func inMemory() throws -> AppDatabase {
@@ -67,6 +56,12 @@ public extension AppDatabase {
             name: Database.resumeNotification,
             object: nil
         )
+    }
+
+    func reloadAfterOtherProcesses() async throws {
+        try await writer.write { db in
+            try db.notifyChanges(in: .fullDatabase)
+        }
     }
 }
 
@@ -100,6 +95,7 @@ extension AppDatabase {
 private extension AppDatabase {
     static let groupIdentifier = "group.com.yossibank.kakeibot"
     static let fileName = "kakeibot.sqlite"
+    static let busyTimeout: TimeInterval = 5
 
     static var groupContainer: URL? {
         let manager = FileManager.default
@@ -114,6 +110,7 @@ private extension AppDatabase {
 
         configuration.observesSuspensionNotifications = true
         configuration.persistentReadOnlyConnections = true
+        configuration.busyMode = .timeout(busyTimeout)
 
         return configuration
     }
@@ -124,6 +121,25 @@ private extension AppDatabase {
         self.entryListObservation = ValueObservation
             .tracking(Self.entryList)
             .shared(in: writer)
+    }
+
+    static func appGroupMigrated(readonly: Bool) throws -> AppDatabase {
+        var configuration = configuration
+
+        configuration.readonly = readonly
+
+        let path = try groupPath()
+        let pool = try DatabasePool(path: path, configuration: configuration)
+
+        let isMigrated = try pool.read { db in
+            try migrator.hasCompletedMigrations(db)
+        }
+
+        guard isMigrated else {
+            throw SetupError.notMigrated
+        }
+
+        return AppDatabase(migrated: pool)
     }
 
     static func groupPath() throws -> String {
