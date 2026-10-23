@@ -169,7 +169,7 @@ KakeibotApp/
 │   │           ├── Input/   入力欄、選ぶボタン、引き出し、行の一覧、保存のボタンの文字
 │   │           └── Tile/    カテゴリと口座のタイルと、その並べ方
 │   ├── Notifications/       予約されているべき通知と今の予約の差を OS に反映、押された通知の行き先を受ける
-│   └── WidgetFeature/
+│   └── WidgetFeature/       ウィジェットの見た目、タイムライン、テーマの色の当て方
 └── Tests/
     ├── AppFeatureTests/
     ├── DesignSystemTests/
@@ -306,13 +306,15 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 | 記録忘れの通知 | 入力シート（今日） |
 | 固定費の更新前の通知 | 設定 → 固定費 → その固定費 |
 
+行き先は、通知と同じ `PlannedNotification.Route` で表す。ウィジェットからは、`kakeibot://home` のように、行き先の文字列を `kakeibot` の URL にして渡す。
+
 ## 通知とウィジェット
 
 | 対象 | 方式 |
 | --- | --- |
 | 記録忘れの通知 | 数日先まで予約し、当日の記録か支出なしの印ができたら当日分を取り消す |
 | 固定費の更新前の通知 | 更新日の N 日前で予約する |
-| iOS のウィジェット | WidgetFeature が Store で DB を直接読む。ホームと同じ集計クエリを使う |
+| iOS のウィジェット | WidgetFeature が `AppDatabase.appGroupForReading()` で DB を読むだけで開き、ホームと同じ `MonthOverview` を使う。背景は、テーマの色の値から作った色で描く。表の形が最新でなければ読まない。AppModel が記録・予算・固定費・テーマの変化を見張って更新し、日付が変わるときはタイムラインで切り替える |
 
 ## テスト
 

@@ -38,28 +38,24 @@ public extension HomeModel {
         public let templates: [EntryTemplate]
     }
 
-    struct PeriodRecurring: Hashable {
-        public let date: LocalDate
-        public let recurring: Recurring
-        public let entry: Entry?
-        public let status: Status
-        public let amount: Int
-    }
-
-    enum Status: Hashable {
-        case done
-        case upcoming
-        case missing
-    }
-
     static let recentLimit = 5
 
+    var overview: MonthOverview {
+        MonthOverview(
+            list: list,
+            budgets: budgets,
+            recurrings: recurrings,
+            monthStartDay: monthStartDay,
+            today: today
+        )
+    }
+
     var month: YearMonth {
-        today.periodMonth(startingOn: monthStartDay)
+        overview.month
     }
 
     var period: ClosedRange<LocalDate> {
-        month.period(startingOn: monthStartDay)
+        overview.period
     }
 
     var monthRangeText: String {
@@ -67,92 +63,47 @@ public extension HomeModel {
     }
 
     var monthExpense: Int {
-        monthDays.reduce(0) { $0 + $1.expenseTotal }
+        overview.monthExpense
     }
 
     var periodRecurrings: [PeriodRecurring] {
-        let entries = list?.days
-            .flatMap(\.entries)
-            .filter { $0.recurringId != nil } ?? []
-
-        return recurrings
-            .flatMap { recurring in
-                recurring
-                    .dates(from: period.lowerBound, through: period.upperBound)
-                    .compactMap { date in
-                        let entry = entries.first { entry in
-                            recurring.isRecorded(by: entry, on: date)
-                        }
-
-                        let amount = entry?.amount
-                            ?? list?.amount(of: recurring, on: date)
-                            ?? recurring.amount
-
-                        guard entry != nil || amount > 0 else {
-                            return nil
-                        }
-
-                        return PeriodRecurring(
-                            date: date,
-                            recurring: recurring,
-                            entry: entry,
-                            status: status(of: date, entry: entry),
-                            amount: amount
-                        )
-                    }
-            }
-            .sorted { $0.date < $1.date }
+        overview.periodRecurrings
     }
 
     var recurringExpense: Int {
-        recurringTotal(of: .expense)
+        overview.recurringExpense
     }
 
     var recurringIncome: Int {
-        recurringTotal(of: .income)
+        overview.recurringIncome
     }
 
     var paidRecurringExpense: Int {
-        recurringTotal(of: .expense) { $0 == .done }
+        overview.paidRecurringExpense
     }
 
     var upcomingRecurringExpense: Int {
-        recurringTotal(of: .expense) { $0 == .upcoming }
+        overview.upcomingRecurringExpense
     }
 
     var paidRecurringRatio: Double {
-        guard recurringExpense > 0 else {
-            return 0
-        }
-
-        let ratio = Double(paidRecurringExpense) / Double(recurringExpense)
-        return min(ratio, 1)
+        overview.paidRecurringRatio
     }
 
     var monthIncome: Int {
-        monthDays.reduce(0) { $0 + $1.incomeTotal }
+        overview.monthIncome
     }
 
     var todayExpense: Int {
-        expense(on: today)
+        overview.todayExpense
     }
 
     var yesterdayExpense: Int {
-        expense(on: today.adding(days: -1))
+        overview.yesterdayExpense
     }
 
     var budgetUsage: BudgetUsage? {
-        guard let budget = budgets.amount(for: nil, in: month) else {
-            return nil
-        }
-
-        return BudgetUsage(
-            budget: budget,
-            spent: monthExpense,
-            upcoming: upcomingRecurringExpense,
-            today: today,
-            periodEnd: period.upperBound
-        )
+        overview.budgetUsage
     }
 
     var templates: [EntryTemplate] {
@@ -323,30 +274,6 @@ private extension HomeModel {
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
     static let recurringTitle = "固定費"
 
-    func status(
-        of date: LocalDate,
-        entry: Entry?
-    ) -> Status {
-        if entry != nil {
-            return .done
-        }
-
-        return date > today ? .upcoming : .missing
-    }
-
-    func recurringTotal(
-        of type: Entry.Kind,
-        where isIncluded: (Status) -> Bool = { _ in true }
-    ) -> Int {
-        periodRecurrings
-            .filter { $0.recurring.type == type && isIncluded($0.status) }
-            .reduce(0) { $0 + $1.amount }
-    }
-
-    var monthDays: [EntryDay] {
-        list?.days.filter { period.contains($0.date) } ?? []
-    }
-
     var templateUses: [EntryTemplate.ID: Int] {
         let start = today.adding(days: 1 - TemplateOrder.frequentDays)
         let days = list?.days ?? []
@@ -404,10 +331,6 @@ private extension HomeModel {
         ) { startDay in
             monthStartDay = startDay
         }
-    }
-
-    func expense(on date: LocalDate) -> Int {
-        list?.days.first { $0.date == date }?.expenseTotal ?? 0
     }
 
     func isOrdered(

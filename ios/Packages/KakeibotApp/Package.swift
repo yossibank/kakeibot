@@ -35,6 +35,7 @@ let package = Package(
             name: "WidgetFeature",
             dependencies: [
                 "DesignSystem",
+                .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
         ),
