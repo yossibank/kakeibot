@@ -88,6 +88,7 @@ struct MainView: View {
                 HomeView(
                     model: home,
                     setup: setup,
+                    isRevealed: isRevealed,
                     onOpenEntry: { id in
                         sheet = .edit(id)
                     },
@@ -186,7 +187,8 @@ struct MainView: View {
         .overlay(alignment: .bottom) {
             FloatingTabBar(
                 selection: $tab,
-                items: Self.tabItems
+                items: Self.tabItems,
+                isAddHinted: !setup.isEntryOpened
             ) {
                 sheet = .new
             }
@@ -259,6 +261,11 @@ struct MainView: View {
             if isRevealed,
                let route {
                 open(route)
+            }
+        }
+        .onChange(of: sheet) { _, sheet in
+            Task {
+                await markOpened(sheet)
             }
         }
         .onChange(of: today) { _, today in
@@ -427,7 +434,7 @@ private extension MainView {
     }
 
     func openLaunchScreen() async {
-        let screen = await (try? database.setting(.launchScreen)) ?? .entry
+        let screen = await (try? database.setting(.launchScreen)) ?? .home
 
         guard route == nil else {
             return
@@ -439,6 +446,14 @@ private extension MainView {
         case .review: tab = .review
         case .assets: tab = .assets
         case .entry: sheet = .new
+        }
+    }
+
+    func markOpened(_ sheet: Sheet?) async {
+        switch sheet {
+        case .new: await setup.markEntryOpened()
+        case .settings: await setup.markSettingsOpened()
+        default: break
         }
     }
 

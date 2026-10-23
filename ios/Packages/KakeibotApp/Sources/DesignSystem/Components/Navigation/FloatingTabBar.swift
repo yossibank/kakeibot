@@ -8,16 +8,19 @@ public struct FloatingTabBar<Value: Hashable>: View {
     @State private var addCount = 0
 
     let items: [Item]
+    let isAddHinted: Bool
     let onAdd: () -> Void
 
     public init(
         selection: Binding<Value>,
         items: [Item],
+        isAddHinted: Bool = false,
         onAdd: @escaping () -> Void
     ) {
         _selection = selection
 
         self.items = items
+        self.isAddHinted = isAddHinted
         self.onAdd = onAdd
     }
 
@@ -125,12 +128,37 @@ private extension FloatingTabBar {
                 Circle()
                     .strokeBorder(Self.goldRing, lineWidth: 1.2)
             }
+            .overlay {
+                if isAddHinted {
+                    addHint
+                }
+            }
+            .animation(.easeOut(duration: 0.3), value: isAddHinted)
             .contentShape(Circle())
         }
         .buttonStyle(PressStyle())
         .glass(tint: Palette.backgroundBottom.opacity(.strong), in: Circle())
         .shadow(color: Palette.glow.opacity(.muted), radius: 14, y: 4)
         .sensoryFeedback(.impact(weight: .light), trigger: addCount)
+    }
+
+    var addHint: some View {
+        TimelineView(.animation) { context in
+            let seconds = context.date.timeIntervalSinceReferenceDate
+            let turn = seconds.truncatingRemainder(dividingBy: Self.hintPeriod) / Self.hintPeriod
+
+            Circle()
+                .trim(from: 0, to: Self.hintLength)
+                .stroke(
+                    Palette.accentStrong,
+                    style: StrokeStyle(lineWidth: 2.4, lineCap: .round)
+                )
+                .rotationEffect(.degrees(360 * turn - 90))
+                .shadow(color: Palette.accent, radius: 6)
+                .padding(1.2)
+        }
+        .allowsHitTesting(false)
+        .transition(.opacity)
     }
 
     func tabItem(
@@ -156,6 +184,14 @@ private extension FloatingTabBar {
 }
 
 private extension FloatingTabBar {
+    static var hintPeriod: Double {
+        2.4
+    }
+
+    static var hintLength: CGFloat {
+        0.22
+    }
+
     static var sheen: LinearGradient {
         LinearGradient(
             colors: [.white.opacity(0.07), .white.opacity(0)],
@@ -283,7 +319,8 @@ private struct PressStyle: ButtonStyle {
 
         FloatingTabBar(
             selection: $selection,
-            items: items
+            items: items,
+            isAddHinted: true
         ) {}
     }
     .background(Palette.background)

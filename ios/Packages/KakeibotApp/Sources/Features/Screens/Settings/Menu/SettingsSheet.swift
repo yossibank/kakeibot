@@ -5,7 +5,7 @@ import SwiftUI
 
 public struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
-    @State private var launchScreen: LaunchScreen = .entry
+    @State private var launchScreen: LaunchScreen = .home
     @State private var startsWithAmount = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
@@ -502,7 +502,7 @@ private extension SettingsSheet {
                 launchScreen = screen
             }
         } catch {
-            launchScreen = .entry
+            launchScreen = .home
         }
     }
 

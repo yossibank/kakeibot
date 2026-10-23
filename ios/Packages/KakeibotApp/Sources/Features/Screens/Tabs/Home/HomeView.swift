@@ -9,6 +9,7 @@ public struct HomeView: View {
     @State private var orderButtonFrame: CGRect = .zero
 
     private let setup: SetupModel
+    private let isRevealed: Bool
     private let onOpenEntry: (Entry.ID) -> Void
     private let onShowRecords: () -> Void
     private let onOpenSettings: () -> Void
@@ -23,6 +24,7 @@ public struct HomeView: View {
     public init(
         model: HomeModel,
         setup: SetupModel,
+        isRevealed: Bool,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onShowRecords: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
@@ -36,6 +38,7 @@ public struct HomeView: View {
     ) {
         self.model = model
         self.setup = setup
+        self.isRevealed = isRevealed
         self.onOpenEntry = onOpenEntry
         self.onShowRecords = onShowRecords
         self.onOpenSettings = onOpenSettings
@@ -54,9 +57,9 @@ public struct HomeView: View {
                 header
                 dialCard
 
-                if setup.showsCard {
+                if showsSetupCard {
                     HomeSetupCard(model: setup, onOpen: onOpenSetup)
-                        .transition(.opacity)
+                        .transition(.offset(y: 16).combined(with: .opacity))
                 }
 
                 templateCard
@@ -65,7 +68,7 @@ public struct HomeView: View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
-            .animation(.snappy, value: setup.showsCard)
+            .animation(.snappy, value: showsSetupCard)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -93,7 +96,11 @@ private extension HomeView {
             }
 
             Spacer()
-            HeaderButton(systemImage: "gearshape", action: onOpenSettings)
+            HeaderButton(
+                systemImage: "gearshape",
+                showsDot: !setup.isSettingsOpened,
+                action: onOpenSettings
+            )
         }
     }
 
@@ -424,6 +431,10 @@ private extension HomeView {
     static let tileHeight = TemplateCardSize.regular.height
     static let shadowRoom: CGFloat = 32
     static let toolStroke = Palette.accent.opacity(.muted)
+
+    var showsSetupCard: Bool {
+        isRevealed && setup.showsCard
+    }
 
     var dialTitle: String {
         model.budgetUsage?.remainingTitle ?? "今月の支出"

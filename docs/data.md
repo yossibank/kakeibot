@@ -320,7 +320,9 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | theme_id | `system`（iPhone に合わせる）か、用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空なら `system` |
 | onboarding_completed | `true` `false` |
 | setup_card_closed | `true` なら、ホームの残りの設定のカードを出さない |
-| launch_screen | `home`・`records`・`review`・`assets`・`entry`。空なら入力シート |
+| entry_opened | `true` `false`。入力シートを一度開くと `true` にし、入力の ＋ に光を回さない |
+| settings_opened | `true` `false`。設定を一度開くと `true` にし、ホームの設定のボタンに金の点を出さない |
+| launch_screen | `home`・`records`・`review`・`assets`・`entry`。空ならホーム |
 | corner_style | `square`・`small`・`standard`・`large`。`square` は角を丸めない。空なら `standard` |
 | font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `mincho` |
 | text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `gothic` |

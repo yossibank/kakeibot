@@ -7,6 +7,8 @@ import Store
 public final class SetupModel: ScreenModel {
     public private(set) var progress: SetupProgress?
     public private(set) var isCardClosed = true
+    public private(set) var isEntryOpened = true
+    public private(set) var isSettingsOpened = true
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -43,17 +45,41 @@ public extension SetupModel {
             group.addTask {
                 await self.observeCardClosed()
             }
+
+            group.addTask {
+                await self.observeEntryOpened()
+            }
+
+            group.addTask {
+                await self.observeSettingsOpened()
+            }
         }
+    }
+
+    func markEntryOpened() async {
+        guard !isEntryOpened else {
+            return
+        }
+
+        isEntryOpened = true
+
+        await save(.entryOpened)
+    }
+
+    func markSettingsOpened() async {
+        guard !isSettingsOpened else {
+            return
+        }
+
+        isSettingsOpened = true
+
+        await save(.settingsOpened)
     }
 
     func closeCard() async {
         isCardClosed = true
 
-        do {
-            try await database.setSetting(.setupCardClosed, to: true)
-        } catch {
-            errorNotice.show(Self.saveFailedMessage)
-        }
+        await save(.setupCardClosed)
     }
 }
 
@@ -76,6 +102,32 @@ private extension SetupModel {
             failure: Self.loadFailedMessage
         ) { isClosed in
             isCardClosed = isClosed
+        }
+    }
+
+    func observeEntryOpened() async {
+        await observe(
+            database.settingUpdates(.entryOpened),
+            failure: Self.loadFailedMessage
+        ) { isOpened in
+            isEntryOpened = isOpened
+        }
+    }
+
+    func observeSettingsOpened() async {
+        await observe(
+            database.settingUpdates(.settingsOpened),
+            failure: Self.loadFailedMessage
+        ) { isOpened in
+            isSettingsOpened = isOpened
+        }
+    }
+
+    func save(_ key: SettingKey<Bool>) async {
+        do {
+            try await database.setSetting(key, to: true)
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
         }
     }
 }
