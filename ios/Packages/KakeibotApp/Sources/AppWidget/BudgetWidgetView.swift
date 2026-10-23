@@ -13,7 +13,7 @@ struct BudgetWidgetView: View {
             .padding(16)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .widgetURL(PlannedNotification.Route.home.url)
-            .widgetTheme(entry.look)
+            .widgetTheme(entry.look, style: entry.style)
     }
 }
 
@@ -200,7 +200,7 @@ private extension BudgetWidgetView {
 
 private extension BudgetWidgetView {
     func titleText(of summary: BudgetWidgetSummary) -> String {
-        summary.usage == nil ? "今月の支出" : "今月あといくら"
+        summary.usage?.remainingTitle ?? "今月の支出"
     }
 
     func amount(of summary: BudgetWidgetSummary) -> String {
@@ -208,7 +208,7 @@ private extension BudgetWidgetView {
             return AmountText.text(summary.monthExpense)
         }
 
-        return AmountText.text(usage.remaining)
+        return usage.remainingAmountText
     }
 
     func amountColor(of summary: BudgetWidgetSummary) -> Color {
@@ -246,8 +246,12 @@ private extension BudgetWidgetView {
             return [Row(title: "昨日の支出", amount: summary.yesterdayExpense)]
         }
 
+        let day = usage.isOver
+            ? Row(title: "昨日の支出", amount: summary.yesterdayExpense)
+            : Row(title: "今日の支出", amount: summary.todayExpense)
+
         return [
-            Row(title: "今日の支出", amount: summary.todayExpense),
+            day,
             Row(title: "今月の支出", amount: usage.spent)
         ]
     }

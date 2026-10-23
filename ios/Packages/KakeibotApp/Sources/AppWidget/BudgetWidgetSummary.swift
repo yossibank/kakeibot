@@ -44,14 +44,13 @@ extension BudgetWidgetSummary {
     }
 
     var today: Today {
-        guard let usage else {
+        guard
+            let usage,
+            !usage.isOver
+        else {
             let text = AmountText.text(todayExpense)
 
             return Today(title: "今日の支出", text: text, isOver: false)
-        }
-
-        if usage.isOver {
-            return Today(title: "今月", text: usage.remainingText, isOver: true)
         }
 
         let left = usage.todayRemaining(spentToday: todayExpense)
@@ -62,8 +61,8 @@ extension BudgetWidgetSummary {
             return Today(title: "今日あと", text: text, isOver: false)
         }
 
-        let text = "\(AmountText.text(-left)) 超え"
+        let text = AmountText.text(-left)
 
-        return Today(title: "今日", text: text, isOver: true)
+        return Today(title: "今日の予算オーバー", text: text, isOver: true)
     }
 }

@@ -59,7 +59,7 @@ ios/
 | App Group | `group.com.yossibank.kakeibot` | 同じ |
 | Data Protection | | `NSFileProtectionComplete` |
 | アプリアイコン | Icon Composer の `AppIcon.icon`（ホワイト）。設定で選べる色違いは、同じフォルダの `AppIcon-<色>.icon`。設定の見本を描くため、同じ絵を `Assets.xcassets` の `AppIconYen`・`AppIconDial` に写して持つ | |
-| 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | 入れない |
+| 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | アプリのものを `WidgetFonts` で読む |
 | ライセンスの一覧 | `Kakeibot/Settings.bundle`。`make licenses` で LicensePlist が作り、設定アプリに出す | 入れない |
 
 ### 署名

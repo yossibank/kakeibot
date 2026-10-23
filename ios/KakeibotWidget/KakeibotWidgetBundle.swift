@@ -8,4 +8,8 @@ struct KakeibotWidgetBundle: WidgetBundle {
         BudgetWidget()
         BudgetLockWidget()
     }
+
+    init() {
+        WidgetFonts.register()
+    }
 }

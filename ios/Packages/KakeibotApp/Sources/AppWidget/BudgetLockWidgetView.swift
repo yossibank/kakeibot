@@ -12,6 +12,7 @@ struct BudgetLockWidgetView: View {
         content
             .widgetURL(PlannedNotification.Route.home.url)
             .containerBackground(.clear, for: .widget)
+            .environment(\.themeStyle, entry.style)
     }
 }
 
@@ -36,18 +37,21 @@ private extension BudgetLockWidgetView {
             }
         } else {
             Text("アプリを開くと出ます")
-                .font(.caption)
+                .textFont(.caption)
         }
     }
 
     @ViewBuilder
     func circular(_ summary: BudgetWidgetSummary) -> some View {
-        if let usage = summary.usage {
+        if let usage = summary.usage,
+           !usage.isOver {
             Gauge(value: 1 - usage.progress) {
                 Text("あと")
             } currentValueLabel: {
                 Text(shortAmount(usage.remaining))
+                    .displayFont(.body, weight: .bold)
                     .monospacedDigit()
+                    .minimumScaleFactor(0.5)
                     .privacySensitive()
             }
             .gaugeStyle(.accessoryCircularCapacity)
@@ -56,14 +60,16 @@ private extension BudgetLockWidgetView {
                 AccessoryWidgetBackground()
 
                 VStack(spacing: 0) {
-                    Text("支出")
-                        .font(.caption2)
+                    Text(circularTitle(of: summary))
+                        .textFont(.caption2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
 
-                    Text(shortAmount(summary.monthExpense))
-                        .font(.headline)
+                    Text(shortAmount(mainAmount(of: summary)))
+                        .displayFont(.body, weight: .bold)
                         .monospacedDigit()
                         .lineLimit(1)
-                        .minimumScaleFactor(0.6)
+                        .minimumScaleFactor(0.5)
                         .privacySensitive()
                 }
                 .padding(.horizontal, 4)
@@ -75,20 +81,20 @@ private extension BudgetLockWidgetView {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .firstTextBaseline) {
                 Text(headline(of: summary))
-                    .font(.caption)
+                    .textFont(.caption)
                     .lineLimit(1)
 
                 Spacer(minLength: 4)
 
                 if let usage = summary.usage {
                     Text("あと \(usage.daysLeft) 日")
-                        .font(.caption2)
+                        .textFont(.caption2)
                         .foregroundStyle(.secondary)
                 }
             }
 
             Text(AmountText.text(mainAmount(of: summary)))
-                .font(.title3.weight(.bold))
+                .displayFont(.headline, weight: .bold)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
@@ -96,7 +102,7 @@ private extension BudgetLockWidgetView {
                 .privacySensitive()
 
             Text(detail(of: summary))
-                .font(.caption)
+                .textFont(.caption)
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
@@ -107,10 +113,9 @@ private extension BudgetLockWidgetView {
     }
 
     func inline(_ summary: BudgetWidgetSummary) -> some View {
-        let label = summary.usage == nil ? "今月の支出" : "今月あと"
         let amount = AmountText.text(mainAmount(of: summary))
 
-        return Text("\(label) \(amount)")
+        return Text("\(inlineTitle(of: summary)) \(amount)")
             .monospacedDigit()
             .privacySensitive()
     }
@@ -120,15 +125,27 @@ private extension BudgetLockWidgetView {
     nonisolated static let locale = Locale(identifier: "ja_JP")
 
     func headline(of summary: BudgetWidgetSummary) -> String {
+        summary.usage?.remainingTitle ?? "今月の支出"
+    }
+
+    func circularTitle(of summary: BudgetWidgetSummary) -> String {
+        summary.usage == nil ? "支出" : "オーバー"
+    }
+
+    func inlineTitle(of summary: BudgetWidgetSummary) -> String {
         guard let usage = summary.usage else {
             return "今月の支出"
         }
 
-        return usage.isOver ? "予算を超えています" : "今月あといくら"
+        return usage.isOver ? "予算オーバー" : "今月あと"
     }
 
     func mainAmount(of summary: BudgetWidgetSummary) -> Int {
-        summary.usage?.remaining ?? summary.monthExpense
+        guard let usage = summary.usage else {
+            return summary.monthExpense
+        }
+
+        return abs(usage.remaining)
     }
 
     func detail(of summary: BudgetWidgetSummary) -> String {
@@ -138,20 +155,17 @@ private extension BudgetLockWidgetView {
     }
 
     func shortAmount(_ amount: Int) -> String {
-        let sign = amount < 0 ? "−" : ""
-        let value = abs(amount)
-
-        guard value >= 10000 else {
-            return "\(sign)\(value.formatted(.number.locale(Self.locale)))"
+        guard amount >= 10000 else {
+            return amount.formatted(.number.locale(Self.locale))
         }
 
-        let man = Double(value) / 10000
+        let man = Double(amount) / 10000
 
         let format = FloatingPointFormatStyle<Double>.number
             .precision(.fractionLength(0...1))
             .rounded(rule: .down)
             .locale(Self.locale)
 
-        return "\(sign)\(man.formatted(format))万"
+        return "\(man.formatted(format))万"
     }
 }
