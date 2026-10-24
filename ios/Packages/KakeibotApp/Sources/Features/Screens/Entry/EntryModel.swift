@@ -107,7 +107,7 @@ public extension EntryModel {
         }
     }
 
-    static let categoriesPerPage = 20
+    static let categoriesPerPage = 15
 
     static let destinationTitle = "振替先"
 

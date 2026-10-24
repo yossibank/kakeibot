@@ -47,7 +47,8 @@ struct EntryPreviewCard: View {
                 detail: model.previewDetail,
                 memo: model.previewMemo,
                 amount: model.amount,
-                type: model.type
+                type: model.type,
+                foldsMemo: false
             )
             .padding(.top, 4)
             .overlay(alignment: .top) {

@@ -546,7 +546,7 @@ private extension MainView {
 private extension View {
     func tabContent() -> some View {
         toolbar(.hidden, for: .tabBar)
-            .safeAreaPadding(.bottom, FloatingTabBar<Int>.height)
+            .safeAreaPadding(.bottom, FloatingTabBar<Int>.clearance)
     }
 }
 

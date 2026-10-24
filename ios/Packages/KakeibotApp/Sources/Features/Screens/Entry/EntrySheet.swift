@@ -695,7 +695,7 @@ private extension EntrySheet {
     )
 
     static let fade: CGFloat = 20
-    static let categoryRows = 4
+    static let categoryRows = 3
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54

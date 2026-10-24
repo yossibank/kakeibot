@@ -7,13 +7,18 @@ struct EntryMemo: View {
     @State private var lineHeight: CGFloat = 0
 
     let text: String
+    let isFoldable: Bool
 
-    init(_ text: String) {
+    init(
+        _ text: String,
+        isFoldable: Bool = true
+    ) {
         self.text = text
+        self.isFoldable = isFoldable
     }
 
     var body: some View {
-        let limit = isExpanded ? nil : Self.lineLimit
+        let limit = isExpanded || !isFoldable ? nil : Self.lineLimit
 
         shownText
             .textFont(.caption)
