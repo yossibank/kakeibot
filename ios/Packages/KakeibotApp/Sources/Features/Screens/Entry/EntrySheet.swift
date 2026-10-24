@@ -17,6 +17,7 @@ public struct EntrySheet: View {
     @State private var sheetWidth: CGFloat = 0
     @State private var drawerHeight: CGFloat = 0
     @State private var deletion: Deletion?
+    @State private var notice: EntryNoticeModel
 
     @FocusState private var isMemoFocused: Bool
 
@@ -30,6 +31,7 @@ public struct EntrySheet: View {
         onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+        _notice = State(initialValue: EntryNoticeModel(database: model.database))
 
         self.onChange = onChange
     }
@@ -68,6 +70,14 @@ public struct EntrySheet: View {
             .deletionNotice($deletion, bottom: bannerBottom) { deletion in
                 Task {
                     await model.restore(deletion)
+                }
+            }
+            .entryNotice(notice, above: bannerBottom - 12)
+            .onChange(of: notice.notice) {
+                if notice.notice == .undone {
+                    Task {
+                        await model.reloadWallets()
+                    }
                 }
             }
             .background {
@@ -115,12 +125,7 @@ private extension EntrySheet {
                 .padding(.vertical, -Self.fade)
             }
 
-            PrimaryButton(model.saveTitle) {
-                Task {
-                    await save()
-                }
-            }
-            .disabled(!model.canSave)
+            saveButtons
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -336,6 +341,23 @@ private extension EntrySheet {
                 count: model.categoryPages.count,
                 current: categoryPage ?? 0
             )
+            .frame(maxWidth: .infinity)
+            .overlay(alignment: .trailing) {
+                Button {
+                    open(.categories)
+                } label: {
+                    HStack(spacing: 2) {
+                        Text("編集")
+
+                        Image(systemName: "chevron.right")
+                    }
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.accent)
+                    .frame(minHeight: 32)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            }
 
             if !model.hasOpenedCategoryMenu {
                 Label("長押しで編集・非表示", systemImage: "hand.tap")
@@ -356,12 +378,7 @@ private extension EntrySheet {
                 model.press(key)
             }
 
-            PrimaryButton(model.saveTitle) {
-                Task {
-                    await save()
-                }
-            }
-            .disabled(!model.canSave)
+            saveButtons
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -380,6 +397,38 @@ private extension EntrySheet {
         } action: { height in
             drawerHeight = height
         }
+    }
+
+    var saveButtons: some View {
+        HStack(spacing: 8) {
+            PrimaryButton(model.saveTitle) {
+                Task {
+                    await save()
+                }
+            }
+
+            if !model.isEditing {
+                Button {
+                    Task {
+                        await saveAndContinue()
+                    }
+                } label: {
+                    Label("続ける", systemImage: "plus")
+                        .textFont(.footnote, weight: .bold)
+                        .foregroundStyle(Palette.accent)
+                        .padding(.horizontal, 16)
+                        .frame(minHeight: 56)
+                        .overlay {
+                            Capsule()
+                                .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 1)
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .opacity(model.canSave ? 1 : 0.4)
+            }
+        }
+        .disabled(!model.canSave)
     }
 
     @ViewBuilder
@@ -604,6 +653,14 @@ private extension EntrySheet {
             )
         case .newTemplate:
             TemplateEditSheet(model: model.newTemplateModel())
+        case .categories:
+            NavigationStack {
+                CategoryListView(
+                    database: model.database,
+                    kind: model.type == .income ? .income : .expense
+                )
+                .toolbar(.hidden, for: .navigationBar)
+            }
         }
     }
 }
@@ -621,6 +678,7 @@ private extension EntrySheet {
         case editCategory(EntryCategory)
         case addTag(EntryCategory)
         case newTemplate
+        case categories
 
         var id: Self {
             self
@@ -829,6 +887,17 @@ private extension EntrySheet {
 
         onChange(change)
         dismiss()
+    }
+
+    func saveAndContinue() async {
+        guard let change = await model.save() else {
+            return
+        }
+
+        await model.startNext()
+
+        notice.show(change)
+        setEnteringAmount(true)
     }
 
     func delete() async {

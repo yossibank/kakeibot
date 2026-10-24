@@ -13,7 +13,7 @@ public struct WalletEditSheet: View {
     @State private var isConfirmingDelete = false
     @State private var isEditingPayment = false
     @State private var isAskingPayment = false
-    @State private var addedLoan: Wallet?
+    @State private var addedWallet: Wallet?
 
     @FocusState private var focus: Field?
 
@@ -134,17 +134,17 @@ public struct WalletEditSheet: View {
         .sheet(isPresented: $isEditingPayment) {
             closePayment()
         } content: {
-            RecurringEditSheet(model: model.paymentModel(for: addedLoan?.id))
+            RecurringEditSheet(model: model.paymentModel(for: addedWallet?.id))
         }
         .confirmation(
             isPresented: $isAskingPayment,
             systemImage: "repeat",
-            title: "毎月の返済も決めますか",
-            message: "固定費として、返済の日と額を決められます",
+            title: model.paymentQuestion,
+            message: model.paymentQuestionNote,
             keepTitle: "あとで",
             confirmTitle: "決める",
             role: .suggestion,
-            onKeep: finishAddedLoan
+            onKeep: finishAddedWallet
         ) {
             isEditingPayment = true
         }
@@ -598,20 +598,20 @@ private extension WalletEditSheet {
             return
         }
 
-        guard !model.isEditing, wallet.kind == .loan else {
+        guard !model.isEditing, model.asksPayment else {
             onSave(wallet)
             dismiss()
 
             return
         }
 
-        addedLoan = wallet
+        addedWallet = wallet
         isAskingPayment = true
     }
 
     func closePayment() {
-        guard addedLoan == nil else {
-            finishAddedLoan()
+        guard addedWallet == nil else {
+            finishAddedWallet()
 
             return
         }
@@ -621,12 +621,12 @@ private extension WalletEditSheet {
         }
     }
 
-    func finishAddedLoan() {
-        guard let addedLoan else {
+    func finishAddedWallet() {
+        guard let addedWallet else {
             return
         }
 
-        onSave(addedLoan)
+        onSave(addedWallet)
         dismiss()
     }
 

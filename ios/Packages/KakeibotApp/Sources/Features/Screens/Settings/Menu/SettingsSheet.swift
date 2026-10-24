@@ -7,6 +7,7 @@ public struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
     @State private var launchScreen: LaunchScreen = .home
     @State private var startsWithAmount = false
+    @State private var categoriesByUse = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
     @State private var theme: ThemeChoice = .system
@@ -44,7 +45,7 @@ public struct SettingsSheet: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 8) {
-                            sectionTitle("入力")
+                            sectionTitle("記録")
 
                             VStack(spacing: 0) {
                                 NavigationLink {
@@ -84,14 +85,6 @@ public struct SettingsSheet: View {
                                 } label: {
                                     row("固定費", systemImage: "repeat")
                                 }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    StampListView(database: database)
-                                } label: {
-                                    row("スタンプ", systemImage: "seal")
-                                }
                             }
                             .buttonStyle(.plain)
                             .padding(.horizontal, 16)
@@ -120,6 +113,18 @@ public struct SettingsSheet: View {
 
                                 Hairline()
 
+                                pickerRow(
+                                    "週の始まり",
+                                    systemImage: "calendar.day.timeline.left"
+                                ) {
+                                    CapsulePicker(
+                                        selection: weekStartBinding,
+                                        options: Weekday.weekStartOptions
+                                    )
+                                }
+
+                                Hairline()
+
                                 NavigationLink {
                                     BudgetListView(
                                         model: BudgetListModel(
@@ -130,6 +135,21 @@ public struct SettingsSheet: View {
                                 } label: {
                                     row("予算", systemImage: "chart.bar")
                                 }
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 16)
+                            .card()
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            sectionTitle("楽しみ")
+
+                            VStack(spacing: 0) {
+                                NavigationLink {
+                                    StampListView(database: database)
+                                } label: {
+                                    row("スタンプ", systemImage: "seal")
+                                }
 
                                 Hairline()
 
@@ -137,18 +157,6 @@ public struct SettingsSheet: View {
                                     RewardRuleListView(database: database)
                                 } label: {
                                     row("ごほうび", systemImage: "gift")
-                                }
-
-                                Hairline()
-
-                                pickerRow(
-                                    "週の始まり",
-                                    systemImage: "calendar.day.timeline.left"
-                                ) {
-                                    CapsulePicker(
-                                        selection: weekStartBinding,
-                                        options: Weekday.weekStartOptions
-                                    )
                                 }
                             }
                             .buttonStyle(.plain)
@@ -233,7 +241,19 @@ public struct SettingsSheet: View {
                                 ) {
                                     CapsulePicker(
                                         selection: startsWithAmountBinding,
-                                        options: Self.startOptions
+                                        options: Self.flagOptions
+                                    )
+                                }
+
+                                Hairline()
+
+                                pickerRow(
+                                    "よく使うカテゴリを先に",
+                                    systemImage: "arrow.up.arrow.down"
+                                ) {
+                                    CapsulePicker(
+                                        selection: categoriesByUseBinding,
+                                        options: Self.flagOptions
                                     )
                                 }
 
@@ -324,6 +344,11 @@ public struct SettingsSheet: View {
             let starts = try? await database.setting(.entryStartsWithAmount)
 
             startsWithAmount = starts ?? false
+        }
+        .task {
+            let byUse = try? await database.setting(.categoriesByUse)
+
+            categoriesByUse = byUse ?? false
         }
     }
 }
@@ -462,7 +487,7 @@ private extension SettingsSheet {
 private extension SettingsSheet {
     static let valueScale: CGFloat = 0.7
 
-    static let startOptions: [CapsulePicker<Bool>.Option] = [
+    static let flagOptions: [CapsulePicker<Bool>.Option] = [
         .init("する", value: true),
         .init("しない", value: false)
     ]
@@ -482,6 +507,18 @@ private extension SettingsSheet {
                     .entryStartsWithAmount,
                     to: starts
                 )
+            }
+        }
+    }
+
+    var categoriesByUseBinding: Binding<Bool> {
+        Binding {
+            categoriesByUse
+        } set: { byUse in
+            categoriesByUse = byUse
+
+            Task {
+                try? await database.setSetting(.categoriesByUse, to: byUse)
             }
         }
     }

@@ -88,7 +88,21 @@ public extension WalletEditModel {
     }
 
     var paymentTitle: String {
-        kind == .loan ? "毎月の返済" : "引き落とし"
+        kind == .loan ? "毎月の返済" : "締め日と引き落とし"
+    }
+
+    var asksPayment: Bool {
+        Self.isDebt(kind)
+    }
+
+    var paymentQuestion: String {
+        kind == .loan ? "毎月の返済も決めますか" : "締め日と引き落としも決めますか"
+    }
+
+    var paymentQuestionNote: String {
+        kind == .loan
+            ? "固定費として、返済の日と額を決められます"
+            : "締め日までの利用分を、引き落とし日に銀行から振り替えます"
     }
 
     var paymentText: String {

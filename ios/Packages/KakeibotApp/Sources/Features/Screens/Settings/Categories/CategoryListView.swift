@@ -24,11 +24,17 @@ public struct CategoryListView: View {
 
     private let database: AppDatabase
 
-    public init(database: AppDatabase) {
+    public init(
+        database: AppDatabase,
+        kind: EntryCategory.Kind = .expense
+    ) {
         let hintFlag = SettingsScreenFlag.closedHint(.categories, in: database)
         let hiddenList = SettingsScreenFlag.openHiddenList(.categories, in: database)
+        let model = CategoryListModel(database: database)
 
-        _model = State(initialValue: CategoryListModel(database: database))
+        model.kind = kind
+
+        _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
         _hiddenList = State(initialValue: hiddenList)
 
