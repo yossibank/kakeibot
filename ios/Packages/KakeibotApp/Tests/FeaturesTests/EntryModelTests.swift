@@ -310,6 +310,79 @@ struct EntryModelTests {
 
         #expect(model.billMonth == nil)
     }
+
+    @Test
+    func followsLastWalletOfCategory() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let categories = options.expenseCategories
+        let wallets = options.wallets
+        try await setup.saveEntry(category: categories[0].id, wallet: wallets[1].id, at: 1)
+        try await setup.saveEntry(category: categories[1].id, wallet: wallets[0].id, at: 2)
+        let model = EntryModel(database: setup.database, date: setup.date)
+
+        await model.load()
+        let first = model.walletId
+        model.categoryId = categories[1].id
+        let second = model.walletId
+
+        #expect(first == wallets[1].id)
+        #expect(second == wallets[0].id)
+    }
+
+    @Test
+    func keepsChosenWallet() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let categories = options.expenseCategories
+        let wallets = options.wallets
+        try await setup.saveEntry(category: categories[1].id, wallet: wallets[0].id, at: 1)
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        model.categoryId = categories[1].id
+        model.walletId = wallets[1].id
+        model.categoryId = categories[2].id
+
+        #expect(model.walletId == wallets[1].id)
+    }
+
+    @Test
+    func startsNextEntryKeepingChoices() async throws {
+        let model = try await Self.newModel()
+        model.press(.digit(5))
+        model.memo = "ランチ"
+        let category = model.categoryId
+        let wallet = model.walletId
+
+        _ = await model.save()
+        await model.startNext()
+
+        #expect(model.amount == 0)
+        #expect(model.memo.isEmpty)
+        #expect(model.categoryId == category)
+        #expect(model.walletId == wallet)
+        #expect(!model.isChanged)
+    }
+
+    @Test
+    func ordersCategoriesByUseWhenChosen() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let third = options.expenseCategories[2]
+        let wallet = options.wallets[0]
+        try await setup.saveEntry(category: third.id, wallet: wallet.id, at: 1)
+        let manual = EntryModel(database: setup.database, date: setup.date)
+        await manual.load()
+        try await setup.database.setSetting(.categoriesByUse, to: true)
+        let model = EntryModel(database: setup.database, date: setup.date)
+
+        await model.load()
+
+        #expect(manual.categoryId == options.expenseCategories[0].id)
+        #expect(model.categoryId == third.id)
+        #expect(model.categoryPages.first?.first?.categoryId == third.id)
+    }
 }
 
 extension EntryModelTests {
@@ -342,6 +415,24 @@ extension EntryModelTests.Setup {
 
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         return try await database.saveEntry(draft, at: now)
+    }
+
+    func saveEntry(
+        category categoryId: EntryCategory.ID,
+        wallet walletId: Wallet.ID,
+        at seconds: TimeInterval
+    ) async throws {
+        let draft = EntryDraft(
+            type: .expense,
+            amount: 500,
+            date: LocalDate(Date(), in: .current),
+            categoryId: categoryId,
+            walletId: walletId
+        )
+
+        let createdAt = Date(timeIntervalSince1970: seconds)
+
+        try await database.saveEntry(draft, at: createdAt)
     }
 
     func cardWithBill() async throws -> Wallet {

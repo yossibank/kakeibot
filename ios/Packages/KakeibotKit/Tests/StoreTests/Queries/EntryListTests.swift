@@ -110,4 +110,77 @@ struct EntryListTests {
         #expect(options.expenseCategories == remaining)
         #expect(options.wallets.map(\.name) == ["銀行", "財布"])
     }
+
+    @Test
+    func countsCategoryUsesWithinFrequentDays() throws {
+        let today = try #require(LocalDate("2026-10-24"))
+        let food = EntryCategory.ID()
+        let fun = EntryCategory.ID()
+
+        let entries = [
+            Self.entry(food, on: today),
+            Self.entry(food, on: today.adding(days: -89)),
+            Self.entry(food, on: today.adding(days: -90)),
+            Self.entry(fun, on: today, recurringId: Recurring.ID())
+        ]
+
+        let list = Self.list(entries)
+
+        #expect(list.categoryUses(through: today) == [food: 2])
+    }
+
+    @Test
+    func findsLastWalletByCategory() throws {
+        let today = try #require(LocalDate("2026-10-24"))
+        let food = EntryCategory.ID()
+        let fun = EntryCategory.ID()
+        let cash = Wallet.ID()
+        let bank = Wallet.ID()
+        let card = Wallet.ID()
+
+        let entries = [
+            Self.entry(food, on: today, wallet: cash, createdAt: 1),
+            Self.entry(food, on: today, wallet: bank, createdAt: 2),
+            Self.entry(fun, on: today, wallet: card, createdAt: 3)
+        ]
+
+        let list = Self.list(entries)
+
+        #expect(list.lastWalletId(for: .expense, category: food) == bank)
+        #expect(list.lastWalletId(for: .expense, category: nil) == card)
+        #expect(list.lastWalletId(for: .income, category: nil) == nil)
+    }
+}
+
+private extension EntryListTests {
+    static func entry(
+        _ categoryId: EntryCategory.ID,
+        on date: LocalDate,
+        wallet walletId: Wallet.ID = Wallet.ID(),
+        createdAt seconds: TimeInterval = 0,
+        recurringId: Recurring.ID? = nil
+    ) -> Entry {
+        let createdAt = Date(timeIntervalSince1970: seconds)
+
+        return Entry(
+            type: .expense,
+            amount: 500,
+            date: date,
+            categoryId: categoryId,
+            walletId: walletId,
+            recurringId: recurringId,
+            createdAt: createdAt,
+            updatedAt: createdAt
+        )
+    }
+
+    static func list(_ entries: [Entry]) -> EntryList {
+        EntryList(
+            days: EntryDay.grouping(entries),
+            categories: [:],
+            tags: [:],
+            wallets: [:],
+            icons: [:]
+        )
+    }
 }

@@ -14,6 +14,8 @@ public struct RecordsView: View {
     @State private var rewardTarget: StampTarget?
     @State private var stampCount = 0
     @State private var isFiltering = false
+    @State private var selection: Set<Entry.ID>?
+    @State private var batchTarget: RecordsBatchSheet.Target?
 
     @FocusState private var isSearchFocused: Bool
 
@@ -21,19 +23,25 @@ public struct RecordsView: View {
     private let onDelete: (Entry.ID) -> Void
     private let onAddEntry: (LocalDate) -> Void
     private let onOpenRecurring: (Recurring.ID) -> Void
+    private let onChangeEntries: ([Entry.ID], EntryBatchChange) -> Void
+    private let onDeleteEntries: ([Entry.ID]) -> Void
 
     public init(
         model: RecordsModel,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onDelete: @escaping (Entry.ID) -> Void,
         onAddEntry: @escaping (LocalDate) -> Void,
-        onOpenRecurring: @escaping (Recurring.ID) -> Void
+        onOpenRecurring: @escaping (Recurring.ID) -> Void,
+        onChangeEntries: @escaping ([Entry.ID], EntryBatchChange) -> Void,
+        onDeleteEntries: @escaping ([Entry.ID]) -> Void
     ) {
         self.model = model
         self.onOpenEntry = onOpenEntry
         self.onDelete = onDelete
         self.onAddEntry = onAddEntry
         self.onOpenRecurring = onOpenRecurring
+        self.onChangeEntries = onChangeEntries
+        self.onDeleteEntries = onDeleteEntries
     }
 
     public var body: some View {
@@ -54,6 +62,11 @@ public struct RecordsView: View {
                         )
 
                         Spacer()
+
+                        if model.layout == .list {
+                            selectButton
+                        }
+
                         filterButton
 
                         toolButton(systemImage: "magnifyingglass") {
@@ -74,6 +87,21 @@ public struct RecordsView: View {
             .padding(.bottom, 24)
         }
         .scrollDismissesKeyboard(.interactively)
+        .safeAreaInset(edge: .bottom) {
+            if let selection {
+                selectionBar(selection)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .onChange(of: model.layout) {
+            finishSelecting()
+        }
+        .onChange(of: model.month) {
+            finishSelecting()
+        }
+        .onChange(of: model.isSearching) {
+            finishSelecting()
+        }
         .sensoryFeedback(.selection, trigger: model.month)
         .sensoryFeedback(.selection, trigger: model.selectedDate)
         .errorBanner(model.errorNotice) {
@@ -84,6 +112,16 @@ public struct RecordsView: View {
         }
         .sheet(item: $rewardTarget) { target in
             RecordsRewardSheet(model: model, date: target.date)
+        }
+        .sheet(item: $batchTarget) { target in
+            RecordsBatchSheet(
+                model: model,
+                target: target,
+                count: selection?.count ?? 0
+            ) { change in
+                onChangeEntries(Array(selection ?? []), change)
+                finishSelecting()
+            }
         }
         .sheet(isPresented: $isFiltering) {
             RecordsFilterSheet(filter: $model.filter, list: model.list)
@@ -401,6 +439,31 @@ private extension RecordsView {
         }
     }
 
+    var selectButton: some View {
+        let isSelecting = selection != nil
+
+        return Button {
+            openId = nil
+
+            withAnimation(.snappy) {
+                selection = isSelecting ? nil : []
+            }
+        } label: {
+            Text(isSelecting ? "完了" : "選択")
+                .textFont(.footnote)
+                .foregroundStyle(Palette.accent)
+                .padding(.horizontal, 14)
+                .frame(height: 36)
+                .overlay {
+                    Capsule()
+                        .stroke(Palette.line, lineWidth: 1)
+                }
+                .frame(minHeight: 44)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
     func searchSummary(_ summary: RecordsModel.SearchSummary) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
@@ -409,6 +472,7 @@ private extension RecordsView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
 
+                selectButton
                 Spacer()
 
                 Text(PeriodText.range(summary.range))
@@ -671,26 +735,124 @@ private extension RecordsView {
         .card()
     }
 
+    @ViewBuilder
     func swipeRow(_ row: EntryRowItem) -> some View {
-        SwipeRow(id: row.id, openId: $openId) {
-            onOpenEntry(row.id)
-        } onAction: {
-            onDelete(row.id)
-        } content: {
-            EntryRow(
-                icon: row.icon,
-                title: row.title,
-                tag: row.tag,
-                detail: row.detail,
-                memo: row.memo,
-                amount: row.amount,
-                type: row.type,
-                isRecurring: row.isRecurring
-            )
+        if let selection {
+            let isSelected = selection.contains(row.id)
+            let mark = isSelected ? "checkmark.circle.fill" : "circle"
+
+            Button {
+                toggleSelection(row.id)
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: mark)
+                        .sansFont(.headline)
+                        .foregroundStyle(Palette.accent)
+                        .contentTransition(.symbolEffect(.replace))
+
+                    entryRow(row)
+                }
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+            .overlay(alignment: .top) {
+                Hairline(thickness: 1)
+            }
+        } else {
+            SwipeRow(id: row.id, openId: $openId) {
+                onOpenEntry(row.id)
+            } onAction: {
+                onDelete(row.id)
+            } content: {
+                entryRow(row)
+            }
+            .overlay(alignment: .top) {
+                Hairline(thickness: 1)
+            }
         }
-        .overlay(alignment: .top) {
-            Hairline(thickness: 1)
+    }
+
+    func entryRow(_ row: EntryRowItem) -> some View {
+        EntryRow(
+            icon: row.icon,
+            title: row.title,
+            tag: row.tag,
+            detail: row.detail,
+            memo: row.memo,
+            amount: row.amount,
+            type: row.type,
+            isRecurring: row.isRecurring
+        )
+    }
+
+    func selectionBar(_ selection: Set<Entry.ID>) -> some View {
+        let type = model.batchType(of: selection)
+        let canChangeWallet = !selection.isEmpty && !model.hasTransfer(in: selection)
+
+        return HStack(spacing: 4) {
+            Text("\(selection.count) 件")
+                .textFont(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+                .padding(.leading, 8)
+
+            Spacer(minLength: 4)
+
+            barButton(
+                "カテゴリ",
+                systemImage: "tag",
+                isEnabled: type != nil
+            ) {
+                if let type {
+                    batchTarget = .category(type)
+                }
+            }
+
+            barButton(
+                "口座",
+                systemImage: "building.columns",
+                isEnabled: canChangeWallet
+            ) {
+                batchTarget = .wallet
+            }
+
+            barButton(
+                "削除",
+                systemImage: "trash",
+                isEnabled: !selection.isEmpty
+            ) {
+                onDeleteEntries(Array(selection))
+                finishSelecting()
+            }
         }
+        .padding(.horizontal, 8)
+        .frame(minHeight: 56)
+        .background(Palette.panel, in: .capsule)
+        .overlay {
+            Capsule()
+                .stroke(Palette.outline, lineWidth: 1)
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+    }
+
+    func barButton(
+        _ title: String,
+        systemImage: String,
+        isEnabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+                .textFont(.footnote)
+                .foregroundStyle(Palette.accent)
+                .padding(.horizontal, 10)
+                .frame(minHeight: 44)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.4)
     }
 
     func stampSheet(on date: LocalDate) -> some View {
@@ -867,6 +1029,26 @@ private extension RecordsView {
         }
 
         return date.tint ?? Palette.text
+    }
+
+    func toggleSelection(_ id: Entry.ID) {
+        guard var selected = selection else {
+            return
+        }
+
+        if selected.contains(id) {
+            selected.remove(id)
+        } else {
+            selected.insert(id)
+        }
+
+        selection = selected
+    }
+
+    func finishSelecting() {
+        withAnimation(.snappy) {
+            selection = nil
+        }
     }
 
     func openSearch() {

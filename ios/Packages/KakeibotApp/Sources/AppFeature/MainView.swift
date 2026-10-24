@@ -145,6 +145,16 @@ struct MainView: View {
                     },
                     onOpenRecurring: { id in
                         sheet = .recurring(id)
+                    },
+                    onChangeEntries: { ids, change in
+                        Task {
+                            await notice.changeEntries(ids, to: change)
+                        }
+                    },
+                    onDeleteEntries: { ids in
+                        Task {
+                            await notice.deleteEntries(ids)
+                        }
                     }
                 )
                 .tabContent()
@@ -182,6 +192,9 @@ struct MainView: View {
                     },
                     onOpenEntry: { id in
                         sheet = .edit(id)
+                    },
+                    onMarkReward: {
+                        sheet = .reward
                     }
                 )
                 .tabContent()
@@ -354,6 +367,8 @@ private extension MainView {
                 )
                 .toolbar(.hidden, for: .navigationBar)
             }
+        case .reward:
+            RecordsRewardSheet(model: records, date: today)
         case .periodRecurrings:
             PeriodRecurringSheet(
                 model: home,
@@ -395,6 +410,7 @@ private extension MainView {
         case recurring(Recurring.ID)
         case periodRecurrings
         case setup(SetupItem)
+        case reward
 
         var id: Self {
             self

@@ -15,19 +15,22 @@ public struct AssetsView: View {
     private let onOpenWallet: (Wallet.ID) -> Void
     private let onOpenRecurring: (Recurring.ID) -> Void
     private let onOpenEntry: (Entry.ID) -> Void
+    private let onMarkReward: () -> Void
 
     public init(
         model: AssetsModel,
         onTransfer: @escaping () -> Void,
         onOpenWallet: @escaping (Wallet.ID) -> Void,
         onOpenRecurring: @escaping (Recurring.ID) -> Void,
-        onOpenEntry: @escaping (Entry.ID) -> Void
+        onOpenEntry: @escaping (Entry.ID) -> Void,
+        onMarkReward: @escaping () -> Void
     ) {
         self.model = model
         self.onTransfer = onTransfer
         self.onOpenWallet = onOpenWallet
         self.onOpenRecurring = onOpenRecurring
         self.onOpenEntry = onOpenEntry
+        self.onMarkReward = onMarkReward
     }
 
     public var body: some View {
@@ -141,12 +144,34 @@ private extension AssetsView {
     }
 
     var rewardCard: some View {
-        Button {
-            isShowingReward = true
-        } label: {
-            rewardCardBody
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                isShowingReward = true
+            } label: {
+                rewardCardBody
+            }
+            .buttonStyle(.plain)
+
+            Button(action: onMarkReward) {
+                Label("今日の達成を付ける", systemImage: "gift")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.accent)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .overlay {
+                        Capsule()
+                            .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+                    }
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
+        .padding(16)
+        .card()
+        .overlay {
+            if model.isRewardGoalReached {
+                reachedGlow
+            }
+        }
     }
 
     var rewardCardBody: some View {
@@ -194,11 +219,7 @@ private extension AssetsView {
                 goalLine(goal)
             }
 
-            if model.recentRewards.isEmpty {
-                Text("記録の日の見出しの贈り物のボタンから、達成を付けられます")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-            } else {
+            if !model.recentRewards.isEmpty {
                 VStack(spacing: 8) {
                     ForEach(model.recentRewards) { log in
                         rewardRow(log)
@@ -206,13 +227,7 @@ private extension AssetsView {
                 }
             }
         }
-        .padding(16)
-        .card()
-        .overlay {
-            if model.isRewardGoalReached {
-                reachedGlow
-            }
-        }
+        .contentShape(.rect)
     }
 
     var reachedGlow: some View {

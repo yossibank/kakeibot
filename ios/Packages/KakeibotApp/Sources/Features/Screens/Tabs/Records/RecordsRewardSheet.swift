@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct RecordsRewardSheet: View {
+public struct RecordsRewardSheet: View {
     @State private var isAddingRule = false
 
     @Environment(\.dismiss) private var dismiss
@@ -11,7 +11,15 @@ struct RecordsRewardSheet: View {
     let model: RecordsModel
     let date: LocalDate
 
-    var body: some View {
+    public init(
+        model: RecordsModel,
+        date: LocalDate
+    ) {
+        self.model = model
+        self.date = date
+    }
+
+    public var body: some View {
         FittedSheet {
             VStack(spacing: 20) {
                 header
