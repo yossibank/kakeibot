@@ -133,7 +133,7 @@ struct SettingWriteTests {
         try await database.setSetting(.launchScreen, to: .records)
         let saved = try await database.setting(.launchScreen)
 
-        #expect(initial == .entry)
+        #expect(initial == .home)
         #expect(saved == .records)
     }
 

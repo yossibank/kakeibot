@@ -5,13 +5,12 @@ import SwiftUI
 
 public struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
-    @State private var launchScreen: LaunchScreen = .entry
+    @State private var launchScreen: LaunchScreen = .home
     @State private var startsWithAmount = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
     @State private var theme: ThemeChoice = .system
     @State private var customThemes: [Theme] = []
-    @State private var appIcon = AppIconListModel()
 
     #if DEBUG
     @State private var isConfirmingSample = false
@@ -25,13 +24,16 @@ public struct SettingsSheet: View {
 
     private let database: AppDatabase
     private let today: LocalDate
+    private let appIcon: AppIconListModel
 
     public init(
         database: AppDatabase,
-        today: LocalDate
+        today: LocalDate,
+        appIcon: AppIconListModel
     ) {
         self.database = database
         self.today = today
+        self.appIcon = appIcon
     }
 
     public var body: some View {
@@ -502,7 +504,7 @@ private extension SettingsSheet {
                 launchScreen = screen
             }
         } catch {
-            launchScreen = .entry
+            launchScreen = .home
         }
     }
 
@@ -617,7 +619,8 @@ private extension SettingsSheet {
 
         SettingsSheet(
             database: database,
-            today: LocalDate(Date(), in: .current)
+            today: LocalDate(Date(), in: .current),
+            appIcon: AppIconListModel()
         )
     }
 }

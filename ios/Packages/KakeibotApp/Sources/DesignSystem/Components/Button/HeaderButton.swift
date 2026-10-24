@@ -3,15 +3,18 @@ import SwiftUI
 public struct HeaderButton: View {
     let systemImage: String
     let title: String?
+    let showsDot: Bool
     let action: () -> Void
 
     public init(
         systemImage: String,
         title: String? = nil,
+        showsDot: Bool = false,
         action: @escaping () -> Void
     ) {
         self.systemImage = systemImage
         self.title = title
+        self.showsDot = showsDot
         self.action = action
     }
 
@@ -35,6 +38,16 @@ public struct HeaderButton: View {
                 Capsule()
                     .stroke(Self.stroke, lineWidth: 1)
             }
+            .overlay(alignment: .topTrailing) {
+                if showsDot {
+                    Circle()
+                        .fill(Palette.accentStrong)
+                        .frame(width: 8, height: 8)
+                        .shadow(color: Palette.glow, radius: 4)
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
+            .animation(.snappy, value: showsDot)
             .frame(minHeight: 44)
             .contentShape(Capsule())
         }
@@ -74,7 +87,10 @@ private extension HeaderButton {
 
 #Preview {
     HStack(spacing: 24) {
-        HeaderButton(systemImage: "gearshape") {}
+        HeaderButton(
+            systemImage: "gearshape",
+            showsDot: true
+        ) {}
 
         HeaderButton(
             systemImage: "arrow.left.arrow.right",

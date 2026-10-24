@@ -12,7 +12,6 @@ struct WalletEditModelTests {
         let model = WalletEditModel(database: setup.database)
         model.name = "楽天カード"
         model.kind = .card
-        model.isNegative = true
         model.press(.digit(3))
         model.press(.digit(8))
         model.press(.doubleZero)
@@ -86,6 +85,23 @@ struct WalletEditModelTests {
 
         #expect(followed == .bank)
         #expect(model.icon.glyph == .coin)
+    }
+
+    @Test
+    func followsSignWhenKindChanges() async throws {
+        let setup = try await Setup()
+        let model = WalletEditModel(database: setup.database)
+
+        model.kind = .card
+        let card = model.isNegative
+        model.kind = .bank
+        let bank = model.isNegative
+        model.isNegative = true
+        model.kind = .cash
+
+        #expect(card)
+        #expect(!bank)
+        #expect(model.isNegative)
     }
 
     @Test

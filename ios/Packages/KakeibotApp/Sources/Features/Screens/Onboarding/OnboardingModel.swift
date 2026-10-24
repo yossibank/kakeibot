@@ -7,16 +7,16 @@ import Store
 @MainActor
 @Observable
 public final class OnboardingModel {
-    public var launchScreen: LaunchScreen = .entry
-
     public private(set) var weekStart: Weekday = .sunday
 
     public private(set) var page: Page = .welcome
+    public private(set) var route: Route?
 
     public internal(set) var errorNotice = ErrorNotice()
 
     public let monthStart: MonthStartDayModel
     public let budget: BudgetListModel
+    public let setup: SetupModel
 
     private let database: AppDatabase
 
@@ -27,6 +27,7 @@ public final class OnboardingModel {
         self.database = database
         self.monthStart = MonthStartDayModel(database: database, today: today)
         self.budget = BudgetListModel(database: database, today: today)
+        self.setup = SetupModel(database: database)
     }
 }
 
@@ -35,15 +36,33 @@ public extension OnboardingModel {
         case welcome
         case monthStart
         case budget
-        case launchScreen
+        case setup
+    }
+
+    enum Route: CaseIterable, Sendable {
+        case quick
+        case minimal
+        case full
+
+        var pages: [Page] {
+            switch self {
+            case .quick: [.welcome]
+            case .minimal: [.welcome, .monthStart, .budget]
+            case .full: Page.allCases
+            }
+        }
+    }
+
+    var pages: [Page] {
+        route?.pages ?? [.welcome]
     }
 
     var isFirstPage: Bool {
-        page == Page.allCases.first
+        page == .welcome
     }
 
     var isLastPage: Bool {
-        page == Page.allCases.last
+        page == pages.last
     }
 
     var nextTitle: String {
@@ -55,6 +74,8 @@ public extension OnboardingModel {
         await budget.load()
 
         do {
+            try await database.insertTemplatesIfEmpty(at: Date())
+            try await database.setSetting(.entryStartsWithAmount, to: true)
             weekStart = try await database.setting(.weekStart)
         } catch {
             errorNotice.show(Self.loadFailedMessage)
@@ -71,14 +92,16 @@ public extension OnboardingModel {
         }
     }
 
-    func canTurn(forward: Bool) -> Bool {
-        let offset = forward ? 1 : -1
+    func choose(_ route: Route) {
+        self.route = route
+    }
 
-        return Page(rawValue: page.rawValue + offset) != nil
+    func canTurn(forward: Bool) -> Bool {
+        neighbor(forward: forward) != nil
     }
 
     func next() {
-        guard let next = Page(rawValue: page.rawValue + 1) else {
+        guard let next = neighbor(forward: true) else {
             return
         }
 
@@ -92,7 +115,7 @@ public extension OnboardingModel {
     }
 
     func back() {
-        guard let previous = Page(rawValue: page.rawValue - 1) else {
+        guard let previous = neighbor(forward: false) else {
             return
         }
 
@@ -101,7 +124,6 @@ public extension OnboardingModel {
 
     func finish() async -> Bool {
         do {
-            try await database.setSetting(.launchScreen, to: launchScreen)
             try await database.setSetting(.onboardingCompleted, to: true)
 
             return true
@@ -116,4 +138,15 @@ public extension OnboardingModel {
 private extension OnboardingModel {
     static let loadFailedMessage = "設定を読めませんでした"
     static let saveFailedMessage = "設定を保存できませんでした"
+
+    func neighbor(forward: Bool) -> Page? {
+        guard let index = pages.firstIndex(of: page) else {
+            return nil
+        }
+
+        let offset = forward ? 1 : -1
+        let target = index + offset
+
+        return pages.indices.contains(target) ? pages[target] : nil
+    }
 }

@@ -37,7 +37,7 @@ public extension SettingKey where Value == ReminderTime? {
 
 public extension SettingKey where Value == LaunchScreen {
     static var launchScreen: Self {
-        Self(.launchScreen, default: .entry)
+        Self(.launchScreen, default: .home)
     }
 }
 
@@ -145,6 +145,22 @@ public extension SettingKey where Value == Bool {
 
     static var onboardingCompleted: Self {
         Self(flag: .onboardingCompleted)
+    }
+
+    static var setupCardClosed: Self {
+        Self(flag: .setupCardClosed)
+    }
+
+    static var customizeCardClosed: Self {
+        Self(flag: .customizeCardClosed)
+    }
+
+    static var entryOpened: Self {
+        Self(flag: .entryOpened)
+    }
+
+    static var settingsOpened: Self {
+        Self(flag: .settingsOpened)
     }
 }
 

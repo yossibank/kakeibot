@@ -12,6 +12,8 @@ struct MainView: View {
     @State private var records: RecordsModel
     @State private var review: ReviewModel
     @State private var assets: AssetsModel
+    @State private var setup: SetupModel
+    @State private var appIcon = AppIconListModel()
     @State private var draft: EntryModel
     @State private var notice: EntryNoticeModel
     @State private var undo: DeletionUndo
@@ -61,6 +63,8 @@ struct MainView: View {
             )
         )
 
+        _setup = State(initialValue: SetupModel(database: database))
+
         _draft = State(
             initialValue: EntryModel(
                 database: database,
@@ -84,6 +88,10 @@ struct MainView: View {
             Tab(value: MainTab.home) {
                 HomeView(
                     model: home,
+                    setup: setup,
+                    appIcon: appIcon,
+                    isRevealed: isRevealed,
+                    isSheetOpen: sheet != nil,
                     onOpenEntry: { id in
                         sheet = .edit(id)
                     },
@@ -112,6 +120,9 @@ struct MainView: View {
                     },
                     onOpenRecurrings: {
                         sheet = .periodRecurrings
+                    },
+                    onOpenSetup: { item in
+                        sheet = .setup(item)
                     }
                 )
                 .tabContent()
@@ -179,7 +190,8 @@ struct MainView: View {
         .overlay(alignment: .bottom) {
             FloatingTabBar(
                 selection: $tab,
-                items: Self.tabItems
+                items: Self.tabItems,
+                isAddHinted: !setup.isEntryOpened
             ) {
                 sheet = .new
             }
@@ -227,6 +239,9 @@ struct MainView: View {
             await assets.run()
         }
         .task {
+            await setup.run()
+        }
+        .task {
             await draft.load()
         }
         .task(id: isRevealed) {
@@ -249,6 +264,11 @@ struct MainView: View {
             if isRevealed,
                let route {
                 open(route)
+            }
+        }
+        .onChange(of: sheet) { _, sheet in
+            Task {
+                await markOpened(sheet)
             }
         }
         .onChange(of: today) { _, today in
@@ -280,7 +300,8 @@ private extension MainView {
         case .settings:
             SettingsSheet(
                 database: database,
-                today: today
+                today: today,
+                appIcon: appIcon
             )
         case let .template(template):
             EntrySheet(
@@ -323,6 +344,16 @@ private extension MainView {
             ) { deletion in
                 undo.deletion = deletion
             }
+        case let .setup(item):
+            NavigationStack {
+                SetupDestination(
+                    item,
+                    database: database,
+                    today: today,
+                    appIcon: appIcon
+                )
+                .toolbar(.hidden, for: .navigationBar)
+            }
         case .periodRecurrings:
             PeriodRecurringSheet(
                 model: home,
@@ -363,6 +394,7 @@ private extension MainView {
         case wallet(Wallet.ID)
         case recurring(Recurring.ID)
         case periodRecurrings
+        case setup(SetupItem)
 
         var id: Self {
             self
@@ -411,7 +443,7 @@ private extension MainView {
     }
 
     func openLaunchScreen() async {
-        let screen = await (try? database.setting(.launchScreen)) ?? .entry
+        let screen = await (try? database.setting(.launchScreen)) ?? .home
 
         guard route == nil else {
             return
@@ -423,6 +455,14 @@ private extension MainView {
         case .review: tab = .review
         case .assets: tab = .assets
         case .entry: sheet = .new
+        }
+    }
+
+    func markOpened(_ sheet: Sheet?) async {
+        switch sheet {
+        case .new: await setup.markEntryOpened()
+        case .settings: await setup.markSettingsOpened()
+        default: break
         }
     }
 

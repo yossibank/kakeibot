@@ -8,6 +8,10 @@ public struct HomeView: View {
     @State private var openId: Entry.ID?
     @State private var orderButtonFrame: CGRect = .zero
 
+    private let setup: SetupModel
+    private let appIcon: AppIconListModel
+    private let isRevealed: Bool
+    private let isSheetOpen: Bool
     private let onOpenEntry: (Entry.ID) -> Void
     private let onShowRecords: () -> Void
     private let onOpenSettings: () -> Void
@@ -17,9 +21,14 @@ public struct HomeView: View {
     private let onAddTemplate: () -> Void
     private let onDeleteEntry: (Entry.ID) -> Void
     private let onOpenRecurrings: () -> Void
+    private let onOpenSetup: (SetupItem) -> Void
 
     public init(
         model: HomeModel,
+        setup: SetupModel,
+        appIcon: AppIconListModel,
+        isRevealed: Bool,
+        isSheetOpen: Bool,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onShowRecords: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
@@ -28,9 +37,14 @@ public struct HomeView: View {
         onOpenOrderMenu: @escaping (CGRect) -> Void,
         onAddTemplate: @escaping () -> Void,
         onDeleteEntry: @escaping (Entry.ID) -> Void,
-        onOpenRecurrings: @escaping () -> Void
+        onOpenRecurrings: @escaping () -> Void,
+        onOpenSetup: @escaping (SetupItem) -> Void
     ) {
         self.model = model
+        self.setup = setup
+        self.appIcon = appIcon
+        self.isRevealed = isRevealed
+        self.isSheetOpen = isSheetOpen
         self.onOpenEntry = onOpenEntry
         self.onShowRecords = onShowRecords
         self.onOpenSettings = onOpenSettings
@@ -40,6 +54,7 @@ public struct HomeView: View {
         self.onAddTemplate = onAddTemplate
         self.onDeleteEntry = onDeleteEntry
         self.onOpenRecurrings = onOpenRecurrings
+        self.onOpenSetup = onOpenSetup
     }
 
     public var body: some View {
@@ -47,12 +62,30 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
                 dialCard
+
+                if showsSetupCard {
+                    HomeSetupCard(model: setup, onOpen: onOpenSetup)
+                        .transition(Self.cardTransition)
+                }
+
+                if showsCustomizeCard {
+                    HomeCustomizeCard(
+                        model: setup,
+                        appIcon: appIcon,
+                        isSheetOpen: isSheetOpen,
+                        onOpen: onOpenSetup
+                    )
+                    .transition(Self.cardTransition)
+                }
+
                 templateCard
                 recentCard
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
+            .animation(.snappy, value: showsSetupCard)
+            .animation(.snappy, value: showsCustomizeCard)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -80,7 +113,11 @@ private extension HomeView {
             }
 
             Spacer()
-            HeaderButton(systemImage: "gearshape", action: onOpenSettings)
+            HeaderButton(
+                systemImage: "gearshape",
+                showsDot: !setup.isSettingsOpened,
+                action: onOpenSettings
+            )
         }
     }
 
@@ -411,6 +448,18 @@ private extension HomeView {
     static let tileHeight = TemplateCardSize.regular.height
     static let shadowRoom: CGFloat = 32
     static let toolStroke = Palette.accent.opacity(.muted)
+
+    static var cardTransition: AnyTransition {
+        .offset(y: 16).combined(with: .opacity)
+    }
+
+    var showsSetupCard: Bool {
+        isRevealed && setup.showsCard
+    }
+
+    var showsCustomizeCard: Bool {
+        isRevealed && setup.showsCustomizeCard
+    }
 
     var dialTitle: String {
         model.budgetUsage?.remainingTitle ?? "今月の支出"

@@ -7,7 +7,7 @@ import Testing
 @MainActor
 struct OnboardingModelTests {
     @Test
-    func walksPagesAndSavesChoices() async throws {
+    func walksFullRouteAndSavesChoices() async throws {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(25))
 
@@ -18,6 +18,8 @@ struct OnboardingModelTests {
 
         await model.load()
         let first = model.isFirstPage
+        let locked = model.canTurn(forward: true)
+        model.choose(.full)
         model.next()
         await model.monthStart.choose(payday)
         model.next()
@@ -27,19 +29,77 @@ struct OnboardingModelTests {
         let back = model.page
         model.next()
         model.next()
-        model.launchScreen = .review
         let title = model.nextTitle
         let finished = await model.finish()
-        let launchScreen = try await setup.database.setting(.launchScreen)
+        let startsWithAmount = try await setup.database.setting(.entryStartsWithAmount)
         let completed = try await setup.database.setting(.onboardingCompleted)
 
         #expect(first)
+        #expect(!locked)
         #expect(budgetMonth == YearMonth(year: 2026, month: 10))
         #expect(back == .monthStart)
+        #expect(model.page == .setup)
         #expect(model.isLastPage)
         #expect(title == "はじめる")
         #expect(finished)
-        #expect(launchScreen == .review)
+        #expect(startsWithAmount)
         #expect(completed)
+    }
+
+    @Test
+    func endsMinimalRouteAtBudget() async throws {
+        let setup = try await HomeModelTests.Setup()
+
+        let model = OnboardingModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        model.choose(.minimal)
+        model.next()
+        model.next()
+
+        #expect(model.page == .budget)
+        #expect(model.isLastPage)
+        #expect(!model.canTurn(forward: true))
+    }
+
+    @Test
+    func keepsAmountChoiceAfterFinish() async throws {
+        let setup = try await HomeModelTests.Setup()
+
+        let model = OnboardingModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await model.load()
+        let initial = try await setup.database.setting(.entryStartsWithAmount)
+        await model.setup.setStartsWithAmount(false)
+        _ = await model.finish()
+        let saved = try await setup.database.setting(.entryStartsWithAmount)
+
+        #expect(initial)
+        #expect(!saved)
+    }
+
+    @Test
+    func addsStarterTemplatesOnce() async throws {
+        let setup = try await HomeModelTests.Setup()
+
+        let model = OnboardingModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await model.load()
+        await model.load()
+        let templates = try await setup.database.templates()
+        let options = try await setup.database.entryOptions()
+        let cash = options.wallets.first { $0.kind == .cash }
+
+        #expect(templates.map(\.name) == ["コンビニ", "ランチ", "電車", "日用品"])
+        #expect(templates.allSatisfy { $0.amount == nil })
+        #expect(templates.allSatisfy { $0.walletId == cash?.id })
     }
 }

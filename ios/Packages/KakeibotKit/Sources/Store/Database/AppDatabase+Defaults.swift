@@ -25,6 +25,16 @@ public extension AppDatabase {
             try Self.insertShelf(into: db, at: now)
         }
     }
+
+    func insertTemplatesIfEmpty(at now: Date) async throws {
+        try await writer.write { db in
+            guard try EntryTemplate.fetchCount(db) == 0 else {
+                return
+            }
+
+            try Self.insertTemplates(into: db, at: now)
+        }
+    }
 }
 
 private extension AppDatabase {
@@ -58,6 +68,13 @@ private extension AppDatabase {
         Seed(name: "給料", glyph: .salary, color: "#2A9D8F"),
         Seed(name: "臨時収入", glyph: .bonus, color: "#E9C46A"),
         Seed(name: "その他", glyph: .other, color: "#8D99AE")
+    ]
+
+    static let templates: [(name: String, category: String)] = [
+        ("コンビニ", "食費"),
+        ("ランチ", "食費"),
+        ("電車", "交通"),
+        ("日用品", "日用品")
     ]
 
     static let shelf: [(Icon.Glyph, String)] = [
@@ -120,6 +137,45 @@ private extension AppDatabase {
             )
 
             try category.insert(db)
+        }
+    }
+
+    static func insertTemplates(
+        into db: Database,
+        at now: Date
+    ) throws {
+        let wallets = try Wallet.fetchAll(db)
+            .filter { $0.archivedAt == nil }
+            .sorted { $0.sortOrder < $1.sortOrder }
+
+        let wallet = wallets.first { $0.kind == .cash } ?? wallets.first
+
+        guard let wallet else {
+            return
+        }
+
+        let categories = try EntryCategory.fetchAll(db)
+            .filter { $0.kind == .expense && $0.archivedAt == nil }
+
+        let seeds = templates.compactMap { seed in
+            categories
+                .first { $0.name == seed.category }
+                .map { (seed.name, $0) }
+        }
+
+        for (order, (name, category)) in seeds.enumerated() {
+            let template = EntryTemplate(
+                name: name,
+                type: .expense,
+                amount: nil,
+                categoryId: category.id,
+                walletId: wallet.id,
+                sortOrder: order,
+                createdAt: now,
+                updatedAt: now
+            )
+
+            try template.insert(db)
         }
     }
 

@@ -153,6 +153,10 @@ private extension EntrySheet {
                             open(.wallet(role))
                         }
 
+                        Text("チャージ・カードの引き落とし・口座どうしの移動")
+                            .textFont(.caption2)
+                            .foregroundStyle(Palette.subtext)
+
                         if let remaining = model.loanRemaining,
                            remaining != model.amount {
                             payOffButton(remaining)
