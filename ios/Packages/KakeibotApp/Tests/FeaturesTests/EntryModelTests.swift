@@ -47,12 +47,14 @@ struct EntryModelTests {
     }
 
     @Test
-    func picksFirstCategoryOfSelectedType() async throws {
+    func startsWithoutCategory() async throws {
         let model = try await Self.newModel()
+        let initial = model.categoryId
 
         model.select(.income)
 
-        #expect(model.categoryId == model.options?.incomeCategories.first?.id)
+        #expect(initial == nil)
+        #expect(model.categoryId == nil)
     }
 
     @Test
@@ -60,6 +62,7 @@ struct EntryModelTests {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date)
         await model.load()
+        model.categoryId = model.categories.first?.id
         model.press(.digit(5))
         model.press(.doubleZero)
         model.memo = "ランチ"
@@ -162,7 +165,7 @@ struct EntryModelTests {
         model.categoryId = transit.id
 
         model.select(.income)
-        let incomeFirst = model.selectedCategory?.name
+        let incomeFirst = model.selectedCategory
         let income = model.categories
         let bonus = try #require(income.first { $0.name == "臨時収入" })
         model.categoryId = bonus.id
@@ -172,7 +175,7 @@ struct EntryModelTests {
 
         model.select(.income)
 
-        #expect(incomeFirst == "給料")
+        #expect(incomeFirst == nil)
         #expect(expenseBack == "交通")
         #expect(model.selectedCategory?.name == "臨時収入")
     }
@@ -213,14 +216,15 @@ struct EntryModelTests {
     }
 
     @Test
-    func hidesSelectedCategoryAndSelectsNext() async throws {
+    func hidesSelectedCategoryAndClearsChoice() async throws {
         let model = try await Self.newModel()
-        let food = try #require(model.selectedCategory)
+        let food = try #require(model.categories.first)
+        model.categoryId = food.id
 
         await model.hideCategory(food)
 
         #expect(!model.categories.contains(food))
-        #expect(model.selectedCategory?.name == "日用品")
+        #expect(model.selectedCategory == nil)
     }
 
     @Test
@@ -247,8 +251,11 @@ struct EntryModelTests {
         model.press(.digit(9))
         model.press(.digit(8))
         model.press(.digit(0))
+        let uncategorized = model.saveTitle
+        model.categoryId = model.categories.first?.id
 
         #expect(empty == "金額を入れてください")
+        #expect(uncategorized == "カテゴリを選んでください")
         #expect(model.saveTitle == "¥980 を記録する")
     }
 
@@ -293,6 +300,7 @@ struct EntryModelTests {
         let card = try await setup.cardWithBill()
         let model = EntryModel(database: setup.database, date: setup.date)
         await model.load()
+        model.categoryId = model.categories.first?.id
         model.press(.digit(5))
         model.walletId = card.id
 
@@ -322,6 +330,7 @@ struct EntryModelTests {
         let model = EntryModel(database: setup.database, date: setup.date)
 
         await model.load()
+        model.categoryId = categories[0].id
         let first = model.walletId
         model.categoryId = categories[1].id
         let second = model.walletId
@@ -350,9 +359,9 @@ struct EntryModelTests {
     @Test
     func startsNextEntryKeepingChoices() async throws {
         let model = try await Self.newModel()
+        model.categoryId = model.categories.first?.id
         model.press(.digit(5))
         model.memo = "ランチ"
-        let category = model.categoryId
         let wallet = model.walletId
 
         _ = await model.save()
@@ -360,7 +369,7 @@ struct EntryModelTests {
 
         #expect(model.amount == 0)
         #expect(model.memo.isEmpty)
-        #expect(model.categoryId == category)
+        #expect(model.categoryId == nil)
         #expect(model.walletId == wallet)
         #expect(!model.isChanged)
     }
@@ -379,8 +388,7 @@ struct EntryModelTests {
 
         await model.load()
 
-        #expect(manual.categoryId == options.expenseCategories[0].id)
-        #expect(model.categoryId == third.id)
+        #expect(manual.categoryPages.first?.first?.categoryId == options.expenseCategories[0].id)
         #expect(model.categoryPages.first?.first?.categoryId == third.id)
     }
 }

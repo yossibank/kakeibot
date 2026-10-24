@@ -7,7 +7,6 @@ public struct EntrySheet: View {
     @State private var model: EntryModel
     @State private var isEnteringAmount = false
     @State private var isEditingMemo = false
-    @State private var isPeekingMemo = false
     @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
     @State private var memoChipFrame: CGRect = .zero
@@ -103,6 +102,8 @@ public struct EntrySheet: View {
 }
 
 extension EntrySheet {
+    nonisolated static let coordinateSpace = "EntrySheet"
+
     static func categoryFill(_ isSelected: Bool) -> Color {
         isSelected ? Palette.accent.opacity(.subtle) : Color.clear
     }
@@ -146,7 +147,6 @@ private extension EntrySheet {
     var form: some View {
         VStack(spacing: 16) {
             previewCard
-            details
 
             if model.type == .transfer {
                 ZStack(alignment: .top) {
@@ -188,10 +188,20 @@ private extension EntrySheet {
 
             categoryPager
 
-            TagLine(tagItems, selection: model.tagId) { id in
-                model.toggleTag(id)
-            } onAdd: {
-                editTags()
+            if model.selectedCategory != nil {
+                VStack(spacing: 4) {
+                    TagLine(tagItems, selection: model.tagId) { id in
+                        model.toggleTag(id)
+                    } onAdd: {
+                        editTags()
+                    }
+
+                    if model.tags.isEmpty {
+                        Text("タグでカテゴリを細かく分けられます（昼ごはんなど）")
+                            .textFont(.caption2)
+                            .foregroundStyle(Palette.subtext)
+                    }
+                }
             }
         }
     }
@@ -224,90 +234,24 @@ private extension EntrySheet {
     }
 
     var previewCard: some View {
-        Button {
-            setEnteringAmount(!isEnteringAmount)
-        } label: {
-            EntryPreviewCard(
-                model: model,
-                isActive: isEnteringAmount,
-                today: today
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    var details: some View {
-        HStack(spacing: 8) {
-            if model.type != .transfer {
-                Button {
-                    open(.wallet(.source))
-                } label: {
-                    Chip(
-                        model.walletName,
-                        systemImage: "wallet.bifold",
-                        isHighlighted: model.walletId != nil
-                    )
-                }
-            }
-
-            Button {
+        EntryPreviewCard(
+            memoFrame: $memoChipFrame,
+            model: model,
+            isActive: isEnteringAmount,
+            today: today,
+            onAmount: {
+                setEnteringAmount(!isEnteringAmount)
+            },
+            onDate: {
                 open(.date)
-            } label: {
-                Chip(
-                    EntryModel.dateText(for: model.date, today: today),
-                    systemImage: "calendar",
-                    isHighlighted: true
-                )
+            },
+            onWallet: {
+                open(.wallet(.source))
+            },
+            onMemo: {
+                editMemo(true)
             }
-
-            Button {
-                if !isPeekingMemo {
-                    editMemo(true)
-                }
-            } label: {
-                ViewThatFits(in: .horizontal) {
-                    Chip(
-                        memoTitle,
-                        systemImage: "square.and.pencil",
-                        isHighlighted: !model.memo.isEmpty
-                    )
-
-                    Chip(
-                        "",
-                        systemImage: "square.and.pencil",
-                        isHighlighted: !model.memo.isEmpty
-                    )
-                }
-            }
-            .simultaneousGesture(memoPeekGesture)
-            .background {
-                Color.clear
-                    .popover(isPresented: $isPeekingMemo) {
-                        memoPeek
-                    }
-            }
-            .sensoryFeedback(.impact(weight: .light), trigger: isPeekingMemo)
-            .layoutPriority(-1)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .named(Self.coordinateSpace))
-            } action: { frame in
-                memoChipFrame = frame
-            }
-
-            Spacer(minLength: 0)
-        }
-        .buttonStyle(.plain)
-    }
-
-    var memoPeek: some View {
-        Text(model.memo)
-            .textFont(.footnote)
-            .foregroundStyle(Palette.text)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: Self.peekWidth, alignment: .leading)
-            .padding(16)
-            .presentationCompactAdaptation(.popover)
-            .presentationBackground(Palette.panel)
+        )
     }
 
     var categoryPager: some View {
@@ -363,10 +307,17 @@ private extension EntrySheet {
 
     var keypadDrawer: some View {
         VStack(spacing: 12) {
-            RingButton(systemImage: "checkmark", style: .prominent) {
-                setEnteringAmount(false)
+            HStack(spacing: 8) {
+                if model.type == .transfer {
+                    Spacer()
+                } else {
+                    categoryStrip
+                }
+
+                RingButton(systemImage: "checkmark", style: .prominent) {
+                    setEnteringAmount(false)
+                }
             }
-            .frame(maxWidth: .infinity, alignment: .trailing)
 
             Keypad(activeTax: model.calculator.taxNote?.rate) { key in
                 model.press(key)
@@ -390,6 +341,24 @@ private extension EntrySheet {
             proxy.size.height
         } action: { height in
             drawerHeight = height
+        }
+    }
+
+    var categoryStrip: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    ForEach(model.categories) { category in
+                        stripButton(category)
+                            .id(category.id)
+                    }
+                }
+                .padding(.vertical, 1)
+            }
+            .scrollIndicators(.hidden)
+            .onAppear {
+                proxy.scrollTo(model.categoryId, anchor: .center)
+            }
         }
     }
 
@@ -472,6 +441,34 @@ private extension EntrySheet {
         }
         .buttonStyle(.plain)
         .transition(.opacity)
+    }
+
+    func stripButton(_ category: EntryCategory) -> some View {
+        let isSelected = model.categoryId == category.id
+        let color = isSelected ? Palette.accentStrong : Palette.subtext
+        let border = isSelected ? Palette.outline : Palette.accent.opacity(.medium)
+
+        return Button {
+            model.categoryId = category.id
+        } label: {
+            HStack(spacing: 4) {
+                IconImage(model.icon(for: category), size: 12)
+
+                Text(category.name)
+                    .lineLimit(1)
+            }
+            .textFont(size: .caption)
+            .foregroundStyle(color)
+            .padding(.horizontal, 12)
+            .frame(height: 36)
+            .background(Self.categoryFill(isSelected), in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(border, lineWidth: 1)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 
     func categoryGrid(_ page: [EntryModel.CategoryCell]) -> some View {
@@ -679,8 +676,6 @@ private extension EntrySheet {
         }
     }
 
-    nonisolated static let coordinateSpace = "EntrySheet"
-
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income),
@@ -700,8 +695,6 @@ private extension EntrySheet {
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
     static let menuPressDuration = 0.15
-    static let peekDuration = 0.35
-    static let peekWidth: CGFloat = 260
 
     static var pagerHeight: CGFloat {
         let rows = CGFloat(categoryRows)
@@ -719,17 +712,6 @@ private extension EntrySheet {
 
     var today: LocalDate {
         LocalDate(Date(), in: .current)
-    }
-
-    var memoPeekGesture: some Gesture {
-        LongPressGesture(minimumDuration: Self.peekDuration)
-            .onEnded { _ in
-                isPeekingMemo = !model.memo.isEmpty
-            }
-    }
-
-    var memoTitle: String {
-        model.memo.isEmpty ? "メモ" : model.memo
     }
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {

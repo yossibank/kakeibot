@@ -252,16 +252,16 @@ public extension EntryModel {
     }
 
     var saveTitle: String {
+        guard let draft else {
+            return "\(walletTitle)を選んでください"
+        }
+
+        if let problem = draft.problems.first {
+            return Self.message(for: problem)
+        }
+
         if isEditing {
             return "変更を保存"
-        }
-
-        guard amount > 0 else {
-            return "金額を入れてください"
-        }
-
-        if type == .transfer, toWalletId == nil {
-            return "\(Self.destinationTitle)を選んでください"
         }
 
         let action = type == .transfer ? "振り替える" : "記録する"
@@ -322,11 +322,7 @@ public extension EntryModel {
     }
 
     var previewTitle: String {
-        if let selectedCategory {
-            return selectedCategory.name
-        }
-
-        return type == .transfer ? "振替" : "未分類"
+        selectedCategory?.name ?? typeName
     }
 
     var previewTag: String? {
@@ -536,7 +532,7 @@ public extension EntryModel {
             if let id {
                 categoryId = id
             } else if !categories.contains(where: { $0.id == categoryId }) {
-                categoryId = categories.first?.id
+                categoryId = nil
             }
         } catch {
             report(error)
@@ -607,7 +603,7 @@ public extension EntryModel {
         if categories.contains(where: { $0.id == remembered }) {
             categoryId = remembered
         } else if !categories.contains(where: { $0.id == categoryId }) {
-            categoryId = categories.first?.id
+            categoryId = nil
         }
 
         if followsUsual, !isEditing, type != .transfer {
@@ -648,6 +644,10 @@ public extension EntryModel {
     }
 
     func startNext() async {
+        let wallet = walletId
+
+        categoryId = nil
+        walletId = wallet
         calculator = AmountCalculator()
         memo = ""
         tagId = nil
@@ -812,8 +812,7 @@ private extension EntryModel {
 
     func loadEntry() async throws {
         guard let editingId else {
-            categoryId = categories.first?.id
-            walletId = usualWalletId(for: categoryId)
+            walletId = usualWalletId(for: nil)
 
             if type == .transfer {
                 chooseDestination()
