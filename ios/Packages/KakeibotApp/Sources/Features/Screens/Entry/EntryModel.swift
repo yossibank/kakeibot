@@ -252,16 +252,16 @@ public extension EntryModel {
     }
 
     var saveTitle: String {
-        guard let draft else {
-            return "\(walletTitle)を選んでください"
-        }
-
-        if let problem = draft.problems.first {
-            return Self.message(for: problem)
-        }
-
         if isEditing {
             return "変更を保存"
+        }
+
+        guard amount > 0 else {
+            return "金額を入れてください"
+        }
+
+        if type == .transfer, toWalletId == nil {
+            return "\(Self.destinationTitle)を選んでください"
         }
 
         let action = type == .transfer ? "振り替える" : "記録する"
@@ -315,31 +315,6 @@ public extension EntryModel {
         case .onHand, .card:
             return nil
         }
-    }
-
-    var previewIcon: Icon? {
-        selectedCategory.flatMap(icon(for:))
-    }
-
-    var previewTitle: String {
-        selectedCategory?.name ?? typeName
-    }
-
-    var previewTag: String? {
-        tags.first { $0.id == tagId }?.name
-    }
-
-    var previewDetail: String? {
-        EntryRowItem.walletText(
-            type: type,
-            source: wallet(walletId)?.name,
-            destination: wallet(toWalletId)?.name,
-            billMonth: draft?.billMonth
-        )
-    }
-
-    var previewMemo: String? {
-        memo.isEmpty ? nil : memo
     }
 
     static func dateText(
@@ -532,7 +507,7 @@ public extension EntryModel {
             if let id {
                 categoryId = id
             } else if !categories.contains(where: { $0.id == categoryId }) {
-                categoryId = nil
+                categoryId = categories.first?.id
             }
         } catch {
             report(error)
@@ -603,7 +578,7 @@ public extension EntryModel {
         if categories.contains(where: { $0.id == remembered }) {
             categoryId = remembered
         } else if !categories.contains(where: { $0.id == categoryId }) {
-            categoryId = nil
+            categoryId = categories.first?.id
         }
 
         if followsUsual, !isEditing, type != .transfer {
@@ -644,10 +619,6 @@ public extension EntryModel {
     }
 
     func startNext() async {
-        let wallet = walletId
-
-        categoryId = nil
-        walletId = wallet
         calculator = AmountCalculator()
         memo = ""
         tagId = nil
@@ -812,7 +783,8 @@ private extension EntryModel {
 
     func loadEntry() async throws {
         guard let editingId else {
-            walletId = usualWalletId(for: nil)
+            categoryId = categories.first?.id
+            walletId = usualWalletId(for: categoryId)
 
             if type == .transfer {
                 chooseDestination()

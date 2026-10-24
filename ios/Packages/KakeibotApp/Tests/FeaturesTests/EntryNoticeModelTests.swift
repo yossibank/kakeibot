@@ -176,11 +176,6 @@ extension EntryNoticeModelTests.Setup {
         )
 
         await model.load()
-
-        if id == nil, type != .transfer {
-            model.categoryId = model.categories.first?.id
-        }
-
         return model
     }
 

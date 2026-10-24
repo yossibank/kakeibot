@@ -17,7 +17,7 @@ struct EntryTemplateRow: View {
                 Button {
                     onAdd()
                 } label: {
-                    Label("テンプレートにする", systemImage: "plus")
+                    Label("今の入力を保存", systemImage: "plus")
                         .textFont(size: .caption)
                         .foregroundStyle(Palette.accent)
                         .padding(.horizontal, 12)

@@ -10,7 +10,6 @@ public struct EntryRow: View {
     let amount: Int
     let type: Entry.Kind
     let isRecurring: Bool
-    let foldsMemo: Bool
 
     public init(
         icon: Icon?,
@@ -20,8 +19,7 @@ public struct EntryRow: View {
         memo: String? = nil,
         amount: Int,
         type: Entry.Kind,
-        isRecurring: Bool = false,
-        foldsMemo: Bool = true
+        isRecurring: Bool = false
     ) {
         self.icon = icon
         self.title = title
@@ -31,7 +29,6 @@ public struct EntryRow: View {
         self.amount = amount
         self.type = type
         self.isRecurring = isRecurring
-        self.foldsMemo = foldsMemo
     }
 
     public var body: some View {
@@ -73,7 +70,7 @@ public struct EntryRow: View {
                 }
 
                 if let memo {
-                    EntryMemo(memo, isFoldable: foldsMemo)
+                    EntryMemo(memo)
                 }
             }
             .padding(.vertical, 8)
