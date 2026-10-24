@@ -833,7 +833,7 @@ private extension RecordsView {
                 .stroke(Palette.outline, lineWidth: 1)
         }
         .padding(.horizontal, 16)
-        .padding(.bottom, 8)
+        .padding(.bottom, 16)
     }
 
     func barButton(

@@ -6,8 +6,6 @@ struct EntryMemo: View {
     @State private var shownHeight: CGFloat = 0
     @State private var lineHeight: CGFloat = 0
 
-    @Namespace private var toggleSpace
-
     let text: String
 
     init(_ text: String) {
@@ -17,46 +15,40 @@ struct EntryMemo: View {
     var body: some View {
         let limit = isExpanded ? nil : Self.lineLimit
 
-        VStack(alignment: .trailing, spacing: 2) {
-            Text(text)
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(limit)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .onGeometryChange(for: CGFloat.self) { proxy in
-                    proxy.size.height
-                } action: { height in
-                    shownHeight = height
-                }
-                .background(alignment: .topLeading) {
-                    measure
-                }
-                .mask {
-                    fade
-                }
-                .overlay(alignment: .bottomTrailing) {
-                    if isTruncated {
-                        toggleMark
-                    }
-                }
-
-            if isExpanded {
-                toggleMark
+        shownText
+            .textFont(.caption)
+            .foregroundStyle(Palette.subtext)
+            .lineLimit(limit)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.height
+            } action: { height in
+                shownHeight = height
             }
-        }
-        .padding(.leading, 8)
-        .overlay(alignment: .leading) {
-            Capsule()
-                .fill(Palette.accent.opacity(.medium))
-                .frame(width: 2)
-        }
-        .contentShape(.rect)
-        .onTapGesture {
-            toggle()
-        }
-        .allowsHitTesting(canExpand)
-        .sensoryFeedback(.selection, trigger: isExpanded)
+            .background(alignment: .topLeading) {
+                measure
+            }
+            .mask {
+                fade
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if canExpand {
+                    toggleMark
+                }
+            }
+            .padding(.leading, 8)
+            .overlay(alignment: .leading) {
+                Capsule()
+                    .fill(Palette.accent.opacity(.medium))
+                    .frame(width: 2)
+            }
+            .contentShape(.rect)
+            .onTapGesture {
+                toggle()
+            }
+            .allowsHitTesting(canExpand)
+            .sensoryFeedback(.selection, trigger: isExpanded)
     }
 }
 
@@ -112,15 +104,25 @@ private extension EntryMemo {
             .sansFont(.micro, weight: .bold)
             .foregroundStyle(Palette.accent)
             .rotationEffect(.degrees(angle))
-            .frame(width: 20, height: 16)
-            .matchedGeometryEffect(id: Self.toggleID, in: toggleSpace)
+            .frame(width: Self.toggleWidth, height: 16)
     }
 }
 
 private extension EntryMemo {
     static let lineLimit = 2
     static let fadeWidth: CGFloat = 72
-    static let toggleID = "toggle"
+    static let toggleWidth: CGFloat = 20
+
+    var shownText: Text {
+        guard isExpanded else {
+            return Text(text)
+        }
+
+        let room = Image(size: CGSize(width: Self.toggleWidth, height: 1)) { _ in
+        }
+
+        return Text("\(text)\(room)")
+    }
 
     var isTruncated: Bool {
         !isExpanded && fullHeight > shownHeight + 1

@@ -145,7 +145,7 @@ private extension EntrySheet {
 
     var form: some View {
         VStack(spacing: 16) {
-            dial
+            previewCard
             details
 
             if model.type == .transfer {
@@ -223,23 +223,17 @@ private extension EntrySheet {
         }
     }
 
-    var dial: some View {
+    var previewCard: some View {
         Button {
             setEnteringAmount(!isEnteringAmount)
         } label: {
-            GeometryReader { proxy in
-                let size = min(proxy.size.width, proxy.size.height)
-
-                EntryDialFace(
-                    model: model,
-                    isActive: isEnteringAmount,
-                    size: size
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+            EntryPreviewCard(
+                model: model,
+                isActive: isEnteringAmount,
+                today: today
+            )
         }
         .buttonStyle(.plain)
-        .frame(minHeight: Self.dialMinSize, maxHeight: 270)
     }
 
     var details: some View {
@@ -700,9 +694,8 @@ private extension EntrySheet {
         topTrailingRadius: 28
     )
 
-    static let dialMinSize: CGFloat = 240
     static let fade: CGFloat = 20
-    static let categoryRows = 3
+    static let categoryRows = 4
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54

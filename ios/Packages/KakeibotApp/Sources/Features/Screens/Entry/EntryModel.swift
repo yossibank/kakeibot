@@ -107,7 +107,7 @@ public extension EntryModel {
         }
     }
 
-    static let categoriesPerPage = 15
+    static let categoriesPerPage = 20
 
     static let destinationTitle = "振替先"
 
@@ -315,6 +315,35 @@ public extension EntryModel {
         case .onHand, .card:
             return nil
         }
+    }
+
+    var previewIcon: Icon? {
+        selectedCategory.flatMap(icon(for:))
+    }
+
+    var previewTitle: String {
+        if let selectedCategory {
+            return selectedCategory.name
+        }
+
+        return type == .transfer ? "振替" : "未分類"
+    }
+
+    var previewTag: String? {
+        tags.first { $0.id == tagId }?.name
+    }
+
+    var previewDetail: String? {
+        EntryRowItem.walletText(
+            type: type,
+            source: wallet(walletId)?.name,
+            destination: wallet(toWalletId)?.name,
+            billMonth: draft?.billMonth
+        )
+    }
+
+    var previewMemo: String? {
+        memo.isEmpty ? nil : memo
     }
 
     static func dateText(

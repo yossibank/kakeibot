@@ -39,24 +39,35 @@ extension EntryRowItem {
     }
 }
 
+extension EntryRowItem {
+    static func walletText(
+        type: Entry.Kind,
+        source: String?,
+        destination: String?,
+        billMonth: YearMonth?
+    ) -> String? {
+        guard type == .transfer, let destination else {
+            let bill = billMonth.map { "（\($0.month)月払い）" } ?? ""
+
+            return source.map { $0 + bill }
+        }
+
+        return [source, destination]
+            .compactMap(\.self)
+            .joined(separator: " → ")
+    }
+}
+
 private extension EntryRowItem {
     static func walletText(
         for entry: Entry,
         in list: EntryList
     ) -> String? {
-        let source = list.wallets[entry.walletId]?.name
-
-        guard
-            entry.type == .transfer,
-            let destination = entry.toWalletId.flatMap({ list.wallets[$0] })
-        else {
-            let bill = entry.billMonth.map { "（\($0.month)月払い）" } ?? ""
-
-            return source.map { $0 + bill }
-        }
-
-        return [source, destination.name]
-            .compactMap(\.self)
-            .joined(separator: " → ")
+        walletText(
+            type: entry.type,
+            source: list.wallets[entry.walletId]?.name,
+            destination: entry.toWalletId.flatMap { list.wallets[$0]?.name },
+            billMonth: entry.billMonth
+        )
     }
 }
