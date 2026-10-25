@@ -84,7 +84,7 @@ public extension SettingKey where Value == [HomeSection] {
     static var homeSections: Self {
         Self(
             .homeSections,
-            default: HomeSection.allCases,
+            default: HomeSection.standard,
             decode: { text in
                 text.split(separator: ",").compactMap { name in
                     HomeSection(rawValue: String(name))
@@ -191,10 +191,6 @@ public extension SettingKey where Value == Bool {
 
     static var setupCardClosed: Self {
         Self(flag: .setupCardClosed)
-    }
-
-    static var customizeCardClosed: Self {
-        Self(flag: .customizeCardClosed)
     }
 
     static var entryOpened: Self {

@@ -3,13 +3,15 @@ public struct HomeLayout: Hashable, Sendable {
     public private(set) var hidden: Set<HomeSection>
 
     public init(
-        order: [HomeSection] = HomeSection.allCases,
+        order: [HomeSection] = HomeSection.standard,
         hidden: Set<HomeSection> = []
     ) {
         var seen = Set<HomeSection>()
         let listed = order.filter { seen.insert($0).inserted }
         let missing = HomeSection.allCases.filter { !seen.contains($0) }
         let order = listed + missing
+        let added = missing.filter { !HomeSection.standard.contains($0) }
+        let hidden = hidden.union(added)
 
         self.order = order
         self.hidden = hidden.count < order.count ? hidden : hidden.subtracting(order.prefix(1))

@@ -8,7 +8,6 @@ import Store
 public final class SetupModel: ScreenModel {
     public private(set) var progress: SetupProgress?
     public private(set) var isCardClosed = true
-    public private(set) var isCustomizeCardClosed = true
     public private(set) var isEntryOpened = true
     public private(set) var isSettingsOpened = true
     public private(set) var launchScreen: LaunchScreen = .home
@@ -38,10 +37,6 @@ public extension SetupModel {
         !isCardClosed && !cardItems.isEmpty
     }
 
-    var showsCustomizeCard: Bool {
-        !isCustomizeCardClosed
-    }
-
     var startsWithAmountTitle: String {
         startsWithAmount ? "する" : "しない"
     }
@@ -62,10 +57,6 @@ public extension SetupModel {
 
             group.addTask {
                 await self.observeCardClosed()
-            }
-
-            group.addTask {
-                await self.observeCustomizeCardClosed()
             }
 
             group.addTask {
@@ -118,11 +109,6 @@ public extension SetupModel {
         isCardClosed = true
         await save(.setupCardClosed, to: true)
     }
-
-    func closeCustomizeCard() async {
-        isCustomizeCardClosed = true
-        await save(.customizeCardClosed, to: true)
-    }
 }
 
 private extension SetupModel {
@@ -144,15 +130,6 @@ private extension SetupModel {
             failure: Self.loadFailedMessage
         ) { isClosed in
             isCardClosed = isClosed
-        }
-    }
-
-    func observeCustomizeCardClosed() async {
-        await observe(
-            database.settingUpdates(.customizeCardClosed),
-            failure: Self.loadFailedMessage
-        ) { isClosed in
-            isCustomizeCardClosed = isClosed
         }
     }
 

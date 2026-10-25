@@ -21,6 +21,7 @@ public struct HomeView: View {
     private let onAddTemplate: () -> Void
     private let onDeleteEntry: (Entry.ID) -> Void
     private let onOpenRecurrings: () -> Void
+    private let onOpenRecurring: (Recurring.ID) -> Void
     private let onOpenSetup: (SetupItem) -> Void
 
     public init(
@@ -38,6 +39,7 @@ public struct HomeView: View {
         onAddTemplate: @escaping () -> Void,
         onDeleteEntry: @escaping (Entry.ID) -> Void,
         onOpenRecurrings: @escaping () -> Void,
+        onOpenRecurring: @escaping (Recurring.ID) -> Void,
         onOpenSetup: @escaping (SetupItem) -> Void
     ) {
         self.model = model
@@ -54,6 +56,7 @@ public struct HomeView: View {
         self.onAddTemplate = onAddTemplate
         self.onDeleteEntry = onDeleteEntry
         self.onOpenRecurrings = onOpenRecurrings
+        self.onOpenRecurring = onOpenRecurring
         self.onOpenSetup = onOpenSetup
     }
 
@@ -67,17 +70,7 @@ public struct HomeView: View {
                         .transition(Self.cardTransition)
                 }
 
-                if showsCustomizeCard {
-                    HomeCustomizeCard(
-                        model: setup,
-                        appIcon: appIcon,
-                        isSheetOpen: isSheetOpen,
-                        onOpen: onOpenSetup
-                    )
-                    .transition(Self.cardTransition)
-                }
-
-                ForEach(model.homeLayout.visible) { section in
+                ForEach(sections) { section in
                     sectionView(section)
                 }
             }
@@ -85,8 +78,7 @@ public struct HomeView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
             .animation(.snappy, value: showsSetupCard)
-            .animation(.snappy, value: showsCustomizeCard)
-            .animation(.snappy, value: model.homeLayout)
+            .animation(.snappy, value: sections)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -407,6 +399,77 @@ private extension HomeView {
         .card()
     }
 
+    var billCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .firstTextBaseline) {
+                SectionTitle("これからの引き落とし")
+
+                Spacer()
+
+                if !model.upcomingBills.isEmpty {
+                    Text("合計 \(AmountText.text(model.upcomingBillTotal))")
+                        .textFont(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                }
+            }
+            .frame(minHeight: 44)
+
+            if model.upcomingBills.isEmpty {
+                Text("これからの引き落としはありません")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .padding(.vertical, 16)
+            } else {
+                ForEach(model.upcomingBills, id: \.recurring.id) { bill in
+                    Button {
+                        onOpenRecurring(bill.recurring.id)
+                    } label: {
+                        billRow(bill)
+                    }
+                    .buttonStyle(.plain)
+                    .overlay(alignment: .top) {
+                        Hairline(thickness: 1)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+        .card()
+    }
+
+    var stampCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionTitle("今月のスタンプ")
+                .frame(minHeight: 44)
+
+            if model.stampTallies.isEmpty {
+                Text("今月はまだスタンプを押していません")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .padding(.bottom, 8)
+            } else {
+                LazyVGrid(columns: Self.stampColumns, alignment: .leading) {
+                    ForEach(model.stampTallies) { tally in
+                        HStack(spacing: 8) {
+                            IconSeal(tally.icon, size: 28)
+
+                            Text("×\(tally.count)")
+                                .displayFont(.body)
+                                .monospacedDigit()
+                                .foregroundStyle(Palette.accentStrong)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
+    }
+
     var divider: some View {
         Rectangle()
             .fill(Palette.accent.opacity(.soft))
@@ -438,6 +501,47 @@ private extension HomeView {
         .buttonStyle(.plain)
     }
 
+    func billRow(_ bill: CardBill) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(bill.date.month)/\(bill.date.day)")
+                    .displayFont(.body)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accent)
+
+                Text(daysText(until: bill.date))
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+            }
+            .frame(width: Self.billDateWidth, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(model.title(of: bill.recurring))
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+
+                if bill.shortage > 0 {
+                    Text("残高が \(AmountText.text(bill.shortage)) 足りません")
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.rose)
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer(minLength: 8)
+
+            Text(AmountText.text(bill.amount))
+                .displayFont(.headline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+        }
+        .padding(.vertical, 12)
+        .contentShape(.rect)
+    }
+
     func stat(
         _ title: String,
         amount: Int,
@@ -461,12 +565,29 @@ private extension HomeView {
     @ViewBuilder
     func sectionView(_ section: HomeSection) -> some View {
         switch section {
+        case .customize:
+            HomeCustomizeCard(
+                model: setup,
+                appIcon: appIcon,
+                isSheetOpen: isSheetOpen,
+                onOpen: onOpenSetup,
+                onClose: {
+                    Task {
+                        await model.hide(.customize)
+                    }
+                }
+            )
+            .transition(Self.cardTransition)
         case .budget:
             dialCard
         case .templates:
             templateCard
         case .recent:
             recentCard
+        case .bills:
+            billCard
+        case .stamps:
+            stampCard
         }
     }
 }
@@ -480,6 +601,11 @@ private extension HomeView {
     static let tileHeight = TemplateCardSize.regular.height
     static let shadowRoom: CGFloat = 32
     static let toolStroke = Palette.accent.opacity(.muted)
+    static let billDateWidth: CGFloat = 56
+
+    static let stampColumns = [
+        GridItem(.adaptive(minimum: 72), spacing: 12, alignment: .leading)
+    ]
 
     static var cardTransition: AnyTransition {
         .offset(y: 16).combined(with: .opacity)
@@ -489,8 +615,8 @@ private extension HomeView {
         isRevealed && setup.showsCard
     }
 
-    var showsCustomizeCard: Bool {
-        isRevealed && setup.showsCustomizeCard
+    var sections: [HomeSection] {
+        model.homeLayout.visible.filter { $0 != .customize || isRevealed }
     }
 
     var dialTitle: String {
@@ -538,6 +664,11 @@ private extension HomeView {
 
     var templateHint: String {
         model.templates.isEmpty ? "よく使う入力を 1 回で" : "押すとすぐ記録"
+    }
+
+    func daysText(until date: LocalDate) -> String {
+        let days = model.today.days(until: date)
+        return days == 1 ? "明日" : "あと \(days) 日"
     }
 }
 

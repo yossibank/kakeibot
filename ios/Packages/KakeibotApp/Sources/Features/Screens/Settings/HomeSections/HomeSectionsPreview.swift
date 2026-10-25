@@ -43,6 +43,39 @@ private extension HomeSectionsPreview {
         .padding(.horizontal, 4)
     }
 
+    var customize: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            line(Palette.accentStrong, width: 120, height: 9)
+
+            HStack(spacing: 8) {
+                ForEach(0..<3, id: \.self) { _ in
+                    customizeTile
+                }
+            }
+        }
+        .padding(16)
+        .card()
+    }
+
+    var customizeTile: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Circle()
+                .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
+                .frame(width: 18, height: 18)
+
+            line(Palette.text, width: 52, height: 7)
+
+            line(Palette.subtext, width: 32, height: 6)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Palette.card, in: .rect(cornerRadius: corner.radius(16)))
+        .overlay {
+            RoundedRectangle(cornerRadius: corner.radius(16))
+                .stroke(Palette.outline, lineWidth: 0.8)
+        }
+    }
+
     var budget: some View {
         VStack(spacing: 16) {
             ZStack(alignment: .bottom) {
@@ -152,12 +185,71 @@ private extension HomeSectionsPreview {
         .card()
     }
 
+    var bills: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                line(Palette.accent, width: 120, height: 9)
+
+                Spacer()
+
+                line(Palette.subtext, width: 64, height: 8)
+            }
+            .padding(.vertical, 12)
+
+            ForEach(Self.billWidths, id: \.self) { width in
+                Hairline()
+
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        line(Palette.accent, width: 32, height: 10)
+
+                        line(Palette.hint, width: 28, height: 6)
+                    }
+                    .frame(width: 40, alignment: .leading)
+
+                    line(Palette.text, width: width, height: 8)
+
+                    Spacer()
+
+                    line(Palette.accentStrong, width: 56, height: 10)
+                }
+                .padding(.vertical, 12)
+            }
+        }
+        .padding(.horizontal, 16)
+        .card()
+    }
+
+    var stamps: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            line(Palette.accent, width: 96, height: 9)
+
+            HStack(spacing: 16) {
+                ForEach(0..<3, id: \.self) { _ in
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(Palette.accent.opacity(.subtle))
+                            .frame(width: 26, height: 26)
+
+                        line(Palette.accentStrong, width: 20, height: 10)
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
+    }
+
     @ViewBuilder
     func block(_ section: HomeSection) -> some View {
         switch section {
+        case .customize: customize
         case .budget: budget
         case .templates: templates
         case .recent: recent
+        case .bills: bills
+        case .stamps: stamps
         }
     }
 
@@ -174,4 +266,5 @@ private extension HomeSectionsPreview {
 
 private extension HomeSectionsPreview {
     static let recentWidths: [CGFloat] = [96, 72, 112]
+    static let billWidths: [CGFloat] = [88, 104]
 }

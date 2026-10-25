@@ -6,7 +6,22 @@ struct HomeLayoutTests {
     func addsMissingSectionsAndDropsRepeats() {
         let layout = HomeLayout(order: [.recent, .budget, .recent])
 
-        #expect(layout.order == [.recent, .budget, .templates])
+        #expect(layout.order == [.recent, .budget, .customize, .templates, .bills, .stamps])
+    }
+
+    @Test
+    func hidesAddedSectionsOutsideTheStandard() {
+        let layout = HomeLayout(order: [.budget, .templates, .recent])
+
+        #expect(layout.visible == [.budget, .templates, .recent, .customize])
+        #expect(layout.hidden == [.bills, .stamps])
+    }
+
+    @Test
+    func showsListedSectionsOutsideTheStandard() {
+        let layout = HomeLayout(order: HomeSection.allCases)
+
+        #expect(layout.visible == HomeSection.allCases)
     }
 
     @Test
@@ -21,7 +36,7 @@ struct HomeLayoutTests {
 
     @Test
     func refusesToHideTheLastShownSection() {
-        var layout = HomeLayout(hidden: [.budget, .templates])
+        var layout = HomeLayout(hidden: [.customize, .budget, .templates])
 
         layout.setHidden(.recent, true)
 
@@ -40,10 +55,10 @@ struct HomeLayoutTests {
 
         layout.move(.budget, to: 10)
 
-        #expect(layout.order == [.templates, .recent, .budget])
+        #expect(layout.order == [.customize, .templates, .recent, .bills, .stamps, .budget])
 
         layout.move(.recent, to: -1)
 
-        #expect(layout.order == [.recent, .templates, .budget])
+        #expect(layout.order == [.recent, .customize, .templates, .bills, .stamps, .budget])
     }
 }

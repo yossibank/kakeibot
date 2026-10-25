@@ -122,6 +122,9 @@ struct MainView: View {
                     onOpenRecurrings: {
                         sheet = .periodRecurrings
                     },
+                    onOpenRecurring: { id in
+                        sheet = .recurring(id)
+                    },
                     onOpenSetup: { item in
                         sheet = .setup(item)
                     }

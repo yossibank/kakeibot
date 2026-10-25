@@ -12,14 +12,11 @@ struct HomeCustomizeCard: View {
     let appIcon: AppIconListModel
     let isSheetOpen: Bool
     let onOpen: (SetupItem) -> Void
+    let onClose: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HomeCardHeader(title: "自分好みにカスタマイズ") {
-                Task {
-                    await model.closeCustomizeCard()
-                }
-            }
+            HomeCardHeader(title: "自分好みにカスタマイズ", onClose: onClose)
 
             ScrollView(.horizontal) {
                 HStack(spacing: 12) {
