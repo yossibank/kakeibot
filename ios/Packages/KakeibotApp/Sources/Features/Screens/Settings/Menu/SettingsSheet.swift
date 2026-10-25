@@ -10,6 +10,7 @@ public struct SettingsSheet: View {
     @State private var categoriesByUse = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
+    @State private var authorization: NotificationAuthorization = .allowed
     @State private var theme: ThemeChoice = .system
     @State private var customThemes: [Theme] = []
 
@@ -257,6 +258,7 @@ public struct SettingsSheet: View {
                                             database: database,
                                             today: today,
                                             time: reminderTime,
+                                            authorization: authorization,
                                             permission: permission
                                         )
                                     )
@@ -321,6 +323,9 @@ public struct SettingsSheet: View {
         }
         .task {
             await observeReminderTime()
+        }
+        .task {
+            authorization = await permission.authorization()
         }
         .task {
             await observeTheme()
