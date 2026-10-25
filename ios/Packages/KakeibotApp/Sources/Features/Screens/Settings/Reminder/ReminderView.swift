@@ -23,11 +23,13 @@ public struct ReminderView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    hero
+                    VStack(spacing: 12) {
+                        hero
 
-                    if model.isDenied {
-                        deniedCard
-                            .transition(.opacity)
+                        if model.isDenied {
+                            deniedBanner
+                                .transition(.opacity)
+                        }
                     }
 
                     if model.isOn {
@@ -59,10 +61,12 @@ public struct ReminderView: View {
         .animation(.snappy, value: model.time)
         .animation(.snappy, value: model.isDenied)
         .animation(.snappy, value: isPickingTime)
+        .animation(.snappy, value: model.previewDay)
         .transaction(value: model.isLoaded) { transaction in
             transaction.disablesAnimations = true
         }
         .sensoryFeedback(.selection, trigger: model.time)
+        .sensoryFeedback(.selection, trigger: model.previewDay)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 Task {
@@ -78,33 +82,35 @@ public struct ReminderView: View {
 
 private extension ReminderView {
     var hero: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             Image(systemName: bellImage)
                 .sansFont(.headline, weight: .light)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 48, height: 48)
                 .background(Palette.accent.opacity(.subtle), in: Circle())
                 .contentTransition(.symbolEffect(.replace))
+                .symbolEffect(
+                    .wiggle,
+                    options: .repeat(.periodic(delay: 4)),
+                    isActive: model.isOn
+                )
 
-            VStack(spacing: 8) {
-                Text("記録忘れの通知")
-                    .textFont(.caption2)
-                    .tracking(3)
-                    .foregroundStyle(Palette.accent)
+            Text(timeText)
+                .displayFont(.display)
+                .monospacedDigit()
+                .foregroundStyle(timeColor)
+                .contentTransition(.numericText())
 
-                Text(timeText)
-                    .displayFont(.display)
-                    .monospacedDigit()
-                    .foregroundStyle(timeColor)
-                    .contentTransition(.numericText())
-
+            HStack(spacing: 12) {
                 Text(summaryText)
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
-                    .multilineTextAlignment(.center)
-            }
+                    .fixedSize(horizontal: false, vertical: true)
 
-            CapsulePicker(selection: onBinding, options: Self.onOptions)
+                Spacer(minLength: 0)
+
+                CapsulePicker(selection: onBinding, options: Self.onOptions)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
@@ -112,37 +118,40 @@ private extension ReminderView {
         .card(cornerRadius: 24)
     }
 
-    var deniedCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("通知が許可されていません", systemImage: "bell.slash")
-                .textFont(.subheadline, weight: .semibold)
-                .foregroundStyle(Palette.rose)
+    var deniedBanner: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle")
+                .sansFont(.small)
 
-            Text("設定アプリで「かけいぼっと」の通知を許可すると届きます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
+            Text("通知が届かない状態です")
+                .textFont(.footnote, weight: .semibold)
+
+            Spacer(minLength: 0)
 
             Button {
                 openSettings()
             } label: {
-                Text("設定アプリを開く")
-                    .textFont(.footnote, weight: .semibold)
-                    .foregroundStyle(Palette.accentStrong)
-                    .frame(maxWidth: .infinity, minHeight: 40)
-                    .background(Palette.rose.opacity(.subtle), in: Capsule())
-                    .overlay {
-                        Capsule()
-                            .stroke(Palette.rose.opacity(.medium), lineWidth: 1)
-                    }
-                    .contentShape(Capsule())
+                HStack(spacing: 2) {
+                    Text("許可する")
+                        .textFont(.caption, weight: .semibold)
+
+                    Image(systemName: "chevron.right")
+                        .sansFont(.micro, weight: .semibold)
+                }
+                .padding(.horizontal, 12)
+                .frame(minHeight: 30)
+                .background(Palette.rose.opacity(.subtle), in: Capsule())
+                .contentShape(Capsule())
             }
             .buttonStyle(.plain)
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Palette.rose.opacity(.faint), in: cardShape)
+        .foregroundStyle(Palette.rose)
+        .padding(.leading, 16)
+        .padding(.trailing, 8)
+        .padding(.vertical, 8)
+        .background(Palette.rose.opacity(.faint), in: Capsule())
         .overlay {
-            cardShape
+            Capsule()
                 .stroke(Palette.rose.opacity(.muted), lineWidth: 1)
         }
     }
@@ -151,23 +160,28 @@ private extension ReminderView {
         VStack(alignment: .leading, spacing: 12) {
             SettingsSectionTitle("時刻")
 
-            LazyVGrid(columns: Self.columns, spacing: 8) {
-                ForEach(ReminderModel.presets, id: \.self) { time in
-                    let isSelected = !isPickingTime && model.time == time
+            ScrollView(.horizontal) {
+                HStack(spacing: 8) {
+                    ForEach(ReminderModel.presets, id: \.self) { time in
+                        let isSelected = !isPickingTime && model.time == time
 
-                    SettingsChoice(time.description, isSelected: isSelected) {
-                        isPickingTime = false
+                        timeButton("\(time.hour)", isSelected: isSelected) {
+                            isPickingTime = false
 
-                        Task {
-                            await model.choose(time)
+                            Task {
+                                await model.choose(time)
+                            }
                         }
                     }
-                }
 
-                SettingsChoice("ほかの時刻", isSelected: isPickingTime) {
-                    isPickingTime = true
+                    timeButton("…", isSelected: isPickingTime) {
+                        isPickingTime = true
+                    }
                 }
+                .padding(.vertical, 4)
+                .padding(.horizontal, 2)
             }
+            .scrollIndicators(.hidden)
 
             if isPickingTime {
                 DatePicker(
@@ -190,51 +204,68 @@ private extension ReminderView {
         VStack(alignment: .leading, spacing: 12) {
             SettingsSectionTitle("届く通知")
 
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "yensign")
-                    .sansFont(.body, weight: .medium)
-                    .foregroundStyle(Palette.cardBottom)
-                    .frame(width: 38, height: 38)
-                    .background(
-                        Palette.accent,
-                        in: .rect(cornerRadius: corner.radius(8))
-                    )
+            HStack(spacing: 4) {
+                dayStepButton("chevron.left", by: -1)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text("かけいぼっと")
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
-
-                        Spacer()
-
-                        Text(timeText)
-                            .textFont(.caption2)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                    }
-
-                    Text(NotificationPlan.reminderTitle)
-                        .textFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(Palette.text)
-
-                    Text(NotificationPlan.reminderBody)
-                        .textFont(.footnote)
-                        .foregroundStyle(Palette.text.opacity(.strong))
+                ForEach(Self.days, id: \.self) { day in
+                    dayButton(day)
                 }
+
+                dayStepButton("chevron.right", by: 1)
             }
-            .padding(16)
-            .background(Palette.text.opacity(.faint), in: cardShape)
-            .overlay {
-                cardShape
-                    .stroke(Palette.text.opacity(.subtle), lineWidth: 1)
-            }
+
+            notificationCard
+                .padding(12)
+                .background(wallpaper, in: cardShape)
 
             Text("記録か「支出なし」の印がある日は届きません")
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
                 .padding(.leading, 8)
         }
+    }
+
+    var notificationCard: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "yensign")
+                .sansFont(.body, weight: .medium)
+                .foregroundStyle(Palette.cardBottom)
+                .frame(width: 38, height: 38)
+                .background(
+                    Palette.accent,
+                    in: .rect(cornerRadius: corner.radius(9))
+                )
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("かけいぼっと")
+                        .textFont(.caption2, weight: .semibold)
+                        .foregroundStyle(Palette.text.opacity(.strong))
+
+                    Spacer()
+
+                    Text(timeText)
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                }
+
+                Text(model.previewMessage.title)
+                    .textFont(.subheadline, weight: .semibold)
+                    .foregroundStyle(Palette.text)
+                    .contentTransition(.opacity)
+
+                Text(model.previewMessage.body)
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.text.opacity(.strong))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .contentTransition(.opacity)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.regularMaterial, in: bubbleShape)
+        .shadow(color: Palette.shadow.opacity(.muted), radius: 12, y: 4)
     }
 
     var recurringNote: some View {
@@ -269,6 +300,64 @@ private extension ReminderView {
         }
     }
 
+    func timeButton(
+        _ title: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        let color = isSelected ? Palette.accentStrong : Palette.subtext
+        let weight: Font.Weight = isSelected ? .semibold : .regular
+
+        return Button(action: action) {
+            Text(title)
+                .textFont(.subheadline, weight: weight)
+                .monospacedDigit()
+                .foregroundStyle(color)
+                .frame(width: 48, height: 48)
+                .background(SettingsTile.fill(isSelected: isSelected), in: Circle())
+                .overlay {
+                    Circle()
+                        .stroke(SettingsTile.stroke(isSelected: isSelected), lineWidth: 1)
+                }
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    func dayButton(_ day: Weekday) -> some View {
+        let isSelected = model.previewDay == day
+        let color = isSelected ? Palette.accentStrong : Palette.subtext
+        let weight: Font.Weight = isSelected ? .semibold : .regular
+
+        return Button {
+            model.showPreview(on: day)
+        } label: {
+            Text(day.shortName)
+                .textFont(.caption, weight: weight)
+                .foregroundStyle(color)
+                .frame(maxWidth: .infinity, minHeight: 32)
+                .background(SettingsTile.fill(isSelected: isSelected), in: Capsule())
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
+    func dayStepButton(
+        _ systemImage: String,
+        by step: Int
+    ) -> some View {
+        Button {
+            showPreview(by: step)
+        } label: {
+            Image(systemName: systemImage)
+                .sansFont(.micro, weight: .semibold)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 24, height: 32)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
     func noticeRow(_ notice: PlannedNotification) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Text("\(notice.date.month)/\(notice.date.day) \(notice.time.description)")
@@ -299,13 +388,34 @@ private extension ReminderView {
         .init("オン", value: true)
     ]
 
-    static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 8),
-        count: 3
-    )
+    static let days: [Weekday] = [
+        .monday,
+        .tuesday,
+        .wednesday,
+        .thursday,
+        .friday,
+        .saturday,
+        .sunday
+    ]
 
     var cardShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(20))
+        RoundedRectangle(cornerRadius: corner.radius(24))
+    }
+
+    var bubbleShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(18))
+    }
+
+    var wallpaper: LinearGradient {
+        LinearGradient(
+            colors: [
+                Palette.accent.opacity(.muted),
+                Palette.rose.opacity(.soft),
+                Palette.accentDeep.opacity(.soft)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 
     var bellImage: String {
@@ -321,11 +431,7 @@ private extension ReminderView {
     }
 
     var summaryText: String {
-        guard let time = model.time else {
-            return "記録を忘れても知らせません"
-        }
-
-        return "毎日 \(time) に、記録のない日だけ知らせます"
+        model.isOn ? "記録のない日だけ、そっと\nお知らせします" : "記録を忘れても、\nお知らせしません"
     }
 
     var recurringText: String {
@@ -370,6 +476,13 @@ private extension ReminderView {
                 await model.choose(time)
             }
         }
+    }
+
+    func showPreview(by step: Int) {
+        let index = Self.days.firstIndex(of: model.previewDay) ?? 0
+        let next = (index + step + Self.days.count) % Self.days.count
+
+        model.showPreview(on: Self.days[next])
     }
 
     func openSettings() {

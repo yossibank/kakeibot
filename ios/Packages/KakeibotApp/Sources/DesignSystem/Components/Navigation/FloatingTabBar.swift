@@ -95,7 +95,8 @@ private extension FloatingTabBar {
         let isDragging = dragX != nil
         let fill = Palette.accent.opacity(isDragging ? .soft : .subtle)
         let scale: CGFloat = isDragging ? 1.08 : 1
-        let opacity: Double = barWidth > 0 ? 1 : 0
+        let isShown = barWidth > 0 && highlightedIndex != nil
+        let opacity: Double = isShown ? 1 : 0
 
         return Capsule()
             .fill(fill)
@@ -247,17 +248,17 @@ private extension FloatingTabBar {
         items.isEmpty ? 0 : barWidth / CGFloat(items.count)
     }
 
-    var selectedIndex: Int {
-        items.firstIndex { $0.value == selection } ?? 0
+    var selectedIndex: Int? {
+        items.firstIndex { $0.value == selection }
     }
 
-    var highlightedIndex: Int {
+    var highlightedIndex: Int? {
         dragX.map(index(at:)) ?? selectedIndex
     }
 
     var indicatorX: CGFloat {
         guard let dragX else {
-            return itemWidth * CGFloat(selectedIndex)
+            return itemWidth * CGFloat(selectedIndex ?? 0)
         }
 
         let maxX = barWidth - itemWidth
@@ -284,7 +285,7 @@ private extension FloatingTabBar {
 
     func index(at x: CGFloat) -> Int {
         guard itemWidth > 0 else {
-            return selectedIndex
+            return selectedIndex ?? 0
         }
 
         let index = Int((x / itemWidth).rounded(.down))

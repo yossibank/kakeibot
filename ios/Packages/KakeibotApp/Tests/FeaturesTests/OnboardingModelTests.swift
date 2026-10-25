@@ -75,7 +75,10 @@ struct OnboardingModelTests {
 
         await model.load()
         let initial = try await setup.database.setting(.entryStartsWithAmount)
-        await model.setup.setStartsWithAmount(false)
+        await EntryStartModel(
+            database: setup.database,
+            today: setup.today
+        ).choose(false)
         _ = await model.finish()
         let saved = try await setup.database.setting(.entryStartsWithAmount)
 

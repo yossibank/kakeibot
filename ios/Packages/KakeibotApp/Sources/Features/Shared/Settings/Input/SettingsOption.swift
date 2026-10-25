@@ -1,13 +1,28 @@
-import Core
 import DesignSystem
 import SwiftUI
 
-struct LaunchScreenOption: View {
+struct SettingsOption: View {
     @Environment(\.themeStyle.corner) private var corner
 
-    let screen: LaunchScreen
+    let title: String
+    let note: String
+    let systemImage: String
     let isSelected: Bool
     let action: () -> Void
+
+    init(
+        _ title: String,
+        note: String,
+        systemImage: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) {
+        self.title = title
+        self.note = note
+        self.systemImage = systemImage
+        self.isSelected = isSelected
+        self.action = action
+    }
 
     var body: some View {
         let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
@@ -16,17 +31,17 @@ struct LaunchScreenOption: View {
 
         Button(action: action) {
             HStack(spacing: 16) {
-                Image(systemName: screen.systemImage)
+                Image(systemName: systemImage)
                     .sansFont(.headline, weight: .light)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 32)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(screen.title)
+                    Text(title)
                         .textFont(.subheadline, weight: .semibold)
                         .foregroundStyle(Palette.accentStrong)
 
-                    Text(screen.note)
+                    Text(note)
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                 }
@@ -49,7 +64,7 @@ struct LaunchScreenOption: View {
     }
 }
 
-private extension LaunchScreenOption {
+private extension SettingsOption {
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(20))
     }

@@ -67,10 +67,6 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         }
     }
 
-    public var isToggle: Bool {
-        self == .startsWithAmount
-    }
-
     public func isDone(in progress: SetupProgress) -> Bool {
         switch self {
         case .budget: progress.hasBudget

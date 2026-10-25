@@ -61,3 +61,4 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | --- | --- | --- |
 | [Klee One](https://github.com/fontworks-fonts/Klee) | The Klee Project Authors | 字体の「手書き」 |
 | [DotGothic16](https://github.com/fontworks-fonts/DotGothic16) | The DotGothic16 Project Authors | 字体の「ドット」 |
+| [Hachi Maru Pop](https://github.com/noriokanisawa/HachiMaruPop) | The Hachi Maru Pop Project Authors | 字体の「ポップ」 |

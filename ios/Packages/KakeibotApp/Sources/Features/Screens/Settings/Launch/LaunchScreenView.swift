@@ -24,8 +24,10 @@ public struct LaunchScreenView: View {
                         .padding(.vertical, 12)
 
                     ForEach(LaunchScreen.allCases, id: \.self) { screen in
-                        LaunchScreenOption(
-                            screen: screen,
+                        SettingsOption(
+                            screen.title,
+                            note: screen.note,
+                            systemImage: screen.systemImage,
                             isSelected: model.screen == screen
                         ) {
                             Task {
