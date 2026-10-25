@@ -325,8 +325,8 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | settings_opened | `true` `false`。設定を一度開くと `true` にし、ホームの設定のボタンに金の点を出さない |
 | launch_screen | `home`・`records`・`review`・`assets`・`entry`。空ならホーム |
 | corner_style | `square`・`small`・`standard`・`large`。`square` は角を丸めない。空なら `standard` |
-| font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `mincho` |
-| text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`。空なら `gothic` |
+| font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop`。空なら `mincho` |
+| text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop`。空なら `gothic` |
 | text_size | 文字の大きさ。`small`・`standard`・`large`。空なら `standard` |
 | entry_starts_with_amount | `true` なら、新しく記録するとき入力シートをテンキーを出して開く |
 | categories_by_use | `true` なら、入力シートのカテゴリをよく使う順に並べる |

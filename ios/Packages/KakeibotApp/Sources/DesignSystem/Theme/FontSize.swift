@@ -82,6 +82,7 @@ private extension ThemeFont {
         case .rounded: "HiraMaruProN-W4"
         case .handwriting: "KleeOne-Regular"
         case .dot: "DotGothic16-Regular"
+        case .pop: "HachiMaruPop-Regular"
         }
     }
 }

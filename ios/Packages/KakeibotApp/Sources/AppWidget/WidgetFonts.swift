@@ -17,6 +17,7 @@ public enum WidgetFonts {
 private extension WidgetFonts {
     static let fileNames = [
         "KleeOne-Regular.ttf",
-        "DotGothic16-Regular.ttf"
+        "DotGothic16-Regular.ttf",
+        "HachiMaruPop-Regular.ttf"
     ]
 }

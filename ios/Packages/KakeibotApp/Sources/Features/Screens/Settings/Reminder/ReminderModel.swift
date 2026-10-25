@@ -10,6 +10,7 @@ public final class ReminderModel {
     public private(set) var time: ReminderTime?
     public private(set) var authorization: NotificationAuthorization = .allowed
     public private(set) var isLoaded = false
+    public private(set) var previewDay: Weekday
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -32,6 +33,7 @@ public final class ReminderModel {
         self.time = time
         self.lastTime = time ?? .evening
         self.authorization = authorization
+        self.previewDay = today.weekday
         self.permission = permission
     }
 }
@@ -75,6 +77,14 @@ public extension ReminderModel {
 
     var isCustom: Bool {
         time.map { !Self.presets.contains($0) } ?? false
+    }
+
+    var previewMessage: ReminderMessage {
+        ReminderMessage(on: previewDay)
+    }
+
+    func showPreview(on day: Weekday) {
+        previewDay = day
     }
 
     func load() async {

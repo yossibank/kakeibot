@@ -20,8 +20,6 @@ public enum NotificationPlan {
 
     public static let reminderDays = 7
     public static let recurringDays = 31
-    public static let reminderTitle = "今日の記録はまだです"
-    public static let reminderBody = "使ったお金か「支出なし」の印を入れておきましょう"
 
     public static func notifications(
         today: LocalDate,
@@ -69,12 +67,14 @@ private extension NotificationPlan {
             .map { today.adding(days: $0) }
             .filter { !recorded.contains($0) }
             .map { date in
-                PlannedNotification(
+                let message = ReminderMessage(on: date.weekday)
+
+                return PlannedNotification(
                     key: "reminder",
                     date: date,
                     time: time,
-                    title: reminderTitle,
-                    body: reminderBody,
+                    title: message.title,
+                    body: message.body,
                     route: .entry(date)
                 )
             }
