@@ -14,7 +14,7 @@ public struct MonthStartDayView: View {
         VStack(spacing: 20) {
             SettingsBackHeader("月の始まり")
 
-            Text("給料日に合わせると、その日から次の給料日の前の日までを 1 か月として数えます")
+            Text("給料日に合わせると、給料日から\n次の給料日の前の日までを 1 か月として数えます")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)

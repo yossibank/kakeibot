@@ -59,6 +59,9 @@ public struct ReminderView: View {
         .animation(.snappy, value: model.time)
         .animation(.snappy, value: model.isDenied)
         .animation(.snappy, value: isPickingTime)
+        .transaction(value: model.isLoaded) { transaction in
+            transaction.disablesAnimations = true
+        }
         .sensoryFeedback(.selection, trigger: model.time)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
@@ -115,7 +118,7 @@ private extension ReminderView {
                 .textFont(.subheadline, weight: .semibold)
                 .foregroundStyle(Palette.rose)
 
-            Text("設定アプリで Kakeibot の通知を許可すると届きます")
+            Text("設定アプリで「かけいぼっと」の通知を許可すると届きます")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
 
@@ -199,7 +202,7 @@ private extension ReminderView {
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text("Kakeibot")
+                        Text("かけいぼっと")
                             .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
 

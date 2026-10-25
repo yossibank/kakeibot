@@ -9,6 +9,7 @@ import Store
 public final class ReminderModel {
     public private(set) var time: ReminderTime?
     public private(set) var authorization: NotificationAuthorization = .allowed
+    public private(set) var isLoaded = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -23,12 +24,14 @@ public final class ReminderModel {
         database: AppDatabase,
         today: LocalDate,
         time: ReminderTime?,
+        authorization: NotificationAuthorization = .allowed,
         permission: NotificationPermission
     ) {
         self.database = database
         self.today = today
         self.time = time
         self.lastTime = time ?? .evening
+        self.authorization = authorization
         self.permission = permission
     }
 }
@@ -75,15 +78,29 @@ public extension ReminderModel {
     }
 
     func load() async {
+        let loaded: (ReminderTime?, NotificationInput)?
+
         do {
-            time = try await database.setting(.reminderTime)
-            lastTime = time ?? lastTime
-            input = try await database.notificationInput(from: today)
+            let time = try await database.setting(.reminderTime)
+            let input = try await database.notificationInput(from: today)
+
+            loaded = (time, input)
         } catch {
+            loaded = nil
+        }
+
+        let authorization = await permission.authorization()
+
+        if let (time, input) = loaded {
+            self.time = time
+            self.input = input
+            lastTime = time ?? lastTime
+        } else {
             errorNotice.show(Self.loadFailedMessage)
         }
 
-        authorization = await permission.authorization()
+        self.authorization = authorization
+        isLoaded = true
     }
 
     func setOn(_ isOn: Bool) async {

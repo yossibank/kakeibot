@@ -86,8 +86,8 @@ public struct HomeView: View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
-            .animation(.snappy, value: showsSetupCard)
-            .animation(.snappy, value: showsCustomizeCard)
+            .animation(setupCardAnimation, value: showsSetupCard)
+            .animation(customizeCardAnimation, value: showsCustomizeCard)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -480,6 +480,14 @@ private extension HomeView {
 
     var showsCustomizeCard: Bool {
         isRevealed && setup.showsCustomizeCard
+    }
+
+    var setupCardAnimation: Animation? {
+        showsSetupCard ? nil : .snappy
+    }
+
+    var customizeCardAnimation: Animation? {
+        showsCustomizeCard ? nil : .snappy
     }
 
     var dialTitle: String {
