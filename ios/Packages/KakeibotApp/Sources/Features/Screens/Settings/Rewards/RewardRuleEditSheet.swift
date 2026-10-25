@@ -6,6 +6,7 @@ import SwiftUI
 public struct RewardRuleEditSheet: View {
     @State private var model: RewardRuleEditModel
     @State private var panel: Panel?
+    @State private var isEditingIcon = false
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingDelete = false
 
@@ -43,6 +44,12 @@ public struct RewardRuleEditSheet: View {
                     .zIndex(1)
             }
         }
+        .iconEditorDrawer(
+            isPresented: $isEditingIcon,
+            model: model.icon,
+            focus: $focus,
+            textField: .text
+        )
         .overlay(alignment: .top) {
             header
                 .padding(.horizontal, 20)
@@ -96,7 +103,18 @@ private extension RewardRuleEditSheet {
 
             ScrollView {
                 VStack(spacing: 16) {
-                    IconBadge(model.icon.preview, size: 86)
+                    Button {
+                        focus = nil
+                        isEditingIcon = true
+                    } label: {
+                        IconBadge(model.icon.preview, size: 86)
+                            .overlay(alignment: .bottomTrailing) {
+                                EditBadge()
+                                    .offset(x: 6, y: 6)
+                            }
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
 
                     SettingsField(
                         "名前（例：自炊した日）",
@@ -115,12 +133,6 @@ private extension RewardRuleEditSheet {
                             .foregroundStyle(Palette.subtext)
                             .padding(.leading, 8)
                     }
-
-                    IconEditor(
-                        model: model.icon,
-                        focus: $focus,
-                        textField: .text
-                    )
                 }
                 .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)

@@ -219,9 +219,13 @@ private extension TemplateEditSheet {
             Button {
                 open(.amount)
             } label: {
-                TemplateCardAmount(amount: model.amount, size: .large)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(.rect)
+                HStack(spacing: 8) {
+                    TemplateCardAmount(amount: model.amount, size: .large)
+
+                    EditBadge(size: 20)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(.rect)
             }
             .buttonStyle(.plain)
         }

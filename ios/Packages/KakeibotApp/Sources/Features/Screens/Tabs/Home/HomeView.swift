@@ -155,13 +155,27 @@ private extension HomeView {
                             .foregroundStyle(usage.tint)
                     }
 
-                    Text("予算 \(AmountText.text(usage.budget))")
+                    Button {
+                        onOpenSetup(.budget)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text("予算 \(AmountText.text(usage.budget))")
+
+                            Image(systemName: "chevron.right")
+                                .sansFont(.micro, weight: .semibold)
+                        }
                         .textFont(.caption)
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
+                        .frame(minHeight: 28)
+                        .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
                 }
             } else {
-                Button(action: onOpenSettings) {
+                Button {
+                    onOpenSetup(.budget)
+                } label: {
                     HStack(spacing: 4) {
                         Text("予算を決めると、あといくら使えるかが出ます")
 

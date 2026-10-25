@@ -361,7 +361,7 @@ private extension RecurringListView {
             [
                 Self.purpose,
                 .move,
-                .init("pause.circle", "下の枠に置くと止められます"),
+                .init("pause.circle", "長押しして下の枠へ運ぶと止められます"),
                 .init("hand.point.left", "横に払うと、止めると削除のボタンが出ます")
             ]
         }

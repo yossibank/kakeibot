@@ -111,19 +111,19 @@ private extension BudgetListView {
                     .tracking(3)
                     .foregroundStyle(Palette.accent)
 
-                Text(amountText(model.totalAmount))
-                    .displayFont(.largeTitle, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(amountColor(model.totalAmount))
+                HStack(spacing: 8) {
+                    Text(amountText(model.totalAmount))
+                        .displayFont(.largeTitle, weight: .bold)
+                        .monospacedDigit()
+                        .foregroundStyle(amountColor(model.totalAmount))
+
+                    EditBadge()
+                }
 
                 if let usage = model.usage(for: nil) {
                     usageLine(usage)
                         .padding(.horizontal, 24)
                         .padding(.top, 4)
-                } else {
-                    Text("押して変えられます")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -158,6 +158,8 @@ private extension BudgetListView {
                         .displayFont(.body)
                         .monospacedDigit()
                         .foregroundStyle(amountColor(amount))
+
+                    EditBadge(size: 20)
                 }
 
                 if let usage {

@@ -145,12 +145,16 @@ private extension RecurringEditSheet {
             Button {
                 open(amountPanel)
             } label: {
-                Text(amountText)
-                    .displayFont(.largeTitle, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(amountColor)
-                    .frame(maxWidth: .infinity)
-                    .contentShape(.rect)
+                HStack(spacing: 8) {
+                    Text(amountText)
+                        .displayFont(.largeTitle, weight: .bold)
+                        .monospacedDigit()
+                        .foregroundStyle(amountColor)
+
+                    EditBadge()
+                }
+                .frame(maxWidth: .infinity)
+                .contentShape(.rect)
             }
             .buttonStyle(.plain)
 

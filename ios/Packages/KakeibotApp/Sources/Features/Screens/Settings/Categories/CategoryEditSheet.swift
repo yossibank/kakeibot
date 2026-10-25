@@ -11,6 +11,7 @@ public struct CategoryEditSheet: View {
     @State private var isMovingTag = false
     @State private var tagName = ""
     @State private var ignoresKeyboard = false
+    @State private var isEditingIcon = false
 
     @FocusState private var focus: Field?
     @FocusState private var isTagFocused: Bool
@@ -46,6 +47,12 @@ public struct CategoryEditSheet: View {
                 }
             }
         }
+        .iconEditorDrawer(
+            isPresented: $isEditingIcon,
+            model: model.icon,
+            focus: $focus,
+            textField: .text
+        )
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -99,12 +106,6 @@ private extension CategoryEditSheet {
                     )
 
                     tags
-
-                    IconEditor(
-                        model: model.icon,
-                        focus: $focus,
-                        textField: .text
-                    )
                 }
                 .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)
@@ -154,24 +155,35 @@ private extension CategoryEditSheet {
 
     var preview: some View {
         HStack(spacing: 20) {
-            VStack(spacing: 8) {
-                IconImage(model.icon.preview, size: 24)
-                    .foregroundStyle(Palette.accent)
+            Button {
+                focus = nil
+                isEditingIcon = true
+            } label: {
+                VStack(spacing: 8) {
+                    IconImage(model.icon.preview, size: 24)
+                        .foregroundStyle(Palette.accent)
 
-                Text(model.name.isEmpty ? "名前" : model.name)
-                    .textFont(size: .caption)
-                    .lineLimit(1)
+                    Text(model.name.isEmpty ? "名前" : model.name)
+                        .textFont(size: .caption)
+                        .lineLimit(1)
+                }
+                .foregroundStyle(Palette.accentStrong)
+                .frame(width: 86, height: 86)
+                .background(
+                    Palette.accent.opacity(.subtle),
+                    in: .rect(cornerRadius: corner.radius(20))
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: corner.radius(20))
+                        .stroke(Palette.outline, lineWidth: 1)
+                }
+                .overlay(alignment: .bottomTrailing) {
+                    EditBadge()
+                        .offset(x: 6, y: 6)
+                }
+                .contentShape(.rect)
             }
-            .foregroundStyle(Palette.accentStrong)
-            .frame(width: 86, height: 86)
-            .background(
-                Palette.accent.opacity(.subtle),
-                in: .rect(cornerRadius: corner.radius(20))
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: corner.radius(20))
-                    .stroke(Palette.outline, lineWidth: 1)
-            }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("入力シートでの見え方")

@@ -8,6 +8,7 @@ public struct WalletEditSheet: View {
     @State private var isConfirmingDiscard = false
     @State private var isEnteringAmount = false
     @State private var isEnteringValuation = false
+    @State private var isEditingIcon = false
     @State private var openValuationId: Valuation.ID?
     @State private var isConfirmingHide = false
     @State private var isConfirmingDelete = false
@@ -106,6 +107,12 @@ public struct WalletEditSheet: View {
                 }
             }
         }
+        .iconEditorDrawer(
+            isPresented: $isEditingIcon,
+            model: model.icon,
+            focus: $focus,
+            textField: .text
+        )
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -187,12 +194,6 @@ private extension WalletEditSheet {
                             isEditingPayment = true
                         }
                     }
-
-                    IconEditor(
-                        model: model.icon,
-                        focus: $focus,
-                        textField: .text
-                    )
                 }
                 .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)
@@ -244,17 +245,28 @@ private extension WalletEditSheet {
 
     var preview: some View {
         HStack(spacing: 16) {
-            IconImage(model.icon.preview, size: 22)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 48, height: 48)
-                .background(
-                    Palette.accent.opacity(.subtle),
-                    in: .rect(cornerRadius: corner.radius(16))
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(16))
-                        .stroke(Palette.outline, lineWidth: 1)
-                }
+            Button {
+                focus = nil
+                isEditingIcon = true
+            } label: {
+                IconImage(model.icon.preview, size: 22)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 48, height: 48)
+                    .background(
+                        Palette.accent.opacity(.subtle),
+                        in: .rect(cornerRadius: corner.radius(16))
+                    )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: corner.radius(16))
+                            .stroke(Palette.outline, lineWidth: 1)
+                    }
+                    .overlay(alignment: .bottomTrailing) {
+                        EditBadge(size: 20)
+                            .offset(x: 6, y: 6)
+                    }
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(previewName)
@@ -329,8 +341,11 @@ private extension WalletEditSheet {
                             .foregroundStyle(Palette.text)
 
                         Spacer(minLength: 8)
+
+                        EditBadge()
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.leading, 16)
+                    .padding(.trailing, 12)
                     .frame(height: 46)
                     .background(
                         Palette.panel,
