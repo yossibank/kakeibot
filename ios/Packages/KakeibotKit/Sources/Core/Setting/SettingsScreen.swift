@@ -7,4 +7,5 @@ public enum SettingsScreen: String, CaseIterable, Codable, Sendable {
     case rewards
     case budgets
     case themes
+    case homeSections
 }

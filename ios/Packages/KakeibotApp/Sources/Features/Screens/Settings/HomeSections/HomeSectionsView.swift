@@ -8,21 +8,28 @@ public struct HomeSectionsView: View {
     @State private var dragging: HomeSection?
     @State private var dragStart = 0
     @State private var dragTranslation: CGFloat = 0
+    @State private var hintFlag: SettingsScreenFlag
 
     @Environment(\.themeStyle.corner) private var corner
 
-    public init(model: HomeSectionsModel) {
+    public init(
+        model: HomeSectionsModel,
+        database: AppDatabase
+    ) {
+        let hintFlag = SettingsScreenFlag.closedHint(.homeSections, in: database)
+
         _model = State(initialValue: model)
+        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         VStack(spacing: 20) {
-            SettingsBackHeader("ホームに出すもの")
+            SettingsBackHeader("ホームに出すもの", hint: hintFlag)
 
-            Text("長押しで並べ替え、下の枠へ運ぶと隠せます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .multilineTextAlignment(.center)
+            SettingsHint(
+                flag: hintFlag,
+                lines: [.init("square.stack", "ホームに並べる順番と、出すものを選べます"), .move, .hide]
+            )
 
             ScrollView {
                 board
@@ -244,7 +251,10 @@ private extension HomeSectionsView {
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         NavigationStack {
-            HomeSectionsView(model: HomeSectionsModel(database: database))
+            HomeSectionsView(
+                model: HomeSectionsModel(database: database),
+                database: database
+            )
         }
     }
 }
