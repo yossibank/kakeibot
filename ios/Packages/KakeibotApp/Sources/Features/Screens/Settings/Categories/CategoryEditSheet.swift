@@ -182,11 +182,11 @@ private extension CategoryEditSheet {
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: corner.radius(20))
-                        .stroke(Palette.outline, lineWidth: 1)
+                        .stroke(iconStroke, lineWidth: iconStrokeWidth)
                 }
                 .overlay(alignment: .bottomTrailing) {
-                    EditBadge(bounces: true)
-                        .offset(x: 4, y: 4)
+                    EditBadge(size: 26, style: .button)
+                        .offset(x: 8, y: 8)
                 }
                 .contentShape(.rect)
             }
@@ -283,6 +283,14 @@ private extension CategoryEditSheet {
 
     static var tagTransition: AnyTransition {
         .scale(scale: 0.95).combined(with: .opacity)
+    }
+
+    var iconStroke: Color {
+        isEditingIcon ? Palette.accent : Palette.outline
+    }
+
+    var iconStrokeWidth: CGFloat {
+        isEditingIcon ? 2 : 1
     }
 
     var keyboardRegions: SafeAreaRegions {

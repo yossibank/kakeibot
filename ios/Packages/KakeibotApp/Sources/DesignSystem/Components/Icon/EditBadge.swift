@@ -1,42 +1,68 @@
 import SwiftUI
 
 public struct EditBadge: View {
-    @State private var bounce = 0
-
     private let size: CGFloat
-    private let bounces: Bool
+    private let style: Style
 
     public init(
         size: CGFloat = 18,
-        bounces: Bool = false
+        style: Style = .quiet
     ) {
         self.size = size
-        self.bounces = bounces
+        self.style = style
     }
 
     public var body: some View {
         Image(systemName: "pencil")
-            .font(.system(size: size * 0.55, weight: .medium))
-            .foregroundStyle(Palette.accent.opacity(.strong))
-            .symbolEffect(.bounce, options: .repeat(2), value: bounce)
+            .font(.system(size: size * 0.55, weight: weight))
+            .foregroundStyle(pencilColor)
             .frame(width: size, height: size)
             .background {
                 Circle()
                     .fill(Palette.panel)
                     .overlay {
                         Circle()
-                            .fill(Palette.accent.opacity(.subtle))
+                            .fill(tint)
                     }
             }
-            .task {
-                guard bounces else {
-                    return
-                }
-
-                try? await Task.sleep(for: .milliseconds(600))
-
-                bounce += 1
+            .overlay {
+                Circle()
+                    .stroke(strokeColor, lineWidth: 1)
             }
+            .shadow(color: shadowColor, radius: 4, y: 2)
+    }
+}
+
+public extension EditBadge {
+    enum Style: Sendable {
+        case quiet
+        case button
+    }
+}
+
+private extension EditBadge {
+    var isButton: Bool {
+        style == .button
+    }
+
+    var weight: Font.Weight {
+        isButton ? .semibold : .medium
+    }
+
+    var pencilColor: Color {
+        isButton ? Palette.accent : Palette.accent.opacity(.strong)
+    }
+
+    var tint: Color {
+        isButton ? Color.clear : Palette.accent.opacity(.subtle)
+    }
+
+    var strokeColor: Color {
+        isButton ? Palette.accent : Color.clear
+    }
+
+    var shadowColor: Color {
+        isButton ? Palette.shadow : Color.clear
     }
 }
 
@@ -44,7 +70,7 @@ public struct EditBadge: View {
     HStack(spacing: 16) {
         EditBadge()
 
-        EditBadge(size: 16, bounces: true)
+        EditBadge(size: 26, style: .button)
 
         Text("¥150,000")
             .editBadge()

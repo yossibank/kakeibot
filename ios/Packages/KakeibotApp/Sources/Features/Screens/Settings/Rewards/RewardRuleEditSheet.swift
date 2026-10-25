@@ -14,6 +14,7 @@ public struct RewardRuleEditSheet: View {
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     private let onDelete: (Deletion) -> Void
 
@@ -110,9 +111,16 @@ private extension RewardRuleEditSheet {
                         isEditingIcon = true
                     } label: {
                         IconBadge(model.icon.preview, size: 86)
+                            .overlay {
+                                RoundedRectangle(
+                                    cornerRadius: corner.radius(86 * 0.3),
+                                    style: .continuous
+                                )
+                                .stroke(iconStroke, lineWidth: iconStrokeWidth)
+                            }
                             .overlay(alignment: .bottomTrailing) {
-                                EditBadge(bounces: true)
-                                    .offset(x: 4, y: 4)
+                                EditBadge(size: 26, style: .button)
+                                    .offset(x: 8, y: 8)
                             }
                             .contentShape(.rect)
                     }
@@ -207,6 +215,14 @@ private extension RewardRuleEditSheet {
     }
 
     static let fade: CGFloat = 16
+
+    var iconStroke: Color {
+        isEditingIcon ? Palette.accent : Palette.outline
+    }
+
+    var iconStrokeWidth: CGFloat {
+        isEditingIcon ? 2 : 1
+    }
 
     var amountValue: String {
         model.amount.map { AmountText.text($0) } ?? "入れる"

@@ -265,11 +265,11 @@ private extension WalletEditSheet {
                     )
                     .overlay {
                         RoundedRectangle(cornerRadius: corner.radius(16))
-                            .stroke(Palette.outline, lineWidth: 1)
+                            .stroke(iconStroke, lineWidth: iconStrokeWidth)
                     }
                     .overlay(alignment: .bottomTrailing) {
-                        EditBadge(bounces: true)
-                            .offset(x: 4, y: 4)
+                        EditBadge(size: 24, style: .button)
+                            .offset(x: 8, y: 8)
                     }
                     .contentShape(.rect)
             }
@@ -556,6 +556,14 @@ private extension WalletEditSheet {
 
     var signFill: Color {
         signColor.opacity(0.1)
+    }
+
+    var iconStroke: Color {
+        isEditingIcon ? Palette.accent : Palette.outline
+    }
+
+    var iconStrokeWidth: CGFloat {
+        isEditingIcon ? 2 : 1
     }
 
     var amountStroke: Color {

@@ -23,7 +23,7 @@ struct IconEditorDrawer<Field: Hashable>: ViewModifier {
                                 close()
                             }
 
-                        SettingsDrawer("アイコン", isFloating: true) {
+                        SettingsDrawer("アイコン") {
                             close()
                         } content: {
                             ScrollView {
@@ -38,8 +38,6 @@ struct IconEditorDrawer<Field: Hashable>: ViewModifier {
                             .scrollDismissesKeyboard(.interactively)
                             .frame(maxHeight: .infinity)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.bottom, 8)
                     }
                     .transition(.settingsDrawer)
                 }
@@ -75,7 +73,7 @@ extension View {
 
 private extension IconEditorDrawer {
     static var gap: CGFloat {
-        12
+        16
     }
 
     var inset: CGFloat {

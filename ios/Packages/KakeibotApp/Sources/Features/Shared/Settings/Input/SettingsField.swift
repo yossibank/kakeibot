@@ -30,20 +30,26 @@ struct SettingsField<Field: Hashable>: View {
     }
 
     var body: some View {
-        TextField(
-            prompt,
-            text: $text,
-            prompt: Text(prompt).foregroundStyle(Palette.hint)
-        )
-        .font(font ?? .text(.body, in: textFont, scale: textScale))
-        .foregroundStyle(Palette.text)
-        .tint(Palette.accent)
-        .submitLabel(.done)
-        .focused(focus, equals: field)
-        .onSubmit {
-            focus.wrappedValue = nil
+        HStack(spacing: 8) {
+            TextField(
+                prompt,
+                text: $text,
+                prompt: Text(prompt).foregroundStyle(Palette.hint)
+            )
+            .font(font ?? .text(.body, in: textFont, scale: textScale))
+            .foregroundStyle(Palette.text)
+            .tint(Palette.accent)
+            .submitLabel(.done)
+            .focused(focus, equals: field)
+            .onSubmit {
+                focus.wrappedValue = nil
+            }
+
+            EditBadge(size: 16)
+                .opacity(badgeOpacity)
         }
-        .padding(.horizontal, 16)
+        .padding(.leading, 16)
+        .padding(.trailing, 12)
         .frame(height: 46)
         .background(Palette.panel, in: .rect(cornerRadius: corner.radius(16)))
         .overlay {
@@ -57,6 +63,10 @@ struct SettingsField<Field: Hashable>: View {
 private extension SettingsField {
     var isFocused: Bool {
         focus.wrappedValue == field
+    }
+
+    var badgeOpacity: Double {
+        isFocused ? 0 : 1
     }
 
     var stroke: Color {

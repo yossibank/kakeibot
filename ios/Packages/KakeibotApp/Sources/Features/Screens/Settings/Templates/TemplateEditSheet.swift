@@ -196,18 +196,23 @@ private extension TemplateEditSheet {
             detail: detail,
             size: .large
         ) {
-            TextField(
-                "名前",
-                text: $model.name,
-                prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
-            )
-            .font(TemplateCardSize.large.nameFont(in: themeStyle))
-            .foregroundStyle(Palette.accentStrong)
-            .tint(Palette.accent)
-            .submitLabel(.done)
-            .focused($focus, equals: .name)
-            .onSubmit {
-                focus = nil
+            HStack(spacing: 8) {
+                TextField(
+                    "名前",
+                    text: $model.name,
+                    prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
+                )
+                .font(TemplateCardSize.large.nameFont(in: themeStyle))
+                .foregroundStyle(Palette.accentStrong)
+                .tint(Palette.accent)
+                .submitLabel(.done)
+                .focused($focus, equals: .name)
+                .onSubmit {
+                    focus = nil
+                }
+
+                EditBadge(size: 16)
+                    .opacity(nameBadgeOpacity)
             }
             .padding(.bottom, 8)
             .overlay(alignment: .bottom) {
@@ -434,6 +439,10 @@ private extension TemplateEditSheet {
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {
         model.tags.map { TagLine.Item(id: $0.id, name: $0.name) }
+    }
+
+    var nameBadgeOpacity: Double {
+        focus == .name ? 0 : 1
     }
 
     var nameLine: Color {

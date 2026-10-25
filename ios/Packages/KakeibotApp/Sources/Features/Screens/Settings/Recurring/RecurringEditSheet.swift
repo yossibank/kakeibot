@@ -167,6 +167,11 @@ private extension RecurringEditSheet {
             .tint(Palette.accent)
             .submitLabel(.done)
             .focused($isNameFocused)
+            .padding(.horizontal, 24)
+            .overlay(alignment: .trailing) {
+                EditBadge(size: 16)
+                    .opacity(nameBadgeOpacity)
+            }
             .padding(.bottom, 8)
             .overlay(alignment: .bottom) {
                 Rectangle()
@@ -423,6 +428,10 @@ private extension RecurringEditSheet {
 
     var headerTitle: String {
         model.isEditing ? "固定費を編集" : "固定費を追加"
+    }
+
+    var nameBadgeOpacity: Double {
+        isNameFocused ? 0 : 1
     }
 
     var amountColor: Color {
