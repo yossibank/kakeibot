@@ -37,6 +37,7 @@ public struct AssetsView: View {
         ScrollView {
             VStack(spacing: 12) {
                 header
+
                 totalCard
 
                 if !model.upcomingBills.isEmpty {
@@ -184,6 +185,7 @@ private extension AssetsView {
                     .background(Palette.accent.opacity(.subtle), in: Circle())
 
                 SectionTitle("ごほうび貯金箱")
+
                 Spacer()
 
                 if model.isRewardGoalReached {
@@ -249,6 +251,7 @@ private extension AssetsView {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 SectionTitle("これからの引き落とし")
+
                 Spacer()
 
                 Text("合計 \(AmountText.text(model.upcomingBillTotal))")
@@ -275,6 +278,7 @@ private extension AssetsView {
     var trendLegend: some View {
         HStack(spacing: 16) {
             legend("手元のお金", dash: [])
+
             legend("純資産", dash: BalanceTrend.netWorthDash)
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -610,7 +614,6 @@ private extension AssetsView {
 
     static func payoffText(_ payoff: LoanPayoff) -> String {
         let date = payoff.lastDate
-
         return "あと \(payoff.count) 回・\(String(date.year))/\(date.month) まで"
     }
 
@@ -648,7 +651,6 @@ private extension AssetsView {
 
     func nextBillText(_ bill: CardBill) -> String {
         let date = "\(bill.date.month)/\(bill.date.day)"
-
         return "\(date) に \(AmountText.text(bill.amount)) 引き落とし"
     }
 
@@ -682,7 +684,6 @@ private extension AssetsView {
 
     func daysText(until date: LocalDate) -> String {
         let days = model.today.days(until: date)
-
         return days == 1 ? "明日" : "あと \(days) 日"
     }
 

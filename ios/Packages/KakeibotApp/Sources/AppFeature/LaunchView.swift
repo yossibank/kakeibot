@@ -31,6 +31,7 @@ public struct LaunchView: View {
     public var body: some View {
         ZStack {
             Color(uiColor: .systemBackground)
+
             mark
 
             themed

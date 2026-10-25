@@ -59,7 +59,6 @@ private extension RewardRuleListModel {
 
     func rules(isHidden: Bool) -> [RewardRule] {
         let rules = list?.rules ?? []
-
         return rules.filter { $0.isActive != isHidden }
     }
 }
@@ -71,7 +70,6 @@ extension RewardRuleListModel: SettingsBoardModel {
 
     public func saveOrder(_ ids: [RewardRule.ID]) async throws {
         let ids = ids + hidden.map(\.id)
-
         try await database.reorderRewardRules(ids, at: Date())
     }
 

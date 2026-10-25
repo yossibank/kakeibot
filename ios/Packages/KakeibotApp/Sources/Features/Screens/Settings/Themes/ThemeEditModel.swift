@@ -121,7 +121,6 @@ public extension ThemeEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -133,11 +132,9 @@ public extension ThemeEditModel {
 
         do {
             try await database.deleteTheme(editingId)
-
             return true
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
-
             return false
         }
     }

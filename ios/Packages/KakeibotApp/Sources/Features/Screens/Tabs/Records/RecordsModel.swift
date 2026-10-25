@@ -136,7 +136,6 @@ public extension RecordsModel {
 
     func batchCategories(for type: Entry.Kind) -> [EntryCategory] {
         let categories = list?.filterCategories ?? []
-
         return categories.filter { $0.kind.rawValue == type.rawValue }
     }
 
@@ -176,7 +175,6 @@ public extension RecordsModel {
 
     func clearRecentSearches() async {
         recentSearches = []
-
         await saveRecentSearches()
     }
 
@@ -241,7 +239,6 @@ public extension RecordsModel {
         on date: LocalDate
     ) -> Bool {
         let logs = rewardBank?.logs(on: date) ?? []
-
         return logs.contains { $0.ruleId == rule.id }
     }
 
@@ -385,7 +382,6 @@ private extension RecordsModel {
 
     func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
         let entries = list?.days.flatMap(\.entries) ?? []
-
         return entries.filter { ids.contains($0.id) }
     }
 

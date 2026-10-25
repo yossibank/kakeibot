@@ -32,7 +32,6 @@ extension MonthStartDay {
     func period(startingIn yearMonth: YearMonth) -> ClosedRange<LocalDate> {
         let start = date(in: yearMonth)
         let end = date(in: yearMonth.adding(months: 1)).adding(days: -1)
-
         return start...end
     }
 }
@@ -60,7 +59,6 @@ extension MonthStartDay: Codable {
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
-
         try container.encode(day)
     }
 }

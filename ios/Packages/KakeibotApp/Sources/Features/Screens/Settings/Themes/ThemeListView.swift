@@ -44,8 +44,11 @@ public struct ThemeListView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
                         section("ライト", isLight: true)
+
                         section("ダーク", isLight: false)
+
                         customSection
+
                         systemSection
                     }
                     .padding(.vertical, 8)
@@ -146,6 +149,7 @@ private extension ThemeListView {
                     .mask {
                         HStack(spacing: 0) {
                             Color.clear
+
                             Color.black
                         }
                     }
@@ -249,9 +253,7 @@ private extension ThemeListView {
                             .onTapGesture {
                                 select(choice)
                             }
-                            .onLongPressGesture(
-                                minimumDuration: Self.menuPressDuration
-                            ) {
+                            .onLongPressGesture(minimumDuration: Self.menuPressDuration) {
                                 let space = CoordinateSpace.named(Self.space)
 
                                 let menu = Menu(
@@ -345,7 +347,6 @@ private extension ThemeListView {
                 systemImage: "plus.square.on.square"
             ) {
                 closeMenu()
-
                 editing = .new(base: menu.palette)
             }
 
@@ -357,7 +358,6 @@ private extension ThemeListView {
                     systemImage: "square.and.pencil"
                 ) {
                     closeMenu()
-
                     editing = .edit(theme)
                 }
             }

@@ -40,7 +40,6 @@ public extension AppDatabase {
 
     static func inMemory() throws -> AppDatabase {
         let queue = try DatabaseQueue(configuration: configuration)
-
         return try AppDatabase(queue)
     }
 
@@ -100,9 +99,7 @@ private extension AppDatabase {
     static var groupContainer: URL? {
         let manager = FileManager.default
 
-        return manager.containerURL(
-            forSecurityApplicationGroupIdentifier: groupIdentifier
-        )
+        return manager.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)
     }
 
     static var configuration: Configuration {

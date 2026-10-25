@@ -355,7 +355,6 @@ private extension TemplateEditSheet {
                     isSelected: model.categoryId == category.id
                 ) {
                     model.categoryId = category.id
-
                     closePanel()
                 }
             }
@@ -375,7 +374,6 @@ private extension TemplateEditSheet {
                     isSelected: model.walletId == wallet.id
                 ) {
                     model.walletId = wallet.id
-
                     closePanel()
                 }
             }
@@ -527,7 +525,6 @@ private extension TemplateEditSheet {
 
     func closePanel() {
         focus = nil
-
         hidePanel()
     }
 

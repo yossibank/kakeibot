@@ -16,6 +16,7 @@ struct RecordsFilterSheet: View {
     var body: some View {
         VStack(spacing: 20) {
             header
+
             CapsulePicker(selection: $tab, options: tabOptions)
 
             if isEmpty {
@@ -300,7 +301,6 @@ private extension RecordsFilterSheet {
 
     func keepShownTags() {
         let shown = Set(tagGroups.flatMap { $0.tags.map(\.id) })
-
         filter.tagIds.formIntersection(shown)
     }
 

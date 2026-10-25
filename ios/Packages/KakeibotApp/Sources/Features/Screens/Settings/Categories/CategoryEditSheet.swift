@@ -193,6 +193,7 @@ private extension CategoryEditSheet {
         VStack(alignment: .leading, spacing: 2) {
             HStack {
                 SettingsSectionTitle("タグ")
+
                 Spacer()
 
                 if model.tags.count > 1 {
@@ -291,7 +292,6 @@ private extension CategoryEditSheet {
 
     func editTag(_ id: UUID) {
         let name = model.tags.first { $0.id == id }?.draft.name ?? ""
-
         showTag(.rename(id), name: name)
     }
 
@@ -379,7 +379,10 @@ private extension CategoryEditSheet {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
 
         CategoryEditSheet(
-            model: CategoryEditModel(database: database, kind: .expense)
+            model: CategoryEditModel(
+                database: database,
+                kind: .expense
+            )
         )
     }
 }

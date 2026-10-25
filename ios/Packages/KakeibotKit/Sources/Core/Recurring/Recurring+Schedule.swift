@@ -22,13 +22,11 @@ public extension Recurring {
 
     func pendingDates(through today: LocalDate) -> [LocalDate] {
         let start = generatedUntil.map { $0.adding(days: 1) } ?? startDate
-
         return dates(from: start, through: today)
     }
 
     func nextDate(onOrAfter date: LocalDate) -> LocalDate? {
         let horizon = date.adding(days: Self.searchDays)
-
         return dates(from: date, through: horizon).first
     }
 
@@ -51,12 +49,11 @@ private extension Recurring {
     static let searchDays = 400
 
     func shifted(_ date: LocalDate) -> LocalDate {
-        let step =
-            switch holidayShift {
-            case .none: 0
-            case .previous: -1
-            case .next: 1
-            }
+        let step = switch holidayShift {
+        case .none: 0
+        case .previous: -1
+        case .next: 1
+        }
 
         guard step != 0 else {
             return date

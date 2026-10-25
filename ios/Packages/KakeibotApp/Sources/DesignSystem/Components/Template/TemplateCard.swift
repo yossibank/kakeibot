@@ -64,8 +64,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
     }
 }
 
-public extension TemplateCard
-    where Name == TemplateCardName, Amount == TemplateCardAmount {
+public extension TemplateCard where Name == TemplateCardName, Amount == TemplateCardAmount {
     init(
         icon: Icon?,
         name: String,

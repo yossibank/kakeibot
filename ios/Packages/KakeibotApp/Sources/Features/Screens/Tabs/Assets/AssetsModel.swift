@@ -282,7 +282,6 @@ public extension AssetsModel {
             return true
         } catch {
             errorNotice.show(Self.goalFailedMessage)
-
             return false
         }
     }
@@ -352,7 +351,6 @@ private extension AssetsModel {
         in list: EntryList
     ) -> EntryRowItem {
         let day = "\(entry.date.month)/\(entry.date.day)"
-
         return EntryRowItem(entry, in: list, dayLabel: day)
     }
 

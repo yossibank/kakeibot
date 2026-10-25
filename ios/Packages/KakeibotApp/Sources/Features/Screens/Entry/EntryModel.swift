@@ -23,18 +23,17 @@ public final class EntryModel {
         }
     }
 
-    public var toWalletId: Wallet.ID?
-    public var memo = ""
-
     public var categoryId: EntryCategory.ID? {
         didSet {
             if categoryId != oldValue {
                 tagId = nil
-
                 followUsualWallet(from: oldValue)
             }
         }
     }
+
+    public var toWalletId: Wallet.ID?
+    public var memo = ""
 
     public private(set) var tagId: EntryTag.ID?
     public private(set) var billMonth: YearMonth?
@@ -373,7 +372,6 @@ public extension EntryModel {
     func icon(for template: EntryTemplate) -> Icon? {
         let categories = categories(for: template.type)
         let category = categories.first { $0.id == template.categoryId }
-
         return category.flatMap { options?.icons[$0.iconId] }
     }
 
@@ -382,7 +380,9 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
 
             options = try await database.entryOptions()
+
             recentMemos = try await database.recentMemos(limit: limit)
+
             allTemplates = try await database.templates()
 
             cardBills = try await database.recurrings()
@@ -393,9 +393,7 @@ public extension EntryModel {
 
             weekStart = try await database.setting(.weekStart)
 
-            startsWithAmount = try await database.setting(
-                .entryStartsWithAmount
-            )
+            startsWithAmount = try await database.setting(.entryStartsWithAmount)
 
             try await loadBalances()
 
@@ -464,7 +462,6 @@ public extension EntryModel {
 
     func newCategoryModel() -> CategoryEditModel {
         let kind: EntryCategory.Kind = type == .income ? .income : .expense
-
         return CategoryEditModel(database: database, kind: kind)
     }
 
@@ -475,7 +472,6 @@ public extension EntryModel {
     func reloadWallets() async {
         do {
             options = try await database.entryOptions()
-
             try await loadBalances()
         } catch {
             report(error)
@@ -552,13 +548,11 @@ public extension EntryModel {
 
     func selectBill(_ date: LocalDate) {
         let isUsual = date == billChoices.first?.date
-
         billMonth = isUsual ? nil : date.yearMonth
     }
 
     func swapWallets() {
         let source = walletId
-
         walletId = toWalletId
         toWalletId = source
     }
@@ -571,6 +565,7 @@ public extension EntryModel {
         let followsUsual = walletId == usualWalletId(for: categoryId)
 
         categoryByType[self.type] = categoryId
+
         self.type = type
 
         let remembered = categoryByType[type]
@@ -613,7 +608,6 @@ public extension EntryModel {
             return EntryChange(kind: kind, entry: entry, label: title)
         } catch {
             report(error)
-
             return nil
         }
     }
@@ -641,13 +635,10 @@ public extension EntryModel {
 
         do {
             try await database.deleteEntry(original.id)
-
             let title = label(for: original)
-
             return EntryChange(kind: .deleted, entry: original, label: title)
         } catch {
             report(error)
-
             return nil
         }
     }
@@ -667,7 +658,6 @@ private extension EntryModel {
     }
 
     static let restoreFailedMessage = "元に戻せませんでした"
-
     static let recentMemoLimit = 6
     static let billTitles = ["いつもどおり", "次に回す", "2 回先"]
     static let numberLocale = Locale(identifier: "ja_JP")
@@ -752,7 +742,6 @@ private extension EntryModel {
         return categories.sorted { lhs, rhs in
             let left = categoryUses[lhs.id, default: 0]
             let right = categoryUses[rhs.id, default: 0]
-
             return left == right ? lhs.sortOrder < rhs.sortOrder : left > right
         }
     }

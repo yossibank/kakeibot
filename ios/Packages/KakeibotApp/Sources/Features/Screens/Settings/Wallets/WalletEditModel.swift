@@ -172,7 +172,6 @@ public extension WalletEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -215,7 +214,6 @@ public extension WalletEditModel {
 
             guard let wallet, let icon = list.icons[wallet.iconId] else {
                 errorNotice.show(Self.loadFailedMessage)
-
                 return
             }
 
@@ -265,7 +263,6 @@ public extension WalletEditModel {
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return nil
         }
     }
@@ -287,11 +284,9 @@ public extension WalletEditModel {
             return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {
             errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
-
             return false
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -305,9 +300,7 @@ public extension WalletEditModel {
             return try await database.deleteWallet(editingId)
         } catch {
             let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
-
             errorNotice.show(message)
-
             return nil
         }
     }

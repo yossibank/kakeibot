@@ -59,6 +59,7 @@ final class DismissAttemptController: UIViewController {
         }
 
         original = presentation.delegate
+
         presentation.delegate = self
     }
 
@@ -97,9 +98,7 @@ extension DismissAttemptController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerShouldDismiss(
         _ presentationController: UIPresentationController
     ) -> Bool {
-        original?.presentationControllerShouldDismiss?(
-            presentationController
-        ) ?? true
+        original?.presentationControllerShouldDismiss?(presentationController) ?? true
     }
 
     func presentationControllerDidAttemptToDismiss(
@@ -107,9 +106,7 @@ extension DismissAttemptController: UIAdaptivePresentationControllerDelegate {
     ) {
         onAttempt()
 
-        original?.presentationControllerDidAttemptToDismiss?(
-            presentationController
-        )
+        original?.presentationControllerDidAttemptToDismiss?(presentationController)
     }
 
     func presentationControllerWillDismiss(

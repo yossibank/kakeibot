@@ -8,17 +8,16 @@ public struct StampListView: View {
     @State private var model: StampListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
+    @State private var hiddenId: ShelfIcon.ID?
+    @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
+    @State private var hiddenList: SettingsScreenFlag
 
     @State private var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
         spacing: Self.spacing
     )
-
-    @State private var hiddenId: ShelfIcon.ID?
-    @State private var deletion: Deletion?
-    @State private var isConfirmingDeleteHidden = false
-    @State private var hiddenList: SettingsScreenFlag
 
     @Environment(\.themeStyle.corner) private var corner
 

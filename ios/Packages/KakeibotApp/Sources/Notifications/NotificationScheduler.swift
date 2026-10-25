@@ -42,8 +42,7 @@ public extension NotificationScheduler {
             await client.remove(stale)
         }
 
-        for (identifier, notification) in wanted
-            where !pending.contains(identifier) {
+        for (identifier, notification) in wanted where !pending.contains(identifier) {
             try? await client.add(
                 identifier: identifier,
                 title: notification.title,
@@ -76,7 +75,6 @@ private extension NotificationScheduler {
         in timeZone: TimeZone
     ) -> Date {
         let components = components(of: notification, in: timeZone)
-
         return components.date ?? .distantPast
     }
 }

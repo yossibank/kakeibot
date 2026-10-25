@@ -17,7 +17,6 @@ struct QuickRecordWidgetProvider: TimelineProvider {
         Task {
             let now = Date()
             let timeline = await Self.timeline(at: now, isPreview: isPreview)
-
             completion(timeline.entries.first ?? .sample(at: now))
         }
     }

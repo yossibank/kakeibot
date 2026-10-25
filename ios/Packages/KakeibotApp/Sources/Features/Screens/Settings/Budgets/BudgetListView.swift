@@ -65,6 +65,7 @@ private extension BudgetListView {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             SettingsSectionTitle("カテゴリごと")
+
                             Spacer()
 
                             Text("合計 \(AmountText.text(model.categoriesTotal))")
@@ -184,6 +185,7 @@ private extension BudgetListView {
 
             HStack {
                 Text("使った額 \(AmountText.text(usage.spent))")
+
                 Spacer()
 
                 Text(usage.remainingText)
@@ -199,7 +201,6 @@ private extension BudgetListView {
 private extension BudgetListView {
     var recurringText: String {
         let amount = AmountText.text(model.recurringExpense)
-
         return "この月の固定費は \(amount)。予算の目安にできます"
     }
 

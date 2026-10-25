@@ -144,6 +144,7 @@ private extension RecordsView {
                 .foregroundStyle(Palette.accent)
 
             Spacer()
+
             monthButton(systemImage: "chevron.left", months: -1)
 
             VStack(spacing: 1) {
@@ -270,7 +271,6 @@ private extension RecordsView {
             ForEach(model.recentSearches, id: \.self) { word in
                 Button {
                     model.searchText = word
-
                     rememberSearch()
                 } label: {
                     HStack(spacing: 12) {
@@ -429,6 +429,7 @@ private extension RecordsView {
     var summary: some View {
         HStack(spacing: 0) {
             total("支出", amount: model.expenseTotal, color: Palette.accentStrong)
+
             total("収入", amount: model.incomeTotal, color: Palette.accent)
         }
         .padding(.horizontal, 16)
@@ -473,6 +474,7 @@ private extension RecordsView {
                     .foregroundStyle(Palette.accentStrong)
 
                 selectButton
+
                 Spacer()
 
                 Text(PeriodText.range(summary.range))

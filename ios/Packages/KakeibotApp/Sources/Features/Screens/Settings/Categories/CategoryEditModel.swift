@@ -154,7 +154,6 @@ public extension CategoryEditModel {
 
             guard let category, let icon = list.icons[category.iconId] else {
                 errorNotice.show(Self.loadFailedMessage)
-
                 return
             }
 
@@ -193,7 +192,6 @@ public extension CategoryEditModel {
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return nil
         }
     }
@@ -215,7 +213,6 @@ public extension CategoryEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -229,11 +226,9 @@ public extension CategoryEditModel {
             return try await database.deleteCategory(editingId)
         } catch AppDatabase.CategoryWriteError.hasEntries {
             errorNotice.show(Self.inUseMessage)
-
             return nil
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
-
             return nil
         }
     }
@@ -309,7 +304,6 @@ private extension CategoryEditModel {
 
     func apply(_ draft: CategoryDraft) {
         name = draft.name
-
         icon.apply(draft.icon)
     }
 }

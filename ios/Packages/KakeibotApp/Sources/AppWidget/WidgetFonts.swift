@@ -9,7 +9,6 @@ public enum WidgetFonts {
 
         for name in fileNames {
             let url = appURL.appending(path: name)
-
             CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
         }
     }

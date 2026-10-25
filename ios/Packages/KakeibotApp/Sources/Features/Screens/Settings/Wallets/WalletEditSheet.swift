@@ -163,6 +163,7 @@ private extension WalletEditSheet {
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 8) {
                         preview
+
                         colorNote
                     }
 
@@ -174,6 +175,7 @@ private extension WalletEditSheet {
                     )
 
                     kindChooser
+
                     balanceField
 
                     if model.showsValuation {
@@ -601,7 +603,6 @@ private extension WalletEditSheet {
         guard !model.isEditing, model.asksPayment else {
             onSave(wallet)
             dismiss()
-
             return
         }
 
@@ -612,7 +613,6 @@ private extension WalletEditSheet {
     func closePayment() {
         guard addedWallet == nil else {
             finishAddedWallet()
-
             return
         }
 
@@ -635,7 +635,6 @@ private extension WalletEditSheet {
 
         guard !model.needsHideConfirmation else {
             isConfirmingHide = true
-
             return
         }
 

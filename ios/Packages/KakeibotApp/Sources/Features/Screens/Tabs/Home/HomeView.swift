@@ -61,6 +61,7 @@ public struct HomeView: View {
         ScrollView {
             VStack(spacing: 12) {
                 header
+
                 dialCard
 
                 if showsSetupCard {
@@ -79,6 +80,7 @@ public struct HomeView: View {
                 }
 
                 templateCard
+
                 recentCard
             }
             .padding(.horizontal, 16)
@@ -113,6 +115,7 @@ private extension HomeView {
             }
 
             Spacer()
+
             HeaderButton(
                 systemImage: "gearshape",
                 showsDot: !setup.isSettingsOpened,
@@ -234,6 +237,7 @@ private extension HomeView {
             ZStack {
                 HStack {
                     SectionTitle("テンプレート")
+
                     Spacer()
 
                     Button("すべて", action: onShowAllTemplates)
@@ -345,6 +349,7 @@ private extension HomeView {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 SectionTitle("最近の記録")
+
                 Spacer()
 
                 Button("すべて", action: onShowRecords)

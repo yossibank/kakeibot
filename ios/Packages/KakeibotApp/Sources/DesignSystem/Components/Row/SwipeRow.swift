@@ -209,7 +209,6 @@ private extension SwipeRow {
 
     func delete() {
         openId = nil
-
         onDelete?()
     }
 
@@ -224,7 +223,6 @@ private extension SwipeRow {
     func tap() {
         guard openId == nil else {
             openId = nil
-
             return
         }
 

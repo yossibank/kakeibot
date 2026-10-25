@@ -196,11 +196,7 @@ public struct SettingsSheet: View {
                                 Hairline()
 
                                 NavigationLink {
-                                    ThemeStyleView(
-                                        model: ThemeStyleModel(
-                                            database: database
-                                        )
-                                    )
+                                    ThemeStyleView(model: ThemeStyleModel(database: database))
                                 } label: {
                                     row(
                                         "文字と角の丸み",
@@ -220,11 +216,7 @@ public struct SettingsSheet: View {
 
                             VStack(spacing: 0) {
                                 NavigationLink {
-                                    LaunchScreenView(
-                                        model: LaunchScreenModel(
-                                            database: database
-                                        )
-                                    )
+                                    LaunchScreenView(model: LaunchScreenModel(database: database))
                                 } label: {
                                     row(
                                         "起動時に開く画面",
@@ -286,9 +278,7 @@ public struct SettingsSheet: View {
 
                             VStack(spacing: 0) {
                                 NavigationLink {
-                                    BackupView(
-                                        model: BackupModel(database: database)
-                                    )
+                                    BackupView(model: BackupModel(database: database))
                                 } label: {
                                     row(
                                         "バックアップ",
@@ -297,6 +287,7 @@ public struct SettingsSheet: View {
                                 }
 
                                 Hairline()
+
                                 versionRow
                             }
                             .buttonStyle(.plain)
@@ -342,12 +333,10 @@ public struct SettingsSheet: View {
         }
         .task {
             let starts = try? await database.setting(.entryStartsWithAmount)
-
             startsWithAmount = starts ?? false
         }
         .task {
             let byUse = try? await database.setting(.categoriesByUse)
-
             categoriesByUse = byUse ?? false
         }
     }
@@ -426,7 +415,9 @@ private extension SettingsSheet {
         return ViewThatFits(in: .horizontal) {
             HStack(spacing: 12) {
                 label
+
                 Spacer(minLength: 8)
+
                 picker
             }
             .frame(minHeight: 52)

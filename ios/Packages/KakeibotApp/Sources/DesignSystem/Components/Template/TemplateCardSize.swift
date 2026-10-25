@@ -23,19 +23,16 @@ public extension TemplateCardSize {
 
     func nameFont(in style: ThemeStyle) -> Font {
         let size: FontSize = self == .regular ? .body : .headline
-
         return display(size, weight: .medium, in: style)
     }
 
     func amountFont(in style: ThemeStyle) -> Font {
         let size: FontSize = self == .regular ? .headline : .largeTitle
-
         return display(size, weight: .medium, in: style)
     }
 
     func emptyAmountFont(in style: ThemeStyle) -> Font {
         let size: FontSize = self == .regular ? .small : .body
-
         return display(size, weight: .regular, in: style)
     }
 }

@@ -371,7 +371,6 @@ private extension WalletListView {
         guard model.balance(of: wallet) == 0 else {
             hiding = wallet
             isConfirmingHide = true
-
             return
         }
 

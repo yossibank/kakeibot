@@ -96,7 +96,9 @@ private extension ThemeEditSheet {
             }
 
             Spacer()
+
             SettingsSheetTitle(model.isEditing ? "テーマを編集" : "テーマをつくる")
+
             Spacer()
 
             if model.isEditing {

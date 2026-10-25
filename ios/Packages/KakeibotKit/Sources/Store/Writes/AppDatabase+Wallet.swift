@@ -67,9 +67,7 @@ public extension AppDatabase {
                 throw WalletWriteError.walletNotFound
             }
 
-            let entries = Entry.filter(
-                Column("wallet_id") == id || Column("to_wallet_id") == id
-            )
+            let entries = Entry.filter(Column("wallet_id") == id || Column("to_wallet_id") == id)
 
             if try entries.fetchCount(db) > 0 {
                 throw WalletWriteError.hasEntries

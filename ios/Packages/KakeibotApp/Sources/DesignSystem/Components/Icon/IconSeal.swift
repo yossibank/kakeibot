@@ -66,7 +66,9 @@ private extension IconSeal {
 
     HStack(spacing: 16) {
         IconSeal(star, size: 18)
+
         IconSeal(cake, size: 18)
+
         IconSeal(star, size: 30)
     }
     .padding()

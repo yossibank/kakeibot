@@ -62,13 +62,11 @@ private extension TemplateOrderMenu {
     func panelX(in width: CGFloat) -> CGFloat {
         let preferred = anchor.maxX - Self.width
         let limit = width - Self.width - Self.inset
-
         return min(max(preferred, Self.inset), limit)
     }
 
     func choose(_ order: TemplateOrder) {
         selection = order
-
         onClose()
     }
 }

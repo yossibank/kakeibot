@@ -71,7 +71,6 @@ extension CategoryListModel: SettingsBoardModel {
 
     public func saveOrder(_ ids: [EntryCategory.ID]) async throws {
         let ids = ids + hidden.map(\.id)
-
         try await database.reorderCategories(ids, at: Date())
     }
 

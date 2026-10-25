@@ -26,7 +26,6 @@ public extension AmountText {
         type: Entry.Kind? = nil
     ) -> String {
         let number = abs(amount).formatted(.number.locale(locale))
-
         return "\(sign(of: amount, type: type))¥\(number)"
     }
 }
@@ -59,9 +58,13 @@ private extension AmountText {
 #Preview {
     VStack(alignment: .trailing) {
         AmountText(980, type: .expense)
+
         AmountText(250_000, type: .income)
+
         AmountText(3000, type: .transfer)
+
         AmountText(1_234_567)
+
         AmountText(-24800)
     }
     .padding()

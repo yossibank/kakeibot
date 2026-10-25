@@ -19,7 +19,10 @@ public struct OnboardingView: View {
         onFinish: @escaping () -> Void
     ) {
         _model = State(
-            initialValue: OnboardingModel(database: database, today: today)
+            initialValue: OnboardingModel(
+                database: database,
+                today: today
+            )
         )
 
         self.database = database
@@ -273,6 +276,7 @@ private extension OnboardingView {
                 )
 
                 setupSection("記録の準備", items: SetupItem.onboarding)
+
                 setupSection("自分好みに", items: SetupItem.customize)
             }
             .padding(.vertical, 8)
@@ -380,7 +384,6 @@ private extension OnboardingView {
     func next() async {
         guard model.isLastPage else {
             turnPage(.forward)
-
             return
         }
 

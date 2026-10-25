@@ -34,6 +34,7 @@ extension RecordTemplateIntent {
         let database = try AppDatabase.appGroupForWriting()
 
         try await database.recordFromWidget(id, on: today, at: now)
+
         await database.finishWidgetWrite(today: today)
 
         return .result()

@@ -200,9 +200,7 @@ private extension RecurringEditSheet {
                 .transition(Self.monthTransition)
             }
 
-            MonthStartDayGrid(
-                selection: MonthStartDay(model.day) ?? .first
-            ) { day in
+            MonthStartDayGrid(selection: MonthStartDay(model.day) ?? .first) { day in
                 model.day = day.day
             }
         }
@@ -214,13 +212,11 @@ private extension RecurringEditSheet {
             HStack(spacing: 8) {
                 SettingsChoice("終わりなし", isSelected: model.endDate == nil) {
                     model.endDate = nil
-
                     closePanel()
                 }
 
                 SettingsChoice("今日で終える", isSelected: isEndingToday) {
                     model.endDate = model.today
-
                     closePanel()
                 }
             }
@@ -266,13 +262,10 @@ private extension RecurringEditSheet {
                 isSelected: model.closingDay == nil
             ) {
                 model.closingDay = nil
-
                 closePanel()
             }
 
-            MonthStartDayGrid(
-                selection: model.closingDay.flatMap(MonthStartDay.init)
-            ) { day in
+            MonthStartDayGrid(selection: model.closingDay.flatMap(MonthStartDay.init)) { day in
                 model.closingDay = day.day
 
                 closePanel()
@@ -292,7 +285,6 @@ private extension RecurringEditSheet {
                     isSelected: model.remindDaysBefore == days
                 ) {
                     model.remindDaysBefore = days
-
                     closePanel()
                 }
             }
@@ -341,7 +333,6 @@ private extension RecurringEditSheet {
                     isSelected: model.walletId == wallet.id
                 ) {
                     model.walletId = wallet.id
-
                     closePanel()
                 }
             }
@@ -358,7 +349,6 @@ private extension RecurringEditSheet {
                     isSelected: model.toWalletId == wallet.id
                 ) {
                     model.toWalletId = wallet.id
-
                     closePanel()
                 }
             }

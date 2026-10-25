@@ -26,6 +26,7 @@ public struct MonthCalendar: View {
         VStack(spacing: 8) {
             HStack {
                 monthButton(systemImage: "chevron.left", months: -1)
+
                 Spacer()
 
                 Text(monthTitle)
@@ -33,6 +34,7 @@ public struct MonthCalendar: View {
                     .foregroundStyle(Palette.accentStrong)
 
                 Spacer()
+
                 monthButton(systemImage: "chevron.right", months: 1)
             }
 
@@ -90,7 +92,10 @@ private extension MonthCalendar {
     func cell(for date: LocalDate?) -> some View {
         if let date {
             let isSelected = date == selection
-            let weight: Font.Weight = isSelected ? .semibold : .regular
+
+            let weight: Font.Weight = isSelected
+                ? .semibold
+                : .regular
 
             let ring = date == today && !isSelected
                 ? Palette.accent
@@ -157,7 +162,6 @@ private extension MonthCalendar {
         let weeks = month.weeks(startingOn: weekStart)
         let blank = [LocalDate?](repeating: nil, count: 7)
         let missing = max(Self.rowCount - weeks.count, 0)
-
         return weeks + Array(repeating: blank, count: missing)
     }
 

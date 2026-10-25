@@ -86,12 +86,10 @@ public extension View {
                     role: role,
                     onConfirm: {
                         isPresented.wrappedValue = false
-
                         onConfirm()
                     },
                     onKeep: {
                         isPresented.wrappedValue = false
-
                         onKeep()
                     }
                 )

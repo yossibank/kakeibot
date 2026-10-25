@@ -146,6 +146,7 @@ private extension EntrySheet {
     var form: some View {
         VStack(spacing: 16) {
             dial
+
             details
 
             if model.type == .transfer {
@@ -203,7 +204,9 @@ private extension EntrySheet {
             }
 
             Spacer()
+
             CapsulePicker(selection: typeBinding, options: Self.typeOptions)
+
             Spacer()
 
             if model.isEditing {
@@ -543,12 +546,8 @@ private extension EntrySheet {
                         .onTapGesture {
                             select(category)
                         }
-                        .onLongPressGesture(
-                            minimumDuration: Self.menuPressDuration
-                        ) {
-                            let space = CoordinateSpace.named(
-                                Self.coordinateSpace
-                            )
+                        .onLongPressGesture(minimumDuration: Self.menuPressDuration) {
+                            let space = CoordinateSpace.named(Self.coordinateSpace)
 
                             openMenu(for: category, at: proxy.frame(in: space))
                         } onPressingChanged: { isPressing in
@@ -687,19 +686,7 @@ private extension EntrySheet {
 
     nonisolated static let coordinateSpace = "EntrySheet"
 
-    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
-        .init("支出", value: .expense),
-        .init("収入", value: .income),
-        .init("振替", value: .transfer)
-    ]
-
     static let memoCardInset: CGFloat = 12
-
-    static let drawerShape = UnevenRoundedRectangle(
-        topLeadingRadius: 28,
-        topTrailingRadius: 28
-    )
-
     static let dialMinSize: CGFloat = 240
     static let fade: CGFloat = 20
     static let categoryRows = 3
@@ -709,6 +696,17 @@ private extension EntrySheet {
     static let menuPressDuration = 0.15
     static let peekDuration = 0.35
     static let peekWidth: CGFloat = 260
+
+    static let drawerShape = UnevenRoundedRectangle(
+        topLeadingRadius: 28,
+        topTrailingRadius: 28
+    )
+
+    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
+        .init("支出", value: .expense),
+        .init("収入", value: .income),
+        .init("振替", value: .transfer)
+    ]
 
     static var pagerHeight: CGFloat {
         let rows = CGFloat(categoryRows)
@@ -771,7 +769,6 @@ private extension EntrySheet {
 
     func open(_ sheet: Sheet) {
         setEnteringAmount(false)
-
         self.sheet = sheet
     }
 
@@ -829,7 +826,6 @@ private extension EntrySheet {
 
     func select(_ category: EntryCategory) {
         setEnteringAmount(false)
-
         model.categoryId = category.id
     }
 

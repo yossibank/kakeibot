@@ -65,6 +65,7 @@ private extension IconImage {
 
     HStack {
         IconImage(glyph)
+
         IconImage(emoji)
     }
     .padding()

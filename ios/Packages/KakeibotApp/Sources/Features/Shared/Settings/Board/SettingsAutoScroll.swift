@@ -75,7 +75,6 @@ private extension SettingsAutoScroll {
 
             if delta != 0 {
                 offset = target
-
                 position.scrollTo(y: target)
                 onStep?(delta)
             }

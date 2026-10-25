@@ -265,7 +265,6 @@ public extension HomeModel {
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return nil
         }
     }

@@ -40,10 +40,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                 ) { index, option in
                     let isHighlighted = index == highlightedIndex
                     let weight: Font.Weight = isHighlighted ? .bold : .regular
-
-                    let color = isHighlighted
-                        ? Palette.accentStrong
-                        : Palette.subtext
+                    let color = isHighlighted ? Palette.accentStrong : Palette.subtext
 
                     Text(option.title)
                         .textFont(.footnote, weight: weight)
@@ -205,7 +202,6 @@ private extension CapsulePicker {
 
     func index(at x: CGFloat) -> Int {
         let index = Int((x / segmentWidth).rounded(.down))
-
         return min(max(index, 0), options.count - 1)
     }
 }

@@ -26,7 +26,10 @@ public struct SetupDestination: View {
         switch item {
         case .budget:
             BudgetListView(
-                model: BudgetListModel(database: database, today: today)
+                model: BudgetListModel(
+                    database: database,
+                    today: today
+                )
             )
         case .wallets:
             WalletListView(database: database)
@@ -34,7 +37,10 @@ public struct SetupDestination: View {
             CategoryListView(database: database)
         case .recurrings:
             RecurringListView(
-                model: RecurringListModel(database: database, today: today)
+                model: RecurringListModel(
+                    database: database,
+                    today: today
+                )
             )
         case .templates:
             TemplateListView(database: database)
@@ -48,9 +54,7 @@ public struct SetupDestination: View {
                 )
             )
         case .launchScreen:
-            LaunchScreenView(
-                model: LaunchScreenModel(database: database)
-            )
+            LaunchScreenView(model: LaunchScreenModel(database: database))
         case .startsWithAmount:
             EmptyView()
         case .theme:
@@ -58,9 +62,7 @@ public struct SetupDestination: View {
         case .appIcon:
             AppIconListView(model: appIcon)
         case .themeStyle:
-            ThemeStyleView(
-                model: ThemeStyleModel(database: database)
-            )
+            ThemeStyleView(model: ThemeStyleModel(database: database))
         }
     }
 }

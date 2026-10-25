@@ -8,17 +8,16 @@ public struct CategoryListView: View {
     @State private var model: CategoryListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
+    @State private var hiddenId: EntryCategory.ID?
+    @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
+    @State private var hiddenList: SettingsScreenFlag
 
     @State private var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
         spacing: Self.spacing
     )
-
-    @State private var hiddenId: EntryCategory.ID?
-    @State private var deletion: Deletion?
-    @State private var isConfirmingDeleteHidden = false
-    @State private var hiddenList: SettingsScreenFlag
 
     @Environment(\.themeStyle.corner) private var corner
 
@@ -44,6 +43,7 @@ public struct CategoryListView: View {
     public var body: some View {
         VStack(spacing: 16) {
             SettingsBackHeader("カテゴリ", hint: hintFlag)
+
             CapsulePicker(selection: $model.kind, options: Self.kindOptions)
 
             SettingsHint(
@@ -315,14 +315,14 @@ private extension CategoryListView {
 
     nonisolated static let space = "CategoryBoard"
 
+    static let columnCount = 4
+    static let spacing: CGFloat = 8
+    static let tileHeight: CGFloat = 78
+
     static let kindOptions: [CapsulePicker<EntryCategory.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income)
     ]
-
-    static let columnCount = 4
-    static let spacing: CGFloat = 8
-    static let tileHeight: CGFloat = 78
 
     static let columns = Array(
         repeating: GridItem(.flexible(), spacing: spacing),

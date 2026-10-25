@@ -15,6 +15,7 @@ public struct AppIconListView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     section("ライト", isLight: true)
+
                     section("ダーク", isLight: false)
                 }
                 .padding(.vertical, 8)

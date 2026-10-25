@@ -55,7 +55,9 @@ private extension Chip {
 #Preview {
     HStack {
         Chip("財布", systemImage: "wallet.bifold")
+
         Chip("9/10（木）", systemImage: "calendar", isHighlighted: true)
+
         Chip("", systemImage: "square.and.pencil", isHighlighted: true)
     }
     .padding()

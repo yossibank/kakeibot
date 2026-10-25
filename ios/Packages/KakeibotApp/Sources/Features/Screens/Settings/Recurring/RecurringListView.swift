@@ -27,6 +27,7 @@ public struct RecurringListView: View {
     public var body: some View {
         VStack(spacing: 16) {
             SettingsBackHeader("固定費", hint: hintFlag)
+
             SettingsHint(flag: hintFlag, lines: hint)
 
             ScrollView {
@@ -101,9 +102,7 @@ public struct RecurringListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
         .navigationDestination(item: $destination) { destination in
-            RecurringEditSheet(
-                model: model.editModel(for: destination.editingId)
-            ) { deletion in
+            RecurringEditSheet(model: model.editModel(for: destination.editingId)) { deletion in
                 self.deletion = deletion
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -295,6 +294,7 @@ private extension RecurringListView {
                             .lineLimit(2)
 
                         Spacer(minLength: 8)
+
                         AmountText(row.amount, type: row.type)
                     }
 

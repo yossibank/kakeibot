@@ -222,7 +222,6 @@ private extension RewardRuleEditSheet {
 
     func closePanel() {
         focus = nil
-
         hidePanel()
     }
 

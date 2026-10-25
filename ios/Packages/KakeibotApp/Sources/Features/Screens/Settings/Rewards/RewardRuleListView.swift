@@ -8,17 +8,16 @@ public struct RewardRuleListView: View {
     @State private var model: RewardRuleListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
+    @State private var hiddenId: RewardRule.ID?
+    @State private var deletion: Deletion?
+    @State private var isConfirmingDeleteHidden = false
+    @State private var hiddenList: SettingsScreenFlag
 
     @State private var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
         spacing: Self.spacing
     )
-
-    @State private var hiddenId: RewardRule.ID?
-    @State private var deletion: Deletion?
-    @State private var isConfirmingDeleteHidden = false
-    @State private var hiddenList: SettingsScreenFlag
 
     @Environment(\.themeStyle.corner) private var corner
 
@@ -102,9 +101,7 @@ public struct RewardRuleListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
         .navigationDestination(item: $destination) { destination in
-            RewardRuleEditSheet(
-                model: editModel(for: destination)
-            ) { deletion in
+            RewardRuleEditSheet(model: editModel(for: destination)) { deletion in
                 self.deletion = deletion
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -264,6 +261,7 @@ private extension RewardRuleListView {
         return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
                 IconBadge(icon, size: 46)
+
                 Spacer(minLength: 6)
 
                 if let total = model.total(for: rule) {

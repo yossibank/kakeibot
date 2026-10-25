@@ -25,10 +25,10 @@ public struct RingButton: View {
             Image(systemName: systemImage)
                 .sansFont(.body, weight: .light)
                 .foregroundStyle(foreground)
-                .frame(width: 38, height: 38)
+                .frame(width: 36, height: 36)
                 .background(fill, in: Circle())
                 .overlay(Circle().stroke(stroke, lineWidth: 1))
-                .frame(width: 44, height: 44)
+                .frame(width: 40, height: 40)
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
@@ -83,6 +83,7 @@ private extension RingButton {
 #Preview {
     HStack(spacing: 24) {
         RingButton(systemImage: "xmark") {}
+
         RingButton(systemImage: "checkmark", style: .prominent) {}
 
         RingButton(

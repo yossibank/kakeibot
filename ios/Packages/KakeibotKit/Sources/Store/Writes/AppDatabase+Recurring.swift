@@ -28,7 +28,6 @@ public extension AppDatabase {
             } else {
                 recurring = try draft.newRecurring(at: now)
                 recurring.sortOrder = try Recurring.nextSortOrder(in: db)
-
                 try recurring.insert(db)
             }
 
@@ -60,7 +59,6 @@ public extension AppDatabase {
             if !isHidden {
                 let yesterday = today.adding(days: -1)
                 let generated = recurring.generatedUntil ?? yesterday
-
                 recurring.generatedUntil = max(generated, yesterday)
             }
 

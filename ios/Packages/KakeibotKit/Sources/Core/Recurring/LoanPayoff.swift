@@ -43,7 +43,6 @@ public extension LoanPayoff {
 
                 if remaining <= 0 {
                     self.init(count: count, lastDate: payment.date)
-
                     return
                 }
             }

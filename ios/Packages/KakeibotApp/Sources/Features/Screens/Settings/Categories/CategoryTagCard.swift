@@ -23,6 +23,7 @@ struct CategoryTagCard: View {
                     .foregroundStyle(Palette.accent)
 
                 Spacer()
+
                 RingButton(systemImage: "xmark", action: onClose)
             }
 

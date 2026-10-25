@@ -33,6 +33,7 @@ extension UndoWidgetEntryIntent {
         let database = try AppDatabase.appGroupForWriting()
 
         try await database.undoWidgetEntry(id)
+
         await database.finishWidgetWrite(today: today)
 
         return .result()

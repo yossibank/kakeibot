@@ -81,7 +81,6 @@ public extension EntryNoticeModel {
     func deleteEntries(_ ids: [Entry.ID]) async {
         do {
             let previous = try await database.deleteEntries(ids)
-
             notice = .batch(EntryBatch(kind: .deleted, previous: previous))
         } catch {
             notice = .failed(Self.deleteFailedMessage)
