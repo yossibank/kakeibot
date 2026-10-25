@@ -7,7 +7,7 @@ struct LaunchScreenPreview: View {
 
     var body: some View {
         FloatingTabBar(
-            selection: .constant(tab),
+            selection: .constant(selection),
             items: Self.items,
             isAddHinted: selection == .entry,
             onAdd: {}
@@ -22,9 +22,5 @@ private extension LaunchScreenPreview {
 
     static let items: [FloatingTabBar<LaunchScreen>.Item] = tabs.map { screen in
         .init(screen.title, systemImage: screen.systemImage, value: screen)
-    }
-
-    var tab: LaunchScreen {
-        selection == .entry ? .home : selection
     }
 }
