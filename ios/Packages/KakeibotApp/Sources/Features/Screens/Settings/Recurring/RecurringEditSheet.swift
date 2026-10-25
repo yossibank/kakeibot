@@ -149,8 +149,11 @@ private extension RecurringEditSheet {
                     .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(amountColor)
-                    .editBadge()
                     .frame(maxWidth: .infinity)
+                    .overlay(alignment: .trailing) {
+                        EditBadge()
+                            .padding(.trailing, 16)
+                    }
                     .contentShape(.rect)
             }
             .buttonStyle(.plain)
@@ -169,8 +172,16 @@ private extension RecurringEditSheet {
             .focused($isNameFocused)
             .padding(.horizontal, 24)
             .overlay(alignment: .trailing) {
-                EditBadge(size: 16)
-                    .opacity(nameBadgeOpacity)
+                Button {
+                    isNameFocused = true
+                } label: {
+                    EditBadge(size: 16)
+                        .frame(width: 32, height: 32)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .opacity(nameBadgeOpacity)
+                .offset(x: 8)
             }
             .padding(.bottom, 8)
             .overlay(alignment: .bottom) {

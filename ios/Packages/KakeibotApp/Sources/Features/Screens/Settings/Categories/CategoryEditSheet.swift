@@ -185,8 +185,8 @@ private extension CategoryEditSheet {
                         .stroke(iconStroke, lineWidth: iconStrokeWidth)
                 }
                 .overlay(alignment: .bottomTrailing) {
-                    EditBadge(size: 26, style: .button)
-                        .offset(x: 8, y: 8)
+                    EditBadge()
+                        .offset(x: 4, y: 4)
                 }
                 .contentShape(.rect)
             }

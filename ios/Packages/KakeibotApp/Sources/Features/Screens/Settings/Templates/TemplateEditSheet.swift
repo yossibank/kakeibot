@@ -211,8 +211,15 @@ private extension TemplateEditSheet {
                     focus = nil
                 }
 
-                EditBadge(size: 16)
-                    .opacity(nameBadgeOpacity)
+                Button {
+                    focus = .name
+                } label: {
+                    EditBadge(size: 16)
+                        .frame(width: 32, height: 32)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .opacity(nameBadgeOpacity)
             }
             .padding(.bottom, 8)
             .overlay(alignment: .bottom) {
@@ -227,9 +234,10 @@ private extension TemplateEditSheet {
                 HStack(spacing: 8) {
                     TemplateCardAmount(amount: model.amount, size: .large)
 
+                    Spacer(minLength: 8)
+
                     EditBadge(size: 16)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)

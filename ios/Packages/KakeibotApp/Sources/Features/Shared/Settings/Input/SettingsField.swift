@@ -45,11 +45,18 @@ struct SettingsField<Field: Hashable>: View {
                 focus.wrappedValue = nil
             }
 
-            EditBadge(size: 16)
-                .opacity(badgeOpacity)
+            Button {
+                focus.wrappedValue = field
+            } label: {
+                EditBadge(size: 16)
+                    .frame(width: 32, height: 32)
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+            .opacity(badgeOpacity)
         }
         .padding(.leading, 16)
-        .padding(.trailing, 12)
+        .padding(.trailing, 4)
         .frame(height: 46)
         .background(Palette.panel, in: .rect(cornerRadius: corner.radius(16)))
         .overlay {

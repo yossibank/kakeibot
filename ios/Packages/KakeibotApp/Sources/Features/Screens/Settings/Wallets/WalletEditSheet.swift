@@ -268,8 +268,8 @@ private extension WalletEditSheet {
                             .stroke(iconStroke, lineWidth: iconStrokeWidth)
                     }
                     .overlay(alignment: .bottomTrailing) {
-                        EditBadge(size: 24, style: .button)
-                            .offset(x: 8, y: 8)
+                        EditBadge()
+                            .offset(x: 4, y: 4)
                     }
                     .contentShape(.rect)
             }
