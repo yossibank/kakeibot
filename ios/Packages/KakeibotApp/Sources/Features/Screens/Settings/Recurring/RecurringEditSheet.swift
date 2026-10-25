@@ -151,7 +151,8 @@ private extension RecurringEditSheet {
                     .foregroundStyle(amountColor)
                     .frame(maxWidth: .infinity)
                     .overlay(alignment: .trailing) {
-                        EditBadge()
+                        EditBadge(size: 16)
+                            .frame(width: 32, height: 32)
                             .padding(.trailing, 16)
                     }
                     .contentShape(.rect)
@@ -181,7 +182,7 @@ private extension RecurringEditSheet {
                 }
                 .buttonStyle(.plain)
                 .opacity(nameBadgeOpacity)
-                .offset(x: 8)
+                .offset(x: 24)
             }
             .padding(.bottom, 8)
             .overlay(alignment: .bottom) {

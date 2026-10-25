@@ -151,7 +151,7 @@ private extension RewardRuleListView {
                 Image(systemName: "plus")
                     .sansFont(.title, weight: .ultraLight)
 
-                Text("ごほうびを足す")
+                Text("ごほうびを追加")
                     .textFont(.footnote)
             }
             .foregroundStyle(Palette.accent)

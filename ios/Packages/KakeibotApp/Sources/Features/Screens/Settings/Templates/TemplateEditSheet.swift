@@ -237,6 +237,7 @@ private extension TemplateEditSheet {
                     Spacer(minLength: 8)
 
                     EditBadge(size: 16)
+                        .frame(width: 32, height: 32)
                 }
                 .contentShape(.rect)
             }
