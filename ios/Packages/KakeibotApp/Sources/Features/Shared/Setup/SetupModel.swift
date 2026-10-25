@@ -94,11 +94,6 @@ public extension SetupModel {
         }
     }
 
-    func setStartsWithAmount(_ starts: Bool) async {
-        startsWithAmount = starts
-        await save(.entryStartsWithAmount, to: starts)
-    }
-
     func markEntryOpened() async {
         guard !isEntryOpened else {
             return

@@ -239,13 +239,18 @@ public struct SettingsSheet: View {
 
                                 Hairline()
 
-                                pickerRow(
-                                    "金額から入力",
-                                    systemImage: "yensign"
-                                ) {
-                                    CapsulePicker(
-                                        selection: startsWithAmountBinding,
-                                        options: Self.flagOptions
+                                NavigationLink {
+                                    EntryStartView(
+                                        model: EntryStartModel(
+                                            database: database,
+                                            today: today
+                                        )
+                                    )
+                                } label: {
+                                    row(
+                                        "金額から入力",
+                                        systemImage: "yensign",
+                                        value: startsWithAmountText
                                     )
                                 }
 
@@ -348,8 +353,7 @@ public struct SettingsSheet: View {
             await observeLaunchScreen()
         }
         .task {
-            let starts = try? await database.setting(.entryStartsWithAmount)
-            startsWithAmount = starts ?? false
+            await observeStartsWithAmount()
         }
         .task {
             let byUse = try? await database.setting(.categoriesByUse)
@@ -503,19 +507,8 @@ private extension SettingsSheet {
         reminderTime?.description ?? "オフ"
     }
 
-    var startsWithAmountBinding: Binding<Bool> {
-        Binding {
-            startsWithAmount
-        } set: { starts in
-            startsWithAmount = starts
-
-            Task {
-                try? await database.setSetting(
-                    .entryStartsWithAmount,
-                    to: starts
-                )
-            }
-        }
+    var startsWithAmountText: String {
+        startsWithAmount ? "する" : "しない"
     }
 
     var categoriesByUseBinding: Binding<Bool> {
@@ -549,6 +542,16 @@ private extension SettingsSheet {
             }
         } catch {
             launchScreen = .home
+        }
+    }
+
+    func observeStartsWithAmount() async {
+        do {
+            for try await starts in database.settingUpdates(.entryStartsWithAmount) {
+                startsWithAmount = starts
+            }
+        } catch {
+            startsWithAmount = false
         }
     }
 

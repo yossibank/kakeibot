@@ -4,4 +4,5 @@ public enum ThemeFont: String, CaseIterable, Codable, Sendable {
     case rounded
     case handwriting
     case dot
+    case pop
 }

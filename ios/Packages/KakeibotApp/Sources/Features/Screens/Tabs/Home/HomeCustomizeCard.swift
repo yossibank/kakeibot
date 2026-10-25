@@ -25,7 +25,7 @@ struct HomeCustomizeCard: View {
                 HStack(spacing: 12) {
                     ForEach(SetupItem.customize) { item in
                         Button {
-                            open(item)
+                            onOpen(item)
                         } label: {
                             tile(item)
                         }
@@ -140,19 +140,6 @@ private extension HomeCustomizeCard {
     func glow(_ item: SetupItem) {
         withAnimation(.easeOut(duration: 0.25)) {
             glowing = item
-        }
-    }
-
-    func open(_ item: SetupItem) {
-        guard item.isToggle else {
-            onOpen(item)
-            return
-        }
-
-        glow(item)
-
-        Task {
-            await model.setStartsWithAmount(!model.startsWithAmount)
         }
     }
 }

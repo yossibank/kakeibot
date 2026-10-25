@@ -51,6 +51,7 @@ extension ThemeFont {
         case .rounded: "丸ゴシック"
         case .handwriting: "手書き"
         case .dot: "ドット"
+        case .pop: "ポップ"
         }
     }
 }
