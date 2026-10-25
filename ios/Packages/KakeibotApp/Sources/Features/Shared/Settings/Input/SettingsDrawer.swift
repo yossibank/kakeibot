@@ -3,15 +3,18 @@ import SwiftUI
 
 struct SettingsDrawer<Content: View>: View {
     private let title: String
+    private let isFloating: Bool
     private let onDone: () -> Void
     private let content: Content
 
     init(
         _ title: String,
+        isFloating: Bool = false,
         onDone: @escaping () -> Void,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
+        self.isFloating = isFloating
         self.onDone = onDone
         self.content = content()
     }
@@ -40,20 +43,31 @@ struct SettingsDrawer<Content: View>: View {
         .padding(.top, 12)
         .padding(.bottom, 12)
         .background {
-            Self.shape
+            shape
                 .fill(Palette.panel)
                 .overlay {
-                    Self.shape
+                    shape
                         .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
-                .ignoresSafeArea(edges: .bottom)
+                .ignoresSafeArea(edges: ignoredEdges)
         }
     }
 }
 
 private extension SettingsDrawer {
-    static var shape: UnevenRoundedRectangle {
-        UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
+    var ignoredEdges: Edge.Set {
+        isFloating ? [] : .bottom
+    }
+
+    var shape: UnevenRoundedRectangle {
+        let bottom: CGFloat = isFloating ? 28 : 0
+
+        return UnevenRoundedRectangle(
+            topLeadingRadius: 28,
+            bottomLeadingRadius: bottom,
+            bottomTrailingRadius: bottom,
+            topTrailingRadius: 28
+        )
     }
 }
 

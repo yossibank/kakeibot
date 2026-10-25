@@ -147,68 +147,70 @@ private extension HomeView {
             .frame(maxWidth: 290)
             .animation(.snappy, value: model.budgetUsage)
 
-            if let usage = model.budgetUsage {
-                VStack(spacing: 4) {
-                    if let warning = usage.warningText {
-                        Text(warning)
-                            .textFont(.caption, weight: .semibold)
-                            .foregroundStyle(usage.tint)
-                    }
+            VStack(spacing: 4) {
+                if let usage = model.budgetUsage {
+                    VStack(spacing: 4) {
+                        if let warning = usage.warningText {
+                            Text(warning)
+                                .textFont(.caption, weight: .semibold)
+                                .foregroundStyle(usage.tint)
+                        }
 
+                        Button {
+                            onOpenSetup(.budget)
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text("予算 \(AmountText.text(usage.budget))")
+
+                                Image(systemName: "chevron.right")
+                                    .sansFont(.micro, weight: .semibold)
+                            }
+                            .textFont(.caption)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+                            .padding(.vertical, 4)
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                } else {
                     Button {
                         onOpenSetup(.budget)
                     } label: {
                         HStack(spacing: 4) {
-                            Text("予算 \(AmountText.text(usage.budget))")
+                            Text("予算を決めると、あといくら使えるかが出ます")
 
                             Image(systemName: "chevron.right")
                                 .sansFont(.micro, weight: .semibold)
                         }
                         .textFont(.caption)
-                        .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
-                        .frame(minHeight: 28)
+                        .frame(minHeight: 32)
                         .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
                 }
-            } else {
-                Button {
-                    onOpenSetup(.budget)
-                } label: {
-                    HStack(spacing: 4) {
-                        Text("予算を決めると、あといくら使えるかが出ます")
 
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .semibold)
-                    }
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .frame(minHeight: 32)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
+                if model.recurringExpense > 0 {
+                    Button(action: onOpenRecurrings) {
+                        VStack(spacing: 8) {
+                            HStack(spacing: 4) {
+                                Label(recurringText, systemImage: "repeat")
 
-            if model.recurringExpense > 0 {
-                Button(action: onOpenRecurrings) {
-                    VStack(spacing: 8) {
-                        HStack(spacing: 4) {
-                            Label(recurringText, systemImage: "repeat")
+                                Image(systemName: "chevron.right")
+                                    .sansFont(.micro, weight: .semibold)
+                            }
+                            .textFont(.caption2)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
 
-                            Image(systemName: "chevron.right")
-                                .sansFont(.micro, weight: .semibold)
+                            recurringProgress
                         }
-                        .textFont(.caption2)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-
-                        recurringProgress
+                        .padding(.vertical, 4)
+                        .contentShape(.rect)
                     }
-                    .frame(minHeight: 28)
-                    .contentShape(.rect)
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
 
             HStack(spacing: 0) {

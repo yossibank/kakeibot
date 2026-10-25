@@ -246,14 +246,11 @@ private extension OnboardingView {
                         .tracking(3)
                         .foregroundStyle(Palette.accent)
 
-                    HStack(spacing: 8) {
-                        Text(budgetText)
-                            .displayFont(.largeTitle, weight: .bold)
-                            .monospacedDigit()
-                            .foregroundStyle(budgetColor)
-
-                        EditBadge()
-                    }
+                    Text(budgetText)
+                        .displayFont(.largeTitle, weight: .bold)
+                        .monospacedDigit()
+                        .foregroundStyle(budgetColor)
+                        .editBadge()
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 24)

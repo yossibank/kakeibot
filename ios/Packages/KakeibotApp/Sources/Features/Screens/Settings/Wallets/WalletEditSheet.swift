@@ -9,6 +9,7 @@ public struct WalletEditSheet: View {
     @State private var isEnteringAmount = false
     @State private var isEnteringValuation = false
     @State private var isEditingIcon = false
+    @State private var iconBottom: CGFloat = 0
     @State private var openValuationId: Valuation.ID?
     @State private var isConfirmingHide = false
     @State private var isConfirmingDelete = false
@@ -111,7 +112,8 @@ public struct WalletEditSheet: View {
             isPresented: $isEditingIcon,
             model: model.icon,
             focus: $focus,
-            textField: .text
+            textField: .text,
+            below: iconBottom
         )
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -172,6 +174,11 @@ private extension WalletEditSheet {
                         preview
 
                         colorNote
+                    }
+                    .onGeometryChange(for: CGFloat.self) { proxy in
+                        proxy.frame(in: .global).maxY
+                    } action: { maxY in
+                        iconBottom = maxY
                     }
 
                     SettingsField(
@@ -261,8 +268,8 @@ private extension WalletEditSheet {
                             .stroke(Palette.outline, lineWidth: 1)
                     }
                     .overlay(alignment: .bottomTrailing) {
-                        EditBadge(size: 20)
-                            .offset(x: 6, y: 6)
+                        EditBadge(bounces: true)
+                            .offset(x: 4, y: 4)
                     }
                     .contentShape(.rect)
             }
@@ -521,7 +528,8 @@ private extension WalletEditSheet {
                 systemImage: "chart.line.uptrend.xyaxis",
                 title: "今の評価額",
                 value: AmountText.text(amount),
-                isEmpty: false
+                isEmpty: false,
+                isAmount: true
             )
         ]
     }

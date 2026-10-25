@@ -222,7 +222,7 @@ private extension TemplateEditSheet {
                 HStack(spacing: 8) {
                     TemplateCardAmount(amount: model.amount, size: .large)
 
-                    EditBadge(size: 20)
+                    EditBadge(size: 16)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(.rect)

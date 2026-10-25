@@ -7,6 +7,7 @@ public struct RewardRuleEditSheet: View {
     @State private var model: RewardRuleEditModel
     @State private var panel: Panel?
     @State private var isEditingIcon = false
+    @State private var iconBottom: CGFloat = 0
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingDelete = false
 
@@ -48,7 +49,8 @@ public struct RewardRuleEditSheet: View {
             isPresented: $isEditingIcon,
             model: model.icon,
             focus: $focus,
-            textField: .text
+            textField: .text,
+            below: iconBottom
         )
         .overlay(alignment: .top) {
             header
@@ -109,12 +111,17 @@ private extension RewardRuleEditSheet {
                     } label: {
                         IconBadge(model.icon.preview, size: 86)
                             .overlay(alignment: .bottomTrailing) {
-                                EditBadge()
-                                    .offset(x: 6, y: 6)
+                                EditBadge(bounces: true)
+                                    .offset(x: 4, y: 4)
                             }
                             .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
+                    .onGeometryChange(for: CGFloat.self) { proxy in
+                        proxy.frame(in: .global).maxY
+                    } action: { maxY in
+                        iconBottom = maxY
+                    }
 
                     SettingsField(
                         "名前（例：自炊した日）",

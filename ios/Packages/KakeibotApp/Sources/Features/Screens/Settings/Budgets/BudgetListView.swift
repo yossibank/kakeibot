@@ -111,14 +111,11 @@ private extension BudgetListView {
                     .tracking(3)
                     .foregroundStyle(Palette.accent)
 
-                HStack(spacing: 8) {
-                    Text(amountText(model.totalAmount))
-                        .displayFont(.largeTitle, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(amountColor(model.totalAmount))
-
-                    EditBadge()
-                }
+                Text(amountText(model.totalAmount))
+                    .displayFont(.largeTitle, weight: .bold)
+                    .monospacedDigit()
+                    .foregroundStyle(amountColor(model.totalAmount))
+                    .editBadge()
 
                 if let usage = model.usage(for: nil) {
                     usageLine(usage)
@@ -159,7 +156,7 @@ private extension BudgetListView {
                         .monospacedDigit()
                         .foregroundStyle(amountColor(amount))
 
-                    EditBadge(size: 20)
+                    EditBadge(size: 16)
                 }
 
                 if let usage {
