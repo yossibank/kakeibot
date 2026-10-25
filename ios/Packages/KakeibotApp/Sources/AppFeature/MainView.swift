@@ -464,6 +464,13 @@ private extension MainView {
             return
         }
 
+        #if DEBUG
+        if let launchSheet = Sheet.launchArgument {
+            sheet = launchSheet
+            return
+        }
+        #endif
+
         switch screen {
         case .home: tab = .home
         case .records: tab = .records
@@ -539,6 +546,29 @@ private extension MainView {
         }
     }
 }
+
+#if DEBUG
+private extension MainView.Sheet {
+    static var launchArgument: Self? {
+        let arguments = ProcessInfo.processInfo.arguments
+
+        guard
+            let index = arguments.firstIndex(of: "-open"),
+            arguments.indices.contains(index + 1)
+        else {
+            return nil
+        }
+
+        let name = arguments[index + 1]
+
+        guard name != "settings" else {
+            return .settings
+        }
+
+        return SetupItem(rawValue: name).map { .setup($0) }
+    }
+}
+#endif
 
 private extension View {
     func tabContent() -> some View {

@@ -68,6 +68,8 @@ public struct SetupDestination: View {
             AppIconListView(model: appIcon)
         case .themeStyle:
             ThemeStyleView(model: ThemeStyleModel(database: database))
+        case .homeSections:
+            HomeSectionsView(model: HomeSectionsModel(database: database))
         }
     }
 }
