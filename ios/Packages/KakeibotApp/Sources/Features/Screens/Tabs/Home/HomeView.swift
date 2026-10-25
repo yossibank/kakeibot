@@ -62,6 +62,21 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
 
+                if showsSetupCard {
+                    HomeSetupCard(model: setup, onOpen: onOpenSetup)
+                        .transition(Self.cardTransition)
+                }
+
+                if showsCustomizeCard {
+                    HomeCustomizeCard(
+                        model: setup,
+                        appIcon: appIcon,
+                        isSheetOpen: isSheetOpen,
+                        onOpen: onOpenSetup
+                    )
+                    .transition(Self.cardTransition)
+                }
+
                 ForEach(model.homeLayout.visible) { section in
                     sectionView(section)
                 }
@@ -448,21 +463,6 @@ private extension HomeView {
         switch section {
         case .budget:
             dialCard
-        case .setup:
-            if showsSetupCard {
-                HomeSetupCard(model: setup, onOpen: onOpenSetup)
-                    .transition(Self.cardTransition)
-            }
-
-            if showsCustomizeCard {
-                HomeCustomizeCard(
-                    model: setup,
-                    appIcon: appIcon,
-                    isSheetOpen: isSheetOpen,
-                    onOpen: onOpenSetup
-                )
-                .transition(Self.cardTransition)
-            }
         case .templates:
             templateCard
         case .recent:

@@ -331,7 +331,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | entry_starts_with_amount | `true` なら、新しく記録するとき入力シートをテンキーを出して開く |
 | categories_by_use | `true` なら、入力シートのカテゴリをよく使う順に並べる |
 | template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |
-| home_sections | ホームに並べる順。`budget` `setup` `templates` `recent` を `,` でつないだもの。無いものは後ろに足す。空ならこの順 |
+| home_sections | ホームに並べる順。`budget` `templates` `recent` を `,` でつないだもの。無いものは後ろに足す。空ならこの順 |
 | home_hidden_sections | ホームに出さないもの。書き方は home_sections と同じ。すべては隠さない。空ならすべて出す |
 | category_menu_opened | `true` `false`。`true` なら入力シートの長押しのヒントを出さない |
 | records_layout | `calendar` `list`。空ならカレンダー |

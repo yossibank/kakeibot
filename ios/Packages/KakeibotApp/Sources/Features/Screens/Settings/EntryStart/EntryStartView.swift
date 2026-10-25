@@ -71,7 +71,7 @@ public struct EntryStartView: View {
 
 private extension EntryStartView {
     var preview: some View {
-        ZStack {
+        SettingsScreenPreview {
             if model.isLoaded {
                 EntrySheet(
                     model: EntryModel(
@@ -83,28 +83,10 @@ private extension EntryStartView {
                 .transition(.opacity)
             }
         }
-        .frame(width: Self.screenSize.width, height: Self.screenSize.height)
-        .background(Palette.background)
-        .allowsHitTesting(false)
-        .scaleEffect(Self.scale)
-        .frame(
-            width: Self.screenSize.width * Self.scale,
-            height: Self.screenSize.height * Self.scale
-        )
-        .clipShape(Self.screenShape)
-        .overlay {
-            Self.screenShape
-                .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
-        }
-        .shadow(color: Palette.shadow.opacity(.muted), radius: 16, y: 6)
     }
 }
 
 private extension EntryStartView {
-    static let screenSize = CGSize(width: 393, height: 780)
-    static let scale: CGFloat = 0.5
-    static let screenShape = RoundedRectangle(cornerRadius: 26)
-
     func choose(_ starts: Bool) {
         Task {
             await model.choose(starts)

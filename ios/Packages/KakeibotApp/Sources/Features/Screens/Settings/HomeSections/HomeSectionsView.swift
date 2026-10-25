@@ -9,8 +9,6 @@ public struct HomeSectionsView: View {
     @State private var dragStart = 0
     @State private var dragTranslation: CGFloat = 0
 
-    @Environment(\.themeStyle.corner) private var corner
-
     public init(model: HomeSectionsModel) {
         _model = State(initialValue: model)
     }
@@ -26,7 +24,7 @@ public struct HomeSectionsView: View {
 
             ScrollView {
                 VStack(spacing: 12) {
-                    preview
+                    HomeSectionsPreview(sections: model.layout.visible)
                         .padding(.vertical, 12)
 
                     VStack(spacing: 0) {
@@ -77,62 +75,6 @@ public struct HomeSectionsView: View {
 }
 
 private extension HomeSectionsView {
-    var preview: some View {
-        VStack(spacing: 6) {
-            HStack {
-                Text("ホーム")
-                    .displayFont(.caption)
-                    .foregroundStyle(Palette.accent)
-
-                Spacer()
-
-                Image(systemName: "gearshape")
-                    .sansFont(.caption)
-                    .foregroundStyle(Palette.accent)
-            }
-            .padding(.horizontal, 4)
-
-            ForEach(model.layout.visible) { section in
-                previewBlock(section)
-                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding(12)
-        .frame(width: 180, height: 240)
-        .background(Palette.background)
-        .clipShape(Self.screenShape)
-        .overlay {
-            Self.screenShape
-                .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
-        }
-        .shadow(color: Palette.shadow.opacity(.muted), radius: 16, y: 6)
-    }
-
-    func previewBlock(_ section: HomeSection) -> some View {
-        let height = Self.previewHeight(of: section)
-
-        return HStack(spacing: 6) {
-            Image(systemName: section.systemImage)
-                .sansFont(.micro)
-
-            Text(section.title)
-                .textFont(size: .micro)
-
-            Spacer(minLength: 0)
-        }
-        .foregroundStyle(Palette.accentStrong)
-        .padding(.horizontal, 10)
-        .frame(maxWidth: .infinity, minHeight: height, alignment: .topLeading)
-        .padding(.top, 2)
-        .background(Palette.card, in: .rect(cornerRadius: corner.radius(10)))
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(10))
-                .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
-        }
-    }
-
     func row(_ section: HomeSection) -> some View {
         let isHidden = model.layout.isHidden(section)
         let opacity = isHidden ? Emphasis.medium.rawValue : 1
@@ -168,21 +110,11 @@ private extension HomeSectionsView {
 
 private extension HomeSectionsView {
     static let rowHeight: CGFloat = 56
-    static let screenShape = RoundedRectangle(cornerRadius: 22)
 
     static let shownOptions: [CapsulePicker<Bool>.Option] = [
         .init("出す", value: true),
         .init("隠す", value: false)
     ]
-
-    static func previewHeight(of section: HomeSection) -> CGFloat {
-        switch section {
-        case .budget: 64
-        case .setup: 32
-        case .templates: 40
-        case .recent: 48
-        }
-    }
 
     func shownBinding(_ section: HomeSection) -> Binding<Bool> {
         Binding {
@@ -207,7 +139,7 @@ private extension HomeSectionsView {
 
     func dragGesture(_ section: HomeSection) -> some Gesture {
         LongPressGesture(minimumDuration: 0.2)
-            .sequenced(before: DragGesture())
+            .sequenced(before: DragGesture(coordinateSpace: .global))
             .onChanged { value in
                 switch value {
                 case .first(true):

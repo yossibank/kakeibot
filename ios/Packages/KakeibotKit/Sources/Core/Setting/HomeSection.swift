@@ -1,6 +1,5 @@
 public enum HomeSection: String, CaseIterable, Codable, Sendable {
     case budget
-    case setup
     case templates
     case recent
 }
