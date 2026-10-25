@@ -50,15 +50,43 @@ struct HomeLayoutTests {
     }
 
     @Test
-    func movesWithinBounds() {
+    func listsHiddenSectionsBelowTheBoundary() {
+        let layout = HomeLayout.standard
+
+        #expect(
+            layout.slots == [
+                .section(.customize),
+                .section(.budget),
+                .section(.templates),
+                .section(.recent),
+                .boundary,
+                .section(.bills),
+                .section(.stamps)
+            ]
+        )
+    }
+
+    @Test
+    func hidesAndShowsAcrossTheBoundary() {
         var layout = HomeLayout.standard
 
-        layout.move(.budget, to: 10)
+        layout.move(.budget, toSlot: 10)
 
-        #expect(layout.order == [.customize, .templates, .recent, .bills, .stamps, .budget])
+        #expect(layout.visible == [.customize, .templates, .recent])
+        #expect(layout.hidden == [.budget, .bills, .stamps])
 
-        layout.move(.recent, to: -1)
+        layout.move(.stamps, toSlot: -1)
 
-        #expect(layout.order == [.recent, .customize, .templates, .bills, .stamps, .budget])
+        #expect(layout.visible == [.stamps, .customize, .templates, .recent])
+        #expect(layout.hidden == [.budget, .bills])
+    }
+
+    @Test
+    func keepsTheLastShownSectionAboveTheBoundary() {
+        var layout = HomeLayout(hidden: [.customize, .budget, .templates])
+
+        layout.move(.recent, toSlot: 3)
+
+        #expect(layout.visible == [.recent])
     }
 }

@@ -9,6 +9,8 @@ public struct HomeSectionsView: View {
     @State private var dragStart = 0
     @State private var dragTranslation: CGFloat = 0
 
+    @Environment(\.themeStyle.corner) private var corner
+
     public init(model: HomeSectionsModel) {
         _model = State(initialValue: model)
     }
@@ -17,36 +19,14 @@ public struct HomeSectionsView: View {
         VStack(spacing: 20) {
             SettingsBackHeader("ホームに出すもの")
 
-            Text("ホームに並べる順番と、出すものを選べます")
+            Text("長押しで並べ替え、下の枠へ運ぶと隠せます")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
 
             ScrollView {
-                VStack(spacing: 12) {
-                    HomeSectionsPreview(sections: model.layout.visible)
-                        .padding(.vertical, 12)
-
-                    VStack(spacing: 0) {
-                        ForEach(model.layout.order) { section in
-                            row(section)
-                                .overlay(alignment: .top) {
-                                    if section != model.layout.order.first {
-                                        Hairline()
-                                    }
-                                }
-                                .offset(y: offset(of: section))
-                                .zIndex(dragging == section ? 1 : 0)
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .card()
-
-                    Text("≡ を長押しして上下に動かすと並べ替えます")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
-                }
-                .padding(.vertical, 8)
+                board
+                    .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(dragging != nil)
@@ -75,18 +55,85 @@ public struct HomeSectionsView: View {
 }
 
 private extension HomeSectionsView {
+    var zoneShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
+
+    var board: some View {
+        let slots = model.layout.slots
+
+        return VStack(spacing: 0) {
+            ForEach(Array(slots.enumerated()), id: \.element) { index, slot in
+                switch slot {
+                case let .section(section):
+                    row(section)
+                        .overlay(alignment: .top) {
+                            if index > 0,
+                               slots[index - 1].section != nil,
+                               dragging != section {
+                                Hairline()
+                                    .padding(.horizontal, 16)
+                            }
+                        }
+                        .offset(y: offset(of: section))
+                        .zIndex(dragging == section ? 1 : 0)
+                case .boundary:
+                    boundary
+                }
+            }
+        }
+        .background(alignment: .top) {
+            zones
+        }
+    }
+
+    var zones: some View {
+        let shownHeight = CGFloat(model.layout.visible.count) * Self.rowHeight
+        let hiddenCount = model.layout.order.count - model.layout.visible.count
+        let hiddenHeight = CGFloat(hiddenCount + 1) * Self.rowHeight - Self.zoneGap
+
+        return VStack(spacing: Self.zoneGap) {
+            Color.clear
+                .frame(height: shownHeight)
+                .card()
+
+            zoneShape
+                .fill(Palette.backgroundBottom.opacity(.strong))
+                .overlay {
+                    zoneShape
+                        .stroke(Palette.subtext.opacity(0.6), style: .dashed)
+                }
+                .frame(height: hiddenHeight)
+        }
+    }
+
+    var boundary: some View {
+        let isEmpty = model.layout.visible.count == model.layout.order.count
+        let title = isEmpty ? "ここへ運ぶと隠せます" : "隠したもの"
+        let alignment: Alignment = isEmpty ? .center : .leading
+
+        return HStack(spacing: 8) {
+            Image(systemName: "eye.slash")
+
+            Text(title)
+        }
+        .textFont(.caption)
+        .foregroundStyle(Palette.subtext)
+        .padding(.horizontal, 16)
+        .padding(.top, Self.zoneGap)
+        .frame(maxWidth: .infinity, alignment: alignment)
+        .frame(height: Self.rowHeight)
+    }
+
     func row(_ section: HomeSection) -> some View {
         let isHidden = model.layout.isHidden(section)
         let opacity = isHidden ? Emphasis.medium.rawValue : 1
-        let fill = dragging == section ? Palette.panel : Color.clear
+        let isDragging = dragging == section
+        let scale = isDragging ? Self.liftScale : 1
 
         return HStack(spacing: 12) {
-            Image(systemName: "line.3.horizontal")
-                .sansFont(.body)
-                .foregroundStyle(Palette.hint)
-                .frame(width: 32, height: Self.rowHeight)
-                .contentShape(.rect)
-                .gesture(dragGesture(section))
+            HomeSectionThumbnail(section: section)
+                .opacity(opacity)
 
             Text(section.title)
                 .textFont(.subheadline)
@@ -97,39 +144,34 @@ private extension HomeSectionsView {
 
             Spacer(minLength: 0)
 
-            CapsulePicker(
-                selection: shownBinding(section),
-                options: Self.shownOptions
-            )
-            .disabled(!model.layout.canHide(section))
+            Image(systemName: "line.3.horizontal")
+                .sansFont(.body)
+                .foregroundStyle(Palette.hint)
         }
+        .padding(.horizontal, 16)
         .frame(height: Self.rowHeight)
-        .background(fill)
+        .background {
+            if isDragging {
+                zoneShape
+                    .fill(Palette.panel)
+                    .shadow(color: Palette.shadow, radius: 12, y: 4)
+            }
+        }
+        .scaleEffect(scale)
+        .contentShape(.rect)
+        .gesture(dragGesture(section))
     }
 }
 
 private extension HomeSectionsView {
     static let rowHeight: CGFloat = 56
-
-    static let shownOptions: [CapsulePicker<Bool>.Option] = [
-        .init("出す", value: true),
-        .init("隠す", value: false)
-    ]
-
-    func shownBinding(_ section: HomeSection) -> Binding<Bool> {
-        Binding {
-            !model.layout.isHidden(section)
-        } set: { isShown in
-            Task {
-                await model.setHidden(section, !isShown)
-            }
-        }
-    }
+    static let zoneGap: CGFloat = 16
+    static let liftScale: CGFloat = 1.02
 
     func offset(of section: HomeSection) -> CGFloat {
         guard
             dragging == section,
-            let index = model.layout.order.firstIndex(of: section)
+            let index = model.layout.slots.firstIndex(of: .section(section))
         else {
             return 0
         }
@@ -139,7 +181,7 @@ private extension HomeSectionsView {
 
     func dragGesture(_ section: HomeSection) -> some Gesture {
         LongPressGesture(minimumDuration: 0.2)
-            .sequenced(before: DragGesture(coordinateSpace: .global))
+            .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .global))
             .onChanged { value in
                 switch value {
                 case .first(true):
@@ -161,9 +203,12 @@ private extension HomeSectionsView {
             return
         }
 
-        dragStart = model.layout.order.firstIndex(of: section) ?? 0
+        dragStart = model.layout.slots.firstIndex(of: .section(section)) ?? 0
         dragTranslation = 0
-        dragging = section
+
+        withAnimation(.snappy) {
+            dragging = section
+        }
     }
 
     func moveDragging(
@@ -176,7 +221,7 @@ private extension HomeSectionsView {
         dragTranslation = translation
 
         withAnimation(.snappy) {
-            model.move(section, to: target)
+            model.move(section, toSlot: target)
         }
     }
 

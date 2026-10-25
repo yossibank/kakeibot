@@ -34,17 +34,9 @@ public extension HomeSectionsModel {
 
     func move(
         _ section: HomeSection,
-        to index: Int
+        toSlot index: Int
     ) {
-        layout.move(section, to: index)
-    }
-
-    func setHidden(
-        _ section: HomeSection,
-        _ isHidden: Bool
-    ) async {
-        layout.setHidden(section, isHidden)
-        await save()
+        layout.move(section, toSlot: index)
     }
 
     func save() async {
