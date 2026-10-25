@@ -10,7 +10,6 @@ public struct HomeView: View {
 
     private let setup: SetupModel
     private let appIcon: AppIconListModel
-    private let isRevealed: Bool
     private let isSheetOpen: Bool
     private let onOpenEntry: (Entry.ID) -> Void
     private let onShowRecords: () -> Void
@@ -28,7 +27,6 @@ public struct HomeView: View {
         model: HomeModel,
         setup: SetupModel,
         appIcon: AppIconListModel,
-        isRevealed: Bool,
         isSheetOpen: Bool,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onShowRecords: @escaping () -> Void,
@@ -45,7 +43,6 @@ public struct HomeView: View {
         self.model = model
         self.setup = setup
         self.appIcon = appIcon
-        self.isRevealed = isRevealed
         self.isSheetOpen = isSheetOpen
         self.onOpenEntry = onOpenEntry
         self.onShowRecords = onShowRecords
@@ -65,20 +62,20 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
 
-                if showsSetupCard {
+                if setup.showsCard {
                     HomeSetupCard(model: setup, onOpen: onOpenSetup)
                         .transition(Self.cardTransition)
                 }
 
-                ForEach(sections) { section in
+                ForEach(model.homeLayout.visible) { section in
                     sectionView(section)
                 }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
-            .animation(.snappy, value: showsSetupCard)
-            .animation(.snappy, value: sections)
+            .animation(.snappy, value: setup.showsCard)
+            .animation(.snappy, value: model.homeLayout)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -609,14 +606,6 @@ private extension HomeView {
 
     static var cardTransition: AnyTransition {
         .offset(y: 16).combined(with: .opacity)
-    }
-
-    var showsSetupCard: Bool {
-        isRevealed && setup.showsCard
-    }
-
-    var sections: [HomeSection] {
-        model.homeLayout.visible.filter { $0 != .customize || isRevealed }
     }
 
     var dialTitle: String {

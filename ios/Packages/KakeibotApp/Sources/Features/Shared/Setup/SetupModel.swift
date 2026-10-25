@@ -17,6 +17,8 @@ public final class SetupModel: ScreenModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
+    private var isCardClosedLoaded = false
+
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
@@ -31,6 +33,10 @@ public extension SetupModel {
         }
 
         return SetupItem.home.filter { !$0.isDone(in: progress) }
+    }
+
+    var isLoaded: Bool {
+        progress != nil && isCardClosedLoaded
     }
 
     var showsCard: Bool {
@@ -130,6 +136,7 @@ private extension SetupModel {
             failure: Self.loadFailedMessage
         ) { isClosed in
             isCardClosed = isClosed
+            isCardClosedLoaded = true
         }
     }
 

@@ -91,7 +91,6 @@ struct MainView: View {
                     model: home,
                     setup: setup,
                     appIcon: appIcon,
-                    isRevealed: isRevealed,
                     isSheetOpen: sheet != nil,
                     onOpenEntry: { id in
                         sheet = .edit(id)
@@ -447,7 +446,10 @@ private extension MainView {
 
 private extension MainView {
     var isLoaded: Bool {
-        home.list != nil || home.errorNotice.message != nil
+        let isHomeLoaded = home.list != nil || home.errorNotice.message != nil
+        let isSetupLoaded = setup.isLoaded || setup.errorNotice.message != nil
+
+        return isHomeLoaded && isSetupLoaded
     }
 
     var templateOrderBinding: Binding<TemplateOrder> {
