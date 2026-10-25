@@ -35,6 +35,7 @@ public struct ReviewView: View {
         ScrollView {
             VStack(spacing: 12) {
                 header
+
                 periodBar
 
                 content
@@ -100,6 +101,7 @@ private extension ReviewView {
     var periodBar: some View {
         HStack {
             periodButton(systemImage: "chevron.left", count: -1)
+
             Spacer()
 
             VStack(spacing: 1) {
@@ -244,7 +246,9 @@ private extension ReviewView {
                 VStack(spacing: 8) {
                     HStack {
                         Text("予算 \(AmountText.text(usage.budget))")
+
                         Spacer()
+
                         Text(usage.remainingText)
                     }
                     .textFont(.caption)
@@ -471,7 +475,6 @@ private extension ReviewView {
     func recurringText(_ recurring: Int) -> String {
         let other = model.total(of: model.kind) - recurring
         let fixed = "固定費 \(AmountText.text(recurring))"
-
         return "\(fixed)・それ以外 \(AmountText.text(other))"
     }
 

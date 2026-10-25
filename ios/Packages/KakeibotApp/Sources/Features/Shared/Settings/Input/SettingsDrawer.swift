@@ -46,14 +46,15 @@ struct SettingsDrawer<Content: View>: View {
                     Self.shape
                         .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
-                .ignoresSafeArea(edges: .bottom)
         }
+        .padding(.horizontal, 12)
+        .padding(.bottom, 8)
     }
 }
 
 private extension SettingsDrawer {
-    static var shape: UnevenRoundedRectangle {
-        UnevenRoundedRectangle(topLeadingRadius: 28, topTrailingRadius: 28)
+    static var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: 28)
     }
 }
 

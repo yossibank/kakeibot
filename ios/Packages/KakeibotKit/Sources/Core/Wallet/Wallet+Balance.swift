@@ -65,7 +65,6 @@ private extension Wallet {
     func transferChange(by entry: Entry) -> Int {
         let outgoing = entry.walletId == id ? -entry.amount : 0
         let incoming = entry.toWalletId == id ? entry.amount : 0
-
         return outgoing + incoming
     }
 }

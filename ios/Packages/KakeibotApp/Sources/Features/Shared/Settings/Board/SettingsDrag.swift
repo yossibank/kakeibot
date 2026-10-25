@@ -263,7 +263,6 @@ private extension SettingsDrag {
 
     func disarm() {
         armTask?.cancel()
-
         armTask = nil
     }
 }

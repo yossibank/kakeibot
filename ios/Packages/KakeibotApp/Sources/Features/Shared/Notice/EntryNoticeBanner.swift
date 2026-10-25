@@ -48,7 +48,7 @@ private extension EntryNoticeBanner {
     @ViewBuilder
     func banner(_ notice: EntryNoticeModel.Notice) -> some View {
         switch notice {
-        case .changed:
+        case .changed, .batch:
             NoticeBanner(
                 notice.message,
                 systemImage: "checkmark",

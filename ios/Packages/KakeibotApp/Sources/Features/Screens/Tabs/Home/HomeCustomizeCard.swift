@@ -80,9 +80,7 @@ struct HomeCustomizeCard: View {
 
 private extension HomeCustomizeCard {
     func tile(_ item: SetupItem) -> some View {
-        let shape = RoundedRectangle(
-            cornerRadius: themeStyle.corner.radius(Self.cornerRadius)
-        )
+        let shape = RoundedRectangle(cornerRadius: themeStyle.corner.radius(Self.cornerRadius))
 
         return VStack(alignment: .leading, spacing: 4) {
             Image(systemName: item.systemImage)
@@ -148,7 +146,6 @@ private extension HomeCustomizeCard {
     func open(_ item: SetupItem) {
         guard item.isToggle else {
             onOpen(item)
-
             return
         }
 

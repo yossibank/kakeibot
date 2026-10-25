@@ -6,12 +6,15 @@ import SwiftUI
 public struct RewardRuleEditSheet: View {
     @State private var model: RewardRuleEditModel
     @State private var panel: Panel?
+    @State private var isEditingIcon = false
+    @State private var iconBottom: CGFloat = 0
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.themeStyle.corner) private var corner
 
     private let onDelete: (Deletion) -> Void
 
@@ -43,6 +46,13 @@ public struct RewardRuleEditSheet: View {
                     .zIndex(1)
             }
         }
+        .iconEditorDrawer(
+            isPresented: $isEditingIcon,
+            model: model.icon,
+            focus: $focus,
+            textField: .text,
+            below: iconBottom
+        )
         .overlay(alignment: .top) {
             header
                 .padding(.horizontal, 20)
@@ -96,10 +106,33 @@ private extension RewardRuleEditSheet {
 
             ScrollView {
                 VStack(spacing: 16) {
-                    IconBadge(model.icon.preview, size: 86)
+                    Button {
+                        focus = nil
+                        isEditingIcon = true
+                    } label: {
+                        IconBadge(model.icon.preview, size: 86)
+                            .overlay {
+                                RoundedRectangle(
+                                    cornerRadius: corner.radius(86 * 0.3),
+                                    style: .continuous
+                                )
+                                .stroke(iconStroke, lineWidth: iconStrokeWidth)
+                            }
+                            .overlay(alignment: .bottomTrailing) {
+                                EditBadge()
+                                    .offset(x: 4, y: 4)
+                            }
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                    .onGeometryChange(for: CGFloat.self) { proxy in
+                        proxy.frame(in: .global).maxY
+                    } action: { maxY in
+                        iconBottom = maxY
+                    }
 
                     SettingsField(
-                        "名前（例：自炊した日）",
+                        "名前（自炊した日など）",
                         text: $model.name,
                         focus: $focus,
                         field: .name
@@ -110,17 +143,11 @@ private extension RewardRuleEditSheet {
                             open(panel)
                         }
 
-                        Text("達成した日に、この額を貯金箱に貯めます")
+                        Text("達成した日に、この金額を貯金箱に貯めます")
                             .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
                             .padding(.leading, 8)
                     }
-
-                    IconEditor(
-                        model: model.icon,
-                        focus: $focus,
-                        textField: .text
-                    )
                 }
                 .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)
@@ -163,7 +190,7 @@ private extension RewardRuleEditSheet {
     }
 
     func drawerView(_ panel: Panel) -> some View {
-        SettingsDrawer("貯める額") {
+        SettingsDrawer("金額") {
             closePanel()
         } content: {
             VStack(spacing: 12) {
@@ -189,8 +216,16 @@ private extension RewardRuleEditSheet {
 
     static let fade: CGFloat = 16
 
+    var iconStroke: Color {
+        isEditingIcon ? Palette.accent : Palette.outline
+    }
+
+    var iconStrokeWidth: CGFloat {
+        isEditingIcon ? 2 : 1
+    }
+
     var amountValue: String {
-        model.amount.map { AmountText.text($0) } ?? "入れる"
+        AmountText.text(model.amount ?? 0)
     }
 
     var rowItems: [SettingsRowList<Panel>.Item] {
@@ -198,7 +233,7 @@ private extension RewardRuleEditSheet {
             .init(
                 panel: .amount,
                 systemImage: "yensign",
-                title: "貯める額",
+                title: "金額",
                 value: amountValue,
                 isEmpty: model.amount == nil,
                 isAmount: true
@@ -222,7 +257,6 @@ private extension RewardRuleEditSheet {
 
     func closePanel() {
         focus = nil
-
         hidePanel()
     }
 

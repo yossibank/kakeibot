@@ -38,7 +38,6 @@ private extension DialTicks {
     ) -> CGPoint {
         let x = center.x + sin(angle) * radius
         let y = center.y - cos(angle) * radius
-
         return CGPoint(x: x, y: y)
     }
 }

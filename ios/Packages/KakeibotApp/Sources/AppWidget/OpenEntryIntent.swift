@@ -17,9 +17,7 @@ struct OpenEntryIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         let today = LocalDate(Date(), in: .current)
-
         NotificationRouter.shared.open(.entry(today))
-
         return .result()
     }
 }

@@ -17,6 +17,7 @@ public struct EntrySheet: View {
     @State private var sheetWidth: CGFloat = 0
     @State private var drawerHeight: CGFloat = 0
     @State private var deletion: Deletion?
+    @State private var notice: EntryNoticeModel
 
     @FocusState private var isMemoFocused: Bool
 
@@ -30,6 +31,7 @@ public struct EntrySheet: View {
         onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+        _notice = State(initialValue: EntryNoticeModel(database: model.database))
 
         self.onChange = onChange
     }
@@ -68,6 +70,14 @@ public struct EntrySheet: View {
             .deletionNotice($deletion, bottom: bannerBottom) { deletion in
                 Task {
                     await model.restore(deletion)
+                }
+            }
+            .entryNotice(notice, above: bannerBottom - 12)
+            .onChange(of: notice.notice) {
+                if notice.notice == .undone {
+                    Task {
+                        await model.reloadWallets()
+                    }
                 }
             }
             .background {
@@ -115,12 +125,7 @@ private extension EntrySheet {
                 .padding(.vertical, -Self.fade)
             }
 
-            PrimaryButton(model.saveTitle) {
-                Task {
-                    await save()
-                }
-            }
-            .disabled(!model.canSave)
+            saveButtons
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -141,6 +146,7 @@ private extension EntrySheet {
     var form: some View {
         VStack(spacing: 16) {
             dial
+
             details
 
             if model.type == .transfer {
@@ -198,7 +204,9 @@ private extension EntrySheet {
             }
 
             Spacer()
+
             CapsulePicker(selection: typeBinding, options: Self.typeOptions)
+
             Spacer()
 
             if model.isEditing {
@@ -336,6 +344,23 @@ private extension EntrySheet {
                 count: model.categoryPages.count,
                 current: categoryPage ?? 0
             )
+            .frame(maxWidth: .infinity)
+            .overlay(alignment: .trailing) {
+                Button {
+                    open(.categories)
+                } label: {
+                    HStack(spacing: 2) {
+                        Text("編集")
+
+                        Image(systemName: "chevron.right")
+                    }
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.accent)
+                    .frame(minHeight: 32)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            }
 
             if !model.hasOpenedCategoryMenu {
                 Label("長押しで編集・非表示", systemImage: "hand.tap")
@@ -356,12 +381,7 @@ private extension EntrySheet {
                 model.press(key)
             }
 
-            PrimaryButton(model.saveTitle) {
-                Task {
-                    await save()
-                }
-            }
-            .disabled(!model.canSave)
+            saveButtons
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -380,6 +400,38 @@ private extension EntrySheet {
         } action: { height in
             drawerHeight = height
         }
+    }
+
+    var saveButtons: some View {
+        HStack(spacing: 8) {
+            PrimaryButton(model.saveTitle) {
+                Task {
+                    await save()
+                }
+            }
+
+            if !model.isEditing {
+                Button {
+                    Task {
+                        await saveAndContinue()
+                    }
+                } label: {
+                    Label("続ける", systemImage: "plus")
+                        .textFont(.footnote, weight: .bold)
+                        .foregroundStyle(Palette.accent)
+                        .padding(.horizontal, 16)
+                        .frame(minHeight: 56)
+                        .overlay {
+                            Capsule()
+                                .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 1)
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .opacity(model.canSave ? 1 : 0.4)
+            }
+        }
+        .disabled(!model.canSave)
     }
 
     @ViewBuilder
@@ -494,12 +546,8 @@ private extension EntrySheet {
                         .onTapGesture {
                             select(category)
                         }
-                        .onLongPressGesture(
-                            minimumDuration: Self.menuPressDuration
-                        ) {
-                            let space = CoordinateSpace.named(
-                                Self.coordinateSpace
-                            )
+                        .onLongPressGesture(minimumDuration: Self.menuPressDuration) {
+                            let space = CoordinateSpace.named(Self.coordinateSpace)
 
                             openMenu(for: category, at: proxy.frame(in: space))
                         } onPressingChanged: { isPressing in
@@ -604,6 +652,14 @@ private extension EntrySheet {
             )
         case .newTemplate:
             TemplateEditSheet(model: model.newTemplateModel())
+        case .categories:
+            NavigationStack {
+                CategoryListView(
+                    database: model.database,
+                    kind: model.type == .income ? .income : .expense
+                )
+                .toolbar(.hidden, for: .navigationBar)
+            }
         }
     }
 }
@@ -621,6 +677,7 @@ private extension EntrySheet {
         case editCategory(EntryCategory)
         case addTag(EntryCategory)
         case newTemplate
+        case categories
 
         var id: Self {
             self
@@ -629,19 +686,7 @@ private extension EntrySheet {
 
     nonisolated static let coordinateSpace = "EntrySheet"
 
-    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
-        .init("支出", value: .expense),
-        .init("収入", value: .income),
-        .init("振替", value: .transfer)
-    ]
-
     static let memoCardInset: CGFloat = 12
-
-    static let drawerShape = UnevenRoundedRectangle(
-        topLeadingRadius: 28,
-        topTrailingRadius: 28
-    )
-
     static let dialMinSize: CGFloat = 240
     static let fade: CGFloat = 20
     static let categoryRows = 3
@@ -651,6 +696,17 @@ private extension EntrySheet {
     static let menuPressDuration = 0.15
     static let peekDuration = 0.35
     static let peekWidth: CGFloat = 260
+
+    static let drawerShape = UnevenRoundedRectangle(
+        topLeadingRadius: 28,
+        topTrailingRadius: 28
+    )
+
+    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
+        .init("支出", value: .expense),
+        .init("収入", value: .income),
+        .init("振替", value: .transfer)
+    ]
 
     static var pagerHeight: CGFloat {
         let rows = CGFloat(categoryRows)
@@ -713,7 +769,6 @@ private extension EntrySheet {
 
     func open(_ sheet: Sheet) {
         setEnteringAmount(false)
-
         self.sheet = sheet
     }
 
@@ -771,7 +826,6 @@ private extension EntrySheet {
 
     func select(_ category: EntryCategory) {
         setEnteringAmount(false)
-
         model.categoryId = category.id
     }
 
@@ -829,6 +883,17 @@ private extension EntrySheet {
 
         onChange(change)
         dismiss()
+    }
+
+    func saveAndContinue() async {
+        guard let change = await model.save() else {
+            return
+        }
+
+        await model.startNext()
+
+        notice.show(change)
+        setEnteringAmount(true)
     }
 
     func delete() async {

@@ -88,7 +88,21 @@ public extension WalletEditModel {
     }
 
     var paymentTitle: String {
-        kind == .loan ? "毎月の返済" : "引き落とし"
+        kind == .loan ? "毎月の返済" : "締め日と引き落とし"
+    }
+
+    var asksPayment: Bool {
+        Self.isDebt(kind)
+    }
+
+    var paymentQuestion: String {
+        kind == .loan ? "毎月の返済も決めますか" : "締め日と引き落としも決めますか"
+    }
+
+    var paymentQuestionNote: String {
+        kind == .loan
+            ? "固定費として、返済の日と額を決められます"
+            : "締め日までの利用分を、引き落とし日に銀行から振り替えます"
     }
 
     var paymentText: String {
@@ -158,7 +172,6 @@ public extension WalletEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -201,7 +214,6 @@ public extension WalletEditModel {
 
             guard let wallet, let icon = list.icons[wallet.iconId] else {
                 errorNotice.show(Self.loadFailedMessage)
-
                 return
             }
 
@@ -251,7 +263,6 @@ public extension WalletEditModel {
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return nil
         }
     }
@@ -273,11 +284,9 @@ public extension WalletEditModel {
             return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {
             errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
-
             return false
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -291,9 +300,7 @@ public extension WalletEditModel {
             return try await database.deleteWallet(editingId)
         } catch {
             let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
-
             errorNotice.show(message)
-
             return nil
         }
     }

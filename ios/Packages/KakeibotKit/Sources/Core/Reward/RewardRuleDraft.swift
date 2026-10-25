@@ -40,7 +40,6 @@ public extension RewardRuleDraft {
 
     func newIcon(at now: Date) throws -> Icon {
         try validate()
-
         return try icon.newIcon(at: now)
     }
 
@@ -67,7 +66,6 @@ public extension RewardRuleDraft {
         at now: Date
     ) throws -> Icon {
         try validate()
-
         return try self.icon.applied(to: icon, at: now)
     }
 

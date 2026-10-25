@@ -66,7 +66,6 @@ public extension PageSlide {
 
             withTransaction(transaction) {
                 change()
-
                 slide.wrappedValue = PageSlide(offset: entry, opacity: 0)
             }
 

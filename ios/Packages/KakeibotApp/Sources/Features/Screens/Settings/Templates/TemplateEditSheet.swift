@@ -196,18 +196,30 @@ private extension TemplateEditSheet {
             detail: detail,
             size: .large
         ) {
-            TextField(
-                "名前",
-                text: $model.name,
-                prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
-            )
-            .font(TemplateCardSize.large.nameFont(in: themeStyle))
-            .foregroundStyle(Palette.accentStrong)
-            .tint(Palette.accent)
-            .submitLabel(.done)
-            .focused($focus, equals: .name)
-            .onSubmit {
-                focus = nil
+            HStack(spacing: 8) {
+                TextField(
+                    "名前",
+                    text: $model.name,
+                    prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
+                )
+                .font(TemplateCardSize.large.nameFont(in: themeStyle))
+                .foregroundStyle(Palette.accentStrong)
+                .tint(Palette.accent)
+                .submitLabel(.done)
+                .focused($focus, equals: .name)
+                .onSubmit {
+                    focus = nil
+                }
+
+                Button {
+                    focus = .name
+                } label: {
+                    EditBadge(size: 16)
+                        .frame(width: 32, height: 32)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .opacity(nameBadgeOpacity)
             }
             .padding(.bottom, 8)
             .overlay(alignment: .bottom) {
@@ -219,9 +231,15 @@ private extension TemplateEditSheet {
             Button {
                 open(.amount)
             } label: {
-                TemplateCardAmount(amount: model.amount, size: .large)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(.rect)
+                HStack(spacing: 8) {
+                    TemplateCardAmount(amount: model.amount, size: .large)
+
+                    Spacer(minLength: 8)
+
+                    EditBadge(size: 16)
+                        .frame(width: 32, height: 32)
+                }
+                .contentShape(.rect)
             }
             .buttonStyle(.plain)
         }
@@ -355,7 +373,6 @@ private extension TemplateEditSheet {
                     isSelected: model.categoryId == category.id
                 ) {
                     model.categoryId = category.id
-
                     closePanel()
                 }
             }
@@ -375,7 +392,6 @@ private extension TemplateEditSheet {
                     isSelected: model.walletId == wallet.id
                 ) {
                     model.walletId = wallet.id
-
                     closePanel()
                 }
             }
@@ -432,6 +448,10 @@ private extension TemplateEditSheet {
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {
         model.tags.map { TagLine.Item(id: $0.id, name: $0.name) }
+    }
+
+    var nameBadgeOpacity: Double {
+        focus == .name ? 0 : 1
     }
 
     var nameLine: Color {
@@ -527,7 +547,6 @@ private extension TemplateEditSheet {
 
     func closePanel() {
         focus = nil
-
         hidePanel()
     }
 

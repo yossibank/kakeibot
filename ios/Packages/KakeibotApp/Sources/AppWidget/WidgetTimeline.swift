@@ -6,7 +6,6 @@ enum WidgetTimeline {
     static func nextMidnight(after date: Date) -> Date? {
         let calendar = Calendar.current
         let start = calendar.startOfDay(for: date)
-
         return calendar.date(byAdding: .day, value: 1, to: start)
     }
 }

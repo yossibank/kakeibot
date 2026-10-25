@@ -71,7 +71,6 @@ public extension BackupModel {
             return true
         } catch {
             errorNotice.show(Self.exportFailedMessage)
-
             return false
         }
     }
@@ -92,7 +91,6 @@ public extension BackupModel {
 
         guard case let .success(url) = result else {
             errorNotice.show(Self.readFailedMessage)
-
             return false
         }
 
@@ -106,7 +104,6 @@ public extension BackupModel {
 
         guard let data = try? Data(contentsOf: url) else {
             errorNotice.show(Self.readFailedMessage)
-
             return false
         }
 
@@ -117,11 +114,9 @@ public extension BackupModel {
     func read(_ data: Data) -> Bool {
         do {
             pending = try ExportV1(json: data)
-
             return true
         } catch {
             errorNotice.show(Self.readMessage(for: error))
-
             return false
         }
     }
@@ -143,7 +138,6 @@ public extension BackupModel {
 
         do {
             try await database.restoreBackup(pending)
-
             doneMessage = Self.restoredMessage
         } catch {
             errorNotice.show(Self.restoreFailedMessage)

@@ -24,6 +24,7 @@ public struct PeriodRecurringSheet: View {
             ScrollView {
                 VStack(spacing: 16) {
                     summaryCard
+
                     timelineCard
                 }
                 .padding(.vertical, 8)
@@ -299,7 +300,6 @@ private extension PeriodRecurringSheet {
 
     func daysText(until date: LocalDate) -> String {
         let days = model.today.days(until: date)
-
         return days == 1 ? "明日" : "あと \(days) 日"
     }
 }

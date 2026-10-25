@@ -42,7 +42,6 @@ public extension YearMonth {
     func weeks(startingOn weekStart: Weekday) -> [[LocalDate?]] {
         let first = LocalDate(yearMonth: self, clampedDay: 1)
         let last = first.adding(days: numberOfDays - 1)
-
         return (first...last).weeks(startingOn: weekStart)
     }
 
@@ -112,7 +111,6 @@ private extension YearMonth {
     ) -> Int {
         let result = value.quotientAndRemainder(dividingBy: divisor)
         let (quotient, remainder) = result
-
         return remainder < 0 ? quotient - 1 : quotient
     }
 }
@@ -149,7 +147,6 @@ extension YearMonth: Codable {
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
-
         try container.encode(description)
     }
 }

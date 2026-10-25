@@ -130,6 +130,37 @@ public extension RecordsModel {
         rewardBank?.activeRules ?? []
     }
 
+    var batchWallets: [Wallet] {
+        list?.filterWallets ?? []
+    }
+
+    func batchCategories(for type: Entry.Kind) -> [EntryCategory] {
+        let categories = list?.filterCategories ?? []
+        return categories.filter { $0.kind.rawValue == type.rawValue }
+    }
+
+    func batchType(of ids: Set<Entry.ID>) -> Entry.Kind? {
+        let types = Set(selectedEntries(ids).map(\.type))
+
+        guard types.count == 1, let type = types.first, type != .transfer else {
+            return nil
+        }
+
+        return type
+    }
+
+    func hasTransfer(in ids: Set<Entry.ID>) -> Bool {
+        selectedEntries(ids).contains { $0.type == .transfer }
+    }
+
+    func icon(for category: EntryCategory) -> Icon? {
+        list?.icons[category.iconId]
+    }
+
+    func icon(for wallet: Wallet) -> Icon? {
+        list?.icons[wallet.iconId]
+    }
+
     func rememberSearch(_ text: String) async {
         let words = EntrySearch.remembering(text, in: recentSearches)
 
@@ -144,7 +175,6 @@ public extension RecordsModel {
 
     func clearRecentSearches() async {
         recentSearches = []
-
         await saveRecentSearches()
     }
 
@@ -209,7 +239,6 @@ public extension RecordsModel {
         on date: LocalDate
     ) -> Bool {
         let logs = rewardBank?.logs(on: date) ?? []
-
         return logs.contains { $0.ruleId == rule.id }
     }
 
@@ -350,6 +379,11 @@ private extension RecordsModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
     static let recurringTitle = "固定費"
+
+    func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
+        let entries = list?.days.flatMap(\.entries) ?? []
+        return entries.filter { ids.contains($0.id) }
+    }
 
     func observe() async {
         await observe(

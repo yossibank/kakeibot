@@ -36,6 +36,7 @@ private final class PaletteSceneView: UIView {
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
+
         observeStyle()
         apply()
     }

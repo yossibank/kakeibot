@@ -8,13 +8,6 @@ public struct TemplateListView: View {
     @State private var model: TemplateListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
-
-    @State private var grid = SettingsBoardGrid(
-        columns: 1,
-        itemHeight: TemplateRowCard.height,
-        spacing: 12
-    )
-
     @State private var hiddenId: EntryTemplate.ID?
     @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
@@ -22,6 +15,12 @@ public struct TemplateListView: View {
     @State private var deleting: EntryTemplate.ID?
     @State private var isConfirmingDelete = false
     @State private var hiddenList: SettingsScreenFlag
+
+    @State private var grid = SettingsBoardGrid(
+        columns: 1,
+        itemHeight: TemplateRowCard.height,
+        spacing: 12
+    )
 
     private let database: AppDatabase
 
@@ -39,6 +38,7 @@ public struct TemplateListView: View {
     public var body: some View {
         VStack(spacing: 16) {
             SettingsBackHeader("テンプレート", hint: hintFlag)
+
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
 
             SettingsHint(

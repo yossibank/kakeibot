@@ -48,9 +48,7 @@ public struct RootView: View {
                 }
             }
         }
-        .onReceive(
-            NotificationCenter.default.publisher(for: .NSCalendarDayChanged)
-        ) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
             Task {
                 await model.refreshDay()
             }
@@ -122,13 +120,11 @@ private extension RootView {
 
     var themePalette: ThemePalette {
         let isDark = colorScheme == .dark
-
         return model.look.palette(isDark: isDark)
     }
 
     var shownPalette: ThemePalette {
         let isDark = colorScheme == .dark
-
         return shownLook.palette(isDark: isDark)
     }
 

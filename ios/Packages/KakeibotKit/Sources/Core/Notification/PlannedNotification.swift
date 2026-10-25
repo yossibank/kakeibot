@@ -50,7 +50,6 @@ public extension PlannedNotification.Route {
     init?(link: String) {
         if link == "home" {
             self = .home
-
             return
         }
 

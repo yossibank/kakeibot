@@ -163,7 +163,6 @@ public extension RecurringEditModel {
 
     func select(category id: EntryCategory.ID) {
         categoryId = id
-
         suggestHolidayShift()
     }
 
@@ -204,7 +203,6 @@ public extension RecurringEditModel {
     func save() async -> Bool {
         if let problem = draft.problems.first {
             errorNotice.show(message(for: problem))
-
             return false
         }
 
@@ -219,7 +217,6 @@ public extension RecurringEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -233,7 +230,6 @@ public extension RecurringEditModel {
             return try await database.deleteRecurring(editingId)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return nil
         }
     }
@@ -256,7 +252,6 @@ public extension RecurringEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }

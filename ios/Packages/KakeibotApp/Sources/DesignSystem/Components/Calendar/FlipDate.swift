@@ -50,6 +50,7 @@ public struct FlipDate: View {
         .overlay(alignment: .top) {
             HStack(spacing: 20) {
                 binding
+
                 binding
             }
             .offset(y: -4)
@@ -77,6 +78,7 @@ private extension FlipDate {
     HStack(spacing: 12) {
         if let date = LocalDate("2026-10-27") {
             FlipDate(date)
+
             FlipDate(date, isSelected: true)
         }
     }

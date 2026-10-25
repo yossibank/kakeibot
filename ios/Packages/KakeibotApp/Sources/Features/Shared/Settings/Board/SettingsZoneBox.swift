@@ -25,6 +25,7 @@ struct SettingsZoneBox: View {
             ZStack {
                 HStack(spacing: 8) {
                     Image(systemName: label.systemImage)
+
                     Text(label.title)
                 }
                 .foregroundStyle(color)

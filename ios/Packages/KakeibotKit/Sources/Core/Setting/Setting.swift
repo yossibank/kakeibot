@@ -31,6 +31,7 @@ public extension Setting {
         case entryStartsWithAmount = "entry_starts_with_amount"
         case templateOrder = "template_order"
         case categoryMenuOpened = "category_menu_opened"
+        case categoriesByUse = "categories_by_use"
         case recordsLayout = "records_layout"
         case reviewScale = "review_scale"
         case reviewKind = "review_kind"

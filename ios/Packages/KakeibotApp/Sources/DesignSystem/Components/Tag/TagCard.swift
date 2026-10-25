@@ -62,7 +62,6 @@ extension TagCard {
     ) -> CGFloat {
         let font = UIFont.systemFont(ofSize: size.fontSize)
         let text = (title as NSString).size(withAttributes: [.font: font])
-
         return max(ceil(text.width) + size.padding * 2, size.minWidth)
     }
 }
@@ -164,8 +163,11 @@ private extension TagCard.Size {
 #Preview {
     HStack(spacing: 8) {
         TagCard("朝ごはん")
+
         TagCard("昼ごはん", style: .selected)
+
         TagCard("＋", style: .add)
+
         TagCard("夜ごはん", size: .small)
     }
     .padding()

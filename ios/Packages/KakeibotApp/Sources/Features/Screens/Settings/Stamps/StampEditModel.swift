@@ -62,7 +62,6 @@ public extension StampEditModel {
                 let saved = shelf.icons[shelfIcon.iconId]
             else {
                 errorNotice.show(Self.loadFailedMessage)
-
                 return
             }
 
@@ -86,7 +85,6 @@ public extension StampEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -108,7 +106,6 @@ public extension StampEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -122,7 +119,6 @@ public extension StampEditModel {
             return try await database.deleteShelfIcon(editingId)
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
-
             return nil
         }
     }

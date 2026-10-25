@@ -105,6 +105,41 @@ struct EntryNoticeModelTests {
         #expect(shown == .changed(change))
         #expect(setup.notice.notice == nil)
     }
+
+    @Test
+    func changesCategoryOfSelectedEntriesAndUndoes() async throws {
+        let setup = try await Setup()
+        let saved = try await setup.saveEntry()
+        let options = try await setup.database.entryOptions()
+        let other = options.expenseCategories[1]
+
+        await setup.notice.changeEntries([saved.id], to: .category(other.id))
+        let message = setup.notice.notice?.message
+        let changed = try setup.database.snapshot().entries
+        await setup.notice.undo()
+        let restored = try setup.database.snapshot().entries
+
+        #expect(message == "1 件のカテゴリを変えました")
+        #expect(changed.map(\.categoryId) == [other.id])
+        #expect(restored.map(\.categoryId) == [saved.categoryId])
+    }
+
+    @Test
+    func deletesSelectedEntriesAndUndoes() async throws {
+        let setup = try await Setup()
+        let first = try await setup.saveEntry()
+        let second = try await setup.saveEntry()
+
+        await setup.notice.deleteEntries([first.id, second.id])
+        let message = setup.notice.notice?.message
+        let deleted = try setup.database.snapshot().entries
+        await setup.notice.undo()
+        let restored = try setup.database.snapshot().entries
+
+        #expect(message == "2 件を削除しました")
+        #expect(deleted.isEmpty)
+        #expect(Set(restored.map(\.id)) == [first.id, second.id])
+    }
 }
 
 extension EntryNoticeModelTests {

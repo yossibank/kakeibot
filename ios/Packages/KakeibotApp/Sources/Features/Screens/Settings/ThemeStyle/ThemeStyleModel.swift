@@ -35,7 +35,6 @@ public extension ThemeStyleModel {
             try await database.setSetting(.cornerStyle, to: corner)
         } catch {
             style = previous
-
             errorNotice.show(Self.saveFailedMessage)
         }
     }
@@ -49,7 +48,6 @@ public extension ThemeStyleModel {
             try await database.setSetting(.fontStyle, to: font)
         } catch {
             style = previous
-
             errorNotice.show(Self.saveFailedMessage)
         }
     }
@@ -63,7 +61,6 @@ public extension ThemeStyleModel {
             try await database.setSetting(.textSize, to: size)
         } catch {
             style = previous
-
             errorNotice.show(Self.saveFailedMessage)
         }
     }
@@ -77,7 +74,6 @@ public extension ThemeStyleModel {
             try await database.setSetting(.textFontStyle, to: font)
         } catch {
             style = previous
-
             errorNotice.show(Self.saveFailedMessage)
         }
     }

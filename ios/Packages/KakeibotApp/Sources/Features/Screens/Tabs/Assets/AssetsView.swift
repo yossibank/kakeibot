@@ -15,25 +15,29 @@ public struct AssetsView: View {
     private let onOpenWallet: (Wallet.ID) -> Void
     private let onOpenRecurring: (Recurring.ID) -> Void
     private let onOpenEntry: (Entry.ID) -> Void
+    private let onMarkReward: () -> Void
 
     public init(
         model: AssetsModel,
         onTransfer: @escaping () -> Void,
         onOpenWallet: @escaping (Wallet.ID) -> Void,
         onOpenRecurring: @escaping (Recurring.ID) -> Void,
-        onOpenEntry: @escaping (Entry.ID) -> Void
+        onOpenEntry: @escaping (Entry.ID) -> Void,
+        onMarkReward: @escaping () -> Void
     ) {
         self.model = model
         self.onTransfer = onTransfer
         self.onOpenWallet = onOpenWallet
         self.onOpenRecurring = onOpenRecurring
         self.onOpenEntry = onOpenEntry
+        self.onMarkReward = onMarkReward
     }
 
     public var body: some View {
         ScrollView {
             VStack(spacing: 12) {
                 header
+
                 totalCard
 
                 if !model.upcomingBills.isEmpty {
@@ -141,12 +145,34 @@ private extension AssetsView {
     }
 
     var rewardCard: some View {
-        Button {
-            isShowingReward = true
-        } label: {
-            rewardCardBody
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                isShowingReward = true
+            } label: {
+                rewardCardBody
+            }
+            .buttonStyle(.plain)
+
+            Button(action: onMarkReward) {
+                Label("今日の達成を付ける", systemImage: "gift")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.accent)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .overlay {
+                        Capsule()
+                            .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+                    }
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
+        .padding(16)
+        .card()
+        .overlay {
+            if model.isRewardGoalReached {
+                reachedGlow
+            }
+        }
     }
 
     var rewardCardBody: some View {
@@ -159,6 +185,7 @@ private extension AssetsView {
                     .background(Palette.accent.opacity(.subtle), in: Circle())
 
                 SectionTitle("ごほうび貯金箱")
+
                 Spacer()
 
                 if model.isRewardGoalReached {
@@ -194,11 +221,7 @@ private extension AssetsView {
                 goalLine(goal)
             }
 
-            if model.recentRewards.isEmpty {
-                Text("記録の日の見出しの贈り物のボタンから、達成を付けられます")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-            } else {
+            if !model.recentRewards.isEmpty {
                 VStack(spacing: 8) {
                     ForEach(model.recentRewards) { log in
                         rewardRow(log)
@@ -206,13 +229,7 @@ private extension AssetsView {
                 }
             }
         }
-        .padding(16)
-        .card()
-        .overlay {
-            if model.isRewardGoalReached {
-                reachedGlow
-            }
-        }
+        .contentShape(.rect)
     }
 
     var reachedGlow: some View {
@@ -234,6 +251,7 @@ private extension AssetsView {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 SectionTitle("これからの引き落とし")
+
                 Spacer()
 
                 Text("合計 \(AmountText.text(model.upcomingBillTotal))")
@@ -260,6 +278,7 @@ private extension AssetsView {
     var trendLegend: some View {
         HStack(spacing: 16) {
             legend("手元のお金", dash: [])
+
             legend("純資産", dash: BalanceTrend.netWorthDash)
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -595,7 +614,6 @@ private extension AssetsView {
 
     static func payoffText(_ payoff: LoanPayoff) -> String {
         let date = payoff.lastDate
-
         return "あと \(payoff.count) 回・\(String(date.year))/\(date.month) まで"
     }
 
@@ -633,7 +651,6 @@ private extension AssetsView {
 
     func nextBillText(_ bill: CardBill) -> String {
         let date = "\(bill.date.month)/\(bill.date.day)"
-
         return "\(date) に \(AmountText.text(bill.amount)) 引き落とし"
     }
 
@@ -667,7 +684,6 @@ private extension AssetsView {
 
     func daysText(until date: LocalDate) -> String {
         let days = model.today.days(until: date)
-
         return days == 1 ? "明日" : "あと \(days) 日"
     }
 

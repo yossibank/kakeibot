@@ -11,6 +11,8 @@ public struct CategoryEditSheet: View {
     @State private var isMovingTag = false
     @State private var tagName = ""
     @State private var ignoresKeyboard = false
+    @State private var isEditingIcon = false
+    @State private var iconBottom: CGFloat = 0
 
     @FocusState private var focus: Field?
     @FocusState private var isTagFocused: Bool
@@ -46,6 +48,13 @@ public struct CategoryEditSheet: View {
                 }
             }
         }
+        .iconEditorDrawer(
+            isPresented: $isEditingIcon,
+            model: model.icon,
+            focus: $focus,
+            textField: .text,
+            below: iconBottom
+        )
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -90,6 +99,11 @@ private extension CategoryEditSheet {
             ScrollView {
                 VStack(spacing: 16) {
                     preview
+                        .onGeometryChange(for: CGFloat.self) { proxy in
+                            proxy.frame(in: .global).maxY
+                        } action: { maxY in
+                            iconBottom = maxY
+                        }
 
                     SettingsField(
                         "名前",
@@ -99,12 +113,6 @@ private extension CategoryEditSheet {
                     )
 
                     tags
-
-                    IconEditor(
-                        model: model.icon,
-                        focus: $focus,
-                        textField: .text
-                    )
                 }
                 .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)
@@ -154,24 +162,35 @@ private extension CategoryEditSheet {
 
     var preview: some View {
         HStack(spacing: 20) {
-            VStack(spacing: 8) {
-                IconImage(model.icon.preview, size: 24)
-                    .foregroundStyle(Palette.accent)
+            Button {
+                focus = nil
+                isEditingIcon = true
+            } label: {
+                VStack(spacing: 8) {
+                    IconImage(model.icon.preview, size: 24)
+                        .foregroundStyle(Palette.accent)
 
-                Text(model.name.isEmpty ? "名前" : model.name)
-                    .textFont(size: .caption)
-                    .lineLimit(1)
+                    Text(model.name.isEmpty ? "名前" : model.name)
+                        .textFont(size: .caption)
+                        .lineLimit(1)
+                }
+                .foregroundStyle(Palette.accentStrong)
+                .frame(width: 86, height: 86)
+                .background(
+                    Palette.accent.opacity(.subtle),
+                    in: .rect(cornerRadius: corner.radius(20))
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: corner.radius(20))
+                        .stroke(iconStroke, lineWidth: iconStrokeWidth)
+                }
+                .overlay(alignment: .bottomTrailing) {
+                    EditBadge()
+                        .offset(x: 4, y: 4)
+                }
+                .contentShape(.rect)
             }
-            .foregroundStyle(Palette.accentStrong)
-            .frame(width: 86, height: 86)
-            .background(
-                Palette.accent.opacity(.subtle),
-                in: .rect(cornerRadius: corner.radius(20))
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: corner.radius(20))
-                    .stroke(Palette.outline, lineWidth: 1)
-            }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("入力シートでの見え方")
@@ -193,6 +212,7 @@ private extension CategoryEditSheet {
         VStack(alignment: .leading, spacing: 2) {
             HStack {
                 SettingsSectionTitle("タグ")
+
                 Spacer()
 
                 if model.tags.count > 1 {
@@ -265,6 +285,14 @@ private extension CategoryEditSheet {
         .scale(scale: 0.95).combined(with: .opacity)
     }
 
+    var iconStroke: Color {
+        isEditingIcon ? Palette.accent : Palette.outline
+    }
+
+    var iconStrokeWidth: CGFloat {
+        isEditingIcon ? 2 : 1
+    }
+
     var keyboardRegions: SafeAreaRegions {
         ignoresKeyboard ? .keyboard : []
     }
@@ -291,7 +319,6 @@ private extension CategoryEditSheet {
 
     func editTag(_ id: UUID) {
         let name = model.tags.first { $0.id == id }?.draft.name ?? ""
-
         showTag(.rename(id), name: name)
     }
 
@@ -379,7 +406,10 @@ private extension CategoryEditSheet {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
 
         CategoryEditSheet(
-            model: CategoryEditModel(database: database, kind: .expense)
+            model: CategoryEditModel(
+                database: database,
+                kind: .expense
+            )
         )
     }
 }

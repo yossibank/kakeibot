@@ -137,9 +137,7 @@ extension AppModel {
 
     func observeNotifications(in database: AppDatabase) async {
         do {
-            for try await input in database.notificationInputUpdates(
-                from: today
-            ) {
+            for try await input in database.notificationInputUpdates(from: today) {
                 await schedule(input)
             }
         } catch {
@@ -157,7 +155,6 @@ private extension AppModel {
         do {
             for try await look in database.themeLookUpdates() {
                 self.look = look
-
                 reloadWidgets()
             }
         } catch {
@@ -169,7 +166,6 @@ private extension AppModel {
         do {
             for try await style in database.styleUpdates() {
                 self.style = style
-
                 reloadWidgets()
             }
         } catch {
@@ -223,7 +219,6 @@ private extension AppModel {
 
     func schedule(_ input: NotificationInput) async {
         let plan = input.plan(today: today)
-
         await scheduler.apply(plan, now: Date(), timeZone: .current)
     }
 

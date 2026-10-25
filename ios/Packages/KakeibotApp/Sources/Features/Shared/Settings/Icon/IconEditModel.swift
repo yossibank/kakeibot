@@ -249,7 +249,6 @@ public extension IconEditModel {
 
     func inputEmoji(_ value: String) {
         let last = value.last { Self.isEmoji($0) }
-
         emoji = last.map(String.init) ?? ""
     }
 

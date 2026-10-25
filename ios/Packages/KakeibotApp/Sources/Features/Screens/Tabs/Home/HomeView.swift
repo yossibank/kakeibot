@@ -61,6 +61,7 @@ public struct HomeView: View {
         ScrollView {
             VStack(spacing: 12) {
                 header
+
                 dialCard
 
                 if showsSetupCard {
@@ -79,6 +80,7 @@ public struct HomeView: View {
                 }
 
                 templateCard
+
                 recentCard
             }
             .padding(.horizontal, 16)
@@ -113,6 +115,7 @@ private extension HomeView {
             }
 
             Spacer()
+
             HeaderButton(
                 systemImage: "gearshape",
                 showsDot: !setup.isSettingsOpened,
@@ -144,54 +147,70 @@ private extension HomeView {
             .frame(maxWidth: 290)
             .animation(.snappy, value: model.budgetUsage)
 
-            if let usage = model.budgetUsage {
-                VStack(spacing: 4) {
-                    if let warning = usage.warningText {
-                        Text(warning)
-                            .textFont(.caption, weight: .semibold)
-                            .foregroundStyle(usage.tint)
+            VStack(spacing: 4) {
+                if let usage = model.budgetUsage {
+                    VStack(spacing: 4) {
+                        if let warning = usage.warningText {
+                            Text(warning)
+                                .textFont(.caption, weight: .semibold)
+                                .foregroundStyle(usage.tint)
+                        }
+
+                        Button {
+                            onOpenSetup(.budget)
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text("予算 \(AmountText.text(usage.budget))")
+
+                                Image(systemName: "chevron.right")
+                                    .sansFont(.micro, weight: .semibold)
+                            }
+                            .textFont(.caption)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+                            .padding(.vertical, 4)
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                     }
-
-                    Text("予算 \(AmountText.text(usage.budget))")
-                        .textFont(.caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                }
-            } else {
-                Button(action: onOpenSettings) {
-                    HStack(spacing: 4) {
-                        Text("予算を決めると、あといくら使えるかが出ます")
-
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .semibold)
-                    }
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .frame(minHeight: 32)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
-
-            if model.recurringExpense > 0 {
-                Button(action: onOpenRecurrings) {
-                    VStack(spacing: 8) {
+                } else {
+                    Button {
+                        onOpenSetup(.budget)
+                    } label: {
                         HStack(spacing: 4) {
-                            Label(recurringText, systemImage: "repeat")
+                            Text("予算を決めると、あといくら使えるかが出ます")
 
                             Image(systemName: "chevron.right")
                                 .sansFont(.micro, weight: .semibold)
                         }
-                        .textFont(.caption2)
-                        .monospacedDigit()
+                        .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
-
-                        recurringProgress
+                        .frame(minHeight: 32)
+                        .contentShape(.rect)
                     }
-                    .frame(minHeight: 28)
-                    .contentShape(.rect)
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
+
+                if model.recurringExpense > 0 {
+                    Button(action: onOpenRecurrings) {
+                        VStack(spacing: 8) {
+                            HStack(spacing: 4) {
+                                Label(recurringText, systemImage: "repeat")
+
+                                Image(systemName: "chevron.right")
+                                    .sansFont(.micro, weight: .semibold)
+                            }
+                            .textFont(.caption2)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+
+                            recurringProgress
+                        }
+                        .padding(.vertical, 4)
+                        .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
 
             HStack(spacing: 0) {
@@ -234,6 +253,7 @@ private extension HomeView {
             ZStack {
                 HStack {
                     SectionTitle("テンプレート")
+
                     Spacer()
 
                     Button("すべて", action: onShowAllTemplates)
@@ -345,6 +365,7 @@ private extension HomeView {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 SectionTitle("最近の記録")
+
                 Spacer()
 
                 Button("すべて", action: onShowRecords)

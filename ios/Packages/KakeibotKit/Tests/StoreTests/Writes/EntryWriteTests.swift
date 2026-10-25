@@ -158,6 +158,71 @@ struct EntryWriteTests {
         #expect(restored == [saved])
         #expect(reverted == [saved])
     }
+
+    @Test
+    func changesCategoryOnlyForMatchingType() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let category = options.expenseCategories[1]
+        let later = setup.now.addingTimeInterval(60)
+        var income = setup.draft
+        income.type = .income
+        income.categoryId = options.incomeCategories[0].id
+
+        let spent = try await setup.database.saveEntry(setup.draft, at: setup.now)
+        let earned = try await setup.database.saveEntry(income, at: setup.now)
+
+        let previous = try await setup.database.changeEntries(
+            [spent.id, earned.id],
+            to: .category(category.id),
+            at: later
+        )
+
+        let changed = try await setup.database.entry(spent.id)
+        let kept = try await setup.database.entry(earned.id)
+
+        #expect(previous == [spent])
+        #expect(changed?.categoryId == category.id)
+        #expect(changed?.updatedAt == later)
+        #expect(kept == earned)
+    }
+
+    @Test
+    func changesWalletOfEntries() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let wallet = options.wallets[1]
+
+        let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
+
+        let previous = try await setup.database.changeEntries(
+            [saved.id],
+            to: .wallet(wallet.id),
+            at: setup.now
+        )
+
+        let changed = try await setup.database.entry(saved.id)
+
+        #expect(previous == [saved])
+        #expect(changed?.walletId == wallet.id)
+    }
+
+    @Test
+    func deletesAndRestoresEntries() async throws {
+        let setup = try await Setup()
+
+        let first = try await setup.database.saveEntry(setup.draft, at: setup.now)
+        let second = try await setup.database.saveEntry(setup.draft, at: setup.now)
+
+        let deleted = try await setup.database.deleteEntries([first.id, second.id])
+        let emptied = try setup.database.snapshot().entries
+        try await setup.database.restoreEntries(deleted)
+        let restored = try setup.database.snapshot().entries
+
+        #expect(Set(deleted) == [first, second])
+        #expect(emptied.isEmpty)
+        #expect(Set(restored) == [first, second])
+    }
 }
 
 extension EntryWriteTests {

@@ -8,12 +8,14 @@ public struct WalletEditSheet: View {
     @State private var isConfirmingDiscard = false
     @State private var isEnteringAmount = false
     @State private var isEnteringValuation = false
+    @State private var isEditingIcon = false
+    @State private var iconBottom: CGFloat = 0
     @State private var openValuationId: Valuation.ID?
     @State private var isConfirmingHide = false
     @State private var isConfirmingDelete = false
     @State private var isEditingPayment = false
     @State private var isAskingPayment = false
-    @State private var addedLoan: Wallet?
+    @State private var addedWallet: Wallet?
 
     @FocusState private var focus: Field?
 
@@ -106,6 +108,13 @@ public struct WalletEditSheet: View {
                 }
             }
         }
+        .iconEditorDrawer(
+            isPresented: $isEditingIcon,
+            model: model.icon,
+            focus: $focus,
+            textField: .text,
+            below: iconBottom
+        )
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -134,17 +143,17 @@ public struct WalletEditSheet: View {
         .sheet(isPresented: $isEditingPayment) {
             closePayment()
         } content: {
-            RecurringEditSheet(model: model.paymentModel(for: addedLoan?.id))
+            RecurringEditSheet(model: model.paymentModel(for: addedWallet?.id))
         }
         .confirmation(
             isPresented: $isAskingPayment,
             systemImage: "repeat",
-            title: "毎月の返済も決めますか",
-            message: "固定費として、返済の日と額を決められます",
+            title: model.paymentQuestion,
+            message: model.paymentQuestionNote,
             keepTitle: "あとで",
             confirmTitle: "決める",
             role: .suggestion,
-            onKeep: finishAddedLoan
+            onKeep: finishAddedWallet
         ) {
             isEditingPayment = true
         }
@@ -163,7 +172,13 @@ private extension WalletEditSheet {
                 VStack(alignment: .leading, spacing: 20) {
                     VStack(alignment: .leading, spacing: 8) {
                         preview
+
                         colorNote
+                    }
+                    .onGeometryChange(for: CGFloat.self) { proxy in
+                        proxy.frame(in: .global).maxY
+                    } action: { maxY in
+                        iconBottom = maxY
                     }
 
                     SettingsField(
@@ -174,6 +189,7 @@ private extension WalletEditSheet {
                     )
 
                     kindChooser
+
                     balanceField
 
                     if model.showsValuation {
@@ -185,12 +201,6 @@ private extension WalletEditSheet {
                             isEditingPayment = true
                         }
                     }
-
-                    IconEditor(
-                        model: model.icon,
-                        focus: $focus,
-                        textField: .text
-                    )
                 }
                 .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)
@@ -242,17 +252,28 @@ private extension WalletEditSheet {
 
     var preview: some View {
         HStack(spacing: 16) {
-            IconImage(model.icon.preview, size: 22)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 48, height: 48)
-                .background(
-                    Palette.accent.opacity(.subtle),
-                    in: .rect(cornerRadius: corner.radius(16))
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(16))
-                        .stroke(Palette.outline, lineWidth: 1)
-                }
+            Button {
+                focus = nil
+                isEditingIcon = true
+            } label: {
+                IconImage(model.icon.preview, size: 22)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 48, height: 48)
+                    .background(
+                        Palette.accent.opacity(.subtle),
+                        in: .rect(cornerRadius: corner.radius(16))
+                    )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: corner.radius(16))
+                            .stroke(iconStroke, lineWidth: iconStrokeWidth)
+                    }
+                    .overlay(alignment: .bottomTrailing) {
+                        EditBadge()
+                            .offset(x: 4, y: 4)
+                    }
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(previewName)
@@ -327,8 +348,11 @@ private extension WalletEditSheet {
                             .foregroundStyle(Palette.text)
 
                         Spacer(minLength: 8)
+
+                        EditBadge()
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.leading, 16)
+                    .padding(.trailing, 12)
                     .frame(height: 46)
                     .background(
                         Palette.panel,
@@ -504,7 +528,8 @@ private extension WalletEditSheet {
                 systemImage: "chart.line.uptrend.xyaxis",
                 title: "今の評価額",
                 value: AmountText.text(amount),
-                isEmpty: false
+                isEmpty: false,
+                isAmount: true
             )
         ]
     }
@@ -531,6 +556,14 @@ private extension WalletEditSheet {
 
     var signFill: Color {
         signColor.opacity(0.1)
+    }
+
+    var iconStroke: Color {
+        isEditingIcon ? Palette.accent : Palette.outline
+    }
+
+    var iconStrokeWidth: CGFloat {
+        isEditingIcon ? 2 : 1
     }
 
     var amountStroke: Color {
@@ -598,21 +631,19 @@ private extension WalletEditSheet {
             return
         }
 
-        guard !model.isEditing, wallet.kind == .loan else {
+        guard !model.isEditing, model.asksPayment else {
             onSave(wallet)
             dismiss()
-
             return
         }
 
-        addedLoan = wallet
+        addedWallet = wallet
         isAskingPayment = true
     }
 
     func closePayment() {
-        guard addedLoan == nil else {
-            finishAddedLoan()
-
+        guard addedWallet == nil else {
+            finishAddedWallet()
             return
         }
 
@@ -621,12 +652,12 @@ private extension WalletEditSheet {
         }
     }
 
-    func finishAddedLoan() {
-        guard let addedLoan else {
+    func finishAddedWallet() {
+        guard let addedWallet else {
             return
         }
 
-        onSave(addedLoan)
+        onSave(addedWallet)
         dismiss()
     }
 
@@ -635,7 +666,6 @@ private extension WalletEditSheet {
 
         guard !model.needsHideConfirmation else {
             isConfirmingHide = true
-
             return
         }
 

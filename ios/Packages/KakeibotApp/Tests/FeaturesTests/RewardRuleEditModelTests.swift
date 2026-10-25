@@ -31,7 +31,7 @@ struct RewardRuleEditModelTests {
         model.name = "自炊した日"
 
         #expect(!model.canSave)
-        #expect(model.saveTitle == "額を入れてください")
+        #expect(model.saveTitle == "金額を入れてください")
     }
 
     @Test

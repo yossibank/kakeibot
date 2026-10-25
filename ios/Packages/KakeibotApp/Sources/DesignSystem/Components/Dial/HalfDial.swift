@@ -87,7 +87,6 @@ private extension HalfTicks {
     ) -> CGPoint {
         let x = center.x + cos(angle) * radius
         let y = center.y + sin(angle) * radius
-
         return CGPoint(x: x, y: y)
     }
 }

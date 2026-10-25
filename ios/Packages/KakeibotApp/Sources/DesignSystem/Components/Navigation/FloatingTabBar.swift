@@ -27,10 +27,11 @@ public struct FloatingTabBar<Value: Hashable>: View {
     public var body: some View {
         HStack(spacing: 12) {
             tabs
+
             addButton
         }
         .padding(.horizontal, 16)
-        .padding(.bottom, 4)
+        .padding(.bottom, Self.bottomGap)
     }
 }
 
@@ -53,6 +54,10 @@ public extension FloatingTabBar {
 
     static var height: CGFloat {
         64
+    }
+
+    static var clearance: CGFloat {
+        height + bottomGap
     }
 }
 
@@ -107,7 +112,6 @@ private extension FloatingTabBar {
     var addButton: some View {
         Button {
             addCount += 1
-
             onAdd()
         } label: {
             ZStack {
@@ -184,6 +188,10 @@ private extension FloatingTabBar {
 }
 
 private extension FloatingTabBar {
+    static var bottomGap: CGFloat {
+        4
+    }
+
     static var hintPeriod: Double {
         2.4
     }

@@ -18,7 +18,6 @@ extension SettingsBoardGrid {
     func height(slots: Int) -> CGFloat {
         let rows = (slots + columns - 1) / columns
         let gaps = spacing * CGFloat(max(rows - 1, 0))
-
         return itemHeight * CGFloat(rows) + gaps
     }
 

@@ -78,13 +78,9 @@ extension ReviewSummaryTests.Ids {
     func named(
         _ breakdown: ReviewSummary.Breakdown
     ) -> ReviewSummaryTests.Totals {
-        let categoryNames = Dictionary(
-            uniqueKeysWithValues: categories.map { ($1, $0) }
-        )
+        let categoryNames = Dictionary(uniqueKeysWithValues: categories.map { ($1, $0) })
 
-        let walletNames = Dictionary(
-            uniqueKeysWithValues: wallets.map { ($1, $0) }
-        )
+        let walletNames = Dictionary(uniqueKeysWithValues: wallets.map { ($1, $0) })
 
         let byCategory = breakdown.byCategory.map { id, amount in
             (categoryNames[id] ?? id.description, amount)

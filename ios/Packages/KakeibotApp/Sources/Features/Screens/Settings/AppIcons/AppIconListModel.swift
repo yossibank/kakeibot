@@ -30,7 +30,6 @@ public extension AppIconListModel {
             try await switcher.setName(choice.alternateName)
         } catch {
             current = previous
-
             errorNotice.show(Self.changeFailedMessage)
         }
     }

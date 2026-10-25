@@ -141,21 +141,20 @@ public extension AppIconChoice {
     }
 
     init(_ preset: ThemePreset) {
-        self =
-            switch preset {
-            case .navy: .navy
-            case .black: .black
-            case .forest: .forest
-            case .teal: .teal
-            case .wine: .wine
-            case .plum: .plum
-            case .ivory: .ivory
-            case .white: .white
-            case .sky: .sky
-            case .sage: .sage
-            case .rose: .rose
-            case .gold: .gold
-            }
+        self = switch preset {
+        case .navy: .navy
+        case .black: .black
+        case .forest: .forest
+        case .teal: .teal
+        case .wine: .wine
+        case .plum: .plum
+        case .ivory: .ivory
+        case .white: .white
+        case .sky: .sky
+        case .sage: .sage
+        case .rose: .rose
+        case .gold: .gold
+        }
     }
 
     init?(_ choice: ThemeChoice) {

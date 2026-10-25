@@ -8,7 +8,6 @@ import Store
 @Observable
 public final class OnboardingModel {
     public private(set) var weekStart: Weekday = .sunday
-
     public private(set) var page: Page = .welcome
     public private(set) var route: Route?
 
@@ -125,11 +124,9 @@ public extension OnboardingModel {
     func finish() async -> Bool {
         do {
             try await database.setSetting(.onboardingCompleted, to: true)
-
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }

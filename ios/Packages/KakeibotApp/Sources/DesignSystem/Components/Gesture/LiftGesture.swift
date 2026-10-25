@@ -22,9 +22,7 @@ public extension LiftGesture {
         context: Context
     ) -> UILongPressGestureRecognizer {
         let recognizer = UILongPressGestureRecognizer()
-
         recognizer.minimumPressDuration = 0.3
-
         return recognizer
     }
 

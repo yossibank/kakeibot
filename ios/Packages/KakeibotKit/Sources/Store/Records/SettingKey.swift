@@ -143,6 +143,10 @@ public extension SettingKey where Value == Bool {
         Self(flag: .categoryMenuOpened)
     }
 
+    static var categoriesByUse: Self {
+        Self(flag: .categoriesByUse)
+    }
+
     static var onboardingCompleted: Self {
         Self(flag: .onboardingCompleted)
     }

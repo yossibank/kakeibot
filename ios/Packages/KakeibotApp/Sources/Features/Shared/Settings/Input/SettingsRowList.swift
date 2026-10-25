@@ -92,9 +92,13 @@ private extension SettingsRowList {
                     .foregroundStyle(color)
                     .lineLimit(1)
 
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(Palette.accent.opacity(.medium))
+                if item.isAmount {
+                    EditBadge(size: 16)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(Palette.accent.opacity(.medium))
+                }
             }
             .padding(.horizontal, 16)
             .frame(height: 56)

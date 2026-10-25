@@ -50,7 +50,6 @@ public extension BudgetListModel {
 
     var recurringExpense: Int {
         let period = month.period(startingOn: monthStartDay)
-
         return recurrings.total(of: .expense, in: period)
     }
 
@@ -146,7 +145,6 @@ public extension BudgetListModel {
 
     func startEditing(_ target: Target) {
         let amount = amount(for: target.categoryId) ?? 0
-
         calculator = AmountCalculator(amount: amount)
         editing = target
     }
@@ -170,7 +168,6 @@ public extension BudgetListModel {
     func finishEditing() async {
         guard canSave, calculator.amount != editingAmount else {
             cancelEditing()
-
             return
         }
 

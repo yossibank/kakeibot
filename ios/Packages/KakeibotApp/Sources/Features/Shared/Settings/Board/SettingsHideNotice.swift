@@ -17,7 +17,6 @@ extension View {
                     actionTitle: "取り消す"
                 ) {
                     id.wrappedValue = nil
-
                     onUndo(hiddenId)
                 }
                 .padding(.bottom, bottom)

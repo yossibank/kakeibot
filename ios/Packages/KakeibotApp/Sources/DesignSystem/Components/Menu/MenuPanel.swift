@@ -38,6 +38,7 @@ public struct MenuPanel<Content: View>: View {
         ) {}
 
         MenuDivider()
+
         MenuRow("名前順", systemImage: "textformat") {}
     }
     .padding()

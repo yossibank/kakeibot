@@ -179,7 +179,6 @@ public extension TemplateEditModel {
     func save() async -> EntryTemplate? {
         if let problem = draft.problems.first {
             errorNotice.show(message(for: problem))
-
             return nil
         }
 
@@ -191,7 +190,6 @@ public extension TemplateEditModel {
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return nil
         }
     }
@@ -205,7 +203,6 @@ public extension TemplateEditModel {
             return try await database.deleteTemplate(editingId)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return nil
         }
     }
@@ -227,7 +224,6 @@ public extension TemplateEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }

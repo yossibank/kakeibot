@@ -96,13 +96,10 @@ public extension SettingsBoardModel {
         do {
             try await saveHidden(id, isHidden: true)
             await reload()
-
             return true
         } catch {
             let message = hideFailedMessage(for: error) ?? Self.hideFailedText
-
             errorNotice.show(message)
-
             return false
         }
     }
@@ -121,9 +118,7 @@ public extension SettingsBoardModel {
 
         do {
             let deletion = try await remove(id)
-
             await reload()
-
             return deletion
         } catch {
             let message = deleteFailedMessage(for: error)

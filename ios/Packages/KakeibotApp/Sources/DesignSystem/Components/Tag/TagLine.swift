@@ -116,7 +116,6 @@ extension TagLine {
     ) -> Bool {
         let cards = names.map { TagCard.width(of: $0) }.reduce(0, +)
         let gaps = spacing * CGFloat(max(names.count - 1, 0))
-
         return cards + gaps + inset * 2 <= width
     }
 }
@@ -265,7 +264,6 @@ private extension TagLine {
 
     var cards: [Card] {
         let add: [Card] = onAdd == nil ? [] : [.add]
-
         return tags.map(Card.tag) + add
     }
 
@@ -290,7 +288,6 @@ private extension TagLine {
     func drop(at index: Int) -> CGFloat {
         let count = Double(max(cards.count, 1))
         let position = (Double(index) + 0.5) / count
-
         return 6 + 7 * sin(.pi * position)
     }
 

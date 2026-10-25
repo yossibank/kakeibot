@@ -23,16 +23,17 @@ public final class EntryModel {
         }
     }
 
-    public var toWalletId: Wallet.ID?
-    public var memo = ""
-
     public var categoryId: EntryCategory.ID? {
         didSet {
             if categoryId != oldValue {
                 tagId = nil
+                followUsualWallet(from: oldValue)
             }
         }
     }
+
+    public var toWalletId: Wallet.ID?
+    public var memo = ""
 
     public private(set) var tagId: EntryTag.ID?
     public private(set) var billMonth: YearMonth?
@@ -47,14 +48,17 @@ public final class EntryModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
+    let database: AppDatabase
+
     private var baseline: Snapshot?
     private var original: Entry?
     private var allTemplates: [EntryTemplate] = []
     private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
     private var appliedTemplateId: EntryTemplate.ID?
     private var cardBills: [Recurring] = []
+    private var history: EntryList?
+    private var categoryUses: [EntryCategory.ID: Int]?
 
-    private let database: AppDatabase
     private let editingId: Entry.ID?
     private let startingTemplate: EntryTemplate?
 
@@ -368,7 +372,6 @@ public extension EntryModel {
     func icon(for template: EntryTemplate) -> Icon? {
         let categories = categories(for: template.type)
         let category = categories.first { $0.id == template.categoryId }
-
         return category.flatMap { options?.icons[$0.iconId] }
     }
 
@@ -377,7 +380,9 @@ public extension EntryModel {
             let limit = Self.recentMemoLimit
 
             options = try await database.entryOptions()
+
             recentMemos = try await database.recentMemos(limit: limit)
+
             allTemplates = try await database.templates()
 
             cardBills = try await database.recurrings()
@@ -388,11 +393,14 @@ public extension EntryModel {
 
             weekStart = try await database.setting(.weekStart)
 
-            startsWithAmount = try await database.setting(
-                .entryStartsWithAmount
-            )
+            startsWithAmount = try await database.setting(.entryStartsWithAmount)
 
             try await loadBalances()
+
+            if try await database.setting(.categoriesByUse) {
+                categoryUses = history?.categoryUses(through: Self.today)
+            }
+
             try await loadEntry()
 
             if let startingTemplate {
@@ -454,7 +462,6 @@ public extension EntryModel {
 
     func newCategoryModel() -> CategoryEditModel {
         let kind: EntryCategory.Kind = type == .income ? .income : .expense
-
         return CategoryEditModel(database: database, kind: kind)
     }
 
@@ -465,7 +472,6 @@ public extension EntryModel {
     func reloadWallets() async {
         do {
             options = try await database.entryOptions()
-
             try await loadBalances()
         } catch {
             report(error)
@@ -542,13 +548,11 @@ public extension EntryModel {
 
     func selectBill(_ date: LocalDate) {
         let isUsual = date == billChoices.first?.date
-
         billMonth = isUsual ? nil : date.yearMonth
     }
 
     func swapWallets() {
         let source = walletId
-
         walletId = toWalletId
         toWalletId = source
     }
@@ -558,7 +562,10 @@ public extension EntryModel {
             return
         }
 
+        let followsUsual = walletId == usualWalletId(for: categoryId)
+
         categoryByType[self.type] = categoryId
+
         self.type = type
 
         let remembered = categoryByType[type]
@@ -567,6 +574,10 @@ public extension EntryModel {
             categoryId = remembered
         } else if !categories.contains(where: { $0.id == categoryId }) {
             categoryId = categories.first?.id
+        }
+
+        if followsUsual, !isEditing, type != .transfer {
+            walletId = usualWalletId(for: categoryId)
         }
 
         if type == .transfer {
@@ -597,9 +608,24 @@ public extension EntryModel {
             return EntryChange(kind: kind, entry: entry, label: title)
         } catch {
             report(error)
-
             return nil
         }
+    }
+
+    func startNext() async {
+        calculator = AmountCalculator()
+        memo = ""
+        tagId = nil
+        billMonth = nil
+        appliedTemplateId = nil
+
+        do {
+            try await loadBalances()
+        } catch {
+            report(error)
+        }
+
+        baseline = snapshot
     }
 
     func delete() async -> EntryChange? {
@@ -609,13 +635,10 @@ public extension EntryModel {
 
         do {
             try await database.deleteEntry(original.id)
-
             let title = label(for: original)
-
             return EntryChange(kind: .deleted, entry: original, label: title)
         } catch {
             report(error)
-
             return nil
         }
     }
@@ -635,10 +658,13 @@ private extension EntryModel {
     }
 
     static let restoreFailedMessage = "元に戻せませんでした"
-
     static let recentMemoLimit = 6
     static let billTitles = ["いつもどおり", "次に回す", "2 回先"]
     static let numberLocale = Locale(identifier: "ja_JP")
+
+    static var today: LocalDate {
+        LocalDate(Date(), in: .current)
+    }
 
     var snapshot: Snapshot {
         Snapshot(
@@ -703,17 +729,51 @@ private extension EntryModel {
     }
 
     func categories(for type: Entry.Kind) -> [EntryCategory] {
-        switch type {
+        let categories: [EntryCategory] = switch type {
         case .expense: options?.expenseCategories ?? []
         case .income: options?.incomeCategories ?? []
         case .transfer: []
         }
+
+        guard let categoryUses else {
+            return categories
+        }
+
+        return categories.sorted { lhs, rhs in
+            let left = categoryUses[lhs.id, default: 0]
+            let right = categoryUses[rhs.id, default: 0]
+            return left == right ? lhs.sortOrder < rhs.sortOrder : left > right
+        }
+    }
+
+    func usualWalletId(for categoryId: EntryCategory.ID?) -> Wallet.ID? {
+        let candidates = [
+            history?.lastWalletId(for: type, category: categoryId),
+            history?.lastWalletId(for: type, category: nil),
+            wallets.first?.id
+        ]
+
+        return candidates.compactMap(\.self).first { id in
+            wallets.contains { $0.id == id }
+        }
+    }
+
+    func followUsualWallet(from previous: EntryCategory.ID?) {
+        guard
+            !isEditing,
+            type != .transfer,
+            walletId == usualWalletId(for: previous)
+        else {
+            return
+        }
+
+        walletId = usualWalletId(for: categoryId)
     }
 
     func loadEntry() async throws {
         guard let editingId else {
             categoryId = categories.first?.id
-            walletId = wallets.first?.id
+            walletId = usualWalletId(for: categoryId)
 
             if type == .transfer {
                 chooseDestination()
@@ -741,6 +801,8 @@ private extension EntryModel {
 
     func loadBalances() async throws {
         let list = try await database.entryList()
+
+        history = list
 
         let entries = list.days
             .flatMap(\.entries)

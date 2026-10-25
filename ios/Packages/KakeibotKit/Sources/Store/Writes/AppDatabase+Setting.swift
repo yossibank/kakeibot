@@ -20,7 +20,6 @@ extension AppDatabase {
     ) throws {
         guard let text = key.encode(value) else {
             _ = try Setting.deleteOne(db, key: key.key)
-
             return
         }
 

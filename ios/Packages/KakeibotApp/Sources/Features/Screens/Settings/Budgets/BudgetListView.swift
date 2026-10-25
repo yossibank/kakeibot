@@ -65,6 +65,7 @@ private extension BudgetListView {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             SettingsSectionTitle("カテゴリごと")
+
                             Spacer()
 
                             Text("合計 \(AmountText.text(model.categoriesTotal))")
@@ -114,15 +115,12 @@ private extension BudgetListView {
                     .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(amountColor(model.totalAmount))
+                    .editBadge()
 
                 if let usage = model.usage(for: nil) {
                     usageLine(usage)
                         .padding(.horizontal, 24)
                         .padding(.top, 4)
-                } else {
-                    Text("押して変えられます")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -157,6 +155,8 @@ private extension BudgetListView {
                         .displayFont(.body)
                         .monospacedDigit()
                         .foregroundStyle(amountColor(amount))
+
+                    EditBadge(size: 16)
                 }
 
                 if let usage {
@@ -184,6 +184,7 @@ private extension BudgetListView {
 
             HStack {
                 Text("使った額 \(AmountText.text(usage.spent))")
+
                 Spacer()
 
                 Text(usage.remainingText)
@@ -199,7 +200,6 @@ private extension BudgetListView {
 private extension BudgetListView {
     var recurringText: String {
         let amount = AmountText.text(model.recurringExpense)
-
         return "この月の固定費は \(amount)。予算の目安にできます"
     }
 

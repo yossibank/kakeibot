@@ -24,7 +24,6 @@ public extension ThemePalette {
     ) -> Double {
         let lighter = max(luminance(first), luminance(second))
         let darker = min(luminance(first), luminance(second))
-
         return (lighter + 0.05) / (darker + 0.05)
     }
 }

@@ -273,7 +273,6 @@ private extension QuickRecordWidgetView {
 
     func amountText(of record: QuickRecordWidgetSummary.Record) -> String {
         let text = AmountText.text(record.amount)
-
         return record.type == .income ? "+" + text : text
     }
 }

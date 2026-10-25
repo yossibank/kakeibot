@@ -144,7 +144,6 @@ private extension DonutChart {
         Task {
             try? await Task.sleep(for: Self.highlightDelay)
             onSelect(segment.id)
-
             highlighted = nil
         }
     }

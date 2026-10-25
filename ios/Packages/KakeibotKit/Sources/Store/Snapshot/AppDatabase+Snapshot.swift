@@ -21,7 +21,6 @@ public extension AppDatabase {
     ) async throws -> Data {
         let tables = try await tables()
         let export = ExportV1(exportedAt: date, app: app, data: tables)
-
         return try export.json()
     }
 

@@ -73,6 +73,7 @@ struct MainView: View {
         )
 
         _notice = State(initialValue: EntryNoticeModel(database: database))
+
         _undo = State(initialValue: DeletionUndo(database: database))
 
         self.database = database
@@ -145,6 +146,16 @@ struct MainView: View {
                     },
                     onOpenRecurring: { id in
                         sheet = .recurring(id)
+                    },
+                    onChangeEntries: { ids, change in
+                        Task {
+                            await notice.changeEntries(ids, to: change)
+                        }
+                    },
+                    onDeleteEntries: { ids in
+                        Task {
+                            await notice.deleteEntries(ids)
+                        }
                     }
                 )
                 .tabContent()
@@ -182,6 +193,9 @@ struct MainView: View {
                     },
                     onOpenEntry: { id in
                         sheet = .edit(id)
+                    },
+                    onMarkReward: {
+                        sheet = .reward
                     }
                 )
                 .tabContent()
@@ -354,6 +368,8 @@ private extension MainView {
                 )
                 .toolbar(.hidden, for: .navigationBar)
             }
+        case .reward:
+            RecordsRewardSheet(model: records, date: today)
         case .periodRecurrings:
             PeriodRecurringSheet(
                 model: home,
@@ -395,6 +411,7 @@ private extension MainView {
         case recurring(Recurring.ID)
         case periodRecurrings
         case setup(SetupItem)
+        case reward
 
         var id: Self {
             self
@@ -402,6 +419,8 @@ private extension MainView {
     }
 
     static let noticeBottom = FloatingTabBar<Int>.height + 24
+    static let warmupDuration: Duration = .milliseconds(500)
+    static let sheetCloseDuration: Duration = .milliseconds(600)
 
     static let tabItems: [FloatingTabBar<MainTab>.Item] = [
         .init("ホーム", systemImage: "house", value: .home),
@@ -409,9 +428,6 @@ private extension MainView {
         .init("振り返り", systemImage: "chart.pie", value: .review),
         .init("資産", systemImage: "building.columns", value: .assets)
     ]
-
-    static let warmupDuration: Duration = .milliseconds(500)
-    static let sheetCloseDuration: Duration = .milliseconds(600)
 }
 
 private extension MainView {
@@ -421,7 +437,6 @@ private extension MainView {
             .allowsHitTesting(false)
             .task {
                 try? await Task.sleep(for: Self.warmupDuration)
-
                 isWarmingEntry = false
             }
     }
@@ -472,7 +487,6 @@ private extension MainView {
         Task {
             if sheet != nil {
                 sheet = nil
-
                 try? await Task.sleep(for: Self.sheetCloseDuration)
             }
 
@@ -503,7 +517,6 @@ private extension MainView {
     func useTemplate(_ template: EntryTemplate) {
         guard template.amount != nil else {
             sheet = .template(template)
-
             return
         }
 
@@ -530,7 +543,7 @@ private extension MainView {
 private extension View {
     func tabContent() -> some View {
         toolbar(.hidden, for: .tabBar)
-            .safeAreaPadding(.bottom, FloatingTabBar<Int>.height)
+            .safeAreaPadding(.bottom, FloatingTabBar<Int>.clearance)
     }
 }
 

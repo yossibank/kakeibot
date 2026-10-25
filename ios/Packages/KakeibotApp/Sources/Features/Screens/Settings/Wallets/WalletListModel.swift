@@ -35,7 +35,6 @@ public extension WalletListModel {
     func balance(of wallet: Wallet) -> Int {
         let entries = list?.days.flatMap(\.entries) ?? []
         let valuations = list?.valuations ?? []
-
         return wallet.balance(with: entries, valuations: valuations)
     }
 
@@ -76,7 +75,6 @@ extension WalletListModel: SettingsBoardModel {
 
     public func saveOrder(_ ids: [Wallet.ID]) async throws {
         let ids = ids + hidden.map(\.id)
-
         try await database.reorderWallets(ids, at: Date())
     }
 

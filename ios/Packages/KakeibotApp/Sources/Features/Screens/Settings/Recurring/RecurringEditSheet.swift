@@ -150,6 +150,11 @@ private extension RecurringEditSheet {
                     .monospacedDigit()
                     .foregroundStyle(amountColor)
                     .frame(maxWidth: .infinity)
+                    .overlay(alignment: .trailing) {
+                        EditBadge(size: 16)
+                            .frame(width: 32, height: 32)
+                            .padding(.trailing, 16)
+                    }
                     .contentShape(.rect)
             }
             .buttonStyle(.plain)
@@ -166,6 +171,19 @@ private extension RecurringEditSheet {
             .tint(Palette.accent)
             .submitLabel(.done)
             .focused($isNameFocused)
+            .padding(.horizontal, 24)
+            .overlay(alignment: .trailing) {
+                Button {
+                    isNameFocused = true
+                } label: {
+                    EditBadge(size: 16)
+                        .frame(width: 32, height: 32)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .opacity(nameBadgeOpacity)
+                .offset(x: 24)
+            }
             .padding(.bottom, 8)
             .overlay(alignment: .bottom) {
                 Rectangle()
@@ -200,9 +218,7 @@ private extension RecurringEditSheet {
                 .transition(Self.monthTransition)
             }
 
-            MonthStartDayGrid(
-                selection: MonthStartDay(model.day) ?? .first
-            ) { day in
+            MonthStartDayGrid(selection: MonthStartDay(model.day) ?? .first) { day in
                 model.day = day.day
             }
         }
@@ -214,13 +230,11 @@ private extension RecurringEditSheet {
             HStack(spacing: 8) {
                 SettingsChoice("終わりなし", isSelected: model.endDate == nil) {
                     model.endDate = nil
-
                     closePanel()
                 }
 
                 SettingsChoice("今日で終える", isSelected: isEndingToday) {
                     model.endDate = model.today
-
                     closePanel()
                 }
             }
@@ -266,13 +280,10 @@ private extension RecurringEditSheet {
                 isSelected: model.closingDay == nil
             ) {
                 model.closingDay = nil
-
                 closePanel()
             }
 
-            MonthStartDayGrid(
-                selection: model.closingDay.flatMap(MonthStartDay.init)
-            ) { day in
+            MonthStartDayGrid(selection: model.closingDay.flatMap(MonthStartDay.init)) { day in
                 model.closingDay = day.day
 
                 closePanel()
@@ -292,7 +303,6 @@ private extension RecurringEditSheet {
                     isSelected: model.remindDaysBefore == days
                 ) {
                     model.remindDaysBefore = days
-
                     closePanel()
                 }
             }
@@ -341,7 +351,6 @@ private extension RecurringEditSheet {
                     isSelected: model.walletId == wallet.id
                 ) {
                     model.walletId = wallet.id
-
                     closePanel()
                 }
             }
@@ -358,7 +367,6 @@ private extension RecurringEditSheet {
                     isSelected: model.toWalletId == wallet.id
                 ) {
                     model.toWalletId = wallet.id
-
                     closePanel()
                 }
             }
@@ -432,6 +440,10 @@ private extension RecurringEditSheet {
 
     var headerTitle: String {
         model.isEditing ? "固定費を編集" : "固定費を追加"
+    }
+
+    var nameBadgeOpacity: Double {
+        isNameFocused ? 0 : 1
     }
 
     var amountColor: Color {

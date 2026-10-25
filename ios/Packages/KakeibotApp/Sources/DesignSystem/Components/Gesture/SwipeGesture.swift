@@ -50,9 +50,7 @@ extension SwipeGesture {
         context: Context
     ) -> UIPanGestureRecognizer {
         let recognizer = UIPanGestureRecognizer()
-
         recognizer.delegate = context.coordinator
-
         return recognizer
     }
 

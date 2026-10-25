@@ -80,7 +80,6 @@ public extension RewardRuleEditModel {
                 let saved = list.icons[rule.iconId]
             else {
                 errorNotice.show(Self.loadFailedMessage)
-
                 return
             }
 
@@ -107,7 +106,6 @@ public extension RewardRuleEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -129,7 +127,6 @@ public extension RewardRuleEditModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
-
             return false
         }
     }
@@ -143,7 +140,6 @@ public extension RewardRuleEditModel {
             return try await database.deleteRewardRule(editingId)
         } catch {
             errorNotice.show(Self.deleteFailedMessage)
-
             return nil
         }
     }

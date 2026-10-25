@@ -19,7 +19,10 @@ public struct OnboardingView: View {
         onFinish: @escaping () -> Void
     ) {
         _model = State(
-            initialValue: OnboardingModel(database: database, today: today)
+            initialValue: OnboardingModel(
+                database: database,
+                today: today
+            )
         )
 
         self.database = database
@@ -140,7 +143,9 @@ private extension OnboardingView {
     }
 
     var welcomePage: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 12) {
+            Spacer()
+
             VStack(spacing: 12) {
                 Text("ようこそ")
                     .displayFont(.title)
@@ -151,29 +156,28 @@ private extension OnboardingView {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.accentStrong)
             }
-            .padding(.top, 36)
 
-            VStack(spacing: 12) {
-                PrimaryButton("すぐ始める") {
-                    Task {
-                        model.choose(.quick)
-                        await finish()
-                    }
+            Spacer()
+
+            routeButton(
+                .minimal,
+                title: "予算だけ決めて始める",
+                detail: "月の始まりと予算",
+                duration: "1 分"
+            )
+
+            routeButton(
+                .full,
+                title: "しっかり決めて始める",
+                detail: "口座・固定費・通知・見た目なども",
+                duration: "5 分"
+            )
+
+            PrimaryButton("すぐ始める") {
+                Task {
+                    model.choose(.quick)
+                    await finish()
                 }
-
-                routeButton(
-                    .minimal,
-                    title: "予算だけ決めて始める",
-                    detail: "月の始まりと予算",
-                    duration: "1 分"
-                )
-
-                routeButton(
-                    .full,
-                    title: "しっかり決めて始める",
-                    detail: "口座・固定費・通知・見た目なども",
-                    duration: "5 分"
-                )
             }
 
             Text("どれも、あとで設定から変えられます")
@@ -181,6 +185,7 @@ private extension OnboardingView {
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
         }
+        .frame(maxHeight: .infinity)
     }
 
     var monthStartPage: some View {
@@ -245,10 +250,7 @@ private extension OnboardingView {
                         .displayFont(.largeTitle, weight: .bold)
                         .monospacedDigit()
                         .foregroundStyle(budgetColor)
-
-                    Text("押して入れられます")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
+                        .editBadge()
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 24)
@@ -273,6 +275,7 @@ private extension OnboardingView {
                 )
 
                 setupSection("記録の準備", items: SetupItem.onboarding)
+
                 setupSection("自分好みに", items: SetupItem.customize)
             }
             .padding(.vertical, 8)
@@ -380,7 +383,6 @@ private extension OnboardingView {
     func next() async {
         guard model.isLastPage else {
             turnPage(.forward)
-
             return
         }
 

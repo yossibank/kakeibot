@@ -400,9 +400,7 @@ struct RecurringWriteTests {
             at: setup.now
         )
 
-        let recurring = try #require(
-            try setup.database.snapshot().recurrings.first
-        )
+        let recurring = try #require(try setup.database.snapshot().recurrings.first)
 
         try await setup.database.setRecurringHidden(
             recurring.id,
@@ -416,9 +414,7 @@ struct RecurringWriteTests {
         )
         let shownWhileHidden = try await setup.database.recurrings()
 
-        let allWhileHidden = try await setup.database.recurrings(
-            includingHidden: true
-        )
+        let allWhileHidden = try await setup.database.recurrings(includingHidden: true)
 
         try await setup.database.setRecurringHidden(
             recurring.id,

@@ -19,6 +19,7 @@ struct AssetsRewardSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     balanceCard
+
                     goalSection
 
                     if !model.boughtGoals.isEmpty {
@@ -102,6 +103,7 @@ private extension AssetsRewardSheet {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 SectionTitle("目標")
+
                 Spacer()
 
                 Button {
@@ -142,7 +144,7 @@ private extension AssetsRewardSheet {
             SectionTitle("達成の履歴")
 
             if model.rewardHistory.isEmpty {
-                Text("記録の日の見出しの贈り物のボタンから、達成を付けられます")
+                Text("資産の「今日の達成を付ける」か、記録の日の見出しの贈り物のボタンから付けられます")
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .padding(.leading, 8)

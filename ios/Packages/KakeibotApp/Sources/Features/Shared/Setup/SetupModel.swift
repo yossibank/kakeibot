@@ -96,7 +96,6 @@ public extension SetupModel {
 
     func setStartsWithAmount(_ starts: Bool) async {
         startsWithAmount = starts
-
         await save(.entryStartsWithAmount, to: starts)
     }
 
@@ -122,13 +121,11 @@ public extension SetupModel {
 
     func closeCard() async {
         isCardClosed = true
-
         await save(.setupCardClosed, to: true)
     }
 
     func closeCustomizeCard() async {
         isCustomizeCardClosed = true
-
         await save(.customizeCardClosed, to: true)
     }
 }

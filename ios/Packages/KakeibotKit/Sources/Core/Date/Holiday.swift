@@ -101,7 +101,6 @@ private extension Holiday {
     ) -> Int {
         let years = year - 1980
         let day = base + 0.242194 * Double(years)
-
         return Int(day.rounded(.down)) - years / 4
     }
 }

@@ -3,7 +3,6 @@ import Core
 public extension EntryList {
     func icon(for template: EntryTemplate) -> Icon? {
         let category = categories[template.categoryId]
-
         return category.flatMap { icons[$0.iconId] }
     }
 

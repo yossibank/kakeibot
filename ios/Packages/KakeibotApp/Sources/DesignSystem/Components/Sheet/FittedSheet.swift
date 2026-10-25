@@ -59,6 +59,7 @@ final class FittedDetentController: UIViewController {
 
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
+
         apply(animated: false)
     }
 
