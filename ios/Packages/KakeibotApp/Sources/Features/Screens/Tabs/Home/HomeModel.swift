@@ -17,6 +17,8 @@ public final class HomeModel: ScreenModel {
     public internal(set) var errorNotice = ErrorNotice()
 
     private var allTemplates: [EntryTemplate] = []
+    private var homeSections = HomeSection.allCases
+    private var homeHiddenSections: Set<HomeSection> = []
     private var budgets: [Budget] = []
     private var recurrings: [Recurring] = []
 
@@ -138,8 +140,13 @@ public extension HomeModel {
         return rows
     }
 
+    var homeLayout: HomeLayout {
+        HomeLayout(order: homeSections, hidden: homeHiddenSections)
+    }
+
     func run() async {
         await loadTemplateOrder()
+        await loadHomeLayout()
 
         await withDiscardingTaskGroup { group in
             group.addTask {
@@ -160,6 +167,14 @@ public extension HomeModel {
 
             group.addTask {
                 await self.observeMonthStartDay()
+            }
+
+            group.addTask {
+                await self.observeHomeSections()
+            }
+
+            group.addTask {
+                await self.observeHomeHiddenSections()
             }
         }
     }
@@ -309,6 +324,33 @@ private extension HomeModel {
             failure: Self.loadFailedMessage
         ) { budgets in
             self.budgets = budgets
+        }
+    }
+
+    func loadHomeLayout() async {
+        do {
+            homeSections = try await database.setting(.homeSections)
+            homeHiddenSections = try await database.setting(.homeHiddenSections)
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
+    }
+
+    func observeHomeSections() async {
+        await observe(
+            database.settingUpdates(.homeSections),
+            failure: Self.loadFailedMessage
+        ) { sections in
+            homeSections = sections
+        }
+    }
+
+    func observeHomeHiddenSections() async {
+        await observe(
+            database.settingUpdates(.homeHiddenSections),
+            failure: Self.loadFailedMessage
+        ) { sections in
+            homeHiddenSections = sections
         }
     }
 

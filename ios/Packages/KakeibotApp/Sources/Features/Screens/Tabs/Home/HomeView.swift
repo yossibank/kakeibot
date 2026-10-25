@@ -62,32 +62,16 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
 
-                dialCard
-
-                if showsSetupCard {
-                    HomeSetupCard(model: setup, onOpen: onOpenSetup)
-                        .transition(Self.cardTransition)
+                ForEach(model.homeLayout.visible) { section in
+                    sectionView(section)
                 }
-
-                if showsCustomizeCard {
-                    HomeCustomizeCard(
-                        model: setup,
-                        appIcon: appIcon,
-                        isSheetOpen: isSheetOpen,
-                        onOpen: onOpenSetup
-                    )
-                    .transition(Self.cardTransition)
-                }
-
-                templateCard
-
-                recentCard
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
             .animation(.snappy, value: showsSetupCard)
             .animation(.snappy, value: showsCustomizeCard)
+            .animation(.snappy, value: model.homeLayout)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -457,6 +441,33 @@ private extension HomeView {
                 .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder
+    func sectionView(_ section: HomeSection) -> some View {
+        switch section {
+        case .budget:
+            dialCard
+        case .setup:
+            if showsSetupCard {
+                HomeSetupCard(model: setup, onOpen: onOpenSetup)
+                    .transition(Self.cardTransition)
+            }
+
+            if showsCustomizeCard {
+                HomeCustomizeCard(
+                    model: setup,
+                    appIcon: appIcon,
+                    isSheetOpen: isSheetOpen,
+                    onOpen: onOpenSetup
+                )
+                .transition(Self.cardTransition)
+            }
+        case .templates:
+            templateCard
+        case .recent:
+            recentCard
+        }
     }
 }
 

@@ -30,6 +30,8 @@ public extension Setting {
         case launchScreen = "launch_screen"
         case entryStartsWithAmount = "entry_starts_with_amount"
         case templateOrder = "template_order"
+        case homeSections = "home_sections"
+        case homeHiddenSections = "home_hidden_sections"
         case categoryMenuOpened = "category_menu_opened"
         case categoriesByUse = "categories_by_use"
         case recordsLayout = "records_layout"

@@ -80,6 +80,44 @@ public extension SettingKey where Value == TemplateOrder {
     }
 }
 
+public extension SettingKey where Value == [HomeSection] {
+    static var homeSections: Self {
+        Self(
+            .homeSections,
+            default: HomeSection.allCases,
+            decode: { text in
+                text.split(separator: ",").compactMap { name in
+                    HomeSection(rawValue: String(name))
+                }
+            },
+            encode: { sections in
+                sections.map(\.rawValue).joined(separator: ",")
+            }
+        )
+    }
+}
+
+public extension SettingKey where Value == Set<HomeSection> {
+    static var homeHiddenSections: Self {
+        Self(
+            .homeHiddenSections,
+            default: [],
+            decode: { text in
+                let sections = text.split(separator: ",").compactMap { name in
+                    HomeSection(rawValue: String(name))
+                }
+
+                return Set(sections)
+            },
+            encode: { sections in
+                let names = sections.map(\.rawValue).sorted()
+
+                return names.isEmpty ? nil : names.joined(separator: ",")
+            }
+        )
+    }
+}
+
 public extension SettingKey where Value == RecordsLayout {
     static var recordsLayout: Self {
         Self(.recordsLayout, default: .calendar)

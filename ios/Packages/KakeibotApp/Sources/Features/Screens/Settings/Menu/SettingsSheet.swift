@@ -228,6 +228,17 @@ public struct SettingsSheet: View {
 
                                 Hairline()
 
+                                NavigationLink {
+                                    HomeSectionsView(model: HomeSectionsModel(database: database))
+                                } label: {
+                                    row(
+                                        "ホームに出すもの",
+                                        systemImage: "square.stack"
+                                    )
+                                }
+
+                                Hairline()
+
                                 pickerRow(
                                     "金額から入力",
                                     systemImage: "yensign"
