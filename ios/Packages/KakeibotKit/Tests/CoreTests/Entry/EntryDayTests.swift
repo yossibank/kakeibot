@@ -65,7 +65,7 @@ extension EntryDayTests.DaySummary {
 private extension EntryDayTests {
     static var dayCases: [DayCase] {
         get throws {
-            try Fixture.load("entry/entry-day.json")
+            try Fixture.cases("entry/entry-day.json")
         }
     }
 }

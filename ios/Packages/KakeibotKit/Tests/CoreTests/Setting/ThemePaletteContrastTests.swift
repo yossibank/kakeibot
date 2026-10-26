@@ -49,13 +49,13 @@ extension ThemePaletteContrastTests {
 private extension ThemePaletteContrastTests {
     static var contrastCases: [ContrastCase] {
         get throws {
-            try Fixture.load("setting/theme-palette-contrast.json")
+            try Fixture.cases("setting/theme-palette-contrast.json")
         }
     }
 
     static var readableCases: [ReadableCase] {
         get throws {
-            try Fixture.load("setting/theme-palette-readable.json")
+            try Fixture.cases("setting/theme-palette-readable.json")
         }
     }
 

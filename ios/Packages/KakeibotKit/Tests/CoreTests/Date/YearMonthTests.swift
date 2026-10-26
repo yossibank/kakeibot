@@ -66,13 +66,13 @@ extension YearMonthTests {
 private extension YearMonthTests {
     static var periodCases: [PeriodCase] {
         get throws {
-            try Fixture.load("date/year-month-period.json")
+            try Fixture.cases("date/year-month-period.json")
         }
     }
 
     static var weeksCases: [WeeksCase] {
         get throws {
-            try Fixture.load("date/year-month-weeks.json")
+            try Fixture.cases("date/year-month-weeks.json")
         }
     }
 

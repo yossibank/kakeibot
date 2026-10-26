@@ -101,7 +101,7 @@ extension CategoryDraftTests.DraftCase {
 private extension CategoryDraftTests {
     static var draftCases: [DraftCase] {
         get throws {
-            try Fixture.load("category/category-draft.json")
+            try Fixture.cases("category/category-draft.json")
         }
     }
 }

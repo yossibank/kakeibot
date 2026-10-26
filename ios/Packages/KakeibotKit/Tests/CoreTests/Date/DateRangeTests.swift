@@ -34,7 +34,7 @@ extension DateRangeTests {
 private extension DateRangeTests {
     static var weeksCases: [WeeksCase] {
         get throws {
-            try Fixture.load("date/date-range-weeks.json")
+            try Fixture.cases("date/date-range-weeks.json")
         }
     }
 }

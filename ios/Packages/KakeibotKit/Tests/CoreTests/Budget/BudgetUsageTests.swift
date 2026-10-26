@@ -34,7 +34,7 @@ extension BudgetUsageTests {
 private extension BudgetUsageTests {
     static var usageCases: [UsageCase] {
         get throws {
-            try Fixture.load("budget/budget-usage.json")
+            try Fixture.cases("budget/budget-usage.json")
         }
     }
 }

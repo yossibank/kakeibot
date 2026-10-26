@@ -1,75 +1,86 @@
-[
-  {
-    "budgets": [],
-    "category": null,
-    "month": "2026-10",
-    "amount": null
-  },
-  {
-    "budgets": [
-      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-      { "category": null, "fromMonth": "2026-04", "amount": 120000 },
-      { "category": null, "fromMonth": "2026-07", "amount": null }
-    ],
-    "category": null,
-    "month": "2025-12",
-    "amount": null
-  },
-  {
-    "budgets": [
-      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-      { "category": null, "fromMonth": "2026-04", "amount": 120000 },
-      { "category": null, "fromMonth": "2026-07", "amount": null }
-    ],
-    "category": null,
-    "month": "2026-03",
-    "amount": 100000
-  },
-  {
-    "budgets": [
-      { "category": null, "fromMonth": "2026-04", "amount": 120000 },
-      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-      { "category": null, "fromMonth": "2026-07", "amount": null }
-    ],
-    "category": null,
-    "month": "2026-04",
-    "amount": 120000
-  },
-  {
-    "budgets": [
-      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-      { "category": null, "fromMonth": "2026-04", "amount": 120000 },
-      { "category": null, "fromMonth": "2026-07", "amount": null }
-    ],
-    "category": null,
-    "month": "2026-08",
-    "amount": null
-  },
-  {
-    "budgets": [
-      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-      { "category": "food", "fromMonth": "2026-02", "amount": 30000 }
-    ],
-    "category": "food",
-    "month": "2026-01",
-    "amount": null
-  },
-  {
-    "budgets": [
-      { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-      { "category": "food", "fromMonth": "2026-02", "amount": 30000 },
-      { "category": "daily", "fromMonth": "2026-02", "amount": 8000 }
-    ],
-    "category": "food",
-    "month": "2026-05",
-    "amount": 30000
-  },
-  {
-    "budgets": [
-      { "category": "food", "fromMonth": "2026-02", "amount": 30000 }
-    ],
-    "category": null,
-    "month": "2026-05",
-    "amount": null
-  }
-]
+{
+  "description": "ある月に使う予算を出す。fromMonth がその月以前でいちばん新しい行の額を使う。category が空なら月全体の予算を、名前ならそのカテゴリの予算を表す。月全体とカテゴリの予算は混ぜない。",
+  "cases": [
+    {
+      "summary": "予算が 1 行も無い",
+      "budgets": [],
+      "category": null,
+      "month": "2026-10",
+      "amount": null
+    },
+    {
+      "summary": "最初の予算より前の月",
+      "budgets": [
+        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+        { "category": null, "fromMonth": "2026-04", "amount": 120000 },
+        { "category": null, "fromMonth": "2026-07", "amount": null }
+      ],
+      "category": null,
+      "month": "2025-12",
+      "amount": null
+    },
+    {
+      "summary": "次の予算が始まる前は前の額",
+      "budgets": [
+        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+        { "category": null, "fromMonth": "2026-04", "amount": 120000 },
+        { "category": null, "fromMonth": "2026-07", "amount": null }
+      ],
+      "category": null,
+      "month": "2026-03",
+      "amount": 100000
+    },
+    {
+      "summary": "並びが順不同でも新しい行を使う",
+      "budgets": [
+        { "category": null, "fromMonth": "2026-04", "amount": 120000 },
+        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+        { "category": null, "fromMonth": "2026-07", "amount": null }
+      ],
+      "category": null,
+      "month": "2026-04",
+      "amount": 120000
+    },
+    {
+      "summary": "額が空の行が新しければ予算なし",
+      "budgets": [
+        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+        { "category": null, "fromMonth": "2026-04", "amount": 120000 },
+        { "category": null, "fromMonth": "2026-07", "amount": null }
+      ],
+      "category": null,
+      "month": "2026-08",
+      "amount": null
+    },
+    {
+      "summary": "カテゴリの予算が始まる前の月",
+      "budgets": [
+        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+        { "category": "food", "fromMonth": "2026-02", "amount": 30000 }
+      ],
+      "category": "food",
+      "month": "2026-01",
+      "amount": null
+    },
+    {
+      "summary": "ほかのカテゴリの予算と混ぜない",
+      "budgets": [
+        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
+        { "category": "food", "fromMonth": "2026-02", "amount": 30000 },
+        { "category": "daily", "fromMonth": "2026-02", "amount": 8000 }
+      ],
+      "category": "food",
+      "month": "2026-05",
+      "amount": 30000
+    },
+    {
+      "summary": "月全体の予算にカテゴリを混ぜない",
+      "budgets": [
+        { "category": "food", "fromMonth": "2026-02", "amount": 30000 }
+      ],
+      "category": null,
+      "month": "2026-05",
+      "amount": null
+    }
+  ]
+}

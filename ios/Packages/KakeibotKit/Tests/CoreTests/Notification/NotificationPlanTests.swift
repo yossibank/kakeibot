@@ -135,7 +135,7 @@ extension NotificationPlanTests {
 private extension NotificationPlanTests {
     static var planCases: [PlanCase] {
         get throws {
-            try Fixture.load("notification/notification-plan.json")
+            try Fixture.cases("notification/notification-plan.json")
         }
     }
 

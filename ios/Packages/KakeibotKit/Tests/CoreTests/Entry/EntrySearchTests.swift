@@ -48,13 +48,13 @@ extension EntrySearchTests {
 private extension EntrySearchTests {
     static var cases: [SearchCase] {
         get throws {
-            try Fixture.load("entry/entry-search.json")
+            try Fixture.cases("entry/entry-search.json")
         }
     }
 
     static var recentCases: [RecentCase] {
         get throws {
-            try Fixture.load("entry/entry-search-recent.json")
+            try Fixture.cases("entry/entry-search-recent.json")
         }
     }
 }

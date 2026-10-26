@@ -1,86 +1,93 @@
-[
-  {
-    "background": "#16223D",
-    "surface": "#141C2F",
-    "text": "#EDE6D6",
-    "subtext": "#8C97AE",
-    "accent": "#CDAA6B",
-    "palette": {
-      "backgroundTop": "#16223D",
-      "backgroundBottom": "#090E18",
-      "panel": "#0E1628",
-      "cardTop": "#141C2F",
-      "cardBottom": "#090D15",
-      "line": "#2E3443",
-      "accent": "#CDAA6B",
-      "accentDeep": "#856F46",
-      "accentStrong": "#EBDDC4",
+{
+  "description": "手で選ぶ 5 色から作る、描く色の組を出す。色は #RRGGBB で書く。描く色の組は、地が明るいかで混ぜ方を変える。混ぜた値は、色の成分ごとに四捨五入する。backgroundBottom は、暗い地では地に黒を 6 割、明るい地では地に黒を 4 分混ぜる。panel は、暗い地では地に黒を 3 割 5 分、明るい地では地に黒を 2 分混ぜる。cardBottom は、暗い地ではカードに黒を 5 割 5 分、明るい地ではカードに地を 5 割混ぜる。line は、どちらもカードに文字を 1 割 2 分混ぜる。accentDeep は、暗い地では強調に黒を 3 割 5 分、明るい地では強調に白を 3 割 5 分混ぜる。accentStrong は、暗い地では強調に白を 6 割、明るい地では強調に黒を 4 割 5 分混ぜる。hint は、どちらも控えめな文字に地を 1 割 2 分混ぜる。palette は、役割ごとの色を持つ。",
+  "cases": [
+    {
+      "summary": "暗い青の地から作る",
+      "background": "#16223D",
+      "surface": "#141C2F",
       "text": "#EDE6D6",
       "subtext": "#8C97AE",
-      "hint": "#7E89A0"
-    }
-  },
-  {
-    "background": "#12302C",
-    "surface": "#173A35",
-    "text": "#EAF4F1",
-    "subtext": "#8FB3A9",
-    "accent": "#7FD1B9",
-    "palette": {
-      "backgroundTop": "#12302C",
-      "backgroundBottom": "#071312",
-      "panel": "#0C1F1D",
-      "cardTop": "#173A35",
-      "cardBottom": "#0A1A18",
-      "line": "#30504C",
-      "accent": "#7FD1B9",
-      "accentDeep": "#538878",
-      "accentStrong": "#CCEDE3",
+      "accent": "#CDAA6B",
+      "palette": {
+        "backgroundTop": "#16223D",
+        "backgroundBottom": "#090E18",
+        "panel": "#0E1628",
+        "cardTop": "#141C2F",
+        "cardBottom": "#090D15",
+        "line": "#2E3443",
+        "accent": "#CDAA6B",
+        "accentDeep": "#856F46",
+        "accentStrong": "#EBDDC4",
+        "text": "#EDE6D6",
+        "subtext": "#8C97AE",
+        "hint": "#7E89A0"
+      }
+    },
+    {
+      "summary": "暗い緑の地から作る",
+      "background": "#12302C",
+      "surface": "#173A35",
       "text": "#EAF4F1",
       "subtext": "#8FB3A9",
-      "hint": "#80A39A"
-    }
-  },
-  {
-    "background": "#F8F4EB",
-    "surface": "#FFFFFF",
-    "text": "#2A2418",
-    "subtext": "#6B6152",
-    "accent": "#8A6420",
-    "palette": {
-      "backgroundTop": "#F8F4EB",
-      "backgroundBottom": "#EEEAE2",
-      "panel": "#F3EFE6",
-      "cardTop": "#FFFFFF",
-      "cardBottom": "#FCFAF5",
-      "line": "#E5E5E3",
-      "accent": "#8A6420",
-      "accentDeep": "#B39A6E",
-      "accentStrong": "#4C3712",
+      "accent": "#7FD1B9",
+      "palette": {
+        "backgroundTop": "#12302C",
+        "backgroundBottom": "#071312",
+        "panel": "#0C1F1D",
+        "cardTop": "#173A35",
+        "cardBottom": "#0A1A18",
+        "line": "#30504C",
+        "accent": "#7FD1B9",
+        "accentDeep": "#538878",
+        "accentStrong": "#CCEDE3",
+        "text": "#EAF4F1",
+        "subtext": "#8FB3A9",
+        "hint": "#80A39A"
+      }
+    },
+    {
+      "summary": "明るい黄の地から作る",
+      "background": "#F8F4EB",
+      "surface": "#FFFFFF",
       "text": "#2A2418",
       "subtext": "#6B6152",
-      "hint": "#7C7364"
-    }
-  },
-  {
-    "background": "#EEF4FA",
-    "surface": "#FFFFFF",
-    "text": "#17233A",
-    "subtext": "#54627A",
-    "accent": "#2F5A8C",
-    "palette": {
-      "backgroundTop": "#EEF4FA",
-      "backgroundBottom": "#E4EAF0",
-      "panel": "#E9EFF5",
-      "cardTop": "#FFFFFF",
-      "cardBottom": "#F7FAFD",
-      "line": "#E3E5E7",
-      "accent": "#2F5A8C",
-      "accentDeep": "#7894B4",
-      "accentStrong": "#1A324D",
+      "accent": "#8A6420",
+      "palette": {
+        "backgroundTop": "#F8F4EB",
+        "backgroundBottom": "#EEEAE2",
+        "panel": "#F3EFE6",
+        "cardTop": "#FFFFFF",
+        "cardBottom": "#FCFAF5",
+        "line": "#E5E5E3",
+        "accent": "#8A6420",
+        "accentDeep": "#B39A6E",
+        "accentStrong": "#4C3712",
+        "text": "#2A2418",
+        "subtext": "#6B6152",
+        "hint": "#7C7364"
+      }
+    },
+    {
+      "summary": "明るい青の地から作る",
+      "background": "#EEF4FA",
+      "surface": "#FFFFFF",
       "text": "#17233A",
       "subtext": "#54627A",
-      "hint": "#667489"
+      "accent": "#2F5A8C",
+      "palette": {
+        "backgroundTop": "#EEF4FA",
+        "backgroundBottom": "#E4EAF0",
+        "panel": "#E9EFF5",
+        "cardTop": "#FFFFFF",
+        "cardBottom": "#F7FAFD",
+        "line": "#E3E5E7",
+        "accent": "#2F5A8C",
+        "accentDeep": "#7894B4",
+        "accentStrong": "#1A324D",
+        "text": "#17233A",
+        "subtext": "#54627A",
+        "hint": "#667489"
+      }
     }
-  }
-]
+  ]
+}

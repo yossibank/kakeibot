@@ -126,7 +126,7 @@ extension EntryDraftTests.Destination {
 private extension EntryDraftTests {
     static var draftCases: [DraftCase] {
         get throws {
-            try Fixture.load("entry/entry-draft.json")
+            try Fixture.cases("entry/entry-draft.json")
         }
     }
 

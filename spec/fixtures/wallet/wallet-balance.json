@@ -1,84 +1,95 @@
-[
-  {
-    "initialBalance": 10000,
-    "entries": [],
-    "through": null,
-    "balance": 10000
-  },
-  {
-    "initialBalance": 10000,
-    "entries": [
-      { "type": "expense", "amount": 980, "date": "2026-10-01", "wallet": "self", "toWallet": null },
-      { "type": "income", "amount": 3000, "date": "2026-10-02", "wallet": "self", "toWallet": null },
-      { "type": "expense", "amount": 500, "date": "2026-10-02", "wallet": "other", "toWallet": null }
-    ],
-    "through": null,
-    "balance": 12020
-  },
-  {
-    "initialBalance": 0,
-    "entries": [
-      { "type": "transfer", "amount": 5000, "date": "2026-10-03", "wallet": "self", "toWallet": "other" },
-      { "type": "transfer", "amount": 2000, "date": "2026-10-04", "wallet": "other", "toWallet": "self" }
-    ],
-    "through": null,
-    "balance": -3000
-  },
-  {
-    "initialBalance": -24800,
-    "entries": [
-      { "type": "expense", "amount": 1200, "date": "2026-10-05", "wallet": "self", "toWallet": null },
-      { "type": "transfer", "amount": 24800, "date": "2026-10-27", "wallet": "other", "toWallet": "self" }
-    ],
-    "through": null,
-    "balance": -1200
-  },
-  {
-    "initialBalance": 1000,
-    "entries": [
-      { "type": "expense", "amount": 100, "date": "2026-09-30", "wallet": "self", "toWallet": null },
-      { "type": "expense", "amount": 200, "date": "2026-10-01", "wallet": "self", "toWallet": null },
-      { "type": "expense", "amount": 400, "date": "2026-10-02", "wallet": "self", "toWallet": null }
-    ],
-    "through": "2026-10-01",
-    "balance": 700
-  },
-  {
-    "initialBalance": 100000,
-    "entries": [
-      { "type": "transfer", "amount": 50000, "date": "2026-10-01", "wallet": "other", "toWallet": "self" },
-      { "type": "transfer", "amount": 20000, "date": "2026-10-05", "wallet": "other", "toWallet": "self" },
-      { "type": "transfer", "amount": 10000, "date": "2026-10-10", "wallet": "other", "toWallet": "self" }
-    ],
-    "valuations": [
-      { "date": "2026-10-05", "amount": 180000 }
-    ],
-    "through": null,
-    "balance": 190000
-  },
-  {
-    "initialBalance": 100000,
-    "entries": [
-      { "type": "transfer", "amount": 50000, "date": "2026-10-01", "wallet": "other", "toWallet": "self" },
-      { "type": "transfer", "amount": 10000, "date": "2026-10-10", "wallet": "other", "toWallet": "self" }
-    ],
-    "valuations": [
-      { "date": "2026-09-20", "amount": 90000 },
-      { "date": "2026-10-05", "amount": 180000 }
-    ],
-    "through": "2026-10-04",
-    "balance": 140000
-  },
-  {
-    "initialBalance": 100000,
-    "entries": [
-      { "type": "income", "amount": 3000, "date": "2026-10-05", "wallet": "self", "toWallet": null, "createdAt": "2026-10-05T09:00:00Z" },
-      { "type": "income", "amount": 2000, "date": "2026-10-05", "wallet": "self", "toWallet": null, "createdAt": "2026-10-05T15:00:00Z" }
-    ],
-    "valuations": [
-      { "date": "2026-10-05", "amount": 180000, "createdAt": "2026-10-05T12:00:00Z" }
-    ],
-    "through": null,
-    "balance": 182000
-  }
-]
+{
+  "description": "1 つの財布の、ある日までの残高を出す。wallet と toWallet は、self（残高を出す財布）か other（ほかの財布）で書く。残高は、最初の残高に、収入と振替で入った額を足し、支出と振替で出した額を引く。through までに評価額があれば、いちばん新しい評価額から、その日より後の記録だけを足し引きする。評価額と同じ日の記録は、評価額より後に作ったものだけを足し引きする。記録と評価額に createdAt が無ければ、記録を先に作ったものとする。最初の残高は、マイナスでもよい。valuations は、無ければ空にする。through が空なら、すべての記録を足し引きする。",
+  "cases": [
+    {
+      "summary": "記録が無い",
+      "initialBalance": 10000,
+      "entries": [],
+      "through": null,
+      "balance": 10000
+    },
+    {
+      "summary": "収入と支出を足し引きする",
+      "initialBalance": 10000,
+      "entries": [
+        { "type": "expense", "amount": 980, "date": "2026-10-01", "wallet": "self", "toWallet": null },
+        { "type": "income", "amount": 3000, "date": "2026-10-02", "wallet": "self", "toWallet": null },
+        { "type": "expense", "amount": 500, "date": "2026-10-02", "wallet": "other", "toWallet": null }
+      ],
+      "through": null,
+      "balance": 12020
+    },
+    {
+      "summary": "振替の出入りを足し引きする",
+      "initialBalance": 0,
+      "entries": [
+        { "type": "transfer", "amount": 5000, "date": "2026-10-03", "wallet": "self", "toWallet": "other" },
+        { "type": "transfer", "amount": 2000, "date": "2026-10-04", "wallet": "other", "toWallet": "self" }
+      ],
+      "through": null,
+      "balance": -3000
+    },
+    {
+      "summary": "最初の残高がマイナスで振替で戻る",
+      "initialBalance": -24800,
+      "entries": [
+        { "type": "expense", "amount": 1200, "date": "2026-10-05", "wallet": "self", "toWallet": null },
+        { "type": "transfer", "amount": 24800, "date": "2026-10-27", "wallet": "other", "toWallet": "self" }
+      ],
+      "through": null,
+      "balance": -1200
+    },
+    {
+      "summary": "through より後の記録は入れない",
+      "initialBalance": 1000,
+      "entries": [
+        { "type": "expense", "amount": 100, "date": "2026-09-30", "wallet": "self", "toWallet": null },
+        { "type": "expense", "amount": 200, "date": "2026-10-01", "wallet": "self", "toWallet": null },
+        { "type": "expense", "amount": 400, "date": "2026-10-02", "wallet": "self", "toWallet": null }
+      ],
+      "through": "2026-10-01",
+      "balance": 700
+    },
+    {
+      "summary": "評価額より後の記録だけ足す",
+      "initialBalance": 100000,
+      "entries": [
+        { "type": "transfer", "amount": 50000, "date": "2026-10-01", "wallet": "other", "toWallet": "self" },
+        { "type": "transfer", "amount": 20000, "date": "2026-10-05", "wallet": "other", "toWallet": "self" },
+        { "type": "transfer", "amount": 10000, "date": "2026-10-10", "wallet": "other", "toWallet": "self" }
+      ],
+      "valuations": [
+        { "date": "2026-10-05", "amount": 180000 }
+      ],
+      "through": null,
+      "balance": 190000
+    },
+    {
+      "summary": "through より後の評価額は使わない",
+      "initialBalance": 100000,
+      "entries": [
+        { "type": "transfer", "amount": 50000, "date": "2026-10-01", "wallet": "other", "toWallet": "self" },
+        { "type": "transfer", "amount": 10000, "date": "2026-10-10", "wallet": "other", "toWallet": "self" }
+      ],
+      "valuations": [
+        { "date": "2026-09-20", "amount": 90000 },
+        { "date": "2026-10-05", "amount": 180000 }
+      ],
+      "through": "2026-10-04",
+      "balance": 140000
+    },
+    {
+      "summary": "同じ日は後に作った記録だけ足す",
+      "initialBalance": 100000,
+      "entries": [
+        { "type": "income", "amount": 3000, "date": "2026-10-05", "wallet": "self", "toWallet": null, "createdAt": "2026-10-05T09:00:00Z" },
+        { "type": "income", "amount": 2000, "date": "2026-10-05", "wallet": "self", "toWallet": null, "createdAt": "2026-10-05T15:00:00Z" }
+      ],
+      "valuations": [
+        { "date": "2026-10-05", "amount": 180000, "createdAt": "2026-10-05T12:00:00Z" }
+      ],
+      "through": null,
+      "balance": 182000
+    }
+  ]
+}

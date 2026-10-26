@@ -1,16 +1,19 @@
-[
-  { "frequency": "monthly", "month": null, "day": 25, "startDate": "2026-01-10", "endDate": null, "from": "2026-01-01", "through": "2026-04-30", "dates": ["2026-01-25", "2026-02-25", "2026-03-25", "2026-04-25"] },
-  { "frequency": "monthly", "month": null, "day": 31, "startDate": "2026-01-01", "endDate": null, "from": "2026-01-01", "through": "2026-04-30", "dates": ["2026-01-31", "2026-02-28", "2026-03-31", "2026-04-30"] },
-  { "frequency": "monthly", "month": null, "day": 31, "startDate": "2028-01-01", "endDate": null, "from": "2028-02-01", "through": "2028-02-29", "dates": ["2028-02-29"] },
-  { "frequency": "monthly", "month": null, "day": 10, "startDate": "2026-03-15", "endDate": null, "from": "2026-03-01", "through": "2026-05-31", "dates": ["2026-04-10", "2026-05-10"] },
-  { "frequency": "monthly", "month": null, "day": 10, "startDate": "2026-01-01", "endDate": "2026-04-09", "from": "2026-01-01", "through": "2026-12-31", "dates": ["2026-01-10", "2026-02-10", "2026-03-10"] },
-  { "frequency": "monthly", "month": null, "day": 10, "startDate": "2026-01-01", "endDate": null, "from": "2026-02-10", "through": "2026-02-10", "dates": ["2026-02-10"] },
-  { "frequency": "yearly", "month": 2, "day": 29, "startDate": "2025-01-01", "endDate": null, "from": "2025-01-01", "through": "2028-12-31", "dates": ["2025-02-28", "2026-02-28", "2027-02-28", "2028-02-29"] },
-  { "frequency": "yearly", "month": 12, "day": 1, "startDate": "2026-12-02", "endDate": null, "from": "2026-01-01", "through": "2028-12-31", "dates": ["2027-12-01", "2028-12-01"] },
-  { "frequency": "monthly", "month": null, "day": 1, "startDate": "2026-06-01", "endDate": null, "from": "2026-01-01", "through": "2026-05-31", "dates": [] },
-  { "frequency": "monthly", "month": null, "day": 25, "holidayShift": "next", "startDate": "2026-01-01", "endDate": null, "from": "2026-01-01", "through": "2026-06-30", "dates": ["2026-01-26", "2026-02-25", "2026-03-25", "2026-04-27", "2026-05-25", "2026-06-25"] },
-  { "frequency": "monthly", "month": null, "day": 25, "holidayShift": "previous", "startDate": "2026-01-01", "endDate": null, "from": "2026-01-01", "through": "2026-06-30", "dates": ["2026-01-23", "2026-02-25", "2026-03-25", "2026-04-24", "2026-05-25", "2026-06-25"] },
-  { "frequency": "monthly", "month": null, "day": 3, "holidayShift": "next", "startDate": "2026-01-01", "endDate": null, "from": "2026-05-01", "through": "2026-05-31", "dates": ["2026-05-07"] },
-  { "frequency": "monthly", "month": null, "day": 31, "holidayShift": "next", "startDate": "2026-01-01", "endDate": null, "from": "2026-12-01", "through": "2027-01-31", "dates": ["2027-01-04"] },
-  { "frequency": "monthly", "month": null, "day": 1, "holidayShift": "previous", "startDate": "2026-01-01", "endDate": null, "from": "2026-10-01", "through": "2026-10-31", "dates": ["2026-10-01", "2026-10-30"] }
-]
+{
+  "description": "固定費の、範囲の中で記録を作る日を出す。月末を超える day は、その月の最終日にする。holidayShift が none でなければ、土日・祝日・12/31〜1/3 に当たった日を前か次の平日にずらす。startDate より前と endDate より後の日は、ずらした後の日で比べて入れない。frequency は monthly か yearly にする。month は yearly のときだけ書く。holidayShift は none・previous・next のどれかにし、無ければ none とする。",
+  "cases": [
+    { "summary": "毎月 25 日を並べる", "frequency": "monthly", "month": null, "day": 25, "startDate": "2026-01-10", "endDate": null, "from": "2026-01-01", "through": "2026-04-30", "dates": ["2026-01-25", "2026-02-25", "2026-03-25", "2026-04-25"] },
+    { "summary": "月末を超える 31 日は最終日にする", "frequency": "monthly", "month": null, "day": 31, "startDate": "2026-01-01", "endDate": null, "from": "2026-01-01", "through": "2026-04-30", "dates": ["2026-01-31", "2026-02-28", "2026-03-31", "2026-04-30"] },
+    { "summary": "うるう年の 2 月は 29 日にする", "frequency": "monthly", "month": null, "day": 31, "startDate": "2028-01-01", "endDate": null, "from": "2028-02-01", "through": "2028-02-29", "dates": ["2028-02-29"] },
+    { "summary": "開始日より前の日は入れない", "frequency": "monthly", "month": null, "day": 10, "startDate": "2026-03-15", "endDate": null, "from": "2026-03-01", "through": "2026-05-31", "dates": ["2026-04-10", "2026-05-10"] },
+    { "summary": "終了日より後の日は入れない", "frequency": "monthly", "month": null, "day": 10, "startDate": "2026-01-01", "endDate": "2026-04-09", "from": "2026-01-01", "through": "2026-12-31", "dates": ["2026-01-10", "2026-02-10", "2026-03-10"] },
+    { "summary": "範囲が 1 日だけ", "frequency": "monthly", "month": null, "day": 10, "startDate": "2026-01-01", "endDate": null, "from": "2026-02-10", "through": "2026-02-10", "dates": ["2026-02-10"] },
+    { "summary": "毎年 2 月 29 日は平年に 28 日にする", "frequency": "yearly", "month": 2, "day": 29, "startDate": "2025-01-01", "endDate": null, "from": "2025-01-01", "through": "2028-12-31", "dates": ["2025-02-28", "2026-02-28", "2027-02-28", "2028-02-29"] },
+    { "summary": "開始日の後の最初の年から入れる", "frequency": "yearly", "month": 12, "day": 1, "startDate": "2026-12-02", "endDate": null, "from": "2026-01-01", "through": "2028-12-31", "dates": ["2027-12-01", "2028-12-01"] },
+    { "summary": "開始日が範囲の後で何も入れない", "frequency": "monthly", "month": null, "day": 1, "startDate": "2026-06-01", "endDate": null, "from": "2026-01-01", "through": "2026-05-31", "dates": [] },
+    { "summary": "休日に当たる日を次の平日にずらす", "frequency": "monthly", "month": null, "day": 25, "holidayShift": "next", "startDate": "2026-01-01", "endDate": null, "from": "2026-01-01", "through": "2026-06-30", "dates": ["2026-01-26", "2026-02-25", "2026-03-25", "2026-04-27", "2026-05-25", "2026-06-25"] },
+    { "summary": "休日に当たる日を前の平日にずらす", "frequency": "monthly", "month": null, "day": 25, "holidayShift": "previous", "startDate": "2026-01-01", "endDate": null, "from": "2026-01-01", "through": "2026-06-30", "dates": ["2026-01-23", "2026-02-25", "2026-03-25", "2026-04-24", "2026-05-25", "2026-06-25"] },
+    { "summary": "連休を越えて次の平日にずらす", "frequency": "monthly", "month": null, "day": 3, "holidayShift": "next", "startDate": "2026-01-01", "endDate": null, "from": "2026-05-01", "through": "2026-05-31", "dates": ["2026-05-07"] },
+    { "summary": "年末年始を越えて次の平日にずらす", "frequency": "monthly", "month": null, "day": 31, "holidayShift": "next", "startDate": "2026-01-01", "endDate": null, "from": "2026-12-01", "through": "2027-01-31", "dates": ["2027-01-04"] },
+    { "summary": "翌月の日が前にずれて範囲に入る", "frequency": "monthly", "month": null, "day": 1, "holidayShift": "previous", "startDate": "2026-01-01", "endDate": null, "from": "2026-10-01", "through": "2026-10-31", "dates": ["2026-10-01", "2026-10-30"] }
+  ]
+}

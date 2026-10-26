@@ -1,15 +1,18 @@
-[
-  { "query": "ランチ", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
-  { "query": "食費", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
-  { "query": "980", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
-  { "query": "¥1,200", "amount": 1200, "texts": ["食費"], "matches": true },
-  { "query": "１２００円", "amount": 1200, "texts": ["食費"], "matches": true },
-  { "query": "1200", "amount": 120, "texts": ["食費"], "matches": false },
-  { "query": "ランチ 財布", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
-  { "query": "ランチ　銀行", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": false },
-  { "query": "amazon", "amount": 3200, "texts": ["Amazon で本", "趣味", "カード"], "matches": true },
-  { "query": "ＡＭＡＺＯＮ", "amount": 3200, "texts": ["Amazon で本", "趣味", "カード"], "matches": true },
-  { "query": "本 3200", "amount": 3200, "texts": ["Amazon で本", "趣味", "カード"], "matches": true },
-  { "query": "給料", "amount": 280000, "texts": ["給与", "銀行"], "matches": false },
-  { "query": "", "amount": 980, "texts": ["ランチ"], "matches": true }
-]
+{
+  "description": "検索の言葉に記録が当てはまるかを出す。query は空白（全角も含む）で言葉に分け、すべての言葉が当てはまれば真にする。言葉は texts のどれかに含まれれば当てはまる。¥・\\・,・円を除いた数が amount と同じでも当てはまる。大文字と小文字、全角と半角は区別しない。言葉が無ければ真にする。texts は、メモ・カテゴリ・タグ・口座の名前を並べる。",
+  "cases": [
+    { "summary": "メモに含まれる言葉", "query": "ランチ", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
+    { "summary": "カテゴリに含まれる言葉", "query": "食費", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
+    { "summary": "金額と同じ数", "query": "980", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
+    { "summary": "¥ と , を付けた金額", "query": "¥1,200", "amount": 1200, "texts": ["食費"], "matches": true },
+    { "summary": "全角の数と円を付けた金額", "query": "１２００円", "amount": 1200, "texts": ["食費"], "matches": true },
+    { "summary": "金額と合わない数", "query": "1200", "amount": 120, "texts": ["食費"], "matches": false },
+    { "summary": "言葉が 2 つとも当てはまる", "query": "ランチ 財布", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": true },
+    { "summary": "全角の空白で分け外れた言葉がある", "query": "ランチ　銀行", "amount": 980, "texts": ["ランチ", "食費", "財布"], "matches": false },
+    { "summary": "大文字と小文字を区別しない", "query": "amazon", "amount": 3200, "texts": ["Amazon で本", "趣味", "カード"], "matches": true },
+    { "summary": "全角と半角を区別しない", "query": "ＡＭＡＺＯＮ", "amount": 3200, "texts": ["Amazon で本", "趣味", "カード"], "matches": true },
+    { "summary": "言葉と金額を組み合わせる", "query": "本 3200", "amount": 3200, "texts": ["Amazon で本", "趣味", "カード"], "matches": true },
+    { "summary": "どの言葉も当てはまらない", "query": "給料", "amount": 280000, "texts": ["給与", "銀行"], "matches": false },
+    { "summary": "言葉が無ければ当てはまる", "query": "", "amount": 980, "texts": ["ランチ"], "matches": true }
+  ]
+}

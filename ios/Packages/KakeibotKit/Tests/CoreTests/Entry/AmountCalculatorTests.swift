@@ -54,7 +54,7 @@ extension AmountCalculatorTests {
 private extension AmountCalculatorTests {
     static var cases: [KeysCase] {
         get throws {
-            try Fixture.load("entry/amount-calculator.json")
+            try Fixture.cases("entry/amount-calculator.json")
         }
     }
 

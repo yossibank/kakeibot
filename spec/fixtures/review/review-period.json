@@ -1,10 +1,13 @@
-[
-  { "scale": "week", "date": "2026-10-17", "monthStartDay": 1, "weekStart": "sunday", "start": "2026-10-11", "end": "2026-10-17", "previousStart": "2026-10-04", "previousEnd": "2026-10-10" },
-  { "scale": "week", "date": "2026-10-17", "monthStartDay": 1, "weekStart": "monday", "start": "2026-10-12", "end": "2026-10-18", "previousStart": "2026-10-05", "previousEnd": "2026-10-11" },
-  { "scale": "week", "date": "2026-01-01", "monthStartDay": 1, "weekStart": "monday", "start": "2025-12-29", "end": "2026-01-04", "previousStart": "2025-12-22", "previousEnd": "2025-12-28" },
-  { "scale": "month", "date": "2026-10-17", "monthStartDay": 1, "weekStart": "sunday", "start": "2026-10-01", "end": "2026-10-31", "previousStart": "2026-09-01", "previousEnd": "2026-09-30" },
-  { "scale": "month", "date": "2026-10-17", "monthStartDay": 25, "weekStart": "sunday", "start": "2026-09-25", "end": "2026-10-24", "previousStart": "2026-08-25", "previousEnd": "2026-09-24" },
-  { "scale": "month", "date": "2026-03-15", "monthStartDay": 31, "weekStart": "sunday", "start": "2026-02-28", "end": "2026-03-30", "previousStart": "2026-01-31", "previousEnd": "2026-02-27" },
-  { "scale": "year", "date": "2026-10-17", "monthStartDay": 1, "weekStart": "sunday", "start": "2026-01-01", "end": "2026-12-31", "previousStart": "2025-01-01", "previousEnd": "2025-12-31" },
-  { "scale": "year", "date": "2026-12-30", "monthStartDay": 25, "weekStart": "sunday", "start": "2026-12-25", "end": "2027-12-24", "previousStart": "2025-12-25", "previousEnd": "2026-12-24" }
-]
+{
+  "description": "日付を含む週・月・年の範囲と、1 つ前の範囲を出す。scale は week・month・year のどれかにする。",
+  "cases": [
+    { "summary": "日曜始まりの週", "scale": "week", "date": "2026-10-17", "monthStartDay": 1, "weekStart": "sunday", "start": "2026-10-11", "end": "2026-10-17", "previousStart": "2026-10-04", "previousEnd": "2026-10-10" },
+    { "summary": "月曜始まりの週", "scale": "week", "date": "2026-10-17", "monthStartDay": 1, "weekStart": "monday", "start": "2026-10-12", "end": "2026-10-18", "previousStart": "2026-10-05", "previousEnd": "2026-10-11" },
+    { "summary": "年をまたぐ週", "scale": "week", "date": "2026-01-01", "monthStartDay": 1, "weekStart": "monday", "start": "2025-12-29", "end": "2026-01-04", "previousStart": "2025-12-22", "previousEnd": "2025-12-28" },
+    { "summary": "1 日始まりの月", "scale": "month", "date": "2026-10-17", "monthStartDay": 1, "weekStart": "sunday", "start": "2026-10-01", "end": "2026-10-31", "previousStart": "2026-09-01", "previousEnd": "2026-09-30" },
+    { "summary": "25 日始まりの月", "scale": "month", "date": "2026-10-17", "monthStartDay": 25, "weekStart": "sunday", "start": "2026-09-25", "end": "2026-10-24", "previousStart": "2026-08-25", "previousEnd": "2026-09-24" },
+    { "summary": "31 日始まりの月は末日にずれる", "scale": "month", "date": "2026-03-15", "monthStartDay": 31, "weekStart": "sunday", "start": "2026-02-28", "end": "2026-03-30", "previousStart": "2026-01-31", "previousEnd": "2026-02-27" },
+    { "summary": "1 日始まりの年", "scale": "year", "date": "2026-10-17", "monthStartDay": 1, "weekStart": "sunday", "start": "2026-01-01", "end": "2026-12-31", "previousStart": "2025-01-01", "previousEnd": "2025-12-31" },
+    { "summary": "25 日始まりで年の始まりが 12 月 25 日", "scale": "year", "date": "2026-12-30", "monthStartDay": 25, "weekStart": "sunday", "start": "2026-12-25", "end": "2027-12-24", "previousStart": "2025-12-25", "previousEnd": "2026-12-24" }
+  ]
+}

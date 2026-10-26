@@ -41,7 +41,7 @@ extension BudgetAmountTests {
 private extension BudgetAmountTests {
     static var amountCases: [AmountCase] {
         get throws {
-            try Fixture.load("budget/budget-amount.json")
+            try Fixture.cases("budget/budget-amount.json")
         }
     }
 }

@@ -129,7 +129,7 @@ extension WalletBalanceTests.BalanceCase {
 private extension WalletBalanceTests {
     static var balanceCases: [BalanceCase] {
         get throws {
-            try Fixture.load("wallet/wallet-balance.json")
+            try Fixture.cases("wallet/wallet-balance.json")
         }
     }
 }

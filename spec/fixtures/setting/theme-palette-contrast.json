@@ -1,37 +1,47 @@
-[
-  {
-    "first": "#000000",
-    "second": "#FFFFFF",
-    "ratio": 21.0
-  },
-  {
-    "first": "#FFFFFF",
-    "second": "#000000",
-    "ratio": 21.0
-  },
-  {
-    "first": "#777777",
-    "second": "#777777",
-    "ratio": 1.0
-  },
-  {
-    "first": "#767676",
-    "second": "#FFFFFF",
-    "ratio": 4.54
-  },
-  {
-    "first": "#EDE6D6",
-    "second": "#16223D",
-    "ratio": 12.7
-  },
-  {
-    "first": "#CDAA6B",
-    "second": "#080C16",
-    "ratio": 8.9
-  },
-  {
-    "first": "#7E89A0",
-    "second": "#16223D",
-    "ratio": 4.49
-  }
-]
+{
+  "description": "2 色のコントラスト比を出す。小数第 2 位に丸める。色は #RRGGBB で書く。",
+  "cases": [
+    {
+      "summary": "黒と白で最大の 21",
+      "first": "#000000",
+      "second": "#FFFFFF",
+      "ratio": 21.0
+    },
+    {
+      "summary": "白と黒でも同じ 21",
+      "first": "#FFFFFF",
+      "second": "#000000",
+      "ratio": 21.0
+    },
+    {
+      "summary": "同じ色は 1",
+      "first": "#777777",
+      "second": "#777777",
+      "ratio": 1.0
+    },
+    {
+      "summary": "4.5 をわずかに超える",
+      "first": "#767676",
+      "second": "#FFFFFF",
+      "ratio": 4.54
+    },
+    {
+      "summary": "文字の色と地の色の比",
+      "first": "#EDE6D6",
+      "second": "#16223D",
+      "ratio": 12.7
+    },
+    {
+      "summary": "強調の色と暗い地の比",
+      "first": "#CDAA6B",
+      "second": "#080C16",
+      "ratio": 8.9
+    },
+    {
+      "summary": "4.5 にわずかに届かない",
+      "first": "#7E89A0",
+      "second": "#16223D",
+      "ratio": 4.49
+    }
+  ]
+}
