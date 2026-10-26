@@ -1,8 +1,10 @@
-.PHONY: setup open format licenses build test-build test verify
+.PHONY: setup open format licenses build test-build test snapshot verify
 
 SIMULATOR ?= $(shell xcrun simctl list devices available iPhone | awk -F '[()]' '/iPhone/ { print $$2; exit }')
 XCBEAUTIFY = $(shell command -v xcbeautify)
 BEAUTIFY = $(if $(XCBEAUTIFY),| xcbeautify)
+CLAUDE_CONFIG ?= $(HOME)/Applications/AI/claude-config
+SNAPSHOT ?= widget
 CHECKOUT = $(if $(BRANCH),$(shell git worktree list --porcelain | awk '/^worktree / { path = substr($$0, 10) } $$0 == "branch refs/heads/$(BRANCH)" { print path }'),.)
 
 setup:
@@ -29,6 +31,9 @@ test-build:
 
 test:
 	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' test $(BEAUTIFY)
+
+snapshot:
+	$(CLAUDE_CONFIG)/skills/ui-snapshot/scripts/render.sh ios/Packages/KakeibotApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
 
 verify:
 	scripts/verify.sh swift test --package-path ios/Packages/KakeibotKit
