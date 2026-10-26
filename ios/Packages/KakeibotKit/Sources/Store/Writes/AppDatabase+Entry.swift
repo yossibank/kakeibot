@@ -235,7 +235,7 @@ private extension AppDatabase {
 
             return category?.kind.rawValue == entry.type.rawValue
         case let .wallet(id):
-            return try Wallet.exists(db, key: id)
+            return try entry.transferId == nil && Wallet.exists(db, key: id)
         }
     }
 

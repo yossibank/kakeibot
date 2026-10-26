@@ -82,6 +82,26 @@ struct TransferFeeWriteTests {
     }
 
     @Test
+    func keepsFeeWalletOnBatchChange() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+
+        let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
+        let fee = try #require(try await setup.database.fee(of: transfer.id))
+
+        let changed = try await setup.database.changeEntries(
+            [fee.id],
+            to: .wallet(options.wallets[0].id),
+            at: setup.now
+        )
+
+        let after = try await setup.database.fee(of: transfer.id)
+
+        #expect(changed.isEmpty)
+        #expect(after?.walletId == transfer.walletId)
+    }
+
+    @Test
     func deletesFeeWithTransfer() async throws {
         let setup = try await Setup()
 

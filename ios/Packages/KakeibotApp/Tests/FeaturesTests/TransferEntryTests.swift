@@ -216,6 +216,7 @@ struct TransferEntryTests {
         )
 
         await model.load()
+        let after = model.wallet(setup.bank).flatMap { model.afterLine(of: $0, isSource: true) }
         model.setFee(330)
         let saved = await model.save()
 
@@ -224,6 +225,7 @@ struct TransferEntryTests {
         #expect(saved?.entry.id == transfer.id)
         #expect(saved?.fee?.id == fee.id)
         #expect(saved?.fee?.amount == 330)
+        #expect(after?.amount == -10220)
     }
 
     @Test

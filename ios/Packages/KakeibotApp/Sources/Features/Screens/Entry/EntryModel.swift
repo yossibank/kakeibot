@@ -285,7 +285,8 @@ public extension EntryModel {
         var seen: Set<String> = []
 
         let unique = manualTransfers.filter { entry in
-            let key = "\(entry.walletId)>\(String(describing: entry.toWalletId))>\(entry.amount)>\(fee(of: entry))"
+            let route = "\(entry.walletId)>\(String(describing: entry.toWalletId))"
+            let key = "\(route)>\(entry.amount)>\(fee(of: entry))"
             return seen.insert(key).inserted
         }
 
@@ -583,9 +584,9 @@ public extension EntryModel {
 
             budgets = try await database.budgets()
 
-            try await loadBalances()
-
             try await loadEntry()
+
+            try await loadBalances()
 
             if let startingTemplate {
                 apply(startingTemplate)
