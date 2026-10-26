@@ -21,6 +21,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 共通の木に、次のものを足している。
 
 - `android/`：未着手
+- `scripts/docs-check.py`：文書と実物の一致を確かめる。リンク先とその見出し、Makefile の入口、この文書のパッケージの木、fixtures の `description` と `summary` を見る
 - `spec/`：`export-format.md`、`fixtures.md`、`fixtures/`（Core のフォルダ名の小文字にそろえる）
 - `.claude/rules/`：spec の文書の役割
 - `.claude/snapshots/widget/`：`ui-snapshot` で描くウィジェットの場合（あといくらの小・中、ロック画面の丸・横長・1 行）

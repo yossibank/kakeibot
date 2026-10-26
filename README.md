@@ -45,7 +45,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | 道具を入れ、hook を入れる | `make setup` |
 | Xcode でワークスペースを開く | `make open` |
 | ブランチのワークツリーを Xcode で開く | `make open BRANCH=feat/...` |
-| 変更の確認（KakeibotKit のテストと iOS のビルド。出力は成否と失敗の箇所だけ） | `make verify` |
+| 変更の確認（文書の一致、KakeibotKit のテスト、iOS のビルド。出力は成否と失敗の箇所だけ） | `make verify` |
 | iOS のビルド（シミュレーター） | `make build` |
 | テストのコンパイルだけ（走らせない） | `make test-build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
