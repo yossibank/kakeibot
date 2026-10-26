@@ -240,6 +240,10 @@ private extension ReviewView {
                     )
                 }
                 .padding(.top, 8)
+
+                if !model.moves.isEmpty {
+                    moveList
+                }
             }
 
             if let usage = model.budgetUsage {
@@ -263,6 +267,34 @@ private extension ReviewView {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
+    }
+
+    var moveList: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("支出に入らない動き")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+
+            ForEach(model.moves) { move in
+                HStack {
+                    Label(Self.title(of: move.role), systemImage: "arrow.right")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.text)
+
+                    Spacer()
+
+                    Text(AmountText.text(move.amount))
+                        .textFont(.footnote)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.text)
+                }
+            }
+        }
+        .padding(.top, 12)
+        .overlay(alignment: .top) {
+            Hairline(thickness: 1)
+        }
+        .padding(.top, 4)
     }
 
     func periodButton(
@@ -457,6 +489,14 @@ private extension ReviewView {
         case .expense: "支出"
         case .income: "収入"
         case .balance: "収支"
+        }
+    }
+
+    static func title(of role: Wallet.Kind.Role) -> String {
+        switch role {
+        case .loan: "借入の返済"
+        case .investment: "投資の積立"
+        case .onHand, .card: ""
         }
     }
 

@@ -46,6 +46,15 @@ public extension ReviewModel {
         public let usage: BudgetUsage?
     }
 
+    struct Move: Identifiable {
+        public let role: Wallet.Kind.Role
+        public let amount: Int
+
+        public var id: Wallet.Kind.Role {
+            role
+        }
+    }
+
     static let recurringShareId = AnyHashable("recurring")
 
     var period: ReviewPeriod {
@@ -160,6 +169,29 @@ public extension ReviewModel {
             ratio: Double(recurringTotal) / Double(total),
             usage: nil
         )
+    }
+
+    var moves: [Move] {
+        guard let list else {
+            return []
+        }
+
+        let transfers = entries.filter { entry in
+            entry.type == .transfer && period.range.contains(entry.date)
+        }
+
+        return Self.moveRoles.compactMap { role in
+            let amount = transfers
+                .filter { entry in
+                    let from = list.wallets[entry.walletId]?.kind.role
+                    let to = entry.toWalletId.flatMap { list.wallets[$0] }?.kind.role
+
+                    return to == role && from != role
+                }
+                .reduce(0) { $0 + $1.amount }
+
+            return amount > 0 ? Move(role: role, amount: amount) : nil
+        }
     }
 
     var stampTallies: [StampCalendar.Tally] {
@@ -299,6 +331,7 @@ private extension ReviewModel {
         let sortOrder: Int
     }
 
+    static let moveRoles: [Wallet.Kind.Role] = [.loan, .investment]
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
 

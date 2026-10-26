@@ -15,9 +15,9 @@ public final class AssetsModel: ScreenModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    private var recurrings: [Recurring] = []
+    let database: AppDatabase
 
-    private let database: AppDatabase
+    private var recurrings: [Recurring] = []
 
     public init(
         database: AppDatabase,
@@ -226,6 +226,10 @@ public extension AssetsModel {
 
     var isRewardGoalReached: Bool {
         rewardGoal.map { remaining(to: $0) == 0 } ?? false
+    }
+
+    var rewardRules: [RewardRule] {
+        rewardBank?.activeRules ?? []
     }
 
     var waitingGoals: [RewardGoal] {

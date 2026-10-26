@@ -6,6 +6,7 @@ import SwiftUI
 struct AssetsRewardSheet: View {
     @State private var goalTarget: GoalTarget?
     @State private var boughtId: RewardGoal.ID?
+    @State private var isEditingRules = false
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
@@ -13,31 +14,41 @@ struct AssetsRewardSheet: View {
     let model: AssetsModel
 
     var body: some View {
-        VStack(spacing: 16) {
-            header
+        NavigationStack {
+            VStack(spacing: 16) {
+                header
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    balanceCard
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        balanceCard
 
-                    goalSection
+                        guideSection
 
-                    if !model.boughtGoals.isEmpty {
-                        boughtSection
+                        goalSection
+
+                        ruleSection
+
+                        if !model.boughtGoals.isEmpty {
+                            boughtSection
+                        }
+
+                        historySection
                     }
-
-                    historySection
+                    .padding(.bottom, 24)
                 }
-                .padding(.bottom, 24)
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 20)
-        .background {
-            Rectangle()
-                .fill(Palette.background)
-                .ignoresSafeArea()
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+            .background {
+                Rectangle()
+                    .fill(Palette.background)
+                    .ignoresSafeArea()
+            }
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(isPresented: $isEditingRules) {
+                RewardRuleListView(database: model.database)
+            }
         }
         .sheet(item: $goalTarget) { target in
             AssetsGoalSheet(model: model.goalEditModel(editing: target.goal))
@@ -76,27 +87,60 @@ private extension AssetsRewardSheet {
     }
 
     var balanceCard: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "gift")
-                .sansFont(.title, weight: .light)
-                .foregroundStyle(Palette.accent)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(AmountText.text(model.rewardBalance))
+                    .displayFont(.largeTitle)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
 
-            Text("頑張りで浮いた分")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
+                Spacer(minLength: 8)
 
-            Text(AmountText.text(model.rewardBalance))
-                .displayFont(.largeTitle)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
+                Image(systemName: "gift")
+                    .sansFont(.title, weight: .light)
+                    .foregroundStyle(Palette.accent)
+            }
 
-            Text("本物の口座のお金とは別に数えます")
-                .textFont(.caption2)
-                .foregroundStyle(Palette.hint)
+            if let goal = model.rewardGoal {
+                nearestGoal(goal)
+            } else {
+                Text("我慢できた日に決めた額を貯めていきます。口座の残高は変わりません")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+            }
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
+        .padding(20)
         .card()
+    }
+
+    var guideSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionTitle("使い方")
+
+            VStack(alignment: .leading, spacing: 12) {
+                guideStep(
+                    1,
+                    title: "決まりを作る",
+                    note: "例：外食しなかったら ¥500"
+                )
+
+                guideStep(
+                    2,
+                    title: "守れた日に「今日の達成」を付ける",
+                    note: nil
+                )
+
+                guideStep(
+                    3,
+                    title: "貯まったら、目標の物を買う",
+                    note: nil
+                )
+            }
+            .padding(16)
+            .card()
+        }
     }
 
     var goalSection: some View {
@@ -106,25 +150,64 @@ private extension AssetsRewardSheet {
 
                 Spacer()
 
-                Button {
-                    goalTarget = GoalTarget(goal: nil)
-                } label: {
-                    Label("決める", systemImage: "plus")
-                        .textFont(.caption, weight: .semibold)
-                        .foregroundStyle(Palette.accent)
+                if !model.waitingGoals.isEmpty {
+                    Button {
+                        goalTarget = GoalTarget(goal: nil)
+                    } label: {
+                        Label("足す", systemImage: "plus")
+                            .textFont(.caption, weight: .semibold)
+                            .foregroundStyle(Palette.accent)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
 
             if model.waitingGoals.isEmpty {
-                Text("欲しい物と額を決めると、あといくらで届くか分かります")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .padding(.leading, 8)
+                AddButton("欲しい物と額を決める") {
+                    goalTarget = GoalTarget(goal: nil)
+                }
             } else {
                 ForEach(model.waitingGoals) { goal in
                     goalRow(goal)
                 }
+            }
+        }
+    }
+
+    var ruleSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                SectionTitle("決まり")
+
+                Spacer()
+
+                Button {
+                    isEditingRules = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Text("直す")
+
+                        Image(systemName: "chevron.right")
+                            .sansFont(.micro, weight: .bold)
+                    }
+                    .textFont(.caption, weight: .semibold)
+                    .foregroundStyle(Palette.accent)
+                }
+                .buttonStyle(.plain)
+            }
+
+            if model.rewardRules.isEmpty {
+                AddButton("決まりを作る") {
+                    isEditingRules = true
+                }
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(model.rewardRules, id: \.id) { rule in
+                        ruleRow(rule)
+                    }
+                }
+                .padding(16)
+                .card()
             }
         }
     }
@@ -213,6 +296,84 @@ private extension AssetsRewardSheet {
         .contentShape(.rect)
         .onTapGesture {
             goalTarget = GoalTarget(goal: goal)
+        }
+    }
+
+    func nearestGoal(_ goal: RewardGoal) -> some View {
+        let remaining = model.remaining(to: goal)
+        let progress = model.progress(to: goal)
+        let percent = Int((progress * 100).rounded(.down))
+        let note = remaining > 0 ? "あと \(AmountText.text(remaining))" : "届きました"
+
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("\(goal.name) まで")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+
+                Spacer(minLength: 8)
+
+                Text(note)
+                    .textFont(.caption, weight: .semibold)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accent)
+            }
+
+            HStack(spacing: 8) {
+                RatioBar(progress, tint: Palette.accent, height: 8)
+
+                Text("\(percent)%")
+                    .textFont(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+            }
+        }
+    }
+
+    func guideStep(
+        _ number: Int,
+        title: String,
+        note: String?
+    ) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text("\(number)")
+                .textFont(.caption, weight: .semibold)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accent)
+                .frame(width: 22, height: 22)
+                .background(Palette.accent.opacity(.subtle), in: Circle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.text)
+
+                if let note {
+                    Text(note)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    func ruleRow(_ rule: RewardRule) -> some View {
+        HStack(spacing: 12) {
+            IconBadge(model.rewardIcon(for: rule), size: 26)
+
+            Text(rule.name)
+                .textFont(.footnote)
+                .foregroundStyle(Palette.text)
+                .lineLimit(1)
+
+            Spacer(minLength: 8)
+
+            Text("＋\(AmountText.text(rule.amount))")
+                .textFont(.footnote)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accent)
         }
     }
 

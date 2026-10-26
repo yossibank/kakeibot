@@ -8,6 +8,7 @@ public struct AssetsView: View {
     @State private var movedBill: AssetsModel.UpcomingBill?
     @State private var pendingEntry: Entry.ID?
     @State private var isShowingReward = false
+    @State private var isAddingGoal = false
 
     @Environment(\.themeStyle.corner) private var corner
 
@@ -44,8 +45,12 @@ public struct AssetsView: View {
                     billCard
                 }
 
-                ForEach(model.sections) { section in
-                    walletSection(section)
+                if !ownedSections.isEmpty {
+                    walletGroup("持っているお金", sections: ownedSections)
+                }
+
+                if !owedSections.isEmpty {
+                    walletGroup("返すお金", sections: owedSections)
                 }
 
                 rewardCard
@@ -59,6 +64,9 @@ public struct AssetsView: View {
         }
         .sheet(isPresented: $isShowingReward) {
             AssetsRewardSheet(model: model)
+        }
+        .sheet(isPresented: $isAddingGoal) {
+            AssetsGoalSheet(model: model.goalEditModel(editing: nil))
         }
         .sheet(item: $movedBill, onDismiss: openPendingEntry) { bill in
             AssetsMovedSheet(row: bill) { id in
@@ -153,6 +161,12 @@ private extension AssetsView {
             }
             .buttonStyle(.plain)
 
+            if model.rewardGoal == nil {
+                AddButton("欲しい物を目標にする") {
+                    isAddingGoal = true
+                }
+            }
+
             Button(action: onMarkReward) {
                 Label("今日の達成を付ける", systemImage: "gift")
                     .textFont(.footnote)
@@ -203,16 +217,16 @@ private extension AssetsView {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("頑張りで浮いた分")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-
                 Text(AmountText.text(model.rewardBalance))
                     .displayFont(.title)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
 
-                Text("本物の口座のお金とは別に数えます")
+                Text("我慢できた日に決めた額を貯めていきます")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+
+                Text("口座の残高は変わりません")
                     .textFont(.caption2)
                     .foregroundStyle(Palette.hint)
             }
@@ -285,25 +299,41 @@ private extension AssetsView {
     }
 
     var netWorthRow: some View {
-        HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("純資産")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.text)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("純資産")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.text)
 
-                Text("投資と借入も入れた額")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.hint)
+                    Text("投資と借入も入れた額")
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.hint)
+                }
+
+                Spacer(minLength: 8)
+
+                Text(AmountText.text(model.holdings.netWorth))
+                    .displayFont(.headline)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
 
-            Spacer(minLength: 8)
+            if !owedSections.isEmpty {
+                HStack(spacing: 8) {
+                    Text("持つ")
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.subtext)
 
-            Text(AmountText.text(model.holdings.netWorth))
-                .displayFont(.headline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                    RatioBar(ownedShare, tint: Palette.accent, height: 6)
+
+                    Text("返す")
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.subtext)
+                }
+            }
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 12)
@@ -381,6 +411,35 @@ private extension AssetsView {
             Text(title)
                 .textFont(size: .micro)
                 .foregroundStyle(Palette.subtext)
+        }
+    }
+
+    func walletGroup(
+        _ title: String,
+        sections: [AssetsModel.WalletSection]
+    ) -> some View {
+        let total = sections.flatMap(\.rows).reduce(0) { $0 + $1.balance }
+
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(title)
+                    .textFont(.subheadline, weight: .semibold)
+                    .foregroundStyle(Palette.text)
+
+                Spacer(minLength: 8)
+
+                Text(AmountText.text(total))
+                    .displayFont(.headline)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 4)
+            .padding(.top, 8)
+
+            ForEach(sections) { section in
+                walletSection(section)
+            }
         }
     }
 
@@ -515,7 +574,7 @@ private extension AssetsView {
                 }
             }
 
-            Text(AmountText.text(Self.shownAmount(of: row)))
+            Text(AmountText.text(row.balance))
                 .displayFont(.headline)
                 .monospacedDigit()
                 .foregroundStyle(Self.amountColor(of: row))
@@ -534,6 +593,12 @@ private extension AssetsView {
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 74, alignment: .leading)
         .card(cornerRadius: 20)
+        .overlay {
+            if Self.isOwed(row.wallet.kind.role) {
+                RoundedRectangle(cornerRadius: corner.radius(20))
+                    .strokeBorder(Palette.accent.opacity(.medium), style: .dashed)
+            }
+        }
         .contentShape(.rect)
     }
 }
@@ -543,6 +608,22 @@ private extension AssetsView {
         repeating: GridItem(.flexible(), spacing: 8),
         count: 2
     )
+
+    var ownedSections: [AssetsModel.WalletSection] {
+        model.sections.filter { !Self.isOwed($0.role) }
+    }
+
+    var owedSections: [AssetsModel.WalletSection] {
+        model.sections.filter { Self.isOwed($0.role) }
+    }
+
+    var ownedShare: Double {
+        let owned = ownedSections.flatMap(\.rows).reduce(0) { $0 + max($1.balance, 0) }
+        let owed = owedSections.flatMap(\.rows).reduce(0) { $0 + max(-$1.balance, 0) }
+        let total = owned + owed
+
+        return total == 0 ? 1 : Double(owned) / Double(total)
+    }
 
     var netWorths: [Int]? {
         model.showsNetWorth ? model.monthTotals.map(\.netWorth) : nil
@@ -570,6 +651,13 @@ private extension AssetsView {
         return "先月末より \(sign)\(AmountText.text(change))"
     }
 
+    static func isOwed(_ role: Wallet.Kind.Role) -> Bool {
+        switch role {
+        case .card, .loan: true
+        case .onHand, .investment: false
+        }
+    }
+
     static func title(of role: Wallet.Kind.Role) -> String {
         switch role {
         case .onHand: "手持ち"
@@ -587,16 +675,9 @@ private extension AssetsView {
         }
     }
 
-    static func shownAmount(of row: AssetsModel.WalletRow) -> Int {
-        switch row.wallet.kind.role {
-        case .card, .loan: abs(row.balance)
-        case .onHand, .investment: row.balance
-        }
-    }
-
     static func amountColor(of row: AssetsModel.WalletRow) -> Color {
         switch row.wallet.kind.role {
-        case .card: row.balance > 0 ? Palette.accent : Palette.accentStrong
+        case .card: row.balance > 0 ? Palette.accent : Palette.text
         case .loan: Palette.text
         case .onHand, .investment:
             row.balance < 0 ? Palette.rose : Palette.accentStrong
