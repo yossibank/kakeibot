@@ -492,11 +492,16 @@ private extension EntrySheet {
 
     func categoryButton(_ category: EntryCategory) -> some View {
         let isPressing = pressingCategory == category.id
-        let scale: CGFloat = isPressing ? 0.93 : 1
+        let isSelected = model.categoryId == category.id
+        let restingScale = isSelected ? Self.selectedScale : 1
+        let scale = isPressing ? 0.93 : restingScale
+        let glow = isSelected ? Palette.glow.opacity(.muted) : Color.clear
 
         return categoryFace(category, isLifted: false)
+            .shadow(color: glow, radius: 8)
             .scaleEffect(scale)
             .animation(.snappy(duration: 0.2), value: isPressing)
+            .animation(.snappy(duration: 0.25), value: isSelected)
             .overlay {
                 GeometryReader { proxy in
                     Color.clear
@@ -525,9 +530,10 @@ private extension EntrySheet {
         let fill = isLifted ? Palette.panel : Self.categoryFill(isLit)
         let border = isLit ? Palette.outline : Color.clear
         let width: CGFloat = isLifted ? 1.2 : 1
+        let iconSize: CGFloat = isLit ? 19 : 17
 
         return VStack(spacing: 4) {
-            IconImage(model.icon(for: category), size: 17)
+            IconImage(model.icon(for: category), size: iconSize)
 
             Text(category.name)
                 .textFont(size: .caption)
@@ -648,8 +654,9 @@ private extension EntrySheet {
     static let fade: CGFloat = 20
     static let categoryRows = 3
     static let categoryColumns = 5
-    static let categorySpacing: CGFloat = 8
-    static let categoryHeight: CGFloat = 56
+    static let categorySpacing: CGFloat = 4
+    static let categoryHeight: CGFloat = 54
+    static let selectedScale: CGFloat = 1.08
     static let menuPressDuration = 0.15
 
     static let drawerShape = UnevenRoundedRectangle(

@@ -38,7 +38,7 @@ public struct RecurringEditSheet: View {
                     .transition(.opacity)
                     .zIndex(1)
 
-                SettingsDrawer(title(for: panel)) {
+                SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
                     closePanel()
                 } content: {
                     drawerBody(panel)
@@ -576,6 +576,10 @@ private extension RecurringEditSheet {
                 isEmpty: model.remindDaysBefore == nil
             )
         ]
+    }
+
+    func showsDone(for panel: Panel) -> Bool {
+        panel != .amount
     }
 
     func title(for panel: Panel) -> String {

@@ -343,7 +343,7 @@ private extension TemplateEditSheet {
     }
 
     func drawerView(_ panel: Panel) -> some View {
-        SettingsDrawer(title(for: panel)) {
+        SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
             closePanel()
         } content: {
             drawerBody(panel)
@@ -521,6 +521,10 @@ private extension TemplateEditSheet {
                 isEmpty: model.memo.isEmpty
             )
         ]
+    }
+
+    func showsDone(for panel: Panel) -> Bool {
+        panel != .amount
     }
 
     func title(for panel: Panel) -> String {

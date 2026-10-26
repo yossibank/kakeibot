@@ -190,7 +190,7 @@ private extension RewardRuleEditSheet {
     }
 
     func drawerView(_ panel: Panel) -> some View {
-        SettingsDrawer("金額") {
+        SettingsDrawer("金額", showsDone: false) {
             closePanel()
         } content: {
             VStack(spacing: 12) {

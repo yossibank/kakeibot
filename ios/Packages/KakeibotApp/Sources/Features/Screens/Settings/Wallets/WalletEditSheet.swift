@@ -52,7 +52,7 @@ public struct WalletEditSheet: View {
                         .transition(.opacity)
                         .zIndex(1)
 
-                    SettingsDrawer("最初の残高") {
+                    SettingsDrawer("最初の残高", showsDone: false) {
                         closeAmount()
                     } content: {
                         VStack(spacing: 12) {
@@ -441,7 +441,7 @@ private extension WalletEditSheet {
                 .transition(.opacity)
                 .zIndex(1)
 
-            SettingsDrawer(title) {
+            SettingsDrawer(title, showsDone: false) {
                 onSave()
             } content: {
                 VStack(spacing: 12) {

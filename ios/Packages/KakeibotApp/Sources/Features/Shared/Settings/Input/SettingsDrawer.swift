@@ -3,15 +3,18 @@ import SwiftUI
 
 struct SettingsDrawer<Content: View>: View {
     private let title: String
+    private let showsDone: Bool
     private let onDone: () -> Void
     private let content: Content
 
     init(
         _ title: String,
+        showsDone: Bool = true,
         onDone: @escaping () -> Void,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
+        self.showsDone = showsDone
         self.onDone = onDone
         self.content = content()
     }
@@ -26,11 +29,13 @@ struct SettingsDrawer<Content: View>: View {
 
                 Spacer()
 
-                RingButton(
-                    systemImage: "checkmark",
-                    style: .prominent,
-                    action: onDone
-                )
+                if showsDone {
+                    RingButton(
+                        systemImage: "checkmark",
+                        style: .prominent,
+                        action: onDone
+                    )
+                }
             }
 
             content

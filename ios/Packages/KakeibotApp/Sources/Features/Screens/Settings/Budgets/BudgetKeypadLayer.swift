@@ -36,7 +36,7 @@ private struct BudgetKeypadLayer: ViewModifier {
 
 private extension BudgetKeypadLayer {
     var drawer: some View {
-        SettingsDrawer(model.editingTitle) {
+        SettingsDrawer(model.editingTitle, showsDone: false) {
             Task {
                 await model.finishEditing()
             }
