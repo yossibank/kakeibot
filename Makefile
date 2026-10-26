@@ -1,4 +1,4 @@
-.PHONY: setup open format licenses build test-build test
+.PHONY: setup open format licenses build test-build test verify
 
 SIMULATOR ?= $(shell xcrun simctl list devices available iPhone | awk -F '[()]' '/iPhone/ { print $$2; exit }')
 XCBEAUTIFY = $(shell command -v xcbeautify)
@@ -29,3 +29,7 @@ test-build:
 
 test:
 	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' test $(BEAUTIFY)
+
+verify:
+	scripts/verify.sh swift test --package-path ios/Packages/KakeibotKit
+	scripts/verify.sh xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build

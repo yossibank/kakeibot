@@ -23,6 +23,8 @@ kakeibot/
 ├── android/                 未着手
 ├── docs/
 ├── ios/
+├── scripts/
+│   └── verify.sh            コマンドの全ログをファイルに書き、成否と失敗の行だけを出す
 ├── spec/
 │   ├── export-format.md
 │   ├── fixtures.md
@@ -33,7 +35,7 @@ kakeibot/
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
 ├── Brewfile                 Mint、pre-commit、xcbeautify
-├── Makefile                 準備・開く・整形・ライセンスの作り直し・ビルド・テストのコンパイル・テストのコマンド
+├── Makefile                 準備・開く・整形・ライセンスの作り直し・確認・ビルド・テストのコンパイル・テストのコマンド
 └── Mintfile                 SwiftFormat と LicensePlist の版
 ```
 
@@ -333,7 +335,7 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 
 テストターゲットは `ios/Kakeibot.xctestplan` にまとめ、`Kakeibot` スキームに付ける。パッケージは、プロジェクトのフォルダとしても登録する。こうしないと、スキームからパッケージのテストターゲットが見えない。
 
-`make test` は、このテストプランを iOS シミュレーターで走らせる。`make test-build` は、走らせずにコンパイルだけする。CI は置かず、PR ごとに手元で `make test` を走らせる。`make` のビルドとテストは、xcbeautify があれば出力を通して整える。
+`make test` は、このテストプランを iOS シミュレーターで走らせる。`make test-build` は、走らせずにコンパイルだけする。CI は置かず、PR ごとに手元で `make test` を走らせる。`make` のビルドとテストは、xcbeautify があれば出力を通して整える。`make verify` は、KakeibotKit の `swift test` と iOS のビルドを `scripts/verify.sh` を通して走らせる。
 
 | 対象 | 方法 |
 | --- | --- |
