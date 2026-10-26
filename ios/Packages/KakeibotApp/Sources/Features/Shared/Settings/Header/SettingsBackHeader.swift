@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SettingsBackHeader: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.isSettingsSheetRoot) private var isSheetRoot
 
     private let title: String
     private let hint: SettingsScreenFlag?
@@ -17,7 +18,7 @@ struct SettingsBackHeader: View {
 
     var body: some View {
         HStack {
-            RingButton(systemImage: "chevron.left") {
+            RingButton(systemImage: closeImage) {
                 dismiss()
             }
 
@@ -44,5 +45,15 @@ struct SettingsBackHeader: View {
             }
             .frame(width: 44, height: 44)
         }
+    }
+}
+
+public extension EnvironmentValues {
+    @Entry var isSettingsSheetRoot = false
+}
+
+private extension SettingsBackHeader {
+    var closeImage: String {
+        isSheetRoot ? "xmark" : "chevron.left"
     }
 }
