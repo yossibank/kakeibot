@@ -6,7 +6,7 @@
 
 変更したら `make verify` を通す。出力は成否と失敗の箇所だけで、全ログのパスは最後の行にある。テストは CI で走らせず、PR を作る前に手元で `make test` を 1 回通す。push し直すときは、Swift か fixtures を変えたときだけ通し直す。文書だけの PR では走らせない。結果は PR の本文の「確認」に書く。
 
-ウィジェットの見た目を変えたら、`widget-snapshot` のスキルで描いて確かめる。動きの不具合は、claude-config の `ui-record` のスキルで録画して確かめる。
+ウィジェットの見た目を変えたら、claude-config の `ui-snapshot` のスキルに `ios/Packages/KakeibotApp` と `.claude/snapshots/widget` を渡して描いて確かめる。動きの不具合は、claude-config の `ui-record` のスキルで録画して確かめる。
 
 ## コードの書き方
 
