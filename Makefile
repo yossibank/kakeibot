@@ -36,5 +36,6 @@ snapshot:
 	$(CLAUDE_CONFIG)/skills/ui-snapshot/scripts/render.sh ios/Packages/KakeibotApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
 
 verify:
+	scripts/verify.sh scripts/docs-check.py
 	scripts/verify.sh swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build
