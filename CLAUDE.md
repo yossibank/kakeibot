@@ -25,6 +25,7 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 | 表の形を変える | [data](docs/data.md) | data。書き出しに響くなら export-format も |
 | 書き出しの形式を変える | [export-format](spec/export-format.md) | export-format |
 | fixtures を足す・変える | [fixtures](spec/fixtures.md) | fixtures |
+| 画面の言葉・型の名前を足す・変える | [glossary](docs/glossary.md) | glossary |
 | 方針を決める・変える | [decisions](docs/decisions/) の、`docs-section.sh` で探した節だけ | decisions |
 | 作る順番の 1 段を終える | [roadmap](docs/roadmap.md) | roadmap の状態 |
 | 対応 OS を変える | [overview](docs/overview.md) | overview、README のバッジ |
