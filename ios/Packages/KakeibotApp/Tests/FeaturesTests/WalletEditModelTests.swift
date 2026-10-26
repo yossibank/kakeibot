@@ -145,6 +145,7 @@ struct WalletEditModelTests {
         await model.load()
         let loaded = model.loanAmount.amount
         let isChanged = model.isChanged
+        let repaid = model.repaidText
         model.kind = .bank
         let changed = try #require(await model.save())
 
@@ -152,6 +153,7 @@ struct WalletEditModelTests {
         #expect(saved.loanAmount == 300_000)
         #expect(loaded == 300_000)
         #expect(!isChanged)
+        #expect(repaid == "¥300,000 を返しました（100%）")
         #expect(!model.showsLoanAmount)
         #expect(changed.loanAmount == nil)
     }

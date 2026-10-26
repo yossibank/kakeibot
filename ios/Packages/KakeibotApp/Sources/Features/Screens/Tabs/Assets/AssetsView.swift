@@ -62,6 +62,7 @@ public struct AssetsView: View {
                 }
 
                 rewardCard
+                    .padding(.top, 12)
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
@@ -463,7 +464,7 @@ private extension AssetsView {
                     .minimumScaleFactor(0.6)
             }
             .padding(.horizontal, 4)
-            .padding(.top, 8)
+            .padding(.top, 12)
 
             VStack(spacing: 0) {
                 ForEach(sections) { section in

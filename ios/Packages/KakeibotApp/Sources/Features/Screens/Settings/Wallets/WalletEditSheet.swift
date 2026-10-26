@@ -84,7 +84,7 @@ public struct WalletEditSheet: View {
 
                 if isEnteringLoanAmount {
                     amountDrawer(
-                        "借りた額",
+                        "最初に借りた額",
                         amount: model.loanAmount.amount,
                         tax: loanAmountTax,
                         saveTitle: "借りた額を決める",
@@ -184,8 +184,14 @@ private extension WalletEditSheet {
                     }
 
                     if !rowItems.isEmpty {
-                        SettingsRowList(items: rowItems) { panel in
-                            open(panel)
+                        VStack(alignment: .leading, spacing: 8) {
+                            SettingsRowList(items: rowItems) { panel in
+                                open(panel)
+                            }
+
+                            if model.showsLoanAmount {
+                                loanAmountNote
+                            }
                         }
                     }
                 }
@@ -378,6 +384,21 @@ private extension WalletEditSheet {
         }
     }
 
+    var loanAmountNote: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("返し終えた割合を出すのに使います。残高は変わりません")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+
+            if let repaid = model.repaidText {
+                Text(repaid)
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accent)
+            }
+        }
+    }
+
     var valuationHistory: some View {
         VStack(alignment: .leading, spacing: 8) {
             SettingsSectionTitle("これまでの評価額")
@@ -553,7 +574,7 @@ private extension WalletEditSheet {
         .init(
             panel: .loanAmount,
             systemImage: "yensign.circle",
-            title: "借りた額",
+            title: "最初に借りた額",
             value: model.loanAmountText,
             isEmpty: model.loanAmount.amount == 0,
             isAmount: true
@@ -564,7 +585,7 @@ private extension WalletEditSheet {
         let loan = model.showsLoanAmount ? [loanAmountItem] : []
         let payment = model.showsPayment ? paymentItems : []
 
-        return loan + payment
+        return payment + loan
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {

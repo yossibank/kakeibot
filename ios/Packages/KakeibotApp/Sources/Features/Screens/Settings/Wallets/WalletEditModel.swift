@@ -97,6 +97,20 @@ public extension WalletEditModel {
         loanAmount.amount > 0 ? AmountText.text(loanAmount.amount) : "未入力"
     }
 
+    var repaidText: String? {
+        let borrowed = loanAmount.amount
+
+        guard borrowed > 0 else {
+            return nil
+        }
+
+        let remaining = max(-(isEditing ? balance : initialBalance), 0)
+        let repaid = min(max(borrowed - remaining, 0), borrowed)
+        let percent = repaid * 100 / borrowed
+
+        return "\(AmountText.text(repaid)) を返しました（\(percent)%）"
+    }
+
     var paymentTitle: String {
         kind == .loan ? "毎月の返済" : "締め日と引き落とし"
     }

@@ -298,9 +298,17 @@ private extension ReviewView {
         let ratio = model.repaymentRatio(in: moves)
 
         return VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "arrow.left.arrow.right")
+                    .sansFont(.small, weight: .semibold)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 26, height: 26)
+                    .background(Palette.accent.opacity(.subtle), in: Circle())
+
                 VStack(alignment: .leading, spacing: 2) {
-                    SectionTitle("返済と積立")
+                    Text("返済と積立")
+                        .textFont(.subheadline, weight: .semibold)
+                        .foregroundStyle(Palette.text)
 
                     Text("支出には数えていません")
                         .textFont(.caption2)
@@ -349,7 +357,9 @@ private extension ReviewView {
                 }
             }
         }
-        .padding(16)
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
     }
@@ -401,7 +411,7 @@ private extension ReviewView {
                 .font(.caption)
                 .foregroundStyle(Palette.hint)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, 8)
         .contentShape(.rect)
     }
 
