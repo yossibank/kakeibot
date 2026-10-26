@@ -1,6 +1,8 @@
 # fixtures の形式
 
-Core の計算を iOS と Android で同じ結果にそろえる、fixtures の JSON の形式を書く。置き場所とファイル名の付け方は、[architecture.md の「名前の決まり」](../docs/architecture.md#名前の決まり)にある。
+> [!NOTE]
+> Core の計算を iOS と Android で同じ結果にそろえる、fixtures の JSON の形式が分かる。
+> 置き場所とファイル名の付け方は、[architecture.md の「名前の決まり」](../docs/architecture.md#名前の決まり)にある。
 
 ## 共通の決まり
 
