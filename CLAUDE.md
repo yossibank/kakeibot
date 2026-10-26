@@ -12,7 +12,7 @@
 
 VoiceOver などのアクセシビリティの対応は入れない。`accessibility` で始まるモディファイアや、読み上げのためだけの値や引数を書かない。
 
-ファイルとフォルダの置き場所と名前は、[architecture の「名前の決まり」](docs/architecture.md#名前の決まり)に従う。
+ファイルとフォルダの置き場所と名前は、[architecture の「名前の決まり」](docs/architecture.md#名前の決まり)に従う。共通の構成は `~/Applications/AI/claude-config/docs/architecture-ios.md` にある。
 
 ## 文書
 
