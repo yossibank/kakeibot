@@ -6,9 +6,7 @@
 
 変更したら `make build` を通す。テストは CI で走らせず、PR を作る前に手元で `make test` を 1 回通す。push し直すときは、Swift か fixtures を変えたときだけ通し直す。文書だけの PR では走らせない。結果は PR の本文の「確認」に書く。
 
-pre-commit の整形で commit が止まったら、差分を確かめてからステージし直す。止まる仕組みは [README の「動かし方」](README.md#動かし方)にある。`--no-verify` で飛ばさない。
-
-ウィジェットの見た目を変えたら、`widget-snapshot` のスキルで描いて確かめる。動きの不具合は、claude-config の `sim-record` のスキルで録画して確かめる。
+ウィジェットの見た目を変えたら、`widget-snapshot` のスキルで描いて確かめる。動きの不具合は、claude-config の `ui-record` のスキルで録画して確かめる。
 
 ## コードの書き方
 
