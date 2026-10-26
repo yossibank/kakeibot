@@ -173,14 +173,6 @@ public extension SettingKey where Value == Entry.ID? {
 }
 
 public extension SettingKey where Value == Bool {
-    static var entryStartsWithAmount: Self {
-        Self(flag: .entryStartsWithAmount)
-    }
-
-    static var categoriesByUse: Self {
-        Self(flag: .categoriesByUse)
-    }
-
     static var onboardingCompleted: Self {
         Self(flag: .onboardingCompleted)
     }

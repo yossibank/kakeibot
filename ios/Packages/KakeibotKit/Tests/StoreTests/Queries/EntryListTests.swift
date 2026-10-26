@@ -112,24 +112,6 @@ struct EntryListTests {
     }
 
     @Test
-    func countsCategoryUsesWithinFrequentDays() throws {
-        let today = try #require(LocalDate("2026-10-24"))
-        let food = EntryCategory.ID()
-        let fun = EntryCategory.ID()
-
-        let entries = [
-            Self.entry(food, on: today),
-            Self.entry(food, on: today.adding(days: -89)),
-            Self.entry(food, on: today.adding(days: -90)),
-            Self.entry(fun, on: today, recurringId: Recurring.ID())
-        ]
-
-        let list = Self.list(entries)
-
-        #expect(list.categoryUses(through: today) == [food: 2])
-    }
-
-    @Test
     func findsLastWalletByCategory() throws {
         let today = try #require(LocalDate("2026-10-24"))
         let food = EntryCategory.ID()
@@ -157,8 +139,7 @@ private extension EntryListTests {
         _ categoryId: EntryCategory.ID,
         on date: LocalDate,
         wallet walletId: Wallet.ID = Wallet.ID(),
-        createdAt seconds: TimeInterval = 0,
-        recurringId: Recurring.ID? = nil
+        createdAt seconds: TimeInterval = 0
     ) -> Entry {
         let createdAt = Date(timeIntervalSince1970: seconds)
 
@@ -168,7 +149,6 @@ private extension EntryListTests {
             date: date,
             categoryId: categoryId,
             walletId: walletId,
-            recurringId: recurringId,
             createdAt: createdAt,
             updatedAt: createdAt
         )

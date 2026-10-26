@@ -212,17 +212,14 @@ private extension EntrySheet {
         VStack(spacing: 16) {
             categoryPager
 
-            TagLine(
-                tagItems,
-                selection: model.tagId,
-                onSelect: { id in
+            VStack(spacing: 4) {
+                TagLine(tagItems, selection: model.tagId) { id in
                     model.toggleTag(id)
-                },
-                onAdd: {
-                    editTags()
-                },
-                onEdit: tagEditAction
-            )
+                }
+
+                EntryEditActions(onAdd: tagAddAction, onEdit: tagEditAction)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
 
             EntryTemplateRow(
                 model: model,
@@ -296,11 +293,21 @@ private extension EntrySheet {
             .frame(height: Self.pagerHeight)
             .id(model.type)
 
-            if model.categoryPages.count > 1 {
+            ZStack {
                 PageDots(
                     count: model.categoryPages.count,
                     current: categoryPage ?? 0
                 )
+
+                EntryEditActions(
+                    onAdd: {
+                        open(.newCategory)
+                    },
+                    onEdit: {
+                        open(.categories)
+                    }
+                )
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
     }
@@ -396,30 +403,6 @@ private extension EntrySheet {
         .transition(Self.memoTransition)
     }
 
-    func dashedCell(
-        _ title: String,
-        systemImage: String,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            VStack(spacing: 4) {
-                Image(systemName: systemImage)
-                    .sansFont(.body, weight: .ultraLight)
-
-                Text(title)
-                    .textFont(size: .caption)
-            }
-            .foregroundStyle(Palette.accent)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .overlay {
-                RoundedRectangle(cornerRadius: corner.radius(12))
-                    .stroke(Palette.accent.opacity(.medium), style: .dashed)
-            }
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-    }
-
     func payOffButton(_ remaining: Int) -> some View {
         Button {
             withAnimation(.snappy) {
@@ -444,7 +427,7 @@ private extension EntrySheet {
         .transition(.opacity)
     }
 
-    func categoryGrid(_ page: [EntryModel.CategoryCell]) -> some View {
+    func categoryGrid(_ page: [EntryCategory]) -> some View {
         Grid(
             horizontalSpacing: Self.categorySpacing,
             verticalSpacing: Self.categorySpacing
@@ -455,28 +438,12 @@ private extension EntrySheet {
                         let index = row * Self.categoryColumns + column
 
                         if index < page.count {
-                            categoryCell(page[index])
+                            categoryButton(page[index])
                         } else {
                             Color.clear
                         }
                     }
                 }
-            }
-        }
-    }
-
-    @ViewBuilder
-    func categoryCell(_ cell: EntryModel.CategoryCell) -> some View {
-        switch cell {
-        case let .category(category):
-            categoryButton(category)
-        case .add:
-            dashedCell("追加", systemImage: "plus") {
-                open(.newCategory)
-            }
-        case .edit:
-            dashedCell("編集", systemImage: "gearshape") {
-                open(.categories)
             }
         }
     }
@@ -638,7 +605,7 @@ private extension EntrySheet {
     static let memoCardInset: CGFloat = 12
     static let fade: CGFloat = 20
     static let categoryRows = 3
-    static let categoryColumns = 5
+    static let categoryColumns = 4
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
     static let menuPressDuration = 0.15
@@ -674,6 +641,16 @@ private extension EntrySheet {
 
     var saveDetail: String? {
         model.saveDetail(today: today)
+    }
+
+    var tagAddAction: (() -> Void)? {
+        guard model.selectedCategory != nil else {
+            return nil
+        }
+
+        return {
+            editTags()
+        }
     }
 
     var tagEditAction: (() -> Void)? {
@@ -755,14 +732,12 @@ private extension EntrySheet {
             await model.load()
         }
 
-        isEnteringAmount = model.opensKeypadFirst
-
         showSelectedCategory()
     }
 
     func showSelectedCategory() {
         let page = model.categoryPages.firstIndex { page in
-            page.contains { $0.categoryId == model.categoryId }
+            page.contains { $0.id == model.categoryId }
         }
 
         categoryPage = page ?? 0
@@ -777,7 +752,7 @@ private extension EntrySheet {
     }
 
     func select(_ category: EntryCategory) {
-        setEnteringAmount(false)
+        setEnteringAmount(model.amount == 0)
         model.categoryId = category.id
     }
 

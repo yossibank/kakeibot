@@ -43,7 +43,6 @@ public final class EntryModel {
     public private(set) var recentMemos: [String] = []
     public private(set) var balances: [Wallet.ID: Int] = [:]
     public private(set) var weekStart: Weekday = .sunday
-    public private(set) var startsWithAmount = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -56,7 +55,6 @@ public final class EntryModel {
     private var appliedTemplateId: EntryTemplate.ID?
     private var cardBills: [Recurring] = []
     private var history: EntryList?
-    private var categoryUses: [EntryCategory.ID: Int]?
     private var budgets: [Budget] = []
     private var monthStartDay: MonthStartDay = .first
 
@@ -79,20 +77,6 @@ public final class EntryModel {
 }
 
 public extension EntryModel {
-    enum CategoryCell: Hashable {
-        case category(EntryCategory)
-        case add
-        case edit
-
-        public var categoryId: EntryCategory.ID? {
-            if case let .category(category) = self {
-                category.id
-            } else {
-                nil
-            }
-        }
-    }
-
     struct WalletSection {
         public let kind: Wallet.Kind
         public let wallets: [Wallet]
@@ -118,7 +102,7 @@ public extension EntryModel {
         }
     }
 
-    static let categoriesPerPage = 15
+    static let categoriesPerPage = 12
     static let recentTransferLimit = 3
     static let frequentRouteLimit = 6
 
@@ -126,10 +110,6 @@ public extension EntryModel {
 
     var isEditing: Bool {
         editingId != nil
-    }
-
-    var opensKeypadFirst: Bool {
-        startsWithAmount && !isEditing && amount == 0
     }
 
     var isLoaded: Bool {
@@ -171,12 +151,11 @@ public extension EntryModel {
         allTemplates.filter { $0.type == type }
     }
 
-    var categoryPages: [[CategoryCell]] {
-        let cells = categories.map(CategoryCell.category) + [.add, .edit]
+    var categoryPages: [[EntryCategory]] {
         let size = Self.categoriesPerPage
 
-        return stride(from: 0, to: cells.count, by: size).map { start in
-            Array(cells[start..<min(start + size, cells.count)])
+        return stride(from: 0, to: categories.count, by: size).map { start in
+            Array(categories[start..<min(start + size, categories.count)])
         }
     }
 
@@ -563,17 +542,11 @@ public extension EntryModel {
 
             weekStart = try await database.setting(.weekStart)
 
-            startsWithAmount = try await database.setting(.entryStartsWithAmount)
-
             monthStartDay = try await database.setting(.monthStartDay)
 
             budgets = try await database.budgets()
 
             try await loadBalances()
-
-            if try await database.setting(.categoriesByUse) {
-                categoryUses = history?.categoryUses(through: Self.today)
-            }
 
             try await loadEntry()
 
@@ -917,20 +890,10 @@ private extension EntryModel {
     }
 
     func categories(for type: Entry.Kind) -> [EntryCategory] {
-        let categories: [EntryCategory] = switch type {
+        switch type {
         case .expense: options?.expenseCategories ?? []
         case .income: options?.incomeCategories ?? []
         case .transfer: []
-        }
-
-        guard let categoryUses else {
-            return categories
-        }
-
-        return categories.sorted { lhs, rhs in
-            let left = categoryUses[lhs.id, default: 0]
-            let right = categoryUses[rhs.id, default: 0]
-            return left == right ? lhs.sortOrder < rhs.sortOrder : left > right
         }
     }
 

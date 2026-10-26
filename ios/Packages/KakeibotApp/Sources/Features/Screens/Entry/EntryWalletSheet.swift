@@ -14,7 +14,7 @@ struct EntryWalletSheet: View {
     let role: Role
 
     var body: some View {
-        FittedSheet {
+        FittedSheet(anchor: scrollAnchor) {
             VStack(alignment: .leading, spacing: 20) {
                 HStack {
                     Text(title)
@@ -196,6 +196,10 @@ private extension EntryWalletSheet {
 
     var showsBills: Bool {
         role == .source && !model.billChoices.isEmpty
+    }
+
+    var scrollAnchor: UnitPoint? {
+        showsBills ? .bottom : nil
     }
 
     var billNote: String? {

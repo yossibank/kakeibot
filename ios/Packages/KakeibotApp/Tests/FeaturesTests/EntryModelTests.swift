@@ -22,20 +22,6 @@ struct EntryModelTests {
     }
 
     @Test
-    func opensKeypadFirstWhenChosen() async throws {
-        let setup = try await Setup()
-        let initial = EntryModel(database: setup.database, date: setup.date)
-        await initial.load()
-        try await setup.database.setSetting(.entryStartsWithAmount, to: true)
-        let model = EntryModel(database: setup.database, date: setup.date)
-
-        await model.load()
-
-        #expect(!initial.opensKeypadFirst)
-        #expect(model.opensKeypadFirst)
-    }
-
-    @Test
     func capsAmountAtNineDigits() async throws {
         let model = try await Self.newModel()
 
@@ -141,17 +127,15 @@ struct EntryModelTests {
     }
 
     @Test
-    func splitsCategoriesAddAndEditIntoPages() async throws {
+    func splitsCategoriesIntoPages() async throws {
         let model = try await Self.newModel()
 
         let expensePages = model.categoryPages
         model.select(.income)
         let incomePages = model.categoryPages
 
-        #expect(expensePages.map(\.count) == [14])
-        #expect(expensePages[0].suffix(2) == [.add, .edit])
-        #expect(incomePages.map(\.count) == [5])
-        #expect(incomePages[0].suffix(2) == [.add, .edit])
+        #expect(expensePages.map(\.count) == [12])
+        #expect(incomePages.map(\.count) == [3])
     }
 
     @Test
@@ -397,25 +381,6 @@ struct EntryModelTests {
         #expect(model.categoryId == category)
         #expect(model.walletId == wallet)
         #expect(!model.isChanged)
-    }
-
-    @Test
-    func ordersCategoriesByUseWhenChosen() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let third = options.expenseCategories[2]
-        let wallet = options.wallets[0]
-        try await setup.saveEntry(category: third.id, wallet: wallet.id, at: 1)
-        let manual = EntryModel(database: setup.database, date: setup.date)
-        await manual.load()
-        try await setup.database.setSetting(.categoriesByUse, to: true)
-        let model = EntryModel(database: setup.database, date: setup.date)
-
-        await model.load()
-
-        #expect(manual.categoryId == options.expenseCategories[0].id)
-        #expect(model.categoryId == third.id)
-        #expect(model.categoryPages.first?.first?.categoryId == third.id)
     }
 }
 
