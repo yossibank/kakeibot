@@ -333,7 +333,6 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |
 | home_sections | ホームに並べる順。`customize` `budget` `templates` `recent` `bills` `stamps` を `,` でつないだもの。空なら `customize` `budget` `templates` `recent` の順。無いものは後ろに足し、`bills` と `stamps` は隠す |
 | home_hidden_sections | ホームに出さないもの。書き方は home_sections と同じ。すべては隠さない。空なら home_sections にあるものをすべて出す |
-| category_menu_opened | `true` `false`。使っていない。キーの決まりのために残している |
 | records_layout | `calendar` `list`。空ならカレンダー |
 | review_scale | `week` `month` `year`。空なら月 |
 | review_kind | `expense` `income` `balance`。空なら支出 |

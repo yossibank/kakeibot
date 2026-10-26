@@ -310,17 +310,21 @@ public extension EntryModel {
             return "\(Self.destinationTitle)を選んでください"
         }
 
-        let amountText = AmountText.text(amount)
+        let action = type == .transfer ? "振り替える" : "記録する"
 
-        guard type != .transfer else {
-            return "\(amountText) を振り替える"
+        return "\(AmountText.text(amount)) を\(action)"
+    }
+
+    var saveSubject: String? {
+        guard
+            !isEditing,
+            amount > 0,
+            type != .transfer
+        else {
+            return nil
         }
 
-        guard let category = selectedCategory else {
-            return "\(amountText) を記録する"
-        }
-
-        return "\(category.name) \(amountText) を記録する"
+        return selectedCategory?.name
     }
 
     var isOverSourceBalance: Bool {

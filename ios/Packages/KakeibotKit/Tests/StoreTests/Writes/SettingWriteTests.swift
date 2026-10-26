@@ -177,16 +177,4 @@ struct SettingWriteTests {
         #expect(scale == .year)
         #expect(kind == .balance)
     }
-
-    @Test
-    func savesCategoryMenuOpened() async throws {
-        let database = try AppDatabase.inMemory()
-
-        let before = try await database.setting(.categoryMenuOpened)
-        try await database.setSetting(.categoryMenuOpened, to: true)
-        let after = try await database.setting(.categoryMenuOpened)
-
-        #expect(!before)
-        #expect(after)
-    }
 }

@@ -4,15 +4,18 @@ public struct PrimaryButton: View {
     @Environment(\.isEnabled) private var isEnabled
 
     let title: String
+    let subject: String?
     let detail: String?
     let action: () -> Void
 
     public init(
         _ title: String,
+        subject: String? = nil,
         detail: String? = nil,
         action: @escaping () -> Void
     ) {
         self.title = title
+        self.subject = subject
         self.detail = detail
         self.action = action
     }
@@ -20,8 +23,15 @@ public struct PrimaryButton: View {
     public var body: some View {
         Button(action: action) {
             VStack(spacing: 1) {
-                Text(title)
-                    .textFont(.body, weight: .bold)
+                HStack(spacing: 4) {
+                    if let subject {
+                        Text(subject)
+                    }
+
+                    Text(title)
+                        .layoutPriority(1)
+                }
+                .textFont(.body, weight: .bold)
 
                 if let detail {
                     Text(detail)
@@ -30,6 +40,7 @@ public struct PrimaryButton: View {
             }
             .lineLimit(1)
             .minimumScaleFactor(0.8)
+            .padding(.horizontal, 16)
             .foregroundStyle(textColor)
             .frame(maxWidth: .infinity, minHeight: 56)
             .background {
@@ -114,7 +125,7 @@ private extension PrimaryButton {
     VStack(spacing: 16) {
         PrimaryButton("¥12,800 を記録する") {}
 
-        PrimaryButton("食費 ¥1,280 を記録する", detail: "今日・財布から") {}
+        PrimaryButton("¥1,280 を記録する", subject: "食費", detail: "今日・財布から") {}
 
         PrimaryButton("金額を入れてください") {}
             .disabled(true)

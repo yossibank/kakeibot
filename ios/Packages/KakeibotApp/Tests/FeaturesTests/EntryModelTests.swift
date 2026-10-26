@@ -249,7 +249,8 @@ struct EntryModelTests {
         model.press(.digit(0))
 
         #expect(empty == "金額を入れてください")
-        #expect(model.saveTitle == "食費 ¥980 を記録する")
+        #expect(model.saveTitle == "¥980 を記録する")
+        #expect(model.saveSubject == "食費")
     }
 
     @Test

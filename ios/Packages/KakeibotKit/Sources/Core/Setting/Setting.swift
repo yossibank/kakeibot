@@ -31,7 +31,6 @@ public extension Setting {
         case templateOrder = "template_order"
         case homeSections = "home_sections"
         case homeHiddenSections = "home_hidden_sections"
-        case categoryMenuOpened = "category_menu_opened"
         case categoriesByUse = "categories_by_use"
         case recordsLayout = "records_layout"
         case reviewScale = "review_scale"

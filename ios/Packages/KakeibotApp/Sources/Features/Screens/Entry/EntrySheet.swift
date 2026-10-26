@@ -35,13 +35,13 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        GeometryReader { _ in
+        GeometryReader { proxy in
             ZStack(alignment: .top) {
                 content
                     .ignoresSafeArea(.keyboard)
 
                 if isEditingMemo {
-                    memoLayer
+                    memoLayer(height: proxy.size.height)
                 }
 
                 if let categoryMenu {
@@ -333,7 +333,11 @@ private extension EntrySheet {
 
     var saveButtons: some View {
         HStack(spacing: 8) {
-            PrimaryButton(model.saveTitle, detail: saveDetail) {
+            PrimaryButton(
+                model.saveTitle,
+                subject: model.saveSubject,
+                detail: saveDetail
+            ) {
                 Task {
                     await save()
                 }
@@ -364,7 +368,7 @@ private extension EntrySheet {
     }
 
     @ViewBuilder
-    var memoLayer: some View {
+    func memoLayer(height: CGFloat) -> some View {
         Palette.scrim
             .opacity(0.35)
             .ignoresSafeArea()
@@ -382,6 +386,7 @@ private extension EntrySheet {
             .padding(.horizontal, Self.memoCardInset)
             .padding(.bottom, Self.memoCardInset)
         }
+        .frame(height: height)
         .transition(Self.memoTransition)
     }
 
