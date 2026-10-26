@@ -1,5 +1,5 @@
 {
-  "description": "地の色に対して読みにくい色を出す。基準は decisions/look.md の「テーマの読みやすさ」にある。unreadable は accent・accentStrong・text・subtext・hint の順に並べる。色は #RRGGBB で書く。theme は、役割ごとの色を持つ。unreadable は、役割の名前を並べる。",
+  "description": "地の色に対して読みにくい色を出す。基準は decisions/themes.md の「テーマの読みやすさ」にある。unreadable は accent・accentStrong・text・subtext・hint の順に並べる。色は #RRGGBB で書く。theme は、役割ごとの色を持つ。unreadable は、役割の名前を並べる。",
   "cases": [
     {
       "summary": "暗いテーマはすべて読める",
