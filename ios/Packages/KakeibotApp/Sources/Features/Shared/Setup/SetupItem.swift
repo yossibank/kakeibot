@@ -12,6 +12,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
     case theme
     case appIcon
     case themeStyle
+    case homeSections
 
     public static let onboarding: [Self] = [
         .wallets,
@@ -48,6 +49,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .theme: "テーマ"
         case .appIcon: "アプリアイコン"
         case .themeStyle: "文字と角の丸み"
+        case .homeSections: "ホームに出すもの"
         }
     }
 
@@ -64,6 +66,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .theme: "paintpalette"
         case .appIcon: "app.badge"
         case .themeStyle: "textformat"
+        case .homeSections: "square.stack"
         }
     }
 
@@ -74,7 +77,14 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .recurrings: progress.hasRecurring
         case .reminder: progress.hasReminder
         case .theme: progress.hasTheme
-        case .categories, .templates, .launchScreen, .startsWithAmount, .appIcon, .themeStyle: false
+        case .categories,
+             .templates,
+             .launchScreen,
+             .startsWithAmount,
+             .appIcon,
+             .themeStyle,
+             .homeSections:
+            false
         }
     }
 }

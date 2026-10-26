@@ -8,7 +8,6 @@ import Store
 public final class SetupModel: ScreenModel {
     public private(set) var progress: SetupProgress?
     public private(set) var isCardClosed = true
-    public private(set) var isCustomizeCardClosed = true
     public private(set) var isEntryOpened = true
     public private(set) var isSettingsOpened = true
     public private(set) var launchScreen: LaunchScreen = .home
@@ -17,6 +16,8 @@ public final class SetupModel: ScreenModel {
     public private(set) var customThemes: [Theme] = []
 
     public internal(set) var errorNotice = ErrorNotice()
+
+    private var isCardClosedLoaded = false
 
     private let database: AppDatabase
 
@@ -34,12 +35,12 @@ public extension SetupModel {
         return SetupItem.home.filter { !$0.isDone(in: progress) }
     }
 
-    var showsCard: Bool {
-        !isCardClosed && !cardItems.isEmpty
+    var isLoaded: Bool {
+        progress != nil && isCardClosedLoaded
     }
 
-    var showsCustomizeCard: Bool {
-        !isCustomizeCardClosed
+    var showsCard: Bool {
+        !isCardClosed && !cardItems.isEmpty
     }
 
     var startsWithAmountTitle: String {
@@ -62,10 +63,6 @@ public extension SetupModel {
 
             group.addTask {
                 await self.observeCardClosed()
-            }
-
-            group.addTask {
-                await self.observeCustomizeCardClosed()
             }
 
             group.addTask {
@@ -118,11 +115,6 @@ public extension SetupModel {
         isCardClosed = true
         await save(.setupCardClosed, to: true)
     }
-
-    func closeCustomizeCard() async {
-        isCustomizeCardClosed = true
-        await save(.customizeCardClosed, to: true)
-    }
 }
 
 private extension SetupModel {
@@ -144,15 +136,7 @@ private extension SetupModel {
             failure: Self.loadFailedMessage
         ) { isClosed in
             isCardClosed = isClosed
-        }
-    }
-
-    func observeCustomizeCardClosed() async {
-        await observe(
-            database.settingUpdates(.customizeCardClosed),
-            failure: Self.loadFailedMessage
-        ) { isClosed in
-            isCustomizeCardClosed = isClosed
+            isCardClosedLoaded = true
         }
     }
 

@@ -229,6 +229,20 @@ public struct SettingsSheet: View {
                                 Hairline()
 
                                 NavigationLink {
+                                    HomeSectionsView(
+                                        model: HomeSectionsModel(database: database),
+                                        database: database
+                                    )
+                                } label: {
+                                    row(
+                                        "ホームに出すもの",
+                                        systemImage: "square.stack"
+                                    )
+                                }
+
+                                Hairline()
+
+                                NavigationLink {
                                     EntryStartView(
                                         model: EntryStartModel(
                                             database: database,

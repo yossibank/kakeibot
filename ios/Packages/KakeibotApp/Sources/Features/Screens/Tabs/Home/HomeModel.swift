@@ -17,8 +17,11 @@ public final class HomeModel: ScreenModel {
     public internal(set) var errorNotice = ErrorNotice()
 
     private var allTemplates: [EntryTemplate] = []
+    private var homeSections = HomeSection.standard
+    private var homeHiddenSections: Set<HomeSection> = []
     private var budgets: [Budget] = []
     private var recurrings: [Recurring] = []
+    private var stampCalendar: StampCalendar?
 
     private let database: AppDatabase
 
@@ -138,8 +141,34 @@ public extension HomeModel {
         return rows
     }
 
+    var homeLayout: HomeLayout {
+        HomeLayout(order: homeSections, hidden: homeHiddenSections)
+    }
+
+    var upcomingBills: [CardBill] {
+        guard let list else {
+            return []
+        }
+
+        return CardBill.upcoming(
+            recurrings: recurrings,
+            wallets: Array(list.wallets.values),
+            entries: list.days.flatMap(\.entries),
+            after: today
+        )
+    }
+
+    var upcomingBillTotal: Int {
+        upcomingBills.reduce(0) { $0 + $1.amount }
+    }
+
+    var stampTallies: [StampCalendar.Tally] {
+        stampCalendar?.tallies(in: period) ?? []
+    }
+
     func run() async {
         await loadTemplateOrder()
+        await loadHomeLayout()
 
         await withDiscardingTaskGroup { group in
             group.addTask {
@@ -160,6 +189,18 @@ public extension HomeModel {
 
             group.addTask {
                 await self.observeMonthStartDay()
+            }
+
+            group.addTask {
+                await self.observeHomeSections()
+            }
+
+            group.addTask {
+                await self.observeHomeHiddenSections()
+            }
+
+            group.addTask {
+                await self.observeStamps()
             }
         }
     }
@@ -188,6 +229,22 @@ public extension HomeModel {
             try await database.setSetting(.templateOrder, to: order)
         } catch {
             errorNotice.show(Self.orderSaveFailedMessage)
+        }
+    }
+
+    func hide(_ section: HomeSection) async {
+        var layout = homeLayout
+
+        layout.setHidden(section, true)
+
+        homeSections = layout.order
+        homeHiddenSections = layout.hidden
+
+        do {
+            try await database.setSetting(.homeSections, to: layout.order)
+            try await database.setSetting(.homeHiddenSections, to: layout.hidden)
+        } catch {
+            errorNotice.show(Self.layoutSaveFailedMessage)
         }
     }
 
@@ -274,6 +331,7 @@ private extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "記録できませんでした"
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
+    static let layoutSaveFailedMessage = "設定を保存できませんでした"
     static let recurringTitle = "固定費"
 
     func observe() async {
@@ -309,6 +367,42 @@ private extension HomeModel {
             failure: Self.loadFailedMessage
         ) { budgets in
             self.budgets = budgets
+        }
+    }
+
+    func loadHomeLayout() async {
+        do {
+            homeSections = try await database.setting(.homeSections)
+            homeHiddenSections = try await database.setting(.homeHiddenSections)
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
+    }
+
+    func observeHomeSections() async {
+        await observe(
+            database.settingUpdates(.homeSections),
+            failure: Self.loadFailedMessage
+        ) { sections in
+            homeSections = sections
+        }
+    }
+
+    func observeHomeHiddenSections() async {
+        await observe(
+            database.settingUpdates(.homeHiddenSections),
+            failure: Self.loadFailedMessage
+        ) { sections in
+            homeHiddenSections = sections
+        }
+    }
+
+    func observeStamps() async {
+        await observe(
+            database.stampCalendarUpdates(),
+            failure: Self.loadFailedMessage
+        ) { calendar in
+            stampCalendar = calendar
         }
     }
 

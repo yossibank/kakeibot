@@ -91,7 +91,6 @@ struct MainView: View {
                     model: home,
                     setup: setup,
                     appIcon: appIcon,
-                    isRevealed: isRevealed,
                     isSheetOpen: sheet != nil,
                     onOpenEntry: { id in
                         sheet = .edit(id)
@@ -121,6 +120,9 @@ struct MainView: View {
                     },
                     onOpenRecurrings: {
                         sheet = .periodRecurrings
+                    },
+                    onOpenRecurring: { id in
+                        sheet = .recurring(id)
                     },
                     onOpenSetup: { item in
                         sheet = .setup(item)
@@ -444,7 +446,10 @@ private extension MainView {
 
 private extension MainView {
     var isLoaded: Bool {
-        home.list != nil || home.errorNotice.message != nil
+        let isHomeLoaded = home.list != nil || home.errorNotice.message != nil
+        let isSetupLoaded = setup.isLoaded || setup.errorNotice.message != nil
+
+        return isHomeLoaded && isSetupLoaded
     }
 
     var templateOrderBinding: Binding<TemplateOrder> {
@@ -463,6 +468,13 @@ private extension MainView {
         guard route == nil else {
             return
         }
+
+        #if DEBUG
+        if let launchSheet = Sheet.launchArgument {
+            sheet = launchSheet
+            return
+        }
+        #endif
 
         switch screen {
         case .home: tab = .home
@@ -539,6 +551,29 @@ private extension MainView {
         }
     }
 }
+
+#if DEBUG
+private extension MainView.Sheet {
+    static var launchArgument: Self? {
+        let arguments = ProcessInfo.processInfo.arguments
+
+        guard
+            let index = arguments.firstIndex(of: "-open"),
+            arguments.indices.contains(index + 1)
+        else {
+            return nil
+        }
+
+        let name = arguments[index + 1]
+
+        guard name != "settings" else {
+            return .settings
+        }
+
+        return SetupItem(rawValue: name).map { .setup($0) }
+    }
+}
+#endif
 
 private extension View {
     func tabContent() -> some View {

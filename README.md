@@ -53,6 +53,12 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | Swift の整形 | `make format` |
 | ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
 
+DEBUG のビルドは、起動の引数 `-open` で設定の画面を直接開く。`settings` なら設定のシートを、`SetupItem` の名前（`homeSections` など）ならその画面を開く。
+
+```sh
+xcrun simctl launch booted com.yossibank.kakeibot -open homeSections
+```
+
 ## 出典
 
 アプリに同梱するフォントは、どれも [SIL Open Font License 1.1](https://openfontlicense.org/) で配られている。使う文字だけに絞って入れ、ライセンスの文を `ios/Kakeibot/Fonts` に置く。
