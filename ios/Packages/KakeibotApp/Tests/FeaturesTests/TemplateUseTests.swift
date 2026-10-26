@@ -171,7 +171,7 @@ struct TemplateUseTests {
     @Test
     func ordersTemplatesAndRemembersTheOrder() async throws {
         let setup = try await Setup()
-        try await setup.saveTemplate(name: "ハンドソープ", amount: 400)
+        try await setup.saveTemplate(name: "洗剤", amount: 400)
         try await setup.saveTemplate(name: "ティッシュ", amount: 900)
         let options = try await setup.database.entryOptions()
 
@@ -215,10 +215,10 @@ struct TemplateUseTests {
 
         await reopened.loadTemplateOrder()
 
-        #expect(manual == ["ハンドソープ", "ティッシュ", "駅前のカフェでモーニング"])
-        #expect(category == ["駅前のカフェでモーニング", "ハンドソープ", "ティッシュ"])
-        #expect(amount == ["ティッシュ", "駅前のカフェでモーニング", "ハンドソープ"])
-        #expect(name == ["ティッシュ", "ハンドソープ", "駅前のカフェでモーニング"])
+        #expect(manual == ["洗剤", "ティッシュ", "駅前のカフェでモーニング"])
+        #expect(category == ["駅前のカフェでモーニング", "洗剤", "ティッシュ"])
+        #expect(amount == ["ティッシュ", "駅前のカフェでモーニング", "洗剤"])
+        #expect(name == ["ティッシュ", "駅前のカフェでモーニング", "洗剤"])
         #expect(reopened.templateOrder == .name)
     }
 
