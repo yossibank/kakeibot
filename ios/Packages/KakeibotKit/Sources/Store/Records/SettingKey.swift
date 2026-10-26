@@ -172,6 +172,17 @@ public extension SettingKey where Value == Entry.ID? {
     }
 }
 
+public extension SettingKey where Value == EntryCategory.ID? {
+    static var feeCategory: Self {
+        Self(
+            .feeCategoryId,
+            default: nil,
+            decode: { EntryCategory.ID($0) },
+            encode: { $0?.description }
+        )
+    }
+}
+
 public extension SettingKey where Value == Bool {
     static var onboardingCompleted: Self {
         Self(flag: .onboardingCompleted)

@@ -5,22 +5,25 @@ public struct EntryChange: Hashable, Sendable {
     public let kind: Kind
     public let entry: Entry
     public let label: String
+    public let fee: Entry?
 
     public init(
         kind: Kind,
         entry: Entry,
-        label: String
+        label: String,
+        fee: Entry? = nil
     ) {
         self.kind = kind
         self.entry = entry
         self.label = label
+        self.fee = fee
     }
 }
 
 public extension EntryChange {
     enum Kind: Hashable, Sendable {
         case recorded
-        case edited(previous: Entry)
+        case edited(previous: Entry, previousFee: Entry?)
         case deleted
     }
 

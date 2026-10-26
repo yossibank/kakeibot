@@ -178,9 +178,12 @@ emoji・text・glyph のどれかは必須。
 | recurring_id | TEXT | 固定費から作った記録 |
 | recurring_date | TEXT | どの回の分か |
 | bill_month | TEXT | カードの引き落としの月（`2026-11`）。空なら締め日で決める |
+| transfer_id | TEXT | 振替の手数料だけ。元の振替の entry。重複禁止。振替を消すと一緒に消える |
 | created_at / updated_at | TEXT | |
 
 `recurring_id` と `recurring_date` は、そろって入るか、どちらも空にする。`(recurring_id, recurring_date)` は重複禁止。支出を記録した日の `no_spend_day` は消す。
+
+振替の手数料は、振替と別の支出の記録にする。日付と財布は振替に合わせ、財布は振替元にする。カテゴリは `fee_category_id` の設定のカテゴリにし、無ければ「手数料」を作る。手数料を 0 にすると記録を消す。
 
 ### template
 
@@ -340,6 +343,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | closed_hidden_lists | 非表示の項目をたたんだ設定の画面。書き方は closed_hints と同じ。空ならすべて開く |
 | recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで |
 | widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。取り消すと消す |
+| fee_category_id | 振替の手数料に付ける category の id |
 
 列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
 

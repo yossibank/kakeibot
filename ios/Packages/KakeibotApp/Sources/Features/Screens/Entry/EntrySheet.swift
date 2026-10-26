@@ -137,6 +137,9 @@ private extension EntrySheet {
                     onWallet: {
                         open(.wallet(.source))
                     },
+                    onFee: {
+                        enterFee()
+                    },
                     onDate: {
                         open(.date)
                     },
@@ -268,7 +271,7 @@ private extension EntrySheet {
 
     var dial: some View {
         Button {
-            setEnteringAmount(!isEnteringAmount)
+            tapDial()
         } label: {
             EntryDialFace(model: model)
         }
@@ -310,18 +313,22 @@ private extension EntrySheet {
 
     var keypadDrawer: some View {
         VStack(spacing: 12) {
-            EntryTemplateRow(
-                model: model,
-                isCompact: true,
-                onUse: { template in
-                    useTemplate(template)
-                },
-                onAdd: {
-                    open(.newTemplate)
-                }
-            )
+            if model.keypadTarget == .fee {
+                EntryFeeRow(model: model)
+            } else {
+                EntryTemplateRow(
+                    model: model,
+                    isCompact: true,
+                    onUse: { template in
+                        useTemplate(template)
+                    },
+                    onAdd: {
+                        open(.newTemplate)
+                    }
+                )
+            }
 
-            Keypad(calculator: model.calculator) {
+            Keypad(calculator: model.activeCalculator) {
                 setEnteringAmount(false)
             } onKey: { key in
                 model.press(key)
@@ -768,7 +775,30 @@ private extension EntrySheet {
     func setEnteringAmount(_ isEntering: Bool) {
         withAnimation(.snappy) {
             isEnteringAmount = isEntering
+
+            if !isEntering {
+                model.enter(.amount)
+            }
         }
+    }
+
+    func tapDial() {
+        guard model.keypadTarget == .fee else {
+            setEnteringAmount(!isEnteringAmount)
+            return
+        }
+
+        withAnimation(.snappy) {
+            model.enter(.amount)
+        }
+    }
+
+    func enterFee() {
+        withAnimation(.snappy) {
+            model.enter(.fee)
+        }
+
+        setEnteringAmount(true)
     }
 
     func load() async {

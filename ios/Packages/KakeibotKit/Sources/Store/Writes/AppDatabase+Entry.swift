@@ -30,24 +30,33 @@ public extension AppDatabase {
         }
     }
 
-    func restoreEntry(_ entry: Entry) async throws {
-        try await restoreEntries([entry])
+    func fee(of id: Entry.ID) async throws -> Entry? {
+        try await writer.read { db in
+            try Self.fee(of: id, in: db)
+        }
+    }
+
+    func restoreEntry(
+        _ entry: Entry,
+        fee: Entry? = nil
+    ) async throws {
+        try await writer.write { db in
+            try Self.restore([entry], in: db)
+
+            _ = try Entry
+                .filter(Column("transfer_id") == entry.id)
+                .filter(Column("id") != fee?.id)
+                .deleteAll(db)
+
+            if let fee {
+                try Self.restore([fee], in: db)
+            }
+        }
     }
 
     func restoreEntries(_ entries: [Entry]) async throws {
         try await writer.write { db in
-            for var entry in entries {
-                if let templateId = entry.templateId,
-                   try !EntryTemplate.exists(db, key: templateId) {
-                    entry.templateId = nil
-                }
-
-                try entry.save(db)
-
-                if entry.type == .expense {
-                    try NoSpendDay.deleteOne(db, key: entry.date)
-                }
-            }
+            try Self.restore(entries, in: db)
         }
     }
 
@@ -61,9 +70,14 @@ public extension AppDatabase {
         try await writer.write { db in
             let entries = try Entry.fetchAll(db, keys: ids)
 
+            let fees = try Entry
+                .filter(ids.contains(Column("transfer_id")))
+                .filter(!ids.contains(Column("id")))
+                .fetchAll(db)
+
             _ = try Entry.deleteAll(db, keys: ids)
 
-            return entries
+            return entries + fees
         }
     }
 
@@ -131,11 +145,85 @@ extension AppDatabase {
             try NoSpendDay.deleteOne(db, key: entry.date)
         }
 
+        try saveFee(draft.fee, for: entry, in: db, at: now)
+
         return entry
+    }
+
+    static func fee(
+        of id: Entry.ID,
+        in db: Database
+    ) throws -> Entry? {
+        try Entry
+            .filter(Column("transfer_id") == id)
+            .fetchOne(db)
     }
 }
 
 private extension AppDatabase {
+    static func restore(
+        _ entries: [Entry],
+        in db: Database
+    ) throws {
+        let ordered = entries.filter { $0.transferId == nil }
+            + entries.filter { $0.transferId != nil }
+
+        for var entry in ordered {
+            if let templateId = entry.templateId,
+               try !EntryTemplate.exists(db, key: templateId) {
+                entry.templateId = nil
+            }
+
+            if let transferId = entry.transferId,
+               try !Entry.exists(db, key: transferId) {
+                entry.transferId = nil
+            }
+
+            try entry.save(db)
+
+            if entry.type == .expense {
+                try NoSpendDay.deleteOne(db, key: entry.date)
+            }
+        }
+    }
+
+    static func saveFee(
+        _ amount: Int,
+        for transfer: Entry,
+        in db: Database,
+        at now: Date
+    ) throws {
+        let existing = try fee(of: transfer.id, in: db)
+
+        guard
+            transfer.type == .transfer,
+            amount > 0
+        else {
+            try existing?.delete(db)
+            return
+        }
+
+        var fee = try existing ?? Entry(
+            type: .expense,
+            amount: amount,
+            date: transfer.date,
+            categoryId: feeCategoryId(in: db, at: now),
+            walletId: transfer.walletId,
+            transferId: transfer.id,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        fee.amount = amount
+        fee.date = transfer.date
+        fee.walletId = transfer.walletId
+        fee.billMonth = nil
+        fee.updatedAt = now
+
+        try fee.save(db)
+        try NoSpendDay.deleteOne(db, key: fee.date)
+    }
+
     static func canChange(
         _ entry: Entry,
         to change: EntryBatchChange,

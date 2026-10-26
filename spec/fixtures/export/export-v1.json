@@ -160,6 +160,7 @@
         "recurringId": "40000000-0000-4000-8000-000000000001",
         "recurringDate": "2026-09-27",
         "billMonth": "2026-11",
+        "transferId": null,
         "createdAt": "2026-09-27T00:00:00Z",
         "updatedAt": "2026-09-27T00:00:00Z"
       },
@@ -177,6 +178,7 @@
         "recurringId": null,
         "recurringDate": null,
         "billMonth": null,
+        "transferId": null,
         "createdAt": "2026-09-25T01:00:00Z",
         "updatedAt": "2026-09-25T01:00:00Z"
       },
@@ -194,6 +196,7 @@
         "recurringId": null,
         "recurringDate": null,
         "billMonth": null,
+        "transferId": null,
         "createdAt": "2026-09-28T03:00:00Z",
         "updatedAt": "2026-09-28T03:00:00Z"
       },
@@ -211,8 +214,27 @@
         "recurringId": null,
         "recurringDate": null,
         "billMonth": null,
+        "transferId": null,
         "createdAt": "2026-10-01T10:00:00Z",
         "updatedAt": "2026-10-01T10:00:00Z"
+      },
+      {
+        "id": "50000000-0000-4000-8000-000000000005",
+        "type": "expense",
+        "amount": 110,
+        "date": "2026-09-28",
+        "categoryId": "30000000-0000-4000-8000-000000000001",
+        "tagId": null,
+        "templateId": null,
+        "walletId": "20000000-0000-4000-8000-000000000002",
+        "toWalletId": null,
+        "memo": null,
+        "recurringId": null,
+        "recurringDate": null,
+        "billMonth": null,
+        "transferId": "50000000-0000-4000-8000-000000000003",
+        "createdAt": "2026-09-28T03:00:00Z",
+        "updatedAt": "2026-09-28T03:00:00Z"
       }
     ],
     "templates": [

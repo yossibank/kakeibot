@@ -13,7 +13,12 @@ struct EntryDialFace: View {
 
             VStack(spacing: 2) {
                 HStack(spacing: 6) {
-                    if model.type == .transfer, let route = model.routeText {
+                    if isEnteringFee {
+                        Image(systemName: "yensign.circle")
+                            .sansFont(.caption, weight: .semibold)
+
+                        Text("手数料")
+                    } else if model.type == .transfer, let route = model.routeText {
                         Image(systemName: "arrow.left.arrow.right")
                             .sansFont(.caption, weight: .semibold)
 
@@ -30,7 +35,7 @@ struct EntryDialFace: View {
                 .foregroundStyle(Palette.accentStrong)
                 .frame(maxWidth: Self.width * 0.7, minHeight: 20)
 
-                Text(AmountText.text(model.amount))
+                Text(AmountText.text(shownAmount))
                     .font(amountFont)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
@@ -65,14 +70,31 @@ private extension EntryDialFace {
         model.budgetUsage
     }
 
+    var isEnteringFee: Bool {
+        model.keypadTarget == .fee
+    }
+
+    var shownAmount: Int {
+        isEnteringFee ? model.fee : model.amount
+    }
+
     var amountFont: Font {
-        let size: CGFloat = model.amount < 100_000 ? 40 : 28
+        let size: CGFloat = shownAmount < 100_000 ? 40 : 28
         return .display(size: size, weight: .semibold, in: themeFont)
     }
 
     var note: String? {
         if let expression = model.expressionText {
             return expression
+        }
+
+        if isEnteringFee {
+            return "振替 \(AmountText.text(model.amount))"
+        }
+
+        if model.type == .transfer, model.fee > 0 {
+            let fee = "手数料 \(AmountText.text(model.fee))"
+            return [fee, model.sourceBalanceText].compactMap(\.self).joined(separator: "・")
         }
 
         if model.type == .transfer {

@@ -15,6 +15,7 @@ public struct Entry: Hashable, Sendable {
     public var recurringId: Recurring.ID?
     public var recurringDate: LocalDate?
     public var billMonth: YearMonth?
+    public var transferId: Entry.ID?
     public var createdAt: Date
     public var updatedAt: Date
 
@@ -32,6 +33,7 @@ public struct Entry: Hashable, Sendable {
         recurringId: Recurring.ID? = nil,
         recurringDate: LocalDate? = nil,
         billMonth: YearMonth? = nil,
+        transferId: Entry.ID? = nil,
         createdAt: Date,
         updatedAt: Date
     ) {
@@ -48,6 +50,7 @@ public struct Entry: Hashable, Sendable {
         self.recurringId = recurringId
         self.recurringDate = recurringDate
         self.billMonth = billMonth
+        self.transferId = transferId
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -82,6 +85,7 @@ extension Entry: Codable {
         try container.encodeOrNull(recurringId, forKey: .recurringId)
         try container.encodeOrNull(recurringDate, forKey: .recurringDate)
         try container.encodeOrNull(billMonth, forKey: .billMonth)
+        try container.encodeOrNull(transferId, forKey: .transferId)
         try container.encode(createdAt, forKey: .createdAt)
         try container.encode(updatedAt, forKey: .updatedAt)
     }
