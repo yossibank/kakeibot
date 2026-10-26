@@ -71,8 +71,12 @@ private extension EntryTransferPanel {
                         Grid(horizontalSpacing: 8, verticalSpacing: 2) {
                             balanceLine(current)
 
-                            balanceLine(after ?? current)
-                                .opacity(after == nil ? 0 : 1)
+                            if let after {
+                                balanceLine(after)
+                            } else if !isOver {
+                                balanceLine(current)
+                                    .opacity(0)
+                            }
                         }
                         .textFont(.caption2)
                         .lineLimit(1)
