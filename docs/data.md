@@ -117,6 +117,7 @@ emoji・text・glyph のどれかは必須。
 | kind | TEXT | `cash` `bank` `card` `emoney` `point` `other` `investment` `loan` |
 | icon_id | TEXT | |
 | initial_balance | INTEGER | カードはマイナスでもよい |
+| loan_amount | INTEGER | 借入の口座で最初に借りた額。ほかは NULL |
 | sort_order | INTEGER | |
 | archived_at | TEXT | |
 | created_at / updated_at | TEXT | |

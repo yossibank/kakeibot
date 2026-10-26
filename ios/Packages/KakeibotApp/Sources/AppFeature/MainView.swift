@@ -369,6 +369,7 @@ private extension MainView {
                     appIcon: appIcon
                 )
                 .toolbar(.hidden, for: .navigationBar)
+                .environment(\.isSettingsSheetRoot, true)
             }
         case .reward:
             RecordsRewardSheet(model: records, date: today)

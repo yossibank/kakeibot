@@ -37,6 +37,38 @@ struct WalletDraftTests {
         #expect(wallet.sortOrder == 4)
     }
 
+    @Test(arguments: [
+        (Wallet.Kind.loan, 300_000, Int?.some(300_000)),
+        (Wallet.Kind.loan, 0, nil),
+        (Wallet.Kind.bank, 300_000, nil)
+    ])
+    func keepsLoanAmountOnlyForLoans(
+        kind: Wallet.Kind,
+        amount: Int,
+        expected: Int?
+    ) throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+
+        let draft = WalletDraft(
+            kind: kind,
+            name: "奨学金",
+            mark: .text("奨"),
+            color: "#BF4040",
+            initialBalance: -240_000,
+            loanAmount: amount
+        )
+
+        let icon = try draft.newIcon(at: now)
+
+        let wallet = try draft.newWallet(
+            iconId: icon.id,
+            sortOrder: 0,
+            at: now
+        )
+
+        #expect(wallet.loanAmount == expected)
+    }
+
     @Test
     func keepsIdentityWhenApplied() throws {
         let created = Date(timeIntervalSince1970: 1_790_000_000)

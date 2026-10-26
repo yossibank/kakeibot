@@ -36,6 +36,7 @@ extension SettingsRowList {
         let systemImage: String
         let title: String
         let value: String
+        let detail: String?
         let isEmpty: Bool
         let isAmount: Bool
 
@@ -44,6 +45,7 @@ extension SettingsRowList {
             systemImage: String,
             title: String,
             value: String,
+            detail: String? = nil,
             isEmpty: Bool,
             isAmount: Bool = false
         ) {
@@ -51,6 +53,7 @@ extension SettingsRowList {
             self.systemImage = systemImage
             self.title = title
             self.value = value
+            self.detail = detail
             self.isEmpty = isEmpty
             self.isAmount = isAmount
         }
@@ -74,34 +77,47 @@ private extension SettingsRowList {
         return Button {
             onOpen(item.panel)
         } label: {
-            HStack(spacing: 12) {
-                Image(systemName: item.systemImage)
-                    .sansFont(.small)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 28, height: 28)
-                    .background(Palette.accent.opacity(.subtle), in: Circle())
+            VStack(alignment: .trailing, spacing: 2) {
+                HStack(spacing: 12) {
+                    Image(systemName: item.systemImage)
+                        .sansFont(.small)
+                        .foregroundStyle(Palette.accent)
+                        .frame(width: 28, height: 28)
+                        .background(Palette.accent.opacity(.subtle), in: Circle())
 
-                Text(item.title)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.subtext)
+                    Text(item.title)
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.subtext)
 
-                Spacer(minLength: 12)
+                    Spacer(minLength: 12)
 
-                Text(item.value)
-                    .font(font)
-                    .foregroundStyle(color)
-                    .lineLimit(1)
+                    Text(item.value)
+                        .font(font)
+                        .foregroundStyle(color)
+                        .lineLimit(1)
 
-                if item.isAmount {
-                    EditBadge(size: 16)
-                } else {
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundStyle(Palette.accent.opacity(.medium))
+                    if item.isAmount {
+                        EditBadge(size: Self.markWidth)
+                    } else {
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundStyle(Palette.accent.opacity(.medium))
+                    }
+                }
+
+                if let detail = item.detail {
+                    Text(detail)
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accent)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .padding(.trailing, Self.markWidth + 12)
                 }
             }
             .padding(.horizontal, 16)
-            .frame(height: 56)
+            .padding(.vertical, 10)
+            .frame(minHeight: 56)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -109,6 +125,10 @@ private extension SettingsRowList {
 }
 
 private extension SettingsRowList {
+    static var markWidth: CGFloat {
+        16
+    }
+
     static var cardFill: LinearGradient {
         LinearGradient(
             colors: [Palette.cardTop, Palette.cardBottom],

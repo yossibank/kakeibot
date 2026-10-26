@@ -50,6 +50,7 @@
         "kind": "cash",
         "iconId": "10000000-0000-4000-8000-000000000001",
         "initialBalance": 1000,
+        "loanAmount": null,
         "sortOrder": 0,
         "archivedAt": null,
         "createdAt": "2026-01-01T00:00:00Z",
@@ -61,6 +62,7 @@
         "kind": "bank",
         "iconId": "10000000-0000-4000-8000-000000000002",
         "initialBalance": 50000,
+        "loanAmount": null,
         "sortOrder": 1,
         "archivedAt": null,
         "createdAt": "2026-01-01T00:00:00Z",
@@ -72,10 +74,23 @@
         "kind": "card",
         "iconId": "10000000-0000-4000-8000-000000000001",
         "initialBalance": -5000,
+        "loanAmount": null,
         "sortOrder": 2,
         "archivedAt": "2026-09-30T15:00:00Z",
         "createdAt": "2026-01-01T00:00:00Z",
         "updatedAt": "2026-09-30T15:00:00Z"
+      },
+      {
+        "id": "20000000-0000-4000-8000-000000000004",
+        "name": "奨学金",
+        "kind": "loan",
+        "iconId": "10000000-0000-4000-8000-000000000002",
+        "initialBalance": -240000,
+        "loanAmount": 300000,
+        "sortOrder": 3,
+        "archivedAt": null,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z"
       }
     ],
     "valuations": [

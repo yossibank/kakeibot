@@ -119,6 +119,7 @@ extension RecordTests {
         let shelfIcon: ShelfIcon
         let cash: Wallet
         let bank: Wallet
+        let loan: Wallet
         let category: EntryCategory
         let recurring: Recurring
         let expense: Entry
@@ -229,7 +230,7 @@ extension RecordTests.Sample {
         RecordTests.Tables(
             icons: [icon],
             shelfIcons: [shelfIcon],
-            wallets: [cash, bank],
+            wallets: [cash, bank, loan],
             categories: [category],
             recurrings: [recurring],
             entries: [expense, transfer],
@@ -283,6 +284,17 @@ extension RecordTests.Sample {
             iconId: icon.id,
             initialBalance: 50000,
             sortOrder: 1,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let loan = Wallet(
+            name: "奨学金",
+            kind: .loan,
+            iconId: icon.id,
+            initialBalance: -240_000,
+            loanAmount: 300_000,
+            sortOrder: 2,
             createdAt: now,
             updatedAt: now
         )
@@ -412,6 +424,7 @@ extension RecordTests.Sample {
             shelfIcon: shelfIcon,
             cash: cash,
             bank: bank,
+            loan: loan,
             category: category,
             recurring: recurring,
             expense: expense,
@@ -434,6 +447,7 @@ extension RecordTests.Sample {
             shelfIcon,
             cash,
             bank,
+            loan,
             category,
             recurring,
             expense,

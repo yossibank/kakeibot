@@ -71,6 +71,17 @@ struct ExportV1Tests {
     }
 
     @Test
+    func readsWalletsWithoutLoanAmount() throws {
+        let json = try Self.fixtureWithoutLoanAmount()
+
+        let export = try ExportV1(json: json)
+        let amounts = export.data.wallets.map(\.loanAmount)
+
+        #expect(!amounts.isEmpty)
+        #expect(amounts.allSatisfy { $0 == nil })
+    }
+
+    @Test
     func readsEntriesWithoutBillMonth() throws {
         let json = try Self.fixtureWithoutBillMonth()
 
@@ -184,6 +195,17 @@ private extension ExportV1Tests {
         let rows = try #require(tables["recurrings"] as? [[String: Any]])
         let key = "holidayShift"
         tables["recurrings"] = rows.map { $0.filter { $0.key != key } }
+        object["data"] = tables
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixtureWithoutLoanAmount() throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+        let rows = try #require(tables["wallets"] as? [[String: Any]])
+        tables["wallets"] = rows.map { $0.filter { $0.key != "loanAmount" } }
         object["data"] = tables
         return try JSONSerialization.data(withJSONObject: object)
     }

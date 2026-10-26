@@ -18,6 +18,7 @@ public final class WalletEditModel {
 
     public private(set) var calculator = AmountCalculator()
     public private(set) var valuation = AmountCalculator()
+    public private(set) var loanAmount = AmountCalculator()
     public private(set) var balance = 0
     public private(set) var valuations: [Valuation] = []
     public private(set) var isHidden = false
@@ -64,7 +65,8 @@ public extension WalletEditModel {
             name: name,
             mark: icon.mark,
             color: icon.color,
-            initialBalance: initialBalance
+            initialBalance: initialBalance,
+            loanAmount: loanAmount.amount > 0 ? loanAmount.amount : nil
         )
     }
 
@@ -85,6 +87,28 @@ public extension WalletEditModel {
 
     var showsValuation: Bool {
         isEditing && kind == .investment
+    }
+
+    var showsLoanAmount: Bool {
+        kind == .loan
+    }
+
+    var loanAmountText: String {
+        loanAmount.amount > 0 ? AmountText.text(loanAmount.amount) : "未入力"
+    }
+
+    var repaidText: String? {
+        let borrowed = loanAmount.amount
+
+        guard borrowed > 0 else {
+            return nil
+        }
+
+        let remaining = max(-(isEditing ? balance : initialBalance), 0)
+        let repaid = min(max(borrowed - remaining, 0), borrowed)
+        let percent = repaid * 100 / borrowed
+
+        return "\(AmountText.text(repaid)) 返済済み（\(percent)%）"
     }
 
     var paymentTitle: String {
@@ -146,6 +170,10 @@ public extension WalletEditModel {
 
     func pressValuation(_ key: AmountCalculator.Key) {
         valuation.press(key)
+    }
+
+    func pressLoanAmount(_ key: AmountCalculator.Key) {
+        loanAmount.press(key)
     }
 
     func startValuation() {
@@ -354,5 +382,6 @@ private extension WalletEditModel {
 
         isNegative = draft.initialBalance < 0
         calculator = AmountCalculator(amount: abs(draft.initialBalance))
+        loanAmount = AmountCalculator(amount: draft.loanAmount ?? 0)
     }
 }

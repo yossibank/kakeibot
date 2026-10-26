@@ -137,6 +137,14 @@ private extension ReviewView {
 
             detailCard
 
+            if model.kind == .balance {
+                let moves = model.moves
+
+                if !moves.isEmpty {
+                    moveCard(moves)
+                }
+            }
+
             if model.kind != .balance {
                 ReviewSharesCard(
                     title: "カテゴリごと",
@@ -225,6 +233,26 @@ private extension ReviewView {
                 .buttonStyle(.plain)
             }
 
+            if model.kind == .expense,
+               !model.moves.isEmpty {
+                Button {
+                    select(.balance)
+                } label: {
+                    HStack(spacing: 4) {
+                        Label(moveText, systemImage: "arrow.right")
+
+                        Image(systemName: "chevron.right")
+                            .sansFont(.micro, weight: .semibold)
+                    }
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .frame(minHeight: 28)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            }
+
             if model.kind == .balance {
                 VStack(spacing: 12) {
                     balanceBar(
@@ -263,6 +291,128 @@ private extension ReviewView {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
+    }
+
+    func moveCard(_ moves: [ReviewModel.Move]) -> some View {
+        let total = ReviewModel.total(of: moves)
+        let ratio = model.repaymentRatio(in: moves)
+
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "arrow.left.arrow.right")
+                    .sansFont(.small, weight: .semibold)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 26, height: 26)
+                    .background(Palette.accent.opacity(.subtle), in: Circle())
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("返済と積立")
+                        .textFont(.subheadline, weight: .semibold)
+                        .foregroundStyle(Palette.text)
+
+                    Text("支出には数えていません")
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.hint)
+                }
+
+                Spacer(minLength: 8)
+
+                Text(AmountText.text(total))
+                    .displayFont(.headline)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+            }
+
+            VStack(spacing: 8) {
+                SplitBar(
+                    ratio,
+                    leading: Palette.accent,
+                    trailing: Palette.accent.opacity(.medium)
+                )
+
+                HStack {
+                    moveLegend("返済", ratio: ratio, color: Palette.accent)
+
+                    Spacer()
+
+                    moveLegend(
+                        "積立",
+                        ratio: 1 - ratio,
+                        color: Palette.accent.opacity(.medium)
+                    )
+                }
+            }
+
+            VStack(spacing: 0) {
+                ForEach(moves) { move in
+                    Button {
+                        openShare = model.share(of: move)
+                    } label: {
+                        moveRow(move)
+                    }
+                    .buttonStyle(.plain)
+                    .overlay(alignment: .top) {
+                        Hairline(thickness: 1)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
+    }
+
+    func moveLegend(
+        _ title: String,
+        ratio: Double,
+        color: Color
+    ) -> some View {
+        let percent = Int((ratio * 100).rounded())
+
+        return HStack(spacing: 4) {
+            Circle()
+                .fill(color)
+                .frame(width: 8, height: 8)
+
+            Text("\(title) \(percent)%")
+                .textFont(.caption2)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+        }
+    }
+
+    func moveRow(_ move: ReviewModel.Move) -> some View {
+        HStack(spacing: 12) {
+            IconBadge(move.icon, size: 32)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(move.wallet.name)
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+
+                Text(Self.moveNote(of: move))
+                    .textFont(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 8)
+
+            Text(AmountText.text(move.amount))
+                .textFont(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundStyle(Palette.hint)
+        }
+        .padding(.vertical, 8)
+        .contentShape(.rect)
     }
 
     func periodButton(
@@ -313,11 +463,7 @@ private extension ReviewView {
         let change = model.change(of: kind)
 
         return Button {
-            model.setKind(kind)
-
-            Task {
-                await model.saveSelection()
-            }
+            select(kind)
         } label: {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
@@ -415,6 +561,11 @@ private extension ReviewView {
         Self.changeColor(model.change, of: model.kind)
     }
 
+    var moveText: String {
+        let total = ReviewModel.total(of: model.moves)
+        return "ほかに返済と積立 \(AmountText.text(total))"
+    }
+
     var comparisonText: String {
         let previous = Self.previousName(of: model.scale)
         let change = model.change
@@ -460,6 +611,24 @@ private extension ReviewView {
         }
     }
 
+    static func moveNote(of move: ReviewModel.Move) -> String {
+        let balance = AmountText.text(abs(move.balance))
+
+        guard move.wallet.kind == .loan else {
+            return "評価額 \(balance)"
+        }
+
+        guard move.balance < 0 else {
+            return "返し終わりました"
+        }
+
+        guard let payoff = move.payoff else {
+            return "残り \(balance)"
+        }
+
+        return "残り \(balance)・あと \(payoff.count) 回"
+    }
+
     static func previousName(of scale: ReviewPeriod.Scale) -> String {
         switch scale {
         case .week: "前の週"
@@ -499,6 +668,14 @@ private extension ReviewView {
         }
 
         openShare = nil
+    }
+
+    func select(_ kind: ReviewKind) {
+        model.setKind(kind)
+
+        Task {
+            await model.saveSelection()
+        }
     }
 
     func openPendingDay() {

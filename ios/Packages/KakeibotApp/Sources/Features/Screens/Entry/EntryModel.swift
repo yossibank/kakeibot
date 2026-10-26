@@ -96,6 +96,11 @@ public extension EntryModel {
         public let wallets: [Wallet]
     }
 
+    struct BalanceLine: Equatable {
+        public let title: String
+        public let amount: Int
+    }
+
     struct BillChoice: Identifiable, Hashable {
         public let date: LocalDate
         public let title: String
@@ -269,7 +274,10 @@ public extension EntryModel {
     }
 
     var isOverSourceBalance: Bool {
-        guard type == .transfer else {
+        guard
+            type == .transfer,
+            amount > 0
+        else {
             return false
         }
 
@@ -292,28 +300,6 @@ public extension EntryModel {
         }
 
         return -balance
-    }
-
-    var destinationNote: String? {
-        guard
-            type == .transfer,
-            amount > 0,
-            let wallet = wallet(toWalletId),
-            let balance = balance(of: wallet)
-        else {
-            return nil
-        }
-
-        let after = balance + amount
-
-        switch wallet.kind.role {
-        case .loan:
-            return "返したあと \(AmountText.text(max(-after, 0)))"
-        case .investment:
-            return "積み立てたあと \(AmountText.text(after))"
-        case .onHand, .card:
-            return nil
-        }
     }
 
     static func dateText(
@@ -358,6 +344,40 @@ public extension EntryModel {
         case .loan: return "残り \(AmountText.text(max(-balance, 0)))"
         case .investment: return "評価額 \(AmountText.text(balance))"
         case .onHand, .card: return "残高 \(AmountText.text(balance))"
+        }
+    }
+
+    func currentLine(of wallet: Wallet) -> BalanceLine? {
+        guard let balance = balance(of: wallet) else {
+            return nil
+        }
+
+        switch wallet.kind.role {
+        case .loan: return BalanceLine(title: "今の残り", amount: max(-balance, 0))
+        case .investment: return BalanceLine(title: "今の評価額", amount: balance)
+        case .onHand, .card: return BalanceLine(title: "残高", amount: balance)
+        }
+    }
+
+    func afterLine(
+        of wallet: Wallet,
+        isSource: Bool
+    ) -> BalanceLine? {
+        guard
+            type == .transfer,
+            amount > 0,
+            let balance = balance(of: wallet)
+        else {
+            return nil
+        }
+
+        let after = isSource ? balance - amount : balance + amount
+
+        switch (wallet.kind.role, isSource) {
+        case (.loan, false): return BalanceLine(title: "返済後", amount: max(-after, 0))
+        case (.investment, false): return BalanceLine(title: "積立後", amount: after)
+        case (.loan, true): return BalanceLine(title: "振替後", amount: max(-after, 0))
+        default: return BalanceLine(title: "振替後", amount: after)
         }
     }
 

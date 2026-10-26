@@ -15,9 +15,9 @@ public final class AssetsModel: ScreenModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    private var recurrings: [Recurring] = []
+    let database: AppDatabase
 
-    private let database: AppDatabase
+    private var recurrings: [Recurring] = []
 
     public init(
         database: AppDatabase,
@@ -35,6 +35,7 @@ public extension AssetsModel {
         public let balance: Int
         public let nextBill: CardBill?
         public let repayment: Repayment?
+        public let repaidRatio: Double?
 
         public var id: Wallet.ID {
             wallet.id
@@ -126,13 +127,15 @@ public extension AssetsModel {
 
         return wallets.map { wallet in
             let next = bills.first { $0.bill.recurring.toWalletId == wallet.id }
+            let balance = balance(of: wallet)
 
             return WalletRow(
                 wallet: wallet,
                 icon: list?.icons[wallet.iconId],
-                balance: balance(of: wallet),
+                balance: balance,
                 nextBill: next?.bill,
-                repayment: repayment(of: wallet)
+                repayment: repayment(of: wallet),
+                repaidRatio: repaidRatio(of: wallet, balance: balance)
             )
         }
     }
@@ -226,6 +229,10 @@ public extension AssetsModel {
 
     var isRewardGoalReached: Bool {
         rewardGoal.map { remaining(to: $0) == 0 } ?? false
+    }
+
+    var rewardRules: [RewardRule] {
+        rewardBank?.activeRules ?? []
     }
 
     var waitingGoals: [RewardGoal] {
@@ -356,6 +363,23 @@ private extension AssetsModel {
 
     func balance(of wallet: Wallet) -> Int {
         wallet.balance(with: entries, valuations: valuations)
+    }
+
+    func repaidRatio(
+        of wallet: Wallet,
+        balance: Int
+    ) -> Double? {
+        guard
+            wallet.kind == .loan,
+            let loanAmount = wallet.loanAmount,
+            loanAmount > 0
+        else {
+            return nil
+        }
+
+        let repaid = loanAmount - max(-balance, 0)
+
+        return min(max(Double(repaid) / Double(loanAmount), 0), 1)
     }
 
     func repayment(of wallet: Wallet) -> Repayment? {

@@ -67,9 +67,9 @@ public struct RecordsView: View {
                             selectButton
                         }
 
-                        filterButton
+                        filterButton(title: "絞り込み")
 
-                        toolButton(systemImage: "magnifyingglass") {
+                        toolButton(systemImage: "magnifyingglass", title: "検索") {
                             openSearch()
                         }
                     }
@@ -204,7 +204,7 @@ private extension RecordsView {
                     .stroke(Palette.outline, lineWidth: 1)
             }
 
-            filterButton
+            filterButton(title: nil)
 
             Button("閉じる") {
                 closeSearch()
@@ -297,15 +297,6 @@ private extension RecordsView {
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
         .card()
-    }
-
-    var filterButton: some View {
-        toolButton(
-            systemImage: "line.3.horizontal.decrease",
-            isOn: !model.filter.isEmpty
-        ) {
-            isFiltering = true
-        }
     }
 
     @ViewBuilder
@@ -443,31 +434,22 @@ private extension RecordsView {
     var selectButton: some View {
         let isSelecting = selection != nil
 
-        return Button {
+        return toolButton(
+            systemImage: isSelecting ? "checkmark" : "checkmark.circle",
+            title: isSelecting ? "完了" : "選択",
+            isOn: isSelecting
+        ) {
             openId = nil
 
             withAnimation(.snappy) {
                 selection = isSelecting ? nil : []
             }
-        } label: {
-            Text(isSelecting ? "完了" : "選択")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.accent)
-                .padding(.horizontal, 14)
-                .frame(height: 36)
-                .overlay {
-                    Capsule()
-                        .stroke(Palette.line, lineWidth: 1)
-                }
-                .frame(minHeight: 44)
-                .contentShape(.rect)
         }
-        .buttonStyle(.plain)
     }
 
     func searchSummary(_ summary: RecordsModel.SearchSummary) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
+            HStack {
                 Text("\(summary.count) 件")
                     .textFont(.subheadline)
                     .monospacedDigit()
@@ -505,8 +487,19 @@ private extension RecordsView {
         }
     }
 
+    func filterButton(title: String?) -> some View {
+        toolButton(
+            systemImage: "line.3.horizontal.decrease",
+            title: title,
+            isOn: !model.filter.isEmpty
+        ) {
+            isFiltering = true
+        }
+    }
+
     func toolButton(
         systemImage: String,
+        title: String? = nil,
         isOn: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
@@ -514,17 +507,27 @@ private extension RecordsView {
         let ring = isOn ? Palette.accent : Palette.line
 
         return Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(Palette.accent)
-                .frame(width: 36, height: 36)
-                .background(fill, in: Circle())
-                .overlay {
-                    Circle()
-                        .stroke(ring, lineWidth: 1)
+            VStack(spacing: 2) {
+                Image(systemName: systemImage)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 36, height: 36)
+                    .background(fill, in: Circle())
+                    .overlay {
+                        Circle()
+                            .stroke(ring, lineWidth: 1)
+                    }
+
+                if let title {
+                    Text(title)
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                        .fixedSize()
                 }
-                .frame(width: 44, height: 44)
-                .contentShape(.rect)
+            }
+            .frame(minWidth: 44, minHeight: 44)
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
     }
