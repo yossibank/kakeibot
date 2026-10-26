@@ -1,5 +1,5 @@
 {
-  "description": "時刻と時差から、その場所の日付を出す。timeZone は IANA の名前で書く。",
+  "description": "時刻と時差から、その場所の日付を出す。timeZone は IANA の名前で書く。同じケースで、その日の始まりの時刻と、その 1 秒前が前の日になることも確かめる。",
   "cases": [
     { "summary": "東京で日付が変わる直前", "instant": "2026-10-10T14:59:59Z", "timeZone": "Asia/Tokyo", "date": "2026-10-10" },
     { "summary": "東京で日付が変わった瞬間", "instant": "2026-10-10T15:00:00Z", "timeZone": "Asia/Tokyo", "date": "2026-10-11" },

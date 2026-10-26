@@ -1,5 +1,5 @@
 {
-  "description": "範囲の中の支出と収入の合計、カテゴリと財布ごとの内訳を出す。振替は、どちらの合計にも入れない。expense と income は、total と、名前ごとの categories・wallets を持つ。",
+  "description": "範囲の中の支出と収入の合計、カテゴリと財布ごとの内訳を出す。振替は、どちらの合計にも入れない。expense と income は、total と、名前ごとの categories・wallets を持つ。balance は、収入の合計から支出の合計を引いた値にする。",
   "cases": [
     {
       "summary": "範囲の外と振替を除いて合計する",

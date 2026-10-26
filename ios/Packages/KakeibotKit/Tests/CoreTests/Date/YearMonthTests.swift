@@ -41,6 +41,7 @@ struct YearMonthTests {
         #expect(weeks.allSatisfy { $0.count == 7 })
         #expect(cells.prefix(fixture.leading).allSatisfy { $0 == nil })
         #expect(cells.suffix(fixture.trailing).allSatisfy { $0 == nil })
+        #expect(cells.count == fixture.leading + days.count + fixture.trailing)
         #expect(days.map(\.day) == Array(1...fixture.month.numberOfDays))
         #expect(days.allSatisfy { $0.yearMonth == fixture.month })
     }
