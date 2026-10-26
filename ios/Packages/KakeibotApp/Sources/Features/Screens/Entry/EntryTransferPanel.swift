@@ -68,10 +68,15 @@ private extension EntryTransferPanel {
 
                 if let current {
                     VStack(spacing: 2) {
-                        balanceLine(current)
+                        Grid(horizontalSpacing: 8, verticalSpacing: 2) {
+                            balanceLine(current)
 
-                        balanceLine(after ?? current)
-                            .opacity(after == nil ? 0 : 1)
+                            balanceLine(after ?? current)
+                                .opacity(after == nil ? 0 : 1)
+                        }
+                        .textFont(.caption2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
 
                         if isOver {
                             Text(Self.overNote)
@@ -94,18 +99,15 @@ private extension EntryTransferPanel {
     }
 
     func balanceLine(_ line: EntryModel.BalanceLine) -> some View {
-        HStack(spacing: 4) {
+        GridRow {
             Text(line.title)
-
-            Spacer(minLength: 4)
+                .gridColumnAlignment(.leading)
 
             Text(AmountText.text(line.amount))
                 .monospacedDigit()
                 .contentTransition(.numericText())
+                .gridColumnAlignment(.trailing)
         }
-        .textFont(.caption2)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
     }
 }
 
