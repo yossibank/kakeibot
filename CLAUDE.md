@@ -25,11 +25,13 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 | 表の形を変える | [data](docs/data.md) | data。書き出しに響くなら export-format も |
 | 書き出しの形式を変える | [export-format](spec/export-format.md) | export-format |
 | fixtures を足す・変える | [fixtures](spec/fixtures.md) | fixtures |
-| 方針を決める・変える | [decisions](docs/decisions.md) | decisions |
+| 方針を決める・変える | [decisions](docs/decisions/) の、`docs-section.sh` で探した節だけ | decisions |
 | 作る順番の 1 段を終える | [roadmap](docs/roadmap.md) | roadmap の状態 |
 | 対応 OS を変える | [overview](docs/overview.md) | overview、README のバッジ |
 | Swift の版・使う技術を変える | [architecture](docs/architecture.md) | architecture、README のバッジ |
 | 未検証の項目を確かめる | 各文書の `[!WARNING]` | 結果で本文を書き換え、WARNING から消す |
 | 整形・確認の仕組みを変える | [README の「動かし方」](README.md#動かし方) | README、architecture のリポジトリの木 |
 
-どの事実をどの文書に書くかは [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) にあり、文書を開くと読み込まれる。
+decisions には、迷った案があり、理由を残さないと同じ議論になる決定だけを書く。
+
+spec の文書の役割は [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) にあり、文書を開くと読み込まれる。
