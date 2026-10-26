@@ -19,6 +19,7 @@ iOS・Android の家計簿アプリ
 | データの形 | [docs/data.md](docs/data.md) |
 | なぜそう決めたか | [docs/decisions/](docs/decisions/) |
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
+| 画面の言葉とコードの名前 | [docs/glossary.md](docs/glossary.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
 | fixtures の形式 | [spec/fixtures.md](spec/fixtures.md) |
 | 作業と文書の決まり | [CLAUDE.md](CLAUDE.md) |
