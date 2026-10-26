@@ -1,80 +1,88 @@
-[
-  {
-    "today": "2026-10-17",
-    "reminderTime": "21:00",
-    "recorded": ["2026-10-17", "2026-10-19"],
-    "recurrings": [],
-    "notifications": [
-      { "date": "2026-10-18", "time": "21:00", "title": "今週のふりかえりの前に", "body": "今日の記録を入れると、1 週間がそろいます" },
-      { "date": "2026-10-20", "time": "21:00", "title": "今日の家計簿、まだ白紙です", "body": "1 行だけでも、書いておきましょう" },
-      { "date": "2026-10-21", "time": "21:00", "title": "週のなかば、ひと息つきましょう", "body": "レシートが手元にあるうちに記録できます" },
-      { "date": "2026-10-22", "time": "21:00", "title": "今日のお金、覚えていますか", "body": "使わなかった日は「支出なし」の印だけで大丈夫です" },
-      { "date": "2026-10-23", "time": "21:00", "title": "1 週間おつかれさまでした", "body": "今日の分を入れて、週末を軽くしましょう" }
-    ]
-  },
-  {
-    "today": "2026-10-17",
-    "reminderTime": null,
-    "recorded": [],
-    "recurrings": [
-      { "name": "家賃", "amount": 78000, "frequency": "monthly", "month": null, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 3 }
-    ],
-    "notifications": [
-      { "date": "2026-10-24", "time": "09:00", "title": "家賃", "body": "10/27 に ¥78,000 です" }
-    ]
-  },
-  {
-    "today": "2026-10-17",
-    "reminderTime": "21:00",
-    "recorded": ["2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23"],
-    "recurrings": [
-      { "name": "給料", "amount": 280000, "frequency": "monthly", "month": null, "day": 17, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 0 },
-      { "name": "保険", "amount": 12000, "frequency": "yearly", "month": 11, "day": 1, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 7 },
-      { "name": "スマホ", "amount": 4800, "frequency": "monthly", "month": null, "day": 20, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null }
-    ],
-    "notifications": [
-      { "date": "2026-10-17", "time": "21:00", "title": "給料", "body": "今日は ¥280,000 の日です" },
-      { "date": "2026-10-25", "time": "21:00", "title": "保険", "body": "11/1 に ¥12,000 です" }
-    ]
-  },
-  {
-    "today": "2026-10-17",
-    "reminderTime": null,
-    "recorded": [],
-    "recurrings": [
-      { "name": "スマホ", "amount": 4800, "frequency": "monthly", "month": null, "day": 20, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null }
-    ],
-    "notifications": []
-  },
-  {
-    "today": "2026-10-17",
-    "reminderTime": null,
-    "recorded": [],
-    "recurrings": [
-      {
-        "name": "カード",
-        "amount": 0,
-        "frequency": "monthly",
-        "month": null,
-        "day": 26,
-        "closingDay": 15,
-        "startDate": "2026-01-01",
-        "endDate": null,
-        "remindDaysBefore": 1,
-        "shortage": {
-          "date": "2026-10-26",
-          "wallet": "銀行",
-          "amount": 12000
+{
+  "description": "予約されているべき通知の日・時刻・見出し・本文を出す。closingDay があれば、カードへの利用分の振替として、額を入れずに知らせる。shortage があれば、その日の知らせに、口座の足りない額を添える。通知は、日・時刻・識別の順に並べる。reminderTime が空なら、記録忘れを知らせない。recorded は、記録か支出なしの印がある日を並べる。",
+  "cases": [
+    {
+      "summary": "記録の無い日に記録忘れを知らせる",
+      "today": "2026-10-17",
+      "reminderTime": "21:00",
+      "recorded": ["2026-10-17", "2026-10-19"],
+      "recurrings": [],
+      "notifications": [
+        { "date": "2026-10-18", "time": "21:00", "title": "今週のふりかえりの前に", "body": "今日の記録を入れると、1 週間がそろいます" },
+        { "date": "2026-10-20", "time": "21:00", "title": "今日の家計簿、まだ白紙です", "body": "1 行だけでも、書いておきましょう" },
+        { "date": "2026-10-21", "time": "21:00", "title": "週のなかば、ひと息つきましょう", "body": "レシートが手元にあるうちに記録できます" },
+        { "date": "2026-10-22", "time": "21:00", "title": "今日のお金、覚えていますか", "body": "使わなかった日は「支出なし」の印だけで大丈夫です" },
+        { "date": "2026-10-23", "time": "21:00", "title": "1 週間おつかれさまでした", "body": "今日の分を入れて、週末を軽くしましょう" }
+      ]
+    },
+    {
+      "summary": "固定費を前もって知らせる",
+      "today": "2026-10-17",
+      "reminderTime": null,
+      "recorded": [],
+      "recurrings": [
+        { "name": "家賃", "amount": 78000, "frequency": "monthly", "month": null, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 3 }
+      ],
+      "notifications": [
+        { "date": "2026-10-24", "time": "09:00", "title": "家賃", "body": "10/27 に ¥78,000 です" }
+      ]
+    },
+    {
+      "summary": "記録済みの週は固定費だけ知らせる",
+      "today": "2026-10-17",
+      "reminderTime": "21:00",
+      "recorded": ["2026-10-17", "2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23"],
+      "recurrings": [
+        { "name": "給料", "amount": 280000, "frequency": "monthly", "month": null, "day": 17, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 0 },
+        { "name": "保険", "amount": 12000, "frequency": "yearly", "month": 11, "day": 1, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 7 },
+        { "name": "スマホ", "amount": 4800, "frequency": "monthly", "month": null, "day": 20, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null }
+      ],
+      "notifications": [
+        { "date": "2026-10-17", "time": "21:00", "title": "給料", "body": "今日は ¥280,000 の日です" },
+        { "date": "2026-10-25", "time": "21:00", "title": "保険", "body": "11/1 に ¥12,000 です" }
+      ]
+    },
+    {
+      "summary": "知らせの設定が無い固定費は知らせない",
+      "today": "2026-10-17",
+      "reminderTime": null,
+      "recorded": [],
+      "recurrings": [
+        { "name": "スマホ", "amount": 4800, "frequency": "monthly", "month": null, "day": 20, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null }
+      ],
+      "notifications": []
+    },
+    {
+      "summary": "カードの引き落としと足りない額を知らせる",
+      "today": "2026-10-17",
+      "reminderTime": null,
+      "recorded": [],
+      "recurrings": [
+        {
+          "name": "カード",
+          "amount": 0,
+          "frequency": "monthly",
+          "month": null,
+          "day": 26,
+          "closingDay": 15,
+          "startDate": "2026-01-01",
+          "endDate": null,
+          "remindDaysBefore": 1,
+          "shortage": {
+            "date": "2026-10-26",
+            "wallet": "銀行",
+            "amount": 12000
+          }
         }
-      }
-    ],
-    "notifications": [
-      {
-        "date": "2026-10-25",
-        "time": "09:00",
-        "title": "カード",
-        "body": "10/26 に引き落としがあります。銀行が ¥12,000 足りません"
-      }
-    ]
-  }
-]
+      ],
+      "notifications": [
+        {
+          "date": "2026-10-25",
+          "time": "09:00",
+          "title": "カード",
+          "body": "10/26 に引き落としがあります。銀行が ¥12,000 足りません"
+        }
+      ]
+    }
+  ]
+}

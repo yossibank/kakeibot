@@ -1,7 +1,10 @@
-[
-  { "recent": [], "text": "ランチ", "result": ["ランチ"] },
-  { "recent": ["ランチ", "本"], "text": "  本 ", "result": ["本", "ランチ"] },
-  { "recent": ["ランチ"], "text": "   ", "result": ["ランチ"] },
-  { "recent": ["a", "b", "c", "d", "e"], "text": "f", "result": ["f", "a", "b", "c", "d"] },
-  { "recent": ["a", "b", "c", "d", "e"], "text": "c", "result": ["c", "a", "b", "d", "e"] }
-]
+{
+  "description": "探した言葉を覚えたときの並びを出す。text の前後の空白を除いて先頭に足し、同じ言葉は前のものを消す。5 つを超えたら古いものから消す。空なら recent のままにする。",
+  "cases": [
+    { "summary": "最初の言葉を覚える", "recent": [], "text": "ランチ", "result": ["ランチ"] },
+    { "summary": "前後の空白を除いて先頭に移す", "recent": ["ランチ", "本"], "text": "  本 ", "result": ["本", "ランチ"] },
+    { "summary": "空白だけなら変えない", "recent": ["ランチ"], "text": "   ", "result": ["ランチ"] },
+    { "summary": "5 つを超えたら古いものを消す", "recent": ["a", "b", "c", "d", "e"], "text": "f", "result": ["f", "a", "b", "c", "d"] },
+    { "summary": "同じ言葉を重ねず先頭に移す", "recent": ["a", "b", "c", "d", "e"], "text": "c", "result": ["c", "a", "b", "d", "e"] }
+  ]
+}

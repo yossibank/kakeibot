@@ -51,7 +51,7 @@ extension ReviewPeriodTests {
 private extension ReviewPeriodTests {
     static var periodCases: [PeriodCase] {
         get throws {
-            try Fixture.load("review/review-period.json")
+            try Fixture.cases("review/review-period.json")
         }
     }
 }

@@ -91,7 +91,7 @@ extension EntryTemplateDraftTests.DraftCase {
 private extension EntryTemplateDraftTests {
     static var draftCases: [DraftCase] {
         get throws {
-            try Fixture.load("entry/entry-template-draft.json")
+            try Fixture.cases("entry/entry-template-draft.json")
         }
     }
 

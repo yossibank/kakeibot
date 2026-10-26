@@ -101,7 +101,7 @@ extension ReviewSummaryTests.Ids {
 private extension ReviewSummaryTests {
     static var summaryCases: [SummaryCase] {
         get throws {
-            try Fixture.load("review/review-summary.json")
+            try Fixture.cases("review/review-summary.json")
         }
     }
 }

@@ -1,15 +1,18 @@
-[
-  { "type": "expense", "amount": 500, "category": true, "tag": false, "toWallet": "none", "problems": [] },
-  { "type": "income", "amount": 1, "category": true, "tag": false, "toWallet": "none", "problems": [] },
-  { "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "other", "problems": [] },
-  { "type": "expense", "amount": 500, "category": true, "tag": true, "toWallet": "none", "problems": [] },
-  { "type": "expense", "amount": 0, "category": true, "tag": false, "toWallet": "none", "problems": ["amountNotPositive"] },
-  { "type": "expense", "amount": -100, "category": true, "tag": false, "toWallet": "none", "problems": ["amountNotPositive"] },
-  { "type": "expense", "amount": 500, "category": false, "tag": false, "toWallet": "none", "problems": ["missingCategory"] },
-  { "type": "income", "amount": 0, "category": false, "tag": false, "toWallet": "none", "problems": ["amountNotPositive", "missingCategory"] },
-  { "type": "transfer", "amount": 3000, "category": true, "tag": false, "toWallet": "other", "problems": ["categoryOnTransfer"] },
-  { "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "none", "problems": ["missingDestination"] },
-  { "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "same", "problems": ["sameWallet"] },
-  { "type": "expense", "amount": 500, "category": false, "tag": true, "toWallet": "none", "problems": ["missingCategory", "tagWithoutCategory"] },
-  { "type": "transfer", "amount": 3000, "category": false, "tag": true, "toWallet": "other", "problems": ["tagWithoutCategory"] }
-]
+{
+  "description": "入力の判定で出る問題を試す。category と tag は、入っているかを真偽で書く。toWallet は none・same・other のどれかにする。",
+  "cases": [
+    { "summary": "支出の正しい入力", "type": "expense", "amount": 500, "category": true, "tag": false, "toWallet": "none", "problems": [] },
+    { "summary": "収入は 1 円から通る", "type": "income", "amount": 1, "category": true, "tag": false, "toWallet": "none", "problems": [] },
+    { "summary": "振替の正しい入力", "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "other", "problems": [] },
+    { "summary": "タグ付きの支出", "type": "expense", "amount": 500, "category": true, "tag": true, "toWallet": "none", "problems": [] },
+    { "summary": "金額が 0 円", "type": "expense", "amount": 0, "category": true, "tag": false, "toWallet": "none", "problems": ["amountNotPositive"] },
+    { "summary": "金額がマイナス", "type": "expense", "amount": -100, "category": true, "tag": false, "toWallet": "none", "problems": ["amountNotPositive"] },
+    { "summary": "カテゴリが無い", "type": "expense", "amount": 500, "category": false, "tag": false, "toWallet": "none", "problems": ["missingCategory"] },
+    { "summary": "金額とカテゴリがどちらも誤り", "type": "income", "amount": 0, "category": false, "tag": false, "toWallet": "none", "problems": ["amountNotPositive", "missingCategory"] },
+    { "summary": "振替にカテゴリが付いている", "type": "transfer", "amount": 3000, "category": true, "tag": false, "toWallet": "other", "problems": ["categoryOnTransfer"] },
+    { "summary": "振替の移動先が無い", "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "none", "problems": ["missingDestination"] },
+    { "summary": "振替の移動先が同じ財布", "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "same", "problems": ["sameWallet"] },
+    { "summary": "カテゴリが無くタグだけある", "type": "expense", "amount": 500, "category": false, "tag": true, "toWallet": "none", "problems": ["missingCategory", "tagWithoutCategory"] },
+    { "summary": "振替にタグだけ付いている", "type": "transfer", "amount": 3000, "category": false, "tag": true, "toWallet": "other", "problems": ["tagWithoutCategory"] }
+  ]
+}

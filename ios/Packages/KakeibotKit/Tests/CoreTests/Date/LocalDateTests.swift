@@ -111,19 +111,19 @@ private extension LocalDateTests {
 
     static var instantCases: [InstantCase] {
         get throws {
-            try Fixture.load("date/local-date-instant.json")
+            try Fixture.cases("date/local-date-instant.json")
         }
     }
 
     static var periodCases: [PeriodCase] {
         get throws {
-            try Fixture.load("date/year-month-period.json")
+            try Fixture.cases("date/year-month-period.json")
         }
     }
 
     static var weekCases: [WeekCase] {
         get throws {
-            try Fixture.load("date/local-date-week.json")
+            try Fixture.cases("date/local-date-week.json")
         }
     }
 }

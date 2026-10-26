@@ -1,4 +1,5 @@
 {
+  "description": "読み込める format と version の判定を試す。invalid は、format と version を持つオブジェクトの配列にする。",
   "valid": [
     { "format": "kakeibot-export", "version": 1 }
   ],

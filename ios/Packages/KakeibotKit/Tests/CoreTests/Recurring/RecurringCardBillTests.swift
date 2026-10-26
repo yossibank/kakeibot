@@ -100,7 +100,7 @@ extension RecurringCardBillTests {
 private extension RecurringCardBillTests {
     static var periodCases: [PeriodCase] {
         get throws {
-            try Fixture.load("recurring/card-bill-period.json")
+            try Fixture.cases("recurring/card-bill-period.json")
         }
     }
 

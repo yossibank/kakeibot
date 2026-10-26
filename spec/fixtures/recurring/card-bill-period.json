@@ -1,8 +1,11 @@
-[
-  { "closingDay": 15, "paidOn": "2026-11-10", "from": "2026-09-16", "through": "2026-10-15" },
-  { "closingDay": 31, "paidOn": "2026-11-27", "from": "2026-10-01", "through": "2026-10-31" },
-  { "closingDay": 31, "paidOn": "2026-03-27", "from": "2026-02-01", "through": "2026-02-28" },
-  { "closingDay": 15, "paidOn": "2026-10-15", "from": "2026-08-16", "through": "2026-09-15" },
-  { "closingDay": 10, "paidOn": "2026-10-27", "from": "2026-09-11", "through": "2026-10-10" },
-  { "closingDay": 30, "paidOn": "2026-03-10", "from": "2026-01-31", "through": "2026-02-28" }
-]
+{
+  "description": "カードの引き落とし日に払う、利用分の期間を出す。",
+  "cases": [
+    { "summary": "締め日が 15 日で翌月 10 日に払う", "closingDay": 15, "paidOn": "2026-11-10", "from": "2026-09-16", "through": "2026-10-15" },
+    { "summary": "締め日が 31 日で 10 月は末日まで", "closingDay": 31, "paidOn": "2026-11-27", "from": "2026-10-01", "through": "2026-10-31" },
+    { "summary": "締め日が 31 日で 2 月は末日まで", "closingDay": 31, "paidOn": "2026-03-27", "from": "2026-02-01", "through": "2026-02-28" },
+    { "summary": "締め日と引き落とし日が同じ日", "closingDay": 15, "paidOn": "2026-10-15", "from": "2026-08-16", "through": "2026-09-15" },
+    { "summary": "締め日が 10 日で月末近くに払う", "closingDay": 10, "paidOn": "2026-10-27", "from": "2026-09-11", "through": "2026-10-10" },
+    { "summary": "締め日が 30 日で 2 月は末日まで", "closingDay": 30, "paidOn": "2026-03-10", "from": "2026-01-31", "through": "2026-02-28" }
+  ]
+}

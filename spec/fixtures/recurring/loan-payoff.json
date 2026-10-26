@@ -1,54 +1,64 @@
-[
-  {
-    "balance": -1200000,
-    "today": "2026-10-21",
-    "repayments": [{ "amount": 15000, "day": 27, "endDate": null }],
-    "count": 80,
-    "lastDate": "2033-05-27"
-  },
-  {
-    "balance": -100000,
-    "today": "2026-10-21",
-    "repayments": [{ "amount": 30000, "day": 10, "endDate": null }],
-    "count": 4,
-    "lastDate": "2027-02-10"
-  },
-  {
-    "balance": -30000,
-    "today": "2026-10-27",
-    "repayments": [{ "amount": 15000, "day": 27, "endDate": null }],
-    "count": 2,
-    "lastDate": "2026-12-27"
-  },
-  {
-    "balance": -50000,
-    "today": "2026-10-21",
-    "repayments": [
-      { "amount": 10000, "day": 5, "endDate": null },
-      { "amount": 20000, "day": 20, "endDate": null }
-    ],
-    "count": 4,
-    "lastDate": "2026-12-20"
-  },
-  {
-    "balance": 0,
-    "today": "2026-10-21",
-    "repayments": [{ "amount": 15000, "day": 27, "endDate": null }],
-    "count": null,
-    "lastDate": null
-  },
-  {
-    "balance": -100000,
-    "today": "2026-10-21",
-    "repayments": [{ "amount": 30000, "day": 10, "endDate": "2026-12-31" }],
-    "count": null,
-    "lastDate": null
-  },
-  {
-    "balance": -100000,
-    "today": "2026-10-21",
-    "repayments": [],
-    "count": null,
-    "lastDate": null
-  }
-]
+{
+  "description": "借入を返し終える回数と最後の日を出す。lastDate は、返し終わらなければ空にする。",
+  "cases": [
+    {
+      "summary": "返済が 1 つで割り切れる",
+      "balance": -1200000,
+      "today": "2026-10-21",
+      "repayments": [{ "amount": 15000, "day": 27, "endDate": null }],
+      "count": 80,
+      "lastDate": "2033-05-27"
+    },
+    {
+      "summary": "返済が割り切れず最後は少ない額",
+      "balance": -100000,
+      "today": "2026-10-21",
+      "repayments": [{ "amount": 30000, "day": 10, "endDate": null }],
+      "count": 4,
+      "lastDate": "2027-02-10"
+    },
+    {
+      "summary": "今日の返済日は数えない",
+      "balance": -30000,
+      "today": "2026-10-27",
+      "repayments": [{ "amount": 15000, "day": 27, "endDate": null }],
+      "count": 2,
+      "lastDate": "2026-12-27"
+    },
+    {
+      "summary": "返済が 2 つあるとき合わせて数える",
+      "balance": -50000,
+      "today": "2026-10-21",
+      "repayments": [
+        { "amount": 10000, "day": 5, "endDate": null },
+        { "amount": 20000, "day": 20, "endDate": null }
+      ],
+      "count": 4,
+      "lastDate": "2026-12-20"
+    },
+    {
+      "summary": "借入が 0 円で返す回数は無い",
+      "balance": 0,
+      "today": "2026-10-21",
+      "repayments": [{ "amount": 15000, "day": 27, "endDate": null }],
+      "count": null,
+      "lastDate": null
+    },
+    {
+      "summary": "終わりの日までに返し終わらない",
+      "balance": -100000,
+      "today": "2026-10-21",
+      "repayments": [{ "amount": 30000, "day": 10, "endDate": "2026-12-31" }],
+      "count": null,
+      "lastDate": null
+    },
+    {
+      "summary": "返済の設定が無い",
+      "balance": -100000,
+      "today": "2026-10-21",
+      "repayments": [],
+      "count": null,
+      "lastDate": null
+    }
+  ]
+}

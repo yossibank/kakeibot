@@ -65,7 +65,7 @@ extension EntryTagDraftTests {
 private extension EntryTagDraftTests {
     static var draftCases: [DraftCase] {
         get throws {
-            try Fixture.load("category/entry-tag-draft.json")
+            try Fixture.cases("category/entry-tag-draft.json")
         }
     }
 }

@@ -1,50 +1,59 @@
-[
-  {
-    "name": "財布",
-    "kind": "cash",
-    "mark": { "kind": "glyph", "value": "cash" },
-    "color": "#C9A96E",
-    "initialBalance": 12000,
-    "problems": []
-  },
-  {
-    "name": "  楽天カード  ",
-    "kind": "card",
-    "mark": { "kind": "text", "value": "楽" },
-    "color": "#BF4040",
-    "initialBalance": -38000,
-    "problems": []
-  },
-  {
-    "name": "   ",
-    "kind": "bank",
-    "mark": { "kind": "glyph", "value": "bank" },
-    "color": "#8DB0EA",
-    "initialBalance": 0,
-    "problems": ["emptyName"]
-  },
-  {
-    "name": "Suica",
-    "kind": "emoney",
-    "mark": { "kind": "emoji", "value": " " },
-    "color": "#81B29A",
-    "initialBalance": 2000,
-    "problems": ["emptyMark"]
-  },
-  {
-    "name": "ポイント",
-    "kind": "point",
-    "mark": { "kind": "text", "value": "ポイント" },
-    "color": "#C9A96E",
-    "initialBalance": 0,
-    "problems": ["textTooLong"]
-  },
-  {
-    "name": "",
-    "kind": "cash",
-    "mark": { "kind": "glyph", "value": "cash" },
-    "color": "C9A96E",
-    "initialBalance": 0,
-    "problems": ["emptyName", "invalidColor"]
-  }
-]
+{
+  "description": "財布の入力の判定で出る問題を試す。財布の名前とアイコンは、カテゴリと同じ決まりで判定する。最初の残高は、マイナスでもよい。mark は category-draft.json と同じ形で書く。",
+  "cases": [
+    {
+      "summary": "現金の正しい入力",
+      "name": "財布",
+      "kind": "cash",
+      "mark": { "kind": "glyph", "value": "cash" },
+      "color": "#C9A96E",
+      "initialBalance": 12000,
+      "problems": []
+    },
+    {
+      "summary": "前後の空白を除いてマイナスの残高で通る",
+      "name": "  楽天カード  ",
+      "kind": "card",
+      "mark": { "kind": "text", "value": "楽" },
+      "color": "#BF4040",
+      "initialBalance": -38000,
+      "problems": []
+    },
+    {
+      "summary": "名前が空白だけ",
+      "name": "   ",
+      "kind": "bank",
+      "mark": { "kind": "glyph", "value": "bank" },
+      "color": "#8DB0EA",
+      "initialBalance": 0,
+      "problems": ["emptyName"]
+    },
+    {
+      "summary": "絵文字が空",
+      "name": "Suica",
+      "kind": "emoney",
+      "mark": { "kind": "emoji", "value": " " },
+      "color": "#81B29A",
+      "initialBalance": 2000,
+      "problems": ["emptyMark"]
+    },
+    {
+      "summary": "文字が 3 文字を超える",
+      "name": "ポイント",
+      "kind": "point",
+      "mark": { "kind": "text", "value": "ポイント" },
+      "color": "#C9A96E",
+      "initialBalance": 0,
+      "problems": ["textTooLong"]
+    },
+    {
+      "summary": "名前が空で色に # が無い",
+      "name": "",
+      "kind": "cash",
+      "mark": { "kind": "glyph", "value": "cash" },
+      "color": "C9A96E",
+      "initialBalance": 0,
+      "problems": ["emptyName", "invalidColor"]
+    }
+  ]
+}

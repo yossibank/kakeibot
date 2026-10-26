@@ -141,7 +141,7 @@ extension WalletDraftTests.DraftCase {
 private extension WalletDraftTests {
     static var draftCases: [DraftCase] {
         get throws {
-            try Fixture.load("wallet/wallet-draft.json")
+            try Fixture.cases("wallet/wallet-draft.json")
         }
     }
 }

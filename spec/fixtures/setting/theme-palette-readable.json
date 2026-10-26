@@ -1,138 +1,148 @@
-[
-  {
-    "theme": {
-      "backgroundTop": "#16223D",
-      "backgroundBottom": "#080C16",
-      "panel": "#0E1628",
-      "cardTop": "#141C2F",
-      "cardBottom": "#090D18",
-      "line": "#26314A",
-      "accent": "#CDAA6B",
-      "accentDeep": "#8F6C38",
-      "accentStrong": "#F4E6C1",
-      "text": "#EDE6D6",
-      "subtext": "#8C97AE",
-      "hint": "#7E89A0"
+{
+  "description": "地の色に対して読みにくい色を出す。基準は decisions/look.md の「テーマの読みやすさ」にある。unreadable は accent・accentStrong・text・subtext・hint の順に並べる。色は #RRGGBB で書く。theme は、役割ごとの色を持つ。unreadable は、役割の名前を並べる。",
+  "cases": [
+    {
+      "summary": "暗いテーマはすべて読める",
+      "theme": {
+        "backgroundTop": "#16223D",
+        "backgroundBottom": "#080C16",
+        "panel": "#0E1628",
+        "cardTop": "#141C2F",
+        "cardBottom": "#090D18",
+        "line": "#26314A",
+        "accent": "#CDAA6B",
+        "accentDeep": "#8F6C38",
+        "accentStrong": "#F4E6C1",
+        "text": "#EDE6D6",
+        "subtext": "#8C97AE",
+        "hint": "#7E89A0"
+      },
+      "unreadable": []
     },
-    "unreadable": []
-  },
-  {
-    "theme": {
-      "backgroundTop": "#FAF7F0",
-      "backgroundBottom": "#EFE9DC",
-      "panel": "#F4EFE4",
-      "cardTop": "#FFFFFF",
-      "cardBottom": "#F3EEE3",
-      "line": "#DDD4C2",
-      "accent": "#8A6420",
-      "accentDeep": "#5E4313",
-      "accentStrong": "#3E2C0C",
-      "text": "#1F1B16",
-      "subtext": "#6A6256",
-      "hint": "#7D7466"
+    {
+      "summary": "明るいテーマはすべて読める",
+      "theme": {
+        "backgroundTop": "#FAF7F0",
+        "backgroundBottom": "#EFE9DC",
+        "panel": "#F4EFE4",
+        "cardTop": "#FFFFFF",
+        "cardBottom": "#F3EEE3",
+        "line": "#DDD4C2",
+        "accent": "#8A6420",
+        "accentDeep": "#5E4313",
+        "accentStrong": "#3E2C0C",
+        "text": "#1F1B16",
+        "subtext": "#6A6256",
+        "hint": "#7D7466"
+      },
+      "unreadable": []
     },
-    "unreadable": []
-  },
-  {
-    "theme": {
-      "backgroundTop": "#16223D",
-      "backgroundBottom": "#080C16",
-      "panel": "#0E1628",
-      "cardTop": "#141C2F",
-      "cardBottom": "#090D18",
-      "line": "#26314A",
-      "accent": "#CDAA6B",
-      "accentDeep": "#8F6C38",
-      "accentStrong": "#F4E6C1",
-      "text": "#3A4458",
-      "subtext": "#8C97AE",
-      "hint": "#7E89A0"
+    {
+      "summary": "文字の色が地に近い",
+      "theme": {
+        "backgroundTop": "#16223D",
+        "backgroundBottom": "#080C16",
+        "panel": "#0E1628",
+        "cardTop": "#141C2F",
+        "cardBottom": "#090D18",
+        "line": "#26314A",
+        "accent": "#CDAA6B",
+        "accentDeep": "#8F6C38",
+        "accentStrong": "#F4E6C1",
+        "text": "#3A4458",
+        "subtext": "#8C97AE",
+        "hint": "#7E89A0"
+      },
+      "unreadable": [
+        "text"
+      ]
     },
-    "unreadable": [
-      "text"
-    ]
-  },
-  {
-    "theme": {
-      "backgroundTop": "#16223D",
-      "backgroundBottom": "#080C16",
-      "panel": "#0E1628",
-      "cardTop": "#141C2F",
-      "cardBottom": "#090D18",
-      "line": "#26314A",
-      "accent": "#CDAA6B",
-      "accentDeep": "#8F6C38",
-      "accentStrong": "#F4E6C1",
-      "text": "#EDE6D6",
-      "subtext": "#3C465C",
-      "hint": "#2E3648"
+    {
+      "summary": "控えめな文字と補助が読めない",
+      "theme": {
+        "backgroundTop": "#16223D",
+        "backgroundBottom": "#080C16",
+        "panel": "#0E1628",
+        "cardTop": "#141C2F",
+        "cardBottom": "#090D18",
+        "line": "#26314A",
+        "accent": "#CDAA6B",
+        "accentDeep": "#8F6C38",
+        "accentStrong": "#F4E6C1",
+        "text": "#EDE6D6",
+        "subtext": "#3C465C",
+        "hint": "#2E3648"
+      },
+      "unreadable": [
+        "subtext",
+        "hint"
+      ]
     },
-    "unreadable": [
-      "subtext",
-      "hint"
-    ]
-  },
-  {
-    "theme": {
-      "backgroundTop": "#16223D",
-      "backgroundBottom": "#080C16",
-      "panel": "#0E1628",
-      "cardTop": "#8C97AE",
-      "cardBottom": "#090D18",
-      "line": "#26314A",
-      "accent": "#CDAA6B",
-      "accentDeep": "#8F6C38",
-      "accentStrong": "#F4E6C1",
-      "text": "#EDE6D6",
-      "subtext": "#8C97AE",
-      "hint": "#7E89A0"
+    {
+      "summary": "カードが明るくすべて読めない",
+      "theme": {
+        "backgroundTop": "#16223D",
+        "backgroundBottom": "#080C16",
+        "panel": "#0E1628",
+        "cardTop": "#8C97AE",
+        "cardBottom": "#090D18",
+        "line": "#26314A",
+        "accent": "#CDAA6B",
+        "accentDeep": "#8F6C38",
+        "accentStrong": "#F4E6C1",
+        "text": "#EDE6D6",
+        "subtext": "#8C97AE",
+        "hint": "#7E89A0"
+      },
+      "unreadable": [
+        "accent",
+        "accentStrong",
+        "text",
+        "subtext",
+        "hint"
+      ]
     },
-    "unreadable": [
-      "accent",
-      "accentStrong",
-      "text",
-      "subtext",
-      "hint"
-    ]
-  },
-  {
-    "theme": {
-      "backgroundTop": "#FAF7F0",
-      "backgroundBottom": "#EFE9DC",
-      "panel": "#F4EFE4",
-      "cardTop": "#FFFFFF",
-      "cardBottom": "#F3EEE3",
-      "line": "#DDD4C2",
-      "accent": "#CDAA6B",
-      "accentDeep": "#5E4313",
-      "accentStrong": "#F4E6C1",
-      "text": "#EDE6D6",
-      "subtext": "#6A6256",
-      "hint": "#7D7466"
+    {
+      "summary": "明るい地に暗い地用の色を使う",
+      "theme": {
+        "backgroundTop": "#FAF7F0",
+        "backgroundBottom": "#EFE9DC",
+        "panel": "#F4EFE4",
+        "cardTop": "#FFFFFF",
+        "cardBottom": "#F3EEE3",
+        "line": "#DDD4C2",
+        "accent": "#CDAA6B",
+        "accentDeep": "#5E4313",
+        "accentStrong": "#F4E6C1",
+        "text": "#EDE6D6",
+        "subtext": "#6A6256",
+        "hint": "#7D7466"
+      },
+      "unreadable": [
+        "accent",
+        "accentStrong",
+        "text"
+      ]
     },
-    "unreadable": [
-      "accent",
-      "accentStrong",
-      "text"
-    ]
-  },
-  {
-    "theme": {
-      "backgroundTop": "#16223D",
-      "backgroundBottom": "#080C16",
-      "panel": "#0E1628",
-      "cardTop": "#141C2F",
-      "cardBottom": "#090D18",
-      "line": "#26314A",
-      "accent": "#5A4A2E",
-      "accentDeep": "#8F6C38",
-      "accentStrong": "#A89A80",
-      "text": "#EDE6D6",
-      "subtext": "#8C97AE",
-      "hint": "#7E89A0"
-    },
-    "unreadable": [
-      "accent"
-    ]
-  }
-]
+    {
+      "summary": "強調の色が暗くて読めない",
+      "theme": {
+        "backgroundTop": "#16223D",
+        "backgroundBottom": "#080C16",
+        "panel": "#0E1628",
+        "cardTop": "#141C2F",
+        "cardBottom": "#090D18",
+        "line": "#26314A",
+        "accent": "#5A4A2E",
+        "accentDeep": "#8F6C38",
+        "accentStrong": "#A89A80",
+        "text": "#EDE6D6",
+        "subtext": "#8C97AE",
+        "hint": "#7E89A0"
+      },
+      "unreadable": [
+        "accent"
+      ]
+    }
+  ]
+}

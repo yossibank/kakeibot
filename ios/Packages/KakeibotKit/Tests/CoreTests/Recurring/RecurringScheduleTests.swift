@@ -126,7 +126,7 @@ extension RecurringScheduleTests {
 private extension RecurringScheduleTests {
     static var datesCases: [DatesCase] {
         get throws {
-            try Fixture.load("recurring/recurring-dates.json")
+            try Fixture.cases("recurring/recurring-dates.json")
         }
     }
 

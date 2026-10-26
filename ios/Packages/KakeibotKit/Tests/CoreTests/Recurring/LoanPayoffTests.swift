@@ -59,7 +59,7 @@ extension LoanPayoffTests.RepaymentCase {
 private extension LoanPayoffTests {
     static var payoffCases: [PayoffCase] {
         get throws {
-            try Fixture.load("recurring/loan-payoff.json")
+            try Fixture.cases("recurring/loan-payoff.json")
         }
     }
 }

@@ -65,13 +65,13 @@ extension ThemeDraftTests {
 private extension ThemeDraftTests {
     static var baseCases: [BaseCase] {
         get throws {
-            try Fixture.load("setting/theme-palette-base.json")
+            try Fixture.cases("setting/theme-palette-base.json")
         }
     }
 
     static var draftCases: [DraftCase] {
         get throws {
-            try Fixture.load("setting/theme-draft.json")
+            try Fixture.cases("setting/theme-draft.json")
         }
     }
 

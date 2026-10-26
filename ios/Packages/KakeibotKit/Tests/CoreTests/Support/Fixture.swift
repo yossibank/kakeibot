@@ -14,6 +14,13 @@ enum Fixture {
         decoder.dateDecodingStrategy = .iso8601
         return try decoder.decode(type, from: data)
     }
+
+    static func cases<Case: Decodable>(
+        _ path: String,
+        as type: Case.Type = Case.self
+    ) throws -> [Case] {
+        try load(path, as: Cases<Case>.self).cases
+    }
 }
 
 private extension Fixture {
@@ -21,6 +28,10 @@ private extension Fixture {
         .deletingLastPathComponent()
         .appending(path: "../../../../../../spec/fixtures")
         .standardized
+}
+
+private struct Cases<Case: Decodable>: Decodable {
+    let cases: [Case]
 }
 
 struct ValidityFixture<Value: Decodable & Sendable>: Decodable {

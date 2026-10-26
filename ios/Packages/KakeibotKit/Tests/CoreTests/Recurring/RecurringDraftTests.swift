@@ -126,7 +126,7 @@ extension RecurringDraftTests {
 private extension RecurringDraftTests {
     static var draftCases: [DraftCase] {
         get throws {
-            try Fixture.load("recurring/recurring-draft.json")
+            try Fixture.cases("recurring/recurring-draft.json")
         }
     }
 

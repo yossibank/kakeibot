@@ -1,8 +1,11 @@
-[
-  { "name": "朝ごはん", "problems": [] },
-  { "name": "  昼ごはん  ", "problems": [] },
-  { "name": "おやつと夜食の分", "problems": [] },
-  { "name": "", "problems": ["emptyName"] },
-  { "name": "   ", "problems": ["emptyName"] },
-  { "name": "朝ごはんと昼ごはん", "problems": ["nameTooLong"] }
-]
+{
+  "description": "タグの名前の判定で出る問題を試す。名前の前後の空白は除いてから判定する。タグの名前は 8 文字までにする。",
+  "cases": [
+    { "summary": "ふつうの名前", "name": "朝ごはん", "problems": [] },
+    { "summary": "前後の空白を除いて通る", "name": "  昼ごはん  ", "problems": [] },
+    { "summary": "ちょうど 8 文字", "name": "おやつと夜食の分", "problems": [] },
+    { "summary": "名前が空", "name": "", "problems": ["emptyName"] },
+    { "summary": "名前が空白だけ", "name": "   ", "problems": ["emptyName"] },
+    { "summary": "名前が 8 文字を超える", "name": "朝ごはんと昼ごはん", "problems": ["nameTooLong"] }
+  ]
+}

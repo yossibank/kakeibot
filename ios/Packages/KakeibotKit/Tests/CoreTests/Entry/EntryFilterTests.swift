@@ -60,7 +60,7 @@ extension EntryFilterTests.EntryItem {
 private extension EntryFilterTests {
     static var cases: [FilterCase] {
         get throws {
-            try Fixture.load("entry/entry-filter.json")
+            try Fixture.cases("entry/entry-filter.json")
         }
     }
 }

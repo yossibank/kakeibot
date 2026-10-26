@@ -1,8 +1,11 @@
-[
-  { "weekStart": "sunday", "month": "2026-10", "leading": 4, "trailing": 0, "rows": 5 },
-  { "weekStart": "monday", "month": "2026-10", "leading": 3, "trailing": 1, "rows": 5 },
-  { "weekStart": "sunday", "month": "2026-02", "leading": 0, "trailing": 0, "rows": 4 },
-  { "weekStart": "monday", "month": "2026-02", "leading": 6, "trailing": 1, "rows": 5 },
-  { "weekStart": "sunday", "month": "2026-08", "leading": 6, "trailing": 5, "rows": 6 },
-  { "weekStart": "monday", "month": "2024-02", "leading": 3, "trailing": 3, "rows": 5 }
-]
+{
+  "description": "カレンダーのマス目を出す。前後の空きマスの数と、週の数を確かめる。leading と trailing は前後の空きマスの数、rows は週の数を表す。",
+  "cases": [
+    { "summary": "日曜始まりで前に空きがある", "weekStart": "sunday", "month": "2026-10", "leading": 4, "trailing": 0, "rows": 5 },
+    { "summary": "月曜始まりで前後に空きがある", "weekStart": "monday", "month": "2026-10", "leading": 3, "trailing": 1, "rows": 5 },
+    { "summary": "空きマスが無く 4 週", "weekStart": "sunday", "month": "2026-02", "leading": 0, "trailing": 0, "rows": 4 },
+    { "summary": "月初が日曜で前に 6 つ空く", "weekStart": "monday", "month": "2026-02", "leading": 6, "trailing": 1, "rows": 5 },
+    { "summary": "6 週になる月", "weekStart": "sunday", "month": "2026-08", "leading": 6, "trailing": 5, "rows": 6 },
+    { "summary": "うるう年の 2 月", "weekStart": "monday", "month": "2024-02", "leading": 3, "trailing": 3, "rows": 5 }
+  ]
+}

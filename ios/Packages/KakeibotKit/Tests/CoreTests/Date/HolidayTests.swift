@@ -37,7 +37,7 @@ extension HolidayTests {
 private extension HolidayTests {
     static var cases: [YearCase] {
         get throws {
-            try Fixture.load("date/holiday-dates.json")
+            try Fixture.cases("date/holiday-dates.json")
         }
     }
 }
