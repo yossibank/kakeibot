@@ -139,7 +139,6 @@ struct WalletEditModelTests {
         adding.pressLoanAmount(.doubleZero)
         adding.pressLoanAmount(.doubleZero)
         adding.pressLoanAmount(.digit(0))
-        adding.pressLoanAmount(.digit(0))
         let saved = try #require(await adding.save())
 
         let model = WalletEditModel(database: setup.database, editing: saved.id)
