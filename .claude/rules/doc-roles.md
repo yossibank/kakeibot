@@ -7,7 +7,7 @@ paths:
 
 # 文書の役割
 
-kakeibot の文書を読み書きするときに読み込まれる。どの事実をどの文書に書くかを決める。書き方の決まりは、共通の設定（[claude-config](https://github.com/yossibank/claude-config) の `rules/docs.md`）にある。
+kakeibot の文書を読み書きするときに読み込まれる。どの事実をどの文書に書くかを決める。書き方の決まりは、共通の設定（[claude-config](https://github.com/yossibank/claude-config) の `rules/docs-writing.md`）にある。
 
 | 文書 | 書く | 書かない |
 | --- | --- | --- |

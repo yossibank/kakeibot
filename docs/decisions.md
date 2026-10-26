@@ -64,7 +64,7 @@ SwiftFormat（Mint で版を固定）。commit の前に pre-commit が整形し
 
 ### 文書の確認
 
-Claude Code のフック（claude-config の `hooks/check-docs.py`）で、書き方の決まりを確かめる。
+Claude Code のフック（claude-config の `hooks/post-edit-check-docs.py`）で、書き方の決まりを確かめる。
 
 | 理由 | 選ばなかった案 |
 | --- | --- |
