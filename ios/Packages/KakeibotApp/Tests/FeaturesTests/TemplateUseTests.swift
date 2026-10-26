@@ -218,7 +218,7 @@ struct TemplateUseTests {
         #expect(manual == ["洗剤", "ティッシュ", "駅前のカフェでモーニング"])
         #expect(category == ["駅前のカフェでモーニング", "洗剤", "ティッシュ"])
         #expect(amount == ["ティッシュ", "駅前のカフェでモーニング", "洗剤"])
-        #expect(name == ["ティッシュ", "洗剤", "駅前のカフェでモーニング"])
+        #expect(name == ["ティッシュ", "駅前のカフェでモーニング", "洗剤"])
         #expect(reopened.templateOrder == .name)
     }
 

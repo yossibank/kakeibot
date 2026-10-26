@@ -2,7 +2,7 @@
 
 SIMULATOR ?= $(shell xcrun simctl list devices available iPhone | awk -F '[()]' '/iPhone/ { print $$2; exit }')
 XCBEAUTIFY = $(shell command -v xcbeautify)
-BEAUTIFY = $(if $(XCBEAUTIFY),| xcbeautify $(XCBEAUTIFY_FLAGS))
+BEAUTIFY = $(if $(XCBEAUTIFY),| xcbeautify)
 CHECKOUT = $(if $(BRANCH),$(shell git worktree list --porcelain | awk '/^worktree / { path = substr($$0, 10) } $$0 == "branch refs/heads/$(BRANCH)" { print path }'),.)
 
 setup:

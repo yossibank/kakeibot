@@ -1,4 +1,5 @@
 import Core
+import Foundation
 
 public extension EntryList {
     func icon(for template: EntryTemplate) -> Icon? {
@@ -77,7 +78,13 @@ private extension EntryList {
                 return left > right
             }
         case .name:
-            let result = lhs.name.localizedStandardCompare(rhs.name)
+            let japanese = Locale(identifier: "ja_JP")
+
+            let result = lhs.name.compare(
+                rhs.name,
+                options: [.caseInsensitive, .numeric, .widthInsensitive],
+                locale: japanese
+            )
 
             if result != .orderedSame {
                 return result == .orderedAscending

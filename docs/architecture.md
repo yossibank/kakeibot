@@ -30,7 +30,6 @@ kakeibot/
 ├── .claude/
 │   ├── rules/               文書の役割
 │   └── skills/              ウィジェットを描いて PNG にする widget-snapshot
-├── .github/                 CI（ビルドとテスト）
 ├── .pre-commit-config.yaml  commit の前の確認（SwiftFormat）
 ├── .swiftformat
 ├── Brewfile                 Mint、pre-commit、xcbeautify
@@ -335,7 +334,7 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 
 テストターゲットは `ios/Kakeibot.xctestplan` にまとめ、`Kakeibot` スキームに付ける。パッケージは、プロジェクトのフォルダとしても登録する。こうしないと、スキームからパッケージのテストターゲットが見えない。
 
-`make test` は、このテストプランを iOS シミュレーターで走らせる。`make test-build` は、走らせずにコンパイルだけする。CI（`.github/workflows/verify.yml`）は、`make test` だけを走らせる。`make` のビルドとテストは、xcbeautify があれば出力を通して整える。CI では、失敗を GitHub Actions の注釈として出す。
+`make test` は、このテストプランを iOS シミュレーターで走らせる。`make test-build` は、走らせずにコンパイルだけする。CI は置かず、PR ごとに手元で `make test` を走らせる。`make` のビルドとテストは、xcbeautify があれば出力を通して整える。
 
 | 対象 | 方法 |
 | --- | --- |

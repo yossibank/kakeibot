@@ -2,8 +2,6 @@
 
 iOS・Android の家計簿アプリ
 
-![Verify](https://img.shields.io/github/actions/workflow/status/yossibank/kakeibot/verify.yml?branch=main&label=Verify&logo=github)
-
 ![iOS 18+](https://img.shields.io/badge/iOS-18%2B-000000?logo=apple&logoColor=white)
 ![Android 8+](https://img.shields.io/badge/Android-8%2B-3DDC84?logo=android&logoColor=white)
 ![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)
