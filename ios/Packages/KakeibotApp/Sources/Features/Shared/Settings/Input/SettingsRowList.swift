@@ -36,6 +36,7 @@ extension SettingsRowList {
         let systemImage: String
         let title: String
         let value: String
+        let detail: String?
         let isEmpty: Bool
         let isAmount: Bool
 
@@ -44,6 +45,7 @@ extension SettingsRowList {
             systemImage: String,
             title: String,
             value: String,
+            detail: String? = nil,
             isEmpty: Bool,
             isAmount: Bool = false
         ) {
@@ -51,6 +53,7 @@ extension SettingsRowList {
             self.systemImage = systemImage
             self.title = title
             self.value = value
+            self.detail = detail
             self.isEmpty = isEmpty
             self.isAmount = isAmount
         }
@@ -87,10 +90,20 @@ private extension SettingsRowList {
 
                 Spacer(minLength: 12)
 
-                Text(item.value)
-                    .font(font)
-                    .foregroundStyle(color)
-                    .lineLimit(1)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(item.value)
+                        .font(font)
+                        .foregroundStyle(color)
+                        .lineLimit(1)
+
+                    if let detail = item.detail {
+                        Text(detail)
+                            .textFont(.caption2)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.accent)
+                            .lineLimit(1)
+                    }
+                }
 
                 if item.isAmount {
                     EditBadge(size: 16)

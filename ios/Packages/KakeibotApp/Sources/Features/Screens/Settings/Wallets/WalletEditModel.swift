@@ -108,7 +108,7 @@ public extension WalletEditModel {
         let repaid = min(max(borrowed - remaining, 0), borrowed)
         let percent = repaid * 100 / borrowed
 
-        return "\(AmountText.text(repaid)) を返しました（\(percent)%）"
+        return "\(AmountText.text(repaid)) 返済済み（\(percent)%）"
     }
 
     var paymentTitle: String {

@@ -43,8 +43,11 @@ private extension EntryTransferPanel {
         let icon = wallet.flatMap { model.icon(for: $0) }
         let isOver = role == .source && model.isOverSourceBalance
         let balanceColor = isOver ? Palette.rose : Palette.subtext
-        let caption = isOver ? Self.overNote : note(for: role)
-        let captionOpacity: Double = caption == nil ? 0 : 1
+        let current = wallet.flatMap(model.currentLine)
+
+        let after = wallet.flatMap { wallet in
+            model.afterLine(of: wallet, isSource: role == .source)
+        }
 
         return Button {
             onPick(role)
@@ -63,24 +66,22 @@ private extension EntryTransferPanel {
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
 
-                if let balance = wallet.flatMap(model.balanceText) {
+                if let current {
                     VStack(spacing: 2) {
-                        Text(balance)
-                            .textFont(.caption2)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                        balanceLine(current)
 
-                        Text(caption ?? " ")
-                            .textFont(.caption2)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .contentTransition(.numericText())
-                            .opacity(captionOpacity)
+                        balanceLine(after ?? current)
+                            .opacity(after == nil ? 0 : 1)
+
+                        if isOver {
+                            Text(Self.overNote)
+                                .textFont(.caption2)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
                     }
                     .foregroundStyle(balanceColor)
-                    .animation(.snappy, value: caption)
+                    .animation(.snappy, value: after)
                 }
             }
             .padding(.horizontal, 8)
@@ -91,14 +92,25 @@ private extension EntryTransferPanel {
         }
         .buttonStyle(.plain)
     }
+
+    func balanceLine(_ line: EntryModel.BalanceLine) -> some View {
+        HStack(spacing: 4) {
+            Text(line.title)
+
+            Spacer(minLength: 4)
+
+            Text(AmountText.text(line.amount))
+                .monospacedDigit()
+                .contentTransition(.numericText())
+        }
+        .textFont(.caption2)
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+    }
 }
 
 private extension EntryTransferPanel {
     static let overNote = "残高を超えています"
-
-    func note(for role: EntryWalletSheet.Role) -> String? {
-        role == .destination ? model.destinationNote : nil
-    }
 
     func title(_ role: EntryWalletSheet.Role) -> String {
         switch role {

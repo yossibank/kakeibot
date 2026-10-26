@@ -162,13 +162,17 @@ struct TransferEntryTests {
         model.press(.digit(3))
         model.press(.doubleZero)
         model.press(.doubleZero)
-        let partial = model.destinationNote
+        let current = model.currentLine(of: loan)
+        let partial = model.afterLine(of: loan, isSource: false)
         model.payOffLoan()
 
         #expect(remaining == 100_000)
-        #expect(partial == "返したあと ¥70,000")
+        #expect(current?.title == "今の残り")
+        #expect(current?.amount == 100_000)
+        #expect(partial?.title == "返済後")
+        #expect(partial?.amount == 70000)
         #expect(model.amount == 100_000)
-        #expect(model.destinationNote == "返したあと ¥0")
+        #expect(model.afterLine(of: loan, isSource: false)?.amount == 0)
     }
 
     @Test

@@ -153,7 +153,7 @@ struct WalletEditModelTests {
         #expect(saved.loanAmount == 300_000)
         #expect(loaded == 300_000)
         #expect(!isChanged)
-        #expect(repaid == "¥300,000 を返しました（100%）")
+        #expect(repaid == "¥300,000 返済済み（100%）")
         #expect(!model.showsLoanAmount)
         #expect(changed.loanAmount == nil)
     }
