@@ -82,12 +82,11 @@ private extension EntryTransferPanel {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
 
-                        if isOver {
-                            Text(Self.overNote)
-                                .textFont(.caption2)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                        }
+                        Text(Self.overNote)
+                            .textFont(.caption2)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .opacity(isOver ? 1 : 0)
                     }
                     .foregroundStyle(balanceColor)
                     .animation(.snappy, value: after)

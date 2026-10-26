@@ -165,16 +165,10 @@ private extension EntrySheet {
     }
 
     var form: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             dial
 
-            if model.type == .transfer {
-                EntryRouteRow(model: model) { route in
-                    withAnimation(.snappy) {
-                        model.applyRoute(route)
-                    }
-                }
-            } else {
+            if model.type != .transfer {
                 categoryArea
             }
         }
@@ -184,6 +178,12 @@ private extension EntrySheet {
         VStack(spacing: 12) {
             EntryTransferPanel(model: model) { role in
                 open(.wallet(role))
+            }
+
+            EntryRouteRow(model: model) { route in
+                withAnimation(.snappy) {
+                    model.applyRoute(route)
+                }
             }
 
             let transfers = model.recentTransfers
@@ -209,7 +209,7 @@ private extension EntrySheet {
     }
 
     var categoryArea: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             EntryTemplateRow(
                 model: model,
                 onUse: { template in

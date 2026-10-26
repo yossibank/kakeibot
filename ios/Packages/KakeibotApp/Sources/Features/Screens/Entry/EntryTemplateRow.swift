@@ -35,6 +35,7 @@ struct EntryTemplateRow: View {
             .padding(.vertical, 1)
         }
         .scrollIndicators(.hidden)
+        .frame(height: Self.height * 2 + Self.spacing + 2, alignment: .top)
     }
 }
 
