@@ -17,7 +17,7 @@ iOS・Android の家計簿アプリ
 | 何を作るか | [docs/overview.md](docs/overview.md) |
 | どう作るか | [docs/architecture.md](docs/architecture.md) |
 | データの形 | [docs/data.md](docs/data.md) |
-| なぜそう決めたか | [docs/decisions.md](docs/decisions.md) |
+| なぜそう決めたか | [docs/decisions/](docs/decisions/) |
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
 | fixtures の形式 | [spec/fixtures.md](spec/fixtures.md) |

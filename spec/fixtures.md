@@ -132,7 +132,7 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | `theme-palette-base.json` | 手で選ぶ 5 色から作る、描く色の組 | `background`、`surface`、`text`、`subtext`、`accent`、`palette`（役割ごとの色） |
 | `theme-draft.json` | 手で作るテーマの判定で出る問題 | `name`、`background`、`surface`、`text`、`subtext`、`accent`、`problems` |
 
-基準は [decisions.md の「テーマの読みやすさ」](../docs/decisions.md#テーマの読みやすさ)にある。テーマの名前は、前後の空白を除いて 12 文字までにする。
+基準は [decisions/look.md の「テーマの読みやすさ」](../docs/decisions/look.md#テーマの読みやすさ)にある。テーマの名前は、前後の空白を除いて 12 文字までにする。
 
 描く色の組は、地が明るいかで混ぜ方を変える。混ぜた値は、色の成分ごとに四捨五入する。
 
