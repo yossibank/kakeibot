@@ -14,6 +14,7 @@ struct DateRangeTests {
         #expect(weeks.allSatisfy { $0.count == 7 })
         #expect(cells.prefix(fixture.leading).allSatisfy { $0 == nil })
         #expect(cells.suffix(fixture.trailing).allSatisfy { $0 == nil })
+        #expect(cells.count == fixture.leading + days.count + fixture.trailing)
         #expect(days.first == fixture.start)
         #expect(days.last == fixture.end)
         #expect(pairs.allSatisfy { $0.adding(days: 1) == $1 })
