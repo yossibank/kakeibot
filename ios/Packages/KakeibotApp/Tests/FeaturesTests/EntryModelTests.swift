@@ -127,15 +127,17 @@ struct EntryModelTests {
     }
 
     @Test
-    func splitsCategoriesIntoPages() async throws {
+    func splitsCategoriesAddAndEditIntoPages() async throws {
         let model = try await Self.newModel()
 
         let expensePages = model.categoryPages
         model.select(.income)
         let incomePages = model.categoryPages
 
-        #expect(expensePages.map(\.count) == [12])
-        #expect(incomePages.map(\.count) == [3])
+        #expect(expensePages.map(\.count) == [14])
+        #expect(expensePages[0].suffix(2) == [.add, .edit])
+        #expect(incomePages.map(\.count) == [5])
+        #expect(incomePages[0].suffix(2) == [.add, .edit])
     }
 
     @Test

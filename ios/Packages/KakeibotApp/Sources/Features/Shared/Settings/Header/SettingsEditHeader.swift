@@ -33,9 +33,14 @@ struct SettingsEditHeader: View {
             }
             .frame(width: Self.sideWidth, alignment: .trailing)
         }
+        .overlay {
+            if isMenuOpen {
+                scrim
+            }
+        }
         .overlay(alignment: .topTrailing) {
             if isMenuOpen {
-                menuLayer
+                menu
             }
         }
         .zIndex(1)
@@ -50,21 +55,18 @@ extension EnvironmentValues {
 }
 
 private extension SettingsEditHeader {
-    @ViewBuilder
-    var menuLayer: some View {
+    var scrim: some View {
         Palette.scrim
             .opacity(0.45)
             .frame(width: Self.scrimSize, height: Self.scrimSize)
-            .offset(
-                x: Self.scrimSize / 2,
-                y: -Self.scrimSize / 2
-            )
             .ignoresSafeArea()
             .onTapGesture {
                 openMenu(false)
             }
             .transition(.opacity)
+    }
 
+    var menu: some View {
         MenuPanel(width: Self.menuWidth) {
             MenuRow(hideTitle, systemImage: hideImage) {
                 openMenu(false)
@@ -73,7 +75,7 @@ private extension SettingsEditHeader {
 
             MenuDivider()
 
-            MenuRow("削除", systemImage: "trash") {
+            MenuRow("削除", systemImage: "trash", isDestructive: true) {
                 openMenu(false)
                 onDelete()
             }

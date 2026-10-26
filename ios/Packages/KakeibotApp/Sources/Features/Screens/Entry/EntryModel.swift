@@ -77,6 +77,20 @@ public final class EntryModel {
 }
 
 public extension EntryModel {
+    enum CategoryCell: Hashable {
+        case category(EntryCategory)
+        case add
+        case edit
+
+        public var categoryId: EntryCategory.ID? {
+            if case let .category(category) = self {
+                category.id
+            } else {
+                nil
+            }
+        }
+    }
+
     struct WalletSection {
         public let kind: Wallet.Kind
         public let wallets: [Wallet]
@@ -102,7 +116,7 @@ public extension EntryModel {
         }
     }
 
-    static let categoriesPerPage = 12
+    static let categoriesPerPage = 15
     static let recentTransferLimit = 3
     static let frequentRouteLimit = 6
 
@@ -151,11 +165,12 @@ public extension EntryModel {
         allTemplates.filter { $0.type == type }
     }
 
-    var categoryPages: [[EntryCategory]] {
+    var categoryPages: [[CategoryCell]] {
+        let cells = categories.map(CategoryCell.category) + [.add, .edit]
         let size = Self.categoriesPerPage
 
-        return stride(from: 0, to: categories.count, by: size).map { start in
-            Array(categories[start..<min(start + size, categories.count)])
+        return stride(from: 0, to: cells.count, by: size).map { start in
+            Array(cells[start..<min(start + size, cells.count)])
         }
     }
 
