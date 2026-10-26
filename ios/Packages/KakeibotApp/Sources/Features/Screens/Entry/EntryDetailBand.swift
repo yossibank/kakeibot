@@ -150,11 +150,11 @@ private extension EntryDetailBand {
 
             HStack(spacing: 4) {
                 Text(value)
-                    .textFont(.footnote)
+                    .textFont(.subheadline)
                     .monospacedDigit()
                     .foregroundStyle(tint ?? valueColor)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.85)
+                    .minimumScaleFactor(0.7)
 
                 if showsChevron {
                     Spacer(minLength: 0)
@@ -173,7 +173,7 @@ private extension EntryDetailBand {
 }
 
 private extension EntryDetailBand {
-    static let height: CGFloat = 54
+    static let height: CGFloat = 64
     static let walletWeight: CGFloat = 1
     static let dateWeight: CGFloat = 1.25
     static let memoWeight: CGFloat = 1

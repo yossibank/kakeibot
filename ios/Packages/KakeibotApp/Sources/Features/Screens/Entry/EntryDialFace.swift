@@ -46,7 +46,7 @@ struct EntryDialFace: View {
 }
 
 extension EntryDialFace {
-    static let width: CGFloat = 280
+    static let width: CGFloat = 304
 }
 
 private extension EntryDialFace {

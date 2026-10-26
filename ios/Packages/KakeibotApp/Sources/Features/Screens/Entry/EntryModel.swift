@@ -113,6 +113,7 @@ public extension EntryModel {
     }
 
     static let categoriesPerPage = 15
+    static let recentTransferLimit = 3
 
     static let destinationTitle = "振替先"
 
@@ -259,6 +260,28 @@ public extension EntryModel {
         )
 
         return overview.budgetUsage
+    }
+
+    var recentTransfers: [Entry] {
+        let transfers = (history?.days ?? [])
+            .flatMap(\.entries)
+            .filter { entry in
+                entry.type == .transfer
+                    && entry.recurringId == nil
+                    && entry.id != editingId
+                    && wallet(entry.walletId) != nil
+                    && wallet(entry.toWalletId) != nil
+            }
+            .sorted { $0.createdAt > $1.createdAt }
+
+        var seen: Set<String> = []
+
+        let unique = transfers.filter { entry in
+            let key = "\(entry.walletId)>\(String(describing: entry.toWalletId))>\(entry.amount)"
+            return seen.insert(key).inserted
+        }
+
+        return Array(unique.prefix(Self.recentTransferLimit))
     }
 
     var walletTitle: String {
@@ -650,6 +673,12 @@ public extension EntryModel {
     func selectBill(_ date: LocalDate) {
         let isUsual = date == billChoices.first?.date
         billMonth = isUsual ? nil : date.yearMonth
+    }
+
+    func applyTransfer(_ entry: Entry) {
+        walletId = entry.walletId
+        toWalletId = entry.toWalletId
+        calculator = AmountCalculator(amount: entry.amount)
     }
 
     func swapWallets() {

@@ -221,6 +221,31 @@ struct TransferEntryTests {
 
         #expect(!model.canSave)
     }
+
+    @Test
+    func listsRecentTransfersOnce() async throws {
+        let setup = try await Setup()
+        try await setup.saveTransfer(5000, from: setup.bank, to: setup.cash, at: 1)
+        try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 2)
+        try await setup.saveTransfer(5000, from: setup.bank, to: setup.cash, at: 3)
+        try await setup.saveTransfer(1000, from: setup.bank, to: setup.cash, at: 4)
+
+        let model = EntryModel(
+            database: setup.database,
+            date: setup.date,
+            type: .transfer
+        )
+
+        await model.load()
+        let amounts = model.recentTransfers.map(\.amount)
+        let oldest = try #require(model.recentTransfers.last)
+        model.applyTransfer(oldest)
+
+        #expect(amounts == [1000, 5000, 3000])
+        #expect(model.walletId == setup.cash)
+        #expect(model.toWalletId == setup.bank)
+        #expect(model.amount == 3000)
+    }
 }
 
 extension TransferEntryTests {
@@ -247,5 +272,24 @@ extension TransferEntryTests.Setup {
             bank: options.wallets[1].id,
             salary: options.incomeCategories[0].id
         )
+    }
+
+    func saveTransfer(
+        _ amount: Int,
+        from walletId: Wallet.ID,
+        to toWalletId: Wallet.ID,
+        at seconds: TimeInterval
+    ) async throws {
+        let draft = EntryDraft(
+            type: .transfer,
+            amount: amount,
+            date: date,
+            categoryId: nil,
+            walletId: walletId,
+            toWalletId: toWalletId
+        )
+
+        let now = Date(timeIntervalSince1970: 1_791_000_000 + seconds)
+        _ = try await database.saveEntry(draft, at: now)
     }
 }

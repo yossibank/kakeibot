@@ -108,7 +108,7 @@ extension EntrySheet {
 
 private extension EntrySheet {
     var content: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             header
 
             ViewThatFits(in: .vertical) {
@@ -165,7 +165,7 @@ private extension EntrySheet {
     }
 
     var form: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             dial
 
             if model.type != .transfer {
@@ -180,9 +180,20 @@ private extension EntrySheet {
                 open(.wallet(role))
             }
 
-            Text("チャージ・カードの支払い・口座のあいだの移動")
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
+            let transfers = model.recentTransfers
+
+            if transfers.isEmpty {
+                Text("チャージ・カードの支払い・口座のあいだの移動")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+            } else {
+                EntryRecentTransfers(model: model, transfers: transfers) { transfer in
+                    withAnimation(.snappy) {
+                        model.applyTransfer(transfer)
+                    }
+                }
+                .padding(.top, 8)
+            }
 
             if let remaining = model.loanRemaining,
                remaining != model.amount {
@@ -192,7 +203,7 @@ private extension EntrySheet {
     }
 
     var categoryArea: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             EntryTemplateRow(
                 model: model,
                 onUse: { template in
@@ -205,10 +216,20 @@ private extension EntrySheet {
 
             categoryPager
 
-            TagLine(tagItems, selection: model.tagId) { id in
-                model.toggleTag(id)
-            } onAdd: {
-                editTags()
+            VStack(spacing: 4) {
+                TagLine(tagItems, selection: model.tagId) { id in
+                    model.toggleTag(id)
+                } onAdd: {
+                    editTags()
+                }
+
+                if let category = model.selectedCategory,
+                   !model.tags.isEmpty {
+                    editPill("タグを編集", systemImage: "tag") {
+                        open(.editCategory(category))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                }
             }
         }
     }
@@ -279,22 +300,9 @@ private extension EntrySheet {
             )
             .frame(maxWidth: .infinity)
             .overlay(alignment: .trailing) {
-                Button {
+                editPill("カテゴリを編集", systemImage: "gearshape") {
                     open(.categories)
-                } label: {
-                    Label("カテゴリを編集", systemImage: "gearshape")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.accent)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .overlay {
-                            Capsule()
-                                .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
-                        }
-                        .frame(minHeight: 32)
-                        .contentShape(.rect)
                 }
-                .buttonStyle(.plain)
             }
         }
     }
@@ -388,6 +396,27 @@ private extension EntrySheet {
         }
         .frame(height: height)
         .transition(Self.memoTransition)
+    }
+
+    func editPill(
+        _ title: String,
+        systemImage: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+                .textFont(.caption)
+                .foregroundStyle(Palette.accent)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .overlay {
+                    Capsule()
+                        .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+                }
+                .frame(minHeight: 32)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
     }
 
     func payOffButton(_ remaining: Int) -> some View {
