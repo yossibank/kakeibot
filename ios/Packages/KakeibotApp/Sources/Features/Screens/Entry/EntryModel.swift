@@ -42,7 +42,6 @@ public final class EntryModel {
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
     public private(set) var balances: [Wallet.ID: Int] = [:]
-    public private(set) var hasOpenedCategoryMenu = true
     public private(set) var weekStart: Weekday = .sunday
     public private(set) var startsWithAmount = false
 
@@ -58,6 +57,8 @@ public final class EntryModel {
     private var cardBills: [Recurring] = []
     private var history: EntryList?
     private var categoryUses: [EntryCategory.ID: Int]?
+    private var budgets: [Budget] = []
+    private var monthStartDay: MonthStartDay = .first
 
     private let editingId: Entry.ID?
     private let startingTemplate: EntryTemplate?
@@ -81,6 +82,7 @@ public extension EntryModel {
     enum CategoryCell: Hashable {
         case category(EntryCategory)
         case add
+        case edit
 
         public var categoryId: EntryCategory.ID? {
             if case let .category(category) = self {
@@ -94,6 +96,11 @@ public extension EntryModel {
     struct WalletSection {
         public let kind: Wallet.Kind
         public let wallets: [Wallet]
+    }
+
+    struct TransferRoute: Hashable {
+        public let walletId: Wallet.ID
+        public let toWalletId: Wallet.ID
     }
 
     struct BalanceLine: Equatable {
@@ -112,6 +119,8 @@ public extension EntryModel {
     }
 
     static let categoriesPerPage = 15
+    static let recentTransferLimit = 3
+    static let frequentRouteLimit = 6
 
     static let destinationTitle = "振替先"
 
@@ -163,7 +172,7 @@ public extension EntryModel {
     }
 
     var categoryPages: [[CategoryCell]] {
-        let cells = categories.map(CategoryCell.category) + [.add]
+        let cells = categories.map(CategoryCell.category) + [.add, .edit]
         let size = Self.categoriesPerPage
 
         return stride(from: 0, to: cells.count, by: size).map { start in
@@ -199,13 +208,18 @@ public extension EntryModel {
     }
 
     var walletName: String {
-        let name = wallet(walletId)?.name ?? walletTitle
+        wallet(walletId)?.name ?? walletTitle
+    }
 
-        guard billMonth != nil, let date = selectedBillDate else {
-            return name
+    var billText: String? {
+        guard
+            billMonth != nil,
+            let date = selectedBillDate
+        else {
+            return nil
         }
 
-        return "\(name) → \(date.month)/\(date.day)"
+        return "\(date.month)/\(date.day)払い"
     }
 
     var billChoices: [BillChoice] {
@@ -235,11 +249,98 @@ public extension EntryModel {
         return chosen?.date ?? choices.first?.date
     }
 
+    var isUsualWallet: Bool {
+        type == .transfer || walletId == usualWalletId(for: categoryId)
+    }
+
+    var budgetUsage: BudgetUsage? {
+        guard type == .expense else {
+            return nil
+        }
+
+        let overview = MonthOverview(
+            list: history,
+            budgets: budgets,
+            recurrings: [],
+            monthStartDay: monthStartDay,
+            today: Self.today
+        )
+
+        return overview.budgetUsage
+    }
+
+    var recentTransfers: [Entry] {
+        var seen: Set<String> = []
+
+        let unique = manualTransfers.filter { entry in
+            let key = "\(entry.walletId)>\(String(describing: entry.toWalletId))>\(entry.amount)"
+            return seen.insert(key).inserted
+        }
+
+        return Array(unique.prefix(Self.recentTransferLimit))
+    }
+
+    var frequentRoutes: [TransferRoute] {
+        let routes = manualTransfers.compactMap(Self.route(of:))
+        let counts = Dictionary(routes.map { ($0, 1) }, uniquingKeysWith: +)
+
+        var seen: Set<TransferRoute> = []
+
+        let ordered = routes.filter { seen.insert($0).inserted }
+
+        let sorted = ordered.enumerated().sorted { lhs, rhs in
+            let left = counts[lhs.element, default: 0]
+            let right = counts[rhs.element, default: 0]
+            return left == right ? lhs.offset < rhs.offset : left > right
+        }
+
+        return sorted.prefix(Self.frequentRouteLimit).map(\.element)
+    }
+
+    var routeText: String? {
+        guard
+            let source = wallet(walletId),
+            let destination = wallet(toWalletId)
+        else {
+            return nil
+        }
+
+        return "\(source.name) → \(destination.name)"
+    }
+
+    var sourceBalanceText: String? {
+        guard
+            type == .transfer,
+            let source = wallet(walletId),
+            let line = afterLine(of: source, isSource: true) ?? currentLine(of: source)
+        else {
+            return nil
+        }
+
+        return "\(source.name) \(line.title) \(AmountText.text(line.amount))"
+    }
+
     var walletTitle: String {
         switch type {
         case .expense: "支払い元"
         case .income: "入金先"
         case .transfer: "振替元"
+        }
+    }
+
+    var memoPrompt: String {
+        switch type {
+        case .expense: "店名や買ったもの"
+        case .income: "どこから入ったか"
+        case .transfer: "何のための移動か"
+        }
+    }
+
+    var memoHint: String {
+        switch type {
+        case .expense: "店名など"
+        case .income: "入金元など"
+        case .transfer: "用途など"
         }
     }
 
@@ -273,6 +374,18 @@ public extension EntryModel {
         return "\(AmountText.text(amount)) を\(action)"
     }
 
+    var saveSubject: String? {
+        guard
+            !isEditing,
+            amount > 0,
+            type != .transfer
+        else {
+            return nil
+        }
+
+        return selectedCategory?.name
+    }
+
     var isOverSourceBalance: Bool {
         guard
             type == .transfer,
@@ -302,14 +415,20 @@ public extension EntryModel {
         return -balance
     }
 
+    static func dayText(
+        for date: LocalDate,
+        today: LocalDate
+    ) -> String {
+        date.year == today.year
+            ? "\(date.month)/\(date.day)"
+            : "\(date.year)/\(date.month)/\(date.day)"
+    }
+
     static func dateText(
         for date: LocalDate,
         today: LocalDate
     ) -> String {
-        let day = date.year == today.year
-            ? "\(date.month)/\(date.day)"
-            : "\(date.year)/\(date.month)/\(date.day)"
-
+        let day = dayText(for: date, today: today)
         let text = "\(day)（\(date.weekday.shortName)）"
 
         switch date {
@@ -317,6 +436,40 @@ public extension EntryModel {
         case today.adding(days: -1): return "昨日 \(text)"
         default: return text
         }
+    }
+
+    static func dateTitle(
+        for date: LocalDate,
+        today: LocalDate
+    ) -> String {
+        let days = date.days(until: today)
+
+        switch days {
+        case 0, 1: return "日付"
+        case 2...: return "日付・\(days)日前"
+        default: return "日付・\(-days)日後"
+        }
+    }
+
+    func saveDetail(today: LocalDate) -> String? {
+        guard
+            !isEditing,
+            canSave,
+            type != .transfer,
+            let wallet = wallet(walletId)
+        else {
+            return nil
+        }
+
+        let day = switch date {
+        case today: "今日"
+        case today.adding(days: -1): "昨日"
+        default: Self.dayText(for: date, today: today)
+        }
+
+        let direction = type == .income ? "へ" : "から"
+
+        return "\(day)・\(wallet.name)\(direction)"
     }
 
     func icon(for category: EntryCategory) -> Icon? {
@@ -408,12 +561,13 @@ public extension EntryModel {
             cardBills = try await database.recurrings()
                 .filter { $0.type == .transfer && $0.closingDay != nil }
 
-            hasOpenedCategoryMenu = try await database
-                .setting(.categoryMenuOpened)
-
             weekStart = try await database.setting(.weekStart)
 
             startsWithAmount = try await database.setting(.entryStartsWithAmount)
+
+            monthStartDay = try await database.setting(.monthStartDay)
+
+            budgets = try await database.budgets()
 
             try await loadBalances()
 
@@ -544,20 +698,6 @@ public extension EntryModel {
         }
     }
 
-    func markCategoryMenuOpened() async {
-        guard !hasOpenedCategoryMenu else {
-            return
-        }
-
-        hasOpenedCategoryMenu = true
-
-        do {
-            try await database.setSetting(.categoryMenuOpened, to: true)
-        } catch {
-            report(error)
-        }
-    }
-
     func press(_ key: AmountCalculator.Key) {
         calculator.press(key)
     }
@@ -569,6 +709,17 @@ public extension EntryModel {
     func selectBill(_ date: LocalDate) {
         let isUsual = date == billChoices.first?.date
         billMonth = isUsual ? nil : date.yearMonth
+    }
+
+    func applyRoute(_ route: TransferRoute) {
+        walletId = route.walletId
+        toWalletId = route.toWalletId
+    }
+
+    func applyTransfer(_ entry: Entry) {
+        walletId = entry.walletId
+        toWalletId = entry.toWalletId
+        calculator = AmountCalculator(amount: entry.amount)
     }
 
     func swapWallets() {
@@ -686,6 +837,19 @@ private extension EntryModel {
         LocalDate(Date(), in: .current)
     }
 
+    var manualTransfers: [Entry] {
+        (history?.days ?? [])
+            .flatMap(\.entries)
+            .filter { entry in
+                entry.type == .transfer
+                    && entry.recurringId == nil
+                    && entry.id != editingId
+                    && wallet(entry.walletId) != nil
+                    && wallet(entry.toWalletId) != nil
+            }
+            .sorted { $0.createdAt > $1.createdAt }
+    }
+
     var snapshot: Snapshot {
         Snapshot(
             type: type,
@@ -723,6 +887,10 @@ private extension EntryModel {
             memo: memo,
             billMonth: billMonth
         )
+    }
+
+    static func route(of entry: Entry) -> TransferRoute? {
+        entry.toWalletId.map { TransferRoute(walletId: entry.walletId, toWalletId: $0) }
     }
 
     static func number(_ value: Int) -> String {

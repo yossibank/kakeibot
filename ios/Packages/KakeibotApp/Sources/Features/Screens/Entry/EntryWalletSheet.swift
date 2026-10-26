@@ -148,6 +148,11 @@ private extension EntryWalletSheet {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 4)
             }
+
+            PrimaryButton(decideTitle) {
+                dismiss()
+            }
+            .padding(.top, 8)
         }
         .sensoryFeedback(.selection, trigger: model.billMonth)
     }
@@ -162,11 +167,6 @@ private extension EntryWalletSheet {
         return Button {
             withAnimation(.snappy) {
                 model.selectBill(choice.date)
-            }
-
-            Task {
-                try? await Task.sleep(for: Self.closeDelay)
-                dismiss()
             }
         } label: {
             VStack(spacing: 8) {
@@ -190,8 +190,6 @@ private extension EntryWalletSheet {
 }
 
 private extension EntryWalletSheet {
-    static let closeDelay = Duration.milliseconds(300)
-
     static var billTransition: AnyTransition {
         .opacity.combined(with: .move(edge: .bottom))
     }
@@ -217,6 +215,14 @@ private extension EntryWalletSheet {
         let period = chosen.period.map(RecurringText.period) ?? ""
 
         return "\(period) の利用分として、\(day) に引き落とされます"
+    }
+
+    var decideTitle: String {
+        guard let date = model.selectedBillDate else {
+            return "決める"
+        }
+
+        return "\(date.month)/\(date.day) 払いで決める"
     }
 
     var title: String {

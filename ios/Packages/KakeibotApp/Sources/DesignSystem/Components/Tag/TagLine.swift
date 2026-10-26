@@ -9,6 +9,7 @@ public struct TagLine<ID: Hashable & Sendable>: View {
     let selection: Set<ID>
     let onSelect: (ID) -> Void
     let onAdd: (() -> Void)?
+    let onEdit: (() -> Void)?
     let onMove: ((ID, Int) -> Void)?
 
     public init(
@@ -16,6 +17,7 @@ public struct TagLine<ID: Hashable & Sendable>: View {
         selection: ID?,
         onSelect: @escaping (ID) -> Void,
         onAdd: (() -> Void)? = nil,
+        onEdit: (() -> Void)? = nil,
         onMove: ((ID, Int) -> Void)? = nil
     ) {
         self.init(
@@ -23,6 +25,7 @@ public struct TagLine<ID: Hashable & Sendable>: View {
             selection: Set([selection].compactMap(\.self)),
             onSelect: onSelect,
             onAdd: onAdd,
+            onEdit: onEdit,
             onMove: onMove
         )
     }
@@ -32,12 +35,14 @@ public struct TagLine<ID: Hashable & Sendable>: View {
         selection: Set<ID>,
         onSelect: @escaping (ID) -> Void,
         onAdd: (() -> Void)? = nil,
+        onEdit: (() -> Void)? = nil,
         onMove: ((ID, Int) -> Void)? = nil
     ) {
         self.tags = tags
         self.selection = selection
         self.onSelect = onSelect
         self.onAdd = onAdd
+        self.onEdit = onEdit
         self.onMove = onMove
     }
 
@@ -208,11 +213,13 @@ private extension TagLine {
     enum Card: Identifiable {
         case tag(Item)
         case add
+        case edit
 
         var id: CardID {
             switch self {
             case let .tag(item): .tag(item.id)
             case .add: .add
+            case .edit: .edit
             }
         }
 
@@ -228,6 +235,7 @@ private extension TagLine {
     enum CardID: Hashable {
         case tag(ID)
         case add
+        case edit
     }
 
     struct Lift {
@@ -264,7 +272,8 @@ private extension TagLine {
 
     var cards: [Card] {
         let add: [Card] = onAdd == nil ? [] : [.add]
-        return tags.map(Card.tag) + add
+        let edit: [Card] = onEdit == nil ? [] : [.edit]
+        return tags.map(Card.tag) + add + edit
     }
 
     var addTitle: String {
@@ -275,13 +284,14 @@ private extension TagLine {
         switch card {
         case let .tag(item): item.name
         case .add: addTitle
+        case .edit: "編集"
         }
     }
 
     func style(of card: Card) -> TagCard.Style {
         switch card {
         case .tag: isSelected(card) ? .selected : .plain
-        case .add: .add
+        case .add, .edit: .add
         }
     }
 
@@ -305,6 +315,8 @@ private extension TagLine {
             onSelect(item.id)
         case .add:
             onAdd?()
+        case .edit:
+            onEdit?()
         }
     }
 

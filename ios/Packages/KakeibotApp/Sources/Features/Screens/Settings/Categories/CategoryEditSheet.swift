@@ -246,7 +246,7 @@ private extension CategoryEditSheet {
             .opacity(0.45)
             .ignoresSafeArea()
             .onTapGesture {
-                closeTag()
+                cancelTag()
             }
             .transition(.opacity)
 
@@ -260,7 +260,7 @@ private extension CategoryEditSheet {
             },
             onDelete: deleteAction(for: edit),
             onClose: {
-                closeTag()
+                cancelTag()
             }
         )
         .padding(.horizontal, 20)
@@ -360,9 +360,28 @@ private extension CategoryEditSheet {
         case nil: true
         }
 
-        if isDone {
-            closeTag()
+        guard isDone else {
+            return
+        }
+
+        closeTag()
+
+        guard startsAddingTag else {
             storeTags()
+            return
+        }
+
+        Task {
+            await model.storeTags()
+            dismiss()
+        }
+    }
+
+    func cancelTag() {
+        closeTag()
+
+        if startsAddingTag {
+            dismiss()
         }
     }
 

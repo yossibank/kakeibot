@@ -7,10 +7,8 @@ public struct EntrySheet: View {
     @State private var model: EntryModel
     @State private var isEnteringAmount = false
     @State private var isEditingMemo = false
-    @State private var isPeekingMemo = false
     @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
-    @State private var memoChipFrame: CGRect = .zero
     @State private var isConfirmingDiscard = false
     @State private var categoryMenu: CategoryMenu?
     @State private var pressingCategory: EntryCategory.ID?
@@ -37,12 +35,13 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        GeometryReader { _ in
+        GeometryReader { proxy in
             ZStack(alignment: .top) {
                 content
+                    .ignoresSafeArea(.keyboard)
 
                 if isEditingMemo {
-                    memoLayer
+                    memoLayer(height: proxy.size.height)
                 }
 
                 if let categoryMenu {
@@ -98,7 +97,6 @@ public struct EntrySheet: View {
                 await load()
             }
         }
-        .ignoresSafeArea(.keyboard)
     }
 }
 
@@ -110,7 +108,7 @@ extension EntrySheet {
 
 private extension EntrySheet {
     var content: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             header
 
             ViewThatFits(in: .vertical) {
@@ -125,7 +123,30 @@ private extension EntrySheet {
                 .padding(.vertical, -Self.fade)
             }
 
-            saveButtons
+            if model.type == .transfer {
+                transferArea
+                    .frame(maxHeight: .infinity)
+            } else {
+                Spacer(minLength: 0)
+            }
+
+            VStack(spacing: 12) {
+                EntryDetailBand(
+                    model: model,
+                    today: today,
+                    onWallet: {
+                        open(.wallet(.source))
+                    },
+                    onDate: {
+                        open(.date)
+                    },
+                    onMemo: {
+                        editMemo(true)
+                    }
+                )
+
+                saveButtons
+            }
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -147,36 +168,62 @@ private extension EntrySheet {
         VStack(spacing: 16) {
             dial
 
-            details
+            if model.type != .transfer {
+                categoryArea
+            }
+        }
+    }
 
-            if model.type == .transfer {
-                ZStack(alignment: .top) {
-                    categoryArea
-                        .hidden()
+    var transferArea: some View {
+        VStack(spacing: 12) {
+            EntryTransferPanel(model: model) { role in
+                open(.wallet(role))
+            }
 
-                    VStack(spacing: 12) {
-                        EntryTransferPanel(model: model) { role in
-                            open(.wallet(role))
-                        }
+            EntryRouteRow(model: model) { route in
+                withAnimation(.snappy) {
+                    model.applyRoute(route)
+                }
+            }
 
-                        Text("チャージ・カードの引き落とし・口座どうしの移動")
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
+            let transfers = model.recentTransfers
 
-                        if let remaining = model.loanRemaining,
-                           remaining != model.amount {
-                            payOffButton(remaining)
-                        }
+            if transfers.isEmpty {
+                Text("チャージ・カードの支払い・口座のあいだの移動")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+            } else {
+                EntryRecentTransfers(model: model, transfers: transfers) { transfer in
+                    withAnimation(.snappy) {
+                        model.applyTransfer(transfer)
                     }
                 }
-            } else {
-                categoryArea
+                .padding(.top, 8)
+            }
+
+            if let remaining = model.loanRemaining,
+               remaining != model.amount {
+                payOffButton(remaining)
             }
         }
     }
 
     var categoryArea: some View {
         VStack(spacing: 16) {
+            categoryPager
+
+            TagLine(
+                tagItems,
+                selection: model.tagId,
+                onSelect: { id in
+                    model.toggleTag(id)
+                },
+                onAdd: {
+                    editTags()
+                },
+                onEdit: tagEditAction
+            )
+
             EntryTemplateRow(
                 model: model,
                 onUse: { template in
@@ -186,14 +233,6 @@ private extension EntrySheet {
                     open(.newTemplate)
                 }
             )
-
-            categoryPager
-
-            TagLine(tagItems, selection: model.tagId) { id in
-                model.toggleTag(id)
-            } onAdd: {
-                editTags()
-            }
         }
     }
 
@@ -230,93 +269,10 @@ private extension EntrySheet {
         Button {
             setEnteringAmount(!isEnteringAmount)
         } label: {
-            GeometryReader { proxy in
-                let size = min(proxy.size.width, proxy.size.height)
-
-                EntryDialFace(
-                    model: model,
-                    isActive: isEnteringAmount,
-                    size: size
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+            EntryDialFace(model: model)
         }
         .buttonStyle(.plain)
-        .frame(minHeight: Self.dialMinSize, maxHeight: 270)
-    }
-
-    var details: some View {
-        HStack(spacing: 8) {
-            if model.type != .transfer {
-                Button {
-                    open(.wallet(.source))
-                } label: {
-                    Chip(
-                        model.walletName,
-                        systemImage: "wallet.bifold",
-                        isHighlighted: model.walletId != nil
-                    )
-                }
-            }
-
-            Button {
-                open(.date)
-            } label: {
-                Chip(
-                    EntryModel.dateText(for: model.date, today: today),
-                    systemImage: "calendar",
-                    isHighlighted: true
-                )
-            }
-
-            Button {
-                if !isPeekingMemo {
-                    editMemo(true)
-                }
-            } label: {
-                ViewThatFits(in: .horizontal) {
-                    Chip(
-                        memoTitle,
-                        systemImage: "square.and.pencil",
-                        isHighlighted: !model.memo.isEmpty
-                    )
-
-                    Chip(
-                        "",
-                        systemImage: "square.and.pencil",
-                        isHighlighted: !model.memo.isEmpty
-                    )
-                }
-            }
-            .simultaneousGesture(memoPeekGesture)
-            .background {
-                Color.clear
-                    .popover(isPresented: $isPeekingMemo) {
-                        memoPeek
-                    }
-            }
-            .sensoryFeedback(.impact(weight: .light), trigger: isPeekingMemo)
-            .layoutPriority(-1)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .named(Self.coordinateSpace))
-            } action: { frame in
-                memoChipFrame = frame
-            }
-
-            Spacer(minLength: 0)
-        }
-        .buttonStyle(.plain)
-    }
-
-    var memoPeek: some View {
-        Text(model.memo)
-            .textFont(.footnote)
-            .foregroundStyle(Palette.text)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: Self.peekWidth, alignment: .leading)
-            .padding(16)
-            .presentationCompactAdaptation(.popover)
-            .presentationBackground(Palette.panel)
+        .frame(maxWidth: .infinity)
     }
 
     var categoryPager: some View {
@@ -340,32 +296,11 @@ private extension EntrySheet {
             .frame(height: Self.pagerHeight)
             .id(model.type)
 
-            PageDots(
-                count: model.categoryPages.count,
-                current: categoryPage ?? 0
-            )
-            .frame(maxWidth: .infinity)
-            .overlay(alignment: .trailing) {
-                Button {
-                    open(.categories)
-                } label: {
-                    HStack(spacing: 2) {
-                        Text("編集")
-
-                        Image(systemName: "chevron.right")
-                    }
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.accent)
-                    .frame(minHeight: 32)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
-
-            if !model.hasOpenedCategoryMenu {
-                Label("長押しで編集・非表示", systemImage: "hand.tap")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
+            if model.categoryPages.count > 1 {
+                PageDots(
+                    count: model.categoryPages.count,
+                    current: categoryPage ?? 0
+                )
             }
         }
     }
@@ -404,7 +339,11 @@ private extension EntrySheet {
 
     var saveButtons: some View {
         HStack(spacing: 8) {
-            PrimaryButton(model.saveTitle) {
+            PrimaryButton(
+                model.saveTitle,
+                subject: model.saveSubject,
+                detail: saveDetail
+            ) {
                 Task {
                     await save()
                 }
@@ -435,7 +374,7 @@ private extension EntrySheet {
     }
 
     @ViewBuilder
-    var memoLayer: some View {
+    func memoLayer(height: CGFloat) -> some View {
         Palette.scrim
             .opacity(0.35)
             .ignoresSafeArea()
@@ -444,19 +383,41 @@ private extension EntrySheet {
             }
             .transition(.opacity)
 
-        Color.clear
-            .frame(height: max(memoChipFrame.minY - 10, 0))
-            .overlay(alignment: .bottom) {
-                EntryMemoCard(
-                    model: model,
-                    isFocused: $isMemoFocused,
-                    pointerX: memoChipFrame.midX - Self.memoCardInset
-                ) {
-                    editMemo(false)
-                }
-                .padding(.horizontal, Self.memoCardInset)
+        VStack {
+            Spacer(minLength: 0)
+
+            EntryMemoCard(model: model, isFocused: $isMemoFocused) {
+                editMemo(false)
             }
-            .transition(Self.memoTransition)
+            .padding(.horizontal, Self.memoCardInset)
+            .padding(.bottom, Self.memoCardInset)
+        }
+        .frame(height: height)
+        .transition(Self.memoTransition)
+    }
+
+    func dashedCell(
+        _ title: String,
+        systemImage: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: systemImage)
+                    .sansFont(.body, weight: .ultraLight)
+
+                Text(title)
+                    .textFont(size: .caption)
+            }
+            .foregroundStyle(Palette.accent)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay {
+                RoundedRectangle(cornerRadius: corner.radius(12))
+                    .stroke(Palette.accent.opacity(.medium), style: .dashed)
+            }
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
     }
 
     func payOffButton(_ remaining: Int) -> some View {
@@ -510,25 +471,13 @@ private extension EntrySheet {
         case let .category(category):
             categoryButton(category)
         case .add:
-            Button {
+            dashedCell("追加", systemImage: "plus") {
                 open(.newCategory)
-            } label: {
-                VStack(spacing: 4) {
-                    Image(systemName: "plus")
-                        .sansFont(.body, weight: .ultraLight)
-
-                    Text("追加")
-                        .textFont(size: .caption)
-                }
-                .foregroundStyle(Palette.accent)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(12))
-                        .stroke(Palette.accent.opacity(.medium), style: .dashed)
-                }
-                .contentShape(.rect)
             }
-            .buttonStyle(.plain)
+        case .edit:
+            dashedCell("編集", systemImage: "gearshape") {
+                open(.categories)
+            }
         }
     }
 
@@ -687,15 +636,12 @@ private extension EntrySheet {
     nonisolated static let coordinateSpace = "EntrySheet"
 
     static let memoCardInset: CGFloat = 12
-    static let dialMinSize: CGFloat = 240
     static let fade: CGFloat = 20
     static let categoryRows = 3
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
     static let menuPressDuration = 0.15
-    static let peekDuration = 0.35
-    static let peekWidth: CGFloat = 260
 
     static let drawerShape = UnevenRoundedRectangle(
         topLeadingRadius: 28,
@@ -726,15 +672,21 @@ private extension EntrySheet {
         LocalDate(Date(), in: .current)
     }
 
-    var memoPeekGesture: some Gesture {
-        LongPressGesture(minimumDuration: Self.peekDuration)
-            .onEnded { _ in
-                isPeekingMemo = !model.memo.isEmpty
-            }
+    var saveDetail: String? {
+        model.saveDetail(today: today)
     }
 
-    var memoTitle: String {
-        model.memo.isEmpty ? "メモ" : model.memo
+    var tagEditAction: (() -> Void)? {
+        guard
+            let category = model.selectedCategory,
+            !model.tags.isEmpty
+        else {
+            return nil
+        }
+
+        return {
+            open(.editCategory(category))
+        }
     }
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {
@@ -836,10 +788,6 @@ private extension EntrySheet {
         setEnteringAmount(false)
 
         pressingCategory = nil
-
-        Task {
-            await model.markCategoryMenuOpened()
-        }
 
         withAnimation(.snappy(duration: 0.25)) {
             categoryMenu = CategoryMenu(category: category, frame: frame)

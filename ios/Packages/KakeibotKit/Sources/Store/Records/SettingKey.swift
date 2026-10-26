@@ -177,10 +177,6 @@ public extension SettingKey where Value == Bool {
         Self(flag: .entryStartsWithAmount)
     }
 
-    static var categoryMenuOpened: Self {
-        Self(flag: .categoryMenuOpened)
-    }
-
     static var categoriesByUse: Self {
         Self(flag: .categoriesByUse)
     }

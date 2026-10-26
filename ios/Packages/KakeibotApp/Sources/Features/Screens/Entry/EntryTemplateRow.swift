@@ -9,38 +9,57 @@ struct EntryTemplateRow: View {
 
     var body: some View {
         ScrollView(.horizontal) {
-            HStack(spacing: 8) {
-                ForEach(model.templates) { template in
-                    button(template)
-                }
+            VStack(alignment: .leading, spacing: Self.spacing) {
+                HStack(spacing: Self.spacing) {
+                    ForEach(firstRow) { template in
+                        button(template)
+                    }
 
-                Button {
-                    onAdd()
-                } label: {
-                    Label("今の入力を保存", systemImage: "plus")
-                        .textFont(size: .caption)
-                        .foregroundStyle(Palette.accent)
-                        .padding(.horizontal, 12)
-                        .frame(height: Self.height)
-                        .overlay {
-                            Capsule()
-                                .stroke(
-                                    Palette.accent.opacity(.medium),
-                                    style: .dashed
-                                )
-                        }
-                        .contentShape(Capsule())
+                    if secondRow.isEmpty {
+                        addButton
+                    }
                 }
-                .buttonStyle(.plain)
+                .fixedSize()
+
+                if !secondRow.isEmpty {
+                    HStack(spacing: Self.spacing) {
+                        ForEach(secondRow) { template in
+                            button(template)
+                        }
+
+                        addButton
+                    }
+                    .fixedSize()
+                }
             }
             .padding(.vertical, 1)
         }
         .scrollIndicators(.hidden)
-        .frame(height: Self.height + 2)
     }
 }
 
 private extension EntryTemplateRow {
+    var addButton: some View {
+        Button {
+            onAdd()
+        } label: {
+            Label("今の入力を保存", systemImage: "plus")
+                .textFont(size: .caption)
+                .foregroundStyle(Palette.accent)
+                .padding(.horizontal, 12)
+                .frame(height: Self.height)
+                .overlay {
+                    Capsule()
+                        .stroke(
+                            Palette.accent.opacity(.medium),
+                            style: .dashed
+                        )
+                }
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+
     func button(_ template: EntryTemplate) -> some View {
         let isApplied = model.isApplied(template)
         let icon = model.icon(for: template)
@@ -81,6 +100,21 @@ private extension EntryTemplateRow {
 
 private extension EntryTemplateRow {
     static let height: CGFloat = 34
+    static let spacing: CGFloat = 8
+    static let minimumForTwoRows = 3
+
+    var splitIndex: Int {
+        let count = model.templates.count
+        return count < Self.minimumForTwoRows ? count : (count + 1) / 2
+    }
+
+    var firstRow: ArraySlice<EntryTemplate> {
+        model.templates.prefix(splitIndex)
+    }
+
+    var secondRow: ArraySlice<EntryTemplate> {
+        model.templates.dropFirst(splitIndex)
+    }
 
     static func stroke(_ isApplied: Bool) -> Color {
         isApplied ? Palette.accent : Palette.accent.opacity(.soft)

@@ -141,17 +141,17 @@ struct EntryModelTests {
     }
 
     @Test
-    func splitsCategoriesAndAddIntoPages() async throws {
+    func splitsCategoriesAddAndEditIntoPages() async throws {
         let model = try await Self.newModel()
 
         let expensePages = model.categoryPages
         model.select(.income)
         let incomePages = model.categoryPages
 
-        #expect(expensePages.map(\.count) == [13])
-        #expect(expensePages[0].last == .add)
-        #expect(incomePages.map(\.count) == [4])
-        #expect(incomePages[0].last == .add)
+        #expect(expensePages.map(\.count) == [14])
+        #expect(expensePages[0].suffix(2) == [.add, .edit])
+        #expect(incomePages.map(\.count) == [5])
+        #expect(incomePages[0].suffix(2) == [.add, .edit])
     }
 
     @Test
@@ -250,6 +250,38 @@ struct EntryModelTests {
 
         #expect(empty == "金額を入れてください")
         #expect(model.saveTitle == "¥980 を記録する")
+        #expect(model.saveSubject == "食費")
+    }
+
+    @Test
+    func describesSaveDetail() async throws {
+        let model = try await Self.newModel()
+        let today = model.date
+
+        let empty = model.saveDetail(today: today)
+        model.press(.digit(5))
+        let recorded = model.saveDetail(today: today)
+        model.date = today.adding(days: -2)
+        let earlier = model.saveDetail(today: today)
+
+        #expect(empty == nil)
+        #expect(recorded == "今日・財布から")
+        #expect(earlier == "10/10・財布から")
+    }
+
+    @Test(arguments: [
+        ("2026-10-12", "日付"),
+        ("2026-10-11", "日付"),
+        ("2026-10-10", "日付・2日前"),
+        ("2026-10-14", "日付・2日後")
+    ])
+    func titlesDate(text: String, expected: String) throws {
+        let today = try #require(LocalDate("2026-10-12"))
+        let date = try #require(LocalDate(text))
+
+        let title = EntryModel.dateTitle(for: date, today: today)
+
+        #expect(title == expected)
     }
 
     @Test(arguments: [
@@ -300,10 +332,12 @@ struct EntryModelTests {
         let later = try #require(model.billChoices.last?.date)
         model.selectBill(later)
         let name = model.walletName
+        let bill = model.billText
         let change = await model.save()
 
         #expect(dates == ["2026-11-27", "2026-12-27", "2027-01-27"])
-        #expect(name == "カード → 1/27")
+        #expect(name == "カード")
+        #expect(bill == "1/27払い")
         #expect(change?.entry.billMonth == later.yearMonth)
 
         model.date = try #require(LocalDate("2026-10-13"))

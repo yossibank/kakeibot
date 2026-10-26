@@ -6,47 +6,94 @@ struct EntryDialFace: View {
     @Environment(\.themeStyle.displayFont) private var themeFont
 
     let model: EntryModel
-    let isActive: Bool
-    let size: CGFloat
 
     var body: some View {
-        ZStack {
-            DialFace(isActive: isActive)
+        ZStack(alignment: .bottom) {
+            HalfDial(progress: usage?.progress, tint: usage?.tint ?? Palette.accent)
 
-            Text(model.typeName)
-                .displayFont(.caption)
-                .tracking(5)
-                .foregroundStyle(Palette.accent)
-                .offset(y: -size * 0.19)
+            VStack(spacing: 2) {
+                HStack(spacing: 6) {
+                    if model.type == .transfer, let route = model.routeText {
+                        Image(systemName: "arrow.left.arrow.right")
+                            .sansFont(.caption, weight: .semibold)
 
-            Text(AmountText.text(model.amount))
-                .font(amountFont)
-                .monospacedDigit()
+                        Text(route)
+                            .lineLimit(1)
+                    } else if let category = model.selectedCategory {
+                        IconImage(model.icon(for: category), size: 13)
+
+                        Text(category.name)
+                            .lineLimit(1)
+                    }
+                }
+                .textFont(.footnote, weight: .bold)
                 .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.85)
-                .frame(width: size * 0.7, height: size * 0.26)
+                .frame(maxWidth: Self.width * 0.7, minHeight: 20)
 
-            Text(note)
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .frame(width: size * 0.66)
-                .offset(y: size * 0.19)
+                Text(AmountText.text(model.amount))
+                    .font(amountFont)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .editBadge()
+                    .frame(height: Self.amountHeight)
+
+                Text(note ?? " ")
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(noteColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .frame(maxWidth: Self.width * 0.7)
+            }
+            .padding(.bottom, Self.lift)
         }
-        .frame(width: size, height: size)
-        .contentShape(Circle())
+        .frame(width: Self.width)
+        .contentShape(.rect)
     }
 }
 
+extension EntryDialFace {
+    static let width: CGFloat = 320
+}
+
 private extension EntryDialFace {
-    var amountFont: Font {
-        let scale: CGFloat = model.amount < 100_000 ? 0.2 : 0.118
-        return .display(size: size * scale, weight: .semibold, in: themeFont)
+    static let amountHeight: CGFloat = 48
+    static let lift: CGFloat = 12
+
+    var usage: BudgetUsage? {
+        model.budgetUsage
     }
 
-    var note: String {
-        model.expressionText ?? (isActive ? "入力中" : "タップして入力")
+    var amountFont: Font {
+        let size: CGFloat = model.amount < 100_000 ? 40 : 28
+        return .display(size: size, weight: .semibold, in: themeFont)
+    }
+
+    var note: String? {
+        if let expression = model.expressionText {
+            return expression
+        }
+
+        if model.type == .transfer {
+            return model.sourceBalanceText
+        }
+
+        return usage.map { "\($0.remainingTitle) \($0.remainingAmountText)" }
+    }
+
+    var noteColor: Color {
+        if model.expressionText == nil, model.isOverSourceBalance {
+            return Palette.rose
+        }
+
+        guard
+            model.expressionText == nil,
+            let usage
+        else {
+            return Palette.subtext
+        }
+
+        return usage.isOver || usage.isNearLimit ? usage.tint : Palette.subtext
     }
 }
