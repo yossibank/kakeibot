@@ -246,6 +246,31 @@ struct TransferEntryTests {
         #expect(model.toWalletId == setup.bank)
         #expect(model.amount == 3000)
     }
+
+    @Test
+    func ordersFrequentRoutesByCount() async throws {
+        let setup = try await Setup()
+        try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 1)
+        try await setup.saveTransfer(5000, from: setup.bank, to: setup.cash, at: 2)
+        try await setup.saveTransfer(1000, from: setup.bank, to: setup.cash, at: 3)
+
+        let model = EntryModel(
+            database: setup.database,
+            date: setup.date,
+            type: .transfer
+        )
+
+        await model.load()
+        let routes = model.frequentRoutes
+        let last = try #require(routes.last)
+        model.applyRoute(last)
+
+        #expect(routes.map(\.walletId) == [setup.bank, setup.cash])
+        #expect(model.walletId == setup.cash)
+        #expect(model.toWalletId == setup.bank)
+        #expect(model.routeText == "財布 → 銀行")
+        #expect(model.sourceBalanceText?.hasPrefix("財布 残高 ") == true)
+    }
 }
 
 extension TransferEntryTests {

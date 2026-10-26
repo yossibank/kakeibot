@@ -168,7 +168,13 @@ private extension EntrySheet {
         VStack(spacing: 12) {
             dial
 
-            if model.type != .transfer {
+            if model.type == .transfer {
+                EntryRouteRow(model: model) { route in
+                    withAnimation(.snappy) {
+                        model.applyRoute(route)
+                    }
+                }
+            } else {
                 categoryArea
             }
         }
@@ -216,21 +222,17 @@ private extension EntrySheet {
 
             categoryPager
 
-            VStack(spacing: 4) {
-                TagLine(tagItems, selection: model.tagId) { id in
+            TagLine(
+                tagItems,
+                selection: model.tagId,
+                onSelect: { id in
                     model.toggleTag(id)
-                } onAdd: {
+                },
+                onAdd: {
                     editTags()
-                }
-
-                if let category = model.selectedCategory,
-                   !model.tags.isEmpty {
-                    editPill("タグを編集", systemImage: "tag") {
-                        open(.editCategory(category))
-                    }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-            }
+                },
+                onEdit: tagEditAction
+            )
         }
     }
 
@@ -294,15 +296,11 @@ private extension EntrySheet {
             .frame(height: Self.pagerHeight)
             .id(model.type)
 
-            PageDots(
-                count: model.categoryPages.count,
-                current: categoryPage ?? 0
-            )
-            .frame(maxWidth: .infinity)
-            .overlay(alignment: .trailing) {
-                editPill("カテゴリを編集", systemImage: "gearshape") {
-                    open(.categories)
-                }
+            if model.categoryPages.count > 1 {
+                PageDots(
+                    count: model.categoryPages.count,
+                    current: categoryPage ?? 0
+                )
             }
         }
     }
@@ -398,23 +396,26 @@ private extension EntrySheet {
         .transition(Self.memoTransition)
     }
 
-    func editPill(
+    func dashedCell(
         _ title: String,
         systemImage: String,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            Label(title, systemImage: systemImage)
-                .textFont(.caption)
-                .foregroundStyle(Palette.accent)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .overlay {
-                    Capsule()
-                        .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
-                }
-                .frame(minHeight: 32)
-                .contentShape(.rect)
+            VStack(spacing: 4) {
+                Image(systemName: systemImage)
+                    .sansFont(.body, weight: .ultraLight)
+
+                Text(title)
+                    .textFont(size: .caption)
+            }
+            .foregroundStyle(Palette.accent)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay {
+                RoundedRectangle(cornerRadius: corner.radius(12))
+                    .stroke(Palette.accent.opacity(.medium), style: .dashed)
+            }
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
     }
@@ -470,25 +471,13 @@ private extension EntrySheet {
         case let .category(category):
             categoryButton(category)
         case .add:
-            Button {
+            dashedCell("追加", systemImage: "plus") {
                 open(.newCategory)
-            } label: {
-                VStack(spacing: 4) {
-                    Image(systemName: "plus")
-                        .sansFont(.body, weight: .ultraLight)
-
-                    Text("追加")
-                        .textFont(size: .caption)
-                }
-                .foregroundStyle(Palette.accent)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(12))
-                        .stroke(Palette.accent.opacity(.medium), style: .dashed)
-                }
-                .contentShape(.rect)
             }
-            .buttonStyle(.plain)
+        case .edit:
+            dashedCell("編集", systemImage: "gearshape") {
+                open(.categories)
+            }
         }
     }
 
@@ -685,6 +674,19 @@ private extension EntrySheet {
 
     var saveDetail: String? {
         model.saveDetail(today: today)
+    }
+
+    var tagEditAction: (() -> Void)? {
+        guard
+            let category = model.selectedCategory,
+            !model.tags.isEmpty
+        else {
+            return nil
+        }
+
+        return {
+            open(.editCategory(category))
+        }
     }
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {

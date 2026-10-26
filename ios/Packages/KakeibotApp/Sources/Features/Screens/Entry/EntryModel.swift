@@ -82,6 +82,7 @@ public extension EntryModel {
     enum CategoryCell: Hashable {
         case category(EntryCategory)
         case add
+        case edit
 
         public var categoryId: EntryCategory.ID? {
             if case let .category(category) = self {
@@ -95,6 +96,11 @@ public extension EntryModel {
     struct WalletSection {
         public let kind: Wallet.Kind
         public let wallets: [Wallet]
+    }
+
+    struct TransferRoute: Hashable {
+        public let walletId: Wallet.ID
+        public let toWalletId: Wallet.ID
     }
 
     struct BalanceLine: Equatable {
@@ -114,6 +120,7 @@ public extension EntryModel {
 
     static let categoriesPerPage = 15
     static let recentTransferLimit = 3
+    static let frequentRouteLimit = 6
 
     static let destinationTitle = "振替先"
 
@@ -165,7 +172,7 @@ public extension EntryModel {
     }
 
     var categoryPages: [[CategoryCell]] {
-        let cells = categories.map(CategoryCell.category) + [.add]
+        let cells = categories.map(CategoryCell.category) + [.add, .edit]
         let size = Self.categoriesPerPage
 
         return stride(from: 0, to: cells.count, by: size).map { start in
@@ -263,25 +270,54 @@ public extension EntryModel {
     }
 
     var recentTransfers: [Entry] {
-        let transfers = (history?.days ?? [])
-            .flatMap(\.entries)
-            .filter { entry in
-                entry.type == .transfer
-                    && entry.recurringId == nil
-                    && entry.id != editingId
-                    && wallet(entry.walletId) != nil
-                    && wallet(entry.toWalletId) != nil
-            }
-            .sorted { $0.createdAt > $1.createdAt }
-
         var seen: Set<String> = []
 
-        let unique = transfers.filter { entry in
+        let unique = manualTransfers.filter { entry in
             let key = "\(entry.walletId)>\(String(describing: entry.toWalletId))>\(entry.amount)"
             return seen.insert(key).inserted
         }
 
         return Array(unique.prefix(Self.recentTransferLimit))
+    }
+
+    var frequentRoutes: [TransferRoute] {
+        let routes = manualTransfers.compactMap(Self.route(of:))
+        let counts = Dictionary(routes.map { ($0, 1) }, uniquingKeysWith: +)
+
+        var seen: Set<TransferRoute> = []
+
+        let ordered = routes.filter { seen.insert($0).inserted }
+
+        let sorted = ordered.enumerated().sorted { lhs, rhs in
+            let left = counts[lhs.element, default: 0]
+            let right = counts[rhs.element, default: 0]
+            return left == right ? lhs.offset < rhs.offset : left > right
+        }
+
+        return sorted.prefix(Self.frequentRouteLimit).map(\.element)
+    }
+
+    var routeText: String? {
+        guard
+            let source = wallet(walletId),
+            let destination = wallet(toWalletId)
+        else {
+            return nil
+        }
+
+        return "\(source.name) → \(destination.name)"
+    }
+
+    var sourceBalanceText: String? {
+        guard
+            type == .transfer,
+            let source = wallet(walletId),
+            let line = afterLine(of: source, isSource: true) ?? currentLine(of: source)
+        else {
+            return nil
+        }
+
+        return "\(source.name) \(line.title) \(AmountText.text(line.amount))"
     }
 
     var walletTitle: String {
@@ -675,6 +711,11 @@ public extension EntryModel {
         billMonth = isUsual ? nil : date.yearMonth
     }
 
+    func applyRoute(_ route: TransferRoute) {
+        walletId = route.walletId
+        toWalletId = route.toWalletId
+    }
+
     func applyTransfer(_ entry: Entry) {
         walletId = entry.walletId
         toWalletId = entry.toWalletId
@@ -796,6 +837,19 @@ private extension EntryModel {
         LocalDate(Date(), in: .current)
     }
 
+    var manualTransfers: [Entry] {
+        (history?.days ?? [])
+            .flatMap(\.entries)
+            .filter { entry in
+                entry.type == .transfer
+                    && entry.recurringId == nil
+                    && entry.id != editingId
+                    && wallet(entry.walletId) != nil
+                    && wallet(entry.toWalletId) != nil
+            }
+            .sorted { $0.createdAt > $1.createdAt }
+    }
+
     var snapshot: Snapshot {
         Snapshot(
             type: type,
@@ -833,6 +887,10 @@ private extension EntryModel {
             memo: memo,
             billMonth: billMonth
         )
+    }
+
+    static func route(of entry: Entry) -> TransferRoute? {
+        entry.toWalletId.map { TransferRoute(walletId: entry.walletId, toWalletId: $0) }
     }
 
     static func number(_ value: Int) -> String {

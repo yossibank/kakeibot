@@ -19,6 +19,7 @@ struct EntryTemplateRow: View {
                         addButton
                     }
                 }
+                .fixedSize()
 
                 if !secondRow.isEmpty {
                     HStack(spacing: Self.spacing) {
@@ -28,6 +29,7 @@ struct EntryTemplateRow: View {
 
                         addButton
                     }
+                    .fixedSize()
                 }
             }
             .padding(.vertical, 1)
