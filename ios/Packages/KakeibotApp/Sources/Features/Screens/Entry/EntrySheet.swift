@@ -210,16 +210,6 @@ private extension EntrySheet {
 
     var categoryArea: some View {
         VStack(spacing: 16) {
-            EntryTemplateRow(
-                model: model,
-                onUse: { template in
-                    useTemplate(template)
-                },
-                onAdd: {
-                    open(.newTemplate)
-                }
-            )
-
             categoryPager
 
             TagLine(
@@ -232,6 +222,16 @@ private extension EntrySheet {
                     editTags()
                 },
                 onEdit: tagEditAction
+            )
+
+            EntryTemplateRow(
+                model: model,
+                onUse: { template in
+                    useTemplate(template)
+                },
+                onAdd: {
+                    open(.newTemplate)
+                }
             )
         }
     }

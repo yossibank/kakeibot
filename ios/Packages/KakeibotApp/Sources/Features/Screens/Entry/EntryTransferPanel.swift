@@ -52,13 +52,13 @@ private extension EntryTransferPanel {
         return Button {
             onPick(role)
         } label: {
-            VStack(spacing: 12) {
+            VStack(spacing: 6) {
                 Text(title(role))
                     .textFont(.caption2)
                     .tracking(3)
                     .foregroundStyle(Palette.accent)
 
-                IconImage(icon, size: 24)
+                IconImage(icon, size: 20)
                     .foregroundStyle(Palette.accent)
 
                 Text(wallet?.name ?? "選ぶ")
@@ -67,34 +67,26 @@ private extension EntryTransferPanel {
                     .lineLimit(1)
 
                 if let current {
-                    VStack(spacing: 2) {
-                        Grid(horizontalSpacing: 8, verticalSpacing: 2) {
+                    Grid(horizontalSpacing: 8, verticalSpacing: 2) {
+                        balanceLine(current)
+
+                        if let after {
+                            balanceLine(after)
+                        } else {
                             balanceLine(current)
-
-                            if let after {
-                                balanceLine(after)
-                            } else if !isOver {
-                                balanceLine(current)
-                                    .opacity(0)
-                            }
+                                .opacity(0)
                         }
-                        .textFont(.caption2)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-
-                        Text(Self.overNote)
-                            .textFont(.caption2)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .opacity(isOver ? 1 : 0)
                     }
+                    .textFont(.caption2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     .foregroundStyle(balanceColor)
                     .animation(.snappy, value: after)
                 }
             }
             .padding(.horizontal, 8)
-            .padding(.vertical, 12)
-            .frame(maxWidth: .infinity, minHeight: 120)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity)
             .card(cornerRadius: 20)
             .contentShape(.rect)
         }
@@ -115,8 +107,6 @@ private extension EntryTransferPanel {
 }
 
 private extension EntryTransferPanel {
-    static let overNote = "残高を超えています"
-
     func title(_ role: EntryWalletSheet.Role) -> String {
         switch role {
         case .source: model.walletTitle
