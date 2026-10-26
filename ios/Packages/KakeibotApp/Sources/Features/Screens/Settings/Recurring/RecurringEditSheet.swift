@@ -315,7 +315,9 @@ private extension RecurringEditSheet {
         switch panel {
         case .amount:
             VStack(spacing: 12) {
-                Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+                Keypad(calculator: model.calculator) {
+                    closePanel()
+                } onKey: { key in
                     model.press(key)
                 }
 

@@ -2,18 +2,20 @@ import Core
 import SwiftUI
 
 public struct Keypad: View {
+    @State private var clearCount = 0
+
     @Environment(\.themeStyle.corner) private var corner
 
-    let activeTax: AmountCalculator.TaxRate?
+    let calculator: AmountCalculator
     let onDone: (() -> Void)?
     let onKey: (AmountCalculator.Key) -> Void
 
     public init(
-        activeTax: AmountCalculator.TaxRate? = nil,
+        calculator: AmountCalculator,
         onDone: (() -> Void)? = nil,
         onKey: @escaping (AmountCalculator.Key) -> Void
     ) {
-        self.activeTax = activeTax
+        self.calculator = calculator
         self.onDone = onDone
         self.onKey = onKey
     }
@@ -28,12 +30,17 @@ public struct Keypad: View {
                 }
             }
         }
+        .sensoryFeedback(.impact(weight: .medium), trigger: clearCount)
     }
 }
 
 private extension Keypad {
+    var showsDone: Bool {
+        onDone != nil && !calculator.hasOperation
+    }
+
     func button(for key: AmountCalculator.Key) -> some View {
-        let isActive = key == activeTax.map(AmountCalculator.Key.tax)
+        let isActive = key == calculator.taxNote.map { .tax($0.rate) }
 
         return Button {
             press(key)
@@ -58,6 +65,7 @@ private extension Keypad {
             LongPressGesture(minimumDuration: Self.clearPressDuration)
                 .onEnded { _ in
                     if key == .delete {
+                        clearCount += 1
                         onKey(.clear)
                     }
                 }
@@ -103,7 +111,7 @@ private extension Keypad {
                 .textFont(size: .headline)
                 .foregroundStyle(Palette.accentStrong)
         case .equals:
-            if onDone == nil {
+            if !showsDone {
                 Text("＝")
                     .textFont(size: .headline, weight: .semibold)
                     .foregroundStyle(Palette.backgroundBottom)
@@ -123,6 +131,7 @@ private extension Keypad {
 
     func press(_ key: AmountCalculator.Key) {
         if key == .equals,
+           showsDone,
            let onDone {
             onDone()
         } else {
@@ -178,7 +187,7 @@ public extension AmountCalculator.Operation {
 }
 
 #Preview {
-    Keypad(activeTax: .standard) { _ in }
+    Keypad(calculator: AmountCalculator(amount: 1280)) { _ in }
         .padding()
         .background(Palette.background)
 }

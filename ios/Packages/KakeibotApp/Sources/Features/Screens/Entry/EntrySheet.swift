@@ -319,10 +319,9 @@ private extension EntrySheet {
                 }
             )
 
-            Keypad(
-                activeTax: model.calculator.taxNote?.rate,
-                onDone: keypadDone
-            ) { key in
+            Keypad(calculator: model.calculator) {
+                setEnteringAmount(false)
+            } onKey: { key in
                 model.press(key)
             }
 
@@ -649,8 +648,8 @@ private extension EntrySheet {
     static let fade: CGFloat = 20
     static let categoryRows = 3
     static let categoryColumns = 5
-    static let categorySpacing: CGFloat = 4
-    static let categoryHeight: CGFloat = 54
+    static let categorySpacing: CGFloat = 8
+    static let categoryHeight: CGFloat = 56
     static let menuPressDuration = 0.15
 
     static let drawerShape = UnevenRoundedRectangle(
@@ -684,16 +683,6 @@ private extension EntrySheet {
 
     var saveDetail: String? {
         model.saveDetail(today: today)
-    }
-
-    var keypadDone: (() -> Void)? {
-        guard !model.calculator.hasOperation else {
-            return nil
-        }
-
-        return {
-            setEnteringAmount(false)
-        }
     }
 
     var tagEditAction: (() -> Void)? {
