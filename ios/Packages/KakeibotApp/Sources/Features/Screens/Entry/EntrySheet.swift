@@ -285,6 +285,7 @@ private extension EntrySheet {
                         id: \.offset
                     ) { index, page in
                         categoryGrid(page)
+                            .padding(Self.liftInset)
                             .containerRelativeFrame(.horizontal)
                             .id(index)
                     }
@@ -294,7 +295,8 @@ private extension EntrySheet {
             .scrollTargetBehavior(.paging)
             .scrollPosition(id: $categoryPage)
             .scrollIndicators(.hidden)
-            .frame(height: Self.pagerHeight)
+            .frame(height: Self.pagerHeight + Self.liftInset * 2)
+            .padding(-Self.liftInset)
             .id(model.type)
 
             if model.categoryPages.count > 1 {
@@ -424,6 +426,7 @@ private extension EntrySheet {
                 RoundedRectangle(cornerRadius: corner.radius(12))
                     .stroke(Palette.accent.opacity(.medium), style: .dashed)
             }
+            .padding(Self.actionInset)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -657,6 +660,8 @@ private extension EntrySheet {
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
     static let selectedScale: CGFloat = 1.08
+    static let liftInset: CGFloat = 10
+    static let actionInset: CGFloat = 6
     static let menuPressDuration = 0.15
 
     static let drawerShape = UnevenRoundedRectangle(
@@ -791,7 +796,7 @@ private extension EntrySheet {
     }
 
     func select(_ category: EntryCategory) {
-        setEnteringAmount(model.amount == 0)
+        setEnteringAmount(false)
         model.categoryId = category.id
     }
 
