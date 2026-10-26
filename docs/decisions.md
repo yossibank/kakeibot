@@ -70,13 +70,13 @@ Claude Code のフック（claude-config の `hooks/check-docs.py`）で、書�
 | --- | --- |
 | 文書を書くのはほぼ Claude なので、書いたその場で直せる。リポジトリごとの準備が要らない | pre-commit で確かめる、自動では確かめない |
 
-### CI の走らせ方
+### テストの走らせ方
 
-CI はビルドを別に走らせず、`make test` のビルドで兼ねる。CI の 1 回は 15 分で打ち切る。ビルドとテストの出力は xcbeautify で整え、CI では失敗を GitHub Actions の注釈で出す。
+CI は置かない。PR を作る前に、Claude が手元で `make test` を 1 回走らせ、結果を PR の本文に書く。push し直すときは、Swift か fixtures を変えたときだけ走らせ直す。文書だけの PR では走らせない。ビルドは別に走らせず、`make test` のビルドで兼ねる。ビルドとテストの出力は xcbeautify で整える。
 
 | 理由 | 選ばなかった案 |
 | --- | --- |
-| 同じビルドを 2 回しなくて済む。シミュレーターが止まっても長く待たない。長いログから失敗を探さずに済む | xcodebuild の出力をそのまま出す、CI でもビルドを別に走らせる、Core と Store を `swift test` で走らせる（CI では毎回 GRDB を取り直し、かえって遅い）、先にシミュレーターを起動する（起動の途中は `simctl list` と `xcodebuild` が待たされ、かえって遅い）、ビルドの成果物をキャッシュする（15 秒ほどしか縮まない） |
+| リポジトリは非公開で、GitHub Actions を使わない。結果の変わらない変更で待たずに済む。同じビルドを 2 回しなくて済む。長いログから失敗を探さずに済む | GitHub Actions で走らせる、手元の Mac を GitHub Actions のランナーにする、push のたびに走らせる、`make test-build` も別に走らせる、xcodebuild の出力をそのまま出す、先にシミュレーターを起動する（起動の途中は `simctl list` と `xcodebuild` が待たされ、かえって遅い） |
 
 ### 画面の言語
 
