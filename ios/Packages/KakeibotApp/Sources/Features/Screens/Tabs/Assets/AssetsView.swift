@@ -46,11 +46,11 @@ public struct AssetsView: View {
                 }
 
                 if !ownedSections.isEmpty {
-                    walletGroup("持っているお金", sections: ownedSections)
+                    ownedGroup
                 }
 
-                if !owedSections.isEmpty {
-                    walletGroup("返すお金", sections: owedSections)
+                if !owedRows.isEmpty {
+                    owedGroup
                 }
 
                 rewardCard
@@ -321,17 +321,24 @@ private extension AssetsView {
                     .minimumScaleFactor(0.7)
             }
 
-            if !owedSections.isEmpty {
-                HStack(spacing: 8) {
-                    Text("持つ")
-                        .textFont(size: .micro)
-                        .foregroundStyle(Palette.subtext)
+            if !owedRows.isEmpty {
+                VStack(spacing: 4) {
+                    SplitBar(
+                        ownedShare,
+                        leading: Palette.accent,
+                        trailing: Palette.accent.opacity(.muted)
+                    )
 
-                    RatioBar(ownedShare, tint: Palette.accent, height: 6)
+                    HStack {
+                        Text("資産 \(AmountText.text(ownedTotal))")
 
-                    Text("返す")
-                        .textFont(size: .micro)
-                        .foregroundStyle(Palette.subtext)
+                        Spacer(minLength: 8)
+
+                        Text("負債 \(AmountText.text(-owedTotal))")
+                    }
+                    .textFont(size: .micro)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
                 }
             }
         }
@@ -341,6 +348,50 @@ private extension AssetsView {
             Palette.accent.opacity(.faint),
             in: .rect(cornerRadius: corner.radius(16))
         )
+    }
+
+    var ownedGroup: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            groupHeader(
+                "資産",
+                systemImage: "yensign",
+                count: ownedSections.flatMap(\.rows).count,
+                total: ownedTotal
+            )
+
+            ForEach(ownedSections) { section in
+                walletSection(section)
+            }
+        }
+    }
+
+    var owedGroup: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            groupHeader(
+                "負債",
+                systemImage: "arrow.uturn.backward",
+                count: owedRows.count,
+                total: -owedTotal
+            )
+
+            VStack(spacing: 0) {
+                ForEach(owedRows) { row in
+                    Button {
+                        onOpenWallet(row.wallet.id)
+                    } label: {
+                        owedRow(row)
+                    }
+                    .buttonStyle(.plain)
+                    .overlay(alignment: .top) {
+                        if row.id != owedRows.first?.id {
+                            Hairline(thickness: 1)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .card(cornerRadius: 24)
+        }
     }
 
     func goalLine(_ goal: RewardGoal) -> some View {
@@ -414,33 +465,86 @@ private extension AssetsView {
         }
     }
 
-    func walletGroup(
+    func groupHeader(
         _ title: String,
-        sections: [AssetsModel.WalletSection]
+        systemImage: String,
+        count: Int,
+        total: Int
     ) -> some View {
-        let total = sections.flatMap(\.rows).reduce(0) { $0 + $1.balance }
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .sansFont(.small, weight: .semibold)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 26, height: 26)
+                .background(Palette.accent.opacity(.subtle), in: Circle())
 
-        return VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(title)
-                    .textFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(Palette.text)
+            Text(title)
+                .textFont(.subheadline, weight: .semibold)
+                .foregroundStyle(Palette.text)
 
-                Spacer(minLength: 8)
+            Text("\(count) 口座")
+                .textFont(.caption2)
+                .foregroundStyle(Palette.subtext)
 
-                Text(AmountText.text(total))
-                    .displayFont(.headline)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-            }
-            .padding(.horizontal, 4)
-            .padding(.top, 8)
+            Spacer(minLength: 8)
 
-            ForEach(sections) { section in
-                walletSection(section)
+            Text(AmountText.text(total))
+                .displayFont(.headline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 4)
+        .padding(.top, 8)
+    }
+
+    func owedRow(_ row: AssetsModel.WalletRow) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            IconBadge(row.icon, size: 32)
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(row.wallet.name)
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.text)
+                        .lineLimit(1)
+
+                    if let label = Self.label(of: row) {
+                        Text(label)
+                            .textFont(.caption2)
+                            .foregroundStyle(Palette.subtext)
+                            .lineLimit(1)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    Text(AmountText.text(row.balance))
+                        .displayFont(.headline)
+                        .monospacedDigit()
+                        .foregroundStyle(Self.amountColor(of: row))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+
+                HStack(spacing: 8) {
+                    if let ratio = row.repaidRatio {
+                        RatioBar(ratio, tint: Palette.accent, height: 4)
+                    }
+
+                    if let note = owedNote(of: row) {
+                        Text(note)
+                            .textFont(.caption2)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .fixedSize(horizontal: row.repaidRatio != nil, vertical: false)
+                    }
+                }
             }
         }
+        .padding(.vertical, 12)
+        .contentShape(.rect)
     }
 
     func walletSection(_ section: AssetsModel.WalletSection) -> some View {
@@ -563,15 +667,6 @@ private extension AssetsView {
                     .textFont(.caption)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
-
-                Spacer(minLength: 4)
-
-                if let label = Self.label(of: row) {
-                    Text(label)
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
-                        .lineLimit(1)
-                }
             }
 
             Text(AmountText.text(row.balance))
@@ -580,25 +675,10 @@ private extension AssetsView {
                 .foregroundStyle(Self.amountColor(of: row))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-
-            if let note = note(of: row) {
-                Text(note)
-                    .textFont(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
         }
         .padding(12)
-        .frame(maxWidth: .infinity, minHeight: 74, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .card(cornerRadius: 20)
-        .overlay {
-            if Self.isOwed(row.wallet.kind.role) {
-                RoundedRectangle(cornerRadius: corner.radius(20))
-                    .strokeBorder(Palette.accent.opacity(.medium), style: .dashed)
-            }
-        }
         .contentShape(.rect)
     }
 }
@@ -613,13 +693,23 @@ private extension AssetsView {
         model.sections.filter { !Self.isOwed($0.role) }
     }
 
-    var owedSections: [AssetsModel.WalletSection] {
-        model.sections.filter { Self.isOwed($0.role) }
+    var owedRows: [AssetsModel.WalletRow] {
+        model.sections
+            .filter { Self.isOwed($0.role) }
+            .flatMap(\.rows)
+    }
+
+    var ownedTotal: Int {
+        ownedSections.flatMap(\.rows).reduce(0) { $0 + $1.balance }
+    }
+
+    var owedTotal: Int {
+        owedRows.reduce(0) { $0 + $1.balance }
     }
 
     var ownedShare: Double {
-        let owned = ownedSections.flatMap(\.rows).reduce(0) { $0 + max($1.balance, 0) }
-        let owed = owedSections.flatMap(\.rows).reduce(0) { $0 + max(-$1.balance, 0) }
+        let owned = max(ownedTotal, 0)
+        let owed = max(-owedTotal, 0)
         let total = owned + owed
 
         return total == 0 ? 1 : Double(owned) / Double(total)
@@ -718,7 +808,7 @@ private extension AssetsView {
         return CGFloat(min(share, 1))
     }
 
-    func note(of row: AssetsModel.WalletRow) -> String? {
+    func owedNote(of row: AssetsModel.WalletRow) -> String? {
         if let repayment = row.repayment {
             return Self.repaymentText(repayment)
         }
@@ -732,7 +822,7 @@ private extension AssetsView {
 
     func nextBillText(_ bill: CardBill) -> String {
         let date = "\(bill.date.month)/\(bill.date.day)"
-        return "\(date) に \(AmountText.text(bill.amount)) 引き落とし"
+        return "\(date) に引き落とし・\(daysText(until: bill.date))"
     }
 
     func openPendingEntry() {

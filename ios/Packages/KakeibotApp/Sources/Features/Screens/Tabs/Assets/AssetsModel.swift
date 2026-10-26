@@ -35,6 +35,7 @@ public extension AssetsModel {
         public let balance: Int
         public let nextBill: CardBill?
         public let repayment: Repayment?
+        public let repaidRatio: Double?
 
         public var id: Wallet.ID {
             wallet.id
@@ -126,13 +127,15 @@ public extension AssetsModel {
 
         return wallets.map { wallet in
             let next = bills.first { $0.bill.recurring.toWalletId == wallet.id }
+            let balance = balance(of: wallet)
 
             return WalletRow(
                 wallet: wallet,
                 icon: list?.icons[wallet.iconId],
-                balance: balance(of: wallet),
+                balance: balance,
                 nextBill: next?.bill,
-                repayment: repayment(of: wallet)
+                repayment: repayment(of: wallet),
+                repaidRatio: repaidRatio(of: wallet, balance: balance)
             )
         }
     }
@@ -360,6 +363,29 @@ private extension AssetsModel {
 
     func balance(of wallet: Wallet) -> Int {
         wallet.balance(with: entries, valuations: valuations)
+    }
+
+    func repaidRatio(
+        of wallet: Wallet,
+        balance: Int
+    ) -> Double? {
+        guard wallet.kind == .loan else {
+            return nil
+        }
+
+        let repaid = entries
+            .filter { entry in
+                let from = list?.wallets[entry.walletId]?.kind.role
+
+                return entry.type == .transfer
+                    && entry.toWalletId == wallet.id
+                    && from != .loan
+            }
+            .reduce(0) { $0 + $1.amount }
+
+        let total = repaid + max(-balance, 0)
+
+        return repaid > 0 && total > 0 ? Double(repaid) / Double(total) : nil
     }
 
     func repayment(of wallet: Wallet) -> Repayment? {

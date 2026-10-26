@@ -21,6 +21,8 @@ public final class ReviewModel: ScreenModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
+    private var recurrings: [Recurring] = []
+
     @ObservationIgnored private var summaries: [
         ClosedRange<LocalDate>: ReviewSummary
     ] = [:]
@@ -47,11 +49,14 @@ public extension ReviewModel {
     }
 
     struct Move: Identifiable {
-        public let role: Wallet.Kind.Role
+        public let wallet: Wallet
+        public let icon: Icon?
         public let amount: Int
+        public let balance: Int
+        public let payoff: LoanPayoff?
 
-        public var id: Wallet.Kind.Role {
-            role
+        public var id: Wallet.ID {
+            wallet.id
         }
     }
 
@@ -176,26 +181,60 @@ public extension ReviewModel {
             return []
         }
 
-        let transfers = entries.filter { entry in
-            entry.type == .transfer && period.range.contains(entry.date)
-        }
+        return list.wallets.values
+            .filter { Self.moveRoles.contains($0.kind.role) && $0.archivedAt == nil }
+            .sorted { lhs, rhs in
+                let lhsOrder = Self.moveRoles.firstIndex(of: lhs.kind.role) ?? 0
+                let rhsOrder = Self.moveRoles.firstIndex(of: rhs.kind.role) ?? 0
 
-        return Self.moveRoles.compactMap { role in
-            let amount = transfers
-                .filter { entry in
-                    let from = list.wallets[entry.walletId]?.kind.role
-                    let to = entry.toWalletId.flatMap { list.wallets[$0] }?.kind.role
-
-                    return to == role && from != role
+                if lhsOrder != rhsOrder {
+                    return lhsOrder < rhsOrder
                 }
-                .reduce(0) { $0 + $1.amount }
 
-            return amount > 0 ? Move(role: role, amount: amount) : nil
-        }
+                return lhs.sortOrder < rhs.sortOrder
+            }
+            .compactMap { wallet in
+                let amount = moveEntries(to: wallet, in: list).reduce(0) { $0 + $1.amount }
+
+                guard amount > 0 else {
+                    return nil
+                }
+
+                let balance = wallet.balance(with: entries, valuations: list.valuations)
+
+                return Move(
+                    wallet: wallet,
+                    icon: list.icons[wallet.iconId],
+                    amount: amount,
+                    balance: balance,
+                    payoff: payoff(of: wallet, balance: balance)
+                )
+            }
     }
 
     var stampTallies: [StampCalendar.Tally] {
         stampCalendar?.tallies(in: period.range) ?? []
+    }
+
+    func repaymentRatio(in moves: [Move]) -> Double {
+        let total = moves.reduce(0) { $0 + $1.amount }
+
+        let repaid = moves
+            .filter { $0.wallet.kind.role == .loan }
+            .reduce(0) { $0 + $1.amount }
+
+        return total == 0 ? 0 : Double(repaid) / Double(total)
+    }
+
+    func share(of move: Move) -> Share {
+        Share(
+            id: AnyHashable(MoveKey(walletId: move.wallet.id)),
+            name: move.wallet.name,
+            icon: move.icon,
+            amount: move.amount,
+            ratio: 0,
+            usage: nil
+        )
     }
 
     func total(of kind: ReviewKind) -> Int {
@@ -211,6 +250,10 @@ public extension ReviewModel {
     }
 
     func rows(for share: Share) -> [EntryRowItem] {
+        if let key = share.id.base as? MoveKey {
+            return moveRows(to: key.walletId)
+        }
+
         guard let list, let type = entryType else {
             return []
         }
@@ -270,6 +313,10 @@ public extension ReviewModel {
             }
 
             group.addTask {
+                await self.observeRecurrings()
+            }
+
+            group.addTask {
                 await self.observeMonthStartDay()
             }
 
@@ -326,6 +373,10 @@ public extension ReviewModel {
 }
 
 private extension ReviewModel {
+    struct MoveKey: Hashable {
+        let walletId: Wallet.ID
+    }
+
     struct Ranked {
         let share: Share
         let sortOrder: Int
@@ -444,6 +495,65 @@ private extension ReviewModel {
             failure: Self.loadFailedMessage
         ) { budgets in
             self.budgets = budgets
+        }
+    }
+
+    func moveEntries(
+        to wallet: Wallet,
+        in list: EntryList
+    ) -> [Entry] {
+        entries.filter { entry in
+            let from = list.wallets[entry.walletId]?.kind.role
+
+            return entry.type == .transfer
+                && entry.toWalletId == wallet.id
+                && from != wallet.kind.role
+                && period.range.contains(entry.date)
+        }
+    }
+
+    func moveRows(to walletId: Wallet.ID) -> [EntryRowItem] {
+        guard let list, let wallet = list.wallets[walletId] else {
+            return []
+        }
+
+        return moveEntries(to: wallet, in: list)
+            .sorted { $0.date > $1.date }
+            .map { entry in
+                let label = "\(entry.date.month)/\(entry.date.day)"
+
+                return EntryRowItem(entry, in: list, dayLabel: label)
+            }
+    }
+
+    func payoff(
+        of wallet: Wallet,
+        balance: Int
+    ) -> LoanPayoff? {
+        guard
+            wallet.kind == .loan,
+            balance < 0
+        else {
+            return nil
+        }
+
+        let repayments = recurrings.filter { recurring in
+            recurring.type == .transfer && recurring.toWalletId == wallet.id
+        }
+
+        return LoanPayoff(
+            balance: balance,
+            repayments: repayments,
+            after: today
+        )
+    }
+
+    func observeRecurrings() async {
+        await observe(
+            database.recurringUpdates(),
+            failure: Self.loadFailedMessage
+        ) { recurrings in
+            self.recurrings = recurrings
         }
     }
 

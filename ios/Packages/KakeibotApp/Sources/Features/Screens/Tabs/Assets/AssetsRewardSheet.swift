@@ -106,9 +106,15 @@ private extension AssetsRewardSheet {
             if let goal = model.rewardGoal {
                 nearestGoal(goal)
             } else {
-                Text("我慢できた日に決めた額を貯めていきます。口座の残高は変わりません")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("我慢できた日に決めた額を貯めていきます")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+
+                    Text("口座の残高は変わりません")
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.hint)
+                }
             }
         }
         .padding(20)
@@ -122,19 +128,19 @@ private extension AssetsRewardSheet {
             VStack(alignment: .leading, spacing: 12) {
                 guideStep(
                     1,
-                    title: "決まりを作る",
+                    title: "ごほうびの決まりを作る",
                     note: "例：外食しなかったら ¥500"
                 )
 
                 guideStep(
                     2,
-                    title: "守れた日に「今日の達成」を付ける",
+                    title: "守れた日に「今日の達成を付ける」を押す",
                     note: nil
                 )
 
                 guideStep(
                     3,
-                    title: "貯まったら、目標の物を買う",
+                    title: "目標の額まで貯まったら買う",
                     note: nil
                 )
             }
@@ -154,7 +160,7 @@ private extension AssetsRewardSheet {
                     Button {
                         goalTarget = GoalTarget(goal: nil)
                     } label: {
-                        Label("足す", systemImage: "plus")
+                        Label("追加", systemImage: "plus")
                             .textFont(.caption, weight: .semibold)
                             .foregroundStyle(Palette.accent)
                     }
@@ -163,7 +169,7 @@ private extension AssetsRewardSheet {
             }
 
             if model.waitingGoals.isEmpty {
-                AddButton("欲しい物と額を決める") {
+                AddButton("欲しい物を目標にする") {
                     goalTarget = GoalTarget(goal: nil)
                 }
             } else {
@@ -177,7 +183,7 @@ private extension AssetsRewardSheet {
     var ruleSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                SectionTitle("決まり")
+                SectionTitle("ごほうびの決まり")
 
                 Spacer()
 
@@ -185,7 +191,7 @@ private extension AssetsRewardSheet {
                     isEditingRules = true
                 } label: {
                     HStack(spacing: 4) {
-                        Text("直す")
+                        Text("編集")
 
                         Image(systemName: "chevron.right")
                             .sansFont(.micro, weight: .bold)
@@ -197,7 +203,7 @@ private extension AssetsRewardSheet {
             }
 
             if model.rewardRules.isEmpty {
-                AddButton("決まりを作る") {
+                AddButton("ごほうびを追加") {
                     isEditingRules = true
                 }
             } else {
