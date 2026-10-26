@@ -20,6 +20,7 @@ public extension ExportV1 {
     enum ReadError: Error, Equatable {
         case unknownFormat(String)
         case unsupportedVersion(Int)
+        case missingTransfer
     }
 
     enum Platform: String, CaseIterable, Codable, Sendable {
@@ -209,6 +210,10 @@ extension ExportV1: Codable {
         let app = try container.decode(App.self, forKey: .app)
         let data = try container.decode(Tables.self, forKey: .data)
 
+        guard data.hasTransferForEveryFee else {
+            throw ReadError.missingTransfer
+        }
+
         self.init(
             exportedAt: exportedAt,
             app: app,
@@ -224,5 +229,12 @@ extension ExportV1: Codable {
         try container.encode(exportedAt, forKey: .exportedAt)
         try container.encode(app, forKey: .app)
         try container.encode(data, forKey: .data)
+    }
+}
+
+private extension ExportV1.Tables {
+    var hasTransferForEveryFee: Bool {
+        let transfers = Set(entries.filter { $0.type == .transfer }.map(\.id))
+        return entries.compactMap(\.transferId).allSatisfy(transfers.contains)
     }
 }

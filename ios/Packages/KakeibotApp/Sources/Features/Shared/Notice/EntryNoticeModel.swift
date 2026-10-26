@@ -98,7 +98,7 @@ public extension EntryNoticeModel {
         }
 
         do {
-            try await database.deleteEntry(id)
+            let deleted = try await database.deleteEntry(id)
 
             let label = EntryChange.label(for: entry) { id in
                 list.categories[id]
@@ -106,11 +106,11 @@ public extension EntryNoticeModel {
                 list.wallets[id]
             }
 
-            let fee = entries.first { $0.transferId == id }
+            let fee = deleted.first { $0.transferId == id }
 
             let change = EntryChange(
                 kind: .deleted,
-                entry: entry,
+                entry: deleted.first { $0.id == id } ?? entry,
                 label: label,
                 fee: fee
             )

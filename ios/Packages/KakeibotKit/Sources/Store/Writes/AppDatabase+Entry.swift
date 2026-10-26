@@ -60,10 +60,9 @@ public extension AppDatabase {
         }
     }
 
-    func deleteEntry(_ id: Entry.ID) async throws {
-        try await writer.write { db in
-            _ = try Entry.deleteOne(db, key: id)
-        }
+    @discardableResult
+    func deleteEntry(_ id: Entry.ID) async throws -> [Entry] {
+        try await deleteEntries([id])
     }
 
     func deleteEntries(_ ids: [Entry.ID]) async throws -> [Entry] {
@@ -158,34 +157,6 @@ extension AppDatabase {
             .filter(Column("transfer_id") == id)
             .fetchOne(db)
     }
-}
-
-private extension AppDatabase {
-    static func restore(
-        _ entries: [Entry],
-        in db: Database
-    ) throws {
-        let ordered = entries.filter { $0.transferId == nil }
-            + entries.filter { $0.transferId != nil }
-
-        for var entry in ordered {
-            if let templateId = entry.templateId,
-               try !EntryTemplate.exists(db, key: templateId) {
-                entry.templateId = nil
-            }
-
-            if let transferId = entry.transferId,
-               try !Entry.exists(db, key: transferId) {
-                entry.transferId = nil
-            }
-
-            try entry.save(db)
-
-            if entry.type == .expense {
-                try NoSpendDay.deleteOne(db, key: entry.date)
-            }
-        }
-    }
 
     static func saveFee(
         _ amount: Int,
@@ -222,6 +193,34 @@ private extension AppDatabase {
 
         try fee.save(db)
         try NoSpendDay.deleteOne(db, key: fee.date)
+    }
+}
+
+private extension AppDatabase {
+    static func restore(
+        _ entries: [Entry],
+        in db: Database
+    ) throws {
+        let ordered = entries.filter { $0.transferId == nil }
+            + entries.filter { $0.transferId != nil }
+
+        for var entry in ordered {
+            if let templateId = entry.templateId,
+               try !EntryTemplate.exists(db, key: templateId) {
+                entry.templateId = nil
+            }
+
+            if let transferId = entry.transferId,
+               try !Entry.exists(db, key: transferId) {
+                entry.transferId = nil
+            }
+
+            try entry.save(db)
+
+            if entry.type == .expense {
+                try NoSpendDay.deleteOne(db, key: entry.date)
+            }
+        }
     }
 
     static func canChange(

@@ -383,6 +383,25 @@ private extension RecurringEditSheet {
             holidayChooser
         case .closing:
             closingChooser
+        case .fee:
+            VStack(spacing: 12) {
+                FeeChoiceRow(
+                    choices: FeeChoiceRow.defaultChoices,
+                    selection: model.fee
+                ) { amount in
+                    model.setFee(amount)
+                }
+
+                Keypad(calculator: model.feeCalculator) {
+                    closePanel()
+                } onKey: { key in
+                    model.pressFee(key)
+                }
+
+                PrimaryButton("決める") {
+                    closePanel()
+                }
+            }
         case .remind:
             remindChooser
         }
@@ -400,6 +419,7 @@ private extension RecurringEditSheet {
         case end
         case holiday
         case closing
+        case fee
         case remind
     }
 
@@ -523,8 +543,16 @@ private extension RecurringEditSheet {
             isEmpty: model.selectedDestination == nil
         )
 
+        let fee = SettingsRowList<Panel>.Item(
+            panel: .fee,
+            systemImage: "yensign.circle",
+            title: "手数料",
+            value: model.fee > 0 ? AmountText.text(model.fee) : "なし",
+            isEmpty: model.fee == 0
+        )
+
         guard model.canUseClosingDay else {
-            return [wallet, destination]
+            return [wallet, destination, fee]
         }
 
         let closing = SettingsRowList<Panel>.Item(
@@ -535,7 +563,7 @@ private extension RecurringEditSheet {
             isEmpty: model.closingDay == nil
         )
 
-        return [wallet, destination, closing]
+        return [wallet, destination, closing, fee]
     }
 
     var scheduleItems: [SettingsRowList<Panel>.Item] {
@@ -579,7 +607,7 @@ private extension RecurringEditSheet {
     }
 
     func showsDone(for panel: Panel) -> Bool {
-        panel != .amount
+        panel != .amount && panel != .fee
     }
 
     func title(for panel: Panel) -> String {
@@ -593,6 +621,7 @@ private extension RecurringEditSheet {
         case .end: "終わり"
         case .holiday: "休日なら"
         case .closing: "金額の決め方"
+        case .fee: "手数料"
         case .remind: "前に知らせる"
         }
     }

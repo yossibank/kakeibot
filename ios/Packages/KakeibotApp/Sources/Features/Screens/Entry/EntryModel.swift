@@ -126,7 +126,6 @@ public extension EntryModel {
     static let categoriesPerPage = 15
     static let recentTransferLimit = 3
     static let frequentRouteLimit = 6
-    static let feeChoices = [110, 220, 330, 440]
 
     static let destinationTitle = "振替先"
 
@@ -152,6 +151,20 @@ public extension EntryModel {
 
     var activeCalculator: AmountCalculator {
         keypadTarget == .fee ? feeCalculator : calculator
+    }
+
+    var feeChoices: [Int] {
+        let used = (history?.days ?? [])
+            .flatMap(\.entries)
+            .filter { $0.transferId != nil }
+            .sorted { $0.createdAt > $1.createdAt }
+            .map(\.amount)
+
+        var seen: Set<Int> = []
+
+        let ordered = (used + FeeChoiceRow.defaultChoices).filter { seen.insert($0).inserted }
+
+        return Array(ordered.prefix(FeeChoiceRow.defaultChoices.count))
     }
 
     var expressionText: String? {
@@ -836,15 +849,14 @@ public extension EntryModel {
         }
 
         do {
-            try await database.deleteEntry(original.id)
-
+            let deleted = try await database.deleteEntry(original.id)
             let title = label(for: original)
 
             return EntryChange(
                 kind: .deleted,
                 entry: original,
                 label: title,
-                fee: originalFee
+                fee: deleted.first { $0.transferId == original.id }
             )
         } catch {
             report(error)

@@ -102,6 +102,35 @@ struct TransferFeeWriteTests {
     }
 
     @Test
+    func recordsFeeWithRecurringTransfer() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let start = try #require(LocalDate("2026-10-03"))
+
+        let draft = RecurringDraft(
+            type: .transfer,
+            amount: 10000,
+            categoryId: nil,
+            walletId: options.wallets[1].id,
+            toWalletId: options.wallets[0].id,
+            frequency: .monthly,
+            month: 10,
+            day: 3,
+            fee: 110,
+            startDate: start
+        )
+
+        try await setup.database.saveRecurring(draft, today: start, at: setup.now)
+
+        let entries = try setup.database.snapshot().entries
+        let transfer = try #require(entries.first { $0.type == .transfer })
+        let fee = try await setup.database.fee(of: transfer.id)
+
+        #expect(fee?.amount == 110)
+        #expect(fee?.walletId == transfer.walletId)
+    }
+
+    @Test
     func deletesFeeWithTransfer() async throws {
         let setup = try await Setup()
 

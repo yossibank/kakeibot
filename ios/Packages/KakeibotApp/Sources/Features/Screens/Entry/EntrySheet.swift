@@ -314,7 +314,12 @@ private extension EntrySheet {
     var keypadDrawer: some View {
         VStack(spacing: 12) {
             if model.keypadTarget == .fee {
-                EntryFeeRow(model: model)
+                FeeChoiceRow(
+                    choices: model.feeChoices,
+                    selection: model.fee
+                ) { amount in
+                    model.setFee(amount)
+                }
             } else {
                 EntryTemplateRow(
                     model: model,

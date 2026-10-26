@@ -25,6 +25,38 @@ struct EntryNoticeModelTests {
     }
 
     @Test
+    func restoresFeeDeletedFromStaleList() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+
+        var draft = EntryDraft(
+            type: .transfer,
+            amount: 10000,
+            date: setup.date,
+            categoryId: nil,
+            walletId: options.wallets[1].id,
+            toWalletId: options.wallets[0].id
+        )
+
+        let transfer = try await setup.database.saveEntry(draft, at: Date())
+        let stale = try await setup.database.entryList()
+        draft.fee = 110
+
+        try await setup.database.saveEntry(
+            draft,
+            editing: transfer.id,
+            at: Date()
+        )
+
+        await setup.notice.delete(transfer.id, in: stale)
+        await setup.notice.undo()
+
+        let fee = try await setup.database.fee(of: transfer.id)
+
+        #expect(fee?.amount == 110)
+    }
+
+    @Test
     func undoesEdit() async throws {
         let setup = try await Setup()
         let saved = try await setup.saveEntry()

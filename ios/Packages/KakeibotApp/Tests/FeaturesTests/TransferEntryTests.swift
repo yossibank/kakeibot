@@ -163,6 +163,33 @@ struct TransferEntryTests {
     }
 
     @Test
+    func putsUsedFeesFirst() async throws {
+        let setup = try await Setup()
+
+        let draft = EntryDraft(
+            type: .transfer,
+            amount: 10000,
+            date: setup.date,
+            categoryId: nil,
+            walletId: setup.bank,
+            toWalletId: setup.cash,
+            fee: 165
+        )
+
+        try await setup.database.saveEntry(draft, at: Date())
+
+        let model = EntryModel(
+            database: setup.database,
+            date: setup.date,
+            type: .transfer
+        )
+
+        await model.load()
+
+        #expect(model.feeChoices == [165, 110, 220, 330])
+    }
+
+    @Test
     func countsFeeInSourceBalance() async throws {
         let setup = try await Setup()
         let date = try #require(LocalDate("2026-10-01"))

@@ -154,12 +154,14 @@ private extension BackupModel {
     static let readFailedMessage = "ファイルを読めませんでした"
     static let unknownFormatMessage = "かけいぼっとのバックアップではありません"
     static let newerVersionMessage = "新しい版のアプリで書き出したファイルです"
+    static let missingTransferMessage = "元の振替が無い手数料があるため、読み込めません"
     static let restoreFailedMessage = "読み込めませんでした。いまのデータはそのままです"
 
     static func readMessage(for error: any Error) -> String {
         switch error as? ExportV1.ReadError {
         case .unknownFormat: unknownFormatMessage
         case .unsupportedVersion: newerVersionMessage
+        case .missingTransfer: missingTransferMessage
         case nil: readFailedMessage
         }
     }

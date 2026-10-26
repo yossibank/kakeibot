@@ -22,6 +22,7 @@ public final class RecurringEditModel {
 
     public private(set) var type: Entry.Kind = .expense
     public private(set) var calculator = AmountCalculator()
+    public private(set) var feeCalculator = AmountCalculator()
     public private(set) var options: EntryOptions?
     public private(set) var isHidden = false
 
@@ -85,6 +86,7 @@ public extension RecurringEditModel {
             day: day,
             holidayShift: holidayShift,
             closingDay: canUseClosingDay ? closingDay : nil,
+            fee: type == .transfer ? fee : 0,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore
@@ -93,6 +95,10 @@ public extension RecurringEditModel {
 
     var canUseClosingDay: Bool {
         type == .transfer && selectedDestination?.kind == .card
+    }
+
+    var fee: Int {
+        feeCalculator.amount
     }
 
     var isCardBill: Bool {
@@ -173,6 +179,14 @@ public extension RecurringEditModel {
 
     func press(_ key: AmountCalculator.Key) {
         calculator.press(key)
+    }
+
+    func pressFee(_ key: AmountCalculator.Key) {
+        feeCalculator.press(key)
+    }
+
+    func setFee(_ amount: Int) {
+        feeCalculator = AmountCalculator(amount: amount)
     }
 
     func load() async {
@@ -319,7 +333,7 @@ private extension RecurringEditModel {
         case .sameWallet: "振替元と振替先を別にしてください"
         case .endBeforeStart: "終わりを始まりより後にしてください"
         case .categoryOnTransfer, .dayOutOfRange, .closingDayOutOfRange,
-             .monthOutOfRange, .remindOutOfRange:
+             .monthOutOfRange, .remindOutOfRange, .feeNegative:
             Self.saveFailedMessage
         }
     }
@@ -350,6 +364,7 @@ private extension RecurringEditModel {
         day = draft.day
         holidayShift = draft.holidayShift
         closingDay = draft.closingDay
+        feeCalculator = AmountCalculator(amount: draft.fee)
         startDate = draft.startDate
         endDate = draft.endDate
         remindDaysBefore = draft.remindDaysBefore
