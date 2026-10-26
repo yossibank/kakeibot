@@ -7,6 +7,7 @@ public struct Wallet: Hashable, Sendable {
     public var kind: Kind
     public var iconId: Icon.ID
     public var initialBalance: Int
+    public var loanAmount: Int?
     public var sortOrder: Int
     public var archivedAt: Date?
     public var createdAt: Date
@@ -18,6 +19,7 @@ public struct Wallet: Hashable, Sendable {
         kind: Kind,
         iconId: Icon.ID,
         initialBalance: Int,
+        loanAmount: Int? = nil,
         sortOrder: Int,
         archivedAt: Date? = nil,
         createdAt: Date,
@@ -28,6 +30,7 @@ public struct Wallet: Hashable, Sendable {
         self.kind = kind
         self.iconId = iconId
         self.initialBalance = initialBalance
+        self.loanAmount = loanAmount
         self.sortOrder = sortOrder
         self.archivedAt = archivedAt
         self.createdAt = createdAt
@@ -53,6 +56,42 @@ public extension Wallet {
 extension Wallet: Identifiable {}
 
 extension Wallet: Codable {
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case kind
+        case iconId
+        case initialBalance
+        case loanAmount
+        case sortOrder
+        case archivedAt
+        case createdAt
+        case updatedAt
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        try self.init(
+            id: container.decode(ID.self, forKey: .id),
+            name: container.decode(String.self, forKey: .name),
+            kind: container.decode(Kind.self, forKey: .kind),
+            iconId: container.decode(Icon.ID.self, forKey: .iconId),
+            initialBalance: container.decode(Int.self, forKey: .initialBalance),
+            loanAmount: container.decodeIfPresent(
+                Int.self,
+                forKey: .loanAmount
+            ),
+            sortOrder: container.decode(Int.self, forKey: .sortOrder),
+            archivedAt: container.decodeIfPresent(
+                Date.self,
+                forKey: .archivedAt
+            ),
+            createdAt: container.decode(Date.self, forKey: .createdAt),
+            updatedAt: container.decode(Date.self, forKey: .updatedAt)
+        )
+    }
+
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
@@ -61,6 +100,7 @@ extension Wallet: Codable {
         try container.encode(kind, forKey: .kind)
         try container.encode(iconId, forKey: .iconId)
         try container.encode(initialBalance, forKey: .initialBalance)
+        try container.encodeOrNull(loanAmount, forKey: .loanAmount)
         try container.encode(sortOrder, forKey: .sortOrder)
         try container.encodeOrNull(archivedAt, forKey: .archivedAt)
         try container.encode(createdAt, forKey: .createdAt)

@@ -53,6 +53,32 @@ struct WalletWriteTests {
     }
 
     @Test
+    func savesLoanAmountAndClearsItWhenKindChanges() async throws {
+        let setup = try await Setup()
+        var draft = setup.draft
+        draft.kind = .loan
+        draft.loanAmount = 300_000
+
+        let saved = try await setup.database.saveWallet(draft, at: setup.now)
+        let list = try await setup.database.entryList()
+
+        draft.kind = .bank
+
+        let updated = try await setup.database.saveWallet(
+            draft,
+            editing: saved.id,
+            at: setup.now
+        )
+
+        let reloaded = try await setup.database.entryList()
+
+        #expect(saved.loanAmount == 300_000)
+        #expect(list.wallets[saved.id]?.loanAmount == 300_000)
+        #expect(updated.loanAmount == nil)
+        #expect(reloaded.wallets[saved.id]?.loanAmount == nil)
+    }
+
+    @Test
     func reordersWallets() async throws {
         let setup = try await Setup()
         let cash = try await setup.wallet(named: "財布")

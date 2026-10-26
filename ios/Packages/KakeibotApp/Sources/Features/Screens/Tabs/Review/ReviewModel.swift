@@ -216,8 +216,12 @@ public extension ReviewModel {
         stampCalendar?.tallies(in: period.range) ?? []
     }
 
+    static func total(of moves: [Move]) -> Int {
+        moves.reduce(0) { $0 + $1.amount }
+    }
+
     func repaymentRatio(in moves: [Move]) -> Double {
-        let total = moves.reduce(0) { $0 + $1.amount }
+        let total = Self.total(of: moves)
 
         let repaid = moves
             .filter { $0.wallet.kind.role == .loan }

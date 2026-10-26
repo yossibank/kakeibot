@@ -8,6 +8,7 @@ public struct WalletEditSheet: View {
     @State private var isConfirmingDiscard = false
     @State private var isEnteringAmount = false
     @State private var isEnteringValuation = false
+    @State private var isEnteringLoanAmount = false
     @State private var isEditingIcon = false
     @State private var iconBottom: CGFloat = 0
     @State private var openValuationId: Valuation.ID?
@@ -67,44 +68,30 @@ public struct WalletEditSheet: View {
                 }
 
                 if isEnteringValuation {
-                    Palette.scrim
-                        .opacity(0.35)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            closeValuation()
-                        }
-                        .transition(.opacity)
-                        .zIndex(1)
-
-                    SettingsDrawer("今の評価額") {
+                    amountDrawer(
+                        "今の評価額",
+                        amount: model.valuation.amount,
+                        tax: valuationTax,
+                        saveTitle: "評価額を保存",
+                        onPress: model.pressValuation,
+                        onDismiss: closeValuation
+                    ) {
                         Task {
                             await saveValuation()
                         }
-                    } content: {
-                        VStack(spacing: 12) {
-                            Text(AmountText.text(model.valuation.amount))
-                                .displayFont(.largeTitle, weight: .bold)
-                                .monospacedDigit()
-                                .foregroundStyle(Palette.accentStrong)
-                                .contentTransition(.numericText())
-                                .animation(
-                                    .snappy,
-                                    value: model.valuation.amount
-                                )
-
-                            Keypad(activeTax: valuationTax) { key in
-                                model.pressValuation(key)
-                            }
-
-                            PrimaryButton("評価額を保存") {
-                                Task {
-                                    await saveValuation()
-                                }
-                            }
-                        }
                     }
-                    .transition(.settingsDrawer)
-                    .zIndex(1)
+                }
+
+                if isEnteringLoanAmount {
+                    amountDrawer(
+                        "借りた額",
+                        amount: model.loanAmount.amount,
+                        tax: loanAmountTax,
+                        saveTitle: "借りた額を決める",
+                        onPress: model.pressLoanAmount,
+                        onDismiss: closeLoanAmount,
+                        onSave: closeLoanAmount
+                    )
                 }
             }
         }
@@ -196,9 +183,9 @@ private extension WalletEditSheet {
                         valuationField
                     }
 
-                    if model.showsPayment {
-                        SettingsRowList(items: paymentItems) { _ in
-                            isEditingPayment = true
+                    if !rowItems.isEmpty {
+                        SettingsRowList(items: rowItems) { panel in
+                            open(panel)
                         }
                     }
                 }
@@ -377,8 +364,8 @@ private extension WalletEditSheet {
 
     var valuationField: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SettingsRowList(items: valuationItems) { _ in
-                openValuation()
+            SettingsRowList(items: valuationItems) { panel in
+                open(panel)
             }
 
             Text("値動きの分は、収入や支出に入れず、残高だけを合わせます")
@@ -434,6 +421,50 @@ private extension WalletEditSheet {
         }
         .buttonStyle(.plain)
         .sensoryFeedback(.selection, trigger: model.isNegative)
+    }
+
+    func amountDrawer(
+        _ title: String,
+        amount: Int,
+        tax: AmountCalculator.TaxRate?,
+        saveTitle: String,
+        onPress: @escaping (AmountCalculator.Key) -> Void,
+        onDismiss: @escaping () -> Void,
+        onSave: @escaping () -> Void
+    ) -> some View {
+        Group {
+            Palette.scrim
+                .opacity(0.35)
+                .ignoresSafeArea()
+                .onTapGesture {
+                    onDismiss()
+                }
+                .transition(.opacity)
+                .zIndex(1)
+
+            SettingsDrawer(title) {
+                onSave()
+            } content: {
+                VStack(spacing: 12) {
+                    Text(AmountText.text(amount))
+                        .displayFont(.largeTitle, weight: .bold)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accentStrong)
+                        .contentTransition(.numericText())
+                        .animation(.snappy, value: amount)
+
+                    Keypad(activeTax: tax) { key in
+                        onPress(key)
+                    }
+
+                    PrimaryButton(saveTitle) {
+                        onSave()
+                    }
+                }
+            }
+            .transition(.settingsDrawer)
+            .zIndex(1)
+        }
     }
 
     func valuationRow(_ valuation: Valuation) -> some View {
@@ -492,6 +523,7 @@ private extension WalletEditSheet {
     enum Panel: Hashable {
         case payment
         case valuation
+        case loanAmount
     }
 
     static let fade: CGFloat = 16
@@ -515,6 +547,24 @@ private extension WalletEditSheet {
                 isEmpty: model.payment == nil
             )
         ]
+    }
+
+    var loanAmountItem: SettingsRowList<Panel>.Item {
+        .init(
+            panel: .loanAmount,
+            systemImage: "yensign.circle",
+            title: "借りた額",
+            value: model.loanAmountText,
+            isEmpty: model.loanAmount.amount == 0,
+            isAmount: true
+        )
+    }
+
+    var rowItems: [SettingsRowList<Panel>.Item] {
+        let loan = model.showsLoanAmount ? [loanAmountItem] : []
+        let payment = model.showsPayment ? paymentItems : []
+
+        return loan + payment
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {
@@ -578,6 +628,18 @@ private extension WalletEditSheet {
         model.valuation.taxNote?.rate
     }
 
+    var loanAmountTax: AmountCalculator.TaxRate? {
+        model.loanAmount.taxNote?.rate
+    }
+
+    func open(_ panel: Panel) {
+        switch panel {
+        case .payment: isEditingPayment = true
+        case .valuation: openValuation()
+        case .loanAmount: openLoanAmount()
+        }
+    }
+
     func openAmount() {
         focus = nil
 
@@ -605,6 +667,20 @@ private extension WalletEditSheet {
     func closeValuation() {
         withAnimation(.snappy) {
             isEnteringValuation = false
+        }
+    }
+
+    func openLoanAmount() {
+        focus = nil
+
+        withAnimation(.snappy) {
+            isEnteringLoanAmount = true
+        }
+    }
+
+    func closeLoanAmount() {
+        withAnimation(.snappy) {
+            isEnteringLoanAmount = false
         }
     }
 

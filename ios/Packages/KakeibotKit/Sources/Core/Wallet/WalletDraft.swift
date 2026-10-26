@@ -6,19 +6,22 @@ public struct WalletDraft: Hashable, Sendable {
     public var mark: IconDraft.Mark
     public var color: String
     public var initialBalance: Int
+    public var loanAmount: Int?
 
     public init(
         kind: Wallet.Kind,
         name: String,
         mark: IconDraft.Mark,
         color: String,
-        initialBalance: Int
+        initialBalance: Int,
+        loanAmount: Int? = nil
     ) {
         self.kind = kind
         self.name = name
         self.mark = mark
         self.color = color
         self.initialBalance = initialBalance
+        self.loanAmount = loanAmount
     }
 }
 
@@ -44,7 +47,8 @@ public extension WalletDraft {
             name: wallet.name,
             mark: IconDraft.Mark(icon),
             color: icon.color,
-            initialBalance: wallet.initialBalance
+            initialBalance: wallet.initialBalance,
+            loanAmount: wallet.loanAmount
         )
     }
 
@@ -65,6 +69,7 @@ public extension WalletDraft {
             kind: kind,
             iconId: iconId,
             initialBalance: initialBalance,
+            loanAmount: savedLoanAmount,
             sortOrder: sortOrder,
             createdAt: now,
             updatedAt: now
@@ -90,6 +95,7 @@ public extension WalletDraft {
         updated.name = trimmedName
         updated.kind = kind
         updated.initialBalance = initialBalance
+        updated.loanAmount = savedLoanAmount
         updated.updatedAt = now
 
         return updated
@@ -99,6 +105,18 @@ public extension WalletDraft {
 private extension WalletDraft {
     var trimmedName: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var savedLoanAmount: Int? {
+        guard
+            kind == .loan,
+            let loanAmount,
+            loanAmount > 0
+        else {
+            return nil
+        }
+
+        return loanAmount
     }
 
     func validate() throws {

@@ -233,6 +233,26 @@ private extension ReviewView {
                 .buttonStyle(.plain)
             }
 
+            if model.kind == .expense,
+               !model.moves.isEmpty {
+                Button {
+                    select(.balance)
+                } label: {
+                    HStack(spacing: 4) {
+                        Label(moveText, systemImage: "arrow.right")
+
+                        Image(systemName: "chevron.right")
+                            .sansFont(.micro, weight: .semibold)
+                    }
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .frame(minHeight: 28)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            }
+
             if model.kind == .balance {
                 VStack(spacing: 12) {
                     balanceBar(
@@ -274,7 +294,7 @@ private extension ReviewView {
     }
 
     func moveCard(_ moves: [ReviewModel.Move]) -> some View {
-        let total = moves.reduce(0) { $0 + $1.amount }
+        let total = ReviewModel.total(of: moves)
         let ratio = model.repaymentRatio(in: moves)
 
         return VStack(alignment: .leading, spacing: 12) {
@@ -433,11 +453,7 @@ private extension ReviewView {
         let change = model.change(of: kind)
 
         return Button {
-            model.setKind(kind)
-
-            Task {
-                await model.saveSelection()
-            }
+            select(kind)
         } label: {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
@@ -533,6 +549,11 @@ private extension ReviewView {
 
     var selectedChangeColor: Color {
         Self.changeColor(model.change, of: model.kind)
+    }
+
+    var moveText: String {
+        let total = ReviewModel.total(of: model.moves)
+        return "ほかに返済と積立 \(AmountText.text(total))"
     }
 
     var comparisonText: String {
@@ -637,6 +658,14 @@ private extension ReviewView {
         }
 
         openShare = nil
+    }
+
+    func select(_ kind: ReviewKind) {
+        model.setKind(kind)
+
+        Task {
+            await model.saveSelection()
+        }
     }
 
     func openPendingDay() {

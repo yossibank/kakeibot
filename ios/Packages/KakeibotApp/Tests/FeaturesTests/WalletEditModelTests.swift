@@ -130,6 +130,34 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func savesLoanAmountAndClearsItWhenKindChanges() async throws {
+        let setup = try await Setup()
+        let adding = WalletEditModel(database: setup.database)
+        adding.name = "奨学金"
+        adding.kind = .loan
+        adding.pressLoanAmount(.digit(3))
+        adding.pressLoanAmount(.doubleZero)
+        adding.pressLoanAmount(.doubleZero)
+        adding.pressLoanAmount(.digit(0))
+        adding.pressLoanAmount(.digit(0))
+        let saved = try #require(await adding.save())
+
+        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        await model.load()
+        let loaded = model.loanAmount.amount
+        let isChanged = model.isChanged
+        model.kind = .bank
+        let changed = try #require(await model.save())
+
+        #expect(adding.showsLoanAmount)
+        #expect(saved.loanAmount == 300_000)
+        #expect(loaded == 300_000)
+        #expect(!isChanged)
+        #expect(!model.showsLoanAmount)
+        #expect(changed.loanAmount == nil)
+    }
+
+    @Test
     func setsInvestmentValuation() async throws {
         let setup = try await Setup()
         let adding = WalletEditModel(database: setup.database)

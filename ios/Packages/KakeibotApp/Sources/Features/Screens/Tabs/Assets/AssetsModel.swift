@@ -369,23 +369,17 @@ private extension AssetsModel {
         of wallet: Wallet,
         balance: Int
     ) -> Double? {
-        guard wallet.kind == .loan else {
+        guard
+            wallet.kind == .loan,
+            let loanAmount = wallet.loanAmount,
+            loanAmount > 0
+        else {
             return nil
         }
 
-        let repaid = entries
-            .filter { entry in
-                let from = list?.wallets[entry.walletId]?.kind.role
+        let repaid = loanAmount - max(-balance, 0)
 
-                return entry.type == .transfer
-                    && entry.toWalletId == wallet.id
-                    && from != .loan
-            }
-            .reduce(0) { $0 + $1.amount }
-
-        let total = repaid + max(-balance, 0)
-
-        return repaid > 0 && total > 0 ? Double(repaid) / Double(total) : nil
+        return min(max(Double(repaid) / Double(loanAmount), 0), 1)
     }
 
     func repayment(of wallet: Wallet) -> Repayment? {
