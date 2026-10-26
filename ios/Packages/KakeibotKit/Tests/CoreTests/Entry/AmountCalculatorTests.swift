@@ -65,6 +65,7 @@ private extension AmountCalculatorTests {
 
         switch text {
         case "00": return .doubleZero
+        case "000": return .tripleZero
         case "del": return .delete
         case "ac": return .clear
         case "+": return .operation(.add)

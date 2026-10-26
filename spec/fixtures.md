@@ -63,7 +63,7 @@ Core の計算を iOS と Android で同じ結果にそろえる、fixtures の 
 | --- | --- | --- |
 | `entry-draft.json` | 入力の判定で出る問題 | `type`、`amount`、`category`・`tag`（真偽）、`toWallet`（`none`・`same`・`other`）、`problems` |
 | `entry-template-draft.json` | テンプレートの判定で出る問題 | `name`、`type`、`amount`（空でもよい）、`category`・`wallet`（真偽）、`problems` |
-| `amount-calculator.json` | 電卓のキーを順に押したときの金額と式。式は左から順に計算し、割り算と税込みは 1 円未満を切り捨てる | `keys`（`0`〜`9`・`00`・`del`・`ac`・`+`・`-`・`*`・`/`・`=`・`tax8`・`tax10`）、`amount`、`expression`（数と記号を空白で区切る） |
+| `amount-calculator.json` | 電卓のキーを順に押したときの金額と式。式は左から順に計算し、割り算と税込みは 1 円未満を切り捨てる | `keys`（`0`〜`9`・`00`・`000`・`del`・`ac`・`+`・`-`・`*`・`/`・`=`・`tax8`・`tax10`）、`amount`、`expression`（数と記号を空白で区切る） |
 | `entry-day.json` | 記録を日ごとにまとめ、支出と収入の合計を出す | `entries`（`id`・`type`・`amount`・`date`・`createdAt`）、`days`（`date`・`expense`・`income`・`entryIds`） |
 | `entry-search.json` | 検索の言葉に記録が当てはまるか | `query`、`amount`、`texts`（メモ・カテゴリ・タグ・口座の名前）、`matches` |
 | `entry-search-recent.json` | 探した言葉を覚えたときの並び | `recent`、`text`、`result` |

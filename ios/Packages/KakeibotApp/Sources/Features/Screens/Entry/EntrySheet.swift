@@ -308,24 +308,21 @@ private extension EntrySheet {
 
     var keypadDrawer: some View {
         VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                EntryTemplateRow(
-                    model: model,
-                    isCompact: true,
-                    onUse: { template in
-                        useTemplate(template)
-                    },
-                    onAdd: {
-                        open(.newTemplate)
-                    }
-                )
-
-                RingButton(systemImage: "checkmark", style: .prominent) {
-                    setEnteringAmount(false)
+            EntryTemplateRow(
+                model: model,
+                isCompact: true,
+                onUse: { template in
+                    useTemplate(template)
+                },
+                onAdd: {
+                    open(.newTemplate)
                 }
-            }
+            )
 
-            Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+            Keypad(
+                activeTax: model.calculator.taxNote?.rate,
+                onDone: keypadDone
+            ) { key in
                 model.press(key)
             }
 
@@ -687,6 +684,16 @@ private extension EntrySheet {
 
     var saveDetail: String? {
         model.saveDetail(today: today)
+    }
+
+    var keypadDone: (() -> Void)? {
+        guard !model.calculator.hasOperation else {
+            return nil
+        }
+
+        return {
+            setEnteringAmount(false)
+        }
     }
 
     var tagEditAction: (() -> Void)? {
