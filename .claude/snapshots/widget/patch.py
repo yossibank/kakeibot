@@ -8,16 +8,6 @@ VIEWS = {
     "BudgetLockWidgetView": "BudgetWidgetEntry",
     "QuickRecordWidgetView": "QuickRecordWidgetEntry",
 }
-ANCHOR = '        .testTarget(\n            name: "AppFeatureTests",'
-TARGET = """        .testTarget(
-            name: "AppWidgetSnapshotTests",
-            dependencies: [
-                "AppWidget",
-                "DesignSystem",
-                .product(name: "Core", package: "KakeibotKit")
-            ]
-        ),
-"""
 
 
 def replace(path, old, new):
@@ -32,5 +22,3 @@ for view, entry in VIEWS.items():
     stored = f"    let entry: {entry}\n"
     replace(path, FAMILY, "")
     replace(path, stored, stored + "    var family: WidgetFamily = .systemSmall\n")
-
-replace(f"{package}/Package.swift", ANCHOR, TARGET + ANCHOR)

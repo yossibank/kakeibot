@@ -23,7 +23,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 - `android/`：未着手
 - `spec/`：`export-format.md`、`fixtures.md`、`fixtures/`（Core のフォルダ名の小文字にそろえる）
 - `.claude/rules/`：spec の文書の役割
-- `.claude/skills/`：ウィジェットを描いて PNG にする `widget-snapshot`
+- `.claude/snapshots/widget/`：`ui-snapshot` で描くウィジェットの場合（あといくらの小・中、ロック画面の丸・横長・1 行）
 
 ## ios
 

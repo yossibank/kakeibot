@@ -7,7 +7,7 @@ import UIKit
 import WidgetKit
 
 @MainActor
-struct RenderTests {
+struct SnapshotTests {
     @Test
     func render() throws {
         let today = LocalDate(Date(), in: .current)
@@ -31,7 +31,7 @@ struct RenderTests {
     }
 }
 
-extension RenderTests {
+extension SnapshotTests {
     struct Shape {
         let name: String
         let size: CGSize
@@ -40,7 +40,7 @@ extension RenderTests {
     }
 }
 
-private extension RenderTests {
+private extension SnapshotTests {
     static let directory = "__OUT__"
 
     static let shapes: [Shape] = [
