@@ -135,6 +135,36 @@ struct TransferEntryTests {
     }
 
     @Test
+    func waitsForAmountBeforeWarningOverNegativeBalance() async throws {
+        let setup = try await Setup()
+
+        let card = try await setup.database.saveWallet(
+            WalletDraft(
+                kind: .card,
+                name: "カード",
+                mark: .glyph(.card),
+                color: "#4A6FA5",
+                initialBalance: -5000
+            ),
+            at: Date()
+        )
+
+        let model = EntryModel(
+            database: setup.database,
+            date: setup.date,
+            type: .transfer
+        )
+
+        await model.load()
+        model.walletId = card.id
+        let empty = model.isOverSourceBalance
+        model.press(.digit(1))
+
+        #expect(!empty)
+        #expect(model.isOverSourceBalance)
+    }
+
+    @Test
     func paysOffLoanAtOnce() async throws {
         let setup = try await Setup()
 

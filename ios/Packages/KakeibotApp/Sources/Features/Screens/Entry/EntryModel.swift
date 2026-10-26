@@ -274,7 +274,10 @@ public extension EntryModel {
     }
 
     var isOverSourceBalance: Bool {
-        guard type == .transfer else {
+        guard
+            type == .transfer,
+            amount > 0
+        else {
             return false
         }
 
