@@ -9,7 +9,6 @@ public struct EntrySheet: View {
     @State private var isEditingMemo = false
     @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
-    @State private var memoFrame: CGRect = .zero
     @State private var isConfirmingDiscard = false
     @State private var categoryMenu: CategoryMenu?
     @State private var pressingCategory: EntryCategory.ID?
@@ -39,6 +38,7 @@ public struct EntrySheet: View {
         GeometryReader { _ in
             ZStack(alignment: .top) {
                 content
+                    .ignoresSafeArea(.keyboard)
 
                 if isEditingMemo {
                     memoLayer
@@ -97,7 +97,6 @@ public struct EntrySheet: View {
                 await load()
             }
         }
-        .ignoresSafeArea(.keyboard)
     }
 }
 
@@ -124,13 +123,17 @@ private extension EntrySheet {
                 .padding(.vertical, -Self.fade)
             }
 
-            Spacer(minLength: 0)
+            if model.type == .transfer {
+                transferArea
+                    .frame(maxHeight: .infinity)
+            } else {
+                Spacer(minLength: 0)
+            }
 
             VStack(spacing: 12) {
                 EntryDetailBand(
                     model: model,
                     today: today,
-                    coordinateSpace: Self.coordinateSpace,
                     onWallet: {
                         open(.wallet(.source))
                     },
@@ -139,9 +142,6 @@ private extension EntrySheet {
                     },
                     onMemo: {
                         editMemo(true)
-                    },
-                    onMemoFrame: { frame in
-                        memoFrame = frame
                     }
                 )
 
@@ -168,28 +168,25 @@ private extension EntrySheet {
         VStack(spacing: 16) {
             dial
 
-            if model.type == .transfer {
-                ZStack(alignment: .top) {
-                    categoryArea
-                        .hidden()
-
-                    VStack(spacing: 12) {
-                        EntryTransferPanel(model: model) { role in
-                            open(.wallet(role))
-                        }
-
-                        Text("チャージ・カードの引き落とし・口座どうしの移動")
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
-
-                        if let remaining = model.loanRemaining,
-                           remaining != model.amount {
-                            payOffButton(remaining)
-                        }
-                    }
-                }
-            } else {
+            if model.type != .transfer {
                 categoryArea
+            }
+        }
+    }
+
+    var transferArea: some View {
+        VStack(spacing: 12) {
+            EntryTransferPanel(model: model) { role in
+                open(.wallet(role))
+            }
+
+            Text("チャージ・カードの支払い・口座のあいだの移動")
+                .textFont(.caption2)
+                .foregroundStyle(Palette.subtext)
+
+            if let remaining = model.loanRemaining,
+               remaining != model.amount {
+                payOffButton(remaining)
             }
         }
     }
@@ -285,23 +282,19 @@ private extension EntrySheet {
                 Button {
                     open(.categories)
                 } label: {
-                    HStack(spacing: 2) {
-                        Text("カテゴリを編集")
-
-                        Image(systemName: "chevron.right")
-                    }
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.accent)
-                    .frame(minHeight: 32)
-                    .contentShape(.rect)
+                    Label("カテゴリを編集", systemImage: "gearshape")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.accent)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .overlay {
+                            Capsule()
+                                .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+                        }
+                        .frame(minHeight: 32)
+                        .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
-            }
-
-            if !model.hasOpenedCategoryMenu {
-                Label("長押しで編集・非表示", systemImage: "hand.tap")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
             }
         }
     }
@@ -380,19 +373,16 @@ private extension EntrySheet {
             }
             .transition(.opacity)
 
-        Color.clear
-            .frame(height: max(memoFrame.minY - 10, 0))
-            .overlay(alignment: .bottom) {
-                EntryMemoCard(
-                    model: model,
-                    isFocused: $isMemoFocused,
-                    pointerX: memoFrame.midX - Self.memoCardInset
-                ) {
-                    editMemo(false)
-                }
-                .padding(.horizontal, Self.memoCardInset)
+        VStack {
+            Spacer(minLength: 0)
+
+            EntryMemoCard(model: model, isFocused: $isMemoFocused) {
+                editMemo(false)
             }
-            .transition(Self.memoTransition)
+            .padding(.horizontal, Self.memoCardInset)
+            .padding(.bottom, Self.memoCardInset)
+        }
+        .transition(Self.memoTransition)
     }
 
     func payOffButton(_ remaining: Int) -> some View {
@@ -624,7 +614,7 @@ private extension EntrySheet {
 
     static let memoCardInset: CGFloat = 12
     static let fade: CGFloat = 20
-    static let categoryRows = 4
+    static let categoryRows = 3
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
@@ -762,10 +752,6 @@ private extension EntrySheet {
         setEnteringAmount(false)
 
         pressingCategory = nil
-
-        Task {
-            await model.markCategoryMenuOpened()
-        }
 
         withAnimation(.snappy(duration: 0.25)) {
             categoryMenu = CategoryMenu(category: category, frame: frame)

@@ -331,10 +331,12 @@ struct EntryModelTests {
         let later = try #require(model.billChoices.last?.date)
         model.selectBill(later)
         let name = model.walletName
+        let bill = model.billText
         let change = await model.save()
 
         #expect(dates == ["2026-11-27", "2026-12-27", "2027-01-27"])
-        #expect(name == "カード → 1/27")
+        #expect(name == "カード")
+        #expect(bill == "1/27払い")
         #expect(change?.entry.billMonth == later.yearMonth)
 
         model.date = try #require(LocalDate("2026-10-13"))

@@ -42,7 +42,6 @@ public final class EntryModel {
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
     public private(set) var balances: [Wallet.ID: Int] = [:]
-    public private(set) var hasOpenedCategoryMenu = true
     public private(set) var weekStart: Weekday = .sunday
     public private(set) var startsWithAmount = false
 
@@ -113,7 +112,7 @@ public extension EntryModel {
         }
     }
 
-    static let categoriesPerPage = 20
+    static let categoriesPerPage = 15
 
     static let destinationTitle = "振替先"
 
@@ -201,13 +200,18 @@ public extension EntryModel {
     }
 
     var walletName: String {
-        let name = wallet(walletId)?.name ?? walletTitle
+        wallet(walletId)?.name ?? walletTitle
+    }
 
-        guard billMonth != nil, let date = selectedBillDate else {
-            return name
+    var billText: String? {
+        guard
+            billMonth != nil,
+            let date = selectedBillDate
+        else {
+            return nil
         }
 
-        return "\(name) → \(date.month)/\(date.day)"
+        return "\(date.month)/\(date.day)払い"
     }
 
     var billChoices: [BillChoice] {
@@ -262,6 +266,22 @@ public extension EntryModel {
         case .expense: "支払い元"
         case .income: "入金先"
         case .transfer: "振替元"
+        }
+    }
+
+    var memoPrompt: String {
+        switch type {
+        case .expense: "店名や買ったもの"
+        case .income: "どこから入ったか"
+        case .transfer: "何のための移動か"
+        }
+    }
+
+    var memoHint: String {
+        switch type {
+        case .expense: "店名など"
+        case .income: "入金元など"
+        case .transfer: "用途など"
         }
     }
 
@@ -478,9 +498,6 @@ public extension EntryModel {
             cardBills = try await database.recurrings()
                 .filter { $0.type == .transfer && $0.closingDay != nil }
 
-            hasOpenedCategoryMenu = try await database
-                .setting(.categoryMenuOpened)
-
             weekStart = try await database.setting(.weekStart)
 
             startsWithAmount = try await database.setting(.entryStartsWithAmount)
@@ -613,20 +630,6 @@ public extension EntryModel {
             )
 
             await reloadCategories()
-        } catch {
-            report(error)
-        }
-    }
-
-    func markCategoryMenuOpened() async {
-        guard !hasOpenedCategoryMenu else {
-            return
-        }
-
-        hasOpenedCategoryMenu = true
-
-        do {
-            try await database.setSetting(.categoryMenuOpened, to: true)
         } catch {
             report(error)
         }

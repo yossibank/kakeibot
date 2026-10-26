@@ -9,11 +9,9 @@ struct EntryDetailBand: View {
 
     let model: EntryModel
     let today: LocalDate
-    let coordinateSpace: String
     let onWallet: () -> Void
     let onDate: () -> Void
     let onMemo: () -> Void
-    let onMemoFrame: (CGRect) -> Void
 
     var body: some View {
         GeometryReader { proxy in
@@ -57,9 +55,9 @@ private extension EntryDetailBand {
     var walletCell: some View {
         Button(action: onWallet) {
             cell(
-                title: model.walletTitle,
+                title: walletTitle,
                 value: model.walletName,
-                isChanged: !model.isUsualWallet,
+                isChanged: !model.isUsualWallet || model.billText != nil,
                 showsChevron: true
             )
         }
@@ -120,11 +118,6 @@ private extension EntryDetailBand {
                 }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: isPeekingMemo)
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .named(coordinateSpace))
-        } action: { frame in
-            onMemoFrame(frame)
-        }
     }
 
     var memoPeek: some View {
@@ -197,6 +190,10 @@ private extension EntryDetailBand {
         return wallet + Self.dateWeight + Self.memoWeight
     }
 
+    var walletTitle: String {
+        model.billText ?? model.walletTitle
+    }
+
     var isToday: Bool {
         model.date == today
     }
@@ -204,7 +201,7 @@ private extension EntryDetailBand {
     var memoText: String {
         let firstLine = model.memo.split(whereSeparator: \.isNewline).first
 
-        return firstLine.map(String.init) ?? "＋ 店名など"
+        return firstLine.map(String.init) ?? "＋ \(model.memoHint)"
     }
 
     var memoPeekGesture: some Gesture {

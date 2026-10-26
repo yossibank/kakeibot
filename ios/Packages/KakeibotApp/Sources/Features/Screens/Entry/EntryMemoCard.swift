@@ -8,7 +8,6 @@ struct EntryMemoCard: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let isFocused: FocusState<Bool>.Binding
-    let pointerX: CGFloat
     let onDone: () -> Void
 
     var body: some View {
@@ -30,7 +29,7 @@ struct EntryMemoCard: View {
             TextField(
                 "メモ",
                 text: $model.memo,
-                prompt: Text("メモを書く").foregroundStyle(Palette.hint),
+                prompt: Text(model.memoPrompt).foregroundStyle(Palette.hint),
                 axis: .vertical
             )
             .lineLimit(1...4)
@@ -56,9 +55,6 @@ struct EntryMemoCard: View {
             RoundedRectangle(cornerRadius: corner.radius(20))
                 .stroke(Palette.outline, lineWidth: 1)
         }
-        .overlay(alignment: .bottomLeading) {
-            pointer
-        }
         .shadow(color: Palette.shadow.opacity(0.45), radius: 20, y: 10)
         .task {
             isFocused.wrappedValue = true
@@ -67,22 +63,6 @@ struct EntryMemoCard: View {
 }
 
 private extension EntryMemoCard {
-    static let pointerSize = CGSize(width: 18, height: 9)
-
-    var pointer: some View {
-        let size = Self.pointerSize
-
-        return ZStack {
-            BalloonPointer(isClosed: true)
-                .fill(Palette.panel)
-
-            BalloonPointer(isClosed: false)
-                .stroke(Palette.outline, lineWidth: 1)
-        }
-        .frame(width: size.width, height: size.height)
-        .offset(x: pointerX - size.width / 2, y: size.height - 1)
-    }
-
     func suggestionButton(_ memo: String) -> some View {
         Button(memo) {
             model.memo = memo
@@ -94,23 +74,5 @@ private extension EntryMemoCard {
         .frame(minHeight: 32)
         .overlay(Capsule().stroke(Palette.line, lineWidth: 1))
         .buttonStyle(.plain)
-    }
-}
-
-private struct BalloonPointer: Shape {
-    let isClosed: Bool
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-
-        if isClosed {
-            path.closeSubpath()
-        }
-
-        return path
     }
 }

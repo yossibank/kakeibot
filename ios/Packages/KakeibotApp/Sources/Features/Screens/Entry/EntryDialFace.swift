@@ -22,23 +22,23 @@ struct EntryDialFace: View {
                 }
                 .textFont(.footnote, weight: .bold)
                 .foregroundStyle(Palette.accentStrong)
-                .frame(minHeight: 20)
+                .frame(maxWidth: Self.width * 0.7, minHeight: 20)
 
                 Text(AmountText.text(model.amount))
                     .font(amountFont)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.85)
+                    .editBadge()
 
-                Text(note)
+                Text(note ?? " ")
                     .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(noteColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
+                    .frame(maxWidth: Self.width * 0.7)
             }
-            .frame(width: Self.width * 0.7)
         }
         .frame(width: Self.width)
         .contentShape(.rect)
@@ -59,16 +59,12 @@ private extension EntryDialFace {
         return .display(size: size, weight: .semibold, in: themeFont)
     }
 
-    var note: String {
+    var note: String? {
         if let expression = model.expressionText {
             return expression
         }
 
-        guard let usage else {
-            return "タップして入力"
-        }
-
-        return "\(usage.remainingTitle) \(usage.remainingAmountText)"
+        return usage.map { "\($0.remainingTitle) \($0.remainingAmountText)" }
     }
 
     var noteColor: Color {
