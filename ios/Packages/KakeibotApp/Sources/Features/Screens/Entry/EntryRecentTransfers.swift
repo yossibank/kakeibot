@@ -30,9 +30,15 @@ private extension EntryRecentTransfers {
             onUse(transfer)
         } label: {
             HStack(spacing: 8) {
-                Text(route(of: transfer))
-                    .foregroundStyle(Palette.text)
-                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Text(model.wallet(transfer.walletId)?.name ?? "")
+
+                    Text("→")
+
+                    Text(model.wallet(transfer.toWalletId)?.name ?? "")
+                }
+                .foregroundStyle(Palette.text)
+                .lineLimit(1)
 
                 Spacer(minLength: 8)
 
@@ -58,11 +64,5 @@ private extension EntryRecentTransfers {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-    }
-
-    func route(of transfer: Entry) -> String {
-        let source = model.wallet(transfer.walletId)?.name ?? ""
-        let destination = model.wallet(transfer.toWalletId)?.name ?? ""
-        return "\(source) → \(destination)"
     }
 }
