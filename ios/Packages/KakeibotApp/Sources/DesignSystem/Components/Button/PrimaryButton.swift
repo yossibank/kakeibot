@@ -4,32 +4,42 @@ public struct PrimaryButton: View {
     @Environment(\.isEnabled) private var isEnabled
 
     let title: String
+    let detail: String?
     let action: () -> Void
 
     public init(
         _ title: String,
+        detail: String? = nil,
         action: @escaping () -> Void
     ) {
         self.title = title
+        self.detail = detail
         self.action = action
     }
 
     public var body: some View {
         Button(action: action) {
-            Text(title)
-                .textFont(.body, weight: .bold)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .foregroundStyle(textColor)
-                .frame(maxWidth: .infinity, minHeight: 56)
-                .background {
-                    face
+            VStack(spacing: 1) {
+                Text(title)
+                    .textFont(.body, weight: .bold)
+
+                if let detail {
+                    Text(detail)
+                        .textFont(.caption2)
                 }
-                .overlay {
-                    Capsule()
-                        .strokeBorder(rim, lineWidth: 1)
-                }
-                .contentShape(Capsule())
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .foregroundStyle(textColor)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .background {
+                face
+            }
+            .overlay {
+                Capsule()
+                    .strokeBorder(rim, lineWidth: 1)
+            }
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .shadow(color: glow, radius: 14, y: 6)
@@ -103,6 +113,8 @@ private extension PrimaryButton {
 #Preview {
     VStack(spacing: 16) {
         PrimaryButton("¥12,800 を記録する") {}
+
+        PrimaryButton("食費 ¥1,280 を記録する", detail: "今日・財布から") {}
 
         PrimaryButton("金額を入れてください") {}
             .disabled(true)

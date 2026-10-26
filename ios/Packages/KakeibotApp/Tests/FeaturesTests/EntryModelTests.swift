@@ -249,7 +249,38 @@ struct EntryModelTests {
         model.press(.digit(0))
 
         #expect(empty == "金額を入れてください")
-        #expect(model.saveTitle == "¥980 を記録する")
+        #expect(model.saveTitle == "食費 ¥980 を記録する")
+    }
+
+    @Test
+    func describesSaveDetail() async throws {
+        let model = try await Self.newModel()
+        let today = model.date
+
+        let empty = model.saveDetail(today: today)
+        model.press(.digit(5))
+        let recorded = model.saveDetail(today: today)
+        model.date = today.adding(days: -2)
+        let earlier = model.saveDetail(today: today)
+
+        #expect(empty == nil)
+        #expect(recorded == "今日・財布から")
+        #expect(earlier == "10/10・財布から")
+    }
+
+    @Test(arguments: [
+        ("2026-10-12", "日付"),
+        ("2026-10-11", "日付"),
+        ("2026-10-10", "日付・2日前"),
+        ("2026-10-14", "日付・2日後")
+    ])
+    func titlesDate(text: String, expected: String) throws {
+        let today = try #require(LocalDate("2026-10-12"))
+        let date = try #require(LocalDate(text))
+
+        let title = EntryModel.dateTitle(for: date, today: today)
+
+        #expect(title == expected)
     }
 
     @Test(arguments: [

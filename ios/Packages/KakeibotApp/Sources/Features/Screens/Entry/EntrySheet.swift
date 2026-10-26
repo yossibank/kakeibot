@@ -7,10 +7,9 @@ public struct EntrySheet: View {
     @State private var model: EntryModel
     @State private var isEnteringAmount = false
     @State private var isEditingMemo = false
-    @State private var isPeekingMemo = false
     @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
-    @State private var memoChipFrame: CGRect = .zero
+    @State private var memoFrame: CGRect = .zero
     @State private var isConfirmingDiscard = false
     @State private var categoryMenu: CategoryMenu?
     @State private var pressingCategory: EntryCategory.ID?
@@ -125,7 +124,29 @@ private extension EntrySheet {
                 .padding(.vertical, -Self.fade)
             }
 
-            saveButtons
+            Spacer(minLength: 0)
+
+            VStack(spacing: 12) {
+                EntryDetailBand(
+                    model: model,
+                    today: today,
+                    coordinateSpace: Self.coordinateSpace,
+                    onWallet: {
+                        open(.wallet(.source))
+                    },
+                    onDate: {
+                        open(.date)
+                    },
+                    onMemo: {
+                        editMemo(true)
+                    },
+                    onMemoFrame: { frame in
+                        memoFrame = frame
+                    }
+                )
+
+                saveButtons
+            }
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -146,8 +167,6 @@ private extension EntrySheet {
     var form: some View {
         VStack(spacing: 16) {
             dial
-
-            details
 
             if model.type == .transfer {
                 ZStack(alignment: .top) {
@@ -230,93 +249,10 @@ private extension EntrySheet {
         Button {
             setEnteringAmount(!isEnteringAmount)
         } label: {
-            GeometryReader { proxy in
-                let size = min(proxy.size.width, proxy.size.height)
-
-                EntryDialFace(
-                    model: model,
-                    isActive: isEnteringAmount,
-                    size: size
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+            EntryDialFace(model: model)
         }
         .buttonStyle(.plain)
-        .frame(minHeight: Self.dialMinSize, maxHeight: 270)
-    }
-
-    var details: some View {
-        HStack(spacing: 8) {
-            if model.type != .transfer {
-                Button {
-                    open(.wallet(.source))
-                } label: {
-                    Chip(
-                        model.walletName,
-                        systemImage: "wallet.bifold",
-                        isHighlighted: model.walletId != nil
-                    )
-                }
-            }
-
-            Button {
-                open(.date)
-            } label: {
-                Chip(
-                    EntryModel.dateText(for: model.date, today: today),
-                    systemImage: "calendar",
-                    isHighlighted: true
-                )
-            }
-
-            Button {
-                if !isPeekingMemo {
-                    editMemo(true)
-                }
-            } label: {
-                ViewThatFits(in: .horizontal) {
-                    Chip(
-                        memoTitle,
-                        systemImage: "square.and.pencil",
-                        isHighlighted: !model.memo.isEmpty
-                    )
-
-                    Chip(
-                        "",
-                        systemImage: "square.and.pencil",
-                        isHighlighted: !model.memo.isEmpty
-                    )
-                }
-            }
-            .simultaneousGesture(memoPeekGesture)
-            .background {
-                Color.clear
-                    .popover(isPresented: $isPeekingMemo) {
-                        memoPeek
-                    }
-            }
-            .sensoryFeedback(.impact(weight: .light), trigger: isPeekingMemo)
-            .layoutPriority(-1)
-            .onGeometryChange(for: CGRect.self) { proxy in
-                proxy.frame(in: .named(Self.coordinateSpace))
-            } action: { frame in
-                memoChipFrame = frame
-            }
-
-            Spacer(minLength: 0)
-        }
-        .buttonStyle(.plain)
-    }
-
-    var memoPeek: some View {
-        Text(model.memo)
-            .textFont(.footnote)
-            .foregroundStyle(Palette.text)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: Self.peekWidth, alignment: .leading)
-            .padding(16)
-            .presentationCompactAdaptation(.popover)
-            .presentationBackground(Palette.panel)
+        .frame(maxWidth: .infinity)
     }
 
     var categoryPager: some View {
@@ -350,7 +286,7 @@ private extension EntrySheet {
                     open(.categories)
                 } label: {
                     HStack(spacing: 2) {
-                        Text("編集")
+                        Text("カテゴリを編集")
 
                         Image(systemName: "chevron.right")
                     }
@@ -404,7 +340,7 @@ private extension EntrySheet {
 
     var saveButtons: some View {
         HStack(spacing: 8) {
-            PrimaryButton(model.saveTitle) {
+            PrimaryButton(model.saveTitle, detail: saveDetail) {
                 Task {
                     await save()
                 }
@@ -445,12 +381,12 @@ private extension EntrySheet {
             .transition(.opacity)
 
         Color.clear
-            .frame(height: max(memoChipFrame.minY - 10, 0))
+            .frame(height: max(memoFrame.minY - 10, 0))
             .overlay(alignment: .bottom) {
                 EntryMemoCard(
                     model: model,
                     isFocused: $isMemoFocused,
-                    pointerX: memoChipFrame.midX - Self.memoCardInset
+                    pointerX: memoFrame.midX - Self.memoCardInset
                 ) {
                     editMemo(false)
                 }
@@ -687,15 +623,12 @@ private extension EntrySheet {
     nonisolated static let coordinateSpace = "EntrySheet"
 
     static let memoCardInset: CGFloat = 12
-    static let dialMinSize: CGFloat = 240
     static let fade: CGFloat = 20
-    static let categoryRows = 3
+    static let categoryRows = 4
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
     static let menuPressDuration = 0.15
-    static let peekDuration = 0.35
-    static let peekWidth: CGFloat = 260
 
     static let drawerShape = UnevenRoundedRectangle(
         topLeadingRadius: 28,
@@ -726,15 +659,8 @@ private extension EntrySheet {
         LocalDate(Date(), in: .current)
     }
 
-    var memoPeekGesture: some Gesture {
-        LongPressGesture(minimumDuration: Self.peekDuration)
-            .onEnded { _ in
-                isPeekingMemo = !model.memo.isEmpty
-            }
-    }
-
-    var memoTitle: String {
-        model.memo.isEmpty ? "メモ" : model.memo
+    var saveDetail: String? {
+        model.saveDetail(today: today)
     }
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {

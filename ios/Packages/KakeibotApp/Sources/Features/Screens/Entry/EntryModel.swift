@@ -58,6 +58,8 @@ public final class EntryModel {
     private var cardBills: [Recurring] = []
     private var history: EntryList?
     private var categoryUses: [EntryCategory.ID: Int]?
+    private var budgets: [Budget] = []
+    private var monthStartDay: MonthStartDay = .first
 
     private let editingId: Entry.ID?
     private let startingTemplate: EntryTemplate?
@@ -111,7 +113,7 @@ public extension EntryModel {
         }
     }
 
-    static let categoriesPerPage = 15
+    static let categoriesPerPage = 20
 
     static let destinationTitle = "振替先"
 
@@ -235,6 +237,26 @@ public extension EntryModel {
         return chosen?.date ?? choices.first?.date
     }
 
+    var isUsualWallet: Bool {
+        type == .transfer || walletId == usualWalletId(for: categoryId)
+    }
+
+    var budgetUsage: BudgetUsage? {
+        guard type == .expense else {
+            return nil
+        }
+
+        let overview = MonthOverview(
+            list: history,
+            budgets: budgets,
+            recurrings: [],
+            monthStartDay: monthStartDay,
+            today: Self.today
+        )
+
+        return overview.budgetUsage
+    }
+
     var walletTitle: String {
         switch type {
         case .expense: "支払い元"
@@ -268,9 +290,17 @@ public extension EntryModel {
             return "\(Self.destinationTitle)を選んでください"
         }
 
-        let action = type == .transfer ? "振り替える" : "記録する"
+        let amountText = AmountText.text(amount)
 
-        return "\(AmountText.text(amount)) を\(action)"
+        guard type != .transfer else {
+            return "\(amountText) を振り替える"
+        }
+
+        guard let category = selectedCategory else {
+            return "\(amountText) を記録する"
+        }
+
+        return "\(category.name) \(amountText) を記録する"
     }
 
     var isOverSourceBalance: Bool {
@@ -302,14 +332,20 @@ public extension EntryModel {
         return -balance
     }
 
+    static func dayText(
+        for date: LocalDate,
+        today: LocalDate
+    ) -> String {
+        date.year == today.year
+            ? "\(date.month)/\(date.day)"
+            : "\(date.year)/\(date.month)/\(date.day)"
+    }
+
     static func dateText(
         for date: LocalDate,
         today: LocalDate
     ) -> String {
-        let day = date.year == today.year
-            ? "\(date.month)/\(date.day)"
-            : "\(date.year)/\(date.month)/\(date.day)"
-
+        let day = dayText(for: date, today: today)
         let text = "\(day)（\(date.weekday.shortName)）"
 
         switch date {
@@ -317,6 +353,40 @@ public extension EntryModel {
         case today.adding(days: -1): return "昨日 \(text)"
         default: return text
         }
+    }
+
+    static func dateTitle(
+        for date: LocalDate,
+        today: LocalDate
+    ) -> String {
+        let days = date.days(until: today)
+
+        switch days {
+        case 0, 1: return "日付"
+        case 2...: return "日付・\(days)日前"
+        default: return "日付・\(-days)日後"
+        }
+    }
+
+    func saveDetail(today: LocalDate) -> String? {
+        guard
+            !isEditing,
+            canSave,
+            type != .transfer,
+            let wallet = wallet(walletId)
+        else {
+            return nil
+        }
+
+        let day = switch date {
+        case today: "今日"
+        case today.adding(days: -1): "昨日"
+        default: Self.dayText(for: date, today: today)
+        }
+
+        let direction = type == .income ? "へ" : "から"
+
+        return "\(day)・\(wallet.name)\(direction)"
     }
 
     func icon(for category: EntryCategory) -> Icon? {
@@ -414,6 +484,10 @@ public extension EntryModel {
             weekStart = try await database.setting(.weekStart)
 
             startsWithAmount = try await database.setting(.entryStartsWithAmount)
+
+            monthStartDay = try await database.setting(.monthStartDay)
+
+            budgets = try await database.budgets()
 
             try await loadBalances()
 
