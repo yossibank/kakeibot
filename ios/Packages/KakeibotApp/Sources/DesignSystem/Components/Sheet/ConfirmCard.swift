@@ -133,6 +133,8 @@ private extension ConfirmCard {
                     .displayFont(.headline, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
                     .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(message)
                     .textFont(.caption)

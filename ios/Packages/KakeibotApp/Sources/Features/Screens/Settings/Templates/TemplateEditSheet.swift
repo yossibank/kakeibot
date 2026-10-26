@@ -343,7 +343,7 @@ private extension TemplateEditSheet {
     }
 
     func drawerView(_ panel: Panel) -> some View {
-        SettingsDrawer(title(for: panel)) {
+        SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
             closePanel()
         } content: {
             drawerBody(panel)
@@ -355,7 +355,9 @@ private extension TemplateEditSheet {
         switch panel {
         case .amount:
             VStack(spacing: 12) {
-                Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+                Keypad(calculator: model.calculator) {
+                    closePanel()
+                } onKey: { key in
                     model.press(key)
                 }
 
@@ -519,6 +521,10 @@ private extension TemplateEditSheet {
                 isEmpty: model.memo.isEmpty
             )
         ]
+    }
+
+    func showsDone(for panel: Panel) -> Bool {
+        panel != .amount
     }
 
     func title(for panel: Panel) -> String {

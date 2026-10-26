@@ -4,6 +4,7 @@ import SwiftUI
 
 struct EntryTemplateRow: View {
     let model: EntryModel
+    let isCompact: Bool
     let onUse: (EntryTemplate) -> Void
     let onAdd: () -> Void
 
@@ -105,7 +106,8 @@ private extension EntryTemplateRow {
 
     var splitIndex: Int {
         let count = model.templates.count
-        return count < Self.minimumForTwoRows ? count : (count + 1) / 2
+        let isOneRow = isCompact || count < Self.minimumForTwoRows
+        return isOneRow ? count : (count + 1) / 2
     }
 
     var firstRow: ArraySlice<EntryTemplate> {

@@ -22,20 +22,6 @@ struct EntryModelTests {
     }
 
     @Test
-    func opensKeypadFirstWhenChosen() async throws {
-        let setup = try await Setup()
-        let initial = EntryModel(database: setup.database, date: setup.date)
-        await initial.load()
-        try await setup.database.setSetting(.entryStartsWithAmount, to: true)
-        let model = EntryModel(database: setup.database, date: setup.date)
-
-        await model.load()
-
-        #expect(!initial.opensKeypadFirst)
-        #expect(model.opensKeypadFirst)
-    }
-
-    @Test
     func capsAmountAtNineDigits() async throws {
         let model = try await Self.newModel()
 
@@ -346,13 +332,12 @@ struct EntryModelTests {
     }
 
     @Test
-    func followsLastWalletOfCategory() async throws {
+    func startsWithFirstWallet() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
         let categories = options.expenseCategories
         let wallets = options.wallets
         try await setup.saveEntry(category: categories[0].id, wallet: wallets[1].id, at: 1)
-        try await setup.saveEntry(category: categories[1].id, wallet: wallets[0].id, at: 2)
         let model = EntryModel(database: setup.database, date: setup.date)
 
         await model.load()
@@ -360,8 +345,9 @@ struct EntryModelTests {
         model.categoryId = categories[1].id
         let second = model.walletId
 
-        #expect(first == wallets[1].id)
+        #expect(first == wallets[0].id)
         #expect(second == wallets[0].id)
+        #expect(model.isUsualWallet)
     }
 
     @Test
@@ -397,25 +383,6 @@ struct EntryModelTests {
         #expect(model.categoryId == category)
         #expect(model.walletId == wallet)
         #expect(!model.isChanged)
-    }
-
-    @Test
-    func ordersCategoriesByUseWhenChosen() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let third = options.expenseCategories[2]
-        let wallet = options.wallets[0]
-        try await setup.saveEntry(category: third.id, wallet: wallet.id, at: 1)
-        let manual = EntryModel(database: setup.database, date: setup.date)
-        await manual.load()
-        try await setup.database.setSetting(.categoriesByUse, to: true)
-        let model = EntryModel(database: setup.database, date: setup.date)
-
-        await model.load()
-
-        #expect(manual.categoryId == options.expenseCategories[0].id)
-        #expect(model.categoryId == third.id)
-        #expect(model.categoryPages.first?.first?.categoryId == third.id)
     }
 }
 

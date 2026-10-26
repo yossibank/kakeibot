@@ -17,6 +17,7 @@ public extension AmountCalculator {
     enum Key: Hashable, Sendable {
         case digit(Int)
         case doubleZero
+        case tripleZero
         case delete
         case clear
         case operation(Operation)
@@ -84,6 +85,7 @@ public extension AmountCalculator {
         switch key {
         case let .digit(digit): append(digit: digit, shift: 10)
         case .doubleZero: append(digit: 0, shift: 100)
+        case .tripleZero: append(digit: 0, shift: 1000)
         case .delete: deleteLast()
         case .clear: clear()
         case let .operation(operation): append(operation)

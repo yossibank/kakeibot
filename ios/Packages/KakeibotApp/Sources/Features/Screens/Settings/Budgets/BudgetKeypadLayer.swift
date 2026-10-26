@@ -36,7 +36,7 @@ private struct BudgetKeypadLayer: ViewModifier {
 
 private extension BudgetKeypadLayer {
     var drawer: some View {
-        SettingsDrawer(model.editingTitle) {
+        SettingsDrawer(model.editingTitle, showsDone: false) {
             Task {
                 await model.finishEditing()
             }
@@ -49,7 +49,11 @@ private extension BudgetKeypadLayer {
                     .contentTransition(.numericText())
                     .animation(.snappy, value: model.calculator.amount)
 
-                Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+                Keypad(calculator: model.calculator) {
+                    Task {
+                        await model.finishEditing()
+                    }
+                } onKey: { key in
                     model.press(key)
                 }
 

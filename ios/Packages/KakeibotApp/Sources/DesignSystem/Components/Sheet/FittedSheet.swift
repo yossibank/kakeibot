@@ -4,9 +4,14 @@ import UIKit
 public struct FittedSheet<Content: View>: View {
     @State private var contentHeight: CGFloat = 0
 
+    let anchor: UnitPoint?
     let content: Content
 
-    public init(@ViewBuilder content: () -> Content) {
+    public init(
+        anchor: UnitPoint? = nil,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.anchor = anchor
         self.content = content()
     }
 
@@ -23,6 +28,7 @@ public struct FittedSheet<Content: View>: View {
                 }
         }
         .scrollBounceBehavior(.basedOnSize)
+        .defaultScrollAnchor(anchor)
         .background {
             FittedDetent(height: max(contentHeight, 120))
         }

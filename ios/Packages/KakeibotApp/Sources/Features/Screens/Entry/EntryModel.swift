@@ -27,7 +27,6 @@ public final class EntryModel {
         didSet {
             if categoryId != oldValue {
                 tagId = nil
-                followUsualWallet(from: oldValue)
             }
         }
     }
@@ -43,7 +42,6 @@ public final class EntryModel {
     public private(set) var recentMemos: [String] = []
     public private(set) var balances: [Wallet.ID: Int] = [:]
     public private(set) var weekStart: Weekday = .sunday
-    public private(set) var startsWithAmount = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -56,7 +54,6 @@ public final class EntryModel {
     private var appliedTemplateId: EntryTemplate.ID?
     private var cardBills: [Recurring] = []
     private var history: EntryList?
-    private var categoryUses: [EntryCategory.ID: Int]?
     private var budgets: [Budget] = []
     private var monthStartDay: MonthStartDay = .first
 
@@ -126,10 +123,6 @@ public extension EntryModel {
 
     var isEditing: Bool {
         editingId != nil
-    }
-
-    var opensKeypadFirst: Bool {
-        startsWithAmount && !isEditing && amount == 0
     }
 
     var isLoaded: Bool {
@@ -250,7 +243,7 @@ public extension EntryModel {
     }
 
     var isUsualWallet: Bool {
-        type == .transfer || walletId == usualWalletId(for: categoryId)
+        type == .transfer || walletId == wallets.first?.id
     }
 
     var budgetUsage: BudgetUsage? {
@@ -563,17 +556,11 @@ public extension EntryModel {
 
             weekStart = try await database.setting(.weekStart)
 
-            startsWithAmount = try await database.setting(.entryStartsWithAmount)
-
             monthStartDay = try await database.setting(.monthStartDay)
 
             budgets = try await database.budgets()
 
             try await loadBalances()
-
-            if try await database.setting(.categoriesByUse) {
-                categoryUses = history?.categoryUses(through: Self.today)
-            }
 
             try await loadEntry()
 
@@ -733,8 +720,6 @@ public extension EntryModel {
             return
         }
 
-        let followsUsual = walletId == usualWalletId(for: categoryId)
-
         categoryByType[self.type] = categoryId
 
         self.type = type
@@ -745,10 +730,6 @@ public extension EntryModel {
             categoryId = remembered
         } else if !categories.contains(where: { $0.id == categoryId }) {
             categoryId = categories.first?.id
-        }
-
-        if followsUsual, !isEditing, type != .transfer {
-            walletId = usualWalletId(for: categoryId)
         }
 
         if type == .transfer {
@@ -917,51 +898,17 @@ private extension EntryModel {
     }
 
     func categories(for type: Entry.Kind) -> [EntryCategory] {
-        let categories: [EntryCategory] = switch type {
+        switch type {
         case .expense: options?.expenseCategories ?? []
         case .income: options?.incomeCategories ?? []
         case .transfer: []
         }
-
-        guard let categoryUses else {
-            return categories
-        }
-
-        return categories.sorted { lhs, rhs in
-            let left = categoryUses[lhs.id, default: 0]
-            let right = categoryUses[rhs.id, default: 0]
-            return left == right ? lhs.sortOrder < rhs.sortOrder : left > right
-        }
-    }
-
-    func usualWalletId(for categoryId: EntryCategory.ID?) -> Wallet.ID? {
-        let candidates = [
-            history?.lastWalletId(for: type, category: categoryId),
-            history?.lastWalletId(for: type, category: nil),
-            wallets.first?.id
-        ]
-
-        return candidates.compactMap(\.self).first { id in
-            wallets.contains { $0.id == id }
-        }
-    }
-
-    func followUsualWallet(from previous: EntryCategory.ID?) {
-        guard
-            !isEditing,
-            type != .transfer,
-            walletId == usualWalletId(for: previous)
-        else {
-            return
-        }
-
-        walletId = usualWalletId(for: categoryId)
     }
 
     func loadEntry() async throws {
         guard let editingId else {
             categoryId = categories.first?.id
-            walletId = usualWalletId(for: categoryId)
+            walletId = wallets.first?.id
 
             if type == .transfer {
                 chooseDestination()

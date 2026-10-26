@@ -5,6 +5,7 @@ public struct MenuRow: View {
     let note: String?
     let systemImage: String
     let isSelected: Bool
+    let isDestructive: Bool
     let action: () -> Void
 
     public init(
@@ -12,12 +13,14 @@ public struct MenuRow: View {
         note: String? = nil,
         systemImage: String,
         isSelected: Bool = false,
+        isDestructive: Bool = false,
         action: @escaping () -> Void
     ) {
         self.title = title
         self.note = note
         self.systemImage = systemImage
         self.isSelected = isSelected
+        self.isDestructive = isDestructive
         self.action = action
     }
 
@@ -26,7 +29,7 @@ public struct MenuRow: View {
             HStack(spacing: 12) {
                 Image(systemName: systemImage)
                     .sansFont(.body, weight: .light)
-                    .foregroundStyle(Palette.accent)
+                    .foregroundStyle(iconColor)
                     .frame(width: 22)
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -59,8 +62,16 @@ public struct MenuRow: View {
 }
 
 private extension MenuRow {
+    var iconColor: Color {
+        isDestructive ? Palette.rose : Palette.accent
+    }
+
     var titleColor: Color {
-        isSelected ? Palette.accentStrong : Palette.text
+        switch (isDestructive, isSelected) {
+        case (true, _): Palette.rose
+        case (false, true): Palette.accentStrong
+        case (false, false): Palette.text
+        }
     }
 
     var selectionFill: Color {

@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsEditHeader: View {
+    @State private var isMenuOpen = false
+
     @Environment(\.isSettingsEditPushed) private var isPushed
 
     let title: String
@@ -24,19 +26,26 @@ struct SettingsEditHeader: View {
 
             ZStack {
                 if isEditing {
-                    HStack(spacing: 8) {
-                        SettingsHideButton(isHidden: isHidden, action: onHide)
-
-                        RingButton(
-                            systemImage: "trash",
-                            style: .destructive,
-                            label: "削除",
-                            action: onDelete
-                        )
+                    RingButton(systemImage: "ellipsis", style: menuStyle) {
+                        openMenu(true)
                     }
                 }
             }
             .frame(width: Self.sideWidth, alignment: .trailing)
+        }
+        .overlay {
+            if isMenuOpen {
+                scrim
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            if isMenuOpen {
+                menu
+            }
+        }
+        .zIndex(1)
+        .sensoryFeedback(.impact(weight: .medium), trigger: isMenuOpen) { _, isOpen in
+            isOpen
         }
     }
 }
@@ -46,9 +55,61 @@ extension EnvironmentValues {
 }
 
 private extension SettingsEditHeader {
-    static let sideWidth: CGFloat = 104
+    var scrim: some View {
+        Palette.scrim
+            .opacity(0.45)
+            .frame(width: Self.scrimSize, height: Self.scrimSize)
+            .ignoresSafeArea()
+            .onTapGesture {
+                openMenu(false)
+            }
+            .transition(.opacity)
+    }
+
+    var menu: some View {
+        MenuPanel(width: Self.menuWidth) {
+            MenuRow(hideTitle, systemImage: hideImage) {
+                openMenu(false)
+                onHide()
+            }
+
+            MenuDivider()
+
+            MenuRow("削除", systemImage: "trash", isDestructive: true) {
+                openMenu(false)
+                onDelete()
+            }
+        }
+        .offset(y: Self.menuTop)
+        .transition(.scale(scale: 0.95, anchor: .topTrailing).combined(with: .opacity))
+    }
+}
+
+private extension SettingsEditHeader {
+    static let sideWidth: CGFloat = 44
+    static let menuWidth: CGFloat = 236
+    static let menuTop: CGFloat = 48
+    static let scrimSize: CGFloat = 4000
 
     var closeImage: String {
         isPushed ? "chevron.left" : "xmark"
+    }
+
+    var menuStyle: RingButton.Style {
+        isHidden ? .prominent : .plain
+    }
+
+    var hideTitle: String {
+        isHidden ? "表示に戻す" : "非表示にする"
+    }
+
+    var hideImage: String {
+        isHidden ? "eye" : "eye.slash"
+    }
+
+    func openMenu(_ isOpen: Bool) {
+        withAnimation(.snappy(duration: 0.25)) {
+            isMenuOpen = isOpen
+        }
     }
 }

@@ -8,7 +8,6 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
     case templates
     case reminder
     case launchScreen
-    case startsWithAmount
     case theme
     case appIcon
     case themeStyle
@@ -24,7 +23,6 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
 
     public static let customize: [Self] = [
         .launchScreen,
-        .startsWithAmount,
         .theme,
         .appIcon,
         .themeStyle
@@ -45,7 +43,6 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .templates: "テンプレート"
         case .reminder: "記録忘れの通知"
         case .launchScreen: "起動時に開く画面"
-        case .startsWithAmount: "金額から入力"
         case .theme: "テーマ"
         case .appIcon: "アプリアイコン"
         case .themeStyle: "文字と角の丸み"
@@ -62,7 +59,6 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .templates: "rectangle.stack"
         case .reminder: "bell"
         case .launchScreen: "iphone"
-        case .startsWithAmount: "yensign"
         case .theme: "paintpalette"
         case .appIcon: "app.badge"
         case .themeStyle: "textformat"
@@ -80,7 +76,6 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .categories,
              .templates,
              .launchScreen,
-             .startsWithAmount,
              .appIcon,
              .themeStyle,
              .homeSections:

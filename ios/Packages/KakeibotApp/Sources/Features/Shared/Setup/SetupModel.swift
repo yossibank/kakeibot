@@ -11,7 +11,6 @@ public final class SetupModel: ScreenModel {
     public private(set) var isEntryOpened = true
     public private(set) var isSettingsOpened = true
     public private(set) var launchScreen: LaunchScreen = .home
-    public private(set) var startsWithAmount = true
     public private(set) var theme: ThemeChoice = .system
     public private(set) var customThemes: [Theme] = []
 
@@ -43,10 +42,6 @@ public extension SetupModel {
         !isCardClosed && !cardItems.isEmpty
     }
 
-    var startsWithAmountTitle: String {
-        startsWithAmount ? "する" : "しない"
-    }
-
     var themeTitle: String {
         theme.title(in: customThemes)
     }
@@ -75,10 +70,6 @@ public extension SetupModel {
 
             group.addTask {
                 await self.observeLaunchScreen()
-            }
-
-            group.addTask {
-                await self.observeStartsWithAmount()
             }
 
             group.addTask {
@@ -164,15 +155,6 @@ private extension SetupModel {
             failure: Self.loadFailedMessage
         ) { screen in
             launchScreen = screen
-        }
-    }
-
-    func observeStartsWithAmount() async {
-        await observe(
-            database.settingUpdates(.entryStartsWithAmount),
-            failure: Self.loadFailedMessage
-        ) { starts in
-            startsWithAmount = starts
         }
     }
 

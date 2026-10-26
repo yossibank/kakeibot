@@ -55,13 +55,6 @@ public struct SetupDestination: View {
             )
         case .launchScreen:
             LaunchScreenView(model: LaunchScreenModel(database: database))
-        case .startsWithAmount:
-            EntryStartView(
-                model: EntryStartModel(
-                    database: database,
-                    today: today
-                )
-            )
         case .theme:
             ThemeListView(database: database, appIcon: appIcon)
         case .appIcon:

@@ -226,6 +226,7 @@ private extension EntrySheet {
 
             EntryTemplateRow(
                 model: model,
+                isCompact: false,
                 onUse: { template in
                     useTemplate(template)
                 },
@@ -284,6 +285,7 @@ private extension EntrySheet {
                         id: \.offset
                     ) { index, page in
                         categoryGrid(page)
+                            .padding(Self.liftInset)
                             .containerRelativeFrame(.horizontal)
                             .id(index)
                     }
@@ -293,7 +295,8 @@ private extension EntrySheet {
             .scrollTargetBehavior(.paging)
             .scrollPosition(id: $categoryPage)
             .scrollIndicators(.hidden)
-            .frame(height: Self.pagerHeight)
+            .frame(height: Self.pagerHeight + Self.liftInset * 2)
+            .padding(-Self.liftInset)
             .id(model.type)
 
             if model.categoryPages.count > 1 {
@@ -307,12 +310,20 @@ private extension EntrySheet {
 
     var keypadDrawer: some View {
         VStack(spacing: 12) {
-            RingButton(systemImage: "checkmark", style: .prominent) {
-                setEnteringAmount(false)
-            }
-            .frame(maxWidth: .infinity, alignment: .trailing)
+            EntryTemplateRow(
+                model: model,
+                isCompact: true,
+                onUse: { template in
+                    useTemplate(template)
+                },
+                onAdd: {
+                    open(.newTemplate)
+                }
+            )
 
-            Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+            Keypad(calculator: model.calculator) {
+                setEnteringAmount(false)
+            } onKey: { key in
                 model.press(key)
             }
 
@@ -415,6 +426,7 @@ private extension EntrySheet {
                 RoundedRectangle(cornerRadius: corner.radius(12))
                     .stroke(Palette.accent.opacity(.medium), style: .dashed)
             }
+            .padding(Self.actionInset)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -483,11 +495,16 @@ private extension EntrySheet {
 
     func categoryButton(_ category: EntryCategory) -> some View {
         let isPressing = pressingCategory == category.id
-        let scale: CGFloat = isPressing ? 0.93 : 1
+        let isSelected = model.categoryId == category.id
+        let restingScale = isSelected ? Self.selectedScale : 1
+        let scale = isPressing ? 0.93 : restingScale
+        let glow = isSelected ? Palette.glow.opacity(.muted) : Color.clear
 
         return categoryFace(category, isLifted: false)
+            .shadow(color: glow, radius: 8)
             .scaleEffect(scale)
             .animation(.snappy(duration: 0.2), value: isPressing)
+            .animation(.snappy(duration: 0.25), value: isSelected)
             .overlay {
                 GeometryReader { proxy in
                     Color.clear
@@ -516,9 +533,10 @@ private extension EntrySheet {
         let fill = isLifted ? Palette.panel : Self.categoryFill(isLit)
         let border = isLit ? Palette.outline : Color.clear
         let width: CGFloat = isLifted ? 1.2 : 1
+        let iconSize: CGFloat = isLit ? 19 : 17
 
         return VStack(spacing: 4) {
-            IconImage(model.icon(for: category), size: 17)
+            IconImage(model.icon(for: category), size: iconSize)
 
             Text(category.name)
                 .textFont(size: .caption)
@@ -641,6 +659,9 @@ private extension EntrySheet {
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
+    static let selectedScale: CGFloat = 1.05
+    static let liftInset: CGFloat = 10
+    static let actionInset: CGFloat = 6
     static let menuPressDuration = 0.15
 
     static let drawerShape = UnevenRoundedRectangle(
@@ -754,8 +775,6 @@ private extension EntrySheet {
         if !model.isLoaded {
             await model.load()
         }
-
-        isEnteringAmount = model.opensKeypadFirst
 
         showSelectedCategory()
     }

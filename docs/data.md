@@ -328,8 +328,8 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop`。空なら `mincho` |
 | text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop`。空なら `gothic` |
 | text_size | 文字の大きさ。`small`・`standard`・`large`。空なら `standard` |
-| entry_starts_with_amount | `true` なら、新しく記録するとき入力シートをテンキーを出して開く |
-| categories_by_use | `true` なら、入力シートのカテゴリをよく使う順に並べる |
+| entry_starts_with_amount | 今は使わない |
+| categories_by_use | 今は使わない |
 | template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |
 | home_sections | ホームに並べる順。`customize` `budget` `templates` `recent` `bills` `stamps` を `,` でつないだもの。空なら `customize` `budget` `templates` `recent` の順。無いものは後ろに足し、`bills` と `stamps` は隠す |
 | home_hidden_sections | ホームに出さないもの。書き方は home_sections と同じ。すべては隠さない。空なら home_sections にあるものをすべて出す |

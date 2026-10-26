@@ -38,7 +38,7 @@ public struct RecurringEditSheet: View {
                     .transition(.opacity)
                     .zIndex(1)
 
-                SettingsDrawer(title(for: panel)) {
+                SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
                     closePanel()
                 } content: {
                     drawerBody(panel)
@@ -315,7 +315,9 @@ private extension RecurringEditSheet {
         switch panel {
         case .amount:
             VStack(spacing: 12) {
-                Keypad(activeTax: model.calculator.taxNote?.rate) { key in
+                Keypad(calculator: model.calculator) {
+                    closePanel()
+                } onKey: { key in
                     model.press(key)
                 }
 
@@ -574,6 +576,10 @@ private extension RecurringEditSheet {
                 isEmpty: model.remindDaysBefore == nil
             )
         ]
+    }
+
+    func showsDone(for panel: Panel) -> Bool {
+        panel != .amount
     }
 
     func title(for panel: Panel) -> String {

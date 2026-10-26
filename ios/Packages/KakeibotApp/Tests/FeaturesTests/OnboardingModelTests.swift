@@ -31,7 +31,6 @@ struct OnboardingModelTests {
         model.next()
         let title = model.nextTitle
         let finished = await model.finish()
-        let startsWithAmount = try await setup.database.setting(.entryStartsWithAmount)
         let completed = try await setup.database.setting(.onboardingCompleted)
 
         #expect(first)
@@ -42,7 +41,6 @@ struct OnboardingModelTests {
         #expect(model.isLastPage)
         #expect(title == "はじめる")
         #expect(finished)
-        #expect(startsWithAmount)
         #expect(completed)
     }
 
@@ -62,28 +60,6 @@ struct OnboardingModelTests {
         #expect(model.page == .budget)
         #expect(model.isLastPage)
         #expect(!model.canTurn(forward: true))
-    }
-
-    @Test
-    func keepsAmountChoiceAfterFinish() async throws {
-        let setup = try await HomeModelTests.Setup()
-
-        let model = OnboardingModel(
-            database: setup.database,
-            today: setup.today
-        )
-
-        await model.load()
-        let initial = try await setup.database.setting(.entryStartsWithAmount)
-        await EntryStartModel(
-            database: setup.database,
-            today: setup.today
-        ).choose(false)
-        _ = await model.finish()
-        let saved = try await setup.database.setting(.entryStartsWithAmount)
-
-        #expect(initial)
-        #expect(!saved)
     }
 
     @Test

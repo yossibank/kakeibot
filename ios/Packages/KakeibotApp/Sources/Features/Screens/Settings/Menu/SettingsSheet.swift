@@ -6,8 +6,6 @@ import SwiftUI
 public struct SettingsSheet: View {
     @State private var monthStartDay: MonthStartDay = .first
     @State private var launchScreen: LaunchScreen = .home
-    @State private var startsWithAmount = false
-    @State private var categoriesByUse = false
     @State private var weekStart: Weekday = .sunday
     @State private var reminderTime: ReminderTime?
     @State private var authorization: NotificationAuthorization = .allowed
@@ -243,35 +241,6 @@ public struct SettingsSheet: View {
                                 Hairline()
 
                                 NavigationLink {
-                                    EntryStartView(
-                                        model: EntryStartModel(
-                                            database: database,
-                                            today: today
-                                        )
-                                    )
-                                } label: {
-                                    row(
-                                        "金額から入力",
-                                        systemImage: "yensign",
-                                        value: startsWithAmountText
-                                    )
-                                }
-
-                                Hairline()
-
-                                pickerRow(
-                                    "よく使うカテゴリを先に",
-                                    systemImage: "arrow.up.arrow.down"
-                                ) {
-                                    CapsulePicker(
-                                        selection: categoriesByUseBinding,
-                                        options: Self.flagOptions
-                                    )
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
                                     ReminderView(
                                         model: ReminderModel(
                                             database: database,
@@ -354,13 +323,6 @@ public struct SettingsSheet: View {
         }
         .task {
             await observeLaunchScreen()
-        }
-        .task {
-            await observeStartsWithAmount()
-        }
-        .task {
-            let byUse = try? await database.setting(.categoriesByUse)
-            categoriesByUse = byUse ?? false
         }
     }
 }
@@ -501,29 +463,8 @@ private extension SettingsSheet {
 private extension SettingsSheet {
     static let valueScale: CGFloat = 0.7
 
-    static let flagOptions: [CapsulePicker<Bool>.Option] = [
-        .init("する", value: true),
-        .init("しない", value: false)
-    ]
-
     var reminderText: String {
         reminderTime?.description ?? "オフ"
-    }
-
-    var startsWithAmountText: String {
-        startsWithAmount ? "する" : "しない"
-    }
-
-    var categoriesByUseBinding: Binding<Bool> {
-        Binding {
-            categoriesByUse
-        } set: { byUse in
-            categoriesByUse = byUse
-
-            Task {
-                try? await database.setSetting(.categoriesByUse, to: byUse)
-            }
-        }
     }
 
     var weekStartBinding: Binding<Weekday> {
@@ -545,16 +486,6 @@ private extension SettingsSheet {
             }
         } catch {
             launchScreen = .home
-        }
-    }
-
-    func observeStartsWithAmount() async {
-        do {
-            for try await starts in database.settingUpdates(.entryStartsWithAmount) {
-                startsWithAmount = starts
-            }
-        } catch {
-            startsWithAmount = false
         }
     }
 

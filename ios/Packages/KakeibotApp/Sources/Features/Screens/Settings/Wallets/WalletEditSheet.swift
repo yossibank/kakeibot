@@ -52,11 +52,13 @@ public struct WalletEditSheet: View {
                         .transition(.opacity)
                         .zIndex(1)
 
-                    SettingsDrawer("最初の残高") {
+                    SettingsDrawer("最初の残高", showsDone: false) {
                         closeAmount()
                     } content: {
                         VStack(spacing: 12) {
-                            Keypad(activeTax: activeTax) { key in
+                            Keypad(calculator: model.calculator) {
+                                closeAmount()
+                            } onKey: { key in
                                 model.press(key)
                             }
 
@@ -70,8 +72,7 @@ public struct WalletEditSheet: View {
                 if isEnteringValuation {
                     amountDrawer(
                         "今の評価額",
-                        amount: model.valuation.amount,
-                        tax: valuationTax,
+                        calculator: model.valuation,
                         saveTitle: "評価額を保存",
                         onPress: model.pressValuation,
                         onDismiss: closeValuation
@@ -85,8 +86,7 @@ public struct WalletEditSheet: View {
                 if isEnteringLoanAmount {
                     amountDrawer(
                         "最初に借りた額",
-                        amount: model.loanAmount.amount,
-                        tax: loanAmountTax,
+                        calculator: model.loanAmount,
                         saveTitle: "借りた額を決める",
                         onPress: model.pressLoanAmount,
                         onDismiss: closeLoanAmount,
@@ -425,8 +425,7 @@ private extension WalletEditSheet {
 
     func amountDrawer(
         _ title: String,
-        amount: Int,
-        tax: AmountCalculator.TaxRate?,
+        calculator: AmountCalculator,
         saveTitle: String,
         onPress: @escaping (AmountCalculator.Key) -> Void,
         onDismiss: @escaping () -> Void,
@@ -442,18 +441,20 @@ private extension WalletEditSheet {
                 .transition(.opacity)
                 .zIndex(1)
 
-            SettingsDrawer(title) {
+            SettingsDrawer(title, showsDone: false) {
                 onSave()
             } content: {
                 VStack(spacing: 12) {
-                    Text(AmountText.text(amount))
+                    Text(AmountText.text(calculator.amount))
                         .displayFont(.largeTitle, weight: .bold)
                         .monospacedDigit()
                         .foregroundStyle(Palette.accentStrong)
                         .contentTransition(.numericText())
-                        .animation(.snappy, value: amount)
+                        .animation(.snappy, value: calculator.amount)
 
-                    Keypad(activeTax: tax) { key in
+                    Keypad(calculator: calculator) {
+                        onSave()
+                    } onKey: { key in
                         onPress(key)
                     }
 
@@ -619,18 +620,6 @@ private extension WalletEditSheet {
 
     var amountStroke: Color {
         isEnteringAmount ? Palette.accent : Palette.accent.opacity(.muted)
-    }
-
-    var activeTax: AmountCalculator.TaxRate? {
-        model.calculator.taxNote?.rate
-    }
-
-    var valuationTax: AmountCalculator.TaxRate? {
-        model.valuation.taxNote?.rate
-    }
-
-    var loanAmountTax: AmountCalculator.TaxRate? {
-        model.loanAmount.taxNote?.rate
     }
 
     func open(_ panel: Panel) {

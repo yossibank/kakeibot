@@ -3,8 +3,6 @@ import DesignSystem
 import SwiftUI
 
 struct EntryDetailBand: View {
-    @State private var isPeekingMemo = false
-
     @Environment(\.themeStyle.corner) private var corner
 
     let model: EntryModel
@@ -97,11 +95,7 @@ private extension EntryDetailBand {
     }
 
     var memoCell: some View {
-        Button {
-            if !isPeekingMemo {
-                onMemo()
-            }
-        } label: {
+        Button(action: onMemo) {
             cell(
                 title: "メモ",
                 value: memoText,
@@ -110,25 +104,6 @@ private extension EntryDetailBand {
                 showsChevron: false
             )
         }
-        .simultaneousGesture(memoPeekGesture)
-        .background {
-            Color.clear
-                .popover(isPresented: $isPeekingMemo) {
-                    memoPeek
-                }
-        }
-        .sensoryFeedback(.impact(weight: .light), trigger: isPeekingMemo)
-    }
-
-    var memoPeek: some View {
-        Text(model.memo)
-            .textFont(.footnote)
-            .foregroundStyle(Palette.text)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: Self.peekWidth, alignment: .leading)
-            .padding(16)
-            .presentationCompactAdaptation(.popover)
-            .presentationBackground(Palette.panel)
     }
 
     func cell(
@@ -178,8 +153,6 @@ private extension EntryDetailBand {
     static let dateWeight: CGFloat = 1.25
     static let memoWeight: CGFloat = 1
     static let pillWidth: CGFloat = 40
-    static let peekDuration = 0.35
-    static let peekWidth: CGFloat = 260
 
     var showsWallet: Bool {
         model.type != .transfer
@@ -202,12 +175,5 @@ private extension EntryDetailBand {
         let firstLine = model.memo.split(whereSeparator: \.isNewline).first
 
         return firstLine.map(String.init) ?? "＋ \(model.memoHint)"
-    }
-
-    var memoPeekGesture: some Gesture {
-        LongPressGesture(minimumDuration: Self.peekDuration)
-            .onEnded { _ in
-                isPeekingMemo = !model.memo.isEmpty
-            }
     }
 }

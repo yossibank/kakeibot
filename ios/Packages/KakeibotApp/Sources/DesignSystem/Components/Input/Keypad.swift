@@ -2,16 +2,21 @@ import Core
 import SwiftUI
 
 public struct Keypad: View {
+    @State private var clearCount = 0
+
     @Environment(\.themeStyle.corner) private var corner
 
-    let activeTax: AmountCalculator.TaxRate?
+    let calculator: AmountCalculator
+    let onDone: (() -> Void)?
     let onKey: (AmountCalculator.Key) -> Void
 
     public init(
-        activeTax: AmountCalculator.TaxRate? = nil,
+        calculator: AmountCalculator,
+        onDone: (() -> Void)? = nil,
         onKey: @escaping (AmountCalculator.Key) -> Void
     ) {
-        self.activeTax = activeTax
+        self.calculator = calculator
+        self.onDone = onDone
         self.onKey = onKey
     }
 
@@ -25,15 +30,20 @@ public struct Keypad: View {
                 }
             }
         }
+        .sensoryFeedback(.impact(weight: .medium), trigger: clearCount)
     }
 }
 
 private extension Keypad {
+    var showsDone: Bool {
+        onDone != nil && !calculator.hasOperation
+    }
+
     func button(for key: AmountCalculator.Key) -> some View {
-        let isActive = key == activeTax.map(AmountCalculator.Key.tax)
+        let isActive = key == calculator.taxNote.map { .tax($0.rate) }
 
         return Button {
-            onKey(key)
+            press(key)
         } label: {
             label(for: key, isActive: isActive)
                 .frame(maxWidth: .infinity, minHeight: 50)
@@ -51,6 +61,15 @@ private extension Keypad {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
+        .simultaneousGesture(
+            LongPressGesture(minimumDuration: Self.clearPressDuration)
+                .onEnded { _ in
+                    if key == .delete {
+                        clearCount += 1
+                        onKey(.clear)
+                    }
+                }
+        )
     }
 
     @ViewBuilder
@@ -63,15 +82,12 @@ private extension Keypad {
             digitText(String(value))
         case .doubleZero:
             digitText("00")
-        case .delete:
+        case .tripleZero:
+            digitText("000")
+        case .delete, .clear:
             Image(systemName: "delete.left")
                 .sansFont(.headline, weight: .light)
                 .foregroundStyle(Palette.text)
-        case .clear:
-            Text("AC")
-                .displayFont(.body, weight: .medium)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
         case let .tax(rate):
             let labelColor = isActive ? Palette.accent : Palette.subtext
 
@@ -95,9 +111,15 @@ private extension Keypad {
                 .textFont(size: .headline)
                 .foregroundStyle(Palette.accentStrong)
         case .equals:
-            Text("＝")
-                .textFont(size: .headline, weight: .semibold)
-                .foregroundStyle(Palette.backgroundBottom)
+            if !showsDone {
+                Text("＝")
+                    .textFont(size: .headline, weight: .semibold)
+                    .foregroundStyle(Palette.backgroundBottom)
+            } else {
+                Image(systemName: "checkmark")
+                    .sansFont(.headline, weight: .semibold)
+                    .foregroundStyle(Palette.backgroundBottom)
+            }
         }
     }
 
@@ -106,15 +128,27 @@ private extension Keypad {
             .displayFont(.title)
             .foregroundStyle(Palette.text)
     }
+
+    func press(_ key: AmountCalculator.Key) {
+        if key == .equals,
+           showsDone,
+           let onDone {
+            onDone()
+        } else {
+            onKey(key)
+        }
+    }
 }
 
 private extension Keypad {
+    static let clearPressDuration = 0.5
+
     static let rows: [[AmountCalculator.Key]] = [
-        [.clear, .tax(.reduced), .tax(.standard), .operation(.divide)],
+        [.delete, .tax(.reduced), .tax(.standard), .operation(.divide)],
         [.digit(1), .digit(2), .digit(3), .operation(.multiply)],
         [.digit(4), .digit(5), .digit(6), .operation(.subtract)],
         [.digit(7), .digit(8), .digit(9), .operation(.add)],
-        [.doubleZero, .digit(0), .delete, .equals]
+        [.doubleZero, .digit(0), .tripleZero, .equals]
     ]
 
     static func background(
@@ -122,7 +156,7 @@ private extension Keypad {
         isActive: Bool
     ) -> Color {
         switch key {
-        case .digit, .doubleZero, .delete, .clear: Color.clear
+        case .digit, .doubleZero, .tripleZero, .delete, .clear: Color.clear
         case .tax: isActive ? Palette.accent.opacity(.subtle) : Color.clear
         case .operation: Palette.accent.opacity(.subtle)
         case .equals: Palette.accent
@@ -134,7 +168,7 @@ private extension Keypad {
         isActive: Bool
     ) -> Color {
         switch key {
-        case .clear: Palette.accent.opacity(.muted)
+        case .delete: Palette.accent.opacity(.muted)
         case .tax: isActive ? Palette.accent : Palette.accent.opacity(.muted)
         default: Color.clear
         }
@@ -153,7 +187,7 @@ public extension AmountCalculator.Operation {
 }
 
 #Preview {
-    Keypad(activeTax: .standard) { _ in }
+    Keypad(calculator: AmountCalculator(amount: 1280)) { _ in }
         .padding()
         .background(Palette.background)
 }
