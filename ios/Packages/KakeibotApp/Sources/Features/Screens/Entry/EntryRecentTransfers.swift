@@ -24,7 +24,9 @@ struct EntryRecentTransfers: View {
 
 private extension EntryRecentTransfers {
     func row(_ transfer: Entry) -> some View {
-        Button {
+        let fee = model.fee(of: transfer)
+
+        return Button {
             onUse(transfer)
         } label: {
             HStack(spacing: 8) {
@@ -33,6 +35,14 @@ private extension EntryRecentTransfers {
                     .lineLimit(1)
 
                 Spacer(minLength: 8)
+
+                if fee > 0 {
+                    Text("＋手数料 \(AmountText.text(fee))")
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                }
 
                 Text(AmountText.text(transfer.amount))
                     .monospacedDigit()
