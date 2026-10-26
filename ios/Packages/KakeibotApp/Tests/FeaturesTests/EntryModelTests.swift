@@ -332,13 +332,12 @@ struct EntryModelTests {
     }
 
     @Test
-    func followsLastWalletOfCategory() async throws {
+    func startsWithFirstWallet() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
         let categories = options.expenseCategories
         let wallets = options.wallets
         try await setup.saveEntry(category: categories[0].id, wallet: wallets[1].id, at: 1)
-        try await setup.saveEntry(category: categories[1].id, wallet: wallets[0].id, at: 2)
         let model = EntryModel(database: setup.database, date: setup.date)
 
         await model.load()
@@ -346,8 +345,9 @@ struct EntryModelTests {
         model.categoryId = categories[1].id
         let second = model.walletId
 
-        #expect(first == wallets[1].id)
+        #expect(first == wallets[0].id)
         #expect(second == wallets[0].id)
+        #expect(model.isUsualWallet)
     }
 
     @Test

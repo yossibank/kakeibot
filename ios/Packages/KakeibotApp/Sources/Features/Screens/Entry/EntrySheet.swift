@@ -659,7 +659,7 @@ private extension EntrySheet {
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
-    static let selectedScale: CGFloat = 1.08
+    static let selectedScale: CGFloat = 1.05
     static let liftInset: CGFloat = 10
     static let actionInset: CGFloat = 6
     static let menuPressDuration = 0.15
