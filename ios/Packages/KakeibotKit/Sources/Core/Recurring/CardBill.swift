@@ -34,6 +34,7 @@ public extension CardBill {
         recurrings: [Recurring],
         wallets: [Wallet],
         entries: [Entry],
+        valuations: [Valuation],
         after today: LocalDate
     ) -> [CardBill] {
         let cards = Set(wallets.filter { $0.kind == .card }.map(\.id))
@@ -53,7 +54,10 @@ public extension CardBill {
             .map { recurring, date in
                 let source = recurring.walletId
                 let wallet = wallets.first { $0.id == source }
-                let current = wallet?.balance(with: entries) ?? 0
+                let current = wallet?.balance(
+                    with: entries,
+                    valuations: valuations
+                ) ?? 0
                 let before = balances[source] ?? current
                 let amount = recurring.amount(paidOn: date, entries: entries)
 

@@ -255,7 +255,7 @@ public extension EntryModel {
             return nil
         }
 
-        return "\(date.month)/\(date.day)払い"
+        return Recurring.billText(paidOn: date)
     }
 
     var billRecurring: Recurring? {
@@ -274,7 +274,7 @@ public extension EntryModel {
             return []
         }
 
-        let dates = bill.billDates(for: date, count: Self.billTitles.count)
+        let dates = bill.billDates(for: date, count: Recurring.billChoiceCount)
 
         return zip(dates, Self.billTitles).map { date, title in
             BillChoice(

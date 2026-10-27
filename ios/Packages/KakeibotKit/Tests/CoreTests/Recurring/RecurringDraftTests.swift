@@ -45,7 +45,7 @@ struct RecurringDraftTests {
     }
 
     @Test
-    func regeneratesWhenStartMovesEarlier() throws {
+    func keepsGeneratedDateWhenStartMovesEarlier() throws {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         let generated = try #require(LocalDate("2026-03-27"))
         let earlier = try #require(LocalDate("2025-12-01"))
@@ -58,10 +58,10 @@ struct RecurringDraftTests {
         let moved = try draft.applied(to: original, at: now)
 
         draft.startDate = earlier
-        let regenerated = try draft.applied(to: original, at: now)
+        let earlierStart = try draft.applied(to: original, at: now)
 
         #expect(moved.generatedUntil == generated)
-        #expect(regenerated.generatedUntil == nil)
+        #expect(earlierStart.generatedUntil == generated)
     }
 
     @Test

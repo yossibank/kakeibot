@@ -178,7 +178,7 @@ emoji・text・glyph のどれかは必須。
 | to_wallet_id | TEXT | 振替だけ。wallet_id と別 |
 | memo | TEXT | |
 | recurring_id | TEXT | 固定費から作った記録 |
-| recurring_date | TEXT | どの回の分か |
+| recurring_date | TEXT | 休日でずらす前の予定日。どの回の分かを表す。`date` は実際の日（ずらした後） |
 | bill_month | TEXT | カードの引き落としの回の月（`2026-11`）。休日でずらす前の予定日の月で書く。空なら締め日で決める |
 | transfer_id | TEXT | 振替の手数料だけ。元の振替の entry。重複禁止。振替を消すと一緒に消える |
 | created_at / updated_at | TEXT | |

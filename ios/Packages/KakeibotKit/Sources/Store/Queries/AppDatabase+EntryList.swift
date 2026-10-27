@@ -39,13 +39,17 @@ extension AppDatabase {
         let valuations = try Valuation.fetchAll(db)
         let icons = try byID(Icon.fetchAll(db))
 
+        let cardBills = try recurrings(in: db)
+            .filter { $0.type == .transfer && $0.closingDay != nil }
+
         return EntryList(
             days: days,
             categories: categories,
             tags: tags,
             wallets: wallets,
             valuations: valuations,
-            icons: icons
+            icons: icons,
+            cardBills: cardBills
         )
     }
 }

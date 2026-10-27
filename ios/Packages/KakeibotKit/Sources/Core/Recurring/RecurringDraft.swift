@@ -177,10 +177,6 @@ public extension RecurringDraft {
         updated.closingDay = cardClosingDay
         updated.fee = savedFee
 
-        if startDate < recurring.startDate {
-            updated.generatedUntil = nil
-        }
-
         updated.startDate = startDate
         updated.endDate = endDate
         updated.remindDaysBefore = remindDaysBefore
