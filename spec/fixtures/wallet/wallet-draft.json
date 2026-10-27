@@ -1,5 +1,5 @@
 {
-  "description": "財布の入力の判定で出る問題を試す。財布の名前とアイコンは、カテゴリと同じ決まりで判定する。最初の残高は、マイナスでもよい。mark は category-draft.json と同じ形で書く。",
+  "description": "財布の入力の判定で出る問題を試す。財布の名前とアイコンは、カテゴリと同じ決まりで判定する。最初の残高は、マイナスでもよい。mark は category-draft.json と同じ形で書く。recordedKind は、記録・評価額・固定費がある財布の、保存されている種類である。recordedKind があるときは、資産（cash・bank・emoney・point・other・investment）と負債（card・loan）をまたぐ kind に変えられず、kindLocked が出る。同じ側の中なら変えられる。recordedKind が無い財布は、自由に変えられる。",
   "cases": [
     {
       "summary": "現金の正しい入力",
@@ -54,6 +54,55 @@
       "color": "C9A96E",
       "initialBalance": 0,
       "problems": ["emptyName", "invalidColor"]
+    },
+    {
+      "summary": "記録があるカードは現金に変えられない",
+      "name": "楽天カード",
+      "kind": "cash",
+      "recordedKind": "card",
+      "mark": { "kind": "text", "value": "楽" },
+      "color": "#BF4040",
+      "initialBalance": 0,
+      "problems": ["kindLocked"]
+    },
+    {
+      "summary": "記録がある銀行はローンに変えられない",
+      "name": "銀行",
+      "kind": "loan",
+      "recordedKind": "bank",
+      "mark": { "kind": "glyph", "value": "bank" },
+      "color": "#8DB0EA",
+      "initialBalance": 0,
+      "problems": ["kindLocked"]
+    },
+    {
+      "summary": "記録がある投資は銀行に変えられる",
+      "name": "積立",
+      "kind": "bank",
+      "recordedKind": "investment",
+      "mark": { "kind": "glyph", "value": "bank" },
+      "color": "#8DB0EA",
+      "initialBalance": 0,
+      "problems": []
+    },
+    {
+      "summary": "記録があるカードはローンに変えられる",
+      "name": "分割払い",
+      "kind": "loan",
+      "recordedKind": "card",
+      "mark": { "kind": "text", "value": "分" },
+      "color": "#BF4040",
+      "initialBalance": -30000,
+      "problems": []
+    },
+    {
+      "summary": "記録が無ければカードを現金に変えられる",
+      "name": "楽天カード",
+      "kind": "cash",
+      "mark": { "kind": "text", "value": "楽" },
+      "color": "#BF4040",
+      "initialBalance": 0,
+      "problems": []
     }
   ]
 }

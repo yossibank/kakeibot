@@ -112,7 +112,12 @@ public extension AssetsModel {
     }
 
     var holdings: Holdings {
-        Holdings(wallets: wallets, entries: entries, valuations: valuations)
+        Holdings(
+            wallets: wallets,
+            entries: entries,
+            valuations: valuations,
+            through: today
+        )
     }
 
     var total: Int {
@@ -381,7 +386,11 @@ private extension AssetsModel {
     }
 
     func balance(of wallet: Wallet) -> Int {
-        wallet.balance(with: entries, valuations: valuations)
+        wallet.balance(
+            with: entries,
+            valuations: valuations,
+            through: today
+        )
     }
 
     func repaidRatio(

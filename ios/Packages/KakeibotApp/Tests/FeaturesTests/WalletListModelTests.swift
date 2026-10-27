@@ -47,6 +47,38 @@ struct WalletListModelTests {
     }
 
     @Test
+    func leavesOutFutureEntriesFromBalance() async throws {
+        let database = try AppDatabase.inMemory()
+        try database.insertDefaultsIfEmpty(at: Date())
+        let options = try await database.entryOptions()
+        let cash = try #require(options.wallets.first)
+        let today = LocalDate(Date(), in: .current)
+
+        let income = EntryDraft(
+            type: .income,
+            amount: 1000,
+            date: today,
+            categoryId: options.incomeCategories[0].id,
+            walletId: cash.id
+        )
+
+        let future = EntryDraft(
+            type: .expense,
+            amount: 400,
+            date: today.adding(days: 3),
+            categoryId: options.expenseCategories[0].id,
+            walletId: cash.id
+        )
+
+        try await database.saveEntry(income, at: Date())
+        try await database.saveEntry(future, at: Date())
+        let model = WalletListModel(database: database)
+        await model.load()
+
+        #expect(model.balance(of: cash) == 1000)
+    }
+
+    @Test
     func hidesWalletButKeepsTheLastOne() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())

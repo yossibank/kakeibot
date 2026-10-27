@@ -205,7 +205,11 @@ public extension ReviewModel {
                     return nil
                 }
 
-                let balance = wallet.balance(with: entries, valuations: list.valuations)
+                let balance = wallet.balance(
+                    with: entries,
+                    valuations: list.valuations,
+                    through: today
+                )
 
                 return Move(
                     wallet: wallet,

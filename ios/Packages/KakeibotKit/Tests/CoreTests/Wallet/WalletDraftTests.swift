@@ -117,6 +117,7 @@ extension WalletDraftTests {
     struct DraftCase: Decodable, Sendable {
         let name: String
         let kind: Wallet.Kind
+        let recordedKind: Wallet.Kind?
         let mark: FixtureMark
         let color: String
         let initialBalance: Int
@@ -133,7 +134,8 @@ extension WalletDraftTests.DraftCase {
             name: name,
             mark: mark,
             color: color,
-            initialBalance: initialBalance
+            initialBalance: initialBalance,
+            recordedKind: recordedKind
         )
     }
 }

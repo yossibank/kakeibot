@@ -41,4 +41,44 @@ struct MonthOverviewTests {
         #expect(tomorrow.yesterdayExpense == 1200)
         #expect(nextMonth.monthExpense == 0)
     }
+
+    @Test
+    func treatsUngeneratedRecurringOfTodayAsUpcoming() throws {
+        let today = try #require(LocalDate("2026-10-23"))
+        let yesterday = today.adding(days: -1)
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+
+        func overview(generatedUntil: LocalDate?) throws -> MonthOverview {
+            let recurring = try Recurring(
+                type: .expense,
+                amount: 5000,
+                categoryId: EntryCategory.ID(),
+                walletId: Wallet.ID(),
+                frequency: .monthly,
+                day: 23,
+                startDate: #require(LocalDate("2026-01-01")),
+                generatedUntil: generatedUntil,
+                createdAt: now,
+                updatedAt: now
+            )
+
+            return MonthOverview(
+                list: nil,
+                budgets: [],
+                recurrings: [recurring],
+                monthStartDay: .first,
+                today: today
+            )
+        }
+
+        let ungenerated = try overview(generatedUntil: yesterday)
+        let neverGenerated = try overview(generatedUntil: nil)
+        let deleted = try overview(generatedUntil: today)
+
+        #expect(ungenerated.periodRecurrings.map(\.status) == [.upcoming])
+        #expect(ungenerated.nextRecurringExpense?.date == today)
+        #expect(neverGenerated.periodRecurrings.map(\.status) == [.upcoming])
+        #expect(deleted.periodRecurrings.map(\.status) == [.missing])
+        #expect(deleted.nextRecurringExpense == nil)
+    }
 }

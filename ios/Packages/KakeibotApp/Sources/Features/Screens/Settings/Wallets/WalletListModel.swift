@@ -35,7 +35,12 @@ public extension WalletListModel {
     func balance(of wallet: Wallet) -> Int {
         let entries = list?.days.flatMap(\.entries) ?? []
         let valuations = list?.valuations ?? []
-        return wallet.balance(with: entries, valuations: valuations)
+
+        return wallet.balance(
+            with: entries,
+            valuations: valuations,
+            through: Self.today
+        )
     }
 
     func load() async {
@@ -58,6 +63,10 @@ public extension WalletListModel {
 
 private extension WalletListModel {
     static let loadFailedMessage = "口座を読めませんでした"
+
+    static var today: LocalDate {
+        LocalDate(Date(), in: .current)
+    }
 
     func wallets(isHidden: Bool) -> [Wallet] {
         let wallets = list.map { Array($0.wallets.values) } ?? []

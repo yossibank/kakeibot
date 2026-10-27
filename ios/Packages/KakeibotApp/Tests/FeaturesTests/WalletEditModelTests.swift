@@ -105,6 +105,34 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func locksKindAcrossDebtOnlyWithRecords() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let bank = try await setup.wallet(named: "銀行")
+        let cash = try await setup.wallet(named: "財布")
+
+        let draft = try EntryDraft(
+            type: .expense,
+            amount: 500,
+            date: #require(LocalDate("2026-10-10")),
+            categoryId: options.expenseCategories[0].id,
+            walletId: bank.id
+        )
+
+        try await setup.database.saveEntry(draft, at: Date())
+        let used = WalletEditModel(database: setup.database, editing: bank.id)
+        let unused = WalletEditModel(database: setup.database, editing: cash.id)
+        await used.load()
+        await unused.load()
+
+        used.kind = .card
+        unused.kind = .card
+
+        #expect(used.draft.problems == [.kindLocked])
+        #expect(unused.draft.problems.isEmpty)
+    }
+
+    @Test
     func loadsAndEditsWallet() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")

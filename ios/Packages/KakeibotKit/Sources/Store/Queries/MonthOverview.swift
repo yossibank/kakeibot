@@ -73,7 +73,11 @@ public extension MonthOverview {
                             date: date,
                             recurring: recurring,
                             entry: entry,
-                            status: status(of: date, entry: entry),
+                            status: status(
+                                of: date,
+                                entry: entry,
+                                recurring: recurring
+                            ),
                             amount: amount
                         )
                     }
@@ -165,13 +169,20 @@ private extension MonthOverview {
 
     func status(
         of date: LocalDate,
-        entry: Entry?
+        entry: Entry?,
+        recurring: Recurring
     ) -> PeriodRecurring.Status {
         if entry != nil {
             return .done
         }
 
-        return date > today ? .upcoming : .missing
+        if date > today {
+            return .upcoming
+        }
+
+        let isGenerated = recurring.generatedUntil.map { date <= $0 } ?? false
+
+        return date == today && !isGenerated ? .upcoming : .missing
     }
 
     func recurringTotal(

@@ -6,4 +6,5 @@ public enum DraftProblem: String, CaseIterable, Codable, Error, Sendable {
     case invalidColor
     case nameTooLong
     case unreadableColors
+    case kindLocked
 }

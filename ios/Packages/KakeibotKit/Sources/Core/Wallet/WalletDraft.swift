@@ -7,6 +7,7 @@ public struct WalletDraft: Hashable, Sendable {
     public var color: String
     public var initialBalance: Int
     public var loanAmount: Int?
+    public var recordedKind: Wallet.Kind?
 
     public init(
         kind: Wallet.Kind,
@@ -14,7 +15,8 @@ public struct WalletDraft: Hashable, Sendable {
         mark: IconDraft.Mark,
         color: String,
         initialBalance: Int,
-        loanAmount: Int? = nil
+        loanAmount: Int? = nil,
+        recordedKind: Wallet.Kind? = nil
     ) {
         self.kind = kind
         self.name = name
@@ -22,6 +24,7 @@ public struct WalletDraft: Hashable, Sendable {
         self.color = color
         self.initialBalance = initialBalance
         self.loanAmount = loanAmount
+        self.recordedKind = recordedKind
     }
 }
 
@@ -35,7 +38,11 @@ public extension WalletDraft {
             ? [.emptyName]
             : []
 
-        return nameProblems + icon.problems
+        let kindProblems: [DraftProblem] = isKindLocked
+            ? [.kindLocked]
+            : []
+
+        return nameProblems + icon.problems + kindProblems
     }
 
     init(
@@ -103,6 +110,10 @@ public extension WalletDraft {
 }
 
 private extension WalletDraft {
+    var isKindLocked: Bool {
+        recordedKind.map { $0.isDebt != kind.isDebt } ?? false
+    }
+
     var trimmedName: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines)
     }
