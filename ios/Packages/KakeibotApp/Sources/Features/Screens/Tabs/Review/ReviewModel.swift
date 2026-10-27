@@ -82,7 +82,11 @@ public extension ReviewModel {
     }
 
     var previousSummary: ReviewSummary {
-        summary(in: period.previous.range)
+        summary(in: period.comparisonRange(today: today))
+    }
+
+    var isComparingPartially: Bool {
+        period.range.contains(today)
     }
 
     var total: Int {
@@ -182,7 +186,7 @@ public extension ReviewModel {
         }
 
         return list.wallets.values
-            .filter { Self.moveRoles.contains($0.kind.role) && $0.archivedAt == nil }
+            .filter { Self.moveRoles.contains($0.kind.role) }
             .sorted { lhs, rhs in
                 let lhsOrder = Self.moveRoles.firstIndex(of: lhs.kind.role) ?? 0
                 let rhsOrder = Self.moveRoles.firstIndex(of: rhs.kind.role) ?? 0
