@@ -13,7 +13,7 @@ struct LatestSchemaTests {
         let queue = try Self.makeQueue()
 
         for (index, kind) in Wallet.Kind.allCases.enumerated() {
-            let accepted = Self.accepts(queue) { db in
+            let accepted = try Self.accepts(queue) { db in
                 try db.execute(
                     sql: Self.insertWallet,
                     arguments: [Self.id(index + 10), kind.rawValue]
@@ -23,7 +23,7 @@ struct LatestSchemaTests {
             #expect(accepted, Self.hint)
         }
 
-        let unknown = Self.accepts(queue) { db in
+        let unknown = try Self.accepts(queue) { db in
             try db.execute(sql: Self.insertWallet, arguments: [Self.id(99), "unknown"])
         }
 
@@ -35,7 +35,7 @@ struct LatestSchemaTests {
         let queue = try Self.makeQueue()
 
         for (index, kind) in EntryCategory.Kind.allCases.enumerated() {
-            let accepted = Self.accepts(queue) { db in
+            let accepted = try Self.accepts(queue) { db in
                 try db.execute(
                     sql: Self.insertCategory,
                     arguments: [Self.id(index + 10), kind.rawValue]
@@ -45,7 +45,7 @@ struct LatestSchemaTests {
             #expect(accepted, Self.hint)
         }
 
-        let unknown = Self.accepts(queue) { db in
+        let unknown = try Self.accepts(queue) { db in
             try db.execute(sql: Self.insertCategory, arguments: [Self.id(99), "unknown"])
         }
 
@@ -58,7 +58,7 @@ struct LatestSchemaTests {
 
         for (index, frequency) in Recurring.Frequency.allCases.enumerated() {
             let month = frequency == .yearly ? 1 : nil
-            let accepted = Self.accepts(queue) { db in
+            let accepted = try Self.accepts(queue) { db in
                 try db.execute(
                     sql: Self.insertRecurring,
                     arguments: [Self.id(index + 10), frequency.rawValue, month]
@@ -68,7 +68,7 @@ struct LatestSchemaTests {
             #expect(accepted, Self.hint)
         }
 
-        let unknown = Self.accepts(queue) { db in
+        let unknown = try Self.accepts(queue) { db in
             try db.execute(
                 sql: Self.insertRecurring,
                 arguments: [Self.id(99), "unknown", nil]
@@ -84,7 +84,7 @@ struct LatestSchemaTests {
 
         for (index, kind) in Entry.Kind.allCases.enumerated() {
             let isTransfer = kind == .transfer
-            let accepted = Self.accepts(queue) { db in
+            let accepted = try Self.accepts(queue) { db in
                 try db.execute(
                     sql: Self.insertEntry,
                     arguments: [
@@ -99,7 +99,7 @@ struct LatestSchemaTests {
             #expect(accepted, Self.hint)
         }
 
-        let unknown = Self.accepts(queue) { db in
+        let unknown = try Self.accepts(queue) { db in
             try db.execute(
                 sql: Self.insertEntry,
                 arguments: [Self.id(99), "unknown", Self.categoryID, nil]
@@ -138,12 +138,13 @@ extension LatestSchemaTests {
     static func accepts(
         _ queue: DatabaseQueue,
         _ write: (Database) throws -> Void
-    ) -> Bool {
+    ) throws -> Bool {
         do {
             try queue.write(write)
 
             return true
-        } catch {
+        } catch let error as DatabaseError
+            where error.extendedResultCode == .SQLITE_CONSTRAINT_CHECK {
             return false
         }
     }
