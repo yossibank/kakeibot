@@ -117,10 +117,12 @@ private extension EntrySheet {
                 ScrollView {
                     form
                         .padding(.vertical, Self.fade)
+                        .padding(.horizontal, Self.liftInset)
                 }
                 .scrollIndicators(.hidden)
                 .edgeFade(Self.fade)
                 .padding(.vertical, -Self.fade)
+                .padding(.horizontal, -Self.liftInset)
             }
 
             Spacer(minLength: 0)

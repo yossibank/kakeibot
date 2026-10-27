@@ -9,7 +9,7 @@ struct EntryDialFace: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            HalfDial(progress: usage?.progress, tint: usage?.tint ?? Palette.accent)
+            HalfDial(progress: progress, tint: tint)
 
             VStack(spacing: 4) {
                 HStack(spacing: 8) {
@@ -70,6 +70,18 @@ private extension EntryDialFace {
         model.budgetUsage
     }
 
+    var progress: Double? {
+        usage?.progress ?? model.transferProgress
+    }
+
+    var tint: Color {
+        if let usage {
+            return usage.tint
+        }
+
+        return model.isOverSourceBalance ? Palette.rose : Palette.accent
+    }
+
     var isEnteringFee: Bool {
         model.keypadTarget == .fee
     }
@@ -101,7 +113,8 @@ private extension EntryDialFace {
             return model.sourceBalanceText
         }
 
-        return usage.map { "\($0.remainingTitle) \($0.remainingAmountText)" }
+        return usage.map { "\($0.remainingTitle) \($0.remainingAmountText)" } ?? model
+            .monthTotalText
     }
 
     var noteColor: Color {

@@ -77,6 +77,10 @@ public extension RecurringListModel {
         )
     }
 
+    static func title(of type: Entry.Kind) -> String {
+        type == .transfer ? "振替" : "固定費"
+    }
+
     func hintFlag() -> SettingsScreenFlag {
         .closedHint(.recurrings, in: database)
     }
@@ -104,10 +108,6 @@ public extension RecurringListModel {
 
 private extension RecurringListModel {
     static let loadFailedMessage = "固定費を読めませんでした"
-
-    static func title(of type: Entry.Kind) -> String {
-        type == .transfer ? "振替" : "固定費"
-    }
 
     func observeRecurrings() async {
         await observe(

@@ -73,14 +73,15 @@ public struct EntryRow: View {
                 }
 
                 if let route {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(route.source)
+                    HStack(spacing: 4) {
+                        RouteChip(route.source, isDestination: false)
 
-                        Text("→ \(route.destination)")
+                        Image(systemName: "arrow.right")
+                            .sansFont(.micro, weight: .semibold)
+                            .foregroundStyle(Palette.subtext)
+
+                        RouteChip(route.destination, isDestination: true)
                     }
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
                 }
 
                 if let memo {
@@ -111,6 +112,41 @@ public extension EntryRow {
             self.source = source
             self.destination = destination
         }
+    }
+}
+
+private struct RouteChip: View {
+    @Environment(\.themeStyle.corner) private var corner
+
+    let title: String
+    let isDestination: Bool
+
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(6))
+    }
+
+    init(
+        _ title: String,
+        isDestination: Bool
+    ) {
+        self.title = title
+        self.isDestination = isDestination
+    }
+
+    var body: some View {
+        Text(title)
+            .textFont(.caption)
+            .foregroundStyle(isDestination ? Palette.accentStrong : Palette.subtext)
+            .lineLimit(1)
+            .truncationMode(.tail)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(isDestination ? Palette.accent.opacity(.subtle) : Color.clear, in: shape)
+            .overlay {
+                if !isDestination {
+                    shape.stroke(Palette.outline, lineWidth: 1)
+                }
+            }
     }
 }
 
