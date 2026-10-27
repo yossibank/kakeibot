@@ -4,15 +4,17 @@ public extension Recurring {
             return nil
         }
 
+        let scheduled = scheduledDate(of: date)
+
         let thisMonth = LocalDate(
-            yearMonth: date.yearMonth,
+            yearMonth: scheduled.yearMonth,
             clampedDay: closingDay
         )
 
-        let closing = thisMonth < date
+        let closing = thisMonth < scheduled
             ? thisMonth
             : LocalDate(
-                yearMonth: date.yearMonth.adding(months: -1),
+                yearMonth: scheduled.yearMonth.adding(months: -1),
                 clampedDay: closingDay
             )
 
@@ -37,7 +39,7 @@ public extension Recurring {
 
         let used = entries
             .filter { $0.walletId == card }
-            .filter { Self.isBilled($0, paidOn: date, in: period) }
+            .filter { isBilled($0, paidOn: date, in: period) }
             .reduce(0) { $0 + Self.usage(of: $1) }
 
         return max(used, 0)
@@ -71,7 +73,15 @@ public extension Recurring {
 }
 
 private extension Recurring {
-    static func isBilled(
+    static func usage(of entry: Entry) -> Int {
+        switch entry.type {
+        case .expense: entry.amount
+        case .income: -entry.amount
+        case .transfer: 0
+        }
+    }
+
+    func isBilled(
         _ entry: Entry,
         paidOn date: LocalDate,
         in period: ClosedRange<LocalDate>
@@ -80,14 +90,6 @@ private extension Recurring {
             return period.contains(entry.date)
         }
 
-        return month == date.yearMonth
-    }
-
-    static func usage(of entry: Entry) -> Int {
-        switch entry.type {
-        case .expense: entry.amount
-        case .income: -entry.amount
-        case .transfer: 0
-        }
+        return month == occurrenceMonth(of: date)
     }
 }

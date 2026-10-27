@@ -23,6 +23,35 @@ struct RecurringScheduleTests {
         #expect(dates == fixture.dates)
     }
 
+    @Test(arguments: try occurrenceCases)
+    func judgesSameOccurrence(fixture: OccurrenceCase) throws {
+        var recurring = try Self.recurring(
+            frequency: .monthly,
+            month: nil,
+            day: fixture.day,
+            startDate: #require(LocalDate("2026-01-01")),
+            endDate: nil
+        )
+
+        recurring.holidayShift = fixture.holidayShift ?? .none
+
+        let entry = Entry(
+            type: .expense,
+            amount: 1000,
+            date: fixture.recorded,
+            categoryId: EntryCategory.ID(),
+            walletId: Wallet.ID(),
+            recurringId: recurring.id,
+            recurringDate: fixture.recorded,
+            createdAt: recurring.createdAt,
+            updatedAt: recurring.updatedAt
+        )
+
+        let same = recurring.isRecorded(by: entry, on: fixture.date)
+
+        #expect(same == fixture.same)
+    }
+
     @Test
     func continuesAfterGeneratedDate() throws {
         let start = try #require(LocalDate("2026-01-01"))
@@ -110,6 +139,14 @@ struct RecurringScheduleTests {
 }
 
 extension RecurringScheduleTests {
+    struct OccurrenceCase: Decodable, Sendable {
+        let day: Int
+        let holidayShift: Recurring.HolidayShift?
+        let recorded: LocalDate
+        let date: LocalDate
+        let same: Bool
+    }
+
     struct DatesCase: Decodable, Sendable {
         let frequency: Recurring.Frequency
         let month: Int?
@@ -124,6 +161,12 @@ extension RecurringScheduleTests {
 }
 
 private extension RecurringScheduleTests {
+    static var occurrenceCases: [OccurrenceCase] {
+        get throws {
+            try Fixture.cases("recurring/recurring-occurrence.json")
+        }
+    }
+
     static var datesCases: [DatesCase] {
         get throws {
             try Fixture.cases("recurring/recurring-dates.json")

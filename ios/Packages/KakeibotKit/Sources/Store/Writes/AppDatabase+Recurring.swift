@@ -166,14 +166,15 @@ private extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws -> Entry? {
-        let earliest = date.adding(days: -Recurring.sameDateMargin)
-        let latest = date.adding(days: Recurring.sameDateMargin)
+        let earliest = date.adding(days: -40)
+        let latest = date.adding(days: 40)
 
         let exists = try Entry
             .filter(Column("recurring_id") == recurring.id)
             .filter(Column("recurring_date") >= earliest)
             .filter(Column("recurring_date") <= latest)
-            .fetchCount(db) > 0
+            .fetchAll(db)
+            .contains { recurring.isRecorded(by: $0, on: date) }
 
         let amount = try billAmount(of: recurring, on: date, in: db)
 
@@ -223,7 +224,7 @@ private extension AppDatabase {
 
         let entries = try Entry
             .filter(Column("wallet_id") == card)
-            .filter(inPeriod || Column("bill_month") == date.yearMonth)
+            .filter(inPeriod || Column("bill_month") == recurring.occurrenceMonth(of: date))
             .fetchAll(db)
 
         return recurring.amount(paidOn: date, entries: entries)

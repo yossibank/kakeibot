@@ -1,6 +1,4 @@
 public extension Recurring {
-    static let sameDateMargin = 10
-
     func dates(
         from start: LocalDate,
         through end: LocalDate
@@ -41,7 +39,24 @@ public extension Recurring {
             return false
         }
 
-        return abs(date.days(until: recordedDate)) <= Self.sameDateMargin
+        return occurrenceMonth(of: recordedDate) == occurrenceMonth(of: date)
+    }
+
+    func scheduledDate(of date: LocalDate) -> LocalDate {
+        let months = months(
+            from: date.yearMonth.adding(months: -1),
+            through: date.yearMonth.adding(months: 1)
+        )
+
+        let scheduled = months
+            .map { LocalDate(yearMonth: $0, clampedDay: day) }
+            .first { shifted($0) == date }
+
+        return scheduled ?? date
+    }
+
+    func occurrenceMonth(of date: LocalDate) -> YearMonth {
+        scheduledDate(of: date).yearMonth
     }
 }
 
