@@ -9,7 +9,7 @@ struct EntryRowItemTests {
     func showsBillDateOfMovedUsage() throws {
         let setup = try Setup()
 
-        let item = try EntryRowItem(setup.entry(billMonth: "2027-02"), in: setup.list)
+        let item = try EntryRowItem(setup.entry(billMonth: "2027-02"), in: setup.list([setup.bill]))
 
         #expect(item.detail == "カード（3/1払い）")
     }
@@ -18,7 +18,33 @@ struct EntryRowItemTests {
     func keepsMonthWhenBillIsUnknown() throws {
         let setup = try Setup()
 
-        let item = try EntryRowItem(setup.entry(billMonth: "2030-02"), in: setup.list)
+        let item = try EntryRowItem(setup.entry(billMonth: "2030-02"), in: setup.list([setup.bill]))
+
+        #expect(item.detail == "カード（2月払い）")
+    }
+
+    @Test
+    func skipsHiddenBillOfSameCard() throws {
+        let setup = try Setup()
+        let hidden = setup.another(day: 20, archived: true)
+
+        let item = try EntryRowItem(
+            setup.entry(billMonth: "2027-02"),
+            in: setup.list([hidden, setup.bill])
+        )
+
+        #expect(item.detail == "カード（3/1払い）")
+    }
+
+    @Test
+    func keepsMonthWhenTwoBillsFit() throws {
+        let setup = try Setup()
+        let other = setup.another(day: 20, archived: false)
+
+        let item = try EntryRowItem(
+            setup.entry(billMonth: "2027-02"),
+            in: setup.list([other, setup.bill])
+        )
 
         #expect(item.detail == "カード（2月払い）")
     }
@@ -27,7 +53,7 @@ struct EntryRowItemTests {
 extension EntryRowItemTests {
     struct Setup {
         let card: Wallet
-        let list: EntryList
+        let bill: Recurring
 
         init() throws {
             let now = Date(timeIntervalSince1970: 1_791_000_000)
@@ -57,13 +83,38 @@ extension EntryRowItemTests {
                 updatedAt: now
             )
 
-            self.list = EntryList(
+            self.bill = bill
+        }
+
+        func another(
+            day: Int,
+            archived: Bool
+        ) -> Recurring {
+            Recurring(
+                type: bill.type,
+                amount: bill.amount,
+                categoryId: nil,
+                walletId: bill.walletId,
+                toWalletId: bill.toWalletId,
+                frequency: bill.frequency,
+                day: day,
+                holidayShift: bill.holidayShift,
+                closingDay: bill.closingDay,
+                startDate: bill.startDate,
+                archivedAt: archived ? bill.createdAt : nil,
+                createdAt: bill.createdAt,
+                updatedAt: bill.updatedAt
+            )
+        }
+
+        func list(_ bills: [Recurring]) -> EntryList {
+            EntryList(
                 days: [],
                 categories: [:],
                 tags: [:],
                 wallets: [card.id: card],
                 icons: [:],
-                cardBills: [bill]
+                cardBills: bills
             )
         }
 

@@ -59,12 +59,11 @@ private extension EntryRowItem {
             return nil
         }
 
-        let date = list.cardBills
-            .filter { $0.toWalletId == entry.walletId }
+        let dates = list.cardBills
+            .filter { $0.toWalletId == entry.walletId && $0.archivedAt == nil }
             .compactMap { $0.billDate(for: entry.date, in: month) }
-            .first
 
-        guard let date else {
+        guard let date = dates.first, dates.count == 1 else {
             return "（\(month.month)月払い）"
         }
 

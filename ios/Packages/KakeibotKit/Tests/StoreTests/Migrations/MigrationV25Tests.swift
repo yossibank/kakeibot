@@ -33,6 +33,7 @@ struct MigrationV25Tests {
 
         #expect(months["one"] == "2026-12")
         #expect(months["two"] == "2027-03")
+        #expect(months["after"] == "2026-02")
     }
 }
 
@@ -61,7 +62,8 @@ private extension MigrationV25Tests {
             recorded("plain", recurring: plainID, on: "2026-03-25"),
             recorded("lost", recurring: plainID, on: "2027-08-14"),
             billed("one", card: cardOne, month: "2027-01"),
-            billed("two", card: cardTwo, month: "2027-03")
+            billed("two", card: cardTwo, month: "2027-03"),
+            billed("after", card: cardOne, month: "2026-02", updatedAt: "2026-11-01T00:00:00.000Z")
         ]
 
         return parts.joined(separator: "\n")
@@ -141,13 +143,14 @@ private extension MigrationV25Tests {
     static func billed(
         _ id: String,
         card: String,
-        month: String
+        month: String,
+        updatedAt: String = "2026-01-01T00:00:00Z"
     ) -> String {
         """
         INSERT INTO entry (id, type, amount, date, category_id, wallet_id, \
         bill_month, created_at, updated_at)
         VALUES ('\(id)', 'expense', 500, '2026-12-01', 'k', \(card), \
-        '\(month)', \(stamp));
+        '\(month)', '2026-01-01T00:00:00Z', '\(updatedAt)');
         """
     }
 }
