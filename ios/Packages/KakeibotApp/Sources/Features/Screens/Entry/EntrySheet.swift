@@ -111,21 +111,16 @@ private extension EntrySheet {
         VStack(spacing: 12) {
             header
 
-            ViewThatFits(in: .vertical) {
+            ScrollView {
                 form
-
-                ScrollView {
-                    form
-                        .padding(.vertical, Self.fade)
-                        .padding(.horizontal, Self.liftInset)
-                }
-                .scrollIndicators(.hidden)
-                .edgeFade(Self.fade)
-                .padding(.vertical, -Self.fade)
-                .padding(.horizontal, -Self.liftInset)
+                    .padding(.vertical, Self.fade)
+                    .padding(.horizontal, Self.liftInset)
             }
-
-            Spacer(minLength: 0)
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.hidden)
+            .edgeFade(Self.fade)
+            .padding(.vertical, -Self.fade)
+            .padding(.horizontal, -Self.liftInset)
 
             VStack(spacing: 12) {
                 EntryDetailBand(
@@ -281,7 +276,7 @@ private extension EntrySheet {
     var categoryPager: some View {
         VStack(spacing: 8) {
             ScrollView(.horizontal) {
-                HStack(spacing: 0) {
+                LazyHStack(spacing: 0) {
                     ForEach(
                         Array(model.categoryPages.enumerated()),
                         id: \.offset
