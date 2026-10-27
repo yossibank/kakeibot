@@ -11,7 +11,7 @@ public final class BackupModel {
     public private(set) var pending: ExportV1?
     public private(set) var doneMessage: String?
     public private(set) var isWorking = false
-    public private(set) var previousDates: [Date]
+    public private(set) var previous: [Previous] = []
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -27,7 +27,6 @@ public final class BackupModel {
         self.database = database
         self.stash = stash
         self.appVersion = appVersion
-        self.previousDates = Self.exportedDates(of: stash.load())
     }
 }
 
@@ -36,6 +35,15 @@ public extension BackupModel {
         public let kind: FileKind
         public let data: Data
         public let name: String
+    }
+
+    struct Previous: Equatable, Identifiable, Sendable {
+        public let url: URL
+        public let date: Date
+
+        public var id: URL {
+            url
+        }
     }
 
     enum FileKind: String, Sendable {
@@ -55,12 +63,20 @@ public extension BackupModel {
         return "\(date) に書き出した\(counts)に置き換えます。いまのデータは残りません"
     }
 
-    func previousDay(at index: Int) -> String {
-        Self.dayText(previousDates[index])
+    func loadPrevious() async {
+        let stash = stash
+
+        previous = await Task.detached {
+            Self.previous(in: stash)
+        }.value
     }
 
-    func previousTitle(at index: Int) -> String {
-        let text = Self.dayTimeText(previousDates[index])
+    func previousDay(of item: Previous) -> String {
+        Self.dayText(item.date)
+    }
+
+    func previousTitle(of item: Previous) -> String {
+        let text = Self.dayTimeText(item.date)
 
         return "読み込む前のデータに戻す（\(text)）"
     }
@@ -137,17 +153,20 @@ public extension BackupModel {
     }
 
     @discardableResult
-    func readPrevious(at index: Int) -> Bool {
+    func readPrevious(_ item: Previous) async -> Bool {
         doneMessage = nil
 
-        let stashes = stash.load()
+        let result = await Task.detached {
+            Result { try ExportV1(json: Data(contentsOf: item.url)) }
+        }.value
 
-        guard stashes.indices.contains(index) else {
-            errorNotice.show(Self.readFailedMessage)
+        do {
+            pending = try result.get()
+            return true
+        } catch {
+            errorNotice.show(Self.readMessage(for: error))
             return false
         }
-
-        return read(stashes[index])
     }
 
     func cancelRestore() {
@@ -182,7 +201,7 @@ public extension BackupModel {
             errorNotice.show(Self.restoreFailedMessage)
         }
 
-        previousDates = Self.exportedDates(of: stash.load())
+        await loadPrevious()
         self.pending = nil
     }
 }
@@ -218,8 +237,12 @@ private extension BackupModel {
         return "kakeibot-\(formatter.string(from: date)).\(kind.rawValue)"
     }
 
-    static func exportedDates(of stashes: [Data]) -> [Date] {
-        stashes.compactMap { try? ExportV1(json: $0).exportedAt }
+    nonisolated static func previous(in stash: BackupStash) -> [Previous] {
+        stash.load().compactMap { item in
+            (try? ExportV1(json: item.data)).map {
+                Previous(url: item.url, date: $0.exportedAt)
+            }
+        }
     }
 
     static func dayText(_ date: Date) -> String {

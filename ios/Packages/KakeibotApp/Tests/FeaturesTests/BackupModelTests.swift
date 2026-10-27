@@ -81,10 +81,10 @@ struct BackupModelTests {
         target.read(file.data)
         await target.restore()
         let stashed = try #require(setup.stash.load().first)
-        let export = try ExportV1(json: stashed)
+        let export = try ExportV1(json: stashed.data)
 
         #expect(export.data == before)
-        #expect(target.previousDates.count == 1)
+        #expect(target.previous.count == 1)
     }
 
     @Test
@@ -103,7 +103,7 @@ struct BackupModelTests {
 
         #expect(target.errorNotice.message == "読み込めませんでした。いまのデータはそのままです")
         #expect(try setup.target.snapshot().wallets.isEmpty)
-        #expect(target.previousDates.isEmpty)
+        #expect(target.previous.isEmpty)
     }
 
     @Test
@@ -118,7 +118,7 @@ struct BackupModelTests {
 
         target.read(file.data)
         await target.restore()
-        let isRead = target.readPrevious(at: 0)
+        let isRead = await target.readPrevious(target.previous[0])
         await target.restore()
 
         #expect(isRead)
@@ -135,12 +135,12 @@ struct BackupModelTests {
         try await restore(target, from: setup.source, now: setup.now)
         let second = try setup.target.snapshot()
         try await restore(target, from: AppDatabase.inMemory(defaultsAt: setup.now), now: setup.now)
-        let isRead = target.readPrevious(at: 1)
+        let isRead = await target.readPrevious(target.previous[1])
         await target.restore()
 
         #expect(isRead)
         #expect(second != first)
-        #expect(target.previousDates.count == 2)
+        #expect(target.previous.count == 2)
         #expect(try setup.target.snapshot() == first)
     }
 
@@ -156,11 +156,74 @@ struct BackupModelTests {
             try await restore(target, from: source, now: setup.now)
         }
 
-        let tables = try setup.stash.load().map { try ExportV1(json: $0).data }
+        let tables = try setup.stash.load().map { try ExportV1(json: $0.data).data }
 
         #expect(tables.count == 2)
         #expect(!tables.contains(first))
-        #expect(target.previousDates.count == 2)
+        #expect(target.previous.count == 2)
+    }
+
+    @Test
+    func skipsBrokenStashRow() async throws {
+        let setup = try Setup()
+        let model = BackupModel(database: setup.target, stash: setup.stash)
+        let app = ExportV1.App(platform: .ios, version: "1.0")
+        let valid = try await setup.source.backup(at: setup.now, app: app)
+
+        try Data("x".utf8).write(to: setup.stash.urls[0])
+        try valid.write(to: setup.stash.urls[1])
+        await model.loadPrevious()
+        let item = try #require(model.previous.first)
+        let isRead = await model.readPrevious(item)
+
+        #expect(model.previous.count == 1)
+        #expect(item.url == setup.stash.urls[1])
+        #expect(isRead)
+        #expect(model.pending?.exportedAt == setup.now)
+    }
+
+    @Test
+    func keepsRowForSecondStashWhenFirstIsMissing() async throws {
+        let setup = try Setup()
+        let model = BackupModel(database: setup.target, stash: setup.stash)
+        let app = ExportV1.App(platform: .ios, version: "1.0")
+        let valid = try await setup.source.backup(at: setup.now, app: app)
+
+        try valid.write(to: setup.stash.urls[1])
+        await model.loadPrevious()
+        let item = try #require(model.previous.first)
+        let isRead = await model.readPrevious(item)
+
+        #expect(model.previous.count == 1)
+        #expect(isRead)
+    }
+
+    @Test
+    func keepsBothGenerationsWhenSaveFails() throws {
+        let setup = try Setup()
+        let first = Data("first".utf8)
+        let second = Data("second".utf8)
+
+        try first.write(to: setup.stash.urls[0])
+        try second.write(to: setup.stash.urls[1])
+
+        for failing in 1...2 {
+            let counter = Counter()
+            let stash = BackupStash(urls: setup.stash.urls) { data, url in
+                if counter.next() == failing {
+                    throw CocoaError(.fileWriteUnknown)
+                }
+
+                try data.write(to: url, options: .atomic)
+            }
+
+            #expect(throws: CocoaError.self) {
+                try stash.save(Data("new".utf8))
+            }
+
+            #expect(try Data(contentsOf: setup.stash.urls[0]) == first)
+            #expect(try Data(contentsOf: setup.stash.urls[1]) == second)
+        }
     }
 
     @Test
@@ -182,6 +245,15 @@ struct BackupModelTests {
 }
 
 extension BackupModelTests {
+    final class Counter: @unchecked Sendable {
+        private var count = 0
+
+        func next() -> Int {
+            count += 1
+            return count
+        }
+    }
+
     struct Setup {
         let source: AppDatabase
         let target: AppDatabase
@@ -212,6 +284,11 @@ extension BackupModelTests.Setup {
         let url = URL.temporaryDirectory
             .appending(path: UUID().uuidString)
             .appending(path: "previous.json")
+
+        try FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
 
         self.init(
             source: source,

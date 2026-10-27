@@ -69,16 +69,16 @@ public struct BackupView: View {
                             )
                         }
 
-                        ForEach(model.previousDates.indices, id: \.self) { index in
+                        ForEach(model.previous) { item in
                             Hairline()
 
                             Button {
-                                restorePrevious(at: index)
+                                restorePrevious(item)
                             } label: {
                                 action(
-                                    model.previousTitle(at: index),
+                                    model.previousTitle(of: item),
                                     systemImage: "arrow.uturn.backward",
-                                    detail: "\(model.previousDay(at: index)) に退避したデータに戻せます"
+                                    detail: "\(model.previousDay(of: item)) に退避したデータに戻せます"
                                 )
                             }
                         }
@@ -118,6 +118,9 @@ public struct BackupView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
+        .task {
+            await model.loadPrevious()
+        }
         .animation(.snappy, value: model.doneMessage)
         .fileExporter(
             isPresented: $isExporting,
@@ -219,8 +222,10 @@ private extension BackupView {
         isImporting = true
     }
 
-    func restorePrevious(at index: Int) {
-        isConfirmingRestore = model.readPrevious(at: index)
+    func restorePrevious(_ item: BackupModel.Previous) {
+        Task {
+            isConfirmingRestore = await model.readPrevious(item)
+        }
     }
 }
 
