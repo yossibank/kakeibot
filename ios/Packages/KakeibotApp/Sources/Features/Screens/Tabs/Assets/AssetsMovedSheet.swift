@@ -59,6 +59,7 @@ private extension AssetsMovedSheet {
                             title: item.title,
                             tag: item.tag,
                             detail: item.detail,
+                            route: item.route,
                             memo: item.memo,
                             amount: item.amount,
                             type: item.type,
