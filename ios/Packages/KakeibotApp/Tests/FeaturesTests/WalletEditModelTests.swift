@@ -133,6 +133,38 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func leavesOutFutureEntriesFromBalance() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let bank = try await setup.wallet(named: "銀行")
+        let today = LocalDate(Date(), in: .current)
+
+        let income = EntryDraft(
+            type: .income,
+            amount: 1000,
+            date: today,
+            categoryId: options.incomeCategories[0].id,
+            walletId: bank.id
+        )
+
+        let future = EntryDraft(
+            type: .expense,
+            amount: 400,
+            date: today.adding(days: 3),
+            categoryId: options.expenseCategories[0].id,
+            walletId: bank.id
+        )
+
+        try await setup.database.saveEntry(income, at: Date())
+        try await setup.database.saveEntry(future, at: Date())
+        let model = WalletEditModel(database: setup.database, editing: bank.id)
+
+        await model.load()
+
+        #expect(model.balance == 1000)
+    }
+
+    @Test
     func loadsAndEditsWallet() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")

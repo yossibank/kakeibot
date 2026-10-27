@@ -351,6 +351,10 @@ private extension WalletEditModel {
     static let saveFailedMessage = "保存できませんでした"
     static let deleteFailedMessage = "削除できませんでした"
 
+    static var today: LocalDate {
+        LocalDate(Date(), in: .current)
+    }
+
     static func hasRecords(
         of wallet: Wallet,
         in list: EntryList,
@@ -391,7 +395,8 @@ private extension WalletEditModel {
     ) {
         balance = wallet.balance(
             with: list.days.flatMap(\.entries),
-            valuations: list.valuations
+            valuations: list.valuations,
+            through: Self.today
         )
 
         valuations = list.valuations
