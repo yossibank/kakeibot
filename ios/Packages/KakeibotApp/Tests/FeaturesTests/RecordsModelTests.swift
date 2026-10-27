@@ -206,10 +206,12 @@ struct RecordsModelTests {
 
         await model.load()
         let day = try #require(model.days.first)
-        let details = model.rows(for: day).map(\.detail)
+        let routes = model.rows(for: day)
+            .compactMap(\.route)
+            .map { "\($0.source) → \($0.destination)" }
 
-        #expect(details.contains("銀行 → 財布 の手数料"))
-        #expect(details.contains("銀行 → 財布"))
+        #expect(routes.contains("銀行 → 財布 の手数料"))
+        #expect(routes.contains("銀行 → 財布"))
     }
 
     @Test

@@ -123,12 +123,7 @@ private extension EntrySheet {
                 .padding(.vertical, -Self.fade)
             }
 
-            if model.type == .transfer {
-                transferArea
-                    .frame(maxHeight: .infinity)
-            } else {
-                Spacer(minLength: 0)
-            }
+            Spacer(minLength: 0)
 
             VStack(spacing: 12) {
                 EntryDetailBand(
@@ -168,10 +163,12 @@ private extension EntrySheet {
     }
 
     var form: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 24) {
             dial
 
-            if model.type != .transfer {
+            if model.type == .transfer {
+                transferArea
+            } else {
                 categoryArea
             }
         }

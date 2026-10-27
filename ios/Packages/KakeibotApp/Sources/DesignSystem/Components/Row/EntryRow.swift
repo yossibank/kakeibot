@@ -6,6 +6,7 @@ public struct EntryRow: View {
     let title: String
     let tag: String?
     let detail: String?
+    let route: Route?
     let memo: String?
     let amount: Int
     let type: Entry.Kind
@@ -16,6 +17,7 @@ public struct EntryRow: View {
         title: String,
         tag: String? = nil,
         detail: String?,
+        route: Route? = nil,
         memo: String? = nil,
         amount: Int,
         type: Entry.Kind,
@@ -25,6 +27,7 @@ public struct EntryRow: View {
         self.title = title
         self.tag = tag
         self.detail = detail
+        self.route = route
         self.memo = memo
         self.amount = amount
         self.type = type
@@ -69,6 +72,17 @@ public struct EntryRow: View {
                     }
                 }
 
+                if let route {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(route.source)
+
+                        Text("→ \(route.destination)")
+                    }
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+
                 if let memo {
                     EntryMemo(memo)
                 }
@@ -82,6 +96,21 @@ public struct EntryRow: View {
         }
         .frame(minHeight: 48)
         .contentShape(.rect)
+    }
+}
+
+public extension EntryRow {
+    struct Route: Equatable, Sendable {
+        public let source: String
+        public let destination: String
+
+        public init(
+            source: String,
+            destination: String
+        ) {
+            self.source = source
+            self.destination = destination
+        }
     }
 }
 
@@ -129,7 +158,11 @@ public struct EntryRow: View {
         EntryRow(
             icon: nil,
             title: "振替",
-            detail: "銀行 → 財布",
+            detail: nil,
+            route: EntryRow.Route(
+                source: "三井住友銀行 普通預金",
+                destination: "楽天ペイ チャージ用"
+            ),
             amount: 20000,
             type: .transfer
         )

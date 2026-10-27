@@ -379,6 +379,7 @@ private extension HomeView {
                             title: row.title,
                             tag: row.tag,
                             detail: row.detail,
+                            route: row.route,
                             memo: row.memo,
                             amount: row.amount,
                             type: row.type,
