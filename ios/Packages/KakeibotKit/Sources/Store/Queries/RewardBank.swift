@@ -50,6 +50,13 @@ public extension RewardBank {
         rules.first { $0.id == log.ruleId }
     }
 
+    func rules(on date: LocalDate) -> [RewardRule] {
+        let achieved = Set(logs(on: date).map(\.ruleId))
+        let hidden = rules.filter { !$0.isActive && achieved.contains($0.id) }
+
+        return activeRules + hidden
+    }
+
     func icon(for rule: RewardRule) -> Icon? {
         icons[rule.iconId]
     }

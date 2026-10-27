@@ -103,34 +103,74 @@ struct RewardRuleWriteTests {
     }
 
     @Test
-    func deletesRuleWithLogsAndRestores() async throws {
+    func deletesRuleWithoutLogsAndRestores() async throws {
+        let setup = try Setup()
+        let rule = try await setup.save("自炊した日")
+
+        let deletion = try await setup.database.deleteRewardRule(rule.id)
+        let deleted = try await setup.database.rewardRuleList()
+
+        try await setup.database.restore(deletion)
+        let restored = try await setup.database.rewardRuleList()
+
+        #expect(deleted.rules.isEmpty)
+        #expect(restored.rules == [rule])
+    }
+
+    @Test
+    func keepsRuleWithLogs() async throws {
         let setup = try Setup()
         let rule = try await setup.save("自炊した日")
         let date = try #require(LocalDate("2026-10-22"))
 
-        let log = RewardLog(
-            ruleId: rule.id,
-            date: date,
-            amount: rule.amount,
-            createdAt: setup.now
+        try await setup.database.setReward(
+            rule.id,
+            isAchieved: true,
+            on: date,
+            at: setup.now
         )
 
-        try await setup.database.writer.write { db in
-            try log.insert(db)
+        await #expect(throws: AppDatabase.RewardRuleWriteError.hasLogs) {
+            try await setup.database.deleteRewardRule(rule.id)
         }
 
-        let deletion = try await setup.database.deleteRewardRule(rule.id)
-        let deleted = try await setup.database.rewardRuleList()
-        let deletedLogs = try await setup.logs()
+        let list = try await setup.database.rewardRuleList()
+        let logs = try await setup.logs()
 
-        try await setup.database.restore(deletion)
-        let restored = try await setup.database.rewardRuleList()
-        let restoredLogs = try await setup.logs()
+        #expect(list.rules == [rule])
+        #expect(logs.count == 1)
+    }
 
-        #expect(deleted.rules.isEmpty)
-        #expect(deletedLogs.isEmpty)
-        #expect(restored.rules == [rule])
-        #expect(restoredLogs == [log])
+    @Test
+    func keepsBalanceNonNegativeWhenRuleIsDeleted() async throws {
+        let setup = try Setup()
+        let rule = try await setup.save("自炊した日")
+        let first = try #require(LocalDate("2026-10-01"))
+
+        for offset in 0..<60 {
+            try await setup.database.setReward(
+                rule.id,
+                isAchieved: true,
+                on: first.adding(days: offset),
+                at: setup.now
+            )
+        }
+
+        let goal = try await setup.database.saveRewardGoal(
+            RewardGoalDraft(name: "靴", targetAmount: 30000),
+            at: setup.now
+        )
+
+        try await setup.database.setRewardGoalPurchased(
+            goal.id,
+            isPurchased: true,
+            at: setup.now
+        )
+
+        try? await setup.database.deleteRewardRule(rule.id)
+        let bank = try await setup.database.rewardBank()
+
+        #expect(bank.balance == 0)
     }
 }
 

@@ -5,6 +5,7 @@ import GRDB
 public extension AppDatabase {
     enum RewardGoalWriteError: Error, Equatable {
         case goalNotFound
+        case shortOfBalance
     }
 
     @discardableResult
@@ -42,6 +43,17 @@ public extension AppDatabase {
         try await writer.write { db in
             guard var goal = try RewardGoal.fetchOne(db, key: id) else {
                 throw RewardGoalWriteError.goalNotFound
+            }
+
+            if isPurchased, goal.purchasedAt == nil {
+                let logs = try RewardLog.fetchAll(db)
+                let goals = try RewardGoal.fetchAll(db)
+
+                let balance = RewardBalance.amount(logs: logs, goals: goals)
+
+                guard balance >= goal.targetAmount else {
+                    throw RewardGoalWriteError.shortOfBalance
+                }
             }
 
             goal.purchasedAt = isPurchased ? now : nil

@@ -84,6 +84,10 @@ extension RewardRuleListModel: SettingsBoardModel {
         )
     }
 
+    public func isInUse(_ error: any Error) -> Bool {
+        error as? AppDatabase.RewardRuleWriteError == .hasLogs
+    }
+
     public func remove(_ id: RewardRule.ID) async throws -> Deletion {
         try await database.deleteRewardRule(id)
     }

@@ -6,6 +6,7 @@ public extension AppDatabase {
     enum RewardRuleWriteError: Error, Equatable {
         case ruleNotFound
         case iconNotFound
+        case hasLogs
     }
 
     @discardableResult
@@ -63,12 +64,12 @@ public extension AppDatabase {
 
             let logs = RewardLog.filter(Column("rule_id") == id)
 
-            let deletion = try Deletion(
-                rewardRules: [rule],
-                rewardLogs: logs.fetchAll(db)
-            )
+            guard try logs.fetchCount(db) == 0 else {
+                throw RewardRuleWriteError.hasLogs
+            }
 
-            try logs.deleteAll(db)
+            let deletion = Deletion(rewardRules: [rule])
+
             try rule.delete(db)
 
             return deletion

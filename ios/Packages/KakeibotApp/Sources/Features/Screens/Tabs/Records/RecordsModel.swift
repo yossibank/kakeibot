@@ -135,6 +135,10 @@ public extension RecordsModel {
         list?.filterWallets ?? []
     }
 
+    func rewardRules(on date: LocalDate) -> [RewardRule] {
+        rewardBank?.rules(on: date) ?? []
+    }
+
     func batchCategories(for type: Entry.Kind) -> [EntryCategory] {
         let categories = list?.filterCategories ?? []
         return categories.filter { $0.kind.rawValue == type.rawValue }
@@ -256,6 +260,10 @@ public extension RecordsModel {
         on date: LocalDate
     ) async {
         let isAchieved = !isAchieved(rule, on: date)
+
+        guard rule.isActive || !isAchieved else {
+            return
+        }
 
         do {
             try await database.setReward(

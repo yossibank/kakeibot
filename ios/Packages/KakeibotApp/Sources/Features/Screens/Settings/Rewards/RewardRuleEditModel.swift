@@ -10,6 +10,7 @@ public final class RewardRuleEditModel {
     public var name = ""
     public private(set) var calculator = AmountCalculator()
     public private(set) var isHidden = false
+    public private(set) var hasLogs = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -89,6 +90,7 @@ public extension RewardRuleEditModel {
             icon.apply(saved)
 
             isHidden = !rule.isActive
+            hasLogs = list.total(of: rule) != nil
             baseline = draft
         } catch {
             errorNotice.show(Self.loadFailedMessage)
