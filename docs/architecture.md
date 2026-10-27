@@ -103,7 +103,7 @@ KakeibotApp/
 │   │   │   ├── Settings/    設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（#if DEBUG）
 │   │   │   └── Tabs/        Assets・Home・Records・Review
 │   │   └── Shared/
-│   │       ├── Model/       画面のモデルの見張りの形、記録の検索と絞り込み
+│   │       ├── Model/       画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み
 │   │       ├── Notice/      記録・削除の知らせと取り消し
 │   │       ├── Period/      期間の範囲と月の始まり
 │   │       ├── Settings/    設定の画面で使う部品（Board・Header・Hint・Icon・Input・Preview・Tile）
@@ -126,6 +126,8 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | MainView | タブは Home・Records・Review・Assets。シートは新規・編集・設定・テンプレート（`EntryTemplate`）・振替・口座（`Wallet`）・固定費（`Recurring`）など |
 
 記録の一覧（`EntryList`）の見張り（`ValueObservation`）は `AppDatabase` が 1 つだけ持ち、見張る画面のあいだで共有する。
+
+見張りが失敗したら、1 秒・2 秒・4 秒待って見張り直す。3 回を超えたら知らせを出して止める。アプリが裏から前面に戻ったときも、MainView が各画面の見張りを始め直す。ホームは、止まったときに「読み込めませんでした」と「もう一度読み込む」を出す。
 
 ### 保存から反映まで
 

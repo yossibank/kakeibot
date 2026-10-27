@@ -35,7 +35,7 @@ extension AppModel {
         case opening
         case onboarding(AppDatabase)
         case ready(AppDatabase)
-        case failed(String)
+        case failed
     }
 
     var route: PlannedNotification.Route? {
@@ -62,8 +62,18 @@ extension AppModel {
             style = await (try? database.style()) ?? .standard
             launch = completed ? .ready(database) : .onboarding(database)
         } catch {
-            launch = .failed(String(describing: error))
+            launch = .failed
         }
+    }
+
+    func retryOpen() async {
+        guard case .failed = launch else {
+            return
+        }
+
+        launch = .opening
+
+        await open()
     }
 
     func open(_ url: URL) {

@@ -95,12 +95,16 @@ private extension RootView {
             .task {
                 await model.observeWidgets(in: database)
             }
-        case let .failed(message):
-            ContentUnavailableView(
-                "データを開けませんでした",
-                systemImage: "exclamationmark.triangle",
-                description: Text(message)
-            )
+        case .failed:
+            ContentUnavailableView {
+                Label("データを開けませんでした", systemImage: "exclamationmark.triangle")
+            } actions: {
+                Button("もう一度試す") {
+                    Task {
+                        await model.retryOpen()
+                    }
+                }
+            }
         }
     }
 }
