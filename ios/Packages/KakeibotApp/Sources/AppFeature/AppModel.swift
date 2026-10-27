@@ -1,4 +1,5 @@
 import Core
+import Features
 import Foundation
 import Notifications
 import Observation
@@ -17,16 +18,19 @@ final class AppModel {
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let scheduler: NotificationScheduler
     private let router: NotificationRouter
+    private let retryDelays: [Duration]
 
     init(
         openDatabase: @escaping @Sendable () throws -> AppDatabase,
         scheduler: NotificationScheduler = NotificationScheduler(),
-        router: NotificationRouter = .shared
+        router: NotificationRouter = .shared,
+        retryDelays: [Duration] = ScreenObservation.retryDelays
     ) {
         self.today = Self.currentDay()
         self.openDatabase = openDatabase
         self.scheduler = scheduler
         self.router = router
+        self.retryDelays = retryDelays
     }
 }
 
@@ -36,6 +40,13 @@ extension AppModel {
         case onboarding(AppDatabase)
         case ready(AppDatabase)
         case failed
+    }
+
+    var hasDatabase: Bool {
+        switch launch {
+        case .onboarding, .ready: true
+        case .opening, .failed: false
+        }
     }
 
     var route: PlannedNotification.Route? {
@@ -146,13 +157,23 @@ extension AppModel {
     }
 
     func observeNotifications(in database: AppDatabase) async {
-        do {
-            for try await input in database.notificationInputUpdates(from: today) {
-                await schedule(input)
-            }
-        } catch {
-            return
+        let today = today
+
+        await watch(database.notificationInputUpdates(from: today)) { input in
+            await self.schedule(input)
         }
+    }
+
+    @discardableResult
+    func watch<Values: AsyncSequence>(
+        _ values: @autoclosure () -> Values,
+        receive: nonisolated(nonsending) (Values.Element) async -> Void
+    ) async -> Bool {
+        await ScreenObservation.retry(
+            values(),
+            retryDelays: retryDelays,
+            receive: receive
+        )
     }
 }
 
@@ -162,54 +183,36 @@ private extension AppModel {
     }
 
     func observeLook(in database: AppDatabase) async {
-        do {
-            for try await look in database.themeLookUpdates() {
-                self.look = look
-                reloadWidgets()
-            }
-        } catch {
-            return
+        await watch(database.themeLookUpdates()) { look in
+            self.look = look
+            self.reloadWidgets()
         }
     }
 
     func observeStyle(in database: AppDatabase) async {
-        do {
-            for try await style in database.styleUpdates() {
-                self.style = style
-                reloadWidgets()
-            }
-        } catch {
-            return
+        await watch(database.styleUpdates()) { style in
+            self.style = style
+            self.reloadWidgets()
         }
     }
 
     func observeOverviewForWidgets(in database: AppDatabase) async {
-        do {
-            for try await _ in database.monthOverviewUpdates(on: today) {
-                reloadWidgets()
-            }
-        } catch {
-            return
+        let today = today
+
+        await watch(database.monthOverviewUpdates(on: today)) { _ in
+            self.reloadWidgets()
         }
     }
 
     func observeTemplatesForWidgets(in database: AppDatabase) async {
-        do {
-            for try await _ in database.templateUpdates() {
-                reloadWidgets()
-            }
-        } catch {
-            return
+        await watch(database.templateUpdates()) { _ in
+            self.reloadWidgets()
         }
     }
 
     func observeTemplateOrderForWidgets(in database: AppDatabase) async {
-        do {
-            for try await _ in database.settingUpdates(.templateOrder) {
-                reloadWidgets()
-            }
-        } catch {
-            return
+        await watch(database.settingUpdates(.templateOrder)) { _ in
+            self.reloadWidgets()
         }
     }
 

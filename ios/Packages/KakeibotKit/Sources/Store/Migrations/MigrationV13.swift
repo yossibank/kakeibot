@@ -1,4 +1,3 @@
-import Core
 import GRDB
 
 enum MigrationV13 {
@@ -8,7 +7,7 @@ enum MigrationV13 {
 
             table.column("type", .text)
                 .notNull()
-                .check { Entry.Kind.allCases.contains($0) }
+                .check { entryKinds.contains($0) }
 
             table.column("amount", .integer).notNull().check { $0 >= 0 }
             table.column("category_id", .text).references("category")
@@ -18,7 +17,7 @@ enum MigrationV13 {
 
             table.column("frequency", .text)
                 .notNull()
-                .check { Recurring.Frequency.allCases.contains($0) }
+                .check { frequencies.contains($0) }
 
             table.column("month", .integer).check { (1...12).contains($0) }
 
@@ -56,6 +55,19 @@ enum MigrationV13 {
         try db.drop(table: "recurring")
         try db.rename(table: "new_recurring", to: "recurring")
     }
+}
+
+extension MigrationV13 {
+    static let entryKinds = [
+        "expense",
+        "income",
+        "transfer"
+    ]
+
+    static let frequencies = [
+        "monthly",
+        "yearly"
+    ]
 }
 
 private extension MigrationV13 {

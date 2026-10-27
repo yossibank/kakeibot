@@ -1,4 +1,3 @@
-import Core
 import GRDB
 
 enum MigrationV1 {
@@ -19,7 +18,63 @@ enum MigrationV1 {
     }
 }
 
-private extension MigrationV1 {
+extension MigrationV1 {
+    static let walletKinds = [
+        "cash",
+        "bank",
+        "card",
+        "emoney",
+        "point",
+        "other",
+        "investment",
+        "loan"
+    ]
+
+    static let categoryKinds = [
+        "expense",
+        "income"
+    ]
+
+    static let frequencies = [
+        "monthly",
+        "yearly"
+    ]
+
+    static let entryKinds = [
+        "expense",
+        "income",
+        "transfer"
+    ]
+
+    static let settingKeys = [
+        "month_start_day",
+        "week_start",
+        "reminder_time",
+        "theme_id",
+        "corner_style",
+        "font_style",
+        "text_font_style",
+        "text_size",
+        "onboarding_completed",
+        "setup_card_closed",
+        "entry_opened",
+        "settings_opened",
+        "launch_screen",
+        "entry_starts_with_amount",
+        "template_order",
+        "home_sections",
+        "home_hidden_sections",
+        "categories_by_use",
+        "records_layout",
+        "review_scale",
+        "review_kind",
+        "closed_hints",
+        "closed_hidden_lists",
+        "recent_searches",
+        "widget_entry",
+        "fee_category_id"
+    ]
+
     static let themeColors = [
         "background",
         "surface",
@@ -29,7 +84,9 @@ private extension MigrationV1 {
         "expense",
         "income"
     ]
+}
 
+private extension MigrationV1 {
     static func createIcon(_ db: Database) throws {
         try db.create(table: "icon") { table in
             table.primaryKey("id", .text)
@@ -48,7 +105,7 @@ private extension MigrationV1 {
 
             table.column("kind", .text)
                 .notNull()
-                .check { Wallet.Kind.allCases.contains($0) }
+                .check { walletKinds.contains($0) }
 
             table.column("icon_id", .text).notNull().references("icon")
             table.column("initial_balance", .integer).notNull()
@@ -64,7 +121,7 @@ private extension MigrationV1 {
 
             table.column("kind", .text)
                 .notNull()
-                .check { EntryCategory.Kind.allCases.contains($0) }
+                .check { categoryKinds.contains($0) }
 
             table.column("name", .text).notNull()
             table.column("icon_id", .text).notNull().references("icon")
@@ -81,7 +138,7 @@ private extension MigrationV1 {
 
             table.column("frequency", .text)
                 .notNull()
-                .check { Recurring.Frequency.allCases.contains($0) }
+                .check { frequencies.contains($0) }
 
             table.column("month", .integer).check { (1...12).contains($0) }
 
@@ -201,7 +258,7 @@ private extension MigrationV1 {
     static func createSetting(_ db: Database) throws {
         try db.create(table: "setting") { table in
             table.primaryKey("key", .text)
-                .check { Setting.Key.allCases.contains($0) }
+                .check { settingKeys.contains($0) }
 
             table.column("value", .text).notNull()
         }
@@ -210,7 +267,7 @@ private extension MigrationV1 {
     static func addMovementColumns(to table: TableDefinition) {
         table.column("type", .text)
             .notNull()
-            .check { Entry.Kind.allCases.contains($0) }
+            .check { entryKinds.contains($0) }
 
         table.column("amount", .integer).notNull().check { $0 >= 1 }
         table.column("category_id", .text).references("category")

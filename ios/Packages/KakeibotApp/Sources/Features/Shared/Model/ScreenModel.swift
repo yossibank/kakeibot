@@ -5,17 +5,14 @@ protocol ScreenModel: AnyObject {
     var errorNotice: ErrorNotice { get set }
 }
 
-enum ScreenObservation {
-    static let retryDelays: [Duration] = [.seconds(1), .seconds(2), .seconds(4)]
-}
+public enum ScreenObservation {
+    public static let retryDelays: [Duration] = [.seconds(1), .seconds(2), .seconds(4)]
 
-extension ScreenModel {
-    @discardableResult
-    func observe<Values: AsyncSequence>(
+    public static func retry<Values: AsyncSequence>(
         _ values: @autoclosure () -> Values,
-        failure message: String,
         retryDelays: [Duration] = ScreenObservation.retryDelays,
-        receive: (Values.Element) -> Void
+        isolation: isolated (any Actor)? = #isolation,
+        receive: nonisolated(nonsending) (Values.Element) async -> Void
     ) async -> Bool {
         var attempt = 0
 
@@ -23,7 +20,7 @@ extension ScreenModel {
             do {
                 for try await value in values() {
                     attempt = 0
-                    receive(value)
+                    await receive(value)
                 }
 
                 return false
@@ -33,7 +30,6 @@ extension ScreenModel {
                 }
 
                 guard attempt < retryDelays.count else {
-                    errorNotice.show(message)
                     return true
                 }
 
@@ -46,5 +42,27 @@ extension ScreenModel {
                 attempt += 1
             }
         }
+    }
+}
+
+extension ScreenModel {
+    @discardableResult
+    func observe<Values: AsyncSequence>(
+        _ values: @autoclosure () -> Values,
+        failure message: String,
+        retryDelays: [Duration] = ScreenObservation.retryDelays,
+        receive: (Values.Element) -> Void
+    ) async -> Bool {
+        let isFailed = await ScreenObservation.retry(
+            values(),
+            retryDelays: retryDelays,
+            receive: receive
+        )
+
+        if isFailed {
+            errorNotice.show(message)
+        }
+
+        return isFailed
     }
 }
