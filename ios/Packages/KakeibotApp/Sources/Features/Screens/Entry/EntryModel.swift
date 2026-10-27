@@ -717,6 +717,19 @@ public extension EntryModel {
     func reloadWallets() async {
         do {
             options = try await database.entryOptions()
+
+            if !wallets.contains(where: { $0.id == walletId }) {
+                walletId = wallets.first { $0.id != toWalletId }?.id ?? wallets.first?.id
+            }
+
+            if type == .transfer {
+                if !wallets.contains(where: { $0.id == toWalletId }) {
+                    toWalletId = nil
+                }
+
+                chooseDestination()
+            }
+
             try await loadBalances()
         } catch {
             report(error)
