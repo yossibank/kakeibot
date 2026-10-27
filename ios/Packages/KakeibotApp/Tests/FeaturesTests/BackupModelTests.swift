@@ -9,7 +9,7 @@ struct BackupModelTests {
     @Test
     func namesFileByDay() async throws {
         let setup = try Setup()
-        let model = BackupModel(database: setup.source, appVersion: "1.2")
+        let model = BackupModel(database: setup.source, stash: setup.stash, appVersion: "1.2")
 
         let isMade = await model.makeFile(.json, at: setup.now)
         let file = try #require(model.file)
@@ -23,7 +23,7 @@ struct BackupModelTests {
     @Test
     func writesSpreadsheet() async throws {
         let setup = try Setup()
-        let model = BackupModel(database: setup.source)
+        let model = BackupModel(database: setup.source, stash: setup.stash)
 
         await model.makeFile(.csv, at: setup.now)
         let file = try #require(model.file)
@@ -36,8 +36,8 @@ struct BackupModelTests {
     @Test
     func restoresAfterConfirming() async throws {
         let setup = try Setup()
-        let source = BackupModel(database: setup.source)
-        let target = BackupModel(database: setup.target)
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+        let target = BackupModel(database: setup.target, stash: setup.stash)
         await source.makeFile(.json, at: setup.now)
         let file = try #require(source.file)
 
@@ -55,8 +55,8 @@ struct BackupModelTests {
     @Test
     func keepsDataWhenCancelled() async throws {
         let setup = try Setup()
-        let source = BackupModel(database: setup.source)
-        let target = BackupModel(database: setup.target)
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+        let target = BackupModel(database: setup.target, stash: setup.stash)
         await source.makeFile(.json, at: setup.now)
         let file = try #require(source.file)
 
@@ -69,9 +69,66 @@ struct BackupModelTests {
     }
 
     @Test
+    func stashesCurrentDataBeforeRestoring() async throws {
+        let setup = try Setup()
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+        let target = BackupModel(database: setup.target, stash: setup.stash)
+        try setup.target.insertDefaultsIfEmpty(at: setup.now)
+        let before = try setup.target.snapshot()
+        await source.makeFile(.json, at: setup.now)
+        let file = try #require(source.file)
+
+        target.read(file.data)
+        await target.restore()
+        let stashed = try #require(setup.stash.load())
+        let export = try ExportV1(json: stashed)
+
+        #expect(export.data == before)
+        #expect(target.previousDate != nil)
+    }
+
+    @Test
+    func keepsDataWhenStashFails() async throws {
+        let setup = try Setup()
+        let blocker = URL.temporaryDirectory.appending(path: UUID().uuidString)
+        try Data().write(to: blocker)
+        let stash = BackupStash(url: blocker.appending(path: "previous.json"))
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+        let target = BackupModel(database: setup.target, stash: stash)
+        await source.makeFile(.json, at: setup.now)
+        let file = try #require(source.file)
+
+        target.read(file.data)
+        await target.restore()
+
+        #expect(target.errorNotice.message == "読み込めませんでした。いまのデータはそのままです")
+        #expect(try setup.target.snapshot().wallets.isEmpty)
+        #expect(target.previousDate == nil)
+    }
+
+    @Test
+    func readsStashedDataToGoBack() async throws {
+        let setup = try Setup()
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+        let target = BackupModel(database: setup.target, stash: setup.stash)
+        try setup.target.insertDefaultsIfEmpty(at: setup.now)
+        let before = try setup.target.snapshot()
+        await source.makeFile(.json, at: setup.now)
+        let file = try #require(source.file)
+
+        target.read(file.data)
+        await target.restore()
+        let isRead = target.readPrevious()
+        await target.restore()
+
+        #expect(isRead)
+        #expect(try setup.target.snapshot().wallets.count == before.wallets.count)
+    }
+
+    @Test
     func rejectsOtherFiles() throws {
         let setup = try Setup()
-        let model = BackupModel(database: setup.target)
+        let model = BackupModel(database: setup.target, stash: setup.stash)
         let other = Data(#"{"format":"other","version":1}"#.utf8)
         let newer = Data(#"{"format":"kakeibot-export","version":99}"#.utf8)
 
@@ -91,6 +148,7 @@ extension BackupModelTests {
         let source: AppDatabase
         let target: AppDatabase
         let now: Date
+        let stash: BackupStash
     }
 }
 
@@ -101,7 +159,16 @@ extension BackupModelTests.Setup {
         let now = try #require(Self.date("2026-10-03T12:00:00"))
         try source.insertDefaultsIfEmpty(at: now)
 
-        self.init(source: source, target: target, now: now)
+        let url = URL.temporaryDirectory
+            .appending(path: UUID().uuidString)
+            .appending(path: "previous.json")
+
+        self.init(
+            source: source,
+            target: target,
+            now: now,
+            stash: BackupStash(url: url)
+        )
     }
 
     static func date(_ text: String) -> Date? {

@@ -11,18 +11,23 @@ public final class BackupModel {
     public private(set) var pending: ExportV1?
     public private(set) var doneMessage: String?
     public private(set) var isWorking = false
+    public private(set) var previousDate: Date?
 
     public internal(set) var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
+    private let stash: BackupStash
     private let appVersion: String
 
     public init(
         database: AppDatabase,
+        stash: BackupStash = .standard,
         appVersion: String = Bundle.main.shortVersion
     ) {
         self.database = database
+        self.stash = stash
         self.appVersion = appVersion
+        self.previousDate = Self.exportedAt(of: stash.load())
     }
 }
 
@@ -48,6 +53,10 @@ public extension BackupModel {
         let counts = "記録 \(data.entries.count) 件・口座 \(data.wallets.count) 件"
 
         return "\(date) に書き出した\(counts)に置き換えます。いまのデータは残りません"
+    }
+
+    var previousDay: String? {
+        previousDate.map(Self.dayText)
     }
 
     @discardableResult
@@ -121,6 +130,18 @@ public extension BackupModel {
         }
     }
 
+    @discardableResult
+    func readPrevious() -> Bool {
+        doneMessage = nil
+
+        guard let data = stash.load() else {
+            errorNotice.show(Self.readFailedMessage)
+            return false
+        }
+
+        return read(data)
+    }
+
     func cancelRestore() {
         pending = nil
     }
@@ -137,6 +158,11 @@ public extension BackupModel {
         }
 
         do {
+            let app = ExportV1.App(platform: .ios, version: appVersion)
+            let current = try await database.backup(at: Date(), app: app)
+
+            try stash.save(current)
+            previousDate = Self.exportedAt(of: current)
             try await database.restoreBackup(pending)
             doneMessage = Self.restoredMessage
         } catch {
@@ -176,6 +202,10 @@ private extension BackupModel {
         formatter.dateFormat = "yyyy-MM-dd"
 
         return "kakeibot-\(formatter.string(from: date)).\(kind.rawValue)"
+    }
+
+    static func exportedAt(of data: Data?) -> Date? {
+        data.flatMap { try? ExportV1(json: $0) }?.exportedAt
     }
 
     static func dayText(_ date: Date) -> String {

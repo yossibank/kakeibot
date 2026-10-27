@@ -112,6 +112,26 @@ struct ExportV1Tests {
         }
     }
 
+    @Test
+    func skipsSettingsWithUnknownKey() throws {
+        let rows = try Self.settingRows
+        let json = try Self.fixture(settings: rows.valid + rows.invalid)
+
+        let export = try ExportV1(json: json)
+        let keys = export.data.settings.map(\.key.rawValue)
+
+        #expect(keys == rows.valid.compactMap { $0["key"] })
+    }
+
+    @Test
+    func rejectsSettingWithBrokenValue() throws {
+        let json = try Self.fixture(settings: [["key": "week_start", "value": 1]])
+
+        #expect(throws: DecodingError.self) {
+            try ExportV1(json: json)
+        }
+    }
+
     @Test(arguments: try headers.valid)
     func readsSupportedHeader(header: Header) throws {
         let json = try Self.fixture(with: header)
@@ -143,6 +163,22 @@ private extension ExportV1Tests {
         get throws {
             try Fixture.load("export/export-v1-header.json")
         }
+    }
+
+    static var settingRows: ValidityFixture<[String: String]> {
+        get throws {
+            try Fixture.load("export/export-v1-setting.json")
+        }
+    }
+
+    static func fixture(settings: [Any]) throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+        tables["settings"] = settings
+        object["data"] = tables
+        return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixture(with header: Header) throws -> Data {
