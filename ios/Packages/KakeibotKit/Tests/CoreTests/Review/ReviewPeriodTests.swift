@@ -19,6 +19,21 @@ struct ReviewPeriodTests {
     }
 
     @Test(arguments: try periodCases)
+    func cutsPreviousToSameElapsedDays(fixture: PeriodCase) {
+        let period = ReviewPeriod(
+            scale: fixture.scale,
+            containing: fixture.date,
+            monthStartDay: fixture.monthStartDay,
+            weekStart: fixture.weekStart
+        )
+
+        let today = fixture.today ?? fixture.date
+        let range = period.comparisonRange(today: today)
+
+        #expect(range == fixture.comparisonStart...fixture.comparisonEnd)
+    }
+
+    @Test(arguments: try periodCases)
     func movesSeveralPeriods(fixture: PeriodCase) {
         let period = ReviewPeriod(
             scale: fixture.scale,
@@ -45,6 +60,9 @@ extension ReviewPeriodTests {
         let end: LocalDate
         let previousStart: LocalDate
         let previousEnd: LocalDate
+        let today: LocalDate?
+        let comparisonStart: LocalDate
+        let comparisonEnd: LocalDate
     }
 }
 

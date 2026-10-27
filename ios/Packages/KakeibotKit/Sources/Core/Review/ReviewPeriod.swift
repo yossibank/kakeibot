@@ -41,6 +41,19 @@ public extension ReviewPeriod {
         adding(-1)
     }
 
+    func comparisonRange(today: LocalDate) -> ClosedRange<LocalDate> {
+        let full = previous.range
+
+        guard range.contains(today) else {
+            return full
+        }
+
+        let elapsed = range.lowerBound.days(until: today)
+        let end = min(full.lowerBound.adding(days: elapsed), full.upperBound)
+
+        return full.lowerBound...end
+    }
+
     func adding(_ count: Int) -> ReviewPeriod {
         let date: LocalDate
 

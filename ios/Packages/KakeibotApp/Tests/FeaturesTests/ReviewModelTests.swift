@@ -12,7 +12,8 @@ struct ReviewModelTests {
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
         try await setup.save(.expense, amount: 3000, on: "2026-10-05")
         try await setup.save(.income, amount: 250_000, on: "2026-10-10")
-        try await setup.save(.expense, amount: 5000, on: "2026-09-20")
+        try await setup.save(.expense, amount: 5000, on: "2026-09-10")
+        try await setup.save(.expense, amount: 7000, on: "2026-09-20")
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
@@ -29,6 +30,64 @@ struct ReviewModelTests {
         #expect(expenseChange == -1020)
         #expect(incomeChange == 250_000)
         #expect(balance == 246_020)
+    }
+
+    @Test
+    func comparesWholePreviousMonthWhenFinished() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        try await setup.save(.expense, amount: 3000, on: "2026-09-05")
+        try await setup.save(.expense, amount: 7000, on: "2026-09-20")
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        try await observe(model) {
+            model.list != nil
+        }
+
+        model.move(by: -1)
+
+        #expect(!model.isComparingPartially)
+        #expect(model.change == 7000 + 3000)
+    }
+
+    @Test
+    func countsMovesToArchivedWalletInPastPeriod() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let now = Date()
+
+        let loan = try await setup.database.saveWallet(
+            WalletDraft(
+                kind: .loan,
+                name: "奨学金",
+                mark: .glyph(.contract),
+                color: "#4A6FA5",
+                initialBalance: -1_200_000
+            ),
+            at: now
+        )
+
+        let options = try await setup.database.entryOptions()
+
+        let draft = try EntryDraft(
+            type: .transfer,
+            amount: 30000,
+            date: #require(LocalDate("2026-09-10")),
+            categoryId: nil,
+            walletId: options.wallets[0].id,
+            toWalletId: loan.id
+        )
+
+        try await setup.database.saveEntry(draft, at: now)
+        try await setup.database.setWalletHidden(loan.id, isHidden: true, at: now)
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        try await observe(model) {
+            model.list != nil
+        }
+
+        model.move(by: -1)
+
+        #expect(ReviewModel.total(of: model.moves) == 30000)
+        #expect(model.moves.map(\.wallet.id) == [loan.id])
     }
 
     @Test

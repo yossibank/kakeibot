@@ -296,6 +296,7 @@ private extension ReviewView {
     func moveCard(_ moves: [ReviewModel.Move]) -> some View {
         let total = ReviewModel.total(of: moves)
         let ratio = model.repaymentRatio(in: moves)
+        let repaidPercent = Int((ratio * 100).rounded())
 
         return VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: 8) {
@@ -331,13 +332,17 @@ private extension ReviewView {
                 )
 
                 HStack {
-                    moveLegend("返済", ratio: ratio, color: Palette.accent)
+                    moveLegend(
+                        "返済",
+                        percent: repaidPercent,
+                        color: Palette.accent
+                    )
 
                     Spacer()
 
                     moveLegend(
                         "積立",
-                        ratio: 1 - ratio,
+                        percent: 100 - repaidPercent,
                         color: Palette.accent.opacity(.medium)
                     )
                 }
@@ -366,12 +371,10 @@ private extension ReviewView {
 
     func moveLegend(
         _ title: String,
-        ratio: Double,
+        percent: Int,
         color: Color
     ) -> some View {
-        let percent = Int((ratio * 100).rounded())
-
-        return HStack(spacing: 4) {
+        HStack(spacing: 4) {
             Circle()
                 .fill(color)
                 .frame(width: 8, height: 8)
@@ -393,11 +396,13 @@ private extension ReviewView {
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
 
-                Text(Self.moveNote(of: move))
-                    .textFont(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
+                if let note = Self.moveNote(of: move) {
+                    Text(note)
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                }
             }
 
             Spacer(minLength: 8)
@@ -567,7 +572,9 @@ private extension ReviewView {
     }
 
     var comparisonText: String {
-        let previous = Self.previousName(of: model.scale)
+        let previous = model.isComparingPartially
+            ? Self.partialName(of: model.scale)
+            : Self.previousName(of: model.scale)
         let change = model.change
         let amount = AmountText.text(abs(change))
 
@@ -611,7 +618,11 @@ private extension ReviewView {
         }
     }
 
-    static func moveNote(of move: ReviewModel.Move) -> String {
+    static func moveNote(of move: ReviewModel.Move) -> String? {
+        guard move.wallet.archivedAt == nil else {
+            return nil
+        }
+
         let balance = AmountText.text(abs(move.balance))
 
         guard move.wallet.kind == .loan else {
@@ -634,6 +645,14 @@ private extension ReviewView {
         case .week: "前の週"
         case .month: "前の月"
         case .year: "前の年"
+        }
+    }
+
+    static func partialName(of scale: ReviewPeriod.Scale) -> String {
+        switch scale {
+        case .week: "前の週の同じ曜日まで"
+        case .month: "前の月の同じ日まで"
+        case .year: "前の年の同じ日まで"
         }
     }
 
