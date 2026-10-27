@@ -34,29 +34,21 @@ public extension NotificationRouter {
 extension NotificationRouter: UNUserNotificationCenterDelegate {
     public nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
-        willPresent notification: UNNotification,
-        withCompletionHandler completionHandler: @escaping (
-            UNNotificationPresentationOptions
-        ) -> Void
-    ) {
-        completionHandler([.banner, .list, .sound])
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .list, .sound]
     }
 
     public nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping () -> Void
-    ) {
+        didReceive response: UNNotificationResponse
+    ) async {
         let userInfo = response.notification.request.content.userInfo
         let link = userInfo[LiveNotificationCenter.linkKey] as? String
         let route = link.flatMap(PlannedNotification.Route.init(link:))
 
-        MainActor.assumeIsolated {
-            if let route {
-                open(route)
-            }
+        if let route {
+            await open(route)
         }
-
-        completionHandler()
     }
 }
