@@ -48,14 +48,14 @@ struct CardBillTests {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         let today = try #require(LocalDate("2026-10-20"))
         let start = try #require(LocalDate("2026-01-01"))
-        let bank = Self.wallet(.bank, balance: 10000, at: now)
+        let source = Self.wallet(.investment, balance: 10000, at: now)
         let card = Self.wallet(.card, balance: 0, at: now)
 
         let bill = Recurring(
             type: .transfer,
             amount: 30000,
             categoryId: nil,
-            walletId: bank.id,
+            walletId: source.id,
             toWalletId: card.id,
             frequency: .monthly,
             day: 27,
@@ -65,7 +65,7 @@ struct CardBillTests {
         )
 
         let valuation = try Valuation(
-            walletId: bank.id,
+            walletId: source.id,
             date: #require(LocalDate("2026-10-01")),
             amount: 50000,
             createdAt: now,
@@ -74,7 +74,7 @@ struct CardBillTests {
 
         let upcoming = CardBill.upcoming(
             recurrings: [bill],
-            wallets: [bank, card],
+            wallets: [source, card],
             entries: [],
             valuations: [valuation],
             after: today
