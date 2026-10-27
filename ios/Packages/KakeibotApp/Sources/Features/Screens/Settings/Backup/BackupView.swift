@@ -68,10 +68,30 @@ public struct BackupView: View {
                                 detail: "いまのデータと置き換えます"
                             )
                         }
+
+                        if let day = model.previousDay {
+                            Hairline()
+
+                            Button {
+                                restorePrevious()
+                            } label: {
+                                action(
+                                    "読み込む前のデータに戻す",
+                                    systemImage: "arrow.uturn.backward",
+                                    detail: "\(day) に退避したデータに戻せます"
+                                )
+                            }
+                        }
                     }
+                    .disabled(model.isWorking)
                     .buttonStyle(.plain)
                     .padding(.horizontal, 16)
                     .card()
+
+                    if model.isWorking {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                    }
 
                     if let message = model.doneMessage {
                         Label(message, systemImage: "checkmark.circle")
@@ -190,21 +210,17 @@ private extension BackupView {
     }
 
     func exportFile(_ kind: BackupModel.FileKind) {
-        guard !model.isWorking else {
-            return
-        }
-
         Task {
             isExporting = await model.makeFile(kind, at: Date())
         }
     }
 
     func importFile() {
-        guard !model.isWorking else {
-            return
-        }
-
         isImporting = true
+    }
+
+    func restorePrevious() {
+        isConfirmingRestore = model.readPrevious()
     }
 }
 

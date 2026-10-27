@@ -187,7 +187,10 @@ public extension ExportV1.Tables {
                 forKey: .noSpendDays
             ),
             themes: container.decode([Theme].self, forKey: .themes),
-            settings: container.decode([Setting].self, forKey: .settings)
+            settings: container.decode(
+                [SettingRow].self,
+                forKey: .settings
+            ).compactMap(\.setting)
         )
     }
 }
@@ -236,5 +239,14 @@ private extension ExportV1.Tables {
     var hasTransferForEveryFee: Bool {
         let transfers = Set(entries.filter { $0.type == .transfer }.map(\.id))
         return entries.compactMap(\.transferId).allSatisfy(transfers.contains)
+    }
+}
+
+private struct SettingRow: Decodable {
+    let key: String
+    let value: String
+
+    var setting: Setting? {
+        Setting.Key(rawValue: key).map { Setting(key: $0, value: value) }
     }
 }
