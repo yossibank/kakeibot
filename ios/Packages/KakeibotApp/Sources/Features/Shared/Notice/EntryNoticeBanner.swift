@@ -20,7 +20,7 @@ private struct EntryNoticeBanner: ViewModifier {
         return content
             .simultaneousGesture(
                 TapGesture().onEnded {
-                    clear()
+                    model.clearOnTap()
                 }
             )
             .overlay(alignment: .bottom) {
@@ -29,7 +29,7 @@ private struct EntryNoticeBanner: ViewModifier {
                         .padding(.horizontal, 16)
                         .padding(.bottom, bottom)
                         .onTapGesture {
-                            clear()
+                            model.clearOnTap()
                         }
                         .transition(Self.transition)
                 }
@@ -76,14 +76,6 @@ private extension EntryNoticeBanner {
 private extension EntryNoticeBanner {
     static let transition = AnyTransition.move(edge: .bottom)
         .combined(with: .opacity)
-
-    func clear() {
-        guard model.notice != nil else {
-            return
-        }
-
-        model.clear()
-    }
 
     func clearLater() async {
         guard let notice = model.notice else {

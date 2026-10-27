@@ -155,6 +155,7 @@ public extension HomeModel {
             recurrings: recurrings,
             wallets: Array(list.wallets.values),
             entries: list.days.flatMap(\.entries),
+            valuations: list.valuations,
             after: today
         )
     }
@@ -314,12 +315,13 @@ public extension HomeModel {
         }
 
         do {
-            let entry = try await database.saveEntry(draft, at: Date())
+            let saved = try await database.saveEntryResult(draft, at: Date())
 
             return EntryChange(
                 kind: .recorded,
-                entry: entry,
-                label: template.name
+                entry: saved.entry,
+                label: template.name,
+                clearedNoSpendDays: saved.clearedNoSpendDays
             )
         } catch {
             errorNotice.show(Self.saveFailedMessage)

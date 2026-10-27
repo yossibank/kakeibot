@@ -12,6 +12,7 @@ public final class RecordsModel: ScreenModel {
     public var isSearching = false
     public var searchText = ""
     public var filter = EntryFilter()
+    public var isConfirmingDelete = false
 
     public private(set) var month: YearMonth
     public private(set) var monthStartDay: MonthStartDay = .first
@@ -25,6 +26,7 @@ public final class RecordsModel: ScreenModel {
     public private(set) var rewardBank: RewardBank?
     public private(set) var recurrings: [Recurring] = []
     public private(set) var recentSearches: [String] = []
+    public private(set) var pendingDeleteIDs: [Entry.ID] = []
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -135,6 +137,10 @@ public extension RecordsModel {
         list?.filterWallets ?? []
     }
 
+    var pendingDeleteCount: Int {
+        pendingDeleteIDs.count
+    }
+
     func rewardRules(on date: LocalDate) -> [RewardRule] {
         rewardBank?.rules(on: date) ?? []
     }
@@ -223,6 +229,30 @@ public extension RecordsModel {
         }
     }
 
+    func requestDelete(
+        _ ids: [Entry.ID],
+        delete: ([Entry.ID]) -> Void
+    ) {
+        guard ids.count >= Self.confirmDeleteThreshold else {
+            delete(ids)
+            return
+        }
+
+        pendingDeleteIDs = ids
+        isConfirmingDelete = true
+    }
+
+    func confirmDelete(delete: ([Entry.ID]) -> Void) {
+        let ids = pendingDeleteIDs
+        cancelDelete()
+        delete(ids)
+    }
+
+    func cancelDelete() {
+        pendingDeleteIDs = []
+        isConfirmingDelete = false
+    }
+
     func removeStamp(on date: LocalDate) async {
         do {
             try await database.removeStamp(on: date)
@@ -259,6 +289,10 @@ public extension RecordsModel {
         _ rule: RewardRule,
         on date: LocalDate
     ) async {
+        guard canReward(on: date) else {
+            return
+        }
+
         let isAchieved = !isAchieved(rule, on: date)
 
         guard rule.isActive || !isAchieved else {
@@ -277,6 +311,10 @@ public extension RecordsModel {
         } catch {
             errorNotice.show(Self.saveFailedMessage)
         }
+    }
+
+    func canReward(on date: LocalDate) -> Bool {
+        date <= today
     }
 
     func canMarkNoSpend(on date: LocalDate) -> Bool {
@@ -391,6 +429,7 @@ private extension RecordsModel {
     static let saveFailedMessage = "保存できませんでした"
     static let rewardShortOfBalanceMessage = "貯金箱の残高が足りないため、達成を外せません"
     static let recurringTitle = "固定費"
+    static let confirmDeleteThreshold = 10
 
     func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
         let entries = list?.days.flatMap(\.entries) ?? []

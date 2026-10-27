@@ -219,7 +219,18 @@ public extension EntryModel {
     }
 
     var wallets: [Wallet] {
-        options?.wallets ?? []
+        let wallets = options?.wallets ?? []
+
+        guard isEditing else {
+            return wallets
+        }
+
+        let kept = [walletId, toWalletId]
+            .compactMap(\.self)
+            .filter { id in !wallets.contains { $0.id == id } }
+            .compactMap { history?.wallets[$0] }
+
+        return (wallets + kept).sorted { $0.sortOrder < $1.sortOrder }
     }
 
     var walletSections: [WalletSection] {
@@ -244,7 +255,7 @@ public extension EntryModel {
             return nil
         }
 
-        return "\(date.month)/\(date.day)払い"
+        return Recurring.billText(paidOn: date)
     }
 
     var billRecurring: Recurring? {
@@ -263,7 +274,7 @@ public extension EntryModel {
             return []
         }
 
-        let dates = bill.billDates(for: date, count: Self.billTitles.count)
+        let dates = bill.billDates(for: date, count: Recurring.billChoiceCount)
 
         return zip(dates, Self.billTitles).map { date, title in
             BillChoice(
@@ -728,6 +739,7 @@ public extension EntryModel {
     func reloadWallets() async {
         do {
             options = try await database.entryOptions()
+            history = try await database.entryList()
 
             if !wallets.contains(where: { $0.id == walletId }) {
                 walletId = wallets.first { $0.id != toWalletId }?.id ?? wallets.first?.id
@@ -741,7 +753,7 @@ public extension EntryModel {
                 chooseDestination()
             }
 
-            try await loadBalances()
+            updateBalances()
         } catch {
             report(error)
         }
@@ -768,6 +780,7 @@ public extension EntryModel {
     func reloadCategories(selecting id: EntryCategory.ID? = nil) async {
         do {
             options = try await database.entryOptions()
+            history = try await database.entryList()
 
             if let id {
                 categoryId = id
@@ -869,12 +882,13 @@ public extension EntryModel {
         }
 
         do {
-            let entry = try await database.saveEntry(
+            let saved = try await database.saveEntryResult(
                 draft,
                 editing: editingId,
                 at: Date()
             )
 
+            let entry = saved.entry
             let fee = try await database.fee(of: entry.id)
             let title = label(for: entry)
 
@@ -888,7 +902,8 @@ public extension EntryModel {
                 kind: kind,
                 entry: entry,
                 label: title,
-                fee: fee
+                fee: fee,
+                clearedNoSpendDays: saved.clearedNoSpendDays
             )
         } catch {
             report(error)
@@ -1041,11 +1056,26 @@ private extension EntryModel {
     }
 
     func categories(for type: Entry.Kind) -> [EntryCategory] {
-        switch type {
+        let categories = switch type {
         case .expense: options?.expenseCategories ?? []
         case .income: options?.incomeCategories ?? []
-        case .transfer: []
+        case .transfer: [EntryCategory]()
         }
+
+        guard isEditing else {
+            return categories
+        }
+
+        let ids = Set([categoryId, categoryByType[type]].compactMap(\.self))
+
+        let kept = ids
+            .compactMap { history?.categories[$0] }
+            .filter { kept in
+                kept.kind.rawValue == type.rawValue
+                    && !categories.contains { $0.id == kept.id }
+            }
+
+        return (categories + kept).sorted { $0.sortOrder < $1.sortOrder }
     }
 
     func loadEntry() async throws {
@@ -1086,9 +1116,14 @@ private extension EntryModel {
     }
 
     func loadBalances() async throws {
-        let list = try await database.entryList()
+        history = try await database.entryList()
+        updateBalances()
+    }
 
-        history = list
+    func updateBalances() {
+        guard let list = history else {
+            return
+        }
 
         let entries = list.days
             .flatMap(\.entries)

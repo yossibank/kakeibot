@@ -124,6 +124,14 @@ public extension EntryNoticeModel {
     func clear() {
         notice = nil
     }
+
+    func clearOnTap() {
+        guard notice?.dismissesOnTap == true else {
+            return
+        }
+
+        notice = nil
+    }
 }
 
 public extension EntryNoticeModel.Notice {
@@ -138,8 +146,16 @@ public extension EntryNoticeModel.Notice {
 
     var seconds: Int {
         switch self {
-        case .changed, .batch, .failed: 4
+        case .changed, .failed: 4
+        case .batch: 8
         case .undone: 2
+        }
+    }
+
+    var dismissesOnTap: Bool {
+        switch self {
+        case .batch: false
+        case .changed, .undone, .failed: true
         }
     }
 }
@@ -152,9 +168,16 @@ private extension EntryNoticeModel {
     func undo(_ change: EntryChange) async throws {
         switch change.kind {
         case .recorded:
-            try await database.deleteEntry(change.entry.id)
+            try await database.deleteEntry(
+                change.entry.id,
+                restoringNoSpend: change.clearedNoSpendDays
+            )
         case let .edited(previous, previousFee):
-            try await database.restoreEntry(previous, fee: previousFee)
+            try await database.restoreEntry(
+                previous,
+                fee: previousFee,
+                restoringNoSpend: change.clearedNoSpendDays
+            )
         case .deleted:
             try await database.restoreEntry(change.entry, fee: change.fee)
         }

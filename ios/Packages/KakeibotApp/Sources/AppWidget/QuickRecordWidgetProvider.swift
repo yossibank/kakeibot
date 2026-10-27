@@ -57,7 +57,7 @@ private extension QuickRecordWidgetProvider {
         let look = await database.widgetLook()
         let style = await database.widgetStyle()
         let order = await (try? database.setting(.templateOrder)) ?? .manual
-        let recordedId = await (try? database.setting(.widgetEntry)) ?? nil
+        let recordedId = await (try? database.setting(.widgetEntry))??.entryId
 
         let summary = QuickRecordWidgetSummary(
             overview,

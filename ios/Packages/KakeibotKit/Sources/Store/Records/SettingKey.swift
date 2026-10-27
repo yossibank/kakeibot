@@ -161,13 +161,13 @@ public extension SettingKey where Value == [String] {
     }
 }
 
-public extension SettingKey where Value == Entry.ID? {
+public extension SettingKey where Value == WidgetRecord? {
     static var widgetEntry: Self {
         Self(
             .widgetEntry,
             default: nil,
-            decode: { Entry.ID($0) },
-            encode: { $0?.description }
+            decode: { WidgetRecord($0) },
+            encode: { $0?.text }
         )
     }
 }

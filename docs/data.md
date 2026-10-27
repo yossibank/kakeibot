@@ -178,7 +178,7 @@ emoji・text・glyph のどれかは必須。
 | to_wallet_id | TEXT | 振替だけ。wallet_id と別 |
 | memo | TEXT | |
 | recurring_id | TEXT | 固定費から作った記録 |
-| recurring_date | TEXT | どの回の分か |
+| recurring_date | TEXT | 休日でずらす前の予定日。どの回の分かを表す。`date` は実際の日（ずらした後） |
 | bill_month | TEXT | カードの引き落としの回の月（`2026-11`）。休日でずらす前の予定日の月で書く。空なら締め日で決める |
 | transfer_id | TEXT | 振替の手数料だけ。元の振替の entry。重複禁止。振替を消すと一緒に消える |
 | created_at / updated_at | TEXT | |
@@ -346,7 +346,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | closed_hints | 説明を閉じた設定の画面を `,` でつないだもの（`categories` `wallets` `templates` `recurrings` `stamps` `rewards` `budgets` `themes` `homeSections`）。空ならすべて出す |
 | closed_hidden_lists | 非表示の項目をたたんだ設定の画面。書き方は closed_hints と同じ。空ならすべて開く |
 | recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで |
-| widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。取り消すと消す |
+| widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。その記録で支出なしの印を消したときは、`,` に続けてその日付（`2026-10-03`）を付ける。取り消すと消す |
 | fee_category_id | 振替の手数料に付ける category の id |
 
 列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
