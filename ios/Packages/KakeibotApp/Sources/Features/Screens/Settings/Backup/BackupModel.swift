@@ -11,7 +11,7 @@ public final class BackupModel {
     public private(set) var pending: ExportV1?
     public private(set) var doneMessage: String?
     public private(set) var isWorking = false
-    public private(set) var previousDate: Date?
+    public private(set) var previousDates: [Date]
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -27,7 +27,7 @@ public final class BackupModel {
         self.database = database
         self.stash = stash
         self.appVersion = appVersion
-        self.previousDate = Self.exportedAt(of: stash.load())
+        self.previousDates = Self.exportedDates(of: stash.load())
     }
 }
 
@@ -55,8 +55,14 @@ public extension BackupModel {
         return "\(date) に書き出した\(counts)に置き換えます。いまのデータは残りません"
     }
 
-    var previousDay: String? {
-        previousDate.map(Self.dayText)
+    func previousDay(at index: Int) -> String {
+        Self.dayText(previousDates[index])
+    }
+
+    func previousTitle(at index: Int) -> String {
+        let text = Self.dayTimeText(previousDates[index])
+
+        return "読み込む前のデータに戻す（\(text)）"
     }
 
     @discardableResult
@@ -131,15 +137,17 @@ public extension BackupModel {
     }
 
     @discardableResult
-    func readPrevious() -> Bool {
+    func readPrevious(at index: Int) -> Bool {
         doneMessage = nil
 
-        guard let data = stash.load() else {
+        let stashes = stash.load()
+
+        guard stashes.indices.contains(index) else {
             errorNotice.show(Self.readFailedMessage)
             return false
         }
 
-        return read(data)
+        return read(stashes[index])
     }
 
     func cancelRestore() {
@@ -159,16 +167,22 @@ public extension BackupModel {
 
         do {
             let app = ExportV1.App(platform: .ios, version: appVersion)
-            let current = try await database.backup(at: Date(), app: app)
+            let stash = stash
 
-            try stash.save(current)
-            previousDate = Self.exportedAt(of: current)
-            try await database.restoreBackup(pending)
+            try await database.restoreBackup(
+                pending,
+                stashingAt: Date(),
+                app: app
+            ) {
+                try stash.save($0)
+            }
+
             doneMessage = Self.restoredMessage
         } catch {
             errorNotice.show(Self.restoreFailedMessage)
         }
 
+        previousDates = Self.exportedDates(of: stash.load())
         self.pending = nil
     }
 }
@@ -204,8 +218,8 @@ private extension BackupModel {
         return "kakeibot-\(formatter.string(from: date)).\(kind.rawValue)"
     }
 
-    static func exportedAt(of data: Data?) -> Date? {
-        data.flatMap { try? ExportV1(json: $0) }?.exportedAt
+    static func exportedDates(of stashes: [Data]) -> [Date] {
+        stashes.compactMap { try? ExportV1(json: $0).exportedAt }
     }
 
     static func dayText(_ date: Date) -> String {
@@ -213,6 +227,15 @@ private extension BackupModel {
 
         formatter.locale = Locale(identifier: "ja_JP")
         formatter.dateFormat = "yyyy/M/d"
+
+        return formatter.string(from: date)
+    }
+
+    static func dayTimeText(_ date: Date) -> String {
+        let formatter = DateFormatter()
+
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.dateFormat = "yyyy/M/d H:mm"
 
         return formatter.string(from: date)
     }

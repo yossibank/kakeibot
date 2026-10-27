@@ -69,16 +69,16 @@ public struct BackupView: View {
                             )
                         }
 
-                        if let day = model.previousDay {
+                        ForEach(model.previousDates.indices, id: \.self) { index in
                             Hairline()
 
                             Button {
-                                restorePrevious()
+                                restorePrevious(at: index)
                             } label: {
                                 action(
-                                    "読み込む前のデータに戻す",
+                                    model.previousTitle(at: index),
                                     systemImage: "arrow.uturn.backward",
-                                    detail: "\(day) に退避したデータに戻せます"
+                                    detail: "\(model.previousDay(at: index)) に退避したデータに戻せます"
                                 )
                             }
                         }
@@ -219,8 +219,8 @@ private extension BackupView {
         isImporting = true
     }
 
-    func restorePrevious() {
-        isConfirmingRestore = model.readPrevious()
+    func restorePrevious(at index: Int) {
+        isConfirmingRestore = model.readPrevious(at: index)
     }
 }
 
