@@ -106,6 +106,14 @@ public extension HomeModel {
         overview.yesterdayExpense
     }
 
+    var middleTitle: String {
+        "昨日"
+    }
+
+    var middleAmount: Int {
+        yesterdayExpense
+    }
+
     var budgetUsage: BudgetUsage? {
         overview.budgetUsage
     }

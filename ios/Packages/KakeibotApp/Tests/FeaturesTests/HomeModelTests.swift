@@ -89,6 +89,30 @@ struct HomeModelTests {
     }
 
     @Test
+    func showsYesterdayInTheMiddleWithAndWithoutBudget() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, daysAgo: 0)
+        try await setup.save(.expense, amount: 4500, daysAgo: 1)
+        let model = HomeModel(database: setup.database, today: setup.today)
+        await model.load()
+
+        #expect(model.budgetUsage == nil)
+        #expect(model.middleTitle == "昨日")
+        #expect(model.middleAmount == 4500)
+        #expect(model.monthExpense == 5480)
+
+        try await setup.database.setBudget(
+            120_000,
+            for: nil,
+            from: setup.today.yearMonth
+        )
+        await model.load()
+
+        #expect(model.middleTitle == "昨日")
+        #expect(model.middleAmount == 4500)
+    }
+
+    @Test
     func listsRecentEntriesNewestFirst() async throws {
         let setup = try await Setup()
 

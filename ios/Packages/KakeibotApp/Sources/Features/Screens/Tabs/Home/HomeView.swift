@@ -65,13 +65,16 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
 
-                if setup.showsCard {
-                    HomeSetupCard(model: setup, onOpen: onOpenSetup)
-                        .transition(Self.cardTransition)
+                if setup.showsCard, !showsBudget {
+                    setupCard
                 }
 
                 ForEach(model.homeLayout.visible) { section in
                     sectionView(section)
+
+                    if section == .budget, setup.showsCard {
+                        setupCard
+                    }
                 }
             }
             .padding(.horizontal, 16)
@@ -92,6 +95,10 @@ public struct HomeView: View {
 }
 
 private extension HomeView {
+    var showsBudget: Bool {
+        model.homeLayout.visible.contains(.budget)
+    }
+
     var header: some View {
         HStack {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -113,6 +120,11 @@ private extension HomeView {
                 action: onOpenSettings
             )
         }
+    }
+
+    var setupCard: some View {
+        HomeSetupCard(model: setup, onOpen: onOpenSetup)
+            .transition(Self.cardTransition)
     }
 
     var dialCard: some View {
@@ -214,8 +226,8 @@ private extension HomeView {
                 divider
 
                 stat(
-                    middleTitle,
-                    amount: middleAmount,
+                    model.middleTitle,
+                    amount: model.middleAmount,
                     color: Palette.text
                 )
 
@@ -632,14 +644,6 @@ private extension HomeView {
 
     var dialAmountColor: Color {
         model.budgetUsage?.amountTint ?? Palette.accentStrong
-    }
-
-    var middleTitle: String {
-        model.budgetUsage == nil ? "昨日" : "今月の支出"
-    }
-
-    var middleAmount: Int {
-        model.budgetUsage == nil ? model.yesterdayExpense : model.monthExpense
     }
 
     var recurringText: String {

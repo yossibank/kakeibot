@@ -5,7 +5,7 @@ import SwiftUI
 
 public struct EntrySheet: View {
     @State private var model: EntryModel
-    @State private var isEnteringAmount = false
+    @State private var isEnteringAmount: Bool
     @State private var isEditingMemo = false
     @State private var categoryPage: Int? = 0
     @State private var sheet: Sheet?
@@ -29,6 +29,7 @@ public struct EntrySheet: View {
         onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+        _isEnteringAmount = State(initialValue: model.opensKeypad)
         _notice = State(initialValue: EntryNoticeModel(database: model.database))
 
         self.onChange = onChange

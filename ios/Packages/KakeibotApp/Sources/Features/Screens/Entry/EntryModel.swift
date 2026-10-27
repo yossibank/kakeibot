@@ -133,6 +133,10 @@ public extension EntryModel {
         editingId != nil
     }
 
+    var opensKeypad: Bool {
+        !isEditing && startingTemplate == nil
+    }
+
     var isLoaded: Bool {
         options != nil
     }
