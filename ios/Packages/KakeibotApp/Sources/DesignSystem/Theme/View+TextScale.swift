@@ -33,6 +33,8 @@ private struct SharesTextScale<ID: Equatable>: ViewModifier {
     @State private var scale = 1.0
     @State private var epoch = 0
 
+    @Environment(\.themeStyle) private var style
+
     let id: ID
 
     func body(content: Content) -> some View {
@@ -43,9 +45,18 @@ private struct SharesTextScale<ID: Equatable>: ViewModifier {
                 scale = min(scale, report.scale)
             }
             .onChange(of: id) {
-                scale = 1
-                epoch += 1
+                reset()
             }
+            .onChange(of: style) {
+                reset()
+            }
+    }
+}
+
+private extension SharesTextScale {
+    func reset() {
+        scale = 1
+        epoch += 1
     }
 }
 
