@@ -24,7 +24,7 @@ struct RecurringScheduleTests {
     }
 
     @Test(arguments: try occurrenceCases)
-    func judgesSameOccurrence(fixture: OccurrenceCase) throws {
+    func createsOnlyUnrecordedOccurrences(fixture: OccurrenceCase) throws {
         var recurring = try Self.recurring(
             frequency: .monthly,
             month: nil,
@@ -35,21 +35,30 @@ struct RecurringScheduleTests {
 
         recurring.holidayShift = fixture.holidayShift ?? .none
 
-        let entry = Entry(
-            type: .expense,
-            amount: 1000,
-            date: fixture.recorded,
-            categoryId: EntryCategory.ID(),
-            walletId: Wallet.ID(),
-            recurringId: recurring.id,
-            recurringDate: fixture.recorded,
-            createdAt: recurring.createdAt,
-            updatedAt: recurring.updatedAt
-        )
+        let entries = fixture.recorded.map { recorded in
+            Entry(
+                type: .expense,
+                amount: 1000,
+                date: recorded,
+                categoryId: EntryCategory.ID(),
+                walletId: Wallet.ID(),
+                recurringId: recurring.id,
+                recurringDate: recorded,
+                createdAt: recurring.createdAt,
+                updatedAt: recurring.updatedAt
+            )
+        }
 
-        let same = recurring.isRecorded(by: entry, on: fixture.date)
+        let created = recurring
+            .occurrences(from: fixture.from, through: fixture.through)
+            .filter { occurrence in
+                !entries.contains {
+                    recurring.isRecorded(by: $0, scheduled: occurrence.scheduled)
+                }
+            }
+            .map(\.scheduled)
 
-        #expect(same == fixture.same)
+        #expect(created == fixture.created)
     }
 
     @Test
@@ -66,9 +75,9 @@ struct RecurringScheduleTests {
             endDate: nil
         )
 
-        let fresh = recurring.pendingDates(through: today)
+        let fresh = recurring.pendingOccurrences(through: today).map(\.date)
         recurring.generatedUntil = generated
-        let pending = recurring.pendingDates(through: today)
+        let pending = recurring.pendingOccurrences(through: today).map(\.date)
 
         #expect(fresh.map(\.description) == [
             "2026-01-25",
@@ -142,9 +151,10 @@ extension RecurringScheduleTests {
     struct OccurrenceCase: Decodable, Sendable {
         let day: Int
         let holidayShift: Recurring.HolidayShift?
-        let recorded: LocalDate
-        let date: LocalDate
-        let same: Bool
+        let recorded: [LocalDate]
+        let from: LocalDate
+        let through: LocalDate
+        let created: [LocalDate]
     }
 
     struct DatesCase: Decodable, Sendable {

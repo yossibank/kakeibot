@@ -47,8 +47,27 @@ private extension EntryRowItem {
         for entry: Entry,
         in list: EntryList
     ) -> String? {
-        let bill = entry.billMonth.map { "（\($0.month)月払い）" } ?? ""
+        let bill = billText(for: entry, in: list) ?? ""
         return list.wallets[entry.walletId].map { $0.name + bill }
+    }
+
+    static func billText(
+        for entry: Entry,
+        in list: EntryList
+    ) -> String? {
+        guard let month = entry.billMonth else {
+            return nil
+        }
+
+        let dates = list.cardBills
+            .filter { $0.toWalletId == entry.walletId && $0.archivedAt == nil }
+            .compactMap { $0.billDate(for: entry.date, in: month) }
+
+        guard let date = dates.first, dates.count == 1 else {
+            return "（\(month.month)月払い）"
+        }
+
+        return "（\(Recurring.billText(paidOn: date))）"
     }
 
     static func route(

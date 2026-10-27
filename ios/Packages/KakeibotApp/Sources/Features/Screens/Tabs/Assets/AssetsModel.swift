@@ -176,6 +176,7 @@ public extension AssetsModel {
             recurrings: recurrings,
             wallets: Array(list.wallets.values),
             entries: entries,
+            valuations: valuations,
             after: today
         )
 
