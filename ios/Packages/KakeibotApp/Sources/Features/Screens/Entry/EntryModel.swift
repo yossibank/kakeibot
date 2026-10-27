@@ -739,22 +739,21 @@ public extension EntryModel {
     func reloadWallets() async {
         do {
             options = try await database.entryOptions()
+            history = try await database.entryList()
 
-            if !isEditing {
-                if !wallets.contains(where: { $0.id == walletId }) {
-                    walletId = wallets.first { $0.id != toWalletId }?.id ?? wallets.first?.id
-                }
-
-                if type == .transfer {
-                    if !wallets.contains(where: { $0.id == toWalletId }) {
-                        toWalletId = nil
-                    }
-
-                    chooseDestination()
-                }
+            if !wallets.contains(where: { $0.id == walletId }) {
+                walletId = wallets.first { $0.id != toWalletId }?.id ?? wallets.first?.id
             }
 
-            try await loadBalances()
+            if type == .transfer {
+                if !wallets.contains(where: { $0.id == toWalletId }) {
+                    toWalletId = nil
+                }
+
+                chooseDestination()
+            }
+
+            updateBalances()
         } catch {
             report(error)
         }
@@ -781,10 +780,11 @@ public extension EntryModel {
     func reloadCategories(selecting id: EntryCategory.ID? = nil) async {
         do {
             options = try await database.entryOptions()
+            history = try await database.entryList()
 
             if let id {
                 categoryId = id
-            } else if !isEditing, !categories.contains(where: { $0.id == categoryId }) {
+            } else if !categories.contains(where: { $0.id == categoryId }) {
                 categoryId = categories.first?.id
             }
         } catch {
@@ -1062,16 +1062,20 @@ private extension EntryModel {
         case .transfer: [EntryCategory]()
         }
 
-        guard
-            isEditing,
-            let kept = categoryId.flatMap({ history?.categories[$0] }),
-            kept.kind.rawValue == type.rawValue,
-            !categories.contains(where: { $0.id == kept.id })
-        else {
+        guard isEditing else {
             return categories
         }
 
-        return (categories + [kept]).sorted { $0.sortOrder < $1.sortOrder }
+        let ids = Set([categoryId, categoryByType[type]].compactMap(\.self))
+
+        let kept = ids
+            .compactMap { history?.categories[$0] }
+            .filter { kept in
+                kept.kind.rawValue == type.rawValue
+                    && !categories.contains { $0.id == kept.id }
+            }
+
+        return (categories + kept).sorted { $0.sortOrder < $1.sortOrder }
     }
 
     func loadEntry() async throws {
@@ -1112,9 +1116,14 @@ private extension EntryModel {
     }
 
     func loadBalances() async throws {
-        let list = try await database.entryList()
+        history = try await database.entryList()
+        updateBalances()
+    }
 
-        history = list
+    func updateBalances() {
+        guard let list = history else {
+            return
+        }
 
         let entries = list.days
             .flatMap(\.entries)
