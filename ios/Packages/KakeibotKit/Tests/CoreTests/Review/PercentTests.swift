@@ -15,4 +15,16 @@ struct PercentTests {
     func floorsToWholePercent(part: Int, whole: Int, expected: Int) {
         #expect(Percent.floor(part, of: whole) == expected)
     }
+
+    @Test(arguments: [
+        ([42400, 36400, 21200], [43, 36, 21]),
+        ([30000, 50000], [38, 62]),
+        ([1, 1, 1], [34, 33, 33]),
+        ([20, 30, 50], [20, 30, 50]),
+        ([100], [100]),
+        ([0, 0], [0, 0])
+    ])
+    func sharesAddUpToHundred(parts: [Int], expected: [Int]) {
+        #expect(Percent.shares(parts) == expected)
+    }
 }

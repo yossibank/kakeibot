@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -45,11 +46,13 @@ struct ReviewSharesCard: View {
                     }
                 }
 
-                ForEach(shares) { share in
+                let percents = Percent.shares(shares.map(\.amount))
+
+                ForEach(Array(zip(shares, percents)), id: \.0.id) { share, percent in
                     Button {
                         onOpen(share)
                     } label: {
-                        label(share)
+                        label(share, percent: percent)
                     }
                     .buttonStyle(.plain)
                 }
@@ -85,7 +88,10 @@ private extension ReviewSharesCard {
         .padding(.horizontal, 36)
     }
 
-    func label(_ share: ReviewModel.Share) -> some View {
+    func label(
+        _ share: ReviewModel.Share,
+        percent: Int
+    ) -> some View {
         VStack(spacing: 8) {
             HStack(spacing: 12) {
                 IconBadge(share.icon, size: 30)
@@ -95,7 +101,7 @@ private extension ReviewSharesCard {
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
 
-                Text(Self.percentText(share.ratio))
+                Text("\(percent)%")
                     .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
@@ -124,10 +130,6 @@ private extension ReviewSharesCard {
 private extension ReviewSharesCard {
     static let chartLimit = 5
     static let minorRatio = 0.05
-
-    static func percentText(_ ratio: Double) -> String {
-        "\(Int((ratio * 100).rounded()))%"
-    }
 
     static func otherShares(
         _ shares: [ReviewModel.Share]
