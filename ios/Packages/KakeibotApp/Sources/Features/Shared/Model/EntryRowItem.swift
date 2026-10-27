@@ -68,7 +68,7 @@ private extension EntryRowItem {
             return "（\(month.month)月払い）"
         }
 
-        return "（\(date.month)/\(date.day)払い）"
+        return "（\(Recurring.billText(paidOn: date))）"
     }
 
     static func route(

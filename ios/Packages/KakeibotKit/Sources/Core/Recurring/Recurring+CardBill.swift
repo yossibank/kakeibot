@@ -1,4 +1,10 @@
 public extension Recurring {
+    static let billChoiceCount = 3
+
+    static func billText(paidOn date: LocalDate) -> String {
+        "\(date.month)/\(date.day)払い"
+    }
+
     func billingPeriod(paidOn date: LocalDate) -> ClosedRange<LocalDate>? {
         guard let closingDay else {
             return nil
@@ -81,8 +87,6 @@ public extension Recurring {
 }
 
 private extension Recurring {
-    static let billChoiceCount = 3
-
     static func usage(of entry: Entry) -> Int {
         switch entry.type {
         case .expense: entry.amount
