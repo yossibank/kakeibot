@@ -181,7 +181,7 @@ public extension AssetsModel {
 
         return bills.map { bill in
             let card = bill.recurring.toWalletId
-            let month = bill.date.yearMonth
+            let month = bill.recurring.occurrenceMonth(of: bill.date)
 
             let moved = entries
                 .filter { $0.walletId == card && $0.billMonth != nil }

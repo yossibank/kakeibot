@@ -45,6 +45,26 @@ struct RecurringDraftTests {
     }
 
     @Test
+    func regeneratesWhenStartMovesEarlier() throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        let generated = try #require(LocalDate("2026-03-27"))
+        let earlier = try #require(LocalDate("2025-12-01"))
+        let later = try #require(LocalDate("2026-02-01"))
+        var original = try Self.rentDraft().newRecurring(at: now)
+        original.generatedUntil = generated
+
+        var draft = RecurringDraft(original)
+        draft.startDate = later
+        let moved = try draft.applied(to: original, at: now)
+
+        draft.startDate = earlier
+        let regenerated = try draft.applied(to: original, at: now)
+
+        #expect(moved.generatedUntil == generated)
+        #expect(regenerated.generatedUntil == nil)
+    }
+
+    @Test
     func keepsDestinationOnlyForTransfer() throws {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         let card = Wallet.ID()

@@ -93,6 +93,75 @@ struct RecurringWriteTests {
         ])
     }
 
+    @Test(arguments: [20, 12])
+    func keepsOneEntryAfterChangingDay(day: Int) async throws {
+        let setup = try await Setup()
+        let first = try #require(LocalDate("2026-03-10"))
+        let last = try #require(LocalDate("2026-03-31"))
+
+        try await setup.database.generateRecurringEntries(
+            through: first,
+            at: setup.now
+        )
+
+        try await setup.changeDay(to: day)
+
+        try await setup.database.generateRecurringEntries(
+            through: last,
+            at: setup.now
+        )
+
+        let dates = try setup.database
+            .snapshot()
+            .entries
+            .compactMap(\.recurringDate)
+            .sorted()
+            .map(\.description)
+
+        #expect(dates == ["2026-01-25", "2026-02-25", "2026-03-\(day)"])
+    }
+
+    @Test
+    func generatesPastEntriesWhenStartMovesEarlier() async throws {
+        let setup = try await Setup()
+        let today = try #require(LocalDate("2026-03-31"))
+        let earlier = try #require(LocalDate("2025-11-01"))
+
+        try await setup.database.generateRecurringEntries(
+            through: today,
+            at: setup.now
+        )
+
+        let recurring = try #require(
+            setup.database.snapshot().recurrings.first
+        )
+
+        var draft = RecurringDraft(recurring)
+        draft.startDate = earlier
+
+        _ = try await setup.database.saveRecurring(
+            draft,
+            editing: recurring.id,
+            today: today,
+            at: setup.now
+        )
+
+        let dates = try setup.database
+            .snapshot()
+            .entries
+            .compactMap(\.recurringDate)
+            .sorted()
+            .map(\.description)
+
+        #expect(dates == [
+            "2025-11-25",
+            "2025-12-25",
+            "2026-01-25",
+            "2026-02-25",
+            "2026-03-25"
+        ])
+    }
+
     @Test
     func paysCardUsageUntilClosingDay() async throws {
         let setup = try await Setup()
@@ -472,6 +541,16 @@ extension RecurringWriteTests.Setup {
 }
 
 private extension RecurringWriteTests.Setup {
+    func changeDay(to day: Int) async throws {
+        try await database.writer.write { db in
+            for var recurring in try Recurring.fetchAll(db) {
+                recurring.day = day
+                recurring.generatedUntil = nil
+                try recurring.update(db)
+            }
+        }
+    }
+
     func shiftHoliday(to shift: Recurring.HolidayShift) async throws {
         try await database.writer.write { db in
             for var recurring in try Recurring.fetchAll(db) {

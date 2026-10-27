@@ -5,7 +5,12 @@ import Testing
 struct RecurringCardBillTests {
     @Test(arguments: try periodCases)
     func findsBillingPeriod(fixture: PeriodCase) throws {
-        let bill = try Self.bill(closingDay: fixture.closingDay)
+        let bill = try Self.bill(
+            closingDay: fixture.closingDay,
+            day: fixture.day ?? 10,
+            holidayShift: fixture.holidayShift ?? .none
+        )
+
         let period = bill.billingPeriod(paidOn: fixture.paidOn)
         #expect(period == fixture.from...fixture.through)
     }
@@ -65,6 +70,37 @@ struct RecurringCardBillTests {
     }
 
     @Test
+    func countsMovedUsageOncePerOccurrence() throws {
+        let bill = try Self.bill(
+            closingDay: 31,
+            day: 27,
+            holidayShift: .next
+        )
+
+        let card = try #require(bill.toWalletId)
+        let february = try #require(LocalDate("2027-03-01"))
+        let march = try #require(LocalDate("2027-03-29"))
+
+        var moved = try Self.entry(
+            .expense,
+            500,
+            on: "2027-01-20",
+            wallet: card
+        )
+
+        moved.billMonth = YearMonth("2027-02")
+
+        let entries = try [
+            moved,
+            Self.entry(.expense, 9000, on: "2027-01-05", wallet: card),
+            Self.entry(.expense, 7000, on: "2027-02-05", wallet: card)
+        ]
+
+        #expect(bill.amount(paidOn: february, entries: entries) == 9500)
+        #expect(bill.amount(paidOn: march, entries: entries) == 7000)
+    }
+
+    @Test
     func listsBillDatesFromUsualOne() throws {
         let bill = try Self.bill(closingDay: 31)
         let used = try #require(LocalDate("2026-08-31"))
@@ -91,6 +127,8 @@ struct RecurringCardBillTests {
 extension RecurringCardBillTests {
     struct PeriodCase: Decodable, Sendable {
         let closingDay: Int
+        let day: Int?
+        let holidayShift: Recurring.HolidayShift?
         let paidOn: LocalDate
         let from: LocalDate
         let through: LocalDate
@@ -104,7 +142,11 @@ private extension RecurringCardBillTests {
         }
     }
 
-    static func bill(closingDay: Int) throws -> Recurring {
+    static func bill(
+        closingDay: Int,
+        day: Int = 10,
+        holidayShift: Recurring.HolidayShift = .none
+    ) throws -> Recurring {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         let start = try #require(LocalDate("2026-01-01"))
 
@@ -115,7 +157,8 @@ private extension RecurringCardBillTests {
             walletId: Wallet.ID(),
             toWalletId: Wallet.ID(),
             frequency: .monthly,
-            day: 10,
+            day: day,
+            holidayShift: holidayShift,
             closingDay: closingDay,
             startDate: start,
             createdAt: now,

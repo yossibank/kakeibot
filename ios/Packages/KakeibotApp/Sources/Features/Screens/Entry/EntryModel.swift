@@ -247,12 +247,19 @@ public extension EntryModel {
         return "\(date.month)/\(date.day)払い"
     }
 
-    var billChoices: [BillChoice] {
+    var billRecurring: Recurring? {
         guard
             type != .transfer,
-            let walletId,
-            let bill = cardBills.first(where: { $0.toWalletId == walletId })
+            let walletId
         else {
+            return nil
+        }
+
+        return cardBills.first { $0.toWalletId == walletId }
+    }
+
+    var billChoices: [BillChoice] {
+        guard let bill = billRecurring else {
             return []
         }
 
@@ -269,7 +276,11 @@ public extension EntryModel {
 
     var selectedBillDate: LocalDate? {
         let choices = billChoices
-        let chosen = choices.first { $0.date.yearMonth == billMonth }
+        let recurring = billRecurring
+
+        let chosen = choices.first {
+            recurring?.occurrenceMonth(of: $0.date) == billMonth
+        }
 
         return chosen?.date ?? choices.first?.date
     }
@@ -791,7 +802,7 @@ public extension EntryModel {
 
     func selectBill(_ date: LocalDate) {
         let isUsual = date == billChoices.first?.date
-        billMonth = isUsual ? nil : date.yearMonth
+        billMonth = isUsual ? nil : billRecurring?.occurrenceMonth(of: date)
     }
 
     func applyRoute(_ route: TransferRoute) {

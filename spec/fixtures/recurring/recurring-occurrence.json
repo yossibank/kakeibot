@@ -1,0 +1,11 @@
+{
+  "description": "固定費の、すでにある記録が、これから作る日と同じ回かを判定する。同じ回は、休日でずらす前の予定日の月が同じこと。day は今の引き落とし日で、holidayShift は none・previous・next のどれかにし、無ければ none とする。recorded は記録の固定費の日、date は作る日にする。",
+  "cases": [
+    { "summary": "引き落とし日を 5 日から 20 日に変えても、同じ月は同じ回にする", "day": 20, "recorded": "2026-03-05", "date": "2026-03-20", "same": true },
+    { "summary": "引き落とし日を 5 日から 12 日に変えても、同じ月は同じ回にする", "day": 12, "recorded": "2026-03-05", "date": "2026-03-12", "same": true },
+    { "summary": "月が違えば別の回にする", "day": 20, "recorded": "2026-03-05", "date": "2026-04-20", "same": false },
+    { "summary": "20 日から 5 日に変えても、同じ月は同じ回にする", "day": 5, "recorded": "2026-03-20", "date": "2026-03-05", "same": true },
+    { "summary": "休日で翌月にずれた日どうしは、同じ回にする", "day": 27, "holidayShift": "next", "recorded": "2027-03-01", "date": "2027-03-01", "same": true },
+    { "summary": "休日で翌月にずれた日と、次の月の回は別にする", "day": 27, "holidayShift": "next", "recorded": "2027-03-01", "date": "2027-03-29", "same": false }
+  ]
+}
