@@ -222,6 +222,104 @@ struct CardBillRecalcWriteTests {
         #expect(try setup.bill()?.amount == 10000)
         #expect(try setup.bill(of: other.id) == nil)
     }
+
+    @Test
+    func countsFeeOfGeneratedTransferInBill() async throws {
+        let setup = try await Setup(usage: [])
+
+        let transfer = try Recurring(
+            type: .transfer,
+            amount: 5000,
+            categoryId: nil,
+            walletId: setup.card,
+            toWalletId: setup.bank,
+            frequency: .monthly,
+            day: 5,
+            fee: 110,
+            startDate: #require(LocalDate("2026-10-05")),
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
+        try await setup.database.writer.write { db in
+            try transfer.insert(db)
+        }
+
+        try await setup.database.generateRecurringEntries(
+            through: #require(LocalDate("2026-11-10")),
+            at: setup.now
+        )
+
+        #expect(try setup.bill()?.amount == 110)
+    }
+
+    @Test
+    func keepsBillWhenDeletedRecurringIsRestored() async throws {
+        let setup = try await Setup(usage: [10000])
+
+        let expense = try Recurring(
+            type: .expense,
+            amount: 2000,
+            categoryId: setup.category,
+            walletId: setup.card,
+            frequency: .monthly,
+            day: 1,
+            startDate: #require(LocalDate("2026-10-01")),
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
+        try await setup.database.writer.write { db in
+            try expense.insert(db)
+        }
+
+        try await setup.database.generateRecurringEntries(
+            through: #require(LocalDate("2026-11-10")),
+            at: setup.now
+        )
+
+        #expect(try setup.bill()?.amount == 12000)
+
+        let deletion = try await setup.database.deleteRecurring(expense.id)
+
+        try await setup.database.writer.write { db in
+            var bill = try #require(try Recurring.fetchOne(db, key: setup.recurringId))
+            bill.closingDay = 1
+            try bill.update(db)
+        }
+
+        try await setup.database.restore(deletion)
+
+        #expect(try setup.bill()?.amount == 12000)
+    }
+
+    @Test
+    func replacesBillRecordedOnAnotherDayOfSameMonth() async throws {
+        let setup = try await Setup(usage: [10000])
+        let bill = try #require(try setup.bill())
+
+        try await setup.database.deleteEntry(bill.id)
+
+        let moved = try Entry(
+            type: .transfer,
+            amount: 999,
+            date: #require(LocalDate("2026-11-12")),
+            categoryId: nil,
+            walletId: setup.bank,
+            toWalletId: setup.card,
+            recurringId: setup.recurringId,
+            recurringDate: #require(LocalDate("2026-11-12")),
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
+        try await setup.database.restoreEntries([moved])
+        try await setup.database.restoreEntries([bill])
+
+        let bills = try setup.bills()
+        #expect(bills.count == 1)
+        #expect(bills.first?.id == bill.id)
+    }
 }
 
 extension CardBillRecalcWriteTests {

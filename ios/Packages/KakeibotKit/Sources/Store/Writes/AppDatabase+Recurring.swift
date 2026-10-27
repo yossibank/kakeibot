@@ -325,6 +325,10 @@ private extension AppDatabase {
 
         if let entry {
             change.after.append(entry)
+
+            if let fee = try fee(of: entry.id, in: db) {
+                change.after.append(fee)
+            }
         }
 
         return entry

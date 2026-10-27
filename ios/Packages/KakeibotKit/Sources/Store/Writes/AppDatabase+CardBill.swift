@@ -55,19 +55,9 @@ extension AppDatabase {
         var rows = try Entry.fetchAll(db, keys: ids)
 
         for entry in entries {
-            guard
-                let recurringId = entry.recurringId,
-                let recurringDate = entry.recurringDate
-            else {
-                continue
+            if let sameRecurrence = Entry.sameRecurrence(as: entry) {
+                rows += try sameRecurrence.fetchAll(db)
             }
-
-            let duplicates = try Entry
-                .filter(Column("recurring_id") == recurringId)
-                .filter(Column("recurring_date") == recurringDate)
-                .fetchAll(db)
-
-            rows += duplicates
         }
 
         let fees = try Entry
@@ -184,5 +174,23 @@ private extension Recurring {
         .filter { $0.scheduled.yearMonth == month }
 
         return paid + carried
+    }
+}
+
+extension Entry {
+    static func sameRecurrence(as entry: Entry) -> QueryInterfaceRequest<Entry>? {
+        guard
+            let recurringId = entry.recurringId,
+            let month = entry.recurringDate?.yearMonth,
+            let first = LocalDate(yearMonth: month, day: 1),
+            let next = LocalDate(yearMonth: month.adding(months: 1), day: 1)
+        else {
+            return nil
+        }
+
+        return Entry
+            .filter(Column("recurring_id") == recurringId)
+            .filter(Column("recurring_date") >= first)
+            .filter(Column("recurring_date") < next)
     }
 }

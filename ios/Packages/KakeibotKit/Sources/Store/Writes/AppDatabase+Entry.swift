@@ -307,17 +307,11 @@ private extension AppDatabase {
         of entry: Entry,
         in db: Database
     ) throws {
-        guard
-            let recurringId = entry.recurringId,
-            let recurringDate = entry.recurringDate
-        else {
+        guard let sameRecurrence = Entry.sameRecurrence(as: entry) else {
             return
         }
 
-        let duplicates = Entry
-            .filter(Column("recurring_id") == recurringId)
-            .filter(Column("recurring_date") == recurringDate)
-            .filter(Column("id") != entry.id)
+        let duplicates = sameRecurrence.filter(Column("id") != entry.id)
 
         let ids = try duplicates.fetchAll(db).map(\.id)
 

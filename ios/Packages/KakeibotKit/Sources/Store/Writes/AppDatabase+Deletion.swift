@@ -1,18 +1,9 @@
 import Core
-import Foundation
 import GRDB
 
 public extension AppDatabase {
-    func restore(
-        _ deletion: Deletion,
-        at now: Date = Date()
-    ) async throws {
+    func restore(_ deletion: Deletion) async throws {
         try await writer.write { db in
-            var change = CardBillChange()
-
-            change.before = try Self.existingRows(of: deletion.entries, in: db)
-            change.after = deletion.entries
-
             for record in deletion.records {
                 try record.insert(db)
             }
@@ -20,8 +11,6 @@ public extension AppDatabase {
             for entry in deletion.entries {
                 try entry.update(db)
             }
-
-            try Self.recalculateCardBills(change, in: db, at: now)
         }
     }
 }
