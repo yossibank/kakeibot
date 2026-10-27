@@ -34,6 +34,8 @@ public struct RootView: View {
         }
         .task {
             await model.open()
+        }
+        .task(id: model.hasDatabase) {
             await model.observeTheme()
         }
         .onOpenURL { url in
@@ -89,10 +91,10 @@ private extension RootView {
             } onLoad: {
                 isHomeLoaded = true
             }
-            .task {
+            .task(id: model.today) {
                 await model.observeNotifications(in: database)
             }
-            .task {
+            .task(id: model.today) {
                 await model.observeWidgets(in: database)
             }
         case .failed:

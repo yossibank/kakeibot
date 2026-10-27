@@ -113,6 +113,78 @@ struct AppModelTests {
     }
 
     @Test
+    func observesThemeAfterRetryOpen() async throws {
+        let database = try AppDatabase.inMemory()
+        let attempts = Attempts()
+
+        let model = AppModel {
+            attempts.count += 1
+
+            guard attempts.count > 1 else {
+                throw AppDatabase.SetupError.appGroupUnavailable
+            }
+
+            return database
+        }
+
+        await model.open()
+        #expect(!model.hasDatabase)
+
+        await model.retryOpen()
+        #expect(model.hasDatabase)
+
+        let task = Task {
+            await model.observeTheme()
+        }
+
+        try await database.setSetting(.theme, to: .preset(.wine))
+
+        let expected = ThemeLook.fixed(ThemePreset.wine.palette)
+
+        for _ in 0..<200 where model.look != expected {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        task.cancel()
+
+        #expect(model.look == expected)
+    }
+
+    @Test
+    func watchRetriesAfterFailure() async {
+        let model = AppModel(
+            openDatabase: AppDatabase.inMemory,
+            retryDelays: [.milliseconds(1), .milliseconds(1)]
+        )
+
+        let attempts = Attempts()
+        var received: [Int] = []
+
+        let isFailed = await model.watch(Self.values(attempts, failures: 2)) { value in
+            received.append(value)
+        }
+
+        #expect(!isFailed)
+        #expect(attempts.count == 3)
+        #expect(received == [1])
+    }
+
+    @Test
+    func watchStopsAfterRetryLimit() async {
+        let model = AppModel(
+            openDatabase: AppDatabase.inMemory,
+            retryDelays: [.milliseconds(1)]
+        )
+
+        let attempts = Attempts()
+
+        let isFailed = await model.watch(Self.values(attempts, failures: 10)) { _ in }
+
+        #expect(isFailed)
+        #expect(attempts.count == 2)
+    }
+
+    @Test
     func ignoresRetryUnlessFailed() async throws {
         let database = try AppDatabase.inMemory()
         let attempts = Attempts()
@@ -130,7 +202,28 @@ struct AppModelTests {
 }
 
 extension AppModelTests {
+    struct Failure: Error {}
+
     final class Attempts: @unchecked Sendable {
         var count = 0
+    }
+}
+
+private extension AppModelTests {
+    static func values(
+        _ attempts: Attempts,
+        failures: Int
+    ) -> AsyncThrowingStream<Int, Error> {
+        attempts.count += 1
+        let isFailing = attempts.count <= failures
+
+        return AsyncThrowingStream { continuation in
+            if isFailing {
+                continuation.finish(throwing: Failure())
+            } else {
+                continuation.yield(1)
+                continuation.finish()
+            }
+        }
     }
 }

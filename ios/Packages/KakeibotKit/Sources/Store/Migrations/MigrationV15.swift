@@ -1,4 +1,3 @@
-import Core
 import GRDB
 
 enum MigrationV15 {
@@ -9,7 +8,7 @@ enum MigrationV15 {
 
             table.column("kind", .text)
                 .notNull()
-                .check { Wallet.Kind.allCases.contains($0) }
+                .check { walletKinds.contains($0) }
 
             table.column("icon_id", .text).notNull().references("icon")
             table.column("initial_balance", .integer).notNull()
@@ -23,6 +22,19 @@ enum MigrationV15 {
         try db.drop(table: "wallet")
         try db.rename(table: "new_wallet", to: "wallet")
     }
+}
+
+extension MigrationV15 {
+    static let walletKinds = [
+        "cash",
+        "bank",
+        "card",
+        "emoney",
+        "point",
+        "other",
+        "investment",
+        "loan"
+    ]
 }
 
 private extension MigrationV15 {

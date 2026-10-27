@@ -1,4 +1,3 @@
-import Core
 import GRDB
 
 enum MigrationV2 {
@@ -42,23 +41,23 @@ private extension MigrationV2 {
     SELECT id, emoji, text, NULL, color, created_at, updated_at FROM icon
     """
 
-    static let defaultGlyphs: [(String, Icon.Glyph)] = [
-        ("🍙", .food),
-        ("🧻", .daily),
-        ("🚃", .transit),
-        ("🍻", .social),
-        ("🎮", .hobby),
-        ("👕", .clothes),
-        ("💄", .beauty),
-        ("💊", .medical),
-        ("🏠", .home),
-        ("📱", .phone),
-        ("💡", .utility),
-        ("📦", .other),
-        ("💴", .salary),
-        ("🎁", .bonus),
-        ("✨", .other),
-        ("👛", .cash),
-        ("🏦", .bank)
+    static let defaultGlyphs: [(String, String)] = [
+        ("🍙", "food"),
+        ("🧻", "daily"),
+        ("🚃", "transit"),
+        ("🍻", "social"),
+        ("🎮", "hobby"),
+        ("👕", "clothes"),
+        ("💄", "beauty"),
+        ("💊", "medical"),
+        ("🏠", "home"),
+        ("📱", "phone"),
+        ("💡", "utility"),
+        ("📦", "other"),
+        ("💴", "salary"),
+        ("🎁", "bonus"),
+        ("✨", "other"),
+        ("👛", "cash"),
+        ("🏦", "bank")
     ]
 }
