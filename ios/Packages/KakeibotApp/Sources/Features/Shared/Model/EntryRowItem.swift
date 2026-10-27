@@ -44,6 +44,10 @@ private extension EntryRowItem {
         for entry: Entry,
         in list: EntryList
     ) -> String? {
+        if let transfer = transfer(of: entry, in: list) {
+            return walletText(for: transfer, in: list).map { "\($0) の手数料" }
+        }
+
         let source = list.wallets[entry.walletId]?.name
 
         guard
@@ -57,5 +61,19 @@ private extension EntryRowItem {
         return [source, destination.name]
             .compactMap(\.self)
             .joined(separator: " → ")
+    }
+
+    static func transfer(
+        of fee: Entry,
+        in list: EntryList
+    ) -> Entry? {
+        guard let transferId = fee.transferId else {
+            return nil
+        }
+
+        return list.days
+            .first { $0.date == fee.date }?
+            .entries
+            .first { $0.id == transferId && $0.type == .transfer }
     }
 }

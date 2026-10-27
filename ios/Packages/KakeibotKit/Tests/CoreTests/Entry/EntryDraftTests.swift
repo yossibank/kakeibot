@@ -83,6 +83,7 @@ extension EntryDraftTests {
         let category: Bool
         let tag: Bool
         let toWallet: Destination
+        let fee: Int?
         let problems: [EntryDraft.Problem]
     }
 
@@ -108,7 +109,8 @@ extension EntryDraftTests.DraftCase {
             categoryId: categoryId,
             tagId: tagId,
             walletId: walletId,
-            toWalletId: toWalletId
+            toWalletId: toWalletId,
+            fee: fee ?? 0
         )
     }
 }

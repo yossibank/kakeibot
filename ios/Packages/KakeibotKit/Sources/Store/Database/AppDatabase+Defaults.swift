@@ -37,6 +37,37 @@ public extension AppDatabase {
     }
 }
 
+extension AppDatabase {
+    static func feeCategoryId(
+        in db: Database,
+        at now: Date
+    ) throws -> EntryCategory.ID {
+        if let id = try setting(.feeCategory, in: db),
+           try EntryCategory.exists(db, key: id) {
+            return id
+        }
+
+        let icon = try insertIcon(for: feeSeed, into: db, at: now)
+
+        let expenses = EntryCategory
+            .filter(Column("kind") == EntryCategory.Kind.expense.rawValue)
+
+        let category = try EntryCategory(
+            kind: .expense,
+            name: feeSeed.name,
+            iconId: icon.id,
+            sortOrder: EntryCategory.nextSortOrder(of: expenses, in: db),
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try category.insert(db)
+        try setSetting(.feeCategory, to: category.id, in: db)
+
+        return category.id
+    }
+}
+
 private extension AppDatabase {
     struct Seed {
         let name: String
@@ -69,6 +100,8 @@ private extension AppDatabase {
         Seed(name: "臨時収入", glyph: .bonus, color: "#E9C46A"),
         Seed(name: "その他", glyph: .other, color: "#8D99AE")
     ]
+
+    static let feeSeed = Seed(name: "手数料", glyph: .coin, color: "#A68A64")
 
     static let templates: [(name: String, category: String)] = [
         ("コンビニ", "食費"),

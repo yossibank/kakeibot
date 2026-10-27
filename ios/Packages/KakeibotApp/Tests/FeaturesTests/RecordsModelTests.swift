@@ -185,6 +185,34 @@ struct RecordsModelTests {
     }
 
     @Test
+    func describesFeeRowWithTransferRoute() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let date = try #require(LocalDate("2026-10-12"))
+
+        let draft = EntryDraft(
+            type: .transfer,
+            amount: 10000,
+            date: date,
+            categoryId: nil,
+            walletId: options.wallets[1].id,
+            toWalletId: options.wallets[0].id,
+            fee: 110
+        )
+
+        try await setup.database.saveEntry(draft, at: Date())
+
+        let model = RecordsModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        let day = try #require(model.days.first)
+        let details = model.rows(for: day).map(\.detail)
+
+        #expect(details.contains("銀行 → 財布 の手数料"))
+        #expect(details.contains("銀行 → 財布"))
+    }
+
+    @Test
     func showsTodayUntilAnotherDayIsChosen() async throws {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)

@@ -51,10 +51,12 @@
 | `archivedAt`（`templates`・`recurrings`） | 無ければ、空として読む |
 | `holidayShift`（`recurrings`） | 無ければ、`none` として読む |
 | `closingDay`（`recurrings`） | 無ければ、空として読む |
+| `fee`（`recurrings`） | 無ければ、空として読む |
 | `loanAmount`（`wallets`） | 無ければ、空として読む |
 | `valuations` | 無いファイルは、空として読む |
 | `tags` | 無いファイルは、空として読む。記録とテンプレート（`EntryTemplate`）の `tagId` も、無ければ空として読む |
 | `billMonth`（`entries`） | 無ければ、空として読む |
+| `transferId`（`entries`） | 無ければ、空として読む |
 
 古い版のファイルは、最新の版になるまで版を 1 つずつ上げてから読む。
 

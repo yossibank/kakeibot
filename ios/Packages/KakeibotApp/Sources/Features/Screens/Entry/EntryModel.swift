@@ -38,6 +38,8 @@ public final class EntryModel {
     public private(set) var billMonth: YearMonth?
     public private(set) var type: Entry.Kind
     public private(set) var calculator = AmountCalculator()
+    public private(set) var feeCalculator = AmountCalculator()
+    public private(set) var keypadTarget: KeypadTarget = .amount
     public private(set) var options: EntryOptions?
     public private(set) var recentMemos: [String] = []
     public private(set) var balances: [Wallet.ID: Int] = [:]
@@ -49,6 +51,7 @@ public final class EntryModel {
 
     private var baseline: Snapshot?
     private var original: Entry?
+    private var originalFee: Entry?
     private var allTemplates: [EntryTemplate] = []
     private var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
     private var appliedTemplateId: EntryTemplate.ID?
@@ -56,8 +59,8 @@ public final class EntryModel {
     private var history: EntryList?
     private var budgets: [Budget] = []
     private var monthStartDay: MonthStartDay = .first
+    private var editingId: Entry.ID?
 
-    private let editingId: Entry.ID?
     private let startingTemplate: EntryTemplate?
 
     public init(
@@ -76,6 +79,11 @@ public final class EntryModel {
 }
 
 public extension EntryModel {
+    enum KeypadTarget: Hashable {
+        case amount
+        case fee
+    }
+
     enum CategoryCell: Hashable {
         case category(EntryCategory)
         case add
@@ -137,7 +145,31 @@ public extension EntryModel {
         calculator.amount
     }
 
+    var fee: Int {
+        type == .transfer ? feeCalculator.amount : 0
+    }
+
+    var activeCalculator: AmountCalculator {
+        keypadTarget == .fee ? feeCalculator : calculator
+    }
+
+    var feeChoices: [Int] {
+        let used = (history?.days ?? [])
+            .flatMap(\.entries)
+            .filter { $0.transferId != nil }
+            .sorted { $0.createdAt > $1.createdAt }
+            .map(\.amount)
+
+        var seen: Set<Int> = []
+
+        let ordered = (used + FeeChoiceRow.defaultChoices).filter { seen.insert($0).inserted }
+
+        return Array(ordered.prefix(FeeChoiceRow.defaultChoices.count))
+    }
+
     var expressionText: String? {
+        let calculator = activeCalculator
+
         if let note = calculator.taxNote {
             return "\(Self.number(note.base)) の税込み \(note.rate.rawValue)%"
         }
@@ -266,7 +298,8 @@ public extension EntryModel {
         var seen: Set<String> = []
 
         let unique = manualTransfers.filter { entry in
-            let key = "\(entry.walletId)>\(String(describing: entry.toWalletId))>\(entry.amount)"
+            let route = "\(entry.walletId)>\(String(describing: entry.toWalletId))"
+            let key = "\(route)>\(entry.amount)>\(fee(of: entry))"
             return seen.insert(key).inserted
         }
 
@@ -391,7 +424,7 @@ public extension EntryModel {
             return false
         }
 
-        return amount > balance
+        return amount + fee > balance
     }
 
     var loanRemaining: Int? {
@@ -445,6 +478,10 @@ public extension EntryModel {
     }
 
     func saveDetail(today: LocalDate) -> String? {
+        if type == .transfer, fee > 0 {
+            return "手数料 \(AmountText.text(fee)) も記録"
+        }
+
         guard
             !isEditing,
             canSave,
@@ -517,7 +554,7 @@ public extension EntryModel {
             return nil
         }
 
-        let after = isSource ? balance - amount : balance + amount
+        let after = isSource ? balance - amount - fee : balance + amount
 
         switch (wallet.kind.role, isSource) {
         case (.loan, false): return BalanceLine(title: "返済後", amount: max(-after, 0))
@@ -560,9 +597,9 @@ public extension EntryModel {
 
             budgets = try await database.budgets()
 
-            try await loadBalances()
-
             try await loadEntry()
+
+            try await loadBalances()
 
             if let startingTemplate {
                 apply(startingTemplate)
@@ -686,7 +723,23 @@ public extension EntryModel {
     }
 
     func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        switch keypadTarget {
+        case .amount: calculator.press(key)
+        case .fee: feeCalculator.press(key)
+        }
+    }
+
+    func enter(_ target: KeypadTarget) {
+        keypadTarget = type == .transfer ? target : .amount
+    }
+
+    func setFee(_ amount: Int) {
+        feeCalculator = AmountCalculator(amount: amount)
+    }
+
+    func fee(of transfer: Entry) -> Int {
+        let entries = history?.days.flatMap(\.entries) ?? []
+        return entries.first { $0.transferId == transfer.id }?.amount ?? 0
     }
 
     func toggleTag(_ id: EntryTag.ID) {
@@ -707,6 +760,7 @@ public extension EntryModel {
         walletId = entry.walletId
         toWalletId = entry.toWalletId
         calculator = AmountCalculator(amount: entry.amount)
+        feeCalculator = AmountCalculator(amount: fee(of: entry))
     }
 
     func swapWallets() {
@@ -723,6 +777,7 @@ public extension EntryModel {
         categoryByType[self.type] = categoryId
 
         self.type = type
+        keypadTarget = .amount
 
         let remembered = categoryByType[type]
 
@@ -749,15 +804,21 @@ public extension EntryModel {
                 at: Date()
             )
 
+            let fee = try await database.fee(of: entry.id)
             let title = label(for: entry)
 
             let kind: EntryChange.Kind = if let original {
-                .edited(previous: original)
+                .edited(previous: original, previousFee: originalFee)
             } else {
                 .recorded
             }
 
-            return EntryChange(kind: kind, entry: entry, label: title)
+            return EntryChange(
+                kind: kind,
+                entry: entry,
+                label: title,
+                fee: fee
+            )
         } catch {
             report(error)
             return nil
@@ -766,6 +827,8 @@ public extension EntryModel {
 
     func startNext() async {
         calculator = AmountCalculator()
+        feeCalculator = AmountCalculator()
+        keypadTarget = .amount
         memo = ""
         tagId = nil
         billMonth = nil
@@ -786,9 +849,15 @@ public extension EntryModel {
         }
 
         do {
-            try await database.deleteEntry(original.id)
+            let deleted = try await database.deleteEntry(original.id)
             let title = label(for: original)
-            return EntryChange(kind: .deleted, entry: original, label: title)
+
+            return EntryChange(
+                kind: .deleted,
+                entry: original,
+                label: title,
+                fee: deleted.first { $0.transferId == original.id }
+            )
         } catch {
             report(error)
             return nil
@@ -800,6 +869,7 @@ private extension EntryModel {
     struct Snapshot: Equatable {
         let type: Entry.Kind
         let calculator: AmountCalculator
+        let feeCalculator: AmountCalculator
         let date: LocalDate
         let categoryId: EntryCategory.ID?
         let tagId: EntryTag.ID?
@@ -835,6 +905,7 @@ private extension EntryModel {
         Snapshot(
             type: type,
             calculator: calculator,
+            feeCalculator: feeCalculator,
             date: date,
             categoryId: categoryId,
             tagId: tagId,
@@ -866,7 +937,8 @@ private extension EntryModel {
             walletId: walletId,
             toWalletId: toWalletId,
             memo: memo,
-            billMonth: billMonth
+            billMonth: billMonth,
+            fee: fee
         )
     }
 
@@ -917,10 +989,17 @@ private extension EntryModel {
             return
         }
 
-        guard let entry = try await database.entry(editingId) else {
+        guard var entry = try await database.entry(editingId) else {
             throw AppDatabase.WriteError.entryNotFound
         }
 
+        if let transferId = entry.transferId,
+           let transfer = try await database.entry(transferId) {
+            entry = transfer
+            self.editingId = transferId
+        }
+
+        originalFee = try await database.fee(of: entry.id)
         original = entry
         type = entry.type
         calculator = AmountCalculator(amount: entry.amount)
@@ -932,6 +1011,7 @@ private extension EntryModel {
         memo = entry.memo ?? ""
         appliedTemplateId = entry.templateId
         billMonth = entry.billMonth
+        feeCalculator = AmountCalculator(amount: originalFee?.amount ?? 0)
     }
 
     func loadBalances() async throws {
@@ -941,7 +1021,7 @@ private extension EntryModel {
 
         let entries = list.days
             .flatMap(\.entries)
-            .filter { $0.id != editingId }
+            .filter { $0.id != editingId && !isOwnFee($0) }
 
         let valuations = list.valuations
 
@@ -960,6 +1040,14 @@ private extension EntryModel {
         } wallet: { id in
             wallet(id)
         }
+    }
+
+    func isOwnFee(_ entry: Entry) -> Bool {
+        guard let editingId else {
+            return false
+        }
+
+        return entry.transferId == editingId
     }
 
     func chooseDestination() {

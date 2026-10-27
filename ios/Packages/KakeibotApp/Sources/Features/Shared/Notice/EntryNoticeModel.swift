@@ -98,7 +98,7 @@ public extension EntryNoticeModel {
         }
 
         do {
-            try await database.deleteEntry(id)
+            let deleted = try await database.deleteEntry(id)
 
             let label = EntryChange.label(for: entry) { id in
                 list.categories[id]
@@ -106,7 +106,14 @@ public extension EntryNoticeModel {
                 list.wallets[id]
             }
 
-            let change = EntryChange(kind: .deleted, entry: entry, label: label)
+            let fee = deleted.first { $0.transferId == id }
+
+            let change = EntryChange(
+                kind: .deleted,
+                entry: deleted.first { $0.id == id } ?? entry,
+                label: label,
+                fee: fee
+            )
 
             show(change)
         } catch {
@@ -146,10 +153,10 @@ private extension EntryNoticeModel {
         switch change.kind {
         case .recorded:
             try await database.deleteEntry(change.entry.id)
-        case let .edited(previous):
-            try await database.restoreEntry(previous)
+        case let .edited(previous, previousFee):
+            try await database.restoreEntry(previous, fee: previousFee)
         case .deleted:
-            try await database.restoreEntry(change.entry)
+            try await database.restoreEntry(change.entry, fee: change.fee)
         }
     }
 }

@@ -201,6 +201,8 @@ private extension AppDatabase {
             try NoSpendDay.deleteOne(db, key: date)
         }
 
+        try saveFee(recurring.fee ?? 0, for: entry, in: db, at: now)
+
         return entry
     }
 

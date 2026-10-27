@@ -8,6 +8,7 @@ struct EntryDetailBand: View {
     let model: EntryModel
     let today: LocalDate
     let onWallet: () -> Void
+    let onFee: () -> Void
     let onDate: () -> Void
     let onMemo: () -> Void
 
@@ -19,9 +20,12 @@ struct EntryDetailBand: View {
                 if showsWallet {
                     walletCell
                         .frame(width: unit * Self.walletWeight)
-
-                    divider
+                } else {
+                    feeCell
+                        .frame(width: unit * Self.walletWeight)
                 }
+
+                divider
 
                 dateCell
                     .frame(width: unit * Self.dateWeight)
@@ -56,6 +60,18 @@ private extension EntryDetailBand {
                 title: walletTitle,
                 value: model.walletName,
                 isChanged: !model.isUsualWallet || model.billText != nil,
+                showsChevron: true
+            )
+        }
+    }
+
+    var feeCell: some View {
+        Button(action: onFee) {
+            cell(
+                title: "手数料",
+                value: model.fee > 0 ? AmountText.text(model.fee) : "なし",
+                valueColor: model.fee > 0 ? Palette.text : Palette.subtext,
+                isChanged: model.fee > 0,
                 showsChevron: true
             )
         }
@@ -159,8 +175,7 @@ private extension EntryDetailBand {
     }
 
     var totalWeight: CGFloat {
-        let wallet = showsWallet ? Self.walletWeight : 0
-        return wallet + Self.dateWeight + Self.memoWeight
+        Self.walletWeight + Self.dateWeight + Self.memoWeight
     }
 
     var walletTitle: String {

@@ -11,6 +11,7 @@ public struct EntryDraft: Hashable, Sendable {
     public var toWalletId: Wallet.ID?
     public var memo: String
     public var billMonth: YearMonth?
+    public var fee: Int
 
     public init(
         type: Entry.Kind,
@@ -22,7 +23,8 @@ public struct EntryDraft: Hashable, Sendable {
         walletId: Wallet.ID,
         toWalletId: Wallet.ID? = nil,
         memo: String = "",
-        billMonth: YearMonth? = nil
+        billMonth: YearMonth? = nil,
+        fee: Int = 0
     ) {
         self.type = type
         self.amount = amount
@@ -34,6 +36,7 @@ public struct EntryDraft: Hashable, Sendable {
         self.toWalletId = toWalletId
         self.memo = memo
         self.billMonth = billMonth
+        self.fee = fee
     }
 }
 
@@ -45,6 +48,8 @@ public extension EntryDraft {
         case missingDestination
         case sameWallet
         case tagWithoutCategory
+        case feeNegative
+        case feeOnNonTransfer
     }
 
     var problems: [Problem] {
@@ -54,7 +59,7 @@ public extension EntryDraft {
             ? [.tagWithoutCategory]
             : []
 
-        return amountProblems + typeProblems + tagProblems
+        return amountProblems + typeProblems + tagProblems + feeProblems
     }
 
     init(_ entry: Entry) {
@@ -125,6 +130,14 @@ private extension EntryDraft {
                 ? []
                 : [.categoryOnTransfer]
             return categoryProblems + destinationProblems
+        }
+    }
+
+    var feeProblems: [Problem] {
+        switch (fee, type) {
+        case (..<0, _): [.feeNegative]
+        case (1..., .expense), (1..., .income): [.feeOnNonTransfer]
+        default: []
         }
     }
 

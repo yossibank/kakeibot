@@ -92,6 +92,26 @@ struct ExportV1Tests {
         #expect(months.allSatisfy { $0 == nil })
     }
 
+    @Test
+    func readsEntriesWithoutTransferId() throws {
+        let json = try Self.fixtureWithoutTransferId()
+
+        let export = try ExportV1(json: json)
+        let transfers = export.data.entries.map(\.transferId)
+
+        #expect(!transfers.isEmpty)
+        #expect(transfers.allSatisfy { $0 == nil })
+    }
+
+    @Test
+    func rejectsFeeWithoutTransfer() throws {
+        let json = try Self.fixtureWithoutTransfer()
+
+        #expect(throws: ExportV1.ReadError.missingTransfer) {
+            try ExportV1(json: json)
+        }
+    }
+
     @Test(arguments: try headers.valid)
     func readsSupportedHeader(header: Header) throws {
         let json = try Self.fixture(with: header)
@@ -217,6 +237,28 @@ private extension ExportV1Tests {
         var tables = try #require(object["data"] as? [String: Any])
         let rows = try #require(tables["entries"] as? [[String: Any]])
         tables["entries"] = rows.map { $0.filter { $0.key != "billMonth" } }
+        object["data"] = tables
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixtureWithoutTransferId() throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+        let rows = try #require(tables["entries"] as? [[String: Any]])
+        tables["entries"] = rows.map { $0.filter { $0.key != "transferId" } }
+        object["data"] = tables
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixtureWithoutTransfer() throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+        let rows = try #require(tables["entries"] as? [[String: Any]])
+        tables["entries"] = rows.filter { ($0["type"] as? String) != "transfer" }
         object["data"] = tables
         return try JSONSerialization.data(withJSONObject: object)
     }
