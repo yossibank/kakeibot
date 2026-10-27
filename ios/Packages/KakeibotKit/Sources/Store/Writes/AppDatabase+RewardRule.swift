@@ -7,6 +7,7 @@ public extension AppDatabase {
         case ruleNotFound
         case iconNotFound
         case hasLogs
+        case shortOfBalance
     }
 
     @discardableResult

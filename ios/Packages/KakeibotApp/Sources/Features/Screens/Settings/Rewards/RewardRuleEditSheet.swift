@@ -97,7 +97,7 @@ public struct RewardRuleEditSheet: View {
                 : "このごほうびを削除しますか",
             message: model.hasLogs
                 ? "貯めた記録があります。非表示にすると、貯めた分を残したまま一覧から外せます"
-                : "貯めた記録はありません",
+                : nil,
             keepTitle: "やめる",
             confirmTitle: model.hasLogs ? "非表示にする" : "削除する"
         ) {

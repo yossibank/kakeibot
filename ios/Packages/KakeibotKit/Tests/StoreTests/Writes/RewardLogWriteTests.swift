@@ -83,6 +83,56 @@ struct RewardLogWriteTests {
 
         #expect(bank.balance == 200)
     }
+
+    @Test
+    func rejectsClearingAfterPurchase() async throws {
+        let setup = try await Setup()
+        try await setup.achieve(true)
+
+        let bought = RewardGoal(
+            name: "靴",
+            targetAmount: 300,
+            purchasedAt: setup.now,
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
+        try await setup.database.writer.write { db in
+            try bought.insert(db)
+        }
+
+        await #expect(throws: AppDatabase.RewardRuleWriteError.shortOfBalance) {
+            try await setup.achieve(false)
+        }
+
+        let bank = try await setup.database.rewardBank()
+
+        #expect(bank.logs.count == 1)
+        #expect(bank.balance == 200)
+    }
+
+    @Test
+    func clearsBeforePurchase() async throws {
+        let setup = try await Setup()
+        try await setup.achieve(true)
+
+        let waiting = RewardGoal(
+            name: "鞄",
+            targetAmount: 1000,
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
+        try await setup.database.writer.write { db in
+            try waiting.insert(db)
+        }
+
+        try await setup.achieve(false)
+        let bank = try await setup.database.rewardBank()
+
+        #expect(bank.logs.isEmpty)
+        #expect(bank.balance == 0)
+    }
 }
 
 private extension RewardLogWriteTests {

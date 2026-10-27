@@ -272,6 +272,8 @@ public extension RecordsModel {
                 on: date,
                 at: Date()
             )
+        } catch AppDatabase.RewardRuleWriteError.shortOfBalance {
+            errorNotice.show(Self.rewardShortOfBalanceMessage)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
         }
@@ -387,6 +389,7 @@ public extension RecordsModel {
 private extension RecordsModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
+    static let rewardShortOfBalanceMessage = "貯金箱の残高が足りないため、達成を外せません"
     static let recurringTitle = "固定費"
 
     func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
