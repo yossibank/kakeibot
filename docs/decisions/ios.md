@@ -59,7 +59,7 @@ Features は、ターゲットとフォルダを決める。
 
 | 項目 | 内容 |
 | --- | --- |
-| 理由 | DesignSystem は Core と Store を知らない。設定だけの部品を公開の部品に混ぜない |
+| 理由 | DesignSystem は Core の型を使うが、Store は知らない。設定だけの部品を公開の部品に混ぜない |
 | 却下 | すべての部品を DesignSystem に置く |
 
 決まり：

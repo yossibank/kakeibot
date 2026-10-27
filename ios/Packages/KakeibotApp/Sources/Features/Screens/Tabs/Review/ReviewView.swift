@@ -269,7 +269,7 @@ private extension ReviewView {
                     balanceBar(
                         "支出",
                         amount: model.summary.expense.total,
-                        tint: Palette.rose
+                        tint: Palette.accentStrong
                     )
                 }
                 .padding(.top, 8)

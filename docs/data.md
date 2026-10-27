@@ -312,7 +312,7 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | --- | --- | --- |
 | id | TEXT | |
 | name | TEXT | |
-| background / surface / text_primary / text_secondary / accent / expense / income | TEXT | `#RRGGBB`。地・カード・文字・控えめな文字・強調と、支出・収入の色 |
+| background / surface / text_primary / text_secondary / accent / expense / income | TEXT | `#RRGGBB`。地・カード・文字・控えめな文字・強調と、支出・収入の色。expense・income は描画に使わない |
 | corner_radius | INTEGER | 今は使わない。角の丸みは setting の `corner_style` で選ぶ |
 | font_id | TEXT | 今は使わない。字体は setting の `font_style` と `text_font_style` で選ぶ |
 | is_builtin | INTEGER | |
