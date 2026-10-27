@@ -28,7 +28,7 @@ public extension ThemePalette {
     }
 }
 
-private extension ThemePalette {
+extension ThemePalette {
     static let surfaces: [Role] = [
         .backgroundTop,
         .backgroundBottom,
@@ -36,7 +36,9 @@ private extension ThemePalette {
         .cardTop,
         .cardBottom
     ]
+}
 
+private extension ThemePalette {
     static let readableRoles: [(Role, Double)] = [
         (.accent, 3),
         (.accentStrong, 4.5),

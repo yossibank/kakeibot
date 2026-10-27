@@ -27,19 +27,35 @@ struct PaletteTests {
     }
 
     @Test
-    func changesMeaningColorsByBrightness() {
+    func changesMeaningColorsByTheme() {
         var environment = EnvironmentValues()
         environment.palette = Self.forest
-        environment.colorScheme = .dark
 
         let dark = Palette.rose.resolve(in: environment)
 
-        environment.colorScheme = .light
+        environment.palette = ThemePreset.white.palette
 
         let light = Palette.rose.resolve(in: environment)
 
         #expect(rgb(dark) == 0xE3A3A3)
         #expect(rgb(light) == 0xB04A4A)
+    }
+
+    @Test
+    func shiftsMeaningColorsOnMidtoneBackground() {
+        var palette = Self.forest
+        palette.backgroundTop = 0x7B7B5D
+        palette.backgroundBottom = 0x7B7B5D
+        palette.panel = 0x7B7B5D
+        palette.cardTop = 0x7B7B5D
+        palette.cardBottom = 0x7B7B5D
+
+        var environment = EnvironmentValues()
+        environment.palette = palette
+
+        let rose = Palette.rose.resolve(in: environment)
+
+        #expect(rgb(rose) == palette.color(.rose))
     }
 }
 
