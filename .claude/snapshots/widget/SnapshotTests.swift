@@ -42,7 +42,7 @@ struct SnapshotTests {
                     .frame(width: size.width, height: size.height)
                     .background(Color(white: 0.97))
 
-                try Self.write(view, to: "quick-\(name)-\(size.width).png")
+                try Self.write(view, to: "quick-\(name)-\(Int(size.width))x\(Int(size.height)).png")
             }
         }
     }
@@ -69,8 +69,10 @@ private extension SnapshotTests {
     ]
 
     static let quickShapes: [(WidgetFamily, CGSize)] = [
-        (.systemSmall, CGSize(width: 170, height: 170)),
-        (.systemMedium, CGSize(width: 364, height: 170))
+        (.systemMedium, CGSize(width: 364, height: 170)),
+        (.systemLarge, CGSize(width: 364, height: 382)),
+        (.systemMedium, CGSize(width: 321, height: 148)),
+        (.systemLarge, CGSize(width: 321, height: 324))
     ]
 
     static func quickCases() -> [(String, QuickRecordWidgetSummary)] {
