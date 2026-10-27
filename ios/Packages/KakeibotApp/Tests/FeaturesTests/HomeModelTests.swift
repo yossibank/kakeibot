@@ -89,7 +89,7 @@ struct HomeModelTests {
     }
 
     @Test
-    func showsYesterdayInTheMiddleWithAndWithoutBudget() async throws {
+    func swapsMiddleFigureByBudget() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         try await setup.save(.expense, amount: 4500, daysAgo: 1)
@@ -99,7 +99,6 @@ struct HomeModelTests {
         #expect(model.budgetUsage == nil)
         #expect(model.middleTitle == "昨日")
         #expect(model.middleAmount == 4500)
-        #expect(model.monthExpense == 5480)
 
         try await setup.database.setBudget(
             120_000,
@@ -108,8 +107,8 @@ struct HomeModelTests {
         )
         await model.load()
 
-        #expect(model.middleTitle == "昨日")
-        #expect(model.middleAmount == 4500)
+        #expect(model.middleTitle == "今月の支出")
+        #expect(model.middleAmount == 5480)
     }
 
     @Test

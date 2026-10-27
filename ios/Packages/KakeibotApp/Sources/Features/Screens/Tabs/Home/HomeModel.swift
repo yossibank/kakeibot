@@ -107,11 +107,11 @@ public extension HomeModel {
     }
 
     var middleTitle: String {
-        "昨日"
+        budgetUsage == nil ? "昨日" : "今月の支出"
     }
 
     var middleAmount: Int {
-        yesterdayExpense
+        budgetUsage == nil ? yesterdayExpense : monthExpense
     }
 
     var budgetUsage: BudgetUsage? {
