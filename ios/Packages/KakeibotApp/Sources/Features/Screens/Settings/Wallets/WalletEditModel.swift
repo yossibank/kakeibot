@@ -106,7 +106,7 @@ public extension WalletEditModel {
 
         let remaining = max(-(isEditing ? balance : initialBalance), 0)
         let repaid = min(max(borrowed - remaining, 0), borrowed)
-        let percent = repaid * 100 / borrowed
+        let percent = Percent.floor(repaid, of: borrowed)
 
         return "\(AmountText.text(repaid)) 返済済み（\(percent)%）"
     }

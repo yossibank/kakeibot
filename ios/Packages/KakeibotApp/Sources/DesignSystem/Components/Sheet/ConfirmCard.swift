@@ -11,8 +11,10 @@ public struct ConfirmCard: View {
     private let message: String
     private let keepTitle: String
     private let confirmTitle: String
+    private let alternateTitle: String?
     private let role: Role
     private let onConfirm: () -> Void
+    private let onAlternate: () -> Void
     private let onKeep: () -> Void
 
     public init(
@@ -21,8 +23,10 @@ public struct ConfirmCard: View {
         message: String,
         keepTitle: String,
         confirmTitle: String,
+        alternateTitle: String? = nil,
         role: Role = .destructive,
         onConfirm: @escaping () -> Void,
+        onAlternate: @escaping () -> Void = {},
         onKeep: @escaping () -> Void
     ) {
         self.systemImage = systemImage
@@ -30,8 +34,10 @@ public struct ConfirmCard: View {
         self.message = message
         self.keepTitle = keepTitle
         self.confirmTitle = confirmTitle
+        self.alternateTitle = alternateTitle
         self.role = role
         self.onConfirm = onConfirm
+        self.onAlternate = onAlternate
         self.onKeep = onKeep
     }
 
@@ -71,8 +77,10 @@ public extension View {
         message: String,
         keepTitle: String,
         confirmTitle: String,
+        alternateTitle: String? = nil,
         role: ConfirmCard.Role = .destructive,
         onKeep: @escaping () -> Void = {},
+        onAlternate: @escaping () -> Void = {},
         onConfirm: @escaping () -> Void
     ) -> some View {
         overlay {
@@ -83,10 +91,15 @@ public extension View {
                     message: message,
                     keepTitle: keepTitle,
                     confirmTitle: confirmTitle,
+                    alternateTitle: alternateTitle,
                     role: role,
                     onConfirm: {
                         isPresented.wrappedValue = false
                         onConfirm()
+                    },
+                    onAlternate: {
+                        isPresented.wrappedValue = false
+                        onAlternate()
                     },
                     onKeep: {
                         isPresented.wrappedValue = false
@@ -144,21 +157,20 @@ private extension ConfirmCard {
             }
 
             VStack(spacing: 12) {
-                switch role {
-                case .destructive:
-                    filledButton(keepTitle, action: onKeep)
+                if let alternateTitle {
+                    filledButton(alternateTitle, action: onAlternate)
                     outlinedButton(
                         confirmTitle,
                         color: Palette.rose,
                         action: onConfirm
                     )
-                case .suggestion:
-                    filledButton(confirmTitle, action: onConfirm)
                     outlinedButton(
                         keepTitle,
                         color: Palette.subtext,
                         action: onKeep
                     )
+                } else {
+                    twoChoices
                 }
             }
             .buttonStyle(.plain)
@@ -171,6 +183,26 @@ private extension ConfirmCard {
                 .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
         }
         .shadow(color: Palette.shadow.opacity(0.5), radius: 30, y: 14)
+    }
+
+    @ViewBuilder
+    var twoChoices: some View {
+        switch role {
+        case .destructive:
+            filledButton(keepTitle, action: onKeep)
+            outlinedButton(
+                confirmTitle,
+                color: Palette.rose,
+                action: onConfirm
+            )
+        case .suggestion:
+            filledButton(confirmTitle, action: onConfirm)
+            outlinedButton(
+                keepTitle,
+                color: Palette.subtext,
+                action: onKeep
+            )
+        }
     }
 
     func filledButton(

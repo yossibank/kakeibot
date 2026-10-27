@@ -6,6 +6,7 @@ import SwiftUI
 public struct StampEditSheet: View {
     @State private var model: StampEditModel
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
@@ -67,6 +68,19 @@ public struct StampEditSheet: View {
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
+        .confirmsUnsavedHide(
+            isHidden: model.isHidden,
+            canSave: model.canSave,
+            isPresented: $isConfirmingHideChanges
+        ) {
+            Task {
+                await save(hiding: true)
+            }
+        } onDiscard: {
+            Task {
+                await setHidden(!model.isHidden)
+            }
+        }
         .confirmsDiscard(
             when: model.isChanged,
             isPresented: $isConfirmingDiscard
@@ -100,9 +114,7 @@ private extension StampEditSheet {
         ) {
             close()
         } onHide: {
-            Task {
-                await setHidden(!model.isHidden)
-            }
+            toggleHidden()
         } onDelete: {
             isConfirmingDelete = true
         }
@@ -126,12 +138,30 @@ private extension StampEditSheet {
         }
     }
 
-    func save() async {
+    func save(hiding: Bool = false) async {
         focus = nil
 
         if await model.save() {
+            if hiding {
+                guard await model.setHidden(!model.isHidden) else {
+                    return
+                }
+            }
+
             dismiss()
         }
+    }
+
+    func toggleHidden() {
+        guard model.isChanged else {
+            Task {
+                await setHidden(!model.isHidden)
+            }
+
+            return
+        }
+
+        isConfirmingHideChanges = true
     }
 
     func setHidden(_ isHidden: Bool) async {

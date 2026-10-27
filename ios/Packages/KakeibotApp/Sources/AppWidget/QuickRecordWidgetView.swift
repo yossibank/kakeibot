@@ -25,7 +25,7 @@ private extension QuickRecordWidgetView {
         if let summary = entry.summary {
             VStack(spacing: 6) {
                 header(of: summary)
-                    .frame(height: Self.headerHeight)
+                    .frame(height: headerHeight(of: summary))
 
                 if summary.tiles.isEmpty {
                     Text("テンプレートを作ると、ここから記録できます")
@@ -74,6 +74,8 @@ private extension QuickRecordWidgetView {
                     Text("取り消す")
                         .textFont(size: .caption, weight: .semibold)
                         .foregroundStyle(Palette.accentStrong)
+                        .lineLimit(1)
+                        .fixedSize()
                         .padding(.horizontal, 12)
                         .frame(maxHeight: .infinity)
                         .overlay {
@@ -259,6 +261,7 @@ private extension QuickRecordWidgetView {
 private extension QuickRecordWidgetView {
     static let columns = 2
     static let headerHeight: CGFloat = 20
+    static let undoHeaderHeight: CGFloat = 32
     static let tileRadius: CGFloat = 14
     static let badgeSize: CGFloat = 20
     static let markSize: CGFloat = 20
@@ -269,6 +272,10 @@ private extension QuickRecordWidgetView {
 
     var rowCount: Int {
         isLarge ? 3 : 2
+    }
+
+    func headerHeight(of summary: QuickRecordWidgetSummary) -> CGFloat {
+        summary.recorded(at: entry.date) == nil ? Self.headerHeight : Self.undoHeaderHeight
     }
 
     func amountText(of record: QuickRecordWidgetSummary.Record) -> String {

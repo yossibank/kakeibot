@@ -28,6 +28,23 @@ struct SnapshotTests {
                 try Self.write(view, to: "\(name)-\(shape.name).png")
             }
         }
+
+        for (name, summary) in Self.quickCases() {
+            let entry = QuickRecordWidgetEntry(
+                date: Date(),
+                summary: summary,
+                look: .followsDevice,
+                style: .standard
+            )
+
+            for (shape, size) in Self.quickShapes {
+                let view = QuickRecordWidgetView(entry: entry, family: shape)
+                    .frame(width: size.width, height: size.height)
+                    .background(Color(white: 0.97))
+
+                try Self.write(view, to: "quick-\(name)-\(size.width).png")
+            }
+        }
     }
 }
 
@@ -50,6 +67,30 @@ private extension SnapshotTests {
         lock("rectangular", .accessoryRectangular, CGSize(width: 172, height: 76)),
         lock("inline", .accessoryInline, CGSize(width: 260, height: 24))
     ]
+
+    static let quickShapes: [(WidgetFamily, CGSize)] = [
+        (.systemSmall, CGSize(width: 170, height: 170)),
+        (.systemMedium, CGSize(width: 364, height: 170))
+    ]
+
+    static func quickCases() -> [(String, QuickRecordWidgetSummary)] {
+        let sample = QuickRecordWidgetSummary.sample()
+
+        let undo = QuickRecordWidgetSummary(
+            todayExpense: sample.todayExpense,
+            tiles: sample.tiles,
+            todayRecords: sample.todayRecords,
+            todayCount: sample.todayCount,
+            recorded: QuickRecordWidgetSummary.Recorded(
+                id: Entry.ID(),
+                name: "ランチ",
+                amount: 980,
+                until: Date().addingTimeInterval(60)
+            )
+        )
+
+        return [("normal", sample), ("undo", undo)]
+    }
 
     static func cases(on today: LocalDate) -> [(String, BudgetWidgetSummary?)] {
         let periodEnd = today.adding(days: 8)

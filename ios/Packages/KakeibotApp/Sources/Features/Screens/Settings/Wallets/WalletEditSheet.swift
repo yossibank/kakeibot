@@ -6,6 +6,7 @@ import SwiftUI
 public struct WalletEditSheet: View {
     @State private var model: WalletEditModel
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingHideChanges = false
     @State private var isEnteringAmount = false
     @State private var isEnteringValuation = false
     @State private var isEnteringLoanAmount = false
@@ -105,6 +106,19 @@ public struct WalletEditSheet: View {
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
+        .confirmsUnsavedHide(
+            isHidden: model.isHidden,
+            canSave: model.canSave,
+            isPresented: $isConfirmingHideChanges
+        ) {
+            Task {
+                await save(hiding: true)
+            }
+        } onDiscard: {
+            Task {
+                await setHidden(!model.isHidden)
+            }
+        }
         .confirmsDiscard(
             when: model.isChanged,
             isPresented: $isConfirmingDiscard
@@ -120,9 +134,7 @@ public struct WalletEditSheet: View {
             balance: model.balance,
             isPresented: $isConfirmingHide
         ) {
-            Task {
-                await setHidden(true)
-            }
+            requestHide()
         }
         .onChange(of: model.kind) {
             focus = nil
@@ -690,7 +702,7 @@ private extension WalletEditSheet {
         }
     }
 
-    func save() async {
+    func save(hiding: Bool = false) async {
         focus = nil
 
         guard let wallet = await model.save() else {
@@ -699,6 +711,13 @@ private extension WalletEditSheet {
 
         guard !model.isEditing, model.asksPayment else {
             onSave(wallet)
+
+            if hiding {
+                guard await model.setHidden(!model.isHidden) else {
+                    return
+                }
+            }
+
             dismiss()
             return
         }
@@ -735,9 +754,19 @@ private extension WalletEditSheet {
             return
         }
 
-        Task {
-            await setHidden(!model.isHidden)
+        requestHide()
+    }
+
+    func requestHide() {
+        guard model.isChanged else {
+            Task {
+                await setHidden(!model.isHidden)
+            }
+
+            return
         }
+
+        isConfirmingHideChanges = true
     }
 
     func setHidden(_ isHidden: Bool) async {

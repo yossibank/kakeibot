@@ -7,6 +7,7 @@ public struct RecurringEditSheet: View {
     @State private var model: RecurringEditModel
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
 
     @FocusState private var isNameFocused: Bool
@@ -62,6 +63,19 @@ public struct RecurringEditSheet: View {
                 .onTapGesture {
                     isNameFocused = false
                 }
+        }
+        .confirmsUnsavedHide(
+            isHidden: model.isHidden,
+            canSave: model.canSave,
+            isPresented: $isConfirmingHideChanges
+        ) {
+            Task {
+                await save(hiding: true)
+            }
+        } onDiscard: {
+            Task {
+                await setHidden(!model.isHidden)
+            }
         }
         .confirmsDiscard(
             when: model.isChanged,
@@ -132,9 +146,7 @@ private extension RecurringEditSheet {
         ) {
             close()
         } onHide: {
-            Task {
-                await setHidden(!model.isHidden)
-            }
+            toggleHidden()
         } onDelete: {
             isConfirmingDelete = true
         }
@@ -650,10 +662,16 @@ private extension RecurringEditSheet {
         }
     }
 
-    func save() async {
+    func save(hiding: Bool = false) async {
         closePanel()
 
         if await model.save() {
+            if hiding {
+                guard await model.setHidden(!model.isHidden) else {
+                    return
+                }
+            }
+
             dismiss()
         }
     }
@@ -663,6 +681,18 @@ private extension RecurringEditSheet {
             onDelete(deletion)
             dismiss()
         }
+    }
+
+    func toggleHidden() {
+        guard model.isChanged else {
+            Task {
+                await setHidden(!model.isHidden)
+            }
+
+            return
+        }
+
+        isConfirmingHideChanges = true
     }
 
     func setHidden(_ isHidden: Bool) async {
