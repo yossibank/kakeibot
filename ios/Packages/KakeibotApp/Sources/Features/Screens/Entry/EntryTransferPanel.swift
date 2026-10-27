@@ -67,7 +67,7 @@ private extension EntryTransferPanel {
                     .lineLimit(1)
 
                 if let current {
-                    Grid(horizontalSpacing: 8, verticalSpacing: 2) {
+                    Grid(horizontalSpacing: 8, verticalSpacing: 4) {
                         balanceLine(current)
 
                         if let after {
@@ -77,7 +77,7 @@ private extension EntryTransferPanel {
                                 .opacity(0)
                         }
                     }
-                    .textFont(.caption2)
+                    .textFont(.footnote)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                     .foregroundStyle(balanceColor)
@@ -85,7 +85,7 @@ private extension EntryTransferPanel {
                 }
             }
             .padding(.horizontal, 8)
-            .padding(.vertical, 10)
+            .padding(.vertical, 12)
             .frame(maxWidth: .infinity)
             .card(cornerRadius: 20)
             .contentShape(.rect)
