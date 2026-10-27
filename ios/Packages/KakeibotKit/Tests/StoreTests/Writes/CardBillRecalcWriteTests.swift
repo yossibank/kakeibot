@@ -125,6 +125,103 @@ struct CardBillRecalcWriteTests {
         try await setup.database.undoWidgetEntry(entry.id)
         #expect(try setup.bill()?.amount == 10000)
     }
+
+    @Test
+    func restoresOneBillAfterBulkDeleteOfUsageAndBill() async throws {
+        let setup = try await Setup(usage: [10000])
+        let added = try await setup.spend(3000, on: "2026-10-05")
+        let bill = try #require(try setup.bill())
+
+        let deleted = try await setup.database.deleteEntries([added.id, bill.id])
+        #expect(try setup.bills().isEmpty)
+
+        try await setup.database.restoreEntries(deleted)
+
+        let bills = try setup.bills()
+        #expect(bills.count == 1)
+        #expect(bills.first?.amount == 13000)
+    }
+
+    @Test
+    func doesNotRecreateBillDeletedByHand() async throws {
+        let setup = try await Setup(usage: [10000])
+        let bill = try #require(try setup.bill())
+        let added = try await setup.spend(3000, on: "2026-10-05")
+
+        try await setup.database.deleteEntry(bill.id)
+
+        var draft = EntryDraft(added)
+        draft.amount = 5000
+
+        try await setup.database.saveEntry(
+            draft,
+            editing: added.id,
+            at: setup.now.addingTimeInterval(1)
+        )
+
+        #expect(try setup.bills().isEmpty)
+    }
+
+    @Test
+    func restoresBillRemovedWithAllUsage() async throws {
+        let setup = try await Setup(usage: [10000])
+        let usage = try #require(try setup.database.snapshot().entries
+            .first { $0.recurringId == nil })
+
+        let deleted = try await setup.database.deleteEntries([usage.id])
+        #expect(try setup.bills().isEmpty)
+
+        try await setup.database.restoreEntries(deleted)
+
+        let bills = try setup.bills()
+        #expect(bills.count == 1)
+        #expect(bills.first?.amount == 10000)
+    }
+
+    @Test
+    func restoresBillOfPreviousWalletOnUndo() async throws {
+        let setup = try await Setup(usage: [10000])
+
+        let other = try Recurring(
+            type: .transfer,
+            amount: 0,
+            categoryId: nil,
+            walletId: setup.card,
+            toWalletId: setup.bank,
+            frequency: .monthly,
+            day: 10,
+            closingDay: 15,
+            startDate: #require(LocalDate("2026-11-01")),
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
+        try await setup.database.writer.write { db in
+            try other.insert(db)
+        }
+
+        try await setup.database.generateRecurringEntries(
+            through: #require(LocalDate("2026-11-10")),
+            at: setup.now
+        )
+
+        let usage = try #require(try setup.database.snapshot().entries
+            .first { $0.recurringId == nil })
+
+        let previous = try await setup.database.changeEntries(
+            [usage.id],
+            to: .wallet(setup.bank),
+            at: setup.now.addingTimeInterval(1)
+        )
+
+        #expect(try setup.bill() == nil)
+        #expect(try setup.bill(of: other.id)?.amount == 10000)
+
+        try await setup.database.restoreEntries(previous)
+
+        #expect(try setup.bill()?.amount == 10000)
+        #expect(try setup.bill(of: other.id) == nil)
+    }
 }
 
 extension CardBillRecalcWriteTests {
@@ -205,6 +302,14 @@ extension CardBillRecalcWriteTests.Setup {
     }
 
     func bill() throws -> Entry? {
-        try database.snapshot().entries.first { $0.recurringId == recurringId }
+        try bill(of: recurringId)
+    }
+
+    func bill(of id: Recurring.ID) throws -> Entry? {
+        try database.snapshot().entries.first { $0.recurringId == id }
+    }
+
+    func bills() throws -> [Entry] {
+        try database.snapshot().entries.filter { $0.recurringId == recurringId }
     }
 }

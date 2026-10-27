@@ -41,7 +41,9 @@ public extension AppDatabase {
             _ = try Entry.deleteOne(db, key: id)
 
             if let entry {
-                try Self.recalculateCardBills(affectedBy: [entry], in: db, at: now)
+                let change = CardBillChange(before: [entry])
+
+                try Self.recalculateCardBills(change, in: db, at: now)
             }
 
             if try Self.setting(.widgetEntry, in: db) == id {

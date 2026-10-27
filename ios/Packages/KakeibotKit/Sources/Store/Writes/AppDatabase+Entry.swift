@@ -24,9 +24,19 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
+            var change = CardBillChange()
+
             for draft in drafts {
-                try Self.saveEntry(draft, editing: nil, in: db, at: now)
+                try Self.saveEntry(
+                    draft,
+                    editing: nil,
+                    change: &change,
+                    in: db,
+                    at: now
+                )
             }
+
+            try Self.recalculateCardBills(change, in: db, at: now)
         }
     }
 
@@ -42,6 +52,13 @@ public extension AppDatabase {
         at now: Date = Date()
     ) async throws {
         try await writer.write { db in
+            let restored = [entry] + [fee].compactMap(\.self)
+
+            var change = CardBillChange()
+
+            change.before = try Self.existingRows(of: restored, in: db)
+            change.after = restored
+
             try Self.restore([entry], in: db)
 
             _ = try Entry
@@ -53,7 +70,7 @@ public extension AppDatabase {
                 try Self.restore([fee], in: db)
             }
 
-            try Self.recalculateCardBills(affectedBy: [entry], in: db, at: now)
+            try Self.recalculateCardBills(change, in: db, at: now)
         }
     }
 
@@ -62,8 +79,13 @@ public extension AppDatabase {
         at now: Date = Date()
     ) async throws {
         try await writer.write { db in
+            var change = CardBillChange()
+
+            change.before = try Self.existingRows(of: entries, in: db)
+            change.after = entries
+
             try Self.restore(entries, in: db)
-            try Self.recalculateCardBills(affectedBy: entries, in: db, at: now)
+            try Self.recalculateCardBills(change, in: db, at: now)
         }
     }
 
@@ -89,7 +111,9 @@ public extension AppDatabase {
 
             _ = try Entry.deleteAll(db, keys: ids)
 
-            try Self.recalculateCardBills(affectedBy: entries + fees, in: db, at: now)
+            let change = CardBillChange(before: entries + fees)
+
+            try Self.recalculateCardBills(change, in: db, at: now)
 
             return entries + fees
         }
@@ -108,10 +132,10 @@ public extension AppDatabase {
                 try Self.canChange(entry, to: change, in: db)
             }
 
-            var touched: [Entry] = []
+            var touched = CardBillChange()
 
             for var entry in changed {
-                touched.append(entry)
+                touched.before.append(entry)
 
                 switch change {
                 case let .category(id):
@@ -126,10 +150,10 @@ public extension AppDatabase {
 
                 try entry.update(db)
 
-                touched.append(entry)
+                touched.after.append(entry)
             }
 
-            try Self.recalculateCardBills(affectedBy: touched, in: db, at: now)
+            try Self.recalculateCardBills(touched, in: db, at: now)
 
             return changed
         }
@@ -144,7 +168,31 @@ extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws -> Entry {
+        var change = CardBillChange()
+
+        let entry = try saveEntry(
+            draft,
+            editing: id,
+            change: &change,
+            in: db,
+            at: now
+        )
+
+        try recalculateCardBills(change, in: db, at: now)
+
+        return entry
+    }
+
+    @discardableResult
+    static func saveEntry(
+        _ draft: EntryDraft,
+        editing id: Entry.ID?,
+        change: inout CardBillChange,
+        in db: Database,
+        at now: Date
+    ) throws -> Entry {
         let before = try id.flatMap { try Entry.fetchOne(db, key: $0) }
+        let beforeFee = try before.flatMap { try fee(of: $0.id, in: db) }
 
         let entry = try Self.entry(
             from: draft,
@@ -170,7 +218,11 @@ extension AppDatabase {
         }
 
         try saveFee(draft.fee, for: entry, in: db, at: now)
-        try recalculateCardBills(affectedBy: [before, entry].compactMap(\.self), in: db, at: now)
+
+        let afterFee = try fee(of: entry.id, in: db)
+
+        change.before += [before, beforeFee].compactMap(\.self)
+        change.after += [entry, afterFee].compactMap(\.self)
 
         return entry
     }
@@ -231,6 +283,8 @@ private extension AppDatabase {
             + entries.filter { $0.transferId != nil }
 
         for var entry in ordered {
+            try removeRecordedDuplicates(of: entry, in: db)
+
             if let templateId = entry.templateId,
                try !EntryTemplate.exists(db, key: templateId) {
                 entry.templateId = nil
@@ -247,6 +301,28 @@ private extension AppDatabase {
                 try NoSpendDay.deleteOne(db, key: entry.date)
             }
         }
+    }
+
+    static func removeRecordedDuplicates(
+        of entry: Entry,
+        in db: Database
+    ) throws {
+        guard
+            let recurringId = entry.recurringId,
+            let recurringDate = entry.recurringDate
+        else {
+            return
+        }
+
+        let duplicates = Entry
+            .filter(Column("recurring_id") == recurringId)
+            .filter(Column("recurring_date") == recurringDate)
+            .filter(Column("id") != entry.id)
+
+        let ids = try duplicates.fetchAll(db).map(\.id)
+
+        _ = try Entry.filter(ids.contains(Column("transfer_id"))).deleteAll(db)
+        _ = try duplicates.deleteAll(db)
     }
 
     static func canChange(
