@@ -63,6 +63,7 @@ struct NotificationSchedulerTests {
 
         #expect(state.components.count == 1)
         #expect(state.components.first?.timeZone == nil)
+        #expect(state.components.first?.calendar == nil)
         #expect(state.components.first?.hour == 21)
     }
 }

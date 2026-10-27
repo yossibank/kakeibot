@@ -59,7 +59,6 @@ private extension NotificationScheduler {
         of notification: PlannedNotification
     ) -> DateComponents {
         DateComponents(
-            calendar: Calendar(identifier: .gregorian),
             year: notification.date.year,
             month: notification.date.month,
             day: notification.date.day,
@@ -73,6 +72,7 @@ private extension NotificationScheduler {
         in timeZone: TimeZone
     ) -> Date {
         var components = components(of: notification)
+        components.calendar = Calendar(identifier: .gregorian)
         components.timeZone = timeZone
         return components.date ?? .distantPast
     }
