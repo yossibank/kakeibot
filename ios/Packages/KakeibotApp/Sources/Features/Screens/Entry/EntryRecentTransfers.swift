@@ -31,11 +31,11 @@ private extension EntryRecentTransfers {
         } label: {
             HStack(spacing: 8) {
                 HStack(spacing: 4) {
-                    Text(model.wallet(transfer.walletId)?.name ?? "")
+                    name(model.wallet(transfer.walletId)?.name ?? "")
 
                     Text("→")
 
-                    Text(model.wallet(transfer.toWalletId)?.name ?? "")
+                    name(model.wallet(transfer.toWalletId)?.name ?? "")
                 }
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
@@ -64,5 +64,25 @@ private extension EntryRecentTransfers {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+
+    func name(_ text: String) -> some View {
+        ViewThatFits(in: .horizontal) {
+            ForEach(shortened(text), id: \.self) { candidate in
+                Text(candidate)
+            }
+        }
+    }
+}
+
+private extension EntryRecentTransfers {
+    func shortened(_ text: String) -> [String] {
+        let cuts = (1..<max(text.count, 1)).reversed().map { count in
+            let head = text.prefix(count).trimmingCharacters(in: .whitespaces)
+            return "\(head)…"
+        }
+
+        var seen = Set<String>()
+        return ([text] + cuts).filter { seen.insert($0).inserted }
     }
 }

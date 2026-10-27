@@ -8,6 +8,7 @@ public struct EntryRowItem: Identifiable, Equatable {
     public let title: String
     public let tag: String?
     public let detail: String?
+    public let route: EntryRow.Route?
     public let memo: String?
     public let amount: Int
     public let type: Entry.Kind
@@ -23,14 +24,16 @@ extension EntryRowItem {
         let category = entry.categoryId.flatMap { list.categories[$0] }
         let tag = entry.tagId.flatMap { list.tags[$0] }
         let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
-        let wallets = Self.walletText(for: entry, in: list)
+        let route = Self.route(for: entry, in: list)
+        let wallet = route == nil ? Self.walletText(for: entry, in: list) : nil
 
         self.init(
             id: entry.id,
             icon: category.flatMap { list.icons[$0.iconId] },
             title: list.title(of: entry),
             tag: tag?.name,
-            detail: [dayLabel, wallets].rowDetail,
+            detail: [dayLabel, wallet].rowDetail,
+            route: route,
             memo: memo,
             amount: entry.amount,
             type: entry.type,
@@ -44,23 +47,35 @@ private extension EntryRowItem {
         for entry: Entry,
         in list: EntryList
     ) -> String? {
-        if let transfer = transfer(of: entry, in: list) {
-            return walletText(for: transfer, in: list).map { "\($0) の手数料" }
-        }
+        let bill = entry.billMonth.map { "（\($0.month)月払い）" } ?? ""
+        return list.wallets[entry.walletId].map { $0.name + bill }
+    }
 
-        let source = list.wallets[entry.walletId]?.name
+    static func route(
+        for entry: Entry,
+        in list: EntryList
+    ) -> EntryRow.Route? {
+        if let transfer = transfer(of: entry, in: list) {
+            return route(for: transfer, in: list).map { route in
+                EntryRow.Route(
+                    source: route.source,
+                    destination: "\(route.destination) の手数料"
+                )
+            }
+        }
 
         guard
             entry.type == .transfer,
+            let source = list.wallets[entry.walletId],
             let destination = entry.toWalletId.flatMap({ list.wallets[$0] })
         else {
-            let bill = entry.billMonth.map { "（\($0.month)月払い）" } ?? ""
-            return source.map { $0 + bill }
+            return nil
         }
 
-        return [source, destination.name]
-            .compactMap(\.self)
-            .joined(separator: " → ")
+        return EntryRow.Route(
+            source: source.name,
+            destination: destination.name
+        )
     }
 
     static func transfer(
