@@ -1,8 +1,21 @@
 public extension Recurring {
-    func dates(
+    struct Occurrence: Hashable, Sendable {
+        public let scheduled: LocalDate
+        public let date: LocalDate
+
+        public init(
+            scheduled: LocalDate,
+            date: LocalDate
+        ) {
+            self.scheduled = scheduled
+            self.date = date
+        }
+    }
+
+    func occurrences(
         from start: LocalDate,
         through end: LocalDate
-    ) -> [LocalDate] {
+    ) -> [Occurrence] {
         let lower = max(start, startDate)
         let upper = endDate.map { min(end, $0) } ?? end
 
@@ -14,13 +27,21 @@ public extension Recurring {
         let last = upper.yearMonth.adding(months: 1)
 
         return months(from: first, through: last)
-            .map { shifted(LocalDate(yearMonth: $0, clampedDay: day)) }
-            .filter { lower <= $0 && $0 <= upper }
+            .map { LocalDate(yearMonth: $0, clampedDay: day) }
+            .map { Occurrence(scheduled: $0, date: shifted($0)) }
+            .filter { lower <= $0.date && $0.date <= upper }
     }
 
-    func pendingDates(through today: LocalDate) -> [LocalDate] {
+    func dates(
+        from start: LocalDate,
+        through end: LocalDate
+    ) -> [LocalDate] {
+        occurrences(from: start, through: end).map(\.date)
+    }
+
+    func pendingOccurrences(through today: LocalDate) -> [Occurrence] {
         let start = generatedUntil.map { $0.adding(days: 1) } ?? startDate
-        return dates(from: start, through: today)
+        return occurrences(from: start, through: today)
     }
 
     func nextDate(onOrAfter date: LocalDate) -> LocalDate? {
@@ -30,29 +51,35 @@ public extension Recurring {
 
     func isRecorded(
         by entry: Entry,
-        on date: LocalDate
+        scheduled: LocalDate
     ) -> Bool {
         guard
             entry.recurringId == id,
-            let recordedDate = entry.recurringDate
+            let recorded = entry.recurringDate
         else {
             return false
         }
 
-        return occurrenceMonth(of: recordedDate) == occurrenceMonth(of: date)
+        return recorded.yearMonth == scheduled.yearMonth
+    }
+
+    func occurrence(on date: LocalDate) -> Occurrence {
+        Occurrence(scheduled: scheduledDate(of: date), date: date)
     }
 
     func scheduledDate(of date: LocalDate) -> LocalDate {
-        let months = months(
-            from: date.yearMonth.adding(months: -1),
-            through: date.yearMonth.adding(months: 1)
-        )
+        scheduledDate(shiftedTo: date) ?? date
+    }
 
-        let scheduled = months
-            .map { LocalDate(yearMonth: $0, clampedDay: day) }
+    func scheduledDate(shiftedTo date: LocalDate) -> LocalDate? {
+        scheduledDates(shiftedInto: date.yearMonth)
             .first { shifted($0) == date }
+    }
 
-        return scheduled ?? date
+    func scheduledDates(shiftedInto month: YearMonth) -> [LocalDate] {
+        months(from: month.adding(months: -1), through: month.adding(months: 1))
+            .map { LocalDate(yearMonth: $0, clampedDay: day) }
+            .filter { shifted($0).yearMonth == month }
     }
 
     func occurrenceMonth(of date: LocalDate) -> YearMonth {

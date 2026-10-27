@@ -155,6 +155,7 @@ public extension HomeModel {
             recurrings: recurrings,
             wallets: Array(list.wallets.values),
             entries: list.days.flatMap(\.entries),
+            valuations: list.valuations,
             after: today
         )
     }

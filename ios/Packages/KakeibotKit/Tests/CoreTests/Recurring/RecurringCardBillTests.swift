@@ -15,6 +15,43 @@ struct RecurringCardBillTests {
         #expect(period == fixture.from...fixture.through)
     }
 
+    @Test(arguments: ["2027-01", "2027-12"])
+    func continuesPeriodsAcrossShortMonths(
+        start: String
+    ) throws {
+        let first = try #require(YearMonth(start))
+
+        for closingDay in 28...31 {
+            for day in 28...31 {
+                let bill = try Self.bill(closingDay: closingDay, day: day)
+
+                let periods = try (0..<14).map { offset in
+                    let month = first.adding(months: offset)
+
+                    let paidOn = try #require(
+                        stride(from: day, through: 1, by: -1)
+                            .lazy
+                            .compactMap { LocalDate(yearMonth: month, day: $0) }
+                            .first
+                    )
+
+                    return try #require(bill.billingPeriod(paidOn: paidOn))
+                }
+
+                #expect(periods.count == 14)
+
+                for (previous, next) in zip(periods, periods.dropFirst()) {
+                    #expect(
+                        previous.upperBound.adding(days: 1) == next.lowerBound,
+                        Comment(
+                            rawValue: "closing \(closingDay) day \(day) at \(next.lowerBound)"
+                        )
+                    )
+                }
+            }
+        }
+    }
+
     @Test
     func sumsCardUsageOfPeriod() throws {
         let bill = try Self.bill(closingDay: 15)

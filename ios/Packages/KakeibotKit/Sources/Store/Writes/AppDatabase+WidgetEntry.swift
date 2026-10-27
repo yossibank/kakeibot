@@ -41,7 +41,15 @@ public extension AppDatabase {
         at now: Date = Date()
     ) async throws {
         try await writer.write { db in
+            let entry = try Entry.fetchOne(db, key: id)
+
             _ = try Entry.deleteOne(db, key: id)
+
+            if let entry {
+                let change = CardBillChange(before: [entry])
+
+                try Self.recalculateCardBills(change, in: db, at: now)
+            }
 
             guard let record = try Self.setting(.widgetEntry, in: db),
                   record.entryId == id
