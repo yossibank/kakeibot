@@ -12,20 +12,14 @@ public extension Recurring {
 
         let scheduled = scheduledDate(of: date)
 
-        let thisMonth = LocalDate(
-            yearMonth: scheduled.yearMonth,
-            clampedDay: closingDay
-        )
+        let closingMonth = day > closingDay
+            ? scheduled.yearMonth
+            : scheduled.yearMonth.adding(months: -1)
 
-        let closing = thisMonth < scheduled
-            ? thisMonth
-            : LocalDate(
-                yearMonth: scheduled.yearMonth.adding(months: -1),
-                clampedDay: closingDay
-            )
+        let closing = LocalDate(yearMonth: closingMonth, clampedDay: closingDay)
 
         let previous = LocalDate(
-            yearMonth: closing.yearMonth.adding(months: -1),
+            yearMonth: closingMonth.adding(months: -1),
             clampedDay: closingDay
         )
 

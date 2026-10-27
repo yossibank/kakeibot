@@ -63,6 +63,7 @@ private extension AppDatabase {
             recurrings: recurrings,
             wallets: wallets,
             entries: Entry.fetchAll(db),
+            valuations: Valuation.fetchAll(db),
             after: start.adding(days: -1)
         )
 
