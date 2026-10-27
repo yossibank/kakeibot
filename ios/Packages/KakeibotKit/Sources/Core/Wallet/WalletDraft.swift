@@ -8,6 +8,7 @@ public struct WalletDraft: Hashable, Sendable {
     public var initialBalance: Int
     public var loanAmount: Int?
     public var recordedKind: Wallet.Kind?
+    public var hasValuations: Bool
 
     public init(
         kind: Wallet.Kind,
@@ -16,7 +17,8 @@ public struct WalletDraft: Hashable, Sendable {
         color: String,
         initialBalance: Int,
         loanAmount: Int? = nil,
-        recordedKind: Wallet.Kind? = nil
+        recordedKind: Wallet.Kind? = nil,
+        hasValuations: Bool = false
     ) {
         self.kind = kind
         self.name = name
@@ -25,6 +27,7 @@ public struct WalletDraft: Hashable, Sendable {
         self.initialBalance = initialBalance
         self.loanAmount = loanAmount
         self.recordedKind = recordedKind
+        self.hasValuations = hasValuations
     }
 }
 
@@ -36,10 +39,6 @@ public extension WalletDraft {
     var problems: [DraftProblem] {
         let nameProblems: [DraftProblem] = trimmedName.isEmpty
             ? [.emptyName]
-            : []
-
-        let kindProblems: [DraftProblem] = isKindLocked
-            ? [.kindLocked]
             : []
 
         return nameProblems + icon.problems + kindProblems
@@ -57,6 +56,19 @@ public extension WalletDraft {
             initialBalance: wallet.initialBalance,
             loanAmount: wallet.loanAmount
         )
+    }
+
+    func locked(
+        by wallet: Wallet,
+        hasRecords: Bool,
+        hasValuations: Bool
+    ) -> WalletDraft {
+        var locked = self
+
+        locked.recordedKind = hasRecords ? wallet.kind : nil
+        locked.hasValuations = hasValuations
+
+        return locked
     }
 
     func newIcon(at now: Date) throws -> Icon {
@@ -110,8 +122,20 @@ public extension WalletDraft {
 }
 
 private extension WalletDraft {
-    var isKindLocked: Bool {
-        recordedKind.map { $0.isDebt != kind.isDebt } ?? false
+    var kindProblems: [DraftProblem] {
+        guard let recordedKind else {
+            return []
+        }
+
+        if recordedKind.isDebt != kind.isDebt {
+            return [.kindLocked]
+        }
+
+        if hasValuations, recordedKind == .investment, kind != .investment {
+            return [.valuedKindLocked]
+        }
+
+        return []
     }
 
     var trimmedName: String {

@@ -118,6 +118,7 @@ extension WalletDraftTests {
         let name: String
         let kind: Wallet.Kind
         let recordedKind: Wallet.Kind?
+        let hasValuations: Bool?
         let mark: FixtureMark
         let color: String
         let initialBalance: Int
@@ -135,7 +136,8 @@ extension WalletDraftTests.DraftCase {
             mark: mark,
             color: color,
             initialBalance: initialBalance,
-            recordedKind: recordedKind
+            recordedKind: recordedKind,
+            hasValuations: hasValuations ?? false
         )
     }
 }

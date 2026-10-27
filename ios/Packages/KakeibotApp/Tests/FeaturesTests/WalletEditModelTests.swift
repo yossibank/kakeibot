@@ -165,6 +165,95 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func confirmsHidingWalletWithOnlyFutureEntries() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let bank = try await setup.wallet(named: "銀行")
+        let today = LocalDate(Date(), in: .current)
+
+        let future = EntryDraft(
+            type: .expense,
+            amount: 400,
+            date: today.adding(days: 3),
+            categoryId: options.expenseCategories[0].id,
+            walletId: bank.id
+        )
+
+        try await setup.database.saveEntry(future, at: Date())
+        let model = WalletEditModel(database: setup.database, editing: bank.id)
+
+        await model.load()
+
+        #expect(model.balance == 0)
+        #expect(model.needsHideConfirmation)
+    }
+
+    @Test
+    func locksKindWhenOnlyHiddenRecurringUsesWallet() async throws {
+        let setup = try await Setup()
+        let bank = try await setup.wallet(named: "銀行")
+        let cash = try await setup.wallet(named: "財布")
+        let today = LocalDate(Date(), in: .current)
+
+        let draft = RecurringDraft(
+            type: .transfer,
+            amount: 1000,
+            categoryId: nil,
+            walletId: bank.id,
+            toWalletId: cash.id,
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: today.adding(days: 30)
+        )
+
+        let saved = try await setup.database.saveRecurring(
+            draft,
+            today: today,
+            at: Date()
+        )
+
+        try await setup.database.setRecurringHidden(
+            saved.id,
+            isHidden: true,
+            today: today,
+            at: Date()
+        )
+
+        let model = WalletEditModel(database: setup.database, editing: cash.id)
+        await model.load()
+
+        model.kind = .card
+
+        #expect(model.draft.problems == [.kindLocked])
+    }
+
+    @Test
+    func locksInvestmentWithValuation() async throws {
+        let setup = try await Setup()
+        let today = LocalDate(Date(), in: .current)
+
+        let adding = WalletEditModel(database: setup.database)
+        adding.name = "積立"
+        adding.kind = .investment
+        let saved = try #require(await adding.save())
+
+        try await setup.database.saveValuation(
+            150_000,
+            of: saved.id,
+            on: today,
+            at: Date()
+        )
+
+        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        await model.load()
+
+        model.kind = .bank
+
+        #expect(model.draft.problems == [.valuedKindLocked])
+    }
+
+    @Test
     func loadsAndEditsWallet() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")

@@ -369,7 +369,7 @@ private extension WalletListView {
     }
 
     func requestHide(_ wallet: Wallet) {
-        guard model.balance(of: wallet) == 0 else {
+        guard !model.needsHideConfirmation(of: wallet) else {
             hiding = wallet
             isConfirmingHide = true
             return

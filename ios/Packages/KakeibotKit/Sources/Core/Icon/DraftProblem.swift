@@ -7,4 +7,5 @@ public enum DraftProblem: String, CaseIterable, Codable, Error, Sendable {
     case nameTooLong
     case unreadableColors
     case kindLocked
+    case valuedKindLocked
 }

@@ -32,6 +32,13 @@ public extension WalletListModel {
         list?.icons[wallet.iconId]
     }
 
+    func needsHideConfirmation(of wallet: Wallet) -> Bool {
+        let entries = list?.days.flatMap(\.entries) ?? []
+        let valuations = list?.valuations ?? []
+
+        return wallet.balance(with: entries, valuations: valuations) != 0
+    }
+
     func balance(of wallet: Wallet) -> Int {
         let entries = list?.days.flatMap(\.entries) ?? []
         let valuations = list?.valuations ?? []

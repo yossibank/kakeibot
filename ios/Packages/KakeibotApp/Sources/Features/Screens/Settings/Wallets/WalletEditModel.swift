@@ -24,6 +24,8 @@ public final class WalletEditModel {
     public private(set) var isHidden = false
     public private(set) var payment: Recurring?
     public private(set) var recordedKind: Wallet.Kind?
+    public private(set) var hasValuations = false
+    public private(set) var totalBalance = 0
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -68,7 +70,8 @@ public extension WalletEditModel {
             color: icon.color,
             initialBalance: initialBalance,
             loanAmount: loanAmount.amount > 0 ? loanAmount.amount : nil,
-            recordedKind: recordedKind
+            recordedKind: recordedKind,
+            hasValuations: hasValuations
         )
     }
 
@@ -150,7 +153,7 @@ public extension WalletEditModel {
     }
 
     var needsHideConfirmation: Bool {
-        !isHidden && balance != 0
+        !isHidden && totalBalance != 0
     }
 
     static func glyph(for kind: Wallet.Kind) -> Icon.Glyph {
@@ -250,7 +253,7 @@ public extension WalletEditModel {
             apply(WalletDraft(wallet, icon: icon))
             apply(list, to: wallet)
 
-            let recurrings = try await database.recurrings()
+            let recurrings = try await database.recurrings(includingHidden: true)
 
             let hasRecords = Self.hasRecords(
                 of: wallet,
@@ -258,7 +261,14 @@ public extension WalletEditModel {
                 recurrings: recurrings
             )
 
-            recordedKind = hasRecords ? wallet.kind : nil
+            let locked = WalletDraft(wallet, icon: icon).locked(
+                by: wallet,
+                hasRecords: hasRecords,
+                hasValuations: list.valuations.contains { $0.walletId == wallet.id }
+            )
+
+            recordedKind = locked.recordedKind
+            hasValuations = locked.hasValuations
             isHidden = wallet.archivedAt != nil
             baseline = draft
 
@@ -393,11 +403,15 @@ private extension WalletEditModel {
         _ list: EntryList,
         to wallet: Wallet
     ) {
+        let entries = list.days.flatMap(\.entries)
+
         balance = wallet.balance(
-            with: list.days.flatMap(\.entries),
+            with: entries,
             valuations: list.valuations,
             through: Self.today
         )
+
+        totalBalance = wallet.balance(with: entries, valuations: list.valuations)
 
         valuations = list.valuations
             .filter { $0.walletId == wallet.id }

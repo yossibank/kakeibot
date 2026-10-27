@@ -250,6 +250,115 @@ struct WalletWriteTests {
 }
 
 extension WalletWriteTests {
+    @Test
+    func refusesDebtChangeWhenWalletHasEntries() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let bank = try await setup.wallet(named: "銀行")
+        let day = try #require(LocalDate("2026-10-10"))
+
+        let entry = EntryDraft(
+            type: .expense,
+            amount: 500,
+            date: day,
+            categoryId: options.expenseCategories[0].id,
+            walletId: bank.id
+        )
+
+        try await setup.database.saveEntry(entry, at: setup.now)
+        var draft = setup.draft
+        draft.kind = .card
+
+        await #expect(throws: DraftProblem.kindLocked) {
+            try await setup.database.saveWallet(draft, editing: bank.id, at: setup.now)
+        }
+
+        let stored = try await setup.wallet(named: "銀行")
+
+        #expect(stored.kind == .bank)
+    }
+
+    @Test
+    func refusesDebtChangeWhenOnlyHiddenRecurringUsesWallet() async throws {
+        let setup = try await Setup()
+        let bank = try await setup.wallet(named: "銀行")
+        let cash = try await setup.wallet(named: "財布")
+        let day = try #require(LocalDate("2026-10-10"))
+
+        let recurring = RecurringDraft(
+            type: .transfer,
+            amount: 1000,
+            categoryId: nil,
+            walletId: bank.id,
+            toWalletId: cash.id,
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: day.adding(days: 30)
+        )
+
+        let saved = try await setup.database.saveRecurring(
+            recurring,
+            today: day,
+            at: setup.now
+        )
+
+        try await setup.database.setRecurringHidden(
+            saved.id,
+            isHidden: true,
+            today: day,
+            at: setup.now
+        )
+
+        var draft = setup.draft
+        draft.kind = .card
+
+        await #expect(throws: DraftProblem.kindLocked) {
+            try await setup.database.saveWallet(draft, editing: cash.id, at: setup.now)
+        }
+    }
+
+    @Test
+    func refusesLeavingInvestmentWhenValued() async throws {
+        let setup = try await Setup()
+        let day = try #require(LocalDate("2026-10-10"))
+        var investment = setup.draft
+        investment.kind = .investment
+        let saved = try await setup.database.saveWallet(investment, at: setup.now)
+
+        try await setup.database.saveValuation(
+            150_000,
+            of: saved.id,
+            on: day,
+            at: setup.now
+        )
+
+        var draft = investment
+        draft.kind = .bank
+
+        await #expect(throws: DraftProblem.valuedKindLocked) {
+            try await setup.database.saveWallet(draft, editing: saved.id, at: setup.now)
+        }
+    }
+
+    @Test
+    func changesKindFreelyWithoutRecords() async throws {
+        let setup = try await Setup()
+        let saved = try await setup.database.saveWallet(setup.draft, at: setup.now)
+        var draft = setup.draft
+        draft.kind = .cash
+
+        let updated = try await setup.database.saveWallet(
+            draft,
+            editing: saved.id,
+            at: setup.now
+        )
+
+        #expect(updated.kind == .cash)
+    }
+}
+
+extension WalletWriteTests {
     struct Setup {
         let database: AppDatabase
         let now: Date

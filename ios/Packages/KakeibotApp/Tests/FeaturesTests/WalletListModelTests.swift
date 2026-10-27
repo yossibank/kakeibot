@@ -79,6 +79,32 @@ struct WalletListModelTests {
     }
 
     @Test
+    func confirmsHidingWalletWithOnlyFutureEntries() async throws {
+        let database = try AppDatabase.inMemory()
+        try database.insertDefaultsIfEmpty(at: Date())
+        let options = try await database.entryOptions()
+        let cash = try #require(options.wallets.first)
+        let bank = try #require(options.wallets.last)
+        let today = LocalDate(Date(), in: .current)
+
+        let future = EntryDraft(
+            type: .expense,
+            amount: 400,
+            date: today.adding(days: 3),
+            categoryId: options.expenseCategories[0].id,
+            walletId: cash.id
+        )
+
+        try await database.saveEntry(future, at: Date())
+        let model = WalletListModel(database: database)
+        await model.load()
+
+        #expect(model.balance(of: cash) == 0)
+        #expect(model.needsHideConfirmation(of: cash))
+        #expect(!model.needsHideConfirmation(of: bank))
+    }
+
+    @Test
     func hidesWalletButKeepsTheLastOne() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())
