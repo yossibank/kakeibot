@@ -41,6 +41,20 @@ public extension AssetsModel {
         public var id: Wallet.ID {
             wallet.id
         }
+
+        public var repaidPercent: Int? {
+            guard
+                wallet.kind == .loan,
+                let loanAmount = wallet.loanAmount,
+                loanAmount > 0
+            else {
+                return nil
+            }
+
+            let repaid = loanAmount - max(-balance, 0)
+
+            return Percent.floor(repaid, of: loanAmount)
+        }
     }
 
     enum Repayment: Equatable {
@@ -269,6 +283,10 @@ public extension AssetsModel {
 
     func progress(to goal: RewardGoal) -> Double {
         rewardBank?.progress(to: goal) ?? 0
+    }
+
+    func percent(to goal: RewardGoal) -> Int {
+        rewardBank?.percent(to: goal) ?? 0
     }
 
     func goalEditModel(editing goal: RewardGoal?) -> AssetsGoalEditModel {

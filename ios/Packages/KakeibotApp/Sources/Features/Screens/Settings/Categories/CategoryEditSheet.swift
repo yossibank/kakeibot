@@ -6,6 +6,7 @@ import SwiftUI
 public struct CategoryEditSheet: View {
     @State private var model: CategoryEditModel
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
     @State private var tagEdit: TagEdit?
     @State private var isMovingTag = false
@@ -57,6 +58,19 @@ public struct CategoryEditSheet: View {
         )
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
+        }
+        .confirmsUnsavedHide(
+            isHidden: model.isHidden,
+            canSave: model.canSave,
+            isPresented: $isConfirmingHideChanges
+        ) {
+            Task {
+                await save(hiding: true)
+            }
+        } onDiscard: {
+            Task {
+                await setHidden(!model.isHidden)
+            }
         }
         .confirmsDiscard(
             when: model.isChanged,
@@ -152,9 +166,7 @@ private extension CategoryEditSheet {
         ) {
             close()
         } onHide: {
-            Task {
-                await setHidden(!model.isHidden)
-            }
+            toggleHidden()
         } onDelete: {
             isConfirmingDelete = true
         }
@@ -395,7 +407,7 @@ private extension CategoryEditSheet {
         }
     }
 
-    func save() async {
+    func save(hiding: Bool = false) async {
         focus = nil
 
         guard let category = await model.save() else {
@@ -403,7 +415,26 @@ private extension CategoryEditSheet {
         }
 
         onSave(category)
+
+        if hiding {
+            guard await model.setHidden(!model.isHidden) else {
+                return
+            }
+        }
+
         dismiss()
+    }
+
+    func toggleHidden() {
+        guard model.isChanged else {
+            Task {
+                await setHidden(!model.isHidden)
+            }
+
+            return
+        }
+
+        isConfirmingHideChanges = true
     }
 
     func setHidden(_ isHidden: Bool) async {

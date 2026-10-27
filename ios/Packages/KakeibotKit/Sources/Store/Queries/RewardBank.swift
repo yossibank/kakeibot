@@ -68,6 +68,10 @@ public extension RewardBank {
         return min(max(ratio, 0), 1)
     }
 
+    func percent(to goal: RewardGoal) -> Int {
+        Percent.floor(balance, of: goal.targetAmount)
+    }
+
     func logs(on date: LocalDate) -> [RewardLog] {
         logs.filter { $0.date == date }
     }

@@ -780,11 +780,11 @@ private extension AssetsView {
         if let repayment = row.repayment {
             let text = Self.repaymentText(repayment)
 
-            guard let ratio = row.repaidRatio else {
+            guard let percent = row.repaidPercent else {
                 return text
             }
 
-            return "\(Int((ratio * 100).rounded(.down)))%・\(text)"
+            return "\(percent)%・\(text)"
         }
 
         guard row.wallet.kind == .card else {

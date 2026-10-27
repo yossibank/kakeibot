@@ -671,7 +671,7 @@ private extension EntrySheet {
     static let selectedScale: CGFloat = 1.05
     static let liftInset: CGFloat = 10
     static let actionInset: CGFloat = 6
-    static let menuPressDuration = 0.15
+    static let menuPressDuration = 0.4
 
     static let drawerShape = UnevenRoundedRectangle(
         topLeadingRadius: 28,

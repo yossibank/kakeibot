@@ -7,6 +7,7 @@ public struct TemplateEditSheet: View {
     @State private var model: TemplateEditModel
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
+    @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
@@ -76,6 +77,19 @@ public struct TemplateEditSheet: View {
             }
             .sensoryFeedback(.selection, trigger: model.categoryId)
             .sensoryFeedback(.selection, trigger: model.walletId)
+            .confirmsUnsavedHide(
+                isHidden: model.isHidden,
+                canSave: model.canSave,
+                isPresented: $isConfirmingHideChanges
+            ) {
+                Task {
+                    await save(hiding: true)
+                }
+            } onDiscard: {
+                Task {
+                    await setHidden(!model.isHidden)
+                }
+            }
             .confirmsDiscard(
                 when: model.isChanged,
                 isPresented: $isConfirmingDiscard
@@ -152,9 +166,7 @@ private extension TemplateEditSheet {
         ) {
             close()
         } onHide: {
-            Task {
-                await setHidden(!model.isHidden)
-            }
+            toggleHidden()
         } onDelete: {
             isConfirmingDelete = true
         }
@@ -566,7 +578,7 @@ private extension TemplateEditSheet {
         }
     }
 
-    func save() async {
+    func save(hiding: Bool = false) async {
         closePanel()
 
         guard let template = await model.save() else {
@@ -574,6 +586,13 @@ private extension TemplateEditSheet {
         }
 
         onSave(template)
+
+        if hiding {
+            guard await model.setHidden(!model.isHidden) else {
+                return
+            }
+        }
+
         dismiss()
     }
 
@@ -582,6 +601,18 @@ private extension TemplateEditSheet {
             onDelete(deletion)
             dismiss()
         }
+    }
+
+    func toggleHidden() {
+        guard model.isChanged else {
+            Task {
+                await setHidden(!model.isHidden)
+            }
+
+            return
+        }
+
+        isConfirmingHideChanges = true
     }
 
     func setHidden(_ isHidden: Bool) async {
