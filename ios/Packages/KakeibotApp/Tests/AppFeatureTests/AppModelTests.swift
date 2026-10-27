@@ -1,6 +1,7 @@
 @testable import AppFeature
 import Core
 import Foundation
+import Notifications
 import Store
 import Testing
 
@@ -70,6 +71,23 @@ struct AppModelTests {
         let entries = try database.snapshot().entries
 
         #expect(entries.map(\.recurringDate) == [today])
+    }
+
+    @Test
+    func reschedulesNotificationsOnDemand() async throws {
+        let database = try AppDatabase.inMemory()
+        let client = NotificationSchedulerTests.FakeCenter(pending: [])
+        let scheduler = NotificationScheduler(client: client)
+        try await database.setSetting(.onboardingCompleted, to: true)
+        try await database.setSetting(.reminderTime, to: .evening)
+        let model = AppModel(openDatabase: { database }, scheduler: scheduler)
+
+        await model.open()
+        await model.rescheduleNotifications()
+
+        let state = await client.state
+
+        #expect(!state.added.isEmpty)
     }
 
     @Test

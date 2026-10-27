@@ -104,6 +104,32 @@ struct TagWriteTests {
     }
 
     @Test
+    func hidesArchivedTagFromTemplateDetail() async throws {
+        let setup = try await Setup()
+        try await setup.saveFood(tags: ["朝ごはん"])
+        let tag = try #require(try await setup.foodTags().first)
+        let entry = try await setup.entryDraft()
+
+        let draft = EntryTemplateDraft(
+            name: "朝",
+            type: .expense,
+            amount: 500,
+            categoryId: entry.categoryId,
+            tagId: tag.id,
+            walletId: entry.walletId
+        )
+
+        let template = try await setup.database.saveTemplate(draft, at: setup.now)
+        let before = try await setup.database.entryList().detailParts(for: template)
+
+        try await setup.saveFood([])
+        let after = try await setup.database.entryList().detailParts(for: template)
+
+        #expect(before.contains("朝ごはん"))
+        #expect(!after.contains("朝ごはん"))
+    }
+
+    @Test
     func savesEntryWithTagOfItsCategory() async throws {
         let setup = try await Setup()
         try await setup.saveFood(tags: ["昼ごはん"])

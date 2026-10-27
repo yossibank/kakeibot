@@ -53,6 +53,95 @@ struct BackupModelTests {
     }
 
     @Test
+    func asksPermissionAfterRestoringReminder() async throws {
+        let setup = try Setup()
+        let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+
+        let target = BackupModel(
+            database: setup.target,
+            stash: setup.stash,
+            permission: client.permission
+        )
+
+        try await setup.source.setSetting(.reminderTime, to: .evening)
+        await source.makeFile(.json, at: setup.now)
+        let file = try #require(source.file)
+
+        target.read(file.data)
+        await target.restore()
+
+        let requested = await client.requested
+        let rescheduled = await client.rescheduled
+
+        #expect(requested)
+        #expect(rescheduled)
+    }
+
+    @Test
+    func asksPermissionAfterRestoringRecurringWithNotice() async throws {
+        let setup = try Setup()
+        let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+        let today = LocalDate(setup.now, in: .current)
+        let options = try await setup.source.entryOptions()
+
+        let draft = RecurringDraft(
+            type: .expense,
+            amount: 78000,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            memo: "家賃",
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: today,
+            remindDaysBefore: 3
+        )
+
+        try await setup.source.saveRecurring(draft, today: today, at: setup.now)
+
+        let target = BackupModel(
+            database: setup.target,
+            stash: setup.stash,
+            permission: client.permission
+        )
+
+        await source.makeFile(.json, at: setup.now)
+        let file = try #require(source.file)
+
+        target.read(file.data)
+        await target.restore()
+
+        let requested = await client.requested
+
+        #expect(requested)
+    }
+
+    @Test
+    func doesNotAskPermissionWithoutNotifications() async throws {
+        let setup = try Setup()
+        let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+
+        let target = BackupModel(
+            database: setup.target,
+            stash: setup.stash,
+            permission: client.permission
+        )
+
+        await source.makeFile(.json, at: setup.now)
+        let file = try #require(source.file)
+
+        target.read(file.data)
+        await target.restore()
+
+        let requested = await client.requested
+
+        #expect(!requested)
+    }
+
+    @Test
     func keepsDataWhenCancelled() async throws {
         let setup = try Setup()
         let source = BackupModel(database: setup.source, stash: setup.stash)

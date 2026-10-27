@@ -62,7 +62,9 @@ struct RecurringModelTests {
 
         let saved = await model.save(permission: client.permission)
         let asked = await client.requested
+        let rescheduled = await client.rescheduled
 
+        #expect(rescheduled)
         #expect(saved)
         #expect(!askedWithout)
         #expect(asked)

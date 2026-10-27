@@ -341,9 +341,7 @@ private extension RecurringEditModel {
             return
         }
 
-        if await permission.authorization() == .notDetermined {
-            _ = await permission.request()
-        }
+        await permission.requestIfUndecided()
     }
 
     func presetPayment() {
