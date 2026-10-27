@@ -19,6 +19,9 @@ struct MainView: View {
     @State private var undo: DeletionUndo
     @State private var isWarmingEntry = true
     @State private var orderMenuAnchor: CGRect?
+    @State private var observationRound = 0
+
+    @Environment(\.scenePhase) private var scenePhase
 
     private let database: AppDatabase
     private let today: LocalDate
@@ -98,6 +101,9 @@ struct MainView: View {
                     onShowRecords: {
                         tab = .records
                     },
+                    onRetry: {
+                        observationRound += 1
+                    },
                     onOpenSettings: {
                         sheet = .settings
                     },
@@ -160,6 +166,9 @@ struct MainView: View {
                         }
                     }
                 )
+                .loadFailed(records.isListFailed) {
+                    observationRound += 1
+                }
                 .tabContent()
             }
 
@@ -178,6 +187,9 @@ struct MainView: View {
                         tab = .records
                     }
                 )
+                .loadFailed(review.isListFailed) {
+                    observationRound += 1
+                }
                 .tabContent()
             }
 
@@ -200,6 +212,9 @@ struct MainView: View {
                         sheet = .reward
                     }
                 )
+                .loadFailed(assets.isListFailed) {
+                    observationRound += 1
+                }
                 .tabContent()
             }
         }
@@ -242,19 +257,19 @@ struct MainView: View {
         .sheet(item: $sheet, onDismiss: prepareDraft) { sheet in
             sheetContent(for: sheet)
         }
-        .task {
+        .task(id: observationRound) {
             await home.run()
         }
-        .task {
+        .task(id: observationRound) {
             await records.run()
         }
-        .task {
+        .task(id: observationRound) {
             await review.run()
         }
-        .task {
+        .task(id: observationRound) {
             await assets.run()
         }
-        .task {
+        .task(id: observationRound) {
             await setup.run()
         }
         .task {
@@ -269,6 +284,11 @@ struct MainView: View {
                 open(route)
             } else {
                 await openLaunchScreen()
+            }
+        }
+        .onChange(of: scenePhase) { old, phase in
+            if old == .background, phase == .active {
+                observationRound += 1
             }
         }
         .onChange(of: isLoaded, initial: true) {

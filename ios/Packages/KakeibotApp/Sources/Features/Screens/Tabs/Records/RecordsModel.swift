@@ -18,6 +18,7 @@ public final class RecordsModel: ScreenModel {
     public private(set) var weekStart: Weekday = .sunday
     public private(set) var layout: RecordsLayout = .calendar
     public private(set) var list: EntryList?
+    public private(set) var isListFailed = false
     public private(set) var noSpendDays: Set<LocalDate> = []
     public private(set) var stampCalendar: StampCalendar?
     public private(set) var stampShelf: IconShelf?
@@ -386,7 +387,9 @@ private extension RecordsModel {
     }
 
     func observe() async {
-        await observe(
+        isListFailed = false
+
+        isListFailed = await observe(
             database.entryListUpdates(),
             failure: Self.loadFailedMessage
         ) { list in

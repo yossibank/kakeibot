@@ -13,6 +13,7 @@ public final class HomeModel: ScreenModel {
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var templateOrder: TemplateOrder = .manual
     public private(set) var list: EntryList?
+    public private(set) var isListFailed = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -335,7 +336,9 @@ private extension HomeModel {
     static let recurringTitle = "固定費"
 
     func observe() async {
-        await observe(
+        isListFailed = false
+
+        isListFailed = await observe(
             database.entryListUpdates(),
             failure: Self.loadFailedMessage
         ) { list in

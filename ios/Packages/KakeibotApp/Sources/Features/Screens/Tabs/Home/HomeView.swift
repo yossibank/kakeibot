@@ -13,6 +13,7 @@ public struct HomeView: View {
     private let isSheetOpen: Bool
     private let onOpenEntry: (Entry.ID) -> Void
     private let onShowRecords: () -> Void
+    private let onRetry: () -> Void
     private let onOpenSettings: () -> Void
     private let onUseTemplate: (EntryTemplate) -> Void
     private let onShowAllTemplates: () -> Void
@@ -30,6 +31,7 @@ public struct HomeView: View {
         isSheetOpen: Bool,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onShowRecords: @escaping () -> Void,
+        onRetry: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
         onUseTemplate: @escaping (EntryTemplate) -> Void,
         onShowAllTemplates: @escaping () -> Void,
@@ -46,6 +48,7 @@ public struct HomeView: View {
         self.isSheetOpen = isSheetOpen
         self.onOpenEntry = onOpenEntry
         self.onShowRecords = onShowRecords
+        self.onRetry = onRetry
         self.onOpenSettings = onOpenSettings
         self.onUseTemplate = onUseTemplate
         self.onShowAllTemplates = onShowAllTemplates
@@ -362,7 +365,9 @@ private extension HomeView {
                     .frame(minHeight: 44)
             }
 
-            if model.recentRows.isEmpty {
+            if model.isListFailed {
+                LoadFailedNotice(onRetry: onRetry)
+            } else if model.recentRows.isEmpty {
                 Text("まだ記録がありません。右下の ＋ から記録できます")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
