@@ -85,7 +85,7 @@ private extension EntryTransferPanel {
                 }
             }
             .padding(.horizontal, 8)
-            .padding(.vertical, 14)
+            .padding(.vertical, 12)
             .frame(maxWidth: .infinity)
             .card(cornerRadius: 20)
             .contentShape(.rect)
