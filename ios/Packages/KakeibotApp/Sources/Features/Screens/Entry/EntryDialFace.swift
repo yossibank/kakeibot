@@ -113,8 +113,8 @@ private extension EntryDialFace {
             return model.sourceBalanceText
         }
 
-        return usage.map { "\($0.remainingTitle) \($0.remainingAmountText)" } ?? model
-            .monthTotalText
+        let remaining = usage.map { "\($0.remainingTitle) \($0.remainingAmountText)" }
+        return remaining ?? model.monthTotalText
     }
 
     var noteColor: Color {

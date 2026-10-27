@@ -32,7 +32,7 @@ public extension RecurringListModel {
         public let title: String
         public let schedule: String
         public let place: String?
-        public let amount: Int
+        public let amount: Int?
         public let type: Entry.Kind
         public let icon: Icon?
         public let next: LocalDate?

@@ -178,7 +178,7 @@ public extension RecurringEditModel {
                 : name,
             schedule: [schedule, holiday].rowDetail ?? schedule,
             place: place.isEmpty ? nil : place,
-            amount: amount,
+            amount: isCardBill ? nil : amount,
             type: type,
             icon: icon,
             next: recurring.nextDate(onOrAfter: today),

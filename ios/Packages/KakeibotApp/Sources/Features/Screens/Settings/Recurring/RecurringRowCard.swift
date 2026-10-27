@@ -27,7 +27,13 @@ struct RecurringRowCard: View {
 
                     Spacer(minLength: 8)
 
-                    AmountText(row.amount, type: row.type)
+                    if let amount = row.amount {
+                        AmountText(amount, type: row.type)
+                    } else {
+                        Text("利用分")
+                            .textFont(.subheadline)
+                            .foregroundStyle(Palette.subtext)
+                    }
                 }
 
                 Text(row.schedule)
