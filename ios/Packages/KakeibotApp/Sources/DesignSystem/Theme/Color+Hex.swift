@@ -37,13 +37,9 @@ extension Color {
         self.init(red: red, green: green, blue: blue)
     }
 
-    init(
-        light: UInt32,
-        dark: UInt32
-    ) {
+    init(semantic: ThemePalette.Semantic) {
         let color = UIColor { traits in
-            let isLight = traits.userInterfaceStyle == .light
-            return UIColor(rgb: isLight ? light : dark)
+            UIColor(rgb: traits[PaletteTrait.self].color(semantic))
         }
 
         self.init(uiColor: color)

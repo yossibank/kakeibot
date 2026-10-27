@@ -1,0 +1,59 @@
+{
+  "description": "意味を持つ色を、地の色に合わせて読める色にする。地は background を 5 色すべてに使う。地が明るければ明るいテーマの元の色、暗ければ暗いテーマの元の色から始め、地のどれとも比が 3 以上ならそのまま返す。足りなければ明度をずらす。color を持つケースは、その色と一致する。color が null のケースは、返る色が元の色と違い、地との比が 3 以上になる。色は #RRGGBB で書く。",
+  "cases": [
+    {
+      "summary": "明るい既定の地では rose は元の色のまま",
+      "background": "#FFFFFF",
+      "semantic": "rose",
+      "color": "#B04A4A"
+    },
+    {
+      "summary": "明るい既定の地では saturday は元の色のまま",
+      "background": "#FFFFFF",
+      "semantic": "saturday",
+      "color": "#2D63B5"
+    },
+    {
+      "summary": "暗い既定の地では rose は元の色のまま",
+      "background": "#16223D",
+      "semantic": "rose",
+      "color": "#E3A3A3"
+    },
+    {
+      "summary": "暗い既定の地では amber は元の色のまま",
+      "background": "#16223D",
+      "semantic": "amber",
+      "color": "#E89B57"
+    },
+    {
+      "summary": "中間の明るさの地で rose をずらす",
+      "background": "#7B7B5D",
+      "semantic": "rose",
+      "color": null
+    },
+    {
+      "summary": "中間の明るさの地で holiday をずらす",
+      "background": "#7B7B5D",
+      "semantic": "holiday",
+      "color": null
+    },
+    {
+      "summary": "中間の明るさの地で amber をずらす",
+      "background": "#7B7B5D",
+      "semantic": "amber",
+      "color": null
+    },
+    {
+      "summary": "青い明るい地で saturday をずらす",
+      "background": "#8FA8C8",
+      "semantic": "saturday",
+      "color": null
+    },
+    {
+      "summary": "青い明るい地で rose をずらす",
+      "background": "#8FA8C8",
+      "semantic": "rose",
+      "color": null
+    }
+  ]
+}
