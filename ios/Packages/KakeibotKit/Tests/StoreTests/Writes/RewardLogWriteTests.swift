@@ -112,6 +112,25 @@ struct RewardLogWriteTests {
     }
 
     @Test
+    func rejectsAchievingHiddenRule() async throws {
+        let setup = try await Setup()
+
+        try await setup.database.setRewardRuleHidden(
+            setup.rule.id,
+            isHidden: true,
+            at: setup.now
+        )
+
+        await #expect(throws: AppDatabase.RewardRuleWriteError.isHidden) {
+            try await setup.achieve(true)
+        }
+
+        let bank = try await setup.database.rewardBank()
+
+        #expect(bank.logs.isEmpty)
+    }
+
+    @Test
     func clearsBeforePurchase() async throws {
         let setup = try await Setup()
         try await setup.achieve(true)

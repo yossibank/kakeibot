@@ -99,12 +99,13 @@ public struct RewardRuleEditSheet: View {
                 ? "貯めた記録があります。非表示にすると、貯めた分を残したまま一覧から外せます"
                 : nil,
             keepTitle: "やめる",
-            confirmTitle: model.hasLogs ? "非表示にする" : "削除する"
+            confirmTitle: model.hasLogs ? "非表示にする" : "削除する",
+            role: model.hasLogs ? .suggestion : .destructive
         ) {
-            Task {
-                if model.hasLogs {
-                    await setHidden(true)
-                } else {
+            if model.hasLogs {
+                toggleHidden()
+            } else {
+                Task {
                     await delete()
                 }
             }
@@ -190,7 +191,8 @@ private extension RewardRuleEditSheet {
         SettingsEditHeader(
             title: model.isEditing ? "ごほうびを編集" : "ごほうびを追加",
             isEditing: model.isEditing,
-            isHidden: model.isHidden
+            isHidden: model.isHidden,
+            canDelete: !(model.isHidden && model.hasLogs)
         ) {
             close()
         } onHide: {

@@ -37,6 +37,10 @@ public extension AppDatabase {
                 return
             }
 
+            guard rule.isActive else {
+                throw RewardRuleWriteError.isHidden
+            }
+
             let log = RewardLog(
                 ruleId: rule.id,
                 date: date,
