@@ -16,6 +16,7 @@ struct RecordsFilterLine: View {
                 .textFont(.caption)
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             Spacer()
 

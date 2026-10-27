@@ -185,6 +185,7 @@ private extension CategoryEditSheet {
                     Text(model.name.isEmpty ? "名前" : model.name)
                         .textFont(size: .caption)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
                 .foregroundStyle(Palette.accentStrong)
                 .frame(width: 86, height: 86)

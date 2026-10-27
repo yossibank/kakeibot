@@ -65,6 +65,7 @@ private extension EntryTransferPanel {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 if let current {
                     Grid(horizontalSpacing: 8, verticalSpacing: 4) {

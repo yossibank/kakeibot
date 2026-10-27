@@ -49,6 +49,7 @@ private extension FeeChoiceRow {
                 .monospacedDigit()
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity)
                 .frame(height: Self.height)
                 .background(fill, in: Capsule())

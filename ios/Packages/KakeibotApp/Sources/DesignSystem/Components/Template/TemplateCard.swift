@@ -39,6 +39,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
                         .tracking(1)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
 

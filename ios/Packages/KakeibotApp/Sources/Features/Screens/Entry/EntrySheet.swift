@@ -547,6 +547,7 @@ private extension EntrySheet {
             Text(category.name)
                 .textFont(size: .caption)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
         .foregroundStyle(color)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

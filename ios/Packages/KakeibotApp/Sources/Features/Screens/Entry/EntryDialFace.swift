@@ -24,11 +24,13 @@ struct EntryDialFace: View {
 
                         Text(route)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     } else if let category = model.selectedCategory {
                         IconImage(model.icon(for: category), size: 13)
 
                         Text(category.name)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                 }
                 .textFont(.footnote, weight: .bold)
@@ -40,6 +42,7 @@ struct EntryDialFace: View {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     .editBadge()
                     .frame(height: Self.amountHeight)
 

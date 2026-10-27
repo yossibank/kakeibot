@@ -370,6 +370,7 @@ private extension AssetsView {
                     .textFont(.caption)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Spacer(minLength: 8)
 
@@ -394,6 +395,7 @@ private extension AssetsView {
                 .textFont(.footnote)
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             Spacer(minLength: 8)
 
@@ -524,12 +526,14 @@ private extension AssetsView {
                         .textFont(.subheadline)
                         .foregroundStyle(Palette.text)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
 
                     if let label = Self.label(of: row) {
                         Text(label)
                             .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
 
                     Spacer(minLength: 8)
@@ -583,6 +587,7 @@ private extension AssetsView {
                                 .textFont(.caption2)
                                 .foregroundStyle(Palette.subtext)
                                 .lineLimit(1)
+                                .minimumScaleFactor(0.8)
                         }
 
                         if let moves = Self.movesText(of: row) {
@@ -615,6 +620,7 @@ private extension AssetsView {
                         .monospacedDigit()
                         .foregroundStyle(Palette.accentStrong)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
 
                 balanceBar(row.bill)

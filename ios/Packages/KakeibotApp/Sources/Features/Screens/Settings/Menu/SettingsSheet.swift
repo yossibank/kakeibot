@@ -394,6 +394,7 @@ private extension SettingsSheet {
                 .textFont(.subheadline)
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .fixedSize()
         }
 
@@ -433,6 +434,7 @@ private extension SettingsSheet {
                 .textFont(.subheadline)
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .layoutPriority(1)
 
             Spacer()
@@ -441,6 +443,7 @@ private extension SettingsSheet {
                 ViewThatFits(in: .horizontal) {
                     Text(value)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                         .fixedSize()
 
                     Text(shortValue ?? value)

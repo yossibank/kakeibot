@@ -12,6 +12,7 @@ struct SettingsSheetTitle: View {
         ViewThatFits(in: .horizontal) {
             label(text, tracking: Self.tracking)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             label(wrapped, tracking: Self.wrappedTracking)
                 .lineLimit(2)

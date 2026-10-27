@@ -290,6 +290,7 @@ private extension TemplateEditSheet {
             }
             .textFont(size: .caption)
             .lineLimit(1)
+            .minimumScaleFactor(0.8)
             .fixedSize()
             .padding(.leading, 8)
             .padding(.trailing, 12)

@@ -22,6 +22,7 @@ public struct MenuHeader<Leading: View>: View {
                 .tracking(1)
                 .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             Spacer(minLength: 0)
         }

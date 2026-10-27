@@ -400,6 +400,7 @@ private extension ReviewView {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 if let note = Self.moveNote(of: move) {
                     Text(note)
@@ -407,6 +408,7 @@ private extension ReviewView {
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
 

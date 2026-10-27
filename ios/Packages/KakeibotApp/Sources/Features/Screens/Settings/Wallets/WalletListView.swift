@@ -266,6 +266,7 @@ private extension WalletListView {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Text(wallet.kind.title)
                     .textFont(.caption2)

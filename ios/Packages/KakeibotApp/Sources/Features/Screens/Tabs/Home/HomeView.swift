@@ -523,6 +523,7 @@ private extension HomeView {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 if bill.shortage > 0 {
                     Text("残高が \(AmountText.text(bill.shortage)) 足りません")
@@ -530,6 +531,7 @@ private extension HomeView {
                         .monospacedDigit()
                         .foregroundStyle(Palette.rose)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
 
@@ -540,6 +542,7 @@ private extension HomeView {
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
         .padding(.vertical, 12)
         .contentShape(.rect)

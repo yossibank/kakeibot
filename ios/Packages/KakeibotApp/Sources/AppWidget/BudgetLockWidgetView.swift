@@ -83,6 +83,7 @@ private extension BudgetLockWidgetView {
                 Text(headline(of: summary))
                     .textFont(.caption)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Spacer(minLength: 4)
 

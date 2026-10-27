@@ -142,6 +142,7 @@ private extension BudgetWidgetView {
             .tracking(1)
             .foregroundStyle(Palette.accent)
             .lineLimit(1)
+            .minimumScaleFactor(0.8)
     }
 
     @ViewBuilder

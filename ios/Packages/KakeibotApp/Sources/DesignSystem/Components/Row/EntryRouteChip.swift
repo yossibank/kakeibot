@@ -20,6 +20,7 @@ public struct EntryRouteChip: View {
             .textFont(.caption)
             .foregroundStyle(textColor)
             .lineLimit(1)
+            .minimumScaleFactor(0.8)
             .truncationMode(.tail)
             .padding(.horizontal, 8)
             .padding(.vertical, 2)

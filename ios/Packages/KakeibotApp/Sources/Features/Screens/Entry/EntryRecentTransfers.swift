@@ -54,6 +54,7 @@ private extension EntryRecentTransfers {
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
 
                 Text(AmountText.text(transfer.amount))

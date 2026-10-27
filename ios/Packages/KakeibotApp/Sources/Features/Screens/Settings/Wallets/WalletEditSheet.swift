@@ -279,6 +279,7 @@ private extension WalletEditSheet {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Text(model.kind.title)
                     .textFont(.caption2)
@@ -509,6 +510,7 @@ private extension WalletEditSheet {
                 .textFont(.footnote)
                 .foregroundStyle(textColor)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(fill, in: Capsule())
                 .overlay {

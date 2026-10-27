@@ -70,6 +70,7 @@ private extension EntryMemoCard {
         .textFont(.caption)
         .foregroundStyle(Palette.text)
         .lineLimit(1)
+        .minimumScaleFactor(0.8)
         .padding(.horizontal, 12)
         .frame(minHeight: 32)
         .overlay(Capsule().stroke(Palette.line, lineWidth: 1))

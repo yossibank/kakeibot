@@ -255,6 +255,7 @@ private extension AssetsRewardSheet {
                     .textFont(.subheadline, weight: .semibold)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Spacer(minLength: 8)
 
@@ -317,6 +318,7 @@ private extension AssetsRewardSheet {
                     .textFont(.caption)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Spacer(minLength: 8)
 
@@ -373,6 +375,7 @@ private extension AssetsRewardSheet {
                 .textFont(.footnote)
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             Spacer(minLength: 8)
 
@@ -397,6 +400,7 @@ private extension AssetsRewardSheet {
                     .textFont(.footnote)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Text(date.formatted(.dateTime.year().month().day()))
                     .textFont(.caption2)
@@ -474,6 +478,7 @@ private extension AssetsRewardSheet {
                 .textFont(.footnote)
                 .foregroundStyle(Palette.text)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             Spacer(minLength: 8)
 

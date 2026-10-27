@@ -40,6 +40,7 @@ struct RecurringRowCard: View {
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 HStack(alignment: .firstTextBaseline) {
                     if let place = row.place {
@@ -47,6 +48,7 @@ struct RecurringRowCard: View {
                             .textFont(.caption)
                             .foregroundStyle(Palette.subtext)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
 
                     Spacer(minLength: 8)
