@@ -27,8 +27,10 @@ private extension MigrationV25 {
 
     static let billEntrySQL = """
     SELECT id, wallet_id, bill_month FROM entry
-    WHERE bill_month IS NOT NULL
+    WHERE bill_month IS NOT NULL AND updated_at < '\(billMonthCutoff)'
     """
+
+    static let billMonthCutoff = "2026-10-27T09:28:13"
 
     static let sameOccurrenceSQL = """
     SELECT EXISTS (
