@@ -25,6 +25,14 @@ public extension AppDatabase {
                 recurring = try draft.applied(to: current, at: now)
 
                 try recurring.update(db)
+
+                try Self.generateEarlierEntries(
+                    of: recurring,
+                    before: current.startDate,
+                    through: today,
+                    in: db,
+                    at: now
+                )
             } else {
                 recurring = try draft.newRecurring(at: now)
                 recurring.sortOrder = try Recurring.nextSortOrder(in: db)
@@ -109,7 +117,7 @@ public extension AppDatabase {
 
             return try Self.insertEntry(
                 of: recurring,
-                on: date,
+                on: recurring.occurrence(on: date),
                 in: db,
                 at: now
             )
@@ -140,12 +148,12 @@ private extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws {
-        let dates = recurring.archivedAt == nil
-            ? recurring.pendingDates(through: today)
+        let occurrences = recurring.archivedAt == nil
+            ? recurring.pendingOccurrences(through: today)
             : []
 
-        for date in dates {
-            try insertEntry(of: recurring, on: date, in: db, at: now)
+        for occurrence in occurrences {
+            try insertEntry(of: recurring, on: occurrence, in: db, at: now)
         }
 
         guard recurring.startDate <= today else {
@@ -159,24 +167,46 @@ private extension AppDatabase {
         try updated.update(db)
     }
 
+    static func generateEarlierEntries(
+        of recurring: Recurring,
+        before previousStart: LocalDate,
+        through today: LocalDate,
+        in db: Database,
+        at now: Date
+    ) throws {
+        guard
+            recurring.archivedAt == nil,
+            recurring.startDate < previousStart
+        else {
+            return
+        }
+
+        let last = min(previousStart.adding(days: -1), today)
+
+        for occurrence in recurring.occurrences(from: recurring.startDate, through: last) {
+            try insertEntry(of: recurring, on: occurrence, in: db, at: now)
+        }
+    }
+
     @discardableResult
     static func insertEntry(
         of recurring: Recurring,
-        on date: LocalDate,
+        on occurrence: Recurring.Occurrence,
         in db: Database,
         at now: Date
     ) throws -> Entry? {
-        let earliest = date.adding(days: -40)
-        let latest = date.adding(days: 40)
+        let date = occurrence.date
+        let earliest = occurrence.scheduled.adding(days: -40)
+        let latest = occurrence.scheduled.adding(days: 40)
 
         let exists = try Entry
             .filter(Column("recurring_id") == recurring.id)
             .filter(Column("recurring_date") >= earliest)
             .filter(Column("recurring_date") <= latest)
             .fetchAll(db)
-            .contains { recurring.isRecorded(by: $0, on: date) }
+            .contains { recurring.isRecorded(by: $0, scheduled: occurrence.scheduled) }
 
-        let amount = try billAmount(of: recurring, on: date, in: db)
+        let amount = try billAmount(of: recurring, on: occurrence, in: db)
 
         guard !exists, amount > 0 else {
             return nil
@@ -191,7 +221,7 @@ private extension AppDatabase {
             toWalletId: recurring.toWalletId,
             memo: recurring.memo,
             recurringId: recurring.id,
-            recurringDate: date,
+            recurringDate: occurrence.scheduled,
             createdAt: now,
             updatedAt: now
         )
@@ -209,11 +239,11 @@ private extension AppDatabase {
 
     static func billAmount(
         of recurring: Recurring,
-        on date: LocalDate,
+        on occurrence: Recurring.Occurrence,
         in db: Database
     ) throws -> Int {
         guard
-            let period = recurring.billingPeriod(paidOn: date),
+            let period = recurring.billingPeriod(paidOn: occurrence.date),
             let card = recurring.toWalletId
         else {
             return recurring.amount
@@ -224,9 +254,9 @@ private extension AppDatabase {
 
         let entries = try Entry
             .filter(Column("wallet_id") == card)
-            .filter(inPeriod || Column("bill_month") == recurring.occurrenceMonth(of: date))
+            .filter(inPeriod || Column("bill_month") == occurrence.scheduled.yearMonth)
             .fetchAll(db)
 
-        return recurring.amount(paidOn: date, entries: entries)
+        return recurring.amount(paidOn: occurrence.date, entries: entries)
     }
 }

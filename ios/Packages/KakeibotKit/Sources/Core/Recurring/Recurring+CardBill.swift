@@ -45,6 +45,14 @@ public extension Recurring {
         return max(used, 0)
     }
 
+    func billDate(
+        for used: LocalDate,
+        in month: YearMonth
+    ) -> LocalDate? {
+        billDates(for: used, count: Self.billChoiceCount)
+            .first { occurrenceMonth(of: $0) == month }
+    }
+
     func billDates(
         for used: LocalDate,
         count: Int
@@ -73,6 +81,8 @@ public extension Recurring {
 }
 
 private extension Recurring {
+    static let billChoiceCount = 3
+
     static func usage(of entry: Entry) -> Int {
         switch entry.type {
         case .expense: entry.amount

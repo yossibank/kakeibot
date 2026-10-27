@@ -55,10 +55,12 @@ public extension MonthOverview {
         return recurrings
             .flatMap { recurring in
                 recurring
-                    .dates(from: period.lowerBound, through: period.upperBound)
-                    .compactMap { date in
+                    .occurrences(from: period.lowerBound, through: period.upperBound)
+                    .compactMap { occurrence in
+                        let date = occurrence.date
+
                         let entry = entries.first { entry in
-                            recurring.isRecorded(by: entry, on: date)
+                            recurring.isRecorded(by: entry, scheduled: occurrence.scheduled)
                         }
 
                         let amount = entry?.amount
