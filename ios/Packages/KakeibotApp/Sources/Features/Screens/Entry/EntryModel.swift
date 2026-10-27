@@ -671,17 +671,23 @@ public extension EntryModel {
         return template.id == appliedTemplateId
             && template.type == type
             && template.categoryId == categoryId
-            && template.tagId == tagId
+            && recordableTagId(of: template) == tagId
             && template.walletId == walletId
             && (template.memo ?? "") == memo
             && amountMatches
+    }
+
+    func recordableTagId(of template: EntryTemplate) -> EntryTag.ID? {
+        let tags = options?.tags ?? []
+
+        return tags.first { $0.id == template.tagId && $0.archivedAt == nil }?.id
     }
 
     func apply(_ template: EntryTemplate) {
         select(template.type)
 
         categoryId = template.categoryId
-        tagId = template.tagId
+        tagId = recordableTagId(of: template)
         walletId = template.walletId
         memo = template.memo ?? ""
         calculator = AmountCalculator(amount: template.amount ?? 0)

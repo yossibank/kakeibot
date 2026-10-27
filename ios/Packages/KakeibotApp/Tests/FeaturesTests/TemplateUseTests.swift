@@ -24,6 +24,28 @@ struct TemplateUseTests {
     }
 
     @Test
+    func dropsArchivedTagWhenApplyingTemplate() async throws {
+        let setup = try await Setup()
+        let tag = try await setup.saveTag("買い置き")
+
+        let stock = try await setup.saveTemplate(
+            name: "買い置き",
+            amount: 500,
+            tagId: tag.id
+        )
+
+        try await setup.database.saveTags([], for: tag.categoryId, at: Date())
+
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        model.apply(stock)
+
+        #expect(model.tagId == nil)
+        #expect(model.isApplied(stock))
+    }
+
+    @Test
     func appliesTagAndDropsItWithOtherCategory() async throws {
         let setup = try await Setup()
         let tag = try await setup.saveTag("買い置き")
