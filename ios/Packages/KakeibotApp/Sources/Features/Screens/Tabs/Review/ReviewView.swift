@@ -214,43 +214,48 @@ private extension ReviewView {
                     .foregroundStyle(Palette.text)
             }
 
-            if let recurring = model.recurringTotal {
-                Button {
-                    openShare = model.recurringShare
-                } label: {
-                    HStack(spacing: 4) {
-                        Label(recurringText(recurring), systemImage: "repeat")
+            if model.recurringTotal != nil
+                || (model.kind == .expense && !model.moves.isEmpty) {
+                VStack(alignment: .leading, spacing: 0) {
+                    if let recurring = model.recurringTotal {
+                        Button {
+                            openShare = model.recurringShare
+                        } label: {
+                            HStack(spacing: 4) {
+                                Label(recurringText(recurring), systemImage: "repeat")
 
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .semibold)
+                                Image(systemName: "chevron.right")
+                                    .sansFont(.micro, weight: .semibold)
+                            }
+                            .textFont(.caption)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+                            .frame(minHeight: 24)
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .frame(minHeight: 28)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
 
-            if model.kind == .expense,
-               !model.moves.isEmpty {
-                Button {
-                    select(.balance)
-                } label: {
-                    HStack(spacing: 4) {
-                        Label(moveText, systemImage: "arrow.right")
+                    if model.kind == .expense,
+                       !model.moves.isEmpty {
+                        Button {
+                            select(.balance)
+                        } label: {
+                            HStack(spacing: 4) {
+                                Label(moveText, systemImage: "arrow.right")
 
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .semibold)
+                                Image(systemName: "chevron.right")
+                                    .sansFont(.micro, weight: .semibold)
+                            }
+                            .textFont(.caption)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+                            .frame(minHeight: 24)
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .frame(minHeight: 28)
-                    .contentShape(.rect)
                 }
-                .buttonStyle(.plain)
             }
 
             if model.kind == .balance {
@@ -395,6 +400,7 @@ private extension ReviewView {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 if let note = Self.moveNote(of: move) {
                     Text(note)
@@ -402,6 +408,7 @@ private extension ReviewView {
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
 

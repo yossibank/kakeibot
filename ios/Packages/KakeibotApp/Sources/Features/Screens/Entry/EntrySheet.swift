@@ -111,19 +111,16 @@ private extension EntrySheet {
         VStack(spacing: 12) {
             header
 
-            ViewThatFits(in: .vertical) {
+            ScrollView {
                 form
-
-                ScrollView {
-                    form
-                        .padding(.vertical, Self.fade)
-                }
-                .scrollIndicators(.hidden)
-                .edgeFade(Self.fade)
-                .padding(.vertical, -Self.fade)
+                    .padding(.vertical, Self.fade)
+                    .padding(.horizontal, Self.liftInset)
             }
-
-            Spacer(minLength: 0)
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.hidden)
+            .edgeFade(Self.fade)
+            .padding(.vertical, -Self.fade)
+            .padding(.horizontal, -Self.liftInset)
 
             VStack(spacing: 12) {
                 EntryDetailBand(
@@ -550,6 +547,7 @@ private extension EntrySheet {
             Text(category.name)
                 .textFont(size: .caption)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
         .foregroundStyle(color)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

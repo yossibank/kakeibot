@@ -225,6 +225,7 @@ private extension PeriodRecurringSheet {
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
 

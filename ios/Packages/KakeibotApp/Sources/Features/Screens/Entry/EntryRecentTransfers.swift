@@ -31,14 +31,20 @@ private extension EntryRecentTransfers {
         } label: {
             HStack(spacing: 8) {
                 HStack(spacing: 4) {
-                    name(model.wallet(transfer.walletId)?.name ?? "")
+                    EntryRouteChip(
+                        model.wallet(transfer.walletId)?.name ?? "",
+                        isDestination: false
+                    )
 
-                    Text("→")
+                    Image(systemName: "arrow.right")
+                        .sansFont(.micro, weight: .semibold)
+                        .foregroundStyle(Palette.subtext)
 
-                    name(model.wallet(transfer.toWalletId)?.name ?? "")
+                    EntryRouteChip(
+                        model.wallet(transfer.toWalletId)?.name ?? "",
+                        isDestination: true
+                    )
                 }
-                .foregroundStyle(Palette.text)
-                .lineLimit(1)
 
                 Spacer(minLength: 8)
 
@@ -48,11 +54,13 @@ private extension EntryRecentTransfers {
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
 
                 Text(AmountText.text(transfer.amount))
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+                    .fixedSize()
 
                 Image(systemName: "chevron.right")
                     .sansFont(.micro, weight: .semibold)
@@ -64,25 +72,5 @@ private extension EntryRecentTransfers {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-    }
-
-    func name(_ text: String) -> some View {
-        ViewThatFits(in: .horizontal) {
-            ForEach(shortened(text), id: \.self) { candidate in
-                Text(candidate)
-            }
-        }
-    }
-}
-
-private extension EntryRecentTransfers {
-    func shortened(_ text: String) -> [String] {
-        let cuts = (1..<max(text.count, 1)).reversed().map { count in
-            let head = text.prefix(count).trimmingCharacters(in: .whitespaces)
-            return "\(head)…"
-        }
-
-        var seen = Set<String>()
-        return ([text] + cuts).filter { seen.insert($0).inserted }
     }
 }

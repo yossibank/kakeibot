@@ -95,6 +95,7 @@ private extension SettingsRowList {
                         .font(font)
                         .foregroundStyle(color)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
 
                     if item.isAmount {
                         EditBadge(size: Self.markWidth)

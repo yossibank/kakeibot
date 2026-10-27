@@ -35,6 +35,7 @@ public struct TemplateRowCard: View {
                     .tracking(1)
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
 
             Spacer(minLength: 8)

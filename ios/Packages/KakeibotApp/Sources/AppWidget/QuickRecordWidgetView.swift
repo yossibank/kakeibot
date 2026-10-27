@@ -89,6 +89,7 @@ private extension QuickRecordWidgetView {
                         .textFont(size: .caption, weight: .semibold)
                         .foregroundStyle(Palette.accentStrong)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                         .fixedSize()
                         .padding(.horizontal, 12)
                         .frame(maxHeight: .infinity)
@@ -113,6 +114,7 @@ private extension QuickRecordWidgetView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     .privacySensitive()
             }
             .frame(maxHeight: .infinity)
@@ -176,6 +178,7 @@ private extension QuickRecordWidgetView {
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
 
             if isLarge {
@@ -183,6 +186,7 @@ private extension QuickRecordWidgetView {
                     .textFont(size: .micro)
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     .padding(.leading, Self.badgeSize + 6)
             }
 
@@ -266,11 +270,13 @@ private extension QuickRecordWidgetView {
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Text(record.detail)
                     .textFont(size: .micro)
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
 
             Spacer(minLength: 8)
@@ -280,6 +286,7 @@ private extension QuickRecordWidgetView {
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .privacySensitive()
         }
     }

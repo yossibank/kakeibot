@@ -100,6 +100,7 @@ private extension ReviewSharesCard {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Text("\(percent)%")
                     .textFont(.caption)

@@ -9,7 +9,7 @@ struct EntryDialFace: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            HalfDial(progress: usage?.progress, tint: usage?.tint ?? Palette.accent)
+            HalfDial(progress: progress, tint: tint)
 
             VStack(spacing: 4) {
                 HStack(spacing: 8) {
@@ -24,11 +24,13 @@ struct EntryDialFace: View {
 
                         Text(route)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     } else if let category = model.selectedCategory {
                         IconImage(model.icon(for: category), size: 13)
 
                         Text(category.name)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                 }
                 .textFont(.footnote, weight: .bold)
@@ -40,6 +42,7 @@ struct EntryDialFace: View {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     .editBadge()
                     .frame(height: Self.amountHeight)
 
@@ -68,6 +71,18 @@ private extension EntryDialFace {
 
     var usage: BudgetUsage? {
         model.budgetUsage
+    }
+
+    var progress: Double? {
+        usage?.progress ?? model.transferProgress
+    }
+
+    var tint: Color {
+        if let usage {
+            return usage.tint
+        }
+
+        return model.isOverSourceBalance ? Palette.rose : Palette.accent
     }
 
     var isEnteringFee: Bool {
@@ -101,7 +116,8 @@ private extension EntryDialFace {
             return model.sourceBalanceText
         }
 
-        return usage.map { "\($0.remainingTitle) \($0.remainingAmountText)" }
+        let remaining = usage.map { "\($0.remainingTitle) \($0.remainingAmountText)" }
+        return remaining ?? model.monthTotalText
     }
 
     var noteColor: Color {

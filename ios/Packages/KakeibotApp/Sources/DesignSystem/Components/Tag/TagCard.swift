@@ -24,6 +24,7 @@ public struct TagCard: View {
             .font(.system(size: size.fontSize))
             .foregroundStyle(foreground)
             .lineLimit(1)
+            .minimumScaleFactor(0.8)
             .fixedSize()
             .padding(.top, size.holeSpace)
             .padding(.horizontal, size.padding)

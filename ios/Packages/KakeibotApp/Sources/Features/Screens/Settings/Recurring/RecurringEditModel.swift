@@ -144,6 +144,48 @@ public extension RecurringEditModel {
         wallets.first { $0.id == toWalletId }
     }
 
+    var previewRow: RecurringListModel.Row {
+        let schedule = RecurringText.schedule(frequency, month: month, day: day)
+        let holiday = RecurringText.holidayNote(holidayShift)
+        let closing = canUseClosingDay ? closingDay.map(RecurringText.closingNote) : nil
+        let name = memo.trimmingCharacters(in: .whitespaces)
+        let destination = type == .transfer ? selectedDestination?.name : nil
+        let place = [selectedWallet?.name, destination].compactMap(\.self).joined(separator: " → ")
+
+        let recurring = Recurring(
+            type: type,
+            amount: amount,
+            categoryId: categoryId,
+            walletId: walletId ?? Wallet.ID(),
+            frequency: frequency,
+            month: month,
+            day: day,
+            holidayShift: holidayShift,
+            startDate: startDate,
+            endDate: endDate,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+
+        let icon = type == .transfer
+            ? selectedWallet.flatMap(icon(for:))
+            : selectedCategory.flatMap(icon(for:))
+
+        return RecurringListModel.Row(
+            id: recurring.id,
+            title: name.isEmpty
+                ? selectedCategory?.name ?? RecurringListModel.title(of: type)
+                : name,
+            schedule: [schedule, holiday].rowDetail ?? schedule,
+            place: place.isEmpty ? nil : place,
+            amount: isCardBill ? nil : amount,
+            type: type,
+            icon: icon,
+            next: recurring.nextDate(onOrAfter: today),
+            closing: closing
+        )
+    }
+
     func icon(for category: EntryCategory) -> Icon? {
         options?.icons[category.iconId]
     }

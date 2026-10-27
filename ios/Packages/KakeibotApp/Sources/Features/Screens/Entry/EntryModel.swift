@@ -283,15 +283,48 @@ public extension EntryModel {
             return nil
         }
 
-        let overview = MonthOverview(
-            list: history,
-            budgets: budgets,
-            recurrings: [],
-            monthStartDay: monthStartDay,
-            today: Self.today
-        )
+        return monthOverview.budgetUsage
+    }
 
-        return overview.budgetUsage
+    var monthTotalText: String? {
+        guard
+            type != .transfer,
+            budgetUsage == nil
+        else {
+            return nil
+        }
+
+        let overview = monthOverview
+        let month = history?.days.filter { overview.period.contains($0.date) } ?? []
+
+        let entries = month
+            .flatMap(\.entries)
+            .filter { $0.type == type && (categoryId == nil || $0.categoryId == categoryId) }
+
+        let current = entries.reduce(0) { $0 + $1.amount }
+        let title = "今月の\(selectedCategory?.name ?? typeName)"
+
+        let previous = entries.first { $0.id == original?.id }?.amount ?? 0
+        let added = overview.period.contains(date) ? amount : 0
+        let after = current - previous + added
+
+        guard after != current else {
+            return "\(title) \(AmountText.text(current))"
+        }
+
+        return "\(title) \(AmountText.text(current)) → \(AmountText.text(after))"
+    }
+
+    var transferProgress: Double? {
+        guard
+            type == .transfer,
+            let balance = wallet(walletId).flatMap(balance(of:)),
+            balance > 0
+        else {
+            return nil
+        }
+
+        return min(max(Double(amount + fee) / Double(balance), 0), 1)
     }
 
     var recentTransfers: [Entry] {
@@ -439,6 +472,16 @@ public extension EntryModel {
         }
 
         return -balance
+    }
+
+    var monthOverview: MonthOverview {
+        MonthOverview(
+            list: history,
+            budgets: budgets,
+            recurrings: [],
+            monthStartDay: monthStartDay,
+            today: Self.today
+        )
     }
 
     static func dayText(

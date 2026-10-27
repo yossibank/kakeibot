@@ -275,6 +275,7 @@ private extension ThemeListView {
                 .textFont(.footnote)
                 .foregroundStyle(titleColor)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
     }
 

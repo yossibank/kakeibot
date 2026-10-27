@@ -282,6 +282,7 @@ private extension RecordsView {
                             .textFont(.subheadline)
                             .foregroundStyle(Palette.text)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
 
                         Spacer()
                     }
@@ -523,6 +524,7 @@ private extension RecordsView {
                         .textFont(size: .micro)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                         .fixedSize()
                 }
             }
@@ -975,6 +977,7 @@ private extension RecordsView {
         }
         .textFont(.caption)
         .lineLimit(1)
+        .minimumScaleFactor(0.8)
     }
 }
 

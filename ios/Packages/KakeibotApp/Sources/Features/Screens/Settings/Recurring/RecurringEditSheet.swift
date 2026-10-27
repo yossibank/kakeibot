@@ -10,7 +10,7 @@ public struct RecurringEditSheet: View {
     @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
 
-    @FocusState private var isNameFocused: Bool
+    @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
 
@@ -61,7 +61,7 @@ public struct RecurringEditSheet: View {
                 .fill(Palette.background)
                 .ignoresSafeArea()
                 .onTapGesture {
-                    isNameFocused = false
+                    focus = nil
                 }
         }
         .confirmsUnsavedHide(
@@ -108,23 +108,43 @@ private extension RecurringEditSheet {
                 .frame(height: 44)
 
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 20) {
                     if !model.isEditing {
                         CapsulePicker(
                             selection: typeBinding,
                             options: Self.typeOptions
                         )
+                        .frame(maxWidth: .infinity)
                     }
 
-                    hero
+                    VStack(alignment: .leading, spacing: 8) {
+                        RecurringRowCard(row: model.previewRow)
+                            .frame(height: RecurringRowCard.height)
+
+                        Text("一覧では、このカードで並びます")
+                            .textFont(.caption2)
+                            .foregroundStyle(Palette.subtext)
+                            .padding(.leading, 4)
+                    }
+
+                    SettingsField(
+                        namePrompt,
+                        text: $model.memo,
+                        focus: $focus,
+                        field: .name
+                    )
 
                     SettingsRowList(items: rowItems) { panel in
                         open(panel)
                     }
                 }
+                .padding(.bottom, 8)
+                .padding(.vertical, Self.fade)
             }
-            .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
+            .edgeFade(Self.fade)
+            .padding(.vertical, -Self.fade)
+            .scrollDismissesKeyboard(.interactively)
 
             PrimaryButton(model.saveTitle) {
                 Task {
@@ -150,63 +170,6 @@ private extension RecurringEditSheet {
         } onDelete: {
             isConfirmingDelete = true
         }
-    }
-
-    var hero: some View {
-        VStack(spacing: 16) {
-            Button {
-                open(amountPanel)
-            } label: {
-                Text(amountText)
-                    .displayFont(.largeTitle, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(amountColor)
-                    .frame(maxWidth: .infinity)
-                    .overlay(alignment: .trailing) {
-                        EditBadge(size: 16)
-                            .frame(width: 32, height: 32)
-                            .padding(.trailing, 16)
-                    }
-                    .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-
-            TextField(
-                "名前",
-                text: $model.memo,
-                prompt: Text(namePrompt)
-                    .foregroundStyle(Palette.hint)
-            )
-            .multilineTextAlignment(.center)
-            .displayFont(.body)
-            .foregroundStyle(Palette.accentStrong)
-            .tint(Palette.accent)
-            .submitLabel(.done)
-            .focused($isNameFocused)
-            .padding(.horizontal, 24)
-            .overlay(alignment: .trailing) {
-                Button {
-                    isNameFocused = true
-                } label: {
-                    EditBadge(size: 16)
-                        .frame(width: 32, height: 32)
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-                .opacity(nameBadgeOpacity)
-                .offset(x: 24)
-            }
-            .padding(.bottom, 8)
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(Palette.accent.opacity(.medium))
-                    .frame(height: 1)
-            }
-            .padding(.horizontal, 40)
-        }
-        .padding(.vertical, 16)
-        .frame(maxWidth: .infinity)
-        .card()
     }
 
     var scheduleChooser: some View {
@@ -327,6 +290,8 @@ private extension RecurringEditSheet {
         switch panel {
         case .amount:
             VStack(spacing: 12) {
+                SettingsKeypadValue(model.amount)
+
                 Keypad(calculator: model.calculator) {
                     closePanel()
                 } onKey: { key in
@@ -397,6 +362,8 @@ private extension RecurringEditSheet {
             closingChooser
         case .fee:
             VStack(spacing: 12) {
+                SettingsKeypadValue(model.fee)
+
                 FeeChoiceRow(
                     choices: FeeChoiceRow.defaultChoices,
                     selection: model.fee
@@ -421,6 +388,10 @@ private extension RecurringEditSheet {
 }
 
 private extension RecurringEditSheet {
+    enum Field: Hashable {
+        case name
+    }
+
     enum Panel: Hashable {
         case amount
         case category
@@ -452,6 +423,8 @@ private extension RecurringEditSheet {
         count: 4
     )
 
+    static let fade: CGFloat = 16
+
     static let remindColumns = Array(
         repeating: GridItem(.flexible(), spacing: 8),
         count: 3
@@ -466,24 +439,14 @@ private extension RecurringEditSheet {
 
     var namePrompt: String {
         switch model.type {
-        case .expense: "名前（家賃・サブスクなど）"
-        case .income: "名前（給料・年金など）"
-        case .transfer: "名前（カードの引き落とし・積立など）"
+        case .expense: "家賃・サブスクなど"
+        case .income: "給料・年金など"
+        case .transfer: "カードの引き落とし・積立など"
         }
     }
 
     var headerTitle: String {
         model.isEditing ? "固定費を編集" : "固定費を追加"
-    }
-
-    var nameBadgeOpacity: Double {
-        isNameFocused ? 0 : 1
-    }
-
-    var amountColor: Color {
-        let isSet = model.amount > 0 || model.isCardBill
-
-        return isSet ? Palette.accentStrong : Palette.hint
     }
 
     var amountText: String {
@@ -523,7 +486,18 @@ private extension RecurringEditSheet {
     }
 
     var rowItems: [SettingsRowList<Panel>.Item] {
-        moneyItems + scheduleItems
+        [amountItem] + moneyItems + scheduleItems
+    }
+
+    var amountItem: SettingsRowList<Panel>.Item {
+        .init(
+            panel: amountPanel,
+            systemImage: "yensign",
+            title: "金額",
+            value: amountText,
+            isEmpty: model.amount == 0 && !model.isCardBill,
+            isAmount: true
+        )
     }
 
     var moneyItems: [SettingsRowList<Panel>.Item] {
@@ -639,7 +613,7 @@ private extension RecurringEditSheet {
     }
 
     func open(_ panel: Panel) {
-        isNameFocused = false
+        focus = nil
 
         withAnimation(.snappy) {
             self.panel = panel

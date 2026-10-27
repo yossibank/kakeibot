@@ -279,6 +279,7 @@ private extension WalletEditSheet {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Text(model.kind.title)
                     .textFont(.caption2)
@@ -457,12 +458,7 @@ private extension WalletEditSheet {
                 onSave()
             } content: {
                 VStack(spacing: 12) {
-                    Text(AmountText.text(calculator.amount))
-                        .displayFont(.largeTitle, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .contentTransition(.numericText())
-                        .animation(.snappy, value: calculator.amount)
+                    SettingsKeypadValue(calculator.amount)
 
                     Keypad(calculator: calculator) {
                         onSave()
@@ -514,6 +510,7 @@ private extension WalletEditSheet {
                 .textFont(.footnote)
                 .foregroundStyle(textColor)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(fill, in: Capsule())
                 .overlay {

@@ -69,18 +69,20 @@ public struct EntryRow: View {
                             .textFont(.caption)
                             .foregroundStyle(Palette.subtext)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                 }
 
                 if let route {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(route.source)
+                    HStack(spacing: 4) {
+                        EntryRouteChip(route.source, isDestination: false)
 
-                        Text("→ \(route.destination)")
+                        Image(systemName: "arrow.right")
+                            .sansFont(.micro, weight: .semibold)
+                            .foregroundStyle(Palette.subtext)
+
+                        EntryRouteChip(route.destination, isDestination: true)
                     }
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
                 }
 
                 if let memo {

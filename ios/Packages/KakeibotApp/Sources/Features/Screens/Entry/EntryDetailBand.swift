@@ -137,6 +137,7 @@ private extension EntryDetailBand {
                 .textFont(.caption2)
                 .foregroundStyle(tint ?? Palette.subtext)
                 .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .padding(.trailing, trailingInset)
 
             HStack(spacing: 4) {

@@ -4,6 +4,7 @@ public struct TagLine<ID: Hashable & Sendable>: View {
     @State private var lift: Lift?
     @State private var frames: [ID: CGRect] = [:]
     @State private var liftCount = 0
+    @State private var lineWidth: CGFloat = 0
 
     let tags: [Item]
     let selection: Set<ID>
@@ -47,7 +48,7 @@ public struct TagLine<ID: Hashable & Sendable>: View {
     }
 
     public var body: some View {
-        ViewThatFits(in: .horizontal) {
+        ScrollView(.horizontal) {
             HStack(spacing: 0) {
                 ForEach(
                     Array(cards.enumerated()),
@@ -65,25 +66,16 @@ public struct TagLine<ID: Hashable & Sendable>: View {
                 liftedCard
             }
             .padding(.horizontal, Self.inset)
-
-            ScrollView(.horizontal) {
-                HStack(spacing: Self.spacing) {
-                    ForEach(
-                        Array(cards.enumerated()),
-                        id: \.element.id
-                    ) { index, card in
-                        hanging(card, at: index)
-                    }
-                }
-                .coordinateSpace(.named(Self.space))
-                .overlay(alignment: .topLeading) {
-                    liftedCard
-                }
-                .padding(.horizontal, Self.inset)
-                .padding(.bottom, Self.inset)
-            }
-            .scrollIndicators(.hidden)
-            .scrollDisabled(lift != nil)
+            .padding(.bottom, Self.inset)
+            .frame(minWidth: lineWidth)
+        }
+        .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+        .scrollIndicators(.hidden)
+        .scrollDisabled(lift != nil)
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            lineWidth = width
         }
         .frame(maxWidth: .infinity)
         .frame(height: Self.height, alignment: .top)

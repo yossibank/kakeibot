@@ -146,7 +146,7 @@ private extension RewardRuleEditSheet {
                     }
 
                     SettingsField(
-                        "名前（自炊した日など）",
+                        "自炊した日など",
                         text: $model.name,
                         focus: $focus,
                         field: .name

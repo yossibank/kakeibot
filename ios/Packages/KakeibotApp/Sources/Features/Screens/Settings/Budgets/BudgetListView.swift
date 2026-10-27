@@ -38,7 +38,7 @@ private extension BudgetListView {
                     .textFont(.caption)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.85)
+                    .minimumScaleFactor(0.8)
 
                 if model.recurringExpense > 0 {
                     Label(recurringText, systemImage: "repeat")
@@ -46,7 +46,7 @@ private extension BudgetListView {
                         .monospacedDigit()
                         .foregroundStyle(Palette.accent)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.85)
+                        .minimumScaleFactor(0.8)
                 }
             }
 
