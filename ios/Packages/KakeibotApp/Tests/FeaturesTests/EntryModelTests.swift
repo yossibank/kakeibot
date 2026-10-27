@@ -348,6 +348,28 @@ struct EntryModelTests {
     }
 
     @Test
+    func removesEntryMovedOutOfMonthFromTotal() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let wallet = try #require(options.wallets.first?.id)
+
+        try await setup.saveEntry(category: options.expenseCategories[0].id, wallet: wallet, at: 1)
+
+        let entry = try #require(try setup.database.snapshot().entries.first)
+
+        let model = EntryModel(
+            database: setup.database,
+            editing: entry.id,
+            date: entry.date
+        )
+
+        await model.load()
+        model.date = entry.date.adding(days: -62)
+
+        #expect(model.monthTotalText == "今月の食費 ¥500 → ¥0")
+    }
+
+    @Test
     func deletesExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)

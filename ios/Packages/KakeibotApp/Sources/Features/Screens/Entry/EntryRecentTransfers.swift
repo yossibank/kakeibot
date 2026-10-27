@@ -59,6 +59,7 @@ private extension EntryRecentTransfers {
                 Text(AmountText.text(transfer.amount))
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+                    .fixedSize()
 
                 Image(systemName: "chevron.right")
                     .sansFont(.micro, weight: .semibold)

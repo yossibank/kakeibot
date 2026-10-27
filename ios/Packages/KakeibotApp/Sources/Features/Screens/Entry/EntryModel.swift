@@ -304,15 +304,13 @@ public extension EntryModel {
         let current = entries.reduce(0) { $0 + $1.amount }
         let title = "今月の\(selectedCategory?.name ?? typeName)"
 
-        guard
-            amount > 0,
-            overview.period.contains(date)
-        else {
+        let previous = entries.first { $0.id == original?.id }?.amount ?? 0
+        let added = overview.period.contains(date) ? amount : 0
+        let after = current - previous + added
+
+        guard after != current else {
             return "\(title) \(AmountText.text(current))"
         }
-
-        let previous = entries.first { $0.id == original?.id }?.amount ?? 0
-        let after = current - previous + amount
 
         return "\(title) \(AmountText.text(current)) → \(AmountText.text(after))"
     }
