@@ -17,6 +17,7 @@ public extension EntryTagDraft {
     enum Problem: String, CaseIterable, Codable, Error, Sendable {
         case emptyName
         case nameTooLong
+        case duplicateName
     }
 
     static let maxNameLength = 8
@@ -31,6 +32,18 @@ public extension EntryTagDraft {
 
     init(_ tag: EntryTag) {
         self.init(id: tag.id, name: tag.name)
+    }
+
+    func problems(among others: [EntryTagDraft]) -> [Problem] {
+        let own = problems
+
+        guard own.isEmpty else {
+            return own
+        }
+
+        let isDuplicate = others.contains { $0.trimmedName == trimmedName }
+
+        return isDuplicate ? [.duplicateName] : []
     }
 
     func newTag(

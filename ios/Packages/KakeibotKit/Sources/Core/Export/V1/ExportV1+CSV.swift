@@ -20,6 +20,8 @@ private extension ExportV1.Tables {
 
     static let byteOrderMark: [UInt8] = [0xEF, 0xBB, 0xBF]
 
+    static let formulaPrefixes: Set<Character> = ["=", "+", "-", "@"]
+
     var sortedEntries: [Entry] {
         entries.sorted { lhs, rhs in
             if lhs.date != rhs.date {
@@ -32,6 +34,14 @@ private extension ExportV1.Tables {
 
             return lhs.id.description < rhs.id.description
         }
+    }
+
+    static func text(_ field: String) -> String {
+        guard let first = field.first, formulaPrefixes.contains(first) else {
+            return field
+        }
+
+        return "'" + field
     }
 
     static func escape(_ field: String) -> String {
@@ -64,11 +74,11 @@ private extension ExportV1.Tables {
             entry.date.description,
             Self.kindTitle(entry.type),
             String(entry.amount),
-            category?.name ?? "",
-            tag?.name ?? "",
-            wallet?.name ?? "",
-            toWallet?.name ?? "",
-            entry.memo ?? ""
+            Self.text(category?.name ?? ""),
+            Self.text(tag?.name ?? ""),
+            Self.text(wallet?.name ?? ""),
+            Self.text(toWallet?.name ?? ""),
+            Self.text(entry.memo ?? "")
         ]
     }
 }

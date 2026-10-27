@@ -74,14 +74,15 @@ public extension LocalDate {
 
     func startOfDay(in timeZone: TimeZone) -> Date {
         let localDays = dayNumber - Self.unixEpochDayNumber
-        let localSeconds = TimeInterval(localDays * Self.secondsPerDay)
-        let localStart = Date(timeIntervalSince1970: localSeconds)
-        let offsetSeconds = timeZone.secondsFromGMT(for: localStart)
-        let estimatedOffset = TimeInterval(offsetSeconds)
-        let estimate = localStart.addingTimeInterval(-estimatedOffset)
-        let offset = TimeInterval(timeZone.secondsFromGMT(for: estimate))
+        let localNoon = TimeInterval(localDays * Self.secondsPerDay + Self.secondsPerDay / 2)
+        let noonAsUTC = Date(timeIntervalSince1970: localNoon)
+        let offset = TimeInterval(timeZone.secondsFromGMT(for: noonAsUTC))
+        let noon = noonAsUTC.addingTimeInterval(-offset)
 
-        return localStart.addingTimeInterval(-offset)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+
+        return calendar.startOfDay(for: noon)
     }
 
     func periodMonth(startingOn startDay: MonthStartDay) -> YearMonth {

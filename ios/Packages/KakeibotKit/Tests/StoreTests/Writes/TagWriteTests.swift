@@ -76,6 +76,34 @@ struct TagWriteTests {
     }
 
     @Test
+    func restoresArchivedTagWithSameName() async throws {
+        let setup = try await Setup()
+        try await setup.saveFood(tags: ["朝ごはん", "昼ごはん"])
+        let before = try await setup.foodTags()
+        let kept = EntryTagDraft(before[1])
+
+        try await setup.saveFood([kept])
+        try await setup.saveFood([kept, EntryTagDraft(name: " 朝ごはん ")])
+
+        let after = try await setup.foodTags()
+        let options = try await setup.database.entryOptions()
+        let all = options.tags.filter { $0.categoryId == before[0].categoryId }
+
+        #expect(after.map(\.id) == [before[1].id, before[0].id])
+        #expect(after.map(\.sortOrder) == [0, 1])
+        #expect(all.count == 2)
+    }
+
+    @Test
+    func rejectsDuplicateTagName() async throws {
+        let setup = try await Setup()
+
+        await #expect(throws: EntryTagDraft.Problem.duplicateName) {
+            try await setup.saveFood(tags: ["朝ごはん", "朝ごはん "])
+        }
+    }
+
+    @Test
     func savesEntryWithTagOfItsCategory() async throws {
         let setup = try await Setup()
         try await setup.saveFood(tags: ["昼ごはん"])

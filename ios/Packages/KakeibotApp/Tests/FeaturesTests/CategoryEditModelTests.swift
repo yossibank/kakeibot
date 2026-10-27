@@ -130,6 +130,28 @@ struct CategoryEditModelTests {
     }
 
     @Test
+    func rejectsTagWithNameOfAnotherTag() throws {
+        let database = try Self.database()
+        let model = CategoryEditModel(database: database, kind: .expense)
+
+        _ = model.addTag("朝ごはん")
+        _ = model.addTag("昼ごはん")
+        let duplicated = model.addTag(" 朝ごはん ")
+        let addError = model.tagProblem
+        let lunch = try #require(model.tags.last)
+        let renamed = model.renameTag(lunch.id, to: "朝ごはん")
+        let renameError = model.tagProblem
+        let kept = model.renameTag(lunch.id, to: "昼ごはん")
+
+        #expect(!duplicated)
+        #expect(addError == "同じ名前のタグがあります")
+        #expect(!renamed)
+        #expect(renameError == "同じ名前のタグがあります")
+        #expect(kept)
+        #expect(model.tags.count == 2)
+    }
+
+    @Test
     func storesTagsWithoutSavingCategory() async throws {
         let database = try Self.database()
         let list = try await database.categoryList()

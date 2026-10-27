@@ -34,6 +34,41 @@ struct RecurringModelTests {
     }
 
     @Test
+    func asksPermissionOnlyWhenSavingWithReminder() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
+
+        let without = RecurringEditModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await without.load()
+        without.press(.digit(5))
+        without.memo = "家賃"
+
+        _ = await without.save(permission: client.permission)
+        let askedWithout = await client.requested
+
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await model.load()
+        model.press(.digit(5))
+        model.memo = "保険"
+        model.remindDaysBefore = 1
+
+        let saved = await model.save(permission: client.permission)
+        let asked = await client.requested
+
+        #expect(saved)
+        #expect(!askedWithout)
+        #expect(asked)
+    }
+
+    @Test
     func suggestsHolidayShiftFromCategory() async throws {
         let setup = try await RecordsModelTests.Setup()
 

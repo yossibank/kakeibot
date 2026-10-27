@@ -51,6 +51,23 @@ struct SnapshotTests {
     }
 
     @Test
+    func skipsUnknownSettingKeys() throws {
+        let database = try AppDatabase.inMemory()
+        let export = try Self.export
+
+        try database.replace(with: export.data)
+        try database.writer.write { db in
+            try db.execute(
+                sql: "INSERT INTO setting (key, value) VALUES ('future_key', '1')"
+            )
+        }
+
+        let snapshot = try database.snapshot()
+
+        #expect(snapshot == export.data)
+    }
+
+    @Test
     func restoresWhatItBacksUp() async throws {
         let database = try AppDatabase.inMemory()
         let restored = try AppDatabase.inMemory()

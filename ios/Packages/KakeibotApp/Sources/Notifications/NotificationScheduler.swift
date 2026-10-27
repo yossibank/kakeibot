@@ -19,13 +19,12 @@ public extension NotificationScheduler {
         now: Date,
         timeZone: TimeZone
     ) async {
-        let upcoming = plan.filter { notification in
-            Self.fireDate(of: notification, in: timeZone) > now
+        guard await client.authorization() == .allowed else {
+            return
         }
 
-        if !upcoming.isEmpty,
-           await client.authorization() == .notDetermined {
-            _ = await client.requestAuthorization()
+        let upcoming = plan.filter { notification in
+            Self.fireDate(of: notification, in: timeZone) > now
         }
 
         let wanted = Dictionary(

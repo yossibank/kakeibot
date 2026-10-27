@@ -283,6 +283,28 @@ struct TemplateUseTests {
     }
 
     @Test
+    func recordsFromHomeWithoutArchivedTag() async throws {
+        let setup = try await Setup()
+        let tag = try await setup.saveTag("朝ごはん")
+
+        let lunch = try await setup.saveTemplate(
+            name: "ランチ",
+            amount: 980,
+            tagId: tag.id
+        )
+
+        let home = HomeModel(database: setup.database, today: setup.date)
+        let kept = try #require(await home.record(lunch))
+
+        try await setup.database.saveTags([], for: tag.categoryId, at: Date())
+
+        let dropped = try #require(await home.record(lunch))
+
+        #expect(kept.entry.tagId == tag.id)
+        #expect(dropped.entry.tagId == nil)
+    }
+
+    @Test
     func recordsFromHomeAndUndoes() async throws {
         let setup = try await Setup()
         let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980)

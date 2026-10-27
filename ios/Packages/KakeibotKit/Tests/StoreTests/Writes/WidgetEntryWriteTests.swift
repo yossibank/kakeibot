@@ -52,6 +52,64 @@ struct WidgetEntryWriteTests {
     }
 
     @Test
+    func dropsArchivedTagOfTemplate() async throws {
+        let setup = try await Setup()
+        let food = try #require(setup.draft.categoryId)
+        let tag = try await setup.database.saveTags(
+            [EntryTagDraft(name: "朝ごはん")],
+            for: food,
+            at: setup.now
+        )[0]
+
+        var draft = setup.draft
+        draft.tagId = tag.id
+
+        let template = try await setup.database.saveTemplate(draft, at: setup.now)
+
+        let kept = try await setup.database.recordFromWidget(
+            template.id,
+            on: setup.today,
+            at: setup.now
+        )
+
+        try await setup.database.saveTags([], for: food, at: setup.now)
+
+        let dropped = try await setup.database.recordFromWidget(
+            template.id,
+            on: setup.today,
+            at: setup.now
+        )
+
+        #expect(kept.tagId == tag.id)
+        #expect(dropped.tagId == nil)
+    }
+
+    @Test
+    func buildsDraftWithoutArchivedTag() async throws {
+        let setup = try await Setup()
+        let food = try #require(setup.draft.categoryId)
+        let tag = try await setup.database.saveTags(
+            [EntryTagDraft(name: "朝ごはん")],
+            for: food,
+            at: setup.now
+        )[0]
+
+        var draft = setup.draft
+        draft.tagId = tag.id
+
+        let template = try await setup.database.saveTemplate(draft, at: setup.now)
+        let before = try await setup.database.entryDraft(for: template, on: setup.today)
+
+        try await setup.database.saveTags([], for: food, at: setup.now)
+
+        let after = try await setup.database.entryDraft(for: template, on: setup.today)
+
+        #expect(before?.tagId == tag.id)
+        #expect(after?.tagId == nil)
+        #expect(after?.templateId == template.id)
+    }
+
+    @Test
     func rejectsTemplateWithoutAmount() async throws {
         let setup = try await Setup()
         var draft = setup.draft

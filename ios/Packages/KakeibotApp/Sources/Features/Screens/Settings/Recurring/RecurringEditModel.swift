@@ -256,7 +256,7 @@ public extension RecurringEditModel {
         }
     }
 
-    func save() async -> Bool {
+    func save(permission: NotificationPermission = .allowed) async -> Bool {
         if let problem = draft.problems.first {
             errorNotice.show(message(for: problem))
             return false
@@ -269,6 +269,8 @@ public extension RecurringEditModel {
                 today: today,
                 at: Date()
             )
+
+            await requestPermissionIfReminding(permission)
 
             return true
         } catch {
@@ -331,6 +333,16 @@ private extension RecurringEditModel {
         case .salary, .bonus: return .previous
         case .home, .utility, .phone: return .next
         default: return .none
+        }
+    }
+
+    func requestPermissionIfReminding(_ permission: NotificationPermission) async {
+        guard remindDaysBefore != nil else {
+            return
+        }
+
+        if await permission.authorization() == .notDetermined {
+            _ = await permission.request()
         }
     }
 
