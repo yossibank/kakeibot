@@ -115,7 +115,7 @@ public extension AppDatabase {
                 return nil
             }
 
-            return try Self.insertEntry(
+            return try Self.generateEntry(
                 of: recurring,
                 on: recurring.occurrence(on: date),
                 in: db,
@@ -141,53 +141,7 @@ public extension AppDatabase {
     }
 }
 
-private extension AppDatabase {
-    static func generateEntries(
-        of recurring: Recurring,
-        through today: LocalDate,
-        in db: Database,
-        at now: Date
-    ) throws {
-        let occurrences = recurring.archivedAt == nil
-            ? recurring.pendingOccurrences(through: today)
-            : []
-
-        for occurrence in occurrences {
-            try insertEntry(of: recurring, on: occurrence, in: db, at: now)
-        }
-
-        guard recurring.startDate <= today else {
-            return
-        }
-
-        var updated = recurring
-
-        updated.generatedUntil = today
-
-        try updated.update(db)
-    }
-
-    static func generateEarlierEntries(
-        of recurring: Recurring,
-        before previousStart: LocalDate,
-        through today: LocalDate,
-        in db: Database,
-        at now: Date
-    ) throws {
-        guard
-            recurring.archivedAt == nil,
-            recurring.startDate < previousStart
-        else {
-            return
-        }
-
-        let last = min(previousStart.adding(days: -1), today)
-
-        for occurrence in recurring.occurrences(from: recurring.startDate, through: last) {
-            try insertEntry(of: recurring, on: occurrence, in: db, at: now)
-        }
-    }
-
+extension AppDatabase {
     @discardableResult
     static func insertEntry(
         of recurring: Recurring,
@@ -258,5 +212,69 @@ private extension AppDatabase {
             .fetchAll(db)
 
         return recurring.amount(paidOn: occurrence.date, entries: entries)
+    }
+}
+
+private extension AppDatabase {
+    static func generateEntries(
+        of recurring: Recurring,
+        through today: LocalDate,
+        in db: Database,
+        at now: Date
+    ) throws {
+        let occurrences = recurring.archivedAt == nil
+            ? recurring.pendingOccurrences(through: today)
+            : []
+
+        for occurrence in occurrences {
+            try generateEntry(of: recurring, on: occurrence, in: db, at: now)
+        }
+
+        guard recurring.startDate <= today else {
+            return
+        }
+
+        var updated = recurring
+
+        updated.generatedUntil = today
+
+        try updated.update(db)
+    }
+
+    static func generateEarlierEntries(
+        of recurring: Recurring,
+        before previousStart: LocalDate,
+        through today: LocalDate,
+        in db: Database,
+        at now: Date
+    ) throws {
+        guard
+            recurring.archivedAt == nil,
+            recurring.startDate < previousStart
+        else {
+            return
+        }
+
+        let last = min(previousStart.adding(days: -1), today)
+
+        for occurrence in recurring.occurrences(from: recurring.startDate, through: last) {
+            try generateEntry(of: recurring, on: occurrence, in: db, at: now)
+        }
+    }
+
+    @discardableResult
+    static func generateEntry(
+        of recurring: Recurring,
+        on occurrence: Recurring.Occurrence,
+        in db: Database,
+        at now: Date
+    ) throws -> Entry? {
+        let entry = try insertEntry(of: recurring, on: occurrence, in: db, at: now)
+
+        if let entry {
+            try recalculateCardBills(affectedBy: [entry], in: db, at: now)
+        }
+
+        return entry
     }
 }

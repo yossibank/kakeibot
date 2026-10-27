@@ -31,9 +31,18 @@ public extension AppDatabase {
         }
     }
 
-    func undoWidgetEntry(_ id: Entry.ID) async throws {
+    func undoWidgetEntry(
+        _ id: Entry.ID,
+        at now: Date = Date()
+    ) async throws {
         try await writer.write { db in
+            let entry = try Entry.fetchOne(db, key: id)
+
             _ = try Entry.deleteOne(db, key: id)
+
+            if let entry {
+                try Self.recalculateCardBills(affectedBy: [entry], in: db, at: now)
+            }
 
             if try Self.setting(.widgetEntry, in: db) == id {
                 try Self.setSetting(.widgetEntry, to: nil, in: db)

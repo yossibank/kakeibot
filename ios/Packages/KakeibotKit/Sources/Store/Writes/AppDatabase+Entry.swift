@@ -38,7 +38,8 @@ public extension AppDatabase {
 
     func restoreEntry(
         _ entry: Entry,
-        fee: Entry? = nil
+        fee: Entry? = nil,
+        at now: Date = Date()
     ) async throws {
         try await writer.write { db in
             try Self.restore([entry], in: db)
@@ -51,21 +52,33 @@ public extension AppDatabase {
             if let fee {
                 try Self.restore([fee], in: db)
             }
+
+            try Self.recalculateCardBills(affectedBy: [entry], in: db, at: now)
         }
     }
 
-    func restoreEntries(_ entries: [Entry]) async throws {
+    func restoreEntries(
+        _ entries: [Entry],
+        at now: Date = Date()
+    ) async throws {
         try await writer.write { db in
             try Self.restore(entries, in: db)
+            try Self.recalculateCardBills(affectedBy: entries, in: db, at: now)
         }
     }
 
     @discardableResult
-    func deleteEntry(_ id: Entry.ID) async throws -> [Entry] {
-        try await deleteEntries([id])
+    func deleteEntry(
+        _ id: Entry.ID,
+        at now: Date = Date()
+    ) async throws -> [Entry] {
+        try await deleteEntries([id], at: now)
     }
 
-    func deleteEntries(_ ids: [Entry.ID]) async throws -> [Entry] {
+    func deleteEntries(
+        _ ids: [Entry.ID],
+        at now: Date = Date()
+    ) async throws -> [Entry] {
         try await writer.write { db in
             let entries = try Entry.fetchAll(db, keys: ids)
 
@@ -75,6 +88,8 @@ public extension AppDatabase {
                 .fetchAll(db)
 
             _ = try Entry.deleteAll(db, keys: ids)
+
+            try Self.recalculateCardBills(affectedBy: entries + fees, in: db, at: now)
 
             return entries + fees
         }
@@ -93,7 +108,11 @@ public extension AppDatabase {
                 try Self.canChange(entry, to: change, in: db)
             }
 
+            var touched: [Entry] = []
+
             for var entry in changed {
+                touched.append(entry)
+
                 switch change {
                 case let .category(id):
                     entry.categoryId = id
@@ -106,7 +125,11 @@ public extension AppDatabase {
                 entry.updatedAt = now
 
                 try entry.update(db)
+
+                touched.append(entry)
             }
+
+            try Self.recalculateCardBills(affectedBy: touched, in: db, at: now)
 
             return changed
         }
@@ -121,6 +144,8 @@ extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws -> Entry {
+        let before = try id.flatMap { try Entry.fetchOne(db, key: $0) }
+
         let entry = try Self.entry(
             from: draft,
             editing: id,
@@ -145,6 +170,7 @@ extension AppDatabase {
         }
 
         try saveFee(draft.fee, for: entry, in: db, at: now)
+        try recalculateCardBills(affectedBy: [before, entry].compactMap(\.self), in: db, at: now)
 
         return entry
     }
