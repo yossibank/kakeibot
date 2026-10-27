@@ -93,6 +93,19 @@ public struct RecordsView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .confirmation(
+            isPresented: $model.isConfirmingDelete,
+            systemImage: "trash",
+            title: "\(model.pendingDeleteCount) 件の記録を削除しますか",
+            message: "削除した後も、知らせの『取り消す』で戻せます",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            model.confirmDelete { ids in
+                onDeleteEntries(ids)
+                finishSelecting()
+            }
+        }
         .onChange(of: model.layout) {
             finishSelecting()
         }
@@ -831,8 +844,10 @@ private extension RecordsView {
                 isEnabled: !selection.isEmpty,
                 tint: Palette.rose
             ) {
-                onDeleteEntries(Array(selection))
-                finishSelecting()
+                model.requestDelete(Array(selection)) { ids in
+                    onDeleteEntries(ids)
+                    finishSelecting()
+                }
             }
         }
         .padding(.horizontal, 8)

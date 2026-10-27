@@ -376,6 +376,37 @@ struct RecordsModelTests {
         #expect(stamped?.glyph == .party)
         #expect(calendar.stamps.isEmpty)
     }
+
+    @Test
+    func confirmsBatchDeleteOfTenOrMore() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        let ids = (0..<10).map { _ in Entry.ID() }
+        var deleted: [[Entry.ID]] = []
+
+        model.requestDelete(Array(ids.prefix(9))) { deleted.append($0) }
+
+        #expect(!model.isConfirmingDelete)
+        #expect(deleted == [Array(ids.prefix(9))])
+
+        deleted = []
+        model.requestDelete(ids) { deleted.append($0) }
+
+        #expect(model.isConfirmingDelete)
+        #expect(model.pendingDeleteCount == 10)
+        #expect(deleted.isEmpty)
+
+        model.cancelDelete()
+
+        #expect(!model.isConfirmingDelete)
+        #expect(deleted.isEmpty)
+
+        model.requestDelete(ids) { deleted.append($0) }
+        model.confirmDelete { deleted.append($0) }
+
+        #expect(!model.isConfirmingDelete)
+        #expect(deleted == [ids])
+    }
 }
 
 extension RecordsModelTests {

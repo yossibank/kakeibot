@@ -12,6 +12,7 @@ public final class RecordsModel: ScreenModel {
     public var isSearching = false
     public var searchText = ""
     public var filter = EntryFilter()
+    public var isConfirmingDelete = false
 
     public private(set) var month: YearMonth
     public private(set) var monthStartDay: MonthStartDay = .first
@@ -25,6 +26,7 @@ public final class RecordsModel: ScreenModel {
     public private(set) var rewardBank: RewardBank?
     public private(set) var recurrings: [Recurring] = []
     public private(set) var recentSearches: [String] = []
+    public private(set) var pendingDeleteIDs: [Entry.ID] = []
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -135,6 +137,10 @@ public extension RecordsModel {
         list?.filterWallets ?? []
     }
 
+    var pendingDeleteCount: Int {
+        pendingDeleteIDs.count
+    }
+
     func batchCategories(for type: Entry.Kind) -> [EntryCategory] {
         let categories = list?.filterCategories ?? []
         return categories.filter { $0.kind.rawValue == type.rawValue }
@@ -217,6 +223,30 @@ public extension RecordsModel {
         } catch {
             errorNotice.show(Self.saveFailedMessage)
         }
+    }
+
+    func requestDelete(
+        _ ids: [Entry.ID],
+        delete: ([Entry.ID]) -> Void
+    ) {
+        guard ids.count >= Self.confirmDeleteThreshold else {
+            delete(ids)
+            return
+        }
+
+        pendingDeleteIDs = ids
+        isConfirmingDelete = true
+    }
+
+    func confirmDelete(delete: ([Entry.ID]) -> Void) {
+        let ids = pendingDeleteIDs
+        cancelDelete()
+        delete(ids)
+    }
+
+    func cancelDelete() {
+        pendingDeleteIDs = []
+        isConfirmingDelete = false
     }
 
     func removeStamp(on date: LocalDate) async {
@@ -388,6 +418,7 @@ private extension RecordsModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
     static let recurringTitle = "固定費"
+    static let confirmDeleteThreshold = 10
 
     func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
         let entries = list?.days.flatMap(\.entries) ?? []
