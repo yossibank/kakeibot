@@ -14,11 +14,13 @@ final class AppModel {
     private(set) var today: LocalDate
     private(set) var look: ThemeLook = .followsDevice
     private(set) var style: ThemeStyle = .standard
+    private(set) var observationRound = 0
 
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let scheduler: NotificationScheduler
     private let router: NotificationRouter
     private let retryDelays: [Duration]
+    private var hasStoppedObservation = false
 
     init(
         openDatabase: @escaping @Sendable () throws -> AppDatabase,
@@ -164,16 +166,35 @@ extension AppModel {
         }
     }
 
+    func observationID<Base: Hashable>(_ base: Base) -> ObservationID<Base> {
+        ObservationID(base: base, round: observationRound)
+    }
+
+    func returnToForeground() {
+        guard hasStoppedObservation else {
+            return
+        }
+
+        hasStoppedObservation = false
+        observationRound += 1
+    }
+
     @discardableResult
     func watch<Values: AsyncSequence>(
         _ values: @autoclosure () -> Values,
         receive: nonisolated(nonsending) (Values.Element) async -> Void
     ) async -> Bool {
-        await ScreenObservation.retry(
+        let isFailed = await ScreenObservation.retry(
             values(),
             retryDelays: retryDelays,
             receive: receive
         )
+
+        if isFailed {
+            hasStoppedObservation = true
+        }
+
+        return isFailed
     }
 }
 
@@ -243,4 +264,21 @@ private extension AppModel {
 struct ObservationID<Base: Hashable>: Hashable {
     let base: Base
     let round: Int
+}
+
+struct ForegroundReturn {
+    private var wasBackground = false
+
+    mutating func receive(_ phase: ScenePhase) -> Bool {
+        switch phase {
+        case .background:
+            wasBackground = true
+            return false
+        case .active:
+            defer { wasBackground = false }
+            return wasBackground
+        default:
+            return false
+        }
+    }
 }
