@@ -26,6 +26,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 - `.claude/rules/`：spec の文書の役割
 - `.claude/snapshots/widget/`：`ui-snapshot` で描くウィジェットの場合（あといくらの小・中、ロック画面の丸・横長・1 行）
 - `.claude/snapshots/recent-transfers/`：`ui-snapshot` で描く入力シートの最近の振替の行（長い口座名、手数料の有無）
+- `.claude/snapshots/entry-sheet/`：`ui-snapshot` で描く入力シートの全体（支出・振替）。カテゴリの格子は描かれない
 
 ## ios
 
