@@ -431,6 +431,31 @@ struct RecurringWriteTests {
     }
 
     @Test
+    func restoresRemainingEntriesWhenOneIsGone() async throws {
+        let setup = try await Setup()
+        let today = try #require(LocalDate("2026-02-28"))
+
+        try await setup.database.generateRecurringEntries(
+            through: today,
+            at: setup.now
+        )
+
+        let id = try #require(setup.database.snapshot().recurrings.first?.id)
+        let ids = try setup.database.snapshot().entries.map(\.id)
+        let gone = try #require(ids.first)
+        let kept = try #require(ids.last)
+        let deletion = try await setup.database.deleteRecurring(id)
+
+        try await setup.database.deleteEntry(gone)
+        try await setup.database.restore(deletion)
+        let restored = try setup.database.snapshot()
+
+        #expect(restored.recurrings.map(\.id) == [id])
+        #expect(restored.entries.map(\.id) == [kept])
+        #expect(restored.entries.allSatisfy { $0.recurringId == id })
+    }
+
+    @Test
     func rejectsUnknownRecurring() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()

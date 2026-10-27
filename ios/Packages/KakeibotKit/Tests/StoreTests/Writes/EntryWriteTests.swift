@@ -5,6 +5,50 @@ import Testing
 
 struct EntryWriteTests {
     @Test
+    func reportsAndRestoresClearedNoSpendDay() async throws {
+        let setup = try await Setup()
+        try await setup.database.markNoSpendDay(setup.draft.date, at: setup.now)
+
+        let result = try await setup.database.saveEntryResult(
+            setup.draft,
+            at: setup.now
+        )
+
+        let cleared = try setup.database.snapshot().noSpendDays
+
+        try await setup.database.deleteEntry(
+            result.entry.id,
+            restoringNoSpend: result.clearedNoSpendDays
+        )
+
+        let restored = try setup.database.snapshot().noSpendDays
+
+        #expect(result.clearedNoSpendDays.map(\.date) == [setup.draft.date])
+        #expect(cleared.isEmpty)
+        #expect(restored.map(\.date) == [setup.draft.date])
+    }
+
+    @Test
+    func doesNotMakeNoSpendDayOnUnmarkedDay() async throws {
+        let setup = try await Setup()
+
+        let result = try await setup.database.saveEntryResult(
+            setup.draft,
+            at: setup.now
+        )
+
+        try await setup.database.deleteEntry(
+            result.entry.id,
+            restoringNoSpend: result.clearedNoSpendDays
+        )
+
+        let snapshot = try setup.database.snapshot()
+
+        #expect(result.clearedNoSpendDays.isEmpty)
+        #expect(snapshot.noSpendDays.isEmpty)
+    }
+
+    @Test
     func savesNewEntry() async throws {
         let setup = try await Setup()
 

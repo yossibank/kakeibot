@@ -14,6 +14,14 @@ public extension AppDatabase {
         editing id: Entry.ID? = nil,
         at now: Date
     ) async throws -> Entry {
+        try await saveEntryResult(draft, editing: id, at: now).entry
+    }
+
+    func saveEntryResult(
+        _ draft: EntryDraft,
+        editing id: Entry.ID? = nil,
+        at now: Date
+    ) async throws -> SavedEntry {
         try await writer.write { db in
             try Self.saveEntry(draft, editing: id, in: db, at: now)
         }
@@ -38,7 +46,8 @@ public extension AppDatabase {
 
     func restoreEntry(
         _ entry: Entry,
-        fee: Entry? = nil
+        fee: Entry? = nil,
+        restoringNoSpend days: [NoSpendDay] = []
     ) async throws {
         try await writer.write { db in
             try Self.restore([entry], in: db)
@@ -51,6 +60,8 @@ public extension AppDatabase {
             if let fee {
                 try Self.restore([fee], in: db)
             }
+
+            try Self.restoreNoSpendDays(days, in: db)
         }
     }
 
@@ -61,11 +72,17 @@ public extension AppDatabase {
     }
 
     @discardableResult
-    func deleteEntry(_ id: Entry.ID) async throws -> [Entry] {
-        try await deleteEntries([id])
+    func deleteEntry(
+        _ id: Entry.ID,
+        restoringNoSpend days: [NoSpendDay] = []
+    ) async throws -> [Entry] {
+        try await deleteEntries([id], restoringNoSpend: days)
     }
 
-    func deleteEntries(_ ids: [Entry.ID]) async throws -> [Entry] {
+    func deleteEntries(
+        _ ids: [Entry.ID],
+        restoringNoSpend days: [NoSpendDay] = []
+    ) async throws -> [Entry] {
         try await writer.write { db in
             let entries = try Entry.fetchAll(db, keys: ids)
 
@@ -75,6 +92,8 @@ public extension AppDatabase {
                 .fetchAll(db)
 
             _ = try Entry.deleteAll(db, keys: ids)
+
+            try Self.restoreNoSpendDays(days, in: db)
 
             return entries + fees
         }
@@ -120,7 +139,7 @@ extension AppDatabase {
         editing id: Entry.ID?,
         in db: Database,
         at now: Date
-    ) throws -> Entry {
+    ) throws -> SavedEntry {
         let entry = try Self.entry(
             from: draft,
             editing: id,
@@ -140,13 +159,45 @@ extension AppDatabase {
 
         try entry.save(db)
 
+        var cleared: [NoSpendDay] = []
+
         if entry.type == .expense {
-            try NoSpendDay.deleteOne(db, key: entry.date)
+            cleared += try clearNoSpendDay(on: entry.date, in: db)
         }
 
-        try saveFee(draft.fee, for: entry, in: db, at: now)
+        cleared += try saveFee(draft.fee, for: entry, in: db, at: now)
 
-        return entry
+        return SavedEntry(entry: entry, clearedNoSpendDays: cleared)
+    }
+
+    @discardableResult
+    static func clearNoSpendDay(
+        on date: LocalDate,
+        in db: Database
+    ) throws -> [NoSpendDay] {
+        guard let day = try NoSpendDay.fetchOne(db, key: date) else {
+            return []
+        }
+
+        _ = try NoSpendDay.deleteOne(db, key: date)
+
+        return [day]
+    }
+
+    static func restoreNoSpendDays(
+        _ days: [NoSpendDay],
+        in db: Database
+    ) throws {
+        for day in days {
+            let expenses = try Entry
+                .filter(Column("date") == day.date)
+                .filter(Column("type") == Entry.Kind.expense)
+                .fetchCount(db)
+
+            if expenses == 0 {
+                try day.save(db)
+            }
+        }
     }
 
     static func fee(
@@ -158,12 +209,13 @@ extension AppDatabase {
             .fetchOne(db)
     }
 
+    @discardableResult
     static func saveFee(
         _ amount: Int,
         for transfer: Entry,
         in db: Database,
         at now: Date
-    ) throws {
+    ) throws -> [NoSpendDay] {
         let existing = try fee(of: transfer.id, in: db)
 
         guard
@@ -171,7 +223,7 @@ extension AppDatabase {
             amount > 0
         else {
             try existing?.delete(db)
-            return
+            return []
         }
 
         var fee = try existing ?? Entry(
@@ -192,7 +244,8 @@ extension AppDatabase {
         fee.updatedAt = now
 
         try fee.save(db)
-        try NoSpendDay.deleteOne(db, key: fee.date)
+
+        return try clearNoSpendDay(on: fee.date, in: db)
     }
 }
 
@@ -218,7 +271,7 @@ private extension AppDatabase {
             try entry.save(db)
 
             if entry.type == .expense {
-                try NoSpendDay.deleteOne(db, key: entry.date)
+                try clearNoSpendDay(on: entry.date, in: db)
             }
         }
     }

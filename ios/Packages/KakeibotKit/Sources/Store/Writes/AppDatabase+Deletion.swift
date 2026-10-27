@@ -8,7 +8,7 @@ public extension AppDatabase {
                 try record.insert(db)
             }
 
-            for entry in deletion.entries {
+            for entry in deletion.entries where try Entry.exists(db, key: entry.id) {
                 try entry.update(db)
             }
         }

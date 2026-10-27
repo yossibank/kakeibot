@@ -25,7 +25,7 @@ struct WidgetEntryWriteTests {
         #expect(saved?.amount == 980)
         #expect(saved?.date == setup.today)
         #expect(saved?.templateId == template.id)
-        #expect(remembered == entry.id)
+        #expect(remembered?.entryId == entry.id)
     }
 
     @Test
@@ -107,6 +107,44 @@ struct WidgetEntryWriteTests {
         #expect(before?.tagId == tag.id)
         #expect(after?.tagId == nil)
         #expect(after?.templateId == template.id)
+    }
+
+    @Test
+    func undoRestoresNoSpendDayClearedByWidget() async throws {
+        let setup = try await Setup()
+        try await setup.database.markNoSpendDay(setup.today, at: setup.now)
+
+        let template = try await setup.database.saveTemplate(
+            setup.draft,
+            at: setup.now
+        )
+
+        let entry = try await setup.database.recordFromWidget(
+            template.id,
+            on: setup.today,
+            at: setup.now
+        )
+
+        let cleared = try setup.database.snapshot().noSpendDays
+        try await setup.database.undoWidgetEntry(entry.id)
+        let restored = try setup.database.snapshot().noSpendDays
+        let remembered = try await setup.database.setting(.widgetEntry)
+
+        #expect(cleared.isEmpty)
+        #expect(restored.map(\.date) == [setup.today])
+        #expect(remembered == nil)
+    }
+
+    @Test
+    func readsBothWidgetRecordForms() throws {
+        let id = Entry.ID()
+        let date = try #require(LocalDate("2026-10-03"))
+
+        #expect(WidgetRecord(id.description) == WidgetRecord(entryId: id))
+        #expect(WidgetRecord("\(id),2026-10-03") == WidgetRecord(
+            entryId: id,
+            clearedNoSpendDate: date
+        ))
     }
 
     @Test

@@ -55,7 +55,7 @@ public extension BackupModel {
         let date = Self.dayText(pending.exportedAt)
         let counts = "記録 \(data.entries.count) 件・口座 \(data.wallets.count) 件"
 
-        return "\(date) に書き出した\(counts)に置き換えます。いまのデータは残りません"
+        return "\(date) に書き出した\(counts)に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます"
     }
 
     var previousDay: String? {
