@@ -166,6 +166,9 @@ struct MainView: View {
                         }
                     }
                 )
+                .loadFailed(records.isListFailed) {
+                    observationRound += 1
+                }
                 .tabContent()
             }
 
@@ -184,6 +187,9 @@ struct MainView: View {
                         tab = .records
                     }
                 )
+                .loadFailed(review.isListFailed) {
+                    observationRound += 1
+                }
                 .tabContent()
             }
 
@@ -206,6 +212,9 @@ struct MainView: View {
                         sheet = .reward
                     }
                 )
+                .loadFailed(assets.isListFailed) {
+                    observationRound += 1
+                }
                 .tabContent()
             }
         }

@@ -366,18 +366,7 @@ private extension HomeView {
             }
 
             if model.isListFailed {
-                VStack(spacing: 8) {
-                    Text("読み込めませんでした")
-                        .textFont(.footnote)
-                        .foregroundStyle(Palette.subtext)
-
-                    Button("もう一度読み込む", action: onRetry)
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.accent)
-                        .frame(minHeight: 44)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                LoadFailedNotice(onRetry: onRetry)
             } else if model.recentRows.isEmpty {
                 Text("まだ記録がありません。右下の ＋ から記録できます")
                     .textFont(.footnote)

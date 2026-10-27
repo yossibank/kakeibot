@@ -11,6 +11,7 @@ public final class ReviewModel: ScreenModel {
 
     public private(set) var scale: ReviewPeriod.Scale = .month
     public private(set) var kind: ReviewKind = .expense
+    public private(set) var isListFailed = false
     public private(set) var offset = 0
     public private(set) var isMovingForward = true
     public private(set) var monthStartDay: MonthStartDay = .first
@@ -475,7 +476,9 @@ private extension ReviewModel {
     }
 
     func observe() async {
-        await observe(
+        isListFailed = false
+
+        isListFailed = await observe(
             database.entryListUpdates(),
             failure: Self.loadFailedMessage
         ) { list in

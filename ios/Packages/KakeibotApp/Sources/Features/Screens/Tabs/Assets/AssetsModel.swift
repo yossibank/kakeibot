@@ -11,6 +11,7 @@ public final class AssetsModel: ScreenModel {
 
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var list: EntryList?
+    public private(set) var isListFailed = false
     public private(set) var rewardBank: RewardBank?
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -411,7 +412,9 @@ private extension AssetsModel {
     }
 
     func observe() async {
-        await observe(
+        isListFailed = false
+
+        isListFailed = await observe(
             database.entryListUpdates(),
             failure: Self.loadFailedMessage
         ) { list in

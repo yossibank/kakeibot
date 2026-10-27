@@ -85,4 +85,52 @@ struct AppModelTests {
             return
         }
     }
+
+    @Test
+    func opensAgainAfterFailure() async throws {
+        let database = try AppDatabase.inMemory()
+        let attempts = Attempts()
+
+        let model = AppModel {
+            attempts.count += 1
+
+            guard attempts.count > 1 else {
+                throw AppDatabase.SetupError.appGroupUnavailable
+            }
+
+            return database
+        }
+
+        await model.open()
+        await model.retryOpen()
+
+        guard case .onboarding = model.launch else {
+            Issue.record("Expected onboarding, got \(model.launch)")
+            return
+        }
+
+        #expect(attempts.count == 2)
+    }
+
+    @Test
+    func ignoresRetryUnlessFailed() async throws {
+        let database = try AppDatabase.inMemory()
+        let attempts = Attempts()
+
+        let model = AppModel {
+            attempts.count += 1
+            return database
+        }
+
+        await model.open()
+        await model.retryOpen()
+
+        #expect(attempts.count == 1)
+    }
+}
+
+extension AppModelTests {
+    final class Attempts: @unchecked Sendable {
+        var count = 0
+    }
 }
