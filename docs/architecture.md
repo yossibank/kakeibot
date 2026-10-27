@@ -122,9 +122,9 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | 型 | 持つもの |
 | --- | --- |
 | AppModel | 最初の設定が済んでいなければ Onboarding を出す。今日は RootView が MainView と Onboarding に渡す |
-| MainView | タブは Home・Records・Review・Assets。シートは新規・編集・設定・テンプレート・振替・口座・固定費など |
+| MainView | タブは Home・Records・Review・Assets。シートは新規・編集・設定・テンプレート（`EntryTemplate`）・振替・口座（`Wallet`）・固定費（`Recurring`）など |
 
-記録の一覧（`EntryList`）の見張りは `AppDatabase` が 1 つだけ持ち、見張る画面のあいだで共有する。
+記録の一覧（`EntryList`）の見張り（`ValueObservation`）は `AppDatabase` が 1 つだけ持ち、見張る画面のあいだで共有する。
 
 ### 保存から反映まで
 
@@ -175,7 +175,7 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 | --- | --- |
 | 記録忘れの通知 | 数日先まで予約し、当日の記録か支出なしの印ができたら当日分を取り消す |
 | 固定費の更新前の通知 | 更新日の N 日前で予約する |
-| iOS のウィジェット | AppWidget が `AppDatabase.appGroupForReading()` で DB を読むだけで開き、ホームと同じ `MonthOverview` を使う。背景は、テーマの色の値から作った色で描く。表の形が最新でなければ読まない。AppModel が記録・予算・固定費・テンプレートとその並べ順・テーマの変化を見張って更新し、日付が変わるときはタイムラインで切り替える。すぐ記録を押したときだけ、AppIntent が `appGroupForWriting()` で開いて書き、通知を予約し直してすべてのウィジェットを更新する |
+| iOS のウィジェット | AppWidget が `AppDatabase.appGroupForReading()` で DB を読むだけで開き、ホームと同じ `MonthOverview` を使う。背景は、テーマ（`ThemePalette`）の色の値から作った色で描く。表の形が最新でなければ読まない。AppModel が記録・予算・固定費・テンプレートとその並べ順・テーマの変化を見張って更新し、日付が変わるときはタイムラインで切り替える。すぐ記録を押したときだけ、AppIntent が `appGroupForWriting()` で開いて書き、通知を予約し直してすべてのウィジェットを更新する |
 
 ## テスト
 

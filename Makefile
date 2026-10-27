@@ -30,7 +30,7 @@ test-build:
 	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' build-for-testing $(BEAUTIFY)
 
 test:
-	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' test $(BEAUTIFY)
+	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' -collect-test-diagnostics never test $(BEAUTIFY)
 
 snapshot:
 	$(CLAUDE_CONFIG)/skills/ui-snapshot/scripts/render.sh ios/Packages/KakeibotApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
