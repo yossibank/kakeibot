@@ -457,12 +457,7 @@ private extension WalletEditSheet {
                 onSave()
             } content: {
                 VStack(spacing: 12) {
-                    Text(AmountText.text(calculator.amount))
-                        .displayFont(.largeTitle, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .contentTransition(.numericText())
-                        .animation(.snappy, value: calculator.amount)
+                    SettingsKeypadValue(calculator.amount)
 
                     Keypad(calculator: calculator) {
                         onSave()

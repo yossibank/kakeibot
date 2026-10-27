@@ -281,7 +281,7 @@ private extension EntrySheet {
     var categoryPager: some View {
         VStack(spacing: 8) {
             ScrollView(.horizontal) {
-                LazyHStack(spacing: 0) {
+                HStack(spacing: 0) {
                     ForEach(
                         Array(model.categoryPages.enumerated()),
                         id: \.offset
