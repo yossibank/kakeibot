@@ -710,6 +710,10 @@ public extension EntryModel {
         WalletEditModel(database: database)
     }
 
+    func editWalletModel(_ id: Wallet.ID) -> WalletEditModel {
+        WalletEditModel(database: database, editing: id)
+    }
+
     func reloadWallets() async {
         do {
             options = try await database.entryOptions()

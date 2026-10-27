@@ -6,7 +6,9 @@ struct EntryWalletSheet: View {
     @Bindable var model: EntryModel
 
     @State private var isAdding = false
+    @State private var isEditing = false
     @State private var added: Wallet?
+    @State private var editing: Wallet?
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
@@ -22,6 +24,15 @@ struct EntryWalletSheet: View {
                         .foregroundStyle(Palette.accentStrong)
 
                     Spacer()
+
+                    RingButton(
+                        systemImage: "pencil",
+                        style: isEditing ? .prominent : .plain
+                    ) {
+                        withAnimation(.snappy) {
+                            isEditing.toggle()
+                        }
+                    }
 
                     RingButton(systemImage: "plus") {
                         isAdding = true
@@ -41,7 +52,7 @@ struct EntryWalletSheet: View {
                     }
                 }
 
-                if showsBills {
+                if showsBills, !isEditing {
                     billSection
                         .transition(Self.billTransition)
                 }
@@ -51,6 +62,9 @@ struct EntryWalletSheet: View {
             WalletEditSheet(model: model.newWalletModel()) { wallet in
                 added = wallet
             }
+        }
+        .sheet(item: $editing, onDismiss: reload) { wallet in
+            WalletEditSheet(model: model.editWalletModel(wallet.id))
         }
     }
 }
@@ -70,6 +84,12 @@ private extension EntryWalletSheet {
         let iconColor = isSelected ? Palette.accent : Palette.subtext
 
         return Button {
+            guard !isEditing else {
+                editing = wallet
+
+                return
+            }
+
             withAnimation(.snappy) {
                 select(wallet)
             }
@@ -96,7 +116,11 @@ private extension EntryWalletSheet {
 
                 Spacer()
 
-                if isSelected {
+                if isEditing {
+                    Image(systemName: "pencil")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(Palette.accent)
+                } else if isSelected {
                     Image(systemName: "checkmark")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(Palette.accent)
@@ -122,8 +146,8 @@ private extension EntryWalletSheet {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .disabled(isTaken)
-        .opacity(isTaken ? 0.45 : 1)
+        .disabled(isTaken && !isEditing)
+        .opacity(isTaken && !isEditing ? 0.45 : 1)
     }
 }
 
@@ -258,6 +282,12 @@ private extension EntryWalletSheet {
         switch role {
         case .source: model.walletId
         case .destination: model.toWalletId
+        }
+    }
+
+    func reload() {
+        Task {
+            await model.reloadWallets()
         }
     }
 

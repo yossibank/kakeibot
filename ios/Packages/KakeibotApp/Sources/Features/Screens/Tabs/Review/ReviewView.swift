@@ -372,6 +372,7 @@ private extension ReviewView {
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
+        .sharesTextScale(id: moves.map(\.wallet.name))
     }
 
     func moveLegend(
@@ -399,8 +400,7 @@ private extension ReviewView {
                 Text(move.wallet.name)
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 if let note = Self.moveNote(of: move) {
                     Text(note)

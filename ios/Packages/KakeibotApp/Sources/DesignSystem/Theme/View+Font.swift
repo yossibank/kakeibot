@@ -33,35 +33,38 @@ public extension View {
 
 private struct DisplayFont: ViewModifier {
     @Environment(\.themeStyle.displayFont) private var font
-    @Environment(\.themeStyle.textSize.scale) private var scale
+    @Environment(\.themeStyle.textSize.scale) private var textSize
+    @Environment(\.sharedTextScale) private var shared
 
     let size: FontSize
     let weight: Font.Weight
 
     func body(content: Content) -> some View {
-        content.font(.display(size, weight: weight, in: font, scale: scale))
+        content.font(.display(size, weight: weight, in: font, scale: textSize * shared))
     }
 }
 
 private struct SansFont: ViewModifier {
-    @Environment(\.themeStyle.textSize.scale) private var scale
+    @Environment(\.themeStyle.textSize.scale) private var textSize
+    @Environment(\.sharedTextScale) private var shared
 
     let size: FontSize
     let weight: Font.Weight
 
     func body(content: Content) -> some View {
-        content.font(.sans(size, weight: weight, scale: scale))
+        content.font(.sans(size, weight: weight, scale: textSize * shared))
     }
 }
 
 private struct TextFont: ViewModifier {
     @Environment(\.themeStyle.textFont) private var font
-    @Environment(\.themeStyle.textSize.scale) private var scale
+    @Environment(\.themeStyle.textSize.scale) private var textSize
+    @Environment(\.sharedTextScale) private var shared
 
     let spec: Spec
 
     func body(content: Content) -> some View {
-        content.font(spec.font(in: font, scale: scale))
+        content.font(spec.font(in: font, scale: textSize * shared))
     }
 }
 

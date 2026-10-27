@@ -17,6 +17,7 @@ struct EntryRouteRow: View {
             .padding(.vertical, 1)
         }
         .scrollIndicators(.hidden)
+        .sharesTextScale(id: model.frequentRoutes)
     }
 }
 
@@ -34,17 +35,17 @@ private extension EntryRouteRow {
         } label: {
             HStack(spacing: 6) {
                 Text(source)
+                    .sharedTextScale()
 
                 Image(systemName: "arrow.right")
                     .sansFont(.micro, weight: .semibold)
                     .foregroundStyle(Palette.accent)
 
                 Text(destination)
+                    .sharedTextScale()
             }
             .textFont(size: .caption)
             .foregroundStyle(Palette.text)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
             .padding(.horizontal, 12)
             .frame(height: Self.height)
             .background(EntrySheet.categoryFill(isApplied), in: Capsule())

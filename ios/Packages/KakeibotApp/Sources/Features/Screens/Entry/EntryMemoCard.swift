@@ -45,6 +45,7 @@ struct EntryMemoCard: View {
                             suggestionButton(memo)
                         }
                     }
+                    .sharesTextScale(id: model.recentMemos)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -64,16 +65,17 @@ struct EntryMemoCard: View {
 
 private extension EntryMemoCard {
     func suggestionButton(_ memo: String) -> some View {
-        Button(memo) {
+        Button {
             model.memo = memo
+        } label: {
+            Text(memo)
+                .textFont(.caption)
+                .foregroundStyle(Palette.text)
+                .sharedTextScale()
+                .padding(.horizontal, 12)
+                .frame(minHeight: 32)
+                .overlay(Capsule().stroke(Palette.line, lineWidth: 1))
         }
-        .textFont(.caption)
-        .foregroundStyle(Palette.text)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
-        .padding(.horizontal, 12)
-        .frame(minHeight: 32)
-        .overlay(Capsule().stroke(Palette.line, lineWidth: 1))
         .buttonStyle(.plain)
     }
 }

@@ -40,6 +40,7 @@ struct RecordsFilterSheet: View {
                             }
                         }
                         .padding(.vertical, 4)
+                        .sharesTextScale(id: items(in: tab).map(\.name))
                     }
                 }
                 .scrollIndicators(.hidden)
@@ -157,8 +158,7 @@ private extension RecordsFilterSheet {
                 Text(item.name)
                     .textFont(.caption2)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
             }
             .frame(maxWidth: .infinity, minHeight: 72)
             .background(fill, in: shape)

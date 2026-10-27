@@ -89,6 +89,7 @@ public struct RecurringListView: View {
         ) { id in
             floatingTile(id)
         }
+        .sharesTextScale(id: (model.rows + model.hiddenRows).map(\.place))
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }

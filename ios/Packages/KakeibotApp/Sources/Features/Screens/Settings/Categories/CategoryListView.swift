@@ -96,6 +96,7 @@ public struct CategoryListView: View {
         ) { id in
             floatingTile(id)
         }
+        .sharesTextScale(id: model.shown + model.hidden)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -270,8 +271,7 @@ private extension CategoryListView {
             Text(category.name)
                 .textFont(size: .caption)
                 .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .sharedTextScale()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottom) {

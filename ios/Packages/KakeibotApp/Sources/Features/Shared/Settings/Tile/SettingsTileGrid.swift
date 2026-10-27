@@ -24,6 +24,7 @@ struct SettingsTileGrid<Item: Identifiable, Tile: View>: View {
                 }
             }
         }
+        .sharesTextScale(id: items.map(\.id))
     }
 }
 

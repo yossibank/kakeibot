@@ -120,6 +120,7 @@ private extension RecurringEditSheet {
                     VStack(alignment: .leading, spacing: 8) {
                         RecurringRowCard(row: model.previewRow)
                             .frame(height: RecurringRowCard.height)
+                            .sharesTextScale(id: model.previewRow.place)
 
                         Text("一覧では、このカードで並びます")
                             .textFont(.caption2)

@@ -512,6 +512,7 @@ private extension AssetsView {
             }
         }
         .padding(.bottom, 4)
+        .sharesTextScale(id: section.rows.map(\.wallet.name))
     }
 
     func walletRow(_ row: AssetsModel.WalletRow) -> some View {
@@ -525,8 +526,7 @@ private extension AssetsView {
                     Text(row.wallet.name)
                         .textFont(.subheadline)
                         .foregroundStyle(Palette.text)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                        .sharedTextScale()
 
                     if let label = Self.label(of: row) {
                         Text(label)

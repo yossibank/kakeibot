@@ -481,6 +481,7 @@ private extension EntrySheet {
                 }
             }
         }
+        .sharesTextScale(id: page)
     }
 
     @ViewBuilder
@@ -546,8 +547,7 @@ private extension EntrySheet {
 
             Text(category.name)
                 .textFont(size: .caption)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .sharedTextScale()
         }
         .foregroundStyle(color)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -570,6 +570,7 @@ private extension EntrySheet {
             .transition(.opacity)
 
         categoryFace(menu.category, isLifted: true)
+            .sharesTextScale(id: menu.category)
             .frame(width: menu.frame.width, height: menu.frame.height)
             .scaleEffect(1.06)
             .shadow(color: Palette.glow.opacity(.muted), radius: 12)

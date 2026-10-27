@@ -68,8 +68,7 @@ public struct EntryRow: View {
                         Text(detail)
                             .textFont(.caption)
                             .foregroundStyle(Palette.subtext)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .sharedTextScale()
                     }
                 }
 

@@ -76,6 +76,7 @@ private extension AssetsMovedSheet {
             }
             .padding(.horizontal, 16)
             .card()
+            .sharesTextScale(id: rows)
         }
     }
 }

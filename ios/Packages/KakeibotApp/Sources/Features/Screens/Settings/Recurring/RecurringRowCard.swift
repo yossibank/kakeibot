@@ -47,8 +47,7 @@ struct RecurringRowCard: View {
                         Text(place)
                             .textFont(.caption)
                             .foregroundStyle(Palette.subtext)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .sharedTextScale()
                     }
 
                     Spacer(minLength: 8)

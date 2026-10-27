@@ -72,6 +72,7 @@ struct ReviewShareSheet: View {
                 }
                 .padding(.horizontal, 16)
                 .card()
+                .sharesTextScale(id: rows)
             }
             .scrollIndicators(.hidden)
         }
