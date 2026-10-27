@@ -19,8 +19,7 @@ struct SettingsCategoryTile: View {
 
                 Text(category.name)
                     .textFont(size: .caption)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
             }
             .foregroundStyle(color)
             .frame(maxWidth: .infinity, minHeight: 54)

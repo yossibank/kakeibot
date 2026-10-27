@@ -281,8 +281,7 @@ private extension RecordsView {
                         Text(word)
                             .textFont(.subheadline)
                             .foregroundStyle(Palette.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .sharedTextScale()
 
                         Spacer()
                     }
@@ -298,6 +297,7 @@ private extension RecordsView {
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
         .card()
+        .sharesTextScale(id: model.recentSearches)
     }
 
     @ViewBuilder
@@ -740,6 +740,7 @@ private extension RecordsView {
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
         .card()
+        .sharesTextScale(id: model.rows(for: day))
     }
 
     @ViewBuilder

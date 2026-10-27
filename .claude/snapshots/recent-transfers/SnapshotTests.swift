@@ -40,7 +40,7 @@ private extension SnapshotTests {
         let bank = try await database.saveWallet(
             WalletDraft(
                 kind: .bank,
-                name: "三井住友銀行 普通預金",
+                name: "三井住友カード（NL）ゴールド",
                 mark: .glyph(.bank),
                 color: "#4A6FA5",
                 initialBalance: 100_000
@@ -51,7 +51,7 @@ private extension SnapshotTests {
         let pay = try await database.saveWallet(
             WalletDraft(
                 kind: .cash,
-                name: "楽天ペイ チャージ用",
+                name: "楽天銀行 普通預金",
                 mark: .glyph(.card),
                 color: "#E07A5F",
                 initialBalance: 0

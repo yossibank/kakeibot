@@ -90,6 +90,7 @@ public struct WalletListView: View {
         ) { id in
             floatingTile(id)
         }
+        .sharesTextScale(id: model.shown + model.hidden)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -265,8 +266,7 @@ private extension WalletListView {
                 Text(wallet.name)
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 Text(wallet.kind.title)
                     .textFont(.caption2)

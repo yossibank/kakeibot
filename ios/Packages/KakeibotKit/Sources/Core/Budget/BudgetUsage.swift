@@ -25,7 +25,7 @@ public extension BudgetUsage {
     }
 
     var isNearLimit: Bool {
-        !isOver && spent * 5 >= budget * 4
+        budget > 0 && !isOver && spent * 5 >= budget * 4
     }
 
     var progress: Double {

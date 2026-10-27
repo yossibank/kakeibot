@@ -36,6 +36,7 @@ struct RecordsBatchSheet: View {
                         }
                     }
                 }
+                .sharesTextScale(id: names)
             }
         }
     }
@@ -55,6 +56,13 @@ extension RecordsBatchSheet {
 private extension RecordsBatchSheet {
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
+    }
+
+    var names: [String] {
+        switch target {
+        case let .category(type): model.batchCategories(for: type).map(\.name)
+        case .wallet: model.batchWallets.map(\.name)
+        }
     }
 
     var title: String {
@@ -101,8 +109,7 @@ private extension RecordsBatchSheet {
                 Text(name)
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 Spacer(minLength: 8)
             }

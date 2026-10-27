@@ -440,6 +440,44 @@ struct TransferEntryTests {
         #expect(model.routeText == "財布 → 銀行")
         #expect(model.sourceBalanceText?.hasPrefix("財布 残高 ") == true)
     }
+
+    @Test
+    func choosesAnotherSourceWhenHidden() async throws {
+        let setup = try await Setup()
+
+        let model = EntryModel(
+            database: setup.database,
+            date: setup.date,
+            type: .transfer
+        )
+
+        await model.load()
+        try await setup.database.setWalletHidden(setup.cash, isHidden: true, at: Date())
+        await model.reloadWallets()
+
+        #expect(model.walletId != setup.cash)
+        #expect(model.walletId != nil)
+        #expect(model.walletId != model.toWalletId)
+    }
+
+    @Test
+    func choosesAnotherDestinationWhenHidden() async throws {
+        let setup = try await Setup()
+
+        let model = EntryModel(
+            database: setup.database,
+            date: setup.date,
+            type: .transfer
+        )
+
+        await model.load()
+        try await setup.database.setWalletHidden(setup.bank, isHidden: true, at: Date())
+        await model.reloadWallets()
+
+        #expect(model.walletId == setup.cash)
+        #expect(model.toWalletId != setup.bank)
+        #expect(model.toWalletId != setup.cash)
+    }
 }
 
 extension TransferEntryTests {

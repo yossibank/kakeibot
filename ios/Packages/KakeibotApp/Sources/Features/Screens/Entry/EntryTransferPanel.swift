@@ -32,6 +32,7 @@ struct EntryTransferPanel: View {
 
             card(.destination)
         }
+        .sharesTextScale(id: [model.walletId, model.toWalletId])
         .sensoryFeedback(.selection, trigger: model.toWalletId)
     }
 }
@@ -64,8 +65,7 @@ private extension EntryTransferPanel {
                 Text(wallet?.name ?? "選ぶ")
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 if let current {
                     Grid(horizontalSpacing: 8, verticalSpacing: 4) {

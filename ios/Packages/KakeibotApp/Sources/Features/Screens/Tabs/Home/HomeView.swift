@@ -400,6 +400,7 @@ private extension HomeView {
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
         .card()
+        .sharesTextScale(id: model.recentRows)
     }
 
     var billCard: some View {
@@ -440,6 +441,7 @@ private extension HomeView {
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
         .card()
+        .sharesTextScale(id: model.upcomingBills.map { model.title(of: $0.recurring) })
     }
 
     var stampCard: some View {
@@ -522,8 +524,7 @@ private extension HomeView {
                 Text(model.title(of: bill.recurring))
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 if bill.shortage > 0 {
                     Text("残高が \(AmountText.text(bill.shortage)) 足りません")

@@ -39,6 +39,7 @@ public struct RecordsRewardSheet: View {
                             row(rule)
                         }
                     }
+                    .sharesTextScale(id: model.rewardRules.map(\.name))
 
                     total
                 }
@@ -115,8 +116,7 @@ private extension RecordsRewardSheet {
                 Text(rule.name)
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 Spacer(minLength: 8)
 

@@ -173,6 +173,7 @@ private extension ThemeListView {
                 newTile
             }
         }
+        .sharesTextScale(id: model.customThemes.map(\.name))
     }
 
     var newTile: some View {
@@ -222,6 +223,7 @@ private extension ThemeListView {
                 }
             }
         }
+        .sharesTextScale(id: presets)
     }
 
     func sectionTitle(_ title: String) -> some View {
@@ -274,8 +276,7 @@ private extension ThemeListView {
             Text(title)
                 .textFont(.footnote)
                 .foregroundStyle(titleColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .sharedTextScale()
         }
     }
 

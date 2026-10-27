@@ -178,6 +178,7 @@ private extension AssetsRewardSheet {
                 }
             }
         }
+        .sharesTextScale(id: model.waitingGoals.map(\.name))
     }
 
     var ruleSection: some View {
@@ -214,6 +215,7 @@ private extension AssetsRewardSheet {
                 }
                 .padding(16)
                 .card()
+                .sharesTextScale(id: model.rewardRules.map(\.name))
             }
         }
     }
@@ -226,6 +228,7 @@ private extension AssetsRewardSheet {
                 boughtRow(goal)
             }
         }
+        .sharesTextScale(id: model.boughtGoals.map(\.name))
     }
 
     var historySection: some View {
@@ -254,8 +257,7 @@ private extension AssetsRewardSheet {
                 Text(goal.name)
                     .textFont(.subheadline, weight: .semibold)
                     .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 Spacer(minLength: 8)
 
@@ -317,8 +319,7 @@ private extension AssetsRewardSheet {
                 Text("\(goal.name) まで")
                     .textFont(.caption)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 Spacer(minLength: 8)
 
@@ -337,6 +338,7 @@ private extension AssetsRewardSheet {
                     .foregroundStyle(Palette.subtext)
             }
         }
+        .sharesTextScale(id: goal.name)
     }
 
     func guideStep(
@@ -374,8 +376,7 @@ private extension AssetsRewardSheet {
             Text(rule.name)
                 .textFont(.footnote)
                 .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .sharedTextScale()
 
             Spacer(minLength: 8)
 
@@ -399,8 +400,7 @@ private extension AssetsRewardSheet {
                 Text(goal.name)
                     .textFont(.footnote)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 Text(date.formatted(.dateTime.year().month().day()))
                     .textFont(.caption2)
@@ -464,6 +464,7 @@ private extension AssetsRewardSheet {
             }
             .padding(16)
             .card()
+            .sharesTextScale(id: month.logs)
         }
     }
 
@@ -477,8 +478,7 @@ private extension AssetsRewardSheet {
             Text(rule?.name ?? "")
                 .textFont(.footnote)
                 .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .sharedTextScale()
 
             Spacer(minLength: 8)
 

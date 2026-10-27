@@ -19,10 +19,19 @@ struct EntryRecentTransfers: View {
                 row(transfer)
             }
         }
+        .sharesTextScale(id: names)
     }
 }
 
 private extension EntryRecentTransfers {
+    var names: [String] {
+        transfers.flatMap { transfer in
+            [transfer.walletId, transfer.toWalletId].map { id in
+                model.wallet(id)?.name ?? ""
+            }
+        }
+    }
+
     func row(_ transfer: Entry) -> some View {
         let fee = model.fee(of: transfer)
 
@@ -48,19 +57,21 @@ private extension EntryRecentTransfers {
 
                 Spacer(minLength: 8)
 
-                if fee > 0 {
-                    Text("＋手数料 \(AmountText.text(fee))")
-                        .textFont(.caption2)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(AmountText.text(transfer.amount))
                         .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
+                        .foregroundStyle(Palette.accentStrong)
+                        .fixedSize()
 
-                Text(AmountText.text(transfer.amount))
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .fixedSize()
+                    if fee > 0 {
+                        Text("＋手数料 \(AmountText.text(fee))")
+                            .textFont(.caption2)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+                            .fixedSize()
+                    }
+                }
+                .layoutPriority(1)
 
                 Image(systemName: "chevron.right")
                     .sansFont(.micro, weight: .semibold)
