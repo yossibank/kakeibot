@@ -11,8 +11,8 @@ struct EntryDialFace: View {
         ZStack(alignment: .bottom) {
             HalfDial(progress: usage?.progress, tint: usage?.tint ?? Palette.accent)
 
-            VStack(spacing: 8) {
-                HStack(spacing: 6) {
+            VStack(spacing: 4) {
+                HStack(spacing: 8) {
                     if isEnteringFee {
                         Image(systemName: "yensign.circle")
                             .sansFont(.caption, weight: .semibold)
