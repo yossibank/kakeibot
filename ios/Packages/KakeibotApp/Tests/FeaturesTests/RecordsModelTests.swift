@@ -250,6 +250,29 @@ struct RecordsModelTests {
     }
 
     @Test
+    func refusesRewardOnFutureDay() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        let future = setup.today.adding(days: 1)
+
+        let draft = RewardRuleDraft(
+            name: "自炊した日",
+            amount: 500,
+            icon: IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
+        )
+
+        let rule = try await setup.database.saveRewardRule(draft, at: Date())
+
+        await model.toggleReward(rule, on: future)
+        await model.toggleReward(rule, on: setup.today)
+        let logs = try setup.database.snapshot().rewardLogs
+
+        #expect(!model.canReward(on: future))
+        #expect(model.canReward(on: setup.today))
+        #expect(logs.map(\.date) == [setup.today])
+    }
+
+    @Test
     func togglesNoSpendDay() async throws {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)

@@ -255,6 +255,10 @@ public extension RecordsModel {
         _ rule: RewardRule,
         on date: LocalDate
     ) async {
+        guard canReward(on: date) else {
+            return
+        }
+
         let isAchieved = !isAchieved(rule, on: date)
 
         do {
@@ -267,6 +271,10 @@ public extension RecordsModel {
         } catch {
             errorNotice.show(Self.saveFailedMessage)
         }
+    }
+
+    func canReward(on date: LocalDate) -> Bool {
+        date <= today
     }
 
     func canMarkNoSpend(on date: LocalDate) -> Bool {

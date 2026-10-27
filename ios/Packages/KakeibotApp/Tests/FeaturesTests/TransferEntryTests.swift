@@ -478,6 +478,92 @@ struct TransferEntryTests {
         #expect(model.toWalletId != setup.bank)
         #expect(model.toWalletId != setup.cash)
     }
+
+    @Test
+    func keepsHiddenWalletsWhenEditing() async throws {
+        let setup = try await Setup()
+        let billMonth = try #require(YearMonth(year: 2026, month: 11))
+
+        let draft = try await EntryDraft(
+            type: .expense,
+            amount: 800,
+            date: setup.date,
+            categoryId: setup.database.entryOptions().expenseCategories[0].id,
+            walletId: setup.cash,
+            billMonth: billMonth
+        )
+
+        let entry = try await setup.database.saveEntry(draft, at: Date())
+        try await setup.database.setWalletHidden(setup.cash, isHidden: true, at: Date())
+
+        let model = EntryModel(
+            database: setup.database,
+            editing: entry.id,
+            date: setup.date
+        )
+
+        await model.load()
+        await model.reloadWallets()
+
+        #expect(model.walletId == setup.cash)
+        #expect(model.billMonth == entry.billMonth)
+        #expect(model.wallet(setup.cash) != nil)
+        #expect(model.wallet(setup.bank) != nil)
+    }
+
+    @Test
+    func keepsHiddenTransferWalletsWhenEditing() async throws {
+        let setup = try await Setup()
+        try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 1)
+        let transfer = try #require(setup.database.snapshot().entries.first)
+        try await setup.database.setWalletHidden(setup.bank, isHidden: true, at: Date())
+
+        let model = EntryModel(
+            database: setup.database,
+            editing: transfer.id,
+            date: setup.date
+        )
+
+        await model.load()
+        await model.reloadWallets()
+
+        #expect(model.walletId == setup.cash)
+        #expect(model.toWalletId == setup.bank)
+        #expect(model.wallet(setup.bank) != nil)
+    }
+
+    @Test
+    func keepsHiddenCategoryWhenEditing() async throws {
+        let setup = try await Setup()
+
+        let draft = EntryDraft(
+            type: .income,
+            amount: 3000,
+            date: setup.date,
+            categoryId: setup.salary,
+            walletId: setup.cash
+        )
+
+        let entry = try await setup.database.saveEntry(draft, at: Date())
+
+        try await setup.database.setCategoryHidden(
+            setup.salary,
+            isHidden: true,
+            at: Date()
+        )
+
+        let model = EntryModel(
+            database: setup.database,
+            editing: entry.id,
+            date: setup.date
+        )
+
+        await model.load()
+        await model.reloadCategories()
+
+        #expect(model.categoryId == setup.salary)
+        #expect(model.selectedCategory?.id == setup.salary)
+    }
 }
 
 extension TransferEntryTests {

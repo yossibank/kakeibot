@@ -219,7 +219,18 @@ public extension EntryModel {
     }
 
     var wallets: [Wallet] {
-        options?.wallets ?? []
+        let wallets = options?.wallets ?? []
+
+        guard isEditing else {
+            return wallets
+        }
+
+        let kept = [walletId, toWalletId]
+            .compactMap(\.self)
+            .filter { id in !wallets.contains { $0.id == id } }
+            .compactMap { history?.wallets[$0] }
+
+        return (wallets + kept).sorted { $0.sortOrder < $1.sortOrder }
     }
 
     var walletSections: [WalletSection] {
@@ -729,16 +740,18 @@ public extension EntryModel {
         do {
             options = try await database.entryOptions()
 
-            if !wallets.contains(where: { $0.id == walletId }) {
-                walletId = wallets.first { $0.id != toWalletId }?.id ?? wallets.first?.id
-            }
-
-            if type == .transfer {
-                if !wallets.contains(where: { $0.id == toWalletId }) {
-                    toWalletId = nil
+            if !isEditing {
+                if !wallets.contains(where: { $0.id == walletId }) {
+                    walletId = wallets.first { $0.id != toWalletId }?.id ?? wallets.first?.id
                 }
 
-                chooseDestination()
+                if type == .transfer {
+                    if !wallets.contains(where: { $0.id == toWalletId }) {
+                        toWalletId = nil
+                    }
+
+                    chooseDestination()
+                }
             }
 
             try await loadBalances()
@@ -771,7 +784,7 @@ public extension EntryModel {
 
             if let id {
                 categoryId = id
-            } else if !categories.contains(where: { $0.id == categoryId }) {
+            } else if !isEditing, !categories.contains(where: { $0.id == categoryId }) {
                 categoryId = categories.first?.id
             }
         } catch {
@@ -869,12 +882,13 @@ public extension EntryModel {
         }
 
         do {
-            let entry = try await database.saveEntry(
+            let saved = try await database.saveEntryResult(
                 draft,
                 editing: editingId,
                 at: Date()
             )
 
+            let entry = saved.entry
             let fee = try await database.fee(of: entry.id)
             let title = label(for: entry)
 
@@ -888,7 +902,8 @@ public extension EntryModel {
                 kind: kind,
                 entry: entry,
                 label: title,
-                fee: fee
+                fee: fee,
+                clearedNoSpendDays: saved.clearedNoSpendDays
             )
         } catch {
             report(error)
@@ -1041,11 +1056,22 @@ private extension EntryModel {
     }
 
     func categories(for type: Entry.Kind) -> [EntryCategory] {
-        switch type {
+        let categories = switch type {
         case .expense: options?.expenseCategories ?? []
         case .income: options?.incomeCategories ?? []
-        case .transfer: []
+        case .transfer: [EntryCategory]()
         }
+
+        guard
+            isEditing,
+            let kept = categoryId.flatMap({ history?.categories[$0] }),
+            kept.kind.rawValue == type.rawValue,
+            !categories.contains(where: { $0.id == kept.id })
+        else {
+            return categories
+        }
+
+        return (categories + [kept]).sorted { $0.sortOrder < $1.sortOrder }
     }
 
     func loadEntry() async throws {

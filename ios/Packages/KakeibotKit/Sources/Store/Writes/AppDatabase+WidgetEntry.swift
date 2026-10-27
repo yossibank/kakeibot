@@ -23,21 +23,38 @@ public extension AppDatabase {
                 throw WidgetEntryError.amountMissing
             }
 
-            let entry = try Self.saveEntry(draft, editing: nil, in: db, at: now)
+            let saved = try Self.saveEntry(draft, editing: nil, in: db, at: now)
 
-            try Self.setSetting(.widgetEntry, to: entry.id, in: db)
+            let record = WidgetRecord(
+                entryId: saved.entry.id,
+                clearedNoSpendDate: saved.clearedNoSpendDays.first?.date
+            )
 
-            return entry
+            try Self.setSetting(.widgetEntry, to: record, in: db)
+
+            return saved.entry
         }
     }
 
-    func undoWidgetEntry(_ id: Entry.ID) async throws {
+    func undoWidgetEntry(
+        _ id: Entry.ID,
+        at now: Date = Date()
+    ) async throws {
         try await writer.write { db in
             _ = try Entry.deleteOne(db, key: id)
 
-            if try Self.setting(.widgetEntry, in: db) == id {
-                try Self.setSetting(.widgetEntry, to: nil, in: db)
+            guard let record = try Self.setting(.widgetEntry, in: db),
+                  record.entryId == id
+            else {
+                return
             }
+
+            let days = record.clearedNoSpendDate.map {
+                [NoSpendDay(date: $0, createdAt: now)]
+            } ?? []
+
+            try Self.restoreNoSpendDays(days, in: db)
+            try Self.setSetting(.widgetEntry, to: nil, in: db)
         }
     }
 }
