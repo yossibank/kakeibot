@@ -10,11 +10,9 @@ struct QuickRecordWidgetView: View {
 
     var body: some View {
         ViewThatFits(in: .vertical) {
-            layout(Self.regular)
-
-            layout(Self.tight)
-
-            layout(Self.compact)
+            ForEach(Self.layouts.indices, id: \.self) { index in
+                layout(Self.layouts[index])
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .widgetURL(PlannedNotification.Route.home.url)
@@ -25,6 +23,7 @@ struct QuickRecordWidgetView: View {
 private extension QuickRecordWidgetView {
     func layout(_ metrics: Metrics) -> some View {
         content(metrics)
+            .frame(maxHeight: .infinity, alignment: .top)
             .padding(.horizontal, 16)
             .padding(.top, metrics.top)
             .padding(.bottom, metrics.bottom)
@@ -35,7 +34,11 @@ private extension QuickRecordWidgetView {
         if let summary = entry.summary {
             VStack(spacing: metrics.spacing) {
                 header(of: summary)
-                    .frame(height: headerHeight(of: summary, metrics: metrics))
+                    .frame(
+                        minHeight: metrics.headerHeight,
+                        maxHeight: headerMaxHeight(of: summary, metrics: metrics)
+                    )
+                    .layoutPriority(1)
 
                 if summary.tiles.isEmpty {
                     Text("テンプレートを作ると、ここから記録できます")
@@ -45,6 +48,7 @@ private extension QuickRecordWidgetView {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     grid(of: summary, metrics: metrics)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 if isLarge {
@@ -294,6 +298,14 @@ private extension QuickRecordWidgetView {
     }
 
     static let columns = 2
+    static let layouts = [
+        regular,
+        tight,
+        tight.limited(2),
+        tight.limited(1),
+        compact.limited(2),
+        compact.limited(1)
+    ]
     static let tileRadius: CGFloat = 14
     static let badgeSize: CGFloat = 20
     static let markSize: CGFloat = 20
@@ -327,7 +339,7 @@ private extension QuickRecordWidgetView {
         undoHeaderHeight: 24,
         gridSpacing: 6,
         tilePadding: 4,
-        todayLimit: 1
+        todayLimit: .max
     )
 
     var isLarge: Bool {
@@ -338,7 +350,7 @@ private extension QuickRecordWidgetView {
         isLarge ? 3 : 2
     }
 
-    func headerHeight(
+    func headerMaxHeight(
         of summary: QuickRecordWidgetSummary,
         metrics: Metrics
     ) -> CGFloat {
@@ -348,5 +360,20 @@ private extension QuickRecordWidgetView {
     func amountText(of record: QuickRecordWidgetSummary.Record) -> String {
         let text = AmountText.text(record.amount)
         return record.type == .income ? "+" + text : text
+    }
+}
+
+private extension QuickRecordWidgetView.Metrics {
+    func limited(_ count: Int) -> Self {
+        Self(
+            top: top,
+            bottom: bottom,
+            spacing: spacing,
+            headerHeight: headerHeight,
+            undoHeaderHeight: undoHeaderHeight,
+            gridSpacing: gridSpacing,
+            tilePadding: tilePadding,
+            todayLimit: count
+        )
     }
 }

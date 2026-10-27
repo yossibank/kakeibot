@@ -71,6 +71,8 @@ private extension SnapshotTests {
     static let quickShapes: [(WidgetFamily, CGSize)] = [
         (.systemMedium, CGSize(width: 364, height: 170)),
         (.systemLarge, CGSize(width: 364, height: 382)),
+        (.systemMedium, CGSize(width: 329, height: 155)),
+        (.systemLarge, CGSize(width: 329, height: 345)),
         (.systemMedium, CGSize(width: 321, height: 148)),
         (.systemLarge, CGSize(width: 321, height: 324))
     ]
