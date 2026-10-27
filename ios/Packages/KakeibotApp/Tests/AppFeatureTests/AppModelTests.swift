@@ -185,6 +185,16 @@ struct AppModelTests {
     }
 
     @Test
+    func observationIDChangesWithRound() {
+        let first = ObservationID(base: true, round: 0)
+        let next = ObservationID(base: true, round: 1)
+
+        #expect(first != next)
+        #expect(first == ObservationID(base: true, round: 0))
+        #expect(first != ObservationID(base: false, round: 0))
+    }
+
+    @Test
     func ignoresRetryUnlessFailed() async throws {
         let database = try AppDatabase.inMemory()
         let attempts = Attempts()

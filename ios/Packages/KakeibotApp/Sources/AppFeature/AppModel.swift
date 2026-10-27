@@ -239,3 +239,8 @@ private extension AppModel {
         try? await database.generateRecurringEntries(through: today, at: Date())
     }
 }
+
+struct ObservationID<Base: Hashable>: Hashable {
+    let base: Base
+    let round: Int
+}

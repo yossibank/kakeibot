@@ -11,6 +11,7 @@ public struct RootView: View {
     @State private var isLaunching = true
     @State private var isRevealed = false
     @State private var isHomeLoaded = false
+    @State private var observationRound = 0
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
@@ -35,14 +36,18 @@ public struct RootView: View {
         .task {
             await model.open()
         }
-        .task(id: model.hasDatabase) {
+        .task(id: ObservationID(base: model.hasDatabase, round: observationRound)) {
             await model.observeTheme()
         }
         .onOpenURL { url in
             model.open(url)
         }
-        .onChange(of: scenePhase) { _, phase in
+        .onChange(of: scenePhase) { old, phase in
             model.changeScene(to: phase)
+
+            if old == .background, phase == .active {
+                observationRound += 1
+            }
 
             if phase == .active {
                 Task {
@@ -91,10 +96,10 @@ private extension RootView {
             } onLoad: {
                 isHomeLoaded = true
             }
-            .task(id: model.today) {
+            .task(id: ObservationID(base: model.today, round: observationRound)) {
                 await model.observeNotifications(in: database)
             }
-            .task(id: model.today) {
+            .task(id: ObservationID(base: model.today, round: observationRound)) {
                 await model.observeWidgets(in: database)
             }
         case .failed:
