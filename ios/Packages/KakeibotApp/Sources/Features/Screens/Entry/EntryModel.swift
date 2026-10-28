@@ -1138,7 +1138,13 @@ private extension EntryModel {
         let valuations = list.valuations
 
         let pairs = wallets.map { wallet in
-            (wallet.id, wallet.balance(with: entries, valuations: valuations))
+            let balance = wallet.balance(
+                with: entries,
+                valuations: valuations,
+                through: Self.today
+            )
+
+            return (wallet.id, balance)
         }
 
         balances = Dictionary(uniqueKeysWithValues: pairs)

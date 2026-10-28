@@ -7,6 +7,8 @@ public struct WalletDraft: Hashable, Sendable {
     public var color: String
     public var initialBalance: Int
     public var loanAmount: Int?
+    public var recordedKind: Wallet.Kind?
+    public var hasValuations: Bool
 
     public init(
         kind: Wallet.Kind,
@@ -14,7 +16,9 @@ public struct WalletDraft: Hashable, Sendable {
         mark: IconDraft.Mark,
         color: String,
         initialBalance: Int,
-        loanAmount: Int? = nil
+        loanAmount: Int? = nil,
+        recordedKind: Wallet.Kind? = nil,
+        hasValuations: Bool = false
     ) {
         self.kind = kind
         self.name = name
@@ -22,6 +26,8 @@ public struct WalletDraft: Hashable, Sendable {
         self.color = color
         self.initialBalance = initialBalance
         self.loanAmount = loanAmount
+        self.recordedKind = recordedKind
+        self.hasValuations = hasValuations
     }
 }
 
@@ -35,7 +41,7 @@ public extension WalletDraft {
             ? [.emptyName]
             : []
 
-        return nameProblems + icon.problems
+        return nameProblems + icon.problems + kindProblems
     }
 
     init(
@@ -50,6 +56,19 @@ public extension WalletDraft {
             initialBalance: wallet.initialBalance,
             loanAmount: wallet.loanAmount
         )
+    }
+
+    func locked(
+        by wallet: Wallet,
+        hasRecords: Bool,
+        hasValuations: Bool
+    ) -> WalletDraft {
+        var locked = self
+
+        locked.recordedKind = hasRecords ? wallet.kind : nil
+        locked.hasValuations = hasValuations
+
+        return locked
     }
 
     func newIcon(at now: Date) throws -> Icon {
@@ -103,6 +122,22 @@ public extension WalletDraft {
 }
 
 private extension WalletDraft {
+    var kindProblems: [DraftProblem] {
+        guard let recordedKind else {
+            return []
+        }
+
+        if recordedKind.isDebt != kind.isDebt {
+            return [.kindLocked]
+        }
+
+        if hasValuations, recordedKind == .investment, kind != .investment {
+            return [.valuedKindLocked]
+        }
+
+        return []
+    }
+
     var trimmedName: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines)
     }

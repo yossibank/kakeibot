@@ -76,4 +76,8 @@ public extension Wallet.Kind {
         case .loan: .loan
         }
     }
+
+    var isDebt: Bool {
+        self == .card || self == .loan
+    }
 }

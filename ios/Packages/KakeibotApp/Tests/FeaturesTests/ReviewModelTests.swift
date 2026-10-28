@@ -91,6 +91,64 @@ struct ReviewModelTests {
     }
 
     @Test
+    func leavesOutFutureRepaymentsFromPayoff() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let now = Date()
+
+        let loan = try await setup.database.saveWallet(
+            WalletDraft(
+                kind: .loan,
+                name: "奨学金",
+                mark: .glyph(.contract),
+                color: "#4A6FA5",
+                initialBalance: -100_000
+            ),
+            at: now
+        )
+
+        let options = try await setup.database.entryOptions()
+
+        for text in ["2026-10-10", "2026-10-20"] {
+            let draft = try EntryDraft(
+                type: .transfer,
+                amount: 30000,
+                date: #require(LocalDate(text)),
+                categoryId: nil,
+                walletId: options.wallets[0].id,
+                toWalletId: loan.id
+            )
+
+            try await setup.database.saveEntry(draft, at: now)
+        }
+
+        try await setup.database.saveRecurring(
+            RecurringDraft(
+                type: .transfer,
+                amount: 30000,
+                categoryId: nil,
+                walletId: options.wallets[0].id,
+                toWalletId: loan.id,
+                frequency: .monthly,
+                month: 1,
+                day: 27,
+                startDate: #require(LocalDate("2026-10-16"))
+            ),
+            today: setup.today,
+            at: now
+        )
+
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        try await observe(model) {
+            model.list != nil && !model.moves.isEmpty
+        }
+
+        let move = try #require(model.moves.first)
+
+        #expect(move.balance == -70000)
+    }
+
+    @Test
     func ranksCategoriesByAmount() async throws {
         let setup = try await RecordsModelTests.Setup()
         let options = try await setup.database.entryOptions()

@@ -43,6 +43,7 @@ struct WalletBalanceTests {
 
 extension WalletBalanceTests {
     struct BalanceCase: Decodable, Sendable {
+        let kind: Wallet.Kind?
         let initialBalance: Int
         let entries: [EntryCase]
         let valuations: [ValuationCase]?
@@ -75,10 +76,13 @@ extension WalletBalanceTests.BalanceCase {
     static let recordedAt = Date(timeIntervalSince1970: 0)
     static let valuedAt = Date(timeIntervalSince1970: 1)
 
-    static func wallet(initialBalance: Int) -> Wallet {
+    static func wallet(
+        kind: Wallet.Kind = .cash,
+        initialBalance: Int
+    ) -> Wallet {
         Wallet(
             name: "財布",
-            kind: .cash,
+            kind: kind,
             iconId: Icon.ID(),
             initialBalance: initialBalance,
             sortOrder: 0,
@@ -88,7 +92,10 @@ extension WalletBalanceTests.BalanceCase {
     }
 
     func wallet() -> Wallet {
-        Self.wallet(initialBalance: initialBalance)
+        Self.wallet(
+            kind: kind ?? .cash,
+            initialBalance: initialBalance
+        )
     }
 
     func valuations(wallet: Wallet.ID) -> [Valuation] {

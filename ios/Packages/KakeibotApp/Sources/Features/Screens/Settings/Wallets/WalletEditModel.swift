@@ -23,6 +23,9 @@ public final class WalletEditModel {
     public private(set) var valuations: [Valuation] = []
     public private(set) var isHidden = false
     public private(set) var payment: Recurring?
+    public private(set) var recordedKind: Wallet.Kind?
+    public private(set) var hasValuations = false
+    public private(set) var totalBalance = 0
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -66,7 +69,9 @@ public extension WalletEditModel {
             mark: icon.mark,
             color: icon.color,
             initialBalance: initialBalance,
-            loanAmount: loanAmount.amount > 0 ? loanAmount.amount : nil
+            loanAmount: loanAmount.amount > 0 ? loanAmount.amount : nil,
+            recordedKind: recordedKind,
+            hasValuations: hasValuations
         )
     }
 
@@ -116,7 +121,7 @@ public extension WalletEditModel {
     }
 
     var asksPayment: Bool {
-        Self.isDebt(kind)
+        kind.isDebt
     }
 
     var paymentQuestion: String {
@@ -148,7 +153,7 @@ public extension WalletEditModel {
     }
 
     var needsHideConfirmation: Bool {
-        !isHidden && balance != 0
+        !isHidden && totalBalance != 0
     }
 
     static func glyph(for kind: Wallet.Kind) -> Icon.Glyph {
@@ -226,6 +231,10 @@ public extension WalletEditModel {
             }
 
             apply(list, to: wallet)
+
+            try await refreshLock(of: wallet, in: list)
+            baseline?.recordedKind = recordedKind
+            baseline?.hasValuations = hasValuations
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
@@ -247,6 +256,8 @@ public extension WalletEditModel {
 
             apply(WalletDraft(wallet, icon: icon))
             apply(list, to: wallet)
+
+            try await refreshLock(of: wallet, in: list)
 
             isHidden = wallet.archivedAt != nil
             baseline = draft
@@ -340,13 +351,53 @@ private extension WalletEditModel {
     static let saveFailedMessage = "保存できませんでした"
     static let deleteFailedMessage = "削除できませんでした"
 
-    static func isDebt(_ kind: Wallet.Kind) -> Bool {
-        kind == .card || kind == .loan
+    static var today: LocalDate {
+        LocalDate(Date(), in: .current)
+    }
+
+    static func hasRecords(
+        of wallet: Wallet,
+        in list: EntryList,
+        recurrings: [Recurring]
+    ) -> Bool {
+        let hasEntries = list.days.flatMap(\.entries).contains { entry in
+            entry.walletId == wallet.id || entry.toWalletId == wallet.id
+        }
+
+        let hasValuations = list.valuations.contains { $0.walletId == wallet.id }
+
+        let hasRecurrings = recurrings.contains { recurring in
+            recurring.walletId == wallet.id || recurring.toWalletId == wallet.id
+        }
+
+        return hasEntries || hasValuations || hasRecurrings
+    }
+
+    func refreshLock(
+        of wallet: Wallet,
+        in list: EntryList
+    ) async throws {
+        let recurrings = try await database.recurrings(includingHidden: true)
+
+        let hasRecords = Self.hasRecords(
+            of: wallet,
+            in: list,
+            recurrings: recurrings
+        )
+
+        let locked = draft.locked(
+            by: wallet,
+            hasRecords: hasRecords,
+            hasValuations: list.valuations.contains { $0.walletId == wallet.id }
+        )
+
+        recordedKind = locked.recordedKind
+        hasValuations = locked.hasValuations
     }
 
     func followKind(from oldKind: Wallet.Kind) {
-        if isNegative == Self.isDebt(oldKind) {
-            isNegative = Self.isDebt(kind)
+        if isNegative == oldKind.isDebt {
+            isNegative = kind.isDebt
         }
 
         guard icon.markKind == .glyph else {
@@ -364,10 +415,15 @@ private extension WalletEditModel {
         _ list: EntryList,
         to wallet: Wallet
     ) {
+        let entries = list.days.flatMap(\.entries)
+
         balance = wallet.balance(
-            with: list.days.flatMap(\.entries),
-            valuations: list.valuations
+            with: entries,
+            valuations: list.valuations,
+            through: Self.today
         )
+
+        totalBalance = wallet.balance(with: entries, valuations: list.valuations)
 
         valuations = list.valuations
             .filter { $0.walletId == wallet.id }

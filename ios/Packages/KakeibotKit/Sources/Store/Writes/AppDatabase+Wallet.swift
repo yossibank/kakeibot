@@ -137,12 +137,39 @@ private extension AppDatabase {
             throw WalletWriteError.iconNotFound
         }
 
-        let wallet = try draft.applied(to: existing, at: now)
+        let locked = try draft.locked(
+            by: existing,
+            hasRecords: Self.hasRecords(of: id, in: db),
+            hasValuations: Self.hasValuations(of: id, in: db)
+        )
+
+        let wallet = try locked.applied(to: existing, at: now)
 
         try draft.applied(to: icon, at: now).update(db)
         try wallet.update(db)
 
         return wallet
+    }
+
+    static func hasValuations(
+        of id: Wallet.ID,
+        in db: Database
+    ) throws -> Bool {
+        try Valuation
+            .filter(Column("wallet_id") == id)
+            .fetchCount(db) > 0
+    }
+
+    static func hasRecords(
+        of id: Wallet.ID,
+        in db: Database
+    ) throws -> Bool {
+        let walletColumns = Column("wallet_id") == id || Column("to_wallet_id") == id
+
+        let hasEntries = try Entry.filter(walletColumns).fetchCount(db) > 0
+        let hasRecurrings = try Recurring.filter(walletColumns).fetchCount(db) > 0
+
+        return try hasEntries || hasRecurrings || hasValuations(of: id, in: db)
     }
 
     static func shownWalletCount(in db: Database) throws -> Int {

@@ -40,6 +40,19 @@ struct AssetsModelTests {
     }
 
     @Test
+    func leavesOutFutureEntriesFromBalances() async throws {
+        let setup = try await Setup()
+        try await setup.save(.income, 1000, on: "2026-10-10", from: setup.cash)
+        try await setup.save(.expense, 400, on: "2026-10-20", from: setup.cash)
+        let model = AssetsModel(database: setup.database, today: setup.today)
+
+        await model.load()
+
+        #expect(model.rows.first?.balance == 1000)
+        #expect(model.total == 1000)
+    }
+
+    @Test
     func listsUpcomingCardBills() async throws {
         let setup = try await Setup()
 
@@ -126,6 +139,14 @@ struct AssetsModelTests {
                 initialBalance: -100_000
             ),
             at: Date()
+        )
+
+        try await setup.save(
+            .transfer,
+            30000,
+            on: "2026-10-20",
+            from: setup.bank,
+            to: loan.id
         )
 
         let draft = try RecurringDraft(

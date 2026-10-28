@@ -21,7 +21,9 @@ public extension Wallet {
         valuations: [Valuation] = [],
         through date: LocalDate? = nil
     ) -> Int {
-        let valuation = latestValuation(in: valuations, through: date)
+        let valuation = kind == .investment
+            ? latestValuation(in: valuations, through: date)
+            : nil
         let start = valuation?.amount ?? initialBalance
 
         return entries.reduce(start) { balance, entry in

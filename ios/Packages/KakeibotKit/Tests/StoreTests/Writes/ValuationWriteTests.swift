@@ -29,7 +29,10 @@ struct ValuationWriteTests {
 
         let list = try await database.entryList()
 
-        let balance = wallet.balance(with: [], valuations: list.valuations)
+        var investment = wallet
+        investment.kind = .investment
+
+        let balance = investment.balance(with: [], valuations: list.valuations)
 
         #expect(list.valuations.map(\.amount) == [160_000])
         #expect(balance == 160_000)
