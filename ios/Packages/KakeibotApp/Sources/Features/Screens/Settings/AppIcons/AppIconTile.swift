@@ -31,7 +31,7 @@ struct AppIconTile: View {
                     .overlay(alignment: .bottomTrailing) {
                         if isCurrent {
                             Image(systemName: "checkmark.circle.fill")
-                                .font(.title3)
+                                .sansFont(.headline)
                                 .foregroundStyle(
                                     Palette.accent,
                                     Palette.background

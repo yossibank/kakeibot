@@ -160,7 +160,7 @@ private extension BackupView {
     ) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             Image(systemName: systemImage)
-                .font(.caption.weight(.medium))
+                .sansFont(.caption, weight: .medium)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 22)
 
@@ -195,7 +195,7 @@ private extension BackupView {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.footnote)
+                .sansFont(.small)
                 .foregroundStyle(Palette.hint)
         }
         .frame(minHeight: 58)

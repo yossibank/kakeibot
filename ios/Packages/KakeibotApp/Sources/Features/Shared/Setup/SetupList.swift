@@ -52,13 +52,13 @@ private extension SetupList {
 
             if model.isDone(item) {
                 Image(systemName: "checkmark")
-                    .font(.footnote.weight(.semibold))
+                    .sansFont(.small, weight: .semibold)
                     .foregroundStyle(Palette.accent)
                     .transition(.scale.combined(with: .opacity))
             }
 
             Image(systemName: "chevron.right")
-                .font(.footnote)
+                .sansFont(.small)
                 .foregroundStyle(Palette.hint)
         }
         .frame(minHeight: 48)

@@ -349,7 +349,7 @@ private extension OnboardingView {
                     .foregroundStyle(Palette.hint)
 
                 Image(systemName: "chevron.right")
-                    .font(.footnote)
+                    .sansFont(.small)
                     .foregroundStyle(Palette.hint)
             }
             .frame(minHeight: 56)

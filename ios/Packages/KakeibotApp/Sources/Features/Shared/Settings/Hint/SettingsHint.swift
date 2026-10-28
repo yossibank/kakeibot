@@ -91,7 +91,7 @@ private extension SettingsHint {
                 }
             } label: {
                 Image(systemName: "xmark")
-                    .font(.caption2.weight(.bold))
+                    .sansFont(.caption, weight: .bold)
                     .foregroundStyle(Palette.subtext)
                     .frame(width: 24, height: 24)
                     .background(Palette.line, in: Circle())
@@ -113,7 +113,7 @@ private extension SettingsHint {
     func row(_ line: Line) -> some View {
         HStack(spacing: 12) {
             Image(systemName: line.systemImage)
-                .font(.caption.weight(.medium))
+                .sansFont(.caption, weight: .medium)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 26, height: 26)
                 .background(Palette.accent.opacity(.subtle), in: Circle())

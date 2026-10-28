@@ -80,7 +80,7 @@ private extension MonthCalendar {
             move(months: months)
         } label: {
             Image(systemName: systemImage)
-                .font(.footnote.weight(.semibold))
+                .sansFont(.small, weight: .semibold)
                 .foregroundStyle(Palette.subtext)
                 .frame(width: 44, height: 36)
                 .contentShape(.rect)

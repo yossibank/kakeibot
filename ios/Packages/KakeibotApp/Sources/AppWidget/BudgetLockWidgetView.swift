@@ -33,7 +33,7 @@ private extension BudgetLockWidgetView {
                 AccessoryWidgetBackground()
 
                 Image(systemName: "yensign")
-                    .font(.title2)
+                    .sansFont(.headline)
             }
         } else {
             Text("アプリを開くと出ます")

@@ -302,7 +302,7 @@ private extension ThemeListView {
             .overlay(alignment: .bottomTrailing) {
                 if isCurrent {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.title3)
+                        .sansFont(.headline)
                         .foregroundStyle(Palette.accent, Palette.background)
                         .offset(x: 6, y: 6)
                         .transition(.scale.combined(with: .opacity))
