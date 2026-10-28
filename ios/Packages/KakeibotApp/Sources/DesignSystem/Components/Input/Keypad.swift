@@ -21,7 +21,7 @@ public struct Keypad: View {
     }
 
     public var body: some View {
-        Grid(horizontalSpacing: 6, verticalSpacing: 6) {
+        Grid(horizontalSpacing: 8, verticalSpacing: 8) {
             ForEach(Array(Self.rows.enumerated()), id: \.offset) { _, row in
                 GridRow {
                     ForEach(row, id: \.self) { key in

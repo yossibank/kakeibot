@@ -254,7 +254,7 @@ private extension OnboardingView {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 24)
-                .card(cornerRadius: 24)
+                .card()
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)

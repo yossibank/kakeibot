@@ -9,8 +9,8 @@ public enum TemplateCardSize: Sendable {
 public extension TemplateCardSize {
     var textSpacing: CGFloat {
         switch self {
-        case .regular: 3
-        case .large: 10
+        case .regular: 4
+        case .large: 8
         }
     }
 
@@ -61,22 +61,22 @@ extension TemplateCardSize {
 
     var gap: CGFloat {
         switch self {
-        case .regular: 10
-        case .large: 14
+        case .regular: 8
+        case .large: 12
         }
     }
 
     var spacing: CGFloat {
         switch self {
-        case .regular: 10
+        case .regular: 8
         case .large: 16
         }
     }
 
     var padding: CGFloat {
         switch self {
-        case .regular: 14
-        case .large: 22
+        case .regular: 12
+        case .large: 24
         }
     }
 
@@ -90,7 +90,7 @@ extension TemplateCardSize {
     var cornerRadius: CGFloat {
         switch self {
         case .regular: 20
-        case .large: 26
+        case .large: 24
         }
     }
 

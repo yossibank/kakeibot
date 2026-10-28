@@ -114,7 +114,7 @@ private extension HomeCustomizeCard {
 
 private extension HomeCustomizeCard {
     static let tileSize = CGSize(width: 116, height: 96)
-    static let cornerRadius: CGFloat = 18
+    static let cornerRadius: CGFloat = 20
     static let textScale: CGFloat = 0.7
     static let shadowRoom: CGFloat = 32
     static let glowDuration: Duration = .milliseconds(1200)

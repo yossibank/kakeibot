@@ -53,7 +53,7 @@ private extension EntryTransferPanel {
         return Button {
             onPick(role)
         } label: {
-            VStack(spacing: 6) {
+            VStack(spacing: 4) {
                 Text(title(role))
                     .textFont(.caption2)
                     .tracking(3)

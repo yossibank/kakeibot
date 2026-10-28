@@ -157,7 +157,7 @@ private extension AssetsView {
             }
         }
         .padding(16)
-        .card(cornerRadius: 24)
+        .card()
     }
 
     var rewardCard: some View {
@@ -294,7 +294,7 @@ private extension AssetsView {
             }
         }
         .padding(16)
-        .card(cornerRadius: 24)
+        .card()
     }
 
     var trendLegend: some View {
@@ -478,7 +478,7 @@ private extension AssetsView {
                 }
             }
             .padding(.horizontal, 16)
-            .card(cornerRadius: 24)
+            .card()
         }
     }
 

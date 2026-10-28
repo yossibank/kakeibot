@@ -115,7 +115,7 @@ private extension ReminderView {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
         .padding(.horizontal, 16)
-        .card(cornerRadius: 24)
+        .card()
     }
 
     var deniedBanner: some View {
@@ -194,7 +194,7 @@ private extension ReminderView {
                 .frame(maxWidth: .infinity)
                 .frame(height: 160)
                 .clipped()
-                .card(cornerRadius: 24)
+                .card()
                 .transition(.opacity)
             }
         }
@@ -262,7 +262,7 @@ private extension ReminderView {
                     .contentTransition(.opacity)
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.regularMaterial, in: bubbleShape)
         .shadow(color: Palette.shadow.opacity(.muted), radius: 12, y: 4)
@@ -403,7 +403,7 @@ private extension ReminderView {
     }
 
     var bubbleShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(18))
+        RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     var wallpaper: LinearGradient {

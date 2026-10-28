@@ -125,7 +125,7 @@ private extension BudgetListView {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
-            .card(cornerRadius: 24)
+            .card()
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
