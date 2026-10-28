@@ -50,6 +50,25 @@ struct ReviewModelTests {
     }
 
     @Test
+    func knowsWhetherPreviousPeriodHasEntries() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-05")
+        try await setup.save(.income, amount: 3000, on: "2026-09-03")
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        try await observe(model) {
+            model.list != nil
+        }
+
+        let hasPreviousNow = model.hasPreviousEntries
+        model.move(by: -1)
+        let hasPreviousLastMonth = model.hasPreviousEntries
+
+        #expect(hasPreviousNow)
+        #expect(!hasPreviousLastMonth)
+    }
+
+    @Test
     func countsMovesToArchivedWalletInPastPeriod() async throws {
         let setup = try await RecordsModelTests.Setup()
         let now = Date()

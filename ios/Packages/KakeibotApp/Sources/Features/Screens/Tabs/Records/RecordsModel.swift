@@ -58,6 +58,10 @@ public extension RecordsModel {
         PeriodText.range(period)
     }
 
+    var isCurrentMonth: Bool {
+        month == today.periodMonth(startingOn: monthStartDay)
+    }
+
     var days: [EntryDay] {
         let days = list?.days.filter { period.contains($0.date) } ?? []
 

@@ -334,10 +334,19 @@ private extension RecordsView {
         switch model.layout {
         case .list:
             if model.days.isEmpty {
-                Text("この月の記録はありません")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .padding(.vertical, 40)
+                VStack(spacing: 16) {
+                    Text("この月の記録はありません")
+                        .textFont(.footnote)
+                        .foregroundStyle(Palette.subtext)
+
+                    if model.isCurrentMonth,
+                       model.filter.isEmpty {
+                        PrimaryButton("記録する") {
+                            onAddEntry(model.today)
+                        }
+                    }
+                }
+                .padding(.vertical, 40)
             }
 
             ForEach(model.days, id: \.date) { day in

@@ -146,26 +146,36 @@ private extension ReviewView {
             }
 
             if model.kind != .balance {
-                ReviewSharesCard(
-                    title: "カテゴリごと",
-                    shares: model.categoryShares,
-                    total: ReviewSharesCard.Total(
-                        title: totalTitle,
-                        amount: model.total
-                    ),
-                    onOpen: { share in
-                        openShare = share
-                    }
-                )
+                if model.categoryShares.isEmpty,
+                   model.walletShares.isEmpty {
+                    ReviewSharesCard(
+                        title: nil,
+                        shares: [],
+                        total: nil,
+                        onOpen: { _ in }
+                    )
+                } else {
+                    ReviewSharesCard(
+                        title: "カテゴリごと",
+                        shares: model.categoryShares,
+                        total: ReviewSharesCard.Total(
+                            title: totalTitle,
+                            amount: model.total
+                        ),
+                        onOpen: { share in
+                            openShare = share
+                        }
+                    )
 
-                ReviewSharesCard(
-                    title: "口座ごと",
-                    shares: model.walletShares,
-                    total: nil,
-                    onOpen: { share in
-                        openShare = share
-                    }
-                )
+                    ReviewSharesCard(
+                        title: "口座ごと",
+                        shares: model.walletShares,
+                        total: nil,
+                        onOpen: { share in
+                            openShare = share
+                        }
+                    )
+                }
             }
 
             if !model.stampTallies.isEmpty {
@@ -205,9 +215,11 @@ private extension ReviewView {
     var detailCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                Image(systemName: Self.changeImage(model.change))
-                    .sansFont(.caption)
-                    .foregroundStyle(selectedChangeColor)
+                if model.hasPreviousEntries {
+                    Image(systemName: Self.changeImage(model.change))
+                        .sansFont(.caption)
+                        .foregroundStyle(selectedChangeColor)
+                }
 
                 Text(comparisonText)
                     .textFont(.footnote)
@@ -485,9 +497,11 @@ private extension ReviewView {
 
                     Spacer(minLength: 0)
 
-                    Image(systemName: Self.changeImage(change))
-                        .sansFont(.caption, weight: .semibold)
-                        .foregroundStyle(Self.changeColor(change, of: kind))
+                    if model.hasPreviousEntries {
+                        Image(systemName: Self.changeImage(change))
+                            .sansFont(.caption, weight: .semibold)
+                            .foregroundStyle(Self.changeColor(change, of: kind))
+                    }
                 }
 
                 Text(AmountText.text(model.total(of: kind)))
@@ -579,6 +593,10 @@ private extension ReviewView {
     }
 
     var comparisonText: String {
+        guard model.hasPreviousEntries else {
+            return "比べる記録がまだありません"
+        }
+
         let previous = model.isComparingPartially
             ? Self.partialName(of: model.scale)
             : Self.previousName(of: model.scale)

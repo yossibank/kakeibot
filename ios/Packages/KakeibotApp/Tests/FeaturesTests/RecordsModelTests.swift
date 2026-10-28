@@ -359,6 +359,18 @@ struct RecordsModelTests {
     }
 
     @Test
+    func tellsWhetherShownMonthIsCurrent() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        let isCurrentAtFirst = model.isCurrentMonth
+
+        model.move(months: -1)
+
+        #expect(isCurrentAtFirst)
+        #expect(!model.isCurrentMonth)
+    }
+
+    @Test
     func stampsAndRemovesWithShownChoices() async throws {
         let setup = try await Setup()
         try setup.database.insertShelfIfEmpty(at: Date())

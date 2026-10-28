@@ -90,6 +90,12 @@ public extension ReviewModel {
         period.range.contains(today)
     }
 
+    var hasPreviousEntries: Bool {
+        let range = period.comparisonRange(today: today)
+
+        return entries.contains { range.contains($0.date) }
+    }
+
     var total: Int {
         total(of: kind)
     }
