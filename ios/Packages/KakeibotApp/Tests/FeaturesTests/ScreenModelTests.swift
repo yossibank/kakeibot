@@ -41,6 +41,19 @@ struct ScreenModelTests {
     }
 
     @Test
+    func stopsWhenFailingRightAfterEachValue() async {
+        let counter = Counter()
+
+        let isFailed = await ScreenObservation.retry(
+            Self.valueThenFailure(counter),
+            retryDelays: [.zero, .zero, .zero]
+        ) { _ in }
+
+        #expect(isFailed)
+        #expect(counter.attempts == 4)
+    }
+
+    @Test
     func stopsWhenCancelled() async {
         let model = Model()
         let counter = Counter()
@@ -75,6 +88,15 @@ private extension ScreenModelTests {
     }
 
     static let delays: [Duration] = [.milliseconds(1), .milliseconds(1), .milliseconds(1)]
+
+    static func valueThenFailure(_ counter: Counter) -> AsyncThrowingStream<Int, Error> {
+        counter.attempts += 1
+
+        return AsyncThrowingStream { continuation in
+            continuation.yield(1)
+            continuation.finish(throwing: Failure())
+        }
+    }
 
     static func values(
         _ counter: Counter,

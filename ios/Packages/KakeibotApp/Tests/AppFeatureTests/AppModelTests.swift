@@ -203,6 +203,63 @@ struct AppModelTests {
     }
 
     @Test
+    func observationIDChangesWithRound() {
+        let first = ObservationID(base: true, round: 0)
+        let next = ObservationID(base: true, round: 1)
+
+        #expect(first != next)
+        #expect(first == ObservationID(base: true, round: 0))
+        #expect(first != ObservationID(base: false, round: 0))
+    }
+
+    @Test
+    func keepsObservationIDWhenNothingStopped() {
+        let model = AppModel(openDatabase: AppDatabase.inMemory)
+        let before = model.observationID(false)
+
+        model.returnToForeground()
+
+        #expect(model.observationID(false) == before)
+    }
+
+    @Test
+    func changesObservationIDOnceAfterStopped() async {
+        let model = AppModel(
+            openDatabase: AppDatabase.inMemory,
+            retryDelays: []
+        )
+
+        let before = model.observationID(false)
+        let attempts = Attempts()
+
+        await model.watch(Self.values(attempts, failures: 10)) { _ in }
+        model.returnToForeground()
+
+        let after = model.observationID(false)
+
+        model.returnToForeground()
+
+        #expect(after != before)
+        #expect(model.observationID(false) == after)
+    }
+
+    @Test
+    func detectsForegroundAfterInactive() {
+        var foreground = ForegroundReturn()
+
+        let results = [
+            foreground.receive(.inactive),
+            foreground.receive(.active),
+            foreground.receive(.background),
+            foreground.receive(.inactive),
+            foreground.receive(.active),
+            foreground.receive(.active)
+        ]
+
+        #expect(results == [false, false, false, false, true, false])
+    }
+
+    @Test
     func ignoresRetryUnlessFailed() async throws {
         let database = try AppDatabase.inMemory()
         let attempts = Attempts()
