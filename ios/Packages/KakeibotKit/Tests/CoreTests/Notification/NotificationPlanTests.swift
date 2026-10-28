@@ -51,6 +51,44 @@ struct NotificationPlanTests {
     }
 
     @Test
+    func keepsEarliestSixtyFour() throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        let today = try #require(LocalDate("2026-10-17"))
+        let time = try #require(ReminderTime("21:00"))
+        let last = try #require(LocalDate("2026-11-09"))
+
+        let recurrings = (0..<40).map { index in
+            Recurring(
+                type: .expense,
+                amount: 1000,
+                categoryId: EntryCategory.ID(),
+                walletId: Wallet.ID(),
+                memo: "固定費\(index)",
+                frequency: .monthly,
+                day: 5,
+                startDate: today,
+                remindDaysBefore: 0,
+                createdAt: now,
+                updatedAt: now
+            )
+        }
+
+        let notifications = NotificationPlan.notifications(
+            today: today,
+            reminderTime: time,
+            recordedDates: [],
+            recurrings: recurrings,
+            names: [:]
+        )
+
+        #expect(NotificationPlan.maxCount == 64)
+        #expect(notifications.count == 64)
+        #expect(notifications.first?.date == today)
+        #expect(notifications.last?.date == last)
+        #expect(notifications.map(\.date) == notifications.map(\.date).sorted())
+    }
+
+    @Test
     func readsAndWritesTime() throws {
         let time = try #require(ReminderTime("07:05"))
 

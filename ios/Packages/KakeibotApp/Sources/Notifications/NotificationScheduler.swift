@@ -47,7 +47,7 @@ public extension NotificationScheduler {
                 title: notification.title,
                 body: notification.body,
                 link: notification.route.link,
-                at: Self.components(of: notification, in: timeZone)
+                at: Self.components(of: notification)
             )
         }
     }
@@ -55,12 +55,9 @@ public extension NotificationScheduler {
 
 private extension NotificationScheduler {
     static func components(
-        of notification: PlannedNotification,
-        in timeZone: TimeZone
+        of notification: PlannedNotification
     ) -> DateComponents {
         DateComponents(
-            calendar: Calendar(identifier: .gregorian),
-            timeZone: timeZone,
             year: notification.date.year,
             month: notification.date.month,
             day: notification.date.day,
@@ -73,7 +70,9 @@ private extension NotificationScheduler {
         of notification: PlannedNotification,
         in timeZone: TimeZone
     ) -> Date {
-        let components = components(of: notification, in: timeZone)
+        var components = components(of: notification)
+        components.calendar = Calendar(identifier: .gregorian)
+        components.timeZone = timeZone
         return components.date ?? .distantPast
     }
 }

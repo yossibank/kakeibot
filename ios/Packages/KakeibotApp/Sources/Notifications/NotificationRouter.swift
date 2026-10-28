@@ -35,28 +35,30 @@ extension NotificationRouter: UNUserNotificationCenterDelegate {
     public nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
-        withCompletionHandler completionHandler: @escaping (
+        withCompletionHandler completionHandler: @escaping @Sendable (
             UNNotificationPresentationOptions
         ) -> Void
     ) {
-        completionHandler([.banner, .list, .sound])
+        Task { @MainActor in
+            completionHandler([.banner, .list, .sound])
+        }
     }
 
     public nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping () -> Void
+        withCompletionHandler completionHandler: @escaping @Sendable () -> Void
     ) {
         let userInfo = response.notification.request.content.userInfo
         let link = userInfo[LiveNotificationCenter.linkKey] as? String
         let route = link.flatMap(PlannedNotification.Route.init(link:))
 
-        MainActor.assumeIsolated {
+        Task { @MainActor in
             if let route {
                 open(route)
             }
-        }
 
-        completionHandler()
+            completionHandler()
+        }
     }
 }

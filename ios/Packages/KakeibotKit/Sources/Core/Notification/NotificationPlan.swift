@@ -18,8 +18,9 @@ public enum NotificationPlan {
         }
     }
 
-    public static let reminderDays = 7
+    public static let reminderDays = 30
     public static let recurringDays = 31
+    public static let maxCount = 64
 
     public static func notifications(
         today: LocalDate,
@@ -43,7 +44,7 @@ public enum NotificationPlan {
             )
         }
 
-        return (reminders + notices).sorted { lhs, rhs in
+        let sorted = (reminders + notices).sorted { lhs, rhs in
             if lhs.date != rhs.date {
                 return lhs.date < rhs.date
             }
@@ -54,6 +55,8 @@ public enum NotificationPlan {
 
             return lhs.key < rhs.key
         }
+
+        return Array(sorted.prefix(maxCount))
     }
 }
 

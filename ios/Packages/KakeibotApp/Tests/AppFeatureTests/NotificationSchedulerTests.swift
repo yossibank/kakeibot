@@ -70,6 +70,25 @@ struct NotificationSchedulerTests {
         #expect(state.added.isEmpty)
         #expect(state.removed.isEmpty)
     }
+
+    @Test
+    func leavesTimeZoneToDevice() async throws {
+        let client = FakeCenter(pending: [])
+        let scheduler = NotificationScheduler(client: client)
+        let timeZone = try #require(TimeZone(identifier: "Asia/Tokyo"))
+        let now = Date(timeIntervalSince1970: 1_792_220_400)
+        let today = try #require(LocalDate("2026-10-18"))
+        let time = try #require(ReminderTime("21:00"))
+        let notification = Self.reminder(on: today, at: time)
+
+        await scheduler.apply([notification], now: now, timeZone: timeZone)
+        let state = await client.state
+
+        #expect(state.components.count == 1)
+        #expect(state.components.first?.timeZone == nil)
+        #expect(state.components.first?.calendar == nil)
+        #expect(state.components.first?.hour == 21)
+    }
 }
 
 extension NotificationSchedulerTests {
@@ -79,6 +98,7 @@ extension NotificationSchedulerTests {
             var added: [String] = []
             var removed: [String] = []
             var links: [String] = []
+            var components: [DateComponents] = []
             var requested = false
         }
 
@@ -107,6 +127,7 @@ extension NotificationSchedulerTests {
         ) async throws {
             state.added.append(identifier)
             state.links.append(link)
+            state.components.append(components)
         }
 
         func remove(_ identifiers: [String]) async {
