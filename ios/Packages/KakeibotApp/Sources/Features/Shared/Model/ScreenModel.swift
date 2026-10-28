@@ -19,7 +19,6 @@ public enum ScreenObservation {
         while true {
             do {
                 for try await value in values() {
-                    attempt = 0
                     await receive(value)
                 }
 
