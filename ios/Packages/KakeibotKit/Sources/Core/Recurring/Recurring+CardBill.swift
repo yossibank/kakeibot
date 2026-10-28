@@ -1,4 +1,10 @@
 public extension Recurring {
+    static let billChoiceCount = 3
+
+    static func billText(paidOn date: LocalDate) -> String {
+        "\(date.month)/\(date.day)払い"
+    }
+
     func billingPeriod(paidOn date: LocalDate) -> ClosedRange<LocalDate>? {
         guard let closingDay else {
             return nil
@@ -43,6 +49,14 @@ public extension Recurring {
             .reduce(0) { $0 + Self.usage(of: $1) }
 
         return max(used, 0)
+    }
+
+    func billDate(
+        for used: LocalDate,
+        in month: YearMonth
+    ) -> LocalDate? {
+        billDates(for: used, count: Self.billChoiceCount)
+            .first { occurrenceMonth(of: $0) == month }
     }
 
     func billDates(
