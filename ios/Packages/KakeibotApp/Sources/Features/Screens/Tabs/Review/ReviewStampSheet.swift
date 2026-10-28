@@ -103,7 +103,7 @@ private extension ReviewStampSheet {
             }
 
             Image(systemName: "chevron.right")
-                .font(.caption2)
+                .sansFont(.small)
                 .foregroundStyle(Palette.hint)
         }
         .frame(minHeight: 48)

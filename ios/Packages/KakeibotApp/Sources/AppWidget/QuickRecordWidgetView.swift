@@ -72,7 +72,7 @@ private extension QuickRecordWidgetView {
         if let recorded = summary.recorded(at: entry.date) {
             HStack(spacing: 6) {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.caption)
+                    .sansFont(.caption)
                     .foregroundStyle(Palette.accent)
 
                 Text("\(recorded.name) \(AmountText.text(recorded.amount)) を記録しました")

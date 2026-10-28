@@ -101,7 +101,7 @@ private extension SettingsRowList {
                         EditBadge(size: Self.markWidth)
                     } else {
                         Image(systemName: "chevron.right")
-                            .font(.caption)
+                            .sansFont(.small)
                             .foregroundStyle(Palette.accent.opacity(.medium))
                     }
                 }

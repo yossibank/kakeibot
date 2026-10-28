@@ -460,7 +460,7 @@ private extension SettingsSheet {
             }
 
             Image(systemName: "chevron.right")
-                .font(.footnote)
+                .sansFont(.small)
                 .foregroundStyle(Palette.hint)
         }
         .frame(minHeight: 48)

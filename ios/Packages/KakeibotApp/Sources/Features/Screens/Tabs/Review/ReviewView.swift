@@ -206,7 +206,7 @@ private extension ReviewView {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: Self.changeImage(model.change))
-                    .font(.caption)
+                    .sansFont(.caption)
                     .foregroundStyle(selectedChangeColor)
 
                 Text(comparisonText)
@@ -420,7 +420,7 @@ private extension ReviewView {
                 .foregroundStyle(Palette.accentStrong)
 
             Image(systemName: "chevron.right")
-                .font(.caption)
+                .sansFont(.small)
                 .foregroundStyle(Palette.hint)
         }
         .padding(.vertical, 8)
@@ -435,7 +435,7 @@ private extension ReviewView {
             move(by: count)
         } label: {
             Image(systemName: systemImage)
-                .font(.footnote.weight(.semibold))
+                .sansFont(.small, weight: .semibold)
                 .foregroundStyle(Palette.subtext)
                 .frame(width: 40, height: 44)
                 .contentShape(.rect)
@@ -486,7 +486,7 @@ private extension ReviewView {
                     Spacer(minLength: 0)
 
                     Image(systemName: Self.changeImage(change))
-                        .font(.caption2.weight(.semibold))
+                        .sansFont(.caption, weight: .semibold)
                         .foregroundStyle(Self.changeColor(change, of: kind))
                 }
 

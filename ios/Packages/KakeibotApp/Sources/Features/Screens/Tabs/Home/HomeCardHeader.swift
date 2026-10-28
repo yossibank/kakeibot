@@ -16,7 +16,7 @@ struct HomeCardHeader: View {
 
             Button(action: onClose) {
                 Image(systemName: "xmark")
-                    .font(.caption2.weight(.bold))
+                    .sansFont(.caption, weight: .bold)
                     .foregroundStyle(Palette.subtext)
                     .frame(width: 24, height: 24)
                     .background(Palette.line, in: Circle())

@@ -392,7 +392,7 @@ private extension AssetsRewardSheet {
 
         return HStack(spacing: 12) {
             Image(systemName: "bag.fill")
-                .font(.footnote)
+                .sansFont(.small)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 26)
 

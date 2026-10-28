@@ -220,7 +220,7 @@ private extension AssetsView {
                 }
 
                 Image(systemName: "chevron.right")
-                    .font(.footnote)
+                    .sansFont(.small)
                     .foregroundStyle(Palette.hint)
             }
 

@@ -9,7 +9,7 @@ struct RecordsFilterLine: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "line.3.horizontal.decrease")
-                .font(.caption.weight(.semibold))
+                .sansFont(.caption, weight: .semibold)
                 .foregroundStyle(Palette.accent)
 
             Text(title)

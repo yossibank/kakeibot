@@ -181,7 +181,7 @@ private extension RecordsView {
         HStack(spacing: 12) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                    .font(.footnote.weight(.semibold))
+                    .sansFont(.small, weight: .semibold)
                     .foregroundStyle(Palette.subtext)
 
                 TextField(
@@ -288,7 +288,7 @@ private extension RecordsView {
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: "clock.arrow.circlepath")
-                            .font(.footnote)
+                            .sansFont(.small)
                             .foregroundStyle(Palette.subtext)
 
                         Text(word)
@@ -523,7 +523,7 @@ private extension RecordsView {
         return Button(action: action) {
             VStack(spacing: 2) {
                 Image(systemName: systemImage)
-                    .font(.footnote.weight(.semibold))
+                    .sansFont(.small, weight: .semibold)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 36, height: 36)
                     .background(fill, in: Circle())
@@ -555,7 +555,7 @@ private extension RecordsView {
             move(months: months)
         } label: {
             Image(systemName: systemImage)
-                .font(.footnote.weight(.semibold))
+                .sansFont(.small, weight: .semibold)
                 .foregroundStyle(Palette.subtext)
                 .frame(width: 40, height: 44)
                 .contentShape(.rect)
@@ -708,7 +708,7 @@ private extension RecordsView {
             .opacity(0.6)
 
             Image(systemName: "chevron.right")
-                .font(.footnote)
+                .sansFont(.small)
                 .foregroundStyle(Palette.hint)
         }
         .padding(.vertical, 8)
@@ -953,13 +953,13 @@ private extension RecordsView {
     func rewardButtonLabel(on date: LocalDate) -> some View {
         if model.rewardTotal(on: date) > 0 {
             Image(systemName: "gift.fill")
-                .font(.footnote)
+                .sansFont(.small)
                 .foregroundStyle(Palette.background)
                 .frame(width: 26, height: 26)
                 .background(Palette.accent, in: .circle)
         } else {
             Image(systemName: "gift")
-                .font(.footnote)
+                .sansFont(.small)
                 .foregroundStyle(Palette.subtext)
                 .frame(width: 26, height: 26)
                 .overlay {
@@ -975,7 +975,7 @@ private extension RecordsView {
             IconSeal(stamp, size: 26)
         } else {
             Image(systemName: "seal")
-                .font(.footnote)
+                .sansFont(.small)
                 .foregroundStyle(Palette.subtext)
                 .frame(width: 26, height: 26)
                 .overlay {

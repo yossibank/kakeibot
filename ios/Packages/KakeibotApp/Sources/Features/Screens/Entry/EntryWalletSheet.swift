@@ -118,11 +118,11 @@ private extension EntryWalletSheet {
 
                 if isEditing {
                     Image(systemName: "pencil")
-                        .font(.footnote.weight(.semibold))
+                        .sansFont(.small, weight: .semibold)
                         .foregroundStyle(Palette.accent)
                 } else if isSelected {
                     Image(systemName: "checkmark")
-                        .font(.footnote.weight(.semibold))
+                        .sansFont(.small, weight: .semibold)
                         .foregroundStyle(Palette.accent)
                 } else if isTaken {
                     Text("\(takenTitle)に選択中")

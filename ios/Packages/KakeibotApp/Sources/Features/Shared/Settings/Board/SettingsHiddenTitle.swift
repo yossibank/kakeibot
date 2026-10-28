@@ -18,7 +18,7 @@ struct SettingsHiddenTitle: View {
                 } label: {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
                         Image(systemName: "chevron.right")
-                            .font(.caption2.weight(.semibold))
+                            .sansFont(.caption, weight: .semibold)
                             .foregroundStyle(Palette.accent)
                             .rotationEffect(.degrees(flag.isOn ? 90 : 0))
 

@@ -115,7 +115,7 @@ private extension ReviewSharesCard {
                     .foregroundStyle(Palette.accentStrong)
 
                 Image(systemName: "chevron.right")
-                    .font(.caption2)
+                    .sansFont(.small)
                     .foregroundStyle(Palette.hint)
             }
 
