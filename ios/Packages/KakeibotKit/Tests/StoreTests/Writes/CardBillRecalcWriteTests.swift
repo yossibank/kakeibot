@@ -280,7 +280,10 @@ struct CardBillRecalcWriteTests {
 
         #expect(try setup.bill()?.amount == 12000)
 
-        let deletion = try await setup.database.deleteRecurring(expense.id)
+        let deletion = try await setup.database.deleteRecurring(
+            expense.id,
+            at: setup.now
+        )
 
         try await setup.database.writer.write { db in
             var bill = try #require(try Recurring.fetchOne(db, key: setup.recurringId))

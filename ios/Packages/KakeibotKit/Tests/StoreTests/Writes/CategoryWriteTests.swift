@@ -87,7 +87,10 @@ struct CategoryWriteTests {
         let setup = try await Setup()
         let food = try await setup.category(named: "食費")
 
-        let deletion = try await setup.database.deleteCategory(food.id)
+        let deletion = try await setup.database.deleteCategory(
+            food.id,
+            at: setup.now
+        )
         let categories = try await setup.expenseCategories()
 
         try await setup.database.restore(deletion)
@@ -116,7 +119,10 @@ struct CategoryWriteTests {
         try await setup.database.saveEntry(entry, at: setup.now)
 
         await #expect(throws: AppDatabase.CategoryWriteError.hasEntries) {
-            try await setup.database.deleteCategory(food.id)
+            try await setup.database.deleteCategory(
+                food.id,
+                at: setup.now
+            )
         }
     }
 

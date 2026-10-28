@@ -17,6 +17,7 @@ iOS・Android の家計簿アプリ
 | 何を作るか | [docs/overview.md](docs/overview.md) |
 | どう作るか | [docs/architecture.md](docs/architecture.md) |
 | データの形 | [docs/data.md](docs/data.md) |
+| 同期のための表 | [docs/data-sync.md](docs/data-sync.md) |
 | なぜそう決めたか | [docs/decisions/](docs/decisions/) |
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
 | 画面の言葉とコードの名前 | [docs/glossary.md](docs/glossary.md) |

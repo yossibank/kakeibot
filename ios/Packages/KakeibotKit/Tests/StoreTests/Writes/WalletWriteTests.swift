@@ -171,7 +171,10 @@ struct WalletWriteTests {
             at: setup.now
         )
 
-        let deletion = try await setup.database.deleteWallet(card.id)
+        let deletion = try await setup.database.deleteWallet(
+            card.id,
+            at: setup.now
+        )
         let list = try await setup.database.entryList()
         let recurrings = try await setup.database.recurrings()
 
@@ -201,8 +204,14 @@ struct WalletWriteTests {
         let second = try await setup.database.saveWallet(draft, at: setup.now)
 
         let deletions = try await [
-            setup.database.deleteWallet(first.id),
-            setup.database.deleteWallet(second.id)
+            setup.database.deleteWallet(
+                first.id,
+                at: setup.now
+            ),
+            setup.database.deleteWallet(
+                second.id,
+                at: setup.now
+            )
         ]
 
         try await setup.database.restore(Deletion(merging: deletions))
@@ -231,7 +240,10 @@ struct WalletWriteTests {
         try await setup.database.saveEntry(entry, at: setup.now)
 
         await #expect(throws: AppDatabase.WalletWriteError.hasEntries) {
-            try await setup.database.deleteWallet(cash.id)
+            try await setup.database.deleteWallet(
+                cash.id,
+                at: setup.now
+            )
         }
     }
 

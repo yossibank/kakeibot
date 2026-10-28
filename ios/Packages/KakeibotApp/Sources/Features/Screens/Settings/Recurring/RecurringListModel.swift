@@ -183,7 +183,10 @@ extension RecurringListModel: SettingsBoardModel {
     }
 
     public func remove(_ id: Recurring.ID) async throws -> Deletion {
-        try await database.deleteRecurring(id)
+        try await database.deleteRecurring(
+            id,
+            at: Date()
+        )
     }
 
     public func restoreRemoved(_ deletion: Deletion) async throws {

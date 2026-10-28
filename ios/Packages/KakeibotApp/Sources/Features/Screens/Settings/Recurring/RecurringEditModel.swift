@@ -285,7 +285,10 @@ public extension RecurringEditModel {
         }
 
         do {
-            return try await database.deleteRecurring(editingId)
+            return try await database.deleteRecurring(
+                editingId,
+                at: Date()
+            )
         } catch {
             errorNotice.show(Self.saveFailedMessage)
             return nil

@@ -1,4 +1,5 @@
 import Core
+import Foundation
 import GRDB
 
 public extension AppDatabase {
@@ -23,7 +24,8 @@ extension AppDatabase {
     @discardableResult
     static func deleteRecurrings(
         _ recurrings: QueryInterfaceRequest<Recurring>,
-        in db: Database
+        in db: Database,
+        at now: Date
     ) throws -> Deletion {
         let deleted = try recurrings.fetchAll(db)
         let ids = deleted.map(\.id)
@@ -33,7 +35,8 @@ extension AppDatabase {
         try linked.updateAll(
             db,
             Column("recurring_id").set(to: nil),
-            Column("recurring_date").set(to: nil)
+            Column("recurring_date").set(to: nil),
+            Column("updated_at").set(to: now.formatted(.iso8601))
         )
 
         try recurrings.deleteAll(db)
