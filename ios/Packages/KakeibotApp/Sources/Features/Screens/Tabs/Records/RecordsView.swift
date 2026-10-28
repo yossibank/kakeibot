@@ -3,8 +3,6 @@ import DesignSystem
 import SwiftUI
 
 public struct RecordsView: View {
-    @Environment(\.themeStyle.corner) private var corner
-
     @Bindable private var model: RecordsModel
 
     @State private var openId: Entry.ID?
@@ -409,10 +407,7 @@ private extension RecordsView {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(20))
-                .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
-        }
+        .card(cornerRadius: 20)
     }
 
     var selectButton: some View {
@@ -465,10 +460,7 @@ private extension RecordsView {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(20))
-                .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
-        }
+        .card(cornerRadius: 20)
     }
 
     func filterButton(title: String?) -> some View {
