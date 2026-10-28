@@ -388,6 +388,11 @@ public extension RecordsModel {
         selectedDate = nil
     }
 
+    func openWallet(_ id: Wallet.ID) {
+        openCurrentMonth()
+        filter = EntryFilter(walletIds: [id])
+    }
+
     func closeSearch() {
         isSearching = false
         searchText = ""

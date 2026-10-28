@@ -371,6 +371,27 @@ struct RecordsModelTests {
     }
 
     @Test
+    func opensWalletWithOnlyThatWalletFiltered() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let category = try #require(options.expenseCategories.first?.id)
+        let wallet = try #require(options.wallets.first?.id)
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        model.move(months: -3)
+        model.isSearching = true
+        model.searchText = "ランチ"
+        model.filter = EntryFilter(categoryIds: [category])
+
+        model.openWallet(wallet)
+
+        #expect(model.month.description == "2026-10")
+        #expect(model.shownDate == setup.today)
+        #expect(!model.isSearching)
+        #expect(model.searchText.isEmpty)
+        #expect(model.filter == EntryFilter(walletIds: [wallet]))
+    }
+
+    @Test
     func stampsAndRemovesWithShownChoices() async throws {
         let setup = try await Setup()
         try setup.database.insertShelfIfEmpty(at: Date())
