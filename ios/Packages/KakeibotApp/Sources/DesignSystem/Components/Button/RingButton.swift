@@ -5,17 +5,20 @@ public struct RingButton: View {
 
     let systemImage: String
     let style: Style
+    let size: Size
     let label: String?
     let action: () -> Void
 
     public init(
         systemImage: String,
         style: Style = .plain,
+        size: Size = .regular,
         label: String? = nil,
         action: @escaping () -> Void
     ) {
         self.systemImage = systemImage
         self.style = style
+        self.size = size
         self.label = label
         self.action = action
     }
@@ -23,12 +26,12 @@ public struct RingButton: View {
     public var body: some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .sansFont(.body, weight: .light)
+                .sansFont(size.font, weight: size.weight)
                 .foregroundStyle(foreground)
-                .frame(width: 36, height: 36)
+                .frame(width: size.diameter, height: size.diameter)
                 .background(fill, in: Circle())
                 .overlay(Circle().stroke(stroke, lineWidth: 1))
-                .frame(width: 40, height: 40)
+                .frame(width: size.hitSize, height: size.hitSize)
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
@@ -51,6 +54,11 @@ public extension RingButton {
         case plain
         case prominent
         case destructive
+    }
+
+    enum Size: Sendable {
+        case regular
+        case small
     }
 }
 
@@ -80,9 +88,44 @@ private extension RingButton {
     }
 }
 
+private extension RingButton.Size {
+    var font: FontSize {
+        switch self {
+        case .regular: .body
+        case .small: .caption
+        }
+    }
+
+    var weight: Font.Weight {
+        switch self {
+        case .regular: .light
+        case .small: .regular
+        }
+    }
+
+    var diameter: CGFloat {
+        switch self {
+        case .regular: 36
+        case .small: 24
+        }
+    }
+
+    var hitSize: CGFloat {
+        switch self {
+        case .regular: 40
+        case .small: 32
+        }
+    }
+}
+
 #Preview {
     HStack(spacing: 24) {
         RingButton(systemImage: "xmark") {}
+
+        RingButton(
+            systemImage: "xmark",
+            size: .small
+        ) {}
 
         RingButton(systemImage: "checkmark", style: .prominent) {}
 

@@ -71,7 +71,10 @@ private extension SettingsHint {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            RingButton(systemImage: "xmark") {
+            RingButton(
+                systemImage: "xmark",
+                size: .small
+            ) {
                 withAnimation(.snappy) {
                     _ = flag.set(true)
                 }
