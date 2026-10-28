@@ -145,6 +145,6 @@ public extension ReminderModel {
 
 private extension ReminderModel {
     static let noticeCount = 3
-    static let loadFailedMessage = "通知の設定を読み込めませんでした"
+    static let loadFailedMessage = "通知の設定を読めませんでした"
     static let saveFailedMessage = "通知の設定を保存できませんでした"
 }

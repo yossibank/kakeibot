@@ -19,7 +19,7 @@ public struct ReminderView: View {
 
     public var body: some View {
         VStack(spacing: 20) {
-            SettingsBackHeader("通知")
+            SettingsBackHeader("記録忘れの通知")
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {

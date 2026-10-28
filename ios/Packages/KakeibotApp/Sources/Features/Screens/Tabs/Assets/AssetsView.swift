@@ -403,7 +403,7 @@ private extension AssetsView {
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)
 
-            Text("＋\(AmountText.text(log.amount))")
+            Text("+\(AmountText.text(log.amount))")
                 .textFont(.footnote)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accent)

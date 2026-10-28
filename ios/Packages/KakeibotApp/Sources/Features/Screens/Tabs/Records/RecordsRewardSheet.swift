@@ -29,7 +29,7 @@ public struct RecordsRewardSheet: View {
                         systemImage: "gift",
                         title: "ごほうびの決まりがまだありません",
                         message: "決まりを作ると、ここで達成を付けられます",
-                        actionTitle: "ごほうびを作る"
+                        actionTitle: "ごほうびを追加"
                     ) {
                         isAddingRule = true
                     }
@@ -124,7 +124,7 @@ private extension RecordsRewardSheet {
 
                 Spacer(minLength: 8)
 
-                Text("＋\(AmountText.text(rule.amount))")
+                Text("+\(AmountText.text(rule.amount))")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.accent)
 
