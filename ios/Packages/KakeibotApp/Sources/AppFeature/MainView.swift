@@ -412,6 +412,10 @@ private extension MainView {
             ) { _ in
             } onDelete: { deletion in
                 undo.deletion = deletion
+            } onShowEntries: {
+                self.sheet = nil
+                records.openWallet(id)
+                tab = .records
             }
         }
     }

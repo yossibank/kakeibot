@@ -17,6 +17,7 @@ public struct WalletEditSheet: View {
     @State private var isConfirmingDelete = false
     @State private var isEditingPayment = false
     @State private var isAskingPayment = false
+    @State private var leavesForEntries = false
     @State private var addedWallet: Wallet?
 
     @FocusState private var focus: Field?
@@ -27,18 +28,21 @@ public struct WalletEditSheet: View {
     private let onSave: (Wallet) -> Void
     private let onDelete: (Deletion) -> Void
     private let onHide: () -> Void
+    private let onShowEntries: (() -> Void)?
 
     public init(
         model: WalletEditModel,
         onSave: @escaping (Wallet) -> Void = { _ in },
         onDelete: @escaping (Deletion) -> Void = { _ in },
-        onHide: @escaping () -> Void = {}
+        onHide: @escaping () -> Void = {},
+        onShowEntries: (() -> Void)? = nil
     ) {
         _model = State(initialValue: model)
 
         self.onSave = onSave
         self.onDelete = onDelete
         self.onHide = onHide
+        self.onShowEntries = onShowEntries
     }
 
     public var body: some View {
@@ -132,7 +136,12 @@ public struct WalletEditSheet: View {
             when: model.isChanged,
             isPresented: $isConfirmingDiscard
         ) {
-            dismiss()
+            discard()
+        }
+        .onChange(of: isConfirmingDiscard) {
+            if !isConfirmingDiscard {
+                leavesForEntries = false
+            }
         }
         .confirmsWalletDelete(isPresented: $isConfirmingDelete) {
             Task {
@@ -541,6 +550,7 @@ private extension WalletEditSheet {
         case payment
         case valuation
         case loanAmount
+        case entries
     }
 
     static let fade: CGFloat = 16
@@ -578,11 +588,26 @@ private extension WalletEditSheet {
         )
     }
 
+    var entriesItem: SettingsRowList<Panel>.Item {
+        .init(
+            panel: .entries,
+            systemImage: "list.bullet",
+            title: "出入りを見る",
+            value: "記録",
+            isEmpty: false
+        )
+    }
+
     var rowItems: [SettingsRowList<Panel>.Item] {
         let loan = model.showsLoanAmount ? [loanAmountItem] : []
         let payment = model.showsPayment ? paymentItems : []
+        let entries = showsEntries ? [entriesItem] : []
 
-        return payment + loan
+        return payment + loan + entries
+    }
+
+    var showsEntries: Bool {
+        onShowEntries != nil && model.isEditing
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {
@@ -643,6 +668,7 @@ private extension WalletEditSheet {
         case .payment: isEditingPayment = true
         case .valuation: openValuation()
         case .loanAmount: openLoanAmount()
+        case .entries: showEntries()
         }
     }
 
@@ -701,6 +727,25 @@ private extension WalletEditSheet {
 
         if model.isChanged {
             isConfirmingDiscard = true
+        } else {
+            dismiss()
+        }
+    }
+
+    func showEntries() {
+        focus = nil
+
+        if model.isChanged {
+            isConfirmingDiscard = true
+            leavesForEntries = true
+        } else {
+            onShowEntries?()
+        }
+    }
+
+    func discard() {
+        if leavesForEntries {
+            onShowEntries?()
         } else {
             dismiss()
         }
