@@ -11,12 +11,12 @@ public struct SettingsSheet: View {
     @State private var authorization: NotificationAuthorization = .allowed
     @State private var theme: ThemeChoice = .system
     @State private var customThemes: [Theme] = []
+    @State private var isSyncOn = false
 
     #if DEBUG
     @State private var isConfirmingSample = false
     @State private var isInsertingSample = false
     @State private var sampleMessage: String?
-    @State private var isSyncOn = false
     #endif
 
     @Environment(\.dismiss) private var dismiss
