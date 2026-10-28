@@ -27,6 +27,37 @@ struct ThemeEditModelTests {
     }
 
     @Test
+    func restoresDeletedChosenTheme() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let creating = ThemeEditModel(
+            database: setup.database,
+            editing: nil,
+            base: ThemePreset.forest.palette
+        )
+        creating.draft.name = "森の夜"
+        _ = await creating.save()
+        let theme = try #require(try await setup.database.customThemes().first)
+
+        let editing = ThemeEditModel(
+            database: setup.database,
+            editing: theme,
+            base: ThemePreset.forest.palette
+        )
+        let deletion = try #require(await editing.delete())
+        let afterDelete = try await setup.database.setting(.theme)
+
+        let list = ThemeListModel(
+            database: setup.database,
+            appIcon: AppIconListModel(switcher: AppIconListModelTests.Switcher(name: nil).client)
+        )
+        await list.restore(deletion)
+
+        #expect(afterDelete == .preset(.white))
+        #expect(list.current == .custom(theme.id))
+        #expect(list.customThemes == [theme])
+    }
+
+    @Test
     func keepsTextReadableWhenBackgroundChanges() async throws {
         let setup = try await HomeModelTests.Setup()
 

@@ -102,6 +102,39 @@ struct ThemeWriteTests {
     }
 
     @Test
+    func restoresDeletedChosenTheme() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 0)
+        let theme = try await database.saveTheme(Self.mint, at: now)
+        try await database.setSetting(.theme, to: .custom(theme.id))
+
+        let deletion = try await database.deleteTheme(theme.id)
+        try await database.restore(deletion)
+        let choice = try await database.setting(.theme)
+        let themes = try await database.customThemes()
+
+        #expect(choice == .custom(theme.id))
+        #expect(themes == [theme])
+    }
+
+    @Test
+    func keepsChoiceWhenRestoringUnchosenTheme() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 0)
+        let theme = try await database.saveTheme(Self.mint, at: now)
+        try await database.setSetting(.theme, to: .preset(.black))
+
+        let deletion = try await database.deleteTheme(theme.id)
+        try await database.setSetting(.theme, to: .preset(.white))
+        try await database.restore(deletion)
+        let choice = try await database.setting(.theme)
+        let themes = try await database.customThemes()
+
+        #expect(choice == .preset(.white))
+        #expect(themes == [theme])
+    }
+
+    @Test
     func rejectsUnreadableTheme() async throws {
         let database = try AppDatabase.inMemory()
         var draft = Self.mint

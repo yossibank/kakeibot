@@ -98,4 +98,33 @@ struct BudgetListModelTests {
         #expect(model.totalAmount == nil)
         #expect(model.editing == nil)
     }
+
+    @Test
+    func detectsChangedAmountWhileEditing() async throws {
+        let setup = try await HomeModelTests.Setup()
+        try await setup.database.setBudget(50000, for: nil, from: setup.today.yearMonth)
+
+        let model = BudgetListModel(
+            database: setup.database,
+            today: setup.today
+        )
+
+        await model.load()
+        let closed = model.isChanged
+
+        model.startEditing(.total)
+        let opened = model.isChanged
+
+        model.press(.digit(1))
+        let changed = model.isChanged
+
+        model.cancelEditing()
+        let canceled = model.isChanged
+
+        #expect(!closed)
+        #expect(!opened)
+        #expect(changed)
+        #expect(!canceled)
+        #expect(model.totalAmount == 50000)
+    }
 }

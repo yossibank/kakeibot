@@ -12,8 +12,14 @@ public struct ThemeEditSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    public init(model: ThemeEditModel) {
+    private let onDelete: (Deletion) -> Void
+
+    public init(
+        model: ThemeEditModel,
+        onDelete: @escaping (Deletion) -> Void = { _ in }
+    ) {
         _model = State(initialValue: model)
+        self.onDelete = onDelete
     }
 
     public var body: some View {
@@ -90,30 +96,16 @@ public struct ThemeEditSheet: View {
 
 private extension ThemeEditSheet {
     var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                close()
-            }
-
-            Spacer()
-
-            SettingsSheetTitle(model.isEditing ? "テーマを編集" : "テーマをつくる")
-
-            Spacer()
-
-            if model.isEditing {
-                RingButton(
-                    systemImage: "trash",
-                    style: .destructive,
-                    label: "削除"
-                ) {
-                    focus = nil
-                    isConfirmingDelete = true
-                }
-            } else {
-                Color.clear
-                    .frame(width: 44, height: 44)
-            }
+        SettingsEditHeader(
+            title: model.isEditing ? "テーマを編集" : "テーマをつくる",
+            isEditing: model.isEditing,
+            isHidden: false,
+            canHide: false
+        ) {
+            close()
+        } onHide: {} onDelete: {
+            focus = nil
+            isConfirmingDelete = true
         }
     }
 
@@ -212,7 +204,8 @@ private extension ThemeEditSheet {
     }
 
     func delete() async {
-        if await model.delete() {
+        if let deletion = await model.delete() {
+            onDelete(deletion)
             dismiss()
         }
     }

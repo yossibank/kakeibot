@@ -34,17 +34,24 @@ public extension AppDatabase {
         }
     }
 
-    func deleteTheme(_ id: Theme.ID) async throws {
+    @discardableResult
+    func deleteTheme(_ id: Theme.ID) async throws -> Deletion {
         try await writer.write { db in
-            guard try Theme.deleteOne(db, key: id) else {
+            guard let theme = try Theme.fetchOne(db, key: id) else {
                 throw ThemeWriteError.themeNotFound
             }
 
+            try theme.delete(db)
+
             let choice = try Self.setting(.theme, in: db)
 
-            if choice == .custom(id) {
-                try Self.setSetting(.theme, to: .preset(.white), in: db)
+            guard choice == .custom(id) else {
+                return Deletion(themes: [theme])
             }
+
+            try Self.setSetting(.theme, to: .preset(.white), in: db)
+
+            return Deletion(themes: [theme], themeChoice: choice)
         }
     }
 }

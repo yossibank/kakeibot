@@ -14,7 +14,9 @@ public struct Deletion: Hashable, Sendable, Identifiable {
     var shelfIcons: [ShelfIcon] = []
     var rewardRules: [RewardRule] = []
     var rewardLogs: [RewardLog] = []
+    var themes: [Theme] = []
     var entries: [Entry] = []
+    var themeChoice: ThemeChoice?
 }
 
 public extension Deletion {
@@ -30,7 +32,9 @@ public extension Deletion {
             shelfIcons: deletions.flatMap(\.shelfIcons),
             rewardRules: deletions.flatMap(\.rewardRules),
             rewardLogs: deletions.flatMap(\.rewardLogs),
-            entries: deletions.flatMap(\.entries)
+            themes: deletions.flatMap(\.themes),
+            entries: deletions.flatMap(\.entries),
+            themeChoice: deletions.lazy.compactMap(\.themeChoice).first
         )
     }
 }

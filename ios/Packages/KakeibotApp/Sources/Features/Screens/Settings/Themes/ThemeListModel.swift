@@ -84,9 +84,20 @@ public extension ThemeListModel {
     func dismissSuggestion() {
         suggestedIcon = nil
     }
+
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await database.restore(deletion)
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage)
+        }
+
+        await load()
+    }
 }
 
 private extension ThemeListModel {
     static let loadFailedMessage = "設定を読めませんでした"
     static let saveFailedMessage = "設定を保存できませんでした"
+    static let restoreFailedMessage = "元に戻せませんでした"
 }

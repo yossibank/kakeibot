@@ -9,6 +9,7 @@ struct SettingsEditHeader: View {
     let title: String
     let isEditing: Bool
     let isHidden: Bool
+    var canHide = true
     var canDelete = true
     let onClose: () -> Void
     let onHide: () -> Void
@@ -69,14 +70,18 @@ private extension SettingsEditHeader {
 
     var menu: some View {
         MenuPanel(width: Self.menuWidth) {
-            MenuRow(hideTitle, systemImage: hideImage) {
-                openMenu(false)
-                onHide()
+            if canHide {
+                MenuRow(hideTitle, systemImage: hideImage) {
+                    openMenu(false)
+                    onHide()
+                }
+            }
+
+            if canHide, canDelete {
+                MenuDivider()
             }
 
             if canDelete {
-                MenuDivider()
-
                 MenuRow("削除", systemImage: "trash", isDestructive: true) {
                     openMenu(false)
                     onDelete()

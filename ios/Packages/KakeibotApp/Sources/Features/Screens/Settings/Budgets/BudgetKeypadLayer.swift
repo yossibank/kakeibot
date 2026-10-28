@@ -9,6 +9,8 @@ extension View {
 }
 
 private struct BudgetKeypadLayer: ViewModifier {
+    @State private var isConfirmingDiscard = false
+
     let model: BudgetListModel
 
     func body(content: Content) -> some View {
@@ -20,7 +22,7 @@ private struct BudgetKeypadLayer: ViewModifier {
                     .opacity(0.35)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        model.cancelEditing()
+                        close()
                     }
                     .transition(.opacity)
                     .zIndex(1)
@@ -31,6 +33,12 @@ private struct BudgetKeypadLayer: ViewModifier {
             }
         }
         .animation(.snappy, value: model.editing)
+        .confirmsDiscard(
+            when: model.isChanged,
+            isPresented: $isConfirmingDiscard
+        ) {
+            model.cancelEditing()
+        }
     }
 }
 
@@ -75,6 +83,16 @@ private extension BudgetKeypadLayer {
                     .frame(minHeight: 36)
                 }
             }
+        }
+    }
+}
+
+private extension BudgetKeypadLayer {
+    func close() {
+        if model.isChanged {
+            isConfirmingDiscard = true
+        } else {
+            model.cancelEditing()
         }
     }
 }
