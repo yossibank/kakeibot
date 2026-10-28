@@ -27,6 +27,8 @@
 
 `(table_name, record_id)` が主キー。行が残っていれば保存、無ければ削除として送る。
 
+`WITHOUT ROWID` の表なので、GRDB の見張りは、この表の変更に気づかない。トリガーを通さずに書くときは、`notifyChanges` で見張りに知らせる。
+
 setting は、次の key を記録しない。
 
 - `onboarding_completed`
@@ -46,3 +48,14 @@ setting は、次の key を記録しない。
 | --- | --- | --- |
 | table_name / record_id | TEXT | sync_change と同じ |
 | fields | TEXT | 列の値の JSON |
+
+## sync_record
+
+iCloud にあるレコードの控え。送った行と受け取った行ごとに、CloudKit の system fields を持つ。
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| table_name / record_id | TEXT | sync_change と同じ |
+| system_fields | BLOB | 次に送るときの元にする |
+
+受け取った行と同じ書き込みで控える。同期を切ったときと、全部を取り直すときは、全部消す。

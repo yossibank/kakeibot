@@ -46,6 +46,13 @@
         "identifier" : "FeaturesTests",
         "name" : "FeaturesTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Packages\/KakeibotApp",
+        "identifier" : "SyncTests",
+        "name" : "SyncTests"
+      }
     }
   ],
   "version" : 1

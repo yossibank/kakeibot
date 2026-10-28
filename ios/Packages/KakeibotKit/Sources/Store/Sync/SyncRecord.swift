@@ -28,6 +28,7 @@ public struct SyncKey: Hashable, Sendable {
 
 public struct SyncChange: Hashable, Sendable {
     public let key: SyncKey
+    public let isDeletion: Bool
 
     let version: Int64
 }

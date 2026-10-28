@@ -51,7 +51,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 ## パッケージ
 
-2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/` と `Store/Sync/` を足している。依存の向きは、共通の形と同じである。
+2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/` と、`Sync` を足している。依存の向きは、共通の形に `AppFeature --> Sync --> Store` を足したものである。
 
 ### KakeibotKit
 
@@ -109,7 +109,8 @@ KakeibotApp/
 │   │       ├── Period/      期間の範囲と月の始まり
 │   │       ├── Settings/    設定の画面で使う部品（Board・Header・Hint・Icon・Input・Preview・Tile）
 │   │       └── Setup/       残りの設定とカスタマイズの項目と進み具合
-│   └── Notifications/
+│   ├── Notifications/
+│   └── Sync/                CKSyncEngine で、記録した変更を送り、届いた変更を Store に渡す
 └── Tests/
 ```
 

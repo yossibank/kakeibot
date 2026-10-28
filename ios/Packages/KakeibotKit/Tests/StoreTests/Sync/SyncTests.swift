@@ -4,6 +4,33 @@ import GRDB
 import Testing
 
 struct SyncTests {
+    @Test(.timeLimit(.minutes(1)))
+    func notifiesChangeRecordedByTrigger() async throws {
+        let setup = try await Setup()
+        var updates = setup.database.syncChangeUpdates().makeAsyncIterator()
+
+        let first: Void? = try await updates.next()
+        try await setup
+            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        let second: Void? = try await updates.next()
+
+        #expect(first != nil)
+        #expect(second != nil)
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func notifiesQueuedChange() async throws {
+        let setup = try await Setup()
+        var updates = setup.database.syncChangeUpdates().makeAsyncIterator()
+
+        let first: Void? = try await updates.next()
+        try await setup.database.queueAllForSync()
+        let second: Void? = try await updates.next()
+
+        #expect(first != nil)
+        #expect(second != nil)
+    }
+
     @Test
     func recordsChangesOnlyWhenEnabled() async throws {
         let setup = try await Setup(enabled: false)
@@ -202,6 +229,66 @@ struct SyncTests {
         try await setup.database.saveSyncEngineState(state)
 
         #expect(try await setup.database.syncEngineState() == state)
+    }
+
+    @Test
+    func marksChangeOfMissingRowAsDeletion() async throws {
+        let setup = try await Setup()
+
+        try await setup
+            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        let saved = try await setup.database.pendingSyncChanges().map(\.isDeletion)
+        try await setup.execute("DELETE FROM no_spend_day")
+        let deleted = try await setup.database.pendingSyncChanges().map(\.isDeletion)
+
+        #expect(saved == [false])
+        #expect(deleted == [true])
+    }
+
+    @Test
+    func savesSystemFieldsWithRemoteRows() async throws {
+        let setup = try await Setup()
+
+        try await setup
+            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+
+        let saved = SyncKey(table: .noSpendDay, id: "2026-10-02")
+        let deleted = SyncKey(table: .noSpendDay, id: "2026-10-01")
+        let remote = SyncRecord(key: saved, values: ["created_at": .text("x")])
+        let fields = Data([1])
+
+        try await setup.database.saveSyncSystemFields([deleted: fields])
+        try await setup.database.applySyncChanges(
+            saved: [remote],
+            deleted: [deleted],
+            systemFields: [saved: fields]
+        )
+
+        #expect(try await setup.database.syncSystemFields(for: saved) == fields)
+        #expect(try await setup.database.syncSystemFields(for: deleted) == nil)
+    }
+
+    @Test
+    func savesAndResetsSystemFields() async throws {
+        let setup = try await Setup()
+        let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
+        let other = SyncKey(table: .noSpendDay, id: "2026-10-02")
+        let fields = Data([1, 2, 3])
+
+        try await setup.database.saveSyncSystemFields([key: fields, other: fields])
+        try await setup.database.saveSyncEngineState(Data([4]))
+        let saved = try await setup.database.syncSystemFields(for: key)
+
+        try await setup.database.removeSyncSystemFields([key])
+        let removed = try await setup.database.syncSystemFields(for: key)
+
+        try await setup.database.resetSync()
+
+        #expect(saved == fields)
+        #expect(removed == nil)
+        #expect(try await setup.database.syncSystemFields(for: other) == nil)
+        #expect(try await setup.database.syncEngineState() == nil)
     }
 }
 
