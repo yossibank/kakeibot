@@ -11,22 +11,28 @@ struct SettingsField<Field: Hashable>: View {
 
     private let prompt: String
     private let font: Font?
+    private let isInvalid: Bool
     private let focus: FocusState<Field?>.Binding
     private let field: Field
+    private let onSubmit: (() -> Void)?
 
     init(
         _ prompt: String,
         text: Binding<String>,
         font: Font? = nil,
+        isInvalid: Bool = false,
         focus: FocusState<Field?>.Binding,
-        field: Field
+        field: Field,
+        onSubmit: (() -> Void)? = nil
     ) {
         _text = text
 
         self.prompt = prompt
         self.font = font
+        self.isInvalid = isInvalid
         self.focus = focus
         self.field = field
+        self.onSubmit = onSubmit
     }
 
     var body: some View {
@@ -42,7 +48,11 @@ struct SettingsField<Field: Hashable>: View {
             .submitLabel(.done)
             .focused(focus, equals: field)
             .onSubmit {
-                focus.wrappedValue = nil
+                if let onSubmit {
+                    onSubmit()
+                } else {
+                    focus.wrappedValue = nil
+                }
             }
 
             Button {
@@ -77,6 +87,10 @@ private extension SettingsField {
     }
 
     var stroke: Color {
-        isFocused ? Palette.accent : Palette.accent.opacity(.muted)
+        if isInvalid {
+            return Palette.rose
+        }
+
+        return isFocused ? Palette.accent : Palette.accent.opacity(.muted)
     }
 }
