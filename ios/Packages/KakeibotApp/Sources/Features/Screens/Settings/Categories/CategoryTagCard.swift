@@ -5,9 +5,7 @@ import SwiftUI
 struct CategoryTagCard: View {
     @Binding var name: String
 
-    @Environment(\.themeStyle.corner) private var corner
-
-    var isFocused: FocusState<Bool>.Binding
+    var isFocused: FocusState<Bool?>.Binding
 
     let isAdding: Bool
     let errorMessage: String?
@@ -17,20 +15,19 @@ struct CategoryTagCard: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            HStack {
-                Label(title, systemImage: "tag")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.accent)
-
-                Spacer()
-
-                RingButton(systemImage: "xmark", action: onClose)
-            }
+            header
 
             preview
 
             VStack(alignment: .leading, spacing: 8) {
-                field
+                SettingsField(
+                    "朝ごはん など",
+                    text: $name,
+                    isInvalid: errorMessage != nil,
+                    focus: isFocused,
+                    field: true,
+                    onSubmit: onCommit
+                )
 
                 Text(note)
                     .textFont(.caption2)
@@ -38,32 +35,7 @@ struct CategoryTagCard: View {
                     .padding(.leading, 4)
             }
 
-            HStack(spacing: 12) {
-                if let onDelete {
-                    Button(action: onDelete) {
-                        Text("削除")
-                            .textFont(.subheadline)
-                            .foregroundStyle(Palette.rose)
-                            .frame(maxWidth: .infinity, minHeight: 44)
-                            .overlay {
-                                Capsule()
-                                    .stroke(Palette.rose.opacity(.medium))
-                            }
-                            .contentShape(Capsule())
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                Button(action: onCommit) {
-                    Text(commitTitle)
-                        .textFont(.subheadline, weight: .bold)
-                        .foregroundStyle(Palette.background)
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                        .background(Palette.accent, in: Capsule())
-                        .contentShape(Capsule())
-                }
-                .buttonStyle(.plain)
-            }
+            PrimaryButton(commitTitle, action: onCommit)
         }
         .padding(16)
         .floatingCard()
@@ -74,6 +46,32 @@ struct CategoryTagCard: View {
 }
 
 private extension CategoryTagCard {
+    var header: some View {
+        HStack {
+            RingButton(systemImage: "xmark", action: onClose)
+
+            Spacer()
+
+            Label(title, systemImage: "tag")
+                .textFont(.caption)
+                .foregroundStyle(Palette.accent)
+
+            Spacer()
+
+            if let onDelete {
+                RingButton(
+                    systemImage: "trash",
+                    style: .destructive,
+                    label: "削除",
+                    action: onDelete
+                )
+            } else {
+                Color.clear
+                    .frame(width: 44, height: 44)
+            }
+        }
+    }
+
     var preview: some View {
         VStack(spacing: 0) {
             Rectangle()
@@ -92,30 +90,6 @@ private extension CategoryTagCard {
         }
         .animation(.snappy(duration: 0.2), value: name)
     }
-
-    var field: some View {
-        TextField(
-            "名前",
-            text: $name,
-            prompt: Text("朝ごはん など").foregroundStyle(Palette.hint)
-        )
-        .textFont(.body)
-        .foregroundStyle(Palette.text)
-        .tint(Palette.accent)
-        .submitLabel(.done)
-        .focused(isFocused)
-        .onSubmit(onCommit)
-        .padding(.horizontal, 16)
-        .frame(height: 46)
-        .background(
-            Palette.background,
-            in: .rect(cornerRadius: corner.radius(16))
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(16))
-                .stroke(fieldStroke, lineWidth: 1)
-        }
-    }
 }
 
 private extension CategoryTagCard {
@@ -124,7 +98,7 @@ private extension CategoryTagCard {
     }
 
     var commitTitle: String {
-        isAdding ? "追加" : "変更"
+        SettingsSaveTitle.text(problem: nil, isEditing: !isAdding)
     }
 
     var previewName: String {
@@ -139,9 +113,5 @@ private extension CategoryTagCard {
 
     var noteColor: Color {
         errorMessage == nil ? Palette.subtext : Palette.rose
-    }
-
-    var fieldStroke: Color {
-        errorMessage == nil ? Palette.outline : Palette.rose
     }
 }

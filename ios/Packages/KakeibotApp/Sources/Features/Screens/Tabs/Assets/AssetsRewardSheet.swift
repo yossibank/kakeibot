@@ -74,10 +74,7 @@ private extension AssetsRewardSheet {
 
             Spacer()
 
-            Text("ごほうび貯金箱")
-                .displayFont(.body)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
+            SheetTitle("ごほうび貯金箱")
 
             Spacer()
 

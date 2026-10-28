@@ -72,7 +72,7 @@ private extension IconEditor {
         VStack(alignment: .leading, spacing: 16) {
             ForEach(IconEditModel.glyphSections) { section in
                 VStack(alignment: .leading, spacing: 8) {
-                    SettingsSectionTitle(section.title)
+                    SectionTitle(section.title)
 
                     LazyVGrid(columns: Self.gridColumns, spacing: 8) {
                         ForEach(section.glyphs, id: \.self) { glyph in
@@ -88,7 +88,7 @@ private extension IconEditor {
         VStack(alignment: .leading, spacing: 16) {
             ForEach(IconEditModel.emojiSections) { section in
                 VStack(alignment: .leading, spacing: 8) {
-                    SettingsSectionTitle(section.title)
+                    SectionTitle(section.title)
 
                     LazyVGrid(columns: Self.gridColumns, spacing: 8) {
                         ForEach(section.emojis, id: \.self) { emoji in

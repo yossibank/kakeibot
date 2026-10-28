@@ -47,10 +47,7 @@ public struct PeriodRecurringSheet: View {
 private extension PeriodRecurringSheet {
     var header: some View {
         ZStack {
-            Text("今月の固定費")
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
+            SheetTitle("今月の固定費")
 
             HStack {
                 RingButton(systemImage: "xmark") {

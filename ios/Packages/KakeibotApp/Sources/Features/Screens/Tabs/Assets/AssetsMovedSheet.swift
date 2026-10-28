@@ -43,10 +43,7 @@ private extension AssetsMovedSheet {
         rows: [EntryRowItem]
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .textFont(.caption)
-                .tracking(2)
-                .foregroundStyle(Palette.subtext)
+            SectionTitle(title)
 
             VStack(spacing: 0) {
                 ForEach(rows) { item in

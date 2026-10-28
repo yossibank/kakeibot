@@ -288,10 +288,7 @@ private extension OnboardingView {
         items: [SetupItem]
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .textFont(.caption2)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
+            SectionTitle(title)
                 .padding(.leading, 8)
 
             SetupList(items, model: model.setup) { item in

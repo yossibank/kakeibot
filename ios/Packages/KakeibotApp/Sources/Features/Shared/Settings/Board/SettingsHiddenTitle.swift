@@ -22,7 +22,7 @@ struct SettingsHiddenTitle: View {
                             .foregroundStyle(Palette.accent)
                             .rotationEffect(.degrees(flag.isOn ? 90 : 0))
 
-                        SettingsSectionTitle("\(title)（\(count)）")
+                        SectionTitle("\(title)（\(count)）")
                     }
                     .frame(minHeight: 32)
                     .contentShape(.rect)

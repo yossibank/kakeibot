@@ -68,10 +68,7 @@ private extension RecordsStampSheet {
 
             Spacer()
 
-            Text("\(date.month)/\(date.day) のスタンプ")
-                .displayFont(.body)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
+            SheetTitle("\(date.month)/\(date.day) のスタンプ")
 
             Spacer()
 

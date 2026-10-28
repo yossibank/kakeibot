@@ -43,10 +43,7 @@ struct EntryWalletSheet: View {
 
                 ForEach(model.walletSections) { section in
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(section.kind.title)
-                            .textFont(.caption)
-                            .tracking(2)
-                            .foregroundStyle(Palette.subtext)
+                        SectionTitle(section.kind.title)
 
                         ForEach(section.wallets) { wallet in
                             walletRow(wallet)
@@ -165,10 +162,7 @@ private extension EntryWalletSheet {
 private extension EntryWalletSheet {
     var billSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("請求")
-                .textFont(.caption)
-                .tracking(2)
-                .foregroundStyle(Palette.subtext)
+            SectionTitle("請求")
 
             HStack(spacing: 12) {
                 ForEach(model.billChoices) { choice in

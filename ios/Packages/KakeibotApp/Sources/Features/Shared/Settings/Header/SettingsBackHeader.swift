@@ -24,10 +24,7 @@ struct SettingsBackHeader: View {
 
             Spacer()
 
-            Text(title)
-                .displayFont(.body)
-                .tracking(4)
-                .foregroundStyle(Palette.accent)
+            SheetTitle(title)
 
             Spacer()
 

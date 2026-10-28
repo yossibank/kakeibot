@@ -16,7 +16,7 @@ public struct CategoryEditSheet: View {
     @State private var iconBottom: CGFloat = 0
 
     @FocusState private var focus: Field?
-    @FocusState private var isTagFocused: Bool
+    @FocusState private var isTagFocused: Bool?
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
@@ -227,7 +227,7 @@ private extension CategoryEditSheet {
     var tags: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack {
-                SettingsSectionTitle("タグ")
+                SectionTitle("タグ")
 
                 Spacer()
 
@@ -360,7 +360,7 @@ private extension CategoryEditSheet {
     }
 
     func closeTag() {
-        isTagFocused = false
+        isTagFocused = nil
 
         model.clearTagProblem()
 

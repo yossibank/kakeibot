@@ -107,10 +107,7 @@ private extension AssetsGoalSheet {
 
             Spacer()
 
-            Text(title)
-                .displayFont(.body)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
+            SheetTitle(title)
 
             Spacer()
 

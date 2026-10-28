@@ -9,10 +9,7 @@ struct EntryRecentTransfers: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("最近の振替")
-                .textFont(.caption2)
-                .tracking(2)
-                .foregroundStyle(Palette.subtext)
+            SectionTitle("最近の振替")
                 .padding(.horizontal, 4)
 
             ForEach(transfers) { transfer in

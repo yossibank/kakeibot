@@ -95,10 +95,7 @@ private extension RecordsFilterSheet {
 
             Spacer()
 
-            Text("絞り込む")
-                .displayFont(.body)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
+            SheetTitle("絞り込む")
 
             Spacer()
 
