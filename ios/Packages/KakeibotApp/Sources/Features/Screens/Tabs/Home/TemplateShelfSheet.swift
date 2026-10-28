@@ -99,30 +99,11 @@ private extension TemplateShelfSheet {
     }
 
     var searchField: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .sansFont(.small, weight: .light)
-                .foregroundStyle(Palette.subtext)
-
-            TextField(
-                "名前で探す",
-                text: $query,
-                prompt: Text("名前で探す").foregroundStyle(Palette.hint)
-            )
-            .textFont(.subheadline)
-            .foregroundStyle(Palette.text)
-            .tint(Palette.accent)
-            .submitLabel(.search)
-            .focused($isSearching)
-        }
-        .padding(.horizontal, 16)
-        .frame(height: 42)
-        .background(Palette.panel, in: Capsule())
-        .overlay {
-            Capsule()
-                .stroke(searchStroke, lineWidth: 1)
-        }
-        .animation(.snappy(duration: 0.2), value: isSearching)
+        SearchField(
+            "名前で探す",
+            text: $query,
+            focus: $isSearching
+        )
     }
 
     func sectionView(_ section: HomeModel.TemplateSection) -> some View {
@@ -160,10 +141,6 @@ private extension TemplateShelfSheet {
         query.isEmpty
             ? "まだテンプレートがありません"
             : "「\(query)」に合うテンプレートはありません"
-    }
-
-    var searchStroke: Color {
-        isSearching ? Palette.accent : Palette.accent.opacity(.muted)
     }
 
     func use(_ template: EntryTemplate) {

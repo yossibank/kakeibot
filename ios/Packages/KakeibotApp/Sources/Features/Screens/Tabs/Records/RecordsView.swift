@@ -179,42 +179,12 @@ private extension RecordsView {
 
     var searchBar: some View {
         HStack(spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: "magnifyingglass")
-                    .sansFont(.small, weight: .semibold)
-                    .foregroundStyle(Palette.subtext)
-
-                TextField(
-                    "メモ・カテゴリ・口座・金額",
-                    text: $model.searchText,
-                    prompt: Text("メモ・カテゴリ・口座・金額")
-                        .foregroundStyle(Palette.hint)
-                )
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-                .tint(Palette.accent)
-                .submitLabel(.search)
-                .focused($isSearchFocused)
-                .onSubmit {
-                    rememberSearch()
-                }
-
-                if !model.searchText.isEmpty {
-                    Button {
-                        model.searchText = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(Palette.hint)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal, 16)
-            .frame(height: 44)
-            .background(Palette.faint, in: Capsule())
-            .overlay {
-                Capsule()
-                    .stroke(Palette.outline, lineWidth: 1)
+            SearchField(
+                "メモ・カテゴリ・口座・金額",
+                text: $model.searchText,
+                focus: $isSearchFocused
+            ) {
+                rememberSearch()
             }
 
             filterButton(title: nil)
