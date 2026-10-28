@@ -24,9 +24,19 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
+            var change = CardBillChange()
+
             for draft in drafts {
-                try Self.saveEntry(draft, editing: nil, in: db, at: now)
+                try Self.saveEntry(
+                    draft,
+                    editing: nil,
+                    change: &change,
+                    in: db,
+                    at: now
+                )
             }
+
+            try Self.recalculateCardBills(change, in: db, at: now)
         }
     }
 
@@ -38,9 +48,17 @@ public extension AppDatabase {
 
     func restoreEntry(
         _ entry: Entry,
-        fee: Entry? = nil
+        fee: Entry? = nil,
+        at now: Date = Date()
     ) async throws {
         try await writer.write { db in
+            let restored = [entry] + [fee].compactMap(\.self)
+
+            var change = CardBillChange()
+
+            change.before = try Self.existingRows(of: restored, in: db)
+            change.after = restored
+
             try Self.restore([entry], in: db)
 
             _ = try Entry
@@ -51,21 +69,38 @@ public extension AppDatabase {
             if let fee {
                 try Self.restore([fee], in: db)
             }
+
+            try Self.recalculateCardBills(change, in: db, at: now)
         }
     }
 
-    func restoreEntries(_ entries: [Entry]) async throws {
+    func restoreEntries(
+        _ entries: [Entry],
+        at now: Date = Date()
+    ) async throws {
         try await writer.write { db in
+            var change = CardBillChange()
+
+            change.before = try Self.existingRows(of: entries, in: db)
+            change.after = entries
+
             try Self.restore(entries, in: db)
+            try Self.recalculateCardBills(change, in: db, at: now)
         }
     }
 
     @discardableResult
-    func deleteEntry(_ id: Entry.ID) async throws -> [Entry] {
-        try await deleteEntries([id])
+    func deleteEntry(
+        _ id: Entry.ID,
+        at now: Date = Date()
+    ) async throws -> [Entry] {
+        try await deleteEntries([id], at: now)
     }
 
-    func deleteEntries(_ ids: [Entry.ID]) async throws -> [Entry] {
+    func deleteEntries(
+        _ ids: [Entry.ID],
+        at now: Date = Date()
+    ) async throws -> [Entry] {
         try await writer.write { db in
             let entries = try Entry.fetchAll(db, keys: ids)
 
@@ -75,6 +110,10 @@ public extension AppDatabase {
                 .fetchAll(db)
 
             _ = try Entry.deleteAll(db, keys: ids)
+
+            let change = CardBillChange(before: entries + fees)
+
+            try Self.recalculateCardBills(change, in: db, at: now)
 
             return entries + fees
         }
@@ -93,7 +132,11 @@ public extension AppDatabase {
                 try Self.canChange(entry, to: change, in: db)
             }
 
+            var touched = CardBillChange()
+
             for var entry in changed {
+                touched.before.append(entry)
+
                 switch change {
                 case let .category(id):
                     entry.categoryId = id
@@ -106,7 +149,11 @@ public extension AppDatabase {
                 entry.updatedAt = now
 
                 try entry.update(db)
+
+                touched.after.append(entry)
             }
+
+            try Self.recalculateCardBills(touched, in: db, at: now)
 
             return changed
         }
@@ -121,6 +168,32 @@ extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws -> Entry {
+        var change = CardBillChange()
+
+        let entry = try saveEntry(
+            draft,
+            editing: id,
+            change: &change,
+            in: db,
+            at: now
+        )
+
+        try recalculateCardBills(change, in: db, at: now)
+
+        return entry
+    }
+
+    @discardableResult
+    static func saveEntry(
+        _ draft: EntryDraft,
+        editing id: Entry.ID?,
+        change: inout CardBillChange,
+        in db: Database,
+        at now: Date
+    ) throws -> Entry {
+        let before = try id.flatMap { try Entry.fetchOne(db, key: $0) }
+        let beforeFee = try before.flatMap { try fee(of: $0.id, in: db) }
+
         let entry = try Self.entry(
             from: draft,
             editing: id,
@@ -145,6 +218,11 @@ extension AppDatabase {
         }
 
         try saveFee(draft.fee, for: entry, in: db, at: now)
+
+        let afterFee = try fee(of: entry.id, in: db)
+
+        change.before += [before, beforeFee].compactMap(\.self)
+        change.after += [entry, afterFee].compactMap(\.self)
 
         return entry
     }
@@ -205,6 +283,8 @@ private extension AppDatabase {
             + entries.filter { $0.transferId != nil }
 
         for var entry in ordered {
+            try removeRecordedDuplicates(of: entry, in: db)
+
             if let templateId = entry.templateId,
                try !EntryTemplate.exists(db, key: templateId) {
                 entry.templateId = nil
@@ -221,6 +301,22 @@ private extension AppDatabase {
                 try NoSpendDay.deleteOne(db, key: entry.date)
             }
         }
+    }
+
+    static func removeRecordedDuplicates(
+        of entry: Entry,
+        in db: Database
+    ) throws {
+        guard let sameRecurrence = Entry.sameRecurrence(as: entry) else {
+            return
+        }
+
+        let duplicates = sameRecurrence.filter(Column("id") != entry.id)
+
+        let ids = try duplicates.fetchAll(db).map(\.id)
+
+        _ = try Entry.filter(ids.contains(Column("transfer_id"))).deleteAll(db)
+        _ = try duplicates.deleteAll(db)
     }
 
     static func canChange(
