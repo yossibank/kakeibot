@@ -11,6 +11,7 @@ public final class BackupModel {
     public private(set) var pending: ExportV1?
     public private(set) var doneMessage: String?
     public private(set) var isWorking = false
+    public private(set) var isSyncOn = false
     public private(set) var previous: [Previous] = []
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -64,6 +65,10 @@ public extension BackupModel {
         let counts = "記録 \(data.entries.count) 件・口座 \(data.wallets.count) 件"
 
         return "\(date) に書き出した\(counts)に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます"
+    }
+
+    func loadSync() async {
+        isSyncOn = await (try? database.isSyncEnabled()) ?? false
     }
 
     func loadPrevious() async {

@@ -8,21 +8,58 @@ public extension AppDatabase {
         }
     }
 
-    func setSyncEnabled(_ enabled: Bool) async throws {
-        try await writer.write { db in
-            try db.execute(sql: "UPDATE sync_state SET enabled = ?", arguments: [enabled])
+    func syncEnabledUpdates() -> some AsyncSequence<Bool, any Error> {
+        ValueObservation
+            .tracking { db in
+                try Bool.fetchOne(db, sql: "SELECT enabled FROM sync_state") ?? false
+            }
+            .removeDuplicates()
+            .values(in: writer)
+    }
+
+    func hasEntries() async throws -> Bool {
+        try await writer.read { db in
+            try Bool.fetchOne(db, sql: "SELECT EXISTS (SELECT 1 FROM entry)") ?? false
         }
     }
 
     func queueAllForSync() async throws {
         try await writer.write { db in
-            for table in SyncTable.allCases {
+            try Self.queueAll(in: db)
+        }
+    }
+
+    func turnOnSync() async throws {
+        try await writer.write { db in
+            try Self.clearSync(in: db)
+            try db.execute(sql: "UPDATE sync_state SET enabled = 1")
+            try Self.queueAll(in: db)
+        }
+    }
+
+    func turnOnSyncReplacingLocal() async throws {
+        try await writer.write { db in
+            try Self.clearSync(in: db)
+
+            for table in SyncTable.allCases.reversed() {
                 let ids = try Self.localIDs(in: table, db: db)
 
                 for id in ids {
-                    try Self.queue(SyncKey(table: table, id: id), in: db)
+                    try db.execute(
+                        sql: "DELETE FROM \(table.rawValue) WHERE \(table.keyColumn) = ?",
+                        arguments: [id]
+                    )
                 }
             }
+
+            try db.execute(sql: "UPDATE sync_state SET enabled = 1")
+        }
+    }
+
+    func turnOffSync() async throws {
+        try await writer.write { db in
+            try db.execute(sql: "UPDATE sync_state SET enabled = 0")
+            try Self.clearSync(in: db)
         }
     }
 
@@ -32,11 +69,18 @@ public extension AppDatabase {
         }
     }
 
-    func syncChangeUpdates() -> some AsyncSequence<Void, any Error> {
-        let tables = (SyncTable.allCases.map(\.rawValue) + ["sync_change"]).map { Table($0) }
+    func pendingSyncCountUpdates() -> some AsyncSequence<Int, any Error> {
+        ValueObservation
+            .tracking(regions: Self.syncChangeRegions) { db in
+                try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM sync_change") ?? 0
+            }
+            .removeDuplicates()
+            .values(in: writer)
+    }
 
-        return ValueObservation
-            .tracking(regions: tables) { db in
+    func syncChangeUpdates() -> some AsyncSequence<Void, any Error> {
+        ValueObservation
+            .tracking(regions: Self.syncChangeRegions) { db in
                 try String.fetchAll(
                     db,
                     sql: "SELECT table_name || '/' || record_id || '/' || version FROM sync_change"
@@ -58,6 +102,8 @@ public extension AppDatabase {
                     arguments: [change.key.table.rawValue, change.key.id, change.version]
                 )
             }
+
+            try db.notifyChanges(in: Table("sync_change"))
         }
     }
 
@@ -145,11 +191,23 @@ public extension AppDatabase {
     }
 }
 
+extension AppDatabase {
+    func setSyncEnabled(_ enabled: Bool) async throws {
+        try await writer.write { db in
+            try db.execute(sql: "UPDATE sync_state SET enabled = ?", arguments: [enabled])
+        }
+    }
+}
+
 private extension AppDatabase {
     enum Outcome {
         case applied
         case skipped
         case blocked
+    }
+
+    static var syncChangeRegions: [Table<Row>] {
+        (SyncTable.allCases.map(\.rawValue) + ["sync_change"]).map { Table($0) }
     }
 
     static func setApplying(
@@ -185,6 +243,24 @@ private extension AppDatabase {
         }
 
         return ids.filter { !SyncTable.localSettingKeys.contains($0) }
+    }
+
+    static func queueAll(in db: Database) throws {
+        for table in SyncTable.allCases {
+            let ids = try localIDs(in: table, db: db)
+
+            for id in ids {
+                try queue(SyncKey(table: table, id: id), in: db)
+            }
+        }
+    }
+
+    static func clearSync(in db: Database) throws {
+        try db.execute(sql: "UPDATE sync_state SET engine_state = NULL")
+        try db.execute(sql: "DELETE FROM sync_record")
+        try db.execute(sql: "DELETE FROM sync_change")
+        try db.execute(sql: "DELETE FROM sync_waiting")
+        try db.notifyChanges(in: Table("sync_change"))
     }
 
     static func pendingChanges(in db: Database) throws -> [SyncChange] {

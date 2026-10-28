@@ -20,6 +20,33 @@ public actor SyncEngine {
 public extension SyncEngine {
     static let containerIdentifier = "iCloud.com.yossibank.kakeibot"
 
+    static func isAccountAvailable(
+        in container: CKContainer = CKContainer(identifier: containerIdentifier)
+    ) async -> Bool {
+        await (try? container.accountStatus()) == .available
+    }
+
+    static func hasCloudData(
+        in container: CKContainer = CKContainer(identifier: containerIdentifier)
+    ) async throws -> Bool {
+        do {
+            _ = try await container.privateCloudDatabase.recordZone(for: zoneID)
+            return true
+        } catch let error as CKError where error.code == .zoneNotFound {
+            return false
+        }
+    }
+
+    static func deleteCloudData(
+        in container: CKContainer = CKContainer(identifier: containerIdentifier)
+    ) async throws {
+        do {
+            try await container.privateCloudDatabase.deleteRecordZone(withID: zoneID)
+        } catch let error as CKError where error.code == .zoneNotFound {
+            return
+        }
+    }
+
     func start() async {
         guard engine == nil else {
             return
@@ -45,6 +72,11 @@ public extension SyncEngine {
 
     func enqueuePending() async {
         await enqueuePending(excluding: [])
+    }
+
+    func stop() {
+        engine = nil
+        sending = [:]
     }
 }
 
@@ -95,17 +127,13 @@ private extension SyncEngine {
     }
 
     func restart() async {
-        engine = nil
-        sending = [:]
+        stop()
         await start()
     }
 
     func turnOff() async {
-        try? await database.resetSync()
-        try? await database.setSyncEnabled(false)
-
-        engine = nil
-        sending = [:]
+        try? await database.turnOffSync()
+        stop()
     }
 
     func record(for recordID: CKRecord.ID) async -> CKRecord? {
