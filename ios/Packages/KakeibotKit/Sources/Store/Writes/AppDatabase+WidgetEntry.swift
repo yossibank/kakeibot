@@ -23,11 +23,16 @@ public extension AppDatabase {
                 throw WidgetEntryError.amountMissing
             }
 
-            let entry = try Self.saveEntry(draft, editing: nil, in: db, at: now)
+            let saved = try Self.saveEntry(draft, editing: nil, in: db, at: now)
 
-            try Self.setSetting(.widgetEntry, to: entry.id, in: db)
+            let record = WidgetRecord(
+                entryId: saved.entry.id,
+                clearedNoSpendDate: saved.clearedNoSpendDays.first?.date
+            )
 
-            return entry
+            try Self.setSetting(.widgetEntry, to: record, in: db)
+
+            return saved.entry
         }
     }
 
@@ -46,9 +51,18 @@ public extension AppDatabase {
                 try Self.recalculateCardBills(change, in: db, at: now)
             }
 
-            if try Self.setting(.widgetEntry, in: db) == id {
-                try Self.setSetting(.widgetEntry, to: nil, in: db)
+            guard let record = try Self.setting(.widgetEntry, in: db),
+                  record.entryId == id
+            else {
+                return
             }
+
+            let days = record.clearedNoSpendDate.map {
+                [NoSpendDay(date: $0, createdAt: now)]
+            } ?? []
+
+            try Self.restoreNoSpendDays(days, in: db)
+            try Self.setSetting(.widgetEntry, to: nil, in: db)
         }
     }
 }

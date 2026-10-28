@@ -93,6 +93,19 @@ public struct RecordsView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .confirmation(
+            isPresented: $model.isConfirmingDelete,
+            systemImage: "trash",
+            title: "\(model.pendingDeleteCount) 件の記録を削除しますか",
+            message: "削除した後も、知らせの『取り消す』で戻せます",
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            model.confirmDelete { ids in
+                onDeleteEntries(ids)
+                finishSelecting()
+            }
+        }
         .onChange(of: model.layout) {
             finishSelecting()
         }
@@ -828,10 +841,13 @@ private extension RecordsView {
             barButton(
                 "削除",
                 systemImage: "trash",
-                isEnabled: !selection.isEmpty
+                isEnabled: !selection.isEmpty,
+                tint: Palette.rose
             ) {
-                onDeleteEntries(Array(selection))
-                finishSelecting()
+                model.requestDelete(Array(selection)) { ids in
+                    onDeleteEntries(ids)
+                    finishSelecting()
+                }
             }
         }
         .padding(.horizontal, 8)
@@ -849,12 +865,13 @@ private extension RecordsView {
         _ title: String,
         systemImage: String,
         isEnabled: Bool,
+        tint: Color = Palette.accent,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
                 .textFont(.footnote)
-                .foregroundStyle(Palette.accent)
+                .foregroundStyle(tint)
                 .padding(.horizontal, 10)
                 .frame(minHeight: 44)
                 .contentShape(.rect)
@@ -912,12 +929,14 @@ private extension RecordsView {
                 }
             }
 
-            Button {
-                rewardTarget = StampTarget(date: date)
-            } label: {
-                rewardButtonLabel(on: date)
+            if model.canReward(on: date) {
+                Button {
+                    rewardTarget = StampTarget(date: date)
+                } label: {
+                    rewardButtonLabel(on: date)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
 
             Button {
                 stampTarget = StampTarget(date: date)

@@ -250,6 +250,29 @@ struct RecordsModelTests {
     }
 
     @Test
+    func refusesRewardOnFutureDay() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        let future = setup.today.adding(days: 1)
+
+        let draft = RewardRuleDraft(
+            name: "自炊した日",
+            amount: 500,
+            icon: IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
+        )
+
+        let rule = try await setup.database.saveRewardRule(draft, at: Date())
+
+        await model.toggleReward(rule, on: future)
+        await model.toggleReward(rule, on: setup.today)
+        let logs = try setup.database.snapshot().rewardLogs
+
+        #expect(!model.canReward(on: future))
+        #expect(model.canReward(on: setup.today))
+        #expect(logs.map(\.date) == [setup.today])
+    }
+
+    @Test
     func togglesNoSpendDay() async throws {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)
@@ -352,6 +375,37 @@ struct RecordsModelTests {
         #expect(!choices.contains { $0.id == hidden.iconId })
         #expect(stamped?.glyph == .party)
         #expect(calendar.stamps.isEmpty)
+    }
+
+    @Test
+    func confirmsBatchDeleteOfTenOrMore() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        let ids = (0..<10).map { _ in Entry.ID() }
+        var deleted: [[Entry.ID]] = []
+
+        model.requestDelete(Array(ids.prefix(9))) { deleted.append($0) }
+
+        #expect(!model.isConfirmingDelete)
+        #expect(deleted == [Array(ids.prefix(9))])
+
+        deleted = []
+        model.requestDelete(ids) { deleted.append($0) }
+
+        #expect(model.isConfirmingDelete)
+        #expect(model.pendingDeleteCount == 10)
+        #expect(deleted.isEmpty)
+
+        model.cancelDelete()
+
+        #expect(!model.isConfirmingDelete)
+        #expect(deleted.isEmpty)
+
+        model.requestDelete(ids) { deleted.append($0) }
+        model.confirmDelete { deleted.append($0) }
+
+        #expect(!model.isConfirmingDelete)
+        #expect(deleted == [ids])
     }
 }
 

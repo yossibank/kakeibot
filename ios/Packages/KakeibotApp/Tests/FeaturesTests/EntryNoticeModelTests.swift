@@ -172,6 +172,57 @@ struct EntryNoticeModelTests {
         #expect(deleted.isEmpty)
         #expect(Set(restored.map(\.id)) == [first.id, second.id])
     }
+
+    @Test
+    func keepsBatchNoticeLongerAndIgnoresScreenTaps() async throws {
+        let setup = try await Setup()
+        let first = try await setup.saveEntry()
+        let second = try await setup.saveEntry()
+
+        await setup.notice.deleteEntries([first.id, second.id])
+        setup.notice.clearOnTap()
+        let batch = setup.notice.notice
+
+        setup.notice.show(EntryChange(kind: .recorded, entry: first, label: "食費"))
+        setup.notice.clearOnTap()
+
+        #expect(batch?.seconds == 8)
+        #expect(batch != nil)
+        #expect(setup.notice.notice == nil)
+        #expect(EntryNoticeModel.Notice.failed("x").seconds == 4)
+        #expect(EntryNoticeModel.Notice.undone.seconds == 2)
+    }
+
+    @Test
+    func restoresNoSpendMarkWhenUndoingNewEntry() async throws {
+        let setup = try await Setup()
+        try await setup.database.markNoSpendDay(setup.date, at: Date())
+        let model = try await setup.entryModel()
+        model.press(.digit(5))
+
+        let change = try #require(await model.save())
+        let cleared = try setup.database.snapshot().noSpendDays
+        setup.notice.show(change)
+        await setup.notice.undo()
+        let restored = try setup.database.snapshot().noSpendDays
+
+        #expect(cleared.isEmpty)
+        #expect(restored.map(\.date) == [setup.date])
+    }
+
+    @Test
+    func doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay() async throws {
+        let setup = try await Setup()
+        let model = try await setup.entryModel()
+        model.press(.digit(5))
+
+        let change = try #require(await model.save())
+        setup.notice.show(change)
+        await setup.notice.undo()
+        let restored = try setup.database.snapshot().noSpendDays
+
+        #expect(restored.isEmpty)
+    }
 }
 
 extension EntryNoticeModelTests {

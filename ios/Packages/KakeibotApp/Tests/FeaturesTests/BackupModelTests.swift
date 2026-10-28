@@ -46,7 +46,7 @@ struct BackupModelTests {
         await target.restore()
 
         #expect(isRead)
-        #expect(summary == "2026/10/3 に書き出した記録 0 件・口座 2 件に置き換えます。いまのデータは残りません")
+        #expect(summary == "2026/10/3 に書き出した記録 0 件・口座 2 件に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます")
         #expect(target.pending == nil)
         #expect(target.doneMessage == "読み込みました")
         #expect(try setup.target.snapshot() == setup.source.snapshot())

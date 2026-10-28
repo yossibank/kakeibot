@@ -6,17 +6,20 @@ public struct EntryChange: Hashable, Sendable {
     public let entry: Entry
     public let label: String
     public let fee: Entry?
+    public let clearedNoSpendDays: [NoSpendDay]
 
     public init(
         kind: Kind,
         entry: Entry,
         label: String,
-        fee: Entry? = nil
+        fee: Entry? = nil,
+        clearedNoSpendDays: [NoSpendDay] = []
     ) {
         self.kind = kind
         self.entry = entry
         self.label = label
         self.fee = fee
+        self.clearedNoSpendDays = clearedNoSpendDays
     }
 }
 
