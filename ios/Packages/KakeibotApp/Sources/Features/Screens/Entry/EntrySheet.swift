@@ -315,7 +315,7 @@ private extension EntrySheet {
                 ) { amount in
                     model.setFee(amount)
                 }
-            } else {
+            } else if model.type != .transfer {
                 EntryTemplateRow(
                     model: model,
                     isCompact: true,
