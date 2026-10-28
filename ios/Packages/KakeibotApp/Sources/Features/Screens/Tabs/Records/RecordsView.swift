@@ -339,7 +339,8 @@ private extension RecordsView {
                         .textFont(.footnote)
                         .foregroundStyle(Palette.subtext)
 
-                    if model.isCurrentMonth {
+                    if model.isCurrentMonth,
+                       model.filter.isEmpty {
                         PrimaryButton("記録する") {
                             onAddEntry(model.today)
                         }
