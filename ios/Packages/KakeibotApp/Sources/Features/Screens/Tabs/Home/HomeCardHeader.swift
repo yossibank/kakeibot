@@ -14,7 +14,11 @@ struct HomeCardHeader: View {
 
             Spacer()
 
-            RingButton(systemImage: "xmark", action: onClose)
+            RingButton(
+                systemImage: "xmark",
+                size: .small,
+                action: onClose
+            )
         }
         .padding(.top, 8)
     }

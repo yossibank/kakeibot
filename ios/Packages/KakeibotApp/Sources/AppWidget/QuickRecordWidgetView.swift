@@ -55,6 +55,7 @@ private extension QuickRecordWidgetView {
                     Rectangle()
                         .fill(Palette.line)
                         .frame(height: 1)
+                        .padding(.vertical, 8)
 
                     todayRecords(of: summary, limit: metrics.todayLimit)
                 }
@@ -233,7 +234,7 @@ private extension QuickRecordWidgetView {
         let records = Array(summary.todayRecords.prefix(limit))
         let others = summary.todayCount - records.count
 
-        return VStack(alignment: .leading, spacing: 4) {
+        return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
                 Text("今日の記録 \(summary.todayCount) 件")
                     .textFont(size: .micro)
