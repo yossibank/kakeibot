@@ -71,20 +71,11 @@ private extension SettingsHint {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Button {
+            RingButton(systemImage: "xmark") {
                 withAnimation(.snappy) {
                     _ = flag.set(true)
                 }
-            } label: {
-                Image(systemName: "xmark")
-                    .sansFont(.caption, weight: .bold)
-                    .foregroundStyle(Palette.subtext)
-                    .frame(width: 24, height: 24)
-                    .background(Palette.line, in: Circle())
-                    .frame(width: 32, height: 32)
-                    .contentShape(.rect)
             }
-            .buttonStyle(.plain)
         }
         .padding(.leading, 12)
         .padding(.trailing, 8)

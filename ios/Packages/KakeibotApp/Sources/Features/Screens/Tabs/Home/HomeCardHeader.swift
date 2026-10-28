@@ -14,16 +14,7 @@ struct HomeCardHeader: View {
 
             Spacer()
 
-            Button(action: onClose) {
-                Image(systemName: "xmark")
-                    .sansFont(.caption, weight: .bold)
-                    .foregroundStyle(Palette.subtext)
-                    .frame(width: 24, height: 24)
-                    .background(Palette.line, in: Circle())
-                    .frame(width: 32, height: 32)
-                    .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
+            RingButton(systemImage: "xmark", action: onClose)
         }
         .padding(.top, 8)
     }

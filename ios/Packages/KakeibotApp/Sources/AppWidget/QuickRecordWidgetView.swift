@@ -209,11 +209,15 @@ private extension QuickRecordWidgetView {
 
                 Spacer(minLength: 0)
 
-                Image(systemName: tile.amount == nil ? "pencil" : "plus")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(Palette.backgroundTop)
-                    .frame(width: Self.markSize, height: Self.markSize)
-                    .background(Palette.accent, in: Circle())
+                if tile.amount == nil {
+                    EditBadge(size: Self.markSize)
+                } else {
+                    Image(systemName: "plus")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(Palette.backgroundTop)
+                        .frame(width: Self.markSize, height: Self.markSize)
+                        .background(Palette.accent, in: Circle())
+                }
             }
         }
         .padding(.horizontal, 8)
