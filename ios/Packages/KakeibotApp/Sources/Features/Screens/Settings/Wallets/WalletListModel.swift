@@ -102,7 +102,10 @@ extension WalletListModel: SettingsBoardModel {
     }
 
     public func remove(_ id: Wallet.ID) async throws -> Deletion {
-        try await database.deleteWallet(id)
+        try await database.deleteWallet(
+            id,
+            at: Date()
+        )
     }
 
     public func restoreRemoved(_ deletion: Deletion) async throws {

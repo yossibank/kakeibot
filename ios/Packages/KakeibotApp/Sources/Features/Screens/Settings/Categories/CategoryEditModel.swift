@@ -225,7 +225,10 @@ public extension CategoryEditModel {
         }
 
         do {
-            return try await database.deleteCategory(editingId)
+            return try await database.deleteCategory(
+                editingId,
+                at: Date()
+            )
         } catch AppDatabase.CategoryWriteError.hasEntries {
             errorNotice.show(Self.inUseMessage)
             return nil

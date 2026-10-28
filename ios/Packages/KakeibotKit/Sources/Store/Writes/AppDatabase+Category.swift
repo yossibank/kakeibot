@@ -72,7 +72,10 @@ public extension AppDatabase {
     }
 
     @discardableResult
-    func deleteCategory(_ id: EntryCategory.ID) async throws -> Deletion {
+    func deleteCategory(
+        _ id: EntryCategory.ID,
+        at now: Date
+    ) async throws -> Deletion {
         try await writer.write { db in
             guard let category = try EntryCategory.fetchOne(db, key: id) else {
                 throw CategoryWriteError.categoryNotFound
@@ -97,7 +100,7 @@ public extension AppDatabase {
                 budgets: budgets.fetchAll(db)
             )
 
-            try Self.deleteRecurrings(recurrings, in: db)
+            try Self.deleteRecurrings(recurrings, in: db, at: now)
             try templates.deleteAll(db)
             try budgets.deleteAll(db)
             try tags.deleteAll(db)

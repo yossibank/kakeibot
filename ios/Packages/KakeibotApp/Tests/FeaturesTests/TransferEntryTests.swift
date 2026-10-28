@@ -587,7 +587,10 @@ struct TransferEntryTests {
 
         await model.load()
         model.walletId = setup.bank
-        _ = try await setup.database.deleteWallet(setup.bank)
+        _ = try await setup.database.deleteWallet(
+            setup.bank,
+            at: Date()
+        )
         await model.reloadWallets()
 
         #expect(model.walletId != setup.bank)
@@ -618,7 +621,10 @@ struct TransferEntryTests {
 
         await model.load()
         model.categoryId = other
-        _ = try await setup.database.deleteCategory(other)
+        _ = try await setup.database.deleteCategory(
+            other,
+            at: Date()
+        )
         await model.reloadCategories()
 
         #expect(model.categoryId != other)

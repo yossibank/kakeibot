@@ -61,7 +61,10 @@ public extension AppDatabase {
     }
 
     @discardableResult
-    func deleteWallet(_ id: Wallet.ID) async throws -> Deletion {
+    func deleteWallet(
+        _ id: Wallet.ID,
+        at now: Date
+    ) async throws -> Deletion {
         try await writer.write { db in
             guard let wallet = try Wallet.fetchOne(db, key: id) else {
                 throw WalletWriteError.walletNotFound
@@ -92,7 +95,7 @@ public extension AppDatabase {
                 valuations: valuations.fetchAll(db)
             )
 
-            try Self.deleteRecurrings(recurrings, in: db)
+            try Self.deleteRecurrings(recurrings, in: db, at: now)
             try templates.deleteAll(db)
             try valuations.deleteAll(db)
             try wallet.delete(db)

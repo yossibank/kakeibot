@@ -577,7 +577,10 @@ struct RecurringWriteTests {
         )
 
         let id = try #require(setup.database.snapshot().recurrings.first?.id)
-        let deletion = try await setup.database.deleteRecurring(id)
+        let deletion = try await setup.database.deleteRecurring(
+            id,
+            at: setup.now
+        )
         let snapshot = try setup.database.snapshot()
 
         try await setup.database.restore(deletion)
@@ -588,6 +591,30 @@ struct RecurringWriteTests {
         #expect(snapshot.entries.allSatisfy { $0.recurringId == nil })
         #expect(restored.recurrings.map(\.id) == [id])
         #expect(restored.entries.allSatisfy { $0.recurringId == id })
+    }
+
+    @Test
+    func touchesUpdatedAtOfLinkedEntriesOnDelete() async throws {
+        let setup = try await Setup()
+        let today = try #require(LocalDate("2026-02-28"))
+        let later = setup.now.addingTimeInterval(60)
+
+        try await setup.database.generateRecurringEntries(
+            through: today,
+            at: setup.now
+        )
+
+        let id = try #require(setup.database.snapshot().recurrings.first?.id)
+
+        try await setup.database.deleteRecurring(
+            id,
+            at: later
+        )
+
+        let entries = try setup.database.snapshot().entries
+
+        #expect(!entries.isEmpty)
+        #expect(entries.allSatisfy { $0.updatedAt == later })
     }
 
     @Test
@@ -604,7 +631,10 @@ struct RecurringWriteTests {
         let ids = try setup.database.snapshot().entries.map(\.id)
         let gone = try #require(ids.first)
         let kept = try #require(ids.last)
-        let deletion = try await setup.database.deleteRecurring(id)
+        let deletion = try await setup.database.deleteRecurring(
+            id,
+            at: setup.now
+        )
 
         try await setup.database.deleteEntry(gone)
         try await setup.database.restore(deletion)

@@ -86,7 +86,10 @@ extension CategoryListModel: SettingsBoardModel {
     }
 
     public func remove(_ id: EntryCategory.ID) async throws -> Deletion {
-        try await database.deleteCategory(id)
+        try await database.deleteCategory(
+            id,
+            at: Date()
+        )
     }
 
     public func restoreRemoved(_ deletion: Deletion) async throws {

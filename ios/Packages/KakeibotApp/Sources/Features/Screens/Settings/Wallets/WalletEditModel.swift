@@ -336,7 +336,10 @@ public extension WalletEditModel {
         }
 
         do {
-            return try await database.deleteWallet(editingId)
+            return try await database.deleteWallet(
+                editingId,
+                at: Date()
+            )
         } catch {
             let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
             errorNotice.show(message)
