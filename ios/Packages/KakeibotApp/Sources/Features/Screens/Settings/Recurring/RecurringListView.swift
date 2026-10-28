@@ -105,6 +105,8 @@ public struct RecurringListView: View {
         .navigationDestination(item: $destination) { destination in
             RecurringEditSheet(model: model.editModel(for: destination.editingId)) { deletion in
                 self.deletion = deletion
+            } onHide: {
+                hiddenId = destination.editingId
             }
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)

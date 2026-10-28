@@ -5,6 +5,7 @@ import SwiftUI
 
 struct AssetsGoalSheet: View {
     @State private var model: AssetsGoalEditModel
+    @State private var isConfirmingDiscard = false
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
@@ -68,6 +69,12 @@ struct AssetsGoalSheet: View {
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
+        .confirmsDiscard(
+            when: model.isChanged,
+            isPresented: $isConfirmingDiscard
+        ) {
+            dismiss()
+        }
         .confirmation(
             isPresented: $isConfirmingDelete,
             systemImage: "trash",
@@ -95,7 +102,7 @@ private extension AssetsGoalSheet {
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
-                dismiss()
+                close()
             }
 
             Spacer()
@@ -119,6 +126,16 @@ private extension AssetsGoalSheet {
                 Color.clear
                     .frame(width: 44, height: 44)
             }
+        }
+    }
+
+    func close() {
+        focus = nil
+
+        if model.isChanged {
+            isConfirmingDiscard = true
+        } else {
+            dismiss()
         }
     }
 

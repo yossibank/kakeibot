@@ -26,16 +26,19 @@ public struct WalletEditSheet: View {
 
     private let onSave: (Wallet) -> Void
     private let onDelete: (Deletion) -> Void
+    private let onHide: () -> Void
 
     public init(
         model: WalletEditModel,
         onSave: @escaping (Wallet) -> Void = { _ in },
-        onDelete: @escaping (Deletion) -> Void = { _ in }
+        onDelete: @escaping (Deletion) -> Void = { _ in },
+        onHide: @escaping () -> Void = {}
     ) {
         _model = State(initialValue: model)
 
         self.onSave = onSave
         self.onDelete = onDelete
+        self.onHide = onHide
     }
 
     public var body: some View {
@@ -74,12 +77,17 @@ public struct WalletEditSheet: View {
                     amountDrawer(
                         "今の評価額",
                         calculator: model.valuation,
-                        saveTitle: "評価額を保存",
                         onPress: model.pressValuation,
                         onDismiss: closeValuation
                     ) {
                         Task {
                             await saveValuation()
+                        }
+                    } button: {
+                        PrimaryButton("評価額を保存") {
+                            Task {
+                                await saveValuation()
+                            }
                         }
                     }
                 }
@@ -88,11 +96,12 @@ public struct WalletEditSheet: View {
                     amountDrawer(
                         "最初に借りた額",
                         calculator: model.loanAmount,
-                        saveTitle: "借りた額を決める",
                         onPress: model.pressLoanAmount,
                         onDismiss: closeLoanAmount,
-                        onSave: closeLoanAmount
-                    )
+                        onDone: closeLoanAmount
+                    ) {
+                        saveButton
+                    }
                 }
             }
         }
@@ -439,10 +448,10 @@ private extension WalletEditSheet {
     func amountDrawer(
         _ title: String,
         calculator: AmountCalculator,
-        saveTitle: String,
         onPress: @escaping (AmountCalculator.Key) -> Void,
         onDismiss: @escaping () -> Void,
-        onSave: @escaping () -> Void
+        onDone: @escaping () -> Void,
+        @ViewBuilder button: () -> some View
     ) -> some View {
         Group {
             Palette.scrim
@@ -455,20 +464,18 @@ private extension WalletEditSheet {
                 .zIndex(1)
 
             SettingsDrawer(title, showsDone: false) {
-                onSave()
+                onDone()
             } content: {
                 VStack(spacing: 12) {
                     SettingsKeypadValue(calculator.amount)
 
                     Keypad(calculator: calculator) {
-                        onSave()
+                        onDone()
                     } onKey: { key in
                         onPress(key)
                     }
 
-                    PrimaryButton(saveTitle) {
-                        onSave()
-                    }
+                    button()
                 }
             }
             .transition(.settingsDrawer)
@@ -713,6 +720,10 @@ private extension WalletEditSheet {
                 guard await model.setHidden(!model.isHidden) else {
                     return
                 }
+
+                if model.isHidden {
+                    onHide()
+                }
             }
 
             dismiss()
@@ -768,6 +779,10 @@ private extension WalletEditSheet {
 
     func setHidden(_ isHidden: Bool) async {
         if await model.setHidden(isHidden) {
+            if isHidden {
+                onHide()
+            }
+
             dismiss()
         }
     }

@@ -18,14 +18,17 @@ public struct RewardRuleEditSheet: View {
     @Environment(\.themeStyle.corner) private var corner
 
     private let onDelete: (Deletion) -> Void
+    private let onHide: () -> Void
 
     public init(
         model: RewardRuleEditModel,
-        onDelete: @escaping (Deletion) -> Void = { _ in }
+        onDelete: @escaping (Deletion) -> Void = { _ in },
+        onHide: @escaping () -> Void = {}
     ) {
         _model = State(initialValue: model)
 
         self.onDelete = onDelete
+        self.onHide = onHide
     }
 
     public var body: some View {
@@ -302,6 +305,10 @@ private extension RewardRuleEditSheet {
                 guard await model.setHidden(!model.isHidden) else {
                     return
                 }
+
+                if model.isHidden {
+                    onHide()
+                }
             }
 
             dismiss()
@@ -324,6 +331,10 @@ private extension RewardRuleEditSheet {
         closePanel()
 
         if await model.setHidden(isHidden) {
+            if isHidden {
+                onHide()
+            }
+
             dismiss()
         }
     }

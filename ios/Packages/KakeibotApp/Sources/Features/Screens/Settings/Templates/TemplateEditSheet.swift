@@ -18,16 +18,19 @@ public struct TemplateEditSheet: View {
 
     let onSave: (EntryTemplate) -> Void
     let onDelete: (Deletion) -> Void
+    let onHide: () -> Void
 
     public init(
         model: TemplateEditModel,
         onSave: @escaping (EntryTemplate) -> Void = { _ in },
-        onDelete: @escaping (Deletion) -> Void = { _ in }
+        onDelete: @escaping (Deletion) -> Void = { _ in },
+        onHide: @escaping () -> Void = {}
     ) {
         _model = State(initialValue: model)
 
         self.onSave = onSave
         self.onDelete = onDelete
+        self.onHide = onHide
     }
 
     public var body: some View {
@@ -592,6 +595,10 @@ private extension TemplateEditSheet {
             guard await model.setHidden(!model.isHidden) else {
                 return
             }
+
+            if model.isHidden {
+                onHide()
+            }
         }
 
         dismiss()
@@ -618,6 +625,10 @@ private extension TemplateEditSheet {
 
     func setHidden(_ isHidden: Bool) async {
         if await model.setHidden(isHidden) {
+            if isHidden {
+                onHide()
+            }
+
             dismiss()
         }
     }

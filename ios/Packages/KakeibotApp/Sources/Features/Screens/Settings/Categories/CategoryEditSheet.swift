@@ -24,18 +24,21 @@ public struct CategoryEditSheet: View {
     let startsAddingTag: Bool
     let onSave: (EntryCategory) -> Void
     let onDelete: (Deletion) -> Void
+    let onHide: () -> Void
 
     public init(
         model: CategoryEditModel,
         startsAddingTag: Bool = false,
         onSave: @escaping (EntryCategory) -> Void = { _ in },
-        onDelete: @escaping (Deletion) -> Void = { _ in }
+        onDelete: @escaping (Deletion) -> Void = { _ in },
+        onHide: @escaping () -> Void = {}
     ) {
         _model = State(initialValue: model)
 
         self.startsAddingTag = startsAddingTag
         self.onSave = onSave
         self.onDelete = onDelete
+        self.onHide = onHide
     }
 
     public var body: some View {
@@ -82,7 +85,7 @@ public struct CategoryEditSheet: View {
             isPresented: $isConfirmingDelete,
             systemImage: "trash",
             title: "このカテゴリを削除しますか",
-            message: "使っている固定費・テンプレート・予算・タグも消えます。元に戻せません",
+            message: "使っている固定費・テンプレート・予算・タグも消えます",
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {
@@ -421,6 +424,10 @@ private extension CategoryEditSheet {
             guard await model.setHidden(!model.isHidden) else {
                 return
             }
+
+            if model.isHidden {
+                onHide()
+            }
         }
 
         dismiss()
@@ -440,6 +447,10 @@ private extension CategoryEditSheet {
 
     func setHidden(_ isHidden: Bool) async {
         if await model.setHidden(isHidden) {
+            if isHidden {
+                onHide()
+            }
+
             dismiss()
         }
     }
