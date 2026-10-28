@@ -112,7 +112,7 @@ private extension AssetsView {
         VStack(alignment: .leading, spacing: 12) {
             SectionTitle("手元のお金")
 
-            HStack(alignment: .firstTextBaseline) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(AmountText.text(model.total))
                     .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
@@ -120,10 +120,9 @@ private extension AssetsView {
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
 
-                Spacer(minLength: 8)
-
                 Text(changeText)
                     .textFont(.caption)
+                    .monospacedDigit()
                     .foregroundStyle(Palette.accent)
             }
 
@@ -625,20 +624,25 @@ private extension AssetsView {
 
                 balanceBar(row.bill)
 
-                HStack(alignment: .firstTextBaseline) {
-                    Text(balanceText(row))
-                        .textFont(.caption2)
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(row.source ?? "口座")
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+
+                        Spacer(minLength: 8)
+
+                        Text(daysText(until: row.bill.date))
+                            .foregroundStyle(Palette.accent)
+                    }
+
+                    Text(balanceText(row.bill))
                         .monospacedDigit()
-                        .foregroundStyle(balanceColor(row.bill))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
-
-                    Spacer(minLength: 8)
-
-                    Text(daysText(until: row.bill.date))
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.accent)
                 }
+                .textFont(.caption2)
+                .foregroundStyle(balanceColor(row.bill))
             }
         }
         .padding(12)
@@ -815,18 +819,15 @@ private extension AssetsView {
         onOpenEntry(pendingEntry)
     }
 
-    func balanceText(_ row: AssetsModel.UpcomingBill) -> String {
-        let source = row.source ?? "口座"
-        let bill = row.bill
-
+    func balanceText(_ bill: CardBill) -> String {
         guard bill.shortage == 0 else {
-            return "\(source)が \(AmountText.text(bill.shortage)) 足りません"
+            return "\(AmountText.text(bill.shortage)) 足りません"
         }
 
         let before = AmountText.text(bill.balanceBefore)
         let after = AmountText.text(bill.balanceAfter)
 
-        return "\(source) \(before) → \(after)"
+        return "\(before) → \(after)"
     }
 
     func balanceColor(_ bill: CardBill) -> Color {
