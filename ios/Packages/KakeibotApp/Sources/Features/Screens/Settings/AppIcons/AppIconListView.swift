@@ -44,10 +44,7 @@ private extension AppIconListView {
         isLight: Bool
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .textFont(.caption2)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
+            SectionTitle(title)
                 .padding(.leading, 8)
 
             LazyVGrid(columns: Self.columns, spacing: 20) {

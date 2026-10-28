@@ -1,14 +1,13 @@
-import DesignSystem
 import SwiftUI
 
-struct SettingsSheetTitle: View {
+public struct SheetTitle: View {
     let text: String
 
-    init(_ text: String) {
+    public init(_ text: String) {
         self.text = text
     }
 
-    var body: some View {
+    public var body: some View {
         ViewThatFits(in: .horizontal) {
             label(text, tracking: Self.tracking)
                 .lineLimit(1)
@@ -21,7 +20,7 @@ struct SettingsSheetTitle: View {
     }
 }
 
-private extension SettingsSheetTitle {
+private extension SheetTitle {
     static let tracking: CGFloat = 4
     static let wrappedTracking: CGFloat = 2
     static let wrappedScale: CGFloat = 0.6

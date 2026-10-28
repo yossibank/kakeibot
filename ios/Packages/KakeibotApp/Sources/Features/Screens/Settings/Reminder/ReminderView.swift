@@ -158,7 +158,7 @@ private extension ReminderView {
 
     var timeSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SettingsSectionTitle("時刻")
+            SectionTitle("時刻")
 
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
@@ -202,7 +202,7 @@ private extension ReminderView {
 
     var previewSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SettingsSectionTitle("届く通知")
+            SectionTitle("届く通知")
 
             HStack(spacing: 4) {
                 dayStepButton("chevron.left", by: -1)
@@ -270,7 +270,7 @@ private extension ReminderView {
 
     var recurringNote: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SettingsSectionTitle("固定費の通知")
+            SectionTitle("固定費の通知")
 
             HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "repeat")

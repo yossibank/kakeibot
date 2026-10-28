@@ -80,10 +80,7 @@ private extension RecordsBatchSheet {
 
             Spacer()
 
-            Text(title)
-                .displayFont(.body)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
+            SheetTitle(title)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
 

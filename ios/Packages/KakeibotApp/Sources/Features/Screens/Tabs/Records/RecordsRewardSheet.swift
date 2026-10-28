@@ -69,10 +69,7 @@ private extension RecordsRewardSheet {
 
             Spacer()
 
-            Text("\(date.month)/\(date.day) のごほうび")
-                .displayFont(.body)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
+            SheetTitle("\(date.month)/\(date.day) のごほうび")
 
             Spacer()
 

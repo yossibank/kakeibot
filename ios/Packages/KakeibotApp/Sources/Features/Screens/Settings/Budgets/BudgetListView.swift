@@ -64,7 +64,7 @@ private extension BudgetListView {
 
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            SettingsSectionTitle("カテゴリごと")
+                            SectionTitle("カテゴリごと")
 
                             Spacer()
 

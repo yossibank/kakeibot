@@ -24,10 +24,7 @@ struct SettingsDrawer<Content: View>: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack {
-                Text(title)
-                    .textFont(.caption2)
-                    .tracking(3)
-                    .foregroundStyle(Palette.accent)
+                SectionTitle(title)
 
                 Spacer()
 

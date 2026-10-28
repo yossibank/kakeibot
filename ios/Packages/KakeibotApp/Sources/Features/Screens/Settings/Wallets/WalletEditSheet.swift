@@ -330,7 +330,7 @@ private extension WalletEditSheet {
 
     var kindChooser: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SettingsSectionTitle("種類")
+            SectionTitle("種類")
 
             LazyVGrid(columns: Self.kindColumns, spacing: 8) {
                 ForEach(Wallet.Kind.allCases, id: \.self) { kind in
@@ -342,7 +342,7 @@ private extension WalletEditSheet {
 
     var balanceField: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SettingsSectionTitle("最初の残高")
+            SectionTitle("最初の残高")
 
             HStack(spacing: 12) {
                 signButton
@@ -402,7 +402,7 @@ private extension WalletEditSheet {
 
     var valuationHistory: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SettingsSectionTitle("これまでの評価額")
+            SectionTitle("これまでの評価額")
                 .padding(.top, 12)
 
             ForEach(model.valuations) { valuation in

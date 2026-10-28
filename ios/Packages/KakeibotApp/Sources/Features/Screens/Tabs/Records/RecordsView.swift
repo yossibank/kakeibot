@@ -257,10 +257,7 @@ private extension RecordsView {
     var recentList: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
-                Text("最近探した言葉")
-                    .textFont(.caption2)
-                    .tracking(2)
-                    .foregroundStyle(Palette.accent)
+                SectionTitle("最近探した言葉")
 
                 Spacer()
 

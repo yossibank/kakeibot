@@ -22,7 +22,7 @@ struct SettingsEditHeader: View {
 
             Spacer()
 
-            SettingsSheetTitle(title)
+            SheetTitle(title)
 
             Spacer()
 

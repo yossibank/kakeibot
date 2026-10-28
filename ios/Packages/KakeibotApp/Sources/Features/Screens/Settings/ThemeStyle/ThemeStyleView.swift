@@ -238,10 +238,7 @@ private extension ThemeStyleView {
     }
 
     func rowTitle(_ title: String) -> some View {
-        Text(title)
-            .textFont(.caption2)
-            .tracking(3)
-            .foregroundStyle(Palette.accent)
+        SectionTitle(title)
             .padding(.leading, 8)
     }
 }
