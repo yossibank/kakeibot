@@ -250,6 +250,26 @@ struct SyncShareTests {
         #expect(after.tags.map(\.id.description) == ["00000000-0000-4000-8000-000000000001"])
         #expect(after.categories.allSatisfy { $0.walletId == nil })
     }
+
+    @Test
+    func hidesSharedCategoriesFromEntryOptions() async throws {
+        let setup = try await SyncTests.Setup(enabled: false)
+        let walletID = try await setup.walletID()
+        let categoryID = try await setup.categoryID()
+        let before = try await setup.database.entryOptions()
+
+        try await setup.execute("""
+        INSERT INTO tag (id, category_id, name, sort_order, archived_at, created_at, updated_at)
+        VALUES ('00000000-0000-4000-8000-000000000001', '\(categoryID)', '外食', 0, NULL,
+                '2026-01-01T00:00:00Z', '2026-01-01T00:00:00Z')
+        """)
+        try await setup.database.startSharing(#require(Wallet.ID(walletID)))
+        let after = try await setup.database.entryOptions()
+
+        #expect(after.expenseCategories.map(\.id) == before.expenseCategories.map(\.id))
+        #expect(after.incomeCategories.map(\.id) == before.incomeCategories.map(\.id))
+        #expect(after.tags.map(\.id.description) == ["00000000-0000-4000-8000-000000000001"])
+    }
 }
 
 private extension SyncTests.Setup {
