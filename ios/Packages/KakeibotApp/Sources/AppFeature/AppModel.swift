@@ -16,6 +16,7 @@ final class AppModel {
     private(set) var look: ThemeLook = .followsDevice
     private(set) var style: ThemeStyle = .standard
     private(set) var observationRound = 0
+    private(set) var isSyncEnabled = false
 
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let scheduler: NotificationScheduler
@@ -177,8 +178,16 @@ extension AppModel {
         }
     }
 
+    func observeSync(in database: AppDatabase) async {
+        await watch(database.syncEnabledUpdates()) { isEnabled in
+            self.isSyncEnabled = isEnabled
+        }
+    }
+
     func syncChanges(in database: AppDatabase) async {
-        guard await (try? database.isSyncEnabled()) == true else {
+        guard isSyncEnabled else {
+            await syncEngine?.stop()
+            syncEngine = nil
             return
         }
 

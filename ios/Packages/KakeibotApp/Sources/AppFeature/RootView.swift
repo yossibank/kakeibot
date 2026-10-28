@@ -4,6 +4,7 @@ import Features
 import Notifications
 import Store
 import SwiftUI
+import Sync
 import UIKit
 
 public struct RootView: View {
@@ -61,6 +62,7 @@ public struct RootView: View {
             }
         }
         .environment(\.notificationPermission, .live { await model.rescheduleNotifications() })
+        .environment(\.syncCloud, .live)
         .palette(shownLook)
         .environment(\.palette, shownPalette)
         .environment(\.themeStyle, shownStyle)
@@ -103,6 +105,9 @@ private extension RootView {
                 await model.observeWidgets(in: database)
             }
             .task(id: model.observationID(model.today)) {
+                await model.observeSync(in: database)
+            }
+            .task(id: model.observationID(model.isSyncEnabled)) {
                 await model.syncChanges(in: database)
             }
         case .failed:
@@ -156,6 +161,16 @@ extension NotificationPermission {
         } reschedule: {
             await reschedule()
         }
+    }
+}
+
+extension SyncCloud {
+    static let live = Self {
+        await SyncEngine.isAccountAvailable()
+    } hasData: {
+        try await SyncEngine.hasCloudData()
+    } deleteData: {
+        try await SyncEngine.deleteCloudData()
     }
 }
 

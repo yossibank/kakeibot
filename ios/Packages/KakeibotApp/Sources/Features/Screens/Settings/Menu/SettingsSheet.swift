@@ -11,16 +11,17 @@ public struct SettingsSheet: View {
     @State private var authorization: NotificationAuthorization = .allowed
     @State private var theme: ThemeChoice = .system
     @State private var customThemes: [Theme] = []
+    @State private var isSyncOn = false
 
     #if DEBUG
     @State private var isConfirmingSample = false
     @State private var isInsertingSample = false
     @State private var sampleMessage: String?
-    @State private var syncMessage: String?
     #endif
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.notificationPermission) private var permission
+    @Environment(\.syncCloud) private var syncCloud
     @Environment(\.themeStyle) private var themeStyle
 
     private let database: AppDatabase
@@ -269,6 +270,23 @@ public struct SettingsSheet: View {
 
                             VStack(spacing: 0) {
                                 NavigationLink {
+                                    SyncView(
+                                        model: SyncModel(
+                                            database: database,
+                                            cloud: syncCloud
+                                        )
+                                    )
+                                } label: {
+                                    row(
+                                        "iCloud 同期",
+                                        systemImage: "icloud",
+                                        value: isSyncOn ? "オン" : "オフ"
+                                    )
+                                }
+
+                                Hairline()
+
+                                NavigationLink {
                                     BackupView(
                                         model: BackupModel(
                                             database: database,
@@ -329,6 +347,9 @@ public struct SettingsSheet: View {
         }
         .task {
             await observeLaunchScreen()
+        }
+        .task {
+            await observeSync()
         }
     }
 }
@@ -502,6 +523,16 @@ private extension SettingsSheet {
         }
     }
 
+    func observeSync() async {
+        do {
+            for try await isOn in database.syncEnabledUpdates() {
+                isSyncOn = isOn
+            }
+        } catch {
+            isSyncOn = false
+        }
+    }
+
     func observeTheme() async {
         do {
             for try await theme in database.settingUpdates(.theme) {
@@ -571,24 +602,6 @@ private extension SettingsSheet {
                     .foregroundStyle(Palette.subtext)
                     .padding(.leading, 8)
             }
-
-            Button {
-                Task {
-                    await enableSync()
-                }
-            } label: {
-                row("同期を入れる", systemImage: "icloud")
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal, 16)
-            .card()
-
-            if let syncMessage {
-                Text(syncMessage)
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .padding(.leading, 8)
-            }
         }
     }
 }
@@ -611,17 +624,6 @@ private extension SettingsSheet {
         }
 
         isInsertingSample = false
-    }
-
-    func enableSync() async {
-        do {
-            try await database.setSyncEnabled(true)
-            try await database.queueAllForSync()
-
-            syncMessage = "同期を入れました。アプリを終了して開き直すと始まります"
-        } catch {
-            syncMessage = "同期を入れられませんでした"
-        }
     }
 }
 #endif

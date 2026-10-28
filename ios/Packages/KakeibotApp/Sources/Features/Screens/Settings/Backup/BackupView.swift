@@ -29,6 +29,13 @@ public struct BackupView: View {
                             "iphone.and.arrow.forward",
                             "機種変更の前に書き出すと、新しい端末で戻せます"
                         )
+
+                        if model.isSyncOn {
+                            note(
+                                "icloud",
+                                "iCloud 同期を切ると、読み込めます"
+                            )
+                        }
                     }
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -57,29 +64,31 @@ public struct BackupView: View {
                             )
                         }
 
-                        Hairline()
-
-                        Button {
-                            importFile()
-                        } label: {
-                            action(
-                                "読み込む",
-                                systemImage: "square.and.arrow.down",
-                                detail: "いまのデータと置き換えます"
-                            )
-                        }
-
-                        ForEach(model.previous) { item in
+                        if !model.isSyncOn {
                             Hairline()
 
                             Button {
-                                restorePrevious(item)
+                                importFile()
                             } label: {
                                 action(
-                                    model.previousTitle(of: item),
-                                    systemImage: "arrow.uturn.backward",
-                                    detail: "\(model.previousDay(of: item)) に退避したデータに戻せます"
+                                    "読み込む",
+                                    systemImage: "square.and.arrow.down",
+                                    detail: "いまのデータと置き換えます"
                                 )
+                            }
+
+                            ForEach(model.previous) { item in
+                                Hairline()
+
+                                Button {
+                                    restorePrevious(item)
+                                } label: {
+                                    action(
+                                        model.previousTitle(of: item),
+                                        systemImage: "arrow.uturn.backward",
+                                        detail: "\(model.previousDay(of: item)) に退避したデータに戻せます"
+                                    )
+                                }
                             }
                         }
                     }
@@ -118,6 +127,9 @@ public struct BackupView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
+        .task {
+            await model.loadSync()
+        }
         .task {
             await model.loadPrevious()
         }

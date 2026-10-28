@@ -14,3 +14,4 @@
 | 固定費 | 固定費 | `Recurring` | 毎月・毎年に自動で記録する支出・収入・振替 |
 | スタンプ | スタンプ | `CalendarStamp` | カレンダーの日に 1 つ押す印。押す前の一覧の印は `ShelfIcon` で持つ |
 | ごほうび | ごほうび貯金 | `RewardRule`・`RewardGoal`・`RewardLog` | 決まりの達成で仮想の貯金箱に貯まる額。口座の残高は変えない |
+| iCloud 同期 | 端末間の同期 | `SyncModel`・`SyncEngine` | 自分の iCloud で、記録と設定を端末どうしでそろえること |
