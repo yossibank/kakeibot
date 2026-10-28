@@ -86,7 +86,7 @@ public extension CategoryEditModel {
     func addTag(_ name: String) -> Bool {
         let draft = EntryTagDraft(name: name)
 
-        guard check(draft) else {
+        guard check(draft, among: tags.map(\.draft)) else {
             return false
         }
 
@@ -107,7 +107,9 @@ public extension CategoryEditModel {
 
         draft.name = name
 
-        guard check(draft) else {
+        let others = tags.filter { $0.id != id }.map(\.draft)
+
+        guard check(draft, among: others) else {
             return false
         }
 
@@ -252,13 +254,19 @@ private extension CategoryEditModel {
         )
     }
 
-    func check(_ tag: EntryTagDraft) -> Bool {
-        switch tag.problems.first {
+    func check(
+        _ tag: EntryTagDraft,
+        among others: [EntryTagDraft]
+    ) -> Bool {
+        switch tag.problems(among: others).first {
         case .emptyName:
             tagProblem = "タグの名前を入れてください"
             return false
         case .nameTooLong:
             tagProblem = "タグは \(EntryTagDraft.maxNameLength) 文字までです"
+            return false
+        case .duplicateName:
+            tagProblem = "同じ名前のタグがあります"
             return false
         case nil:
             tagProblem = nil

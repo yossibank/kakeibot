@@ -19,7 +19,7 @@ public extension AppDatabase {
                 throw WidgetEntryError.templateNotFound
             }
 
-            guard let draft = template.entryDraft(on: date) else {
+            guard let draft = try Self.entryDraft(for: template, on: date, in: db) else {
                 throw WidgetEntryError.amountMissing
             }
 
@@ -33,6 +33,15 @@ public extension AppDatabase {
             try Self.setSetting(.widgetEntry, to: record, in: db)
 
             return saved.entry
+        }
+    }
+
+    func entryDraft(
+        for template: EntryTemplate,
+        on date: LocalDate
+    ) async throws -> EntryDraft? {
+        try await writer.read { db in
+            try Self.entryDraft(for: template, on: date, in: db)
         }
     }
 
@@ -64,5 +73,25 @@ public extension AppDatabase {
             try Self.restoreNoSpendDays(days, in: db)
             try Self.setSetting(.widgetEntry, to: nil, in: db)
         }
+    }
+}
+
+extension AppDatabase {
+    static func entryDraft(
+        for template: EntryTemplate,
+        on date: LocalDate,
+        in db: Database
+    ) throws -> EntryDraft? {
+        guard var draft = template.entryDraft(on: date) else {
+            return nil
+        }
+
+        let tag = try draft.tagId.flatMap { try EntryTag.fetchOne(db, key: $0) }
+
+        if tag?.archivedAt != nil {
+            draft.tagId = nil
+        }
+
+        return draft
     }
 }

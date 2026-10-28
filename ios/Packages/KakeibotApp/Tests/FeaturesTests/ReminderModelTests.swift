@@ -7,6 +7,36 @@ import Testing
 @MainActor
 struct ReminderModelTests {
     @Test
+    func reschedulesOnlyWhenPermissionIsGranted() async throws {
+        let database = try AppDatabase.inMemory()
+        let granted = FakePermission(authorization: .notDetermined)
+        let declined = FakePermission(authorization: .notDetermined, grants: false)
+
+        let allowed = ReminderModel(
+            database: database,
+            today: LocalDate(Date(), in: .current),
+            time: nil,
+            permission: granted.permission
+        )
+
+        let refused = ReminderModel(
+            database: database,
+            today: LocalDate(Date(), in: .current),
+            time: nil,
+            permission: declined.permission
+        )
+
+        await allowed.setOn(true)
+        await refused.setOn(true)
+
+        let rescheduledAfterGrant = await granted.rescheduled
+        let rescheduledAfterDecline = await declined.rescheduled
+
+        #expect(rescheduledAfterGrant)
+        #expect(!rescheduledAfterDecline)
+    }
+
+    @Test
     func turnsOnAtEveningAndAsksPermission() async throws {
         let database = try AppDatabase.inMemory()
         let client = FakePermission(authorization: .notDetermined)
@@ -120,29 +150,42 @@ extension ReminderModelTests {
 extension ReminderModelTests {
     actor FakePermission {
         private(set) var requested = false
+        private(set) var rescheduled = false
 
         private var status: NotificationAuthorization
+
+        private let grants: Bool
 
         nonisolated var permission: NotificationPermission {
             NotificationPermission {
                 await self.status
             } request: {
                 await self.request()
+            } reschedule: {
+                await self.reschedule()
             }
         }
 
-        init(authorization: NotificationAuthorization) {
+        init(
+            authorization: NotificationAuthorization,
+            grants: Bool = true
+        ) {
             self.status = authorization
+            self.grants = grants
         }
 
         func request() -> Bool {
             requested = true
 
             if status == .notDetermined {
-                status = .allowed
+                status = grants ? .allowed : .denied
             }
 
             return status == .allowed
+        }
+
+        func reschedule() {
+            rescheduled = true
         }
     }
 }

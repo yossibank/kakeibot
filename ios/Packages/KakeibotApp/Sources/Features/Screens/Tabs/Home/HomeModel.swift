@@ -310,11 +310,13 @@ public extension HomeModel {
     }
 
     func record(_ template: EntryTemplate) async -> EntryChange? {
-        guard let draft = template.entryDraft(on: today) else {
-            return nil
-        }
-
         do {
+            let recordable = try await database.entryDraft(for: template, on: today)
+
+            guard let draft = recordable else {
+                return nil
+            }
+
             let saved = try await database.saveEntryResult(draft, at: Date())
 
             return EntryChange(

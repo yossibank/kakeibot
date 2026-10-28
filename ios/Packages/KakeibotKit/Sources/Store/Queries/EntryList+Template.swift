@@ -9,7 +9,8 @@ public extension EntryList {
 
     func detailParts(for template: EntryTemplate) -> [String?] {
         let category = categories[template.categoryId]?.name
-        let tag = template.tagId.flatMap { tags[$0]?.name }
+        let shown = template.tagId.flatMap { tags[$0] }.flatMap { $0.archivedAt == nil ? $0 : nil }
+        let tag = shown?.name
         let wallet = wallets[template.walletId]?.name
 
         return [category, tag, wallet]

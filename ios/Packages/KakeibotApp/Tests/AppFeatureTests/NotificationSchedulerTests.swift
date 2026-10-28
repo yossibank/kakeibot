@@ -27,7 +27,30 @@ struct NotificationSchedulerTests {
         #expect(state.added.count == 1)
         #expect(state.added.first?.hasSuffix(suffix) == true)
         #expect(state.links == ["entry/2026-10-17"])
-        #expect(state.requested)
+        #expect(!state.requested)
+    }
+
+    @Test(arguments: [NotificationAuthorization.notDetermined, .denied])
+    func neverAsksPermissionNorSchedulesWithoutIt(
+        authorization: NotificationAuthorization
+    ) async throws {
+        let client = FakeCenter(pending: [], authorization: authorization)
+        let scheduler = NotificationScheduler(client: client)
+        let timeZone = try #require(TimeZone(identifier: "Asia/Tokyo"))
+        let now = Date(timeIntervalSince1970: 1_792_220_400)
+        let today = try #require(LocalDate("2026-10-17"))
+        let later = try #require(ReminderTime("21:00"))
+
+        await scheduler.apply(
+            [Self.reminder(on: today, at: later)],
+            now: now,
+            timeZone: timeZone
+        )
+
+        let state = await client.state
+
+        #expect(!state.requested)
+        #expect(state.added.isEmpty)
     }
 
     @Test
@@ -61,8 +84,14 @@ extension NotificationSchedulerTests {
 
         private(set) var state: State
 
-        init(pending: [String]) {
+        private let status: NotificationAuthorization
+
+        init(
+            pending: [String],
+            authorization: NotificationAuthorization = .allowed
+        ) {
             self.state = State(pending: pending)
+            self.status = authorization
         }
 
         func pendingIdentifiers() async -> [String] {
@@ -85,7 +114,7 @@ extension NotificationSchedulerTests {
         }
 
         func authorization() async -> NotificationAuthorization {
-            .notDetermined
+            status
         }
 
         func requestAuthorization() async -> Bool {

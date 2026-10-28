@@ -174,7 +174,7 @@
         "templateId": null,
         "walletId": "20000000-0000-4000-8000-000000000002",
         "toWalletId": null,
-        "memo": null,
+        "memo": "=SUM(A1)",
         "recurringId": null,
         "recurringDate": null,
         "billMonth": null,

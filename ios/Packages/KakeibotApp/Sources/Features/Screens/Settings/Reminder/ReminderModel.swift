@@ -133,9 +133,7 @@ public extension ReminderModel {
             return
         }
 
-        if await permission.authorization() == .notDetermined {
-            _ = await permission.request()
-        }
+        await permission.requestIfUndecided()
 
         authorization = await permission.authorization()
     }

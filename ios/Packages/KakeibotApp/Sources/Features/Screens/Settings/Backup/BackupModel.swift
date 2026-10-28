@@ -18,14 +18,17 @@ public final class BackupModel {
     private let database: AppDatabase
     private let stash: BackupStash
     private let appVersion: String
+    private let permission: NotificationPermission
 
     public init(
         database: AppDatabase,
         stash: BackupStash = .standard,
-        appVersion: String = Bundle.main.shortVersion
+        appVersion: String = Bundle.main.shortVersion,
+        permission: NotificationPermission = .allowed
     ) {
         self.database = database
         self.stash = stash
+        self.permission = permission
         self.appVersion = appVersion
         self.previousDate = Self.exportedAt(of: stash.load())
     }
@@ -165,11 +168,24 @@ public extension BackupModel {
             previousDate = Self.exportedAt(of: current)
             try await database.restoreBackup(pending)
             doneMessage = Self.restoredMessage
+
+            if pending.data.needsNotifications {
+                await permission.requestIfUndecided()
+            }
         } catch {
             errorNotice.show(Self.restoreFailedMessage)
         }
 
         self.pending = nil
+    }
+}
+
+private extension ExportV1.Tables {
+    var needsNotifications: Bool {
+        let hasReminder = settings.contains { $0.key == .reminderTime }
+        let hasNotice = recurrings.contains { $0.archivedAt == nil && $0.remindDaysBefore != nil }
+
+        return hasReminder || hasNotice
     }
 }
 

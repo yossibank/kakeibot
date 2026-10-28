@@ -6,7 +6,9 @@ struct EntryTagDraftTests {
     @Test(arguments: try draftCases)
     func findsProblems(fixture: DraftCase) {
         let draft = EntryTagDraft(name: fixture.name)
-        #expect(draft.problems == fixture.problems)
+        let others = (fixture.others ?? []).map { EntryTagDraft(name: $0) }
+
+        #expect(draft.problems(among: others) == fixture.problems)
     }
 
     @Test
@@ -58,6 +60,7 @@ struct EntryTagDraftTests {
 extension EntryTagDraftTests {
     struct DraftCase: Decodable, Sendable {
         let name: String
+        let others: [String]?
         let problems: [EntryTagDraft.Problem]
     }
 }

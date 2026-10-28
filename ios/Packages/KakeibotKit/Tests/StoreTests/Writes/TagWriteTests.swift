@@ -76,6 +76,60 @@ struct TagWriteTests {
     }
 
     @Test
+    func restoresArchivedTagWithSameName() async throws {
+        let setup = try await Setup()
+        try await setup.saveFood(tags: ["朝ごはん", "昼ごはん"])
+        let before = try await setup.foodTags()
+        let kept = EntryTagDraft(before[1])
+
+        try await setup.saveFood([kept])
+        try await setup.saveFood([kept, EntryTagDraft(name: " 朝ごはん ")])
+
+        let after = try await setup.foodTags()
+        let options = try await setup.database.entryOptions()
+        let all = options.tags.filter { $0.categoryId == before[0].categoryId }
+
+        #expect(after.map(\.id) == [before[1].id, before[0].id])
+        #expect(after.map(\.sortOrder) == [0, 1])
+        #expect(all.count == 2)
+    }
+
+    @Test
+    func rejectsDuplicateTagName() async throws {
+        let setup = try await Setup()
+
+        await #expect(throws: EntryTagDraft.Problem.duplicateName) {
+            try await setup.saveFood(tags: ["朝ごはん", "朝ごはん "])
+        }
+    }
+
+    @Test
+    func hidesArchivedTagFromTemplateDetail() async throws {
+        let setup = try await Setup()
+        try await setup.saveFood(tags: ["朝ごはん"])
+        let tag = try #require(try await setup.foodTags().first)
+        let entry = try await setup.entryDraft()
+
+        let draft = EntryTemplateDraft(
+            name: "朝",
+            type: .expense,
+            amount: 500,
+            categoryId: entry.categoryId,
+            tagId: tag.id,
+            walletId: entry.walletId
+        )
+
+        let template = try await setup.database.saveTemplate(draft, at: setup.now)
+        let before = try await setup.database.entryList().detailParts(for: template)
+
+        try await setup.saveFood([])
+        let after = try await setup.database.entryList().detailParts(for: template)
+
+        #expect(before.contains("朝ごはん"))
+        #expect(!after.contains("朝ごはん"))
+    }
+
+    @Test
     func savesEntryWithTagOfItsCategory() async throws {
         let setup = try await Setup()
         try await setup.saveFood(tags: ["昼ごはん"])

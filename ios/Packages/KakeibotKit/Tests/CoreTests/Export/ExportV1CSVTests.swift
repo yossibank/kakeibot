@@ -25,4 +25,17 @@ struct ExportV1CSVTests {
 
         #expect(lines[1].hasSuffix(",\"本, \"\"上巻\"\"\""))
     }
+
+    @Test
+    func prefixesMemoStartingWithMinus() throws {
+        let json = try Fixture.data("export/export-v1.json")
+        var tables = try ExportV1(json: json).data
+        tables.entries = [tables.entries[0]]
+        tables.entries[0].memo = "-1"
+
+        let csv = String(decoding: tables.csv(), as: UTF8.self)
+        let lines = csv.components(separatedBy: "\r\n")
+
+        #expect(lines[1].hasSuffix(",'-1"))
+    }
 }

@@ -60,7 +60,7 @@ public struct RootView: View {
                 await model.refreshDay()
             }
         }
-        .environment(\.notificationPermission, .live)
+        .environment(\.notificationPermission, .live { await model.rescheduleNotifications() })
         .palette(shownLook)
         .environment(\.palette, shownPalette)
         .environment(\.themeStyle, shownStyle)
@@ -145,10 +145,14 @@ private extension RootView {
 }
 
 extension NotificationPermission {
-    static let live = Self {
-        await LiveNotificationCenter().authorization()
-    } request: {
-        await LiveNotificationCenter().requestAuthorization()
+    static func live(reschedule: @escaping Reschedule) -> Self {
+        Self {
+            await LiveNotificationCenter().authorization()
+        } request: {
+            await LiveNotificationCenter().requestAuthorization()
+        } reschedule: {
+            await reschedule()
+        }
     }
 }
 
