@@ -286,7 +286,7 @@ private extension RewardRuleListView {
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
 
-                Text("＋\(AmountText.text(rule.amount))")
+                Text("+\(AmountText.text(rule.amount))")
                     .displayFont(.headline)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accent)

@@ -25,7 +25,7 @@ struct RecordsStampSheet: View {
                         systemImage: "seal",
                         title: "スタンプがまだありません",
                         message: "スタンプを作ると、ここから押せます",
-                        actionTitle: "スタンプを作る"
+                        actionTitle: "スタンプを追加"
                     ) {
                         isAddingStamp = true
                     }

@@ -380,7 +380,7 @@ private extension AssetsRewardSheet {
 
             Spacer(minLength: 8)
 
-            Text("＋\(AmountText.text(rule.amount))")
+            Text("+\(AmountText.text(rule.amount))")
                 .textFont(.footnote)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accent)
@@ -451,7 +451,7 @@ private extension AssetsRewardSheet {
 
                 Spacer()
 
-                Text("＋\(AmountText.text(total))")
+                Text("+\(AmountText.text(total))")
                     .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accent)
@@ -487,7 +487,7 @@ private extension AssetsRewardSheet {
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)
 
-            Text("＋\(AmountText.text(log.amount))")
+            Text("+\(AmountText.text(log.amount))")
                 .textFont(.footnote)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accent)

@@ -28,7 +28,11 @@ public struct HomeSectionsView: View {
 
             SettingsHint(
                 flag: hintFlag,
-                lines: [.init("square.stack", "ホームに並べる順番と、出すものを選べます"), .move, .hide]
+                lines: [
+                    .init("square.stack", "ホームに並べる順番と、出すものを選べます"),
+                    .move,
+                    .init("eye.slash", "長押しして下の枠へ運ぶと隠せます")
+                ]
             )
 
             ScrollView {
