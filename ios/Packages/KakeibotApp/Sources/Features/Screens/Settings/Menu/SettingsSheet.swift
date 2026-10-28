@@ -268,7 +268,12 @@ public struct SettingsSheet: View {
 
                             VStack(spacing: 0) {
                                 NavigationLink {
-                                    BackupView(model: BackupModel(database: database))
+                                    BackupView(
+                                        model: BackupModel(
+                                            database: database,
+                                            permission: permission
+                                        )
+                                    )
                                 } label: {
                                     row(
                                         "バックアップ",

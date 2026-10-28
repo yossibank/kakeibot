@@ -50,19 +50,21 @@ public extension AmountCalculator {
     static let maxValue = 999_999_999
 
     var value: Int {
-        var total = 0
+        var total: Int128 = 0
         var pending = Operation.add
 
         for token in tokens {
             switch token {
             case let .number(number):
-                total = pending.apply(total, number)
+                total = pending.apply(total, Int128(number))
             case let .operation(operation):
                 pending = operation
             }
         }
 
-        return total
+        let limit = Int128(Self.maxValue)
+
+        return Int(min(max(total, -limit), limit))
     }
 
     var amount: Int {
@@ -177,19 +179,30 @@ private extension AmountCalculator {
 }
 
 private extension AmountCalculator.Operation {
+    static let ceiling = Int128.max / 2
+
     func apply(
-        _ lhs: Int,
-        _ rhs: Int
-    ) -> Int {
-        let result = switch self {
+        _ lhs: Int128,
+        _ rhs: Int128
+    ) -> Int128 {
+        switch self {
         case .add: lhs + rhs
         case .subtract: lhs - rhs
-        case .multiply: lhs * rhs
+        case .multiply: multiply(lhs, rhs)
         case .divide: rhs == 0 ? lhs : lhs / rhs
         }
+    }
 
-        let limit = AmountCalculator.maxValue
+    func multiply(
+        _ lhs: Int128,
+        _ rhs: Int128
+    ) -> Int128 {
+        let (product, overflow) = lhs.multipliedReportingOverflow(by: rhs)
 
-        return min(max(result, -limit), limit)
+        guard !overflow else {
+            return (lhs < 0) == (rhs < 0) ? Self.ceiling : -Self.ceiling
+        }
+
+        return min(max(product, -Self.ceiling), Self.ceiling)
     }
 }

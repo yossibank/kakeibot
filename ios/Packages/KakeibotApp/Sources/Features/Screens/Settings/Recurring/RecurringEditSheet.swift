@@ -13,6 +13,7 @@ public struct RecurringEditSheet: View {
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.notificationPermission) private var permission
 
     private let onDelete: (Deletion) -> Void
 
@@ -640,7 +641,7 @@ private extension RecurringEditSheet {
     func save(hiding: Bool = false) async {
         closePanel()
 
-        if await model.save() {
+        if await model.save(permission: permission) {
             if hiding {
                 guard await model.setHidden(!model.isHidden) else {
                     return

@@ -166,6 +166,34 @@ private extension AppDatabase {
             .filter(Column("category_id") == categoryId)
             .fetchAll(db)
 
+        let names = drafts.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) }
+
+        guard Set(names).count == names.count else {
+            throw EntryTagDraft.Problem.duplicateName
+        }
+
+        var restorable = existing
+            .filter { $0.archivedAt != nil }
+            .sorted { ($0.createdAt, $0.id.description) < ($1.createdAt, $1.id.description) }
+
+        let drafts = zip(drafts, names).map { draft, name in
+            guard draft.id == nil else {
+                return draft
+            }
+
+            let index = restorable.firstIndex { $0.name == name }
+
+            guard let index else {
+                return draft
+            }
+
+            var restored = draft
+
+            restored.id = restorable.remove(at: index).id
+
+            return restored
+        }
+
         let kept = Set(drafts.compactMap(\.id))
 
         for var tag in existing where !kept.contains(tag.id) {

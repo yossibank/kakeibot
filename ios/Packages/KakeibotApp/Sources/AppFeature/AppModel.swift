@@ -125,6 +125,15 @@ extension AppModel {
         }
     }
 
+    func rescheduleNotifications() async {
+        switch launch {
+        case let .onboarding(database), let .ready(database):
+            await scheduleNotifications(in: database)
+        case .opening, .failed:
+            return
+        }
+    }
+
     func observeTheme() async {
         switch launch {
         case let .onboarding(database), let .ready(database):
