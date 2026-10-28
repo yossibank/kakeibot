@@ -7,7 +7,7 @@ public extension AppDatabase {
         try writer.write { db in
             guard
                 try Wallet.fetchCount(db) == 0,
-                try EntryCategory.fetchCount(db) == 0
+                try EntryCategory.filter(Column("wallet_id") == nil).fetchCount(db) == 0
             else {
                 return
             }
@@ -187,7 +187,7 @@ private extension AppDatabase {
             return
         }
 
-        let categories = try EntryCategory.fetchAll(db)
+        let categories = try EntryCategory.filter(Column("wallet_id") == nil).fetchAll(db)
             .filter { $0.kind == .expense && $0.archivedAt == nil }
 
         let seeds = templates.compactMap { seed in

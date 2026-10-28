@@ -192,6 +192,21 @@ public extension AppDatabase {
 }
 
 extension AppDatabase {
+    static func queue(
+        _ key: SyncKey,
+        in db: Database
+    ) throws {
+        try db.execute(
+            sql: """
+            INSERT INTO sync_change (table_name, record_id, version) VALUES (?, ?, 1)
+            ON CONFLICT (table_name, record_id) DO UPDATE SET version = version + 1
+            """,
+            arguments: [key.table.rawValue, key.id]
+        )
+
+        try db.notifyChanges(in: Table("sync_change"))
+    }
+
     func setSyncEnabled(_ enabled: Bool) async throws {
         try await writer.write { db in
             try db.execute(sql: "UPDATE sync_state SET enabled = ?", arguments: [enabled])
@@ -278,21 +293,6 @@ private extension AppDatabase {
             sql: "SELECT * FROM \(key.table.rawValue) WHERE \(key.table.keyColumn) = ?",
             arguments: [key.id]
         )
-    }
-
-    static func queue(
-        _ key: SyncKey,
-        in db: Database
-    ) throws {
-        try db.execute(
-            sql: """
-            INSERT INTO sync_change (table_name, record_id, version) VALUES (?, ?, 1)
-            ON CONFLICT (table_name, record_id) DO UPDATE SET version = version + 1
-            """,
-            arguments: [key.table.rawValue, key.id]
-        )
-
-        try db.notifyChanges(in: Table("sync_change"))
     }
 
     static func applyDeletion(

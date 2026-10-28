@@ -18,6 +18,7 @@
 ## sync_change
 
 まだ送っていない行。data の表のすべてに、行を足す・変える・消すと、ここに記録するトリガーを持つ。
+トリガーは、同期を入れているか、sync_share に行があるときだけ記録する。
 
 | 列 | 型 | 補足 |
 | --- | --- | --- |
@@ -39,6 +40,29 @@ setting は、次の key を記録しない。
 - `closed_hidden_lists`
 - `recent_searches`
 - `widget_entry`
+
+## sync_share
+
+共有している財布。財布ごとに 1 行持つ。
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| wallet_id | TEXT | 主キー。wallet を参照し、財布を消すと一緒に消える |
+| owner_name | TEXT | 自分が誘った側なら NULL。誘われた側なら、誘った人の CloudKit の owner name |
+
+`WITHOUT ROWID` の表である。ゾーンの名前は列に持たず、`"Wallet-" + wallet_id` で決める。
+
+行がどのゾーンに入るかは、次の表で決める。sync_share にある財布だけが共有のゾーンになり、それ以外は自分のゾーンに入る。
+
+| 表 | 共有のゾーンになる財布 |
+| --- | --- |
+| wallet | その id |
+| valuation | wallet_id |
+| entry | wallet_id。無ければ to_wallet_id（振替は、どちらかが共有なら共有のゾーン） |
+| category | wallet_id |
+| tag | その category の wallet_id |
+| icon | その icon を指す共有の wallet。無ければ wallet_id を持つ category |
+| ほかの表 | 自分のゾーン |
 
 ## sync_waiting
 

@@ -48,6 +48,7 @@ private extension AppDatabaseTests {
         "shelf_icon",
         "sync_change",
         "sync_record",
+        "sync_share",
         "sync_state",
         "sync_waiting",
         "tag",

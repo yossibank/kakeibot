@@ -31,7 +31,7 @@ enum MigrationV26 {
     }
 }
 
-private extension MigrationV26 {
+extension MigrationV26 {
     static let tables = [
         ("icon", "id"),
         ("wallet", "id"),
@@ -68,6 +68,7 @@ private extension MigrationV26 {
     static func createTriggers(
         on table: String,
         key: String,
+        recording: String = recording,
         in db: Database
     ) throws {
         for (name, event, row) in events {

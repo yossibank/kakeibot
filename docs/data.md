@@ -19,6 +19,7 @@ erDiagram
     wallet ||--o{ valuation : "wallet_id"
     category |o--o{ entry : "category_id"
     category ||--o{ tag : "category_id"
+    wallet |o--o{ category : "wallet_id"
     tag |o--o{ entry : "tag_id"
     tag |o--o{ template : "tag_id"
     template |o--o{ entry : "template_id"
@@ -150,6 +151,7 @@ emoji・text・glyph のどれかは必須。
 | icon_id | TEXT | |
 | sort_order | INTEGER | |
 | archived_at | TEXT | |
+| wallet_id | TEXT | 共有の財布の共有用のカテゴリだけ。自分のカテゴリは NULL |
 | created_at / updated_at | TEXT | |
 
 ### tag
