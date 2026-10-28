@@ -56,4 +56,4 @@ iCloud にあるレコードの控え。送った行と受け取った行ごと�
 | table_name / record_id | TEXT | sync_change と同じ |
 | system_fields | BLOB | 次に送るときの元にする |
 
-iCloud のアカウントが変わったときと、iCloud のゾーンが消えたときは、全部消す。
+受け取った行と同じ書き込みで控える。同期を切ったときと、全部を取り直すときは、全部消す。

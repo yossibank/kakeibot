@@ -219,6 +219,30 @@ struct SyncTests {
     }
 
     @Test
+    func savesSystemFieldsWithRemoteRows() async throws {
+        let setup = try await Setup()
+
+        try await setup
+            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+
+        let saved = SyncKey(table: .noSpendDay, id: "2026-10-02")
+        let deleted = SyncKey(table: .noSpendDay, id: "2026-10-01")
+        let remote = SyncRecord(key: saved, values: ["created_at": .text("x")])
+        let fields = Data([1])
+
+        try await setup.database.saveSyncSystemFields([deleted: fields])
+        try await setup.database.applySyncChanges(
+            saved: [remote],
+            deleted: [deleted],
+            systemFields: [saved: fields]
+        )
+
+        #expect(try await setup.database.syncSystemFields(for: saved) == fields)
+        #expect(try await setup.database.syncSystemFields(for: deleted) == nil)
+    }
+
+    @Test
     func savesAndResetsSystemFields() async throws {
         let setup = try await Setup()
         let key = SyncKey(table: .noSpendDay, id: "2026-10-01")

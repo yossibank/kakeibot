@@ -32,13 +32,17 @@ public extension AppDatabase {
         }
     }
 
-    func pendingSyncChangeUpdates() -> some AsyncSequence<[SyncChange], any Error> {
+    func syncChangeUpdates() -> some AsyncSequence<Void, any Error> {
         ValueObservation
             .tracking { db in
-                try Self.pendingChanges(in: db)
+                try String.fetchAll(
+                    db,
+                    sql: "SELECT table_name || '/' || record_id || '/' || version FROM sync_change"
+                )
             }
             .removeDuplicates()
             .values(in: writer)
+            .map { _ in }
     }
 
     func removeSyncChanges(_ changes: [SyncChange]) async throws {
@@ -69,17 +73,23 @@ public extension AppDatabase {
 
     func applySyncChanges(
         saved: [SyncRecord],
-        deleted: [SyncKey]
+        deleted: [SyncKey],
+        systemFields: [SyncKey: Data] = [:]
     ) async throws {
         try await writer.write { db in
             try Self.setApplying(true, in: db)
 
             for key in Self.parentsLast(deleted) {
                 try Self.applyDeletion(of: key, in: db)
+                try Self.removeSystemFields(of: key, in: db)
             }
 
             for record in Self.parentsFirst(saved) {
                 try Self.applySave(of: record, in: db)
+            }
+
+            for (key, data) in systemFields {
+                try Self.saveSystemFields(data, of: key, in: db)
             }
 
             try Self.retryWaiting(in: db)
@@ -112,14 +122,7 @@ public extension AppDatabase {
     func saveSyncSystemFields(_ fields: [SyncKey: Data]) async throws {
         try await writer.write { db in
             for (key, data) in fields {
-                try db.execute(
-                    sql: """
-                    INSERT INTO sync_record (table_name, record_id, system_fields) VALUES (?, ?, ?)
-                    ON CONFLICT (table_name, record_id) DO UPDATE
-                    SET system_fields = excluded.system_fields
-                    """,
-                    arguments: [key.table.rawValue, key.id, data]
-                )
+                try Self.saveSystemFields(data, of: key, in: db)
             }
         }
     }
@@ -127,10 +130,7 @@ public extension AppDatabase {
     func removeSyncSystemFields(_ keys: [SyncKey]) async throws {
         try await writer.write { db in
             for key in keys {
-                try db.execute(
-                    sql: "DELETE FROM sync_record WHERE table_name = ? AND record_id = ?",
-                    arguments: [key.table.rawValue, key.id]
-                )
+                try Self.removeSystemFields(of: key, in: db)
             }
         }
     }
@@ -279,6 +279,30 @@ private extension AppDatabase {
                 progressed = true
             }
         }
+    }
+
+    static func saveSystemFields(
+        _ data: Data,
+        of key: SyncKey,
+        in db: Database
+    ) throws {
+        try db.execute(
+            sql: """
+            INSERT INTO sync_record (table_name, record_id, system_fields) VALUES (?, ?, ?)
+            ON CONFLICT (table_name, record_id) DO UPDATE SET system_fields = excluded.system_fields
+            """,
+            arguments: [key.table.rawValue, key.id, data]
+        )
+    }
+
+    static func removeSystemFields(
+        of key: SyncKey,
+        in db: Database
+    ) throws {
+        try db.execute(
+            sql: "DELETE FROM sync_record WHERE table_name = ? AND record_id = ?",
+            arguments: [key.table.rawValue, key.id]
+        )
     }
 
     static func removeWaiting(

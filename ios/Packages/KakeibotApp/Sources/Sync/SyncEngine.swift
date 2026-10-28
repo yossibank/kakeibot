@@ -43,6 +43,27 @@ public extension SyncEngine {
         }
     }
 
+    func enqueuePending() async {
+        await enqueuePending(excluding: [])
+    }
+}
+
+private extension SyncEngine {
+    static var zoneID: CKRecordZone.ID {
+        CKRecordZone.ID(zoneName: "Kakeibot")
+    }
+
+    func enqueuePending(excluding failed: Set<SyncKey>) async {
+        guard
+            engine != nil,
+            let changes = try? await database.pendingSyncChanges()
+        else {
+            return
+        }
+
+        enqueue(changes.filter { !failed.contains($0.key) })
+    }
+
     func enqueue(_ changes: [SyncChange]) {
         guard let engine else {
             return
@@ -72,12 +93,6 @@ public extension SyncEngine {
         engine.state.remove(pendingRecordZoneChanges: removed)
         engine.state.add(pendingRecordZoneChanges: added)
     }
-}
-
-private extension SyncEngine {
-    static var zoneID: CKRecordZone.ID {
-        CKRecordZone.ID(zoneName: "Kakeibot")
-    }
 
     func restart() async {
         engine = nil
@@ -85,7 +100,10 @@ private extension SyncEngine {
         await start()
     }
 
-    func stop() {
+    func turnOff() async {
+        try? await database.resetSync()
+        try? await database.setSyncEnabled(false)
+
         engine = nil
         sending = [:]
     }
@@ -107,8 +125,7 @@ private extension SyncEngine {
         case .signIn:
             try? await database.queueAllForSync()
         case .signOut, .switchAccounts:
-            try? await database.resetSync()
-            await restart()
+            await turnOff()
         @unknown default:
             break
         }
@@ -119,15 +136,13 @@ private extension SyncEngine {
             return
         }
 
-        try? await database.resetSync()
-
         switch deletion.reason {
         case .encryptedDataReset:
+            try? await database.resetSync()
             await restart()
             try? await database.queueAllForSync()
         default:
-            try? await database.setSyncEnabled(false)
-            stop()
+            await turnOff()
         }
     }
 
@@ -142,11 +157,14 @@ private extension SyncEngine {
         }
 
         do {
-            try await database.applySyncChanges(saved: saved, deleted: deleted)
-            try await database.saveSyncSystemFields(systemFields)
-            try await database.removeSyncSystemFields(deleted)
+            try await database.applySyncChanges(
+                saved: saved,
+                deleted: deleted,
+                systemFields: systemFields
+            )
         } catch {
-            return
+            try? await database.resetSync()
+            await restart()
         }
     }
 
@@ -161,6 +179,11 @@ private extension SyncEngine {
                 fields[key] = record.systemFields
             }
         }
+        let failedSaves = sent.failedRecordSaves.map(\.record.recordID)
+        let failedDeletes = sent.failedRecordDeletes
+            .filter { $0.value.code != .unknownItem }
+            .map(\.key)
+        let failed = Set((failedSaves + failedDeletes).compactMap(SyncKey.init))
         let finished = (Array(systemFields.keys) + deleted)
             .compactMap { sending.removeValue(forKey: $0) }
 
@@ -172,9 +195,7 @@ private extension SyncEngine {
             await retry(failure)
         }
 
-        if let changes = try? await database.pendingSyncChanges() {
-            enqueue(changes)
-        }
+        await enqueuePending(excluding: failed)
     }
 
     func retry(_ failure: CKSyncEngine.Event.SentRecordZoneChanges.FailedRecordSave) async {
@@ -211,8 +232,11 @@ private extension SyncEngine {
         }
 
         do {
-            try await database.saveSyncSystemFields([key: serverRecord.systemFields])
-            try await database.applySyncChanges(saved: [remote], deleted: [])
+            try await database.applySyncChanges(
+                saved: [remote],
+                deleted: [],
+                systemFields: [key: serverRecord.systemFields]
+            )
 
             if try await database.syncRecord(for: key) == remote {
                 let change = sending.removeValue(forKey: key)

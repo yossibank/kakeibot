@@ -187,8 +187,8 @@ extension AppModel {
         syncEngine = engine
         await engine.start()
 
-        await watch(database.pendingSyncChangeUpdates()) { changes in
-            await engine.enqueue(changes)
+        await watch(database.syncChangeUpdates()) {
+            await engine.enqueuePending()
         }
     }
 
