@@ -88,6 +88,10 @@ public extension BudgetListModel {
         calculator.amount > 0
     }
 
+    var isChanged: Bool {
+        editing != nil && calculator.amount != (editingAmount ?? 0)
+    }
+
     var saveTitle: String {
         canSave ? "\(month.month)月からこの額にする" : "金額を入れてください"
     }

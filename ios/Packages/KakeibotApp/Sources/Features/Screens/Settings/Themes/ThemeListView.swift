@@ -7,6 +7,7 @@ public struct ThemeListView: View {
     @State private var model: ThemeListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var editing: EditTarget?
+    @State private var deletion: Deletion?
     @State private var menu: Menu?
     @State private var pressing: ThemeChoice?
     @State private var size: CGSize = .zero
@@ -55,6 +56,9 @@ public struct ThemeListView: View {
                 }
                 .scrollIndicators(.hidden)
                 .scrollDisabled(menu != nil)
+                .deletionNotice($deletion) { deletion in
+                    restore(deletion)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 16)
@@ -99,14 +103,23 @@ public struct ThemeListView: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: menu) { _, new in
             new != nil
         }
-        .sheet(item: $editing, onDismiss: reload) { target in
+        .navigationDestination(item: $editing) { target in
             ThemeEditSheet(
                 model: ThemeEditModel(
                     database: database,
                     editing: target.theme,
                     base: target.base ?? model.currentPalette
                 )
-            )
+            ) { deletion in
+                self.deletion = deletion
+            }
+            .toolbar(.hidden, for: .navigationBar)
+            .environment(\.isSettingsEditPushed, true)
+        }
+        .onChange(of: editing) { _, editing in
+            if editing == nil {
+                reload()
+            }
         }
         .task {
             await model.load()
@@ -383,7 +396,7 @@ private extension ThemeListView {
         let frame: CGRect
     }
 
-    enum EditTarget: Identifiable {
+    enum EditTarget: Hashable, Identifiable {
         case new(base: ThemePalette?)
         case edit(Theme)
 
@@ -466,6 +479,12 @@ private extension ThemeListView {
     func reload() {
         Task {
             await model.load()
+        }
+    }
+
+    func restore(_ deletion: Deletion) {
+        Task {
+            await model.restore(deletion)
         }
     }
 }

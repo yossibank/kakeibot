@@ -11,6 +11,10 @@ public extension AppDatabase {
             for entry in deletion.entries where try Entry.exists(db, key: entry.id) {
                 try entry.update(db)
             }
+
+            if let choice = deletion.themeChoice {
+                try Self.setSetting(.theme, to: choice, in: db)
+            }
         }
     }
 }
@@ -50,7 +54,8 @@ private extension Deletion {
             valuations,
             shelfIcons,
             rewardRules,
-            rewardLogs
+            rewardLogs,
+            themes
         ]
 
         return tables.flatMap(\.self)
