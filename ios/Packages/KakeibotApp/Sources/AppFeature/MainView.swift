@@ -20,6 +20,7 @@ struct MainView: View {
     @State private var isWarmingEntry = true
     @State private var orderMenuAnchor: CGRect?
     @State private var observationRound = 0
+    @State private var foreground = ForegroundReturn()
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -286,8 +287,8 @@ struct MainView: View {
                 await openLaunchScreen()
             }
         }
-        .onChange(of: scenePhase) { old, phase in
-            if old == .background, phase == .active {
+        .onChange(of: scenePhase) { _, phase in
+            if foreground.receive(phase) {
                 observationRound += 1
             }
         }
