@@ -372,9 +372,21 @@ public extension RecordsModel {
     }
 
     func open(_ date: LocalDate) {
+        closeSearch()
         month = date.periodMonth(startingOn: monthStartDay)
         selectedDate = date
         layout = .calendar
+    }
+
+    func openCurrentMonth() {
+        closeSearch()
+        month = today.periodMonth(startingOn: monthStartDay)
+        selectedDate = nil
+    }
+
+    func closeSearch() {
+        isSearching = false
+        searchText = ""
     }
 
     func move(months: Int) {

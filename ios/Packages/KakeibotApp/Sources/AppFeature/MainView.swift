@@ -100,6 +100,8 @@ struct MainView: View {
                         sheet = .edit(id)
                     },
                     onShowRecords: {
+                        records.openCurrentMonth()
+
                         tab = .records
                     },
                     onRetry: {

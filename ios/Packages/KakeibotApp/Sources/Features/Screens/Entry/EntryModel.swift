@@ -510,20 +510,11 @@ public extension EntryModel {
         )
     }
 
-    static func dayText(
-        for date: LocalDate,
-        today: LocalDate
-    ) -> String {
-        date.year == today.year
-            ? "\(date.month)/\(date.day)"
-            : "\(date.year)/\(date.month)/\(date.day)"
-    }
-
     static func dateText(
         for date: LocalDate,
         today: LocalDate
     ) -> String {
-        let day = dayText(for: date, today: today)
+        let day = PeriodText.day(date, today: today)
         let text = "\(day)（\(date.weekday.shortName)）"
 
         switch date {
@@ -563,7 +554,7 @@ public extension EntryModel {
         let day = switch date {
         case today: "今日"
         case today.adding(days: -1): "昨日"
-        default: Self.dayText(for: date, today: today)
+        default: PeriodText.day(date, today: today)
         }
 
         let direction = type == .income ? "へ" : "から"
