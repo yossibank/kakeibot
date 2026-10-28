@@ -89,6 +89,38 @@ struct HomeModelTests {
     }
 
     @Test
+    func swapsMiddleFigureByBudget() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, daysAgo: 0)
+        try await setup.save(.expense, amount: 4500, daysAgo: 1)
+        let model = HomeModel(database: setup.database, today: setup.today)
+        await model.load()
+
+        #expect(model.budgetUsage == nil)
+        #expect(model.middleTitle == "昨日")
+        #expect(model.middleAmount == 4500)
+
+        let task = Task {
+            await model.run()
+        }
+
+        try await setup.database.setBudget(
+            120_000,
+            for: nil,
+            from: setup.today.yearMonth
+        )
+
+        for _ in 0..<200 where model.budgetUsage == nil {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        task.cancel()
+
+        #expect(model.middleTitle == "今月の支出")
+        #expect(model.middleAmount == 5480)
+    }
+
+    @Test
     func listsRecentEntriesNewestFirst() async throws {
         let setup = try await Setup()
 

@@ -70,6 +70,22 @@ struct EntryModelTests {
     }
 
     @Test
+    func opensKeypadOnlyForNewEntries() async throws {
+        let setup = try await Setup()
+        let entry = try await setup.saveEntry(amount: 980)
+
+        let new = EntryModel(database: setup.database, date: setup.date)
+        let edit = EntryModel(
+            database: setup.database,
+            editing: entry.id,
+            date: setup.date
+        )
+
+        #expect(new.opensKeypad)
+        #expect(!edit.opensKeypad)
+    }
+
+    @Test
     func editsExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
