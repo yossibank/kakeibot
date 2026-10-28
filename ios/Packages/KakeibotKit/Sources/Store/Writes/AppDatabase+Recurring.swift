@@ -280,9 +280,9 @@ private extension AppDatabase {
 
         var updated = recurring
 
-        updated.generatedUntil = today
-
-        try updated.update(db)
+        _ = try updated.updateChanges(db) {
+            $0.generatedUntil = today
+        }
     }
 
     static func generateEarlierEntries(

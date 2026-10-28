@@ -34,6 +34,28 @@ struct RecurringWriteTests {
     }
 
     @Test
+    func skipsWritingWhenNothingChanged() async throws {
+        let setup = try await Setup()
+        let today = try #require(LocalDate("2026-04-30"))
+
+        try await setup.database.generateRecurringEntries(
+            through: today,
+            at: setup.now
+        )
+
+        let before = try await setup.database.writer.read { $0.totalChangesCount }
+
+        try await setup.database.generateRecurringEntries(
+            through: today,
+            at: setup.now
+        )
+
+        let after = try await setup.database.writer.read { $0.totalChangesCount }
+
+        #expect(after == before)
+    }
+
+    @Test
     func generatesOnShiftedDate() async throws {
         let setup = try await Setup()
         let today = try #require(LocalDate("2026-04-30"))
