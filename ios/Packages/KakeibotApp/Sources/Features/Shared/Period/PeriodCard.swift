@@ -26,7 +26,7 @@ struct PeriodCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 20)
-        .card(cornerRadius: 24)
+        .card()
         .animation(.snappy, value: periodText)
     }
 }

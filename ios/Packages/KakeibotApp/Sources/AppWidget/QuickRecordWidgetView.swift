@@ -70,7 +70,7 @@ private extension QuickRecordWidgetView {
     @ViewBuilder
     func header(of summary: QuickRecordWidgetSummary) -> some View {
         if let recorded = summary.recorded(at: entry.date) {
-            HStack(spacing: 6) {
+            HStack(spacing: 4) {
                 Image(systemName: "checkmark.circle.fill")
                     .sansFont(.caption)
                     .foregroundStyle(Palette.accent)
@@ -168,7 +168,7 @@ private extension QuickRecordWidgetView {
         padding: CGFloat
     ) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 6) {
+            HStack(spacing: 4) {
                 IconImage(tile.icon, size: 11)
                     .foregroundStyle(Palette.accent)
                     .frame(width: Self.badgeSize, height: Self.badgeSize)
@@ -187,7 +187,7 @@ private extension QuickRecordWidgetView {
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    .padding(.leading, Self.badgeSize + 6)
+                    .padding(.leading, Self.badgeSize + 4)
             }
 
             Spacer(minLength: 0)
@@ -216,7 +216,7 @@ private extension QuickRecordWidgetView {
                     .background(Palette.accent, in: Circle())
             }
         }
-        .padding(.horizontal, 10)
+        .padding(.horizontal, 8)
         .padding(.vertical, padding)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .templateCardFace(cornerRadius: Self.tileRadius, shadowRadius: 4)
@@ -229,7 +229,7 @@ private extension QuickRecordWidgetView {
         let records = Array(summary.todayRecords.prefix(limit))
         let others = summary.todayCount - records.count
 
-        return VStack(alignment: .leading, spacing: 6) {
+        return VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 Text("今日の記録 \(summary.todayCount) 件")
                     .textFont(size: .micro)
@@ -313,13 +313,13 @@ private extension QuickRecordWidgetView {
         compact.limited(2),
         compact.limited(1)
     ]
-    static let tileRadius: CGFloat = 14
+    static let tileRadius: CGFloat = 12
     static let badgeSize: CGFloat = 20
     static let markSize: CGFloat = 20
     static let regular = Metrics(
         top: 12,
         bottom: 18,
-        spacing: 6,
+        spacing: 4,
         headerHeight: 20,
         undoHeaderHeight: 32,
         gridSpacing: 8,
@@ -330,7 +330,7 @@ private extension QuickRecordWidgetView {
     static let tight = Metrics(
         top: 8,
         bottom: 8,
-        spacing: 6,
+        spacing: 4,
         headerHeight: 20,
         undoHeaderHeight: 28,
         gridSpacing: 8,
@@ -344,7 +344,7 @@ private extension QuickRecordWidgetView {
         spacing: 4,
         headerHeight: 16,
         undoHeaderHeight: 24,
-        gridSpacing: 6,
+        gridSpacing: 4,
         tilePadding: 4,
         todayLimit: .max
     )

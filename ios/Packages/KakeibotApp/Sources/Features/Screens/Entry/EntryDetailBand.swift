@@ -102,7 +102,7 @@ private extension EntryDetailBand {
                         Capsule()
                             .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
                     }
-                    .padding(.top, 7)
+                    .padding(.top, 8)
                     .padding(.trailing, 8)
                     .frame(minWidth: 44, minHeight: 44, alignment: .topTrailing)
                     .contentShape(.rect)

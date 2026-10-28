@@ -33,7 +33,7 @@ private extension EntryRouteRow {
         return Button {
             onUse(route)
         } label: {
-            HStack(spacing: 6) {
+            HStack(spacing: 4) {
                 Text(source)
                     .sharedTextScale()
 

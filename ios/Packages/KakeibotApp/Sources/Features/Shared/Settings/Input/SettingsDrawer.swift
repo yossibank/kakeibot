@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsDrawer<Content: View>: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     private let title: String
     private let showsDone: Bool
     private let onDone: () -> Void
@@ -45,10 +47,10 @@ struct SettingsDrawer<Content: View>: View {
         .padding(.top, 12)
         .padding(.bottom, 12)
         .background {
-            Self.shape
+            shape
                 .fill(Palette.panel)
                 .overlay {
-                    Self.shape
+                    shape
                         .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
         }
@@ -58,8 +60,8 @@ struct SettingsDrawer<Content: View>: View {
 }
 
 private extension SettingsDrawer {
-    static var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 28)
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(28))
     }
 }
 

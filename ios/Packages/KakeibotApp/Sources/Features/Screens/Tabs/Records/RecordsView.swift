@@ -872,7 +872,7 @@ private extension RecordsView {
             Label(title, systemImage: systemImage)
                 .textFont(.footnote)
                 .foregroundStyle(tint)
-                .padding(.horizontal, 10)
+                .padding(.horizontal, 8)
                 .frame(minHeight: 44)
                 .contentShape(.rect)
         }

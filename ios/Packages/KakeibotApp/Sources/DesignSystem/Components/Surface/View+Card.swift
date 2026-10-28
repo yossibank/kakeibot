@@ -2,7 +2,7 @@ import Core
 import SwiftUI
 
 public extension View {
-    func card(cornerRadius: CGFloat = 22) -> some View {
+    func card(cornerRadius: CGFloat = 24) -> some View {
         modifier(CardBackground(cornerRadius: cornerRadius))
     }
 }
@@ -30,7 +30,7 @@ private struct CardBackground: ViewModifier {
         Text("今月の支出")
             .foregroundStyle(Palette.text)
             .frame(maxWidth: .infinity, minHeight: 120)
-            .card(cornerRadius: 24)
+            .card()
 
         Text("最近の記録")
             .foregroundStyle(Palette.text)

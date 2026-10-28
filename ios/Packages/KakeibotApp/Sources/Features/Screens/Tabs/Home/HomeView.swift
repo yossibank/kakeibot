@@ -248,7 +248,7 @@ private extension HomeView {
         }
         .padding(16)
         .padding(.top, 4)
-        .card(cornerRadius: 24)
+        .card()
     }
 
     var templateCard: some View {
