@@ -8,6 +8,7 @@ public struct EntryCategory: Hashable, Sendable {
     public var iconId: Icon.ID
     public var sortOrder: Int
     public var archivedAt: Date?
+    public var walletId: Wallet.ID?
     public var createdAt: Date
     public var updatedAt: Date
 
@@ -18,6 +19,7 @@ public struct EntryCategory: Hashable, Sendable {
         iconId: Icon.ID,
         sortOrder: Int,
         archivedAt: Date? = nil,
+        walletId: Wallet.ID? = nil,
         createdAt: Date,
         updatedAt: Date
     ) {
@@ -27,6 +29,7 @@ public struct EntryCategory: Hashable, Sendable {
         self.iconId = iconId
         self.sortOrder = sortOrder
         self.archivedAt = archivedAt
+        self.walletId = walletId
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -53,6 +56,7 @@ extension EntryCategory: Codable {
         try container.encode(iconId, forKey: .iconId)
         try container.encode(sortOrder, forKey: .sortOrder)
         try container.encodeOrNull(archivedAt, forKey: .archivedAt)
+        try container.encodeOrNull(walletId, forKey: .walletId)
         try container.encode(createdAt, forKey: .createdAt)
         try container.encode(updatedAt, forKey: .updatedAt)
     }

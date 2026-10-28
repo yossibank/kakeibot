@@ -51,6 +51,7 @@
 | `archivedAt`（`templates`・`recurrings`） | 無ければ、空として読む |
 | `holidayShift`（`recurrings`） | 無ければ、`none` として読む |
 | `closingDay`（`recurrings`） | 無ければ、空として読む |
+| `walletId`（`categories`） | 無ければ、空として読む |
 | `fee`（`recurrings`） | 無ければ、空として読む |
 | `loanAmount`（`wallets`） | 無ければ、空として読む |
 | `valuations` | 無いファイルは、空として読む |

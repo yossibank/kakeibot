@@ -64,8 +64,16 @@ private extension AppDatabase {
     """
 
     static func entryOptions(in db: Database) throws -> EntryOptions {
-        let categories = try EntryCategory.unarchivedInOrder().fetchAll(db)
-        let tags = try EntryTag.order(EntryTag.sortOrder).fetchAll(db)
+        let categories = try EntryCategory
+            .unarchivedInOrder()
+            .filter(Column("wallet_id") == nil)
+            .fetchAll(db)
+
+        let tags = try EntryTag
+            .order(EntryTag.sortOrder)
+            .filter(sql: "category_id IN (SELECT id FROM category WHERE wallet_id IS NULL)")
+            .fetchAll(db)
+
         let wallets = try Wallet.unarchivedInOrder().fetchAll(db)
         let expenseCategories = categories.filter { $0.kind == .expense }
         let incomeCategories = categories.filter { $0.kind == .income }

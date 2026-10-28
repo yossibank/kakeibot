@@ -121,6 +121,7 @@ private extension AppDatabase {
 
         let sameKind = EntryCategory
             .filter(Column("kind") == draft.kind.rawValue)
+            .filter(Column("wallet_id") == nil)
 
         let sortOrder = try EntryCategory.nextSortOrder(of: sameKind, in: db)
 

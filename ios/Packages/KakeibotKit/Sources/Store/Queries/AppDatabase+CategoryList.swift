@@ -16,10 +16,14 @@ public extension AppDatabase {
 private extension AppDatabase {
     static func categoryList(in db: Database) throws -> CategoryList {
         let categories = try EntryCategory
+            .filter(Column("wallet_id") == nil)
             .order(EntryCategory.sortOrder)
             .fetchAll(db)
 
-        let tags = try EntryTag.unarchivedInOrder().fetchAll(db)
+        let tags = try EntryTag
+            .unarchivedInOrder()
+            .filter(sql: "category_id IN (SELECT id FROM category WHERE wallet_id IS NULL)")
+            .fetchAll(db)
         let pairs = try Icon.fetchAll(db).map { ($0.id, $0) }
         let icons = Dictionary(uniqueKeysWithValues: pairs)
 
