@@ -69,16 +69,16 @@ public struct BackupView: View {
                             )
                         }
 
-                        if let day = model.previousDay {
+                        ForEach(model.previous) { item in
                             Hairline()
 
                             Button {
-                                restorePrevious()
+                                restorePrevious(item)
                             } label: {
                                 action(
-                                    "読み込む前のデータに戻す",
+                                    model.previousTitle(of: item),
                                     systemImage: "arrow.uturn.backward",
-                                    detail: "\(day) に退避したデータに戻せます"
+                                    detail: "\(model.previousDay(of: item)) に退避したデータに戻せます"
                                 )
                             }
                         }
@@ -118,6 +118,9 @@ public struct BackupView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
+        .task {
+            await model.loadPrevious()
+        }
         .animation(.snappy, value: model.doneMessage)
         .fileExporter(
             isPresented: $isExporting,
@@ -219,8 +222,10 @@ private extension BackupView {
         isImporting = true
     }
 
-    func restorePrevious() {
-        isConfirmingRestore = model.readPrevious()
+    func restorePrevious(_ item: BackupModel.Previous) {
+        Task {
+            isConfirmingRestore = await model.readPrevious(item)
+        }
     }
 }
 

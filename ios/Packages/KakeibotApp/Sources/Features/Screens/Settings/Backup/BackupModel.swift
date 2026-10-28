@@ -11,7 +11,7 @@ public final class BackupModel {
     public private(set) var pending: ExportV1?
     public private(set) var doneMessage: String?
     public private(set) var isWorking = false
-    public private(set) var previousDate: Date?
+    public private(set) var previous: [Previous] = []
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -30,7 +30,6 @@ public final class BackupModel {
         self.stash = stash
         self.permission = permission
         self.appVersion = appVersion
-        self.previousDate = Self.exportedAt(of: stash.load())
     }
 }
 
@@ -39,6 +38,15 @@ public extension BackupModel {
         public let kind: FileKind
         public let data: Data
         public let name: String
+    }
+
+    struct Previous: Equatable, Identifiable, Sendable {
+        public let url: URL
+        public let date: Date
+
+        public var id: URL {
+            url
+        }
     }
 
     enum FileKind: String, Sendable {
@@ -58,8 +66,22 @@ public extension BackupModel {
         return "\(date) に書き出した\(counts)に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます"
     }
 
-    var previousDay: String? {
-        previousDate.map(Self.dayText)
+    func loadPrevious() async {
+        let stash = stash
+
+        previous = await Task.detached {
+            Self.previous(in: stash)
+        }.value
+    }
+
+    func previousDay(of item: Previous) -> String {
+        Self.dayText(item.date)
+    }
+
+    func previousTitle(of item: Previous) -> String {
+        let text = Self.dayTimeText(item.date)
+
+        return "読み込む前のデータに戻す（\(text)）"
     }
 
     @discardableResult
@@ -134,15 +156,20 @@ public extension BackupModel {
     }
 
     @discardableResult
-    func readPrevious() -> Bool {
+    func readPrevious(_ item: Previous) async -> Bool {
         doneMessage = nil
 
-        guard let data = stash.load() else {
-            errorNotice.show(Self.readFailedMessage)
+        let result = await Task.detached {
+            Result { try ExportV1(json: Data(contentsOf: item.url)) }
+        }.value
+
+        do {
+            pending = try result.get()
+            return true
+        } catch {
+            errorNotice.show(Self.readMessage(for: error))
             return false
         }
-
-        return read(data)
     }
 
     func cancelRestore() {
@@ -162,11 +189,16 @@ public extension BackupModel {
 
         do {
             let app = ExportV1.App(platform: .ios, version: appVersion)
-            let current = try await database.backup(at: Date(), app: app)
+            let stash = stash
 
-            try stash.save(current)
-            previousDate = Self.exportedAt(of: current)
-            try await database.restoreBackup(pending)
+            try await database.restoreBackup(
+                pending,
+                stashingAt: Date(),
+                app: app
+            ) {
+                try stash.save($0)
+            }
+
             doneMessage = Self.restoredMessage
 
             if pending.data.needsNotifications {
@@ -176,6 +208,7 @@ public extension BackupModel {
             errorNotice.show(Self.restoreFailedMessage)
         }
 
+        await loadPrevious()
         self.pending = nil
     }
 }
@@ -220,8 +253,12 @@ private extension BackupModel {
         return "kakeibot-\(formatter.string(from: date)).\(kind.rawValue)"
     }
 
-    static func exportedAt(of data: Data?) -> Date? {
-        data.flatMap { try? ExportV1(json: $0) }?.exportedAt
+    nonisolated static func previous(in stash: BackupStash) -> [Previous] {
+        stash.load().compactMap { item in
+            (try? ExportV1(json: item.data)).map {
+                Previous(url: item.url, date: $0.exportedAt)
+            }
+        }
     }
 
     static func dayText(_ date: Date) -> String {
@@ -229,6 +266,15 @@ private extension BackupModel {
 
         formatter.locale = Locale(identifier: "ja_JP")
         formatter.dateFormat = "yyyy/M/d"
+
+        return formatter.string(from: date)
+    }
+
+    static func dayTimeText(_ date: Date) -> String {
+        let formatter = DateFormatter()
+
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.dateFormat = "yyyy/M/d H:mm"
 
         return formatter.string(from: date)
     }

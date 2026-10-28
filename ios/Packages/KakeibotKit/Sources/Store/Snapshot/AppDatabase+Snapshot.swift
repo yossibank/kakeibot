@@ -28,8 +28,20 @@ public extension AppDatabase {
         try await tables().csv()
     }
 
-    func restoreBackup(_ export: ExportV1) async throws {
+    func restoreBackup(
+        _ export: ExportV1,
+        stashingAt date: Date,
+        app: ExportV1.App,
+        stash: @Sendable (Data) throws -> Void
+    ) async throws {
         try await writer.write { db in
+            let current = try ExportV1(
+                exportedAt: date,
+                app: app,
+                data: ExportV1.Tables(fetchingFrom: db)
+            )
+
+            try stash(current.json())
             try Self.replace(with: export.data, in: db)
         }
     }
