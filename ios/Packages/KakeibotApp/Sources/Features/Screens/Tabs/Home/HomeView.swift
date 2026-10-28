@@ -130,7 +130,7 @@ private extension HomeView {
     var dialCard: some View {
         VStack(spacing: 16) {
             ZStack(alignment: .bottom) {
-                HalfDial(progress: model.budgetUsage?.progress, tint: dialTint)
+                HalfDial(progress: dialProgress, tint: dialTint)
 
                 VStack(spacing: 2) {
                     Text(dialTitle)
@@ -153,7 +153,8 @@ private extension HomeView {
             VStack(spacing: 4) {
                 if let usage = model.budgetUsage {
                     VStack(spacing: 4) {
-                        if let warning = usage.warningText {
+                        if !model.isListFailed,
+                           let warning = usage.warningText {
                             Text(warning)
                                 .textFont(.caption, weight: .semibold)
                                 .foregroundStyle(usage.tint)
@@ -219,7 +220,7 @@ private extension HomeView {
             HStack(spacing: 0) {
                 stat(
                     "今日",
-                    amount: model.todayExpense,
+                    amount: listAmount(model.todayExpense),
                     color: Palette.accentStrong
                 )
 
@@ -227,7 +228,7 @@ private extension HomeView {
 
                 stat(
                     model.middleTitle,
-                    amount: model.middleAmount,
+                    amount: listAmount(model.middleAmount),
                     color: Palette.text
                 )
 
@@ -235,7 +236,7 @@ private extension HomeView {
 
                 stat(
                     "今月の収入",
-                    amount: model.monthIncome,
+                    amount: listAmount(model.monthIncome),
                     color: Palette.accent
                 )
             }
@@ -563,7 +564,7 @@ private extension HomeView {
 
     func stat(
         _ title: String,
-        amount: Int,
+        amount: String,
         color: Color
     ) -> some View {
         VStack(spacing: 2) {
@@ -571,7 +572,7 @@ private extension HomeView {
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
-            Text(AmountText.text(amount))
+            Text(amount)
                 .displayFont(.body)
                 .monospacedDigit()
                 .foregroundStyle(color)
@@ -621,6 +622,7 @@ private extension HomeView {
     static let shadowRoom: CGFloat = 32
     static let toolStroke = Palette.accent.opacity(.muted)
     static let billDateWidth: CGFloat = 56
+    static let unknownAmount = "—"
 
     static let stampColumns = [
         GridItem(.adaptive(minimum: 72), spacing: 12, alignment: .leading)
@@ -635,6 +637,10 @@ private extension HomeView {
     }
 
     var dialAmount: String {
+        guard !model.isListFailed else {
+            return Self.unknownAmount
+        }
+
         guard let usage = model.budgetUsage else {
             return AmountText.text(model.monthExpense)
         }
@@ -642,8 +648,16 @@ private extension HomeView {
         return usage.remainingAmountText
     }
 
+    var dialProgress: Double? {
+        model.isListFailed ? nil : model.budgetUsage?.progress
+    }
+
     var dialAmountColor: Color {
-        model.budgetUsage?.amountTint ?? Palette.accentStrong
+        guard !model.isListFailed else {
+            return Palette.subtext
+        }
+
+        return model.budgetUsage?.amountTint ?? Palette.accentStrong
     }
 
     var recurringText: String {
@@ -667,6 +681,10 @@ private extension HomeView {
 
     var templateHint: String {
         model.templates.isEmpty ? "よく使う入力を 1 回で" : "押すとすぐ記録"
+    }
+
+    func listAmount(_ amount: Int) -> String {
+        model.isListFailed ? Self.unknownAmount : AmountText.text(amount)
     }
 
     func daysText(until date: LocalDate) -> String {

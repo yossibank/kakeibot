@@ -3,14 +3,16 @@ import DesignSystem
 import SwiftUI
 
 struct ReviewSharesCard: View {
-    let title: String
+    let title: String?
     let shares: [ReviewModel.Share]
     let total: Total?
     let onOpen: (ReviewModel.Share) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionTitle(title)
+            if let title {
+                SectionTitle(title)
+            }
 
             if shares.isEmpty {
                 Text("この期間の記録はありません")
