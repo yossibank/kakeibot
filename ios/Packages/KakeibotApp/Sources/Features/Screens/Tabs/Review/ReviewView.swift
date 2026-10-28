@@ -552,7 +552,7 @@ private extension ReviewView {
         let month = range.upperBound.yearMonth
 
         switch model.scale {
-        case .week: return PeriodText.range(range)
+        case .week: return PeriodText.range(range, today: model.today)
         case .month: return "\(String(month.year))年 \(month.month)月"
         case .year: return "\(String(month.year))年"
         }

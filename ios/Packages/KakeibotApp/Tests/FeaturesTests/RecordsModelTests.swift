@@ -322,15 +322,40 @@ struct RecordsModelTests {
     @Test
     func opensDayInCalendar() async throws {
         let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let category = try #require(options.expenseCategories.first?.id)
         let model = RecordsModel(database: setup.database, today: setup.today)
         let date = try #require(LocalDate("2026-08-03"))
         model.setLayout(.list)
+        model.isSearching = true
+        model.searchText = "ランチ"
+        model.filter = EntryFilter(categoryIds: [category])
 
         model.open(date)
 
         #expect(model.month.description == "2026-08")
         #expect(model.shownDate == date)
         #expect(model.layout == .calendar)
+        #expect(!model.isSearching)
+        #expect(model.searchText.isEmpty)
+        #expect(model.filter == EntryFilter(categoryIds: [category]))
+    }
+
+    @Test
+    func opensCurrentMonthWithSearchClosed() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        model.move(months: -3)
+        model.selectedDate = try #require(LocalDate("2026-07-03"))
+        model.isSearching = true
+        model.searchText = "ランチ"
+
+        model.openCurrentMonth()
+
+        #expect(model.month.description == "2026-10")
+        #expect(model.shownDate == setup.today)
+        #expect(!model.isSearching)
+        #expect(model.searchText.isEmpty)
     }
 
     @Test

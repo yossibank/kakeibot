@@ -473,7 +473,7 @@ private extension RecordsView {
 
                 Spacer()
 
-                Text(PeriodText.range(summary.range))
+                Text(PeriodText.range(summary.range, today: model.today))
                     .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
@@ -908,7 +908,7 @@ private extension RecordsView {
 
         return HStack(spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("\(date.month)/\(date.day)")
+                Text(PeriodText.day(date, today: model.today))
                     .displayFont(.headline)
                     .foregroundStyle(Palette.accentStrong)
 
@@ -1107,8 +1107,7 @@ private extension RecordsView {
         }
 
         withAnimation(.snappy) {
-            model.isSearching = false
-            model.searchText = ""
+            model.closeSearch()
         }
     }
 
