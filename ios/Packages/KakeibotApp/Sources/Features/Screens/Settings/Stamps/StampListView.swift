@@ -254,31 +254,9 @@ private extension StampListView {
 
         return IconBadge(model.icon(for: shelfIcon), size: 44)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(tileBackground(isHidden: isHidden))
-            .overlay {
-                tileBorder(isHidden: isHidden)
-            }
+            .settingsTileFace(isHidden: isHidden)
             .opacity(opacity)
             .contentShape(.rect)
-    }
-
-    @ViewBuilder
-    func tileBackground(isHidden: Bool) -> some View {
-        if !isHidden {
-            tileShape
-                .fill(Self.tileFill)
-        }
-    }
-
-    @ViewBuilder
-    func tileBorder(isHidden: Bool) -> some View {
-        if isHidden {
-            tileShape
-                .stroke(Palette.subtext.opacity(.muted), style: .dashed)
-        } else {
-            tileShape
-                .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
-        }
     }
 }
 
@@ -298,14 +276,6 @@ private extension StampListView {
         repeating: GridItem(.flexible(), spacing: spacing),
         count: columnCount
     )
-
-    static var tileFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.cardTop, Palette.cardBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
 
     var tileShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))

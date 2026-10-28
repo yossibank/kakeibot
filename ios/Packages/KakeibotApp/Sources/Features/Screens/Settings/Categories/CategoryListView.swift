@@ -280,31 +280,9 @@ private extension CategoryListView {
                 .frame(width: 24, height: 2)
                 .padding(.bottom, 8)
         }
-        .background(tileBackground(isHidden: isHidden))
-        .overlay {
-            tileBorder(isHidden: isHidden)
-        }
+        .settingsTileFace(isHidden: isHidden)
         .opacity(opacity)
         .contentShape(.rect)
-    }
-
-    @ViewBuilder
-    func tileBackground(isHidden: Bool) -> some View {
-        if !isHidden {
-            tileShape
-                .fill(Self.tileFill)
-        }
-    }
-
-    @ViewBuilder
-    func tileBorder(isHidden: Bool) -> some View {
-        if isHidden {
-            tileShape
-                .stroke(Palette.subtext.opacity(.muted), style: .dashed)
-        } else {
-            tileShape
-                .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
-        }
     }
 }
 
@@ -329,14 +307,6 @@ private extension CategoryListView {
         repeating: GridItem(.flexible(), spacing: spacing),
         count: columnCount
     )
-
-    static var tileFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.cardTop, Palette.cardBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
 
     var tileShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))

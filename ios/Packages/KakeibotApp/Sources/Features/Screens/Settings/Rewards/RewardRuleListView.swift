@@ -300,10 +300,7 @@ private extension RewardRuleListView {
             glow(icon)
         }
         .clipShape(tileShape)
-        .background(tileBackground(isHidden: isHidden))
-        .overlay {
-            tileBorder(isHidden: isHidden)
-        }
+        .settingsTileFace(isHidden: isHidden)
         .opacity(opacity)
         .contentShape(.rect)
     }
@@ -333,25 +330,6 @@ private extension RewardRuleListView {
             .blur(radius: 24)
             .offset(x: 36, y: -36)
     }
-
-    @ViewBuilder
-    func tileBackground(isHidden: Bool) -> some View {
-        if !isHidden {
-            tileShape
-                .fill(Self.tileFill)
-        }
-    }
-
-    @ViewBuilder
-    func tileBorder(isHidden: Bool) -> some View {
-        if isHidden {
-            tileShape
-                .stroke(Palette.subtext.opacity(.muted), style: .dashed)
-        } else {
-            tileShape
-                .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
-        }
-    }
 }
 
 private extension RewardRuleListView {
@@ -370,14 +348,6 @@ private extension RewardRuleListView {
         repeating: GridItem(.flexible(), spacing: spacing),
         count: columnCount
     )
-
-    static var tileFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.cardTop, Palette.cardBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
 
     var tileShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
