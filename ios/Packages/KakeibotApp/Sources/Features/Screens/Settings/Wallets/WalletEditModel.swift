@@ -231,6 +231,10 @@ public extension WalletEditModel {
             }
 
             apply(list, to: wallet)
+
+            try await refreshLock(of: wallet, in: list)
+            baseline?.recordedKind = recordedKind
+            baseline?.hasValuations = hasValuations
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
@@ -253,22 +257,8 @@ public extension WalletEditModel {
             apply(WalletDraft(wallet, icon: icon))
             apply(list, to: wallet)
 
-            let recurrings = try await database.recurrings(includingHidden: true)
+            try await refreshLock(of: wallet, in: list)
 
-            let hasRecords = Self.hasRecords(
-                of: wallet,
-                in: list,
-                recurrings: recurrings
-            )
-
-            let locked = WalletDraft(wallet, icon: icon).locked(
-                by: wallet,
-                hasRecords: hasRecords,
-                hasValuations: list.valuations.contains { $0.walletId == wallet.id }
-            )
-
-            recordedKind = locked.recordedKind
-            hasValuations = locked.hasValuations
             isHidden = wallet.archivedAt != nil
             baseline = draft
 
@@ -381,6 +371,28 @@ private extension WalletEditModel {
         }
 
         return hasEntries || hasValuations || hasRecurrings
+    }
+
+    func refreshLock(
+        of wallet: Wallet,
+        in list: EntryList
+    ) async throws {
+        let recurrings = try await database.recurrings(includingHidden: true)
+
+        let hasRecords = Self.hasRecords(
+            of: wallet,
+            in: list,
+            recurrings: recurrings
+        )
+
+        let locked = draft.locked(
+            by: wallet,
+            hasRecords: hasRecords,
+            hasValuations: list.valuations.contains { $0.walletId == wallet.id }
+        )
+
+        recordedKind = locked.recordedKind
+        hasValuations = locked.hasValuations
     }
 
     func followKind(from oldKind: Wallet.Kind) {

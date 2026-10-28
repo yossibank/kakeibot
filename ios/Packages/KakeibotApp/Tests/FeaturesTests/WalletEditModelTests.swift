@@ -254,6 +254,53 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func locksKindRightAfterAddingValuation() async throws {
+        let setup = try await Setup()
+        let adding = WalletEditModel(database: setup.database)
+        adding.name = "積立"
+        adding.kind = .investment
+        let saved = try #require(await adding.save())
+        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        await model.load()
+
+        model.pressValuation(.digit(5))
+        _ = await model.saveValuation()
+        let isChanged = model.isChanged
+        model.kind = .bank
+
+        #expect(!isChanged)
+        #expect(!model.canSave)
+        #expect(model.draft.problems == [.valuedKindLocked])
+    }
+
+    @Test
+    func unlocksKindRightAfterDeletingLastValuation() async throws {
+        let setup = try await Setup()
+        let adding = WalletEditModel(database: setup.database)
+        adding.name = "積立"
+        adding.kind = .investment
+        let saved = try #require(await adding.save())
+
+        try await setup.database.saveValuation(
+            5,
+            of: saved.id,
+            on: LocalDate(Date(), in: .current),
+            at: Date()
+        )
+
+        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        await model.load()
+        let valuation = try #require(model.valuations.first)
+
+        await model.deleteValuation(valuation.id)
+        let isChanged = model.isChanged
+        model.kind = .bank
+
+        #expect(!isChanged)
+        #expect(model.canSave)
+    }
+
+    @Test
     func loadsAndEditsWallet() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
