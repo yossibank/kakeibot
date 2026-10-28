@@ -12,6 +12,7 @@ public final class AssetsGoalEditModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
+    private let baseline: RewardGoalDraft
     private let database: AppDatabase
     private let editing: RewardGoal?
 
@@ -23,6 +24,10 @@ public final class AssetsGoalEditModel {
         self.editing = goal
         self.name = goal?.name ?? ""
         self.calculator = AmountCalculator(amount: goal?.targetAmount ?? 0)
+        self.baseline = RewardGoalDraft(
+            name: goal?.name ?? "",
+            targetAmount: goal?.targetAmount ?? 0
+        )
     }
 }
 
@@ -33,6 +38,10 @@ public extension AssetsGoalEditModel {
 
     var draft: RewardGoalDraft {
         RewardGoalDraft(name: name, targetAmount: calculator.amount)
+    }
+
+    var isChanged: Bool {
+        draft != baseline
     }
 
     var canSave: Bool {

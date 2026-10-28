@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Store
 import SwiftUI
 
 struct EntryWalletSheet: View {
@@ -9,6 +10,7 @@ struct EntryWalletSheet: View {
     @State private var isEditing = false
     @State private var added: Wallet?
     @State private var editing: Wallet?
+    @State private var deletion: Deletion?
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
@@ -64,7 +66,16 @@ struct EntryWalletSheet: View {
             }
         }
         .sheet(item: $editing, onDismiss: reload) { wallet in
-            WalletEditSheet(model: model.editWalletModel(wallet.id))
+            WalletEditSheet(model: model.editWalletModel(wallet.id)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
+        }
+        .deletionNotice($deletion) { deletion in
+            Task {
+                await model.restore(deletion)
+                await model.reloadWallets()
+            }
         }
     }
 }

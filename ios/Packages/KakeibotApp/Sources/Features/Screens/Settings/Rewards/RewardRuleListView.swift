@@ -103,6 +103,10 @@ public struct RewardRuleListView: View {
         .navigationDestination(item: $destination) { destination in
             RewardRuleEditSheet(model: editModel(for: destination)) { deletion in
                 self.deletion = deletion
+            } onHide: {
+                if case let .edit(id) = destination {
+                    hiddenId = id
+                }
             }
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)

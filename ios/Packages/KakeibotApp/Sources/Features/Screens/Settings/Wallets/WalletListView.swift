@@ -107,6 +107,10 @@ public struct WalletListView: View {
             WalletEditSheet(model: editModel(for: destination)) { _ in
             } onDelete: { deletion in
                 self.deletion = deletion
+            } onHide: {
+                if case let .edit(id) = destination {
+                    hiddenId = id
+                }
             }
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)

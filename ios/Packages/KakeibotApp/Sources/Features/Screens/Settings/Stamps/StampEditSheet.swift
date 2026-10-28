@@ -14,14 +14,17 @@ public struct StampEditSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     private let onDelete: (Deletion) -> Void
+    private let onHide: () -> Void
 
     public init(
         model: StampEditModel,
-        onDelete: @escaping (Deletion) -> Void = { _ in }
+        onDelete: @escaping (Deletion) -> Void = { _ in },
+        onHide: @escaping () -> Void = {}
     ) {
         _model = State(initialValue: model)
 
         self.onDelete = onDelete
+        self.onHide = onHide
     }
 
     public var body: some View {
@@ -146,6 +149,10 @@ private extension StampEditSheet {
                 guard await model.setHidden(!model.isHidden) else {
                     return
                 }
+
+                if model.isHidden {
+                    onHide()
+                }
             }
 
             dismiss()
@@ -168,6 +175,10 @@ private extension StampEditSheet {
         focus = nil
 
         if await model.setHidden(isHidden) {
+            if isHidden {
+                onHide()
+            }
+
             dismiss()
         }
     }

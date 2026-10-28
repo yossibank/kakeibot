@@ -16,14 +16,17 @@ public struct RecurringEditSheet: View {
     @Environment(\.notificationPermission) private var permission
 
     private let onDelete: (Deletion) -> Void
+    private let onHide: () -> Void
 
     public init(
         model: RecurringEditModel,
-        onDelete: @escaping (Deletion) -> Void = { _ in }
+        onDelete: @escaping (Deletion) -> Void = { _ in },
+        onHide: @escaping () -> Void = {}
     ) {
         _model = State(initialValue: model)
 
         self.onDelete = onDelete
+        self.onHide = onHide
     }
 
     public var body: some View {
@@ -148,12 +151,7 @@ private extension RecurringEditSheet {
             .padding(.vertical, -Self.fade)
             .scrollDismissesKeyboard(.interactively)
 
-            PrimaryButton(model.saveTitle) {
-                Task {
-                    await save()
-                }
-            }
-            .disabled(!model.canSave)
+            saveButton
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -172,6 +170,15 @@ private extension RecurringEditSheet {
         } onDelete: {
             isConfirmingDelete = true
         }
+    }
+
+    var saveButton: some View {
+        PrimaryButton(model.saveTitle) {
+            Task {
+                await save()
+            }
+        }
+        .disabled(!model.canSave)
     }
 
     var scheduleChooser: some View {
@@ -300,9 +307,7 @@ private extension RecurringEditSheet {
                     model.press(key)
                 }
 
-                PrimaryButton("決める") {
-                    closePanel()
-                }
+                saveButton
             }
         case .category:
             SettingsTileGrid(
@@ -379,9 +384,7 @@ private extension RecurringEditSheet {
                     model.pressFee(key)
                 }
 
-                PrimaryButton("決める") {
-                    closePanel()
-                }
+                saveButton
             }
         case .remind:
             remindChooser
@@ -536,7 +539,8 @@ private extension RecurringEditSheet {
             systemImage: "yensign.circle",
             title: "手数料",
             value: model.fee > 0 ? AmountText.text(model.fee) : "なし",
-            isEmpty: model.fee == 0
+            isEmpty: model.fee == 0,
+            isAmount: true
         )
 
         guard model.canUseClosingDay else {
@@ -646,6 +650,10 @@ private extension RecurringEditSheet {
                 guard await model.setHidden(!model.isHidden) else {
                     return
                 }
+
+                if model.isHidden {
+                    onHide()
+                }
             }
 
             dismiss()
@@ -673,6 +681,10 @@ private extension RecurringEditSheet {
 
     func setHidden(_ isHidden: Bool) async {
         if await model.setHidden(isHidden) {
+            if isHidden {
+                onHide()
+            }
+
             dismiss()
         }
     }

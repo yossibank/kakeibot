@@ -103,6 +103,10 @@ public struct StampListView: View {
         .navigationDestination(item: $destination) { destination in
             StampEditSheet(model: editModel(for: destination)) { deletion in
                 self.deletion = deletion
+            } onHide: {
+                if case let .edit(id) = destination {
+                    hiddenId = id
+                }
             }
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)

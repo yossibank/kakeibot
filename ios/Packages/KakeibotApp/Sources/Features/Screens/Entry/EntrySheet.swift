@@ -625,7 +625,10 @@ private extension EntrySheet {
             CategoryEditSheet(
                 model: model.editCategoryModel(category),
                 startsAddingTag: true
-            )
+            ) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
         case .newTemplate:
             TemplateEditSheet(model: model.newTemplateModel())
         case .categories:
