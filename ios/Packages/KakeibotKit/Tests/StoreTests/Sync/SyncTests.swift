@@ -4,6 +4,33 @@ import GRDB
 import Testing
 
 struct SyncTests {
+    @Test(.timeLimit(.minutes(1)))
+    func notifiesChangeRecordedByTrigger() async throws {
+        let setup = try await Setup()
+        var updates = setup.database.syncChangeUpdates().makeAsyncIterator()
+
+        let first: Void? = try await updates.next()
+        try await setup
+            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        let second: Void? = try await updates.next()
+
+        #expect(first != nil)
+        #expect(second != nil)
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func notifiesQueuedChange() async throws {
+        let setup = try await Setup()
+        var updates = setup.database.syncChangeUpdates().makeAsyncIterator()
+
+        let first: Void? = try await updates.next()
+        try await setup.database.queueAllForSync()
+        let second: Void? = try await updates.next()
+
+        #expect(first != nil)
+        #expect(second != nil)
+    }
+
     @Test
     func recordsChangesOnlyWhenEnabled() async throws {
         let setup = try await Setup(enabled: false)

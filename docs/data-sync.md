@@ -27,6 +27,8 @@
 
 `(table_name, record_id)` が主キー。行が残っていれば保存、無ければ削除として送る。
 
+`WITHOUT ROWID` の表なので、GRDB の見張りは、この表の変更に気づかない。トリガーを通さずに書くときは、`notifyChanges` で見張りに知らせる。
+
 setting は、次の key を記録しない。
 
 - `onboarding_completed`

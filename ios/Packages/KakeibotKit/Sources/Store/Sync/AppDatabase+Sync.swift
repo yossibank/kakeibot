@@ -33,8 +33,10 @@ public extension AppDatabase {
     }
 
     func syncChangeUpdates() -> some AsyncSequence<Void, any Error> {
-        ValueObservation
-            .tracking { db in
+        let tables = (SyncTable.allCases.map(\.rawValue) + ["sync_change"]).map { Table($0) }
+
+        return ValueObservation
+            .tracking(regions: tables) { db in
                 try String.fetchAll(
                     db,
                     sql: "SELECT table_name || '/' || record_id || '/' || version FROM sync_change"
@@ -213,6 +215,8 @@ private extension AppDatabase {
             """,
             arguments: [key.table.rawValue, key.id]
         )
+
+        try db.notifyChanges(in: Table("sync_change"))
     }
 
     static func applyDeletion(
