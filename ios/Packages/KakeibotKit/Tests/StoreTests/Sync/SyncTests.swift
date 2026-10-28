@@ -177,6 +177,24 @@ struct SyncTests {
     }
 
     @Test
+    func keepsLocalDeletionNotYetSent() async throws {
+        let setup = try await Setup()
+
+        try await setup
+            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+
+        let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
+        let remote = SyncRecord(key: key, values: ["created_at": .text("x")])
+
+        try await setup.execute("DELETE FROM no_spend_day")
+        try await setup.database.applySyncChanges(saved: [remote], deleted: [])
+
+        #expect(try await setup.database.syncRecord(for: key) == nil)
+        #expect(try await setup.pendingKeys() == [key])
+    }
+
+    @Test
     func savesEngineState() async throws {
         let setup = try await Setup()
         let state = Data([1, 2, 3])

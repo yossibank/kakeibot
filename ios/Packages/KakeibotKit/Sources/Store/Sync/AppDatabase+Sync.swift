@@ -264,15 +264,30 @@ private extension AppDatabase {
         _ record: SyncRecord,
         in db: Database
     ) throws -> Bool {
+        guard let row = try localRow(for: record.key, in: db) else {
+            return try !isPending(record.key, in: db)
+        }
+
         guard
             record.key.table.hasUpdatedAt,
             case let .text(incoming) = record.values["updated_at"],
-            let local = try localRow(for: record.key, in: db)?["updated_at"] as String?
+            let local = row["updated_at"] as String?
         else {
             return true
         }
 
         return incoming >= local
+    }
+
+    static func isPending(
+        _ key: SyncKey,
+        in db: Database
+    ) throws -> Bool {
+        try Bool.fetchOne(
+            db,
+            sql: "SELECT EXISTS (SELECT 1 FROM sync_change WHERE table_name = ? AND record_id = ?)",
+            arguments: [key.table.rawValue, key.id]
+        ) ?? false
     }
 
     static func removeConflicts(

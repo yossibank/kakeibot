@@ -16,9 +16,7 @@ public enum SyncTable: String, CaseIterable, Sendable {
     case shelfIcon = "shelf_icon"
     case noSpendDay = "no_spend_day"
     case setting
-}
 
-extension SyncTable {
     struct UniqueKey {
         let columns: [String]
         let matchesNull: Bool

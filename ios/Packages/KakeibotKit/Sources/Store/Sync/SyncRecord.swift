@@ -36,9 +36,7 @@ public enum SyncValue: Codable, Hashable, Sendable {
     case null
     case integer(Int64)
     case text(String)
-}
 
-extension SyncValue {
     var databaseValue: DatabaseValue {
         switch self {
         case .null: .null
