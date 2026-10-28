@@ -5,8 +5,6 @@ import SwiftUI
 struct EntryMemoCard: View {
     @Bindable var model: EntryModel
 
-    @Environment(\.themeStyle.corner) private var corner
-
     let isFocused: FocusState<Bool>.Binding
     let onDone: () -> Void
 
@@ -51,12 +49,7 @@ struct EntryMemoCard: View {
             }
         }
         .padding(16)
-        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(20)))
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(20))
-                .stroke(Palette.outline, lineWidth: 1)
-        }
-        .shadow(color: Palette.shadow.opacity(0.45), radius: 20, y: 10)
+        .floatingCard()
         .task {
             isFocused.wrappedValue = true
         }

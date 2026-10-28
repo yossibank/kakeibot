@@ -13,7 +13,6 @@ public struct TemplateEditSheet: View {
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.themeStyle.corner) private var corner
     @Environment(\.themeStyle) private var themeStyle
 
     let onSave: (EntryTemplate) -> Void
@@ -333,12 +332,7 @@ private extension TemplateEditSheet {
             .focused($focus, equals: .memo)
         }
         .padding(16)
-        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(20)))
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(20))
-                .stroke(Palette.outline, lineWidth: 1)
-        }
-        .shadow(color: Palette.shadow.opacity(0.45), radius: 20, y: 10)
+        .floatingCard()
         .task {
             focus = .memo
         }

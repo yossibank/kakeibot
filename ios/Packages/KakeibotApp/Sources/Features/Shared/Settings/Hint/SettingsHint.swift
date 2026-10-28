@@ -3,8 +3,6 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsHint: View {
-    @Environment(\.themeStyle.corner) private var corner
-
     private let flag: SettingsScreenFlag
     private let lines: [Line]
 
@@ -64,18 +62,6 @@ private extension SettingsHint {
         .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
     }
 
-    static var fill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.cardTop, Palette.cardBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
-
     var card: some View {
         HStack(alignment: .top, spacing: 8) {
             VStack(alignment: .leading, spacing: 8) {
@@ -103,11 +89,7 @@ private extension SettingsHint {
         .padding(.leading, 12)
         .padding(.trailing, 8)
         .padding(.vertical, 12)
-        .background(Self.fill, in: shape)
-        .overlay {
-            shape
-                .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
-        }
+        .settingsTileFace(isHidden: false)
     }
 
     func row(_ line: Line) -> some View {

@@ -22,7 +22,7 @@ struct SettingsRowList<Panel: Hashable>: View {
                     }
             }
         }
-        .background(Self.cardFill.opacity(0.7), in: shape)
+        .background(SettingsTile.cardFill.opacity(0.7), in: shape)
         .overlay {
             shape
                 .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
@@ -128,14 +128,6 @@ private extension SettingsRowList {
 private extension SettingsRowList {
     static var markWidth: CGFloat {
         16
-    }
-
-    static var cardFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.cardTop, Palette.cardBottom],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
     }
 
     var shape: RoundedRectangle {
