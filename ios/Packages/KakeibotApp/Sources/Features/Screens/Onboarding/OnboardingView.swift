@@ -120,7 +120,7 @@ private extension OnboardingView {
                 Color.clear
                     .frame(width: 44, height: 44)
             } else {
-                Button("スキップ") {
+                Button("あとで決める") {
                     Task {
                         await finish()
                     }

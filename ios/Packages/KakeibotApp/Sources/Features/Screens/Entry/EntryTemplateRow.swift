@@ -64,7 +64,7 @@ private extension EntryTemplateRow {
     func button(_ template: EntryTemplate) -> some View {
         let isApplied = model.isApplied(template)
         let icon = model.icon(for: template)
-        let amount = template.amount.map { AmountText.text($0) } ?? "入力"
+        let amount = template.amount.map { AmountText.text($0) } ?? "毎回入れる"
 
         let amountColor = template.amount == nil
             ? Palette.subtext

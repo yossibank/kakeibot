@@ -286,7 +286,7 @@ private extension TemplateEditSheet {
                 Text(previewName)
                     .foregroundStyle(Palette.text)
 
-                Text(capsuleAmount)
+                Text(amountValue)
                     .displayFont(.caption)
                     .foregroundStyle(Palette.accentStrong)
             }
@@ -478,10 +478,6 @@ private extension TemplateEditSheet {
 
     var previewName: String {
         model.name.isEmpty ? "名前" : model.name
-    }
-
-    var capsuleAmount: String {
-        model.amount.map { AmountText.text($0) } ?? "入力"
     }
 
     var amountValue: String {
