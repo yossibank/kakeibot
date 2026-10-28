@@ -16,6 +16,7 @@ public struct SettingsSheet: View {
     @State private var isConfirmingSample = false
     @State private var isInsertingSample = false
     @State private var sampleMessage: String?
+    @State private var syncMessage: String?
     #endif
 
     @Environment(\.dismiss) private var dismiss
@@ -570,6 +571,24 @@ private extension SettingsSheet {
                     .foregroundStyle(Palette.subtext)
                     .padding(.leading, 8)
             }
+
+            Button {
+                Task {
+                    await enableSync()
+                }
+            } label: {
+                row("同期を入れる", systemImage: "icloud")
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 16)
+            .card()
+
+            if let syncMessage {
+                Text(syncMessage)
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .padding(.leading, 8)
+            }
         }
     }
 }
@@ -592,6 +611,17 @@ private extension SettingsSheet {
         }
 
         isInsertingSample = false
+    }
+
+    func enableSync() async {
+        do {
+            try await database.setSyncEnabled(true)
+            try await database.queueAllForSync()
+
+            syncMessage = "同期を入れました。アプリを終了して開き直すと始まります"
+        } catch {
+            syncMessage = "同期を入れられませんでした"
+        }
     }
 }
 #endif

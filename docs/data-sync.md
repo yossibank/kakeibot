@@ -46,3 +46,14 @@ setting は、次の key を記録しない。
 | --- | --- | --- |
 | table_name / record_id | TEXT | sync_change と同じ |
 | fields | TEXT | 列の値の JSON |
+
+## sync_record
+
+iCloud にあるレコードの控え。送った行と受け取った行ごとに、CloudKit の system fields を持つ。
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| table_name / record_id | TEXT | sync_change と同じ |
+| system_fields | BLOB | 次に送るときの元にする |
+
+iCloud のアカウントが変わったときと、iCloud のゾーンが消えたときは、全部消す。

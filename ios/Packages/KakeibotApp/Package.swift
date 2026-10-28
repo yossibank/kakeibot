@@ -27,6 +27,7 @@ let package = Package(
                 "DesignSystem",
                 "Features",
                 "Notifications",
+                "Sync",
                 .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
@@ -55,6 +56,12 @@ let package = Package(
             ]
         ),
         .target(
+            name: "Sync",
+            dependencies: [
+                .product(name: "Store", package: "KakeibotKit")
+            ]
+        ),
+        .target(
             name: "DesignSystem",
             dependencies: [
                 .product(name: "Core", package: "KakeibotKit")
@@ -80,6 +87,13 @@ let package = Package(
             dependencies: [
                 "Features",
                 .product(name: "Core", package: "KakeibotKit"),
+                .product(name: "Store", package: "KakeibotKit")
+            ]
+        ),
+        .testTarget(
+            name: "SyncTests",
+            dependencies: [
+                "Sync",
                 .product(name: "Store", package: "KakeibotKit")
             ]
         )

@@ -5,6 +5,7 @@ import Notifications
 import Observation
 import Store
 import SwiftUI
+import Sync
 import WidgetKit
 
 @MainActor
@@ -21,6 +22,7 @@ final class AppModel {
     private let router: NotificationRouter
     private let retryDelays: [Duration]
     private var hasStoppedObservation = false
+    private var syncEngine: SyncEngine?
 
     init(
         openDatabase: @escaping @Sendable () throws -> AppDatabase,
@@ -172,6 +174,21 @@ extension AppModel {
 
         await watch(database.notificationInputUpdates(from: today)) { input in
             await self.schedule(input)
+        }
+    }
+
+    func syncChanges(in database: AppDatabase) async {
+        guard await (try? database.isSyncEnabled()) == true else {
+            return
+        }
+
+        let engine = syncEngine ?? SyncEngine(database: database)
+
+        syncEngine = engine
+        await engine.start()
+
+        await watch(database.pendingSyncChangeUpdates()) { changes in
+            await engine.enqueue(changes)
         }
     }
 

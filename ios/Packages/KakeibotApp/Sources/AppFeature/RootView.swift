@@ -102,6 +102,9 @@ private extension RootView {
             .task(id: model.observationID(model.today)) {
                 await model.observeWidgets(in: database)
             }
+            .task(id: model.observationID(model.today)) {
+                await model.syncChanges(in: database)
+            }
         case .failed:
             ContentUnavailableView {
                 Label("データを開けませんでした", systemImage: "exclamationmark.triangle")

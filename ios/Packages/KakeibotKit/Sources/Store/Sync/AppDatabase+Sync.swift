@@ -28,10 +28,17 @@ public extension AppDatabase {
 
     func pendingSyncChanges() async throws -> [SyncChange] {
         try await writer.read { db in
-            try Row
-                .fetchAll(db, sql: "SELECT table_name, record_id, version FROM sync_change")
-                .compactMap(SyncChange.init)
+            try Self.pendingChanges(in: db)
         }
+    }
+
+    func pendingSyncChangeUpdates() -> some AsyncSequence<[SyncChange], any Error> {
+        ValueObservation
+            .tracking { db in
+                try Self.pendingChanges(in: db)
+            }
+            .removeDuplicates()
+            .values(in: writer)
     }
 
     func removeSyncChanges(_ changes: [SyncChange]) async throws {
@@ -91,6 +98,49 @@ public extension AppDatabase {
             try db.execute(sql: "UPDATE sync_state SET engine_state = ?", arguments: [state])
         }
     }
+
+    func syncSystemFields(for key: SyncKey) async throws -> Data? {
+        try await writer.read { db in
+            try Data.fetchOne(
+                db,
+                sql: "SELECT system_fields FROM sync_record WHERE table_name = ? AND record_id = ?",
+                arguments: [key.table.rawValue, key.id]
+            )
+        }
+    }
+
+    func saveSyncSystemFields(_ fields: [SyncKey: Data]) async throws {
+        try await writer.write { db in
+            for (key, data) in fields {
+                try db.execute(
+                    sql: """
+                    INSERT INTO sync_record (table_name, record_id, system_fields) VALUES (?, ?, ?)
+                    ON CONFLICT (table_name, record_id) DO UPDATE
+                    SET system_fields = excluded.system_fields
+                    """,
+                    arguments: [key.table.rawValue, key.id, data]
+                )
+            }
+        }
+    }
+
+    func removeSyncSystemFields(_ keys: [SyncKey]) async throws {
+        try await writer.write { db in
+            for key in keys {
+                try db.execute(
+                    sql: "DELETE FROM sync_record WHERE table_name = ? AND record_id = ?",
+                    arguments: [key.table.rawValue, key.id]
+                )
+            }
+        }
+    }
+
+    func resetSync() async throws {
+        try await writer.write { db in
+            try db.execute(sql: "UPDATE sync_state SET engine_state = NULL")
+            try db.execute(sql: "DELETE FROM sync_record")
+        }
+    }
 }
 
 private extension AppDatabase {
@@ -133,6 +183,12 @@ private extension AppDatabase {
         }
 
         return ids.filter { !SyncTable.localSettingKeys.contains($0) }
+    }
+
+    static func pendingChanges(in db: Database) throws -> [SyncChange] {
+        try Row
+            .fetchAll(db, sql: "SELECT table_name, record_id, version FROM sync_change")
+            .compactMap { try SyncChange($0, in: db) }
     }
 
     static func localRow(
@@ -345,13 +401,20 @@ private extension AppDatabase {
 }
 
 private extension SyncChange {
-    init?(_ row: Row) {
+    init?(
+        _ row: Row,
+        in db: Database
+    ) throws {
         guard let table = SyncTable(rawValue: row["table_name"]) else {
             return nil
         }
 
+        let key = SyncKey(table: table, id: row["record_id"])
+        let isDeletion = try AppDatabase.localRow(for: key, in: db) == nil
+
         self.init(
-            key: SyncKey(table: table, id: row["record_id"]),
+            key: key,
+            isDeletion: isDeletion,
             version: row["version"]
         )
     }

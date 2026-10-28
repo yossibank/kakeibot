@@ -203,6 +203,42 @@ struct SyncTests {
 
         #expect(try await setup.database.syncEngineState() == state)
     }
+
+    @Test
+    func marksChangeOfMissingRowAsDeletion() async throws {
+        let setup = try await Setup()
+
+        try await setup
+            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        let saved = try await setup.database.pendingSyncChanges().map(\.isDeletion)
+        try await setup.execute("DELETE FROM no_spend_day")
+        let deleted = try await setup.database.pendingSyncChanges().map(\.isDeletion)
+
+        #expect(saved == [false])
+        #expect(deleted == [true])
+    }
+
+    @Test
+    func savesAndResetsSystemFields() async throws {
+        let setup = try await Setup()
+        let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
+        let other = SyncKey(table: .noSpendDay, id: "2026-10-02")
+        let fields = Data([1, 2, 3])
+
+        try await setup.database.saveSyncSystemFields([key: fields, other: fields])
+        try await setup.database.saveSyncEngineState(Data([4]))
+        let saved = try await setup.database.syncSystemFields(for: key)
+
+        try await setup.database.removeSyncSystemFields([key])
+        let removed = try await setup.database.syncSystemFields(for: key)
+
+        try await setup.database.resetSync()
+
+        #expect(saved == fields)
+        #expect(removed == nil)
+        #expect(try await setup.database.syncSystemFields(for: other) == nil)
+        #expect(try await setup.database.syncEngineState() == nil)
+    }
 }
 
 extension SyncTests {
