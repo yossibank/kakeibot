@@ -141,6 +141,10 @@ public extension RecordsModel {
         pendingDeleteIDs.count
     }
 
+    func rewardRules(on date: LocalDate) -> [RewardRule] {
+        rewardBank?.rules(on: date) ?? []
+    }
+
     func batchCategories(for type: Entry.Kind) -> [EntryCategory] {
         let categories = list?.filterCategories ?? []
         return categories.filter { $0.kind.rawValue == type.rawValue }
@@ -291,6 +295,10 @@ public extension RecordsModel {
 
         let isAchieved = !isAchieved(rule, on: date)
 
+        guard rule.isActive || !isAchieved else {
+            return
+        }
+
         do {
             try await database.setReward(
                 rule.id,
@@ -298,6 +306,8 @@ public extension RecordsModel {
                 on: date,
                 at: Date()
             )
+        } catch AppDatabase.RewardRuleWriteError.shortOfBalance {
+            errorNotice.show(Self.rewardShortOfBalanceMessage)
         } catch {
             errorNotice.show(Self.saveFailedMessage)
         }
@@ -417,6 +427,7 @@ public extension RecordsModel {
 private extension RecordsModel {
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
+    static let rewardShortOfBalanceMessage = "貯金箱の残高が足りないため、達成を外せません"
     static let recurringTitle = "固定費"
     static let confirmDeleteThreshold = 10
 

@@ -19,12 +19,26 @@ public extension AppDatabase {
                 .filter(Column("date") == date)
 
             guard isAchieved else {
+                let cleared = try saved.fetchAll(db).reduce(0) { $0 + $1.amount }
+                let logs = try RewardLog.fetchAll(db)
+                let goals = try RewardGoal.fetchAll(db)
+
+                let balance = RewardBalance.amount(logs: logs, goals: goals)
+
+                guard balance - cleared >= 0 else {
+                    throw RewardRuleWriteError.shortOfBalance
+                }
+
                 try saved.deleteAll(db)
                 return
             }
 
             guard try saved.fetchCount(db) == 0 else {
                 return
+            }
+
+            guard rule.isActive else {
+                throw RewardRuleWriteError.isHidden
             }
 
             let log = RewardLog(

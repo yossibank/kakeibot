@@ -111,7 +111,7 @@ public struct RewardRuleListView: View {
             isPresented: $isConfirmingDeleteHidden,
             systemImage: "trash",
             title: "非表示のごほうびをまとめて削除しますか",
-            message: "貯めた記録も消えます",
+            message: "貯めた記録があるものは残ります",
             keepTitle: "やめる",
             confirmTitle: "まとめて削除する"
         ) {

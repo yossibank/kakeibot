@@ -24,7 +24,7 @@ public struct RecordsRewardSheet: View {
             VStack(spacing: 20) {
                 header
 
-                if model.rewardRules.isEmpty {
+                if rules.isEmpty {
                     RecordsSheetEmpty(
                         systemImage: "gift",
                         title: "ごほうびの決まりがまだありません",
@@ -35,11 +35,11 @@ public struct RecordsRewardSheet: View {
                     }
                 } else {
                     VStack(spacing: 8) {
-                        ForEach(model.rewardRules) { rule in
+                        ForEach(rules) { rule in
                             row(rule)
                         }
                     }
-                    .sharesTextScale(id: model.rewardRules.map(\.name))
+                    .sharesTextScale(id: rules.map(\.name))
 
                     total
                 }
@@ -53,6 +53,10 @@ public struct RecordsRewardSheet: View {
 }
 
 private extension RecordsRewardSheet {
+    var rules: [RewardRule] {
+        model.rewardRules(on: date)
+    }
+
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
     }
@@ -72,7 +76,7 @@ private extension RecordsRewardSheet {
 
             Spacer()
 
-            if model.rewardRules.isEmpty {
+            if rules.isEmpty {
                 Color.clear
                     .frame(width: 44, height: 44)
             } else {

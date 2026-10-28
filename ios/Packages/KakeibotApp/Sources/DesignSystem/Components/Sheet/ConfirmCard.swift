@@ -8,7 +8,7 @@ public struct ConfirmCard: View {
 
     private let systemImage: String
     private let title: String
-    private let message: String
+    private let message: String?
     private let keepTitle: String
     private let confirmTitle: String
     private let alternateTitle: String?
@@ -20,7 +20,7 @@ public struct ConfirmCard: View {
     public init(
         systemImage: String,
         title: String,
-        message: String,
+        message: String? = nil,
         keepTitle: String,
         confirmTitle: String,
         alternateTitle: String? = nil,
@@ -74,7 +74,7 @@ public extension View {
         isPresented: Binding<Bool>,
         systemImage: String,
         title: String,
-        message: String,
+        message: String? = nil,
         keepTitle: String,
         confirmTitle: String,
         alternateTitle: String? = nil,
@@ -149,11 +149,13 @@ private extension ConfirmCard {
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text(message)
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+                if let message {
+                    Text(message)
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
 
             VStack(spacing: 12) {

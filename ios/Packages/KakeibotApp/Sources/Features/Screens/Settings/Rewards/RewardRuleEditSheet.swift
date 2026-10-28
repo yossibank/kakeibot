@@ -91,14 +91,23 @@ public struct RewardRuleEditSheet: View {
         }
         .confirmation(
             isPresented: $isConfirmingDelete,
-            systemImage: "trash",
-            title: "このごほうびを削除しますか",
-            message: "このごほうびで貯めた記録も消えます",
+            systemImage: model.hasLogs ? "eye.slash" : "trash",
+            title: model.hasLogs
+                ? "このごほうびは削除できません"
+                : "このごほうびを削除しますか",
+            message: model.hasLogs
+                ? "貯めた記録があります。非表示にすると、貯めた分を残したまま一覧から外せます"
+                : nil,
             keepTitle: "やめる",
-            confirmTitle: "削除する"
+            confirmTitle: model.hasLogs ? "非表示にする" : "削除する",
+            role: model.hasLogs ? .suggestion : .destructive
         ) {
-            Task {
-                await delete()
+            if model.hasLogs {
+                toggleHidden()
+            } else {
+                Task {
+                    await delete()
+                }
             }
         }
         .onChange(of: focus) {
@@ -182,7 +191,8 @@ private extension RewardRuleEditSheet {
         SettingsEditHeader(
             title: model.isEditing ? "ごほうびを編集" : "ごほうびを追加",
             isEditing: model.isEditing,
-            isHidden: model.isHidden
+            isHidden: model.isHidden,
+            canDelete: !(model.isHidden && model.hasLogs)
         ) {
             close()
         } onHide: {
