@@ -65,6 +65,45 @@ struct SyncConflictTests {
         #expect(stamps == "local")
         #expect(try await setup.pendingKeys() == [])
     }
+
+    @Test
+    func replacedRowArrivesWithItsOldRowDeletion() async throws {
+        let a = try await SyncTests.Setup()
+        let b = try await SyncTests.Setup()
+
+        try await a.execute(Self.insertOldBudget)
+        try await b.receive(a.outgoing())
+        try await a.execute(Self.replaceBudget)
+        try await b.receive(a.outgoing())
+
+        let budgets = try await b.value(Self.budgetIDs)
+
+        #expect(budgets == "b2")
+    }
+
+    @Test
+    func replacedRowArrivesBeforeItsOldRowDeletion() async throws {
+        let a = try await SyncTests.Setup()
+        let b = try await SyncTests.Setup()
+
+        try await a.execute(Self.insertOldBudget)
+        try await b.receive(a.outgoing())
+        try await a.execute(Self.replaceBudget)
+
+        let changes = try await a.outgoing()
+
+        try await b.database.applySyncChanges(
+            saved: changes.saved,
+            deleted: [],
+            systemFields: changes.systemFields
+        )
+
+        try await b.database.applySyncChanges(saved: [], deleted: changes.deleted)
+
+        let budgets = try await b.value(Self.budgetIDs)
+
+        #expect(budgets == "b2")
+    }
 }
 
 extension SyncConflictTests {
@@ -73,6 +112,19 @@ extension SyncConflictTests {
         var deleted: [SyncRecordID] = []
         var systemFields: [SyncRecordID: Data] = [:]
     }
+}
+
+private extension SyncConflictTests {
+    static let budgetIDs = "SELECT group_concat(id) FROM budget WHERE from_month = '2026-11'"
+
+    static let insertOldBudget = """
+    INSERT INTO budget (id, category_id, from_month, amount) VALUES ('b1', NULL, '2026-11', 50000)
+    """
+
+    static let replaceBudget = """
+    DELETE FROM budget WHERE id = 'b1';
+    INSERT INTO budget (id, category_id, from_month, amount) VALUES ('b2', NULL, '2026-11', 60000)
+    """
 }
 
 extension SyncTests.Setup {
