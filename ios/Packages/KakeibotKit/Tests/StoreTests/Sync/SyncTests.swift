@@ -1,3 +1,4 @@
+import Core
 import Foundation
 import GRDB
 @testable import Store
@@ -333,12 +334,29 @@ extension SyncTests.Setup {
         }
     }
 
+    func joinForeignShare(of walletID: String) async throws {
+        let id = try #require(Wallet.ID(walletID))
+        let zone = SyncZone.wallet(id)
+        let zoned = SyncKey(table: .wallet, id: walletID).recordID(in: zone)
+
+        try await database.applySyncChanges(
+            saved: [],
+            deleted: [],
+            systemFields: [zoned: Data([1])],
+            owners: [zone: "owner"]
+        )
+    }
+
     func pendingKeys() async throws -> [SyncKey] {
         try await database.pendingSyncChanges().map(\.key)
     }
 
     func walletID() async throws -> String {
         try await value("SELECT id FROM wallet ORDER BY sort_order")
+    }
+
+    func otherWalletID() async throws -> String {
+        try await value("SELECT id FROM wallet ORDER BY sort_order LIMIT 1 OFFSET 1")
     }
 
     func categoryID() async throws -> String {

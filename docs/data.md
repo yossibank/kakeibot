@@ -350,6 +350,8 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで |
 | widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。その記録で支出なしの印を消したときは、`,` に続けてその日付（`2026-10-03`）を付ける。取り消すと消す |
 | fee_category_id | 振替の手数料に付ける category の id |
+| transfer_out_category_id | 抜けた共有の財布への振替を支出に変えるときに付ける category の id |
+| transfer_in_category_id | 抜けた共有の財布からの振替を収入に変えるときに付ける category の id |
 
 列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
 

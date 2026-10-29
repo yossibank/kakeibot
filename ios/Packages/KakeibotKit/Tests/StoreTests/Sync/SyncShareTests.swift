@@ -340,10 +340,6 @@ private extension SyncTests.Setup {
         return []
     }
 
-    func otherWalletID() async throws -> String {
-        try await value("SELECT id FROM wallet ORDER BY sort_order LIMIT 1 OFFSET 1")
-    }
-
     func zone(
         _ table: SyncTable,
         _ id: String

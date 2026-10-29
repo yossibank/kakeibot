@@ -218,6 +218,7 @@ private extension AppDatabase {
                 )
             }
 
+            try leaveSharedWallet(id, in: db, at: Date())
             try db.notifyChanges(in: Table("sync_change"))
             return
         }
