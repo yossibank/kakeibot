@@ -78,7 +78,6 @@ private extension EntryDateSheet {
             },
             set: { date in
                 model.date = date
-
                 dismiss()
             }
         )

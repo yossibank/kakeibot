@@ -51,7 +51,8 @@ struct EntryWalletSheet: View {
                     }
                 }
 
-                if showsBills, !isEditing {
+                if showsBills,
+                   !isEditing {
                     billSection
                         .transition(Self.billTransition)
                 }
@@ -85,6 +86,32 @@ extension EntryWalletSheet {
 }
 
 private extension EntryWalletSheet {
+    var billSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SectionTitle("請求")
+
+            HStack(spacing: 12) {
+                ForEach(model.billChoices) { choice in
+                    billButton(choice)
+                }
+            }
+
+            if let billNote {
+                Text(billNote)
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 4)
+            }
+
+            PrimaryButton(decideTitle) {
+                dismiss()
+            }
+            .padding(.top, 8)
+        }
+        .sensoryFeedback(.selection, trigger: model.billMonth)
+    }
+
     func walletRow(_ wallet: Wallet) -> some View {
         let isSelected = selectedId == wallet.id
         let isTaken = takenId == wallet.id
@@ -94,7 +121,6 @@ private extension EntryWalletSheet {
         return Button {
             guard !isEditing else {
                 editing = wallet
-
                 return
             }
 
@@ -156,34 +182,6 @@ private extension EntryWalletSheet {
         .buttonStyle(.plain)
         .disabled(isTaken && !isEditing)
         .opacity(isTaken && !isEditing ? 0.45 : 1)
-    }
-}
-
-private extension EntryWalletSheet {
-    var billSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SectionTitle("請求")
-
-            HStack(spacing: 12) {
-                ForEach(model.billChoices) { choice in
-                    billButton(choice)
-                }
-            }
-
-            if let billNote {
-                Text(billNote)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 4)
-            }
-
-            PrimaryButton(decideTitle) {
-                dismiss()
-            }
-            .padding(.top, 8)
-        }
-        .sensoryFeedback(.selection, trigger: model.billMonth)
     }
 
     func billButton(_ choice: EntryModel.BillChoice) -> some View {

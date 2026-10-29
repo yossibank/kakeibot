@@ -18,7 +18,8 @@ struct EntryDialFace: View {
                             .sansFont(.caption, weight: .semibold)
 
                         Text("手数料")
-                    } else if model.type == .transfer, let route = model.routeText {
+                    } else if model.type == .transfer,
+                              let route = model.routeText {
                         Image(systemName: "arrow.left.arrow.right")
                             .sansFont(.caption, weight: .semibold)
 
@@ -107,7 +108,8 @@ private extension EntryDialFace {
             return "振替 \(AmountText.text(model.amount))"
         }
 
-        if model.type == .transfer, model.fee > 0 {
+        if model.type == .transfer,
+           model.fee > 0 {
             let fee = "手数料 \(AmountText.text(model.fee))"
             return [fee, model.sourceBalanceText].compactMap(\.self).joined(separator: "・")
         }
@@ -121,7 +123,8 @@ private extension EntryDialFace {
     }
 
     var noteColor: Color {
-        if model.expressionText == nil, model.isOverSourceBalance {
+        if model.expressionText == nil,
+           model.isOverSourceBalance {
             return Palette.rose
         }
 
