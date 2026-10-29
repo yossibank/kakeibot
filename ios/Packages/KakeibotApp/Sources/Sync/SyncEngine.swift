@@ -26,10 +26,10 @@ public actor SyncEngine {
 public extension SyncEngine {
     static let containerIdentifier = "iCloud.com.yossibank.kakeibot"
 
-    static func isAccountAvailable(
+    static func accountStatus(
         in container: CKContainer = CKContainer(identifier: containerIdentifier)
-    ) async -> Bool {
-        await (try? container.accountStatus()) == .available
+    ) async -> CKAccountStatus {
+        await (try? container.accountStatus()) ?? .couldNotDetermine
     }
 
     static func hasCloudData(

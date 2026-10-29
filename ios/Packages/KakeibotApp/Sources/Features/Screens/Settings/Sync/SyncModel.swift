@@ -8,7 +8,7 @@ import Store
 @Observable
 public final class SyncModel {
     public private(set) var isOn = false
-    public private(set) var isAvailable = true
+    public private(set) var account = SyncAccount.available
     public private(set) var isWorking = false
     public private(set) var pendingCount: Int?
     public private(set) var stopReason: SyncStopReason?
@@ -31,6 +31,24 @@ public final class SyncModel {
 }
 
 public extension SyncModel {
+    var isAvailable: Bool {
+        account == .available
+    }
+
+    var footnote: String {
+        guard !isOn else {
+            return Self.keepsDataNote
+        }
+
+        return switch account {
+        case .available: Self.keepsDataNote
+        case .noAccount: "設定アプリで iCloud にサインインすると使えます"
+        case .restricted: "この iPhone では、制限で iCloud を使えません"
+        case .temporarilyUnavailable: "設定アプリで iCloud にサインインし直すと使えます"
+        case .couldNotDetermine: "iCloud の状態を確かめられませんでした。時間をおいて開き直してください"
+        }
+    }
+
     func load() async {
         do {
             isOn = try await database.isSyncEnabled()
@@ -38,7 +56,11 @@ public extension SyncModel {
             errorNotice.show(Self.loadFailedMessage)
         }
 
-        isAvailable = await cloud.isAvailable()
+        account = await cloud.account()
+    }
+
+    func refreshAccount() async {
+        account = await cloud.account()
     }
 
     func observeStatus() async {
@@ -123,6 +145,7 @@ public extension SyncModel {
 }
 
 private extension SyncModel {
+    static let keepsDataNote = "切っても、この iPhone のデータは残ります"
     static let loadFailedMessage = "同期の状態を読み込めませんでした"
     static let saveFailedMessage = "同期を切り替えられませんでした。時間をおいて試してください"
     static let shareFailedMessage = "共有を開けませんでした。時間をおいて試してください"
@@ -136,7 +159,7 @@ private extension SyncModel {
     }
 
     func turnOn() async {
-        isAvailable = await cloud.isAvailable()
+        account = await cloud.account()
 
         guard isAvailable else {
             return

@@ -5,6 +5,8 @@ import SwiftUI
 public struct SyncView: View {
     @State private var model: SyncModel
 
+    @Environment(\.scenePhase) private var scenePhase
+
     public init(model: SyncModel) {
         _model = State(initialValue: model)
     }
@@ -67,7 +69,7 @@ public struct SyncView: View {
                             }
                         }
 
-                        Text(footnote)
+                        Text(model.footnote)
                             .textFont(.footnote)
                             .foregroundStyle(Palette.subtext)
                             .padding(.leading, 8)
@@ -128,6 +130,13 @@ public struct SyncView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task {
+                    await model.refreshAccount()
+                }
+            }
+        }
         .task {
             await model.load()
         }
@@ -224,12 +233,6 @@ private extension SyncView {
 
     var canChange: Bool {
         model.isOn || model.isAvailable
-    }
-
-    var footnote: String {
-        model.isAvailable || model.isOn
-            ? "切っても、この iPhone のデータは残ります"
-            : "設定アプリで iCloud にサインインすると使えます"
     }
 
     var onBinding: Binding<Bool> {

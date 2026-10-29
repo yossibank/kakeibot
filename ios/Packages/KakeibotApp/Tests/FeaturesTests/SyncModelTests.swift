@@ -53,13 +53,48 @@ struct SyncModelTests {
     @Test
     func staysOffWhenSignedOut() async throws {
         let setup = try await HomeModelTests.Setup()
-        let cloud = FakeCloud(isAvailable: false, hasData: false)
+        let cloud = FakeCloud(account: .noAccount, hasData: false)
         let model = SyncModel(database: setup.database, cloud: cloud.cloud)
 
         await model.setOn(true)
 
         #expect(model.isOn == false)
         #expect(model.isAvailable == false)
+    }
+
+    @Test(
+        arguments: [
+            (SyncAccount.noAccount, "設定アプリで iCloud にサインインすると使えます"),
+            (.restricted, "この iPhone では、制限で iCloud を使えません"),
+            (.temporarilyUnavailable, "設定アプリで iCloud にサインインし直すと使えます"),
+            (.couldNotDetermine, "iCloud の状態を確かめられませんでした。時間をおいて開き直してください")
+        ]
+    )
+    func explainsWhyICloudCannotBeUsed(
+        account: SyncAccount,
+        expected: String
+    ) async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(account: account, hasData: false)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+
+        await model.load()
+
+        #expect(model.footnote == expected)
+    }
+
+    @Test
+    func checksICloudAgainWhenBack() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(account: .noAccount, hasData: false)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+
+        await model.load()
+        await cloud.signIn()
+        await model.refreshAccount()
+
+        #expect(model.isAvailable)
+        #expect(model.footnote == "切っても、この iPhone のデータは残ります")
     }
 
     @Test
@@ -238,20 +273,20 @@ extension SyncModelTests {
         private(set) var deleted = false
         private(set) var shareCalls: [String] = []
 
-        private let isAvailable: Bool
+        private var account: SyncAccount
         private let hasData: Bool
         private let stopsInSheet: Bool
         private let failsToCreate: Bool
         private let failsToDelete: Bool
 
         init(
-            isAvailable: Bool = true,
+            account: SyncAccount = .available,
             hasData: Bool,
             stopsInSheet: Bool = false,
             failsToCreate: Bool = false,
             failsToDelete: Bool = false
         ) {
-            self.isAvailable = isAvailable
+            self.account = account
             self.hasData = hasData
             self.stopsInSheet = stopsInSheet
             self.failsToCreate = failsToCreate
@@ -263,7 +298,7 @@ extension SyncModelTests {
 extension SyncModelTests.FakeCloud {
     nonisolated var cloud: SyncCloud {
         SyncCloud {
-            self.isAvailable
+            await self.account
         } hasData: {
             self.hasData
         } deleteData: {
@@ -283,6 +318,10 @@ extension SyncModelTests.FakeCloud {
 
     func delete() {
         deleted = true
+    }
+
+    func signIn() {
+        account = .available
     }
 
     func record(_ call: String) {

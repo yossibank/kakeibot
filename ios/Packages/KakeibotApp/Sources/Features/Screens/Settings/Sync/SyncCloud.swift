@@ -2,7 +2,7 @@ import Core
 import SwiftUI
 
 public struct SyncCloud: Sendable {
-    public let isAvailable: Check
+    public let account: Account
     public let hasData: DataCheck
     public let deleteData: Delete
     public let createShare: CreateShare
@@ -10,14 +10,14 @@ public struct SyncCloud: Sendable {
     public let deleteShare: DeleteShare
 
     public init(
-        isAvailable: @escaping Check,
+        account: @escaping Account,
         hasData: @escaping DataCheck,
         deleteData: @escaping Delete,
         createShare: @escaping CreateShare,
         showShare: @escaping ShowShare,
         deleteShare: @escaping DeleteShare
     ) {
-        self.isAvailable = isAvailable
+        self.account = account
         self.hasData = hasData
         self.deleteData = deleteData
         self.createShare = createShare
@@ -27,7 +27,7 @@ public struct SyncCloud: Sendable {
 }
 
 public extension SyncCloud {
-    typealias Check = @Sendable () async -> Bool
+    typealias Account = @Sendable () async -> SyncAccount
     typealias DataCheck = @Sendable () async throws -> Bool
     typealias Delete = @Sendable () async throws -> Void
     typealias CreateShare = @Sendable (Wallet.ID, String) async throws -> Void
@@ -36,8 +36,8 @@ public extension SyncCloud {
     typealias DeleteShare = @Sendable (Wallet.ID) async throws -> Void
 
     static let unavailable = Self(
-        isAvailable: {
-            false
+        account: {
+            .noAccount
         },
         hasData: {
             false
