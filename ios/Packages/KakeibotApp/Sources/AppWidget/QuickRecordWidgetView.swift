@@ -147,7 +147,6 @@ private extension QuickRecordWidgetView {
                 gridRow(2, of: tiles, padding: metrics.tilePadding)
             }
         }
-        .sharesTextScale(id: tiles.map(\.name))
     }
 
     func gridRow(
@@ -210,7 +209,8 @@ private extension QuickRecordWidgetView {
                 Text(tile.name)
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
-                    .sharedTextScale()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
 
             if isLarge {
@@ -295,7 +295,6 @@ private extension QuickRecordWidgetView {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .sharesTextScale(id: records.map(\.title))
     }
 
     func recordRow(_ record: QuickRecordWidgetSummary.Record) -> some View {
@@ -309,7 +308,8 @@ private extension QuickRecordWidgetView {
                 Text(record.title)
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.text)
-                    .sharedTextScale()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
 
                 Text(record.detail)
                     .textFont(size: .micro)
