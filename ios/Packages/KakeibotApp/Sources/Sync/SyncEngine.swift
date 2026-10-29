@@ -26,10 +26,10 @@ public actor SyncEngine {
 public extension SyncEngine {
     static let containerIdentifier = "iCloud.com.yossibank.kakeibot"
 
-    static func isAccountAvailable(
+    static func accountStatus(
         in container: CKContainer = CKContainer(identifier: containerIdentifier)
-    ) async -> Bool {
-        await (try? container.accountStatus()) == .available
+    ) async -> CKAccountStatus {
+        await (try? container.accountStatus()) ?? .couldNotDetermine
     }
 
     static func hasCloudData(
@@ -113,24 +113,12 @@ extension SyncEngine {
         container.database(with: scope)
     }
 
-    func isForeign(_ zoneName: String) -> Bool {
-        owners[zoneName] != nil
-    }
-
-    func sends(to zoneName: String) -> Bool {
-        guard !isShared else {
-            return isForeign(zoneName)
-        }
-
-        return !isForeign(zoneName) && (isSyncEnabled || zoneName != SyncZone.own)
-    }
-
-    func receives(from zoneName: String) -> Bool {
-        guard !isShared else {
-            return SyncZone.walletID(of: zoneName) != nil
-        }
-
-        return isSyncEnabled || zoneName != SyncZone.own
+    var route: SyncRoute {
+        SyncRoute(
+            isShared: isShared,
+            isSyncEnabled: isSyncEnabled,
+            owners: owners
+        )
     }
 
     func recordID(of id: SyncRecordID) -> CKRecord.ID {
@@ -148,8 +136,8 @@ extension SyncEngine {
         await start(isSyncEnabled: isSyncEnabled)
     }
 
-    func turnOff() async {
-        try? await database.turnOffSync()
+    func turnOff(because reason: SyncStopReason) async {
+        try? await database.turnOffSync(because: reason)
         isSyncEnabled = false
         await restart()
     }

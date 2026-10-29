@@ -6,12 +6,12 @@ import SwiftUI
 public struct SettingsSheet: View {
     @State var monthStartDay: MonthStartDay = .first
     @State var launchScreen: LaunchScreen = .home
-    @State var weekStart: Weekday = .sunday
     @State var reminderTime: ReminderTime?
     @State var authorization: NotificationAuthorization = .allowed
     @State var theme: ThemeChoice = .system
     @State var customThemes: [Theme] = []
-    @State var isSyncOn = false
+    @State var syncStatus = SyncStatus.off
+    @State var weekStart: WeekStartModel
 
     #if DEBUG
     @State var isConfirmingSample = false
@@ -21,6 +21,7 @@ public struct SettingsSheet: View {
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.notificationPermission) var permission
+    @Environment(\.scenePhase) var scenePhase
     @Environment(\.syncCloud) var syncCloud
     @Environment(\.themeStyle) var themeStyle
 
@@ -33,6 +34,8 @@ public struct SettingsSheet: View {
         today: LocalDate,
         appIcon: AppIconListModel
     ) {
+        _weekStart = State(initialValue: WeekStartModel(database: database))
+
         self.database = database
         self.today = today
         self.appIcon = appIcon
@@ -75,11 +78,21 @@ public struct SettingsSheet: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
+        .errorBanner(weekStart.errorNotice) {
+            weekStart.errorNotice.clear()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task {
+                    authorization = await permission.authorization()
+                }
+            }
+        }
         .task {
             await observeMonthStartDay()
         }
         .task {
-            weekStart = await (try? database.setting(.weekStart)) ?? .sunday
+            await weekStart.load()
         }
         .task {
             await observeReminderTime()
@@ -125,11 +138,11 @@ private extension SettingsSheet {
 
     func observeSync() async {
         do {
-            for try await isOn in database.syncEnabledUpdates() {
-                isSyncOn = isOn
+            for try await status in database.syncStatusUpdates() {
+                syncStatus = status
             }
         } catch {
-            isSyncOn = false
+            syncStatus = .off
         }
     }
 

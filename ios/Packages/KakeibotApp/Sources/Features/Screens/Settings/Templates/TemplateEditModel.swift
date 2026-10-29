@@ -185,7 +185,7 @@ public extension TemplateEditModel {
         do {
             return try await database.saveTemplate(draft, editing: editingId, at: Date())
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return nil
         }
     }
@@ -198,7 +198,7 @@ public extension TemplateEditModel {
         do {
             return try await database.deleteTemplate(editingId)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return nil
         }
     }
@@ -215,7 +215,7 @@ public extension TemplateEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }

@@ -99,17 +99,28 @@ public extension WalletEditModel {
             await loadBalance()
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
 
-    func deleteValuation(_ id: Valuation.ID) async {
+    func deleteValuation(_ id: Valuation.ID) async -> Deletion? {
         do {
-            try await database.deleteValuation(id)
+            let deletion = try await database.deleteValuation(id)
+            await loadBalance()
+            return deletion
+        } catch {
+            errorNotice.show(Self.deleteFailedMessage, for: error)
+            return nil
+        }
+    }
+
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await database.restore(deletion)
             await loadBalance()
         } catch {
-            errorNotice.show(Self.deleteFailedMessage)
+            errorNotice.show(Self.restoreFailedMessage, for: error)
         }
     }
 
@@ -197,7 +208,7 @@ public extension WalletEditModel {
         do {
             return try await database.saveWallet(draft, editing: editingId, at: Date())
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return nil
         }
     }
@@ -215,7 +226,7 @@ public extension WalletEditModel {
             errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
             return false
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -229,7 +240,7 @@ public extension WalletEditModel {
             return try await database.deleteWallet(editingId, at: Date())
         } catch {
             let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
-            errorNotice.show(message)
+            errorNotice.show(message, for: error)
             return nil
         }
     }
@@ -239,6 +250,7 @@ private extension WalletEditModel {
     static let defaultColor = "#C9A465"
     static let loadFailedMessage = "口座を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
+    static let restoreFailedMessage = "元に戻せませんでした"
     static let deleteFailedMessage = "削除できませんでした"
 
     static var today: LocalDate {

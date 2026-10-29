@@ -12,7 +12,7 @@ import WidgetKit
 @MainActor
 @Observable
 final class AppModel {
-    var shareNotice = ErrorNotice()
+    var notice = ErrorNotice()
 
     private(set) var launch: Launch = .opening
     private(set) var today: LocalDate
@@ -22,6 +22,7 @@ final class AppModel {
     private(set) var syncActivity = SyncActivity(isSyncEnabled: false, isSharing: false)
 
     private let openDatabase: @Sendable () throws -> AppDatabase
+    private let currentDay: @Sendable () -> LocalDate
     private let scheduler: NotificationScheduler
     private let router: NotificationRouter
     private let shareInbox: SyncShareInbox
@@ -36,10 +37,12 @@ final class AppModel {
         scheduler: NotificationScheduler = NotificationScheduler(),
         router: NotificationRouter = .shared,
         shareInbox: SyncShareInbox = .shared,
-        retryDelays: [Duration] = ScreenObservation.retryDelays
+        retryDelays: [Duration] = ScreenObservation.retryDelays,
+        currentDay: @escaping @Sendable () -> LocalDate = AppModel.deviceDay
     ) {
-        self.today = Self.currentDay()
+        self.today = currentDay()
         self.openDatabase = openDatabase
+        self.currentDay = currentDay
         self.scheduler = scheduler
         self.router = router
         self.shareInbox = shareInbox
@@ -68,6 +71,10 @@ extension AppModel {
 
     var pendingShareCount: Int {
         shareInbox.pending.count
+    }
+
+    nonisolated static func deviceDay() -> LocalDate {
+        LocalDate(Date(), in: .current)
     }
 
     func open() async {
@@ -128,7 +135,7 @@ extension AppModel {
     }
 
     func refreshDay() async {
-        today = Self.currentDay()
+        today = currentDay()
 
         switch launch {
         case let .onboarding(database), let .ready(database):
@@ -235,7 +242,7 @@ extension AppModel {
             } catch is CancellationError {
                 continue
             } catch {
-                shareNotice.show(Self.shareFailedMessage)
+                notice.show(Self.shareFailedMessage)
             }
         }
 
@@ -281,10 +288,7 @@ extension AppModel {
 
 private extension AppModel {
     static let shareFailedMessage = "共有の口座に参加できませんでした"
-
-    static func currentDay() -> LocalDate {
-        LocalDate(Date(), in: .current)
-    }
+    static let recurringFailedMessage = "固定費を自動で記録できませんでした"
 
     func observeLook(in database: AppDatabase) async {
         await watch(database.themeLookUpdates()) { look in
@@ -340,7 +344,15 @@ private extension AppModel {
     }
 
     func generateRecurring(in database: AppDatabase) async {
-        try? await database.generateRecurringEntries(through: today, at: Date())
+        do {
+            try await database.generateRecurringEntries(through: today, at: Date())
+        } catch {
+            guard !AppDatabase.isInterrupted(error) else {
+                return
+            }
+
+            notice.show(Self.recurringFailedMessage, for: error)
+        }
     }
 }
 

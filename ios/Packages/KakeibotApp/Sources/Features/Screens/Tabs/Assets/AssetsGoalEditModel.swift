@@ -70,7 +70,7 @@ public extension AssetsGoalEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -84,7 +84,7 @@ public extension AssetsGoalEditModel {
             try await database.deleteRewardGoal(editing.id)
             return true
         } catch {
-            errorNotice.show(Self.deleteFailedMessage)
+            errorNotice.show(Self.deleteFailedMessage, for: error)
             return false
         }
     }

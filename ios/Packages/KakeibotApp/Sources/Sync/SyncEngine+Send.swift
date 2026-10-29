@@ -57,11 +57,21 @@ extension SyncEngine {
 
         let failedKeys = (failedSaves + failedDeletes).compactMap(SyncKey.init)
         let failed = Set(failedKeys)
-        let finished = finishedChanges(saved: savedIDs, deleted: deleted)
+        let finished = finishChanges(saved: savedIDs, deleted: deleted)
+
+        let failureCodes = sent.failedRecordSaves.map(\.error.code)
+            + sent.failedRecordDeletes.values.map(\.code)
+
+        let problem = failureCodes.lazy.compactMap(SyncSendProblem.init).first
 
         try? await database.saveSyncSystemFields(systemFields)
         try? await database.removeSyncSystemFields(deleted)
         try? await database.removeSyncChanges(finished)
+
+        if !isShared,
+           problem != nil || !savedIDs.isEmpty || !deleted.isEmpty {
+            try? await database.setSyncSendProblem(problem)
+        }
 
         for failure in sent.failedRecordSaves {
             await retry(failure)
@@ -93,13 +103,15 @@ private extension SyncEngine {
         var removed: [CKSyncEngine.PendingRecordZoneChange] = []
         var dropped: [SyncChange] = []
 
+        let route = route
+
         for change in changes {
             let targets = pendingTargets(of: change)
 
             if targets.isEmpty,
                !isShared,
                !saving.contains(change.key),
-               !change.zones.contains(where: isForeign) {
+               !change.zones.contains(where: route.isForeign) {
                 dropped.append(change)
             }
 
@@ -128,14 +140,16 @@ private extension SyncEngine {
             opposite: CKSyncEngine.PendingRecordZoneChange
         )] = []
 
+        let route = route
+
         if let zone = change.saveZone,
-           sends(to: zone) {
+           route.sends(to: zone) {
             let syncID = SyncRecordID(key: change.key, zoneName: zone)
             let id = recordID(of: syncID)
             targets.append((.saveRecord(id), .deleteRecord(id)))
         }
 
-        for zone in change.deleteZones where sends(to: zone) {
+        for zone in change.deleteZones where route.sends(to: zone) {
             let syncID = SyncRecordID(key: change.key, zoneName: zone)
             let id = recordID(of: syncID)
             targets.append((.deleteRecord(id), .saveRecord(id)))
@@ -144,52 +158,27 @@ private extension SyncEngine {
         return targets
     }
 
-    func finishedChanges(
+    func finishChanges(
         saved: [SyncRecordID],
         deleted: [SyncRecordID]
     ) -> [SyncChange] {
-        var finished: [SyncChange] = []
+        let result = route.finish(
+            sending: sending,
+            saved: saved,
+            deleted: deleted
+        )
 
-        for id in saved {
-            guard
-                let change = sending[id.key],
-                change.saveZone == id.zoneName
-            else {
-                continue
-            }
-
-            let deletions = staleDeletions(of: change)
-
-            sending.removeValue(forKey: id.key)
-            finished.append(change)
-            engine?.state.add(pendingRecordZoneChanges: deletions)
+        let deletions = result.staleDeletions.map { id in
+            CKSyncEngine.PendingRecordZoneChange.deleteRecord(recordID(of: id))
         }
 
-        let zones = Dictionary(grouping: deleted, by: \.key).mapValues { Set($0.map(\.zoneName)) }
-
-        for (key, deletedZones) in zones {
-            guard
-                let change = sending[key],
-                change.saveZone == nil,
-                Set(change.deleteZones.filter { sends(to: $0) }).isSubset(of: deletedZones)
-            else {
-                continue
-            }
-
-            sending.removeValue(forKey: key)
-            finished.append(change)
+        for change in result.finished {
+            sending.removeValue(forKey: change.key)
         }
 
-        return finished
-    }
+        engine?.state.add(pendingRecordZoneChanges: deletions)
 
-    func staleDeletions(of change: SyncChange) -> [CKSyncEngine.PendingRecordZoneChange] {
-        change.deleteZones
-            .filter { sends(to: $0) }
-            .map { zone in
-                let id = SyncRecordID(key: change.key, zoneName: zone)
-                return .deleteRecord(recordID(of: id))
-            }
+        return result.finished
     }
 
     func retry(_ failure: CKSyncEngine.Event.SentRecordZoneChanges.FailedRecordSave) async {
@@ -199,14 +188,11 @@ private extension SyncEngine {
             return
         }
 
-        switch failure.error.code {
-        case .serverRecordChanged:
+        switch route.retry(after: failure.error.code) {
+        case .resolveConflict:
             await resolveConflict(of: id, with: failure.error.serverRecord)
-        case .zoneNotFound:
-            guard
-                !isShared,
-                await (try? database.syncSaveZone(for: id.key)) == id.zoneName
-            else {
+        case .saveZoneAgain:
+            guard await (try? database.syncSaveZone(for: id.key)) == id.zoneName else {
                 return
             }
 
@@ -214,10 +200,10 @@ private extension SyncEngine {
 
             engine?.state.add(pendingDatabaseChanges: [.saveZone(zone)])
             engine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
-        case .unknownItem:
+        case .sendAgain:
             try? await database.removeSyncSystemFields([id])
             engine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
-        default:
+        case .skip:
             break
         }
     }

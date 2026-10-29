@@ -3,9 +3,22 @@ import Features
 import Foundation
 import Store
 import Testing
+import TestSupport
 
 @MainActor
 struct HomeModelTests {
+    @Test
+    func showsNoRecordsOnlyAfterListArrives() async throws {
+        let setup = try await Setup()
+        let model = HomeModel(database: setup.database, today: setup.today)
+        let before = model.showsNoRecords
+
+        await model.load()
+
+        #expect(before == false)
+        #expect(model.showsNoRecords)
+    }
+
     @Test
     func sumsMonthTodayAndYesterday() async throws {
         let setup = try await Setup()
@@ -78,8 +91,8 @@ struct HomeModelTests {
 
         try await setup.database.setBudget(120_000, for: nil, from: month)
 
-        for _ in 0..<200 where model.budgetUsage == nil {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            model.budgetUsage != nil
         }
 
         task.cancel()
@@ -106,8 +119,8 @@ struct HomeModelTests {
 
         try await setup.database.setBudget(120_000, for: nil, from: setup.today.yearMonth)
 
-        for _ in 0..<200 where model.budgetUsage == nil {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            model.budgetUsage != nil
         }
 
         task.cancel()

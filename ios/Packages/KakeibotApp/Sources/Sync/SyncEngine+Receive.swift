@@ -11,8 +11,10 @@ extension SyncEngine {
             }
 
             try? await database.queueAllForSync()
-        case .signOut, .switchAccounts:
-            await isShared ? leaveShares() : leaveAccount()
+        case .signOut:
+            await isShared ? leaveShares() : leaveAccount(because: .signedOut)
+        case .switchAccounts:
+            await isShared ? leaveShares() : leaveAccount(because: .accountChanged)
         @unknown default:
             break
         }
@@ -37,20 +39,22 @@ extension SyncEngine {
             await restart()
             try? await database.queueAllForSync()
         default:
-            await turnOff()
+            await turnOff(because: .cloudReplaced)
         }
     }
 
     func applyFetched(_ changes: CKSyncEngine.Event.FetchedRecordZoneChanges) async {
+        let route = route
+
         let records = changes.modifications
             .map(\.record)
-            .filter { receives(from: $0.recordID.zoneID.zoneName) }
+            .filter { route.receives(from: $0.recordID.zoneID.zoneName) }
 
         let saved = records.compactMap(SyncRecord.init)
 
         let deleted = changes.deletions
             .compactMap { SyncRecordID($0.recordID) }
-            .filter { receives(from: $0.zoneName) }
+            .filter { route.receives(from: $0.zoneName) }
 
         let systemFields = records.reduce(into: [SyncRecordID: Data]()) { fields, record in
             if let id = SyncRecordID(record.recordID) {
@@ -79,8 +83,8 @@ extension SyncEngine {
 }
 
 private extension SyncEngine {
-    func leaveAccount() async {
-        try? await database.turnOffSyncForAccountChange()
+    func leaveAccount(because reason: SyncStopReason) async {
+        try? await database.turnOffSyncForAccountChange(reason)
         isSyncEnabled = false
         await restart()
     }

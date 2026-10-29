@@ -52,4 +52,19 @@ public extension SyncEngine {
             return
         }
     }
+
+    static func leaveShare(
+        zoneName: String,
+        ownerName: String,
+        in container: CKContainer = CKContainer(identifier: containerIdentifier)
+    ) async throws {
+        let zoneID = CKRecordZone.ID(zoneName: zoneName, ownerName: ownerName)
+        let shareID = CKRecord.ID(recordName: CKRecordNameZoneWideShare, zoneID: zoneID)
+
+        do {
+            _ = try await container.sharedCloudDatabase.deleteRecord(withID: shareID)
+        } catch let error as CKError where [.unknownItem, .zoneNotFound].contains(error.code) {
+            return
+        }
+    }
 }

@@ -22,6 +22,9 @@ public struct RootView: View {
     public var body: some View {
         ZStack {
             content
+                .errorBanner(model.notice, bottom: noticeBottom) {
+                    model.notice.clear()
+                }
 
             if isLaunching {
                 LaunchView(
@@ -103,9 +106,6 @@ private extension RootView {
             } onLoad: {
                 isHomeLoaded = true
             }
-            .errorBanner(model.shareNotice, bottom: MainView.noticeBottom) {
-                model.shareNotice.clear()
-            }
             .task(id: model.observationID(model.today)) {
                 await model.observeNotifications(in: database)
             }
@@ -144,6 +144,13 @@ private extension RootView {
         }
     }
 
+    var noticeBottom: CGFloat {
+        switch model.launch {
+        case .ready: MainView.noticeBottom
+        case .opening, .onboarding, .failed: 12
+        }
+    }
+
     var shownLook: ThemeLook {
         isRevealed ? model.look : .followsDevice
     }
@@ -177,7 +184,7 @@ extension NotificationPermission {
 
 extension SyncCloud {
     static let live = Self {
-        await SyncEngine.isAccountAvailable()
+        await SyncAccount(SyncEngine.accountStatus())
     } hasData: {
         try await SyncEngine.hasCloudData()
     } deleteData: {
@@ -193,6 +200,9 @@ extension SyncCloud {
     } deleteShare: { walletID in
         let zoneName = SyncZone.wallet(walletID)
         try await SyncEngine.deleteShare(zoneName: zoneName)
+    } leaveShare: { walletID, ownerName in
+        let zoneName = SyncZone.wallet(walletID)
+        try await SyncEngine.leaveShare(zoneName: zoneName, ownerName: ownerName)
     }
 }
 

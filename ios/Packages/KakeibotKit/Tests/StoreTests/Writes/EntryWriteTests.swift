@@ -26,6 +26,25 @@ struct EntryWriteTests {
     }
 
     @Test
+    func tellsStorageFullFromOtherFailures() async throws {
+        let setup = try await Setup()
+        var draft = setup.draft
+        draft.memo = String(repeating: "あ", count: 100_000)
+
+        try await setup.database.writer.writeWithoutTransaction { db in
+            let pages = try Int.fetchOne(db, sql: "PRAGMA page_count") ?? 0
+            try db.execute(sql: "PRAGMA max_page_count = \(pages)")
+        }
+
+        let error = await #expect(throws: (any Error).self) {
+            try await setup.database.saveEntryResult(draft, at: setup.now)
+        }
+
+        #expect(error.map { AppDatabase.isStorageFull($0) } == true)
+        #expect(AppDatabase.isStorageFull(CancellationError()) == false)
+    }
+
+    @Test
     func doesNotMakeNoSpendDayOnUnmarkedDay() async throws {
         let setup = try await Setup()
 

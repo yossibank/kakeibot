@@ -5,6 +5,7 @@ import Observation
 import Store
 import Synchronization
 import Testing
+import TestSupport
 
 @MainActor
 struct ReviewModelTests {
@@ -167,7 +168,7 @@ struct ReviewModelTests {
     func cachedMovesStillWatchRecurrings() async throws {
         let setup = try await RecordsModelTests.Setup()
         let now = Date()
-        let changed = Mutex(false)
+        let notified = Mutex(false)
 
         let wallet = WalletDraft(
             kind: .loan,
@@ -209,28 +210,27 @@ struct ReviewModelTests {
             await model.run()
         }
 
-        for _ in 0..<200 where model.moves.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.moves.isEmpty
         }
-
-        try await Task.sleep(for: .milliseconds(200))
-        _ = model.moves
+        #expect(model.moves.first?.payoff == nil)
 
         withObservationTracking {
             _ = model.moves
         } onChange: {
-            changed.withLock { $0 = true }
+            notified.withLock { $0 = true }
         }
 
         try await setup.database.saveRecurring(recurring, today: setup.today, at: now)
 
-        for _ in 0..<200 where !changed.withLock({ $0 }) {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            _ = model.moves
+
+            return notified.withLock { $0 }
         }
 
         task.cancel()
 
-        #expect(changed.withLock { $0 })
         #expect(model.moves.first?.payoff != nil)
     }
 
@@ -338,15 +338,17 @@ struct ReviewModelTests {
 private extension ReviewModelTests {
     func observe(
         _ model: ReviewModel,
-        until isReady: () -> Bool
+        sourceLocation: SourceLocation = #_sourceLocation,
+        until isReady: @escaping @MainActor () -> Bool
     ) async throws {
         let task = Task {
             await model.run()
         }
 
-        for _ in 0..<200 where !isReady() {
-            try await Task.sleep(for: .milliseconds(10))
-        }
+        await ObservationWait.until(
+            sourceLocation: sourceLocation,
+            isReady
+        )
 
         task.cancel()
     }

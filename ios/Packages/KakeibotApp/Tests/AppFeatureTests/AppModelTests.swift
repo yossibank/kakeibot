@@ -1,9 +1,11 @@
 @testable import AppFeature
 import Core
 import Foundation
+import GRDB
 import Notifications
 import Store
 import Testing
+import TestSupport
 
 @MainActor
 struct AppModelTests {
@@ -71,6 +73,93 @@ struct AppModelTests {
         let entries = try database.snapshot().entries
 
         #expect(entries.map(\.recurringDate) == [today])
+    }
+
+    @Test
+    func tellsWhenRecurringEntriesCannotBeRecorded() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date()
+        try database.insertDefaultsIfEmpty(at: now)
+        try await database.setSetting(.onboardingCompleted, to: true)
+        let options = try await database.entryOptions()
+        let today = LocalDate(now, in: .current)
+
+        let recurring = Recurring(
+            type: .expense,
+            amount: 78000,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            frequency: .monthly,
+            day: today.day,
+            startDate: today,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try await database.writer.write { db in
+            try recurring.insert(db)
+
+            try db.execute(
+                sql: """
+                CREATE TRIGGER fail_entry BEFORE INSERT ON entry
+                BEGIN SELECT RAISE(ABORT, 'failing for tests'); END
+                """
+            )
+        }
+
+        let model = AppModel { database }
+
+        await model.open()
+
+        #expect(model.notice.message == "固定費を自動で記録できませんでした")
+    }
+
+    @Test
+    func staysQuietWhenRecurringIsInterrupted() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date()
+        try database.insertDefaultsIfEmpty(at: now)
+        try await database.setSetting(.onboardingCompleted, to: true)
+        let options = try await database.entryOptions()
+        let today = LocalDate(now, in: .current)
+        let client = NotificationSchedulerTests.FakeCenter(pending: [])
+        let scheduler = NotificationScheduler(client: client)
+        let model = AppModel(openDatabase: { database }, scheduler: scheduler)
+
+        await model.open()
+
+        let recurring = Recurring(
+            type: .expense,
+            amount: 78000,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            frequency: .monthly,
+            day: today.day,
+            startDate: today,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try await database.writer.write { db in
+            try recurring.insert(db)
+
+            db.add(
+                function: DatabaseFunction("interrupt_for_tests", argumentCount: 0) { _ in
+                    throw DatabaseError(resultCode: .SQLITE_INTERRUPT)
+                }
+            )
+
+            try db.execute(
+                sql: """
+                CREATE TRIGGER interrupt_entry BEFORE INSERT ON entry
+                BEGIN SELECT interrupt_for_tests(); END
+                """
+            )
+        }
+
+        await model.refreshDay()
+
+        #expect(model.notice.message == nil)
     }
 
     @Test
@@ -159,8 +248,8 @@ struct AppModelTests {
 
         let expected = ThemeLook.fixed(ThemePreset.wine.palette)
 
-        for _ in 0..<200 where model.look != expected {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            model.look == expected
         }
 
         task.cancel()

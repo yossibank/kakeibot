@@ -235,7 +235,7 @@ public extension ReviewModel {
             try await database.setSetting(.reviewScale, to: scale)
             try await database.setSetting(.reviewKind, to: kind)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 

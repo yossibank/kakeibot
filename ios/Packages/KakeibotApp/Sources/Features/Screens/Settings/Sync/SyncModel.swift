@@ -8,10 +8,13 @@ import Store
 @Observable
 public final class SyncModel {
     public private(set) var isOn = false
-    public private(set) var isAvailable = true
+    public private(set) var account = SyncAccount.available
     public private(set) var isWorking = false
     public private(set) var pendingCount: Int?
+    public private(set) var stopReason: SyncStopReason?
+    public private(set) var sendProblem: SyncSendProblem?
     public private(set) var shares: [WalletShare] = []
+    public private(set) var joined: [JoinedShare] = []
 
     public internal(set) var isChoosing = false
     public internal(set) var errorNotice = ErrorNotice()
@@ -29,6 +32,29 @@ public final class SyncModel {
 }
 
 public extension SyncModel {
+    static let choiceMessage = """
+    使う方を選んでください。選ばなかった方は置き換わります。\
+    「この iPhone のデータを使う」を選ぶと、ほかの iPhone の同期は切れます
+    """
+
+    var isAvailable: Bool {
+        account == .available
+    }
+
+    var footnote: String {
+        guard !isOn else {
+            return Self.keepsDataNote
+        }
+
+        return switch account {
+        case .available: Self.keepsDataNote
+        case .noAccount: "設定アプリで iCloud にサインインすると使えます"
+        case .restricted: "この iPhone では、制限で iCloud を使えません"
+        case .temporarilyUnavailable: "設定アプリで iCloud にサインインし直すと使えます"
+        case .couldNotDetermine: "iCloud の状態を確かめられませんでした。時間をおいて開き直してください"
+        }
+    }
+
     func load() async {
         do {
             isOn = try await database.isSyncEnabled()
@@ -36,7 +62,32 @@ public extension SyncModel {
             errorNotice.show(Self.loadFailedMessage)
         }
 
-        isAvailable = await cloud.isAvailable()
+        account = await cloud.account()
+    }
+
+    func refreshAccount() async {
+        account = await cloud.account()
+    }
+
+    func observeStatus() async {
+        do {
+            for try await status in database.syncStatusUpdates() {
+                isOn = status.isEnabled
+                stopReason = status.stopReason
+                sendProblem = status.sendProblem
+            }
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
+    }
+
+    func pendingText(_ count: Int) -> String {
+        guard count > 0 else {
+            return "最新の状態です"
+        }
+
+        let head = sendProblem?.message ?? "iCloud に送っています"
+        return "\(head)（残り \(count) 件）"
     }
 
     func observePending() async {
@@ -82,6 +133,25 @@ public extension SyncModel {
         }
     }
 
+    func observeJoined() async {
+        do {
+            for try await joined in database.joinedShareUpdates() {
+                self.joined = joined
+            }
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
+    }
+
+    func leave(_ item: JoinedShare) async {
+        let id = item.wallet.id
+
+        await work(failure: Self.leaveFailedMessage) {
+            try await cloud.leaveShare(id, item.ownerName)
+            try await database.endSharing(id)
+        }
+    }
+
     func share(_ item: WalletShare) async {
         let id = item.wallet.id
         let name = item.wallet.name
@@ -100,10 +170,12 @@ public extension SyncModel {
 }
 
 private extension SyncModel {
+    static let keepsDataNote = "切っても、この iPhone のデータは残ります"
     static let loadFailedMessage = "同期の状態を読み込めませんでした"
     static let saveFailedMessage = "同期を切り替えられませんでした。時間をおいて試してください"
     static let shareFailedMessage = "共有を開けませんでした。時間をおいて試してください"
     static let stopFailedMessage = "共有をやめられませんでした。時間をおいて試してください"
+    static let leaveFailedMessage = "共有から抜けられませんでした。時間をおいて試してください"
 
     func stopSharing(_ id: Wallet.ID) async {
         await work(failure: Self.stopFailedMessage) {
@@ -113,7 +185,7 @@ private extension SyncModel {
     }
 
     func turnOn() async {
-        isAvailable = await cloud.isAvailable()
+        account = await cloud.account()
 
         guard isAvailable else {
             return
@@ -146,7 +218,7 @@ private extension SyncModel {
 
             isOn = try await database.isSyncEnabled()
         } catch {
-            errorNotice.show(failure)
+            errorNotice.show(failure, for: error)
         }
 
         isWorking = false

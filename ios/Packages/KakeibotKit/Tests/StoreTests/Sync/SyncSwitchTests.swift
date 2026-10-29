@@ -92,6 +92,91 @@ struct SyncSwitchTests {
         #expect(try await setup.database.syncEngineState(isShared: false) == nil)
     }
 
+    @Test
+    func keepsWhySyncStoppedForAccountChange() async throws {
+        let setup = try await SyncTests.Setup()
+
+        try await setup.database.turnOffSyncForAccountChange(.signedOut)
+        let status = try await setup.database.syncStatus()
+
+        #expect(status.isEnabled == false)
+        #expect(status.stopReason == .signedOut)
+    }
+
+    @Test
+    func keepsWhySyncStoppedWhenCloudIsReplaced() async throws {
+        let setup = try await SyncTests.Setup()
+
+        try await setup.database.turnOffSync(because: .cloudReplaced)
+        let status = try await setup.database.syncStatus()
+
+        #expect(status.isEnabled == false)
+        #expect(status.stopReason == .cloudReplaced)
+    }
+
+    @Test
+    func forgetsWhySyncStoppedWhenTurnedOnOrOffByHand() async throws {
+        let setup = try await SyncTests.Setup()
+
+        try await setup.database.turnOffSyncForAccountChange(.accountChanged)
+        try await setup.database.turnOnSync()
+        let turnedOn = try await setup.database.syncStatus()
+
+        #expect(turnedOn.stopReason == nil)
+
+        try await setup.database.turnOffSync(because: .cloudReplaced)
+        try await setup.database.turnOffSync()
+        let turnedOff = try await setup.database.syncStatus()
+
+        #expect(turnedOff.stopReason == nil)
+
+        try await setup.database.turnOnSync()
+        try await setup.database.turnOffSync(because: .cloudReplaced)
+        try await setup.database.turnOnSyncReplacingLocal()
+        let replaced = try await setup.database.syncStatus()
+
+        #expect(replaced.stopReason == nil)
+    }
+
+    @Test
+    func leavesNoReasonWhenSyncWasAlreadyOffByHand() async throws {
+        let setup = try await SyncTests.Setup(enabled: false)
+
+        try await setup.database.turnOffSyncForAccountChange(.signedOut)
+        let afterAccountChange = try await setup.database.syncStatus()
+
+        #expect(afterAccountChange.stopReason == nil)
+
+        try await setup.database.turnOffSync(because: .cloudReplaced)
+        let afterReplaced = try await setup.database.syncStatus()
+
+        #expect(afterReplaced.stopReason == nil)
+    }
+
+    @Test
+    func keepsWhySendingIsStuckUntilItGoesThrough() async throws {
+        let setup = try await SyncTests.Setup()
+
+        try await setup.database.setSyncSendProblem(.quotaExceeded)
+        let stuck = try await setup.database.syncStatus()
+        try await setup.database.setSyncSendProblem(nil)
+        let sent = try await setup.database.syncStatus()
+
+        #expect(stuck.sendProblem == .quotaExceeded)
+        #expect(sent.sendProblem == nil)
+    }
+
+    @Test
+    func forgetsWhySendingIsStuckWhenTurnedOff() async throws {
+        let setup = try await SyncTests.Setup()
+
+        try await setup.database.setSyncSendProblem(.networkUnavailable)
+        try await setup.database.turnOffSync()
+        let status = try await setup.database.syncStatus()
+
+        #expect(status.sendProblem == nil)
+    }
+
     @Test(.timeLimit(.minutes(1)))
     func countsPendingUntilSent() async throws {
         let setup = try await SyncTests.Setup()

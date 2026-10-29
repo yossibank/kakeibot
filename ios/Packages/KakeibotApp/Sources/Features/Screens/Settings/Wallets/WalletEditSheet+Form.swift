@@ -240,7 +240,7 @@ extension WalletEditSheet {
                     openValuationId = nil
                 } onAction: {
                     Task {
-                        await model.deleteValuation(valuation.id)
+                        valuationDeletion = await model.deleteValuation(valuation.id)
                     }
                 } content: {
                     valuationRow(valuation)

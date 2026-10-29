@@ -29,7 +29,7 @@ public struct RecordsRewardSheet: View {
                         systemImage: "gift",
                         title: "ごほうびの決まりがまだありません",
                         message: "決まりを作ると、ここで達成を付けられます",
-                        actionTitle: "ごほうびを追加"
+                        actionTitle: "決まりを追加"
                     ) {
                         isAddingRule = true
                     }

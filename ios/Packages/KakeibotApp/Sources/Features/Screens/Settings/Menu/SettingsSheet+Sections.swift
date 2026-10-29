@@ -224,21 +224,23 @@ private extension SettingsSheet {
     }
 
     var reminderText: String {
-        reminderTime?.description ?? "オフ"
+        ReminderModel.rowText(time: reminderTime, authorization: authorization)
     }
 
     var syncText: String {
-        isSyncOn ? "オン" : "オフ"
+        switch (syncStatus.isEnabled, syncStatus.stopReason) {
+        case (true, _): "オン"
+        case (false, .some): "切れました"
+        case (false, nil): "オフ"
+        }
     }
 
     var weekStartBinding: Binding<Weekday> {
         Binding {
-            weekStart
+            weekStart.weekStart
         } set: { day in
-            weekStart = day
-
             Task {
-                try? await database.setSetting(.weekStart, to: day)
+                await weekStart.choose(day)
             }
         }
     }

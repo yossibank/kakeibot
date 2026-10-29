@@ -18,6 +18,7 @@ public struct WalletEditSheet: View {
     @State var isEditingPayment = false
     @State var isAskingPayment = false
     @State var addedWallet: Wallet?
+    @State var valuationDeletion: Deletion?
 
     @FocusState var focus: Field?
 
@@ -114,6 +115,11 @@ public struct WalletEditSheet: View {
         )
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
+        }
+        .deletionNotice($valuationDeletion) { deletion in
+            Task {
+                await model.restore(deletion)
+            }
         }
         .confirmsUnsavedHide(
             isHidden: model.isHidden,

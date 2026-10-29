@@ -4,6 +4,9 @@ import SwiftUI
 
 public struct SyncView: View {
     @State private var model: SyncModel
+    @State private var leaving: JoinedShare?
+
+    @Environment(\.scenePhase) private var scenePhase
 
     public init(model: SyncModel) {
         _model = State(initialValue: model)
@@ -39,25 +42,35 @@ public struct SyncView: View {
                         .card()
                         .disabled(model.isWorking || !canChange)
 
-                        if model.isOn,
-                           let count = model.pendingCount {
-                            HStack(spacing: 8) {
-                                if count > 0 {
-                                    ProgressView()
-                                        .controlSize(.mini)
-                                } else {
-                                    Image(systemName: "checkmark.circle")
-                                        .foregroundStyle(Palette.accent)
-                                }
-
-                                Text(pendingText(count))
-                            }
-                            .textFont(.footnote)
-                            .foregroundStyle(Palette.subtext)
-                            .padding(.leading, 8)
+                        if !model.isOn,
+                           let reason = model.stopReason {
+                            warning(reason.message)
                         }
 
-                        Text(footnote)
+                        if model.isOn,
+                           let count = model.pendingCount {
+                            if count > 0,
+                               model.sendProblem != nil {
+                                warning(model.pendingText(count))
+                            } else {
+                                HStack(spacing: 8) {
+                                    if count > 0 {
+                                        ProgressView()
+                                            .controlSize(.mini)
+                                    } else {
+                                        Image(systemName: "checkmark.circle")
+                                            .foregroundStyle(Palette.accent)
+                                    }
+
+                                    Text(model.pendingText(count))
+                                }
+                                .textFont(.footnote)
+                                .foregroundStyle(Palette.subtext)
+                                .padding(.leading, 8)
+                            }
+                        }
+
+                        Text(model.footnote)
                             .textFont(.footnote)
                             .foregroundStyle(Palette.subtext)
                             .padding(.leading, 8)
@@ -96,6 +109,37 @@ public struct SyncView: View {
                         }
                     }
 
+                    if !model.joined.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            SectionTitle("誘われた口座")
+                                .padding(.leading, 8)
+
+                            VStack(spacing: 0) {
+                                ForEach(model.joined, id: \.wallet.id) { item in
+                                    if item.wallet.id != model.joined.first?.wallet.id {
+                                        Hairline()
+                                    }
+
+                                    Button {
+                                        leaving = item
+                                    } label: {
+                                        joinedRow(item)
+                                    }
+                                }
+                            }
+                            .sharesTextScale(id: model.joined.map(\.wallet.name))
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 16)
+                            .card()
+                            .disabled(model.isWorking || !model.isAvailable)
+
+                            Text("抜けると、この iPhone からその口座と記録が消えます")
+                                .textFont(.footnote)
+                                .foregroundStyle(Palette.subtext)
+                                .padding(.leading, 8)
+                        }
+                    }
+
                     if model.isWorking {
                         ProgressView()
                             .frame(maxWidth: .infinity)
@@ -118,8 +162,18 @@ public struct SyncView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task {
+                    await model.refreshAccount()
+                }
+            }
+        }
         .task {
             await model.load()
+        }
+        .task {
+            await model.observeStatus()
         }
         .task {
             await model.observePending()
@@ -127,11 +181,24 @@ public struct SyncView: View {
         .task {
             await model.observeShares()
         }
+        .task {
+            await model.observeJoined()
+        }
+        .confirmation(
+            isPresented: isLeavingBinding,
+            systemImage: "person.crop.circle.badge.minus",
+            title: "共有から抜けますか",
+            message: "この iPhone から口座と記録が消えます。自分の口座との振替は、支出と収入にして残します",
+            keepTitle: "やめる",
+            confirmTitle: "抜ける"
+        ) {
+            leave()
+        }
         .confirmation(
             isPresented: $model.isChoosing,
             systemImage: "icloud",
             title: "iCloud にもデータがあります",
-            message: "使う方を選んでください。選ばなかった方は置き換わります",
+            message: SyncModel.choiceMessage,
             keepTitle: "やめる",
             confirmTitle: "iCloud のデータを使う",
             alternateTitle: "この iPhone のデータを使う",
@@ -165,6 +232,37 @@ private extension SyncView {
                 .foregroundStyle(Palette.text)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    func warning(_ text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle")
+
+            Text(text)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .textFont(.footnote)
+        .foregroundStyle(Palette.rose)
+        .padding(.leading, 8)
+    }
+
+    func joinedRow(_ item: JoinedShare) -> some View {
+        HStack(spacing: 12) {
+            IconBadge(item.icon, size: 32)
+
+            Text(item.wallet.name)
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+                .sharedTextScale()
+
+            Spacer(minLength: 0)
+
+            Text("抜ける")
+                .textFont(.footnote)
+                .foregroundStyle(Palette.rose)
+        }
+        .frame(minHeight: 58)
+        .contentShape(.rect)
     }
 
     func shareRow(_ item: WalletShare) -> some View {
@@ -201,10 +299,14 @@ private extension SyncView {
         model.isOn || model.isAvailable
     }
 
-    var footnote: String {
-        model.isAvailable || model.isOn
-            ? "切っても、この iPhone のデータは残ります"
-            : "設定アプリで iCloud にサインインすると使えます"
+    var isLeavingBinding: Binding<Bool> {
+        Binding {
+            leaving != nil
+        } set: { isPresented in
+            if !isPresented {
+                leaving = nil
+            }
+        }
     }
 
     var onBinding: Binding<Bool> {
@@ -217,8 +319,16 @@ private extension SyncView {
         }
     }
 
-    func pendingText(_ count: Int) -> String {
-        count > 0 ? "iCloud に送っています（残り \(count) 件）" : "最新の状態です"
+    func leave() {
+        guard let leaving else {
+            return
+        }
+
+        self.leaving = nil
+
+        Task {
+            await model.leave(leaving)
+        }
     }
 
     func shareStatus(_ item: WalletShare) -> String {

@@ -3,9 +3,38 @@ import Features
 import Foundation
 import Store
 import Testing
+import TestSupport
 
 @MainActor
 struct RecurringModelTests {
+    @Test
+    func warnsThatRemindersCannotArriveWhenDenied() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let client = ReminderModelTests.FakePermission(authorization: .denied)
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        await model.load()
+
+        await model.refreshAuthorization(client.permission)
+        let withoutReminder = model.isNotificationDenied
+        model.remindDaysBefore = 1
+
+        #expect(withoutReminder == false)
+        #expect(model.isNotificationDenied)
+    }
+
+    @Test
+    func doesNotWarnWhenRemindersAreAllowed() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let client = ReminderModelTests.FakePermission(authorization: .allowed)
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        await model.load()
+        model.remindDaysBefore = 1
+
+        await model.refreshAuthorization(client.permission)
+
+        #expect(model.isNotificationDenied == false)
+    }
+
     @Test
     func savesRecurringAndGeneratesEntries() async throws {
         let setup = try await RecordsModelTests.Setup()
@@ -218,8 +247,8 @@ struct RecurringModelTests {
             await model.observe()
         }
 
-        for _ in 0..<200 where model.rows.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.rows.isEmpty
         }
 
         task.cancel()
@@ -258,14 +287,14 @@ struct RecurringModelTests {
             await model.observe()
         }
 
-        for _ in 0..<200 where model.rows.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.rows.isEmpty
         }
 
         await model.hide(saved.id)
 
-        for _ in 0..<200 where model.hiddenRows.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.hiddenRows.isEmpty
         }
 
         let shownWhileHidden = model.rows.count
@@ -273,8 +302,8 @@ struct RecurringModelTests {
 
         await model.show(saved.id)
 
-        for _ in 0..<200 where model.rows.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.rows.isEmpty
         }
 
         task.cancel()

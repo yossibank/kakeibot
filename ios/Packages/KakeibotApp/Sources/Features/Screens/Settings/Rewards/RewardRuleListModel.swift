@@ -55,7 +55,7 @@ public extension RewardRuleListModel {
 }
 
 private extension RewardRuleListModel {
-    static let loadFailedMessage = "ごほうびを読めませんでした"
+    static let loadFailedMessage = "決まりを読めませんでした"
 
     func rules(isHidden: Bool) -> [RewardRule] {
         (list?.rules ?? []).filter { $0.isActive != isHidden }

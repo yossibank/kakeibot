@@ -214,7 +214,7 @@ public extension BackupModel {
                 await permission.requestIfUndecided()
             }
         } catch {
-            errorNotice.show(Self.restoreFailedMessage)
+            errorNotice.show(Self.restoreFailedMessage, for: error)
         }
 
         await loadPrevious()

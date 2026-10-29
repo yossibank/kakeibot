@@ -147,7 +147,7 @@ public extension EntryModel {
             await reloadCategories()
             await reloadTemplates()
         } catch {
-            errorNotice.show(Self.restoreFailedMessage)
+            errorNotice.show(Self.restoreFailedMessage, for: error)
         }
     }
 

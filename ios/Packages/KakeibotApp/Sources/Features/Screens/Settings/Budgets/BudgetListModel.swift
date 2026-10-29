@@ -204,7 +204,7 @@ private extension BudgetListModel {
             budgets = try await database.budgets()
             self.editing = nil
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }

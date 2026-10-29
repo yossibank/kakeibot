@@ -26,6 +26,7 @@ public final class RecurringEditModel {
     public private(set) var options: EntryOptions?
     public private(set) var isHidden = false
 
+    public internal(set) var authorization: NotificationAuthorization = .allowed
     public internal(set) var errorNotice = ErrorNotice()
 
     let today: LocalDate
@@ -231,7 +232,7 @@ public extension RecurringEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -244,7 +245,7 @@ public extension RecurringEditModel {
         do {
             return try await database.deleteRecurring(editingId, at: Date())
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return nil
         }
     }
@@ -266,7 +267,7 @@ public extension RecurringEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }

@@ -107,7 +107,7 @@ public extension RewardRuleEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -128,7 +128,7 @@ public extension RewardRuleEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -141,7 +141,7 @@ public extension RewardRuleEditModel {
         do {
             return try await database.deleteRewardRule(editingId)
         } catch {
-            errorNotice.show(Self.deleteFailedMessage)
+            errorNotice.show(Self.deleteFailedMessage, for: error)
             return nil
         }
     }
@@ -150,5 +150,5 @@ public extension RewardRuleEditModel {
 private extension RewardRuleEditModel {
     static let saveFailedMessage = "保存できませんでした"
     static let deleteFailedMessage = "削除できませんでした"
-    static let loadFailedMessage = "ごほうびを読めませんでした"
+    static let loadFailedMessage = "決まりを読めませんでした"
 }

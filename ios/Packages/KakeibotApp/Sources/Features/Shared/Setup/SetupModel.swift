@@ -183,7 +183,7 @@ private extension SetupModel {
         do {
             try await database.setSetting(key, to: value)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }

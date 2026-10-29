@@ -86,7 +86,7 @@ public extension OnboardingModel {
         do {
             try await database.setSetting(.weekStart, to: weekStart)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -125,7 +125,7 @@ public extension OnboardingModel {
             try await database.setSetting(.onboardingCompleted, to: true)
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }

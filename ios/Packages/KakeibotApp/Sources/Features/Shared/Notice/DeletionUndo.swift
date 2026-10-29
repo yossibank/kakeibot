@@ -20,7 +20,7 @@ public extension DeletionUndo {
         do {
             try await database.restore(deletion)
         } catch {
-            errorNotice.show(Self.restoreFailedMessage)
+            errorNotice.show(Self.restoreFailedMessage, for: error)
         }
     }
 }

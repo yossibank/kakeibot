@@ -3,6 +3,7 @@ import Features
 import Foundation
 import Store
 import Testing
+import TestSupport
 
 @MainActor
 struct MonthStartDayModelTests {
@@ -99,9 +100,13 @@ struct MonthStartDayModelTests {
 }
 
 private extension MonthStartDayModelTests {
-    func wait(until isReady: () -> Bool) async throws {
-        for _ in 0..<200 where !isReady() {
-            try await Task.sleep(for: .milliseconds(10))
-        }
+    func wait(
+        sourceLocation: SourceLocation = #_sourceLocation,
+        until isReady: @escaping @MainActor () -> Bool
+    ) async throws {
+        await ObservationWait.until(
+            sourceLocation: sourceLocation,
+            isReady
+        )
     }
 }

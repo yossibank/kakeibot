@@ -77,6 +77,10 @@ public extension RecordsModel {
         return filter.apply(to: days)
     }
 
+    var showsNoRecords: Bool {
+        list != nil && days.isEmpty
+    }
+
     var expenseTotal: Int {
         days.reduce(0) { $0 + $1.expenseTotal }
     }
@@ -206,7 +210,7 @@ public extension RecordsModel {
         do {
             try await database.setSetting(.recordsLayout, to: layout)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -288,7 +292,7 @@ private extension RecordsModel {
         do {
             try await database.setSetting(.recentSearches, to: recentSearches)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 

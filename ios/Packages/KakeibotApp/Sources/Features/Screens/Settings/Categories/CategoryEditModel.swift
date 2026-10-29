@@ -186,7 +186,7 @@ public extension CategoryEditModel {
                 at: Date()
             )
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return nil
         }
     }
@@ -207,7 +207,7 @@ public extension CategoryEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -226,7 +226,7 @@ public extension CategoryEditModel {
             errorNotice.show(Self.inUseMessage)
             return nil
         } catch {
-            errorNotice.show(Self.deleteFailedMessage)
+            errorNotice.show(Self.deleteFailedMessage, for: error)
             return nil
         }
     }
@@ -300,7 +300,7 @@ private extension CategoryEditModel {
 
             baseline = baseline.map { Snapshot(draft: $0.draft, tags: drafts) }
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 

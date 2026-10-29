@@ -69,7 +69,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 ## パッケージ
 
-2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/` と、`Sync` を足している。依存の向きは、共通の形に `AppFeature --> Sync --> Store` を足したものである。
+2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/` と、`Sync`・`TestSupport` を足している。依存の向きは、共通の形に `AppFeature --> Sync --> Store` と `AppFeatureTests・FeaturesTests --> TestSupport` を足したものである。
 
 ### KakeibotKit
 
@@ -166,11 +166,12 @@ KakeibotApp/
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み |
-| `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、読み込めないときの表示 |
+| `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、読み込めないときの表示、保存の失敗が空き容量不足かの見分け |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり |
 | `Features/Shared/Settings/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Preview・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |
+| `Tests/TestSupport/` | テストの補助。観測している値が変わるのを、上限の時間まで待つ |
 
 ## 名前の決まり
 
@@ -188,8 +189,8 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 
 記録の一覧（`EntryList`）の見張りは、`AppDatabase` が 1 つだけ持つ。見張りの型は `ValueObservation` で、次のように使う。
 
-- 見張る画面と入力シートのあいだで共有する。中身が変わらない書き込みでは、値を渡さない
-- 月の集計（`MonthOverview`）と通知の入力（`NotificationInput`）も、この一覧から作る。ほかの表は、小さな問い合わせで足す
+- 見張る画面と入力シートのあいだで共有する。中身が変わらない書き込みでは、値を渡さない。
+- 月の集計（`MonthOverview`）と通知の入力（`NotificationInput`）も、この一覧から作る。ほかの表は、小さな問い合わせで足す。
 
 ### 見張り直し
 
@@ -262,7 +263,7 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 
 ## テスト
 
-テストの形は、共通の形と同じである。Core のテストは、fixtures を全部通す。
+テストの形は、共通の形に `SyncTests` と `AppWidgetTests` を足したものである。Core のテストは、fixtures を全部通す。
 
 ## 未検証
 

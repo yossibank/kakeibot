@@ -59,7 +59,7 @@ public struct RewardRuleEditSheet: View {
         )
         .overlay(alignment: .top) {
             SettingsEditHeader(
-                title: model.isEditing ? "ごほうびを編集" : "ごほうびを追加",
+                title: model.isEditing ? "決まりを編集" : "決まりを追加",
                 isEditing: model.isEditing,
                 isHidden: model.isHidden,
                 canDelete: !(model.isHidden && model.hasLogs)
@@ -252,7 +252,7 @@ private extension RewardRuleEditSheet {
     }
 
     var deleteTitle: String {
-        model.hasLogs ? "このごほうびは削除できません" : "このごほうびを削除しますか"
+        model.hasLogs ? "この決まりは削除できません" : "この決まりを削除しますか"
     }
 
     var deleteMessage: String? {
