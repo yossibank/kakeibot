@@ -15,3 +15,4 @@
 | スタンプ | スタンプ | `CalendarStamp` | カレンダーの日に 1 つ押す印。押す前の一覧の印は `ShelfIcon` で持つ |
 | ごほうび | ごほうび貯金 | `RewardRule`・`RewardGoal`・`RewardLog` | 決まりの達成で仮想の貯金箱に貯まる額。口座の残高は変えない |
 | iCloud 同期 | 端末間の同期 | `SyncModel`・`SyncEngine` | 自分の iCloud で、記録と設定を端末どうしでそろえること |
+| 家族と共有する口座 | 家族との共有 | `WalletShare`・`SyncShareSheet` | 口座ごとに、ほかの iCloud の人と記録を分けあうこと |

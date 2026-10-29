@@ -74,14 +74,74 @@ struct SyncModelTests {
         #expect(model.isOn == false)
         #expect(try await setup.database.pendingSyncChanges().isEmpty)
     }
+
+    @Test
+    func startsSharingAndShowsSheet() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let item = try await firstShare(in: setup.database)
+
+        await model.share(item)
+        let shared = try await firstShare(in: setup.database)
+
+        #expect(await cloud.shareCalls == ["create", "show"])
+        #expect(shared.isShared)
+        #expect(model.errorNotice.message == nil)
+    }
+
+    @Test
+    func showsSheetWithoutCreatingWhenAlreadyShared() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let item = try await firstShare(in: setup.database)
+
+        try await setup.database.startSharing(item.wallet.id)
+        let shared = try await firstShare(in: setup.database)
+        await model.share(shared)
+
+        #expect(await cloud.shareCalls == ["show"])
+    }
+
+    @Test
+    func endsSharingWhenSheetStops() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false, stopsInSheet: true)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let item = try await firstShare(in: setup.database)
+
+        await model.share(item)
+        let after = try await firstShare(in: setup.database)
+
+        #expect(await cloud.shareCalls == ["create", "show", "delete"])
+        #expect(after.isShared == false)
+    }
+
+    @Test
+    func keepsWalletUnsharedWhenCreatingFails() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false, failsToCreate: true)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let item = try await firstShare(in: setup.database)
+
+        await model.share(item)
+        let after = try await firstShare(in: setup.database)
+
+        #expect(after.isShared == false)
+        #expect(model.errorNotice.message != nil)
+    }
 }
 
 extension SyncModelTests {
     actor FakeCloud {
         private(set) var deleted = false
+        private(set) var shareCalls: [String] = []
 
         private let isAvailable: Bool
         private let hasData: Bool
+        private let stopsInSheet: Bool
+        private let failsToCreate: Bool
 
         nonisolated var cloud: SyncCloud {
             SyncCloud {
@@ -90,19 +150,56 @@ extension SyncModelTests {
                 self.hasData
             } deleteData: {
                 await self.delete()
+            } createShare: { _, _ in
+                try await self.createShare()
+            } showShare: { _, _, onStop in
+                await self.record("show")
+
+                if self.stopsInSheet {
+                    await onStop()
+                }
+            } deleteShare: { _ in
+                await self.record("delete")
             }
         }
 
         init(
             isAvailable: Bool = true,
-            hasData: Bool
+            hasData: Bool,
+            stopsInSheet: Bool = false,
+            failsToCreate: Bool = false
         ) {
             self.isAvailable = isAvailable
             self.hasData = hasData
+            self.stopsInSheet = stopsInSheet
+            self.failsToCreate = failsToCreate
         }
 
         func delete() {
             deleted = true
         }
+
+        func record(_ call: String) {
+            shareCalls.append(call)
+        }
+
+        func createShare() throws {
+            shareCalls.append("create")
+
+            if failsToCreate {
+                throw CancellationError()
+            }
+        }
+    }
+
+    func firstShare(in database: AppDatabase) async throws -> WalletShare {
+        var first: WalletShare?
+
+        for try await shares in database.walletShareUpdates() {
+            first = shares.first
+            break
+        }
+
+        return try #require(first)
     }
 }

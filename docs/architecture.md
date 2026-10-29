@@ -110,7 +110,7 @@ KakeibotApp/
 │   │       ├── Settings/    設定の画面で使う部品（Board・Header・Hint・Icon・Input・Preview・Tile）
 │   │       └── Setup/       残りの設定とカスタマイズの項目と進み具合
 │   ├── Notifications/
-│   └── Sync/                CKSyncEngine で、記録した変更を送り、届いた変更を Store に渡す
+│   └── Sync/                CKSyncEngine で変更を送り受けする。財布の共有と共有シートも作る
 └── Tests/
 ```
 

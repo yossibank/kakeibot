@@ -20,6 +20,15 @@ public extension AppDatabase {
             try Self.endSharing(walletID, in: db)
         }
     }
+
+    func walletShareUpdates() -> some AsyncSequence<[WalletShare], any Error> {
+        ValueObservation
+            .tracking { db in
+                try Self.walletShares(in: db)
+            }
+            .removeDuplicates()
+            .values(in: writer)
+    }
 }
 
 extension AppDatabase {
@@ -48,6 +57,31 @@ private extension AppDatabase {
         var categories: [String: String] = [:]
         var tags: [String: String] = [:]
         var keys: [SyncKey] = []
+    }
+
+    static func walletShares(in db: Database) throws -> [WalletShare] {
+        let rows = try Row.fetchAll(
+            db,
+            sql: """
+            SELECT wallet.*, sync_share.wallet_id IS NOT NULL AS is_shared FROM wallet
+            LEFT JOIN sync_share ON sync_share.wallet_id = wallet.id
+            WHERE sync_share.owner_name IS NULL
+                AND (wallet.archived_at IS NULL OR sync_share.wallet_id IS NOT NULL)
+            ORDER BY wallet.sort_order, wallet.created_at
+            """
+        )
+
+        let wallets = try rows.map { try Wallet(row: $0) }
+        let icons = try Icon.fetchAll(db, keys: wallets.map(\.iconId))
+        let iconsByID = Dictionary(uniqueKeysWithValues: icons.map { ($0.id, $0) })
+
+        return zip(wallets, rows).map { wallet, row in
+            WalletShare(
+                wallet: wallet,
+                icon: iconsByID[wallet.iconId],
+                isShared: row["is_shared"]
+            )
+        }
     }
 
     static func shareCandidates(

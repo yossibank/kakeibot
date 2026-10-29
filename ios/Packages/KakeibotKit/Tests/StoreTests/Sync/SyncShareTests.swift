@@ -270,6 +270,43 @@ struct SyncShareTests {
         #expect(after.incomeCategories.map(\.id) == before.incomeCategories.map(\.id))
         #expect(after.tags.map(\.id.description) == ["00000000-0000-4000-8000-000000000001"])
     }
+
+    @Test
+    func listsOwnWalletsWithShareState() async throws {
+        let setup = try await SyncTests.Setup(enabled: false)
+        let shared = try await setup.walletID()
+        let other = try await setup.otherWalletID()
+
+        try await setup.execute("INSERT INTO sync_share (wallet_id) VALUES ('\(shared)')")
+        let before = try await setup.walletShares()
+        try await setup.execute("""
+        INSERT INTO sync_share (wallet_id, owner_name) VALUES ('\(other)', '_owner')
+        """)
+        let after = try await setup.walletShares()
+
+        #expect(before.first?.wallet.id.description == shared)
+        #expect(before.first?.isShared == true)
+        #expect(before.first?.icon != nil)
+        #expect(before.filter(\.isShared).count == 1)
+        #expect(after.map(\.wallet.id.description).contains(other) == false)
+        #expect(after.count == before.count - 1)
+    }
+
+    @Test
+    func listsHiddenWalletOnlyWhileSharing() async throws {
+        let setup = try await SyncTests.Setup(enabled: false)
+        let walletID = try await setup.walletID()
+
+        try await setup.execute("""
+        UPDATE wallet SET archived_at = created_at WHERE id = '\(walletID)'
+        """)
+        let hidden = try await setup.walletShares()
+        try await setup.execute("INSERT INTO sync_share (wallet_id) VALUES ('\(walletID)')")
+        let sharing = try await setup.walletShares()
+
+        #expect(hidden.map(\.wallet.id.description).contains(walletID) == false)
+        #expect(sharing.map(\.wallet.id.description).contains(walletID))
+    }
 }
 
 private extension SyncTests.Setup {
@@ -293,6 +330,14 @@ private extension SyncTests.Setup {
         let sharedIcon: String
         let categoryIcon = "i-category"
         let ownIcon = "i-own"
+    }
+
+    func walletShares() async throws -> [WalletShare] {
+        for try await shares in database.walletShareUpdates() {
+            return shares
+        }
+
+        return []
     }
 
     func otherWalletID() async throws -> String {
