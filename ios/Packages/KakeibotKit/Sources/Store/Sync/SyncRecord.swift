@@ -46,20 +46,6 @@ public struct SyncChange: Hashable, Sendable {
     public let deleteZones: [String]
 
     let version: Int64
-
-    public init(
-        key: SyncKey,
-        isDeletion: Bool,
-        saveZone: String?,
-        deleteZones: [String],
-        version: Int64
-    ) {
-        self.key = key
-        self.isDeletion = isDeletion
-        self.saveZone = saveZone
-        self.deleteZones = deleteZones
-        self.version = version
-    }
 }
 
 public extension SyncChange {

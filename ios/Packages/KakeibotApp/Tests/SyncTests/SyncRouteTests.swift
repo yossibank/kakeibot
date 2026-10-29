@@ -1,5 +1,5 @@
 import CloudKit
-import Store
+@testable import Store
 @testable import Sync
 import Testing
 
