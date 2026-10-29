@@ -19,7 +19,8 @@ extension HomeView {
 
                 CapsulePicker(
                     selection: $model.templateType,
-                    options: Self.typeOptions
+                    options: Self.typeOptions,
+                    size: .small
                 )
             }
             .padding(.top, 8)

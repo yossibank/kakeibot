@@ -6,7 +6,7 @@ public enum HomeSection: String, CaseIterable, Codable, Identifiable, Sendable {
     case bills
     case stamps
 
-    public static let standard: [Self] = [.budget, .customize, .templates, .recent]
+    public static let standard: [Self] = [.customize, .budget, .templates, .recent]
 
     public var id: Self {
         self

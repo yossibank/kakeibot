@@ -11,14 +11,17 @@ public struct CapsulePicker<Value: Hashable>: View {
     @Environment(\.themeStyle.textSize.scale) private var textScale
 
     let options: [Option]
+    let size: Size
 
     public init(
         selection: Binding<Value>,
-        options: [Option]
+        options: [Option],
+        size: Size = .regular
     ) {
         _selection = selection
 
         self.options = options
+        self.size = size
     }
 
     public var body: some View {
@@ -42,7 +45,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                     let color = isHighlighted ? Palette.accentStrong : Palette.subtext
 
                     Text(option.title)
-                        .textFont(.footnote, weight: weight)
+                        .textFont(size.font, weight: weight)
                         .foregroundStyle(color)
                         .frame(width: segmentWidth, height: segmentHeight)
                 }
@@ -75,6 +78,25 @@ public struct CapsulePicker<Value: Hashable>: View {
 }
 
 public extension CapsulePicker {
+    enum Size: Sendable {
+        case regular
+        case small
+
+        var font: Font.TextStyle {
+            switch self {
+            case .regular: .footnote
+            case .small: .caption
+            }
+        }
+
+        var segment: CGSize {
+            switch self {
+            case .regular: CGSize(width: 72, height: 30)
+            case .small: CGSize(width: 56, height: 26)
+            }
+        }
+    }
+
     struct Option {
         public let title: String
         public let value: Value
@@ -140,11 +162,11 @@ private extension CapsulePicker {
     }
 
     var segmentWidth: CGFloat {
-        72 * textScale
+        size.segment.width * textScale
     }
 
     var segmentHeight: CGFloat {
-        30 * textScale
+        size.segment.height * textScale
     }
 
     var selectedIndex: Int {

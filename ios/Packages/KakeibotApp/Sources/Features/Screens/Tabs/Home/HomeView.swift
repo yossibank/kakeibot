@@ -67,18 +67,12 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
 
-                if setup.showsCard,
-                   !showsBudget {
+                if setup.showsCard {
                     setupCard
                 }
 
                 ForEach(model.homeLayout.visible) { section in
                     sectionView(section)
-
-                    if section == .budget,
-                       setup.showsCard {
-                        setupCard
-                    }
                 }
             }
             .padding(.horizontal, 16)
@@ -114,11 +108,7 @@ private extension HomeView {
 
             Spacer()
 
-            HeaderButton(
-                systemImage: "gearshape",
-                showsDot: !setup.isSettingsOpened,
-                action: onOpenSettings
-            )
+            HeaderButton(systemImage: "gearshape", action: onOpenSettings)
         }
     }
 
@@ -246,9 +236,5 @@ private extension HomeView {
 
     static var cardTransition: AnyTransition {
         .offset(y: 16).combined(with: .opacity)
-    }
-
-    var showsBudget: Bool {
-        model.homeLayout.visible.contains(.budget)
     }
 }

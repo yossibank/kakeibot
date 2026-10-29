@@ -53,8 +53,8 @@ struct HomeLayoutTests {
 
         #expect(
             layout.slots == [
-                .section(.budget),
                 .section(.customize),
+                .section(.budget),
                 .section(.templates),
                 .section(.recent),
                 .boundary,

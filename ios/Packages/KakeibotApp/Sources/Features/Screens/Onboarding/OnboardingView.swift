@@ -157,25 +157,37 @@ private extension OnboardingView {
 
             Spacer()
 
-            routeButton(
-                .minimal,
-                title: "予算だけ決めて始める",
-                detail: "月の始まりと予算",
-                duration: "1 分"
-            )
-
-            routeButton(
-                .full,
-                title: "しっかり決めて始める",
-                detail: "口座・固定費・通知・見た目なども",
-                duration: "5 分"
-            )
-
-            PrimaryButton("すぐ始める") {
-                Task {
-                    model.choose(.quick)
-                    await finish()
+            VStack(spacing: 0) {
+                routeRow(
+                    systemImage: "gearshape",
+                    title: "しっかり決めて始める",
+                    detail: "口座・固定費・通知・見た目",
+                    duration: "5 分"
+                ) {
+                    model.choose(.full)
+                    turnPage(.forward)
                 }
+
+                Hairline()
+                    .padding(.leading, 52)
+
+                routeRow(
+                    systemImage: "bolt",
+                    title: "決めずに始める",
+                    detail: "設定はあとで",
+                    duration: nil
+                ) {
+                    Task {
+                        model.choose(.quick)
+                        await finish()
+                    }
+                }
+            }
+            .card()
+
+            PrimaryButton("予算を決めて始める（1 分）") {
+                model.choose(.minimal)
+                turnPage(.forward)
             }
 
             Text("どれも、あとで設定から変えられます")
@@ -186,17 +198,20 @@ private extension OnboardingView {
         .frame(maxHeight: .infinity)
     }
 
-    func routeButton(
-        _ route: OnboardingModel.Route,
+    func routeRow(
+        systemImage: String,
         title: String,
         detail: String,
-        duration: String
+        duration: String?,
+        action: @escaping () -> Void
     ) -> some View {
-        Button {
-            model.choose(route)
-            turnPage(.forward)
-        } label: {
+        Button(action: action) {
             HStack(spacing: 12) {
+                Image(systemName: systemImage)
+                    .sansFont(.body, weight: .light)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 24)
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
                         .textFont(.subheadline)
@@ -209,10 +224,12 @@ private extension OnboardingView {
 
                 Spacer()
 
-                Text(duration)
-                    .textFont(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.hint)
+                if let duration {
+                    Text(duration)
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.hint)
+                }
 
                 Image(systemName: "chevron.right")
                     .sansFont(.small)
@@ -220,7 +237,6 @@ private extension OnboardingView {
             }
             .frame(minHeight: 56)
             .padding(.horizontal, 16)
-            .card()
             .contentShape(.rect)
         }
         .buttonStyle(.plain)

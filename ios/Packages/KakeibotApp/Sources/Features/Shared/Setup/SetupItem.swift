@@ -43,7 +43,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .budget: "月の予算"
         case .wallets: "口座と今の残高"
         case .categories: "使うカテゴリ"
-        case .recurrings: "固定費（家賃・通信など）"
+        case .recurrings: "固定費"
         case .templates: "テンプレート"
         case .reminder: "記録忘れの通知"
         case .launchScreen: "起動時に開く画面"

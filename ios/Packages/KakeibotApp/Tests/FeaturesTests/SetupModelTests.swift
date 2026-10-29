@@ -32,7 +32,7 @@ struct SetupModelTests {
     }
 
     @Test
-    func marksEntryAndSettingsOpenedOnce() async throws {
+    func marksEntryOpenedOnce() async throws {
         let database = try AppDatabase.inMemory()
         let model = SetupModel(database: database)
         let task = Task {
@@ -40,19 +40,16 @@ struct SetupModelTests {
         }
 
         try await Self.wait {
-            model.isLoaded && !model.isEntryOpened && !model.isSettingsOpened
+            model.isLoaded && !model.isEntryOpened
         }
 
         await model.markEntryOpened()
-        await model.markSettingsOpened()
         let entryOpened = try await database.setting(.entryOpened)
-        let settingsOpened = try await database.setting(.settingsOpened)
         try await database.failWrites(to: "setting")
         await model.markEntryOpened()
         task.cancel()
 
         #expect(entryOpened)
-        #expect(settingsOpened)
         #expect(model.errorNotice.message == nil)
     }
 

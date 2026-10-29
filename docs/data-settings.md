@@ -31,7 +31,7 @@ expense・income の列は、描画に使わない。
 | onboarding_completed | `true` `false` | |
 | setup_card_closed | `true` なら、ホームの残りの設定のカードを出さない | |
 | entry_opened | `true` `false` | 入力シートを一度開くと `true` にし、入力の ＋ に光を回さない |
-| settings_opened | `true` `false` | 設定を一度開くと `true` にし、ホームの設定のボタンに金の点を出さない |
+| settings_opened | `true` `false` | 今は読み書きしない |
 | launch_screen | `home`・`records`・`review`・`assets`・`entry` | 空ならホーム |
 | corner_style | `square`・`small`・`standard`・`large` | 空なら `standard`。`square` は角を丸めない |
 | font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop` | 空なら `mincho` |

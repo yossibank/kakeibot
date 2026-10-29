@@ -9,14 +9,15 @@ struct MainView: View {
     @State var sheet: Sheet?
     @State var home: HomeModel
     @State var records: RecordsModel
+    @State var review: ReviewModel
+    @State var assets: AssetsModel
     @State var setup: SetupModel
     @State var appIcon = AppIconListModel()
     @State var draft: EntryModel
     @State var notice: EntryNoticeModel
     @State var undo: DeletionUndo
+    @State var launchScreen: LaunchScreen?
 
-    @State private var review: ReviewModel
-    @State private var assets: AssetsModel
     @State private var isWarmingEntry = true
     @State private var orderMenuAnchor: CGRect?
     @State private var observationRound = 0
@@ -286,15 +287,18 @@ struct MainView: View {
         .task {
             await draft.load()
         }
-        .task(id: isRevealed) {
-            guard isRevealed else {
+        .task {
+            await chooseLaunchTab()
+        }
+        .task(id: isLaunchReady) {
+            guard isLaunchReady else {
                 return
             }
 
             if let route {
                 open(route)
             } else {
-                await openLaunchScreen()
+                openLaunchSheet()
             }
         }
         .onChange(of: tab, initial: true) {
@@ -367,6 +371,10 @@ private extension MainView {
 }
 
 private extension MainView {
+    var isLaunchReady: Bool {
+        isRevealed && launchScreen != nil
+    }
+
     func tabObservation(_ tab: MainTab) -> ObservationID<Bool> {
         ObservationID(base: openedTabs.contains(tab), round: observationRound)
     }
