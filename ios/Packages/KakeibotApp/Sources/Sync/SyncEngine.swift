@@ -273,10 +273,6 @@ private extension SyncEngine {
         try? await database.removeSyncSystemFields(deleted)
         try? await database.removeSyncChanges(finished)
 
-        for id in deleted {
-            deleteWalletZone(after: id)
-        }
-
         for failure in sent.failedRecordSaves {
             await retry(failure)
         }
@@ -322,18 +318,6 @@ private extension SyncEngine {
         change.deleteZones
             .filter { isSent(to: $0) }
             .map { .deleteRecord(SyncRecordID(key: change.key, zoneName: $0).recordID) }
-    }
-
-    func deleteWalletZone(after id: SyncRecordID) {
-        guard
-            id.key.table == .wallet,
-            SyncZone.walletID(of: id.zoneName)?.description == id.key.id
-        else {
-            return
-        }
-
-        let zoneID = CKRecordZone.ID(zoneName: id.zoneName)
-        engine?.state.add(pendingDatabaseChanges: [.deleteZone(zoneID)])
     }
 
     func retry(_ failure: CKSyncEngine.Event.SentRecordZoneChanges.FailedRecordSave) async {

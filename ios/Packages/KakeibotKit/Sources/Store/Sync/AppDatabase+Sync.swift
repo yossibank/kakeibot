@@ -18,10 +18,19 @@ public extension AppDatabase {
     }
 
     func syncActivityUpdates() -> some AsyncSequence<SyncActivity, any Error> {
-        ValueObservation
-            .tracking { db in
+        let regions = Self.syncChangeRegions + [Table("sync_state"), Table("sync_share")]
+
+        return ValueObservation
+            .tracking(regions: regions) { db in
                 let enabled = try Bool.fetchOne(db, sql: "SELECT enabled FROM sync_state")
-                let sharing = try Bool.fetchOne(db, sql: "SELECT EXISTS (SELECT 1 FROM sync_share)")
+                let sharing = try Bool.fetchOne(
+                    db,
+                    sql: """
+                    SELECT EXISTS (SELECT 1 FROM sync_share)
+                        OR (NOT enabled AND EXISTS (SELECT 1 FROM sync_change))
+                    FROM sync_state
+                    """
+                )
 
                 return SyncActivity(
                     isSyncEnabled: enabled ?? false,

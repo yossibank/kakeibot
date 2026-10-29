@@ -237,6 +237,24 @@ struct SyncZoneTests {
         #expect(deleted == SyncZoneTests.Counts(categories: 0, tags: 0, icons: 0))
         #expect(restored == counts)
     }
+
+    @Test
+    func keepsActiveUntilDeletedSharedWalletIsSent() async throws {
+        let setup = try await SyncTests.Setup(enabled: false)
+        let walletID = try await setup.walletID()
+        let id = try #require(Wallet.ID(walletID))
+        let key = SyncKey(table: .wallet, id: walletID)
+
+        try await setup.database.startSharing(id)
+        try await setup.database.deleteWallet(id, at: Date(timeIntervalSince1970: 0))
+
+        let change = try await setup.change(of: key)
+        let activity = try await setup.database.syncActivityUpdates().first { _ in true }
+
+        #expect(change.isDeletion)
+        #expect(try await setup.value("SELECT COUNT(*) FROM sync_share") == "0")
+        #expect(activity?.isActive == true)
+    }
 }
 
 private extension SyncTests.Setup {

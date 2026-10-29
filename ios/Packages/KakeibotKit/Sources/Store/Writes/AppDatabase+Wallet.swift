@@ -102,6 +102,9 @@ public extension AppDatabase {
                 valuations: valuations.fetchAll(db)
             )
 
+            let key = SyncKey(table: .wallet, id: id.description)
+            let isShared = try Self.syncSharedWallet(for: key, in: db) != nil
+
             try Self.deleteRecurrings(recurrings, in: db, at: now)
             try templates.deleteAll(db)
             try valuations.deleteAll(db)
@@ -109,6 +112,10 @@ public extension AppDatabase {
             try categories.deleteAll(db)
             try icons.deleteAll(db)
             try wallet.delete(db)
+
+            if isShared {
+                try Self.queue(key, in: db)
+            }
 
             return deletion
         }
