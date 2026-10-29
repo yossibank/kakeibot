@@ -43,6 +43,9 @@ private struct SharesTextScale<ID: Equatable>: ViewModifier {
             .onPreferenceChange(TextScaleKey.self) { report in
                 scale = min(scale, report.scale)
             }
+            .transformPreference(TextScaleKey.self) { report in
+                report = TextScaleKey.defaultValue
+            }
             .onChange(of: id) {
                 reset()
             }
