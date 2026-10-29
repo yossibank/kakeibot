@@ -113,24 +113,12 @@ extension SyncEngine {
         container.database(with: scope)
     }
 
-    func isForeign(_ zoneName: String) -> Bool {
-        owners[zoneName] != nil
-    }
-
-    func sends(to zoneName: String) -> Bool {
-        guard !isShared else {
-            return isForeign(zoneName)
-        }
-
-        return !isForeign(zoneName) && (isSyncEnabled || zoneName != SyncZone.own)
-    }
-
-    func receives(from zoneName: String) -> Bool {
-        guard !isShared else {
-            return SyncZone.walletID(of: zoneName) != nil
-        }
-
-        return isSyncEnabled || zoneName != SyncZone.own
+    var route: SyncRoute {
+        SyncRoute(
+            isShared: isShared,
+            isSyncEnabled: isSyncEnabled,
+            owners: owners
+        )
     }
 
     func recordID(of id: SyncRecordID) -> CKRecord.ID {
