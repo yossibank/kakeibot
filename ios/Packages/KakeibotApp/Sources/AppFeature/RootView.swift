@@ -22,6 +22,9 @@ public struct RootView: View {
     public var body: some View {
         ZStack {
             content
+                .errorBanner(model.notice, bottom: noticeBottom) {
+                    model.notice.clear()
+                }
 
             if isLaunching {
                 LaunchView(
@@ -103,9 +106,6 @@ private extension RootView {
             } onLoad: {
                 isHomeLoaded = true
             }
-            .errorBanner(model.notice, bottom: MainView.noticeBottom) {
-                model.notice.clear()
-            }
             .task(id: model.observationID(model.today)) {
                 await model.observeNotifications(in: database)
             }
@@ -141,6 +141,13 @@ private extension RootView {
         case .opening: false
         case .ready: isHomeLoaded
         case .onboarding, .failed: true
+        }
+    }
+
+    var noticeBottom: CGFloat {
+        switch model.launch {
+        case .ready: MainView.noticeBottom
+        case .opening, .onboarding, .failed: 12
         }
     }
 
