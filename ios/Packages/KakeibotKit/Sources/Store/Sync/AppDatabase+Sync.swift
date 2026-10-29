@@ -274,6 +274,11 @@ private extension AppDatabase {
     ) AND NOT EXISTS (
         SELECT 1 FROM category JOIN sync_share ON sync_share.wallet_id = category.wallet_id
         WHERE sync_waiting.fields LIKE '%' || category.id || '%'
+    ) AND NOT EXISTS (
+        SELECT 1 FROM sync_record
+        WHERE sync_record.table_name = sync_waiting.table_name
+            AND sync_record.record_id = sync_waiting.record_id
+            AND sync_record.zone_name <> '\(SyncZone.own)'
     )
     """
 

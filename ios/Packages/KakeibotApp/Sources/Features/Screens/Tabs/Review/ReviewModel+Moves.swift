@@ -23,6 +23,8 @@ public extension ReviewModel {
 
         let range = period.range
 
+        _ = recurrings
+
         if let cached = moveCache[range] {
             return cached
         }
