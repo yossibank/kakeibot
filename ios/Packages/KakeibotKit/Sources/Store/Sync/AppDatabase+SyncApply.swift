@@ -10,6 +10,7 @@ public extension AppDatabase {
     ) async throws {
         try await writer.write { db in
             let joinedIDs = Array(systemFields.keys)
+            let sharedKeys = Self.sharedKeys(in: systemFields)
 
             try Self.setApplying(true, in: db)
 
@@ -22,7 +23,8 @@ public extension AppDatabase {
             }
 
             for record in Self.parentsFirst(saved) {
-                try Self.applySave(of: record, in: db)
+                let kept = sharedKeys.contains(record.key) ? record.removingLocalColumns() : record
+                try Self.applySave(of: kept, in: db)
             }
 
             for (id, data) in systemFields {
