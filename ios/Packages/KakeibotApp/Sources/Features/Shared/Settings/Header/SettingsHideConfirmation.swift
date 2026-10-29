@@ -10,6 +10,7 @@ extension View {
         onDiscard: @escaping () -> Void
     ) -> some View {
         let verb = isHidden ? "表示" : "非表示"
+        let alternateTitle = canSave ? "保存して\(verb)" : nil
 
         return confirmation(
             isPresented: isPresented,
@@ -18,7 +19,7 @@ extension View {
             message: "入力した内容は、保存しないと残りません",
             keepTitle: "戻る",
             confirmTitle: "捨てて\(verb)",
-            alternateTitle: canSave ? "保存して\(verb)" : nil,
+            alternateTitle: alternateTitle,
             onAlternate: onSave,
             onConfirm: onDiscard
         )

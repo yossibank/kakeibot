@@ -28,7 +28,11 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         .themeStyle
     ]
 
-    public static let home: [Self] = [.budget, .wallets, .recurrings]
+    public static let home: [Self] = [
+        .budget,
+        .wallets,
+        .recurrings
+    ]
 
     public var id: Self {
         self
@@ -73,13 +77,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .recurrings: progress.hasRecurring
         case .reminder: progress.hasReminder
         case .theme: progress.hasTheme
-        case .categories,
-             .templates,
-             .launchScreen,
-             .appIcon,
-             .themeStyle,
-             .homeSections:
-            false
+        case .categories, .templates, .launchScreen, .appIcon, .themeStyle, .homeSections: false
         }
     }
 }

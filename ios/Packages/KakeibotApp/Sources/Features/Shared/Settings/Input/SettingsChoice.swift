@@ -25,16 +25,10 @@ struct SettingsChoice: View {
                 .monospacedDigit()
                 .foregroundStyle(color)
                 .frame(maxWidth: .infinity, minHeight: 40)
-                .background(
-                    SettingsTile.fill(isSelected: isSelected),
-                    in: Capsule()
-                )
+                .background(SettingsTile.fill(isSelected: isSelected), in: Capsule())
                 .overlay {
                     Capsule()
-                        .stroke(
-                            SettingsTile.stroke(isSelected: isSelected),
-                            lineWidth: 1
-                        )
+                        .stroke(SettingsTile.stroke(isSelected: isSelected), lineWidth: 1)
                 }
                 .contentShape(Capsule())
         }

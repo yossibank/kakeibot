@@ -61,7 +61,8 @@ private extension SettingsAutoScroll {
             return -maxSpeed * min((top + band - y) / band, 1)
         }
 
-        if y > bottom - band, y < bottom {
+        if y > bottom - band,
+           y < bottom {
             return maxSpeed * (y - (bottom - band)) / band
         }
 
@@ -93,23 +94,18 @@ extension View {
 }
 
 private struct SettingsAutoScrollModifier: ViewModifier {
-    struct Metrics: Equatable {
-        let offset: CGFloat
-        let maxOffset: CGFloat
-    }
-
     @Bindable var autoScroll: SettingsAutoScroll
 
     func body(content: Content) -> some View {
         content
             .scrollPosition($autoScroll.position)
             .onScrollGeometryChange(for: Metrics.self) { geometry in
-                let range = geometry.contentSize.height
-                    - geometry.containerSize.height
+                let range = geometry.contentSize.height - geometry.containerSize.height
+                let maxOffset = max(range, 0)
 
                 return Metrics(
                     offset: geometry.contentOffset.y,
-                    maxOffset: max(range, 0)
+                    maxOffset: maxOffset
                 )
             } action: { _, metrics in
                 autoScroll.offset = metrics.offset
@@ -120,5 +116,12 @@ private struct SettingsAutoScrollModifier: ViewModifier {
             } action: { frame in
                 autoScroll.viewport = frame
             }
+    }
+}
+
+private extension SettingsAutoScrollModifier {
+    struct Metrics: Equatable {
+        let offset: CGFloat
+        let maxOffset: CGFloat
     }
 }

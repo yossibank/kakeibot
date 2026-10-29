@@ -105,7 +105,11 @@ private extension IconEditor {
             SettingsField(
                 "3 文字まで",
                 text: textBinding,
-                font: .display(.headline, in: themeFont, scale: textScale),
+                font: .display(
+                    .headline,
+                    in: themeFont,
+                    scale: textScale
+                ),
                 focus: focus,
                 field: textField
             )
@@ -133,10 +137,7 @@ private extension IconEditor {
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: corner.radius(12))
-                        .stroke(
-                            Self.tileStroke(isSelected: isSelected),
-                            lineWidth: 1
-                        )
+                        .stroke(Self.tileStroke(isSelected: isSelected), lineWidth: 1)
                 }
                 .contentShape(.rect)
         }
@@ -158,10 +159,7 @@ private extension IconEditor {
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: corner.radius(12))
-                        .stroke(
-                            Self.tileStroke(isSelected: isSelected),
-                            lineWidth: 1
-                        )
+                        .stroke(Self.tileStroke(isSelected: isSelected), lineWidth: 1)
                 }
                 .contentShape(.rect)
         }
@@ -202,11 +200,13 @@ private extension IconEditor {
     }
 
     static var colorColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 2), count: 11)
+        let column = GridItem(.flexible(), spacing: 2)
+        return Array(repeating: column, count: 11)
     }
 
     static var gridColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 8), count: 8)
+        let column = GridItem(.flexible(), spacing: 8)
+        return Array(repeating: column, count: 8)
     }
 
     var customColor: Binding<Color> {

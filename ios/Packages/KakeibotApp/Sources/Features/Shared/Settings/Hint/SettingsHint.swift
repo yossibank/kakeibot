@@ -28,13 +28,9 @@ struct SettingsHint: View {
 }
 
 extension SettingsHint {
-    struct Line: Identifiable {
+    struct Line {
         let systemImage: String
         let text: String
-
-        var id: String {
-            text
-        }
 
         init(
             _ systemImage: String,
@@ -50,18 +46,10 @@ extension SettingsHint.Line {
     static let move = Self("hand.draw", "長押しで並べ替えられます")
     static let hide = Self("eye.slash", "長押しして下の枠へ運ぶと非表示にできます")
     static let swipeHide = Self("hand.point.left", "横に払っても非表示にできます")
-
-    static let swipeDelete = Self(
-        "hand.point.left",
-        "横に払うと、非表示と削除のボタンが出ます"
-    )
+    static let swipeDelete = Self("hand.point.left", "横に払うと、非表示と削除のボタンが出ます")
 }
 
 private extension SettingsHint {
-    static var transition: AnyTransition {
-        .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
-    }
-
     var card: some View {
         HStack(alignment: .top, spacing: 8) {
             VStack(alignment: .leading, spacing: 8) {
@@ -100,5 +88,17 @@ private extension SettingsHint {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
+    }
+}
+
+private extension SettingsHint {
+    static var transition: AnyTransition {
+        .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
+    }
+}
+
+extension SettingsHint.Line: Identifiable {
+    var id: String {
+        text
     }
 }
