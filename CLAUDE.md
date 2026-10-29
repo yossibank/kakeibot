@@ -31,6 +31,7 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 | --- | --- | --- |
 | 機能・画面を足す | [overview](docs/overview.md)、[roadmap](docs/roadmap.md) | overview、roadmap |
 | ターゲット・依存・フォルダを変える、ファイルを足す・名前を変える | [architecture](docs/architecture.md) | architecture |
+| 画面の組み立て・見張り・通知とウィジェットの流れを変える | [architecture-screens](docs/architecture-screens.md) | architecture-screens |
 | 表の形を変える | [data](docs/data.md)、[data-settings](docs/data-settings.md)、[data-sync](docs/data-sync.md) | 変えた表の文書。書き出しに響くなら export-format も |
 | 書き出しの形式を変える | [export-format](spec/export-format.md) | export-format |
 | fixtures を足す・変える | [fixtures](spec/fixtures.md) | fixtures |
