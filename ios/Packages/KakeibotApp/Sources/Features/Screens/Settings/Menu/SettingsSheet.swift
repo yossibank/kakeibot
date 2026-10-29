@@ -21,6 +21,7 @@ public struct SettingsSheet: View {
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.notificationPermission) var permission
+    @Environment(\.scenePhase) var scenePhase
     @Environment(\.syncCloud) var syncCloud
     @Environment(\.themeStyle) var themeStyle
 
@@ -79,6 +80,13 @@ public struct SettingsSheet: View {
         }
         .errorBanner(weekStart.errorNotice) {
             weekStart.errorNotice.clear()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task {
+                    authorization = await permission.authorization()
+                }
+            }
         }
         .task {
             await observeMonthStartDay()

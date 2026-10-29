@@ -26,6 +26,7 @@ public final class RecurringEditModel {
     public private(set) var options: EntryOptions?
     public private(set) var isHidden = false
 
+    public internal(set) var authorization: NotificationAuthorization = .allowed
     public internal(set) var errorNotice = ErrorNotice()
 
     let today: LocalDate

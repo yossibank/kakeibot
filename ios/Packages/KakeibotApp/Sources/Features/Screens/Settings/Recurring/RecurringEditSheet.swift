@@ -15,6 +15,7 @@ public struct RecurringEditSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.notificationPermission) private var permission
+    @Environment(\.scenePhase) private var scenePhase
 
     private let onDelete: (Deletion) -> Void
     private let onHide: () -> Void
@@ -107,8 +108,17 @@ public struct RecurringEditSheet: View {
                 await delete()
             }
         }
+        .animation(.snappy, value: model.isNotificationDenied)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task {
+                    await model.refreshAuthorization(permission)
+                }
+            }
+        }
         .task {
             await model.load()
+            await model.refreshAuthorization(permission)
         }
     }
 }
@@ -174,6 +184,11 @@ private extension RecurringEditSheet {
 
                     SettingsRowList(items: rowItems) { panel in
                         open(panel)
+                    }
+
+                    if model.isNotificationDenied {
+                        NotificationDeniedBanner()
+                            .transition(.opacity)
                     }
                 }
                 .padding(.bottom, 8)

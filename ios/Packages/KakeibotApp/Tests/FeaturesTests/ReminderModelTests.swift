@@ -37,6 +37,17 @@ struct ReminderModelTests {
     }
 
     @Test
+    func asksForPermissionInSettingsRowWhenDenied() {
+        let denied = ReminderModel.rowText(time: .evening, authorization: .denied)
+        let allowed = ReminderModel.rowText(time: .evening, authorization: .allowed)
+        let off = ReminderModel.rowText(time: nil, authorization: .denied)
+
+        #expect(denied == "許可が必要")
+        #expect(allowed == "21:00")
+        #expect(off == "オフ")
+    }
+
+    @Test
     func turnsOnAtEveningAndAsksPermission() async throws {
         let database = try AppDatabase.inMemory()
         let today = LocalDate(Date(), in: .current)

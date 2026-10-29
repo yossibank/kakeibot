@@ -83,6 +83,17 @@ public extension ReminderModel {
         ReminderMessage(on: previewDay)
     }
 
+    static func rowText(
+        time: ReminderTime?,
+        authorization: NotificationAuthorization
+    ) -> String {
+        guard let time else {
+            return "オフ"
+        }
+
+        return authorization == .denied ? "許可が必要" : time.description
+    }
+
     func showPreview(on day: Weekday) {
         previewDay = day
     }

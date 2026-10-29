@@ -224,7 +224,7 @@ private extension SettingsSheet {
     }
 
     var reminderText: String {
-        reminderTime?.description ?? "オフ"
+        ReminderModel.rowText(time: reminderTime, authorization: authorization)
     }
 
     var syncText: String {

@@ -7,6 +7,34 @@ import Testing
 @MainActor
 struct RecurringModelTests {
     @Test
+    func warnsThatRemindersCannotArriveWhenDenied() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let client = ReminderModelTests.FakePermission(authorization: .denied)
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        await model.load()
+
+        await model.refreshAuthorization(client.permission)
+        let withoutReminder = model.isNotificationDenied
+        model.remindDaysBefore = 1
+
+        #expect(withoutReminder == false)
+        #expect(model.isNotificationDenied)
+    }
+
+    @Test
+    func doesNotWarnWhenRemindersAreAllowed() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let client = ReminderModelTests.FakePermission(authorization: .allowed)
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        await model.load()
+        model.remindDaysBefore = 1
+
+        await model.refreshAuthorization(client.permission)
+
+        #expect(model.isNotificationDenied == false)
+    }
+
+    @Test
     func savesRecurringAndGeneratesEntries() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
