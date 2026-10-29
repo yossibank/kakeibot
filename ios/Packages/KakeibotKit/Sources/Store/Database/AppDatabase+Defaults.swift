@@ -57,6 +57,58 @@ extension AppDatabase {
 
         return try categoryId(for: key, seed: transferSeed, kind: kind, in: db, at: now)
     }
+
+    static func transferCategoryId(
+        _ kind: EntryCategory.Kind,
+        ofWallet walletID: Wallet.ID,
+        in db: Database,
+        at now: Date
+    ) throws -> EntryCategory.ID {
+        if let id = try existingTransferCategoryId(kind, ofWallet: walletID, in: db) {
+            return id
+        }
+
+        let icon = try insertIcon(for: transferSeed, into: db, at: now)
+
+        let sameKind = EntryCategory
+            .filter(Column("kind") == kind.rawValue)
+            .filter(Column("wallet_id") == walletID.description)
+
+        let sortOrder = try EntryCategory.nextSortOrder(of: sameKind, in: db)
+
+        let category = EntryCategory(
+            kind: kind,
+            name: transferSeed.name,
+            iconId: icon.id,
+            sortOrder: sortOrder,
+            walletId: walletID,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try category.insert(db)
+
+        return category.id
+    }
+
+    static func existingTransferCategoryId(
+        _ kind: EntryCategory.Kind,
+        ofWallet walletID: Wallet.ID,
+        in db: Database
+    ) throws -> EntryCategory.ID? {
+        let id = try String.fetchOne(
+            db,
+            sql: """
+            SELECT id FROM category
+            WHERE wallet_id = ? AND kind = ? AND name = ?
+            ORDER BY archived_at IS NOT NULL, sort_order
+            LIMIT 1
+            """,
+            arguments: [walletID.description, kind.rawValue, transferSeed.name]
+        )
+
+        return id.flatMap(EntryCategory.ID.init)
+    }
 }
 
 private extension AppDatabase {

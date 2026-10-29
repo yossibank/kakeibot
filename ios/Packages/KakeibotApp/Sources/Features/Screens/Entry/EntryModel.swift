@@ -19,6 +19,7 @@ public final class EntryModel {
         didSet {
             if walletId != oldValue {
                 billMonth = nil
+                fitCategoryToWallet()
             }
         }
     }

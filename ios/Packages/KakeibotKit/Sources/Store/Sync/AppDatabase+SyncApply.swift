@@ -10,6 +10,7 @@ public extension AppDatabase {
     ) async throws {
         try await writer.write { db in
             let joinedIDs = Array(systemFields.keys)
+            let sharedKeys = Self.sharedKeys(in: systemFields)
 
             try Self.setApplying(true, in: db)
 
@@ -22,15 +23,16 @@ public extension AppDatabase {
             }
 
             for record in Self.parentsFirst(saved) {
-                try Self.applySave(of: record, in: db)
+                let kept = sharedKeys.contains(record.key) ? record.removingLocalColumns() : record
+                try Self.applySave(of: kept, in: db)
             }
 
             for (id, data) in systemFields {
                 try Self.saveSystemFields(data, of: id, in: db)
             }
 
-            try Self.retryWaiting(in: db)
             try Self.joinSharedWallets(in: joinedIDs, owners: owners, db: db)
+            try Self.retryWaiting(in: db)
             try Self.setApplying(false, in: db)
         }
     }
@@ -231,9 +233,10 @@ private extension AppDatabase {
     }
 
     static func save(
-        _ record: SyncRecord,
+        _ received: SyncRecord,
         in db: Database
     ) throws -> Outcome {
+        let record = try receivedTransfer(received, in: db)
         let table = record.key.table
         let names = try db.columns(in: table.rawValue).map(\.name)
         let columns = Set(names)

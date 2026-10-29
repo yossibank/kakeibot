@@ -70,6 +70,16 @@ private extension AppDatabase {
             .filter(sql: "category_id IN (SELECT id FROM category WHERE wallet_id IS NULL)")
             .fetchAll(db)
 
+        let sharedCategories = try EntryCategory
+            .unarchivedInOrder()
+            .filter(Column("wallet_id") != nil)
+            .fetchAll(db)
+
+        let sharedTags = try EntryTag
+            .order(EntryTag.sortOrder)
+            .filter(sql: "category_id IN (SELECT id FROM category WHERE wallet_id IS NOT NULL)")
+            .fetchAll(db)
+
         let wallets = try Wallet.unarchivedInOrder().fetchAll(db)
         let expenseCategories = categories.filter { $0.kind == .expense }
         let incomeCategories = categories.filter { $0.kind == .income }
@@ -80,7 +90,9 @@ private extension AppDatabase {
             incomeCategories: incomeCategories,
             tags: tags,
             wallets: wallets,
-            icons: icons
+            icons: icons,
+            sharedCategories: sharedCategories,
+            sharedTags: sharedTags
         )
     }
 

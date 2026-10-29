@@ -18,7 +18,7 @@ extension AppDatabase {
         let rows = try Row.fetchAll(
             db,
             sql: """
-            SELECT id, icon_id FROM category
+            SELECT id FROM category
             WHERE wallet_id IS NULL AND (
                 archived_at IS NULL OR id IN (
                     SELECT category_id FROM entry WHERE wallet_id = ? OR to_wallet_id = ?
@@ -31,32 +31,13 @@ extension AppDatabase {
 
         for row in rows {
             let categoryID: String = row["id"]
-            let iconID: String = row["icon_id"]
-            let newCategoryID = EntryCategory.ID().description
-            let newIconID = Icon.ID().description
-            let iconKey = SyncKey(table: .icon, id: newIconID)
-            let categoryKey = SyncKey(table: .category, id: newCategoryID)
-
-            try copyRow(
-                of: "icon",
-                id: iconID,
-                as: newIconID,
-                replacing: [:],
-                in: db
-            )
-
-            try copyRow(
-                of: "category",
-                id: categoryID,
-                as: newCategoryID,
-                replacing: ["icon_id": newIconID, "wallet_id": walletID],
-                in: db
-            )
+            let copy = try copyCategory(categoryID, to: walletID, in: db)
+            let newCategoryID = copy.category
 
             copied.categories[categoryID] = newCategoryID
 
-            copied.keys.append(iconKey)
-            copied.keys.append(categoryKey)
+            copied.keys.append(SyncKey(table: .icon, id: copy.icon))
+            copied.keys.append(SyncKey(table: .category, id: newCategoryID))
 
             let tags = try String.fetchAll(
                 db,
@@ -73,24 +54,66 @@ extension AppDatabase {
             )
 
             for tagID in tags {
-                let newTagID = EntryTag.ID().description
-                let tagKey = SyncKey(table: .tag, id: newTagID)
-
-                try copyRow(
-                    of: "tag",
-                    id: tagID,
-                    as: newTagID,
-                    replacing: ["category_id": newCategoryID],
-                    in: db
-                )
+                let newTagID = try copyTag(tagID, to: newCategoryID, in: db)
 
                 copied.tags[tagID] = newTagID
 
-                copied.keys.append(tagKey)
+                copied.keys.append(SyncKey(table: .tag, id: newTagID))
             }
         }
 
         return copied
+    }
+
+    static func copyCategory(
+        _ categoryID: String,
+        to walletID: String,
+        in db: Database
+    ) throws -> (category: String, icon: String) {
+        let iconID = try String.fetchOne(
+            db,
+            sql: "SELECT icon_id FROM category WHERE id = ?",
+            arguments: [categoryID]
+        ) ?? ""
+
+        let newCategoryID = EntryCategory.ID().description
+        let newIconID = Icon.ID().description
+
+        try copyRow(
+            of: "icon",
+            id: iconID,
+            as: newIconID,
+            replacing: [:],
+            in: db
+        )
+
+        try copyRow(
+            of: "category",
+            id: categoryID,
+            as: newCategoryID,
+            replacing: ["icon_id": newIconID, "wallet_id": walletID],
+            in: db
+        )
+
+        return (newCategoryID, newIconID)
+    }
+
+    static func copyTag(
+        _ tagID: String,
+        to categoryID: String,
+        in db: Database
+    ) throws -> String {
+        let newTagID = EntryTag.ID().description
+
+        try copyRow(
+            of: "tag",
+            id: tagID,
+            as: newTagID,
+            replacing: ["category_id": categoryID],
+            in: db
+        )
+
+        return newTagID
     }
 
     static func moveEntries(

@@ -22,7 +22,7 @@ extension SyncEngine {
     func record(for recordID: CKRecord.ID) async -> CKRecord? {
         guard
             let id = SyncRecordID(recordID),
-            let local = try? await database.syncRecord(for: id.key),
+            let local = try? await database.syncRecord(for: id),
             let zone = try? await database.syncSaveZone(for: id.key),
             zone == id.zoneName
         else {
@@ -240,7 +240,7 @@ private extension SyncEngine {
                 systemFields: [id: serverRecord.systemFields]
             )
 
-            if try await database.syncRecord(for: id.key) == remote {
+            if try await database.syncRecord(for: id) == remote {
                 let change = sending.removeValue(forKey: id.key)
                 let changes = change.map { [$0] } ?? []
                 try await database.removeSyncChanges(changes)
