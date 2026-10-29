@@ -229,6 +229,8 @@ extension AppModel {
         for metadata in shares {
             do {
                 try await SyncEngine.acceptShare(metadata)
+            } catch is CancellationError {
+                continue
             } catch {
                 shareNotice.show(Self.shareFailedMessage)
             }
