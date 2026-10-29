@@ -80,7 +80,7 @@ private extension QuickRecordWidgetView {
                     .textFont(size: .caption)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.5)
                     .privacySensitive()
 
                 Spacer(minLength: 4)
@@ -90,7 +90,7 @@ private extension QuickRecordWidgetView {
                         .textFont(size: .caption, weight: .semibold)
                         .foregroundStyle(Palette.accentStrong)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                        .minimumScaleFactor(0.5)
                         .fixedSize()
                         .padding(.horizontal, 12)
                         .frame(maxHeight: .infinity)
@@ -115,7 +115,7 @@ private extension QuickRecordWidgetView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.5)
                     .privacySensitive()
             }
             .frame(maxHeight: .infinity)
@@ -189,7 +189,7 @@ private extension QuickRecordWidgetView {
                     .textFont(size: .micro)
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.5)
                     .padding(.leading, Self.badgeSize + 4)
             }
 
@@ -202,7 +202,7 @@ private extension QuickRecordWidgetView {
                         .monospacedDigit()
                         .foregroundStyle(Palette.accentStrong)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.5)
                         .privacySensitive()
                 } else {
                     Text("毎回入れる")
@@ -284,7 +284,7 @@ private extension QuickRecordWidgetView {
                     .textFont(size: .micro)
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.5)
             }
 
             Spacer(minLength: 8)
@@ -294,7 +294,7 @@ private extension QuickRecordWidgetView {
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.5)
                 .privacySensitive()
         }
     }

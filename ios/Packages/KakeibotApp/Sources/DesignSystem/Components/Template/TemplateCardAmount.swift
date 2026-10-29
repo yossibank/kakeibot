@@ -22,7 +22,7 @@ public struct TemplateCardAmount: View {
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                .minimumScaleFactor(0.5)
         } else {
             Text("毎回入れる")
                 .font(size.emptyAmountFont(in: themeStyle))

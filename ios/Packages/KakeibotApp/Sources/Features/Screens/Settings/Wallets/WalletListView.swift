@@ -260,7 +260,7 @@ private extension WalletListView {
                 .monospacedDigit()
                 .foregroundStyle(balanceColor)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.5)
         }
         .padding(.horizontal, 16)
         .frame(height: Self.rowHeight)

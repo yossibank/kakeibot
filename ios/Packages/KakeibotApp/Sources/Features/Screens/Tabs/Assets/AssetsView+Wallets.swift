@@ -62,7 +62,7 @@ extension AssetsView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
             }
             .padding(.horizontal, 4)
             .padding(.top, 12)
@@ -144,7 +144,7 @@ private extension AssetsView {
                         .monospacedDigit()
                         .foregroundStyle(Self.amountColor(of: row))
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.8)
                 }
 
                 if row.repaidRatio != nil || note != nil {

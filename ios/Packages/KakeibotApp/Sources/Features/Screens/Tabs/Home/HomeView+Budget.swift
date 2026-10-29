@@ -19,7 +19,7 @@ extension HomeView {
                         .monospacedDigit()
                         .foregroundStyle(dialAmountColor)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.6)
+                        .minimumScaleFactor(0.5)
                         .contentTransition(.numericText())
                 }
             }
@@ -162,7 +162,7 @@ private extension HomeView {
                 .monospacedDigit()
                 .foregroundStyle(color)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.5)
         }
         .frame(maxWidth: .infinity)
     }
