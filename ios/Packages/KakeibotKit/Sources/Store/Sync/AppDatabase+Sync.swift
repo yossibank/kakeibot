@@ -273,6 +273,13 @@ extension AppDatabase {
         try db.notifyChanges(in: Table("sync_change"))
     }
 
+    static func setApplying(
+        _ applying: Bool,
+        in db: Database
+    ) throws {
+        try db.execute(sql: "UPDATE sync_state SET applying = ?", arguments: [applying])
+    }
+
     func setSyncEnabled(_ enabled: Bool) async throws {
         try await writer.write { db in
             try db.execute(sql: "UPDATE sync_state SET enabled = ?", arguments: [enabled])
@@ -297,13 +304,6 @@ private extension AppDatabase {
 
     static func engineStateColumn(_ isShared: Bool) -> String {
         isShared ? "shared_engine_state" : "engine_state"
-    }
-
-    static func setApplying(
-        _ applying: Bool,
-        in db: Database
-    ) throws {
-        try db.execute(sql: "UPDATE sync_state SET applying = ?", arguments: [applying])
     }
 
     static func parentsFirst(_ records: [SyncRecord]) -> [SyncRecord] {

@@ -312,19 +312,6 @@ private extension SyncTests.Setup {
         try #require(await database.pendingSyncChanges().first { $0.key == key })
     }
 
-    func joinForeignShare(of walletID: String) async throws {
-        let id = try #require(Wallet.ID(walletID))
-        let zone = SyncZone.wallet(id)
-        let zoned = SyncKey(table: .wallet, id: walletID).recordID(in: zone)
-
-        try await database.applySyncChanges(
-            saved: [],
-            deleted: [],
-            systemFields: [zoned: Data([1])],
-            owners: [zone: "owner"]
-        )
-    }
-
     func sharedCounts(of walletID: String) async throws -> SyncZoneTests.Counts {
         let categories = try await value(
             "SELECT COUNT(*) FROM category WHERE wallet_id = '\(walletID)'"
