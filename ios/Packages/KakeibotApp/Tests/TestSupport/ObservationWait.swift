@@ -14,44 +14,49 @@ public extension ObservationWait {
         let deadline = ContinuousClock.now.advanced(by: timeout)
 
         while !isReady() {
-            guard ContinuousClock.now < deadline else {
+            guard await nextChange(of: isReady, before: deadline) == .changed else {
                 Issue.record(
-                    "\(timeout) 待っても条件を満たさなかった",
+                    "\(timeout) 待っても変化の知らせが届かなかった",
                     sourceLocation: sourceLocation
                 )
 
                 return
             }
-
-            await nextChange(of: isReady, before: deadline)
         }
     }
 }
 
 @MainActor
 private extension ObservationWait {
+    enum Wake {
+        case changed
+        case timedOut
+    }
+
     static func nextChange(
         of read: @escaping @MainActor () -> Bool,
         before deadline: ContinuousClock.Instant
-    ) async {
+    ) async -> Wake {
         let signal = ChangeSignal()
 
         let timer = Task {
             try? await Task.sleep(until: deadline, clock: .continuous)
-            signal.fire()
+            signal.fire(.timedOut)
         }
 
-        await withCheckedContinuation { continuation in
+        let wake = await withCheckedContinuation { continuation in
             signal.wait(continuation)
 
             withObservationTracking {
                 _ = read()
             } onChange: {
-                signal.fire()
+                signal.fire(.changed)
             }
         }
 
         timer.cancel()
+
+        return wake
     }
 }
 
@@ -62,27 +67,31 @@ private final class ChangeSignal: Sendable {
 private extension ChangeSignal {
     enum State {
         case idle
-        case waiting(CheckedContinuation<Void, Never>)
-        case fired
+        case waiting(CheckedContinuation<ObservationWait.Wake, Never>)
+        case fired(ObservationWait.Wake)
     }
 
-    func wait(_ continuation: CheckedContinuation<Void, Never>) {
+    func wait(_ continuation: CheckedContinuation<ObservationWait.Wake, Never>) {
         state.withLock { state in
-            if case .fired = state {
-                continuation.resume()
+            if case let .fired(wake) = state {
+                continuation.resume(returning: wake)
             } else {
                 state = .waiting(continuation)
             }
         }
     }
 
-    func fire() {
+    func fire(_ wake: ObservationWait.Wake) {
         state.withLock { state in
-            if case let .waiting(continuation) = state {
-                continuation.resume()
+            switch state {
+            case .idle:
+                state = .fired(wake)
+            case let .waiting(continuation):
+                continuation.resume(returning: wake)
+                state = .fired(wake)
+            case .fired:
+                break
             }
-
-            state = .fired
         }
     }
 }
