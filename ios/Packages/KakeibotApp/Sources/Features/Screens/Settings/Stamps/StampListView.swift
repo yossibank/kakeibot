@@ -134,9 +134,23 @@ private extension StampListView {
                 movableTile(shelfIcon)
             }
 
-            addTile
-                .frame(width: grid.itemWidth, height: Self.tileHeight)
-                .position(grid.center(at: model.shown.count))
+            Button {
+                destination = .new
+            } label: {
+                Image(systemName: "plus")
+                    .sansFont(.headline, weight: .ultraLight)
+                    .foregroundStyle(Palette.accent)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Palette.faint, in: tileShape)
+                    .overlay {
+                        tileShape
+                            .stroke(Palette.outline, style: .dashed)
+                    }
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+            .frame(width: grid.itemWidth, height: Self.tileHeight)
+            .position(grid.center(at: model.shown.count))
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
@@ -145,24 +159,6 @@ private extension StampListView {
         } action: { width in
             grid.width = width
         }
-    }
-
-    var addTile: some View {
-        Button {
-            destination = .new
-        } label: {
-            Image(systemName: "plus")
-                .sansFont(.headline, weight: .ultraLight)
-                .foregroundStyle(Palette.accent)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Palette.faint, in: tileShape)
-                .overlay {
-                    tileShape
-                        .stroke(Palette.outline, style: .dashed)
-                }
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 
     var hiddenSection: some View {
@@ -218,9 +214,7 @@ private extension StampListView {
 
     @ViewBuilder
     func floatingTile(_ id: ShelfIcon.ID) -> some View {
-        let items = model.shown + model.hidden
-
-        if let shelfIcon = items.first(where: { $0.id == id }) {
+        if let shelfIcon = (model.shown + model.hidden).first(where: { $0.id == id }) {
             tileFace(shelfIcon, isHidden: false)
         }
     }
@@ -296,10 +290,9 @@ private extension StampListView {
         let index = model.shown.firstIndex(of: shelfIcon) ?? 0
         let start = grid.center(at: index)
 
-        let center = drag
-            .follow(shelfIcon.id, from: start, to: location) { next in
-                follow(shelfIcon, to: next)
-            }
+        let center = drag.follow(shelfIcon.id, from: start, to: location) { next in
+            follow(shelfIcon, to: next)
+        }
 
         guard let center else {
             return

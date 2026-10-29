@@ -41,13 +41,9 @@ public extension BackupModel {
         public let name: String
     }
 
-    struct Previous: Equatable, Identifiable, Sendable {
+    struct Previous: Equatable, Sendable {
         public let url: URL
         public let date: Date
-
-        public var id: URL {
-            url
-        }
     }
 
     enum FileKind: String, Sendable {
@@ -165,7 +161,9 @@ public extension BackupModel {
         doneMessage = nil
 
         let result = await Task.detached {
-            Result { try ExportV1(json: Data(contentsOf: item.url)) }
+            Result {
+                try ExportV1(json: Data(contentsOf: item.url))
+            }
         }.value
 
         do {
@@ -218,15 +216,6 @@ public extension BackupModel {
     }
 }
 
-private extension ExportV1.Tables {
-    var needsNotifications: Bool {
-        let hasReminder = settings.contains { $0.key == .reminderTime }
-        let hasNotice = recurrings.contains { $0.archivedAt == nil && $0.remindDaysBefore != nil }
-
-        return hasReminder || hasNotice
-    }
-}
-
 private extension BackupModel {
     static let exportedMessage = "書き出しました"
     static let restoredMessage = "読み込みました"
@@ -236,6 +225,14 @@ private extension BackupModel {
     static let newerVersionMessage = "新しい版のアプリで書き出したファイルです"
     static let missingTransferMessage = "元の振替が無い手数料があるため、読み込めません"
     static let restoreFailedMessage = "読み込めませんでした。いまのデータはそのままです"
+
+    nonisolated static func previous(in stash: BackupStash) -> [Previous] {
+        stash.load().compactMap { item in
+            (try? ExportV1(json: item.data)).map {
+                Previous(url: item.url, date: $0.exportedAt)
+            }
+        }
+    }
 
     static func readMessage(for error: any Error) -> String {
         switch error as? ExportV1.ReadError {
@@ -256,14 +253,6 @@ private extension BackupModel {
         formatter.dateFormat = "yyyy-MM-dd"
 
         return "kakeibot-\(formatter.string(from: date)).\(kind.rawValue)"
-    }
-
-    nonisolated static func previous(in stash: BackupStash) -> [Previous] {
-        stash.load().compactMap { item in
-            (try? ExportV1(json: item.data)).map {
-                Previous(url: item.url, date: $0.exportedAt)
-            }
-        }
     }
 
     static func dayText(_ date: Date) -> String {
@@ -295,5 +284,20 @@ private extension BackupModel {
         case .csv:
             return try await database.spreadsheet()
         }
+    }
+}
+
+extension BackupModel.Previous: Identifiable {
+    public var id: URL {
+        url
+    }
+}
+
+private extension ExportV1.Tables {
+    var needsNotifications: Bool {
+        let hasReminder = settings.contains { $0.key == .reminderTime }
+        let hasNotice = recurrings.contains { $0.archivedAt == nil && $0.remindDaysBefore != nil }
+
+        return hasReminder || hasNotice
     }
 }

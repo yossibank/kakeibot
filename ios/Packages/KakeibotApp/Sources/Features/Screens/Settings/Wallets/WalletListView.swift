@@ -4,29 +4,31 @@ import Store
 import SwiftUI
 
 public struct WalletListView: View {
-    @State private var drag = SettingsDrag<Wallet.ID>()
-    @State private var model: WalletListModel
+    @State var drag = SettingsDrag<Wallet.ID>()
+    @State var model: WalletListModel
+    @State var hiddenId: Wallet.ID?
+    @State var deletion: Deletion?
+    @State var hiding: Wallet?
+    @State var isConfirmingHide = false
+    @State var deleting: Wallet?
+    @State var isConfirmingDelete = false
+
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
     @State private var openId: Wallet.ID?
-    @State private var hiddenId: Wallet.ID?
-    @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
-    @State private var hiding: Wallet?
-    @State private var isConfirmingHide = false
-    @State private var deleting: Wallet?
-    @State private var isConfirmingDelete = false
 
     @Environment(\.themeStyle.corner) private var corner
 
-    private let database: AppDatabase
+    let database: AppDatabase
 
     public init(database: AppDatabase) {
         let hintFlag = SettingsScreenFlag.closedHint(.wallets, in: database)
         let hiddenList = SettingsScreenFlag.openHiddenList(.wallets, in: database)
+        let model = WalletListModel(database: database)
 
-        _model = State(initialValue: WalletListModel(database: database))
+        _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
         _hiddenList = State(initialValue: hiddenList)
 
@@ -37,10 +39,7 @@ public struct WalletListView: View {
         VStack(spacing: 16) {
             SettingsBackHeader("口座", hint: hintFlag)
 
-            SettingsHint(
-                flag: hintFlag,
-                lines: [.move, .hide, .swipeDelete]
-            )
+            SettingsHint(flag: hintFlag, lines: [.move, .hide, .swipeDelete])
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
@@ -70,10 +69,7 @@ public struct WalletListView: View {
             }
 
             if drag.lift != nil {
-                SettingsHideTarget(
-                    zones: $drag.zones,
-                    isArmed: drag.isOverHide
-                )
+                SettingsHideTarget(zones: $drag.zones, isArmed: drag.isOverHide)
             } else {
                 AddButton("口座を追加") {
                     destination = .new
@@ -84,10 +80,7 @@ public struct WalletListView: View {
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .settingsLiftLayer(
-            drag,
-            scale: 1.03
-        ) { id in
+        .settingsLiftLayer(drag, scale: 1.03) { id in
             floatingTile(id)
         }
         .sharesTextScale(id: model.shown + model.hidden)
@@ -104,8 +97,7 @@ public struct WalletListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
         .navigationDestination(item: $destination) { destination in
-            WalletEditSheet(model: editModel(for: destination)) { _ in
-            } onDelete: { deletion in
+            WalletEditSheet(model: editModel(for: destination)) { _ in } onDelete: { deletion in
                 self.deletion = deletion
             } onHide: {
                 if case let .edit(id) = destination {
@@ -115,10 +107,7 @@ public struct WalletListView: View {
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)
         }
-        .confirmsWalletHide(
-            balance: hidingBalance,
-            isPresented: $isConfirmingHide
-        ) {
+        .confirmsWalletHide(balance: hidingBalance, isPresented: $isConfirmingHide) {
             if let hiding {
                 hide(hiding.id)
             }
@@ -157,11 +146,7 @@ private extension WalletListView {
 
     var hiddenSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SettingsHiddenTitle(
-                flag: hiddenList,
-                title: "非表示の口座",
-                count: model.hidden.count
-            ) {
+            SettingsHiddenTitle(flag: hiddenList, title: "非表示の口座", count: model.hidden.count) {
                 isConfirmingDeleteHidden = true
             }
 
@@ -185,12 +170,7 @@ private extension WalletListView {
             .animation(nil, value: isLifted)
             .contentShape(.rect)
             .offset(offset)
-            .settingsLiftFrame(
-                drag,
-                \.hiddenFrames,
-                id: wallet.id,
-                in: Self.space
-            )
+            .settingsLiftFrame(drag, \.hiddenFrames, id: wallet.id, in: Self.space)
             .zIndex(layer)
             .onTapGesture {
                 destination = .edit(wallet.id)
@@ -233,12 +213,7 @@ private extension WalletListView {
         .opacity(opacity)
         .animation(nil, value: isLifted)
         .offset(y: center.y - Self.rowHeight / 2)
-        .settingsLiftFrame(
-            drag,
-            \.rowFrames,
-            id: wallet.id,
-            in: Self.space
-        )
+        .settingsLiftFrame(drag, \.rowFrames, id: wallet.id, in: Self.space)
         .zIndex(layer)
         .gesture(
             LiftGesture(in: Self.space) { location in
@@ -291,145 +266,6 @@ private extension WalletListView {
         .frame(height: Self.rowHeight)
         .card(cornerRadius: 20)
         .contentShape(.rect)
-    }
-}
-
-private extension WalletListView {
-    enum Destination: Hashable {
-        case new
-        case edit(Wallet.ID)
-    }
-
-    nonisolated static let space = "WalletBoard"
-
-    static let rowHeight: CGFloat = 68
-
-    static let grid = SettingsBoardGrid(
-        columns: 1,
-        itemHeight: rowHeight,
-        spacing: 12
-    )
-
-    var boardHeight: CGFloat {
-        Self.grid.height(slots: model.shown.count)
-    }
-
-    var hidingBalance: Int {
-        hiding.map { model.balance(of: $0) } ?? 0
-    }
-
-    func follow(
-        _ wallet: Wallet,
-        to location: CGPoint
-    ) {
-        let index = model.shown.firstIndex(of: wallet) ?? 0
-        let start = Self.grid.center(at: index)
-
-        let center = drag.follow(wallet.id, from: start, to: location) { next in
-            follow(wallet, to: next)
-        }
-
-        guard let center else {
-            return
-        }
-
-        let target = Self.grid.index(at: center, count: model.shown.count)
-
-        withAnimation(.snappy) {
-            model.move(wallet.id, to: target)
-        }
-    }
-
-    func drop() {
-        switch drag.drop() {
-        case let .hide(id):
-            let wallet = model.shown.first { $0.id == id }
-
-            withAnimation(.snappy) {
-                model.cancelMoving()
-            }
-
-            if let wallet {
-                requestHide(wallet)
-            }
-        case .move:
-            Task {
-                await model.finishMoving()
-            }
-        case nil:
-            break
-        }
-    }
-
-    func requestDelete(_ wallet: Wallet) {
-        deleting = wallet
-        isConfirmingDelete = true
-    }
-
-    func delete(_ id: Wallet.ID) {
-        Task {
-            deletion = await model.delete(id)
-        }
-    }
-
-    func requestHide(_ wallet: Wallet) {
-        guard !model.needsHideConfirmation(of: wallet) else {
-            hiding = wallet
-            isConfirmingHide = true
-            return
-        }
-
-        hide(wallet.id)
-    }
-
-    func followHidden(
-        _ id: Wallet.ID,
-        to location: CGPoint
-    ) {
-        drag.followHidden(id, to: location)
-    }
-
-    func dropHidden() {
-        guard let id = drag.dropHidden() else {
-            return
-        }
-
-        show(id)
-    }
-
-    func hide(_ id: Wallet.ID) {
-        Task {
-            if await model.hide(id) {
-                hiddenId = id
-            }
-        }
-    }
-
-    func deleteHidden() {
-        Task {
-            deletion = await model.deleteHidden()
-        }
-    }
-
-    func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
-        }
-    }
-
-    func show(_ id: Wallet.ID) {
-        Task {
-            await model.show(id)
-        }
-    }
-
-    func editModel(for destination: Destination) -> WalletEditModel {
-        switch destination {
-        case .new:
-            WalletEditModel(database: database)
-        case let .edit(id):
-            WalletEditModel(database: database, editing: id)
-        }
     }
 }
 

@@ -19,6 +19,7 @@ public struct ThemeEditSheet: View {
         onDelete: @escaping (Deletion) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
+
         self.onDelete = onDelete
     }
 
@@ -137,17 +138,20 @@ private extension ThemeEditSheet {
         let isSelected = model.draft[keyPath: slot.keyPath] == hex
         let isAvailable = model.isAvailable(hex, for: slot)
         let ring = isSelected ? Palette.accent : Palette.line
+        let ringWidth: CGFloat = isSelected ? 2 : 1
+        let opacity: Double = isAvailable ? 1 : 0.35
+        let color = Color(hex: hex) ?? .clear
 
         return Button {
             model.choose(hex, for: slot)
         } label: {
             Circle()
-                .fill(Color(hex: hex) ?? .clear)
+                .fill(color)
                 .frame(width: 30, height: 30)
                 .padding(4)
                 .overlay {
                     Circle()
-                        .stroke(ring, lineWidth: isSelected ? 2 : 1)
+                        .stroke(ring, lineWidth: ringWidth)
                 }
                 .overlay {
                     if !isAvailable {
@@ -156,7 +160,7 @@ private extension ThemeEditSheet {
                             .foregroundStyle(Palette.hint)
                     }
                 }
-                .opacity(isAvailable ? 1 : 0.35)
+                .opacity(opacity)
         }
         .buttonStyle(.plain)
         .disabled(!isAvailable)

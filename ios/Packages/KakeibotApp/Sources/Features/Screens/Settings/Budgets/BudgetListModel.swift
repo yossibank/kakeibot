@@ -58,9 +58,7 @@ public extension BudgetListModel {
     }
 
     var categories: [EntryCategory] {
-        let categories = categoryList?.categories ?? []
-
-        return categories.filter { category in
+        (categoryList?.categories ?? []).filter { category in
             category.kind == .expense && category.archivedAt == nil
         }
     }
@@ -102,9 +100,8 @@ public extension BudgetListModel {
 
     func spent(for categoryId: EntryCategory.ID?) -> Int {
         let period = month.period(startingOn: monthStartDay)
-        let days = entryList?.days.filter { period.contains($0.date) } ?? []
 
-        return days
+        return (entryList?.days.filter { period.contains($0.date) } ?? [])
             .flatMap(\.entries)
             .filter { entry in
                 entry.type == .expense
@@ -118,11 +115,13 @@ public extension BudgetListModel {
             return nil
         }
 
+        let periodEnd = month.period(startingOn: monthStartDay).upperBound
+
         return BudgetUsage(
             budget: budget,
             spent: spent(for: categoryId),
             today: today,
-            periodEnd: month.period(startingOn: monthStartDay).upperBound
+            periodEnd: periodEnd
         )
     }
 
@@ -170,7 +169,10 @@ public extension BudgetListModel {
     }
 
     func finishEditing() async {
-        guard canSave, calculator.amount != editingAmount else {
+        guard
+            canSave,
+            calculator.amount != editingAmount
+        else {
             cancelEditing()
             return
         }

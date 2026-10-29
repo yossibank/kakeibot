@@ -7,10 +7,10 @@ import Store
 @MainActor
 @Observable
 public final class RewardRuleListModel: ScreenModel {
-    public private(set) var list: RewardRuleList?
     public var movingOrder: [RewardRule.ID]?
-
     public var errorNotice = ErrorNotice()
+
+    public private(set) var list: RewardRuleList?
 
     private let database: AppDatabase
 
@@ -58,8 +58,7 @@ private extension RewardRuleListModel {
     static let loadFailedMessage = "ごほうびを読めませんでした"
 
     func rules(isHidden: Bool) -> [RewardRule] {
-        let rules = list?.rules ?? []
-        return rules.filter { $0.isActive != isHidden }
+        (list?.rules ?? []).filter { $0.isActive != isHidden }
     }
 }
 

@@ -4,29 +4,29 @@ import Store
 import SwiftUI
 
 public struct SettingsSheet: View {
-    @State private var monthStartDay: MonthStartDay = .first
-    @State private var launchScreen: LaunchScreen = .home
-    @State private var weekStart: Weekday = .sunday
-    @State private var reminderTime: ReminderTime?
-    @State private var authorization: NotificationAuthorization = .allowed
-    @State private var theme: ThemeChoice = .system
-    @State private var customThemes: [Theme] = []
-    @State private var isSyncOn = false
+    @State var monthStartDay: MonthStartDay = .first
+    @State var launchScreen: LaunchScreen = .home
+    @State var weekStart: Weekday = .sunday
+    @State var reminderTime: ReminderTime?
+    @State var authorization: NotificationAuthorization = .allowed
+    @State var theme: ThemeChoice = .system
+    @State var customThemes: [Theme] = []
+    @State var isSyncOn = false
 
     #if DEBUG
-    @State private var isConfirmingSample = false
-    @State private var isInsertingSample = false
-    @State private var sampleMessage: String?
+    @State var isConfirmingSample = false
+    @State var isInsertingSample = false
+    @State var sampleMessage: String?
     #endif
 
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.notificationPermission) private var permission
-    @Environment(\.syncCloud) private var syncCloud
-    @Environment(\.themeStyle) private var themeStyle
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.notificationPermission) var permission
+    @Environment(\.syncCloud) var syncCloud
+    @Environment(\.themeStyle) var themeStyle
 
-    private let database: AppDatabase
-    private let today: LocalDate
-    private let appIcon: AppIconListModel
+    let database: AppDatabase
+    let today: LocalDate
+    let appIcon: AppIconListModel
 
     public init(
         database: AppDatabase,
@@ -45,269 +45,17 @@ public struct SettingsSheet: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            sectionTitle("記録")
+                        recordSection
 
-                            VStack(spacing: 0) {
-                                NavigationLink {
-                                    WalletListView(database: database)
-                                } label: {
-                                    row("口座", systemImage: "building.columns")
-                                }
+                        periodSection
 
-                                Hairline()
+                        funSection
 
-                                NavigationLink {
-                                    CategoryListView(database: database)
-                                } label: {
-                                    row("カテゴリ", systemImage: "tag")
-                                }
+                        lookSection
 
-                                Hairline()
+                        usageSection
 
-                                NavigationLink {
-                                    TemplateListView(database: database)
-                                } label: {
-                                    row(
-                                        "テンプレート",
-                                        systemImage: "rectangle.stack"
-                                    )
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    RecurringListView(
-                                        model: RecurringListModel(
-                                            database: database,
-                                            today: today
-                                        )
-                                    )
-                                } label: {
-                                    row("固定費", systemImage: "repeat")
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal, 16)
-                            .card()
-                        }
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            sectionTitle("期間と予算")
-
-                            VStack(spacing: 0) {
-                                NavigationLink {
-                                    MonthStartDayView(
-                                        model: MonthStartDayModel(
-                                            database: database,
-                                            today: today
-                                        )
-                                    )
-                                } label: {
-                                    row(
-                                        "月の始まり",
-                                        systemImage: "calendar",
-                                        value: PeriodText
-                                            .startDay(monthStartDay)
-                                    )
-                                }
-
-                                Hairline()
-
-                                pickerRow(
-                                    "週の始まり",
-                                    systemImage: "calendar.day.timeline.left"
-                                ) {
-                                    CapsulePicker(
-                                        selection: weekStartBinding,
-                                        options: Weekday.weekStartOptions
-                                    )
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    BudgetListView(
-                                        model: BudgetListModel(
-                                            database: database,
-                                            today: today
-                                        )
-                                    )
-                                } label: {
-                                    row("予算", systemImage: "chart.bar")
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal, 16)
-                            .card()
-                        }
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            sectionTitle("楽しみ")
-
-                            VStack(spacing: 0) {
-                                NavigationLink {
-                                    StampListView(database: database)
-                                } label: {
-                                    row("スタンプ", systemImage: "seal")
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    RewardRuleListView(database: database)
-                                } label: {
-                                    row("ごほうび", systemImage: "gift")
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal, 16)
-                            .card()
-                        }
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            sectionTitle("見た目")
-
-                            VStack(spacing: 0) {
-                                NavigationLink {
-                                    ThemeListView(
-                                        database: database,
-                                        appIcon: appIcon
-                                    )
-                                } label: {
-                                    row(
-                                        "テーマ",
-                                        systemImage: "paintpalette",
-                                        value: theme.title(in: customThemes)
-                                    )
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    AppIconListView(model: appIcon)
-                                } label: {
-                                    row(
-                                        "アプリアイコン",
-                                        systemImage: "app.badge",
-                                        value: appIcon.current.title
-                                    )
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    ThemeStyleView(model: ThemeStyleModel(database: database))
-                                } label: {
-                                    row(
-                                        "文字と角の丸み",
-                                        systemImage: "textformat",
-                                        value: themeStyle.title,
-                                        shortValue: themeStyle.shortTitle
-                                    )
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal, 16)
-                            .card()
-                        }
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            sectionTitle("使い方")
-
-                            VStack(spacing: 0) {
-                                NavigationLink {
-                                    LaunchScreenView(model: LaunchScreenModel(database: database))
-                                } label: {
-                                    row(
-                                        "起動時に開く画面",
-                                        systemImage: "iphone",
-                                        value: launchScreen.title
-                                    )
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    HomeSectionsView(
-                                        model: HomeSectionsModel(database: database),
-                                        database: database
-                                    )
-                                } label: {
-                                    row(
-                                        "ホームに出すもの",
-                                        systemImage: "square.stack"
-                                    )
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    ReminderView(
-                                        model: ReminderModel(
-                                            database: database,
-                                            today: today,
-                                            time: reminderTime,
-                                            authorization: authorization,
-                                            permission: permission
-                                        )
-                                    )
-                                } label: {
-                                    row(
-                                        "記録忘れの通知",
-                                        systemImage: "bell",
-                                        value: reminderText
-                                    )
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal, 16)
-                            .card()
-                        }
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            sectionTitle("データとアプリ")
-
-                            VStack(spacing: 0) {
-                                NavigationLink {
-                                    SyncView(
-                                        model: SyncModel(
-                                            database: database,
-                                            cloud: syncCloud
-                                        )
-                                    )
-                                } label: {
-                                    row(
-                                        "iCloud 同期",
-                                        systemImage: "icloud",
-                                        value: isSyncOn ? "オン" : "オフ"
-                                    )
-                                }
-
-                                Hairline()
-
-                                NavigationLink {
-                                    BackupView(
-                                        model: BackupModel(
-                                            database: database,
-                                            permission: permission
-                                        )
-                                    )
-                                } label: {
-                                    row(
-                                        "バックアップ",
-                                        systemImage: "externaldrive"
-                                    )
-                                }
-
-                                Hairline()
-
-                                versionRow
-                            }
-                            .buttonStyle(.plain)
-                            .padding(.horizontal, 16)
-                            .card()
-                        }
+                        dataSection
 
                         #if DEBUG
                         sampleSection
@@ -355,154 +103,6 @@ public struct SettingsSheet: View {
 }
 
 private extension SettingsSheet {
-    var header: some View {
-        HStack {
-            Color.clear
-                .frame(width: 44, height: 44)
-
-            Spacer()
-
-            SheetTitle("設定")
-
-            Spacer()
-
-            RingButton(systemImage: "xmark") {
-                dismiss()
-            }
-        }
-    }
-
-    var versionRow: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "info.circle")
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
-
-            Text("バージョン")
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-
-            Spacer()
-
-            Text(Bundle.main.shortVersion)
-                .textFont(.footnote)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-        }
-        .frame(minHeight: 48)
-    }
-
-    func sectionTitle(_ title: String) -> some View {
-        SectionTitle(title)
-            .padding(.leading, 8)
-    }
-
-    func pickerRow(
-        _ title: String,
-        systemImage: String,
-        @ViewBuilder picker: () -> some View
-    ) -> some View {
-        let picker = picker()
-
-        let label = HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
-
-            Text(title)
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .fixedSize()
-        }
-
-        return ViewThatFits(in: .horizontal) {
-            HStack(spacing: 12) {
-                label
-
-                Spacer(minLength: 8)
-
-                picker
-            }
-            .frame(minHeight: 52)
-
-            VStack(alignment: .leading, spacing: 8) {
-                label
-
-                picker
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.vertical, 12)
-        }
-    }
-
-    func row(
-        _ title: String,
-        systemImage: String,
-        value: String? = nil,
-        shortValue: String? = nil
-    ) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
-
-            Text(title)
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .layoutPriority(1)
-
-            Spacer()
-
-            if let value {
-                ViewThatFits(in: .horizontal) {
-                    Text(value)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .fixedSize()
-
-                    Text(shortValue ?? value)
-                        .lineLimit(1)
-                        .minimumScaleFactor(Self.valueScale)
-                }
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-            }
-
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
-        }
-        .frame(minHeight: 48)
-        .contentShape(.rect)
-    }
-}
-
-private extension SettingsSheet {
-    static let valueScale: CGFloat = 0.7
-
-    var reminderText: String {
-        reminderTime?.description ?? "オフ"
-    }
-
-    var weekStartBinding: Binding<Weekday> {
-        Binding {
-            weekStart
-        } set: { day in
-            weekStart = day
-
-            Task {
-                try? await database.setSetting(.weekStart, to: day)
-            }
-        }
-    }
-
     func observeLaunchScreen() async {
         do {
             for try await screen in database.settingUpdates(.launchScreen) {
@@ -564,78 +164,11 @@ private extension SettingsSheet {
     }
 }
 
-#if DEBUG
-private extension SettingsSheet {
-    var sampleSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            sectionTitle("開発")
-
-            Button {
-                isConfirmingSample = true
-            } label: {
-                row("テストデータを入れる", systemImage: "wand.and.stars")
-            }
-            .buttonStyle(.plain)
-            .disabled(isInsertingSample)
-            .padding(.horizontal, 16)
-            .card()
-            .confirmationDialog(
-                "4 か月分の記録・予算・テンプレート・固定費を足します",
-                isPresented: $isConfirmingSample,
-                titleVisibility: .visible
-            ) {
-                Button("足す") {
-                    Task {
-                        await insertSample()
-                    }
-                }
-            }
-
-            if isInsertingSample {
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-            }
-
-            if let sampleMessage {
-                Text(sampleMessage)
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .padding(.leading, 8)
-            }
-        }
-    }
-}
-
-private extension SettingsSheet {
-    func insertSample() async {
-        isInsertingSample = true
-        sampleMessage = nil
-
-        do {
-            try await SampleData.insert(
-                into: database,
-                today: today,
-                now: Date()
-            )
-
-            sampleMessage = "テストデータを入れました"
-        } catch {
-            sampleMessage = "テストデータを入れられませんでした"
-        }
-
-        isInsertingSample = false
-    }
-}
-#endif
-
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
+        let today = LocalDate(Date(), in: .current)
 
-        SettingsSheet(
-            database: database,
-            today: LocalDate(Date(), in: .current),
-            appIcon: AppIconListModel()
-        )
+        SettingsSheet(database: database, today: today, appIcon: AppIconListModel())
     }
 }

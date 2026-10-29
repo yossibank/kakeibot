@@ -8,11 +8,10 @@ import Store
 @Observable
 public final class CategoryListModel: ScreenModel {
     public var kind: EntryCategory.Kind = .expense
+    public var movingOrder: [EntryCategory.ID]?
+    public var errorNotice = ErrorNotice()
 
     public private(set) var list: CategoryList?
-    public var movingOrder: [EntryCategory.ID]?
-
-    public var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 

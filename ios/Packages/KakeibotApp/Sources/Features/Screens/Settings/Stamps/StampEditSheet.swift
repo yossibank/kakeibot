@@ -29,7 +29,17 @@ public struct StampEditSheet: View {
 
     public var body: some View {
         VStack(spacing: 16) {
-            header
+            SettingsEditHeader(
+                title: model.isEditing ? "スタンプを編集" : "スタンプを追加",
+                isEditing: model.isEditing,
+                isHidden: model.isHidden
+            ) {
+                close()
+            } onHide: {
+                toggleHidden()
+            } onDelete: {
+                isConfirmingDelete = true
+            }
 
             ScrollView {
                 VStack(spacing: 16) {
@@ -104,22 +114,6 @@ public struct StampEditSheet: View {
         }
         .task {
             await model.load()
-        }
-    }
-}
-
-private extension StampEditSheet {
-    var header: some View {
-        SettingsEditHeader(
-            title: model.isEditing ? "スタンプを編集" : "スタンプを追加",
-            isEditing: model.isEditing,
-            isHidden: model.isHidden
-        ) {
-            close()
-        } onHide: {
-            toggleHidden()
-        } onDelete: {
-            isConfirmingDelete = true
         }
     }
 }

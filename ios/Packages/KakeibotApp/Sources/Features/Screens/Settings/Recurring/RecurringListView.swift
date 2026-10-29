@@ -4,24 +4,26 @@ import Store
 import SwiftUI
 
 public struct RecurringListView: View {
-    @State private var drag = SettingsDrag<Recurring.ID>()
-    @State private var model: RecurringListModel
+    @State var drag = SettingsDrag<Recurring.ID>()
+    @State var model: RecurringListModel
+    @State var deleting: Recurring.ID?
+    @State var isConfirmingDelete = false
+    @State var hiddenId: Recurring.ID?
+    @State var deletion: Deletion?
+
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
     @State private var openId: Recurring.ID?
-    @State private var deleting: Recurring.ID?
-    @State private var isConfirmingDelete = false
-    @State private var hiddenId: Recurring.ID?
-    @State private var deletion: Deletion?
     @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
 
     public init(model: RecurringListModel) {
         let hintFlag = model.hintFlag()
+        let hiddenList = model.hiddenListFlag()
 
         _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
-        _hiddenList = State(initialValue: model.hiddenListFlag())
+        _hiddenList = State(initialValue: hiddenList)
     }
 
     public var body: some View {
@@ -69,10 +71,7 @@ public struct RecurringListView: View {
             }
 
             if drag.lift != nil {
-                SettingsHideTarget(
-                    zones: $drag.zones,
-                    isArmed: drag.isOverHide
-                )
+                SettingsHideTarget(zones: $drag.zones, isArmed: drag.isOverHide)
             } else {
                 AddButton("固定費を追加") {
                     destination = .new
@@ -83,13 +82,10 @@ public struct RecurringListView: View {
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .settingsLiftLayer(
-            drag,
-            scale: 1.03
-        ) { id in
+        .settingsLiftLayer(drag, scale: 1.03) { id in
             floatingTile(id)
         }
-        .sharesTextScale(id: (model.rows + model.hiddenRows).map(\.place))
+        .sharesTextScale(id: places)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -137,6 +133,10 @@ public struct RecurringListView: View {
             await model.observe()
         }
     }
+}
+
+extension RecurringListView {
+    static let grid = SettingsBoardGrid(columns: 1, itemHeight: rowHeight, spacing: 12)
 }
 
 private extension RecurringListView {
@@ -196,12 +196,7 @@ private extension RecurringListView {
             .opacity(opacity)
             .animation(nil, value: isLifted)
             .offset(offset)
-            .settingsLiftFrame(
-                drag,
-                \.hiddenFrames,
-                id: row.id,
-                in: Self.space
-            )
+            .settingsLiftFrame(drag, \.hiddenFrames, id: row.id, in: Self.space)
             .zIndex(layer)
             .onTapGesture {
                 destination = .edit(row.id)
@@ -265,12 +260,7 @@ private extension RecurringListView {
         .opacity(opacity)
         .animation(nil, value: isLifted)
         .offset(y: center.y - Self.rowHeight / 2)
-        .settingsLiftFrame(
-            drag,
-            \.rowFrames,
-            id: row.id,
-            in: Self.space
-        )
+        .settingsLiftFrame(drag, \.rowFrames, id: row.id, in: Self.space)
         .zIndex(layer)
         .gesture(
             LiftGesture(in: Self.space) { location in
@@ -291,17 +281,11 @@ private extension RecurringListView {
     nonisolated static let space = "RecurringList"
 
     static let rowHeight = RecurringRowCard.height
+    static let purpose = SettingsHint.Line("calendar.badge.clock", "決まった日に、記録をひとりでに入れます")
 
-    static let grid = SettingsBoardGrid(
-        columns: 1,
-        itemHeight: rowHeight,
-        spacing: 12
-    )
-
-    static let purpose = SettingsHint.Line(
-        "calendar.badge.clock",
-        "決まった日に、記録をひとりでに入れます"
-    )
+    var places: [String?] {
+        (model.rows + model.hiddenRows).map(\.place)
+    }
 
     var hint: [SettingsHint.Line] {
         if model.rows.isEmpty {
@@ -318,93 +302,6 @@ private extension RecurringListView {
 
     func boardHeight(count: Int) -> CGFloat {
         Self.grid.height(slots: count)
-    }
-
-    func follow(
-        _ row: RecurringListModel.Row,
-        at index: Int,
-        to location: CGPoint
-    ) {
-        let start = Self.grid.center(at: index)
-
-        let center = drag.follow(row.id, from: start, to: location) { next in
-            follow(row, at: index, to: next)
-        }
-
-        guard let center else {
-            return
-        }
-
-        let target = Self.grid.index(at: center, count: model.rows.count)
-
-        withAnimation(.snappy) {
-            model.move(row.id, to: target)
-        }
-    }
-
-    func drop() {
-        switch drag.drop() {
-        case let .hide(id):
-            hide(id)
-        case .move:
-            Task {
-                await model.finishMoving()
-            }
-        case nil:
-            break
-        }
-    }
-
-    func hide(_ id: Recurring.ID) {
-        Task {
-            if await model.hide(id) {
-                hiddenId = id
-            }
-        }
-    }
-
-    func requestDelete(_ id: Recurring.ID) {
-        deleting = id
-        isConfirmingDelete = true
-    }
-
-    func delete(_ id: Recurring.ID) {
-        Task {
-            deletion = await model.delete(id)
-        }
-    }
-
-    func deleteHidden() {
-        Task {
-            deletion = await model.deleteHidden()
-        }
-    }
-
-    func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
-        }
-    }
-
-    func show(_ id: Recurring.ID) {
-        Task {
-            await model.show(id)
-        }
-    }
-
-    func followHidden(
-        _ id: Recurring.ID,
-        to location: CGPoint
-    ) {
-        drag.followHidden(id, to: location)
-    }
-
-    func dropHidden() {
-        guard let id = drag.dropHidden() else {
-            return
-        }
-
-        show(id)
     }
 }
 

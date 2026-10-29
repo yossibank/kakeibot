@@ -7,11 +7,11 @@ import Store
 @MainActor
 @Observable
 public final class RecurringListModel: ScreenModel {
-    public private(set) var recurrings: [Recurring] = []
     public var movingOrder: [Recurring.ID]?
-    public private(set) var list: EntryList?
-
     public var errorNotice = ErrorNotice()
+
+    public private(set) var recurrings: [Recurring] = []
+    public private(set) var list: EntryList?
 
     let today: LocalDate
 
@@ -139,17 +139,21 @@ private extension RecurringListModel {
 
         let holiday = RecurringText.holidayNote(recurring.holidayShift)
         let closing = recurring.closingDay.map(RecurringText.closingNote)
+        let title = list.title(of: recurring) ?? Self.title(of: recurring.type)
+        let detail = [schedule, holiday].rowDetail ?? schedule
         let place = list.place(of: recurring)
         let next = recurring.nextDate(onOrAfter: today)
+        let amount = list.amount(of: recurring, on: next ?? today)
+        let icon = list.icon(of: recurring)
 
         return Row(
             id: recurring.id,
-            title: list.title(of: recurring) ?? Self.title(of: recurring.type),
-            schedule: [schedule, holiday].rowDetail ?? schedule,
+            title: title,
+            schedule: detail,
             place: place,
-            amount: list.amount(of: recurring, on: next ?? today),
+            amount: amount,
             type: recurring.type,
-            icon: list.icon(of: recurring),
+            icon: icon,
             next: next,
             closing: closing
         )
@@ -183,10 +187,7 @@ extension RecurringListModel: SettingsBoardModel {
     }
 
     public func remove(_ id: Recurring.ID) async throws -> Deletion {
-        try await database.deleteRecurring(
-            id,
-            at: Date()
-        )
+        try await database.deleteRecurring(id, at: Date())
     }
 
     public func restoreRemoved(_ deletion: Deletion) async throws {

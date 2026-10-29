@@ -199,8 +199,7 @@ private extension BudgetListView {
 
 private extension BudgetListView {
     var recurringText: String {
-        let amount = AmountText.text(model.recurringExpense)
-        return "この月の固定費は \(amount)。予算の目安にできます"
+        "この月の固定費は \(AmountText.text(model.recurringExpense))。予算の目安にできます"
     }
 
     func amountText(_ amount: Int?) -> String {

@@ -58,104 +58,6 @@ public extension WalletEditModel {
         baseline.map { $0 != draft } ?? false
     }
 
-    var initialBalance: Int {
-        isNegative ? -calculator.amount : calculator.amount
-    }
-
-    var draft: WalletDraft {
-        WalletDraft(
-            kind: kind,
-            name: name,
-            mark: icon.mark,
-            color: icon.color,
-            initialBalance: initialBalance,
-            loanAmount: loanAmount.amount > 0 ? loanAmount.amount : nil,
-            recordedKind: recordedKind,
-            hasValuations: hasValuations
-        )
-    }
-
-    var canSave: Bool {
-        draft.problems.isEmpty
-    }
-
-    var saveTitle: String {
-        SettingsSaveTitle.text(
-            problem: draft.problems.first?.message,
-            isEditing: isEditing
-        )
-    }
-
-    var showsPayment: Bool {
-        isEditing && (kind == .card || kind == .loan)
-    }
-
-    var showsValuation: Bool {
-        isEditing && kind == .investment
-    }
-
-    var showsLoanAmount: Bool {
-        kind == .loan
-    }
-
-    var loanAmountText: String {
-        loanAmount.amount > 0 ? AmountText.text(loanAmount.amount) : "未入力"
-    }
-
-    var repaidText: String? {
-        let borrowed = loanAmount.amount
-
-        guard borrowed > 0 else {
-            return nil
-        }
-
-        let remaining = max(-(isEditing ? balance : initialBalance), 0)
-        let repaid = min(max(borrowed - remaining, 0), borrowed)
-        let percent = Percent.floor(repaid, of: borrowed)
-
-        return "\(AmountText.text(repaid)) 返済済み（\(percent)%）"
-    }
-
-    var paymentTitle: String {
-        kind == .loan ? "毎月の返済" : "締め日と引き落とし"
-    }
-
-    var asksPayment: Bool {
-        kind.isDebt
-    }
-
-    var paymentQuestion: String {
-        kind == .loan ? "毎月の返済も決めますか" : "締め日と引き落としも決めますか"
-    }
-
-    var paymentQuestionNote: String {
-        kind == .loan
-            ? "固定費として、返済の日と額を決められます"
-            : "締め日までの利用分を、引き落とし日に銀行から振り替えます"
-    }
-
-    var paymentText: String {
-        guard let payment else {
-            return "決めていません"
-        }
-
-        let schedule = RecurringText.schedule(
-            payment.frequency,
-            month: payment.month ?? payment.startDate.month,
-            day: payment.day
-        )
-
-        let closing = payment.closingDay.map(RecurringText.closingNote)
-        let amount = payment.amount > 0 ? AmountText.text(payment.amount) : nil
-        let detail = closing ?? amount
-
-        return [schedule, detail].compactMap(\.self).joined(separator: "・")
-    }
-
-    var needsHideConfirmation: Bool {
-        !isHidden && totalBalance != 0
-    }
-
     static func glyph(for kind: Wallet.Kind) -> Icon.Glyph {
         switch kind {
         case .cash: .cash
@@ -193,15 +95,8 @@ public extension WalletEditModel {
         let amount = valuation.amount
 
         do {
-            try await database.saveValuation(
-                amount,
-                of: editingId,
-                on: LocalDate(Date(), in: .current),
-                at: Date()
-            )
-
+            try await database.saveValuation(amount, of: editingId, on: Self.today, at: Date())
             await loadBalance()
-
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage)
@@ -233,6 +128,7 @@ public extension WalletEditModel {
             apply(list, to: wallet)
 
             try await refreshLock(of: wallet, in: list)
+
             baseline?.recordedKind = recordedKind
             baseline?.hasValuations = hasValuations
         } catch {
@@ -247,14 +143,18 @@ public extension WalletEditModel {
 
         do {
             let list = try await database.entryList()
-            let wallet = list.wallets[editingId]
 
-            guard let wallet, let icon = list.icons[wallet.iconId] else {
+            guard
+                let wallet = list.wallets[editingId],
+                let icon = list.icons[wallet.iconId]
+            else {
                 errorNotice.show(Self.loadFailedMessage)
                 return
             }
 
-            apply(WalletDraft(wallet, icon: icon))
+            let stored = WalletDraft(wallet, icon: icon)
+
+            apply(stored)
             apply(list, to: wallet)
 
             try await refreshLock(of: wallet, in: list)
@@ -295,11 +195,7 @@ public extension WalletEditModel {
 
     func save() async -> Wallet? {
         do {
-            return try await database.saveWallet(
-                draft,
-                editing: editingId,
-                at: Date()
-            )
+            return try await database.saveWallet(draft, editing: editingId, at: Date())
         } catch {
             errorNotice.show(Self.saveFailedMessage)
             return nil
@@ -312,14 +208,8 @@ public extension WalletEditModel {
         }
 
         do {
-            try await database.setWalletHidden(
-                editingId,
-                isHidden: isHidden,
-                at: Date()
-            )
-
+            try await database.setWalletHidden(editingId, isHidden: isHidden, at: Date())
             self.isHidden = isHidden
-
             return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {
             errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
@@ -336,10 +226,7 @@ public extension WalletEditModel {
         }
 
         do {
-            return try await database.deleteWallet(
-                editingId,
-                at: Date()
-            )
+            return try await database.deleteWallet(editingId, at: Date())
         } catch {
             let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
             errorNotice.show(message)
@@ -381,17 +268,13 @@ private extension WalletEditModel {
         in list: EntryList
     ) async throws {
         let recurrings = try await database.recurrings(includingHidden: true)
-
-        let hasRecords = Self.hasRecords(
-            of: wallet,
-            in: list,
-            recurrings: recurrings
-        )
+        let hasRecords = Self.hasRecords(of: wallet, in: list, recurrings: recurrings)
+        let hasOwnValuations = list.valuations.contains { $0.walletId == wallet.id }
 
         let locked = draft.locked(
             by: wallet,
             hasRecords: hasRecords,
-            hasValuations: list.valuations.contains { $0.walletId == wallet.id }
+            hasValuations: hasOwnValuations
         )
 
         recordedKind = locked.recordedKind
@@ -420,12 +303,7 @@ private extension WalletEditModel {
     ) {
         let entries = list.days.flatMap(\.entries)
 
-        balance = wallet.balance(
-            with: entries,
-            valuations: list.valuations,
-            through: Self.today
-        )
-
+        balance = wallet.balance(with: entries, valuations: list.valuations, through: Self.today)
         totalBalance = wallet.balance(with: entries, valuations: list.valuations)
 
         valuations = list.valuations

@@ -29,7 +29,8 @@ public extension MonthStartDayModel {
     }
 
     var periodText: String {
-        PeriodText.range(month.period(startingOn: startDay))
+        let period = month.period(startingOn: startDay)
+        return PeriodText.range(period)
     }
 
     func load() async {

@@ -13,6 +13,36 @@ public enum AppIconChoice: CaseIterable, Sendable {
     case teal
     case wine
     case plum
+
+    public init(_ preset: ThemePreset) {
+        self = switch preset {
+        case .navy: .navy
+        case .black: .black
+        case .forest: .forest
+        case .teal: .teal
+        case .wine: .wine
+        case .plum: .plum
+        case .ivory: .ivory
+        case .white: .white
+        case .sky: .sky
+        case .sage: .sage
+        case .rose: .rose
+        case .gold: .gold
+        }
+    }
+
+    public init?(_ choice: ThemeChoice) {
+        switch choice {
+        case .system: self = .white
+        case let .preset(preset): self.init(preset)
+        case .custom: return nil
+        }
+    }
+
+    public init(alternateName: String?) {
+        let choice = Self.allCases.first { $0.alternateName == alternateName }
+        self = choice ?? .white
+    }
 }
 
 public extension AppIconChoice {
@@ -138,36 +168,6 @@ public extension AppIconChoice {
                 dial: Self.inkMark
             )
         }
-    }
-
-    init(_ preset: ThemePreset) {
-        self = switch preset {
-        case .navy: .navy
-        case .black: .black
-        case .forest: .forest
-        case .teal: .teal
-        case .wine: .wine
-        case .plum: .plum
-        case .ivory: .ivory
-        case .white: .white
-        case .sky: .sky
-        case .sage: .sage
-        case .rose: .rose
-        case .gold: .gold
-        }
-    }
-
-    init?(_ choice: ThemeChoice) {
-        switch choice {
-        case .system: self = .white
-        case let .preset(preset): self.init(preset)
-        case .custom: return nil
-        }
-    }
-
-    init(alternateName: String?) {
-        let choice = Self.allCases.first { $0.alternateName == alternateName }
-        self = choice ?? .white
     }
 }
 

@@ -52,10 +52,7 @@ struct ThemePreview: View {
         }
         .padding(8)
         .frame(height: 132)
-        .background(
-            Palette.background,
-            in: .rect(cornerRadius: corner.radius(16))
-        )
+        .background(Palette.background, in: .rect(cornerRadius: corner.radius(16)))
         .environment(\.palette, palette)
     }
 }

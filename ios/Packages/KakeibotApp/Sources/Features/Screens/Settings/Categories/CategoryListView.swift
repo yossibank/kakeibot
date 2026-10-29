@@ -4,20 +4,21 @@ import Store
 import SwiftUI
 
 public struct CategoryListView: View {
-    @State private var drag = SettingsDrag<EntryCategory.ID>()
-    @State private var model: CategoryListModel
-    @State private var hintFlag: SettingsScreenFlag
-    @State private var destination: Destination?
-    @State private var hiddenId: EntryCategory.ID?
-    @State private var deletion: Deletion?
-    @State private var isConfirmingDeleteHidden = false
-    @State private var hiddenList: SettingsScreenFlag
+    @State var drag = SettingsDrag<EntryCategory.ID>()
+    @State var model: CategoryListModel
+    @State var hiddenId: EntryCategory.ID?
+    @State var deletion: Deletion?
 
-    @State private var grid = SettingsBoardGrid(
+    @State var grid = SettingsBoardGrid(
         columns: Self.columnCount,
         itemHeight: Self.tileHeight,
         spacing: Self.spacing
     )
+
+    @State private var hintFlag: SettingsScreenFlag
+    @State private var destination: Destination?
+    @State private var isConfirmingDeleteHidden = false
+    @State private var hiddenList: SettingsScreenFlag
 
     @Environment(\.themeStyle.corner) private var corner
 
@@ -110,8 +111,7 @@ public struct CategoryListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
         .navigationDestination(item: $destination) { destination in
-            CategoryEditSheet(model: editModel(for: destination)) { _ in
-            } onDelete: { deletion in
+            CategoryEditSheet(model: editModel(for: destination)) { _ in } onDelete: { deletion in
                 self.deletion = deletion
             } onHide: {
                 if case let .edit(_, id) = destination {
@@ -228,9 +228,7 @@ private extension CategoryListView {
 
     @ViewBuilder
     func floatingTile(_ id: EntryCategory.ID) -> some View {
-        let items = model.shown + model.hidden
-
-        if let category = items.first(where: { $0.id == id }) {
+        if let category = (model.shown + model.hidden).first(where: { $0.id == id }) {
             tileFace(category, isHidden: false)
         }
     }
@@ -320,89 +318,10 @@ private extension CategoryListView {
         grid.height(slots: model.shown.count + 1)
     }
 
-    func follow(
-        _ category: EntryCategory,
-        to location: CGPoint
-    ) {
-        let index = model.shown.firstIndex(of: category) ?? 0
-        let start = grid.center(at: index)
-
-        let center = drag
-            .follow(category.id, from: start, to: location) { next in
-                follow(category, to: next)
-            }
-
-        guard let center else {
-            return
-        }
-
-        let target = grid.index(at: center, count: model.shown.count)
-
-        withAnimation(.snappy) {
-            model.move(category.id, to: target)
-        }
-    }
-
-    func drop() {
-        switch drag.drop() {
-        case let .hide(id):
-            hide(id)
-        case .move:
-            Task {
-                await model.finishMoving()
-            }
-        case nil:
-            break
-        }
-    }
-
-    func followHidden(
-        _ id: EntryCategory.ID,
-        to location: CGPoint
-    ) {
-        drag.followHidden(id, to: location)
-    }
-
-    func dropHidden() {
-        guard let id = drag.dropHidden() else {
-            return
-        }
-
-        show(id)
-    }
-
-    func hide(_ id: EntryCategory.ID) {
-        Task {
-            if await model.hide(id) {
-                hiddenId = id
-            }
-        }
-    }
-
-    func deleteHidden() {
-        Task {
-            deletion = await model.deleteHidden()
-        }
-    }
-
-    func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
-        }
-    }
-
-    func show(_ id: EntryCategory.ID) {
-        Task {
-            await model.show(id)
-        }
-    }
-
     func editModel(for destination: Destination) -> CategoryEditModel {
         switch destination {
-        case let .new(kind):
-            CategoryEditModel(database: database, kind: kind)
-        case let .edit(kind, id):
-            CategoryEditModel(database: database, kind: kind, editing: id)
+        case let .new(kind): CategoryEditModel(database: database, kind: kind)
+        case let .edit(kind, id): CategoryEditModel(database: database, kind: kind, editing: id)
         }
     }
 }

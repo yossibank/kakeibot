@@ -7,10 +7,10 @@ import Store
 @MainActor
 @Observable
 public final class WalletListModel: ScreenModel {
-    public private(set) var list: EntryList?
     public var movingOrder: [Wallet.ID]?
-
     public var errorNotice = ErrorNotice()
+
+    public private(set) var list: EntryList?
 
     private let database: AppDatabase
 
@@ -43,11 +43,7 @@ public extension WalletListModel {
         let entries = list?.days.flatMap(\.entries) ?? []
         let valuations = list?.valuations ?? []
 
-        return wallet.balance(
-            with: entries,
-            valuations: valuations,
-            through: Self.today
-        )
+        return wallet.balance(with: entries, valuations: valuations, through: Self.today)
     }
 
     func load() async {
@@ -59,10 +55,7 @@ public extension WalletListModel {
     }
 
     func observe() async {
-        await observe(
-            database.entryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
+        await observe(database.entryListUpdates(), failure: Self.loadFailedMessage) { list in
             self.list = list
         }
     }
@@ -102,10 +95,7 @@ extension WalletListModel: SettingsBoardModel {
     }
 
     public func remove(_ id: Wallet.ID) async throws -> Deletion {
-        try await database.deleteWallet(
-            id,
-            at: Date()
-        )
+        try await database.deleteWallet(id, at: Date())
     }
 
     public func restoreRemoved(_ deletion: Deletion) async throws {

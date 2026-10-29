@@ -58,5 +58,3 @@ public struct LaunchScreenView: View {
         }
     }
 }
-
-private extension LaunchScreenView {}
