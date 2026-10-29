@@ -12,15 +12,16 @@ public protocol SettingsBoardModel: AnyObject {
 
     func reload() async
     func saveOrder(_ ids: [Item.ID]) async throws
-    func saveHidden(
-        _ id: Item.ID,
-        isHidden: Bool
-    ) async throws
     func remove(_ id: Item.ID) async throws -> Deletion
     func restoreRemoved(_ deletion: Deletion) async throws
     func hideFailedMessage(for error: any Error) -> String?
     func deleteFailedMessage(for error: any Error) -> String?
     func isInUse(_ error: any Error) -> Bool
+
+    func saveHidden(
+        _ id: Item.ID,
+        isHidden: Bool
+    ) async throws
 }
 
 public extension SettingsBoardModel {
@@ -121,11 +122,8 @@ public extension SettingsBoardModel {
             await reload()
             return deletion
         } catch {
-            let message = deleteFailedMessage(for: error)
-                ?? Self.deleteFailedText
-
+            let message = deleteFailedMessage(for: error) ?? Self.deleteFailedText
             errorNotice.show(message)
-
             return nil
         }
     }

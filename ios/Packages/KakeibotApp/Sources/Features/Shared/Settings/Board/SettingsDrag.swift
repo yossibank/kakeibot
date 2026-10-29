@@ -142,16 +142,19 @@ extension SettingsDrag {
             )
         }
 
+        let isInsideHide = zones.isOverHide(location, from: origin)
+
         current.location = location
         lift = current
 
-        arm(zones.isOverHide(location, from: origin), flag: \.isOverHide)
+        arm(isInsideHide, flag: \.isOverHide)
 
         autoScroll.follow(
             y: location.y + origin.y,
             bottom: zones.hide.isEmpty ? nil : zones.hideTop
         ) { delta in
-            onScroll(CGPoint(x: location.x, y: location.y + delta))
+            let point = CGPoint(x: location.x, y: location.y + delta)
+            onScroll(point)
         }
 
         guard !isOverHide else {
@@ -195,8 +198,11 @@ extension SettingsDrag {
             liftCount += 1
         }
 
+        let isInsideShow = zones.isOverShow(location, from: origin)
+
         hiddenLift?.location = location
-        arm(zones.isOverShow(location, from: origin), flag: \.isOverShow)
+
+        arm(isInsideShow, flag: \.isOverShow)
     }
 
     func dropHidden() -> ID? {

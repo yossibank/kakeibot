@@ -31,7 +31,8 @@ struct SettingsHiddenTitle: View {
 
                 Spacer()
 
-                if flag.isOn, let onDeleteAll {
+                if flag.isOn,
+                   let onDeleteAll {
                     Button(action: onDeleteAll) {
                         Label("まとめて削除", systemImage: "trash")
                             .textFont(.caption)

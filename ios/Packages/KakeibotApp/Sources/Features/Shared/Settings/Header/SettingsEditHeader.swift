@@ -77,7 +77,8 @@ private extension SettingsEditHeader {
                 }
             }
 
-            if canHide, canDelete {
+            if canHide,
+               canDelete {
                 MenuDivider()
             }
 

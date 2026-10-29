@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 
 struct SettingsDropZones: Equatable {
@@ -26,7 +27,9 @@ extension SettingsDropZones {
             height: Self.hideHeight
         )
 
-        return area.contains(Self.global(location, from: origin))
+        let point = Self.global(location, from: origin)
+
+        return area.contains(point)
     }
 
     func isOverShow(
@@ -40,7 +43,9 @@ extension SettingsDropZones {
             height: Self.showHeight
         )
 
-        return area.contains(Self.global(location, from: origin))
+        let point = Self.global(location, from: origin)
+
+        return area.contains(point)
     }
 }
 
@@ -69,5 +74,25 @@ extension View {
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
+    }
+}
+
+struct SettingsShowZone: View {
+    let isTargeted: Bool
+
+    var body: some View {
+        SettingsZoneBox(
+            isOn: isTargeted,
+            closedHeight: SettingsDropZones.showHeight,
+            tint: Palette.accent,
+            offLabel: .init(
+                systemImage: "eye",
+                title: "ここに置くと表示に戻ります"
+            ),
+            onLabel: .init(
+                systemImage: "eye",
+                title: "離すと表示に戻ります"
+            )
+        )
     }
 }

@@ -72,7 +72,9 @@ public extension EntryNoticeModel {
                 at: Date()
             )
 
-            notice = .batch(EntryBatch(kind: kind, previous: previous))
+            let batch = EntryBatch(kind: kind, previous: previous)
+
+            notice = .batch(batch)
         } catch {
             notice = .failed(Self.changeFailedMessage)
         }
@@ -81,7 +83,8 @@ public extension EntryNoticeModel {
     func deleteEntries(_ ids: [Entry.ID]) async {
         do {
             let previous = try await database.deleteEntries(ids)
-            notice = .batch(EntryBatch(kind: .deleted, previous: previous))
+            let batch = EntryBatch(kind: .deleted, previous: previous)
+            notice = .batch(batch)
         } catch {
             notice = .failed(Self.deleteFailedMessage)
         }
@@ -93,7 +96,10 @@ public extension EntryNoticeModel {
     ) async {
         let entries = list?.days.flatMap(\.entries) ?? []
 
-        guard let list, let entry = entries.first(where: { $0.id == id }) else {
+        guard
+            let list,
+            let entry = entries.first(where: { $0.id == id })
+        else {
             return
         }
 

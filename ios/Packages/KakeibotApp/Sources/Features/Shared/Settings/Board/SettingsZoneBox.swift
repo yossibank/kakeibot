@@ -68,7 +68,9 @@ private extension SettingsZoneBox {
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
     }
+}
 
+private extension SettingsZoneBox {
     func update() {
         guard isOn else {
             showsOnLabel = false

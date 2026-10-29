@@ -60,6 +60,34 @@ private struct SettingsLiftLayer<ID: Hashable, Tile: View>: ViewModifier {
 }
 
 private extension SettingsLiftLayer {
+    func floatingTile(_ floating: SettingsDrag<ID>.Floating) -> some View {
+        let tileSize = floating.size ?? size ?? .zero
+        let dock = dockArea
+        let isDocked = dock != nil
+        let tileScale = dock.map { fitScale(tileSize, in: $0) } ?? scale
+
+        let natural = CGPoint(
+            x: floating.center.x + drag.origin.x - origin.x,
+            y: floating.center.y + drag.origin.y - origin.y
+        )
+
+        let center = dock.map { CGPoint(x: $0.midX, y: $0.midY) } ?? natural
+
+        return tile(floating.id)
+            .frame(width: tileSize.width, height: tileSize.height)
+            .scaleEffect(tileScale)
+            .shadow(color: Palette.shadow.opacity(0.5), radius: 16, y: 8)
+            .position(center)
+            .animation(.spring(duration: 0.4, bounce: 0.2), value: isDocked)
+            .transition(.identity)
+    }
+}
+
+private extension SettingsLiftLayer {
+    static var dockInset: CGFloat {
+        10
+    }
+
     var dockArea: CGRect? {
         let zones = drag.zones
         let label = SettingsDropZones.labelHeight
@@ -85,28 +113,6 @@ private extension SettingsLiftLayer {
         )
     }
 
-    func floatingTile(_ floating: SettingsDrag<ID>.Floating) -> some View {
-        let tileSize = floating.size ?? size ?? .zero
-        let dock = dockArea
-        let isDocked = dock != nil
-        let tileScale = dock.map { fitScale(tileSize, in: $0) } ?? scale
-
-        let natural = CGPoint(
-            x: floating.center.x + drag.origin.x - origin.x,
-            y: floating.center.y + drag.origin.y - origin.y
-        )
-
-        let center = dock.map { CGPoint(x: $0.midX, y: $0.midY) } ?? natural
-
-        return tile(floating.id)
-            .frame(width: tileSize.width, height: tileSize.height)
-            .scaleEffect(tileScale)
-            .shadow(color: Palette.shadow.opacity(0.5), radius: 16, y: 8)
-            .position(center)
-            .animation(.spring(duration: 0.4, bounce: 0.2), value: isDocked)
-            .transition(.identity)
-    }
-
     func fitScale(
         _ tileSize: CGSize,
         in area: CGRect
@@ -122,11 +128,5 @@ private extension SettingsLiftLayer {
         let height = area.height / tileSize.height
 
         return min(scale, width, height)
-    }
-}
-
-private extension SettingsLiftLayer {
-    static var dockInset: CGFloat {
-        10
     }
 }

@@ -29,10 +29,7 @@ struct SettingsCategoryTile: View {
             )
             .overlay {
                 RoundedRectangle(cornerRadius: corner.radius(12))
-                    .stroke(
-                        SettingsTile.stroke(isSelected: isSelected),
-                        lineWidth: 1
-                    )
+                    .stroke(SettingsTile.stroke(isSelected: isSelected), lineWidth: 1)
             }
             .contentShape(.rect)
         }

@@ -63,7 +63,10 @@ private extension EntryRowItem {
             .filter { $0.toWalletId == entry.walletId && $0.archivedAt == nil }
             .compactMap { $0.billDate(for: entry.date, in: month) }
 
-        guard let date = dates.first, dates.count == 1 else {
+        guard
+            let date = dates.first,
+            dates.count == 1
+        else {
             return "（\(month.month)月払い）"
         }
 

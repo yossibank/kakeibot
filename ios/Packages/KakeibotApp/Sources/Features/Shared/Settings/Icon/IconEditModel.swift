@@ -28,22 +28,14 @@ public extension IconEditModel {
         case text
     }
 
-    struct GlyphSection: Identifiable {
+    struct GlyphSection {
         public let title: String
         public let glyphs: [Icon.Glyph]
-
-        public var id: String {
-            title
-        }
     }
 
-    struct EmojiSection: Identifiable {
+    struct EmojiSection {
         public let title: String
         public let emojis: [String]
-
-        public var id: String {
-            title
-        }
     }
 
     static let colors = [
@@ -285,7 +277,20 @@ private extension IconEditModel {
             return false
         }
 
-        return first.properties.isEmojiPresentation
-            || (first.properties.isEmoji && scalars.count > 1)
+        let isSequence = first.properties.isEmoji && scalars.count > 1
+
+        return first.properties.isEmojiPresentation || isSequence
+    }
+}
+
+extension IconEditModel.GlyphSection: Identifiable {
+    public var id: String {
+        title
+    }
+}
+
+extension IconEditModel.EmojiSection: Identifiable {
+    public var id: String {
+        title
     }
 }
