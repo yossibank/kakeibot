@@ -144,6 +144,7 @@ struct SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
         let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        try await setup.database.turnOnSync()
         try await setup.database.turnOffSync(because: .cloudReplaced)
 
         let task = Task {
