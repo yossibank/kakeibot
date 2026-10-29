@@ -120,4 +120,34 @@ struct MonthOverviewTests {
         #expect(deleted.periodRecurrings.map(\.status) == [.missing])
         #expect(deleted.nextRecurringExpense == nil)
     }
+
+    @Test
+    func billsCardUsageAndKeepsRecordedAmounts() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        let options = try await database.entryOptions()
+        let bill = try await database.insertCardBill(at: now)
+        let card = try #require(bill.toWalletId)
+        let used = try #require(LocalDate("2026-10-10"))
+        let today = try #require(LocalDate("2026-10-17"))
+        let billDate = try #require(LocalDate("2026-10-27"))
+
+        let spending = EntryDraft(
+            type: .expense,
+            amount: 5000,
+            date: used,
+            categoryId: options.expenseCategories[0].id,
+            walletId: card
+        )
+
+        try await database.saveEntry(spending, at: now)
+        let overview = try await database.monthOverview(on: today)
+        let moved = overview.moved(to: billDate.adding(days: 1))
+
+        #expect(overview.periodRecurrings.map(\.date) == [billDate])
+        #expect(overview.periodRecurrings.map(\.amount) == [5000])
+        #expect(overview.periodRecurrings.map(\.status) == [.upcoming])
+        #expect(moved.periodRecurrings.map(\.status) == [.missing])
+    }
 }

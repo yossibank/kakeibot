@@ -7,22 +7,49 @@ import Store
 @MainActor
 @Observable
 public final class HomeModel: ScreenModel {
-    public var today: LocalDate
     public var templateType: Entry.Kind = .expense
 
-    public private(set) var monthStartDay: MonthStartDay = .first
+    public var today: LocalDate {
+        didSet {
+            updateOverview()
+        }
+    }
+
     public private(set) var templateOrder: TemplateOrder = .manual
-    public private(set) var list: EntryList?
     public private(set) var isListFailed = false
+    public private(set) var overview: MonthOverview
+    public private(set) var upcomingBills: [CardBill] = []
+
+    public private(set) var monthStartDay: MonthStartDay = .first {
+        didSet {
+            updateOverview()
+        }
+    }
+
+    public private(set) var list: EntryList? {
+        didSet {
+            updateOverview()
+        }
+    }
 
     public internal(set) var errorNotice = ErrorNotice()
 
     private var allTemplates: [EntryTemplate] = []
     private var homeSections = HomeSection.standard
     private var homeHiddenSections: Set<HomeSection> = []
-    private var budgets: [Budget] = []
-    private var recurrings: [Recurring] = []
     private var stampCalendar: StampCalendar?
+
+    private var budgets: [Budget] = [] {
+        didSet {
+            updateOverview()
+        }
+    }
+
+    private var recurrings: [Recurring] = [] {
+        didSet {
+            updateOverview()
+        }
+    }
 
     private let database: AppDatabase
 
@@ -32,27 +59,19 @@ public final class HomeModel: ScreenModel {
     ) {
         self.database = database
         self.today = today
+
+        self.overview = MonthOverview(
+            list: nil,
+            budgets: [],
+            recurrings: [],
+            monthStartDay: .first,
+            today: today
+        )
     }
 }
 
 public extension HomeModel {
-    struct TemplateSection: Identifiable {
-        public let id: EntryCategory.ID
-        public let title: String
-        public let templates: [EntryTemplate]
-    }
-
     static let recentLimit = 5
-
-    var overview: MonthOverview {
-        MonthOverview(
-            list: list,
-            budgets: budgets,
-            recurrings: recurrings,
-            monthStartDay: monthStartDay,
-            today: today
-        )
-    }
 
     var templates: [EntryTemplate] {
         let shown = allTemplates.filter { $0.type == templateType }
@@ -90,23 +109,6 @@ public extension HomeModel {
 
     var homeLayout: HomeLayout {
         HomeLayout(order: homeSections, hidden: homeHiddenSections)
-    }
-
-    var upcomingBills: [CardBill] {
-        guard let list else {
-            return []
-        }
-
-        let wallets = Array(list.wallets.values)
-        let entries = list.days.flatMap(\.entries)
-
-        return CardBill.upcoming(
-            recurrings: recurrings,
-            wallets: wallets,
-            entries: entries,
-            valuations: list.valuations,
-            after: today
-        )
     }
 
     var upcomingBillTotal: Int {
@@ -213,37 +215,6 @@ public extension HomeModel {
 
     func icon(for template: EntryTemplate) -> Icon? {
         list?.icon(for: template)
-    }
-
-    func templateSections(matching query: String) -> [TemplateSection] {
-        let trimmed = query.trimmingCharacters(in: .whitespaces)
-
-        let matched = templates.filter { template in
-            trimmed.isEmpty
-                || template.name.localizedStandardContains(trimmed)
-                || detail(for: template).localizedStandardContains(trimmed)
-        }
-
-        let categories = (list.map { Array($0.categories.values) } ?? [])
-            .sorted { $0.sortOrder < $1.sortOrder }
-
-        return categories.compactMap { category in
-            let templates = matched.filter { $0.categoryId == category.id }
-
-            guard !templates.isEmpty else {
-                return nil
-            }
-
-            return TemplateSection(
-                id: category.id,
-                title: category.name,
-                templates: templates
-            )
-        }
-    }
-
-    func detail(for template: EntryTemplate) -> String {
-        list?.detail(for: template) ?? ""
     }
 
     func record(_ item: PeriodRecurring) async {
@@ -369,6 +340,26 @@ private extension HomeModel {
         ) { startDay in
             monthStartDay = startDay
         }
+    }
+
+    func updateOverview() {
+        overview = MonthOverview(
+            list: list,
+            budgets: budgets,
+            recurrings: recurrings,
+            monthStartDay: monthStartDay,
+            today: today
+        )
+
+        upcomingBills = list.map { list in
+            CardBill.upcoming(
+                recurrings: recurrings,
+                wallets: Array(list.wallets.values),
+                entries: list.days.flatMap(\.entries),
+                valuations: list.valuations,
+                after: today
+            )
+        } ?? []
     }
 
     func dayLabel(for date: LocalDate) -> String {

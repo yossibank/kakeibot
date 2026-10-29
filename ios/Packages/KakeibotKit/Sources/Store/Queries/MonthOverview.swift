@@ -6,6 +6,9 @@ public struct MonthOverview: Equatable, Sendable {
     public let recurrings: [Recurring]
     public let monthStartDay: MonthStartDay
     public let today: LocalDate
+    public let periodRecurrings: [PeriodRecurring]
+
+    private let monthDays: [EntryDay]
 
     public init(
         list: EntryList?,
@@ -14,11 +17,24 @@ public struct MonthOverview: Equatable, Sendable {
         monthStartDay: MonthStartDay,
         today: LocalDate
     ) {
+        let month = today.periodMonth(startingOn: monthStartDay)
+        let period = month.period(startingOn: monthStartDay)
+        let entries = list?.days.flatMap(\.entries)
+
         self.list = list
         self.budgets = budgets
         self.recurrings = recurrings
         self.monthStartDay = monthStartDay
         self.today = today
+
+        self.periodRecurrings = Self.periodRecurrings(
+            of: recurrings,
+            in: period,
+            entries: entries,
+            today: today
+        )
+
+        self.monthDays = list?.days.filter { period.contains($0.date) } ?? []
     }
 }
 
@@ -46,42 +62,6 @@ public extension MonthOverview {
     var yesterdayExpense: Int {
         let yesterday = today.adding(days: -1)
         return expense(on: yesterday)
-    }
-
-    var periodRecurrings: [PeriodRecurring] {
-        let entries = list?.days.flatMap(\.entries).filter { $0.recurringId != nil } ?? []
-
-        return recurrings
-            .flatMap { recurring in
-                recurring
-                    .occurrences(from: period.lowerBound, through: period.upperBound)
-                    .compactMap { occurrence in
-                        let date = occurrence.date
-
-                        let entry = entries.first { entry in
-                            recurring.isRecorded(by: entry, scheduled: occurrence.scheduled)
-                        }
-
-                        let amount = entry?.amount
-                            ?? paidAmount(of: recurring, on: date)
-                            ?? recurring.amount
-
-                        guard entry != nil || amount > 0 else {
-                            return nil
-                        }
-
-                        let state = status(of: date, entry: entry, recurring: recurring)
-
-                        return PeriodRecurring(
-                            date: date,
-                            recurring: recurring,
-                            entry: entry,
-                            status: state,
-                            amount: amount
-                        )
-                    }
-            }
-            .sorted { $0.date < $1.date }
     }
 
     var recurringExpense: Int {
@@ -145,29 +125,57 @@ public extension MonthOverview {
 }
 
 private extension MonthOverview {
-    var monthDays: [EntryDay] {
-        list?.days.filter { period.contains($0.date) } ?? []
+    static func periodRecurrings(
+        of recurrings: [Recurring],
+        in period: ClosedRange<LocalDate>,
+        entries: [Entry]?,
+        today: LocalDate
+    ) -> [PeriodRecurring] {
+        let recorded = entries?.filter { $0.recurringId != nil } ?? []
+
+        return recurrings
+            .flatMap { recurring in
+                recurring
+                    .occurrences(from: period.lowerBound, through: period.upperBound)
+                    .compactMap { occurrence in
+                        let date = occurrence.date
+
+                        let entry = recorded.first { entry in
+                            recurring.isRecorded(by: entry, scheduled: occurrence.scheduled)
+                        }
+
+                        let amount = entry?.amount
+                            ?? entries.map { recurring.amount(paidOn: date, entries: $0) }
+                            ?? recurring.amount
+
+                        guard entry != nil || amount > 0 else {
+                            return nil
+                        }
+
+                        let state = status(
+                            of: date,
+                            entry: entry,
+                            recurring: recurring,
+                            today: today
+                        )
+
+                        return PeriodRecurring(
+                            date: date,
+                            recurring: recurring,
+                            entry: entry,
+                            status: state,
+                            amount: amount
+                        )
+                    }
+            }
+            .sorted { $0.date < $1.date }
     }
 
-    func expense(on date: LocalDate) -> Int {
-        list?.days.first { $0.date == date }?.expenseTotal ?? 0
-    }
-
-    func paidAmount(
-        of recurring: Recurring,
-        on date: LocalDate
-    ) -> Int? {
-        list.map { list in
-            let entries = list.days.flatMap(\.entries)
-
-            return recurring.amount(paidOn: date, entries: entries)
-        }
-    }
-
-    func status(
+    static func status(
         of date: LocalDate,
         entry: Entry?,
-        recurring: Recurring
+        recurring: Recurring,
+        today: LocalDate
     ) -> PeriodRecurring.Status {
         if entry != nil {
             return .done
@@ -180,6 +188,10 @@ private extension MonthOverview {
         let isGenerated = recurring.generatedUntil.map { date <= $0 } ?? false
 
         return date == today && !isGenerated ? .upcoming : .missing
+    }
+
+    func expense(on date: LocalDate) -> Int {
+        list?.days.first { $0.date == date }?.expenseTotal ?? 0
     }
 
     func recurringTotal(
