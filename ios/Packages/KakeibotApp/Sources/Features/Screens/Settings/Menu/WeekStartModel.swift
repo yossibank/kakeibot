@@ -12,6 +12,8 @@ public final class WeekStartModel {
 
     private let database: AppDatabase
 
+    private var savedWeekStart: Weekday = .sunday
+
     public init(database: AppDatabase) {
         self.database = database
     }
@@ -20,17 +22,20 @@ public final class WeekStartModel {
 public extension WeekStartModel {
     func load() async {
         weekStart = await (try? database.setting(.weekStart)) ?? .sunday
+        savedWeekStart = weekStart
     }
 
     func choose(_ day: Weekday) async {
-        let previous = weekStart
-
         weekStart = day
 
         do {
             try await database.setSetting(.weekStart, to: day)
+            savedWeekStart = day
         } catch {
-            weekStart = previous
+            if weekStart == day {
+                weekStart = savedWeekStart
+            }
+
             errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
