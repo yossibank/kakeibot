@@ -360,10 +360,8 @@ extension SyncModelTests.FakeCloud {
 }
 
 private extension SyncModelTests {
-    func wait(until isReady: () -> Bool) async throws {
-        for _ in 0..<200 where !isReady() {
-            try await Task.sleep(for: .milliseconds(10))
-        }
+    func wait(until isReady: @escaping @MainActor () -> Bool) async throws {
+        await ObservationWait.until(isReady)
     }
 
     func firstShare(in database: AppDatabase) async throws -> WalletShare {

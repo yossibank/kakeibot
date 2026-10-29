@@ -246,8 +246,8 @@ struct RecurringModelTests {
             await model.observe()
         }
 
-        for _ in 0..<200 where model.rows.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.rows.isEmpty
         }
 
         task.cancel()
@@ -286,14 +286,14 @@ struct RecurringModelTests {
             await model.observe()
         }
 
-        for _ in 0..<200 where model.rows.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.rows.isEmpty
         }
 
         await model.hide(saved.id)
 
-        for _ in 0..<200 where model.hiddenRows.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.hiddenRows.isEmpty
         }
 
         let shownWhileHidden = model.rows.count
@@ -301,8 +301,8 @@ struct RecurringModelTests {
 
         await model.show(saved.id)
 
-        for _ in 0..<200 where model.rows.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.rows.isEmpty
         }
 
         task.cancel()

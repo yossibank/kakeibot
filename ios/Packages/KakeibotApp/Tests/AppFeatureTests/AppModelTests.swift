@@ -198,8 +198,8 @@ struct AppModelTests {
 
         let expected = ThemeLook.fixed(ThemePreset.wine.palette)
 
-        for _ in 0..<200 where model.look != expected {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            model.look == expected
         }
 
         task.cancel()

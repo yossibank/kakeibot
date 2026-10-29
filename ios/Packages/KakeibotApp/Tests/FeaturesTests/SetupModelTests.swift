@@ -68,9 +68,7 @@ struct SetupModelTests {
 }
 
 private extension SetupModelTests {
-    static func wait(until isReady: () -> Bool) async throws {
-        for _ in 0..<200 where !isReady() {
-            try await Task.sleep(for: .milliseconds(10))
-        }
+    static func wait(until isReady: @escaping @MainActor () -> Bool) async throws {
+        await ObservationWait.until(isReady)
     }
 }

@@ -90,8 +90,8 @@ struct HomeModelTests {
 
         try await setup.database.setBudget(120_000, for: nil, from: month)
 
-        for _ in 0..<200 where model.budgetUsage == nil {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            model.budgetUsage != nil
         }
 
         task.cancel()
@@ -118,8 +118,8 @@ struct HomeModelTests {
 
         try await setup.database.setBudget(120_000, for: nil, from: setup.today.yearMonth)
 
-        for _ in 0..<200 where model.budgetUsage == nil {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            model.budgetUsage != nil
         }
 
         task.cancel()

@@ -133,8 +133,8 @@ extension AssetsModelTests.Setup {
             await model.run()
         }
 
-        for _ in 0..<200 where model.rewardBank == nil || model.list == nil {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            model.rewardBank != nil && model.list != nil
         }
 
         task.cancel()

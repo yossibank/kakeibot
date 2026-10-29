@@ -159,8 +159,8 @@ struct TemplateUseTests {
             await home.run()
         }
 
-        for _ in 0..<200 where home.templates.count < 3 || home.list == nil {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            home.templates.count >= 3 && home.list != nil
         }
 
         let all = home.templateSections(matching: "")
@@ -196,8 +196,8 @@ struct TemplateUseTests {
             await home.run()
         }
 
-        for _ in 0..<200 where home.templates.count < 3 || home.list == nil {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            home.templates.count >= 3 && home.list != nil
         }
 
         let manual = home.templates.map(\.name)
@@ -234,14 +234,14 @@ struct TemplateUseTests {
             await home.run()
         }
 
-        for _ in 0..<200 where home.templates.count < 2 || home.list == nil {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            home.templates.count >= 2 && home.list != nil
         }
 
         _ = await home.record(tissue)
 
-        for _ in 0..<200 where home.list?.days.count ?? 0 < 2 {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            home.list?.days.count ?? 0 >= 2
         }
 
         await home.setTemplateOrder(.frequent)
@@ -262,8 +262,8 @@ struct TemplateUseTests {
             await home.run()
         }
 
-        for _ in 0..<200 where home.templates.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !home.templates.isEmpty
         }
 
         let expense = home.templates.map(\.name)

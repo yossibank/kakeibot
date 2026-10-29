@@ -181,15 +181,15 @@ struct RecordsModelTests {
 
         await model.toggleNoSpendDay(on: setup.today)
 
-        for _ in 0..<200 where model.noSpendDays.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.noSpendDays.isEmpty
         }
 
         let marked = model.noSpendDays
         await model.toggleNoSpendDay(on: setup.today)
 
-        for _ in 0..<200 where !model.noSpendDays.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            model.noSpendDays.isEmpty
         }
 
         let unmarked = model.noSpendDays
@@ -278,8 +278,8 @@ struct RecordsModelTests {
             await model.run()
         }
 
-        for _ in 0..<200 where model.stampChoices.isEmpty {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            !model.stampChoices.isEmpty
         }
 
         let choices = model.stampChoices
@@ -289,8 +289,8 @@ struct RecordsModelTests {
         await model.stamp(star, on: today)
         await model.stamp(party, on: today)
 
-        for _ in 0..<200 where model.stampIcon(on: today)?.id != party.id {
-            try await Task.sleep(for: .milliseconds(10))
+        await ObservationWait.until {
+            model.stampIcon(on: today)?.id == party.id
         }
 
         let stamped = model.stampIcon(on: today)
