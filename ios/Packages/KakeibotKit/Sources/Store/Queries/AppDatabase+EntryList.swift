@@ -10,6 +10,14 @@ public extension AppDatabase {
         try await writer.read(Self.entryList)
     }
 
+    func latestEntryList() async throws -> EntryList {
+        for try await list in entryListObservation.values() {
+            return list
+        }
+
+        throw CancellationError()
+    }
+
     func entryOptions() async throws -> EntryOptions {
         try await writer.read(Self.entryOptions)
     }

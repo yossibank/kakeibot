@@ -99,6 +99,9 @@ public struct EntrySheet: View {
             .task {
                 await load()
             }
+            .task {
+                await model.observeHistory()
+            }
         }
     }
 }

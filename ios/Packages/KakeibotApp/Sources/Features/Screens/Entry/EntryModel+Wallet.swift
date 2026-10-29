@@ -168,8 +168,19 @@ public extension EntryModel {
 
 extension EntryModel {
     func loadBalances() async throws {
-        history = try await database.entryList()
+        history = try await database.latestEntryList()
         updateBalances()
+    }
+
+    func observeHistory() async {
+        do {
+            for try await list in database.entryListUpdates() {
+                history = list
+                updateBalances()
+            }
+        } catch {
+            report(error)
+        }
     }
 }
 

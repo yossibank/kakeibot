@@ -103,6 +103,21 @@ struct EntryListTests {
     }
 
     @Test
+    func readsLatestSharedList() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        let draft = try await expenseDraft(in: database)
+
+        let saved = try await database.saveEntry(draft, at: now)
+        let latest = try await database.latestEntryList()
+        let read = try await database.entryList()
+
+        #expect(latest == read)
+        #expect(latest.days.first?.entries == [saved])
+    }
+
+    @Test
     func listsRecentMemosOnce() async throws {
         let database = try AppDatabase.inMemory()
         let start = Date(timeIntervalSince1970: 1_791_000_000)
