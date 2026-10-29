@@ -63,6 +63,8 @@ public struct EntryRow: View {
 
                     if let tag {
                         TagCard(tag, size: .small)
+                            .sharesTextScale(id: tag)
+                            .layoutPriority(1)
                     }
 
                     if let detail {

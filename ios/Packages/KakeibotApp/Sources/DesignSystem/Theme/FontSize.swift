@@ -1,5 +1,4 @@
 import Core
-import CoreGraphics
 import SwiftUI
 
 public enum FontSize: CGFloat, Sendable {

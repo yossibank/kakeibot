@@ -113,7 +113,7 @@ private extension MonthCalendar {
                         .textFont(size: .micro)
                         .foregroundStyle(Palette.holiday)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.8)
                         .frame(height: 10)
                 }
                 .opacity(opacity)

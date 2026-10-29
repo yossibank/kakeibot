@@ -62,6 +62,7 @@ public struct TagLine<ID: Hashable & Sendable>: View {
                     hanging(card, at: index)
                 }
             }
+            .sharesTextScale(id: tags.map(\.name))
             .coordinateSpace(.named(Self.space))
             .overlay(alignment: .topLeading) {
                 liftedCard
@@ -235,11 +236,11 @@ private extension TagLine {
     }
 
     static var spacing: CGFloat {
-        6
+        8
     }
 
     static var inset: CGFloat {
-        6
+        4
     }
 
     static var tilts: [Double] {

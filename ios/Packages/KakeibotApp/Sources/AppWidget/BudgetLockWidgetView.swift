@@ -63,7 +63,7 @@ private extension BudgetLockWidgetView {
                     Text(circularTitle(of: summary))
                         .textFont(.caption2)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.5)
 
                     Text(shortAmount(mainAmount(of: summary)))
                         .displayFont(.body, weight: .bold)
@@ -83,7 +83,7 @@ private extension BudgetLockWidgetView {
                 Text(headline(of: summary))
                     .textFont(.caption)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.5)
 
                 Spacer(minLength: 4)
 
@@ -98,7 +98,7 @@ private extension BudgetLockWidgetView {
                 .displayFont(.headline, weight: .bold)
                 .monospacedDigit()
                 .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                .minimumScaleFactor(0.5)
                 .widgetAccentable()
                 .privacySensitive()
 
@@ -107,7 +107,7 @@ private extension BudgetLockWidgetView {
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.5)
                 .privacySensitive()
         }
         .frame(maxWidth: .infinity, alignment: .leading)

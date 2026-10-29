@@ -70,7 +70,7 @@ private extension ReminderView {
                 .frame(width: 38, height: 38)
                 .background(
                     Palette.accent,
-                    in: .rect(cornerRadius: corner.radius(9))
+                    in: .rect(cornerRadius: corner.radius(8))
                 )
 
             VStack(alignment: .leading, spacing: 4) {

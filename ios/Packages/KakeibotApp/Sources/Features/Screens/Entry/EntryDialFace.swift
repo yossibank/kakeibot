@@ -43,7 +43,7 @@ struct EntryDialFace: View {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.5)
                     .editBadge()
                     .frame(height: Self.amountHeight)
 

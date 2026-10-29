@@ -120,7 +120,7 @@ private extension AssetsView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
 
                 Text(changeText)
                     .textFont(.caption)
@@ -191,7 +191,7 @@ private extension AssetsView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.5)
             }
 
             if !owedSections.isEmpty {

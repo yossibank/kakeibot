@@ -15,7 +15,7 @@ extension RewardRuleListView {
             HStack(alignment: .top) {
                 IconBadge(icon, size: 46)
 
-                Spacer(minLength: 6)
+                Spacer(minLength: 8)
 
                 if let total = model.total(for: rule) {
                     totalBadge(total)
@@ -40,7 +40,7 @@ extension RewardRuleListView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accent)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.5)
             }
         }
         .padding(16)

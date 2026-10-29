@@ -62,7 +62,7 @@ public struct TemplateListView: View {
                 }
             }
             .scrollIndicators(.hidden)
-            .contentMargins(.horizontal, 18, for: .scrollContent)
+            .contentMargins(.horizontal, 20, for: .scrollContent)
             .padding(.horizontal, -20)
             .scrollDisabled(drag.isLifting)
             .settingsAutoScroll(drag.autoScroll)

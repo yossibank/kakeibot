@@ -32,7 +32,7 @@ private extension HomeSectionThumbnail {
     }
 
     var customize: some View {
-        HStack(spacing: 3) {
+        HStack(spacing: 4) {
             ForEach(0..<3, id: \.self) { _ in
                 RoundedRectangle(cornerRadius: 2)
                     .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
@@ -50,7 +50,7 @@ private extension HomeSectionThumbnail {
     }
 
     var templates: some View {
-        Grid(horizontalSpacing: 3, verticalSpacing: 3) {
+        Grid(horizontalSpacing: 4, verticalSpacing: 4) {
             ForEach(0..<2, id: \.self) { _ in
                 GridRow {
                     ForEach(0..<2, id: \.self) { _ in
@@ -66,7 +66,7 @@ private extension HomeSectionThumbnail {
     var recent: some View {
         VStack(spacing: 4) {
             ForEach(Self.recentWidths, id: \.self) { width in
-                HStack(spacing: 3) {
+                HStack(spacing: 4) {
                     Circle()
                         .fill(Palette.accent.opacity(.subtle))
                         .frame(width: 5, height: 5)
@@ -78,9 +78,9 @@ private extension HomeSectionThumbnail {
     }
 
     var bills: some View {
-        VStack(spacing: 5) {
+        VStack(spacing: 4) {
             ForEach(Self.billWidths, id: \.self) { width in
-                HStack(spacing: 3) {
+                HStack(spacing: 4) {
                     line(Palette.accent, width: 6)
 
                     line(Palette.text, width: width)

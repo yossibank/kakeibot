@@ -54,7 +54,7 @@ private extension BudgetWidgetView {
 
             dial(summary)
 
-            Spacer(minLength: 6)
+            Spacer(minLength: 4)
 
             footer(of: summary)
         }
@@ -69,14 +69,14 @@ private extension BudgetWidgetView {
 
                 dial(summary)
 
-                Spacer(minLength: 6)
+                Spacer(minLength: 4)
 
                 Text(budgetNote(of: summary))
                     .textFont(size: .caption)
                     .monospacedDigit()
                     .foregroundStyle(noteColor(of: summary))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.5)
                     .frame(maxWidth: .infinity)
                     .privacySensitive()
             }
@@ -98,7 +98,7 @@ private extension BudgetWidgetView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
                     .privacySensitive()
 
                 Rectangle()
@@ -120,7 +120,7 @@ private extension BudgetWidgetView {
                                 .monospacedDigit()
                                 .foregroundStyle(Palette.text)
                                 .lineLimit(1)
-                                .minimumScaleFactor(0.7)
+                                .minimumScaleFactor(0.5)
                                 .privacySensitive()
                         }
                     }
@@ -138,7 +138,7 @@ private extension BudgetWidgetView {
             .tracking(1)
             .foregroundStyle(Palette.accent)
             .lineLimit(1)
-            .minimumScaleFactor(0.8)
+            .minimumScaleFactor(0.5)
     }
 
     @ViewBuilder
@@ -178,7 +178,7 @@ private extension BudgetWidgetView {
                 .textFont(size: .caption, weight: .semibold)
                 .foregroundStyle(noteColor(of: summary))
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.5)
                 .frame(maxWidth: .infinity)
         } else {
             HStack(alignment: .firstTextBaseline) {
@@ -193,7 +193,7 @@ private extension BudgetWidgetView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.5)
                     .privacySensitive()
             }
         }

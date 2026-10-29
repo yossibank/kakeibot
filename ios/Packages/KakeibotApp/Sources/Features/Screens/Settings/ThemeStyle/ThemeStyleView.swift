@@ -1,6 +1,5 @@
 import Core
 import DesignSystem
-import Foundation
 import SwiftUI
 
 public struct ThemeStyleView: View {
@@ -34,7 +33,8 @@ public struct ThemeStyleView: View {
                     fontRow(
                         "見出しと金額の字体",
                         selection: displayFontBinding,
-                        sample: AmountText.text(Self.sampleAmount)
+                        sample: AmountText.text(Self.sampleAmount),
+                        sampleScale: 0.5
                     ) { font in
                         .display(.headline, in: font, scale: 1)
                     }
@@ -42,7 +42,8 @@ public struct ThemeStyleView: View {
                     fontRow(
                         "本文の字体",
                         selection: textFontBinding,
-                        sample: Self.sampleText
+                        sample: Self.sampleText,
+                        sampleScale: 0.8
                     ) { font in
                         .text(.subheadline, in: font, scale: 1)
                     }
@@ -50,7 +51,7 @@ public struct ThemeStyleView: View {
                     cornerRow
                 }
             }
-            .contentMargins(.horizontal, 18, for: .scrollContent)
+            .contentMargins(.horizontal, 20, for: .scrollContent)
             .contentMargins(.vertical, Self.fade, for: .scrollContent)
             .edgeFade(Self.fade)
             .padding(.horizontal, -20)
@@ -88,18 +89,20 @@ private extension ThemeStyleView {
                     .textFont(size: .caption)
                     .tracking(4)
                     .foregroundStyle(Palette.accent)
+                    .minimumScaleFactor(0.8)
 
                 Text(AmountText.text(Self.sampleRest))
                     .displayFont(.title, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+                    .minimumScaleFactor(0.5)
 
                 Text("予算 ¥200,000")
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.subtext)
+                    .minimumScaleFactor(0.8)
             }
             .lineLimit(1)
-            .minimumScaleFactor(0.6)
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity)
             .frame(height: Self.restCardHeight)
@@ -168,6 +171,7 @@ private extension ThemeStyleView {
         _ title: String,
         selection: Binding<ThemeFont>,
         sample: String,
+        sampleScale: CGFloat,
         font: @escaping (ThemeFont) -> Font
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -185,7 +189,7 @@ private extension ThemeStyleView {
                             .font(font(choice))
                             .foregroundStyle(Palette.text)
                             .lineLimit(1)
-                            .minimumScaleFactor(0.6)
+                            .minimumScaleFactor(sampleScale)
                     }
                 }
             }

@@ -33,6 +33,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
                 VStack(alignment: .leading, spacing: size.textSpacing) {
                     name
                         .lineLimit(size.nameLines)
+                        .minimumScaleFactor(size.nameScale)
 
                     Text(detail)
                         .font(size.detailFont(in: themeStyle))

@@ -1,6 +1,5 @@
 import Core
 import DesignSystem
-import Store
 import SwiftUI
 
 extension ReviewView {
@@ -221,7 +220,7 @@ private extension ReviewView {
                     .monospacedDigit()
                     .foregroundStyle(amountColor)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 12)

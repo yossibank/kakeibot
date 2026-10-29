@@ -64,6 +64,7 @@ struct ReviewSharesCard: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
+        .sharesTextScale(id: shares.map(\.name))
     }
 }
 
@@ -86,7 +87,7 @@ private extension ReviewSharesCard {
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                .minimumScaleFactor(0.5)
         }
         .padding(.horizontal, 36)
     }
@@ -102,8 +103,7 @@ private extension ReviewSharesCard {
                 Text(share.name)
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 Text("\(percent)%")
                     .textFont(.caption)

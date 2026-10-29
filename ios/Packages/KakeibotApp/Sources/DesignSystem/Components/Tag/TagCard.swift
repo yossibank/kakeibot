@@ -21,11 +21,10 @@ public struct TagCard: View {
 
     public var body: some View {
         Text(title)
-            .font(.system(size: size.fontSize))
+            .modifier(TagFont(size: size.fontSize))
             .foregroundStyle(foreground)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-            .fixedSize()
+            .minimumScaleFactor(TextScale.floor)
+            .sharedTextScale()
             .padding(.top, size.holeSpace)
             .padding(.horizontal, size.padding)
             .frame(minWidth: size.minWidth, minHeight: size.height)
@@ -128,15 +127,12 @@ private extension TagCard.Size {
     var padding: CGFloat {
         switch self {
         case .regular: 8
-        case .small: 6
+        case .small: 4
         }
     }
 
     var radius: CGFloat {
-        switch self {
-        case .regular: 4
-        case .small: 3
-        }
+        4
     }
 
     var hole: CGFloat {
@@ -148,16 +144,23 @@ private extension TagCard.Size {
 
     var holeTop: CGFloat {
         switch self {
-        case .regular: 3
+        case .regular: 4
         case .small: 2
         }
     }
 
     var holeSpace: CGFloat {
-        switch self {
-        case .regular: 5
-        case .small: 6
-        }
+        4
+    }
+}
+
+private struct TagFont: ViewModifier {
+    @Environment(\.sharedTextScale) private var shared
+
+    let size: CGFloat
+
+    func body(content: Content) -> some View {
+        content.font(.system(size: size * shared))
     }
 }
 

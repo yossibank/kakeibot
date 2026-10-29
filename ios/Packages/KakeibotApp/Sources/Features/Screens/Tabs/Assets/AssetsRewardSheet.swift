@@ -1,6 +1,5 @@
 import Core
 import DesignSystem
-import Store
 import SwiftUI
 
 struct AssetsRewardSheet: View {
@@ -10,7 +9,6 @@ struct AssetsRewardSheet: View {
     @State private var isEditingRules = false
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.themeStyle.corner) private var corner
 
     let model: AssetsModel
 
@@ -98,7 +96,7 @@ private extension AssetsRewardSheet {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
 
                 Spacer(minLength: 8)
 

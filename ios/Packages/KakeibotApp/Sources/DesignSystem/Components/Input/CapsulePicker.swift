@@ -91,7 +91,7 @@ public extension CapsulePicker {
 
 private extension CapsulePicker {
     static var inset: CGFloat {
-        3
+        4
     }
 
     static var thumbFill: LinearGradient {

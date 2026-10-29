@@ -26,6 +26,7 @@ extension AssetsView {
                     .buttonStyle(.plain)
                 }
             }
+            .sharesTextScale(id: model.upcomingBills.map(\.source))
         }
         .padding(16)
         .card()
@@ -62,7 +63,7 @@ extension AssetsView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
             }
             .padding(.horizontal, 4)
             .padding(.top, 12)
@@ -229,8 +230,8 @@ private extension AssetsView {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(alignment: .firstTextBaseline) {
                         Text(row.source ?? "口座")
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .textFont(.caption2)
+                            .sharedTextScale()
 
                         Spacer(minLength: 8)
 

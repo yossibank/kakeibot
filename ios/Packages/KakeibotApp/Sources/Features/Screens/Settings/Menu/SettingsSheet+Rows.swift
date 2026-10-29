@@ -65,23 +65,10 @@ extension SettingsSheet {
                 .fixedSize()
         }
 
-        return ViewThatFits(in: .horizontal) {
-            HStack(spacing: 12) {
-                label
+        return PickerRowLayout {
+            label
 
-                Spacer(minLength: 8)
-
-                picker
-            }
-            .frame(minHeight: 52)
-
-            VStack(alignment: .leading, spacing: 8) {
-                label
-
-                picker
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .padding(.vertical, 12)
+            picker
         }
     }
 
@@ -115,7 +102,7 @@ extension SettingsSheet {
 
                     Text(shortValue ?? value)
                         .lineLimit(1)
-                        .minimumScaleFactor(Self.valueScale)
+                        .minimumScaleFactor(0.8)
                 }
                 .textFont(.footnote)
                 .foregroundStyle(Palette.subtext)
@@ -130,6 +117,55 @@ extension SettingsSheet {
     }
 }
 
-private extension SettingsSheet {
-    static let valueScale: CGFloat = 0.7
+private struct PickerRowLayout: Layout {
+    static let gap: CGFloat = 20
+    static let rowHeight: CGFloat = 52
+    static let lineSpacing: CGFloat = 8
+    static let inset: CGFloat = 12
+
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) -> CGSize {
+        let label = subviews[0].sizeThatFits(.unspecified)
+        let picker = subviews[1].sizeThatFits(.unspecified)
+        let rowWidth = label.width + Self.gap + picker.width
+        let width = proposal.width ?? rowWidth
+
+        guard rowWidth > width else {
+            return CGSize(width: width, height: max(label.height, picker.height, Self.rowHeight))
+        }
+
+        let height = label.height + Self.lineSpacing + picker.height + Self.inset * 2
+
+        return CGSize(width: width, height: height)
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        let label = subviews[0].sizeThatFits(.unspecified)
+        let picker = subviews[1].sizeThatFits(.unspecified)
+        let rowWidth = label.width + Self.gap + picker.width
+
+        guard rowWidth > bounds.width else {
+            let leading = CGPoint(x: bounds.minX, y: bounds.midY)
+            let trailing = CGPoint(x: bounds.maxX, y: bounds.midY)
+
+            subviews[0].place(at: leading, anchor: .leading, proposal: .unspecified)
+            subviews[1].place(at: trailing, anchor: .trailing, proposal: .unspecified)
+
+            return
+        }
+
+        let top = CGPoint(x: bounds.minX, y: bounds.minY + Self.inset)
+        let bottom = CGPoint(x: bounds.maxX, y: bounds.maxY - Self.inset)
+
+        subviews[0].place(at: top, anchor: .topLeading, proposal: .unspecified)
+        subviews[1].place(at: bottom, anchor: .bottomTrailing, proposal: .unspecified)
+    }
 }

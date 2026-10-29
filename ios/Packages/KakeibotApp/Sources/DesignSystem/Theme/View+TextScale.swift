@@ -43,6 +43,9 @@ private struct SharesTextScale<ID: Equatable>: ViewModifier {
             .onPreferenceChange(TextScaleKey.self) { report in
                 scale = min(scale, report.scale)
             }
+            .transformPreference(TextScaleKey.self) { report in
+                report = TextScaleKey.defaultValue
+            }
             .onChange(of: id) {
                 reset()
             }
@@ -137,6 +140,10 @@ private struct ProposedWidth: Layout {
         subviews: Subviews,
         cache: inout ()
     ) -> CGFloat? {
-        subviews[0].dimensions(in: proposal)[guide]
+        guard guide == .firstTextBaseline || guide == .lastTextBaseline else {
+            return nil
+        }
+
+        return subviews[0].dimensions(in: proposal)[guide]
     }
 }

@@ -1,6 +1,5 @@
 import Core
 import SwiftUI
-import UIKit
 
 public enum Palette {
     public static let backgroundTop = Color(themed: \.backgroundTop)
