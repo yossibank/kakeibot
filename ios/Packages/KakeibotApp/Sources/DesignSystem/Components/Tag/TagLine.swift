@@ -62,6 +62,7 @@ public struct TagLine<ID: Hashable & Sendable>: View {
                     hanging(card, at: index)
                 }
             }
+            .sharesTextScale(id: tags.map(\.name))
             .coordinateSpace(.named(Self.space))
             .overlay(alignment: .topLeading) {
                 liftedCard

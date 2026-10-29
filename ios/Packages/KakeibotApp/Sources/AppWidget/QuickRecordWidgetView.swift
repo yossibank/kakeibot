@@ -145,6 +145,7 @@ private extension QuickRecordWidgetView {
                 }
             }
         }
+        .sharesTextScale(id: tiles.map(\.name))
     }
 
     @ViewBuilder
@@ -180,8 +181,7 @@ private extension QuickRecordWidgetView {
                 Text(tile.name)
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
             }
 
             if isLarge {
@@ -264,6 +264,7 @@ private extension QuickRecordWidgetView {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .sharesTextScale(id: records.map(\.title))
     }
 
     func recordRow(_ record: QuickRecordWidgetSummary.Record) -> some View {
@@ -277,8 +278,7 @@ private extension QuickRecordWidgetView {
                 Text(record.title)
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 Text(record.detail)
                     .textFont(size: .micro)

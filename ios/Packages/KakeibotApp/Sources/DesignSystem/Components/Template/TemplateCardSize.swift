@@ -45,6 +45,13 @@ extension TemplateCardSize {
         }
     }
 
+    var nameScale: CGFloat {
+        switch self {
+        case .regular: 1
+        case .large: 0.8
+        }
+    }
+
     var iconSize: CGFloat {
         switch self {
         case .regular: 16

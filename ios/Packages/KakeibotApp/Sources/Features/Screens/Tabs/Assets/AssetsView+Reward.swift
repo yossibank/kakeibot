@@ -105,6 +105,7 @@ private extension AssetsView {
                         rewardRow(log)
                     }
                 }
+                .sharesTextScale(id: model.recentRewards)
             }
         }
         .contentShape(.rect)
@@ -145,8 +146,7 @@ private extension AssetsView {
             Text(rule?.name ?? "")
                 .textFont(.footnote)
                 .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .sharedTextScale()
 
             Spacer(minLength: 8)
 
