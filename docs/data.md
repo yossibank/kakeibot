@@ -82,6 +82,8 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 スタンプの一覧が 1 つも無ければ（しまったものも数える）、shelf_icon を入れる。絵柄は `star`・`party`・`trophy`・`cake`・`fitness`・`travel`・`sun`・`moon` の順にする。
 
+同期を入れて最初の取得を終えるまでは、財布・カテゴリ・shelf_icon を入れない。`sync_state.engine_state` が空の間がそれに当たる。
+
 ## 表
 
 表ごとに、列と型と補足を書く。型は SQLite の型で書く。
