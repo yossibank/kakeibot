@@ -31,8 +31,8 @@ public extension AppDatabase {
                 try Self.saveSystemFields(data, of: id, in: db)
             }
 
-            try Self.retryWaiting(in: db)
             try Self.joinSharedWallets(in: joinedIDs, owners: owners, db: db)
+            try Self.retryWaiting(in: db)
             try Self.setApplying(false, in: db)
         }
     }
@@ -233,9 +233,10 @@ private extension AppDatabase {
     }
 
     static func save(
-        _ record: SyncRecord,
+        _ received: SyncRecord,
         in db: Database
     ) throws -> Outcome {
+        let record = try receivedTransfer(received, in: db)
         let table = record.key.table
         let names = try db.columns(in: table.rawValue).map(\.name)
         let columns = Set(names)

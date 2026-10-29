@@ -144,9 +144,7 @@ public extension AppDatabase {
     func syncRecord(for key: SyncKey) async throws -> SyncRecord? {
         try await writer.read { db in
             try Self.localRow(for: key, in: db).map { row in
-                let pairs = row.columnNames.map { ($0, SyncValue(row[$0])) }
-                let values = Dictionary(uniqueKeysWithValues: pairs)
-                return SyncRecord(key: key, values: values)
+                SyncRecord(key: key, row: row)
             }
         }
     }

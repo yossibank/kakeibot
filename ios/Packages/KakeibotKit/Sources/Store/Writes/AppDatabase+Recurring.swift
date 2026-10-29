@@ -211,6 +211,7 @@ extension AppDatabase {
         )
 
         try fitCategory(of: &entry, in: db)
+        try prepareSharedTransfer(entry, in: db, at: now)
         try entry.insert(db)
 
         if entry.type == .expense {

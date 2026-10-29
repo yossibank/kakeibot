@@ -153,6 +153,7 @@ extension AppDatabase {
         var entry = try Self.entry(from: draft, editing: id, in: db, at: now)
 
         try fitCategory(of: &entry, in: db)
+        try prepareSharedTransfer(entry, in: db, at: now)
 
         guard try Self.tag(entry.tagId, belongsTo: entry.categoryId, in: db) else {
             throw WriteError.tagMismatch
