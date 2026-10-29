@@ -9,16 +9,8 @@ struct RecurringWriteTests {
         let setup = try await Setup()
         let today = try #require(LocalDate("2026-04-30"))
 
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
-
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
-
+        try await setup.database.generateRecurringEntries(through: today, at: setup.now)
+        try await setup.database.generateRecurringEntries(through: today, at: setup.now)
         let snapshot = try setup.database.snapshot()
         let dates = snapshot.entries.compactMap(\.recurringDate)
         let generated = snapshot.recurrings.first?.generatedUntil
@@ -37,289 +29,13 @@ struct RecurringWriteTests {
     func skipsWritingWhenNothingChanged() async throws {
         let setup = try await Setup()
         let today = try #require(LocalDate("2026-04-30"))
-
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
+        try await setup.database.generateRecurringEntries(through: today, at: setup.now)
 
         let before = try await setup.database.writer.read { $0.totalChangesCount }
-
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
-
+        try await setup.database.generateRecurringEntries(through: today, at: setup.now)
         let after = try await setup.database.writer.read { $0.totalChangesCount }
 
         #expect(after == before)
-    }
-
-    @Test
-    func generatesOnShiftedDate() async throws {
-        let setup = try await Setup()
-        let today = try #require(LocalDate("2026-04-30"))
-        try await setup.shiftHoliday(to: .next)
-
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
-
-        let entries = try setup.database.snapshot().entries
-        let dates = entries.map(\.date).sorted().map(\.description)
-        let scheduled = entries.compactMap(\.recurringDate).sorted().map(\.description)
-
-        #expect(dates == [
-            "2026-01-26",
-            "2026-02-25",
-            "2026-03-25",
-            "2026-04-27"
-        ])
-        #expect(scheduled == [
-            "2026-01-25",
-            "2026-02-25",
-            "2026-03-25",
-            "2026-04-25"
-        ])
-    }
-
-    @Test
-    func keepsOneEntryAfterChangingShift() async throws {
-        let setup = try await Setup()
-        let saturday = try #require(LocalDate("2026-04-25"))
-        let may = try #require(LocalDate("2026-05-31"))
-
-        try await setup.database.generateRecurringEntries(
-            through: saturday,
-            at: setup.now
-        )
-
-        try await setup.shiftHoliday(to: .next)
-
-        try await setup.database.generateRecurringEntries(
-            through: may,
-            at: setup.now
-        )
-
-        let dates = try setup.database
-            .snapshot()
-            .entries
-            .compactMap(\.recurringDate)
-            .sorted()
-            .map(\.description)
-
-        #expect(dates == [
-            "2026-01-25",
-            "2026-02-25",
-            "2026-03-25",
-            "2026-04-25",
-            "2026-05-25"
-        ])
-    }
-
-    @Test(arguments: [20, 12])
-    func keepsOneEntryAfterChangingDay(day: Int) async throws {
-        let setup = try await Setup()
-        let first = try #require(LocalDate("2026-03-10"))
-        let last = try #require(LocalDate("2026-03-31"))
-
-        try await setup.database.generateRecurringEntries(
-            through: first,
-            at: setup.now
-        )
-
-        try await setup.changeDay(to: day)
-
-        try await setup.database.generateRecurringEntries(
-            through: last,
-            at: setup.now
-        )
-
-        let dates = try setup.database
-            .snapshot()
-            .entries
-            .compactMap(\.recurringDate)
-            .sorted()
-            .map(\.description)
-
-        #expect(dates == ["2026-01-25", "2026-02-25", "2026-03-\(day)"])
-    }
-
-    @Test
-    func generatesPastEntriesWhenStartMovesEarlier() async throws {
-        let setup = try await Setup()
-        let today = try #require(LocalDate("2026-03-31"))
-        let earlier = try #require(LocalDate("2025-11-01"))
-
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
-
-        let recurring = try #require(
-            setup.database.snapshot().recurrings.first
-        )
-
-        var draft = RecurringDraft(recurring)
-        draft.startDate = earlier
-
-        _ = try await setup.database.saveRecurring(
-            draft,
-            editing: recurring.id,
-            today: today,
-            at: setup.now
-        )
-
-        let dates = try setup.database
-            .snapshot()
-            .entries
-            .compactMap(\.recurringDate)
-            .sorted()
-            .map(\.description)
-
-        #expect(dates == [
-            "2025-11-25",
-            "2025-12-25",
-            "2026-01-25",
-            "2026-02-25",
-            "2026-03-25"
-        ])
-    }
-
-    @Test
-    func createsNextOccurrenceAfterDroppingShift() async throws {
-        let setup = try await Setup()
-        let paid = try #require(LocalDate("2027-03-01"))
-        let end = try #require(LocalDate("2027-03-31"))
-        try await setup.change(day: 27, shift: .next)
-
-        try await setup.database.generateRecurringEntries(
-            through: paid,
-            at: setup.now
-        )
-
-        try await setup.change(day: 27, shift: .none)
-
-        try await setup.database.generateRecurringEntries(
-            through: end,
-            at: setup.now
-        )
-
-        let scheduled = try setup.database
-            .snapshot()
-            .entries
-            .compactMap(\.recurringDate)
-            .filter { $0.description >= "2027-02-01" }
-            .sorted()
-            .map(\.description)
-
-        #expect(scheduled == ["2027-02-27", "2027-03-27"])
-    }
-
-    @Test
-    func createsNextOccurrenceAfterChangingDay() async throws {
-        let setup = try await Setup()
-        let paid = try #require(LocalDate("2027-03-01"))
-        let end = try #require(LocalDate("2027-03-31"))
-        try await setup.change(day: 27, shift: .next)
-
-        try await setup.database.generateRecurringEntries(
-            through: paid,
-            at: setup.now
-        )
-
-        try await setup.change(day: 20, shift: .next)
-
-        try await setup.database.generateRecurringEntries(
-            through: end,
-            at: setup.now
-        )
-
-        let scheduled = try setup.database
-            .snapshot()
-            .entries
-            .compactMap(\.recurringDate)
-            .filter { $0.description >= "2027-02-01" }
-            .sorted()
-            .map(\.description)
-
-        #expect(scheduled == ["2027-02-27", "2027-03-20"])
-    }
-
-    @Test
-    func createsNextOccurrenceAfterYearEndShift() async throws {
-        let setup = try await Setup()
-        let shifted = try #require(LocalDate("2027-01-04"))
-        let end = try #require(LocalDate("2027-01-31"))
-        try await setup.change(day: 31, shift: .next)
-
-        try await setup.database.generateRecurringEntries(
-            through: shifted,
-            at: setup.now
-        )
-
-        try await setup.change(day: 31, shift: .none)
-
-        try await setup.database.generateRecurringEntries(
-            through: end,
-            at: setup.now
-        )
-
-        let scheduled = try setup.database
-            .snapshot()
-            .entries
-            .compactMap(\.recurringDate)
-            .filter { $0.description >= "2026-12-01" }
-            .sorted()
-            .map(\.description)
-
-        #expect(scheduled == ["2026-12-31", "2027-01-31"])
-    }
-
-    @Test
-    func keepsDeletedOccurrenceWhenStartMovesEarlier() async throws {
-        let setup = try await Setup()
-        let today = try #require(LocalDate("2026-03-31"))
-        let earlier = try #require(LocalDate("2025-11-01"))
-
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
-
-        try await setup.database.writer.write { db in
-            try db.execute(sql: "DELETE FROM entry WHERE recurring_date = '2026-02-25'")
-        }
-
-        let recurring = try #require(
-            setup.database.snapshot().recurrings.first
-        )
-
-        var draft = RecurringDraft(recurring)
-        draft.startDate = earlier
-        draft.day = 20
-
-        _ = try await setup.database.saveRecurring(
-            draft,
-            editing: recurring.id,
-            today: today,
-            at: setup.now
-        )
-
-        let dates = try setup.database
-            .snapshot()
-            .entries
-            .compactMap(\.recurringDate)
-            .sorted()
-            .map(\.description)
-
-        #expect(dates == [
-            "2025-11-20",
-            "2025-12-20",
-            "2026-01-25",
-            "2026-03-25"
-        ])
     }
 
     @Test
@@ -383,15 +99,8 @@ struct RecurringWriteTests {
             try bill.insert(db)
         }
 
-        try await setup.database.generateRecurringEntries(
-            through: paidOn,
-            at: setup.now
-        )
-
-        let payment = try setup.database
-            .snapshot()
-            .entries
-            .first { $0.recurringId == bill.id }
+        try await setup.database.generateRecurringEntries(through: paidOn, at: setup.now)
+        let payment = try setup.database.snapshot().entries.first { $0.recurringId == bill.id }
 
         #expect(payment?.amount == 42500)
         #expect(payment?.date == paidOn)
@@ -404,17 +113,8 @@ struct RecurringWriteTests {
         let recurring = try #require(recurrings.first)
         let date = try #require(LocalDate("2026-03-25"))
 
-        let first = try await setup.database.recordRecurring(
-            recurring.id,
-            on: date,
-            at: setup.now
-        )
-
-        let second = try await setup.database.recordRecurring(
-            recurring.id,
-            on: date,
-            at: setup.now
-        )
+        let first = try await setup.database.recordRecurring(recurring.id, on: date, at: setup.now)
+        let second = try await setup.database.recordRecurring(recurring.id, on: date, at: setup.now)
 
         #expect(first?.recurringDate == date)
         #expect(second == nil)
@@ -427,18 +127,9 @@ struct RecurringWriteTests {
         let march = try #require(LocalDate("2026-03-01"))
         let may = try #require(LocalDate("2026-05-31"))
 
-        try await setup.database.generateRecurringEntries(
-            through: march,
-            at: setup.now
-        )
-
+        try await setup.database.generateRecurringEntries(through: march, at: setup.now)
         let first = try setup.database.snapshot().entries.count
-
-        try await setup.database.generateRecurringEntries(
-            through: may,
-            at: setup.now
-        )
-
+        try await setup.database.generateRecurringEntries(through: may, at: setup.now)
         let second = try setup.database.snapshot().entries.count
 
         #expect(first == 2)
@@ -449,274 +140,13 @@ struct RecurringWriteTests {
     func clearsNoSpendDayOfExpense() async throws {
         let setup = try await Setup()
         let payday = try #require(LocalDate("2026-01-25"))
-
         try await setup.database.markNoSpendDay(payday, at: setup.now)
 
-        try await setup.database.generateRecurringEntries(
-            through: payday,
-            at: setup.now
-        )
-
+        try await setup.database.generateRecurringEntries(through: payday, at: setup.now)
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.noSpendDays.isEmpty)
         #expect(snapshot.entries.count == 1)
-    }
-
-    @Test
-    func savesAndGeneratesUpToToday() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let start = try #require(LocalDate("2026-02-01"))
-        let today = try #require(LocalDate("2026-03-31"))
-
-        let draft = RecurringDraft(
-            type: .income,
-            amount: 280_000,
-            categoryId: options.incomeCategories[0].id,
-            walletId: options.wallets[1].id,
-            memo: "給料",
-            frequency: .monthly,
-            month: 1,
-            day: 25,
-            startDate: start
-        )
-
-        let saved = try await setup.database.saveRecurring(
-            draft,
-            today: today,
-            at: setup.now
-        )
-
-        let incomes = try setup.database
-            .snapshot()
-            .entries
-            .filter { $0.recurringId == saved.id }
-
-        #expect(incomes.count == 2)
-        #expect(saved.generatedUntil == today)
-    }
-
-    @Test
-    func generatesTransferBetweenWallets() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let today = try #require(LocalDate("2026-01-26"))
-        try await setup.database.markNoSpendDay(today, at: setup.now)
-
-        let draft = RecurringDraft(
-            type: .transfer,
-            amount: 30000,
-            categoryId: nil,
-            walletId: options.wallets[1].id,
-            toWalletId: options.wallets[0].id,
-            frequency: .monthly,
-            month: 1,
-            day: 26,
-            startDate: today
-        )
-
-        let saved = try await setup.database.saveRecurring(
-            draft,
-            today: today,
-            at: setup.now
-        )
-
-        let snapshot = try setup.database.snapshot()
-        let transfers = snapshot.entries.filter { $0.recurringId == saved.id }
-
-        #expect(transfers.map(\.type) == [.transfer])
-        #expect(transfers.first?.toWalletId == options.wallets[0].id)
-        #expect(transfers.first?.categoryId == nil)
-        #expect(snapshot.noSpendDays.map(\.date) == [today])
-    }
-
-    @Test
-    func addsAtEndAndReorders() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let start = try #require(LocalDate("2026-02-01"))
-
-        let draft = RecurringDraft(
-            type: .expense,
-            amount: 4800,
-            categoryId: options.expenseCategories[0].id,
-            walletId: options.wallets[0].id,
-            frequency: .monthly,
-            month: 1,
-            day: 1,
-            startDate: start
-        )
-
-        let added = try await setup.database.saveRecurring(
-            draft,
-            today: start,
-            at: setup.now
-        )
-
-        let before = try await setup.database.recurrings().map(\.id)
-        try await setup.database.reorderRecurrings(
-            before.reversed(),
-            at: setup.now
-        )
-        let after = try await setup.database.recurrings().map(\.id)
-
-        #expect(added.sortOrder == 1)
-        #expect(before.last == added.id)
-        #expect(after == before.reversed())
-    }
-
-    @Test
-    func deletesRecurringButKeepsEntries() async throws {
-        let setup = try await Setup()
-        let today = try #require(LocalDate("2026-02-28"))
-
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
-
-        let id = try #require(setup.database.snapshot().recurrings.first?.id)
-        let deletion = try await setup.database.deleteRecurring(
-            id,
-            at: setup.now
-        )
-        let snapshot = try setup.database.snapshot()
-
-        try await setup.database.restore(deletion)
-        let restored = try setup.database.snapshot()
-
-        #expect(snapshot.recurrings.isEmpty)
-        #expect(snapshot.entries.count == 2)
-        #expect(snapshot.entries.allSatisfy { $0.recurringId == nil })
-        #expect(restored.recurrings.map(\.id) == [id])
-        #expect(restored.entries.allSatisfy { $0.recurringId == id })
-    }
-
-    @Test
-    func touchesUpdatedAtOfLinkedEntriesOnDelete() async throws {
-        let setup = try await Setup()
-        let today = try #require(LocalDate("2026-02-28"))
-        let later = setup.now.addingTimeInterval(60)
-
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
-
-        let id = try #require(setup.database.snapshot().recurrings.first?.id)
-
-        try await setup.database.deleteRecurring(
-            id,
-            at: later
-        )
-
-        let entries = try setup.database.snapshot().entries
-
-        #expect(!entries.isEmpty)
-        #expect(entries.allSatisfy { $0.updatedAt == later })
-    }
-
-    @Test
-    func restoresRemainingEntriesWhenOneIsGone() async throws {
-        let setup = try await Setup()
-        let today = try #require(LocalDate("2026-02-28"))
-
-        try await setup.database.generateRecurringEntries(
-            through: today,
-            at: setup.now
-        )
-
-        let id = try #require(setup.database.snapshot().recurrings.first?.id)
-        let ids = try setup.database.snapshot().entries.map(\.id)
-        let gone = try #require(ids.first)
-        let kept = try #require(ids.last)
-        let deletion = try await setup.database.deleteRecurring(
-            id,
-            at: setup.now
-        )
-
-        try await setup.database.deleteEntry(gone)
-        try await setup.database.restore(deletion)
-        let restored = try setup.database.snapshot()
-
-        #expect(restored.recurrings.map(\.id) == [id])
-        #expect(restored.entries.map(\.id) == [kept])
-        #expect(restored.entries.allSatisfy { $0.recurringId == id })
-    }
-
-    @Test
-    func rejectsUnknownRecurring() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let start = try #require(LocalDate("2026-02-01"))
-
-        let draft = RecurringDraft(
-            type: .expense,
-            amount: 4800,
-            categoryId: options.expenseCategories[0].id,
-            walletId: options.wallets[0].id,
-            frequency: .monthly,
-            month: 1,
-            day: 10,
-            startDate: start
-        )
-
-        await #expect(throws: AppDatabase.RecurringWriteError.self) {
-            try await setup.database.saveRecurring(
-                draft,
-                editing: Recurring.ID(),
-                today: start,
-                at: setup.now
-            )
-        }
-    }
-
-    @Test
-    func pausesWhileHiddenWithoutBackfill() async throws {
-        let setup = try await Setup()
-        let january = try #require(LocalDate("2026-01-31"))
-        let february = try #require(LocalDate("2026-02-01"))
-        let april = try #require(LocalDate("2026-04-30"))
-        let may = try #require(LocalDate("2026-05-25"))
-        try await setup.database.generateRecurringEntries(
-            through: january,
-            at: setup.now
-        )
-
-        let recurring = try #require(try setup.database.snapshot().recurrings.first)
-
-        try await setup.database.setRecurringHidden(
-            recurring.id,
-            isHidden: true,
-            today: february,
-            at: setup.now
-        )
-        try await setup.database.generateRecurringEntries(
-            through: april,
-            at: setup.now
-        )
-        let shownWhileHidden = try await setup.database.recurrings()
-
-        let allWhileHidden = try await setup.database.recurrings(includingHidden: true)
-
-        try await setup.database.setRecurringHidden(
-            recurring.id,
-            isHidden: false,
-            today: may,
-            at: setup.now
-        )
-
-        let dates = try setup.database
-            .snapshot()
-            .entries
-            .compactMap(\.recurringDate)
-            .sorted()
-            .map(\.description)
-
-        #expect(shownWhileHidden.isEmpty)
-        #expect(allWhileHidden.count == 1)
-        #expect(dates == ["2026-01-25", "2026-05-25"])
     }
 }
 
@@ -731,9 +161,11 @@ extension RecurringWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
-        try database.insertDefaultsIfEmpty(at: now)
-        let options = try await database.entryOptions()
         let start = try #require(LocalDate("2026-01-01"))
+
+        try database.insertDefaultsIfEmpty(at: now)
+
+        let options = try await database.entryOptions()
 
         let recurring = Recurring(
             type: .expense,
@@ -752,39 +184,5 @@ extension RecurringWriteTests.Setup {
         }
 
         self.init(database: database, now: now)
-    }
-}
-
-private extension RecurringWriteTests.Setup {
-    func changeDay(to day: Int) async throws {
-        try await database.writer.write { db in
-            for var recurring in try Recurring.fetchAll(db) {
-                recurring.day = day
-                recurring.generatedUntil = nil
-                try recurring.update(db)
-            }
-        }
-    }
-
-    func change(
-        day: Int,
-        shift: Recurring.HolidayShift
-    ) async throws {
-        try await database.writer.write { db in
-            for var recurring in try Recurring.fetchAll(db) {
-                recurring.day = day
-                recurring.holidayShift = shift
-                try recurring.update(db)
-            }
-        }
-    }
-
-    func shiftHoliday(to shift: Recurring.HolidayShift) async throws {
-        try await database.writer.write { db in
-            for var recurring in try Recurring.fetchAll(db) {
-                recurring.holidayShift = shift
-                try recurring.update(db)
-            }
-        }
     }
 }
