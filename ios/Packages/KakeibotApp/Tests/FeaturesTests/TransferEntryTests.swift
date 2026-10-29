@@ -9,12 +9,7 @@ struct TransferEntryTests {
     @Test
     func startsWithTwoDifferentWallets() async throws {
         let setup = try await Setup()
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
 
@@ -28,12 +23,7 @@ struct TransferEntryTests {
     @Test
     func savesSwappedTransfer() async throws {
         let setup = try await Setup()
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         model.press(.digit(3))
@@ -84,12 +74,7 @@ struct TransferEntryTests {
         )
 
         try await setup.database.saveEntry(income, at: Date())
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         model.press(.digit(5))
@@ -115,12 +100,7 @@ struct TransferEntryTests {
         )
 
         try await setup.database.saveEntry(income, at: Date())
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         model.press(.digit(3))
@@ -148,12 +128,7 @@ struct TransferEntryTests {
         )
 
         try await setup.database.saveEntry(income, at: Date())
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         model.press(.digit(1))
@@ -169,12 +144,7 @@ struct TransferEntryTests {
     @Test
     func hidesDialProgressWithoutBalance() async throws {
         let setup = try await Setup()
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         model.press(.digit(5))
@@ -183,146 +153,19 @@ struct TransferEntryTests {
     }
 
     @Test
-    func savesFeeTypedOnKeypad() async throws {
-        let setup = try await Setup()
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
-
-        await model.load()
-        model.press(.digit(5))
-        model.press(.doubleZero)
-        model.press(.digit(0))
-        model.enter(.fee)
-        model.press(.digit(1))
-        model.press(.digit(1))
-        model.press(.digit(0))
-
-        let saved = await model.save()
-        let fee = try #require(saved?.fee)
-
-        #expect(model.amount == 5000)
-        #expect(fee.amount == 110)
-        #expect(fee.walletId == setup.cash)
-        #expect(fee.transferId == saved?.entry.id)
-    }
-
-    @Test
-    func putsUsedFeesFirst() async throws {
-        let setup = try await Setup()
-
-        let draft = EntryDraft(
-            type: .transfer,
-            amount: 10000,
-            date: setup.date,
-            categoryId: nil,
-            walletId: setup.bank,
-            toWalletId: setup.cash,
-            fee: 165
-        )
-
-        try await setup.database.saveEntry(draft, at: Date())
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
-
-        await model.load()
-
-        #expect(model.feeChoices == [165, 110, 220, 330])
-    }
-
-    @Test
-    func countsFeeInSourceBalance() async throws {
-        let setup = try await Setup()
-        let date = try #require(LocalDate("2026-10-01"))
-
-        let income = EntryDraft(
-            type: .income,
-            amount: 3000,
-            date: date,
-            categoryId: setup.salary,
-            walletId: setup.cash
-        )
-
-        try await setup.database.saveEntry(income, at: Date())
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
-
-        await model.load()
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.press(.digit(0))
-        model.setFee(110)
-
-        #expect(model.isOverSourceBalance)
-    }
-
-    @Test
-    func opensTransferFromFee() async throws {
-        let setup = try await Setup()
-
-        let draft = EntryDraft(
-            type: .transfer,
-            amount: 10000,
-            date: setup.date,
-            categoryId: nil,
-            walletId: setup.bank,
-            toWalletId: setup.cash,
-            fee: 220
-        )
-
-        let transfer = try await setup.database.saveEntry(draft, at: Date())
-        let fee = try #require(try await setup.database.fee(of: transfer.id))
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: fee.id,
-            date: setup.date
-        )
-
-        await model.load()
-        let after = model.wallet(setup.bank).flatMap { model.afterLine(of: $0, isSource: true) }
-        model.setFee(330)
-        let saved = await model.save()
-
-        #expect(model.type == .transfer)
-        #expect(model.amount == 10000)
-        #expect(saved?.entry.id == transfer.id)
-        #expect(saved?.fee?.id == fee.id)
-        #expect(saved?.fee?.amount == 330)
-        #expect(after?.amount == -10220)
-    }
-
-    @Test
     func waitsForAmountBeforeWarningOverNegativeBalance() async throws {
         let setup = try await Setup()
 
-        let card = try await setup.database.saveWallet(
-            WalletDraft(
-                kind: .card,
-                name: "カード",
-                mark: .glyph(.card),
-                color: "#4A6FA5",
-                initialBalance: -5000
-            ),
-            at: Date()
+        let wallet = WalletDraft(
+            kind: .card,
+            name: "カード",
+            mark: .glyph(.card),
+            color: "#4A6FA5",
+            initialBalance: -5000
         )
 
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let card = try await setup.database.saveWallet(wallet, at: Date())
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         model.walletId = card.id
@@ -337,22 +180,16 @@ struct TransferEntryTests {
     func paysOffLoanAtOnce() async throws {
         let setup = try await Setup()
 
-        let loan = try await setup.database.saveWallet(
-            WalletDraft(
-                kind: .loan,
-                name: "奨学金",
-                mark: .glyph(.contract),
-                color: "#4A6FA5",
-                initialBalance: -100_000
-            ),
-            at: Date()
+        let wallet = WalletDraft(
+            kind: .loan,
+            name: "奨学金",
+            mark: .glyph(.contract),
+            color: "#4A6FA5",
+            initialBalance: -100_000
         )
 
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let loan = try await setup.database.saveWallet(wallet, at: Date())
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         model.walletId = setup.bank
@@ -377,12 +214,7 @@ struct TransferEntryTests {
     @Test
     func reportsSameWallet() async throws {
         let setup = try await Setup()
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         model.press(.digit(5))
@@ -398,12 +230,7 @@ struct TransferEntryTests {
         try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 2)
         try await setup.saveTransfer(5000, from: setup.bank, to: setup.cash, at: 3)
         try await setup.saveTransfer(1000, from: setup.bank, to: setup.cash, at: 4)
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         let amounts = model.recentTransfers.map(\.amount)
@@ -422,12 +249,7 @@ struct TransferEntryTests {
         try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 1)
         try await setup.saveTransfer(5000, from: setup.bank, to: setup.cash, at: 2)
         try await setup.saveTransfer(1000, from: setup.bank, to: setup.cash, at: 3)
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         let routes = model.frequentRoutes
@@ -444,12 +266,7 @@ struct TransferEntryTests {
     @Test
     func choosesAnotherSourceWhenHidden() async throws {
         let setup = try await Setup()
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         try await setup.database.setWalletHidden(setup.cash, isHidden: true, at: Date())
@@ -463,12 +280,7 @@ struct TransferEntryTests {
     @Test
     func choosesAnotherDestinationWhenHidden() async throws {
         let setup = try await Setup()
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            type: .transfer
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
         try await setup.database.setWalletHidden(setup.bank, isHidden: true, at: Date())
@@ -477,191 +289,6 @@ struct TransferEntryTests {
         #expect(model.walletId == setup.cash)
         #expect(model.toWalletId != setup.bank)
         #expect(model.toWalletId != setup.cash)
-    }
-
-    @Test
-    func keepsHiddenWalletsWhenEditing() async throws {
-        let setup = try await Setup()
-        let billMonth = try #require(YearMonth(year: 2026, month: 11))
-
-        let draft = try await EntryDraft(
-            type: .expense,
-            amount: 800,
-            date: setup.date,
-            categoryId: setup.database.entryOptions().expenseCategories[0].id,
-            walletId: setup.cash,
-            billMonth: billMonth
-        )
-
-        let entry = try await setup.database.saveEntry(draft, at: Date())
-        try await setup.database.setWalletHidden(setup.cash, isHidden: true, at: Date())
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: setup.date
-        )
-
-        await model.load()
-        await model.reloadWallets()
-
-        #expect(model.walletId == setup.cash)
-        #expect(model.billMonth == entry.billMonth)
-        #expect(model.wallet(setup.cash) != nil)
-        #expect(model.wallet(setup.bank) != nil)
-    }
-
-    @Test
-    func keepsHiddenTransferWalletsWhenEditing() async throws {
-        let setup = try await Setup()
-        try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 1)
-        let transfer = try #require(setup.database.snapshot().entries.first)
-        try await setup.database.setWalletHidden(setup.bank, isHidden: true, at: Date())
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: transfer.id,
-            date: setup.date
-        )
-
-        await model.load()
-        await model.reloadWallets()
-
-        #expect(model.walletId == setup.cash)
-        #expect(model.toWalletId == setup.bank)
-        #expect(model.wallet(setup.bank) != nil)
-    }
-
-    @Test
-    func keepsHiddenCategoryWhenEditing() async throws {
-        let setup = try await Setup()
-
-        let draft = EntryDraft(
-            type: .income,
-            amount: 3000,
-            date: setup.date,
-            categoryId: setup.salary,
-            walletId: setup.cash
-        )
-
-        let entry = try await setup.database.saveEntry(draft, at: Date())
-
-        try await setup.database.setCategoryHidden(
-            setup.salary,
-            isHidden: true,
-            at: Date()
-        )
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: setup.date
-        )
-
-        await model.load()
-        await model.reloadCategories()
-
-        #expect(model.categoryId == setup.salary)
-        #expect(model.selectedCategory?.id == setup.salary)
-    }
-
-    @Test
-    func reselectsDeletedWalletWhenEditing() async throws {
-        let setup = try await Setup()
-
-        let draft = try await EntryDraft(
-            type: .expense,
-            amount: 800,
-            date: setup.date,
-            categoryId: setup.database.entryOptions().expenseCategories[0].id,
-            walletId: setup.cash
-        )
-
-        let entry = try await setup.database.saveEntry(draft, at: Date())
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: setup.date
-        )
-
-        await model.load()
-        model.walletId = setup.bank
-        _ = try await setup.database.deleteWallet(
-            setup.bank,
-            at: Date()
-        )
-        await model.reloadWallets()
-
-        #expect(model.walletId != setup.bank)
-        #expect(model.walletId != nil)
-    }
-
-    @Test
-    func reselectsDeletedCategoryWhenEditing() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let other = options.incomeCategories[1].id
-
-        let draft = EntryDraft(
-            type: .income,
-            amount: 3000,
-            date: setup.date,
-            categoryId: setup.salary,
-            walletId: setup.cash
-        )
-
-        let entry = try await setup.database.saveEntry(draft, at: Date())
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: setup.date
-        )
-
-        await model.load()
-        model.categoryId = other
-        _ = try await setup.database.deleteCategory(
-            other,
-            at: Date()
-        )
-        await model.reloadCategories()
-
-        #expect(model.categoryId != other)
-        #expect(model.categoryId != nil)
-    }
-
-    @Test
-    func restoresHiddenCategoryAfterSwitchingType() async throws {
-        let setup = try await Setup()
-
-        let draft = EntryDraft(
-            type: .income,
-            amount: 3000,
-            date: setup.date,
-            categoryId: setup.salary,
-            walletId: setup.cash
-        )
-
-        let entry = try await setup.database.saveEntry(draft, at: Date())
-
-        try await setup.database.setCategoryHidden(
-            setup.salary,
-            isHidden: true,
-            at: Date()
-        )
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: setup.date
-        )
-
-        await model.load()
-        model.select(.expense)
-        model.select(.income)
-
-        #expect(model.categoryId == setup.salary)
     }
 }
 
@@ -678,9 +305,11 @@ extension TransferEntryTests {
 extension TransferEntryTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
-        try database.insertDefaultsIfEmpty(at: Date())
-        let options = try await database.entryOptions()
         let date = try #require(LocalDate("2026-10-12"))
+
+        try database.insertDefaultsIfEmpty(at: Date())
+
+        let options = try await database.entryOptions()
 
         self.init(
             database: database,
@@ -697,6 +326,8 @@ extension TransferEntryTests.Setup {
         to toWalletId: Wallet.ID,
         at seconds: TimeInterval
     ) async throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000 + seconds)
+
         let draft = EntryDraft(
             type: .transfer,
             amount: amount,
@@ -706,7 +337,6 @@ extension TransferEntryTests.Setup {
             toWalletId: toWalletId
         )
 
-        let now = Date(timeIntervalSince1970: 1_791_000_000 + seconds)
         _ = try await database.saveEntry(draft, at: now)
     }
 }

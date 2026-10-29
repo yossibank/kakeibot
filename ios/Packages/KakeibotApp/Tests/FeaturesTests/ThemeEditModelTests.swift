@@ -29,11 +29,13 @@ struct ThemeEditModelTests {
     @Test
     func restoresDeletedChosenTheme() async throws {
         let setup = try await HomeModelTests.Setup()
+
         let creating = ThemeEditModel(
             database: setup.database,
             editing: nil,
             base: ThemePreset.forest.palette
         )
+
         creating.draft.name = "森の夜"
         _ = await creating.save()
         let theme = try #require(try await setup.database.customThemes().first)
@@ -43,13 +45,13 @@ struct ThemeEditModelTests {
             editing: theme,
             base: ThemePreset.forest.palette
         )
+
         let deletion = try #require(await editing.delete())
         let afterDelete = try await setup.database.setting(.theme)
 
-        let list = ThemeListModel(
-            database: setup.database,
-            appIcon: AppIconListModel(switcher: AppIconListModelTests.Switcher(name: nil).client)
-        )
+        let switcher = AppIconListModelTests.Switcher(name: nil)
+        let appIcon = AppIconListModel(switcher: switcher.client)
+        let list = ThemeListModel(database: setup.database, appIcon: appIcon)
         await list.restore(deletion)
 
         #expect(afterDelete == .preset(.white))
@@ -60,12 +62,7 @@ struct ThemeEditModelTests {
     @Test
     func keepsTextReadableWhenBackgroundChanges() async throws {
         let setup = try await HomeModelTests.Setup()
-
-        let model = ThemeEditModel(
-            database: setup.database,
-            editing: nil,
-            base: .night
-        )
+        let model = ThemeEditModel(database: setup.database, editing: nil, base: .night)
 
         model.choose("#FFFFFF", for: .background)
 
@@ -76,12 +73,7 @@ struct ThemeEditModelTests {
     @Test
     func disablesUnreadableSwatches() async throws {
         let setup = try await HomeModelTests.Setup()
-
-        let model = ThemeEditModel(
-            database: setup.database,
-            editing: nil,
-            base: .night
-        )
+        let model = ThemeEditModel(database: setup.database, editing: nil, base: .night)
 
         let dark = model.isAvailable("#1E1E22", for: .text)
         let light = model.isAvailable("#EDE6D6", for: .text)
@@ -93,12 +85,7 @@ struct ThemeEditModelTests {
     @Test
     func blocksUnreadableColors() async throws {
         let setup = try await HomeModelTests.Setup()
-
-        let model = ThemeEditModel(
-            database: setup.database,
-            editing: nil,
-            base: .night
-        )
+        let model = ThemeEditModel(database: setup.database, editing: nil, base: .night)
 
         model.draft.name = "読めない"
         model.draft.text = model.draft.background

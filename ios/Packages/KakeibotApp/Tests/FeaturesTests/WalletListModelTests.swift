@@ -30,12 +30,7 @@ struct WalletListModelTests {
         try database.insertDefaultsIfEmpty(at: Date())
         let options = try await database.entryOptions()
         let bank = try #require(options.wallets.last)
-
-        try await database.setWalletHidden(
-            bank.id,
-            isHidden: true,
-            at: Date()
-        )
+        try await database.setWalletHidden(bank.id, isHidden: true, at: Date())
 
         let model = WalletListModel(database: database)
         await model.load()
@@ -53,6 +48,7 @@ struct WalletListModelTests {
         let options = try await database.entryOptions()
         let cash = try #require(options.wallets.first)
         let today = LocalDate(Date(), in: .current)
+        let futureDate = today.adding(days: 3)
 
         let income = EntryDraft(
             type: .income,
@@ -65,7 +61,7 @@ struct WalletListModelTests {
         let future = EntryDraft(
             type: .expense,
             amount: 400,
-            date: today.adding(days: 3),
+            date: futureDate,
             categoryId: options.expenseCategories[0].id,
             walletId: cash.id
         )
@@ -86,11 +82,12 @@ struct WalletListModelTests {
         let cash = try #require(options.wallets.first)
         let bank = try #require(options.wallets.last)
         let today = LocalDate(Date(), in: .current)
+        let futureDate = today.adding(days: 3)
 
         let future = EntryDraft(
             type: .expense,
             amount: 400,
-            date: today.adding(days: 3),
+            date: futureDate,
             categoryId: options.expenseCategories[0].id,
             walletId: cash.id
         )

@@ -9,23 +9,9 @@ struct AssetsModelTests {
     @Test
     func sumsBalancesByWalletAndMonth() async throws {
         let setup = try await Setup()
-
-        try await setup.save(
-            .income,
-            250_000,
-            on: "2026-09-25",
-            from: setup.bank
-        )
-
+        try await setup.save(.income, 250_000, on: "2026-09-25", from: setup.bank)
         try await setup.save(.expense, 980, on: "2026-10-01", from: setup.cash)
-
-        try await setup.save(
-            .transfer,
-            10000,
-            on: "2026-10-02",
-            from: setup.bank,
-            to: setup.cash
-        )
+        try await setup.save(.transfer, 10000, on: "2026-10-02", from: setup.bank, to: setup.cash)
 
         let model = AssetsModel(database: setup.database, today: setup.today)
         await model.load()
@@ -56,19 +42,29 @@ struct AssetsModelTests {
     func listsUpcomingCardBills() async throws {
         let setup = try await Setup()
 
-        let card = try await setup.database.saveWallet(
-            WalletDraft(
-                kind: .card,
-                name: "カード",
-                mark: .glyph(.card),
-                color: "#4A6FA5",
-                initialBalance: 0
-            ),
-            at: Date()
+        let wallet = WalletDraft(
+            kind: .card,
+            name: "カード",
+            mark: .glyph(.card),
+            color: "#4A6FA5",
+            initialBalance: 0
         )
 
-        try await setup.save(.expense, 30000, on: "2026-09-20", from: card.id)
-        try await setup.save(.expense, 12000, on: "2026-10-10", from: card.id)
+        let card = try await setup.database.saveWallet(wallet, at: Date())
+
+        try await setup.save(
+            .expense,
+            30000,
+            on: "2026-09-20",
+            from: card.id
+        )
+
+        try await setup.save(
+            .expense,
+            12000,
+            on: "2026-10-10",
+            from: card.id
+        )
 
         try await setup.save(
             .expense,
@@ -99,11 +95,7 @@ struct AssetsModelTests {
             startDate: #require(LocalDate("2026-10-01"))
         )
 
-        try await setup.database.saveRecurring(
-            draft,
-            today: setup.today,
-            at: Date()
-        )
+        try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
         let model = AssetsModel(database: setup.database, today: setup.today)
         await model.load()
@@ -130,24 +122,16 @@ struct AssetsModelTests {
     func estimatesLoanPayoff() async throws {
         let setup = try await Setup()
 
-        let loan = try await setup.database.saveWallet(
-            WalletDraft(
-                kind: .loan,
-                name: "奨学金",
-                mark: .glyph(.contract),
-                color: "#4A6FA5",
-                initialBalance: -100_000
-            ),
-            at: Date()
+        let wallet = WalletDraft(
+            kind: .loan,
+            name: "奨学金",
+            mark: .glyph(.contract),
+            color: "#4A6FA5",
+            initialBalance: -100_000
         )
 
-        try await setup.save(
-            .transfer,
-            30000,
-            on: "2026-10-20",
-            from: setup.bank,
-            to: loan.id
-        )
+        let loan = try await setup.database.saveWallet(wallet, at: Date())
+        try await setup.save(.transfer, 30000, on: "2026-10-20", from: setup.bank, to: loan.id)
 
         let draft = try RecurringDraft(
             type: .transfer,
@@ -161,11 +145,7 @@ struct AssetsModelTests {
             startDate: #require(LocalDate("2026-10-16"))
         )
 
-        try await setup.database.saveRecurring(
-            draft,
-            today: setup.today,
-            at: Date()
-        )
+        try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
         let model = AssetsModel(database: setup.database, today: setup.today)
         await model.load()
@@ -192,9 +172,11 @@ extension AssetsModelTests {
 extension AssetsModelTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
-        try database.insertDefaultsIfEmpty(at: Date())
-        let options = try await database.entryOptions()
         let today = try #require(LocalDate("2026-10-15"))
+
+        try database.insertDefaultsIfEmpty(at: Date())
+
+        let options = try await database.entryOptions()
 
         self.init(
             database: database,

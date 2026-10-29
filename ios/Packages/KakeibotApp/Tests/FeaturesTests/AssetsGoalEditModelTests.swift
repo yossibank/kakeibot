@@ -8,7 +8,8 @@ import Testing
 struct AssetsGoalEditModelTests {
     @Test
     func newGoalIsChangedAfterInput() throws {
-        let model = try AssetsGoalEditModel(database: AppDatabase.inMemory())
+        let database = try AppDatabase.inMemory()
+        let model = AssetsGoalEditModel(database: database)
 
         let changedBeforeInput = model.isChanged
 
@@ -20,16 +21,16 @@ struct AssetsGoalEditModelTests {
 
     @Test
     func editingGoalIsChangedOnlyWhenDraftDiffers() throws {
+        let database = try AppDatabase.inMemory()
+
         let goal = RewardGoal(
             name: "新しい靴",
             targetAmount: 12000,
             createdAt: Date(),
             updatedAt: Date()
         )
-        let model = try AssetsGoalEditModel(
-            database: AppDatabase.inMemory(),
-            editing: goal
-        )
+
+        let model = AssetsGoalEditModel(database: database, editing: goal)
 
         let changedBeforeEdit = model.isChanged
 

@@ -6,9 +6,7 @@ struct AppIconListModelTests {
     @Test
     func startsFromCurrentIcon() {
         let switcher = Switcher(name: "AppIcon-Forest")
-
         let model = AppIconListModel(switcher: switcher.client)
-
         #expect(model.current == .forest)
     }
 
@@ -46,18 +44,6 @@ extension AppIconListModelTests {
 
         let fails: Bool
 
-        var client: AppIconSwitcher {
-            AppIconSwitcher {
-                self.name
-            } setName: { name in
-                if self.fails {
-                    throw SwitchError.failed
-                }
-
-                self.name = name
-            }
-        }
-
         init(
             name: String?,
             fails: Bool = false
@@ -69,5 +55,19 @@ extension AppIconListModelTests {
 
     enum SwitchError: Error {
         case failed
+    }
+}
+
+extension AppIconListModelTests.Switcher {
+    var client: AppIconSwitcher {
+        AppIconSwitcher {
+            self.name
+        } setName: { name in
+            if self.fails {
+                throw AppIconListModelTests.SwitchError.failed
+            }
+
+            self.name = name
+        }
     }
 }

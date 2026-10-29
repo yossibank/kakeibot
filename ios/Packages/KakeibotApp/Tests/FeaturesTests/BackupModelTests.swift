@@ -70,7 +70,6 @@ struct BackupModelTests {
 
         target.read(file.data)
         await target.restore()
-
         let requested = await client.requested
         let rescheduled = await client.rescheduled
 
@@ -112,7 +111,6 @@ struct BackupModelTests {
 
         target.read(file.data)
         await target.restore()
-
         let requested = await client.requested
 
         #expect(requested)
@@ -135,7 +133,6 @@ struct BackupModelTests {
 
         target.read(file.data)
         await target.restore()
-
         let requested = await client.requested
 
         #expect(!requested)
@@ -181,7 +178,8 @@ struct BackupModelTests {
         let setup = try Setup()
         let blocker = URL.temporaryDirectory.appending(path: UUID().uuidString)
         try Data().write(to: blocker)
-        let stash = BackupStash(urls: [blocker.appending(path: "previous.json")])
+        let url = blocker.appending(path: "previous.json")
+        let stash = BackupStash(urls: [url])
         let source = BackupModel(database: setup.source, stash: setup.stash)
         let target = BackupModel(database: setup.target, stash: stash)
         await source.makeFile(.json, at: setup.now)
@@ -223,7 +221,8 @@ struct BackupModelTests {
 
         try await restore(target, from: setup.source, now: setup.now)
         let second = try setup.target.snapshot()
-        try await restore(target, from: AppDatabase.inMemory(defaultsAt: setup.now), now: setup.now)
+        let source = try AppDatabase.inMemory(defaultsAt: setup.now)
+        try await restore(target, from: source, now: setup.now)
         let isRead = await target.readPrevious(target.previous[1])
         await target.restore()
 
@@ -298,6 +297,7 @@ struct BackupModelTests {
 
         for failing in 1...2 {
             let counter = Counter()
+
             let stash = BackupStash(urls: setup.stash.urls) { data, url in
                 if counter.next() == failing {
                     throw CocoaError(.fileWriteUnknown)
@@ -333,23 +333,7 @@ struct BackupModelTests {
     }
 }
 
-extension BackupModelTests {
-    final class Counter: @unchecked Sendable {
-        private var count = 0
-
-        func next() -> Int {
-            count += 1
-            return count
-        }
-    }
-
-    struct Setup {
-        let source: AppDatabase
-        let target: AppDatabase
-        let now: Date
-        let stash: BackupStash
-    }
-
+private extension BackupModelTests {
     func restore(
         _ model: BackupModel,
         from source: AppDatabase,
@@ -360,43 +344,6 @@ extension BackupModelTests {
 
         model.read(data)
         await model.restore()
-    }
-}
-
-extension BackupModelTests.Setup {
-    init() throws {
-        let source = try AppDatabase.inMemory()
-        let target = try AppDatabase.inMemory()
-        let now = try #require(Self.date("2026-10-03T12:00:00"))
-        try source.insertDefaultsIfEmpty(at: now)
-
-        let url = URL.temporaryDirectory
-            .appending(path: UUID().uuidString)
-            .appending(path: "previous.json")
-
-        try FileManager.default.createDirectory(
-            at: url.deletingLastPathComponent(),
-            withIntermediateDirectories: true
-        )
-
-        self.init(
-            source: source,
-            target: target,
-            now: now,
-            stash: BackupStash(
-                urls: [
-                    url,
-                    url.deletingLastPathComponent().appending(path: "previous-2.json")
-                ]
-            )
-        )
-    }
-
-    static func date(_ text: String) -> Date? {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        return formatter.date(from: text)
     }
 }
 

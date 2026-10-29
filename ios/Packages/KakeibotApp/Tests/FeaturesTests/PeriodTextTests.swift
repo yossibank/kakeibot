@@ -11,9 +11,7 @@ struct PeriodTextTests {
     func showsYearOnlyOutsideThisYear(text: String, expected: String) throws {
         let today = try #require(LocalDate("2026-10-17"))
         let date = try #require(LocalDate(text))
-
         let day = PeriodText.day(date, today: today)
-
         #expect(day == expected)
     }
 
@@ -30,9 +28,7 @@ struct PeriodTextTests {
         let today = try #require(LocalDate("2026-10-17"))
         let lowerBound = try #require(LocalDate(lower))
         let upperBound = try #require(LocalDate(upper))
-
         let range = PeriodText.range(lowerBound...upperBound, today: today)
-
         #expect(range == expected)
     }
 }

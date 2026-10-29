@@ -10,11 +10,7 @@ struct RecurringModelTests {
     func savesRecurringAndGeneratesEntries() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
-
-        let model = RecurringEditModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
 
         await model.load()
         model.press(.digit(7))
@@ -38,11 +34,7 @@ struct RecurringModelTests {
         let setup = try await RecordsModelTests.Setup()
         let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
 
-        let without = RecurringEditModel(
-            database: setup.database,
-            today: setup.today
-        )
-
+        let without = RecurringEditModel(database: setup.database, today: setup.today)
         await without.load()
         without.press(.digit(5))
         without.memo = "家賃"
@@ -50,11 +42,7 @@ struct RecurringModelTests {
         _ = await without.save(permission: client.permission)
         let askedWithout = await client.requested
 
-        let model = RecurringEditModel(
-            database: setup.database,
-            today: setup.today
-        )
-
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
         await model.load()
         model.press(.digit(5))
         model.memo = "保険"
@@ -73,11 +61,7 @@ struct RecurringModelTests {
     @Test
     func suggestsHolidayShiftFromCategory() async throws {
         let setup = try await RecordsModelTests.Setup()
-
-        let model = RecurringEditModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
 
         await model.load()
         model.select(.income)
@@ -99,16 +83,15 @@ struct RecurringModelTests {
     func presetsCardBillFromCard() async throws {
         let setup = try await RecordsModelTests.Setup()
 
-        let card = try await setup.database.saveWallet(
-            WalletDraft(
-                kind: .card,
-                name: "カード",
-                mark: .glyph(.card),
-                color: "#4A6FA5",
-                initialBalance: 0
-            ),
-            at: Date()
+        let wallet = WalletDraft(
+            kind: .card,
+            name: "カード",
+            mark: .glyph(.card),
+            color: "#4A6FA5",
+            initialBalance: 0
         )
+
+        let card = try await setup.database.saveWallet(wallet, at: Date())
 
         let model = RecurringEditModel(
             database: setup.database,
@@ -132,16 +115,15 @@ struct RecurringModelTests {
     func presetsLoanRepaymentFromLoan() async throws {
         let setup = try await RecordsModelTests.Setup()
 
-        let loan = try await setup.database.saveWallet(
-            WalletDraft(
-                kind: .loan,
-                name: "奨学金",
-                mark: .glyph(.contract),
-                color: "#4A6FA5",
-                initialBalance: -1_200_000
-            ),
-            at: Date()
+        let wallet = WalletDraft(
+            kind: .loan,
+            name: "奨学金",
+            mark: .glyph(.contract),
+            color: "#4A6FA5",
+            initialBalance: -1_200_000
         )
+
+        let loan = try await setup.database.saveWallet(wallet, at: Date())
 
         let model = RecurringEditModel(
             database: setup.database,
@@ -163,11 +145,7 @@ struct RecurringModelTests {
     func savesTransferBetweenWallets() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
-
-        let model = RecurringEditModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
 
         await model.load()
         model.select(.transfer)
@@ -191,11 +169,7 @@ struct RecurringModelTests {
     @Test
     func refusesSameWalletTransfer() async throws {
         let setup = try await RecordsModelTests.Setup()
-
-        let model = RecurringEditModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
 
         await model.load()
         model.select(.transfer)
@@ -210,11 +184,7 @@ struct RecurringModelTests {
     @Test
     func refusesEmptyAmount() async throws {
         let setup = try await RecordsModelTests.Setup()
-
-        let model = RecurringEditModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
 
         await model.load()
         let saved = await model.save()
@@ -241,16 +211,8 @@ struct RecurringModelTests {
             startDate: start
         )
 
-        try await setup.database.saveRecurring(
-            draft,
-            today: setup.today,
-            at: Date()
-        )
-
-        let model = RecurringListModel(
-            database: setup.database,
-            today: setup.today
-        )
+        try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
+        let model = RecurringListModel(database: setup.database, today: setup.today)
 
         let task = Task {
             await model.observe()
@@ -289,16 +251,8 @@ struct RecurringModelTests {
             startDate: start
         )
 
-        let saved = try await setup.database.saveRecurring(
-            draft,
-            today: setup.today,
-            at: Date()
-        )
-
-        let model = RecurringListModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let saved = try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
+        let model = RecurringListModel(database: setup.database, today: setup.today)
 
         let task = Task {
             await model.observe()

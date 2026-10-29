@@ -75,11 +75,7 @@ struct EntryModelTests {
         let entry = try await setup.saveEntry(amount: 980)
 
         let new = EntryModel(database: setup.database, date: setup.date)
-        let edit = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: setup.date
-        )
+        let edit = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
 
         #expect(new.opensKeypad)
         #expect(!edit.opensKeypad)
@@ -89,13 +85,7 @@ struct EntryModelTests {
     func editsExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: setup.date
-        )
-
+        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
         await model.load()
 
         model.press(.delete)
@@ -271,47 +261,15 @@ struct EntryModelTests {
         #expect(earlier == "10/10・財布から")
     }
 
-    @Test(arguments: [
-        ("2026-10-12", "日付"),
-        ("2026-10-11", "日付"),
-        ("2026-10-10", "日付・2日前"),
-        ("2026-10-14", "日付・2日後")
-    ])
-    func titlesDate(text: String, expected: String) throws {
-        let today = try #require(LocalDate("2026-10-12"))
-        let date = try #require(LocalDate(text))
-
-        let title = EntryModel.dateTitle(for: date, today: today)
-
-        #expect(title == expected)
-    }
-
-    @Test(arguments: [
-        ("2026-10-12", "今日 10/12（月）"),
-        ("2026-10-11", "昨日 10/11（日）"),
-        ("2026-10-05", "10/5（月）"),
-        ("2025-12-31", "2025/12/31（水）")
-    ])
-    func describesDate(text: String, expected: String) throws {
-        let today = try #require(LocalDate("2026-10-12"))
-        let date = try #require(LocalDate(text))
-
-        let description = EntryModel.dateText(for: date, today: today)
-
-        #expect(description == expected)
-    }
-
     @Test
     func showsMonthTotalOfCategoryWithoutBudget() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
         let wallet = try #require(options.wallets.first?.id)
         let categories = options.expenseCategories
-
         try await setup.saveEntry(category: categories[0].id, wallet: wallet, at: 1)
         try await setup.saveEntry(category: categories[0].id, wallet: wallet, at: 2)
         try await setup.saveEntry(category: categories[1].id, wallet: wallet, at: 3)
-
         let model = EntryModel(database: setup.database, date: setup.date)
         await model.load()
 
@@ -342,16 +300,9 @@ struct EntryModelTests {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
         let wallet = try #require(options.wallets.first?.id)
-
         try await setup.saveEntry(category: options.expenseCategories[0].id, wallet: wallet, at: 1)
-
         let entry = try #require(try setup.database.snapshot().entries.first)
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: entry.date
-        )
+        let model = EntryModel(database: setup.database, editing: entry.id, date: entry.date)
 
         await model.load()
         model.press(.delete)
@@ -368,16 +319,9 @@ struct EntryModelTests {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
         let wallet = try #require(options.wallets.first?.id)
-
         try await setup.saveEntry(category: options.expenseCategories[0].id, wallet: wallet, at: 1)
-
         let entry = try #require(try setup.database.snapshot().entries.first)
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: entry.date
-        )
+        let model = EntryModel(database: setup.database, editing: entry.id, date: entry.date)
 
         await model.load()
         model.date = entry.date.adding(days: -62)
@@ -389,13 +333,7 @@ struct EntryModelTests {
     func deletesExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
-
-        let model = EntryModel(
-            database: setup.database,
-            editing: entry.id,
-            date: setup.date
-        )
-
+        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
         await model.load()
 
         let deleted = await model.delete()
@@ -403,100 +341,6 @@ struct EntryModelTests {
 
         #expect(deleted?.entry == entry)
         #expect(stored == nil)
-    }
-
-    @Test
-    func movesCardUsageToLaterBill() async throws {
-        let setup = try await Setup()
-        let card = try await setup.cardWithBill()
-        let model = EntryModel(database: setup.database, date: setup.date)
-        await model.load()
-        model.press(.digit(5))
-        model.walletId = card.id
-
-        let dates = model.billChoices.map(\.date.description)
-        let later = try #require(model.billChoices.last?.date)
-        model.selectBill(later)
-        let name = model.walletName
-        let bill = model.billText
-        let change = await model.save()
-
-        #expect(dates == ["2026-11-27", "2026-12-27", "2027-01-27"])
-        #expect(name == "カード")
-        #expect(bill == "1/27払い")
-        #expect(change?.entry.billMonth == later.yearMonth)
-
-        model.date = try #require(LocalDate("2026-10-13"))
-
-        #expect(model.billMonth == nil)
-    }
-
-    @Test
-    func leavesOutFutureEntriesFromBalance() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let cash = try #require(options.wallets.first)
-        let today = LocalDate(Date(), in: .current)
-
-        let income = EntryDraft(
-            type: .income,
-            amount: 1000,
-            date: today,
-            categoryId: options.incomeCategories[0].id,
-            walletId: cash.id
-        )
-
-        let future = EntryDraft(
-            type: .expense,
-            amount: 400,
-            date: today.adding(days: 3),
-            categoryId: options.expenseCategories[0].id,
-            walletId: cash.id
-        )
-
-        try await setup.database.saveEntry(income, at: Date())
-        try await setup.database.saveEntry(future, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date)
-
-        await model.load()
-
-        #expect(model.balance(of: cash) == 1000)
-    }
-
-    @Test
-    func startsWithFirstWallet() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let categories = options.expenseCategories
-        let wallets = options.wallets
-        try await setup.saveEntry(category: categories[0].id, wallet: wallets[1].id, at: 1)
-        let model = EntryModel(database: setup.database, date: setup.date)
-
-        await model.load()
-        let first = model.walletId
-        model.categoryId = categories[1].id
-        let second = model.walletId
-
-        #expect(first == wallets[0].id)
-        #expect(second == wallets[0].id)
-        #expect(model.isUsualWallet)
-    }
-
-    @Test
-    func keepsChosenWallet() async throws {
-        let setup = try await Setup()
-        let options = try await setup.database.entryOptions()
-        let categories = options.expenseCategories
-        let wallets = options.wallets
-        try await setup.saveEntry(category: categories[1].id, wallet: wallets[0].id, at: 1)
-        let model = EntryModel(database: setup.database, date: setup.date)
-        await model.load()
-
-        model.categoryId = categories[1].id
-        model.walletId = wallets[1].id
-        model.categoryId = categories[2].id
-
-        #expect(model.walletId == wallets[1].id)
     }
 
     @Test
@@ -518,97 +362,13 @@ struct EntryModelTests {
     }
 }
 
-extension EntryModelTests {
-    struct Setup {
-        let database: AppDatabase
-        let date: LocalDate
-    }
-}
-
-extension EntryModelTests.Setup {
-    init() async throws {
-        let database = try AppDatabase.inMemory()
-        try database.insertDefaultsIfEmpty(at: Date())
-        let date = try #require(LocalDate("2026-10-12"))
-        self.init(database: database, date: date)
-    }
-
-    func saveEntry(amount: Int) async throws -> Entry {
-        let options = try await database.entryOptions()
-        let categoryId = options.expenseCategories.first?.id
-        let walletId = try #require(options.wallets.first?.id)
-
-        let draft = EntryDraft(
-            type: .expense,
-            amount: amount,
-            date: date,
-            categoryId: categoryId,
-            walletId: walletId
-        )
-
-        let now = Date(timeIntervalSince1970: 1_791_000_000)
-        return try await database.saveEntry(draft, at: now)
-    }
-
-    func saveEntry(
-        category categoryId: EntryCategory.ID,
-        wallet walletId: Wallet.ID,
-        at seconds: TimeInterval
-    ) async throws {
-        let draft = EntryDraft(
-            type: .expense,
-            amount: 500,
-            date: LocalDate(Date(), in: .current),
-            categoryId: categoryId,
-            walletId: walletId
-        )
-
-        let createdAt = Date(timeIntervalSince1970: seconds)
-
-        try await database.saveEntry(draft, at: createdAt)
-    }
-
-    func cardWithBill() async throws -> Wallet {
-        let options = try await database.entryOptions()
-        let bank = options.wallets.first { $0.kind == .bank }
-
-        let card = try await database.saveWallet(
-            WalletDraft(
-                kind: .card,
-                name: "カード",
-                mark: .glyph(.card),
-                color: "#4A6FA5",
-                initialBalance: 0
-            ),
-            at: Date()
-        )
-
-        _ = try await database.saveRecurring(
-            RecurringDraft(
-                type: .transfer,
-                amount: 0,
-                categoryId: nil,
-                walletId: bank?.id,
-                toWalletId: card.id,
-                frequency: .monthly,
-                month: 1,
-                day: 27,
-                closingDay: 31,
-                startDate: date
-            ),
-            today: date,
-            at: Date()
-        )
-
-        return card
-    }
-}
-
 private extension EntryModelTests {
     static func newModel() async throws -> EntryModel {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date)
+
         await model.load()
+
         return model
     }
 }

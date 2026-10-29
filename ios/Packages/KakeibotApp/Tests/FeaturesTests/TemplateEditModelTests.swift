@@ -67,12 +67,7 @@ struct TemplateEditModelTests {
         await creator.load()
         creator.name = "定期"
         let saved = try #require(await creator.save())
-
-        let model = TemplateEditModel(
-            database: database,
-            type: .expense,
-            editing: saved.id
-        )
+        let model = TemplateEditModel(database: database, type: .expense, editing: saved.id)
 
         await model.load()
         let loaded = model.isChanged

@@ -35,11 +35,7 @@ struct CategoryEditModelTests {
         model.name = "配当"
         model.icon.glyph = .invest
 
-        let canSaveBeforeName = CategoryEditModel(
-            database: database,
-            kind: .income
-        ).canSave
-
+        let canSaveBeforeName = CategoryEditModel(database: database, kind: .income).canSave
         let saved = await model.save()
         let list = try await database.categoryList()
         let category = list.categories.first { $0.name == "配当" }
@@ -55,12 +51,7 @@ struct CategoryEditModelTests {
         let database = try Self.database()
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
-
-        let model = CategoryEditModel(
-            database: database,
-            kind: .expense,
-            editing: food.id
-        )
+        let model = CategoryEditModel(database: database, kind: .expense, editing: food.id)
 
         await model.load()
 
@@ -96,12 +87,7 @@ struct CategoryEditModelTests {
         let database = try Self.database()
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
-
-        let model = CategoryEditModel(
-            database: database,
-            kind: .expense,
-            editing: food.id
-        )
+        let model = CategoryEditModel(database: database, kind: .expense, editing: food.id)
 
         await model.load()
 
@@ -156,12 +142,7 @@ struct CategoryEditModelTests {
         let database = try Self.database()
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
-
-        let model = CategoryEditModel(
-            database: database,
-            kind: .expense,
-            editing: food.id
-        )
+        let model = CategoryEditModel(database: database, kind: .expense, editing: food.id)
 
         await model.load()
         model.name = "外食"

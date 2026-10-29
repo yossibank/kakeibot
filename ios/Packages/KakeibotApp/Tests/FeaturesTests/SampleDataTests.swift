@@ -19,7 +19,6 @@ struct SampleDataTests {
         let dates = snapshot.entries.map(\.date)
         let noSpendDays = Set(snapshot.noSpendDays.map(\.date))
         let start = today.adding(days: -SampleData.dayCount)
-
         let spentDays = Set(snapshot.entries.filter { $0.type == .expense }.map(\.date))
 
         #expect(snapshot.entries.count > 250)
