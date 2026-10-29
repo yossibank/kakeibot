@@ -3,19 +3,22 @@ import Foundation
 import Store
 
 public actor SyncEngine {
-    var sending: [SyncKey: SyncChange] = [:]
-
     let database: AppDatabase
+    let scope: CKDatabase.Scope
     let container: CKContainer
 
-    private(set) var engine: CKSyncEngine?
-    private(set) var isSyncEnabled = false
+    var engine: CKSyncEngine?
+    var sending: [SyncKey: SyncChange] = [:]
+    var owners: [String: String] = [:]
+    var isSyncEnabled = false
 
     public init(
         database: AppDatabase,
+        scope: CKDatabase.Scope,
         container: CKContainer = CKContainer(identifier: SyncEngine.containerIdentifier)
     ) {
         self.database = database
+        self.scope = scope
         self.container = container
     }
 }
@@ -57,31 +60,32 @@ public extension SyncEngine {
 
         self.isSyncEnabled = isSyncEnabled
 
-        let data = try? await database.syncEngineState()
-
+        let data = try? await database.syncEngineState(isShared: isShared)
         let state = data.flatMap {
             try? JSONDecoder().decode(CKSyncEngine.State.Serialization.self, from: $0)
         }
-
         let configuration = CKSyncEngine.Configuration(
-            database: container.privateCloudDatabase,
+            database: cloudDatabase,
             stateSerialization: state,
             delegate: self
         )
-
         let engine = CKSyncEngine(configuration)
 
         self.engine = engine
 
         if state == nil,
-           isSyncEnabled {
-            let zone = CKRecordZone(zoneID: Self.zoneID)
-            engine.state.add(pendingDatabaseChanges: [.saveZone(zone)])
+           isSyncEnabled,
+           !isShared {
+            engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: Self.zoneID))])
         }
     }
 
     func enqueuePending() async {
         await enqueuePending(excluding: [])
+    }
+
+    func fetchChanges() async {
+        try? await engine?.fetchChanges()
     }
 
     func stop() {
@@ -91,21 +95,47 @@ public extension SyncEngine {
 }
 
 extension SyncEngine {
+    static let goneCodes: Set<CKError.Code> = [.unknownItem, .zoneNotFound]
+
     static var zoneID: CKRecordZone.ID {
         CKRecordZone.ID(zoneName: SyncZone.own)
     }
 
-    func enqueuePending(excluding failed: Set<SyncKey>) async {
-        guard
-            engine != nil,
-            let changes = try? await database.pendingSyncChanges()
-        else {
-            return
+    var isShared: Bool {
+        scope == .shared
+    }
+
+    var cloudDatabase: CKDatabase {
+        container.database(with: scope)
+    }
+
+    func isForeign(_ zoneName: String) -> Bool {
+        owners[zoneName] != nil
+    }
+
+    func sends(to zoneName: String) -> Bool {
+        guard !isShared else {
+            return isForeign(zoneName)
         }
 
-        let remaining = changes.filter { !failed.contains($0.key) }
+        return !isForeign(zoneName) && (isSyncEnabled || zoneName != SyncZone.own)
+    }
 
-        await enqueue(remaining)
+    func receives(from zoneName: String) -> Bool {
+        guard !isShared else {
+            return SyncZone.walletID(of: zoneName) != nil
+        }
+
+        return isSyncEnabled || zoneName != SyncZone.own
+    }
+
+    func recordID(of id: SyncRecordID) -> CKRecord.ID {
+        let zoneID = CKRecordZone.ID(
+            zoneName: id.zoneName,
+            ownerName: owners[id.zoneName] ?? CKCurrentUserDefaultName
+        )
+
+        return id.key.recordID(in: zoneID)
     }
 
     func restart() async {
@@ -117,76 +147,53 @@ extension SyncEngine {
 
     func turnOff() async {
         try? await database.turnOffSync()
-        stop()
+        isSyncEnabled = false
+        await restart()
     }
 }
 
-private extension SyncEngine {
-    func enqueue(_ changes: [SyncChange]) async {
-        guard let engine else {
+extension SyncEngine: CKSyncEngineDelegate {
+    public func handleEvent(
+        _ event: CKSyncEngine.Event,
+        syncEngine: CKSyncEngine
+    ) async {
+        guard syncEngine === engine else {
             return
         }
 
-        let pending = Set(engine.state.pendingRecordZoneChanges)
-
-        let savingKeys = pending.compactMap { change -> SyncKey? in
-            guard case let .saveRecord(id) = change else {
-                return nil
+        switch event {
+        case let .stateUpdate(update):
+            let data = try? JSONEncoder().encode(update.stateSerialization)
+            try? await database.saveSyncEngineState(data, isShared: isShared)
+        case let .accountChange(change):
+            await changeAccount(change)
+        case let .fetchedDatabaseChanges(changes):
+            for deletion in changes.deletions {
+                await deleteZone(deletion)
             }
-
-            return SyncKey(id)
+        case let .fetchedRecordZoneChanges(changes):
+            await applyFetched(changes)
+        case let .sentRecordZoneChanges(sent):
+            await finishSending(sent)
+        default:
+            break
         }
-
-        let saving = Set(savingKeys)
-
-        var added: [CKSyncEngine.PendingRecordZoneChange] = []
-        var removed: [CKSyncEngine.PendingRecordZoneChange] = []
-        var dropped: [SyncChange] = []
-
-        for change in changes {
-            let targets = pendingTargets(of: change)
-
-            if targets.isEmpty,
-               !saving.contains(change.key) {
-                dropped.append(change)
-            }
-
-            for (wanted, opposite) in targets where !pending.contains(wanted) {
-                added.append(wanted)
-
-                if pending.contains(opposite) {
-                    removed.append(opposite)
-                }
-            }
-        }
-
-        engine.state.remove(pendingRecordZoneChanges: removed)
-        engine.state.add(pendingRecordZoneChanges: added)
-        try? await database.removeSyncChanges(dropped)
     }
 
-    func pendingTargets(
-        of change: SyncChange
-    ) -> [(
-        wanted: CKSyncEngine.PendingRecordZoneChange,
-        opposite: CKSyncEngine.PendingRecordZoneChange
-    )] {
-        var targets: [(
-            wanted: CKSyncEngine.PendingRecordZoneChange,
-            opposite: CKSyncEngine.PendingRecordZoneChange
-        )] = []
+    public func nextRecordZoneChangeBatch(
+        _ context: CKSyncEngine.SendChangesContext,
+        syncEngine: CKSyncEngine
+    ) async -> CKSyncEngine.RecordZoneChangeBatch? {
+        let changes = syncEngine.state.pendingRecordZoneChanges
+            .filter { context.options.scope.contains($0) }
+        let local = await (try? database.pendingSyncChanges()) ?? []
 
-        if let zone = change.saveZone,
-           isSyncEnabled || zone != SyncZone.own {
-            let id = SyncRecordID(key: change.key, zoneName: zone).recordID
-            targets.append((.saveRecord(id), .deleteRecord(id)))
+        for change in local {
+            sending[change.key] = change
         }
 
-        for zone in change.deleteZones where isSyncEnabled || zone != SyncZone.own {
-            let id = SyncRecordID(key: change.key, zoneName: zone).recordID
-            targets.append((.deleteRecord(id), .saveRecord(id)))
+        return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: changes) { recordID in
+            await self.record(for: recordID)
         }
-
-        return targets
     }
 }

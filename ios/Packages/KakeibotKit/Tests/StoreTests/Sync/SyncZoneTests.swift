@@ -127,6 +127,54 @@ struct SyncZoneTests {
     }
 
     @Test
+    func joinsShareWithOwnerOfOtherAccount() async throws {
+        let setup = try await SyncTests.Setup(enabled: false)
+        let walletID = try await setup.walletID()
+        let id = try #require(Wallet.ID(walletID))
+        let zone = SyncZone.wallet(id)
+
+        try await setup.joinForeignShare(of: walletID)
+
+        #expect(try await setup.database.syncShareOwners() == [zone: "owner"])
+    }
+
+    @Test
+    func endsForeignSharingAndDropsPendingRows() async throws {
+        let setup = try await SyncTests.Setup()
+        let walletID = try await setup.walletID()
+        let id = try #require(Wallet.ID(walletID))
+
+        try await setup.joinForeignShare(of: walletID)
+        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        try await setup.execute("UPDATE wallet SET name = 'x' WHERE id = '\(walletID)'")
+
+        try await setup.database.endSharing(id)
+
+        #expect(try await setup.pendingKeys() == [])
+        #expect(try await setup.value("SELECT COUNT(*) FROM sync_share") == "0")
+        #expect(try await setup.value("SELECT COUNT(*) FROM sync_record") == "0")
+    }
+
+    @Test
+    func resetsOnlyForeignZonesForSharedDatabase() async throws {
+        let setup = try await SyncTests.Setup()
+        let walletID = try await setup.walletID()
+        let own = SyncKey(table: .noSpendDay, id: "2026-10-01").own
+
+        try await setup.joinForeignShare(of: walletID)
+        try await setup.database.saveSyncSystemFields([own: Data([2])])
+        try await setup.database.saveSyncEngineState(Data([3]), isShared: false)
+        try await setup.database.saveSyncEngineState(Data([4]), isShared: true)
+
+        try await setup.database.resetSync(isShared: true)
+
+        #expect(try await setup.value("SELECT COUNT(*) FROM sync_record") == "1")
+        #expect(try await setup.database.syncSystemFields(for: own) == Data([2]))
+        #expect(try await setup.database.syncEngineState(isShared: false) == Data([3]))
+        #expect(try await setup.database.syncEngineState(isShared: true) == nil)
+    }
+
+    @Test
     func keepsSharedWalletStateWhenTurningOff() async throws {
         let setup = try await SyncTests.Setup()
         let walletID = try await setup.walletID()
@@ -157,9 +205,11 @@ struct SyncZoneTests {
         let id = try #require(Wallet.ID(walletID))
 
         try await setup.database.startSharing(id)
+        try await setup.database.saveSyncEngineState(Data([1]), isShared: true)
         try await setup.database.turnOnSyncReplacingLocal()
 
         #expect(try await setup.database.isSyncEnabled())
+        #expect(try await setup.database.syncEngineState(isShared: true) == nil)
         #expect(try await setup.pendingKeys() == [])
         #expect(try await setup.value("SELECT COUNT(*) FROM wallet") == "0")
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_record") == "0")
