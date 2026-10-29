@@ -270,6 +270,17 @@ public extension Icon {
         case smile
         case infinity
         case number
+
+        public init(known rawValue: String) {
+            self = Self(rawValue: rawValue) ?? .other
+        }
+
+        public init(from decoder: any Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let rawValue = try container.decode(String.self)
+
+            self.init(known: rawValue)
+        }
     }
 }
 

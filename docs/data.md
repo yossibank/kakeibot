@@ -101,7 +101,7 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 | color | TEXT | `#RRGGBB` |
 | created_at / updated_at | TEXT | |
 
-emoji・text・glyph のどれかは必須。
+emoji・text・glyph のどれかは必須。新しい版で足した glyph を古い版が受け取ったら、`other` として読む。
 
 ### shelf_icon
 
