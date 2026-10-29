@@ -74,6 +74,45 @@ struct AppModelTests {
     }
 
     @Test
+    func tellsWhenRecurringEntriesCannotBeRecorded() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date()
+        try database.insertDefaultsIfEmpty(at: now)
+        try await database.setSetting(.onboardingCompleted, to: true)
+        let options = try await database.entryOptions()
+        let today = LocalDate(now, in: .current)
+
+        let recurring = Recurring(
+            type: .expense,
+            amount: 78000,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            frequency: .monthly,
+            day: today.day,
+            startDate: today,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try await database.writer.write { db in
+            try recurring.insert(db)
+
+            try db.execute(
+                sql: """
+                CREATE TRIGGER fail_entry BEFORE INSERT ON entry
+                BEGIN SELECT RAISE(ABORT, 'failing for tests'); END
+                """
+            )
+        }
+
+        let model = AppModel { database }
+
+        await model.open()
+
+        #expect(model.notice.message == "固定費を自動で記録できませんでした")
+    }
+
+    @Test
     func reschedulesNotificationsOnDemand() async throws {
         let database = try AppDatabase.inMemory()
         let client = NotificationSchedulerTests.FakeCenter(pending: [])

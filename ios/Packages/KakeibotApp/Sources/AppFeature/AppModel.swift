@@ -12,7 +12,7 @@ import WidgetKit
 @MainActor
 @Observable
 final class AppModel {
-    var shareNotice = ErrorNotice()
+    var notice = ErrorNotice()
 
     private(set) var launch: Launch = .opening
     private(set) var today: LocalDate
@@ -235,7 +235,7 @@ extension AppModel {
             } catch is CancellationError {
                 continue
             } catch {
-                shareNotice.show(Self.shareFailedMessage)
+                notice.show(Self.shareFailedMessage)
             }
         }
 
@@ -281,6 +281,7 @@ extension AppModel {
 
 private extension AppModel {
     static let shareFailedMessage = "共有の口座に参加できませんでした"
+    static let recurringFailedMessage = "固定費を自動で記録できませんでした"
 
     static func currentDay() -> LocalDate {
         LocalDate(Date(), in: .current)
@@ -340,7 +341,11 @@ private extension AppModel {
     }
 
     func generateRecurring(in database: AppDatabase) async {
-        try? await database.generateRecurringEntries(through: today, at: Date())
+        do {
+            try await database.generateRecurringEntries(through: today, at: Date())
+        } catch {
+            notice.show(Self.recurringFailedMessage)
+        }
     }
 }
 
