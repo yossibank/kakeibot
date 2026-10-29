@@ -111,6 +111,7 @@ public extension AppDatabase {
 
                 entry.updatedAt = now
 
+                try Self.fitCategory(of: &entry, in: db)
                 try entry.update(db)
                 touched.after.append(entry)
             }
@@ -149,7 +150,9 @@ extension AppDatabase {
     ) throws -> SavedEntry {
         let before = try id.flatMap { try Entry.fetchOne(db, key: $0) }
         let beforeFee = try before.flatMap { try fee(of: $0.id, in: db) }
-        let entry = try Self.entry(from: draft, editing: id, in: db, at: now)
+        var entry = try Self.entry(from: draft, editing: id, in: db, at: now)
+
+        try fitCategory(of: &entry, in: db)
 
         guard try Self.tag(entry.tagId, belongsTo: entry.categoryId, in: db) else {
             throw WriteError.tagMismatch
@@ -231,6 +234,7 @@ extension AppDatabase {
         fee.billMonth = nil
         fee.updatedAt = now
 
+        try fitCategory(of: &fee, in: db)
         try fee.save(db)
 
         return try clearNoSpendDay(on: fee.date, in: db)

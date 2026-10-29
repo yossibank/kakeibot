@@ -42,9 +42,7 @@ public extension EntryModel {
     }
 
     var tags: [EntryTag] {
-        let tags = options?.tags ?? []
-
-        return tags.filter { tag in
+        allTags.filter { tag in
             tag.categoryId == categoryId
                 && (tag.archivedAt == nil || tag.id == tagId)
         }
@@ -73,9 +71,7 @@ public extension EntryModel {
     }
 
     func recordableTagId(of template: EntryTemplate) -> EntryTag.ID? {
-        let tags = options?.tags ?? []
-
-        return tags.first { $0.id == template.tagId && $0.archivedAt == nil }?.id
+        allTags.first { $0.id == template.tagId && $0.archivedAt == nil }?.id
     }
 
     func apply(_ template: EntryTemplate) {
@@ -173,8 +169,8 @@ public extension EntryModel {
 extension EntryModel {
     func categories(for type: Entry.Kind) -> [EntryCategory] {
         let categories = switch type {
-        case .expense: options?.expenseCategories ?? []
-        case .income: options?.incomeCategories ?? []
+        case .expense: offeredCategories(of: .expense)
+        case .income: offeredCategories(of: .income)
         case .transfer: [EntryCategory]()
         }
 
@@ -193,8 +189,54 @@ extension EntryModel {
 
         return (categories + kept).sorted { $0.sortOrder < $1.sortOrder }
     }
+
+    func fitCategoryToWallet() {
+        guard
+            let categoryId,
+            let current = allCategories.first(where: { $0.id == categoryId }),
+            !categories.contains(where: { $0.id == categoryId })
+        else {
+            return
+        }
+
+        let tagName = allTags.first { $0.id == tagId }?.name
+        let fitted = categories.first { $0.name == current.name } ?? categories.first
+
+        self.categoryId = fitted?.id
+        tagId = tags.first { $0.name == tagName }?.id
+    }
 }
 
 private extension EntryModel {
     static let restoreFailedMessage = "元に戻せませんでした"
+
+    var allCategories: [EntryCategory] {
+        let own = (options?.expenseCategories ?? []) + (options?.incomeCategories ?? [])
+        return own + (options?.sharedCategories ?? [])
+    }
+
+    var allTags: [EntryTag] {
+        (options?.tags ?? []) + (options?.sharedTags ?? [])
+    }
+
+    var walletCategories: [EntryCategory] {
+        let categories = options?.sharedCategories ?? []
+
+        return categories.filter { category in
+            category.walletId != nil && category.walletId == walletId
+        }
+    }
+
+    func offeredCategories(of kind: EntryCategory.Kind) -> [EntryCategory] {
+        let shared = walletCategories
+
+        guard shared.isEmpty else {
+            return shared.filter { $0.kind == kind }
+        }
+
+        return switch kind {
+        case .expense: options?.expenseCategories ?? []
+        case .income: options?.incomeCategories ?? []
+        }
+    }
 }

@@ -196,7 +196,7 @@ extension AppDatabase {
             return nil
         }
 
-        let entry = Entry(
+        var entry = Entry(
             type: recurring.type,
             amount: amount,
             date: date,
@@ -210,6 +210,7 @@ extension AppDatabase {
             updatedAt: now
         )
 
+        try fitCategory(of: &entry, in: db)
         try entry.insert(db)
 
         if entry.type == .expense {

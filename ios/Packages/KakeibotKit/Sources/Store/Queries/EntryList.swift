@@ -34,18 +34,24 @@ public struct EntryOptions: Equatable, Sendable {
     public let tags: [EntryTag]
     public let wallets: [Wallet]
     public let icons: [Icon.ID: Icon]
+    public let sharedCategories: [EntryCategory]
+    public let sharedTags: [EntryTag]
 
     public init(
         expenseCategories: [EntryCategory],
         incomeCategories: [EntryCategory],
         tags: [EntryTag],
         wallets: [Wallet],
-        icons: [Icon.ID: Icon]
+        icons: [Icon.ID: Icon],
+        sharedCategories: [EntryCategory] = [],
+        sharedTags: [EntryTag] = []
     ) {
         self.expenseCategories = expenseCategories
         self.incomeCategories = incomeCategories
         self.tags = tags
         self.wallets = wallets
         self.icons = icons
+        self.sharedCategories = sharedCategories
+        self.sharedTags = sharedTags
     }
 }
