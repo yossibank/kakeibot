@@ -4,9 +4,7 @@ import Foundation
 public struct NotificationScheduler: Sendable {
     private let client: any NotificationCenterClient
 
-    public init(
-        client: any NotificationCenterClient = LiveNotificationCenter()
-    ) {
+    public init(client: any NotificationCenterClient = LiveNotificationCenter()) {
         self.client = client
     }
 }
@@ -27,14 +25,9 @@ public extension NotificationScheduler {
             Self.fireDate(of: notification, in: timeZone) > now
         }
 
-        let wanted = Dictionary(
-            upcoming.map { (Self.prefix + $0.identifier, $0) },
-            uniquingKeysWith: { first, _ in first }
-        )
-
-        let pending = await client.pendingIdentifiers()
-            .filter { $0.hasPrefix(Self.prefix) }
-
+        let entries = upcoming.map { (Self.prefix + $0.identifier, $0) }
+        let wanted = Dictionary(entries, uniquingKeysWith: { first, _ in first })
+        let pending = await client.pendingIdentifiers().filter { $0.hasPrefix(Self.prefix) }
         let stale = pending.filter { wanted[$0] == nil }
 
         if !stale.isEmpty {
@@ -42,21 +35,21 @@ public extension NotificationScheduler {
         }
 
         for (identifier, notification) in wanted where !pending.contains(identifier) {
+            let components = Self.components(of: notification)
+
             try? await client.add(
                 identifier: identifier,
                 title: notification.title,
                 body: notification.body,
                 link: notification.route.link,
-                at: Self.components(of: notification)
+                at: components
             )
         }
     }
 }
 
 private extension NotificationScheduler {
-    static func components(
-        of notification: PlannedNotification
-    ) -> DateComponents {
+    static func components(of notification: PlannedNotification) -> DateComponents {
         DateComponents(
             year: notification.date.year,
             month: notification.date.month,
@@ -71,8 +64,10 @@ private extension NotificationScheduler {
         in timeZone: TimeZone
     ) -> Date {
         var components = components(of: notification)
+
         components.calendar = Calendar(identifier: .gregorian)
         components.timeZone = timeZone
+
         return components.date ?? .distantPast
     }
 }

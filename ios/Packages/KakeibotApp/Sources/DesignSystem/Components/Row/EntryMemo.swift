@@ -118,12 +118,8 @@ private extension EntryMemo {
             return Text(text)
         }
 
-        let room = Image(
-            size: CGSize(
-                width: Self.toggleWidth,
-                height: 1
-            )
-        ) { _ in }
+        let size = CGSize(width: Self.toggleWidth, height: 1)
+        let room = Image(size: size) { _ in }
 
         return Text("\(text)\(room)")
     }

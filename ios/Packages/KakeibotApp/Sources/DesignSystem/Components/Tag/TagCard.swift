@@ -63,7 +63,9 @@ extension TagCard {
     ) -> CGFloat {
         let font = UIFont.systemFont(ofSize: size.fontSize)
         let text = (title as NSString).size(withAttributes: [.font: font])
-        return max(ceil(text.width) + size.padding * 2, size.minWidth)
+        let width = ceil(text.width) + size.padding * 2
+
+        return max(width, size.minWidth)
     }
 }
 
@@ -97,9 +99,7 @@ private extension TagCard {
     }
 
     var strokeStyle: StrokeStyle {
-        style == .add
-            ? StrokeStyle(lineWidth: 1, dash: [3, 2])
-            : StrokeStyle(lineWidth: 1)
+        style == .add ? StrokeStyle(lineWidth: 1, dash: [3, 2]) : StrokeStyle(lineWidth: 1)
     }
 }
 

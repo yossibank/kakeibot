@@ -61,7 +61,12 @@ public struct RootView: View {
                 await model.refreshDay()
             }
         }
-        .environment(\.notificationPermission, .live { await model.rescheduleNotifications() })
+        .environment(
+            \.notificationPermission,
+            .live {
+                await model.rescheduleNotifications()
+            }
+        )
         .environment(\.syncCloud, .live)
         .palette(shownLook)
         .environment(\.palette, shownPalette)
@@ -175,13 +180,16 @@ extension SyncCloud {
     } deleteData: {
         try await SyncEngine.deleteCloudData()
     } createShare: { walletID, title in
-        _ = try await SyncEngine.share(zoneName: SyncZone.wallet(walletID), title: title)
+        let zoneName = SyncZone.wallet(walletID)
+        _ = try await SyncEngine.share(zoneName: zoneName, title: title)
     } showShare: { walletID, title, onStop in
-        let share = try await SyncEngine.share(zoneName: SyncZone.wallet(walletID), title: title)
+        let zoneName = SyncZone.wallet(walletID)
+        let share = try await SyncEngine.share(zoneName: zoneName, title: title)
 
         SyncShareSheet.present(share, title: title, onStop: onStop)
     } deleteShare: { walletID in
-        try await SyncEngine.deleteShare(zoneName: SyncZone.wallet(walletID))
+        let zoneName = SyncZone.wallet(walletID)
+        try await SyncEngine.deleteShare(zoneName: zoneName)
     }
 }
 
@@ -208,7 +216,10 @@ private final class WarmupView: UIView {
     override func didMoveToWindow() {
         super.didMoveToWindow()
 
-        guard let window, !isWarmedUp else {
+        guard
+            let window,
+            !isWarmedUp
+        else {
             return
         }
 

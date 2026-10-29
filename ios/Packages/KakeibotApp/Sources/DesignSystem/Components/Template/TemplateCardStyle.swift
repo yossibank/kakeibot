@@ -72,10 +72,7 @@ private struct TemplateCardFace: ViewModifier {
             .overlay {
                 shape
                     .inset(by: 4)
-                    .strokeBorder(
-                        Palette.accent.opacity(.subtle),
-                        lineWidth: 0.5
-                    )
+                    .strokeBorder(Palette.accent.opacity(.subtle), lineWidth: 0.5)
             }
             .shadow(color: Palette.shadow.opacity(0.35), radius: 3, y: 2)
             .shadow(

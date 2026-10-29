@@ -17,7 +17,8 @@ struct BudgetWidgetProvider: TimelineProvider {
         Task {
             let now = Date()
             let timeline = await Self.timeline(at: now, isPreview: isPreview)
-            completion(timeline.entries.first ?? .sample(at: now))
+            let entry = timeline.entries.first ?? .sample(at: now)
+            completion(entry)
         }
     }
 
@@ -28,7 +29,8 @@ struct BudgetWidgetProvider: TimelineProvider {
         let isPreview = context.isPreview
 
         Task {
-            await completion(Self.timeline(at: Date(), isPreview: isPreview))
+            let timeline = await Self.timeline(at: Date(), isPreview: isPreview)
+            completion(timeline)
         }
     }
 }
@@ -56,10 +58,11 @@ private extension BudgetWidgetProvider {
         let look = await database.widgetLook()
         let weekStart = await (try? database.setting(.weekStart)) ?? .sunday
         let style = await database.widgetStyle()
+        let summary = BudgetWidgetSummary(overview, weekStart: weekStart)
 
         let current = BudgetWidgetEntry(
             date: now,
-            summary: BudgetWidgetSummary(overview, weekStart: weekStart),
+            summary: summary,
             look: look,
             style: style
         )
@@ -68,11 +71,13 @@ private extension BudgetWidgetProvider {
             return Timeline(entries: [current], policy: .never)
         }
 
-        let tomorrow = overview.moved(to: today.adding(days: 1))
+        let nextDay = today.adding(days: 1)
+        let tomorrow = overview.moved(to: nextDay)
+        let nextSummary = BudgetWidgetSummary(tomorrow, weekStart: weekStart)
 
         let next = BudgetWidgetEntry(
             date: midnight,
-            summary: BudgetWidgetSummary(tomorrow, weekStart: weekStart),
+            summary: nextSummary,
             look: look,
             style: style
         )

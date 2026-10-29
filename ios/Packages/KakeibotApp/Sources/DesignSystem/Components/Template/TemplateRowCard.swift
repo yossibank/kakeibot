@@ -60,26 +60,11 @@ public extension TemplateRowCard {
 
 #Preview {
     VStack(spacing: 12) {
-        TemplateRowCard(
-            icon: nil,
-            name: "ランチ",
-            detail: "食費・財布",
-            amount: 980
-        )
+        TemplateRowCard(icon: nil, name: "ランチ", detail: "食費・財布", amount: 980)
 
-        TemplateRowCard(
-            icon: nil,
-            name: "駅前のカフェでモーニング",
-            detail: "食費・財布",
-            amount: 650
-        )
+        TemplateRowCard(icon: nil, name: "駅前のカフェでモーニング", detail: "食費・財布", amount: 650)
 
-        TemplateRowCard(
-            icon: nil,
-            name: "定期",
-            detail: "交通・銀行",
-            amount: nil
-        )
+        TemplateRowCard(icon: nil, name: "定期", detail: "交通・銀行", amount: nil)
     }
     .padding()
     .background(Palette.background)

@@ -23,6 +23,10 @@ public struct MonthCalendar: View {
     }
 
     public var body: some View {
+        let weekdays = Weekday.week(startingOn: weekStart)
+        let rows = Array(weeks.enumerated())
+        let edge: Edge = movesForward ? .trailing : .leading
+
         VStack(spacing: 8) {
             HStack {
                 monthButton(systemImage: "chevron.left", months: -1)
@@ -39,10 +43,7 @@ public struct MonthCalendar: View {
             }
 
             HStack(spacing: 0) {
-                ForEach(
-                    Weekday.week(startingOn: weekStart),
-                    id: \.self
-                ) { weekday in
+                ForEach(weekdays, id: \.self) { weekday in
                     Text(weekday.shortName)
                         .textFont(.caption2)
                         .foregroundStyle(Self.headerColor(for: weekday))
@@ -51,19 +52,18 @@ public struct MonthCalendar: View {
             }
 
             VStack(spacing: 8) {
-                ForEach(Array(weeks.enumerated()), id: \.offset) { _, week in
+                ForEach(rows, id: \.offset) { _, week in
+                    let days = Array(week.enumerated())
+
                     HStack(spacing: 0) {
-                        ForEach(
-                            Array(week.enumerated()),
-                            id: \.offset
-                        ) { _, date in
+                        ForEach(days, id: \.offset) { _, date in
                             cell(for: date)
                         }
                     }
                 }
             }
             .id(month)
-            .transition(.push(from: movesForward ? .trailing : .leading))
+            .transition(.push(from: edge))
             .contentShape(.rect)
             .simultaneousGesture(swipe)
         }
@@ -92,15 +92,10 @@ private extension MonthCalendar {
     func cell(for date: LocalDate?) -> some View {
         if let date {
             let isSelected = date == selection
-
-            let weight: Font.Weight = isSelected
-                ? .semibold
-                : .regular
-
-            let ring = date == today && !isSelected
-                ? Palette.accent
-                : Color.clear
-
+            let weight: Font.Weight = isSelected ? .semibold : .regular
+            let ring = date == today && !isSelected ? Palette.accent : Color.clear
+            let fill = isSelected ? Palette.accent : Color.clear
+            let opacity = date > today && !isSelected ? 0.5 : 1
             let holiday = Holiday.name(of: date)
 
             Button {
@@ -111,10 +106,7 @@ private extension MonthCalendar {
                         .displayFont(.body, weight: weight)
                         .foregroundStyle(foreground(for: date))
                         .frame(width: 32, height: 32)
-                        .background(
-                            isSelected ? Palette.accent : Color.clear,
-                            in: Circle()
-                        )
+                        .background(fill, in: Circle())
                         .overlay(Circle().stroke(ring, lineWidth: 1))
 
                     Text(holiday ?? "")
@@ -124,7 +116,7 @@ private extension MonthCalendar {
                         .minimumScaleFactor(0.7)
                         .frame(height: 10)
                 }
-                .opacity(date > today && !isSelected ? 0.5 : 1)
+                .opacity(opacity)
                 .frame(maxWidth: .infinity, minHeight: Self.cellHeight)
                 .contentShape(.rect)
             }
@@ -154,7 +146,9 @@ private extension MonthCalendar {
                     return
                 }
 
-                move(months: width < 0 ? 1 : -1)
+                let months = width < 0 ? 1 : -1
+
+                move(months: months)
             }
     }
 
@@ -162,6 +156,7 @@ private extension MonthCalendar {
         let weeks = month.weeks(startingOn: weekStart)
         let blank = [LocalDate?](repeating: nil, count: 7)
         let missing = max(Self.rowCount - weeks.count, 0)
+
         return weeks + Array(repeating: blank, count: missing)
     }
 
@@ -193,7 +188,9 @@ private extension MonthCalendar {
 #Preview {
     @Previewable @State var selection = LocalDate(Date(), in: .current)
 
-    MonthCalendar(selection: $selection, today: LocalDate(Date(), in: .current))
+    let today = LocalDate(Date(), in: .current)
+
+    MonthCalendar(selection: $selection, today: today)
         .padding()
         .background(Palette.background)
 }

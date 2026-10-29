@@ -126,7 +126,9 @@ private extension QuickRecordWidgetView {
         of summary: QuickRecordWidgetSummary,
         metrics: Metrics
     ) -> some View {
-        let tiles = Array(summary.tiles.prefix(rowCount * Self.columns))
+        let count = rowCount * Self.columns
+        let visible = summary.tiles.prefix(count)
+        let tiles = Array(visible)
 
         return Grid(horizontalSpacing: 8, verticalSpacing: metrics.gridSpacing) {
             ForEach(0..<rowCount, id: \.self) { row in
@@ -231,7 +233,8 @@ private extension QuickRecordWidgetView {
         of summary: QuickRecordWidgetSummary,
         limit: Int
     ) -> some View {
-        let records = Array(summary.todayRecords.prefix(limit))
+        let shown = summary.todayRecords.prefix(limit)
+        let records = Array(shown)
         let others = summary.todayCount - records.count
 
         return VStack(alignment: .leading, spacing: 8) {
@@ -310,6 +313,10 @@ private extension QuickRecordWidgetView {
     }
 
     static let columns = 2
+    static let tileRadius: CGFloat = 12
+    static let badgeSize: CGFloat = 20
+    static let markSize: CGFloat = 20
+
     static let layouts = [
         regular,
         tight,
@@ -318,9 +325,7 @@ private extension QuickRecordWidgetView {
         compact.limited(2),
         compact.limited(1)
     ]
-    static let tileRadius: CGFloat = 12
-    static let badgeSize: CGFloat = 20
-    static let markSize: CGFloat = 20
+
     static let regular = Metrics(
         top: 12,
         bottom: 18,

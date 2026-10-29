@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-public struct LiftGesture: UIGestureRecognizerRepresentable {
+public struct LiftGesture {
     private let space: String
     private let onMove: (CGPoint) -> Void
     private let onEnd: () -> Void
@@ -17,8 +17,8 @@ public struct LiftGesture: UIGestureRecognizerRepresentable {
     }
 }
 
-public extension LiftGesture {
-    func makeUIGestureRecognizer(
+extension LiftGesture: UIGestureRecognizerRepresentable {
+    public func makeUIGestureRecognizer(
         context: Context
     ) -> UILongPressGestureRecognizer {
         let recognizer = UILongPressGestureRecognizer()
@@ -26,7 +26,7 @@ public extension LiftGesture {
         return recognizer
     }
 
-    func handleUIGestureRecognizerAction(
+    public func handleUIGestureRecognizerAction(
         _ recognizer: UILongPressGestureRecognizer,
         context: Context
     ) {

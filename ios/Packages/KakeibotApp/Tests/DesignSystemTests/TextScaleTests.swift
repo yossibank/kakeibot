@@ -25,6 +25,7 @@ struct TextScaleTests {
     @Test
     func ignoresUnmeasuredWidths() {
         #expect(TextScale.fitting(available: .infinity, needed: 100) == 1)
+
         #expect(TextScale.fitting(available: 50, needed: 0) == 1)
     }
 }

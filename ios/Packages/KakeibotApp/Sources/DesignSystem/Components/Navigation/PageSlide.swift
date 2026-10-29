@@ -22,17 +22,14 @@ public extension PageSlide {
         by x: CGFloat
     ) {
         let fade = Double(abs(x) / fadeDistance)
+        let opacity = max(1 - fade, minimumOpacity)
 
         var transaction = Transaction()
 
         transaction.disablesAnimations = true
 
         withTransaction(transaction) {
-            slide.wrappedValue = PageSlide(
-                offset: x,
-                opacity: max(1 - fade, minimumOpacity),
-                isDragging: true
-            )
+            slide.wrappedValue = PageSlide(offset: x, opacity: opacity, isDragging: true)
         }
     }
 
@@ -62,6 +59,7 @@ public extension PageSlide {
             try? await Task.sleep(for: .seconds(outDuration))
 
             var transaction = Transaction()
+
             transaction.disablesAnimations = true
 
             withTransaction(transaction) {
@@ -76,13 +74,6 @@ public extension PageSlide {
     }
 }
 
-public extension View {
-    func pageSlide(_ slide: PageSlide) -> some View {
-        offset(x: slide.offset)
-            .opacity(slide.opacity)
-    }
-}
-
 private extension PageSlide {
     init(
         offset: CGFloat,
@@ -92,5 +83,12 @@ private extension PageSlide {
         self.offset = offset
         self.opacity = opacity
         self.isDragging = isDragging
+    }
+}
+
+public extension View {
+    func pageSlide(_ slide: PageSlide) -> some View {
+        offset(x: slide.offset)
+            .opacity(slide.opacity)
     }
 }

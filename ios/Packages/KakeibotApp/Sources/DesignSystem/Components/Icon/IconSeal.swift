@@ -25,10 +25,7 @@ public struct IconSeal: View {
             }
             .overlay {
                 Circle()
-                    .strokeBorder(
-                        Palette.backgroundBottom,
-                        lineWidth: size * 0.08
-                    )
+                    .strokeBorder(Palette.backgroundBottom, lineWidth: size * 0.08)
             }
             .shadow(color: tint.opacity(glow), radius: size * 0.2)
     }

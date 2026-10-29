@@ -6,8 +6,11 @@ import WidgetKit
 struct KakeibotWidgetBundle: WidgetBundle {
     var body: some Widget {
         BudgetWidget()
+
         BudgetLockWidget()
+
         QuickRecordWidget()
+
         RecordEntryControl()
     }
 

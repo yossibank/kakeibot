@@ -63,8 +63,10 @@ public extension FloatingTabBar {
 
 private extension FloatingTabBar {
     var tabs: some View {
-        HStack(spacing: 0) {
-            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+        let indexedItems = Array(items.enumerated())
+
+        return HStack(spacing: 0) {
+            ForEach(indexedItems, id: \.offset) { index, item in
                 tabItem(item, isHighlighted: index == highlightedIndex)
             }
         }
@@ -154,10 +156,7 @@ private extension FloatingTabBar {
 
             Circle()
                 .trim(from: 0, to: Self.hintLength)
-                .stroke(
-                    Palette.accentStrong,
-                    style: StrokeStyle(lineWidth: 2.4, lineCap: .round)
-                )
+                .stroke(Palette.accentStrong, style: StrokeStyle(lineWidth: 2.4, lineCap: .round))
                 .rotationEffect(.degrees(360 * turn - 90))
                 .shadow(color: Palette.accent, radius: 6)
                 .padding(1.2)

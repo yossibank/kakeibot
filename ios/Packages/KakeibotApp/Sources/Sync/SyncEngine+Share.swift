@@ -10,6 +10,7 @@ public extension SyncEngine {
         let database = container.privateCloudDatabase
         let zoneID = CKRecordZone.ID(zoneName: zoneName)
         let shareID = CKRecord.ID(recordName: CKRecordNameZoneWideShare, zoneID: zoneID)
+        let zone = CKRecordZone(zoneID: zoneID)
 
         do {
             if let share = try await database.record(for: shareID) as? CKShare {
@@ -22,7 +23,7 @@ public extension SyncEngine {
         share[CKShare.SystemFieldKey.title] = title
 
         _ = try await database.modifyRecordZones(
-            saving: [CKRecordZone(zoneID: zoneID)],
+            saving: [zone],
             deleting: []
         )
 

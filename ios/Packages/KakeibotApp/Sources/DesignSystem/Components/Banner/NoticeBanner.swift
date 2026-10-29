@@ -40,7 +40,8 @@ public struct NoticeBanner: View {
 
             Spacer(minLength: 8)
 
-            if let actionTitle, let action {
+            if let actionTitle,
+               let action {
                 Button(action: action) {
                     Text(actionTitle)
                         .textFont(.caption, weight: .semibold)
@@ -49,10 +50,7 @@ public struct NoticeBanner: View {
                         .frame(height: 34)
                         .overlay {
                             Capsule()
-                                .strokeBorder(
-                                    Palette.accent.opacity(.medium),
-                                    lineWidth: 0.8
-                                )
+                                .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 0.8)
                         }
                         .contentShape(Capsule())
                 }
@@ -115,17 +113,9 @@ private extension NoticeBanner {
 
 #Preview {
     VStack(spacing: 16) {
-        NoticeBanner(
-            "ランチ ¥980 を記録しました",
-            systemImage: "checkmark",
-            actionTitle: "取り消す"
-        ) {}
+        NoticeBanner("ランチ ¥980 を記録しました", systemImage: "checkmark", actionTitle: "取り消す") {}
 
-        NoticeBanner(
-            "名前を入れてください",
-            systemImage: "exclamationmark",
-            tone: .error
-        )
+        NoticeBanner("名前を入れてください", systemImage: "exclamationmark", tone: .error)
     }
     .padding()
     .background(Palette.background)

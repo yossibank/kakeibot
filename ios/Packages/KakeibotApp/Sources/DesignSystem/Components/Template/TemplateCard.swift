@@ -58,10 +58,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
         .padding(.horizontal, size.padding)
         .frame(maxWidth: .infinity)
         .frame(height: size.height)
-        .templateCardFace(
-            cornerRadius: size.cornerRadius,
-            shadowRadius: size.shadowRadius
-        )
+        .templateCardFace(cornerRadius: size.cornerRadius, shadowRadius: size.shadowRadius)
     }
 }
 
@@ -83,28 +80,12 @@ public extension TemplateCard where Name == TemplateCardName, Amount == Template
 
 #Preview {
     VStack(spacing: 20) {
-        TemplateCard(
-            icon: nil,
-            name: "ランチ",
-            detail: "食費・財布",
-            amount: 980,
-            size: .large
-        )
+        TemplateCard(icon: nil, name: "ランチ", detail: "食費・財布", amount: 980, size: .large)
 
         HStack(spacing: 8) {
-            TemplateCard(
-                icon: nil,
-                name: "コーヒー",
-                detail: "カフェ・財布",
-                amount: 450
-            )
+            TemplateCard(icon: nil, name: "コーヒー", detail: "カフェ・財布", amount: 450)
 
-            TemplateCard(
-                icon: nil,
-                name: "定期",
-                detail: "交通・銀行",
-                amount: nil
-            )
+            TemplateCard(icon: nil, name: "定期", detail: "交通・銀行", amount: nil)
         }
     }
     .padding()

@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-struct SwipeGesture: UIGestureRecognizerRepresentable {
+struct SwipeGesture {
     private let allowsRightward: Bool
     private let onMove: (CGFloat) -> Void
     private let onEnd: (CGFloat) -> Void
@@ -17,22 +17,9 @@ struct SwipeGesture: UIGestureRecognizerRepresentable {
     }
 }
 
-extension SwipeGesture {
-    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+extension SwipeGesture: UIGestureRecognizerRepresentable {
+    final class Coordinator: NSObject {
         var allowsRightward = true
-
-        func gestureRecognizerShouldBegin(
-            _ recognizer: UIGestureRecognizer
-        ) -> Bool {
-            guard let pan = recognizer as? UIPanGestureRecognizer else {
-                return false
-            }
-
-            let velocity = pan.velocity(in: pan.view)
-            let isHorizontal = abs(velocity.x) > abs(velocity.y)
-
-            return isHorizontal && (allowsRightward || velocity.x < 0)
-        }
     }
 
     func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator {
@@ -70,5 +57,20 @@ extension SwipeGesture {
         default:
             break
         }
+    }
+}
+
+extension SwipeGesture.Coordinator: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(
+        _ recognizer: UIGestureRecognizer
+    ) -> Bool {
+        guard let pan = recognizer as? UIPanGestureRecognizer else {
+            return false
+        }
+
+        let velocity = pan.velocity(in: pan.view)
+        let isHorizontal = abs(velocity.x) > abs(velocity.y)
+
+        return isHorizontal && (allowsRightward || velocity.x < 0)
     }
 }

@@ -18,11 +18,10 @@ public struct HalfDial: View {
                 .stroke(Palette.line, lineWidth: 2)
 
             if let progress {
-                HalfArc(progress: min(max(progress, 0), 1))
-                    .stroke(
-                        tint,
-                        style: StrokeStyle(lineWidth: 2, lineCap: .round)
-                    )
+                let clamped = min(max(progress, 0), 1)
+
+                HalfArc(progress: clamped)
+                    .stroke(tint, style: StrokeStyle(lineWidth: 2, lineCap: .round))
             }
 
             HalfTicks(count: 30, step: 1, length: 6, inset: 10)
@@ -35,9 +34,11 @@ public struct HalfDial: View {
     }
 }
 
-private struct HalfArc: Shape {
+private struct HalfArc {
     let progress: Double
+}
 
+extension HalfArc: Shape {
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.maxY)
         let radius = min(rect.width / 2, rect.height) - 1
@@ -55,12 +56,26 @@ private struct HalfArc: Shape {
     }
 }
 
-private struct HalfTicks: Shape {
+private struct HalfTicks {
     let count: Int
     let step: Int
     let length: CGFloat
     let inset: CGFloat
+}
 
+private extension HalfTicks {
+    static func point(
+        from center: CGPoint,
+        at angle: Double,
+        radius: CGFloat
+    ) -> CGPoint {
+        let x = center.x + cos(angle) * radius
+        let y = center.y + sin(angle) * radius
+        return CGPoint(x: x, y: y)
+    }
+}
+
+extension HalfTicks: Shape {
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.maxY)
         let outer = min(rect.width / 2, rect.height) - inset
@@ -76,18 +91,6 @@ private struct HalfTicks: Shape {
                 path.addLine(to: end)
             }
         }
-    }
-}
-
-private extension HalfTicks {
-    static func point(
-        from center: CGPoint,
-        at angle: Double,
-        radius: CGFloat
-    ) -> CGPoint {
-        let x = center.x + cos(angle) * radius
-        let y = center.y + sin(angle) * radius
-        return CGPoint(x: x, y: y)
     }
 }
 

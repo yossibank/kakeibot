@@ -21,7 +21,9 @@ struct SnapshotTests {
                 .background(Color(uiColor: .systemBackground))
                 .environment(\.colorScheme, scheme)
 
-            try Self.write(view, to: "recent-\(scheme == .dark ? "dark" : "light").png")
+            let suffix = scheme == .dark ? "dark" : "light"
+
+            try Self.write(view, to: "recent-\(suffix).png")
         }
     }
 }
@@ -37,27 +39,24 @@ private extension SnapshotTests {
 
         try database.insertDefaultsIfEmpty(at: now)
 
-        let bank = try await database.saveWallet(
-            WalletDraft(
-                kind: .bank,
-                name: "三井住友カード（NL）ゴールド",
-                mark: .glyph(.bank),
-                color: "#4A6FA5",
-                initialBalance: 100_000
-            ),
-            at: now
+        let bankDraft = WalletDraft(
+            kind: .bank,
+            name: "三井住友カード（NL）ゴールド",
+            mark: .glyph(.bank),
+            color: "#4A6FA5",
+            initialBalance: 100_000
         )
 
-        let pay = try await database.saveWallet(
-            WalletDraft(
-                kind: .cash,
-                name: "楽天銀行 普通預金",
-                mark: .glyph(.card),
-                color: "#E07A5F",
-                initialBalance: 0
-            ),
-            at: now
+        let payDraft = WalletDraft(
+            kind: .cash,
+            name: "楽天銀行 普通預金",
+            mark: .glyph(.card),
+            color: "#E07A5F",
+            initialBalance: 0
         )
+
+        let bank = try await database.saveWallet(bankDraft, at: now)
+        let pay = try await database.saveWallet(payDraft, at: now)
 
         let options = try await database.entryOptions()
 
@@ -78,7 +77,8 @@ private extension SnapshotTests {
                 fee: fee
             )
 
-            let createdAt = now.addingTimeInterval(TimeInterval(-index))
+            let offset = TimeInterval(-index)
+            let createdAt = now.addingTimeInterval(offset)
 
             try await database.saveEntry(draft, at: createdAt)
         }

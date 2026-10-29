@@ -10,7 +10,8 @@ struct WidgetTheme: ViewModifier {
     let style: ThemeStyle
 
     func body(content: Content) -> some View {
-        let palette = look.palette(isDark: colorScheme == .dark)
+        let isDark = colorScheme == .dark
+        let palette = look.palette(isDark: isDark)
 
         content
             .containerBackground(for: .widget) {

@@ -30,16 +30,20 @@ public struct FittedSheet<Content: View>: View {
         .scrollBounceBehavior(.basedOnSize)
         .defaultScrollAnchor(anchor)
         .background {
-            FittedDetent(height: max(contentHeight, 120))
+            let height = max(contentHeight, 120)
+
+            FittedDetent(height: height)
         }
         .presentationDragIndicator(.visible)
         .presentationBackground(Palette.panel)
     }
 }
 
-private struct FittedDetent: UIViewControllerRepresentable {
+private struct FittedDetent {
     let height: CGFloat
+}
 
+extension FittedDetent: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> FittedDetentController {
         FittedDetentController()
     }

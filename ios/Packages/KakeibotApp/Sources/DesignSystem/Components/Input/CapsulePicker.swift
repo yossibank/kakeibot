@@ -22,6 +22,8 @@ public struct CapsulePicker<Value: Hashable>: View {
     }
 
     public var body: some View {
+        let indexedOptions = Array(options.enumerated())
+
         ZStack(alignment: .leading) {
             Capsule()
                 .fill(Self.thumbFill)
@@ -34,10 +36,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                 .offset(x: thumbX)
 
             HStack(spacing: 0) {
-                ForEach(
-                    Array(options.enumerated()),
-                    id: \.offset
-                ) { index, option in
+                ForEach(indexedOptions, id: \.offset) { index, option in
                     let isHighlighted = index == highlightedIndex
                     let weight: Font.Weight = isHighlighted ? .bold : .regular
                     let color = isHighlighted ? Palette.accentStrong : Palette.subtext
@@ -45,10 +44,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                     Text(option.title)
                         .textFont(.footnote, weight: weight)
                         .foregroundStyle(color)
-                        .frame(
-                            width: segmentWidth,
-                            height: segmentHeight
-                        )
+                        .frame(width: segmentWidth, height: segmentHeight)
                 }
             }
         }
@@ -190,7 +186,8 @@ private extension CapsulePicker {
             }
             .onEnded { value in
                 let center = thumbOffset.map { $0 + segmentWidth / 2 }
-                let index = index(at: center ?? value.location.x - Self.inset)
+                let x = center ?? value.location.x - Self.inset
+                let index = index(at: x)
 
                 withAnimation(Self.spring) {
                     thumbOffset = nil

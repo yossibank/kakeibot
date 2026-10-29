@@ -18,8 +18,10 @@ public struct TagRows<ID: Hashable & Sendable>: View {
     }
 
     public var body: some View {
+        let indexedRows = Array(rows.enumerated())
+
         VStack(spacing: 0) {
-            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+            ForEach(indexedRows, id: \.offset) { _, row in
                 TagLine(row, selection: selection, onSelect: onSelect)
             }
         }

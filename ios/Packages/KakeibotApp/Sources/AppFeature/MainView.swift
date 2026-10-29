@@ -6,17 +6,18 @@ import Store
 import SwiftUI
 
 struct MainView: View {
-    @State private var tab: MainTab = .home
-    @State private var sheet: Sheet?
-    @State private var home: HomeModel
-    @State private var records: RecordsModel
+    @State var tab: MainTab = .home
+    @State var sheet: Sheet?
+    @State var home: HomeModel
+    @State var records: RecordsModel
+    @State var setup: SetupModel
+    @State var appIcon = AppIconListModel()
+    @State var draft: EntryModel
+    @State var notice: EntryNoticeModel
+    @State var undo: DeletionUndo
+
     @State private var review: ReviewModel
     @State private var assets: AssetsModel
-    @State private var setup: SetupModel
-    @State private var appIcon = AppIconListModel()
-    @State private var draft: EntryModel
-    @State private var notice: EntryNoticeModel
-    @State private var undo: DeletionUndo
     @State private var isWarmingEntry = true
     @State private var orderMenuAnchor: CGRect?
     @State private var observationRound = 0
@@ -24,11 +25,12 @@ struct MainView: View {
 
     @Environment(\.scenePhase) private var scenePhase
 
-    private let database: AppDatabase
-    private let today: LocalDate
-    private let route: PlannedNotification.Route?
+    let database: AppDatabase
+    let today: LocalDate
+    let route: PlannedNotification.Route?
+    let onRouteOpened: () -> Void
+
     private let isRevealed: Bool
-    private let onRouteOpened: () -> Void
     private let onLoad: () -> Void
 
     init(
@@ -321,132 +323,18 @@ struct MainView: View {
     }
 }
 
-private extension MainView {
-    @ViewBuilder
-    func sheetContent(for sheet: Sheet) -> some View {
-        switch sheet {
-        case .new:
-            EntrySheet(model: draft, onChange: notice.show)
-        case let .edit(id):
-            EntrySheet(
-                model: EntryModel(
-                    database: database,
-                    editing: id,
-                    date: today
-                ),
-                onChange: notice.show
-            )
-        case .settings:
-            SettingsSheet(
-                database: database,
-                today: today,
-                appIcon: appIcon
-            )
-        case let .template(template):
-            EntrySheet(
-                model: EntryModel(
-                    database: database,
-                    date: today,
-                    template: template
-                ),
-                onChange: notice.show
-            )
-        case .transfer:
-            EntrySheet(
-                model: EntryModel(
-                    database: database,
-                    date: today,
-                    type: .transfer
-                ),
-                onChange: notice.show
-            )
-        case .templates:
-            TemplateShelfSheet(
-                model: home,
-                database: database,
-                onUse: useTemplate
-            )
-        case .newTemplate:
-            TemplateEditSheet(
-                model: TemplateEditModel(
-                    database: database,
-                    type: home.templateType
-                )
-            )
-        case let .recurring(id):
-            RecurringEditSheet(
-                model: RecurringEditModel(
-                    database: database,
-                    today: today,
-                    editing: id
-                )
-            ) { deletion in
-                undo.deletion = deletion
-            }
-        case let .setup(item):
-            NavigationStack {
-                SetupDestination(
-                    item,
-                    database: database,
-                    today: today,
-                    appIcon: appIcon
-                )
-                .toolbar(.hidden, for: .navigationBar)
-                .environment(\.isSettingsSheetRoot, true)
-            }
-        case .reward:
-            RecordsRewardSheet(model: records, date: today)
-        case .periodRecurrings:
-            PeriodRecurringSheet(
-                model: home,
-                onOpenRecurring: { id in
-                    self.sheet = .recurring(id)
-                }
-            )
-        case let .wallet(id):
-            WalletEditSheet(
-                model: WalletEditModel(
-                    database: database,
-                    editing: id
-                )
-            ) { _ in
-            } onDelete: { deletion in
-                undo.deletion = deletion
-            }
-        }
-    }
-}
-
-private extension MainView {
+extension MainView {
     enum MainTab: Hashable {
         case home
         case records
         case review
         case assets
     }
+}
 
-    enum Sheet: Hashable, Identifiable {
-        case new
-        case edit(Entry.ID)
-        case settings
-        case template(EntryTemplate)
-        case newTemplate
-        case templates
-        case transfer
-        case wallet(Wallet.ID)
-        case recurring(Recurring.ID)
-        case periodRecurrings
-        case setup(SetupItem)
-        case reward
-
-        var id: Self {
-            self
-        }
-    }
-
+private extension MainView {
     static let noticeBottom = FloatingTabBar<Int>.height + 24
     static let warmupDuration: Duration = .milliseconds(500)
-    static let sheetCloseDuration: Duration = .milliseconds(600)
 
     static let tabItems: [FloatingTabBar<MainTab>.Item] = [
         .init("ホーム", systemImage: "house", value: .home),
@@ -467,137 +355,6 @@ private extension MainView {
             }
     }
 }
-
-private extension MainView {
-    var isLoaded: Bool {
-        let isHomeLoaded = home.list != nil || home.errorNotice.message != nil
-        let isSetupLoaded = setup.isLoaded || setup.errorNotice.message != nil
-
-        return isHomeLoaded && isSetupLoaded
-    }
-
-    var templateOrderBinding: Binding<TemplateOrder> {
-        Binding {
-            home.templateOrder
-        } set: { order in
-            Task {
-                await home.setTemplateOrder(order)
-            }
-        }
-    }
-
-    func openLaunchScreen() async {
-        let screen = await (try? database.setting(.launchScreen)) ?? .home
-
-        guard route == nil else {
-            return
-        }
-
-        #if DEBUG
-        if let launchSheet = Sheet.launchArgument {
-            sheet = launchSheet
-            return
-        }
-        #endif
-
-        switch screen {
-        case .home: tab = .home
-        case .records: tab = .records
-        case .review: tab = .review
-        case .assets: tab = .assets
-        case .entry: sheet = .new
-        }
-    }
-
-    func markOpened(_ sheet: Sheet?) async {
-        switch sheet {
-        case .new: await setup.markEntryOpened()
-        case .settings: await setup.markSettingsOpened()
-        default: break
-        }
-    }
-
-    func open(_ route: PlannedNotification.Route) {
-        onRouteOpened()
-
-        Task {
-            if sheet != nil {
-                sheet = nil
-                try? await Task.sleep(for: Self.sheetCloseDuration)
-            }
-
-            switch route {
-            case .home:
-                tab = .home
-            case let .entry(date):
-                tab = .home
-                draft.date = date
-                sheet = .new
-            case let .recurring(id):
-                sheet = .recurring(id)
-            case let .template(id):
-                tab = .home
-                sheet = await templateSheet(id)
-            }
-        }
-    }
-
-    func templateSheet(_ id: EntryTemplate.ID) async -> Sheet? {
-        let templates = await (try? database.templates()) ?? []
-
-        return templates
-            .first { $0.id == id }
-            .map { .template($0) }
-    }
-
-    func useTemplate(_ template: EntryTemplate) {
-        guard template.amount != nil else {
-            sheet = .template(template)
-            return
-        }
-
-        sheet = nil
-
-        Task {
-            if let change = await home.record(template) {
-                notice.show(change)
-            }
-        }
-    }
-
-    func prepareDraft() {
-        let model = EntryModel(database: database, date: today)
-
-        draft = model
-
-        Task {
-            await model.load()
-        }
-    }
-}
-
-#if DEBUG
-private extension MainView.Sheet {
-    static var launchArgument: Self? {
-        let arguments = ProcessInfo.processInfo.arguments
-
-        guard
-            let index = arguments.firstIndex(of: "-open"),
-            arguments.indices.contains(index + 1)
-        else {
-            return nil
-        }
-
-        let name = arguments[index + 1]
-
-        guard name != "settings" else {
-            return .settings
-        }
-
-        return SetupItem(rawValue: name).map { .setup($0) }
-    }
-}
-#endif
 
 private extension View {
     func tabContent() -> some View {

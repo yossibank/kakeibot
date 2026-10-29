@@ -22,6 +22,7 @@ extension BudgetWidgetSummary {
         weekStart: Weekday
     ) {
         let week = overview.today.week(startingOn: weekStart)
+        let weekExpense = overview.expense(in: week)
 
         let next = overview.nextRecurringExpense.map { item in
             let title = overview.list?.title(of: item.recurring) ?? "固定費"
@@ -38,22 +39,25 @@ extension BudgetWidgetSummary {
             monthExpense: overview.monthExpense,
             todayExpense: overview.todayExpense,
             yesterdayExpense: overview.yesterdayExpense,
-            weekExpense: overview.expense(in: week),
+            weekExpense: weekExpense,
             nextRecurring: next
         )
     }
 
     static func sample(on today: LocalDate) -> BudgetWidgetSummary {
+        let periodEnd = today.adding(days: 8)
+        let nextDate = today.adding(days: 3)
+
         let usage = BudgetUsage(
             budget: 90000,
             spent: 58000,
             today: today,
-            periodEnd: today.adding(days: 8)
+            periodEnd: periodEnd
         )
 
         let next = NextRecurring(
             title: "家賃",
-            date: today.adding(days: 3),
+            date: nextDate,
             amount: 80000
         )
 

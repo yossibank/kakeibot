@@ -18,11 +18,15 @@ public protocol NotificationCenterClient: Sendable {
     func requestAuthorization() async -> Bool
 }
 
-public struct LiveNotificationCenter: NotificationCenterClient {
-    public static let linkKey = "link"
-
+public struct LiveNotificationCenter {
     public init() {}
+}
 
+public extension LiveNotificationCenter {
+    static let linkKey = "link"
+}
+
+extension LiveNotificationCenter: NotificationCenterClient {
     public func pendingIdentifiers() async -> [String] {
         await UNUserNotificationCenter.current()
             .pendingNotificationRequests()
@@ -63,8 +67,7 @@ public struct LiveNotificationCenter: NotificationCenterClient {
     }
 
     public func authorization() async -> NotificationAuthorization {
-        let settings = await UNUserNotificationCenter.current()
-            .notificationSettings()
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
 
         switch settings.authorizationStatus {
         case .notDetermined: return .notDetermined

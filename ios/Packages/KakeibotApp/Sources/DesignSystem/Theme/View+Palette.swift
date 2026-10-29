@@ -10,9 +10,11 @@ public extension View {
     }
 }
 
-private struct PaletteScene: UIViewRepresentable {
+private struct PaletteScene {
     let look: ThemeLook
+}
 
+extension PaletteScene: UIViewRepresentable {
     func makeUIView(context: Context) -> PaletteSceneView {
         PaletteSceneView()
     }
@@ -40,7 +42,9 @@ private final class PaletteSceneView: UIView {
         observeStyle()
         apply()
     }
+}
 
+private extension PaletteSceneView {
     func apply() {
         guard let scene = window?.windowScene else {
             return

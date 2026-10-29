@@ -101,19 +101,12 @@ private extension PrimaryButton {
 
     var rim: LinearGradient {
         let colors = if isEnabled {
-            [
-                Palette.accentStrong.opacity(.strong),
-                Palette.accent.opacity(.soft)
-            ]
+            [Palette.accentStrong.opacity(.strong), Palette.accent.opacity(.soft)]
         } else {
             [Palette.accent.opacity(.muted), Palette.accent.opacity(.subtle)]
         }
 
-        return LinearGradient(
-            colors: colors,
-            startPoint: .top,
-            endPoint: .bottom
-        )
+        return LinearGradient(colors: colors, startPoint: .top, endPoint: .bottom)
     }
 
     var glow: Color {

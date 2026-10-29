@@ -66,10 +66,7 @@ private extension FlipDate {
             .frame(width: 3, height: 9)
             .overlay {
                 Capsule()
-                    .stroke(
-                        Palette.backgroundBottom.opacity(0.5),
-                        lineWidth: 0.5
-                    )
+                    .stroke(Palette.backgroundBottom.opacity(0.5), lineWidth: 0.5)
             }
     }
 }
