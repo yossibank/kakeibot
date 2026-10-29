@@ -38,14 +38,17 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        GeometryReader { proxy in
+        GeometryReader { _ in
             ZStack(alignment: .top) {
                 content
                     .ignoresSafeArea(.keyboard)
-
-                if isEditingMemo {
-                    memoLayer(height: proxy.size.height)
-                }
+                    .floatingInput(isPresented: isEditingMemo) {
+                        editMemo(false)
+                    } card: {
+                        EntryMemoCard(model: model, isFocused: $isMemoFocused) {
+                            editMemo(false)
+                        }
+                    }
 
                 if let categoryMenu {
                     categoryMenuLayer(categoryMenu)
@@ -265,29 +268,6 @@ private extension EntrySheet {
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
-    }
-
-    @ViewBuilder
-    func memoLayer(height: CGFloat) -> some View {
-        Palette.scrim
-            .opacity(0.35)
-            .ignoresSafeArea()
-            .onTapGesture {
-                editMemo(false)
-            }
-            .transition(.opacity)
-
-        VStack {
-            Spacer(minLength: 0)
-
-            EntryMemoCard(model: model, isFocused: $isMemoFocused) {
-                editMemo(false)
-            }
-            .padding(.horizontal, Self.memoCardInset)
-            .padding(.bottom, Self.memoCardInset)
-        }
-        .frame(height: height)
-        .transition(Self.memoTransition)
     }
 }
 

@@ -20,8 +20,6 @@ public struct CategoryListView: View {
     @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
 
-    @Environment(\.themeStyle.corner) private var corner
-
     private let database: AppDatabase
 
     public init(
@@ -54,6 +52,13 @@ public struct CategoryListView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    if model.shown.isEmpty {
+                        SettingsEmptyNote(
+                            systemImage: "tag",
+                            text: "カテゴリを足すと、ここに並びます"
+                        )
+                    }
+
                     board
 
                     if !model.hidden.isEmpty {
@@ -144,9 +149,11 @@ private extension CategoryListView {
                 movableTile(category)
             }
 
-            addTile
-                .frame(width: grid.itemWidth, height: Self.tileHeight)
-                .position(grid.center(at: model.shown.count))
+            AddTile {
+                destination = .new(model.kind)
+            }
+            .frame(width: grid.itemWidth, height: Self.tileHeight)
+            .position(grid.center(at: model.shown.count))
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
@@ -155,24 +162,6 @@ private extension CategoryListView {
         } action: { width in
             grid.width = width
         }
-    }
-
-    var addTile: some View {
-        Button {
-            destination = .new(model.kind)
-        } label: {
-            Image(systemName: "plus")
-                .sansFont(.headline, weight: .ultraLight)
-                .foregroundStyle(Palette.accent)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Palette.faint, in: tileShape)
-                .overlay {
-                    tileShape
-                        .stroke(Palette.outline, style: .dashed)
-                }
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 
     var hiddenSection: some View {
@@ -262,28 +251,11 @@ private extension CategoryListView {
         _ category: EntryCategory,
         isHidden: Bool
     ) -> some View {
-        let icon = model.icon(for: category)
-        let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.subtext
-        let opacity: Double = isHidden ? 0.6 : 1
-
-        return VStack(spacing: 8) {
-            IconImage(icon, size: 20)
-                .foregroundStyle(Palette.accent)
-
-            Text(category.name)
-                .textFont(size: .caption)
-                .foregroundStyle(Palette.text)
-                .sharedTextScale()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .bottom) {
-            Capsule()
-                .fill(color)
-                .frame(width: 24, height: 2)
-                .padding(.bottom, 8)
-        }
-        .settingsTileFace(isHidden: isHidden)
-        .opacity(opacity)
+        CategoryTileFace(
+            icon: model.icon(for: category),
+            name: category.name,
+            isHidden: isHidden
+        )
         .contentShape(.rect)
     }
 }
@@ -309,10 +281,6 @@ private extension CategoryListView {
         repeating: GridItem(.flexible(), spacing: spacing),
         count: columnCount
     )
-
-    var tileShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
 
     var boardHeight: CGFloat {
         grid.height(slots: model.shown.count + 1)

@@ -6,8 +6,6 @@ import SwiftUI
 public struct RewardRuleListView: View {
     @State var model: RewardRuleListModel
 
-    @Environment(\.themeStyle.corner) var corner
-
     @State private var drag = SettingsDrag<RewardRule.ID>()
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
@@ -46,6 +44,13 @@ public struct RewardRuleListView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    if model.shown.isEmpty {
+                        SettingsEmptyNote(
+                            systemImage: "gift",
+                            text: "ご褒美の決まりを足すと、ここに並びます"
+                        )
+                    }
+
                     board
 
                     if !model.hidden.isEmpty {
@@ -135,26 +140,9 @@ private extension RewardRuleListView {
                 movableTile(rule)
             }
 
-            Button {
+            AddTile {
                 destination = .new
-            } label: {
-                VStack(spacing: 8) {
-                    Image(systemName: "plus")
-                        .sansFont(.title, weight: .ultraLight)
-
-                    Text("決まりを追加")
-                        .textFont(.footnote)
-                }
-                .foregroundStyle(Palette.accent)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Palette.faint, in: tileShape)
-                .overlay {
-                    tileShape
-                        .stroke(Palette.outline, style: .dashed)
-                }
-                .contentShape(.rect)
             }
-            .buttonStyle(.plain)
             .frame(width: grid.itemWidth, height: Self.tileHeight)
             .position(grid.center(at: model.shown.count))
         }
@@ -216,6 +204,20 @@ private extension RewardRuleListView {
                     dropHidden()
                 }
             )
+    }
+
+    func tileFace(
+        _ rule: RewardRule,
+        isHidden: Bool
+    ) -> some View {
+        RewardRuleTile(
+            icon: model.icon(for: rule),
+            name: rule.name,
+            amount: rule.amount,
+            total: model.total(for: rule),
+            isHidden: isHidden
+        )
+        .contentShape(.rect)
     }
 
     @ViewBuilder

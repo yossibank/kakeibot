@@ -77,60 +77,29 @@ extension WalletEditSheet {
     }
 
     var preview: some View {
-        HStack(spacing: 16) {
+        WalletRowCard(
+            name: previewName,
+            kind: model.kind,
+            amount: model.initialBalance,
+            caption: "最初の残高"
+        ) {
             Button {
                 focus = nil
                 isEditingIcon = true
             } label: {
-                IconImage(model.icon.preview, size: 22)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 48, height: 48)
-                    .background(
-                        Palette.accent.opacity(.subtle),
-                        in: .rect(cornerRadius: corner.radius(16))
-                    )
-                    .overlay {
-                        RoundedRectangle(cornerRadius: corner.radius(16))
-                            .stroke(iconStroke, lineWidth: iconStrokeWidth)
-                    }
-                    .overlay(alignment: .bottomTrailing) {
-                        EditBadge()
-                            .offset(x: 4, y: 4)
-                    }
-                    .contentShape(.rect)
+                WalletRowIcon(
+                    icon: model.icon.preview,
+                    stroke: iconStroke,
+                    strokeWidth: iconStrokeWidth
+                )
+                .overlay(alignment: .bottomTrailing) {
+                    EditBadge()
+                        .offset(x: 4, y: 4)
+                }
+                .contentShape(.rect)
             }
             .buttonStyle(.plain)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(previewName)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                Text(model.kind.title)
-                    .textFont(.caption2)
-                    .tracking(1)
-                    .foregroundStyle(Palette.subtext)
-            }
-
-            Spacer(minLength: 8)
-
-            VStack(alignment: .trailing, spacing: 4) {
-                Text("最初の残高")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-
-                Text(AmountText.text(model.initialBalance))
-                    .displayFont(.headline)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-            }
         }
-        .padding(16)
-        .card(cornerRadius: 20)
     }
 
     var colorNote: some View {

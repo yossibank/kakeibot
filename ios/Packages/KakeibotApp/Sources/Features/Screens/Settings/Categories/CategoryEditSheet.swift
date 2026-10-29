@@ -48,10 +48,13 @@ public struct CategoryEditSheet: View {
             ZStack {
                 content
                     .ignoresSafeArea(keyboardRegions)
-
-                if let tagEdit {
-                    tagLayer(tagEdit)
-                }
+                    .floatingInput(isPresented: tagEdit != nil) {
+                        cancelTag()
+                    } card: {
+                        if let tagEdit {
+                            tagCard(tagEdit)
+                        }
+                    }
             }
         }
         .iconEditorDrawer(
@@ -195,24 +198,17 @@ private extension CategoryEditSheet {
                 focus = nil
                 isEditingIcon = true
             } label: {
-                VStack(spacing: 8) {
-                    IconImage(model.icon.preview, size: 24)
-                        .foregroundStyle(Palette.accent)
-
-                    Text(model.name.isEmpty ? "名前" : model.name)
-                        .textFont(size: .caption)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-                .foregroundStyle(Palette.accentStrong)
-                .frame(width: 86, height: 86)
-                .background(
-                    Palette.accent.opacity(.subtle),
-                    in: .rect(cornerRadius: corner.radius(20))
+                CategoryTileFace(
+                    icon: model.icon.preview,
+                    name: model.name.isEmpty ? "名前" : model.name,
+                    isHidden: false
                 )
+                .frame(width: 80, height: 78)
                 .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(20))
-                        .stroke(iconStroke, lineWidth: iconStrokeWidth)
+                    if isEditingIcon {
+                        RoundedRectangle(cornerRadius: corner.radius(16))
+                            .stroke(Palette.accent, lineWidth: 2)
+                    }
                 }
                 .overlay(alignment: .bottomTrailing) {
                     EditBadge()
@@ -270,16 +266,7 @@ private extension CategoryEditSheet {
         }
     }
 
-    @ViewBuilder
-    func tagLayer(_ edit: TagEdit) -> some View {
-        Palette.scrim
-            .opacity(0.45)
-            .ignoresSafeArea()
-            .onTapGesture {
-                cancelTag()
-            }
-            .transition(.opacity)
-
+    func tagCard(_ edit: TagEdit) -> some View {
         CategoryTagCard(
             name: $tagName,
             isFocused: $isTagFocused,
@@ -293,25 +280,11 @@ private extension CategoryEditSheet {
                 cancelTag()
             }
         )
-        .padding(.horizontal, 20)
-        .transition(Self.tagTransition)
     }
 }
 
 private extension CategoryEditSheet {
     static let fade: CGFloat = 16
-
-    static var tagTransition: AnyTransition {
-        .scale(scale: 0.95).combined(with: .opacity)
-    }
-
-    var iconStroke: Color {
-        isEditingIcon ? Palette.accent : Palette.outline
-    }
-
-    var iconStrokeWidth: CGFloat {
-        isEditingIcon ? 2 : 1
-    }
 
     var graphColor: Color {
         Color(hex: model.icon.color) ?? Palette.subtext

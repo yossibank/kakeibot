@@ -143,19 +143,25 @@ private extension RewardRuleEditSheet {
                         focus = nil
                         isEditingIcon = true
                     } label: {
-                        IconBadge(model.icon.preview, size: 86)
-                            .overlay {
-                                RoundedRectangle(
-                                    cornerRadius: corner.radius(86 * 0.3),
-                                    style: .continuous
-                                )
-                                .stroke(iconStroke, lineWidth: iconStrokeWidth)
+                        RewardRuleTile(
+                            icon: model.icon.preview,
+                            name: model.name.isEmpty ? "名前" : model.name,
+                            amount: model.amount ?? 0,
+                            total: nil,
+                            isHidden: false
+                        )
+                        .frame(width: 172, height: 156)
+                        .overlay {
+                            if isEditingIcon {
+                                RoundedRectangle(cornerRadius: corner.radius(16))
+                                    .stroke(Palette.accent, lineWidth: 2)
                             }
-                            .overlay(alignment: .bottomTrailing) {
-                                EditBadge()
-                                    .offset(x: 4, y: 4)
-                            }
-                            .contentShape(.rect)
+                        }
+                        .overlay(alignment: .bottomTrailing) {
+                            EditBadge()
+                                .offset(x: 4, y: 4)
+                        }
+                        .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
                     .onGeometryChange(for: CGFloat.self) { proxy in
@@ -234,14 +240,6 @@ private extension RewardRuleEditSheet {
     }
 
     static let fade: CGFloat = 16
-
-    var iconStroke: Color {
-        isEditingIcon ? Palette.accent : Palette.outline
-    }
-
-    var iconStrokeWidth: CGFloat {
-        isEditingIcon ? 2 : 1
-    }
 
     var amountValue: String {
         AmountText.text(model.amount ?? 0)

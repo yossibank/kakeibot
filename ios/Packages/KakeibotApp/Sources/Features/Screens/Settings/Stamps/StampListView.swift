@@ -19,8 +19,6 @@ public struct StampListView: View {
         spacing: Self.spacing
     )
 
-    @Environment(\.themeStyle.corner) private var corner
-
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
@@ -45,6 +43,13 @@ public struct StampListView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    if model.shown.isEmpty {
+                        SettingsEmptyNote(
+                            systemImage: "checkmark.seal",
+                            text: "スタンプを足すと、ここに並びます"
+                        )
+                    }
+
                     board
 
                     if !model.hidden.isEmpty {
@@ -134,21 +139,9 @@ private extension StampListView {
                 movableTile(shelfIcon)
             }
 
-            Button {
+            AddTile {
                 destination = .new
-            } label: {
-                Image(systemName: "plus")
-                    .sansFont(.headline, weight: .ultraLight)
-                    .foregroundStyle(Palette.accent)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Palette.faint, in: tileShape)
-                    .overlay {
-                        tileShape
-                            .stroke(Palette.outline, style: .dashed)
-                    }
-                    .contentShape(.rect)
             }
-            .buttonStyle(.plain)
             .frame(width: grid.itemWidth, height: Self.tileHeight)
             .position(grid.center(at: model.shown.count))
         }
@@ -248,12 +241,7 @@ private extension StampListView {
         _ shelfIcon: ShelfIcon,
         isHidden: Bool
     ) -> some View {
-        let opacity: Double = isHidden ? 0.6 : 1
-
-        return IconBadge(model.icon(for: shelfIcon), size: 44)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .settingsTileFace(isHidden: isHidden)
-            .opacity(opacity)
+        StampTileFace(icon: model.icon(for: shelfIcon), isHidden: isHidden)
             .contentShape(.rect)
     }
 }
@@ -274,10 +262,6 @@ private extension StampListView {
         repeating: GridItem(.flexible(), spacing: spacing),
         count: columnCount
     )
-
-    var tileShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
 
     var boardHeight: CGFloat {
         grid.height(slots: model.shown.count + 1)

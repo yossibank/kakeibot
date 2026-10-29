@@ -39,8 +39,14 @@ public struct TemplateEditSheet: View {
             ZStack(alignment: .bottom) {
                 content
                     .ignoresSafeArea(keyboardRegions)
+                    .floatingInput(isPresented: panel == .memo) {
+                        closePanel()
+                    } card: {
+                        memoCard
+                    }
 
-                if let panel {
+                if let panel,
+                   panel != .memo {
                     Palette.scrim
                         .opacity(0.35)
                         .ignoresSafeArea()
@@ -50,21 +56,13 @@ public struct TemplateEditSheet: View {
                         .transition(.opacity)
                         .zIndex(1)
 
-                    if panel == .memo {
-                        memoCard
-                            .padding(.horizontal, 16)
-                            .frame(maxHeight: .infinity)
-                            .transition(Self.memoTransition)
-                            .zIndex(1)
-                    } else {
-                        SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
-                            closePanel()
-                        } content: {
-                            drawerBody(panel)
-                        }
-                        .transition(.settingsDrawer)
-                        .zIndex(1)
+                    SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
+                        closePanel()
+                    } content: {
+                        drawerBody(panel)
                     }
+                    .transition(.settingsDrawer)
+                    .zIndex(1)
                 }
             }
             .overlay(alignment: .top) {
@@ -217,10 +215,6 @@ private extension TemplateEditSheet {
 
 private extension TemplateEditSheet {
     static let fade: CGFloat = 16
-
-    static var memoTransition: AnyTransition {
-        .scale(scale: 0.95).combined(with: .opacity)
-    }
 
     var title: String {
         let action = model.isEditing ? "編集" : "追加"

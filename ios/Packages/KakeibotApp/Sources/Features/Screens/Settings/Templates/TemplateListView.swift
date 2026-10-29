@@ -47,6 +47,13 @@ public struct TemplateListView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    if model.shown.isEmpty {
+                        SettingsEmptyNote(
+                            systemImage: "rectangle.stack",
+                            text: "よく使う入力を足すと、1 回で記録できます"
+                        )
+                    }
+
                     board
 
                     if !model.hidden.isEmpty {
