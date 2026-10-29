@@ -3,6 +3,7 @@ import Features
 import Foundation
 import Store
 import Testing
+import TestSupport
 
 extension AssetsModelTests {
     @Test

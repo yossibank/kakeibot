@@ -2,10 +2,10 @@ import Observation
 import Synchronization
 import Testing
 
-enum ObservationWait {}
+public enum ObservationWait {}
 
 @MainActor
-extension ObservationWait {
+public extension ObservationWait {
     static func until(
         timeout: Duration = .seconds(10),
         sourceLocation: SourceLocation = #_sourceLocation,

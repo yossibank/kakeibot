@@ -2,6 +2,7 @@ import Features
 import Foundation
 import Store
 import Testing
+import TestSupport
 
 @MainActor
 struct SyncModelTests {

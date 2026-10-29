@@ -4,6 +4,7 @@ import Foundation
 import Notifications
 import Store
 import Testing
+import TestSupport
 
 @MainActor
 struct AppModelTests {

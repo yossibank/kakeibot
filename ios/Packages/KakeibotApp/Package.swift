@@ -67,11 +67,16 @@ let package = Package(
                 .product(name: "Core", package: "KakeibotKit")
             ]
         ),
+        .target(
+            name: "TestSupport",
+            path: "Tests/TestSupport"
+        ),
         .testTarget(
             name: "AppFeatureTests",
             dependencies: [
                 "AppFeature",
                 "Notifications",
+                "TestSupport",
                 .product(name: "Store", package: "KakeibotKit")
             ]
         ),
@@ -94,6 +99,7 @@ let package = Package(
             name: "FeaturesTests",
             dependencies: [
                 "Features",
+                "TestSupport",
                 .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
