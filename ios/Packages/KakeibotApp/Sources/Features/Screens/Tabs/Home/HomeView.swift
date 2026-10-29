@@ -142,7 +142,7 @@ private extension HomeView {
 
             if model.isListFailed {
                 LoadFailedNotice(onRetry: onRetry)
-            } else if model.recentRows.isEmpty {
+            } else if model.showsNoRecords {
                 Text("まだ記録がありません。右下の ＋ から記録できます")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)

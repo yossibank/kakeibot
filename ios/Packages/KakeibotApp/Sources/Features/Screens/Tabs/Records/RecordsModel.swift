@@ -77,6 +77,10 @@ public extension RecordsModel {
         return filter.apply(to: days)
     }
 
+    var showsNoRecords: Bool {
+        list != nil && days.isEmpty
+    }
+
     var expenseTotal: Int {
         days.reduce(0) { $0 + $1.expenseTotal }
     }

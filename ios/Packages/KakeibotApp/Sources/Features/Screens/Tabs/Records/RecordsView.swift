@@ -214,7 +214,7 @@ private extension RecordsView {
 
         switch model.layout {
         case .list:
-            if model.days.isEmpty {
+            if model.showsNoRecords {
                 VStack(spacing: 16) {
                     Text("この月の記録はありません")
                         .textFont(.footnote)

@@ -44,7 +44,8 @@ extension RecordsView {
 
             if !upcoming.isEmpty {
                 upcomingList(upcoming, on: date)
-            } else if day == nil {
+            } else if day == nil,
+                      model.list != nil {
                 Text("この日の記録はありません")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)

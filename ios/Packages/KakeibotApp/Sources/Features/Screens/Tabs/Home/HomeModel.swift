@@ -90,6 +90,10 @@ public final class HomeModel: ScreenModel {
 public extension HomeModel {
     static let recentLimit = 5
 
+    var showsNoRecords: Bool {
+        list != nil && recentRows.isEmpty
+    }
+
     var recentRows: [EntryRowItem] {
         guard let list else {
             return []

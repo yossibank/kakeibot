@@ -7,6 +7,18 @@ import Testing
 @MainActor
 struct HomeModelTests {
     @Test
+    func showsNoRecordsOnlyAfterListArrives() async throws {
+        let setup = try await Setup()
+        let model = HomeModel(database: setup.database, today: setup.today)
+        let before = model.showsNoRecords
+
+        await model.load()
+
+        #expect(before == false)
+        #expect(model.showsNoRecords)
+    }
+
+    @Test
     func sumsMonthTodayAndYesterday() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
