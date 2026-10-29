@@ -50,7 +50,7 @@ public extension MonthStartDayModel {
             try await database.setSetting(.monthStartDay, to: startDay)
         } catch {
             self.startDay = previous
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }

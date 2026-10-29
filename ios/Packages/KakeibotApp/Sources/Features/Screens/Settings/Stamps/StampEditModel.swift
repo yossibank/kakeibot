@@ -84,7 +84,7 @@ public extension StampEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -105,7 +105,7 @@ public extension StampEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -118,7 +118,7 @@ public extension StampEditModel {
         do {
             return try await database.deleteShelfIcon(editingId)
         } catch {
-            errorNotice.show(Self.deleteFailedMessage)
+            errorNotice.show(Self.deleteFailedMessage, for: error)
             return nil
         }
     }

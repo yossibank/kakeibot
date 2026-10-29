@@ -84,7 +84,7 @@ public extension SettingsBoardModel {
             try await saveOrder(movingOrder)
             await reload()
         } catch {
-            errorNotice.show(Self.saveFailedText)
+            errorNotice.show(Self.saveFailedText, for: error)
         }
 
         self.movingOrder = nil
@@ -100,7 +100,7 @@ public extension SettingsBoardModel {
             return true
         } catch {
             let message = hideFailedMessage(for: error) ?? Self.hideFailedText
-            errorNotice.show(message)
+            errorNotice.show(message, for: error)
             return false
         }
     }
@@ -110,7 +110,7 @@ public extension SettingsBoardModel {
             try await saveHidden(id, isHidden: false)
             await reload()
         } catch {
-            errorNotice.show(Self.showFailedText)
+            errorNotice.show(Self.showFailedText, for: error)
         }
     }
 
@@ -123,7 +123,7 @@ public extension SettingsBoardModel {
             return deletion
         } catch {
             let message = deleteFailedMessage(for: error) ?? Self.deleteFailedText
-            errorNotice.show(message)
+            errorNotice.show(message, for: error)
             return nil
         }
     }
@@ -153,7 +153,7 @@ public extension SettingsBoardModel {
             try await restoreRemoved(deletion)
             await reload()
         } catch {
-            errorNotice.show(Self.restoreFailedText)
+            errorNotice.show(Self.restoreFailedText, for: error)
         }
     }
 }

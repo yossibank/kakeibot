@@ -44,7 +44,7 @@ public extension HomeSectionsModel {
             try await database.setSetting(.homeSections, to: layout.order)
             try await database.setSetting(.homeHiddenSections, to: layout.hidden)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }

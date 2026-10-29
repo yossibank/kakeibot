@@ -35,7 +35,7 @@ public extension LaunchScreenModel {
             try await database.setSetting(.launchScreen, to: screen)
         } catch {
             self.screen = previous
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }

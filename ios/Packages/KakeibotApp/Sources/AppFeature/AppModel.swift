@@ -344,7 +344,7 @@ private extension AppModel {
         do {
             try await database.generateRecurringEntries(through: today, at: Date())
         } catch {
-            notice.show(Self.recurringFailedMessage)
+            notice.show(Self.recurringFailedMessage, for: error)
         }
     }
 }

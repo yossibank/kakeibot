@@ -188,7 +188,7 @@ public extension HomeModel {
         do {
             try await database.setSetting(.templateOrder, to: order)
         } catch {
-            errorNotice.show(Self.orderSaveFailedMessage)
+            errorNotice.show(Self.orderSaveFailedMessage, for: error)
         }
     }
 
@@ -204,7 +204,7 @@ public extension HomeModel {
             try await database.setSetting(.homeSections, to: layout.order)
             try await database.setSetting(.homeHiddenSections, to: layout.hidden)
         } catch {
-            errorNotice.show(Self.layoutSaveFailedMessage)
+            errorNotice.show(Self.layoutSaveFailedMessage, for: error)
         }
     }
 
@@ -232,7 +232,7 @@ public extension HomeModel {
                 at: Date()
             )
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -253,7 +253,7 @@ public extension HomeModel {
                 clearedNoSpendDays: saved.clearedNoSpendDays
             )
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return nil
         }
     }

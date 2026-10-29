@@ -56,7 +56,7 @@ public extension RecordsModel {
         } catch AppDatabase.RewardRuleWriteError.shortOfBalance {
             errorNotice.show(Self.rewardShortOfBalanceMessage)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 

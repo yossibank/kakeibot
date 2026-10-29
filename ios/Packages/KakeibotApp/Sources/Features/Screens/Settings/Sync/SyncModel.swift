@@ -197,7 +197,7 @@ private extension SyncModel {
 
             isOn = try await database.isSyncEnabled()
         } catch {
-            errorNotice.show(failure)
+            errorNotice.show(failure, for: error)
         }
 
         isWorking = false

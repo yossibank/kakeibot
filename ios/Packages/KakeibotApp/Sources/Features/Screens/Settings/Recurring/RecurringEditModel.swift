@@ -232,7 +232,7 @@ public extension RecurringEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -245,7 +245,7 @@ public extension RecurringEditModel {
         do {
             return try await database.deleteRecurring(editingId, at: Date())
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return nil
         }
     }
@@ -267,7 +267,7 @@ public extension RecurringEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }

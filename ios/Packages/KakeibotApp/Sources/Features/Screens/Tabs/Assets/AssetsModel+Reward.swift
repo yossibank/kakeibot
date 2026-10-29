@@ -86,7 +86,7 @@ public extension AssetsModel {
 
             return true
         } catch {
-            errorNotice.show(Self.goalFailedMessage)
+            errorNotice.show(Self.goalFailedMessage, for: error)
             return false
         }
     }

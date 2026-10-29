@@ -24,7 +24,7 @@ public extension RecordsModel {
         do {
             try await database.stamp(icon.id, on: date, at: Date())
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -32,7 +32,7 @@ public extension RecordsModel {
         do {
             try await database.removeStamp(on: date)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -52,7 +52,7 @@ public extension RecordsModel {
                 try await database.markNoSpendDay(date, at: Date())
             }
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }

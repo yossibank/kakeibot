@@ -206,7 +206,7 @@ public extension RecordsModel {
         do {
             try await database.setSetting(.recordsLayout, to: layout)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -288,7 +288,7 @@ private extension RecordsModel {
         do {
             try await database.setSetting(.recentSearches, to: recentSearches)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 

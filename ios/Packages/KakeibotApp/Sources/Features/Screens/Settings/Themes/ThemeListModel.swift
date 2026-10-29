@@ -59,7 +59,7 @@ public extension ThemeListModel {
             try await database.setSetting(.theme, to: choice)
         } catch {
             current = previous
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
             return
         }
 
@@ -89,7 +89,7 @@ public extension ThemeListModel {
         do {
             try await database.restore(deletion)
         } catch {
-            errorNotice.show(Self.restoreFailedMessage)
+            errorNotice.show(Self.restoreFailedMessage, for: error)
         }
 
         await load()

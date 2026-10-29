@@ -137,7 +137,7 @@ public extension ReminderModel {
         do {
             try await database.setSetting(.reminderTime, to: time)
         } catch {
-            errorNotice.show(Self.saveFailedMessage)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
 
         guard time != nil else {
