@@ -29,6 +29,15 @@ public extension AppDatabase {
             .removeDuplicates()
             .values(in: writer)
     }
+
+    func joinedShareUpdates() -> some AsyncSequence<[JoinedShare], any Error> {
+        ValueObservation
+            .tracking { db in
+                try Self.joinedShares(in: db)
+            }
+            .removeDuplicates()
+            .values(in: writer)
+    }
 }
 
 extension AppDatabase {
@@ -73,6 +82,32 @@ private extension AppDatabase {
 
         return zip(wallets, rows).map { wallet, row in
             WalletShare(wallet: wallet, icon: iconsByID[wallet.iconId], isShared: row["is_shared"])
+        }
+    }
+
+    static func joinedShares(in db: Database) throws -> [JoinedShare] {
+        let rows = try Row.fetchAll(
+            db,
+            sql: """
+            SELECT wallet.*, sync_share.owner_name AS share_owner FROM wallet
+            JOIN sync_share ON sync_share.wallet_id = wallet.id
+            WHERE sync_share.owner_name IS NOT NULL
+            ORDER BY wallet.sort_order, wallet.created_at
+            """
+        )
+
+        let wallets = try rows.map { try Wallet(row: $0) }
+        let iconIds = wallets.map(\.iconId)
+        let icons = try Icon.fetchAll(db, keys: iconIds)
+        let iconPairs = icons.map { ($0.id, $0) }
+        let iconsByID = Dictionary(uniqueKeysWithValues: iconPairs)
+
+        return zip(wallets, rows).map { wallet, row in
+            JoinedShare(
+                wallet: wallet,
+                icon: iconsByID[wallet.iconId],
+                ownerName: row["share_owner"]
+            )
         }
     }
 

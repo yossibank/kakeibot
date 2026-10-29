@@ -357,4 +357,23 @@ struct SyncShareTests {
         #expect(hidden.map(\.wallet.id.description).contains(walletID) == false)
         #expect(sharing.map(\.wallet.id.description).contains(walletID))
     }
+
+    @Test
+    func listsJoinedWalletsWithOwner() async throws {
+        let setup = try await SyncTests.Setup(enabled: false)
+        let own = try await setup.walletID()
+        let joined = try await setup.otherWalletID()
+
+        try await setup.execute("INSERT INTO sync_share (wallet_id) VALUES ('\(own)')")
+
+        try await setup.execute("""
+        INSERT INTO sync_share (wallet_id, owner_name) VALUES ('\(joined)', '_owner')
+        """)
+
+        let shares = try await setup.joinedShares()
+
+        #expect(shares.map(\.wallet.id.description) == [joined])
+        #expect(shares.first?.ownerName == "_owner")
+        #expect(shares.first?.icon != nil)
+    }
 }

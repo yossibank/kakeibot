@@ -14,6 +14,7 @@ public final class SyncModel {
     public private(set) var stopReason: SyncStopReason?
     public private(set) var sendProblem: SyncSendProblem?
     public private(set) var shares: [WalletShare] = []
+    public private(set) var joined: [JoinedShare] = []
 
     public internal(set) var isChoosing = false
     public internal(set) var errorNotice = ErrorNotice()
@@ -132,6 +133,25 @@ public extension SyncModel {
         }
     }
 
+    func observeJoined() async {
+        do {
+            for try await joined in database.joinedShareUpdates() {
+                self.joined = joined
+            }
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
+    }
+
+    func leave(_ item: JoinedShare) async {
+        let id = item.wallet.id
+
+        await work(failure: Self.leaveFailedMessage) {
+            try await cloud.leaveShare(id, item.ownerName)
+            try await database.endSharing(id)
+        }
+    }
+
     func share(_ item: WalletShare) async {
         let id = item.wallet.id
         let name = item.wallet.name
@@ -155,6 +175,7 @@ private extension SyncModel {
     static let saveFailedMessage = "同期を切り替えられませんでした。時間をおいて試してください"
     static let shareFailedMessage = "共有を開けませんでした。時間をおいて試してください"
     static let stopFailedMessage = "共有をやめられませんでした。時間をおいて試してください"
+    static let leaveFailedMessage = "共有から抜けられませんでした。時間をおいて試してください"
 
     func stopSharing(_ id: Wallet.ID) async {
         await work(failure: Self.stopFailedMessage) {

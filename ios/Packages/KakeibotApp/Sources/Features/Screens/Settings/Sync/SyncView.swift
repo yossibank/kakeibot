@@ -4,6 +4,7 @@ import SwiftUI
 
 public struct SyncView: View {
     @State private var model: SyncModel
+    @State private var leaving: JoinedShare?
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -108,6 +109,37 @@ public struct SyncView: View {
                         }
                     }
 
+                    if !model.joined.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            SectionTitle("誘われた口座")
+                                .padding(.leading, 8)
+
+                            VStack(spacing: 0) {
+                                ForEach(model.joined, id: \.wallet.id) { item in
+                                    if item.wallet.id != model.joined.first?.wallet.id {
+                                        Hairline()
+                                    }
+
+                                    Button {
+                                        leaving = item
+                                    } label: {
+                                        joinedRow(item)
+                                    }
+                                }
+                            }
+                            .sharesTextScale(id: model.joined.map(\.wallet.name))
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 16)
+                            .card()
+                            .disabled(model.isWorking || !model.isAvailable)
+
+                            Text("抜けると、この iPhone からその口座と記録が消えます")
+                                .textFont(.footnote)
+                                .foregroundStyle(Palette.subtext)
+                                .padding(.leading, 8)
+                        }
+                    }
+
                     if model.isWorking {
                         ProgressView()
                             .frame(maxWidth: .infinity)
@@ -148,6 +180,19 @@ public struct SyncView: View {
         }
         .task {
             await model.observeShares()
+        }
+        .task {
+            await model.observeJoined()
+        }
+        .confirmation(
+            isPresented: isLeavingBinding,
+            systemImage: "person.crop.circle.badge.minus",
+            title: "共有から抜けますか",
+            message: "この iPhone から口座と記録が消えます。自分の口座との振替は、支出と収入にして残します",
+            keepTitle: "やめる",
+            confirmTitle: "抜ける"
+        ) {
+            leave()
         }
         .confirmation(
             isPresented: $model.isChoosing,
@@ -201,6 +246,25 @@ private extension SyncView {
         .padding(.leading, 8)
     }
 
+    func joinedRow(_ item: JoinedShare) -> some View {
+        HStack(spacing: 12) {
+            IconBadge(item.icon, size: 32)
+
+            Text(item.wallet.name)
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+                .sharedTextScale()
+
+            Spacer(minLength: 0)
+
+            Text("抜ける")
+                .textFont(.footnote)
+                .foregroundStyle(Palette.rose)
+        }
+        .frame(minHeight: 58)
+        .contentShape(.rect)
+    }
+
     func shareRow(_ item: WalletShare) -> some View {
         HStack(spacing: 12) {
             IconBadge(item.icon, size: 32)
@@ -235,6 +299,16 @@ private extension SyncView {
         model.isOn || model.isAvailable
     }
 
+    var isLeavingBinding: Binding<Bool> {
+        Binding {
+            leaving != nil
+        } set: { isPresented in
+            if !isPresented {
+                leaving = nil
+            }
+        }
+    }
+
     var onBinding: Binding<Bool> {
         Binding {
             model.isOn
@@ -242,6 +316,18 @@ private extension SyncView {
             Task {
                 await model.setOn(isOn)
             }
+        }
+    }
+
+    func leave() {
+        guard let leaving else {
+            return
+        }
+
+        self.leaving = nil
+
+        Task {
+            await model.leave(leaving)
         }
     }
 

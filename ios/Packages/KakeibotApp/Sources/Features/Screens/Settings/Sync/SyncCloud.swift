@@ -8,6 +8,7 @@ public struct SyncCloud: Sendable {
     public let createShare: CreateShare
     public let showShare: ShowShare
     public let deleteShare: DeleteShare
+    public let leaveShare: LeaveShare
 
     public init(
         account: @escaping Account,
@@ -15,7 +16,8 @@ public struct SyncCloud: Sendable {
         deleteData: @escaping Delete,
         createShare: @escaping CreateShare,
         showShare: @escaping ShowShare,
-        deleteShare: @escaping DeleteShare
+        deleteShare: @escaping DeleteShare,
+        leaveShare: @escaping LeaveShare
     ) {
         self.account = account
         self.hasData = hasData
@@ -23,6 +25,7 @@ public struct SyncCloud: Sendable {
         self.createShare = createShare
         self.showShare = showShare
         self.deleteShare = deleteShare
+        self.leaveShare = leaveShare
     }
 }
 
@@ -34,6 +37,7 @@ public extension SyncCloud {
     typealias Stop = @MainActor () async -> Void
     typealias ShowShare = @MainActor (Wallet.ID, String, @escaping Stop) async throws -> Void
     typealias DeleteShare = @Sendable (Wallet.ID) async throws -> Void
+    typealias LeaveShare = @Sendable (Wallet.ID, String) async throws -> Void
 
     static let unavailable = Self(
         account: {
@@ -45,7 +49,8 @@ public extension SyncCloud {
         deleteData: {},
         createShare: { _, _ in },
         showShare: { _, _, _ in },
-        deleteShare: { _ in }
+        deleteShare: { _ in },
+        leaveShare: { _, _ in }
     )
 }
 

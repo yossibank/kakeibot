@@ -193,6 +193,9 @@ extension SyncCloud {
     } deleteShare: { walletID in
         let zoneName = SyncZone.wallet(walletID)
         try await SyncEngine.deleteShare(zoneName: zoneName)
+    } leaveShare: { walletID, ownerName in
+        let zoneName = SyncZone.wallet(walletID)
+        try await SyncEngine.leaveShare(zoneName: zoneName, ownerName: ownerName)
     }
 }
 

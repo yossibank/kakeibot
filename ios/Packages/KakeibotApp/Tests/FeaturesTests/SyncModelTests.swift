@@ -279,19 +279,22 @@ extension SyncModelTests {
         private let stopsInSheet: Bool
         private let failsToCreate: Bool
         private let failsToDelete: Bool
+        private let failsToLeave: Bool
 
         init(
             account: SyncAccount = .available,
             hasData: Bool,
             stopsInSheet: Bool = false,
             failsToCreate: Bool = false,
-            failsToDelete: Bool = false
+            failsToDelete: Bool = false,
+            failsToLeave: Bool = false
         ) {
             self.account = account
             self.hasData = hasData
             self.stopsInSheet = stopsInSheet
             self.failsToCreate = failsToCreate
             self.failsToDelete = failsToDelete
+            self.failsToLeave = failsToLeave
         }
     }
 }
@@ -314,6 +317,8 @@ extension SyncModelTests.FakeCloud {
             }
         } deleteShare: { _ in
             try await self.deleteShare()
+        } leaveShare: { _, owner in
+            try await self.leaveShare(owner)
         }
     }
 
@@ -333,6 +338,14 @@ extension SyncModelTests.FakeCloud {
         shareCalls.append("delete")
 
         if failsToDelete {
+            throw CancellationError()
+        }
+    }
+
+    func leaveShare(_ owner: String) throws {
+        shareCalls.append("leave \(owner)")
+
+        if failsToLeave {
             throw CancellationError()
         }
     }

@@ -20,3 +20,4 @@
 | ごほうび貯金箱 | 貯金箱 | `RewardBank`・`RewardBalance` | 達成で貯めた合計から、買った目標の額を引いた残り |
 | iCloud 同期 | 端末間の同期 | `SyncModel`・`SyncEngine` | 自分の iCloud で、記録と設定を端末どうしでそろえること |
 | 家族と共有する口座 | 家族との共有 | `WalletShare`・`SyncShareSheet` | 口座ごとに、ほかの iCloud の人と記録を分けあうこと |
+| 誘われた口座 | 誘われた共有の財布 | `JoinedShare` | ほかの iCloud の人に誘われて入った共有の口座。同期の画面から抜けられる |

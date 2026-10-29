@@ -35,6 +35,14 @@ extension SyncTests.Setup {
         return []
     }
 
+    func joinedShares() async throws -> [JoinedShare] {
+        for try await shares in database.joinedShareUpdates() {
+            return shares
+        }
+
+        return []
+    }
+
     func zone(
         _ table: SyncTable,
         _ id: String
