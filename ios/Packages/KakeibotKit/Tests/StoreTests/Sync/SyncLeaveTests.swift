@@ -115,6 +115,31 @@ struct SyncLeaveTests {
         #expect(try await setup.count("entry") == 0)
         #expect(try await setup.pendingKeys() == [])
     }
+
+    @Test
+    func endsOwnSharesWhenAccountChanges() async throws {
+        let setup = try await SyncTests.Setup()
+        let walletID = try await setup.walletID()
+        let otherID = try await setup.otherWalletID()
+        let id = try #require(Wallet.ID(walletID))
+        let key = SyncKey(table: .wallet, id: walletID)
+
+        try await setup.database.startSharing(id)
+        try await setup.database
+            .saveSyncSystemFields([key.recordID(in: SyncZone.wallet(id)): Data([1])])
+        try await setup.joinForeignShare(of: otherID)
+
+        try await setup.database.turnOffSyncForAccountChange()
+
+        let owners = try await setup
+            .value("SELECT group_concat(IFNULL(owner_name, 'self')) FROM sync_share")
+        let zones = try await setup.count("sync_record WHERE zone_name = '\(SyncZone.wallet(id))'")
+
+        #expect(owners == "owner")
+        #expect(zones == 0)
+        #expect(try await setup.pendingKeys().filter { $0.id == walletID }.isEmpty)
+        #expect(try await setup.database.isSyncEnabled() == false)
+    }
 }
 
 private extension SyncTests.Setup {

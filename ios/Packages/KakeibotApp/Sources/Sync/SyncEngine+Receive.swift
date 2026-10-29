@@ -12,7 +12,7 @@ extension SyncEngine {
 
             try? await database.queueAllForSync()
         case .signOut, .switchAccounts:
-            await isShared ? leaveShares() : turnOff()
+            await isShared ? leaveShares() : leaveAccount()
         @unknown default:
             break
         }
@@ -79,6 +79,12 @@ extension SyncEngine {
 }
 
 private extension SyncEngine {
+    func leaveAccount() async {
+        try? await database.turnOffSyncForAccountChange()
+        isSyncEnabled = false
+        await restart()
+    }
+
     func leaveShares() async {
         let owners = await (try? database.syncShareOwners()) ?? [:]
 

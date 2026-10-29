@@ -20,6 +20,29 @@ struct DefaultsTests {
     }
 
     @Test
+    func waitsForFirstFetchAfterUsingCloudData() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        try database.insertShelfIfEmpty(at: now)
+        try await database.turnOnSyncReplacingLocal()
+
+        try database.insertDefaultsIfEmpty(at: now)
+        try database.insertShelfIfEmpty(at: now)
+        let waiting = try database.snapshot()
+
+        try await database.saveSyncEngineState(Data([1]), isShared: false)
+        try database.insertDefaultsIfEmpty(at: now)
+        try database.insertShelfIfEmpty(at: now)
+        let fetched = try database.snapshot()
+
+        #expect(waiting.wallets.isEmpty)
+        #expect(waiting.shelfIcons.isEmpty)
+        #expect(fetched.wallets.count == 2)
+        #expect(!fetched.shelfIcons.isEmpty)
+    }
+
+    @Test
     func addsStarterTemplatesOnlyWhenEmpty() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)

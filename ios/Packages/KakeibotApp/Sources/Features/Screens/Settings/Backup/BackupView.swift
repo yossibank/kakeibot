@@ -30,10 +30,10 @@ public struct BackupView: View {
                             "機種変更の前に書き出すと、新しい端末で戻せます"
                         )
 
-                        if model.isSyncOn {
+                        if model.isSyncActive {
                             note(
                                 "icloud",
-                                "iCloud 同期を切ると、読み込めます"
+                                "iCloud の同期と共有をやめると、読み込めます"
                             )
                         }
                     }
@@ -64,7 +64,7 @@ public struct BackupView: View {
                             )
                         }
 
-                        if !model.isSyncOn {
+                        if !model.isSyncActive {
                             Hairline()
 
                             Button {

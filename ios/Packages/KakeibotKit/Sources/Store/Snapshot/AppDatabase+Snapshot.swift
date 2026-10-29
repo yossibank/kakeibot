@@ -3,6 +3,10 @@ import Foundation
 import GRDB
 
 public extension AppDatabase {
+    enum RestoreError: Error, Equatable {
+        case sharing
+    }
+
     func snapshot() throws -> ExportV1.Tables {
         try writer.read { db in
             try ExportV1.Tables(fetchingFrom: db)
@@ -35,6 +39,12 @@ public extension AppDatabase {
         stash: @Sendable (Data) throws -> Void
     ) async throws {
         try await writer.write { db in
+            let isSharing = try Bool.fetchOne(db, sql: "SELECT EXISTS (SELECT 1 FROM sync_share)")
+
+            guard isSharing != true else {
+                throw RestoreError.sharing
+            }
+
             let tables = try ExportV1.Tables(fetchingFrom: db)
             let current = ExportV1(exportedAt: date, app: app, data: tables)
             let json = try current.json()

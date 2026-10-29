@@ -6,6 +6,7 @@ public extension AppDatabase {
     func insertDefaultsIfEmpty(at now: Date) throws {
         try writer.write { db in
             guard
+                try !Self.isAwaitingFirstFetch(in: db),
                 try Wallet.fetchCount(db) == 0,
                 try EntryCategory.filter(Column("wallet_id") == nil).fetchCount(db) == 0
             else {
@@ -18,7 +19,10 @@ public extension AppDatabase {
 
     func insertShelfIfEmpty(at now: Date) throws {
         try writer.write { db in
-            guard try ShelfIcon.fetchCount(db) == 0 else {
+            guard
+                try !Self.isAwaitingFirstFetch(in: db),
+                try ShelfIcon.fetchCount(db) == 0
+            else {
                 return
             }
 
@@ -164,6 +168,13 @@ private extension AppDatabase {
         (.sun, "#F4A261"),
         (.moon, "#577590")
     ]
+
+    static func isAwaitingFirstFetch(in db: Database) throws -> Bool {
+        try Bool.fetchOne(
+            db,
+            sql: "SELECT enabled AND engine_state IS NULL FROM sync_state"
+        ) ?? false
+    }
 
     static func categoryId(
         for key: SettingKey<EntryCategory.ID?>,

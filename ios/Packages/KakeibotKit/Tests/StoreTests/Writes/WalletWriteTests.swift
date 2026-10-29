@@ -140,6 +140,20 @@ struct WalletWriteTests {
     }
 
     @Test
+    func deletesWalletIconWithWallet() async throws {
+        let setup = try await Setup()
+        let wallet = try await setup.database.saveWallet(setup.draft, at: setup.now)
+
+        let deletion = try await setup.database.deleteWallet(wallet.id, at: setup.now)
+        let deleted = try setup.database.snapshot().icons.map(\.id)
+        try await setup.database.restore(deletion)
+        let restored = try setup.database.snapshot().icons.map(\.id)
+
+        #expect(!deleted.contains(wallet.iconId))
+        #expect(restored.contains(wallet.iconId))
+    }
+
+    @Test
     func restoresMergedDeletions() async throws {
         let setup = try await Setup()
         let first = try await setup.database.saveWallet(setup.draft, at: setup.now)

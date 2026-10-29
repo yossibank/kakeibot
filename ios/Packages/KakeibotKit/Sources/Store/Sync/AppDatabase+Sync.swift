@@ -91,6 +91,22 @@ public extension AppDatabase {
         }
     }
 
+    func turnOffSyncForAccountChange() async throws {
+        try await writer.write { db in
+            try db.execute(
+                sql: """
+                DELETE FROM sync_record WHERE zone_name IN (
+                    SELECT \(SyncZone.walletZoneSQL) FROM sync_share WHERE owner_name IS NULL
+                )
+                """
+            )
+
+            try db.execute(sql: "DELETE FROM sync_share WHERE owner_name IS NULL")
+            try db.execute(sql: "UPDATE sync_state SET enabled = 0")
+            try Self.clearOwnSync(in: db)
+        }
+    }
+
     func syncSaveZone(for key: SyncKey) async throws -> String {
         try await writer.read { db in
             try Self.saveZone(for: key, in: db)
@@ -250,6 +266,21 @@ private extension AppDatabase {
     SELECT \(SyncZone.walletZoneSQL) FROM sync_share WHERE owner_name IS NOT NULL
     """
 
+    static let removeOwnWaitingSQL = """
+    DELETE FROM sync_waiting
+    WHERE NOT EXISTS (
+        SELECT 1 FROM sync_share WHERE sync_waiting.fields LIKE '%' || sync_share.wallet_id || '%'
+    ) AND NOT EXISTS (
+        SELECT 1 FROM category JOIN sync_share ON sync_share.wallet_id = category.wallet_id
+        WHERE sync_waiting.fields LIKE '%' || category.id || '%'
+    ) AND NOT EXISTS (
+        SELECT 1 FROM sync_record
+        WHERE sync_record.table_name = sync_waiting.table_name
+            AND sync_record.record_id = sync_waiting.record_id
+            AND sync_record.zone_name <> '\(SyncZone.own)'
+    )
+    """
+
     static var syncChangeRegions: [Table<Row>] {
         let names = SyncTable.allCases.map(\.rawValue) + ["sync_change"]
         return names.map { Table($0) }
@@ -311,7 +342,7 @@ private extension AppDatabase {
             arguments: [SyncZone.own]
         )
 
-        try db.execute(sql: "DELETE FROM sync_waiting")
+        try db.execute(sql: removeOwnWaitingSQL)
         try db.notifyChanges(in: Table("sync_change"))
     }
 

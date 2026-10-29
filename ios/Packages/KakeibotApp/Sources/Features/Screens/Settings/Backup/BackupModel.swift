@@ -11,7 +11,7 @@ public final class BackupModel {
     public private(set) var pending: ExportV1?
     public private(set) var doneMessage: String?
     public private(set) var isWorking = false
-    public private(set) var isSyncOn = false
+    public private(set) var isSyncActive = false
     public private(set) var previous: [Previous] = []
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -64,7 +64,13 @@ public extension BackupModel {
     }
 
     func loadSync() async {
-        isSyncOn = await (try? database.isSyncEnabled()) ?? false
+        do {
+            for try await activity in database.syncActivityUpdates() {
+                isSyncActive = activity.isActive
+            }
+        } catch {
+            isSyncActive = false
+        }
     }
 
     func loadPrevious() async {

@@ -1,3 +1,4 @@
+import Core
 import Foundation
 import GRDB
 
@@ -12,7 +13,16 @@ public extension AppDatabase {
             let joinedIDs = Array(systemFields.keys)
             let sharedKeys = Self.sharedKeys(in: systemFields)
 
+            let waitingIDs = try String.fetchAll(
+                db,
+                sql: "SELECT record_id FROM sync_waiting WHERE table_name = 'entry'"
+            )
+
+            let entryIDs = (saved.map(\.key) + deleted.map(\.key)).filter { $0.table == .entry }
+                .map(\.id) + waitingIDs
+
             var blocked: [SyncKey] = []
+            var cardBills = try CardBillChange(before: Self.cardEntries(entryIDs, in: db))
 
             try Self.setApplying(true, in: db)
 
@@ -42,7 +52,11 @@ public extension AppDatabase {
             }
 
             try Self.retryWaiting(in: db)
+
+            cardBills.after = try Self.cardEntries(entryIDs, in: db)
+
             try Self.setApplying(false, in: db)
+            try Self.recalculateCardBills(cardBills, in: db, at: Date())
         }
     }
 
@@ -81,6 +95,22 @@ private extension AppDatabase {
         case applied
         case skipped
         case blocked
+    }
+
+    static func cardEntries(
+        _ ids: [String],
+        in db: Database
+    ) throws -> [Entry] {
+        guard !ids.isEmpty else {
+            return []
+        }
+
+        return try Entry
+            .filter(ids.contains(Column("id")))
+            .filter(
+                sql: "wallet_id IN (SELECT to_wallet_id FROM recurring WHERE closing_day IS NOT NULL)"
+            )
+            .fetchAll(db)
     }
 
     static func parentsFirst(_ records: [SyncRecord]) -> [SyncRecord] {

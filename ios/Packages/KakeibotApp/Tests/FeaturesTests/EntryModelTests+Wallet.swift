@@ -99,4 +99,27 @@ extension EntryModelTests {
 
         #expect(model.walletId == wallets[1].id)
     }
+
+    @Test
+    func offersSharedCategoriesForSharedWallet() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let shared = options.wallets[1]
+        try await setup.database.startSharing(shared.id)
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        let own = model.selectedCategory
+
+        model.walletId = shared.id
+        let sharedCategory = model.selectedCategory
+        let walletIDs = Set(model.categories.map(\.walletId))
+
+        model.walletId = options.wallets[0].id
+        let back = model.selectedCategory
+
+        #expect(sharedCategory?.name == own?.name)
+        #expect(sharedCategory?.walletId == shared.id)
+        #expect(walletIDs == [shared.id])
+        #expect(back == own)
+    }
 }
