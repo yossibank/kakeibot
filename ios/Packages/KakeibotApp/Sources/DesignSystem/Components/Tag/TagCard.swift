@@ -23,6 +23,7 @@ public struct TagCard: View {
         Text(title)
             .modifier(TagFont(size: size.fontSize))
             .foregroundStyle(foreground)
+            .minimumScaleFactor(TextScale.floor)
             .sharedTextScale()
             .padding(.top, size.holeSpace)
             .padding(.horizontal, size.padding)
