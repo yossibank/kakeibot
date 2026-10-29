@@ -145,4 +145,29 @@ extension WalletEditModelTests {
         #expect(model.valuations.map(\.id) == [id])
         #expect(model.balance == 9)
     }
+
+    @Test
+    func offersNoUndoWhenValuationIsAlreadyGone() async throws {
+        let setup = try await Setup()
+        let adding = WalletEditModel(database: setup.database)
+        adding.name = "つみたて"
+        adding.kind = .investment
+        adding.press(.digit(5))
+        adding.press(.doubleZero)
+        let saved = try #require(await adding.save())
+
+        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        await model.load()
+        model.startValuation()
+        model.pressValuation(.digit(9))
+        _ = await model.saveValuation()
+        let id = try #require(model.valuations.first?.id)
+        _ = try await setup.database.deleteValuation(id)
+
+        let deletion = await model.deleteValuation(id)
+
+        #expect(deletion == nil)
+        #expect(model.errorNotice.message == nil)
+        #expect(model.valuations.isEmpty)
+    }
 }
