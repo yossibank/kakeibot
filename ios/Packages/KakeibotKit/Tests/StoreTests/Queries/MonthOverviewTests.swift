@@ -47,6 +47,39 @@ struct MonthOverviewTests {
     }
 
     @Test
+    func publishesSameOverviewAsOneRead() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        let options = try await database.entryOptions()
+        let today = try #require(LocalDate("2026-10-23"))
+        let month = try #require(YearMonth("2026-10"))
+
+        let draft = EntryDraft(
+            type: .expense,
+            amount: 1200,
+            date: today,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id
+        )
+
+        try await database.saveEntry(draft, at: now)
+        try await database.setBudget(50000, for: nil, from: month)
+
+        var updates = database.monthOverviewUpdates(on: today).makeAsyncIterator()
+        let first = try await updates.next()
+        let read = try await database.monthOverview(on: today)
+
+        #expect(first == read)
+        #expect(first?.budgetUsage?.remaining == 48800)
+
+        try await database.setBudget(60000, for: nil, from: month)
+        let next = try await updates.next()
+
+        #expect(next?.budgetUsage?.remaining == 58800)
+    }
+
+    @Test
     func treatsUngeneratedRecurringOfTodayAsUpcoming() throws {
         let today = try #require(LocalDate("2026-10-23"))
         let yesterday = today.adding(days: -1)

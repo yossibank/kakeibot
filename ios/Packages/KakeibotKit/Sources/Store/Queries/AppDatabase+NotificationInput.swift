@@ -5,71 +5,61 @@ public extension AppDatabase {
     func notificationInputUpdates(
         from start: LocalDate
     ) -> some AsyncSequence<NotificationInput, any Error> {
-        ValueObservation
-            .tracking { db in
-                try Self.notificationInput(from: start, in: db)
-            }
-            .removeDuplicates()
-            .values(in: writer)
+        EntryListJoin.updates(in: self) { db in
+            try Self.notificationPart(from: start, in: db)
+        } join: { list, part in
+            part.input(with: list)
+        }
     }
 
     func notificationInput(
         from start: LocalDate
     ) async throws -> NotificationInput {
         try await writer.read { db in
-            try Self.notificationInput(from: start, in: db)
+            let list = try Self.entryList(in: db)
+            let part = try Self.notificationPart(from: start, in: db)
+
+            return part.input(with: list)
         }
     }
 }
 
-private extension AppDatabase {
-    static func notificationInput(
-        from start: LocalDate,
-        in db: Database
-    ) throws -> NotificationInput {
-        let entryDateRequest = Entry
-            .select(Column("date"))
-            .filter(Column("date") >= start)
-            .distinct()
+private struct NotificationPart: Equatable, Sendable {
+    let start: LocalDate
+    let markedDates: [LocalDate]
+    let recurrings: [Recurring]
+    let reminderTime: ReminderTime?
+}
 
-        let entryDates = try LocalDate.fetchAll(db, entryDateRequest)
-        let markedDates = try NoSpendDay.filter(Column("date") >= start).fetchAll(db).map(\.date)
+private extension NotificationPart {
+    func input(with list: EntryList) -> NotificationInput {
+        let entryDates = list.days.map(\.date).filter { $0 >= start }
         let recordedDates = Set(entryDates + markedDates)
-        let namePairs = try EntryCategory.fetchAll(db).map { ($0.id, $0.name) }
-        let recurrings = try recurrings(in: db)
-        let reminderTime = try setting(.reminderTime, in: db)
-        let names = Dictionary(namePairs, uniquingKeysWith: { first, _ in first })
-        let shortages = try shortages(of: recurrings, from: start, in: db)
+        let names = list.categories.mapValues(\.name)
 
         return NotificationInput(
             recordedDates: recordedDates,
             recurrings: recurrings,
             reminderTime: reminderTime,
             names: names,
-            shortages: shortages
+            shortages: shortages(in: list)
         )
     }
 
-    static func shortages(
-        of recurrings: [Recurring],
-        from start: LocalDate,
-        in db: Database
-    ) throws -> [NotificationPlan.Shortage] {
-        let wallets = try Wallet.fetchAll(db)
-        let entries = try Entry.fetchAll(db)
-        let valuations = try Valuation.fetchAll(db)
+    func shortages(in list: EntryList) -> [NotificationPlan.Shortage] {
+        let wallets = Array(list.wallets.values)
         let yesterday = start.adding(days: -1)
 
         let bills = CardBill.upcoming(
             recurrings: recurrings,
             wallets: wallets,
-            entries: entries,
-            valuations: valuations,
+            entries: list.days.flatMap(\.entries),
+            valuations: list.valuations,
             after: yesterday
         )
 
         return bills.filter { $0.shortage > 0 }.map { bill in
-            let source = wallets.first { $0.id == bill.recurring.walletId }
+            let source = list.wallets[bill.recurring.walletId]
 
             return NotificationPlan.Shortage(
                 recurringId: bill.recurring.id,
@@ -78,5 +68,23 @@ private extension AppDatabase {
                 amount: bill.shortage
             )
         }
+    }
+}
+
+private extension AppDatabase {
+    static func notificationPart(
+        from start: LocalDate,
+        in db: Database
+    ) throws -> NotificationPart {
+        let markedDates = try NoSpendDay.filter(Column("date") >= start).fetchAll(db).map(\.date)
+        let recurrings = try recurrings(in: db)
+        let reminderTime = try setting(.reminderTime, in: db)
+
+        return NotificationPart(
+            start: start,
+            markedDates: markedDates,
+            recurrings: recurrings,
+            reminderTime: reminderTime
+        )
     }
 }

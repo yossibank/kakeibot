@@ -59,7 +59,7 @@ struct EntryListTests {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         try database.insertDefaultsIfEmpty(at: now)
         let draft = try await expenseDraft(in: database)
-        let bill = try await insertCardBill(into: database, at: now)
+        let bill = try await database.insertCardBill(at: now)
         let generated = try #require(LocalDate("2026-10-02"))
 
         var updates = database.entryListUpdates().makeAsyncIterator()
@@ -168,45 +168,5 @@ private extension EntryListTests {
             categoryId: options.expenseCategories[0].id,
             walletId: options.wallets[0].id
         )
-    }
-
-    func insertCardBill(
-        into database: AppDatabase,
-        at now: Date
-    ) async throws -> Recurring {
-        let options = try await database.entryOptions()
-        let bank = options.wallets[1]
-        let start = try #require(LocalDate("2026-01-01"))
-
-        let card = Wallet(
-            name: "カード",
-            kind: .card,
-            iconId: bank.iconId,
-            initialBalance: 0,
-            sortOrder: 9,
-            createdAt: now,
-            updatedAt: now
-        )
-
-        let bill = Recurring(
-            type: .transfer,
-            amount: 0,
-            categoryId: nil,
-            walletId: bank.id,
-            toWalletId: card.id,
-            frequency: .monthly,
-            day: 27,
-            closingDay: 15,
-            startDate: start,
-            createdAt: now,
-            updatedAt: now
-        )
-
-        try await database.writer.write { db in
-            try card.insert(db)
-            try bill.insert(db)
-        }
-
-        return bill
     }
 }
