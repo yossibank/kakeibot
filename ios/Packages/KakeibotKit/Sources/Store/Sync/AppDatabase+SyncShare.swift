@@ -204,15 +204,27 @@ private extension AppDatabase {
             arguments: [id]
         ) ?? false
 
-        guard
-            isOwner,
-            isEnabled,
-            hasWallet
-        else {
+        guard hasWallet else {
             return
         }
 
         let keys = try keysOfWallet(id, in: db) + categoryKeys(ofWallet: id, in: db)
+
+        guard isOwner else {
+            for key in keys {
+                try db.execute(
+                    sql: "DELETE FROM sync_change WHERE table_name = ? AND record_id = ?",
+                    arguments: [key.table.rawValue, key.id]
+                )
+            }
+
+            try db.notifyChanges(in: Table("sync_change"))
+            return
+        }
+
+        guard isEnabled else {
+            return
+        }
 
         for key in keys {
             try queue(key, in: db)

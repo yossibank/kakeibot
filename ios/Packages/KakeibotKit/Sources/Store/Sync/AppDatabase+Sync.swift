@@ -347,7 +347,7 @@ private extension AppDatabase {
     }
 
     static func clearSync(in db: Database) throws {
-        try db.execute(sql: "UPDATE sync_state SET engine_state = NULL")
+        try db.execute(sql: "UPDATE sync_state SET engine_state = NULL, shared_engine_state = NULL")
         try db.execute(sql: "DELETE FROM sync_record")
         try db.execute(sql: "DELETE FROM sync_change")
         try db.execute(sql: "DELETE FROM sync_waiting")

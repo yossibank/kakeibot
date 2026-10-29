@@ -139,13 +139,14 @@ struct SyncZoneTests {
     }
 
     @Test
-    func endsForeignSharingWithoutQueueing() async throws {
+    func endsForeignSharingAndDropsPendingRows() async throws {
         let setup = try await SyncTests.Setup()
         let walletID = try await setup.walletID()
         let id = try #require(Wallet.ID(walletID))
 
         try await setup.joinForeignShare(of: walletID)
         try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        try await setup.execute("UPDATE wallet SET name = 'x' WHERE id = '\(walletID)'")
 
         try await setup.database.endSharing(id)
 
@@ -204,9 +205,11 @@ struct SyncZoneTests {
         let id = try #require(Wallet.ID(walletID))
 
         try await setup.database.startSharing(id)
+        try await setup.database.saveSyncEngineState(Data([1]), isShared: true)
         try await setup.database.turnOnSyncReplacingLocal()
 
         #expect(try await setup.database.isSyncEnabled())
+        #expect(try await setup.database.syncEngineState(isShared: true) == nil)
         #expect(try await setup.pendingKeys() == [])
         #expect(try await setup.value("SELECT COUNT(*) FROM wallet") == "0")
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_record") == "0")
