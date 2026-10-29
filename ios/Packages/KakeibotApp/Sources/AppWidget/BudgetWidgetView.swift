@@ -54,7 +54,7 @@ private extension BudgetWidgetView {
 
             dial(summary)
 
-            Spacer(minLength: 6)
+            Spacer(minLength: 4)
 
             footer(of: summary)
         }
@@ -69,7 +69,7 @@ private extension BudgetWidgetView {
 
                 dial(summary)
 
-                Spacer(minLength: 6)
+                Spacer(minLength: 4)
 
                 Text(budgetNote(of: summary))
                     .textFont(size: .caption)

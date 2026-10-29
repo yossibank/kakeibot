@@ -126,15 +126,12 @@ private extension TagCard.Size {
     var padding: CGFloat {
         switch self {
         case .regular: 8
-        case .small: 6
+        case .small: 4
         }
     }
 
     var radius: CGFloat {
-        switch self {
-        case .regular: 4
-        case .small: 3
-        }
+        4
     }
 
     var hole: CGFloat {
@@ -146,16 +143,13 @@ private extension TagCard.Size {
 
     var holeTop: CGFloat {
         switch self {
-        case .regular: 3
+        case .regular: 4
         case .small: 2
         }
     }
 
     var holeSpace: CGFloat {
-        switch self {
-        case .regular: 5
-        case .small: 6
-        }
+        4
     }
 }
 

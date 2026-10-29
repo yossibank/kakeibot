@@ -52,7 +52,7 @@ public struct ThemeStyleView: View {
                     cornerRow
                 }
             }
-            .contentMargins(.horizontal, 18, for: .scrollContent)
+            .contentMargins(.horizontal, 20, for: .scrollContent)
             .contentMargins(.vertical, Self.fade, for: .scrollContent)
             .edgeFade(Self.fade)
             .padding(.horizontal, -20)

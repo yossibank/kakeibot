@@ -236,11 +236,11 @@ private extension TagLine {
     }
 
     static var spacing: CGFloat {
-        6
+        8
     }
 
     static var inset: CGFloat {
-        6
+        4
     }
 
     static var tilts: [Double] {

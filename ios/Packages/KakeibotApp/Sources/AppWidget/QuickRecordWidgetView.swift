@@ -350,7 +350,7 @@ private extension QuickRecordWidgetView {
 
     static let regular = Metrics(
         top: 12,
-        bottom: 18,
+        bottom: 16,
         spacing: 4,
         headerHeight: 20,
         undoHeaderHeight: 32,
