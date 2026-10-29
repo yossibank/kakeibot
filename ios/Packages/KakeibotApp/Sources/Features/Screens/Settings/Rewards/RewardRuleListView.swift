@@ -37,7 +37,7 @@ public struct RewardRuleListView: View {
 
     public var body: some View {
         VStack(spacing: 16) {
-            SettingsBackHeader("ごほうび", hint: hintFlag)
+            SettingsBackHeader("ごほうびの決まり", hint: hintFlag)
 
             SettingsHint(
                 flag: hintFlag,
@@ -115,7 +115,7 @@ public struct RewardRuleListView: View {
         .confirmation(
             isPresented: $isConfirmingDeleteHidden,
             systemImage: "trash",
-            title: "非表示のごほうびをまとめて削除しますか",
+            title: "非表示の決まりをまとめて削除しますか",
             message: "貯めた記録があるものは残ります",
             keepTitle: "やめる",
             confirmTitle: "まとめて削除する"
@@ -171,7 +171,7 @@ private extension RewardRuleListView {
         VStack(alignment: .leading, spacing: 8) {
             SettingsHiddenTitle(
                 flag: hiddenList,
-                title: "非表示のごほうび",
+                title: "非表示の決まり",
                 count: model.hidden.count
             ) {
                 isConfirmingDeleteHidden = true
