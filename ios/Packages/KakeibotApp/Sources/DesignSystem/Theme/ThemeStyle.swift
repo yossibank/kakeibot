@@ -1,5 +1,4 @@
 import Core
-import CoreGraphics
 import SwiftUI
 
 public extension ThemeStyle {

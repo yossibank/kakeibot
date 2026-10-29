@@ -1,6 +1,5 @@
 import Core
 import DesignSystem
-import Foundation
 import SwiftUI
 
 public struct ThemeStyleView: View {
