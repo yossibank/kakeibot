@@ -38,14 +38,17 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        GeometryReader { proxy in
+        GeometryReader { _ in
             ZStack(alignment: .top) {
                 content
                     .ignoresSafeArea(.keyboard)
-
-                if isEditingMemo {
-                    memoLayer(height: proxy.size.height)
-                }
+                    .floatingInput(isPresented: isEditingMemo) {
+                        editMemo(false)
+                    } card: {
+                        EntryMemoCard(model: model, isFocused: $isMemoFocused) {
+                            editMemo(false)
+                        }
+                    }
 
                 if let categoryMenu {
                     categoryMenuLayer(categoryMenu)
@@ -147,10 +150,10 @@ extension EntrySheet {
 extension EntrySheet {
     nonisolated static let coordinateSpace = "EntrySheet"
 
-    static let memoCardInset: CGFloat = 12
+    static let menuInset: CGFloat = 12
     static let liftInset: CGFloat = 12
 
-    static var memoTransition: AnyTransition {
+    static var menuTransition: AnyTransition {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
     }
 
@@ -265,29 +268,6 @@ private extension EntrySheet {
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
-    }
-
-    @ViewBuilder
-    func memoLayer(height: CGFloat) -> some View {
-        Palette.scrim
-            .opacity(0.35)
-            .ignoresSafeArea()
-            .onTapGesture {
-                editMemo(false)
-            }
-            .transition(.opacity)
-
-        VStack {
-            Spacer(minLength: 0)
-
-            EntryMemoCard(model: model, isFocused: $isMemoFocused) {
-                editMemo(false)
-            }
-            .padding(.horizontal, Self.memoCardInset)
-            .padding(.bottom, Self.memoCardInset)
-        }
-        .frame(height: height)
-        .transition(Self.memoTransition)
     }
 }
 

@@ -43,7 +43,8 @@ public struct StampEditSheet: View {
 
             ScrollView {
                 VStack(spacing: 16) {
-                    IconBadge(model.icon.preview, size: 86)
+                    StampTileFace(icon: model.icon.preview, isHidden: false)
+                        .frame(width: 80, height: 78)
 
                     IconEditor(
                         model: model.icon,

@@ -38,14 +38,14 @@ public struct RecurringListView: View {
                         totalCard
                     }
 
-                    board
-
                     if model.rows.isEmpty {
-                        Text("家賃や給料などを足すと、ここに並びます")
-                            .textFont(.footnote)
-                            .foregroundStyle(Palette.subtext)
-                            .padding(.vertical, 40)
+                        SettingsEmptyNote(
+                            systemImage: "repeat",
+                            text: "家賃や給料などを足すと、ここに並びます"
+                        )
                     }
+
+                    board
 
                     if !model.hiddenRows.isEmpty {
                         hiddenSection

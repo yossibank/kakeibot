@@ -19,8 +19,6 @@ public struct WalletListView: View {
     @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
 
-    @Environment(\.themeStyle.corner) private var corner
-
     let database: AppDatabase
 
     public init(database: AppDatabase) {
@@ -43,6 +41,13 @@ public struct WalletListView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    if model.shown.isEmpty {
+                        SettingsEmptyNote(
+                            systemImage: "building.columns",
+                            text: "口座を足すと、ここに並びます"
+                        )
+                    }
+
                     board
 
                     if !model.hidden.isEmpty {
@@ -225,46 +230,13 @@ private extension WalletListView {
     }
 
     func row(_ wallet: Wallet) -> some View {
-        let balance = model.balance(of: wallet)
-        let balanceColor = balance < 0 ? Palette.rose : Palette.accentStrong
-
-        return HStack(spacing: 16) {
-            IconImage(model.icon(for: wallet), size: 18)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 40, height: 40)
-                .background(
-                    Palette.accent.opacity(.subtle),
-                    in: .rect(cornerRadius: corner.radius(12))
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(12))
-                        .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
-                }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(wallet.name)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
-                    .sharedTextScale()
-
-                Text(wallet.kind.title)
-                    .textFont(.caption2)
-                    .tracking(1)
-                    .foregroundStyle(Palette.subtext)
-            }
-
-            Spacer(minLength: 8)
-
-            Text(AmountText.text(balance))
-                .displayFont(.body)
-                .monospacedDigit()
-                .foregroundStyle(balanceColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
+        WalletRowCard(
+            name: wallet.name,
+            kind: wallet.kind,
+            amount: model.balance(of: wallet)
+        ) {
+            WalletRowIcon(icon: model.icon(for: wallet))
         }
-        .padding(.horizontal, 16)
-        .frame(height: Self.rowHeight)
-        .card(cornerRadius: 20)
         .contentShape(.rect)
     }
 }

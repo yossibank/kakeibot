@@ -72,7 +72,7 @@ extension EntrySheet {
                 )
                 .offset(x: menuX(for: menu))
             }
-            .transition(Self.memoTransition)
+            .transition(Self.menuTransition)
     }
 }
 
@@ -313,7 +313,7 @@ private extension EntrySheet {
 
     func menuX(for menu: CategoryMenu) -> CGFloat {
         let width = EntryCategoryMenu.width
-        let inset = Self.memoCardInset
+        let inset = Self.menuInset
         let preferred = menu.frame.midX - width / 2
 
         return min(max(preferred, inset), sheetWidth - width - inset)

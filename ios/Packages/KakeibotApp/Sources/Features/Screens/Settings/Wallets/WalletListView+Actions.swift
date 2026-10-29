@@ -11,7 +11,7 @@ extension WalletListView {
 
     nonisolated static let space = "WalletBoard"
 
-    static let rowHeight: CGFloat = 68
+    static let rowHeight = WalletRowCard<WalletRowIcon>.height
     static let grid = SettingsBoardGrid(columns: 1, itemHeight: rowHeight, spacing: 12)
 
     var boardHeight: CGFloat {
