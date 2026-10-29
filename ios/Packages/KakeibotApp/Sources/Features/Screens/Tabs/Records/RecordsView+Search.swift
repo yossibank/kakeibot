@@ -39,7 +39,7 @@ extension RecordsView {
         } else if let summary = model.searchSummary {
             searchSummary(summary)
 
-            ForEach(days, id: \.self) { day in
+            ForEach(days, id: \.date) { day in
                 dayCard(day)
             }
         } else {

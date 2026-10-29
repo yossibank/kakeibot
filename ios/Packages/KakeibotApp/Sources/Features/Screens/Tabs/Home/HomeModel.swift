@@ -7,16 +7,21 @@ import Store
 @MainActor
 @Observable
 public final class HomeModel: ScreenModel {
-    public var templateType: Entry.Kind = .expense
+    public var templateType: Entry.Kind = .expense {
+        didSet {
+            updateTemplates()
+        }
+    }
 
     public var today: LocalDate {
         didSet {
             updateOverview()
+            updateTemplates()
         }
     }
 
-    public private(set) var templateOrder: TemplateOrder = .manual
     public private(set) var isListFailed = false
+    public private(set) var templates: [EntryTemplate] = []
     public private(set) var overview: MonthOverview
     public private(set) var upcomingBills: [CardBill] = []
 
@@ -26,18 +31,30 @@ public final class HomeModel: ScreenModel {
         }
     }
 
+    public private(set) var templateOrder: TemplateOrder = .manual {
+        didSet {
+            updateTemplates()
+        }
+    }
+
     public private(set) var list: EntryList? {
         didSet {
             updateOverview()
+            updateTemplates()
         }
     }
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    private var allTemplates: [EntryTemplate] = []
     private var homeSections = HomeSection.standard
     private var homeHiddenSections: Set<HomeSection> = []
     private var stampCalendar: StampCalendar?
+
+    private var allTemplates: [EntryTemplate] = [] {
+        didSet {
+            updateTemplates()
+        }
+    }
 
     private var budgets: [Budget] = [] {
         didSet {
@@ -72,16 +89,6 @@ public final class HomeModel: ScreenModel {
 
 public extension HomeModel {
     static let recentLimit = 5
-
-    var templates: [EntryTemplate] {
-        let shown = allTemplates.filter { $0.type == templateType }
-
-        guard let list else {
-            return shown
-        }
-
-        return list.ordered(shown, by: templateOrder, today: today)
-    }
 
     var recentRows: [EntryRowItem] {
         guard let list else {
@@ -360,6 +367,12 @@ private extension HomeModel {
                 after: today
             )
         } ?? []
+    }
+
+    func updateTemplates() {
+        let shown = allTemplates.filter { $0.type == templateType }
+
+        templates = list?.ordered(shown, by: templateOrder, today: today) ?? shown
     }
 
     func dayLabel(for date: LocalDate) -> String {
