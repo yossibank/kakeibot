@@ -21,20 +21,24 @@ final class AppModel {
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let scheduler: NotificationScheduler
     private let router: NotificationRouter
+    private let shareInbox: SyncShareInbox
     private let retryDelays: [Duration]
     private var hasStoppedObservation = false
     private var syncEngine: SyncEngine?
+    private var sharedSyncEngine: SyncEngine?
 
     init(
         openDatabase: @escaping @Sendable () throws -> AppDatabase,
         scheduler: NotificationScheduler = NotificationScheduler(),
         router: NotificationRouter = .shared,
+        shareInbox: SyncShareInbox = .shared,
         retryDelays: [Duration] = ScreenObservation.retryDelays
     ) {
         self.today = Self.currentDay()
         self.openDatabase = openDatabase
         self.scheduler = scheduler
         self.router = router
+        self.shareInbox = shareInbox
         self.retryDelays = retryDelays
     }
 }
@@ -56,6 +60,10 @@ extension AppModel {
 
     var route: PlannedNotification.Route? {
         router.route
+    }
+
+    var pendingShareCount: Int {
+        shareInbox.pending.count
     }
 
     func open() async {
@@ -186,20 +194,44 @@ extension AppModel {
 
     func syncChanges(in database: AppDatabase) async {
         await syncEngine?.stop()
+        await sharedSyncEngine?.stop()
         syncEngine = nil
+        sharedSyncEngine = nil
 
         guard syncActivity.isActive else {
             return
         }
 
-        let engine = SyncEngine(database: database)
+        let engine = SyncEngine(database: database, scope: .private)
+        let sharedEngine = SyncEngine(database: database, scope: .shared)
 
         syncEngine = engine
+        sharedSyncEngine = sharedEngine
         await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
+        await sharedEngine.start(isSyncEnabled: syncActivity.isSyncEnabled)
 
         await watch(database.syncChangeUpdates()) {
             await engine.enqueuePending()
+            await sharedEngine.enqueuePending()
         }
+    }
+
+    func acceptShares(in database: AppDatabase) async {
+        let shares = shareInbox.take()
+
+        guard !shares.isEmpty else {
+            return
+        }
+
+        for metadata in shares {
+            try? await SyncEngine.acceptShare(metadata)
+        }
+
+        let engine = sharedSyncEngine ?? SyncEngine(database: database, scope: .shared)
+
+        sharedSyncEngine = engine
+        await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
+        await engine.fetchChanges()
     }
 
     func observationID<Base: Hashable>(_ base: Base) -> ObservationID<Base> {

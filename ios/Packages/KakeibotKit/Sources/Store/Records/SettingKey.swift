@@ -181,6 +181,24 @@ public extension SettingKey where Value == EntryCategory.ID? {
             encode: { $0?.description }
         )
     }
+
+    static var transferOutCategory: Self {
+        Self(
+            .transferOutCategoryId,
+            default: nil,
+            decode: { EntryCategory.ID($0) },
+            encode: { $0?.description }
+        )
+    }
+
+    static var transferInCategory: Self {
+        Self(
+            .transferInCategoryId,
+            default: nil,
+            decode: { EntryCategory.ID($0) },
+            encode: { $0?.description }
+        )
+    }
 }
 
 public extension SettingKey where Value == Bool {

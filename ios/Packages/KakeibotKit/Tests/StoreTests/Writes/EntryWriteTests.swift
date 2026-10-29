@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import GRDB
 import Store
 import Testing
 
@@ -173,6 +174,34 @@ struct EntryWriteTests {
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries.isEmpty)
+    }
+
+    @Test
+    func deletesEntryPointedByRewardGoal() async throws {
+        let setup = try await Setup()
+
+        let saved = try await setup.database.saveEntry(
+            setup.draft,
+            at: setup.now
+        )
+
+        let goal = try await setup.database.saveRewardGoal(
+            RewardGoalDraft(name: "靴", targetAmount: 6000),
+            at: setup.now
+        )
+
+        try await setup.database.writer.write { db in
+            try db.execute(
+                sql: "UPDATE reward_goal SET entry_id = ? WHERE id = ?",
+                arguments: [saved.id.description, goal.id.description]
+            )
+        }
+
+        try await setup.database.deleteEntry(saved.id)
+        let snapshot = try setup.database.snapshot()
+
+        #expect(snapshot.entries.isEmpty)
+        #expect(snapshot.rewardGoals.map(\.entryId) == [nil])
     }
 
     @Test

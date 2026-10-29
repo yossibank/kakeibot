@@ -184,6 +184,12 @@ private extension AppDatabase {
     ) throws {
         let id = walletID.description
 
+        let isOwner = try Bool.fetchOne(
+            db,
+            sql: "SELECT owner_name IS NULL FROM sync_share WHERE wallet_id = ?",
+            arguments: [id]
+        ) ?? true
+
         try db.execute(sql: "DELETE FROM sync_share WHERE wallet_id = ?", arguments: [id])
         try db.execute(
             sql: "DELETE FROM sync_record WHERE zone_name = ?",
@@ -198,11 +204,28 @@ private extension AppDatabase {
             arguments: [id]
         ) ?? false
 
-        guard isEnabled, hasWallet else {
+        guard hasWallet else {
             return
         }
 
         let keys = try keysOfWallet(id, in: db) + categoryKeys(ofWallet: id, in: db)
+
+        guard isOwner else {
+            for key in keys {
+                try db.execute(
+                    sql: "DELETE FROM sync_change WHERE table_name = ? AND record_id = ?",
+                    arguments: [key.table.rawValue, key.id]
+                )
+            }
+
+            try leaveSharedWallet(id, in: db, at: Date())
+            try db.notifyChanges(in: Table("sync_change"))
+            return
+        }
+
+        guard isEnabled else {
+            return
+        }
 
         for key in keys {
             try queue(key, in: db)
