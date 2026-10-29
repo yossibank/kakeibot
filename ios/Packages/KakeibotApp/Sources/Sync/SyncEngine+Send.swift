@@ -68,7 +68,8 @@ extension SyncEngine {
         try? await database.removeSyncSystemFields(deleted)
         try? await database.removeSyncChanges(finished)
 
-        if problem != nil || !savedIDs.isEmpty || !deleted.isEmpty {
+        if !isShared,
+           problem != nil || !savedIDs.isEmpty || !deleted.isEmpty {
             try? await database.setSyncSendProblem(problem)
         }
 

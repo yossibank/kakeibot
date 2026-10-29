@@ -30,10 +30,10 @@ public extension AppDatabase {
         }
     }
 
-    func deleteValuation(_ id: Valuation.ID) async throws -> Deletion {
+    func deleteValuation(_ id: Valuation.ID) async throws -> Deletion? {
         try await writer.write { db in
             guard let valuation = try Valuation.fetchOne(db, key: id) else {
-                return Deletion()
+                return nil
             }
 
             _ = try valuation.delete(db)

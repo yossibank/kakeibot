@@ -63,9 +63,13 @@ extension AssetsModelTests {
         let model = AssetsModel(database: setup.database, today: setup.today)
 
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
+        let bank = try await setup.database.rewardBank()
+        let saved = try #require(bank.goals.first { $0.id == goal.id })
 
         #expect(isSaved == false)
         #expect(model.errorNotice.message == "目標を保存できませんでした")
+        #expect(saved.purchasedAt == nil)
+        #expect(bank.waitingGoals.map(\.id) == [goal.id])
     }
 
     @Test
