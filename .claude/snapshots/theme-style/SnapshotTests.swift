@@ -18,7 +18,20 @@ struct SnapshotTests {
         await model.load()
 
         for variant in Self.variants {
-            try Self.write(ThemeStyleView(model: model), variant: variant, to: "theme-style")
+            try Self.write(ThemeStyleTextView(model: model), variant: variant, to: "text")
+            try Self.write(ThemeStyleLookView(model: model), variant: variant, to: "look")
+        }
+
+        for spacing in [ThemeRowSpacing.compact, .relaxed] {
+            let spacingModel = ThemeStyleModel(database: database)
+
+            await spacingModel.choose(spacing)
+            await spacingModel.load()
+
+            let variant = Self.variants[0]
+            let name = "look-\(spacing.rawValue)"
+
+            try Self.write(ThemeStyleLookView(model: spacingModel), variant: variant, to: name)
         }
     }
 }
@@ -29,6 +42,7 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+        let backdrop: ThemeBackdrop
     }
 }
 
@@ -37,8 +51,8 @@ private extension SnapshotTests {
     static let maxHeight: CGFloat = 2400
 
     static let variants = [
-        Variant(name: "regular", width: 393, scheme: .light, textSize: .standard),
-        Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large)
+        Variant(name: "regular", width: 393, scheme: .light, textSize: .standard, backdrop: .washi),
+        Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large, backdrop: .grid)
     ]
 
     static func wait(until isReady: () -> Bool) async throws {
@@ -145,7 +159,8 @@ private extension SnapshotTests {
             corner: .standard,
             displayFont: .mincho,
             textFont: .gothic,
-            textSize: variant.textSize
+            textSize: variant.textSize,
+            backdrop: variant.backdrop
         )
 
         let content = view

@@ -75,8 +75,7 @@ public struct StampEditSheet: View {
             focus = nil
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
         .errorBanner(model.errorNotice) {

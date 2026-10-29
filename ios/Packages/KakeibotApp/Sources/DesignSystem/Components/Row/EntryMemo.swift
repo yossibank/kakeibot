@@ -48,7 +48,7 @@ struct EntryMemo: View {
                 toggle()
             }
             .allowsHitTesting(canExpand)
-            .sensoryFeedback(.selection, trigger: isExpanded)
+            .haptic(.selection, trigger: isExpanded)
     }
 }
 

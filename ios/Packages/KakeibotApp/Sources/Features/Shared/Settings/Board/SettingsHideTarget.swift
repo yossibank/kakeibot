@@ -31,7 +31,7 @@ struct SettingsHideTarget: View {
                 }
             }
             .transition(.opacity)
-            .sensoryFeedback(.impact(weight: .heavy), trigger: isArmed) { _, new in
+            .haptic(.impact(weight: .heavy), trigger: isArmed) { _, new in
                 new
             }
     }

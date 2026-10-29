@@ -24,7 +24,7 @@ extension ThemeListView {
         preview(menu.palette, isCurrent: menu.choice == model.current)
             .frame(width: menu.frame.width, height: menu.frame.height)
             .scaleEffect(1.04)
-            .shadow(color: Palette.glow.opacity(.muted), radius: 12)
+            .glow(Palette.glow.opacity(.muted), radius: 12)
             .position(x: menu.frame.midX, y: menu.frame.midY)
             .allowsHitTesting(false)
             .transition(.opacity)

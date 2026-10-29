@@ -49,8 +49,8 @@ public struct ReviewView: View {
         .onPageSwipe(following: $slide, canMove: canMove) { direction in
             move(direction)
         }
-        .sensoryFeedback(.selection, trigger: model.period)
-        .sensoryFeedback(.selection, trigger: model.kind)
+        .haptic(.selection, trigger: model.period)
+        .haptic(.selection, trigger: model.kind)
         .sheet(item: $openShare, onDismiss: openPendingEntry) { share in
             ReviewShareSheet(
                 share: share,
@@ -75,8 +75,7 @@ public struct ReviewView: View {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
     }

@@ -32,7 +32,7 @@ public struct Keypad: View {
                 }
             }
         }
-        .sensoryFeedback(.impact(weight: .medium), trigger: clearCount)
+        .haptic(.impact(weight: .medium), trigger: clearCount)
     }
 }
 

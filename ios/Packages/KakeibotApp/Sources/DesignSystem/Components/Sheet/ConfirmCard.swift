@@ -220,7 +220,7 @@ public extension View {
             }
         }
         .animation(.snappy(duration: 0.25), value: isPresented.wrappedValue)
-        .sensoryFeedback(feedback, trigger: isPresented.wrappedValue) { _, new in
+        .haptic(feedback, trigger: isPresented.wrappedValue) { _, new in
             new
         }
     }

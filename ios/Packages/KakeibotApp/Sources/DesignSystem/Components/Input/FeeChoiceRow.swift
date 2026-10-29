@@ -24,7 +24,7 @@ public struct FeeChoiceRow: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .sensoryFeedback(.selection, trigger: selection)
+        .haptic(.selection, trigger: selection)
     }
 }
 

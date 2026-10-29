@@ -172,8 +172,7 @@ private extension CategoryEditSheet {
             focus = nil
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
     }

@@ -74,6 +74,24 @@ public extension SettingKey where Value == ThemeTextSize {
     }
 }
 
+public extension SettingKey where Value == ThemeRowSpacing {
+    static var rowSpacing: Self {
+        Self(.rowSpacing, default: .standard)
+    }
+}
+
+public extension SettingKey where Value == ThemeStampShape {
+    static var stampShape: Self {
+        Self(.stampShape, default: .circle)
+    }
+}
+
+public extension SettingKey where Value == ThemeBackdrop {
+    static var backdrop: Self {
+        Self(.backdrop, default: .plain)
+    }
+}
+
 public extension SettingKey where Value == TemplateOrder {
     static var templateOrder: Self {
         Self(.templateOrder, default: .manual)
@@ -217,6 +235,18 @@ public extension SettingKey where Value == Bool {
     static var settingsOpened: Self {
         Self(flag: .settingsOpened)
     }
+
+    static var tabTitles: Self {
+        Self(switch: .tabTitles)
+    }
+
+    static var haptics: Self {
+        Self(switch: .haptics)
+    }
+
+    static var decorations: Self {
+        Self(switch: .decorations)
+    }
 }
 
 extension SettingKey {
@@ -278,6 +308,15 @@ extension SettingKey where Value == Bool {
             default: false,
             decode: { $0 == "true" },
             encode: { $0 ? "true" : nil }
+        )
+    }
+
+    init(switch key: Setting.Key) {
+        self.init(
+            key,
+            default: true,
+            decode: { $0 != "false" },
+            encode: { $0 ? nil : "false" }
         )
     }
 }

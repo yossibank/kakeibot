@@ -21,7 +21,7 @@ public struct BudgetListView: View {
             }
             .budgetKeypad(model)
             .toolbar(.hidden, for: .navigationBar)
-            .sensoryFeedback(.selection, trigger: model.budgets)
+            .haptic(.selection, trigger: model.budgets)
             .task {
                 await model.load()
             }
@@ -95,8 +95,7 @@ private extension BudgetListView {
         .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
     }

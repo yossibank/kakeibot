@@ -7,6 +7,9 @@ public struct FloatingTabBar<Value: Hashable>: View {
     @State private var dragX: CGFloat?
     @State private var addCount = 0
 
+    @Environment(\.themeStyle.decorations) private var hasDecorations
+    @Environment(\.themeStyle.showsTabTitles) private var showsTitles
+
     let items: [Item]
     let isAddHinted: Bool
     let onAdd: () -> Void
@@ -62,6 +65,14 @@ public extension FloatingTabBar {
 }
 
 private extension FloatingTabBar {
+    var ring: AnyShapeStyle {
+        if hasDecorations {
+            return AnyShapeStyle(Self.goldRing)
+        }
+
+        return AnyShapeStyle(Palette.outline)
+    }
+
     var tabs: some View {
         let indexedItems = Array(items.enumerated())
 
@@ -80,7 +91,7 @@ private extension FloatingTabBar {
         }
         .contentShape(Capsule())
         .gesture(dragGesture)
-        .sensoryFeedback(.selection, trigger: highlightedIndex)
+        .haptic(.selection, trigger: highlightedIndex)
         .padding(8)
         .background {
             Capsule()
@@ -133,7 +144,7 @@ private extension FloatingTabBar {
             }
             .overlay {
                 Circle()
-                    .strokeBorder(Self.goldRing, lineWidth: 1.2)
+                    .strokeBorder(ring, lineWidth: 1.2)
             }
             .overlay {
                 if isAddHinted {
@@ -145,8 +156,8 @@ private extension FloatingTabBar {
         }
         .buttonStyle(PressStyle())
         .glass(tint: Palette.backgroundBottom.opacity(.strong), in: Circle())
-        .shadow(color: Palette.glow.opacity(.muted), radius: 14, y: 4)
-        .sensoryFeedback(.impact(weight: .light), trigger: addCount)
+        .glow(Palette.glow.opacity(.muted), radius: 14, y: 4)
+        .haptic(.impact(weight: .light), trigger: addCount)
     }
 
     var addHint: some View {
@@ -172,15 +183,20 @@ private extension FloatingTabBar {
         let iconColor = isHighlighted ? Palette.accent : Palette.subtext
         let titleColor = isHighlighted ? Palette.accentStrong : Palette.subtext
 
+        let iconScale: Image.Scale = showsTitles ? .medium : .large
+
         return VStack(spacing: 4) {
             Image(systemName: item.systemImage)
                 .sansFont(.headline, weight: .light)
+                .imageScale(iconScale)
                 .foregroundStyle(iconColor)
 
-            Text(item.title)
-                .textFont(size: .caption)
-                .tracking(0.6)
-                .foregroundStyle(titleColor)
+            if showsTitles {
+                Text(item.title)
+                    .textFont(size: .caption)
+                    .tracking(0.6)
+                    .foregroundStyle(titleColor)
+            }
         }
         .frame(maxWidth: .infinity, minHeight: Self.height - 12)
         .contentShape(Capsule())

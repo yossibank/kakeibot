@@ -73,8 +73,7 @@ public struct RecurringEditSheet: View {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
                 .onTapGesture {
                     focus = nil

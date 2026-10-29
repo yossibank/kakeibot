@@ -51,11 +51,10 @@ struct RecordsFilterSheet: View {
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
-        .sensoryFeedback(.selection, trigger: filter)
+        .haptic(.selection, trigger: filter)
         .presentationDetents([.medium, .large])
     }
 }

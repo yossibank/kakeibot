@@ -46,7 +46,7 @@ struct SettingsEditHeader: View {
             }
         }
         .zIndex(1)
-        .sensoryFeedback(.impact(weight: .medium), trigger: isMenuOpen) { _, isOpen in
+        .haptic(.impact(weight: .medium), trigger: isMenuOpen) { _, isOpen in
             isOpen
         }
     }

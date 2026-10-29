@@ -72,8 +72,7 @@ public struct SettingsSheet: View {
             .padding(.top, 16)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background {
-                Rectangle()
-                    .fill(Palette.background)
+                Backdrop()
                     .ignoresSafeArea()
             }
             .toolbar(.hidden, for: .navigationBar)

@@ -74,8 +74,7 @@ public struct RewardRuleEditSheet: View {
             .padding(.top, 20)
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
                 .onTapGesture {
                     focus = nil

@@ -47,12 +47,11 @@ public struct LaunchScreenView: View {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .sensoryFeedback(.selection, trigger: model.screen)
+        .haptic(.selection, trigger: model.screen)
         .task {
             await model.load()
         }

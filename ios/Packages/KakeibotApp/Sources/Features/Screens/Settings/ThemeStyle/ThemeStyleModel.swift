@@ -27,59 +27,64 @@ public extension ThemeStyleModel {
     }
 
     func choose(_ corner: ThemeCorner) async {
-        let previous = style
-
-        style.corner = corner
-
-        do {
-            try await database.setSetting(.cornerStyle, to: corner)
-        } catch {
-            style = previous
-            errorNotice.show(Self.saveFailedMessage, for: error)
-        }
+        await choose(corner, at: \.corner, key: .cornerStyle)
     }
 
     func choose(displayFont font: ThemeFont) async {
-        let previous = style
-
-        style.displayFont = font
-
-        do {
-            try await database.setSetting(.fontStyle, to: font)
-        } catch {
-            style = previous
-            errorNotice.show(Self.saveFailedMessage, for: error)
-        }
-    }
-
-    func choose(_ size: ThemeTextSize) async {
-        let previous = style
-
-        style.textSize = size
-
-        do {
-            try await database.setSetting(.textSize, to: size)
-        } catch {
-            style = previous
-            errorNotice.show(Self.saveFailedMessage, for: error)
-        }
+        await choose(font, at: \.displayFont, key: .fontStyle)
     }
 
     func choose(textFont font: ThemeFont) async {
-        let previous = style
+        await choose(font, at: \.textFont, key: .textFontStyle)
+    }
 
-        style.textFont = font
+    func choose(_ size: ThemeTextSize) async {
+        await choose(size, at: \.textSize, key: .textSize)
+    }
 
-        do {
-            try await database.setSetting(.textFontStyle, to: font)
-        } catch {
-            style = previous
-            errorNotice.show(Self.saveFailedMessage, for: error)
-        }
+    func choose(_ spacing: ThemeRowSpacing) async {
+        await choose(spacing, at: \.rowSpacing, key: .rowSpacing)
+    }
+
+    func choose(_ shape: ThemeStampShape) async {
+        await choose(shape, at: \.stampShape, key: .stampShape)
+    }
+
+    func choose(showsTabTitles: Bool) async {
+        await choose(showsTabTitles, at: \.showsTabTitles, key: .tabTitles)
+    }
+
+    func choose(_ backdrop: ThemeBackdrop) async {
+        await choose(backdrop, at: \.backdrop, key: .backdrop)
+    }
+
+    func choose(haptics: Bool) async {
+        await choose(haptics, at: \.haptics, key: .haptics)
+    }
+
+    func choose(decorations: Bool) async {
+        await choose(decorations, at: \.decorations, key: .decorations)
     }
 }
 
 private extension ThemeStyleModel {
     static let loadFailedMessage = "設定を読めませんでした"
     static let saveFailedMessage = "設定を保存できませんでした"
+
+    func choose<Value>(
+        _ value: Value,
+        at keyPath: WritableKeyPath<ThemeStyle, Value>,
+        key: SettingKey<Value>
+    ) async {
+        let previous = style
+
+        style[keyPath: keyPath] = value
+
+        do {
+            try await database.setSetting(key, to: value)
+        } catch {
+            style = previous
+            errorNotice.show(Self.saveFailedMessage, for: error)
+        }
+    }
 }

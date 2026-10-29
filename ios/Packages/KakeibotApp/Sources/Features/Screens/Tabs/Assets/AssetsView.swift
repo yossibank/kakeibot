@@ -85,8 +85,7 @@ public struct AssetsView: View {
             }
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
     }

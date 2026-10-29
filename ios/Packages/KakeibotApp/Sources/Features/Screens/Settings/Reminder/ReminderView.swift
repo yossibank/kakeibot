@@ -53,8 +53,7 @@ public struct ReminderView: View {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -65,8 +64,8 @@ public struct ReminderView: View {
         .transaction(value: model.isLoaded) { transaction in
             transaction.disablesAnimations = true
         }
-        .sensoryFeedback(.selection, trigger: model.time)
-        .sensoryFeedback(.selection, trigger: model.previewDay)
+        .haptic(.selection, trigger: model.time)
+        .haptic(.selection, trigger: model.previewDay)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 Task {

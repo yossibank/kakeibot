@@ -60,7 +60,7 @@ public struct EntrySheet: View {
             } action: { width in
                 sheetWidth = width
             }
-            .sensoryFeedback(
+            .haptic(
                 .impact(weight: .medium),
                 trigger: categoryMenu
             ) { _, menu in
@@ -86,8 +86,7 @@ public struct EntrySheet: View {
                 }
             }
             .background {
-                Rectangle()
-                    .fill(Palette.background)
+                Backdrop()
                     .ignoresSafeArea()
             }
             .confirmsDiscard(

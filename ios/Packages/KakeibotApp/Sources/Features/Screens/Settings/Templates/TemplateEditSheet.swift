@@ -84,15 +84,14 @@ public struct TemplateEditSheet: View {
                 model.errorNotice.clear()
             }
             .background {
-                Rectangle()
-                    .fill(Palette.background)
+                Backdrop()
                     .ignoresSafeArea()
                     .onTapGesture {
                         focus = nil
                     }
             }
-            .sensoryFeedback(.selection, trigger: model.categoryId)
-            .sensoryFeedback(.selection, trigger: model.walletId)
+            .haptic(.selection, trigger: model.categoryId)
+            .haptic(.selection, trigger: model.walletId)
             .confirmsUnsavedHide(
                 isHidden: model.isHidden,
                 canSave: model.canSave,

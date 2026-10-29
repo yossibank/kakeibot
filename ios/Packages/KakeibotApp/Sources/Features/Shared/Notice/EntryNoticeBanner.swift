@@ -35,7 +35,7 @@ private struct EntryNoticeBanner: ViewModifier {
                 }
             }
             .animation(.snappy, value: model.notice)
-            .sensoryFeedback(.success, trigger: model.change) { _, new in
+            .haptic(.success, trigger: model.change) { _, new in
                 new != nil
             }
             .task(id: model.notice) {

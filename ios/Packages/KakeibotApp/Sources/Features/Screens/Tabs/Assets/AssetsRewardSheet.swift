@@ -40,8 +40,7 @@ struct AssetsRewardSheet: View {
             .padding(.horizontal, 20)
             .padding(.top, 20)
             .background {
-                Rectangle()
-                    .fill(Palette.background)
+                Backdrop()
                     .ignoresSafeArea()
             }
             .toolbar(.hidden, for: .navigationBar)

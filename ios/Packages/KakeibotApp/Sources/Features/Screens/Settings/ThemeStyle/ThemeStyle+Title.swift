@@ -1,7 +1,7 @@
 import Core
 
 extension ThemeStyle {
-    var title: String {
+    var textTitle: String {
         let fonts = displayFont == textFont
             ? displayFont.title
             : "\(displayFont.title)と\(textFont.title)"
@@ -10,15 +10,19 @@ extension ThemeStyle {
             return "文字\(textSize.title)・\(fonts)"
         }
 
-        return "\(fonts)・角\(corner.title)"
+        return fonts
     }
 
-    var shortTitle: String {
+    var shortTextTitle: String {
         guard textSize == .standard else {
             return "文字\(textSize.title)"
         }
 
-        return title
+        return textTitle
+    }
+
+    var lookTitle: String {
+        "角\(corner.title)"
     }
 }
 
@@ -39,6 +43,36 @@ extension ThemeCorner {
         case .small: "小さめ"
         case .standard: "ふつう"
         case .large: "大きめ"
+        }
+    }
+}
+
+extension ThemeRowSpacing {
+    var title: String {
+        switch self {
+        case .compact: "詰める"
+        case .standard: "ふつう"
+        case .relaxed: "ゆったり"
+        }
+    }
+}
+
+extension ThemeStampShape {
+    var title: String {
+        switch self {
+        case .circle: "丸"
+        case .rounded: "角丸"
+        case .seal: "印"
+        }
+    }
+}
+
+extension ThemeBackdrop {
+    var title: String {
+        switch self {
+        case .plain: "無地"
+        case .washi: "和紙"
+        case .grid: "方眼"
         }
     }
 }

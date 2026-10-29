@@ -50,12 +50,24 @@ private extension AppDatabase {
         let displayFont = try setting(.fontStyle, in: db)
         let textFont = try setting(.textFontStyle, in: db)
         let textSize = try setting(.textSize, in: db)
+        let rowSpacing = try setting(.rowSpacing, in: db)
+        let stampShape = try setting(.stampShape, in: db)
+        let showsTabTitles = try setting(.tabTitles, in: db)
+        let backdrop = try setting(.backdrop, in: db)
+        let haptics = try setting(.haptics, in: db)
+        let decorations = try setting(.decorations, in: db)
 
         return ThemeStyle(
             corner: corner,
             displayFont: displayFont,
             textFont: textFont,
-            textSize: textSize
+            textSize: textSize,
+            rowSpacing: rowSpacing,
+            stampShape: stampShape,
+            showsTabTitles: showsTabTitles,
+            backdrop: backdrop,
+            haptics: haptics,
+            decorations: decorations
         )
     }
 }

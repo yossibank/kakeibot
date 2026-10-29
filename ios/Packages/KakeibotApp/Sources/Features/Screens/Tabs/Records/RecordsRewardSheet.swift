@@ -48,7 +48,7 @@ public struct RecordsRewardSheet: View {
         .sheet(isPresented: $isAddingRule) {
             RewardRuleEditSheet(model: model.rewardRuleEditModel())
         }
-        .sensoryFeedback(.success, trigger: model.rewardTotal(on: date))
+        .haptic(.success, trigger: model.rewardTotal(on: date))
     }
 }
 

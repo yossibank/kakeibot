@@ -22,6 +22,12 @@ public extension Setting {
         case fontStyle = "font_style"
         case textFontStyle = "text_font_style"
         case textSize = "text_size"
+        case rowSpacing = "row_spacing"
+        case stampShape = "stamp_shape"
+        case tabTitles = "tab_titles"
+        case backdrop
+        case haptics
+        case decorations
         case onboardingCompleted = "onboarding_completed"
         case setupCardClosed = "setup_card_closed"
         case entryOpened = "entry_opened"
