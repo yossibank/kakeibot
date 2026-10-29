@@ -9,7 +9,6 @@ public final class SetupModel: ScreenModel {
     public private(set) var progress: SetupProgress?
     public private(set) var isCardClosed = true
     public private(set) var isEntryOpened = true
-    public private(set) var isSettingsOpened = true
     public private(set) var launchScreen: LaunchScreen = .home
     public private(set) var theme: ThemeChoice = .system
     public private(set) var customThemes: [Theme] = []
@@ -65,10 +64,6 @@ public extension SetupModel {
             }
 
             group.addTask {
-                await self.observeSettingsOpened()
-            }
-
-            group.addTask {
                 await self.observeLaunchScreen()
             }
 
@@ -90,16 +85,6 @@ public extension SetupModel {
         isEntryOpened = true
 
         await save(.entryOpened, to: true)
-    }
-
-    func markSettingsOpened() async {
-        guard !isSettingsOpened else {
-            return
-        }
-
-        isSettingsOpened = true
-
-        await save(.settingsOpened, to: true)
     }
 
     func closeCard() async {
@@ -137,15 +122,6 @@ private extension SetupModel {
             failure: Self.loadFailedMessage
         ) { isOpened in
             isEntryOpened = isOpened
-        }
-    }
-
-    func observeSettingsOpened() async {
-        await observe(
-            database.settingUpdates(.settingsOpened),
-            failure: Self.loadFailedMessage
-        ) { isOpened in
-            isSettingsOpened = isOpened
         }
     }
 

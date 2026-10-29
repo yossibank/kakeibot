@@ -8,7 +8,7 @@ extension MainView {
         let isHomeLoaded = home.list != nil || home.errorNotice.message != nil
         let isSetupLoaded = setup.isLoaded || setup.errorNotice.message != nil
 
-        return isHomeLoaded && isSetupLoaded
+        return isHomeLoaded && isSetupLoaded && launchScreen != nil && isTabLoaded
     }
 
     var templateOrderBinding: Binding<TemplateOrder> {
@@ -21,9 +21,23 @@ extension MainView {
         }
     }
 
-    func openLaunchScreen() async {
+    func chooseLaunchTab() async {
         let screen = await (try? database.setting(.launchScreen)) ?? .home
 
+        if route == nil,
+           !hasLaunchSheet {
+            switch screen {
+            case .home, .entry: tab = .home
+            case .records: tab = .records
+            case .review: tab = .review
+            case .assets: tab = .assets
+            }
+        }
+
+        launchScreen = screen
+    }
+
+    func openLaunchSheet() {
         guard route == nil else {
             return
         }
@@ -35,21 +49,17 @@ extension MainView {
         }
         #endif
 
-        switch screen {
-        case .home: tab = .home
-        case .records: tab = .records
-        case .review: tab = .review
-        case .assets: tab = .assets
-        case .entry: sheet = .new
+        if launchScreen == .entry {
+            sheet = .new
         }
     }
 
     func markOpened(_ sheet: Sheet?) async {
-        switch sheet {
-        case .new: await setup.markEntryOpened()
-        case .settings: await setup.markSettingsOpened()
-        default: break
+        guard sheet == .new else {
+            return
         }
+
+        await setup.markEntryOpened()
     }
 
     func open(_ route: PlannedNotification.Route) {
@@ -105,6 +115,23 @@ extension MainView {
 
 private extension MainView {
     static let sheetCloseDuration: Duration = .milliseconds(600)
+
+    var isTabLoaded: Bool {
+        switch tab {
+        case .home: true
+        case .records: records.list != nil || records.errorNotice.message != nil
+        case .review: review.list != nil || review.errorNotice.message != nil
+        case .assets: assets.list != nil || assets.errorNotice.message != nil
+        }
+    }
+
+    var hasLaunchSheet: Bool {
+        #if DEBUG
+        Sheet.launchArgument != nil
+        #else
+        false
+        #endif
+    }
 
     func templateSheet(_ id: EntryTemplate.ID) async -> Sheet? {
         let templates = await (try? database.templates()) ?? []
