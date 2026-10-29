@@ -325,13 +325,17 @@ struct ReviewModelTests {
 private extension ReviewModelTests {
     func observe(
         _ model: ReviewModel,
+        sourceLocation: SourceLocation = #_sourceLocation,
         until isReady: @escaping @MainActor () -> Bool
     ) async throws {
         let task = Task {
             await model.run()
         }
 
-        await ObservationWait.until(isReady)
+        await ObservationWait.until(
+            sourceLocation: sourceLocation,
+            isReady
+        )
 
         task.cancel()
     }

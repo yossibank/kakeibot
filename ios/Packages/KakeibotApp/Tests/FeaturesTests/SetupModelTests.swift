@@ -69,7 +69,13 @@ struct SetupModelTests {
 }
 
 private extension SetupModelTests {
-    static func wait(until isReady: @escaping @MainActor () -> Bool) async throws {
-        await ObservationWait.until(isReady)
+    static func wait(
+        sourceLocation: SourceLocation = #_sourceLocation,
+        until isReady: @escaping @MainActor () -> Bool
+    ) async throws {
+        await ObservationWait.until(
+            sourceLocation: sourceLocation,
+            isReady
+        )
     }
 }

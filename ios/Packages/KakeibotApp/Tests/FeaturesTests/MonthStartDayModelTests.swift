@@ -100,7 +100,13 @@ struct MonthStartDayModelTests {
 }
 
 private extension MonthStartDayModelTests {
-    func wait(until isReady: @escaping @MainActor () -> Bool) async throws {
-        await ObservationWait.until(isReady)
+    func wait(
+        sourceLocation: SourceLocation = #_sourceLocation,
+        until isReady: @escaping @MainActor () -> Bool
+    ) async throws {
+        await ObservationWait.until(
+            sourceLocation: sourceLocation,
+            isReady
+        )
     }
 }

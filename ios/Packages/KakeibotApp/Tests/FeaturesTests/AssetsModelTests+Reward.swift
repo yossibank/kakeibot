@@ -127,14 +127,16 @@ extension AssetsModelTests.Setup {
     }
 
     @MainActor
-    func runningModel() async throws -> AssetsModel {
+    func runningModel(
+        sourceLocation: SourceLocation = #_sourceLocation
+    ) async throws -> AssetsModel {
         let model = AssetsModel(database: database, today: today)
 
         let task = Task {
             await model.run()
         }
 
-        await ObservationWait.until {
+        await ObservationWait.until(sourceLocation: sourceLocation) {
             model.rewardBank != nil && model.list != nil
         }
 
