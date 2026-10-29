@@ -298,7 +298,7 @@ emoji・text・glyph のどれかは必須。
 | name | TEXT | |
 | target_amount | INTEGER | |
 | purchased_at | TEXT | |
-| entry_id | TEXT | 買ったときの記録 |
+| entry_id | TEXT | 買ったときの記録。その記録を消すと空にする |
 | created_at / updated_at | TEXT | |
 
 貯金箱の残高 ＝ reward_log の合計 − 買った目標の target_amount の合計。
