@@ -179,7 +179,10 @@ private extension CapsulePicker {
     }
 
     var segmentWidth: CGFloat {
-        guard let width else {
+        guard
+            let width,
+            width > Self.inset * 2
+        else {
             return idealSegmentWidth
         }
 
