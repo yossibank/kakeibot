@@ -20,12 +20,28 @@ struct SnapshotTests {
 
             try Self.write(view, to: "\(name).png")
         }
+
+        let model = try await Self.model(.expense, digits: Self.smallDigits)
+        let style = ThemeStyle(
+            corner: .standard,
+            displayFont: .mincho,
+            textFont: .gothic,
+            textSize: .large
+        )
+        let mini = EntrySheet(model: model)
+            .frame(width: Self.mini.width, height: Self.mini.height)
+            .background(Palette.background)
+            .environment(\.themeStyle, style)
+            .environment(\.colorScheme, .dark)
+
+        try Self.write(mini, to: "entry-mini-large.png")
     }
 }
 
 private extension SnapshotTests {
     static let directory = "__OUT__"
     static let phone = CGSize(width: 393, height: 852)
+    static let mini = CGSize(width: 375, height: 812)
 
     static let smallDigits: [AmountCalculator.Key] = [.digit(1), .digit(2), .doubleZero]
     static let largeDigits = (2...9).reversed().map(AmountCalculator.Key.digit)

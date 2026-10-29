@@ -275,9 +275,10 @@ private extension FloatingTabBar {
             .onEnded { value in
                 let index = index(at: value.location.x)
 
+                selection = items[index].value
+
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                     dragX = nil
-                    selection = items[index].value
                 }
             }
     }

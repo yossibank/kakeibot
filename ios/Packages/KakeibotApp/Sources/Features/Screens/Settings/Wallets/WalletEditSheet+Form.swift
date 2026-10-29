@@ -109,10 +109,11 @@ extension WalletEditSheet {
                 .frame(width: 10, height: 10)
 
             Text("アイコンの色は、振り返りのグラフの色になります")
+                .tracking(1)
         }
         .textFont(.caption2)
         .foregroundStyle(Palette.subtext)
-        .padding(.leading, 4)
+        .frame(maxWidth: .infinity)
     }
 
     var kindChooser: some View {

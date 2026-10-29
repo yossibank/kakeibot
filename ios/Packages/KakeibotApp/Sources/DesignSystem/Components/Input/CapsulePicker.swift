@@ -6,6 +6,7 @@ public struct CapsulePicker<Value: Hashable>: View {
 
     @State private var thumbOffset: CGFloat?
     @State private var pendingIndex: Int?
+    @State private var width: CGFloat?
     @State private var feedback = UISelectionFeedbackGenerator()
 
     @Environment(\.themeStyle.textSize.scale) private var textScale
@@ -47,12 +48,20 @@ public struct CapsulePicker<Value: Hashable>: View {
                     Text(option.title)
                         .textFont(size.font, weight: weight)
                         .foregroundStyle(color)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                         .frame(width: segmentWidth, height: segmentHeight)
                 }
             }
         }
         .padding(Self.inset)
-        .fixedSize()
+        .frame(minWidth: 0, maxWidth: idealWidth, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            self.width = width
+        }
         .background {
             Capsule()
                 .fill(Self.sheen)
@@ -161,8 +170,25 @@ private extension CapsulePicker {
         .spring(response: 0.32, dampingFraction: 0.78)
     }
 
-    var segmentWidth: CGFloat {
+    var idealSegmentWidth: CGFloat {
         size.segment.width * textScale
+    }
+
+    var idealWidth: CGFloat {
+        idealSegmentWidth * CGFloat(options.count) + Self.inset * 2
+    }
+
+    var segmentWidth: CGFloat {
+        guard
+            let width,
+            width > Self.inset * 2
+        else {
+            return idealSegmentWidth
+        }
+
+        let fitted = (width - Self.inset * 2) / CGFloat(options.count)
+
+        return min(idealSegmentWidth, fitted)
     }
 
     var segmentHeight: CGFloat {
