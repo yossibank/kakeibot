@@ -41,6 +41,7 @@ public extension AppDatabase {
                 try Self.queue(key, in: db)
             }
 
+            try Self.retryWaiting(in: db)
             try Self.setApplying(false, in: db)
         }
     }
@@ -259,11 +260,12 @@ private extension AppDatabase {
         let columns = Set(names)
         let values = record.values.filter { columns.contains($0.key) && $0.key != table.keyColumn }
 
-        guard
-            try isNewer(record, in: db),
-            let losers = try conflictLosers(against: record, columns: columns, in: db)
-        else {
+        guard try isNewer(record, in: db) else {
             return .skipped
+        }
+
+        guard let losers = try conflictLosers(against: record, columns: columns, in: db) else {
+            return .blocked
         }
 
         do {
