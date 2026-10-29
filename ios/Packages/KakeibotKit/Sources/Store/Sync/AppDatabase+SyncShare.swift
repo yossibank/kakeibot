@@ -53,12 +53,6 @@ extension AppDatabase {
 }
 
 private extension AppDatabase {
-    struct Copied {
-        var categories: [String: String] = [:]
-        var tags: [String: String] = [:]
-        var keys: [SyncKey] = []
-    }
-
     static func walletShares(in db: Database) throws -> [WalletShare] {
         let rows = try Row.fetchAll(
             db,
@@ -72,15 +66,13 @@ private extension AppDatabase {
         )
 
         let wallets = try rows.map { try Wallet(row: $0) }
-        let icons = try Icon.fetchAll(db, keys: wallets.map(\.iconId))
-        let iconsByID = Dictionary(uniqueKeysWithValues: icons.map { ($0.id, $0) })
+        let iconIds = wallets.map(\.iconId)
+        let icons = try Icon.fetchAll(db, keys: iconIds)
+        let iconPairs = icons.map { ($0.id, $0) }
+        let iconsByID = Dictionary(uniqueKeysWithValues: iconPairs)
 
         return zip(wallets, rows).map { wallet, row in
-            WalletShare(
-                wallet: wallet,
-                icon: iconsByID[wallet.iconId],
-                isShared: row["is_shared"]
-            )
+            WalletShare(wallet: wallet, icon: iconsByID[wallet.iconId], isShared: row["is_shared"])
         }
     }
 
@@ -169,6 +161,7 @@ private extension AppDatabase {
         }
 
         let copied = try copyOwnCategories(for: walletID, in: db)
+
         try moveEntries(of: walletID, to: copied, in: db)
 
         let keys = try keysOfWallet(walletID, in: db) + copied.keys
@@ -183,6 +176,7 @@ private extension AppDatabase {
         in db: Database
     ) throws {
         let id = walletID.description
+        let zoneName = SyncZone.wallet(walletID)
 
         let isOwner = try Bool.fetchOne(
             db,
@@ -191,10 +185,7 @@ private extension AppDatabase {
         ) ?? true
 
         try db.execute(sql: "DELETE FROM sync_share WHERE wallet_id = ?", arguments: [id])
-        try db.execute(
-            sql: "DELETE FROM sync_record WHERE zone_name = ?",
-            arguments: [SyncZone.wallet(walletID)]
-        )
+        try db.execute(sql: "DELETE FROM sync_record WHERE zone_name = ?", arguments: [zoneName])
 
         let isEnabled = try Bool.fetchOne(db, sql: "SELECT enabled FROM sync_state") ?? false
 
@@ -288,130 +279,5 @@ private extension AppDatabase {
             + icons.map { SyncKey(table: .icon, id: $0) }
             + valuations.map { SyncKey(table: .valuation, id: $0) }
             + entries.map { SyncKey(table: .entry, id: $0) }
-    }
-
-    static func copyOwnCategories(
-        for walletID: String,
-        in db: Database
-    ) throws -> Copied {
-        var copied = Copied()
-
-        let rows = try Row.fetchAll(
-            db,
-            sql: """
-            SELECT id, icon_id FROM category
-            WHERE wallet_id IS NULL AND (
-                archived_at IS NULL OR id IN (
-                    SELECT category_id FROM entry WHERE wallet_id = ? OR to_wallet_id = ?
-                )
-            )
-            ORDER BY sort_order, id
-            """,
-            arguments: [walletID, walletID]
-        )
-
-        for row in rows {
-            let categoryID: String = row["id"]
-            let iconID: String = row["icon_id"]
-            let newCategoryID = EntryCategory.ID().description
-            let newIconID = Icon.ID().description
-
-            try copyRow(of: "icon", id: iconID, as: newIconID, replacing: [:], in: db)
-
-            try copyRow(
-                of: "category",
-                id: categoryID,
-                as: newCategoryID,
-                replacing: ["icon_id": newIconID, "wallet_id": walletID],
-                in: db
-            )
-
-            copied.categories[categoryID] = newCategoryID
-            copied.keys.append(SyncKey(table: .icon, id: newIconID))
-            copied.keys.append(SyncKey(table: .category, id: newCategoryID))
-
-            let tags = try String.fetchAll(
-                db,
-                sql: """
-                SELECT id FROM tag
-                WHERE category_id = ? AND (
-                    archived_at IS NULL OR id IN (
-                        SELECT tag_id FROM entry WHERE wallet_id = ? OR to_wallet_id = ?
-                    )
-                )
-                ORDER BY sort_order, id
-                """,
-                arguments: [categoryID, walletID, walletID]
-            )
-
-            for tagID in tags {
-                let newTagID = EntryTag.ID().description
-
-                try copyRow(
-                    of: "tag",
-                    id: tagID,
-                    as: newTagID,
-                    replacing: ["category_id": newCategoryID],
-                    in: db
-                )
-
-                copied.tags[tagID] = newTagID
-                copied.keys.append(SyncKey(table: .tag, id: newTagID))
-            }
-        }
-
-        return copied
-    }
-
-    static func moveEntries(
-        of walletID: String,
-        to copied: Copied,
-        in db: Database
-    ) throws {
-        for (old, new) in copied.categories {
-            try db.execute(
-                sql: """
-                UPDATE entry SET category_id = ?
-                WHERE category_id = ? AND (wallet_id = ? OR to_wallet_id = ?)
-                """,
-                arguments: [new, old, walletID, walletID]
-            )
-        }
-
-        for (old, new) in copied.tags {
-            try db.execute(
-                sql: """
-                UPDATE entry SET tag_id = ?
-                WHERE tag_id = ? AND (wallet_id = ? OR to_wallet_id = ?)
-                """,
-                arguments: [new, old, walletID, walletID]
-            )
-        }
-    }
-
-    static func copyRow(
-        of table: String,
-        id: String,
-        as newID: String,
-        replacing values: [String: String],
-        in db: Database
-    ) throws {
-        let names = try db.columns(in: table).map(\.name)
-
-        let expressions = names.map { name in
-            name == "id" || values[name] != nil ? "?" : name
-        }
-
-        let replaced = names.compactMap { name in
-            name == "id" ? newID : values[name]
-        }
-
-        try db.execute(
-            sql: """
-            INSERT INTO \(table) (\(names.joined(separator: ", ")))
-            SELECT \(expressions.joined(separator: ", ")) FROM \(table) WHERE id = ?
-            """,
-            arguments: StatementArguments(replaced + [id])
-        )
     }
 }

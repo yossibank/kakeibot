@@ -141,16 +141,10 @@ struct EntryWriteTests {
     @Test
     func deletesEntryPointedByRewardGoal() async throws {
         let setup = try await Setup()
+        let goalDraft = RewardGoalDraft(name: "靴", targetAmount: 6000)
 
-        let saved = try await setup.database.saveEntry(
-            setup.draft,
-            at: setup.now
-        )
-
-        let goal = try await setup.database.saveRewardGoal(
-            RewardGoalDraft(name: "靴", targetAmount: 6000),
-            at: setup.now
-        )
+        let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
+        let goal = try await setup.database.saveRewardGoal(goalDraft, at: setup.now)
 
         try await setup.database.writer.write { db in
             try db.execute(

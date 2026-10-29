@@ -146,7 +146,8 @@ struct SyncZoneTests {
         let id = try #require(Wallet.ID(walletID))
 
         try await setup.joinForeignShare(of: walletID)
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
         try await setup.execute("UPDATE wallet SET name = 'x' WHERE id = '\(walletID)'")
 
         try await setup.database.endSharing(id)
@@ -205,6 +206,7 @@ struct SyncZoneTests {
 
         try await setup.database.startSharing(id)
         try await setup.database.saveSyncEngineState(Data([1]), isShared: true)
+
         try await setup.database.turnOnSyncReplacingLocal()
 
         #expect(try await setup.database.isSyncEnabled())

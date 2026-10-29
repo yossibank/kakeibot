@@ -50,12 +50,14 @@ extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws {
+        let updatedAt = now.formatted(.iso8601)
+
         try RewardGoal
             .filter(entryIDs.contains(Column("entry_id")))
             .updateAll(
                 db,
                 Column("entry_id").set(to: nil),
-                Column("updated_at").set(to: now.formatted(.iso8601))
+                Column("updated_at").set(to: updatedAt)
             )
     }
 }

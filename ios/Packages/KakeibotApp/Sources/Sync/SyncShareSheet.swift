@@ -34,12 +34,15 @@ public extension SyncShareSheet {
         let controller = ShareController(share: share, container: container)
 
         controller.availablePermissions = [.allowPrivate, .allowReadWrite]
+
         controller.delegate = sheet
+
         controller.onDismiss = { [weak sheet, weak controller] in
             sheet?.close(controller?.share)
         }
 
         shown = sheet
+
         presenter.present(controller, animated: true)
     }
 }

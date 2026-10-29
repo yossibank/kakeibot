@@ -9,10 +9,10 @@ struct SyncTests {
     func notifiesChangeRecordedByTrigger() async throws {
         let setup = try await Setup()
         var updates = setup.database.syncChangeUpdates().makeAsyncIterator()
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
 
         let first: Void? = try await updates.next()
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        try await setup.execute(insert)
         let second: Void? = try await updates.next()
 
         #expect(first != nil)
@@ -35,44 +35,50 @@ struct SyncTests {
     @Test
     func recordsChangesOnlyWhenEnabled() async throws {
         let setup = try await Setup(enabled: false)
+        let first = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
+        let second = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-02', 'x')"
+        let secondKey = SyncKey(table: .noSpendDay, id: "2026-10-02")
 
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        try await setup.execute(first)
         let disabled = try await setup.pendingKeys()
         try await setup.database.setSyncEnabled(true)
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-02', 'x')")
+        try await setup.execute(second)
         let enabled = try await setup.pendingKeys()
 
         #expect(disabled == [])
-        #expect(enabled == [SyncKey(table: .noSpendDay, id: "2026-10-02")])
+        #expect(enabled == [secondKey])
     }
 
     @Test
     func skipsLocalSettings() async throws {
         let setup = try await Setup()
+        let onboarding = "INSERT INTO setting (key, value) VALUES ('onboarding_completed', 'true')"
+        let weekStart = "INSERT INTO setting (key, value) VALUES ('week_start', 'monday')"
+        let weekStartKey = SyncKey(table: .setting, id: "week_start")
 
-        try await setup
-            .execute("INSERT INTO setting (key, value) VALUES ('onboarding_completed', 'true')")
-        try await setup.execute("INSERT INTO setting (key, value) VALUES ('week_start', 'monday')")
+        try await setup.execute(onboarding)
+        try await setup.execute(weekStart)
+        let keys = try await setup.pendingKeys()
 
-        #expect(try await setup.pendingKeys() == [SyncKey(table: .setting, id: "week_start")])
+        #expect(keys == [weekStartKey])
     }
 
     @Test
     func keepsChangeMadeAfterReading() async throws {
         let setup = try await Setup()
         let walletID = try await setup.walletID()
+        let key = SyncKey(table: .wallet, id: walletID)
 
         try await setup.execute("UPDATE wallet SET name = 'A' WHERE id = '\(walletID)'")
         let read = try await setup.database.pendingSyncChanges()
         try await setup.execute("UPDATE wallet SET name = 'B' WHERE id = '\(walletID)'")
         try await setup.database.removeSyncChanges(read)
         let afterNewer = try await setup.pendingKeys()
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        let rest = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(rest)
         let afterAll = try await setup.pendingKeys()
 
-        #expect(afterNewer == [SyncKey(table: .wallet, id: walletID)])
+        #expect(afterNewer == [key])
         #expect(afterAll == [])
     }
 
@@ -83,8 +89,10 @@ struct SyncTests {
         try await setup.execute("INSERT INTO setting (key, value) VALUES ('entry_opened', 'true')")
         try await setup.database.queueAllForSync()
         let keys = try await setup.pendingKeys()
+        let walletID = try await setup.walletID()
+        let wallet = SyncKey(table: .wallet, id: walletID)
 
-        #expect(try await keys.contains(SyncKey(table: .wallet, id: setup.walletID())))
+        #expect(keys.contains(wallet))
         #expect(!keys.contains { $0.table == .setting })
     }
 
@@ -92,7 +100,8 @@ struct SyncTests {
     func appliesRemoteRowWithoutRecording() async throws {
         let source = try await Setup()
         let target = try await Setup(defaults: false)
-        let key = try await SyncKey(table: .wallet, id: source.walletID())
+        let walletID = try await source.walletID()
+        let key = SyncKey(table: .wallet, id: walletID)
         let walletRecord = try #require(try await source.database.syncRecord(for: key))
         let iconRecord = try await source.iconRecord(of: key)
 
@@ -105,16 +114,15 @@ struct SyncTests {
     @Test
     func keepsNewerLocalRow() async throws {
         let setup = try await Setup()
-        let key = try await SyncKey(table: .wallet, id: setup.walletID())
+        let walletID = try await setup.walletID()
+        let key = SyncKey(table: .wallet, id: walletID)
         let local = try #require(try await setup.database.syncRecord(for: key))
         var values = local.values
-
         values["name"] = .text("old")
         values["updated_at"] = .text("2000-01-01T00:00:00Z")
-        try await setup.database.applySyncChanges(
-            saved: [SyncRecord(key: key, values: values)],
-            deleted: []
-        )
+        let remote = SyncRecord(key: key, values: values)
+
+        try await setup.database.applySyncChanges(saved: [remote], deleted: [])
 
         #expect(try await setup.database.syncRecord(for: key) == local)
     }
@@ -123,13 +131,13 @@ struct SyncTests {
     func waitsForMissingParent() async throws {
         let source = try await Setup()
         let target = try await Setup(defaults: false)
-        let key = try await SyncKey(table: .wallet, id: source.walletID())
+        let walletID = try await source.walletID()
+        let key = SyncKey(table: .wallet, id: walletID)
         let walletRecord = try #require(try await source.database.syncRecord(for: key))
         let iconRecord = try await source.iconRecord(of: key)
 
         try await target.database.applySyncChanges(saved: [walletRecord], deleted: [])
         let waiting = try await target.database.syncRecord(for: key)
-
         try await target.database.applySyncChanges(saved: [iconRecord], deleted: [])
         let arrived = try await target.database.syncRecord(for: key)
 
@@ -147,10 +155,13 @@ struct SyncTests {
         VALUES ('local', '2026-10-01', '\(iconID)', 'x')
         """)
 
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
+        let remoteKey = SyncKey(table: .calendarStamp, id: "remote")
+        let local = SyncKey(table: .calendarStamp, id: "local")
 
         let remote = SyncRecord(
-            key: SyncKey(table: .calendarStamp, id: "remote"),
+            key: remoteKey,
             values: [
                 "date": .text("2026-10-01"),
                 "icon_id": .text(iconID),
@@ -159,8 +170,6 @@ struct SyncTests {
         )
 
         try await setup.database.applySyncChanges(saved: [remote], deleted: [])
-
-        let local = SyncKey(table: .calendarStamp, id: "local")
 
         #expect(try await setup.database.syncRecord(for: local) == nil)
         #expect(try await setup.database.syncRecord(for: remote.key) != nil)
@@ -178,8 +187,8 @@ struct SyncTests {
         VALUES ('e', 'expense', 100, '2026-10-01', '\(categoryID)', '\(walletID)', 'x', 'x')
         """)
 
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
-
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
         let key = SyncKey(table: .wallet, id: walletID)
 
         try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
@@ -191,12 +200,11 @@ struct SyncTests {
     @Test
     func deletesRemoteRowWithoutRecording() async throws {
         let setup = try await Setup()
-
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
-
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
         let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
+        try await setup.execute(insert)
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
 
         try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
 
@@ -207,13 +215,12 @@ struct SyncTests {
     @Test
     func keepsLocalDeletionNotYetSent() async throws {
         let setup = try await Setup()
-
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
-
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
         let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
         let remote = SyncRecord(key: key, values: ["created_at": .text("x")])
+        try await setup.execute(insert)
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
 
         try await setup.execute("DELETE FROM no_spend_day")
         try await setup.database.applySyncChanges(saved: [remote], deleted: [])
@@ -238,9 +245,9 @@ struct SyncTests {
     @Test
     func marksChangeOfMissingRowAsDeletion() async throws {
         let setup = try await Setup()
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
 
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        try await setup.execute(insert)
         let saved = try await setup.database.pendingSyncChanges().map(\.isDeletion)
         try await setup.execute("DELETE FROM no_spend_day")
         let deleted = try await setup.database.pendingSyncChanges().map(\.isDeletion)
@@ -252,17 +259,16 @@ struct SyncTests {
     @Test
     func savesSystemFieldsWithRemoteRows() async throws {
         let setup = try await Setup()
-
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
-
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
         let saved = SyncKey(table: .noSpendDay, id: "2026-10-02")
         let deleted = SyncKey(table: .noSpendDay, id: "2026-10-01")
         let remote = SyncRecord(key: saved, values: ["created_at": .text("x")])
         let fields = Data([1])
-
+        try await setup.execute(insert)
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
         try await setup.database.saveSyncSystemFields([deleted.own: fields])
+
         try await setup.database.applySyncChanges(
             saved: [remote],
             deleted: [deleted.own],
@@ -283,7 +289,6 @@ struct SyncTests {
         try await setup.database.saveSyncSystemFields([key.own: fields, other.own: fields])
         try await setup.database.saveSyncEngineState(Data([4]), isShared: false)
         let saved = try await setup.database.syncSystemFields(for: key.own)
-
         try await setup.database.removeSyncSystemFields([key.own])
         let removed = try await setup.database.syncSystemFields(for: key.own)
 
@@ -369,7 +374,10 @@ extension SyncTests.Setup {
 
     func iconRecord(of wallet: SyncKey) async throws -> SyncRecord {
         let id = try await value("SELECT icon_id FROM wallet WHERE id = '\(wallet.id)'")
-        return try #require(try await database.syncRecord(for: SyncKey(table: .icon, id: id)))
+        let key = SyncKey(table: .icon, id: id)
+        let record = try await database.syncRecord(for: key)
+
+        return try #require(record)
     }
 
     func value(_ sql: String) async throws -> String {

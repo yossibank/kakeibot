@@ -75,12 +75,10 @@ struct SyncSwitchTests {
         let category = try await setup.categoryID()
         let before = try await setup.database.hasEntries()
 
-        try await setup.execute(
-            """
-            INSERT INTO entry (id, type, amount, category_id, wallet_id, date, created_at, updated_at)
-            VALUES ('e1', 'expense', 1, '\(category)', '\(wallet)', '2026-10-12', 'x', 'x')
-            """
-        )
+        try await setup.execute("""
+        INSERT INTO entry (id, type, amount, category_id, wallet_id, date, created_at, updated_at)
+        VALUES ('e1', 'expense', 1, '\(category)', '\(wallet)', '2026-10-12', 'x', 'x')
+        """)
 
         #expect(before == false)
         #expect(try await setup.database.hasEntries())
