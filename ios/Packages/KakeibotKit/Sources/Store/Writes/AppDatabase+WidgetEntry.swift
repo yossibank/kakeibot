@@ -56,12 +56,12 @@ public extension AppDatabase {
 
             if let entry {
                 let change = CardBillChange(before: [entry])
-
                 try Self.recalculateCardBills(change, in: db, at: now)
             }
 
-            guard let record = try Self.setting(.widgetEntry, in: db),
-                  record.entryId == id
+            guard
+                let record = try Self.setting(.widgetEntry, in: db),
+                record.entryId == id
             else {
                 return
             }

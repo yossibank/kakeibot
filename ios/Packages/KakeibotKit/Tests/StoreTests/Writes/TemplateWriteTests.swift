@@ -7,14 +7,10 @@ struct TemplateWriteTests {
     @Test
     func addsTemplatesInOrder() async throws {
         let setup = try await Setup()
-
-        let lunch = try await setup.database.saveTemplate(
-            setup.draft,
-            at: setup.now
-        )
-
         var coffee = setup.draft
         coffee.name = "コーヒー"
+
+        let lunch = try await setup.database.saveTemplate(setup.draft, at: setup.now)
         let saved = try await setup.database.saveTemplate(coffee, at: setup.now)
         let templates = try await setup.database.templates()
 
@@ -27,24 +23,12 @@ struct TemplateWriteTests {
     func hidesAndShowsTemplate() async throws {
         let setup = try await Setup()
 
-        let saved = try await setup.database.saveTemplate(
-            setup.draft,
-            at: setup.now
-        )
+        let saved = try await setup.database.saveTemplate(setup.draft, at: setup.now)
 
-        try await setup.database.setTemplateHidden(
-            saved.id,
-            isHidden: true,
-            at: setup.now
-        )
+        try await setup.database.setTemplateHidden(saved.id, isHidden: true, at: setup.now)
         let shown = try await setup.database.templates()
         let all = try await setup.database.templates(includingHidden: true)
-
-        try await setup.database.setTemplateHidden(
-            saved.id,
-            isHidden: false,
-            at: setup.now
-        )
+        try await setup.database.setTemplateHidden(saved.id, isHidden: false, at: setup.now)
         let restored = try await setup.database.templates()
 
         #expect(shown.isEmpty)
@@ -59,19 +43,9 @@ struct TemplateWriteTests {
         var edited = setup.draft
         edited.amount = nil
 
-        let saved = try await setup.database.saveTemplate(
-            setup.draft,
-            at: setup.now
-        )
-
-        let updated = try await setup.database.saveTemplate(
-            edited,
-            editing: saved.id,
-            at: later
-        )
-
+        let saved = try await setup.database.saveTemplate(setup.draft, at: setup.now)
+        let updated = try await setup.database.saveTemplate(edited, editing: saved.id, at: later)
         let afterUpdate = try await setup.database.templates()
-
         try await setup.database.deleteTemplate(saved.id)
         let afterDelete = try await setup.database.templates()
 
@@ -93,10 +67,8 @@ struct TemplateWriteTests {
         }
 
         let ids = try await setup.database.templates().map(\.id)
-        try await setup.database.reorderTemplates(
-            ids.reversed(),
-            at: setup.now
-        )
+        let reversed = Array(ids.reversed())
+        try await setup.database.reorderTemplates(reversed, at: setup.now)
         let reordered = try await setup.database.templates()
 
         #expect(reordered.map(\.name) == names.reversed())
@@ -106,12 +78,15 @@ struct TemplateWriteTests {
     func clearsTemplateOfEntriesWhenDeleted() async throws {
         let setup = try await Setup()
 
-        let template = try await setup.database.saveTemplate(
-            setup.draft,
-            at: setup.now
+        let today = try #require(
+            LocalDate(
+                year: 2026,
+                month: 10,
+                day: 3
+            )
         )
 
-        let today = try #require(LocalDate(year: 2026, month: 10, day: 3))
+        let template = try await setup.database.saveTemplate(setup.draft, at: setup.now)
         let draft = try #require(template.entryDraft(on: today))
         let entry = try await setup.database.saveEntry(draft, at: setup.now)
 
@@ -131,12 +106,15 @@ struct TemplateWriteTests {
     func restoresDeletedTemplateWithItsEntries() async throws {
         let setup = try await Setup()
 
-        let template = try await setup.database.saveTemplate(
-            setup.draft,
-            at: setup.now
+        let today = try #require(
+            LocalDate(
+                year: 2026,
+                month: 10,
+                day: 3
+            )
         )
 
-        let today = try #require(LocalDate(year: 2026, month: 10, day: 3))
+        let template = try await setup.database.saveTemplate(setup.draft, at: setup.now)
         let draft = try #require(template.entryDraft(on: today))
         let entry = try await setup.database.saveEntry(draft, at: setup.now)
 
@@ -175,7 +153,9 @@ extension TemplateWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
+
         try database.insertDefaultsIfEmpty(at: now)
+
         let options = try await database.entryOptions()
 
         let draft = EntryTemplateDraft(

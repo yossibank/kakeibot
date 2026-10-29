@@ -34,16 +34,15 @@ extension SortableRecord {
     }
 
     static func nextSortOrder(in db: Database) throws -> Int {
-        try nextSortOrder(of: all(), in: db)
+        let request = all()
+        return try nextSortOrder(of: request, in: db)
     }
 
     static func nextSortOrder(
         of request: QueryInterfaceRequest<Self>,
         in db: Database
     ) throws -> Int {
-        let maxOrder = try request
-            .select(max(sortOrder), as: Int?.self)
-            .fetchOne(db)
+        let maxOrder = try request.select(max(sortOrder), as: Int?.self).fetchOne(db)
 
         return (maxOrder ?? nil).map { $0 + 1 } ?? 0
     }

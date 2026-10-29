@@ -15,21 +15,20 @@ struct RecurringScheduleTests {
 
         recurring.holidayShift = fixture.holidayShift ?? .none
 
-        let dates = recurring.dates(
-            from: fixture.from,
-            through: fixture.through
-        )
+        let dates = recurring.dates(from: fixture.from, through: fixture.through)
 
         #expect(dates == fixture.dates)
     }
 
     @Test(arguments: try occurrenceCases)
     func createsOnlyUnrecordedOccurrences(fixture: OccurrenceCase) throws {
-        var recurring = try Self.recurring(
+        let startDate = try #require(LocalDate("2026-01-01"))
+
+        var recurring = Self.recurring(
             frequency: .monthly,
             month: nil,
             day: fixture.day,
-            startDate: #require(LocalDate("2026-01-01")),
+            startDate: startDate,
             endDate: nil
         )
 
@@ -75,17 +74,12 @@ struct RecurringScheduleTests {
             endDate: nil
         )
 
-        let fresh = recurring.pendingOccurrences(through: today).map(\.date)
+        let fresh = recurring.pendingOccurrences(through: today).map(\.date.description)
         recurring.generatedUntil = generated
-        let pending = recurring.pendingOccurrences(through: today).map(\.date)
+        let pending = recurring.pendingOccurrences(through: today).map(\.date.description)
 
-        #expect(fresh.map(\.description) == [
-            "2026-01-25",
-            "2026-02-25",
-            "2026-03-25",
-            "2026-04-25"
-        ])
-        #expect(pending.map(\.description) == ["2026-03-25", "2026-04-25"])
+        #expect(fresh == ["2026-01-25", "2026-02-25", "2026-03-25", "2026-04-25"])
+        #expect(pending == ["2026-03-25", "2026-04-25"])
     }
 
     @Test
@@ -141,9 +135,13 @@ struct RecurringScheduleTests {
         salary.type = .income
 
         let recurrings = [rent, insurance, salary]
+        let range = from...through
 
-        #expect(recurrings.total(of: .expense, in: from...through) == 78000)
-        #expect(recurrings.total(of: .income, in: from...through) == 78000)
+        let expense = recurrings.total(of: .expense, in: range)
+        let income = recurrings.total(of: .income, in: range)
+
+        #expect(expense == 78000)
+        #expect(income == 78000)
     }
 }
 

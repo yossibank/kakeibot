@@ -2,9 +2,7 @@
 import Testing
 
 struct MigrationFrozenValuesTests {
-    private static let hint = Comment(
-        rawValue: "古いマイグレーションの値は変えない"
-    )
+    private static let hint = Comment(rawValue: "古いマイグレーションの値は変えない")
 
     @Test
     func walletKindsStayFrozen() {

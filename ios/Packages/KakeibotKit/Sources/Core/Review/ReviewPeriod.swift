@@ -21,10 +21,12 @@ public struct ReviewPeriod: Hashable, Sendable {
             self.range = date.period(startingOn: monthStartDay)
         case .year:
             let month = date.periodMonth(startingOn: monthStartDay)
-            let december = month.adding(months: 12 - month.month)
+            let monthsToDecember = 12 - month.month
+            let december = month.adding(months: monthsToDecember)
             let january = december.adding(months: -11)
             let start = january.period(startingOn: monthStartDay).lowerBound
             let end = december.period(startingOn: monthStartDay).upperBound
+
             self.range = start...end
         }
     }
@@ -49,7 +51,8 @@ public extension ReviewPeriod {
         }
 
         let elapsed = range.lowerBound.days(until: today)
-        let end = min(full.lowerBound.adding(days: elapsed), full.upperBound)
+        let shifted = full.lowerBound.adding(days: elapsed)
+        let end = min(shifted, full.upperBound)
 
         return full.lowerBound...end
     }
@@ -59,12 +62,14 @@ public extension ReviewPeriod {
 
         switch scale {
         case .week:
-            date = range.lowerBound.adding(days: 7 * count)
+            let days = 7 * count
+            date = range.lowerBound.adding(days: days)
         case .month:
             let month = range.upperBound.yearMonth.adding(months: count)
             date = month.period(startingOn: monthStartDay).lowerBound
         case .year:
-            let month = range.upperBound.yearMonth.adding(months: 12 * count)
+            let months = 12 * count
+            let month = range.upperBound.yearMonth.adding(months: months)
             date = month.period(startingOn: monthStartDay).lowerBound
         }
 

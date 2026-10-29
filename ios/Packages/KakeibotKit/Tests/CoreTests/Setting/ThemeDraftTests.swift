@@ -14,7 +14,6 @@ struct ThemeDraftTests {
         )
 
         let palette = draft.palette.map(Self.colors)
-
         #expect(palette == fixture.palette)
     }
 
@@ -78,8 +77,11 @@ private extension ThemeDraftTests {
     static func colors(_ palette: ThemePalette) -> [String: String] {
         let pairs = ThemePalette.Role.allCases.map { role in
             let digits = String(palette[role], radix: 16, uppercase: true)
-            let padding = String(repeating: "0", count: 6 - digits.count)
-            return (role.rawValue, "#" + padding + digits)
+            let paddingCount = 6 - digits.count
+            let padding = String(repeating: "0", count: paddingCount)
+            let hex = "#" + padding + digits
+
+            return (role.rawValue, hex)
         }
 
         return Dictionary(uniqueKeysWithValues: pairs)

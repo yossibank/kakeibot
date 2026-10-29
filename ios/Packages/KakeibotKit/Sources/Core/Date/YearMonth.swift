@@ -41,12 +41,15 @@ public extension YearMonth {
 
     func weeks(startingOn weekStart: Weekday) -> [[LocalDate?]] {
         let first = LocalDate(yearMonth: self, clampedDay: 1)
-        let last = first.adding(days: numberOfDays - 1)
+        let lastOffset = numberOfDays - 1
+        let last = first.adding(days: lastOffset)
+
         return (first...last).weeks(startingOn: weekStart)
     }
 
     func period(startingOn startDay: MonthStartDay) -> ClosedRange<LocalDate> {
-        let startedLastMonth = startDay.period(startingIn: adding(months: -1))
+        let lastMonth = adding(months: -1)
+        let startedLastMonth = startDay.period(startingIn: lastMonth)
 
         if startedLastMonth.upperBound.yearMonth == self {
             return startedLastMonth
@@ -109,8 +112,7 @@ private extension YearMonth {
         _ value: Int,
         _ divisor: Int
     ) -> Int {
-        let result = value.quotientAndRemainder(dividingBy: divisor)
-        let (quotient, remainder) = result
+        let (quotient, remainder) = value.quotientAndRemainder(dividingBy: divisor)
         return remainder < 0 ? quotient - 1 : quotient
     }
 }
@@ -125,7 +127,6 @@ extension YearMonth: CustomStringConvertible {
     public var description: String {
         let yearText = DateText.padded(year, digits: 4)
         let monthText = DateText.padded(month, digits: 2)
-
         return "\(yearText)-\(monthText)"
     }
 }

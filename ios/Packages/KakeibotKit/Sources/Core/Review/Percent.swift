@@ -1,10 +1,16 @@
 public enum Percent {
-    public static func floor(_ part: Int, of whole: Int) -> Int {
+    public static func floor(
+        _ part: Int,
+        of whole: Int
+    ) -> Int {
         guard whole > 0 else {
             return 0
         }
 
-        return min(max(part * 100 / whole, 0), 100)
+        let percent = part * 100 / whole
+        let nonNegative = max(percent, 0)
+
+        return min(nonNegative, 100)
     }
 
     public static func shares(_ parts: [Int]) -> [Int] {
@@ -15,7 +21,9 @@ public enum Percent {
         }
 
         var percents = parts.map { $0 * 100 / whole }
+
         let rest = 100 - percents.reduce(0, +)
+
         let order = parts.indices.sorted { lhs, rhs in
             let lhsRest = parts[lhs] * 100 % whole
             let rhsRest = parts[rhs] * 100 % whole

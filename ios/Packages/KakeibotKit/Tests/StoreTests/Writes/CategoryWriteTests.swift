@@ -8,12 +8,7 @@ struct CategoryWriteTests {
     func addsCategoryAfterSameKind() async throws {
         let setup = try await Setup()
 
-        let saved = try await setup.database.saveCategory(
-            setup.draft,
-            tags: [],
-            at: setup.now
-        )
-
+        let saved = try await setup.database.saveCategory(setup.draft, tags: [], at: setup.now)
         let list = try await setup.database.categoryList()
         let icon = try #require(list.icons[saved.iconId])
 
@@ -70,15 +65,13 @@ struct CategoryWriteTests {
     func reordersCategories() async throws {
         let setup = try await Setup()
         let before = try await setup.expenseCategories()
-        let reversed = before.map(\.id).reversed()
+        let ids = before.map(\.id)
+        let reversed = Array(ids.reversed())
 
-        try await setup.database.reorderCategories(
-            Array(reversed),
-            at: setup.now
-        )
+        try await setup.database.reorderCategories(reversed, at: setup.now)
         let after = try await setup.expenseCategories()
 
-        #expect(after.map(\.id) == Array(reversed))
+        #expect(after.map(\.id) == reversed)
         #expect(after.map(\.sortOrder) == Array(0..<before.count))
     }
 
@@ -87,12 +80,8 @@ struct CategoryWriteTests {
         let setup = try await Setup()
         let food = try await setup.category(named: "食費")
 
-        let deletion = try await setup.database.deleteCategory(
-            food.id,
-            at: setup.now
-        )
+        let deletion = try await setup.database.deleteCategory(food.id, at: setup.now)
         let categories = try await setup.expenseCategories()
-
         try await setup.database.restore(deletion)
         let restored = try await setup.category(named: "食費")
 
@@ -119,10 +108,7 @@ struct CategoryWriteTests {
         try await setup.database.saveEntry(entry, at: setup.now)
 
         await #expect(throws: AppDatabase.CategoryWriteError.hasEntries) {
-            try await setup.database.deleteCategory(
-                food.id,
-                at: setup.now
-            )
+            try await setup.database.deleteCategory(food.id, at: setup.now)
         }
     }
 
@@ -131,18 +117,9 @@ struct CategoryWriteTests {
         let setup = try await Setup()
         let food = try await setup.category(named: "食費")
 
-        try await setup.database.setCategoryHidden(
-            food.id,
-            isHidden: true,
-            at: setup.now
-        )
+        try await setup.database.setCategoryHidden(food.id, isHidden: true, at: setup.now)
         let hiddenOptions = try await setup.database.entryOptions()
-
-        try await setup.database.setCategoryHidden(
-            food.id,
-            isHidden: false,
-            at: setup.now
-        )
+        try await setup.database.setCategoryHidden(food.id, isHidden: false, at: setup.now)
         let shownOptions = try await setup.database.entryOptions()
 
         #expect(!hiddenOptions.expenseCategories.contains { $0.id == food.id })
@@ -162,21 +139,17 @@ extension CategoryWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
-        try database.insertDefaultsIfEmpty(at: now)
+        let draft = CategoryDraft(kind: .expense, name: "外食", mark: .glyph(.cafe), color: "#E07A5F")
 
-        let draft = CategoryDraft(
-            kind: .expense,
-            name: "外食",
-            mark: .glyph(.cafe),
-            color: "#E07A5F"
-        )
+        try database.insertDefaultsIfEmpty(at: now)
 
         self.init(database: database, now: now, draft: draft)
     }
 
     func category(named name: String) async throws -> EntryCategory {
         let list = try await database.categoryList()
-        return try #require(list.categories.first { $0.name == name })
+        let category = list.categories.first { $0.name == name }
+        return try #require(category)
     }
 
     func expenseCategories() async throws -> [EntryCategory] {

@@ -29,10 +29,8 @@ public enum Holiday {
 
         return isWeekend || isYearEnd || contains(date)
     }
-}
 
-private extension Holiday {
-    static func namedHoliday(on date: LocalDate) -> String? {
+    private static func namedHoliday(on date: LocalDate) -> String? {
         switch (date.month, date.day) {
         case (1, 1): "元日"
         case (1, _) where isMonday(date, week: 2): "成人の日"
@@ -54,12 +52,15 @@ private extension Holiday {
         }
     }
 
-    static func isNamed(_ date: LocalDate) -> Bool {
+    private static func isNamed(_ date: LocalDate) -> Bool {
         namedHoliday(on: date) != nil
     }
 
-    static func isSubstitute(_ date: LocalDate) -> Bool {
-        guard date.weekday != .sunday, !isNamed(date) else {
+    private static func isSubstitute(_ date: LocalDate) -> Bool {
+        guard
+            date.weekday != .sunday,
+            !isNamed(date)
+        else {
             return false
         }
 
@@ -76,31 +77,33 @@ private extension Holiday {
         return false
     }
 
-    static func isBetweenHolidays(_ date: LocalDate) -> Bool {
-        isNamed(date.adding(days: -1)) && isNamed(date.adding(days: 1))
+    private static func isBetweenHolidays(_ date: LocalDate) -> Bool {
+        let previous = date.adding(days: -1)
+        let next = date.adding(days: 1)
+        return isNamed(previous) && isNamed(next)
     }
 
-    static func isMonday(
+    private static func isMonday(
         _ date: LocalDate,
         week: Int
     ) -> Bool {
         date.weekday == .monday && (date.day - 1) / 7 == week - 1
     }
 
-    static func springEquinox(in year: Int) -> Int {
+    private static func springEquinox(in year: Int) -> Int {
         equinox(base: 20.8431, year: year)
     }
 
-    static func autumnEquinox(in year: Int) -> Int {
+    private static func autumnEquinox(in year: Int) -> Int {
         equinox(base: 23.2488, year: year)
     }
 
-    static func equinox(
+    private static func equinox(
         base: Double,
         year: Int
     ) -> Int {
         let years = year - 1980
-        let day = base + 0.242194 * Double(years)
-        return Int(day.rounded(.down)) - years / 4
+        let day = (base + 0.242194 * Double(years)).rounded(.down)
+        return Int(day) - years / 4
     }
 }

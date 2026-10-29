@@ -31,12 +31,13 @@ extension AppDatabase {
         let ids = deleted.map(\.id)
         let linked = Entry.filter(ids.contains(Column("recurring_id")))
         let entries = try linked.fetchAll(db)
+        let updatedAt = now.formatted(.iso8601)
 
         try linked.updateAll(
             db,
             Column("recurring_id").set(to: nil),
             Column("recurring_date").set(to: nil),
-            Column("updated_at").set(to: now.formatted(.iso8601))
+            Column("updated_at").set(to: updatedAt)
         )
 
         try recurrings.deleteAll(db)

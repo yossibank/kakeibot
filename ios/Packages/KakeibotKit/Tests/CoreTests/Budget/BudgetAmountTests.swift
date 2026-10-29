@@ -9,8 +9,10 @@ struct BudgetAmountTests {
         let ids = ["food": food, "daily": daily]
 
         let budgets = fixture.budgets.map { row in
-            Budget(
-                categoryId: row.category.flatMap { ids[$0] },
+            let rowCategoryId = row.category.flatMap { ids[$0] }
+
+            return Budget(
+                categoryId: rowCategoryId,
                 fromMonth: row.fromMonth,
                 amount: row.amount
             )
@@ -18,7 +20,6 @@ struct BudgetAmountTests {
 
         let categoryId = fixture.category.flatMap { ids[$0] }
         let amount = budgets.amount(for: categoryId, in: fixture.month)
-
         #expect(amount == fixture.amount)
     }
 }

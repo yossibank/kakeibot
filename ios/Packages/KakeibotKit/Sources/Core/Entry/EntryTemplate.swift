@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EntryTemplate: Hashable, Sendable {
+public struct EntryTemplate: Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var name: String
@@ -64,8 +64,6 @@ public extension EntryTemplate {
         )
     }
 }
-
-extension EntryTemplate: Identifiable {}
 
 extension EntryTemplate: Codable {
     public func encode(to encoder: any Encoder) throws {

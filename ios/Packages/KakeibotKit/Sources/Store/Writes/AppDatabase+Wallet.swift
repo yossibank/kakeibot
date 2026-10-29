@@ -30,12 +30,7 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
-            try Wallet.reorder(
-                ids,
-                orThrow: WalletWriteError.walletNotFound,
-                in: db,
-                at: now
-            )
+            try Wallet.reorder(ids, orThrow: WalletWriteError.walletNotFound, in: db, at: now)
         }
     }
 
@@ -49,7 +44,8 @@ public extension AppDatabase {
                 throw WalletWriteError.walletNotFound
             }
 
-            if isHidden, try Self.shownWalletCount(in: db) <= 1 {
+            if isHidden,
+               try Self.shownWalletCount(in: db) <= 1 {
                 throw WalletWriteError.lastShownWallet
             }
 
@@ -89,17 +85,24 @@ public extension AppDatabase {
             let valuations = Valuation.filter(Column("wallet_id") == id)
             let categories = EntryCategory.filter(Column("wallet_id") == id)
             let deletedCategories = try categories.fetchAll(db)
-            let tags = EntryTag.filter(deletedCategories.map(\.id).contains(Column("category_id")))
-            let icons = Icon.filter(deletedCategories.map(\.iconId).contains(Column("id")))
+            let categoryIds = deletedCategories.map(\.id)
+            let iconIds = deletedCategories.map(\.iconId)
+            let tags = EntryTag.filter(categoryIds.contains(Column("category_id")))
+            let icons = Icon.filter(iconIds.contains(Column("id")))
+            let iconRecords = try icons.fetchAll(db)
+            let tagRecords = try tags.fetchAll(db)
+            let recurringRecords = try recurrings.fetchAll(db)
+            let templateRecords = try templates.fetchAll(db)
+            let valuationRecords = try valuations.fetchAll(db)
 
-            let deletion = try Deletion(
-                icons: icons.fetchAll(db),
+            let deletion = Deletion(
+                icons: iconRecords,
                 wallets: [wallet],
                 categories: deletedCategories,
-                tags: tags.fetchAll(db),
-                recurrings: recurrings.fetchAll(db),
-                templates: templates.fetchAll(db),
-                valuations: valuations.fetchAll(db)
+                tags: tagRecords,
+                recurrings: recurringRecords,
+                templates: templateRecords,
+                valuations: valuationRecords
             )
 
             let key = SyncKey(table: .wallet, id: id.description)
@@ -131,11 +134,7 @@ private extension AppDatabase {
         let icon = try draft.newIcon(at: now)
         let sortOrder = try Wallet.nextSortOrder(in: db)
 
-        let wallet = try draft.newWallet(
-            iconId: icon.id,
-            sortOrder: sortOrder,
-            at: now
-        )
+        let wallet = try draft.newWallet(iconId: icon.id, sortOrder: sortOrder, at: now)
 
         try icon.insert(db)
         try wallet.insert(db)
@@ -157,10 +156,13 @@ private extension AppDatabase {
             throw WalletWriteError.iconNotFound
         }
 
-        let locked = try draft.locked(
+        let hasRecords = try Self.hasRecords(of: id, in: db)
+        let hasValuations = try Self.hasValuations(of: id, in: db)
+
+        let locked = draft.locked(
             by: existing,
-            hasRecords: Self.hasRecords(of: id, in: db),
-            hasValuations: Self.hasValuations(of: id, in: db)
+            hasRecords: hasRecords,
+            hasValuations: hasValuations
         )
 
         let wallet = try locked.applied(to: existing, at: now)
@@ -175,9 +177,7 @@ private extension AppDatabase {
         of id: Wallet.ID,
         in db: Database
     ) throws -> Bool {
-        try Valuation
-            .filter(Column("wallet_id") == id)
-            .fetchCount(db) > 0
+        try Valuation.filter(Column("wallet_id") == id).fetchCount(db) > 0
     }
 
     static func hasRecords(
@@ -193,8 +193,6 @@ private extension AppDatabase {
     }
 
     static func shownWalletCount(in db: Database) throws -> Int {
-        try Wallet
-            .filter(Column("archived_at") == nil)
-            .fetchCount(db)
+        try Wallet.filter(Column("archived_at") == nil).fetchCount(db)
     }
 }

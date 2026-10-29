@@ -104,7 +104,6 @@ struct EntryListTests {
         }
 
         let options = try await database.entryOptions()
-
         let remaining = Array(defaults.expenseCategories.dropFirst())
 
         #expect(options.expenseCategories == remaining)

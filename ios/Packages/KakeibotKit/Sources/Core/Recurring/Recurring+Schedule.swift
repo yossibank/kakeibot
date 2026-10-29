@@ -64,7 +64,8 @@ public extension Recurring {
     }
 
     func occurrence(on date: LocalDate) -> Occurrence {
-        Occurrence(scheduled: scheduledDate(of: date), date: date)
+        let scheduled = scheduledDate(of: date)
+        return Occurrence(scheduled: scheduled, date: date)
     }
 
     func scheduledDate(of date: LocalDate) -> LocalDate {
@@ -72,12 +73,14 @@ public extension Recurring {
     }
 
     func scheduledDate(shiftedTo date: LocalDate) -> LocalDate? {
-        scheduledDates(shiftedInto: date.yearMonth)
-            .first { shifted($0) == date }
+        scheduledDates(shiftedInto: date.yearMonth).first { shifted($0) == date }
     }
 
     func scheduledDates(shiftedInto month: YearMonth) -> [LocalDate] {
-        months(from: month.adding(months: -1), through: month.adding(months: 1))
+        let previous = month.adding(months: -1)
+        let next = month.adding(months: 1)
+
+        return months(from: previous, through: next)
             .map { LocalDate(yearMonth: $0, clampedDay: day) }
             .filter { shifted($0).yearMonth == month }
     }
@@ -121,10 +124,7 @@ private extension Recurring {
             return indices.map { YearMonth(monthIndex: $0) }
         case .yearly:
             let month = month ?? 1
-
-            return indices
-                .map { YearMonth(monthIndex: $0) }
-                .filter { $0.month == month }
+            return indices.map { YearMonth(monthIndex: $0) }.filter { $0.month == month }
         }
     }
 }

@@ -12,26 +12,12 @@ struct ValuationWriteTests {
         let wallet = try #require(options.wallets.first)
         let day = try #require(LocalDate("2026-10-21"))
         let now = Date()
-
-        try await database.saveValuation(
-            150_000,
-            of: wallet.id,
-            on: day,
-            at: now
-        )
-
-        try await database.saveValuation(
-            160_000,
-            of: wallet.id,
-            on: day,
-            at: now
-        )
-
-        let list = try await database.entryList()
-
         var investment = wallet
         investment.kind = .investment
 
+        try await database.saveValuation(150_000, of: wallet.id, on: day, at: now)
+        try await database.saveValuation(160_000, of: wallet.id, on: day, at: now)
+        let list = try await database.entryList()
         let balance = investment.balance(with: [], valuations: list.valuations)
 
         #expect(list.valuations.map(\.amount) == [160_000])

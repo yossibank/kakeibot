@@ -22,21 +22,21 @@ public struct Deletion: Hashable, Sendable, Identifiable {
 
 public extension Deletion {
     init(merging deletions: [Deletion]) {
-        self.init(
-            icons: deletions.flatMap(\.icons),
-            wallets: deletions.flatMap(\.wallets),
-            categories: deletions.flatMap(\.categories),
-            tags: deletions.flatMap(\.tags),
-            recurrings: deletions.flatMap(\.recurrings),
-            templates: deletions.flatMap(\.templates),
-            budgets: deletions.flatMap(\.budgets),
-            valuations: deletions.flatMap(\.valuations),
-            shelfIcons: deletions.flatMap(\.shelfIcons),
-            rewardRules: deletions.flatMap(\.rewardRules),
-            rewardLogs: deletions.flatMap(\.rewardLogs),
-            themes: deletions.flatMap(\.themes),
-            entries: deletions.flatMap(\.entries),
-            themeChoice: deletions.lazy.compactMap(\.themeChoice).first
-        )
+        self.init()
+
+        self.icons = deletions.flatMap(\.icons)
+        self.wallets = deletions.flatMap(\.wallets)
+        self.categories = deletions.flatMap(\.categories)
+        self.tags = deletions.flatMap(\.tags)
+        self.recurrings = deletions.flatMap(\.recurrings)
+        self.templates = deletions.flatMap(\.templates)
+        self.budgets = deletions.flatMap(\.budgets)
+        self.valuations = deletions.flatMap(\.valuations)
+        self.shelfIcons = deletions.flatMap(\.shelfIcons)
+        self.rewardRules = deletions.flatMap(\.rewardRules)
+        self.rewardLogs = deletions.flatMap(\.rewardLogs)
+        self.themes = deletions.flatMap(\.themes)
+        self.entries = deletions.flatMap(\.entries)
+        self.themeChoice = deletions.lazy.compactMap(\.themeChoice).first
     }
 }

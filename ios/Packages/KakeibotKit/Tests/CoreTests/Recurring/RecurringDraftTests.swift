@@ -30,7 +30,6 @@ struct RecurringDraftTests {
         let generated = try #require(LocalDate("2026-03-27"))
         var original = try Self.rentDraft().newRecurring(at: created)
         original.generatedUntil = generated
-
         var draft = RecurringDraft(original)
         draft.frequency = .yearly
         draft.month = 4
@@ -52,11 +51,10 @@ struct RecurringDraftTests {
         let later = try #require(LocalDate("2026-02-01"))
         var original = try Self.rentDraft().newRecurring(at: now)
         original.generatedUntil = generated
-
         var draft = RecurringDraft(original)
+
         draft.startDate = later
         let moved = try draft.applied(to: original, at: now)
-
         draft.startDate = earlier
         let earlierStart = try draft.applied(to: original, at: now)
 
@@ -115,31 +113,35 @@ extension RecurringDraftTests {
         let endDate: LocalDate?
         let remindDaysBefore: Int?
         let problems: [RecurringDraft.Problem]
+    }
+}
 
-        func draft() -> RecurringDraft {
-            let walletId = Wallet.ID()
+extension RecurringDraftTests.DraftCase {
+    func draft() -> RecurringDraft {
+        let walletId = Wallet.ID()
+        let categoryId = category ? EntryCategory.ID() : nil
+        let draftWalletId = wallet ? walletId : nil
 
-            let toWalletId: Wallet.ID? = switch toWallet {
-            case "same": walletId
-            case "other": Wallet.ID()
-            default: nil
-            }
-
-            return RecurringDraft(
-                type: type,
-                amount: amount,
-                categoryId: category ? EntryCategory.ID() : nil,
-                walletId: wallet ? walletId : nil,
-                toWalletId: toWalletId,
-                frequency: frequency,
-                month: month,
-                day: day,
-                closingDay: closingDay,
-                startDate: startDate,
-                endDate: endDate,
-                remindDaysBefore: remindDaysBefore
-            )
+        let toWalletId: Wallet.ID? = switch toWallet {
+        case "same": walletId
+        case "other": Wallet.ID()
+        default: nil
         }
+
+        return RecurringDraft(
+            type: type,
+            amount: amount,
+            categoryId: categoryId,
+            walletId: draftWalletId,
+            toWalletId: toWalletId,
+            frequency: frequency,
+            month: month,
+            day: day,
+            closingDay: closingDay,
+            startDate: startDate,
+            endDate: endDate,
+            remindDaysBefore: remindDaysBefore
+        )
     }
 }
 

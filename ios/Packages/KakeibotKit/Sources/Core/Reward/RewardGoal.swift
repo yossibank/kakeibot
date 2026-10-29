@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RewardGoal: Hashable, Sendable {
+public struct RewardGoal: Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var name: String
@@ -32,8 +32,6 @@ public struct RewardGoal: Hashable, Sendable {
 public extension RewardGoal {
     typealias ID = Identifier<RewardGoal>
 }
-
-extension RewardGoal: Identifiable {}
 
 extension RewardGoal: Codable {
     public func encode(to encoder: any Encoder) throws {

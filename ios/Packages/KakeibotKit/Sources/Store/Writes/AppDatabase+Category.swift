@@ -91,13 +91,17 @@ public extension AppDatabase {
             let templates = EntryTemplate.filter(column == id)
             let budgets = Budget.filter(column == id)
             let tags = EntryTag.filter(column == id)
+            let tagRecords = try tags.fetchAll(db)
+            let recurringRecords = try recurrings.fetchAll(db)
+            let templateRecords = try templates.fetchAll(db)
+            let budgetRecords = try budgets.fetchAll(db)
 
-            let deletion = try Deletion(
+            let deletion = Deletion(
                 categories: [category],
-                tags: tags.fetchAll(db),
-                recurrings: recurrings.fetchAll(db),
-                templates: templates.fetchAll(db),
-                budgets: budgets.fetchAll(db)
+                tags: tagRecords,
+                recurrings: recurringRecords,
+                templates: templateRecords,
+                budgets: budgetRecords
             )
 
             try Self.deleteRecurrings(recurrings, in: db, at: now)
@@ -124,12 +128,7 @@ private extension AppDatabase {
             .filter(Column("wallet_id") == nil)
 
         let sortOrder = try EntryCategory.nextSortOrder(of: sameKind, in: db)
-
-        let category = try draft.newCategory(
-            iconId: icon.id,
-            sortOrder: sortOrder,
-            at: now
-        )
+        let category = try draft.newCategory(iconId: icon.id, sortOrder: sortOrder, at: now)
 
         try icon.insert(db)
         try category.insert(db)
@@ -166,9 +165,7 @@ private extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws -> [EntryTag] {
-        let existing = try EntryTag
-            .filter(Column("category_id") == categoryId)
-            .fetchAll(db)
+        let existing = try EntryTag.filter(Column("category_id") == categoryId).fetchAll(db)
 
         let names = drafts.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) }
 
@@ -198,7 +195,8 @@ private extension AppDatabase {
             return restored
         }
 
-        let kept = Set(drafts.compactMap(\.id))
+        let keptIds = drafts.compactMap(\.id)
+        let kept = Set(keptIds)
 
         for var tag in existing where !kept.contains(tag.id) {
             guard tag.archivedAt == nil else {
@@ -213,14 +211,8 @@ private extension AppDatabase {
 
         return try drafts.enumerated().map { order, draft in
             guard let id = draft.id else {
-                let tag = try draft.newTag(
-                    categoryId: categoryId,
-                    sortOrder: order,
-                    at: now
-                )
-
+                let tag = try draft.newTag(categoryId: categoryId, sortOrder: order, at: now)
                 try tag.insert(db)
-
                 return tag
             }
 

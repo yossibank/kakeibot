@@ -5,19 +5,13 @@ struct EntrySearchTests {
     @Test(arguments: try cases)
     func matchesWords(fixture: SearchCase) {
         let search = EntrySearch(fixture.query)
-
-        let matches = search.matches(
-            amount: fixture.amount,
-            texts: fixture.texts
-        )
-
+        let matches = search.matches(amount: fixture.amount, texts: fixture.texts)
         #expect(matches == fixture.matches)
     }
 
     @Test(arguments: try recentCases)
     func remembersRecentWords(fixture: RecentCase) {
         let result = EntrySearch.remembering(fixture.text, in: fixture.recent)
-
         #expect(result == fixture.result)
     }
 

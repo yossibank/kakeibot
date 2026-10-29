@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Theme: Hashable, Sendable {
+public struct Theme: Codable, Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var name: String
@@ -52,13 +52,7 @@ public struct Theme: Hashable, Sendable {
 
 public extension Theme {
     typealias ID = Identifier<Theme>
-}
 
-extension Theme: Identifiable {}
-
-extension Theme: Codable {}
-
-public extension Theme {
     var palette: ThemePalette {
         ThemeDraft(self).palette ?? .night
     }

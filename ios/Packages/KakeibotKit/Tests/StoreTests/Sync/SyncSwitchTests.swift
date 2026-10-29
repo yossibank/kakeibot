@@ -7,38 +7,38 @@ struct SyncSwitchTests {
     func turningOnQueuesAllRows() async throws {
         let setup = try await SyncTests.Setup(enabled: false)
         let wallet = try await setup.walletID()
+        let key = SyncKey(table: .wallet, id: wallet)
 
         try await setup.database.turnOnSync()
 
         #expect(try await setup.database.isSyncEnabled())
-        #expect(try await setup.pendingKeys().contains(SyncKey(table: .wallet, id: wallet)))
+        #expect(try await setup.pendingKeys().contains(key))
     }
 
     @Test
     func replacingLocalRemovesSyncedRowsWithoutRecording() async throws {
         let setup = try await SyncTests.Setup(enabled: false)
-
-        try await setup
-            .execute("INSERT INTO setting (key, value) VALUES ('onboarding_completed', 'true')")
-        try await setup.execute("INSERT INTO setting (key, value) VALUES ('week_start', 'monday')")
+        let onboarding = "INSERT INTO setting (key, value) VALUES ('onboarding_completed', 'true')"
+        let weekStart = "INSERT INTO setting (key, value) VALUES ('week_start', 'monday')"
+        try await setup.execute(onboarding)
+        try await setup.execute(weekStart)
 
         try await setup.database.turnOnSyncReplacingLocal()
+        let keys = try await setup.value("SELECT group_concat(key) FROM setting")
 
         #expect(try await setup.database.isSyncEnabled())
         #expect(try await setup.pendingKeys() == [])
         #expect(try await setup.value("SELECT COUNT(*) FROM wallet") == "0")
         #expect(try await setup.value("SELECT COUNT(*) FROM category") == "0")
-        #expect(try await setup
-            .value("SELECT group_concat(key) FROM setting") == "onboarding_completed")
+        #expect(keys == "onboarding_completed")
     }
 
     @Test
     func turningOffClearsSyncState() async throws {
         let setup = try await SyncTests.Setup()
         let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
-
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
+        try await setup.execute(insert)
         try await setup.database.saveSyncSystemFields([key.own: Data([1])])
         try await setup.database.saveSyncEngineState(Data([2]))
 
@@ -54,12 +54,13 @@ struct SyncSwitchTests {
     func countsPendingUntilSent() async throws {
         let setup = try await SyncTests.Setup()
         var counts = setup.database.pendingSyncCountUpdates().makeAsyncIterator()
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
 
         let first = try await counts.next()
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        try await setup.execute(insert)
         let queued = try await counts.next()
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
         let sent = try await counts.next()
 
         #expect(first == 0)

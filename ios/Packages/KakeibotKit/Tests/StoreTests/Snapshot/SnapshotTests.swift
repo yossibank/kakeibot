@@ -56,10 +56,9 @@ struct SnapshotTests {
         let export = try Self.export
 
         try database.replace(with: export.data)
+
         try database.writer.write { db in
-            try db.execute(
-                sql: "INSERT INTO setting (key, value) VALUES ('future_key', '1')"
-            )
+            try db.execute(sql: "INSERT INTO setting (key, value) VALUES ('future_key', '1')")
         }
 
         let snapshot = try database.snapshot()
@@ -78,11 +77,7 @@ struct SnapshotTests {
         try database.replace(with: export.data)
         let json = try await database.backup(at: date, app: app)
         let backup = try ExportV1(json: json)
-        try await restored.restoreBackup(
-            backup,
-            stashingAt: date,
-            app: app
-        ) { _ in }
+        try await restored.restoreBackup(backup, stashingAt: date, app: app) { _ in }
 
         #expect(backup.exportedAt == date)
         #expect(backup.app == app)
@@ -104,11 +99,7 @@ struct SnapshotTests {
 
         let before = try database.snapshot()
 
-        try await database.restoreBackup(
-            export,
-            stashingAt: date,
-            app: app
-        ) { data in
+        try await database.restoreBackup(export, stashingAt: date, app: app) { data in
             stashed.set(data)
         }
 
@@ -132,11 +123,7 @@ struct SnapshotTests {
         let before = try database.snapshot()
 
         await #expect(throws: StashError.self) {
-            try await database.restoreBackup(
-                export,
-                stashingAt: Date(),
-                app: app
-            ) { _ in
+            try await database.restoreBackup(export, stashingAt: Date(), app: app) { _ in
                 throw StashError()
             }
         }
@@ -150,10 +137,12 @@ extension SnapshotTests {
 
     final class Stashed: @unchecked Sendable {
         private(set) var data: Data?
+    }
+}
 
-        func set(_ data: Data) {
-            self.data = data
-        }
+extension SnapshotTests.Stashed {
+    func set(_ data: Data) {
+        self.data = data
     }
 }
 

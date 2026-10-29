@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EntryTag: Hashable, Sendable {
+public struct EntryTag: Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var categoryId: EntryCategory.ID
@@ -32,8 +32,6 @@ public struct EntryTag: Hashable, Sendable {
 public extension EntryTag {
     typealias ID = Identifier<EntryTag>
 }
-
-extension EntryTag: Identifiable {}
 
 extension EntryTag: Codable {
     public func encode(to encoder: any Encoder) throws {

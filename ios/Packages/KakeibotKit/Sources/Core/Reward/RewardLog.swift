@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RewardLog: Hashable, Sendable {
+public struct RewardLog: Codable, Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var ruleId: RewardRule.ID
@@ -26,7 +26,3 @@ public struct RewardLog: Hashable, Sendable {
 public extension RewardLog {
     typealias ID = Identifier<RewardLog>
 }
-
-extension RewardLog: Identifiable {}
-
-extension RewardLog: Codable {}

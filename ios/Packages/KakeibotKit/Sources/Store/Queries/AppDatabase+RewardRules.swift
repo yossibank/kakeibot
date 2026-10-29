@@ -2,13 +2,8 @@ import Core
 import GRDB
 
 public extension AppDatabase {
-    func rewardRuleListUpdates() -> some AsyncSequence<
-        RewardRuleList,
-        any Error
-    > {
-        ValueObservation
-            .tracking(Self.rewardRuleList)
-            .values(in: writer)
+    func rewardRuleListUpdates() -> some AsyncSequence<RewardRuleList, any Error> {
+        ValueObservation.tracking(Self.rewardRuleList).values(in: writer)
     }
 
     func rewardRuleList() async throws -> RewardRuleList {
@@ -18,19 +13,13 @@ public extension AppDatabase {
 
 private extension AppDatabase {
     static func rewardRuleList(in db: Database) throws -> RewardRuleList {
-        let rules = try RewardRule
-            .order(RewardRule.sortOrder, Column("created_at"))
-            .fetchAll(db)
-
+        let rules = try RewardRule.order(RewardRule.sortOrder, Column("created_at")).fetchAll(db)
         let iconIds = rules.map(\.iconId)
         let pairs = try Icon.fetchAll(db, keys: iconIds).map { ($0.id, $0) }
         let icons = Dictionary(uniqueKeysWithValues: pairs)
+        let totals = try rewardTotals(in: db)
 
-        return try RewardRuleList(
-            rules: rules,
-            icons: icons,
-            totals: rewardTotals(in: db)
-        )
+        return RewardRuleList(rules: rules, icons: icons, totals: totals)
     }
 
     static func rewardTotals(
@@ -46,11 +35,7 @@ private extension AppDatabase {
         )
 
         let pairs = rows.map { row in
-            let total = RewardRuleList.Total(
-                count: row["count"],
-                amount: row["amount"]
-            )
-
+            let total = RewardRuleList.Total(count: row["count"], amount: row["amount"])
             return (row["rule_id"] as RewardRule.ID, total)
         }
 

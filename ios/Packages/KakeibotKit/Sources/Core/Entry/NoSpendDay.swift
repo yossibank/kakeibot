@@ -1,6 +1,6 @@
 import Foundation
 
-public struct NoSpendDay: Hashable, Sendable {
+public struct NoSpendDay: Codable, Hashable, Sendable {
     public let date: LocalDate
 
     public var createdAt: Date
@@ -19,5 +19,3 @@ extension NoSpendDay: Identifiable {
         date
     }
 }
-
-extension NoSpendDay: Codable {}

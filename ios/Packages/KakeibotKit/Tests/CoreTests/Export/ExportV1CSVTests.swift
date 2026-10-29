@@ -7,9 +7,7 @@ struct ExportV1CSVTests {
     func writesFixtureRows() throws {
         let json = try Fixture.data("export/export-v1.json")
         let expected = try Fixture.data("export/export-v1.csv")
-
         let csv = try ExportV1(json: json).data.csv()
-
         #expect(csv == expected)
     }
 
@@ -20,7 +18,8 @@ struct ExportV1CSVTests {
         tables.entries = [tables.entries[0]]
         tables.entries[0].memo = "本, \"上巻\""
 
-        let csv = String(decoding: tables.csv(), as: UTF8.self)
+        let data = tables.csv()
+        let csv = String(decoding: data, as: UTF8.self)
         let lines = csv.components(separatedBy: "\r\n")
 
         #expect(lines[1].hasSuffix(",\"本, \"\"上巻\"\"\""))
@@ -33,7 +32,8 @@ struct ExportV1CSVTests {
         tables.entries = [tables.entries[0]]
         tables.entries[0].memo = "-1"
 
-        let csv = String(decoding: tables.csv(), as: UTF8.self)
+        let data = tables.csv()
+        let csv = String(decoding: data, as: UTF8.self)
         let lines = csv.components(separatedBy: "\r\n")
 
         #expect(lines[1].hasSuffix(",'-1"))

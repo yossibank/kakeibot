@@ -9,7 +9,9 @@ public extension ExportV1.Tables {
             .map { $0 + "\r\n" }
             .joined()
 
-        return Data(Self.byteOrderMark + text.utf8)
+        let bytes = Self.byteOrderMark + text.utf8
+
+        return Data(bytes)
     }
 }
 
@@ -19,7 +21,6 @@ private extension ExportV1.Tables {
     ]
 
     static let byteOrderMark: [UInt8] = [0xEF, 0xBB, 0xBF]
-
     static let formulaPrefixes: Set<Character> = ["=", "+", "-", "@"]
 
     var sortedEntries: [Entry] {
@@ -37,7 +38,10 @@ private extension ExportV1.Tables {
     }
 
     static func text(_ field: String) -> String {
-        guard let first = field.first, formulaPrefixes.contains(first) else {
+        guard
+            let first = field.first,
+            formulaPrefixes.contains(first)
+        else {
             return field
         }
 
@@ -65,19 +69,19 @@ private extension ExportV1.Tables {
     }
 
     func row(_ entry: Entry) -> [String] {
-        let category = categories.first { $0.id == entry.categoryId }
-        let tag = tags.first { $0.id == entry.tagId }
-        let wallet = wallets.first { $0.id == entry.walletId }
-        let toWallet = wallets.first { $0.id == entry.toWalletId }
+        let categoryName = categories.first { $0.id == entry.categoryId }?.name ?? ""
+        let tagName = tags.first { $0.id == entry.tagId }?.name ?? ""
+        let walletName = wallets.first { $0.id == entry.walletId }?.name ?? ""
+        let toWalletName = wallets.first { $0.id == entry.toWalletId }?.name ?? ""
 
         return [
             entry.date.description,
             Self.kindTitle(entry.type),
             String(entry.amount),
-            Self.text(category?.name ?? ""),
-            Self.text(tag?.name ?? ""),
-            Self.text(wallet?.name ?? ""),
-            Self.text(toWallet?.name ?? ""),
+            Self.text(categoryName),
+            Self.text(tagName),
+            Self.text(walletName),
+            Self.text(toWalletName),
             Self.text(entry.memo ?? "")
         ]
     }

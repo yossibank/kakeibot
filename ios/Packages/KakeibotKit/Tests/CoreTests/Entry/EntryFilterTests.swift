@@ -11,10 +11,9 @@ struct EntryFilterTests {
             tagIds: Set(fixture.tags)
         )
 
-        let days = EntryDay.grouping(fixture.entries.map(\.entry))
-
+        let entries = fixture.entries.map(\.entry)
+        let days = EntryDay.grouping(entries)
         let kept = filter.apply(to: days).flatMap(\.entries)
-
         #expect(kept.map(\.id) == fixture.keptIds)
     }
 }

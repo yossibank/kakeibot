@@ -29,6 +29,22 @@ public struct WalletDraft: Hashable, Sendable {
         self.recordedKind = recordedKind
         self.hasValuations = hasValuations
     }
+
+    public init(
+        _ wallet: Wallet,
+        icon: Icon
+    ) {
+        let mark = IconDraft.Mark(icon)
+
+        self.init(
+            kind: wallet.kind,
+            name: wallet.name,
+            mark: mark,
+            color: icon.color,
+            initialBalance: wallet.initialBalance,
+            loanAmount: wallet.loanAmount
+        )
+    }
 }
 
 public extension WalletDraft {
@@ -37,25 +53,8 @@ public extension WalletDraft {
     }
 
     var problems: [DraftProblem] {
-        let nameProblems: [DraftProblem] = trimmedName.isEmpty
-            ? [.emptyName]
-            : []
-
+        let nameProblems: [DraftProblem] = trimmedName.isEmpty ? [.emptyName] : []
         return nameProblems + icon.problems + kindProblems
-    }
-
-    init(
-        _ wallet: Wallet,
-        icon: Icon
-    ) {
-        self.init(
-            kind: wallet.kind,
-            name: wallet.name,
-            mark: IconDraft.Mark(icon),
-            color: icon.color,
-            initialBalance: wallet.initialBalance,
-            loanAmount: wallet.loanAmount
-        )
     }
 
     func locked(
@@ -131,7 +130,9 @@ private extension WalletDraft {
             return [.kindLocked]
         }
 
-        if hasValuations, recordedKind == .investment, kind != .investment {
+        if hasValuations,
+           recordedKind == .investment,
+           kind != .investment {
             return [.valuedKindLocked]
         }
 

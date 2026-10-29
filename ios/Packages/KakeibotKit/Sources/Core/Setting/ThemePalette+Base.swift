@@ -12,21 +12,28 @@ public extension ThemePalette {
         let onWhite = Self.contrast(background, 0xFFFFFF)
         let mixes = onBlack > onWhite ? Mixes.light : Mixes.dark
         let (cardTarget, cardRatio) = mixes.cardBottom
-        let cardBottom = (cardTarget ?? background, cardRatio)
+        let cardBottomMix = (cardTarget ?? background, cardRatio)
+        let backgroundBottom = Self.mix(background, mixes.backgroundBottom)
+        let panel = Self.mix(background, mixes.panel)
+        let cardBottom = Self.mix(surface, cardBottomMix)
+        let line = Self.mix(surface, (text, 0.12))
+        let accentDeep = Self.mix(accent, mixes.accentDeep)
+        let accentStrong = Self.mix(accent, mixes.accentStrong)
+        let hint = Self.mix(subtext, (background, 0.12))
 
         self.init(
             backgroundTop: background,
-            backgroundBottom: Self.mix(background, mixes.backgroundBottom),
-            panel: Self.mix(background, mixes.panel),
+            backgroundBottom: backgroundBottom,
+            panel: panel,
             cardTop: surface,
-            cardBottom: Self.mix(surface, cardBottom),
-            line: Self.mix(surface, (text, 0.12)),
+            cardBottom: cardBottom,
+            line: line,
             accent: accent,
-            accentDeep: Self.mix(accent, mixes.accentDeep),
-            accentStrong: Self.mix(accent, mixes.accentStrong),
+            accentDeep: accentDeep,
+            accentStrong: accentStrong,
             text: text,
             subtext: subtext,
-            hint: Self.mix(subtext, (background, 0.12))
+            hint: hint
         )
     }
 }
@@ -49,8 +56,9 @@ private extension ThemePalette {
         let channels = [UInt32(16), 8, 0].map { shift in
             let from = Double((color >> shift) & 0xFF)
             let to = Double((other >> shift) & 0xFF)
+            let mixed = (from + (to - from) * ratio).rounded()
 
-            return UInt32((from + (to - from) * ratio).rounded()) << shift
+            return UInt32(mixed) << shift
         }
 
         return channels.reduce(0, |)

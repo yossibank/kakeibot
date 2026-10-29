@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EntryCategory: Hashable, Sendable {
+public struct EntryCategory: Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var kind: Kind
@@ -43,8 +43,6 @@ public extension EntryCategory {
         case income
     }
 }
-
-extension EntryCategory: Identifiable {}
 
 extension EntryCategory: Codable {
     public func encode(to encoder: any Encoder) throws {

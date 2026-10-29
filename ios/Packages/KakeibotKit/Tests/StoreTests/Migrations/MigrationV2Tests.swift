@@ -11,14 +11,8 @@ struct MigrationV2Tests {
         try migrator.migrate(queue, upTo: "v1")
 
         try queue.write { db in
-            try db.execute(
-                sql: Self.insertIcon,
-                arguments: [Self.foodIcon, "🍙"]
-            )
-            try db.execute(
-                sql: Self.insertIcon,
-                arguments: [Self.customIcon, "🎯"]
-            )
+            try db.execute(sql: Self.insertIcon, arguments: [Self.foodIcon, "🍙"])
+            try db.execute(sql: Self.insertIcon, arguments: [Self.customIcon, "🎯"])
             try db.execute(sql: Self.insertWallet, arguments: [Self.foodIcon])
         }
 

@@ -12,16 +12,20 @@ struct MonthOverviewTests {
         let options = try await database.entryOptions()
         let today = try #require(LocalDate("2026-10-23"))
         let month = try #require(YearMonth("2026-10"))
+        let tomorrowDate = today.adding(days: 1)
+        let nextMonthDate = today.adding(days: 9)
 
-        for (date, amount) in [
+        for (text, amount) in [
             ("2026-09-30", 999),
             ("2026-10-01", 3000),
             ("2026-10-23", 1200)
         ] {
-            let draft = try EntryDraft(
+            let date = try #require(LocalDate(text))
+
+            let draft = EntryDraft(
                 type: .expense,
                 amount: amount,
-                date: #require(LocalDate(date)),
+                date: date,
                 categoryId: options.expenseCategories[0].id,
                 walletId: options.wallets[0].id
             )
@@ -31,8 +35,8 @@ struct MonthOverviewTests {
 
         try await database.setBudget(50000, for: nil, from: month)
         let overview = try await database.monthOverview(on: today)
-        let tomorrow = overview.moved(to: today.adding(days: 1))
-        let nextMonth = overview.moved(to: today.adding(days: 9))
+        let tomorrow = overview.moved(to: tomorrowDate)
+        let nextMonth = overview.moved(to: nextMonthDate)
 
         #expect(overview.monthExpense == 4200)
         #expect(overview.todayExpense == 1200)
@@ -49,14 +53,16 @@ struct MonthOverviewTests {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
 
         func overview(generatedUntil: LocalDate?) throws -> MonthOverview {
-            let recurring = try Recurring(
+            let startDate = try #require(LocalDate("2026-01-01"))
+
+            let recurring = Recurring(
                 type: .expense,
                 amount: 5000,
                 categoryId: EntryCategory.ID(),
                 walletId: Wallet.ID(),
                 frequency: .monthly,
                 day: 23,
-                startDate: #require(LocalDate("2026-01-01")),
+                startDate: startDate,
                 generatedUntil: generatedUntil,
                 createdAt: now,
                 updatedAt: now

@@ -30,8 +30,6 @@ extension AppDatabase {
             ? Recurring.all()
             : Recurring.filter(Column("archived_at") == nil)
 
-        return try request
-            .order(Recurring.sortOrder, Column("created_at"))
-            .fetchAll(db)
+        return try request.order(Recurring.sortOrder, Column("created_at")).fetchAll(db)
     }
 }

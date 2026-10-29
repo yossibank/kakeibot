@@ -115,11 +115,10 @@ struct ExportV1Tests {
     @Test
     func skipsSettingsWithUnknownKey() throws {
         let rows = try Self.settingRows
-        let json = try Self.fixture(settings: rows.valid + rows.invalid)
-
+        let settings = rows.valid + rows.invalid
+        let json = try Self.fixture(settings: settings)
         let export = try ExportV1(json: json)
         let keys = export.data.settings.map(\.key.rawValue)
-
         #expect(keys == rows.valid.compactMap { $0["key"] })
     }
 
@@ -135,9 +134,7 @@ struct ExportV1Tests {
     @Test(arguments: try headers.valid)
     func readsSupportedHeader(header: Header) throws {
         let json = try Self.fixture(with: header)
-
         let export = try ExportV1(json: json)
-
         #expect(export.app.platform == .ios)
     }
 
@@ -174,39 +171,52 @@ private extension ExportV1Tests {
     static func fixture(settings: [Any]) throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
+
         tables["settings"] = settings
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixture(with header: Header) throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
+
         object["format"] = header.format
         object["version"] = header.version
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixtureWithoutTemplates() throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
+
         tables["templates"] = nil
+
         let entries = try #require(tables["entries"] as? [[String: Any]])
+
         tables["entries"] = entries.map { $0.filter { $0.key != "templateId" } }
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixtureWithoutTags() throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
+
         tables["tags"] = nil
 
         for key in ["entries", "templates"] {
@@ -215,22 +225,27 @@ private extension ExportV1Tests {
         }
 
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixtureWithoutShelfIcons() throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
+
         tables["shelfIcons"] = nil
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixtureWithoutArchivedAt() throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
 
@@ -240,66 +255,87 @@ private extension ExportV1Tests {
         }
 
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixtureWithoutHolidayShift() throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
+
         let rows = try #require(tables["recurrings"] as? [[String: Any]])
-        let key = "holidayShift"
-        tables["recurrings"] = rows.map { $0.filter { $0.key != key } }
+
+        tables["recurrings"] = rows.map { $0.filter { $0.key != "holidayShift" } }
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixtureWithoutLoanAmount() throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
+
         let rows = try #require(tables["wallets"] as? [[String: Any]])
+
         tables["wallets"] = rows.map { $0.filter { $0.key != "loanAmount" } }
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixtureWithoutBillMonth() throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
+
         let rows = try #require(tables["entries"] as? [[String: Any]])
+
         tables["entries"] = rows.map { $0.filter { $0.key != "billMonth" } }
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixtureWithoutTransferId() throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
+
         let rows = try #require(tables["entries"] as? [[String: Any]])
+
         tables["entries"] = rows.map { $0.filter { $0.key != "transferId" } }
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func fixtureWithoutTransfer() throws -> Data {
         let data = try Fixture.data("export/export-v1.json")
         let json = try JSONSerialization.jsonObject(with: data)
+
         var object = try #require(json as? [String: Any])
         var tables = try #require(object["data"] as? [String: Any])
+
         let rows = try #require(tables["entries"] as? [[String: Any]])
+
         tables["entries"] = rows.filter { ($0["type"] as? String) != "transfer" }
         object["data"] = tables
+
         return try JSONSerialization.data(withJSONObject: object)
     }
 
     static func jsonObject(_ data: Data) throws -> NSDictionary {
-        try #require(JSONSerialization.jsonObject(with: data) as? NSDictionary)
+        let object = try JSONSerialization.jsonObject(with: data)
+        return try #require(object as? NSDictionary)
     }
 }

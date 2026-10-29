@@ -14,14 +14,10 @@ public struct StampCalendar: Equatable, Sendable {
 }
 
 public extension StampCalendar {
-    struct Tally: Identifiable, Equatable, Sendable {
+    struct Tally: Equatable, Sendable {
         public let icon: Icon
         public let count: Int
         public let lastDate: LocalDate
-
-        public var id: Icon.ID {
-            icon.id
-        }
     }
 
     func icon(on date: LocalDate) -> Icon? {
@@ -50,5 +46,11 @@ public extension StampCalendar {
 
             return lhs.lastDate > rhs.lastDate
         }
+    }
+}
+
+extension StampCalendar.Tally: Identifiable {
+    public var id: Icon.ID {
+        icon.id
     }
 }

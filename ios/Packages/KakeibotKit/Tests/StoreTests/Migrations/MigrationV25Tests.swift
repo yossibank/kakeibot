@@ -25,10 +25,7 @@ struct MigrationV25Tests {
         let queue = try Self.migratedQueue()
 
         let months = try queue.read { db in
-            try Self.pairs(
-                db,
-                sql: "SELECT id, bill_month FROM entry WHERE bill_month IS NOT NULL"
-            )
+            try Self.pairs(db, sql: "SELECT id, bill_month FROM entry WHERE bill_month IS NOT NULL")
         }
 
         #expect(months["one"] == "2026-12")

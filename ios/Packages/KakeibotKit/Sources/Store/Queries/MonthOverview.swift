@@ -44,13 +44,12 @@ public extension MonthOverview {
     }
 
     var yesterdayExpense: Int {
-        expense(on: today.adding(days: -1))
+        let yesterday = today.adding(days: -1)
+        return expense(on: yesterday)
     }
 
     var periodRecurrings: [PeriodRecurring] {
-        let entries = list?.days
-            .flatMap(\.entries)
-            .filter { $0.recurringId != nil } ?? []
+        let entries = list?.days.flatMap(\.entries).filter { $0.recurringId != nil } ?? []
 
         return recurrings
             .flatMap { recurring in
@@ -71,15 +70,13 @@ public extension MonthOverview {
                             return nil
                         }
 
+                        let state = status(of: date, entry: entry, recurring: recurring)
+
                         return PeriodRecurring(
                             date: date,
                             recurring: recurring,
                             entry: entry,
-                            status: status(
-                                of: date,
-                                entry: entry,
-                                recurring: recurring
-                            ),
+                            status: state,
                             amount: amount
                         )
                     }
@@ -133,9 +130,7 @@ public extension MonthOverview {
     }
 
     func expense(in range: ClosedRange<LocalDate>) -> Int {
-        list?.days
-            .filter { range.contains($0.date) }
-            .reduce(0) { $0 + $1.expenseTotal } ?? 0
+        list?.days.filter { range.contains($0.date) }.reduce(0) { $0 + $1.expenseTotal } ?? 0
     }
 
     func moved(to day: LocalDate) -> MonthOverview {

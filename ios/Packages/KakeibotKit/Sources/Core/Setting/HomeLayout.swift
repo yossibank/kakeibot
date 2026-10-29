@@ -7,14 +7,16 @@ public struct HomeLayout: Hashable, Sendable {
         hidden: Set<HomeSection> = []
     ) {
         var seen = Set<HomeSection>()
+
         let listed = order.filter { seen.insert($0).inserted }
         let missing = HomeSection.allCases.filter { !seen.contains($0) }
         let order = listed + missing
         let added = missing.filter { !HomeSection.standard.contains($0) }
         let hidden = hidden.union(added)
+        let leading = order.prefix(1)
 
         self.order = order
-        self.hidden = hidden.count < order.count ? hidden : hidden.subtracting(order.prefix(1))
+        self.hidden = hidden.count < order.count ? hidden : hidden.subtracting(leading)
     }
 }
 
@@ -41,7 +43,6 @@ public extension HomeLayout {
     var slots: [Slot] {
         let shown = visible.map(Slot.section)
         let hiddenSlots = order.filter(isHidden).map(Slot.section)
-
         return shown + [.boundary] + hiddenSlots
     }
 
@@ -64,7 +65,11 @@ public extension HomeLayout {
         }
 
         slots.remove(at: from)
-        slots.insert(.section(section), at: min(max(index, 0), slots.count))
+
+        let lowerClamped = max(index, 0)
+        let target = min(lowerClamped, slots.count)
+
+        slots.insert(.section(section), at: target)
 
         guard
             let boundary = slots.firstIndex(of: .boundary),

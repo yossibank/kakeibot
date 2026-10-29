@@ -6,12 +6,7 @@ public extension Wallet {
         through date: LocalDate? = nil
     ) -> Int {
         wallets.reduce(0) { total, wallet in
-            let balance = wallet.balance(
-                with: entries,
-                valuations: valuations,
-                through: date
-            )
-
+            let balance = wallet.balance(with: entries, valuations: valuations, through: date)
             return total + balance
         }
     }
@@ -21,17 +16,17 @@ public extension Wallet {
         valuations: [Valuation] = [],
         through date: LocalDate? = nil
     ) -> Int {
-        let valuation = kind == .investment
-            ? latestValuation(in: valuations, through: date)
-            : nil
+        let valuation = kind == .investment ? latestValuation(in: valuations, through: date) : nil
         let start = valuation?.amount ?? initialBalance
 
         return entries.reduce(start) { balance, entry in
-            if let date, date < entry.date {
+            if let date,
+               date < entry.date {
                 return balance
             }
 
-            if let valuation, valuation.includes(entry) {
+            if let valuation,
+               valuation.includes(entry) {
                 return balance
             }
 
@@ -55,12 +50,9 @@ private extension Wallet {
 
     func change(by entry: Entry) -> Int {
         switch entry.type {
-        case .expense:
-            entry.walletId == id ? -entry.amount : 0
-        case .income:
-            entry.walletId == id ? entry.amount : 0
-        case .transfer:
-            transferChange(by: entry)
+        case .expense: entry.walletId == id ? -entry.amount : 0
+        case .income: entry.walletId == id ? entry.amount : 0
+        case .transfer: transferChange(by: entry)
         }
     }
 

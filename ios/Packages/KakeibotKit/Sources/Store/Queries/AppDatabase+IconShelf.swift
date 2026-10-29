@@ -3,9 +3,7 @@ import GRDB
 
 public extension AppDatabase {
     func iconShelfUpdates() -> some AsyncSequence<IconShelf, any Error> {
-        ValueObservation
-            .tracking(Self.iconShelf)
-            .values(in: writer)
+        ValueObservation.tracking(Self.iconShelf).values(in: writer)
     }
 
     func iconShelf() async throws -> IconShelf {
@@ -15,17 +13,11 @@ public extension AppDatabase {
 
 private extension AppDatabase {
     static func iconShelf(in db: Database) throws -> IconShelf {
-        let shelfIcons = try ShelfIcon
-            .order(ShelfIcon.sortOrder)
-            .fetchAll(db)
-
+        let shelfIcons = try ShelfIcon.order(ShelfIcon.sortOrder).fetchAll(db)
         let iconIds = shelfIcons.map(\.iconId)
         let pairs = try Icon.fetchAll(db, keys: iconIds).map { ($0.id, $0) }
         let icons = Dictionary(uniqueKeysWithValues: pairs)
 
-        return IconShelf(
-            shelfIcons: shelfIcons,
-            icons: icons
-        )
+        return IconShelf(shelfIcons: shelfIcons, icons: icons)
     }
 }

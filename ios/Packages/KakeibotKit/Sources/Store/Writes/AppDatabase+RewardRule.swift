@@ -31,12 +31,7 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
-            try RewardRule.reorder(
-                ids,
-                orThrow: RewardRuleWriteError.ruleNotFound,
-                in: db,
-                at: now
-            )
+            try RewardRule.reorder(ids, orThrow: RewardRuleWriteError.ruleNotFound, in: db, at: now)
         }
     }
 
@@ -86,12 +81,8 @@ private extension AppDatabase {
         at now: Date
     ) throws -> RewardRule {
         let icon = try draft.newIcon(at: now)
-
-        let rule = try draft.newRule(
-            iconId: icon.id,
-            sortOrder: RewardRule.nextSortOrder(in: db),
-            at: now
-        )
+        let sortOrder = try RewardRule.nextSortOrder(in: db)
+        let rule = try draft.newRule(iconId: icon.id, sortOrder: sortOrder, at: now)
 
         try icon.insert(db)
         try rule.insert(db)

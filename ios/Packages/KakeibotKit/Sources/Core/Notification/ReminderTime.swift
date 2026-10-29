@@ -1,4 +1,4 @@
-public struct ReminderTime: Hashable, Comparable, Sendable {
+public struct ReminderTime: Hashable, Sendable {
     public let hour: Int
     public let minute: Int
 
@@ -6,20 +6,18 @@ public struct ReminderTime: Hashable, Comparable, Sendable {
         hour: Int,
         minute: Int
     ) {
-        guard (0...23).contains(hour), (0...59).contains(minute) else {
+        guard
+            (0...23).contains(hour),
+            (0...59).contains(minute)
+        else {
             return nil
         }
 
         self.hour = hour
         self.minute = minute
     }
-}
 
-public extension ReminderTime {
-    static let morning = Self(checkedHour: 9, minute: 0)
-    static let evening = Self(checkedHour: 21, minute: 0)
-
-    init?(_ text: String) {
+    public init?(_ text: String) {
         let parts = text.split(separator: ":")
 
         guard
@@ -33,8 +31,25 @@ public extension ReminderTime {
 
         self.init(hour: hour, minute: minute)
     }
+}
 
-    static func < (lhs: Self, rhs: Self) -> Bool {
+public extension ReminderTime {
+    static let morning = Self(checkedHour: 9, minute: 0)
+    static let evening = Self(checkedHour: 21, minute: 0)
+}
+
+private extension ReminderTime {
+    init(
+        checkedHour hour: Int,
+        minute: Int
+    ) {
+        self.hour = hour
+        self.minute = minute
+    }
+}
+
+extension ReminderTime: Comparable {
+    public static func < (lhs: Self, rhs: Self) -> Bool {
         (lhs.hour, lhs.minute) < (rhs.hour, rhs.minute)
     }
 }
@@ -43,7 +58,6 @@ extension ReminderTime: CustomStringConvertible {
     public var description: String {
         let hour = hour < 10 ? "0\(hour)" : "\(hour)"
         let minute = minute < 10 ? "0\(minute)" : "\(minute)"
-
         return "\(hour):\(minute)"
     }
 }
@@ -66,15 +80,5 @@ extension ReminderTime: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(description)
-    }
-}
-
-private extension ReminderTime {
-    init(
-        checkedHour hour: Int,
-        minute: Int
-    ) {
-        self.hour = hour
-        self.minute = minute
     }
 }

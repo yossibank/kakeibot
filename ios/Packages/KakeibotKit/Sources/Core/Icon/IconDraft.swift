@@ -11,6 +11,12 @@ public struct IconDraft: Hashable, Sendable {
         self.mark = mark
         self.color = color
     }
+
+    public init(_ icon: Icon) {
+        let mark = Mark(icon)
+
+        self.init(mark: mark, color: icon.color)
+    }
 }
 
 public extension IconDraft {
@@ -18,18 +24,24 @@ public extension IconDraft {
         case glyph(Icon.Glyph)
         case emoji(String)
         case text(String)
+
+        public init(_ icon: Icon) {
+            if let glyph = icon.glyph {
+                self = .glyph(glyph)
+            } else if let emoji = icon.emoji,
+                      !emoji.isEmpty {
+                self = .emoji(emoji)
+            } else {
+                self = .text(icon.text ?? "")
+            }
+        }
     }
 
     static let maxTextLength = 3
 
     var problems: [DraftProblem] {
         let colorProblems: [DraftProblem] = isValidColor ? [] : [.invalidColor]
-
         return markProblems + colorProblems
-    }
-
-    init(_ icon: Icon) {
-        self.init(mark: Mark(icon), color: icon.color)
     }
 
     func newIcon(at now: Date) throws -> Icon {
@@ -60,18 +72,6 @@ public extension IconDraft {
         updated.updatedAt = now
 
         return updated
-    }
-}
-
-public extension IconDraft.Mark {
-    init(_ icon: Icon) {
-        if let glyph = icon.glyph {
-            self = .glyph(glyph)
-        } else if let emoji = icon.emoji, !emoji.isEmpty {
-            self = .emoji(emoji)
-        } else {
-            self = .text(icon.text ?? "")
-        }
     }
 }
 

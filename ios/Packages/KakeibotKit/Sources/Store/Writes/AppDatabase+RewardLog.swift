@@ -14,15 +14,12 @@ public extension AppDatabase {
                 throw RewardRuleWriteError.ruleNotFound
             }
 
-            let saved = RewardLog
-                .filter(Column("rule_id") == ruleId)
-                .filter(Column("date") == date)
+            let saved = RewardLog.filter(Column("rule_id") == ruleId).filter(Column("date") == date)
 
             guard isAchieved else {
                 let cleared = try saved.fetchAll(db).reduce(0) { $0 + $1.amount }
                 let logs = try RewardLog.fetchAll(db)
                 let goals = try RewardGoal.fetchAll(db)
-
                 let balance = RewardBalance.amount(logs: logs, goals: goals)
 
                 guard balance - cleared >= 0 else {
@@ -30,6 +27,7 @@ public extension AppDatabase {
                 }
 
                 try saved.deleteAll(db)
+
                 return
             }
 
@@ -41,12 +39,7 @@ public extension AppDatabase {
                 throw RewardRuleWriteError.isHidden
             }
 
-            let log = RewardLog(
-                ruleId: rule.id,
-                date: date,
-                amount: rule.amount,
-                createdAt: now
-            )
+            let log = RewardLog(ruleId: rule.id, date: date, amount: rule.amount, createdAt: now)
 
             try log.insert(db)
         }

@@ -4,20 +4,17 @@ import GRDB
 import Testing
 
 struct LatestSchemaTests {
-    private static let hint = Comment(
-        rawValue: "enum に case を足したら、表を作り直すマイグレーションを足す"
-    )
+    private static let hint = Comment(rawValue: "enum に case を足したら、表を作り直すマイグレーションを足す")
 
     @Test
     func walletAcceptsEveryKind() throws {
         let queue = try Self.makeQueue()
 
         for (index, kind) in Wallet.Kind.allCases.enumerated() {
+            let id = Self.id(index + 10)
+
             let accepted = try Self.accepts(queue) { db in
-                try db.execute(
-                    sql: Self.insertWallet,
-                    arguments: [Self.id(index + 10), kind.rawValue]
-                )
+                try db.execute(sql: Self.insertWallet, arguments: [id, kind.rawValue])
             }
 
             #expect(accepted, Self.hint)
@@ -35,11 +32,10 @@ struct LatestSchemaTests {
         let queue = try Self.makeQueue()
 
         for (index, kind) in EntryCategory.Kind.allCases.enumerated() {
+            let id = Self.id(index + 10)
+
             let accepted = try Self.accepts(queue) { db in
-                try db.execute(
-                    sql: Self.insertCategory,
-                    arguments: [Self.id(index + 10), kind.rawValue]
-                )
+                try db.execute(sql: Self.insertCategory, arguments: [id, kind.rawValue])
             }
 
             #expect(accepted, Self.hint)
@@ -57,11 +53,13 @@ struct LatestSchemaTests {
         let queue = try Self.makeQueue()
 
         for (index, frequency) in Recurring.Frequency.allCases.enumerated() {
+            let id = Self.id(index + 10)
             let month = frequency == .yearly ? 1 : nil
+
             let accepted = try Self.accepts(queue) { db in
                 try db.execute(
                     sql: Self.insertRecurring,
-                    arguments: [Self.id(index + 10), frequency.rawValue, month]
+                    arguments: [id, frequency.rawValue, month]
                 )
             }
 
@@ -69,10 +67,7 @@ struct LatestSchemaTests {
         }
 
         let unknown = try Self.accepts(queue) { db in
-            try db.execute(
-                sql: Self.insertRecurring,
-                arguments: [Self.id(99), "unknown", nil]
-            )
+            try db.execute(sql: Self.insertRecurring, arguments: [Self.id(99), "unknown", nil])
         }
 
         #expect(!unknown)
@@ -83,16 +78,15 @@ struct LatestSchemaTests {
         let queue = try Self.makeQueue()
 
         for (index, kind) in Entry.Kind.allCases.enumerated() {
+            let id = Self.id(index + 10)
             let isTransfer = kind == .transfer
+            let categoryID = isTransfer ? nil : Self.categoryID
+            let toWalletID = isTransfer ? Self.toWalletID : nil
+
             let accepted = try Self.accepts(queue) { db in
                 try db.execute(
                     sql: Self.insertEntry,
-                    arguments: [
-                        Self.id(index + 10),
-                        kind.rawValue,
-                        isTransfer ? nil : Self.categoryID,
-                        isTransfer ? Self.toWalletID : nil
-                    ]
+                    arguments: [id, kind.rawValue, categoryID, toWalletID]
                 )
             }
 
@@ -117,7 +111,8 @@ extension LatestSchemaTests {
     static let categoryID = id(4)
 
     static func id(_ number: Int) -> String {
-        "00000000-0000-4000-8000-\(String(format: "%012d", number))"
+        let suffix = String(format: "%012d", number)
+        return "00000000-0000-4000-8000-\(suffix)"
     }
 
     static func makeQueue() throws -> DatabaseQueue {
@@ -141,7 +136,6 @@ extension LatestSchemaTests {
     ) throws -> Bool {
         do {
             try queue.write(write)
-
             return true
         } catch let error as DatabaseError
             where error.extendedResultCode == .SQLITE_CONSTRAINT_CHECK {

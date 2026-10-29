@@ -14,28 +14,22 @@ public struct RewardRuleDraft: Hashable, Sendable {
         self.amount = amount
         self.icon = icon
     }
+
+    public init(
+        _ rule: RewardRule,
+        icon: Icon
+    ) {
+        let iconDraft = IconDraft(icon)
+
+        self.init(name: rule.name, amount: rule.amount, icon: iconDraft)
+    }
 }
 
 public extension RewardRuleDraft {
     var problems: [DraftProblem] {
-        let nameProblems: [DraftProblem] = trimmedName.isEmpty
-            ? [.emptyName]
-            : []
-
+        let nameProblems: [DraftProblem] = trimmedName.isEmpty ? [.emptyName] : []
         let amountProblems: [DraftProblem] = amount > 0 ? [] : [.emptyAmount]
-
         return nameProblems + amountProblems + icon.problems
-    }
-
-    init(
-        _ rule: RewardRule,
-        icon: Icon
-    ) {
-        self.init(
-            name: rule.name,
-            amount: rule.amount,
-            icon: IconDraft(icon)
-        )
     }
 
     func newIcon(at now: Date) throws -> Icon {

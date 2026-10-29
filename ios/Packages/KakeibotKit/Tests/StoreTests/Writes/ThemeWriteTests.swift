@@ -20,9 +20,7 @@ struct ThemeWriteTests {
     @Test
     func followsDeviceByDefault() async throws {
         let database = try AppDatabase.inMemory()
-
         let look = try await database.themeLook()
-
         #expect(look == .followsDevice)
     }
 
@@ -42,17 +40,12 @@ struct ThemeWriteTests {
     @Test
     func readsChosenStyle() async throws {
         let database = try AppDatabase.inMemory()
+        let expected = ThemeStyle(corner: .large, displayFont: .rounded, textFont: .mincho)
 
         try await database.setSetting(.cornerStyle, to: .large)
         try await database.setSetting(.fontStyle, to: .rounded)
         try await database.setSetting(.textFontStyle, to: .mincho)
         let style = try await database.style()
-
-        let expected = ThemeStyle(
-            corner: .large,
-            displayFont: .rounded,
-            textFont: .mincho
-        )
 
         #expect(style == expected)
     }
@@ -60,9 +53,7 @@ struct ThemeWriteTests {
     @Test
     func usesStandardStyleByDefault() async throws {
         let database = try AppDatabase.inMemory()
-
         let style = try await database.style()
-
         #expect(style == .standard)
     }
 
@@ -70,16 +61,12 @@ struct ThemeWriteTests {
     func updatesTheme() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 0)
+        let later = now.addingTimeInterval(60)
         let theme = try await database.saveTheme(Self.mint, at: now)
         var draft = Self.mint
         draft.name = "夜のミント"
 
-        let updated = try await database.saveTheme(
-            draft,
-            editing: theme.id,
-            at: now.addingTimeInterval(60)
-        )
-
+        let updated = try await database.saveTheme(draft, editing: theme.id, at: later)
         let themes = try await database.customThemes()
 
         #expect(updated.id == theme.id)

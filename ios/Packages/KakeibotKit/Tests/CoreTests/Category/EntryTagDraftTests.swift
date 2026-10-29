@@ -7,7 +7,6 @@ struct EntryTagDraftTests {
     func findsProblems(fixture: DraftCase) {
         let draft = EntryTagDraft(name: fixture.name)
         let others = (fixture.others ?? []).map { EntryTagDraft(name: $0) }
-
         #expect(draft.problems(among: others) == fixture.problems)
     }
 
@@ -17,11 +16,7 @@ struct EntryTagDraftTests {
         let categoryId = EntryCategory.ID()
         let draft = EntryTagDraft(name: " 昼ごはん ")
 
-        let tag = try draft.newTag(
-            categoryId: categoryId,
-            sortOrder: 2,
-            at: now
-        )
+        let tag = try draft.newTag(categoryId: categoryId, sortOrder: 2, at: now)
 
         #expect(tag.name == "昼ごはん")
         #expect(tag.categoryId == categoryId)

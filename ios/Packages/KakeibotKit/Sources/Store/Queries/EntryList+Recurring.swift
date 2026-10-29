@@ -16,9 +16,7 @@ public extension EntryList {
 
         let destination = recurring.toWalletId.flatMap { wallets[$0] }
 
-        return [wallet?.name, destination?.name]
-            .compactMap(\.self)
-            .joined(separator: " → ")
+        return [wallet?.name, destination?.name].compactMap(\.self).joined(separator: " → ")
     }
 
     func amount(

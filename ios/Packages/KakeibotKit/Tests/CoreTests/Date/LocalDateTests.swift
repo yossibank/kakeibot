@@ -28,11 +28,12 @@ struct LocalDateTests {
 
         let start = fixture.date.startOfDay(in: timeZone)
         let justBefore = start.addingTimeInterval(-1)
-
-        #expect(LocalDate(start, in: timeZone) == fixture.date)
         let previousDay = fixture.date.adding(days: -1)
+        let startDate = LocalDate(start, in: timeZone)
+        let justBeforeDate = LocalDate(justBefore, in: timeZone)
 
-        #expect(LocalDate(justBefore, in: timeZone) == previousDay)
+        #expect(startDate == fixture.date)
+        #expect(justBeforeDate == previousDay)
     }
 
     @Test(arguments: try weekCases)
@@ -61,10 +62,11 @@ struct LocalDateTests {
     @Test
     func movesBeforeYearOne() throws {
         let date = try #require(LocalDate("0001-01-01"))
+        let dayBefore = LocalDate(year: 0, month: 12, day: 31)
 
         let earlier = date.adding(days: -1)
 
-        #expect(earlier == LocalDate(year: 0, month: 12, day: 31))
+        #expect(earlier == dayBefore)
         #expect(earlier.adding(days: 1) == date)
     }
 
@@ -74,8 +76,9 @@ struct LocalDateTests {
 
         let data = try JSONEncoder().encode([date])
         let decoded = try JSONDecoder().decode([LocalDate].self, from: data)
+        let text = String(decoding: data, as: UTF8.self)
 
-        #expect(String(decoding: data, as: UTF8.self) == #"["2026-02-01"]"#)
+        #expect(text == #"["2026-02-01"]"#)
         #expect(decoded == [date])
     }
 }

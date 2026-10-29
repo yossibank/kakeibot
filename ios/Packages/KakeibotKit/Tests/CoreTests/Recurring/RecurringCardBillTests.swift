@@ -16,9 +16,7 @@ struct RecurringCardBillTests {
     }
 
     @Test(arguments: ["2027-01", "2027-12"])
-    func continuesPeriodsAcrossShortMonths(
-        start: String
-    ) throws {
+    func continuesPeriodsAcrossShortMonths(start: String) throws {
         let first = try #require(YearMonth(start))
 
         for closingDay in 28...31 {
@@ -41,12 +39,9 @@ struct RecurringCardBillTests {
                 #expect(periods.count == 14)
 
                 for (previous, next) in zip(periods, periods.dropFirst()) {
-                    #expect(
-                        previous.upperBound.adding(days: 1) == next.lowerBound,
-                        Comment(
-                            rawValue: "closing \(closingDay) day \(day) at \(next.lowerBound)"
-                        )
-                    )
+                    let message = "closing \(closingDay) day \(day) at \(next.lowerBound)"
+                    let comment = Comment(rawValue: message)
+                    #expect(previous.upperBound.adding(days: 1) == next.lowerBound, comment)
                 }
             }
         }
@@ -67,7 +62,8 @@ struct RecurringCardBillTests {
             Self.entry(.expense, 5000, on: "2026-10-01", wallet: Wallet.ID())
         ]
 
-        #expect(bill.amount(paidOn: paidOn, entries: entries) == 40000)
+        let amount = bill.amount(paidOn: paidOn, entries: entries)
+        #expect(amount == 40000)
     }
 
     @Test
@@ -76,23 +72,9 @@ struct RecurringCardBillTests {
         let card = try #require(bill.toWalletId)
         let october = try #require(LocalDate("2026-10-10"))
         let november = try #require(LocalDate("2026-11-10"))
-
-        var late = try Self.entry(
-            .expense,
-            3000,
-            on: "2026-08-31",
-            wallet: card
-        )
-
+        var late = try Self.entry(.expense, 3000, on: "2026-08-31", wallet: card)
         late.billMonth = november.yearMonth
-
-        var moved = try Self.entry(
-            .expense,
-            500,
-            on: "2026-09-20",
-            wallet: card
-        )
-
+        var moved = try Self.entry(.expense, 500, on: "2026-09-20", wallet: card)
         moved.billMonth = november.yearMonth
 
         let entries = try [
@@ -102,29 +84,20 @@ struct RecurringCardBillTests {
             Self.entry(.expense, 7000, on: "2026-10-05", wallet: card)
         ]
 
-        #expect(bill.amount(paidOn: october, entries: entries) == 9000)
-        #expect(bill.amount(paidOn: november, entries: entries) == 10500)
+        let octoberAmount = bill.amount(paidOn: october, entries: entries)
+        let novemberAmount = bill.amount(paidOn: november, entries: entries)
+
+        #expect(octoberAmount == 9000)
+        #expect(novemberAmount == 10500)
     }
 
     @Test
     func countsMovedUsageOncePerOccurrence() throws {
-        let bill = try Self.bill(
-            closingDay: 31,
-            day: 27,
-            holidayShift: .next
-        )
-
+        let bill = try Self.bill(closingDay: 31, day: 27, holidayShift: .next)
         let card = try #require(bill.toWalletId)
         let february = try #require(LocalDate("2027-03-01"))
         let march = try #require(LocalDate("2027-03-29"))
-
-        var moved = try Self.entry(
-            .expense,
-            500,
-            on: "2027-01-20",
-            wallet: card
-        )
-
+        var moved = try Self.entry(.expense, 500, on: "2027-01-20", wallet: card)
         moved.billMonth = YearMonth("2027-02")
 
         let entries = try [
@@ -133,31 +106,30 @@ struct RecurringCardBillTests {
             Self.entry(.expense, 7000, on: "2027-02-05", wallet: card)
         ]
 
-        #expect(bill.amount(paidOn: february, entries: entries) == 9500)
-        #expect(bill.amount(paidOn: march, entries: entries) == 7000)
+        let februaryAmount = bill.amount(paidOn: february, entries: entries)
+        let marchAmount = bill.amount(paidOn: march, entries: entries)
+
+        #expect(februaryAmount == 9500)
+        #expect(marchAmount == 7000)
     }
 
     @Test
     func listsBillDatesFromUsualOne() throws {
         let bill = try Self.bill(closingDay: 31)
         let used = try #require(LocalDate("2026-08-31"))
-
         let dates = bill.billDates(for: used, count: 3)
-
-        #expect(dates.map(\.description) == [
-            "2026-09-10",
-            "2026-10-10",
-            "2026-11-10"
-        ])
+        #expect(dates.map(\.description) == ["2026-09-10", "2026-10-10", "2026-11-10"])
     }
 
     @Test
     func keepsFixedAmountWithoutClosingDay() throws {
+        let paidOn = try #require(LocalDate("2026-11-10"))
         var bill = try Self.bill(closingDay: 15)
         bill.closingDay = nil
-        let paidOn = try #require(LocalDate("2026-11-10"))
 
-        #expect(bill.amount(paidOn: paidOn, entries: []) == 45000)
+        let amount = bill.amount(paidOn: paidOn, entries: [])
+
+        #expect(amount == 45000)
     }
 }
 
@@ -210,11 +182,12 @@ private extension RecurringCardBillTests {
         wallet: Wallet.ID
     ) throws -> Entry {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
+        let localDate = try #require(LocalDate(date))
 
-        return try Entry(
+        return Entry(
             type: type,
             amount: amount,
-            date: #require(LocalDate(date)),
+            date: localDate,
             categoryId: nil,
             walletId: wallet,
             createdAt: now,

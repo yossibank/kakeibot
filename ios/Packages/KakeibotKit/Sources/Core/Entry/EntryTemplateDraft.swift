@@ -26,6 +26,18 @@ public struct EntryTemplateDraft: Hashable, Sendable {
         self.walletId = walletId
         self.memo = memo
     }
+
+    public init(_ template: EntryTemplate) {
+        self.init(
+            name: template.name,
+            type: template.type,
+            amount: template.amount,
+            categoryId: template.categoryId,
+            tagId: template.tagId,
+            walletId: template.walletId,
+            memo: template.memo ?? ""
+        )
+    }
 }
 
 public extension EntryTemplateDraft {
@@ -48,7 +60,8 @@ public extension EntryTemplateDraft {
             problems.append(.transfer)
         }
 
-        if let amount, amount < 1 {
+        if let amount,
+           amount < 1 {
             problems.append(.amountNotPositive)
         }
 
@@ -61,18 +74,6 @@ public extension EntryTemplateDraft {
         }
 
         return problems
-    }
-
-    init(_ template: EntryTemplate) {
-        self.init(
-            name: template.name,
-            type: template.type,
-            amount: template.amount,
-            categoryId: template.categoryId,
-            tagId: template.tagId,
-            walletId: template.walletId,
-            memo: template.memo ?? ""
-        )
     }
 
     func newTemplate(
@@ -123,7 +124,6 @@ private extension EntryTemplateDraft {
 
     var trimmedMemo: String? {
         let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
-
         return trimmed.isEmpty ? nil : trimmed
     }
 
@@ -135,7 +135,10 @@ private extension EntryTemplateDraft {
             throw problem
         }
 
-        guard let categoryId, let walletId else {
+        guard
+            let categoryId,
+            let walletId
+        else {
             throw Problem.missingCategory
         }
 

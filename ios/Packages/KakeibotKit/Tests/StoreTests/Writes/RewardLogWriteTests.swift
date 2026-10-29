@@ -12,7 +12,6 @@ struct RewardLogWriteTests {
         try await setup.achieve(true)
         try await setup.achieve(true)
         let achieved = try await setup.database.rewardBank()
-
         try await setup.achieve(false)
         let cleared = try await setup.database.rewardBank()
 
@@ -37,18 +36,9 @@ struct RewardLogWriteTests {
     func keepsAmountAtAchievement() async throws {
         let setup = try await Setup()
         try await setup.achieve(true)
+        let draft = RewardRuleDraft(name: "自炊した日", amount: 800, icon: setup.icon)
 
-        let draft = RewardRuleDraft(
-            name: "自炊した日",
-            amount: 800,
-            icon: setup.icon
-        )
-
-        try await setup.database.saveRewardRule(
-            draft,
-            editing: setup.rule.id,
-            at: setup.now
-        )
+        try await setup.database.saveRewardRule(draft, editing: setup.rule.id, at: setup.now)
         let bank = try await setup.database.rewardBank()
 
         #expect(bank.logs.map(\.amount) == [500])
@@ -114,12 +104,7 @@ struct RewardLogWriteTests {
     @Test
     func rejectsAchievingHiddenRule() async throws {
         let setup = try await Setup()
-
-        try await setup.database.setRewardRuleHidden(
-            setup.rule.id,
-            isHidden: true,
-            at: setup.now
-        )
+        try await setup.database.setRewardRuleHidden(setup.rule.id, isHidden: true, at: setup.now)
 
         await #expect(throws: AppDatabase.RewardRuleWriteError.isHidden) {
             try await setup.achieve(true)
@@ -154,35 +139,27 @@ struct RewardLogWriteTests {
     }
 }
 
-private extension RewardLogWriteTests {
+extension RewardLogWriteTests {
     struct Setup {
         let database: AppDatabase
         let rule: RewardRule
         let now = Date(timeIntervalSince1970: 0)
         let icon = IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         let date: LocalDate
+    }
+}
 
-        init() async throws {
-            let database = try AppDatabase.inMemory()
+extension RewardLogWriteTests.Setup {
+    init() async throws {
+        let database = try AppDatabase.inMemory()
+        let draft = RewardRuleDraft(name: "自炊した日", amount: 500, icon: icon)
 
-            let draft = RewardRuleDraft(
-                name: "自炊した日",
-                amount: 500,
-                icon: icon
-            )
+        self.rule = try await database.saveRewardRule(draft, at: now)
+        self.date = try #require(LocalDate("2026-10-22"))
+        self.database = database
+    }
 
-            self.rule = try await database.saveRewardRule(draft, at: now)
-            self.date = try #require(LocalDate("2026-10-22"))
-            self.database = database
-        }
-
-        func achieve(_ isAchieved: Bool) async throws {
-            try await database.setReward(
-                rule.id,
-                isAchieved: isAchieved,
-                on: date,
-                at: now
-            )
-        }
+    func achieve(_ isAchieved: Bool) async throws {
+        try await database.setReward(rule.id, isAchieved: isAchieved, on: date, at: now)
     }
 }

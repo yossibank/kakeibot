@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Icon: Hashable, Sendable {
+public struct Icon: Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var emoji: String?
@@ -272,8 +272,6 @@ public extension Icon {
         case number
     }
 }
-
-extension Icon: Identifiable {}
 
 extension Icon: Codable {
     public func encode(to encoder: any Encoder) throws {

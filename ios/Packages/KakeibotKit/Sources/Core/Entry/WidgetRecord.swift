@@ -9,6 +9,18 @@ public struct WidgetRecord: Hashable, Sendable {
         self.entryId = entryId
         self.clearedNoSpendDate = clearedNoSpendDate
     }
+
+    public init?(_ text: String) {
+        let parts = text.split(separator: ",", maxSplits: 1).map(String.init)
+
+        guard let entryId = parts.first.flatMap(Entry.ID.init) else {
+            return nil
+        }
+
+        let clearedNoSpendDate = parts.dropFirst().first.flatMap(LocalDate.init)
+
+        self.init(entryId: entryId, clearedNoSpendDate: clearedNoSpendDate)
+    }
 }
 
 public extension WidgetRecord {
@@ -18,18 +30,5 @@ public extension WidgetRecord {
         }
 
         return "\(entryId),\(clearedNoSpendDate)"
-    }
-
-    init?(_ text: String) {
-        let parts = text.split(separator: ",", maxSplits: 1).map(String.init)
-
-        guard let entryId = parts.first.flatMap(Entry.ID.init) else {
-            return nil
-        }
-
-        self.init(
-            entryId: entryId,
-            clearedNoSpendDate: parts.dropFirst().first.flatMap(LocalDate.init)
-        )
     }
 }

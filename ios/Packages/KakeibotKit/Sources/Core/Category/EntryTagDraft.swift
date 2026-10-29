@@ -11,6 +11,10 @@ public struct EntryTagDraft: Hashable, Sendable {
         self.id = id
         self.name = name
     }
+
+    public init(_ tag: EntryTag) {
+        self.init(id: tag.id, name: tag.name)
+    }
 }
 
 public extension EntryTagDraft {
@@ -28,10 +32,6 @@ public extension EntryTagDraft {
         }
 
         return trimmedName.count > Self.maxNameLength ? [.nameTooLong] : []
-    }
-
-    init(_ tag: EntryTag) {
-        self.init(id: tag.id, name: tag.name)
     }
 
     func problems(among others: [EntryTagDraft]) -> [Problem] {

@@ -75,10 +75,11 @@ private extension AppDatabase {
         at now: Date
     ) throws -> ShelfIcon {
         let icon = try draft.newIcon(at: now)
+        let sortOrder = try ShelfIcon.nextSortOrder(in: db)
 
-        let shelfIcon = try ShelfIcon(
+        let shelfIcon = ShelfIcon(
             iconId: icon.id,
-            sortOrder: ShelfIcon.nextSortOrder(in: db),
+            sortOrder: sortOrder,
             createdAt: now,
             updatedAt: now
         )

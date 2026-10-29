@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RewardRule: Hashable, Sendable {
+public struct RewardRule: Codable, Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var name: String
@@ -35,7 +35,3 @@ public struct RewardRule: Hashable, Sendable {
 public extension RewardRule {
     typealias ID = Identifier<RewardRule>
 }
-
-extension RewardRule: Identifiable {}
-
-extension RewardRule: Codable {}

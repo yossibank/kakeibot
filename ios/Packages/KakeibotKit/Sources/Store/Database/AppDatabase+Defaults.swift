@@ -49,14 +49,15 @@ extension AppDatabase {
 
         let icon = try insertIcon(for: feeSeed, into: db, at: now)
 
-        let expenses = EntryCategory
-            .filter(Column("kind") == EntryCategory.Kind.expense.rawValue)
+        let expenses = EntryCategory.filter(Column("kind") == EntryCategory.Kind.expense.rawValue)
 
-        let category = try EntryCategory(
+        let sortOrder = try EntryCategory.nextSortOrder(of: expenses, in: db)
+
+        let category = EntryCategory(
             kind: .expense,
             name: feeSeed.name,
             iconId: icon.id,
-            sortOrder: EntryCategory.nextSortOrder(of: expenses, in: db),
+            sortOrder: sortOrder,
             createdAt: now,
             updatedAt: now
         )
@@ -141,13 +142,7 @@ private extension AppDatabase {
             try wallet.insert(db)
         }
 
-        try insertCategories(
-            expenseCategories,
-            kind: .expense,
-            into: db,
-            at: now
-        )
-
+        try insertCategories(expenseCategories, kind: .expense, into: db, at: now)
         try insertCategories(incomeCategories, kind: .income, into: db, at: now)
     }
 
@@ -191,9 +186,7 @@ private extension AppDatabase {
             .filter { $0.kind == .expense && $0.archivedAt == nil }
 
         let seeds = templates.compactMap { seed in
-            categories
-                .first { $0.name == seed.category }
-                .map { (seed.name, $0) }
+            categories.first { $0.name == seed.category }.map { (seed.name, $0) }
         }
 
         for (order, (name, category)) in seeds.enumerated() {
@@ -217,12 +210,7 @@ private extension AppDatabase {
         at now: Date
     ) throws {
         for (order, (glyph, color)) in shelf.enumerated() {
-            let icon = try insertIcon(
-                glyph: glyph,
-                color: color,
-                into: db,
-                at: now
-            )
+            let icon = try insertIcon(glyph: glyph, color: color, into: db, at: now)
 
             let shelfIcon = ShelfIcon(
                 iconId: icon.id,
@@ -240,12 +228,7 @@ private extension AppDatabase {
         into db: Database,
         at now: Date
     ) throws -> Icon {
-        try insertIcon(
-            glyph: seed.glyph,
-            color: seed.color,
-            into: db,
-            at: now
-        )
+        try insertIcon(glyph: seed.glyph, color: seed.color, into: db, at: now)
     }
 
     static func insertIcon(

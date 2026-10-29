@@ -50,6 +50,7 @@ struct CardBillTests {
         let start = try #require(LocalDate("2026-01-01"))
         let source = Self.wallet(.investment, balance: 10000, at: now)
         let card = Self.wallet(.card, balance: 0, at: now)
+        let valuationDate = try #require(LocalDate("2026-10-01"))
 
         let bill = Recurring(
             type: .transfer,
@@ -64,9 +65,9 @@ struct CardBillTests {
             updatedAt: now
         )
 
-        let valuation = try Valuation(
+        let valuation = Valuation(
             walletId: source.id,
-            date: #require(LocalDate("2026-10-01")),
+            date: valuationDate,
             amount: 50000,
             createdAt: now,
             updatedAt: now
@@ -85,14 +86,16 @@ struct CardBillTests {
     }
 }
 
-private extension CardBillTests {
+extension CardBillTests {
     struct Bill {
         let from: Wallet.ID
         let to: Wallet.ID
         let amount: Int
         let day: Int
     }
+}
 
+private extension CardBillTests {
     static func bill(
         from: Wallet.ID,
         to: Wallet.ID,

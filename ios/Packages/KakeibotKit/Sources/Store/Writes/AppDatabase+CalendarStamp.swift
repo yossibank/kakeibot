@@ -10,15 +10,9 @@ public extension AppDatabase {
         at now: Date
     ) async throws -> CalendarStamp {
         try await writer.write { db in
-            try CalendarStamp
-                .filter(Column("date") == date)
-                .deleteAll(db)
+            try CalendarStamp.filter(Column("date") == date).deleteAll(db)
 
-            let stamp = CalendarStamp(
-                date: date,
-                iconId: iconId,
-                createdAt: now
-            )
+            let stamp = CalendarStamp(date: date, iconId: iconId, createdAt: now)
 
             try stamp.insert(db)
 
@@ -28,9 +22,7 @@ public extension AppDatabase {
 
     func removeStamp(on date: LocalDate) async throws {
         try await writer.write { db in
-            _ = try CalendarStamp
-                .filter(Column("date") == date)
-                .deleteAll(db)
+            _ = try CalendarStamp.filter(Column("date") == date).deleteAll(db)
         }
     }
 }

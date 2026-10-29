@@ -9,18 +9,20 @@ public struct LoanPayoff: Hashable, Sendable {
         self.count = count
         self.lastDate = lastDate
     }
-}
 
-public extension LoanPayoff {
-    init?(
+    public init?(
         balance: Int,
         repayments: [Recurring],
         after today: LocalDate
     ) {
         let repayments = repayments.filter { $0.amount > 0 }
+
         var remaining = -balance
 
-        guard remaining > 0, !repayments.isEmpty else {
+        guard
+            remaining > 0,
+            !repayments.isEmpty
+        else {
             return nil
         }
 

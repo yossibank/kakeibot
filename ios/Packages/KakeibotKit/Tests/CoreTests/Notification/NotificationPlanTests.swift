@@ -9,13 +9,16 @@ struct NotificationPlanTests {
 
         let recurrings = fixture.recurrings.map { row in
             let isBill = row.closingDay != nil
+            let type: Entry.Kind = isBill ? .transfer : .expense
+            let categoryId = isBill ? nil : EntryCategory.ID()
+            let toWalletId = isBill ? Wallet.ID() : nil
 
             return Recurring(
-                type: isBill ? .transfer : .expense,
+                type: type,
                 amount: row.amount,
-                categoryId: isBill ? nil : EntryCategory.ID(),
+                categoryId: categoryId,
                 walletId: Wallet.ID(),
-                toWalletId: isBill ? Wallet.ID() : nil,
+                toWalletId: toWalletId,
                 memo: row.name,
                 frequency: row.frequency,
                 month: row.month,
@@ -29,13 +32,15 @@ struct NotificationPlanTests {
             )
         }
 
+        let shortages = Self.shortages(of: fixture, recurrings: recurrings)
+
         let notifications = NotificationPlan.notifications(
             today: fixture.today,
             reminderTime: fixture.reminderTime,
             recordedDates: Set(fixture.recorded),
             recurrings: recurrings,
             names: [:],
-            shortages: Self.shortages(of: fixture, recurrings: recurrings)
+            shortages: shortages
         )
 
         let rows = notifications.map { notification in

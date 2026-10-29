@@ -9,9 +9,11 @@ public struct BudgetUsage: Hashable, Sendable {
         today: LocalDate,
         periodEnd: LocalDate
     ) {
+        let days = periodEnd.dayNumber - today.dayNumber + 1
+
         self.budget = budget
         self.spent = spent
-        self.daysLeft = max(periodEnd.dayNumber - today.dayNumber + 1, 1)
+        self.daysLeft = max(days, 1)
     }
 }
 
@@ -33,6 +35,8 @@ public extension BudgetUsage {
             return 1
         }
 
-        return min(Double(spent) / Double(budget), 1)
+        let ratio = Double(spent) / Double(budget)
+
+        return min(ratio, 1)
     }
 }

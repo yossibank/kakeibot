@@ -56,19 +56,23 @@ public extension AmountCalculator {
         for token in tokens {
             switch token {
             case let .number(number):
-                total = pending.apply(total, Int128(number))
+                let operand = Int128(number)
+                total = pending.apply(total, operand)
             case let .operation(operation):
                 pending = operation
             }
         }
 
         let limit = Int128(Self.maxValue)
+        let lowerClamped = max(total, -limit)
+        let clamped = min(lowerClamped, limit)
 
-        return Int(min(max(total, -limit), limit))
+        return Int(clamped)
     }
 
     var amount: Int {
-        min(max(value, 0), Self.maxValue)
+        let nonNegative = max(value, 0)
+        return min(nonNegative, Self.maxValue)
     }
 
     var hasOperation: Bool {
@@ -130,8 +134,10 @@ private extension AmountCalculator {
 
         tokens.removeLast()
 
-        if case let .number(number) = last, number >= 10 {
-            tokens.append(.number(number / 10))
+        if case let .number(number) = last,
+           number >= 10 {
+            let shortened = number / 10
+            tokens.append(.number(shortened))
         }
     }
 
@@ -171,7 +177,8 @@ private extension AmountCalculator {
             return
         }
 
-        let taxed = min(base * (100 + rate.rawValue) / 100, Self.maxValue)
+        let withTax = base * (100 + rate.rawValue) / 100
+        let taxed = min(withTax, Self.maxValue)
 
         tokens = [.number(taxed)]
         taxNote = TaxNote(base: base, rate: rate)
@@ -203,6 +210,8 @@ private extension AmountCalculator.Operation {
             return (lhs < 0) == (rhs < 0) ? Self.ceiling : -Self.ceiling
         }
 
-        return min(max(product, -Self.ceiling), Self.ceiling)
+        let lowerClamped = max(product, -Self.ceiling)
+
+        return min(lowerClamped, Self.ceiling)
     }
 }

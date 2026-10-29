@@ -7,9 +7,11 @@ public struct ReviewSummary: Hashable, Sendable {
         in range: ClosedRange<LocalDate>
     ) {
         let inRange = entries.filter { range.contains($0.date) }
+        let expenses = inRange.filter { $0.type == .expense }
+        let incomes = inRange.filter { $0.type == .income }
 
-        self.expense = Breakdown(inRange.filter { $0.type == .expense })
-        self.income = Breakdown(inRange.filter { $0.type == .income })
+        self.expense = Breakdown(expenses)
+        self.income = Breakdown(incomes)
     }
 }
 
@@ -35,6 +37,8 @@ public extension ReviewSummary {
 
 extension ReviewSummary.Breakdown {
     init(_ entries: [Entry]) {
+        let total = entries.reduce(0) { $0 + $1.amount }
+
         var byCategory: [EntryCategory.ID: Int] = [:]
         var byWallet: [Wallet.ID: Int] = [:]
 
@@ -46,10 +50,6 @@ extension ReviewSummary.Breakdown {
             byWallet[entry.walletId, default: 0] += entry.amount
         }
 
-        self.init(
-            total: entries.reduce(0) { $0 + $1.amount },
-            byCategory: byCategory,
-            byWallet: byWallet
-        )
+        self.init(total: total, byCategory: byCategory, byWallet: byWallet)
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct CalendarStamp: Hashable, Sendable {
+public struct CalendarStamp: Codable, Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var date: LocalDate
@@ -23,7 +23,3 @@ public struct CalendarStamp: Hashable, Sendable {
 public extension CalendarStamp {
     typealias ID = Identifier<CalendarStamp>
 }
-
-extension CalendarStamp: Identifiable {}
-
-extension CalendarStamp: Codable {}

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Recurring: Hashable, Sendable {
+public struct Recurring: Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var type: Entry.Kind
@@ -86,8 +86,6 @@ public extension Recurring {
     }
 }
 
-extension Recurring: Identifiable {}
-
 extension Recurring: Codable {
     enum CodingKeys: String, CodingKey {
         case id
@@ -115,55 +113,50 @@ extension Recurring: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let shift = try container.decodeIfPresent(HolidayShift.self, forKey: .holidayShift)
+        let id = try container.decode(ID.self, forKey: .id)
+        let type = try container.decode(Entry.Kind.self, forKey: .type)
+        let amount = try container.decode(Int.self, forKey: .amount)
+        let categoryId = try container.decodeIfPresent(EntryCategory.ID.self, forKey: .categoryId)
+        let walletId = try container.decode(Wallet.ID.self, forKey: .walletId)
+        let toWalletId = try container.decodeIfPresent(Wallet.ID.self, forKey: .toWalletId)
+        let memo = try container.decodeIfPresent(String.self, forKey: .memo)
+        let frequency = try container.decode(Frequency.self, forKey: .frequency)
+        let month = try container.decodeIfPresent(Int.self, forKey: .month)
+        let day = try container.decode(Int.self, forKey: .day)
+        let closingDay = try container.decodeIfPresent(Int.self, forKey: .closingDay)
+        let fee = try container.decodeIfPresent(Int.self, forKey: .fee)
+        let startDate = try container.decode(LocalDate.self, forKey: .startDate)
+        let endDate = try container.decodeIfPresent(LocalDate.self, forKey: .endDate)
+        let remindDaysBefore = try container.decodeIfPresent(Int.self, forKey: .remindDaysBefore)
+        let generatedUntil = try container.decodeIfPresent(LocalDate.self, forKey: .generatedUntil)
+        let sortOrder = try container.decode(Int.self, forKey: .sortOrder)
+        let archivedAt = try container.decodeIfPresent(Date.self, forKey: .archivedAt)
+        let createdAt = try container.decode(Date.self, forKey: .createdAt)
+        let updatedAt = try container.decode(Date.self, forKey: .updatedAt)
 
-        let shift = try container.decodeIfPresent(
-            HolidayShift.self,
-            forKey: .holidayShift
-        )
-
-        try self.init(
-            id: container.decode(ID.self, forKey: .id),
-            type: container.decode(Entry.Kind.self, forKey: .type),
-            amount: container.decode(Int.self, forKey: .amount),
-            categoryId: container.decodeIfPresent(
-                EntryCategory.ID.self,
-                forKey: .categoryId
-            ),
-            walletId: container.decode(Wallet.ID.self, forKey: .walletId),
-            toWalletId: container.decodeIfPresent(
-                Wallet.ID.self,
-                forKey: .toWalletId
-            ),
-            memo: container.decodeIfPresent(String.self, forKey: .memo),
-            frequency: container.decode(Frequency.self, forKey: .frequency),
-            month: container.decodeIfPresent(Int.self, forKey: .month),
-            day: container.decode(Int.self, forKey: .day),
+        self.init(
+            id: id,
+            type: type,
+            amount: amount,
+            categoryId: categoryId,
+            walletId: walletId,
+            toWalletId: toWalletId,
+            memo: memo,
+            frequency: frequency,
+            month: month,
+            day: day,
             holidayShift: shift ?? .none,
-            closingDay: container.decodeIfPresent(
-                Int.self,
-                forKey: .closingDay
-            ),
-            fee: container.decodeIfPresent(Int.self, forKey: .fee),
-            startDate: container.decode(LocalDate.self, forKey: .startDate),
-            endDate: container.decodeIfPresent(
-                LocalDate.self,
-                forKey: .endDate
-            ),
-            remindDaysBefore: container.decodeIfPresent(
-                Int.self,
-                forKey: .remindDaysBefore
-            ),
-            generatedUntil: container.decodeIfPresent(
-                LocalDate.self,
-                forKey: .generatedUntil
-            ),
-            sortOrder: container.decode(Int.self, forKey: .sortOrder),
-            archivedAt: container.decodeIfPresent(
-                Date.self,
-                forKey: .archivedAt
-            ),
-            createdAt: container.decode(Date.self, forKey: .createdAt),
-            updatedAt: container.decode(Date.self, forKey: .updatedAt)
+            closingDay: closingDay,
+            fee: fee,
+            startDate: startDate,
+            endDate: endDate,
+            remindDaysBefore: remindDaysBefore,
+            generatedUntil: generatedUntil,
+            sortOrder: sortOrder,
+            archivedAt: archivedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt
         )
     }
 

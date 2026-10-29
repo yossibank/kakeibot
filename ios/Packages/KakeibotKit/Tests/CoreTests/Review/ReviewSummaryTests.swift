@@ -8,22 +8,24 @@ struct ReviewSummaryTests {
         let ids = Ids()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
 
+        let range = fixture.start...fixture.end
+
         let entries = fixture.entries.map { row in
-            Entry(
+            let categoryId = row.category.flatMap { ids.categories[$0] }
+            let walletId = ids.wallet(row.wallet)
+
+            return Entry(
                 type: row.type,
                 amount: row.amount,
                 date: row.date,
-                categoryId: row.category.flatMap { ids.categories[$0] },
-                walletId: ids.wallet(row.wallet),
+                categoryId: categoryId,
+                walletId: walletId,
                 createdAt: now,
                 updatedAt: now
             )
         }
 
-        let summary = ReviewSummary(
-            entries: entries,
-            in: fixture.start...fixture.end
-        )
+        let summary = ReviewSummary(entries: entries, in: range)
 
         #expect(ids.named(summary.expense) == fixture.expense)
         #expect(ids.named(summary.income) == fixture.income)
@@ -75,12 +77,11 @@ extension ReviewSummaryTests.Ids {
         wallets[name] ?? Wallet.ID()
     }
 
-    func named(
-        _ breakdown: ReviewSummary.Breakdown
-    ) -> ReviewSummaryTests.Totals {
-        let categoryNames = Dictionary(uniqueKeysWithValues: categories.map { ($1, $0) })
-
-        let walletNames = Dictionary(uniqueKeysWithValues: wallets.map { ($1, $0) })
+    func named(_ breakdown: ReviewSummary.Breakdown) -> ReviewSummaryTests.Totals {
+        let categoryPairs = categories.map { ($1, $0) }
+        let walletPairs = wallets.map { ($1, $0) }
+        let categoryNames = Dictionary(uniqueKeysWithValues: categoryPairs)
+        let walletNames = Dictionary(uniqueKeysWithValues: walletPairs)
 
         let byCategory = breakdown.byCategory.map { id, amount in
             (categoryNames[id] ?? id.description, amount)
@@ -90,10 +91,13 @@ extension ReviewSummaryTests.Ids {
             (walletNames[id] ?? id.description, amount)
         }
 
+        let categoryTotals = Dictionary(uniqueKeysWithValues: byCategory)
+        let walletTotals = Dictionary(uniqueKeysWithValues: byWallet)
+
         return ReviewSummaryTests.Totals(
             total: breakdown.total,
-            categories: Dictionary(uniqueKeysWithValues: byCategory),
-            wallets: Dictionary(uniqueKeysWithValues: byWallet)
+            categories: categoryTotals,
+            wallets: walletTotals
         )
     }
 }

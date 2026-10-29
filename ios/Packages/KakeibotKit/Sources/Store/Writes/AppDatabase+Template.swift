@@ -15,20 +15,9 @@ public extension AppDatabase {
         at now: Date
     ) async throws -> EntryTemplate {
         try await writer.write { db in
-            let template = try Self.template(
-                from: draft,
-                editing: id,
-                in: db,
-                at: now
-            )
+            let template = try Self.template(from: draft, editing: id, in: db, at: now)
 
-            let belongs = try Self.tag(
-                template.tagId,
-                belongsTo: template.categoryId,
-                in: db
-            )
-
-            guard belongs else {
+            guard try Self.tag(template.tagId, belongsTo: template.categoryId, in: db) else {
                 throw TemplateWriteError.tagMismatch
             }
 
@@ -60,11 +49,9 @@ public extension AppDatabase {
         try await writer.write { db in
             let templates = EntryTemplate.filter(id: id)
             let entries = Entry.filter(Column("template_id") == id)
-
-            let deletion = try Deletion(
-                templates: templates.fetchAll(db),
-                entries: entries.fetchAll(db)
-            )
+            let templateRecords = try templates.fetchAll(db)
+            let entryRecords = try entries.fetchAll(db)
+            let deletion = Deletion(templates: templateRecords, entries: entryRecords)
 
             try templates.deleteAll(db)
 
@@ -96,7 +83,6 @@ private extension AppDatabase {
     ) throws -> EntryTemplate {
         guard let id else {
             let sortOrder = try EntryTemplate.nextSortOrder(in: db)
-
             return try draft.newTemplate(sortOrder: sortOrder, at: now)
         }
 

@@ -20,11 +20,7 @@ public extension AppDatabase {
 
     func recentMemos(limit: Int) async throws -> [String] {
         try await writer.read { db in
-            try String.fetchAll(
-                db,
-                sql: Self.recentMemosSQL,
-                arguments: [limit]
-            )
+            try String.fetchAll(db, sql: Self.recentMemosSQL, arguments: [limit])
         }
     }
 }
@@ -33,11 +29,11 @@ extension AppDatabase {
     static func entryList(in db: Database) throws -> EntryList {
         let entries = try Entry.fetchAll(db)
         let days = EntryDay.grouping(entries)
-        let categories = try byID(EntryCategory.fetchAll(db))
-        let tags = try byID(EntryTag.fetchAll(db))
-        let wallets = try byID(Wallet.fetchAll(db))
+        let categories = try byID(EntryCategory.self, in: db)
+        let tags = try byID(EntryTag.self, in: db)
+        let wallets = try byID(Wallet.self, in: db)
         let valuations = try Valuation.fetchAll(db)
-        let icons = try byID(Icon.fetchAll(db))
+        let icons = try byID(Icon.self, in: db)
 
         let cardBills = try recurrings(in: db)
             .filter { $0.type == .transfer && $0.closingDay != nil }
@@ -77,7 +73,7 @@ private extension AppDatabase {
         let wallets = try Wallet.unarchivedInOrder().fetchAll(db)
         let expenseCategories = categories.filter { $0.kind == .expense }
         let incomeCategories = categories.filter { $0.kind == .income }
-        let icons = try byID(Icon.fetchAll(db))
+        let icons = try byID(Icon.self, in: db)
 
         return EntryOptions(
             expenseCategories: expenseCategories,
@@ -88,7 +84,11 @@ private extension AppDatabase {
         )
     }
 
-    static func byID<Item: Identifiable>(_ items: [Item]) -> [Item.ID: Item] {
-        Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
+    static func byID<Record: StoreRecord & Identifiable>(
+        _ type: Record.Type,
+        in db: Database
+    ) throws -> [Record.ID: Record] {
+        let pairs = try Record.fetchAll(db).map { ($0.id, $0) }
+        return Dictionary(uniqueKeysWithValues: pairs)
     }
 }

@@ -25,11 +25,7 @@ struct NoSpendDayWriteTests {
         let setup = try await Setup()
         let next = setup.date.adding(days: 1)
 
-        try await setup.database.markNoSpendDays(
-            [setup.date, next],
-            at: setup.now
-        )
-
+        try await setup.database.markNoSpendDays([setup.date, next], at: setup.now)
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.noSpendDays.map(\.date) == [setup.date, next])
@@ -90,13 +86,10 @@ extension NoSpendDayWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
-        try database.insertDefaultsIfEmpty(at: now)
         let date = try #require(LocalDate("2026-10-03"))
 
-        self.init(
-            database: database,
-            now: now,
-            date: date
-        )
+        try database.insertDefaultsIfEmpty(at: now)
+
+        self.init(database: database, now: now, date: date)
     }
 }

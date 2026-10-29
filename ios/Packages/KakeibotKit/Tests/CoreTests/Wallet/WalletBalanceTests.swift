@@ -36,7 +36,6 @@ struct WalletBalanceTests {
         )
 
         let total = Wallet.totalBalance(of: [cash, card], with: [entry])
-
         #expect(total == 200)
     }
 }
@@ -92,10 +91,7 @@ extension WalletBalanceTests.BalanceCase {
     }
 
     func wallet() -> Wallet {
-        Self.wallet(
-            kind: kind ?? .cash,
-            initialBalance: initialBalance
-        )
+        Self.wallet(kind: kind ?? .cash, initialBalance: initialBalance)
     }
 
     func valuations(wallet: Wallet.ID) -> [Valuation] {

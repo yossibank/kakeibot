@@ -30,9 +30,7 @@ public extension RewardBank {
     }
 
     var waitingGoals: [RewardGoal] {
-        goals
-            .filter { $0.purchasedAt == nil }
-            .sorted { $0.createdAt < $1.createdAt }
+        goals.filter { $0.purchasedAt == nil }.sorted { $0.createdAt < $1.createdAt }
     }
 
     var boughtGoals: [RewardGoal] {
@@ -51,7 +49,8 @@ public extension RewardBank {
     }
 
     func rules(on date: LocalDate) -> [RewardRule] {
-        let achieved = Set(logs(on: date).map(\.ruleId))
+        let ruleIds = logs(on: date).map(\.ruleId)
+        let achieved = Set(ruleIds)
         let hidden = rules.filter { !$0.isActive && achieved.contains($0.id) }
 
         return activeRules + hidden
@@ -62,7 +61,8 @@ public extension RewardBank {
     }
 
     func remaining(to goal: RewardGoal) -> Int {
-        max(goal.targetAmount - balance, 0)
+        let shortfall = goal.targetAmount - balance
+        return max(shortfall, 0)
     }
 
     func progress(to goal: RewardGoal) -> Double {
@@ -71,8 +71,9 @@ public extension RewardBank {
         }
 
         let ratio = Double(balance) / Double(goal.targetAmount)
+        let nonNegative = max(ratio, 0)
 
-        return min(max(ratio, 0), 1)
+        return min(nonNegative, 1)
     }
 
     func percent(to goal: RewardGoal) -> Int {

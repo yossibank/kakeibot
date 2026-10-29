@@ -11,23 +11,17 @@ public struct RewardGoalDraft: Hashable, Sendable {
         self.name = name
         self.targetAmount = targetAmount
     }
+
+    public init(_ goal: RewardGoal) {
+        self.init(name: goal.name, targetAmount: goal.targetAmount)
+    }
 }
 
 public extension RewardGoalDraft {
     var problems: [DraftProblem] {
-        let nameProblems: [DraftProblem] = trimmedName.isEmpty
-            ? [.emptyName]
-            : []
-
-        let amountProblems: [DraftProblem] = targetAmount > 0
-            ? []
-            : [.emptyAmount]
-
+        let nameProblems: [DraftProblem] = trimmedName.isEmpty ? [.emptyName] : []
+        let amountProblems: [DraftProblem] = targetAmount > 0 ? [] : [.emptyAmount]
         return nameProblems + amountProblems
-    }
-
-    init(_ goal: RewardGoal) {
-        self.init(name: goal.name, targetAmount: goal.targetAmount)
     }
 
     func newGoal(at now: Date) throws -> RewardGoal {

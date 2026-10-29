@@ -1,4 +1,4 @@
-public enum HomeSection: String, CaseIterable, Codable, Sendable {
+public enum HomeSection: String, CaseIterable, Codable, Identifiable, Sendable {
     case customize
     case budget
     case templates
@@ -7,9 +7,7 @@ public enum HomeSection: String, CaseIterable, Codable, Sendable {
     case stamps
 
     public static let standard: [Self] = [.budget, .customize, .templates, .recent]
-}
 
-extension HomeSection: Identifiable {
     public var id: Self {
         self
     }
