@@ -58,9 +58,20 @@ public struct RewardRuleEditSheet: View {
             below: iconBottom
         )
         .overlay(alignment: .top) {
-            header
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
+            SettingsEditHeader(
+                title: model.isEditing ? "ごほうびを編集" : "ごほうびを追加",
+                isEditing: model.isEditing,
+                isHidden: model.isHidden,
+                canDelete: !(model.isHidden && model.hasLogs)
+            ) {
+                close()
+            } onHide: {
+                toggleHidden()
+            } onDelete: {
+                isConfirmingDelete = true
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
         }
         .background {
             Rectangle()
@@ -94,16 +105,12 @@ public struct RewardRuleEditSheet: View {
         }
         .confirmation(
             isPresented: $isConfirmingDelete,
-            systemImage: model.hasLogs ? "eye.slash" : "trash",
-            title: model.hasLogs
-                ? "このごほうびは削除できません"
-                : "このごほうびを削除しますか",
-            message: model.hasLogs
-                ? "貯めた記録があります。非表示にすると、貯めた分を残したまま一覧から外せます"
-                : nil,
+            systemImage: deleteImage,
+            title: deleteTitle,
+            message: deleteMessage,
             keepTitle: "やめる",
-            confirmTitle: model.hasLogs ? "非表示にする" : "削除する",
-            role: model.hasLogs ? .suggestion : .destructive
+            confirmTitle: deleteConfirmTitle,
+            role: deleteRole
         ) {
             if model.hasLogs {
                 toggleHidden()
@@ -190,21 +197,6 @@ private extension RewardRuleEditSheet {
         .padding(.bottom, 8)
     }
 
-    var header: some View {
-        SettingsEditHeader(
-            title: model.isEditing ? "ごほうびを編集" : "ごほうびを追加",
-            isEditing: model.isEditing,
-            isHidden: model.isHidden,
-            canDelete: !(model.isHidden && model.hasLogs)
-        ) {
-            close()
-        } onHide: {
-            toggleHidden()
-        } onDelete: {
-            isConfirmingDelete = true
-        }
-    }
-
     var saveButton: some View {
         PrimaryButton(model.saveTitle) {
             Task {
@@ -253,6 +245,26 @@ private extension RewardRuleEditSheet {
 
     var amountValue: String {
         AmountText.text(model.amount ?? 0)
+    }
+
+    var deleteImage: String {
+        model.hasLogs ? "eye.slash" : "trash"
+    }
+
+    var deleteTitle: String {
+        model.hasLogs ? "このごほうびは削除できません" : "このごほうびを削除しますか"
+    }
+
+    var deleteMessage: String? {
+        model.hasLogs ? "貯めた記録があります。非表示にすると、貯めた分を残したまま一覧から外せます" : nil
+    }
+
+    var deleteConfirmTitle: String {
+        model.hasLogs ? "非表示にする" : "削除する"
+    }
+
+    var deleteRole: ConfirmCard.Role {
+        model.hasLogs ? .suggestion : .destructive
     }
 
     var rowItems: [SettingsRowList<Panel>.Item] {

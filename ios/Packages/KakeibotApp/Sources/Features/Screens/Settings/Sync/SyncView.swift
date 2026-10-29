@@ -16,15 +16,9 @@ public struct SyncView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 8) {
-                        note(
-                            "arrow.triangle.2.circlepath",
-                            "記録と設定を、同じ iCloud の端末どうしでそろえます"
-                        )
+                        note("arrow.triangle.2.circlepath", "記録と設定を、同じ iCloud の端末どうしでそろえます")
 
-                        note(
-                            "lock",
-                            "データは iCloud に暗号化して置きます"
-                        )
+                        note("lock", "データは iCloud に暗号化して置きます")
                     }
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -156,11 +150,6 @@ public struct SyncView: View {
 }
 
 private extension SyncView {
-    static let onOptions: [CapsulePicker<Bool>.Option] = [
-        .init("オフ", value: false),
-        .init("オン", value: true)
-    ]
-
     func note(
         _ systemImage: String,
         _ text: String
@@ -189,9 +178,9 @@ private extension SyncView {
 
             Spacer(minLength: 0)
 
-            Text(item.isShared ? "共有中" : "共有する")
+            Text(shareStatus(item))
                 .textFont(.footnote)
-                .foregroundStyle(item.isShared ? Palette.subtext : Palette.accent)
+                .foregroundStyle(shareTint(item))
 
             Image(systemName: "chevron.right")
                 .sansFont(.small)
@@ -203,6 +192,11 @@ private extension SyncView {
 }
 
 private extension SyncView {
+    static let onOptions: [CapsulePicker<Bool>.Option] = [
+        .init("オフ", value: false),
+        .init("オン", value: true)
+    ]
+
     var canChange: Bool {
         model.isOn || model.isAvailable
     }
@@ -225,6 +219,14 @@ private extension SyncView {
 
     func pendingText(_ count: Int) -> String {
         count > 0 ? "iCloud に送っています（残り \(count) 件）" : "最新の状態です"
+    }
+
+    func shareStatus(_ item: WalletShare) -> String {
+        item.isShared ? "共有中" : "共有する"
+    }
+
+    func shareTint(_ item: WalletShare) -> Color {
+        item.isShared ? Palette.subtext : Palette.accent
     }
 }
 

@@ -14,12 +14,12 @@ public final class RecurringEditModel {
     public var frequency: Recurring.Frequency = .monthly
     public var month: Int
     public var day: Int
-    public private(set) var holidayShift: Recurring.HolidayShift = .none
     public var closingDay: Int?
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
 
+    public private(set) var holidayShift: Recurring.HolidayShift = .none
     public private(set) var type: Entry.Kind = .expense
     public private(set) var calculator = AmountCalculator()
     public private(set) var feeCalculator = AmountCalculator()
@@ -74,7 +74,10 @@ public extension RecurringEditModel {
     }
 
     var draft: RecurringDraft {
-        RecurringDraft(
+        let closing = canUseClosingDay ? closingDay : nil
+        let transferFee = type == .transfer ? fee : 0
+
+        return RecurringDraft(
             type: type,
             amount: amount,
             categoryId: categoryId,
@@ -85,8 +88,8 @@ public extension RecurringEditModel {
             month: month,
             day: day,
             holidayShift: holidayShift,
-            closingDay: canUseClosingDay ? closingDay : nil,
-            fee: type == .transfer ? fee : 0,
+            closingDay: closing,
+            fee: transferFee,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore
@@ -110,10 +113,8 @@ public extension RecurringEditModel {
     }
 
     var saveTitle: String {
-        SettingsSaveTitle.text(
-            problem: draft.problems.first.map(message),
-            isEditing: isEditing
-        )
+        let problem = draft.problems.first.map(message)
+        return SettingsSaveTitle.text(problem: problem, isEditing: isEditing)
     }
 
     var isChanged: Bool {
@@ -144,48 +145,6 @@ public extension RecurringEditModel {
         wallets.first { $0.id == toWalletId }
     }
 
-    var previewRow: RecurringListModel.Row {
-        let schedule = RecurringText.schedule(frequency, month: month, day: day)
-        let holiday = RecurringText.holidayNote(holidayShift)
-        let closing = canUseClosingDay ? closingDay.map(RecurringText.closingNote) : nil
-        let name = memo.trimmingCharacters(in: .whitespaces)
-        let destination = type == .transfer ? selectedDestination?.name : nil
-        let place = [selectedWallet?.name, destination].compactMap(\.self).joined(separator: " → ")
-
-        let recurring = Recurring(
-            type: type,
-            amount: amount,
-            categoryId: categoryId,
-            walletId: walletId ?? Wallet.ID(),
-            frequency: frequency,
-            month: month,
-            day: day,
-            holidayShift: holidayShift,
-            startDate: startDate,
-            endDate: endDate,
-            createdAt: Date(),
-            updatedAt: Date()
-        )
-
-        let icon = type == .transfer
-            ? selectedWallet.flatMap(icon(for:))
-            : selectedCategory.flatMap(icon(for:))
-
-        return RecurringListModel.Row(
-            id: recurring.id,
-            title: name.isEmpty
-                ? selectedCategory?.name ?? RecurringListModel.title(of: type)
-                : name,
-            schedule: [schedule, holiday].rowDetail ?? schedule,
-            place: place.isEmpty ? nil : place,
-            amount: isCardBill ? nil : amount,
-            type: type,
-            icon: icon,
-            next: recurring.nextDate(onOrAfter: today),
-            closing: closing
-        )
-    }
-
     func icon(for category: EntryCategory) -> Icon? {
         options?.icons[category.iconId]
     }
@@ -202,7 +161,8 @@ public extension RecurringEditModel {
         self.type = type
         categoryId = categories.first?.id
 
-        if type == .transfer, toWalletId == nil {
+        if type == .transfer,
+           toWalletId == nil {
             toWalletId = wallets.first { $0.id != walletId }?.id
         }
 
@@ -258,17 +218,14 @@ public extension RecurringEditModel {
 
     func save(permission: NotificationPermission = .allowed) async -> Bool {
         if let problem = draft.problems.first {
-            errorNotice.show(message(for: problem))
+            let text = message(for: problem)
+
+            errorNotice.show(text)
             return false
         }
 
         do {
-            try await database.saveRecurring(
-                draft,
-                editing: editingId,
-                today: today,
-                at: Date()
-            )
+            try await database.saveRecurring(draft, editing: editingId, today: today, at: Date())
 
             await requestPermissionIfReminding(permission)
 
@@ -285,10 +242,7 @@ public extension RecurringEditModel {
         }
 
         do {
-            return try await database.deleteRecurring(
-                editingId,
-                at: Date()
-            )
+            return try await database.deleteRecurring(editingId, at: Date())
         } catch {
             errorNotice.show(Self.saveFailedMessage)
             return nil
@@ -321,7 +275,6 @@ public extension RecurringEditModel {
 private extension RecurringEditModel {
     static let billClosingDay = 31
     static let billPaymentDay = 27
-
     static let loadFailedMessage = "固定費を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
 
@@ -348,7 +301,10 @@ private extension RecurringEditModel {
     }
 
     func presetPayment() {
-        guard !isEditing, let target = paidWallet else {
+        guard
+            !isEditing,
+            let target = paidWallet
+        else {
             return
         }
 
@@ -372,7 +328,10 @@ private extension RecurringEditModel {
     }
 
     func suggestHolidayShift() {
-        guard !isEditing, !isHolidayShiftChosen else {
+        guard
+            !isEditing,
+            !isHolidayShiftChosen
+        else {
             return
         }
 

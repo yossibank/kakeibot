@@ -20,8 +20,8 @@ public final class ThemeEditModel {
         editing theme: Theme?,
         base palette: ThemePalette
     ) {
-        let draft = theme.map(ThemeDraft.init)
-            ?? ThemeDraft(name: "", palette: palette)
+        let draft = theme.map(ThemeDraft.init) ?? ThemeDraft(name: "", palette: palette)
+
         self.draft = draft
         self.baseline = draft
         self.database = database
@@ -197,6 +197,9 @@ public extension ThemeEditModel.Slot {
 }
 
 private extension ThemeEditModel {
+    static let saveFailedMessage = "保存できませんでした"
+    static let deleteFailedMessage = "削除できませんでした"
+
     static func isLight(_ hex: String) -> Bool {
         let rgb = UInt32(hex.dropFirst(), radix: 16) ?? 0
         let onBlack = ThemePalette.contrast(rgb, 0x000000)
@@ -228,9 +231,4 @@ private extension ThemeEditModel {
 
         return slot.roles.isDisjoint(with: palette.unreadableRoles)
     }
-}
-
-private extension ThemeEditModel {
-    static let saveFailedMessage = "保存できませんでした"
-    static let deleteFailedMessage = "削除できませんでした"
 }

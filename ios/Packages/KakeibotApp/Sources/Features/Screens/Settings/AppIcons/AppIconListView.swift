@@ -66,7 +66,10 @@ private extension AppIconListView {
 
 private extension AppIconListView {
     static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 12),
+        repeating: GridItem(
+            .flexible(),
+            spacing: 12
+        ),
         count: 3
     )
 

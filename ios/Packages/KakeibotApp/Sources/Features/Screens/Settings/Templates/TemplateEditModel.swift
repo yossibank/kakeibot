@@ -95,10 +95,8 @@ public extension TemplateEditModel {
     }
 
     var saveTitle: String {
-        SettingsSaveTitle.text(
-            problem: draft.problems.first.map(message),
-            isEditing: isEditing
-        )
+        let problem = draft.problems.first.map(message)
+        return SettingsSaveTitle.text(problem: problem, isEditing: isEditing)
     }
 
     var isChanged: Bool {
@@ -178,16 +176,14 @@ public extension TemplateEditModel {
 
     func save() async -> EntryTemplate? {
         if let problem = draft.problems.first {
-            errorNotice.show(message(for: problem))
+            let text = message(for: problem)
+
+            errorNotice.show(text)
             return nil
         }
 
         do {
-            return try await database.saveTemplate(
-                draft,
-                editing: editingId,
-                at: Date()
-            )
+            return try await database.saveTemplate(draft, editing: editingId, at: Date())
         } catch {
             errorNotice.show(Self.saveFailedMessage)
             return nil
@@ -213,11 +209,7 @@ public extension TemplateEditModel {
         }
 
         do {
-            try await database.setTemplateHidden(
-                editingId,
-                isHidden: isHidden,
-                at: Date()
-            )
+            try await database.setTemplateHidden(editingId, isHidden: isHidden, at: Date())
 
             self.isHidden = isHidden
 

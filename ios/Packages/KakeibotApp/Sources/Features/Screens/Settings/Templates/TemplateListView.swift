@@ -4,31 +4,33 @@ import Store
 import SwiftUI
 
 public struct TemplateListView: View {
-    @State private var drag = SettingsDrag<EntryTemplate.ID>()
-    @State private var model: TemplateListModel
-    @State private var hintFlag: SettingsScreenFlag
-    @State private var destination: Destination?
-    @State private var hiddenId: EntryTemplate.ID?
-    @State private var deletion: Deletion?
-    @State private var isConfirmingDeleteHidden = false
-    @State private var openId: EntryTemplate.ID?
-    @State private var deleting: EntryTemplate.ID?
-    @State private var isConfirmingDelete = false
-    @State private var hiddenList: SettingsScreenFlag
+    @State var drag = SettingsDrag<EntryTemplate.ID>()
+    @State var model: TemplateListModel
+    @State var hiddenId: EntryTemplate.ID?
+    @State var deletion: Deletion?
+    @State var deleting: EntryTemplate.ID?
+    @State var isConfirmingDelete = false
 
-    @State private var grid = SettingsBoardGrid(
+    @State var grid = SettingsBoardGrid(
         columns: 1,
         itemHeight: TemplateRowCard.height,
         spacing: 12
     )
+
+    @State private var hintFlag: SettingsScreenFlag
+    @State private var destination: Destination?
+    @State private var isConfirmingDeleteHidden = false
+    @State private var openId: EntryTemplate.ID?
+    @State private var hiddenList: SettingsScreenFlag
 
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
         let hintFlag = SettingsScreenFlag.closedHint(.templates, in: database)
         let hiddenList = SettingsScreenFlag.openHiddenList(.templates, in: database)
+        let model = TemplateListModel(database: database)
 
-        _model = State(initialValue: TemplateListModel(database: database))
+        _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
         _hiddenList = State(initialValue: hiddenList)
 
@@ -41,10 +43,7 @@ public struct TemplateListView: View {
 
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
 
-            SettingsHint(
-                flag: hintFlag,
-                lines: hint
-            )
+            SettingsHint(flag: hintFlag, lines: hint)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
@@ -76,10 +75,7 @@ public struct TemplateListView: View {
             }
 
             if drag.lift != nil {
-                SettingsHideTarget(
-                    zones: $drag.zones,
-                    isArmed: drag.isOverHide
-                )
+                SettingsHideTarget(zones: $drag.zones, isArmed: drag.isOverHide)
             } else {
                 AddButton(addTitle) {
                     destination = .new(model.type)
@@ -90,11 +86,7 @@ public struct TemplateListView: View {
         .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .settingsLiftLayer(
-            drag,
-            size: CGSize(width: grid.itemWidth, height: grid.itemHeight),
-            scale: 1.03
-        ) { id in
+        .settingsLiftLayer(drag, size: liftSize, scale: 1.03) { id in
             floatingTile(id)
         }
         .errorBanner(model.errorNotice) {
@@ -110,14 +102,17 @@ public struct TemplateListView: View {
         .sensoryFeedback(.selection, trigger: model.movingOrder)
         .sensoryFeedback(.success, trigger: drag.showCount)
         .navigationDestination(item: $destination) { destination in
-            TemplateEditSheet(model: editModel(for: destination)) { _ in
-            } onDelete: { deletion in
-                self.deletion = deletion
-            } onHide: {
-                if case let .edit(id) = destination {
-                    hiddenId = id
+            TemplateEditSheet(
+                model: editModel(for: destination),
+                onDelete: { deletion in
+                    self.deletion = deletion
+                },
+                onHide: {
+                    if case let .edit(id) = destination {
+                        hiddenId = id
+                    }
                 }
-            }
+            )
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)
         }
@@ -203,12 +198,7 @@ private extension TemplateListView {
             .opacity(opacity)
             .animation(nil, value: isLifted)
             .offset(offset)
-            .settingsLiftFrame(
-                drag,
-                \.hiddenFrames,
-                id: template.id,
-                in: Self.space
-            )
+            .settingsLiftFrame(drag, \.hiddenFrames, id: template.id, in: Self.space)
             .zIndex(layer)
             .onTapGesture {
                 destination = .edit(template.id)
@@ -303,92 +293,8 @@ private extension TemplateListView {
         grid.height(slots: model.shown.count)
     }
 
-    func follow(
-        _ template: EntryTemplate,
-        to location: CGPoint
-    ) {
-        let index = model.shown.firstIndex(of: template) ?? 0
-        let start = grid.center(at: index)
-
-        let center = drag
-            .follow(template.id, from: start, to: location) { next in
-                follow(template, to: next)
-            }
-
-        guard let center else {
-            return
-        }
-
-        let target = grid.index(at: center, count: model.shown.count)
-
-        withAnimation(.snappy) {
-            model.move(template.id, to: target)
-        }
-    }
-
-    func drop() {
-        switch drag.drop() {
-        case let .hide(id):
-            hide(id)
-        case .move:
-            Task {
-                await model.finishMoving()
-            }
-        case nil:
-            break
-        }
-    }
-
-    func followHidden(
-        _ id: EntryTemplate.ID,
-        to location: CGPoint
-    ) {
-        drag.followHidden(id, to: location)
-    }
-
-    func dropHidden() {
-        guard let id = drag.dropHidden() else {
-            return
-        }
-
-        show(id)
-    }
-
-    func hide(_ id: EntryTemplate.ID) {
-        Task {
-            if await model.hide(id) {
-                hiddenId = id
-            }
-        }
-    }
-
-    func requestDelete(_ id: EntryTemplate.ID) {
-        deleting = id
-        isConfirmingDelete = true
-    }
-
-    func delete(_ id: EntryTemplate.ID) {
-        Task {
-            deletion = await model.delete(id)
-        }
-    }
-
-    func deleteHidden() {
-        Task {
-            deletion = await model.deleteHidden()
-        }
-    }
-
-    func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
-        }
-    }
-
-    func show(_ id: EntryTemplate.ID) {
-        Task {
-            await model.show(id)
-        }
+    var liftSize: CGSize {
+        CGSize(width: grid.itemWidth, height: grid.itemHeight)
     }
 
     func editModel(for destination: Destination) -> TemplateEditModel {

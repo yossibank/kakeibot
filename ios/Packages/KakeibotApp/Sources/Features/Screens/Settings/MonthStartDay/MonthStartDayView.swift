@@ -21,10 +21,7 @@ public struct MonthStartDayView: View {
 
             ScrollView {
                 VStack(spacing: 20) {
-                    PeriodCard(
-                        periodText: model.periodText,
-                        month: model.month
-                    )
+                    PeriodCard(periodText: model.periodText, month: model.month)
 
                     MonthStartDayGrid(selection: model.startDay) { day in
                         Task {
@@ -61,11 +58,13 @@ public struct MonthStartDayView: View {
 
 #Preview {
     if let database = try? AppDatabase.inMemory() {
+        let today = LocalDate(Date(), in: .current)
+
         NavigationStack {
             MonthStartDayView(
                 model: MonthStartDayModel(
                     database: database,
-                    today: LocalDate(Date(), in: .current)
+                    today: today
                 )
             )
         }

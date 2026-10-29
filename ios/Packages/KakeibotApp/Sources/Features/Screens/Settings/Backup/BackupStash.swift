@@ -1,20 +1,15 @@
 import Foundation
 
 public struct BackupStash: Sendable {
-    public typealias Write = @Sendable (Data, URL) throws -> Void
-
-    public struct Item: Sendable {
-        public let url: URL
-        public let data: Data
-    }
-
     public let urls: [URL]
 
     private let write: Write
 
     public init(
         urls: [URL],
-        write: @escaping Write = { try $0.write(to: $1, options: .atomic) }
+        write: @escaping Write = {
+            try $0.write(to: $1, options: .atomic)
+        }
     ) {
         self.urls = urls
         self.write = write
@@ -22,6 +17,13 @@ public struct BackupStash: Sendable {
 }
 
 public extension BackupStash {
+    typealias Write = @Sendable (Data, URL) throws -> Void
+
+    struct Item: Sendable {
+        public let url: URL
+        public let data: Data
+    }
+
     static var standard: BackupStash {
         let base = URL.applicationSupportDirectory
 

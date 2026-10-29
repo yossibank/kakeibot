@@ -4,21 +4,23 @@ import Store
 import SwiftUI
 
 public struct CategoryEditSheet: View {
-    @State private var model: CategoryEditModel
-    @State private var isConfirmingDiscard = false
-    @State private var isConfirmingHideChanges = false
+    @State var model: CategoryEditModel
+    @State var isConfirmingDiscard = false
+    @State var isConfirmingHideChanges = false
+    @State var tagEdit: TagEdit?
+    @State var tagName = ""
+    @State var ignoresKeyboard = false
+
+    @FocusState var focus: Field?
+    @FocusState var isTagFocused: Bool?
+
+    @Environment(\.dismiss) var dismiss
+
     @State private var isConfirmingDelete = false
-    @State private var tagEdit: TagEdit?
     @State private var isMovingTag = false
-    @State private var tagName = ""
-    @State private var ignoresKeyboard = false
     @State private var isEditingIcon = false
     @State private var iconBottom: CGFloat = 0
 
-    @FocusState private var focus: Field?
-    @FocusState private var isTagFocused: Bool?
-
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
 
     let startsAddingTag: Bool
@@ -105,6 +107,18 @@ public struct CategoryEditSheet: View {
                 addTag()
             }
         }
+    }
+}
+
+extension CategoryEditSheet {
+    enum Field: Hashable {
+        case name
+        case text
+    }
+
+    enum TagEdit: Hashable {
+        case add
+        case rename(UUID)
     }
 }
 
@@ -213,7 +227,7 @@ private extension CategoryEditSheet {
 
                 HStack(spacing: 8) {
                     Circle()
-                        .fill(Color(hex: model.icon.color) ?? Palette.subtext)
+                        .fill(graphColor)
                         .frame(width: 10, height: 10)
 
                     Text("振り返りのグラフの色")
@@ -285,16 +299,6 @@ private extension CategoryEditSheet {
 }
 
 private extension CategoryEditSheet {
-    enum Field: Hashable {
-        case name
-        case text
-    }
-
-    enum TagEdit: Hashable {
-        case add
-        case rename(UUID)
-    }
-
     static let fade: CGFloat = 16
 
     static var tagTransition: AnyTransition {
@@ -307,6 +311,10 @@ private extension CategoryEditSheet {
 
     var iconStrokeWidth: CGFloat {
         isEditingIcon ? 2 : 1
+    }
+
+    var graphColor: Color {
+        Color(hex: model.icon.color) ?? Palette.subtext
     }
 
     var keyboardRegions: SafeAreaRegions {
@@ -326,139 +334,6 @@ private extension CategoryEditSheet {
             model.removeTag(id)
             closeTag()
             storeTags()
-        }
-    }
-
-    func addTag() {
-        showTag(.add, name: "")
-    }
-
-    func editTag(_ id: UUID) {
-        let name = model.tags.first { $0.id == id }?.draft.name ?? ""
-        showTag(.rename(id), name: name)
-    }
-
-    func showTag(
-        _ edit: TagEdit,
-        name: String
-    ) {
-        focus = nil
-        tagName = name
-        ignoresKeyboard = true
-
-        model.clearTagProblem()
-
-        withAnimation(.snappy(duration: 0.25)) {
-            tagEdit = edit
-        }
-    }
-
-    func storeTags() {
-        Task {
-            await model.storeTags()
-        }
-    }
-
-    func closeTag() {
-        isTagFocused = nil
-
-        model.clearTagProblem()
-
-        withAnimation(.snappy(duration: 0.2)) {
-            tagEdit = nil
-        }
-    }
-
-    func commitTag() {
-        let isDone = switch tagEdit {
-        case .add: model.addTag(tagName)
-        case let .rename(id): model.renameTag(id, to: tagName)
-        case nil: true
-        }
-
-        guard isDone else {
-            return
-        }
-
-        closeTag()
-
-        guard startsAddingTag else {
-            storeTags()
-            return
-        }
-
-        Task {
-            await model.storeTags()
-            dismiss()
-        }
-    }
-
-    func cancelTag() {
-        closeTag()
-
-        if startsAddingTag {
-            dismiss()
-        }
-    }
-
-    func close() {
-        focus = nil
-
-        if model.isChanged {
-            isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
-    }
-
-    func save(hiding: Bool = false) async {
-        focus = nil
-
-        guard let category = await model.save() else {
-            return
-        }
-
-        onSave(category)
-
-        if hiding {
-            guard await model.setHidden(!model.isHidden) else {
-                return
-            }
-
-            if model.isHidden {
-                onHide()
-            }
-        }
-
-        dismiss()
-    }
-
-    func toggleHidden() {
-        guard model.isChanged else {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-
-            return
-        }
-
-        isConfirmingHideChanges = true
-    }
-
-    func setHidden(_ isHidden: Bool) async {
-        if await model.setHidden(isHidden) {
-            if isHidden {
-                onHide()
-            }
-
-            dismiss()
-        }
-    }
-
-    func delete() async {
-        if let deletion = await model.delete() {
-            onDelete(deletion)
-            dismiss()
         }
     }
 }

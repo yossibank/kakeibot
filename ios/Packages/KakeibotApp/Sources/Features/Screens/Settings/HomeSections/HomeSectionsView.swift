@@ -66,10 +66,6 @@ public struct HomeSectionsView: View {
 }
 
 private extension HomeSectionsView {
-    var zoneShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
-
     var board: some View {
         let slots = model.layout.slots
 
@@ -87,7 +83,7 @@ private extension HomeSectionsView {
                             }
                         }
                         .offset(y: offset(of: section))
-                        .zIndex(dragging == section ? 1 : 0)
+                        .zIndex(layer(of: section))
                 case .boundary:
                     boundary
                 }
@@ -179,6 +175,10 @@ private extension HomeSectionsView {
     static let zoneGap: CGFloat = 16
     static let liftScale: CGFloat = 1.02
 
+    var zoneShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
+
     func offset(of section: HomeSection) -> CGFloat {
         guard
             dragging == section,
@@ -188,6 +188,10 @@ private extension HomeSectionsView {
         }
 
         return dragTranslation - CGFloat(index - dragStart) * Self.rowHeight
+    }
+
+    func layer(of section: HomeSection) -> Double {
+        dragging == section ? 1 : 0
     }
 
     func dragGesture(_ section: HomeSection) -> some Gesture {

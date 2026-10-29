@@ -1,0 +1,237 @@
+import Core
+import DesignSystem
+import Store
+import SwiftUI
+
+extension RecurringEditSheet {
+    @ViewBuilder
+    func drawerBody(_ panel: Panel) -> some View {
+        switch panel {
+        case .amount:
+            VStack(spacing: 12) {
+                SettingsKeypadValue(model.amount)
+
+                Keypad(calculator: model.calculator) {
+                    closePanel()
+                } onKey: { key in
+                    model.press(key)
+                }
+
+                saveButton
+            }
+        case .category:
+            SettingsTileGrid(items: model.categories, columns: 5, spacing: 4) { category in
+                SettingsCategoryTile(
+                    category: category,
+                    icon: model.icon(for: category),
+                    isSelected: model.categoryId == category.id
+                ) {
+                    model.select(category: category.id)
+                    closePanel()
+                }
+            }
+            .padding(.bottom, 8)
+        case .wallet:
+            SettingsTileGrid(items: model.wallets, columns: 3, spacing: 8) { wallet in
+                SettingsWalletTile(
+                    wallet: wallet,
+                    icon: model.icon(for: wallet),
+                    isSelected: model.walletId == wallet.id
+                ) {
+                    model.walletId = wallet.id
+                    closePanel()
+                }
+            }
+            .padding(.bottom, 8)
+        case .destination:
+            SettingsTileGrid(items: model.wallets, columns: 3, spacing: 8) { wallet in
+                SettingsWalletTile(
+                    wallet: wallet,
+                    icon: model.icon(for: wallet),
+                    isSelected: model.toWalletId == wallet.id
+                ) {
+                    model.toWalletId = wallet.id
+                    closePanel()
+                }
+            }
+            .padding(.bottom, 8)
+        case .schedule:
+            scheduleChooser
+        case .start:
+            MonthCalendar(selection: $model.startDate, today: model.today)
+        case .end:
+            endChooser
+        case .holiday:
+            holidayChooser
+        case .closing:
+            closingChooser
+        case .fee:
+            VStack(spacing: 12) {
+                SettingsKeypadValue(model.fee)
+
+                FeeChoiceRow(choices: FeeChoiceRow.defaultChoices, selection: model.fee) { amount in
+                    model.setFee(amount)
+                }
+
+                Keypad(calculator: model.feeCalculator) {
+                    closePanel()
+                } onKey: { key in
+                    model.pressFee(key)
+                }
+
+                saveButton
+            }
+        case .remind:
+            remindChooser
+        }
+    }
+}
+
+private extension RecurringEditSheet {
+    var scheduleChooser: some View {
+        VStack(spacing: 16) {
+            CapsulePicker(selection: $model.frequency, options: Self.frequencyOptions)
+
+            if model.frequency == .yearly {
+                LazyVGrid(columns: Self.monthColumns, spacing: 8) {
+                    ForEach(1...12, id: \.self) { month in
+                        SettingsChoice("\(month) 月", isSelected: model.month == month) {
+                            model.month = month
+                        }
+                    }
+                }
+                .transition(Self.monthTransition)
+            }
+
+            MonthStartDayGrid(selection: scheduleDay) { day in
+                model.day = day.day
+            }
+        }
+        .padding(.bottom, 8)
+    }
+
+    var endChooser: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 8) {
+                SettingsChoice("終わりなし", isSelected: model.endDate == nil) {
+                    model.endDate = nil
+                    closePanel()
+                }
+
+                SettingsChoice("今日で終える", isSelected: isEndingToday) {
+                    model.endDate = model.today
+                    closePanel()
+                }
+            }
+
+            MonthCalendar(selection: endBinding, today: model.today)
+        }
+    }
+
+    var holidayChooser: some View {
+        VStack(spacing: 12) {
+            Text("土日・祝日・年末年始（12/31〜1/3）に当たったときに、日をずらします")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: 8) {
+                ForEach(Recurring.HolidayShift.allCases, id: \.self) { shift in
+                    SettingsChoice(
+                        RecurringText.holidayShift(shift),
+                        isSelected: model.holidayShift == shift
+                    ) {
+                        model.choose(shift)
+                        closePanel()
+                    }
+                }
+            }
+        }
+        .padding(.bottom, 8)
+    }
+
+    var closingChooser: some View {
+        VStack(spacing: 12) {
+            Text("締め日までのカードの利用分を、引き落とし日に振り替えます")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+
+            SettingsChoice(RecurringText.closingDay(nil), isSelected: model.closingDay == nil) {
+                model.closingDay = nil
+                closePanel()
+            }
+
+            MonthStartDayGrid(selection: closingDaySelection) { day in
+                model.closingDay = day.day
+                closePanel()
+            }
+        }
+        .padding(.bottom, 8)
+    }
+
+    var remindChooser: some View {
+        LazyVGrid(columns: Self.remindColumns, spacing: 8) {
+            ForEach(RecurringEditModel.remindChoices, id: \.self) { days in
+                SettingsChoice(
+                    RecurringText.remind(days),
+                    isSelected: model.remindDaysBefore == days
+                ) {
+                    model.remindDaysBefore = days
+                    closePanel()
+                }
+            }
+        }
+        .padding(.bottom, 8)
+    }
+}
+
+private extension RecurringEditSheet {
+    static let frequencyOptions: [CapsulePicker<Recurring.Frequency>.Option] = [
+        .init("毎月", value: .monthly),
+        .init("毎年", value: .yearly)
+    ]
+
+    static let monthColumns = Array(
+        repeating: GridItem(
+            .flexible(),
+            spacing: 8
+        ),
+        count: 4
+    )
+
+    static let remindColumns = Array(
+        repeating: GridItem(
+            .flexible(),
+            spacing: 8
+        ),
+        count: 3
+    )
+
+    static var monthTransition: AnyTransition {
+        .asymmetric(
+            insertion: .opacity.animation(.snappy.delay(0.15)),
+            removal: .identity
+        )
+    }
+
+    var scheduleDay: MonthStartDay {
+        MonthStartDay(model.day) ?? .first
+    }
+
+    var closingDaySelection: MonthStartDay? {
+        model.closingDay.flatMap(MonthStartDay.init)
+    }
+
+    var isEndingToday: Bool {
+        model.endDate == model.today
+    }
+
+    var endBinding: Binding<LocalDate> {
+        Binding {
+            model.endDate ?? model.startDate
+        } set: { date in
+            model.endDate = date
+        }
+    }
+}

@@ -35,14 +35,18 @@ public extension SyncCloud {
     typealias ShowShare = @MainActor (Wallet.ID, String, @escaping Stop) async throws -> Void
     typealias DeleteShare = @Sendable (Wallet.ID) async throws -> Void
 
-    static let unavailable = Self {
-        false
-    } hasData: {
-        false
-    } deleteData: {} createShare: { _, _ in
-    } showShare: { _, _, _ in
-    } deleteShare: { _ in
-    }
+    static let unavailable = Self(
+        isAvailable: {
+            false
+        },
+        hasData: {
+            false
+        },
+        deleteData: {},
+        createShare: { _, _ in },
+        showShare: { _, _, _ in },
+        deleteShare: { _ in }
+    )
 }
 
 public extension EnvironmentValues {

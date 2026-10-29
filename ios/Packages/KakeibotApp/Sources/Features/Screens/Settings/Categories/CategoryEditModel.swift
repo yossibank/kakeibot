@@ -41,18 +41,6 @@ public extension CategoryEditModel {
         public let id: UUID
 
         public var draft: EntryTagDraft
-
-        init(
-            id: UUID,
-            draft: EntryTagDraft
-        ) {
-            self.id = id
-            self.draft = draft
-        }
-
-        init(_ tag: EntryTag) {
-            self.init(id: UUID(), draft: EntryTagDraft(tag))
-        }
     }
 
     var isEditing: Bool {
@@ -90,7 +78,9 @@ public extension CategoryEditModel {
             return false
         }
 
-        tags.append(EditingTag(id: UUID(), draft: draft))
+        let tag = EditingTag(id: UUID(), draft: draft)
+
+        tags.append(tag)
 
         return true
     }
@@ -103,11 +93,11 @@ public extension CategoryEditModel {
             return false
         }
 
+        let others = tags.filter { $0.id != id }.map(\.draft)
+
         var draft = tags[index].draft
 
         draft.name = name
-
-        let others = tags.filter { $0.id != id }.map(\.draft)
 
         guard check(draft, among: others) else {
             return false
@@ -154,16 +144,19 @@ public extension CategoryEditModel {
             let list = try await database.categoryList()
             let category = list.categories.first { $0.id == editingId }
 
-            guard let category, let icon = list.icons[category.iconId] else {
+            guard
+                let category,
+                let icon = list.icons[category.iconId]
+            else {
                 errorNotice.show(Self.loadFailedMessage)
                 return
             }
 
-            apply(CategoryDraft(category, icon: icon))
+            let loaded = CategoryDraft(category, icon: icon)
 
-            let tags = list.tags.filter { $0.categoryId == editingId }
+            apply(loaded)
 
-            self.tags = tags.map(EditingTag.init)
+            tags = list.tags.filter { $0.categoryId == editingId }.map(EditingTag.init)
             isHidden = category.archivedAt != nil
             baseline = snapshot
         } catch {
@@ -300,9 +293,7 @@ private extension CategoryEditModel {
             }
 
             for (editing, draft) in zip(sent, drafts) {
-                let index = tags.firstIndex { $0.id == editing.id }
-
-                if let index {
+                if let index = tags.firstIndex(where: { $0.id == editing.id }) {
                     tags[index].draft.id = draft.id
                 }
             }
@@ -316,5 +307,11 @@ private extension CategoryEditModel {
     func apply(_ draft: CategoryDraft) {
         name = draft.name
         icon.apply(draft.icon)
+    }
+}
+
+extension CategoryEditModel.EditingTag {
+    init(_ tag: EntryTag) {
+        self.init(id: UUID(), draft: EntryTagDraft(tag))
     }
 }

@@ -7,10 +7,10 @@ import Store
 @MainActor
 @Observable
 public final class StampListModel: ScreenModel {
-    public private(set) var shelf: IconShelf?
     public var movingOrder: [ShelfIcon.ID]?
-
     public var errorNotice = ErrorNotice()
+
+    public private(set) var shelf: IconShelf?
 
     private let database: AppDatabase
 
@@ -54,8 +54,7 @@ private extension StampListModel {
     static let loadFailedMessage = "スタンプを読めませんでした"
 
     func stamps(isHidden: Bool) -> [ShelfIcon] {
-        let stamps = shelf?.shelfIcons ?? []
-        return stamps.filter { ($0.archivedAt != nil) == isHidden }
+        (shelf?.shelfIcons ?? []).filter { ($0.archivedAt != nil) == isHidden }
     }
 }
 

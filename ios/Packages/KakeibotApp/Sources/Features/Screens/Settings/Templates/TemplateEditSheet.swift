@@ -4,16 +4,18 @@ import Store
 import SwiftUI
 
 public struct TemplateEditSheet: View {
-    @State private var model: TemplateEditModel
+    @State var model: TemplateEditModel
+
+    @FocusState var focus: Field?
+
+    @Environment(\.themeStyle) var themeStyle
+
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
 
-    @FocusState private var focus: Field?
-
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.themeStyle) private var themeStyle
 
     let onSave: (EntryTemplate) -> Void
     let onDelete: (Deletion) -> Void
@@ -55,16 +57,30 @@ public struct TemplateEditSheet: View {
                             .transition(Self.memoTransition)
                             .zIndex(1)
                     } else {
-                        drawerView(panel)
-                            .transition(.settingsDrawer)
-                            .zIndex(1)
+                        SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
+                            closePanel()
+                        } content: {
+                            drawerBody(panel)
+                        }
+                        .transition(.settingsDrawer)
+                        .zIndex(1)
                     }
                 }
             }
             .overlay(alignment: .top) {
-                header
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
+                SettingsEditHeader(
+                    title: title,
+                    isEditing: model.isEditing,
+                    isHidden: model.isHidden
+                ) {
+                    close()
+                } onHide: {
+                    toggleHidden()
+                } onDelete: {
+                    isConfirmingDelete = true
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
             }
             .errorBanner(model.errorNotice) {
                 model.errorNotice.clear()
@@ -92,10 +108,7 @@ public struct TemplateEditSheet: View {
                     await setHidden(!model.isHidden)
                 }
             }
-            .confirmsDiscard(
-                when: model.isChanged,
-                isPresented: $isConfirmingDiscard
-            ) {
+            .confirmsDiscard(when: model.isChanged, isPresented: $isConfirmingDiscard) {
                 dismiss()
             }
             .confirmation(
@@ -122,6 +135,45 @@ public struct TemplateEditSheet: View {
     }
 }
 
+extension TemplateEditSheet {
+    var saveButton: some View {
+        PrimaryButton(model.saveTitle) {
+            Task {
+                await save()
+            }
+        }
+        .disabled(!model.canSave)
+    }
+}
+
+extension TemplateEditSheet {
+    enum Field: Hashable {
+        case name
+        case memo
+    }
+
+    enum Panel: Hashable {
+        case amount
+        case category
+        case tag
+        case wallet
+        case memo
+    }
+
+    func open(_ panel: Panel) {
+        focus = nil
+
+        withAnimation(.snappy) {
+            self.panel = panel
+        }
+    }
+
+    func closePanel() {
+        focus = nil
+        hidePanel()
+    }
+}
+
 private extension TemplateEditSheet {
     var content: some View {
         VStack(spacing: 16) {
@@ -133,7 +185,9 @@ private extension TemplateEditSheet {
                     preview
 
                     VStack(alignment: .leading, spacing: 8) {
-                        rows
+                        SettingsRowList(items: rowItems) { panel in
+                            open(panel)
+                        }
 
                         Text("金額を空にすると、使うときに入れられます")
                             .textFont(.caption2)
@@ -159,275 +213,9 @@ private extension TemplateEditSheet {
         .padding(.top, 20)
         .padding(.bottom, 8)
     }
-
-    var header: some View {
-        SettingsEditHeader(
-            title: title,
-            isEditing: model.isEditing,
-            isHidden: model.isHidden
-        ) {
-            close()
-        } onHide: {
-            toggleHidden()
-        } onDelete: {
-            isConfirmingDelete = true
-        }
-    }
-
-    var saveButton: some View {
-        PrimaryButton(model.saveTitle) {
-            Task {
-                await save()
-            }
-        }
-        .disabled(!model.canSave)
-    }
-
-    var preview: some View {
-        VStack(spacing: 16) {
-            card
-
-            Text("ホームでは、このカードで並びます")
-                .textFont(.caption2)
-                .tracking(1)
-                .foregroundStyle(Palette.subtext)
-        }
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity)
-        .background {
-            EllipticalGradient(
-                colors: [Palette.accent.opacity(.soft), .clear],
-                center: .center,
-                startRadiusFraction: 0,
-                endRadiusFraction: 0.5
-            )
-        }
-    }
-
-    var card: some View {
-        TemplateCard(
-            icon: categoryIcon,
-            detail: detail,
-            size: .large
-        ) {
-            HStack(spacing: 8) {
-                TextField(
-                    "名前",
-                    text: $model.name,
-                    prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
-                )
-                .font(TemplateCardSize.large.nameFont(in: themeStyle))
-                .foregroundStyle(Palette.accentStrong)
-                .tint(Palette.accent)
-                .submitLabel(.done)
-                .focused($focus, equals: .name)
-                .onSubmit {
-                    focus = nil
-                }
-
-                Button {
-                    focus = .name
-                } label: {
-                    EditBadge(size: 16)
-                        .frame(width: 32, height: 32)
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-                .opacity(nameBadgeOpacity)
-            }
-            .padding(.bottom, 8)
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(nameLine)
-                    .frame(height: 1)
-            }
-        } amount: {
-            Button {
-                open(.amount)
-            } label: {
-                HStack(spacing: 8) {
-                    TemplateCardAmount(amount: model.amount, size: .large)
-
-                    Spacer(minLength: 8)
-
-                    EditBadge(size: 16)
-                        .frame(width: 32, height: 32)
-                }
-                .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-        }
-        .shadow(color: Palette.glow.opacity(.subtle), radius: 30)
-        .background(alignment: .bottom) {
-            Ellipse()
-                .fill(Palette.shadow.opacity(0.55))
-                .frame(width: 260, height: 22)
-                .blur(radius: 14)
-                .offset(y: 26)
-        }
-    }
-
-    var rows: some View {
-        SettingsRowList(items: rowItems) { panel in
-            open(panel)
-        }
-    }
-
-    var capsulePreview: some View {
-        HStack(spacing: 8) {
-            Text("入力シートでは")
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-
-            HStack(spacing: 8) {
-                IconImage(categoryIcon, size: 12)
-                    .foregroundStyle(Palette.accent)
-
-                Text(previewName)
-                    .foregroundStyle(Palette.text)
-
-                Text(amountValue)
-                    .displayFont(.caption)
-                    .foregroundStyle(Palette.accentStrong)
-            }
-            .textFont(size: .caption)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-            .fixedSize()
-            .padding(.leading, 8)
-            .padding(.trailing, 12)
-            .frame(height: 30)
-            .overlay {
-                Capsule()
-                    .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
-            }
-        }
-        .frame(minHeight: 46)
-    }
-
-    var memoCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label("メモ", systemImage: "square.and.pencil")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.accent)
-
-                Spacer()
-
-                RingButton(systemImage: "checkmark", style: .prominent) {
-                    closePanel()
-                }
-            }
-
-            TextField(
-                "メモ",
-                text: $model.memo,
-                prompt: Text("メモを書く").foregroundStyle(Palette.hint),
-                axis: .vertical
-            )
-            .lineLimit(1...4)
-            .textFont(.subheadline)
-            .foregroundStyle(Palette.text)
-            .tint(Palette.accent)
-            .focused($focus, equals: .memo)
-        }
-        .padding(16)
-        .floatingCard()
-        .task {
-            focus = .memo
-        }
-    }
-
-    @ViewBuilder
-    var tagChooser: some View {
-        if model.tags.isEmpty {
-            Text("このカテゴリにタグはありません。カテゴリの編集で足せます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .frame(maxWidth: .infinity, minHeight: 54)
-        } else {
-            TagLine(tagItems, selection: model.tagId) { id in
-                model.toggleTag(id)
-            }
-        }
-    }
-
-    func drawerView(_ panel: Panel) -> some View {
-        SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
-            closePanel()
-        } content: {
-            drawerBody(panel)
-        }
-    }
-
-    @ViewBuilder
-    func drawerBody(_ panel: Panel) -> some View {
-        switch panel {
-        case .amount:
-            VStack(spacing: 12) {
-                Keypad(calculator: model.calculator) {
-                    closePanel()
-                } onKey: { key in
-                    model.press(key)
-                }
-
-                saveButton
-            }
-        case .category:
-            SettingsTileGrid(
-                items: model.categories,
-                columns: 5,
-                spacing: 4
-            ) { category in
-                SettingsCategoryTile(
-                    category: category,
-                    icon: model.icon(for: category),
-                    isSelected: model.categoryId == category.id
-                ) {
-                    model.categoryId = category.id
-                    closePanel()
-                }
-            }
-            .padding(.bottom, 8)
-        case .tag:
-            tagChooser
-                .padding(.bottom, 8)
-        case .wallet:
-            SettingsTileGrid(
-                items: model.wallets,
-                columns: 3,
-                spacing: 8
-            ) { wallet in
-                SettingsWalletTile(
-                    wallet: wallet,
-                    icon: model.icon(for: wallet),
-                    isSelected: model.walletId == wallet.id
-                ) {
-                    model.walletId = wallet.id
-                    closePanel()
-                }
-            }
-            .padding(.bottom, 8)
-        case .memo:
-            EmptyView()
-        }
-    }
 }
 
 private extension TemplateEditSheet {
-    enum Field: Hashable {
-        case name
-        case memo
-    }
-
-    enum Panel: Hashable {
-        case amount
-        case category
-        case tag
-        case wallet
-        case memo
-    }
-
     static let fade: CGFloat = 16
 
     static var memoTransition: AnyTransition {
@@ -442,46 +230,6 @@ private extension TemplateEditSheet {
 
     var keyboardRegions: SafeAreaRegions {
         panel == .memo ? .keyboard : []
-    }
-
-    var categoryIcon: Icon? {
-        model.selectedCategory.flatMap { model.icon(for: $0) }
-    }
-
-    var detail: String {
-        let parts = [
-            model.selectedCategory?.name,
-            model.selectedTag?.name,
-            model.selectedWallet?.name
-        ]
-
-        return parts.rowDetail ?? ""
-    }
-
-    var tagItems: [TagLine<EntryTag.ID>.Item] {
-        model.tags.map { TagLine.Item(id: $0.id, name: $0.name) }
-    }
-
-    var nameBadgeOpacity: Double {
-        focus == .name ? 0 : 1
-    }
-
-    var nameLine: Color {
-        if model.errorNotice.message != nil, model.name.isEmpty {
-            Palette.rose
-        } else if focus == .name {
-            Palette.accent
-        } else {
-            Palette.accent.opacity(.medium)
-        }
-    }
-
-    var previewName: String {
-        model.name.isEmpty ? "名前" : model.name
-    }
-
-    var amountValue: String {
-        model.amount.map { AmountText.text($0) } ?? "毎回入れる"
     }
 
     var memoValue: String {
@@ -543,23 +291,10 @@ private extension TemplateEditSheet {
         }
     }
 
-    func open(_ panel: Panel) {
-        focus = nil
-
-        withAnimation(.snappy) {
-            self.panel = panel
-        }
-    }
-
     func hidePanel() {
         withAnimation(.snappy) {
             panel = nil
         }
-    }
-
-    func closePanel() {
-        focus = nil
-        hidePanel()
     }
 
     func close() {

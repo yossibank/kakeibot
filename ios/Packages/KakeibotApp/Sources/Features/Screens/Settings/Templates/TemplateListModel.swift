@@ -8,12 +8,11 @@ import Store
 @Observable
 public final class TemplateListModel: ScreenModel {
     public var type: Entry.Kind = .expense
+    public var movingOrder: [EntryTemplate.ID]?
+    public var errorNotice = ErrorNotice()
 
     public private(set) var templates: [EntryTemplate] = []
-    public var movingOrder: [EntryTemplate.ID]?
     public private(set) var list: EntryList?
-
-    public var errorNotice = ErrorNotice()
 
     private let database: AppDatabase
 
@@ -100,18 +99,16 @@ extension TemplateListModel: SettingsBoardModel {
 
     public func saveOrder(_ ids: [EntryTemplate.ID]) async throws {
         let others = templates.map(\.id).filter { !ids.contains($0) }
-        try await database.reorderTemplates(ids + others, at: Date())
+        let ordered = ids + others
+
+        try await database.reorderTemplates(ordered, at: Date())
     }
 
     public func saveHidden(
         _ id: EntryTemplate.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setTemplateHidden(
-            id,
-            isHidden: isHidden,
-            at: Date()
-        )
+        try await database.setTemplateHidden(id, isHidden: isHidden, at: Date())
     }
 
     public func remove(_ id: EntryTemplate.ID) async throws -> Deletion {

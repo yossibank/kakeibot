@@ -32,10 +32,7 @@ struct AppIconTile: View {
                         if isCurrent {
                             Image(systemName: "checkmark.circle.fill")
                                 .sansFont(.headline)
-                                .foregroundStyle(
-                                    Palette.accent,
-                                    Palette.background
-                                )
+                                .foregroundStyle(Palette.accent, Palette.background)
                                 .offset(x: 6, y: 6)
                                 .transition(.scale.combined(with: .opacity))
                         }
@@ -62,10 +59,7 @@ private extension AppIconTile {
 
     var preview: some View {
         AppIconPreview(choice: choice, size: Self.size)
-            .keyframeAnimator(
-                initialValue: Pop(),
-                trigger: taps
-            ) { content, pop in
+            .keyframeAnimator(initialValue: Pop(), trigger: taps) { content, pop in
                 content
                     .scaleEffect(pop.scale)
                     .background {
