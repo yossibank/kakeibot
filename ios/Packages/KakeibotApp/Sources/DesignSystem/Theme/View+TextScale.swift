@@ -137,6 +137,10 @@ private struct ProposedWidth: Layout {
         subviews: Subviews,
         cache: inout ()
     ) -> CGFloat? {
-        subviews[0].dimensions(in: proposal)[guide]
+        guard guide == .firstTextBaseline || guide == .lastTextBaseline else {
+            return nil
+        }
+
+        return subviews[0].dimensions(in: proposal)[guide]
     }
 }
