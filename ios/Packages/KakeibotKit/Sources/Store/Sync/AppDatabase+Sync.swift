@@ -320,7 +320,12 @@ private extension AppDatabase {
         in db: Database
     ) throws {
         try db.execute(
-            sql: "UPDATE sync_state SET enabled = 0, stop_reason = ?, send_problem = NULL",
+            sql: """
+            UPDATE sync_state SET
+                enabled = 0,
+                stop_reason = CASE WHEN enabled = 1 OR ?1 IS NULL THEN ?1 ELSE stop_reason END,
+                send_problem = NULL
+            """,
             arguments: [reason?.rawValue]
         )
 
