@@ -10,11 +10,7 @@ struct MonthStartDayModelTests {
     func choosesAndSavesStartDay() async throws {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(25))
-
-        let model = MonthStartDayModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = MonthStartDayModel(database: setup.database, today: setup.today)
 
         await model.load()
         let initial = model.periodText

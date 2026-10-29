@@ -143,26 +143,6 @@ extension SyncModelTests {
         private let stopsInSheet: Bool
         private let failsToCreate: Bool
 
-        nonisolated var cloud: SyncCloud {
-            SyncCloud {
-                self.isAvailable
-            } hasData: {
-                self.hasData
-            } deleteData: {
-                await self.delete()
-            } createShare: { _, _ in
-                try await self.createShare()
-            } showShare: { _, _, onStop in
-                await self.record("show")
-
-                if self.stopsInSheet {
-                    await onStop()
-                }
-            } deleteShare: { _ in
-                await self.record("delete")
-            }
-        }
-
         init(
             isAvailable: Bool = true,
             hasData: Bool,
@@ -174,24 +154,48 @@ extension SyncModelTests {
             self.stopsInSheet = stopsInSheet
             self.failsToCreate = failsToCreate
         }
+    }
+}
 
-        func delete() {
-            deleted = true
-        }
+extension SyncModelTests.FakeCloud {
+    nonisolated var cloud: SyncCloud {
+        SyncCloud {
+            self.isAvailable
+        } hasData: {
+            self.hasData
+        } deleteData: {
+            await self.delete()
+        } createShare: { _, _ in
+            try await self.createShare()
+        } showShare: { _, _, onStop in
+            await self.record("show")
 
-        func record(_ call: String) {
-            shareCalls.append(call)
-        }
-
-        func createShare() throws {
-            shareCalls.append("create")
-
-            if failsToCreate {
-                throw CancellationError()
+            if self.stopsInSheet {
+                await onStop()
             }
+        } deleteShare: { _ in
+            await self.record("delete")
         }
     }
 
+    func delete() {
+        deleted = true
+    }
+
+    func record(_ call: String) {
+        shareCalls.append(call)
+    }
+
+    func createShare() throws {
+        shareCalls.append("create")
+
+        if failsToCreate {
+            throw CancellationError()
+        }
+    }
+}
+
+private extension SyncModelTests {
     func firstShare(in database: AppDatabase) async throws -> WalletShare {
         var first: WalletShare?
 

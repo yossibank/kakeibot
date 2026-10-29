@@ -9,26 +9,26 @@ struct ReminderModelTests {
     @Test
     func reschedulesOnlyWhenPermissionIsGranted() async throws {
         let database = try AppDatabase.inMemory()
+        let today = LocalDate(Date(), in: .current)
         let granted = FakePermission(authorization: .notDetermined)
         let declined = FakePermission(authorization: .notDetermined, grants: false)
 
         let allowed = ReminderModel(
             database: database,
-            today: LocalDate(Date(), in: .current),
+            today: today,
             time: nil,
             permission: granted.permission
         )
 
         let refused = ReminderModel(
             database: database,
-            today: LocalDate(Date(), in: .current),
+            today: today,
             time: nil,
             permission: declined.permission
         )
 
         await allowed.setOn(true)
         await refused.setOn(true)
-
         let rescheduledAfterGrant = await granted.rescheduled
         let rescheduledAfterDecline = await declined.rescheduled
 
@@ -39,11 +39,12 @@ struct ReminderModelTests {
     @Test
     func turnsOnAtEveningAndAsksPermission() async throws {
         let database = try AppDatabase.inMemory()
+        let today = LocalDate(Date(), in: .current)
         let client = FakePermission(authorization: .notDetermined)
 
         let model = ReminderModel(
             database: database,
-            today: LocalDate(Date(), in: .current),
+            today: today,
             time: nil,
             permission: client.permission
         )
@@ -63,11 +64,12 @@ struct ReminderModelTests {
     @Test
     func keepsChosenTimeWhenTurnedBackOn() async throws {
         let database = try AppDatabase.inMemory()
+        let today = LocalDate(Date(), in: .current)
         let client = FakePermission(authorization: .allowed)
 
         let model = ReminderModel(
             database: database,
-            today: LocalDate(Date(), in: .current),
+            today: today,
             time: nil,
             permission: client.permission
         )
@@ -88,11 +90,12 @@ struct ReminderModelTests {
     @Test
     func showsDeniedOnlyWhenOn() async throws {
         let database = try AppDatabase.inMemory()
+        let today = LocalDate(Date(), in: .current)
         let client = FakePermission(authorization: .denied)
 
         let model = ReminderModel(
             database: database,
-            today: LocalDate(Date(), in: .current),
+            today: today,
             time: nil,
             permission: client.permission
         )
@@ -156,16 +159,6 @@ extension ReminderModelTests {
 
         private let grants: Bool
 
-        nonisolated var permission: NotificationPermission {
-            NotificationPermission {
-                await self.status
-            } request: {
-                await self.request()
-            } reschedule: {
-                await self.reschedule()
-            }
-        }
-
         init(
             authorization: NotificationAuthorization,
             grants: Bool = true
@@ -173,19 +166,31 @@ extension ReminderModelTests {
             self.status = authorization
             self.grants = grants
         }
+    }
+}
 
-        func request() -> Bool {
-            requested = true
+extension ReminderModelTests.FakePermission {
+    nonisolated var permission: NotificationPermission {
+        NotificationPermission {
+            await self.status
+        } request: {
+            await self.request()
+        } reschedule: {
+            await self.reschedule()
+        }
+    }
 
-            if status == .notDetermined {
-                status = grants ? .allowed : .denied
-            }
+    func request() -> Bool {
+        requested = true
 
-            return status == .allowed
+        if status == .notDetermined {
+            status = grants ? .allowed : .denied
         }
 
-        func reschedule() {
-            rescheduled = true
-        }
+        return status == .allowed
+    }
+
+    func reschedule() {
+        rescheduled = true
     }
 }

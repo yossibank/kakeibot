@@ -41,16 +41,10 @@ struct EntryNoticeModelTests {
         let transfer = try await setup.database.saveEntry(draft, at: Date())
         let stale = try await setup.database.entryList()
         draft.fee = 110
-
-        try await setup.database.saveEntry(
-            draft,
-            editing: transfer.id,
-            at: Date()
-        )
+        try await setup.database.saveEntry(draft, editing: transfer.id, at: Date())
 
         await setup.notice.delete(transfer.id, in: stale)
         await setup.notice.undo()
-
         let fee = try await setup.database.fee(of: transfer.id)
 
         #expect(fee?.amount == 110)
@@ -183,7 +177,8 @@ struct EntryNoticeModelTests {
         setup.notice.clearOnTap()
         let batch = setup.notice.notice
 
-        setup.notice.show(EntryChange(kind: .recorded, entry: first, label: "食費"))
+        let change = EntryChange(kind: .recorded, entry: first, label: "食費")
+        setup.notice.show(change)
         setup.notice.clearOnTap()
 
         #expect(batch?.seconds == 8)
@@ -237,27 +232,18 @@ extension EntryNoticeModelTests {
 extension EntryNoticeModelTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
-        try database.insertDefaultsIfEmpty(at: Date())
         let date = try #require(LocalDate("2026-10-12"))
+        let notice = EntryNoticeModel(database: database)
 
-        self.init(
-            database: database,
-            date: date,
-            notice: EntryNoticeModel(database: database)
-        )
+        try database.insertDefaultsIfEmpty(at: Date())
+        self.init(database: database, date: date, notice: notice)
     }
 
     func entryModel(
         editing id: Entry.ID? = nil,
         type: Entry.Kind = .expense
     ) async throws -> EntryModel {
-        let model = EntryModel(
-            database: database,
-            editing: id,
-            date: date,
-            type: type
-        )
-
+        let model = EntryModel(database: database, editing: id, date: date, type: type)
         await model.load()
         return model
     }

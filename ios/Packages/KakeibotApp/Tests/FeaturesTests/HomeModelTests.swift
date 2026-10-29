@@ -104,11 +104,7 @@ struct HomeModelTests {
             await model.run()
         }
 
-        try await setup.database.setBudget(
-            120_000,
-            for: nil,
-            from: setup.today.yearMonth
-        )
+        try await setup.database.setBudget(120_000, for: nil, from: setup.today.yearMonth)
 
         for _ in 0..<200 where model.budgetUsage == nil {
             try await Task.sleep(for: .milliseconds(10))
@@ -127,12 +123,7 @@ struct HomeModelTests {
         for daysAgo in 0..<7 {
             let amount = 100 + daysAgo
             let memo = "メモ\(daysAgo)"
-            try await setup.save(
-                .expense,
-                amount: amount,
-                daysAgo: daysAgo,
-                memo: memo
-            )
+            try await setup.save(.expense, amount: amount, daysAgo: daysAgo, memo: memo)
         }
 
         let model = HomeModel(database: setup.database, today: setup.today)
@@ -160,8 +151,9 @@ extension HomeModelTests {
 extension HomeModelTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
-        try database.insertDefaultsIfEmpty(at: Date())
         let today = try #require(LocalDate("2026-10-12"))
+
+        try database.insertDefaultsIfEmpty(at: Date())
         self.init(database: database, today: today)
     }
 
@@ -193,16 +185,15 @@ extension HomeModelTests.Setup {
         memo: String = ""
     ) async throws {
         let options = try await database.entryOptions()
-        let categories = type == .income
-            ? options.incomeCategories
-            : options.expenseCategories
+        let categories = type == .income ? options.incomeCategories : options.expenseCategories
         let offset = TimeInterval(daysAgo)
         let createdAt = Date(timeIntervalSince1970: 1_791_000_000 - offset)
+        let date = today.adding(days: -daysAgo)
 
         let draft = EntryDraft(
             type: type,
             amount: amount,
-            date: today.adding(days: -daysAgo),
+            date: date,
             categoryId: categories.first?.id,
             walletId: options.wallets[0].id,
             memo: memo

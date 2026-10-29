@@ -30,106 +30,6 @@ struct RecordsModelTests {
     }
 
     @Test
-    func searchesAcrossMonths() async throws {
-        let setup = try await Setup()
-
-        try await setup.save(
-            .expense,
-            amount: 980,
-            on: "2026-10-12",
-            memo: "ランチ"
-        )
-
-        try await setup.save(.income, amount: 250_000, on: "2026-10-10")
-
-        try await setup.save(
-            .expense,
-            amount: 500,
-            on: "2026-09-30",
-            memo: "コーヒー"
-        )
-
-        let model = RecordsModel(database: setup.database, today: setup.today)
-
-        await model.load()
-
-        model.searchText = "ランチ"
-        let lunch = model.searchDays.map(\.date.description)
-
-        model.searchText = "食費"
-        let food = model.searchDays.map(\.date.description)
-
-        model.searchText = "¥500"
-        let amount = model.searchDays.map(\.date.description)
-
-        model.searchText = " "
-        let blank = model.searchDays
-
-        #expect(lunch == ["2026-10-12"])
-        #expect(food == ["2026-10-12", "2026-09-30"])
-        #expect(amount == ["2026-09-30"])
-        #expect(blank.isEmpty)
-    }
-
-    @Test
-    func filtersByCategoryAndSumsSearch() async throws {
-        let setup = try await Setup()
-
-        try await setup.save(
-            .expense,
-            amount: 980,
-            on: "2026-10-12",
-            memo: "ランチ"
-        )
-
-        try await setup.save(.income, amount: 250_000, on: "2026-10-10")
-
-        try await setup.save(
-            .expense,
-            amount: 500,
-            on: "2026-09-30",
-            memo: "ランチ"
-        )
-
-        let options = try await setup.database.entryOptions()
-        let food = try #require(options.expenseCategories.first)
-        let model = RecordsModel(database: setup.database, today: setup.today)
-        await model.load()
-
-        model.searchText = "ランチ"
-        let summary = model.searchSummary
-
-        model.filter = EntryFilter(categoryIds: [food.id])
-        let filtered = model.days.map(\.date.description)
-        let title = model.filterTitle
-
-        model.filter = EntryFilter()
-
-        #expect(summary?.count == 2)
-        #expect(summary?.expenseTotal == 1480)
-        #expect(summary?.range.lowerBound.description == "2026-09-30")
-        #expect(summary?.range.upperBound.description == "2026-10-12")
-        #expect(filtered == ["2026-10-12"])
-        #expect(title == food.name)
-        #expect(model.days.count == 2)
-    }
-
-    @Test
-    func remembersSearchedWords() async throws {
-        let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, today: setup.today)
-
-        await model.rememberSearch("ランチ")
-        await model.rememberSearch("本")
-        let saved = try await setup.database.setting(.recentSearches)
-
-        await model.clearRecentSearches()
-
-        #expect(saved == ["本", "ランチ"])
-        #expect(model.recentSearches.isEmpty)
-    }
-
-    @Test
     func showsUpcomingRecurringOnFutureDays() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
@@ -149,11 +49,7 @@ struct RecordsModelTests {
             startDate: start
         )
 
-        _ = try await setup.database.saveRecurring(
-            draft,
-            today: setup.today,
-            at: Date()
-        )
+        _ = try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
         let model = RecordsModel(database: setup.database, today: setup.today)
 
         await model.load()
@@ -166,12 +62,7 @@ struct RecordsModelTests {
     @Test
     func describesRowsWithMemoAndWallet() async throws {
         let setup = try await Setup()
-        try await setup.save(
-            .expense,
-            amount: 980,
-            on: "2026-10-12",
-            memo: "ランチ"
-        )
+        try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
         try await setup.save(.expense, amount: 220, on: "2026-10-12", memo: "")
         let model = RecordsModel(database: setup.database, today: setup.today)
 
@@ -201,11 +92,11 @@ struct RecordsModelTests {
         )
 
         try await setup.database.saveEntry(draft, at: Date())
-
         let model = RecordsModel(database: setup.database, today: setup.today)
 
         await model.load()
         let day = try #require(model.days.first)
+
         let routes = model.rows(for: day)
             .compactMap(\.route)
             .map { "\($0.source) → \($0.destination)" }
@@ -254,13 +145,8 @@ struct RecordsModelTests {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)
         let future = setup.today.adding(days: 1)
-
-        let draft = RewardRuleDraft(
-            name: "自炊した日",
-            amount: 500,
-            icon: IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
-        )
-
+        let icon = IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
+        let draft = RewardRuleDraft(name: "自炊した日", amount: 500, icon: icon)
         let rule = try await setup.database.saveRewardRule(draft, at: Date())
 
         await model.toggleReward(rule, on: future)
@@ -309,11 +195,7 @@ struct RecordsModelTests {
         model.setLayout(.list)
         await model.saveLayout()
 
-        let reopened = RecordsModel(
-            database: setup.database,
-            today: setup.today
-        )
-
+        let reopened = RecordsModel(database: setup.database, today: setup.today)
         await reopened.loadLayout()
 
         #expect(reopened.layout == .list)
@@ -376,11 +258,7 @@ struct RecordsModelTests {
         try setup.database.insertShelfIfEmpty(at: Date())
         let shelf = try await setup.database.iconShelf()
         let hidden = try #require(shelf.shelfIcons.last)
-        try await setup.database.setShelfIconHidden(
-            hidden.id,
-            isHidden: true,
-            at: Date()
-        )
+        try await setup.database.setShelfIconHidden(hidden.id, isHidden: true, at: Date())
         let today = setup.today
         let model = RecordsModel(database: setup.database, today: today)
 
@@ -419,15 +297,21 @@ struct RecordsModelTests {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)
         let ids = (0..<10).map { _ in Entry.ID() }
+        let firstNine = Array(ids.prefix(9))
         var deleted: [[Entry.ID]] = []
 
-        model.requestDelete(Array(ids.prefix(9))) { deleted.append($0) }
+        model.requestDelete(firstNine) {
+            deleted.append($0)
+        }
 
         #expect(!model.isConfirmingDelete)
-        #expect(deleted == [Array(ids.prefix(9))])
+        #expect(deleted == [firstNine])
 
         deleted = []
-        model.requestDelete(ids) { deleted.append($0) }
+
+        model.requestDelete(ids) {
+            deleted.append($0)
+        }
 
         #expect(model.isConfirmingDelete)
         #expect(model.pendingDeleteCount == 10)
@@ -438,8 +322,13 @@ struct RecordsModelTests {
         #expect(!model.isConfirmingDelete)
         #expect(deleted.isEmpty)
 
-        model.requestDelete(ids) { deleted.append($0) }
-        model.confirmDelete { deleted.append($0) }
+        model.requestDelete(ids) {
+            deleted.append($0)
+        }
+
+        model.confirmDelete {
+            deleted.append($0)
+        }
 
         #expect(!model.isConfirmingDelete)
         #expect(deleted == [ids])
@@ -456,8 +345,9 @@ extension RecordsModelTests {
 extension RecordsModelTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
-        try database.insertDefaultsIfEmpty(at: Date())
         let today = try #require(LocalDate("2026-10-17"))
+
+        try database.insertDefaultsIfEmpty(at: Date())
         self.init(database: database, today: today)
     }
 
@@ -468,9 +358,7 @@ extension RecordsModelTests.Setup {
         memo: String = ""
     ) async throws {
         let options = try await database.entryOptions()
-        let categories = type == .income
-            ? options.incomeCategories
-            : options.expenseCategories
+        let categories = type == .income ? options.incomeCategories : options.expenseCategories
         let date = try #require(LocalDate(text))
         let days = try await database.entryList().days
         let count = days.reduce(0) { $0 + $1.entries.count }

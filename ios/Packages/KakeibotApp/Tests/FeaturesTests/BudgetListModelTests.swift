@@ -11,11 +11,7 @@ struct BudgetListModelTests {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(10))
         try await setup.database.setSetting(.monthStartDay, to: payday)
-
-        let model = BudgetListModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
         let food = try #require(model.categories.first)
@@ -51,11 +47,7 @@ struct BudgetListModelTests {
         let setup = try await HomeModelTests.Setup()
         let month = setup.today.yearMonth
         try await setup.database.setBudget(50000, for: nil, from: month)
-
-        let model = BudgetListModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
         model.startEditing(.total)
@@ -71,11 +63,7 @@ struct BudgetListModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 9000, daysAgo: 0)
         try await setup.save(.income, amount: 50000, daysAgo: 0)
-
-        let model = BudgetListModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
         let food = try #require(model.categories.first)
@@ -103,11 +91,7 @@ struct BudgetListModelTests {
     func detectsChangedAmountWhileEditing() async throws {
         let setup = try await HomeModelTests.Setup()
         try await setup.database.setBudget(50000, for: nil, from: setup.today.yearMonth)
-
-        let model = BudgetListModel(
-            database: setup.database,
-            today: setup.today
-        )
+        let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
         let closed = model.isChanged

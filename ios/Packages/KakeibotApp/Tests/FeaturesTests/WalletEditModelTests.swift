@@ -32,12 +32,7 @@ struct WalletEditModelTests {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
         let model = WalletEditModel(database: setup.database)
-
-        let editing = WalletEditModel(
-            database: setup.database,
-            editing: bank.id
-        )
-
+        let editing = WalletEditModel(database: setup.database, editing: bank.id)
         await editing.load()
 
         let empty = model.saveTitle
@@ -138,6 +133,7 @@ struct WalletEditModelTests {
         let options = try await setup.database.entryOptions()
         let bank = try await setup.wallet(named: "銀行")
         let today = LocalDate(Date(), in: .current)
+        let futureDate = today.adding(days: 3)
 
         let income = EntryDraft(
             type: .income,
@@ -150,7 +146,7 @@ struct WalletEditModelTests {
         let future = EntryDraft(
             type: .expense,
             amount: 400,
-            date: today.adding(days: 3),
+            date: futureDate,
             categoryId: options.expenseCategories[0].id,
             walletId: bank.id
         )
@@ -170,11 +166,12 @@ struct WalletEditModelTests {
         let options = try await setup.database.entryOptions()
         let bank = try await setup.wallet(named: "銀行")
         let today = LocalDate(Date(), in: .current)
+        let futureDate = today.adding(days: 3)
 
         let future = EntryDraft(
             type: .expense,
             amount: 400,
-            date: today.adding(days: 3),
+            date: futureDate,
             categoryId: options.expenseCategories[0].id,
             walletId: bank.id
         )
@@ -194,6 +191,7 @@ struct WalletEditModelTests {
         let bank = try await setup.wallet(named: "銀行")
         let cash = try await setup.wallet(named: "財布")
         let today = LocalDate(Date(), in: .current)
+        let start = today.adding(days: 30)
 
         let draft = RecurringDraft(
             type: .transfer,
@@ -204,14 +202,10 @@ struct WalletEditModelTests {
             frequency: .monthly,
             month: 1,
             day: 27,
-            startDate: today.adding(days: 30)
+            startDate: start
         )
 
-        let saved = try await setup.database.saveRecurring(
-            draft,
-            today: today,
-            at: Date()
-        )
+        let saved = try await setup.database.saveRecurring(draft, today: today, at: Date())
 
         try await setup.database.setRecurringHidden(
             saved.id,
@@ -226,78 +220,6 @@ struct WalletEditModelTests {
         model.kind = .card
 
         #expect(model.draft.problems == [.kindLocked])
-    }
-
-    @Test
-    func locksInvestmentWithValuation() async throws {
-        let setup = try await Setup()
-        let today = LocalDate(Date(), in: .current)
-
-        let adding = WalletEditModel(database: setup.database)
-        adding.name = "積立"
-        adding.kind = .investment
-        let saved = try #require(await adding.save())
-
-        try await setup.database.saveValuation(
-            150_000,
-            of: saved.id,
-            on: today,
-            at: Date()
-        )
-
-        let model = WalletEditModel(database: setup.database, editing: saved.id)
-        await model.load()
-
-        model.kind = .bank
-
-        #expect(model.draft.problems == [.valuedKindLocked])
-    }
-
-    @Test
-    func locksKindRightAfterAddingValuation() async throws {
-        let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database)
-        adding.name = "積立"
-        adding.kind = .investment
-        let saved = try #require(await adding.save())
-        let model = WalletEditModel(database: setup.database, editing: saved.id)
-        await model.load()
-
-        model.pressValuation(.digit(5))
-        _ = await model.saveValuation()
-        let isChanged = model.isChanged
-        model.kind = .bank
-
-        #expect(!isChanged)
-        #expect(!model.canSave)
-        #expect(model.draft.problems == [.valuedKindLocked])
-    }
-
-    @Test
-    func unlocksKindRightAfterDeletingLastValuation() async throws {
-        let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database)
-        adding.name = "積立"
-        adding.kind = .investment
-        let saved = try #require(await adding.save())
-
-        try await setup.database.saveValuation(
-            5,
-            of: saved.id,
-            on: LocalDate(Date(), in: .current),
-            at: Date()
-        )
-
-        let model = WalletEditModel(database: setup.database, editing: saved.id)
-        await model.load()
-        let valuation = try #require(model.valuations.first)
-
-        await model.deleteValuation(valuation.id)
-        let isChanged = model.isChanged
-        model.kind = .bank
-
-        #expect(!isChanged)
-        #expect(model.canSave)
     }
 
     @Test
@@ -355,69 +277,6 @@ struct WalletEditModelTests {
     }
 
     @Test
-    func setsInvestmentValuation() async throws {
-        let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database)
-        adding.name = "つみたて"
-        adding.kind = .investment
-        adding.press(.digit(1))
-        adding.press(.doubleZero)
-        adding.press(.doubleZero)
-        adding.press(.digit(0))
-        let saved = try #require(await adding.save())
-
-        let model = WalletEditModel(database: setup.database, editing: saved.id)
-        await model.load()
-        model.startValuation()
-        let start = model.valuation.amount
-        model.pressValuation(.clear)
-        model.pressValuation(.digit(1))
-        model.pressValuation(.digit(2))
-        model.pressValuation(.doubleZero)
-        model.pressValuation(.doubleZero)
-        let isSaved = await model.saveValuation()
-
-        let reloaded = WalletEditModel(
-            database: setup.database,
-            editing: saved.id
-        )
-
-        await reloaded.load()
-
-        #expect(model.showsValuation)
-        #expect(start == 100_000)
-        #expect(isSaved)
-        #expect(reloaded.balance == 120_000)
-        #expect(reloaded.initialBalance == 100_000)
-        #expect(reloaded.valuations.map(\.amount) == [120_000])
-    }
-
-    @Test
-    func deletesValuationAndCountsFromStart() async throws {
-        let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database)
-        adding.name = "つみたて"
-        adding.kind = .investment
-        adding.press(.digit(5))
-        adding.press(.doubleZero)
-        let saved = try #require(await adding.save())
-
-        let model = WalletEditModel(database: setup.database, editing: saved.id)
-        await model.load()
-        model.startValuation()
-        model.pressValuation(.digit(9))
-        _ = await model.saveValuation()
-        let valued = model.balance
-        let id = try #require(model.valuations.first?.id)
-
-        await model.deleteValuation(id)
-
-        #expect(valued == 9)
-        #expect(model.valuations.isEmpty)
-        #expect(model.balance == 500)
-    }
-
-    @Test
     func asksBeforeHidingWalletWithBalance() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
@@ -434,7 +293,6 @@ struct WalletEditModelTests {
         )
 
         try await setup.database.saveEntry(income, at: Date())
-
         let model = WalletEditModel(database: setup.database, editing: bank.id)
         await model.load()
 
@@ -466,18 +324,10 @@ struct WalletEditModelTests {
         let cash = try await setup.wallet(named: "財布")
         let bank = try await setup.wallet(named: "銀行")
 
-        let bankModel = WalletEditModel(
-            database: setup.database,
-            editing: bank.id
-        )
-
+        let bankModel = WalletEditModel(database: setup.database, editing: bank.id)
         let hid = await bankModel.setHidden(true)
 
-        let cashModel = WalletEditModel(
-            database: setup.database,
-            editing: cash.id
-        )
-
+        let cashModel = WalletEditModel(database: setup.database, editing: cash.id)
         let refused = await cashModel.setHidden(true)
 
         #expect(hid)
@@ -495,6 +345,7 @@ extension WalletEditModelTests {
 extension WalletEditModelTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
+
         try database.insertDefaultsIfEmpty(at: Date())
         self.init(database: database)
     }

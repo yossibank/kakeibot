@@ -11,12 +11,7 @@ struct CategoryListModelTests {
         let database = try Self.database()
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
-
-        try await database.setCategoryHidden(
-            food.id,
-            isHidden: true,
-            at: Date()
-        )
+        try await database.setCategoryHidden(food.id, isHidden: true, at: Date())
         let model = CategoryListModel(database: database)
 
         await model.load()

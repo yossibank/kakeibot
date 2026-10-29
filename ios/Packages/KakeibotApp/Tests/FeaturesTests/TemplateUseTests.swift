@@ -27,15 +27,8 @@ struct TemplateUseTests {
     func dropsArchivedTagWhenApplyingTemplate() async throws {
         let setup = try await Setup()
         let tag = try await setup.saveTag("買い置き")
-
-        let stock = try await setup.saveTemplate(
-            name: "買い置き",
-            amount: 500,
-            tagId: tag.id
-        )
-
+        let stock = try await setup.saveTemplate(name: "買い置き", amount: 500, tagId: tag.id)
         try await setup.database.saveTags([], for: tag.categoryId, at: Date())
-
         let model = EntryModel(database: setup.database, date: setup.date)
         await model.load()
 
@@ -49,13 +42,7 @@ struct TemplateUseTests {
     func appliesTagAndDropsItWithOtherCategory() async throws {
         let setup = try await Setup()
         let tag = try await setup.saveTag("買い置き")
-
-        let stock = try await setup.saveTemplate(
-            name: "買い置き",
-            amount: 1200,
-            tagId: tag.id
-        )
-
+        let stock = try await setup.saveTemplate(name: "買い置き", amount: 1200, tagId: tag.id)
         let model = EntryModel(database: setup.database, date: setup.date)
         await model.load()
 
@@ -94,12 +81,7 @@ struct TemplateUseTests {
         let setup = try await Setup()
         let pass = try await setup.saveTemplate(name: "定期", amount: nil)
         try await setup.saveTemplate(name: "給料", amount: nil, type: .income)
-
-        let model = EntryModel(
-            database: setup.database,
-            date: setup.date,
-            template: pass
-        )
+        let model = EntryModel(database: setup.database, date: setup.date, template: pass)
 
         await model.load()
 
@@ -208,11 +190,7 @@ struct TemplateUseTests {
         )
 
         try await setup.database.saveTemplate(cafe, at: Date())
-
-        let home = HomeModel(
-            database: setup.database,
-            today: setup.date
-        )
+        let home = HomeModel(database: setup.database, today: setup.date)
 
         let task = Task {
             await home.run()
@@ -231,11 +209,7 @@ struct TemplateUseTests {
         let name = home.templates.map(\.name)
         task.cancel()
 
-        let reopened = HomeModel(
-            database: setup.database,
-            today: setup.date
-        )
-
+        let reopened = HomeModel(database: setup.database, today: setup.date)
         await reopened.loadTemplateOrder()
 
         #expect(manual == ["洗剤", "ティッシュ", "駅前のカフェでモーニング"])
@@ -254,11 +228,7 @@ struct TemplateUseTests {
         let old = try #require(soap.entryDraft(on: oldDate))
         try await setup.database.saveEntry(old, at: Date())
         try await setup.database.saveEntry(old, at: Date())
-
-        let home = HomeModel(
-            database: setup.database,
-            today: setup.date
-        )
+        let home = HomeModel(database: setup.database, today: setup.date)
 
         let task = Task {
             await home.run()
@@ -309,18 +279,12 @@ struct TemplateUseTests {
     func recordsFromHomeWithoutArchivedTag() async throws {
         let setup = try await Setup()
         let tag = try await setup.saveTag("朝ごはん")
-
-        let lunch = try await setup.saveTemplate(
-            name: "ランチ",
-            amount: 980,
-            tagId: tag.id
-        )
-
+        let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980, tagId: tag.id)
         let home = HomeModel(database: setup.database, today: setup.date)
+
         let kept = try #require(await home.record(lunch))
 
         try await setup.database.saveTags([], for: tag.categoryId, at: Date())
-
         let dropped = try #require(await home.record(lunch))
 
         #expect(kept.entry.tagId == tag.id)
@@ -359,8 +323,9 @@ extension TemplateUseTests {
 extension TemplateUseTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
-        try database.insertDefaultsIfEmpty(at: Date())
         let date = try #require(LocalDate("2026-10-15"))
+
+        try database.insertDefaultsIfEmpty(at: Date())
         self.init(database: database, date: date)
     }
 
@@ -369,15 +334,13 @@ extension TemplateUseTests.Setup {
         let options = try await database.entryOptions()
         let category = options.expenseCategories[1]
         let icon = try #require(list.icons[category.iconId])
+        let draft = CategoryDraft(category, icon: icon)
+        let tagDrafts = [EntryTagDraft(name: name)]
 
-        try await database.saveCategory(
-            CategoryDraft(category, icon: icon),
-            tags: [EntryTagDraft(name: name)],
-            editing: category.id,
-            at: Date()
-        )
+        try await database.saveCategory(draft, tags: tagDrafts, editing: category.id, at: Date())
 
         let tags = try await database.categoryList().tags
+
         return try #require(tags.first)
     }
 
@@ -389,10 +352,7 @@ extension TemplateUseTests.Setup {
         tagId: EntryTag.ID? = nil
     ) async throws -> EntryTemplate {
         let options = try await database.entryOptions()
-
-        let categories = type == .income
-            ? options.incomeCategories
-            : options.expenseCategories
+        let categories = type == .income ? options.incomeCategories : options.expenseCategories
 
         let draft = EntryTemplateDraft(
             name: name,

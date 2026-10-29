@@ -73,17 +73,15 @@ struct ReviewModelTests {
         let setup = try await RecordsModelTests.Setup()
         let now = Date()
 
-        let loan = try await setup.database.saveWallet(
-            WalletDraft(
-                kind: .loan,
-                name: "奨学金",
-                mark: .glyph(.contract),
-                color: "#4A6FA5",
-                initialBalance: -1_200_000
-            ),
-            at: now
+        let wallet = WalletDraft(
+            kind: .loan,
+            name: "奨学金",
+            mark: .glyph(.contract),
+            color: "#4A6FA5",
+            initialBalance: -1_200_000
         )
 
+        let loan = try await setup.database.saveWallet(wallet, at: now)
         let options = try await setup.database.entryOptions()
 
         let draft = try EntryDraft(
@@ -114,17 +112,15 @@ struct ReviewModelTests {
         let setup = try await RecordsModelTests.Setup()
         let now = Date()
 
-        let loan = try await setup.database.saveWallet(
-            WalletDraft(
-                kind: .loan,
-                name: "奨学金",
-                mark: .glyph(.contract),
-                color: "#4A6FA5",
-                initialBalance: -100_000
-            ),
-            at: now
+        let wallet = WalletDraft(
+            kind: .loan,
+            name: "奨学金",
+            mark: .glyph(.contract),
+            color: "#4A6FA5",
+            initialBalance: -100_000
         )
 
+        let loan = try await setup.database.saveWallet(wallet, at: now)
         let options = try await setup.database.entryOptions()
 
         for text in ["2026-10-10", "2026-10-20"] {
@@ -140,21 +136,19 @@ struct ReviewModelTests {
             try await setup.database.saveEntry(draft, at: now)
         }
 
-        try await setup.database.saveRecurring(
-            RecurringDraft(
-                type: .transfer,
-                amount: 30000,
-                categoryId: nil,
-                walletId: options.wallets[0].id,
-                toWalletId: loan.id,
-                frequency: .monthly,
-                month: 1,
-                day: 27,
-                startDate: #require(LocalDate("2026-10-16"))
-            ),
-            today: setup.today,
-            at: now
+        let recurring = try RecurringDraft(
+            type: .transfer,
+            amount: 30000,
+            categoryId: nil,
+            walletId: options.wallets[0].id,
+            toWalletId: loan.id,
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: #require(LocalDate("2026-10-16"))
         )
+
+        try await setup.database.saveRecurring(recurring, today: setup.today, at: now)
 
         let model = ReviewModel(database: setup.database, today: setup.today)
 
@@ -192,8 +186,10 @@ struct ReviewModelTests {
         #expect(shares.last?.usage?.remaining == 2000)
         #expect(shares.first?.usage == nil)
 
-        let foodRows = try model.rows(for: #require(shares.last))
-        let walletRows = try model.rows(for: #require(model.walletShares.first))
+        let foodShare = try #require(shares.last)
+        let walletShare = try #require(model.walletShares.first)
+        let foodRows = model.rows(for: foodShare)
+        let walletRows = model.rows(for: walletShare)
 
         #expect(foodRows.map(\.amount) == [1500, 500])
         #expect(walletRows.map(\.amount) == [6000, 1500, 500])
