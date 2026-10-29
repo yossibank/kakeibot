@@ -40,14 +40,14 @@ struct SyncSwitchTests {
         try await setup
             .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
         try await setup.database.saveSyncSystemFields([key.own: Data([1])])
-        try await setup.database.saveSyncEngineState(Data([2]))
+        try await setup.database.saveSyncEngineState(Data([2]), isShared: false)
 
         try await setup.database.turnOffSync()
 
         #expect(try await setup.database.isSyncEnabled() == false)
         #expect(try await setup.pendingKeys() == [])
         #expect(try await setup.database.syncSystemFields(for: key.own) == nil)
-        #expect(try await setup.database.syncEngineState() == nil)
+        #expect(try await setup.database.syncEngineState(isShared: false) == nil)
     }
 
     @Test(.timeLimit(.minutes(1)))

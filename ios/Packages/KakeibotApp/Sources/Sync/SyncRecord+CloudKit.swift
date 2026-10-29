@@ -22,10 +22,6 @@ extension SyncKey {
 }
 
 extension SyncRecordID {
-    var recordID: CKRecord.ID {
-        key.recordID(in: CKRecordZone.ID(zoneName: zoneName))
-    }
-
     init?(_ recordID: CKRecord.ID) {
         guard let key = SyncKey(recordID) else {
             return nil
