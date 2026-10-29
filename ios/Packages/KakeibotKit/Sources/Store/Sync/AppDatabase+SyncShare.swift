@@ -14,6 +14,12 @@ public extension AppDatabase {
             try Self.startSharing(walletID.description, in: db)
         }
     }
+
+    func endSharing(_ walletID: Wallet.ID) async throws {
+        try await writer.write { db in
+            try Self.endSharing(walletID, in: db)
+        }
+    }
 }
 
 extension AppDatabase {
@@ -136,6 +142,67 @@ private extension AppDatabase {
         for key in keys {
             try queue(key, in: db)
         }
+    }
+
+    static func endSharing(
+        _ walletID: Wallet.ID,
+        in db: Database
+    ) throws {
+        let id = walletID.description
+
+        try db.execute(sql: "DELETE FROM sync_share WHERE wallet_id = ?", arguments: [id])
+        try db.execute(
+            sql: "DELETE FROM sync_record WHERE zone_name = ?",
+            arguments: [SyncZone.wallet(walletID)]
+        )
+
+        let isEnabled = try Bool.fetchOne(db, sql: "SELECT enabled FROM sync_state") ?? false
+
+        let hasWallet = try Bool.fetchOne(
+            db,
+            sql: "SELECT EXISTS (SELECT 1 FROM wallet WHERE id = ?)",
+            arguments: [id]
+        ) ?? false
+
+        guard isEnabled, hasWallet else {
+            return
+        }
+
+        let keys = try keysOfWallet(id, in: db) + categoryKeys(ofWallet: id, in: db)
+
+        for key in keys {
+            try queue(key, in: db)
+        }
+    }
+
+    static func categoryKeys(
+        ofWallet walletID: String,
+        in db: Database
+    ) throws -> [SyncKey] {
+        let categories = try String.fetchAll(
+            db,
+            sql: "SELECT id FROM category WHERE wallet_id = ?",
+            arguments: [walletID]
+        )
+
+        let tags = try String.fetchAll(
+            db,
+            sql: """
+            SELECT tag.id FROM tag JOIN category ON category.id = tag.category_id
+            WHERE category.wallet_id = ?
+            """,
+            arguments: [walletID]
+        )
+
+        let icons = try String.fetchAll(
+            db,
+            sql: "SELECT icon_id FROM category WHERE wallet_id = ?",
+            arguments: [walletID]
+        )
+
+        return categories.map { SyncKey(table: .category, id: $0) }
+            + tags.map { SyncKey(table: .tag, id: $0) }
+            + icons.map { SyncKey(table: .icon, id: $0) }
     }
 
     static func keysOfWallet(

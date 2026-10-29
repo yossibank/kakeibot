@@ -181,7 +181,7 @@ struct SyncTests {
 
         let key = SyncKey(table: .wallet, id: walletID)
 
-        try await setup.database.applySyncChanges(saved: [], deleted: [key])
+        try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
 
         #expect(try await setup.database.syncRecord(for: key) != nil)
         #expect(try await setup.pendingKeys() == [key])
@@ -197,7 +197,7 @@ struct SyncTests {
 
         let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
 
-        try await setup.database.applySyncChanges(saved: [], deleted: [key])
+        try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
 
         #expect(try await setup.database.syncRecord(for: key) == nil)
         #expect(try await setup.pendingKeys() == [])
@@ -258,15 +258,15 @@ struct SyncTests {
         let remote = SyncRecord(key: saved, values: ["created_at": .text("x")])
         let fields = Data([1])
 
-        try await setup.database.saveSyncSystemFields([deleted: fields])
+        try await setup.database.saveSyncSystemFields([deleted.own: fields])
         try await setup.database.applySyncChanges(
             saved: [remote],
-            deleted: [deleted],
-            systemFields: [saved: fields]
+            deleted: [deleted.own],
+            systemFields: [saved.own: fields]
         )
 
-        #expect(try await setup.database.syncSystemFields(for: saved) == fields)
-        #expect(try await setup.database.syncSystemFields(for: deleted) == nil)
+        #expect(try await setup.database.syncSystemFields(for: saved.own) == fields)
+        #expect(try await setup.database.syncSystemFields(for: deleted.own) == nil)
     }
 
     @Test
@@ -276,18 +276,18 @@ struct SyncTests {
         let other = SyncKey(table: .noSpendDay, id: "2026-10-02")
         let fields = Data([1, 2, 3])
 
-        try await setup.database.saveSyncSystemFields([key: fields, other: fields])
+        try await setup.database.saveSyncSystemFields([key.own: fields, other.own: fields])
         try await setup.database.saveSyncEngineState(Data([4]))
-        let saved = try await setup.database.syncSystemFields(for: key)
+        let saved = try await setup.database.syncSystemFields(for: key.own)
 
-        try await setup.database.removeSyncSystemFields([key])
-        let removed = try await setup.database.syncSystemFields(for: key)
+        try await setup.database.removeSyncSystemFields([key.own])
+        let removed = try await setup.database.syncSystemFields(for: key.own)
 
         try await setup.database.resetSync()
 
         #expect(saved == fields)
         #expect(removed == nil)
-        #expect(try await setup.database.syncSystemFields(for: other) == nil)
+        #expect(try await setup.database.syncSystemFields(for: other.own) == nil)
         #expect(try await setup.database.syncEngineState() == nil)
     }
 }
@@ -295,6 +295,16 @@ struct SyncTests {
 extension SyncTests {
     struct Setup {
         let database: AppDatabase
+    }
+}
+
+extension SyncKey {
+    var own: SyncRecordID {
+        SyncRecordID(key: self, zoneName: SyncZone.own)
+    }
+
+    func recordID(in zoneName: String) -> SyncRecordID {
+        SyncRecordID(key: self, zoneName: zoneName)
     }
 }
 

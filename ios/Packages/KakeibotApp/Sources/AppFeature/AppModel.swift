@@ -16,7 +16,7 @@ final class AppModel {
     private(set) var look: ThemeLook = .followsDevice
     private(set) var style: ThemeStyle = .standard
     private(set) var observationRound = 0
-    private(set) var isSyncEnabled = false
+    private(set) var syncActivity = SyncActivity(isSyncEnabled: false, isSharing: false)
 
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let scheduler: NotificationScheduler
@@ -179,22 +179,23 @@ extension AppModel {
     }
 
     func observeSync(in database: AppDatabase) async {
-        await watch(database.syncEnabledUpdates()) { isEnabled in
-            self.isSyncEnabled = isEnabled
+        await watch(database.syncActivityUpdates()) { activity in
+            self.syncActivity = activity
         }
     }
 
     func syncChanges(in database: AppDatabase) async {
-        guard isSyncEnabled else {
-            await syncEngine?.stop()
-            syncEngine = nil
+        await syncEngine?.stop()
+        syncEngine = nil
+
+        guard syncActivity.isActive else {
             return
         }
 
-        let engine = syncEngine ?? SyncEngine(database: database)
+        let engine = SyncEngine(database: database)
 
         syncEngine = engine
-        await engine.start()
+        await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
 
         await watch(database.syncChangeUpdates()) {
             await engine.enqueuePending()

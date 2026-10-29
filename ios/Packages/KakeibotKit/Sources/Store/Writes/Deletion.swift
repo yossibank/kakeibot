@@ -4,6 +4,7 @@ import Foundation
 public struct Deletion: Hashable, Sendable, Identifiable {
     public let id = UUID()
 
+    var icons: [Icon] = []
     var wallets: [Wallet] = []
     var categories: [EntryCategory] = []
     var tags: [EntryTag] = []
@@ -22,6 +23,7 @@ public struct Deletion: Hashable, Sendable, Identifiable {
 public extension Deletion {
     init(merging deletions: [Deletion]) {
         self.init(
+            icons: deletions.flatMap(\.icons),
             wallets: deletions.flatMap(\.wallets),
             categories: deletions.flatMap(\.categories),
             tags: deletions.flatMap(\.tags),

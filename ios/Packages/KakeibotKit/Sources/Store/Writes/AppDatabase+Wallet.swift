@@ -87,18 +87,35 @@ public extension AppDatabase {
 
             let templates = EntryTemplate.filter(Column("wallet_id") == id)
             let valuations = Valuation.filter(Column("wallet_id") == id)
+            let categories = EntryCategory.filter(Column("wallet_id") == id)
+            let deletedCategories = try categories.fetchAll(db)
+            let tags = EntryTag.filter(deletedCategories.map(\.id).contains(Column("category_id")))
+            let icons = Icon.filter(deletedCategories.map(\.iconId).contains(Column("id")))
 
             let deletion = try Deletion(
+                icons: icons.fetchAll(db),
                 wallets: [wallet],
+                categories: deletedCategories,
+                tags: tags.fetchAll(db),
                 recurrings: recurrings.fetchAll(db),
                 templates: templates.fetchAll(db),
                 valuations: valuations.fetchAll(db)
             )
 
+            let key = SyncKey(table: .wallet, id: id.description)
+            let isShared = try Self.syncSharedWallet(for: key, in: db) != nil
+
             try Self.deleteRecurrings(recurrings, in: db, at: now)
             try templates.deleteAll(db)
             try valuations.deleteAll(db)
+            try tags.deleteAll(db)
+            try categories.deleteAll(db)
+            try icons.deleteAll(db)
             try wallet.delete(db)
+
+            if isShared {
+                try Self.queue(key, in: db)
+            }
 
             return deletion
         }
