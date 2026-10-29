@@ -178,7 +178,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | MainView | タブは Home・Records・Review・Assets |
 | MainView のシート | 新規・編集・設定・振替など。テンプレート（`EntryTemplate`）・口座（`Wallet`）・固定費（`Recurring`）も開く |
 
-記録の一覧（`EntryList`）の見張りは、`AppDatabase` が 1 つだけ持つ。見張りの型は `ValueObservation` で、見張る画面のあいだで共有する。
+記録の一覧（`EntryList`）の見張りは、`AppDatabase` が 1 つだけ持つ。見張りの型は `ValueObservation` で、見張る画面のあいだで共有する。中身が変わらない書き込みでは、画面に値を渡さない。
 
 ### 見張り直し
 

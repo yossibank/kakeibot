@@ -118,7 +118,10 @@ private extension AppDatabase {
     init(migrated writer: any DatabaseWriter) {
         self.writer = writer
 
-        self.entryListObservation = ValueObservation.tracking(Self.entryList).shared(in: writer)
+        self.entryListObservation = ValueObservation
+            .tracking(Self.entryList)
+            .removeDuplicates()
+            .shared(in: writer)
     }
 
     static func appGroupMigrated(readonly: Bool) throws -> AppDatabase {

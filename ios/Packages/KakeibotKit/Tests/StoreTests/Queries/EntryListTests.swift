@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import GRDB
 import Store
 import Testing
 
@@ -33,6 +34,48 @@ struct EntryListTests {
         #expect(second?.days.map(\.date) == [date])
         #expect(second?.days.first?.entries == [saved])
         #expect(second?.days.first?.expenseTotal == 980)
+    }
+
+    @Test
+    func skipsUnchangedLists() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        let draft = try await expenseDraft(in: database)
+
+        var updates = database.entryListUpdates().makeAsyncIterator()
+        _ = try await updates.next()
+
+        try await database.reloadAfterOtherProcesses()
+        let saved = try await database.saveEntry(draft, at: now)
+        let next = try await updates.next()
+
+        #expect(next?.days.first?.entries == [saved])
+    }
+
+    @Test
+    func skipsGeneratedDateWrites() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        let draft = try await expenseDraft(in: database)
+        let bill = try await insertCardBill(into: database, at: now)
+        let generated = try #require(LocalDate("2026-10-02"))
+
+        var updates = database.entryListUpdates().makeAsyncIterator()
+        let first = try await updates.next()
+
+        #expect(first?.cardBills.map(\.id) == [bill.id])
+
+        try await database.writer.write { db in
+            try db.execute(sql: Self.generatedUpdate, arguments: [generated])
+        }
+
+        let saved = try await database.saveEntry(draft, at: now)
+        let next = try await updates.next()
+
+        #expect(next?.days.first?.entries == [saved])
+        #expect(next?.cardBills.map(\.id) == [bill.id])
     }
 
     @Test
@@ -108,5 +151,62 @@ struct EntryListTests {
 
         #expect(options.expenseCategories == remaining)
         #expect(options.wallets.map(\.name) == ["銀行", "財布"])
+    }
+}
+
+private extension EntryListTests {
+    static let generatedUpdate = "UPDATE recurring SET generated_until = ?"
+
+    func expenseDraft(in database: AppDatabase) async throws -> EntryDraft {
+        let options = try await database.entryOptions()
+        let date = try #require(LocalDate("2026-10-03"))
+
+        return EntryDraft(
+            type: .expense,
+            amount: 980,
+            date: date,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id
+        )
+    }
+
+    func insertCardBill(
+        into database: AppDatabase,
+        at now: Date
+    ) async throws -> Recurring {
+        let options = try await database.entryOptions()
+        let bank = options.wallets[1]
+        let start = try #require(LocalDate("2026-01-01"))
+
+        let card = Wallet(
+            name: "カード",
+            kind: .card,
+            iconId: bank.iconId,
+            initialBalance: 0,
+            sortOrder: 9,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let bill = Recurring(
+            type: .transfer,
+            amount: 0,
+            categoryId: nil,
+            walletId: bank.id,
+            toWalletId: card.id,
+            frequency: .monthly,
+            day: 27,
+            closingDay: 15,
+            startDate: start,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try await database.writer.write { db in
+            try card.insert(db)
+            try bill.insert(db)
+        }
+
+        return bill
     }
 }
