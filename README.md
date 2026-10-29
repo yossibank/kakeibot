@@ -51,7 +51,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | iOS のビルド（シミュレーター） | `make build` |
 | テストのコンパイルだけ（走らせない） | `make test-build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
-| ウィジェットの見た目を PNG に描く（claude-config の `ui-snapshot` を使う。出力は `.build/snapshots/widget/`） | `make snapshot` |
+| 画面の部品を PNG に描く（claude-config の `ui-snapshot` を使う。セットは `.claude/snapshots/` の下の名前。出力は `.build/snapshots/<セット>/`） | `make snapshot SNAPSHOT=widget` |
 | Swift の整形 | `make format` |
 | ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
 
