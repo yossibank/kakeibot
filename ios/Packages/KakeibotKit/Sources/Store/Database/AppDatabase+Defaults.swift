@@ -42,30 +42,32 @@ extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws -> EntryCategory.ID {
-        if let id = try setting(.feeCategory, in: db),
-           try EntryCategory.exists(db, key: id) {
-            return id
+        try categoryId(
+            for: .feeCategory,
+            seed: feeSeed,
+            kind: .expense,
+            in: db,
+            at: now
+        )
+    }
+
+    static func transferCategoryId(
+        _ kind: EntryCategory.Kind,
+        in db: Database,
+        at now: Date
+    ) throws -> EntryCategory.ID {
+        let key: SettingKey<EntryCategory.ID?> = switch kind {
+        case .expense: .transferOutCategory
+        case .income: .transferInCategory
         }
 
-        let icon = try insertIcon(for: feeSeed, into: db, at: now)
-
-        let expenses = EntryCategory.filter(Column("kind") == EntryCategory.Kind.expense.rawValue)
-
-        let sortOrder = try EntryCategory.nextSortOrder(of: expenses, in: db)
-
-        let category = EntryCategory(
-            kind: .expense,
-            name: feeSeed.name,
-            iconId: icon.id,
-            sortOrder: sortOrder,
-            createdAt: now,
-            updatedAt: now
+        return try categoryId(
+            for: key,
+            seed: transferSeed,
+            kind: kind,
+            in: db,
+            at: now
         )
-
-        try category.insert(db)
-        try setSetting(.feeCategory, to: category.id, in: db)
-
-        return category.id
     }
 }
 
@@ -103,6 +105,7 @@ private extension AppDatabase {
     ]
 
     static let feeSeed = Seed(name: "手数料", glyph: .coin, color: "#A68A64")
+    static let transferSeed = Seed(name: "振替", glyph: .banknote, color: "#7A8B99")
 
     static let templates: [(name: String, category: String)] = [
         ("コンビニ", "食費"),
@@ -121,6 +124,36 @@ private extension AppDatabase {
         (.sun, "#F4A261"),
         (.moon, "#577590")
     ]
+
+    static func categoryId(
+        for key: SettingKey<EntryCategory.ID?>,
+        seed: Seed,
+        kind: EntryCategory.Kind,
+        in db: Database,
+        at now: Date
+    ) throws -> EntryCategory.ID {
+        if let id = try setting(key, in: db),
+           try EntryCategory.exists(db, key: id) {
+            return id
+        }
+
+        let icon = try insertIcon(for: seed, into: db, at: now)
+        let sameKind = EntryCategory.filter(Column("kind") == kind.rawValue)
+
+        let category = try EntryCategory(
+            kind: kind,
+            name: seed.name,
+            iconId: icon.id,
+            sortOrder: EntryCategory.nextSortOrder(of: sameKind, in: db),
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try category.insert(db)
+        try setSetting(key, to: category.id, in: db)
+
+        return category.id
+    }
 
     static func insertDefaults(
         into db: Database,
@@ -142,7 +175,13 @@ private extension AppDatabase {
             try wallet.insert(db)
         }
 
-        try insertCategories(expenseCategories, kind: .expense, into: db, at: now)
+        try insertCategories(
+            expenseCategories,
+            kind: .expense,
+            into: db,
+            at: now
+        )
+
         try insertCategories(incomeCategories, kind: .income, into: db, at: now)
     }
 
@@ -186,7 +225,9 @@ private extension AppDatabase {
             .filter { $0.kind == .expense && $0.archivedAt == nil }
 
         let seeds = templates.compactMap { seed in
-            categories.first { $0.name == seed.category }.map { (seed.name, $0) }
+            categories
+                .first { $0.name == seed.category }
+                .map { (seed.name, $0) }
         }
 
         for (order, (name, category)) in seeds.enumerated() {
@@ -210,7 +251,12 @@ private extension AppDatabase {
         at now: Date
     ) throws {
         for (order, (glyph, color)) in shelf.enumerated() {
-            let icon = try insertIcon(glyph: glyph, color: color, into: db, at: now)
+            let icon = try insertIcon(
+                glyph: glyph,
+                color: color,
+                into: db,
+                at: now
+            )
 
             let shelfIcon = ShelfIcon(
                 iconId: icon.id,
@@ -228,7 +274,12 @@ private extension AppDatabase {
         into db: Database,
         at now: Date
     ) throws -> Icon {
-        try insertIcon(glyph: seed.glyph, color: seed.color, into: db, at: now)
+        try insertIcon(
+            glyph: seed.glyph,
+            color: seed.color,
+            into: db,
+            at: now
+        )
     }
 
     static func insertIcon(

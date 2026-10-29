@@ -3,6 +3,8 @@ import Core
 public enum SyncZone {
     public static let own = "Kakeibot"
 
+    static let walletZoneSQL = "'\(prefix)' || wallet_id"
+
     private static let prefix = "Wallet-"
 
     public static func wallet(_ id: Wallet.ID) -> String {
