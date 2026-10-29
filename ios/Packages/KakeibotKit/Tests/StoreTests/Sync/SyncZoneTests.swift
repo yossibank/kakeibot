@@ -59,31 +59,28 @@ struct SyncZoneTests {
     @Test
     func skipsDeletionFromOtherZone() async throws {
         let setup = try await SyncTests.Setup()
-        let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
-        let other = key.recordID(in: "Wallet-b")
-        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
-        try await setup.execute(insert)
-        try await setup.database.saveSyncSystemFields([other: Data([1])])
+        let key = try await setup.insertSharedEntry()
+        let shared = try await key.recordID(in: setup.sharedZone())
+        try await setup.database.saveSyncSystemFields([shared: Data([1]), key.own: Data([2])])
 
         try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
 
         #expect(try await setup.database.syncRecord(for: key) != nil)
-        #expect(try await setup.database.syncSystemFields(for: other) == Data([1]))
+        #expect(try await setup.database.syncSystemFields(for: shared) == Data([1]))
+        #expect(try await setup.database.syncSystemFields(for: key.own) == nil)
     }
 
     @Test
     func appliesDeletionFromSameZone() async throws {
         let setup = try await SyncTests.Setup()
-        let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
-        let other = key.recordID(in: "Wallet-b")
-        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
-        try await setup.execute(insert)
-        try await setup.database.saveSyncSystemFields([other: Data([1]), key.own: Data([2])])
+        let key = try await setup.insertSharedEntry()
+        let shared = try await key.recordID(in: setup.sharedZone())
+        try await setup.database.saveSyncSystemFields([shared: Data([1]), key.own: Data([2])])
 
-        try await setup.database.applySyncChanges(saved: [], deleted: [other])
+        try await setup.database.applySyncChanges(saved: [], deleted: [shared])
 
         #expect(try await setup.database.syncRecord(for: key) == nil)
-        #expect(try await setup.database.syncSystemFields(for: other) == nil)
+        #expect(try await setup.database.syncSystemFields(for: shared) == nil)
         #expect(try await setup.database.syncSystemFields(for: key.own) == Data([2]))
     }
 
@@ -305,6 +302,43 @@ struct SyncZoneTests {
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_share") == "0")
         #expect(activity?.isActive == true)
     }
+
+    @Test
+    func zoneMoveDeletionArrivingLaterRemovesRow() async throws {
+        let device = try await SyncTests.Setup()
+        let walletID = try await device.walletID()
+        let categoryID = try await device.categoryID()
+        let wallet = SyncKey(table: .wallet, id: walletID)
+        let entry = SyncKey(table: .entry, id: "e1")
+
+        try await device.execute("""
+        INSERT INTO entry (id, type, amount, category_id, wallet_id, date, created_at, updated_at)
+        VALUES ('e1', 'expense', 1, '\(categoryID)', '\(walletID)', '2026-10-12', 'x', 'x')
+        """)
+
+        try await device.database.saveSyncSystemFields([
+            wallet.own: Data([1]),
+            entry.own: Data([1])
+        ])
+        try await device.database.removeSyncChanges(device.database.pendingSyncChanges())
+
+        let zone = try SyncZone.wallet(#require(Wallet.ID(walletID)))
+        let walletRecord = try #require(try await device.database.syncRecord(for: wallet))
+        let entryRecord = try #require(try await device.database.syncRecord(for: entry))
+
+        try await device.database.applySyncChanges(
+            saved: [walletRecord, entryRecord],
+            deleted: [],
+            systemFields: [
+                wallet.recordID(in: zone): Data([2]),
+                entry.recordID(in: zone): Data([2])
+            ]
+        )
+
+        try await device.database.applySyncChanges(saved: [], deleted: [entry.own])
+
+        #expect(try await device.database.syncRecord(for: entry) != nil)
+    }
 }
 
 private extension SyncTests.Setup {
@@ -342,5 +376,26 @@ extension SyncZoneTests {
         let categories: Int
         let tags: Int
         let icons: Int
+    }
+}
+
+extension SyncTests.Setup {
+    func insertSharedEntry() async throws -> SyncKey {
+        let walletID = try await walletID()
+        let categoryID = try await categoryID()
+
+        try await execute("INSERT INTO sync_share (wallet_id) VALUES ('\(walletID)')")
+
+        try await execute("""
+        INSERT INTO entry (id, type, amount, category_id, wallet_id, date, created_at, updated_at)
+        VALUES ('e-shared', 'expense', 1, '\(categoryID)', '\(walletID)', '2026-10-12', 'x', 'x')
+        """)
+
+        return SyncKey(table: .entry, id: "e-shared")
+    }
+
+    func sharedZone() async throws -> String {
+        let walletID = try await walletID()
+        return try SyncZone.wallet(#require(Wallet.ID(walletID)))
     }
 }

@@ -90,13 +90,20 @@ private extension AppDatabase {
         of id: SyncRecordID,
         in db: Database
     ) throws -> Bool {
-        let zones = try String.fetchAll(
+        let otherZones = try String.fetchAll(
             db,
-            sql: "SELECT zone_name FROM sync_record WHERE table_name = ? AND record_id = ?",
-            arguments: [id.key.table.rawValue, id.key.id]
+            sql: """
+            SELECT zone_name FROM sync_record
+            WHERE table_name = ? AND record_id = ? AND zone_name <> ?
+            """,
+            arguments: [id.key.table.rawValue, id.key.id, id.zoneName]
         )
 
-        return zones.isEmpty || zones.contains(id.zoneName)
+        guard !otherZones.isEmpty else {
+            return true
+        }
+
+        return try saveZone(for: id.key, in: db) == id.zoneName
     }
 
     static func joinSharedWallets(
