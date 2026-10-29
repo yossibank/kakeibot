@@ -131,6 +131,20 @@ struct SyncModelTests {
         #expect(after.isShared == false)
         #expect(model.errorNotice.message != nil)
     }
+
+    @Test
+    func keepsSharingWhenDeletingCloudShareFails() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false, stopsInSheet: true, failsToDelete: true)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let item = try await firstShare(in: setup.database)
+
+        await model.share(item)
+        let after = try await firstShare(in: setup.database)
+
+        #expect(after.isShared == true)
+        #expect(model.errorNotice.message != nil)
+    }
 }
 
 extension SyncModelTests {
@@ -142,17 +156,20 @@ extension SyncModelTests {
         private let hasData: Bool
         private let stopsInSheet: Bool
         private let failsToCreate: Bool
+        private let failsToDelete: Bool
 
         init(
             isAvailable: Bool = true,
             hasData: Bool,
             stopsInSheet: Bool = false,
-            failsToCreate: Bool = false
+            failsToCreate: Bool = false,
+            failsToDelete: Bool = false
         ) {
             self.isAvailable = isAvailable
             self.hasData = hasData
             self.stopsInSheet = stopsInSheet
             self.failsToCreate = failsToCreate
+            self.failsToDelete = failsToDelete
         }
     }
 }
@@ -174,7 +191,7 @@ extension SyncModelTests.FakeCloud {
                 await onStop()
             }
         } deleteShare: { _ in
-            await self.record("delete")
+            try await self.deleteShare()
         }
     }
 
@@ -184,6 +201,14 @@ extension SyncModelTests.FakeCloud {
 
     func record(_ call: String) {
         shareCalls.append(call)
+    }
+
+    func deleteShare() throws {
+        shareCalls.append("delete")
+
+        if failsToDelete {
+            throw CancellationError()
+        }
     }
 
     func createShare() throws {
