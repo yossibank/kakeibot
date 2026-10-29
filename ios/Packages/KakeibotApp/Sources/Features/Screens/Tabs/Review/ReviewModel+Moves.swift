@@ -21,39 +21,17 @@ public extension ReviewModel {
             return []
         }
 
-        return list.wallets.values
-            .filter { Self.moveRoles.contains($0.kind.role) }
-            .sorted { lhs, rhs in
-                let lhsOrder = Self.moveRoles.firstIndex(of: lhs.kind.role) ?? 0
-                let rhsOrder = Self.moveRoles.firstIndex(of: rhs.kind.role) ?? 0
+        let range = period.range
 
-                if lhsOrder != rhsOrder {
-                    return lhsOrder < rhsOrder
-                }
+        if let cached = moveCache[range] {
+            return cached
+        }
 
-                return lhs.sortOrder < rhs.sortOrder
-            }
-            .compactMap { wallet in
-                let amount = moveEntries(to: wallet, in: list).reduce(0) { $0 + $1.amount }
+        let made = moves(in: list)
 
-                guard amount > 0 else {
-                    return nil
-                }
+        moveCache[range] = made
 
-                let balance = wallet.balance(
-                    with: entries,
-                    valuations: list.valuations,
-                    through: today
-                )
-
-                return Move(
-                    wallet: wallet,
-                    icon: list.icons[wallet.iconId],
-                    amount: amount,
-                    balance: balance,
-                    payoff: payoff(of: wallet, balance: balance)
-                )
-            }
+        return made
     }
 
     static func total(of moves: [Move]) -> Int {
@@ -107,6 +85,42 @@ extension ReviewModel {
 
 private extension ReviewModel {
     static let moveRoles: [Wallet.Kind.Role] = [.loan, .investment]
+
+    func moves(in list: EntryList) -> [Move] {
+        list.wallets.values
+            .filter { Self.moveRoles.contains($0.kind.role) }
+            .sorted { lhs, rhs in
+                let lhsOrder = Self.moveRoles.firstIndex(of: lhs.kind.role) ?? 0
+                let rhsOrder = Self.moveRoles.firstIndex(of: rhs.kind.role) ?? 0
+
+                if lhsOrder != rhsOrder {
+                    return lhsOrder < rhsOrder
+                }
+
+                return lhs.sortOrder < rhs.sortOrder
+            }
+            .compactMap { wallet in
+                let amount = moveEntries(to: wallet, in: list).reduce(0) { $0 + $1.amount }
+
+                guard amount > 0 else {
+                    return nil
+                }
+
+                let balance = wallet.balance(
+                    with: entries,
+                    valuations: list.valuations,
+                    through: today
+                )
+
+                return Move(
+                    wallet: wallet,
+                    icon: list.icons[wallet.iconId],
+                    amount: amount,
+                    balance: balance,
+                    payoff: payoff(of: wallet, balance: balance)
+                )
+            }
+    }
 
     func moveEntries(
         to wallet: Wallet,

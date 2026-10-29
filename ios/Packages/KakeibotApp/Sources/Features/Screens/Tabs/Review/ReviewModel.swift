@@ -7,7 +7,11 @@ import Store
 @MainActor
 @Observable
 public final class ReviewModel: ScreenModel {
-    public var today: LocalDate
+    public var today: LocalDate {
+        didSet {
+            moveCache = [:]
+        }
+    }
 
     public private(set) var scale: ReviewPeriod.Scale = .month
     public private(set) var kind: ReviewKind = .expense
@@ -16,13 +20,28 @@ public final class ReviewModel: ScreenModel {
     public private(set) var isMovingForward = true
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var weekStart: Weekday = .sunday
-    public private(set) var list: EntryList?
     public private(set) var budgets: [Budget] = []
     public private(set) var stampCalendar: StampCalendar?
 
+    public private(set) var list: EntryList? {
+        didSet {
+            entries = list?.days.flatMap(\.entries) ?? []
+            summaries = [:]
+            moveCache = [:]
+        }
+    }
+
     public internal(set) var errorNotice = ErrorNotice()
 
-    private(set) var recurrings: [Recurring] = []
+    private(set) var entries: [Entry] = []
+
+    private(set) var recurrings: [Recurring] = [] {
+        didSet {
+            moveCache = [:]
+        }
+    }
+
+    @ObservationIgnored var moveCache: [ClosedRange<LocalDate>: [Move]] = [:]
 
     @ObservationIgnored private var summaries: [
         ClosedRange<LocalDate>: ReviewSummary
@@ -235,10 +254,6 @@ public extension ReviewModel {
 }
 
 extension ReviewModel {
-    var entries: [Entry] {
-        list?.days.flatMap(\.entries) ?? []
-    }
-
     var entryType: Entry.Kind? {
         switch kind {
         case .expense: .expense
@@ -283,7 +298,6 @@ private extension ReviewModel {
             failure: Self.loadFailedMessage
         ) { list in
             self.list = list
-            summaries = [:]
         }
     }
 

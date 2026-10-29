@@ -7,18 +7,43 @@ import Store
 @MainActor
 @Observable
 public final class AssetsModel: ScreenModel {
-    public var today: LocalDate
+    public var today: LocalDate {
+        didSet {
+            update()
+        }
+    }
 
-    public private(set) var monthStartDay: MonthStartDay = .first
-    public private(set) var list: EntryList?
     public private(set) var isListFailed = false
     public private(set) var rewardBank: RewardBank?
+    public private(set) var holdings: Holdings
+    public private(set) var changeFromLastMonth = 0
+    public private(set) var rows: [WalletRow] = []
+    public private(set) var upcomingBills: [UpcomingBill] = []
+    public private(set) var monthTotals: [MonthTotal] = []
+
+    public private(set) var monthStartDay: MonthStartDay = .first {
+        didSet {
+            update()
+        }
+    }
+
+    public private(set) var list: EntryList? {
+        didSet {
+            update()
+        }
+    }
 
     public internal(set) var errorNotice = ErrorNotice()
 
     let database: AppDatabase
 
-    private var recurrings: [Recurring] = []
+    private var entries: [Entry] = []
+
+    private var recurrings: [Recurring] = [] {
+        didSet {
+            update()
+        }
+    }
 
     public init(
         database: AppDatabase,
@@ -26,6 +51,15 @@ public final class AssetsModel: ScreenModel {
     ) {
         self.database = database
         self.today = today
+
+        self.holdings = Holdings(
+            wallets: [],
+            entries: [],
+            valuations: [],
+            through: today
+        )
+
+        update()
     }
 }
 
@@ -36,54 +70,12 @@ public extension AssetsModel {
         today.periodMonth(startingOn: monthStartDay)
     }
 
-    var holdings: Holdings {
-        Holdings(
-            wallets: wallets,
-            entries: entries,
-            valuations: valuations,
-            through: today
-        )
-    }
-
     var total: Int {
         holdings.available
     }
 
     var showsNetWorth: Bool {
         wallets.contains { [.investment, .loan].contains($0.kind.role) }
-    }
-
-    var changeFromLastMonth: Int {
-        let lastMonth = currentMonth.adding(months: -1)
-        let end = lastMonth.period(startingOn: monthStartDay).upperBound
-
-        let previous = Holdings(
-            wallets: wallets,
-            entries: entries,
-            valuations: valuations,
-            through: end
-        )
-
-        return total - previous.available
-    }
-
-    var rows: [WalletRow] {
-        let bills = upcomingBills
-
-        return wallets.map { wallet in
-            let next = bills.first { $0.bill.recurring.toWalletId == wallet.id }
-            let balance = balance(of: wallet)
-            let ratio = repaidRatio(of: wallet, balance: balance)
-
-            return WalletRow(
-                wallet: wallet,
-                icon: list?.icons[wallet.iconId],
-                balance: balance,
-                nextBill: next?.bill,
-                repayment: repayment(of: wallet),
-                repaidRatio: ratio
-            )
-        }
     }
 
     var sections: [WalletSection] {
@@ -96,74 +88,8 @@ public extension AssetsModel {
         }
     }
 
-    var upcomingBills: [UpcomingBill] {
-        guard let list else {
-            return []
-        }
-
-        let allWallets = Array(list.wallets.values)
-
-        let bills = CardBill.upcoming(
-            recurrings: recurrings,
-            wallets: allWallets,
-            entries: entries,
-            valuations: valuations,
-            after: today
-        )
-
-        return bills.map { bill in
-            let card = bill.recurring.toWalletId
-            let month = bill.recurring.occurrenceMonth(of: bill.date)
-
-            let moved = entries
-                .filter { $0.walletId == card && $0.billMonth != nil }
-                .sorted { $0.date < $1.date }
-
-            let movedIn = moved
-                .filter { $0.billMonth == month }
-                .map { Self.row(of: $0, in: list) }
-
-            let movedOut = moved
-                .filter { entry in
-                    entry.billMonth != month
-                        && bill.period?.contains(entry.date) == true
-                }
-                .map { Self.row(of: $0, in: list) }
-
-            return UpcomingBill(
-                bill: bill,
-                title: list.title(of: bill.recurring) ?? Self.billTitle,
-                icon: list.icon(of: bill.recurring),
-                source: list.wallets[bill.recurring.walletId]?.name,
-                movedIn: movedIn,
-                movedOut: movedOut
-            )
-        }
-    }
-
     var upcomingBillTotal: Int {
         upcomingBills.reduce(0) { $0 + $1.bill.amount }
-    }
-
-    var monthTotals: [MonthTotal] {
-        (0..<Self.monthCount).reversed().map { offset in
-            let month = currentMonth.adding(months: -offset)
-            let period = month.period(startingOn: monthStartDay)
-            let end = offset == 0 ? today : period.upperBound
-
-            let holdings = Holdings(
-                wallets: wallets,
-                entries: entries,
-                valuations: valuations,
-                through: end
-            )
-
-            return MonthTotal(
-                month: month,
-                total: holdings.available,
-                netWorth: holdings.netWorth
-            )
-        }
     }
 
     func run() async {
@@ -208,10 +134,6 @@ private extension AssetsModel {
             .sorted { $0.sortOrder < $1.sortOrder }
     }
 
-    var entries: [Entry] {
-        list?.days.flatMap(\.entries) ?? []
-    }
-
     var valuations: [Valuation] {
         list?.valuations ?? []
     }
@@ -222,6 +144,123 @@ private extension AssetsModel {
     ) -> EntryRowItem {
         let day = "\(entry.date.month)/\(entry.date.day)"
         return EntryRowItem(entry, in: list, dayLabel: day)
+    }
+
+    func update() {
+        entries = list?.days.flatMap(\.entries) ?? []
+        holdings = makeHoldings()
+        changeFromLastMonth = makeChangeFromLastMonth()
+        upcomingBills = makeUpcomingBills()
+        rows = makeRows()
+        monthTotals = makeMonthTotals()
+    }
+
+    func makeHoldings() -> Holdings {
+        Holdings(
+            wallets: wallets,
+            entries: entries,
+            valuations: valuations,
+            through: today
+        )
+    }
+
+    func makeChangeFromLastMonth() -> Int {
+        let lastMonth = currentMonth.adding(months: -1)
+        let end = lastMonth.period(startingOn: monthStartDay).upperBound
+
+        let previous = Holdings(
+            wallets: wallets,
+            entries: entries,
+            valuations: valuations,
+            through: end
+        )
+
+        return total - previous.available
+    }
+
+    func makeUpcomingBills() -> [UpcomingBill] {
+        guard let list else {
+            return []
+        }
+
+        let allWallets = Array(list.wallets.values)
+
+        let bills = CardBill.upcoming(
+            recurrings: recurrings,
+            wallets: allWallets,
+            entries: entries,
+            valuations: valuations,
+            after: today
+        )
+
+        return bills.map { bill in
+            let card = bill.recurring.toWalletId
+            let month = bill.recurring.occurrenceMonth(of: bill.date)
+
+            let moved = entries
+                .filter { $0.walletId == card && $0.billMonth != nil }
+                .sorted { $0.date < $1.date }
+
+            let movedIn = moved
+                .filter { $0.billMonth == month }
+                .map { Self.row(of: $0, in: list) }
+
+            let movedOut = moved
+                .filter { entry in
+                    entry.billMonth != month
+                        && bill.period?.contains(entry.date) == true
+                }
+                .map { Self.row(of: $0, in: list) }
+
+            return UpcomingBill(
+                bill: bill,
+                title: list.title(of: bill.recurring) ?? Self.billTitle,
+                icon: list.icon(of: bill.recurring),
+                source: list.wallets[bill.recurring.walletId]?.name,
+                movedIn: movedIn,
+                movedOut: movedOut
+            )
+        }
+    }
+
+    func makeRows() -> [WalletRow] {
+        let bills = upcomingBills
+
+        return wallets.map { wallet in
+            let next = bills.first { $0.bill.recurring.toWalletId == wallet.id }
+            let balance = balance(of: wallet)
+            let ratio = repaidRatio(of: wallet, balance: balance)
+
+            return WalletRow(
+                wallet: wallet,
+                icon: list?.icons[wallet.iconId],
+                balance: balance,
+                nextBill: next?.bill,
+                repayment: repayment(of: wallet),
+                repaidRatio: ratio
+            )
+        }
+    }
+
+    func makeMonthTotals() -> [MonthTotal] {
+        (0..<Self.monthCount).reversed().map { offset in
+            let month = currentMonth.adding(months: -offset)
+            let period = month.period(startingOn: monthStartDay)
+            let end = offset == 0 ? today : period.upperBound
+
+            let holdings = Holdings(
+                wallets: wallets,
+                entries: entries,
+                valuations: valuations,
+                through: end
+            )
+
+            return MonthTotal(
+                month: month,
+                total: holdings.available,
+                netWorth: holdings.netWorth
+            )
+        }
     }
 
     func balance(of wallet: Wallet) -> Int {
