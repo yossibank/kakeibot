@@ -46,7 +46,7 @@ extension EntrySheet {
             .sharesTextScale(id: menu.category)
             .frame(width: menu.frame.width, height: menu.frame.height)
             .scaleEffect(1.06)
-            .shadow(color: Palette.glow.opacity(.muted), radius: 12)
+            .glow(Palette.glow.opacity(.muted), radius: 12)
             .position(x: menu.frame.midX, y: menu.frame.midY)
             .allowsHitTesting(false)
             .transition(.opacity)
@@ -219,7 +219,7 @@ private extension EntrySheet {
         let glow = isSelected ? Palette.glow.opacity(.muted) : Color.clear
 
         return categoryFace(category, isLifted: false)
-            .shadow(color: glow, radius: 8)
+            .glow(glow, radius: 8)
             .scaleEffect(scale)
             .animation(.snappy(duration: 0.2), value: isPressing)
             .animation(.snappy(duration: 0.25), value: isSelected)

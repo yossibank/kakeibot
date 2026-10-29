@@ -90,14 +90,13 @@ public struct RecurringListView: View {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .sensoryFeedback(.impact(weight: .medium), trigger: drag.liftCount)
-        .sensoryFeedback(.selection, trigger: model.movingOrder)
-        .sensoryFeedback(.success, trigger: drag.showCount)
+        .haptic(.impact(weight: .medium), trigger: drag.liftCount)
+        .haptic(.selection, trigger: model.movingOrder)
+        .haptic(.success, trigger: drag.showCount)
         .navigationDestination(item: $destination) { destination in
             RecurringEditSheet(model: model.editModel(for: destination.editingId)) { deletion in
                 self.deletion = deletion

@@ -66,17 +66,16 @@ private extension LaunchView {
                     style: StrokeStyle(lineWidth: 2.4, lineCap: .round)
                 )
                 .frame(width: Self.ringSize, height: Self.ringSize)
-                .shadow(color: Palette.accent, radius: 6)
+                .glow(Palette.accent, radius: 6)
         }
         .frame(width: Self.markSize, height: Self.markSize)
-        .shadow(color: Palette.accent.opacity(glow), radius: 24)
+        .glow(Palette.accent.opacity(glow), radius: 24)
         .environment(\.palette, sweepPalette)
     }
 
     var themed: some View {
         ZStack {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
 
             ZStack {
                 Image("AppIconDial", bundle: .main)

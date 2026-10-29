@@ -39,7 +39,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `.claude/snapshots/assets/` | `ui-snapshot` で描く資産のタブ |
 | `.claude/snapshots/home/` | `ui-snapshot` で描くホームのタブ |
 | `.claude/snapshots/settings/` | `ui-snapshot` で描く設定。メニュー・口座・ごほうび・記録忘れの通知 |
-| `.claude/snapshots/theme-style/` | `ui-snapshot` で描く、文字と角の丸みの見本 |
+| `.claude/snapshots/theme-style/` | `ui-snapshot` で描く、「文字」と「見た目と動き」の画面の見本 |
 | `.claude/snapshots/home-sections/` | `ui-snapshot` で描く、ホームの並べ替え |
 | `.claude/snapshots/parts/` | `ui-snapshot` で描く、カレンダー・タグ・テンプレートのカード |
 

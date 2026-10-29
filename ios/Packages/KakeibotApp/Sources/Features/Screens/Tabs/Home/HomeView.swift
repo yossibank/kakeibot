@@ -85,8 +85,7 @@ public struct HomeView: View {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
     }

@@ -35,7 +35,7 @@ public struct CapsulePicker<Value: Hashable>: View {
                     Capsule()
                         .strokeBorder(Self.thumbRim, lineWidth: 0.8)
                 }
-                .shadow(color: Palette.glow.opacity(.muted), radius: 6)
+                .glow(Palette.glow.opacity(.muted), radius: 6)
                 .frame(width: segmentWidth, height: segmentHeight)
                 .offset(x: thumbX)
 

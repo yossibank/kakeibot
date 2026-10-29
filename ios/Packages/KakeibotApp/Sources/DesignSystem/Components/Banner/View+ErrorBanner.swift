@@ -32,7 +32,7 @@ private struct ErrorBanner: ViewModifier {
                 }
             }
             .animation(.snappy, value: notice.message)
-            .sensoryFeedback(.error, trigger: notice.count)
+            .haptic(.error, trigger: notice.count)
             .task(id: notice.count) {
                 guard notice.count > 0 else {
                     return

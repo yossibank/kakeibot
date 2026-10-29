@@ -95,13 +95,12 @@ public struct ThemeListView: View {
             }
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .sensoryFeedback(.selection, trigger: model.current)
-        .sensoryFeedback(.impact(weight: .medium), trigger: menu) { _, new in
+        .haptic(.selection, trigger: model.current)
+        .haptic(.impact(weight: .medium), trigger: menu) { _, new in
             new != nil
         }
         .navigationDestination(item: $editing) { target in

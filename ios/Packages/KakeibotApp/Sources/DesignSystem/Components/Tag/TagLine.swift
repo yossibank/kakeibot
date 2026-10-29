@@ -87,8 +87,8 @@ public struct TagLine<ID: Hashable & Sendable>: View {
                 .frame(height: Self.sag)
         }
         .preference(key: TagLineMovingKey.self, value: lift != nil)
-        .sensoryFeedback(.selection, trigger: selection)
-        .sensoryFeedback(.impact(weight: .medium), trigger: liftCount)
+        .haptic(.selection, trigger: selection)
+        .haptic(.impact(weight: .medium), trigger: liftCount)
         .animation(.spring(duration: 0.35, bounce: 0.4), value: selection)
     }
 }

@@ -33,7 +33,7 @@ struct EntryTransferPanel: View {
             card(.destination)
         }
         .sharesTextScale(id: [model.walletId, model.toWalletId])
-        .sensoryFeedback(.selection, trigger: model.toWalletId)
+        .haptic(.selection, trigger: model.toWalletId)
     }
 }
 

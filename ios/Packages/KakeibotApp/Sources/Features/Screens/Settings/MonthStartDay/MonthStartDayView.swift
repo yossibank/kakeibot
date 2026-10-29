@@ -44,12 +44,11 @@ public struct MonthStartDayView: View {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .sensoryFeedback(.selection, trigger: model.startDay)
+        .haptic(.selection, trigger: model.startDay)
         .task {
             await model.load()
         }

@@ -31,7 +31,7 @@ public struct DonutChart<ID: Hashable>: View {
                     Circle()
                         .trim(from: segment.start, to: segment.end)
                         .stroke(segment.color, lineWidth: width)
-                        .shadow(color: glow.opacity(0.7), radius: 8)
+                        .glow(glow.opacity(0.7), radius: 8)
                         .rotationEffect(.degrees(-90))
                 }
             }

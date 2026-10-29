@@ -122,8 +122,7 @@ public struct BackupView: View {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)

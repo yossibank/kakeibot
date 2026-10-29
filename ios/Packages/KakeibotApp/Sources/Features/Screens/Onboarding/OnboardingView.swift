@@ -84,12 +84,11 @@ private extension OnboardingView {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
         .budgetKeypad(model.budget)
-        .sensoryFeedback(.selection, trigger: model.page)
+        .haptic(.selection, trigger: model.page)
     }
 
     var topBar: some View {

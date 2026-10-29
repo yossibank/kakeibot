@@ -37,6 +37,7 @@ private extension HomeSectionThumbnail {
         HStack(spacing: 3) {
             ForEach(Self.dots.prefix(3).indices, id: \.self) { index in
                 let isLit = index == 0
+                let glowColor = isLit ? Palette.glow : Color.clear
 
                 RoundedRectangle(cornerRadius: 2)
                     .fill(Palette.faint)
@@ -50,7 +51,7 @@ private extension HomeSectionThumbnail {
                             .frame(width: 5, height: 5)
                     }
                     .frame(width: 12, height: 16)
-                    .shadow(color: isLit ? Palette.glow : .clear, radius: 2)
+                    .glow(glowColor, radius: 2)
             }
         }
     }

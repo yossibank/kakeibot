@@ -109,7 +109,7 @@ private extension EntryWalletSheet {
             }
             .padding(.top, 8)
         }
-        .sensoryFeedback(.selection, trigger: model.billMonth)
+        .haptic(.selection, trigger: model.billMonth)
     }
 
     func walletRow(_ wallet: Wallet) -> some View {

@@ -2,6 +2,8 @@ import Core
 import SwiftUI
 
 public struct EntryRow: View {
+    @Environment(\.themeStyle.rowSpacing) private var rowSpacing
+
     let icon: Icon?
     let title: String
     let tag: String?
@@ -91,14 +93,14 @@ public struct EntryRow: View {
                     EntryMemo(memo)
                 }
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, rowSpacing.padding)
 
             Spacer(minLength: 8)
 
             AmountText(amount, type: type)
                 .displayFont(.body)
         }
-        .frame(minHeight: 48)
+        .frame(minHeight: rowSpacing.minHeight)
         .contentShape(.rect)
     }
 }

@@ -11,6 +11,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
     case theme
     case appIcon
     case themeStyle
+    case themeLook
     case homeSections
 
     public static let onboarding: [Self] = [
@@ -25,7 +26,8 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         .launchScreen,
         .theme,
         .appIcon,
-        .themeStyle
+        .themeStyle,
+        .themeLook
     ]
 
     public static let home: [Self] = [
@@ -49,7 +51,8 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .launchScreen: "起動時に開く画面"
         case .theme: "テーマ"
         case .appIcon: "アプリアイコン"
-        case .themeStyle: "文字と角の丸み"
+        case .themeStyle: "文字"
+        case .themeLook: "見た目と動き"
         case .homeSections: "ホームに出すもの"
         }
     }
@@ -66,6 +69,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .theme: "paintpalette"
         case .appIcon: "app.badge"
         case .themeStyle: "textformat"
+        case .themeLook: "square.on.circle"
         case .homeSections: "square.stack"
         }
     }
@@ -77,7 +81,8 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .recurrings: progress.hasRecurring
         case .reminder: progress.hasReminder
         case .theme: progress.hasTheme
-        case .categories, .templates, .launchScreen, .appIcon, .themeStyle, .homeSections: false
+        case .categories, .templates, .launchScreen, .appIcon, .themeStyle, .themeLook,
+             .homeSections: false
         }
     }
 }

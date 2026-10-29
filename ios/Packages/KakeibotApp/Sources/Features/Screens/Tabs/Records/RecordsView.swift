@@ -117,8 +117,8 @@ public struct RecordsView: View {
         .onChange(of: model.isSearching) {
             finishSelecting()
         }
-        .sensoryFeedback(.selection, trigger: model.month)
-        .sensoryFeedback(.selection, trigger: model.selectedDate)
+        .haptic(.selection, trigger: model.month)
+        .haptic(.selection, trigger: model.selectedDate)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
@@ -156,10 +156,9 @@ public struct RecordsView: View {
         .sheet(isPresented: $isFiltering) {
             RecordsFilterSheet(filter: $model.filter, list: model.list)
         }
-        .sensoryFeedback(.success, trigger: stampCount)
+        .haptic(.success, trigger: stampCount)
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
     }

@@ -3,6 +3,8 @@ import SwiftUI
 
 public struct IconSeal: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.themeStyle.stampShape) private var stampShape
+    @Environment(\.themeStyle.corner) private var corner
 
     let icon: Icon
     let size: CGFloat
@@ -16,18 +18,34 @@ public struct IconSeal: View {
     }
 
     public var body: some View {
-        Circle()
-            .fill(tint)
-            .frame(width: size, height: size)
-            .overlay {
-                IconImage(icon, size: size * 0.42)
-                    .foregroundStyle(Palette.backgroundBottom)
-            }
-            .overlay {
-                Circle()
-                    .strokeBorder(Palette.backgroundBottom, lineWidth: size * 0.08)
-            }
-            .shadow(color: tint.opacity(glow), radius: size * 0.2)
+        switch stampShape {
+        case .circle, .rounded:
+            shape
+                .fill(tint)
+                .frame(width: size, height: size)
+                .overlay {
+                    IconImage(icon, size: size * 0.42)
+                        .foregroundStyle(Palette.backgroundBottom)
+                }
+                .overlay {
+                    shape
+                        .strokeBorder(Palette.backgroundBottom, lineWidth: size * 0.08)
+                }
+                .glow(tint.opacity(glow), radius: size * 0.2)
+        case .seal:
+            Circle()
+                .strokeBorder(tint, lineWidth: size * 0.06)
+                .padding(size * 0.12)
+                .overlay {
+                    Circle()
+                        .strokeBorder(tint, lineWidth: size * 0.06)
+                }
+                .frame(width: size, height: size)
+                .overlay {
+                    IconImage(icon, size: size * 0.36)
+                        .foregroundStyle(tint)
+                }
+        }
     }
 }
 
@@ -38,6 +56,15 @@ private extension IconSeal {
 
     var glow: Double {
         colorScheme == .light ? 0.25 : 0.5
+    }
+
+    var shape: RoundedRectangle {
+        switch stampShape {
+        case .circle, .seal:
+            RoundedRectangle(cornerRadius: size / 2, style: .circular)
+        case .rounded:
+            RoundedRectangle(cornerRadius: corner.radius(size * 0.3), style: .continuous)
+        }
     }
 }
 

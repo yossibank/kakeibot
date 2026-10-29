@@ -53,7 +53,7 @@ public struct PrimaryButton: View {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .shadow(color: glow, radius: 14, y: 6)
+        .glow(glow, radius: 14, y: 6)
     }
 }
 

@@ -83,7 +83,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
                 offset = 0
             }
         }
-        .sensoryFeedback(.impact(weight: .medium), trigger: isPastAction) { _, isPast in
+        .haptic(.impact(weight: .medium), trigger: isPastAction) { _, isPast in
             isPast
         }
     }

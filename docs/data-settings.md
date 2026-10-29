@@ -37,6 +37,12 @@ expense・income の列は、描画に使わない。
 | font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop` | 空なら `mincho` |
 | text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop` | 空なら `gothic` |
 | text_size | 文字の大きさ。`small`・`standard`・`large` | 空なら `standard` |
+| row_spacing | 記録の一覧の行の高さと上下の余白。`compact`・`standard`・`relaxed` | 空なら `standard` |
+| stamp_shape | スタンプの印の形。`circle`・`rounded`・`seal`（塗らない二重の輪） | 空なら `circle`。`rounded` は corner_style に従う |
+| tab_titles | 下のタブに名前を出すか。`true` `false` | 空なら `true` |
+| backdrop | 画面の背景の柄。`plain`・`washi`・`grid` | 空なら `plain` |
+| haptics | 押した時に振動するか。`true` `false` | 空なら `true` |
+| decorations | 光の影とタブの金の輪を出すか。`true` `false` | 空なら `true` |
 | entry_starts_with_amount | 今は使わない | |
 | categories_by_use | 今は使わない | |
 | template_order | `manual` `frequent` `category` `amount` `name` | 空なら並べた順 |

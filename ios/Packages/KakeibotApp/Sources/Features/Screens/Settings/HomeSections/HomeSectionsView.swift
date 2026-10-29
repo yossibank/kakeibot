@@ -49,8 +49,7 @@ public struct HomeSectionsView: View {
             model.errorNotice.clear()
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
@@ -58,7 +57,7 @@ public struct HomeSectionsView: View {
         .transaction(value: model.isLoaded) { transaction in
             transaction.disablesAnimations = true
         }
-        .sensoryFeedback(.selection, trigger: model.layout)
+        .haptic(.selection, trigger: model.layout)
         .task {
             await model.load()
         }

@@ -61,8 +61,7 @@ extension WalletEditSheet {
             focus = nil
         }
         .background {
-            Rectangle()
-                .fill(Palette.background)
+            Backdrop()
                 .ignoresSafeArea()
         }
     }
@@ -148,7 +147,7 @@ extension WalletEditSheet {
                         .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
-                .sensoryFeedback(.selection, trigger: model.isNegative)
+                .haptic(.selection, trigger: model.isNegative)
 
                 Button {
                     openAmount()
@@ -305,6 +304,6 @@ extension WalletEditSheet {
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .sensoryFeedback(.selection, trigger: isSelected)
+        .haptic(.selection, trigger: isSelected)
     }
 }

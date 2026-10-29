@@ -103,7 +103,7 @@ private extension HomeCustomizeCard {
         .overlay {
             RoundedRectangle(cornerRadius: themeStyle.corner.radius(Self.cornerRadius))
                 .strokeBorder(Palette.accentStrong, lineWidth: 1.6)
-                .shadow(color: Palette.glow, radius: 10)
+                .glow(Palette.glow, radius: 10)
                 .opacity(glowOpacity(item))
         }
         .contentShape(.rect)
@@ -122,7 +122,8 @@ private extension HomeCustomizeCard {
         case .launchScreen: model.launchScreen.title
         case .theme: model.themeTitle
         case .appIcon: appIcon.current.title
-        case .themeStyle: themeStyle.shortTitle
+        case .themeStyle: themeStyle.shortTextTitle
+        case .themeLook: themeStyle.lookTitle
         default: ""
         }
     }

@@ -31,7 +31,7 @@ extension View {
             }
         }
         .animation(.snappy, value: id.wrappedValue)
-        .sensoryFeedback(.success, trigger: id.wrappedValue) { _, new in
+        .haptic(.success, trigger: id.wrappedValue) { _, new in
             new != nil
         }
     }

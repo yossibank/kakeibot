@@ -146,7 +146,7 @@ private extension TemplateEditSheet {
             }
             .buttonStyle(.plain)
         }
-        .shadow(color: Palette.glow.opacity(.subtle), radius: 30)
+        .glow(Palette.glow.opacity(.subtle), radius: 30)
         .background(alignment: .bottom) {
             Ellipse()
                 .fill(Palette.shadow.opacity(0.55))

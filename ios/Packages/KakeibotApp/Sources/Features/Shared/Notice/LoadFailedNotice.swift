@@ -29,7 +29,7 @@ public extension View {
             if isFailed {
                 LoadFailedNotice(onRetry: onRetry)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Palette.background)
+                    .background { Backdrop() }
             }
         }
     }

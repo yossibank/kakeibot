@@ -139,13 +139,25 @@ extension SettingsSheet {
             Hairline()
 
             NavigationLink {
-                ThemeStyleView(model: ThemeStyleModel(database: database))
+                ThemeStyleTextView(model: ThemeStyleModel(database: database))
             } label: {
                 row(
-                    "文字と角の丸み",
+                    "文字",
                     systemImage: "textformat",
-                    value: themeStyle.title,
-                    shortValue: themeStyle.shortTitle
+                    value: themeStyle.textTitle,
+                    shortValue: themeStyle.shortTextTitle
+                )
+            }
+
+            Hairline()
+
+            NavigationLink {
+                ThemeStyleLookView(model: ThemeStyleModel(database: database))
+            } label: {
+                row(
+                    "見た目と動き",
+                    systemImage: "square.on.circle",
+                    value: themeStyle.lookTitle
                 )
             }
         }
