@@ -198,6 +198,8 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 
 `recurring_id` と `recurring_date` は、そろって入るか、どちらも空にする。`(recurring_id, recurring_date)` は重複禁止。支出を記録した日の `no_spend_day` は消す。
 
+索引は、`date`・`(wallet_id, date)`・`to_wallet_id`・`category_id` に付ける。
+
 振替の手数料は、振替と別の支出の記録にする。決まりは次のとおり。
 
 - 日付と財布は振替に合わせ、財布は振替元にする。
