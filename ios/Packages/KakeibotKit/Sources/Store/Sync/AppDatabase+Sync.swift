@@ -91,6 +91,22 @@ public extension AppDatabase {
         }
     }
 
+    func turnOffSyncForAccountChange() async throws {
+        try await writer.write { db in
+            try db.execute(
+                sql: """
+                DELETE FROM sync_record WHERE zone_name IN (
+                    SELECT \(SyncZone.walletZoneSQL) FROM sync_share WHERE owner_name IS NULL
+                )
+                """
+            )
+
+            try db.execute(sql: "DELETE FROM sync_share WHERE owner_name IS NULL")
+            try db.execute(sql: "UPDATE sync_state SET enabled = 0")
+            try Self.clearOwnSync(in: db)
+        }
+    }
+
     func syncSaveZone(for key: SyncKey) async throws -> String {
         try await writer.read { db in
             try Self.saveZone(for: key, in: db)
