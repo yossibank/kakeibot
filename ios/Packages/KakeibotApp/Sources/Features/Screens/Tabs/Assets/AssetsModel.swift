@@ -30,81 +30,6 @@ public final class AssetsModel: ScreenModel {
 }
 
 public extension AssetsModel {
-    struct WalletRow: Identifiable, Equatable {
-        public let wallet: Wallet
-        public let icon: Icon?
-        public let balance: Int
-        public let nextBill: CardBill?
-        public let repayment: Repayment?
-        public let repaidRatio: Double?
-
-        public var id: Wallet.ID {
-            wallet.id
-        }
-
-        public var repaidPercent: Int? {
-            guard
-                wallet.kind == .loan,
-                let loanAmount = wallet.loanAmount,
-                loanAmount > 0
-            else {
-                return nil
-            }
-
-            let repaid = loanAmount - max(-balance, 0)
-
-            return Percent.floor(repaid, of: loanAmount)
-        }
-    }
-
-    enum Repayment: Equatable {
-        case unset
-        case finished
-        case open
-        case until(LoanPayoff)
-    }
-
-    struct RewardMonth: Identifiable, Equatable {
-        public let month: YearMonth
-        public let logs: [RewardLog]
-
-        public var id: YearMonth {
-            month
-        }
-    }
-
-    struct WalletSection: Identifiable, Equatable {
-        public let role: Wallet.Kind.Role
-        public let rows: [WalletRow]
-
-        public var id: Wallet.Kind.Role {
-            role
-        }
-    }
-
-    struct MonthTotal: Identifiable, Equatable {
-        public let month: YearMonth
-        public let total: Int
-        public let netWorth: Int
-
-        public var id: YearMonth {
-            month
-        }
-    }
-
-    struct UpcomingBill: Identifiable, Equatable {
-        public let bill: CardBill
-        public let title: String
-        public let icon: Icon?
-        public let source: String?
-        public let movedIn: [EntryRowItem]
-        public let movedOut: [EntryRowItem]
-
-        public var id: Recurring.ID {
-            bill.recurring.id
-        }
-    }
-
     static let monthCount = 6
 
     var currentMonth: YearMonth {
@@ -148,6 +73,7 @@ public extension AssetsModel {
         return wallets.map { wallet in
             let next = bills.first { $0.bill.recurring.toWalletId == wallet.id }
             let balance = balance(of: wallet)
+            let ratio = repaidRatio(of: wallet, balance: balance)
 
             return WalletRow(
                 wallet: wallet,
@@ -155,7 +81,7 @@ public extension AssetsModel {
                 balance: balance,
                 nextBill: next?.bill,
                 repayment: repayment(of: wallet),
-                repaidRatio: repaidRatio(of: wallet, balance: balance)
+                repaidRatio: ratio
             )
         }
     }
@@ -166,9 +92,7 @@ public extension AssetsModel {
         return Wallet.Kind.Role.allCases.compactMap { role in
             let members = rows.filter { $0.wallet.kind.role == role }
 
-            return members.isEmpty
-                ? nil
-                : WalletSection(role: role, rows: members)
+            return members.isEmpty ? nil : WalletSection(role: role, rows: members)
         }
     }
 
@@ -177,9 +101,11 @@ public extension AssetsModel {
             return []
         }
 
+        let allWallets = Array(list.wallets.values)
+
         let bills = CardBill.upcoming(
             recurrings: recurrings,
-            wallets: Array(list.wallets.values),
+            wallets: allWallets,
             entries: entries,
             valuations: valuations,
             after: today
@@ -193,20 +119,24 @@ public extension AssetsModel {
                 .filter { $0.walletId == card && $0.billMonth != nil }
                 .sorted { $0.date < $1.date }
 
-            let movedIn = moved.filter { $0.billMonth == month }
+            let movedIn = moved
+                .filter { $0.billMonth == month }
+                .map { Self.row(of: $0, in: list) }
 
-            let movedOut = moved.filter { entry in
-                entry.billMonth != month
-                    && bill.period?.contains(entry.date) == true
-            }
+            let movedOut = moved
+                .filter { entry in
+                    entry.billMonth != month
+                        && bill.period?.contains(entry.date) == true
+                }
+                .map { Self.row(of: $0, in: list) }
 
             return UpcomingBill(
                 bill: bill,
                 title: list.title(of: bill.recurring) ?? Self.billTitle,
                 icon: list.icon(of: bill.recurring),
                 source: list.wallets[bill.recurring.walletId]?.name,
-                movedIn: movedIn.map { Self.row(of: $0, in: list) },
-                movedOut: movedOut.map { Self.row(of: $0, in: list) }
+                movedIn: movedIn,
+                movedOut: movedOut
             )
         }
     }
@@ -234,96 +164,6 @@ public extension AssetsModel {
                 netWorth: holdings.netWorth
             )
         }
-    }
-
-    var rewardBalance: Int {
-        rewardBank?.balance ?? 0
-    }
-
-    var recentRewards: [RewardLog] {
-        Array((rewardBank?.logs ?? []).prefix(Self.recentRewardCount))
-    }
-
-    var rewardGoal: RewardGoal? {
-        rewardBank?.waitingGoals.first
-    }
-
-    var isRewardGoalReached: Bool {
-        rewardGoal.map { remaining(to: $0) == 0 } ?? false
-    }
-
-    var rewardRules: [RewardRule] {
-        rewardBank?.activeRules ?? []
-    }
-
-    var waitingGoals: [RewardGoal] {
-        rewardBank?.waitingGoals ?? []
-    }
-
-    var boughtGoals: [RewardGoal] {
-        rewardBank?.boughtGoals ?? []
-    }
-
-    var rewardHistory: [RewardMonth] {
-        var months: [RewardMonth] = []
-
-        for log in rewardBank?.logs ?? [] {
-            let month = log.date.yearMonth
-
-            if let last = months.last, last.month == month {
-                months[months.count - 1] = RewardMonth(
-                    month: month,
-                    logs: last.logs + [log]
-                )
-            } else {
-                months.append(RewardMonth(month: month, logs: [log]))
-            }
-        }
-
-        return months
-    }
-
-    func remaining(to goal: RewardGoal) -> Int {
-        rewardBank?.remaining(to: goal) ?? goal.targetAmount
-    }
-
-    func progress(to goal: RewardGoal) -> Double {
-        rewardBank?.progress(to: goal) ?? 0
-    }
-
-    func percent(to goal: RewardGoal) -> Int {
-        rewardBank?.percent(to: goal) ?? 0
-    }
-
-    func goalEditModel(editing goal: RewardGoal?) -> AssetsGoalEditModel {
-        AssetsGoalEditModel(database: database, editing: goal)
-    }
-
-    @discardableResult
-    func setPurchased(
-        _ id: RewardGoal.ID,
-        isPurchased: Bool
-    ) async -> Bool {
-        do {
-            try await database.setRewardGoalPurchased(
-                id,
-                isPurchased: isPurchased,
-                at: Date()
-            )
-
-            return true
-        } catch {
-            errorNotice.show(Self.goalFailedMessage)
-            return false
-        }
-    }
-
-    func rewardRule(for log: RewardLog) -> RewardRule? {
-        rewardBank?.rule(for: log)
-    }
-
-    func rewardIcon(for rule: RewardRule) -> Icon? {
-        rewardBank?.icon(for: rule)
     }
 
     func run() async {
@@ -358,8 +198,6 @@ public extension AssetsModel {
 
 private extension AssetsModel {
     static let loadFailedMessage = "残高を読めませんでした"
-    static let recentRewardCount = 3
-    static let goalFailedMessage = "目標を保存できませんでした"
     static let billTitle = "引き落とし"
 
     var wallets: [Wallet] {
@@ -407,8 +245,10 @@ private extension AssetsModel {
         }
 
         let repaid = loanAmount - max(-balance, 0)
+        let ratio = Double(repaid) / Double(loanAmount)
+        let lower = max(ratio, 0)
 
-        return min(max(Double(repaid) / Double(loanAmount), 0), 1)
+        return min(lower, 1)
     }
 
     func repayment(of wallet: Wallet) -> Repayment? {

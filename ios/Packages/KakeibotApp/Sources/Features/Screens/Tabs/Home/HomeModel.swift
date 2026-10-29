@@ -54,70 +54,6 @@ public extension HomeModel {
         )
     }
 
-    var month: YearMonth {
-        overview.month
-    }
-
-    var period: ClosedRange<LocalDate> {
-        overview.period
-    }
-
-    var monthRangeText: String {
-        PeriodText.range(period)
-    }
-
-    var monthExpense: Int {
-        overview.monthExpense
-    }
-
-    var periodRecurrings: [PeriodRecurring] {
-        overview.periodRecurrings
-    }
-
-    var recurringExpense: Int {
-        overview.recurringExpense
-    }
-
-    var recurringIncome: Int {
-        overview.recurringIncome
-    }
-
-    var paidRecurringExpense: Int {
-        overview.paidRecurringExpense
-    }
-
-    var upcomingRecurringExpense: Int {
-        overview.upcomingRecurringExpense
-    }
-
-    var paidRecurringRatio: Double {
-        overview.paidRecurringRatio
-    }
-
-    var monthIncome: Int {
-        overview.monthIncome
-    }
-
-    var todayExpense: Int {
-        overview.todayExpense
-    }
-
-    var yesterdayExpense: Int {
-        overview.yesterdayExpense
-    }
-
-    var middleTitle: String {
-        budgetUsage == nil ? "昨日" : "今月の支出"
-    }
-
-    var middleAmount: Int {
-        budgetUsage == nil ? yesterdayExpense : monthExpense
-    }
-
-    var budgetUsage: BudgetUsage? {
-        overview.budgetUsage
-    }
-
     var templates: [EntryTemplate] {
         let shown = allTemplates.filter { $0.type == templateType }
 
@@ -143,7 +79,9 @@ public extension HomeModel {
                     return rows
                 }
 
-                rows.append(EntryRowItem(entry, in: list, dayLabel: label))
+                let row = EntryRowItem(entry, in: list, dayLabel: label)
+
+                rows.append(row)
             }
         }
 
@@ -159,10 +97,13 @@ public extension HomeModel {
             return []
         }
 
+        let wallets = Array(list.wallets.values)
+        let entries = list.days.flatMap(\.entries)
+
         return CardBill.upcoming(
             recurrings: recurrings,
-            wallets: Array(list.wallets.values),
-            entries: list.days.flatMap(\.entries),
+            wallets: wallets,
+            entries: entries,
             valuations: list.valuations,
             after: today
         )
