@@ -31,7 +31,10 @@ public struct IconImage: View {
 
 private extension IconImage {
     var textSize: CGFloat {
-        guard icon?.emoji == nil, let text = icon?.text else {
+        guard
+            icon?.emoji == nil,
+            let text = icon?.text
+        else {
             return size
         }
 

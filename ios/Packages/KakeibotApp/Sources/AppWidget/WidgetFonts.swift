@@ -2,6 +2,12 @@ import CoreText
 import Foundation
 
 public enum WidgetFonts {
+    private static let fileNames = [
+        "KleeOne-Regular.ttf",
+        "DotGothic16-Regular.ttf",
+        "HachiMaruPop-Regular.ttf"
+    ]
+
     public static func register() {
         let appURL = Bundle.main.bundleURL
             .deletingLastPathComponent()
@@ -12,12 +18,4 @@ public enum WidgetFonts {
             CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
         }
     }
-}
-
-private extension WidgetFonts {
-    static let fileNames = [
-        "KleeOne-Regular.ttf",
-        "DotGothic16-Regular.ttf",
-        "HachiMaruPop-Regular.ttf"
-    ]
 }

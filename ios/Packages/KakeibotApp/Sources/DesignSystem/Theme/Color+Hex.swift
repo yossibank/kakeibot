@@ -12,7 +12,8 @@ public extension Color {
         UIColor(self).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
 
         let values = [red, green, blue].map { value in
-            Int((min(max(value, 0), 1) * 255).rounded())
+            let clamped = min(max(value, 0), 1)
+            return Int((clamped * 255).rounded())
         }
 
         return "#" + values.map { String(format: "%02X", $0) }.joined()
@@ -21,7 +22,10 @@ public extension Color {
     init?(hex: String) {
         let digits = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
 
-        guard digits.count == 6, let value = UInt32(digits, radix: 16) else {
+        guard
+            digits.count == 6,
+            let value = UInt32(digits, radix: 16)
+        else {
             return nil
         }
 
@@ -34,12 +38,14 @@ extension Color {
         let red = Double((value >> 16) & 0xFF) / 255
         let green = Double((value >> 8) & 0xFF) / 255
         let blue = Double(value & 0xFF) / 255
+
         self.init(red: red, green: green, blue: blue)
     }
 
     init(semantic: ThemePalette.Semantic) {
         let color = UIColor { traits in
-            UIColor(rgb: traits[PaletteTrait.self].color(semantic))
+            let rgb = traits[PaletteTrait.self].color(semantic)
+            return UIColor(rgb: rgb)
         }
 
         self.init(uiColor: color)
@@ -53,6 +59,7 @@ extension Color {
             let rgb = traits[PaletteTrait.self][keyPath: role]
             let isLight = traits.userInterfaceStyle == .light
             let alpha = isLight ? lightOpacity : 1
+
             return UIColor(rgb: rgb).withAlphaComponent(alpha)
         }
 

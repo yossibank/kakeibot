@@ -21,8 +21,10 @@ public struct Keypad: View {
     }
 
     public var body: some View {
+        let rows = Array(Self.rows.enumerated())
+
         Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-            ForEach(Array(Self.rows.enumerated()), id: \.offset) { _, row in
+            ForEach(rows, id: \.offset) { _, row in
                 GridRow {
                     ForEach(row, id: \.self) { key in
                         button(for: key)
@@ -35,10 +37,6 @@ public struct Keypad: View {
 }
 
 private extension Keypad {
-    var showsDone: Bool {
-        onDone != nil && !calculator.hasOperation
-    }
-
     func button(for key: AmountCalculator.Key) -> some View {
         let isActive = key == calculator.taxNote.map { .tax($0.rate) }
 
@@ -53,10 +51,7 @@ private extension Keypad {
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: corner.radius(16))
-                        .stroke(
-                            Self.stroke(for: key, isActive: isActive),
-                            lineWidth: 0.75
-                        )
+                        .stroke(Self.stroke(for: key, isActive: isActive), lineWidth: 0.75)
                 }
                 .contentShape(.rect)
         }
@@ -90,6 +85,7 @@ private extension Keypad {
                 .foregroundStyle(Palette.text)
         case let .tax(rate):
             let labelColor = isActive ? Palette.accent : Palette.subtext
+            let valueColor = isActive ? Palette.accentStrong : Palette.text
 
             VStack(spacing: 0) {
                 Text("税込")
@@ -104,7 +100,7 @@ private extension Keypad {
                     Text("%")
                         .displayFont(.caption)
                 }
-                .foregroundStyle(isActive ? Palette.accentStrong : Palette.text)
+                .foregroundStyle(valueColor)
             }
         case let .operation(operation):
             Text(operation.symbol)
@@ -128,16 +124,6 @@ private extension Keypad {
             .displayFont(.title)
             .foregroundStyle(Palette.text)
     }
-
-    func press(_ key: AmountCalculator.Key) {
-        if key == .equals,
-           showsDone,
-           let onDone {
-            onDone()
-        } else {
-            onKey(key)
-        }
-    }
 }
 
 private extension Keypad {
@@ -150,6 +136,10 @@ private extension Keypad {
         [.digit(7), .digit(8), .digit(9), .operation(.add)],
         [.doubleZero, .digit(0), .tripleZero, .equals]
     ]
+
+    var showsDone: Bool {
+        onDone != nil && !calculator.hasOperation
+    }
 
     static func background(
         for key: AmountCalculator.Key,
@@ -173,6 +163,16 @@ private extension Keypad {
         default: Color.clear
         }
     }
+
+    func press(_ key: AmountCalculator.Key) {
+        if key == .equals,
+           showsDone,
+           let onDone {
+            onDone()
+        } else {
+            onKey(key)
+        }
+    }
 }
 
 public extension AmountCalculator.Operation {
@@ -187,7 +187,9 @@ public extension AmountCalculator.Operation {
 }
 
 #Preview {
-    Keypad(calculator: AmountCalculator(amount: 1280)) { _ in }
+    let calculator = AmountCalculator(amount: 1280)
+
+    Keypad(calculator: calculator) { _ in }
         .padding()
         .background(Palette.background)
 }

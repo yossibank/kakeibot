@@ -42,7 +42,11 @@ struct SnapshotTests {
                     .frame(width: size.width, height: size.height)
                     .background(Color(white: 0.97))
 
-                try Self.write(view, to: "quick-\(name)-\(Int(size.width))x\(Int(size.height)).png")
+                let width = Int(size.width)
+                let height = Int(size.height)
+                let fileName = "quick-\(name)-\(width)x\(height).png"
+
+                try Self.write(view, to: fileName)
             }
         }
     }
@@ -79,18 +83,21 @@ private extension SnapshotTests {
 
     static func quickCases() -> [(String, QuickRecordWidgetSummary)] {
         let sample = QuickRecordWidgetSummary.sample()
+        let until = Date().addingTimeInterval(60)
+
+        let recorded = QuickRecordWidgetSummary.Recorded(
+            id: Entry.ID(),
+            name: "ランチ",
+            amount: 980,
+            until: until
+        )
 
         let undo = QuickRecordWidgetSummary(
             todayExpense: sample.todayExpense,
             tiles: sample.tiles,
             todayRecords: sample.todayRecords,
             todayCount: sample.todayCount,
-            recorded: QuickRecordWidgetSummary.Recorded(
-                id: Entry.ID(),
-                name: "ランチ",
-                amount: 980,
-                until: Date().addingTimeInterval(60)
-            )
+            recorded: recorded
         )
 
         return [("normal", sample), ("undo", undo)]
@@ -137,7 +144,9 @@ private extension SnapshotTests {
         _ family: WidgetFamily,
         _ size: CGSize
     ) -> Shape {
-        Shape(name: name, size: size, background: Color(white: 0.97)) { entry in
+        let background = Color(white: 0.97)
+
+        return Shape(name: name, size: size, background: background) { entry in
             AnyView(BudgetWidgetView(entry: entry, family: family))
         }
     }
@@ -147,7 +156,9 @@ private extension SnapshotTests {
         _ family: WidgetFamily,
         _ size: CGSize
     ) -> Shape {
-        Shape(name: name, size: size, background: Color(white: 0.2)) { entry in
+        let background = Color(white: 0.2)
+
+        return Shape(name: name, size: size, background: background) { entry in
             AnyView(
                 BudgetLockWidgetView(entry: entry, family: family)
                     .environment(\.colorScheme, .dark)

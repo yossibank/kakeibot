@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct DialTicks: Shape {
+public struct DialTicks {
     let count: Int
     let length: CGFloat
 
@@ -11,7 +11,21 @@ public struct DialTicks: Shape {
         self.count = count
         self.length = length
     }
+}
 
+private extension DialTicks {
+    static func point(
+        from center: CGPoint,
+        at angle: Double,
+        radius: CGFloat
+    ) -> CGPoint {
+        let x = center.x + sin(angle) * radius
+        let y = center.y - cos(angle) * radius
+        return CGPoint(x: x, y: y)
+    }
+}
+
+extension DialTicks: Shape {
     public func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let outer = min(rect.width, rect.height) / 2
@@ -27,18 +41,6 @@ public struct DialTicks: Shape {
                 path.addLine(to: end)
             }
         }
-    }
-}
-
-private extension DialTicks {
-    static func point(
-        from center: CGPoint,
-        at angle: Double,
-        radius: CGFloat
-    ) -> CGPoint {
-        let x = center.x + sin(angle) * radius
-        let y = center.y - cos(angle) * radius
-        return CGPoint(x: x, y: y)
     }
 }
 

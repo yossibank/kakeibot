@@ -14,6 +14,7 @@ public struct SearchField: View {
         onSubmit: @escaping () -> Void = {}
     ) {
         _text = text
+
         self.prompt = prompt
         self.focus = focus
         self.onSubmit = onSubmit
@@ -62,11 +63,7 @@ public struct SearchField: View {
     @Previewable @State var text = "コンビニ"
     @Previewable @FocusState var isFocused: Bool
 
-    SearchField(
-        "名前で探す",
-        text: $text,
-        focus: $isFocused
-    )
-    .padding()
-    .background(Palette.background)
+    SearchField("名前で探す", text: $text, focus: $isFocused)
+        .padding()
+        .background(Palette.background)
 }

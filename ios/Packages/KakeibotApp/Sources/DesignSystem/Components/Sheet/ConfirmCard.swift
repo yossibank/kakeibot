@@ -69,64 +69,7 @@ public extension ConfirmCard {
     }
 }
 
-public extension View {
-    func confirmation(
-        isPresented: Binding<Bool>,
-        systemImage: String,
-        title: String,
-        message: String? = nil,
-        keepTitle: String,
-        confirmTitle: String,
-        alternateTitle: String? = nil,
-        role: ConfirmCard.Role = .destructive,
-        onKeep: @escaping () -> Void = {},
-        onAlternate: @escaping () -> Void = {},
-        onConfirm: @escaping () -> Void
-    ) -> some View {
-        overlay {
-            if isPresented.wrappedValue {
-                ConfirmCard(
-                    systemImage: systemImage,
-                    title: title,
-                    message: message,
-                    keepTitle: keepTitle,
-                    confirmTitle: confirmTitle,
-                    alternateTitle: alternateTitle,
-                    role: role,
-                    onConfirm: {
-                        isPresented.wrappedValue = false
-                        onConfirm()
-                    },
-                    onAlternate: {
-                        isPresented.wrappedValue = false
-                        onAlternate()
-                    },
-                    onKeep: {
-                        isPresented.wrappedValue = false
-                        onKeep()
-                    }
-                )
-            }
-        }
-        .animation(.snappy(duration: 0.25), value: isPresented.wrappedValue)
-        .sensoryFeedback(
-            role == .destructive ? .warning : .selection,
-            trigger: isPresented.wrappedValue
-        ) { _, new in
-            new
-        }
-    }
-}
-
 private extension ConfirmCard {
-    static var filledFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accentStrong, Palette.accent],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
     var card: some View {
         VStack(spacing: 20) {
             VStack(spacing: 12) {
@@ -136,10 +79,7 @@ private extension ConfirmCard {
                     .frame(width: 52, height: 52)
                     .overlay {
                         Circle()
-                            .stroke(
-                                Palette.accent.opacity(.medium),
-                                lineWidth: 0.8
-                            )
+                            .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
                     }
 
                 Text(title)
@@ -161,16 +101,10 @@ private extension ConfirmCard {
             VStack(spacing: 12) {
                 if let alternateTitle {
                     filledButton(alternateTitle, action: onAlternate)
-                    outlinedButton(
-                        confirmTitle,
-                        color: Palette.rose,
-                        action: onConfirm
-                    )
-                    outlinedButton(
-                        keepTitle,
-                        color: Palette.subtext,
-                        action: onKeep
-                    )
+
+                    outlinedButton(confirmTitle, color: Palette.rose, action: onConfirm)
+
+                    outlinedButton(keepTitle, color: Palette.subtext, action: onKeep)
                 } else {
                     twoChoices
                 }
@@ -192,18 +126,12 @@ private extension ConfirmCard {
         switch role {
         case .destructive:
             filledButton(keepTitle, action: onKeep)
-            outlinedButton(
-                confirmTitle,
-                color: Palette.rose,
-                action: onConfirm
-            )
+
+            outlinedButton(confirmTitle, color: Palette.rose, action: onConfirm)
         case .suggestion:
             filledButton(confirmTitle, action: onConfirm)
-            outlinedButton(
-                keepTitle,
-                color: Palette.subtext,
-                action: onKeep
-            )
+
+            outlinedButton(keepTitle, color: Palette.subtext, action: onKeep)
         }
     }
 
@@ -236,6 +164,64 @@ private extension ConfirmCard {
                         .stroke(color.opacity(.medium), lineWidth: 1)
                 }
                 .contentShape(Capsule())
+        }
+    }
+}
+
+private extension ConfirmCard {
+    static var filledFill: LinearGradient {
+        LinearGradient(
+            colors: [Palette.accentStrong, Palette.accent],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+}
+
+public extension View {
+    func confirmation(
+        isPresented: Binding<Bool>,
+        systemImage: String,
+        title: String,
+        message: String? = nil,
+        keepTitle: String,
+        confirmTitle: String,
+        alternateTitle: String? = nil,
+        role: ConfirmCard.Role = .destructive,
+        onKeep: @escaping () -> Void = {},
+        onAlternate: @escaping () -> Void = {},
+        onConfirm: @escaping () -> Void
+    ) -> some View {
+        let feedback: SensoryFeedback = role == .destructive ? .warning : .selection
+
+        return overlay {
+            if isPresented.wrappedValue {
+                ConfirmCard(
+                    systemImage: systemImage,
+                    title: title,
+                    message: message,
+                    keepTitle: keepTitle,
+                    confirmTitle: confirmTitle,
+                    alternateTitle: alternateTitle,
+                    role: role,
+                    onConfirm: {
+                        isPresented.wrappedValue = false
+                        onConfirm()
+                    },
+                    onAlternate: {
+                        isPresented.wrappedValue = false
+                        onAlternate()
+                    },
+                    onKeep: {
+                        isPresented.wrappedValue = false
+                        onKeep()
+                    }
+                )
+            }
+        }
+        .animation(.snappy(duration: 0.25), value: isPresented.wrappedValue)
+        .sensoryFeedback(feedback, trigger: isPresented.wrappedValue) { _, new in
+            new
         }
     }
 }

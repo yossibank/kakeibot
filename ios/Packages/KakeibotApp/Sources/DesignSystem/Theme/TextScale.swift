@@ -7,7 +7,10 @@ public enum TextScale {
         available: CGFloat,
         needed: CGFloat
     ) -> Double {
-        guard needed > 0, available.isFinite else {
+        guard
+            needed > 0,
+            available.isFinite
+        else {
             return 1
         }
 

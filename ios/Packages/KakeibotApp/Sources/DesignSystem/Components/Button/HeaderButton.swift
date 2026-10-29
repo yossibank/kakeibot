@@ -87,15 +87,9 @@ private extension HeaderButton {
 
 #Preview {
     HStack(spacing: 24) {
-        HeaderButton(
-            systemImage: "gearshape",
-            showsDot: true
-        ) {}
+        HeaderButton(systemImage: "gearshape", showsDot: true) {}
 
-        HeaderButton(
-            systemImage: "arrow.left.arrow.right",
-            title: "振替"
-        ) {}
+        HeaderButton(systemImage: "arrow.left.arrow.right", title: "振替") {}
     }
     .padding()
     .background(Palette.background)

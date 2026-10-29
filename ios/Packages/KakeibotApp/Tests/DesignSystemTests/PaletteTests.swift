@@ -8,9 +8,7 @@ struct PaletteTests {
     @Test
     func usesWhiteByDefault() {
         let environment = EnvironmentValues()
-
         let accent = Palette.accent.resolve(in: environment)
-
         #expect(rgb(accent) == ThemePreset.white.palette.accent)
     }
 

@@ -2,11 +2,9 @@ import Core
 import SwiftUI
 import UIKit
 
-struct PaletteKey: EnvironmentKey {
+struct PaletteKey: EnvironmentKey, UITraitBridgedEnvironmentKey {
     static let defaultValue = ThemePreset.white.palette
-}
 
-extension PaletteKey: UITraitBridgedEnvironmentKey {
     static func read(from traitCollection: UITraitCollection) -> ThemePalette {
         traitCollection[PaletteTrait.self]
     }

@@ -25,10 +25,12 @@ public extension View {
     }
 }
 
-private struct DismissAttemptReader: UIViewControllerRepresentable {
+private struct DismissAttemptReader {
     let isChanged: Bool
     let onAttempt: () -> Void
+}
 
+extension DismissAttemptReader: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> DismissAttemptController {
         DismissAttemptController()
     }
@@ -59,7 +61,6 @@ final class DismissAttemptController: UIViewController {
         }
 
         original = presentation.delegate
-
         presentation.delegate = self
     }
 

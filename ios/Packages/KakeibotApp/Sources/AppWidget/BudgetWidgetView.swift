@@ -18,13 +18,9 @@ struct BudgetWidgetView: View {
 }
 
 private extension BudgetWidgetView {
-    struct Row: Identifiable {
+    struct Row {
         let title: String
         let amount: Int
-
-        var id: String {
-            title
-        }
     }
 
     @ViewBuilder
@@ -254,5 +250,11 @@ private extension BudgetWidgetView {
         let title = "\(next.title) \(next.date.month)/\(next.date.day)"
 
         return spending + [Row(title: title, amount: next.amount)]
+    }
+}
+
+extension BudgetWidgetView.Row: Identifiable {
+    var id: String {
+        title
     }
 }

@@ -118,11 +118,6 @@ private extension TemplateCardSize {
         weight: Font.Weight,
         in style: ThemeStyle
     ) -> Font {
-        .display(
-            size,
-            weight: weight,
-            in: style.displayFont,
-            scale: style.textSize.scale
-        )
+        .display(size, weight: weight, in: style.displayFont, scale: style.textSize.scale)
     }
 }

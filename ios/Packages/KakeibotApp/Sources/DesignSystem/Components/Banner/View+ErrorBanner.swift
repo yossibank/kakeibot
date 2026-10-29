@@ -25,14 +25,10 @@ private struct ErrorBanner: ViewModifier {
         content
             .overlay(alignment: .bottom) {
                 if let message = notice.message {
-                    NoticeBanner(
-                        message,
-                        systemImage: "exclamationmark",
-                        tone: .error
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, bottom)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    NoticeBanner(message, systemImage: "exclamationmark", tone: .error)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, bottom)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
             .animation(.snappy, value: notice.message)

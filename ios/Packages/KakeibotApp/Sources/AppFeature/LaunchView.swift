@@ -160,6 +160,10 @@ private struct RingSweep: Shape {
     func path(in rect: CGRect) -> Path {
         let start = min(max(progress - length, 0), 1)
         let end = min(max(progress, 0), 1)
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+        let startAngle = Angle.degrees(360 * start - 90)
+        let endAngle = Angle.degrees(360 * end - 90)
 
         var path = Path()
 
@@ -168,10 +172,10 @@ private struct RingSweep: Shape {
         }
 
         path.addArc(
-            center: CGPoint(x: rect.midX, y: rect.midY),
-            radius: min(rect.width, rect.height) / 2,
-            startAngle: .degrees(360 * start - 90),
-            endAngle: .degrees(360 * end - 90),
+            center: center,
+            radius: radius,
+            startAngle: startAngle,
+            endAngle: endAngle,
             clockwise: false
         )
 

@@ -13,15 +13,21 @@ public struct PageDots: View {
     }
 
     public var body: some View {
+        let opacity: Double = count > 1 ? 1 : 0
+
         HStack(spacing: 8) {
             ForEach(0..<count, id: \.self) { index in
+                let isCurrent = index == current
+                let fill = isCurrent ? Palette.accent : Palette.line
+                let width: CGFloat = isCurrent ? 16 : 6
+
                 Capsule()
-                    .fill(index == current ? Palette.accent : Palette.line)
-                    .frame(width: index == current ? 16 : 6, height: 6)
+                    .fill(fill)
+                    .frame(width: width, height: 6)
             }
         }
         .animation(.easeOut(duration: 0.2), value: current)
-        .opacity(count > 1 ? 1 : 0)
+        .opacity(opacity)
     }
 }
 

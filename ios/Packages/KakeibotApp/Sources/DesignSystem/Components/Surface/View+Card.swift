@@ -14,10 +14,7 @@ private struct CardBackground: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .background(
-                Palette.card,
-                in: .rect(cornerRadius: corner.radius(cornerRadius))
-            )
+            .background(Palette.card, in: .rect(cornerRadius: corner.radius(cornerRadius)))
             .overlay {
                 RoundedRectangle(cornerRadius: corner.radius(cornerRadius))
                     .strokeBorder(Palette.accent.opacity(.muted), lineWidth: 1)

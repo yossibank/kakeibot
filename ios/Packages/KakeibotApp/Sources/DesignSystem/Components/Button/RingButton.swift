@@ -82,9 +82,7 @@ private extension RingButton {
     }
 
     var fill: Color {
-        isEnabled && style == .prominent
-            ? Palette.accent.opacity(.subtle)
-            : Color.clear
+        isEnabled && style == .prominent ? Palette.accent.opacity(.subtle) : Color.clear
     }
 }
 
@@ -122,18 +120,11 @@ private extension RingButton.Size {
     HStack(spacing: 24) {
         RingButton(systemImage: "xmark") {}
 
-        RingButton(
-            systemImage: "xmark",
-            size: .small
-        ) {}
+        RingButton(systemImage: "xmark", size: .small) {}
 
         RingButton(systemImage: "checkmark", style: .prominent) {}
 
-        RingButton(
-            systemImage: "trash",
-            style: .destructive,
-            label: "削除"
-        ) {}
+        RingButton(systemImage: "trash", style: .destructive, label: "削除") {}
     }
     .padding()
     .background(Palette.background)

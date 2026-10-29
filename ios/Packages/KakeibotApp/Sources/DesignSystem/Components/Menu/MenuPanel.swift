@@ -31,11 +31,7 @@ public struct MenuPanel<Content: View>: View {
 
 #Preview {
     MenuPanel(width: 236) {
-        MenuRow(
-            "並べた順",
-            systemImage: "line.3.horizontal",
-            isSelected: true
-        ) {}
+        MenuRow("並べた順", systemImage: "line.3.horizontal", isSelected: true) {}
 
         MenuDivider()
 

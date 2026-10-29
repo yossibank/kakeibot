@@ -23,7 +23,6 @@ private struct TextScaleKey: PreferenceKey {
         nextValue: () -> TextScaleReport
     ) {
         let next = nextValue()
-
         value.scale = min(value.scale, next.scale)
         value.epoch = max(value.epoch, next.epoch)
     }
@@ -96,10 +95,7 @@ private struct SharedTextScale: ViewModifier {
                     needed = width
                 }
         }
-        .preference(
-            key: TextScaleKey.self,
-            value: TextScaleReport(scale: scale, epoch: epoch)
-        )
+        .preference(key: TextScaleKey.self, value: TextScaleReport(scale: scale, epoch: epoch))
     }
 }
 

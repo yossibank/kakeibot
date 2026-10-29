@@ -37,7 +37,8 @@ public struct EntryRow: View {
     public var body: some View {
         HStack(spacing: 12) {
             Group {
-                if icon == nil, type == .transfer {
+                if icon == nil,
+                   type == .transfer {
                     Image(systemName: "arrow.left.arrow.right")
                         .sansFont(.small, weight: .light)
                         .frame(width: 21, height: 21)
@@ -136,6 +137,8 @@ public extension EntryRow {
         updatedAt: now
     )
 
+    let route = EntryRow.Route(source: "三井住友銀行 普通預金", destination: "楽天ペイ チャージ用")
+
     VStack(spacing: 0) {
         EntryRow(
             icon: food,
@@ -160,10 +163,7 @@ public extension EntryRow {
             icon: nil,
             title: "振替",
             detail: nil,
-            route: EntryRow.Route(
-                source: "三井住友銀行 普通預金",
-                destination: "楽天ペイ チャージ用"
-            ),
+            route: route,
             amount: 20000,
             type: .transfer
         )

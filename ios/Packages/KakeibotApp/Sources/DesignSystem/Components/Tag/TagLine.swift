@@ -21,9 +21,11 @@ public struct TagLine<ID: Hashable & Sendable>: View {
         onEdit: (() -> Void)? = nil,
         onMove: ((ID, Int) -> Void)? = nil
     ) {
+        let selections = Set([selection].compactMap(\.self))
+
         self.init(
             tags,
-            selection: Set([selection].compactMap(\.self)),
+            selection: selections,
             onSelect: onSelect,
             onAdd: onAdd,
             onEdit: onEdit,
@@ -48,12 +50,11 @@ public struct TagLine<ID: Hashable & Sendable>: View {
     }
 
     public var body: some View {
+        let indexedCards = Array(cards.enumerated())
+
         ScrollView(.horizontal) {
             HStack(spacing: 0) {
-                ForEach(
-                    Array(cards.enumerated()),
-                    id: \.element.id
-                ) { index, card in
+                ForEach(indexedCards, id: \.element.id) { index, card in
                     if index > 0 {
                         Spacer(minLength: Self.spacing)
                     }
@@ -117,38 +118,20 @@ extension TagLine {
     }
 }
 
-public struct TagLineMovingKey: PreferenceKey {
-    public static let defaultValue = false
-
-    public static func reduce(
-        value: inout Bool,
-        nextValue: () -> Bool
-    ) {
-        value = value || nextValue()
-    }
-}
-
 private extension TagLine {
     @ViewBuilder
     var liftedCard: some View {
-        if let lift, let frame = frames[lift.id] {
+        if let lift,
+           let frame = frames[lift.id] {
             let index = cards.firstIndex { $0.tagId == lift.id } ?? 0
             let item = tags.first { $0.id == lift.id }
 
             if let item {
                 face(.tag(item), at: index, tilt: 0)
                     .scaleEffect(1.12, anchor: .top)
-                    .shadow(
-                        color: Palette.shadow.opacity(0.5),
-                        radius: 10,
-                        y: 6
-                    )
+                    .shadow(color: Palette.shadow.opacity(0.5), radius: 10, y: 6)
                     .padding(.top, Self.inset)
-                    .frame(
-                        width: frame.width,
-                        height: frame.height,
-                        alignment: .top
-                    )
+                    .frame(width: frame.width, height: frame.height, alignment: .top)
                     .position(x: lift.start + lift.translation, y: frame.midY)
                     .allowsHitTesting(false)
             }
@@ -161,9 +144,10 @@ private extension TagLine {
     ) -> some View {
         let isLifted = card.tagId != nil && card.tagId == lift?.id
         let tilt = isSelected(card) ? 0 : Self.tilts[index % Self.tilts.count]
+        let opacity: Double = isLifted ? 0 : 1
 
         return face(card, at: index, tilt: tilt)
-            .opacity(isLifted ? 0 : 1)
+            .opacity(opacity)
             .padding(.top, Self.inset)
             .contentShape(.rect)
             .onGeometryChange(for: CGRect.self) { proxy in
@@ -322,7 +306,10 @@ private extension TagLine {
         _ card: Card,
         to x: CGFloat
     ) {
-        guard canMove(card), let id = card.tagId else {
+        guard
+            canMove(card),
+            let id = card.tagId
+        else {
             return
         }
 
@@ -330,12 +317,7 @@ private extension TagLine {
             let start = frames[id]?.midX ?? 0
 
             withAnimation(.snappy(duration: 0.2)) {
-                lift = Lift(
-                    id: id,
-                    start: start,
-                    origin: x,
-                    translation: 0
-                )
+                lift = Lift(id: id, start: start, origin: x, translation: 0)
             }
 
             liftCount += 1
@@ -343,7 +325,10 @@ private extension TagLine {
 
         lift?.translation = x - (lift?.origin ?? x)
 
-        guard let lift, let onMove else {
+        guard
+            let lift,
+            let onMove
+        else {
             return
         }
 
@@ -359,6 +344,17 @@ private extension TagLine {
         withAnimation(.snappy) {
             onMove(id, target)
         }
+    }
+}
+
+public struct TagLineMovingKey: PreferenceKey {
+    public static let defaultValue = false
+
+    public static func reduce(
+        value: inout Bool,
+        nextValue: () -> Bool
+    ) {
+        value = value || nextValue()
     }
 }
 
@@ -391,8 +387,7 @@ private struct TagString: Shape {
             names.insert(id, at: index)
         }
 
-        TagLine<String>([], selection: nil) { _ in
-        } onAdd: {}
+        TagLine<String>([], selection: nil) { _ in } onAdd: {}
     }
     .padding()
     .background(Palette.background)

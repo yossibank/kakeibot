@@ -21,14 +21,6 @@ public struct SheetTitle: View {
 }
 
 private extension SheetTitle {
-    static let tracking: CGFloat = 4
-    static let wrappedTracking: CGFloat = 2
-    static let wrappedScale: CGFloat = 0.6
-
-    var wrapped: String {
-        text.replacingOccurrences(of: "を", with: "を\n")
-    }
-
     func label(
         _ text: String,
         tracking: CGFloat
@@ -38,5 +30,15 @@ private extension SheetTitle {
             .tracking(tracking)
             .multilineTextAlignment(.center)
             .foregroundStyle(Palette.accent)
+    }
+}
+
+private extension SheetTitle {
+    static let tracking: CGFloat = 4
+    static let wrappedTracking: CGFloat = 2
+    static let wrappedScale: CGFloat = 0.6
+
+    var wrapped: String {
+        text.replacingOccurrences(of: "を", with: "を\n")
     }
 }

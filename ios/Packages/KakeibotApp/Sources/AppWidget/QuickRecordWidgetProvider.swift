@@ -17,7 +17,8 @@ struct QuickRecordWidgetProvider: TimelineProvider {
         Task {
             let now = Date()
             let timeline = await Self.timeline(at: now, isPreview: isPreview)
-            completion(timeline.entries.first ?? .sample(at: now))
+            let entry = timeline.entries.first ?? .sample(at: now)
+            completion(entry)
         }
     }
 
@@ -28,7 +29,8 @@ struct QuickRecordWidgetProvider: TimelineProvider {
         let isPreview = context.isPreview
 
         Task {
-            await completion(Self.timeline(at: Date(), isPreview: isPreview))
+            let timeline = await Self.timeline(at: Date(), isPreview: isPreview)
+            completion(timeline)
         }
     }
 }
@@ -76,9 +78,11 @@ private extension QuickRecordWidgetProvider {
         ]
 
         if let recorded = summary.recorded(at: now) {
+            let clearedSummary = summary.clearingRecorded()
+
             let cleared = QuickRecordWidgetEntry(
                 date: recorded.until,
-                summary: summary.clearingRecorded(),
+                summary: clearedSummary,
                 look: look,
                 style: style
             )
@@ -90,8 +94,11 @@ private extension QuickRecordWidgetProvider {
             return Timeline(entries: entries, policy: .never)
         }
 
+        let nextDay = today.adding(days: 1)
+        let nextOverview = overview.moved(to: nextDay)
+
         let tomorrow = QuickRecordWidgetSummary(
-            overview.moved(to: today.adding(days: 1)),
+            nextOverview,
             templates: templates,
             order: order,
             recordedId: nil

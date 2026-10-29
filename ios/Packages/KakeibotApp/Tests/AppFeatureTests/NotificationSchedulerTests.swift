@@ -40,13 +40,9 @@ struct NotificationSchedulerTests {
         let now = Date(timeIntervalSince1970: 1_792_220_400)
         let today = try #require(LocalDate("2026-10-17"))
         let later = try #require(ReminderTime("21:00"))
+        let plan = [Self.reminder(on: today, at: later)]
 
-        await scheduler.apply(
-            [Self.reminder(on: today, at: later)],
-            now: now,
-            timeZone: timeZone
-        )
-
+        await scheduler.apply(plan, now: now, timeZone: timeZone)
         let state = await client.state
 
         #expect(!state.requested)
@@ -92,16 +88,7 @@ struct NotificationSchedulerTests {
 }
 
 extension NotificationSchedulerTests {
-    actor FakeCenter: NotificationCenterClient {
-        struct State {
-            var pending: [String]
-            var added: [String] = []
-            var removed: [String] = []
-            var links: [String] = []
-            var components: [DateComponents] = []
-            var requested = false
-        }
-
+    actor FakeCenter {
         private(set) var state: State
 
         private let status: NotificationAuthorization
@@ -112,35 +99,6 @@ extension NotificationSchedulerTests {
         ) {
             self.state = State(pending: pending)
             self.status = authorization
-        }
-
-        func pendingIdentifiers() async -> [String] {
-            state.pending
-        }
-
-        func add(
-            identifier: String,
-            title: String,
-            body: String,
-            link: String,
-            at components: DateComponents
-        ) async throws {
-            state.added.append(identifier)
-            state.links.append(link)
-            state.components.append(components)
-        }
-
-        func remove(_ identifiers: [String]) async {
-            state.removed += identifiers
-        }
-
-        func authorization() async -> NotificationAuthorization {
-            status
-        }
-
-        func requestAuthorization() async -> Bool {
-            state.requested = true
-            return true
         }
     }
 }
@@ -158,5 +116,47 @@ private extension NotificationSchedulerTests {
             body: "本文",
             route: .entry(date)
         )
+    }
+}
+
+extension NotificationSchedulerTests.FakeCenter {
+    struct State {
+        var pending: [String]
+        var added: [String] = []
+        var removed: [String] = []
+        var links: [String] = []
+        var components: [DateComponents] = []
+        var requested = false
+    }
+}
+
+extension NotificationSchedulerTests.FakeCenter: NotificationCenterClient {
+    func pendingIdentifiers() async -> [String] {
+        state.pending
+    }
+
+    func add(
+        identifier: String,
+        title: String,
+        body: String,
+        link: String,
+        at components: DateComponents
+    ) async throws {
+        state.added.append(identifier)
+        state.links.append(link)
+        state.components.append(components)
+    }
+
+    func remove(_ identifiers: [String]) async {
+        state.removed += identifiers
+    }
+
+    func authorization() async -> NotificationAuthorization {
+        status
+    }
+
+    func requestAuthorization() async -> Bool {
+        state.requested = true
+        return true
     }
 }

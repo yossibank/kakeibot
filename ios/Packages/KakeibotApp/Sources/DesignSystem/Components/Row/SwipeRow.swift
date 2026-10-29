@@ -60,8 +60,10 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
                 .offset(x: offset)
         }
         .mask {
+            let leading = offset == 0 ? -Self.shadowRoom : 0
+
             Rectangle()
-                .padding(.leading, offset == 0 ? -Self.shadowRoom : 0)
+                .padding(.leading, leading)
                 .padding([.vertical, .trailing], -Self.shadowRoom)
         }
         .onGeometryChange(for: CGFloat.self) { proxy in
@@ -70,7 +72,10 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
             self.width = width
         }
         .onChange(of: openId) { _, newId in
-            guard newId != id, offset != 0 else {
+            guard
+                newId != id,
+                offset != 0
+            else {
                 return
             }
 
@@ -78,10 +83,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
                 offset = 0
             }
         }
-        .sensoryFeedback(
-            .impact(weight: .medium),
-            trigger: isPastAction
-        ) { _, isPast in
+        .sensoryFeedback(.impact(weight: .medium), trigger: isPastAction) { _, isPast in
             isPast
         }
     }
@@ -111,10 +113,12 @@ private extension SwipeRow {
     }
 
     var deleteButton: some View {
-        Button {
+        let roseFill = Self.gradient(Palette.rose)
+
+        return Button {
             delete()
         } label: {
-            actionLabel("trash", fill: Self.gradient(Palette.rose))
+            actionLabel("trash", fill: roseFill)
         }
         .buttonStyle(.plain)
         .frame(width: Self.actionWidth - Self.gap)
@@ -200,11 +204,7 @@ private extension SwipeRow {
     }
 
     static func gradient(_ color: Color) -> LinearGradient {
-        LinearGradient(
-            colors: [color, color.opacity(0.78)],
-            startPoint: .top,
-            endPoint: .bottom
-        )
+        LinearGradient(colors: [color, color.opacity(0.78)], startPoint: .top, endPoint: .bottom)
     }
 
     func delete() {
@@ -230,7 +230,8 @@ private extension SwipeRow {
     }
 
     func move(by x: CGFloat) {
-        if openId != nil, !isOpen {
+        if openId != nil,
+           !isOpen {
             openId = nil
         }
 

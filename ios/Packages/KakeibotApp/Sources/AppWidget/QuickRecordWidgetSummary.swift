@@ -52,12 +52,15 @@ extension QuickRecordWidgetSummary {
         let today = list?.days.first { $0.date == overview.today }
 
         let tiles = ordered.prefix(Self.limit).map { template in
-            Tile(
+            let detail = list?.detailParts(for: template).rowDetail ?? ""
+            let icon = list?.icon(for: template)
+
+            return Tile(
                 id: template.id,
                 name: template.name,
-                detail: list?.detailParts(for: template).rowDetail ?? "",
+                detail: detail,
                 amount: template.amount,
-                icon: list?.icon(for: template)
+                icon: icon
             )
         }
 
@@ -68,14 +71,17 @@ extension QuickRecordWidgetSummary {
             let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
             let wallet = list?.wallets[entry.walletId]?.name
             let category = entry.categoryId.flatMap { list?.categories[$0] }
+            let title = list?.title(of: entry) ?? ""
+            let detail = [template?.name ?? memo, wallet].rowDetail ?? ""
+            let icon = category.flatMap { list?.icons[$0.iconId] }
 
             return Record(
                 id: entry.id,
-                title: list?.title(of: entry) ?? "",
-                detail: [template?.name ?? memo, wallet].rowDetail ?? "",
+                title: title,
+                detail: detail,
                 amount: entry.amount,
                 type: entry.type,
-                icon: category.flatMap { list?.icons[$0.iconId] }
+                icon: icon
             )
         }
 
@@ -88,19 +94,21 @@ extension QuickRecordWidgetSummary {
 
         let recorded = entry.map { entry in
             let template = templates.first { $0.id == entry.templateId }
+            let name = template?.name ?? list?.title(of: entry) ?? "記録"
+            let until = entry.createdAt.addingTimeInterval(Self.undoInterval)
 
             return Recorded(
                 id: entry.id,
-                name: template?.name ?? list?.title(of: entry) ?? "記録",
+                name: name,
                 amount: entry.amount,
-                until: entry.createdAt.addingTimeInterval(Self.undoInterval)
+                until: until
             )
         }
 
         self.init(
             todayExpense: overview.todayExpense,
-            tiles: Array(tiles),
-            todayRecords: Array(records),
+            tiles: tiles,
+            todayRecords: records,
             todayCount: todayEntries.count,
             recorded: recorded
         )

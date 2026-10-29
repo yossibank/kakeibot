@@ -22,6 +22,7 @@ final class AppModel {
     private let scheduler: NotificationScheduler
     private let router: NotificationRouter
     private let retryDelays: [Duration]
+
     private var hasStoppedObservation = false
     private var syncEngine: SyncEngine?
 
@@ -186,6 +187,7 @@ extension AppModel {
 
     func syncChanges(in database: AppDatabase) async {
         await syncEngine?.stop()
+
         syncEngine = nil
 
         guard syncActivity.isActive else {
@@ -195,6 +197,7 @@ extension AppModel {
         let engine = SyncEngine(database: database)
 
         syncEngine = engine
+
         await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
 
         await watch(database.syncChangeUpdates()) {
@@ -300,21 +303,4 @@ private extension AppModel {
 struct ObservationID<Base: Hashable>: Hashable {
     let base: Base
     let round: Int
-}
-
-struct ForegroundReturn {
-    private var wasBackground = false
-
-    mutating func receive(_ phase: ScenePhase) -> Bool {
-        switch phase {
-        case .background:
-            wasBackground = true
-            return false
-        case .active:
-            defer { wasBackground = false }
-            return wasBackground
-        default:
-            return false
-        }
-    }
 }
