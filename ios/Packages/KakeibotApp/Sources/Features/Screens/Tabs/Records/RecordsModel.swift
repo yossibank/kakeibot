@@ -10,15 +10,24 @@ public final class RecordsModel: ScreenModel {
     public var today: LocalDate
     public var selectedDate: LocalDate?
     public var isSearching = false
-    public var searchText = ""
-    public var filter = EntryFilter()
     public var isConfirmingDelete = false
+
+    public var searchText = "" {
+        didSet {
+            updateSearch()
+        }
+    }
+
+    public var filter = EntryFilter() {
+        didSet {
+            updateSearch()
+        }
+    }
 
     public private(set) var month: YearMonth
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var weekStart: Weekday = .sunday
     public private(set) var layout: RecordsLayout = .calendar
-    public private(set) var list: EntryList?
     public private(set) var isListFailed = false
     public private(set) var noSpendDays: Set<LocalDate> = []
     public private(set) var stampCalendar: StampCalendar?
@@ -27,6 +36,13 @@ public final class RecordsModel: ScreenModel {
     public private(set) var recurrings: [Recurring] = []
     public private(set) var recentSearches: [String] = []
     public private(set) var pendingDeleteIDs: [Entry.ID] = []
+    public private(set) var searchDays: [EntryDay] = []
+
+    public private(set) var list: EntryList? {
+        didSet {
+            updateSearch()
+        }
+    }
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -43,13 +59,6 @@ public final class RecordsModel: ScreenModel {
 }
 
 public extension RecordsModel {
-    struct SearchSummary: Equatable {
-        public let count: Int
-        public let expenseTotal: Int
-        public let incomeTotal: Int
-        public let range: ClosedRange<LocalDate>
-    }
-
     var period: ClosedRange<LocalDate> {
         month.period(startingOn: monthStartDay)
     }
@@ -74,37 +83,6 @@ public extension RecordsModel {
 
     var incomeTotal: Int {
         days.reduce(0) { $0 + $1.incomeTotal }
-    }
-
-    var searchDays: [EntryDay] {
-        let search = EntrySearch(searchText)
-
-        guard
-            !search.isEmpty,
-            let list
-        else {
-            return []
-        }
-
-        return filter.apply(to: list.days(matching: search))
-    }
-
-    var searchSummary: SearchSummary? {
-        let days = searchDays
-
-        guard
-            let first = days.last?.date,
-            let last = days.first?.date
-        else {
-            return nil
-        }
-
-        return SearchSummary(
-            count: days.reduce(0) { $0 + $1.entries.count },
-            expenseTotal: days.reduce(0) { $0 + $1.expenseTotal },
-            incomeTotal: days.reduce(0) { $0 + $1.incomeTotal },
-            range: first...last
-        )
     }
 
     var filterTitle: String? {
@@ -291,6 +269,20 @@ extension RecordsModel {
 
 private extension RecordsModel {
     static let confirmDeleteThreshold = 10
+
+    func updateSearch() {
+        let search = EntrySearch(searchText)
+
+        guard
+            !search.isEmpty,
+            let list
+        else {
+            searchDays = []
+            return
+        }
+
+        searchDays = filter.apply(to: list.days(matching: search))
+    }
 
     func saveRecentSearches() async {
         do {
