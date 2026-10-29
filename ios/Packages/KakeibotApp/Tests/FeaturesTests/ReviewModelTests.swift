@@ -1,7 +1,9 @@
 import Core
 import Features
 import Foundation
+import Observation
 import Store
+import Synchronization
 import Testing
 import TestSupport
 
@@ -166,6 +168,7 @@ struct ReviewModelTests {
     func cachedMovesStillWatchRecurrings() async throws {
         let setup = try await RecordsModelTests.Setup()
         let now = Date()
+        let notified = Mutex(false)
 
         let wallet = WalletDraft(
             kind: .loan,
@@ -212,13 +215,23 @@ struct ReviewModelTests {
         }
         #expect(model.moves.first?.payoff == nil)
 
+        withObservationTracking {
+            _ = model.moves
+        } onChange: {
+            notified.withLock { $0 = true }
+        }
+
         try await setup.database.saveRecurring(recurring, today: setup.today, at: now)
 
         await ObservationWait.until {
-            model.moves.first?.payoff != nil
+            _ = model.moves
+
+            return notified.withLock { $0 }
         }
 
         task.cancel()
+
+        #expect(model.moves.first?.payoff != nil)
     }
 
     @Test
