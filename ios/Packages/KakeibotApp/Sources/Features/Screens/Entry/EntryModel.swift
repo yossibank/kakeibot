@@ -63,6 +63,7 @@ public final class EntryModel {
 
     private var baseline: Snapshot?
     private var originalFee: Entry?
+    private var isSaving = false
 
     private let startingTemplate: EntryTemplate?
 
@@ -165,9 +166,14 @@ public extension EntryModel {
     }
 
     func save() async -> EntryChange? {
-        guard let draft else {
+        guard
+            !isSaving,
+            let draft
+        else {
             return nil
         }
+
+        isSaving = true
 
         do {
             let saved = try await database.saveEntryResult(
@@ -194,6 +200,7 @@ public extension EntryModel {
                 clearedNoSpendDays: saved.clearedNoSpendDays
             )
         } catch {
+            isSaving = false
             report(error)
             return nil
         }
@@ -215,6 +222,7 @@ public extension EntryModel {
         }
 
         baseline = snapshot
+        isSaving = false
     }
 
     func delete() async -> EntryChange? {

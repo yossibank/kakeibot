@@ -86,7 +86,7 @@ public extension AppDatabase {
             let categories = EntryCategory.filter(Column("wallet_id") == id)
             let deletedCategories = try categories.fetchAll(db)
             let categoryIds = deletedCategories.map(\.id)
-            let iconIds = deletedCategories.map(\.iconId)
+            let iconIds = deletedCategories.map(\.iconId) + [wallet.iconId]
             let tags = EntryTag.filter(categoryIds.contains(Column("category_id")))
             let icons = Icon.filter(iconIds.contains(Column("id")))
             let iconRecords = try icons.fetchAll(db)
@@ -113,8 +113,8 @@ public extension AppDatabase {
             try valuations.deleteAll(db)
             try tags.deleteAll(db)
             try categories.deleteAll(db)
-            try icons.deleteAll(db)
             try wallet.delete(db)
+            try icons.deleteAll(db)
 
             if isShared {
                 try Self.queue(key, in: db)

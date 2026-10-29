@@ -59,6 +59,22 @@ struct EntryModelTests {
     }
 
     @Test
+    func savesOnceWhenSaveIsTappedTwice() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        model.press(.digit(5))
+
+        async let first = model.save()
+        async let second = model.save()
+        let changes = await [first, second].compactMap(\.self)
+        let entries = try setup.database.snapshot().entries
+
+        #expect(changes.count == 1)
+        #expect(entries.count == 1)
+    }
+
+    @Test
     func refusesZeroAmount() async throws {
         let model = try await Self.newModel()
 
