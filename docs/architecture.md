@@ -34,6 +34,14 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `.claude/snapshots/widget/` | `ui-snapshot` で描くウィジェットの場合。あといくらの小・中、ロック画面の丸・横長・1 行 |
 | `.claude/snapshots/recent-transfers/` | `ui-snapshot` で描く、入力シートの最近の振替の行。長い口座名、手数料の有無 |
 | `.claude/snapshots/entry-sheet/` | `ui-snapshot` で描く入力シートの全体（支出・振替）。カテゴリの格子は描かれない |
+| `.claude/snapshots/records/` | `ui-snapshot` で描く記録のタブ。カレンダーと一覧 |
+| `.claude/snapshots/review/` | `ui-snapshot` で描く振り返りのタブ |
+| `.claude/snapshots/assets/` | `ui-snapshot` で描く資産のタブ |
+| `.claude/snapshots/home/` | `ui-snapshot` で描くホームのタブ |
+| `.claude/snapshots/settings/` | `ui-snapshot` で描く設定。メニュー・口座・ごほうび・記録忘れの通知 |
+| `.claude/snapshots/theme-style/` | `ui-snapshot` で描く、文字と角の丸みの見本 |
+| `.claude/snapshots/home-sections/` | `ui-snapshot` で描く、ホームの並べ替え |
+| `.claude/snapshots/parts/` | `ui-snapshot` で描く、カレンダー・タグ・テンプレートのカード |
 
 ## ios
 

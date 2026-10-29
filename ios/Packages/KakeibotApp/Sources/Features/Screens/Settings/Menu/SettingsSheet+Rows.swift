@@ -118,7 +118,7 @@ extension SettingsSheet {
 }
 
 private struct PickerRowLayout: Layout {
-    static let gap: CGFloat = 32
+    static let gap: CGFloat = 20
     static let rowHeight: CGFloat = 52
     static let lineSpacing: CGFloat = 8
     static let inset: CGFloat = 12
