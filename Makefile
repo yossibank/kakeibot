@@ -1,10 +1,10 @@
 .PHONY: setup open format licenses build test-build test snapshot verify
 
-SIMULATOR ?= $(shell xcrun simctl list devices available iPhone | awk -F '[()]' '/iPhone/ { print $$2; exit }')
+SIMULATOR ?= $(shell scripts/simulator.sh)
 XCBEAUTIFY = $(shell command -v xcbeautify)
 BEAUTIFY = $(if $(XCBEAUTIFY),| xcbeautify)
 CLAUDE_CONFIG ?= $(HOME)/Applications/AI/claude-config
-SNAPSHOT ?= widget
+SNAPSHOT ?=
 CHECKOUT = $(if $(BRANCH),$(shell git worktree list --porcelain | awk '/^worktree / { path = substr($$0, 10) } $$0 == "branch refs/heads/$(BRANCH)" { print path }'),.)
 
 setup:
@@ -27,15 +27,18 @@ build:
 	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build $(BEAUTIFY)
 
 test-build:
+	@test -n "$(SIMULATOR)" || { echo "NG iPhone のシミュレーターが無い。SIMULATOR に UDID を渡す"; exit 1; }
 	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' build-for-testing $(BEAUTIFY)
 
 test:
+	@test -n "$(SIMULATOR)" || { echo "NG iPhone のシミュレーターが無い。SIMULATOR に UDID を渡す"; exit 1; }
 	set -o pipefail; xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -testPlan Kakeibot -destination 'id=$(SIMULATOR)' -collect-test-diagnostics never test $(BEAUTIFY)
 
 snapshot:
-	$(CLAUDE_CONFIG)/skills/ui-snapshot/scripts/render.sh ios/Packages/KakeibotApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
+	@test -n "$(SNAPSHOT)" || { echo "NG SNAPSHOT に .claude/snapshots/ の下のセットの名前を渡す"; exit 1; }
+	$(CLAUDE_CONFIG)/skills/ui-snapshot/scripts/render-snapshots.sh ios/Packages/KakeibotApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
 
 verify:
-	scripts/verify.sh scripts/docs-check.py
-	scripts/verify.sh swift test --package-path ios/Packages/KakeibotKit
-	scripts/verify.sh xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build
+	scripts/verify.sh docs-check scripts/docs-check.py
+	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
+	scripts/verify.sh app-build xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot -destination 'generic/platform=iOS Simulator' build
