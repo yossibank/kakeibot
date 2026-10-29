@@ -100,7 +100,36 @@ private extension SnapshotTests {
             recorded: recorded
         )
 
-        return [("normal", sample), ("undo", undo)]
+        let longTiles = sample.tiles.map { tile in
+            QuickRecordWidgetSummary.Tile(
+                id: tile.id,
+                name: "子どもの習い事の月謝まとめ払い",
+                detail: "子どもの習い事・みずほ銀行",
+                amount: tile.amount.map { $0 * 10000 },
+                icon: tile.icon
+            )
+        }
+
+        let longRecords = sample.todayRecords.map { record in
+            QuickRecordWidgetSummary.Record(
+                id: record.id,
+                title: "子どもの習い事と教材と遠征費",
+                detail: "発表会の衣装と靴・みずほ銀行",
+                amount: record.amount * 10000,
+                type: record.type,
+                icon: record.icon
+            )
+        }
+
+        let long = QuickRecordWidgetSummary(
+            todayExpense: 12_345_678,
+            tiles: longTiles,
+            todayRecords: longRecords,
+            todayCount: sample.todayCount,
+            recorded: nil
+        )
+
+        return [("normal", sample), ("undo", undo), ("long", long)]
     }
 
     static func cases(on today: LocalDate) -> [(String, BudgetWidgetSummary?)] {
@@ -131,8 +160,25 @@ private extension SnapshotTests {
             nextRecurring: nil
         )
 
+        let huge = BudgetUsage(
+            budget: 12_000_000,
+            spent: 9_876_543,
+            today: today,
+            periodEnd: periodEnd
+        )
+
+        let hugeSummary = BudgetWidgetSummary(
+            usage: huge,
+            monthExpense: huge.spent,
+            todayExpense: 1_234_567,
+            yesterdayExpense: 2_345_678,
+            weekExpense: 8_765_432,
+            nextRecurring: nil
+        )
+
         return [
             ("normal", .sample(on: today)),
+            ("huge", hugeSummary),
             ("over", overSummary),
             ("nobudget", noBudget),
             ("empty", nil)

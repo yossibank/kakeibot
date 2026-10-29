@@ -10,15 +10,15 @@ import UIKit
 struct SnapshotTests {
     @Test
     func render() async throws {
-        for type in [Entry.Kind.expense, .transfer] {
-            let model = try await Self.model(type)
+        for (name, type, digits) in Self.cases {
+            let model = try await Self.model(type, digits: digits)
 
             let view = EntrySheet(model: model)
                 .frame(width: Self.phone.width, height: Self.phone.height)
                 .background(Color(uiColor: .systemBackground))
                 .environment(\.colorScheme, .light)
 
-            try Self.write(view, to: "entry-\(type.rawValue).png")
+            try Self.write(view, to: "\(name).png")
         }
     }
 }
@@ -27,7 +27,19 @@ private extension SnapshotTests {
     static let directory = "__OUT__"
     static let phone = CGSize(width: 393, height: 852)
 
-    static func model(_ type: Entry.Kind) async throws -> EntryModel {
+    static let smallDigits: [AmountCalculator.Key] = [.digit(1), .digit(2), .doubleZero]
+    static let largeDigits = (2...9).reversed().map(AmountCalculator.Key.digit)
+
+    static let cases: [(String, Entry.Kind, [AmountCalculator.Key])] = [
+        ("entry-expense", .expense, smallDigits),
+        ("entry-transfer", .transfer, smallDigits),
+        ("entry-expense-large", .expense, largeDigits)
+    ]
+
+    static func model(
+        _ type: Entry.Kind,
+        digits: [AmountCalculator.Key]
+    ) async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
         let now = Date()
         let date = LocalDate(now, in: .current)
@@ -37,9 +49,10 @@ private extension SnapshotTests {
         let model = EntryModel(database: database, date: date, type: type)
 
         await model.load()
-        model.press(.digit(1))
-        model.press(.digit(2))
-        model.press(.doubleZero)
+
+        for key in digits {
+            model.press(key)
+        }
 
         return model
     }
