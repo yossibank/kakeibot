@@ -67,4 +67,27 @@ struct WeekStartModelTests {
         #expect(model.weekStart == .tuesday)
         #expect(saved == .tuesday)
     }
+
+    @Test
+    func returnsToSavedDayWhenBothQuickSavesFail() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = WeekStartModel(database: setup.database)
+        await model.load()
+        try await setup.database.failWrites(to: "setting")
+
+        let first = Task {
+            await model.choose(.monday)
+        }
+
+        let second = Task {
+            await model.choose(.tuesday)
+        }
+
+        await first.value
+        await second.value
+        let saved = try await setup.database.setting(.weekStart)
+
+        #expect(model.weekStart == .sunday)
+        #expect(saved == .sunday)
+    }
 }
