@@ -30,7 +30,10 @@ public extension WeekStartModel {
         do {
             try await database.setSetting(.weekStart, to: day)
         } catch {
-            weekStart = previous
+            if weekStart == day {
+                weekStart = previous
+            }
+
             errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
