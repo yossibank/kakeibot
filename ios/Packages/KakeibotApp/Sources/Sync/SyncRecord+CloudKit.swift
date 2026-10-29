@@ -13,9 +13,7 @@ extension SyncKey {
             return nil
         }
 
-        let id = String(parts[1])
-
-        self.init(table: table, id: id)
+        self.init(table: table, id: String(parts[1]))
     }
 
     func recordID(in zoneID: CKRecordZone.ID) -> CKRecord.ID {
@@ -24,11 +22,6 @@ extension SyncKey {
 }
 
 extension SyncRecordID {
-    var recordID: CKRecord.ID {
-        let zoneID = CKRecordZone.ID(zoneName: zoneName)
-        return key.recordID(in: zoneID)
-    }
-
     init?(_ recordID: CKRecord.ID) {
         guard let key = SyncKey(recordID) else {
             return nil
@@ -60,16 +53,11 @@ extension SyncRecord {
         in zoneID: CKRecordZone.ID,
         systemFields: Data?
     ) throws -> CKRecord {
-        let recordID = key.recordID(in: zoneID)
-        let data = try JSONEncoder().encode(values)
-
         let record = systemFields.flatMap(CKRecord.init(systemFields:))
-            ?? CKRecord(recordType: key.table.rawValue, recordID: recordID)
-
-        let fields = String(decoding: data, as: UTF8.self)
+            ?? CKRecord(recordType: key.table.rawValue, recordID: key.recordID(in: zoneID))
+        let fields = try String(decoding: JSONEncoder().encode(values), as: UTF8.self)
 
         record.encryptedValues[Self.fieldsKey] = fields
-
         return record
     }
 }
@@ -90,11 +78,7 @@ extension CKRecord {
         }
 
         coder.requiresSecureCoding = true
-
-        defer {
-            coder.finishDecoding()
-        }
-
+        defer { coder.finishDecoding() }
         self.init(coder: coder)
     }
 }

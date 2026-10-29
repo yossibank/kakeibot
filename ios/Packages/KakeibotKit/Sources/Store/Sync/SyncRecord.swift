@@ -48,6 +48,12 @@ public struct SyncChange: Hashable, Sendable {
     let version: Int64
 }
 
+public extension SyncChange {
+    var zones: [String] {
+        (saveZone.map { [$0] } ?? []) + deleteZones
+    }
+}
+
 public struct SyncActivity: Hashable, Sendable {
     public let isSyncEnabled: Bool
     public let isSharing: Bool
