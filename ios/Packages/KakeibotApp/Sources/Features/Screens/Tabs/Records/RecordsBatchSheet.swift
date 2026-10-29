@@ -54,24 +54,6 @@ extension RecordsBatchSheet {
 }
 
 private extension RecordsBatchSheet {
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
-
-    var names: [String] {
-        switch target {
-        case let .category(type): model.batchCategories(for: type).map(\.name)
-        case .wallet: model.batchWallets.map(\.name)
-        }
-    }
-
-    var title: String {
-        switch target {
-        case .category: "\(count) 件のカテゴリを変える"
-        case .wallet: "\(count) 件の口座を変える"
-        }
-    }
-
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
@@ -120,5 +102,25 @@ private extension RecordsBatchSheet {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+}
+
+private extension RecordsBatchSheet {
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
+
+    var names: [String] {
+        switch target {
+        case let .category(type): model.batchCategories(for: type).map(\.name)
+        case .wallet: model.batchWallets.map(\.name)
+        }
+    }
+
+    var title: String {
+        switch target {
+        case .category: "\(count) 件のカテゴリを変える"
+        case .wallet: "\(count) 件の口座を変える"
+        }
     }
 }
