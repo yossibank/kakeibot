@@ -115,6 +115,9 @@ private extension RootView {
             .task(id: model.observationID(model.syncActivity)) {
                 await model.syncChanges(in: database)
             }
+            .task(id: model.observationID(model.pendingShareCount)) {
+                await model.acceptShares(in: database)
+            }
         case .failed:
             ContentUnavailableView {
                 Label("データを開けませんでした", systemImage: "exclamationmark.triangle")

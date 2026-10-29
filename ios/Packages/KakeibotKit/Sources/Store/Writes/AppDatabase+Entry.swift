@@ -121,6 +121,7 @@ public extension AppDatabase {
                 .filter(!ids.contains(Column("id")))
                 .fetchAll(db)
 
+            try Self.detachRewardGoals(from: (entries + fees).map(\.id), in: db, at: now)
             _ = try Entry.deleteAll(db, keys: ids)
 
             try Self.restoreNoSpendDays(days, in: db)

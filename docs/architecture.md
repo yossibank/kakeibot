@@ -45,6 +45,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | アイコンの色違い | 設定で選べる色違いは、同じフォルダの `AppIcon-<色>.icon` | |
 | アイコンの見本 | `Assets.xcassets` の `AppIconYen`・`AppIconDial`。設定の見本に描く、アイコンと同じ絵の写し | |
 | 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | アプリのものを `WidgetFonts` で読む |
+| 共有の受け入れ | Info.plist の `CKSharingSupported`。AppFeature の `AppDelegate` が、シーンの delegate を差し替えて共有のリンクを受け取る | |
 
 `license_plist.yml` には、同梱のフォントと配布元のライセンスを手で足す。
 
@@ -161,7 +162,7 @@ KakeibotApp/
 | `Features/Shared/Period/` | 期間の範囲と月の始まり |
 | `Features/Shared/Settings/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Preview・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
-| `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有と共有シートも作る |
+| `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |
 
 ## 名前の決まり
 

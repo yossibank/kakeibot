@@ -42,29 +42,32 @@ extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws -> EntryCategory.ID {
-        if let id = try setting(.feeCategory, in: db),
-           try EntryCategory.exists(db, key: id) {
-            return id
+        try categoryId(
+            for: .feeCategory,
+            seed: feeSeed,
+            kind: .expense,
+            in: db,
+            at: now
+        )
+    }
+
+    static func transferCategoryId(
+        _ kind: EntryCategory.Kind,
+        in db: Database,
+        at now: Date
+    ) throws -> EntryCategory.ID {
+        let key: SettingKey<EntryCategory.ID?> = switch kind {
+        case .expense: .transferOutCategory
+        case .income: .transferInCategory
         }
 
-        let icon = try insertIcon(for: feeSeed, into: db, at: now)
-
-        let expenses = EntryCategory
-            .filter(Column("kind") == EntryCategory.Kind.expense.rawValue)
-
-        let category = try EntryCategory(
-            kind: .expense,
-            name: feeSeed.name,
-            iconId: icon.id,
-            sortOrder: EntryCategory.nextSortOrder(of: expenses, in: db),
-            createdAt: now,
-            updatedAt: now
+        return try categoryId(
+            for: key,
+            seed: transferSeed,
+            kind: kind,
+            in: db,
+            at: now
         )
-
-        try category.insert(db)
-        try setSetting(.feeCategory, to: category.id, in: db)
-
-        return category.id
     }
 }
 
@@ -102,6 +105,7 @@ private extension AppDatabase {
     ]
 
     static let feeSeed = Seed(name: "手数料", glyph: .coin, color: "#A68A64")
+    static let transferSeed = Seed(name: "振替", glyph: .banknote, color: "#7A8B99")
 
     static let templates: [(name: String, category: String)] = [
         ("コンビニ", "食費"),
@@ -120,6 +124,36 @@ private extension AppDatabase {
         (.sun, "#F4A261"),
         (.moon, "#577590")
     ]
+
+    static func categoryId(
+        for key: SettingKey<EntryCategory.ID?>,
+        seed: Seed,
+        kind: EntryCategory.Kind,
+        in db: Database,
+        at now: Date
+    ) throws -> EntryCategory.ID {
+        if let id = try setting(key, in: db),
+           try EntryCategory.exists(db, key: id) {
+            return id
+        }
+
+        let icon = try insertIcon(for: seed, into: db, at: now)
+        let sameKind = EntryCategory.filter(Column("kind") == kind.rawValue)
+
+        let category = try EntryCategory(
+            kind: kind,
+            name: seed.name,
+            iconId: icon.id,
+            sortOrder: EntryCategory.nextSortOrder(of: sameKind, in: db),
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try category.insert(db)
+        try setSetting(key, to: category.id, in: db)
+
+        return category.id
+    }
 
     static func insertDefaults(
         into db: Database,

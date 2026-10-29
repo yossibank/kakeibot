@@ -36,6 +36,13 @@ public extension SyncEngine {
         return try result.get() as? CKShare ?? share
     }
 
+    static func acceptShare(
+        _ metadata: CKShare.Metadata,
+        in container: CKContainer = CKContainer(identifier: containerIdentifier)
+    ) async throws {
+        _ = try await container.accept(metadata)
+    }
+
     static func deleteShare(
         zoneName: String,
         in container: CKContainer = CKContainer(identifier: containerIdentifier)
