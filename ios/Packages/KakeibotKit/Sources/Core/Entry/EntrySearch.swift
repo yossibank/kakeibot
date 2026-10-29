@@ -50,11 +50,12 @@ public extension EntrySearch {
 
 private extension EntrySearch {
     static let amountMarks: Set<Character> = ["¥", "\\", ",", "円"]
+    static let japanese = Locale(identifier: "ja_JP")
 
     static func fold(_ text: String) -> String {
         text.folding(
             options: [.caseInsensitive, .widthInsensitive],
-            locale: Locale(identifier: "ja_JP")
+            locale: japanese
         )
     }
 

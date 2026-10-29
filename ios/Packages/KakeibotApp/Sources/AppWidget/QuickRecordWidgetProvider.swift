@@ -41,10 +41,12 @@ private extension QuickRecordWidgetProvider {
         isPreview: Bool
     ) async -> Timeline<QuickRecordWidgetEntry> {
         let today = LocalDate(now, in: .current)
+        let database = try? AppDatabase.appGroupForReading()
+        let recordedId = await (try? database?.setting(.widgetEntry))??.entryId
 
         guard
-            let database = try? AppDatabase.appGroupForReading(),
-            let overview = try? await database.monthOverview(on: today),
+            let database,
+            let overview = try? await database.widgetOverview(on: today, including: recordedId),
             let templates = try? await database.templates()
         else {
             let entry: QuickRecordWidgetEntry = isPreview
@@ -59,7 +61,6 @@ private extension QuickRecordWidgetProvider {
         let look = await database.widgetLook()
         let style = await database.widgetStyle()
         let order = await (try? database.setting(.templateOrder)) ?? .manual
-        let recordedId = await (try? database.setting(.widgetEntry))??.entryId
 
         let summary = QuickRecordWidgetSummary(
             overview,

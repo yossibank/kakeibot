@@ -15,6 +15,7 @@ public extension EntryModel {
 
     var feeChoices: [Int] {
         let used = (history?.days ?? [])
+            .lazy
             .flatMap(\.entries)
             .filter { $0.transferId != nil }
             .sorted { $0.createdAt > $1.createdAt }

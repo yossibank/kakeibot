@@ -30,6 +30,8 @@ public extension EntryList {
 }
 
 private extension EntryList {
+    static let japanese = Locale(identifier: "ja_JP")
+
     func templateUses(through today: LocalDate) -> [EntryTemplate.ID: Int] {
         let start = today.adding(days: 1 - TemplateOrder.frequentDays)
 
@@ -79,12 +81,10 @@ private extension EntryList {
                 return left > right
             }
         case .name:
-            let japanese = Locale(identifier: "ja_JP")
-
             let result = lhs.name.compare(
                 rhs.name,
                 options: [.caseInsensitive, .numeric, .widthInsensitive],
-                locale: japanese
+                locale: Self.japanese
             )
 
             if result != .orderedSame {

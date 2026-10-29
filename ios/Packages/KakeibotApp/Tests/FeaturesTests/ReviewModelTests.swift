@@ -1,7 +1,9 @@
 import Core
 import Features
 import Foundation
+import Observation
 import Store
+import Synchronization
 import Testing
 
 @MainActor
@@ -159,6 +161,77 @@ struct ReviewModelTests {
         let move = try #require(model.moves.first)
 
         #expect(move.balance == -70000)
+    }
+
+    @Test
+    func cachedMovesStillWatchRecurrings() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let now = Date()
+        let changed = Mutex(false)
+
+        let wallet = WalletDraft(
+            kind: .loan,
+            name: "奨学金",
+            mark: .glyph(.contract),
+            color: "#4A6FA5",
+            initialBalance: -100_000
+        )
+
+        let loan = try await setup.database.saveWallet(wallet, at: now)
+        let options = try await setup.database.entryOptions()
+
+        let draft = try EntryDraft(
+            type: .transfer,
+            amount: 30000,
+            date: #require(LocalDate("2026-10-10")),
+            categoryId: nil,
+            walletId: options.wallets[0].id,
+            toWalletId: loan.id
+        )
+
+        try await setup.database.saveEntry(draft, at: now)
+
+        let recurring = try RecurringDraft(
+            type: .transfer,
+            amount: 30000,
+            categoryId: nil,
+            walletId: options.wallets[0].id,
+            toWalletId: loan.id,
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: #require(LocalDate("2027-01-01"))
+        )
+
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        let task = Task {
+            await model.run()
+        }
+
+        for _ in 0..<200 where model.moves.isEmpty {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        try await Task.sleep(for: .milliseconds(200))
+        _ = model.moves
+
+        withObservationTracking {
+            _ = model.moves
+        } onChange: {
+            changed.withLock { $0 = true }
+        }
+
+        try await setup.database.saveRecurring(recurring, today: setup.today, at: now)
+
+        for _ in 0..<200 where !changed.withLock({ $0 }) {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        task.cancel()
+
+        #expect(changed.withLock { $0 })
+        #expect(model.moves.first?.payoff != nil)
     }
 
     @Test

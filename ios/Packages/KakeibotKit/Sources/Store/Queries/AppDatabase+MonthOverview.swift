@@ -20,6 +20,27 @@ public extension AppDatabase {
             return plan.with(list)
         }
     }
+
+    func widgetOverview(
+        on today: LocalDate,
+        including entryId: Entry.ID? = nil
+    ) async throws -> MonthOverview {
+        try await writer.read { db in
+            let plan = try Self.monthPlan(on: today, in: db)
+            let start = plan.widgetStart
+
+            let request = Entry.filter(
+                Column("date") >= start
+                    || Column("recurring_date") >= start
+                    || Column("bill_month") >= start.yearMonth
+                    || Column("id") == entryId
+            )
+
+            let list = try Self.entryList(of: request, in: db)
+
+            return plan.with(list)
+        }
+    }
 }
 
 private extension AppDatabase {
@@ -42,6 +63,16 @@ private extension AppDatabase {
 }
 
 private extension MonthOverview {
+    static let widgetMonths = 4
+
+    var widgetStart: LocalDate {
+        let month = period.lowerBound.yearMonth.adding(months: -Self.widgetMonths)
+        let monthStart = month.period(startingOn: .first).lowerBound
+        let templateStart = today.adding(days: -TemplateOrder.frequentDays)
+
+        return min(monthStart, templateStart)
+    }
+
     func with(_ list: EntryList) -> MonthOverview {
         MonthOverview(
             list: list,
