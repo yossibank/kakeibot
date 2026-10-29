@@ -26,11 +26,45 @@ public struct SyncKey: Hashable, Sendable {
     }
 }
 
+public struct SyncRecordID: Hashable, Sendable {
+    public let key: SyncKey
+    public let zoneName: String
+
+    public init(
+        key: SyncKey,
+        zoneName: String
+    ) {
+        self.key = key
+        self.zoneName = zoneName
+    }
+}
+
 public struct SyncChange: Hashable, Sendable {
     public let key: SyncKey
     public let isDeletion: Bool
+    public let saveZone: String?
+    public let deleteZones: [String]
 
     let version: Int64
+}
+
+public struct SyncActivity: Hashable, Sendable {
+    public let isSyncEnabled: Bool
+    public let isSharing: Bool
+
+    public init(
+        isSyncEnabled: Bool,
+        isSharing: Bool
+    ) {
+        self.isSyncEnabled = isSyncEnabled
+        self.isSharing = isSharing
+    }
+}
+
+public extension SyncActivity {
+    var isActive: Bool {
+        isSyncEnabled || isSharing
+    }
 }
 
 public enum SyncValue: Codable, Hashable, Sendable {

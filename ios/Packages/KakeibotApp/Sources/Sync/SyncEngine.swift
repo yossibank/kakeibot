@@ -7,6 +7,7 @@ public actor SyncEngine {
     private let container: CKContainer
     private var engine: CKSyncEngine?
     private var sending: [SyncKey: SyncChange] = [:]
+    private var isSyncEnabled = false
 
     public init(
         database: AppDatabase,
@@ -47,10 +48,12 @@ public extension SyncEngine {
         }
     }
 
-    func start() async {
+    func start(isSyncEnabled: Bool) async {
         guard engine == nil else {
             return
         }
+
+        self.isSyncEnabled = isSyncEnabled
 
         let data = try? await database.syncEngineState()
         let state = data.flatMap {
@@ -65,7 +68,7 @@ public extension SyncEngine {
 
         self.engine = engine
 
-        if state == nil {
+        if state == nil, isSyncEnabled {
             engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: Self.zoneID))])
         }
     }
@@ -82,7 +85,7 @@ public extension SyncEngine {
 
 private extension SyncEngine {
     static var zoneID: CKRecordZone.ID {
-        CKRecordZone.ID(zoneName: "Kakeibot")
+        CKRecordZone.ID(zoneName: SyncZone.own)
     }
 
     func enqueuePending(excluding failed: Set<SyncKey>) async {
@@ -93,42 +96,79 @@ private extension SyncEngine {
             return
         }
 
-        enqueue(changes.filter { !failed.contains($0.key) })
+        await enqueue(changes.filter { !failed.contains($0.key) })
     }
 
-    func enqueue(_ changes: [SyncChange]) {
+    func enqueue(_ changes: [SyncChange]) async {
         guard let engine else {
             return
         }
 
         let pending = Set(engine.state.pendingRecordZoneChanges)
-        var added: [CKSyncEngine.PendingRecordZoneChange] = []
-        var removed: [CKSyncEngine.PendingRecordZoneChange] = []
 
-        for change in changes {
-            let id = change.key.recordID(in: Self.zoneID)
-            let save = CKSyncEngine.PendingRecordZoneChange.saveRecord(id)
-            let delete = CKSyncEngine.PendingRecordZoneChange.deleteRecord(id)
-            let (wanted, opposite) = change.isDeletion ? (delete, save) : (save, delete)
-
-            guard !pending.contains(wanted) else {
-                continue
+        let saving = Set(pending.compactMap { change -> SyncKey? in
+            guard case let .saveRecord(id) = change else {
+                return nil
             }
 
-            added.append(wanted)
+            return SyncKey(id)
+        })
 
-            if pending.contains(opposite) {
-                removed.append(opposite)
+        var added: [CKSyncEngine.PendingRecordZoneChange] = []
+        var removed: [CKSyncEngine.PendingRecordZoneChange] = []
+        var dropped: [SyncChange] = []
+
+        for change in changes {
+            let targets = pendingTargets(of: change)
+
+            if targets.isEmpty,
+               !saving.contains(change.key) {
+                dropped.append(change)
+            }
+
+            for (wanted, opposite) in targets where !pending.contains(wanted) {
+                added.append(wanted)
+
+                if pending.contains(opposite) {
+                    removed.append(opposite)
+                }
             }
         }
 
         engine.state.remove(pendingRecordZoneChanges: removed)
         engine.state.add(pendingRecordZoneChanges: added)
+        try? await database.removeSyncChanges(dropped)
+    }
+
+    func pendingTargets(
+        of change: SyncChange
+    ) -> [(
+        wanted: CKSyncEngine.PendingRecordZoneChange,
+        opposite: CKSyncEngine.PendingRecordZoneChange
+    )] {
+        var targets: [(
+            wanted: CKSyncEngine.PendingRecordZoneChange,
+            opposite: CKSyncEngine.PendingRecordZoneChange
+        )] = []
+
+        if let zone = change.saveZone, isSyncEnabled || zone != SyncZone.own {
+            let id = SyncRecordID(key: change.key, zoneName: zone).recordID
+            targets.append((.saveRecord(id), .deleteRecord(id)))
+        }
+
+        for zone in change.deleteZones where isSyncEnabled || zone != SyncZone.own {
+            let id = SyncRecordID(key: change.key, zoneName: zone).recordID
+            targets.append((.deleteRecord(id), .saveRecord(id)))
+        }
+
+        return targets
     }
 
     func restart() async {
+        let isSyncEnabled = isSyncEnabled
+
         stop()
-        await start()
+        await start(isSyncEnabled: isSyncEnabled)
     }
 
     func turnOff() async {
@@ -138,14 +178,16 @@ private extension SyncEngine {
 
     func record(for recordID: CKRecord.ID) async -> CKRecord? {
         guard
-            let key = SyncKey(recordID),
-            let local = try? await database.syncRecord(for: key)
+            let id = SyncRecordID(recordID),
+            let local = try? await database.syncRecord(for: id.key),
+            let zone = try? await database.syncSaveZone(for: id.key),
+            zone == id.zoneName
         else {
             return nil
         }
 
-        let systemFields = try? await database.syncSystemFields(for: key)
-        return try? local.record(in: Self.zoneID, systemFields: systemFields)
+        let systemFields = try? await database.syncSystemFields(for: id)
+        return try? local.record(in: recordID.zoneID, systemFields: systemFields)
     }
 
     func changeAccount(_ change: CKSyncEngine.Event.AccountChange) async {
@@ -161,6 +203,10 @@ private extension SyncEngine {
 
     func deleteZone(_ deletion: CKDatabase.DatabaseChange.Deletion) async {
         guard deletion.zoneID == Self.zoneID else {
+            if let walletID = SyncZone.walletID(of: deletion.zoneID.zoneName) {
+                try? await database.endSharing(walletID)
+            }
+
             return
         }
 
@@ -174,13 +220,21 @@ private extension SyncEngine {
         }
     }
 
+    func isSent(to zoneName: String) -> Bool {
+        isSyncEnabled || zoneName != SyncZone.own
+    }
+
     func applyFetched(_ changes: CKSyncEngine.Event.FetchedRecordZoneChanges) async {
-        let records = changes.modifications.map(\.record)
+        let records = changes.modifications
+            .map(\.record)
+            .filter { isSent(to: $0.recordID.zoneID.zoneName) }
         let saved = records.compactMap(SyncRecord.init)
-        let deleted = changes.deletions.compactMap { SyncKey($0.recordID) }
-        let systemFields = records.reduce(into: [SyncKey: Data]()) { fields, record in
-            if let key = SyncKey(record.recordID) {
-                fields[key] = record.systemFields
+        let deleted = changes.deletions
+            .compactMap { SyncRecordID($0.recordID) }
+            .filter { isSent(to: $0.zoneName) }
+        let systemFields = records.reduce(into: [SyncRecordID: Data]()) { fields, record in
+            if let id = SyncRecordID(record.recordID) {
+                fields[id] = record.systemFields
             }
         }
 
@@ -201,23 +255,27 @@ private extension SyncEngine {
             .filter { $0.value.code == .unknownItem }
             .map(\.key)
         let deletedIDs = sent.deletedRecordIDs + unknownDeletes
-        let deleted = deletedIDs.compactMap(SyncKey.init)
-        let systemFields = sent.savedRecords.reduce(into: [SyncKey: Data]()) { fields, record in
-            if let key = SyncKey(record.recordID) {
-                fields[key] = record.systemFields
+        let deleted = deletedIDs.compactMap(SyncRecordID.init)
+        let systemFields = sent.savedRecords
+            .reduce(into: [SyncRecordID: Data]()) { fields, record in
+                if let id = SyncRecordID(record.recordID) {
+                    fields[id] = record.systemFields
+                }
             }
-        }
         let failedSaves = sent.failedRecordSaves.map(\.record.recordID)
         let failedDeletes = sent.failedRecordDeletes
             .filter { $0.value.code != .unknownItem }
             .map(\.key)
         let failed = Set((failedSaves + failedDeletes).compactMap(SyncKey.init))
-        let finished = (Array(systemFields.keys) + deleted)
-            .compactMap { sending.removeValue(forKey: $0) }
+        let finished = finishedChanges(saved: Array(systemFields.keys), deleted: deleted)
 
         try? await database.saveSyncSystemFields(systemFields)
         try? await database.removeSyncSystemFields(deleted)
         try? await database.removeSyncChanges(finished)
+
+        for id in deleted {
+            deleteWalletZone(after: id)
+        }
 
         for failure in sent.failedRecordSaves {
             await retry(failure)
@@ -226,22 +284,74 @@ private extension SyncEngine {
         await enqueuePending(excluding: failed)
     }
 
+    func finishedChanges(
+        saved: [SyncRecordID],
+        deleted: [SyncRecordID]
+    ) -> [SyncChange] {
+        var finished: [SyncChange] = []
+
+        for id in saved {
+            guard let change = sending[id.key], change.saveZone == id.zoneName else {
+                continue
+            }
+
+            sending.removeValue(forKey: id.key)
+            finished.append(change)
+            engine?.state.add(pendingRecordZoneChanges: staleDeletions(of: change))
+        }
+
+        let zones = Dictionary(grouping: deleted, by: \.key).mapValues { Set($0.map(\.zoneName)) }
+
+        for (key, deletedZones) in zones {
+            guard
+                let change = sending[key],
+                change.saveZone == nil,
+                Set(change.deleteZones.filter { isSent(to: $0) }).isSubset(of: deletedZones)
+            else {
+                continue
+            }
+
+            sending.removeValue(forKey: key)
+            finished.append(change)
+        }
+
+        return finished
+    }
+
+    func staleDeletions(of change: SyncChange) -> [CKSyncEngine.PendingRecordZoneChange] {
+        change.deleteZones
+            .filter { isSent(to: $0) }
+            .map { .deleteRecord(SyncRecordID(key: change.key, zoneName: $0).recordID) }
+    }
+
+    func deleteWalletZone(after id: SyncRecordID) {
+        guard
+            id.key.table == .wallet,
+            SyncZone.walletID(of: id.zoneName)?.description == id.key.id
+        else {
+            return
+        }
+
+        let zoneID = CKRecordZone.ID(zoneName: id.zoneName)
+        engine?.state.add(pendingDatabaseChanges: [.deleteZone(zoneID)])
+    }
+
     func retry(_ failure: CKSyncEngine.Event.SentRecordZoneChanges.FailedRecordSave) async {
         let recordID = failure.record.recordID
 
-        guard let key = SyncKey(recordID) else {
+        guard let id = SyncRecordID(recordID) else {
             return
         }
 
         switch failure.error.code {
         case .serverRecordChanged:
-            await resolveConflict(of: key, with: failure.error.serverRecord)
+            await resolveConflict(of: id, with: failure.error.serverRecord)
         case .zoneNotFound:
             engine?.state
-                .add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: Self.zoneID))])
+                .add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: recordID.zoneID))])
             engine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
         case .unknownItem:
-            try? await database.removeSyncSystemFields([key])
+            try? await database.removeSyncSystemFields([id])
             engine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
         default:
             break
@@ -249,7 +359,7 @@ private extension SyncEngine {
     }
 
     func resolveConflict(
-        of key: SyncKey,
+        of id: SyncRecordID,
         with serverRecord: CKRecord?
     ) async {
         guard
@@ -263,11 +373,11 @@ private extension SyncEngine {
             try await database.applySyncChanges(
                 saved: [remote],
                 deleted: [],
-                systemFields: [key: serverRecord.systemFields]
+                systemFields: [id: serverRecord.systemFields]
             )
 
-            if try await database.syncRecord(for: key) == remote {
-                let change = sending.removeValue(forKey: key)
+            if try await database.syncRecord(for: id.key) == remote {
+                let change = sending.removeValue(forKey: id.key)
                 try await database.removeSyncChanges(change.map { [$0] } ?? [])
             } else {
                 engine?.state.add(pendingRecordZoneChanges: [.saveRecord(serverRecord.recordID)])

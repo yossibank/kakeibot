@@ -48,6 +48,7 @@ extension AppDatabase {
 private extension Deletion {
     var records: [any StoreRecord] {
         let tables: [[any StoreRecord]] = [
+            icons,
             wallets,
             categories,
             tags,

@@ -17,6 +17,21 @@ public extension AppDatabase {
             .values(in: writer)
     }
 
+    func syncActivityUpdates() -> some AsyncSequence<SyncActivity, any Error> {
+        ValueObservation
+            .tracking { db in
+                let enabled = try Bool.fetchOne(db, sql: "SELECT enabled FROM sync_state")
+                let sharing = try Bool.fetchOne(db, sql: "SELECT EXISTS (SELECT 1 FROM sync_share)")
+
+                return SyncActivity(
+                    isSyncEnabled: enabled ?? false,
+                    isSharing: sharing ?? false
+                )
+            }
+            .removeDuplicates()
+            .values(in: writer)
+    }
+
     func hasEntries() async throws -> Bool {
         try await writer.read { db in
             try Bool.fetchOne(db, sql: "SELECT EXISTS (SELECT 1 FROM entry)") ?? false
@@ -31,7 +46,7 @@ public extension AppDatabase {
 
     func turnOnSync() async throws {
         try await writer.write { db in
-            try Self.clearSync(in: db)
+            try Self.clearOwnSync(in: db)
             try db.execute(sql: "UPDATE sync_state SET enabled = 1")
             try Self.queueAll(in: db)
         }
@@ -39,7 +54,7 @@ public extension AppDatabase {
 
     func turnOnSyncReplacingLocal() async throws {
         try await writer.write { db in
-            try Self.clearSync(in: db)
+            try Self.setApplying(true, in: db)
 
             for table in SyncTable.allCases.reversed() {
                 let ids = try Self.localIDs(in: table, db: db)
@@ -52,14 +67,22 @@ public extension AppDatabase {
                 }
             }
 
+            try Self.clearSync(in: db)
             try db.execute(sql: "UPDATE sync_state SET enabled = 1")
+            try Self.setApplying(false, in: db)
         }
     }
 
     func turnOffSync() async throws {
         try await writer.write { db in
             try db.execute(sql: "UPDATE sync_state SET enabled = 0")
-            try Self.clearSync(in: db)
+            try Self.clearOwnSync(in: db)
+        }
+    }
+
+    func syncSaveZone(for key: SyncKey) async throws -> String {
+        try await writer.read { db in
+            try Self.saveZone(for: key, in: db)
         }
     }
 
@@ -121,26 +144,30 @@ public extension AppDatabase {
 
     func applySyncChanges(
         saved: [SyncRecord],
-        deleted: [SyncKey],
-        systemFields: [SyncKey: Data] = [:]
+        deleted: [SyncRecordID],
+        systemFields: [SyncRecordID: Data] = [:]
     ) async throws {
         try await writer.write { db in
             try Self.setApplying(true, in: db)
 
-            for key in Self.parentsLast(deleted) {
-                try Self.applyDeletion(of: key, in: db)
-                try Self.removeSystemFields(of: key, in: db)
+            for id in Self.parentsLast(deleted) {
+                if try Self.canApplyDeletion(of: id, in: db) {
+                    try Self.applyDeletion(of: id.key, in: db)
+                }
+
+                try Self.removeSystemFields(of: id, in: db)
             }
 
             for record in Self.parentsFirst(saved) {
                 try Self.applySave(of: record, in: db)
             }
 
-            for (key, data) in systemFields {
-                try Self.saveSystemFields(data, of: key, in: db)
+            for (id, data) in systemFields {
+                try Self.saveSystemFields(data, of: id, in: db)
             }
 
             try Self.retryWaiting(in: db)
+            try Self.joinSharedWallets(in: Array(systemFields.keys), db: db)
             try Self.setApplying(false, in: db)
         }
     }
@@ -157,28 +184,31 @@ public extension AppDatabase {
         }
     }
 
-    func syncSystemFields(for key: SyncKey) async throws -> Data? {
+    func syncSystemFields(for id: SyncRecordID) async throws -> Data? {
         try await writer.read { db in
             try Data.fetchOne(
                 db,
-                sql: "SELECT system_fields FROM sync_record WHERE table_name = ? AND record_id = ?",
-                arguments: [key.table.rawValue, key.id]
+                sql: """
+                SELECT system_fields FROM sync_record
+                WHERE table_name = ? AND record_id = ? AND zone_name = ?
+                """,
+                arguments: [id.key.table.rawValue, id.key.id, id.zoneName]
             )
         }
     }
 
-    func saveSyncSystemFields(_ fields: [SyncKey: Data]) async throws {
+    func saveSyncSystemFields(_ fields: [SyncRecordID: Data]) async throws {
         try await writer.write { db in
-            for (key, data) in fields {
-                try Self.saveSystemFields(data, of: key, in: db)
+            for (id, data) in fields {
+                try Self.saveSystemFields(data, of: id, in: db)
             }
         }
     }
 
-    func removeSyncSystemFields(_ keys: [SyncKey]) async throws {
+    func removeSyncSystemFields(_ ids: [SyncRecordID]) async throws {
         try await writer.write { db in
-            for key in keys {
-                try Self.removeSystemFields(of: key, in: db)
+            for id in ids {
+                try Self.removeSystemFields(of: id, in: db)
             }
         }
     }
@@ -238,10 +268,12 @@ private extension AppDatabase {
         return records.sorted { order[$0.key.table, default: 0] < order[$1.key.table, default: 0] }
     }
 
-    static func parentsLast(_ keys: [SyncKey]) -> [SyncKey] {
+    static func parentsLast(_ ids: [SyncRecordID]) -> [SyncRecordID] {
         let order = Dictionary(uniqueKeysWithValues: SyncTable.allCases.enumerated()
             .map { ($1, $0) })
-        return keys.sorted { order[$0.table, default: 0] > order[$1.table, default: 0] }
+        return ids.sorted {
+            order[$0.key.table, default: 0] > order[$1.key.table, default: 0]
+        }
     }
 
     static func localIDs(
@@ -276,6 +308,66 @@ private extension AppDatabase {
         try db.execute(sql: "DELETE FROM sync_change")
         try db.execute(sql: "DELETE FROM sync_waiting")
         try db.notifyChanges(in: Table("sync_change"))
+    }
+
+    static func clearOwnSync(in db: Database) throws {
+        let ownOnly = try pendingChanges(in: db).filter { change in
+            (change.saveZone ?? SyncZone.own) == SyncZone.own
+                && change.deleteZones.allSatisfy { $0 == SyncZone.own }
+        }
+
+        for change in ownOnly {
+            try db.execute(
+                sql: "DELETE FROM sync_change WHERE table_name = ? AND record_id = ?",
+                arguments: [change.key.table.rawValue, change.key.id]
+            )
+        }
+
+        try db.execute(sql: "UPDATE sync_state SET engine_state = NULL")
+        try db.execute(
+            sql: "DELETE FROM sync_record WHERE zone_name = ?",
+            arguments: [SyncZone.own]
+        )
+        try db.execute(sql: "DELETE FROM sync_waiting")
+        try db.notifyChanges(in: Table("sync_change"))
+    }
+
+    static func saveZone(
+        for key: SyncKey,
+        in db: Database
+    ) throws -> String {
+        try syncSharedWallet(for: key, in: db).map(SyncZone.wallet) ?? SyncZone.own
+    }
+
+    static func canApplyDeletion(
+        of id: SyncRecordID,
+        in db: Database
+    ) throws -> Bool {
+        let zones = try String.fetchAll(
+            db,
+            sql: "SELECT zone_name FROM sync_record WHERE table_name = ? AND record_id = ?",
+            arguments: [id.key.table.rawValue, id.key.id]
+        )
+
+        return zones.isEmpty || zones.contains(id.zoneName)
+    }
+
+    static func joinSharedWallets(
+        in ids: [SyncRecordID],
+        db: Database
+    ) throws {
+        let walletIDs = Set(ids.compactMap { SyncZone.walletID(of: $0.zoneName) })
+
+        for walletID in walletIDs {
+            try db.execute(
+                sql: """
+                INSERT INTO sync_share (wallet_id, owner_name)
+                SELECT id, NULL FROM wallet WHERE id = ?
+                ON CONFLICT DO NOTHING
+                """,
+                arguments: [walletID.description]
+            )
+        }
     }
 
     static func pendingChanges(in db: Database) throws -> [SyncChange] {
@@ -363,25 +455,30 @@ private extension AppDatabase {
 
     static func saveSystemFields(
         _ data: Data,
-        of key: SyncKey,
+        of id: SyncRecordID,
         in db: Database
     ) throws {
         try db.execute(
             sql: """
-            INSERT INTO sync_record (table_name, record_id, system_fields) VALUES (?, ?, ?)
-            ON CONFLICT (table_name, record_id) DO UPDATE SET system_fields = excluded.system_fields
+            INSERT INTO sync_record (table_name, record_id, zone_name, system_fields)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT (table_name, record_id, zone_name)
+            DO UPDATE SET system_fields = excluded.system_fields
             """,
-            arguments: [key.table.rawValue, key.id, data]
+            arguments: [id.key.table.rawValue, id.key.id, id.zoneName, data]
         )
     }
 
     static func removeSystemFields(
-        of key: SyncKey,
+        of id: SyncRecordID,
         in db: Database
     ) throws {
         try db.execute(
-            sql: "DELETE FROM sync_record WHERE table_name = ? AND record_id = ?",
-            arguments: [key.table.rawValue, key.id]
+            sql: """
+            DELETE FROM sync_record
+            WHERE table_name = ? AND record_id = ? AND zone_name = ?
+            """,
+            arguments: [id.key.table.rawValue, id.key.id, id.zoneName]
         )
     }
 
@@ -515,10 +612,23 @@ private extension SyncChange {
 
         let key = SyncKey(table: table, id: row["record_id"])
         let isDeletion = try AppDatabase.localRow(for: key, in: db) == nil
+        let saveZone = try isDeletion ? nil : AppDatabase.saveZone(for: key, in: db)
+
+        let zones = try String.fetchAll(
+            db,
+            sql: """
+            SELECT zone_name FROM sync_record
+            WHERE table_name = ? AND record_id = ?
+            ORDER BY zone_name
+            """,
+            arguments: [table.rawValue, key.id]
+        )
 
         self.init(
             key: key,
             isDeletion: isDeletion,
+            saveZone: saveZone,
+            deleteZones: zones.filter { $0 != saveZone },
             version: row["version"]
         )
     }

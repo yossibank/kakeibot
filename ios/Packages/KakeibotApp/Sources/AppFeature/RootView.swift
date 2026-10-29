@@ -107,7 +107,7 @@ private extension RootView {
             .task(id: model.observationID(model.today)) {
                 await model.observeSync(in: database)
             }
-            .task(id: model.observationID(model.isSyncEnabled)) {
+            .task(id: model.observationID(model.syncActivity)) {
                 await model.syncChanges(in: database)
             }
         case .failed:
