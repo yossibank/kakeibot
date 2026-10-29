@@ -49,7 +49,10 @@ public extension AppDatabase {
     func turnOnSync() async throws {
         try await writer.write { db in
             try Self.clearOwnSync(in: db)
-            try db.execute(sql: "UPDATE sync_state SET enabled = 1, stop_reason = NULL")
+            try db
+                .execute(
+                    sql: "UPDATE sync_state SET enabled = 1, stop_reason = NULL, send_problem = NULL"
+                )
             try Self.queueAll(in: db)
         }
     }
@@ -70,7 +73,10 @@ public extension AppDatabase {
             }
 
             try Self.clearSync(in: db)
-            try db.execute(sql: "UPDATE sync_state SET enabled = 1, stop_reason = NULL")
+            try db
+                .execute(
+                    sql: "UPDATE sync_state SET enabled = 1, stop_reason = NULL, send_problem = NULL"
+                )
             try Self.setApplying(false, in: db)
         }
     }
@@ -309,7 +315,7 @@ private extension AppDatabase {
         in db: Database
     ) throws {
         try db.execute(
-            sql: "UPDATE sync_state SET enabled = 0, stop_reason = ?",
+            sql: "UPDATE sync_state SET enabled = 0, stop_reason = ?, send_problem = NULL",
             arguments: [reason?.rawValue]
         )
 

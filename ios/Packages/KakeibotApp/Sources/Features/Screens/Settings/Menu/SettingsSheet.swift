@@ -11,7 +11,7 @@ public struct SettingsSheet: View {
     @State var authorization: NotificationAuthorization = .allowed
     @State var theme: ThemeChoice = .system
     @State var customThemes: [Theme] = []
-    @State var syncStatus = SyncStatus(isEnabled: false, stopReason: nil)
+    @State var syncStatus = SyncStatus.off
 
     #if DEBUG
     @State var isConfirmingSample = false
@@ -129,7 +129,7 @@ private extension SettingsSheet {
                 syncStatus = status
             }
         } catch {
-            syncStatus = SyncStatus(isEnabled: false, stopReason: nil)
+            syncStatus = .off
         }
     }
 

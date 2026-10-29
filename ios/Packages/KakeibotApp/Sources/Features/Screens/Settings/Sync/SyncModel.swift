@@ -12,6 +12,7 @@ public final class SyncModel {
     public private(set) var isWorking = false
     public private(set) var pendingCount: Int?
     public private(set) var stopReason: SyncStopReason?
+    public private(set) var sendProblem: SyncSendProblem?
     public private(set) var shares: [WalletShare] = []
 
     public internal(set) var isChoosing = false
@@ -45,10 +46,20 @@ public extension SyncModel {
             for try await status in database.syncStatusUpdates() {
                 isOn = status.isEnabled
                 stopReason = status.stopReason
+                sendProblem = status.sendProblem
             }
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
+    }
+
+    func pendingText(_ count: Int) -> String {
+        guard count > 0 else {
+            return "最新の状態です"
+        }
+
+        let head = sendProblem?.message ?? "iCloud に送っています"
+        return "\(head)（残り \(count) 件）"
     }
 
     func observePending() async {

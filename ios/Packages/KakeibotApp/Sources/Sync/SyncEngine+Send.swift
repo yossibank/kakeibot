@@ -59,9 +59,18 @@ extension SyncEngine {
         let failed = Set(failedKeys)
         let finished = finishedChanges(saved: savedIDs, deleted: deleted)
 
+        let failureCodes = sent.failedRecordSaves.map(\.error.code)
+            + sent.failedRecordDeletes.values.map(\.code)
+
+        let problem = failureCodes.lazy.compactMap(SyncSendProblem.init).first
+
         try? await database.saveSyncSystemFields(systemFields)
         try? await database.removeSyncSystemFields(deleted)
         try? await database.removeSyncChanges(finished)
+
+        if problem != nil || !savedIDs.isEmpty || !deleted.isEmpty {
+            try? await database.setSyncSendProblem(problem)
+        }
 
         for failure in sent.failedRecordSaves {
             await retry(failure)

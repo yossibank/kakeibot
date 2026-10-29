@@ -115,6 +115,30 @@ struct SyncSwitchTests {
         #expect(replaced.stopReason == nil)
     }
 
+    @Test
+    func keepsWhySendingIsStuckUntilItGoesThrough() async throws {
+        let setup = try await SyncTests.Setup()
+
+        try await setup.database.setSyncSendProblem(.quotaExceeded)
+        let stuck = try await setup.database.syncStatus()
+        try await setup.database.setSyncSendProblem(nil)
+        let sent = try await setup.database.syncStatus()
+
+        #expect(stuck.sendProblem == .quotaExceeded)
+        #expect(sent.sendProblem == nil)
+    }
+
+    @Test
+    func forgetsWhySendingIsStuckWhenTurnedOff() async throws {
+        let setup = try await SyncTests.Setup()
+
+        try await setup.database.setSyncSendProblem(.networkUnavailable)
+        try await setup.database.turnOffSync()
+        let status = try await setup.database.syncStatus()
+
+        #expect(status.sendProblem == nil)
+    }
+
     @Test(.timeLimit(.minutes(1)))
     func countsPendingUntilSent() async throws {
         let setup = try await SyncTests.Setup()

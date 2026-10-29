@@ -130,6 +130,38 @@ struct SyncModelTests {
     }
 
     @Test
+    func explainsWhySendingIsStuck() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        try await setup.database.turnOnSync()
+
+        let task = Task {
+            await model.observeStatus()
+        }
+
+        try await setup.database.setSyncSendProblem(.quotaExceeded)
+
+        try await wait {
+            model.sendProblem != nil
+        }
+
+        task.cancel()
+
+        #expect(model.pendingText(3) == "iCloud の容量が足りず、送れていません（残り 3 件）")
+        #expect(model.pendingText(0) == "最新の状態です")
+    }
+
+    @Test
+    func showsSendingWhileNothingIsStuck() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+
+        #expect(model.pendingText(3) == "iCloud に送っています（残り 3 件）")
+    }
+
+    @Test
     func startsSharingAndShowsSheet() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)

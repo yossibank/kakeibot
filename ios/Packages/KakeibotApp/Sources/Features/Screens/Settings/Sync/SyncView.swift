@@ -46,20 +46,25 @@ public struct SyncView: View {
 
                         if model.isOn,
                            let count = model.pendingCount {
-                            HStack(spacing: 8) {
-                                if count > 0 {
-                                    ProgressView()
-                                        .controlSize(.mini)
-                                } else {
-                                    Image(systemName: "checkmark.circle")
-                                        .foregroundStyle(Palette.accent)
-                                }
+                            if count > 0,
+                               model.sendProblem != nil {
+                                warning(model.pendingText(count))
+                            } else {
+                                HStack(spacing: 8) {
+                                    if count > 0 {
+                                        ProgressView()
+                                            .controlSize(.mini)
+                                    } else {
+                                        Image(systemName: "checkmark.circle")
+                                            .foregroundStyle(Palette.accent)
+                                    }
 
-                                Text(pendingText(count))
+                                    Text(model.pendingText(count))
+                                }
+                                .textFont(.footnote)
+                                .foregroundStyle(Palette.subtext)
+                                .padding(.leading, 8)
                             }
-                            .textFont(.footnote)
-                            .foregroundStyle(Palette.subtext)
-                            .padding(.leading, 8)
                         }
 
                         Text(footnote)
@@ -235,10 +240,6 @@ private extension SyncView {
                 await model.setOn(isOn)
             }
         }
-    }
-
-    func pendingText(_ count: Int) -> String {
-        count > 0 ? "iCloud に送っています（残り \(count) 件）" : "最新の状態です"
     }
 
     func shareStatus(_ item: WalletShare) -> String {
