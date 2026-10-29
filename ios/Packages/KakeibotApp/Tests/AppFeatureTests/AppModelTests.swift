@@ -1,6 +1,7 @@
 @testable import AppFeature
 import Core
 import Foundation
+import GRDB
 import Notifications
 import Store
 import Testing
@@ -110,6 +111,54 @@ struct AppModelTests {
         await model.open()
 
         #expect(model.notice.message == "固定費を自動で記録できませんでした")
+    }
+
+    @Test
+    func staysQuietWhenRecurringIsInterrupted() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date()
+        try database.insertDefaultsIfEmpty(at: now)
+        try await database.setSetting(.onboardingCompleted, to: true)
+        let options = try await database.entryOptions()
+        let today = LocalDate(now, in: .current)
+        let client = NotificationSchedulerTests.FakeCenter(pending: [])
+        let scheduler = NotificationScheduler(client: client)
+        let model = AppModel(openDatabase: { database }, scheduler: scheduler)
+
+        await model.open()
+
+        let recurring = Recurring(
+            type: .expense,
+            amount: 78000,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            frequency: .monthly,
+            day: today.day,
+            startDate: today,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        try await database.writer.write { db in
+            try recurring.insert(db)
+
+            db.add(
+                function: DatabaseFunction("interrupt_for_tests", argumentCount: 0) { _ in
+                    throw DatabaseError(resultCode: .SQLITE_INTERRUPT)
+                }
+            )
+
+            try db.execute(
+                sql: """
+                CREATE TRIGGER interrupt_entry BEFORE INSERT ON entry
+                BEGIN SELECT interrupt_for_tests(); END
+                """
+            )
+        }
+
+        await model.refreshDay()
+
+        #expect(model.notice.message == nil)
     }
 
     @Test

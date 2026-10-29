@@ -130,11 +130,27 @@ struct SyncSwitchTests {
 
         #expect(turnedOff.stopReason == nil)
 
+        try await setup.database.turnOnSync()
         try await setup.database.turnOffSync(because: .cloudReplaced)
         try await setup.database.turnOnSyncReplacingLocal()
         let replaced = try await setup.database.syncStatus()
 
         #expect(replaced.stopReason == nil)
+    }
+
+    @Test
+    func leavesNoReasonWhenSyncWasAlreadyOffByHand() async throws {
+        let setup = try await SyncTests.Setup(enabled: false)
+
+        try await setup.database.turnOffSyncForAccountChange(.signedOut)
+        let afterAccountChange = try await setup.database.syncStatus()
+
+        #expect(afterAccountChange.stopReason == nil)
+
+        try await setup.database.turnOffSync(because: .cloudReplaced)
+        let afterReplaced = try await setup.database.syncStatus()
+
+        #expect(afterReplaced.stopReason == nil)
     }
 
     @Test

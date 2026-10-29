@@ -150,5 +150,5 @@ public extension RewardRuleEditModel {
 private extension RewardRuleEditModel {
     static let saveFailedMessage = "保存できませんでした"
     static let deleteFailedMessage = "削除できませんでした"
-    static let loadFailedMessage = "ごほうびを読めませんでした"
+    static let loadFailedMessage = "決まりを読めませんでした"
 }
