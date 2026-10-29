@@ -259,13 +259,16 @@ private extension AppDatabase {
         let columns = Set(names)
         let values = record.values.filter { columns.contains($0.key) && $0.key != table.keyColumn }
 
-        guard try isNewer(record, in: db) else {
+        guard
+            try isNewer(record, in: db),
+            let losers = try conflictLosers(against: record, columns: columns, in: db)
+        else {
             return .skipped
         }
 
         do {
             try db.inSavepoint {
-                try removeConflicts(with: record, in: db)
+                try remove(losers, of: table, in: db)
                 try upsert(record.key, values: values, in: db)
                 return .commit
             }
@@ -304,37 +307,6 @@ private extension AppDatabase {
             sql: "SELECT EXISTS (SELECT 1 FROM sync_change WHERE table_name = ? AND record_id = ?)",
             arguments: [key.table.rawValue, key.id]
         ) ?? false
-    }
-
-    static func removeConflicts(
-        with record: SyncRecord,
-        in db: Database
-    ) throws {
-        let table = record.key.table
-
-        for unique in table.uniqueKeys {
-            let values = unique.columns.map { record.values[$0] ?? .null }
-
-            guard unique.matchesNull || !values.contains(.null) else {
-                continue
-            }
-
-            let conditions = unique.columns.map { "\($0) IS ?" }.joined(separator: " AND ")
-            let databaseValues = values.map(\.databaseValue) + [record.key.id.databaseValue]
-            let arguments = StatementArguments(databaseValues)
-
-            try setApplying(false, in: db)
-
-            try db.execute(
-                sql: """
-                DELETE FROM \(table.rawValue)
-                WHERE \(conditions) AND \(table.keyColumn) <> ?
-                """,
-                arguments: arguments
-            )
-
-            try setApplying(true, in: db)
-        }
     }
 
     static func upsert(
