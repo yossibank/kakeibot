@@ -40,6 +40,30 @@ struct RecordTests {
         #expect(row?["created_at"] == "2026-10-03T04:00:00Z")
     }
 
+    @Test(arguments: [
+        ("2026-10-29T02:32:29Z", 1_793_241_149.0),
+        ("2026-10-29T11:32:29+09:00", 1_793_241_149.0),
+        ("2026-10-29T02:32:29.250Z", 1_793_241_149.25)
+    ])
+    func readsStoredTimes(
+        text: String,
+        seconds: TimeInterval
+    ) throws {
+        let database = try AppDatabase.inMemory()
+        let sample = try Sample()
+
+        try database.writer.write { db in
+            try sample.insert(into: db)
+            try db.execute(sql: Self.expenseTimeUpdate, arguments: [text])
+        }
+
+        let entry = try database.writer.read { db in
+            try Entry.fetchOne(db, key: sample.expense.id)
+        }
+
+        #expect(entry?.createdAt == Date(timeIntervalSince1970: seconds))
+    }
+
     @Test
     func acceptsValidEntry() throws {
         let database = try AppDatabase.inMemory()
@@ -221,4 +245,5 @@ extension RecordTests.Tables {
 
 private extension RecordTests {
     static let expenseQuery = "SELECT * FROM entry WHERE type = 'expense'"
+    static let expenseTimeUpdate = "UPDATE entry SET created_at = ? WHERE type = 'expense'"
 }
