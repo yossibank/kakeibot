@@ -54,6 +54,28 @@ struct SyncSwitchTests {
     }
 
     @Test
+    func turningOffKeepsWaitingRowsReceivedFromSharedZones() async throws {
+        let setup = try await SyncTests.Setup()
+        let walletID = try await setup.walletID()
+        let key = SyncKey(table: .tag, id: "tag")
+
+        try await setup.joinForeignShare(of: walletID)
+
+        try await setup.execute("""
+        INSERT INTO sync_waiting (table_name, record_id, fields) VALUES
+            ('tag', 'tag', '{"category_id":{"text":{"_0":"missing"}}}')
+        """)
+
+        try await setup.database
+            .saveSyncSystemFields([key.recordID(in: "Wallet-\(walletID)"): Data([1])])
+        try await setup.database.turnOffSync()
+
+        let waiting = try await setup.value("SELECT group_concat(record_id) FROM sync_waiting")
+
+        #expect(waiting == "tag")
+    }
+
+    @Test
     func turningOffClearsSyncState() async throws {
         let setup = try await SyncTests.Setup()
         let key = SyncKey(table: .noSpendDay, id: "2026-10-01")

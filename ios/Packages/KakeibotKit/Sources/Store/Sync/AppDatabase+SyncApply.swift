@@ -13,9 +13,15 @@ public extension AppDatabase {
             let joinedIDs = Array(systemFields.keys)
             let sharedKeys = Self.sharedKeys(in: systemFields)
 
-            var blocked: [SyncKey] = []
+            let waitingIDs = try String.fetchAll(
+                db,
+                sql: "SELECT record_id FROM sync_waiting WHERE table_name = 'entry'"
+            )
+
             let entryIDs = (saved.map(\.key) + deleted.map(\.key)).filter { $0.table == .entry }
-                .map(\.id)
+                .map(\.id) + waitingIDs
+
+            var blocked: [SyncKey] = []
             var cardBills = try CardBillChange(before: Self.cardEntries(entryIDs, in: db))
 
             try Self.setApplying(true, in: db)
