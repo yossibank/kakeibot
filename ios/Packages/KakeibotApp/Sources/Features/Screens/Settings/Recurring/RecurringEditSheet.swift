@@ -169,15 +169,15 @@ private extension RecurringEditSheet {
                             .frame(maxWidth: .infinity)
                     }
 
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(spacing: 8) {
                         RecurringRowCard(row: model.previewRow)
                             .frame(height: RecurringRowCard.height)
                             .sharesTextScale(id: model.previewRow.place)
 
                         Text("一覧では、このカードで並びます")
                             .textFont(.caption2)
+                            .tracking(1)
                             .foregroundStyle(Palette.subtext)
-                            .padding(.leading, 4)
                     }
 
                     SettingsField(namePrompt, text: $model.memo, focus: $focus, field: .name)
