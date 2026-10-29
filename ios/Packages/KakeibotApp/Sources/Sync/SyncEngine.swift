@@ -61,14 +61,17 @@ public extension SyncEngine {
         self.isSyncEnabled = isSyncEnabled
 
         let data = try? await database.syncEngineState(isShared: isShared)
+
         let state = data.flatMap {
             try? JSONDecoder().decode(CKSyncEngine.State.Serialization.self, from: $0)
         }
+
         let configuration = CKSyncEngine.Configuration(
             database: cloudDatabase,
             stateSerialization: state,
             delegate: self
         )
+
         let engine = CKSyncEngine(configuration)
 
         self.engine = engine
@@ -76,7 +79,8 @@ public extension SyncEngine {
         if state == nil,
            isSyncEnabled,
            !isShared {
-            engine.state.add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: Self.zoneID))])
+            let zone = CKRecordZone(zoneID: Self.zoneID)
+            engine.state.add(pendingDatabaseChanges: [.saveZone(zone)])
         }
     }
 
@@ -140,7 +144,6 @@ extension SyncEngine {
 
     func restart() async {
         let isSyncEnabled = isSyncEnabled
-
         stop()
         await start(isSyncEnabled: isSyncEnabled)
     }
@@ -186,6 +189,7 @@ extension SyncEngine: CKSyncEngineDelegate {
     ) async -> CKSyncEngine.RecordZoneChangeBatch? {
         let changes = syncEngine.state.pendingRecordZoneChanges
             .filter { context.options.scope.contains($0) }
+
         let local = await (try? database.pendingSyncChanges()) ?? []
 
         for change in local {

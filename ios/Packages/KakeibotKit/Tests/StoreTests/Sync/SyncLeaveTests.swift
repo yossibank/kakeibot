@@ -20,7 +20,8 @@ struct SyncLeaveTests {
             '2026-10-12', '2026-10-12T00:00:00Z', '2026-10-12T00:00:00Z'
         )
         """)
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
 
         try await setup.database.endSharing(id)
 
@@ -38,6 +39,8 @@ struct SyncLeaveTests {
         let ownID = try await setup.otherWalletID()
         let categoryID = try await setup.categoryID()
         let id = try #require(Wallet.ID(walletID))
+        let outKey = SyncKey(table: .entry, id: "t-out")
+        let inKey = SyncKey(table: .entry, id: "t-in")
 
         try await setup.joinForeignShare(of: walletID)
         try await setup.execute("""
@@ -50,29 +53,22 @@ struct SyncLeaveTests {
         )
         VALUES ('fee', 'expense', 10, '\(categoryID)', '\(ownID)', 't-out', '2026-10-12', 'x', 'x')
         """)
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
 
         try await setup.database.endSharing(id)
 
         let outgoing = try await setup.row(of: "t-out")
         let incoming = try await setup.row(of: "t-in")
         let pending = try await setup.pendingKeys()
+        let outCategory = try await setup.setting("transfer_out_category_id")
+        let inCategory = try await setup.setting("transfer_in_category_id")
 
-        #expect(try await outgoing == [
-            "expense",
-            ownID,
-            "",
-            setup.setting("transfer_out_category_id")
-        ])
-        #expect(try await incoming == [
-            "income",
-            ownID,
-            "",
-            setup.setting("transfer_in_category_id")
-        ])
+        #expect(outgoing == ["expense", ownID, "", outCategory])
+        #expect(incoming == ["income", ownID, "", inCategory])
         #expect(try await setup.count("entry WHERE id = 'fee' AND transfer_id IS NULL") == 1)
-        #expect(pending.contains(SyncKey(table: .entry, id: "t-out")))
-        #expect(pending.contains(SyncKey(table: .entry, id: "t-in")))
+        #expect(pending.contains(outKey))
+        #expect(pending.contains(inKey))
     }
 
     @Test
@@ -111,7 +107,8 @@ struct SyncLeaveTests {
             '2026-10-12', '2026-10-12T00:00:00Z', '2026-10-12T00:00:00Z'
         )
         """)
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
 
         try await setup.database.endSharing(id)
 
@@ -139,16 +136,19 @@ private extension SyncTests.Setup {
     }
 
     func count(_ from: String) async throws -> Int {
-        try await Int(value("SELECT COUNT(*) FROM \(from)")) ?? -1
+        let text = try await value("SELECT COUNT(*) FROM \(from)")
+        return Int(text) ?? -1
     }
 
     func row(of entryID: String) async throws -> [String] {
         try await database.writer.read { db in
-            let row = try #require(try Row.fetchOne(
+            let fetched = try Row.fetchOne(
                 db,
                 sql: "SELECT type, wallet_id, to_wallet_id, category_id FROM entry WHERE id = ?",
                 arguments: [entryID]
-            ))
+            )
+
+            let row = try #require(fetched)
 
             return row.columnNames.map { (row[$0] as String?) ?? "" }
         }

@@ -45,15 +45,19 @@ extension SyncEngine {
         let records = changes.modifications
             .map(\.record)
             .filter { receives(from: $0.recordID.zoneID.zoneName) }
+
         let saved = records.compactMap(SyncRecord.init)
+
         let deleted = changes.deletions
             .compactMap { SyncRecordID($0.recordID) }
             .filter { receives(from: $0.zoneName) }
+
         let systemFields = records.reduce(into: [SyncRecordID: Data]()) { fields, record in
             if let id = SyncRecordID(record.recordID) {
                 fields[id] = record.systemFields
             }
         }
+
         let owners = records.reduce(into: [String: String]()) { owners, record in
             if isShared {
                 owners[record.recordID.zoneID.zoneName] = record.recordID.zoneID.ownerName

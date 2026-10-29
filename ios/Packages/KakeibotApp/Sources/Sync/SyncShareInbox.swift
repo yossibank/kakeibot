@@ -16,7 +16,6 @@ public extension SyncShareInbox {
 
     func take() -> [CKShare.Metadata] {
         let taken = pending
-
         pending = []
         return taken
     }

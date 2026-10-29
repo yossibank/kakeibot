@@ -42,13 +42,7 @@ extension AppDatabase {
         in db: Database,
         at now: Date
     ) throws -> EntryCategory.ID {
-        try categoryId(
-            for: .feeCategory,
-            seed: feeSeed,
-            kind: .expense,
-            in: db,
-            at: now
-        )
+        try categoryId(for: .feeCategory, seed: feeSeed, kind: .expense, in: db, at: now)
     }
 
     static func transferCategoryId(
@@ -61,13 +55,7 @@ extension AppDatabase {
         case .income: .transferInCategory
         }
 
-        return try categoryId(
-            for: key,
-            seed: transferSeed,
-            kind: kind,
-            in: db,
-            at: now
-        )
+        return try categoryId(for: key, seed: transferSeed, kind: kind, in: db, at: now)
     }
 }
 
@@ -139,12 +127,13 @@ private extension AppDatabase {
 
         let icon = try insertIcon(for: seed, into: db, at: now)
         let sameKind = EntryCategory.filter(Column("kind") == kind.rawValue)
+        let sortOrder = try EntryCategory.nextSortOrder(of: sameKind, in: db)
 
-        let category = try EntryCategory(
+        let category = EntryCategory(
             kind: kind,
             name: seed.name,
             iconId: icon.id,
-            sortOrder: EntryCategory.nextSortOrder(of: sameKind, in: db),
+            sortOrder: sortOrder,
             createdAt: now,
             updatedAt: now
         )
@@ -175,13 +164,7 @@ private extension AppDatabase {
             try wallet.insert(db)
         }
 
-        try insertCategories(
-            expenseCategories,
-            kind: .expense,
-            into: db,
-            at: now
-        )
-
+        try insertCategories(expenseCategories, kind: .expense, into: db, at: now)
         try insertCategories(incomeCategories, kind: .income, into: db, at: now)
     }
 
@@ -225,9 +208,7 @@ private extension AppDatabase {
             .filter { $0.kind == .expense && $0.archivedAt == nil }
 
         let seeds = templates.compactMap { seed in
-            categories
-                .first { $0.name == seed.category }
-                .map { (seed.name, $0) }
+            categories.first { $0.name == seed.category }.map { (seed.name, $0) }
         }
 
         for (order, (name, category)) in seeds.enumerated() {
@@ -251,12 +232,7 @@ private extension AppDatabase {
         at now: Date
     ) throws {
         for (order, (glyph, color)) in shelf.enumerated() {
-            let icon = try insertIcon(
-                glyph: glyph,
-                color: color,
-                into: db,
-                at: now
-            )
+            let icon = try insertIcon(glyph: glyph, color: color, into: db, at: now)
 
             let shelfIcon = ShelfIcon(
                 iconId: icon.id,
@@ -274,12 +250,7 @@ private extension AppDatabase {
         into db: Database,
         at now: Date
     ) throws -> Icon {
-        try insertIcon(
-            glyph: seed.glyph,
-            color: seed.color,
-            into: db,
-            at: now
-        )
+        try insertIcon(glyph: seed.glyph, color: seed.color, into: db, at: now)
     }
 
     static func insertIcon(

@@ -106,12 +106,12 @@ private extension AppDatabase {
             Column("wallet_id") == walletID || Column("to_wallet_id") == walletID
         )
 
-        try detachRewardGoals(from: entries.fetchAll(db).map(\.id), in: db, at: now)
+        let entryIDs = try entries.fetchAll(db).map(\.id)
 
+        try detachRewardGoals(from: entryIDs, in: db, at: now)
         try setApplying(true, in: db)
         _ = try entries.deleteAll(db)
         try setApplying(false, in: db)
-
         _ = try deleteRecurrings(recurrings, in: db, at: now)
 
         try db.execute(

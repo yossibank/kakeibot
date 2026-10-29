@@ -23,6 +23,7 @@ final class AppModel {
     private let router: NotificationRouter
     private let shareInbox: SyncShareInbox
     private let retryDelays: [Duration]
+
     private var hasStoppedObservation = false
     private var syncEngine: SyncEngine?
     private var sharedSyncEngine: SyncEngine?
@@ -195,6 +196,7 @@ extension AppModel {
     func syncChanges(in database: AppDatabase) async {
         await syncEngine?.stop()
         await sharedSyncEngine?.stop()
+
         syncEngine = nil
         sharedSyncEngine = nil
 
@@ -207,6 +209,7 @@ extension AppModel {
 
         syncEngine = engine
         sharedSyncEngine = sharedEngine
+
         await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
         await sharedEngine.start(isSyncEnabled: syncActivity.isSyncEnabled)
 
@@ -230,6 +233,7 @@ extension AppModel {
         let engine = sharedSyncEngine ?? SyncEngine(database: database, scope: .shared)
 
         sharedSyncEngine = engine
+
         await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
         await engine.fetchChanges()
     }
@@ -332,21 +336,4 @@ private extension AppModel {
 struct ObservationID<Base: Hashable>: Hashable {
     let base: Base
     let round: Int
-}
-
-struct ForegroundReturn {
-    private var wasBackground = false
-
-    mutating func receive(_ phase: ScenePhase) -> Bool {
-        switch phase {
-        case .background:
-            wasBackground = true
-            return false
-        case .active:
-            defer { wasBackground = false }
-            return wasBackground
-        default:
-            return false
-        }
-    }
 }
