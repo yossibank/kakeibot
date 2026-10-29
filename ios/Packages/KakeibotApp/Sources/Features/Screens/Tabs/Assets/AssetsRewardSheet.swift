@@ -174,7 +174,7 @@ private extension AssetsRewardSheet {
             }
 
             if model.rewardRules.isEmpty {
-                AddButton("ごほうびを追加") {
+                AddButton("決まりを追加") {
                     isEditingRules = true
                 }
             } else {
