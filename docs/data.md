@@ -33,7 +33,7 @@ erDiagram
     entry |o--o| reward_goal : "entry_id"
 ```
 
-`no_spend_day`・`theme`・`setting` はほかの表を参照しない（`setting` の `theme_id` は値として持つ）。
+`no_spend_day`・`theme`・`setting` はほかの表を参照しない。`setting` の `theme_id` は、値として持つ。
 
 ## 共通の決まり
 
@@ -84,7 +84,9 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 ## 表
 
-表ごとに、列と型と補足を書く。型は SQLite の型で書く。同期のための表は [data-sync](data-sync.md) にある。
+表ごとに、列と型と補足を書く。型は SQLite の型で書く。
+
+`theme` と `setting` は [data-settings](data-settings.md)、同期のための表は [data-sync](data-sync.md) にある。
 
 ### icon
 
@@ -139,7 +141,14 @@ emoji・text・glyph のどれかは必須。
 
 `(wallet_id, date)` は重複禁止。同じ日に入れ直したら置き換える。
 
-財布の残高は、いちばん新しい評価額から数える。評価額があれば、その額に、評価額の日より後の記録を足し引きする。同じ日の記録は、評価額より後に作ったものだけを足し引きする。無ければ、最初の残高に、すべての記録を足し引きする。ある日の時点の残高は、その日までの評価額だけを使う。
+財布の残高は、いちばん新しい評価額から次のように数える。
+
+| 場合 | 数え方 |
+| --- | --- |
+| 評価額がある | その額に、評価額の日より後の記録を足し引きする |
+| 評価額と同じ日の記録 | 評価額より後に作ったものだけを足し引きする |
+| 評価額が無い | 最初の残高に、すべての記録を足し引きする |
+| ある日の時点の残高 | その日までの評価額だけを使う |
 
 ### category
 
@@ -180,14 +189,18 @@ emoji・text・glyph のどれかは必須。
 | to_wallet_id | TEXT | 振替だけ。wallet_id と別 |
 | memo | TEXT | |
 | recurring_id | TEXT | 固定費から作った記録 |
-| recurring_date | TEXT | 休日でずらす前の予定日。どの回の分かを表す。`date` は実際の日（ずらした後） |
-| bill_month | TEXT | カードの引き落としの回の月（`2026-11`）。休日でずらす前の予定日の月で書く。空なら締め日で決める |
-| transfer_id | TEXT | 振替の手数料だけ。元の振替の entry。重複禁止。振替を消すと一緒に消える |
+| recurring_date | TEXT | 休日でずらす前の予定日で、どの回の分かを表す。`date` は実際の日（ずらした後） |
+| bill_month | TEXT | カードの引き落としの回の月（`2026-11`）で、休日でずらす前の予定日の月で書く。空なら締め日で決める |
+| transfer_id | TEXT | 振替の手数料だけが持つ、元の振替の entry。重複禁止で、振替を消すと一緒に消える |
 | created_at / updated_at | TEXT | |
 
 `recurring_id` と `recurring_date` は、そろって入るか、どちらも空にする。`(recurring_id, recurring_date)` は重複禁止。支出を記録した日の `no_spend_day` は消す。
 
-振替の手数料は、振替と別の支出の記録にする。日付と財布は振替に合わせ、財布は振替元にする。カテゴリは `fee_category_id` の設定のカテゴリにし、無ければ「手数料」を作る。手数料を 0 にすると記録を消す。
+振替の手数料は、振替と別の支出の記録にする。決まりは次のとおり。
+
+- 日付と財布は振替に合わせ、財布は振替元にする。
+- カテゴリは `fee_category_id` の設定のカテゴリにし、無ければ「手数料」を作る。
+- 手数料を 0 にすると記録を消す。
 
 ### template
 
@@ -244,8 +257,8 @@ emoji・text・glyph のどれかは必須。
 | month | INTEGER | yearly だけ |
 | day | INTEGER | 1〜31。月末を超えたらその月の最終日 |
 | holiday_shift | TEXT | `none` `previous` `next`。休日に当たったら、そのまま・前の平日・次の平日にする |
-| closing_day | INTEGER | 振替だけ。1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にする。amount は 0 にする |
-| fee | INTEGER | 振替だけ。1 以上。あれば、記録するときに手数料も記録する |
+| closing_day | INTEGER | 振替だけで、1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にし、amount は 0 にする |
+| fee | INTEGER | 振替だけで、1 以上。あれば、記録するときに手数料も記録する |
 | start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |
@@ -307,53 +320,6 @@ date ごとに 1 つまで（date に一意の索引を付ける）。押し直�
 | --- | --- | --- |
 | date | TEXT | 主キー |
 | created_at | TEXT | |
-
-### theme
-
-| 列 | 型 | 補足 |
-| --- | --- | --- |
-| id | TEXT | |
-| name | TEXT | |
-| background / surface / text_primary / text_secondary / accent / expense / income | TEXT | `#RRGGBB`。地・カード・文字・控えめな文字・強調と、支出・収入の色。expense・income は描画に使わない |
-| corner_radius | INTEGER | 今は使わない。角の丸みは setting の `corner_style` で選ぶ |
-| font_id | TEXT | 今は使わない。字体は setting の `font_style` と `text_font_style` で選ぶ |
-| is_builtin | INTEGER | |
-| created_at / updated_at | TEXT | |
-
-### setting
-
-| key | 値 |
-| --- | --- |
-| month_start_day | 1〜31。月末を超えたらその月の最終日 |
-| week_start | `monday`〜`sunday`。空なら日曜 |
-| reminder_time | `HH:mm`。空なら知らせない |
-| theme_id | `system`（iPhone に合わせる）か、用意したテーマの名前（`navy` など、アプリアイコンの色違いと同じ）か、手で作った theme の id。空なら `system` |
-| onboarding_completed | `true` `false` |
-| setup_card_closed | `true` なら、ホームの残りの設定のカードを出さない |
-| entry_opened | `true` `false`。入力シートを一度開くと `true` にし、入力の ＋ に光を回さない |
-| settings_opened | `true` `false`。設定を一度開くと `true` にし、ホームの設定のボタンに金の点を出さない |
-| launch_screen | `home`・`records`・`review`・`assets`・`entry`。空ならホーム |
-| corner_style | `square`・`small`・`standard`・`large`。`square` は角を丸めない。空なら `standard` |
-| font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop`。空なら `mincho` |
-| text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop`。空なら `gothic` |
-| text_size | 文字の大きさ。`small`・`standard`・`large`。空なら `standard` |
-| entry_starts_with_amount | 今は使わない |
-| categories_by_use | 今は使わない |
-| template_order | `manual` `frequent` `category` `amount` `name`。空なら並べた順 |
-| home_sections | ホームに並べる順。`customize` `budget` `templates` `recent` `bills` `stamps` を `,` でつないだもの。空なら `customize` `budget` `templates` `recent` の順。無いものは後ろに足し、`bills` と `stamps` は隠す |
-| home_hidden_sections | ホームに出さないもの。書き方は home_sections と同じ。すべては隠さない。空なら home_sections にあるものをすべて出す |
-| records_layout | `calendar` `list`。空ならカレンダー |
-| review_scale | `week` `month` `year`。空なら月 |
-| review_kind | `expense` `income` `balance`。空なら支出 |
-| closed_hints | 説明を閉じた設定の画面を `,` でつないだもの（`categories` `wallets` `templates` `recurrings` `stamps` `rewards` `budgets` `themes` `homeSections`）。空ならすべて出す |
-| closed_hidden_lists | 非表示の項目をたたんだ設定の画面。書き方は closed_hints と同じ。空ならすべて開く |
-| recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで |
-| widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。その記録で支出なしの印を消したときは、`,` に続けてその日付（`2026-10-03`）を付ける。取り消すと消す |
-| fee_category_id | 振替の手数料に付ける category の id |
-| transfer_out_category_id | 抜けた共有の財布への振替を支出に変えるときに付ける category の id |
-| transfer_in_category_id | 抜けた共有の財布からの振替を収入に変えるときに付ける category の id |
-
-列は `key`（TEXT、主キー）と `value`（TEXT）の 2 つ。`key` は表では縛らず、上の表の名前だけをアプリで使う。
 
 ## 表の形の変更
 

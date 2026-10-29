@@ -8,26 +8,7 @@ iOS・Android の家計簿アプリ
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-0A84FF?logo=swift&logoColor=white)
 ![GRDB](https://img.shields.io/badge/GRDB-003B57?logo=sqlite&logoColor=white)
 
-## 文書
-
-知りたいことごとに、読む文書が分かれている。
-
-| 知りたいこと | 文書 |
-| --- | --- |
-| 何を作るか | [docs/overview.md](docs/overview.md) |
-| どう作るか | [docs/architecture.md](docs/architecture.md) |
-| データの形 | [docs/data.md](docs/data.md) |
-| 同期のための表 | [docs/data-sync.md](docs/data-sync.md) |
-| なぜそう決めたか | [docs/decisions/](docs/decisions/) |
-| 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
-| 画面の言葉とコードの名前 | [docs/glossary.md](docs/glossary.md) |
-| 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
-| fixtures の形式 | [spec/fixtures.md](spec/fixtures.md) |
-| 作業と文書の決まり | [CLAUDE.md](CLAUDE.md) |
-| 文書の役割 | [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) |
-| 全リポジトリ共通の決まり | [claude-config](https://github.com/yossibank/claude-config) |
-
-## 動かし方
+## 🚀 動かし方
 
 Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setup` で入る。
 
@@ -51,9 +32,11 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | iOS のビルド（シミュレーター） | `make build` |
 | テストのコンパイルだけ（走らせない） | `make test-build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
-| 画面の部品を PNG に描く（claude-config の `ui-snapshot` を使う。セットは `.claude/snapshots/` の下の名前。出力は `.build/snapshots/<セット>/`） | `make snapshot SNAPSHOT=widget` |
+| 画面の部品を PNG に描く（下の注） | `make snapshot SNAPSHOT=widget` |
 | Swift の整形 | `make format` |
 | ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
+
+`make snapshot` は claude-config の `ui-snapshot` を使う。セットは `.claude/snapshots/` の下の名前で、出力は `.build/snapshots/<セット>/` に出る。
 
 DEBUG のビルドは、起動の引数 `-open` で設定の画面を直接開く。`settings` なら設定のシートを、`SetupItem` の名前（`homeSections` など）ならその画面を開く。
 
@@ -61,7 +44,27 @@ DEBUG のビルドは、起動の引数 `-open` で設定の画面を直接開�
 xcrun simctl launch booted com.yossibank.kakeibot -open homeSections
 ```
 
-## 出典
+## 📚 文書
+
+知りたいことごとに、読む文書が分かれている。
+
+| 知りたいこと | 文書 |
+| --- | --- |
+| 何を作るか | [docs/overview.md](docs/overview.md) |
+| どう作るか | [docs/architecture.md](docs/architecture.md) |
+| データの形 | [docs/data.md](docs/data.md) |
+| 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |
+| 同期のための表 | [docs/data-sync.md](docs/data-sync.md) |
+| なぜそう決めたか | [docs/decisions/](docs/decisions/) |
+| 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
+| 画面の言葉とコードの名前 | [docs/glossary.md](docs/glossary.md) |
+| 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
+| fixtures の形式 | [spec/fixtures.md](spec/fixtures.md) |
+| 作業と文書の決まり | [CLAUDE.md](CLAUDE.md) |
+| 文書の役割 | [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) |
+| 全リポジトリ共通の決まり | [claude-config](https://github.com/yossibank/claude-config) |
+
+## 🛠️ 出典
 
 アプリに同梱するフォントは、どれも [SIL Open Font License 1.1](https://openfontlicense.org/) で配られている。使う文字だけに絞って入れ、ライセンスの文を `ios/Kakeibot/Fonts` に置く。
 

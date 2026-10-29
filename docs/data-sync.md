@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > 端末間の同期のために持つ表の形が分かる。
-> 同期する表は [data](data.md)、決定は [decisions/sync.md](decisions/sync.md) にある。
+> 同期する表は [data](data.md) と [data-settings](data-settings.md)、決定は [decisions/sync.md](decisions/sync.md) にある。
 
 ## sync_state
 
@@ -18,7 +18,7 @@
 
 ## sync_change
 
-まだ送っていない行。data の表のすべてに、行を足す・変える・消すと、ここに記録するトリガーを持つ。
+まだ送っていない行。data と data-settings の表のすべてに、行を足す・変える・消すと、ここに記録するトリガーを持つ。
 トリガーは、同期を入れているか、sync_share に行があるときだけ記録する。
 
 | 列 | 型 | 補足 |

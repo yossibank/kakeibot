@@ -9,7 +9,7 @@
 
 | 項目 | 内容 |
 | --- | --- |
-| 理由 | Swift が得意で iPhone を毎日使う。iOS をストアに出してから、13 番で Android に取りかかる。AI の段階は Swift 専用 |
+| 理由 | Swift が得意で iPhone を毎日使い、AI の段階は Swift 専用である。iOS をストアに出してから、13 番で Android に取りかかる |
 | 却下 | Kotlin Multiplatform、Compose Multiplatform、Flutter、Swift SDK for Android |
 
 ## リポジトリ
@@ -64,7 +64,8 @@
 | 項目 | 内容 |
 | --- | --- |
 | 理由 | 自分で整形を走らせずに済む。一部だけステージしたファイルは、pre-commit が整形を取り消すので壊れない |
-| 却下 | hook は違反を止めるだけで直さない、hook がステージし直して commit まで通す、SwiftLint も入れる |
+| 却下 | hook は違反を止めるだけで直さない、hook がステージし直して commit まで通す |
+| 却下 | SwiftLint も入れる |
 
 決まり：
 
@@ -73,12 +74,13 @@
 
 ## 文書の確認
 
-**決定：Claude Code のフック（claude-config の `hooks/post-edit-check-docs.py`）で、書き方の決まりを確かめる。**
+**決定：文書の書き方の決まりは、Claude Code のフックで確かめる。**
 
 | 項目 | 内容 |
 | --- | --- |
 | 理由 | 文書を書くのはほぼ Claude なので、書いたその場で直せる。リポジトリごとの準備が要らない |
 | 却下 | pre-commit で確かめる、自動では確かめない |
+| 関連 | フックは claude-config の `hooks/docs-check.py` |
 
 ## テストの走らせ方
 
@@ -86,8 +88,11 @@
 
 | 項目 | 内容 |
 | --- | --- |
-| 理由 | リポジトリは非公開で、GitHub Actions を使わない。結果の変わらない変更で待たずに済む。同じビルドを 2 回しなくて済む。長いログから失敗を探さずに済む |
-| 却下 | GitHub Actions で走らせる、手元の Mac を GitHub Actions のランナーにする、push のたびに走らせる、`make test-build` も別に走らせる、xcodebuild の出力をそのまま出す、先にシミュレーターを起動する（起動の途中は `simctl list` と `xcodebuild` が待たされ、かえって遅い） |
+| 理由 | リポジトリは非公開で、GitHub Actions を使わない |
+| 理由 | 結果の変わらない変更で待たず、同じビルドを 2 回せず、長いログから失敗を探さずに済む |
+| 却下 | GitHub Actions で走らせる、手元の Mac を GitHub Actions のランナーにする |
+| 却下 | push のたびに走らせる、`make test-build` も別に走らせる、xcodebuild の出力をそのまま出す |
+| 却下 | 先にシミュレーターを起動する。起動の途中は `simctl list` と `xcodebuild` が待たされ、かえって遅い |
 
 決まり：
 
