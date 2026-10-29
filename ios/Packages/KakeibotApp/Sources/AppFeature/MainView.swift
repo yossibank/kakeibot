@@ -20,6 +20,7 @@ struct MainView: View {
     @State private var isWarmingEntry = true
     @State private var orderMenuAnchor: CGRect?
     @State private var observationRound = 0
+    @State private var openedTabs: Set<MainTab> = []
     @State private var foreground = ForegroundReturn()
 
     @Environment(\.scenePhase) private var scenePhase
@@ -264,14 +265,20 @@ struct MainView: View {
         .task(id: observationRound) {
             await home.run()
         }
-        .task(id: observationRound) {
-            await records.run()
+        .task(id: tabObservation(.records)) {
+            if openedTabs.contains(.records) {
+                await records.run()
+            }
         }
-        .task(id: observationRound) {
-            await review.run()
+        .task(id: tabObservation(.review)) {
+            if openedTabs.contains(.review) {
+                await review.run()
+            }
         }
-        .task(id: observationRound) {
-            await assets.run()
+        .task(id: tabObservation(.assets)) {
+            if openedTabs.contains(.assets) {
+                await assets.run()
+            }
         }
         .task(id: observationRound) {
             await setup.run()
@@ -289,6 +296,9 @@ struct MainView: View {
             } else {
                 await openLaunchScreen()
             }
+        }
+        .onChange(of: tab, initial: true) {
+            openedTabs.insert(tab)
         }
         .onChange(of: scenePhase) { _, phase in
             if foreground.receive(phase) {
@@ -353,6 +363,12 @@ private extension MainView {
                 try? await Task.sleep(for: Self.warmupDuration)
                 isWarmingEntry = false
             }
+    }
+}
+
+private extension MainView {
+    func tabObservation(_ tab: MainTab) -> ObservationID<Bool> {
+        ObservationID(base: openedTabs.contains(tab), round: observationRound)
     }
 }
 

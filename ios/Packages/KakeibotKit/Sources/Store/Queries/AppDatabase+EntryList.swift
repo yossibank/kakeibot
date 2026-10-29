@@ -10,6 +10,14 @@ public extension AppDatabase {
         try await writer.read(Self.entryList)
     }
 
+    func latestEntryList() async throws -> EntryList {
+        for try await list in entryListObservation.values() {
+            return list
+        }
+
+        throw CancellationError()
+    }
+
     func entryOptions() async throws -> EntryOptions {
         try await writer.read(Self.entryOptions)
     }
@@ -34,9 +42,7 @@ extension AppDatabase {
         let wallets = try byID(Wallet.self, in: db)
         let valuations = try Valuation.fetchAll(db)
         let icons = try byID(Icon.self, in: db)
-
-        let cardBills = try recurrings(in: db)
-            .filter { $0.type == .transfer && $0.closingDay != nil }
+        let cardBills = try cardBills(in: db)
 
         return EntryList(
             days: days,
@@ -94,6 +100,22 @@ private extension AppDatabase {
             sharedCategories: sharedCategories,
             sharedTags: sharedTags
         )
+    }
+
+    static func cardBills(in db: Database) throws -> [Recurring] {
+        let columns = try db
+            .columns(in: Recurring.databaseTableName)
+            .map(\.name)
+            .filter { $0 != "generated_until" }
+            .map(Column.init)
+
+        return try Recurring
+            .select(columns)
+            .filter(Column("archived_at") == nil)
+            .filter(Column("type") == Entry.Kind.transfer)
+            .filter(Column("closing_day") != nil)
+            .order(Recurring.sortOrder, Column("created_at"))
+            .fetchAll(db)
     }
 
     static func byID<Record: StoreRecord & Identifiable>(
