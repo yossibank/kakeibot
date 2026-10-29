@@ -49,8 +49,9 @@ struct ReviewSharesCard: View {
                 }
 
                 let percents = Percent.shares(shares.map(\.amount))
+                let items = Array(zip(shares, percents))
 
-                ForEach(Array(zip(shares, percents)), id: \.0.id) { share, percent in
+                ForEach(items, id: \.0.id) { share, percent in
                     Button {
                         onOpen(share)
                     } label: {
