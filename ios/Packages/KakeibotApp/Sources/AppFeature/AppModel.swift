@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Features
 import Foundation
 import Notifications
@@ -11,6 +12,8 @@ import WidgetKit
 @MainActor
 @Observable
 final class AppModel {
+    var shareNotice = ErrorNotice()
+
     private(set) var launch: Launch = .opening
     private(set) var today: LocalDate
     private(set) var look: ThemeLook = .followsDevice
@@ -224,7 +227,11 @@ extension AppModel {
         }
 
         for metadata in shares {
-            try? await SyncEngine.acceptShare(metadata)
+            do {
+                try await SyncEngine.acceptShare(metadata)
+            } catch {
+                shareNotice.show(Self.shareFailedMessage)
+            }
         }
 
         let engine = sharedSyncEngine ?? SyncEngine(database: database, scope: .shared)
@@ -267,6 +274,8 @@ extension AppModel {
 }
 
 private extension AppModel {
+    static let shareFailedMessage = "共有の口座に参加できませんでした"
+
     static func currentDay() -> LocalDate {
         LocalDate(Date(), in: .current)
     }
