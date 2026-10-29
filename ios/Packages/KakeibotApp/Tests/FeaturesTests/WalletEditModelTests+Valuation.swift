@@ -55,7 +55,7 @@ extension WalletEditModelTests {
         await model.load()
         let valuation = try #require(model.valuations.first)
 
-        await model.deleteValuation(valuation.id)
+        _ = await model.deleteValuation(valuation.id)
         let isChanged = model.isChanged
         model.kind = .bank
 
@@ -115,10 +115,34 @@ extension WalletEditModelTests {
         let valued = model.balance
         let id = try #require(model.valuations.first?.id)
 
-        await model.deleteValuation(id)
+        _ = await model.deleteValuation(id)
 
         #expect(valued == 9)
         #expect(model.valuations.isEmpty)
         #expect(model.balance == 500)
+    }
+
+    @Test
+    func restoresDeletedValuationOnUndo() async throws {
+        let setup = try await Setup()
+        let adding = WalletEditModel(database: setup.database)
+        adding.name = "つみたて"
+        adding.kind = .investment
+        adding.press(.digit(5))
+        adding.press(.doubleZero)
+        let saved = try #require(await adding.save())
+
+        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        await model.load()
+        model.startValuation()
+        model.pressValuation(.digit(9))
+        _ = await model.saveValuation()
+        let id = try #require(model.valuations.first?.id)
+
+        let deletion = try #require(await model.deleteValuation(id))
+        await model.restore(deletion)
+
+        #expect(model.valuations.map(\.id) == [id])
+        #expect(model.balance == 9)
     }
 }
