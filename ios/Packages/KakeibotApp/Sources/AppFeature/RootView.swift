@@ -103,6 +103,9 @@ private extension RootView {
             } onLoad: {
                 isHomeLoaded = true
             }
+            .errorBanner(model.shareNotice, bottom: MainView.noticeBottom) {
+                model.shareNotice.clear()
+            }
             .task(id: model.observationID(model.today)) {
                 await model.observeNotifications(in: database)
             }
