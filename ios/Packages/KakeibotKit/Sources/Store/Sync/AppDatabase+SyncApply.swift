@@ -12,15 +12,9 @@ public extension AppDatabase {
             let joinedIDs = Array(systemFields.keys)
             let sharedKeys = Self.sharedKeys(in: systemFields)
 
+            var blocked: [SyncKey] = []
+
             try Self.setApplying(true, in: db)
-
-            for id in Self.parentsLast(deleted) {
-                if try Self.canApplyDeletion(of: id, in: db) {
-                    try Self.applyDeletion(of: id.key, in: db)
-                }
-
-                try Self.removeSystemFields(of: id, in: db)
-            }
 
             for record in Self.parentsFirst(saved) {
                 let kept = sharedKeys.contains(record.key) ? record.removingLocalColumns() : record
@@ -33,6 +27,20 @@ public extension AppDatabase {
 
             try Self.joinSharedWallets(in: joinedIDs, owners: owners, db: db)
             try Self.retryWaiting(in: db)
+
+            for id in Self.parentsLast(deleted) {
+                if try Self.canApplyDeletion(of: id, in: db),
+                   try !Self.applyDeletion(of: id.key, in: db) {
+                    blocked.append(id.key)
+                }
+
+                try Self.removeSystemFields(of: id, in: db)
+            }
+
+            for key in blocked where try !Self.applyDeletion(of: key, in: db) {
+                try Self.queue(key, in: db)
+            }
+
             try Self.setApplying(false, in: db)
         }
     }
@@ -132,7 +140,7 @@ private extension AppDatabase {
     static func applyDeletion(
         of key: SyncKey,
         in db: Database
-    ) throws {
+    ) throws -> Bool {
         try removeWaiting(key, in: db)
 
         do {
@@ -144,8 +152,10 @@ private extension AppDatabase {
 
                 return .commit
             }
+
+            return true
         } catch let error as DatabaseError where error.resultCode == .SQLITE_CONSTRAINT {
-            try queue(key, in: db)
+            return false
         }
     }
 
