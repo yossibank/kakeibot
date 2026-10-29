@@ -8,6 +8,7 @@ import Store
 @Observable
 public final class AssetsGoalEditModel {
     public var name: String
+
     public private(set) var calculator: AmountCalculator
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -20,14 +21,14 @@ public final class AssetsGoalEditModel {
         database: AppDatabase,
         editing goal: RewardGoal? = nil
     ) {
+        let name = goal?.name ?? ""
+        let amount = goal?.targetAmount ?? 0
+
         self.database = database
         self.editing = goal
-        self.name = goal?.name ?? ""
-        self.calculator = AmountCalculator(amount: goal?.targetAmount ?? 0)
-        self.baseline = RewardGoalDraft(
-            name: goal?.name ?? "",
-            targetAmount: goal?.targetAmount ?? 0
-        )
+        self.name = name
+        self.calculator = AmountCalculator(amount: amount)
+        self.baseline = RewardGoalDraft(name: name, targetAmount: amount)
     }
 }
 

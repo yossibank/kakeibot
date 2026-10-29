@@ -30,7 +30,7 @@ public struct PeriodRecurringSheet: View {
                 .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
-            .contentMargins(.horizontal, 18, for: .scrollContent)
+            .contentMargins(.horizontal, 20, for: .scrollContent)
             .padding(.horizontal, -20)
         }
         .padding(.horizontal, 20)

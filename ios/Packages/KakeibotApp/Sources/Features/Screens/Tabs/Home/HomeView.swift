@@ -3,10 +3,19 @@ import DesignSystem
 import SwiftUI
 
 public struct HomeView: View {
-    @Bindable private var model: HomeModel
+    @Bindable var model: HomeModel
+
+    @State var orderButtonFrame: CGRect = .zero
 
     @State private var openId: Entry.ID?
-    @State private var orderButtonFrame: CGRect = .zero
+
+    let onUseTemplate: (EntryTemplate) -> Void
+    let onShowAllTemplates: () -> Void
+    let onOpenOrderMenu: (CGRect) -> Void
+    let onAddTemplate: () -> Void
+    let onOpenRecurrings: () -> Void
+    let onOpenRecurring: (Recurring.ID) -> Void
+    let onOpenSetup: (SetupItem) -> Void
 
     private let setup: SetupModel
     private let appIcon: AppIconListModel
@@ -15,14 +24,7 @@ public struct HomeView: View {
     private let onShowRecords: () -> Void
     private let onRetry: () -> Void
     private let onOpenSettings: () -> Void
-    private let onUseTemplate: (EntryTemplate) -> Void
-    private let onShowAllTemplates: () -> Void
-    private let onOpenOrderMenu: (CGRect) -> Void
-    private let onAddTemplate: () -> Void
     private let onDeleteEntry: (Entry.ID) -> Void
-    private let onOpenRecurrings: () -> Void
-    private let onOpenRecurring: (Recurring.ID) -> Void
-    private let onOpenSetup: (SetupItem) -> Void
 
     public init(
         model: HomeModel,
@@ -65,14 +67,16 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
 
-                if setup.showsCard, !showsBudget {
+                if setup.showsCard,
+                   !showsBudget {
                     setupCard
                 }
 
                 ForEach(model.homeLayout.visible) { section in
                     sectionView(section)
 
-                    if section == .budget, setup.showsCard {
+                    if section == .budget,
+                       setup.showsCard {
                         setupCard
                     }
                 }
@@ -95,10 +99,6 @@ public struct HomeView: View {
 }
 
 private extension HomeView {
-    var showsBudget: Bool {
-        model.homeLayout.visible.contains(.budget)
-    }
-
     var header: some View {
         HStack {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -125,244 +125,6 @@ private extension HomeView {
     var setupCard: some View {
         HomeSetupCard(model: setup, onOpen: onOpenSetup)
             .transition(Self.cardTransition)
-    }
-
-    var dialCard: some View {
-        VStack(spacing: 16) {
-            ZStack(alignment: .bottom) {
-                HalfDial(progress: dialProgress, tint: dialTint)
-
-                VStack(spacing: 2) {
-                    Text(dialTitle)
-                        .textFont(size: .caption)
-                        .tracking(4)
-                        .foregroundStyle(Palette.accent)
-
-                    Text(dialAmount)
-                        .displayFont(.display, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(dialAmountColor)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
-                        .contentTransition(.numericText())
-                }
-            }
-            .frame(maxWidth: 290)
-            .animation(.snappy, value: model.budgetUsage)
-
-            VStack(spacing: 4) {
-                if let usage = model.budgetUsage {
-                    VStack(spacing: 4) {
-                        if !model.isListFailed,
-                           let warning = usage.warningText {
-                            Text(warning)
-                                .textFont(.caption, weight: .semibold)
-                                .foregroundStyle(usage.tint)
-                        }
-
-                        Button {
-                            onOpenSetup(.budget)
-                        } label: {
-                            HStack(spacing: 4) {
-                                Text("予算 \(AmountText.text(usage.budget))")
-
-                                Image(systemName: "chevron.right")
-                                    .sansFont(.micro, weight: .semibold)
-                            }
-                            .textFont(.caption)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                            .padding(.vertical, 4)
-                            .contentShape(.rect)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                } else {
-                    Button {
-                        onOpenSetup(.budget)
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text("予算を決めると、あといくら使えるかが出ます")
-
-                            Image(systemName: "chevron.right")
-                                .sansFont(.micro, weight: .semibold)
-                        }
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-                        .frame(minHeight: 32)
-                        .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                if model.recurringExpense > 0 {
-                    Button(action: onOpenRecurrings) {
-                        VStack(spacing: 8) {
-                            HStack(spacing: 4) {
-                                Label(recurringText, systemImage: "repeat")
-
-                                Image(systemName: "chevron.right")
-                                    .sansFont(.micro, weight: .semibold)
-                            }
-                            .textFont(.caption2)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-
-                            recurringProgress
-                        }
-                        .padding(.vertical, 4)
-                        .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-
-            HStack(spacing: 0) {
-                stat(
-                    "今日",
-                    amount: listAmount(model.todayExpense),
-                    color: Palette.accentStrong
-                )
-
-                divider
-
-                stat(
-                    model.middleTitle,
-                    amount: listAmount(model.middleAmount),
-                    color: Palette.text
-                )
-
-                divider
-
-                stat(
-                    "今月の収入",
-                    amount: listAmount(model.monthIncome),
-                    color: Palette.accent
-                )
-            }
-            .padding(.top, 12)
-            .overlay(alignment: .top) {
-                Rectangle()
-                    .fill(Palette.accent.opacity(.soft))
-                    .frame(height: 1)
-            }
-        }
-        .padding(16)
-        .padding(.top, 4)
-        .card()
-    }
-
-    var templateCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ZStack {
-                HStack {
-                    SectionTitle("テンプレート")
-
-                    Spacer()
-
-                    Button("すべて", action: onShowAllTemplates)
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.accent)
-                        .frame(minHeight: 44)
-                }
-
-                CapsulePicker(
-                    selection: $model.templateType,
-                    options: Self.typeOptions
-                )
-            }
-            .padding(.top, 8)
-
-            HStack(spacing: 8) {
-                Text(templateHint)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-
-                Spacer()
-
-                if model.templates.count > 1 {
-                    orderButton
-                }
-
-                Button(action: onAddTemplate) {
-                    Image(systemName: "plus")
-                        .sansFont(.small, weight: .light)
-                        .foregroundStyle(Palette.accent)
-                        .frame(width: 32, height: 32)
-                        .overlay {
-                            Circle()
-                                .stroke(Self.toolStroke, lineWidth: 1)
-                        }
-                        .frame(width: 40, height: 40)
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
-
-            if !model.templates.isEmpty {
-                templateShelf
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 16)
-        .card()
-    }
-
-    var orderButton: some View {
-        Button {
-            onOpenOrderMenu(orderButtonFrame)
-        } label: {
-            HStack(spacing: 4) {
-                Image(systemName: "arrow.up.arrow.down")
-                    .sansFont(.caption, weight: .light)
-
-                Text(model.templateOrder.title)
-                    .textFont(.caption2)
-            }
-            .foregroundStyle(Palette.accent)
-            .padding(.horizontal, 12)
-            .frame(height: 32)
-            .overlay {
-                Capsule()
-                    .stroke(Self.toolStroke, lineWidth: 1)
-            }
-            .frame(height: 40)
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .global)
-        } action: { frame in
-            orderButtonFrame = frame
-        }
-    }
-
-    var templateShelf: some View {
-        let rows = Array(
-            repeating: GridItem(.fixed(Self.tileHeight), spacing: 12),
-            count: shelfRowCount
-        )
-
-        return ScrollView(.horizontal) {
-            LazyHGrid(rows: rows, spacing: 12) {
-                ForEach(model.templates) { template in
-                    templateButton(template)
-                        .shelfWidth()
-                }
-            }
-            .scrollTargetLayout()
-        }
-        .scrollIndicators(.hidden)
-        .scrollTargetBehavior(.viewAligned)
-        .contentMargins(.horizontal, 14, for: .scrollContent)
-        .contentMargins(.vertical, 6, for: .scrollContent)
-        .scrollClipDisabled()
-        .mask {
-            Rectangle()
-                .padding(.vertical, -Self.shadowRoom)
-        }
-        .padding(.horizontal, -16)
-        .padding(.vertical, -8)
     }
 
     var recentCard: some View {
@@ -416,47 +178,6 @@ private extension HomeView {
         .sharesTextScale(id: model.recentRows)
     }
 
-    var billCard: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .firstTextBaseline) {
-                SectionTitle("これからの引き落とし")
-
-                Spacer()
-
-                if !model.upcomingBills.isEmpty {
-                    Text("合計 \(AmountText.text(model.upcomingBillTotal))")
-                        .textFont(.caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                }
-            }
-            .frame(minHeight: 44)
-
-            if model.upcomingBills.isEmpty {
-                Text("これからの引き落としはありません")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .padding(.vertical, 16)
-            } else {
-                ForEach(model.upcomingBills, id: \.recurring.id) { bill in
-                    Button {
-                        onOpenRecurring(bill.recurring.id)
-                    } label: {
-                        billRow(bill)
-                    }
-                    .buttonStyle(.plain)
-                    .overlay(alignment: .top) {
-                        Hairline(thickness: 1)
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 8)
-        .card()
-        .sharesTextScale(id: model.upcomingBills.map { model.title(of: $0.recurring) })
-    }
-
     var stampCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionTitle("今月のスタンプ")
@@ -486,100 +207,6 @@ private extension HomeView {
         .padding(.bottom, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
-    }
-
-    var divider: some View {
-        Rectangle()
-            .fill(Palette.accent.opacity(.soft))
-            .frame(width: 1, height: 32)
-    }
-
-    var recurringProgress: some View {
-        Capsule()
-            .fill(Palette.faint)
-            .frame(width: 120, height: 3)
-            .overlay(alignment: .leading) {
-                Capsule()
-                    .fill(Palette.accent)
-                    .frame(width: 120 * model.paidRecurringRatio)
-            }
-    }
-
-    func templateButton(_ template: EntryTemplate) -> some View {
-        Button {
-            onUseTemplate(template)
-        } label: {
-            TemplateCard(
-                icon: model.icon(for: template),
-                name: template.name,
-                detail: model.detail(for: template),
-                amount: template.amount
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    func billRow(_ bill: CardBill) -> some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(bill.date.month)/\(bill.date.day)")
-                    .displayFont(.body)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accent)
-
-                Text(daysText(until: bill.date))
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-            }
-            .frame(width: Self.billDateWidth, alignment: .leading)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(model.title(of: bill.recurring))
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
-                    .sharedTextScale()
-
-                if bill.shortage > 0 {
-                    Text("残高が \(AmountText.text(bill.shortage)) 足りません")
-                        .textFont(.caption2)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.rose)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-            }
-
-            Spacer(minLength: 8)
-
-            Text(AmountText.text(bill.amount))
-                .displayFont(.headline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-        }
-        .padding(.vertical, 12)
-        .contentShape(.rect)
-    }
-
-    func stat(
-        _ title: String,
-        amount: String,
-        color: Color
-    ) -> some View {
-        VStack(spacing: 2) {
-            Text(title)
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-
-            Text(amount)
-                .displayFont(.body)
-                .monospacedDigit()
-                .foregroundStyle(color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder
@@ -613,17 +240,6 @@ private extension HomeView {
 }
 
 private extension HomeView {
-    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
-        .init("支出", value: .expense),
-        .init("収入", value: .income)
-    ]
-
-    static let tileHeight = TemplateCardSize.regular.height
-    static let shadowRoom: CGFloat = 32
-    static let toolStroke = Palette.accent.opacity(.muted)
-    static let billDateWidth: CGFloat = 56
-    static let unknownAmount = "—"
-
     static let stampColumns = [
         GridItem(.adaptive(minimum: 72), spacing: 12, alignment: .leading)
     ]
@@ -632,71 +248,7 @@ private extension HomeView {
         .offset(y: 16).combined(with: .opacity)
     }
 
-    var dialTitle: String {
-        model.budgetUsage?.remainingTitle ?? "今月の支出"
-    }
-
-    var dialAmount: String {
-        guard !model.isListFailed else {
-            return Self.unknownAmount
-        }
-
-        guard let usage = model.budgetUsage else {
-            return AmountText.text(model.monthExpense)
-        }
-
-        return usage.remainingAmountText
-    }
-
-    var dialProgress: Double? {
-        model.isListFailed ? nil : model.budgetUsage?.progress
-    }
-
-    var dialAmountColor: Color {
-        guard !model.isListFailed else {
-            return Palette.subtext
-        }
-
-        return model.budgetUsage?.amountTint ?? Palette.accentStrong
-    }
-
-    var recurringText: String {
-        let total = "今月の固定費 \(AmountText.text(model.recurringExpense))"
-        let upcoming = model.upcomingRecurringExpense
-
-        guard upcoming > 0 else {
-            return total
-        }
-
-        return "\(total)・これから \(AmountText.text(upcoming))"
-    }
-
-    var dialTint: Color {
-        model.budgetUsage?.tint ?? Palette.accent
-    }
-
-    var shelfRowCount: Int {
-        model.templates.count > 2 ? 2 : 1
-    }
-
-    var templateHint: String {
-        model.templates.isEmpty ? "よく使う入力を 1 回で" : "押すとすぐ記録"
-    }
-
-    func listAmount(_ amount: Int) -> String {
-        model.isListFailed ? Self.unknownAmount : AmountText.text(amount)
-    }
-
-    func daysText(until date: LocalDate) -> String {
-        let days = model.today.days(until: date)
-        return days == 1 ? "明日" : "あと \(days) 日"
-    }
-}
-
-private extension View {
-    func shelfWidth() -> some View {
-        containerRelativeFrame(.horizontal) { width, _ in
-            width * 0.62
-        }
+    var showsBudget: Bool {
+        model.homeLayout.visible.contains(.budget)
     }
 }

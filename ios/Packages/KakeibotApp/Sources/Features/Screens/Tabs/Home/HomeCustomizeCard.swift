@@ -36,8 +36,8 @@ struct HomeCustomizeCard: View {
                 }
             }
             .scrollIndicators(.hidden)
-            .contentMargins(.horizontal, 14, for: .scrollContent)
-            .contentMargins(.vertical, 6, for: .scrollContent)
+            .contentMargins(.horizontal, 16, for: .scrollContent)
+            .contentMargins(.vertical, 8, for: .scrollContent)
             .scrollClipDisabled()
             .mask {
                 Rectangle()
@@ -77,9 +77,7 @@ struct HomeCustomizeCard: View {
 
 private extension HomeCustomizeCard {
     func tile(_ item: SetupItem) -> some View {
-        let shape = RoundedRectangle(cornerRadius: themeStyle.corner.radius(Self.cornerRadius))
-
-        return VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 4) {
             Image(systemName: item.systemImage)
                 .sansFont(.body, weight: .light)
                 .foregroundStyle(Palette.accent)
@@ -103,7 +101,7 @@ private extension HomeCustomizeCard {
         .frame(width: Self.tileSize.width, height: Self.tileSize.height, alignment: .leading)
         .templateCardFace(cornerRadius: Self.cornerRadius, shadowRadius: 12)
         .overlay {
-            shape
+            RoundedRectangle(cornerRadius: themeStyle.corner.radius(Self.cornerRadius))
                 .strokeBorder(Palette.accentStrong, lineWidth: 1.6)
                 .shadow(color: Palette.glow, radius: 10)
                 .opacity(glowOpacity(item))

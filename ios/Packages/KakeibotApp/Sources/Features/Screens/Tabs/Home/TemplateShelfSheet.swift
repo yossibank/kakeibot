@@ -36,7 +36,11 @@ public struct TemplateShelfSheet: View {
                     options: Self.typeOptions
                 )
 
-                searchField
+                SearchField(
+                    "名前で探す",
+                    text: $query,
+                    focus: $isSearching
+                )
 
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
@@ -55,7 +59,7 @@ public struct TemplateShelfSheet: View {
                     .padding(.vertical, 8)
                 }
                 .scrollIndicators(.hidden)
-                .contentMargins(.horizontal, 18, for: .scrollContent)
+                .contentMargins(.horizontal, 20, for: .scrollContent)
                 .padding(.horizontal, -20)
                 .scrollDismissesKeyboard(.interactively)
             }
@@ -95,14 +99,6 @@ private extension TemplateShelfSheet {
         }
     }
 
-    var searchField: some View {
-        SearchField(
-            "名前で探す",
-            text: $query,
-            focus: $isSearching
-        )
-    }
-
     func sectionView(_ section: HomeModel.TemplateSection) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             SectionTitle(section.title)
@@ -135,9 +131,7 @@ private extension TemplateShelfSheet {
     }
 
     var emptyText: String {
-        query.isEmpty
-            ? "まだテンプレートがありません"
-            : "「\(query)」に合うテンプレートはありません"
+        query.isEmpty ? "まだテンプレートがありません" : "「\(query)」に合うテンプレートはありません"
     }
 
     func use(_ template: EntryTemplate) {

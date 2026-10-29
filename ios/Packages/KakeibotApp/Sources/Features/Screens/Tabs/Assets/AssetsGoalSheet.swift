@@ -44,7 +44,6 @@ struct AssetsGoalSheet: View {
 
             Keypad(calculator: model.calculator) { key in
                 focus = nil
-
                 model.press(key)
             }
 
@@ -95,10 +94,6 @@ private extension AssetsGoalSheet {
         case name
     }
 
-    var title: String {
-        model.isEditing ? "目標を編集" : "目標を決める"
-    }
-
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
@@ -124,6 +119,12 @@ private extension AssetsGoalSheet {
                     .frame(width: 44, height: 44)
             }
         }
+    }
+}
+
+private extension AssetsGoalSheet {
+    var title: String {
+        model.isEditing ? "目標を編集" : "目標を決める"
     }
 
     func close() {
