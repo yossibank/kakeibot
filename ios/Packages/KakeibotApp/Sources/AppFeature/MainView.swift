@@ -290,8 +290,8 @@ struct MainView: View {
         .task {
             await chooseLaunchTab()
         }
-        .task(id: isRevealed) {
-            guard isRevealed else {
+        .task(id: isLaunchReady) {
+            guard isLaunchReady else {
                 return
             }
 
@@ -371,6 +371,10 @@ private extension MainView {
 }
 
 private extension MainView {
+    var isLaunchReady: Bool {
+        isRevealed && launchScreen != nil
+    }
+
     func tabObservation(_ tab: MainTab) -> ObservationID<Bool> {
         ObservationID(base: openedTabs.contains(tab), round: observationRound)
     }
