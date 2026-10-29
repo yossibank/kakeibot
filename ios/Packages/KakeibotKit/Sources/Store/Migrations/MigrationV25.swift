@@ -3,43 +3,38 @@ import Foundation
 import GRDB
 
 enum MigrationV25 {
-    static func migrate(_ db: Database) throws {
-        let recurrings = try Row
-            .fetchAll(db, sql: recurringSQL)
-            .compactMap(Self.recurring)
+    private static let billMonthCutoff = "2026-10-27T09:28:13"
 
-        try moveRecurringDates(of: recurrings, in: db)
-        try moveBillMonths(of: recurrings, in: db)
-    }
-}
-
-private extension MigrationV25 {
-    static let recurringSQL = """
+    private static let recurringSQL = """
     SELECT id, to_wallet_id, frequency, month, day, holiday_shift, \
     closing_day, start_date
     FROM recurring
     """
 
-    static let recurringEntrySQL = """
+    private static let recurringEntrySQL = """
     SELECT id, recurring_id, recurring_date FROM entry
     WHERE recurring_id IS NOT NULL
     """
 
-    static let billEntrySQL = """
+    private static let billEntrySQL = """
     SELECT id, wallet_id, bill_month FROM entry
     WHERE bill_month IS NOT NULL AND updated_at < '\(billMonthCutoff)'
     """
 
-    static let billMonthCutoff = "2026-10-27T09:28:13"
-
-    static let sameOccurrenceSQL = """
+    private static let sameOccurrenceSQL = """
     SELECT EXISTS (
         SELECT 1 FROM entry
         WHERE recurring_id = ? AND recurring_date = ? AND id <> ?
     )
     """
 
-    static func recurring(_ row: Row) -> Recurring? {
+    static func migrate(_ db: Database) throws {
+        let recurrings = try Row.fetchAll(db, sql: recurringSQL).compactMap(Self.recurring)
+        try moveRecurringDates(of: recurrings, in: db)
+        try moveBillMonths(of: recurrings, in: db)
+    }
+
+    private static func recurring(_ row: Row) -> Recurring? {
         guard
             let id = Recurring.ID(row["id"] as String),
             let frequency = Recurring.Frequency(rawValue: row["frequency"]),
@@ -49,6 +44,7 @@ private extension MigrationV25 {
             return nil
         }
 
+        let toWalletId = (row["to_wallet_id"] as String?).flatMap(Wallet.ID.init)
         let now = Date(timeIntervalSince1970: 0)
 
         return Recurring(
@@ -57,7 +53,7 @@ private extension MigrationV25 {
             amount: 0,
             categoryId: nil,
             walletId: Wallet.ID(),
-            toWalletId: (row["to_wallet_id"] as String?).flatMap(Wallet.ID.init),
+            toWalletId: toWalletId,
             frequency: frequency,
             month: row["month"],
             day: row["day"],
@@ -69,11 +65,12 @@ private extension MigrationV25 {
         )
     }
 
-    static func moveRecurringDates(
+    private static func moveRecurringDates(
         of recurrings: [Recurring],
         in db: Database
     ) throws {
-        let byID = Dictionary(uniqueKeysWithValues: recurrings.map { ($0.id, $0) })
+        let pairs = recurrings.map { ($0.id, $0) }
+        let byID = Dictionary(uniqueKeysWithValues: pairs)
 
         for row in try Row.fetchAll(db, sql: recurringEntrySQL) {
             guard
@@ -106,7 +103,7 @@ private extension MigrationV25 {
         }
     }
 
-    static func moveBillMonths(
+    private static func moveBillMonths(
         of recurrings: [Recurring],
         in db: Database
     ) throws {
@@ -121,13 +118,19 @@ private extension MigrationV25 {
                 $0.toWalletId == wallet && $0.closingDay != nil
             }
 
-            guard let bill = bills.first, bills.count == 1 else {
+            guard
+                let bill = bills.first,
+                bills.count == 1
+            else {
                 continue
             }
 
             let scheduled = bill.scheduledDates(shiftedInto: month)
 
-            guard let first = scheduled.first, scheduled.count == 1 else {
+            guard
+                let first = scheduled.first,
+                scheduled.count == 1
+            else {
                 continue
             }
 
