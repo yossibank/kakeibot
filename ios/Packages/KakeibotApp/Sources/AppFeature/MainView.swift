@@ -312,6 +312,7 @@ struct MainView: View {
         .onChange(of: isLoaded, initial: true) {
             if isLoaded {
                 onLoad()
+                openedTabs.formUnion([.records, .review, .assets])
             }
         }
         .onChange(of: route) { _, route in
