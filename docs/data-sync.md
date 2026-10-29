@@ -16,7 +16,7 @@
 | engine_state | BLOB | 自分のデータベースの CKSyncEngine の状態 |
 | shared_engine_state | BLOB | 共有のデータベースの CKSyncEngine の状態。誘われた共有の財布を送り受けする |
 | stop_reason | TEXT | 同期が自分から切れた理由（`signed_out`・`account_changed`・`cloud_replaced`）。同期を入れているときだけ書く。入れ直すか手で切ると NULL |
-| send_problem | TEXT | 送れていない理由（`quota_exceeded`・`network_unavailable`・`not_allowed`）。送れたら NULL |
+| send_problem | TEXT | 自分のデータベースへ送れていない理由（`quota_exceeded`・`network_unavailable`・`not_allowed`）。送れたら NULL |
 
 ## sync_change
 
