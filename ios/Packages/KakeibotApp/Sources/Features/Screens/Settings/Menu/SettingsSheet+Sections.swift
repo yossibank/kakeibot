@@ -237,12 +237,10 @@ private extension SettingsSheet {
 
     var weekStartBinding: Binding<Weekday> {
         Binding {
-            weekStart
+            weekStart.weekStart
         } set: { day in
-            weekStart = day
-
             Task {
-                try? await database.setSetting(.weekStart, to: day)
+                await weekStart.choose(day)
             }
         }
     }

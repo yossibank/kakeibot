@@ -6,12 +6,12 @@ import SwiftUI
 public struct SettingsSheet: View {
     @State var monthStartDay: MonthStartDay = .first
     @State var launchScreen: LaunchScreen = .home
-    @State var weekStart: Weekday = .sunday
     @State var reminderTime: ReminderTime?
     @State var authorization: NotificationAuthorization = .allowed
     @State var theme: ThemeChoice = .system
     @State var customThemes: [Theme] = []
     @State var syncStatus = SyncStatus.off
+    @State var weekStart: WeekStartModel
 
     #if DEBUG
     @State var isConfirmingSample = false
@@ -33,6 +33,8 @@ public struct SettingsSheet: View {
         today: LocalDate,
         appIcon: AppIconListModel
     ) {
+        _weekStart = State(initialValue: WeekStartModel(database: database))
+
         self.database = database
         self.today = today
         self.appIcon = appIcon
@@ -75,11 +77,14 @@ public struct SettingsSheet: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
+        .errorBanner(weekStart.errorNotice) {
+            weekStart.errorNotice.clear()
+        }
         .task {
             await observeMonthStartDay()
         }
         .task {
-            weekStart = await (try? database.setting(.weekStart)) ?? .sunday
+            await weekStart.load()
         }
         .task {
             await observeReminderTime()
