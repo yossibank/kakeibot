@@ -205,7 +205,8 @@ private extension SyncEngine {
 
     func deleteZone(_ deletion: CKDatabase.DatabaseChange.Deletion) async {
         guard deletion.zoneID == Self.zoneID else {
-            if let walletID = SyncZone.walletID(of: deletion.zoneID.zoneName) {
+            if let walletID = SyncZone.walletID(of: deletion.zoneID.zoneName),
+               await isGone(deletion.zoneID) {
                 try? await database.endSharing(walletID)
             }
 
@@ -219,6 +220,17 @@ private extension SyncEngine {
             try? await database.queueAllForSync()
         default:
             await turnOff()
+        }
+    }
+
+    func isGone(_ zoneID: CKRecordZone.ID) async -> Bool {
+        do {
+            _ = try await container.privateCloudDatabase.recordZone(for: zoneID)
+            return false
+        } catch let error as CKError where error.code == .zoneNotFound {
+            return true
+        } catch {
+            return false
         }
     }
 

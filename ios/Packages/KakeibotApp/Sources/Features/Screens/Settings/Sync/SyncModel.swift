@@ -107,8 +107,8 @@ private extension SyncModel {
 
     func stopSharing(_ id: Wallet.ID) async {
         await work(failure: Self.stopFailedMessage) {
-            try await cloud.deleteShare(id)
             try await database.endSharing(id)
+            try await cloud.deleteShare(id)
         }
     }
 
