@@ -153,7 +153,7 @@ public struct SyncView: View {
             isPresented: $model.isChoosing,
             systemImage: "icloud",
             title: "iCloud にもデータがあります",
-            message: "使う方を選んでください。選ばなかった方は置き換わります",
+            message: SyncModel.choiceMessage,
             keepTitle: "やめる",
             confirmTitle: "iCloud のデータを使う",
             alternateTitle: "この iPhone のデータを使う",

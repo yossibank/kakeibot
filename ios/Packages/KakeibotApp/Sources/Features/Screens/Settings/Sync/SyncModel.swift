@@ -31,6 +31,11 @@ public final class SyncModel {
 }
 
 public extension SyncModel {
+    static let choiceMessage = """
+    使う方を選んでください。選ばなかった方は置き換わります。\
+    「この iPhone のデータを使う」を選ぶと、ほかの iPhone の同期は切れます
+    """
+
     var isAvailable: Bool {
         account == .available
     }

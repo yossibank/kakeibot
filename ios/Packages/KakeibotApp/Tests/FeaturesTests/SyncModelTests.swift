@@ -42,6 +42,7 @@ struct SyncModelTests {
 
         #expect(model.isOn == false)
         #expect(model.isChoosing)
+        #expect(SyncModel.choiceMessage.hasSuffix("「この iPhone のデータを使う」を選ぶと、ほかの iPhone の同期は切れます"))
 
         await model.useLocalData()
 
