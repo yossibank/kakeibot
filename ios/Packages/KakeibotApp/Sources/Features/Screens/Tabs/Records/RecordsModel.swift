@@ -30,7 +30,7 @@ public final class RecordsModel: ScreenModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    private let database: AppDatabase
+    let database: AppDatabase
 
     public init(
         database: AppDatabase,
@@ -116,56 +116,16 @@ public extension RecordsModel {
     }
 
     var shownDate: LocalDate {
-        if let selectedDate, period.contains(selectedDate) {
+        if let selectedDate,
+           period.contains(selectedDate) {
             return selectedDate
         }
 
         return period.contains(today) ? today : period.lowerBound
     }
 
-    var stampChoices: [Icon] {
-        guard let stampShelf else {
-            return []
-        }
-
-        return stampShelf.shelfIcons
-            .filter { $0.archivedAt == nil }
-            .compactMap { stampShelf.icons[$0.iconId] }
-    }
-
-    var rewardRules: [RewardRule] {
-        rewardBank?.activeRules ?? []
-    }
-
-    var batchWallets: [Wallet] {
-        list?.filterWallets ?? []
-    }
-
     var pendingDeleteCount: Int {
         pendingDeleteIDs.count
-    }
-
-    func rewardRules(on date: LocalDate) -> [RewardRule] {
-        rewardBank?.rules(on: date) ?? []
-    }
-
-    func batchCategories(for type: Entry.Kind) -> [EntryCategory] {
-        let categories = list?.filterCategories ?? []
-        return categories.filter { $0.kind.rawValue == type.rawValue }
-    }
-
-    func batchType(of ids: Set<Entry.ID>) -> Entry.Kind? {
-        let types = Set(selectedEntries(ids).map(\.type))
-
-        guard types.count == 1, let type = types.first, type != .transfer else {
-            return nil
-        }
-
-        return type
-    }
-
-    func hasTransfer(in ids: Set<Entry.ID>) -> Bool {
-        selectedEntries(ids).contains { $0.type == .transfer }
     }
 
     func icon(for category: EntryCategory) -> Icon? {
@@ -197,42 +157,6 @@ public extension RecordsModel {
         days.first { $0.date == date }
     }
 
-    func upcomingRecurrings(on date: LocalDate) -> [Recurring] {
-        guard date > today else {
-            return []
-        }
-
-        return recurrings.filter { recurring in
-            !recurring.dates(from: date, through: date).isEmpty
-        }
-    }
-
-    func amount(
-        of recurring: Recurring,
-        on date: LocalDate
-    ) -> Int {
-        list?.amount(of: recurring, on: date) ?? recurring.amount
-    }
-
-    func title(of recurring: Recurring) -> String {
-        list?.title(of: recurring) ?? Self.recurringTitle
-    }
-
-    func stampIcon(on date: LocalDate) -> Icon? {
-        stampCalendar?.icon(on: date)
-    }
-
-    func stamp(
-        _ icon: Icon,
-        on date: LocalDate
-    ) async {
-        do {
-            try await database.stamp(icon.id, on: date, at: Date())
-        } catch {
-            errorNotice.show(Self.saveFailedMessage)
-        }
-    }
-
     func requestDelete(
         _ ids: [Entry.ID],
         delete: ([Entry.ID]) -> Void
@@ -257,122 +181,12 @@ public extension RecordsModel {
         isConfirmingDelete = false
     }
 
-    func removeStamp(on date: LocalDate) async {
-        do {
-            try await database.removeStamp(on: date)
-        } catch {
-            errorNotice.show(Self.saveFailedMessage)
-        }
-    }
-
-    func rewardIcon(for rule: RewardRule) -> Icon? {
-        rewardBank?.icon(for: rule)
-    }
-
-    func rewardTotal(on date: LocalDate) -> Int {
-        rewardBank?.total(on: date) ?? 0
-    }
-
-    func isAchieved(
-        _ rule: RewardRule,
-        on date: LocalDate
-    ) -> Bool {
-        let logs = rewardBank?.logs(on: date) ?? []
-        return logs.contains { $0.ruleId == rule.id }
-    }
-
-    func rewardRuleEditModel() -> RewardRuleEditModel {
-        RewardRuleEditModel(database: database)
-    }
-
-    func stampEditModel() -> StampEditModel {
-        StampEditModel(database: database)
-    }
-
-    func toggleReward(
-        _ rule: RewardRule,
-        on date: LocalDate
-    ) async {
-        guard canReward(on: date) else {
-            return
-        }
-
-        let isAchieved = !isAchieved(rule, on: date)
-
-        guard rule.isActive || !isAchieved else {
-            return
-        }
-
-        do {
-            try await database.setReward(
-                rule.id,
-                isAchieved: isAchieved,
-                on: date,
-                at: Date()
-            )
-        } catch AppDatabase.RewardRuleWriteError.shortOfBalance {
-            errorNotice.show(Self.rewardShortOfBalanceMessage)
-        } catch {
-            errorNotice.show(Self.saveFailedMessage)
-        }
-    }
-
-    func canReward(on date: LocalDate) -> Bool {
-        date <= today
-    }
-
-    func canMarkNoSpend(on date: LocalDate) -> Bool {
-        date <= today && (day(on: date)?.expenseTotal ?? 0) == 0
-    }
-
     func rows(for day: EntryDay) -> [EntryRowItem] {
         guard let list else {
             return []
         }
 
         return day.entries.map { EntryRowItem($0, in: list) }
-    }
-
-    func run() async {
-        await loadLayout()
-
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await self.observe()
-            }
-
-            group.addTask {
-                await self.observeNoSpendDays()
-            }
-
-            group.addTask {
-                await self.observeStamps()
-            }
-
-            group.addTask {
-                await self.observeStampShelf()
-            }
-
-            group.addTask {
-                await self.observeRewardBank()
-            }
-
-            group.addTask {
-                await self.observeRecurrings()
-            }
-
-            group.addTask {
-                await self.observeWeekStart()
-            }
-
-            group.addTask {
-                await self.observeMonthStartDay()
-            }
-
-            group.addTask {
-                await self.observeRecentSearches()
-            }
-        }
     }
 
     func open(_ date: LocalDate) {
@@ -418,18 +232,6 @@ public extension RecordsModel {
         }
     }
 
-    func toggleNoSpendDay(on date: LocalDate) async {
-        do {
-            if noSpendDays.contains(date) {
-                try await database.unmarkNoSpendDay(date)
-            } else {
-                try await database.markNoSpendDay(date, at: Date())
-            }
-        } catch {
-            errorNotice.show(Self.saveFailedMessage)
-        }
-    }
-
     func load() async {
         do {
             list = try await database.entryList()
@@ -438,18 +240,64 @@ public extension RecordsModel {
             errorNotice.show(Self.loadFailedMessage)
         }
     }
+
+    func run() async {
+        await loadLayout()
+
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observe()
+            }
+
+            group.addTask {
+                await self.observeNoSpendDays()
+            }
+
+            group.addTask {
+                await self.observeStamps()
+            }
+
+            group.addTask {
+                await self.observeStampShelf()
+            }
+
+            group.addTask {
+                await self.observeRewardBank()
+            }
+
+            group.addTask {
+                await self.observeRecurrings()
+            }
+
+            group.addTask {
+                await self.observeWeekStart()
+            }
+
+            group.addTask {
+                await self.observeMonthStartDay()
+            }
+
+            group.addTask {
+                await self.observeRecentSearches()
+            }
+        }
+    }
+}
+
+extension RecordsModel {
+    static let loadFailedMessage = "記録を読めませんでした"
+    static let saveFailedMessage = "保存できませんでした"
 }
 
 private extension RecordsModel {
-    static let loadFailedMessage = "記録を読めませんでした"
-    static let saveFailedMessage = "保存できませんでした"
-    static let rewardShortOfBalanceMessage = "貯金箱の残高が足りないため、達成を外せません"
-    static let recurringTitle = "固定費"
     static let confirmDeleteThreshold = 10
 
-    func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
-        let entries = list?.days.flatMap(\.entries) ?? []
-        return entries.filter { ids.contains($0.id) }
+    func saveRecentSearches() async {
+        do {
+            try await database.setSetting(.recentSearches, to: recentSearches)
+        } catch {
+            errorNotice.show(Self.saveFailedMessage)
+        }
     }
 
     func observe() async {
@@ -514,14 +362,6 @@ private extension RecordsModel {
             failure: Self.loadFailedMessage
         ) { words in
             recentSearches = words
-        }
-    }
-
-    func saveRecentSearches() async {
-        do {
-            try await database.setSetting(.recentSearches, to: recentSearches)
-        } catch {
-            errorNotice.show(Self.saveFailedMessage)
         }
     }
 

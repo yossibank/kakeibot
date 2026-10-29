@@ -106,7 +106,10 @@ private extension RecordsStampSheet {
 
 private extension RecordsStampSheet {
     static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 12),
+        repeating: GridItem(
+            .flexible(),
+            spacing: 12
+        ),
         count: 5
     )
 }

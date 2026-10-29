@@ -92,12 +92,14 @@ private extension ReviewStampSheet {
 
             Spacer(minLength: 8)
 
-            if let day, day.expenseTotal > 0 {
+            if let day,
+               day.expenseTotal > 0 {
                 AmountText(day.expenseTotal, type: .expense)
                     .textFont(.caption)
             }
 
-            if let day, day.incomeTotal > 0 {
+            if let day,
+               day.incomeTotal > 0 {
                 AmountText(day.incomeTotal, type: .income)
                     .textFont(.caption)
             }
