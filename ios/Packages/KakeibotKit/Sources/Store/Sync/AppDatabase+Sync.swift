@@ -1,3 +1,4 @@
+import Core
 import Foundation
 import GRDB
 
@@ -154,7 +155,8 @@ public extension AppDatabase {
     func applySyncChanges(
         saved: [SyncRecord],
         deleted: [SyncRecordID],
-        systemFields: [SyncRecordID: Data] = [:]
+        systemFields: [SyncRecordID: Data] = [:],
+        owners: [String: String] = [:]
     ) async throws {
         try await writer.write { db in
             try Self.setApplying(true, in: db)
@@ -176,20 +178,39 @@ public extension AppDatabase {
             }
 
             try Self.retryWaiting(in: db)
-            try Self.joinSharedWallets(in: Array(systemFields.keys), db: db)
+            try Self.joinSharedWallets(in: Array(systemFields.keys), owners: owners, db: db)
             try Self.setApplying(false, in: db)
         }
     }
 
-    func syncEngineState() async throws -> Data? {
+    func syncEngineState(isShared: Bool) async throws -> Data? {
         try await writer.read { db in
-            try Data.fetchOne(db, sql: "SELECT engine_state FROM sync_state")
+            try Data.fetchOne(db, sql: "SELECT \(Self.engineStateColumn(isShared)) FROM sync_state")
         }
     }
 
-    func saveSyncEngineState(_ state: Data?) async throws {
+    func saveSyncEngineState(
+        _ state: Data?,
+        isShared: Bool
+    ) async throws {
         try await writer.write { db in
-            try db.execute(sql: "UPDATE sync_state SET engine_state = ?", arguments: [state])
+            try db.execute(
+                sql: "UPDATE sync_state SET \(Self.engineStateColumn(isShared)) = ?",
+                arguments: [state]
+            )
+        }
+    }
+
+    func syncShareOwners() async throws -> [String: String] {
+        try await writer.read { db in
+            let rows = try Row.fetchAll(
+                db,
+                sql: "SELECT wallet_id, owner_name FROM sync_share WHERE owner_name IS NOT NULL"
+            )
+
+            return Dictionary(uniqueKeysWithValues: rows.map { row in
+                (SyncZone.wallet(row["wallet_id"]), row["owner_name"] as String)
+            })
         }
     }
 
@@ -222,10 +243,16 @@ public extension AppDatabase {
         }
     }
 
-    func resetSync() async throws {
+    func resetSync(isShared: Bool) async throws {
         try await writer.write { db in
-            try db.execute(sql: "UPDATE sync_state SET engine_state = NULL")
-            try db.execute(sql: "DELETE FROM sync_record")
+            try db.execute(sql: "UPDATE sync_state SET \(Self.engineStateColumn(isShared)) = NULL")
+            try db.execute(
+                sql: """
+                DELETE FROM sync_record
+                WHERE (zone_name IN (\(Self.foreignZones))) = ?
+                """,
+                arguments: [isShared]
+            )
         }
     }
 }
@@ -246,6 +273,13 @@ extension AppDatabase {
         try db.notifyChanges(in: Table("sync_change"))
     }
 
+    static func setApplying(
+        _ applying: Bool,
+        in db: Database
+    ) throws {
+        try db.execute(sql: "UPDATE sync_state SET applying = ?", arguments: [applying])
+    }
+
     func setSyncEnabled(_ enabled: Bool) async throws {
         try await writer.write { db in
             try db.execute(sql: "UPDATE sync_state SET enabled = ?", arguments: [enabled])
@@ -260,15 +294,16 @@ private extension AppDatabase {
         case blocked
     }
 
+    static let foreignZones = """
+    SELECT \(SyncZone.walletZoneSQL) FROM sync_share WHERE owner_name IS NOT NULL
+    """
+
     static var syncChangeRegions: [Table<Row>] {
         (SyncTable.allCases.map(\.rawValue) + ["sync_change"]).map { Table($0) }
     }
 
-    static func setApplying(
-        _ applying: Bool,
-        in db: Database
-    ) throws {
-        try db.execute(sql: "UPDATE sync_state SET applying = ?", arguments: [applying])
+    static func engineStateColumn(_ isShared: Bool) -> String {
+        isShared ? "shared_engine_state" : "engine_state"
     }
 
     static func parentsFirst(_ records: [SyncRecord]) -> [SyncRecord] {
@@ -312,7 +347,7 @@ private extension AppDatabase {
     }
 
     static func clearSync(in db: Database) throws {
-        try db.execute(sql: "UPDATE sync_state SET engine_state = NULL")
+        try db.execute(sql: "UPDATE sync_state SET engine_state = NULL, shared_engine_state = NULL")
         try db.execute(sql: "DELETE FROM sync_record")
         try db.execute(sql: "DELETE FROM sync_change")
         try db.execute(sql: "DELETE FROM sync_waiting")
@@ -363,18 +398,23 @@ private extension AppDatabase {
 
     static func joinSharedWallets(
         in ids: [SyncRecordID],
+        owners: [String: String],
         db: Database
     ) throws {
-        let walletIDs = Set(ids.compactMap { SyncZone.walletID(of: $0.zoneName) })
+        let zoneNames = Set(ids.map(\.zoneName))
 
-        for walletID in walletIDs {
+        for zoneName in zoneNames {
+            guard let walletID = SyncZone.walletID(of: zoneName) else {
+                continue
+            }
+
             try db.execute(
                 sql: """
                 INSERT INTO sync_share (wallet_id, owner_name)
-                SELECT id, NULL FROM wallet WHERE id = ?
+                SELECT id, ? FROM wallet WHERE id = ?
                 ON CONFLICT DO NOTHING
                 """,
-                arguments: [walletID.description]
+                arguments: [owners[zoneName], walletID.description]
             )
         }
     }

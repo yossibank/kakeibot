@@ -1,3 +1,4 @@
+import Core
 import Foundation
 import GRDB
 @testable import Store
@@ -225,10 +226,13 @@ struct SyncTests {
     func savesEngineState() async throws {
         let setup = try await Setup()
         let state = Data([1, 2, 3])
+        let shared = Data([4])
 
-        try await setup.database.saveSyncEngineState(state)
+        try await setup.database.saveSyncEngineState(state, isShared: false)
+        try await setup.database.saveSyncEngineState(shared, isShared: true)
 
-        #expect(try await setup.database.syncEngineState() == state)
+        #expect(try await setup.database.syncEngineState(isShared: false) == state)
+        #expect(try await setup.database.syncEngineState(isShared: true) == shared)
     }
 
     @Test
@@ -277,18 +281,18 @@ struct SyncTests {
         let fields = Data([1, 2, 3])
 
         try await setup.database.saveSyncSystemFields([key.own: fields, other.own: fields])
-        try await setup.database.saveSyncEngineState(Data([4]))
+        try await setup.database.saveSyncEngineState(Data([4]), isShared: false)
         let saved = try await setup.database.syncSystemFields(for: key.own)
 
         try await setup.database.removeSyncSystemFields([key.own])
         let removed = try await setup.database.syncSystemFields(for: key.own)
 
-        try await setup.database.resetSync()
+        try await setup.database.resetSync(isShared: false)
 
         #expect(saved == fields)
         #expect(removed == nil)
         #expect(try await setup.database.syncSystemFields(for: other.own) == nil)
-        #expect(try await setup.database.syncEngineState() == nil)
+        #expect(try await setup.database.syncEngineState(isShared: false) == nil)
     }
 }
 
@@ -330,12 +334,29 @@ extension SyncTests.Setup {
         }
     }
 
+    func joinForeignShare(of walletID: String) async throws {
+        let id = try #require(Wallet.ID(walletID))
+        let zone = SyncZone.wallet(id)
+        let zoned = SyncKey(table: .wallet, id: walletID).recordID(in: zone)
+
+        try await database.applySyncChanges(
+            saved: [],
+            deleted: [],
+            systemFields: [zoned: Data([1])],
+            owners: [zone: "owner"]
+        )
+    }
+
     func pendingKeys() async throws -> [SyncKey] {
         try await database.pendingSyncChanges().map(\.key)
     }
 
     func walletID() async throws -> String {
         try await value("SELECT id FROM wallet ORDER BY sort_order")
+    }
+
+    func otherWalletID() async throws -> String {
+        try await value("SELECT id FROM wallet ORDER BY sort_order LIMIT 1 OFFSET 1")
     }
 
     func categoryID() async throws -> String {
