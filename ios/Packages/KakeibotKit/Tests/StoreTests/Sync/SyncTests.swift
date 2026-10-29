@@ -225,10 +225,13 @@ struct SyncTests {
     func savesEngineState() async throws {
         let setup = try await Setup()
         let state = Data([1, 2, 3])
+        let shared = Data([4])
 
-        try await setup.database.saveSyncEngineState(state)
+        try await setup.database.saveSyncEngineState(state, isShared: false)
+        try await setup.database.saveSyncEngineState(shared, isShared: true)
 
-        #expect(try await setup.database.syncEngineState() == state)
+        #expect(try await setup.database.syncEngineState(isShared: false) == state)
+        #expect(try await setup.database.syncEngineState(isShared: true) == shared)
     }
 
     @Test
@@ -277,18 +280,18 @@ struct SyncTests {
         let fields = Data([1, 2, 3])
 
         try await setup.database.saveSyncSystemFields([key.own: fields, other.own: fields])
-        try await setup.database.saveSyncEngineState(Data([4]))
+        try await setup.database.saveSyncEngineState(Data([4]), isShared: false)
         let saved = try await setup.database.syncSystemFields(for: key.own)
 
         try await setup.database.removeSyncSystemFields([key.own])
         let removed = try await setup.database.syncSystemFields(for: key.own)
 
-        try await setup.database.resetSync()
+        try await setup.database.resetSync(isShared: false)
 
         #expect(saved == fields)
         #expect(removed == nil)
         #expect(try await setup.database.syncSystemFields(for: other.own) == nil)
-        #expect(try await setup.database.syncEngineState() == nil)
+        #expect(try await setup.database.syncEngineState(isShared: false) == nil)
     }
 }
 
