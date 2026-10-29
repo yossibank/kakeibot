@@ -28,15 +28,17 @@ struct SettingsScreenPreview<Content: View>: View {
 }
 
 private extension SettingsScreenPreview {
+    static var screenShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: 28)
+    }
+}
+
+private extension SettingsScreenPreview {
     static var screenSize: CGSize {
         CGSize(width: 393, height: 780)
     }
 
     static var scale: CGFloat {
         0.5
-    }
-
-    static var screenShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: 26)
     }
 }
