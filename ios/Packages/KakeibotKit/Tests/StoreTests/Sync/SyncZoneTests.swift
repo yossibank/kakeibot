@@ -304,7 +304,7 @@ struct SyncZoneTests {
     }
 
     @Test
-    func zoneMoveDeletionArrivingLaterRemovesRow() async throws {
+    func zoneMoveDeletionArrivingLaterKeepsRow() async throws {
         let device = try await SyncTests.Setup()
         let walletID = try await device.walletID()
         let categoryID = try await device.categoryID()
