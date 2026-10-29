@@ -84,6 +84,8 @@ public extension SyncEngine {
 }
 
 private extension SyncEngine {
+    static let goneCodes: Set<CKError.Code> = [.unknownItem, .zoneNotFound]
+
     static var zoneID: CKRecordZone.ID {
         CKRecordZone.ID(zoneName: SyncZone.own)
     }
@@ -203,7 +205,8 @@ private extension SyncEngine {
 
     func deleteZone(_ deletion: CKDatabase.DatabaseChange.Deletion) async {
         guard deletion.zoneID == Self.zoneID else {
-            if let walletID = SyncZone.walletID(of: deletion.zoneID.zoneName) {
+            if let walletID = SyncZone.walletID(of: deletion.zoneID.zoneName),
+               await isGone(deletion.zoneID) {
                 try? await database.endSharing(walletID)
             }
 
@@ -217,6 +220,17 @@ private extension SyncEngine {
             try? await database.queueAllForSync()
         default:
             await turnOff()
+        }
+    }
+
+    func isGone(_ zoneID: CKRecordZone.ID) async -> Bool {
+        do {
+            _ = try await container.privateCloudDatabase.recordZone(for: zoneID)
+            return false
+        } catch let error as CKError where error.code == .zoneNotFound {
+            return true
+        } catch {
+            return false
         }
     }
 
@@ -252,7 +266,7 @@ private extension SyncEngine {
 
     func finishSending(_ sent: CKSyncEngine.Event.SentRecordZoneChanges) async {
         let unknownDeletes = sent.failedRecordDeletes
-            .filter { $0.value.code == .unknownItem }
+            .filter { Self.goneCodes.contains($0.value.code) }
             .map(\.key)
         let deletedIDs = sent.deletedRecordIDs + unknownDeletes
         let deleted = deletedIDs.compactMap(SyncRecordID.init)
@@ -264,7 +278,7 @@ private extension SyncEngine {
             }
         let failedSaves = sent.failedRecordSaves.map(\.record.recordID)
         let failedDeletes = sent.failedRecordDeletes
-            .filter { $0.value.code != .unknownItem }
+            .filter { !Self.goneCodes.contains($0.value.code) }
             .map(\.key)
         let failed = Set((failedSaves + failedDeletes).compactMap(SyncKey.init))
         let finished = finishedChanges(saved: Array(systemFields.keys), deleted: deleted)
@@ -331,6 +345,10 @@ private extension SyncEngine {
         case .serverRecordChanged:
             await resolveConflict(of: id, with: failure.error.serverRecord)
         case .zoneNotFound:
+            guard await (try? database.syncSaveZone(for: id.key)) == id.zoneName else {
+                return
+            }
+
             engine?.state
                 .add(pendingDatabaseChanges: [.saveZone(CKRecordZone(zoneID: recordID.zoneID))])
             engine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])

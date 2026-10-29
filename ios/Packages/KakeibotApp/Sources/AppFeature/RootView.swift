@@ -171,6 +171,14 @@ extension SyncCloud {
         try await SyncEngine.hasCloudData()
     } deleteData: {
         try await SyncEngine.deleteCloudData()
+    } createShare: { walletID, title in
+        _ = try await SyncEngine.share(zoneName: SyncZone.wallet(walletID), title: title)
+    } showShare: { walletID, title, onStop in
+        let share = try await SyncEngine.share(zoneName: SyncZone.wallet(walletID), title: title)
+
+        SyncShareSheet.present(share, title: title, onStop: onStop)
+    } deleteShare: { walletID in
+        try await SyncEngine.deleteShare(zoneName: SyncZone.wallet(walletID))
     }
 }
 

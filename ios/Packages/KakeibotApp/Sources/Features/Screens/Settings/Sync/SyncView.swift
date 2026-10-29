@@ -69,6 +69,39 @@ public struct SyncView: View {
                             .padding(.leading, 8)
                     }
 
+                    if !model.shares.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            SectionTitle("家族と共有する口座")
+                                .padding(.leading, 8)
+
+                            VStack(spacing: 0) {
+                                ForEach(model.shares, id: \.wallet.id) { item in
+                                    if item.wallet.id != model.shares.first?.wallet.id {
+                                        Hairline()
+                                    }
+
+                                    Button {
+                                        Task {
+                                            await model.share(item)
+                                        }
+                                    } label: {
+                                        shareRow(item)
+                                    }
+                                }
+                            }
+                            .sharesTextScale(id: model.shares.map(\.wallet.name))
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 16)
+                            .card()
+                            .disabled(model.isWorking || !model.isAvailable)
+
+                            Text("口座ごとに、家族と記録を分けあえます")
+                                .textFont(.footnote)
+                                .foregroundStyle(Palette.subtext)
+                                .padding(.leading, 8)
+                        }
+                    }
+
                     if model.isWorking {
                         ProgressView()
                             .frame(maxWidth: .infinity)
@@ -96,6 +129,9 @@ public struct SyncView: View {
         }
         .task {
             await model.observePending()
+        }
+        .task {
+            await model.observeShares()
         }
         .confirmation(
             isPresented: $model.isChoosing,
@@ -140,6 +176,29 @@ private extension SyncView {
                 .foregroundStyle(Palette.text)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    func shareRow(_ item: WalletShare) -> some View {
+        HStack(spacing: 12) {
+            IconBadge(item.icon, size: 32)
+
+            Text(item.wallet.name)
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+                .sharedTextScale()
+
+            Spacer(minLength: 0)
+
+            Text(item.isShared ? "共有中" : "共有する")
+                .textFont(.footnote)
+                .foregroundStyle(item.isShared ? Palette.subtext : Palette.accent)
+
+            Image(systemName: "chevron.right")
+                .sansFont(.small)
+                .foregroundStyle(Palette.hint)
+        }
+        .frame(minHeight: 58)
+        .contentShape(.rect)
     }
 }
 
