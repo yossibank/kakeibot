@@ -329,10 +329,11 @@ extension MainView {
         case review
         case assets
     }
+
+    static let noticeBottom = FloatingTabBar<Int>.height + 24
 }
 
 private extension MainView {
-    static let noticeBottom = FloatingTabBar<Int>.height + 24
     static let warmupDuration: Duration = .milliseconds(500)
 
     static let tabItems: [FloatingTabBar<MainTab>.Item] = [
