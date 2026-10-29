@@ -344,6 +344,10 @@ private extension AppModel {
         do {
             try await database.generateRecurringEntries(through: today, at: Date())
         } catch {
+            guard !AppDatabase.isInterrupted(error) else {
+                return
+            }
+
             notice.show(Self.recurringFailedMessage, for: error)
         }
     }
