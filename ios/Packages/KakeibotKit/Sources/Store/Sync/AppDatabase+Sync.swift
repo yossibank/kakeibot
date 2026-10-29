@@ -220,6 +220,13 @@ extension AppDatabase {
         try db.execute(sql: "UPDATE sync_state SET applying = ?", arguments: [applying])
     }
 
+    static func saveZone(
+        for key: SyncKey,
+        in db: Database
+    ) throws -> String {
+        try syncSharedWallet(for: key, in: db).map(SyncZone.wallet) ?? SyncZone.own
+    }
+
     static func localRow(
         for key: SyncKey,
         in db: Database
@@ -306,13 +313,6 @@ private extension AppDatabase {
 
         try db.execute(sql: "DELETE FROM sync_waiting")
         try db.notifyChanges(in: Table("sync_change"))
-    }
-
-    static func saveZone(
-        for key: SyncKey,
-        in db: Database
-    ) throws -> String {
-        try syncSharedWallet(for: key, in: db).map(SyncZone.wallet) ?? SyncZone.own
     }
 
     static func pendingChanges(in db: Database) throws -> [SyncChange] {

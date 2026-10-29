@@ -12,15 +12,9 @@ public extension AppDatabase {
             let joinedIDs = Array(systemFields.keys)
             let sharedKeys = Self.sharedKeys(in: systemFields)
 
+            var blocked: [SyncKey] = []
+
             try Self.setApplying(true, in: db)
-
-            for id in Self.parentsLast(deleted) {
-                if try Self.canApplyDeletion(of: id, in: db) {
-                    try Self.applyDeletion(of: id.key, in: db)
-                }
-
-                try Self.removeSystemFields(of: id, in: db)
-            }
 
             for record in Self.parentsFirst(saved) {
                 let kept = sharedKeys.contains(record.key) ? record.removingLocalColumns() : record
@@ -32,6 +26,21 @@ public extension AppDatabase {
             }
 
             try Self.joinSharedWallets(in: joinedIDs, owners: owners, db: db)
+            try Self.retryWaiting(in: db)
+
+            for id in Self.parentsLast(deleted) {
+                if try Self.canApplyDeletion(of: id, in: db),
+                   try !Self.applyDeletion(of: id.key, in: db) {
+                    blocked.append(id.key)
+                }
+
+                try Self.removeSystemFields(of: id, in: db)
+            }
+
+            for key in blocked where try !Self.applyDeletion(of: key, in: db) {
+                try Self.queue(key, in: db)
+            }
+
             try Self.retryWaiting(in: db)
             try Self.setApplying(false, in: db)
         }
@@ -90,13 +99,20 @@ private extension AppDatabase {
         of id: SyncRecordID,
         in db: Database
     ) throws -> Bool {
-        let zones = try String.fetchAll(
+        let otherZones = try String.fetchAll(
             db,
-            sql: "SELECT zone_name FROM sync_record WHERE table_name = ? AND record_id = ?",
-            arguments: [id.key.table.rawValue, id.key.id]
+            sql: """
+            SELECT zone_name FROM sync_record
+            WHERE table_name = ? AND record_id = ? AND zone_name <> ?
+            """,
+            arguments: [id.key.table.rawValue, id.key.id, id.zoneName]
         )
 
-        return zones.isEmpty || zones.contains(id.zoneName)
+        guard !otherZones.isEmpty else {
+            return true
+        }
+
+        return try saveZone(for: id.key, in: db) == id.zoneName
     }
 
     static func joinSharedWallets(
@@ -125,7 +141,7 @@ private extension AppDatabase {
     static func applyDeletion(
         of key: SyncKey,
         in db: Database
-    ) throws {
+    ) throws -> Bool {
         try removeWaiting(key, in: db)
 
         do {
@@ -137,8 +153,10 @@ private extension AppDatabase {
 
                 return .commit
             }
+
+            return true
         } catch let error as DatabaseError where error.resultCode == .SQLITE_CONSTRAINT {
-            try queue(key, in: db)
+            return false
         }
     }
 
@@ -246,9 +264,13 @@ private extension AppDatabase {
             return .skipped
         }
 
+        guard let losers = try conflictLosers(against: record, columns: columns, in: db) else {
+            return .blocked
+        }
+
         do {
             try db.inSavepoint {
-                try removeConflicts(with: record, in: db)
+                try remove(losers, of: table, in: db)
                 try upsert(record.key, values: values, in: db)
                 return .commit
             }
@@ -287,37 +309,6 @@ private extension AppDatabase {
             sql: "SELECT EXISTS (SELECT 1 FROM sync_change WHERE table_name = ? AND record_id = ?)",
             arguments: [key.table.rawValue, key.id]
         ) ?? false
-    }
-
-    static func removeConflicts(
-        with record: SyncRecord,
-        in db: Database
-    ) throws {
-        let table = record.key.table
-
-        for unique in table.uniqueKeys {
-            let values = unique.columns.map { record.values[$0] ?? .null }
-
-            guard unique.matchesNull || !values.contains(.null) else {
-                continue
-            }
-
-            let conditions = unique.columns.map { "\($0) IS ?" }.joined(separator: " AND ")
-            let databaseValues = values.map(\.databaseValue) + [record.key.id.databaseValue]
-            let arguments = StatementArguments(databaseValues)
-
-            try setApplying(false, in: db)
-
-            try db.execute(
-                sql: """
-                DELETE FROM \(table.rawValue)
-                WHERE \(conditions) AND \(table.keyColumn) <> ?
-                """,
-                arguments: arguments
-            )
-
-            try setApplying(true, in: db)
-        }
     }
 
     static func upsert(

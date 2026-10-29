@@ -71,7 +71,7 @@ setting は、次の key を記録しない。
 
 ## sync_waiting
 
-受け取ったが、入れられない行。参照先がまだ無いときや、ほかの決まりに合わないときに置き、次に受け取ったときに入れ直す。
+受け取ったが、入れられない行。参照先がまだ無い・一意の列で負けた・ほかの決まりに合わないときに置き、次に受け取ったときに入れ直す。
 
 | 列 | 型 | 補足 |
 | --- | --- | --- |
@@ -93,3 +93,15 @@ iCloud にあるレコードの控え。送った行と受け取った行ごと�
 同期を入れたとき・切ったときは、自分のゾーン（`Kakeibot`）の行だけを消す。共有のゾーンに関わる sync_change と、`Wallet-` のゾーンの行は残す。sync_waiting は全部消す。
 
 iCloud の行に入れ替えて同期を入れるときは、手元の行を消す間、sync_change に記録しない。sync_record・sync_change・sync_waiting は全部消す。
+
+## 一意の列
+
+受け取った行と手元の行で比べる、一意の列。ぶつかったときに残す方は [decisions/sync.md](decisions/sync.md#一意の列がぶつかったとき) で決める。
+
+| 表 | 一意の列 | 古さを比べる列 |
+| --- | --- | --- |
+| entry | `(recurring_id, recurring_date)`、`transfer_id` | created_at |
+| valuation | `(wallet_id, date)` | created_at |
+| budget | `(category_id, from_month)`。category_id が空の行どうしも比べる | なし（id で比べる） |
+| reward_log | `(rule_id, date)` | created_at |
+| calendar_stamp | `date` | created_at |

@@ -152,7 +152,7 @@ struct SyncTests {
 
         try await setup.execute("""
         INSERT INTO calendar_stamp (id, date, icon_id, created_at)
-        VALUES ('local', '2026-10-01', '\(iconID)', 'x')
+        VALUES ('local', '2026-10-01', '\(iconID)', '2026-10-02T00:00:00Z')
         """)
 
         let changes = try await setup.database.pendingSyncChanges()
@@ -165,7 +165,7 @@ struct SyncTests {
             values: [
                 "date": .text("2026-10-01"),
                 "icon_id": .text(iconID),
-                "created_at": .text("x")
+                "created_at": .text("2026-10-01T00:00:00Z")
             ]
         )
 
