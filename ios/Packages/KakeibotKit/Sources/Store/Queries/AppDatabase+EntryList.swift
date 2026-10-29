@@ -35,7 +35,14 @@ public extension AppDatabase {
 
 extension AppDatabase {
     static func entryList(in db: Database) throws -> EntryList {
-        let entries = try Entry.fetchAll(db)
+        try entryList(of: Entry.all(), in: db)
+    }
+
+    static func entryList(
+        of request: QueryInterfaceRequest<Entry>,
+        in db: Database
+    ) throws -> EntryList {
+        let entries = try request.fetchAll(db)
         let days = EntryDay.grouping(entries)
         let categories = try byID(EntryCategory.self, in: db)
         let tags = try byID(EntryTag.self, in: db)

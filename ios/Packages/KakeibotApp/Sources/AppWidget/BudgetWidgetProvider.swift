@@ -44,7 +44,7 @@ private extension BudgetWidgetProvider {
 
         guard
             let database = try? AppDatabase.appGroupForReading(),
-            let overview = try? await database.monthOverview(on: today)
+            let overview = try? await database.widgetOverview(on: today)
         else {
             let entry: BudgetWidgetEntry = isPreview
                 ? .sample(at: now)
