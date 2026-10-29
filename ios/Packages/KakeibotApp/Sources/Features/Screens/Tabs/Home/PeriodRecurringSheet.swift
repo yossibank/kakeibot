@@ -190,7 +190,7 @@ private extension PeriodRecurringSheet {
                 .textFont(.subheadline)
                 .monospacedDigit()
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity)
     }

@@ -146,7 +146,7 @@ private extension EntryDetailBand {
                     .monospacedDigit()
                     .foregroundStyle(tint ?? valueColor)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.7)
 
                 if showsChevron {
                     Spacer(minLength: 0)

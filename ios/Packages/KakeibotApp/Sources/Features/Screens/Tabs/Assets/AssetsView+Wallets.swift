@@ -145,7 +145,7 @@ private extension AssetsView {
                         .monospacedDigit()
                         .foregroundStyle(Self.amountColor(of: row))
                         .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                        .minimumScaleFactor(0.7)
                 }
 
                 if row.repaidRatio != nil || note != nil {

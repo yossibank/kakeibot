@@ -157,7 +157,7 @@ private extension RecordsView {
         AmountText(amount, type: type)
             .textFont(size: .micro)
             .lineLimit(1)
-            .minimumScaleFactor(0.8)
+            .minimumScaleFactor(0.6)
     }
 
     func upcomingList(
