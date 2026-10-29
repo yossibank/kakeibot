@@ -10,9 +10,17 @@ struct QuickRecordWidgetView: View {
 
     var body: some View {
         ViewThatFits(in: .vertical) {
-            ForEach(Self.layouts.indices, id: \.self) { index in
-                layout(Self.layouts[index])
-            }
+            layout(Self.regular)
+
+            layout(Self.tight)
+
+            layout(Self.tight.limited(2))
+
+            layout(Self.tight.limited(1))
+
+            layout(Self.compact.limited(2))
+
+            layout(Self.compact.limited(1))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .widgetURL(PlannedNotification.Route.home.url)
@@ -131,21 +139,42 @@ private extension QuickRecordWidgetView {
         let tiles = Array(visible)
 
         return Grid(horizontalSpacing: 8, verticalSpacing: metrics.gridSpacing) {
-            ForEach(0..<rowCount, id: \.self) { row in
-                GridRow {
-                    ForEach(0..<Self.columns, id: \.self) { column in
-                        let index = row * Self.columns + column
+            gridRow(0, of: tiles, padding: metrics.tilePadding)
 
-                        if index < tiles.count {
-                            tileButton(tiles[index], padding: metrics.tilePadding)
-                        } else {
-                            Color.clear
-                        }
-                    }
-                }
+            gridRow(1, of: tiles, padding: metrics.tilePadding)
+
+            if isLarge {
+                gridRow(2, of: tiles, padding: metrics.tilePadding)
             }
         }
         .sharesTextScale(id: tiles.map(\.name))
+    }
+
+    func gridRow(
+        _ row: Int,
+        of tiles: [QuickRecordWidgetSummary.Tile],
+        padding: CGFloat
+    ) -> some View {
+        let first = row * Self.columns
+
+        return GridRow {
+            gridCell(at: first, of: tiles, padding: padding)
+
+            gridCell(at: first + 1, of: tiles, padding: padding)
+        }
+    }
+
+    @ViewBuilder
+    func gridCell(
+        at index: Int,
+        of tiles: [QuickRecordWidgetSummary.Tile],
+        padding: CGFloat
+    ) -> some View {
+        if index < tiles.count {
+            tileButton(tiles[index], padding: padding)
+        } else {
+            Color.clear
+        }
     }
 
     @ViewBuilder
@@ -253,14 +282,16 @@ private extension QuickRecordWidgetView {
                 }
             }
 
-            if records.isEmpty {
+            if let first = records.first {
+                recordRow(first)
+            } else {
                 Text("今日はまだ記録していません")
                     .textFont(size: .caption)
                     .foregroundStyle(Palette.hint)
-            } else {
-                ForEach(records) { record in
-                    recordRow(record)
-                }
+            }
+
+            if let second = records.dropFirst().first {
+                recordRow(second)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -316,15 +347,6 @@ private extension QuickRecordWidgetView {
     static let tileRadius: CGFloat = 12
     static let badgeSize: CGFloat = 20
     static let markSize: CGFloat = 20
-
-    static let layouts = [
-        regular,
-        tight,
-        tight.limited(2),
-        tight.limited(1),
-        compact.limited(2),
-        compact.limited(1)
-    ]
 
     static let regular = Metrics(
         top: 12,
