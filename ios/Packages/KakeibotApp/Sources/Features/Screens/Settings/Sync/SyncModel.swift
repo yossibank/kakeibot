@@ -11,6 +11,7 @@ public final class SyncModel {
     public private(set) var isAvailable = true
     public private(set) var isWorking = false
     public private(set) var pendingCount: Int?
+    public private(set) var stopReason: SyncStopReason?
     public private(set) var shares: [WalletShare] = []
 
     public internal(set) var isChoosing = false
@@ -37,6 +38,17 @@ public extension SyncModel {
         }
 
         isAvailable = await cloud.isAvailable()
+    }
+
+    func observeStatus() async {
+        do {
+            for try await status in database.syncStatusUpdates() {
+                isOn = status.isEnabled
+                stopReason = status.stopReason
+            }
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
     }
 
     func observePending() async {

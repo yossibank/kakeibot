@@ -76,6 +76,60 @@ struct SyncModelTests {
     }
 
     @Test
+    func showsWhySyncStoppedOnItsOwn() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        try await setup.database.turnOnSync()
+
+        let task = Task {
+            await model.observeStatus()
+        }
+
+        try await wait {
+            model.isOn
+        }
+
+        try await setup.database.turnOffSyncForAccountChange(.signedOut)
+
+        try await wait {
+            model.stopReason != nil
+        }
+
+        task.cancel()
+
+        #expect(model.isOn == false)
+        #expect(model.stopReason?.message == "iCloud からサインアウトしたため、同期が切れました")
+    }
+
+    @Test
+    func clearsWhySyncStoppedWhenTurnedOnAgain() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        try await setup.database.turnOffSync(because: .cloudReplaced)
+
+        let task = Task {
+            await model.observeStatus()
+        }
+
+        try await wait {
+            model.stopReason != nil
+        }
+
+        await model.setOn(true)
+
+        try await wait {
+            model.stopReason == nil
+        }
+
+        task.cancel()
+
+        #expect(model.isOn)
+        #expect(model.stopReason == nil)
+    }
+
+    @Test
     func startsSharingAndShowsSheet() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
@@ -221,6 +275,12 @@ extension SyncModelTests.FakeCloud {
 }
 
 private extension SyncModelTests {
+    func wait(until isReady: () -> Bool) async throws {
+        for _ in 0..<200 where !isReady() {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+    }
+
     func firstShare(in database: AppDatabase) async throws -> WalletShare {
         var first: WalletShare?
 

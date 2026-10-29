@@ -11,8 +11,10 @@ extension SyncEngine {
             }
 
             try? await database.queueAllForSync()
-        case .signOut, .switchAccounts:
-            await isShared ? leaveShares() : leaveAccount()
+        case .signOut:
+            await isShared ? leaveShares() : leaveAccount(because: .signedOut)
+        case .switchAccounts:
+            await isShared ? leaveShares() : leaveAccount(because: .accountChanged)
         @unknown default:
             break
         }
@@ -37,7 +39,7 @@ extension SyncEngine {
             await restart()
             try? await database.queueAllForSync()
         default:
-            await turnOff()
+            await turnOff(because: .cloudReplaced)
         }
     }
 
@@ -79,8 +81,8 @@ extension SyncEngine {
 }
 
 private extension SyncEngine {
-    func leaveAccount() async {
-        try? await database.turnOffSyncForAccountChange()
+    func leaveAccount(because reason: SyncStopReason) async {
+        try? await database.turnOffSyncForAccountChange(reason)
         isSyncEnabled = false
         await restart()
     }

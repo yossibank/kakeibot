@@ -129,7 +129,7 @@ struct SyncLeaveTests {
             .saveSyncSystemFields([key.recordID(in: SyncZone.wallet(id)): Data([1])])
         try await setup.joinForeignShare(of: otherID)
 
-        try await setup.database.turnOffSyncForAccountChange()
+        try await setup.database.turnOffSyncForAccountChange(.accountChanged)
 
         let owners = try await setup
             .value("SELECT group_concat(IFNULL(owner_name, 'self')) FROM sync_share")

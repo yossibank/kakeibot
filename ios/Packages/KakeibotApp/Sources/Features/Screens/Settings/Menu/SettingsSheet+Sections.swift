@@ -228,7 +228,11 @@ private extension SettingsSheet {
     }
 
     var syncText: String {
-        isSyncOn ? "オン" : "オフ"
+        switch (syncStatus.isEnabled, syncStatus.stopReason) {
+        case (true, _): "オン"
+        case (false, .some): "切れました"
+        case (false, nil): "オフ"
+        }
     }
 
     var weekStartBinding: Binding<Weekday> {

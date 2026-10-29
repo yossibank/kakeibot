@@ -39,6 +39,11 @@ public struct SyncView: View {
                         .card()
                         .disabled(model.isWorking || !canChange)
 
+                        if !model.isOn,
+                           let reason = model.stopReason {
+                            warning(reason.message)
+                        }
+
                         if model.isOn,
                            let count = model.pendingCount {
                             HStack(spacing: 8) {
@@ -122,6 +127,9 @@ public struct SyncView: View {
             await model.load()
         }
         .task {
+            await model.observeStatus()
+        }
+        .task {
             await model.observePending()
         }
         .task {
@@ -165,6 +173,18 @@ private extension SyncView {
                 .foregroundStyle(Palette.text)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+
+    func warning(_ text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle")
+
+            Text(text)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .textFont(.footnote)
+        .foregroundStyle(Palette.rose)
+        .padding(.leading, 8)
     }
 
     func shareRow(_ item: WalletShare) -> some View {

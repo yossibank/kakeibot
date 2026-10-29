@@ -9,15 +9,6 @@ public extension AppDatabase {
         }
     }
 
-    func syncEnabledUpdates() -> some AsyncSequence<Bool, any Error> {
-        ValueObservation
-            .tracking { db in
-                try Bool.fetchOne(db, sql: "SELECT enabled FROM sync_state") ?? false
-            }
-            .removeDuplicates()
-            .values(in: writer)
-    }
-
     func syncActivityUpdates() -> some AsyncSequence<SyncActivity, any Error> {
         let regions = Self.syncChangeRegions + [Table("sync_state"), Table("sync_share")]
 
@@ -58,7 +49,7 @@ public extension AppDatabase {
     func turnOnSync() async throws {
         try await writer.write { db in
             try Self.clearOwnSync(in: db)
-            try db.execute(sql: "UPDATE sync_state SET enabled = 1")
+            try db.execute(sql: "UPDATE sync_state SET enabled = 1, stop_reason = NULL")
             try Self.queueAll(in: db)
         }
     }
@@ -79,19 +70,24 @@ public extension AppDatabase {
             }
 
             try Self.clearSync(in: db)
-            try db.execute(sql: "UPDATE sync_state SET enabled = 1")
+            try db.execute(sql: "UPDATE sync_state SET enabled = 1, stop_reason = NULL")
             try Self.setApplying(false, in: db)
         }
     }
 
     func turnOffSync() async throws {
         try await writer.write { db in
-            try db.execute(sql: "UPDATE sync_state SET enabled = 0")
-            try Self.clearOwnSync(in: db)
+            try Self.turnOff(because: nil, in: db)
         }
     }
 
-    func turnOffSyncForAccountChange() async throws {
+    func turnOffSync(because reason: SyncStopReason) async throws {
+        try await writer.write { db in
+            try Self.turnOff(because: reason, in: db)
+        }
+    }
+
+    func turnOffSyncForAccountChange(_ reason: SyncStopReason) async throws {
         try await writer.write { db in
             try db.execute(
                 sql: """
@@ -102,8 +98,7 @@ public extension AppDatabase {
             )
 
             try db.execute(sql: "DELETE FROM sync_share WHERE owner_name IS NULL")
-            try db.execute(sql: "UPDATE sync_state SET enabled = 0")
-            try Self.clearOwnSync(in: db)
+            try Self.turnOff(because: reason, in: db)
         }
     }
 
@@ -307,6 +302,18 @@ private extension AppDatabase {
                 try queue(key, in: db)
             }
         }
+    }
+
+    static func turnOff(
+        because reason: SyncStopReason?,
+        in db: Database
+    ) throws {
+        try db.execute(
+            sql: "UPDATE sync_state SET enabled = 0, stop_reason = ?",
+            arguments: [reason?.rawValue]
+        )
+
+        try clearOwnSync(in: db)
     }
 
     static func clearSync(in db: Database) throws {

@@ -148,8 +148,8 @@ extension SyncEngine {
         await start(isSyncEnabled: isSyncEnabled)
     }
 
-    func turnOff() async {
-        try? await database.turnOffSync()
+    func turnOff(because reason: SyncStopReason) async {
+        try? await database.turnOffSync(because: reason)
         isSyncEnabled = false
         await restart()
     }

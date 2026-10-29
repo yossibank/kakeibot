@@ -11,7 +11,7 @@ public struct SettingsSheet: View {
     @State var authorization: NotificationAuthorization = .allowed
     @State var theme: ThemeChoice = .system
     @State var customThemes: [Theme] = []
-    @State var isSyncOn = false
+    @State var syncStatus = SyncStatus(isEnabled: false, stopReason: nil)
 
     #if DEBUG
     @State var isConfirmingSample = false
@@ -125,11 +125,11 @@ private extension SettingsSheet {
 
     func observeSync() async {
         do {
-            for try await isOn in database.syncEnabledUpdates() {
-                isSyncOn = isOn
+            for try await status in database.syncStatusUpdates() {
+                syncStatus = status
             }
         } catch {
-            isSyncOn = false
+            syncStatus = SyncStatus(isEnabled: false, stopReason: nil)
         }
     }
 
