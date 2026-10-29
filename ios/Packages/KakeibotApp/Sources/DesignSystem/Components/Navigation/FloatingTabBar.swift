@@ -169,7 +169,7 @@ private extension FloatingTabBar {
                 .trim(from: 0, to: Self.hintLength)
                 .stroke(Palette.accentStrong, style: StrokeStyle(lineWidth: 2.4, lineCap: .round))
                 .rotationEffect(.degrees(360 * turn - 90))
-                .shadow(color: Palette.accent, radius: 6)
+                .glow(Palette.accent, radius: 6)
                 .padding(1.2)
         }
         .allowsHitTesting(false)

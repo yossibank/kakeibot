@@ -52,6 +52,7 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .haptic(.selection, trigger: model.style)
+        .environment(\.themeStyle.haptics, model.style.haptics)
         .onAppear {
             openedStyle = openedStyle ?? appStyle
         }

@@ -37,7 +37,7 @@ extension AssetsView {
             if model.isRewardGoalReached {
                 RoundedRectangle(cornerRadius: corner.radius(24))
                     .strokeBorder(Palette.accent, lineWidth: 1.5)
-                    .shadow(color: Palette.accent, radius: 10)
+                    .glow(Palette.accent, radius: 10)
                     .phaseAnimator([false, true]) { content, isLit in
                         let opacity = isLit ? 1 : 0.3
 

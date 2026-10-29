@@ -66,7 +66,7 @@ private extension LaunchView {
                     style: StrokeStyle(lineWidth: 2.4, lineCap: .round)
                 )
                 .frame(width: Self.ringSize, height: Self.ringSize)
-                .shadow(color: Palette.accent, radius: 6)
+                .glow(Palette.accent, radius: 6)
         }
         .frame(width: Self.markSize, height: Self.markSize)
         .glow(Palette.accent.opacity(glow), radius: 24)
