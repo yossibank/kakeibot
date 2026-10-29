@@ -45,9 +45,11 @@ struct DateDatabaseValueTests {
 private extension DateDatabaseValueTests {
     func makeDatabase() throws -> DatabaseQueue {
         let database = try DatabaseQueue()
+
         try database.write { db in
             try db.execute(sql: "CREATE TABLE sample (value TEXT)")
         }
+
         return database
     }
 
@@ -56,10 +58,7 @@ private extension DateDatabaseValueTests {
         into database: DatabaseQueue
     ) throws {
         try database.write { db in
-            try db.execute(
-                sql: "INSERT INTO sample (value) VALUES (?)",
-                arguments: [value]
-            )
+            try db.execute(sql: "INSERT INTO sample (value) VALUES (?)", arguments: [value])
         }
     }
 

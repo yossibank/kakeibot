@@ -10,11 +10,7 @@ struct EntryWriteTests {
         let setup = try await Setup()
         try await setup.database.markNoSpendDay(setup.draft.date, at: setup.now)
 
-        let result = try await setup.database.saveEntryResult(
-            setup.draft,
-            at: setup.now
-        )
-
+        let result = try await setup.database.saveEntryResult(setup.draft, at: setup.now)
         let cleared = try setup.database.snapshot().noSpendDays
 
         try await setup.database.deleteEntry(
@@ -33,10 +29,7 @@ struct EntryWriteTests {
     func doesNotMakeNoSpendDayOnUnmarkedDay() async throws {
         let setup = try await Setup()
 
-        let result = try await setup.database.saveEntryResult(
-            setup.draft,
-            at: setup.now
-        )
+        let result = try await setup.database.saveEntryResult(setup.draft, at: setup.now)
 
         try await setup.database.deleteEntry(
             result.entry.id,
@@ -52,14 +45,8 @@ struct EntryWriteTests {
     @Test
     func savesNewEntry() async throws {
         let setup = try await Setup()
-
-        let saved = try await setup.database.saveEntry(
-            setup.draft,
-            at: setup.now
-        )
-
+        let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
         let snapshot = try setup.database.snapshot()
-
         #expect(snapshot.entries == [saved])
     }
 
@@ -70,17 +57,8 @@ struct EntryWriteTests {
         var edited = setup.draft
         edited.amount = 1500
 
-        let saved = try await setup.database.saveEntry(
-            setup.draft,
-            at: setup.now
-        )
-
-        let updated = try await setup.database.saveEntry(
-            edited,
-            editing: saved.id,
-            at: later
-        )
-
+        let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
+        let updated = try await setup.database.saveEntry(edited, editing: saved.id, at: later)
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries == [updated])
@@ -94,11 +72,7 @@ struct EntryWriteTests {
         let setup = try await Setup()
 
         await #expect(throws: AppDatabase.WriteError.entryNotFound) {
-            try await setup.database.saveEntry(
-                setup.draft,
-                editing: Entry.ID(),
-                at: setup.now
-            )
+            try await setup.database.saveEntry(setup.draft, editing: Entry.ID(), at: setup.now)
         }
     }
 
@@ -117,9 +91,7 @@ struct EntryWriteTests {
     func clearsNoSpendDayOnlyForExpense(type: Entry.Kind) async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
-        let categories = type == .expense
-            ? options.expenseCategories
-            : options.incomeCategories
+        let categories = type == .expense ? options.expenseCategories : options.incomeCategories
         var draft = setup.draft
         draft.type = type
         draft.categoryId = categories[0].id
@@ -141,18 +113,11 @@ struct EntryWriteTests {
         var invalid = setup.draft
         invalid.amount = 0
 
-        try await setup.database.saveEntries(
-            [setup.draft, setup.draft],
-            at: setup.now
-        )
-
+        try await setup.database.saveEntries([setup.draft, setup.draft], at: setup.now)
         let saved = try setup.database.snapshot().entries.count
 
         await #expect(throws: (any Error).self) {
-            try await setup.database.saveEntries(
-                [setup.draft, invalid],
-                at: setup.now
-            )
+            try await setup.database.saveEntries([setup.draft, invalid], at: setup.now)
         }
 
         let after = try setup.database.snapshot().entries.count
@@ -165,10 +130,7 @@ struct EntryWriteTests {
     func deletesEntry() async throws {
         let setup = try await Setup()
 
-        let saved = try await setup.database.saveEntry(
-            setup.draft,
-            at: setup.now
-        )
+        let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
 
         try await setup.database.deleteEntry(saved.id)
         let snapshot = try setup.database.snapshot()
@@ -211,20 +173,12 @@ struct EntryWriteTests {
         var edited = setup.draft
         edited.amount = 1500
 
-        let saved = try await setup.database.saveEntry(
-            setup.draft,
-            at: setup.now
-        )
+        let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
 
         try await setup.database.deleteEntry(saved.id)
         try await setup.database.restoreEntry(saved)
         let restored = try setup.database.snapshot().entries
-
-        try await setup.database.saveEntry(
-            edited,
-            editing: saved.id,
-            at: later
-        )
+        try await setup.database.saveEntry(edited, editing: saved.id, at: later)
         try await setup.database.restoreEntry(saved)
         let reverted = try setup.database.snapshot().entries
 
@@ -310,9 +264,11 @@ extension EntryWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
-        try database.insertDefaultsIfEmpty(at: now)
-        let options = try await database.entryOptions()
         let date = try #require(LocalDate("2026-10-03"))
+
+        try database.insertDefaultsIfEmpty(at: now)
+
+        let options = try await database.entryOptions()
 
         let draft = EntryDraft(
             type: .expense,
@@ -323,10 +279,6 @@ extension EntryWriteTests.Setup {
             memo: "ランチ"
         )
 
-        self.init(
-            database: database,
-            now: now,
-            draft: draft
-        )
+        self.init(database: database, now: now, draft: draft)
     }
 }

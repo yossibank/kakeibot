@@ -43,11 +43,15 @@ public struct LocalDate: Hashable, Sendable {
         _ date: Date,
         in timeZone: TimeZone
     ) {
-        let offset = TimeInterval(timeZone.secondsFromGMT(for: date))
+        let offsetSeconds = timeZone.secondsFromGMT(for: date)
+        let offset = TimeInterval(offsetSeconds)
         let localSeconds = date.timeIntervalSince1970 + offset
         let dayLength = TimeInterval(Self.secondsPerDay)
-        let days = Int((localSeconds / dayLength).rounded(.down))
-        self.init(dayNumber: Self.unixEpochDayNumber + days)
+        let elapsedDays = (localSeconds / dayLength).rounded(.down)
+        let days = Int(elapsedDays)
+        let dayNumber = Self.unixEpochDayNumber + days
+
+        self.init(dayNumber: dayNumber)
     }
 }
 
@@ -74,12 +78,15 @@ public extension LocalDate {
 
     func startOfDay(in timeZone: TimeZone) -> Date {
         let localDays = dayNumber - Self.unixEpochDayNumber
-        let localNoon = TimeInterval(localDays * Self.secondsPerDay + Self.secondsPerDay / 2)
+        let localNoonSeconds = localDays * Self.secondsPerDay + Self.secondsPerDay / 2
+        let localNoon = TimeInterval(localNoonSeconds)
         let noonAsUTC = Date(timeIntervalSince1970: localNoon)
-        let offset = TimeInterval(timeZone.secondsFromGMT(for: noonAsUTC))
+        let offsetSeconds = timeZone.secondsFromGMT(for: noonAsUTC)
+        let offset = TimeInterval(offsetSeconds)
         let noon = noonAsUTC.addingTimeInterval(-offset)
 
         var calendar = Calendar(identifier: .gregorian)
+
         calendar.timeZone = timeZone
 
         return calendar.startOfDay(for: noon)
@@ -107,13 +114,17 @@ extension LocalDate {
         yearMonth: YearMonth,
         clampedDay day: Int
     ) {
+        let lowerClamped = max(day, 1)
+
         self.yearMonth = yearMonth
-        self.day = min(max(day, 1), yearMonth.numberOfDays)
+        self.day = min(lowerClamped, yearMonth.numberOfDays)
     }
 
     init(dayNumber: Int) {
         let estimatedYear = dayNumber * 400 / Self.daysPer400Years + 1
-        var yearMonth = YearMonth(monthIndex: estimatedYear * 12)
+        let estimatedMonthIndex = estimatedYear * 12
+
+        var yearMonth = YearMonth(monthIndex: estimatedMonthIndex)
 
         while yearMonth.firstDayNumber > dayNumber {
             yearMonth = yearMonth.adding(months: -1)
@@ -134,7 +145,9 @@ extension LocalDate {
             return startedThisMonth
         }
 
-        return startDay.period(startingIn: yearMonth.adding(months: -1))
+        let lastMonth = yearMonth.adding(months: -1)
+
+        return startDay.period(startingIn: lastMonth)
     }
 }
 
@@ -153,7 +166,8 @@ extension LocalDate: Comparable {
 
 extension LocalDate: CustomStringConvertible {
     public var description: String {
-        "\(yearMonth)-\(DateText.padded(day, digits: 2))"
+        let dayText = DateText.padded(day, digits: 2)
+        return "\(yearMonth)-\(dayText)"
     }
 }
 

@@ -50,6 +50,26 @@ public struct RecurringDraft: Hashable, Sendable {
         self.endDate = endDate
         self.remindDaysBefore = remindDaysBefore
     }
+
+    public init(_ recurring: Recurring) {
+        self.init(
+            type: recurring.type,
+            amount: recurring.amount,
+            categoryId: recurring.categoryId,
+            walletId: recurring.walletId,
+            toWalletId: recurring.toWalletId,
+            memo: recurring.memo ?? "",
+            frequency: recurring.frequency,
+            month: recurring.month ?? recurring.startDate.month,
+            day: recurring.day,
+            holidayShift: recurring.holidayShift,
+            closingDay: recurring.closingDay,
+            fee: recurring.fee ?? 0,
+            startDate: recurring.startDate,
+            endDate: recurring.endDate,
+            remindDaysBefore: recurring.remindDaysBefore
+        )
+    }
 }
 
 public extension RecurringDraft {
@@ -73,7 +93,8 @@ public extension RecurringDraft {
     var problems: [Problem] {
         var problems: [Problem] = []
 
-        if amount < 1, cardClosingDay == nil {
+        if amount < 1,
+           cardClosingDay == nil {
             problems.append(.amountNotPositive)
         }
 
@@ -89,7 +110,8 @@ public extension RecurringDraft {
             problems.append(.dayOutOfRange)
         }
 
-        if let closingDay = cardClosingDay, !(1...31).contains(closingDay) {
+        if let closingDay = cardClosingDay,
+           !(1...31).contains(closingDay) {
             problems.append(.closingDayOutOfRange)
         }
 
@@ -97,39 +119,22 @@ public extension RecurringDraft {
             problems.append(.feeNegative)
         }
 
-        if frequency == .yearly, !(1...12).contains(month) {
+        if frequency == .yearly,
+           !(1...12).contains(month) {
             problems.append(.monthOutOfRange)
         }
 
-        if let endDate, endDate < startDate {
+        if let endDate,
+           endDate < startDate {
             problems.append(.endBeforeStart)
         }
 
-        if let days = remindDaysBefore, !Self.remindRange.contains(days) {
+        if let days = remindDaysBefore,
+           !Self.remindRange.contains(days) {
             problems.append(.remindOutOfRange)
         }
 
         return problems
-    }
-
-    init(_ recurring: Recurring) {
-        self.init(
-            type: recurring.type,
-            amount: recurring.amount,
-            categoryId: recurring.categoryId,
-            walletId: recurring.walletId,
-            toWalletId: recurring.toWalletId,
-            memo: recurring.memo ?? "",
-            frequency: recurring.frequency,
-            month: recurring.month ?? recurring.startDate.month,
-            day: recurring.day,
-            holidayShift: recurring.holidayShift,
-            closingDay: recurring.closingDay,
-            fee: recurring.fee ?? 0,
-            startDate: recurring.startDate,
-            endDate: recurring.endDate,
-            remindDaysBefore: recurring.remindDaysBefore
-        )
     }
 
     func newRecurring(at now: Date) throws -> Recurring {
@@ -176,7 +181,6 @@ public extension RecurringDraft {
         updated.holidayShift = holidayShift
         updated.closingDay = cardClosingDay
         updated.fee = savedFee
-
         updated.startDate = startDate
         updated.endDate = endDate
         updated.remindDaysBefore = remindDaysBefore
@@ -189,10 +193,8 @@ public extension RecurringDraft {
 private extension RecurringDraft {
     var categoryProblems: [Problem] {
         switch type {
-        case .expense, .income:
-            categoryId == nil ? [.missingCategory] : []
-        case .transfer:
-            categoryId == nil ? [] : [.categoryOnTransfer]
+        case .expense, .income: categoryId == nil ? [.missingCategory] : []
+        case .transfer: categoryId == nil ? [] : [.categoryOnTransfer]
         }
     }
 
@@ -230,7 +232,6 @@ private extension RecurringDraft {
 
     var trimmedMemo: String? {
         let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
-
         return trimmed.isEmpty ? nil : trimmed
     }
 

@@ -5,6 +5,11 @@ extension ExportV1.Tables {
     init(fetchingFrom db: Database) throws {
         let knownKeys = Setting.Key.allCases.map(\.rawValue)
 
+        let settings = try Setting
+            .filter(knownKeys.contains(Column("key")))
+            .orderByPrimaryKey()
+            .fetchAll(db)
+
         try self.init(
             icons: Icon.orderByPrimaryKey().fetchAll(db),
             shelfIcons: ShelfIcon.orderByPrimaryKey().fetchAll(db),
@@ -22,10 +27,7 @@ extension ExportV1.Tables {
             calendarStamps: CalendarStamp.orderByPrimaryKey().fetchAll(db),
             noSpendDays: NoSpendDay.orderByPrimaryKey().fetchAll(db),
             themes: Theme.orderByPrimaryKey().fetchAll(db),
-            settings: Setting
-                .filter(knownKeys.contains(Column("key")))
-                .orderByPrimaryKey()
-                .fetchAll(db)
+            settings: settings
         )
     }
 

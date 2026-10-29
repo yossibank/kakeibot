@@ -29,7 +29,6 @@ struct ReviewPeriodTests {
 
         let today = fixture.today ?? fixture.date
         let range = period.comparisonRange(today: today)
-
         #expect(range == fixture.comparisonStart...fixture.comparisonEnd)
     }
 

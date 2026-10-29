@@ -5,7 +5,6 @@ struct HomeLayoutTests {
     @Test
     func addsMissingSectionsAndDropsRepeats() {
         let layout = HomeLayout(order: [.recent, .budget, .recent])
-
         #expect(layout.order == [.recent, .budget, .customize, .templates, .bills, .stamps])
     }
 
@@ -20,7 +19,6 @@ struct HomeLayoutTests {
     @Test
     func showsListedSectionsOutsideTheStandard() {
         let layout = HomeLayout(order: HomeSection.allCases)
-
         #expect(layout.visible == HomeSection.allCases)
     }
 

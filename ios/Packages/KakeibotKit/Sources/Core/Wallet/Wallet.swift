@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Wallet: Hashable, Sendable {
+public struct Wallet: Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var name: String
@@ -53,8 +53,6 @@ public extension Wallet {
     }
 }
 
-extension Wallet: Identifiable {}
-
 extension Wallet: Codable {
     enum CodingKeys: String, CodingKey {
         case id
@@ -71,24 +69,28 @@ extension Wallet: Codable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(ID.self, forKey: .id)
+        let name = try container.decode(String.self, forKey: .name)
+        let kind = try container.decode(Kind.self, forKey: .kind)
+        let iconId = try container.decode(Icon.ID.self, forKey: .iconId)
+        let initialBalance = try container.decode(Int.self, forKey: .initialBalance)
+        let loanAmount = try container.decodeIfPresent(Int.self, forKey: .loanAmount)
+        let sortOrder = try container.decode(Int.self, forKey: .sortOrder)
+        let archivedAt = try container.decodeIfPresent(Date.self, forKey: .archivedAt)
+        let createdAt = try container.decode(Date.self, forKey: .createdAt)
+        let updatedAt = try container.decode(Date.self, forKey: .updatedAt)
 
-        try self.init(
-            id: container.decode(ID.self, forKey: .id),
-            name: container.decode(String.self, forKey: .name),
-            kind: container.decode(Kind.self, forKey: .kind),
-            iconId: container.decode(Icon.ID.self, forKey: .iconId),
-            initialBalance: container.decode(Int.self, forKey: .initialBalance),
-            loanAmount: container.decodeIfPresent(
-                Int.self,
-                forKey: .loanAmount
-            ),
-            sortOrder: container.decode(Int.self, forKey: .sortOrder),
-            archivedAt: container.decodeIfPresent(
-                Date.self,
-                forKey: .archivedAt
-            ),
-            createdAt: container.decode(Date.self, forKey: .createdAt),
-            updatedAt: container.decode(Date.self, forKey: .updatedAt)
+        self.init(
+            id: id,
+            name: name,
+            kind: kind,
+            iconId: iconId,
+            initialBalance: initialBalance,
+            loanAmount: loanAmount,
+            sortOrder: sortOrder,
+            archivedAt: archivedAt,
+            createdAt: createdAt,
+            updatedAt: updatedAt
         )
     }
 

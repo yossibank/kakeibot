@@ -18,9 +18,5 @@ public struct ThemeStyle: Hashable, Sendable {
 }
 
 public extension ThemeStyle {
-    static let standard = ThemeStyle(
-        corner: .standard,
-        displayFont: .mincho,
-        textFont: .gothic
-    )
+    static let standard = ThemeStyle(corner: .standard, displayFont: .mincho, textFont: .gothic)
 }

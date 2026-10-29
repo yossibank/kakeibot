@@ -1,37 +1,6 @@
 import GRDB
 
 enum MigrationV26 {
-    static func migrate(_ db: Database) throws {
-        try db.create(table: "sync_state") { table in
-            table.primaryKey("id", .integer).check { $0 == 1 }
-            table.column("enabled", .boolean).notNull().defaults(to: false)
-            table.column("applying", .boolean).notNull().defaults(to: false)
-            table.column("engine_state", .blob)
-        }
-
-        try db.execute(sql: "INSERT INTO sync_state (id) VALUES (1)")
-
-        try db.create(table: "sync_change", options: .withoutRowID) { table in
-            table.column("table_name", .text).notNull()
-            table.column("record_id", .text).notNull()
-            table.column("version", .integer).notNull()
-            table.primaryKey(["table_name", "record_id"])
-        }
-
-        try db.create(table: "sync_waiting", options: .withoutRowID) { table in
-            table.column("table_name", .text).notNull()
-            table.column("record_id", .text).notNull()
-            table.column("fields", .text).notNull()
-            table.primaryKey(["table_name", "record_id"])
-        }
-
-        for (table, key) in tables {
-            try createTriggers(on: table, key: key, in: db)
-        }
-    }
-}
-
-extension MigrationV26 {
     static let tables = [
         ("icon", "id"),
         ("wallet", "id"),
@@ -64,6 +33,35 @@ extension MigrationV26 {
     """
 
     static let recording = "(SELECT enabled AND NOT applying FROM sync_state)"
+
+    static func migrate(_ db: Database) throws {
+        try db.create(table: "sync_state") { table in
+            table.primaryKey("id", .integer).check { $0 == 1 }
+            table.column("enabled", .boolean).notNull().defaults(to: false)
+            table.column("applying", .boolean).notNull().defaults(to: false)
+            table.column("engine_state", .blob)
+        }
+
+        try db.execute(sql: "INSERT INTO sync_state (id) VALUES (1)")
+
+        try db.create(table: "sync_change", options: .withoutRowID) { table in
+            table.column("table_name", .text).notNull()
+            table.column("record_id", .text).notNull()
+            table.column("version", .integer).notNull()
+            table.primaryKey(["table_name", "record_id"])
+        }
+
+        try db.create(table: "sync_waiting", options: .withoutRowID) { table in
+            table.column("table_name", .text).notNull()
+            table.column("record_id", .text).notNull()
+            table.column("fields", .text).notNull()
+            table.primaryKey(["table_name", "record_id"])
+        }
+
+        for (table, key) in tables {
+            try createTriggers(on: table, key: key, in: db)
+        }
+    }
 
     static func createTriggers(
         on table: String,

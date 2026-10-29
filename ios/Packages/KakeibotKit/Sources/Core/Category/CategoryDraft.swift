@@ -17,6 +17,15 @@ public struct CategoryDraft: Hashable, Sendable {
         self.mark = mark
         self.color = color
     }
+
+    public init(
+        _ category: EntryCategory,
+        icon: Icon
+    ) {
+        let mark = Mark(icon)
+
+        self.init(kind: category.kind, name: category.name, mark: mark, color: icon.color)
+    }
 }
 
 public extension CategoryDraft {
@@ -31,20 +40,7 @@ public extension CategoryDraft {
 
     var problems: [Problem] {
         let nameProblems: [Problem] = trimmedName.isEmpty ? [.emptyName] : []
-
         return nameProblems + icon.problems
-    }
-
-    init(
-        _ category: EntryCategory,
-        icon: Icon
-    ) {
-        self.init(
-            kind: category.kind,
-            name: category.name,
-            mark: Mark(icon),
-            color: icon.color
-        )
     }
 
     func newIcon(at now: Date) throws -> Icon {

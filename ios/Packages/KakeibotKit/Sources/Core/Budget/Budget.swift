@@ -1,4 +1,4 @@
-public struct Budget: Hashable, Sendable {
+public struct Budget: Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var categoryId: EntryCategory.ID?
@@ -34,8 +34,6 @@ public extension [Budget] {
         return rows.max { $0.fromMonth < $1.fromMonth }?.amount
     }
 }
-
-extension Budget: Identifiable {}
 
 extension Budget: Codable {
     public func encode(to encoder: any Encoder) throws {

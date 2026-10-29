@@ -17,11 +17,8 @@ public extension Recurring {
             : scheduled.yearMonth.adding(months: -1)
 
         let closing = LocalDate(yearMonth: closingMonth, clampedDay: closingDay)
-
-        let previous = LocalDate(
-            yearMonth: closingMonth.adding(months: -1),
-            clampedDay: closingDay
-        )
+        let previousMonth = closingMonth.adding(months: -1)
+        let previous = LocalDate(yearMonth: previousMonth, clampedDay: closingDay)
 
         return previous.adding(days: 1)...closing
     }
@@ -49,8 +46,7 @@ public extension Recurring {
         for used: LocalDate,
         in month: YearMonth
     ) -> LocalDate? {
-        billDates(for: used, count: Self.billChoiceCount)
-            .first { occurrenceMonth(of: $0) == month }
+        billDates(for: used, count: Self.billChoiceCount).first { occurrenceMonth(of: $0) == month }
     }
 
     func billDates(
@@ -65,7 +61,6 @@ public extension Recurring {
         var cursor = used
 
         while dates.count < count,
-
               let next = nextDate(onOrAfter: cursor) {
             let closing = billingPeriod(paidOn: next)?.upperBound ?? next
 

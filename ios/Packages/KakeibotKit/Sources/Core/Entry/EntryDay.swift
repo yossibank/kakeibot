@@ -36,8 +36,6 @@ private extension EntryDay {
     }
 
     func total(of type: Entry.Kind) -> Int {
-        entries
-            .filter { $0.type == type }
-            .reduce(0) { $0 + $1.amount }
+        entries.filter { $0.type == type }.reduce(0) { $0 + $1.amount }
     }
 }

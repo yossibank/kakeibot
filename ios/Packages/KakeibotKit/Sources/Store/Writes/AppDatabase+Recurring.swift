@@ -128,11 +128,13 @@ public extension AppDatabase {
                 return nil
             }
 
+            let occurrence = recurring.occurrence(on: date)
+
             var change = CardBillChange()
 
             let entry = try Self.generateEntry(
                 of: recurring,
-                on: recurring.occurrence(on: date),
+                on: occurrence,
                 change: &change,
                 in: db,
                 at: now
@@ -187,7 +189,10 @@ extension AppDatabase {
 
         let amount = try billAmount(of: recurring, on: occurrence, in: db)
 
-        guard !exists, amount > 0 else {
+        guard
+            !exists,
+            amount > 0
+        else {
             return nil
         }
 
@@ -268,13 +273,7 @@ private extension AppDatabase {
             : []
 
         for occurrence in occurrences {
-            try generateEntry(
-                of: recurring,
-                on: occurrence,
-                change: &change,
-                in: db,
-                at: now
-            )
+            try generateEntry(of: recurring, on: occurrence, change: &change, in: db, at: now)
         }
 
         guard recurring.startDate <= today else {
@@ -303,16 +302,11 @@ private extension AppDatabase {
             return
         }
 
-        let last = min(previousStart.adding(days: -1), today)
+        let dayBefore = previousStart.adding(days: -1)
+        let last = min(dayBefore, today)
 
         for occurrence in recurring.occurrences(from: recurring.startDate, through: last) {
-            try generateEntry(
-                of: recurring,
-                on: occurrence,
-                change: &change,
-                in: db,
-                at: now
-            )
+            try generateEntry(of: recurring, on: occurrence, change: &change, in: db, at: now)
         }
     }
 

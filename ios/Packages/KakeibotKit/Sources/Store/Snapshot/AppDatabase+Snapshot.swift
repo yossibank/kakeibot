@@ -35,13 +35,11 @@ public extension AppDatabase {
         stash: @Sendable (Data) throws -> Void
     ) async throws {
         try await writer.write { db in
-            let current = try ExportV1(
-                exportedAt: date,
-                app: app,
-                data: ExportV1.Tables(fetchingFrom: db)
-            )
+            let tables = try ExportV1.Tables(fetchingFrom: db)
+            let current = ExportV1(exportedAt: date, app: app, data: tables)
+            let json = try current.json()
 
-            try stash(current.json())
+            try stash(json)
             try Self.replace(with: export.data, in: db)
         }
     }

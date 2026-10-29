@@ -8,7 +8,6 @@ enum MigrationV7 {
         }
 
         try db.execute(sql: "INSERT INTO setting_new (key, value) SELECT key, value FROM setting")
-
         try db.drop(table: "setting")
         try db.rename(table: "setting_new", to: "setting")
     }

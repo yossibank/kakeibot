@@ -6,10 +6,8 @@ public struct Identifier<Owner>: Hashable, Sendable {
     public init(_ uuid: UUID = UUID()) {
         self.uuid = uuid
     }
-}
 
-public extension Identifier {
-    init?(_ text: String) {
+    public init?(_ text: String) {
         guard let uuid = UUID(uuidString: text) else {
             return nil
         }

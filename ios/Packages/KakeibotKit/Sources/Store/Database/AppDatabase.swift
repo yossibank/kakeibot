@@ -44,17 +44,11 @@ public extension AppDatabase {
     }
 
     static func suspend() {
-        NotificationCenter.default.post(
-            name: Database.suspendNotification,
-            object: nil
-        )
+        NotificationCenter.default.post(name: Database.suspendNotification, object: nil)
     }
 
     static func resume() {
-        NotificationCenter.default.post(
-            name: Database.resumeNotification,
-            object: nil
-        )
+        NotificationCenter.default.post(name: Database.resumeNotification, object: nil)
     }
 
     func reloadAfterOtherProcesses() async throws {
@@ -108,9 +102,7 @@ private extension AppDatabase {
     static let busyTimeout: TimeInterval = 5
 
     static var groupContainer: URL? {
-        let manager = FileManager.default
-
-        return manager.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)
     }
 
     static var configuration: Configuration {
@@ -126,9 +118,7 @@ private extension AppDatabase {
     init(migrated writer: any DatabaseWriter) {
         self.writer = writer
 
-        self.entryListObservation = ValueObservation
-            .tracking(Self.entryList)
-            .shared(in: writer)
+        self.entryListObservation = ValueObservation.tracking(Self.entryList).shared(in: writer)
     }
 
     static func appGroupMigrated(readonly: Bool) throws -> AppDatabase {
@@ -155,8 +145,6 @@ private extension AppDatabase {
             throw SetupError.appGroupUnavailable
         }
 
-        let url = directory.appending(path: fileName)
-
-        return url.path(percentEncoded: false)
+        return directory.appending(path: fileName).path(percentEncoded: false)
     }
 }

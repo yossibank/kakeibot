@@ -15,6 +15,31 @@ public struct Holdings: Hashable, Sendable {
         self.investments = investments
         self.loans = loans
     }
+
+    public init(
+        wallets: [Wallet],
+        entries: [Entry],
+        valuations: [Valuation] = [],
+        through date: LocalDate? = nil
+    ) {
+        func total(_ role: Wallet.Kind.Role) -> Int {
+            let wallets = wallets.filter { $0.kind.role == role }
+
+            return Wallet.totalBalance(
+                of: wallets,
+                with: entries,
+                valuations: valuations,
+                through: date
+            )
+        }
+
+        let onHand = total(.onHand)
+        let cards = total(.card)
+        let investments = total(.investment)
+        let loans = total(.loan)
+
+        self.init(onHand: onHand, cards: cards, investments: investments, loans: loans)
+    }
 }
 
 public extension Holdings {
@@ -32,31 +57,6 @@ public extension Holdings {
 
     var refund: Int {
         max(cards, 0)
-    }
-
-    init(
-        wallets: [Wallet],
-        entries: [Entry],
-        valuations: [Valuation] = [],
-        through date: LocalDate? = nil
-    ) {
-        func total(_ role: Wallet.Kind.Role) -> Int {
-            let wallets = wallets.filter { $0.kind.role == role }
-
-            return Wallet.totalBalance(
-                of: wallets,
-                with: entries,
-                valuations: valuations,
-                through: date
-            )
-        }
-
-        self.init(
-            onHand: total(.onHand),
-            cards: total(.card),
-            investments: total(.investment),
-            loans: total(.loan)
-        )
     }
 }
 

@@ -11,28 +11,19 @@ struct MigrationV3Tests {
         try migrator.migrate(queue, upTo: "v2")
 
         try queue.write { db in
-            try db.execute(
-                sql: Self.insertIcon,
-                arguments: [Self.foodIcon, "food"]
-            )
+            try db.execute(sql: Self.insertIcon, arguments: [Self.foodIcon, "food"])
         }
 
         #expect(throws: DatabaseError.self) {
             try queue.write { db in
-                try db.execute(
-                    sql: Self.insertIcon,
-                    arguments: [Self.cafeIcon, "cafe"]
-                )
+                try db.execute(sql: Self.insertIcon, arguments: [Self.cafeIcon, "cafe"])
             }
         }
 
         try migrator.migrate(queue)
 
         try queue.write { db in
-            try db.execute(
-                sql: Self.insertIcon,
-                arguments: [Self.cafeIcon, "cafe"]
-            )
+            try db.execute(sql: Self.insertIcon, arguments: [Self.cafeIcon, "cafe"])
         }
 
         let food = try queue.read { db in

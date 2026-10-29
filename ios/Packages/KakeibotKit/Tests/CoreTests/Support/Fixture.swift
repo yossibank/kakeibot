@@ -1,8 +1,14 @@
 import Foundation
 
 enum Fixture {
+    private static let root = URL(filePath: #filePath)
+        .deletingLastPathComponent()
+        .appending(path: "../../../../../../spec/fixtures")
+        .standardized
+
     static func data(_ path: String) throws -> Data {
-        try Data(contentsOf: root.appending(path: path))
+        let url = root.appending(path: path)
+        return try Data(contentsOf: url)
     }
 
     static func load<Value: Decodable>(
@@ -11,7 +17,9 @@ enum Fixture {
     ) throws -> Value {
         let data = try data(path)
         let decoder = JSONDecoder()
+
         decoder.dateDecodingStrategy = .iso8601
+
         return try decoder.decode(type, from: data)
     }
 
@@ -21,13 +29,6 @@ enum Fixture {
     ) throws -> [Case] {
         try load(path, as: Cases<Case>.self).cases
     }
-}
-
-private extension Fixture {
-    static let root = URL(filePath: #filePath)
-        .deletingLastPathComponent()
-        .appending(path: "../../../../../../spec/fixtures")
-        .standardized
 }
 
 private struct Cases<Case: Decodable>: Decodable {

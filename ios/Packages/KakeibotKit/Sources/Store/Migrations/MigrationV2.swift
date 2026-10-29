@@ -1,6 +1,37 @@
 import GRDB
 
 enum MigrationV2 {
+    private static let glyphNames = [
+        "food", "daily", "transit", "social", "hobby", "clothes", "beauty",
+        "medical", "home", "phone", "utility", "salary", "bonus", "other",
+        "cash", "bank"
+    ]
+
+    private static let copyIcons = """
+    INSERT INTO new_icon (id, emoji, text, glyph, color, created_at, updated_at)
+    SELECT id, emoji, text, NULL, color, created_at, updated_at FROM icon
+    """
+
+    private static let defaultGlyphs: [(String, String)] = [
+        ("🍙", "food"),
+        ("🧻", "daily"),
+        ("🚃", "transit"),
+        ("🍻", "social"),
+        ("🎮", "hobby"),
+        ("👕", "clothes"),
+        ("💄", "beauty"),
+        ("💊", "medical"),
+        ("🏠", "home"),
+        ("📱", "phone"),
+        ("💡", "utility"),
+        ("📦", "other"),
+        ("💴", "salary"),
+        ("🎁", "bonus"),
+        ("✨", "other"),
+        ("👛", "cash"),
+        ("🏦", "bank")
+    ]
+
     static func migrate(_ db: Database) throws {
         try db.create(table: "new_icon") { table in
             table.primaryKey("id", .text)
@@ -27,37 +58,4 @@ enum MigrationV2 {
             )
         }
     }
-}
-
-private extension MigrationV2 {
-    static let glyphNames = [
-        "food", "daily", "transit", "social", "hobby", "clothes", "beauty",
-        "medical", "home", "phone", "utility", "salary", "bonus", "other",
-        "cash", "bank"
-    ]
-
-    static let copyIcons = """
-    INSERT INTO new_icon (id, emoji, text, glyph, color, created_at, updated_at)
-    SELECT id, emoji, text, NULL, color, created_at, updated_at FROM icon
-    """
-
-    static let defaultGlyphs: [(String, String)] = [
-        ("🍙", "food"),
-        ("🧻", "daily"),
-        ("🚃", "transit"),
-        ("🍻", "social"),
-        ("🎮", "hobby"),
-        ("👕", "clothes"),
-        ("💄", "beauty"),
-        ("💊", "medical"),
-        ("🏠", "home"),
-        ("📱", "phone"),
-        ("💡", "utility"),
-        ("📦", "other"),
-        ("💴", "salary"),
-        ("🎁", "bonus"),
-        ("✨", "other"),
-        ("👛", "cash"),
-        ("🏦", "bank")
-    ]
 }

@@ -3,9 +3,7 @@ import GRDB
 
 public extension AppDatabase {
     func customThemeUpdates() -> some AsyncSequence<[Theme], any Error> {
-        ValueObservation
-            .tracking(Self.customThemes)
-            .values(in: writer)
+        ValueObservation.tracking(Self.customThemes).values(in: writer)
     }
 
     func customThemes() async throws -> [Theme] {
@@ -13,10 +11,7 @@ public extension AppDatabase {
     }
 
     func themeLookUpdates() -> some AsyncSequence<ThemeLook, any Error> {
-        ValueObservation
-            .tracking(Self.themeLook)
-            .removeDuplicates()
-            .values(in: writer)
+        ValueObservation.tracking(Self.themeLook).removeDuplicates().values(in: writer)
     }
 
     func themeLook() async throws -> ThemeLook {
@@ -24,10 +19,7 @@ public extension AppDatabase {
     }
 
     func styleUpdates() -> some AsyncSequence<ThemeStyle, any Error> {
-        ValueObservation
-            .tracking(Self.style)
-            .removeDuplicates()
-            .values(in: writer)
+        ValueObservation.tracking(Self.style).removeDuplicates().values(in: writer)
     }
 
     func style() async throws -> ThemeStyle {
@@ -37,10 +29,7 @@ public extension AppDatabase {
 
 private extension AppDatabase {
     static func customThemes(in db: Database) throws -> [Theme] {
-        try Theme
-            .filter(Column("is_builtin") == false)
-            .order(Column("created_at"))
-            .fetchAll(db)
+        try Theme.filter(Column("is_builtin") == false).order(Column("created_at")).fetchAll(db)
     }
 
     static func themeLook(in db: Database) throws -> ThemeLook {
@@ -57,11 +46,16 @@ private extension AppDatabase {
     }
 
     static func style(in db: Database) throws -> ThemeStyle {
-        try ThemeStyle(
-            corner: setting(.cornerStyle, in: db),
-            displayFont: setting(.fontStyle, in: db),
-            textFont: setting(.textFontStyle, in: db),
-            textSize: setting(.textSize, in: db)
+        let corner = try setting(.cornerStyle, in: db)
+        let displayFont = try setting(.fontStyle, in: db)
+        let textFont = try setting(.textFontStyle, in: db)
+        let textSize = try setting(.textSize, in: db)
+
+        return ThemeStyle(
+            corner: corner,
+            displayFont: displayFont,
+            textFont: textFont,
+            textSize: textSize
         )
     }
 }

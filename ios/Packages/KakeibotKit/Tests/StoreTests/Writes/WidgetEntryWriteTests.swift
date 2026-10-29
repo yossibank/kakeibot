@@ -8,10 +8,7 @@ struct WidgetEntryWriteTests {
     func recordsTemplateAndRemembersEntry() async throws {
         let setup = try await Setup()
 
-        let template = try await setup.database.saveTemplate(
-            setup.draft,
-            at: setup.now
-        )
+        let template = try await setup.database.saveTemplate(setup.draft, at: setup.now)
 
         let entry = try await setup.database.recordFromWidget(
             template.id,
@@ -32,10 +29,7 @@ struct WidgetEntryWriteTests {
     func undoDeletesEntryAndForgetsIt() async throws {
         let setup = try await Setup()
 
-        let template = try await setup.database.saveTemplate(
-            setup.draft,
-            at: setup.now
-        )
+        let template = try await setup.database.saveTemplate(setup.draft, at: setup.now)
 
         let entry = try await setup.database.recordFromWidget(
             template.id,
@@ -55,12 +49,8 @@ struct WidgetEntryWriteTests {
     func dropsArchivedTagOfTemplate() async throws {
         let setup = try await Setup()
         let food = try #require(setup.draft.categoryId)
-        let tag = try await setup.database.saveTags(
-            [EntryTagDraft(name: "朝ごはん")],
-            for: food,
-            at: setup.now
-        )[0]
-
+        let tagDraft = EntryTagDraft(name: "朝ごはん")
+        let tag = try await setup.database.saveTags([tagDraft], for: food, at: setup.now)[0]
         var draft = setup.draft
         draft.tagId = tag.id
 
@@ -88,20 +78,14 @@ struct WidgetEntryWriteTests {
     func buildsDraftWithoutArchivedTag() async throws {
         let setup = try await Setup()
         let food = try #require(setup.draft.categoryId)
-        let tag = try await setup.database.saveTags(
-            [EntryTagDraft(name: "朝ごはん")],
-            for: food,
-            at: setup.now
-        )[0]
-
+        let tagDraft = EntryTagDraft(name: "朝ごはん")
+        let tag = try await setup.database.saveTags([tagDraft], for: food, at: setup.now)[0]
         var draft = setup.draft
         draft.tagId = tag.id
 
         let template = try await setup.database.saveTemplate(draft, at: setup.now)
         let before = try await setup.database.entryDraft(for: template, on: setup.today)
-
         try await setup.database.saveTags([], for: food, at: setup.now)
-
         let after = try await setup.database.entryDraft(for: template, on: setup.today)
 
         #expect(before?.tagId == tag.id)
@@ -114,10 +98,7 @@ struct WidgetEntryWriteTests {
         let setup = try await Setup()
         try await setup.database.markNoSpendDay(setup.today, at: setup.now)
 
-        let template = try await setup.database.saveTemplate(
-            setup.draft,
-            at: setup.now
-        )
+        let template = try await setup.database.saveTemplate(setup.draft, at: setup.now)
 
         let entry = try await setup.database.recordFromWidget(
             template.id,
@@ -139,12 +120,13 @@ struct WidgetEntryWriteTests {
     func readsBothWidgetRecordForms() throws {
         let id = Entry.ID()
         let date = try #require(LocalDate("2026-10-03"))
+        let expected = WidgetRecord(entryId: id, clearedNoSpendDate: date)
 
-        #expect(WidgetRecord(id.description) == WidgetRecord(entryId: id))
-        #expect(WidgetRecord("\(id),2026-10-03") == WidgetRecord(
-            entryId: id,
-            clearedNoSpendDate: date
-        ))
+        let plain = WidgetRecord(id.description)
+        let withDate = WidgetRecord("\(id),2026-10-03")
+
+        #expect(plain == WidgetRecord(entryId: id))
+        #expect(withDate == expected)
     }
 
     @Test
@@ -156,11 +138,7 @@ struct WidgetEntryWriteTests {
         let template = try await setup.database.saveTemplate(draft, at: setup.now)
 
         await #expect(throws: AppDatabase.WidgetEntryError.amountMissing) {
-            try await setup.database.recordFromWidget(
-                template.id,
-                on: setup.today,
-                at: setup.now
-            )
+            try await setup.database.recordFromWidget(template.id, on: setup.today, at: setup.now)
         }
     }
 }
@@ -178,8 +156,17 @@ extension WidgetEntryWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
-        let today = try #require(LocalDate(year: 2026, month: 10, day: 3))
+
+        let today = try #require(
+            LocalDate(
+                year: 2026,
+                month: 10,
+                day: 3
+            )
+        )
+
         try database.insertDefaultsIfEmpty(at: now)
+
         let options = try await database.entryOptions()
 
         let draft = EntryTemplateDraft(

@@ -3,9 +3,7 @@ import GRDB
 
 public extension AppDatabase {
     func budgetUpdates() -> some AsyncSequence<[Budget], any Error> {
-        ValueObservation
-            .tracking(Self.budgets)
-            .values(in: writer)
+        ValueObservation.tracking(Self.budgets).values(in: writer)
     }
 
     func budgets() async throws -> [Budget] {

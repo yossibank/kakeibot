@@ -4,9 +4,7 @@ public struct EntrySearch: Hashable, Sendable {
     public let words: [String]
 
     public init(_ text: String) {
-        self.words = text
-            .split(whereSeparator: \.isWhitespace)
-            .map { Self.fold(String($0)) }
+        self.words = text.split(whereSeparator: \.isWhitespace).map { Self.fold(String($0)) }
     }
 }
 
@@ -15,6 +13,23 @@ public extension EntrySearch {
 
     var isEmpty: Bool {
         words.isEmpty
+    }
+
+    static func remembering(
+        _ text: String,
+        in recent: [String]
+    ) -> [String] {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmed.isEmpty else {
+            return recent
+        }
+
+        let others = recent.filter { $0 != trimmed }
+        let candidates = [trimmed] + others
+        let kept = candidates.prefix(recentLimit)
+
+        return Array(kept)
     }
 
     func matches(
@@ -30,23 +45,6 @@ public extension EntrySearch {
 
             return folded.contains { $0.contains(word) }
         }
-    }
-}
-
-public extension EntrySearch {
-    static func remembering(
-        _ text: String,
-        in recent: [String]
-    ) -> [String] {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard !trimmed.isEmpty else {
-            return recent
-        }
-
-        let others = recent.filter { $0 != trimmed }
-
-        return Array(([trimmed] + others).prefix(recentLimit))
     }
 }
 

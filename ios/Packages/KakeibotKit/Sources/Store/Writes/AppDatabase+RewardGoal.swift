@@ -17,9 +17,7 @@ public extension AppDatabase {
         try await writer.write { db in
             guard let id else {
                 let goal = try draft.newGoal(at: now)
-
                 try goal.insert(db)
-
                 return goal
             }
 
@@ -45,10 +43,10 @@ public extension AppDatabase {
                 throw RewardGoalWriteError.goalNotFound
             }
 
-            if isPurchased, goal.purchasedAt == nil {
+            if isPurchased,
+               goal.purchasedAt == nil {
                 let logs = try RewardLog.fetchAll(db)
                 let goals = try RewardGoal.fetchAll(db)
-
                 let balance = RewardBalance.amount(logs: logs, goals: goals)
 
                 guard balance >= goal.targetAmount else {

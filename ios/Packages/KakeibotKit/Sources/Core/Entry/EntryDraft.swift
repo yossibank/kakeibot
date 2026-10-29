@@ -38,6 +38,21 @@ public struct EntryDraft: Hashable, Sendable {
         self.billMonth = billMonth
         self.fee = fee
     }
+
+    public init(_ entry: Entry) {
+        self.init(
+            type: entry.type,
+            amount: entry.amount,
+            date: entry.date,
+            categoryId: entry.categoryId,
+            tagId: entry.tagId,
+            templateId: entry.templateId,
+            walletId: entry.walletId,
+            toWalletId: entry.toWalletId,
+            memo: entry.memo ?? "",
+            billMonth: entry.billMonth
+        )
+    }
 }
 
 public extension EntryDraft {
@@ -54,27 +69,8 @@ public extension EntryDraft {
 
     var problems: [Problem] {
         let amountProblems: [Problem] = amount < 1 ? [.amountNotPositive] : []
-
-        let tagProblems: [Problem] = tagId != nil && categoryId == nil
-            ? [.tagWithoutCategory]
-            : []
-
+        let tagProblems: [Problem] = tagId != nil && categoryId == nil ? [.tagWithoutCategory] : []
         return amountProblems + typeProblems + tagProblems + feeProblems
-    }
-
-    init(_ entry: Entry) {
-        self.init(
-            type: entry.type,
-            amount: entry.amount,
-            date: entry.date,
-            categoryId: entry.categoryId,
-            tagId: entry.tagId,
-            templateId: entry.templateId,
-            walletId: entry.walletId,
-            toWalletId: entry.toWalletId,
-            memo: entry.memo ?? "",
-            billMonth: entry.billMonth
-        )
     }
 
     func newEntry(at now: Date) throws -> Entry {
@@ -126,9 +122,7 @@ private extension EntryDraft {
         case .expense, .income:
             return categoryId == nil ? [.missingCategory] : []
         case .transfer:
-            let categoryProblems: [Problem] = categoryId == nil
-                ? []
-                : [.categoryOnTransfer]
+            let categoryProblems: [Problem] = categoryId == nil ? [] : [.categoryOnTransfer]
             return categoryProblems + destinationProblems
         }
     }
@@ -155,7 +149,6 @@ private extension EntryDraft {
 
     var trimmedMemo: String? {
         let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
-
         return trimmed.isEmpty ? nil : trimmed
     }
 

@@ -14,6 +14,13 @@ public struct ExportV1: Hashable, Sendable {
         self.app = app
         self.data = data
     }
+
+    public init(json: Data) throws {
+        let decoder = JSONDecoder()
+
+        decoder.dateDecodingStrategy = .iso8601
+        self = try decoder.decode(Self.self, from: json)
+    }
 }
 
 public extension ExportV1 {
@@ -41,7 +48,7 @@ public extension ExportV1 {
         }
     }
 
-    struct Tables: Codable, Hashable, Sendable {
+    struct Tables: Hashable, Sendable {
         public var icons: [Icon]
         public var shelfIcons: [ShelfIcon]
         public var wallets: [Wallet]
@@ -102,12 +109,6 @@ public extension ExportV1 {
     static let format = "kakeibot-export"
     static let version = 1
 
-    init(json: Data) throws {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        self = try decoder.decode(Self.self, from: json)
-    }
-
     func json() throws -> Data {
         let encoder = JSONEncoder()
 
@@ -133,68 +134,6 @@ private extension ExportV1 {
     }
 }
 
-public extension ExportV1.Tables {
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        try self.init(
-            icons: container.decode([Icon].self, forKey: .icons),
-            shelfIcons: container.decodeIfPresent(
-                [ShelfIcon].self,
-                forKey: .shelfIcons
-            ) ?? [],
-            wallets: container.decode([Wallet].self, forKey: .wallets),
-            valuations: container.decodeIfPresent(
-                [Valuation].self,
-                forKey: .valuations
-            ) ?? [],
-            categories: container.decode(
-                [EntryCategory].self,
-                forKey: .categories
-            ),
-            tags: container.decodeIfPresent(
-                [EntryTag].self,
-                forKey: .tags
-            ) ?? [],
-            entries: container.decode([Entry].self, forKey: .entries),
-            templates: container.decodeIfPresent(
-                [EntryTemplate].self,
-                forKey: .templates
-            ) ?? [],
-            budgets: container.decode([Budget].self, forKey: .budgets),
-            recurrings: container.decode(
-                [Recurring].self,
-                forKey: .recurrings
-            ),
-            rewardRules: container.decode(
-                [RewardRule].self,
-                forKey: .rewardRules
-            ),
-            rewardLogs: container.decode(
-                [RewardLog].self,
-                forKey: .rewardLogs
-            ),
-            rewardGoals: container.decode(
-                [RewardGoal].self,
-                forKey: .rewardGoals
-            ),
-            calendarStamps: container.decode(
-                [CalendarStamp].self,
-                forKey: .calendarStamps
-            ),
-            noSpendDays: container.decode(
-                [NoSpendDay].self,
-                forKey: .noSpendDays
-            ),
-            themes: container.decode([Theme].self, forKey: .themes),
-            settings: container.decode(
-                [SettingRow].self,
-                forKey: .settings
-            ).compactMap(\.setting)
-        )
-    }
-}
-
 extension ExportV1: Codable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -217,11 +156,7 @@ extension ExportV1: Codable {
             throw ReadError.missingTransfer
         }
 
-        self.init(
-            exportedAt: exportedAt,
-            app: app,
-            data: data
-        )
+        self.init(exportedAt: exportedAt, app: app, data: data)
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -237,15 +172,62 @@ extension ExportV1: Codable {
 
 private extension ExportV1.Tables {
     var hasTransferForEveryFee: Bool {
-        let transfers = Set(entries.filter { $0.type == .transfer }.map(\.id))
+        let transferIds = entries.filter { $0.type == .transfer }.map(\.id)
+        let transfers = Set(transferIds)
         return entries.compactMap(\.transferId).allSatisfy(transfers.contains)
+    }
+}
+
+extension ExportV1.Tables: Codable {
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let icons = try container.decode([Icon].self, forKey: .icons)
+        let shelfIcons = try container.decodeIfPresent([ShelfIcon].self, forKey: .shelfIcons)
+        let wallets = try container.decode([Wallet].self, forKey: .wallets)
+        let valuations = try container.decodeIfPresent([Valuation].self, forKey: .valuations)
+        let categories = try container.decode([EntryCategory].self, forKey: .categories)
+        let tags = try container.decodeIfPresent([EntryTag].self, forKey: .tags)
+        let entries = try container.decode([Entry].self, forKey: .entries)
+        let templates = try container.decodeIfPresent([EntryTemplate].self, forKey: .templates)
+        let budgets = try container.decode([Budget].self, forKey: .budgets)
+        let recurrings = try container.decode([Recurring].self, forKey: .recurrings)
+        let rewardRules = try container.decode([RewardRule].self, forKey: .rewardRules)
+        let rewardLogs = try container.decode([RewardLog].self, forKey: .rewardLogs)
+        let rewardGoals = try container.decode([RewardGoal].self, forKey: .rewardGoals)
+        let calendarStamps = try container.decode([CalendarStamp].self, forKey: .calendarStamps)
+        let noSpendDays = try container.decode([NoSpendDay].self, forKey: .noSpendDays)
+        let themes = try container.decode([Theme].self, forKey: .themes)
+        let settingRows = try container.decode([SettingRow].self, forKey: .settings)
+        let settings = settingRows.compactMap(\.setting)
+
+        self.init(
+            icons: icons,
+            shelfIcons: shelfIcons ?? [],
+            wallets: wallets,
+            valuations: valuations ?? [],
+            categories: categories,
+            tags: tags ?? [],
+            entries: entries,
+            templates: templates ?? [],
+            budgets: budgets,
+            recurrings: recurrings,
+            rewardRules: rewardRules,
+            rewardLogs: rewardLogs,
+            rewardGoals: rewardGoals,
+            calendarStamps: calendarStamps,
+            noSpendDays: noSpendDays,
+            themes: themes,
+            settings: settings
+        )
     }
 }
 
 private struct SettingRow: Decodable {
     let key: String
     let value: String
+}
 
+extension SettingRow {
     var setting: Setting? {
         Setting.Key(rawValue: key).map { Setting(key: $0, value: value) }
     }

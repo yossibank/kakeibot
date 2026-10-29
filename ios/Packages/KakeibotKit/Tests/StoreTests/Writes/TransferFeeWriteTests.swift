@@ -9,7 +9,6 @@ struct TransferFeeWriteTests {
         let setup = try await Setup()
 
         let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
-
         let fee = try #require(try await setup.database.fee(of: transfer.id))
         let options = try await setup.database.entryOptions()
         let category = options.expenseCategories.first { $0.id == fee.categoryId }
@@ -28,7 +27,6 @@ struct TransferFeeWriteTests {
 
         let first = try await setup.database.saveEntry(setup.draft, at: setup.now)
         let second = try await setup.database.saveEntry(setup.draft, at: setup.now)
-
         let firstFee = try await setup.database.fee(of: first.id)
         let secondFee = try await setup.database.fee(of: second.id)
         let options = try await setup.database.entryOptions()
@@ -48,13 +46,7 @@ struct TransferFeeWriteTests {
 
         let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
         let before = try await setup.database.fee(of: transfer.id)
-
-        try await setup.database.saveEntry(
-            edited,
-            editing: transfer.id,
-            at: setup.now
-        )
-
+        try await setup.database.saveEntry(edited, editing: transfer.id, at: setup.now)
         let after = try await setup.database.fee(of: transfer.id)
 
         #expect(after?.id == before?.id)
@@ -69,13 +61,7 @@ struct TransferFeeWriteTests {
         edited.fee = 0
 
         let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
-
-        try await setup.database.saveEntry(
-            edited,
-            editing: transfer.id,
-            at: setup.now
-        )
-
+        try await setup.database.saveEntry(edited, editing: transfer.id, at: setup.now)
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries.map(\.id) == [transfer.id])
@@ -121,7 +107,6 @@ struct TransferFeeWriteTests {
         )
 
         try await setup.database.saveRecurring(draft, today: start, at: setup.now)
-
         let entries = try setup.database.snapshot().entries
         let transfer = try #require(entries.first { $0.type == .transfer })
         let fee = try await setup.database.fee(of: transfer.id)
@@ -135,9 +120,7 @@ struct TransferFeeWriteTests {
         let setup = try await Setup()
 
         let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
-
         try await setup.database.deleteEntry(transfer.id)
-
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries.isEmpty)
@@ -149,13 +132,12 @@ struct TransferFeeWriteTests {
 
         let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
         let fee = try await setup.database.fee(of: transfer.id)
-
         try await setup.database.deleteEntry(transfer.id)
         try await setup.database.restoreEntry(transfer, fee: fee)
-
         let snapshot = try setup.database.snapshot()
+        let expected = Set([transfer, fee].compactMap(\.self))
 
-        #expect(Set(snapshot.entries) == Set([transfer, fee].compactMap(\.self)))
+        #expect(Set(snapshot.entries) == expected)
     }
 
     @Test
@@ -165,15 +147,8 @@ struct TransferFeeWriteTests {
         draft.fee = 0
 
         let transfer = try await setup.database.saveEntry(draft, at: setup.now)
-
-        try await setup.database.saveEntry(
-            setup.draft,
-            editing: transfer.id,
-            at: setup.now
-        )
-
+        try await setup.database.saveEntry(setup.draft, editing: transfer.id, at: setup.now)
         try await setup.database.restoreEntry(transfer, fee: nil)
-
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries == [transfer])
@@ -185,28 +160,24 @@ struct TransferFeeWriteTests {
 
         let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
         let fee = try await setup.database.fee(of: transfer.id)
-
         let deleted = try await setup.database.deleteEntries([transfer.id])
-
-        try await setup.database.restoreEntries(deleted.reversed())
-
+        let reversed = Array(deleted.reversed())
+        try await setup.database.restoreEntries(reversed)
         let snapshot = try setup.database.snapshot()
+        let expected = Set([transfer, fee].compactMap(\.self))
 
-        #expect(Set(deleted) == Set([transfer, fee].compactMap(\.self)))
+        #expect(Set(deleted) == expected)
         #expect(Set(snapshot.entries) == Set(deleted))
     }
 
     @Test
     func replacesTablesWithFeeBeforeTransfer() async throws {
         let setup = try await Setup()
-
         try await setup.database.saveEntry(setup.draft, at: setup.now)
 
         var tables = try setup.database.snapshot()
         tables.entries.reverse()
-
         try setup.database.replace(with: tables)
-
         let snapshot = try setup.database.snapshot()
 
         #expect(Set(snapshot.entries) == Set(tables.entries))
@@ -225,9 +196,11 @@ extension TransferFeeWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
-        try database.insertDefaultsIfEmpty(at: now)
-        let options = try await database.entryOptions()
         let date = try #require(LocalDate("2026-10-03"))
+
+        try database.insertDefaultsIfEmpty(at: now)
+
+        let options = try await database.entryOptions()
 
         let draft = EntryDraft(
             type: .transfer,
@@ -239,10 +212,6 @@ extension TransferFeeWriteTests.Setup {
             fee: 110
         )
 
-        self.init(
-            database: database,
-            now: now,
-            draft: draft
-        )
+        self.init(database: database, now: now, draft: draft)
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Valuation: Hashable, Sendable {
+public struct Valuation: Codable, Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var walletId: Wallet.ID
@@ -37,7 +37,3 @@ public extension Valuation {
         return entry.date < date
     }
 }
-
-extension Valuation: Identifiable {}
-
-extension Valuation: Codable {}

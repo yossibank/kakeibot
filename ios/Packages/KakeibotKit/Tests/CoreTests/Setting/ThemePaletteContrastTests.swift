@@ -5,18 +5,16 @@ import Testing
 struct ThemePaletteContrastTests {
     @Test(arguments: try contrastCases)
     func measuresContrast(fixture: ContrastCase) {
-        let ratio = ThemePalette.contrast(
-            Self.rgb(fixture.first),
-            Self.rgb(fixture.second)
-        )
-
-        #expect((ratio * 100).rounded() / 100 == fixture.ratio)
+        let first = Self.rgb(fixture.first)
+        let second = Self.rgb(fixture.second)
+        let ratio = ThemePalette.contrast(first, second)
+        let roundedRatio = (ratio * 100).rounded() / 100
+        #expect(roundedRatio == fixture.ratio)
     }
 
     @Test(arguments: try readableCases)
     func findsUnreadableRoles(fixture: ReadableCase) {
         let theme = Self.theme(fixture.theme)
-
         #expect(theme.unreadableRoles == fixture.unreadable)
     }
 
@@ -28,7 +26,6 @@ struct ThemePaletteContrastTests {
     @Test
     func tellsLightBackground() {
         let light = ThemePreset.allCases.filter(\.palette.isLight)
-
         #expect(light == [.white, .ivory, .sky, .sage, .rose, .gold])
     }
 }
@@ -60,7 +57,8 @@ private extension ThemePaletteContrastTests {
     }
 
     static func rgb(_ hex: String) -> UInt32 {
-        UInt32(hex.dropFirst(), radix: 16) ?? 0
+        let digits = hex.dropFirst()
+        return UInt32(digits, radix: 16) ?? 0
     }
 
     static func theme(_ colors: [String: String]) -> ThemePalette {
@@ -68,19 +66,32 @@ private extension ThemePaletteContrastTests {
             rgb(colors[role.rawValue] ?? "")
         }
 
+        let backgroundTop = color(.backgroundTop)
+        let backgroundBottom = color(.backgroundBottom)
+        let panel = color(.panel)
+        let cardTop = color(.cardTop)
+        let cardBottom = color(.cardBottom)
+        let line = color(.line)
+        let accent = color(.accent)
+        let accentDeep = color(.accentDeep)
+        let accentStrong = color(.accentStrong)
+        let text = color(.text)
+        let subtext = color(.subtext)
+        let hint = color(.hint)
+
         return ThemePalette(
-            backgroundTop: color(.backgroundTop),
-            backgroundBottom: color(.backgroundBottom),
-            panel: color(.panel),
-            cardTop: color(.cardTop),
-            cardBottom: color(.cardBottom),
-            line: color(.line),
-            accent: color(.accent),
-            accentDeep: color(.accentDeep),
-            accentStrong: color(.accentStrong),
-            text: color(.text),
-            subtext: color(.subtext),
-            hint: color(.hint)
+            backgroundTop: backgroundTop,
+            backgroundBottom: backgroundBottom,
+            panel: panel,
+            cardTop: cardTop,
+            cardBottom: cardBottom,
+            line: line,
+            accent: accent,
+            accentDeep: accentDeep,
+            accentStrong: accentStrong,
+            text: text,
+            subtext: subtext,
+            hint: hint
         )
     }
 }

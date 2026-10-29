@@ -25,11 +25,16 @@ private extension AppDatabase {
         on today: LocalDate,
         in db: Database
     ) throws -> MonthOverview {
-        try MonthOverview(
-            list: entryList(in: db),
-            budgets: budgets(in: db),
-            recurrings: recurrings(in: db),
-            monthStartDay: setting(.monthStartDay, in: db),
+        let list = try entryList(in: db)
+        let budgets = try budgets(in: db)
+        let recurrings = try recurrings(in: db)
+        let monthStartDay = try setting(.monthStartDay, in: db)
+
+        return MonthOverview(
+            list: list,
+            budgets: budgets,
+            recurrings: recurrings,
+            monthStartDay: monthStartDay,
             today: today
         )
     }

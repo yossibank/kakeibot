@@ -31,7 +31,9 @@ extension MonthStartDay {
 
     func period(startingIn yearMonth: YearMonth) -> ClosedRange<LocalDate> {
         let start = date(in: yearMonth)
-        let end = date(in: yearMonth.adding(months: 1)).adding(days: -1)
+        let nextMonth = yearMonth.adding(months: 1)
+        let end = date(in: nextMonth).adding(days: -1)
+
         return start...end
     }
 }

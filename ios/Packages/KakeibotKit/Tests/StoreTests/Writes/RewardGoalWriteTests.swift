@@ -9,15 +9,10 @@ struct RewardGoalWriteTests {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 0)
         let shoes = RewardGoalDraft(name: " 新しい靴 ", targetAmount: 8000)
+        let renamed = RewardGoalDraft(name: "靴", targetAmount: 6000)
 
         let goal = try await database.saveRewardGoal(shoes, at: now)
-
-        let edited = try await database.saveRewardGoal(
-            RewardGoalDraft(name: "靴", targetAmount: 6000),
-            editing: goal.id,
-            at: now
-        )
-
+        let edited = try await database.saveRewardGoal(renamed, editing: goal.id, at: now)
         let bank = try await database.rewardBank()
 
         #expect(goal.name == "新しい靴")
@@ -43,18 +38,9 @@ struct RewardGoalWriteTests {
         let goal = try await database.saveRewardGoal(draft, at: now)
         try await database.saveSavings(600, at: now)
 
-        try await database.setRewardGoalPurchased(
-            goal.id,
-            isPurchased: true,
-            at: now
-        )
+        try await database.setRewardGoalPurchased(goal.id, isPurchased: true, at: now)
         let bought = try await database.rewardBank()
-
-        try await database.setRewardGoalPurchased(
-            goal.id,
-            isPurchased: false,
-            at: now
-        )
+        try await database.setRewardGoalPurchased(goal.id, isPurchased: false, at: now)
         let undone = try await database.rewardBank()
 
         #expect(bought.boughtGoals.map(\.id) == [goal.id])
@@ -72,11 +58,7 @@ struct RewardGoalWriteTests {
         try await database.saveSavings(500, at: now)
 
         await #expect(throws: AppDatabase.RewardGoalWriteError.shortOfBalance) {
-            try await database.setRewardGoalPurchased(
-                goal.id,
-                isPurchased: true,
-                at: now
-            )
+            try await database.setRewardGoalPurchased(goal.id, isPurchased: true, at: now)
         }
 
         let bank = try await database.rewardBank()

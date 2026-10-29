@@ -6,10 +6,8 @@ struct EntryDayTests {
     @Test(arguments: try dayCases)
     func groupsEntriesByDay(fixture: DayCase) {
         let entries = fixture.entries.map(\.entry)
-
         let days = EntryDay.grouping(entries)
         let summaries = days.map(DaySummary.init)
-
         #expect(summaries == fixture.days)
     }
 }

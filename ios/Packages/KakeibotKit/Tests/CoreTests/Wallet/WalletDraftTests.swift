@@ -22,12 +22,7 @@ struct WalletDraftTests {
         )
 
         let icon = try draft.newIcon(at: now)
-
-        let wallet = try draft.newWallet(
-            iconId: icon.id,
-            sortOrder: 4,
-            at: now
-        )
+        let wallet = try draft.newWallet(iconId: icon.id, sortOrder: 4, at: now)
 
         #expect(icon.text == "楽")
         #expect(wallet.name == "楽天カード")
@@ -59,13 +54,7 @@ struct WalletDraftTests {
         )
 
         let icon = try draft.newIcon(at: now)
-
-        let wallet = try draft.newWallet(
-            iconId: icon.id,
-            sortOrder: 0,
-            at: now
-        )
-
+        let wallet = try draft.newWallet(iconId: icon.id, sortOrder: 0, at: now)
         #expect(wallet.loanAmount == expected)
     }
 

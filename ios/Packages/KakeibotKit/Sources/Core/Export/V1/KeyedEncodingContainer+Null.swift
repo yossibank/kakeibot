@@ -5,7 +5,6 @@ extension KeyedEncodingContainer {
     ) throws {
         guard let value else {
             try encodeNil(forKey: key)
-
             return
         }
 

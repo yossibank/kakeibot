@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ShelfIcon: Hashable, Sendable {
+public struct ShelfIcon: Hashable, Identifiable, Sendable {
     public let id: ID
 
     public var iconId: Icon.ID
@@ -29,8 +29,6 @@ public struct ShelfIcon: Hashable, Sendable {
 public extension ShelfIcon {
     typealias ID = Identifier<ShelfIcon>
 }
-
-extension ShelfIcon: Identifiable {}
 
 extension ShelfIcon: Codable {
     public func encode(to encoder: any Encoder) throws {

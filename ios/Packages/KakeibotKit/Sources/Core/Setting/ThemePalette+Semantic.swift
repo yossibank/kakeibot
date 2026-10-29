@@ -41,7 +41,9 @@ public extension ThemePalette {
             return found
         }
 
-        return ([base] + shifts.map(\.best)).max { first, second in
+        let candidates = [base] + shifts.map(\.best)
+
+        return candidates.max { first, second in
             lowestContrast(of: first) < lowestContrast(of: second)
         } ?? base
     }
@@ -58,27 +60,6 @@ private extension ThemePalette {
         let saturation: Double
         let lightness: Double
 
-        var rgb: UInt32 {
-            let chroma = (1 - abs(2 * lightness - 1)) * saturation
-            let sector = hue / 60
-            let mid = chroma * (1 - abs(sector.truncatingRemainder(dividingBy: 2) - 1))
-            let offset = lightness - chroma / 2
-            let parts: (Double, Double, Double) = switch Int(sector) {
-            case 0: (chroma, mid, 0)
-            case 1: (mid, chroma, 0)
-            case 2: (0, chroma, mid)
-            case 3: (0, mid, chroma)
-            case 4: (mid, 0, chroma)
-            default: (chroma, 0, mid)
-            }
-
-            func byte(_ value: Double) -> UInt32 {
-                UInt32(((value + offset) * 255).rounded())
-            }
-
-            return byte(parts.0) << 16 | byte(parts.1) << 8 | byte(parts.2)
-        }
-
         init(
             hue: Double,
             saturation: Double,
@@ -88,51 +69,13 @@ private extension ThemePalette {
             self.saturation = saturation
             self.lightness = lightness
         }
-
-        init(_ rgb: UInt32) {
-            let red = Double((rgb >> 16) & 0xFF) / 255
-            let green = Double((rgb >> 8) & 0xFF) / 255
-            let blue = Double(rgb & 0xFF) / 255
-            let high = max(red, green, blue)
-            let low = min(red, green, blue)
-            let delta = high - low
-            let lightness = (high + low) / 2
-
-            guard delta > 0 else {
-                self.init(hue: 0, saturation: 0, lightness: lightness)
-                return
-            }
-
-            let saturation = delta / (1 - abs(2 * lightness - 1))
-            let sector = switch high {
-            case red: ((green - blue) / delta).truncatingRemainder(dividingBy: 6)
-            case green: (blue - red) / delta + 2
-            default: (red - green) / delta + 4
-            }
-
-            self.init(
-                hue: (sector < 0 ? sector + 6 : sector) * 60,
-                saturation: saturation,
-                lightness: lightness
-            )
-        }
-
-        func lightness(by amount: Double) -> HSL {
-            HSL(
-                hue: hue,
-                saturation: saturation,
-                lightness: min(max(lightness + amount, 0), 1)
-            )
-        }
     }
 
     static let semanticMinimum = 3.0
     static let semanticSteps = 100
 
     func lowestContrast(of color: UInt32) -> Double {
-        Self.surfaces
-            .map { Self.contrast(color, self[$0]) }
-            .min() ?? 0
+        Self.surfaces.map { Self.contrast(color, self[$0]) }.min() ?? 0
     }
 
     func shifted(
@@ -155,5 +98,65 @@ private extension ThemePalette {
         }
 
         return Shift(found: nil, best: best)
+    }
+}
+
+private extension ThemePalette.HSL {
+    var rgb: UInt32 {
+        let chroma = (1 - abs(2 * lightness - 1)) * saturation
+        let sector = hue / 60
+        let sectorRemainder = sector.truncatingRemainder(dividingBy: 2)
+        let mid = chroma * (1 - abs(sectorRemainder - 1))
+        let offset = lightness - chroma / 2
+        let parts: (Double, Double, Double) = switch Int(sector) {
+        case 0: (chroma, mid, 0)
+        case 1: (mid, chroma, 0)
+        case 2: (0, chroma, mid)
+        case 3: (0, mid, chroma)
+        case 4: (mid, 0, chroma)
+        default: (chroma, 0, mid)
+        }
+
+        func byte(_ value: Double) -> UInt32 {
+            let scaled = ((value + offset) * 255).rounded()
+            return UInt32(scaled)
+        }
+
+        return byte(parts.0) << 16 | byte(parts.1) << 8 | byte(parts.2)
+    }
+
+    init(_ rgb: UInt32) {
+        let red = Double((rgb >> 16) & 0xFF) / 255
+        let green = Double((rgb >> 8) & 0xFF) / 255
+        let blue = Double(rgb & 0xFF) / 255
+        let high = max(red, green, blue)
+        let low = min(red, green, blue)
+        let delta = high - low
+        let lightness = (high + low) / 2
+
+        guard delta > 0 else {
+            self.init(hue: 0, saturation: 0, lightness: lightness)
+            return
+        }
+
+        let saturation = delta / (1 - abs(2 * lightness - 1))
+
+        let sector = switch high {
+        case red: ((green - blue) / delta).truncatingRemainder(dividingBy: 6)
+        case green: (blue - red) / delta + 2
+        default: (red - green) / delta + 4
+        }
+
+        let hue = (sector < 0 ? sector + 6 : sector) * 60
+
+        self.init(hue: hue, saturation: saturation, lightness: lightness)
+    }
+
+    func lightness(by amount: Double) -> ThemePalette.HSL {
+        let shifted = lightness + amount
+        let lowerClamped = max(shifted, 0)
+        let clamped = min(lowerClamped, 1)
+
+        return ThemePalette.HSL(hue: hue, saturation: saturation, lightness: clamped)
     }
 }

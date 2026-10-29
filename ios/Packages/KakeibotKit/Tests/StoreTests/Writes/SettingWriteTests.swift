@@ -30,10 +30,7 @@ struct SettingWriteTests {
         let saved = try await database.setting(.closedHints)
 
         let text = try await database.writer.read { db in
-            try String.fetchOne(
-                db,
-                sql: "SELECT value FROM setting WHERE key = 'closed_hints'"
-            )
+            try String.fetchOne(db, sql: "SELECT value FROM setting WHERE key = 'closed_hints'")
         }
 
         #expect(initial.isEmpty)
@@ -45,8 +42,7 @@ struct SettingWriteTests {
     func announcesMonthStartDay() async throws {
         let database = try AppDatabase.inMemory()
         let payday = try #require(MonthStartDay(25))
-        var updates = database.settingUpdates(.monthStartDay)
-            .makeAsyncIterator()
+        var updates = database.settingUpdates(.monthStartDay).makeAsyncIterator()
 
         let initial = try await updates.next()
         try await database.setSetting(.monthStartDay, to: payday)

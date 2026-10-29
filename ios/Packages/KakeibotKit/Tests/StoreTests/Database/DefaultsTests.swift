@@ -100,11 +100,7 @@ struct DefaultsTests {
         let inserted = try await database.iconShelf()
 
         for shelfIcon in inserted.shelfIcons {
-            try await database.setShelfIconHidden(
-                shelfIcon.id,
-                isHidden: true,
-                at: now
-            )
+            try await database.setShelfIconHidden(shelfIcon.id, isHidden: true, at: now)
         }
 
         try database.insertShelfIfEmpty(at: now)

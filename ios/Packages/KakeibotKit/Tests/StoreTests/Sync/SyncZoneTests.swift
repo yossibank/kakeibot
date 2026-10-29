@@ -9,10 +9,10 @@ struct SyncZoneTests {
         let setup = try await SyncTests.Setup(enabled: false)
         let walletID = try await setup.walletID()
         let id = try #require(Wallet.ID(walletID))
+        let key = SyncKey(table: .wallet, id: walletID)
 
         try await setup.database.startSharing(id)
-
-        let change = try await setup.change(of: SyncKey(table: .wallet, id: walletID))
+        let change = try await setup.change(of: key)
 
         #expect(change.saveZone == SyncZone.wallet(id))
         #expect(change.deleteZones == [])
@@ -26,8 +26,8 @@ struct SyncZoneTests {
         let key = SyncKey(table: .wallet, id: walletID)
 
         try await setup.database.saveSyncSystemFields([key.own: Data([1])])
-        try await setup.database.startSharing(id)
 
+        try await setup.database.startSharing(id)
         let change = try await setup.change(of: key)
 
         #expect(change.saveZone == SyncZone.wallet(id))
@@ -61,10 +61,10 @@ struct SyncZoneTests {
         let setup = try await SyncTests.Setup()
         let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
         let other = key.recordID(in: "Wallet-b")
-
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
+        try await setup.execute(insert)
         try await setup.database.saveSyncSystemFields([other: Data([1])])
+
         try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
 
         #expect(try await setup.database.syncRecord(for: key) != nil)
@@ -76,10 +76,10 @@ struct SyncZoneTests {
         let setup = try await SyncTests.Setup()
         let key = SyncKey(table: .noSpendDay, id: "2026-10-01")
         let other = key.recordID(in: "Wallet-b")
-
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
+        try await setup.execute(insert)
         try await setup.database.saveSyncSystemFields([other: Data([1]), key.own: Data([2])])
+
         try await setup.database.applySyncChanges(saved: [], deleted: [other])
 
         #expect(try await setup.database.syncRecord(for: key) == nil)
@@ -116,11 +116,12 @@ struct SyncZoneTests {
         let setup = try await SyncTests.Setup(enabled: false)
         let id = Wallet.ID()
         let key = SyncKey(table: .wallet, id: id.description)
+        let zoned = key.recordID(in: SyncZone.wallet(id))
 
         try await setup.database.applySyncChanges(
             saved: [],
             deleted: [],
-            systemFields: [key.recordID(in: SyncZone.wallet(id)): Data([1])]
+            systemFields: [zoned: Data([1])]
         )
 
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_share") == "0")
@@ -182,14 +183,12 @@ struct SyncZoneTests {
         let shared = SyncKey(table: .wallet, id: walletID)
         let own = SyncKey(table: .noSpendDay, id: "2026-10-01")
         let zoned = shared.recordID(in: SyncZone.wallet(id))
-
+        let insert = "INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')"
         try await setup.database.startSharing(id)
-        try await setup
-            .execute("INSERT INTO no_spend_day (date, created_at) VALUES ('2026-10-01', 'x')")
+        try await setup.execute(insert)
         try await setup.database.saveSyncSystemFields([zoned: Data([1]), own.own: Data([2])])
 
         try await setup.database.turnOffSync()
-
         let keys = try await Set(setup.pendingKeys())
 
         #expect(keys.contains(shared))
@@ -221,22 +220,22 @@ struct SyncZoneTests {
         let walletID = try await setup.walletID()
         let id = try #require(Wallet.ID(walletID))
         let key = SyncKey(table: .wallet, id: walletID)
-
+        let zoned = key.recordID(in: SyncZone.wallet(id))
         try await setup.database.startSharing(id)
-        try await setup.database
-            .saveSyncSystemFields([key.recordID(in: SyncZone.wallet(id)): Data([1])])
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        try await setup.database.saveSyncSystemFields([zoned: Data([1])])
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
 
         try await setup.database.endSharing(id)
-
         let keys = try await Set(setup.pendingKeys())
         let change = try await setup.change(of: key)
+        let wallets = try await setup.value("SELECT COUNT(*) FROM wallet WHERE id = '\(walletID)'")
+
         let categories = try await setup.value("""
         SELECT COUNT(*) FROM category WHERE wallet_id = '\(walletID)'
         """)
 
-        #expect(try await setup
-            .value("SELECT COUNT(*) FROM wallet WHERE id = '\(walletID)'") == "1")
+        #expect(wallets == "1")
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_share") == "0")
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_record") == "0")
         #expect(keys.contains(key))
@@ -252,7 +251,8 @@ struct SyncZoneTests {
         let id = try #require(Wallet.ID(walletID))
 
         try await setup.database.startSharing(id)
-        try await setup.database.removeSyncChanges(setup.database.pendingSyncChanges())
+        let changes = try await setup.database.pendingSyncChanges()
+        try await setup.database.removeSyncChanges(changes)
 
         try await setup.database.endSharing(id)
 
@@ -277,14 +277,13 @@ struct SyncZoneTests {
         let counts = try await setup.sharedCounts(of: walletID)
         let deletion = try await setup.database.deleteWallet(id, at: Date(timeIntervalSince1970: 0))
         let deleted = try await setup.sharedCounts(of: walletID)
-
         try await setup.database.restore(deletion)
-
         let restored = try await setup.sharedCounts(of: walletID)
+        let empty = SyncZoneTests.Counts(categories: 0, tags: 0, icons: 0)
 
         #expect(counts.categories > 0)
         #expect(counts.tags > 0)
-        #expect(deleted == SyncZoneTests.Counts(categories: 0, tags: 0, icons: 0))
+        #expect(deleted == empty)
         #expect(restored == counts)
     }
 
@@ -297,7 +296,6 @@ struct SyncZoneTests {
 
         try await setup.database.startSharing(id)
         try await setup.database.deleteWallet(id, at: Date(timeIntervalSince1970: 0))
-
         let change = try await setup.change(of: key)
         let activity = try await setup.database.syncActivityUpdates().first { _ in true }
 
@@ -309,7 +307,8 @@ struct SyncZoneTests {
 
 private extension SyncTests.Setup {
     func change(of key: SyncKey) async throws -> SyncChange {
-        try #require(await database.pendingSyncChanges().first { $0.key == key })
+        let change = try await database.pendingSyncChanges().first { $0.key == key }
+        return try #require(change)
     }
 
     func sharedCounts(of walletID: String) async throws -> SyncZoneTests.Counts {
@@ -328,11 +327,11 @@ private extension SyncTests.Setup {
         )
         """)
 
-        return SyncZoneTests.Counts(
-            categories: Int(categories) ?? 0,
-            tags: Int(tags) ?? 0,
-            icons: Int(icons) ?? 0
-        )
+        let categoryCount = Int(categories) ?? 0
+        let tagCount = Int(tags) ?? 0
+        let iconCount = Int(icons) ?? 0
+
+        return SyncZoneTests.Counts(categories: categoryCount, tags: tagCount, icons: iconCount)
     }
 }
 

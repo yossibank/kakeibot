@@ -27,28 +27,26 @@ private extension AppDatabase {
         from start: LocalDate,
         in db: Database
     ) throws -> NotificationInput {
-        let entryDates = try LocalDate.fetchAll(
-            db,
-            Entry
-                .select(Column("date"))
-                .filter(Column("date") >= start)
-                .distinct()
-        )
-
-        let markedDates = try NoSpendDay
+        let entryDateRequest = Entry
+            .select(Column("date"))
             .filter(Column("date") >= start)
-            .fetchAll(db)
-            .map(\.date)
+            .distinct()
 
-        let names = try EntryCategory.fetchAll(db).map { ($0.id, $0.name) }
+        let entryDates = try LocalDate.fetchAll(db, entryDateRequest)
+        let markedDates = try NoSpendDay.filter(Column("date") >= start).fetchAll(db).map(\.date)
+        let recordedDates = Set(entryDates + markedDates)
+        let namePairs = try EntryCategory.fetchAll(db).map { ($0.id, $0.name) }
         let recurrings = try recurrings(in: db)
+        let reminderTime = try setting(.reminderTime, in: db)
+        let names = Dictionary(namePairs, uniquingKeysWith: { first, _ in first })
+        let shortages = try shortages(of: recurrings, from: start, in: db)
 
-        return try NotificationInput(
-            recordedDates: Set(entryDates + markedDates),
+        return NotificationInput(
+            recordedDates: recordedDates,
             recurrings: recurrings,
-            reminderTime: setting(.reminderTime, in: db),
-            names: Dictionary(names, uniquingKeysWith: { first, _ in first }),
-            shortages: shortages(of: recurrings, from: start, in: db)
+            reminderTime: reminderTime,
+            names: names,
+            shortages: shortages
         )
     }
 
@@ -58,13 +56,16 @@ private extension AppDatabase {
         in db: Database
     ) throws -> [NotificationPlan.Shortage] {
         let wallets = try Wallet.fetchAll(db)
+        let entries = try Entry.fetchAll(db)
+        let valuations = try Valuation.fetchAll(db)
+        let yesterday = start.adding(days: -1)
 
-        let bills = try CardBill.upcoming(
+        let bills = CardBill.upcoming(
             recurrings: recurrings,
             wallets: wallets,
-            entries: Entry.fetchAll(db),
-            valuations: Valuation.fetchAll(db),
-            after: start.adding(days: -1)
+            entries: entries,
+            valuations: valuations,
+            after: yesterday
         )
 
         return bills.filter { $0.shortage > 0 }.map { bill in

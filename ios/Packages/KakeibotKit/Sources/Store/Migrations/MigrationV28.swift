@@ -1,6 +1,10 @@
 import GRDB
 
 enum MigrationV28 {
+    private static let recording = """
+    (SELECT (enabled OR EXISTS (SELECT 1 FROM sync_share)) AND NOT applying FROM sync_state)
+    """
+
     static func migrate(_ db: Database) throws {
         try db.alter(table: "category") { table in
             table.add(column: "wallet_id", .text).references("wallet")
@@ -21,10 +25,4 @@ enum MigrationV28 {
             try MigrationV26.createTriggers(on: table, key: key, recording: recording, in: db)
         }
     }
-}
-
-private extension MigrationV28 {
-    static let recording = """
-    (SELECT (enabled OR EXISTS (SELECT 1 FROM sync_share)) AND NOT applying FROM sync_state)
-    """
 }

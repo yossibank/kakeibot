@@ -11,7 +11,8 @@ public extension AppDatabase {
         for categoryId: EntryCategory.ID?,
         from month: YearMonth
     ) async throws {
-        if let amount, amount < 1 {
+        if let amount,
+           amount < 1 {
             throw BudgetWriteError.amountNotPositive
         }
 

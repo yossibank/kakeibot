@@ -56,12 +56,12 @@ public enum NotificationPlan {
             return lhs.key < rhs.key
         }
 
-        return Array(sorted.prefix(maxCount))
-    }
-}
+        let limited = sorted.prefix(maxCount)
 
-private extension NotificationPlan {
-    static func reminders(
+        return Array(limited)
+    }
+
+    private static func reminders(
         today: LocalDate,
         time: ReminderTime,
         recorded: Set<LocalDate>
@@ -83,7 +83,7 @@ private extension NotificationPlan {
             }
     }
 
-    static func notices(
+    private static func notices(
         of recurring: Recurring,
         today: LocalDate,
         time: ReminderTime,
@@ -98,7 +98,8 @@ private extension NotificationPlan {
         let category = recurring.categoryId.flatMap { names[$0] }
         let name = memo ?? category ?? "固定費"
         let start = today.adding(days: daysBefore)
-        let end = start.adding(days: recurringDays - 1)
+        let span = recurringDays - 1
+        let end = start.adding(days: span)
         let amount = recurring.closingDay == nil ? recurring.amount : nil
 
         return recurring.dates(from: start, through: end).map { date in
@@ -106,23 +107,21 @@ private extension NotificationPlan {
                 shortage.recurringId == recurring.id && shortage.date == date
             }
 
+            let notifyDate = date.adding(days: -daysBefore)
+            let text = body(amount: amount, on: date, daysBefore: daysBefore, shortage: shortage)
+
             return PlannedNotification(
                 key: "recurring-\(recurring.id)",
-                date: date.adding(days: -daysBefore),
+                date: notifyDate,
                 time: time,
                 title: name,
-                body: body(
-                    amount: amount,
-                    on: date,
-                    daysBefore: daysBefore,
-                    shortage: shortage
-                ),
+                body: text,
                 route: .recurring(recurring.id)
             )
         }
     }
 
-    static func body(
+    private static func body(
         amount: Int?,
         on date: LocalDate,
         daysBefore: Int,
@@ -151,13 +150,15 @@ private extension NotificationPlan {
         return "\(date.month)/\(date.day) に \(yen) です"
     }
 
-    static func grouped(_ amount: Int) -> String {
-        let digits = Array(String(abs(amount)))
+    private static func grouped(_ amount: Int) -> String {
+        let absolute = abs(amount)
+        let digits = Array(String(absolute))
 
         var text = ""
 
         for (index, digit) in digits.enumerated() {
-            if index > 0, (digits.count - index) % 3 == 0 {
+            if index > 0,
+               (digits.count - index) % 3 == 0 {
                 text.append(",")
             }
 

@@ -16,9 +16,7 @@ struct ThemeLookTests {
     @Test
     func keepsFixedPalette() {
         let look = ThemeLook.fixed(ThemePreset.navy.palette)
-
         let dark = look.palette(isDark: true)
-
         #expect(dark == ThemePreset.navy.palette)
     }
 

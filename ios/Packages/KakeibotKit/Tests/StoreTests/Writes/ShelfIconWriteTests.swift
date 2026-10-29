@@ -8,11 +8,7 @@ struct ShelfIconWriteTests {
     func addsShelfIconAtTheEnd() async throws {
         let setup = try await Setup()
 
-        let saved = try await setup.database.saveShelfIcon(
-            setup.draft,
-            at: setup.now
-        )
-
+        let saved = try await setup.database.saveShelfIcon(setup.draft, at: setup.now)
         let shelf = try await setup.database.iconShelf()
         let icon = try #require(shelf.icons[saved.iconId])
 
@@ -29,12 +25,7 @@ struct ShelfIconWriteTests {
         let first = try await setup.firstShelfIcon()
         let draft = IconDraft(mark: .text("推し"), color: "#9C6ADE")
 
-        let updated = try await setup.database.saveShelfIcon(
-            draft,
-            editing: first.id,
-            at: later
-        )
-
+        let updated = try await setup.database.saveShelfIcon(draft, editing: first.id, at: later)
         let shelf = try await setup.database.iconShelf()
         let icon = try #require(shelf.icons[updated.iconId])
 
@@ -64,19 +55,10 @@ struct ShelfIconWriteTests {
         let setup = try await Setup()
         let first = try await setup.firstShelfIcon()
 
-        try await setup.database.setShelfIconHidden(
-            first.id,
-            isHidden: true,
-            at: setup.now
-        )
+        try await setup.database.setShelfIconHidden(first.id, isHidden: true, at: setup.now)
         let hidden = try await setup.database.iconShelf()
         let list = try await setup.database.entryList()
-
-        try await setup.database.setShelfIconHidden(
-            first.id,
-            isHidden: false,
-            at: setup.now
-        )
+        try await setup.database.setShelfIconHidden(first.id, isHidden: false, at: setup.now)
         let shown = try await setup.database.iconShelf()
 
         #expect(hidden.shelfIcons.first?.archivedAt == setup.now)
@@ -146,8 +128,10 @@ extension ShelfIconWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
-        try database.insertShelfIfEmpty(at: now)
         let draft = IconDraft(mark: .emoji("🎉"), color: "#E07A5F")
+
+        try database.insertShelfIfEmpty(at: now)
+
         self.init(database: database, now: now, draft: draft)
     }
 

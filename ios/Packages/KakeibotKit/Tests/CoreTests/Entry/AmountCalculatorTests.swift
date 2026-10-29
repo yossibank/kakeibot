@@ -20,7 +20,6 @@ struct AmountCalculatorTests {
 
         calculator.press(.tax(.standard))
         let note = calculator.taxNote
-
         calculator.press(.digit(1))
 
         #expect(note?.base == 1180)
@@ -59,7 +58,8 @@ private extension AmountCalculatorTests {
     }
 
     static func key(_ text: String) throws -> AmountCalculator.Key {
-        if let digit = Int(text), text.count == 1 {
+        if let digit = Int(text),
+           text.count == 1 {
             return .digit(digit)
         }
 

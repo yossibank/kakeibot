@@ -42,12 +42,7 @@ struct TagWriteTests {
         let food = try await setup.category(named: "食費")
         let drafts = [EntryTagDraft(name: "朝ごはん")]
 
-        let saved = try await setup.database.saveTags(
-            drafts,
-            for: food.id,
-            at: setup.now
-        )
-
+        let saved = try await setup.database.saveTags(drafts, for: food.id, at: setup.now)
         let tags = try await setup.foodTags()
         let category = try await setup.category(named: "食費")
 
@@ -81,10 +76,10 @@ struct TagWriteTests {
         try await setup.saveFood(tags: ["朝ごはん", "昼ごはん"])
         let before = try await setup.foodTags()
         let kept = EntryTagDraft(before[1])
+        let restored = EntryTagDraft(name: " 朝ごはん ")
 
         try await setup.saveFood([kept])
-        try await setup.saveFood([kept, EntryTagDraft(name: " 朝ごはん ")])
-
+        try await setup.saveFood([kept, restored])
         let after = try await setup.foodTags()
         let options = try await setup.database.entryOptions()
         let all = options.tags.filter { $0.categoryId == before[0].categoryId }
@@ -121,7 +116,6 @@ struct TagWriteTests {
 
         let template = try await setup.database.saveTemplate(draft, at: setup.now)
         let before = try await setup.database.entryList().detailParts(for: template)
-
         try await setup.saveFood([])
         let after = try await setup.database.entryList().detailParts(for: template)
 
@@ -191,30 +185,30 @@ extension TagWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
+
         try database.insertDefaultsIfEmpty(at: now)
+
         self.init(database: database, now: now)
     }
 
     func category(named name: String) async throws -> EntryCategory {
         let list = try await database.categoryList()
-        return try #require(list.categories.first { $0.name == name })
+        let category = list.categories.first { $0.name == name }
+        return try #require(category)
     }
 
     func saveFood(tags names: [String]) async throws {
-        try await saveFood(names.map { EntryTagDraft(name: $0) })
+        let drafts = names.map { EntryTagDraft(name: $0) }
+        try await saveFood(drafts)
     }
 
     func saveFood(_ tags: [EntryTagDraft]) async throws {
         let food = try await category(named: "食費")
         let list = try await database.categoryList()
         let icon = try #require(list.icons[food.iconId])
+        let draft = CategoryDraft(food, icon: icon)
 
-        try await database.saveCategory(
-            CategoryDraft(food, icon: icon),
-            tags: tags,
-            editing: food.id,
-            at: now
-        )
+        try await database.saveCategory(draft, tags: tags, editing: food.id, at: now)
     }
 
     func foodTags() async throws -> [EntryTag] {

@@ -1,24 +1,6 @@
 import GRDB
 
 enum MigrationV1 {
-    static func migrate(_ db: Database) throws {
-        try createIcon(db)
-        try createWallet(db)
-        try createCategory(db)
-        try createRecurring(db)
-        try createEntry(db)
-        try createBudget(db)
-        try createRewardRule(db)
-        try createRewardLog(db)
-        try createRewardGoal(db)
-        try createCalendarStamp(db)
-        try createNoSpendDay(db)
-        try createTheme(db)
-        try createSetting(db)
-    }
-}
-
-extension MigrationV1 {
     static let walletKinds = [
         "cash",
         "bank",
@@ -84,10 +66,24 @@ extension MigrationV1 {
         "expense",
         "income"
     ]
-}
 
-private extension MigrationV1 {
-    static func createIcon(_ db: Database) throws {
+    static func migrate(_ db: Database) throws {
+        try createIcon(db)
+        try createWallet(db)
+        try createCategory(db)
+        try createRecurring(db)
+        try createEntry(db)
+        try createBudget(db)
+        try createRewardRule(db)
+        try createRewardLog(db)
+        try createRewardGoal(db)
+        try createCalendarStamp(db)
+        try createNoSpendDay(db)
+        try createTheme(db)
+        try createSetting(db)
+    }
+
+    private static func createIcon(_ db: Database) throws {
         try db.create(table: "icon") { table in
             table.primaryKey("id", .text)
             table.column("emoji", .text)
@@ -98,15 +94,11 @@ private extension MigrationV1 {
         }
     }
 
-    static func createWallet(_ db: Database) throws {
+    private static func createWallet(_ db: Database) throws {
         try db.create(table: "wallet") { table in
             table.primaryKey("id", .text)
             table.column("name", .text).notNull()
-
-            table.column("kind", .text)
-                .notNull()
-                .check { walletKinds.contains($0) }
-
+            table.column("kind", .text).notNull().check { walletKinds.contains($0) }
             table.column("icon_id", .text).notNull().references("icon")
             table.column("initial_balance", .integer).notNull()
             table.column("sort_order", .integer).notNull()
@@ -115,14 +107,10 @@ private extension MigrationV1 {
         }
     }
 
-    static func createCategory(_ db: Database) throws {
+    private static func createCategory(_ db: Database) throws {
         try db.create(table: "category") { table in
             table.primaryKey("id", .text)
-
-            table.column("kind", .text)
-                .notNull()
-                .check { categoryKinds.contains($0) }
-
+            table.column("kind", .text).notNull().check { categoryKinds.contains($0) }
             table.column("name", .text).notNull()
             table.column("icon_id", .text).notNull().references("icon")
             table.column("sort_order", .integer).notNull()
@@ -131,21 +119,13 @@ private extension MigrationV1 {
         }
     }
 
-    static func createRecurring(_ db: Database) throws {
+    private static func createRecurring(_ db: Database) throws {
         try db.create(table: "recurring") { table in
             table.primaryKey("id", .text)
             addMovementColumns(to: table)
-
-            table.column("frequency", .text)
-                .notNull()
-                .check { frequencies.contains($0) }
-
+            table.column("frequency", .text).notNull().check { frequencies.contains($0) }
             table.column("month", .integer).check { (1...12).contains($0) }
-
-            table.column("day", .integer)
-                .notNull()
-                .check { (1...31).contains($0) }
-
+            table.column("day", .integer).notNull().check { (1...31).contains($0) }
             table.column("start_date", .text).notNull()
             table.column("end_date", .text)
             table.column("remind_days_before", .integer).check { $0 >= 0 }
@@ -155,7 +135,7 @@ private extension MigrationV1 {
         }
     }
 
-    static func createEntry(_ db: Database) throws {
+    private static func createEntry(_ db: Database) throws {
         try db.create(table: "entry") { table in
             table.primaryKey("id", .text)
             addMovementColumns(to: table)
@@ -171,7 +151,7 @@ private extension MigrationV1 {
         }
     }
 
-    static func createBudget(_ db: Database) throws {
+    private static func createBudget(_ db: Database) throws {
         try db.create(table: "budget") { table in
             table.primaryKey("id", .text)
             table.column("category_id", .text).references("category")
@@ -189,7 +169,7 @@ private extension MigrationV1 {
         )
     }
 
-    static func createRewardRule(_ db: Database) throws {
+    private static func createRewardRule(_ db: Database) throws {
         try db.create(table: "reward_rule") { table in
             table.primaryKey("id", .text)
             table.column("name", .text).notNull()
@@ -201,7 +181,7 @@ private extension MigrationV1 {
         }
     }
 
-    static func createRewardLog(_ db: Database) throws {
+    private static func createRewardLog(_ db: Database) throws {
         try db.create(table: "reward_log") { table in
             table.primaryKey("id", .text)
             table.column("rule_id", .text).notNull().references("reward_rule")
@@ -212,7 +192,7 @@ private extension MigrationV1 {
         }
     }
 
-    static func createRewardGoal(_ db: Database) throws {
+    private static func createRewardGoal(_ db: Database) throws {
         try db.create(table: "reward_goal") { table in
             table.primaryKey("id", .text)
             table.column("name", .text).notNull()
@@ -223,7 +203,7 @@ private extension MigrationV1 {
         }
     }
 
-    static func createCalendarStamp(_ db: Database) throws {
+    private static func createCalendarStamp(_ db: Database) throws {
         try db.create(table: "calendar_stamp") { table in
             table.primaryKey("id", .text)
             table.column("date", .text).notNull()
@@ -232,14 +212,14 @@ private extension MigrationV1 {
         }
     }
 
-    static func createNoSpendDay(_ db: Database) throws {
+    private static func createNoSpendDay(_ db: Database) throws {
         try db.create(table: "no_spend_day") { table in
             table.primaryKey("date", .text)
             table.column("created_at", .text).notNull()
         }
     }
 
-    static func createTheme(_ db: Database) throws {
+    private static func createTheme(_ db: Database) throws {
         try db.create(table: "theme") { table in
             table.primaryKey("id", .text)
             table.column("name", .text).notNull()
@@ -255,20 +235,15 @@ private extension MigrationV1 {
         }
     }
 
-    static func createSetting(_ db: Database) throws {
+    private static func createSetting(_ db: Database) throws {
         try db.create(table: "setting") { table in
-            table.primaryKey("key", .text)
-                .check { settingKeys.contains($0) }
-
+            table.primaryKey("key", .text).check { settingKeys.contains($0) }
             table.column("value", .text).notNull()
         }
     }
 
-    static func addMovementColumns(to table: TableDefinition) {
-        table.column("type", .text)
-            .notNull()
-            .check { entryKinds.contains($0) }
-
+    private static func addMovementColumns(to table: TableDefinition) {
+        table.column("type", .text).notNull().check { entryKinds.contains($0) }
         table.column("amount", .integer).notNull().check { $0 >= 1 }
         table.column("category_id", .text).references("category")
         table.column("wallet_id", .text).notNull().references("wallet")
@@ -279,7 +254,7 @@ private extension MigrationV1 {
         table.check(sql: "to_wallet_id IS NULL OR to_wallet_id <> wallet_id")
     }
 
-    static func addTimestamps(to table: TableDefinition) {
+    private static func addTimestamps(to table: TableDefinition) {
         table.column("created_at", .text).notNull()
         table.column("updated_at", .text).notNull()
     }

@@ -21,12 +21,7 @@ struct CategoryDraftTests {
         )
 
         let icon = try draft.newIcon(at: now)
-
-        let category = try draft.newCategory(
-            iconId: icon.id,
-            sortOrder: 12,
-            at: now
-        )
+        let category = try draft.newCategory(iconId: icon.id, sortOrder: 12, at: now)
 
         #expect(icon.text == "推し")
         #expect(icon.emoji == nil)
@@ -89,12 +84,7 @@ extension CategoryDraftTests {
 extension CategoryDraftTests.DraftCase {
     func draft() throws -> CategoryDraft {
         let mark = try mark.mark()
-        return CategoryDraft(
-            kind: .expense,
-            name: name,
-            mark: mark,
-            color: color
-        )
+        return CategoryDraft(kind: .expense, name: name, mark: mark, color: color)
     }
 }
 

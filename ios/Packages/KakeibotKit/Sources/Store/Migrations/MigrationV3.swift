@@ -1,6 +1,11 @@
 import GRDB
 
 enum MigrationV3 {
+    private static let copyIcons = """
+    INSERT INTO new_icon (id, emoji, text, glyph, color, created_at, updated_at)
+    SELECT id, emoji, text, glyph, color, created_at, updated_at FROM icon
+    """
+
     static func migrate(_ db: Database) throws {
         try db.create(table: "new_icon") { table in
             table.primaryKey("id", .text)
@@ -20,11 +25,4 @@ enum MigrationV3 {
         try db.drop(table: "icon")
         try db.rename(table: "new_icon", to: "icon")
     }
-}
-
-private extension MigrationV3 {
-    static let copyIcons = """
-    INSERT INTO new_icon (id, emoji, text, glyph, color, created_at, updated_at)
-    SELECT id, emoji, text, glyph, color, created_at, updated_at FROM icon
-    """
 }

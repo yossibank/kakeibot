@@ -13,7 +13,8 @@ struct PercentTests {
         (500, -1, 0)
     ])
     func floorsToWholePercent(part: Int, whole: Int, expected: Int) {
-        #expect(Percent.floor(part, of: whole) == expected)
+        let percent = Percent.floor(part, of: whole)
+        #expect(percent == expected)
     }
 
     @Test(arguments: [

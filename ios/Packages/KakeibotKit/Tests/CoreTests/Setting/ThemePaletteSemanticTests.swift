@@ -5,17 +5,22 @@ import Testing
 struct ThemePaletteSemanticTests {
     @Test(arguments: try semanticCases)
     func makesReadableColor(fixture: SemanticCase) throws {
-        let background = try #require(UInt32(fixture.background.dropFirst(), radix: 16))
+        let backgroundHex = fixture.background.dropFirst()
+        let parsedBackground = UInt32(backgroundHex, radix: 16)
+        let background = try #require(parsedBackground)
         let palette = Self.palette(background: background)
         let semantic = try #require(ThemePalette.Semantic(rawValue: fixture.semantic))
         let color = palette.color(semantic)
         let base = palette.isLight ? semantic.light : semantic.dark
 
         if let expected = fixture.color {
-            #expect(color == UInt32(expected.dropFirst(), radix: 16))
+            let expectedHex = expected.dropFirst()
+            let expectedColor = UInt32(expectedHex, radix: 16)
+            #expect(color == expectedColor)
         } else {
+            let contrast = ThemePalette.contrast(color, background)
             #expect(color != base)
-            #expect(ThemePalette.contrast(color, background) >= 3)
+            #expect(contrast >= 3)
         }
     }
 
@@ -25,7 +30,6 @@ struct ThemePaletteSemanticTests {
 
         for semantic in ThemePalette.Semantic.allCases {
             let base = palette.isLight ? semantic.light : semantic.dark
-
             #expect(palette.color(semantic) == base)
         }
     }
@@ -48,11 +52,13 @@ private extension ThemePaletteSemanticTests {
 
     static func palette(background: UInt32) -> ThemePalette {
         var palette = ThemePalette.night
+
         palette.backgroundTop = background
         palette.backgroundBottom = background
         palette.panel = background
         palette.cardTop = background
         palette.cardBottom = background
+
         return palette
     }
 }

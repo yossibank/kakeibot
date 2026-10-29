@@ -3,9 +3,7 @@ import GRDB
 
 public extension AppDatabase {
     func categoryListUpdates() -> some AsyncSequence<CategoryList, any Error> {
-        ValueObservation
-            .tracking(Self.categoryList)
-            .values(in: writer)
+        ValueObservation.tracking(Self.categoryList).values(in: writer)
     }
 
     func categoryList() async throws -> CategoryList {
@@ -24,13 +22,10 @@ private extension AppDatabase {
             .unarchivedInOrder()
             .filter(sql: "category_id IN (SELECT id FROM category WHERE wallet_id IS NULL)")
             .fetchAll(db)
+
         let pairs = try Icon.fetchAll(db).map { ($0.id, $0) }
         let icons = Dictionary(uniqueKeysWithValues: pairs)
 
-        return CategoryList(
-            categories: categories,
-            tags: tags,
-            icons: icons
-        )
+        return CategoryList(categories: categories, tags: tags, icons: icons)
     }
 }

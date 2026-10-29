@@ -23,6 +23,37 @@ public struct ThemeDraft: Hashable, Sendable {
         self.subtext = subtext
         self.accent = accent
     }
+
+    public init(
+        name: String,
+        palette: ThemePalette
+    ) {
+        let background = ThemeHex.text(palette.backgroundTop)
+        let surface = ThemeHex.text(palette.cardTop)
+        let text = ThemeHex.text(palette.text)
+        let subtext = ThemeHex.text(palette.subtext)
+        let accent = ThemeHex.text(palette.accent)
+
+        self.init(
+            name: name,
+            background: background,
+            surface: surface,
+            text: text,
+            subtext: subtext,
+            accent: accent
+        )
+    }
+
+    public init(_ theme: Theme) {
+        self.init(
+            name: theme.name,
+            background: theme.background,
+            surface: theme.surface,
+            text: theme.textPrimary,
+            subtext: theme.textSecondary,
+            accent: theme.accent
+        )
+    }
 }
 
 public extension ThemeDraft {
@@ -31,8 +62,7 @@ public extension ThemeDraft {
     static let maxNameLength = 12
 
     var palette: ThemePalette? {
-        let colors = [background, surface, text, subtext, accent]
-            .compactMap(ThemeHex.rgb)
+        let colors = [background, surface, text, subtext, accent].compactMap(ThemeHex.rgb)
 
         guard colors.count == 5 else {
             return nil
@@ -55,31 +85,6 @@ public extension ThemeDraft {
         let isReadable = palette.unreadableRoles.isEmpty
 
         return nameProblems + (isReadable ? [] : [.unreadableColors])
-    }
-
-    init(
-        name: String,
-        palette: ThemePalette
-    ) {
-        self.init(
-            name: name,
-            background: ThemeHex.text(palette.backgroundTop),
-            surface: ThemeHex.text(palette.cardTop),
-            text: ThemeHex.text(palette.text),
-            subtext: ThemeHex.text(palette.subtext),
-            accent: ThemeHex.text(palette.accent)
-        )
-    }
-
-    init(_ theme: Theme) {
-        self.init(
-            name: theme.name,
-            background: theme.background,
-            surface: theme.surface,
-            text: theme.textPrimary,
-            subtext: theme.textSecondary,
-            accent: theme.accent
-        )
     }
 
     func newTheme(at now: Date) throws -> Theme {

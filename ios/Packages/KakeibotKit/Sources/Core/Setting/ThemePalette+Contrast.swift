@@ -3,10 +3,7 @@ import Foundation
 public extension ThemePalette {
     var unreadableRoles: [Role] {
         Self.readableRoles.compactMap { role, minimum in
-            let lowest = Self.surfaces
-                .map { Self.contrast(self[role], self[$0]) }
-                .min() ?? 0
-
+            let lowest = Self.surfaces.map { Self.contrast(self[role], self[$0]) }.min() ?? 0
             return lowest < minimum ? role : nil
         }
     }
@@ -14,7 +11,6 @@ public extension ThemePalette {
     var isLight: Bool {
         let onBlack = Self.contrast(backgroundTop, 0x000000)
         let onWhite = Self.contrast(backgroundTop, 0xFFFFFF)
-
         return onBlack > onWhite
     }
 
@@ -22,8 +18,11 @@ public extension ThemePalette {
         _ first: UInt32,
         _ second: UInt32
     ) -> Double {
-        let lighter = max(luminance(first), luminance(second))
-        let darker = min(luminance(first), luminance(second))
+        let firstLuminance = luminance(first)
+        let secondLuminance = luminance(second)
+        let lighter = max(firstLuminance, secondLuminance)
+        let darker = min(firstLuminance, secondLuminance)
+
         return (lighter + 0.05) / (darker + 0.05)
     }
 }
@@ -52,14 +51,10 @@ private extension ThemePalette {
     static func luminance(_ rgb: UInt32) -> Double {
         let channels = [rgb >> 16, rgb >> 8, rgb].map { value in
             let ratio = Double(value & 0xFF) / 255
-
-            return ratio <= 0.04045
-                ? ratio / 12.92
-                : pow((ratio + 0.055) / 1.055, 2.4)
+            let linear = (ratio + 0.055) / 1.055
+            return ratio <= 0.04045 ? ratio / 12.92 : pow(linear, 2.4)
         }
 
-        return zip(channels, Self.luminanceWeights)
-            .map { $0 * $1 }
-            .reduce(0, +)
+        return zip(channels, Self.luminanceWeights).map { $0 * $1 }.reduce(0, +)
     }
 }

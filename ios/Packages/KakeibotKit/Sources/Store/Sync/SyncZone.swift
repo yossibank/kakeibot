@@ -16,6 +16,9 @@ public enum SyncZone {
             return nil
         }
 
-        return Wallet.ID(String(zoneName.dropFirst(prefix.count)))
+        let suffix = zoneName.dropFirst(prefix.count)
+        let id = String(suffix)
+
+        return Wallet.ID(id)
     }
 }

@@ -29,57 +29,54 @@ public extension PlannedNotification {
         case entry(LocalDate)
         case recurring(Recurring.ID)
         case template(EntryTemplate.ID)
+
+        public var link: String {
+            switch self {
+            case .home: "home"
+            case let .entry(date): "entry/\(date)"
+            case let .recurring(id): "recurring/\(id)"
+            case let .template(id): "template/\(id)"
+            }
+        }
+
+        public init?(link: String) {
+            if link == "home" {
+                self = .home
+                return
+            }
+
+            let parts = link.split(separator: "/", maxSplits: 1).map(String.init)
+
+            guard parts.count == 2 else {
+                return nil
+            }
+
+            switch parts[0] {
+            case "entry":
+                guard let date = LocalDate(parts[1]) else {
+                    return nil
+                }
+
+                self = .entry(date)
+            case "recurring":
+                guard let id = Recurring.ID(parts[1]) else {
+                    return nil
+                }
+
+                self = .recurring(id)
+            case "template":
+                guard let id = EntryTemplate.ID(parts[1]) else {
+                    return nil
+                }
+
+                self = .template(id)
+            default:
+                return nil
+            }
+        }
     }
 
     var identifier: String {
-        [key, date.description, time.description, title, body]
-            .joined(separator: "|")
-    }
-}
-
-public extension PlannedNotification.Route {
-    var link: String {
-        switch self {
-        case .home: "home"
-        case let .entry(date): "entry/\(date)"
-        case let .recurring(id): "recurring/\(id)"
-        case let .template(id): "template/\(id)"
-        }
-    }
-
-    init?(link: String) {
-        if link == "home" {
-            self = .home
-            return
-        }
-
-        let parts = link.split(separator: "/", maxSplits: 1).map(String.init)
-
-        guard parts.count == 2 else {
-            return nil
-        }
-
-        switch parts[0] {
-        case "entry":
-            guard let date = LocalDate(parts[1]) else {
-                return nil
-            }
-
-            self = .entry(date)
-        case "recurring":
-            guard let id = Recurring.ID(parts[1]) else {
-                return nil
-            }
-
-            self = .recurring(id)
-        case "template":
-            guard let id = EntryTemplate.ID(parts[1]) else {
-                return nil
-            }
-
-            self = .template(id)
-        default:
-            return nil
-        }
+        [key, date.description, time.description, title, body].joined(separator: "|")
     }
 }

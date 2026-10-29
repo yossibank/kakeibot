@@ -1,4 +1,4 @@
-public struct Setting: Hashable, Sendable {
+public struct Setting: Codable, Hashable, Sendable {
     public let key: Key
 
     public var value: String
@@ -50,5 +50,3 @@ extension Setting: Identifiable {
         key
     }
 }
-
-extension Setting: Codable {}

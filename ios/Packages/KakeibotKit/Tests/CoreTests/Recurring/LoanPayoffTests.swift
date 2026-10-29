@@ -6,8 +6,7 @@ struct LoanPayoffTests {
     @Test(arguments: try payoffCases)
     func findsLastRepayment(fixture: PayoffCase) throws {
         let loan = Wallet.ID()
-        let repayments = try fixture.repayments
-            .map { try $0.recurring(to: loan) }
+        let repayments = try fixture.repayments.map { try $0.recurring(to: loan) }
 
         let payoff = LoanPayoff(
             balance: fixture.balance,
@@ -39,8 +38,9 @@ extension LoanPayoffTests {
 extension LoanPayoffTests.RepaymentCase {
     func recurring(to loan: Wallet.ID) throws -> Recurring {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
+        let startDate = try #require(LocalDate("2026-01-01"))
 
-        return try Recurring(
+        return Recurring(
             type: .transfer,
             amount: amount,
             categoryId: nil,
@@ -48,7 +48,7 @@ extension LoanPayoffTests.RepaymentCase {
             toWalletId: loan,
             frequency: .monthly,
             day: day,
-            startDate: #require(LocalDate("2026-01-01")),
+            startDate: startDate,
             endDate: endDate,
             createdAt: now,
             updatedAt: now
