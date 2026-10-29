@@ -47,7 +47,7 @@ public struct RewardRuleListView: View {
                     if model.shown.isEmpty {
                         SettingsEmptyNote(
                             systemImage: "gift",
-                            text: "ご褒美の決まりを足すと、ここに並びます"
+                            text: "ごほうびの決まりを足すと、ここに並びます"
                         )
                     }
 

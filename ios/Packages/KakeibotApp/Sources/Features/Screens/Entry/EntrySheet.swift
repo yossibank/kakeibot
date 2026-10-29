@@ -150,10 +150,10 @@ extension EntrySheet {
 extension EntrySheet {
     nonisolated static let coordinateSpace = "EntrySheet"
 
-    static let memoCardInset: CGFloat = 12
+    static let menuInset: CGFloat = 12
     static let liftInset: CGFloat = 12
 
-    static var memoTransition: AnyTransition {
+    static var menuTransition: AnyTransition {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
     }
 
