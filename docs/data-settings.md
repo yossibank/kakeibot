@@ -44,7 +44,7 @@ expense・income の列は、描画に使わない。
 | row_spacing | 記録の一覧の行の高さと上下の余白。`compact`・`standard`・`relaxed` | 空なら `standard` |
 | stamp_shape | スタンプの印の形。`circle`・`rounded`・`seal`（塗らない二重の輪） | 空なら `circle`。`rounded` は corner_style に従う |
 | tab_titles | 下のタブに名前を出すか。`true` `false` | 空なら `true` |
-| backdrop | 画面の背景の柄。`plain`・`washi`・`grid` | 空なら `plain` |
+| backdrop | 画面の背景の柄。`plain`・`ruled`（ノートの罫線）・`grid` | 空なら `plain`。`washi` は `ruled` として読む |
 | haptics | 押した時に振動するか。`true` `false` | 空なら `true` |
 | decorations | 光の影とタブの金の輪を出すか。`true` `false` | 空なら `true` |
 | entry_starts_with_amount | 今は使わない | |

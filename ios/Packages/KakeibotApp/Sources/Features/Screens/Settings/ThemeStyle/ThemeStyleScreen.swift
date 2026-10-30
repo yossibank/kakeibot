@@ -48,7 +48,7 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .haptic(.selection, trigger: model.style)
+        .haptic(.selection, trigger: model.style, condition: Self.isSwitchKept)
         .environment(\.themeStyle.haptics, model.style.haptics)
         .onAppear {
             openedStyle = openedStyle ?? appStyle
@@ -66,6 +66,13 @@ private extension ThemeStyleScreen {
 
     var shownStyle: ThemeStyle {
         openedStyle ?? appStyle
+    }
+
+    static func isSwitchKept(
+        _ old: ThemeStyle,
+        _ new: ThemeStyle
+    ) -> Bool {
+        old.haptics == new.haptics && old.decorations == new.decorations
     }
 }
 

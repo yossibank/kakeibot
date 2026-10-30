@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import GRDB
 import Store
 import Testing
 
@@ -143,6 +144,26 @@ struct SettingWriteTests {
 
         #expect(initial == .calendar)
         #expect(saved == .list)
+    }
+
+    @Test
+    func readsWashiBackdropAsRuled() async throws {
+        let database = try AppDatabase.inMemory()
+        let saved = Setting(key: .backdrop, value: "washi")
+
+        try await database.writer.write { db in
+            try saved.insert(db)
+        }
+
+        let backdrop = try await database.setting(.backdrop)
+        try await database.setSetting(.backdrop, to: backdrop)
+
+        let text = try await database.writer.read { db in
+            try String.fetchOne(db, sql: "SELECT value FROM setting WHERE key = 'backdrop'")
+        }
+
+        #expect(backdrop == .ruled)
+        #expect(text == "ruled")
     }
 
     @Test

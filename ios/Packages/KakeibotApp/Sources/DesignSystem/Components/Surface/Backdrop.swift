@@ -4,7 +4,11 @@ import SwiftUI
 public struct Backdrop: View {
     @Environment(\.themeStyle.backdrop) private var backdrop
 
-    public init() {}
+    let scale: CGFloat
+
+    public init(scale: CGFloat = 1) {
+        self.scale = scale
+    }
 
     public var body: some View {
         Rectangle()
@@ -22,87 +26,68 @@ private extension Backdrop {
         switch backdrop {
         case .plain:
             EmptyView()
-        case .washi:
+        case .ruled:
             Canvas { context, size in
-                Self.drawFibers(in: &context, size: size)
+                drawRules(in: &context, size: size)
             }
         case .grid:
             Canvas { context, size in
-                Self.drawGrid(in: &context, size: size)
+                drawGrid(in: &context, size: size)
             }
         }
     }
 }
 
 private extension Backdrop {
-    static let gridInk = Palette.accent.opacity(0.16)
-    static let fiberInk = Palette.accent.opacity(0.2)
+    static let ink = Palette.accent.opacity(0.16)
+    static let marginInk = Palette.rose.opacity(0.24)
     static let gridStep: CGFloat = 20
-    static let fiberArea: CGFloat = 180
+    static let ruleStep: CGFloat = 32
+    static let marginX: CGFloat = 40
 
-    static func drawGrid(
+    func drawGrid(
         in context: inout GraphicsContext,
         size: CGSize
     ) {
+        let step = Self.gridStep * scale
         var path = Path()
 
-        for x in stride(from: gridStep, to: size.width, by: gridStep) {
+        for x in stride(from: step, to: size.width, by: step) {
             path.move(to: CGPoint(x: x, y: 0))
             path.addLine(to: CGPoint(x: x, y: size.height))
         }
 
-        for y in stride(from: gridStep, to: size.height, by: gridStep) {
+        for y in stride(from: step, to: size.height, by: step) {
             path.move(to: CGPoint(x: 0, y: y))
             path.addLine(to: CGPoint(x: size.width, y: y))
         }
 
-        context.stroke(path, with: .color(gridInk), lineWidth: 0.6)
+        context.stroke(path, with: .color(Self.ink), lineWidth: 0.6)
     }
 
-    static func drawFibers(
+    func drawRules(
         in context: inout GraphicsContext,
         size: CGSize
     ) {
-        var random = SeededRandom()
-        var path = Path()
-        let count = Int(size.width * size.height / fiberArea)
+        let step = Self.ruleStep * scale
+        let marginX = Self.marginX * scale
+        var rules = Path()
+        var margin = Path()
 
-        for _ in 0..<count {
-            let start = CGPoint(
-                x: random.next() * size.width,
-                y: random.next() * size.height
-            )
-
-            let angle = random.next() * .pi
-            let length = 6 + random.next() * 12
-
-            let end = CGPoint(
-                x: start.x + cos(angle) * length,
-                y: start.y + sin(angle) * length
-            )
-
-            path.move(to: start)
-            path.addLine(to: end)
+        for y in stride(from: step, to: size.height, by: step) {
+            rules.move(to: CGPoint(x: 0, y: y))
+            rules.addLine(to: CGPoint(x: size.width, y: y))
         }
 
-        context.stroke(path, with: .color(fiberInk), lineWidth: 0.8)
-    }
-}
+        margin.move(to: CGPoint(x: marginX, y: 0))
+        margin.addLine(to: CGPoint(x: marginX, y: size.height))
 
-private struct SeededRandom {
-    private var state: UInt64 = 0x9E37_79B9_7F4A_7C15
-}
-
-private extension SeededRandom {
-    mutating func next() -> CGFloat {
-        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
-
-        let value = Double(state >> 11) / Double(1 << 53)
-        return CGFloat(value)
+        context.stroke(rules, with: .color(Self.ink), lineWidth: 0.8)
+        context.stroke(margin, with: .color(Self.marginInk), lineWidth: 0.8)
     }
 }
 
 #Preview {
     Backdrop()
-        .environment(\.themeStyle.backdrop, .washi)
+        .environment(\.themeStyle.backdrop, .ruled)
 }

@@ -88,7 +88,14 @@ public extension SettingKey where Value == ThemeStampShape {
 
 public extension SettingKey where Value == ThemeBackdrop {
     static var backdrop: Self {
-        Self(.backdrop, default: .plain)
+        Self(
+            .backdrop,
+            default: .plain,
+            decode: { text in
+                ThemeBackdrop(rawValue: text) ?? (text == "washi" ? .ruled : nil)
+            },
+            encode: { $0.rawValue }
+        )
     }
 }
 
