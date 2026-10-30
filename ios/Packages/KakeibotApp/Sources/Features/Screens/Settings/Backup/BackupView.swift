@@ -18,62 +18,60 @@ public struct BackupView: View {
             SettingsBackHeader("バックアップ")
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 28) {
+                    BackupIntroCard()
+
                     VStack(alignment: .leading, spacing: 8) {
-                        note(
-                            "doc.on.doc",
-                            "すべての記録と設定を 1 つのファイルにします"
-                        )
+                        SectionTitle("残す")
+                            .padding(.leading, 8)
 
-                        note(
-                            "iphone.and.arrow.forward",
-                            "機種変更の前に書き出すと、新しい端末で戻せます"
-                        )
+                        VStack(spacing: 0) {
+                            Button {
+                                exportFile(.json)
+                            } label: {
+                                action(
+                                    "書き出す",
+                                    systemImage: "square.and.arrow.up",
+                                    detail: "すべての記録と設定を保存します"
+                                )
+                            }
 
-                        if model.isSyncActive {
-                            note(
-                                "icloud",
-                                "iCloud の同期と共有をやめると、読み込めます"
-                            )
-                        }
-                    }
-                    .padding(16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .card()
-
-                    VStack(spacing: 0) {
-                        Button {
-                            exportFile(.json)
-                        } label: {
-                            action(
-                                "書き出す",
-                                systemImage: "square.and.arrow.up",
-                                detail: "ファイルに保存します"
-                            )
-                        }
-
-                        Hairline()
-
-                        Button {
-                            exportFile(.csv)
-                        } label: {
-                            action(
-                                "表計算用に書き出す",
-                                systemImage: "tablecells",
-                                detail: "記録を CSV で保存します。読み込みには使えません"
-                            )
-                        }
-
-                        if !model.isSyncActive {
                             Hairline()
 
+                            Button {
+                                exportFile(.csv)
+                            } label: {
+                                action(
+                                    "表計算用に書き出す",
+                                    systemImage: "tablecells",
+                                    detail: "CSV で保存します。読み込めません"
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .card()
+
+                        if let message = model.doneMessage {
+                            Label(message, systemImage: "checkmark.circle")
+                                .textFont(.caption)
+                                .foregroundStyle(Palette.accent)
+                                .padding(.leading, 8)
+                                .transition(.opacity)
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        SectionTitle("戻す")
+                            .padding(.leading, 8)
+
+                        VStack(spacing: 0) {
                             Button {
                                 importFile()
                             } label: {
                                 action(
                                     "読み込む",
                                     systemImage: "square.and.arrow.down",
-                                    detail: "いまのデータと置き換えます"
+                                    detail: "ファイルから戻します"
                                 )
                             }
 
@@ -86,30 +84,29 @@ public struct BackupView: View {
                                     action(
                                         model.previousTitle(of: item),
                                         systemImage: "arrow.uturn.backward",
-                                        detail: "\(model.previousDay(of: item)) に退避したデータに戻せます"
+                                        detail: "読み込む前に退避したデータです"
                                     )
                                 }
                             }
                         }
+                        .disabled(model.isSyncActive)
+                        .opacity(restoreOpacity)
+                        .padding(.horizontal, 16)
+                        .card()
+
+                        Text(restoreNote)
+                            .textFont(.caption)
+                            .foregroundStyle(Palette.subtext)
+                            .padding(.leading, 8)
                     }
-                    .disabled(model.isWorking)
-                    .buttonStyle(.plain)
-                    .padding(.horizontal, 16)
-                    .card()
 
                     if model.isWorking {
                         ProgressView()
                             .frame(maxWidth: .infinity)
                     }
-
-                    if let message = model.doneMessage {
-                        Label(message, systemImage: "checkmark.circle")
-                            .textFont(.footnote)
-                            .foregroundStyle(Palette.accent)
-                            .padding(.leading, 8)
-                            .transition(.opacity)
-                    }
                 }
+                .disabled(model.isWorking)
+                .buttonStyle(.plain)
                 .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
@@ -165,23 +162,6 @@ public struct BackupView: View {
 }
 
 private extension BackupView {
-    func note(
-        _ systemImage: String,
-        _ text: String
-    ) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Image(systemName: systemImage)
-                .sansFont(.caption, weight: .medium)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
-
-            Text(text)
-                .textFont(.footnote)
-                .foregroundStyle(Palette.text)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-
     func action(
         _ title: String,
         systemImage: String,
@@ -202,6 +182,8 @@ private extension BackupView {
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
             }
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
 
             Spacer()
 
@@ -215,6 +197,14 @@ private extension BackupView {
 }
 
 private extension BackupView {
+    var restoreOpacity: Double {
+        model.isSyncActive ? 0.5 : 1
+    }
+
+    var restoreNote: String {
+        model.isSyncActive ? "同期と共有をやめると、読み込めます" : "読み込むと、いまのデータと置き換わります"
+    }
+
     var document: BackupDocument? {
         model.file.map { BackupDocument(data: $0.data) }
     }

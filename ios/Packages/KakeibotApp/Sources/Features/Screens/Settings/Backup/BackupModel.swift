@@ -81,14 +81,10 @@ public extension BackupModel {
         }.value
     }
 
-    func previousDay(of item: Previous) -> String {
-        Self.dayText(item.date)
-    }
-
     func previousTitle(of item: Previous) -> String {
         let text = Self.dayTimeText(item.date)
 
-        return "読み込む前のデータに戻す（\(text)）"
+        return "\(text) の退避に戻す"
     }
 
     @discardableResult
