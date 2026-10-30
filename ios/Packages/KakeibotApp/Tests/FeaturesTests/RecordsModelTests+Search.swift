@@ -62,6 +62,38 @@ extension RecordsModelTests {
     }
 
     @Test
+    func tellsWhenFilterHidesEveryRecord() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
+        let options = try await setup.database.entryOptions()
+        let salary = try #require(options.incomeCategories.first)
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+
+        model.filter = EntryFilter(categoryIds: [salary.id])
+        model.searchText = "ランチ"
+        let isMonthHidden = model.isMonthHiddenByFilter
+        let isSearchHidden = model.isSearchHiddenByFilter
+
+        model.searchText = "コーヒー"
+        let isMissingWordHidden = model.isSearchHiddenByFilter
+
+        model.move(months: -1)
+        let isEmptyMonthHidden = model.isMonthHiddenByFilter
+
+        model.move(months: 1)
+        model.clearFilter()
+
+        #expect(isMonthHidden)
+        #expect(isSearchHidden)
+        #expect(!isMissingWordHidden)
+        #expect(!isEmptyMonthHidden)
+        #expect(model.filter.isEmpty)
+        #expect(!model.isMonthHiddenByFilter)
+        #expect(model.days.map(\.date.description) == ["2026-10-12"])
+    }
+
+    @Test
     func remembersSearchedWords() async throws {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)

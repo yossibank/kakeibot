@@ -77,8 +77,7 @@ private extension ReviewView {
                     .foregroundStyle(Palette.text)
             }
 
-            if model.recurringTotal != nil
-                || (model.kind == .expense && !model.moves.isEmpty) {
+            if hasRecurringRow || showsMoveRow {
                 VStack(alignment: .leading, spacing: 0) {
                     if let recurring = model.recurringTotal {
                         Button {
@@ -93,14 +92,13 @@ private extension ReviewView {
                             .textFont(.caption)
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
-                            .frame(minHeight: 24)
-                            .contentShape(.rect)
+                            .frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
+                            .tapArea(Self.rowTapOutsets(top: true, bottom: !showsMoveRow))
                         }
                         .buttonStyle(.plain)
                     }
 
-                    if model.kind == .expense,
-                       !model.moves.isEmpty {
+                    if showsMoveRow {
                         Button {
                             select(.balance)
                         } label: {
@@ -113,8 +111,8 @@ private extension ReviewView {
                             .textFont(.caption)
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
-                            .frame(minHeight: 24)
-                            .contentShape(.rect)
+                            .frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
+                            .tapArea(Self.rowTapOutsets(top: !hasRecurringRow, bottom: true))
                         }
                         .buttonStyle(.plain)
                     }
@@ -269,6 +267,14 @@ private extension ReviewView {
         GridItem(.adaptive(minimum: 72), spacing: 12, alignment: .leading)
     ]
 
+    var hasRecurringRow: Bool {
+        model.recurringTotal != nil
+    }
+
+    var showsMoveRow: Bool {
+        model.kind == .expense && !model.moves.isEmpty
+    }
+
     var totalTitle: String {
         Self.title(of: model.kind)
     }
@@ -348,6 +354,18 @@ private extension ReviewView {
         case .month: "前の月の同じ日まで"
         case .year: "前の年の同じ日まで"
         }
+    }
+
+    static func rowTapOutsets(
+        top: Bool,
+        bottom: Bool
+    ) -> EdgeInsets {
+        EdgeInsets(
+            top: top ? 10 : 0,
+            leading: 0,
+            bottom: bottom ? 10 : 0,
+            trailing: 0
+        )
     }
 
     func recurringText(_ recurring: Int) -> String {

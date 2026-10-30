@@ -54,7 +54,7 @@ private extension EntryChange {
     var verb: String {
         switch kind {
         case .recorded: entry.type == .transfer ? "振り替えました" : "記録しました"
-        case .edited: "変更しました"
+        case .edited: "変えました"
         case .deleted: "削除しました"
         }
     }

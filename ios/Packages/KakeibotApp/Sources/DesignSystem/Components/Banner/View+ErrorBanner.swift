@@ -28,6 +28,7 @@ private struct ErrorBanner: ViewModifier {
                     NoticeBanner(message, systemImage: "exclamationmark", tone: .error)
                         .padding(.horizontal, 16)
                         .padding(.bottom, bottom)
+                        .onTapGesture(perform: onClear)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
@@ -38,11 +39,15 @@ private struct ErrorBanner: ViewModifier {
                     return
                 }
 
-                guard await (try? Task.sleep(for: .seconds(3))) != nil else {
+                guard await (try? Task.sleep(for: Self.duration)) != nil else {
                     return
                 }
 
                 onClear()
             }
     }
+}
+
+private extension ErrorBanner {
+    static let duration = Duration.seconds(6)
 }

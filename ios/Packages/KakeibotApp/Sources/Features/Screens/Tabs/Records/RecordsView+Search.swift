@@ -6,7 +6,7 @@ extension RecordsView {
     var searchBar: some View {
         HStack(spacing: 12) {
             SearchField(
-                "メモ・カテゴリ・口座・金額",
+                "メモ・カテゴリ・タグ・口座・金額",
                 text: $model.searchText,
                 focus: $isSearchFocused
             ) {
@@ -15,11 +15,16 @@ extension RecordsView {
 
             filterButton(title: nil)
 
-            Button("閉じる") {
+            Button {
                 closeSearch()
+            } label: {
+                Text("閉じる")
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.accent)
+                    .frame(minHeight: 44)
+                    .contentShape(.rect)
             }
-            .textFont(.subheadline)
-            .foregroundStyle(Palette.accent)
+            .buttonStyle(.plain)
         }
     }
 
@@ -42,6 +47,8 @@ extension RecordsView {
             ForEach(days, id: \.date) { day in
                 dayCard(day)
             }
+        } else if model.isSearchHiddenByFilter {
+            filteredEmpty
         } else {
             Text("見つかりませんでした")
                 .textFont(.footnote)

@@ -32,7 +32,7 @@ public struct RingButton: View {
                 .background(fill, in: Circle())
                 .overlay(Circle().stroke(stroke, lineWidth: 1))
                 .frame(width: size.hitSize, height: size.hitSize)
-                .contentShape(Circle())
+                .tapArea(max(0, (Self.minimumHitSize - size.hitSize) / 2))
         }
         .buttonStyle(.plain)
         .overlay(alignment: .bottom) {
@@ -63,6 +63,8 @@ public extension RingButton {
 }
 
 private extension RingButton {
+    static let minimumHitSize: CGFloat = 44
+
     var foreground: Color {
         switch (isEnabled, style) {
         case (false, _): Palette.hint

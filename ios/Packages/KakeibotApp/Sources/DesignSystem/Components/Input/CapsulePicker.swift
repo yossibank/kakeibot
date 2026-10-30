@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 public struct CapsulePicker<Value: Hashable>: View {
     @Binding var selection: Value
@@ -7,7 +6,6 @@ public struct CapsulePicker<Value: Hashable>: View {
     @State private var thumbOffset: CGFloat?
     @State private var pendingIndex: Int?
     @State private var width: CGFloat?
-    @State private var feedback = UISelectionFeedbackGenerator()
 
     @Environment(\.themeStyle.textSize.scale) private var textScale
 
@@ -71,15 +69,9 @@ public struct CapsulePicker<Value: Hashable>: View {
                 .strokeBorder(Self.rim, lineWidth: 1)
         }
         .glass(tint: Palette.backgroundBottom.opacity(.medium), in: Capsule())
-        .contentShape(Capsule())
+        .tapArea(tapOutsets)
         .gesture(dragGesture)
-        .onAppear {
-            feedback.prepare()
-        }
-        .onChange(of: highlightedIndex) {
-            feedback.selectionChanged()
-            feedback.prepare()
-        }
+        .haptic(.selection, trigger: highlightedIndex)
         .onChange(of: selection) {
             pendingIndex = nil
         }
@@ -123,6 +115,10 @@ public extension CapsulePicker {
 private extension CapsulePicker {
     static var inset: CGFloat {
         4
+    }
+
+    static var minimumTapHeight: CGFloat {
+        44
     }
 
     static var thumbFill: LinearGradient {
@@ -195,6 +191,17 @@ private extension CapsulePicker {
         size.segment.height * textScale
     }
 
+    var tapOutsets: EdgeInsets {
+        let outset = max(0, (Self.minimumTapHeight - segmentHeight) / 2 - Self.inset)
+
+        return EdgeInsets(
+            top: outset,
+            leading: 0,
+            bottom: outset,
+            trailing: 0
+        )
+    }
+
     var selectedIndex: Int {
         options.firstIndex { $0.value == selection } ?? 0
     }
@@ -218,8 +225,6 @@ private extension CapsulePicker {
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
-                feedback.prepare()
-
                 let start = CGFloat(shownIndex) * segmentWidth
                 let touch = value.startLocation.x - Self.inset
                 let range = start...(start + segmentWidth)

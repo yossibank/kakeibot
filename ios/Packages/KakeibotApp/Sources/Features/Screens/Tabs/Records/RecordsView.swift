@@ -99,7 +99,7 @@ public struct RecordsView: View {
             isPresented: $model.isConfirmingDelete,
             systemImage: "trash",
             title: "\(model.pendingDeleteCount) 件の記録を削除しますか",
-            message: "削除した後も、知らせの『取り消す』で戻せます",
+            message: deleteUndoMessage,
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {
@@ -167,10 +167,19 @@ public struct RecordsView: View {
 private extension RecordsView {
     var header: some View {
         HStack {
-            Text("記録")
-                .displayFont(.body)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
+            if model.isCurrentMonth {
+                title
+            } else {
+                ViewThatFits(in: .horizontal) {
+                    HStack {
+                        title
+
+                        currentMonthChip
+                    }
+
+                    currentMonthChip
+                }
+            }
 
             Spacer()
 
@@ -188,8 +197,22 @@ private extension RecordsView {
                     .foregroundStyle(Palette.subtext)
                     .contentTransition(monthTextTransition)
             }
+            .fixedSize()
 
             monthButton(systemImage: "chevron.right", months: 1)
+        }
+    }
+
+    var title: some View {
+        Text("記録")
+            .displayFont(.body)
+            .tracking(3)
+            .foregroundStyle(Palette.accent)
+    }
+
+    var currentMonthChip: some View {
+        PeriodCurrentChip(title: "今月") {
+            moveToCurrentMonth()
         }
     }
 
@@ -199,9 +222,7 @@ private extension RecordsView {
             RecordsFilterLine(title: title) {
                 isFiltering = true
             } onClear: {
-                withAnimation(.snappy) {
-                    model.filter = EntryFilter()
-                }
+                clearFilter()
             }
         }
     }
@@ -213,7 +234,9 @@ private extension RecordsView {
 
         switch model.layout {
         case .list:
-            if model.showsNoRecords {
+            if model.isMonthHiddenByFilter {
+                filteredEmpty
+            } else if model.showsNoRecords {
                 VStack(spacing: 16) {
                     Text("この月の記録はありません")
                         .textFont(.footnote)
@@ -281,6 +304,11 @@ private extension RecordsView {
         }
     }
 
+    var deleteUndoMessage: String {
+        let seconds = EntryNoticeModel.Notice.batchSeconds
+        return "削除してから \(seconds) 秒間は「取り消す」で戻せます"
+    }
+
     var monthTextTransition: ContentTransition {
         .numericText(countsDown: !isMovingForward)
     }
@@ -308,6 +336,17 @@ private extension RecordsView {
 
         PageSlide.run($slide, forward: months > 0) {
             model.move(months: months)
+        }
+    }
+
+    func moveToCurrentMonth() {
+        let isForward = model.month < model.currentMonth
+
+        openId = nil
+        isMovingForward = isForward
+
+        PageSlide.run($slide, forward: isForward) {
+            model.openCurrentMonth()
         }
     }
 }
