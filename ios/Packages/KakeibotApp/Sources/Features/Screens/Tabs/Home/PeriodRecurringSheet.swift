@@ -223,6 +223,10 @@ private extension PeriodRecurringSheet {
 
                 statusLabel(item)
             }
+
+            Image(systemName: "chevron.right")
+                .sansFont(.small)
+                .foregroundStyle(Palette.hint)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

@@ -153,6 +153,11 @@ private extension AssetsView {
                 }
             }
             .frame(minHeight: 32)
+
+            Image(systemName: "chevron.right")
+                .sansFont(.small)
+                .foregroundStyle(Palette.hint)
+                .frame(height: 32)
         }
         .padding(.vertical, 8)
         .contentShape(.rect)
