@@ -67,6 +67,18 @@ extension SettingsSheet {
         value: String? = nil,
         shortValue: String? = nil
     ) -> some View {
+        row(title, systemImage: systemImage) {
+            if let value {
+                SettingsRowValue(value: value, shortValue: shortValue)
+            }
+        }
+    }
+
+    func row(
+        _ title: String,
+        systemImage: String,
+        @ViewBuilder accessory: () -> some View
+    ) -> some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
                 .sansFont(.body, weight: .light)
@@ -82,9 +94,7 @@ extension SettingsSheet {
 
             Spacer()
 
-            if let value {
-                SettingsRowValue(value: value, shortValue: shortValue)
-            }
+            accessory()
 
             Image(systemName: "chevron.right")
                 .sansFont(.small)

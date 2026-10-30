@@ -196,25 +196,15 @@ private extension ThemeStyleLookView {
     }
 
     func cornerMark(_ option: ThemeCorner) -> some View {
-        let isSelected = option == model.style.corner
-        let color = isSelected ? Palette.accent : Palette.subtext
-        let size = Self.markSize
-        let radius = option.radius(Self.cornerMarkRadius)
+        let color = option == model.style.corner ? Palette.accent : Palette.subtext
 
-        return RoundedRectangle(cornerRadius: radius)
-            .stroke(color, lineWidth: 2.5)
-            .frame(width: size * 2, height: size * 2)
-            .frame(width: size, height: size, alignment: .topLeading)
-            .offset(x: size * 0.15, y: size * 0.15)
-            .frame(width: size, height: size)
-            .clipped()
+        return ThemeStyleCornerMark(corner: option, color: color, size: Self.markSize)
     }
 }
 
 private extension ThemeStyleLookView {
     static let markSize: CGFloat = 30
     static let stampSize: CGFloat = 26
-    static let cornerMarkRadius: CGFloat = 20
 
     static func tabTitle(_ showsTitles: Bool) -> String {
         showsTitles ? "出す" : "出さない"
