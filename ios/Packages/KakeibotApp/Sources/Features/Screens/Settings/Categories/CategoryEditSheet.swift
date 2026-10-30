@@ -198,7 +198,7 @@ private extension CategoryEditSheet {
     }
 
     var preview: some View {
-        HStack(spacing: 20) {
+        VStack(spacing: 8) {
             Button {
                 focus = nil
                 isEditingIcon = true
@@ -223,35 +223,15 @@ private extension CategoryEditSheet {
             }
             .buttonStyle(.plain)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("入力シートでの見え方")
+            SettingsPreviewNote("入力シートでは、このタイルで並びます")
 
-                HStack(spacing: 8) {
-                    Circle()
-                        .fill(graphColor)
-                        .frame(width: 10, height: 10)
-
-                    Text("振り返りのグラフの色")
-                }
-            }
-            .textFont(.caption2)
-            .foregroundStyle(Palette.subtext)
+            SettingsPreviewNote("アイコンの色は、振り返りのグラフの色になります", dot: graphColor)
         }
     }
 
     var tags: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack {
-                SettingsSectionTitle("タグ")
-
-                Spacer()
-
-                if model.tags.count > 1 {
-                    Text("長押しで並べ替え")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
-                }
-            }
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionTitle("タグ")
 
             TagLine(tagItems, selection: nil) { id in
                 editTag(id)
@@ -262,6 +242,10 @@ private extension CategoryEditSheet {
             }
             .onPreferenceChange(TagLineMovingKey.self) { isMoving in
                 isMovingTag = isMoving
+            }
+
+            if model.tags.count > 1 {
+                SettingsCaption("長押しで並べ替えられます")
             }
         }
     }

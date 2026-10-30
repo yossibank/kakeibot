@@ -173,10 +173,7 @@ private extension RecurringEditSheet {
                             .frame(height: RecurringRowCard.height)
                             .sharesTextScale(id: model.previewRow.place)
 
-                        Text("一覧では、このカードで並びます")
-                            .textFont(.caption2)
-                            .tracking(1)
-                            .foregroundStyle(Palette.subtext)
+                        SettingsPreviewNote("一覧では、このカードで並びます")
                     }
 
                     SettingsField(namePrompt, text: $model.memo, focus: $focus, field: .name)
