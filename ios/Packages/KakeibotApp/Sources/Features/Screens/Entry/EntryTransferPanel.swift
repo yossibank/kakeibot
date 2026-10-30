@@ -101,6 +101,8 @@ private extension EntryTransferPanel {
 
             Text(AmountText.text(line.amount))
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .contentTransition(.numericText())
                 .gridColumnAlignment(.trailing)
         }

@@ -65,6 +65,8 @@ private extension AssetsRewardSheet {
                     .textFont(.footnote)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
 
             RatioBar(progress, tint: Palette.accent, height: 8)

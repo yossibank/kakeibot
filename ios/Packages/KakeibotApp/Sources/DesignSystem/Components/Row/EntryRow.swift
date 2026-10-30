@@ -55,6 +55,7 @@ public struct EntryRow: View {
                     Text(title)
                         .textFont(.subheadline)
                         .foregroundStyle(Palette.text)
+                        .sharedTextScale()
                         .layoutPriority(1)
 
                     if isRecurring {
@@ -99,6 +100,9 @@ public struct EntryRow: View {
 
             AmountText(amount, type: type)
                 .displayFont(.body)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .layoutPriority(2)
         }
         .frame(minHeight: rowSpacing.minHeight)
         .contentShape(.rect)

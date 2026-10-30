@@ -74,6 +74,8 @@ private extension PeriodRecurringSheet {
                     .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
 
             progressBar
@@ -230,6 +232,8 @@ private extension PeriodRecurringSheet {
             VStack(alignment: .trailing, spacing: 4) {
                 AmountText(item.amount, type: item.recurring.type)
                     .textFont(.subheadline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 statusLabel(item)
             }

@@ -73,10 +73,12 @@ extension RecordsView {
                 Text(PeriodText.day(date, today: model.today))
                     .displayFont(.headline)
                     .foregroundStyle(Palette.accentStrong)
+                    .fixedSize()
 
                 Text("（\(date.weekday.shortName)）")
                     .textFont(.caption)
                     .foregroundStyle(Self.weekdayColor(for: date))
+                    .fixedSize()
 
                 if let holiday {
                     Text(holiday)

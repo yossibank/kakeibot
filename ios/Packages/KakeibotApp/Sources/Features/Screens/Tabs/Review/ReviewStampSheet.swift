@@ -95,12 +95,16 @@ private extension ReviewStampSheet {
                day.expenseTotal > 0 {
                 AmountText(day.expenseTotal, type: .expense)
                     .textFont(.caption)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
 
             if let day,
                day.incomeTotal > 0 {
                 AmountText(day.incomeTotal, type: .income)
                     .textFont(.caption)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
 
             Image(systemName: "chevron.right")
