@@ -17,6 +17,24 @@ public extension AppDatabase {
         }
     }
 
+    func setSyncFetching(_ fetching: Bool) async throws {
+        try await writer.write { db in
+            try db.execute(
+                sql: "UPDATE sync_state SET fetching = ?1 WHERE fetching IS NOT ?1 AND (enabled OR NOT ?1)",
+                arguments: [fetching]
+            )
+        }
+    }
+
+    func setSyncedAt(_ date: Date) async throws {
+        try await writer.write { db in
+            try db.execute(
+                sql: "UPDATE sync_state SET synced_at = ? WHERE enabled",
+                arguments: [date]
+            )
+        }
+    }
+
     func syncStatusUpdates() -> some AsyncSequence<SyncStatus, any Error> {
         ValueObservation
             .tracking { db in
@@ -31,7 +49,7 @@ private extension AppDatabase {
     static func syncStatus(in db: Database) throws -> SyncStatus {
         let row = try Row.fetchOne(
             db,
-            sql: "SELECT enabled, stop_reason, send_problem FROM sync_state"
+            sql: "SELECT enabled, stop_reason, send_problem, fetching, synced_at FROM sync_state"
         )
 
         let reason: String? = row?["stop_reason"]
@@ -42,7 +60,9 @@ private extension AppDatabase {
         return SyncStatus(
             isEnabled: row?["enabled"] ?? false,
             stopReason: stopReason,
-            sendProblem: sendProblem
+            sendProblem: sendProblem,
+            isFetching: row?["fetching"] ?? false,
+            syncedAt: row?["synced_at"]
         )
     }
 }
