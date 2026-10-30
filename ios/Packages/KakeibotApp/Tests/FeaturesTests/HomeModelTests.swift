@@ -110,7 +110,7 @@ struct HomeModelTests {
         await model.load()
 
         #expect(model.budgetUsage == nil)
-        #expect(model.middleTitle == "昨日")
+        #expect(model.middleTitle == "昨日の支出")
         #expect(model.middleAmount == 4500)
 
         let task = Task {

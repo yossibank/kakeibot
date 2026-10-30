@@ -54,7 +54,7 @@ extension RecordsView {
             }
 
             HStack(spacing: 0) {
-                dayButton("この日に入力", systemImage: "plus") {
+                dayButton("この日に記録する", systemImage: "plus") {
                     onAddEntry(date)
                 }
 

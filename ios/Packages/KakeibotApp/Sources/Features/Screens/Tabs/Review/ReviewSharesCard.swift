@@ -3,7 +3,7 @@ import DesignSystem
 import SwiftUI
 
 struct ReviewSharesCard: View {
-    let title: String?
+    let title: String
     let type: Entry.Kind?
     let shares: [ReviewModel.Share]
     let total: Total?
@@ -11,14 +11,11 @@ struct ReviewSharesCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let title {
-                CardHeader(title)
-            }
+            CardHeader(title)
 
             content
         }
         .padding(.horizontal, 16)
-        .padding(.top, title == nil ? 16 : 0)
         .padding(.bottom, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()

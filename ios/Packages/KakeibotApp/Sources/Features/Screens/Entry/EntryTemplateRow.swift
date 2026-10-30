@@ -54,7 +54,7 @@ private extension EntryTemplateRow {
         let amount = template.amount.map { AmountText.text($0) } ?? "毎回入れる"
 
         let amountColor = template.amount == nil
-            ? Palette.subtext
+            ? Palette.hint
             : Palette.accentStrong
 
         return ChipButton(isSelected: model.isApplied(template)) {

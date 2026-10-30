@@ -28,4 +28,17 @@ extension EntryModelTests {
         let description = EntryModel.dateText(for: date, today: today)
         #expect(description == expected)
     }
+
+    @Test(arguments: [
+        ("2026-10-12", "今日"),
+        ("2026-10-11", "昨日"),
+        ("2026-10-05", "10/5"),
+        ("2025-12-31", "2025/12/31")
+    ])
+    func shortensDate(text: String, expected: String) throws {
+        let today = try #require(LocalDate("2026-10-12"))
+        let date = try #require(LocalDate(text))
+        let description = EntryModel.shortDateText(for: date, today: today)
+        #expect(description == expected)
+    }
 }

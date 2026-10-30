@@ -37,10 +37,10 @@ extension EntrySheet {
         .padding(.top, 8)
         .padding(.bottom, 8)
         .background {
-            Self.drawerShape
+            drawerShape
                 .fill(Palette.panel)
                 .overlay {
-                    Self.drawerShape
+                    drawerShape
                         .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
                 .ignoresSafeArea(edges: .bottom)
@@ -85,8 +85,12 @@ extension EntrySheet {
 }
 
 private extension EntrySheet {
-    static let drawerShape = UnevenRoundedRectangle(
-        topLeadingRadius: 28,
-        topTrailingRadius: 28
-    )
+    var drawerShape: UnevenRoundedRectangle {
+        let radius = corner.radius(28)
+
+        return UnevenRoundedRectangle(
+            topLeadingRadius: radius,
+            topTrailingRadius: radius
+        )
+    }
 }

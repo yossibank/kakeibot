@@ -16,6 +16,8 @@ public struct ReviewView: View {
     @State private var pendingDay: LocalDate?
     @State private var slide = PageSlide()
 
+    let onAddEntry: (LocalDate) -> Void
+
     private let onOpenEntry: (Entry.ID) -> Void
     private let onOpenRecurring: (Recurring.ID) -> Void
     private let onOpenDay: (LocalDate) -> Void
@@ -24,12 +26,14 @@ public struct ReviewView: View {
         model: ReviewModel,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onOpenRecurring: @escaping (Recurring.ID) -> Void,
-        onOpenDay: @escaping (LocalDate) -> Void
+        onOpenDay: @escaping (LocalDate) -> Void,
+        onAddEntry: @escaping (LocalDate) -> Void
     ) {
         self.model = model
         self.onOpenEntry = onOpenEntry
         self.onOpenRecurring = onOpenRecurring
         self.onOpenDay = onOpenDay
+        self.onAddEntry = onAddEntry
     }
 
     public var body: some View {

@@ -26,6 +26,7 @@ public struct HomeView: View {
     private let isSheetOpen: Bool
     private let onOpenEntry: (Entry.ID) -> Void
     private let onShowRecords: () -> Void
+    private let onAddEntry: (LocalDate) -> Void
     private let onRetry: () -> Void
     private let onOpenSettings: () -> Void
     private let onDeleteEntry: (Entry.ID) -> Void
@@ -37,6 +38,7 @@ public struct HomeView: View {
         isSheetOpen: Bool,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onShowRecords: @escaping () -> Void,
+        onAddEntry: @escaping (LocalDate) -> Void,
         onRetry: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
         onUseTemplate: @escaping (EntryTemplate) -> Void,
@@ -55,6 +57,7 @@ public struct HomeView: View {
         self.isSheetOpen = isSheetOpen
         self.onOpenEntry = onOpenEntry
         self.onShowRecords = onShowRecords
+        self.onAddEntry = onAddEntry
         self.onRetry = onRetry
         self.onOpenSettings = onOpenSettings
         self.onUseTemplate = onUseTemplate
@@ -145,10 +148,10 @@ private extension HomeView {
             if model.isListFailed {
                 LoadFailedNotice(onRetry: onRetry)
             } else if model.showsNoRecords {
-                Text("まだ記録がありません。右下の ＋ から記録できます")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .padding(.vertical, 16)
+                EmptyNote(text: "まだ記録がありません") {
+                    onAddEntry(model.today)
+                }
+                .padding(.vertical, 16)
             } else {
                 ForEach(model.recentRows) { row in
                     SwipeRow(id: row.id, openId: $openId) {

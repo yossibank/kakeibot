@@ -55,7 +55,7 @@ public extension HomeModel {
     }
 
     var middleTitle: String {
-        budgetUsage == nil ? "昨日" : "今月の支出"
+        budgetUsage == nil ? "昨日の支出" : "今月の支出"
     }
 
     var middleAmount: Int {

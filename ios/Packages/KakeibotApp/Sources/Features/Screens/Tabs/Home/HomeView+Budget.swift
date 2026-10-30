@@ -96,7 +96,7 @@ extension HomeView {
 
             HStack(spacing: 0) {
                 stat(
-                    "今日",
+                    "今日の支出",
                     amount: model.todayExpense,
                     type: .expense
                 )
