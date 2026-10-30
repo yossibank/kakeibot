@@ -185,8 +185,8 @@ extension NotificationPermission {
 extension SyncCloud {
     static let live = Self {
         await SyncAccount(SyncEngine.accountStatus())
-    } hasData: {
-        try await SyncEngine.hasCloudData()
+    } summary: {
+        try await SyncEngine.cloudSummary()
     } deleteData: {
         try await SyncEngine.deleteCloudData()
     } createShare: { walletID, title in

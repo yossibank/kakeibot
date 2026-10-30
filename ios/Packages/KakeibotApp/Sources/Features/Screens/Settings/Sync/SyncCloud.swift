@@ -1,9 +1,10 @@
 import Core
+import Store
 import SwiftUI
 
 public struct SyncCloud: Sendable {
     public let account: Account
-    public let hasData: DataCheck
+    public let summary: Summary
     public let deleteData: Delete
     public let createShare: CreateShare
     public let showShare: ShowShare
@@ -12,7 +13,7 @@ public struct SyncCloud: Sendable {
 
     public init(
         account: @escaping Account,
-        hasData: @escaping DataCheck,
+        summary: @escaping Summary,
         deleteData: @escaping Delete,
         createShare: @escaping CreateShare,
         showShare: @escaping ShowShare,
@@ -20,7 +21,7 @@ public struct SyncCloud: Sendable {
         leaveShare: @escaping LeaveShare
     ) {
         self.account = account
-        self.hasData = hasData
+        self.summary = summary
         self.deleteData = deleteData
         self.createShare = createShare
         self.showShare = showShare
@@ -31,7 +32,7 @@ public struct SyncCloud: Sendable {
 
 public extension SyncCloud {
     typealias Account = @Sendable () async -> SyncAccount
-    typealias DataCheck = @Sendable () async throws -> Bool
+    typealias Summary = @Sendable () async throws -> SyncSummary?
     typealias Delete = @Sendable () async throws -> Void
     typealias CreateShare = @Sendable (Wallet.ID, String) async throws -> Void
     typealias Stop = @MainActor () async -> Void
@@ -43,8 +44,8 @@ public extension SyncCloud {
         account: {
             .noAccount
         },
-        hasData: {
-            false
+        summary: {
+            nil
         },
         deleteData: {},
         createShare: { _, _ in },
