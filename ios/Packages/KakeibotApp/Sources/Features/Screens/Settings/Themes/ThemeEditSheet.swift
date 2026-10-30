@@ -97,7 +97,7 @@ public struct ThemeEditSheet: View {
 private extension ThemeEditSheet {
     var header: some View {
         SettingsEditHeader(
-            title: model.isEditing ? "テーマを編集" : "テーマをつくる",
+            title: model.isEditing ? "テーマを編集" : "テーマを追加",
             isEditing: model.isEditing,
             isHidden: false,
             canHide: false

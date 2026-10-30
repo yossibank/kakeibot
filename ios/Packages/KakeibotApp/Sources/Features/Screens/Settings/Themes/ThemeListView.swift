@@ -41,10 +41,7 @@ public struct ThemeListView: View {
                 SettingsIntroCard(
                     systemImage: "paintpalette",
                     headline: ("アプリの色を", "好みに変えられます"),
-                    notes: [
-                        .init("hand.tap", "押すと、そのテーマに切り替わります"),
-                        .init("plus.square.on.square", "長押しで、その色をもとにつくれます")
-                    ],
+                    notes: notes,
                     flag: hintFlag
                 )
 
@@ -54,7 +51,9 @@ public struct ThemeListView: View {
 
                         section("ダーク", isLight: false)
 
-                        customSection
+                        if !model.customThemes.isEmpty {
+                            customSection
+                        }
 
                         systemSection
                     }
@@ -65,9 +64,14 @@ public struct ThemeListView: View {
                 .deletionNotice($deletion) { deletion in
                     restore(deletion)
                 }
+
+                AddButton("テーマを追加") {
+                    editing = .new(base: nil)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 16)
+            .padding(.bottom, 8)
 
             if let menu {
                 menuLayer(menu)
@@ -223,36 +227,9 @@ private extension ThemeListView {
                         theme: theme
                     )
                 }
-
-                newTile
             }
         }
         .sharesTextScale(id: model.customThemes.map(\.name))
-    }
-
-    var newTile: some View {
-        Button {
-            editing = .new(base: nil)
-        } label: {
-            VStack(spacing: 8) {
-                RoundedRectangle(cornerRadius: corner.radius(16))
-                    .strokeBorder(Palette.outline, style: .dashed)
-                    .frame(height: 132)
-                    .overlay {
-                        Image(systemName: "plus")
-                            .sansFont(.headline, weight: .light)
-                            .foregroundStyle(Palette.accent)
-                    }
-                    .padding(4)
-
-                Text("つくる")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.accent)
-            }
-            .frame(maxWidth: .infinity)
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 
     func section(
@@ -286,6 +263,14 @@ private extension ThemeListView {
         repeating: GridItem(.flexible(), spacing: 12),
         count: 3
     )
+
+    var notes: [SettingsIntroCard.Note] {
+        let select = SettingsIntroCard.Note("hand.tap", "押すと、そのテーマに切り替わります")
+        let edit = SettingsIntroCard.Note("square.and.pencil", "つくったテーマは、もう一度押すと編集できます")
+        let base = SettingsIntroCard.Note("plus.square.on.square", "長押しで、その色をもとにつくれます")
+
+        return model.customThemes.isEmpty ? [select, base] : [select, edit, base]
+    }
 
     var isSuggestingIcon: Binding<Bool> {
         Binding {
