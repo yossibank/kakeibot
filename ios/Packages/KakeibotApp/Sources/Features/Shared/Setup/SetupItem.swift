@@ -52,7 +52,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .theme: "テーマ"
         case .appIcon: "アプリアイコン"
         case .themeStyle: "文字"
-        case .themeLook: "見た目と動き"
+        case .themeLook: "形と動き"
         case .homeSections: "ホームに出すもの"
         }
     }
@@ -70,7 +70,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .appIcon: "app.badge"
         case .themeStyle: "textformat"
         case .themeLook: "square.on.circle"
-        case .homeSections: "square.stack"
+        case .homeSections: "rectangle.grid.1x2"
         }
     }
 

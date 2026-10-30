@@ -2,25 +2,14 @@ import DesignSystem
 import SwiftUI
 
 extension SettingsSheet {
-    var versionRow: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "info.circle")
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
-
-            Text("バージョン")
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-
-            Spacer()
-
-            Text(Bundle.main.shortVersion)
-                .textFont(.footnote)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-        }
-        .frame(minHeight: 48)
+    var versionText: some View {
+        Text("かけいぼっと \(Bundle.main.shortVersion)")
+            .textFont(.caption2)
+            .monospacedDigit()
+            .foregroundStyle(Palette.hint)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .frame(maxWidth: .infinity)
     }
 
     func section(
@@ -96,15 +85,28 @@ extension SettingsSheet {
             if let value {
                 ViewThatFits(in: .horizontal) {
                     Text(value)
+                        .textFont(.footnote)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                         .fixedSize()
 
+                    if let shortValue {
+                        Text(shortValue)
+                            .textFont(.footnote)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .fixedSize()
+                    }
+
                     Text(shortValue ?? value)
+                        .textFont(.caption2)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
+                        .fixedSize()
+
+                    Color.clear
+                        .frame(width: 0, height: 0)
                 }
-                .textFont(.footnote)
                 .foregroundStyle(Palette.subtext)
             }
 
