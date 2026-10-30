@@ -257,11 +257,6 @@ private extension CategoryEditSheet {
             .onPreferenceChange(TagLineMovingKey.self) { isMoving in
                 isMovingTag = isMoving
             }
-            .onChange(of: isMovingTag) {
-                if !isMovingTag {
-                    storeTags()
-                }
-            }
         }
     }
 
@@ -305,7 +300,6 @@ private extension CategoryEditSheet {
         return {
             model.removeTag(id)
             closeTag()
-            storeTags()
         }
     }
 }

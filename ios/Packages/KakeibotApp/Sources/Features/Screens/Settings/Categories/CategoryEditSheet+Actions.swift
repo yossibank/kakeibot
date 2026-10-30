@@ -10,12 +10,6 @@ extension CategoryEditSheet {
         showTag(.rename(id), name: name)
     }
 
-    func storeTags() {
-        Task {
-            await model.storeTags()
-        }
-    }
-
     func closeTag() {
         isTagFocused = nil
 
@@ -39,14 +33,10 @@ extension CategoryEditSheet {
 
         closeTag()
 
-        guard startsAddingTag else {
-            storeTags()
-            return
-        }
-
-        Task {
-            await model.storeTags()
-            dismiss()
+        if startsAddingTag {
+            Task {
+                await save()
+            }
         }
     }
 
