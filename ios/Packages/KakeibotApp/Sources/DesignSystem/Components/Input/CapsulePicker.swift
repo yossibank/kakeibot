@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 public struct CapsulePicker<Value: Hashable>: View {
     @Binding var selection: Value
@@ -7,7 +6,6 @@ public struct CapsulePicker<Value: Hashable>: View {
     @State private var thumbOffset: CGFloat?
     @State private var pendingIndex: Int?
     @State private var width: CGFloat?
-    @State private var feedback = UISelectionFeedbackGenerator()
 
     @Environment(\.themeStyle.textSize.scale) private var textScale
 
@@ -73,13 +71,7 @@ public struct CapsulePicker<Value: Hashable>: View {
         .glass(tint: Palette.backgroundBottom.opacity(.medium), in: Capsule())
         .contentShape(Capsule())
         .gesture(dragGesture)
-        .onAppear {
-            feedback.prepare()
-        }
-        .onChange(of: highlightedIndex) {
-            feedback.selectionChanged()
-            feedback.prepare()
-        }
+        .haptic(.selection, trigger: highlightedIndex)
         .onChange(of: selection) {
             pendingIndex = nil
         }
@@ -218,8 +210,6 @@ private extension CapsulePicker {
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
-                feedback.prepare()
-
                 let start = CGFloat(shownIndex) * segmentWidth
                 let touch = value.startLocation.x - Self.inset
                 let range = start...(start + segmentWidth)
