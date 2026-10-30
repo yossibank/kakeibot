@@ -137,7 +137,7 @@ private extension AssetsView {
                 if row.repaidRatio != nil || note != nil {
                     HStack(spacing: 8) {
                         if let ratio = row.repaidRatio {
-                            RatioBar(ratio, tint: Palette.accent, height: 4)
+                            RatioBar(ratio, tint: Palette.accent)
                         }
 
                         if let note {

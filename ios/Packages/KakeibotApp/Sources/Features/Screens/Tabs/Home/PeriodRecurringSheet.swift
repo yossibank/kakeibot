@@ -78,7 +78,7 @@ private extension PeriodRecurringSheet {
                     .minimumScaleFactor(0.5)
             }
 
-            progressBar
+            RatioBar(model.paidRecurringRatio, tint: Palette.accent, height: 6)
 
             HStack(spacing: 0) {
                 stat(
@@ -107,20 +107,6 @@ private extension PeriodRecurringSheet {
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
-    }
-
-    var progressBar: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(Palette.faint)
-
-                Capsule()
-                    .fill(Palette.accent)
-                    .frame(width: proxy.size.width * model.paidRecurringRatio)
-            }
-        }
-        .frame(height: 6)
     }
 
     var divider: some View {

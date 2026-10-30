@@ -85,7 +85,7 @@ extension HomeView {
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
 
-                            recurringProgress
+                            RatioBar(model.paidRecurringRatio, tint: Palette.accent)
                         }
                         .padding(.vertical, 4)
                         .tapArea(Self.recurringLinkTapOutsets)
@@ -135,17 +135,6 @@ private extension HomeView {
         Rectangle()
             .fill(Palette.accent.opacity(.soft))
             .frame(width: 1, height: 32)
-    }
-
-    var recurringProgress: some View {
-        Capsule()
-            .fill(Palette.faint)
-            .frame(width: 120, height: 3)
-            .overlay(alignment: .leading) {
-                Capsule()
-                    .fill(Palette.accent)
-                    .frame(width: 120 * model.paidRecurringRatio)
-            }
     }
 
     func stat(
