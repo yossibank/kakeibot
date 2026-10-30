@@ -18,6 +18,11 @@ public extension EntryModel {
         }
     }
 
+    struct HiddenCategory: Hashable, Sendable {
+        public let id: EntryCategory.ID
+        public let wasSelected: Bool
+    }
+
     static let categoriesPerPage = 15
 
     var categories: [EntryCategory] {
@@ -158,7 +163,12 @@ public extension EntryModel {
         }
     }
 
-    func hideCategory(_ category: EntryCategory) async {
+    func hideCategory(_ category: EntryCategory) async -> HiddenCategory? {
+        let hidden = HiddenCategory(
+            id: category.id,
+            wasSelected: category.id == categoryId
+        )
+
         do {
             try await database.setCategoryHidden(
                 category.id,
@@ -167,8 +177,25 @@ public extension EntryModel {
             )
 
             await reloadCategories()
+
+            return hidden
         } catch {
             report(error)
+            return nil
+        }
+    }
+
+    func showCategory(_ hidden: HiddenCategory) async {
+        do {
+            try await database.setCategoryHidden(
+                hidden.id,
+                isHidden: false,
+                at: Date()
+            )
+
+            await reloadCategories(selecting: hidden.wasSelected ? hidden.id : nil)
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage, for: error)
         }
     }
 }

@@ -66,7 +66,7 @@ extension EntrySheet {
                         closeCategoryMenu()
 
                         Task {
-                            await model.hideCategory(menu.category)
+                            hiddenCategory = await model.hideCategory(menu.category)
                         }
                     }
                 )
