@@ -27,6 +27,7 @@ extension ReviewView {
                    model.walletShares.isEmpty {
                     ReviewSharesCard(
                         title: nil,
+                        type: nil,
                         shares: [],
                         total: nil,
                         onOpen: { _ in }
@@ -34,6 +35,7 @@ extension ReviewView {
                 } else {
                     ReviewSharesCard(
                         title: "カテゴリごと",
+                        type: model.entryType,
                         shares: model.categoryShares,
                         total: ReviewSharesCard.Total(
                             title: totalTitle,
@@ -46,6 +48,7 @@ extension ReviewView {
 
                     ReviewSharesCard(
                         title: "口座ごと",
+                        type: model.entryType,
                         shares: model.walletShares,
                         total: nil,
                         onOpen: { share in
@@ -124,13 +127,13 @@ private extension ReviewView {
                     balanceBar(
                         "収入",
                         amount: model.summary.income.total,
-                        tint: Palette.accent
+                        type: .income
                     )
 
                     balanceBar(
                         "支出",
                         amount: model.summary.expense.total,
-                        tint: Palette.accentStrong
+                        type: .expense
                     )
                 }
                 .padding(.top, 8)
@@ -193,7 +196,6 @@ private extension ReviewView {
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
         let rim = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
         let titleColor = isSelected ? Palette.accent : Palette.subtext
-        let amountColor = isSelected ? Palette.accentStrong : Palette.text
         let change = model.change(of: kind)
 
         return Button {
@@ -214,10 +216,8 @@ private extension ReviewView {
                     }
                 }
 
-                Text(AmountText.text(model.total(of: kind)))
+                AmountText(model.total(of: kind), type: kind.entryType)
                     .displayFont(.body)
-                    .monospacedDigit()
-                    .foregroundStyle(amountColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             }
@@ -240,9 +240,11 @@ private extension ReviewView {
     func balanceBar(
         _ title: String,
         amount: Int,
-        tint: Color
+        type: Entry.Kind
     ) -> some View {
-        VStack(spacing: 4) {
+        let tint = type == .income ? Palette.accent : Palette.accentStrong
+
+        return VStack(spacing: 4) {
             HStack {
                 Text(title)
                     .textFont(.caption)
@@ -250,10 +252,8 @@ private extension ReviewView {
 
                 Spacer()
 
-                Text(AmountText.text(amount))
+                AmountText(amount, type: type)
                     .displayFont(.body)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.text)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             }

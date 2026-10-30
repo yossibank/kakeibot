@@ -268,11 +268,7 @@ public extension ReviewModel {
 
 extension ReviewModel {
     var entryType: Entry.Kind? {
-        switch kind {
-        case .expense: .expense
-        case .income: .income
-        case .balance: nil
-        }
+        kind.entryType
     }
 }
 

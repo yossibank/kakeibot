@@ -4,6 +4,7 @@ import SwiftUI
 
 struct ReviewSharesCard: View {
     let title: String?
+    let type: Entry.Kind?
     let shares: [ReviewModel.Share]
     let total: Total?
     let onOpen: (ReviewModel.Share) -> Void
@@ -90,10 +91,8 @@ private extension ReviewSharesCard {
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
-            Text(AmountText.text(total.amount))
+            AmountText(total.amount, type: type)
                 .displayFont(.body)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
         }
@@ -120,10 +119,8 @@ private extension ReviewSharesCard {
 
                 Spacer(minLength: 8)
 
-                Text(AmountText.text(share.amount))
+                AmountText(share.amount, type: type)
                     .displayFont(.body)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
 

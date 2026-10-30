@@ -5,9 +5,9 @@ import SwiftUI
 extension RecordsView {
     var summary: some View {
         HStack(spacing: 0) {
-            total("支出", amount: model.expenseTotal, color: Palette.accentStrong)
+            total("支出", amount: model.expenseTotal, type: .expense)
 
-            total("収入", amount: model.incomeTotal, color: Palette.accent)
+            total("収入", amount: model.incomeTotal, type: .income)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -33,9 +33,9 @@ extension RecordsView {
             }
 
             HStack(spacing: 0) {
-                total("支出", amount: summary.expenseTotal, color: Palette.accentStrong)
+                total("支出", amount: summary.expenseTotal, type: .expense)
 
-                total("収入", amount: summary.incomeTotal, color: Palette.accent)
+                total("収入", amount: summary.incomeTotal, type: .income)
             }
         }
         .padding(.horizontal, 16)
@@ -48,17 +48,15 @@ private extension RecordsView {
     func total(
         _ title: String,
         amount: Int,
-        color: Color
+        type: Entry.Kind
     ) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text(title)
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
 
-            Text(AmountText.text(amount))
+            AmountText(amount, type: type)
                 .displayFont(.body)
-                .monospacedDigit()
-                .foregroundStyle(color)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
         }
