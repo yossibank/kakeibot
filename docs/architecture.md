@@ -185,7 +185,8 @@ KakeibotApp/
 │   │       ├── Notice/
 │   │       ├── Period/
 │   │       ├── Settings/
-│   │       └── Setup/
+│   │       ├── Setup/
+│   │       └── Stamp/
 │   ├── Notifications/
 │   └── Sync/
 └── Tests/
@@ -207,6 +208,7 @@ KakeibotApp/
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、今の期間に戻るボタン |
 | `Features/Shared/Settings/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
+| `Features/Shared/Stamp/` | 押したスタンプの数のカードと、押した日の一覧のシート |
 | `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |
 | `Tests/TestSupport/` | テストの補助。観測している値が変わるのを、上限の時間まで待つ |
 

@@ -58,9 +58,13 @@ extension ReviewView {
                 }
             }
 
-            if !model.stampTallies.isEmpty {
-                stampCard
-            }
+            StampTallyCard(
+                tallies: model.stampTallies,
+                emptyText: "この期間に押したスタンプはありません",
+                onOpen: { tally in
+                    openStamp = tally
+                }
+            )
         }
     }
 }
@@ -162,35 +166,6 @@ private extension ReviewView {
         .card()
     }
 
-    var stampCard: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            CardHeader("押したスタンプ")
-
-            LazyVGrid(columns: Self.stampColumns, alignment: .leading) {
-                ForEach(model.stampTallies) { tally in
-                    Button {
-                        openStamp = tally
-                    } label: {
-                        HStack(spacing: 8) {
-                            IconSeal(tally.icon, size: 28)
-
-                            Text("×\(tally.count)")
-                                .displayFont(.body)
-                                .monospacedDigit()
-                                .foregroundStyle(Palette.accentStrong)
-                        }
-                        .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .card()
-    }
-
     func kindTile(_ kind: ReviewKind) -> some View {
         let isSelected = kind == model.kind
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
@@ -264,10 +239,6 @@ private extension ReviewView {
 }
 
 private extension ReviewView {
-    static let stampColumns = [
-        GridItem(.adaptive(minimum: 72), spacing: 12, alignment: .leading)
-    ]
-
     var hasRecurringRow: Bool {
         model.recurringTotal != nil
     }

@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 import SwiftUI
 
-struct ReviewStampSheet: View {
+struct StampDaysSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     let tally: StampCalendar.Tally
@@ -76,7 +76,7 @@ struct ReviewStampSheet: View {
     }
 }
 
-private extension ReviewStampSheet {
+private extension StampDaysSheet {
     func row(_ date: LocalDate) -> some View {
         let day = entryDay(date)
 

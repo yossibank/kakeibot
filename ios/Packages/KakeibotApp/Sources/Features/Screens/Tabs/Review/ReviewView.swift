@@ -61,7 +61,7 @@ public struct ReviewView: View {
             }
         }
         .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in
-            ReviewStampSheet(
+            StampDaysSheet(
                 tally: tally,
                 periodTitle: periodTitle,
                 days: model.stampDays(of: tally),

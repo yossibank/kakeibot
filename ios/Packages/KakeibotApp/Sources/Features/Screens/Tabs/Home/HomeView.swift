@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Store
 import SwiftUI
 
 public struct HomeView: View {
@@ -8,6 +9,8 @@ public struct HomeView: View {
     @State var orderButtonFrame: CGRect = .zero
 
     @State private var openId: Entry.ID?
+    @State private var openStamp: StampCalendar.Tally?
+    @State private var pendingDay: LocalDate?
 
     let onUseTemplate: (EntryTemplate) -> Void
     let onShowAllTemplates: () -> Void
@@ -16,6 +19,7 @@ public struct HomeView: View {
     let onOpenRecurrings: () -> Void
     let onOpenRecurring: (Recurring.ID) -> Void
     let onOpenSetup: (SetupItem) -> Void
+    let onOpenDay: (LocalDate) -> Void
 
     private let setup: SetupModel
     private let appIcon: AppIconListModel
@@ -42,7 +46,8 @@ public struct HomeView: View {
         onDeleteEntry: @escaping (Entry.ID) -> Void,
         onOpenRecurrings: @escaping () -> Void,
         onOpenRecurring: @escaping (Recurring.ID) -> Void,
-        onOpenSetup: @escaping (SetupItem) -> Void
+        onOpenSetup: @escaping (SetupItem) -> Void,
+        onOpenDay: @escaping (LocalDate) -> Void
     ) {
         self.model = model
         self.setup = setup
@@ -60,6 +65,7 @@ public struct HomeView: View {
         self.onOpenRecurrings = onOpenRecurrings
         self.onOpenRecurring = onOpenRecurring
         self.onOpenSetup = onOpenSetup
+        self.onOpenDay = onOpenDay
     }
 
     public var body: some View {
@@ -83,6 +89,17 @@ public struct HomeView: View {
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
+        }
+        .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in
+            StampDaysSheet(
+                tally: tally,
+                periodTitle: periodTitle,
+                days: model.stampDays(of: tally),
+                entryDay: model.day(on:)
+            ) { date in
+                pendingDay = date
+                openStamp = nil
+            }
         }
         .background {
             Backdrop()
@@ -164,33 +181,13 @@ private extension HomeView {
     }
 
     var stampCard: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            CardHeader("今月のスタンプ")
-
-            if model.stampTallies.isEmpty {
-                Text("今月はまだスタンプを押していません")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .padding(.bottom, 8)
-            } else {
-                LazyVGrid(columns: Self.stampColumns, alignment: .leading) {
-                    ForEach(model.stampTallies) { tally in
-                        HStack(spacing: 8) {
-                            IconSeal(tally.icon, size: 28)
-
-                            Text("×\(tally.count)")
-                                .displayFont(.body)
-                                .monospacedDigit()
-                                .foregroundStyle(Palette.accentStrong)
-                        }
-                    }
-                }
+        StampTallyCard(
+            tallies: model.stampTallies,
+            emptyText: "今月はまだスタンプを押していません",
+            onOpen: { tally in
+                openStamp = tally
             }
-        }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .card()
+        )
     }
 
     @ViewBuilder
@@ -224,11 +221,21 @@ private extension HomeView {
 }
 
 private extension HomeView {
-    static let stampColumns = [
-        GridItem(.adaptive(minimum: 72), spacing: 12, alignment: .leading)
-    ]
-
     static var cardTransition: AnyTransition {
         .offset(y: 16).combined(with: .opacity)
+    }
+
+    var periodTitle: String {
+        "\(String(model.month.year))年 \(model.month.month)月"
+    }
+
+    func openPendingDay() {
+        guard let pendingDay else {
+            return
+        }
+
+        self.pendingDay = nil
+
+        onOpenDay(pendingDay)
     }
 }
