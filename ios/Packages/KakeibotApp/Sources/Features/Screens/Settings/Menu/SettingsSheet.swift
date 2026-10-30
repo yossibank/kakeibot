@@ -12,6 +12,8 @@ public struct SettingsSheet: View {
     @State var customThemes: [Theme] = []
     @State var syncStatus = SyncStatus.off
     @State var weekStart: WeekStartModel
+    @State var recordReset: RecordResetModel
+    @State var isConfirmingReset = false
 
     #if DEBUG
     @State var isConfirmingSample = false
@@ -34,6 +36,7 @@ public struct SettingsSheet: View {
         appIcon: AppIconListModel
     ) {
         _weekStart = State(initialValue: WeekStartModel(database: database))
+        _recordReset = State(initialValue: RecordResetModel(database: database))
 
         self.database = database
         self.today = today
@@ -82,6 +85,21 @@ public struct SettingsSheet: View {
         }
         .errorBanner(weekStart.errorNotice) {
             weekStart.errorNotice.clear()
+        }
+        .errorBanner(recordReset.errorNotice) {
+            recordReset.errorNotice.clear()
+        }
+        .confirmation(
+            isPresented: $isConfirmingReset,
+            systemImage: "trash",
+            title: "記録をすべて削除しますか",
+            message: recordReset.message(isSyncing: syncStatus.isEnabled),
+            keepTitle: "やめる",
+            confirmTitle: "削除する"
+        ) {
+            Task {
+                await recordReset.deleteAll()
+            }
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
