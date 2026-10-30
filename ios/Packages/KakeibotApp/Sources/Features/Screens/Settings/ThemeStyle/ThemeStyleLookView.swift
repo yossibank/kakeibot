@@ -107,6 +107,27 @@ public struct ThemeStyleLookView: View {
 
 private extension ThemeStyleLookView {
     var preview: some View {
+        let shape = RoundedRectangle(cornerRadius: model.style.corner.radius(28))
+
+        return VStack(spacing: 8) {
+            dayCard
+
+            ThemeStyleTabBar()
+        }
+        .padding(.horizontal, 8)
+        .padding(.top, 8)
+        .padding(.bottom, 4)
+        .background {
+            Backdrop()
+        }
+        .clipShape(shape)
+        .overlay {
+            shape
+                .strokeBorder(Palette.line, lineWidth: 1)
+        }
+    }
+
+    var dayCard: some View {
         VStack(spacing: 0) {
             HStack(spacing: 12) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -121,6 +142,8 @@ private extension ThemeStyleLookView {
                     Spacer(minLength: 8)
 
                     AmountText(1340, type: .expense)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                 }
 
                 IconSeal(.styleSample(.star), size: Self.stampSize)
