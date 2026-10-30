@@ -82,6 +82,10 @@
 | 却下 | pre-commit で確かめる、自動では確かめない |
 | 関連 | フックは claude-config の `hooks/docs-check.py` |
 
+決まり：
+
+文書と実物の一致は、`scripts/docs-check.py` で確かめる。見るものは [architecture のリポジトリ](../architecture.md#リポジトリ)にある。文書だけの PR では、`make verify-docs` で走らせる。
+
 ## テストの走らせ方
 
 **決定：CI は置かない。**

@@ -14,6 +14,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 
 | 道具 | 使い道 |
 | --- | --- |
+| [jq](https://jqlang.org/) | テストに使うシミュレーターを選ぶ（`scripts/find-simulator.sh`） |
 | [Mint](https://github.com/yonaskolb/Mint) | SwiftFormat と LicensePlist の版をそろえる（`Mintfile`） |
 | [pre-commit](https://pre-commit.com/) | commit の前の確認を動かす |
 | [xcbeautify](https://github.com/cpisciotta/xcbeautify) | ビルドとテストの出力を読みやすくする |
@@ -29,6 +30,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | Xcode でワークスペースを開く | `make open` |
 | ブランチのワークツリーを Xcode で開く | `make open BRANCH=feat/...` |
 | 変更の確認（文書の一致、KakeibotKit のテスト、iOS のビルド。出力は成否と失敗の箇所だけ） | `make verify` |
+| 文書の一致だけを確かめる（文書だけの変更） | `make verify-docs` |
 | iOS のビルド（シミュレーター） | `make build` |
 | テストのコンパイルだけ（走らせない） | `make test-build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |

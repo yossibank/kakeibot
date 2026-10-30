@@ -26,7 +26,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | パス | 中身 |
 | --- | --- |
 | `android/` | 未着手 |
-| `scripts/docs-check.py` | 文書と実物の一致を確かめる。リンク先とその見出し、Makefile の入口、この文書のパッケージの木を見る |
+| `scripts/docs-check.py` | 文書と実物の一致を確かめ、`make verify-docs` で走る。リンク先とその見出し、Makefile の入口、この文書のパッケージの木を見る |
 | `scripts/docs-check.py` の fixtures | fixtures の `description` と `summary` も見る |
 | `scripts/docs-check.py` のテストプラン | `Package.swift` のテストのターゲットと、テストプランの中身が一致するかも見る |
 | `spec/` | `export-format.md`、`fixtures.md`、`fixtures/` |
