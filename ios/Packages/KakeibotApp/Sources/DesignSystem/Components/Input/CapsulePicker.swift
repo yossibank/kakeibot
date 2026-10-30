@@ -244,7 +244,13 @@ private extension CapsulePicker {
 
                 withAnimation(Self.spring) {
                     thumbOffset = nil
-                    pendingIndex = index == selectedIndex ? nil : index
+
+                    guard index != selectedIndex else {
+                        pendingIndex = nil
+                        return
+                    }
+
+                    pendingIndex = index
                     selection = options[index].value
                 }
             }
