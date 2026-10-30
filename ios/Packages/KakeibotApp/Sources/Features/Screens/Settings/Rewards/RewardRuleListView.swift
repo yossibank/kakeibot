@@ -42,8 +42,7 @@ public struct RewardRuleListView: View {
                 headline: ("我慢できた日に", "決めた額を貯めます"),
                 notes: [
                     .init("banknote", "口座の残高は変わりません"),
-                    .move,
-                    .hide
+                    .arrange
                 ],
                 flag: hintFlag
             )

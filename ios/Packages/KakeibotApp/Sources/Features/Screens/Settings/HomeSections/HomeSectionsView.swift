@@ -30,8 +30,8 @@ public struct HomeSectionsView: View {
                 systemImage: "rectangle.grid.1x2",
                 headline: ("ホームに出すものと", "その順番を選べます"),
                 notes: [
-                    .move,
-                    .init("eye.slash", "下の枠へ運ぶと隠せます")
+                    .init("list.number", "この順でホームに並びます"),
+                    .arrange
                 ],
                 flag: hintFlag
             )

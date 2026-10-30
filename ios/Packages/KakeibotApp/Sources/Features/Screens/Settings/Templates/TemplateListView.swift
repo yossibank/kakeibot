@@ -296,8 +296,7 @@ private extension TemplateListView {
 
         return purpose + [
             .init("list.number", "この順でホームと入力シートに出ます"),
-            .move,
-            .hide,
+            .arrange,
             .swipeDelete
         ]
     }

@@ -53,8 +53,7 @@ extension SettingsIntroCard {
 }
 
 extension SettingsIntroCard.Note {
-    static let move = Self("hand.draw", "長押しで並べ替えられます")
-    static let hide = Self("eye.slash", "下の枠へ運ぶと非表示にできます")
+    static let arrange = Self("hand.draw", "長押しで並べ替え・非表示にできます")
     static let swipeDelete = Self("hand.point.left", "横に払うと、非表示と削除を選べます")
 }
 
@@ -141,7 +140,7 @@ extension SettingsIntroCard.Note: Identifiable {
     SettingsIntroCard(
         systemImage: "building.columns",
         headline: ("お金を置く所ごとに", "残高を分けて数えます"),
-        notes: [.move, .hide, .swipeDelete]
+        notes: [.arrange, .swipeDelete]
     )
     .padding()
     .background(Palette.background)

@@ -303,8 +303,7 @@ private extension RecurringListView {
         }
 
         return purpose + [
-            .move,
-            .init("pause.circle", "下の枠へ運ぶと、止めて非表示にします"),
+            .init("hand.draw", "長押しで並べ替え・止めて非表示にできます"),
             .swipeDelete
         ]
     }
