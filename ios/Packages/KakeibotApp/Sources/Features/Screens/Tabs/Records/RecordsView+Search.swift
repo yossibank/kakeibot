@@ -47,6 +47,8 @@ extension RecordsView {
             ForEach(days, id: \.date) { day in
                 dayCard(day)
             }
+        } else if model.isSearchHiddenByFilter {
+            filteredEmpty
         } else {
             Text("見つかりませんでした")
                 .textFont(.footnote)

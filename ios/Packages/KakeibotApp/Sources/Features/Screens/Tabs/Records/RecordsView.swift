@@ -199,9 +199,7 @@ private extension RecordsView {
             RecordsFilterLine(title: title) {
                 isFiltering = true
             } onClear: {
-                withAnimation(.snappy) {
-                    model.filter = EntryFilter()
-                }
+                clearFilter()
             }
         }
     }
@@ -213,7 +211,9 @@ private extension RecordsView {
 
         switch model.layout {
         case .list:
-            if model.showsNoRecords {
+            if model.isMonthHiddenByFilter {
+                filteredEmpty
+            } else if model.showsNoRecords {
                 VStack(spacing: 16) {
                     Text("この月の記録はありません")
                         .textFont(.footnote)
