@@ -87,6 +87,8 @@ private extension RecordsRewardSheet {
             Text(AmountText.text(model.rewardTotal(on: date)))
                 .displayFont(.headline)
                 .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
                 .contentTransition(.numericText())
                 .animation(.snappy, value: model.rewardTotal(on: date))
         }

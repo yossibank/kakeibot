@@ -205,6 +205,9 @@ private extension RecordsView {
 
             AmountText(amount, type: recurring.type)
                 .textFont(.subheadline)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .layoutPriority(1)
                 .opacity(0.6)
 
             Image(systemName: "chevron.right")

@@ -255,6 +255,8 @@ private extension ReviewView {
                     .displayFont(.body)
                     .monospacedDigit()
                     .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
 
             RatioBar(balanceRatio(of: amount), tint: tint, height: 6)

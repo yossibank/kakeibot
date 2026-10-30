@@ -59,6 +59,8 @@ private extension RecordsView {
                 .displayFont(.body)
                 .monospacedDigit()
                 .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

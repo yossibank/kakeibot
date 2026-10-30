@@ -223,6 +223,8 @@ private extension RecurringListView {
                 .displayFont(.headline)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
         }
         .frame(maxWidth: .infinity)
     }

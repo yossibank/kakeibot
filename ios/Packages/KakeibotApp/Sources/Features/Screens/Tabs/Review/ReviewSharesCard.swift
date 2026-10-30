@@ -116,6 +116,8 @@ private extension ReviewSharesCard {
                     .displayFont(.body)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
 
                 Image(systemName: "chevron.right")
                     .sansFont(.small)

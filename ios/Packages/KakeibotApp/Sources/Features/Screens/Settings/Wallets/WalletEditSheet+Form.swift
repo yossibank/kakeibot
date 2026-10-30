@@ -157,6 +157,8 @@ extension WalletEditSheet {
                             .displayFont(.headline)
                             .monospacedDigit()
                             .foregroundStyle(Palette.text)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
 
                         Spacer(minLength: 8)
 
@@ -275,6 +277,8 @@ extension WalletEditSheet {
                 .displayFont(.body)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
         }
         .padding(.horizontal, 16)
         .frame(height: 48)

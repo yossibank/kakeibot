@@ -54,6 +54,8 @@ private extension BudgetKeypadLayer {
                     .displayFont(.largeTitle, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                     .contentTransition(.numericText())
                     .animation(.snappy, value: model.calculator.amount)
 
