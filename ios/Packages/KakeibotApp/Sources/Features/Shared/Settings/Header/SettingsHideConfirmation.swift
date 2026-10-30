@@ -17,7 +17,7 @@ extension View {
             systemImage: "pencil.slash",
             title: "保存していない変更があります",
             message: "入力した内容は、保存しないと残りません",
-            keepTitle: "戻る",
+            keepTitle: "入力に戻る",
             confirmTitle: "捨てて\(verb)",
             alternateTitle: alternateTitle,
             onAlternate: onSave,
