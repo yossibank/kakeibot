@@ -185,7 +185,8 @@ KakeibotApp/
 │   │       ├── Notice/
 │   │       ├── Period/
 │   │       ├── Settings/
-│   │       └── Setup/
+│   │       ├── Setup/
+│   │       └── Stamp/
 │   ├── Notifications/
 │   └── Sync/
 └── Tests/
@@ -204,9 +205,10 @@ KakeibotApp/
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、読み込めないときの表示、保存の失敗が空き容量不足かの見分け |
-| `Features/Shared/Period/` | 期間の範囲と月の始まり、今の期間に戻るボタン |
+| `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |
 | `Features/Shared/Settings/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
+| `Features/Shared/Stamp/` | 押したスタンプの数のカードと、押した日の一覧のシート |
 | `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |
 | `Tests/TestSupport/` | テストの補助。観測している値が変わるのを、上限の時間まで待つ |
 

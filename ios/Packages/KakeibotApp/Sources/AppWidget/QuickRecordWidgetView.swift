@@ -29,7 +29,7 @@ struct QuickRecordWidgetView: View {
 }
 
 extension QuickRecordWidgetView {
-    static let badgeSize: CGFloat = 20
+    static let badgeSize = TemplateBadge.Size.small.diameter
 
     var isLarge: Bool {
         family == .systemLarge
@@ -87,10 +87,8 @@ private extension QuickRecordWidgetView {
     @ViewBuilder
     func header(of summary: QuickRecordWidgetSummary) -> some View {
         if let recorded = summary.recorded(at: entry.date) {
-            HStack(spacing: 4) {
-                Image(systemName: "checkmark.circle.fill")
-                    .sansFont(.caption)
-                    .foregroundStyle(Palette.accent)
+            HStack(spacing: 8) {
+                NoticeMark(systemImage: "checkmark", size: Self.badgeSize)
 
                 Text("\(recorded.name) \(AmountText.text(recorded.amount)) を記録しました")
                     .textFont(size: .caption)
@@ -102,21 +100,18 @@ private extension QuickRecordWidgetView {
                 Spacer(minLength: 4)
 
                 Button(intent: UndoWidgetEntryIntent(recorded.id)) {
-                    Text("取り消す")
+                    NoticeActionLabel("取り消す", height: nil)
                         .textFont(size: .caption, weight: .semibold)
-                        .foregroundStyle(Palette.accentStrong)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
-                        .fixedSize()
-                        .padding(.horizontal, 12)
-                        .frame(maxHeight: .infinity)
-                        .overlay {
-                            Capsule()
-                                .strokeBorder(Palette.outline, lineWidth: 1)
-                        }
+                        .fixedSize(horizontal: true, vertical: false)
                 }
                 .buttonStyle(.plain)
             }
+            .padding(.leading, 4)
+            .padding(.trailing, 2)
+            .padding(.vertical, 2)
+            .noticeCapsule()
         } else {
             HStack(alignment: .firstTextBaseline) {
                 Text("すぐ記録")
@@ -225,10 +220,7 @@ private extension QuickRecordWidgetView {
 
     func recordRow(_ record: QuickRecordWidgetSummary.Record) -> some View {
         HStack(spacing: 8) {
-            IconImage(record.icon, size: 11)
-                .foregroundStyle(Palette.accent)
-                .frame(width: Self.badgeSize, height: Self.badgeSize)
-                .background(Palette.faint, in: Circle())
+            TemplateBadge(icon: record.icon, size: .small)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(record.title)
@@ -246,10 +238,8 @@ private extension QuickRecordWidgetView {
 
             Spacer(minLength: 8)
 
-            Text(amountText(of: record))
+            AmountText(record.amount, type: record.type)
                 .displayFont(.small, weight: .medium)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
                 .privacySensitive()
@@ -313,11 +303,6 @@ private extension QuickRecordWidgetView {
         metrics: Metrics
     ) -> CGFloat {
         summary.recorded(at: entry.date) == nil ? metrics.headerHeight : metrics.undoHeaderHeight
-    }
-
-    func amountText(of record: QuickRecordWidgetSummary.Record) -> String {
-        let text = AmountText.text(record.amount)
-        return record.type == .income ? "+" + text : text
     }
 }
 

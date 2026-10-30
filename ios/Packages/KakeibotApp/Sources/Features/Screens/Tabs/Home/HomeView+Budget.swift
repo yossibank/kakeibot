@@ -85,7 +85,7 @@ extension HomeView {
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
 
-                            recurringProgress
+                            RatioBar(model.paidRecurringRatio, tint: Palette.accent)
                         }
                         .padding(.vertical, 4)
                         .tapArea(Self.recurringLinkTapOutsets)
@@ -97,24 +97,24 @@ extension HomeView {
             HStack(spacing: 0) {
                 stat(
                     "今日",
-                    amount: listAmount(model.todayExpense),
-                    color: Palette.accentStrong
+                    amount: model.todayExpense,
+                    type: .expense
                 )
 
                 divider
 
                 stat(
                     model.middleTitle,
-                    amount: listAmount(model.middleAmount),
-                    color: Palette.text
+                    amount: model.middleAmount,
+                    type: .expense
                 )
 
                 divider
 
                 stat(
                     "今月の収入",
-                    amount: listAmount(model.monthIncome),
-                    color: Palette.accent
+                    amount: model.monthIncome,
+                    type: .income
                 )
             }
             .padding(.top, 12)
@@ -137,33 +137,27 @@ private extension HomeView {
             .frame(width: 1, height: 32)
     }
 
-    var recurringProgress: some View {
-        Capsule()
-            .fill(Palette.faint)
-            .frame(width: 120, height: 3)
-            .overlay(alignment: .leading) {
-                Capsule()
-                    .fill(Palette.accent)
-                    .frame(width: 120 * model.paidRecurringRatio)
-            }
-    }
-
     func stat(
         _ title: String,
-        amount: String,
-        color: Color
+        amount: Int,
+        type: Entry.Kind
     ) -> some View {
         VStack(spacing: 2) {
             Text(title)
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
-            Text(amount)
-                .displayFont(.body)
-                .monospacedDigit()
-                .foregroundStyle(color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
+            Group {
+                if model.isListFailed {
+                    Text(Self.unknownAmount)
+                        .foregroundStyle(Palette.subtext)
+                } else {
+                    AmountText(amount, type: type)
+                }
+            }
+            .displayFont(.body)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
         }
         .padding(.horizontal, 4)
         .frame(maxWidth: .infinity)
@@ -243,9 +237,5 @@ private extension HomeView {
 
     var dialTint: Color {
         model.budgetUsage?.tint ?? Palette.accent
-    }
-
-    func listAmount(_ amount: Int) -> String {
-        model.isListFailed ? Self.unknownAmount : AmountText.text(amount)
     }
 }

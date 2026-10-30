@@ -27,6 +27,7 @@ extension ReviewView {
                    model.walletShares.isEmpty {
                     ReviewSharesCard(
                         title: nil,
+                        type: nil,
                         shares: [],
                         total: nil,
                         onOpen: { _ in }
@@ -34,6 +35,7 @@ extension ReviewView {
                 } else {
                     ReviewSharesCard(
                         title: "カテゴリごと",
+                        type: model.entryType,
                         shares: model.categoryShares,
                         total: ReviewSharesCard.Total(
                             title: totalTitle,
@@ -46,6 +48,7 @@ extension ReviewView {
 
                     ReviewSharesCard(
                         title: "口座ごと",
+                        type: model.entryType,
                         shares: model.walletShares,
                         total: nil,
                         onOpen: { share in
@@ -55,9 +58,13 @@ extension ReviewView {
                 }
             }
 
-            if !model.stampTallies.isEmpty {
-                stampCard
-            }
+            StampTallyCard(
+                tallies: model.stampTallies,
+                emptyText: "この期間に押したスタンプはありません",
+                onOpen: { tally in
+                    openStamp = tally
+                }
+            )
         }
     }
 }
@@ -124,13 +131,13 @@ private extension ReviewView {
                     balanceBar(
                         "収入",
                         amount: model.summary.income.total,
-                        tint: Palette.accent
+                        type: .income
                     )
 
                     balanceBar(
                         "支出",
                         amount: model.summary.expense.total,
-                        tint: Palette.accentStrong
+                        type: .expense
                     )
                 }
                 .padding(.top, 8)
@@ -159,40 +166,11 @@ private extension ReviewView {
         .card()
     }
 
-    var stampCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionTitle("押したスタンプ")
-
-            LazyVGrid(columns: Self.stampColumns, alignment: .leading) {
-                ForEach(model.stampTallies) { tally in
-                    Button {
-                        openStamp = tally
-                    } label: {
-                        HStack(spacing: 8) {
-                            IconSeal(tally.icon, size: 28)
-
-                            Text("×\(tally.count)")
-                                .displayFont(.body)
-                                .monospacedDigit()
-                                .foregroundStyle(Palette.accentStrong)
-                        }
-                        .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .card()
-    }
-
     func kindTile(_ kind: ReviewKind) -> some View {
         let isSelected = kind == model.kind
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
         let rim = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
         let titleColor = isSelected ? Palette.accent : Palette.subtext
-        let amountColor = isSelected ? Palette.accentStrong : Palette.text
         let change = model.change(of: kind)
 
         return Button {
@@ -213,10 +191,8 @@ private extension ReviewView {
                     }
                 }
 
-                Text(AmountText.text(model.total(of: kind)))
+                AmountText(model.total(of: kind), type: kind.entryType)
                     .displayFont(.body)
-                    .monospacedDigit()
-                    .foregroundStyle(amountColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             }
@@ -239,9 +215,11 @@ private extension ReviewView {
     func balanceBar(
         _ title: String,
         amount: Int,
-        tint: Color
+        type: Entry.Kind
     ) -> some View {
-        VStack(spacing: 4) {
+        let tint = type == .income ? Palette.accent : Palette.accentStrong
+
+        return VStack(spacing: 4) {
             HStack {
                 Text(title)
                     .textFont(.caption)
@@ -249,10 +227,8 @@ private extension ReviewView {
 
                 Spacer()
 
-                Text(AmountText.text(amount))
+                AmountText(amount, type: type)
                     .displayFont(.body)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.text)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             }
@@ -263,10 +239,6 @@ private extension ReviewView {
 }
 
 private extension ReviewView {
-    static let stampColumns = [
-        GridItem(.adaptive(minimum: 72), spacing: 12, alignment: .leading)
-    ]
-
     var hasRecurringRow: Bool {
         model.recurringTotal != nil
     }

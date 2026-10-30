@@ -52,17 +52,10 @@ extension TemplateCardSize {
         }
     }
 
-    var iconSize: CGFloat {
+    var badge: TemplateBadge.Size {
         switch self {
-        case .regular: 16
-        case .large: 24
-        }
-    }
-
-    var badgeSize: CGFloat {
-        switch self {
-        case .regular: 34
-        case .large: 52
+        case .regular: .regular
+        case .large: .large
         }
     }
 

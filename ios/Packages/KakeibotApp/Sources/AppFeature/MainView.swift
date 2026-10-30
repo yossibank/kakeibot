@@ -137,6 +137,11 @@ struct MainView: View {
                     },
                     onOpenSetup: { item in
                         sheet = .setup(item)
+                    },
+                    onOpenDay: { date in
+                        records.open(date)
+
+                        tab = .records
                     }
                 )
                 .tabContent()

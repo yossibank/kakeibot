@@ -23,15 +23,7 @@ public struct NoticeBanner: View {
 
     public var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .sansFont(.caption, weight: .semibold)
-                .foregroundStyle(tone.color)
-                .frame(width: 30, height: 30)
-                .background(tone.color.opacity(0.12), in: Circle())
-                .overlay {
-                    Circle()
-                        .strokeBorder(tone.color.opacity(0.45), lineWidth: 0.6)
-                }
+            NoticeMark(systemImage: systemImage, tone: tone)
 
             Text(message)
                 .textFont(.footnote)
@@ -43,16 +35,8 @@ public struct NoticeBanner: View {
             if let actionTitle,
                let action {
                 Button(action: action) {
-                    Text(actionTitle)
+                    NoticeActionLabel(actionTitle)
                         .textFont(.caption, weight: .semibold)
-                        .foregroundStyle(Palette.accent)
-                        .padding(.horizontal, 16)
-                        .frame(height: 34)
-                        .overlay {
-                            Capsule()
-                                .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 0.8)
-                        }
-                        .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
             }
@@ -60,19 +44,7 @@ public struct NoticeBanner: View {
         .padding(.leading, 12)
         .padding(.trailing, 8)
         .frame(minHeight: 54)
-        .background {
-            ZStack {
-                Capsule()
-                    .fill(Palette.panel)
-
-                Capsule()
-                    .fill(Self.sheen)
-            }
-        }
-        .overlay {
-            Capsule()
-                .strokeBorder(rim, lineWidth: 0.8)
-        }
+        .noticeCapsule(tone)
         .shadow(color: Palette.shadow.opacity(0.5), radius: 20, y: 10)
     }
 }
@@ -90,24 +62,6 @@ extension NoticeBanner.Tone {
         case .info: Palette.accent
         case .error: Palette.rose
         }
-    }
-}
-
-private extension NoticeBanner {
-    static var sheen: LinearGradient {
-        LinearGradient(
-            colors: [.white.opacity(0.06), .white.opacity(0)],
-            startPoint: .top,
-            endPoint: .center
-        )
-    }
-
-    var rim: LinearGradient {
-        LinearGradient(
-            colors: [tone.color.opacity(0.8), tone.color.opacity(0.2)],
-            startPoint: .top,
-            endPoint: .bottom
-        )
     }
 }
 

@@ -47,7 +47,8 @@ struct SnapshotTests {
                 onDeleteEntry: { _ in },
                 onOpenRecurrings: {},
                 onOpenRecurring: { _ in },
-                onOpenSetup: { _ in }
+                onOpenSetup: { _ in },
+                onOpenDay: { _ in }
             )
 
             let sheet = PeriodRecurringSheet(model: model) { _ in }

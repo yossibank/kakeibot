@@ -46,9 +46,10 @@ public final class HomeModel: ScreenModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
+    private(set) var stampCalendar: StampCalendar?
+
     private var homeSections = HomeSection.standard
     private var homeHiddenSections: Set<HomeSection> = []
-    private var stampCalendar: StampCalendar?
 
     private var allTemplates: [EntryTemplate] = [] {
         didSet {
@@ -124,10 +125,6 @@ public extension HomeModel {
 
     var upcomingBillTotal: Int {
         upcomingBills.reduce(0) { $0 + $1.amount }
-    }
-
-    var stampTallies: [StampCalendar.Tally] {
-        stampCalendar?.tallies(in: period) ?? []
     }
 
     func run() async {

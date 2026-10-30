@@ -4,17 +4,11 @@ import SwiftUI
 
 extension AssetsView {
     var billCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
-                SectionTitle("これからの引き落とし")
-
-                Spacer()
-
-                Text("合計 \(AmountText.text(model.upcomingBillTotal))")
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            CardHeader(
+                "これからの引き落とし",
+                note: "合計 \(AmountText.text(model.upcomingBillTotal))"
+            )
 
             VStack(spacing: 12) {
                 ForEach(model.upcomingBills) { row in
@@ -28,7 +22,8 @@ extension AssetsView {
             }
             .sharesTextScale(id: model.upcomingBills.map(\.source))
         }
-        .padding(16)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
         .card()
     }
 
@@ -41,22 +36,12 @@ extension AssetsView {
         let total = rows.reduce(0) { $0 + $1.balance }
 
         return VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Image(systemName: systemImage)
-                        .sansFont(.small, weight: .semibold)
-                        .foregroundStyle(Palette.accent)
-                        .frame(width: 26, height: 26)
-                        .background(Palette.accent.opacity(.subtle), in: Circle())
-
-                    Text(title)
-                        .textFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(Palette.text)
-
-                    Text("\(rows.count) 口座")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
-                }
+            VStack(alignment: .leading, spacing: 0) {
+                CardHeader(
+                    title,
+                    systemImage: systemImage,
+                    note: "\(rows.count) 口座"
+                )
 
                 Text(AmountText.text(total))
                     .displayFont(.title, weight: .bold)
@@ -66,7 +51,6 @@ extension AssetsView {
                     .minimumScaleFactor(0.5)
             }
             .padding(.horizontal, 4)
-            .padding(.top, 12)
 
             VStack(spacing: 0) {
                 ForEach(sections) { section in
@@ -153,7 +137,7 @@ private extension AssetsView {
                 if row.repaidRatio != nil || note != nil {
                     HStack(spacing: 8) {
                         if let ratio = row.repaidRatio {
-                            RatioBar(ratio, tint: Palette.accent, height: 4)
+                            RatioBar(ratio, tint: Palette.accent)
                         }
 
                         if let note {
@@ -169,6 +153,11 @@ private extension AssetsView {
                 }
             }
             .frame(minHeight: 32)
+
+            Image(systemName: "chevron.right")
+                .sansFont(.small)
+                .foregroundStyle(Palette.hint)
+                .frame(height: 32)
         }
         .padding(.vertical, 8)
         .contentShape(.rect)

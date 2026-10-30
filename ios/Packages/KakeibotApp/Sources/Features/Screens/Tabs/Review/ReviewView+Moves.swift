@@ -9,31 +9,19 @@ extension ReviewView {
         let repaidPercent = Int((ratio * 100).rounded())
 
         return VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: 8) {
-                Image(systemName: "arrow.left.arrow.right")
-                    .sansFont(.small, weight: .semibold)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 26, height: 26)
-                    .background(Palette.accent.opacity(.subtle), in: Circle())
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("返済と積立")
-                        .textFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(Palette.text)
-
-                    Text("支出には数えていません")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.hint)
+            VStack(alignment: .leading, spacing: 0) {
+                CardHeader("返済と積立", systemImage: "arrow.left.arrow.right") {
+                    Text(AmountText.text(total))
+                        .displayFont(.headline)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accentStrong)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                 }
 
-                Spacer(minLength: 8)
-
-                Text(AmountText.text(total))
-                    .displayFont(.headline)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                Text("支出には数えていません")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.hint)
             }
 
             VStack(spacing: 8) {
@@ -75,7 +63,6 @@ extension ReviewView {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 16)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()

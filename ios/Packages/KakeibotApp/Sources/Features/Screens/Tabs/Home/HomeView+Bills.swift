@@ -5,19 +5,7 @@ import SwiftUI
 extension HomeView {
     var billCard: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .firstTextBaseline) {
-                SectionTitle("これからの引き落とし")
-
-                Spacer()
-
-                if !model.upcomingBills.isEmpty {
-                    Text("合計 \(AmountText.text(model.upcomingBillTotal))")
-                        .textFont(.caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                }
-            }
-            .frame(minHeight: 44)
+            CardHeader("これからの引き落とし", note: billTotalText)
 
             if model.upcomingBills.isEmpty {
                 Text("これからの引き落としはありません")
@@ -92,6 +80,14 @@ private extension HomeView {
 
 private extension HomeView {
     static let billDateWidth: CGFloat = 56
+
+    var billTotalText: String? {
+        guard !model.upcomingBills.isEmpty else {
+            return nil
+        }
+
+        return "合計 \(AmountText.text(model.upcomingBillTotal))"
+    }
 
     func daysText(until date: LocalDate) -> String {
         let days = model.today.days(until: date)
