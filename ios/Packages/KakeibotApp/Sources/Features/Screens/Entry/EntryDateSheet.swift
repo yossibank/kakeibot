@@ -35,24 +35,14 @@ struct EntryDateSheet: View {
 private extension EntryDateSheet {
     func quickButton(_ quickDay: QuickDay) -> some View {
         let date = today.adding(days: quickDay.offset)
-        let isSelected = model.date == date
-        let titleColor = isSelected ? Palette.accentStrong : Palette.text
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
-        let ring = isSelected ? Palette.accent : Palette.line
 
-        return Button(quickDay.title) {
+        return ChipButton(
+            quickDay.title,
+            isSelected: model.date == date,
+            size: .large
+        ) {
             dateBinding.wrappedValue = date
         }
-        .textFont(.subheadline)
-        .foregroundStyle(titleColor)
-        .padding(.horizontal, 16)
-        .frame(minHeight: 40)
-        .background(fill, in: Capsule())
-        .overlay {
-            Capsule()
-                .stroke(ring, lineWidth: 1)
-        }
-        .buttonStyle(.plain)
     }
 }
 

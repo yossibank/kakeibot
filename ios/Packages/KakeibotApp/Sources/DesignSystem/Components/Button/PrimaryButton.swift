@@ -1,8 +1,6 @@
 import SwiftUI
 
 public struct PrimaryButton: View {
-    @Environment(\.isEnabled) private var isEnabled
-
     let title: String
     let subject: String?
     let detail: String?
@@ -41,76 +39,10 @@ public struct PrimaryButton: View {
             .lineLimit(1)
             .minimumScaleFactor(0.8)
             .padding(.horizontal, 16)
-            .foregroundStyle(textColor)
             .frame(maxWidth: .infinity, minHeight: 56)
-            .background {
-                face
-            }
-            .overlay {
-                Capsule()
-                    .strokeBorder(rim, lineWidth: 1)
-            }
-            .contentShape(Capsule())
+            .goldFace()
         }
         .buttonStyle(.plain)
-        .glow(glow, radius: 14, y: 6)
-    }
-}
-
-private extension PrimaryButton {
-    @ViewBuilder
-    var face: some View {
-        if isEnabled {
-            Capsule()
-                .fill(Self.gold)
-                .overlay {
-                    Capsule()
-                        .fill(Self.sheen)
-                }
-        } else {
-            Capsule()
-                .fill(Palette.card)
-        }
-    }
-}
-
-private extension PrimaryButton {
-    static var gold: LinearGradient {
-        LinearGradient(
-            colors: [
-                Palette.accent.mix(with: Palette.accentStrong, by: 0.3),
-                Palette.accent,
-                Palette.accent.mix(with: Palette.accentDeep, by: 0.45)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
-    static var sheen: LinearGradient {
-        LinearGradient(
-            colors: [.white.opacity(0.22), .white.opacity(0)],
-            startPoint: .top,
-            endPoint: .center
-        )
-    }
-
-    var textColor: Color {
-        isEnabled ? Palette.backgroundBottom : Palette.subtext
-    }
-
-    var rim: LinearGradient {
-        let colors = if isEnabled {
-            [Palette.accentStrong.opacity(.strong), Palette.accent.opacity(.soft)]
-        } else {
-            [Palette.accent.opacity(.muted), Palette.accent.opacity(.subtle)]
-        }
-
-        return LinearGradient(colors: colors, startPoint: .top, endPoint: .bottom)
-    }
-
-    var glow: Color {
-        isEnabled ? Palette.glow.opacity(.muted) : .clear
     }
 }
 

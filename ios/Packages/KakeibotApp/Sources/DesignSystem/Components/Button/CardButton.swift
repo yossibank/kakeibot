@@ -35,23 +35,14 @@ public extension CardButton {
 }
 
 private extension CardButton {
-    static var filledFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accentStrong, Palette.accent],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
     @ViewBuilder
     var label: some View {
         switch style {
         case .filled:
             Text(title)
                 .textFont(.subheadline, weight: .bold)
-                .foregroundStyle(Palette.backgroundBottom)
                 .frame(maxWidth: .infinity, minHeight: height)
-                .background(Self.filledFill, in: Capsule())
+                .goldFace()
         case let .outlined(color):
             Text(title)
                 .textFont(.subheadline)
@@ -68,6 +59,9 @@ private extension CardButton {
 #Preview {
     VStack(spacing: 12) {
         CardButton("使う", style: .filled) {}
+
+        CardButton("選んでください", style: .filled) {}
+            .disabled(true)
 
         CardButton("やめる", style: .outlined(Palette.subtext)) {}
     }

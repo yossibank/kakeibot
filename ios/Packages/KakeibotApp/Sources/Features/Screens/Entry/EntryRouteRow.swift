@@ -22,17 +22,14 @@ struct EntryRouteRow: View {
 }
 
 private extension EntryRouteRow {
-    static let height: CGFloat = 34
-
     func button(_ route: EntryModel.TransferRoute) -> some View {
         let isApplied = model.walletId == route.walletId && model.toWalletId == route.toWalletId
         let source = model.wallet(route.walletId)?.name ?? ""
         let destination = model.wallet(route.toWalletId)?.name ?? ""
-        let stroke = isApplied ? Palette.accent : Palette.accent.opacity(.soft)
 
-        return Button {
+        return ChipButton(isSelected: isApplied) {
             onUse(route)
-        } label: {
+        } content: {
             HStack(spacing: 4) {
                 Text(source)
                     .sharedTextScale()
@@ -44,17 +41,6 @@ private extension EntryRouteRow {
                 Text(destination)
                     .sharedTextScale()
             }
-            .textFont(size: .caption)
-            .foregroundStyle(Palette.text)
-            .padding(.horizontal, 12)
-            .frame(height: Self.height)
-            .background(EntrySheet.categoryFill(isApplied), in: Capsule())
-            .overlay {
-                Capsule()
-                    .stroke(stroke, lineWidth: 1)
-            }
-            .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
     }
 }
