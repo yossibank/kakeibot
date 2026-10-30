@@ -22,7 +22,7 @@ extension SyncView {
             .card()
             .disabled(isSharingLocked)
 
-            caption("同期のオン・オフに関係なく、口座ごとに共有できます")
+            SettingsCaption("同期のオン・オフに関係なく、口座ごとに共有できます。")
 
             steps
         }
@@ -47,7 +47,7 @@ extension SyncView {
             .card()
             .disabled(isSharingLocked)
 
-            caption("抜けると、この iPhone からその口座と記録が消えます")
+            SettingsCaption("抜けると、この iPhone からその口座と記録が消えます。", kind: .caution)
         }
     }
 }
