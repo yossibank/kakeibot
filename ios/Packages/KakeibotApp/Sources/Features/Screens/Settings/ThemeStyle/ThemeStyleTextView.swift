@@ -4,15 +4,20 @@ import SwiftUI
 
 public struct ThemeStyleTextView: View {
     @State private var model: ThemeStyleModel
+    @State private var hintFlag: SettingsScreenFlag
 
     public init(model: ThemeStyleModel) {
+        let hintFlag = model.closedHint(.themeText)
+
         _model = State(initialValue: model)
+        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         ThemeStyleScreen(
             title: "文字",
-            hint: "文字の大きさと字体を選べます。",
+            intro: Self.intro,
+            hint: hintFlag,
             model: model
         ) {
             preview
@@ -126,6 +131,15 @@ private extension ThemeStyleTextView {
 }
 
 private extension ThemeStyleTextView {
+    static let intro = ThemeStyleIntro(
+        systemImage: "textformat",
+        headline: ("文字の大きさと字体を", "好みに変えられます"),
+        notes: [
+            .init("eye", "選ぶと、上の見本が変わります"),
+            .init("arrow.uturn.backward", "戻ると、アプリ全体が変わります")
+        ]
+    )
+
     static let sizeSampleHeight: CGFloat = 30
     static let restCardHeight: CGFloat = 108
     static let sampleRest = 125_560

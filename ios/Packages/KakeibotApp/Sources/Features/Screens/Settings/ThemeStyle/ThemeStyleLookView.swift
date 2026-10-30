@@ -4,15 +4,20 @@ import SwiftUI
 
 public struct ThemeStyleLookView: View {
     @State private var model: ThemeStyleModel
+    @State private var hintFlag: SettingsScreenFlag
 
     public init(model: ThemeStyleModel) {
+        let hintFlag = model.closedHint(.themeLook)
+
         _model = State(initialValue: model)
+        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         ThemeStyleScreen(
             title: "形と動き",
-            hint: "角の丸みや行の間隔、スタンプの形、背景を選べます。",
+            intro: Self.intro,
+            hint: hintFlag,
             model: model
         ) {
             preview
@@ -203,6 +208,15 @@ private extension ThemeStyleLookView {
 }
 
 private extension ThemeStyleLookView {
+    static let intro = ThemeStyleIntro(
+        systemImage: "square.on.circle",
+        headline: ("角の丸みや背景などを", "好みに変えられます"),
+        notes: [
+            .init("eye", "選ぶと、上の見本が変わります"),
+            .init("arrow.uturn.backward", "戻ると、アプリ全体が変わります")
+        ]
+    )
+
     static let markSize: CGFloat = 30
     static let stampSize: CGFloat = 26
 

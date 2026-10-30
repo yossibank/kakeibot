@@ -74,3 +74,5 @@ closed_hints に入る画面の名前は、次のとおり。
 - `budgets`
 - `themes`
 - `homeSections`
+- `themeText`
+- `themeLook`

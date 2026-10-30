@@ -8,4 +8,6 @@ public enum SettingsScreen: String, CaseIterable, Codable, Sendable {
     case budgets
     case themes
     case homeSections
+    case themeText
+    case themeLook
 }
