@@ -136,7 +136,7 @@ private extension CategoryEditSheet {
             header
 
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: SettingsSpacing.form) {
                     preview
                         .onGeometryChange(for: CGFloat.self) { proxy in
                             proxy.frame(in: .global).maxY
@@ -170,7 +170,7 @@ private extension CategoryEditSheet {
             .disabled(!model.canSave)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {

@@ -42,7 +42,7 @@ public struct StampEditSheet: View {
             }
 
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: SettingsSpacing.form) {
                     StampTileFace(icon: model.icon.preview, isHidden: false)
                         .frame(width: 80, height: 78)
 
@@ -68,7 +68,7 @@ public struct StampEditSheet: View {
             .disabled(!model.canSave)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {

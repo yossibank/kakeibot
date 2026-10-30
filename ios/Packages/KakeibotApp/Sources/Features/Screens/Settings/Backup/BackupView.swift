@@ -95,7 +95,7 @@ public struct BackupView: View {
             .scrollIndicators(.hidden)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 16)
+        .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {

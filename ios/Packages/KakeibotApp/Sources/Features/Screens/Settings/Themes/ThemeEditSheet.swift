@@ -28,7 +28,7 @@ public struct ThemeEditSheet: View {
             header
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.form) {
                     ThemePreview(palette: model.palette)
                         .frame(width: 150)
                         .frame(maxWidth: .infinity)
@@ -60,7 +60,7 @@ public struct ThemeEditSheet: View {
             .disabled(!model.canSave)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {

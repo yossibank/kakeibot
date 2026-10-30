@@ -20,7 +20,7 @@ extension WalletEditSheet {
             }
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.form) {
                     VStack(alignment: .leading, spacing: 8) {
                         preview
 
@@ -59,7 +59,7 @@ extension WalletEditSheet {
             saveButton
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {

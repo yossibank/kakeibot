@@ -44,7 +44,7 @@ public struct HomeSectionsView: View {
             .scrollDisabled(dragging != nil)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 16)
+        .padding(.top, SettingsSpacing.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()

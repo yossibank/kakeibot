@@ -70,7 +70,7 @@ public struct ThemeListView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 16)
+            .padding(.top, SettingsSpacing.top)
             .padding(.bottom, 8)
 
             if let menu {
