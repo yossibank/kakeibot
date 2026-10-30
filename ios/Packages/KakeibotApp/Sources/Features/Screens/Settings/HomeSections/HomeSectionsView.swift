@@ -27,7 +27,7 @@ public struct HomeSectionsView: View {
             SettingsBackHeader("ホームに出すもの", hint: hintFlag)
 
             SettingsIntroCard(
-                systemImage: "square.stack",
+                systemImage: "rectangle.grid.1x2",
                 headline: ("ホームに出すものと", "その順番を選べます"),
                 notes: [
                     .move,
