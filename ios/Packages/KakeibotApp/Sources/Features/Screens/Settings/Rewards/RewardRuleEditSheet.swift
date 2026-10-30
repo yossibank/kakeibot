@@ -59,7 +59,7 @@ public struct RewardRuleEditSheet: View {
         )
         .overlay(alignment: .top) {
             SettingsEditHeader(
-                title: model.isEditing ? "決まりを編集" : "決まりを追加",
+                title: model.isEditing ? "決まりを編集" : "ごほうびの決まりを追加",
                 isEditing: model.isEditing,
                 isHidden: model.isHidden,
                 canDelete: !(model.isHidden && model.hasLogs)
@@ -71,7 +71,7 @@ public struct RewardRuleEditSheet: View {
                 isConfirmingDelete = true
             }
             .padding(.horizontal, 20)
-            .padding(.top, 20)
+            .padding(.top, SettingsSpacing.top)
         }
         .background {
             Backdrop()
@@ -137,7 +137,7 @@ private extension RewardRuleEditSheet {
                 .frame(height: 44)
 
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: SettingsSpacing.form) {
                     Button {
                         focus = nil
                         isEditingIcon = true
@@ -195,7 +195,7 @@ private extension RewardRuleEditSheet {
             saveButton
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
     }
 

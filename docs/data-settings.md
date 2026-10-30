@@ -50,8 +50,8 @@ expense・income の列は、描画に使わない。
 | entry_starts_with_amount | 今は使わない | |
 | categories_by_use | 今は使わない | |
 | template_order | `manual` `frequent` `category` `amount` `name` | 空なら並べた順 |
-| home_sections | ホームに並べる順。`customize` `budget` `templates` `recent` `bills` `stamps` を `,` でつないだもの | 空なら `customize` `budget` `templates` `recent` の順。無いものは後ろに足し、`bills` と `stamps` は隠す |
-| home_hidden_sections | ホームに出さないもの。書き方は home_sections と同じで、すべては隠さない | 空なら home_sections にあるものをすべて出す |
+| home_sections | ホームに並べる順。`customize` `budget` `templates` `recent` `bills` `stamps` を `,` でつないだもの | 空なら `customize` `budget` `templates` `recent` の順。無いものは後ろに足し、`bills` と `stamps` は非表示にする |
+| home_hidden_sections | ホームに出さないもの。書き方は home_sections と同じで、すべては非表示にしない | 空なら home_sections にあるものをすべて出す |
 | records_layout | `calendar` `list` | 空ならカレンダー |
 | review_scale | `week` `month` `year` | 空なら月 |
 | review_kind | `expense` `income` `balance` | 空なら支出 |
@@ -74,3 +74,5 @@ closed_hints に入る画面の名前は、次のとおり。
 - `budgets`
 - `themes`
 - `homeSections`
+- `themeText`
+- `themeLook`

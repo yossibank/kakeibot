@@ -14,7 +14,7 @@ public struct LaunchScreenView: View {
             SettingsBackHeader("起動時に開く画面")
 
             ScrollView {
-                VStack(spacing: 12) {
+                VStack(spacing: SettingsSpacing.section) {
                     SettingsIntroCard(
                         systemImage: "iphone",
                         headline: ("アプリを開いたときに", "最初に出す画面を選べます"),
@@ -25,17 +25,18 @@ public struct LaunchScreenView: View {
                     )
 
                     LaunchScreenPreview(selection: model.screen)
-                        .padding(.vertical, 16)
 
-                    ForEach(LaunchScreen.allCases, id: \.self) { screen in
-                        SettingsOption(
-                            screen.title,
-                            note: screen.note,
-                            systemImage: screen.systemImage,
-                            isSelected: model.screen == screen
-                        ) {
-                            Task {
-                                await model.choose(screen)
+                    VStack(spacing: 12) {
+                        ForEach(LaunchScreen.allCases, id: \.self) { screen in
+                            SettingsOption(
+                                screen.title,
+                                note: screen.note,
+                                systemImage: screen.systemImage,
+                                isSelected: model.screen == screen
+                            ) {
+                                Task {
+                                    await model.choose(screen)
+                                }
                             }
                         }
                     }
@@ -45,7 +46,7 @@ public struct LaunchScreenView: View {
             .scrollIndicators(.hidden)
         }
         .padding(.horizontal, 20)
-        .padding(.top, 16)
+        .padding(.top, SettingsSpacing.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()

@@ -8,14 +8,15 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
     @Environment(\.themeStyle) private var appStyle
 
     let title: String
-    let hint: String
+    let intro: ThemeStyleIntro
+    let hint: SettingsScreenFlag
     let model: ThemeStyleModel
     @ViewBuilder let preview: Preview
     @ViewBuilder let content: Content
 
     var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader(title)
+            SettingsBackHeader(title, hint: hint)
 
             preview
                 .animation(.snappy(duration: 0.25), value: model.style)
@@ -24,7 +25,12 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    SettingsCaption(hint)
+                    SettingsIntroCard(
+                        systemImage: intro.systemImage,
+                        headline: intro.headline,
+                        notes: intro.notes,
+                        flag: hint
+                    )
 
                     content
                 }
@@ -38,7 +44,7 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
         .environment(\.themeStyle, shownStyle)
         .font(shownStyle.bodyFont)
         .padding(.horizontal, 20)
-        .padding(.top, 16)
+        .padding(.top, SettingsSpacing.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()

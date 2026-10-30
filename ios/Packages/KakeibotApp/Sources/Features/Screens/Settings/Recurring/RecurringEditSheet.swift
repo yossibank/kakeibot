@@ -67,7 +67,7 @@ public struct RecurringEditSheet: View {
                 isConfirmingDelete = true
             }
             .padding(.horizontal, 20)
-            .padding(.top, 20)
+            .padding(.top, SettingsSpacing.top)
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
@@ -162,7 +162,7 @@ private extension RecurringEditSheet {
                 .frame(height: 44)
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.form) {
                     if !model.isEditing {
                         CapsulePicker(selection: typeBinding, options: Self.typeOptions)
                             .frame(maxWidth: .infinity)
@@ -173,10 +173,7 @@ private extension RecurringEditSheet {
                             .frame(height: RecurringRowCard.height)
                             .sharesTextScale(id: model.previewRow.place)
 
-                        Text("一覧では、このカードで並びます")
-                            .textFont(.caption2)
-                            .tracking(1)
-                            .foregroundStyle(Palette.subtext)
+                        SettingsPreviewNote("一覧では、このカードで並びます")
                     }
 
                     SettingsField(namePrompt, text: $model.memo, focus: $focus, field: .name)
@@ -201,7 +198,7 @@ private extension RecurringEditSheet {
             saveButton
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
     }
 }

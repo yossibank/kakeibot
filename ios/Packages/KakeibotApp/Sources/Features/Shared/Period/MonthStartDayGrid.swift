@@ -33,6 +33,9 @@ private extension MonthStartDayGrid {
                 .displayFont(.body)
                 .monospacedDigit()
                 .foregroundStyle(textColor)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.horizontal, 4)
                 .frame(maxWidth: .infinity, minHeight: 42)
                 .background(fill, in: Circle())
                 .overlay {

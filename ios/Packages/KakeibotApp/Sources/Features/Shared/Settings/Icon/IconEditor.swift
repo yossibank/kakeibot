@@ -114,9 +114,7 @@ private extension IconEditor {
                 field: textField
             )
 
-            Text("「外」「推し」のように、短い文字をアイコンにできます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
+            SettingsCaption("「外」「推し」のように、短い文字をアイコンにできます")
         }
     }
 

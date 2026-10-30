@@ -54,10 +54,8 @@ private extension TemplateEditSheet {
     @ViewBuilder
     var tagChooser: some View {
         if model.tags.isEmpty {
-            Text("このカテゴリにタグはありません。カテゴリの編集で足せます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .frame(maxWidth: .infinity, minHeight: 54)
+            SettingsCaption("このカテゴリにタグはありません。カテゴリの編集で足せます")
+                .frame(maxWidth: .infinity, minHeight: 54, alignment: .leading)
         } else {
             TagLine(tagItems, selection: model.tagId) { id in
                 model.toggleTag(id)

@@ -78,7 +78,7 @@ public struct TemplateEditSheet: View {
                     isConfirmingDelete = true
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 20)
+                .padding(.top, SettingsSpacing.top)
             }
             .errorBanner(model.errorNotice) {
                 model.errorNotice.clear()
@@ -178,7 +178,7 @@ private extension TemplateEditSheet {
                 .frame(height: 44)
 
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: SettingsSpacing.form) {
                     preview
 
                     VStack(alignment: .leading, spacing: 8) {
@@ -204,7 +204,7 @@ private extension TemplateEditSheet {
             saveButton
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
     }
 }
@@ -215,7 +215,7 @@ private extension TemplateEditSheet {
     var title: String {
         let action = model.isEditing ? "編集" : "追加"
 
-        return "\(model.typeName)テンプレートを\(action)"
+        return "\(model.typeName)のテンプレートを\(action)"
     }
 
     var keyboardRegions: SafeAreaRegions {

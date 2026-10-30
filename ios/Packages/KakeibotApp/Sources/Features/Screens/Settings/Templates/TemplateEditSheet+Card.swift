@@ -7,10 +7,7 @@ extension TemplateEditSheet {
         VStack(spacing: 16) {
             card
 
-            Text("ホームでは、このカードで並びます")
-                .textFont(.caption2)
-                .tracking(1)
-                .foregroundStyle(Palette.subtext)
+            SettingsPreviewNote("ホームでは、このカードで並びます")
         }
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity)
@@ -25,26 +22,23 @@ extension TemplateEditSheet {
     }
 
     var capsulePreview: some View {
-        HStack(spacing: 8) {
-            Text("入力シートでは")
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-
+        VStack(spacing: 8) {
             HStack(spacing: 8) {
                 IconImage(categoryIcon, size: 12)
                     .foregroundStyle(Palette.accent)
 
                 Text(previewName)
                     .foregroundStyle(Palette.text)
+                    .truncationMode(.tail)
 
                 Text(amountValue)
                     .displayFont(.caption)
                     .foregroundStyle(Palette.accentStrong)
+                    .layoutPriority(1)
             }
             .textFont(size: .caption)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
-            .fixedSize()
             .padding(.leading, 8)
             .padding(.trailing, 12)
             .frame(height: 30)
@@ -52,8 +46,10 @@ extension TemplateEditSheet {
                 Capsule()
                     .stroke(Palette.accent.opacity(.muted), lineWidth: 1)
             }
+
+            SettingsPreviewNote("入力シートでは、この形で並びます")
         }
-        .frame(minHeight: 46)
+        .frame(maxWidth: .infinity)
     }
 
     var memoCard: some View {

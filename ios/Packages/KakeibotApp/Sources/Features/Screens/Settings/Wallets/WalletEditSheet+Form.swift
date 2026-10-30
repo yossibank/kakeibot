@@ -20,7 +20,7 @@ extension WalletEditSheet {
             }
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.form) {
                     VStack(alignment: .leading, spacing: 8) {
                         preview
 
@@ -59,7 +59,7 @@ extension WalletEditSheet {
             saveButton
         }
         .padding(.horizontal, 20)
-        .padding(.top, 20)
+        .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {
@@ -107,17 +107,9 @@ extension WalletEditSheet {
     }
 
     var colorNote: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(Color(hex: model.icon.color) ?? Palette.subtext)
-                .frame(width: 10, height: 10)
+        let color = Color(hex: model.icon.color) ?? Palette.subtext
 
-            Text("アイコンの色は、振り返りのグラフの色になります")
-                .tracking(1)
-        }
-        .textFont(.caption2)
-        .foregroundStyle(Palette.subtext)
-        .frame(maxWidth: .infinity)
+        return SettingsPreviewNote("アイコンの色は、振り返りのグラフの色になります", dot: color)
     }
 
     var kindChooser: some View {

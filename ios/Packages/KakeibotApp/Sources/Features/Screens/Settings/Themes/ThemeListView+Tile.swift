@@ -22,7 +22,7 @@ extension ThemeListView {
                         Color.clear
                             .contentShape(.rect)
                             .onTapGesture {
-                                select(choice)
+                                tap(choice, theme: theme)
                             }
                             .onLongPressGesture(minimumDuration: Self.menuPressDuration) {
                                 let space = CoordinateSpace.named(Self.space)
@@ -83,4 +83,16 @@ extension ThemeListView {
 
 private extension ThemeListView {
     static let menuPressDuration = 0.4
+
+    func tap(
+        _ choice: ThemeChoice,
+        theme: Theme?
+    ) {
+        if let theme,
+           choice == model.current {
+            editing = .edit(theme)
+        } else {
+            select(choice)
+        }
+    }
 }

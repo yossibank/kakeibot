@@ -17,6 +17,12 @@ public final class ThemeStyleModel {
     }
 }
 
+extension ThemeStyleModel {
+    func closedHint(_ screen: SettingsScreen) -> SettingsScreenFlag {
+        .closedHint(screen, in: database)
+    }
+}
+
 public extension ThemeStyleModel {
     func load() async {
         do {

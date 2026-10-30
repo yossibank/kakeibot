@@ -8,7 +8,7 @@ extension HomeSection {
         case .templates: "テンプレート"
         case .recent: "最近の記録"
         case .bills: "これからの引き落とし"
-        case .stamps: "今月のスタンプ"
+        case .stamps: "押したスタンプ"
         }
     }
 }
