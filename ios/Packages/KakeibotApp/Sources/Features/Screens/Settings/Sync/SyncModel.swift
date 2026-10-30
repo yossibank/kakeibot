@@ -11,18 +11,26 @@ public final class SyncModel {
     public private(set) var account = SyncAccount.available
     public private(set) var isWorking = false
     public private(set) var pendingCount: Int?
+    public private(set) var isPendingFailed = false
     public private(set) var stopReason: SyncStopReason?
     public private(set) var sendProblem: SyncSendProblem?
-    public private(set) var shares: [WalletShare] = []
-    public private(set) var joined: [JoinedShare] = []
+    public private(set) var isFetching = false
+    public private(set) var syncedAt: Date?
     public private(set) var choice: SyncChoice?
 
+    public internal(set) var shares: [WalletShare] = []
+    public internal(set) var joined: [JoinedShare] = []
+    public internal(set) var workingWallet: Wallet.ID?
+    public internal(set) var invitation: WalletShare?
+    public internal(set) var opened: WalletShare?
+    public internal(set) var participants: [SyncParticipant]?
+    public internal(set) var isParticipantsFailed = false
     public internal(set) var errorNotice = ErrorNotice()
 
-    private var requestedOn: Bool?
+    let database: AppDatabase
+    let cloud: SyncCloud
 
-    private let database: AppDatabase
-    private let cloud: SyncCloud
+    private var requestedOn: Bool?
 
     public init(
         database: AppDatabase,
@@ -50,13 +58,37 @@ public extension SyncModel {
         requestedOn != nil
     }
 
+    var progress: SyncProgress? {
+        if isWorking {
+            return .switching
+        }
+
+        guard isOn else {
+            return stopReason.map(SyncProgress.stopped)
+        }
+
+        guard let pendingCount else {
+            return isPendingFailed ? nil : .checking
+        }
+
+        if isFetching {
+            return .receiving
+        }
+
+        guard pendingCount > 0 else {
+            return .upToDate(syncedAt)
+        }
+
+        return sendProblem.map { .stuck($0, pendingCount) } ?? .sending(pendingCount)
+    }
+
     var footnote: String {
         guard !isOn else {
-            return Self.keepsDataNote
+            return "切っても、この iPhone のデータは残ります"
         }
 
         return switch account {
-        case .available: Self.keepsDataNote
+        case .available: "オンにすると、ほかの端末と記録がそろいます"
         case .noAccount: "設定アプリで iCloud にサインインすると使えます"
         case .restricted: "この iPhone では、制限で iCloud を使えません"
         case .temporarilyUnavailable: "設定アプリで iCloud にサインインし直すと使えます"
@@ -78,34 +110,23 @@ public extension SyncModel {
         account = await cloud.account()
     }
 
-    func observeStatus() async {
-        do {
-            for try await status in database.syncStatusUpdates() {
-                isOn = status.isEnabled
-                stopReason = status.stopReason
-                sendProblem = status.sendProblem
+    func observe() async {
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observeStatus()
             }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
-        }
-    }
 
-    func pendingText(_ count: Int) -> String {
-        guard count > 0 else {
-            return "最新の状態です"
-        }
-
-        let head = sendProblem?.message ?? "iCloud に送っています"
-        return "\(head)（残り \(count) 件）"
-    }
-
-    func observePending() async {
-        do {
-            for try await count in database.pendingSyncCountUpdates() {
-                pendingCount = count
+            group.addTask {
+                await self.observePending()
             }
-        } catch {
-            pendingCount = nil
+
+            group.addTask {
+                await self.observeShares()
+            }
+
+            group.addTask {
+                await self.observeJoined()
+            }
         }
     }
 
@@ -170,74 +191,60 @@ public extension SyncModel {
         choice = nil
         requestedOn = nil
     }
+}
+
+extension SyncModel: ScreenModel {}
+
+private extension SyncModel {
+    static let loadFailedMessage = "同期の状態を読み込めませんでした"
+    static let saveFailedMessage = "同期を切り替えられませんでした。時間をおいて試してください"
+
+    func observeStatus() async {
+        await observe(
+            database.syncStatusUpdates(),
+            failure: Self.loadFailedMessage
+        ) { status in
+            self.isOn = status.isEnabled
+            self.stopReason = status.stopReason
+            self.sendProblem = status.sendProblem
+            self.isFetching = status.isFetching
+            self.syncedAt = status.syncedAt
+        }
+    }
+
+    func observePending() async {
+        isPendingFailed = await observe(
+            database.pendingSyncCountUpdates(),
+            failure: Self.loadFailedMessage
+        ) { count in
+            self.pendingCount = count
+        }
+    }
 
     func observeShares() async {
-        do {
-            for try await shares in database.walletShareUpdates() {
-                self.shares = shares
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
+        await observe(
+            database.walletShareUpdates(),
+            failure: Self.loadFailedMessage
+        ) { shares in
+            self.shares = shares
         }
     }
 
     func observeJoined() async {
-        do {
-            for try await joined in database.joinedShareUpdates() {
-                self.joined = joined
-            }
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
-        }
-    }
-
-    func leave(_ item: JoinedShare) async {
-        let id = item.wallet.id
-
-        await work(failure: Self.leaveFailedMessage) {
-            try await cloud.leaveShare(id, item.ownerName)
-            try await database.endSharing(id)
-        }
-    }
-
-    func share(_ item: WalletShare) async {
-        let id = item.wallet.id
-        let name = item.wallet.name
-
-        await work(failure: Self.shareFailedMessage) {
-            if !item.isShared {
-                try await cloud.createShare(id, name)
-                try await database.startSharing(id)
-            }
-
-            try await cloud.showShare(id, name) { [weak self] in
-                await self?.stopSharing(id)
-            }
-        }
-    }
-}
-
-private extension SyncModel {
-    static let keepsDataNote = "切っても、この iPhone のデータは残ります"
-    static let loadFailedMessage = "同期の状態を読み込めませんでした"
-    static let saveFailedMessage = "同期を切り替えられませんでした。時間をおいて試してください"
-    static let shareFailedMessage = "共有を開けませんでした。時間をおいて試してください"
-    static let stopFailedMessage = "共有をやめられませんでした。時間をおいて試してください"
-    static let leaveFailedMessage = "共有から抜けられませんでした。時間をおいて試してください"
-
-    func stopSharing(_ id: Wallet.ID) async {
-        await work(failure: Self.stopFailedMessage) {
-            try await cloud.deleteShare(id)
-            try await database.endSharing(id)
+        await observe(
+            database.joinedShareUpdates(),
+            failure: Self.loadFailedMessage
+        ) { joined in
+            self.joined = joined
         }
     }
 
     func turnOn() async {
         isWorking = true
         account = await cloud.account()
-        isWorking = false
 
         guard isAvailable else {
+            isWorking = false
             return
         }
 
@@ -258,10 +265,7 @@ private extension SyncModel {
         }
     }
 
-    func work(
-        failure: String = saveFailedMessage,
-        _ operation: () async throws -> Void
-    ) async {
+    func work(_ operation: () async throws -> Void) async {
         isWorking = true
         errorNotice.clear()
 
@@ -270,7 +274,7 @@ private extension SyncModel {
 
             isOn = try await database.isSyncEnabled()
         } catch {
-            errorNotice.show(failure, for: error)
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
 
         isWorking = false
