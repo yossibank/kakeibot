@@ -245,9 +245,9 @@ private extension AppDatabase {
             return
         }
 
-        let keys = try keysOfWallet(id, in: db) + categoryKeys(ofWallet: id, in: db)
-
         guard isOwner else {
+            let keys = try keysOfWallet(id, in: db) + categoryKeys(ofWallet: id, in: db)
+
             for key in keys {
                 try db.execute(
                     sql: "DELETE FROM sync_change WHERE table_name = ? AND record_id = ?",
@@ -260,11 +260,13 @@ private extension AppDatabase {
             return
         }
 
+        try returnSharedCategories(of: id, in: db)
+
         guard isEnabled else {
             return
         }
 
-        for key in keys {
+        for key in try keysOfWallet(id, in: db) {
             try queue(key, in: db)
         }
     }
