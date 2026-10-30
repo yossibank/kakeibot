@@ -99,55 +99,17 @@ private extension ReviewView {
     }
 
     var periodBar: some View {
-        HStack {
-            periodButton(systemImage: "chevron.left", count: -1)
-
-            Spacer()
-
-            VStack(spacing: 1) {
-                Text(periodTitle)
-                    .displayFont(.body)
-                    .foregroundStyle(Palette.accentStrong)
-                    .contentTransition(periodTextTransition)
-
-                HStack(spacing: 4) {
-                    if let periodSubtitle {
-                        Text(periodSubtitle)
-                            .textFont(size: .caption)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                            .contentTransition(periodTextTransition)
-                    }
-
-                    if !model.isCurrentPeriod {
-                        PeriodCurrentLink(title: currentPeriodTitle) {
-                            moveToCurrentPeriod()
-                        }
-                    }
-                }
-            }
-
-            Spacer()
-
-            periodButton(systemImage: "chevron.right", count: 1)
-                .disabled(!model.canMoveForward)
-        }
-    }
-
-    func periodButton(
-        systemImage: String,
-        count: Int
-    ) -> some View {
-        Button {
-            move(by: count)
-        } label: {
-            Image(systemName: systemImage)
-                .sansFont(.small, weight: .semibold)
-                .foregroundStyle(Palette.subtext)
-                .frame(width: 40, height: 44)
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
+        PeriodStepper(
+            title: periodTitle,
+            subtitle: periodSubtitle,
+            currentTitle: model.isCurrentPeriod ? nil : currentPeriodTitle,
+            transition: periodTextTransition,
+            canMoveForward: model.canMoveForward,
+            onMove: { count in
+                move(by: count)
+            },
+            onCurrent: moveToCurrentPeriod
+        )
     }
 }
 

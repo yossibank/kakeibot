@@ -55,6 +55,8 @@ public struct RecordsView: View {
                     searchContent
                 } else {
                     header
+
+                    monthStepper
                         .monthSwipe(following: $slide, perform: moveMonth)
 
                     HStack(spacing: 8) {
@@ -166,44 +168,25 @@ public struct RecordsView: View {
 
 private extension RecordsView {
     var header: some View {
-        HStack {
-            title
-
-            Spacer()
-
-            monthButton(systemImage: "chevron.left", months: -1)
-
-            VStack(spacing: 1) {
-                Text("\(String(model.month.year))年 \(model.month.month)月")
-                    .displayFont(.body)
-                    .foregroundStyle(Palette.accentStrong)
-                    .contentTransition(monthTextTransition)
-
-                HStack(spacing: 4) {
-                    Text(model.periodText)
-                        .textFont(size: .caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                        .contentTransition(monthTextTransition)
-
-                    if !model.isCurrentMonth {
-                        PeriodCurrentLink(title: "今月") {
-                            moveToCurrentMonth()
-                        }
-                    }
-                }
-            }
-            .fixedSize()
-
-            monthButton(systemImage: "chevron.right", months: 1)
-        }
-    }
-
-    var title: some View {
         Text("記録")
             .displayFont(.body)
             .tracking(3)
             .foregroundStyle(Palette.accent)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    var monthStepper: some View {
+        PeriodStepper(
+            title: "\(String(model.month.year))年 \(model.month.month)月",
+            subtitle: model.periodText,
+            currentTitle: model.isCurrentMonth ? nil : "今月",
+            transition: monthTextTransition,
+            canMoveForward: true,
+            onMove: { months in
+                move(months: months)
+            },
+            onCurrent: moveToCurrentMonth
+        )
     }
 
     @ViewBuilder
@@ -251,22 +234,6 @@ private extension RecordsView {
 
             shownDayCard
         }
-    }
-
-    func monthButton(
-        systemImage: String,
-        months: Int
-    ) -> some View {
-        Button {
-            move(months: months)
-        } label: {
-            Image(systemName: systemImage)
-                .sansFont(.small, weight: .semibold)
-                .foregroundStyle(Palette.subtext)
-                .frame(width: 40, height: 44)
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
     }
 }
 
