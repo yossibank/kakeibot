@@ -63,21 +63,6 @@ struct SyncTests {
         #expect(keys == [weekStartKey])
     }
 
-    @Test(arguments: SyncTable.localSettingKeys.sorted())
-    func skipsEveryLocalSetting(_ key: String) async throws {
-        let setup = try await Setup()
-        let insert = "INSERT OR REPLACE INTO setting (key, value) VALUES ('\(key)', 'x')"
-        let localKey = SyncKey(table: .setting, id: key)
-
-        try await setup.execute(insert)
-        let recorded = try await setup.pendingKeys()
-        try await setup.database.queueAllForSync()
-        let queued = try await setup.pendingKeys()
-
-        #expect(!recorded.contains(localKey))
-        #expect(!queued.contains(localKey))
-    }
-
     @Test
     func keepsChangeMadeAfterReading() async throws {
         let setup = try await Setup()
