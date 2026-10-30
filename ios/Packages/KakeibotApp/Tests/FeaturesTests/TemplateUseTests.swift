@@ -25,6 +25,25 @@ struct TemplateUseTests {
     }
 
     @Test
+    func keepsTypedAmountAndMemoWhenTemplateLacksThem() async throws {
+        let setup = try await Setup()
+        let pass = try await setup.saveTemplate(name: "定期", amount: nil, memo: "")
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        model.press(.digit(4))
+        model.press(.digit(5))
+        model.press(.digit(0))
+        model.memo = "カフェ"
+
+        model.apply(pass)
+
+        #expect(model.amount == 450)
+        #expect(model.memo == "カフェ")
+        #expect(model.categoryId == pass.categoryId)
+        #expect(model.isApplied(pass))
+    }
+
+    @Test
     func dropsArchivedTagWhenApplyingTemplate() async throws {
         let setup = try await Setup()
         let tag = try await setup.saveTag("買い置き")
@@ -350,7 +369,8 @@ extension TemplateUseTests.Setup {
         name: String,
         amount: Int?,
         type: Entry.Kind = .expense,
-        tagId: EntryTag.ID? = nil
+        tagId: EntryTag.ID? = nil,
+        memo: String = "社食"
     ) async throws -> EntryTemplate {
         let options = try await database.entryOptions()
         let categories = type == .income ? options.incomeCategories : options.expenseCategories
@@ -362,7 +382,7 @@ extension TemplateUseTests.Setup {
             categoryId: categories[1].id,
             tagId: tagId,
             walletId: options.wallets[0].id,
-            memo: "社食"
+            memo: memo
         )
 
         return try await database.saveTemplate(draft, at: Date())
