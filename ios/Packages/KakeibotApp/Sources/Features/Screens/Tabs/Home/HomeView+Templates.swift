@@ -21,34 +21,11 @@ extension HomeView {
             }
             .padding(.top, 8)
 
-            HStack(spacing: 8) {
-                Text(templateHint)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
+            if model.templates.isEmpty {
+                AddButton("テンプレートを作る", action: onAddTemplate)
+            } else {
+                templateTools
 
-                Spacer()
-
-                if model.templates.count > 1 {
-                    orderButton
-                        .layoutPriority(1)
-                }
-
-                Button(action: onAddTemplate) {
-                    Image(systemName: "plus")
-                        .sansFont(.small, weight: .light)
-                        .foregroundStyle(Palette.accent)
-                        .frame(width: 32, height: 32)
-                        .overlay {
-                            Circle()
-                                .stroke(Self.toolStroke, lineWidth: 1)
-                        }
-                        .frame(width: 40, height: 40)
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
-
-            if !model.templates.isEmpty {
                 templateShelf
             }
         }
@@ -59,6 +36,35 @@ extension HomeView {
 }
 
 private extension HomeView {
+    var templateTools: some View {
+        HStack(spacing: 8) {
+            Text("押すとすぐ記録")
+                .textFont(.caption2)
+                .foregroundStyle(Palette.subtext)
+
+            Spacer()
+
+            if model.templates.count > 1 {
+                orderButton
+                    .layoutPriority(1)
+            }
+
+            Button(action: onAddTemplate) {
+                Image(systemName: "plus")
+                    .sansFont(.small, weight: .light)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 32, height: 32)
+                    .overlay {
+                        Circle()
+                            .stroke(Self.toolStroke, lineWidth: 1)
+                    }
+                    .frame(width: 40, height: 40)
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
     var orderButton: some View {
         Button {
             onOpenOrderMenu(orderButtonFrame)
@@ -143,10 +149,6 @@ private extension HomeView {
 
     var shelfRowCount: Int {
         model.templates.count > 2 ? 2 : 1
-    }
-
-    var templateHint: String {
-        model.templates.isEmpty ? "よく使う入力を 1 回で" : "押すとすぐ記録"
     }
 }
 
