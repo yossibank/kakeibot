@@ -45,7 +45,7 @@ public struct SyncView: View {
                         .padding(.horizontal, 16)
                         .card()
 
-                        caption(model.footnote)
+                        SettingsCaption(model.footnote)
                     }
 
                     if !model.shares.isEmpty {

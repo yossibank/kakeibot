@@ -181,10 +181,7 @@ private extension RewardRuleEditSheet {
                             open(panel)
                         }
 
-                        Text("達成した日に、この金額を貯金箱に貯めます")
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
-                            .padding(.leading, 8)
+                        SettingsCaption("達成した日に、この金額を貯金箱に貯めます。")
                     }
                 }
                 .padding(.bottom, 8)

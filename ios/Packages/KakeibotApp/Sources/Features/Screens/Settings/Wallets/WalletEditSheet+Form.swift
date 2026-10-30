@@ -177,9 +177,7 @@ extension WalletEditSheet {
                 .buttonStyle(.plain)
             }
 
-            Text(balanceHint)
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
+            SettingsCaption(balanceHint)
                 .contentTransition(.opacity)
                 .animation(.snappy, value: model.kind == .card)
         }
@@ -191,9 +189,7 @@ extension WalletEditSheet {
                 open(panel)
             }
 
-            Text("値動きの分は、収入や支出に入れず、残高だけを合わせます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
+            SettingsCaption("値動きの分は、収入や支出に入れず、残高だけを合わせます。")
 
             if !model.valuations.isEmpty {
                 valuationHistory
@@ -218,9 +214,7 @@ extension WalletEditSheet {
                 }
             }
 
-            Text("横に払うと消せます。消すと、前の評価額から数え直します")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
+            SettingsCaption("横に払うと消せます。\n消すと、前の評価額から数え直します。")
         }
     }
 
