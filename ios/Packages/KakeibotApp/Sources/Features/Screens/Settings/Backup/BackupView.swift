@@ -8,44 +8,40 @@ public struct BackupView: View {
     @State private var isExporting = false
     @State private var isImporting = false
     @State private var isConfirmingRestore = false
+    @State private var pressed: String?
 
     public init(model: BackupModel) {
         _model = State(initialValue: model)
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("バックアップ")
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     BackupIntroCard()
 
                     VStack(alignment: .leading, spacing: 8) {
-                        SectionTitle("残す")
-                            .padding(.leading, 8)
+                        SettingsSectionTitle("残す")
 
                         VStack(spacing: 0) {
-                            Button {
+                            actionButton(
+                                "書き出す",
+                                systemImage: "square.and.arrow.up",
+                                detail: "すべての記録と設定を保存します"
+                            ) {
                                 exportFile(.json)
-                            } label: {
-                                action(
-                                    "書き出す",
-                                    systemImage: "square.and.arrow.up",
-                                    detail: "すべての記録と設定を保存します"
-                                )
                             }
 
                             Hairline()
 
-                            Button {
+                            actionButton(
+                                "表計算用に書き出す",
+                                systemImage: "tablecells",
+                                detail: "CSV で保存します。読み込めません"
+                            ) {
                                 exportFile(.csv)
-                            } label: {
-                                action(
-                                    "表計算用に書き出す",
-                                    systemImage: "tablecells",
-                                    detail: "CSV で保存します。読み込めません"
-                                )
                             }
                         }
                         .padding(.horizontal, 16)
@@ -53,31 +49,26 @@ public struct BackupView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        SectionTitle("戻す")
-                            .padding(.leading, 8)
+                        SettingsSectionTitle("戻す")
 
                         VStack(spacing: 0) {
-                            Button {
+                            actionButton(
+                                "読み込む",
+                                systemImage: "square.and.arrow.down",
+                                detail: "ファイルから戻します"
+                            ) {
                                 importFile()
-                            } label: {
-                                action(
-                                    "読み込む",
-                                    systemImage: "square.and.arrow.down",
-                                    detail: "ファイルから戻します"
-                                )
                             }
 
                             ForEach(model.previous) { item in
                                 Hairline()
 
-                                Button {
+                                actionButton(
+                                    model.previousTitle(of: item),
+                                    systemImage: "arrow.uturn.backward",
+                                    detail: "読み込む前に退避したデータです"
+                                ) {
                                     restorePrevious(item)
-                                } label: {
-                                    action(
-                                        model.previousTitle(of: item),
-                                        systemImage: "arrow.uturn.backward",
-                                        detail: "読み込む前に退避したデータです"
-                                    )
                                 }
                             }
                         }
@@ -86,15 +77,7 @@ public struct BackupView: View {
                         .padding(.horizontal, 16)
                         .card()
 
-                        Text(restoreNote)
-                            .textFont(.caption)
-                            .foregroundStyle(Palette.subtext)
-                            .padding(.leading, 8)
-                    }
-
-                    if model.isWorking {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
+                        SettingsCaption(restoreNote)
                     }
 
                     if let message = model.doneMessage {
@@ -130,6 +113,11 @@ public struct BackupView: View {
             await model.loadPrevious()
         }
         .animation(.snappy, value: model.doneMessage)
+        .onChange(of: model.isWorking) { _, isWorking in
+            if !isWorking {
+                pressed = nil
+            }
+        }
         .fileExporter(
             isPresented: $isExporting,
             document: document,
@@ -162,37 +150,50 @@ public struct BackupView: View {
 }
 
 private extension BackupView {
-    func action(
+    func actionButton(
         _ title: String,
         systemImage: String,
-        detail: String
+        detail: String,
+        action: @escaping () -> Void
     ) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
+        let isWorking = model.isWorking && pressed == title
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
+        return Button {
+            pressed = title
+            action()
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: systemImage)
+                    .sansFont(.body, weight: .light)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 22)
 
-                Text(detail)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.text)
+
+                    Text(detail)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                }
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+                Spacer()
+
+                if isWorking {
+                    ProgressView()
+                        .controlSize(.small)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .sansFont(.small)
+                        .foregroundStyle(Palette.hint)
+                }
             }
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-
-            Spacer()
-
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            .frame(minHeight: 58)
+            .contentShape(.rect)
         }
-        .frame(minHeight: 58)
-        .contentShape(.rect)
     }
 }
 

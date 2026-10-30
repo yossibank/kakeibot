@@ -14,7 +14,7 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
     @ViewBuilder let content: Content
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader(title)
 
             preview
@@ -23,11 +23,8 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
                 .font(model.style.bodyFont)
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    Text(hint)
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-                        .frame(maxWidth: .infinity)
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
+                    SettingsCaption(hint)
 
                     content
                 }

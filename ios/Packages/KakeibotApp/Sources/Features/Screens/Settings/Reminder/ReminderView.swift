@@ -18,11 +18,20 @@ public struct ReminderView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("記録忘れの通知")
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
+                    SettingsIntroCard(
+                        systemImage: "bell",
+                        headline: ("記録のない日だけ", "そっとお知らせします"),
+                        notes: [
+                            .init("checkmark.circle", "記録か「支出なし」の日は届きません"),
+                            .init("repeat", recurringText)
+                        ]
+                    )
+
                     VStack(spacing: 12) {
                         hero
 
@@ -40,7 +49,9 @@ public struct ReminderView: View {
                             .transition(.opacity)
                     }
 
-                    recurringNote
+                    if !model.upcomingNotices.isEmpty {
+                        recurringSection
+                    }
                 }
                 .padding(.vertical, 8)
             }
@@ -125,7 +136,7 @@ private extension ReminderView {
 
     var timeSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionTitle("時刻")
+            SettingsSectionTitle("時刻")
 
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
@@ -207,7 +218,7 @@ private extension ReminderView {
     }
 
     var summaryText: String {
-        model.isOn ? "記録のない日だけ、そっと\nお知らせします" : "記録を忘れても、\nお知らせしません"
+        model.isOn ? "記録のない日に届きます" : "通知は届きません"
     }
 
     var onBinding: Binding<Bool> {

@@ -58,7 +58,7 @@ struct WalletRowCard<Leading: View>: View {
         }
         .padding(.horizontal, 16)
         .frame(height: Self.height)
-        .card(cornerRadius: 20)
+        .card()
     }
 }
 

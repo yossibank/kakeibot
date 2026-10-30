@@ -9,11 +9,16 @@ public struct AppIconListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("アプリアイコン")
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
+                    SettingsIntroCard(
+                        systemImage: "app.badge",
+                        headline: ("ホーム画面のアイコンを", "好きな色にできます")
+                    )
+
                     section("ライト", isLight: true)
 
                     section("ダーク", isLight: false)
@@ -43,8 +48,7 @@ private extension AppIconListView {
         isLight: Bool
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionTitle(title)
-                .padding(.leading, 8)
+            SettingsSectionTitle(title)
 
             LazyVGrid(columns: Self.columns, spacing: 20) {
                 ForEach(choices(isLight: isLight), id: \.self) { choice in

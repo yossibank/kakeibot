@@ -236,7 +236,7 @@ private extension CategoryEditSheet {
     var tags: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack {
-                SectionTitle("タグ")
+                SettingsSectionTitle("タグ")
 
                 Spacer()
 

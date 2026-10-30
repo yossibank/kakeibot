@@ -14,7 +14,7 @@ struct ThemeStyleChoices<Option: Hashable & Sendable, Sample: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ThemeStyleRowTitle(title)
+            SettingsSectionTitle(title)
 
             LazyVGrid(columns: gridColumns, spacing: 12) {
                 ForEach(options, id: \.self) { option in
@@ -68,19 +68,6 @@ private extension ThemeStyleChoices {
             repeating: GridItem(.flexible(), spacing: 12),
             count: count
         )
-    }
-}
-
-struct ThemeStyleRowTitle: View {
-    let title: String
-
-    init(_ title: String) {
-        self.title = title
-    }
-
-    var body: some View {
-        SectionTitle(title)
-            .padding(.leading, 8)
     }
 }
 

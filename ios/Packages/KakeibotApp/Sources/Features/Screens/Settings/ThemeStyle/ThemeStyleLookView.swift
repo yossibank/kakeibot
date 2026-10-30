@@ -83,7 +83,7 @@ public struct ThemeStyleLookView: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                ThemeStyleRowTitle("振動と飾り")
+                SettingsSectionTitle("振動と飾り")
 
                 ThemeStyleSwitch(
                     title: "押した時の振動",
