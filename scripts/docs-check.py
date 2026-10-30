@@ -164,11 +164,16 @@ def check_test_plan():
     plan_path = os.path.join(ROOT, "ios", "Kakeibot.xctestplan")
     plan = json.load(open(plan_path, encoding="utf-8"))
     planned = {entry["target"]["name"] for entry in plan["testTargets"]}
-    for package in ("KakeibotKit", "KakeibotApp"):
-        manifest = os.path.join(ROOT, "ios", "Packages", package, "Package.swift")
-        for name in TEST_TARGET.findall(open(manifest, encoding="utf-8").read()):
-            if name not in planned:
-                error(plan_path, 1, f"テストプランに無いテストのターゲット: {name}")
+    packages = os.path.join(ROOT, "ios", "Packages")
+    declared = set()
+    for package in sorted(os.listdir(packages)):
+        manifest = os.path.join(packages, package, "Package.swift")
+        if os.path.exists(manifest):
+            declared |= set(TEST_TARGET.findall(open(manifest, encoding="utf-8").read()))
+    for name in sorted(declared - planned):
+        error(plan_path, 1, f"テストプランに無いテストのターゲット: {name}")
+    for name in sorted(planned - declared):
+        error(plan_path, 1, f"Package.swift に無いテストのターゲット: {name}")
 
 
 def main():
