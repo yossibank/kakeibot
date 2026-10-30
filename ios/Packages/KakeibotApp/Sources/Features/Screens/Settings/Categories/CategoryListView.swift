@@ -96,11 +96,15 @@ public struct CategoryListView: View {
                     zones: $drag.zones,
                     isArmed: drag.isOverHide
                 )
-                .padding(.bottom, 8)
+            } else {
+                AddButton(addTitle) {
+                    destination = .new(model.kind)
+                }
             }
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
+        .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .settingsLiftLayer(
             drag,
@@ -154,12 +158,6 @@ private extension CategoryListView {
             ForEach(model.shown) { category in
                 movableTile(category)
             }
-
-            AddTile {
-                destination = .new(model.kind)
-            }
-            .frame(width: grid.itemWidth, height: Self.tileHeight)
-            .position(grid.center(at: model.shown.count))
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
@@ -288,8 +286,12 @@ private extension CategoryListView {
         count: columnCount
     )
 
+    var addTitle: String {
+        model.kind == .income ? "収入のカテゴリを追加" : "支出のカテゴリを追加"
+    }
+
     var boardHeight: CGFloat {
-        grid.height(slots: model.shown.count + 1)
+        grid.height(slots: model.shown.count)
     }
 
     func editModel(for destination: Destination) -> CategoryEditModel {

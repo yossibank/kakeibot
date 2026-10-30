@@ -87,11 +87,15 @@ public struct RewardRuleListView: View {
                     zones: $drag.zones,
                     isArmed: drag.isOverHide
                 )
-                .padding(.bottom, 8)
+            } else {
+                AddButton("ごほうびの決まりを追加") {
+                    destination = .new
+                }
             }
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
+        .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .settingsLiftLayer(
             drag,
@@ -144,12 +148,6 @@ private extension RewardRuleListView {
             ForEach(model.shown) { rule in
                 movableTile(rule)
             }
-
-            AddTile {
-                destination = .new
-            }
-            .frame(width: grid.itemWidth, height: Self.tileHeight)
-            .position(grid.center(at: model.shown.count))
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .frame(height: boardHeight)
@@ -276,7 +274,7 @@ private extension RewardRuleListView {
     )
 
     var boardHeight: CGFloat {
-        grid.height(slots: model.shown.count + 1)
+        grid.height(slots: model.shown.count)
     }
 
     func follow(
