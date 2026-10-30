@@ -88,6 +88,7 @@ public struct ThemeStyleLookView: View {
                 ThemeStyleSwitch(
                     title: "押した時の振動",
                     detail: "選んだ時や記録した時に、軽く振動します",
+                    systemImage: "waveform",
                     isOn: model.style.haptics
                 ) { isOn in
                     await model.choose(haptics: isOn)
@@ -96,11 +97,13 @@ public struct ThemeStyleLookView: View {
                 ThemeStyleSwitch(
                     title: "金の光などの飾り",
                     detail: "ボタンの光とタブの金の輪を出します",
+                    systemImage: "sparkle",
                     isOn: model.style.decorations
                 ) { isOn in
                     await model.choose(decorations: isOn)
                 }
             }
+            .environment(\.themeStyle.decorations, model.style.decorations)
         }
     }
 }

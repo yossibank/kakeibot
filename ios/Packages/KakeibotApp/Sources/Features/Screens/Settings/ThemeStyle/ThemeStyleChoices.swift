@@ -76,11 +76,12 @@ struct ThemeStyleSwitch: View {
 
     let title: String
     let detail: String
+    let systemImage: String
     let isOn: Bool
     let change: (Bool) async -> Void
 
     var body: some View {
-        Toggle(isOn: binding) {
+        GoldSwitch(isOn: binding, systemImage: systemImage) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .textFont(.subheadline)
@@ -91,9 +92,6 @@ struct ThemeStyleSwitch: View {
                     .foregroundStyle(Palette.subtext)
             }
         }
-        .tint(Palette.accent)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
         .background(Palette.panel, in: .rect(cornerRadius: corner.radius(16)))
     }
 }
