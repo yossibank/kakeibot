@@ -111,8 +111,7 @@ private extension ThemeEditSheet {
 
     func colorRow(_ slot: ThemeEditModel.Slot) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            SectionTitle(slot.title)
-                .padding(.leading, 8)
+            SettingsSectionTitle(slot.title)
 
             LazyVGrid(columns: Self.swatchColumns, spacing: 8) {
                 ForEach(slot.swatches, id: \.self) { hex in

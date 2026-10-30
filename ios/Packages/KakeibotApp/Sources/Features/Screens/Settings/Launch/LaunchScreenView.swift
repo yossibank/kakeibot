@@ -10,18 +10,18 @@ public struct LaunchScreenView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("起動時に開く画面")
-
-            Text("アプリを開いたときに、最初に出す画面を選べます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .multilineTextAlignment(.center)
 
             ScrollView {
                 VStack(spacing: 12) {
+                    SettingsIntroCard(
+                        systemImage: "iphone",
+                        headline: ("アプリを開いたときに", "最初に出す画面を選べます")
+                    )
+
                     LaunchScreenPreview(selection: model.screen)
-                        .padding(.vertical, 12)
+                        .padding(.vertical, 16)
 
                     ForEach(LaunchScreen.allCases, id: \.self) { screen in
                         SettingsOption(

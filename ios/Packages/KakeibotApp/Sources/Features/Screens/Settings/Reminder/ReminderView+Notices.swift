@@ -3,9 +3,15 @@ import DesignSystem
 import SwiftUI
 
 extension ReminderView {
+    var recurringText: String {
+        let time = model.time ?? .morning
+
+        return "固定費の通知は \(time) に届きます"
+    }
+
     var previewSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionTitle("届く通知")
+            SettingsSectionTitle("届く通知")
 
             HStack(spacing: 4) {
                 dayStepButton("chevron.left", by: -1)
@@ -20,43 +26,20 @@ extension ReminderView {
             notificationCard
                 .padding(12)
                 .background(wallpaper, in: cardShape)
-
-            Text("記録か「支出なし」の印がある日は届きません")
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-                .padding(.leading, 8)
         }
     }
 
-    var recurringNote: some View {
+    var recurringSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionTitle("固定費の通知")
+            SettingsSectionTitle("固定費の通知")
 
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "repeat")
-                    .sansFont(.small)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 28, height: 28)
-                    .background(Palette.accent.opacity(.subtle), in: Circle())
-
-                Text(recurringText)
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(16)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .card(cornerRadius: 20)
-
-            if !model.upcomingNotices.isEmpty {
-                VStack(spacing: 0) {
-                    ForEach(model.upcomingNotices, id: \.self) { notice in
-                        noticeRow(notice)
-                    }
+            VStack(spacing: 0) {
+                ForEach(model.upcomingNotices, id: \.self) { notice in
+                    noticeRow(notice)
                 }
-                .padding(.horizontal, 16)
-                .card(cornerRadius: 20)
             }
+            .padding(.horizontal, 16)
+            .card()
         }
     }
 }
@@ -192,13 +175,6 @@ private extension ReminderView {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-    }
-
-    var recurringText: String {
-        let time = model.time ?? .morning
-        let head = "固定費ごとに「前に知らせる」を決めると届きます。"
-
-        return head + "時刻は \(time) です"
     }
 
     func showPreview(by step: Int) {

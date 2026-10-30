@@ -38,19 +38,24 @@ public struct TemplateListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("テンプレート", hint: hintFlag)
+
+            SettingsIntroCard(
+                systemImage: "rectangle.stack",
+                headline: ("よく使う入力を", "1 回で記録できます"),
+                notes: notes,
+                flag: hintFlag
+            )
 
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
 
-            SettingsHint(flag: hintFlag, lines: hint)
-
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     if model.shown.isEmpty {
                         SettingsEmptyNote(
                             systemImage: "rectangle.stack",
-                            text: "よく使う入力を足すと、1 回で記録できます"
+                            text: "テンプレートを足すと、ここに並びます"
                         )
                     }
 
@@ -279,12 +284,9 @@ private extension TemplateListView {
         "\(typeName)のテンプレートを追加"
     }
 
-    var hint: [SettingsHint.Line] {
+    var notes: [SettingsIntroCard.Note] {
         if model.shown.isEmpty {
-            [
-                .init("tray.and.arrow.down", "よく使う入力を残しておけます"),
-                .init("bolt", "ホームと入力シートからすぐ入れられます")
-            ]
+            []
         } else {
             [
                 .init("list.number", "この順でホームと入力シートに出ます"),

@@ -40,18 +40,25 @@ public struct CategoryListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("カテゴリ", hint: hintFlag)
+
+            SettingsIntroCard(
+                systemImage: "tag",
+                headline: ("支出と収入を", "分けて振り返れます"),
+                notes: [
+                    .init("arrow.left.arrow.right", "下で支出と収入を切り替えます"),
+                    .init("number", "開くと、タグで細かく分けられます"),
+                    .move,
+                    .hide
+                ],
+                flag: hintFlag
+            )
 
             CapsulePicker(selection: $model.kind, options: Self.kindOptions)
 
-            SettingsHint(
-                flag: hintFlag,
-                lines: [.move, .hide]
-            )
-
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     if model.shown.isEmpty {
                         SettingsEmptyNote(
                             systemImage: "tag",

@@ -27,13 +27,18 @@ public struct RecurringListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("固定費", hint: hintFlag)
 
-            SettingsHint(flag: hintFlag, lines: hint)
+            SettingsIntroCard(
+                systemImage: "repeat",
+                headline: ("決まった日の記録を", "ひとりでに入れます"),
+                notes: notes,
+                flag: hintFlag
+            )
 
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: SettingsSpacing.section) {
                     if !model.rows.isEmpty {
                         totalCard
                     }
@@ -282,23 +287,26 @@ private extension RecurringListView {
     nonisolated static let space = "RecurringList"
 
     static let rowHeight = RecurringRowCard.height
-    static let purpose = SettingsHint.Line("calendar.badge.clock", "決まった日に、記録をひとりでに入れます")
 
     var places: [String?] {
         (model.rows + model.hiddenRows).map(\.place)
     }
 
-    var hint: [SettingsHint.Line] {
+    var notes: [SettingsIntroCard.Note] {
+        let purpose: [SettingsIntroCard.Note] = [
+            .init("calendar", "休日なら、前後の平日にずらせます"),
+            .init("bell", "前もって通知で知らせられます")
+        ]
+
         if model.rows.isEmpty {
-            [Self.purpose]
-        } else {
-            [
-                Self.purpose,
-                .move,
-                .init("pause.circle", "長押しして下の枠へ運ぶと、止めて非表示にできます"),
-                .swipeDelete
-            ]
+            return purpose
         }
+
+        return purpose + [
+            .move,
+            .init("pause.circle", "下の枠へ運ぶと、止めて非表示にします"),
+            .swipeDelete
+        ]
     }
 
     func boardHeight(count: Int) -> CGFloat {
