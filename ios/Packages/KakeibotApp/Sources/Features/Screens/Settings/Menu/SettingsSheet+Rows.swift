@@ -65,9 +65,10 @@ extension SettingsSheet {
         _ title: String,
         systemImage: String,
         value: String? = nil,
-        shortValue: String? = nil
+        shortValue: String? = nil,
+        tint: Color? = nil
     ) -> some View {
-        row(title, systemImage: systemImage) {
+        row(title, systemImage: systemImage, tint: tint) {
             if let value {
                 SettingsRowValue(value: value, shortValue: shortValue)
             }
@@ -77,17 +78,18 @@ extension SettingsSheet {
     func row(
         _ title: String,
         systemImage: String,
+        tint: Color? = nil,
         @ViewBuilder accessory: () -> some View
     ) -> some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage)
                 .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
+                .foregroundStyle(tint ?? Palette.accent)
                 .frame(width: 22)
 
             Text(title)
                 .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
+                .foregroundStyle(tint ?? Palette.text)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .layoutPriority(1)

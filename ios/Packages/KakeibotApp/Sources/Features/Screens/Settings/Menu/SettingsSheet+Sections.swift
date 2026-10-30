@@ -203,6 +203,16 @@ extension SettingsSheet {
             } label: {
                 row("バックアップ", systemImage: "externaldrive")
             }
+
+            Hairline()
+
+            Button {
+                Task {
+                    isConfirmingReset = await recordReset.prepare()
+                }
+            } label: {
+                row("記録をすべて削除", systemImage: "trash", tint: Palette.rose)
+            }
         }
     }
 }
