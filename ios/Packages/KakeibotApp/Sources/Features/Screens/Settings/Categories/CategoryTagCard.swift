@@ -98,7 +98,7 @@ private extension CategoryTagCard {
     }
 
     var commitTitle: String {
-        SettingsSaveTitle.text(problem: nil, isEditing: !isAdding)
+        isAdding ? "追加する" : "変更する"
     }
 
     var previewName: String {

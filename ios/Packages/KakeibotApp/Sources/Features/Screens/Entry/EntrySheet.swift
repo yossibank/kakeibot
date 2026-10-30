@@ -13,6 +13,7 @@ public struct EntrySheet: View {
     @State var sheetWidth: CGFloat = 0
     @State var drawerHeight: CGFloat = 0
     @State var deletion: Deletion?
+    @State var hiddenCategory: EntryModel.HiddenCategory?
 
     @Environment(\.themeStyle.corner) var corner
 
@@ -75,6 +76,12 @@ public struct EntrySheet: View {
             .deletionNotice($deletion, bottom: bannerBottom) { deletion in
                 Task {
                     await model.restore(deletion)
+                }
+            }
+            .settingsHideNotice($hiddenCategory, bottom: bannerBottom) { hidden in
+                Task {
+                    await model.showCategory(hidden)
+                    showSelectedCategory()
                 }
             }
             .entryNotice(notice, above: bannerBottom - 12)

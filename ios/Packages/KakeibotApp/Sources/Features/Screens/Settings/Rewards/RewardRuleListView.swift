@@ -11,6 +11,7 @@ public struct RewardRuleListView: View {
     @State private var destination: Destination?
     @State private var hiddenId: RewardRule.ID?
     @State private var deletion: Deletion?
+    @State private var bulkDelete: SettingsBulkDelete?
     @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
 
@@ -78,7 +79,7 @@ public struct RewardRuleListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
-            .deletionNotice($deletion) { deletion in
+            .deletionNotice($deletion, note: bulkDelete?.note(for: deletion)) { deletion in
                 restore(deletion)
             }
 
@@ -337,7 +338,10 @@ private extension RewardRuleListView {
 
     func deleteHidden() {
         Task {
-            deletion = await model.deleteHidden()
+            let result = await model.deleteHidden()
+
+            bulkDelete = result
+            deletion = result.deletion
         }
     }
 

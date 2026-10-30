@@ -11,6 +11,7 @@ public final class CategoryEditModel {
 
     public private(set) var tags: [EditingTag] = []
     public private(set) var isHidden = false
+    public private(set) var hasEntries = false
     public private(set) var tagProblem: String?
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -19,7 +20,6 @@ public final class CategoryEditModel {
     public let icon = IconEditModel(glyph: .food)
 
     private var baseline: Snapshot?
-    private var tagWrite: Task<Void, Never>?
 
     private let database: AppDatabase
     private let editingId: EntryCategory.ID?
@@ -142,6 +142,7 @@ public extension CategoryEditModel {
 
         do {
             let list = try await database.categoryList()
+            let entries = try await database.entryList().days.flatMap(\.entries)
             let category = list.categories.first { $0.id == editingId }
 
             guard
@@ -158,23 +159,11 @@ public extension CategoryEditModel {
 
             tags = list.tags.filter { $0.categoryId == editingId }.map(EditingTag.init)
             isHidden = category.archivedAt != nil
+            hasEntries = entries.contains { $0.categoryId == editingId }
             baseline = snapshot
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
-    }
-
-    func storeTags() async {
-        let previous = tagWrite
-
-        let write = Task {
-            await previous?.value
-            await writeTags()
-        }
-
-        tagWrite = write
-
-        await write.value
     }
 
     func save() async -> EntryCategory? {
@@ -267,40 +256,6 @@ private extension CategoryEditModel {
         case nil:
             tagProblem = nil
             return true
-        }
-    }
-
-    func writeTags() async {
-        guard let editingId else {
-            return
-        }
-
-        let sent = tags
-
-        do {
-            let saved = try await database.saveTags(
-                sent.map(\.draft),
-                for: editingId,
-                at: Date()
-            )
-
-            let drafts = zip(sent, saved).map { editing, tag in
-                var draft = editing.draft
-
-                draft.id = tag.id
-
-                return draft
-            }
-
-            for (editing, draft) in zip(sent, drafts) {
-                if let index = tags.firstIndex(where: { $0.id == editing.id }) {
-                    tags[index].draft.id = draft.id
-                }
-            }
-
-            baseline = baseline.map { Snapshot(draft: $0.draft, tags: drafts) }
-        } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 

@@ -18,6 +18,11 @@ public extension EntryModel {
         }
     }
 
+    struct HiddenCategory: Hashable, Sendable {
+        public let id: EntryCategory.ID
+        public let wasSelected: Bool
+    }
+
     static let categoriesPerPage = 15
 
     var categories: [EntryCategory] {
@@ -60,13 +65,14 @@ public extension EntryModel {
 
     func isApplied(_ template: EntryTemplate) -> Bool {
         let amountMatches = template.amount.map { $0 == amount } ?? true
+        let memoMatches = template.filledMemo.map { $0 == memo } ?? true
 
         return template.id == appliedTemplateId
             && template.type == type
             && template.categoryId == categoryId
             && recordableTagId(of: template) == tagId
             && template.walletId == walletId
-            && (template.memo ?? "") == memo
+            && memoMatches
             && amountMatches
     }
 
@@ -80,9 +86,15 @@ public extension EntryModel {
         categoryId = template.categoryId
         tagId = recordableTagId(of: template)
         walletId = template.walletId
-        memo = template.memo ?? ""
-        calculator = AmountCalculator(amount: template.amount ?? 0)
         appliedTemplateId = template.id
+
+        if let memo = template.filledMemo {
+            self.memo = memo
+        }
+
+        if let amount = template.amount {
+            calculator = AmountCalculator(amount: amount)
+        }
     }
 
     func toggleTag(_ id: EntryTag.ID) {
@@ -151,7 +163,12 @@ public extension EntryModel {
         }
     }
 
-    func hideCategory(_ category: EntryCategory) async {
+    func hideCategory(_ category: EntryCategory) async -> HiddenCategory? {
+        let hidden = HiddenCategory(
+            id: category.id,
+            wasSelected: category.id == categoryId
+        )
+
         do {
             try await database.setCategoryHidden(
                 category.id,
@@ -160,8 +177,25 @@ public extension EntryModel {
             )
 
             await reloadCategories()
+
+            return hidden
         } catch {
             report(error)
+            return nil
+        }
+    }
+
+    func showCategory(_ hidden: HiddenCategory) async {
+        do {
+            try await database.setCategoryHidden(
+                hidden.id,
+                isHidden: false,
+                at: Date()
+            )
+
+            await reloadCategories(selecting: hidden.wasSelected ? hidden.id : nil)
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage, for: error)
         }
     }
 }
@@ -238,5 +272,11 @@ private extension EntryModel {
         case .expense: options?.expenseCategories ?? []
         case .income: options?.incomeCategories ?? []
         }
+    }
+}
+
+private extension EntryTemplate {
+    var filledMemo: String? {
+        memo.flatMap { $0.isEmpty ? nil : $0 }
     }
 }

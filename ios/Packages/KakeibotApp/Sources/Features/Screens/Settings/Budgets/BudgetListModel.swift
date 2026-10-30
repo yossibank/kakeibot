@@ -46,6 +46,19 @@ public extension BudgetListModel {
             case let .category(category): category.id
             }
         }
+
+        public var title: String {
+            switch self {
+            case let .category(category): "\(category.name)の予算"
+            case .total: "月全体の予算"
+            }
+        }
+    }
+
+    struct Cleared: Hashable {
+        public let target: Target
+        public let amount: Int
+        public let month: YearMonth
     }
 
     var recurringExpense: Int {
@@ -76,10 +89,7 @@ public extension BudgetListModel {
     }
 
     var editingTitle: String {
-        switch editing {
-        case let .category(category): "\(category.name)の予算"
-        case .total, nil: "月全体の予算"
-        }
+        (editing ?? .total).title
     }
 
     var canSave: Bool {
@@ -180,18 +190,49 @@ public extension BudgetListModel {
         await setBudget(calculator.amount)
     }
 
-    func clear() async {
-        await setBudget(nil)
+    func clear() async -> Cleared? {
+        guard
+            let editing,
+            let amount = editingAmount
+        else {
+            return nil
+        }
+
+        guard await setBudget(nil) else {
+            return nil
+        }
+
+        return Cleared(
+            target: editing,
+            amount: amount,
+            month: month
+        )
+    }
+
+    func restore(_ cleared: Cleared) async {
+        do {
+            try await database.setBudget(
+                cleared.amount,
+                for: cleared.target.categoryId,
+                from: cleared.month
+            )
+
+            budgets = try await database.budgets()
+        } catch {
+            errorNotice.show(Self.restoreFailedMessage, for: error)
+        }
     }
 }
 
 private extension BudgetListModel {
     static let loadFailedMessage = "予算を読めませんでした"
     static let saveFailedMessage = "予算を保存できませんでした"
+    static let restoreFailedMessage = "元に戻せませんでした"
 
-    func setBudget(_ amount: Int?) async {
+    @discardableResult
+    func setBudget(_ amount: Int?) async -> Bool {
         guard let editing else {
-            return
+            return false
         }
 
         do {
@@ -203,8 +244,11 @@ private extension BudgetListModel {
 
             budgets = try await database.budgets()
             self.editing = nil
+
+            return true
         } catch {
             errorNotice.show(Self.saveFailedMessage, for: error)
+            return false
         }
     }
 }

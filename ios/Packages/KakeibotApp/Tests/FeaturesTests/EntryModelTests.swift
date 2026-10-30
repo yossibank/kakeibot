@@ -221,14 +221,33 @@ struct EntryModelTests {
     }
 
     @Test
-    func hidesSelectedCategoryAndSelectsNext() async throws {
+    func hidesSelectedCategoryAndSelectsItAgainOnUndo() async throws {
         let model = try await Self.newModel()
         let food = try #require(model.selectedCategory)
 
-        await model.hideCategory(food)
+        let hidden = try #require(await model.hideCategory(food))
+        let next = model.selectedCategory?.name
 
-        #expect(!model.categories.contains(food))
-        #expect(model.selectedCategory?.name == "日用品")
+        await model.showCategory(hidden)
+
+        #expect(hidden.wasSelected)
+        #expect(next == "日用品")
+        #expect(model.categories.contains { $0.id == food.id })
+        #expect(model.selectedCategory?.id == food.id)
+    }
+
+    @Test
+    func keepsSelectionWhenUndoingHiddenOtherCategory() async throws {
+        let model = try await Self.newModel()
+        let food = try #require(model.selectedCategory)
+        let other = try #require(model.categories.last)
+
+        let hidden = try #require(await model.hideCategory(other))
+        await model.showCategory(hidden)
+
+        #expect(!hidden.wasSelected)
+        #expect(model.categories.contains { $0.id == other.id })
+        #expect(model.selectedCategory?.id == food.id)
     }
 
     @Test

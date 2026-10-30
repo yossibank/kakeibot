@@ -34,9 +34,9 @@ struct SettingsBoardModelTests {
     func deletesNothingWhenNoneAreHidden() async {
         let board = FakeBoard(visible: ["a"])
 
-        let deletion = await board.deleteHidden()
+        let result = await board.deleteHidden()
 
-        #expect(deletion == nil)
+        #expect(result.deletion == nil)
         #expect(board.removed.isEmpty)
         #expect(board.errorNotice.message == nil)
     }
@@ -46,9 +46,10 @@ struct SettingsBoardModelTests {
         let board = FakeBoard(visible: ["a"], hidden: ["x", "y"])
         board.move("a", to: 0)
 
-        let deletion = await board.deleteHidden()
+        let result = await board.deleteHidden()
 
-        #expect(deletion != nil)
+        #expect(result.deletion != nil)
+        #expect(result.note(for: result.deletion) == nil)
         #expect(board.removed == ["x", "y"])
         #expect(board.reloadCount == 1)
         #expect(board.movingOrder == nil)
@@ -56,24 +57,39 @@ struct SettingsBoardModelTests {
     }
 
     @Test
-    func keepsHiddenItemsInUse() async {
+    func notesHiddenItemsInUseWithTheDeletion() async {
         let board = FakeBoard(visible: ["a"], hidden: ["x", "y"], inUse: ["y"])
 
-        let deletion = await board.deleteHidden()
+        let result = await board.deleteHidden()
+        let other = Deletion(merging: [])
 
-        #expect(deletion != nil)
+        #expect(result.deletion != nil)
         #expect(board.removed == ["x"])
-        #expect(board.errorNotice.message == "記録がある 1 件は残しました")
+        #expect(result.note(for: result.deletion) == "記録がある 1 件は残しました")
+        #expect(result.note(for: other) == nil)
+        #expect(board.errorNotice.message == nil)
+    }
+
+    @Test
+    func informsWhenEveryHiddenItemIsInUse() async {
+        let board = FakeBoard(visible: ["a"], hidden: ["x", "y"], inUse: ["x", "y"])
+
+        let result = await board.deleteHidden()
+
+        #expect(result.deletion == nil)
+        #expect(board.errorNotice.message == "記録があるので削除しませんでした")
+        #expect(board.errorNotice.tone == .info)
     }
 
     @Test
     func tellsWhenSomeHiddenItemsCannotBeDeleted() async {
         let board = FakeBoard(visible: ["a"], hidden: ["x", "y"], failing: ["x", "y"])
 
-        let deletion = await board.deleteHidden()
+        let result = await board.deleteHidden()
 
-        #expect(deletion == nil)
+        #expect(result.deletion == nil)
         #expect(board.errorNotice.message == "削除できないものがありました")
+        #expect(board.errorNotice.tone == .error)
     }
 }
 
