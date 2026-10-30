@@ -56,6 +56,10 @@ public extension OnboardingModel {
         route?.pages ?? [.welcome]
     }
 
+    var stepPages: [Page] {
+        pages.filter { $0 != .welcome }
+    }
+
     var isFirstPage: Bool {
         page == .welcome
     }

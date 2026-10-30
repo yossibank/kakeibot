@@ -106,8 +106,8 @@ private extension OnboardingView {
 
             if !model.isFirstPage {
                 PageDots(
-                    count: model.pages.count,
-                    current: model.pages.firstIndex(of: model.page) ?? 0
+                    count: model.stepPages.count,
+                    current: model.stepPages.firstIndex(of: model.page) ?? 0
                 )
             }
 
@@ -117,13 +117,15 @@ private extension OnboardingView {
                 Color.clear
                     .frame(width: 44, height: 44)
             } else {
-                Button("あとで決める") {
+                Button("設定を飛ばして始める") {
                     Task {
                         await finish()
                     }
                 }
                 .textFont(.footnote)
                 .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .frame(minWidth: 44, minHeight: 44)
             }
         }
@@ -184,7 +186,7 @@ private extension OnboardingView {
             }
             .card()
 
-            PrimaryButton("予算を決めて始める（1 分）") {
+            PrimaryButton("予算を決めて始める", detail: "1 分") {
                 model.choose(.minimal)
                 turnPage(.forward)
             }

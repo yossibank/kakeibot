@@ -50,6 +50,7 @@ struct OnboardingModelTests {
         model.next()
 
         #expect(model.page == .budget)
+        #expect(model.stepPages == [.monthStart, .budget])
         #expect(model.isLastPage)
         #expect(!model.canTurn(forward: true))
     }
