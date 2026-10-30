@@ -12,7 +12,7 @@ public struct ThemeStyleLookView: View {
     public var body: some View {
         ThemeStyleScreen(
             title: "形と動き",
-            hint: "角の丸みや行の間隔、スタンプの形、背景を選べます",
+            hint: "角の丸みや行の間隔、スタンプの形、背景を選べます。",
             model: model
         ) {
             preview

@@ -12,7 +12,7 @@ public struct ThemeStyleTextView: View {
     public var body: some View {
         ThemeStyleScreen(
             title: "文字",
-            hint: "文字の大きさと字体を選べます",
+            hint: "文字の大きさと字体を選べます。",
             model: model
         ) {
             preview

@@ -186,10 +186,7 @@ private extension TemplateEditSheet {
                             open(panel)
                         }
 
-                        Text("金額を空にすると、使うときに入れられます")
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
-                            .padding(.leading, 8)
+                        SettingsCaption("金額を空にすると、使うときに入れられます。")
                     }
 
                     if !model.isEditing {

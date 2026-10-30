@@ -77,7 +77,7 @@ public struct BackupView: View {
                         .padding(.horizontal, 16)
                         .card()
 
-                        SettingsCaption(restoreNote)
+                        SettingsCaption(restoreNote, kind: model.isSyncActive ? .info : .caution)
                     }
 
                     if let message = model.doneMessage {
@@ -203,7 +203,7 @@ private extension BackupView {
     }
 
     var restoreNote: String {
-        model.isSyncActive ? "同期と共有をやめると、読み込めます" : "読み込むと、いまのデータと置き換わります"
+        model.isSyncActive ? "同期と共有をやめると、読み込めます。" : "読み込むと、いまのデータと置き換わります。"
     }
 
     var document: BackupDocument? {

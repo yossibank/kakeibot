@@ -65,10 +65,10 @@ struct SyncModelTests {
 
     @Test(
         arguments: [
-            (SyncAccount.noAccount, "設定アプリで iCloud にサインインすると使えます"),
-            (.restricted, "この iPhone では、制限で iCloud を使えません"),
-            (.temporarilyUnavailable, "設定アプリで iCloud にサインインし直すと使えます"),
-            (.couldNotDetermine, "iCloud の状態を確かめられませんでした。時間をおいて開き直してください")
+            (SyncAccount.noAccount, "設定アプリで iCloud にサインインすると使えます。"),
+            (.restricted, "この iPhone では、制限で iCloud を使えません。"),
+            (.temporarilyUnavailable, "設定アプリで iCloud にサインインし直すと使えます。"),
+            (.couldNotDetermine, "iCloud の状態を確かめられませんでした。\n時間をおいて開き直してください。")
         ]
     )
     func explainsWhyICloudCannotBeUsed(
@@ -95,7 +95,7 @@ struct SyncModelTests {
         await model.refreshAccount()
 
         #expect(model.isAvailable)
-        #expect(model.footnote == "オンにすると、ほかの端末と記録がそろいます")
+        #expect(model.footnote == "オンにすると、ほかの端末と記録がそろいます。")
     }
 
     @Test

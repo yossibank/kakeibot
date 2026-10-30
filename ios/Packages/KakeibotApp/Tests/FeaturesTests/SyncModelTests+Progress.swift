@@ -83,7 +83,7 @@ extension SyncModelTests {
         task.cancel()
 
         #expect(model.progress == nil)
-        #expect(model.footnote == "オンにすると、ほかの端末と記録がそろいます")
+        #expect(model.footnote == "オンにすると、ほかの端末と記録がそろいます。")
     }
 
     @Test
