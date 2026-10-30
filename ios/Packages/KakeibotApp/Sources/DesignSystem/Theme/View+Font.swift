@@ -40,7 +40,15 @@ private struct DisplayFont: ViewModifier {
     let weight: Font.Weight
 
     func body(content: Content) -> some View {
-        content.font(.display(size, weight: weight, in: font, scale: textSize * shared))
+        content.font(
+            .display(
+                size,
+                weight: weight,
+                in: font,
+                scale: textSize,
+                shared: shared
+            )
+        )
     }
 }
 
@@ -52,7 +60,7 @@ private struct SansFont: ViewModifier {
     let weight: Font.Weight
 
     func body(content: Content) -> some View {
-        content.font(.sans(size, weight: weight, scale: textSize * shared))
+        content.font(.sans(size, weight: weight, scale: textSize, shared: shared))
     }
 }
 
@@ -64,7 +72,7 @@ private struct TextFont: ViewModifier {
     let spec: Spec
 
     func body(content: Content) -> some View {
-        content.font(spec.font(in: font, scale: textSize * shared))
+        content.font(spec.font(in: font, scale: textSize, shared: shared))
     }
 }
 
@@ -78,13 +86,26 @@ private extension TextFont {
 private extension TextFont.Spec {
     func font(
         in font: ThemeFont,
-        scale: Double
+        scale: Double,
+        shared: Double
     ) -> Font {
         switch self {
         case let .style(style, weight):
-            .text(style, weight: weight, in: font, scale: scale)
+            .text(
+                style,
+                weight: weight,
+                in: font,
+                scale: scale,
+                shared: shared
+            )
         case let .size(size, weight):
-            .text(size: size, weight: weight, in: font, scale: scale)
+            .text(
+                size: size,
+                weight: weight,
+                in: font,
+                scale: scale,
+                shared: shared
+            )
         }
     }
 }

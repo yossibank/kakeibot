@@ -12,14 +12,20 @@ public enum FontSize: CGFloat, Sendable {
     case display = 40
 }
 
+public extension FontSize {
+    static let minimumPoints: CGFloat = 10
+}
+
 public extension Font {
     static func display(
         _ size: FontSize,
         weight: Weight = .regular,
         in font: ThemeFont,
-        scale: Double
+        scale: Double,
+        shared: Double = 1
     ) -> Font {
-        display(size: size.rawValue * scale, weight: weight, in: font)
+        let points = points(size.rawValue, scale: scale, shared: shared)
+        return display(size: points, weight: weight, in: font)
     }
 
     static func display(
@@ -40,9 +46,10 @@ public extension Font {
         _ style: TextStyle,
         weight: Weight? = nil,
         in font: ThemeFont,
-        scale: Double
+        scale: Double,
+        shared: Double = 1
     ) -> Font {
-        let size = style.baseSize * scale
+        let size = points(style.baseSize, scale: scale, shared: shared)
         let design: Design = font == .mincho ? .serif : .default
 
         let base: Font = font.customName.map { name in
@@ -60,17 +67,34 @@ public extension Font {
         size: FontSize,
         weight: Weight = .regular,
         in font: ThemeFont,
-        scale: Double
+        scale: Double,
+        shared: Double = 1
     ) -> Font {
-        display(size: size.rawValue * scale, weight: weight, in: font)
+        display(
+            size,
+            weight: weight,
+            in: font,
+            scale: scale,
+            shared: shared
+        )
     }
 
     static func sans(
         _ size: FontSize,
         weight: Weight = .regular,
-        scale: Double
+        scale: Double,
+        shared: Double = 1
     ) -> Font {
-        .system(size: size.rawValue * scale, weight: weight)
+        let points = points(size.rawValue, scale: scale, shared: shared)
+        return .system(size: points, weight: weight)
+    }
+
+    static func points(
+        _ base: CGFloat,
+        scale: Double,
+        shared: Double
+    ) -> CGFloat {
+        max(base * scale, FontSize.minimumPoints) * shared
     }
 }
 
