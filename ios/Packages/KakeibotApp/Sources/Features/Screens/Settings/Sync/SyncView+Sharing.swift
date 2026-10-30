@@ -116,9 +116,7 @@ private extension SyncView {
         isShared: Bool,
         isWorking: Bool
     ) -> some View {
-        let color = isShared ? Palette.subtext : Palette.accent
-
-        return Group {
+        Group {
             if isShared {
                 HStack(spacing: 4) {
                     Image(systemName: "person.2.fill")
@@ -129,6 +127,7 @@ private extension SyncView {
                         .textFont(.caption2, weight: .bold)
                 }
                 .textFont(.footnote, weight: .bold)
+                .foregroundStyle(Palette.subtext)
             } else {
                 HStack(spacing: 4) {
                     Image(systemName: "person.badge.plus")
@@ -138,16 +137,15 @@ private extension SyncView {
                 .textFont(.footnote, weight: .bold)
                 .padding(.horizontal, 16)
                 .frame(minHeight: 32)
-                .background(color.opacity(.muted), in: Capsule())
+                .goldFace()
             }
         }
-        .foregroundStyle(color)
         .opacity(isWorking ? 0 : 1)
         .overlay {
             if isWorking {
                 ProgressView()
                     .controlSize(.small)
-                    .tint(color)
+                    .tint(isShared ? Palette.subtext : Palette.accent)
             }
         }
         .frame(minHeight: 32)

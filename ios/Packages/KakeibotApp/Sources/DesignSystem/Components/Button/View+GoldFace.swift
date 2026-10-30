@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension View {
+public extension View {
     func goldFace() -> some View {
         modifier(GoldFace())
     }
