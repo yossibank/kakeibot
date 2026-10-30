@@ -106,6 +106,7 @@ struct MainView: View {
 
                         tab = .records
                     },
+                    onAddEntry: addEntry(on:),
                     onRetry: {
                         observationRound += 1
                     },
@@ -158,10 +159,7 @@ struct MainView: View {
                             await notice.delete(id, in: records.list)
                         }
                     },
-                    onAddEntry: { date in
-                        draft.date = date
-                        sheet = .new
-                    },
+                    onAddEntry: addEntry(on:),
                     onOpenRecurring: { id in
                         sheet = .recurring(id)
                     },
@@ -195,7 +193,8 @@ struct MainView: View {
                         records.open(date)
 
                         tab = .records
-                    }
+                    },
+                    onAddEntry: addEntry(on:)
                 )
                 .loadFailed(review.isListFailed) {
                     observationRound += 1

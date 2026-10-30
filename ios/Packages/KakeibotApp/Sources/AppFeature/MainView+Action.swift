@@ -54,6 +54,11 @@ extension MainView {
         }
     }
 
+    func addEntry(on date: LocalDate) {
+        draft.date = date
+        sheet = .new
+    }
+
     func markOpened(_ sheet: Sheet?) async {
         guard sheet == .new else {
             return

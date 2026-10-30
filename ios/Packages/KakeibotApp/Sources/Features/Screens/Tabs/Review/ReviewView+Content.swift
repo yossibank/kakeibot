@@ -23,15 +23,15 @@ extension ReviewView {
             }
 
             if model.kind != .balance {
-                if model.categoryShares.isEmpty,
-                   model.walletShares.isEmpty {
-                    ReviewSharesCard(
-                        title: nil,
-                        type: nil,
-                        shares: [],
-                        total: nil,
-                        onOpen: { _ in }
-                    )
+                if model.list == nil {
+                    EmptyView()
+                } else if model.categoryShares.isEmpty,
+                          model.walletShares.isEmpty {
+                    EmptyNote(text: "この期間の記録はありません") {
+                        onAddEntry(recordDate)
+                    }
+                    .padding(16)
+                    .card()
                 } else {
                     ReviewSharesCard(
                         title: "カテゴリごと",
@@ -249,6 +249,11 @@ private extension ReviewView {
 
     var totalTitle: String {
         Self.title(of: model.kind)
+    }
+
+    var recordDate: LocalDate {
+        let range = model.period.range
+        return range.contains(model.today) ? model.today : range.lowerBound
     }
 
     var selectedChangeColor: Color {

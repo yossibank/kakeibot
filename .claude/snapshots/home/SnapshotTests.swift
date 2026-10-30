@@ -38,6 +38,7 @@ struct SnapshotTests {
                 isSheetOpen: false,
                 onOpenEntry: { _ in },
                 onShowRecords: {},
+                onAddEntry: { _ in },
                 onRetry: {},
                 onOpenSettings: {},
                 onUseTemplate: { _ in },

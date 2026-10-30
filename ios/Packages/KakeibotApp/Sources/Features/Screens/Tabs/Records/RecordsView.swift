@@ -210,19 +210,8 @@ private extension RecordsView {
             if model.isMonthHiddenByFilter {
                 filteredEmpty
             } else if model.showsNoRecords {
-                VStack(spacing: 16) {
-                    Text("この月の記録はありません")
-                        .textFont(.footnote)
-                        .foregroundStyle(Palette.subtext)
-
-                    if model.isCurrentMonth,
-                       model.filter.isEmpty {
-                        PrimaryButton("記録する") {
-                            onAddEntry(model.today)
-                        }
-                    }
-                }
-                .padding(.vertical, 40)
+                EmptyNote(text: "この月の記録はありません", onRecord: recordAction)
+                    .padding(.vertical, 40)
             }
 
             ForEach(model.days, id: \.date) { day in
@@ -268,6 +257,18 @@ private extension RecordsView {
 
     var monthTextTransition: ContentTransition {
         .numericText(countsDown: !isMovingForward)
+    }
+
+    var recordAction: (() -> Void)? {
+        guard model.filter.isEmpty else {
+            return nil
+        }
+
+        let date = model.isCurrentMonth ? model.today : model.period.lowerBound
+
+        return {
+            onAddEntry(date)
+        }
     }
 
     func openSearch() {
