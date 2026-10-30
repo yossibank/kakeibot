@@ -29,15 +29,16 @@ extension TemplateEditSheet {
 
                 Text(previewName)
                     .foregroundStyle(Palette.text)
+                    .truncationMode(.tail)
 
                 Text(amountValue)
                     .displayFont(.caption)
                     .foregroundStyle(Palette.accentStrong)
+                    .layoutPriority(1)
             }
             .textFont(size: .caption)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
-            .fixedSize()
             .padding(.leading, 8)
             .padding(.trailing, 12)
             .frame(height: 30)
