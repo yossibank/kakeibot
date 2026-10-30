@@ -50,8 +50,7 @@ public struct CategoryListView: View {
                 notes: [
                     .init("arrow.left.arrow.right", "下で支出と収入を切り替えます"),
                     .init("number", "開くと、タグで細かく分けられます"),
-                    .move,
-                    .hide
+                    .arrange
                 ],
                 flag: hintFlag
             )

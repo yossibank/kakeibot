@@ -39,7 +39,10 @@ public struct StampListView: View {
             SettingsIntroCard(
                 systemImage: "seal",
                 headline: ("カレンダーに押して", "その日を残せます"),
-                notes: [.move, .hide],
+                notes: [
+                    .init("hand.tap", "押すと、絵と名前を変えられます"),
+                    .arrange
+                ],
                 flag: hintFlag
             )
 
