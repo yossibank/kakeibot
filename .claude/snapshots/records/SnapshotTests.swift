@@ -41,6 +41,27 @@ struct SnapshotTests {
             }
         }
 
+        model.setLayout(.list)
+        model.move(months: -1)
+
+        try await Self.wait {
+            !model.isCurrentMonth
+        }
+
+        for variant in Self.variants {
+            let view = RecordsView(
+                model: model,
+                onOpenEntry: { _ in },
+                onDelete: { _ in },
+                onAddEntry: { _ in },
+                onOpenRecurring: { _ in },
+                onChangeEntries: { _, _ in },
+                onDeleteEntries: { _ in }
+            )
+
+            try Self.write(view, variant: variant, to: "records-previous-month")
+        }
+
         task.cancel()
     }
 }
