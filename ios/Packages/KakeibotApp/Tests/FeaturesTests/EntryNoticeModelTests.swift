@@ -63,7 +63,7 @@ struct EntryNoticeModelTests {
         await setup.notice.undo()
         let entries = try setup.database.snapshot().entries
 
-        #expect(change.message == "食費 ¥98 を変更しました")
+        #expect(change.message == "食費 ¥98 を変えました")
         #expect(edited.map(\.amount) == [98])
         #expect(entries.map(\.id) == [saved.id])
         #expect(entries.map(\.amount) == [980])

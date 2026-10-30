@@ -76,7 +76,7 @@ public extension EntryNoticeModel {
 
             notice = .batch(batch)
         } catch {
-            notice = .failed(Self.changeFailedMessage)
+            notice = .failed(Self.changeFailedMessage(of: kind))
         }
     }
 
@@ -141,6 +141,8 @@ public extension EntryNoticeModel {
 }
 
 public extension EntryNoticeModel.Notice {
+    static let batchSeconds = 8
+
     var message: String {
         switch self {
         case let .changed(change): change.message
@@ -153,7 +155,7 @@ public extension EntryNoticeModel.Notice {
     var seconds: Int {
         switch self {
         case .changed, .failed: 4
-        case .batch: 8
+        case .batch: Self.batchSeconds
         case .undone: 2
         }
     }
@@ -169,7 +171,14 @@ public extension EntryNoticeModel.Notice {
 private extension EntryNoticeModel {
     static let undoFailedMessage = "取り消せませんでした"
     static let deleteFailedMessage = "削除できませんでした"
-    static let changeFailedMessage = "変えられませんでした"
+
+    static func changeFailedMessage(of kind: EntryBatch.Kind) -> String {
+        switch kind {
+        case .changedCategory: "カテゴリを変えられませんでした"
+        case .changedWallet: "口座を変えられませんでした"
+        case .deleted: deleteFailedMessage
+        }
+    }
 
     func undo(_ change: EntryChange) async throws {
         switch change.kind {

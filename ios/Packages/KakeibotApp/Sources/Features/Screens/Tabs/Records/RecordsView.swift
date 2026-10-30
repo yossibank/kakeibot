@@ -99,7 +99,7 @@ public struct RecordsView: View {
             isPresented: $model.isConfirmingDelete,
             systemImage: "trash",
             title: "\(model.pendingDeleteCount) 件の記録を削除しますか",
-            message: "削除した後も、知らせの『取り消す』で戻せます",
+            message: deleteUndoMessage,
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {
@@ -302,6 +302,11 @@ private extension RecordsView {
                 }
             }
         }
+    }
+
+    var deleteUndoMessage: String {
+        let seconds = EntryNoticeModel.Notice.batchSeconds
+        return "削除してから \(seconds) 秒間は「取り消す」で戻せます"
     }
 
     var monthTextTransition: ContentTransition {

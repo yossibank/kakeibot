@@ -6,7 +6,7 @@ extension RecordsView {
     var searchBar: some View {
         HStack(spacing: 12) {
             SearchField(
-                "メモ・カテゴリ・口座・金額",
+                "メモ・カテゴリ・タグ・口座・金額",
                 text: $model.searchText,
                 focus: $isSearchFocused
             ) {
