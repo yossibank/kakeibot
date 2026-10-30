@@ -53,6 +53,25 @@ struct BackupModelTests {
     }
 
     @Test
+    func refusesRestoringWhileSyncing() async throws {
+        let setup = try Setup()
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+        let target = BackupModel(database: setup.target, stash: setup.stash)
+        await source.makeFile(.json, at: setup.now)
+        let file = try #require(source.file)
+        target.read(file.data)
+        try await setup.target.turnOnSync()
+        let before = try setup.target.snapshot()
+
+        await target.restore()
+
+        #expect(target.pending == nil)
+        #expect(target.doneMessage == nil)
+        #expect(target.errorNotice.message == "同期と共有をやめると、読み込めます")
+        #expect(try setup.target.snapshot() == before)
+    }
+
+    @Test
     func asksPermissionAfterRestoringReminder() async throws {
         let setup = try Setup()
         let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
