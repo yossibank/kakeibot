@@ -47,3 +47,5 @@ verify: verify-docs
 
 verify-docs:
 	scripts/verify.sh docs-check scripts/docs-check.py
+	@test -f $(CLAUDE_CONFIG)/hooks/docs-check.py || { echo "NG claude-config が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh docs-rules python3 -I $(CLAUDE_CONFIG)/hooks/docs-check.py $$(git ls-files '*.md')

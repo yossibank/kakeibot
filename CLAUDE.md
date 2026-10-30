@@ -21,7 +21,7 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 
 ## 構成
 
-ファイルとフォルダの置き場所と名前は、[architecture の「名前の決まり」](docs/architecture.md#名前の決まり)に従う。共通の構成は、claude-config の `docs/architecture-ios.md` にある。
+ファイルとフォルダの置き場所と名前は、[architecture の「名前の決まり」](docs/architecture.md#-名前の決まり)に従う。共通の構成は、claude-config の `docs/architecture-ios.md` にある。
 
 ## 文書
 
