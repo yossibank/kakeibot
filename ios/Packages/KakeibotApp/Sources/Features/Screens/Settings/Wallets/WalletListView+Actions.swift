@@ -111,7 +111,10 @@ extension WalletListView {
 
     func deleteHidden() {
         Task {
-            deletion = await model.deleteHidden()
+            let result = await model.deleteHidden()
+
+            bulkDelete = result
+            deletion = result.deletion
         }
     }
 

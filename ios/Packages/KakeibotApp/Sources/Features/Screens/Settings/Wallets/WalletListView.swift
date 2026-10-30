@@ -8,6 +8,7 @@ public struct WalletListView: View {
     @State var model: WalletListModel
     @State var hiddenId: Wallet.ID?
     @State var deletion: Deletion?
+    @State var bulkDelete: SettingsBulkDelete?
     @State var hiding: Wallet?
     @State var isConfirmingHide = false
     @State var deleting: Wallet?
@@ -80,7 +81,7 @@ public struct WalletListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
-            .deletionNotice($deletion) { deletion in
+            .deletionNotice($deletion, note: bulkDelete?.note(for: deletion)) { deletion in
                 restore(deletion)
             }
 

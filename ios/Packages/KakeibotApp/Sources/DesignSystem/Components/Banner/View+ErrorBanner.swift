@@ -25,7 +25,7 @@ private struct ErrorBanner: ViewModifier {
         content
             .overlay(alignment: .bottom) {
                 if let message = notice.message {
-                    NoticeBanner(message, systemImage: "exclamationmark", tone: .error)
+                    NoticeBanner(message, systemImage: systemImage, tone: notice.tone)
                         .padding(.horizontal, 16)
                         .padding(.bottom, bottom)
                         .onTapGesture(perform: onClear)
@@ -33,7 +33,9 @@ private struct ErrorBanner: ViewModifier {
                 }
             }
             .animation(.snappy, value: notice.message)
-            .haptic(.error, trigger: notice.count)
+            .haptic(.error, trigger: notice.count) { _, _ in
+                notice.tone == .error
+            }
             .task(id: notice.count) {
                 guard notice.count > 0 else {
                     return
@@ -50,4 +52,11 @@ private struct ErrorBanner: ViewModifier {
 
 private extension ErrorBanner {
     static let duration = Duration.seconds(6)
+
+    var systemImage: String {
+        switch notice.tone {
+        case .info: "info"
+        case .error: "exclamationmark"
+        }
+    }
 }
