@@ -49,10 +49,7 @@ public extension AppDatabase {
     func turnOnSync() async throws {
         try await writer.write { db in
             try Self.clearOwnSync(in: db)
-            try db
-                .execute(
-                    sql: "UPDATE sync_state SET enabled = 1, stop_reason = NULL, send_problem = NULL"
-                )
+            try db.execute(sql: Self.turnOnSQL)
             try Self.queueAll(in: db)
         }
     }
@@ -73,10 +70,7 @@ public extension AppDatabase {
             }
 
             try Self.clearSync(in: db)
-            try db
-                .execute(
-                    sql: "UPDATE sync_state SET enabled = 1, stop_reason = NULL, send_problem = NULL"
-                )
+            try db.execute(sql: Self.turnOnSQL)
             try Self.setApplying(false, in: db)
         }
     }
@@ -104,6 +98,7 @@ public extension AppDatabase {
             )
 
             try db.execute(sql: "DELETE FROM sync_share WHERE owner_name IS NULL")
+            try Self.notifyShareChanges(in: db)
             try Self.turnOff(because: reason, in: db)
         }
     }
@@ -248,6 +243,10 @@ extension AppDatabase {
 }
 
 private extension AppDatabase {
+    static let turnOnSQL = """
+    UPDATE sync_state SET enabled = 1, stop_reason = NULL, send_problem = NULL, fetching = 1
+    """
+
     static let foreignZones = """
     SELECT \(SyncZone.walletZoneSQL) FROM sync_share WHERE owner_name IS NOT NULL
     """
@@ -309,7 +308,9 @@ private extension AppDatabase {
             UPDATE sync_state SET
                 enabled = 0,
                 stop_reason = CASE WHEN enabled = 1 OR ?1 IS NULL THEN ?1 ELSE stop_reason END,
-                send_problem = NULL
+                send_problem = NULL,
+                fetching = 0,
+                synced_at = NULL
             """,
             arguments: [reason?.rawValue]
         )

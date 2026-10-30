@@ -95,7 +95,7 @@ struct SyncModelTests {
         await model.refreshAccount()
 
         #expect(model.isAvailable)
-        #expect(model.footnote == "切っても、この iPhone のデータは残ります")
+        #expect(model.footnote == "オンにすると、ほかの端末と記録がそろいます")
     }
 
     @Test
@@ -119,7 +119,7 @@ struct SyncModelTests {
         try await setup.database.turnOnSync()
 
         let task = Task {
-            await model.observeStatus()
+            await model.observe()
         }
 
         try await wait {
@@ -147,7 +147,7 @@ struct SyncModelTests {
         try await setup.database.turnOffSync(because: .cloudReplaced)
 
         let task = Task {
-            await model.observeStatus()
+            await model.observe()
         }
 
         try await wait {
@@ -165,112 +165,9 @@ struct SyncModelTests {
         #expect(model.isOn)
         #expect(model.stopReason == nil)
     }
-
-    @Test
-    func explainsWhySendingIsStuck() async throws {
-        let setup = try await HomeModelTests.Setup()
-        let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
-        try await setup.database.turnOnSync()
-
-        let task = Task {
-            await model.observeStatus()
-        }
-
-        try await setup.database.setSyncSendProblem(.quotaExceeded)
-
-        try await wait {
-            model.sendProblem != nil
-        }
-
-        task.cancel()
-
-        #expect(model.pendingText(3) == "iCloud の容量が足りず、送れていません（残り 3 件）")
-        #expect(model.pendingText(0) == "最新の状態です")
-    }
-
-    @Test
-    func showsSendingWhileNothingIsStuck() async throws {
-        let setup = try await HomeModelTests.Setup()
-        let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
-
-        #expect(model.pendingText(3) == "iCloud に送っています（残り 3 件）")
-    }
-
-    @Test
-    func startsSharingAndShowsSheet() async throws {
-        let setup = try await HomeModelTests.Setup()
-        let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
-        let item = try await firstShare(in: setup.database)
-
-        await model.share(item)
-        let shared = try await firstShare(in: setup.database)
-
-        #expect(await cloud.shareCalls == ["create", "show"])
-        #expect(shared.isShared)
-        #expect(model.errorNotice.message == nil)
-    }
-
-    @Test
-    func showsSheetWithoutCreatingWhenAlreadyShared() async throws {
-        let setup = try await HomeModelTests.Setup()
-        let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
-        let item = try await firstShare(in: setup.database)
-
-        try await setup.database.startSharing(item.wallet.id)
-        let shared = try await firstShare(in: setup.database)
-        await model.share(shared)
-
-        #expect(await cloud.shareCalls == ["show"])
-    }
-
-    @Test
-    func endsSharingWhenSheetStops() async throws {
-        let setup = try await HomeModelTests.Setup()
-        let cloud = FakeCloud(hasData: false, stopsInSheet: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
-        let item = try await firstShare(in: setup.database)
-
-        await model.share(item)
-        let after = try await firstShare(in: setup.database)
-
-        #expect(await cloud.shareCalls == ["create", "show", "delete"])
-        #expect(after.isShared == false)
-    }
-
-    @Test
-    func keepsWalletUnsharedWhenCreatingFails() async throws {
-        let setup = try await HomeModelTests.Setup()
-        let cloud = FakeCloud(hasData: false, failsToCreate: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
-        let item = try await firstShare(in: setup.database)
-
-        await model.share(item)
-        let after = try await firstShare(in: setup.database)
-
-        #expect(after.isShared == false)
-        #expect(model.errorNotice.message != nil)
-    }
-
-    @Test
-    func keepsSharingWhenDeletingCloudShareFails() async throws {
-        let setup = try await HomeModelTests.Setup()
-        let cloud = FakeCloud(hasData: false, stopsInSheet: true, failsToDelete: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
-        let item = try await firstShare(in: setup.database)
-
-        await model.share(item)
-        let after = try await firstShare(in: setup.database)
-
-        #expect(after.isShared == true)
-        #expect(model.errorNotice.message != nil)
-    }
 }
 
-private extension SyncModelTests {
+extension SyncModelTests {
     func wait(
         sourceLocation: SourceLocation = #_sourceLocation,
         until isReady: @escaping @MainActor () -> Bool

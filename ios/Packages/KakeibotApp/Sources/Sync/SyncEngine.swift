@@ -115,6 +115,10 @@ public extension SyncEngine {
 
     func fetchChanges() async {
         try? await engine?.fetchChanges()
+
+        await Task {
+            await showFetching(false)
+        }.value
     }
 
     func stop() {
@@ -169,6 +173,22 @@ extension SyncEngine {
         await start(isSyncEnabled: isSyncEnabled)
     }
 
+    func showFetching(_ fetching: Bool) async {
+        guard !isShared else {
+            return
+        }
+
+        try? await database.setSyncFetching(fetching)
+    }
+
+    func showSynced() async {
+        guard !isShared else {
+            return
+        }
+
+        try? await database.setSyncedAt(Date())
+    }
+
     func turnOff(because reason: SyncStopReason) async {
         try? await database.turnOffSync(because: reason)
         isSyncEnabled = false
@@ -199,6 +219,13 @@ extension SyncEngine: CKSyncEngineDelegate {
             await applyFetched(changes)
         case let .sentRecordZoneChanges(sent):
             await finishSending(sent)
+        case .willFetchChanges:
+            await showFetching(true)
+        case .didFetchChanges:
+            await showFetching(false)
+            await showSynced()
+        case .didSendChanges:
+            await showSynced()
         default:
             break
         }

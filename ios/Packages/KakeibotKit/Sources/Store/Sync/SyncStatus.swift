@@ -1,16 +1,24 @@
+import Foundation
+
 public struct SyncStatus: Hashable, Sendable {
     public let isEnabled: Bool
     public let stopReason: SyncStopReason?
     public let sendProblem: SyncSendProblem?
+    public let isFetching: Bool
+    public let syncedAt: Date?
 
     public init(
         isEnabled: Bool,
         stopReason: SyncStopReason?,
-        sendProblem: SyncSendProblem?
+        sendProblem: SyncSendProblem?,
+        isFetching: Bool = false,
+        syncedAt: Date? = nil
     ) {
         self.isEnabled = isEnabled
         self.stopReason = stopReason
         self.sendProblem = sendProblem
+        self.isFetching = isFetching
+        self.syncedAt = syncedAt
     }
 }
 

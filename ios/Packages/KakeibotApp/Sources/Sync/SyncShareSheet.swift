@@ -9,13 +9,16 @@ public final class SyncShareSheet: NSObject {
 
     private let title: String
     private let onStop: @MainActor () async -> Void
+    private let onFail: @MainActor () -> Void
 
     private init(
         title: String,
-        onStop: @escaping @MainActor () async -> Void
+        onStop: @escaping @MainActor () async -> Void,
+        onFail: @escaping @MainActor () -> Void
     ) {
         self.title = title
         self.onStop = onStop
+        self.onFail = onFail
     }
 }
 
@@ -24,13 +27,19 @@ public extension SyncShareSheet {
         _ share: CKShare,
         title: String,
         container: CKContainer = CKContainer(identifier: SyncEngine.containerIdentifier),
-        onStop: @escaping @MainActor () async -> Void
+        onStop: @escaping @MainActor () async -> Void,
+        onFail: @escaping @MainActor () -> Void
     ) {
         guard let presenter = topViewController() else {
             return
         }
 
-        let sheet = SyncShareSheet(title: title, onStop: onStop)
+        let sheet = SyncShareSheet(
+            title: title,
+            onStop: onStop,
+            onFail: onFail
+        )
+
         let controller = ShareController(share: share, container: container)
 
         controller.availablePermissions = [.allowPrivate, .allowReadWrite]
@@ -59,6 +68,15 @@ private extension SyncShareSheet {
             }
         }
     }
+
+    static let thumbnail: Data? = {
+        let configuration = UIImage.SymbolConfiguration(pointSize: 120, weight: .light)
+        let symbol = UIImage(systemName: "person.2.circle.fill", withConfiguration: configuration)
+
+        return symbol?
+            .withTintColor(.systemGreen, renderingMode: .alwaysOriginal)
+            .pngData()
+    }()
 
     static func topViewController() -> UIViewController? {
         let scene = UIApplication.shared.connectedScenes
@@ -104,10 +122,16 @@ extension SyncShareSheet: UICloudSharingControllerDelegate {
     public func cloudSharingController(
         _ csc: UICloudSharingController,
         failedToSaveShareWithError error: any Error
-    ) {}
+    ) {
+        onFail()
+    }
 
     public func itemTitle(for csc: UICloudSharingController) -> String? {
         title
+    }
+
+    public func itemThumbnailData(for csc: UICloudSharingController) -> Data? {
+        Self.thumbnail
     }
 
     public func cloudSharingControllerDidStopSharing(_ csc: UICloudSharingController) {
