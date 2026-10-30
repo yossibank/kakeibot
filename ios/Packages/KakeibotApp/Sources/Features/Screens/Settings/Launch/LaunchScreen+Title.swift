@@ -1,6 +1,15 @@
 import Core
+import DesignSystem
 
 extension LaunchScreen {
+    static var tabItems: [FloatingTabBar<LaunchScreen>.Item] {
+        let tabs: [LaunchScreen] = [.home, .records, .review, .assets]
+
+        return tabs.map { screen in
+            .init(screen.title, systemImage: screen.systemImage, value: screen)
+        }
+    }
+
     var title: String {
         switch self {
         case .home: "ホーム"

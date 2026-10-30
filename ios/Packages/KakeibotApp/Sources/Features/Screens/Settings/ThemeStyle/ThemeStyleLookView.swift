@@ -61,8 +61,8 @@ public struct ThemeStyleLookView: View {
                 columns: 2,
                 label: Self.tabTitle
             ) { showsTitles in
-                tabMark(showsTitles)
-                    .frame(height: Self.markSize)
+                ThemeStyleTabBar()
+                    .environment(\.themeStyle.showsTabTitles, showsTitles)
             } choose: { showsTitles in
                 await model.choose(showsTabTitles: showsTitles)
             }
@@ -170,20 +170,6 @@ private extension ThemeStyleLookView {
                 .frame(height: 3)
         }
         .frame(width: Self.markSize * 1.4, height: Self.markSize)
-    }
-
-    func tabMark(_ showsTitles: Bool) -> some View {
-        VStack(spacing: 2) {
-            Image(systemName: "house")
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-
-            if showsTitles {
-                Text("ホーム")
-                    .textFont(size: .micro)
-                    .foregroundStyle(Palette.accentStrong)
-            }
-        }
     }
 
     func cornerMark(_ option: ThemeCorner) -> some View {
