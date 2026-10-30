@@ -99,7 +99,7 @@ public struct SyncView: View {
             isPresented: isStoppingBinding,
             systemImage: "person.2.slash",
             title: "共有をやめますか",
-            message: "家族の iPhone から、この口座と記録が消えます。この iPhone には残ります",
+            message: "相手の iPhone から、この口座と記録が消えます。この iPhone には残ります",
             keepTitle: "続ける",
             confirmTitle: "やめる"
         ) {

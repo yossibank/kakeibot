@@ -5,7 +5,7 @@ import SwiftUI
 extension SyncView {
     var sharingSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SectionTitle("家族と共有する口座")
+            SectionTitle("共有する口座")
                 .padding(.leading, 8)
 
             VStack(spacing: 0) {
@@ -55,11 +55,11 @@ extension SyncView {
 private extension SyncView {
     var steps: some View {
         VStack(alignment: .leading, spacing: 8) {
-            step(1, "「共有する」から、家族に招待を送ります")
+            step(1, "「招待」から、相手に招待を送ります")
 
-            step(2, "家族が、届いたリンクを開きます")
+            step(2, "相手が、届いたリンクを開きます")
 
-            step(3, "家族のかけいぼっとにこの口座が並び、2 人で記録できます")
+            step(3, "相手のかけいぼっとにこの口座が並び、一緒に記録できます")
         }
         .padding(.top, 8)
         .padding(.leading, 8)
@@ -87,10 +87,7 @@ private extension SyncView {
     }
 
     func shareRow(_ item: WalletShare) -> some View {
-        let title = item.isShared ? "共有中" : "共有する"
-        let systemImage = item.isShared ? "chevron.right" : nil
-
-        return HStack(spacing: 12) {
+        HStack(spacing: 12) {
             IconBadge(item.icon, size: 32)
 
             Text(item.wallet.name)
@@ -105,17 +102,57 @@ private extension SyncView {
                     await model.open(item)
                 }
             } label: {
-                pill(
-                    title,
-                    systemImage: systemImage,
-                    color: Palette.accent,
-                    isFilled: !item.isShared,
+                shareLabel(
+                    isShared: item.isShared,
                     isWorking: model.workingWallet == item.wallet.id
                 )
             }
             .buttonStyle(.plain)
         }
         .frame(minHeight: 58)
+    }
+
+    func shareLabel(
+        isShared: Bool,
+        isWorking: Bool
+    ) -> some View {
+        let color = isShared ? Palette.subtext : Palette.accent
+
+        return Group {
+            if isShared {
+                HStack(spacing: 4) {
+                    Image(systemName: "person.2.fill")
+
+                    Text("共有中")
+
+                    Image(systemName: "chevron.right")
+                        .textFont(.caption2, weight: .bold)
+                }
+                .textFont(.footnote, weight: .bold)
+            } else {
+                HStack(spacing: 4) {
+                    Image(systemName: "person.badge.plus")
+
+                    Text("招待")
+                }
+                .textFont(.footnote, weight: .bold)
+                .padding(.horizontal, 16)
+                .frame(minHeight: 32)
+                .background(color.opacity(.muted), in: Capsule())
+            }
+        }
+        .foregroundStyle(color)
+        .opacity(isWorking ? 0 : 1)
+        .overlay {
+            if isWorking {
+                ProgressView()
+                    .controlSize(.small)
+                    .tint(color)
+            }
+        }
+        .frame(minHeight: 32)
+        .contentShape(Rectangle())
+        .fixedSize()
     }
 
     func joinedRow(_ item: JoinedShare) -> some View {

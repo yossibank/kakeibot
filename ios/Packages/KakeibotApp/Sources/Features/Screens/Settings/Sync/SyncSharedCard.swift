@@ -23,7 +23,7 @@ struct SyncSharedCard: View {
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
 
-                    Text("家族と共有しています")
+                    Text("ほかの人と共有しています")
                         .displayFont(.headline, weight: .medium)
                         .foregroundStyle(Palette.accentStrong)
                         .multilineTextAlignment(.center)
