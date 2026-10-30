@@ -51,7 +51,7 @@ private extension SnapshotTests {
     static let maxHeight: CGFloat = 2400
 
     static let variants = [
-        Variant(name: "regular", width: 393, scheme: .light, textSize: .standard, backdrop: .washi),
+        Variant(name: "regular", width: 393, scheme: .light, textSize: .standard, backdrop: .ruled),
         Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large, backdrop: .grid)
     ]
 
