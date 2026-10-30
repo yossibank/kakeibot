@@ -100,6 +100,8 @@ private extension AssetsView {
                     .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .padding(.top, 12)
             .padding(.bottom, 4)

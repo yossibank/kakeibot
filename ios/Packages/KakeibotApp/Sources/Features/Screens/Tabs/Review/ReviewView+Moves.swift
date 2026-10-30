@@ -32,6 +32,8 @@ extension ReviewView {
                     .displayFont(.headline)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
 
             VStack(spacing: 8) {
@@ -125,6 +127,8 @@ private extension ReviewView {
                 .textFont(.subheadline)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             Image(systemName: "chevron.right")
                 .sansFont(.small)

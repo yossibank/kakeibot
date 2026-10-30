@@ -35,6 +35,8 @@ struct ReviewShareSheet: View {
                 Text(share.name)
                     .textFont(.headline)
                     .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Spacer()
 
@@ -42,6 +44,8 @@ struct ReviewShareSheet: View {
                     .displayFont(.headline)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
             .padding(.horizontal, 4)
 

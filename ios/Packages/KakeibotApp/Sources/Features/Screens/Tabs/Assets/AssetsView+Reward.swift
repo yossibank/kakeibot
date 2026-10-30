@@ -85,6 +85,8 @@ private extension AssetsView {
                     .displayFont(.title)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
 
                 Text("我慢できた日に決めた額を貯めていきます")
                     .textFont(.caption)

@@ -29,6 +29,9 @@ struct RecurringRowCard: View {
 
                     if let amount = row.amount {
                         AmountText(amount, type: row.type)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .layoutPriority(1)
                     } else {
                         Text("利用分")
                             .textFont(.subheadline)

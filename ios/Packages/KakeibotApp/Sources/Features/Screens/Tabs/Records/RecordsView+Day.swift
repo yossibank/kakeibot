@@ -83,6 +83,8 @@ extension RecordsView {
                 if let holiday {
                     Text(holiday)
                         .textFont(.caption2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                         .foregroundStyle(Palette.holiday)
                 }
 
