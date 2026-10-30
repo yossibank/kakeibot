@@ -12,7 +12,7 @@
 | PR を作る前 | テストは CI で走らせず、手元で `make test` を 1 回通す。結果は PR の本文の「確認」に書く |
 | push し直す | Swift か fixtures を変えたときだけ、`make test` を通し直す |
 | 文書だけの PR | `make test` を走らせない |
-| ウィジェットの見た目を変えた | `make snapshot SNAPSHOT=widget` で描いて確かめる。PNG は `.build/snapshots/widget/` に出る |
+| 見た目を変えた | 当たるセットを `make snapshot SNAPSHOT=<セット>` で描いて確かめる。セットは `.claude/snapshots/` の下にあり、PNG は `.build/snapshots/<セット>/` に出る |
 | 動きの不具合を確かめる | claude-config の `ui-record` のスキルで録画して確かめる |
 
 ## コードの書き方
@@ -41,6 +41,6 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 | 対応 OS を変える | [overview](docs/overview.md) | overview、README のバッジ |
 | Swift の版・使う技術を変える | [architecture](docs/architecture.md) | architecture、README のバッジ |
 | 未検証の項目を確かめる | 各文書の `[!WARNING]` | 結果で本文を書き換え、WARNING から消す |
-| 整形・確認の仕組みを変える | [README の「動かし方」](README.md#-動かし方) | README、architecture のリポジトリの木 |
+| 整形・確認の仕組みを変える | [README の「動かし方」](README.md#-動かし方) | README、architecture のリポジトリの表 |
 
 spec の文書の役割は [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) にあり、文書を開くと読み込まれる。

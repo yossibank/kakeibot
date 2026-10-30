@@ -42,6 +42,8 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `.claude/snapshots/theme-style/` | `ui-snapshot` で描く、「文字」と「見た目と動き」の画面の見本 |
 | `.claude/snapshots/home-sections/` | `ui-snapshot` で描く、ホームの並べ替え |
 | `.claude/snapshots/parts/` | `ui-snapshot` で描く、カレンダー・タグ・テンプレートのカード |
+| `.claude/snapshots/entry-wallet/` | `ui-snapshot` で描く、入力シートの口座を選ぶシート |
+| `.claude/snapshots/entry-wallet-edit/` | `ui-snapshot` で描く、口座を選ぶシートの編集中 |
 
 ## ios
 
@@ -173,7 +175,7 @@ KakeibotApp/
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、読み込めないときの表示、保存の失敗が空き容量不足かの見分け |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり |
-| `Features/Shared/Settings/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Preview・Tile） |
+| `Features/Shared/Settings/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |
 | `Tests/TestSupport/` | テストの補助。観測している値が変わるのを、上限の時間まで待つ |
@@ -191,7 +193,6 @@ KakeibotApp/
 ## 未検証
 
 > [!WARNING]
-> - パッケージの中のフォントを、起動時の登録で使えるか（DesignSystem を作るとき）
 > - 配布用の証明書を Xcode がクラウドで管理するか（12 番で確かめる）
 > - すぐ記録を押したとき、ウィジェットの拡張から DB に書け、アプリを前面に戻すと画面に出るか。ホーム画面で押して確かめる
 > - ロック中に、ロック画面のウィジェットが金額を出すか（実機）。ファイル保護は、アプリと拡張でそろえた。値は `NSFileProtectionCompleteUntilFirstUserAuthentication` である

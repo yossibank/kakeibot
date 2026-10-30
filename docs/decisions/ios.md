@@ -90,7 +90,7 @@ Features は、ターゲットとフォルダを決める。
 
 決まり：
 
-- Environment で渡すのはテーマだけ。
+Environment で渡すのは、テーマ・文字の倍率・設定の見出しの状態と、外の仕組みの窓口だけにする。窓口は、iCloud の `SyncCloud` と通知の許可の `NotificationPermission` である。ビューがモデルを作るときに、引数で渡す。
 
 ## DB
 
