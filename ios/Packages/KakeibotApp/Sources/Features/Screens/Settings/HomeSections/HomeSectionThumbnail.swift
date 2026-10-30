@@ -38,12 +38,13 @@ private extension HomeSectionThumbnail {
             ForEach(Self.dots.prefix(3).indices, id: \.self) { index in
                 let isLit = index == 0
                 let glowColor = isLit ? Palette.glow : Color.clear
+                let strokeColor = isLit ? Palette.accent : Palette.outline
 
                 RoundedRectangle(cornerRadius: 2)
                     .fill(Palette.faint)
                     .overlay {
                         RoundedRectangle(cornerRadius: 2)
-                            .stroke(isLit ? Palette.accent : Palette.outline, lineWidth: 0.6)
+                            .stroke(strokeColor, lineWidth: 0.6)
                     }
                     .overlay {
                         Circle()
@@ -114,12 +115,14 @@ private extension HomeSectionThumbnail {
         HStack(spacing: 3) {
             ForEach(0..<4, id: \.self) { index in
                 let isPressed = index < 2
+                let fillColor = isPressed ? Palette.accent.opacity(.muted) : Color.clear
+                let strokeOpacity = isPressed ? 1 : 0.5
 
                 Circle()
-                    .fill(isPressed ? Palette.accent.opacity(.muted) : .clear)
+                    .fill(fillColor)
                     .overlay {
                         Circle()
-                            .stroke(Palette.accent.opacity(isPressed ? 1 : 0.5), lineWidth: 0.8)
+                            .stroke(Palette.accent.opacity(strokeOpacity), lineWidth: 0.8)
                     }
                     .overlay {
                         if isPressed {

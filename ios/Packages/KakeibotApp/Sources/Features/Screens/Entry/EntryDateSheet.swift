@@ -36,24 +36,21 @@ private extension EntryDateSheet {
     func quickButton(_ quickDay: QuickDay) -> some View {
         let date = today.adding(days: quickDay.offset)
         let isSelected = model.date == date
+        let titleColor = isSelected ? Palette.accentStrong : Palette.text
+        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let ring = isSelected ? Palette.accent : Palette.line
 
         return Button(quickDay.title) {
             dateBinding.wrappedValue = date
         }
         .textFont(.subheadline)
-        .foregroundStyle(isSelected ? Palette.accentStrong : Palette.text)
+        .foregroundStyle(titleColor)
         .padding(.horizontal, 16)
         .frame(minHeight: 40)
-        .background(
-            isSelected ? Palette.accent.opacity(.subtle) : Color.clear,
-            in: Capsule()
-        )
+        .background(fill, in: Capsule())
         .overlay {
             Capsule()
-                .stroke(
-                    isSelected ? Palette.accent : Palette.line,
-                    lineWidth: 1
-                )
+                .stroke(ring, lineWidth: 1)
         }
         .buttonStyle(.plain)
     }

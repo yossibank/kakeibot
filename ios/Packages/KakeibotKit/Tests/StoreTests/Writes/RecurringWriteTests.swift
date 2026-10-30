@@ -11,6 +11,7 @@ struct RecurringWriteTests {
 
         try await setup.database.generateRecurringEntries(through: today, at: setup.now)
         try await setup.database.generateRecurringEntries(through: today, at: setup.now)
+
         let snapshot = try setup.database.snapshot()
         let dates = snapshot.entries.compactMap(\.recurringDate)
         let generated = snapshot.recurrings.first?.generatedUntil

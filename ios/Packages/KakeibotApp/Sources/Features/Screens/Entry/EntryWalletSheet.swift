@@ -117,6 +117,10 @@ private extension EntryWalletSheet {
         let isTaken = takenId == wallet.id
         let nameColor = isSelected ? Palette.accentStrong : Palette.text
         let iconColor = isSelected ? Palette.accent : Palette.subtext
+        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let ring = isSelected ? Palette.accent : Palette.line
+        let isLocked = isTaken && !isEditing
+        let rowOpacity = isLocked ? 0.45 : 1
 
         return Button {
             guard !isEditing else {
@@ -166,22 +170,16 @@ private extension EntryWalletSheet {
             }
             .padding(.horizontal, 16)
             .frame(minHeight: 52)
-            .background(
-                isSelected ? Palette.accent.opacity(.subtle) : Color.clear,
-                in: .rect(cornerRadius: corner.radius(16))
-            )
+            .background(fill, in: .rect(cornerRadius: corner.radius(16)))
             .overlay {
                 RoundedRectangle(cornerRadius: corner.radius(16))
-                    .stroke(
-                        isSelected ? Palette.accent : Palette.line,
-                        lineWidth: 1
-                    )
+                    .stroke(ring, lineWidth: 1)
             }
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .disabled(isTaken && !isEditing)
-        .opacity(isTaken && !isEditing ? 0.45 : 1)
+        .disabled(isLocked)
+        .opacity(rowOpacity)
     }
 
     func billButton(_ choice: EntryModel.BillChoice) -> some View {

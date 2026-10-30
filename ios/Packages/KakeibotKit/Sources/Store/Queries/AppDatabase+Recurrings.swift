@@ -9,6 +9,7 @@ public extension AppDatabase {
             .tracking { db in
                 try Self.recurrings(in: db, includingHidden: includingHidden)
             }
+            .removeDuplicates()
             .values(in: writer)
     }
 

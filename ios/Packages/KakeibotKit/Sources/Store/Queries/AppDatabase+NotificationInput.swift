@@ -36,24 +36,26 @@ private extension NotificationPart {
         let entryDates = list.days.map(\.date).filter { $0 >= start }
         let recordedDates = Set(entryDates + markedDates)
         let names = list.categories.mapValues(\.name)
+        let billShortages = shortages(in: list)
 
         return NotificationInput(
             recordedDates: recordedDates,
             recurrings: recurrings,
             reminderTime: reminderTime,
             names: names,
-            shortages: shortages(in: list)
+            shortages: billShortages
         )
     }
 
     func shortages(in list: EntryList) -> [NotificationPlan.Shortage] {
         let wallets = Array(list.wallets.values)
         let yesterday = start.adding(days: -1)
+        let entries = list.days.flatMap(\.entries)
 
         let bills = CardBill.upcoming(
             recurrings: recurrings,
             wallets: wallets,
-            entries: list.days.flatMap(\.entries),
+            entries: entries,
             valuations: list.valuations,
             after: yesterday
         )

@@ -10,23 +10,40 @@ extension ExportV1.Tables {
             .orderByPrimaryKey()
             .fetchAll(db)
 
-        try self.init(
-            icons: Icon.orderByPrimaryKey().fetchAll(db),
-            shelfIcons: ShelfIcon.orderByPrimaryKey().fetchAll(db),
-            wallets: Wallet.orderByPrimaryKey().fetchAll(db),
-            valuations: Valuation.orderByPrimaryKey().fetchAll(db),
-            categories: EntryCategory.orderByPrimaryKey().fetchAll(db),
-            tags: EntryTag.orderByPrimaryKey().fetchAll(db),
-            entries: Entry.orderByPrimaryKey().fetchAll(db),
-            templates: EntryTemplate.orderByPrimaryKey().fetchAll(db),
-            budgets: Budget.orderByPrimaryKey().fetchAll(db),
-            recurrings: Recurring.orderByPrimaryKey().fetchAll(db),
-            rewardRules: RewardRule.orderByPrimaryKey().fetchAll(db),
-            rewardLogs: RewardLog.orderByPrimaryKey().fetchAll(db),
-            rewardGoals: RewardGoal.orderByPrimaryKey().fetchAll(db),
-            calendarStamps: CalendarStamp.orderByPrimaryKey().fetchAll(db),
-            noSpendDays: NoSpendDay.orderByPrimaryKey().fetchAll(db),
-            themes: Theme.orderByPrimaryKey().fetchAll(db),
+        let icons = try Icon.orderByPrimaryKey().fetchAll(db)
+        let shelfIcons = try ShelfIcon.orderByPrimaryKey().fetchAll(db)
+        let wallets = try Wallet.orderByPrimaryKey().fetchAll(db)
+        let valuations = try Valuation.orderByPrimaryKey().fetchAll(db)
+        let categories = try EntryCategory.orderByPrimaryKey().fetchAll(db)
+        let tags = try EntryTag.orderByPrimaryKey().fetchAll(db)
+        let entries = try Entry.orderByPrimaryKey().fetchAll(db)
+        let templates = try EntryTemplate.orderByPrimaryKey().fetchAll(db)
+        let budgets = try Budget.orderByPrimaryKey().fetchAll(db)
+        let recurrings = try Recurring.orderByPrimaryKey().fetchAll(db)
+        let rewardRules = try RewardRule.orderByPrimaryKey().fetchAll(db)
+        let rewardLogs = try RewardLog.orderByPrimaryKey().fetchAll(db)
+        let rewardGoals = try RewardGoal.orderByPrimaryKey().fetchAll(db)
+        let calendarStamps = try CalendarStamp.orderByPrimaryKey().fetchAll(db)
+        let noSpendDays = try NoSpendDay.orderByPrimaryKey().fetchAll(db)
+        let themes = try Theme.orderByPrimaryKey().fetchAll(db)
+
+        self.init(
+            icons: icons,
+            shelfIcons: shelfIcons,
+            wallets: wallets,
+            valuations: valuations,
+            categories: categories,
+            tags: tags,
+            entries: entries,
+            templates: templates,
+            budgets: budgets,
+            recurrings: recurrings,
+            rewardRules: rewardRules,
+            rewardLogs: rewardLogs,
+            rewardGoals: rewardGoals,
+            calendarStamps: calendarStamps,
+            noSpendDays: noSpendDays,
+            themes: themes,
             settings: settings
         )
     }

@@ -49,7 +49,10 @@ private extension ReminderTime {
 }
 
 extension ReminderTime: Comparable {
-    public static func < (lhs: Self, rhs: Self) -> Bool {
+    public static func < (
+        lhs: Self,
+        rhs: Self
+    ) -> Bool {
         (lhs.hour, lhs.minute) < (rhs.hour, rhs.minute)
     }
 }

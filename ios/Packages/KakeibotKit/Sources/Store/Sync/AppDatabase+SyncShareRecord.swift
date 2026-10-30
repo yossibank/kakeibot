@@ -34,7 +34,8 @@ extension AppDatabase {
 
     static func receivedTransfer(
         _ record: SyncRecord,
-        in db: Database
+        in db: Database,
+        at now: Date
     ) throws -> SyncRecord {
         guard record.key.table == .entry else {
             return record
@@ -52,7 +53,12 @@ extension AppDatabase {
 
         try setApplying(false, in: db)
 
-        let view = try transferView(of: record, in: walletID, creating: true, db: db)
+        let view = try transferView(
+            of: record,
+            in: walletID,
+            creatingAt: now,
+            db: db
+        )
 
         try setApplying(true, in: db)
 
@@ -156,7 +162,12 @@ private extension AppDatabase {
             return nil
         }
 
-        return try transferView(of: record, in: walletID, creating: false, db: db)
+        return try transferView(
+            of: record,
+            in: walletID,
+            creatingAt: nil,
+            db: db
+        )
     }
 
     static func receivingWallet(
@@ -205,7 +216,7 @@ private extension AppDatabase {
     static func transferView(
         of record: SyncRecord,
         in walletID: Wallet.ID,
-        creating: Bool,
+        creatingAt now: Date?,
         db: Database
     ) throws -> SyncRecord? {
         let wallet = SyncValue.text(walletID.description)
@@ -224,8 +235,8 @@ private extension AppDatabase {
             return nil
         }
 
-        let categoryID: EntryCategory.ID? = if creating {
-            try transferCategoryId(kind, ofWallet: walletID, in: db, at: Date())
+        let categoryID: EntryCategory.ID? = if let now {
+            try transferCategoryId(kind, ofWallet: walletID, in: db, at: now)
         } else {
             try existingTransferCategoryId(kind, ofWallet: walletID, in: db)
         }

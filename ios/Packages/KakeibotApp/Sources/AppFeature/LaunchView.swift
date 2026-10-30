@@ -41,7 +41,7 @@ public struct LaunchView: View {
                 }
         }
         .ignoresSafeArea()
-        .opacity(isLeaving ? 0 : 1)
+        .opacity(screenOpacity)
         .allowsHitTesting(!isLeaving)
         .task {
             await sweepRing()
@@ -107,6 +107,10 @@ private extension LaunchView {
 
     var canReveal: Bool {
         hasSwept && isReady
+    }
+
+    var screenOpacity: Double {
+        isLeaving ? 0 : 1
     }
 
     func sweepRing() async {
