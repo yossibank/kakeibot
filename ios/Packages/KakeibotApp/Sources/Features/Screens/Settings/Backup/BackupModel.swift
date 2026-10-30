@@ -186,6 +186,12 @@ public extension BackupModel {
             return
         }
 
+        guard await !isSyncActiveNow() else {
+            self.pending = nil
+            errorNotice.show(Self.syncActiveMessage)
+            return
+        }
+
         isWorking = true
 
         defer {
@@ -227,6 +233,7 @@ private extension BackupModel {
     static let newerVersionMessage = "新しい版のアプリで書き出したファイルです"
     static let missingTransferMessage = "元の振替が無い手数料があるため、読み込めません"
     static let restoreFailedMessage = "読み込めませんでした。いまのデータはそのままです"
+    static let syncActiveMessage = "同期と共有をやめると、読み込めます"
 
     nonisolated static func previous(in stash: BackupStash) -> [Previous] {
         stash.load().compactMap { item in
@@ -273,6 +280,18 @@ private extension BackupModel {
         formatter.dateFormat = "yyyy/M/d H:mm"
 
         return formatter.string(from: date)
+    }
+
+    func isSyncActiveNow() async -> Bool {
+        do {
+            for try await activity in database.syncActivityUpdates() {
+                return activity.isActive
+            }
+        } catch {
+            return true
+        }
+
+        return true
     }
 
     func data(

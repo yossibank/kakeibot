@@ -50,14 +50,6 @@ public struct BackupView: View {
                         }
                         .padding(.horizontal, 16)
                         .card()
-
-                        if let message = model.doneMessage {
-                            Label(message, systemImage: "checkmark.circle")
-                                .textFont(.caption)
-                                .foregroundStyle(Palette.accent)
-                                .padding(.leading, 8)
-                                .transition(.opacity)
-                        }
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
@@ -103,6 +95,14 @@ public struct BackupView: View {
                     if model.isWorking {
                         ProgressView()
                             .frame(maxWidth: .infinity)
+                    }
+
+                    if let message = model.doneMessage {
+                        Label(message, systemImage: "checkmark.circle")
+                            .textFont(.footnote)
+                            .foregroundStyle(Palette.accent)
+                            .padding(.leading, 8)
+                            .transition(.opacity)
                     }
                 }
                 .disabled(model.isWorking)
