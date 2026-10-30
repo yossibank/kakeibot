@@ -5,7 +5,12 @@ import SwiftUI
 extension WalletEditSheet {
     var content: some View {
         VStack(spacing: 16) {
-            SettingsEditHeader(title: title, isEditing: model.isEditing, isHidden: model.isHidden) {
+            SettingsEditHeader(
+                title: title,
+                isEditing: model.isEditing,
+                isHidden: model.isHidden,
+                canDelete: !(model.isHidden && model.hasEntries)
+            ) {
                 close()
             } onHide: {
                 toggleHidden()

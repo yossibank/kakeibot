@@ -6,6 +6,7 @@ import SwiftUI
 public struct BudgetListView: View {
     @State private var model: BudgetListModel
     @State private var hintFlag: SettingsScreenFlag
+    @State private var cleared: BudgetListModel.Cleared?
 
     public init(model: BudgetListModel) {
         let hintFlag = model.hintFlag()
@@ -19,7 +20,7 @@ public struct BudgetListView: View {
             .errorBanner(model.errorNotice) {
                 model.errorNotice.clear()
             }
-            .budgetKeypad(model)
+            .budgetKeypad(model, cleared: $cleared)
             .toolbar(.hidden, for: .navigationBar)
             .haptic(.selection, trigger: model.budgets)
             .task {
@@ -76,6 +77,15 @@ private extension BudgetListView {
                 .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
+            .settingsHideNotice(
+                $cleared,
+                message: clearedMessage,
+                systemImage: "chart.bar"
+            ) { cleared in
+                Task {
+                    await model.restore(cleared)
+                }
+            }
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -208,6 +218,10 @@ private extension BudgetListView {
 
     var recurringText: String {
         "この月の固定費は \(AmountText.text(model.recurringExpense))。予算の目安にできます"
+    }
+
+    var clearedMessage: String {
+        cleared.map { "\($0.target.title)をなくしました" } ?? ""
     }
 
     func amountText(_ amount: Int?) -> String {

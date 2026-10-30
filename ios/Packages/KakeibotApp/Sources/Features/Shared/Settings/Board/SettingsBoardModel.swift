@@ -128,7 +128,7 @@ public extension SettingsBoardModel {
         }
     }
 
-    func deleteHidden() async -> Deletion? {
+    func deleteHidden() async -> SettingsBulkDelete {
         movingOrder = nil
 
         let ids = hidden.map(\.id)
@@ -141,11 +141,13 @@ public extension SettingsBoardModel {
 
         await reload()
 
-        if let message = result.message {
+        if let message = result.errorMessage {
             errorNotice.show(message)
+        } else if let message = result.infoMessage {
+            errorNotice.inform(message)
         }
 
-        return result.deletion
+        return result
     }
 
     func restore(_ deletion: Deletion) async {

@@ -52,10 +52,35 @@ struct BudgetListModelTests {
         await model.load()
         model.startEditing(.total)
         let current = model.calculator.amount
-        await model.clear()
+        let cleared = try #require(await model.clear())
+        let afterClear = model.totalAmount
+
+        await model.restore(cleared)
+        let budgets = try await setup.database.budgets()
 
         #expect(current == 50000)
-        #expect(model.totalAmount == nil)
+        #expect(afterClear == nil)
+        #expect(cleared.target.title == "月全体の予算")
+        #expect(model.totalAmount == 50000)
+        #expect(budgets.count == 1)
+    }
+
+    @Test
+    func restoresBudgetCarriedFromEarlierMonth() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let month = setup.today.yearMonth
+        let earlier = month.adding(months: -2)
+        try await setup.database.setBudget(30000, for: nil, from: earlier)
+        let model = BudgetListModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        model.startEditing(.total)
+        let cleared = try #require(await model.clear())
+        await model.restore(cleared)
+        let budgets = try await setup.database.budgets()
+
+        #expect(model.totalAmount == 30000)
+        #expect(budgets.map(\.fromMonth) == [earlier])
     }
 
     @Test

@@ -4,14 +4,16 @@ import SwiftUI
 public extension View {
     func deletionNotice(
         _ deletion: Binding<Deletion?>,
+        note: String? = nil,
         bottom: CGFloat = 12,
         onUndo: @escaping (Deletion) -> Void
     ) -> some View {
-        let message = deletion.wrappedValue?.subject?.noticeMessage
+        let subject = deletion.wrappedValue?.subject?.noticeMessage ?? "削除しました"
+        let message = note.map { "\(subject)（\($0)）" } ?? subject
 
         return settingsHideNotice(
             deletion,
-            message: message ?? "削除しました",
+            message: message,
             systemImage: "trash",
             bottom: bottom,
             onUndo: onUndo

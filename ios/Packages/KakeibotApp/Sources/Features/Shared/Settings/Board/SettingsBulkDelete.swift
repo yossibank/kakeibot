@@ -1,22 +1,43 @@
 import Store
 
-struct SettingsBulkDelete {
-    let deletion: Deletion?
-    let keptCount: Int
-    let hasFailed: Bool
+public struct SettingsBulkDelete: Sendable {
+    public let deletion: Deletion?
+    public let keptCount: Int
+    public let hasFailed: Bool
 }
 
-extension SettingsBulkDelete {
-    var message: String? {
-        if hasFailed {
-            return "削除できないものがありました"
-        }
-
-        guard keptCount > 0 else {
+public extension SettingsBulkDelete {
+    func note(for deletion: Deletion?) -> String? {
+        guard
+            keptCount > 0,
+            let deletion,
+            deletion.id == self.deletion?.id
+        else {
             return nil
         }
 
         return "記録がある \(keptCount) 件は残しました"
+    }
+}
+
+extension SettingsBulkDelete {
+    static let failedMessage = "削除できないものがありました"
+    static let allKeptMessage = "記録があるので削除しませんでした"
+
+    var errorMessage: String? {
+        hasFailed ? Self.failedMessage : nil
+    }
+
+    var infoMessage: String? {
+        guard
+            !hasFailed,
+            deletion == nil,
+            keptCount > 0
+        else {
+            return nil
+        }
+
+        return Self.allKeptMessage
     }
 
     @MainActor

@@ -137,7 +137,12 @@ public struct WalletEditSheet: View {
         .confirmsDiscard(when: model.isChanged, isPresented: $isConfirmingDiscard) {
             dismiss()
         }
-        .confirmsWalletDelete(isPresented: $isConfirmingDelete) {
+        .confirmsWalletDelete(
+            hasEntries: model.hasEntries,
+            isPresented: $isConfirmingDelete
+        ) {
+            toggleHidden()
+        } onConfirm: {
             Task {
                 await delete()
             }

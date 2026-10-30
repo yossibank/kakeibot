@@ -75,7 +75,7 @@ extension TemplateListView {
 
     func deleteHidden() {
         Task {
-            deletion = await model.deleteHidden()
+            deletion = await model.deleteHidden().deletion
         }
     }
 

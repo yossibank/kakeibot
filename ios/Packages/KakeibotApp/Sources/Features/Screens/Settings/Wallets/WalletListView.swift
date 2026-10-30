@@ -8,6 +8,7 @@ public struct WalletListView: View {
     @State var model: WalletListModel
     @State var hiddenId: Wallet.ID?
     @State var deletion: Deletion?
+    @State var bulkDelete: SettingsBulkDelete?
     @State var hiding: Wallet?
     @State var isConfirmingHide = false
     @State var deleting: Wallet?
@@ -80,7 +81,7 @@ public struct WalletListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
-            .deletionNotice($deletion) { deletion in
+            .deletionNotice($deletion, note: bulkDelete?.note(for: deletion)) { deletion in
                 restore(deletion)
             }
 
@@ -127,7 +128,14 @@ public struct WalletListView: View {
                 hide(hiding.id)
             }
         }
-        .confirmsWalletDelete(isPresented: $isConfirmingDelete) {
+        .confirmsWalletDelete(
+            hasEntries: deleting.map(model.hasEntries) ?? false,
+            isPresented: $isConfirmingDelete
+        ) {
+            if let deleting {
+                requestHide(deleting)
+            }
+        } onConfirm: {
             if let deleting {
                 delete(deleting.id)
             }

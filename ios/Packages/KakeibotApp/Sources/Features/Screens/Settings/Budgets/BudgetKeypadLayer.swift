@@ -3,12 +3,22 @@ import DesignSystem
 import SwiftUI
 
 extension View {
-    func budgetKeypad(_ model: BudgetListModel) -> some View {
-        modifier(BudgetKeypadLayer(model: model))
+    func budgetKeypad(
+        _ model: BudgetListModel,
+        cleared: Binding<BudgetListModel.Cleared?> = .constant(nil)
+    ) -> some View {
+        modifier(
+            BudgetKeypadLayer(
+                cleared: cleared,
+                model: model
+            )
+        )
     }
 }
 
 private struct BudgetKeypadLayer: ViewModifier {
+    @Binding var cleared: BudgetListModel.Cleared?
+
     @State private var isConfirmingDiscard = false
 
     let model: BudgetListModel
@@ -75,14 +85,20 @@ private extension BudgetKeypadLayer {
                 .disabled(!model.canSave)
 
                 if model.editingAmount != nil {
-                    Button("予算をなくす") {
+                    Button {
                         Task {
-                            await model.clear()
+                            if let result = await model.clear() {
+                                cleared = result
+                            }
                         }
+                    } label: {
+                        Text("予算をなくす")
+                            .textFont(.footnote)
+                            .foregroundStyle(Palette.rose)
+                            .padding(.horizontal, 16)
+                            .frame(minHeight: 44)
+                            .contentShape(.rect)
                     }
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.rose)
-                    .frame(minHeight: 36)
                 }
             }
         }

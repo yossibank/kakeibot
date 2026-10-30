@@ -8,6 +8,7 @@ public struct CategoryListView: View {
     @State var model: CategoryListModel
     @State var hiddenId: EntryCategory.ID?
     @State var deletion: Deletion?
+    @State var bulkDelete: SettingsBulkDelete?
 
     @State var grid = SettingsBoardGrid(
         columns: Self.columnCount,
@@ -87,7 +88,7 @@ public struct CategoryListView: View {
             .settingsHideNotice($hiddenId) { id in
                 show(id)
             }
-            .deletionNotice($deletion) { deletion in
+            .deletionNotice($deletion, note: bulkDelete?.note(for: deletion)) { deletion in
                 restore(deletion)
             }
 

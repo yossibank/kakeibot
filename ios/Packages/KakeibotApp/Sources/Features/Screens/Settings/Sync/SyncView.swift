@@ -181,16 +181,6 @@ private extension SyncView {
     }
 }
 
-extension SyncView {
-    func caption(_ text: String) -> some View {
-        Text(text)
-            .textFont(.caption)
-            .foregroundStyle(Palette.subtext)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(.leading, 8)
-    }
-}
-
 private extension SyncView {
     static let onOptions: [CapsulePicker<Bool>.Option] = [
         .init("オフ", value: false),
