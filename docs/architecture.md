@@ -5,7 +5,7 @@
 > 共通の形は [claude-config の architecture-ios](https://github.com/yossibank/claude-config/blob/main/docs/architecture-ios.md) にある。
 > 手元の置き場所は、claude-config の `docs/architecture-ios.md` である。
 
-## 使う技術
+## 🛠️ 使う技術
 
 iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである。画面と保存を選んだ理由は、decisions の[画面の作り](decisions/ios.md#画面の作り)と [DB](decisions/ios.md#db) にある。Android は、次の技術を使う。
 
@@ -19,7 +19,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 両 OS の分け方とそろえ方は、[decisions/build.md の「共通化」](decisions/build.md#共通化)にある。
 
-## リポジトリ
+## 📂 リポジトリ
 
 共通の木に、次のものを足している。
 
@@ -47,7 +47,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `.claude/snapshots/entry-wallet/` | `ui-snapshot` で描く、入力シートの口座を選ぶシート |
 | `.claude/snapshots/entry-wallet-edit/` | `ui-snapshot` で描く、口座を選ぶシートの編集中 |
 
-## ios
+## 📱 ios
 
 ターゲットと ID は、共通の形の `<App>` を `Kakeibot` にしたものである。ほかに、次のものを持つ。
 
@@ -71,7 +71,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | プロファイル | 2027-10-10 まで |
 | 配布用の証明書 | なし。Archive のときに Xcode がクラウドで管理するものを使う |
 
-## パッケージ
+## 📦 パッケージ
 
 2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/`・`Sync`・`TestSupport` を足している。
 
@@ -79,6 +79,34 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 - `AppFeature --> Sync --> Store`
 - `AppFeatureTests・FeaturesTests --> TestSupport`
+
+テストのターゲットを除いた依存は、次の図のとおりである。
+
+```mermaid
+flowchart TD
+    subgraph app["KakeibotApp"]
+        AppFeature --> Features
+        AppFeature --> Notifications
+        AppFeature --> Sync
+        AppFeature --> DesignSystem
+        AppWidget --> Notifications
+        AppWidget --> DesignSystem
+        Features --> DesignSystem
+    end
+    subgraph kit["KakeibotKit"]
+        Store --> Core
+    end
+    AppFeature --> Store
+    AppWidget --> Store
+    Features --> Store
+    Sync --> Store
+    AppFeature --> Core
+    AppWidget --> Core
+    Features --> Core
+    Notifications --> Core
+    DesignSystem --> Core
+    Store --> GRDB
+```
 
 ### KakeibotKit
 
@@ -182,17 +210,17 @@ KakeibotApp/
 | `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |
 | `Tests/TestSupport/` | テストの補助。観測している値が変わるのを、上限の時間まで待つ |
 
-## 名前の決まり
+## 📏 名前の決まり
 
 フォルダとファイルの名前は、共通の形の「名前の決まり」と `rules/swift-core.md` に従う。kakeibot では、入れる先のない `Core/Identifier` だけ、ファイルが 1 つのフォルダを認める。fixtures は `spec/fixtures/` の下の、Core のフォルダ名を小文字にしたフォルダに置く。
 
 画面の組み立てと通知とウィジェットの方式は、[architecture-screens](architecture-screens.md) にある。
 
-## テスト
+## 🧪 テスト
 
 テストの形は、共通の形に `SyncTests` と `AppWidgetTests` を足したものである。Core のテストは、fixtures を全部通す。
 
-## 未検証
+## ⚠️ 未検証
 
 > [!WARNING]
 > - 配布用の証明書を Xcode がクラウドで管理するか（12 番で確かめる）

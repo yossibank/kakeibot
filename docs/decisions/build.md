@@ -67,9 +67,8 @@
 | 却下 | hook は違反を止めるだけで直さない、hook がステージし直して commit まで通す |
 | 却下 | SwiftLint も入れる |
 
-決まり：
-
-commit の前に pre-commit が整形し、直したら commit を止める。ステージし直すのは人。
+> [!IMPORTANT]
+> commit の前に pre-commit が整形し、直したら commit を止める。ステージし直すのは人。
 
 ## 文書の確認
 
@@ -81,9 +80,8 @@ commit の前に pre-commit が整形し、直したら commit を止める。�
 | 却下 | pre-commit で確かめる、自動では確かめない |
 | 理由 | 文書を書くのはほぼ Claude なので、書いたその場で直せる。フックが見ない文書は `make verify-docs` で見る |
 
-決まり：
-
-文書と実物の一致は、`scripts/docs-check.py` で確かめる。見るものは [architecture のリポジトリ](../architecture.md#リポジトリ)にある。文書だけの PR では、`make verify-docs` で走らせる。
+> [!IMPORTANT]
+> 文書と実物の一致は、`scripts/docs-check.py` で確かめる。見るものは [architecture のリポジトリ](../architecture.md#-リポジトリ)にある。文書だけの PR では、`make verify-docs` で走らせる。
 
 ## テストの走らせ方
 
@@ -97,13 +95,12 @@ commit の前に pre-commit が整形し、直したら commit を止める。�
 | 却下 | push のたびに走らせる、`make test-build` も別に走らせる、xcodebuild の出力をそのまま出す |
 | 却下 | 先にシミュレーターを起動する。起動の途中は `simctl list` と `xcodebuild` が待たされ、かえって遅い |
 
-決まり：
-
-- PR を作る前に、Claude が手元で `make test` を 1 回走らせ、結果を PR の本文に書く。
-- push し直すときは、Swift か fixtures を変えたときだけ走らせ直す。
-- 文書だけの PR では走らせない。
-- ビルドは別に走らせず、`make test` のビルドで兼ねる。
-- ビルドとテストの出力は xcbeautify で整える。
+> [!IMPORTANT]
+> - PR を作る前に、Claude が手元で `make test` を 1 回走らせ、結果を PR の本文に書く。
+> - push し直すときは、Swift か fixtures を変えたときだけ走らせ直す。
+> - 文書だけの PR では走らせない。
+> - ビルドは別に走らせず、`make test` のビルドで兼ねる。
+> - ビルドとテストの出力は xcbeautify で整える。
 
 ## 画面の言語
 
@@ -114,9 +111,8 @@ commit の前に pre-commit が整形し、直したら commit を止める。�
 | 理由 | 日本語で使う人に向けたアプリで、日付選択などの OS の部品も日本語で出る |
 | 却下 | 英語で書いて日本語に訳す |
 
-決まり：
-
-ほかの言語は、出すときに訳を足す。
+> [!IMPORTANT]
+> ほかの言語は、出すときに訳を足す。
 
 ## 画面の言葉づかい
 
@@ -127,6 +123,5 @@ commit の前に pre-commit が整形し、直したら commit を止める。�
 | 理由 | 使ってもらうアプリなので、言い切りより柔らかく聞こえる |
 | 却下 | 「記録した」のような言い切り |
 
-決まり：
-
-ボタンは「取り消す」「削除」のように短く書く。
+> [!IMPORTANT]
+> ボタンは「取り消す」「削除」のように短く書く。
