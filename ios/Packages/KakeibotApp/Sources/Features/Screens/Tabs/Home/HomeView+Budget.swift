@@ -50,7 +50,7 @@ extension HomeView {
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
                             .padding(.vertical, 4)
-                            .contentShape(.rect)
+                            .tapArea(budgetLinkTapOutsets)
                         }
                         .buttonStyle(.plain)
                     }
@@ -67,12 +67,12 @@ extension HomeView {
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .frame(minHeight: 32)
-                        .contentShape(.rect)
+                        .tapArea(budgetHintTapOutsets)
                     }
                     .buttonStyle(.plain)
                 }
 
-                if model.recurringExpense > 0 {
+                if hasRecurringRow {
                     Button(action: onOpenRecurrings) {
                         VStack(spacing: 8) {
                             HStack(spacing: 4) {
@@ -88,7 +88,7 @@ extension HomeView {
                             recurringProgress
                         }
                         .padding(.vertical, 4)
-                        .contentShape(.rect)
+                        .tapArea(Self.recurringLinkTapOutsets)
                     }
                     .buttonStyle(.plain)
                 }
@@ -172,6 +172,35 @@ private extension HomeView {
 
 private extension HomeView {
     static let unknownAmount = "—"
+
+    static let recurringLinkTapOutsets = EdgeInsets(
+        top: 2,
+        leading: 10,
+        bottom: 10,
+        trailing: 10
+    )
+
+    var hasRecurringRow: Bool {
+        model.recurringExpense > 0
+    }
+
+    var budgetLinkTapOutsets: EdgeInsets {
+        EdgeInsets(
+            top: 10,
+            leading: 10,
+            bottom: hasRecurringRow ? 2 : 10,
+            trailing: 10
+        )
+    }
+
+    var budgetHintTapOutsets: EdgeInsets {
+        EdgeInsets(
+            top: 6,
+            leading: 0,
+            bottom: hasRecurringRow ? 2 : 6,
+            trailing: 0
+        )
+    }
 
     var dialTitle: String {
         model.budgetUsage?.remainingTitle ?? "今月の支出"

@@ -100,6 +100,7 @@ extension RecordsView {
                     rewardTarget = StampTarget(date: date)
                 } label: {
                     rewardButtonLabel(on: date)
+                        .tapArea(Self.dayButtonTapOutsets)
                 }
                 .buttonStyle(.plain)
             }
@@ -108,6 +109,7 @@ extension RecordsView {
                 stampTarget = StampTarget(date: date)
             } label: {
                 stampButtonLabel(on: date)
+                    .tapArea(Self.dayButtonTapOutsets)
             }
             .buttonStyle(.plain)
         }
@@ -184,6 +186,13 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
+    static let dayButtonTapOutsets = EdgeInsets(
+        top: 9,
+        leading: 6,
+        bottom: 9,
+        trailing: 6
+    )
+
     static func weekdayColor(for date: LocalDate) -> Color {
         date.tint ?? Palette.subtext
     }

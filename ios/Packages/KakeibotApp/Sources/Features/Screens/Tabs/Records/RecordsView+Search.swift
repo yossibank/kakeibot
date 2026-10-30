@@ -15,11 +15,16 @@ extension RecordsView {
 
             filterButton(title: nil)
 
-            Button("閉じる") {
+            Button {
                 closeSearch()
+            } label: {
+                Text("閉じる")
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.accent)
+                    .frame(minHeight: 44)
+                    .contentShape(.rect)
             }
-            .textFont(.subheadline)
-            .foregroundStyle(Palette.accent)
+            .buttonStyle(.plain)
         }
     }
 

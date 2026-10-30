@@ -24,7 +24,7 @@ struct RecordsFilterLine: View {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundStyle(Palette.hint)
                     .frame(width: 32, height: 32)
-                    .contentShape(.rect)
+                    .tapArea(6)
             }
             .buttonStyle(.plain)
         }
