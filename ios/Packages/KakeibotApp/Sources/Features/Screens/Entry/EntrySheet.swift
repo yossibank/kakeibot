@@ -135,6 +135,8 @@ extension EntrySheet {
                         await saveAndContinue()
                     }
                 }
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .frame(width: Self.continueWidth)
                 .opacity(continueOpacity)
             }
