@@ -28,7 +28,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: size.spacing) {
             HStack(spacing: size.gap) {
-                TemplateBadge(icon: icon, size: size)
+                TemplateBadge(icon: icon, size: size.badge)
 
                 VStack(alignment: .leading, spacing: size.textSpacing) {
                     name

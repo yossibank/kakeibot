@@ -31,10 +31,7 @@ private extension QuickRecordWidgetView {
     ) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 4) {
-                IconImage(tile.icon, size: 11)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: Self.badgeSize, height: Self.badgeSize)
-                    .background(Palette.faint, in: Circle())
+                TemplateBadge(icon: tile.icon, size: .small)
 
                 Text(tile.name)
                     .textFont(size: .caption, weight: .medium)
