@@ -17,7 +17,11 @@ public struct LaunchScreenView: View {
                 VStack(spacing: 12) {
                     SettingsIntroCard(
                         systemImage: "iphone",
-                        headline: ("アプリを開いたときに", "最初に出す画面を選べます")
+                        headline: ("アプリを開いたときに", "最初に出す画面を選べます"),
+                        notes: [
+                            .init("power", "立ち上げたときに、選んだ画面から始まります"),
+                            .init("arrow.uturn.backward", "途中から戻ったときは、前の画面のままです")
+                        ]
                     )
 
                     LaunchScreenPreview(selection: model.screen)

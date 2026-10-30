@@ -285,16 +285,21 @@ private extension TemplateListView {
     }
 
     var notes: [SettingsIntroCard.Note] {
+        let purpose: [SettingsIntroCard.Note] = [
+            .init("hand.tap", "金額を決めておくと、押すだけで記録します"),
+            .init("apps.iphone", "ウィジェットからも記録できます")
+        ]
+
         if model.shown.isEmpty {
-            []
-        } else {
-            [
-                .init("list.number", "この順でホームと入力シートに出ます"),
-                .move,
-                .hide,
-                .swipeDelete
-            ]
+            return purpose
         }
+
+        return purpose + [
+            .init("list.number", "この順でホームと入力シートに出ます"),
+            .move,
+            .hide,
+            .swipeDelete
+        ]
     }
 
     var boardHeight: CGFloat {
