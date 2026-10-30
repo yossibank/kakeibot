@@ -121,7 +121,7 @@ private extension QuickRecordWidgetView {
 
                 Spacer(minLength: 4)
 
-                Text("今日 \(AmountText.text(summary.todayExpense))")
+                Text("今日の支出 \(AmountText.text(summary.todayExpense))")
                     .textFont(size: .caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
