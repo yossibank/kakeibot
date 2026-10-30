@@ -22,6 +22,7 @@ extension HomeView {
                         .minimumScaleFactor(0.5)
                         .contentTransition(.numericText())
                 }
+                .padding(.horizontal, 32)
             }
             .frame(maxWidth: 290)
             .animation(.snappy, value: model.budgetUsage)
@@ -164,6 +165,7 @@ private extension HomeView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
         }
+        .padding(.horizontal, 4)
         .frame(maxWidth: .infinity)
     }
 }

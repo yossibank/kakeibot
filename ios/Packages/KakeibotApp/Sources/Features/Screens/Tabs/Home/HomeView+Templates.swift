@@ -5,23 +5,19 @@ import SwiftUI
 extension HomeView {
     var templateCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ZStack {
-                HStack {
-                    SectionTitle("テンプレート")
-
-                    Spacer()
-
-                    Button("すべて", action: onShowAllTemplates)
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.accent)
-                        .frame(minHeight: 44)
-                }
+            TemplateHeaderLayout(spacing: 8) {
+                SectionTitle("テンプレート")
 
                 CapsulePicker(
                     selection: $model.templateType,
                     options: Self.typeOptions,
                     size: .small
                 )
+
+                Button("すべて", action: onShowAllTemplates)
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.accent)
+                    .frame(minHeight: 44)
             }
             .padding(.top, 8)
 
@@ -34,6 +30,7 @@ extension HomeView {
 
                 if model.templates.count > 1 {
                     orderButton
+                        .layoutPriority(1)
                 }
 
                 Button(action: onAddTemplate) {
@@ -72,6 +69,8 @@ private extension HomeView {
 
                 Text(model.templateOrder.title)
                     .textFont(.caption2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .foregroundStyle(Palette.accent)
             .padding(.horizontal, 12)
