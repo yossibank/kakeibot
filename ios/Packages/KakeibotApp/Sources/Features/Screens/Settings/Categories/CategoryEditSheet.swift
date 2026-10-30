@@ -88,14 +88,19 @@ public struct CategoryEditSheet: View {
         }
         .confirmation(
             isPresented: $isConfirmingDelete,
-            systemImage: "trash",
-            title: "このカテゴリを削除しますか",
-            message: "使っている固定費・テンプレート・予算・タグも消えます",
+            systemImage: deleteImage,
+            title: deleteTitle,
+            message: deleteMessage,
             keepTitle: "やめる",
-            confirmTitle: "削除する"
+            confirmTitle: deleteConfirmTitle,
+            role: deleteRole
         ) {
-            Task {
-                await delete()
+            if model.hasEntries {
+                toggleHidden()
+            } else {
+                Task {
+                    await delete()
+                }
             }
         }
         .onChange(of: focus) {
@@ -181,7 +186,8 @@ private extension CategoryEditSheet {
         SettingsEditHeader(
             title: model.isEditing ? "カテゴリを編集" : "カテゴリを追加",
             isEditing: model.isEditing,
-            isHidden: model.isHidden
+            isHidden: model.isHidden,
+            canDelete: !(model.isHidden && model.hasEntries)
         ) {
             close()
         } onHide: {
@@ -279,9 +285,30 @@ private extension CategoryEditSheet {
 
 private extension CategoryEditSheet {
     static let fade: CGFloat = 16
+    static let hasEntriesMessage = "記録があります。非表示にすると、記録を残したまま一覧から外せます"
 
     var graphColor: Color {
         Color(hex: model.icon.color) ?? Palette.subtext
+    }
+
+    var deleteImage: String {
+        model.hasEntries ? "eye.slash" : "trash"
+    }
+
+    var deleteTitle: String {
+        model.hasEntries ? "このカテゴリは削除できません" : "このカテゴリを削除しますか"
+    }
+
+    var deleteMessage: String {
+        model.hasEntries ? Self.hasEntriesMessage : "使っている固定費・テンプレート・予算・タグも消えます"
+    }
+
+    var deleteConfirmTitle: String {
+        model.hasEntries ? "非表示にする" : "削除する"
+    }
+
+    var deleteRole: ConfirmCard.Role {
+        model.hasEntries ? .suggestion : .destructive
     }
 
     var keyboardRegions: SafeAreaRegions {

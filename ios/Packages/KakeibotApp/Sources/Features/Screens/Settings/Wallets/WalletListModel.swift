@@ -39,6 +39,10 @@ public extension WalletListModel {
         return wallet.balance(with: entries, valuations: valuations) != 0
     }
 
+    func hasEntries(_ wallet: Wallet) -> Bool {
+        list.map { WalletEditModel.hasEntries(of: wallet, in: $0) } ?? false
+    }
+
     func balance(of wallet: Wallet) -> Int {
         let entries = list?.days.flatMap(\.entries) ?? []
         let valuations = list?.valuations ?? []

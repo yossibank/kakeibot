@@ -25,6 +25,7 @@ public final class WalletEditModel {
     public private(set) var payment: Recurring?
     public private(set) var recordedKind: Wallet.Kind?
     public private(set) var hasValuations = false
+    public private(set) var hasEntries = false
     public private(set) var totalBalance = 0
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -246,6 +247,17 @@ public extension WalletEditModel {
     }
 }
 
+extension WalletEditModel {
+    static func hasEntries(
+        of wallet: Wallet,
+        in list: EntryList
+    ) -> Bool {
+        list.days.flatMap(\.entries).contains { entry in
+            entry.walletId == wallet.id || entry.toWalletId == wallet.id
+        }
+    }
+}
+
 private extension WalletEditModel {
     static let defaultColor = "#C9A465"
     static let loadFailedMessage = "口座を読めませんでした"
@@ -262,9 +274,7 @@ private extension WalletEditModel {
         in list: EntryList,
         recurrings: [Recurring]
     ) -> Bool {
-        let hasEntries = list.days.flatMap(\.entries).contains { entry in
-            entry.walletId == wallet.id || entry.toWalletId == wallet.id
-        }
+        let hasEntries = Self.hasEntries(of: wallet, in: list)
 
         let hasValuations = list.valuations.contains { $0.walletId == wallet.id }
 
@@ -291,6 +301,7 @@ private extension WalletEditModel {
 
         recordedKind = locked.recordedKind
         hasValuations = locked.hasValuations
+        hasEntries = Self.hasEntries(of: wallet, in: list)
     }
 
     func followKind(from oldKind: Wallet.Kind) {

@@ -128,7 +128,14 @@ public struct WalletListView: View {
                 hide(hiding.id)
             }
         }
-        .confirmsWalletDelete(isPresented: $isConfirmingDelete) {
+        .confirmsWalletDelete(
+            hasEntries: deleting.map(model.hasEntries) ?? false,
+            isPresented: $isConfirmingDelete
+        ) {
+            if let deleting {
+                requestHide(deleting)
+            }
+        } onConfirm: {
             if let deleting {
                 delete(deleting.id)
             }

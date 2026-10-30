@@ -11,6 +11,7 @@ public final class CategoryEditModel {
 
     public private(set) var tags: [EditingTag] = []
     public private(set) var isHidden = false
+    public private(set) var hasEntries = false
     public private(set) var tagProblem: String?
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -141,6 +142,7 @@ public extension CategoryEditModel {
 
         do {
             let list = try await database.categoryList()
+            let entries = try await database.entryList().days.flatMap(\.entries)
             let category = list.categories.first { $0.id == editingId }
 
             guard
@@ -157,6 +159,7 @@ public extension CategoryEditModel {
 
             tags = list.tags.filter { $0.categoryId == editingId }.map(EditingTag.init)
             isHidden = category.archivedAt != nil
+            hasEntries = entries.contains { $0.categoryId == editingId }
             baseline = snapshot
         } catch {
             errorNotice.show(Self.loadFailedMessage)

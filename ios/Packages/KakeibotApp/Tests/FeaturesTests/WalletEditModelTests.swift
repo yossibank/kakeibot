@@ -125,6 +125,8 @@ struct WalletEditModelTests {
 
         #expect(used.draft.problems == [.kindLocked])
         #expect(unused.draft.problems.isEmpty)
+        #expect(used.hasEntries)
+        #expect(!unused.hasEntries)
     }
 
     @Test
@@ -220,6 +222,7 @@ struct WalletEditModelTests {
         model.kind = .card
 
         #expect(model.draft.problems == [.kindLocked])
+        #expect(!model.hasEntries)
     }
 
     @Test

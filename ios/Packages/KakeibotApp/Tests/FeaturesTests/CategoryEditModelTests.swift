@@ -65,6 +65,34 @@ struct CategoryEditModelTests {
     }
 
     @Test
+    func knowsWhetherCategoryHasEntries() async throws {
+        let database = try Self.database()
+        let options = try await database.entryOptions()
+        let used = options.expenseCategories[0]
+        let unused = options.expenseCategories[1]
+        let walletId = try #require(options.wallets.first?.id)
+        let today = LocalDate(Date(), in: .current)
+
+        let draft = EntryDraft(
+            type: .expense,
+            amount: 500,
+            date: today,
+            categoryId: used.id,
+            walletId: walletId
+        )
+
+        try await database.saveEntry(draft, at: Date())
+        let usedModel = CategoryEditModel(database: database, kind: .expense, editing: used.id)
+        let unusedModel = CategoryEditModel(database: database, kind: .expense, editing: unused.id)
+
+        await usedModel.load()
+        await unusedModel.load()
+
+        #expect(usedModel.hasEntries)
+        #expect(!unusedModel.hasEntries)
+    }
+
+    @Test
     func tracksChangesFromStart() throws {
         let database = try Self.database()
         let model = CategoryEditModel(database: database, kind: .expense)
