@@ -32,15 +32,40 @@ public extension SyncEngine {
         await (try? container.accountStatus()) ?? .couldNotDetermine
     }
 
-    static func hasCloudData(
+    static func cloudSummary(
         in container: CKContainer = CKContainer(identifier: containerIdentifier)
-    ) async throws -> Bool {
+    ) async throws -> SyncSummary? {
+        var entryCount = 0
+        var updates: [String] = []
+        var token: CKServerChangeToken?
+        var moreComing = true
+
         do {
-            _ = try await container.privateCloudDatabase.recordZone(for: zoneID)
-            return true
+            while moreComing {
+                let changes = try await container.privateCloudDatabase.recordZoneChanges(
+                    inZoneWith: zoneID,
+                    since: token,
+                    desiredKeys: [SyncRecord.fieldsKey]
+                )
+
+                let entries = changes.modificationResultsByID.values
+                    .compactMap {
+                        try? $0.get().record
+                    }
+                    .filter {
+                        $0.recordType == SyncTable.entry.rawValue
+                    }
+
+                entryCount += entries.count
+                updates += entries.compactMap(Self.updatedAt)
+                token = changes.changeToken
+                moreComing = changes.moreComing
+            }
         } catch let error as CKError where error.code == .zoneNotFound {
-            return false
+            return nil
         }
+
+        return SyncSummary(entryCount: entryCount, latestUpdate: updates.max())
     }
 
     static func deleteCloudData(
@@ -119,6 +144,14 @@ extension SyncEngine {
             isSyncEnabled: isSyncEnabled,
             owners: owners
         )
+    }
+
+    static func updatedAt(_ record: CKRecord) -> String? {
+        guard case let .text(text)? = SyncRecord(record)?.values["updated_at"] else {
+            return nil
+        }
+
+        return text
     }
 
     func recordID(of id: SyncRecordID) -> CKRecord.ID {

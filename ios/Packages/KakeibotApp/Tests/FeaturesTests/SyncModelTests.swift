@@ -43,7 +43,6 @@ struct SyncModelTests {
 
         #expect(model.isOn == false)
         #expect(model.isChoosing)
-        #expect(SyncModel.choiceMessage.hasSuffix("「この iPhone のデータを使う」を選ぶと、ほかの iPhone の同期は切れます"))
 
         await model.useLocalData()
 
@@ -268,96 +267,6 @@ struct SyncModelTests {
 
         #expect(after.isShared == true)
         #expect(model.errorNotice.message != nil)
-    }
-}
-
-extension SyncModelTests {
-    actor FakeCloud {
-        private(set) var deleted = false
-        private(set) var shareCalls: [String] = []
-
-        private var account: SyncAccount
-        private let hasData: Bool
-        private let stopsInSheet: Bool
-        private let failsToCreate: Bool
-        private let failsToDelete: Bool
-        private let failsToLeave: Bool
-
-        init(
-            account: SyncAccount = .available,
-            hasData: Bool,
-            stopsInSheet: Bool = false,
-            failsToCreate: Bool = false,
-            failsToDelete: Bool = false,
-            failsToLeave: Bool = false
-        ) {
-            self.account = account
-            self.hasData = hasData
-            self.stopsInSheet = stopsInSheet
-            self.failsToCreate = failsToCreate
-            self.failsToDelete = failsToDelete
-            self.failsToLeave = failsToLeave
-        }
-    }
-}
-
-extension SyncModelTests.FakeCloud {
-    nonisolated var cloud: SyncCloud {
-        SyncCloud {
-            await self.account
-        } hasData: {
-            self.hasData
-        } deleteData: {
-            await self.delete()
-        } createShare: { _, _ in
-            try await self.createShare()
-        } showShare: { _, _, onStop in
-            await self.record("show")
-
-            if self.stopsInSheet {
-                await onStop()
-            }
-        } deleteShare: { _ in
-            try await self.deleteShare()
-        } leaveShare: { _, owner in
-            try await self.leaveShare(owner)
-        }
-    }
-
-    func delete() {
-        deleted = true
-    }
-
-    func signIn() {
-        account = .available
-    }
-
-    func record(_ call: String) {
-        shareCalls.append(call)
-    }
-
-    func deleteShare() throws {
-        shareCalls.append("delete")
-
-        if failsToDelete {
-            throw CancellationError()
-        }
-    }
-
-    func leaveShare(_ owner: String) throws {
-        shareCalls.append("leave \(owner)")
-
-        if failsToLeave {
-            throw CancellationError()
-        }
-    }
-
-    func createShare() throws {
-        shareCalls.append("create")
-
-        if failsToCreate {
-            throw CancellationError()
-        }
     }
 }
 

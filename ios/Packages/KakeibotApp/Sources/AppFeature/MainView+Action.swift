@@ -8,7 +8,7 @@ extension MainView {
         let isHomeLoaded = home.list != nil || home.errorNotice.message != nil
         let isSetupLoaded = setup.isLoaded || setup.errorNotice.message != nil
 
-        return isHomeLoaded && isSetupLoaded && launchScreen != nil && isTabLoaded
+        return isHomeLoaded && isSetupLoaded && launchScreen != nil && areTabsLoaded
     }
 
     var templateOrderBinding: Binding<TemplateOrder> {
@@ -116,13 +116,12 @@ extension MainView {
 private extension MainView {
     static let sheetCloseDuration: Duration = .milliseconds(600)
 
-    var isTabLoaded: Bool {
-        switch tab {
-        case .home: true
-        case .records: records.list != nil || records.errorNotice.message != nil
-        case .review: review.list != nil || review.errorNotice.message != nil
-        case .assets: assets.list != nil || assets.errorNotice.message != nil
-        }
+    var areTabsLoaded: Bool {
+        let isRecordsLoaded = records.list != nil || records.errorNotice.message != nil
+        let isReviewLoaded = review.list != nil || review.errorNotice.message != nil
+        let isAssetsLoaded = assets.list != nil || assets.errorNotice.message != nil
+
+        return isRecordsLoaded && isReviewLoaded && isAssetsLoaded
     }
 
     var hasLaunchSheet: Bool {

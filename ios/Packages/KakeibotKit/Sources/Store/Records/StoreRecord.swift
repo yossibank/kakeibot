@@ -69,7 +69,7 @@ extension StoreColumnKey: CodingKey {
     }
 }
 
-private extension Date {
+extension Date {
     static let fractionalStyle = Date.ISO8601FormatStyle(includingFractionalSeconds: true)
 
     init?(storedValue: DatabaseValue) {
