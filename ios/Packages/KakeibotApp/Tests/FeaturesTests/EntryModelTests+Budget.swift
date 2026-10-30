@@ -49,6 +49,24 @@ extension EntryModelTests {
         #expect(model.budgetText == "今月あと ¥9,500 → ¥9,300")
         #expect(model.budgetUsageAfterSave?.spent == 700)
     }
+
+    @Test
+    func showsBudgetBackWithinAfterLoweringEditedAmount() async throws {
+        let setup = try await Setup()
+        try await Self.saveBudgetAndEntry(setup, budget: 400)
+        let entry = try #require(try setup.database.snapshot().entries.first)
+        let model = EntryModel(database: setup.database, editing: entry.id, date: entry.date)
+
+        await model.load()
+        model.press(.delete)
+        model.press(.delete)
+        model.press(.delete)
+        model.press(.digit(3))
+        model.press(.doubleZero)
+
+        #expect(model.budgetText == "予算オーバー ¥100 → あと ¥100")
+        #expect(model.budgetUsageAfterSave?.isOver == false)
+    }
 }
 
 private extension EntryModelTests {
