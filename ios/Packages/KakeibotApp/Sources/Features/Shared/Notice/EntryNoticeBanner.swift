@@ -4,15 +4,23 @@ import SwiftUI
 public extension View {
     func entryNotice(
         _ model: EntryNoticeModel,
-        above inset: CGFloat
+        above inset: CGFloat,
+        clearsOnTap: Bool = true
     ) -> some View {
-        modifier(EntryNoticeBanner(model: model, inset: inset))
+        modifier(
+            EntryNoticeBanner(
+                model: model,
+                inset: inset,
+                clearsOnTap: clearsOnTap
+            )
+        )
     }
 }
 
 private struct EntryNoticeBanner: ViewModifier {
     let model: EntryNoticeModel
     let inset: CGFloat
+    let clearsOnTap: Bool
 
     func body(content: Content) -> some View {
         let bottom = 12 + inset
@@ -21,7 +29,8 @@ private struct EntryNoticeBanner: ViewModifier {
             .simultaneousGesture(
                 TapGesture().onEnded {
                     model.clearOnTap()
-                }
+                },
+                including: tapMask
             )
             .overlay(alignment: .bottom) {
                 if let notice = model.notice {
@@ -76,6 +85,10 @@ private extension EntryNoticeBanner {
 private extension EntryNoticeBanner {
     static let transition = AnyTransition.move(edge: .bottom)
         .combined(with: .opacity)
+
+    var tapMask: GestureMask {
+        clearsOnTap ? .all : .subviews
+    }
 
     func clearLater() async {
         guard let notice = model.notice else {

@@ -67,6 +67,44 @@ public extension EntryModel {
         return monthOverview.budgetUsage
     }
 
+    var budgetUsageAfterSave: BudgetUsage? {
+        guard let usage = budgetUsage else {
+            return nil
+        }
+
+        let totals = monthTotals { $0.type == .expense }
+
+        return BudgetUsage(
+            budget: usage.budget,
+            spent: usage.spent - totals.current + totals.after,
+            today: Self.today,
+            periodEnd: monthOverview.period.upperBound
+        )
+    }
+
+    var budgetText: String? {
+        guard
+            let usage = budgetUsage,
+            let after = budgetUsageAfterSave
+        else {
+            return nil
+        }
+
+        guard after.spent != usage.spent else {
+            return "\(usage.remainingTitle) \(usage.remainingAmountText)"
+        }
+
+        let title = usage.isOver ? "予算オーバー" : "今月あと"
+
+        let label = switch (usage.isOver, after.isOver) {
+        case (false, true): "オーバー "
+        case (true, false): "あと "
+        default: ""
+        }
+
+        return "\(title) \(usage.remainingAmountText) → \(label)\(after.remainingAmountText)"
+    }
+
     var monthTotalText: String? {
         guard
             type != .transfer,
@@ -75,24 +113,17 @@ public extension EntryModel {
             return nil
         }
 
-        let overview = monthOverview
-        let month = history?.days.filter { overview.period.contains($0.date) } ?? []
-
-        let entries = month
-            .flatMap(\.entries)
-            .filter { $0.type == type && (categoryId == nil || $0.categoryId == categoryId) }
-
-        let current = entries.reduce(0) { $0 + $1.amount }
-        let title = "今月の\(selectedCategory?.name ?? typeName)"
-        let previous = entries.first { $0.id == original?.id }?.amount ?? 0
-        let added = overview.period.contains(date) ? amount : 0
-        let after = current - previous + added
-
-        guard after != current else {
-            return "\(title) \(AmountText.text(current))"
+        let totals = monthTotals { entry in
+            entry.type == type && (categoryId == nil || entry.categoryId == categoryId)
         }
 
-        return "\(title) \(AmountText.text(current)) → \(AmountText.text(after))"
+        let title = "今月の\(selectedCategory?.name ?? typeName)"
+
+        guard totals.after != totals.current else {
+            return "\(title) \(AmountText.text(totals.current))"
+        }
+
+        return "\(title) \(AmountText.text(totals.current)) → \(AmountText.text(totals.after))"
     }
 
     var monthOverview: MonthOverview {
@@ -156,5 +187,22 @@ public extension EntryModel {
         let direction = type == .income ? "へ" : "から"
 
         return "\(day)・\(wallet.name)\(direction)"
+    }
+}
+
+private extension EntryModel {
+    func monthTotals(matching isIncluded: (Entry) -> Bool) -> (current: Int, after: Int) {
+        let period = monthOverview.period
+
+        let entries = (history?.days ?? [])
+            .filter { period.contains($0.date) }
+            .flatMap(\.entries)
+            .filter(isIncluded)
+
+        let current = entries.reduce(0) { $0 + $1.amount }
+        let previous = entries.first { $0.id == original?.id }?.amount ?? 0
+        let added = period.contains(date) ? amount : 0
+
+        return (current, current - previous + added)
     }
 }

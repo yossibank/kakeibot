@@ -84,7 +84,11 @@ public struct EntrySheet: View {
                     showSelectedCategory()
                 }
             }
-            .entryNotice(notice, above: bannerBottom - 12)
+            .entryNotice(
+                notice,
+                above: bannerBottom - 12,
+                clearsOnTap: false
+            )
             .onChange(of: notice.notice) {
                 if notice.notice == .undone {
                     Task {
@@ -129,23 +133,18 @@ extension EntrySheet {
             }
 
             if !model.isEditing {
-                Button {
+                CardButton(
+                    "続けて記録",
+                    style: .outlined(Palette.accent),
+                    height: 56
+                ) {
                     Task {
                         await saveAndContinue()
                     }
-                } label: {
-                    Label("続ける", systemImage: "plus")
-                        .textFont(.footnote, weight: .bold)
-                        .foregroundStyle(Palette.accent)
-                        .padding(.horizontal, 16)
-                        .frame(minHeight: 56)
-                        .overlay {
-                            Capsule()
-                                .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 1)
-                        }
-                        .contentShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(width: Self.continueWidth)
                 .opacity(continueOpacity)
             }
         }
@@ -279,6 +278,7 @@ private extension EntrySheet {
 
 private extension EntrySheet {
     static let fade: CGFloat = 20
+    static let continueWidth: CGFloat = 104
 
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),

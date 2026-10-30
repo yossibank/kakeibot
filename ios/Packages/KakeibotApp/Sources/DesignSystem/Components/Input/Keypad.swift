@@ -46,12 +46,12 @@ private extension Keypad {
             label(for: key, isActive: isActive)
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background(
-                    Self.background(for: key, isActive: isActive),
+                    background(for: key, isActive: isActive),
                     in: .rect(cornerRadius: corner.radius(16))
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: corner.radius(16))
-                        .stroke(Self.stroke(for: key, isActive: isActive), lineWidth: 0.75)
+                        .stroke(stroke(for: key, isActive: isActive), lineWidth: 0.75)
                 }
                 .contentShape(.rect)
         }
@@ -112,9 +112,9 @@ private extension Keypad {
                     .textFont(size: .headline, weight: .semibold)
                     .foregroundStyle(Palette.backgroundBottom)
             } else {
-                Image(systemName: "checkmark")
-                    .sansFont(.headline, weight: .semibold)
-                    .foregroundStyle(Palette.backgroundBottom)
+                Image(systemName: "keyboard.chevron.compact.down")
+                    .sansFont(.headline, weight: .light)
+                    .foregroundStyle(Palette.text)
             }
         }
     }
@@ -141,7 +141,7 @@ private extension Keypad {
         onDone != nil && !calculator.hasOperation
     }
 
-    static func background(
+    func background(
         for key: AmountCalculator.Key,
         isActive: Bool
     ) -> Color {
@@ -149,17 +149,18 @@ private extension Keypad {
         case .digit, .doubleZero, .tripleZero, .delete, .clear: Color.clear
         case .tax: isActive ? Palette.accent.opacity(.subtle) : Color.clear
         case .operation: Palette.accent.opacity(.subtle)
-        case .equals: Palette.accent
+        case .equals: showsDone ? Color.clear : Palette.accent
         }
     }
 
-    static func stroke(
+    func stroke(
         for key: AmountCalculator.Key,
         isActive: Bool
     ) -> Color {
         switch key {
         case .delete: Palette.accent.opacity(.muted)
         case .tax: isActive ? Palette.accent : Palette.accent.opacity(.muted)
+        case .equals: showsDone ? Palette.accent.opacity(.muted) : Color.clear
         default: Color.clear
         }
     }

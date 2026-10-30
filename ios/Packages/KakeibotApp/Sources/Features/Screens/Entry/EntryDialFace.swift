@@ -71,7 +71,7 @@ private extension EntryDialFace {
     static let lift: CGFloat = 12
 
     var usage: BudgetUsage? {
-        model.budgetUsage
+        model.budgetUsageAfterSave
     }
 
     var progress: Double? {
@@ -118,8 +118,7 @@ private extension EntryDialFace {
             return model.sourceBalanceText
         }
 
-        let remaining = usage.map { "\($0.remainingTitle) \($0.remainingAmountText)" }
-        return remaining ?? model.monthTotalText
+        return model.budgetText ?? model.monthTotalText
     }
 
     var noteColor: Color {
