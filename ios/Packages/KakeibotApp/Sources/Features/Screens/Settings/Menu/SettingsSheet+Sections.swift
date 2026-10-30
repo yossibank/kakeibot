@@ -171,11 +171,9 @@ extension SettingsSheet {
             NavigationLink {
                 ThemeStyleLookView(model: ThemeStyleModel(database: database))
             } label: {
-                row(
-                    "形と動き",
-                    systemImage: "square.on.circle",
-                    value: themeStyle.lookTitle
-                )
+                row("形と動き", systemImage: "square.on.circle") {
+                    ThemeStyleMarks()
+                }
             }
         }
     }

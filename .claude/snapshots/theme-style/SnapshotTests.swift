@@ -13,25 +13,45 @@ struct SnapshotTests {
         let now = Date()
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = ThemeStyleModel(database: database)
 
-        await model.load()
+        for state in Self.states {
+            for variant in Self.variants {
+                let model = ThemeStyleModel(database: database)
+                let style = state.style(textSize: variant.textSize)
 
-        for variant in Self.variants {
-            try Self.write(ThemeStyleTextView(model: model), variant: variant, to: "text")
-            try Self.write(ThemeStyleLookView(model: model), variant: variant, to: "look")
-        }
+                await model.choose(style.corner)
+                await model.choose(style.textSize)
+                await model.choose(style.rowSpacing)
+                await model.choose(style.stampShape)
+                await model.choose(showsTabTitles: style.showsTabTitles)
+                await model.choose(style.backdrop)
+                await model.choose(haptics: style.haptics)
+                await model.choose(decorations: style.decorations)
+                await model.load()
 
-        for spacing in [ThemeRowSpacing.compact, .relaxed] {
-            let spacingModel = ThemeStyleModel(database: database)
+                let sheet = SettingsSheet(
+                    database: database,
+                    today: today,
+                    appIcon: AppIconListModel()
+                )
 
-            await spacingModel.choose(spacing)
-            await spacingModel.load()
+                try Self.write(
+                    ThemeStyleLookView(model: model),
+                    style: style,
+                    variant: variant,
+                    to: "look-\(state.name)"
+                )
+                try Self.write(sheet, style: style, variant: variant, to: "settings-\(state.name)")
 
-            let variant = Self.variants[0]
-            let name = "look-\(spacing.rawValue)"
-
-            try Self.write(ThemeStyleLookView(model: spacingModel), variant: variant, to: name)
+                if state.name == "standard" {
+                    try Self.write(
+                        ThemeStyleTextView(model: model),
+                        style: style,
+                        variant: variant,
+                        to: "text"
+                    )
+                }
+            }
         }
     }
 }
@@ -42,7 +62,31 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+    }
+
+    struct State {
+        let name: String
+        let corner: ThemeCorner
+        let rowSpacing: ThemeRowSpacing
+        let stampShape: ThemeStampShape
+        let showsTabTitles: Bool
         let backdrop: ThemeBackdrop
+        let isOn: Bool
+
+        func style(textSize: ThemeTextSize) -> ThemeStyle {
+            ThemeStyle(
+                corner: corner,
+                displayFont: .mincho,
+                textFont: .gothic,
+                textSize: textSize,
+                rowSpacing: rowSpacing,
+                stampShape: stampShape,
+                showsTabTitles: showsTabTitles,
+                backdrop: backdrop,
+                haptics: isOn,
+                decorations: isOn
+            )
+        }
     }
 }
 
@@ -51,8 +95,40 @@ private extension SnapshotTests {
     static let maxHeight: CGFloat = 2400
 
     static let variants = [
-        Variant(name: "regular", width: 393, scheme: .light, textSize: .standard, backdrop: .washi),
-        Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large, backdrop: .grid)
+        Variant(name: "regular-light", width: 393, scheme: .light, textSize: .standard),
+        Variant(name: "regular-dark", width: 393, scheme: .dark, textSize: .standard),
+        Variant(name: "narrow-light", width: 320, scheme: .light, textSize: .large),
+        Variant(name: "narrow-dark", width: 320, scheme: .dark, textSize: .large)
+    ]
+
+    static let states = [
+        State(
+            name: "standard",
+            corner: .standard,
+            rowSpacing: .standard,
+            stampShape: .circle,
+            showsTabTitles: true,
+            backdrop: .plain,
+            isOn: true
+        ),
+        State(
+            name: "ruled",
+            corner: .square,
+            rowSpacing: .compact,
+            stampShape: .seal,
+            showsTabTitles: false,
+            backdrop: .ruled,
+            isOn: false
+        ),
+        State(
+            name: "grid",
+            corner: .large,
+            rowSpacing: .relaxed,
+            stampShape: .rounded,
+            showsTabTitles: true,
+            backdrop: .grid,
+            isOn: true
+        )
     ]
 
     static func wait(until isReady: () -> Bool) async throws {
@@ -152,16 +228,11 @@ private extension SnapshotTests {
 
     static func write(
         _ view: some View,
+        style: ThemeStyle,
         variant: Variant,
         to name: String
     ) throws {
-        let style = ThemeStyle(
-            corner: .standard,
-            displayFont: .mincho,
-            textFont: .gothic,
-            textSize: variant.textSize,
-            backdrop: variant.backdrop
-        )
+        let palette = ThemeLook.followsDevice.palette(isDark: variant.scheme == .dark)
 
         let content = view
             .frame(width: variant.width)
@@ -169,6 +240,7 @@ private extension SnapshotTests {
             .clipped()
             .background(Palette.background)
             .environment(\.themeStyle, style)
+            .environment(\.palette, palette)
             .environment(\.colorScheme, variant.scheme)
 
         let renderer = ImageRenderer(content: content)

@@ -61,8 +61,8 @@ public struct ThemeStyleLookView: View {
                 columns: 2,
                 label: Self.tabTitle
             ) { showsTitles in
-                tabMark(showsTitles)
-                    .frame(height: Self.markSize)
+                ThemeStyleTabBar()
+                    .environment(\.themeStyle.showsTabTitles, showsTitles)
             } choose: { showsTitles in
                 await model.choose(showsTabTitles: showsTitles)
             }
@@ -74,10 +74,7 @@ public struct ThemeStyleLookView: View {
                 columns: 3,
                 label: \.title
             ) { backdrop in
-                Backdrop()
-                    .frame(width: Self.markSize * 2.4, height: Self.markSize * 1.4)
-                    .clipShape(.rect(cornerRadius: 4))
-                    .environment(\.themeStyle.backdrop, backdrop)
+                ThemeStyleBackdrop(backdrop: backdrop)
             } choose: { backdrop in
                 await model.choose(backdrop)
             }
@@ -88,6 +85,7 @@ public struct ThemeStyleLookView: View {
                 ThemeStyleSwitch(
                     title: "押した時の振動",
                     detail: "選んだ時や記録した時に、軽く振動します",
+                    systemImage: "waveform",
                     isOn: model.style.haptics
                 ) { isOn in
                     await model.choose(haptics: isOn)
@@ -96,17 +94,40 @@ public struct ThemeStyleLookView: View {
                 ThemeStyleSwitch(
                     title: "金の光などの飾り",
                     detail: "ボタンの光とタブの金の輪を出します",
+                    systemImage: "sparkle",
                     isOn: model.style.decorations
                 ) { isOn in
                     await model.choose(decorations: isOn)
                 }
             }
+            .environment(\.themeStyle.decorations, model.style.decorations)
         }
     }
 }
 
 private extension ThemeStyleLookView {
     var preview: some View {
+        let shape = RoundedRectangle(cornerRadius: model.style.corner.radius(28))
+
+        return VStack(spacing: 8) {
+            dayCard
+
+            ThemeStyleTabBar()
+        }
+        .padding(.horizontal, 8)
+        .padding(.top, 8)
+        .padding(.bottom, 4)
+        .background {
+            Backdrop()
+        }
+        .clipShape(shape)
+        .overlay {
+            shape
+                .strokeBorder(Palette.line, lineWidth: 1)
+        }
+    }
+
+    var dayCard: some View {
         VStack(spacing: 0) {
             HStack(spacing: 12) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -121,6 +142,8 @@ private extension ThemeStyleLookView {
                     Spacer(minLength: 8)
 
                     AmountText(1340, type: .expense)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                 }
 
                 IconSeal(.styleSample(.star), size: Self.stampSize)
@@ -172,40 +195,16 @@ private extension ThemeStyleLookView {
         .frame(width: Self.markSize * 1.4, height: Self.markSize)
     }
 
-    func tabMark(_ showsTitles: Bool) -> some View {
-        VStack(spacing: 2) {
-            Image(systemName: "house")
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-
-            if showsTitles {
-                Text("ホーム")
-                    .textFont(size: .micro)
-                    .foregroundStyle(Palette.accentStrong)
-            }
-        }
-    }
-
     func cornerMark(_ option: ThemeCorner) -> some View {
-        let isSelected = option == model.style.corner
-        let color = isSelected ? Palette.accent : Palette.subtext
-        let size = Self.markSize
-        let radius = option.radius(Self.cornerMarkRadius)
+        let color = option == model.style.corner ? Palette.accent : Palette.subtext
 
-        return RoundedRectangle(cornerRadius: radius)
-            .stroke(color, lineWidth: 2.5)
-            .frame(width: size * 2, height: size * 2)
-            .frame(width: size, height: size, alignment: .topLeading)
-            .offset(x: size * 0.15, y: size * 0.15)
-            .frame(width: size, height: size)
-            .clipped()
+        return ThemeStyleCornerMark(corner: option, color: color, size: Self.markSize)
     }
 }
 
 private extension ThemeStyleLookView {
     static let markSize: CGFloat = 30
     static let stampSize: CGFloat = 26
-    static let cornerMarkRadius: CGFloat = 20
 
     static func tabTitle(_ showsTitles: Bool) -> String {
         showsTitles ? "出す" : "出さない"

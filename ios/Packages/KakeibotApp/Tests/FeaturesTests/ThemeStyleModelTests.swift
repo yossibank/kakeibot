@@ -18,7 +18,7 @@ struct ThemeStyleModelTests {
         await model.choose(ThemeRowSpacing.relaxed)
         await model.choose(ThemeStampShape.seal)
         await model.choose(showsTabTitles: false)
-        await model.choose(ThemeBackdrop.washi)
+        await model.choose(ThemeBackdrop.ruled)
         await model.choose(haptics: false)
         await model.choose(decorations: false)
 
@@ -32,7 +32,7 @@ struct ThemeStyleModelTests {
             rowSpacing: .relaxed,
             stampShape: .seal,
             showsTabTitles: false,
-            backdrop: .washi,
+            backdrop: .ruled,
             haptics: false,
             decorations: false
         )

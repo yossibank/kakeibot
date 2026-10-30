@@ -71,7 +71,7 @@ extension ThemeBackdrop {
     var title: String {
         switch self {
         case .plain: "無地"
-        case .washi: "和紙"
+        case .ruled: "罫線"
         case .grid: "方眼"
         }
     }
