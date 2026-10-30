@@ -104,6 +104,7 @@ public extension AppDatabase {
             )
 
             try db.execute(sql: "DELETE FROM sync_share WHERE owner_name IS NULL")
+            try Self.notifyShareChanges(in: db)
             try Self.turnOff(because: reason, in: db)
         }
     }
