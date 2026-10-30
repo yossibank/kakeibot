@@ -59,22 +59,22 @@ public struct RecordsView: View {
                     monthStepper
                         .monthSwipe(following: $slide, perform: moveMonth)
 
-                    HStack(spacing: 8) {
+                    RecordsToolLayout(spacing: 8) {
                         CapsulePicker(
                             selection: layoutBinding,
                             options: Self.layoutOptions
                         )
 
-                        Spacer()
+                        HStack(spacing: 8) {
+                            if model.layout == .list {
+                                selectButton
+                            }
 
-                        if model.layout == .list {
-                            selectButton
-                        }
+                            filterButton(title: "絞り込み")
 
-                        filterButton(title: "絞り込み")
-
-                        toolButton(systemImage: "magnifyingglass", title: "検索") {
-                            openSearch()
+                            toolButton(systemImage: "magnifyingglass", title: "検索") {
+                                openSearch()
+                            }
                         }
                     }
 

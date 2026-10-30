@@ -36,7 +36,7 @@ struct EntryDialFace: View {
                 }
                 .textFont(.footnote, weight: .bold)
                 .foregroundStyle(Palette.accentStrong)
-                .frame(maxWidth: Self.width * 0.7, minHeight: 20)
+                .frame(maxWidth: Self.maxWidth * 0.7, minHeight: 20)
 
                 Text(AmountText.text(shownAmount))
                     .font(amountFont)
@@ -53,20 +53,17 @@ struct EntryDialFace: View {
                     .foregroundStyle(noteColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    .frame(maxWidth: Self.width * 0.7)
+                    .frame(maxWidth: Self.maxWidth * 0.7)
             }
             .padding(.bottom, Self.lift)
         }
-        .frame(width: Self.width)
+        .frame(maxWidth: Self.maxWidth)
         .contentShape(.rect)
     }
 }
 
-extension EntryDialFace {
-    static let width: CGFloat = 320
-}
-
 private extension EntryDialFace {
+    static let maxWidth: CGFloat = 320
     static let amountHeight: CGFloat = 48
     static let lift: CGFloat = 12
 

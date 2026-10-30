@@ -150,6 +150,17 @@ public extension EntryModel {
         }
     }
 
+    static func shortDateText(
+        for date: LocalDate,
+        today: LocalDate
+    ) -> String {
+        switch date {
+        case today: "今日"
+        case today.adding(days: -1): "昨日"
+        default: PeriodText.day(date, today: today)
+        }
+    }
+
     static func dateTitle(
         for date: LocalDate,
         today: LocalDate
@@ -178,12 +189,7 @@ public extension EntryModel {
             return nil
         }
 
-        let day = switch date {
-        case today: "今日"
-        case today.adding(days: -1): "昨日"
-        default: PeriodText.day(date, today: today)
-        }
-
+        let day = Self.shortDateText(for: date, today: today)
         let direction = type == .income ? "へ" : "から"
 
         return "\(day)・\(wallet.name)\(direction)"
