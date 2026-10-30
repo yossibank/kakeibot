@@ -14,6 +14,7 @@ HEADING = re.compile(r"^#{1,6}\s+(.+?)\s*#*\s*$")
 TREE = re.compile(r"^([│ ]*)[├└]── ([^\s]+/)")
 MAKE = re.compile(r"`make ([a-z][a-z-]*)")
 TARGET = re.compile(r"^([a-z][a-z-]*):", re.M)
+TEST_TARGET = re.compile(r"\.testTarget\(\s*name:\s*\"([^\"]+)\"")
 SAMPLES = {"export/export-v1.json"}
 DOC = os.path.join(ROOT, "docs", "architecture.md")
 
@@ -159,6 +160,16 @@ def check_fixtures():
                 error(path, 1, "summary が重なっている")
 
 
+def check_test_plan():
+    plan_path = os.path.join(ROOT, "ios", "Kakeibot.xctestplan")
+    plan = json.load(open(plan_path, encoding="utf-8"))
+    planned = {entry["target"]["name"] for entry in plan["testTargets"]}
+    for package in ("KakeibotKit", "KakeibotApp"):
+        manifest = os.path.join(ROOT, "ios", "Packages", package, "Package.swift")
+        for name in TEST_TARGET.findall(open(manifest, encoding="utf-8").read()):
+            if name not in planned:
+                error(plan_path, 1, f"テストプランに無いテストのターゲット: {name}")
+
 
 def main():
     makefile = open(os.path.join(ROOT, "Makefile"), encoding="utf-8").read()
@@ -170,6 +181,7 @@ def main():
         check_make(path, text, targets)
     check_trees(DOC, open(DOC, encoding="utf-8").read().split("\n"))
     check_fixtures()
+    check_test_plan()
     print("\n".join(errors))
     sys.exit(1 if errors else 0)
 
