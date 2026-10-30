@@ -2,10 +2,6 @@ import Core
 import SwiftUI
 
 public struct ConfirmCard: View {
-    @Environment(\.themeStyle.corner) private var corner
-
-    @State private var isShown = false
-
     private let systemImage: String
     private let title: String
     private let message: String?
@@ -42,22 +38,8 @@ public struct ConfirmCard: View {
     }
 
     public var body: some View {
-        let scale: CGFloat = isShown ? 1 : 0.94
-
-        return ZStack {
-            Palette.scrim
-                .opacity(0.55)
-                .ignoresSafeArea()
-                .onTapGesture(perform: onKeep)
-
+        ModalCard(onDismiss: onKeep) {
             card
-                .scaleEffect(scale)
-        }
-        .transition(.opacity)
-        .onAppear {
-            withAnimation(.snappy(duration: 0.25)) {
-                isShown = true
-            }
         }
     }
 }
@@ -100,81 +82,30 @@ private extension ConfirmCard {
 
             VStack(spacing: 12) {
                 if let alternateTitle {
-                    filledButton(alternateTitle, action: onAlternate)
+                    CardButton(alternateTitle, style: .filled, action: onAlternate)
 
-                    outlinedButton(confirmTitle, color: Palette.rose, action: onConfirm)
+                    CardButton(confirmTitle, style: .outlined(Palette.rose), action: onConfirm)
 
-                    outlinedButton(keepTitle, color: Palette.subtext, action: onKeep)
+                    CardButton(keepTitle, style: .outlined(Palette.subtext), action: onKeep)
                 } else {
                     twoChoices
                 }
             }
-            .buttonStyle(.plain)
         }
-        .padding(24)
-        .frame(maxWidth: 300)
-        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(28)))
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(28))
-                .stroke(Palette.accent.opacity(.medium), lineWidth: 0.8)
-        }
-        .shadow(color: Palette.shadow.opacity(0.5), radius: 30, y: 14)
     }
 
     @ViewBuilder
     var twoChoices: some View {
         switch role {
         case .destructive:
-            filledButton(keepTitle, action: onKeep)
+            CardButton(keepTitle, style: .filled, action: onKeep)
 
-            outlinedButton(confirmTitle, color: Palette.rose, action: onConfirm)
+            CardButton(confirmTitle, style: .outlined(Palette.rose), action: onConfirm)
         case .suggestion:
-            filledButton(confirmTitle, action: onConfirm)
+            CardButton(confirmTitle, style: .filled, action: onConfirm)
 
-            outlinedButton(keepTitle, color: Palette.subtext, action: onKeep)
+            CardButton(keepTitle, style: .outlined(Palette.subtext), action: onKeep)
         }
-    }
-
-    func filledButton(
-        _ title: String,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Text(title)
-                .textFont(.subheadline, weight: .bold)
-                .foregroundStyle(Palette.backgroundBottom)
-                .frame(maxWidth: .infinity, minHeight: 48)
-                .background(Self.filledFill, in: Capsule())
-                .contentShape(Capsule())
-        }
-    }
-
-    func outlinedButton(
-        _ title: String,
-        color: Color,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Text(title)
-                .textFont(.subheadline)
-                .foregroundStyle(color)
-                .frame(maxWidth: .infinity, minHeight: 48)
-                .overlay {
-                    Capsule()
-                        .stroke(color.opacity(.medium), lineWidth: 1)
-                }
-                .contentShape(Capsule())
-        }
-    }
-}
-
-private extension ConfirmCard {
-    static var filledFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accentStrong, Palette.accent],
-            startPoint: .top,
-            endPoint: .bottom
-        )
     }
 }
 

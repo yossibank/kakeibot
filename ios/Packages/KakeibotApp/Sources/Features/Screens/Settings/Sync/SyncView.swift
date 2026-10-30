@@ -17,63 +17,34 @@ public struct SyncView: View {
             SettingsBackHeader("iCloud 同期")
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        note("arrow.triangle.2.circlepath", "記録と設定を、同じ iCloud の端末どうしでそろえます")
-
-                        note("lock", "データは iCloud に暗号化して置きます")
-                    }
-                    .padding(16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .card()
+                VStack(alignment: .leading, spacing: 28) {
+                    SyncIntroCard()
 
                     VStack(alignment: .leading, spacing: 8) {
-                        HStack(spacing: 12) {
-                            Text("同期する")
-                                .textFont(.subheadline)
-                                .foregroundStyle(Palette.text)
+                        VStack(spacing: 0) {
+                            HStack(spacing: 12) {
+                                Text("同期する")
+                                    .textFont(.subheadline)
+                                    .foregroundStyle(Palette.text)
 
-                            Spacer(minLength: 0)
+                                Spacer(minLength: 0)
 
-                            CapsulePicker(selection: onBinding, options: Self.onOptions)
-                        }
-                        .frame(minHeight: 58)
-                        .padding(.horizontal, 16)
-                        .card()
-                        .disabled(model.isWorking || !canChange)
+                                CapsulePicker(selection: onBinding, options: Self.onOptions)
+                            }
+                            .frame(minHeight: 58)
+                            .disabled(model.isWorking || !canChange)
 
-                        if !model.isOn,
-                           let reason = model.stopReason {
-                            warning(reason.message)
-                        }
+                            if hasStatus {
+                                Hairline()
 
-                        if model.isOn,
-                           let count = model.pendingCount {
-                            if count > 0,
-                               model.sendProblem != nil {
-                                warning(model.pendingText(count))
-                            } else {
-                                HStack(spacing: 8) {
-                                    if count > 0 {
-                                        ProgressView()
-                                            .controlSize(.mini)
-                                    } else {
-                                        Image(systemName: "checkmark.circle")
-                                            .foregroundStyle(Palette.accent)
-                                    }
-
-                                    Text(model.pendingText(count))
-                                }
-                                .textFont(.footnote)
-                                .foregroundStyle(Palette.subtext)
-                                .padding(.leading, 8)
+                                status
+                                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                             }
                         }
+                        .padding(.horizontal, 16)
+                        .card()
 
-                        Text(model.footnote)
-                            .textFont(.footnote)
-                            .foregroundStyle(Palette.subtext)
-                            .padding(.leading, 8)
+                        caption(model.footnote)
                     }
 
                     if !model.shares.isEmpty {
@@ -87,25 +58,15 @@ public struct SyncView: View {
                                         Hairline()
                                     }
 
-                                    Button {
-                                        Task {
-                                            await model.share(item)
-                                        }
-                                    } label: {
-                                        shareRow(item)
-                                    }
+                                    shareRow(item)
                                 }
                             }
                             .sharesTextScale(id: model.shares.map(\.wallet.name))
-                            .buttonStyle(.plain)
                             .padding(.horizontal, 16)
                             .card()
                             .disabled(model.isWorking || !model.isAvailable)
 
-                            Text("口座ごとに、家族と記録を分けあえます")
-                                .textFont(.footnote)
-                                .foregroundStyle(Palette.subtext)
-                                .padding(.leading, 8)
+                            caption("口座ごとに、家族と記録を分けあえます")
                         }
                     }
 
@@ -120,23 +81,15 @@ public struct SyncView: View {
                                         Hairline()
                                     }
 
-                                    Button {
-                                        leaving = item
-                                    } label: {
-                                        joinedRow(item)
-                                    }
+                                    joinedRow(item)
                                 }
                             }
                             .sharesTextScale(id: model.joined.map(\.wallet.name))
-                            .buttonStyle(.plain)
                             .padding(.horizontal, 16)
                             .card()
                             .disabled(model.isWorking || !model.isAvailable)
 
-                            Text("抜けると、この iPhone からその口座と記録が消えます")
-                                .textFont(.footnote)
-                                .foregroundStyle(Palette.subtext)
-                                .padding(.leading, 8)
+                            caption("抜けると、この iPhone からその口座と記録が消えます")
                         }
                     }
 
@@ -193,44 +146,56 @@ public struct SyncView: View {
         ) {
             leave()
         }
-        .confirmation(
-            isPresented: $model.isChoosing,
-            systemImage: "icloud",
-            title: "iCloud にもデータがあります",
-            message: SyncModel.choiceMessage,
-            keepTitle: "やめる",
-            confirmTitle: "iCloud のデータを使う",
-            alternateTitle: "この iPhone のデータを使う",
-            role: .suggestion,
-            onAlternate: {
-                Task {
-                    await model.useLocalData()
-                }
+        .overlay {
+            if let choice = model.choice {
+                SyncChoiceCard(
+                    choice: choice,
+                    onUseLocal: useLocalData,
+                    onUseCloud: useCloudData,
+                    onKeep: model.cancelChoice
+                )
             }
-        ) {
-            Task {
-                await model.useCloudData()
-            }
+        }
+        .animation(.snappy(duration: 0.25), value: model.choice)
+        .haptic(.selection, trigger: model.isChoosing) { _, new in
+            new
         }
     }
 }
 
 private extension SyncView {
-    func note(
-        _ systemImage: String,
-        _ text: String
-    ) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Image(systemName: systemImage)
-                .sansFont(.caption, weight: .medium)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
+    @ViewBuilder
+    var status: some View {
+        if !model.isOn,
+           let reason = model.stopReason {
+            warning(reason.message)
+        } else if let count = model.pendingCount {
+            if count > 0,
+               model.sendProblem != nil {
+                warning(model.pendingText(count))
+            } else {
+                HStack(spacing: 8) {
+                    if count > 0 {
+                        ProgressView()
+                            .controlSize(.mini)
+                    } else {
+                        Image(systemName: "checkmark.circle")
+                            .foregroundStyle(Palette.accent)
+                    }
 
-            Text(text)
+                    Text(model.pendingText(count))
+                }
                 .textFont(.footnote)
-                .foregroundStyle(Palette.text)
-                .fixedSize(horizontal: false, vertical: true)
+                .foregroundStyle(Palette.subtext)
+            }
         }
+    }
+
+    func caption(_ text: String) -> some View {
+        Text(text)
+            .textFont(.caption)
+            .foregroundStyle(Palette.subtext)
+            .padding(.leading, 8)
     }
 
     func warning(_ text: String) -> some View {
@@ -242,7 +207,7 @@ private extension SyncView {
         }
         .textFont(.footnote)
         .foregroundStyle(Palette.rose)
-        .padding(.leading, 8)
+        .padding(.vertical, 12)
     }
 
     func joinedRow(_ item: JoinedShare) -> some View {
@@ -256,16 +221,20 @@ private extension SyncView {
 
             Spacer(minLength: 0)
 
-            Text("抜ける")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.rose)
+            Button {
+                leaving = item
+            } label: {
+                pill("抜ける", color: Palette.rose, isFilled: false)
+            }
+            .buttonStyle(.plain)
         }
         .frame(minHeight: 58)
-        .contentShape(.rect)
     }
 
     func shareRow(_ item: WalletShare) -> some View {
-        HStack(spacing: 12) {
+        let title = item.isShared ? "共有中" : "共有する"
+
+        return HStack(spacing: 12) {
             IconBadge(item.icon, size: 32)
 
             Text(item.wallet.name)
@@ -275,16 +244,37 @@ private extension SyncView {
 
             Spacer(minLength: 0)
 
-            Text(shareStatus(item))
-                .textFont(.footnote)
-                .foregroundStyle(shareTint(item))
-
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            Button {
+                Task {
+                    await model.share(item)
+                }
+            } label: {
+                pill(title, color: Palette.accent, isFilled: !item.isShared)
+            }
+            .buttonStyle(.plain)
         }
         .frame(minHeight: 58)
-        .contentShape(.rect)
+    }
+
+    func pill(
+        _ title: String,
+        color: Color,
+        isFilled: Bool
+    ) -> some View {
+        let fill = isFilled ? color.opacity(.muted) : .clear
+
+        return Text(title)
+            .textFont(.footnote, weight: .bold)
+            .foregroundStyle(color)
+            .padding(.horizontal, 16)
+            .frame(minHeight: 32)
+            .background(fill, in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(color.opacity(.medium), lineWidth: 1)
+            }
+            .contentShape(Capsule())
+            .fixedSize()
     }
 }
 
@@ -296,6 +286,13 @@ private extension SyncView {
 
     var canChange: Bool {
         model.isOn || model.isAvailable
+    }
+
+    var hasStatus: Bool {
+        let isStopped = !model.isOn && model.stopReason != nil
+        let isSending = model.isOn && model.pendingCount != nil
+
+        return isStopped || isSending
     }
 
     var isLeavingBinding: Binding<Bool> {
@@ -310,7 +307,7 @@ private extension SyncView {
 
     var onBinding: Binding<Bool> {
         Binding {
-            model.isOn
+            model.shownOn
         } set: { isOn in
             Task {
                 await model.setOn(isOn)
@@ -330,12 +327,16 @@ private extension SyncView {
         }
     }
 
-    func shareStatus(_ item: WalletShare) -> String {
-        item.isShared ? "共有中" : "共有する"
+    func useLocalData() {
+        Task {
+            await model.useLocalData()
+        }
     }
 
-    func shareTint(_ item: WalletShare) -> Color {
-        item.isShared ? Palette.subtext : Palette.accent
+    func useCloudData() {
+        Task {
+            await model.useCloudData()
+        }
     }
 }
 

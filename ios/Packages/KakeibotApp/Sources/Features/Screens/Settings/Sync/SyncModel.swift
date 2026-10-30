@@ -15,9 +15,11 @@ public final class SyncModel {
     public private(set) var sendProblem: SyncSendProblem?
     public private(set) var shares: [WalletShare] = []
     public private(set) var joined: [JoinedShare] = []
+    public private(set) var choice: SyncChoice?
 
-    public internal(set) var isChoosing = false
     public internal(set) var errorNotice = ErrorNotice()
+
+    private var requestedOn: Bool?
 
     private let database: AppDatabase
     private let cloud: SyncCloud
@@ -32,13 +34,16 @@ public final class SyncModel {
 }
 
 public extension SyncModel {
-    static let choiceMessage = """
-    使う方を選んでください。選ばなかった方は置き換わります。\
-    「この iPhone のデータを使う」を選ぶと、ほかの iPhone の同期は切れます
-    """
-
     var isAvailable: Bool {
         account == .available
+    }
+
+    var isChoosing: Bool {
+        choice != nil
+    }
+
+    var shownOn: Bool {
+        requestedOn ?? isOn
     }
 
     var footnote: String {
@@ -101,6 +106,8 @@ public extension SyncModel {
     }
 
     func setOn(_ isOn: Bool) async {
+        requestedOn = isOn
+
         if isOn {
             await turnOn()
         } else {
@@ -108,19 +115,36 @@ public extension SyncModel {
                 try await database.turnOffSync()
             }
         }
-    }
 
-    func useCloudData() async {
-        await work {
-            try await database.turnOnSyncReplacingLocal()
+        if choice == nil {
+            requestedOn = nil
         }
     }
 
+    func useCloudData() async {
+        choice = nil
+
+        await work {
+            try await database.turnOnSyncReplacingLocal()
+        }
+
+        requestedOn = nil
+    }
+
     func useLocalData() async {
+        choice = nil
+
         await work {
             try await cloud.deleteData()
             try await database.turnOnSync()
         }
+
+        requestedOn = nil
+    }
+
+    func cancelChoice() {
+        choice = nil
+        requestedOn = nil
     }
 
     func observeShares() async {
@@ -192,17 +216,19 @@ private extension SyncModel {
         }
 
         await work {
-            guard try await cloud.hasData() else {
+            guard let cloudSummary = try await cloud.summary() else {
                 try await database.turnOnSync()
                 return
             }
 
-            guard try await database.hasEntries() else {
+            let localSummary = try await database.syncSummary()
+
+            guard localSummary.entryCount > 0 else {
                 try await database.turnOnSyncReplacingLocal()
                 return
             }
 
-            isChoosing = true
+            choice = SyncChoice(local: localSummary, cloud: cloudSummary)
         }
     }
 

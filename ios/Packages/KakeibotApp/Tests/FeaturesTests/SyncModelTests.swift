@@ -43,7 +43,6 @@ struct SyncModelTests {
 
         #expect(model.isOn == false)
         #expect(model.isChoosing)
-        #expect(SyncModel.choiceMessage.hasSuffix("「この iPhone のデータを使う」を選ぶと、ほかの iPhone の同期は切れます"))
 
         await model.useLocalData()
 
@@ -278,6 +277,7 @@ extension SyncModelTests {
 
         private var account: SyncAccount
         private let hasData: Bool
+        private let cloudSummary: SyncSummary
         private let stopsInSheet: Bool
         private let failsToCreate: Bool
         private let failsToDelete: Bool
@@ -286,6 +286,7 @@ extension SyncModelTests {
         init(
             account: SyncAccount = .available,
             hasData: Bool,
+            cloudSummary: SyncSummary = SyncSummary(entryCount: 0, updatedAt: nil),
             stopsInSheet: Bool = false,
             failsToCreate: Bool = false,
             failsToDelete: Bool = false,
@@ -293,6 +294,7 @@ extension SyncModelTests {
         ) {
             self.account = account
             self.hasData = hasData
+            self.cloudSummary = cloudSummary
             self.stopsInSheet = stopsInSheet
             self.failsToCreate = failsToCreate
             self.failsToDelete = failsToDelete
@@ -305,8 +307,8 @@ extension SyncModelTests.FakeCloud {
     nonisolated var cloud: SyncCloud {
         SyncCloud {
             await self.account
-        } hasData: {
-            self.hasData
+        } summary: {
+            self.hasData ? self.cloudSummary : nil
         } deleteData: {
             await self.delete()
         } createShare: { _, _ in
