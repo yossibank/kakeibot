@@ -1,3 +1,4 @@
+import Core
 import Foundation
 @testable import Store
 import Testing
@@ -28,5 +29,22 @@ struct SyncSummaryTests {
 
         let latest = try Date("2026-10-30T08:12:00Z", strategy: .iso8601)
         #expect(summary == SyncSummary(entryCount: 2, updatedAt: latest))
+    }
+
+    @Test
+    func leavesOutEntriesOfSharedWallets() async throws {
+        let setup = try await SyncTests.Setup()
+        let wallet = try await setup.walletID()
+        let category = try await setup.categoryID()
+        try await setup.execute("""
+        INSERT INTO entry (id, type, amount, category_id, wallet_id, date, created_at, updated_at)
+        VALUES ('e1', 'expense', 1, '\(category)', '\(wallet)', '2026-10-28', 'x', '2026-10-30T08:12:00Z')
+        """)
+        let id = try #require(Wallet.ID(wallet))
+        try await setup.database.startSharing(id)
+
+        let summary = try await setup.database.syncSummary()
+
+        #expect(summary == SyncSummary(entryCount: 0, updatedAt: nil))
     }
 }

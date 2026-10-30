@@ -35,7 +35,8 @@ public extension SyncEngine {
     static func cloudSummary(
         in container: CKContainer = CKContainer(identifier: containerIdentifier)
     ) async throws -> SyncSummary? {
-        var entries: [CKRecord] = []
+        var entryCount = 0
+        var updates: [String] = []
         var token: CKServerChangeToken?
         var moreComing = true
 
@@ -44,17 +45,19 @@ public extension SyncEngine {
                 let changes = try await container.privateCloudDatabase.recordZoneChanges(
                     inZoneWith: zoneID,
                     since: token,
-                    desiredKeys: []
+                    desiredKeys: [SyncRecord.fieldsKey]
                 )
 
-                let records = changes.modificationResultsByID.values.compactMap {
-                    try? $0.get().record
-                }
+                let entries = changes.modificationResultsByID.values
+                    .compactMap {
+                        try? $0.get().record
+                    }
+                    .filter {
+                        $0.recordType == SyncTable.entry.rawValue
+                    }
 
-                entries += records.filter {
-                    $0.recordType == SyncTable.entry.rawValue
-                }
-
+                entryCount += entries.count
+                updates += entries.compactMap(Self.updatedAt)
                 token = changes.changeToken
                 moreComing = changes.moreComing
             }
@@ -62,9 +65,7 @@ public extension SyncEngine {
             return nil
         }
 
-        let updatedAt = entries.compactMap(\.modificationDate).max()
-
-        return SyncSummary(entryCount: entries.count, updatedAt: updatedAt)
+        return SyncSummary(entryCount: entryCount, latestUpdate: updates.max())
     }
 
     static func deleteCloudData(
@@ -143,6 +144,14 @@ extension SyncEngine {
             isSyncEnabled: isSyncEnabled,
             owners: owners
         )
+    }
+
+    static func updatedAt(_ record: CKRecord) -> String? {
+        guard case let .text(text)? = SyncRecord(record)?.values["updated_at"] else {
+            return nil
+        }
+
+        return text
     }
 
     func recordID(of id: SyncRecordID) -> CKRecord.ID {

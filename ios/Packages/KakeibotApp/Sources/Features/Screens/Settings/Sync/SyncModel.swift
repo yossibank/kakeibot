@@ -46,6 +46,10 @@ public extension SyncModel {
         requestedOn ?? isOn
     }
 
+    var isSwitching: Bool {
+        requestedOn != nil
+    }
+
     var footnote: String {
         guard !isOn else {
             return Self.keepsDataNote
@@ -105,6 +109,18 @@ public extension SyncModel {
         }
     }
 
+    func request(_ isOn: Bool) -> Bool {
+        guard
+            !isWorking,
+            !isSwitching
+        else {
+            return false
+        }
+
+        requestedOn = isOn
+        return true
+    }
+
     func setOn(_ isOn: Bool) async {
         requestedOn = isOn
 
@@ -122,6 +138,10 @@ public extension SyncModel {
     }
 
     func useCloudData() async {
+        guard isChoosing else {
+            return
+        }
+
         choice = nil
 
         await work {
@@ -132,6 +152,10 @@ public extension SyncModel {
     }
 
     func useLocalData() async {
+        guard isChoosing else {
+            return
+        }
+
         choice = nil
 
         await work {
@@ -209,7 +233,9 @@ private extension SyncModel {
     }
 
     func turnOn() async {
+        isWorking = true
         account = await cloud.account()
+        isWorking = false
 
         guard isAvailable else {
             return

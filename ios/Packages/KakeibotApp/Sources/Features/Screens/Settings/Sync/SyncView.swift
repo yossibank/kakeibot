@@ -32,7 +32,7 @@ public struct SyncView: View {
                                 CapsulePicker(selection: onBinding, options: Self.onOptions)
                             }
                             .frame(minHeight: 58)
-                            .disabled(model.isWorking || !canChange)
+                            .disabled(model.isWorking || model.isSwitching || !canChange)
 
                             if hasStatus {
                                 Hairline()
@@ -309,6 +309,10 @@ private extension SyncView {
         Binding {
             model.shownOn
         } set: { isOn in
+            guard model.request(isOn) else {
+                return
+            }
+
             Task {
                 await model.setOn(isOn)
             }
