@@ -47,8 +47,8 @@ private extension ThemeStyleChoices {
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
-            .frame(maxWidth: .infinity, minHeight: 64)
-            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .padding(8)
             .background(Palette.panel, in: shape)
             .overlay {
                 shape

@@ -74,10 +74,7 @@ public struct ThemeStyleLookView: View {
                 columns: 3,
                 label: \.title
             ) { backdrop in
-                Backdrop()
-                    .frame(width: Self.markSize * 2.4, height: Self.markSize * 1.4)
-                    .clipShape(.rect(cornerRadius: 4))
-                    .environment(\.themeStyle.backdrop, backdrop)
+                ThemeStyleBackdrop(backdrop: backdrop)
             } choose: { backdrop in
                 await model.choose(backdrop)
             }
