@@ -81,7 +81,7 @@ public struct RecordsView: View {
                     Group {
                         monthContent
                     }
-                    .pageSlide(slide)
+                    .pageSlide(slide, page: model.month)
                 }
             }
             .padding(.horizontal, 16)
