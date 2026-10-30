@@ -41,26 +41,15 @@ extension EntrySheet {
 
 private extension EntrySheet {
     func payOffButton(_ remaining: Int) -> some View {
-        Button {
+        ChipButton(
+            "残り \(AmountText.text(remaining)) をまとめて返す",
+            systemImage: "checkmark.seal",
+            size: .large
+        ) {
             withAnimation(.snappy) {
                 model.payOffLoan()
             }
-        } label: {
-            Label(
-                "残り \(AmountText.text(remaining)) をまとめて返す",
-                systemImage: "checkmark.seal"
-            )
-            .textFont(.footnote)
-            .foregroundStyle(Palette.accent)
-            .padding(.horizontal, 16)
-            .frame(minHeight: 40)
-            .overlay {
-                Capsule()
-                    .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
-            }
-            .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
         .transition(.opacity)
     }
 }

@@ -41,28 +41,15 @@ struct EntryTemplateRow: View {
 
 private extension EntryTemplateRow {
     var addButton: some View {
-        Button {
-            onAdd()
-        } label: {
-            Label("今の入力を保存", systemImage: "plus")
-                .textFont(size: .caption)
-                .foregroundStyle(Palette.accent)
-                .padding(.horizontal, 12)
-                .frame(height: Self.height)
-                .overlay {
-                    Capsule()
-                        .stroke(
-                            Palette.accent.opacity(.medium),
-                            style: .dashed
-                        )
-                }
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.plain)
+        ChipButton(
+            "今の入力を保存",
+            systemImage: "plus",
+            outline: .dashed,
+            action: onAdd
+        )
     }
 
     func button(_ template: EntryTemplate) -> some View {
-        let isApplied = model.isApplied(template)
         let icon = model.icon(for: template)
         let amount = template.amount.map { AmountText.text($0) } ?? "毎回入れる"
 
@@ -70,37 +57,24 @@ private extension EntryTemplateRow {
             ? Palette.subtext
             : Palette.accentStrong
 
-        return Button {
+        return ChipButton(isSelected: model.isApplied(template)) {
             onUse(template)
-        } label: {
+        } content: {
             HStack(spacing: 8) {
                 IconImage(icon, size: 12)
                     .foregroundStyle(Palette.accent)
 
                 Text(template.name)
-                    .foregroundStyle(Palette.text)
 
                 Text(amount)
                     .displayFont(.caption)
                     .foregroundStyle(amountColor)
             }
-            .textFont(size: .caption)
-            .padding(.leading, 8)
-            .padding(.trailing, 12)
-            .frame(height: Self.height)
-            .background(EntrySheet.categoryFill(isApplied), in: Capsule())
-            .overlay {
-                Capsule()
-                    .stroke(Self.stroke(isApplied), lineWidth: 1)
-            }
-            .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
     }
 }
 
 private extension EntryTemplateRow {
-    static let height: CGFloat = 34
     static let spacing: CGFloat = 8
     static let minimumForTwoRows = 3
 
@@ -116,9 +90,5 @@ private extension EntryTemplateRow {
 
     var secondRow: ArraySlice<EntryTemplate> {
         model.templates.dropFirst(splitIndex)
-    }
-
-    static func stroke(_ isApplied: Bool) -> Color {
-        isApplied ? Palette.accent : Palette.accent.opacity(.soft)
     }
 }

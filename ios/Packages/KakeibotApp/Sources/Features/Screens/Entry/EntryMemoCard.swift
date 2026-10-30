@@ -58,17 +58,11 @@ struct EntryMemoCard: View {
 
 private extension EntryMemoCard {
     func suggestionButton(_ memo: String) -> some View {
-        Button {
+        ChipButton {
             model.memo = memo
-        } label: {
+        } content: {
             Text(memo)
-                .textFont(.caption)
-                .foregroundStyle(Palette.text)
                 .sharedTextScale()
-                .padding(.horizontal, 12)
-                .frame(minHeight: 32)
-                .overlay(Capsule().stroke(Palette.line, lineWidth: 1))
         }
-        .buttonStyle(.plain)
     }
 }

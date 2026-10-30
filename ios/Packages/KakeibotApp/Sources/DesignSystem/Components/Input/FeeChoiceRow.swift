@@ -33,32 +33,19 @@ public extension FeeChoiceRow {
 }
 
 private extension FeeChoiceRow {
-    static let height: CGFloat = 34
-
     func button(_ amount: Int) -> some View {
-        let isApplied = selection == amount
-        let stroke = isApplied ? Palette.accent : Palette.accent.opacity(.soft)
-        let fill = isApplied ? Palette.accent.opacity(.subtle) : Color.clear
         let title = amount == 0 ? "なし" : AmountText.text(amount)
 
-        return Button {
+        return ChipButton(
+            isSelected: selection == amount,
+            width: .fill
+        ) {
             onSelect(amount)
-        } label: {
+        } content: {
             Text(title)
-                .textFont(size: .caption)
                 .monospacedDigit()
-                .foregroundStyle(Palette.text)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity)
-                .frame(height: Self.height)
-                .background(fill, in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(stroke, lineWidth: 1)
-                }
-                .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
     }
 }
