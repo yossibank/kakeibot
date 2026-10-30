@@ -26,6 +26,7 @@ public extension AppDatabase {
 
         try database.insertDefaultsIfEmpty(at: now)
         try database.insertShelfIfEmpty(at: now)
+        try database.returnSharedCategoriesOfUnsharedWallets()
 
         return database
     }

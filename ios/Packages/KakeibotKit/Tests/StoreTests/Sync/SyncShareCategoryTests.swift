@@ -84,6 +84,47 @@ struct SyncShareCategoryTests {
 
         #expect(category == Category(name: "新しい", walletID: setup.shared.description))
     }
+
+    @Test
+    func keepsOneSharedCategoryPerNameWhenSharingAgain() async throws {
+        let setup = try await Setup()
+
+        try await setup.database.endSharing(setup.shared)
+        try await setup.database.startSharing(setup.shared)
+
+        #expect(try await setup.duplicatedSharedCategories() == "0")
+    }
+
+    @Test
+    func returnsEntriesToOwnCategoriesWhenSharingEnds() async throws {
+        let setup = try await Setup()
+        let entry = try await setup.database.saveEntry(
+            setup.draft(wallet: setup.shared),
+            at: Date()
+        )
+
+        try await setup.database.endSharing(setup.shared)
+        let category = try await setup.category(of: entry.id)
+
+        #expect(category == Category(name: "食費", walletID: nil))
+        #expect(try await setup.sharedCategoryCount() == "0")
+    }
+
+    @Test
+    func returnsLeftSharedCategoriesOfUnsharedWallet() async throws {
+        let setup = try await Setup()
+        let entry = try await setup.database.saveEntry(
+            setup.draft(wallet: setup.shared),
+            at: Date()
+        )
+        try await setup.execute("DELETE FROM sync_share")
+
+        try setup.database.returnSharedCategoriesOfUnsharedWallets()
+        let category = try await setup.category(of: entry.id)
+
+        #expect(category == Category(name: "食費", walletID: nil))
+        #expect(try await setup.sharedCategoryCount() == "0")
+    }
 }
 
 extension SyncShareCategoryTests {
@@ -130,6 +171,19 @@ extension SyncShareCategoryTests.Setup {
 
     func execute(_ sql: String) async throws {
         try await base.execute(sql)
+    }
+
+    func sharedCategoryCount() async throws -> String {
+        try await base.value("SELECT COUNT(*) FROM category WHERE wallet_id = '\(shared)'")
+    }
+
+    func duplicatedSharedCategories() async throws -> String {
+        try await base.value("""
+        SELECT COUNT(*) FROM (
+            SELECT 1 FROM category WHERE wallet_id = '\(shared)'
+            GROUP BY kind, name HAVING COUNT(*) > 1
+        )
+        """)
     }
 
     func category(of entryID: Entry.ID) async throws -> SyncShareCategoryTests.Category {

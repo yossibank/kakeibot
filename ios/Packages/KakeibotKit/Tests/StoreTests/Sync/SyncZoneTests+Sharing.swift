@@ -107,7 +107,7 @@ extension SyncZoneTests {
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_record") == "0")
         #expect(keys.contains(key))
         #expect(change.saveZone == SyncZone.own)
-        #expect(categories != "0")
+        #expect(categories == "0")
         #expect(keys.count > 1)
     }
 
