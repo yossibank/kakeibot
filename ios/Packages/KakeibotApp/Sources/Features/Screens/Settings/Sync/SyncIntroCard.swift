@@ -9,7 +9,7 @@ struct SyncIntroCard: View {
             notes: [
                 .init("arrow.triangle.2.circlepath", "同じ Apple ID の端末どうしでそろいます"),
                 .init("iphone.and.arrow.forward", "機種変更しても、記録が残ります"),
-                .init("person.2", "家族とは、口座ごとに共有できます"),
+                .init("person.2", "ほかの人とは、口座ごとに共有できます"),
                 .init("lock", "記録は暗号化して iCloud に置きます")
             ]
         )

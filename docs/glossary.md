@@ -22,6 +22,6 @@
 | 目標 | 目標 | `RewardGoal` | 貯金箱で貯めて買う欲しい物。額に届くと「買った」にできる |
 | ごほうび貯金箱 | 貯金箱 | `RewardBank`・`RewardBalance` | 達成で貯めた合計から、買った目標の額を引いた残り |
 | iCloud 同期 | 端末間の同期 | `SyncModel`・`SyncEngine` | 自分の iCloud で、記録と設定を端末どうしでそろえること |
-| 家族と共有する口座 | 家族との共有 | `WalletShare`・`SyncShareSheet` | 口座ごとに、ほかの iCloud の人と記録を分けあうこと |
+| 共有する口座 | ほかの人との共有 | `WalletShare`・`SyncShareSheet` | 口座ごとに、ほかの iCloud の人と記録を分けあうこと |
 | 誘われた口座 | 誘われた共有の財布 | `JoinedShare` | ほかの iCloud の人に誘われて入った共有の口座。同期の画面から抜けられる |
 | 参加している人 | 共有の参加者 | `SyncParticipant` | 共有の口座に入っている人。自分・参加中・招待中のどれかの状態を持つ |

@@ -27,9 +27,15 @@ struct SyncInviteCard: View {
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
 
-                    Text("この口座を\n家族と共有します")
+                    Text("この口座を\nほかの人と共有します")
                         .displayFont(.headline, weight: .medium)
                         .foregroundStyle(Palette.accentStrong)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text("家族やパートナーなど、iCloud を使う人を招待できます。")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -38,19 +44,19 @@ struct SyncInviteCard: View {
                     point(
                         "tray.full",
                         title: "共有するもの",
-                        text: "この口座と、その記録・カテゴリ。2 人で付けて直せます"
+                        text: "この口座と、その記録・カテゴリです。\n一緒に付けて、直せます。"
                     )
 
                     point(
                         "person.crop.circle.badge.checkmark",
-                        title: "家族に要るもの",
-                        text: "かけいぼっとと iCloud のサインイン。届いたリンクを開きます"
+                        title: "相手に要るもの",
+                        text: "かけいぼっとと、iCloud へのサインインです。\n届いたリンクを開くと参加できます。"
                     )
 
                     point(
                         "hand.raised",
                         title: "やめるとき",
-                        text: "この画面でいつでもやめられます。家族の iPhone からは消えます"
+                        text: "この画面で、いつでもやめられます。\n相手の iPhone からは消えます。"
                     )
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

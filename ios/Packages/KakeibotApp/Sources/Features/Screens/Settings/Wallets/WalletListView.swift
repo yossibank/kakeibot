@@ -42,7 +42,7 @@ public struct WalletListView: View {
                 headline: ("お金を置く所ごとに", "残高を分けて数えます"),
                 notes: [
                     .init("wallet.bifold", "現金・銀行・カードなどを分けて持てます"),
-                    .init("person.2", "家族とは、口座ごとに共有できます"),
+                    .init("person.2", "ほかの人とは、口座ごとに共有できます"),
                     .move,
                     .hide,
                     .swipeDelete
