@@ -131,6 +131,7 @@ private extension EntryDetailBand {
         trailingInset: CGFloat = 0
     ) -> some View {
         let tint = isChanged ? Palette.amber : nil
+        let fill = isChanged ? Palette.amber.opacity(.subtle) : Color.clear
 
         return VStack(alignment: .leading, spacing: 2) {
             Text(title)
@@ -159,7 +160,7 @@ private extension EntryDetailBand {
         }
         .padding(.horizontal, 12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .background(isChanged ? Palette.amber.opacity(.subtle) : Color.clear)
+        .background(fill)
         .contentShape(.rect)
     }
 }

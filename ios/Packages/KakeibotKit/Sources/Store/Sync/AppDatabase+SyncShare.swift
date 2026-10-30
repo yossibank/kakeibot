@@ -15,9 +15,12 @@ public extension AppDatabase {
         }
     }
 
-    func endSharing(_ walletID: Wallet.ID) async throws {
+    func endSharing(
+        _ walletID: Wallet.ID,
+        at now: Date = Date()
+    ) async throws {
         try await writer.write { db in
-            try Self.endSharing(walletID, in: db)
+            try Self.endSharing(walletID, in: db, at: now)
         }
     }
 
@@ -208,7 +211,8 @@ private extension AppDatabase {
 
     static func endSharing(
         _ walletID: Wallet.ID,
-        in db: Database
+        in db: Database,
+        at now: Date
     ) throws {
         let id = walletID.description
         let zoneName = SyncZone.wallet(walletID)
@@ -244,7 +248,7 @@ private extension AppDatabase {
                 )
             }
 
-            try leaveSharedWallet(id, in: db, at: Date())
+            try leaveSharedWallet(id, in: db, at: now)
             try db.notifyChanges(in: Table("sync_change"))
             return
         }

@@ -215,18 +215,11 @@ extension AppDatabase {
             return []
         }
 
-        var fee = try existing ?? Entry(
-            type: .expense,
-            amount: amount,
-            date: transfer.date,
-            categoryId: feeCategoryId(
-                in: db,
-                at: now
-            ),
-            walletId: transfer.walletId,
-            transferId: transfer.id,
-            createdAt: now,
-            updatedAt: now
+        var fee = try existing ?? newFee(
+            amount,
+            for: transfer,
+            in: db,
+            at: now
         )
 
         fee.amount = amount
@@ -272,5 +265,25 @@ private extension AppDatabase {
         }
 
         return try draft.applied(to: existing, at: now)
+    }
+
+    static func newFee(
+        _ amount: Int,
+        for transfer: Entry,
+        in db: Database,
+        at now: Date
+    ) throws -> Entry {
+        let categoryId = try feeCategoryId(in: db, at: now)
+
+        return Entry(
+            type: .expense,
+            amount: amount,
+            date: transfer.date,
+            categoryId: categoryId,
+            walletId: transfer.walletId,
+            transferId: transfer.id,
+            createdAt: now,
+            updatedAt: now
+        )
     }
 }

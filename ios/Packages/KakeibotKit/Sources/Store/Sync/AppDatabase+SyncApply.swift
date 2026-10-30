@@ -7,7 +7,8 @@ public extension AppDatabase {
         saved: [SyncRecord],
         deleted: [SyncRecordID],
         systemFields: [SyncRecordID: Data] = [:],
-        owners: [String: String] = [:]
+        owners: [String: String] = [:],
+        at now: Date = Date()
     ) async throws {
         try await writer.write { db in
             let joinedIDs = Array(systemFields.keys)
@@ -18,17 +19,19 @@ public extension AppDatabase {
                 sql: "SELECT record_id FROM sync_waiting WHERE table_name = 'entry'"
             )
 
-            let entryIDs = (saved.map(\.key) + deleted.map(\.key)).filter { $0.table == .entry }
-                .map(\.id) + waitingIDs
+            let changedKeys = saved.map(\.key) + deleted.map(\.key)
+            let changedEntryIDs = changedKeys.filter { $0.table == .entry }.map(\.id)
+            let entryIDs = changedEntryIDs + waitingIDs
+            let entriesBefore = try Self.cardEntries(entryIDs, in: db)
 
             var blocked: [SyncKey] = []
-            var cardBills = try CardBillChange(before: Self.cardEntries(entryIDs, in: db))
+            var cardBills = CardBillChange(before: entriesBefore)
 
             try Self.setApplying(true, in: db)
 
             for record in Self.parentsFirst(saved) {
                 let kept = sharedKeys.contains(record.key) ? record.removingLocalColumns() : record
-                try Self.applySave(of: kept, in: db)
+                try Self.applySave(of: kept, in: db, at: now)
             }
 
             for (id, data) in systemFields {
@@ -36,7 +39,7 @@ public extension AppDatabase {
             }
 
             try Self.joinSharedWallets(in: joinedIDs, owners: owners, db: db)
-            try Self.retryWaiting(in: db)
+            try Self.retryWaiting(in: db, at: now)
 
             for id in Self.parentsLast(deleted) {
                 if try Self.canApplyDeletion(of: id, in: db),
@@ -51,12 +54,12 @@ public extension AppDatabase {
                 try Self.queue(key, in: db)
             }
 
-            try Self.retryWaiting(in: db)
+            try Self.retryWaiting(in: db, at: now)
 
             cardBills.after = try Self.cardEntries(entryIDs, in: db)
 
             try Self.setApplying(false, in: db)
-            try Self.recalculateCardBills(cardBills, in: db, at: Date())
+            try Self.recalculateCardBills(cardBills, in: db, at: now)
         }
     }
 
@@ -192,9 +195,10 @@ private extension AppDatabase {
 
     static func applySave(
         of record: SyncRecord,
-        in db: Database
+        in db: Database,
+        at now: Date
     ) throws {
-        guard try save(record, in: db) == .blocked else {
+        guard try save(record, in: db, at: now) == .blocked else {
             try removeWaiting(record.key, in: db)
             return
         }
@@ -215,7 +219,10 @@ private extension AppDatabase {
         )
     }
 
-    static func retryWaiting(in db: Database) throws {
+    static func retryWaiting(
+        in db: Database,
+        at now: Date
+    ) throws {
         var progressed = true
 
         while progressed {
@@ -230,7 +237,7 @@ private extension AppDatabase {
             progressed = false
 
             for record in records {
-                guard try save(record, in: db) != .blocked else {
+                guard try save(record, in: db, at: now) != .blocked else {
                     continue
                 }
 
@@ -282,9 +289,10 @@ private extension AppDatabase {
 
     static func save(
         _ received: SyncRecord,
-        in db: Database
+        in db: Database,
+        at now: Date
     ) throws -> Outcome {
-        let record = try receivedTransfer(received, in: db)
+        let record = try receivedTransfer(received, in: db, at: now)
         let table = record.key.table
         let names = try db.columns(in: table.rawValue).map(\.name)
         let columns = Set(names)

@@ -19,6 +19,7 @@ struct ThemePaletteSemanticTests {
             #expect(color == expectedColor)
         } else {
             let contrast = ThemePalette.contrast(color, background)
+
             #expect(color != base)
             #expect(contrast >= 3)
         }

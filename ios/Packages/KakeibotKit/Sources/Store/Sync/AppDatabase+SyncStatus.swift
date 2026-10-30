@@ -36,11 +36,13 @@ private extension AppDatabase {
 
         let reason: String? = row?["stop_reason"]
         let problem: String? = row?["send_problem"]
+        let stopReason = reason.flatMap(SyncStopReason.init)
+        let sendProblem = problem.flatMap(SyncSendProblem.init)
 
         return SyncStatus(
             isEnabled: row?["enabled"] ?? false,
-            stopReason: reason.flatMap(SyncStopReason.init),
-            sendProblem: problem.flatMap(SyncSendProblem.init)
+            stopReason: stopReason,
+            sendProblem: sendProblem
         )
     }
 }

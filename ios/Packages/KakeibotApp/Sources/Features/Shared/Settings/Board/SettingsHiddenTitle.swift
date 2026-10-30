@@ -20,7 +20,7 @@ struct SettingsHiddenTitle: View {
                         Image(systemName: "chevron.right")
                             .sansFont(.caption, weight: .semibold)
                             .foregroundStyle(Palette.accent)
-                            .rotationEffect(.degrees(flag.isOn ? 90 : 0))
+                            .rotationEffect(chevronAngle)
 
                         SectionTitle("\(title)（\(count)）")
                     }
@@ -54,5 +54,11 @@ struct SettingsHiddenTitle: View {
         .task {
             await flag.load()
         }
+    }
+}
+
+private extension SettingsHiddenTitle {
+    var chevronAngle: Angle {
+        .degrees(flag.isOn ? 90 : 0)
     }
 }

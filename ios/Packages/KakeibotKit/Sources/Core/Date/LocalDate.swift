@@ -159,7 +159,10 @@ private extension LocalDate {
 }
 
 extension LocalDate: Comparable {
-    public static func < (lhs: LocalDate, rhs: LocalDate) -> Bool {
+    public static func < (
+        lhs: LocalDate,
+        rhs: LocalDate
+    ) -> Bool {
         (lhs.yearMonth, lhs.day) < (rhs.yearMonth, rhs.day)
     }
 }

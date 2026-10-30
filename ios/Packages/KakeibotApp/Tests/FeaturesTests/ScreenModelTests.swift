@@ -75,7 +75,7 @@ struct ScreenModelTests {
     }
 }
 
-private extension ScreenModelTests {
+extension ScreenModelTests {
     struct Failure: Error {}
 
     final class Counter {
@@ -86,7 +86,9 @@ private extension ScreenModelTests {
     final class Model: ScreenModel {
         var errorNotice = ErrorNotice()
     }
+}
 
+private extension ScreenModelTests {
     static let delays: [Duration] = [.milliseconds(1), .milliseconds(1), .milliseconds(1)]
 
     static func valueThenFailure(_ counter: Counter) -> AsyncThrowingStream<Int, Error> {

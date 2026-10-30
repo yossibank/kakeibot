@@ -139,7 +139,7 @@ extension EntrySheet {
                         .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
-                .opacity(model.canSave ? 1 : 0.4)
+                .opacity(continueOpacity)
             }
         }
         .disabled(!model.canSave)
@@ -285,6 +285,10 @@ private extension EntrySheet {
 
     var saveDetail: String? {
         model.saveDetail(today: today)
+    }
+
+    var continueOpacity: Double {
+        model.canSave ? 1 : 0.4
     }
 
     var typeBinding: Binding<Entry.Kind> {

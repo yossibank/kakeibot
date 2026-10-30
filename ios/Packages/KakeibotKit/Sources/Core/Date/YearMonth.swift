@@ -118,7 +118,10 @@ private extension YearMonth {
 }
 
 extension YearMonth: Comparable {
-    public static func < (lhs: YearMonth, rhs: YearMonth) -> Bool {
+    public static func < (
+        lhs: YearMonth,
+        rhs: YearMonth
+    ) -> Bool {
         lhs.monthIndex < rhs.monthIndex
     }
 }

@@ -66,7 +66,9 @@ private extension RecordsView {
         tint: Color = Palette.accent,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        let opacity = isEnabled ? 1 : 0.4
+
+        return Button(action: action) {
             Label(title, systemImage: systemImage)
                 .textFont(.footnote)
                 .foregroundStyle(tint)
@@ -76,6 +78,6 @@ private extension RecordsView {
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
-        .opacity(isEnabled ? 1 : 0.4)
+        .opacity(opacity)
     }
 }

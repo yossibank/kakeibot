@@ -12,6 +12,7 @@ struct WidgetTheme: ViewModifier {
     func body(content: Content) -> some View {
         let isDark = colorScheme == .dark
         let palette = look.palette(isDark: isDark)
+        let scheme: ColorScheme = palette.isLight ? .light : .dark
 
         content
             .containerBackground(for: .widget) {
@@ -19,7 +20,7 @@ struct WidgetTheme: ViewModifier {
             }
             .environment(\.palette, palette)
             .environment(\.themeStyle, style)
-            .environment(\.colorScheme, palette.isLight ? .light : .dark)
+            .environment(\.colorScheme, scheme)
     }
 }
 
