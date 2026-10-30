@@ -30,41 +30,26 @@ public struct BudgetListView: View {
 
 private extension BudgetListView {
     var content: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("予算", hint: hintFlag)
 
-            VStack(spacing: 4) {
-                Text("\(model.month.month)月（\(model.periodText)）から使う額")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                if model.recurringExpense > 0 {
-                    Label(recurringText, systemImage: "repeat")
-                        .textFont(.caption2)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accent)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-            }
-
-            SettingsHint(
-                flag: hintFlag,
-                lines: [
+            SettingsIntroCard(
+                systemImage: "chart.bar",
+                headline: ("月に使う額を", "カテゴリ別に決めます"),
+                notes: [
                     .init("calendar", "変えた額はこの月から使います"),
                     .init("clock.arrow.circlepath", "前の月の額はそのまま残ります")
-                ]
+                ],
+                flag: hintFlag
             )
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     totalCard
 
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            SectionTitle("カテゴリごと")
+                            SettingsSectionTitle("カテゴリごと")
 
                             Spacer()
 
@@ -72,6 +57,7 @@ private extension BudgetListView {
                                 .textFont(.caption2)
                                 .monospacedDigit()
                                 .foregroundStyle(Palette.subtext)
+                                .padding(.trailing, 8)
                         }
 
                         VStack(spacing: 0) {
@@ -105,10 +91,18 @@ private extension BudgetListView {
             openDrawer(.total)
         } label: {
             VStack(spacing: 8) {
-                Text("月全体")
-                    .textFont(.caption2)
-                    .tracking(3)
-                    .foregroundStyle(Palette.accent)
+                VStack(spacing: 4) {
+                    Text("月全体")
+                        .textFont(.caption2)
+                        .tracking(3)
+                        .foregroundStyle(Palette.accent)
+
+                    Text(periodText)
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
 
                 Text(amountText(model.totalAmount))
                     .displayFont(.largeTitle, weight: .bold)
@@ -119,6 +113,17 @@ private extension BudgetListView {
                 if let usage = model.usage(for: nil) {
                     usageLine(usage)
                         .padding(.horizontal, 24)
+                        .padding(.top, 4)
+                }
+
+                if model.recurringExpense > 0 {
+                    Label(recurringText, systemImage: "repeat")
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accent)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .padding(.horizontal, 16)
                         .padding(.top, 4)
                 }
             }
@@ -171,7 +176,7 @@ private extension BudgetListView {
                 }
             }
             .padding(.vertical, 12)
-            .frame(minHeight: 48)
+            .frame(minHeight: 52)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -197,6 +202,10 @@ private extension BudgetListView {
 }
 
 private extension BudgetListView {
+    var periodText: String {
+        "\(model.month.month)月（\(model.periodText)）から使う額"
+    }
+
     var recurringText: String {
         "この月の固定費は \(AmountText.text(model.recurringExpense))。予算の目安にできます"
     }

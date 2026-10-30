@@ -154,6 +154,7 @@ private extension AppDatabase {
         db: Database
     ) throws {
         let zoneNames = Set(ids.map(\.zoneName))
+        var hasJoined = false
 
         for zoneName in zoneNames {
             guard let walletID = SyncZone.walletID(of: zoneName) else {
@@ -168,6 +169,12 @@ private extension AppDatabase {
                 """,
                 arguments: [owners[zoneName], walletID.description]
             )
+
+            hasJoined = hasJoined || db.changesCount > 0
+        }
+
+        if hasJoined {
+            try notifyShareChanges(in: db)
         }
     }
 

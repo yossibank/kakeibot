@@ -23,16 +23,17 @@ public struct HomeSectionsView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("ホームに出すもの", hint: hintFlag)
 
-            SettingsHint(
-                flag: hintFlag,
-                lines: [
-                    .init("square.stack", "ホームに並べる順番と、出すものを選べます"),
+            SettingsIntroCard(
+                systemImage: "rectangle.grid.1x2",
+                headline: ("ホームに出すものと", "その順番を選べます"),
+                notes: [
                     .move,
-                    .init("eye.slash", "長押しして下の枠へ運ぶと隠せます")
-                ]
+                    .init("eye.slash", "下の枠へ運ぶと隠せます")
+                ],
+                flag: hintFlag
             )
 
             ScrollView {

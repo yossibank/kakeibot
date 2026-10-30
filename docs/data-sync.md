@@ -36,6 +36,8 @@ flowchart LR
 | shared_engine_state | BLOB | 共有のデータベースの CKSyncEngine の状態。誘われた共有の財布を送り受けする |
 | stop_reason | TEXT | 同期が自分から切れた理由（`signed_out`・`account_changed`・`cloud_replaced`）。同期を入れているときだけ書き、入れ直すか手で切ると NULL |
 | send_problem | TEXT | 自分のデータベースへ送れていない理由で、送れたら NULL。値は `quota_exceeded`・`network_unavailable`・`not_allowed` |
+| fetching | INTEGER | 自分のデータベースから受け取っている間だけ 1。同期を入れると 1 にし、取得を終えると 0 に戻す |
+| synced_at | DATETIME | 自分のデータベースと最後に受け取りか送りを終えた時刻。同期を入れているときだけ書き、切ると NULL |
 
 ### sync_change
 
@@ -72,7 +74,7 @@ setting は、次の key を記録しない。
 | wallet_id | TEXT | 主キー。wallet を参照し、財布を消すと一緒に消える |
 | owner_name | TEXT | 自分が誘った側なら NULL。誘われた側なら、誘った人の CloudKit の owner name |
 
-`WITHOUT ROWID` の表である。ゾーンの名前は列に持たず、`"Wallet-" + wallet_id` で決める。
+`WITHOUT ROWID` の表である。ゾーンの名前は列に持たず、`"Wallet-" + wallet_id` で決める。行を書いたら、同じ書き込みの中で `notifyShareChanges` を呼び、同期の画面の一覧に知らせる。
 
 自分のほかの端末は、`Wallet-` のゾーンのレコードを受け取ったときに、財布があれば行を足す。`endSharing` を呼ぶと、行と、そのゾーンの sync_record が消える。財布の行は残り、自分のゾーンに送り直す。
 

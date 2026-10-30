@@ -4,25 +4,8 @@ import Store
 import SwiftUI
 
 extension SettingsSheet {
-    var header: some View {
-        HStack {
-            Color.clear
-                .frame(width: 44, height: 44)
-
-            Spacer()
-
-            SheetTitle("設定")
-
-            Spacer()
-
-            RingButton(systemImage: "xmark") {
-                dismiss()
-            }
-        }
-    }
-
     var recordSection: some View {
-        section("記録") {
+        section("記録に使うもの") {
             NavigationLink {
                 WalletListView(database: database)
             } label: {
@@ -44,6 +27,21 @@ extension SettingsSheet {
             } label: {
                 row("テンプレート", systemImage: "rectangle.stack")
             }
+        }
+    }
+
+    var budgetSection: some View {
+        section("予算と期間") {
+            NavigationLink {
+                BudgetListView(
+                    model: BudgetListModel(
+                        database: database,
+                        today: today
+                    )
+                )
+            } label: {
+                row("予算", systemImage: "chart.bar")
+            }
 
             Hairline()
 
@@ -57,11 +55,9 @@ extension SettingsSheet {
             } label: {
                 row("固定費", systemImage: "repeat")
             }
-        }
-    }
 
-    var periodSection: some View {
-        section("期間と予算") {
+            Hairline()
+
             NavigationLink {
                 MonthStartDayView(
                     model: MonthStartDayModel(
@@ -77,19 +73,6 @@ extension SettingsSheet {
 
             pickerRow("週の始まり", systemImage: "calendar.day.timeline.left") {
                 CapsulePicker(selection: weekStartBinding, options: Weekday.weekStartOptions)
-            }
-
-            Hairline()
-
-            NavigationLink {
-                BudgetListView(
-                    model: BudgetListModel(
-                        database: database,
-                        today: today
-                    )
-                )
-            } label: {
-                row("予算", systemImage: "chart.bar")
             }
         }
     }
@@ -107,7 +90,41 @@ extension SettingsSheet {
             NavigationLink {
                 RewardRuleListView(database: database)
             } label: {
-                row("ごほうび", systemImage: "gift")
+                row("ごほうびの決まり", systemImage: "gift")
+            }
+        }
+    }
+
+    var homeSection: some View {
+        section("ホームと通知") {
+            NavigationLink {
+                HomeSectionsView(model: HomeSectionsModel(database: database), database: database)
+            } label: {
+                row("ホームに出すもの", systemImage: "rectangle.grid.1x2")
+            }
+
+            Hairline()
+
+            NavigationLink {
+                LaunchScreenView(model: LaunchScreenModel(database: database))
+            } label: {
+                row("起動時に開く画面", systemImage: "iphone", value: launchScreen.title)
+            }
+
+            Hairline()
+
+            NavigationLink {
+                ReminderView(
+                    model: ReminderModel(
+                        database: database,
+                        today: today,
+                        time: reminderTime,
+                        authorization: authorization,
+                        permission: permission
+                    )
+                )
+            } label: {
+                row("記録忘れの通知", systemImage: "bell", value: reminderText)
             }
         }
     }
@@ -155,7 +172,7 @@ extension SettingsSheet {
                 ThemeStyleLookView(model: ThemeStyleModel(database: database))
             } label: {
                 row(
-                    "見た目と動き",
+                    "形と動き",
                     systemImage: "square.on.circle",
                     value: themeStyle.lookTitle
                 )
@@ -163,42 +180,8 @@ extension SettingsSheet {
         }
     }
 
-    var usageSection: some View {
-        section("使い方") {
-            NavigationLink {
-                LaunchScreenView(model: LaunchScreenModel(database: database))
-            } label: {
-                row("起動時に開く画面", systemImage: "iphone", value: launchScreen.title)
-            }
-
-            Hairline()
-
-            NavigationLink {
-                HomeSectionsView(model: HomeSectionsModel(database: database), database: database)
-            } label: {
-                row("ホームに出すもの", systemImage: "square.stack")
-            }
-
-            Hairline()
-
-            NavigationLink {
-                ReminderView(
-                    model: ReminderModel(
-                        database: database,
-                        today: today,
-                        time: reminderTime,
-                        authorization: authorization,
-                        permission: permission
-                    )
-                )
-            } label: {
-                row("記録忘れの通知", systemImage: "bell", value: reminderText)
-            }
-        }
-    }
-
     var dataSection: some View {
-        section("データとアプリ") {
+        section("データ") {
             NavigationLink {
                 SyncView(
                     model: SyncModel(
@@ -222,10 +205,6 @@ extension SettingsSheet {
             } label: {
                 row("バックアップ", systemImage: "externaldrive")
             }
-
-            Hairline()
-
-            versionRow
         }
     }
 }

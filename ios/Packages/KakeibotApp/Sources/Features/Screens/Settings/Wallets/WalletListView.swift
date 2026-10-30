@@ -34,13 +34,24 @@ public struct WalletListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("口座", hint: hintFlag)
 
-            SettingsHint(flag: hintFlag, lines: [.move, .hide, .swipeDelete])
+            SettingsIntroCard(
+                systemImage: "building.columns",
+                headline: ("お金を置く所ごとに", "残高を分けて数えます"),
+                notes: [
+                    .init("wallet.bifold", "現金・銀行・カードなどを分けて持てます"),
+                    .init("person.2", "家族とは、口座ごとに共有できます"),
+                    .move,
+                    .hide,
+                    .swipeDelete
+                ],
+                flag: hintFlag
+            )
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     if model.shown.isEmpty {
                         SettingsEmptyNote(
                             systemImage: "building.columns",

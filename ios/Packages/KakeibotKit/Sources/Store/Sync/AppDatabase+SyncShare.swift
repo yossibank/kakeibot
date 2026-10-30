@@ -62,6 +62,10 @@ extension AppDatabase {
 
         return nil
     }
+
+    static func notifyShareChanges(in db: Database) throws {
+        try db.notifyChanges(in: Table("sync_share"))
+    }
 }
 
 private extension AppDatabase {
@@ -198,6 +202,8 @@ private extension AppDatabase {
             return
         }
 
+        try notifyShareChanges(in: db)
+
         let copied = try copyOwnCategories(for: walletID, in: db)
 
         try moveEntries(of: walletID, to: copied, in: db)
@@ -224,6 +230,7 @@ private extension AppDatabase {
         ) ?? true
 
         try db.execute(sql: "DELETE FROM sync_share WHERE wallet_id = ?", arguments: [id])
+        try notifyShareChanges(in: db)
         try db.execute(sql: "DELETE FROM sync_record WHERE zone_name = ?", arguments: [zoneName])
 
         let isEnabled = try Bool.fetchOne(db, sql: "SELECT enabled FROM sync_state") ?? false

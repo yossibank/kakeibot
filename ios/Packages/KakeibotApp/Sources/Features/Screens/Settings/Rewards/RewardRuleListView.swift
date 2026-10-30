@@ -34,16 +34,22 @@ public struct RewardRuleListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("ごほうびの決まり", hint: hintFlag)
 
-            SettingsHint(
-                flag: hintFlag,
-                lines: [.init("gift", "達成すると貯金箱に貯まる決まりです"), .move, .hide]
+            SettingsIntroCard(
+                systemImage: "gift",
+                headline: ("我慢できた日に", "決めた額を貯めます"),
+                notes: [
+                    .init("banknote", "口座の残高は変わりません"),
+                    .move,
+                    .hide
+                ],
+                flag: hintFlag
             )
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     if model.shown.isEmpty {
                         SettingsEmptyNote(
                             systemImage: "gift",

@@ -3,8 +3,9 @@ import Store
 import SwiftUI
 
 public struct SyncView: View {
-    @State private var model: SyncModel
-    @State private var leaving: JoinedShare?
+    @State var model: SyncModel
+    @State var leaving: JoinedShare?
+    @State var stopping: WalletShare?
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -34,10 +35,10 @@ public struct SyncView: View {
                             .frame(minHeight: 58)
                             .disabled(model.isWorking || model.isSwitching || !canChange)
 
-                            if hasStatus {
+                            if let progress = model.progress {
                                 Hairline()
 
-                                status
+                                status(progress)
                                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                             }
                         }
@@ -48,54 +49,11 @@ public struct SyncView: View {
                     }
 
                     if !model.shares.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            SectionTitle("家族と共有する口座")
-                                .padding(.leading, 8)
-
-                            VStack(spacing: 0) {
-                                ForEach(model.shares, id: \.wallet.id) { item in
-                                    if item.wallet.id != model.shares.first?.wallet.id {
-                                        Hairline()
-                                    }
-
-                                    shareRow(item)
-                                }
-                            }
-                            .sharesTextScale(id: model.shares.map(\.wallet.name))
-                            .padding(.horizontal, 16)
-                            .card()
-                            .disabled(model.isWorking || !model.isAvailable)
-
-                            caption("口座ごとに、家族と記録を分けあえます")
-                        }
+                        sharingSection
                     }
 
                     if !model.joined.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            SectionTitle("誘われた口座")
-                                .padding(.leading, 8)
-
-                            VStack(spacing: 0) {
-                                ForEach(model.joined, id: \.wallet.id) { item in
-                                    if item.wallet.id != model.joined.first?.wallet.id {
-                                        Hairline()
-                                    }
-
-                                    joinedRow(item)
-                                }
-                            }
-                            .sharesTextScale(id: model.joined.map(\.wallet.name))
-                            .padding(.horizontal, 16)
-                            .card()
-                            .disabled(model.isWorking || !model.isAvailable)
-
-                            caption("抜けると、この iPhone からその口座と記録が消えます")
-                        }
-                    }
-
-                    if model.isWorking {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
+                        joinedSection
                     }
                 }
                 .padding(.vertical, 8)
@@ -125,16 +83,7 @@ public struct SyncView: View {
             await model.load()
         }
         .task {
-            await model.observeStatus()
-        }
-        .task {
-            await model.observePending()
-        }
-        .task {
-            await model.observeShares()
-        }
-        .task {
-            await model.observeJoined()
+            await model.observe()
         }
         .confirmation(
             isPresented: isLeavingBinding,
@@ -146,6 +95,16 @@ public struct SyncView: View {
         ) {
             leave()
         }
+        .confirmation(
+            isPresented: isStoppingBinding,
+            systemImage: "person.2.slash",
+            title: "共有をやめますか",
+            message: "家族の iPhone から、この口座と記録が消えます。この iPhone には残ります",
+            keepTitle: "続ける",
+            confirmTitle: "やめる"
+        ) {
+            stopSharing()
+        }
         .overlay {
             if let choice = model.choice {
                 SyncChoiceCard(
@@ -154,48 +113,59 @@ public struct SyncView: View {
                     onUseCloud: useCloudData,
                     onKeep: model.cancelChoice
                 )
+            } else if let invitation = model.invitation {
+                SyncInviteCard(
+                    item: invitation,
+                    onInvite: confirmInvitation,
+                    onCancel: model.cancelInvitation
+                )
+            } else if let opened = model.opened {
+                SyncSharedCard(
+                    item: opened,
+                    participants: model.participants,
+                    isFailed: model.isParticipantsFailed,
+                    onInvite: inviteMore,
+                    onStop: {
+                        askToStop(opened)
+                    },
+                    onClose: model.closeOpened
+                )
             }
         }
         .animation(.snappy(duration: 0.25), value: model.choice)
+        .animation(.snappy(duration: 0.25), value: model.invitation)
+        .animation(.snappy(duration: 0.25), value: model.opened)
         .haptic(.selection, trigger: model.isChoosing) { _, new in
             new
+        }
+        .haptic(.success, trigger: model.progress) { old, new in
+            Self.hasFinishedSyncing(from: old, to: new)
         }
     }
 }
 
 private extension SyncView {
     @ViewBuilder
-    var status: some View {
-        if !model.isOn,
-           let reason = model.stopReason {
-            warning(reason.message)
-        } else if let count = model.pendingCount {
-            if count > 0,
-               model.sendProblem != nil {
-                warning(model.pendingText(count))
-            } else {
-                HStack(spacing: 8) {
-                    if count > 0 {
-                        ProgressView()
-                            .controlSize(.mini)
-                    } else {
-                        Image(systemName: "checkmark.circle")
-                            .foregroundStyle(Palette.accent)
-                    }
-
-                    Text(model.pendingText(count))
+    func status(_ progress: SyncProgress) -> some View {
+        if progress.isProblem {
+            warning(progress.message)
+        } else {
+            HStack(spacing: 8) {
+                if progress.isBusy {
+                    ProgressView()
+                        .controlSize(.mini)
+                } else {
+                    Image(systemName: "checkmark.circle")
+                        .foregroundStyle(Palette.accent)
                 }
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-            }
-        }
-    }
 
-    func caption(_ text: String) -> some View {
-        Text(text)
-            .textFont(.caption)
+                Text(progress.message)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .textFont(.footnote)
             .foregroundStyle(Palette.subtext)
-            .padding(.leading, 8)
+            .padding(.vertical, 12)
+        }
     }
 
     func warning(_ text: String) -> some View {
@@ -209,72 +179,15 @@ private extension SyncView {
         .foregroundStyle(Palette.rose)
         .padding(.vertical, 12)
     }
+}
 
-    func joinedRow(_ item: JoinedShare) -> some View {
-        HStack(spacing: 12) {
-            IconBadge(item.icon, size: 32)
-
-            Text(item.wallet.name)
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-                .sharedTextScale()
-
-            Spacer(minLength: 0)
-
-            Button {
-                leaving = item
-            } label: {
-                pill("抜ける", color: Palette.rose, isFilled: false)
-            }
-            .buttonStyle(.plain)
-        }
-        .frame(minHeight: 58)
-    }
-
-    func shareRow(_ item: WalletShare) -> some View {
-        let title = item.isShared ? "共有中" : "共有する"
-
-        return HStack(spacing: 12) {
-            IconBadge(item.icon, size: 32)
-
-            Text(item.wallet.name)
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-                .sharedTextScale()
-
-            Spacer(minLength: 0)
-
-            Button {
-                Task {
-                    await model.share(item)
-                }
-            } label: {
-                pill(title, color: Palette.accent, isFilled: !item.isShared)
-            }
-            .buttonStyle(.plain)
-        }
-        .frame(minHeight: 58)
-    }
-
-    func pill(
-        _ title: String,
-        color: Color,
-        isFilled: Bool
-    ) -> some View {
-        let fill = isFilled ? color.opacity(.muted) : .clear
-
-        return Text(title)
-            .textFont(.footnote, weight: .bold)
-            .foregroundStyle(color)
-            .padding(.horizontal, 16)
-            .frame(minHeight: 32)
-            .background(fill, in: Capsule())
-            .overlay {
-                Capsule()
-                    .stroke(color.opacity(.medium), lineWidth: 1)
-            }
-            .contentShape(Capsule())
-            .fixedSize()
+extension SyncView {
+    func caption(_ text: String) -> some View {
+        Text(text)
+            .textFont(.caption)
+            .foregroundStyle(Palette.subtext)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.leading, 8)
     }
 }
 
@@ -288,19 +201,22 @@ private extension SyncView {
         model.isOn || model.isAvailable
     }
 
-    var hasStatus: Bool {
-        let isStopped = !model.isOn && model.stopReason != nil
-        let isSending = model.isOn && model.pendingCount != nil
-
-        return isStopped || isSending
-    }
-
     var isLeavingBinding: Binding<Bool> {
         Binding {
             leaving != nil
         } set: { isPresented in
             if !isPresented {
                 leaving = nil
+            }
+        }
+    }
+
+    var isStoppingBinding: Binding<Bool> {
+        Binding {
+            stopping != nil
+        } set: { isPresented in
+            if !isPresented {
+                stopping = nil
             }
         }
     }
@@ -319,6 +235,20 @@ private extension SyncView {
         }
     }
 
+    static func hasFinishedSyncing(
+        from old: SyncProgress?,
+        to new: SyncProgress?
+    ) -> Bool {
+        guard
+            old?.isBusy == true,
+            case .upToDate = new
+        else {
+            return false
+        }
+
+        return true
+    }
+
     func leave() {
         guard let leaving else {
             return
@@ -328,6 +258,35 @@ private extension SyncView {
 
         Task {
             await model.leave(leaving)
+        }
+    }
+
+    func askToStop(_ item: WalletShare) {
+        model.closeOpened()
+        stopping = item
+    }
+
+    func stopSharing() {
+        guard let stopping else {
+            return
+        }
+
+        self.stopping = nil
+
+        Task {
+            await model.stopSharing(stopping)
+        }
+    }
+
+    func confirmInvitation() {
+        Task {
+            await model.confirmInvitation()
+        }
+    }
+
+    func inviteMore() {
+        Task {
+            await model.inviteMore()
         }
     }
 

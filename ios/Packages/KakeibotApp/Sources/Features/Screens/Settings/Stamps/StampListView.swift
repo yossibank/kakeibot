@@ -33,19 +33,21 @@ public struct StampListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("スタンプ", hint: hintFlag)
 
-            SettingsHint(
-                flag: hintFlag,
-                lines: [.init("seal", "カレンダーに押すスタンプです"), .move, .hide]
+            SettingsIntroCard(
+                systemImage: "seal",
+                headline: ("カレンダーに押して", "その日を残せます"),
+                notes: [.move, .hide],
+                flag: hintFlag
             )
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     if model.shown.isEmpty {
                         SettingsEmptyNote(
-                            systemImage: "checkmark.seal",
+                            systemImage: "seal",
                             text: "スタンプを足すと、ここに並びます"
                         )
                     }

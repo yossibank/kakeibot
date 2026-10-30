@@ -116,7 +116,7 @@ private extension SettingsRowList {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .frame(minHeight: 56)
+            .frame(minHeight: 52)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)

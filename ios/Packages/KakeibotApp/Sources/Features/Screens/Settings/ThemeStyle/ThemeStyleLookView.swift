@@ -11,7 +11,7 @@ public struct ThemeStyleLookView: View {
 
     public var body: some View {
         ThemeStyleScreen(
-            title: "見た目と動き",
+            title: "形と動き",
             hint: "角の丸みや行の間隔、スタンプの形、背景を選べます",
             model: model
         ) {
@@ -83,7 +83,7 @@ public struct ThemeStyleLookView: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                ThemeStyleRowTitle("振動と飾り")
+                SettingsSectionTitle("振動と飾り")
 
                 ThemeStyleSwitch(
                     title: "押した時の振動",

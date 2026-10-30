@@ -223,9 +223,21 @@ extension AppModel {
         await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
         await sharedEngine.start(isSyncEnabled: syncActivity.isSyncEnabled)
 
-        await watch(database.syncChangeUpdates()) {
-            await engine.enqueuePending()
-            await sharedEngine.enqueuePending()
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await engine.fetchChanges()
+            }
+
+            group.addTask {
+                await sharedEngine.fetchChanges()
+            }
+
+            group.addTask {
+                await self.watch(database.syncChangeUpdates()) {
+                    await engine.enqueuePending()
+                    await sharedEngine.enqueuePending()
+                }
+            }
         }
     }
 

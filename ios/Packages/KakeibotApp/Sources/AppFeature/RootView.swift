@@ -192,11 +192,21 @@ extension SyncCloud {
     } createShare: { walletID, title in
         let zoneName = SyncZone.wallet(walletID)
         _ = try await SyncEngine.share(zoneName: zoneName, title: title)
-    } showShare: { walletID, title, onStop in
+    } showShare: { walletID, title, onStop, onFail in
         let zoneName = SyncZone.wallet(walletID)
         let share = try await SyncEngine.share(zoneName: zoneName, title: title)
 
-        SyncShareSheet.present(share, title: title, onStop: onStop)
+        SyncShareSheet.present(
+            share,
+            title: title,
+            onStop: onStop,
+            onFail: onFail
+        )
+    } participants: { walletID, title in
+        let zoneName = SyncZone.wallet(walletID)
+        let share = try await SyncEngine.share(zoneName: zoneName, title: title)
+
+        return share.participants.compactMap(SyncParticipant.init)
     } deleteShare: { walletID in
         let zoneName = SyncZone.wallet(walletID)
         try await SyncEngine.deleteShare(zoneName: zoneName)

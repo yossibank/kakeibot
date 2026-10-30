@@ -19,7 +19,6 @@ public struct SettingsSheet: View {
     @State var sampleMessage: String?
     #endif
 
-    @Environment(\.dismiss) var dismiss
     @Environment(\.notificationPermission) var permission
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.syncCloud) var syncCloud
@@ -44,31 +43,35 @@ public struct SettingsSheet: View {
     public var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
-                header
+                SettingsBackHeader("設定")
+                    .environment(\.isSettingsSheetRoot, true)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         recordSection
 
-                        periodSection
+                        budgetSection
 
                         funSection
 
-                        lookSection
+                        homeSection
 
-                        usageSection
+                        lookSection
 
                         dataSection
 
                         #if DEBUG
                         sampleSection
                         #endif
+
+                        versionText
+                            .padding(.top, 8)
                     }
                     .padding(.bottom, 24)
                 }
                 .scrollIndicators(.hidden)
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 20)
             .padding(.top, 16)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background {

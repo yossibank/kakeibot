@@ -11,16 +11,20 @@ public struct MonthStartDayView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader("月の始まり")
 
-            Text("給料日に合わせると、給料日から\n次の給料日の前の日までを 1 か月として数えます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .multilineTextAlignment(.center)
-
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: SettingsSpacing.section) {
+                    SettingsIntroCard(
+                        systemImage: "calendar",
+                        headline: ("給料日に合わせて", "1 か月を数えられます"),
+                        notes: [
+                            .init("arrow.right", "給料日から、次の給料日の前日までです"),
+                            .init("calendar.badge.exclamationmark", "29〜31 日が無い月は、月末からです")
+                        ]
+                    )
+
                     PeriodCard(periodText: model.periodText, month: model.month)
 
                     MonthStartDayGrid(selection: model.startDay) { day in
@@ -28,10 +32,6 @@ public struct MonthStartDayView: View {
                             await model.choose(day)
                         }
                     }
-
-                    Text("29〜31 日を選ぶと、その日がない月は月末から始まります")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
                 }
                 .padding(.vertical, 8)
             }

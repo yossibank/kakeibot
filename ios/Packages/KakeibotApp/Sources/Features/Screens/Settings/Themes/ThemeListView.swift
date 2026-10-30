@@ -35,16 +35,21 @@ public struct ThemeListView: View {
 
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            VStack(spacing: 16) {
+            VStack(spacing: SettingsSpacing.header) {
                 SettingsBackHeader("テーマ", hint: hintFlag)
 
-                SettingsHint(
-                    flag: hintFlag,
-                    lines: Self.hint
+                SettingsIntroCard(
+                    systemImage: "paintpalette",
+                    headline: ("アプリの色を", "好みに変えられます"),
+                    notes: [
+                        .init("hand.tap", "押すと、そのテーマに切り替わります"),
+                        .init("plus.square.on.square", "長押しで、その色をもとにつくれます")
+                    ],
+                    flag: hintFlag
                 )
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                         section("ライト", isLight: true)
 
                         section("ダーク", isLight: false)
@@ -169,7 +174,7 @@ private extension ThemeListView {
         let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
 
         return VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("自動")
+            SettingsSectionTitle("自動")
 
             LazyVGrid(columns: Self.columns, spacing: 20) {
                 Button {
@@ -207,7 +212,7 @@ private extension ThemeListView {
 
     var customSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("つくったテーマ")
+            SettingsSectionTitle("つくったテーマ")
 
             LazyVGrid(columns: Self.columns, spacing: 20) {
                 ForEach(model.customThemes) { theme in
@@ -259,7 +264,7 @@ private extension ThemeListView {
         }
 
         return VStack(alignment: .leading, spacing: 12) {
-            sectionTitle(title)
+            SettingsSectionTitle(title)
 
             LazyVGrid(columns: Self.columns, spacing: 20) {
                 ForEach(presets, id: \.self) { preset in
@@ -274,11 +279,6 @@ private extension ThemeListView {
         }
         .sharesTextScale(id: presets)
     }
-
-    func sectionTitle(_ title: String) -> some View {
-        SectionTitle(title)
-            .padding(.leading, 8)
-    }
 }
 
 private extension ThemeListView {
@@ -286,11 +286,6 @@ private extension ThemeListView {
         repeating: GridItem(.flexible(), spacing: 12),
         count: 3
     )
-
-    static let hint: [SettingsHint.Line] = [
-        .init("hand.tap", "押すと、そのテーマに切り替わります"),
-        .init("plus.square.on.square", "長押しで、その色をもとにつくれます")
-    ]
 
     var isSuggestingIcon: Binding<Bool> {
         Binding {

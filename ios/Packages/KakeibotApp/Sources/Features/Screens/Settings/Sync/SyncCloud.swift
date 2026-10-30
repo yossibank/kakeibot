@@ -8,6 +8,7 @@ public struct SyncCloud: Sendable {
     public let deleteData: Delete
     public let createShare: CreateShare
     public let showShare: ShowShare
+    public let participants: Participants
     public let deleteShare: DeleteShare
     public let leaveShare: LeaveShare
 
@@ -17,6 +18,7 @@ public struct SyncCloud: Sendable {
         deleteData: @escaping Delete,
         createShare: @escaping CreateShare,
         showShare: @escaping ShowShare,
+        participants: @escaping Participants,
         deleteShare: @escaping DeleteShare,
         leaveShare: @escaping LeaveShare
     ) {
@@ -25,6 +27,7 @@ public struct SyncCloud: Sendable {
         self.deleteData = deleteData
         self.createShare = createShare
         self.showShare = showShare
+        self.participants = participants
         self.deleteShare = deleteShare
         self.leaveShare = leaveShare
     }
@@ -36,7 +39,15 @@ public extension SyncCloud {
     typealias Delete = @Sendable () async throws -> Void
     typealias CreateShare = @Sendable (Wallet.ID, String) async throws -> Void
     typealias Stop = @MainActor () async -> Void
-    typealias ShowShare = @MainActor (Wallet.ID, String, @escaping Stop) async throws -> Void
+    typealias Fail = @MainActor () -> Void
+    typealias ShowShare = @MainActor (
+        Wallet.ID,
+        String,
+        @escaping Stop,
+        @escaping Fail
+    ) async throws
+        -> Void
+    typealias Participants = @Sendable (Wallet.ID, String) async throws -> [SyncParticipant]
     typealias DeleteShare = @Sendable (Wallet.ID) async throws -> Void
     typealias LeaveShare = @Sendable (Wallet.ID, String) async throws -> Void
 
@@ -49,7 +60,10 @@ public extension SyncCloud {
         },
         deleteData: {},
         createShare: { _, _ in },
-        showShare: { _, _, _ in },
+        showShare: { _, _, _, _ in },
+        participants: { _, _ in
+            []
+        },
         deleteShare: { _ in },
         leaveShare: { _, _ in }
     )
