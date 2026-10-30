@@ -55,7 +55,7 @@ private extension AssetsRewardSheet {
         let icon = rule.flatMap { model.rewardIcon(for: $0) }
 
         return HStack(spacing: 12) {
-            IconBadge(icon, size: 26)
+            IconBadge(icon, size: 36)
 
             Text(rule?.name ?? "")
                 .textFont(.footnote)

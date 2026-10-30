@@ -157,19 +157,9 @@ private extension AssetsRewardSheet {
 
                 Spacer()
 
-                Button {
+                ToolButton(systemImage: "pencil") {
                     isEditingRules = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Text("編集")
-
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .bold)
-                    }
-                    .textFont(.caption, weight: .semibold)
-                    .foregroundStyle(Palette.accent)
                 }
-                .buttonStyle(.plain)
             }
 
             if model.rewardRules.isEmpty {
@@ -252,7 +242,7 @@ private extension AssetsRewardSheet {
 
     func ruleRow(_ rule: RewardRule) -> some View {
         HStack(spacing: 12) {
-            IconBadge(model.rewardIcon(for: rule), size: 26)
+            IconBadge(model.rewardIcon(for: rule), size: 36)
 
             Text(rule.name)
                 .textFont(.footnote)

@@ -27,6 +27,14 @@ extension SettingsSheet {
             } label: {
                 row("テンプレート", systemImage: "rectangle.stack")
             }
+
+            Hairline()
+
+            switchRow(
+                "金額の入力から始める",
+                systemImage: "keyboard",
+                isOn: entryStartBinding
+            )
         }
     }
 
@@ -236,10 +244,20 @@ private extension SettingsSheet {
 
     var weekStartBinding: Binding<Weekday> {
         Binding {
-            weekStart.weekStart
+            weekStart.value
         } set: { day in
             Task {
                 await weekStart.choose(day)
+            }
+        }
+    }
+
+    var entryStartBinding: Binding<Bool> {
+        Binding {
+            entryStart.value
+        } set: { isOn in
+            Task {
+                await entryStart.choose(isOn)
             }
         }
     }

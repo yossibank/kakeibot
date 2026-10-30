@@ -49,19 +49,7 @@ private extension HomeView {
                     .layoutPriority(1)
             }
 
-            Button(action: onAddTemplate) {
-                Image(systemName: "plus")
-                    .sansFont(.small, weight: .light)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 32, height: 32)
-                    .overlay {
-                        Circle()
-                            .stroke(Self.toolStroke, lineWidth: 1)
-                    }
-                    .frame(width: 40, height: 40)
-                    .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
+            ToolButton(systemImage: "plus", action: onAddTemplate)
         }
     }
 

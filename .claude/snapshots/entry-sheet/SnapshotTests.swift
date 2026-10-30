@@ -35,6 +35,19 @@ struct SnapshotTests {
             .environment(\.colorScheme, .dark)
 
         try Self.write(mini, to: "entry-mini-large.png")
+
+        let closedModel = try await Self.model(
+            .expense,
+            digits: Self.smallDigits,
+            startsWithAmount: false
+        )
+
+        let closed = EntrySheet(model: closedModel)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .background(Color(uiColor: .systemBackground))
+            .environment(\.colorScheme, .light)
+
+        try Self.write(closed, to: "entry-closed.png")
     }
 }
 
@@ -54,13 +67,15 @@ private extension SnapshotTests {
 
     static func model(
         _ type: Entry.Kind,
-        digits: [AmountCalculator.Key]
+        digits: [AmountCalculator.Key],
+        startsWithAmount: Bool = true
     ) async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
         let now = Date()
         let date = LocalDate(now, in: .current)
 
         try database.insertDefaultsIfEmpty(at: now)
+        try await database.setSetting(.entryStartsWithAmount, to: startsWithAmount)
 
         let model = EntryModel(database: database, date: date, type: type)
 

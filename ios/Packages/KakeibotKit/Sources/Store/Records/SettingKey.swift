@@ -1,8 +1,9 @@
 import Core
 
 public struct SettingKey<Value: Sendable>: Sendable {
+    public let defaultValue: Value
+
     let key: Setting.Key
-    let defaultValue: Value
     let decode: @Sendable (String) -> Value?
     let encode: @Sendable (Value) -> String?
 }
@@ -245,6 +246,10 @@ public extension SettingKey where Value == Bool {
 
     static var tabTitles: Self {
         Self(switch: .tabTitles)
+    }
+
+    static var entryStartsWithAmount: Self {
+        Self(switch: .entryStartsWithAmount)
     }
 
     static var haptics: Self {

@@ -4,17 +4,32 @@ import Store
 import Testing
 
 @MainActor
-struct WeekStartModelTests {
+struct SettingValueModelTests {
+    @Test
+    func startsWithAmountUntilTurnedOff() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = SettingValueModel(database: setup.database, key: .entryStartsWithAmount)
+        await model.load()
+        let before = model.value
+
+        await model.choose(false)
+        let saved = try await setup.database.setting(.entryStartsWithAmount)
+
+        #expect(before)
+        #expect(!model.value)
+        #expect(!saved)
+    }
+
     @Test
     func savesChosenDay() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = WeekStartModel(database: setup.database)
+        let model = SettingValueModel(database: setup.database, key: .weekStart)
         await model.load()
 
         await model.choose(.monday)
         let saved = try await setup.database.setting(.weekStart)
 
-        #expect(model.weekStart == .monday)
+        #expect(model.value == .monday)
         #expect(saved == .monday)
         #expect(model.errorNotice.message == nil)
     }
@@ -22,14 +37,14 @@ struct WeekStartModelTests {
     @Test
     func rollsBackAndTellsWhenSavingFails() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = WeekStartModel(database: setup.database)
+        let model = SettingValueModel(database: setup.database, key: .weekStart)
         await model.load()
         try await setup.database.failWrites(to: "setting")
 
         await model.choose(.monday)
         let saved = try await setup.database.setting(.weekStart)
 
-        #expect(model.weekStart == .sunday)
+        #expect(model.value == .sunday)
         #expect(saved == .sunday)
         #expect(model.errorNotice.message == "設定を保存できませんでした")
     }
@@ -37,7 +52,7 @@ struct WeekStartModelTests {
     @Test
     func keepsLaterChoiceWhenEarlierSaveFails() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = WeekStartModel(database: setup.database)
+        let model = SettingValueModel(database: setup.database, key: .weekStart)
         await model.load()
 
         try await setup.database.writer.write { db in
@@ -64,14 +79,14 @@ struct WeekStartModelTests {
         await second.value
         let saved = try await setup.database.setting(.weekStart)
 
-        #expect(model.weekStart == .tuesday)
+        #expect(model.value == .tuesday)
         #expect(saved == .tuesday)
     }
 
     @Test
     func returnsToSavedDayWhenBothQuickSavesFail() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = WeekStartModel(database: setup.database)
+        let model = SettingValueModel(database: setup.database, key: .weekStart)
         await model.load()
         try await setup.database.failWrites(to: "setting")
 
@@ -87,7 +102,7 @@ struct WeekStartModelTests {
         await second.value
         let saved = try await setup.database.setting(.weekStart)
 
-        #expect(model.weekStart == .sunday)
+        #expect(model.value == .sunday)
         #expect(saved == .sunday)
     }
 }

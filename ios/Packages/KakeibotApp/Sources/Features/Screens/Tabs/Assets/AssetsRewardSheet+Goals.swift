@@ -11,14 +11,9 @@ extension AssetsRewardSheet {
                 Spacer()
 
                 if !model.waitingGoals.isEmpty {
-                    Button {
+                    ToolButton(systemImage: "plus") {
                         goalTarget = GoalTarget(goal: nil)
-                    } label: {
-                        Label("追加", systemImage: "plus")
-                            .textFont(.caption, weight: .semibold)
-                            .foregroundStyle(Palette.accent)
                     }
-                    .buttonStyle(.plain)
                 }
             }
 
@@ -49,61 +44,17 @@ extension AssetsRewardSheet {
 
 private extension AssetsRewardSheet {
     func goalRow(_ goal: RewardGoal) -> some View {
-        let remaining = model.remaining(to: goal)
-        let progress = model.progress(to: goal)
-
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(goal.name)
-                    .textFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(Palette.accentStrong)
-                    .sharedTextScale()
-
-                Spacer(minLength: 8)
-
-                Text(AmountText.text(goal.targetAmount))
-                    .textFont(.footnote)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-
-            RatioBar(progress, tint: Palette.accent, height: 8)
-
-            HStack {
-                if remaining > 0 {
-                    Text("あと \(AmountText.text(remaining))")
-                        .textFont(.caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accent)
-                } else {
-                    Text("届きました")
-                        .textFont(.caption, weight: .semibold)
-                        .foregroundStyle(Palette.accent)
-                }
-
-                Spacer()
-
-                if remaining == 0 {
-                    Button {
-                        Task {
-                            await buy(goal)
-                        }
-                    } label: {
-                        Text("買った")
-                            .textFont(.caption, weight: .semibold)
-                            .foregroundStyle(Palette.background)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Palette.accent, in: .capsule)
-                    }
-                    .buttonStyle(.plain)
+        AssetsGoalCard(
+            name: goal.name,
+            targetAmount: goal.targetAmount,
+            remaining: model.remaining(to: goal),
+            progress: model.progress(to: goal),
+            onBuy: {
+                Task {
+                    await buy(goal)
                 }
             }
-        }
-        .padding(16)
-        .card()
+        )
         .contentShape(.rect)
         .onTapGesture {
             goalTarget = GoalTarget(goal: goal)
@@ -115,9 +66,9 @@ private extension AssetsRewardSheet {
 
         return HStack(spacing: 12) {
             Image(systemName: "bag.fill")
-                .sansFont(.small)
+                .sansFont(.body)
                 .foregroundStyle(Palette.accent)
-                .frame(width: 26)
+                .frame(width: 36)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(goal.name)

@@ -339,6 +339,7 @@ private extension EntrySheet {
     func load() async {
         if !model.isLoaded {
             await model.load()
+            isEnteringAmount = model.opensKeypad
         }
 
         showSelectedCategory()
@@ -360,7 +361,7 @@ private extension EntrySheet {
 
         await model.startNext()
         notice.show(change)
-        setEnteringAmount(true)
+        setEnteringAmount(model.startsWithAmount)
     }
 
     func delete() async {

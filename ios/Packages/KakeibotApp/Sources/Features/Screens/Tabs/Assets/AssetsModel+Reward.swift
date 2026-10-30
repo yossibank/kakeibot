@@ -69,7 +69,11 @@ public extension AssetsModel {
     }
 
     func goalEditModel(editing goal: RewardGoal?) -> AssetsGoalEditModel {
-        AssetsGoalEditModel(database: database, editing: goal)
+        AssetsGoalEditModel(
+            database: database,
+            editing: goal,
+            balance: rewardBank?.balance ?? 0
+        )
     }
 
     @discardableResult

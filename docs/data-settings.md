@@ -47,7 +47,7 @@ expense・income の列は、描画に使わない。
 | backdrop | 画面の背景の柄。`plain`・`ruled`（ノートの罫線）・`grid` | 空なら `plain`。`washi` は `ruled` として読む |
 | haptics | 押した時に振動するか。`true` `false` | 空なら `true` |
 | decorations | 光の影とタブの金の輪を出すか。`true` `false` | 空なら `true` |
-| entry_starts_with_amount | 今は使わない | |
+| entry_starts_with_amount | 新しい記録の入力シートを、テンキーを開いて始めるか。`true` `false` | 空なら `true` |
 | categories_by_use | 今は使わない | |
 | template_order | `manual` `frequent` `category` `amount` `name` | 空なら並べた順 |
 | home_sections | ホームに並べる順。`customize` `budget` `templates` `recent` `bills` `stamps` を `,` でつないだもの | 空なら `customize` `budget` `templates` `recent` の順。無いものは後ろに足し、`bills` と `stamps` は非表示にする |

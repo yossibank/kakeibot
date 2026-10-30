@@ -16,16 +16,19 @@ public final class AssetsGoalEditModel {
     private let baseline: RewardGoalDraft
     private let database: AppDatabase
     private let editing: RewardGoal?
+    private let balance: Int
 
     public init(
         database: AppDatabase,
-        editing goal: RewardGoal? = nil
+        editing goal: RewardGoal? = nil,
+        balance: Int = 0
     ) {
         let name = goal?.name ?? ""
         let amount = goal?.targetAmount ?? 0
 
         self.database = database
         self.editing = goal
+        self.balance = balance
         self.name = name
         self.calculator = AmountCalculator(amount: amount)
         self.baseline = RewardGoalDraft(name: name, targetAmount: amount)
@@ -47,6 +50,18 @@ public extension AssetsGoalEditModel {
 
     var canSave: Bool {
         draft.problems.isEmpty
+    }
+
+    var remaining: Int {
+        max(calculator.amount - balance, 0)
+    }
+
+    var progress: Double {
+        guard calculator.amount > 0 else {
+            return 0
+        }
+
+        return Double(balance) / Double(calculator.amount)
     }
 
     var saveTitle: String {
