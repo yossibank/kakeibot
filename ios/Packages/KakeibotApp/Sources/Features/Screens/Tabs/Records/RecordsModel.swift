@@ -67,8 +67,12 @@ public extension RecordsModel {
         PeriodText.range(period)
     }
 
+    var currentMonth: YearMonth {
+        today.periodMonth(startingOn: monthStartDay)
+    }
+
     var isCurrentMonth: Bool {
-        month == today.periodMonth(startingOn: monthStartDay)
+        month == currentMonth
     }
 
     var days: [EntryDay] {
@@ -180,7 +184,7 @@ public extension RecordsModel {
 
     func openCurrentMonth() {
         closeSearch()
-        month = today.periodMonth(startingOn: monthStartDay)
+        month = currentMonth
         selectedDate = nil
     }
 

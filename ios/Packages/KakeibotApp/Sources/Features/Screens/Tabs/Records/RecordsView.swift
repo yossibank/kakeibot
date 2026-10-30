@@ -167,10 +167,19 @@ public struct RecordsView: View {
 private extension RecordsView {
     var header: some View {
         HStack {
-            Text("記録")
-                .displayFont(.body)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
+            if model.isCurrentMonth {
+                title
+            } else {
+                ViewThatFits(in: .horizontal) {
+                    HStack {
+                        title
+
+                        currentMonthChip
+                    }
+
+                    currentMonthChip
+                }
+            }
 
             Spacer()
 
@@ -188,8 +197,22 @@ private extension RecordsView {
                     .foregroundStyle(Palette.subtext)
                     .contentTransition(monthTextTransition)
             }
+            .fixedSize()
 
             monthButton(systemImage: "chevron.right", months: 1)
+        }
+    }
+
+    var title: some View {
+        Text("記録")
+            .displayFont(.body)
+            .tracking(3)
+            .foregroundStyle(Palette.accent)
+    }
+
+    var currentMonthChip: some View {
+        PeriodCurrentChip(title: "今月") {
+            moveToCurrentMonth()
         }
     }
 
@@ -308,6 +331,17 @@ private extension RecordsView {
 
         PageSlide.run($slide, forward: months > 0) {
             model.move(months: months)
+        }
+    }
+
+    func moveToCurrentMonth() {
+        let isForward = model.month < model.currentMonth
+
+        openId = nil
+        isMovingForward = isForward
+
+        PageSlide.run($slide, forward: isForward) {
+            model.openCurrentMonth()
         }
     }
 }

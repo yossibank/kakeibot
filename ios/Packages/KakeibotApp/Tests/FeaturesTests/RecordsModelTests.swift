@@ -263,6 +263,7 @@ struct RecordsModelTests {
 
         #expect(isCurrentAtFirst)
         #expect(!model.isCurrentMonth)
+        #expect(model.month < model.currentMonth)
     }
 
     @Test

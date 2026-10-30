@@ -204,7 +204,7 @@ KakeibotApp/
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、読み込めないときの表示、保存の失敗が空き容量不足かの見分け |
-| `Features/Shared/Period/` | 期間の範囲と月の始まり |
+| `Features/Shared/Period/` | 期間の範囲と月の始まり、今の期間に戻るボタン |
 | `Features/Shared/Settings/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |

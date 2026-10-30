@@ -121,6 +121,12 @@ private extension ReviewView {
 
             Spacer()
 
+            if !model.isCurrentPeriod {
+                PeriodCurrentChip(title: currentPeriodTitle) {
+                    moveToCurrentPeriod()
+                }
+            }
+
             periodButton(systemImage: "chevron.right", count: 1)
                 .disabled(!model.canMoveForward)
         }
@@ -180,6 +186,14 @@ private extension ReviewView {
         case .week: return PeriodText.range(range, today: model.today)
         case .month: return "\(String(month.year))年 \(month.month)月"
         case .year: return "\(String(month.year))年"
+        }
+    }
+
+    var currentPeriodTitle: String {
+        switch model.scale {
+        case .week: "今週"
+        case .month: "今月"
+        case .year: "今年"
         }
     }
 
@@ -251,6 +265,12 @@ private extension ReviewView {
 
         PageSlide.run($slide, forward: count > 0) {
             model.move(by: count)
+        }
+    }
+
+    func moveToCurrentPeriod() {
+        PageSlide.run($slide, forward: true) {
+            model.moveToCurrent()
         }
     }
 }

@@ -287,6 +287,24 @@ struct ReviewModelTests {
     }
 
     @Test
+    func movesBackToCurrentPeriod() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let model = ReviewModel(database: setup.database, today: setup.today)
+        let isCurrentAtFirst = model.isCurrentPeriod
+
+        model.move(by: -3)
+        let isCurrentAfterMove = model.isCurrentPeriod
+
+        model.moveToCurrent()
+
+        #expect(isCurrentAtFirst)
+        #expect(!isCurrentAfterMove)
+        #expect(model.isCurrentPeriod)
+        #expect(model.isMovingForward)
+        #expect(model.period.range.lowerBound.description == "2026-10-01")
+    }
+
+    @Test
     func remembersSelection() async throws {
         let setup = try await RecordsModelTests.Setup()
         let model = ReviewModel(database: setup.database, today: setup.today)

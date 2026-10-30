@@ -85,6 +85,10 @@ public extension ReviewModel {
         offset < 0
     }
 
+    var isCurrentPeriod: Bool {
+        offset == 0
+    }
+
     var summary: ReviewSummary {
         summary(in: period.range)
     }
@@ -250,6 +254,15 @@ public extension ReviewModel {
 
         isMovingForward = count > 0
         offset += count
+    }
+
+    func moveToCurrent() {
+        guard offset < 0 else {
+            return
+        }
+
+        isMovingForward = true
+        offset = 0
     }
 }
 
