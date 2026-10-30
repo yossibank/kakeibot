@@ -167,19 +167,7 @@ public struct RecordsView: View {
 private extension RecordsView {
     var header: some View {
         HStack {
-            if model.isCurrentMonth {
-                title
-            } else {
-                ViewThatFits(in: .horizontal) {
-                    HStack {
-                        title
-
-                        currentMonthChip
-                    }
-
-                    currentMonthChip
-                }
-            }
+            title
 
             Spacer()
 
@@ -191,11 +179,19 @@ private extension RecordsView {
                     .foregroundStyle(Palette.accentStrong)
                     .contentTransition(monthTextTransition)
 
-                Text(model.periodText)
-                    .textFont(size: .caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .contentTransition(monthTextTransition)
+                HStack(spacing: 4) {
+                    Text(model.periodText)
+                        .textFont(size: .caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                        .contentTransition(monthTextTransition)
+
+                    if !model.isCurrentMonth {
+                        PeriodCurrentLink(title: "今月") {
+                            moveToCurrentMonth()
+                        }
+                    }
+                }
             }
             .fixedSize()
 
@@ -208,12 +204,6 @@ private extension RecordsView {
             .displayFont(.body)
             .tracking(3)
             .foregroundStyle(Palette.accent)
-    }
-
-    var currentMonthChip: some View {
-        PeriodCurrentChip(title: "今月") {
-            moveToCurrentMonth()
-        }
     }
 
     @ViewBuilder

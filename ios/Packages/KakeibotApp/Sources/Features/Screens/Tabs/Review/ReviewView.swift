@@ -110,22 +110,24 @@ private extension ReviewView {
                     .foregroundStyle(Palette.accentStrong)
                     .contentTransition(periodTextTransition)
 
-                if let periodSubtitle {
-                    Text(periodSubtitle)
-                        .textFont(size: .caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                        .contentTransition(periodTextTransition)
+                HStack(spacing: 4) {
+                    if let periodSubtitle {
+                        Text(periodSubtitle)
+                            .textFont(size: .caption)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+                            .contentTransition(periodTextTransition)
+                    }
+
+                    if !model.isCurrentPeriod {
+                        PeriodCurrentLink(title: currentPeriodTitle) {
+                            moveToCurrentPeriod()
+                        }
+                    }
                 }
             }
 
             Spacer()
-
-            if !model.isCurrentPeriod {
-                PeriodCurrentChip(title: currentPeriodTitle) {
-                    moveToCurrentPeriod()
-                }
-            }
 
             periodButton(systemImage: "chevron.right", count: 1)
                 .disabled(!model.canMoveForward)
