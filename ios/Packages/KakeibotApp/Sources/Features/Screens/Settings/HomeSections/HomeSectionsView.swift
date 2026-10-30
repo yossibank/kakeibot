@@ -96,7 +96,6 @@ private extension HomeSectionsView {
 
     var zones: some View {
         let shownHeight = CGFloat(model.layout.visible.count) * Self.rowHeight
-        let hiddenCount = model.layout.order.count - model.layout.visible.count
         let hiddenHeight = CGFloat(hiddenCount + 1) * Self.rowHeight - Self.zoneGap
 
         return VStack(spacing: Self.zoneGap) {
@@ -104,19 +103,14 @@ private extension HomeSectionsView {
                 .frame(height: shownHeight)
                 .card()
 
-            zoneShape
-                .fill(Palette.backgroundBottom.opacity(.strong))
-                .overlay {
-                    zoneShape
-                        .stroke(Palette.subtext.opacity(0.6), style: .dashed)
-                }
+            SettingsZoneFrame(color: Palette.subtext, fill: .clear)
                 .frame(height: hiddenHeight)
         }
     }
 
     var boundary: some View {
-        let isEmpty = model.layout.visible.count == model.layout.order.count
-        let title = isEmpty ? "ここへ運ぶと隠せます" : "隠したもの"
+        let isEmpty = hiddenCount == 0
+        let title = isEmpty ? "ここに置くと非表示にできます" : "非表示のもの（\(hiddenCount)）"
         let alignment: Alignment = isEmpty ? .center : .leading
 
         return HStack(spacing: 8) {
@@ -124,8 +118,10 @@ private extension HomeSectionsView {
 
             Text(title)
         }
-        .textFont(.caption)
+        .textFont(.subheadline)
         .foregroundStyle(Palette.subtext)
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
         .padding(.horizontal, 16)
         .padding(.top, Self.zoneGap)
         .frame(maxWidth: .infinity, alignment: alignment)
@@ -174,6 +170,10 @@ private extension HomeSectionsView {
     static let rowHeight: CGFloat = 56
     static let zoneGap: CGFloat = 16
     static let liftScale: CGFloat = 1.02
+
+    var hiddenCount: Int {
+        model.layout.order.count - model.layout.visible.count
+    }
 
     var zoneShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))

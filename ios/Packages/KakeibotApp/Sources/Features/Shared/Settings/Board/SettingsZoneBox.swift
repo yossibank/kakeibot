@@ -40,15 +40,7 @@ struct SettingsZoneBox: View {
         .frame(height: height, alignment: .top)
         .clipShape(shape)
         .background {
-            shape
-                .fill(Palette.backgroundBottom.opacity(.strong))
-
-            shape
-                .fill(fill)
-        }
-        .overlay {
-            shape
-                .stroke(color.opacity(0.6), style: .dashed)
+            SettingsZoneFrame(color: color, fill: fill)
         }
         .animation(.smooth(duration: 0.2), value: isOn)
         .onChange(of: isOn) {
