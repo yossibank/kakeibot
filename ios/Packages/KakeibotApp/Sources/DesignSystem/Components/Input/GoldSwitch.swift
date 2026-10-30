@@ -6,16 +6,19 @@ public struct GoldSwitch<Label: View>: View {
     @Environment(\.themeStyle.decorations) private var hasDecorations
 
     let systemImage: String
+    let insets: EdgeInsets
     let label: Label
 
     public init(
         isOn: Binding<Bool>,
         systemImage: String,
+        insets: EdgeInsets = EdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16),
         @ViewBuilder label: () -> Label
     ) {
         _isOn = isOn
 
         self.systemImage = systemImage
+        self.insets = insets
         self.label = label()
     }
 
@@ -29,8 +32,7 @@ public struct GoldSwitch<Label: View>: View {
 
                 track
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(insets)
             .frame(minHeight: 44)
             .contentShape(.rect)
         }

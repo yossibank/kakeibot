@@ -11,7 +11,8 @@ public struct SettingsSheet: View {
     @State var theme: ThemeChoice = .system
     @State var customThemes: [Theme] = []
     @State var syncStatus = SyncStatus.off
-    @State var weekStart: WeekStartModel
+    @State var weekStart: SettingValueModel<Weekday>
+    @State var entryStart: SettingValueModel<Bool>
     @State var recordReset: RecordResetModel
     @State var isConfirmingReset = false
 
@@ -35,7 +36,20 @@ public struct SettingsSheet: View {
         today: LocalDate,
         appIcon: AppIconListModel
     ) {
-        _weekStart = State(initialValue: WeekStartModel(database: database))
+        _weekStart = State(
+            initialValue: SettingValueModel(
+                database: database,
+                key: .weekStart
+            )
+        )
+
+        _entryStart = State(
+            initialValue: SettingValueModel(
+                database: database,
+                key: .entryStartsWithAmount
+            )
+        )
+
         _recordReset = State(initialValue: RecordResetModel(database: database))
 
         self.database = database
@@ -86,6 +100,9 @@ public struct SettingsSheet: View {
         .errorBanner(weekStart.errorNotice) {
             weekStart.errorNotice.clear()
         }
+        .errorBanner(entryStart.errorNotice) {
+            entryStart.errorNotice.clear()
+        }
         .errorBanner(recordReset.errorNotice) {
             recordReset.errorNotice.clear()
         }
@@ -113,6 +130,9 @@ public struct SettingsSheet: View {
         }
         .task {
             await weekStart.load()
+        }
+        .task {
+            await entryStart.load()
         }
         .task {
             await observeReminderTime()

@@ -74,17 +74,17 @@ extension HomeView {
 
                 if hasRecurringRow {
                     Button(action: onOpenRecurrings) {
-                        VStack(spacing: 8) {
-                            HStack(spacing: 4) {
-                                Label(recurringText, systemImage: "repeat")
+                        HStack(spacing: 4) {
+                            Label(recurringText, systemImage: "repeat")
 
-                                Image(systemName: "chevron.right")
-                                    .sansFont(.micro, weight: .semibold)
-                            }
-                            .textFont(.caption2)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-
+                            Image(systemName: "chevron.right")
+                                .sansFont(.micro, weight: .semibold)
+                        }
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                        .padding(.bottom, 12)
+                        .overlay(alignment: .bottom) {
                             RatioBar(model.paidRecurringRatio, tint: Palette.accent)
                         }
                         .padding(.vertical, 4)

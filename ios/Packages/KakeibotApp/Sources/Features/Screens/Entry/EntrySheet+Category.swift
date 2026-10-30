@@ -277,7 +277,7 @@ private extension EntrySheet {
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
     static let selectedScale: CGFloat = 1.05
-    static let actionInset: CGFloat = 8
+    static let actionInset: CGFloat = 4
     static let menuPressDuration = 0.4
 
     static var pagerHeight: CGFloat {

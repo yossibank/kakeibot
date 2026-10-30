@@ -33,6 +33,23 @@ struct SnapshotTests {
             )
 
             try Self.write(view, variant: variant, to: "assets")
+
+            let reward = AssetsRewardSheet(model: model)
+                .frame(height: 1400)
+
+            try Self.write(reward, variant: variant, to: "assets-reward")
+
+            let adding = AssetsGoalSheet(model: model.goalEditModel(editing: nil))
+                .frame(height: 852)
+
+            try Self.write(adding, variant: variant, to: "assets-goal-new")
+
+            let goal = try #require(model.waitingGoals.first)
+
+            let editing = AssetsGoalSheet(model: model.goalEditModel(editing: goal))
+                .frame(height: 852)
+
+            try Self.write(editing, variant: variant, to: "assets-goal-edit")
         }
 
         task.cancel()

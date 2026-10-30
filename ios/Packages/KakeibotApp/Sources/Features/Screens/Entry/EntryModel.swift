@@ -38,6 +38,7 @@ public final class EntryModel {
     public private(set) var type: Entry.Kind
     public private(set) var recentMemos: [String] = []
     public private(set) var weekStart: Weekday = .sunday
+    public private(set) var startsWithAmount = true
 
     public internal(set) var tagId: EntryTag.ID?
     public internal(set) var billMonth: YearMonth?
@@ -88,7 +89,7 @@ public extension EntryModel {
     }
 
     var opensKeypad: Bool {
-        !isEditing && startingTemplate == nil
+        startsWithAmount && !isEditing && startingTemplate == nil
     }
 
     var isLoaded: Bool {
@@ -127,6 +128,8 @@ public extension EntryModel {
             weekStart = try await database.setting(.weekStart)
 
             monthStartDay = try await database.setting(.monthStartDay)
+
+            startsWithAmount = try await database.setting(.entryStartsWithAmount)
 
             budgets = try await database.budgets()
 
