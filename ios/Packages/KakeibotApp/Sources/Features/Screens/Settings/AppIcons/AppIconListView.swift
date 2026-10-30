@@ -16,7 +16,11 @@ public struct AppIconListView: View {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     SettingsIntroCard(
                         systemImage: "app.badge",
-                        headline: ("ホーム画面のアイコンを", "好きな色にできます")
+                        headline: ("ホーム画面のアイコンを", "好きな色にできます"),
+                        notes: [
+                            .init("arrow.triangle.2.circlepath", "押すと、すぐに切り替わります"),
+                            .init("circle.lefthalf.filled", "ライト用とダーク用から選べます")
+                        ]
                     )
 
                     section("ライト", isLight: true)
