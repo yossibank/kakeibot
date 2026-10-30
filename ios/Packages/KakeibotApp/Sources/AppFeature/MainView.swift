@@ -21,7 +21,6 @@ struct MainView: View {
     @State private var isWarmingEntry = true
     @State private var orderMenuAnchor: CGRect?
     @State private var observationRound = 0
-    @State private var openedTabs: Set<MainTab> = []
     @State private var foreground = ForegroundReturn()
 
     @Environment(\.scenePhase) private var scenePhase
@@ -266,20 +265,14 @@ struct MainView: View {
         .task(id: observationRound) {
             await home.run()
         }
-        .task(id: tabObservation(.records)) {
-            if openedTabs.contains(.records) {
-                await records.run()
-            }
+        .task(id: observationRound) {
+            await records.run()
         }
-        .task(id: tabObservation(.review)) {
-            if openedTabs.contains(.review) {
-                await review.run()
-            }
+        .task(id: observationRound) {
+            await review.run()
         }
-        .task(id: tabObservation(.assets)) {
-            if openedTabs.contains(.assets) {
-                await assets.run()
-            }
+        .task(id: observationRound) {
+            await assets.run()
         }
         .task(id: observationRound) {
             await setup.run()
@@ -301,9 +294,6 @@ struct MainView: View {
                 openLaunchSheet()
             }
         }
-        .onChange(of: tab, initial: true) {
-            openedTabs.insert(tab)
-        }
         .onChange(of: scenePhase) { _, phase in
             if foreground.receive(phase) {
                 observationRound += 1
@@ -312,7 +302,6 @@ struct MainView: View {
         .onChange(of: isLoaded, initial: true) {
             if isLoaded {
                 onLoad()
-                openedTabs.formUnion([.records, .review, .assets])
             }
         }
         .onChange(of: route) { _, route in
@@ -374,10 +363,6 @@ private extension MainView {
 private extension MainView {
     var isLaunchReady: Bool {
         isRevealed && launchScreen != nil
-    }
-
-    func tabObservation(_ tab: MainTab) -> ObservationID<Bool> {
-        ObservationID(base: openedTabs.contains(tab), round: observationRound)
     }
 }
 

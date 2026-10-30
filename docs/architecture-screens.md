@@ -11,7 +11,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | 型 | 持つもの |
 | --- | --- |
 | AppModel | 最初の設定が済んでいなければ Onboarding を出す。今日は RootView が MainView と Onboarding に渡す |
-| MainView | タブは Home・Records・Review・Assets。Home 以外のタブは、Home を読み終えたときに見張りを始める |
+| MainView | タブは Home・Records・Review・Assets。起動したときに全部のタブが見張りを始め、全部を読み終えるまで起動画面を出す |
 | MainView のシート | 新規・編集・設定・振替など。テンプレート（`EntryTemplate`）・口座（`Wallet`）・固定費（`Recurring`）も開く |
 
 記録の一覧（`EntryList`）の見張りは、`AppDatabase` が 1 つだけ持つ。見張りの型は `ValueObservation` で、見張る画面と入力シートのあいだで共有する。中身が変わらない書き込みでは、値を渡さない。
