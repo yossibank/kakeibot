@@ -94,7 +94,7 @@ private extension CategoryTagCard {
 
 private extension CategoryTagCard {
     var title: String {
-        isAdding ? "タグを追加" : "タグを変更"
+        isAdding ? "タグを追加" : "タグを編集"
     }
 
     var commitTitle: String {

@@ -215,7 +215,7 @@ private extension TemplateEditSheet {
     var title: String {
         let action = model.isEditing ? "編集" : "追加"
 
-        return "\(model.typeName)テンプレートを\(action)"
+        return "\(model.typeName)のテンプレートを\(action)"
     }
 
     var keyboardRegions: SafeAreaRegions {

@@ -184,7 +184,7 @@ private extension CategoryEditSheet {
 
     var header: some View {
         SettingsEditHeader(
-            title: model.isEditing ? "カテゴリを編集" : "カテゴリを追加",
+            title: model.isEditing ? "カテゴリを編集" : addTitle,
             isEditing: model.isEditing,
             isHidden: model.isHidden,
             canDelete: !(model.isHidden && model.hasEntries)
@@ -270,6 +270,10 @@ private extension CategoryEditSheet {
 private extension CategoryEditSheet {
     static let fade: CGFloat = 16
     static let hasEntriesMessage = "記録があります。非表示にすると、記録を残したまま一覧から外せます"
+
+    var addTitle: String {
+        model.kind == .income ? "収入のカテゴリを追加" : "支出のカテゴリを追加"
+    }
 
     var graphColor: Color {
         Color(hex: model.icon.color) ?? Palette.subtext
