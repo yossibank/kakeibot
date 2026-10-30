@@ -9,11 +9,32 @@ struct ReviewSharesCard: View {
     let onOpen: (ReviewModel.Share) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             if let title {
-                SectionTitle(title)
+                CardHeader(title)
             }
 
+            content
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, title == nil ? 16 : 0)
+        .padding(.bottom, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
+        .sharesTextScale(id: shares.map(\.name))
+    }
+}
+
+extension ReviewSharesCard {
+    struct Total {
+        let title: String
+        let amount: Int
+    }
+}
+
+private extension ReviewSharesCard {
+    var content: some View {
+        VStack(alignment: .leading, spacing: 12) {
             if shares.isEmpty {
                 Text("この期間の記録はありません")
                     .textFont(.footnote)
@@ -61,21 +82,8 @@ struct ReviewSharesCard: View {
                 }
             }
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .card()
-        .sharesTextScale(id: shares.map(\.name))
     }
-}
 
-extension ReviewSharesCard {
-    struct Total {
-        let title: String
-        let amount: Int
-    }
-}
-
-private extension ReviewSharesCard {
     func center(_ total: Total) -> some View {
         VStack(spacing: 2) {
             Text(total.title)

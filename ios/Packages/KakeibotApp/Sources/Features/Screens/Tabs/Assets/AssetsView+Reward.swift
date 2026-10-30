@@ -31,7 +31,8 @@ extension AssetsView {
             }
             .buttonStyle(.plain)
         }
-        .padding(16)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
         .card()
         .overlay {
             if model.isRewardGoalReached {
@@ -54,22 +55,14 @@ extension AssetsView {
 
 private extension AssetsView {
     var rewardCardBody: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: "gift.fill")
-                    .sansFont(.small)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 26, height: 26)
-                    .background(Palette.accent.opacity(.subtle), in: Circle())
-
-                SectionTitle("ごほうび貯金箱")
-
-                Spacer()
-
+        VStack(alignment: .leading, spacing: 0) {
+            CardHeader("ごほうび貯金箱", systemImage: "gift.fill") {
                 if model.isRewardGoalReached {
                     Text("目標に届きました")
                         .textFont(.caption2, weight: .semibold)
                         .foregroundStyle(Palette.background)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 4)
                         .background(Palette.accent, in: .capsule)
@@ -80,6 +73,13 @@ private extension AssetsView {
                     .foregroundStyle(Palette.hint)
             }
 
+            rewardContent
+        }
+        .contentShape(.rect)
+    }
+
+    var rewardContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(AmountText.text(model.rewardBalance))
                     .displayFont(.title)
@@ -110,7 +110,6 @@ private extension AssetsView {
                 .sharesTextScale(id: model.recentRewards)
             }
         }
-        .contentShape(.rect)
     }
 
     func goalLine(_ goal: RewardGoal) -> some View {

@@ -61,11 +61,7 @@ extension RecordsView {
 private extension RecordsView {
     var recentList: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                SectionTitle("最近探した言葉")
-
-                Spacer()
-
+            CardHeader("最近探した言葉") {
                 Button {
                     Task {
                         await model.clearRecentSearches()
@@ -80,8 +76,6 @@ private extension RecordsView {
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.top, 12)
-            .padding(.bottom, 8)
 
             ForEach(model.recentSearches, id: \.self) { word in
                 Button {

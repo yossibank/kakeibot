@@ -110,9 +110,18 @@ private extension AssetsView {
     }
 
     var totalCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionTitle("手元のお金")
+        VStack(alignment: .leading, spacing: 0) {
+            CardHeader("手元のお金")
 
+            totalContent
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
+        .card()
+    }
+
+    var totalContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(AmountText.text(model.total))
                     .displayFont(.largeTitle, weight: .bold)
@@ -157,8 +166,6 @@ private extension AssetsView {
                 }
             }
         }
-        .padding(16)
-        .card()
     }
 
     var trendLegend: some View {

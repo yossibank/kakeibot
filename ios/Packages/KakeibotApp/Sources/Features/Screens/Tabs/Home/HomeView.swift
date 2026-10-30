@@ -118,11 +118,7 @@ private extension HomeView {
 
     var recentCard: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                SectionTitle("最近の記録")
-
-                Spacer()
-
+            CardHeader("最近の記録") {
                 Button("すべて", action: onShowRecords)
                     .textFont(.caption)
                     .foregroundStyle(Palette.accent)
@@ -168,9 +164,8 @@ private extension HomeView {
     }
 
     var stampCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionTitle("今月のスタンプ")
-                .frame(minHeight: 44)
+        VStack(alignment: .leading, spacing: 4) {
+            CardHeader("今月のスタンプ")
 
             if model.stampTallies.isEmpty {
                 Text("今月はまだスタンプを押していません")

@@ -160,8 +160,8 @@ private extension ReviewView {
     }
 
     var stampCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SectionTitle("押したスタンプ")
+        VStack(alignment: .leading, spacing: 4) {
+            CardHeader("押したスタンプ")
 
             LazyVGrid(columns: Self.stampColumns, alignment: .leading) {
                 ForEach(model.stampTallies) { tally in
@@ -182,7 +182,8 @@ private extension ReviewView {
                 }
             }
         }
-        .padding(16)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
     }

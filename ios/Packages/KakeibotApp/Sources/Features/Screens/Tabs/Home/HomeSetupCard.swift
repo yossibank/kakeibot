@@ -7,11 +7,14 @@ struct HomeSetupCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HomeCardHeader(title: "あと \(model.cardItems.count) つで準備がそろいます") {
-                Task {
-                    await model.closeCard()
+            CardHeader(
+                "あと \(model.cardItems.count) つで準備がそろいます",
+                onClose: {
+                    Task {
+                        await model.closeCard()
+                    }
                 }
-            }
+            )
 
             SetupList(model.cardItems, model: model, onOpen: onOpen)
         }

@@ -16,7 +16,7 @@ struct HomeCustomizeCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HomeCardHeader(title: "自分好みにカスタマイズ", onClose: onClose)
+            CardHeader("自分好みにカスタマイズ", onClose: onClose)
 
             ScrollView(.horizontal) {
                 HStack(spacing: 12) {

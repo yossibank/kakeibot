@@ -11,7 +11,7 @@ extension RecordsView {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .card(cornerRadius: 20)
+        .card()
     }
 
     func searchSummary(_ summary: RecordsModel.SearchSummary) -> some View {
@@ -40,7 +40,7 @@ extension RecordsView {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .card(cornerRadius: 20)
+        .card()
     }
 }
 
