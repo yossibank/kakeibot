@@ -15,6 +15,7 @@ public struct Setting: Codable, Hashable, Sendable {
 public extension Setting {
     enum Key: String, CaseIterable, Codable, Sendable {
         case monthStartDay = "month_start_day"
+        case monthStartShift = "month_start_shift"
         case weekStart = "week_start"
         case reminderTime = "reminder_time"
         case themeId = "theme_id"

@@ -93,7 +93,8 @@ public extension LocalDate {
     }
 
     func periodMonth(startingOn startDay: MonthStartDay) -> YearMonth {
-        period(startingOn: startDay).upperBound.yearMonth
+        let startMonth = startDay.startMonth(ofPeriodContaining: self)
+        return startDay.periodMonth(startingIn: startMonth)
     }
 
     func week(startingOn weekStart: Weekday) -> ClosedRange<LocalDate> {
@@ -139,15 +140,8 @@ extension LocalDate {
     }
 
     func period(startingOn startDay: MonthStartDay) -> ClosedRange<LocalDate> {
-        let startedThisMonth = startDay.period(startingIn: yearMonth)
-
-        if startedThisMonth.contains(self) {
-            return startedThisMonth
-        }
-
-        let lastMonth = yearMonth.adding(months: -1)
-
-        return startDay.period(startingIn: lastMonth)
+        let startMonth = startDay.startMonth(ofPeriodContaining: self)
+        return startDay.period(startingIn: startMonth)
     }
 }
 

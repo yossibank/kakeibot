@@ -48,14 +48,8 @@ public extension YearMonth {
     }
 
     func period(startingOn startDay: MonthStartDay) -> ClosedRange<LocalDate> {
-        let lastMonth = adding(months: -1)
-        let startedLastMonth = startDay.period(startingIn: lastMonth)
-
-        if startedLastMonth.upperBound.yearMonth == self {
-            return startedLastMonth
-        }
-
-        return startDay.period(startingIn: self)
+        let startMonth = startDay.startMonth(ofPeriodIn: self)
+        return startDay.period(startingIn: startMonth)
     }
 }
 

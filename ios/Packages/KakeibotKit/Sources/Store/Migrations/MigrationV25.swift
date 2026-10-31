@@ -38,7 +38,7 @@ enum MigrationV25 {
         guard
             let id = Recurring.ID(row["id"] as String),
             let frequency = Recurring.Frequency(rawValue: row["frequency"]),
-            let holidayShift = Recurring.HolidayShift(rawValue: row["holiday_shift"]),
+            let holidayShift = HolidayShift(rawValue: row["holiday_shift"]),
             let startDate = row["start_date"] as LocalDate?
         else {
             return nil

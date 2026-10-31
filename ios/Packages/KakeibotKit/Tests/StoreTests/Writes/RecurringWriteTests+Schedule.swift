@@ -266,7 +266,7 @@ private extension RecurringWriteTests.Setup {
 
     func change(
         day: Int,
-        shift: Recurring.HolidayShift
+        shift: HolidayShift
     ) async throws {
         try await database.writer.write { db in
             for var recurring in try Recurring.fetchAll(db) {
@@ -277,7 +277,7 @@ private extension RecurringWriteTests.Setup {
         }
     }
 
-    func shiftHoliday(to shift: Recurring.HolidayShift) async throws {
+    func shiftHoliday(to shift: HolidayShift) async throws {
         try await database.writer.write { db in
             for var recurring in try Recurring.fetchAll(db) {
                 recurring.holidayShift = shift

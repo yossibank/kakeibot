@@ -21,7 +21,8 @@ public struct MonthStartDayView: View {
                         headline: ("給料日に合わせて", "1 か月を数えられます"),
                         notes: [
                             .init("arrow.right", "給料日から、次の給料日の前日までです"),
-                            .init("calendar.badge.exclamationmark", "29〜31 日が無い月は、月末からです")
+                            .init("calendar.badge.exclamationmark", "29〜31 日が無い月は、月末からです"),
+                            .init("arrow.left.arrow.right", "土日・祝日は、平日にずらせます")
                         ]
                     )
 
@@ -32,6 +33,8 @@ public struct MonthStartDayView: View {
                             await model.choose(day)
                         }
                     }
+
+                    shiftSection
                 }
                 .padding(.vertical, 8)
             }
@@ -51,6 +54,29 @@ public struct MonthStartDayView: View {
         .haptic(.selection, trigger: model.startDay)
         .task {
             await model.load()
+        }
+    }
+}
+
+private extension MonthStartDayView {
+    var shiftSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SettingsSectionTitle("土日・祝日のとき")
+
+            CapsulePicker(selection: shiftBinding, options: HolidayShift.options)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private extension MonthStartDayView {
+    var shiftBinding: Binding<HolidayShift> {
+        Binding {
+            model.startDay.shift
+        } set: { shift in
+            Task {
+                await model.choose(shift)
+            }
         }
     }
 }

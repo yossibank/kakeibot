@@ -115,7 +115,7 @@ private extension RecurringEditSheet {
                 panel: .holiday,
                 systemImage: "calendar.badge.exclamationmark",
                 title: "休日なら",
-                value: RecurringText.holidayShift(model.holidayShift),
+                value: model.holidayShift.title,
                 isEmpty: model.holidayShift == .none
             ),
             .init(

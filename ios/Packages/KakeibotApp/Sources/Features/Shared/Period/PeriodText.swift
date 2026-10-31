@@ -20,7 +20,8 @@ enum PeriodText {
     }
 
     static func startDay(_ startDay: MonthStartDay) -> String {
-        startDay.isLastDay ? "毎月末日" : "毎月 \(startDay.day) 日"
+        let day = startDay.isLastDay ? "毎月末日" : "毎月 \(startDay.day) 日"
+        return startDay.shift == .none ? day : "\(day)・\(startDay.shift.title)"
     }
 
     private static func date(_ date: LocalDate) -> String {

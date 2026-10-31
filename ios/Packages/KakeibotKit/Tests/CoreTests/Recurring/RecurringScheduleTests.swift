@@ -148,7 +148,7 @@ struct RecurringScheduleTests {
 extension RecurringScheduleTests {
     struct OccurrenceCase: Decodable, Sendable {
         let day: Int
-        let holidayShift: Recurring.HolidayShift?
+        let holidayShift: HolidayShift?
         let recorded: [LocalDate]
         let from: LocalDate
         let through: LocalDate
@@ -159,7 +159,7 @@ extension RecurringScheduleTests {
         let frequency: Recurring.Frequency
         let month: Int?
         let day: Int
-        let holidayShift: Recurring.HolidayShift?
+        let holidayShift: HolidayShift?
         let startDate: LocalDate
         let endDate: LocalDate?
         let from: LocalDate

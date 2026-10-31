@@ -25,7 +25,6 @@ extension AppDatabase {
         _ key: SettingKey<Value>,
         in db: Database
     ) throws -> Value {
-        let setting = try Setting.fetchOne(db, key: key.key)
-        return setting.flatMap { key.decode($0.value) } ?? key.defaultValue
+        try key.read(db)
     }
 }

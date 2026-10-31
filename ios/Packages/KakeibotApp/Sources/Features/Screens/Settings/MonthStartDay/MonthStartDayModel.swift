@@ -41,7 +41,22 @@ public extension MonthStartDayModel {
         }
     }
 
-    func choose(_ startDay: MonthStartDay) async {
+    func choose(_ day: MonthStartDay) async {
+        let chosen = day.shifted(by: startDay.shift)
+        await save(chosen)
+    }
+
+    func choose(_ shift: HolidayShift) async {
+        let chosen = startDay.shifted(by: shift)
+        await save(chosen)
+    }
+}
+
+private extension MonthStartDayModel {
+    static let loadFailedMessage = "設定を読めませんでした"
+    static let saveFailedMessage = "設定を保存できませんでした"
+
+    func save(_ startDay: MonthStartDay) async {
         let previous = self.startDay
 
         self.startDay = startDay
@@ -53,9 +68,4 @@ public extension MonthStartDayModel {
             errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
-}
-
-private extension MonthStartDayModel {
-    static let loadFailedMessage = "設定を読めませんでした"
-    static let saveFailedMessage = "設定を保存できませんでした"
 }

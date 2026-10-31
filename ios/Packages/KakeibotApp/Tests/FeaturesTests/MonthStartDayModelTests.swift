@@ -25,6 +25,25 @@ struct MonthStartDayModelTests {
     }
 
     @Test
+    func keepsShiftWhenChangingDay() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let payday = try #require(MonthStartDay(25))
+        let earlier = try #require(MonthStartDay(20))
+        let model = MonthStartDayModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        await model.choose(payday)
+        await model.choose(.previous)
+        let shiftedText = model.periodText
+        await model.choose(earlier)
+        let saved = try await setup.database.setting(.monthStartDay)
+
+        #expect(shiftedText == "9/25〜10/22")
+        #expect(model.periodText == "9/18〜10/19")
+        #expect(saved == earlier.shifted(by: .previous))
+    }
+
+    @Test
     func countsHomeByPeriod() async throws {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)

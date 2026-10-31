@@ -18,13 +18,6 @@ extension AppDatabase {
         to value: Value,
         in db: Database
     ) throws {
-        guard let text = key.encode(value) else {
-            _ = try Setting.deleteOne(db, key: key.key)
-            return
-        }
-
-        let setting = Setting(key: key.key, value: text)
-
-        try setting.save(db)
+        try key.write(value, db)
     }
 }

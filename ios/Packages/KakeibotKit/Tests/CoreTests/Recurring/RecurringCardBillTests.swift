@@ -137,7 +137,7 @@ extension RecurringCardBillTests {
     struct PeriodCase: Decodable, Sendable {
         let closingDay: Int
         let day: Int?
-        let holidayShift: Recurring.HolidayShift?
+        let holidayShift: HolidayShift?
         let paidOn: LocalDate
         let from: LocalDate
         let through: LocalDate
@@ -154,7 +154,7 @@ private extension RecurringCardBillTests {
     static func bill(
         closingDay: Int,
         day: Int = 10,
-        holidayShift: Recurring.HolidayShift = .none
+        holidayShift: HolidayShift = .none
     ) throws -> Recurring {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         let start = try #require(LocalDate("2026-01-01"))
