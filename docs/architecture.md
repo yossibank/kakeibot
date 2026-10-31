@@ -46,6 +46,9 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `.claude/snapshots/parts/` | `ui-snapshot` で描く、カレンダー・タグ・テンプレートのカード |
 | `.claude/snapshots/entry-wallet/` | `ui-snapshot` で描く、入力シートの口座を選ぶシート |
 | `.claude/snapshots/entry-wallet-edit/` | `ui-snapshot` で描く、口座を選ぶシートの編集中 |
+| `.claude/snapshots/store/` | `store/screenshots/raw/` の画面に文言を重ね、ストアのスクリーンショットを描く |
+| `store/ja/` | App Store の掲載情報の文と URL |
+| `store/screenshots/` | ストアに出す 6.9 インチのスクリーンショット。元の画面は `raw/` |
 
 ## 📱 ios
 
