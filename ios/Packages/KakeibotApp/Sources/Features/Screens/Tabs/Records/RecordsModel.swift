@@ -379,6 +379,10 @@ private extension RecordsModel {
             database.settingUpdates(.monthStartDay),
             failure: Self.loadFailedMessage
         ) { startDay in
+            guard startDay != monthStartDay else {
+                return
+            }
+
             monthStartDay = startDay
             month = today.periodMonth(startingOn: startDay)
         }
