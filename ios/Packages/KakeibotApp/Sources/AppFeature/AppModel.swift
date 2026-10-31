@@ -13,6 +13,7 @@ import WidgetKit
 @Observable
 final class AppModel {
     var notice = ErrorNotice()
+    var isPro = false
 
     private(set) var launch: Launch = .opening
     private(set) var today: LocalDate
@@ -20,6 +21,8 @@ final class AppModel {
     private(set) var style: ThemeStyle = .standard
     private(set) var observationRound = 0
     private(set) var syncActivity = SyncActivity(isSyncEnabled: false, isSharing: false)
+
+    let proStore: ProStore
 
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let currentDay: @Sendable () -> LocalDate
@@ -37,6 +40,7 @@ final class AppModel {
         scheduler: NotificationScheduler = NotificationScheduler(),
         router: NotificationRouter = .shared,
         shareInbox: SyncShareInbox = .shared,
+        proStore: ProStore = .live,
         retryDelays: [Duration] = ScreenObservation.retryDelays,
         currentDay: @escaping @Sendable () -> LocalDate = AppModel.deviceDay
     ) {
@@ -46,6 +50,7 @@ final class AppModel {
         self.scheduler = scheduler
         self.router = router
         self.shareInbox = shareInbox
+        self.proStore = proStore
         self.retryDelays = retryDelays
     }
 }

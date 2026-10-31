@@ -24,8 +24,10 @@ public struct SettingsSheet: View {
     @State var sampleMessage: String?
     #endif
 
+    @Environment(\.isPro) var isPro
     @Environment(\.notificationPermission) var permission
     @Environment(\.openURL) var openURL
+    @Environment(\.proStore) var proStore
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.syncCloud) var syncCloud
     @Environment(\.themeStyle) var themeStyle

@@ -9,6 +9,7 @@ struct ThemeStyleChoices<Option: Hashable & Sendable, Sample: View>: View {
     let selection: Option
     let columns: Int
     let label: (Option) -> String
+    var isLocked: (Option) -> Bool = { _ in false }
     @ViewBuilder let sample: (Option) -> Sample
     let choose: (Option) async -> Void
 
@@ -41,11 +42,17 @@ private extension ThemeStyleChoices {
             VStack(spacing: 8) {
                 sample(option)
 
-                Text(label(option))
-                    .textFont(.caption2)
-                    .foregroundStyle(titleColor)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                HStack(spacing: 4) {
+                    Text(label(option))
+                        .textFont(.caption2)
+                        .foregroundStyle(titleColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+
+                    if isLocked(option) {
+                        ProMark()
+                    }
+                }
             }
             .frame(maxWidth: .infinity, minHeight: 48)
             .padding(8)

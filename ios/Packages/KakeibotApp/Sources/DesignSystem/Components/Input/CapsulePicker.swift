@@ -250,8 +250,14 @@ private extension CapsulePicker {
                         return
                     }
 
+                    let value = options[index].value
+
                     pendingIndex = index
-                    selection = options[index].value
+                    selection = value
+
+                    if selection != value {
+                        pendingIndex = nil
+                    }
                 }
             }
     }

@@ -49,7 +49,7 @@ extension ThemeListView {
                 systemImage: "plus.square.on.square"
             ) {
                 closeMenu()
-                editing = .new(base: menu.palette)
+                create(base: menu.palette)
             }
 
             if let theme = menu.theme {

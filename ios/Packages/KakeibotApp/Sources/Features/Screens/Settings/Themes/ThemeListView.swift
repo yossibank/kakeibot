@@ -10,7 +10,9 @@ public struct ThemeListView: View {
     @State var pressing: ThemeChoice?
     @State var size: CGSize = .zero
     @State var menuHeight: CGFloat = 0
+    @State var proOffer: ProOffer?
 
+    @Environment(\.isPro) var isPro
     @Environment(\.themeStyle.corner) var corner
 
     @State private var hintFlag: SettingsScreenFlag
@@ -65,8 +67,8 @@ public struct ThemeListView: View {
                     restore(deletion)
                 }
 
-                AddButton("テーマを追加") {
-                    editing = .new(base: nil)
+                AddButton("テーマを追加", isLocked: !isPro) {
+                    create(base: nil)
                 }
             }
             .padding(.horizontal, 20)
@@ -108,6 +110,11 @@ public struct ThemeListView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
+        .proOffer(proOffer?.feature) {
+            proOffer = nil
+        } onUnlock: {
+            unlock()
+        }
         .haptic(.selection, trigger: model.current)
         .haptic(.impact(weight: .medium), trigger: menu) { _, new in
             new != nil
@@ -137,6 +144,18 @@ public struct ThemeListView: View {
 }
 
 extension ThemeListView {
+    enum ProOffer: Equatable {
+        case create(base: ThemePalette?)
+        case select(ThemeChoice)
+
+        var feature: String {
+            switch self {
+            case .create: "テーマを作るの"
+            case .select: "作ったテーマ"
+            }
+        }
+    }
+
     enum EditTarget: Hashable, Identifiable {
         case new(base: ThemePalette?)
         case edit(Theme)
@@ -166,8 +185,41 @@ extension ThemeListView {
     static let space = "themes"
 
     func select(_ choice: ThemeChoice) {
+        if case .custom = choice,
+           choice != model.current,
+           !isPro {
+            proOffer = .select(choice)
+            return
+        }
+
         Task {
             await model.select(choice)
+        }
+    }
+
+    func create(base: ThemePalette?) {
+        guard isPro else {
+            proOffer = .create(base: base)
+            return
+        }
+
+        editing = .new(base: base)
+    }
+
+    func unlock() {
+        guard let offer = proOffer else {
+            return
+        }
+
+        proOffer = nil
+
+        switch offer {
+        case let .create(base):
+            editing = .new(base: base)
+        case let .select(choice):
+            Task {
+                await model.select(choice)
+            }
         }
     }
 }

@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:Kakeibot.storekit">
+   </FileRef>
+   <FileRef
       location = "group:Kakeibot.xcodeproj">
    </FileRef>
    <FileRef

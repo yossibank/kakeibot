@@ -98,6 +98,11 @@ private extension SyncView {
             Spacer(minLength: 0)
 
             Button {
+                guard item.isShared || isPro else {
+                    proOffer = .share(item)
+                    return
+                }
+
                 Task {
                     await model.open(item)
                 }
