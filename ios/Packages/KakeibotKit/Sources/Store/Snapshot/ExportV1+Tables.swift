@@ -3,7 +3,9 @@ import GRDB
 
 extension ExportV1.Tables {
     init(fetchingFrom db: Database) throws {
-        let knownKeys = Setting.Key.allCases.map(\.rawValue)
+        let knownKeys = Setting.Key.allCases
+            .filter { $0 != .backupExportedAt }
+            .map(\.rawValue)
 
         let settings = try Setting
             .filter(knownKeys.contains(Column("key")))

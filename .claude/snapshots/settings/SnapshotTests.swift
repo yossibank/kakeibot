@@ -34,6 +34,16 @@ struct SnapshotTests {
 
         let walletSheet = WalletEditSheet(model: walletEdit)
         let reminderView = ReminderView(model: reminder)
+        let exportedAt = now.addingTimeInterval(-40 * 24 * 60 * 60)
+
+        let intros = VStack(spacing: 16) {
+            SyncIntroCard()
+
+            BackupIntroCard()
+        }
+        .padding(20)
+
+        try await database.setSetting(.backupExportedAt, to: exportedAt)
 
         for variant in Self.variants {
             try Self.write(sheet, variant: variant, to: "settings")
@@ -41,6 +51,8 @@ struct SnapshotTests {
             try Self.write(rules, variant: variant, to: "settings-rewards")
             try Self.write(walletSheet, variant: variant, to: "settings-wallet-edit")
             try Self.write(reminderView, variant: variant, to: "settings-reminder")
+            try Self.write(WidgetGuideView(), variant: variant, to: "settings-widget-guide")
+            try Self.write(intros, variant: variant, to: "settings-intros")
         }
     }
 }

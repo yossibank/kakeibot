@@ -196,7 +196,7 @@ extension SettingsSheet {
                     )
                 )
             } label: {
-                row("iCloud 同期", systemImage: "icloud", value: syncText)
+                row("同期と共有", systemImage: "icloud", value: syncText)
             }
 
             Hairline()
@@ -209,7 +209,7 @@ extension SettingsSheet {
                     )
                 )
             } label: {
-                row("バックアップ", systemImage: "externaldrive")
+                row("バックアップ", systemImage: "externaldrive", value: backupText)
             }
 
             Hairline()
@@ -220,6 +220,32 @@ extension SettingsSheet {
                 }
             } label: {
                 row("記録をすべて削除", systemImage: "trash", tint: Palette.rose)
+            }
+        }
+    }
+
+    var aboutSection: some View {
+        section("このアプリについて") {
+            NavigationLink {
+                WidgetGuideView()
+            } label: {
+                row("ウィジェットの置き方", systemImage: "square.grid.2x2")
+            }
+
+            Hairline()
+
+            Button {
+                open(SettingsLink.contact)
+            } label: {
+                row("お問い合わせ", systemImage: "envelope", trailingImage: "arrow.up.right")
+            }
+
+            Hairline()
+
+            Button {
+                open(SettingsLink.review)
+            } label: {
+                row("レビューを書く", systemImage: "star", trailingImage: "arrow.up.right")
             }
         }
     }
@@ -242,6 +268,18 @@ private extension SettingsSheet {
         }
     }
 
+    var backupText: String? {
+        guard !syncStatus.isEnabled else {
+            return nil
+        }
+
+        return BackupModel.exportAgeText(
+            exportedAt: backupExportedAt,
+            firstCreatedAt: firstEntryCreatedAt,
+            now: Date()
+        )
+    }
+
     var weekStartBinding: Binding<Weekday> {
         Binding {
             weekStart.value
@@ -260,5 +298,13 @@ private extension SettingsSheet {
                 await entryStart.choose(isOn)
             }
         }
+    }
+
+    func open(_ url: URL?) {
+        guard let url else {
+            return
+        }
+
+        openURL(url)
     }
 }
