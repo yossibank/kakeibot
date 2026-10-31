@@ -91,9 +91,15 @@ extension SettingsSheet {
         systemImage: String,
         value: String? = nil,
         shortValue: String? = nil,
-        tint: Color? = nil
+        tint: Color? = nil,
+        trailingImage: String = "chevron.right"
     ) -> some View {
-        row(title, systemImage: systemImage, tint: tint) {
+        row(
+            title,
+            systemImage: systemImage,
+            tint: tint,
+            trailingImage: trailingImage
+        ) {
             if let value {
                 SettingsRowValue(value: value, shortValue: shortValue)
             }
@@ -104,6 +110,7 @@ extension SettingsSheet {
         _ title: String,
         systemImage: String,
         tint: Color? = nil,
+        trailingImage: String = "chevron.right",
         @ViewBuilder accessory: () -> some View
     ) -> some View {
         HStack(spacing: 12) {
@@ -123,7 +130,7 @@ extension SettingsSheet {
 
             accessory()
 
-            Image(systemName: "chevron.right")
+            Image(systemName: trailingImage)
                 .sansFont(.small)
                 .foregroundStyle(Palette.hint)
         }

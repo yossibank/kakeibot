@@ -11,6 +11,8 @@ public struct SettingsSheet: View {
     @State var theme: ThemeChoice = .system
     @State var customThemes: [Theme] = []
     @State var syncStatus = SyncStatus.off
+    @State var backupExportedAt: Date?
+    @State var firstEntryCreatedAt: Date?
     @State var weekStart: SettingValueModel<Weekday>
     @State var entryStart: SettingValueModel<Bool>
     @State var recordReset: RecordResetModel
@@ -23,6 +25,7 @@ public struct SettingsSheet: View {
     #endif
 
     @Environment(\.notificationPermission) var permission
+    @Environment(\.openURL) var openURL
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.syncCloud) var syncCloud
     @Environment(\.themeStyle) var themeStyle
@@ -76,6 +79,8 @@ public struct SettingsSheet: View {
                         lookSection
 
                         dataSection
+
+                        aboutSection
 
                         #if DEBUG
                         sampleSection
@@ -152,6 +157,12 @@ public struct SettingsSheet: View {
         .task {
             await observeSync()
         }
+        .task {
+            await observeBackupExportedAt()
+        }
+        .task {
+            firstEntryCreatedAt = try? await database.entryHistory().firstCreatedAt
+        }
     }
 }
 
@@ -183,6 +194,16 @@ private extension SettingsSheet {
             }
         } catch {
             syncStatus = .off
+        }
+    }
+
+    func observeBackupExportedAt() async {
+        do {
+            for try await date in database.settingUpdates(.backupExportedAt) {
+                backupExportedAt = date
+            }
+        } catch {
+            backupExportedAt = nil
         }
     }
 

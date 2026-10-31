@@ -48,6 +48,8 @@ public extension Setting {
         case feeCategoryId = "fee_category_id"
         case transferOutCategoryId = "transfer_out_category_id"
         case transferInCategoryId = "transfer_in_category_id"
+        case backupExportedAt = "backup_exported_at"
+        case reviewRequestedVersion = "review_requested_version"
     }
 }
 

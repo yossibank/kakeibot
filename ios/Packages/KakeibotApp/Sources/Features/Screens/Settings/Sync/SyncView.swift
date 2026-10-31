@@ -15,7 +15,7 @@ public struct SyncView: View {
 
     public var body: some View {
         VStack(spacing: 16) {
-            SettingsBackHeader("iCloud 同期")
+            SettingsBackHeader("同期と共有")
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {

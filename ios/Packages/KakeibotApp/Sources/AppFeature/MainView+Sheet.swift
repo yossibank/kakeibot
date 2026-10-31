@@ -27,7 +27,7 @@ extension MainView {
     func sheetContent(for sheet: Sheet) -> some View {
         switch sheet {
         case .new:
-            EntrySheet(model: draft, onChange: notice.show)
+            EntrySheet(model: draft, onChange: show)
         case let .edit(id):
             EntrySheet(
                 model: EntryModel(
@@ -35,7 +35,7 @@ extension MainView {
                     editing: id,
                     date: today
                 ),
-                onChange: notice.show
+                onChange: show
             )
         case .settings:
             SettingsSheet(
@@ -50,7 +50,7 @@ extension MainView {
                     date: today,
                     template: template
                 ),
-                onChange: notice.show
+                onChange: show
             )
         case .transfer:
             EntrySheet(
@@ -59,7 +59,7 @@ extension MainView {
                     date: today,
                     type: .transfer
                 ),
-                onChange: notice.show
+                onChange: show
             )
         case .templates:
             TemplateShelfSheet(

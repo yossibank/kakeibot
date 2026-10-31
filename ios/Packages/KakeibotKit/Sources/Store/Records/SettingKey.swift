@@ -1,4 +1,5 @@
 import Core
+import Foundation
 
 public struct SettingKey<Value: Sendable>: Sendable {
     public let defaultValue: Value
@@ -223,6 +224,28 @@ public extension SettingKey where Value == EntryCategory.ID? {
             default: nil,
             decode: { EntryCategory.ID($0) },
             encode: { $0?.description }
+        )
+    }
+}
+
+public extension SettingKey where Value == Date? {
+    static var backupExportedAt: Self {
+        Self(
+            .backupExportedAt,
+            default: nil,
+            decode: { try? Date($0, strategy: .iso8601) },
+            encode: { $0?.formatted(.iso8601) }
+        )
+    }
+}
+
+public extension SettingKey where Value == String? {
+    static var reviewRequestedVersion: Self {
+        Self(
+            .reviewRequestedVersion,
+            default: nil,
+            decode: { $0 },
+            encode: { $0 }
         )
     }
 }

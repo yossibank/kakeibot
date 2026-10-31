@@ -8,6 +8,7 @@ struct BackupIntroCard: View {
             headline: ("記録と設定を、まとめて", "1 つのファイルに残せます"),
             notes: [
                 .init("iphone.and.arrow.forward", "機種変更の前に書き出すと、戻せます"),
+                .init("icloud.and.arrow.up", "端末の iCloud バックアップにも含まれます"),
                 .init("tablecells", "記録は、表計算用にも書き出せます"),
                 .init("arrow.uturn.backward", "読み込む前のデータは退避します")
             ]

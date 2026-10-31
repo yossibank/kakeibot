@@ -2,6 +2,7 @@ import Core
 import DesignSystem
 import Features
 import Store
+import StoreKit
 import SwiftUI
 
 struct MainView: View {
@@ -17,6 +18,8 @@ struct MainView: View {
     @State var notice: EntryNoticeModel
     @State var undo: DeletionUndo
     @State var launchScreen: LaunchScreen?
+
+    @Environment(\.requestReview) var requestReview
 
     @State private var isWarmingEntry = true
     @State private var orderMenuAnchor: CGRect?

@@ -199,7 +199,7 @@ KakeibotApp/
 
 | フォルダ | 中身 |
 | --- | --- |
-| `AppFeature/` | 起動の印の動き、通知の許可、入力の準備も持つ |
+| `AppFeature/` | 起動の印の動き、通知の許可、入力の準備、レビューのお願いも持つ |
 | `AppWidget/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
 | `DesignSystem/Components/` | Amount・Banner・Button・Calendar・Chart・Dial・Gesture・Icon・Input・Menu・Navigation・Row・Sheet・Surface・Tag・Template |
 | `Features/Screens/Entry/` | 記録の入力シート |
@@ -230,4 +230,5 @@ KakeibotApp/
 > [!WARNING]
 > - 配布用の証明書を Xcode がクラウドで管理するか（12 番で確かめる）
 > - すぐ記録を押したとき、ウィジェットの拡張から DB に書け、アプリを前面に戻すと画面に出るか。ホーム画面で押して確かめる
+> - App Group の DB が、端末の iCloud バックアップに含まれるか。実機をバックアップから戻して確かめる
 > - ロック中に、ロック画面のウィジェットが金額を出すか（実機）。ファイル保護は、アプリと拡張でそろえた。値は `NSFileProtectionCompleteUntilFirstUserAuthentication` である

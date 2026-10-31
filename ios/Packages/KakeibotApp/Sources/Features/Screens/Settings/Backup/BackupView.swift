@@ -124,7 +124,9 @@ public struct BackupView: View {
             contentType: exportType,
             defaultFilename: model.file?.name
         ) { result in
-            model.finishExport(result)
+            Task {
+                await model.finishExport(result, at: Date())
+            }
         }
         .fileImporter(
             isPresented: $isImporting,

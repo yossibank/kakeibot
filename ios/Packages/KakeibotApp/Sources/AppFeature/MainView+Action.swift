@@ -102,8 +102,23 @@ extension MainView {
 
         Task {
             if let change = await home.record(template) {
-                notice.show(change)
+                show(change)
             }
+        }
+    }
+
+    func show(_ change: EntryChange) {
+        let request = StoreReviewRequest(database: database)
+
+        notice.show(change)
+
+        Task {
+            guard await request.shouldAsk(after: change, at: Date()) else {
+                return
+            }
+
+            try? await Task.sleep(for: Self.sheetCloseDuration)
+            requestReview()
         }
     }
 

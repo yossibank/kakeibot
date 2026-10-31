@@ -63,6 +63,29 @@ public extension BackupModel {
         return "\(date) に書き出した\(counts)に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます"
     }
 
+    static func exportAgeText(
+        exportedAt: Date?,
+        firstCreatedAt: Date? = nil,
+        now: Date,
+        calendar: Calendar = .current
+    ) -> String? {
+        guard let since = exportedAt ?? firstCreatedAt else {
+            return nil
+        }
+
+        let months = calendar.dateComponents([.month], from: since, to: now).month ?? 0
+
+        guard months >= 1 else {
+            return nil
+        }
+
+        guard exportedAt != nil else {
+            return "未"
+        }
+
+        return months < 12 ? "\(months) か月前" : "\(months / 12) 年前"
+    }
+
     func loadSync() async {
         do {
             for try await activity in database.syncActivityUpdates() {
@@ -112,12 +135,21 @@ public extension BackupModel {
         }
     }
 
-    func finishExport(_ result: Result<URL, any Error>) {
+    func finishExport(
+        _ result: Result<URL, any Error>,
+        at date: Date
+    ) async {
+        let kind = file?.kind
+
         file = nil
 
         switch result {
         case .success:
             doneMessage = Self.exportedMessage
+
+            if kind == .json {
+                try? await database.setSetting(.backupExportedAt, to: date)
+            }
         case .failure:
             errorNotice.show(Self.exportFailedMessage)
         }

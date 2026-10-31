@@ -62,6 +62,8 @@ expense・income の列は、描画に使わない。
 | fee_category_id | 振替の手数料に付ける category の id | |
 | transfer_out_category_id | 抜けた共有の財布への振替を、支出に変えるときに付ける category の id | |
 | transfer_in_category_id | 抜けた共有の財布からの振替を、収入に変えるときに付ける category の id | |
+| backup_exported_at | バックアップを JSON で最後に書き出した日時。ISO 8601 | CSV の書き出しでは変えない |
+| review_requested_version | レビューのお願いを出したアプリの版 | 空なら、まだ出していない |
 
 closed_hints に入る画面の名前は、次のとおり。
 
