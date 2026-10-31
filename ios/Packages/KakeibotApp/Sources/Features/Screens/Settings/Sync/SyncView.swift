@@ -6,6 +6,9 @@ public struct SyncView: View {
     @State var model: SyncModel
     @State var leaving: JoinedShare?
     @State var stopping: WalletShare?
+    @State var proOffer: ProOffer?
+
+    @Environment(\.isPro) var isPro
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -135,11 +138,30 @@ public struct SyncView: View {
         .animation(.snappy(duration: 0.25), value: model.choice)
         .animation(.snappy(duration: 0.25), value: model.invitation)
         .animation(.snappy(duration: 0.25), value: model.opened)
+        .proOffer(proOffer?.feature) {
+            proOffer = nil
+        } onUnlock: {
+            unlock()
+        }
         .haptic(.selection, trigger: model.isChoosing) { _, new in
             new
         }
         .haptic(.success, trigger: model.progress) { old, new in
             Self.hasFinishedSyncing(from: old, to: new)
+        }
+    }
+}
+
+extension SyncView {
+    enum ProOffer: Equatable {
+        case sync
+        case share(WalletShare)
+
+        var feature: String {
+            switch self {
+            case .sync: "端末間の同期"
+            case .share: "家族との共有"
+            }
         }
     }
 }
@@ -215,13 +237,12 @@ private extension SyncView {
         Binding {
             model.shownOn
         } set: { isOn in
-            guard model.request(isOn) else {
+            guard !isOn || isPro else {
+                proOffer = .sync
                 return
             }
 
-            Task {
-                await model.setOn(isOn)
-            }
+            turn(isOn)
         }
     }
 
@@ -237,6 +258,33 @@ private extension SyncView {
         }
 
         return true
+    }
+
+    func turn(_ isOn: Bool) {
+        guard model.request(isOn) else {
+            return
+        }
+
+        Task {
+            await model.setOn(isOn)
+        }
+    }
+
+    func unlock() {
+        guard let offer = proOffer else {
+            return
+        }
+
+        proOffer = nil
+
+        switch offer {
+        case .sync:
+            turn(true)
+        case let .share(item):
+            Task {
+                await model.open(item)
+            }
+        }
     }
 
     func leave() {

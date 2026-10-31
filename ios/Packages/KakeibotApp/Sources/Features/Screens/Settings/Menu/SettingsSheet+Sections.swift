@@ -189,6 +189,14 @@ extension SettingsSheet {
     var dataSection: some View {
         section("データ") {
             NavigationLink {
+                ProView(model: ProPurchaseModel(store: proStore))
+            } label: {
+                row("Pro", systemImage: "sparkles", value: proText)
+            }
+
+            Hairline()
+
+            NavigationLink {
                 SyncView(
                     model: SyncModel(
                         database: database,
@@ -258,6 +266,10 @@ private extension SettingsSheet {
 
     var reminderText: String {
         ReminderModel.rowText(time: reminderTime, authorization: authorization)
+    }
+
+    var proText: String {
+        isPro ? "購入済み" : "詳しく見る"
     }
 
     var syncText: String {

@@ -5,6 +5,9 @@ import SwiftUI
 public struct ThemeStyleTextView: View {
     @State private var model: ThemeStyleModel
     @State private var hintFlag: SettingsScreenFlag
+    @State private var fontOffer: FontOffer?
+
+    @Environment(\.isPro) private var isPro
 
     public init(model: ThemeStyleModel) {
         let hintFlag = model.closedHint(.themeText)
@@ -42,7 +45,8 @@ public struct ThemeStyleTextView: View {
                 options: ThemeFont.allCases,
                 selection: model.style.displayFont,
                 columns: 3,
-                label: \.title
+                label: \.title,
+                isLocked: isLocked
             ) { font in
                 fontSample(
                     AmountText.text(Self.sampleAmount),
@@ -50,7 +54,7 @@ public struct ThemeStyleTextView: View {
                     scale: 0.5
                 )
             } choose: { font in
-                await model.choose(displayFont: font)
+                await choose(.display(font))
             }
 
             ThemeStyleChoices(
@@ -58,7 +62,8 @@ public struct ThemeStyleTextView: View {
                 options: ThemeFont.allCases,
                 selection: model.style.textFont,
                 columns: 3,
-                label: \.title
+                label: \.title,
+                isLocked: isLocked
             ) { font in
                 fontSample(
                     Self.sampleText,
@@ -66,7 +71,26 @@ public struct ThemeStyleTextView: View {
                     scale: 0.8
                 )
             } choose: { font in
-                await model.choose(textFont: font)
+                await choose(.text(font))
+            }
+        }
+        .proOffer(fontOffer?.feature) {
+            fontOffer = nil
+            model.cancelPreview()
+        } onUnlock: {
+            unlock()
+        }
+    }
+}
+
+private extension ThemeStyleTextView {
+    enum FontOffer: Equatable {
+        case display(ThemeFont)
+        case text(ThemeFont)
+
+        var feature: String {
+            switch self {
+            case let .display(font), let .text(font): "\(font.title)の字体"
             }
         }
     }
@@ -127,6 +151,52 @@ private extension ThemeStyleTextView {
             .foregroundStyle(Palette.text)
             .lineLimit(1)
             .minimumScaleFactor(scale)
+    }
+}
+
+private extension ThemeStyleTextView {
+    static let freeFonts: Set<ThemeFont> = [.mincho, .gothic]
+
+    func isLocked(_ font: ThemeFont) -> Bool {
+        !isPro && !Self.freeFonts.contains(font)
+    }
+
+    func choose(_ offer: FontOffer) async {
+        switch offer {
+        case let .display(font) where isLocked(font) && font != model.savedStyle.displayFont:
+            model.cancelPreview()
+            model.preview(displayFont: font)
+            fontOffer = offer
+        case let .text(font) where isLocked(font) && font != model.savedStyle.textFont:
+            model.cancelPreview()
+            model.preview(textFont: font)
+            fontOffer = offer
+        default:
+            fontOffer = nil
+            model.cancelPreview()
+            await save(offer)
+        }
+    }
+
+    func unlock() {
+        guard let offer = fontOffer else {
+            return
+        }
+
+        fontOffer = nil
+
+        Task {
+            await save(offer)
+        }
+    }
+
+    func save(_ offer: FontOffer) async {
+        switch offer {
+        case let .display(font):
+            await model.choose(displayFont: font)
+        case let .text(font):
+            await model.choose(textFont: font)
+        }
     }
 }
 

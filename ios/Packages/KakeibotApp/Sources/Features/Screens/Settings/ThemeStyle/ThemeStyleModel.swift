@@ -12,6 +12,8 @@ public final class ThemeStyleModel {
 
     private let database: AppDatabase
 
+    private var previewBase: ThemeStyle?
+
     public init(database: AppDatabase) {
         self.database = database
     }
@@ -24,6 +26,10 @@ extension ThemeStyleModel {
 }
 
 public extension ThemeStyleModel {
+    var savedStyle: ThemeStyle {
+        previewBase ?? style
+    }
+
     func load() async {
         do {
             style = try await database.style()
@@ -42,6 +48,22 @@ public extension ThemeStyleModel {
 
     func choose(textFont font: ThemeFont) async {
         await choose(font, at: \.textFont, key: .textFontStyle)
+    }
+
+    func preview(displayFont font: ThemeFont) {
+        preview(font, at: \.displayFont)
+    }
+
+    func preview(textFont font: ThemeFont) {
+        preview(font, at: \.textFont)
+    }
+
+    func cancelPreview() {
+        if let previewBase {
+            style = previewBase
+        }
+
+        previewBase = nil
     }
 
     func choose(_ size: ThemeTextSize) async {
@@ -82,7 +104,9 @@ private extension ThemeStyleModel {
         at keyPath: WritableKeyPath<ThemeStyle, Value>,
         key: SettingKey<Value>
     ) async {
-        let previous = style
+        let previous = previewBase ?? style
+
+        previewBase = nil
 
         style[keyPath: keyPath] = value
 
@@ -92,5 +116,16 @@ private extension ThemeStyleModel {
             style = previous
             errorNotice.show(Self.saveFailedMessage, for: error)
         }
+    }
+
+    func preview<Value>(
+        _ value: Value,
+        at keyPath: WritableKeyPath<ThemeStyle, Value>
+    ) {
+        if previewBase == nil {
+            previewBase = style
+        }
+
+        style[keyPath: keyPath] = value
     }
 }

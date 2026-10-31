@@ -71,6 +71,8 @@ public struct RootView: View {
             }
         )
         .environment(\.syncCloud, .live)
+        .environment(\.proStore, model.proStore)
+        .environment(\.isPro, model.isPro)
         .palette(shownLook)
         .environment(\.palette, shownPalette)
         .environment(\.themeStyle, shownStyle)
@@ -120,6 +122,9 @@ private extension RootView {
             }
             .task(id: model.observationID(model.pendingShareCount)) {
                 await model.acceptShares(in: database)
+            }
+            .task {
+                await model.observePro(in: database)
             }
         case .failed:
             ContentUnavailableView {

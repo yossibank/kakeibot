@@ -60,6 +60,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | アイコンの色違い | 設定で選べる色違いは、同じフォルダの `AppIcon-<色>.icon` | |
 | アイコンの見本 | `Assets.xcassets` の `AppIconYen`・`AppIconDial`。設定の見本に描く、アイコンと同じ絵の写し | |
 | 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | アプリのものを `WidgetFonts` で読む |
+| Pro の商品 | ID は `com.yossibank.kakeibot.pro`（買い切り、ファミリー共有あり）。手元で試す設定は `ios/Kakeibot.storekit` | |
 | 共有の受け入れ | Info.plist の `CKSharingSupported`。AppFeature の `AppDelegate` が、シーンの delegate を差し替えて共有のリンクを受け取る | |
 
 `license_plist.yml` には、同梱のフォントと配布元のライセンスを手で足す。
@@ -187,6 +188,7 @@ KakeibotApp/
 │   │       ├── Model/
 │   │       ├── Notice/
 │   │       ├── Period/
+│   │       ├── Pro/
 │   │       ├── Settings/
 │   │       ├── Setup/
 │   │       └── Stamp/
@@ -199,7 +201,7 @@ KakeibotApp/
 
 | フォルダ | 中身 |
 | --- | --- |
-| `AppFeature/` | 起動の印の動き、通知の許可、入力の準備、レビューのお願いも持つ |
+| `AppFeature/` | 起動の印の動き、通知の許可、入力の準備、レビューのお願いも持つ。Pro の購入を StoreKit で確かめ、Pro が無くなったら同期を止める |
 | `AppWidget/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
 | `DesignSystem/Components/` | Amount・Banner・Button・Calendar・Chart・Dial・Gesture・Icon・Input・Menu・Navigation・Row・Sheet・Surface・Tag・Template |
 | `Features/Screens/Entry/` | 記録の入力シート |
@@ -209,6 +211,7 @@ KakeibotApp/
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、記録が無いときと読み込めないときの表示、保存の失敗が空き容量不足かの見分け |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |
+| `Features/Shared/Pro/` | Pro を買ったかの状態、Pro の画面、止めた場所で下に出すカード。StoreKit の中身は AppFeature が渡す |
 | `Features/Shared/Settings/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Features/Shared/Stamp/` | 押したスタンプの数のカードと、押した日の一覧のシート |
