@@ -235,7 +235,7 @@ extension SettingsSheet {
             Hairline()
 
             Button {
-                open(SettingsLink.contact)
+                open(SettingsLink.contact())
             } label: {
                 row("お問い合わせ", systemImage: "envelope", trailingImage: "arrow.up.right")
             }
