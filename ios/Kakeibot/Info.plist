@@ -15,8 +15,6 @@
 	</array>
 	<key>CKSharingSupported</key>
 	<true/>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>KleeOne-Regular.ttf</string>
