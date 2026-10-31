@@ -75,6 +75,7 @@ private struct StorePage: View {
                 startPoint: .top,
                 endPoint: .bottom
             )
+            .background(Palette.backgroundTop)
         }
         .clipped()
         .environment(\.colorScheme, .light)
@@ -149,5 +150,33 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name).png")
 
         try data.write(to: url)
+        try writeSmall(image, to: name)
+    }
+
+    static func writeSmall(
+        _ image: CGImage,
+        to name: String
+    ) throws {
+        let context = try #require(
+            CGContext(
+                data: nil,
+                width: 1206,
+                height: 2622,
+                bitsPerComponent: 8,
+                bytesPerRow: 0,
+                space: CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+            )
+        )
+
+        context.interpolationQuality = .high
+        context.draw(image, in: CGRect(x: 0, y: 0, width: 1206, height: 2622))
+
+        let small = try #require(context.makeImage())
+        let data = try #require(UIImage(cgImage: small).pngData())
+        let folder = URL(fileURLWithPath: directory).appending(path: "6.3")
+
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try data.write(to: folder.appending(path: "\(name).png"))
     }
 }
