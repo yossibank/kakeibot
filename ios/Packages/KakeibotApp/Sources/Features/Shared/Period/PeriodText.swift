@@ -24,6 +24,10 @@ enum PeriodText {
         return startDay.shift == .none ? day : "\(day)・\(startDay.shift.title)"
     }
 
+    static func weekdayDate(_ date: LocalDate) -> String {
+        "\(self.date(date))（\(date.weekday.shortName)）"
+    }
+
     private static func date(_ date: LocalDate) -> String {
         "\(date.month)/\(date.day)"
     }

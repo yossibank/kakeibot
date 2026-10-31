@@ -61,23 +61,32 @@ public struct MonthStartDayView: View {
 private extension MonthStartDayView {
     var shiftSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SettingsSectionTitle("土日・祝日のとき")
+            Text("土日・祝日のとき")
+                .textFont(.caption2)
+                .tracking(3)
+                .foregroundStyle(Palette.accent)
 
-            CapsulePicker(selection: shiftBinding, options: HolidayShift.options)
+            HStack(spacing: 8) {
+                ForEach(HolidayShift.allCases, id: \.self) { shift in
+                    SettingsChoice(shift.title, isSelected: model.startDay.shift == shift) {
+                        Task {
+                            await model.choose(shift)
+                        }
+                    }
+                }
+            }
+
+            Text(model.shiftNote)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .monospacedDigit()
+                .fixedSize(horizontal: false, vertical: true)
+                .contentTransition(.numericText())
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-private extension MonthStartDayView {
-    var shiftBinding: Binding<HolidayShift> {
-        Binding {
-            model.startDay.shift
-        } set: { shift in
-            Task {
-                await model.choose(shift)
-            }
-        }
+        .padding(16)
+        .card()
+        .animation(.snappy, value: model.shiftNote)
     }
 }
 

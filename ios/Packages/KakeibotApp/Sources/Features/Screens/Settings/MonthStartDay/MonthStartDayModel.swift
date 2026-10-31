@@ -33,6 +33,22 @@ public extension MonthStartDayModel {
         return PeriodText.range(period)
     }
 
+    var shiftNote: String {
+        let start = month.period(startingOn: startDay).lowerBound
+        let unshiftedDay = startDay.shifted(by: .none)
+        let unshifted = month.period(startingOn: unshiftedDay).lowerBound
+
+        if startDay.shift == .none {
+            return "土日・祝日でも、そのまま数えます"
+        }
+
+        if start == unshifted {
+            return "今の期間の始まりは、平日です"
+        }
+
+        return "\(PeriodText.weekdayDate(unshifted))を \(PeriodText.weekdayDate(start))にずらしています"
+    }
+
     func load() async {
         do {
             startDay = try await database.setting(.monthStartDay)

@@ -33,13 +33,18 @@ struct MonthStartDayModelTests {
 
         await model.load()
         await model.choose(payday)
+        let plainNote = model.shiftNote
         await model.choose(.previous)
         let shiftedText = model.periodText
+        let weekdayNote = model.shiftNote
         await model.choose(earlier)
         let saved = try await setup.database.setting(.monthStartDay)
 
+        #expect(plainNote == "土日・祝日でも、そのまま数えます")
         #expect(shiftedText == "9/25〜10/22")
+        #expect(weekdayNote == "今の期間の始まりは、平日です")
         #expect(model.periodText == "9/18〜10/19")
+        #expect(model.shiftNote == "9/20（日）を 9/18（金）にずらしています")
         #expect(saved == earlier.shifted(by: .previous))
     }
 
