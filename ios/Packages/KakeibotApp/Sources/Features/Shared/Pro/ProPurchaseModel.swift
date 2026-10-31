@@ -1,5 +1,7 @@
 import DesignSystem
+import Foundation
 import Observation
+import OSLog
 
 @MainActor
 @Observable
@@ -58,6 +60,7 @@ private extension ProPurchaseModel {
     static let purchaseFailedMessage = "購入できませんでした。時間をおいて試してください"
     static let restoreFailedMessage = "購入を復元できませんでした。時間をおいて試してください"
     static let nothingToRestoreMessage = "復元できる購入が見つかりませんでした"
+    static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Pro")
 
     func work(
         failedMessage: String,
@@ -79,6 +82,12 @@ private extension ProPurchaseModel {
         } catch ProStoreError.cancelled {
             return nil
         } catch {
+            let code = error as NSError
+            let detail = String(describing: error)
+
+            Self.logger.error(
+                "\(failedMessage, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
+            )
             errorNotice.show(failedMessage)
             return nil
         }
