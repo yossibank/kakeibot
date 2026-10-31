@@ -39,6 +39,15 @@ struct SyncRouteTests {
     }
 
     @Test
+    func ignoresOwnZoneDeletionUntilFirstFetch() {
+        let fresh = Self.route(isSyncEnabled: true, knowsZones: false)
+        let known = Self.route(isSyncEnabled: true, knowsZones: true)
+
+        #expect(fresh.receivesOwnZoneDeletion == false)
+        #expect(known.receivesOwnZoneDeletion)
+    }
+
+    @Test
     func finishesSaveAndDeletesItsOldZone() {
         let route = Self.route(isSyncEnabled: true)
         let change = Self.change(saveZone: Self.ownWallet, deleteZones: [SyncZone.own])
@@ -168,11 +177,13 @@ private extension SyncRouteTests {
 
     static func route(
         isShared: Bool = false,
-        isSyncEnabled: Bool
+        isSyncEnabled: Bool,
+        knowsZones: Bool = true
     ) -> SyncRoute {
         SyncRoute(
             isShared: isShared,
             isSyncEnabled: isSyncEnabled,
+            knowsZones: knowsZones,
             owners: [joinedWallet: "_owner"]
         )
     }
