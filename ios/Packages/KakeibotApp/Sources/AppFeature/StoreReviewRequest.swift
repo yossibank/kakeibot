@@ -30,28 +30,16 @@ extension StoreReviewRequest {
             return false
         }
 
-        do {
-            guard try await database.setting(.reviewRequestedVersion) != version else {
-                return false
-            }
-
-            let history = try await database.entryHistory()
-
-            guard isReady(history, at: now) else {
-                return false
-            }
-
-            try await database.setSetting(.reviewRequestedVersion, to: version)
-
-            return true
-        } catch {
-            return false
+        let claimed = try? await database.claimReviewRequest(version: version) { history in
+            isReady(history, at: now)
         }
+
+        return claimed ?? false
     }
 }
 
 private extension StoreReviewRequest {
-    func isReady(
+    nonisolated func isReady(
         _ history: EntryHistory,
         at now: Date
     ) -> Bool {

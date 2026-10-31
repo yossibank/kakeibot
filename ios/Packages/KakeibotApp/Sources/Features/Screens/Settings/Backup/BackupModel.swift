@@ -242,6 +242,8 @@ public extension BackupModel {
                 try stash.save($0)
             }
 
+            try? await database.setSetting(.backupExportedAt, to: pending.exportedAt)
+
             doneMessage = Self.restoredMessage
 
             if pending.data.needsNotifications {

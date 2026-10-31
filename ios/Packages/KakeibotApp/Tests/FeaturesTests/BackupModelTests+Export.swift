@@ -79,6 +79,25 @@ extension BackupModelTests {
     }
 
     @Test
+    func takesExportDateFromRestoredFile() async throws {
+        let setup = try Setup()
+        let source = BackupModel(database: setup.source, stash: setup.stash)
+        let target = BackupModel(database: setup.target, stash: setup.stash)
+        let earlier = setup.now.addingTimeInterval(-90 * 24 * 60 * 60)
+        try await setup.source.setSetting(.backupExportedAt, to: earlier)
+        await source.makeFile(.json, at: setup.now)
+        let file = try #require(source.file)
+
+        target.read(file.data)
+        await target.restore()
+        let restored = try await setup.target.setting(.backupExportedAt)
+        let text = String(decoding: file.data, as: UTF8.self)
+
+        #expect(restored.map(\.timeIntervalSince1970) == setup.now.timeIntervalSince1970)
+        #expect(!text.contains("backup_exported_at"))
+    }
+
+    @Test
     func skipsSavingExportDateForCSV() async throws {
         let setup = try Setup()
         let model = BackupModel(database: setup.source, stash: setup.stash)
