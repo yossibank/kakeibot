@@ -84,6 +84,16 @@ struct ProPurchaseModelTests {
     }
 
     @Test
+    func staysQuietWhenRestoreIsCancelled() async {
+        let model = ProPurchaseModel(store: .stub(restore: .failure(ProStoreError.cancelled)))
+
+        let isUnlocked = await model.restore()
+
+        #expect(!isUnlocked)
+        #expect(model.errorNotice.message == nil)
+    }
+
+    @Test
     func tellsWhenRestoreFails() async {
         let model = ProPurchaseModel(store: .stub(restore: .failure(StubError())))
 

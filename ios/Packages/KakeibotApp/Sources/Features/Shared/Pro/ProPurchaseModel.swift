@@ -30,22 +30,27 @@ public extension ProPurchaseModel {
     }
 
     func purchase() async -> Bool {
-        await work(failedMessage: Self.purchaseFailedMessage) {
+        let status = await work(failedMessage: Self.purchaseFailedMessage) {
             try await store.purchase()
         }
+
+        return status?.isUnlocked == true
     }
 
     func restore() async -> Bool {
-        let isUnlocked = await work(failedMessage: Self.restoreFailedMessage) {
+        let status = await work(failedMessage: Self.restoreFailedMessage) {
             try await store.restore()
         }
 
-        if !isUnlocked,
-           errorNotice.message == nil {
+        guard let status else {
+            return false
+        }
+
+        if !status.isUnlocked {
             errorNotice.inform(Self.nothingToRestoreMessage)
         }
 
-        return isUnlocked
+        return status.isUnlocked
     }
 }
 
@@ -57,9 +62,9 @@ private extension ProPurchaseModel {
     func work(
         failedMessage: String,
         _ operation: () async throws -> ProStatus
-    ) async -> Bool {
+    ) async -> ProStatus? {
         guard !isWorking else {
-            return false
+            return nil
         }
 
         isWorking = true
@@ -70,10 +75,12 @@ private extension ProPurchaseModel {
         }
 
         do {
-            return try await operation().isUnlocked
+            return try await operation()
+        } catch ProStoreError.cancelled {
+            return nil
         } catch {
             errorNotice.show(failedMessage)
-            return false
+            return nil
         }
     }
 }

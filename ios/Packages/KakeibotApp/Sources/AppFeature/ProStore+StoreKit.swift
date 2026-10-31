@@ -13,7 +13,12 @@ extension ProStore {
     } purchase: {
         try await ProEntitlement.purchase()
     } restore: {
-        try await AppStore.sync()
+        do {
+            try await AppStore.sync()
+        } catch StoreKitError.userCancelled {
+            throw ProStoreError.cancelled
+        }
+
         return await ProEntitlement.refresh()
     }
 }

@@ -52,6 +52,7 @@ public extension ProStore {
 
 public enum ProStoreError: Error {
     case unavailable
+    case cancelled
 }
 
 public extension EnvironmentValues {
