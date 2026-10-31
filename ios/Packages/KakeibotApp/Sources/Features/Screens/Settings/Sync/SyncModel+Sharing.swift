@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import OSLog
 import Store
 
 public extension SyncModel {
@@ -81,6 +82,7 @@ private extension SyncModel {
     static let inviteFailedMessage = "招待を保存できませんでした。時間をおいて試してください"
     static let stopFailedMessage = "共有をやめられませんでした。時間をおいて試してください"
     static let leaveFailedMessage = "共有から抜けられませんでした。時間をおいて試してください"
+    static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Sharing")
 
     func show(
         _ item: WalletShare,
@@ -125,6 +127,12 @@ private extension SyncModel {
         do {
             try await operation()
         } catch {
+            let code = error as NSError
+            let detail = String(describing: error)
+
+            Self.logger.error(
+                "\(failure, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
+            )
             errorNotice.show(failure, for: error)
         }
 
