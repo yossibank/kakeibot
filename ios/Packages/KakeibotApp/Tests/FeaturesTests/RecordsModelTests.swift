@@ -43,6 +43,38 @@ struct RecordsModelTests {
     }
 
     @Test
+    func keepsMonthWhenObservingAgain() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+
+        let first = Task {
+            await model.run()
+        }
+
+        await ObservationWait.until {
+            model.list != nil
+        }
+
+        first.cancel()
+        await first.value
+        model.move(months: -1)
+        try await setup.save(.expense, amount: 500, on: "2026-09-30")
+
+        let second = Task {
+            await model.run()
+        }
+
+        await ObservationWait.until {
+            model.days.count == 1
+        }
+
+        try await Task.sleep(for: .milliseconds(300))
+        second.cancel()
+
+        #expect(model.month.description == "2026-09")
+    }
+
+    @Test
     func showsUpcomingRecurringOnFutureDays() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()

@@ -1,5 +1,5 @@
 {
-  "description": "月の始まりごとの、その月の期間を出す。日付から月への向きも試す。start と end はその月に入り、start の前日と end の翌日は前後の月に入る。",
+  "description": "月の始まりごとの、その月の期間を出す。日付から月への向きも試す。start と end はその月に入り、start の前日と end の翌日は前後の月に入る。monthStartShift は `none` `previous` `next` で、空なら `none`。始まりが土日・祝日・年末年始（12/31〜1/3）に当たったら、前か次の平日にずらす。ずらしても、何月の期間かは変えない。",
   "cases": [
     { "summary": "1 日始まりの 2 月", "monthStartDay": 1, "month": "2026-02", "start": "2026-02-01", "end": "2026-02-28" },
     { "summary": "1 日始まりのうるう年の 2 月", "monthStartDay": 1, "month": "2028-02", "start": "2028-02-01", "end": "2028-02-29" },
@@ -14,6 +14,13 @@
     { "summary": "31 日始まりで 2 月に 31 日が無い", "monthStartDay": 31, "month": "2026-02", "start": "2026-01-31", "end": "2026-02-27" },
     { "summary": "31 日始まりで 3 月の始まりが 2 月 28 日", "monthStartDay": 31, "month": "2026-03", "start": "2026-02-28", "end": "2026-03-30" },
     { "summary": "31 日始まりで 4 月の始まりが 3 月 31 日", "monthStartDay": 31, "month": "2026-04", "start": "2026-03-31", "end": "2026-04-29" },
-    { "summary": "31 日始まりで 5 月の始まりが 4 月 30 日", "monthStartDay": 31, "month": "2026-05", "start": "2026-04-30", "end": "2026-05-30" }
+    { "summary": "31 日始まりで 5 月の始まりが 4 月 30 日", "monthStartDay": 31, "month": "2026-05", "start": "2026-04-30", "end": "2026-05-30" },
+    { "summary": "25 日始まりで日曜を前の平日にずらす", "monthStartDay": 25, "monthStartShift": "previous", "month": "2026-11", "start": "2026-10-23", "end": "2026-11-24" },
+    { "summary": "25 日始まりで日曜を次の平日にずらす", "monthStartDay": 25, "monthStartShift": "next", "month": "2026-11", "start": "2026-10-26", "end": "2026-11-24" },
+    { "summary": "1 日始まりを前の平日にずらすと前の月から始まる", "monthStartDay": 1, "monthStartShift": "previous", "month": "2026-11", "start": "2026-10-30", "end": "2026-11-30" },
+    { "summary": "1 日始まりを次の平日にずらす", "monthStartDay": 1, "monthStartShift": "next", "month": "2026-08", "start": "2026-08-03", "end": "2026-08-31" },
+    { "summary": "31 日始まりを次の平日にずらすと次の月から始まる", "monthStartDay": 31, "monthStartShift": "next", "month": "2026-11", "start": "2026-11-02", "end": "2026-11-29" },
+    { "summary": "5 日始まりで大型連休を前の平日にずらす", "monthStartDay": 5, "monthStartShift": "previous", "month": "2026-06", "start": "2026-05-01", "end": "2026-06-04" },
+    { "summary": "31 日始まりで年末年始を前の平日にずらす", "monthStartDay": 31, "monthStartShift": "previous", "month": "2027-01", "start": "2026-12-30", "end": "2027-01-28" }
   ]
 }

@@ -23,6 +23,41 @@ struct SettingWriteTests {
     }
 
     @Test
+    func savesMonthStartShift() async throws {
+        let database = try AppDatabase.inMemory()
+        let shifted = try #require(MonthStartDay(25, shift: .previous))
+        let plain = try #require(MonthStartDay(25))
+
+        try await database.setSetting(.monthStartDay, to: shifted)
+        let saved = try await database.setting(.monthStartDay)
+        let savedText = try await monthStartShiftText(in: database)
+        try await database.setSetting(.monthStartDay, to: plain)
+        let cleared = try await database.setting(.monthStartDay)
+        let clearedText = try await monthStartShiftText(in: database)
+
+        #expect(saved == shifted)
+        #expect(savedText == "previous")
+        #expect(cleared == plain)
+        #expect(clearedText == nil)
+    }
+
+    @Test
+    func announcesMonthStartShift() async throws {
+        let database = try AppDatabase.inMemory()
+        let payday = try #require(MonthStartDay(25))
+        let shifted = payday.shifted(by: .next)
+        try await database.setSetting(.monthStartDay, to: payday)
+        var updates = database.settingUpdates(.monthStartDay).makeAsyncIterator()
+
+        let initial = try await updates.next()
+        try await database.setSetting(.monthStartDay, to: shifted)
+        let changed = try await updates.next()
+
+        #expect(initial == payday)
+        #expect(changed == shifted)
+    }
+
+    @Test
     func savesClosedHints() async throws {
         let database = try AppDatabase.inMemory()
 
@@ -181,5 +216,16 @@ struct SettingWriteTests {
         #expect(initialKind == .expense)
         #expect(scale == .year)
         #expect(kind == .balance)
+    }
+}
+
+private extension SettingWriteTests {
+    func monthStartShiftText(in database: AppDatabase) async throws -> String? {
+        try await database.writer.read { db in
+            try String.fetchOne(
+                db,
+                sql: "SELECT value FROM setting WHERE key = 'month_start_shift'"
+            )
+        }
     }
 }

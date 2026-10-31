@@ -34,7 +34,8 @@ struct YearMonthTests {
 
     @Test(arguments: try periodCases)
     func findsPeriod(fixture: PeriodCase) {
-        let period = fixture.month.period(startingOn: fixture.monthStartDay)
+        let startDay = fixture.monthStartDay.shifted(by: fixture.monthStartShift ?? .none)
+        let period = fixture.month.period(startingOn: startDay)
         #expect(period == fixture.start...fixture.end)
     }
 
@@ -65,6 +66,7 @@ extension YearMonthTests {
 
     struct PeriodCase: Decodable, Sendable {
         let monthStartDay: MonthStartDay
+        let monthStartShift: HolidayShift?
         let month: YearMonth
         let start: LocalDate
         let end: LocalDate

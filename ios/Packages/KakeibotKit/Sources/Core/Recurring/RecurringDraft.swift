@@ -10,7 +10,7 @@ public struct RecurringDraft: Hashable, Sendable {
     public var frequency: Recurring.Frequency
     public var month: Int
     public var day: Int
-    public var holidayShift: Recurring.HolidayShift
+    public var holidayShift: HolidayShift
     public var closingDay: Int?
     public var fee: Int
     public var startDate: LocalDate
@@ -27,7 +27,7 @@ public struct RecurringDraft: Hashable, Sendable {
         frequency: Recurring.Frequency,
         month: Int,
         day: Int,
-        holidayShift: Recurring.HolidayShift = .none,
+        holidayShift: HolidayShift = .none,
         closingDay: Int? = nil,
         fee: Int = 0,
         startDate: LocalDate,

@@ -1,21 +1,47 @@
 import Core
 import Foundation
+import GRDB
 
 public struct SettingKey<Value: Sendable>: Sendable {
     public let defaultValue: Value
 
-    let key: Setting.Key
-    let decode: @Sendable (String) -> Value?
-    let encode: @Sendable (Value) -> String?
+    let read: @Sendable (Database) throws -> Value
+    let write: @Sendable (Value, Database) throws -> Void
 }
 
 public extension SettingKey where Value == MonthStartDay {
     static var monthStartDay: Self {
-        Self(
+        let day = Self(
             .monthStartDay,
             default: .first,
-            decode: { Int($0).flatMap(MonthStartDay.init) },
+            decode: { Int($0).flatMap { MonthStartDay($0) } },
             encode: { String($0.day) }
+        )
+
+        let shift = SettingKey<HolidayShift>.monthStartShift
+
+        return Self(
+            defaultValue: day.defaultValue,
+            read: { db in
+                let startDay = try day.read(db)
+                let holidayShift = try shift.read(db)
+                return startDay.shifted(by: holidayShift)
+            },
+            write: { startDay, db in
+                try day.write(startDay, db)
+                try shift.write(startDay.shift, db)
+            }
+        )
+    }
+}
+
+private extension SettingKey where Value == HolidayShift {
+    static var monthStartShift: Self {
+        Self(
+            .monthStartShift,
+            default: .none,
+            decode: { HolidayShift(rawValue: $0) },
+            encode: { $0 == .none ? nil : $0.rawValue }
         )
     }
 }
@@ -291,10 +317,23 @@ extension SettingKey {
         decode: @escaping @Sendable (String) -> Value?,
         encode: @escaping @Sendable (Value) -> String?
     ) {
-        self.key = key
         self.defaultValue = defaultValue
-        self.decode = decode
-        self.encode = encode
+
+        self.read = { db in
+            let setting = try Setting.fetchOne(db, key: key)
+            return setting.flatMap { decode($0.value) } ?? defaultValue
+        }
+
+        self.write = { value, db in
+            guard let text = encode(value) else {
+                _ = try Setting.deleteOne(db, key: key)
+                return
+            }
+
+            let setting = Setting(key: key, value: text)
+
+            try setting.save(db)
+        }
     }
 }
 

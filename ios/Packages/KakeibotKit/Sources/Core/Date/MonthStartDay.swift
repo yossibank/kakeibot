@@ -1,12 +1,17 @@
 public struct MonthStartDay: Hashable, Sendable {
     public let day: Int
+    public let shift: HolidayShift
 
-    public init?(_ day: Int) {
+    public init?(
+        _ day: Int,
+        shift: HolidayShift = .none
+    ) {
         guard (1...31).contains(day) else {
             return nil
         }
 
         self.day = day
+        self.shift = shift
     }
 }
 
@@ -16,17 +21,22 @@ public extension MonthStartDay {
     }
 
     static var allDays: [MonthStartDay] {
-        (1...31).map(MonthStartDay.init(validDay:))
+        (1...31).map { MonthStartDay(validDay: $0) }
     }
 
     var isLastDay: Bool {
         day == 31
     }
+
+    func shifted(by shift: HolidayShift) -> MonthStartDay {
+        MonthStartDay(validDay: day, shift: shift)
+    }
 }
 
 extension MonthStartDay {
     func date(in yearMonth: YearMonth) -> LocalDate {
-        LocalDate(yearMonth: yearMonth, clampedDay: day)
+        let date = LocalDate(yearMonth: yearMonth, clampedDay: day)
+        return shift.apply(to: date)
     }
 
     func period(startingIn yearMonth: YearMonth) -> ClosedRange<LocalDate> {
@@ -36,11 +46,28 @@ extension MonthStartDay {
 
         return start...end
     }
+
+    func periodMonth(startingIn yearMonth: YearMonth) -> YearMonth {
+        day == 1 ? yearMonth : yearMonth.adding(months: 1)
+    }
+
+    func startMonth(ofPeriodIn month: YearMonth) -> YearMonth {
+        day == 1 ? month : month.adding(months: -1)
+    }
+
+    func startMonth(ofPeriodContaining date: LocalDate) -> YearMonth {
+        let candidates = (-2...1).map { date.yearMonth.adding(months: $0) }
+        return candidates.first { period(startingIn: $0).contains(date) } ?? date.yearMonth
+    }
 }
 
 private extension MonthStartDay {
-    init(validDay day: Int) {
+    init(
+        validDay day: Int,
+        shift: HolidayShift = .none
+    ) {
         self.day = day
+        self.shift = shift
     }
 }
 

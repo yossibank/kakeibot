@@ -19,7 +19,7 @@ public final class RecurringEditModel {
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
 
-    public private(set) var holidayShift: Recurring.HolidayShift = .none
+    public private(set) var holidayShift: HolidayShift = .none
     public private(set) var type: Entry.Kind = .expense
     public private(set) var calculator = AmountCalculator()
     public private(set) var feeCalculator = AmountCalculator()
@@ -175,7 +175,7 @@ public extension RecurringEditModel {
         suggestHolidayShift()
     }
 
-    func choose(_ shift: Recurring.HolidayShift) {
+    func choose(_ shift: HolidayShift) {
         holidayShift = shift
         isHolidayShiftChosen = true
     }
@@ -279,7 +279,7 @@ private extension RecurringEditModel {
     static let loadFailedMessage = "固定費を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
 
-    var suggestedHolidayShift: Recurring.HolidayShift {
+    var suggestedHolidayShift: HolidayShift {
         guard type != .transfer else {
             return .next
         }

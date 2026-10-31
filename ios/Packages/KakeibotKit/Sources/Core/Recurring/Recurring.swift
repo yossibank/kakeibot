@@ -78,12 +78,6 @@ public extension Recurring {
         case monthly
         case yearly
     }
-
-    enum HolidayShift: String, CaseIterable, Codable, Sendable {
-        case none
-        case previous
-        case next
-    }
 }
 
 extension Recurring: Codable {

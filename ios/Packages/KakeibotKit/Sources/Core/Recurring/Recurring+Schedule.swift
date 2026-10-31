@@ -28,7 +28,7 @@ public extension Recurring {
 
         return months(from: first, through: last)
             .map { LocalDate(yearMonth: $0, clampedDay: day) }
-            .map { Occurrence(scheduled: $0, date: shifted($0)) }
+            .map { Occurrence(scheduled: $0, date: holidayShift.apply(to: $0)) }
             .filter { lower <= $0.date && $0.date <= upper }
     }
 
@@ -73,7 +73,7 @@ public extension Recurring {
     }
 
     func scheduledDate(shiftedTo date: LocalDate) -> LocalDate? {
-        scheduledDates(shiftedInto: date.yearMonth).first { shifted($0) == date }
+        scheduledDates(shiftedInto: date.yearMonth).first { holidayShift.apply(to: $0) == date }
     }
 
     func scheduledDates(shiftedInto month: YearMonth) -> [LocalDate] {
@@ -82,7 +82,7 @@ public extension Recurring {
 
         return months(from: previous, through: next)
             .map { LocalDate(yearMonth: $0, clampedDay: day) }
-            .filter { shifted($0).yearMonth == month }
+            .filter { holidayShift.apply(to: $0).yearMonth == month }
     }
 
     func occurrenceMonth(of date: LocalDate) -> YearMonth {
@@ -92,26 +92,6 @@ public extension Recurring {
 
 private extension Recurring {
     static let searchDays = 400
-
-    func shifted(_ date: LocalDate) -> LocalDate {
-        let step = switch holidayShift {
-        case .none: 0
-        case .previous: -1
-        case .next: 1
-        }
-
-        guard step != 0 else {
-            return date
-        }
-
-        var shifted = date
-
-        while Holiday.isDayOff(shifted) {
-            shifted = shifted.adding(days: step)
-        }
-
-        return shifted
-    }
 
     func months(
         from first: YearMonth,

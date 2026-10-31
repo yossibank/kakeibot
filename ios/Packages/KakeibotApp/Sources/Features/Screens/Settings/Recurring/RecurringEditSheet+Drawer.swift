@@ -136,9 +136,9 @@ private extension RecurringEditSheet {
                 .multilineTextAlignment(.center)
 
             HStack(spacing: 8) {
-                ForEach(Recurring.HolidayShift.allCases, id: \.self) { shift in
+                ForEach(HolidayShift.allCases, id: \.self) { shift in
                     SettingsChoice(
-                        RecurringText.holidayShift(shift),
+                        shift.title,
                         isSelected: model.holidayShift == shift
                     ) {
                         model.choose(shift)
@@ -220,7 +220,7 @@ private extension RecurringEditSheet {
     }
 
     var closingDaySelection: MonthStartDay? {
-        model.closingDay.flatMap(MonthStartDay.init)
+        model.closingDay.flatMap { MonthStartDay($0) }
     }
 
     var isEndingToday: Bool {

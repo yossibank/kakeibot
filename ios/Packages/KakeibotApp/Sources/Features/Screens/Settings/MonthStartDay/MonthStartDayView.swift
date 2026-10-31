@@ -21,7 +21,8 @@ public struct MonthStartDayView: View {
                         headline: ("給料日に合わせて", "1 か月を数えられます"),
                         notes: [
                             .init("arrow.right", "給料日から、次の給料日の前日までです"),
-                            .init("calendar.badge.exclamationmark", "29〜31 日が無い月は、月末からです")
+                            .init("calendar.badge.exclamationmark", "29〜31 日が無い月は、月末からです"),
+                            .init("arrow.left.arrow.right", "土日・祝日は、平日にずらせます")
                         ]
                     )
 
@@ -32,6 +33,8 @@ public struct MonthStartDayView: View {
                             await model.choose(day)
                         }
                     }
+
+                    shiftSection
                 }
                 .padding(.vertical, 8)
             }
@@ -52,6 +55,38 @@ public struct MonthStartDayView: View {
         .task {
             await model.load()
         }
+    }
+}
+
+private extension MonthStartDayView {
+    var shiftSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("土日・祝日のとき")
+                .textFont(.caption2)
+                .tracking(3)
+                .foregroundStyle(Palette.accent)
+
+            HStack(spacing: 8) {
+                ForEach(HolidayShift.allCases, id: \.self) { shift in
+                    SettingsChoice(shift.title, isSelected: model.startDay.shift == shift) {
+                        Task {
+                            await model.choose(shift)
+                        }
+                    }
+                }
+            }
+
+            Text(model.shiftNote)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .monospacedDigit()
+                .fixedSize(horizontal: false, vertical: true)
+                .contentTransition(.numericText())
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .card()
+        .animation(.snappy, value: model.shiftNote)
     }
 }
 

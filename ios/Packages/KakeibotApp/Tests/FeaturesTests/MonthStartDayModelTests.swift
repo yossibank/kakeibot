@@ -25,6 +25,30 @@ struct MonthStartDayModelTests {
     }
 
     @Test
+    func keepsShiftWhenChangingDay() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let payday = try #require(MonthStartDay(25))
+        let earlier = try #require(MonthStartDay(20))
+        let model = MonthStartDayModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        await model.choose(payday)
+        let plainNote = model.shiftNote
+        await model.choose(.previous)
+        let shiftedText = model.periodText
+        let weekdayNote = model.shiftNote
+        await model.choose(earlier)
+        let saved = try await setup.database.setting(.monthStartDay)
+
+        #expect(plainNote == "土日・祝日でも、そのまま数えます")
+        #expect(shiftedText == "9/25〜10/22")
+        #expect(weekdayNote == "今の期間の始まりは、平日です")
+        #expect(model.periodText == "9/18〜10/19")
+        #expect(model.shiftNote == "9/20（日）を 9/18（金）にずらしています")
+        #expect(saved == earlier.shifted(by: .previous))
+    }
+
+    @Test
     func countsHomeByPeriod() async throws {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
