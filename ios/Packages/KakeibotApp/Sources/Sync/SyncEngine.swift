@@ -11,6 +11,7 @@ public actor SyncEngine {
     var sending: [SyncKey: SyncChange] = [:]
     var owners: [String: String] = [:]
     var isSyncEnabled = false
+    var knowsZones = false
 
     public init(
         database: AppDatabase,
@@ -100,6 +101,7 @@ public extension SyncEngine {
         let engine = CKSyncEngine(configuration)
 
         self.engine = engine
+        knowsZones = state != nil
 
         if state == nil,
            isSyncEnabled,
@@ -146,6 +148,7 @@ extension SyncEngine {
         SyncRoute(
             isShared: isShared,
             isSyncEnabled: isSyncEnabled,
+            knowsZones: knowsZones,
             owners: owners
         )
     }
@@ -222,6 +225,7 @@ extension SyncEngine: CKSyncEngineDelegate {
         case .willFetchChanges:
             await showFetching(true)
         case .didFetchChanges:
+            knowsZones = true
             await showFetching(false)
             await showSynced()
         case .didSendChanges:

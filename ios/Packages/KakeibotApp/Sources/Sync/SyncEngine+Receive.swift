@@ -33,6 +33,10 @@ extension SyncEngine {
             return
         }
 
+        guard route.receivesOwnZoneDeletion else {
+            return
+        }
+
         switch deletion.reason {
         case .encryptedDataReset:
             try? await database.resetSync(isShared: false)

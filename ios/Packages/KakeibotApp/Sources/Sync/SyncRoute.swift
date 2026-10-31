@@ -4,6 +4,7 @@ import Store
 struct SyncRoute: Sendable {
     let isShared: Bool
     let isSyncEnabled: Bool
+    let knowsZones: Bool
     let owners: [String: String]
 }
 
@@ -18,6 +19,10 @@ extension SyncRoute {
         case saveZoneAgain
         case sendAgain
         case skip
+    }
+
+    var receivesOwnZoneDeletion: Bool {
+        knowsZones
     }
 
     func isForeign(_ zoneName: String) -> Bool {
