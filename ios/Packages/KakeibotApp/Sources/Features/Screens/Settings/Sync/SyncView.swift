@@ -95,8 +95,8 @@ public struct SyncView: View {
             message: "この iPhone から口座と記録が消えます。自分の口座との振替は、支出と収入にして残します",
             keepTitle: "やめる",
             confirmTitle: "抜ける"
-        ) {
-            leave()
+        ) { [leaving] in
+            leave(leaving)
         }
         .confirmation(
             isPresented: isStoppingBinding,
@@ -105,8 +105,8 @@ public struct SyncView: View {
             message: "相手の iPhone から、この口座と記録が消えます。この iPhone には残ります",
             keepTitle: "続ける",
             confirmTitle: "やめる"
-        ) {
-            stopSharing()
+        ) { [stopping] in
+            stopSharing(stopping)
         }
         .overlay {
             if let choice = model.choice {
@@ -287,15 +287,13 @@ private extension SyncView {
         }
     }
 
-    func leave() {
-        guard let leaving else {
+    func leave(_ item: JoinedShare?) {
+        guard let item else {
             return
         }
 
-        self.leaving = nil
-
         Task {
-            await model.leave(leaving)
+            await model.leave(item)
         }
     }
 
@@ -304,15 +302,13 @@ private extension SyncView {
         stopping = item
     }
 
-    func stopSharing() {
-        guard let stopping else {
+    func stopSharing(_ item: WalletShare?) {
+        guard let item else {
             return
         }
 
-        self.stopping = nil
-
         Task {
-            await model.stopSharing(stopping)
+            await model.stopSharing(item)
         }
     }
 
