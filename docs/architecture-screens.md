@@ -96,3 +96,6 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 | iOS のウィジェットの描き方 | ホームと同じ `MonthOverview` を使う。背景は、テーマ（`ThemePalette`）の色の値から作った色で描く |
 | iOS のウィジェットの更新 | AppModel が、記録・予算・固定費・テンプレートとその並べ順・テーマの変化を見張って更新する。日付が変わるときはタイムラインで切り替える |
 | すぐ記録の書き込み | 押したときだけ、AppIntent が `appGroupForWriting()` で開いて書く。通知を予約し直し、すべてのウィジェットを更新する |
+| すぐ記録の反映 | アプリを前面に戻すと、書いた記録が画面に出る |
+| DB のファイル保護 | `NSFileProtectionCompleteUntilFirstUserAuthentication` にそろえる。ロック中も、ロック画面のウィジェットが金額を出す |
+| DB のバックアップ | App Group の DB は、端末の iCloud バックアップに含まれる |
