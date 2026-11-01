@@ -11,7 +11,11 @@ struct SettingsSwitch: View {
     let change: (Bool) async -> Void
 
     var body: some View {
-        GoldSwitch(isOn: binding, systemImage: systemImage) {
+        GoldSwitch(
+            isOn: binding,
+            systemImage: systemImage,
+            insets: EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+        ) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .textFont(.subheadline)
