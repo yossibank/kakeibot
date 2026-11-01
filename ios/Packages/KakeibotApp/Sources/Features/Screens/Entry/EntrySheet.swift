@@ -249,11 +249,7 @@ private extension EntrySheet {
             Spacer()
 
             if model.isEditing {
-                RingButton(
-                    systemImage: "trash",
-                    style: .destructive,
-                    label: "削除"
-                ) {
+                RingButton(systemImage: "trash", style: .destructive) {
                     Task {
                         await delete()
                     }
@@ -273,6 +269,16 @@ private extension EntrySheet {
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
+        .overlay(alignment: .topTrailing) {
+            if model.showsItems {
+                EntryItemButton(
+                    count: model.items.count,
+                    hasAdjustment: model.hasItemAdjustment
+                ) {
+                    open(.items)
+                }
+            }
+        }
     }
 }
 

@@ -18,6 +18,12 @@ public extension AppDatabase {
         }
     }
 
+    func recentItemNames(limit: Int) async throws -> [String] {
+        try await writer.read { db in
+            try String.fetchAll(db, sql: Self.recentItemNamesSQL, arguments: [limit])
+        }
+    }
+
     func itemNames(at store: String) async throws -> [String: String] {
         try await writer.read { db in
             let names = try ItemName.filter(Column("store") == store).fetchAll(db)
@@ -134,6 +140,14 @@ extension AppDatabase {
 }
 
 private extension AppDatabase {
+    static let recentItemNamesSQL = """
+    SELECT name FROM entry_item
+    WHERE amount > 0
+    GROUP BY name
+    ORDER BY MAX(updated_at) DESC
+    LIMIT ?
+    """
+
     static func replaceItems(
         _ existing: [EntryItem],
         with drafts: [EntryItem.Draft],

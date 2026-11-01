@@ -48,6 +48,40 @@ struct SnapshotTests {
             .environment(\.colorScheme, .light)
 
         try Self.write(closed, to: "entry-closed.png")
+
+        let itemModel = try await Self.model(
+            .expense,
+            digits: Self.itemDigits,
+            startsWithAmount: false
+        )
+
+        Self.addItems(to: itemModel)
+
+        let itemSlip = EntrySheet(model: itemModel)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .background(Color(uiColor: .systemBackground))
+            .environment(\.colorScheme, .light)
+
+        try Self.write(itemSlip, to: "entry-item-slip.png")
+
+        let itemSheet = EntryItemSheet(model: itemModel)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .environment(\.colorScheme, .light)
+
+        try Self.write(itemSheet, to: "entry-item-sheet.png")
+
+        let emptySheet = EntryItemSheet(model: closedModel)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .environment(\.colorScheme, .dark)
+
+        try Self.write(emptySheet, to: "entry-item-empty.png")
+
+        let help = EntryItemHelp {}
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .background(Palette.background)
+            .environment(\.colorScheme, .light)
+
+        try Self.write(help, to: "entry-item-help.png")
     }
 }
 
@@ -58,6 +92,7 @@ private extension SnapshotTests {
 
     static let smallDigits: [AmountCalculator.Key] = [.digit(1), .digit(2), .doubleZero]
     static let largeDigits = (2...9).reversed().map(AmountCalculator.Key.digit)
+    static let itemDigits: [AmountCalculator.Key] = [.digit(6), .digit(6), .digit(6)]
 
     static let cases: [(String, Entry.Kind, [AmountCalculator.Key])] = [
         ("entry-expense", .expense, smallDigits),
@@ -86,6 +121,12 @@ private extension SnapshotTests {
         }
 
         return model
+    }
+
+    static func addItems(to model: EntryModel) {
+        model.memo = "スーパー山田"
+        model.addItem(name: "牛乳", quantity: 2, amount: 396)
+        model.addItem(name: "食パン", amount: 250)
     }
 
     static func write(
