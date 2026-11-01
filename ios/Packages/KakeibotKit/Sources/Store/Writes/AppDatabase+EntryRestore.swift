@@ -6,6 +6,7 @@ public extension AppDatabase {
     func restoreEntry(
         _ entry: Entry,
         fee: Entry? = nil,
+        items: [EntryItem]? = nil,
         restoringNoSpend days: [NoSpendDay] = [],
         at now: Date = Date()
     ) async throws {
@@ -17,7 +18,8 @@ public extension AppDatabase {
             change.before = try Self.existingRows(of: restored, in: db)
             change.after = restored
 
-            try Self.restore([entry], in: db)
+            try Self.restore([entry], in: db, at: now)
+            try Self.restoreItems(items, of: [entry.id], in: db)
 
             _ = try Entry
                 .filter(Column("transfer_id") == entry.id)
@@ -25,7 +27,7 @@ public extension AppDatabase {
                 .deleteAll(db)
 
             if let fee {
-                try Self.restore([fee], in: db)
+                try Self.restore([fee], in: db, at: now)
             }
 
             try Self.restoreNoSpendDays(days, in: db)
@@ -35,6 +37,7 @@ public extension AppDatabase {
 
     func restoreEntries(
         _ entries: [Entry],
+        items: [EntryItem]? = nil,
         at now: Date = Date()
     ) async throws {
         try await writer.write { db in
@@ -43,7 +46,8 @@ public extension AppDatabase {
             change.before = try Self.existingRows(of: entries, in: db)
             change.after = entries
 
-            try Self.restore(entries, in: db)
+            try Self.restore(entries, in: db, at: now)
+            try Self.restoreItems(items, of: entries.map(\.id), in: db)
             try Self.recalculateCardBills(change, in: db, at: now)
         }
     }
@@ -70,7 +74,8 @@ extension AppDatabase {
 private extension AppDatabase {
     static func restore(
         _ entries: [Entry],
-        in db: Database
+        in db: Database,
+        at now: Date
     ) throws {
         let ordered = entries.filter { $0.transferId == nil }
             + entries.filter { $0.transferId != nil }
@@ -88,7 +93,14 @@ private extension AppDatabase {
                 entry.transferId = nil
             }
 
+            let existing = try Entry.fetchOne(db, key: entry.id)
+
             try entry.save(db)
+
+            if let existing,
+               existing.walletId != entry.walletId || existing.toWalletId != entry.toWalletId {
+                try touchItems(of: [entry.id], in: db, at: now)
+            }
 
             if entry.type == .expense {
                 try clearNoSpendDay(on: entry.date, in: db)

@@ -9,6 +9,15 @@ public extension AppDatabase {
         }
     }
 
+    func entryItems(of ids: [Entry.ID]) async throws -> [EntryItem] {
+        try await writer.read { db in
+            try EntryItem
+                .filter(ids.contains(Column("entry_id")))
+                .order(Column("entry_id"), Column("sort_order"))
+                .fetchAll(db)
+        }
+    }
+
     func itemNames(at store: String) async throws -> [String: String] {
         try await writer.read { db in
             let names = try ItemName.filter(Column("store") == store).fetchAll(db)
@@ -23,6 +32,12 @@ public extension AppDatabase {
         at store: String,
         on now: Date
     ) async throws {
+        let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !name.isEmpty else {
+            return
+        }
+
         try await writer.write { db in
             let existing = try ItemName
                 .filter(Column("store") == store)
@@ -81,6 +96,27 @@ extension AppDatabase {
         if let before,
            before.walletId != entry.walletId || before.toWalletId != entry.toWalletId {
             try touchItems(of: [entry.id], in: db, at: now)
+        }
+    }
+
+    static func restoreItems(
+        _ items: [EntryItem]?,
+        of ids: [Entry.ID],
+        in db: Database
+    ) throws {
+        guard let items else {
+            return
+        }
+
+        let keptIDs = items.map(\.id)
+
+        _ = try EntryItem
+            .filter(ids.contains(Column("entry_id")))
+            .filter(!keptIDs.contains(Column("id")))
+            .deleteAll(db)
+
+        for item in items where try Entry.exists(db, key: item.entryId) {
+            try item.save(db)
         }
     }
 

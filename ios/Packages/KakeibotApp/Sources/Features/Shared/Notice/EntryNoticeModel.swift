@@ -45,7 +45,8 @@ public extension EntryNoticeModel {
             case let .changed(change):
                 try await undo(change)
             case let .batch(batch):
-                try await database.restoreEntries(batch.previous)
+                let items = batch.kind == .deleted ? batch.items : nil
+                try await database.restoreEntries(batch.previous, items: items)
             case .undone, .failed, nil:
                 return
             }
@@ -82,8 +83,9 @@ public extension EntryNoticeModel {
 
     func deleteEntries(_ ids: [Entry.ID]) async {
         do {
+            let items = try await database.entryItems(of: ids)
             let previous = try await database.deleteEntries(ids)
-            let batch = EntryBatch(kind: .deleted, previous: previous)
+            let batch = EntryBatch(kind: .deleted, previous: previous, items: items)
             notice = .batch(batch)
         } catch {
             notice = .failed(Self.deleteFailedMessage)
@@ -104,6 +106,7 @@ public extension EntryNoticeModel {
         }
 
         do {
+            let items = try await database.entryItems(of: id)
             let deleted = try await database.deleteEntry(id)
 
             let label = EntryChange.label(for: entry) { id in
@@ -118,7 +121,8 @@ public extension EntryNoticeModel {
                 kind: .deleted,
                 entry: deleted.first { $0.id == id } ?? entry,
                 label: label,
-                fee: fee
+                fee: fee,
+                items: items
             )
 
             show(change)
@@ -194,7 +198,7 @@ private extension EntryNoticeModel {
                 restoringNoSpend: change.clearedNoSpendDays
             )
         case .deleted:
-            try await database.restoreEntry(change.entry, fee: change.fee)
+            try await database.restoreEntry(change.entry, fee: change.fee, items: change.items)
         }
     }
 }

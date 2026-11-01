@@ -81,6 +81,37 @@ struct EntryItemWriteTests {
     }
 
     @Test
+    func restoresItemsWithDeletedEntries() async throws {
+        let setup = try await EntryWriteTests.Setup()
+        var draft = setup.draft
+        draft.items = Self.items
+        let entry = try await setup.database.saveEntry(draft, at: setup.now)
+        let items = try await setup.database.entryItems(of: [entry.id])
+
+        let deleted = try await setup.database.deleteEntries([entry.id])
+        try await setup.database.restoreEntries(deleted, items: items)
+
+        #expect(try await setup.database.entryItems(of: entry.id) == items)
+    }
+
+    @Test
+    func keepsItemsWhenRestoringWithoutItems() async throws {
+        let setup = try await EntryWriteTests.Setup()
+        let options = try await setup.database.entryOptions()
+        var draft = setup.draft
+        draft.items = Self.items
+        let entry = try await setup.database.saveEntry(draft, at: setup.now)
+
+        let change = EntryBatchChange.wallet(options.wallets[1].id)
+        let previous = try await setup.database.changeEntries([entry.id], to: change, at: setup.now)
+        try await setup.database.restoreEntries(previous, at: setup.now.addingTimeInterval(120))
+        let items = try await setup.database.entryItems(of: entry.id)
+
+        #expect(items.count == 3)
+        #expect(items.allSatisfy { $0.updatedAt == setup.now.addingTimeInterval(120) })
+    }
+
+    @Test
     func touchesItemsWhenWalletChanges() async throws {
         let setup = try await EntryWriteTests.Setup()
         let options = try await setup.database.entryOptions()
@@ -104,6 +135,7 @@ struct EntryItemWriteTests {
         try await database.rememberItemName("牛乳", for: "ｷﾞｭｳﾆｭｳ", at: "青葉", on: setup.now)
         try await database.rememberItemName("低脂肪乳", for: "ｷﾞｭｳﾆｭｳ", at: "青葉", on: setup.now)
         try await database.rememberItemName("牛乳", for: "ｷﾞｭｳﾆｭｳ", at: "若葉", on: setup.now)
+        try await database.rememberItemName("  ", for: "ﾊﾟﾝ", at: "青葉", on: setup.now)
         let aoba = try await database.itemNames(at: "青葉")
         let count = try database.snapshot().itemNames.count
 
