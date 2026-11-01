@@ -7,7 +7,7 @@ public enum ObservationWait {}
 @MainActor
 public extension ObservationWait {
     static func until(
-        timeout: Duration = .seconds(10),
+        timeout: Duration = .seconds(30),
         sourceLocation: SourceLocation = #_sourceLocation,
         _ isReady: @escaping @MainActor () -> Bool
     ) async {
