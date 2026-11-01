@@ -61,6 +61,7 @@ expense・income の列は、描画に使わない。
 | closed_hidden_lists | 非表示の項目をたたんだ設定の画面。書き方は closed_hints と同じ | 空ならすべて開く |
 | recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで | |
 | widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。取り消すと消す | その記録で支出なしの印を消したときは、`,` に続けてその日付（`2026-10-03`）を付ける |
+| receipt_saved_count | レシートから読んで保存した記録の数 | 空なら 0。Pro でなければ 3 で止める |
 | fee_category_id | 振替の手数料に付ける category の id | |
 | transfer_out_category_id | 抜けた共有の財布への振替を、支出に変えるときに付ける category の id | |
 | transfer_in_category_id | 抜けた共有の財布からの振替を、収入に変えるときに付ける category の id | |
