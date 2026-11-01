@@ -9,7 +9,15 @@ extension ProStore {
     } updates: {
         ProEntitlement.updates()
     } price: {
-        try await ProEntitlement.product().displayPrice
+        let price = try await ProEntitlement.product().displayPrice
+
+        ProEntitlement.cachedPrice.withLock { cachedPrice in
+            cachedPrice = price
+        }
+
+        return price
+    } cachedPrice: {
+        ProEntitlement.cachedPrice.withLock { $0 }
     } purchase: {
         try await ProEntitlement.purchase()
     } restore: {
@@ -25,6 +33,7 @@ extension ProStore {
 
 private enum ProEntitlement {
     static let productID = "com.yossibank.kakeibot.pro"
+    static let cachedPrice = Mutex<String?>(nil)
     static let listeners = Mutex<[UUID: AsyncStream<ProStatus>.Continuation]>([:])
 
     static func status() async -> ProStatus {

@@ -15,6 +15,7 @@ public final class ProPurchaseModel {
 
     public init(store: ProStore) {
         self.store = store
+        self.price = store.cachedPrice()
     }
 }
 
@@ -28,7 +29,11 @@ public extension ProPurchaseModel {
     }
 
     func load() async {
-        price = try? await store.price()
+        guard let price = try? await store.price() else {
+            return
+        }
+
+        self.price = price
     }
 
     func purchase() async -> Bool {

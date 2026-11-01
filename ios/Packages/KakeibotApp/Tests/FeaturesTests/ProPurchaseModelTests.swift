@@ -24,6 +24,23 @@ struct ProPurchaseModelTests {
     }
 
     @Test
+    func showsCachedPriceBeforeLoading() {
+        let model = ProPurchaseModel(store: .stub(cachedPrice: "¥600"))
+
+        #expect(model.price == "¥600")
+        #expect(model.purchaseTitle == "¥600 で購入する")
+    }
+
+    @Test
+    func keepsCachedPriceWhenReloadFails() async {
+        let model = ProPurchaseModel(store: .stub(cachedPrice: "¥600"))
+
+        await model.load()
+
+        #expect(model.purchaseTitle == "¥600 で購入する")
+    }
+
+    @Test
     func keepsPlainTitleBeforeLoading() {
         let model = ProPurchaseModel(store: .stub())
         #expect(model.purchaseTitle == "購入する")
@@ -123,6 +140,7 @@ extension ProPurchaseModelTests {
 private extension ProStore {
     static func stub(
         price: Result<String, any Error> = .failure(ProPurchaseModelTests.StubError()),
+        cachedPrice: String? = nil,
         purchase: Result<ProStatus, any Error> = .success(.locked),
         restore: Result<ProStatus, any Error> = .success(.locked)
     ) -> Self {
@@ -137,6 +155,9 @@ private extension ProStore {
             },
             price: {
                 try price.get()
+            },
+            cachedPrice: {
+                cachedPrice
             },
             purchase: {
                 try purchase.get()
