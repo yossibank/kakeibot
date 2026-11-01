@@ -25,8 +25,8 @@ flowchart LR
 | 7 | テーマ（`ThemePalette`） | iOS | ✅ 完了 |
 | 8 | ごほうび貯金（`RewardRule`・`RewardGoal`・`RewardLog`） | iOS | ✅ 完了 |
 | 9 | ウィジェット | iOS | ✅ 完了 |
-| 10 | 端末間の同期と家族との共有（iCloud） | iOS | 🚧 作業中 |
-| 11 | Pro の課金（買い切り） | iOS | 🚧 作業中 |
+| 10 | 端末間の同期と家族との共有（iCloud） | iOS | ✅ 完了 |
+| 11 | Pro の課金（買い切り） | iOS | ✅ 完了 |
 | 12 | ストアの準備と公開 | iOS | ⬜ 未着手 |
 | 13 | Core を Kotlin に移して fixtures を通し、1〜9 の画面を作る | Android | ⬜ 未着手 |
 | 14 | ストアの準備と公開 | Android | ⬜ 未着手 |
