@@ -81,6 +81,29 @@ extension AppModelTests {
     }
 
     @Test
+    func showsNoticeWhenSyncFailsToStop() async throws {
+        let database = try AppDatabase.inMemory()
+        try await database.turnOnSync()
+
+        try await database.writer.write { db in
+            try db.execute(
+                sql: """
+                CREATE TRIGGER fail_sync_state BEFORE UPDATE ON sync_state
+                BEGIN SELECT RAISE(ABORT, 'failing for tests'); END
+                """
+            )
+        }
+
+        let model = AppModel(openDatabase: { database }, proStore: .stub(status: .revoked))
+
+        await model.observePro(in: database)
+
+        #expect(try await database.isSyncEnabled())
+        #expect(!model.isPro)
+        #expect(model.notice.message == "同期を止められませんでした。設定の「同期と共有」から止めてください")
+    }
+
+    @Test
     func keepsSyncOnWhenLocked() async throws {
         let database = try AppDatabase.inMemory()
         try await database.turnOnSync()
