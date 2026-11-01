@@ -57,12 +57,14 @@ extension SettingsSheet {
         tint: Color? = nil,
         trailingImage: String = "chevron.right"
     ) -> SettingsRow<SettingsRowValue?> {
-        SettingsRow(
+        let accessory = value.map { SettingsRowValue(value: $0, shortValue: shortValue) }
+
+        return SettingsRow(
             title,
             systemImage: systemImage,
             tint: tint,
             trailingImage: trailingImage,
-            accessory: value.map { SettingsRowValue(value: $0, shortValue: shortValue) }
+            accessory: accessory
         )
     }
 
