@@ -246,6 +246,7 @@
         "name": "牛乳",
         "quantity": 2,
         "amount": 396,
+        "taxRate": 8,
         "sortOrder": 0,
         "createdAt": "2026-09-27T00:00:00Z",
         "updatedAt": "2026-09-27T00:00:00Z"
@@ -256,6 +257,7 @@
         "name": "値引",
         "quantity": 1,
         "amount": -30,
+        "taxRate": null,
         "sortOrder": 1,
         "createdAt": "2026-09-27T00:00:00Z",
         "updatedAt": "2026-09-27T00:00:00Z"

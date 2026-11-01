@@ -12,6 +12,7 @@ struct EntryItemSheet: View {
     @State var target: Target = .unit
     @State var editingIndex: Int?
     @State var editingItem: EntryItem.Draft?
+    @State var taxRate: EntryItem.TaxRate?
     @State var isSlipOpen = false
     @State var removed: EntryModel.RemovedItem?
     @State var openIndex: Int?
@@ -136,7 +137,11 @@ private extension EntryItemSheet {
 
             EntryReceiptRule(style: .dashed)
 
-            summaryLine("小計", amount: model.itemTotal)
+            summaryLine("小計", amount: model.itemTotals.subtotal)
+
+            ForEach(model.itemTotals.taxes, id: \.rate) { tax in
+                taxLine(tax)
+            }
 
             if model.hasItemAdjustment {
                 adjustmentLine
@@ -255,6 +260,14 @@ private extension EntryItemSheet {
                     .textFont(.body)
                     .monospacedDigit()
                     .foregroundStyle(Palette.text)
+
+                if showsRates {
+                    Text(item.taxRate.map { "\($0.rawValue)%" } ?? "")
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accent)
+                        .frame(width: Self.rateWidth, alignment: .trailing)
+                }
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 4)
@@ -290,11 +303,40 @@ private extension EntryItemSheet {
                 .foregroundStyle(Palette.text)
         }
     }
+
+    func taxLine(_ tax: EntryItemTotal.Tax) -> some View {
+        HStack {
+            Text("\(tax.rate.rawValue)%対象")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+
+            Text(AmountText.text(tax.base))
+                .textFont(.caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+
+            Spacer()
+
+            Text("消費税")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+
+            Text(AmountText.text(tax.amount))
+                .textFont(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.text)
+        }
+    }
 }
 
 private extension EntryItemSheet {
     static let noticeBottom: CGFloat = 76
     static let iconWidth: CGFloat = 20
+    static let rateWidth: CGFloat = 28
+
+    var showsRates: Bool {
+        model.items.contains { $0.taxRate != nil }
+    }
 
     var receiptShape: EntryReceiptShape {
         EntryReceiptShape(tooth: 12, hasTopEdge: true)

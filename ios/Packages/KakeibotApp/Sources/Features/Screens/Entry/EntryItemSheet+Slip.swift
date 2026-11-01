@@ -57,7 +57,9 @@ extension EntryItemSheet {
 
             equation
 
-            Keypad(calculator: activeCalculator) { key in
+            CapsulePicker(selection: $taxRate, options: Self.taxOptions, size: .small)
+
+            Keypad(calculator: activeCalculator, showsTax: false) { key in
                 press(key)
             }
 
@@ -95,6 +97,7 @@ extension EntryItemSheet {
             target = .unit
             editingIndex = index
             editingItem = item
+            taxRate = item.taxRate
         }
 
         withAnimation(.snappy) {
@@ -120,6 +123,12 @@ extension EntryItemSheet {
 }
 
 private extension EntryItemSheet {
+    static let taxOptions: [CapsulePicker<EntryItem.TaxRate?>.Option] = [
+        .init("税込", value: nil),
+        .init("8%", value: .reduced),
+        .init("10%", value: .standard)
+    ]
+
     var slipTitle: String {
         editingIndex.map { "品目 \($0 + 1) を変更" } ?? "品目を追加"
     }
@@ -270,14 +279,16 @@ private extension EntryItemSheet {
                 at: editingIndex,
                 name: trimmedName,
                 quantity: lineQuantity,
-                amount: lineAmount
+                amount: lineAmount,
+                taxRate: taxRate
             )
         } else {
             withAnimation(.snappy) {
                 model.addItem(
                     name: trimmedName,
                     quantity: quantityValue,
-                    amount: lineAmount
+                    amount: lineAmount,
+                    taxRate: taxRate
                 )
             }
         }
@@ -302,6 +313,7 @@ private extension EntryItemSheet {
             target = .unit
             editingIndex = nil
             editingItem = nil
+            taxRate = model.items.last?.taxRate
         }
     }
 

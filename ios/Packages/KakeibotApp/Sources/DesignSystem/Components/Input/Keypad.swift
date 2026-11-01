@@ -7,15 +7,18 @@ public struct Keypad: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let calculator: AmountCalculator
+    let showsTax: Bool
     let onDone: (() -> Void)?
     let onKey: (AmountCalculator.Key) -> Void
 
     public init(
         calculator: AmountCalculator,
+        showsTax: Bool = true,
         onDone: (() -> Void)? = nil,
         onKey: @escaping (AmountCalculator.Key) -> Void
     ) {
         self.calculator = calculator
+        self.showsTax = showsTax
         self.onDone = onDone
         self.onKey = onKey
     }
@@ -27,7 +30,12 @@ public struct Keypad: View {
             ForEach(rows, id: \.offset) { _, row in
                 GridRow {
                     ForEach(row, id: \.self) { key in
-                        button(for: key)
+                        if isHidden(key) {
+                            Color.clear
+                                .frame(maxWidth: .infinity, minHeight: 50)
+                        } else {
+                            button(for: key)
+                        }
                     }
                 }
             }
@@ -139,6 +147,14 @@ private extension Keypad {
 
     var showsDone: Bool {
         onDone != nil && !calculator.hasOperation
+    }
+
+    func isHidden(_ key: AmountCalculator.Key) -> Bool {
+        guard case .tax = key else {
+            return false
+        }
+
+        return !showsTax
     }
 
     func background(

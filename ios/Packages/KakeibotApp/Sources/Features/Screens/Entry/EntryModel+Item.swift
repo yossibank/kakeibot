@@ -12,8 +12,12 @@ public extension EntryModel {
         type != .transfer
     }
 
+    var itemTotals: EntryItemTotal {
+        EntryItemTotal(items)
+    }
+
     var itemTotal: Int {
-        items.reduce(0) { $0 + $1.amount }
+        itemTotals.total
     }
 
     var itemAdjustment: Int {
@@ -56,9 +60,15 @@ public extension EntryModel {
     func addItem(
         name: String,
         quantity: Int = 1,
-        amount: Int
+        amount: Int,
+        taxRate: EntryItem.TaxRate? = nil
     ) {
-        let draft = EntryItem.Draft(name: name, quantity: quantity, amount: amount)
+        let draft = EntryItem.Draft(
+            name: name,
+            quantity: quantity,
+            amount: amount,
+            taxRate: taxRate
+        )
 
         changeItems {
             items.append(draft)
@@ -69,7 +79,8 @@ public extension EntryModel {
         at index: Int,
         name: String,
         quantity: Int = 1,
-        amount: Int
+        amount: Int,
+        taxRate: EntryItem.TaxRate? = nil
     ) {
         guard items.indices.contains(index) else {
             return
@@ -79,6 +90,7 @@ public extension EntryModel {
             items[index].name = name
             items[index].quantity = quantity
             items[index].amount = amount
+            items[index].taxRate = taxRate
         }
     }
 

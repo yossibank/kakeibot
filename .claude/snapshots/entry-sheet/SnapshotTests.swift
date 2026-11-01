@@ -125,8 +125,10 @@ private extension SnapshotTests {
 
     static func addItems(to model: EntryModel) {
         model.memo = "スーパー山田"
-        model.addItem(name: "牛乳", quantity: 2, amount: 396)
-        model.addItem(name: "食パン", amount: 250)
+        model.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
+        model.addItem(name: "食パン", amount: 250, taxRate: .reduced)
+        model.addItem(name: "洗剤", amount: 398, taxRate: .standard)
+        model.addItem(name: "弁当", amount: 540)
     }
 
     static func write(
