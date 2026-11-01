@@ -104,6 +104,53 @@
       ]
     },
     {
+      "summary": "@ で始まる単価の行は、どれも次の品目につなげる",
+      "lines": [
+        "@150 x 3",
+        "クロワッサン 450",
+        "@200 x 2",
+        "メロンパン 400",
+        "合計 850"
+      ],
+      "store": null,
+      "date": null,
+      "total": 850,
+      "items": [
+        { "name": "クロワッサン", "quantity": 3, "amount": 450 },
+        { "name": "メロンパン", "quantity": 2, "amount": 400 }
+      ]
+    },
+    {
+      "summary": "品名に容量と入り数の付いた品目",
+      "lines": [
+        "ビール 6x350ml 1,280",
+        "水 500ml×24 1,980",
+        "合計点数 2",
+        "合計 3,260"
+      ],
+      "store": null,
+      "date": null,
+      "total": 3260,
+      "items": [
+        { "name": "ビール 6x350ml", "quantity": 1, "amount": 1280 },
+        { "name": "水 500mlx24", "quantity": 1, "amount": 1980 }
+      ]
+    },
+    {
+      "summary": "店名の行が無く、電話番号から始まる",
+      "lines": [
+        "03-1234-5678",
+        "10:15",
+        "サンドイッチ 380"
+      ],
+      "store": null,
+      "date": null,
+      "total": null,
+      "items": [
+        { "name": "サンドイッチ", "quantity": 1, "amount": 380 }
+      ]
+    },
+    {
       "summary": "何も読めない",
       "lines": ["", "ありがとうございました"],
       "store": null,

@@ -61,7 +61,7 @@ public extension ReceiptReading {
                 hasItem = true
 
             case let .quantity(quantity):
-                if items.isEmpty {
+                if quantity.isUnitFirst || items.isEmpty {
                     pendingQuantity = quantity
                 } else {
                     items[items.count - 1].apply(quantity)

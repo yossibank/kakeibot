@@ -26,6 +26,7 @@ extension ReceiptLine {
     struct Quantity: Equatable {
         let count: Int
         let unit: Int
+        let isUnitFirst: Bool
     }
 }
 
@@ -56,13 +57,15 @@ private extension ReceiptLine {
 
     static var quantityPattern: Regex<(Substring, count: Substring, unit: Substring)> {
         #/
-            (?<count>\d+)\s*(?:コ|個|点|ｺ)?\s*[x*]\s*(?:単|@)?\s*¥?\s*(?<unit>\d{1,3}(?:,\d{3})+|\d+)
+            ^(?<count>\d+)\s*(?:コ|個|点|ｺ)?\s*[x*]\s*(?:単|@)?\s*¥?\s*(?<unit>\d{1,3}(?:,\d{3})+|\d+)
+            (?:\s+¥?\s*(?:\d{1,3}(?:,\d{3})+|\d+)\s*円?)?\s*$
         /#
     }
 
     static var unitFirstPattern: Regex<(Substring, unit: Substring, count: Substring)> {
         #/
-            @\s*¥?\s*(?<unit>\d{1,3}(?:,\d{3})+|\d+)\s*[x*]\s*(?<count>\d+)
+            ^@\s*¥?\s*(?<unit>\d{1,3}(?:,\d{3})+|\d+)\s*[x*]\s*(?<count>\d+)\s*(?:コ|個|点|ｺ)?
+            (?:\s+¥?\s*(?:\d{1,3}(?:,\d{3})+|\d+)\s*円?)?\s*$
         /#
     }
 
@@ -78,7 +81,9 @@ private extension ReceiptLine {
     }
 
     static func kind(of text: String) -> Kind {
-        guard !text.isEmpty else {
+        let words = text.filter { !$0.isWhitespace }
+
+        guard words.contains(where: { !$0.isNumber && !numberJoints.contains($0) }) else {
             return .skip
         }
 
@@ -87,9 +92,9 @@ private extension ReceiptLine {
         }
 
         let amount = amount(in: text)
-        let words = text.filter { !$0.isWhitespace }
+        let isTotal = totalWords.contains(where: words.contains)
 
-        if totalWords.contains(where: words.contains), !words.contains("小計") {
+        if isTotal, !words.contains("小計"), !words.contains("点数") {
             return amount.map { .total($0.value) } ?? .skip
         }
 
@@ -117,7 +122,7 @@ private extension ReceiptLine {
             return nil
         }
 
-        let start = match.range.lowerBound
+        let start = match.sign?.startIndex ?? match.number.startIndex
         let before = start > text.startIndex ? text[text.index(before: start)] : nil
         let digits = match.number.filter(\.isNumber)
 
@@ -140,14 +145,14 @@ private extension ReceiptLine {
            let count = Int(match.count),
            let unit = Int(match.unit.filter(\.isNumber)),
            count > 0 {
-            return Quantity(count: count, unit: unit)
+            return Quantity(count: count, unit: unit, isUnitFirst: true)
         }
 
         if let match = text.firstMatch(of: quantityPattern),
            let count = Int(match.count),
            let unit = Int(match.unit.filter(\.isNumber)),
            count > 0 {
-            return Quantity(count: count, unit: unit)
+            return Quantity(count: count, unit: unit, isUnitFirst: false)
         }
 
         return nil
