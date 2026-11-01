@@ -164,6 +164,7 @@ private extension BudgetListView {
                         }
                     }
                     .padding(.horizontal, 16)
+                    .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
                 if let usage = model.usage(for: nil) {
@@ -187,6 +188,7 @@ private extension BudgetListView {
             .padding(.vertical, 20)
             .card()
             .contentShape(.rect)
+            .animation(.snappy, value: model.carryoverFrom)
         }
         .buttonStyle(.plain)
     }
@@ -249,6 +251,7 @@ private extension BudgetListView {
 
                 Text(usage.remainingText)
                     .foregroundStyle(usage.tint)
+                    .contentTransition(.numericText())
             }
             .textFont(.caption2)
             .monospacedDigit()
