@@ -6,6 +6,14 @@ extension AppModel {
         let status = await proStore.status()
         await apply(status, in: database)
 
+        if !status.isUnlocked {
+            let store = proStore
+
+            Task {
+                _ = try? await store.price()
+            }
+        }
+
         for await status in proStore.updates() {
             await apply(status, in: database)
         }
