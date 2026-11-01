@@ -31,9 +31,10 @@ erDiagram
     wallet ||--o{ template : "wallet_id"
     reward_rule ||--o{ reward_log : "rule_id"
     entry |o--o| reward_goal : "entry_id"
+    entry ||--o{ entry_item : "entry_id"
 ```
 
-`no_spend_day`・`theme`・`setting` はほかの表を参照しない。`setting` の `theme_id` は、値として持つ。
+`no_spend_day`・`item_name`・`theme`・`setting` はほかの表を参照しない。`setting` の `theme_id` は、値として持つ。
 
 ## 📏 共通の決まり
 
@@ -205,6 +206,34 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 - 日付と財布は振替に合わせ、財布は振替元にする。
 - カテゴリは `fee_category_id` の設定のカテゴリにし、無ければ「手数料」を作る。
 - 手数料を 0 にすると記録を消す。
+
+### entry_item
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| id | TEXT | |
+| entry_id | TEXT | 支出か収入の entry。記録を消すと一緒に消える |
+| name | TEXT | 空にしない |
+| quantity | INTEGER | 1 以上 |
+| amount | INTEGER | 数量を掛けた後の金額。値引は負の数 |
+| sort_order | INTEGER | |
+| created_at / updated_at | TEXT | |
+
+索引は、`entry_id` に付ける。品目の合計と記録の `amount` の差は保存しない。決まりは [decisions/records.md の「記録の品目」](decisions/records.md#記録の品目)にある。
+
+### item_name
+
+レシートで人が直した品名を覚える表である。
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| id | TEXT | |
+| store | TEXT | 読んだ店名 |
+| raw | TEXT | 読んだ品名の文字 |
+| name | TEXT | 人が直した品名 |
+| created_at / updated_at | TEXT | |
+
+`(store, raw)` は重複禁止。同じ組を直し直すと、`name` を書き換える。
 
 ### template
 
