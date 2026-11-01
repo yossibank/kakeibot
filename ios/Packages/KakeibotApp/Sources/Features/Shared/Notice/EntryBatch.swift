@@ -3,13 +3,16 @@ import Core
 public struct EntryBatch: Hashable, Sendable {
     public let kind: Kind
     public let previous: [Entry]
+    public let items: [EntryItem]
 
     public init(
         kind: Kind,
-        previous: [Entry]
+        previous: [Entry],
+        items: [EntryItem] = []
     ) {
         self.kind = kind
         self.previous = previous
+        self.items = items
     }
 }
 

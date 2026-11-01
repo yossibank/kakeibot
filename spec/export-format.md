@@ -22,6 +22,8 @@
     "categories": [],
     "tags": [],
     "entries": [],
+    "entryItems": [],
+    "itemNames": [],
     "templates": [],
     "budgets": [],
     "recurrings": [],
@@ -58,6 +60,7 @@
 | `tags` | 無いファイルは、空として読む。記録とテンプレート（`EntryTemplate`）の `tagId` も、無ければ空として読む |
 | `billMonth`（`entries`） | 無ければ、空として読む |
 | `transferId`（`entries`） | 無ければ、空として読む |
+| `entryItems`・`itemNames` | 無いファイルは、空として読む |
 | `settings` | 知らないキーの行は、読み飛ばす。DB から書き出すときは、知らないキーの行と `backup_exported_at` を含めない |
 
 古い版のファイルは、最新の版になるまで版を 1 つずつ上げてから読む。

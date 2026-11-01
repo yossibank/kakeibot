@@ -12,6 +12,7 @@ public struct EntryDraft: Hashable, Sendable {
     public var memo: String
     public var billMonth: YearMonth?
     public var fee: Int
+    public var items: [EntryItem.Draft]?
 
     public init(
         type: Entry.Kind,
@@ -24,7 +25,8 @@ public struct EntryDraft: Hashable, Sendable {
         toWalletId: Wallet.ID? = nil,
         memo: String = "",
         billMonth: YearMonth? = nil,
-        fee: Int = 0
+        fee: Int = 0,
+        items: [EntryItem.Draft]? = nil
     ) {
         self.type = type
         self.amount = amount
@@ -37,6 +39,7 @@ public struct EntryDraft: Hashable, Sendable {
         self.memo = memo
         self.billMonth = billMonth
         self.fee = fee
+        self.items = items
     }
 
     public init(_ entry: Entry) {
@@ -65,12 +68,15 @@ public extension EntryDraft {
         case tagWithoutCategory
         case feeNegative
         case feeOnNonTransfer
+        case itemsOnTransfer
+        case itemNameEmpty
+        case itemQuantityNotPositive
     }
 
     var problems: [Problem] {
         let amountProblems: [Problem] = amount < 1 ? [.amountNotPositive] : []
         let tagProblems: [Problem] = tagId != nil && categoryId == nil ? [.tagWithoutCategory] : []
-        return amountProblems + typeProblems + tagProblems + feeProblems
+        return amountProblems + typeProblems + tagProblems + feeProblems + itemProblems
     }
 
     func newEntry(at now: Date) throws -> Entry {
@@ -133,6 +139,20 @@ private extension EntryDraft {
         case (1..., .expense), (1..., .income): [.feeOnNonTransfer]
         default: []
         }
+    }
+
+    var itemProblems: [Problem] {
+        let items = items ?? []
+        let transferProblems: [Problem] = type == .transfer && !items.isEmpty
+            ? [.itemsOnTransfer]
+            : []
+        let nameProblems: [Problem] = items.contains { $0.trimmedName.isEmpty }
+            ? [.itemNameEmpty]
+            : []
+        let quantityProblems: [Problem] = items.contains { $0.quantity < 1 }
+            ? [.itemQuantityNotPositive]
+            : []
+        return transferProblems + nameProblems + quantityProblems
     }
 
     var destinationProblems: [Problem] {

@@ -56,6 +56,8 @@ public extension ExportV1 {
         public var categories: [EntryCategory]
         public var tags: [EntryTag]
         public var entries: [Entry]
+        public var entryItems: [EntryItem]
+        public var itemNames: [ItemName]
         public var templates: [EntryTemplate]
         public var budgets: [Budget]
         public var recurrings: [Recurring]
@@ -75,6 +77,8 @@ public extension ExportV1 {
             categories: [EntryCategory],
             tags: [EntryTag] = [],
             entries: [Entry],
+            entryItems: [EntryItem] = [],
+            itemNames: [ItemName] = [],
             templates: [EntryTemplate] = [],
             budgets: [Budget],
             recurrings: [Recurring],
@@ -93,6 +97,8 @@ public extension ExportV1 {
             self.categories = categories
             self.tags = tags
             self.entries = entries
+            self.entryItems = entryItems
+            self.itemNames = itemNames
             self.templates = templates
             self.budgets = budgets
             self.recurrings = recurrings
@@ -188,6 +194,8 @@ extension ExportV1.Tables: Codable {
         let categories = try container.decode([EntryCategory].self, forKey: .categories)
         let tags = try container.decodeIfPresent([EntryTag].self, forKey: .tags)
         let entries = try container.decode([Entry].self, forKey: .entries)
+        let entryItems = try container.decodeIfPresent([EntryItem].self, forKey: .entryItems)
+        let itemNames = try container.decodeIfPresent([ItemName].self, forKey: .itemNames)
         let templates = try container.decodeIfPresent([EntryTemplate].self, forKey: .templates)
         let budgets = try container.decode([Budget].self, forKey: .budgets)
         let recurrings = try container.decode([Recurring].self, forKey: .recurrings)
@@ -208,6 +216,8 @@ extension ExportV1.Tables: Codable {
             categories: categories,
             tags: tags ?? [],
             entries: entries,
+            entryItems: entryItems ?? [],
+            itemNames: itemNames ?? [],
             templates: templates ?? [],
             budgets: budgets,
             recurrings: recurrings,

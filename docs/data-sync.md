@@ -89,6 +89,7 @@ setting は、次の key を記録しない。
 | wallet | その id |
 | valuation | wallet_id |
 | entry | wallet_id。無ければ to_wallet_id（振替は、どちらかが共有なら共有のゾーン） |
+| entry_item | その entry と同じ。entry の財布が変わると、品目の updated_at を書き換えて送り直す |
 | category | wallet_id |
 | tag | その category の wallet_id |
 | icon | その icon を指す共有の wallet。無ければ wallet_id を持つ category |
@@ -132,3 +133,4 @@ iCloud の行に入れ替えて同期を入れるときは、手元の行を消�
 | budget | `(category_id, from_month)`。category_id が空の行どうしも比べる | なし（id で比べる） |
 | reward_log | `(rule_id, date)` | created_at |
 | calendar_stamp | `date` | created_at |
+| item_name | `(store, raw)` | created_at |

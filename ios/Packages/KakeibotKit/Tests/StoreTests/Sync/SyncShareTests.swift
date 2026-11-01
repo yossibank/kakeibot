@@ -92,6 +92,30 @@ struct SyncShareTests {
     }
 
     @Test
+    func routesItemsWithTheirEntry() async throws {
+        let setup = try await SyncTests.Setup(enabled: false)
+        let shared = try await setup.walletID()
+        let other = try await setup.otherWalletID()
+        let ids = try await setup.insertRoutingRows(shared: shared, other: other)
+
+        try await setup.execute("INSERT INTO sync_share (wallet_id) VALUES ('\(shared)')")
+
+        try await setup.execute("""
+        INSERT INTO entry_item (id, entry_id, name, quantity, amount, sort_order, created_at, updated_at)
+        VALUES ('item-shared', '\(ids.sharedEntry)', '牛乳', 1, 198, 0, 'x', 'x'),
+            ('item-other', '\(ids.otherEntry)', 'パン', 1, 220, 0, 'x', 'x')
+        """)
+
+        let sharedZone = try await setup.zone(.entryItem, "item-shared")
+        let otherZone = try await setup.zone(.entryItem, "item-other")
+        let pending = try await setup.pendingKeys()
+
+        #expect(sharedZone == shared)
+        #expect(otherZone == nil)
+        #expect(pending.contains(SyncKey(table: .entryItem, id: "item-shared")))
+    }
+
+    @Test
     func copiesOwnCategoriesWhenStartingToShare() async throws {
         let setup = try await SyncTests.Setup(enabled: false)
         let walletID = try await setup.walletID()

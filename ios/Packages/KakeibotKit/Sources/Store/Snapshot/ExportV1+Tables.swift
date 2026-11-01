@@ -19,6 +19,8 @@ extension ExportV1.Tables {
         let categories = try EntryCategory.orderByPrimaryKey().fetchAll(db)
         let tags = try EntryTag.orderByPrimaryKey().fetchAll(db)
         let entries = try Entry.orderByPrimaryKey().fetchAll(db)
+        let entryItems = try EntryItem.orderByPrimaryKey().fetchAll(db)
+        let itemNames = try ItemName.orderByPrimaryKey().fetchAll(db)
         let templates = try EntryTemplate.orderByPrimaryKey().fetchAll(db)
         let budgets = try Budget.orderByPrimaryKey().fetchAll(db)
         let recurrings = try Recurring.orderByPrimaryKey().fetchAll(db)
@@ -37,6 +39,8 @@ extension ExportV1.Tables {
             categories: categories,
             tags: tags,
             entries: entries,
+            entryItems: entryItems,
+            itemNames: itemNames,
             templates: templates,
             budgets: budgets,
             recurrings: recurrings,
@@ -74,6 +78,8 @@ private extension ExportV1.Tables {
         Recurring.self,
         EntryTemplate.self,
         Entry.self,
+        EntryItem.self,
+        ItemName.self,
         Budget.self,
         RewardRule.self,
         RewardLog.self,
@@ -96,6 +102,8 @@ private extension ExportV1.Tables {
             templates,
             entries.filter { $0.transferId == nil },
             entries.filter { $0.transferId != nil },
+            entryItems,
+            itemNames,
             budgets,
             rewardRules,
             rewardLogs,

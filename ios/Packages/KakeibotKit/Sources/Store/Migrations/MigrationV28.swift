@@ -1,7 +1,7 @@
 import GRDB
 
 enum MigrationV28 {
-    private static let recording = """
+    static let recording = """
     (SELECT (enabled OR EXISTS (SELECT 1 FROM sync_share)) AND NOT applying FROM sync_state)
     """
 
