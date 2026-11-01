@@ -37,35 +37,116 @@ extension SettingsSheet {
         _ title: String,
         systemImage: String,
         @ViewBuilder picker: () -> some View
-    ) -> some View {
-        let picker = picker()
-
-        let label = HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
-
-            Text(title)
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .fixedSize()
-        }
-
-        return PickerRowLayout {
-            label
-
-            picker
-        }
+    ) -> SettingsPickerRow<some View> {
+        SettingsPickerRow(title, systemImage: systemImage, picker: picker())
     }
 
     func switchRow(
         _ title: String,
         systemImage: String,
         isOn: Binding<Bool>
-    ) -> some View {
+    ) -> SettingsSwitchRow {
+        SettingsSwitchRow(title, systemImage: systemImage, isOn: isOn)
+    }
+
+    func row(
+        _ title: String,
+        systemImage: String,
+        value: String? = nil,
+        shortValue: String? = nil,
+        tint: Color? = nil,
+        trailingImage: String = "chevron.right"
+    ) -> SettingsRow<SettingsRowValue?> {
+        SettingsRow(
+            title,
+            systemImage: systemImage,
+            tint: tint,
+            trailingImage: trailingImage,
+            accessory: value.map { SettingsRowValue(value: $0, shortValue: shortValue) }
+        )
+    }
+
+    func row(
+        _ title: String,
+        systemImage: String,
+        tint: Color? = nil,
+        trailingImage: String = "chevron.right",
+        @ViewBuilder accessory: () -> some View
+    ) -> SettingsRow<some View> {
+        SettingsRow(
+            title,
+            systemImage: systemImage,
+            tint: tint,
+            trailingImage: trailingImage,
+            accessory: accessory()
+        )
+    }
+}
+
+struct SettingsRow<Accessory: View>: View {
+    let title: String
+    let systemImage: String
+    let tint: Color?
+    let trailingImage: String
+    let accessory: Accessory
+
+    init(
+        _ title: String,
+        systemImage: String,
+        tint: Color?,
+        trailingImage: String,
+        accessory: Accessory
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self.tint = tint
+        self.trailingImage = trailingImage
+        self.accessory = accessory
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .sansFont(.body, weight: .light)
+                .foregroundStyle(tint ?? Palette.accent)
+                .frame(width: 22)
+
+            Text(title)
+                .textFont(.subheadline)
+                .foregroundStyle(tint ?? Palette.text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .layoutPriority(1)
+
+            Spacer()
+
+            accessory
+
+            Image(systemName: trailingImage)
+                .sansFont(.small)
+                .foregroundStyle(Palette.hint)
+        }
+        .frame(minHeight: 48)
+        .contentShape(.rect)
+    }
+}
+
+struct SettingsSwitchRow: View {
+    let title: String
+    let systemImage: String
+    let isOn: Binding<Bool>
+
+    init(
+        _ title: String,
+        systemImage: String,
+        isOn: Binding<Bool>
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self.isOn = isOn
+    }
+
+    var body: some View {
         GoldSwitch(
             isOn: isOn,
             systemImage: systemImage,
@@ -85,61 +166,45 @@ extension SettingsSheet {
             }
         }
     }
+}
 
-    func row(
+struct SettingsPickerRow<Picker: View>: View {
+    let title: String
+    let systemImage: String
+    let picker: Picker
+
+    init(
         _ title: String,
         systemImage: String,
-        value: String? = nil,
-        shortValue: String? = nil,
-        tint: Color? = nil,
-        trailingImage: String = "chevron.right"
-    ) -> some View {
-        row(
-            title,
-            systemImage: systemImage,
-            tint: tint,
-            trailingImage: trailingImage
-        ) {
-            if let value {
-                SettingsRowValue(value: value, shortValue: shortValue)
-            }
-        }
+        picker: Picker
+    ) {
+        self.title = title
+        self.systemImage = systemImage
+        self.picker = picker
     }
 
-    func row(
-        _ title: String,
-        systemImage: String,
-        tint: Color? = nil,
-        trailingImage: String = "chevron.right",
-        @ViewBuilder accessory: () -> some View
-    ) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: systemImage)
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(tint ?? Palette.accent)
-                .frame(width: 22)
+    var body: some View {
+        PickerRowLayout {
+            HStack(spacing: 12) {
+                Image(systemName: systemImage)
+                    .sansFont(.body, weight: .light)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 22)
 
-            Text(title)
-                .textFont(.subheadline)
-                .foregroundStyle(tint ?? Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .layoutPriority(1)
+                Text(title)
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .fixedSize()
+            }
 
-            Spacer()
-
-            accessory()
-
-            Image(systemName: trailingImage)
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            picker
         }
-        .frame(minHeight: 48)
-        .contentShape(.rect)
     }
 }
 
-private struct SettingsRowValue: View {
+struct SettingsRowValue: View {
     let value: String
     let shortValue: String?
 
