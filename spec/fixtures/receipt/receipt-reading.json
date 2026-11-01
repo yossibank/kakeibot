@@ -1,0 +1,162 @@
+{
+  "description": "端末の中の文字認識で読んだレシートの行から、店名・日付・合計・品目を組み立てる。lines は上から順の行。store・date・total は読めなければ null。items は name・quantity・amount の配列。",
+  "cases": [
+    {
+      "summary": "よくあるスーパーのレシート",
+      "lines": [
+        "スーパー青葉 横浜店",
+        "TEL 045-123-4567",
+        "2026年10月03日(土) 18:42",
+        "牛乳 ¥396",
+        "  2コ×単198",
+        "食パン ¥220",
+        "たまご ¥258",
+        "値引 -30",
+        "小計 ¥844",
+        "外税 ¥67",
+        "合計 ¥911",
+        "お預り ¥1,000",
+        "お釣 ¥89"
+      ],
+      "store": "スーパー青葉 横浜店",
+      "date": "2026-10-03",
+      "total": 911,
+      "items": [
+        { "name": "牛乳", "quantity": 2, "amount": 396 },
+        { "name": "食パン", "quantity": 1, "amount": 220 },
+        { "name": "たまご", "quantity": 1, "amount": 228 }
+      ]
+    },
+    {
+      "summary": "全角の数字と円の付いた金額",
+      "lines": [
+        "ドラッグ若葉",
+        "２０２６/１０/０５ １２：３０",
+        "ハンドソープ　　　３９８円",
+        "ティッシュ　　　　１，２９８円※",
+        "合　計　　　　　１，６９６円"
+      ],
+      "store": "ドラッグ若葉",
+      "date": "2026-10-05",
+      "total": 1696,
+      "items": [
+        { "name": "ハンドソープ", "quantity": 1, "amount": 398 },
+        { "name": "ティッシュ", "quantity": 1, "amount": 1298 }
+      ]
+    },
+    {
+      "summary": "単価の行が品目の前にある",
+      "lines": [
+        "青空ベーカリー",
+        "@150 x 3",
+        "クロワッサン 450",
+        "合計 450"
+      ],
+      "store": "青空ベーカリー",
+      "date": null,
+      "total": 450,
+      "items": [
+        { "name": "クロワッサン", "quantity": 3, "amount": 450 }
+      ]
+    },
+    {
+      "summary": "単価だけが品目の行にある",
+      "lines": [
+        "おにぎり 120",
+        "3個 x 120",
+        "合計 360"
+      ],
+      "store": null,
+      "date": null,
+      "total": 360,
+      "items": [
+        { "name": "おにぎり", "quantity": 3, "amount": 360 }
+      ]
+    },
+    {
+      "summary": "合計の後の行は品目にしない",
+      "lines": [
+        "コーヒー 300",
+        "合計 300",
+        "次回使えるクーポン 50"
+      ],
+      "store": null,
+      "date": null,
+      "total": 300,
+      "items": [
+        { "name": "コーヒー", "quantity": 1, "amount": 300 }
+      ]
+    },
+    {
+      "summary": "電話と時刻と番号の行は品目にしない",
+      "lines": [
+        "喫茶みどり",
+        "03-1234-5678",
+        "10:15",
+        "No.0042",
+        "ケーキセット 880"
+      ],
+      "store": "喫茶みどり",
+      "date": null,
+      "total": null,
+      "items": [
+        { "name": "ケーキセット", "quantity": 1, "amount": 880 }
+      ]
+    },
+    {
+      "summary": "@ で始まる単価の行は、どれも次の品目につなげる",
+      "lines": [
+        "@150 x 3",
+        "クロワッサン 450",
+        "@200 x 2",
+        "メロンパン 400",
+        "合計 850"
+      ],
+      "store": null,
+      "date": null,
+      "total": 850,
+      "items": [
+        { "name": "クロワッサン", "quantity": 3, "amount": 450 },
+        { "name": "メロンパン", "quantity": 2, "amount": 400 }
+      ]
+    },
+    {
+      "summary": "品名に容量と入り数の付いた品目",
+      "lines": [
+        "ビール 6x350ml 1,280",
+        "水 500ml×24 1,980",
+        "合計点数 2",
+        "合計 3,260"
+      ],
+      "store": null,
+      "date": null,
+      "total": 3260,
+      "items": [
+        { "name": "ビール 6x350ml", "quantity": 1, "amount": 1280 },
+        { "name": "水 500mlx24", "quantity": 1, "amount": 1980 }
+      ]
+    },
+    {
+      "summary": "店名の行が無く、電話番号から始まる",
+      "lines": [
+        "03-1234-5678",
+        "10:15",
+        "サンドイッチ 380"
+      ],
+      "store": null,
+      "date": null,
+      "total": null,
+      "items": [
+        { "name": "サンドイッチ", "quantity": 1, "amount": 380 }
+      ]
+    },
+    {
+      "summary": "何も読めない",
+      "lines": ["", "ありがとうございました"],
+      "store": null,
+      "date": null,
+      "total": null,
+      "items": []
+    }
+  ]
+}
