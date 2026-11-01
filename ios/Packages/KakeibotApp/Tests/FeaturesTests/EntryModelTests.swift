@@ -302,10 +302,11 @@ struct EntryModelTests {
         let options = try await setup.database.entryOptions()
         let wallet = try #require(options.wallets.first?.id)
         let categories = options.expenseCategories
+        let today = LocalDate(Date(), in: .current)
         try await setup.saveEntry(category: categories[0].id, wallet: wallet, at: 1)
         try await setup.saveEntry(category: categories[0].id, wallet: wallet, at: 2)
         try await setup.saveEntry(category: categories[1].id, wallet: wallet, at: 3)
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, date: today)
         await model.load()
 
         let empty = model.monthTotalText
@@ -319,6 +320,7 @@ struct EntryModelTests {
     @Test
     func showsMonthTotalOfTypeWithoutCategory() async throws {
         let model = try await Self.newModel()
+        model.date = LocalDate(Date(), in: .current)
         model.categoryId = nil
         model.press(.digit(2))
 
