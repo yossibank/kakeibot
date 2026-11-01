@@ -86,6 +86,20 @@ extension EntryModelTests {
     }
 
     @Test
+    func keepsAmountWhenItemTotalIsNegative() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        model.press(.digit(5))
+        model.addItem(name: "値引", amount: -30)
+
+        model.adjustToItems()
+
+        #expect(!model.canAdjustToItems)
+        #expect(model.amount == 5)
+    }
+
+    @Test
     func countsItemsWithQuantity() async throws {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date)

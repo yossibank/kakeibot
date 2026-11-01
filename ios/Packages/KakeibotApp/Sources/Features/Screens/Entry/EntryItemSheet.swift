@@ -11,6 +11,7 @@ struct EntryItemSheet: View {
     @State var quantity = AmountCalculator(amount: 1)
     @State var target: Target = .unit
     @State var editingIndex: Int?
+    @State var editingItem: EntryItem.Draft?
     @State var isSlipOpen = false
     @State var removed: EntryModel.RemovedItem?
     @State var openIndex: Int?
@@ -66,7 +67,7 @@ struct EntryItemSheet: View {
             systemImage: "trash",
             bottom: Self.noticeBottom
         ) { removed in
-            model.restoreItem(removed)
+            restore(removed)
         }
         .background {
             Backdrop()
@@ -204,6 +205,7 @@ private extension EntryItemSheet {
                     .contentShape(.rect)
             }
             .buttonStyle(.plain)
+            .disabled(!model.canAdjustToItems)
 
             Spacer()
 
@@ -305,6 +307,15 @@ private extension EntryItemSheet {
 
     var categoryIcon: Icon? {
         model.selectedCategory.flatMap { model.icon(for: $0) }
+    }
+
+    func restore(_ removed: EntryModel.RemovedItem) {
+        if let editingIndex,
+           removed.index <= editingIndex {
+            self.editingIndex = editingIndex + 1
+        }
+
+        model.restoreItem(removed)
     }
 }
 

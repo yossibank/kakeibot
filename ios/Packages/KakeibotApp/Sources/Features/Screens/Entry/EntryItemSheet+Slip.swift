@@ -94,6 +94,7 @@ extension EntryItemSheet {
             quantity = AmountCalculator(amount: price.quantity)
             target = .unit
             editingIndex = index
+            editingItem = item
         }
 
         withAnimation(.snappy) {
@@ -131,12 +132,39 @@ private extension EntryItemSheet {
         max(1, quantity.amount)
     }
 
+    var keptItem: EntryItem.Draft? {
+        guard let editingItem else {
+            return nil
+        }
+
+        let price = EntryModel.unitPrice(of: editingItem)
+        let shownUnit = AmountCalculator(amount: price.unit).amount
+        let shownQuantity = AmountCalculator(amount: price.quantity).amount
+
+        guard
+            unit.amount == shownUnit,
+            quantity.amount == shownQuantity
+        else {
+            return nil
+        }
+
+        return editingItem
+    }
+
+    var lineQuantity: Int {
+        keptItem?.quantity ?? quantityValue
+    }
+
     var lineAmount: Int {
-        unit.amount * quantityValue
+        keptItem?.amount ?? unit.amount * quantityValue
     }
 
     var canSubmit: Bool {
-        !trimmedName.isEmpty && unit.amount > 0
+        guard !trimmedName.isEmpty else {
+            return false
+        }
+
+        return keptItem != nil || (unit.amount > 0 && lineAmount <= AmountCalculator.maxValue)
     }
 
     var activeCalculator: AmountCalculator {
@@ -241,7 +269,7 @@ private extension EntryItemSheet {
             model.updateItem(
                 at: editingIndex,
                 name: trimmedName,
-                quantity: quantityValue,
+                quantity: lineQuantity,
                 amount: lineAmount
             )
         } else {
@@ -273,6 +301,7 @@ private extension EntryItemSheet {
             quantity = AmountCalculator(amount: 1)
             target = .unit
             editingIndex = nil
+            editingItem = nil
         }
     }
 

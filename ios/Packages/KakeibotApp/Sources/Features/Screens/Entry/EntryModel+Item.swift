@@ -28,6 +28,10 @@ public extension EntryModel {
         !items.isEmpty && itemAdjustment != 0
     }
 
+    var canAdjustToItems: Bool {
+        (0...AmountCalculator.maxValue).contains(itemTotal)
+    }
+
     var store: String {
         get {
             memoLines[0]
@@ -101,6 +105,10 @@ public extension EntryModel {
     }
 
     func adjustToItems() {
+        guard canAdjustToItems else {
+            return
+        }
+
         calculator = AmountCalculator(amount: itemTotal)
     }
 }
