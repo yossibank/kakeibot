@@ -146,7 +146,9 @@ private extension ReviewView {
             if let usage = model.budgetUsage {
                 VStack(spacing: 8) {
                     HStack {
-                        Text("予算 \(AmountText.text(usage.budget))")
+                        Text(usage.budgetText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
 
                         Spacer()
 
