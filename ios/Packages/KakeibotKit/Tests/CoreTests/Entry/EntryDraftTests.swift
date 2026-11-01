@@ -84,7 +84,14 @@ extension EntryDraftTests {
         let tag: Bool
         let toWallet: Destination
         let fee: Int?
+        let items: [ItemCase]?
         let problems: [EntryDraft.Problem]
+    }
+
+    struct ItemCase: Decodable, Sendable {
+        let name: String
+        let quantity: Int
+        let amount: Int
     }
 
     enum Destination: String, Decodable, Sendable {
@@ -102,6 +109,10 @@ extension EntryDraftTests.DraftCase {
         let tagId = tag ? EntryTag.ID() : nil
         let toWalletId = toWallet.walletId(from: walletId)
 
+        let itemDrafts = items?.map { item in
+            EntryItem.Draft(name: item.name, quantity: item.quantity, amount: item.amount)
+        }
+
         return EntryDraft(
             type: type,
             amount: amount,
@@ -110,7 +121,8 @@ extension EntryDraftTests.DraftCase {
             tagId: tagId,
             walletId: walletId,
             toWalletId: toWalletId,
-            fee: fee ?? 0
+            fee: fee ?? 0,
+            items: itemDrafts
         )
     }
 }

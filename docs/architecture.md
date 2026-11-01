@@ -128,6 +128,7 @@ KakeibotKit/
 │   │   ├── Icon/
 │   │   ├── Identifier/
 │   │   ├── Notification/
+│   │   ├── Receipt/
 │   │   ├── Recurring/
 │   │   ├── Review/
 │   │   ├── Reward/
@@ -151,11 +152,12 @@ KakeibotKit/
 | `Core/Budget/` | 予算と消化 |
 | `Core/Category/` | 記録のカテゴリとタグ |
 | `Core/Date/` | LocalDate、期間の区切り、祝日、休日のずらし |
-| `Core/Entry/` | 記録、金額の電卓、日ごとのまとめ |
+| `Core/Entry/` | 記録と品目、金額の電卓、日ごとのまとめ |
 | `Core/Export/V1/` | 書き出しの形 |
 | `Core/Icon/` | アイコンとスタンプ |
 | `Core/Identifier/` | 型付きの ID |
 | `Core/Notification/` | 予約されているべき通知の計算と行き先 |
+| `Core/Receipt/` | レシートで人が直した品名 |
 | `Core/Recurring/` | 固定費と記録漏れの後追い |
 | `Core/Review/` | 振り返りの範囲と集計 |
 | `Core/Reward/` | ごほうびと貯金箱 |

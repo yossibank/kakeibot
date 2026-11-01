@@ -7,6 +7,8 @@ public enum SyncTable: String, CaseIterable, Sendable {
     case recurring
     case template
     case entry
+    case entryItem = "entry_item"
+    case itemName = "item_name"
     case valuation
     case budget
     case rewardRule = "reward_rule"
@@ -59,6 +61,7 @@ public enum SyncTable: String, CaseIterable, Sendable {
         case .budget: [UniqueKey(columns: ["category_id", "from_month"], matchesNull: true)]
         case .rewardLog: [UniqueKey(columns: ["rule_id", "date"], matchesNull: false)]
         case .calendarStamp: [UniqueKey(columns: ["date"], matchesNull: false)]
+        case .itemName: [UniqueKey(columns: ["store", "raw"], matchesNull: false)]
         default: []
         }
     }

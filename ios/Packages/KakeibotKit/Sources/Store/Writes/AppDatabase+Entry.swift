@@ -116,6 +116,10 @@ public extension AppDatabase {
                 touched.after.append(entry)
             }
 
+            if case .wallet = change {
+                try Self.touchItems(of: changed.map(\.id), in: db, at: now)
+            }
+
             try Self.recalculateCardBills(touched, in: db, at: now)
 
             return changed
@@ -160,6 +164,7 @@ extension AppDatabase {
         }
 
         try entry.save(db)
+        try saveItems(draft.items, of: entry, before: before, in: db, at: now)
 
         var cleared: [NoSpendDay] = []
 

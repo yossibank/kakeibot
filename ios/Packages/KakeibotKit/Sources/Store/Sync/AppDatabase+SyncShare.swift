@@ -136,6 +136,17 @@ private extension AppDatabase {
                 in: db
             )
 
+        case .entryItem:
+            return try walletColumns(
+                """
+                SELECT entry.wallet_id, entry.to_wallet_id FROM entry_item
+                JOIN entry ON entry.id = entry_item.entry_id
+                WHERE entry_item.id = ?
+                """,
+                key.id,
+                in: db
+            )
+
         case .category:
             return try walletColumns("SELECT wallet_id FROM category WHERE id = ?", key.id, in: db)
 
@@ -323,9 +334,20 @@ private extension AppDatabase {
             arguments: [walletID]
         )
 
+        let items = try String.fetchAll(
+            db,
+            sql: """
+            SELECT entry_item.id FROM entry_item
+            JOIN entry ON entry.id = entry_item.entry_id
+            WHERE entry.wallet_id = ?1 OR entry.to_wallet_id = ?1
+            """,
+            arguments: [walletID]
+        )
+
         return [SyncKey(table: .wallet, id: walletID)]
             + icons.map { SyncKey(table: .icon, id: $0) }
             + valuations.map { SyncKey(table: .valuation, id: $0) }
             + entries.map { SyncKey(table: .entry, id: $0) }
+            + items.map { SyncKey(table: .entryItem, id: $0) }
     }
 }
