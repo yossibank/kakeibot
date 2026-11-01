@@ -42,6 +42,26 @@ struct SettingWriteTests {
     }
 
     @Test
+    func savesBudgetCarryoverFrom() async throws {
+        let database = try AppDatabase.inMemory()
+        let start = try #require(YearMonth("2026-11"))
+
+        let initial = try await database.setting(.budgetCarryoverFrom)
+        try await database.setSetting(.budgetCarryoverFrom, to: start)
+        let saved = try await database.setting(.budgetCarryoverFrom)
+        let savedText = try await carryoverText(in: database)
+        try await database.setSetting(.budgetCarryoverFrom, to: nil)
+        let cleared = try await database.setting(.budgetCarryoverFrom)
+        let clearedText = try await carryoverText(in: database)
+
+        #expect(initial == nil)
+        #expect(saved == start)
+        #expect(savedText == "2026-11")
+        #expect(cleared == nil)
+        #expect(clearedText == nil)
+    }
+
+    @Test
     func announcesMonthStartShift() async throws {
         let database = try AppDatabase.inMemory()
         let payday = try #require(MonthStartDay(25))
@@ -220,6 +240,15 @@ struct SettingWriteTests {
 }
 
 private extension SettingWriteTests {
+    func carryoverText(in database: AppDatabase) async throws -> String? {
+        try await database.writer.read { db in
+            try String.fetchOne(
+                db,
+                sql: "SELECT value FROM setting WHERE key = 'budget_carryover_from'"
+            )
+        }
+    }
+
     func monthStartShiftText(in database: AppDatabase) async throws -> String? {
         try await database.writer.read { db in
             try String.fetchOne(

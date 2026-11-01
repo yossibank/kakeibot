@@ -136,4 +136,98 @@ struct BudgetListModelTests {
         #expect(!canceled)
         #expect(model.totalAmount == 50000)
     }
+
+    @Test
+    func turnsCarryoverOnFromPeriodMonthAndOff() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = BudgetListModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        let initial = model.isCarryoverOn
+
+        await model.setCarryover(true)
+        let stored = try await setup.database.setting(.budgetCarryoverFrom)
+        let enabled = model.isCarryoverOn
+
+        await model.setCarryover(false)
+        let cleared = try await setup.database.setting(.budgetCarryoverFrom)
+
+        #expect(!initial)
+        #expect(stored == model.month)
+        #expect(enabled)
+        #expect(cleared == nil)
+        #expect(!model.isCarryoverOn)
+    }
+
+    @Test
+    func carriesOnlyTotalBudgetRemainingIntoTotalUsage() async throws {
+        let setup = try await carryoverSetup()
+        let model = BudgetListModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        let food = try #require(model.categories.first)
+        let total = try #require(model.usage(for: nil))
+        let category = try #require(model.usage(for: food.id))
+
+        #expect(model.carryover == 70000)
+        #expect(total.carryover == 70000)
+        #expect(category.carryover == 0)
+    }
+
+    @Test
+    func resetsCarryoverAndRestoresStart() async throws {
+        let setup = try await carryoverSetup()
+        let model = BudgetListModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        let start = model.carryoverFrom
+        let previous = try #require(await model.resetCarryover())
+        let reset = model.carryover
+        let resetStart = try await setup.database.setting(.budgetCarryoverFrom)
+
+        await model.restoreCarryover(from: previous)
+        let restoredStart = try await setup.database.setting(.budgetCarryoverFrom)
+
+        #expect(previous == start)
+        #expect(reset == 0)
+        #expect(resetStart == model.month)
+        #expect(model.carryover == 70000)
+        #expect(restoredStart == start)
+    }
+
+    @Test
+    func keepsCarryoverWhenResetIsNotNeeded() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = BudgetListModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        let off = await model.resetCarryover()
+
+        await model.setCarryover(true)
+        let zero = await model.resetCarryover()
+        let stored = try await setup.database.setting(.budgetCarryoverFrom)
+
+        #expect(off == nil)
+        #expect(model.carryover == 0)
+        #expect(zero == nil)
+        #expect(stored == model.month)
+    }
+}
+
+private extension BudgetListModelTests {
+    func carryoverSetup() async throws -> HomeModelTests.Setup {
+        let setup = try await HomeModelTests.Setup()
+        let options = try await setup.database.entryOptions()
+        let food = try #require(options.expenseCategories.first)
+        let earlier = setup.today.yearMonth.adding(months: -3)
+        let start = setup.today.yearMonth.adding(months: -2)
+
+        try await setup.database.setBudget(50000, for: nil, from: earlier)
+        try await setup.database.setBudget(99999, for: food.id, from: earlier)
+        try await setup.save(.expense, amount: 10000, daysAgo: 50)
+        try await setup.save(.expense, amount: 20000, daysAgo: 20)
+        try await setup.database.setSetting(.budgetCarryoverFrom, to: start)
+
+        return setup
+    }
 }

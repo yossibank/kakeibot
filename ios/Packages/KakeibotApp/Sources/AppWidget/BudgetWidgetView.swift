@@ -222,7 +222,7 @@ private extension BudgetWidgetView {
             return "予算は決めていません"
         }
 
-        return usage.warningText ?? "予算 \(AmountText.text(usage.budget))"
+        return usage.warningText ?? usage.budgetText
     }
 
     func noteColor(of summary: BudgetWidgetSummary) -> Color {

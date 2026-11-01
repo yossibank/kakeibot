@@ -33,6 +33,26 @@ public extension [Budget] {
 
         return rows.max { $0.fromMonth < $1.fromMonth }?.amount
     }
+
+    func carryover(
+        into month: YearMonth,
+        from start: YearMonth?,
+        expense: (YearMonth) -> Int
+    ) -> Int {
+        guard let start else {
+            return 0
+        }
+
+        let months = sequence(first: start) { $0.adding(months: 1) }.prefix { $0 < month }
+
+        return months.reduce(0) { total, current in
+            guard let budget = amount(for: nil, in: current) else {
+                return 0
+            }
+
+            return total + budget - expense(current)
+        }
+    }
 }
 
 extension Budget: Codable {

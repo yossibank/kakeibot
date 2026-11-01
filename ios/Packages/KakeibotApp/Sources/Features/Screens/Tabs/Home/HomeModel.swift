@@ -69,6 +69,12 @@ public final class HomeModel: ScreenModel {
         }
     }
 
+    private var carryoverFrom: YearMonth? {
+        didSet {
+            updateOverview()
+        }
+    }
+
     private let database: AppDatabase
 
     public init(
@@ -150,6 +156,10 @@ public extension HomeModel {
 
             group.addTask {
                 await self.observeMonthStartDay()
+            }
+
+            group.addTask {
+                await self.observeCarryoverFrom()
             }
 
             group.addTask {
@@ -350,12 +360,22 @@ private extension HomeModel {
         }
     }
 
+    func observeCarryoverFrom() async {
+        await observe(
+            database.settingUpdates(.budgetCarryoverFrom),
+            failure: Self.loadFailedMessage
+        ) { month in
+            carryoverFrom = month
+        }
+    }
+
     func updateOverview() {
         overview = MonthOverview(
             list: list,
             budgets: budgets,
             recurrings: recurrings,
             monthStartDay: monthStartDay,
+            carryoverFrom: carryoverFrom,
             today: today
         )
 

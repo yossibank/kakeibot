@@ -7,6 +7,7 @@ public struct BudgetListView: View {
     @State private var model: BudgetListModel
     @State private var hintFlag: SettingsScreenFlag
     @State private var cleared: BudgetListModel.Cleared?
+    @State private var resetFrom: YearMonth?
 
     public init(model: BudgetListModel) {
         let hintFlag = model.hintFlag()
@@ -48,6 +49,15 @@ private extension BudgetListView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     totalCard
 
+                    SettingsSwitch(
+                        title: "残りを繰り越す",
+                        detail: "使いすぎた分は、次の月の予算から引きます",
+                        systemImage: "arrow.turn.down.right",
+                        isOn: model.isCarryoverOn
+                    ) { isOn in
+                        await model.setCarryover(isOn)
+                    }
+
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             SettingsSectionTitle("カテゴリごと")
@@ -86,6 +96,15 @@ private extension BudgetListView {
                     await model.restore(cleared)
                 }
             }
+            .settingsHideNotice(
+                $resetFrom,
+                message: "繰越を 0 に戻しました",
+                systemImage: "arrow.counterclockwise"
+            ) { start in
+                Task {
+                    await model.restoreCarryover(from: start)
+                }
+            }
         }
         .padding(.horizontal, 20)
         .padding(.top, SettingsSpacing.top)
@@ -120,6 +139,34 @@ private extension BudgetListView {
                     .foregroundStyle(amountColor(model.totalAmount))
                     .editBadge()
 
+                if model.isCarryoverOn,
+                   let usage = model.usage(for: nil) {
+                    HStack(spacing: 8) {
+                        Text(usage.carryoverText)
+                            .textFont(.caption)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+
+                        if usage.carryover != 0 {
+                            Button("0 に戻す") {
+                                Task {
+                                    resetFrom = await model.resetCarryover()
+                                }
+                            }
+                            .textFont(.caption2, weight: .semibold)
+                            .foregroundStyle(Palette.accentStrong)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Palette.panel, in: .capsule)
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+
                 if let usage = model.usage(for: nil) {
                     usageLine(usage)
                         .padding(.horizontal, 24)
@@ -141,6 +188,7 @@ private extension BudgetListView {
             .padding(.vertical, 20)
             .card()
             .contentShape(.rect)
+            .animation(.snappy, value: model.carryoverFrom)
         }
         .buttonStyle(.plain)
     }
@@ -203,6 +251,7 @@ private extension BudgetListView {
 
                 Text(usage.remainingText)
                     .foregroundStyle(usage.tint)
+                    .contentTransition(.numericText())
             }
             .textFont(.caption2)
             .monospacedDigit()

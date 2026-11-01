@@ -28,6 +28,23 @@ public struct EntryList: Equatable, Sendable {
     }
 }
 
+public extension EntryList {
+    func budgetCarryover(
+        budgets: [Budget],
+        from start: YearMonth?,
+        into month: YearMonth,
+        startingOn startDay: MonthStartDay
+    ) -> Int {
+        budgets.carryover(into: month, from: start) { month in
+            let period = month.period(startingOn: startDay)
+
+            return days
+                .filter { period.contains($0.date) }
+                .reduce(0) { $0 + $1.expenseTotal }
+        }
+    }
+}
+
 public struct EntryOptions: Equatable, Sendable {
     public let expenseCategories: [EntryCategory]
     public let incomeCategories: [EntryCategory]

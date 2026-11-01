@@ -17,6 +17,25 @@ public extension BudgetUsage {
         return "残り \(AmountText.text(remaining))"
     }
 
+    var budgetText: String {
+        let base = "予算 \(AmountText.text(baseBudget))"
+
+        if carryover > 0 {
+            return "\(base) ＋ 繰越 \(AmountText.text(carryover))"
+        }
+
+        if carryover < 0 {
+            return "\(base) − 繰越 \(AmountText.text(-carryover))"
+        }
+
+        return base
+    }
+
+    var carryoverText: String {
+        let sign = carryover < 0 ? "−" : "＋"
+        return "繰越 \(sign)\(AmountText.text(abs(carryover)))"
+    }
+
     var warningText: String? {
         isNearLimit ? "予算の 8 割を使いました" : nil
     }

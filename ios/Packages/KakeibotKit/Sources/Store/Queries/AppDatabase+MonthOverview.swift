@@ -51,12 +51,14 @@ private extension AppDatabase {
         let budgets = try budgets(in: db)
         let recurrings = try recurrings(in: db)
         let monthStartDay = try setting(.monthStartDay, in: db)
+        let carryoverFrom = try setting(.budgetCarryoverFrom, in: db)
 
         return MonthOverview(
             list: nil,
             budgets: budgets,
             recurrings: recurrings,
             monthStartDay: monthStartDay,
+            carryoverFrom: carryoverFrom,
             today: today
         )
     }
@@ -69,8 +71,15 @@ private extension MonthOverview {
         let month = period.lowerBound.yearMonth.adding(months: -Self.widgetMonths)
         let monthStart = month.period(startingOn: .first).lowerBound
         let templateStart = today.adding(days: -TemplateOrder.frequentDays)
+        let start = min(monthStart, templateStart)
 
-        return min(monthStart, templateStart)
+        guard let carryoverFrom else {
+            return start
+        }
+
+        let carryoverStart = carryoverFrom.period(startingOn: monthStartDay).lowerBound
+
+        return min(start, carryoverStart)
     }
 
     func with(_ list: EntryList) -> MonthOverview {
@@ -79,6 +88,7 @@ private extension MonthOverview {
             budgets: budgets,
             recurrings: recurrings,
             monthStartDay: monthStartDay,
+            carryoverFrom: carryoverFrom,
             today: today
         )
     }

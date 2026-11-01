@@ -16,6 +16,7 @@ public extension Setting {
     enum Key: String, CaseIterable, Codable, Sendable {
         case monthStartDay = "month_start_day"
         case monthStartShift = "month_start_shift"
+        case budgetCarryoverFrom = "budget_carryover_from"
         case weekStart = "week_start"
         case reminderTime = "reminder_time"
         case themeId = "theme_id"

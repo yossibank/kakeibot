@@ -15,6 +15,7 @@ public final class BudgetListModel {
     public private(set) var editing: Target?
     public private(set) var calculator = AmountCalculator()
     public private(set) var recurrings: [Recurring] = []
+    public private(set) var carryoverFrom: YearMonth?
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -80,6 +81,19 @@ public extension BudgetListModel {
         amount(for: nil)
     }
 
+    var isCarryoverOn: Bool {
+        carryoverFrom != nil
+    }
+
+    var carryover: Int {
+        entryList?.budgetCarryover(
+            budgets: budgets,
+            from: carryoverFrom,
+            into: month,
+            startingOn: monthStartDay
+        ) ?? 0
+    }
+
     var categoriesTotal: Int {
         categories.compactMap { amount(for: $0.id) }.reduce(0, +)
     }
@@ -126,9 +140,11 @@ public extension BudgetListModel {
         }
 
         let periodEnd = month.period(startingOn: monthStartDay).upperBound
+        let carried = categoryId == nil ? carryover : 0
 
         return BudgetUsage(
             budget: budget,
+            carryover: carried,
             spent: spent(for: categoryId),
             today: today,
             periodEnd: periodEnd
@@ -151,9 +167,34 @@ public extension BudgetListModel {
             categoryList = try await database.categoryList()
             entryList = try await database.entryList()
             recurrings = try await database.recurrings()
+            carryoverFrom = try await database.setting(.budgetCarryoverFrom)
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
+    }
+
+    func setCarryover(_ isOn: Bool) async {
+        let start = isOn ? month : nil
+        await saveCarryoverFrom(start)
+    }
+
+    func resetCarryover() async -> YearMonth? {
+        guard
+            let previous = carryoverFrom,
+            carryover != 0
+        else {
+            return nil
+        }
+
+        guard await saveCarryoverFrom(month) else {
+            return nil
+        }
+
+        return previous
+    }
+
+    func restoreCarryover(from start: YearMonth) async {
+        await saveCarryoverFrom(start, failure: Self.restoreFailedMessage)
     }
 
     func startEditing(_ target: Target) {
@@ -248,6 +289,22 @@ private extension BudgetListModel {
             return true
         } catch {
             errorNotice.show(Self.saveFailedMessage, for: error)
+            return false
+        }
+    }
+
+    @discardableResult
+    func saveCarryoverFrom(
+        _ start: YearMonth?,
+        failure: String = BudgetListModel.saveFailedMessage
+    ) async -> Bool {
+        do {
+            try await database.setSetting(.budgetCarryoverFrom, to: start)
+            carryoverFrom = start
+
+            return true
+        } catch {
+            errorNotice.show(failure, for: error)
             return false
         }
     }

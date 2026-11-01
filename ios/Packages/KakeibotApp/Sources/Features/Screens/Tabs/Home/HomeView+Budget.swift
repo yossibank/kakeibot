@@ -41,7 +41,9 @@ extension HomeView {
                             onOpenSetup(.budget)
                         } label: {
                             HStack(spacing: 4) {
-                                Text("予算 \(AmountText.text(usage.budget))")
+                                Text(usage.budgetText)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
 
                                 Image(systemName: "chevron.right")
                                     .sansFont(.micro, weight: .semibold)
