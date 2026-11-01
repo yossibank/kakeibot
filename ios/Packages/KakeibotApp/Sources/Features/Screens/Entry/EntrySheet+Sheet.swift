@@ -11,6 +11,8 @@ extension EntrySheet {
             EntryWalletSheet(model: model, role: role)
         case .date:
             EntryDateSheet(model: model, today: today)
+        case .items:
+            EntryItemSheet(model: model)
         case .newCategory:
             CategoryEditSheet(model: model.newCategoryModel()) { category in
                 Task {
@@ -48,6 +50,7 @@ extension EntrySheet {
     enum Sheet: Hashable, Identifiable {
         case wallet(EntryWalletSheet.Role)
         case date
+        case items
         case newCategory
         case editCategory(EntryCategory)
         case addTag(EntryCategory)

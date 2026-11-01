@@ -11,6 +11,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
 
     private let id: ID
     private let role: Role
+    private let actionInset: CGFloat
     private let onTap: () -> Void
     private let onAction: () -> Void
     private let onDelete: (() -> Void)?
@@ -20,6 +21,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
         id: ID,
         openId: Binding<ID?>,
         role: Role = .delete,
+        actionInset: CGFloat = 8,
         onTap: @escaping () -> Void,
         onAction: @escaping () -> Void,
         onDelete: (() -> Void)? = nil,
@@ -29,6 +31,7 @@ public struct SwipeRow<ID: Hashable, Content: View>: View {
 
         self.id = id
         self.role = role
+        self.actionInset = actionInset
         self.onTap = onTap
         self.onAction = onAction
         self.onDelete = onDelete
@@ -108,7 +111,7 @@ private extension SwipeRow {
         }
         .buttonStyle(.plain)
         .frame(width: buttonWidth)
-        .padding(.vertical, 8)
+        .padding(.vertical, actionInset)
         .opacity(opacity)
     }
 
@@ -123,7 +126,7 @@ private extension SwipeRow {
         .buttonStyle(.plain)
         .frame(width: Self.actionWidth - Self.gap)
         .padding(.trailing, Self.gap)
-        .padding(.vertical, 8)
+        .padding(.vertical, actionInset)
         .opacity(opacity)
     }
 

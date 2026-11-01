@@ -37,6 +37,7 @@ public final class EntryModel {
 
     public private(set) var type: Entry.Kind
     public private(set) var recentMemos: [String] = []
+    public private(set) var recentItemNames: [String] = []
     public private(set) var weekStart: Weekday = .sunday
     public private(set) var startsWithAmount = true
 
@@ -44,6 +45,7 @@ public final class EntryModel {
     public internal(set) var billMonth: YearMonth?
     public internal(set) var calculator = AmountCalculator()
     public internal(set) var feeCalculator = AmountCalculator()
+    public internal(set) var items: [EntryItem.Draft] = []
     public internal(set) var keypadTarget: KeypadTarget = .amount
     public internal(set) var options: EntryOptions?
     public internal(set) var balances: [Wallet.ID: Int] = [:]
@@ -116,10 +118,13 @@ public extension EntryModel {
     func load() async {
         do {
             let limit = Self.recentMemoLimit
+            let itemLimit = Self.recentItemNameLimit
 
             options = try await database.entryOptions()
 
             recentMemos = try await database.recentMemos(limit: limit)
+
+            recentItemNames = try await database.recentItemNames(limit: itemLimit)
 
             allTemplates = try await database.templates()
 
@@ -217,6 +222,7 @@ public extension EntryModel {
         feeCalculator = AmountCalculator()
         keypadTarget = .amount
         memo = ""
+        items = []
         tagId = nil
         billMonth = nil
         appliedTemplateId = nil
@@ -279,9 +285,11 @@ private extension EntryModel {
         let toWalletId: Wallet.ID?
         let memo: String
         let billMonth: YearMonth?
+        let items: [EntryItem.Draft]
     }
 
     static let recentMemoLimit = 6
+    static let recentItemNameLimit = 50
 
     var snapshot: Snapshot {
         Snapshot(
@@ -294,7 +302,8 @@ private extension EntryModel {
             walletId: walletId,
             toWalletId: toWalletId,
             memo: memo,
-            billMonth: billMonth
+            billMonth: billMonth,
+            items: items
         )
     }
 
@@ -320,7 +329,8 @@ private extension EntryModel {
             toWalletId: toWalletId,
             memo: memo,
             billMonth: billMonth,
-            fee: fee
+            fee: fee,
+            items: showsItems ? items : []
         )
     }
 
@@ -371,6 +381,7 @@ private extension EntryModel {
         appliedTemplateId = entry.templateId
         billMonth = entry.billMonth
         feeCalculator = AmountCalculator(amount: originalFee?.amount ?? 0)
+        items = try await database.entryItems(of: entry.id).map(EntryItem.Draft.init)
     }
 
     func label(for entry: Entry) -> String {

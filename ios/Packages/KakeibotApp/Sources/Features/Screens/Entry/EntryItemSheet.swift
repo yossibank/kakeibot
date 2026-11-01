@@ -1,0 +1,317 @@
+import Core
+import DesignSystem
+import Store
+import SwiftUI
+
+struct EntryItemSheet: View {
+    @Bindable var model: EntryModel
+
+    @State var name = ""
+    @State var unit = AmountCalculator()
+    @State var quantity = AmountCalculator(amount: 1)
+    @State var target: Target = .unit
+    @State var editingIndex: Int?
+    @State var isSlipOpen = false
+    @State var removed: EntryModel.RemovedItem?
+    @State var openIndex: Int?
+
+    @FocusState var focus: Field?
+
+    @Environment(\.themeStyle.corner) var corner
+
+    @State private var isShowingHelp = false
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                RingButton(systemImage: "questionmark") {
+                    withAnimation(.snappy) {
+                        isShowingHelp = true
+                    }
+                }
+
+                Spacer()
+
+                RingButton(systemImage: "checkmark", style: .prominent) {
+                    dismiss()
+                }
+            }
+            .overlay {
+                SheetTitle("品目")
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 20)
+
+            ScrollView {
+                receipt
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.hidden)
+            .scrollDismissesKeyboard(.interactively)
+
+            if isSlipOpen {
+                slip
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            } else {
+                addBar
+            }
+        }
+        .settingsHideNotice(
+            $removed,
+            message: "品目を消しました",
+            systemImage: "trash",
+            bottom: Self.noticeBottom
+        ) { removed in
+            model.restoreItem(removed)
+        }
+        .background {
+            Backdrop()
+                .ignoresSafeArea()
+                .onTapGesture {
+                    focus = nil
+                }
+        }
+        .ignoresSafeArea(.keyboard)
+        .overlay {
+            if isShowingHelp {
+                EntryItemHelp {
+                    withAnimation(.snappy) {
+                        isShowingHelp = false
+                    }
+                }
+            }
+        }
+        .presentationDragIndicator(.visible)
+    }
+}
+
+private extension EntryItemSheet {
+    var receipt: some View {
+        VStack(spacing: 12) {
+            VStack(spacing: 2) {
+                Text(dateText)
+                    .textFont(.footnote)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+
+                TextField(
+                    "店名",
+                    text: $model.store,
+                    prompt: Text("店名を入れる").foregroundStyle(Palette.hint)
+                )
+                .textFont(.subheadline, weight: .semibold)
+                .foregroundStyle(Palette.text)
+                .multilineTextAlignment(.center)
+                .tint(Palette.accent)
+                .submitLabel(.done)
+                .focused($focus, equals: .store)
+            }
+
+            EntryReceiptRule(style: .dashed)
+
+            if model.items.isEmpty {
+                VStack(spacing: 4) {
+                    Text("品目はまだありません")
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.subtext)
+
+                    Text("下の「品目を追加」から追加できます。")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.hint)
+                }
+                .frame(maxWidth: .infinity, minHeight: 72)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(Array(model.items.enumerated()), id: \.offset) { index, item in
+                        itemRow(item, at: index)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                }
+            }
+
+            EntryReceiptRule(style: .dashed)
+
+            summaryLine("小計", amount: model.itemTotal)
+
+            if model.hasItemAdjustment {
+                adjustmentLine
+            }
+
+            EntryReceiptRule(style: .double)
+
+            HStack(alignment: .firstTextBaseline) {
+                Text("合計")
+                    .textFont(.subheadline, weight: .semibold)
+                    .foregroundStyle(Palette.text)
+
+                Spacer()
+
+                Text(AmountText.text(model.amount))
+                    .displayFont(.title, weight: .bold)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+
+            if !model.items.isEmpty {
+                HStack {
+                    Text("お買上点数")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+
+                    Spacer()
+
+                    Text("\(model.itemCount)点")
+                        .textFont(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 28)
+        .background {
+            receiptShape
+                .fill(Palette.card)
+                .shadow(color: Palette.shadow.opacity(0.6), radius: 12, y: 4)
+        }
+    }
+
+    var adjustmentLine: some View {
+        HStack(spacing: 8) {
+            Text("差額")
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.amber)
+
+            Button {
+                model.adjustToItems()
+            } label: {
+                Text("調整")
+                    .textFont(.caption, weight: .semibold)
+                    .foregroundStyle(Palette.accent)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 4)
+                    .overlay {
+                        Capsule()
+                            .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+                    }
+                    .frame(minHeight: 32)
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+
+            Text(AmountText.text(model.itemAdjustment))
+                .textFont(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.amber)
+        }
+    }
+
+    func itemRow(
+        _ item: EntryItem.Draft,
+        at index: Int
+    ) -> some View {
+        let isEditing = editingIndex == index
+
+        return SwipeRow(
+            id: index,
+            openId: $openIndex,
+            actionInset: 2
+        ) {
+            edit(index)
+        } onAction: {
+            remove(index)
+        } content: {
+            HStack(spacing: 8) {
+                IconImage(categoryIcon, size: 16)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: Self.iconWidth)
+
+                Text(item.trimmedName)
+                    .textFont(.body)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                if let quantity = EntryModel.quantityText(for: item) {
+                    Text(quantity)
+                        .textFont(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                }
+
+                Spacer(minLength: 8)
+
+                Text(AmountText.text(item.amount))
+                    .textFont(.body)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.text)
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 4)
+            .background {
+                ZStack {
+                    Rectangle()
+                        .fill(Palette.card)
+
+                    if isEditing {
+                        Rectangle()
+                            .fill(Palette.accent.opacity(.subtle))
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, -4)
+    }
+
+    func summaryLine(
+        _ title: String,
+        amount: Int
+    ) -> some View {
+        HStack {
+            Text(title)
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.subtext)
+
+            Spacer()
+
+            Text(AmountText.text(amount))
+                .textFont(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.text)
+        }
+    }
+}
+
+private extension EntryItemSheet {
+    static let noticeBottom: CGFloat = 76
+    static let iconWidth: CGFloat = 20
+
+    var receiptShape: EntryReceiptShape {
+        EntryReceiptShape(tooth: 12, hasTopEdge: true)
+    }
+
+    var dateText: String {
+        let date = model.date
+        return "\(date.year)/\(date.month)/\(date.day)（\(date.weekday.shortName)）"
+    }
+
+    var categoryIcon: Icon? {
+        model.selectedCategory.flatMap { model.icon(for: $0) }
+    }
+}
+
+#Preview {
+    if let database = try? AppDatabase.inMemory() {
+        let today = LocalDate(Date(), in: .current)
+
+        EntryItemSheet(model: EntryModel(database: database, date: today))
+    }
+}

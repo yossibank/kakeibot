@@ -219,7 +219,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | sort_order | INTEGER | |
 | created_at / updated_at | TEXT | |
 
-索引は、`entry_id` に付ける。品目の合計と記録の `amount` の差は保存しない。決まりは [decisions/records.md の「記録の品目」](decisions/records.md#記録の品目)にある。
+索引は、`entry_id` に付ける。品目の合計と記録の `amount` の差は保存しない。決まりは [decisions/receipts.md の「記録の品目」](decisions/receipts.md#記録の品目)にある。
 
 ### item_name
 

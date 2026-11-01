@@ -142,6 +142,26 @@ struct EntryItemWriteTests {
         #expect(aoba == ["ｷﾞｭｳﾆｭｳ": "低脂肪乳"])
         #expect(count == 2)
     }
+
+    @Test
+    func listsRecentItemNamesOnce() async throws {
+        let setup = try await EntryWriteTests.Setup()
+        let batches = [["パン"], ["牛乳"], ["パン", "値引"], ["卵"]]
+
+        for (offset, names) in batches.enumerated() {
+            var draft = setup.draft
+            draft.items = names.map { name in
+                EntryItem.Draft(name: name, amount: name == "値引" ? -30 : 100)
+            }
+
+            let now = setup.now.addingTimeInterval(TimeInterval(offset * 60))
+            try await setup.database.saveEntry(draft, at: now)
+        }
+
+        let recent = try await setup.database.recentItemNames(limit: 3)
+
+        #expect(recent == ["卵", "パン", "牛乳"])
+    }
 }
 
 private extension EntryItemWriteTests {
