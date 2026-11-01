@@ -58,6 +58,7 @@ public final class EntryModel {
     private(set) var cardBills: [Recurring] = []
     private(set) var budgets: [Budget] = []
     private(set) var monthStartDay: MonthStartDay = .first
+    private(set) var carryoverFrom: YearMonth?
     private(set) var editingId: Entry.ID?
 
     let database: AppDatabase
@@ -128,6 +129,8 @@ public extension EntryModel {
             weekStart = try await database.setting(.weekStart)
 
             monthStartDay = try await database.setting(.monthStartDay)
+
+            carryoverFrom = try await database.setting(.budgetCarryoverFrom)
 
             startsWithAmount = try await database.setting(.entryStartsWithAmount)
 

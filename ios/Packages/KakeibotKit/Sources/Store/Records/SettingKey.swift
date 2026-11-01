@@ -46,6 +46,17 @@ private extension SettingKey where Value == HolidayShift {
     }
 }
 
+public extension SettingKey where Value == YearMonth? {
+    static var budgetCarryoverFrom: Self {
+        Self(
+            .budgetCarryoverFrom,
+            default: nil,
+            decode: { YearMonth($0) },
+            encode: { $0?.description }
+        )
+    }
+}
+
 public extension SettingKey where Value == Weekday {
     static var weekStart: Self {
         Self(.weekStart, default: .sunday)

@@ -1,23 +1,30 @@
 public struct BudgetUsage: Hashable, Sendable {
-    public let budget: Int
+    public let baseBudget: Int
+    public let carryover: Int
     public let spent: Int
     public let daysLeft: Int
 
     public init(
         budget: Int,
+        carryover: Int = 0,
         spent: Int,
         today: LocalDate,
         periodEnd: LocalDate
     ) {
         let days = periodEnd.dayNumber - today.dayNumber + 1
 
-        self.budget = budget
+        self.baseBudget = budget
+        self.carryover = carryover
         self.spent = spent
         self.daysLeft = max(days, 1)
     }
 }
 
 public extension BudgetUsage {
+    var budget: Int {
+        baseBudget + carryover
+    }
+
     var remaining: Int {
         budget - spent
     }

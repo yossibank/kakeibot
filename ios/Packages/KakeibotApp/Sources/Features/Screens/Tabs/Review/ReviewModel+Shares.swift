@@ -144,11 +144,23 @@ private extension ReviewModel {
             return nil
         }
 
+        let carried = categoryId == nil ? carryover(into: month) : 0
+
         return BudgetUsage(
             budget: budget,
+            carryover: carried,
             spent: spent,
             today: today,
             periodEnd: period.range.upperBound
         )
+    }
+
+    func carryover(into month: YearMonth) -> Int {
+        list?.budgetCarryover(
+            budgets: budgets,
+            from: carryoverFrom,
+            into: month,
+            startingOn: monthStartDay
+        ) ?? 0
     }
 }

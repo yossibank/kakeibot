@@ -75,7 +75,8 @@ public extension EntryModel {
         let totals = monthTotals { $0.type == .expense }
 
         return BudgetUsage(
-            budget: usage.budget,
+            budget: usage.baseBudget,
+            carryover: usage.carryover,
             spent: usage.spent - totals.current + totals.after,
             today: Self.today,
             periodEnd: monthOverview.period.upperBound
@@ -132,6 +133,7 @@ public extension EntryModel {
             budgets: budgets,
             recurrings: [],
             monthStartDay: monthStartDay,
+            carryoverFrom: carryoverFrom,
             today: Self.today
         )
     }

@@ -87,7 +87,7 @@ public struct ThemeStyleLookView: View {
             VStack(alignment: .leading, spacing: 8) {
                 SettingsSectionTitle("振動と飾り")
 
-                ThemeStyleSwitch(
+                SettingsSwitch(
                     title: "押した時の振動",
                     detail: "選んだ時や記録した時に、軽く振動します",
                     systemImage: "waveform",
@@ -96,7 +96,7 @@ public struct ThemeStyleLookView: View {
                     await model.choose(haptics: isOn)
                 }
 
-                ThemeStyleSwitch(
+                SettingsSwitch(
                     title: "金の光などの飾り",
                     detail: "ボタンの光とタブの金の輪を出します",
                     systemImage: "sparkle",

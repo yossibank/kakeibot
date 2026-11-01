@@ -28,19 +28,24 @@ struct SnapshotTests {
         )
 
         let monthStart = MonthStartDayModel(database: database, today: today)
+        let budgets = BudgetListModel(database: database, today: today)
         let payday = try #require(MonthStartDay(25, shift: .previous))
+        let carryoverFrom = today.yearMonth.adding(months: -2)
 
         try await database.setSetting(.monthStartDay, to: payday)
+        try await database.setSetting(.budgetCarryoverFrom, to: carryoverFrom)
 
         await wallets.model.load()
         await rules.model.load()
         await walletEdit.load()
         await reminder.load()
         await monthStart.load()
+        await budgets.load()
 
         let walletSheet = WalletEditSheet(model: walletEdit)
         let reminderView = ReminderView(model: reminder)
         let monthStartView = MonthStartDayView(model: monthStart)
+        let budgetView = BudgetListView(model: budgets)
         let exportedAt = now.addingTimeInterval(-40 * 24 * 60 * 60)
 
         let intros = VStack(spacing: 16) {
@@ -59,6 +64,7 @@ struct SnapshotTests {
             try Self.write(walletSheet, variant: variant, to: "settings-wallet-edit")
             try Self.write(reminderView, variant: variant, to: "settings-reminder")
             try Self.write(monthStartView, variant: variant, to: "settings-month-start")
+            try Self.write(budgetView, variant: variant, to: "settings-budgets")
             try Self.write(WidgetGuideView(), variant: variant, to: "settings-widget-guide")
             try Self.write(intros, variant: variant, to: "settings-intros")
         }

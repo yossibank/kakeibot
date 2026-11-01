@@ -30,6 +30,7 @@ expense・income の列は、描画に使わない。
 | --- | --- | --- |
 | month_start_day | 1〜31 | 月末を超えたらその月の最終日 |
 | month_start_shift | `previous` `next` | 月の始まりが休日なら、前か次の平日にする。空ならずらさない |
+| budget_carryover_from | 予算の繰越を始めた期間の月。`2026-11` の形 | 空なら繰り越さない |
 | week_start | `monday`〜`sunday` | 空なら日曜 |
 | reminder_time | `HH:mm` | 空なら知らせない |
 | theme_id | `system`（iPhone に合わせる）か、用意したテーマの名前か、手で作った theme の id | 空なら `system`。用意したテーマの名前は `navy` などで、アプリアイコンの色違いと同じ |

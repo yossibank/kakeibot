@@ -21,6 +21,7 @@ public final class ReviewModel: ScreenModel {
     public private(set) var monthStartDay: MonthStartDay = .first
     public private(set) var weekStart: Weekday = .sunday
     public private(set) var budgets: [Budget] = []
+    public private(set) var carryoverFrom: YearMonth?
     public private(set) var stampCalendar: StampCalendar?
 
     public private(set) var list: EntryList? {
@@ -200,6 +201,10 @@ public extension ReviewModel {
             }
 
             group.addTask {
+                await self.observeCarryoverFrom()
+            }
+
+            group.addTask {
                 await self.observeWeekStart()
             }
         }
@@ -337,6 +342,15 @@ private extension ReviewModel {
             failure: Self.loadFailedMessage
         ) { startDay in
             monthStartDay = startDay
+        }
+    }
+
+    func observeCarryoverFrom() async {
+        await observe(
+            database.settingUpdates(.budgetCarryoverFrom),
+            failure: Self.loadFailedMessage
+        ) { month in
+            carryoverFrom = month
         }
     }
 

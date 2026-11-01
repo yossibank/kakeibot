@@ -5,6 +5,7 @@ public struct MonthOverview: Equatable, Sendable {
     public let budgets: [Budget]
     public let recurrings: [Recurring]
     public let monthStartDay: MonthStartDay
+    public let carryoverFrom: YearMonth?
     public let today: LocalDate
     public let periodRecurrings: [PeriodRecurring]
 
@@ -15,6 +16,7 @@ public struct MonthOverview: Equatable, Sendable {
         budgets: [Budget],
         recurrings: [Recurring],
         monthStartDay: MonthStartDay,
+        carryoverFrom: YearMonth? = nil,
         today: LocalDate
     ) {
         let month = today.periodMonth(startingOn: monthStartDay)
@@ -25,6 +27,7 @@ public struct MonthOverview: Equatable, Sendable {
         self.budgets = budgets
         self.recurrings = recurrings
         self.monthStartDay = monthStartDay
+        self.carryoverFrom = carryoverFrom
         self.today = today
 
         self.periodRecurrings = Self.periodRecurrings(
@@ -90,6 +93,15 @@ public extension MonthOverview {
         return min(ratio, 1)
     }
 
+    var budgetCarryover: Int {
+        list?.budgetCarryover(
+            budgets: budgets,
+            from: carryoverFrom,
+            into: month,
+            startingOn: monthStartDay
+        ) ?? 0
+    }
+
     var budgetUsage: BudgetUsage? {
         guard let budget = budgets.amount(for: nil, in: month) else {
             return nil
@@ -97,6 +109,7 @@ public extension MonthOverview {
 
         return BudgetUsage(
             budget: budget,
+            carryover: budgetCarryover,
             spent: monthExpense,
             today: today,
             periodEnd: period.upperBound
@@ -119,6 +132,7 @@ public extension MonthOverview {
             budgets: budgets,
             recurrings: recurrings,
             monthStartDay: monthStartDay,
+            carryoverFrom: carryoverFrom,
             today: day
         )
     }

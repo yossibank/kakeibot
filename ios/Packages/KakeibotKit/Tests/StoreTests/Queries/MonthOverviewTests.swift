@@ -47,6 +47,50 @@ struct MonthOverviewTests {
     }
 
     @Test
+    func addsCarryoverToBudgetUsage() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        let options = try await database.entryOptions()
+        let today = try #require(LocalDate("2026-10-23"))
+        let month = try #require(YearMonth("2026-09"))
+        let start = try #require(YearMonth("2026-09"))
+        let date = try #require(LocalDate("2026-09-10"))
+
+        let draft = EntryDraft(
+            type: .expense,
+            amount: 12000,
+            date: date,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id
+        )
+
+        try await database.saveEntry(draft, at: now)
+        try await database.setBudget(50000, for: nil, from: month)
+        try await database.setSetting(.budgetCarryoverFrom, to: start)
+        let overview = try await database.monthOverview(on: today)
+        let usage = try #require(overview.budgetUsage)
+
+        #expect(usage.carryover == 38000)
+        #expect(usage.baseBudget == 50000)
+        #expect(usage.budget == 88000)
+        #expect(usage.remaining == 88000)
+    }
+
+    @Test
+    func hasNoCarryoverWithoutStart() async throws {
+        let database = try AppDatabase.inMemory()
+        let today = try #require(LocalDate("2026-10-23"))
+        let month = try #require(YearMonth("2026-09"))
+        try await database.setBudget(50000, for: nil, from: month)
+        let overview = try await database.monthOverview(on: today)
+        let usage = try #require(overview.budgetUsage)
+
+        #expect(usage.carryover == 0)
+        #expect(usage.budget == 50000)
+    }
+
+    @Test
     func publishesSameOverviewAsOneRead() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
