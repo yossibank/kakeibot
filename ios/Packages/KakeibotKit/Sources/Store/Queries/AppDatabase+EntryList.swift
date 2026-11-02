@@ -7,7 +7,9 @@ public extension AppDatabase {
     }
 
     func entryList() async throws -> EntryList {
-        try await writer.read(Self.entryList)
+        try await writer.read { db in
+            try Self.entryList(in: db)
+        }
     }
 
     func latestEntryList() async throws -> EntryList {
@@ -34,13 +36,21 @@ public extension AppDatabase {
 }
 
 extension AppDatabase {
-    static func entryList(in db: Database) throws -> EntryList {
-        try entryList(of: Entry.all(), in: db)
+    static func entryList(
+        in db: Database,
+        includesItems: Bool = true
+    ) throws -> EntryList {
+        try entryList(
+            of: Entry.all(),
+            in: db,
+            includesItems: includesItems
+        )
     }
 
     static func entryList(
         of request: QueryInterfaceRequest<Entry>,
-        in db: Database
+        in db: Database,
+        includesItems: Bool = false
     ) throws -> EntryList {
         let entries = try request.fetchAll(db)
         let days = EntryDay.grouping(entries)
@@ -50,6 +60,7 @@ extension AppDatabase {
         let valuations = try Valuation.fetchAll(db)
         let icons = try byID(Icon.self, in: db)
         let cardBills = try cardBills(in: db)
+        let items = includesItems ? try listItems(of: request, in: db) : [:]
 
         return EntryList(
             days: days,
@@ -58,7 +69,8 @@ extension AppDatabase {
             wallets: wallets,
             valuations: valuations,
             icons: icons,
-            cardBills: cardBills
+            cardBills: cardBills,
+            items: items
         )
     }
 }
@@ -123,6 +135,17 @@ private extension AppDatabase {
             .filter(Column("closing_day") != nil)
             .order(Recurring.sortOrder, Column("created_at"))
             .fetchAll(db)
+    }
+
+    static func listItems(
+        of request: QueryInterfaceRequest<Entry>,
+        in db: Database
+    ) throws -> [Entry.ID: [EntryItem]] {
+        let ids = request.select(Column("id"))
+
+        let items = try entryItems(where: ids.contains(Column("entry_id")), in: db)
+
+        return Dictionary(grouping: items, by: \.entryId)
     }
 
     static func byID<Record: StoreRecord & Identifiable>(

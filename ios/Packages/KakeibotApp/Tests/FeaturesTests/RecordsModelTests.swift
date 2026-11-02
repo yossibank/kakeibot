@@ -401,7 +401,8 @@ extension RecordsModelTests.Setup {
         _ type: Entry.Kind,
         amount: Int,
         on text: String,
-        memo: String = ""
+        memo: String = "",
+        items: [EntryItem.Draft] = []
     ) async throws {
         let options = try await database.entryOptions()
         let categories = type == .income ? options.incomeCategories : options.expenseCategories
@@ -417,7 +418,8 @@ extension RecordsModelTests.Setup {
             date: date,
             categoryId: categories.first?.id,
             walletId: options.wallets[0].id,
-            memo: memo
+            memo: memo,
+            items: items
         )
 
         try await database.saveEntry(draft, at: createdAt)

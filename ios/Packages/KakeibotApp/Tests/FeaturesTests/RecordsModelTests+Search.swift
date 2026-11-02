@@ -33,6 +33,48 @@ extension RecordsModelTests {
     }
 
     @Test
+    func searchesItemNames() async throws {
+        let setup = try await Setup()
+        let items = [
+            EntryItem.Draft(name: "牛乳", amount: 396),
+            EntryItem.Draft(name: "食パン", amount: 220)
+        ]
+        try await setup.save(.expense, amount: 616, on: "2026-10-12", items: items)
+        try await setup.save(.expense, amount: 500, on: "2026-10-11", memo: "コーヒー")
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+
+        model.searchText = "牛乳"
+        let milk = model.searchDays.map(\.date.description)
+
+        model.searchText = "パン"
+        let bread = model.searchDays.map(\.date.description)
+
+        #expect(milk == ["2026-10-12"])
+        #expect(bread == ["2026-10-12"])
+    }
+
+    @Test
+    func listsItemsUnderRows() async throws {
+        let setup = try await Setup()
+        let items = [
+            EntryItem.Draft(name: "牛乳", quantity: 2, amount: 396),
+            EntryItem.Draft(name: "食パン", amount: 220)
+        ]
+        try await setup.save(.expense, amount: 616, on: "2026-10-12", items: items)
+        try await setup.save(.expense, amount: 500, on: "2026-10-12", memo: "コーヒー")
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let day = try #require(model.days.first)
+
+        let rows = model.rows(for: day)
+
+        #expect(rows.map(\.items.count).sorted() == [0, 2])
+        #expect(rows.flatMap(\.items).map(\.name) == ["牛乳", "食パン"])
+        #expect(rows.flatMap(\.items).map(\.quantity) == [2, 1])
+    }
+
+    @Test
     func filtersByCategoryAndSumsSearch() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")

@@ -11,10 +11,7 @@ public extension AppDatabase {
 
     func entryItems(of ids: [Entry.ID]) async throws -> [EntryItem] {
         try await writer.read { db in
-            try EntryItem
-                .filter(ids.contains(Column("entry_id")))
-                .order(Column("entry_id"), Column("sort_order"))
-                .fetchAll(db)
+            try Self.entryItems(where: ids.contains(Column("entry_id")), in: db)
         }
     }
 
@@ -83,6 +80,16 @@ public extension AppDatabase {
 }
 
 extension AppDatabase {
+    static func entryItems(
+        where entries: some SQLSpecificExpressible,
+        in db: Database
+    ) throws -> [EntryItem] {
+        try EntryItem
+            .filter(entries)
+            .order(Column("entry_id"), Column("sort_order"))
+            .fetchAll(db)
+    }
+
     static func entryItems(
         of id: Entry.ID,
         in db: Database

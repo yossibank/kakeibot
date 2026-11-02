@@ -14,7 +14,7 @@ public extension AppDatabase {
 
     func monthOverview(on today: LocalDate) async throws -> MonthOverview {
         try await writer.read { db in
-            let list = try Self.entryList(in: db)
+            let list = try Self.entryList(in: db, includesItems: false)
             let plan = try Self.monthPlan(on: today, in: db)
 
             return plan.with(list)

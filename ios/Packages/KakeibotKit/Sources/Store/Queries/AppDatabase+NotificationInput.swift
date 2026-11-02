@@ -16,7 +16,7 @@ public extension AppDatabase {
         from start: LocalDate
     ) async throws -> NotificationInput {
         try await writer.read { db in
-            let list = try Self.entryList(in: db)
+            let list = try Self.entryList(in: db, includesItems: false)
             let part = try Self.notificationPart(from: start, in: db)
 
             return part.input(with: list)

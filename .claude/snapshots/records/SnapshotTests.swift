@@ -63,6 +63,54 @@ struct SnapshotTests {
         }
 
         task.cancel()
+
+        let entryId = Entry.ID()
+
+        let items = [
+            ("牛乳", 2, 396, EntryItem.TaxRate?.some(.reduced)),
+            ("食パン", 1, 250, .reduced),
+            ("洗剤", 1, 398, .standard),
+            ("弁当", 1, 540, nil)
+        ]
+        .enumerated()
+        .map { index, item in
+            EntryItem(
+                entryId: entryId,
+                name: item.0,
+                quantity: item.1,
+                amount: item.2,
+                taxRate: item.3,
+                sortOrder: index,
+                createdAt: now,
+                updatedAt: now
+            )
+        }
+
+        for theme in [ThemePreset.white, .black, .rose] {
+            for variant in Self.variants {
+                let receipt = RecordsItemReceipt(items: items, amount: 1674)
+                    .padding(24)
+                    .background(Palette.background)
+                    .environment(\.palette, theme.palette)
+
+                try Self.write(
+                    receipt,
+                    variant: variant,
+                    to: "records-item-receipt-\(theme.rawValue)"
+                )
+
+                let adjusted = RecordsItemReceipt(items: items, amount: 1600)
+                    .padding(24)
+                    .background(Palette.background)
+                    .environment(\.palette, theme.palette)
+
+                try Self.write(
+                    adjusted,
+                    variant: variant,
+                    to: "records-item-adjusted-\(theme.rawValue)"
+                )
+            }
+        }
     }
 }
 
@@ -155,7 +203,12 @@ private extension SnapshotTests {
                 categoryId: category.id,
                 tagId: tags.first?.id,
                 walletId: wallet.id,
-                memo: "発表会の衣装と靴と髪飾りをまとめて買った"
+                memo: "発表会の衣装と靴と髪飾りをまとめて買った",
+                items: [
+                    EntryItem.Draft(name: "発表会の衣装", amount: 1_000_000),
+                    EntryItem.Draft(name: "靴", quantity: 2, amount: 200_000, taxRate: .standard),
+                    EntryItem.Draft(name: "髪飾り", amount: 34567)
+                ]
             ),
             EntryDraft(
                 type: .income,

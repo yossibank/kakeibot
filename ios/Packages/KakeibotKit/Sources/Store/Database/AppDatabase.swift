@@ -127,7 +127,9 @@ private extension AppDatabase {
         self.writer = writer
 
         self.entryListObservation = ValueObservation
-            .tracking(Self.entryList)
+            .tracking { db in
+                try Self.entryList(in: db)
+            }
             .removeDuplicates()
             .shared(in: writer)
     }
