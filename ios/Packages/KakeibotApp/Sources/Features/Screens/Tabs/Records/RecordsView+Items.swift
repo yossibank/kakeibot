@@ -13,7 +13,7 @@ extension RecordsView {
 
                 if isOpen {
                     RecordsItemReceipt(items: row.items, amount: row.amount)
-                        .transition(.move(edge: .top).combined(with: .opacity))
+                        .transition(.receiptUnroll)
                 }
             }
             .padding(.leading, Self.itemIndent)
@@ -63,12 +63,50 @@ private extension RecordsView {
 
 private extension RecordsView {
     func toggleItems(_ id: Entry.ID) {
-        withAnimation(.snappy) {
+        withAnimation(.smooth(duration: 0.32)) {
             if openItemIds.contains(id) {
                 openItemIds.remove(id)
             } else {
                 openItemIds.insert(id)
             }
         }
+    }
+}
+
+private struct ReceiptUnroll: ViewModifier {
+    let progress: Double
+
+    func body(content: Content) -> some View {
+        content
+            .mask(alignment: .top) {
+                VStack(spacing: 0) {
+                    Rectangle()
+
+                    LinearGradient(
+                        colors: [.black, .clear],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: Self.fadeHeight)
+                }
+                .padding(-Self.shadowRoom)
+                .padding(.bottom, -Self.fadeHeight)
+                .scaleEffect(x: 1, y: progress, anchor: .top)
+            }
+            .opacity(progress)
+    }
+}
+
+private extension ReceiptUnroll {
+    static let shadowRoom: CGFloat = 12
+    static let fadeHeight: CGFloat = 28
+}
+
+private extension AnyTransition {
+    static var receiptUnroll: AnyTransition {
+        .modifier(
+            active: ReceiptUnroll(progress: 0),
+            identity: ReceiptUnroll(progress: 1)
+        )
     }
 }
