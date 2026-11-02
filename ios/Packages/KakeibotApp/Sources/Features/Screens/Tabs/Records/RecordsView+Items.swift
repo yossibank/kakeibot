@@ -13,7 +13,7 @@ extension RecordsView {
 
                 if isOpen {
                     RecordsItemReceipt(items: row.items, amount: row.amount)
-                        .transition(.receiptUnroll)
+                        .transition(.receiptEmerge)
                 }
             }
             .padding(.leading, Self.itemIndent)
@@ -63,7 +63,7 @@ private extension RecordsView {
 
 private extension RecordsView {
     func toggleItems(_ id: Entry.ID) {
-        withAnimation(.smooth(duration: 0.32)) {
+        withAnimation(.smooth(duration: 0.36)) {
             if openItemIds.contains(id) {
                 openItemIds.remove(id)
             } else {
@@ -73,40 +73,37 @@ private extension RecordsView {
     }
 }
 
-private struct ReceiptUnroll: ViewModifier {
-    let progress: Double
+private struct ReceiptEmerge: ViewModifier {
+    let progress: CGFloat
 
     func body(content: Content) -> some View {
         content
-            .mask(alignment: .top) {
-                VStack(spacing: 0) {
-                    Rectangle()
-
-                    LinearGradient(
-                        colors: [.black, .clear],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: Self.fadeHeight)
-                }
-                .padding(-Self.shadowRoom)
-                .padding(.bottom, -Self.fadeHeight)
-                .scaleEffect(x: 1, y: progress, anchor: .top)
-            }
-            .opacity(progress)
+            .scaleEffect(
+                x: Self.start.width + (1 - Self.start.width) * progress,
+                y: Self.start.height + (1 - Self.start.height) * progress,
+                anchor: .topLeading
+            )
+            .offset(y: Self.toggleOffset * (1 - progress))
     }
 }
 
-private extension ReceiptUnroll {
-    static let shadowRoom: CGFloat = 12
-    static let fadeHeight: CGFloat = 28
+private extension ReceiptEmerge {
+    static let start = CGSize(width: 0.3, height: 0.08)
+    static let toggleOffset: CGFloat = -18
 }
 
 private extension AnyTransition {
-    static var receiptUnroll: AnyTransition {
-        .modifier(
-            active: ReceiptUnroll(progress: 0),
-            identity: ReceiptUnroll(progress: 1)
-        )
+    static var receiptEmerge: AnyTransition {
+        AnyTransition
+            .modifier(
+                active: ReceiptEmerge(progress: 0),
+                identity: ReceiptEmerge(progress: 1)
+            )
+            .combined(
+                with: .asymmetric(
+                    insertion: .opacity.animation(.easeOut(duration: 0.18)),
+                    removal: .opacity.animation(.easeIn(duration: 0.3))
+                )
+            )
     }
 }
