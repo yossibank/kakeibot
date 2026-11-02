@@ -72,12 +72,34 @@ struct EntryReceiptFlowTests {
         }
 
         flow.confirmGuide()
-        let readAmount = await flow.scan([], into: model)
+        let outcome = await flow.scan([], into: model)
 
-        #expect(readAmount)
+        #expect(outcome == .read(itemCount: 0, hasAmount: true))
         #expect(flow.step == nil)
         #expect(model.amount == 911)
         #expect(model.store == "スーパー青葉")
+        #expect(model.errorNotice.message == EntryReceiptFlow.totalMessage)
+    }
+
+    @Test
+    func countsScannedItems() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        let flow = EntryReceiptFlow { _ in
+            ReceiptReading(
+                items: [
+                    EntryItem.Draft(name: "牛乳", amount: 396),
+                    EntryItem.Draft(name: "食パン", amount: 220)
+                ]
+            )
+        }
+
+        let outcome = await flow.scan([], into: model)
+
+        #expect(outcome == .read(itemCount: 2, hasAmount: true))
+        #expect(model.errorNotice.message == nil)
+        #expect(model.amount == 616)
     }
 
     @Test
@@ -89,9 +111,9 @@ struct EntryReceiptFlowTests {
             ReceiptReading()
         }
 
-        let readAmount = await flow.scan([], into: model)
+        let outcome = await flow.scan([], into: model)
 
-        #expect(!readAmount)
+        #expect(outcome == .unread)
         #expect(flow.step == nil)
         #expect(model.errorNotice.message == EntryReceiptFlow.unreadMessage)
         #expect(model.amount == 0)

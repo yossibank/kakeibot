@@ -22,8 +22,14 @@ extension EntryReceiptFlow {
         case reading
     }
 
+    enum Outcome: Equatable {
+        case unread
+        case read(itemCount: Int, hasAmount: Bool)
+    }
+
     static let offerFeature = "4 回目からのレシートの読み取り"
     static let unreadMessage = "レシートを読めませんでした。明るい所で撮り直してください"
+    static let totalMessage = "レシートの合計を読みました"
 
     var isScanning: Bool {
         step == .camera
@@ -57,7 +63,7 @@ extension EntryReceiptFlow {
     func scan(
         _ pages: [CGImage],
         into model: EntryModel
-    ) async -> Bool {
+    ) async -> Outcome {
         step = .reading
 
         let reading = await read(pages)
@@ -66,11 +72,17 @@ extension EntryReceiptFlow {
 
         guard !reading.isEmpty else {
             model.errorNotice.show(Self.unreadMessage)
-            return false
+            return .unread
         }
 
         await model.apply(reading)
 
-        return model.amount > 0
+        let hasAmount = model.amount > 0
+
+        if reading.items.isEmpty, hasAmount {
+            model.errorNotice.inform(Self.totalMessage)
+        }
+
+        return .read(itemCount: reading.items.count, hasAmount: hasAmount)
     }
 }

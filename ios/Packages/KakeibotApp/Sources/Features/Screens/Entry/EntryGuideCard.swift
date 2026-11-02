@@ -66,6 +66,8 @@ extension EntryGuideCard {
         let systemImage: String
         let title: String
         let detail: String
+
+        var art: EntryReceiptArt.Kind?
     }
 }
 
@@ -88,13 +90,20 @@ extension EntryGuideCard.Guide {
             .init(
                 systemImage: "rectangle.portrait",
                 title: "平らな所に置く",
-                detail: "折れやしわを伸ばし、机などに置いて撮ります。"
+                detail: "折れやしわを伸ばし、机などに置いて撮ります。",
+                art: .flat
             ),
-            .init(systemImage: "sun.max", title: "明るい所で撮る", detail: "影や光の反射が文字に掛からないようにします。"),
+            .init(
+                systemImage: "sun.max",
+                title: "明るい所で撮る",
+                detail: "影や光の反射が文字に掛からないようにします。",
+                art: .bright
+            ),
             .init(
                 systemImage: "viewfinder",
                 title: "1 枚ずつ端まで",
-                detail: "上から下まで枠に収めます。長いレシートは、縦に何枚かに分けて撮れます。"
+                detail: "上から下まで枠に収めます。長いレシートは、縦に何枚かに分けて撮れます。",
+                art: .edges
             )
         ],
         buttonTitle: "撮る"
@@ -104,17 +113,12 @@ extension EntryGuideCard.Guide {
 private extension EntryGuideCard {
     static let maxWidth: CGFloat = 340
     static let markSize: CGFloat = 32
+}
 
+private extension EntryGuideCard {
     func stepRow(_ step: Step) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: step.systemImage)
-                .sansFont(.caption, weight: .semibold)
-                .foregroundStyle(Palette.accent)
-                .frame(width: Self.markSize, height: Self.markSize)
-                .overlay {
-                    Circle()
-                        .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
-                }
+        HStack(alignment: step.art == nil ? .top : .center, spacing: 12) {
+            stepMark(step)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(step.title)
@@ -126,6 +130,22 @@ private extension EntryGuideCard {
                     .foregroundStyle(Palette.subtext)
                     .fixedSize(horizontal: false, vertical: true)
             }
+        }
+    }
+
+    @ViewBuilder
+    func stepMark(_ step: Step) -> some View {
+        if let art = step.art {
+            EntryReceiptArt(kind: art)
+        } else {
+            Image(systemName: step.systemImage)
+                .sansFont(.caption, weight: .semibold)
+                .foregroundStyle(Palette.accent)
+                .frame(width: Self.markSize, height: Self.markSize)
+                .overlay {
+                    Circle()
+                        .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+                }
         }
     }
 }

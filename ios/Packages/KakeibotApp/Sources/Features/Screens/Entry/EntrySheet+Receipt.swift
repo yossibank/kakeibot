@@ -21,7 +21,7 @@ extension EntrySheet {
     }
 
     var receiptButton: some View {
-        ChipButton("レシート", systemImage: "doc.text.viewfinder") {
+        EntryReceiptButton(freeLeft: isPro ? nil : model.freeReceiptsLeft) {
             withAnimation(.snappy) {
                 receipt.start(for: model, isPro: isPro)
             }
@@ -43,7 +43,7 @@ extension EntrySheet {
                 }
             }
         case .reading:
-            readingCard
+            EntryReceiptReadingCard()
         case .camera, nil:
             EmptyView()
         }
@@ -62,33 +62,28 @@ extension EntrySheet {
 }
 
 private extension EntrySheet {
-    static let readingMessage = "レシートを読んでいます"
+    static let coverDismissDelay: Duration = .milliseconds(400)
+}
 
-    var readingCard: some View {
-        ZStack {
-            Palette.scrim
-                .opacity(0.55)
-                .ignoresSafeArea()
-
-            VStack(spacing: 12) {
-                ProgressView()
-                    .tint(Palette.accent)
-
-                Text(Self.readingMessage)
-                    .textFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(Palette.accentStrong)
-            }
-            .padding(24)
-            .background(Palette.card, in: .rect(cornerRadius: corner.radius(20)))
-        }
-        .transition(.opacity)
-    }
-
+private extension EntrySheet {
     func scanReceipt(_ pages: [CGImage]) async {
-        let readAmount = await receipt.scan(pages, into: model)
+        let outcome = await receipt.scan(pages, into: model)
 
-        if readAmount {
+        guard case let .read(itemCount, hasAmount) = outcome else {
+            return
+        }
+
+        if hasAmount {
             setEnteringAmount(false)
         }
+
+        guard itemCount > 0 else {
+            return
+        }
+
+        // fullScreenCover を閉じ終える前に sheet を出すと表示されないため
+        try? await Task.sleep(for: Self.coverDismissDelay)
+
+        open(.items)
     }
 }

@@ -178,6 +178,10 @@ private extension EntryItemSheet {
 
             if model.hasItemAdjustment {
                 adjustmentLine
+
+                if !model.suspectItemIndices.isEmpty {
+                    suspectHint
+                }
             }
 
             EntryReceiptRule(style: .double)
@@ -254,11 +258,25 @@ private extension EntryItemSheet {
         }
     }
 
+    var suspectHint: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "exclamationmark.magnifyingglass")
+
+            Text("色の付いた行が、読み違えているかもしれません")
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+        }
+        .textFont(.caption)
+        .foregroundStyle(Palette.amber)
+    }
+
     func itemRow(
         _ item: EntryItem.Draft,
         at index: Int
     ) -> some View {
         let isEditing = isSlipOpen && editingIndex == index
+        let isSuspect = model.suspectItemIndices.contains(index)
 
         return SwipeRow(
             id: index,
@@ -292,7 +310,7 @@ private extension EntryItemSheet {
                 Text(AmountText.text(item.amount))
                     .textFont(.body)
                     .monospacedDigit()
-                    .foregroundStyle(Palette.text)
+                    .foregroundStyle(isSuspect ? Palette.amber : Palette.text)
 
                 if showsRates {
                     Text(item.taxRate.map { "\($0.rawValue)%" } ?? "")
@@ -312,6 +330,14 @@ private extension EntryItemSheet {
                     if isEditing {
                         Rectangle()
                             .fill(Palette.accent.opacity(.subtle))
+                    } else if isSuspect {
+                        Rectangle()
+                            .fill(Palette.amber.opacity(.subtle))
+                            .overlay(alignment: .leading) {
+                                Rectangle()
+                                    .fill(Palette.amber)
+                                    .frame(width: 2)
+                            }
                     }
                 }
             }

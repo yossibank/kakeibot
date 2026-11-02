@@ -69,6 +69,45 @@ extension EntryModelTests {
     }
 
     @Test
+    func marksSuspectItemsOnlyForReadItems() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        model.press(.digit(6))
+        model.press(.digit(1))
+        model.press(.digit(6))
+        model.addItem(name: "牛乳", amount: 396)
+        model.addItem(name: "食パン", amount: 220)
+        model.addItem(name: "食パン", amount: 220)
+        let typed = model.suspectItemIndices
+
+        await model.apply(
+            ReceiptReading(
+                total: 616,
+                items: [
+                    EntryItem.Draft(name: "牛乳", amount: 396),
+                    EntryItem.Draft(name: "食パン", amount: 220),
+                    EntryItem.Draft(name: "食パン", amount: 220)
+                ]
+            )
+        )
+
+        #expect(typed.isEmpty)
+        #expect(model.suspectItemIndices == [1, 2])
+    }
+
+    @Test
+    func countsFreeReceiptsLeft() async throws {
+        let setup = try await Setup()
+        try await setup.database.setSetting(.receiptSavedCount, to: 2)
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        #expect(model.freeReceiptsLeft == 1)
+    }
+
+    @Test
     func countsOnlySavesFromReceipt() async throws {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date)

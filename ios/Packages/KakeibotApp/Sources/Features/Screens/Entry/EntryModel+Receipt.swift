@@ -12,6 +12,18 @@ public extension EntryModel {
         receiptSavedCount == 0
     }
 
+    var freeReceiptsLeft: Int {
+        max(Self.freeReceiptLimit - receiptSavedCount, 0)
+    }
+
+    var suspectItemIndices: Set<Int> {
+        guard items.contains(where: { $0.readName != nil }) else {
+            return []
+        }
+
+        return Set(ReceiptSuspect.indices(of: items, difference: itemAdjustment))
+    }
+
     func canReadReceipt(isPro: Bool) -> Bool {
         isPro || receiptSavedCount < Self.freeReceiptLimit
     }

@@ -88,6 +88,75 @@ struct SnapshotTests {
             .environment(\.colorScheme, .light)
 
         try Self.write(help, to: "entry-item-help.png")
+
+        for scheme in [ColorScheme.light, .dark] {
+            let guide = EntryGuideCard(onConfirm: {}, guide: .receipt) {}
+                .frame(width: Self.phone.width, height: Self.phone.height)
+                .background(Palette.background)
+                .environment(\.colorScheme, scheme)
+
+            try Self.write(guide, to: "entry-receipt-guide-\(scheme.name).png")
+
+            let reading = EntryReceiptReadingCard()
+                .frame(width: Self.phone.width, height: Self.phone.height)
+                .background(Palette.background)
+                .environment(\.colorScheme, scheme)
+
+            try Self.write(reading, to: "entry-receipt-reading-\(scheme.name).png")
+        }
+
+        let buttons = HStack(spacing: 8) {
+            EntryReceiptButton(freeLeft: 2) {}
+
+            EntryReceiptButton(freeLeft: 0) {}
+
+            EntryReceiptButton(freeLeft: nil) {}
+        }
+        .padding(24)
+        .background(Palette.panel)
+
+        let arts = HStack(spacing: 16) {
+            EntryReceiptArt(kind: .flat)
+
+            EntryReceiptArt(kind: .bright)
+
+            EntryReceiptArt(kind: .edges)
+
+            EntryReceiptArt(kind: .reading)
+        }
+        .padding(24)
+        .background(Palette.panel)
+
+        for scheme in [ColorScheme.light, .dark] {
+            try Self.write(
+                buttons.environment(\.colorScheme, scheme),
+                to: "entry-receipt-buttons-\(scheme.name).png"
+            )
+            try Self.write(
+                arts.environment(\.colorScheme, scheme),
+                to: "entry-receipt-arts-\(scheme.name).png"
+            )
+        }
+
+        let suspectModel = try await Self.model(
+            .expense,
+            digits: [],
+            startsWithAmount: false
+        )
+
+        await suspectModel.apply(Self.suspectReading)
+
+        let suspectSheet = EntryItemSheet(model: suspectModel)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .environment(\.colorScheme, .light)
+
+        try Self.write(suspectSheet, to: "entry-item-suspect.png")
+    }
+}
+
+private extension ColorScheme {
+    var name: String {
+        self == .dark ? "dark" : "light"
     }
 }
 
@@ -105,6 +174,18 @@ private extension SnapshotTests {
         ("entry-transfer", .transfer, smallDigits),
         ("entry-expense-large", .expense, largeDigits)
     ]
+
+    static let suspectReading = ReceiptReading(
+        store: "スーパー青葉 横浜店",
+        total: 1446,
+        items: [
+            EntryItem.Draft(name: "牛乳", quantity: 2, amount: 396),
+            EntryItem.Draft(name: "食パン", amount: 220),
+            EntryItem.Draft(name: "たまご", amount: 278),
+            EntryItem.Draft(name: "バナナ", amount: 198),
+            EntryItem.Draft(name: "ヨーグルト", amount: 414)
+        ]
+    )
 
     static func model(
         _ type: Entry.Kind,
