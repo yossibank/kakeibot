@@ -7,7 +7,9 @@ public extension AppDatabase {
     }
 
     func entryList() async throws -> EntryList {
-        try await writer.read(Self.entryList)
+        try await writer.read { db in
+            try Self.entryList(in: db)
+        }
     }
 
     func latestEntryList() async throws -> EntryList {
@@ -34,13 +36,21 @@ public extension AppDatabase {
 }
 
 extension AppDatabase {
-    static func entryList(in db: Database) throws -> EntryList {
-        try entryList(of: Entry.all(), in: db)
+    static func entryList(
+        in db: Database,
+        includesItems: Bool = true
+    ) throws -> EntryList {
+        try entryList(
+            of: Entry.all(),
+            in: db,
+            includesItems: includesItems
+        )
     }
 
     static func entryList(
         of request: QueryInterfaceRequest<Entry>,
-        in db: Database
+        in db: Database,
+        includesItems: Bool = false
     ) throws -> EntryList {
         let entries = try request.fetchAll(db)
         let days = EntryDay.grouping(entries)
@@ -50,7 +60,7 @@ extension AppDatabase {
         let valuations = try Valuation.fetchAll(db)
         let icons = try byID(Icon.self, in: db)
         let cardBills = try cardBills(in: db)
-        let items = try listItems(of: entries, in: db)
+        let items = includesItems ? try listItems(of: request, in: db) : [:]
 
         return EntryList(
             days: days,
@@ -128,21 +138,15 @@ private extension AppDatabase {
     }
 
     static func listItems(
-        of entries: [Entry],
+        of request: QueryInterfaceRequest<Entry>,
         in db: Database
     ) throws -> [Entry.ID: [EntryItem]] {
-        guard !entries.isEmpty else {
-            return [:]
-        }
-
-        let ids = Set(entries.map(\.id))
+        let ids = request.select(Column("id"))
 
         let items = try EntryItem
+            .filter(ids.contains(Column("entry_id")))
             .order(Column("entry_id"), Column("sort_order"))
             .fetchAll(db)
-            .filter {
-                ids.contains($0.entryId)
-            }
 
         return Dictionary(grouping: items, by: \.entryId)
     }

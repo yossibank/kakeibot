@@ -16,8 +16,12 @@ struct RecordsItemReceipt: View {
 
             EntryReceiptRule(style: .dashed)
 
-            if tax != 0 {
-                summaryLine("消費税", amount: tax)
+            if totals.tax != 0 {
+                summaryLine("消費税", amount: totals.tax)
+            }
+
+            if adjustment != 0 {
+                summaryLine("差額", amount: adjustment, color: Palette.amber)
             }
 
             EntryReceiptRule(style: .double)
@@ -56,8 +60,15 @@ private extension RecordsItemReceipt {
 }
 
 private extension RecordsItemReceipt {
-    var tax: Int {
-        EntryItemTotal(items.map(EntryItem.Draft.init)).taxes.reduce(0) { $0 + $1.amount }
+    var totals: (tax: Int, total: Int) {
+        let total = EntryItemTotal(items.map(EntryItem.Draft.init))
+        let tax = total.taxes.reduce(0) { $0 + $1.amount }
+
+        return (tax, total.total)
+    }
+
+    var adjustment: Int {
+        amount - totals.total
     }
 
     var paper: EntryReceiptShape {
@@ -96,17 +107,18 @@ private extension RecordsItemReceipt {
 
     func summaryLine(
         _ title: String,
-        amount: Int
+        amount: Int,
+        color: Color? = nil
     ) -> some View {
         HStack {
             Text(title)
-                .foregroundStyle(Palette.subtext)
+                .foregroundStyle(color ?? Palette.subtext)
 
             Spacer()
 
             Text(AmountText.text(amount))
                 .monospacedDigit()
-                .foregroundStyle(Palette.text)
+                .foregroundStyle(color ?? Palette.text)
         }
         .textFont(.caption)
     }

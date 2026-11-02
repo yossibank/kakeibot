@@ -86,11 +86,30 @@ struct SnapshotTests {
             )
         }
 
-        for variant in Self.variants {
-            let receipt = RecordsItemReceipt(items: items, amount: 1674)
-                .padding(24)
+        for theme in [ThemePreset.white, .black, .rose] {
+            for variant in Self.variants {
+                let receipt = RecordsItemReceipt(items: items, amount: 1674)
+                    .padding(24)
+                    .background(Palette.background)
+                    .environment(\.palette, theme.palette)
 
-            try Self.write(receipt, variant: variant, to: "records-item-receipt")
+                try Self.write(
+                    receipt,
+                    variant: variant,
+                    to: "records-item-receipt-\(theme.rawValue)"
+                )
+
+                let adjusted = RecordsItemReceipt(items: items, amount: 1600)
+                    .padding(24)
+                    .background(Palette.background)
+                    .environment(\.palette, theme.palette)
+
+                try Self.write(
+                    adjusted,
+                    variant: variant,
+                    to: "records-item-adjusted-\(theme.rawValue)"
+                )
+            }
         }
     }
 }

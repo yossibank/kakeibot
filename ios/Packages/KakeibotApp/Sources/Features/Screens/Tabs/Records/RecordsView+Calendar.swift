@@ -37,6 +37,8 @@ extension RecordsView {
             if let day {
                 ForEach(model.rows(for: day)) { row in
                     swipeRow(row)
+
+                    itemList(row)
                 }
             }
 
