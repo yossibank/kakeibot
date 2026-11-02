@@ -63,10 +63,22 @@ private extension EntryReceiptReader {
                 text: text,
                 minX: box.minX,
                 midY: 1 - box.midY,
-                height: box.height
+                height: box.height,
+                maxX: box.maxX,
+                tilt: tilt(of: observation)
             )
         }
 
         return ReceiptFragment.lines(of: fragments)
+    }
+
+    static func tilt(of observation: RecognizedTextObservation) -> Double {
+        let width = observation.topRight.x - observation.topLeft.x
+
+        guard width > 0 else {
+            return 0
+        }
+
+        return (observation.topLeft.y - observation.topRight.y) / width
     }
 }

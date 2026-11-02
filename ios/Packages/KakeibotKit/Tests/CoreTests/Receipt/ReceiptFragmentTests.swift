@@ -29,13 +29,17 @@ extension ReceiptFragmentTests {
         let minX: Double
         let midY: Double
         let height: Double
+        let maxX: Double?
+        let tilt: Double?
 
         var fragment: ReceiptFragment {
             ReceiptFragment(
                 text: text,
                 minX: minX,
                 midY: midY,
-                height: height
+                height: height,
+                maxX: maxX,
+                tilt: tilt ?? 0
             )
         }
     }

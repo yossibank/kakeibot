@@ -148,6 +148,8 @@ private extension ReceiptLine {
 
     static let maxDigits = 7
 
+    static let minMarkedAmount = 10
+
     static let misreadMarks: Set<Character> = ["0", "6"]
 
     static let reducedMarks: Set<Character> = ["※", "*", "軽"]
@@ -232,7 +234,7 @@ private extension ReceiptLine {
 
     static var takeOutPattern: Regex<Substring> {
         #/
-            ^[T1I]/[O0]\s
+            ^[T1IL]/[O0]\s
         /#
     }
 
@@ -292,7 +294,7 @@ private extension ReceiptLine {
             return .discount(name: "", amount: amount.value)
         }
 
-        if letters.isEmpty || titleWords.contains(where: { letters == $0 }) {
+        if letters.isEmpty || isTitle(letters) {
             return .heading(isTitle: !letters.isEmpty)
         }
 
@@ -360,11 +362,18 @@ private extension ReceiptLine {
             return .discount(name: itemName(amount.name), amount: -abs(amount.value))
         }
 
-        guard isNameLike(itemName(amount.name)) else {
+        guard
+            amount.value != 0,
+            isNameLike(itemName(amount.name))
+        else {
             return .skip
         }
 
         return .item(amount)
+    }
+
+    static func isTitle(_ letters: String) -> Bool {
+        titleWords.contains(letters) || (letters.count == 3 && letters.hasPrefix("領収"))
     }
 
     static func isTax(_ words: String) -> Bool {
@@ -420,7 +429,8 @@ private extension ReceiptLine {
             !amountBlockers.contains(before ?? " "),
             !(before.map { $0.isASCII && $0.isLetter } ?? false),
             digits.count <= maxDigits,
-            let number = Int(digits)
+            let number = Int(digits),
+            number >= minMarkedAmount || !match.mark.contains(where: \.isLetter)
         else {
             return nil
         }
@@ -467,16 +477,25 @@ private extension ReceiptLine {
             return nil
         }
 
+        let parts = unitToken.split(
+            separator: "@",
+            maxSplits: 1,
+            omittingEmptySubsequences: false
+        )
+
+        let gluedCount = parts.count == 2 ? Int(parts[0]) : nil
+        let units = unitCandidates(of: String(parts.last ?? ""))
+
         let countToken = tokens.last.flatMap { token in
             token.firstMatch(of: countTokenPattern).flatMap { Int($0.output.1) }
         }
 
-        let count = countToken ?? 1
+        let counts = [gluedCount, countToken ?? 1].compactMap(\.self)
 
         guard
-            count > 0,
-            value % count == 0,
-            unitCandidates(of: unitToken).contains(value / count)
+            let count = counts.first(where: { count in
+                count > 0 && value % count == 0 && units.contains(value / count)
+            })
         else {
             return nil
         }
