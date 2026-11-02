@@ -24,11 +24,18 @@ struct EntryTaxRateBadge: View {
         Text("\(rate.rawValue)%")
             .textFont(.caption2, weight: .semibold)
             .monospacedDigit()
+            .lineLimit(1)
+            .fixedSize()
             .foregroundStyle(Palette.accentStrong)
             .padding(.horizontal, 6)
+            .frame(minWidth: Self.minWidth)
             .padding(.vertical, 1)
             .background(Palette.accent.opacity(.subtle), in: .capsule)
     }
+}
+
+private extension EntryTaxRateBadge {
+    static let minWidth: CGFloat = 44
 }
 
 struct EntryTaxBreakdown: View {
@@ -36,29 +43,32 @@ struct EntryTaxBreakdown: View {
     let taxIncluded: Bool
 
     var body: some View {
-        VStack(spacing: 6) {
+        Grid(alignment: .leading, horizontalSpacing: 6, verticalSpacing: 6) {
             ForEach(taxes, id: \.rate) { tax in
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                GridRow(alignment: .firstTextBaseline) {
                     EntryTaxRateBadge(rate: tax.rate)
 
                     Text("対象")
 
                     Text(AmountText.text(tax.base))
                         .monospacedDigit()
+                        .gridColumnAlignment(.trailing)
 
-                    Spacer(minLength: 8)
+                    Color.clear
+                        .frame(maxWidth: .infinity, maxHeight: 0)
 
                     Text(taxIncluded ? "うち消費税" : "消費税")
+                        .gridColumnAlignment(.trailing)
 
                     Text(AmountText.text(tax.amount))
                         .monospacedDigit()
                         .foregroundStyle(Palette.text)
+                        .gridColumnAlignment(.trailing)
                 }
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
             }
         }
+        .textFont(.caption)
+        .foregroundStyle(Palette.subtext)
+        .lineLimit(1)
     }
 }

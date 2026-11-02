@@ -76,7 +76,7 @@ extension EntryItemSheet {
         .padding(.bottom, 8)
         .fixedSize(horizontal: false, vertical: true)
         .background {
-            EntryReceiptShape(tooth: 12, hasTopEdge: true, hasBottomEdge: false)
+            EntryReceiptShape(tooth: 12, hasTopEdge: false, hasBottomEdge: false)
                 .fill(Palette.paper)
                 .shadow(color: Palette.shadow.opacity(0.6), radius: 12, y: -2)
                 .ignoresSafeArea(edges: .bottom)
