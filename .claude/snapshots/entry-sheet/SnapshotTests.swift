@@ -70,6 +70,12 @@ struct SnapshotTests {
 
         try Self.write(itemSheet, to: "entry-item-sheet.png")
 
+        let itemInput = EntryItemSheet(model: itemModel, isSlipOpen: true)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .environment(\.colorScheme, .light)
+
+        try Self.write(itemInput, to: "entry-item-input.png")
+
         let emptySheet = EntryItemSheet(model: closedModel)
             .frame(width: Self.phone.width, height: Self.phone.height)
             .environment(\.colorScheme, .dark)

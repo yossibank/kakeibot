@@ -13,7 +13,9 @@ struct EntryItemSheet: View {
     @State var editingIndex: Int?
     @State var editingItem: EntryItem.Draft?
     @State var taxRate: EntryItem.TaxRate?
+    @State var isDiscount = false
     @State var isSlipOpen = false
+    @State var scrollRequest: ScrollRequest?
     @State var removed: EntryModel.RemovedItem?
     @State var openIndex: Int?
 
@@ -46,14 +48,25 @@ struct EntryItemSheet: View {
             .padding(.horizontal, 20)
             .padding(.top, 20)
 
-            ScrollView {
-                receipt
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    receipt
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: scrollRequest) { _, request in
+                    guard let request else {
+                        return
+                    }
+
+                    withAnimation(.snappy) {
+                        proxy.scrollTo(request.index, anchor: .top)
+                    }
+                }
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollIndicators(.hidden)
-            .scrollDismissesKeyboard(.interactively)
 
             if isSlipOpen {
                 slip
@@ -88,6 +101,17 @@ struct EntryItemSheet: View {
             }
         }
         .presentationDragIndicator(.visible)
+    }
+}
+
+extension EntryItemSheet {
+    init(
+        model: EntryModel,
+        isSlipOpen: Bool = false
+    ) {
+        _isSlipOpen = State(initialValue: isSlipOpen)
+
+        self.model = model
     }
 }
 
@@ -130,6 +154,7 @@ private extension EntryItemSheet {
                 VStack(spacing: 0) {
                     ForEach(Array(model.items.enumerated()), id: \.offset) { index, item in
                         itemRow(item, at: index)
+                            .id(index)
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                 }

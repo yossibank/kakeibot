@@ -7,18 +7,18 @@ public struct Keypad: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let calculator: AmountCalculator
-    let showsTax: Bool
+    let accessories: [Accessory]
     let onDone: (() -> Void)?
     let onKey: (AmountCalculator.Key) -> Void
 
     public init(
         calculator: AmountCalculator,
-        showsTax: Bool = true,
+        accessories: [Accessory] = [],
         onDone: (() -> Void)? = nil,
         onKey: @escaping (AmountCalculator.Key) -> Void
     ) {
         self.calculator = calculator
-        self.showsTax = showsTax
+        self.accessories = accessories
         self.onDone = onDone
         self.onKey = onKey
     }
@@ -30,9 +30,8 @@ public struct Keypad: View {
             ForEach(rows, id: \.offset) { _, row in
                 GridRow {
                     ForEach(row, id: \.self) { key in
-                        if isHidden(key) {
-                            Color.clear
-                                .frame(maxWidth: .infinity, minHeight: 50)
+                        if let accessory = accessory(for: key) {
+                            accessoryButton(accessory)
                         } else {
                             button(for: key)
                         }
@@ -44,7 +43,47 @@ public struct Keypad: View {
     }
 }
 
+public extension Keypad {
+    struct Accessory {
+        let title: String
+        let isActive: Bool
+        let action: () -> Void
+
+        public init(
+            _ title: String,
+            isActive: Bool = false,
+            action: @escaping () -> Void
+        ) {
+            self.title = title
+            self.isActive = isActive
+            self.action = action
+        }
+    }
+}
+
 private extension Keypad {
+    func accessoryButton(_ accessory: Accessory) -> some View {
+        let shape = RoundedRectangle(cornerRadius: corner.radius(16))
+        let fill = accessory.isActive ? Palette.accent.opacity(.subtle) : Color.clear
+        let rim = accessory.isActive ? Palette.accent : Palette.accent.opacity(.muted)
+
+        return Button(action: accessory.action) {
+            Text(accessory.title)
+                .textFont(size: .body, weight: .semibold)
+                .foregroundStyle(accessory.isActive ? Palette.accentStrong : Palette.text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(fill, in: shape)
+                .overlay {
+                    shape
+                        .stroke(rim, lineWidth: 0.75)
+                }
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
     func button(for key: AmountCalculator.Key) -> some View {
         let isActive = key == calculator.taxNote.map { .tax($0.rate) }
 
@@ -149,12 +188,16 @@ private extension Keypad {
         onDone != nil && !calculator.hasOperation
     }
 
-    func isHidden(_ key: AmountCalculator.Key) -> Bool {
-        guard case .tax = key else {
-            return false
+    func accessory(for key: AmountCalculator.Key) -> Accessory? {
+        guard
+            case let .tax(rate) = key,
+            let index = AmountCalculator.TaxRate.allCases.firstIndex(of: rate),
+            accessories.indices.contains(index)
+        else {
+            return nil
         }
 
-        return !showsTax
+        return accessories[index]
     }
 
     func background(
