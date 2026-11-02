@@ -26,12 +26,12 @@ extension WidgetGuidePlace {
                 Ability(
                     systemImage: "gauge.with.needle",
                     title: "あといくら",
-                    detail: "今月あといくら使えるかと、今日・今週・今月の支出、次の固定費を出します"
+                    detail: "小は今月あといくら使えるかと今日の支出を出します。中は今週・今月の支出と次の固定費も出します"
                 ),
                 Ability(
                     systemImage: "bolt",
                     title: "すぐ記録",
-                    detail: "テンプレートを押すと、アプリを開かずにその場で記録します。5 秒のあいだ取り消せます"
+                    detail: "テンプレートを押すと、アプリを開かずに記録し、5 秒のあいだ取り消せます。大は今日の記録も出します"
                 ),
                 Ability(
                     systemImage: "pencil",
@@ -52,9 +52,9 @@ extension WidgetGuidePlace {
                     detail: "時計の上に、残りを短く出します"
                 ),
                 Ability(
-                    systemImage: "eye.slash",
-                    title: "金額は伏せる",
-                    detail: "ロックしている間は、金額を伏せて出します"
+                    systemImage: "hand.tap",
+                    title: "押すとホームへ",
+                    detail: "押すと、アプリのホームを開きます"
                 )
             ]
         case .control:

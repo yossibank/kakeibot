@@ -4,6 +4,8 @@ import SwiftUI
 
 struct WidgetGuideStage: View {
     let place: WidgetGuidePlace
+    let widget: WidgetGuideWidget
+    let size: WidgetGuideSize
 
     var body: some View {
         FeatureArtCanvas(width: Self.width, height: height) {
@@ -23,11 +25,21 @@ private extension WidgetGuideStage {
     struct Tile: Hashable {
         let systemImage: String
         let name: String
+        let detail: String
         let amount: Int?
+    }
+
+    struct Record: Hashable {
+        let systemImage: String
+        let title: String
+        let detail: String
+        let amount: Int
     }
 
     static let width: CGFloat = 338
     static let widgetHeight: CGFloat = 158
+    static let largeHeight: CGFloat = 354
+    static let appSize: CGFloat = 62
     static let widgetRadius: CGFloat = 22
     static let tileRadius: CGFloat = 12
     static let markSize: CGFloat = 20
@@ -35,10 +47,24 @@ private extension WidgetGuideStage {
     static let nightTop = Color(red: 0.27, green: 0.29, blue: 0.33)
 
     static let tiles = [
-        Tile(systemImage: "cup.and.saucer", name: "コーヒー", amount: 450),
-        Tile(systemImage: "fork.knife", name: "お昼", amount: 800),
-        Tile(systemImage: "tram", name: "電車", amount: 220),
-        Tile(systemImage: "cart", name: "買い物", amount: nil)
+        Tile(systemImage: "cup.and.saucer", name: "コーヒー", detail: "カフェ・財布", amount: 450),
+        Tile(systemImage: "fork.knife", name: "お昼", detail: "食費・財布", amount: 800),
+        Tile(systemImage: "tram", name: "電車", detail: "交通・カード", amount: 220),
+        Tile(systemImage: "cart", name: "買い物", detail: "日用品・カード", amount: nil),
+        Tile(systemImage: "book", name: "本", detail: "趣味・カード", amount: 1500),
+        Tile(systemImage: "figure.run", name: "ジム", detail: "健康・銀行", amount: 800)
+    ]
+
+    static let records = [
+        Record(systemImage: "fork.knife", title: "食費", detail: "お昼・財布", amount: 800),
+        Record(systemImage: "cup.and.saucer", title: "カフェ", detail: "コーヒー・財布", amount: 450)
+    ]
+
+    static let apps = [
+        "calendar",
+        "camera",
+        "map",
+        "music.note"
     ]
 
     static let controls = [
@@ -55,7 +81,7 @@ private extension WidgetGuideStage {
 private extension WidgetGuideStage {
     var height: CGFloat {
         switch place {
-        case .home: Self.widgetHeight * 2 + 14
+        case .home: size == .large ? Self.largeHeight : Self.widgetHeight
         case .lockScreen: 236
         case .control: 214
         }
@@ -88,9 +114,14 @@ private extension WidgetGuideStage {
     var content: some View {
         switch place {
         case .home:
-            VStack(spacing: 14) {
+            switch (widget, size) {
+            case (.budget, .small):
+                budgetSmall
+            case (.budget, _):
                 budget
-
+            case (.quickRecord, .large):
+                quickRecordLarge
+            case (.quickRecord, _):
                 quickRecord
             }
         case .lockScreen:
@@ -172,20 +203,141 @@ private extension WidgetGuideStage {
         .card(cornerRadius: Self.widgetRadius)
     }
 
-    var quickRecord: some View {
-        VStack(spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("すぐ記録")
-                    .textFont(size: .caption)
-                    .foregroundStyle(Palette.accent)
+    var budgetSmall: some View {
+        HStack(spacing: 22) {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("今月あといくら")
+                        .textFont(size: .caption)
+                        .tracking(1)
+                        .foregroundStyle(Palette.accent)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+
+                    Spacer(minLength: 4)
+
+                    Text("あと 12 日")
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.subtext)
+                        .fixedSize()
+                }
 
                 Spacer(minLength: 4)
 
-                Text("今日の支出 \(AmountText.text(FeatureArtSample.todayExpense))")
-                    .textFont(size: .caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
+                ZStack(alignment: .bottom) {
+                    HalfDial(progress: 0.62)
+
+                    Text(AmountText.text(FeatureArtSample.remaining))
+                        .displayFont(.headline, weight: .bold)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accentStrong)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .padding(.horizontal, 22)
+                }
+
+                Spacer(minLength: 4)
+
+                HStack(alignment: .firstTextBaseline) {
+                    Text("今日の支出")
+                        .textFont(size: .caption)
+                        .foregroundStyle(Palette.subtext)
+
+                    Spacer(minLength: 4)
+
+                    Text(AmountText.text(FeatureArtSample.todayExpense))
+                        .textFont(size: .small, weight: .semibold)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.text)
+                }
             }
+            .padding(14)
+            .frame(width: Self.widgetHeight, height: Self.widgetHeight)
+            .card(cornerRadius: Self.widgetRadius)
+
+            Grid(horizontalSpacing: 22, verticalSpacing: 22) {
+                GridRow {
+                    app(Self.apps[0])
+
+                    app(Self.apps[1])
+                }
+
+                GridRow {
+                    app(Self.apps[2])
+
+                    app(Self.apps[3])
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    var quickRecordLarge: some View {
+        VStack(spacing: 8) {
+            quickRecordHeader
+
+            Grid(horizontalSpacing: 8, verticalSpacing: 8) {
+                ForEach(0..<3, id: \.self) { row in
+                    GridRow {
+                        tile(Self.tiles[row * 2], showsDetail: true)
+
+                        tile(Self.tiles[row * 2 + 1], showsDetail: true)
+                    }
+                }
+            }
+            .frame(height: 198)
+
+            Rectangle()
+                .fill(Palette.line)
+                .frame(height: 1)
+                .padding(.vertical, 4)
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text("今日の記録 3 件")
+                        .textFont(size: .micro)
+                        .tracking(1)
+                        .foregroundStyle(Palette.accent)
+
+                    Spacer(minLength: 4)
+
+                    Text("ほか 1 件")
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.subtext)
+                }
+
+                ForEach(Self.records, id: \.self) { record in
+                    recordRow(record)
+                }
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
+        .padding(.bottom, 14)
+        .frame(height: Self.largeHeight)
+        .card(cornerRadius: Self.widgetRadius)
+    }
+
+    var quickRecordHeader: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text("すぐ記録")
+                .textFont(size: .caption)
+                .foregroundStyle(Palette.accent)
+
+            Spacer(minLength: 4)
+
+            Text("今日の支出 \(AmountText.text(FeatureArtSample.todayExpense))")
+                .textFont(size: .caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+        }
+    }
+
+    var quickRecord: some View {
+        VStack(spacing: 8) {
+            quickRecordHeader
 
             Grid(horizontalSpacing: 8, verticalSpacing: 8) {
                 GridRow {
@@ -346,19 +498,65 @@ private extension WidgetGuideStage {
         }
     }
 
-    func tile(_ tile: Tile) -> some View {
+    func app(_ symbol: String) -> some View {
+        Image(systemName: symbol)
+            .font(.system(size: 24))
+            .foregroundStyle(Palette.accent)
+            .frame(width: Self.appSize, height: Self.appSize)
+            .background(Palette.card.opacity(0.8), in: .rect(cornerRadius: 15))
+    }
+
+    func badge(_ systemImage: String) -> some View {
+        Image(systemName: systemImage)
+            .font(.system(size: 10))
+            .foregroundStyle(Palette.accent)
+            .frame(width: Self.markSize, height: Self.markSize)
+            .background(Palette.faint, in: Circle())
+    }
+
+    func recordRow(_ record: Record) -> some View {
+        HStack(spacing: 8) {
+            badge(record.systemImage)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(record.title)
+                    .textFont(size: .caption, weight: .medium)
+                    .foregroundStyle(Palette.text)
+
+                Text(record.detail)
+                    .textFont(size: .micro)
+                    .foregroundStyle(Palette.subtext)
+            }
+
+            Spacer(minLength: 8)
+
+            Text(AmountText.text(record.amount))
+                .displayFont(.small, weight: .medium)
+                .monospacedDigit()
+                .foregroundStyle(Palette.text)
+        }
+    }
+
+    func tile(
+        _ tile: Tile,
+        showsDetail: Bool = false
+    ) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 4) {
-                Image(systemName: tile.systemImage)
-                    .font(.system(size: 10))
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 20, height: 20)
-                    .background(Palette.faint, in: Circle())
+                badge(tile.systemImage)
 
                 Text(tile.name)
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
+            }
+
+            if showsDetail {
+                Text(tile.detail)
+                    .textFont(size: .micro)
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .padding(.leading, Self.markSize + 4)
             }
 
             Spacer(minLength: 2)

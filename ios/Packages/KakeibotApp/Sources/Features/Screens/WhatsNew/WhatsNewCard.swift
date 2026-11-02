@@ -71,10 +71,24 @@ struct WhatsNewCard: View {
                 }
             }
 
-            Text(feature.text)
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(feature.lead)
+                    .textFont(.subheadline, weight: .semibold)
+                    .foregroundStyle(Palette.text)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                ForEach(feature.points, id: \.self) { point in
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(Palette.accent)
+
+                        Text(point)
+                            .foregroundStyle(Palette.text)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .textFont(.footnote)
+                }
+            }
 
             if let action = feature.action {
                 CardButton(

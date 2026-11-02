@@ -24,7 +24,8 @@ extension WhatsNewRelease {
         let systemImage: String
         let title: String
         let shortTitle: String
-        let text: String
+        let lead: String
+        let points: [String]
         let steps: [Step]
         let action: Action?
         let actionTitle: String
@@ -48,7 +49,11 @@ extension WhatsNewRelease {
                     systemImage: "doc.text.viewfinder",
                     title: "レシートを撮って記録",
                     shortTitle: "レシート",
-                    text: "撮ったレシートから、\n品目・合計・日付・店名まで読みます。\n合計が合わない品目には色が付くので、\n直す所がすぐ分かります。",
+                    lead: "撮るだけで、品目まで入ります",
+                    points: [
+                        "品目・合計・日付・店名を読む",
+                        "合計が合わない品目には色が付く"
+                    ],
                     steps: [
                         Step(scene: .receiptButton, caption: "「レシート」を押す"),
                         Step(scene: .receiptCamera, caption: "レシートを撮る"),
@@ -61,7 +66,11 @@ extension WhatsNewRelease {
                     systemImage: "list.bullet.rectangle",
                     title: "記録の品目",
                     shortTitle: "品目",
-                    text: "1 つの記録に、買った物を並べられます。\n8% と 10% の消費税も、分けて出します。",
+                    lead: "1 つの記録に、買った物を並べられます",
+                    points: [
+                        "品目ごとに金額と個数を入れる",
+                        "8% と 10% の消費税を分けて出す"
+                    ],
                     steps: [
                         Step(scene: .itemsAdd, caption: "「＋ 品目」を押す"),
                         Step(scene: .itemsSlip, caption: "品名と金額を入れる"),
@@ -74,7 +83,11 @@ extension WhatsNewRelease {
                     systemImage: "arrow.uturn.forward.circle",
                     title: "予算の繰越",
                     shortTitle: "繰越",
-                    text: "使い切らなかった予算を、\n次の期間の予算に足せます。\n使いすぎた分は、次の期間から引きます。",
+                    lead: "余った予算を、次の期間に回せます",
+                    points: [
+                        "残りは次の予算に足す",
+                        "使いすぎた分は次の予算から引く"
+                    ],
                     steps: [
                         Step(scene: .carryoverSwitch, caption: "繰り越すにする"),
                         Step(scene: .carryoverLeft, caption: "残りが出る"),

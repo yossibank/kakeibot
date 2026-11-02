@@ -67,6 +67,16 @@ struct SnapshotTests {
             try Self.write(budgetView, variant: variant, to: "settings-budgets")
             try Self.write(WidgetGuideView(), variant: variant, to: "settings-widget-guide")
             try Self.write(
+                WidgetGuideView(place: .home, widget: .budget, size: .small),
+                variant: variant,
+                to: "settings-widget-guide-small"
+            )
+            try Self.write(
+                WidgetGuideView(place: .home, widget: .quickRecord, size: .large),
+                variant: variant,
+                to: "settings-widget-guide-large"
+            )
+            try Self.write(
                 WidgetGuideView(place: .lockScreen),
                 variant: variant,
                 to: "settings-widget-guide-lock"
