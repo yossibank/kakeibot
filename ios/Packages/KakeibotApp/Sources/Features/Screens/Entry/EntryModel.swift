@@ -56,6 +56,7 @@ public final class EntryModel {
     var appliedTemplateId: EntryTemplate.ID?
     var history: EntryList?
     var isReceiptRead = false
+    var receiptStore: String?
 
     private(set) var original: Entry?
     private(set) var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
@@ -231,6 +232,7 @@ public extension EntryModel {
         memo = ""
         items = []
         isReceiptRead = false
+        receiptStore = nil
         tagId = nil
         billMonth = nil
         appliedTemplateId = nil

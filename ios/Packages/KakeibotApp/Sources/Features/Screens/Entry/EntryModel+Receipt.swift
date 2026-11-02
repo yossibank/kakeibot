@@ -3,6 +3,8 @@ import Foundation
 
 public extension EntryModel {
     static let freeReceiptLimit = 3
+    static let receiptCountFailedMessage = "記録は保存しましたが、レシートの回数を数えられませんでした"
+    static let itemNameFailedMessage = "記録は保存しましたが、直した品名を覚えられませんでした"
 
     var showsReceipt: Bool {
         showsItems && keypadTarget == .amount
@@ -28,20 +30,26 @@ public extension EntryModel {
         isPro || receiptSavedCount < Self.freeReceiptLimit
     }
 
-    func apply(_ reading: ReceiptReading) async {
+    @discardableResult
+    func apply(_ reading: ReceiptReading) async -> Bool {
         let store = reading.store?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let names = await rememberedNames(at: store)
         let renamed = reading.renamed(by: names)
+        var setsAmount = false
 
-        if !renamed.items.isEmpty {
+        if renamed.items.isEmpty {
+            forgetReadNames()
+        } else {
             items = renamed.items
         }
 
         if let total = renamed.total,
            (1...AmountCalculator.maxValue).contains(total) {
             calculator = AmountCalculator(amount: total)
-        } else if !renamed.items.isEmpty {
+            setsAmount = true
+        } else if !renamed.items.isEmpty, canAdjustToItems {
             adjustToItems()
+            setsAmount = itemTotal > 0
         }
 
         if let date = renamed.date {
@@ -52,12 +60,20 @@ public extension EntryModel {
             self.store = store
         }
 
+        receiptStore = store.isEmpty ? nil : store
         isReceiptRead = true
+
+        return setsAmount
     }
 }
 
 extension EntryModel {
     func finishReceipt() async {
+        guard showsItems else {
+            isReceiptRead = false
+            return
+        }
+
         await rememberItemNames()
 
         guard isReceiptRead else {
@@ -70,7 +86,7 @@ extension EntryModel {
             try await database.countReceiptSave()
             receiptSavedCount += 1
         } catch {
-            report(error)
+            errorNotice.show(Self.receiptCountFailedMessage)
         }
     }
 }
@@ -90,12 +106,7 @@ private extension EntryModel {
     }
 
     func rememberItemNames() async {
-        let store = store.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard
-            showsItems,
-            !store.isEmpty
-        else {
+        guard let store = receiptStore else {
             return
         }
 
@@ -117,9 +128,15 @@ private extension EntryModel {
                     on: now
                 )
             } catch {
-                report(error)
+                errorNotice.show(Self.itemNameFailedMessage)
                 return
             }
+        }
+    }
+
+    func forgetReadNames() {
+        for index in items.indices {
+            items[index].readName = nil
         }
     }
 }

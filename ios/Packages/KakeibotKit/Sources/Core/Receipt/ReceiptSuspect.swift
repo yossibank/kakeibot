@@ -22,7 +22,7 @@ private extension ReceiptSuspect {
         _ item: EntryItem.Draft,
         difference: Int
     ) -> Bool {
-        difference < 0 && item.amount == -difference
+        difference < 0 && item.taxRate == nil && item.amount == -difference
     }
 
     static func isMisread(

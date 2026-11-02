@@ -89,55 +89,14 @@ struct SnapshotTests {
 
         try Self.write(help, to: "entry-item-help.png")
 
-        for scheme in [ColorScheme.light, .dark] {
-            let guide = EntryGuideCard(onConfirm: {}, guide: .receipt) {}
-                .frame(width: Self.phone.width, height: Self.phone.height)
-                .background(Palette.background)
-                .environment(\.colorScheme, scheme)
+        try await renderReceipt()
+    }
+}
 
-            try Self.write(guide, to: "entry-receipt-guide-\(scheme.name).png")
+private extension SnapshotTests {
+    static let receiptThemes: [ThemePreset] = [.white, .black, .rose]
 
-            let reading = EntryReceiptReadingCard()
-                .frame(width: Self.phone.width, height: Self.phone.height)
-                .background(Palette.background)
-                .environment(\.colorScheme, scheme)
-
-            try Self.write(reading, to: "entry-receipt-reading-\(scheme.name).png")
-        }
-
-        let buttons = HStack(spacing: 8) {
-            EntryReceiptButton(freeLeft: 2) {}
-
-            EntryReceiptButton(freeLeft: 0) {}
-
-            EntryReceiptButton(freeLeft: nil) {}
-        }
-        .padding(24)
-        .background(Palette.panel)
-
-        let arts = HStack(spacing: 16) {
-            EntryReceiptArt(kind: .flat)
-
-            EntryReceiptArt(kind: .bright)
-
-            EntryReceiptArt(kind: .edges)
-
-            EntryReceiptArt(kind: .reading)
-        }
-        .padding(24)
-        .background(Palette.panel)
-
-        for scheme in [ColorScheme.light, .dark] {
-            try Self.write(
-                buttons.environment(\.colorScheme, scheme),
-                to: "entry-receipt-buttons-\(scheme.name).png"
-            )
-            try Self.write(
-                arts.environment(\.colorScheme, scheme),
-                to: "entry-receipt-arts-\(scheme.name).png"
-            )
-        }
-
+    func renderReceipt() async throws {
         let suspectModel = try await Self.model(
             .expense,
             digits: [],
@@ -146,17 +105,75 @@ struct SnapshotTests {
 
         await suspectModel.apply(Self.suspectReading)
 
-        let suspectSheet = EntryItemSheet(model: suspectModel)
-            .frame(width: Self.phone.width, height: Self.phone.height)
-            .environment(\.colorScheme, .light)
+        let drawerModel = try await Self.model(.expense, digits: Self.smallDigits)
 
-        try Self.write(suspectSheet, to: "entry-item-suspect.png")
-    }
-}
+        for theme in Self.receiptThemes {
+            let palette = theme.palette
+            let name = theme.rawValue
 
-private extension ColorScheme {
-    var name: String {
-        self == .dark ? "dark" : "light"
+            let drawer = EntrySheet(model: drawerModel)
+                .frame(width: Self.phone.width, height: Self.phone.height)
+                .background(Palette.background)
+                .environment(\.canScanReceipt, true)
+
+            let guide = EntryGuideCard(onConfirm: {}, guide: .receipt) {}
+                .frame(width: Self.phone.width, height: Self.phone.height)
+                .background(Palette.background)
+
+            let reading = EntryReceiptReadingCard()
+                .frame(width: Self.phone.width, height: Self.phone.height)
+                .background(Palette.background)
+
+            let suspect = EntryItemSheet(model: suspectModel)
+                .frame(width: Self.phone.width, height: Self.phone.height)
+
+            let buttons = HStack(spacing: 8) {
+                EntryReceiptButton(freeLeft: 2) {}
+
+                EntryReceiptButton(freeLeft: 0) {}
+
+                EntryReceiptButton(freeLeft: nil) {}
+            }
+            .padding(24)
+            .background(Palette.panel)
+
+            let arts = HStack(spacing: 16) {
+                EntryReceiptArt(kind: .flat)
+
+                EntryReceiptArt(kind: .bright)
+
+                EntryReceiptArt(kind: .edges)
+
+                EntryReceiptArt(kind: .reading)
+            }
+            .padding(24)
+            .background(Palette.panel)
+
+            try Self.write(
+                drawer.environment(\.palette, palette),
+                to: "entry-receipt-drawer-\(name).png"
+            )
+            try Self.write(
+                guide.environment(\.palette, palette),
+                to: "entry-receipt-guide-\(name).png"
+            )
+            try Self.write(
+                reading.environment(\.palette, palette),
+                to: "entry-receipt-reading-\(name).png"
+            )
+            try Self.write(
+                suspect.environment(\.palette, palette),
+                to: "entry-item-suspect-\(name).png"
+            )
+            try Self.write(
+                buttons.environment(\.palette, palette),
+                to: "entry-receipt-buttons-\(name).png"
+            )
+            try Self.write(
+                arts.environment(\.palette, palette),
+                to: "entry-receipt-arts-\(name).png"
+            )
+        }
     }
 }
 

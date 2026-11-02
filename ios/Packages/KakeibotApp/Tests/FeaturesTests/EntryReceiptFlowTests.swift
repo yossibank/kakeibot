@@ -103,6 +103,23 @@ struct EntryReceiptFlowTests {
     }
 
     @Test
+    func keepsKeypadWhenAmountIsUnread() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        model.press(.digit(5))
+        let flow = EntryReceiptFlow { _ in
+            ReceiptReading(store: "スーパー青葉")
+        }
+
+        let outcome = await flow.scan([], into: model)
+
+        #expect(outcome == .read(itemCount: 0, hasAmount: false))
+        #expect(model.errorNotice.message == nil)
+        #expect(model.amount == 5)
+    }
+
+    @Test
     func reportsUnreadReceipt() async throws {
         let setup = try await EntryModelTests.Setup()
         let model = EntryModel(database: setup.database, date: setup.date)

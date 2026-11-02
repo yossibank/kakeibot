@@ -56,8 +56,8 @@ extension EntryReceiptCamera {
             onCancel()
         }
     }
+}
 
-    static var isSupported: Bool {
-        VNDocumentCameraViewController.isSupported
-    }
+public extension EnvironmentValues {
+    @Entry var canScanReceipt = false
 }

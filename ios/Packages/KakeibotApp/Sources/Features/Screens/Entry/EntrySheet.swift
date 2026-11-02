@@ -18,6 +18,7 @@ public struct EntrySheet: View {
 
     @Environment(\.themeStyle.corner) var corner
     @Environment(\.isPro) var isPro
+    @Environment(\.canScanReceipt) var canScanReceipt
 
     @State private var isEditingMemo = false
     @State private var isConfirmingDiscard = false
@@ -103,7 +104,7 @@ public struct EntrySheet: View {
             .proOffer(receipt.offer, presentsInSheet: true) {
                 receipt.closeOffer()
             } onUnlock: {
-                receipt.start(for: model, isPro: true)
+                receipt.closeOffer()
             }
             .fullScreenCover(isPresented: isScanningReceipt) {
                 receiptCamera

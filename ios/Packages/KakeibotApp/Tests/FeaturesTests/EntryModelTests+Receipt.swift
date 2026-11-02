@@ -108,6 +108,80 @@ extension EntryModelTests {
     }
 
     @Test
+    func remembersNamesUnderReadStore() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        await model.apply(
+            ReceiptReading(
+                store: "セブン新宿店",
+                total: 396,
+                items: [EntryItem.Draft(name: "ギユウニユウ", amount: 396)]
+            )
+        )
+        model.store = "セブン"
+        model.updateItem(at: 0, name: "牛乳", amount: 396)
+        _ = await model.save()
+        let read = try await setup.database.itemNames(at: "セブン新宿店")
+        let edited = try await setup.database.itemNames(at: "セブン")
+
+        #expect(read == ["ギユウニユウ": "牛乳"])
+        #expect(edited.isEmpty)
+    }
+
+    @Test
+    func forgetsEarlierNamesWhenOnlyTotalIsRead() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        await model.apply(
+            ReceiptReading(
+                store: "スーパー青葉",
+                items: [EntryItem.Draft(name: "ギユウニユウ", amount: 396)]
+            )
+        )
+        model.updateItem(at: 0, name: "牛乳", amount: 396)
+        await model.apply(ReceiptReading(store: "ドラッグ若葉", total: 500))
+        _ = await model.save()
+        let first = try await setup.database.itemNames(at: "スーパー青葉")
+        let second = try await setup.database.itemNames(at: "ドラッグ若葉")
+
+        #expect(first.isEmpty)
+        #expect(second.isEmpty)
+        #expect(model.items.allSatisfy { $0.readName == nil })
+    }
+
+    @Test
+    func reportsAmountOnlyWhenReceiptSetsIt() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        model.press(.digit(5))
+
+        let storeOnly = await model.apply(ReceiptReading(store: "スーパー青葉"))
+        let total = await model.apply(ReceiptReading(total: 911))
+
+        #expect(!storeOnly)
+        #expect(total)
+    }
+
+    @Test
+    func skipsCountWhenSavedAsTransfer() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        await model.apply(ReceiptReading(total: 911))
+        model.select(.transfer)
+        _ = await model.save()
+        let count = try await setup.database.setting(.receiptSavedCount)
+
+        #expect(count == 0)
+    }
+
+    @Test
     func countsOnlySavesFromReceipt() async throws {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date)

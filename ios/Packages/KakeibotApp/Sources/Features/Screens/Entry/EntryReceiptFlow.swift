@@ -75,9 +75,7 @@ extension EntryReceiptFlow {
             return .unread
         }
 
-        await model.apply(reading)
-
-        let hasAmount = model.amount > 0
+        let hasAmount = await model.apply(reading)
 
         if reading.items.isEmpty, hasAmount {
             model.errorNotice.inform(Self.totalMessage)

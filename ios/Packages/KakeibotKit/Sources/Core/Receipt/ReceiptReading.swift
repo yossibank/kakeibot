@@ -102,7 +102,7 @@ public extension ReceiptReading {
 
     func merging(_ guessed: ReceiptReading) -> ReceiptReading {
         ReceiptReading(
-            store: guessed.store ?? store,
+            store: store ?? guessed.store,
             date: date ?? guessed.date,
             total: guessed.total ?? total,
             items: guessed.items.isEmpty ? items : guessed.items

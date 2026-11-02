@@ -4,7 +4,7 @@ import SwiftUI
 
 extension EntrySheet {
     var showsReceiptButton: Bool {
-        model.showsReceipt && EntryReceiptCamera.isSupported
+        model.showsReceipt && canScanReceipt
     }
 
     var isScanningReceipt: Binding<Bool> {

@@ -72,7 +72,7 @@ struct ReceiptReadingTests {
 
         let merged = rules.merging(guess)
 
-        #expect(merged.store == "スーパー青葉")
+        #expect(merged.store == "青葉")
         #expect(merged.date == ruleDate)
         #expect(merged.total == 911)
         #expect(merged.items == guessItems)
@@ -82,9 +82,8 @@ struct ReceiptReadingTests {
     func keepsRulesWhereGuessIsEmpty() throws {
         let guessDate = try #require(LocalDate("2026-10-04"))
         let ruleItems = [EntryItem.Draft(name: "牛乳", amount: 396)]
-        let rules = ReceiptReading(store: "青葉", total: 900, items: ruleItems)
-
-        let merged = rules.merging(ReceiptReading(date: guessDate))
+        let merged = ReceiptReading(total: 900, items: ruleItems)
+            .merging(ReceiptReading(store: "青葉", date: guessDate))
 
         #expect(merged.store == "青葉")
         #expect(merged.date == guessDate)
