@@ -21,6 +21,8 @@ public enum Palette {
     public static let shadow = Color(rgb: 0x000000, lightOpacity: 0.18)
     public static let scrim = Color(rgb: 0x000000, lightOpacity: 0.4)
     public static let glow = Color(themed: \.accent, lightOpacity: 0.4)
+    public static let paper = Color(paperOf: \.paper)
+    public static let paperEdge = Color(paperOf: \.paperEdge)
     public static let hairline = accent.opacity(.subtle)
     public static let outline = accent.opacity(.medium)
     public static let faint = accent.opacity(.faint)

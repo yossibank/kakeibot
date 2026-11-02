@@ -8,7 +8,7 @@ struct EntryItemTotalTests {
             try EntryItem.Draft(name: "品目", amount: item.amount, taxRate: Self.rate(item.taxRate))
         }
 
-        let total = EntryItemTotal(items)
+        let total = EntryItemTotal(items, taxIncluded: fixture.taxIncluded)
         let taxes = total.taxes.map { tax in
             Tax(rate: tax.rate.rawValue, base: tax.base, amount: tax.amount)
         }
@@ -16,11 +16,13 @@ struct EntryItemTotalTests {
         #expect(total.subtotal == fixture.subtotal)
         #expect(taxes == fixture.taxes)
         #expect(total.total == fixture.total)
+        #expect(total.taxIncluded == fixture.taxIncluded)
     }
 }
 
 extension EntryItemTotalTests {
     struct TotalCase: Decodable, Sendable {
+        let taxIncluded: Bool
         let items: [Item]
         let subtotal: Int
         let taxes: [Tax]

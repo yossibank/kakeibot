@@ -1,0 +1,307 @@
+{
+  "description": "端末の中のモデルが答えた行の役割から、店名・日付・合計・品目を組み立てる。lines は上から順の行で、行の番号は 0 から数える。labels の storeLine・dateLine・totalLine は店名・日付・合計の行の番号で、無ければ null。labels.items は品目ごとに、金額の書かれた行 line、品名の行 nameLine、数量の行 quantityLine、値引の行 discountLines、税率 taxRate（8・10・null）を持つ。labels.discountLines は、どの品目にも付かないレシート全体の値引の行。nameLine と quantityLine は無ければ null。金額・数量・値引・日付は、指された行の文字から決まりで読み、モデルの答えの数字は使わない。範囲の外の行、ほかの役割で使い終えた行、決まりで品目や金額だけと読めない行、金額が 0 以下の行は品目にしない。合計の行と、合計・お預り・残高の言葉の行より後の行も品目にしない。金額の行に品名が無ければ、nameLine か、すぐ上の役割の無い行を品名にする（どちらも 2 行上まで）。品名に文字が 1 つしか無ければ品目にしない。値引の行は、マイナスの金額か値引の言葉がある行だけを品目の金額から引く。レシート全体の値引は、品目の後に、値引の行の文字を品名にした品目として並べ、taxRate を金額の一番大きい品目に合わせる。数量の行の単価が品目の金額と同じなら、金額を単価×数量にする。内の印の付いた品目は taxRate を null にする。taxRate が null で、金額の後か品名の上の番号の行に ※ の印があれば 8 にする。店名の行は、番号や電話番号の行なら使わない。store・date・total は読めなければ null。items は行の番号の順に、name・quantity・amount・taxRate を並べる。",
+  "cases": [
+    {
+      "summary": "数量と値引を前の品目にまとめる",
+      "lines": [
+        "スーパー青葉 横浜店",
+        "TEL 045-123-4567",
+        "2026年10月03日(土) 18:42",
+        "牛乳 ¥198",
+        "  2コ×単198",
+        "食パン ¥220",
+        "たまご ¥258",
+        "値引 -30",
+        "小計 ¥844",
+        "外税 ¥67",
+        "合計 ¥911"
+      ],
+      "labels": {
+        "storeLine": 0,
+        "dateLine": 2,
+        "totalLine": 10,
+        "items": [
+          {
+            "line": 3,
+            "nameLine": null,
+            "quantityLine": 4,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 5,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 6,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [
+              7
+            ],
+            "taxRate": null
+          }
+        ],
+        "discountLines": []
+      },
+      "store": "スーパー青葉 横浜店",
+      "date": "2026-10-03",
+      "total": 911,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 2,
+          "amount": 396,
+          "taxRate": null
+        },
+        {
+          "name": "食パン",
+          "quantity": 1,
+          "amount": 220,
+          "taxRate": null
+        },
+        {
+          "name": "たまご",
+          "quantity": 1,
+          "amount": 228,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "金額だけの行は上の行を品名にする",
+      "lines": [
+        "ローソン",
+        "からあげクン レッド",
+        "¥238",
+        "合計 ¥238"
+      ],
+      "labels": {
+        "storeLine": 0,
+        "dateLine": null,
+        "totalLine": 3,
+        "items": [
+          {
+            "line": 2,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          }
+        ],
+        "discountLines": []
+      },
+      "store": "ローソン",
+      "date": null,
+      "total": 238,
+      "items": [
+        {
+          "name": "からあげクン レッド",
+          "quantity": 1,
+          "amount": 238,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "行に無い品目と重なった品目は作らない",
+      "lines": [
+        "青葉",
+        "牛乳 ¥396",
+        "合計 ¥396"
+      ],
+      "labels": {
+        "storeLine": 0,
+        "dateLine": null,
+        "totalLine": 2,
+        "items": [
+          {
+            "line": 1,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 1,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 9,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 0,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          }
+        ],
+        "discountLines": []
+      },
+      "store": "青葉",
+      "date": null,
+      "total": 396,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 396,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "税率の印をそのまま品目に付ける",
+      "lines": [
+        "牛乳 ¥198軽",
+        "洗剤 ¥398",
+        "小計 ¥596",
+        "外税8% ¥15",
+        "外税10% ¥39",
+        "合計 ¥650"
+      ],
+      "labels": {
+        "storeLine": null,
+        "dateLine": null,
+        "totalLine": 5,
+        "items": [
+          {
+            "line": 0,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": 8
+          },
+          {
+            "line": 1,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": 10
+          }
+        ],
+        "discountLines": []
+      },
+      "store": null,
+      "date": null,
+      "total": 650,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 198,
+          "taxRate": 8
+        },
+        {
+          "name": "洗剤",
+          "quantity": 1,
+          "amount": 398,
+          "taxRate": 10
+        }
+      ]
+    },
+    {
+      "summary": "品名の行を指した答えを使い、ありえない行は品目にしない",
+      "lines": [
+        "JRC Takashimaya",
+        "ジェイアール名古屋タカシマヤ",
+        "TEL （052）566-1101",
+        "＜クレジットお買上明細＞",
+        "2026年10月30日11時05分通番：5514-9593",
+        "h3349-2935-8548-6※",
+        "弁当",
+        "3,241 1 3,241",
+        "H8241-8734-0013-9 歩除外",
+        "プラスチック製等買物袋（内税）",
+        "内税 3",
+        "お買上高 3,244",
+        "歩引額（005） -324",
+        "外税額 233",
+        "3,153",
+        "ご利用前残高 33,289",
+        "ご利用額 3,241"
+      ],
+      "labels": {
+        "storeLine": 1,
+        "dateLine": 4,
+        "totalLine": 14,
+        "items": [
+          {
+            "line": 7,
+            "nameLine": 6,
+            "quantityLine": null,
+            "discountLines": [
+              13
+            ],
+            "taxRate": null
+          },
+          {
+            "line": 10,
+            "nameLine": 9,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": 8
+          },
+          {
+            "line": 8,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 11,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 16,
+            "nameLine": null,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": 8
+          }
+        ],
+        "discountLines": [
+          12
+        ]
+      },
+      "store": "ジェイアール名古屋タカシマヤ",
+      "date": "2026-10-30",
+      "total": 3153,
+      "items": [
+        {
+          "name": "弁当",
+          "quantity": 1,
+          "amount": 3241,
+          "taxRate": 8
+        },
+        {
+          "name": "プラスチック製等買物袋",
+          "quantity": 1,
+          "amount": 3,
+          "taxRate": null
+        },
+        {
+          "name": "歩引額",
+          "quantity": 1,
+          "amount": -324,
+          "taxRate": 8
+        }
+      ]
+    }
+  ]
+}

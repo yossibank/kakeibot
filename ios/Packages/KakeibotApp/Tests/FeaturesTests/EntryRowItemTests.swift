@@ -42,6 +42,21 @@ struct EntryRowItemTests {
         let item = EntryRowItem(entry, in: list)
         #expect(item.detail == "カード（2月払い）")
     }
+
+    @Test
+    func keepsTaxModeOfEntry() throws {
+        let setup = try Setup()
+        var entry = try setup.entry(billMonth: "2027-02")
+        let list = setup.list([setup.bill])
+        let exclusive = EntryRowItem(entry, in: list)
+
+        entry.taxIncluded = true
+
+        let included = EntryRowItem(entry, in: list)
+
+        #expect(!exclusive.taxIncluded)
+        #expect(included.taxIncluded)
+    }
 }
 
 extension EntryRowItemTests {

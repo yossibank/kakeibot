@@ -12,8 +12,15 @@ extension RecordsView {
                 itemToggle(row, isOpen: isOpen)
 
                 if isOpen {
-                    RecordsItemReceipt(items: row.items, amount: row.amount)
-                        .transition(.receiptEmerge)
+                    RecordsItemReceipt(
+                        taxIncluded: row.taxIncluded,
+                        onClose: {
+                            toggleItems(row.id)
+                        },
+                        items: row.items,
+                        amount: row.amount
+                    )
+                    .transition(.receiptEmerge)
                 }
             }
             .padding(.leading, Self.itemIndent)

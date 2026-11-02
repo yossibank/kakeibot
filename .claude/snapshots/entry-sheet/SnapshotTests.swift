@@ -76,18 +76,122 @@ struct SnapshotTests {
 
         try Self.write(itemInput, to: "entry-item-input.png")
 
+        let includedModel = try await Self.model(
+            .expense,
+            digits: [],
+            startsWithAmount: false
+        )
+
+        await includedModel.apply(Self.includedReading)
+
+        let included = EntryItemSheet(model: includedModel)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .environment(\.colorScheme, .light)
+
+        try Self.write(included, to: "entry-item-included.png")
+
         let emptySheet = EntryItemSheet(model: closedModel)
             .frame(width: Self.phone.width, height: Self.phone.height)
             .environment(\.colorScheme, .dark)
 
         try Self.write(emptySheet, to: "entry-item-empty.png")
 
-        let help = EntryItemHelp {}
+        let help = EntryGuideCard(guide: .items) {}
             .frame(width: Self.phone.width, height: Self.phone.height)
             .background(Palette.background)
             .environment(\.colorScheme, .light)
 
         try Self.write(help, to: "entry-item-help.png")
+
+        try await renderReceipt()
+    }
+}
+
+private extension SnapshotTests {
+    static let receiptThemes: [ThemePreset] = [.white, .black, .rose]
+
+    func renderReceipt() async throws {
+        let suspectModel = try await Self.model(
+            .expense,
+            digits: [],
+            startsWithAmount: false
+        )
+
+        await suspectModel.apply(Self.suspectReading)
+
+        let drawerModel = try await Self.model(
+            .expense,
+            digits: Self.smallDigits,
+            hasTemplates: true
+        )
+
+        for theme in Self.receiptThemes {
+            let palette = theme.palette
+            let name = theme.rawValue
+
+            let drawer = EntrySheet(model: drawerModel)
+                .frame(width: Self.phone.width, height: Self.phone.height)
+                .background(Palette.background)
+                .environment(\.canScanReceipt, true)
+
+            let guide = EntryGuideCard(onConfirm: {}, guide: .receipt) {}
+                .frame(width: Self.phone.width, height: Self.phone.height)
+                .background(Palette.background)
+
+            let reading = EntryReceiptReadingCard()
+                .frame(width: Self.phone.width, height: Self.phone.height)
+                .background(Palette.background)
+
+            let suspect = EntryItemSheet(model: suspectModel)
+                .frame(width: Self.phone.width, height: Self.phone.height)
+
+            let buttons = HStack(spacing: 8) {
+                EntryReceiptButton(freeLeft: 2) {}
+
+                EntryReceiptButton(freeLeft: 0) {}
+
+                EntryReceiptButton(freeLeft: nil) {}
+            }
+            .padding(24)
+            .background(Palette.panel)
+
+            let arts = HStack(spacing: 16) {
+                EntryReceiptArt(kind: .flat)
+
+                EntryReceiptArt(kind: .bright)
+
+                EntryReceiptArt(kind: .edges)
+
+                EntryReceiptArt(kind: .reading)
+            }
+            .padding(24)
+            .background(Palette.panel)
+
+            try Self.write(
+                drawer.environment(\.palette, palette),
+                to: "entry-receipt-drawer-\(name).png"
+            )
+            try Self.write(
+                guide.environment(\.palette, palette),
+                to: "entry-receipt-guide-\(name).png"
+            )
+            try Self.write(
+                reading.environment(\.palette, palette),
+                to: "entry-receipt-reading-\(name).png"
+            )
+            try Self.write(
+                suspect.environment(\.palette, palette),
+                to: "entry-item-suspect-\(name).png"
+            )
+            try Self.write(
+                buttons.environment(\.palette, palette),
+                to: "entry-receipt-buttons-\(name).png"
+            )
+            try Self.write(
+                arts.environment(\.palette, palette),
+                to: "entry-receipt-arts-\(name).png"
+            )
+        }
     }
 }
 
@@ -106,10 +210,34 @@ private extension SnapshotTests {
         ("entry-expense-large", .expense, largeDigits)
     ]
 
+    static let includedReading = ReceiptReading(
+        store: "天然酵母の食パン専門店 つばめ&Milk名駅店",
+        total: 3170,
+        items: [
+            EntryItem.Draft(name: "T/O オムレツサンド", amount: 780, taxRate: .reduced),
+            EntryItem.Draft(name: "絹香食パン", amount: 890, taxRate: .reduced),
+            EntryItem.Draft(name: "スイートポテト", amount: 1500, taxRate: .reduced)
+        ],
+        taxIncluded: true
+    )
+
+    static let suspectReading = ReceiptReading(
+        store: "スーパー青葉 横浜店",
+        total: 1446,
+        items: [
+            EntryItem.Draft(name: "牛乳", quantity: 2, amount: 396),
+            EntryItem.Draft(name: "食パン", amount: 220),
+            EntryItem.Draft(name: "たまご", amount: 278),
+            EntryItem.Draft(name: "バナナ", amount: 198),
+            EntryItem.Draft(name: "ヨーグルト", amount: 414)
+        ]
+    )
+
     static func model(
         _ type: Entry.Kind,
         digits: [AmountCalculator.Key],
-        startsWithAmount: Bool = true
+        startsWithAmount: Bool = true,
+        hasTemplates: Bool = false
     ) async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
         let now = Date()
@@ -117,6 +245,22 @@ private extension SnapshotTests {
 
         try database.insertDefaultsIfEmpty(at: now)
         try await database.setSetting(.entryStartsWithAmount, to: startsWithAmount)
+
+        if hasTemplates {
+            let options = try await database.entryOptions()
+
+            for (name, amount) in [("ランチ", 900), ("コーヒー", 380), ("電車", 440)] {
+                let draft = EntryTemplateDraft(
+                    name: name,
+                    type: .expense,
+                    amount: amount,
+                    categoryId: options.expenseCategories.first?.id,
+                    walletId: options.wallets.first?.id
+                )
+
+                _ = try await database.saveTemplate(draft, at: now)
+            }
+        }
 
         let model = EntryModel(database: database, date: date, type: type)
 
@@ -134,6 +278,7 @@ private extension SnapshotTests {
         model.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
         model.addItem(name: "食パン", amount: 250, taxRate: .reduced)
         model.addItem(name: "洗剤", amount: 398, taxRate: .standard)
+        model.addItem(name: "シール値引", amount: -30, taxRate: .standard)
         model.addItem(name: "弁当", amount: 540)
     }
 

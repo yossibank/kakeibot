@@ -3,12 +3,14 @@ import SwiftUI
 public extension View {
     func proOffer(
         _ feature: String?,
+        presentsInSheet: Bool = false,
         onCancel: @escaping () -> Void = {},
         onUnlock: @escaping () -> Void
     ) -> some View {
         modifier(
             ProOfferModifier(
                 feature: feature,
+                presentsInSheet: presentsInSheet,
                 onCancel: onCancel,
                 onUnlock: onUnlock
             )
@@ -23,6 +25,7 @@ private struct ProOfferModifier: ViewModifier {
     @Environment(\.proStore) private var store
 
     let feature: String?
+    let presentsInSheet: Bool
     let onCancel: () -> Void
     let onUnlock: () -> Void
 
@@ -56,11 +59,36 @@ private struct ProOfferModifier: ViewModifier {
                 isShowingPro = false
                 onUnlock()
             }
-            .navigationDestination(isPresented: $isShowingPro) {
+            .proDestination(
+                isPresented: $isShowingPro,
+                inSheet: presentsInSheet
+            ) {
                 ProView(
                     model: ProPurchaseModel(store: store),
                     onUnlock: onUnlock
                 )
             }
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func proDestination(
+        isPresented: Binding<Bool>,
+        inSheet: Bool,
+        @ViewBuilder destination: @escaping () -> some View
+    ) -> some View {
+        if inSheet {
+            sheet(isPresented: isPresented) {
+                NavigationStack {
+                    destination()
+                }
+            }
+        } else {
+            navigationDestination(
+                isPresented: isPresented,
+                destination: destination
+            )
+        }
     }
 }

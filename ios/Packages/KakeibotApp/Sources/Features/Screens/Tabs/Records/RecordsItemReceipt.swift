@@ -3,12 +3,22 @@ import DesignSystem
 import SwiftUI
 
 struct RecordsItemReceipt: View {
+    var taxIncluded = false
+    var onClose: (() -> Void)?
+
     let items: [EntryItem]
     let amount: Int
 
     var body: some View {
-        VStack(spacing: 8) {
-            VStack(spacing: 6) {
+        VStack(spacing: 10) {
+            Text("お買上明細")
+                .textFont(.caption2, weight: .semibold)
+                .tracking(3)
+                .foregroundStyle(Palette.subtext)
+
+            EntryReceiptRule(style: .dashed)
+
+            VStack(spacing: 7) {
                 ForEach(items) { item in
                     itemLine(item)
                 }
@@ -16,8 +26,8 @@ struct RecordsItemReceipt: View {
 
             EntryReceiptRule(style: .dashed)
 
-            if totals.tax != 0 {
-                summaryLine("消費税", amount: totals.tax)
+            if !totals.taxes.isEmpty {
+                EntryTaxBreakdown(taxes: totals.taxes, taxIncluded: taxIncluded)
             }
 
             if adjustment != 0 {
@@ -30,6 +40,11 @@ struct RecordsItemReceipt: View {
                 Text("合計")
                     .textFont(.caption, weight: .semibold)
                     .foregroundStyle(Palette.text)
+
+                Text("\(itemCount)点")
+                    .textFont(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
 
                 Spacer()
 
@@ -45,12 +60,16 @@ struct RecordsItemReceipt: View {
         .padding(.vertical, 12 + Self.tooth / 2)
         .background {
             paper
-                .fill(Palette.card)
+                .fill(Palette.paper)
                 .shadow(color: Palette.shadow.opacity(0.4), radius: 6, y: 2)
         }
         .overlay {
             paper
-                .stroke(Palette.hairline, lineWidth: 1)
+                .stroke(Palette.paperEdge, lineWidth: 1)
+        }
+        .contentShape(.rect)
+        .onTapGesture {
+            onClose?()
         }
     }
 }
@@ -60,11 +79,16 @@ private extension RecordsItemReceipt {
 }
 
 private extension RecordsItemReceipt {
-    var totals: (tax: Int, total: Int) {
-        let total = EntryItemTotal(items.map(EntryItem.Draft.init))
-        let tax = total.taxes.reduce(0) { $0 + $1.amount }
+    var totals: EntryItemTotal {
+        EntryItemTotal(items.map(EntryItem.Draft.init), taxIncluded: taxIncluded)
+    }
 
-        return (tax, total.total)
+    var itemCount: Int {
+        items.reduce(0) { $0 + $1.quantity }
+    }
+
+    var showsRates: Bool {
+        Set(items.map(\.taxRate)).count > 1
     }
 
     var adjustment: Int {
@@ -78,48 +102,64 @@ private extension RecordsItemReceipt {
 
 private extension RecordsItemReceipt {
     func itemLine(_ item: EntryItem) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
+        ViewThatFits(in: .horizontal) {
+            itemLine(item, style: .caption, fitsName: true)
+
+            itemLine(item, style: .caption2, fitsName: true)
+
+            itemLine(item, style: .caption2, fitsName: false)
+        }
+    }
+
+    func itemLine(
+        _ item: EntryItem,
+        style: Font.TextStyle,
+        fitsName: Bool
+    ) -> some View {
+        let color = item.amount < 0 ? Palette.rose : Palette.text
+
+        return HStack(alignment: .firstTextBaseline, spacing: 4) {
             Text(item.name)
-                .foregroundStyle(Palette.text)
+                .foregroundStyle(color)
                 .lineLimit(1)
+                .fixedSize(horizontal: fitsName, vertical: false)
+                .layoutPriority(1)
 
             if item.quantity > 1 {
                 Text("×\(item.quantity)")
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
+                    .fixedSize()
             }
 
-            Spacer(minLength: 8)
+            if showsRates, let rate = item.taxRate {
+                EntryTaxRateBadge(rate: rate)
+            }
+
+            EntryReceiptLeader()
 
             Text(AmountText.text(item.amount))
                 .monospacedDigit()
-                .foregroundStyle(Palette.text)
-
-            if let rate = item.taxRate {
-                Text("\(rate.rawValue)%")
-                    .textFont(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accent)
-            }
+                .foregroundStyle(color)
+                .fixedSize()
         }
-        .textFont(.caption)
+        .textFont(style)
     }
 
     func summaryLine(
         _ title: String,
         amount: Int,
-        color: Color? = nil
+        color: Color
     ) -> some View {
         HStack {
             Text(title)
-                .foregroundStyle(color ?? Palette.subtext)
 
             Spacer()
 
             Text(AmountText.text(amount))
                 .monospacedDigit()
-                .foregroundStyle(color ?? Palette.text)
         }
         .textFont(.caption)
+        .foregroundStyle(color)
     }
 }

@@ -1,11 +1,14 @@
 {
-  "description": "品目の小計・率ごとの消費税・合計を出す。items の amount は数量を掛けた後の金額で、taxRate が 8 か 10 の品目は税抜、null の品目は税込である。消費税は率ごとに amount を足してから率を掛け、1 円未満を 0 の側へ切り捨てる。taxes は品目のある率だけを 8・10 の順に並べる。total は subtotal と消費税の和である。",
+  "description": "品目の小計・率ごとの消費税・合計を出す。items の amount は数量を掛けた後の金額で、null の品目は税込である。taxIncluded が false（外税）なら、taxRate が 8 か 10 の品目は税抜で、消費税は率ごとに amount を足してから率を掛け、1 円未満を 0 の側へ切り捨てる。total は subtotal と消費税の和である。taxIncluded が true（内税）なら、8 か 10 の品目も税込で、消費税は率ごとに amount を足してから 率 /（100 + 率）を掛け、1 円未満を四捨五入する（0.5 は 0 から遠い側）。total は subtotal と同じで、消費税は足さない。taxes は品目のある率だけを 8・10 の順に並べる。",
   "cases": [
-    { "summary": "税込だけなら消費税を足さない", "items": [{ "amount": 540, "taxRate": null }, { "amount": 120, "taxRate": null }], "subtotal": 660, "taxes": [], "total": 660 },
-    { "summary": "率ごとに足してから 1 回だけ切り捨てる", "items": [{ "amount": 396, "taxRate": 8 }, { "amount": 250, "taxRate": 8 }], "subtotal": 646, "taxes": [{ "rate": 8, "base": 646, "amount": 51 }], "total": 697 },
-    { "summary": "8 % と 10 % と税込を混ぜる", "items": [{ "amount": 396, "taxRate": 8 }, { "amount": 250, "taxRate": 8 }, { "amount": 398, "taxRate": 10 }, { "amount": 540, "taxRate": null }], "subtotal": 1584, "taxes": [{ "rate": 8, "base": 646, "amount": 51 }, { "rate": 10, "base": 398, "amount": 39 }], "total": 1674 },
-    { "summary": "値引も同じ率の対象から引く", "items": [{ "amount": 1000, "taxRate": 10 }, { "amount": -100, "taxRate": 10 }], "subtotal": 900, "taxes": [{ "rate": 10, "base": 900, "amount": 90 }], "total": 990 },
-    { "summary": "負の対象は 0 の側へ切り捨てる", "items": [{ "amount": -55, "taxRate": 8 }], "subtotal": -55, "taxes": [{ "rate": 8, "base": -55, "amount": -4 }], "total": -59 },
-    { "summary": "品目が無ければ 0", "items": [], "subtotal": 0, "taxes": [], "total": 0 }
+    { "summary": "税込だけなら消費税を足さない", "taxIncluded": false, "items": [{ "amount": 540, "taxRate": null }, { "amount": 120, "taxRate": null }], "subtotal": 660, "taxes": [], "total": 660 },
+    { "summary": "率ごとに足してから 1 回だけ切り捨てる", "taxIncluded": false, "items": [{ "amount": 396, "taxRate": 8 }, { "amount": 250, "taxRate": 8 }], "subtotal": 646, "taxes": [{ "rate": 8, "base": 646, "amount": 51 }], "total": 697 },
+    { "summary": "8 % と 10 % と税込を混ぜる", "taxIncluded": false, "items": [{ "amount": 396, "taxRate": 8 }, { "amount": 250, "taxRate": 8 }, { "amount": 398, "taxRate": 10 }, { "amount": 540, "taxRate": null }], "subtotal": 1584, "taxes": [{ "rate": 8, "base": 646, "amount": 51 }, { "rate": 10, "base": 398, "amount": 39 }], "total": 1674 },
+    { "summary": "値引も同じ率の対象から引く", "taxIncluded": false, "items": [{ "amount": 1000, "taxRate": 10 }, { "amount": -100, "taxRate": 10 }], "subtotal": 900, "taxes": [{ "rate": 10, "base": 900, "amount": 90 }], "total": 990 },
+    { "summary": "負の対象は 0 の側へ切り捨てる", "taxIncluded": false, "items": [{ "amount": -55, "taxRate": 8 }], "subtotal": -55, "taxes": [{ "rate": 8, "base": -55, "amount": -4 }], "total": -59 },
+    { "summary": "品目が無ければ 0", "taxIncluded": false, "items": [], "subtotal": 0, "taxes": [], "total": 0 },
+    { "summary": "内税は小計を合計にし、含まれる消費税を四捨五入で出す", "taxIncluded": true, "items": [{ "amount": 780, "taxRate": 8 }, { "amount": 890, "taxRate": 8 }, { "amount": 1500, "taxRate": 8 }], "subtotal": 3170, "taxes": [{ "rate": 8, "base": 3170, "amount": 235 }], "total": 3170 },
+    { "summary": "内税で 8 % と 10 % と税込を混ぜる", "taxIncluded": true, "items": [{ "amount": 396, "taxRate": 8 }, { "amount": 398, "taxRate": 10 }, { "amount": 540, "taxRate": null }], "subtotal": 1334, "taxes": [{ "rate": 8, "base": 396, "amount": 29 }, { "rate": 10, "base": 398, "amount": 36 }], "total": 1334 },
+    { "summary": "内税の負の対象は 0 の側へ丸める", "taxIncluded": true, "items": [{ "amount": -55, "taxRate": 8 }], "subtotal": -55, "taxes": [{ "rate": 8, "base": -55, "amount": -4 }], "total": -55 }
   ]
 }

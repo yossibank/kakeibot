@@ -6,7 +6,7 @@ struct EntryTemplateRow: View {
     let model: EntryModel
     let isCompact: Bool
     let onUse: (EntryTemplate) -> Void
-    let onAdd: () -> Void
+    let onAdd: (() -> Void)?
 
     var body: some View {
         ScrollView(.horizontal) {
@@ -40,13 +40,16 @@ struct EntryTemplateRow: View {
 }
 
 private extension EntryTemplateRow {
+    @ViewBuilder
     var addButton: some View {
-        ChipButton(
-            "今の入力を保存",
-            systemImage: "plus",
-            outline: .dashed,
-            action: onAdd
-        )
+        if let onAdd {
+            ChipButton(
+                "今の入力を保存",
+                systemImage: "plus",
+                outline: .dashed,
+                action: onAdd
+            )
+        }
     }
 
     func button(_ template: EntryTemplate) -> some View {

@@ -1,0 +1,65 @@
+{
+  "description": "レシートの合計と品目の合計が合わない時に、差のある辺りの品目を選ぶ。difference は記録の金額から品目の合計を引いた値。difference が負なら、taxRate が null で amount が -difference の品目を選ぶ。taxRate が null で amount が正の品目は、amount に difference を足した値が正で、桁の数が同じで、1 桁だけ違い、その 2 つの数字が読み違えやすい組（0 と 6・0 と 8・0 と 9・1 と 7・3 と 8・5 と 6・5 と 8・6 と 8・8 と 9）なら選ぶ。suspects は選んだ品目の位置（0 から）を前から順に並べる。difference が 0 なら選ばない。",
+  "cases": [
+    {
+      "summary": "合っていれば選ばない",
+      "items": [{ "amount": 396, "taxRate": null }, { "amount": 220, "taxRate": null }],
+      "difference": 0,
+      "suspects": []
+    },
+    {
+      "summary": "同じ品目を 2 回読んだ行を選ぶ",
+      "items": [{ "amount": 396, "taxRate": null }, { "amount": 220, "taxRate": null }, { "amount": 220, "taxRate": null }],
+      "difference": -220,
+      "suspects": [1, 2]
+    },
+    {
+      "summary": "1 を 7 と読んだ行を選ぶ",
+      "items": [{ "amount": 396, "taxRate": null }, { "amount": 278, "taxRate": null }],
+      "difference": -60,
+      "suspects": [1]
+    },
+    {
+      "summary": "3 を 8 と読んだ行を選ぶ",
+      "items": [{ "amount": 1830, "taxRate": null }, { "amount": 540, "taxRate": null }],
+      "difference": -500,
+      "suspects": [0]
+    },
+    {
+      "summary": "読み違えにくい数字の組は選ばない",
+      "items": [{ "amount": 228, "taxRate": null }],
+      "difference": -10,
+      "suspects": []
+    },
+    {
+      "summary": "桁の数が変わる直し方は選ばない",
+      "items": [{ "amount": 980, "taxRate": null }],
+      "difference": 100,
+      "suspects": []
+    },
+    {
+      "summary": "外税の品目は読み違えを選ばない",
+      "items": [{ "amount": 388, "taxRate": 8 }, { "amount": 280, "taxRate": null }],
+      "difference": -20,
+      "suspects": [1]
+    },
+    {
+      "summary": "外税の品目は差と同じ金額でも選ばない",
+      "items": [{ "amount": 220, "taxRate": 8 }, { "amount": 396, "taxRate": null }],
+      "difference": -220,
+      "suspects": []
+    },
+    {
+      "summary": "値引の行は読み違えを選ばない",
+      "items": [{ "amount": 396, "taxRate": null }, { "amount": -30, "taxRate": null }],
+      "difference": -20,
+      "suspects": []
+    },
+    {
+      "summary": "当てはまる行が無ければ選ばない",
+      "items": [{ "amount": 396, "taxRate": null }, { "amount": 220, "taxRate": null }],
+      "difference": 1234,
+      "suspects": []
+    }
+  ]
+}

@@ -65,6 +65,18 @@ public extension AppDatabase {
             try item.save(db)
         }
     }
+
+    func forgetItemName(
+        for raw: String,
+        at store: String
+    ) async throws {
+        try await writer.write { db in
+            _ = try ItemName
+                .filter(Column("store") == store)
+                .filter(Column("raw") == raw)
+                .deleteAll(db)
+        }
+    }
 }
 
 extension AppDatabase {

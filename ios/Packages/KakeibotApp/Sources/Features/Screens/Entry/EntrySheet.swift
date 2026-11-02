@@ -14,8 +14,11 @@ public struct EntrySheet: View {
     @State var drawerHeight: CGFloat = 0
     @State var deletion: Deletion?
     @State var hiddenCategory: EntryModel.HiddenCategory?
+    @State var receipt = EntryReceiptFlow()
 
     @Environment(\.themeStyle.corner) var corner
+    @Environment(\.isPro) var isPro
+    @Environment(\.canScanReceipt) var canScanReceipt
 
     @State private var isEditingMemo = false
     @State private var isConfirmingDiscard = false
@@ -54,6 +57,8 @@ public struct EntrySheet: View {
                 if let categoryMenu {
                     categoryMenuLayer(categoryMenu)
                 }
+
+                receiptLayer
             }
             .coordinateSpace(.named(Self.coordinateSpace))
             .onGeometryChange(for: CGFloat.self) { proxy in
@@ -95,6 +100,14 @@ public struct EntrySheet: View {
                         await model.reloadWallets()
                     }
                 }
+            }
+            .proOffer(receipt.offer, presentsInSheet: true) {
+                receipt.closeOffer()
+            } onUnlock: {
+                receipt.closeOffer()
+            }
+            .fullScreenCover(isPresented: isScanningReceipt) {
+                receiptCamera
             }
             .background {
                 Backdrop()
@@ -262,23 +275,13 @@ private extension EntrySheet {
     }
 
     var dial: some View {
-        Button {
+        EntryDialFace(model: model) {
+            open(.items)
+        }
+        .onTapGesture {
             tapDial()
-        } label: {
-            EntryDialFace(model: model)
         }
-        .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
-        .overlay(alignment: .topTrailing) {
-            if model.showsItems {
-                EntryItemButton(
-                    count: model.items.count,
-                    hasAdjustment: model.hasItemAdjustment
-                ) {
-                    open(.items)
-                }
-            }
-        }
     }
 }
 

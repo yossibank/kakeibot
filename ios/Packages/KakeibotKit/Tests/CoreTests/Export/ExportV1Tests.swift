@@ -93,6 +93,17 @@ struct ExportV1Tests {
     }
 
     @Test
+    func readsEntriesWithoutTaxIncludedAsExclusive() throws {
+        let json = try Self.fixture(withoutEntryKey: "taxIncluded")
+
+        let export = try ExportV1(json: json)
+        let flags = export.data.entries.map(\.taxIncluded)
+
+        #expect(!flags.isEmpty)
+        #expect(flags.allSatisfy { !$0 })
+    }
+
+    @Test
     func readsEntriesWithoutTransferId() throws {
         let json = try Self.fixtureWithoutTransferId()
 
@@ -299,6 +310,21 @@ private extension ExportV1Tests {
         let rows = try #require(tables["entries"] as? [[String: Any]])
 
         tables["entries"] = rows.map { $0.filter { $0.key != "billMonth" } }
+        object["data"] = tables
+
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixture(withoutEntryKey key: String) throws -> Data {
+        let data = try Fixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+
+        let rows = try #require(tables["entries"] as? [[String: Any]])
+
+        tables["entries"] = rows.map { $0.filter { $0.key != key } }
         object["data"] = tables
 
         return try JSONSerialization.data(withJSONObject: object)

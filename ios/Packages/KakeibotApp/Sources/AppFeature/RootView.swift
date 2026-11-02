@@ -6,6 +6,7 @@ import Store
 import SwiftUI
 import Sync
 import UIKit
+import VisionKit
 
 public struct RootView: View {
     @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
@@ -73,6 +74,7 @@ public struct RootView: View {
         .environment(\.syncCloud, .live)
         .environment(\.proStore, model.proStore)
         .environment(\.isPro, model.isPro)
+        .environment(\.canScanReceipt, VNDocumentCameraViewController.isSupported)
         .palette(shownLook)
         .environment(\.palette, shownPalette)
         .environment(\.themeStyle, shownStyle)

@@ -27,6 +27,87 @@ struct ReceiptReadingTests {
         #expect(reading.difference == 30)
         #expect(unread.difference == nil)
     }
+
+    @Test
+    func settlesOnlyWhenStoreAndItemsMatchTotal() {
+        let items = [EntryItem.Draft(name: "牛乳", amount: 396)]
+
+        let settled = ReceiptReading(store: "スーパー青葉", total: 396, items: items)
+        let off = ReceiptReading(store: "スーパー青葉", total: 400, items: items)
+        let storeless = ReceiptReading(total: 396, items: items)
+
+        #expect(settled.isSettled)
+        #expect(!off.isSettled)
+        #expect(!storeless.isSettled)
+    }
+
+    @Test
+    func renamesItemsByRememberedNames() {
+        let reading = ReceiptReading(
+            store: "スーパー青葉",
+            items: [
+                EntryItem.Draft(name: "ギユウニユウ", quantity: 2, amount: 396),
+                EntryItem.Draft(name: "食パン", amount: 220)
+            ]
+        )
+
+        let renamed = reading.renamed(by: ["ギユウニユウ": "牛乳"])
+
+        let again = renamed.renamed(by: [:])
+
+        #expect(renamed.items.map(\.name) == ["牛乳", "食パン"])
+        #expect(renamed.items.map(\.readName) == ["ギユウニユウ", "食パン"])
+        #expect(renamed.items.map(\.quantity) == [2, 1])
+        #expect(renamed.store == "スーパー青葉")
+        #expect(again.items.map(\.readName) == ["ギユウニユウ", "食パン"])
+    }
+
+    @Test(arguments: try mergingCases)
+    func choosesItemsCloserToTotal(fixture: MergingCase) {
+        let merged = fixture.rules.reading.merging(fixture.guessed.reading)
+
+        #expect(merged.total == fixture.total)
+        #expect(merged.items == fixture.items.map(\.draft))
+        #expect(merged.taxIncluded == fixture.taxIncluded)
+    }
+
+    @Test
+    func prefersStoreFromModelAndDateFromRules() throws {
+        let ruleDate = try #require(LocalDate("2026-10-03"))
+        let guessDate = try #require(LocalDate("2026-10-04"))
+
+        let merged = ReceiptReading(store: "青葉", date: ruleDate)
+            .merging(ReceiptReading(store: "スーパー青葉", date: guessDate))
+
+        let filled = ReceiptReading(store: "青葉")
+            .merging(ReceiptReading(date: guessDate))
+
+        #expect(merged.store == "スーパー青葉")
+        #expect(merged.date == ruleDate)
+        #expect(filled.store == "青葉")
+        #expect(filled.date == guessDate)
+    }
+
+    @Test
+    func addsExclusiveTaxToItemTotal() {
+        let reading = ReceiptReading(
+            total: 650,
+            items: [
+                EntryItem.Draft(name: "牛乳", amount: 198, taxRate: .reduced),
+                EntryItem.Draft(name: "洗剤", amount: 398, taxRate: .standard)
+            ]
+        )
+
+        #expect(reading.itemTotal == 650)
+        #expect(reading.difference == 0)
+    }
+
+    @Test
+    func isEmptyOnlyWhenNothingWasRead() {
+        #expect(ReceiptReading().isEmpty)
+        #expect(!ReceiptReading(total: 911).isEmpty)
+        #expect(!ReceiptReading(lines: ["スーパー青葉"]).isEmpty)
+    }
 }
 
 extension ReceiptReadingTests {
@@ -36,20 +117,32 @@ extension ReceiptReadingTests {
         let store: String?
         let date: LocalDate?
         let total: Int?
-        let items: [ItemCase]
+        let items: [ReceiptItemValue]
 
         var testDescription: String {
             summary
         }
     }
 
-    struct ItemCase: Decodable, Sendable {
-        let name: String
-        let quantity: Int
-        let amount: Int
+    struct MergingCase: Decodable, Sendable, CustomTestStringConvertible {
+        let summary: String
+        let rules: ReadingValue
+        let guessed: ReadingValue
+        let total: Int?
+        let items: [ReceiptItemValue]
+        let taxIncluded: Bool
 
-        var draft: EntryItem.Draft {
-            EntryItem.Draft(name: name, quantity: quantity, amount: amount)
+        var testDescription: String {
+            summary
+        }
+    }
+
+    struct ReadingValue: Decodable, Sendable {
+        let total: Int?
+        let items: [ReceiptItemValue]
+
+        var reading: ReceiptReading {
+            ReceiptReading(total: total, items: items.map(\.draft))
         }
     }
 }
@@ -58,6 +151,12 @@ private extension ReceiptReadingTests {
     static var readingCases: [ReadingCase] {
         get throws {
             try Fixture.cases("receipt/receipt-reading.json")
+        }
+    }
+
+    static var mergingCases: [MergingCase] {
+        get throws {
+            try Fixture.cases("receipt/receipt-merging.json")
         }
     }
 }

@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import Foundation
 
 public extension EntryModel {
@@ -13,7 +14,7 @@ public extension EntryModel {
     }
 
     var itemTotals: EntryItemTotal {
-        EntryItemTotal(items)
+        EntryItemTotal(items, taxIncluded: taxIncluded)
     }
 
     var itemTotal: Int {
@@ -116,6 +117,12 @@ public extension EntryModel {
         }
     }
 
+    func setTaxIncluded(_ isIncluded: Bool) {
+        changeItems {
+            taxIncluded = isIncluded
+        }
+    }
+
     func adjustToItems() {
         guard canAdjustToItems else {
             return
@@ -129,7 +136,15 @@ extension EntryModel {
     static let itemSuggestionLimit = 8
 
     static func quantityText(for item: EntryItem.Draft) -> String? {
-        item.quantity > 1 ? "×\(item.quantity)" : nil
+        guard item.quantity > 1 else {
+            return nil
+        }
+
+        let price = unitPrice(of: item)
+
+        return price.quantity > 1
+            ? "\(price.quantity) × \(AmountText.text(price.unit))"
+            : "×\(item.quantity)"
     }
 
     static func unitPrice(of item: EntryItem.Draft) -> (unit: Int, quantity: Int) {

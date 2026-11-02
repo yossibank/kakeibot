@@ -195,6 +195,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | recurring_date | TEXT | 休日でずらす前の予定日で、どの回の分かを表す。`date` は実際の日（ずらした後） |
 | bill_month | TEXT | カードの引き落としの回の月（`2026-11`）で、休日でずらす前の予定日の月で書く。空なら締め日で決める |
 | transfer_id | TEXT | 振替の手数料だけが持つ、元の振替の entry。重複禁止で、振替を消すと一緒に消える |
+| tax_included | INTEGER | 0 は外税、1 は内税で、品目の税の計算を表す。品目の無い記録は 0 |
 | created_at / updated_at | TEXT | |
 
 `recurring_id` と `recurring_date` は、そろって入るか、どちらも空にする。`(recurring_id, recurring_date)` は重複禁止。支出を記録した日の `no_spend_day` は消す。
@@ -216,7 +217,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | name | TEXT | 空にしない |
 | quantity | INTEGER | 1 以上 |
 | amount | INTEGER | 数量を掛けた後の金額。値引は負の数 |
-| tax_rate | INTEGER | 空・8・10。空は税込の金額で、8 と 10 は税抜の金額 |
+| tax_rate | INTEGER | 空・8・10。空は税込で、8 と 10 は記録が外税なら税抜、内税なら税込の金額 |
 | sort_order | INTEGER | |
 | created_at / updated_at | TEXT | |
 
@@ -234,7 +235,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | name | TEXT | 人が直した品名 |
 | created_at / updated_at | TEXT | |
 
-`(store, raw)` は重複禁止。同じ組を直し直すと、`name` を書き換える。
+`(store, raw)` は重複禁止。同じ組を直し直すと、`name` を書き換える。読んだままの文字に戻すと、行を消す。
 
 ### template
 

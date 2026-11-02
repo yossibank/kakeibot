@@ -66,6 +66,14 @@ extension Color {
         self.init(uiColor: color)
     }
 
+    init(paperOf role: KeyPath<ThemePalette, UInt32> & Sendable) {
+        let color = UIColor { traits in
+            UIColor(rgb: traits[PaletteTrait.self][keyPath: role])
+        }
+
+        self.init(uiColor: color)
+    }
+
     init(
         rgb value: UInt32,
         lightOpacity: CGFloat

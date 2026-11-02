@@ -13,6 +13,7 @@ public struct EntryDraft: Hashable, Sendable {
     public var billMonth: YearMonth?
     public var fee: Int
     public var items: [EntryItem.Draft]?
+    public var taxIncluded: Bool
 
     public init(
         type: Entry.Kind,
@@ -26,7 +27,8 @@ public struct EntryDraft: Hashable, Sendable {
         memo: String = "",
         billMonth: YearMonth? = nil,
         fee: Int = 0,
-        items: [EntryItem.Draft]? = nil
+        items: [EntryItem.Draft]? = nil,
+        taxIncluded: Bool = false
     ) {
         self.type = type
         self.amount = amount
@@ -40,6 +42,7 @@ public struct EntryDraft: Hashable, Sendable {
         self.billMonth = billMonth
         self.fee = fee
         self.items = items
+        self.taxIncluded = taxIncluded
     }
 
     public init(_ entry: Entry) {
@@ -53,7 +56,8 @@ public struct EntryDraft: Hashable, Sendable {
             walletId: entry.walletId,
             toWalletId: entry.toWalletId,
             memo: entry.memo ?? "",
-            billMonth: entry.billMonth
+            billMonth: entry.billMonth,
+            taxIncluded: entry.taxIncluded
         )
     }
 }
@@ -93,6 +97,7 @@ public extension EntryDraft {
             toWalletId: destination,
             memo: trimmedMemo,
             billMonth: billMonth,
+            taxIncluded: includesTax,
             createdAt: now,
             updatedAt: now
         )
@@ -118,11 +123,19 @@ public extension EntryDraft {
         updated.billMonth = billMonth
         updated.updatedAt = now
 
+        if items != nil {
+            updated.taxIncluded = includesTax
+        }
+
         return updated
     }
 }
 
 private extension EntryDraft {
+    var includesTax: Bool {
+        taxIncluded && !(items ?? []).isEmpty
+    }
+
     var typeProblems: [Problem] {
         switch type {
         case .expense, .income:

@@ -13,6 +13,8 @@ extension EntrySheet {
             EntryDateSheet(model: model, today: today)
         case .items:
             EntryItemSheet(model: model)
+        case .newItem:
+            EntryItemSheet(model: model, isSlipOpen: true)
         case .newCategory:
             CategoryEditSheet(model: model.newCategoryModel()) { category in
                 Task {
@@ -51,6 +53,7 @@ extension EntrySheet {
         case wallet(EntryWalletSheet.Role)
         case date
         case items
+        case newItem
         case newCategory
         case editCategory(EntryCategory)
         case addTag(EntryCategory)

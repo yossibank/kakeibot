@@ -44,17 +44,20 @@ public extension EntryItem {
         public var quantity: Int
         public var amount: Int
         public var taxRate: TaxRate?
+        public var readName: String?
 
         public init(
             name: String,
             quantity: Int = 1,
             amount: Int,
-            taxRate: TaxRate? = nil
+            taxRate: TaxRate? = nil,
+            readName: String? = nil
         ) {
             self.name = name
             self.quantity = quantity
             self.amount = amount
             self.taxRate = taxRate
+            self.readName = readName
         }
 
         public init(_ item: EntryItem) {

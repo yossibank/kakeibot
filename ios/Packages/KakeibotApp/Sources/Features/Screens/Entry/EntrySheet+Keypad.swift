@@ -13,16 +13,21 @@ extension EntrySheet {
                     model.setFee(amount)
                 }
             } else if model.type != .transfer {
-                EntryTemplateRow(
-                    model: model,
-                    isCompact: true,
-                    onUse: { template in
-                        useTemplate(template)
-                    },
-                    onAdd: {
-                        open(.newTemplate)
+                VStack(alignment: .leading, spacing: 8) {
+                    preparationRow
+
+                    if !model.templates.isEmpty {
+                        EntryTemplateRow(
+                            model: model,
+                            isCompact: true,
+                            onUse: { template in
+                                useTemplate(template)
+                            },
+                            onAdd: nil
+                        )
                     }
-                )
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Keypad(calculator: model.activeCalculator) {
@@ -92,5 +97,40 @@ private extension EntrySheet {
             topLeadingRadius: radius,
             topTrailingRadius: radius
         )
+    }
+
+    var preparationRow: some View {
+        ViewThatFits(in: .horizontal) {
+            preparationButtons(saveTitle: "今の入力を保存")
+
+            preparationButtons(saveTitle: "保存")
+        }
+    }
+
+    func preparationButtons(saveTitle: String) -> some View {
+        HStack(spacing: 8) {
+            if showsReceiptButton {
+                receiptButton
+            }
+
+            if model.showsItems {
+                ChipButton(
+                    "品目",
+                    systemImage: "plus",
+                    outline: .dashed
+                ) {
+                    open(.newItem)
+                }
+            }
+
+            ChipButton(
+                saveTitle,
+                systemImage: "plus",
+                outline: .dashed
+            ) {
+                open(.newTemplate)
+            }
+        }
+        .fixedSize()
     }
 }
