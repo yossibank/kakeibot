@@ -68,6 +68,7 @@ struct EntryDialFace: View {
                 }
             }
             .padding(.bottom, Self.lift)
+            .offset(y: showsItems ? Self.itemDrop : 0)
         }
         .frame(maxWidth: Self.maxWidth)
         .contentShape(.rect)
@@ -78,6 +79,7 @@ private extension EntryDialFace {
     static let maxWidth: CGFloat = 320
     static let amountHeight: CGFloat = 48
     static let lift: CGFloat = 12
+    static let itemDrop: CGFloat = 24
 
     var usage: BudgetUsage? {
         model.budgetUsageAfterSave
