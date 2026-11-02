@@ -13,16 +13,22 @@ extension EntrySheet {
                     model.setFee(amount)
                 }
             } else if model.type != .transfer {
-                EntryTemplateRow(
-                    model: model,
-                    isCompact: true,
-                    onUse: { template in
-                        useTemplate(template)
-                    },
-                    onAdd: {
-                        open(.newTemplate)
+                HStack(spacing: 8) {
+                    if showsReceiptButton {
+                        receiptButton
                     }
-                )
+
+                    EntryTemplateRow(
+                        model: model,
+                        isCompact: true,
+                        onUse: { template in
+                            useTemplate(template)
+                        },
+                        onAdd: {
+                            open(.newTemplate)
+                        }
+                    )
+                }
             }
 
             Keypad(calculator: model.activeCalculator) {

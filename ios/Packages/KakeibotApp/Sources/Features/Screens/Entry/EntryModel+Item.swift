@@ -6,6 +6,7 @@ public extension EntryModel {
         public let id = UUID()
         public let index: Int
         public let item: EntryItem.Draft
+        public let source: String?
     }
 
     var showsItems: Bool {
@@ -72,6 +73,7 @@ public extension EntryModel {
 
         changeItems {
             items.append(draft)
+            itemSources.append(nil)
         }
     }
 
@@ -99,10 +101,17 @@ public extension EntryModel {
             return nil
         }
 
-        let removed = RemovedItem(index: index, item: items[index])
+        alignItemSources()
+
+        let removed = RemovedItem(
+            index: index,
+            item: items[index],
+            source: itemSources[index]
+        )
 
         changeItems {
             items.remove(at: index)
+            itemSources.remove(at: index)
         }
 
         return removed
@@ -113,6 +122,7 @@ public extension EntryModel {
 
         changeItems {
             items.insert(removed.item, at: index)
+            itemSources.insert(removed.source, at: index)
         }
     }
 
@@ -156,6 +166,7 @@ private extension EntryModel {
     func changeItems(_ change: () -> Void) {
         let follows = amount == 0 || itemAdjustment == 0
 
+        alignItemSources()
         change()
 
         if follows {

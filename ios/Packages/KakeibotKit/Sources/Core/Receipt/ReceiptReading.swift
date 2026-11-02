@@ -28,6 +28,10 @@ public extension ReceiptReading {
         total.map { $0 - itemTotal }
     }
 
+    var isEmpty: Bool {
+        store == nil && date == nil && total == nil && items.isEmpty
+    }
+
     init(lines: [String]) {
         self.init()
 
@@ -81,6 +85,18 @@ public extension ReceiptReading {
                 break
             }
         }
+    }
+
+    func renamed(by names: [String: String]) -> ReceiptReading {
+        var reading = self
+
+        for index in reading.items.indices {
+            if let name = names[reading.items[index].name] {
+                reading.items[index].name = name
+            }
+        }
+
+        return reading
     }
 }
 

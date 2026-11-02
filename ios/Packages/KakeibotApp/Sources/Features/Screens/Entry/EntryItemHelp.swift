@@ -4,6 +4,11 @@ import SwiftUI
 struct EntryItemHelp: View {
     @State private var isShown = false
 
+    var title = "品目の使い方"
+    var steps = Self.itemSteps
+    var buttonTitle = "分かりました"
+    var onConfirm: (() -> Void)?
+
     let onClose: () -> Void
 
     var body: some View {
@@ -16,12 +21,12 @@ struct EntryItemHelp: View {
                 .onTapGesture(perform: onClose)
 
             VStack(spacing: 16) {
-                SheetTitle("品目の使い方")
+                SheetTitle(title)
 
                 EntryReceiptRule(style: .dashed)
 
                 VStack(alignment: .leading, spacing: 16) {
-                    ForEach(Self.steps, id: \.title) { step in
+                    ForEach(steps, id: \.title) { step in
                         stepRow(step)
                     }
                 }
@@ -29,7 +34,7 @@ struct EntryItemHelp: View {
 
                 EntryReceiptRule(style: .double)
 
-                PrimaryButton("分かりました", action: onClose)
+                PrimaryButton(buttonTitle, action: onConfirm ?? onClose)
             }
             .padding(.horizontal, 24)
             .padding(.top, 32)
@@ -52,13 +57,33 @@ struct EntryItemHelp: View {
     }
 }
 
-private extension EntryItemHelp {
+extension EntryItemHelp {
     struct Step {
         let systemImage: String
         let title: String
         let detail: String
     }
 
+    static let itemSteps = [
+        Step(systemImage: "plus", title: "追加", detail: "「＋ 品目を追加」から、品名と単価・数量を入れます。"),
+        Step(systemImage: "hand.tap", title: "変更", detail: "品目を押すと、伝票で直せます。"),
+        Step(systemImage: "arrow.left", title: "削除", detail: "品目を左に滑らせると、削除できます。"),
+        Step(systemImage: "tag", title: "値引・半額", detail: "「値引」で値引の行に、「半額」で単価を半分にできます。"),
+        Step(systemImage: "equal", title: "調整", detail: "差額が出た時は、合計を品目の合計にそろえます。")
+    ]
+
+    static let receiptSteps = [
+        Step(systemImage: "rectangle.portrait", title: "平らな所に置く", detail: "折れやしわを伸ばし、机などに置いて撮ります。"),
+        Step(systemImage: "sun.max", title: "明るい所で撮る", detail: "影や光の反射が文字に掛からないようにします。"),
+        Step(
+            systemImage: "viewfinder",
+            title: "1 枚ずつ端まで",
+            detail: "上から下まで枠に収めます。長いレシートは、縦に何枚かに分けて撮れます。"
+        )
+    ]
+}
+
+private extension EntryItemHelp {
     func stepRow(_ step: Step) -> some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: step.systemImage)
@@ -87,17 +112,19 @@ private extension EntryItemHelp {
 private extension EntryItemHelp {
     static let maxWidth: CGFloat = 340
     static let markSize: CGFloat = 32
-
-    static let steps = [
-        Step(systemImage: "plus", title: "追加", detail: "「＋ 品目を追加」から、品名と単価・数量を入れます。"),
-        Step(systemImage: "hand.tap", title: "変更", detail: "品目を押すと、伝票で直せます。"),
-        Step(systemImage: "arrow.left", title: "削除", detail: "品目を左に滑らせると、削除できます。"),
-        Step(systemImage: "tag", title: "値引・半額", detail: "「値引」で値引の行に、「半額」で単価を半分にできます。"),
-        Step(systemImage: "equal", title: "調整", detail: "差額が出た時は、合計を品目の合計にそろえます。")
-    ]
 }
 
 #Preview {
     EntryItemHelp {}
+        .background(Palette.background)
+}
+
+#Preview("撮り方") {
+    EntryItemHelp(
+        title: "レシートの撮り方",
+        steps: EntryItemHelp.receiptSteps,
+        buttonTitle: "撮る",
+        onConfirm: {}
+    ) {}
         .background(Palette.background)
 }

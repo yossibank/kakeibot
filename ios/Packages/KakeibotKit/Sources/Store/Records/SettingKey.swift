@@ -225,6 +225,17 @@ public extension SettingKey where Value == [String] {
     }
 }
 
+public extension SettingKey where Value == Int {
+    static var receiptSavedCount: Self {
+        Self(
+            .receiptSavedCount,
+            default: 0,
+            decode: { Int($0).map { max($0, 0) } },
+            encode: { $0 > 0 ? String($0) : nil }
+        )
+    }
+}
+
 public extension SettingKey where Value == WidgetRecord? {
     static var widgetEntry: Self {
         Self(

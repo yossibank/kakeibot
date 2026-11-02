@@ -50,10 +50,13 @@ public final class EntryModel {
     public internal(set) var options: EntryOptions?
     public internal(set) var balances: [Wallet.ID: Int] = [:]
     public internal(set) var errorNotice = ErrorNotice()
+    public internal(set) var receiptSavedCount = 0
 
     var allTemplates: [EntryTemplate] = []
     var appliedTemplateId: EntryTemplate.ID?
     var history: EntryList?
+    var itemSources: [String?] = []
+    var isReceiptRead = false
 
     private(set) var original: Entry?
     private(set) var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
@@ -139,6 +142,8 @@ public extension EntryModel {
 
             startsWithAmount = try await database.setting(.entryStartsWithAmount)
 
+            receiptSavedCount = try await database.setting(.receiptSavedCount)
+
             budgets = try await database.budgets()
 
             try await loadEntry()
@@ -194,6 +199,9 @@ public extension EntryModel {
             )
 
             let entry = saved.entry
+
+            await finishReceipt()
+
             let fee = try await database.fee(of: entry.id)
             let title = label(for: entry)
 
@@ -223,6 +231,8 @@ public extension EntryModel {
         keypadTarget = .amount
         memo = ""
         items = []
+        itemSources = []
+        isReceiptRead = false
         tagId = nil
         billMonth = nil
         appliedTemplateId = nil

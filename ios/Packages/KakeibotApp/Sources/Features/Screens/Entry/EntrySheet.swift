@@ -14,8 +14,11 @@ public struct EntrySheet: View {
     @State var drawerHeight: CGFloat = 0
     @State var deletion: Deletion?
     @State var hiddenCategory: EntryModel.HiddenCategory?
+    @State var receiptStep: ReceiptStep?
+    @State var receiptOffer: String?
 
     @Environment(\.themeStyle.corner) var corner
+    @Environment(\.isPro) var isPro
 
     @State private var isEditingMemo = false
     @State private var isConfirmingDiscard = false
@@ -54,6 +57,8 @@ public struct EntrySheet: View {
                 if let categoryMenu {
                     categoryMenuLayer(categoryMenu)
                 }
+
+                receiptLayer
             }
             .coordinateSpace(.named(Self.coordinateSpace))
             .onGeometryChange(for: CGFloat.self) { proxy in
@@ -95,6 +100,14 @@ public struct EntrySheet: View {
                         await model.reloadWallets()
                     }
                 }
+            }
+            .proOffer(receiptOffer, presentsInSheet: true) {
+                receiptOffer = nil
+            } onUnlock: {
+                startReceipt()
+            }
+            .fullScreenCover(isPresented: isScanningReceipt) {
+                receiptCamera
             }
             .background {
                 Backdrop()

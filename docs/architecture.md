@@ -61,6 +61,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | アイコンの見本 | `Assets.xcassets` の `AppIconYen`・`AppIconDial`。設定の見本に描く、アイコンと同じ絵の写し | |
 | 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | アプリのものを `WidgetFonts` で読む |
 | Pro の商品 | ID は `com.yossibank.kakeibot.pro`（買い切り、ファミリー共有あり）。手元で試す設定は `ios/Kakeibot.storekit` | |
+| カメラ | 撮る許可の文は、ビルド設定の `INFOPLIST_KEY_NSCameraUsageDescription` に置く | |
 | 共有の受け入れ | Info.plist の `CKSharingSupported`。AppFeature の `AppDelegate` が、シーンの delegate を差し替えて共有のリンクを受け取る | |
 
 `license_plist.yml` には、同梱のフォントと配布元のライセンスを手で足す。
@@ -157,7 +158,7 @@ KakeibotKit/
 | `Core/Icon/` | アイコンとスタンプ |
 | `Core/Identifier/` | 型付きの ID |
 | `Core/Notification/` | 予約されているべき通知の計算と行き先 |
-| `Core/Receipt/` | 読んだレシートの行から、品目・合計・日付・店名を組み立てる決まり。人が直した品名 |
+| `Core/Receipt/` | 文字の断片をレシートの行にまとめ、行から品目・合計・日付・店名を組み立てる決まり。人が直した品名 |
 | `Core/Recurring/` | 固定費と記録漏れの後追い |
 | `Core/Review/` | 振り返りの範囲と集計 |
 | `Core/Reward/` | ごほうびと貯金箱 |
@@ -206,7 +207,7 @@ KakeibotApp/
 | `AppFeature/` | 起動の印の動き、通知の許可、入力の準備、レビューのお願いも持つ。Pro の購入を StoreKit で確かめ、Pro が無くなったら同期を止める |
 | `AppWidget/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
 | `DesignSystem/Components/` | Amount・Banner・Button・Calendar・Chart・Dial・Gesture・Icon・Input・Menu・Navigation・Row・Sheet・Surface・Tag・Template |
-| `Features/Screens/Entry/` | 記録の入力シート |
+| `Features/Screens/Entry/` | 記録の入力シート。レシートは VisionKit で撮り、Vision と Foundation Models で読む |
 | `Features/Screens/Onboarding/` | 最初の設定のチュートリアル |
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |

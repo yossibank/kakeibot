@@ -27,6 +27,30 @@ struct ReceiptReadingTests {
         #expect(reading.difference == 30)
         #expect(unread.difference == nil)
     }
+
+    @Test
+    func renamesItemsByRememberedNames() {
+        let reading = ReceiptReading(
+            store: "スーパー青葉",
+            items: [
+                EntryItem.Draft(name: "ギユウニユウ", quantity: 2, amount: 396),
+                EntryItem.Draft(name: "食パン", amount: 220)
+            ]
+        )
+
+        let renamed = reading.renamed(by: ["ギユウニユウ": "牛乳"])
+
+        #expect(renamed.items.map(\.name) == ["牛乳", "食パン"])
+        #expect(renamed.items.map(\.quantity) == [2, 1])
+        #expect(renamed.store == "スーパー青葉")
+    }
+
+    @Test
+    func isEmptyOnlyWhenNothingWasRead() {
+        #expect(ReceiptReading().isEmpty)
+        #expect(!ReceiptReading(total: 911).isEmpty)
+        #expect(!ReceiptReading(lines: ["スーパー青葉"]).isEmpty)
+    }
 }
 
 extension ReceiptReadingTests {
