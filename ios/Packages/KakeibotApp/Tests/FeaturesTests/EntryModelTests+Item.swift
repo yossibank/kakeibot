@@ -175,9 +175,11 @@ extension EntryModelTests {
     @Test
     func showsQuantityOnlyWhenMany() {
         let pair = EntryItem.Draft(name: "牛乳", quantity: 2, amount: 396)
+        let uneven = EntryItem.Draft(name: "卵", quantity: 3, amount: 200)
         let single = EntryItem.Draft(name: "パン", amount: 250)
 
-        #expect(EntryModel.quantityText(for: pair) == "×2")
+        #expect(EntryModel.quantityText(for: pair) == "2 × ¥198")
+        #expect(EntryModel.quantityText(for: uneven) == "×3")
         #expect(EntryModel.quantityText(for: single) == nil)
     }
 

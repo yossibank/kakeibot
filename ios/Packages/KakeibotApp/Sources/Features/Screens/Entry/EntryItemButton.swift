@@ -1,48 +1,83 @@
+import Core
 import DesignSystem
 import SwiftUI
 
 struct EntryItemButton: View {
     let count: Int
-    let hasAdjustment: Bool
+    let total: Int
+    let adjustment: Int
     let onOpen: () -> Void
 
     var body: some View {
-        RingButton(
-            systemImage: "receipt",
-            style: count > 0 ? .prominent : .plain,
-            action: onOpen
-        )
-        .overlay(alignment: .topTrailing) {
-            if count > 0 {
-                badge
-                    .clipShape(.capsule)
-                    .offset(x: 2, y: -2)
-                    .allowsHitTesting(false)
+        Button(action: onOpen) {
+            HStack(spacing: 8) {
+                Image(systemName: "receipt")
+                    .foregroundStyle(Palette.accent)
+
+                Text("品目 \(count)件")
+                    .foregroundStyle(Palette.accentStrong)
+
+                Text(AmountText.text(total))
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.text)
+
+                if adjustment != 0 {
+                    Text("差額 \(AmountText.text(adjustment))")
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.amber)
+                }
+
+                Image(systemName: "chevron.right")
+                    .textFont(.caption2, weight: .semibold)
+                    .foregroundStyle(Palette.hint)
             }
+            .textFont(.caption, weight: .semibold)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .padding(.horizontal, 14)
+            .padding(.bottom, Self.tooth / 2)
+            .frame(height: Self.height)
+            .background {
+                paper
+                    .fill(Palette.card)
+                    .shadow(color: Palette.shadow.opacity(0.5), radius: 3, y: 1)
+            }
+            .overlay {
+                paper
+                    .stroke(
+                        adjustment == 0 ? Palette.outline : Palette.amber.opacity(.medium),
+                        lineWidth: 1
+                    )
+            }
+            .contentShape(.rect)
+            .tapArea(Self.tapOutsets)
         }
+        .buttonStyle(.plain)
     }
 }
 
 private extension EntryItemButton {
-    static let badgeSize: CGFloat = 18
+    static let height: CGFloat = 36
+    static let tooth: CGFloat = 6
 
-    @ViewBuilder
-    var badge: some View {
-        let text = Text("\(count)")
-            .textFont(size: .caption, weight: .bold)
-            .monospacedDigit()
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
-            .padding(.horizontal, 4)
-            .frame(minWidth: Self.badgeSize, minHeight: Self.badgeSize)
+    static let tapOutsets = EdgeInsets(
+        top: 4,
+        leading: 0,
+        bottom: 4,
+        trailing: 0
+    )
 
-        if hasAdjustment {
-            text
-                .foregroundStyle(Palette.cardBottom)
-                .background(Palette.amber)
-        } else {
-            text
-                .goldFace()
-        }
+    var paper: EntryReceiptShape {
+        EntryReceiptShape(tooth: Self.tooth, hasTopEdge: false)
     }
+}
+
+#Preview {
+    VStack(spacing: 16) {
+        EntryItemButton(count: 4, total: 1674, adjustment: 0) {}
+
+        EntryItemButton(count: 4, total: 1674, adjustment: -1008) {}
+    }
+    .padding()
+    .background(Palette.background)
 }

@@ -21,6 +21,7 @@ extension EntrySheet {
                     EntryTemplateRow(
                         model: model,
                         isCompact: true,
+                        onAddItem: addItemAction,
                         onUse: { template in
                             useTemplate(template)
                         },
@@ -87,6 +88,21 @@ extension EntrySheet {
         }
 
         setEnteringAmount(true)
+    }
+}
+
+extension EntrySheet {
+    var addItemAction: (() -> Void)? {
+        guard
+            model.showsItems,
+            model.items.isEmpty
+        else {
+            return nil
+        }
+
+        return {
+            open(.items)
+        }
     }
 }
 

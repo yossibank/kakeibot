@@ -257,6 +257,7 @@ private extension SnapshotTests {
         model.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
         model.addItem(name: "食パン", amount: 250, taxRate: .reduced)
         model.addItem(name: "洗剤", amount: 398, taxRate: .standard)
+        model.addItem(name: "シール値引", amount: -30, taxRate: .standard)
         model.addItem(name: "弁当", amount: 540)
     }
 

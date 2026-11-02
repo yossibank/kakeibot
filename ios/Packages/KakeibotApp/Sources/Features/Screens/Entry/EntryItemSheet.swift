@@ -301,6 +301,8 @@ private extension EntryItemSheet {
     ) -> some View {
         let isEditing = isSlipOpen && editingIndex == index
         let isSuspect = model.suspectItemIndices.contains(index)
+        let isNegative = item.amount < 0
+        let amountColor = isSuspect ? Palette.amber : isNegative ? Palette.rose : Palette.text
 
         return SwipeRow(
             id: index,
@@ -312,29 +314,28 @@ private extension EntryItemSheet {
             remove(index)
         } content: {
             HStack(spacing: 8) {
-                IconImage(categoryIcon, size: 13)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: Self.iconWidth)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(item.trimmedName)
+                        .textFont(.subheadline)
+                        .foregroundStyle(isNegative ? Palette.rose : Palette.text)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
 
-                Text(item.trimmedName)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                if let quantity = EntryModel.quantityText(for: item) {
-                    Text(quantity)
-                        .textFont(.caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
+                    if let quantity = EntryModel.quantityText(for: item) {
+                        Text(quantity)
+                            .textFont(.caption)
+                            .monospacedDigit()
+                            .foregroundStyle(Palette.subtext)
+                    }
                 }
+                .padding(.leading, isNegative ? Self.discountIndent : 0)
 
                 Spacer(minLength: 8)
 
                 Text(AmountText.text(item.amount))
                     .textFont(.subheadline)
                     .monospacedDigit()
-                    .foregroundStyle(isSuspect ? Palette.amber : Palette.text)
+                    .foregroundStyle(amountColor)
 
                 if showsRates {
                     Text(item.taxRate.map { "\($0.rawValue)%" } ?? "")
@@ -414,7 +415,7 @@ private extension EntryItemSheet {
 
 private extension EntryItemSheet {
     static let noticeBottom: CGFloat = 76
-    static let iconWidth: CGFloat = 18
+    static let discountIndent: CGFloat = 12
     static let rateWidth: CGFloat = 28
     static let taxModeWidth: CGFloat = 136
 
@@ -434,10 +435,6 @@ private extension EntryItemSheet {
     var dateText: String {
         let date = model.date
         return "\(date.year)/\(date.month)/\(date.day)（\(date.weekday.shortName)）"
-    }
-
-    var categoryIcon: Icon? {
-        model.selectedCategory.flatMap { model.icon(for: $0) }
     }
 
     func restore(_ removed: EntryModel.RemovedItem) {

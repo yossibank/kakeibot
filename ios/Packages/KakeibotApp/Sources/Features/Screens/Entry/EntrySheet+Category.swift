@@ -22,6 +22,7 @@ extension EntrySheet {
             EntryTemplateRow(
                 model: model,
                 isCompact: false,
+                onAddItem: addItemAction,
                 onUse: { template in
                     useTemplate(template)
                 },

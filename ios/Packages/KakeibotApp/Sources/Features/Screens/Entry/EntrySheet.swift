@@ -241,6 +241,18 @@ private extension EntrySheet {
         VStack(spacing: 24) {
             dial
 
+            if model.showsItems, !model.items.isEmpty {
+                EntryItemButton(
+                    count: model.items.count,
+                    total: model.itemTotal,
+                    adjustment: model.itemAdjustment
+                ) {
+                    open(.items)
+                }
+                .padding(.top, -12)
+                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            }
+
             if model.type == .transfer {
                 transferArea
             } else {
@@ -282,16 +294,6 @@ private extension EntrySheet {
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity)
-        .overlay(alignment: .topTrailing) {
-            if model.showsItems {
-                EntryItemButton(
-                    count: model.items.count,
-                    hasAdjustment: model.hasItemAdjustment
-                ) {
-                    open(.items)
-                }
-            }
-        }
     }
 }
 

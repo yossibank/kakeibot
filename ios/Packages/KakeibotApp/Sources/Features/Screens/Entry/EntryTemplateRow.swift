@@ -5,6 +5,7 @@ import SwiftUI
 struct EntryTemplateRow: View {
     let model: EntryModel
     let isCompact: Bool
+    let onAddItem: (() -> Void)?
     let onUse: (EntryTemplate) -> Void
     let onAdd: () -> Void
 
@@ -12,6 +13,15 @@ struct EntryTemplateRow: View {
         ScrollView(.horizontal) {
             VStack(alignment: .leading, spacing: Self.spacing) {
                 HStack(spacing: Self.spacing) {
+                    if let onAddItem {
+                        ChipButton(
+                            "品目",
+                            systemImage: "plus",
+                            outline: .dashed,
+                            action: onAddItem
+                        )
+                    }
+
                     ForEach(firstRow) { template in
                         button(template)
                     }

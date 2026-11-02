@@ -12,7 +12,7 @@ extension EntrySheet {
         case .date:
             EntryDateSheet(model: model, today: today)
         case .items:
-            EntryItemSheet(model: model)
+            EntryItemSheet(model: model, isSlipOpen: model.items.isEmpty)
         case .newCategory:
             CategoryEditSheet(model: model.newCategoryModel()) { category in
                 Task {
