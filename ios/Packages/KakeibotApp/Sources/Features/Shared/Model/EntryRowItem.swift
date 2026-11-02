@@ -14,6 +14,7 @@ public struct EntryRowItem: Identifiable, Equatable {
     public let type: Entry.Kind
     public let isRecurring: Bool
     public let items: [EntryItem]
+    public let taxIncluded: Bool
 }
 
 extension EntryRowItem {
@@ -39,7 +40,8 @@ extension EntryRowItem {
             amount: entry.amount,
             type: entry.type,
             isRecurring: entry.recurringId != nil,
-            items: list.items[entry.id, default: []]
+            items: list.items[entry.id, default: []],
+            taxIncluded: entry.taxIncluded
         )
     }
 }

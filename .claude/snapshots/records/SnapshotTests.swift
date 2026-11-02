@@ -109,6 +109,21 @@ struct SnapshotTests {
                     variant: variant,
                     to: "records-item-adjusted-\(theme.rawValue)"
                 )
+
+                let included = RecordsItemReceipt(
+                    taxIncluded: true,
+                    items: Self.includedItems(entryId: entryId, now: now),
+                    amount: 3170
+                )
+                .padding(24)
+                .background(Palette.background)
+                .environment(\.palette, theme.palette)
+
+                try Self.write(
+                    included,
+                    variant: variant,
+                    to: "records-item-included-\(theme.rawValue)"
+                )
             }
         }
     }
@@ -131,6 +146,26 @@ private extension SnapshotTests {
         Variant(name: "regular", width: 393, scheme: .light, textSize: .standard),
         Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large)
     ]
+
+    static func includedItems(
+        entryId: Entry.ID,
+        now: Date
+    ) -> [EntryItem] {
+        [("T/O オムレツサンド", 780), ("絹香食パン", 890), ("スイートポテト", 1500)]
+            .enumerated()
+            .map { index, item in
+                EntryItem(
+                    entryId: entryId,
+                    name: item.0,
+                    quantity: 1,
+                    amount: item.1,
+                    taxRate: .reduced,
+                    sortOrder: index,
+                    createdAt: now,
+                    updatedAt: now
+                )
+            }
+    }
 
     static func wait(until isReady: () -> Bool) async throws {
         for _ in 0..<300 where !isReady() {

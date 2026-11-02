@@ -3,6 +3,8 @@ import DesignSystem
 import SwiftUI
 
 struct RecordsItemReceipt: View {
+    var taxIncluded = false
+
     let items: [EntryItem]
     let amount: Int
 
@@ -17,7 +19,7 @@ struct RecordsItemReceipt: View {
             EntryReceiptRule(style: .dashed)
 
             if totals.tax != 0 {
-                summaryLine("消費税", amount: totals.tax)
+                summaryLine(taxIncluded ? "うち消費税" : "消費税", amount: totals.tax)
             }
 
             if adjustment != 0 {
@@ -61,10 +63,14 @@ private extension RecordsItemReceipt {
 
 private extension RecordsItemReceipt {
     var totals: (tax: Int, total: Int) {
-        let total = EntryItemTotal(items.map(EntryItem.Draft.init))
+        let total = EntryItemTotal(items.map(EntryItem.Draft.init), taxIncluded: taxIncluded)
         let tax = total.taxes.reduce(0) { $0 + $1.amount }
 
         return (tax, total.total)
+    }
+
+    var showsRates: Bool {
+        Set(items.map(\.taxRate)).count > 1
     }
 
     var adjustment: Int {
@@ -95,7 +101,7 @@ private extension RecordsItemReceipt {
                 .monospacedDigit()
                 .foregroundStyle(Palette.text)
 
-            if let rate = item.taxRate {
+            if showsRates, let rate = item.taxRate {
                 Text("\(rate.rawValue)%")
                     .textFont(.caption2)
                     .monospacedDigit()
