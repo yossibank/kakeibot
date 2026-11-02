@@ -17,6 +17,8 @@ extension RecordsView {
 
             ForEach(model.rows(for: day)) { row in
                 swipeRow(row)
+
+                itemList(row)
             }
         }
         .padding(.horizontal, 16)

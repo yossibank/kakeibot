@@ -37,6 +37,42 @@ struct EntryListTests {
     }
 
     @Test
+    func listsItemsByEntry() async throws {
+        let database = try AppDatabase.inMemory()
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        try database.insertDefaultsIfEmpty(at: now)
+        let options = try await database.entryOptions()
+        let date = try #require(LocalDate("2026-10-03"))
+
+        let receipt = EntryDraft(
+            type: .expense,
+            amount: 616,
+            date: date,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            items: [
+                EntryItem.Draft(name: "牛乳", amount: 396),
+                EntryItem.Draft(name: "食パン", amount: 220)
+            ]
+        )
+
+        let plain = EntryDraft(
+            type: .expense,
+            amount: 500,
+            date: date,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id
+        )
+
+        let saved = try await database.saveEntry(receipt, at: now)
+        let other = try await database.saveEntry(plain, at: now)
+        let list = try await database.entryList()
+
+        #expect(list.items[saved.id]?.map(\.name) == ["牛乳", "食パン"])
+        #expect(list.items[other.id] == nil)
+    }
+
+    @Test
     func skipsUnchangedLists() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
