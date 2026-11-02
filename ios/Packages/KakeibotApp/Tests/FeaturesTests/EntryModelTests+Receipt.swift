@@ -240,6 +240,32 @@ extension EntryModelTests {
     }
 
     @Test
+    func forgetsNameRestoredToTheReadText() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        let reading = ReceiptReading(
+            store: "スーパー青葉",
+            total: 396,
+            items: [EntryItem.Draft(name: "ギユウニユウ", amount: 396)]
+        )
+
+        await model.apply(reading)
+        model.updateItem(at: 0, name: "低脂肪乳", amount: 396)
+        _ = await model.save()
+        await model.startNext()
+        await model.apply(reading)
+        model.updateItem(at: 0, name: "ギユウニユウ", amount: 396)
+        _ = await model.save()
+        await model.startNext()
+        let names = try await setup.database.itemNames(at: "スーパー青葉")
+        await model.apply(reading)
+
+        #expect(names.isEmpty)
+        #expect(model.items.map(\.name) == ["ギユウニユウ"])
+    }
+
+    @Test
     func keepsItemSourcesAlignedWithItems() async throws {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date)

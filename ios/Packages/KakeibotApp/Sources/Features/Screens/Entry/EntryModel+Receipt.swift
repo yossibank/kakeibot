@@ -113,20 +113,21 @@ private extension EntryModel {
         let now = Date()
 
         for item in items {
-            guard
-                let read = item.readName,
-                item.trimmedName != read
-            else {
+            guard let read = item.readName else {
                 continue
             }
 
             do {
-                try await database.rememberItemName(
-                    item.trimmedName,
-                    for: read,
-                    at: store,
-                    on: now
-                )
+                if item.trimmedName == read {
+                    try await database.forgetItemName(for: read, at: store)
+                } else {
+                    try await database.rememberItemName(
+                        item.trimmedName,
+                        for: read,
+                        at: store,
+                        on: now
+                    )
+                }
             } catch {
                 errorNotice.show(Self.itemNameFailedMessage)
                 return

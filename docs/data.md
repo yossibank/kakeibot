@@ -234,7 +234,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | name | TEXT | 人が直した品名 |
 | created_at / updated_at | TEXT | |
 
-`(store, raw)` は重複禁止。同じ組を直し直すと、`name` を書き換える。
+`(store, raw)` は重複禁止。同じ組を直し直すと、`name` を書き換える。読んだままの文字に戻すと、行を消す。
 
 ### template
 

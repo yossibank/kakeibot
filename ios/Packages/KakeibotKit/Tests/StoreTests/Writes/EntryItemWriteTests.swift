@@ -162,6 +162,22 @@ struct EntryItemWriteTests {
     }
 
     @Test
+    func forgetsItemNameOnlyAtTheStore() async throws {
+        let setup = try await EntryWriteTests.Setup()
+        let database = setup.database
+
+        try await database.rememberItemName("牛乳", for: "ｷﾞｭｳﾆｭｳ", at: "青葉", on: setup.now)
+        try await database.rememberItemName("牛乳", for: "ｷﾞｭｳﾆｭｳ", at: "若葉", on: setup.now)
+        try await database.forgetItemName(for: "ｷﾞｭｳﾆｭｳ", at: "青葉")
+        try await database.forgetItemName(for: "ﾊﾟﾝ", at: "青葉")
+        let aoba = try await database.itemNames(at: "青葉")
+        let wakaba = try await database.itemNames(at: "若葉")
+
+        #expect(aoba.isEmpty)
+        #expect(wakaba == ["ｷﾞｭｳﾆｭｳ": "牛乳"])
+    }
+
+    @Test
     func listsRecentItemNamesOnce() async throws {
         let setup = try await EntryWriteTests.Setup()
         let batches = [["パン"], ["牛乳"], ["パン", "値引"], ["卵"]]
