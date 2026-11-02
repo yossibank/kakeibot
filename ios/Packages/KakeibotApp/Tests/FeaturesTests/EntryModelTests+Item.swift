@@ -86,6 +86,23 @@ extension EntryModelTests {
     }
 
     @Test
+    func followsItemTotalWithTax() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        model.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
+        model.addItem(name: "食パン", amount: 250, taxRate: .reduced)
+        model.addItem(name: "洗剤", amount: 398, taxRate: .standard)
+        model.addItem(name: "弁当", amount: 540)
+
+        #expect(model.itemTotals.subtotal == 1584)
+        #expect(model.itemTotals.taxes.map(\.amount) == [51, 39])
+        #expect(model.amount == 1674)
+        #expect(model.itemAdjustment == 0)
+    }
+
+    @Test
     func keepsAmountWhenItemTotalIsNegative() async throws {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date)

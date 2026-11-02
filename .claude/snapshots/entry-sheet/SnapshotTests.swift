@@ -70,6 +70,12 @@ struct SnapshotTests {
 
         try Self.write(itemSheet, to: "entry-item-sheet.png")
 
+        let itemInput = EntryItemSheet(model: itemModel, isSlipOpen: true)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .environment(\.colorScheme, .light)
+
+        try Self.write(itemInput, to: "entry-item-input.png")
+
         let emptySheet = EntryItemSheet(model: closedModel)
             .frame(width: Self.phone.width, height: Self.phone.height)
             .environment(\.colorScheme, .dark)
@@ -125,8 +131,10 @@ private extension SnapshotTests {
 
     static func addItems(to model: EntryModel) {
         model.memo = "スーパー山田"
-        model.addItem(name: "牛乳", quantity: 2, amount: 396)
-        model.addItem(name: "食パン", amount: 250)
+        model.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
+        model.addItem(name: "食パン", amount: 250, taxRate: .reduced)
+        model.addItem(name: "洗剤", amount: 398, taxRate: .standard)
+        model.addItem(name: "弁当", amount: 540)
     }
 
     static func write(

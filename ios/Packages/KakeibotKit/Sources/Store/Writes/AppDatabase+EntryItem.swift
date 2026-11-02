@@ -163,6 +163,7 @@ private extension AppDatabase {
                 name: draft.trimmedName,
                 quantity: draft.quantity,
                 amount: draft.amount,
+                taxRate: draft.taxRate,
                 sortOrder: index,
                 createdAt: now,
                 updatedAt: now
@@ -171,6 +172,7 @@ private extension AppDatabase {
             item.name = draft.trimmedName
             item.quantity = draft.quantity
             item.amount = draft.amount
+            item.taxRate = draft.taxRate
             item.sortOrder = index
 
             guard item != old else {

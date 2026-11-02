@@ -38,6 +38,24 @@ struct EntryItemWriteTests {
     }
 
     @Test
+    func savesAndClearsTaxRate() async throws {
+        let setup = try await EntryWriteTests.Setup()
+        let later = setup.now.addingTimeInterval(60)
+        var draft = setup.draft
+        draft.items = [EntryItem.Draft(name: "牛乳", amount: 396, taxRate: .reduced)]
+        let entry = try await setup.database.saveEntry(draft, at: setup.now)
+        let saved = try await setup.database.entryItems(of: entry.id)
+
+        draft.items = [EntryItem.Draft(name: "牛乳", amount: 396)]
+        try await setup.database.saveEntry(draft, editing: entry.id, at: later)
+        let cleared = try await setup.database.entryItems(of: entry.id)
+
+        #expect(saved.map(\.taxRate) == [.reduced])
+        #expect(cleared.map(\.taxRate) == [nil])
+        #expect(cleared.map(\.updatedAt) == [later])
+    }
+
+    @Test
     func keepsItemsWhenDraftHasNone() async throws {
         let setup = try await EntryWriteTests.Setup()
         var draft = setup.draft

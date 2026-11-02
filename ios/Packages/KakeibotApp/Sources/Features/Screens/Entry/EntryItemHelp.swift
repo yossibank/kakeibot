@@ -92,6 +92,7 @@ private extension EntryItemHelp {
         Step(systemImage: "plus", title: "追加", detail: "「＋ 品目を追加」から、品名と単価・数量を入れます。"),
         Step(systemImage: "hand.tap", title: "変更", detail: "品目を押すと、伝票で直せます。"),
         Step(systemImage: "arrow.left", title: "削除", detail: "品目を左に滑らせると、削除できます。"),
+        Step(systemImage: "tag", title: "値引・半額", detail: "「値引」で値引の行に、「半額」で単価を半分にできます。"),
         Step(systemImage: "equal", title: "調整", detail: "差額が出た時は、合計を品目の合計にそろえます。")
     ]
 }

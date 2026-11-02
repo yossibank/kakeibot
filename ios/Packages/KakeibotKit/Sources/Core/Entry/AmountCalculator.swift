@@ -32,7 +32,7 @@ public extension AmountCalculator {
         case divide
     }
 
-    enum TaxRate: Int, CaseIterable, Sendable {
+    enum TaxRate: Int, CaseIterable, Codable, Sendable {
         case reduced = 8
         case standard = 10
     }

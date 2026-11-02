@@ -13,6 +13,11 @@ extension EntryItemSheet {
         case quantity
     }
 
+    struct ScrollRequest: Equatable {
+        let id = UUID()
+        let index: Int
+    }
+
     var addBar: some View {
         PrimaryButton("＋ 品目を追加") {
             openSlip()
@@ -57,7 +62,7 @@ extension EntryItemSheet {
 
             equation
 
-            Keypad(calculator: activeCalculator) { key in
+            Keypad(calculator: activeCalculator, accessories: accessories) { key in
                 press(key)
             }
 
@@ -69,6 +74,7 @@ extension EntryItemSheet {
         .padding(.horizontal, 16)
         .padding(.top, 20)
         .padding(.bottom, 8)
+        .fixedSize(horizontal: false, vertical: true)
         .background {
             EntryReceiptShape(tooth: 12, hasTopEdge: true, hasBottomEdge: false)
                 .fill(Palette.card)
@@ -90,16 +96,16 @@ extension EntryItemSheet {
 
         withoutAnimation {
             name = item.name
-            unit = AmountCalculator(amount: price.unit)
+            unit = AmountCalculator(amount: abs(price.unit))
             quantity = AmountCalculator(amount: price.quantity)
             target = .unit
             editingIndex = index
             editingItem = item
+            taxRate = item.taxRate
+            isDiscount = item.amount < 0
         }
 
-        withAnimation(.snappy) {
-            isSlipOpen = true
-        }
+        showSlip(scrollingTo: index)
     }
 
     func remove(_ index: Int) {
@@ -117,9 +123,31 @@ extension EntryItemSheet {
             removed = model.removeItem(at: index)
         }
     }
+
+    func scroll(to index: Int) {
+        guard model.items.indices.contains(index) else {
+            return
+        }
+
+        scrollRequest = ScrollRequest(index: index)
+    }
+
+    func showSlip(scrollingTo index: Int) {
+        withAnimation(.snappy) {
+            isSlipOpen = true
+        } completion: {
+            scroll(to: index)
+        }
+    }
 }
 
 private extension EntryItemSheet {
+    static let taxOptions: [CapsulePicker<EntryItem.TaxRate?>.Option] = [
+        .init("税込", value: nil),
+        .init("8%", value: .reduced),
+        .init("10%", value: .standard)
+    ]
+
     var slipTitle: String {
         editingIndex.map { "品目 \($0 + 1) を変更" } ?? "品目を追加"
     }
@@ -138,12 +166,13 @@ private extension EntryItemSheet {
         }
 
         let price = EntryModel.unitPrice(of: editingItem)
-        let shownUnit = AmountCalculator(amount: price.unit).amount
+        let shownUnit = AmountCalculator(amount: abs(price.unit)).amount
         let shownQuantity = AmountCalculator(amount: price.quantity).amount
 
         guard
             unit.amount == shownUnit,
-            quantity.amount == shownQuantity
+            quantity.amount == shownQuantity,
+            isDiscount == (editingItem.amount < 0)
         else {
             return nil
         }
@@ -156,7 +185,8 @@ private extension EntryItemSheet {
     }
 
     var lineAmount: Int {
-        keptItem?.amount ?? unit.amount * quantityValue
+        let sign = isDiscount ? -1 : 1
+        return keptItem?.amount ?? sign * unit.amount * quantityValue
     }
 
     var canSubmit: Bool {
@@ -164,7 +194,18 @@ private extension EntryItemSheet {
             return false
         }
 
-        return keptItem != nil || (unit.amount > 0 && lineAmount <= AmountCalculator.maxValue)
+        return keptItem != nil || (unit.amount > 0 && abs(lineAmount) <= AmountCalculator.maxValue)
+    }
+
+    var accessories: [Keypad.Accessory] {
+        [
+            Keypad.Accessory("値引", isActive: isDiscount) {
+                isDiscount.toggle()
+            },
+            Keypad.Accessory("半額") {
+                halveUnit()
+            }
+        ]
     }
 
     var activeCalculator: AmountCalculator {
@@ -176,27 +217,32 @@ private extension EntryItemSheet {
     }
 
     var equation: some View {
-        HStack(spacing: 8) {
-            token(AmountText.text(unit.amount), label: "単価", for: .unit)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 4) {
+                token(AmountText.text(unit.amount), label: "単価", for: .unit)
 
-            Text("×")
-                .textFont(.body)
-                .foregroundStyle(Palette.subtext)
+                Text("×")
+                    .textFont(.body)
+                    .foregroundStyle(Palette.subtext)
 
-            token("\(quantityValue)", label: "数量", for: .quantity)
+                token("\(quantityValue)", label: "数量", for: .quantity)
 
-            Spacer(minLength: 8)
+                Spacer(minLength: 4)
 
-            Text("=")
-                .textFont(.body)
-                .foregroundStyle(Palette.subtext)
+                Text("=")
+                    .textFont(.body)
+                    .foregroundStyle(Palette.subtext)
 
-            Text(AmountText.text(lineAmount))
-                .displayFont(.title, weight: .bold)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
+                Text(AmountText.text(lineAmount))
+                    .displayFont(.headline, weight: .bold)
+                    .monospacedDigit()
+                    .foregroundStyle(isDiscount ? Palette.rose : Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+
+            CapsulePicker(selection: $taxRate, options: Self.taxOptions, size: .small)
+                .fixedSize()
         }
     }
 
@@ -250,13 +296,14 @@ private extension EntryItemSheet {
         }
     }
 
+    func halveUnit() {
+        target = .unit
+        unit = AmountCalculator(amount: unit.amount / 2)
+    }
+
     func openSlip() {
         resetInput()
-
-        withAnimation(.snappy) {
-            isSlipOpen = true
-        }
-
+        showSlip(scrollingTo: model.items.count - 1)
         focus = .name
     }
 
@@ -270,24 +317,28 @@ private extension EntryItemSheet {
                 at: editingIndex,
                 name: trimmedName,
                 quantity: lineQuantity,
-                amount: lineAmount
+                amount: lineAmount,
+                taxRate: taxRate
             )
+
+            closeSlip()
         } else {
             withAnimation(.snappy) {
                 model.addItem(
                     name: trimmedName,
                     quantity: quantityValue,
-                    amount: lineAmount
+                    amount: lineAmount,
+                    taxRate: taxRate
                 )
             }
-        }
 
-        resetInput()
+            resetInput()
+            scroll(to: model.items.count - 1)
+        }
     }
 
     func closeSlip() {
         focus = nil
-        resetInput()
 
         withAnimation(.snappy) {
             isSlipOpen = false
@@ -302,6 +353,8 @@ private extension EntryItemSheet {
             target = .unit
             editingIndex = nil
             editingItem = nil
+            taxRate = model.items.last?.taxRate
+            isDiscount = false
         }
     }
 

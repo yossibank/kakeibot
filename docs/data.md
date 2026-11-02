@@ -216,6 +216,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | name | TEXT | 空にしない |
 | quantity | INTEGER | 1 以上 |
 | amount | INTEGER | 数量を掛けた後の金額。値引は負の数 |
+| tax_rate | INTEGER | 空・8・10。空は税込の金額で、8 と 10 は税抜の金額 |
 | sort_order | INTEGER | |
 | created_at / updated_at | TEXT | |
 

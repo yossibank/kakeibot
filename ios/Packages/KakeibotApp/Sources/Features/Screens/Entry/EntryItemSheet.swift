@@ -12,7 +12,10 @@ struct EntryItemSheet: View {
     @State var target: Target = .unit
     @State var editingIndex: Int?
     @State var editingItem: EntryItem.Draft?
+    @State var taxRate: EntryItem.TaxRate?
+    @State var isDiscount = false
     @State var isSlipOpen = false
+    @State var scrollRequest: ScrollRequest?
     @State var removed: EntryModel.RemovedItem?
     @State var openIndex: Int?
 
@@ -25,6 +28,25 @@ struct EntryItemSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
+        GeometryReader { _ in
+            content
+        }
+        .ignoresSafeArea(.keyboard)
+        .overlay {
+            if isShowingHelp {
+                EntryItemHelp {
+                    withAnimation(.snappy) {
+                        isShowingHelp = false
+                    }
+                }
+            }
+        }
+        .presentationDragIndicator(.visible)
+    }
+}
+
+private extension EntryItemSheet {
+    var content: some View {
         VStack(spacing: 0) {
             HStack {
                 RingButton(systemImage: "questionmark") {
@@ -45,14 +67,25 @@ struct EntryItemSheet: View {
             .padding(.horizontal, 20)
             .padding(.top, 20)
 
-            ScrollView {
-                receipt
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    receipt
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 16)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: scrollRequest) { _, request in
+                    guard let request else {
+                        return
+                    }
+
+                    withAnimation(.snappy) {
+                        proxy.scrollTo(request.index, anchor: .top)
+                    }
+                }
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollIndicators(.hidden)
-            .scrollDismissesKeyboard(.interactively)
 
             if isSlipOpen {
                 slip
@@ -76,17 +109,17 @@ struct EntryItemSheet: View {
                     focus = nil
                 }
         }
-        .ignoresSafeArea(.keyboard)
-        .overlay {
-            if isShowingHelp {
-                EntryItemHelp {
-                    withAnimation(.snappy) {
-                        isShowingHelp = false
-                    }
-                }
-            }
-        }
-        .presentationDragIndicator(.visible)
+    }
+}
+
+extension EntryItemSheet {
+    init(
+        model: EntryModel,
+        isSlipOpen: Bool = false
+    ) {
+        _isSlipOpen = State(initialValue: isSlipOpen)
+
+        self.model = model
     }
 }
 
@@ -129,6 +162,7 @@ private extension EntryItemSheet {
                 VStack(spacing: 0) {
                     ForEach(Array(model.items.enumerated()), id: \.offset) { index, item in
                         itemRow(item, at: index)
+                            .id(index)
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                 }
@@ -136,7 +170,11 @@ private extension EntryItemSheet {
 
             EntryReceiptRule(style: .dashed)
 
-            summaryLine("小計", amount: model.itemTotal)
+            summaryLine("小計", amount: model.itemTotals.subtotal)
+
+            ForEach(model.itemTotals.taxes, id: \.rate) { tax in
+                taxLine(tax)
+            }
 
             if model.hasItemAdjustment {
                 adjustmentLine
@@ -220,7 +258,7 @@ private extension EntryItemSheet {
         _ item: EntryItem.Draft,
         at index: Int
     ) -> some View {
-        let isEditing = editingIndex == index
+        let isEditing = isSlipOpen && editingIndex == index
 
         return SwipeRow(
             id: index,
@@ -255,6 +293,14 @@ private extension EntryItemSheet {
                     .textFont(.body)
                     .monospacedDigit()
                     .foregroundStyle(Palette.text)
+
+                if showsRates {
+                    Text(item.taxRate.map { "\($0.rawValue)%" } ?? "")
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accent)
+                        .frame(width: Self.rateWidth, alignment: .trailing)
+                }
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 4)
@@ -290,11 +336,40 @@ private extension EntryItemSheet {
                 .foregroundStyle(Palette.text)
         }
     }
+
+    func taxLine(_ tax: EntryItemTotal.Tax) -> some View {
+        HStack {
+            Text("\(tax.rate.rawValue)%対象")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+
+            Text(AmountText.text(tax.base))
+                .textFont(.caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+
+            Spacer()
+
+            Text("消費税")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+
+            Text(AmountText.text(tax.amount))
+                .textFont(.subheadline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.text)
+        }
+    }
 }
 
 private extension EntryItemSheet {
     static let noticeBottom: CGFloat = 76
     static let iconWidth: CGFloat = 20
+    static let rateWidth: CGFloat = 28
+
+    var showsRates: Bool {
+        model.items.contains { $0.taxRate != nil }
+    }
 
     var receiptShape: EntryReceiptShape {
         EntryReceiptShape(tooth: 12, hasTopEdge: true)
