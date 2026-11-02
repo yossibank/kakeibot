@@ -32,7 +32,7 @@ extension FeatureArt {
 }
 
 private extension FeatureArt {
-    static let width: CGFloat = 310
+    static let width: CGFloat = 330
     static let height: CGFloat = 170
 }
 
@@ -49,9 +49,10 @@ private extension FeatureArt {
     }
 
     var receipt: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             FeatureArtReceipt(showsViewfinder: true)
                 .rotationEffect(.degrees(-4))
+                .padding(12)
 
             arrow
 
@@ -65,7 +66,7 @@ private extension FeatureArt {
                 ) {}
                     .allowsHitTesting(false)
             }
-            .frame(width: 160)
+            .frame(width: 156)
         }
     }
 

@@ -21,7 +21,7 @@ public struct WidgetGuideView: View {
                     WidgetGuideIntroCard()
 
                     VStack(spacing: 16) {
-                        CapsulePicker(selection: $place, options: Self.options)
+                        CapsulePicker(selection: $place, options: Self.options, size: .wide)
 
                         WidgetGuideStage(place: place)
                             .id(place)
