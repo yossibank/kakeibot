@@ -46,14 +46,8 @@ struct ProHero: View {
                     .background(Self.gold, in: .capsule)
             }
 
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 14) {
-                    promises
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    promises
-                }
+            RowOrColumnLayout(rowSpacing: 14, columnSpacing: 6) {
+                promises
             }
         }
         .padding(.horizontal, 20)

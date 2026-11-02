@@ -3,6 +3,7 @@ import SwiftUI
 
 struct WhatsNewCard: View {
     @State private var shownSteps: Int
+    @State private var stepsWidth: CGFloat = 0
 
     let feature: WhatsNewRelease.Feature
     let onTry: (WhatsNewRelease.Action) -> Void
@@ -33,56 +34,64 @@ struct WhatsNewCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            ViewThatFits(in: .horizontal) {
-                VStack(spacing: 8) {
-                    HStack(spacing: Self.gap) {
-                        ForEach(indexedSteps, id: \.offset) { index, step in
-                            if index > 0 {
-                                chevron(index)
-                            }
+            Group {
+                if stepsWidth >= wideStepsWidth {
+                    VStack(spacing: 8) {
+                        HStack(spacing: Self.gap) {
+                            ForEach(indexedSteps, id: \.offset) { index, step in
+                                if index > 0 {
+                                    chevron(index)
+                                }
 
-                            WhatsNewScene(kind: step.scene)
-                                .frame(
-                                    minWidth: Self.minSceneWidth,
-                                    idealWidth: Self.minSceneWidth,
-                                    maxWidth: .infinity
-                                )
-                                .modifier(StepReveal(isShown: isShown(index)))
+                                WhatsNewScene(kind: step.scene)
+                                    .frame(
+                                        minWidth: Self.minSceneWidth,
+                                        idealWidth: Self.minSceneWidth,
+                                        maxWidth: .infinity
+                                    )
+                                    .modifier(StepReveal(isShown: isShown(index)))
+                            }
+                        }
+
+                        HStack(alignment: .top, spacing: Self.gap) {
+                            ForEach(indexedSteps, id: \.offset) { index, step in
+                                if index > 0 {
+                                    Color.clear
+                                        .frame(width: Self.chevronWidth, height: 1)
+                                }
+
+                                caption(step, number: index + 1)
+                                    .frame(
+                                        minWidth: Self.minSceneWidth,
+                                        idealWidth: Self.minSceneWidth,
+                                        maxWidth: .infinity,
+                                        alignment: .leading
+                                    )
+                                    .modifier(StepReveal(isShown: isShown(index)))
+                            }
                         }
                     }
-
-                    HStack(alignment: .top, spacing: Self.gap) {
+                } else {
+                    VStack(alignment: .leading, spacing: 10) {
                         ForEach(indexedSteps, id: \.offset) { index, step in
-                            if index > 0 {
-                                Color.clear
-                                    .frame(width: Self.chevronWidth, height: 1)
-                            }
+                            HStack(spacing: 12) {
+                                WhatsNewScene(kind: step.scene)
+                                    .frame(width: Self.listSceneWidth)
 
-                            caption(step, number: index + 1)
-                                .frame(
-                                    minWidth: Self.minSceneWidth,
-                                    idealWidth: Self.minSceneWidth,
-                                    maxWidth: .infinity,
-                                    alignment: .leading
-                                )
-                                .modifier(StepReveal(isShown: isShown(index)))
+                                caption(step, number: index + 1)
+
+                                Spacer(minLength: 0)
+                            }
+                            .modifier(StepReveal(isShown: isShown(index)))
                         }
                     }
                 }
-
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(indexedSteps, id: \.offset) { index, step in
-                        HStack(spacing: 12) {
-                            WhatsNewScene(kind: step.scene)
-                                .frame(width: Self.listSceneWidth)
-
-                            caption(step, number: index + 1)
-
-                            Spacer(minLength: 0)
-                        }
-                        .modifier(StepReveal(isShown: isShown(index)))
-                    }
-                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.width
+            } action: { width in
+                stepsWidth = width
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -116,8 +125,8 @@ struct WhatsNewCard: View {
         }
         .padding(16)
         .card()
-        .onAppear {
-            revealSteps()
+        .task {
+            await revealSteps()
         }
     }
 }
@@ -144,6 +153,12 @@ private extension WhatsNewCard {
 private extension WhatsNewCard {
     var indexedSteps: [(offset: Int, element: WhatsNewRelease.Step)] {
         Array(feature.steps.enumerated())
+    }
+
+    var wideStepsWidth: CGFloat {
+        let count = CGFloat(feature.steps.count)
+        let joint = Self.chevronWidth + Self.gap * 2
+        return Self.minSceneWidth * count + joint * max(count - 1, 0)
     }
 
     func isShown(_ index: Int) -> Bool {
@@ -179,18 +194,20 @@ private extension WhatsNewCard {
         }
     }
 
-    func revealSteps() {
+    func revealSteps() async {
         guard shownSteps < feature.steps.count else {
             return
         }
 
-        Task {
-            for count in 1...feature.steps.count {
-                try? await Task.sleep(for: Self.stepDelay)
+        for count in (shownSteps + 1)...feature.steps.count {
+            do {
+                try await Task.sleep(for: Self.stepDelay)
+            } catch {
+                return
+            }
 
-                withAnimation(.spring(duration: 0.45, bounce: 0.25)) {
-                    shownSteps = count
-                }
+            withAnimation(.spring(duration: 0.45, bounce: 0.25)) {
+                shownSteps = count
             }
         }
     }

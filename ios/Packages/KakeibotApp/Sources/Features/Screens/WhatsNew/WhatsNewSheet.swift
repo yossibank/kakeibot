@@ -123,14 +123,8 @@ private extension WhatsNewSheet {
                 }
             }
 
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 8) {
-                    chips(release, onJump: onJump)
-                }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    chips(release, onJump: onJump)
-                }
+            RowOrColumnLayout(rowSpacing: 8, columnSpacing: 8) {
+                chips(release, onJump: onJump)
             }
         }
         .padding(16)

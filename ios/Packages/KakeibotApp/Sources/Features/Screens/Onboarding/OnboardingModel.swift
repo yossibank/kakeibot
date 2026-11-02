@@ -125,8 +125,15 @@ public extension OnboardingModel {
     }
 
     func finish() async -> Bool {
+        let version = WhatsNewRelease.latestVersion
+
         do {
-            try await database.setSetting(.whatsNewSeenVersion, to: WhatsNewRelease.latestVersion)
+            let seen = try await database.setting(.whatsNewSeenVersion)
+
+            if AppVersion.isNewer(version, than: seen) {
+                try await database.setSetting(.whatsNewSeenVersion, to: version)
+            }
+
             try await database.setSetting(.onboardingCompleted, to: true)
             return true
         } catch {

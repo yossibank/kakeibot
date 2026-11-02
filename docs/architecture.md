@@ -208,7 +208,7 @@ KakeibotApp/
 | --- | --- |
 | `AppFeature/` | 起動の印の動き、通知の許可、入力の準備、レビューのお願いも持つ。Pro の購入を StoreKit で確かめ、Pro が無くなったら同期を止める |
 | `AppWidget/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
-| `DesignSystem/Components/` | Amount・Banner・Button・Calendar・Chart・Dial・Gesture・Icon・Input・Menu・Navigation・Row・Sheet・Surface・Tag・Template |
+| `DesignSystem/Components/` | Amount・Banner・Button・Calendar・Chart・Dial・Gesture・Icon・Input・Layout・Menu・Navigation・Row・Sheet・Surface・Tag・Template |
 | `Features/Screens/Entry/` | 記録の入力シート。レシートは VisionKit で撮り、Vision と Foundation Models で読む |
 | `Features/Screens/Onboarding/` | 最初の設定のチュートリアル |
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |

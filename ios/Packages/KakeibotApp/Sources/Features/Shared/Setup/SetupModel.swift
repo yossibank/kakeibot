@@ -90,7 +90,7 @@ public extension SetupModel {
     func markNewsSeen() async {
         let version = WhatsNewRelease.latestVersion
 
-        guard seenNewsVersion != version else {
+        guard AppVersion.isNewer(version, than: seenNewsVersion) else {
             return
         }
 
