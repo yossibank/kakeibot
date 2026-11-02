@@ -11,7 +11,7 @@ struct WhatsNewScene: View {
         FeatureArtCanvas(width: Self.size, height: Self.size) {
             content
         }
-        .padding(6)
+        .padding(2)
         .background(Palette.faint, in: .rect(cornerRadius: corner.radius(14)))
         .overlay {
             RoundedRectangle(cornerRadius: corner.radius(14))

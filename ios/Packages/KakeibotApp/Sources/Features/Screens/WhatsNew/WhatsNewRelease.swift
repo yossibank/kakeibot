@@ -42,7 +42,7 @@ extension WhatsNewRelease {
 
     static let all = [
         WhatsNewRelease(
-            version: "1.0",
+            version: "1.0.1",
             month: "2026年11月",
             features: [
                 Feature(

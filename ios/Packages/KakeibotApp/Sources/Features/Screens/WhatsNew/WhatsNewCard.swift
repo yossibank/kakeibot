@@ -34,33 +34,47 @@ struct WhatsNewCard: View {
             }
 
             ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 6) {
-                    ForEach(indexedSteps, id: \.offset) { index, step in
-                        if index > 0 {
-                            Image(systemName: "chevron.right")
-                                .textFont(.caption2, weight: .bold)
-                                .foregroundStyle(Palette.hint)
-                                .padding(.top, Self.sceneWidth / 2 - 6)
-                                .opacity(isShown(index) ? 1 : 0)
-                        }
+                VStack(spacing: 8) {
+                    HStack(spacing: Self.gap) {
+                        ForEach(indexedSteps, id: \.offset) { index, step in
+                            if index > 0 {
+                                chevron(index)
+                            }
 
-                        VStack(spacing: 8) {
                             WhatsNewScene(kind: step.scene)
-                                .frame(width: Self.sceneWidth)
+                                .frame(
+                                    minWidth: Self.minSceneWidth,
+                                    idealWidth: Self.minSceneWidth,
+                                    maxWidth: .infinity
+                                )
+                                .modifier(StepReveal(isShown: isShown(index)))
+                        }
+                    }
+
+                    HStack(alignment: .top, spacing: Self.gap) {
+                        ForEach(indexedSteps, id: \.offset) { index, step in
+                            if index > 0 {
+                                Color.clear
+                                    .frame(width: Self.chevronWidth, height: 1)
+                            }
 
                             caption(step, number: index + 1)
-                                .frame(width: Self.sceneWidth)
+                                .frame(
+                                    minWidth: Self.minSceneWidth,
+                                    idealWidth: Self.minSceneWidth,
+                                    maxWidth: .infinity,
+                                    alignment: .leading
+                                )
+                                .modifier(StepReveal(isShown: isShown(index)))
                         }
-                        .modifier(StepReveal(isShown: isShown(index)))
                     }
                 }
-                .frame(maxWidth: .infinity)
 
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(indexedSteps, id: \.offset) { index, step in
                         HStack(spacing: 12) {
                             WhatsNewScene(kind: step.scene)
-                                .frame(width: Self.sceneWidth)
+                                .frame(width: Self.listSceneWidth)
 
                             caption(step, number: index + 1)
 
@@ -120,7 +134,10 @@ private extension WhatsNewCard {
         }
     }
 
-    static let sceneWidth: CGFloat = 86
+    static let minSceneWidth: CGFloat = 88
+    static let listSceneWidth: CGFloat = 116
+    static let chevronWidth: CGFloat = 8
+    static let gap: CGFloat = 2
     static let stepDelay: Duration = .milliseconds(320)
 }
 
@@ -135,6 +152,14 @@ private extension WhatsNewCard {
 }
 
 private extension WhatsNewCard {
+    func chevron(_ index: Int) -> some View {
+        Image(systemName: "chevron.right")
+            .textFont(.caption2, weight: .bold)
+            .foregroundStyle(Palette.hint)
+            .frame(width: Self.chevronWidth)
+            .opacity(isShown(index) ? 1 : 0)
+    }
+
     func caption(
         _ step: WhatsNewRelease.Step,
         number: Int

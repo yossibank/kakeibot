@@ -8,7 +8,7 @@ struct WidgetGuideStage: View {
     let size: WidgetGuideSize
 
     var body: some View {
-        FeatureArtCanvas(width: Self.width, height: height) {
+        FeatureArtCanvas(width: width, height: height) {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
@@ -36,9 +36,10 @@ private extension WidgetGuideStage {
         let amount: Int
     }
 
+    static let homeWidth: CGFloat = 364
     static let width: CGFloat = 338
-    static let widgetHeight: CGFloat = 158
-    static let largeHeight: CGFloat = 354
+    static let widgetHeight: CGFloat = 170
+    static let largeHeight: CGFloat = 382
     static let appSize: CGFloat = 62
     static let widgetRadius: CGFloat = 22
     static let tileRadius: CGFloat = 12
@@ -79,6 +80,10 @@ private extension WidgetGuideStage {
 }
 
 private extension WidgetGuideStage {
+    var width: CGFloat {
+        place == .home ? Self.homeWidth : Self.width
+    }
+
     var height: CGFloat {
         switch place {
         case .home: size == .large ? Self.largeHeight : Self.widgetHeight
@@ -273,8 +278,9 @@ private extension WidgetGuideStage {
     }
 
     var quickRecordLarge: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             quickRecordHeader
+                .frame(height: 20)
 
             Grid(horizontalSpacing: 8, verticalSpacing: 8) {
                 ForEach(0..<3, id: \.self) { row in
@@ -285,12 +291,12 @@ private extension WidgetGuideStage {
                     }
                 }
             }
-            .frame(height: 198)
+            .fixedSize(horizontal: false, vertical: true)
 
             Rectangle()
                 .fill(Palette.line)
                 .frame(height: 1)
-                .padding(.vertical, 4)
+                .padding(.vertical, 8)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .firstTextBaseline) {
@@ -310,12 +316,11 @@ private extension WidgetGuideStage {
                     recordRow(record)
                 }
             }
-
-            Spacer(minLength: 0)
         }
+        .frame(maxHeight: .infinity, alignment: .top)
         .padding(.horizontal, 16)
         .padding(.top, 12)
-        .padding(.bottom, 14)
+        .padding(.bottom, 16)
         .frame(height: Self.largeHeight)
         .card(cornerRadius: Self.widgetRadius)
     }
@@ -336,8 +341,9 @@ private extension WidgetGuideStage {
     }
 
     var quickRecord: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             quickRecordHeader
+                .frame(height: 20)
 
             Grid(horizontalSpacing: 8, verticalSpacing: 8) {
                 GridRow {
@@ -354,7 +360,8 @@ private extension WidgetGuideStage {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.top, 12)
+        .padding(.bottom, 16)
         .frame(height: Self.widgetHeight)
         .card(cornerRadius: Self.widgetRadius)
     }
@@ -587,7 +594,7 @@ private extension WidgetGuideStage {
             }
         }
         .padding(.horizontal, 8)
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .templateCardFace(cornerRadius: Self.tileRadius, shadowRadius: 3)
     }
