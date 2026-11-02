@@ -146,7 +146,7 @@ private extension WhatsNewCard {
     static let minSceneWidth: CGFloat = 88
     static let listSceneWidth: CGFloat = 116
     static let chevronWidth: CGFloat = 8
-    static let gap: CGFloat = 2
+    static let gap: CGFloat = 4
     static let stepDelay: Duration = .milliseconds(320)
 }
 
