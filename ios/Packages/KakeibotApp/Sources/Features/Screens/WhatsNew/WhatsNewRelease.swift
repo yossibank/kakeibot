@@ -21,9 +21,11 @@ public extension WhatsNewRelease {
 
 extension WhatsNewRelease {
     struct Feature: Identifiable, Sendable {
-        let art: FeatureArt.Kind
+        let systemImage: String
         let title: String
+        let shortTitle: String
         let text: String
+        let steps: [Step]
         let action: Action?
         let actionTitle: String
 
@@ -32,29 +34,52 @@ extension WhatsNewRelease {
         }
     }
 
+    struct Step: Hashable, Sendable {
+        let scene: WhatsNewScene.Kind
+        let caption: String
+    }
+
     static let all = [
         WhatsNewRelease(
             version: "1.0",
             month: "2026年11月",
             features: [
                 Feature(
-                    art: .receipt,
+                    systemImage: "doc.text.viewfinder",
                     title: "レシートを撮って記録",
-                    text: "入力シートの「レシート」から撮ると、品目・合計・日付・店名まで読みます",
+                    shortTitle: "レシート",
+                    text: "撮ったレシートから、品目・合計・日付・店名まで読みます。合計が合わない品目には色が付くので、直す所がすぐ分かります",
+                    steps: [
+                        Step(scene: .receiptButton, caption: "「レシート」を押す"),
+                        Step(scene: .receiptCamera, caption: "レシートを撮る"),
+                        Step(scene: .receiptItems, caption: "品目が入る")
+                    ],
                     action: .entry,
                     actionTitle: "入力シートを開く"
                 ),
                 Feature(
-                    art: .items,
+                    systemImage: "list.bullet.rectangle",
                     title: "記録の品目",
-                    text: "1 つの記録に品目を並べ、税率ごとの消費税も確かめられます。テンキーの上の「＋ 品目」から入れます",
+                    shortTitle: "品目",
+                    text: "1 つの記録に、買った物を並べられます。8% と 10% の消費税も分けて出します",
+                    steps: [
+                        Step(scene: .itemsAdd, caption: "「＋ 品目」を押す"),
+                        Step(scene: .itemsSlip, caption: "品名と金額を入れる"),
+                        Step(scene: .itemsList, caption: "税率ごとに並ぶ")
+                    ],
                     action: .entry,
                     actionTitle: "入力シートを開く"
                 ),
                 Feature(
-                    art: .carryover,
+                    systemImage: "arrow.uturn.forward.circle",
                     title: "予算の繰越",
-                    text: "予算の画面で繰り越すにすると、残った予算を次の期間の予算に足します。使いすぎた分は引きます",
+                    shortTitle: "繰越",
+                    text: "使い切らなかった予算を、次の期間の予算に足せます。使いすぎた分は次の期間から引きます",
+                    steps: [
+                        Step(scene: .carryoverSwitch, caption: "繰り越すにする"),
+                        Step(scene: .carryoverLeft, caption: "残りが出る"),
+                        Step(scene: .carryoverNext, caption: "次の予算に足す")
+                    ],
                     action: .setup(.budget),
                     actionTitle: "予算を開く"
                 )

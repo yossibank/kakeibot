@@ -67,12 +67,22 @@ struct SnapshotTests {
             try Self.write(budgetView, variant: variant, to: "settings-budgets")
             try Self.write(WidgetGuideView(), variant: variant, to: "settings-widget-guide")
             try Self.write(
+                WidgetGuideView(place: .lockScreen),
+                variant: variant,
+                to: "settings-widget-guide-lock"
+            )
+            try Self.write(
+                WidgetGuideView(place: .control),
+                variant: variant,
+                to: "settings-widget-guide-control"
+            )
+            try Self.write(
                 ProView(model: ProPurchaseModel(store: .unavailable)),
                 variant: variant,
                 to: "settings-pro"
             )
             try Self.write(
-                WhatsNewSheet(seenVersion: nil) { _ in },
+                WhatsNewSheet(seenVersion: nil, revealsSteps: false) { _ in },
                 variant: variant,
                 to: "settings-whats-new"
             )

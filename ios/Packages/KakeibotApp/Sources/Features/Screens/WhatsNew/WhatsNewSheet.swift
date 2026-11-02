@@ -6,13 +6,16 @@ public struct WhatsNewSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     private let seenVersion: String?
+    private let revealsSteps: Bool
     private let onTry: (WhatsNewRelease.Action) -> Void
 
     public init(
         seenVersion: String?,
+        revealsSteps: Bool = true,
         onTry: @escaping (WhatsNewRelease.Action) -> Void
     ) {
         self.seenVersion = seenVersion
+        self.revealsSteps = revealsSteps
         self.onTry = onTry
     }
 
@@ -20,17 +23,23 @@ public struct WhatsNewSheet: View {
         VStack(spacing: 16) {
             header
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
-                    ForEach(WhatsNewRelease.all) { release in
-                        section(release)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 28) {
+                        ForEach(WhatsNewRelease.all) { release in
+                            section(release) { id in
+                                withAnimation(.smooth) {
+                                    proxy.scrollTo(id, anchor: .top)
+                                }
+                            }
+                        }
                     }
+                    .padding(.vertical, 8)
                 }
-                .padding(.vertical, 8)
+                .scrollIndicators(.hidden)
+                .contentMargins(.horizontal, 20, for: .scrollContent)
+                .padding(.horizontal, -20)
             }
-            .scrollIndicators(.hidden)
-            .contentMargins(.horizontal, 20, for: .scrollContent)
-            .padding(.horizontal, -20)
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -40,10 +49,6 @@ public struct WhatsNewSheet: View {
                 .ignoresSafeArea()
         }
     }
-}
-
-private extension WhatsNewSheet {
-    static let artHeight: CGFloat = 132
 }
 
 private extension WhatsNewSheet {
@@ -67,16 +72,45 @@ private extension WhatsNewSheet {
         }
     }
 
-    func section(_ release: WhatsNewRelease) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+    func section(
+        _ release: WhatsNewRelease,
+        onJump: @escaping (String) -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            summary(release, onJump: onJump)
+
+            ForEach(release.features) { feature in
+                WhatsNewCard(
+                    feature: feature,
+                    revealsSteps: revealsSteps,
+                    onTry: onTry
+                )
+                .id(feature.id)
+            }
+        }
+    }
+
+    func summary(
+        _ release: WhatsNewRelease,
+        onJump: @escaping (String) -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(release.version)
-                    .displayFont(.body, weight: .medium)
+                    .displayFont(.title, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
 
-                Text(release.month)
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(release.features.count) つの新しいこと")
+                        .textFont(.subheadline, weight: .semibold)
+                        .foregroundStyle(Palette.text)
+
+                    Text(release.month)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                }
+
+                Spacer(minLength: 0)
 
                 if isNew(release) {
                     Text("NEW")
@@ -89,40 +123,47 @@ private extension WhatsNewSheet {
                 }
             }
 
-            ForEach(release.features) { feature in
-                card(feature)
-            }
-        }
-    }
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    chips(release, onJump: onJump)
+                }
 
-    func card(_ feature: WhatsNewRelease.Feature) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            FeatureArt(kind: feature.art)
-                .frame(height: Self.artHeight)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(feature.title)
-                    .textFont(.headline)
-                    .foregroundStyle(Palette.text)
-
-                Text(feature.text)
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            if let action = feature.action {
-                CardButton(
-                    feature.actionTitle,
-                    style: .outlined(Palette.accent),
-                    height: 40
-                ) {
-                    onTry(action)
+                VStack(alignment: .leading, spacing: 8) {
+                    chips(release, onJump: onJump)
                 }
             }
         }
         .padding(16)
-        .card()
+        .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 20))
+        .overlay {
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Palette.outline, lineWidth: 1)
+        }
+    }
+
+    func chips(
+        _ release: WhatsNewRelease,
+        onJump: @escaping (String) -> Void
+    ) -> some View {
+        ForEach(release.features) { feature in
+            Button {
+                onJump(feature.id)
+            } label: {
+                Label(feature.shortTitle, systemImage: feature.systemImage)
+                    .textFont(.caption, weight: .semibold)
+                    .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .fixedSize()
+                    .padding(.horizontal, 10)
+                    .frame(height: 32)
+                    .background(Palette.card, in: .capsule)
+                    .overlay {
+                        Capsule()
+                            .stroke(Palette.outline, lineWidth: 0.8)
+                    }
+            }
+            .buttonStyle(.plain)
+        }
     }
 }
 

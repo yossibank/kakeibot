@@ -2,7 +2,15 @@ import DesignSystem
 import SwiftUI
 
 public struct WidgetGuideView: View {
-    public init() {}
+    @State private var place: WidgetGuidePlace
+
+    public init() {
+        self.init(place: .home)
+    }
+
+    init(place: WidgetGuidePlace) {
+        _place = State(initialValue: place)
+    }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
@@ -12,23 +20,18 @@ public struct WidgetGuideView: View {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     WidgetGuideIntroCard()
 
-                    homeSection
+                    VStack(spacing: 16) {
+                        CapsulePicker(selection: $place, options: Self.options)
 
-                    place(
-                        "ロック画面",
-                        sample: .lockScreen,
-                        title: "あといくら",
-                        detail: "今月あといくら使えるかを、丸・横長・1 行の形で出します",
-                        howTo: "ロック画面を長押しして「カスタマイズ」から置けます"
-                    )
+                        WidgetGuideStage(place: place)
+                            .id(place)
+                            .transition(.opacity)
+                    }
+                    .animation(.snappy, value: place)
 
-                    place(
-                        "コントロールセンター",
-                        sample: .control,
-                        title: "記録する",
-                        detail: "押すと、今日の入力シートを開きます",
-                        howTo: "コントロールセンターを開き、左上の ＋ から置けます"
-                    )
+                    abilities
+
+                    steps
                 }
                 .padding(.vertical, 8)
             }
@@ -47,51 +50,37 @@ public struct WidgetGuideView: View {
 }
 
 private extension WidgetGuideView {
-    static let sideTextWidth: CGFloat = 150
-
-    static let steps = [
-        "ホーム画面の空いた所を長押しします",
-        "左上の「編集」から「ウィジェットを追加」を選びます",
-        "「かけいぼっと」を選び、置きたいものを選びます"
-    ]
+    static let options = WidgetGuidePlace.allCases.map { place in
+        CapsulePicker<WidgetGuidePlace>.Option(place.title, value: place)
+    }
 }
 
 private extension WidgetGuideView {
-    var homeSection: some View {
+    var abilities: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SettingsSectionTitle("ホーム画面")
+            SettingsSectionTitle("できること")
 
-            VStack(alignment: .leading, spacing: 16) {
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .center, spacing: 14) {
-                        WidgetGuideSample(kind: .budget)
+            VStack(alignment: .leading, spacing: 14) {
+                ForEach(place.abilities, id: \.self) { ability in
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: ability.systemImage)
+                            .sansFont(.small, weight: .medium)
+                            .foregroundStyle(Palette.accent)
+                            .frame(width: 34, height: 34)
+                            .background(Palette.accent.opacity(.subtle), in: Circle())
 
-                        budgetExplanation
-                            .frame(minWidth: Self.sideTextWidth)
-                    }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(ability.title)
+                                .textFont(.subheadline, weight: .semibold)
+                                .foregroundStyle(Palette.text)
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        WidgetGuideSample(kind: .budget)
+                            Text(ability.detail)
+                                .textFont(.caption)
+                                .foregroundStyle(Palette.subtext)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
 
-                        budgetExplanation
-                    }
-                }
-
-                VStack(alignment: .leading, spacing: 10) {
-                    WidgetGuideSample(kind: .quickRecord)
-
-                    explanation(
-                        title: "すぐ記録",
-                        size: "中・大",
-                        detail: "テンプレートを押すと、アプリを開かずにその場で記録します。鉛筆の印のものは、入力シートで金額を入れます"
-                    )
-                }
-
-                Hairline()
-
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(Self.steps.indices, id: \.self) { index in
-                        stepRow(number: index + 1, text: Self.steps[index])
+                        Spacer(minLength: 0)
                     }
                 }
             }
@@ -100,84 +89,45 @@ private extension WidgetGuideView {
         }
     }
 
-    var budgetExplanation: some View {
-        explanation(
-            title: "あといくら",
-            size: "小・中",
-            detail: "今月あといくら使えるかと、今日の支出を出します。中では今週の支出と次の固定費も並べます"
-        )
-    }
-
-    func place(
-        _ name: String,
-        sample: WidgetGuideSample.Kind,
-        title: String,
-        detail: String,
-        howTo: String
-    ) -> some View {
+    var steps: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SettingsSectionTitle(name)
+            SettingsSectionTitle("置き方")
 
-            VStack(alignment: .leading, spacing: 12) {
-                WidgetGuideSample(kind: sample)
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(place.steps.enumerated()), id: \.offset) { index, text in
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(spacing: 0) {
+                            Text("\(index + 1)")
+                                .textFont(.caption, weight: .bold)
+                                .monospacedDigit()
+                                .foregroundStyle(Palette.backgroundTop)
+                                .frame(width: 24, height: 24)
+                                .background(Palette.accent, in: Circle())
 
-                explanation(title: title, size: nil, detail: detail)
+                            if index < place.steps.count - 1 {
+                                Rectangle()
+                                    .fill(Palette.outline)
+                                    .frame(width: 1.5)
+                                    .frame(minHeight: 14, maxHeight: .infinity)
+                            }
+                        }
 
-                Label(howTo, systemImage: "hand.tap")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.accent)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(16)
-            .card()
-        }
-    }
+                        Text(text)
+                            .textFont(.subheadline)
+                            .foregroundStyle(Palette.text)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.top, 2)
+                            .padding(.bottom, 14)
 
-    func explanation(
-        title: String,
-        size: String?,
-        detail: String
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(title)
-                    .textFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(Palette.text)
-
-                if let size {
-                    Text(size)
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
+                        Spacer(minLength: 0)
+                    }
                 }
             }
-
-            Text(detail)
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 2)
+            .card()
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    func stepRow(
-        number: Int,
-        text: String
-    ) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text("\(number)")
-                .textFont(.subheadline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
-
-            Text(text)
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Spacer(minLength: 0)
-        }
-        .padding(.vertical, 8)
     }
 }
 
