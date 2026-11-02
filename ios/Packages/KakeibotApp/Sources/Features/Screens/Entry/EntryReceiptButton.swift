@@ -23,6 +23,7 @@ struct EntryReceiptButton: View {
             }
             .textFont(.caption, weight: .semibold)
             .lineLimit(1)
+            .minimumScaleFactor(0.8)
             .padding(.horizontal, 12)
             .padding(.bottom, Self.tooth / 2)
             .frame(height: Self.height)

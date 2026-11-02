@@ -16,7 +16,8 @@ enum EntryReceiptReader {
         guard
             !lines.isEmpty,
             #available(iOS 26.0, *),
-            let guessed = await EntryReceiptModel.read(lines) else {
+            let guessed = await EntryReceiptModel.read(lines)
+        else {
             return reading
         }
 

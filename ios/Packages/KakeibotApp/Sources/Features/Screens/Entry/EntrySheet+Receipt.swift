@@ -81,7 +81,6 @@ private extension EntrySheet {
             return
         }
 
-        // fullScreenCover を閉じ終える前に sheet を出すと表示されないため
         try? await Task.sleep(for: Self.coverDismissDelay)
 
         open(.items)
