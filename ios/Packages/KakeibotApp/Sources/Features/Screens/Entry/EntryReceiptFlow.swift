@@ -9,9 +9,14 @@ final class EntryReceiptFlow {
     private(set) var offer: String?
 
     private let read: ([CGImage]) async -> ReceiptReading
+    private let prepare: @MainActor () -> Void
 
-    init(read: @escaping ([CGImage]) async -> ReceiptReading = EntryReceiptReader.read) {
+    init(
+        read: @escaping ([CGImage]) async -> ReceiptReading = EntryReceiptReader.read,
+        prepare: @escaping @MainActor () -> Void = EntryReceiptReader.prepare
+    ) {
         self.read = read
+        self.prepare = prepare
     }
 }
 
@@ -45,10 +50,12 @@ extension EntryReceiptFlow {
         }
 
         offer = nil
+        prepare()
         step = model.showsReceiptGuide ? .guide : .camera
     }
 
     func confirmGuide() {
+        prepare()
         step = .camera
     }
 

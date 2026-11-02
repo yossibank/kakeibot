@@ -158,7 +158,7 @@ KakeibotKit/
 | `Core/Icon/` | アイコンとスタンプ |
 | `Core/Identifier/` | 型付きの ID |
 | `Core/Notification/` | 予約されているべき通知の計算と行き先 |
-| `Core/Receipt/` | 文字の断片をレシートの行にまとめ、行から品目・合計・日付・店名を組み立てる決まり。人が直した品名 |
+| `Core/Receipt/` | 文字の断片をレシートの行にまとめ、行かモデルが答えた行の役割から品目・合計・日付・店名を組み立てる決まり。人が直した品名 |
 | `Core/Recurring/` | 固定費と記録漏れの後追い |
 | `Core/Review/` | 振り返りの範囲と集計 |
 | `Core/Reward/` | ごほうびと貯金箱 |

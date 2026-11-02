@@ -1,0 +1,201 @@
+{
+  "description": "端末の中のモデルが答えた行の役割から、店名・日付・合計・品目を組み立てる。lines は上から順の行で、行の番号は 0 から数える。labels の storeLine・dateLine・totalLine は店名・日付・合計の行の番号で、無ければ null。labels.items は品目ごとに、金額の書かれた行 line、数量の行 quantityLine（無ければ null）、値引の行 discountLines、税率 taxRate（8・10・null）を持つ。金額・数量・値引・日付は、指された行の文字から決まりで読み、モデルの答えの数字は使わない。範囲の外の行、ほかの役割で使い終えた行、金額の無い行、金額が 0 以下の行は品目にしない。金額の行に品名が無ければ、すぐ上の役割の無い行を品名にする。値引は品目の金額から引く。数量の行の単価が品目の金額と同じなら、金額を単価×数量にする。store・date・total は読めなければ null。items は行の番号の順に、name・quantity・amount・taxRate を並べる。",
+  "cases": [
+    {
+      "summary": "数量と値引を前の品目にまとめる",
+      "lines": [
+        "スーパー青葉 横浜店",
+        "TEL 045-123-4567",
+        "2026年10月03日(土) 18:42",
+        "牛乳 ¥198",
+        "  2コ×単198",
+        "食パン ¥220",
+        "たまご ¥258",
+        "値引 -30",
+        "小計 ¥844",
+        "外税 ¥67",
+        "合計 ¥911"
+      ],
+      "labels": {
+        "storeLine": 0,
+        "dateLine": 2,
+        "totalLine": 10,
+        "items": [
+          {
+            "line": 3,
+            "quantityLine": 4,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 5,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 6,
+            "quantityLine": null,
+            "discountLines": [
+              7
+            ],
+            "taxRate": null
+          }
+        ]
+      },
+      "store": "スーパー青葉 横浜店",
+      "date": "2026-10-03",
+      "total": 911,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 2,
+          "amount": 396,
+          "taxRate": null
+        },
+        {
+          "name": "食パン",
+          "quantity": 1,
+          "amount": 220,
+          "taxRate": null
+        },
+        {
+          "name": "たまご",
+          "quantity": 1,
+          "amount": 228,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "金額だけの行は上の行を品名にする",
+      "lines": [
+        "ローソン",
+        "からあげクン レッド",
+        "¥238",
+        "合計 ¥238"
+      ],
+      "labels": {
+        "storeLine": 0,
+        "dateLine": null,
+        "totalLine": 3,
+        "items": [
+          {
+            "line": 2,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          }
+        ]
+      },
+      "store": "ローソン",
+      "date": null,
+      "total": 238,
+      "items": [
+        {
+          "name": "からあげクン レッド",
+          "quantity": 1,
+          "amount": 238,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "行に無い品目と重なった品目は作らない",
+      "lines": [
+        "青葉",
+        "牛乳 ¥396",
+        "合計 ¥396"
+      ],
+      "labels": {
+        "storeLine": 0,
+        "dateLine": null,
+        "totalLine": 2,
+        "items": [
+          {
+            "line": 1,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 1,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 9,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          },
+          {
+            "line": 0,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": null
+          }
+        ]
+      },
+      "store": "青葉",
+      "date": null,
+      "total": 396,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 396,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "税率の印をそのまま品目に付ける",
+      "lines": [
+        "牛乳 ¥198軽",
+        "洗剤 ¥398",
+        "小計 ¥596",
+        "外税8% ¥15",
+        "外税10% ¥39",
+        "合計 ¥650"
+      ],
+      "labels": {
+        "storeLine": null,
+        "dateLine": null,
+        "totalLine": 5,
+        "items": [
+          {
+            "line": 0,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": 8
+          },
+          {
+            "line": 1,
+            "quantityLine": null,
+            "discountLines": [],
+            "taxRate": 10
+          }
+        ]
+      },
+      "store": null,
+      "date": null,
+      "total": 650,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 198,
+          "taxRate": 8
+        },
+        {
+          "name": "洗剤",
+          "quantity": 1,
+          "amount": 398,
+          "taxRate": 10
+        }
+      ]
+    }
+  ]
+}

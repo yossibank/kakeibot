@@ -49,46 +49,43 @@ struct ReceiptReadingTests {
         #expect(again.items.map(\.readName) == ["ギユウニユウ", "食パン"])
     }
 
-    @Test
-    func mergesGuessOverRules() throws {
-        let ruleDate = try #require(LocalDate("2026-10-03"))
-        let guessDate = try #require(LocalDate("2026-10-04"))
-        let ruleItems = [EntryItem.Draft(name: "牛乳", amount: 396)]
-        let guessItems = [EntryItem.Draft(name: "牛乳 1L", quantity: 2, amount: 396)]
+    @Test(arguments: try mergingCases)
+    func choosesItemsCloserToTotal(fixture: MergingCase) {
+        let merged = fixture.rules.reading.merging(fixture.guessed.reading)
 
-        let rules = ReceiptReading(
-            store: "青葉",
-            date: ruleDate,
-            total: 900,
-            items: ruleItems
-        )
-
-        let guess = ReceiptReading(
-            store: "スーパー青葉",
-            date: guessDate,
-            total: 911,
-            items: guessItems
-        )
-
-        let merged = rules.merging(guess)
-
-        #expect(merged.store == "青葉")
-        #expect(merged.date == ruleDate)
-        #expect(merged.total == 911)
-        #expect(merged.items == guessItems)
+        #expect(merged.total == fixture.total)
+        #expect(merged.items == fixture.items.map(\.draft))
     }
 
     @Test
-    func keepsRulesWhereGuessIsEmpty() throws {
+    func prefersStoreAndDateReadByRules() throws {
+        let ruleDate = try #require(LocalDate("2026-10-03"))
         let guessDate = try #require(LocalDate("2026-10-04"))
-        let ruleItems = [EntryItem.Draft(name: "牛乳", amount: 396)]
-        let merged = ReceiptReading(total: 900, items: ruleItems)
-            .merging(ReceiptReading(store: "青葉", date: guessDate))
+
+        let merged = ReceiptReading(store: "青葉", date: ruleDate)
+            .merging(ReceiptReading(store: "スーパー青葉", date: guessDate))
+
+        let filled = ReceiptReading()
+            .merging(ReceiptReading(store: "スーパー青葉", date: guessDate))
 
         #expect(merged.store == "青葉")
-        #expect(merged.date == guessDate)
-        #expect(merged.total == 900)
-        #expect(merged.items == ruleItems)
+        #expect(merged.date == ruleDate)
+        #expect(filled.store == "スーパー青葉")
+        #expect(filled.date == guessDate)
+    }
+
+    @Test
+    func addsExclusiveTaxToItemTotal() {
+        let reading = ReceiptReading(
+            total: 650,
+            items: [
+                EntryItem.Draft(name: "牛乳", amount: 198, taxRate: .reduced),
+                EntryItem.Draft(name: "洗剤", amount: 398, taxRate: .standard)
+            ]
+        )
+
+        #expect(reading.itemTotal == 650)
+        #expect(reading.difference == 0)
     }
 
     @Test
@@ -124,10 +121,39 @@ extension ReceiptReadingTests {
     }
 }
 
+extension ReceiptReadingTests {
+    struct MergingCase: Decodable, Sendable, CustomTestStringConvertible {
+        let summary: String
+        let rules: ReadingValue
+        let guessed: ReadingValue
+        let total: Int?
+        let items: [ReceiptItemValue]
+
+        var testDescription: String {
+            summary
+        }
+    }
+
+    struct ReadingValue: Decodable, Sendable {
+        let total: Int?
+        let items: [ReceiptItemValue]
+
+        var reading: ReceiptReading {
+            ReceiptReading(total: total, items: items.map(\.draft))
+        }
+    }
+}
+
 private extension ReceiptReadingTests {
     static var readingCases: [ReadingCase] {
         get throws {
             try Fixture.cases("receipt/receipt-reading.json")
+        }
+    }
+
+    static var mergingCases: [MergingCase] {
+        get throws {
+            try Fixture.cases("receipt/receipt-merging.json")
         }
     }
 }

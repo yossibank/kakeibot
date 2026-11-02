@@ -21,7 +21,7 @@ public struct ReceiptReading: Hashable, Sendable {
 
 public extension ReceiptReading {
     var itemTotal: Int {
-        items.reduce(0) { $0 + $1.amount }
+        EntryItemTotal(items).total
     }
 
     var difference: Int? {
@@ -100,17 +100,49 @@ public extension ReceiptReading {
         return reading
     }
 
+    func settlingTax() -> ReceiptReading {
+        guard
+            items.contains(where: { $0.taxRate != nil }),
+            itemTotal != total
+        else {
+            return self
+        }
+
+        var reading = self
+
+        for index in reading.items.indices {
+            reading.items[index].taxRate = nil
+        }
+
+        return reading
+    }
+
     func merging(_ guessed: ReceiptReading) -> ReceiptReading {
-        ReceiptReading(
+        let guessed = guessed.settlingTax()
+        let prefersRules = guessed.items.isEmpty || gap(to: guessed.total) < guessed.gap(to: total)
+        let chosen = prefersRules ? self : guessed
+        let other = prefersRules ? guessed : self
+
+        return ReceiptReading(
             store: store ?? guessed.store,
             date: date ?? guessed.date,
-            total: guessed.total ?? total,
-            items: guessed.items.isEmpty ? items : guessed.items
+            total: chosen.total ?? other.total,
+            items: chosen.items
         )
     }
 }
 
-private extension EntryItem.Draft {
+private extension ReceiptReading {
+    func gap(to fallback: Int?) -> Int {
+        guard let total = total ?? fallback else {
+            return .max
+        }
+
+        return abs(total - itemTotal)
+    }
+}
+
+extension EntryItem.Draft {
     mutating func apply(_ quantity: ReceiptLine.Quantity) {
         if amount == quantity.unit {
             amount = quantity.unit * quantity.count

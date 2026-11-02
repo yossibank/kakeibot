@@ -5,23 +5,31 @@ import Vision
 
 enum EntryReceiptReader {
     static func read(_ pages: [CGImage]) async -> ReceiptReading {
-        var lines: [String] = []
+        var pageLines: [[String]] = []
 
         for page in pages {
-            lines += await textLines(in: page)
+            await pageLines.append(textLines(in: page))
         }
 
+        let lines = pageLines.flatMap(\.self)
         let reading = ReceiptReading(lines: lines)
 
         guard
             !lines.isEmpty,
             #available(iOS 26.0, *),
-            let guessed = await EntryReceiptModel.read(lines)
+            let guessed = await EntryReceiptModel.read(pages: pageLines, rules: reading)
         else {
             return reading
         }
 
         return reading.merging(guessed)
+    }
+
+    @MainActor
+    static func prepare() {
+        if #available(iOS 26.0, *) {
+            EntryReceiptModel.prepare()
+        }
     }
 }
 

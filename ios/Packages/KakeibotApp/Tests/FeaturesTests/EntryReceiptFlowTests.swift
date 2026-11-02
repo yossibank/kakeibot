@@ -25,6 +25,26 @@ struct EntryReceiptFlowTests {
     }
 
     @Test
+    func preparesModelWhenCameraOpens() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        var prepared = 0
+        let flow = EntryReceiptFlow { _ in
+            ReceiptReading()
+        } prepare: {
+            prepared += 1
+        }
+
+        flow.start(for: model, isPro: false)
+        let beforeCamera = prepared
+        flow.confirmGuide()
+
+        #expect(beforeCamera == 1)
+        #expect(prepared == 2)
+    }
+
+    @Test
     func opensCameraAfterFirstReceipt() async throws {
         let setup = try await EntryModelTests.Setup()
         try await setup.database.setSetting(.receiptSavedCount, to: 1)

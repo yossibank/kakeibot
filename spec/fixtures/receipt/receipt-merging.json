@@ -1,0 +1,262 @@
+{
+  "description": "決まりで読んだ結果 rules と、モデルの答えから組み立てた結果 guessed のうち、品目を使う方を選ぶ。guessed は先に税を決める：税率の付いた品目があり、品目の合計（小計と率ごとの消費税の和）が guessed の total と違えば、すべての品目の税率を null にする。次に、それぞれの total（無ければもう片方の total）と品目の合計の差の大きさを比べる。guessed の品目が空か、rules の差の方が小さければ rules、それ以外は guessed を選ぶ。total が両方に無ければ guessed を選ぶ。total は選んだ方の total、無ければもう片方の total。items は選んだ方の品目。taxRate は 8・10・null。",
+  "cases": [
+    {
+      "summary": "外税の税率で合計が合えば税率を残す",
+      "rules": {
+        "total": 650,
+        "items": [
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": null
+          },
+          {
+            "name": "洗剤",
+            "quantity": 1,
+            "amount": 398,
+            "taxRate": null
+          }
+        ]
+      },
+      "guessed": {
+        "total": 650,
+        "items": [
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": 8
+          },
+          {
+            "name": "洗剤",
+            "quantity": 1,
+            "amount": 398,
+            "taxRate": 10
+          }
+        ]
+      },
+      "total": 650,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 198,
+          "taxRate": 8
+        },
+        {
+          "name": "洗剤",
+          "quantity": 1,
+          "amount": 398,
+          "taxRate": 10
+        }
+      ]
+    },
+    {
+      "summary": "内税のレシートの印は税込に戻す",
+      "rules": {
+        "total": 596,
+        "items": [
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": null
+          }
+        ]
+      },
+      "guessed": {
+        "total": 596,
+        "items": [
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": 8
+          },
+          {
+            "name": "洗剤",
+            "quantity": 1,
+            "amount": 398,
+            "taxRate": 10
+          }
+        ]
+      },
+      "total": 596,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 198,
+          "taxRate": null
+        },
+        {
+          "name": "洗剤",
+          "quantity": 1,
+          "amount": 398,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "決まりの方が合計に近ければ決まりを使う",
+      "rules": {
+        "total": 616,
+        "items": [
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          },
+          {
+            "name": "食パン",
+            "quantity": 1,
+            "amount": 220,
+            "taxRate": null
+          }
+        ]
+      },
+      "guessed": {
+        "total": 616,
+        "items": [
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          }
+        ]
+      },
+      "total": 616,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 396,
+          "taxRate": null
+        },
+        {
+          "name": "食パン",
+          "quantity": 1,
+          "amount": 220,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "差が同じならモデルを使う",
+      "rules": {
+        "total": 616,
+        "items": [
+          {
+            "name": "ギユウニユウ",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          },
+          {
+            "name": "ハン",
+            "quantity": 1,
+            "amount": 220,
+            "taxRate": null
+          }
+        ]
+      },
+      "guessed": {
+        "total": 616,
+        "items": [
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          },
+          {
+            "name": "パン",
+            "quantity": 1,
+            "amount": 220,
+            "taxRate": null
+          }
+        ]
+      },
+      "total": 616,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 396,
+          "taxRate": null
+        },
+        {
+          "name": "パン",
+          "quantity": 1,
+          "amount": 220,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "モデルに品目が無ければ決まりの品目とモデルの合計を使う",
+      "rules": {
+        "total": null,
+        "items": [
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          }
+        ]
+      },
+      "guessed": {
+        "total": 911,
+        "items": []
+      },
+      "total": 911,
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 396,
+          "taxRate": null
+        }
+      ]
+    },
+    {
+      "summary": "合計がどちらにも無ければモデルを使う",
+      "rules": {
+        "total": null,
+        "items": [
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          }
+        ]
+      },
+      "guessed": {
+        "total": null,
+        "items": [
+          {
+            "name": "牛乳 1L",
+            "quantity": 2,
+            "amount": 396,
+            "taxRate": null
+          }
+        ]
+      },
+      "total": null,
+      "items": [
+        {
+          "name": "牛乳 1L",
+          "quantity": 2,
+          "amount": 396,
+          "taxRate": null
+        }
+      ]
+    }
+  ]
+}

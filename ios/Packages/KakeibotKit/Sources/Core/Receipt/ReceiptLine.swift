@@ -1,15 +1,23 @@
 import Foundation
 
 struct ReceiptLine {
+    let text: String
     let kind: Kind
     let date: LocalDate?
+    let amount: Amount?
+    let quantity: Quantity?
 
     init(_ text: String) {
         let normalized = Self.normalized(text)
         let date = Self.date(in: normalized)
 
+        self.text = normalized
         self.kind = date == nil ? Self.kind(of: normalized) : .skip
         self.date = date
+        self.amount = Self.amount(in: normalized).map { name, value in
+            Amount(name: name, value: value)
+        }
+        self.quantity = Self.quantity(in: normalized)
     }
 }
 
@@ -27,6 +35,11 @@ extension ReceiptLine {
         let count: Int
         let unit: Int
         let isUnitFirst: Bool
+    }
+
+    struct Amount: Equatable {
+        let name: String
+        let value: Int
     }
 }
 
