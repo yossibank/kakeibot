@@ -19,7 +19,7 @@ enum EntryReceiptReader {
             #available(iOS 26.0, *),
             let guessed = await EntryReceiptModel.read(pages: pageLines, rules: reading)
         else {
-            return reading
+            return reading.settlingTax()
         }
 
         return reading.merging(guessed)

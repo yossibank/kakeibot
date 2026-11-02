@@ -41,6 +41,7 @@ public extension EntryModel {
             forgetReadNames()
         } else {
             items = renamed.items
+            taxIncluded = renamed.taxIncluded
         }
 
         if let total = renamed.total,

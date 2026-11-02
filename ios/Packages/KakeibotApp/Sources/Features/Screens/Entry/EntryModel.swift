@@ -46,6 +46,7 @@ public final class EntryModel {
     public internal(set) var calculator = AmountCalculator()
     public internal(set) var feeCalculator = AmountCalculator()
     public internal(set) var items: [EntryItem.Draft] = []
+    public internal(set) var taxIncluded = false
     public internal(set) var keypadTarget: KeypadTarget = .amount
     public internal(set) var options: EntryOptions?
     public internal(set) var balances: [Wallet.ID: Int] = [:]
@@ -231,6 +232,7 @@ public extension EntryModel {
         keypadTarget = .amount
         memo = ""
         items = []
+        taxIncluded = false
         isReceiptRead = false
         receiptStore = nil
         tagId = nil
@@ -296,6 +298,7 @@ private extension EntryModel {
         let memo: String
         let billMonth: YearMonth?
         let items: [EntryItem.Draft]
+        let taxIncluded: Bool
     }
 
     static let recentMemoLimit = 6
@@ -313,7 +316,8 @@ private extension EntryModel {
             toWalletId: toWalletId,
             memo: memo,
             billMonth: billMonth,
-            items: items
+            items: items,
+            taxIncluded: taxIncluded
         )
     }
 
@@ -340,7 +344,8 @@ private extension EntryModel {
             memo: memo,
             billMonth: billMonth,
             fee: fee,
-            items: showsItems ? items : []
+            items: showsItems ? items : [],
+            taxIncluded: taxIncluded
         )
     }
 
@@ -392,6 +397,7 @@ private extension EntryModel {
         billMonth = entry.billMonth
         feeCalculator = AmountCalculator(amount: originalFee?.amount ?? 0)
         items = try await database.entryItems(of: entry.id).map(EntryItem.Draft.init)
+        taxIncluded = entry.taxIncluded
     }
 
     func label(for entry: Entry) -> String {

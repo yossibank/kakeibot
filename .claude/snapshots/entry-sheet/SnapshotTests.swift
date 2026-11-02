@@ -76,6 +76,20 @@ struct SnapshotTests {
 
         try Self.write(itemInput, to: "entry-item-input.png")
 
+        let includedModel = try await Self.model(
+            .expense,
+            digits: [],
+            startsWithAmount: false
+        )
+
+        await includedModel.apply(Self.includedReading)
+
+        let included = EntryItemSheet(model: includedModel)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .environment(\.colorScheme, .light)
+
+        try Self.write(included, to: "entry-item-included.png")
+
         let emptySheet = EntryItemSheet(model: closedModel)
             .frame(width: Self.phone.width, height: Self.phone.height)
             .environment(\.colorScheme, .dark)
@@ -191,6 +205,17 @@ private extension SnapshotTests {
         ("entry-transfer", .transfer, smallDigits),
         ("entry-expense-large", .expense, largeDigits)
     ]
+
+    static let includedReading = ReceiptReading(
+        store: "天然酵母の食パン専門店 つばめ&Milk名駅店",
+        total: 3170,
+        items: [
+            EntryItem.Draft(name: "T/O オムレツサンド", amount: 780, taxRate: .reduced),
+            EntryItem.Draft(name: "絹香食パン", amount: 890, taxRate: .reduced),
+            EntryItem.Draft(name: "スイートポテト", amount: 1500, taxRate: .reduced)
+        ],
+        taxIncluded: true
+    )
 
     static let suspectReading = ReceiptReading(
         store: "スーパー青葉 横浜店",

@@ -172,6 +172,10 @@ private extension EntryItemSheet {
 
             summaryLine("小計", amount: model.itemTotals.subtotal)
 
+            if !model.itemTotals.taxes.isEmpty {
+                taxModeLine
+            }
+
             ForEach(model.itemTotals.taxes, id: \.rate) { tax in
                 taxLine(tax)
             }
@@ -258,6 +262,26 @@ private extension EntryItemSheet {
         }
     }
 
+    var taxModeLine: some View {
+        HStack(spacing: 6) {
+            Text("税の計算")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+
+            Spacer()
+
+            CapsulePicker(
+                selection: Binding(
+                    get: { model.taxIncluded },
+                    set: { model.setTaxIncluded($0) }
+                ),
+                options: Self.taxModeOptions,
+                size: .small
+            )
+            .frame(width: Self.taxModeWidth)
+        }
+    }
+
     var suspectHint: some View {
         HStack(spacing: 6) {
             Image(systemName: "exclamationmark.magnifyingglass")
@@ -288,12 +312,12 @@ private extension EntryItemSheet {
             remove(index)
         } content: {
             HStack(spacing: 8) {
-                IconImage(categoryIcon, size: 16)
+                IconImage(categoryIcon, size: 13)
                     .foregroundStyle(Palette.accent)
                     .frame(width: Self.iconWidth)
 
                 Text(item.trimmedName)
-                    .textFont(.body)
+                    .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -308,7 +332,7 @@ private extension EntryItemSheet {
                 Spacer(minLength: 8)
 
                 Text(AmountText.text(item.amount))
-                    .textFont(.body)
+                    .textFont(.subheadline)
                     .monospacedDigit()
                     .foregroundStyle(isSuspect ? Palette.amber : Palette.text)
 
@@ -320,7 +344,7 @@ private extension EntryItemSheet {
                         .frame(width: Self.rateWidth, alignment: .trailing)
                 }
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, 7)
             .padding(.horizontal, 4)
             .background {
                 ZStack {
@@ -376,7 +400,7 @@ private extension EntryItemSheet {
 
             Spacer()
 
-            Text("消費税")
+            Text(model.taxIncluded ? "うち消費税" : "消費税")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
 
@@ -390,11 +414,17 @@ private extension EntryItemSheet {
 
 private extension EntryItemSheet {
     static let noticeBottom: CGFloat = 76
-    static let iconWidth: CGFloat = 20
+    static let iconWidth: CGFloat = 18
     static let rateWidth: CGFloat = 28
+    static let taxModeWidth: CGFloat = 136
+
+    static let taxModeOptions: [CapsulePicker<Bool>.Option] = [
+        .init("外税", value: false),
+        .init("内税", value: true)
+    ]
 
     var showsRates: Bool {
-        model.items.contains { $0.taxRate != nil }
+        Set(model.items.map(\.taxRate)).count > 1
     }
 
     var receiptShape: EntryReceiptShape {

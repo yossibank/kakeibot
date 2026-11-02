@@ -34,6 +34,33 @@ extension EntryModelTests {
     }
 
     @Test
+    func appliesIncludedTaxFromReceipt() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+
+        await model.apply(
+            ReceiptReading(
+                total: 3170,
+                items: [
+                    EntryItem.Draft(name: "絹香食パン", amount: 890, taxRate: .reduced),
+                    EntryItem.Draft(name: "スイートポテト", amount: 2280, taxRate: .reduced)
+                ],
+                taxIncluded: true
+            )
+        )
+
+        #expect(model.taxIncluded)
+        #expect(model.itemTotal == 3170)
+        #expect(!model.hasItemAdjustment)
+
+        model.setTaxIncluded(false)
+
+        #expect(model.itemTotal == 3423)
+        #expect(model.amount == 3423)
+    }
+
+    @Test
     func keepsUnreadValuesFromReceipt() async throws {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date)

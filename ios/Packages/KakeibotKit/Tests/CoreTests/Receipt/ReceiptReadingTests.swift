@@ -55,22 +55,23 @@ struct ReceiptReadingTests {
 
         #expect(merged.total == fixture.total)
         #expect(merged.items == fixture.items.map(\.draft))
+        #expect(merged.taxIncluded == fixture.taxIncluded)
     }
 
     @Test
-    func prefersStoreAndDateReadByRules() throws {
+    func prefersStoreFromModelAndDateFromRules() throws {
         let ruleDate = try #require(LocalDate("2026-10-03"))
         let guessDate = try #require(LocalDate("2026-10-04"))
 
         let merged = ReceiptReading(store: "青葉", date: ruleDate)
             .merging(ReceiptReading(store: "スーパー青葉", date: guessDate))
 
-        let filled = ReceiptReading()
-            .merging(ReceiptReading(store: "スーパー青葉", date: guessDate))
+        let filled = ReceiptReading(store: "青葉")
+            .merging(ReceiptReading(date: guessDate))
 
-        #expect(merged.store == "青葉")
+        #expect(merged.store == "スーパー青葉")
         #expect(merged.date == ruleDate)
-        #expect(filled.store == "スーパー青葉")
+        #expect(filled.store == "青葉")
         #expect(filled.date == guessDate)
     }
 
@@ -103,31 +104,20 @@ extension ReceiptReadingTests {
         let store: String?
         let date: LocalDate?
         let total: Int?
-        let items: [ItemCase]
+        let items: [ReceiptItemValue]
 
         var testDescription: String {
             summary
         }
     }
 
-    struct ItemCase: Decodable, Sendable {
-        let name: String
-        let quantity: Int
-        let amount: Int
-
-        var draft: EntryItem.Draft {
-            EntryItem.Draft(name: name, quantity: quantity, amount: amount)
-        }
-    }
-}
-
-extension ReceiptReadingTests {
     struct MergingCase: Decodable, Sendable, CustomTestStringConvertible {
         let summary: String
         let rules: ReadingValue
         let guessed: ReadingValue
         let total: Int?
         let items: [ReceiptItemValue]
+        let taxIncluded: Bool
 
         var testDescription: String {
             summary

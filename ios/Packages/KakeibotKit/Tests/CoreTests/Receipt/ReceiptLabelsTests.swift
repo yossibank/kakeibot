@@ -24,7 +24,8 @@ struct ReceiptLabelsTests {
         let second = ReceiptLabels(
             storeLine: 0,
             totalLine: 2,
-            items: [ReceiptLabels.Item(line: 0, quantityLine: 1, discountLines: [2])]
+            items: [ReceiptLabels.Item(line: 0, quantityLine: 1, discountLines: [2])],
+            discountLines: [2]
         )
 
         let joined = first.appending(second.shifted(by: 3))
@@ -34,6 +35,7 @@ struct ReceiptLabelsTests {
         #expect(joined.items.map(\.line) == [1, 3])
         #expect(joined.items.last?.quantityLine == 4)
         #expect(joined.items.last?.discountLines == [5])
+        #expect(joined.discountLines == [5])
     }
 }
 
@@ -57,19 +59,22 @@ extension ReceiptLabelsTests {
         let dateLine: Int?
         let totalLine: Int?
         let items: [ItemLabelValue]
+        let discountLines: [Int]
 
         var labels: ReceiptLabels {
             ReceiptLabels(
                 storeLine: storeLine,
                 dateLine: dateLine,
                 totalLine: totalLine,
-                items: items.map(\.item)
+                items: items.map(\.item),
+                discountLines: discountLines
             )
         }
     }
 
     struct ItemLabelValue: Decodable, Sendable {
         let line: Int
+        let nameLine: Int?
         let quantityLine: Int?
         let discountLines: [Int]
         let taxRate: Int?
@@ -77,6 +82,7 @@ extension ReceiptLabelsTests {
         var item: ReceiptLabels.Item {
             ReceiptLabels.Item(
                 line: line,
+                nameLine: nameLine,
                 quantityLine: quantityLine,
                 discountLines: discountLines,
                 taxRate: taxRate.flatMap(EntryItem.TaxRate.init(rawValue:))

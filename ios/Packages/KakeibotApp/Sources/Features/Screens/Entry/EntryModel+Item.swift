@@ -13,7 +13,7 @@ public extension EntryModel {
     }
 
     var itemTotals: EntryItemTotal {
-        EntryItemTotal(items)
+        EntryItemTotal(items, taxIncluded: taxIncluded)
     }
 
     var itemTotal: Int {
@@ -113,6 +113,12 @@ public extension EntryModel {
 
         changeItems {
             items.insert(removed.item, at: index)
+        }
+    }
+
+    func setTaxIncluded(_ isIncluded: Bool) {
+        changeItems {
+            taxIncluded = isIncluded
         }
     }
 

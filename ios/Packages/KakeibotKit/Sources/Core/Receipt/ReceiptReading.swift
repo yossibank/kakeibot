@@ -5,23 +5,29 @@ public struct ReceiptReading: Hashable, Sendable {
     public var date: LocalDate?
     public var total: Int?
     public var items: [EntryItem.Draft]
+    public var taxIncluded: Bool
+
+    var includedIndices: Set<Int> = []
+    var taxBases: [EntryItem.TaxRate: Int] = [:]
 
     public init(
         store: String? = nil,
         date: LocalDate? = nil,
         total: Int? = nil,
-        items: [EntryItem.Draft] = []
+        items: [EntryItem.Draft] = [],
+        taxIncluded: Bool = false
     ) {
         self.store = store
         self.date = date
         self.total = total
         self.items = items
+        self.taxIncluded = taxIncluded
     }
 }
 
 public extension ReceiptReading {
     var itemTotal: Int {
-        EntryItemTotal(items).total
+        EntryItemTotal(items, taxIncluded: taxIncluded).total
     }
 
     var difference: Int? {
@@ -35,8 +41,7 @@ public extension ReceiptReading {
     init(lines: [String]) {
         self.init()
 
-        var pendingQuantity: ReceiptLine.Quantity?
-        var hasItem = false
+        var builder = Builder()
 
         for text in lines {
             let line = ReceiptLine(text)
@@ -45,46 +50,23 @@ public extension ReceiptReading {
                 self.date = line.date
             }
 
-            guard total == nil else {
-                continue
-            }
-
             switch line.kind {
-            case let .total(amount):
+            case .taxBase:
+                builder.add(line)
+            case let .total(amount) where total == nil:
                 self.total = amount
-
-            case let .item(name, amount):
-                var item = EntryItem.Draft(name: name, amount: amount)
-
-                if let quantity = pendingQuantity {
-                    item.apply(quantity)
-                    pendingQuantity = nil
+            default:
+                if total == nil {
+                    builder.add(line)
                 }
-
-                items.append(item)
-                hasItem = true
-
-            case let .quantity(quantity):
-                if quantity.isUnitFirst || items.isEmpty {
-                    pendingQuantity = quantity
-                } else {
-                    items[items.count - 1].apply(quantity)
-                }
-
-            case let .discount(amount):
-                if !items.isEmpty {
-                    items[items.count - 1].amount += amount
-                }
-
-            case let .text(name):
-                if store == nil, !hasItem, line.date == nil {
-                    self.store = name
-                }
-
-            case .skip:
-                break
             }
         }
+
+        self.store = builder.store
+        self.items = builder.items
+        self.total = total ?? builder.derivedTotal
+        self.includedIndices = builder.includedIndices
+        self.taxBases = builder.taxBases
     }
 
     func renamed(by names: [String: String]) -> ReceiptReading {
@@ -101,14 +83,87 @@ public extension ReceiptReading {
     }
 
     func settlingTax() -> ReceiptReading {
+        guard items.contains(where: { $0.taxRate != nil }) else {
+            let candidates = [
+                taxed(included: false),
+                rating(.standard).taxed(included: false),
+                rating(.reduced).taxed(included: false)
+            ]
+
+            let settled = candidates.first { $0.itemTotal == total } ?? taxed(included: false)
+
+            return settled.items.contains(where: { $0.taxRate != nil })
+                ? settled
+                : settled.ratedByBase()
+        }
+
+        let rated = rating(.standard)
+
+        let candidates = [
+            taxed(included: false),
+            rated.taxed(included: false),
+            rated.taxed(included: true)
+        ]
+
+        return candidates.first { $0.itemTotal == total } ?? untaxed()
+    }
+
+    func merging(_ guessed: ReceiptReading) -> ReceiptReading {
+        let rules = settlingTax()
+        let guessed = guessed.settlingTax()
+        let prefersRules = guessed.items.isEmpty || rules.gap(to: guessed.total) < guessed
+            .gap(to: rules.total)
+        let chosen = prefersRules ? rules : guessed
+        let other = prefersRules ? guessed : rules
+
+        return ReceiptReading(
+            store: guessed.store ?? store,
+            date: date ?? guessed.date,
+            total: chosen.total ?? other.total,
+            items: chosen.items,
+            taxIncluded: chosen.taxIncluded
+        )
+    }
+}
+
+private extension ReceiptReading {
+    func taxed(included: Bool) -> ReceiptReading {
+        var reading = self
+        reading.taxIncluded = included
+        return reading
+    }
+
+    func rating(
+        _ rate: EntryItem.TaxRate,
+        onlyUnmarked: Bool = true
+    ) -> ReceiptReading {
+        var reading = self
+
+        for index in reading.items.indices where !includedIndices.contains(index) {
+            if !onlyUnmarked || reading.items[index].taxRate == nil {
+                reading.items[index].taxRate = rate
+            }
+        }
+
+        return reading
+    }
+
+    func ratedByBase() -> ReceiptReading {
+        let subtotal = items.reduce(0) { $0 + $1.amount }
+
         guard
-            items.contains(where: { $0.taxRate != nil }),
-            itemTotal != total
+            taxBases.count == 1,
+            let (rate, base) = taxBases.first,
+            base == subtotal
         else {
             return self
         }
 
-        var reading = self
+        return rating(rate, onlyUnmarked: false).taxed(included: true)
+    }
+
+    func untaxed() -> ReceiptReading {
+        var reading = taxed(included: false)
 
         for index in reading.items.indices {
             reading.items[index].taxRate = nil
@@ -117,22 +172,6 @@ public extension ReceiptReading {
         return reading
     }
 
-    func merging(_ guessed: ReceiptReading) -> ReceiptReading {
-        let guessed = guessed.settlingTax()
-        let prefersRules = guessed.items.isEmpty || gap(to: guessed.total) < guessed.gap(to: total)
-        let chosen = prefersRules ? self : guessed
-        let other = prefersRules ? guessed : self
-
-        return ReceiptReading(
-            store: store ?? guessed.store,
-            date: date ?? guessed.date,
-            total: chosen.total ?? other.total,
-            items: chosen.items
-        )
-    }
-}
-
-private extension ReceiptReading {
     func gap(to fallback: Int?) -> Int {
         guard let total = total ?? fallback else {
             return .max
