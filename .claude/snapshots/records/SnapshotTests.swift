@@ -63,6 +63,35 @@ struct SnapshotTests {
         }
 
         task.cancel()
+
+        let entryId = Entry.ID()
+
+        let items = [
+            ("牛乳", 2, 396, EntryItem.TaxRate?.some(.reduced)),
+            ("食パン", 1, 250, .reduced),
+            ("洗剤", 1, 398, .standard),
+            ("弁当", 1, 540, nil)
+        ]
+        .enumerated()
+        .map { index, item in
+            EntryItem(
+                entryId: entryId,
+                name: item.0,
+                quantity: item.1,
+                amount: item.2,
+                taxRate: item.3,
+                sortOrder: index,
+                createdAt: now,
+                updatedAt: now
+            )
+        }
+
+        for variant in Self.variants {
+            let receipt = RecordsItemReceipt(items: items, amount: 1674)
+                .padding(24)
+
+            try Self.write(receipt, variant: variant, to: "records-item-receipt")
+        }
     }
 }
 

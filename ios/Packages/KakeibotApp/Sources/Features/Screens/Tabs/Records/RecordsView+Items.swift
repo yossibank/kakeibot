@@ -8,34 +8,16 @@ extension RecordsView {
         if !row.items.isEmpty {
             let isOpen = openItemIds.contains(row.id)
 
-            VStack(alignment: .leading, spacing: 6) {
-                Button {
-                    toggleItems(row.id)
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "receipt")
-
-                        Text("品目 \(row.items.count) 件")
-
-                        Image(systemName: "chevron.down")
-                            .rotationEffect(.degrees(isOpen ? 180 : 0))
-                    }
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .contentShape(.rect)
-                    .tapArea(Self.itemToggleTapOutsets)
-                }
-                .buttonStyle(.plain)
+            VStack(alignment: .leading, spacing: 8) {
+                itemToggle(row, isOpen: isOpen)
 
                 if isOpen {
-                    ForEach(row.items) { item in
-                        itemLine(item)
-                    }
-                    .transition(.opacity)
+                    RecordsItemReceipt(items: row.items, amount: row.amount)
+                        .transition(.move(edge: .top).combined(with: .opacity))
                 }
             }
             .padding(.leading, Self.itemIndent)
-            .padding(.bottom, 10)
+            .padding(.bottom, 12)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
@@ -50,33 +32,36 @@ private extension RecordsView {
         bottom: 10,
         trailing: 8
     )
+}
 
-    func itemLine(_ item: EntryItem) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Text(item.name)
-                .foregroundStyle(Palette.text)
-                .lineLimit(1)
+private extension RecordsView {
+    func itemToggle(
+        _ row: EntryRowItem,
+        isOpen: Bool
+    ) -> some View {
+        Button {
+            toggleItems(row.id)
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "receipt")
+                    .foregroundStyle(Palette.accent)
 
-            if item.quantity > 1 {
-                Text("×\(item.quantity)")
-                    .monospacedDigit()
+                Text("品目 \(row.items.count) 件")
                     .foregroundStyle(Palette.subtext)
+
+                Image(systemName: "chevron.down")
+                    .foregroundStyle(Palette.hint)
+                    .rotationEffect(.degrees(isOpen ? 180 : 0))
             }
-
-            Spacer(minLength: 8)
-
-            if let rate = item.taxRate {
-                Text("\(rate.rawValue)%")
-                    .foregroundStyle(Palette.subtext)
-            }
-
-            Text(AmountText.text(item.amount))
-                .monospacedDigit()
-                .foregroundStyle(Palette.text)
+            .textFont(.caption)
+            .contentShape(.rect)
+            .tapArea(Self.itemToggleTapOutsets)
         }
-        .textFont(.caption)
+        .buttonStyle(.plain)
     }
+}
 
+private extension RecordsView {
     func toggleItems(_ id: Entry.ID) {
         withAnimation(.snappy) {
             if openItemIds.contains(id) {
