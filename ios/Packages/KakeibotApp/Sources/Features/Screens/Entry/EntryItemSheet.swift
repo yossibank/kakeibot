@@ -28,6 +28,25 @@ struct EntryItemSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
+        GeometryReader { _ in
+            content
+        }
+        .ignoresSafeArea(.keyboard)
+        .overlay {
+            if isShowingHelp {
+                EntryItemHelp {
+                    withAnimation(.snappy) {
+                        isShowingHelp = false
+                    }
+                }
+            }
+        }
+        .presentationDragIndicator(.visible)
+    }
+}
+
+private extension EntryItemSheet {
+    var content: some View {
         VStack(spacing: 0) {
             HStack {
                 RingButton(systemImage: "questionmark") {
@@ -90,17 +109,6 @@ struct EntryItemSheet: View {
                     focus = nil
                 }
         }
-        .ignoresSafeArea(.keyboard)
-        .overlay {
-            if isShowingHelp {
-                EntryItemHelp {
-                    withAnimation(.snappy) {
-                        isShowingHelp = false
-                    }
-                }
-            }
-        }
-        .presentationDragIndicator(.visible)
     }
 }
 
@@ -250,7 +258,7 @@ private extension EntryItemSheet {
         _ item: EntryItem.Draft,
         at index: Int
     ) -> some View {
-        let isEditing = editingIndex == index
+        let isEditing = isSlipOpen && editingIndex == index
 
         return SwipeRow(
             id: index,

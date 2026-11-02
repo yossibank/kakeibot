@@ -105,11 +105,7 @@ extension EntryItemSheet {
             isDiscount = item.amount < 0
         }
 
-        withAnimation(.snappy) {
-            isSlipOpen = true
-        }
-
-        scroll(to: index)
+        showSlip(scrollingTo: index)
     }
 
     func remove(_ index: Int) {
@@ -134,6 +130,14 @@ extension EntryItemSheet {
         }
 
         scrollRequest = ScrollRequest(index: index)
+    }
+
+    func showSlip(scrollingTo index: Int) {
+        withAnimation(.snappy) {
+            isSlipOpen = true
+        } completion: {
+            scroll(to: index)
+        }
     }
 }
 
@@ -213,38 +217,32 @@ private extension EntryItemSheet {
     }
 
     var equation: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 4) {
                 token(AmountText.text(unit.amount), label: "単価", for: .unit)
-
-                Spacer(minLength: 0)
 
                 Text("×")
                     .textFont(.body)
                     .foregroundStyle(Palette.subtext)
 
-                Spacer(minLength: 0)
-
                 token("\(quantityValue)", label: "数量", for: .quantity)
-            }
 
-            HStack(spacing: 8) {
-                CapsulePicker(selection: $taxRate, options: Self.taxOptions, size: .small)
-                    .fixedSize()
-
-                Spacer(minLength: 8)
+                Spacer(minLength: 4)
 
                 Text("=")
                     .textFont(.body)
                     .foregroundStyle(Palette.subtext)
 
                 Text(AmountText.text(lineAmount))
-                    .displayFont(.title, weight: .bold)
+                    .displayFont(.headline, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(isDiscount ? Palette.rose : Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             }
+
+            CapsulePicker(selection: $taxRate, options: Self.taxOptions, size: .small)
+                .fixedSize()
         }
     }
 
@@ -264,7 +262,7 @@ private extension EntryItemSheet {
                     .foregroundStyle(isSelected ? Palette.accent : Palette.subtext)
 
                 Text(value)
-                    .displayFont(.title, weight: .bold)
+                    .displayFont(.headline, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(isSelected ? Palette.accentStrong : Palette.text)
                     .lineLimit(1)
@@ -305,13 +303,8 @@ private extension EntryItemSheet {
 
     func openSlip() {
         resetInput()
-
-        withAnimation(.snappy) {
-            isSlipOpen = true
-        }
-
+        showSlip(scrollingTo: model.items.count - 1)
         focus = .name
-        scroll(to: model.items.count - 1)
     }
 
     func submit() {
@@ -346,7 +339,6 @@ private extension EntryItemSheet {
 
     func closeSlip() {
         focus = nil
-        resetInput()
 
         withAnimation(.snappy) {
             isSlipOpen = false
