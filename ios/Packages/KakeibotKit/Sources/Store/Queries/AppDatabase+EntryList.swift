@@ -50,6 +50,7 @@ extension AppDatabase {
         let valuations = try Valuation.fetchAll(db)
         let icons = try byID(Icon.self, in: db)
         let cardBills = try cardBills(in: db)
+        let items = try listItems(of: entries, in: db)
 
         return EntryList(
             days: days,
@@ -58,7 +59,8 @@ extension AppDatabase {
             wallets: wallets,
             valuations: valuations,
             icons: icons,
-            cardBills: cardBills
+            cardBills: cardBills,
+            items: items
         )
     }
 }
@@ -123,6 +125,26 @@ private extension AppDatabase {
             .filter(Column("closing_day") != nil)
             .order(Recurring.sortOrder, Column("created_at"))
             .fetchAll(db)
+    }
+
+    static func listItems(
+        of entries: [Entry],
+        in db: Database
+    ) throws -> [Entry.ID: [EntryItem]] {
+        guard !entries.isEmpty else {
+            return [:]
+        }
+
+        let ids = Set(entries.map(\.id))
+
+        let items = try EntryItem
+            .order(Column("entry_id"), Column("sort_order"))
+            .fetchAll(db)
+            .filter {
+                ids.contains($0.entryId)
+            }
+
+        return Dictionary(grouping: items, by: \.entryId)
     }
 
     static func byID<Record: StoreRecord & Identifiable>(

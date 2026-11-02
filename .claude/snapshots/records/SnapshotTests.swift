@@ -155,7 +155,12 @@ private extension SnapshotTests {
                 categoryId: category.id,
                 tagId: tags.first?.id,
                 walletId: wallet.id,
-                memo: "発表会の衣装と靴と髪飾りをまとめて買った"
+                memo: "発表会の衣装と靴と髪飾りをまとめて買った",
+                items: [
+                    EntryItem.Draft(name: "発表会の衣装", amount: 1_000_000),
+                    EntryItem.Draft(name: "靴", quantity: 2, amount: 200_000, taxRate: .standard),
+                    EntryItem.Draft(name: "髪飾り", amount: 34567)
+                ]
             ),
             EntryDraft(
                 type: .income,

@@ -11,6 +11,7 @@ public struct RecordsView: View {
     @State var selection: Set<Entry.ID>?
     @State var batchTarget: RecordsBatchSheet.Target?
     @State var isFiltering = false
+    @State var openItemIds: Set<Entry.ID> = []
 
     @FocusState var isSearchFocused: Bool
 

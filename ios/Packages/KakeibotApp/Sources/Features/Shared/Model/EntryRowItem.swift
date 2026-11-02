@@ -13,6 +13,7 @@ public struct EntryRowItem: Identifiable, Equatable {
     public let amount: Int
     public let type: Entry.Kind
     public let isRecurring: Bool
+    public let items: [EntryItem]
 }
 
 extension EntryRowItem {
@@ -37,7 +38,8 @@ extension EntryRowItem {
             memo: memo,
             amount: entry.amount,
             type: entry.type,
-            isRecurring: entry.recurringId != nil
+            isRecurring: entry.recurringId != nil,
+            items: list.items[entry.id, default: []]
         )
     }
 }
