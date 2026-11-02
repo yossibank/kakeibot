@@ -67,6 +67,7 @@ expense・income の列は、描画に使わない。
 | transfer_in_category_id | 抜けた共有の財布からの振替を、収入に変えるときに付ける category の id | |
 | backup_exported_at | バックアップを JSON で最後に書き出した日時。ISO 8601 | 書き出しのファイルには含めない。読み込んだときは、そのファイルを書き出した日時にする |
 | review_requested_version | レビューのお願いを出したアプリの版 | 空なら、まだ出していない |
+| whats_new_seen_version | 最後に見たお知らせの版 | 空なら、まだ見ていない。最初の設定を終えた時は、その時の一番新しい版にする |
 
 closed_hints に入る画面の名前は、次のとおり。
 

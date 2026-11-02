@@ -54,6 +54,66 @@ struct SetupModelTests {
     }
 
     @Test
+    func clearsUnreadNewsWhenSeen() async throws {
+        let database = try AppDatabase.inMemory()
+        let model = SetupModel(database: database)
+        let task = Task {
+            await model.run()
+        }
+
+        try await Self.wait {
+            model.hasUnreadNews
+        }
+
+        await model.markNewsSeen()
+        let seen = try await database.setting(.whatsNewSeenVersion)
+        task.cancel()
+
+        #expect(seen == WhatsNewRelease.latestVersion)
+        #expect(model.hasUnreadNews == false)
+        #expect(model.errorNotice.message == nil)
+    }
+
+    @Test
+    func keepsNewsReadUpToLatestVersion() async throws {
+        let database = try AppDatabase.inMemory()
+        try await database.setSetting(.whatsNewSeenVersion, to: WhatsNewRelease.latestVersion)
+        let model = SetupModel(database: database)
+        let task = Task {
+            await model.run()
+        }
+
+        try await Self.wait {
+            model.seenNewsVersion != nil
+        }
+
+        task.cancel()
+
+        #expect(model.hasUnreadNews == false)
+    }
+
+    @Test
+    func keepsNewerSeenVersionFromOtherDevice() async throws {
+        let database = try AppDatabase.inMemory()
+        try await database.setSetting(.whatsNewSeenVersion, to: "999.0")
+        let model = SetupModel(database: database)
+        let task = Task {
+            await model.run()
+        }
+
+        try await Self.wait {
+            model.seenNewsVersion != nil
+        }
+
+        await model.markNewsSeen()
+        let seen = try await database.setting(.whatsNewSeenVersion)
+        task.cancel()
+
+        #expect(seen == "999.0")
+        #expect(model.hasUnreadNews == false)
+    }
+
+    @Test
     func tellsWhenClosingCardCannotBeSaved() async throws {
         let database = try AppDatabase.inMemory()
         let model = SetupModel(database: database)

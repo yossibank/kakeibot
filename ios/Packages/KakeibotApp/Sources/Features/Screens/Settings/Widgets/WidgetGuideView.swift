@@ -2,7 +2,23 @@ import DesignSystem
 import SwiftUI
 
 public struct WidgetGuideView: View {
-    public init() {}
+    @State private var place: WidgetGuidePlace
+    @State private var widget: WidgetGuideWidget
+    @State private var size: WidgetGuideSize
+
+    public init() {
+        self.init(place: .home)
+    }
+
+    init(
+        place: WidgetGuidePlace,
+        widget: WidgetGuideWidget = .budget,
+        size: WidgetGuideSize = .medium
+    ) {
+        _place = State(initialValue: place)
+        _widget = State(initialValue: widget)
+        _size = State(initialValue: size)
+    }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
@@ -12,39 +28,33 @@ public struct WidgetGuideView: View {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     WidgetGuideIntroCard()
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsSectionTitle("置けるもの")
+                    VStack(spacing: 16) {
+                        CapsulePicker(selection: $place, options: Self.options, size: .wide)
 
-                        VStack(spacing: 0) {
-                            ForEach(Self.kinds) { kind in
-                                if kind.id != Self.kinds.first?.id {
-                                    Hairline()
-                                }
-
-                                kindRow(kind)
-                            }
+                        if place == .home {
+                            samplePickers
                         }
-                        .padding(.horizontal, 16)
-                        .card()
+
+                        WidgetGuideStage(
+                            place: place,
+                            widget: widget,
+                            size: size
+                        )
+                        .id(place)
+                        .transition(.opacity)
+                    }
+                    .animation(.snappy, value: place)
+                    .animation(.snappy, value: widget)
+                    .animation(.snappy, value: size)
+                    .onChange(of: widget) {
+                        if !widget.sizes.contains(size) {
+                            size = .medium
+                        }
                     }
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsSectionTitle("ホーム画面に置く")
+                    abilities
 
-                        VStack(spacing: 0) {
-                            ForEach(Self.steps.indices, id: \.self) { index in
-                                if index > 0 {
-                                    Hairline()
-                                }
-
-                                stepRow(number: index + 1, text: Self.steps[index])
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .card()
-
-                        SettingsCaption(Self.otherPlaces)
-                    }
+                    steps
                 }
                 .padding(.vertical, 8)
             }
@@ -63,103 +73,121 @@ public struct WidgetGuideView: View {
 }
 
 private extension WidgetGuideView {
-    struct Kind: Identifiable {
-        let id: String
-        let systemImage: String
-        let title: String
-        let place: String
-        let detail: String
+    static let options = WidgetGuidePlace.allCases.map { place in
+        CapsulePicker<WidgetGuidePlace>.Option(place.title, value: place)
     }
 
-    static let kinds = [
-        Kind(
-            id: "quickRecord",
-            systemImage: "bolt",
-            title: "すぐ記録",
-            place: "ホーム画面・中と大",
-            detail: "テンプレートを押すと、アプリを開かずに記録します"
-        ),
-        Kind(
-            id: "budget",
-            systemImage: "yensign.circle",
-            title: "あといくら",
-            place: "ホーム画面・小と中",
-            detail: "今月あといくら使えるかと、今日の支出を出します"
-        ),
-        Kind(
-            id: "budgetLock",
-            systemImage: "lock",
-            title: "あといくら",
-            place: "ロック画面",
-            detail: "今月あといくら使えるかを出します"
-        ),
-        Kind(
-            id: "recordControl",
-            systemImage: "switch.2",
-            title: "記録する",
-            place: "コントロールセンター",
-            detail: "今日の入力シートを開きます"
-        )
-    ]
+    static let widgetOptions = WidgetGuideWidget.allCases.map { widget in
+        CapsulePicker<WidgetGuideWidget>.Option(widget.title, value: widget)
+    }
+}
 
-    static let steps = [
-        "ホーム画面の空いた所を長押しします",
-        "左上の「編集」から「ウィジェットを追加」を選びます",
-        "「かけいぼっと」を選び、置きたいものを選びます"
-    ]
+private extension WidgetGuideView {
+    var sizeOptions: [CapsulePicker<WidgetGuideSize>.Option] {
+        widget.sizes.map { size in
+            CapsulePicker<WidgetGuideSize>.Option(size.title, value: size)
+        }
+    }
+}
 
-    static let otherPlaces = "ロック画面は、ロック画面を長押しして「カスタマイズ」から置けます。コントロールセンターは、開いて左上の ＋ から置けます。"
+private extension WidgetGuideView {
+    var samplePickers: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) {
+                widgetPicker
 
-    func kindRow(_ kind: Kind) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: kind.systemImage)
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
-
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(kind.title)
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.text)
-
-                    Text(kind.place)
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
-                }
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-
-                Text(kind.detail)
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
+                sizePicker
             }
 
-            Spacer(minLength: 0)
+            VStack(spacing: 12) {
+                widgetPicker
+
+                sizePicker
+            }
         }
-        .padding(.vertical, 12)
     }
 
-    func stepRow(
-        number: Int,
-        text: String
-    ) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text("\(number)")
-                .textFont(.subheadline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
+    var widgetPicker: some View {
+        CapsulePicker(selection: $widget, options: Self.widgetOptions)
+    }
 
-            Text(text)
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.text)
-                .fixedSize(horizontal: false, vertical: true)
+    var sizePicker: some View {
+        CapsulePicker(selection: $size, options: sizeOptions, size: .small)
+            .id(widget)
+    }
 
-            Spacer(minLength: 0)
+    var abilities: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionTitle("できること")
+
+            VStack(alignment: .leading, spacing: 14) {
+                ForEach(place.abilities, id: \.self) { ability in
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: ability.systemImage)
+                            .sansFont(.small, weight: .medium)
+                            .foregroundStyle(Palette.accent)
+                            .frame(width: 34, height: 34)
+                            .background(Palette.accent.opacity(.subtle), in: Circle())
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(ability.title)
+                                .textFont(.subheadline, weight: .semibold)
+                                .foregroundStyle(Palette.text)
+
+                            Text(ability.detail)
+                                .textFont(.caption)
+                                .foregroundStyle(Palette.subtext)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Spacer(minLength: 0)
+                    }
+                }
+            }
+            .padding(16)
+            .card()
         }
-        .padding(.vertical, 12)
+    }
+
+    var steps: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionTitle("置き方")
+
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(place.steps.enumerated()), id: \.offset) { index, text in
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(spacing: 0) {
+                            Text("\(index + 1)")
+                                .textFont(.caption, weight: .bold)
+                                .monospacedDigit()
+                                .foregroundStyle(Palette.backgroundTop)
+                                .frame(width: 24, height: 24)
+                                .background(Palette.accent, in: Circle())
+
+                            if index < place.steps.count - 1 {
+                                Rectangle()
+                                    .fill(Palette.outline)
+                                    .frame(width: 1.5)
+                                    .frame(minHeight: 14, maxHeight: .infinity)
+                            }
+                        }
+
+                        Text(text)
+                            .textFont(.subheadline)
+                            .foregroundStyle(Palette.text)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.top, 2)
+                            .padding(.bottom, 14)
+
+                        Spacer(minLength: 0)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 2)
+            .card()
+        }
     }
 }
 

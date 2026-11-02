@@ -186,8 +186,10 @@ KakeibotApp/
 │   │   │   ├── Entry/
 │   │   │   ├── Onboarding/
 │   │   │   ├── Settings/
-│   │   │   └── Tabs/
+│   │   │   ├── Tabs/
+│   │   │   └── WhatsNew/
 │   │   └── Shared/
+│   │       ├── FeatureArt/
 │   │       ├── Model/
 │   │       ├── Notice/
 │   │       ├── Period/
@@ -206,11 +208,13 @@ KakeibotApp/
 | --- | --- |
 | `AppFeature/` | 起動の印の動き、通知の許可、入力の準備、レビューのお願いも持つ。Pro の購入を StoreKit で確かめ、Pro が無くなったら同期を止める |
 | `AppWidget/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
-| `DesignSystem/Components/` | Amount・Banner・Button・Calendar・Chart・Dial・Gesture・Icon・Input・Menu・Navigation・Row・Sheet・Surface・Tag・Template |
+| `DesignSystem/Components/` | Amount・Banner・Button・Calendar・Chart・Dial・Gesture・Icon・Input・Layout・Menu・Navigation・Row・Sheet・Surface・Tag・Template |
 | `Features/Screens/Entry/` | 記録の入力シート。レシートは VisionKit で撮り、Vision と Foundation Models で読む |
 | `Features/Screens/Onboarding/` | 最初の設定のチュートリアル |
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
+| `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート |
+| `Features/Shared/FeatureArt/` | お知らせと Pro の画面で機能を見せる絵の部品（レシート・伝票・iPhone の枠・見本のデータ）。絵を幅に合わせて縮める枠も置く |
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、記録が無いときと読み込めないときの表示、保存の失敗が空き容量不足かの見分け |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |

@@ -23,35 +23,20 @@ public struct ProView: View {
             SettingsBackHeader("Pro")
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
-                    header
+                VStack(spacing: 20) {
+                    ProHero(price: model.price)
 
-                    section("同期と共有", features: Self.syncFeatures)
+                    ForEach(ProFeature.all) { feature in
+                        ProFeatureCard(feature: feature)
+                    }
 
-                    section("見た目", features: Self.lookFeatures)
+                    ProComparison()
                 }
                 .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
 
-            if isPro {
-                Text("購入済みです。Pro の機能をすべて使えます")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity, minHeight: 48)
-            } else {
-                VStack(spacing: 12) {
-                    CardButton(model.purchaseTitle, style: .filled) {
-                        purchase()
-                    }
-
-                    CardButton("購入を復元", style: .outlined(Palette.subtext)) {
-                        restore()
-                    }
-                }
-                .disabled(model.isWorking)
-            }
+            purchaseBar
         }
         .padding(.horizontal, 20)
         .padding(.top, SettingsSpacing.top)
@@ -72,113 +57,30 @@ public struct ProView: View {
 }
 
 private extension ProView {
-    struct Feature: Identifiable {
-        let systemImage: String
-        let title: String
-        let text: String
-
-        var id: String {
-            title
-        }
-    }
-}
-
-private extension ProView {
-    var header: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "sparkles")
-                .sansFont(.headline, weight: .ultraLight)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 52, height: 52)
-                .overlay {
-                    Circle()
-                        .stroke(Palette.outline, lineWidth: 0.8)
-                }
-
-            Text("かけいぼっと Pro")
-                .displayFont(.headline, weight: .medium)
+    @ViewBuilder
+    var purchaseBar: some View {
+        if isPro {
+            Label("購入済みです。Pro の機能をすべて使えます", systemImage: "checkmark.seal.fill")
+                .textFont(.footnote)
                 .foregroundStyle(Palette.accentStrong)
-
-            Text("一度買えば、ずっと使えます。\nファミリー共有の家族も使えます")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    func section(
-        _ title: String,
-        features: [Feature]
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SettingsSectionTitle(title)
-
-            VStack(spacing: 0) {
-                ForEach(features) { feature in
-                    if feature.id != features.first?.id {
-                        Hairline()
-                    }
-
-                    row(feature)
+                .frame(maxWidth: .infinity, minHeight: 48)
+        } else {
+            VStack(spacing: 4) {
+                CardButton(model.purchaseTitle, style: .filled) {
+                    purchase()
                 }
+
+                Button("購入を復元") {
+                    restore()
+                }
+                .textFont(.footnote)
+                .foregroundStyle(Palette.subtext)
+                .frame(minHeight: 44)
             }
-            .padding(.horizontal, 16)
-            .card()
+            .disabled(model.isWorking)
         }
     }
-
-    func row(_ feature: Feature) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Image(systemName: feature.systemImage)
-                .sansFont(.small, weight: .medium)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 24)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(feature.title)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
-
-                Text(feature.text)
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding(.vertical, 14)
-    }
-}
-
-private extension ProView {
-    static let syncFeatures = [
-        Feature(
-            systemImage: "icloud",
-            title: "端末間の同期",
-            text: "自分の iPhone どうしで、記録と設定をそろえます"
-        ),
-        Feature(
-            systemImage: "person.2",
-            title: "家族との共有",
-            text: "口座を共有して、一緒に記録できます。招待された人は Pro が無くても使えます"
-        )
-    ]
-
-    static let lookFeatures = [
-        Feature(
-            systemImage: "paintpalette",
-            title: "テーマを作る",
-            text: "色を選んで、自分だけのテーマを作れます"
-        ),
-        Feature(
-            systemImage: "textformat",
-            title: "4 つの字体",
-            text: "丸ゴシック・手書き・ドット・ポップの字体を使えます"
-        )
-    ]
 
     func purchase() {
         Task {

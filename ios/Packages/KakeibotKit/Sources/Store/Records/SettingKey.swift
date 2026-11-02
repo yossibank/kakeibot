@@ -296,6 +296,15 @@ public extension SettingKey where Value == String? {
             encode: { $0 }
         )
     }
+
+    static var whatsNewSeenVersion: Self {
+        Self(
+            .whatsNewSeenVersion,
+            default: nil,
+            decode: { $0 },
+            encode: { $0 }
+        )
+    }
 }
 
 public extension SettingKey where Value == Bool {

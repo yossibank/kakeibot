@@ -82,10 +82,11 @@ public extension CapsulePicker {
     enum Size: Sendable {
         case regular
         case small
+        case wide
 
         var font: Font.TextStyle {
             switch self {
-            case .regular: .footnote
+            case .regular, .wide: .footnote
             case .small: .caption
             }
         }
@@ -94,6 +95,7 @@ public extension CapsulePicker {
             switch self {
             case .regular: CGSize(width: 72, height: 30)
             case .small: CGSize(width: 56, height: 26)
+            case .wide: CGSize(width: 104, height: 32)
             }
         }
     }
