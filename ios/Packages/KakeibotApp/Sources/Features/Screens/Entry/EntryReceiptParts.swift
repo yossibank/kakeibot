@@ -9,7 +9,7 @@ struct EntryReceiptLeader: View {
                 Palette.hint.opacity(0.8),
                 style: StrokeStyle(lineWidth: 1.2, lineCap: .round, dash: [0.1, 4])
             )
-            .frame(minWidth: 12, maxWidth: .infinity)
+            .frame(minWidth: 8, maxWidth: .infinity)
             .frame(height: 2)
             .alignmentGuide(.firstTextBaseline) { dimensions in
                 dimensions[.bottom] + 3
@@ -43,32 +43,56 @@ struct EntryTaxBreakdown: View {
     let taxIncluded: Bool
 
     var body: some View {
+        ViewThatFits(in: .horizontal) {
+            grid(isCompact: false)
+
+            grid(isCompact: true)
+        }
+        .textFont(.caption)
+        .foregroundStyle(Palette.subtext)
+    }
+}
+
+private extension EntryTaxBreakdown {
+    func grid(isCompact: Bool) -> some View {
         Grid(alignment: .leading, horizontalSpacing: 6, verticalSpacing: 6) {
             ForEach(taxes, id: \.rate) { tax in
                 GridRow(alignment: .firstTextBaseline) {
                     EntryTaxRateBadge(rate: tax.rate)
 
-                    Text("対象")
+                    if !isCompact {
+                        Text("対象")
+                            .fixedSize()
+                    }
 
                     Text(AmountText.text(tax.base))
                         .monospacedDigit()
+                        .fixedSize()
                         .gridColumnAlignment(.trailing)
 
                     Color.clear
                         .frame(maxWidth: .infinity, maxHeight: 0)
 
-                    Text(taxIncluded ? "うち消費税" : "消費税")
+                    Text(taxTitle(isCompact: isCompact))
+                        .fixedSize()
                         .gridColumnAlignment(.trailing)
 
                     Text(AmountText.text(tax.amount))
                         .monospacedDigit()
                         .foregroundStyle(Palette.text)
+                        .fixedSize()
                         .gridColumnAlignment(.trailing)
                 }
             }
         }
-        .textFont(.caption)
-        .foregroundStyle(Palette.subtext)
-        .lineLimit(1)
+    }
+
+    func taxTitle(isCompact: Bool) -> String {
+        switch (taxIncluded, isCompact) {
+        case (true, false): "うち消費税"
+        case (true, true): "うち税"
+        case (false, false): "消費税"
+        case (false, true): "税"
+        }
     }
 }

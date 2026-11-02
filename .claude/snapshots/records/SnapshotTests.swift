@@ -70,7 +70,8 @@ struct SnapshotTests {
             ("牛乳", 2, 396, EntryItem.TaxRate?.some(.reduced)),
             ("食パン", 1, 250, .reduced),
             ("洗剤", 1, 398, .standard),
-            ("弁当", 1, 540, nil)
+            ("弁当", 1, 540, nil),
+            ("国産大豆の絹ごし豆腐3個パック", 12, 1188, .reduced)
         ]
         .enumerated()
         .map { index, item in

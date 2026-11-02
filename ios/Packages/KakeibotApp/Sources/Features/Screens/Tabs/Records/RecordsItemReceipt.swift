@@ -56,7 +56,7 @@ struct RecordsItemReceipt: View {
                     .minimumScaleFactor(0.6)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 14)
         .padding(.vertical, 12 + Self.tooth / 2)
         .background {
             paper
@@ -102,16 +102,34 @@ private extension RecordsItemReceipt {
 
 private extension RecordsItemReceipt {
     func itemLine(_ item: EntryItem) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 6) {
+        ViewThatFits(in: .horizontal) {
+            itemLine(item, style: .caption, fitsName: true)
+
+            itemLine(item, style: .caption2, fitsName: true)
+
+            itemLine(item, style: .caption2, fitsName: false)
+        }
+    }
+
+    func itemLine(
+        _ item: EntryItem,
+        style: Font.TextStyle,
+        fitsName: Bool
+    ) -> some View {
+        let color = item.amount < 0 ? Palette.rose : Palette.text
+
+        return HStack(alignment: .firstTextBaseline, spacing: 4) {
             Text(item.name)
-                .foregroundStyle(item.amount < 0 ? Palette.rose : Palette.text)
+                .foregroundStyle(color)
                 .lineLimit(1)
+                .fixedSize(horizontal: fitsName, vertical: false)
                 .layoutPriority(1)
 
             if item.quantity > 1 {
                 Text("×\(item.quantity)")
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
+                    .fixedSize()
             }
 
             if showsRates, let rate = item.taxRate {
@@ -122,10 +140,10 @@ private extension RecordsItemReceipt {
 
             Text(AmountText.text(item.amount))
                 .monospacedDigit()
-                .foregroundStyle(item.amount < 0 ? Palette.rose : Palette.text)
-                .layoutPriority(1)
+                .foregroundStyle(color)
+                .fixedSize()
         }
-        .textFont(.caption)
+        .textFont(style)
     }
 
     func summaryLine(
