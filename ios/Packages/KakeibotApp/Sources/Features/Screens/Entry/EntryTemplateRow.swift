@@ -5,23 +5,13 @@ import SwiftUI
 struct EntryTemplateRow: View {
     let model: EntryModel
     let isCompact: Bool
-    let onAddItem: (() -> Void)?
     let onUse: (EntryTemplate) -> Void
-    let onAdd: () -> Void
+    let onAdd: (() -> Void)?
 
     var body: some View {
         ScrollView(.horizontal) {
             VStack(alignment: .leading, spacing: Self.spacing) {
                 HStack(spacing: Self.spacing) {
-                    if let onAddItem {
-                        ChipButton(
-                            "品目",
-                            systemImage: "plus",
-                            outline: .dashed,
-                            action: onAddItem
-                        )
-                    }
-
                     ForEach(firstRow) { template in
                         button(template)
                     }
@@ -50,13 +40,16 @@ struct EntryTemplateRow: View {
 }
 
 private extension EntryTemplateRow {
+    @ViewBuilder
     var addButton: some View {
-        ChipButton(
-            "今の入力を保存",
-            systemImage: "plus",
-            outline: .dashed,
-            action: onAdd
-        )
+        if let onAdd {
+            ChipButton(
+                "今の入力を保存",
+                systemImage: "plus",
+                outline: .dashed,
+                action: onAdd
+            )
+        }
     }
 
     func button(_ template: EntryTemplate) -> some View {

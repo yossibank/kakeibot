@@ -10,7 +10,7 @@ struct EntryItemButton: View {
 
     var body: some View {
         Button(action: onOpen) {
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 Image(systemName: "receipt")
                     .foregroundStyle(Palette.accent)
 
@@ -33,23 +33,11 @@ struct EntryItemButton: View {
             }
             .textFont(.caption, weight: .semibold)
             .lineLimit(1)
-            .minimumScaleFactor(0.8)
-            .padding(.horizontal, 14)
-            .padding(.bottom, Self.tooth / 2)
+            .minimumScaleFactor(0.7)
+            .padding(.horizontal, 12)
             .frame(height: Self.height)
-            .background {
-                paper
-                    .fill(Palette.card)
-                    .shadow(color: Palette.shadow.opacity(0.5), radius: 3, y: 1)
-            }
-            .overlay {
-                paper
-                    .stroke(
-                        adjustment == 0 ? Palette.outline : Palette.amber.opacity(.medium),
-                        lineWidth: 1
-                    )
-            }
-            .contentShape(.rect)
+            .background(fill, in: .capsule)
+            .contentShape(.capsule)
             .tapArea(Self.tapOutsets)
         }
         .buttonStyle(.plain)
@@ -57,18 +45,17 @@ struct EntryItemButton: View {
 }
 
 private extension EntryItemButton {
-    static let height: CGFloat = 36
-    static let tooth: CGFloat = 6
+    static let height: CGFloat = 28
 
     static let tapOutsets = EdgeInsets(
-        top: 4,
+        top: 8,
         leading: 0,
-        bottom: 4,
+        bottom: 8,
         trailing: 0
     )
 
-    var paper: EntryReceiptShape {
-        EntryReceiptShape(tooth: Self.tooth, hasTopEdge: false)
+    var fill: Color {
+        adjustment == 0 ? Palette.accent.opacity(.subtle) : Palette.amber.opacity(.subtle)
     }
 }
 

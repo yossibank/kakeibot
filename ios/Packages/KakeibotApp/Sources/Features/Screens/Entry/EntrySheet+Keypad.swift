@@ -13,23 +13,21 @@ extension EntrySheet {
                     model.setFee(amount)
                 }
             } else if model.type != .transfer {
-                HStack(spacing: 8) {
-                    if showsReceiptButton {
-                        receiptButton
-                    }
+                VStack(alignment: .leading, spacing: 8) {
+                    preparationRow
 
-                    EntryTemplateRow(
-                        model: model,
-                        isCompact: true,
-                        onAddItem: addItemAction,
-                        onUse: { template in
-                            useTemplate(template)
-                        },
-                        onAdd: {
-                            open(.newTemplate)
-                        }
-                    )
+                    if !model.templates.isEmpty {
+                        EntryTemplateRow(
+                            model: model,
+                            isCompact: true,
+                            onUse: { template in
+                                useTemplate(template)
+                            },
+                            onAdd: nil
+                        )
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Keypad(calculator: model.activeCalculator) {
@@ -91,21 +89,6 @@ extension EntrySheet {
     }
 }
 
-extension EntrySheet {
-    var addItemAction: (() -> Void)? {
-        guard
-            model.showsItems,
-            model.items.isEmpty
-        else {
-            return nil
-        }
-
-        return {
-            open(.items)
-        }
-    }
-}
-
 private extension EntrySheet {
     var drawerShape: UnevenRoundedRectangle {
         let radius = corner.radius(28)
@@ -114,5 +97,40 @@ private extension EntrySheet {
             topLeadingRadius: radius,
             topTrailingRadius: radius
         )
+    }
+
+    var preparationRow: some View {
+        ViewThatFits(in: .horizontal) {
+            preparationButtons(saveTitle: "今の入力を保存")
+
+            preparationButtons(saveTitle: "保存")
+        }
+    }
+
+    func preparationButtons(saveTitle: String) -> some View {
+        HStack(spacing: 8) {
+            if showsReceiptButton {
+                receiptButton
+            }
+
+            if model.showsItems {
+                ChipButton(
+                    "品目",
+                    systemImage: "plus",
+                    outline: .dashed
+                ) {
+                    open(.newItem)
+                }
+            }
+
+            ChipButton(
+                saveTitle,
+                systemImage: "plus",
+                outline: .dashed
+            ) {
+                open(.newTemplate)
+            }
+        }
+        .fixedSize()
     }
 }

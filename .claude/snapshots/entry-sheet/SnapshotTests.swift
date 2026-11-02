@@ -119,7 +119,11 @@ private extension SnapshotTests {
 
         await suspectModel.apply(Self.suspectReading)
 
-        let drawerModel = try await Self.model(.expense, digits: Self.smallDigits)
+        let drawerModel = try await Self.model(
+            .expense,
+            digits: Self.smallDigits,
+            hasTemplates: true
+        )
 
         for theme in Self.receiptThemes {
             let palette = theme.palette
@@ -232,7 +236,8 @@ private extension SnapshotTests {
     static func model(
         _ type: Entry.Kind,
         digits: [AmountCalculator.Key],
-        startsWithAmount: Bool = true
+        startsWithAmount: Bool = true,
+        hasTemplates: Bool = false
     ) async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
         let now = Date()
@@ -240,6 +245,22 @@ private extension SnapshotTests {
 
         try database.insertDefaultsIfEmpty(at: now)
         try await database.setSetting(.entryStartsWithAmount, to: startsWithAmount)
+
+        if hasTemplates {
+            let options = try await database.entryOptions()
+
+            for (name, amount) in [("ランチ", 900), ("コーヒー", 380), ("電車", 440)] {
+                let draft = EntryTemplateDraft(
+                    name: name,
+                    type: .expense,
+                    amount: amount,
+                    categoryId: options.expenseCategories.first?.id,
+                    walletId: options.wallets.first?.id
+                )
+
+                _ = try await database.saveTemplate(draft, at: now)
+            }
+        }
 
         let model = EntryModel(database: database, date: date, type: type)
 

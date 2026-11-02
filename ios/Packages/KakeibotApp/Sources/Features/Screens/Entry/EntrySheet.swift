@@ -241,18 +241,6 @@ private extension EntrySheet {
         VStack(spacing: 24) {
             dial
 
-            if model.showsItems, !model.items.isEmpty {
-                EntryItemButton(
-                    count: model.items.count,
-                    total: model.itemTotal,
-                    adjustment: model.itemAdjustment
-                ) {
-                    open(.items)
-                }
-                .padding(.top, -12)
-                .transition(.opacity.combined(with: .scale(scale: 0.95)))
-            }
-
             if model.type == .transfer {
                 transferArea
             } else {
@@ -287,12 +275,12 @@ private extension EntrySheet {
     }
 
     var dial: some View {
-        Button {
-            tapDial()
-        } label: {
-            EntryDialFace(model: model)
+        EntryDialFace(model: model) {
+            open(.items)
         }
-        .buttonStyle(.plain)
+        .onTapGesture {
+            tapDial()
+        }
         .frame(maxWidth: .infinity)
     }
 }

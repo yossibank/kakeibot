@@ -6,6 +6,7 @@ struct EntryDialFace: View {
     @Environment(\.themeStyle.displayFont) private var themeFont
 
     let model: EntryModel
+    let onOpenItems: () -> Void
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -54,6 +55,17 @@ struct EntryDialFace: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                     .frame(maxWidth: Self.maxWidth * 0.7)
+
+                if showsItems {
+                    EntryItemButton(
+                        count: model.items.count,
+                        total: model.itemTotal,
+                        adjustment: model.itemAdjustment,
+                        onOpen: onOpenItems
+                    )
+                    .frame(maxWidth: Self.maxWidth * 0.8)
+                    .padding(.top, 4)
+                }
             }
             .padding(.bottom, Self.lift)
         }
@@ -81,6 +93,10 @@ private extension EntryDialFace {
         }
 
         return model.isOverSourceBalance ? Palette.rose : Palette.accent
+    }
+
+    var showsItems: Bool {
+        model.showsItems && !model.items.isEmpty && !isEnteringFee
     }
 
     var isEnteringFee: Bool {
