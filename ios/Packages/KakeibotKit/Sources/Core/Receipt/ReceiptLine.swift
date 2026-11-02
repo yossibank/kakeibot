@@ -110,6 +110,7 @@ extension ReceiptLine {
             .trimmingCharacters(in: Self.nameTrimmed)
 
         name = String(name.map { halfwidthKana[$0] ?? $0 })
+            .replacing(takeOutPattern, with: "T/O ")
 
         return name.replacing(#/\s{2,}/#, with: " ")
     }
@@ -146,6 +147,8 @@ private extension ReceiptLine {
     static let amountBlockers: Set<Character> = ["#"]
 
     static let maxDigits = 7
+
+    static let misreadMarks: Set<Character> = ["0", "6"]
 
     static let reducedMarks: Set<Character> = ["※", "*", "軽"]
 
@@ -218,6 +221,18 @@ private extension ReceiptLine {
     static var taxBasePattern: Regex<(Substring, rate: Substring, base: Substring)> {
         #/
             (?<rate>10|8)\s*[%8]?\s*(?:対象|課税)[^\d¥]*¥?\s*(?<base>\d{1,3}(?:,\d{3})+|\d+)
+        /#
+    }
+
+    static var countTokenPattern: Regex<(Substring, Substring)> {
+        #/
+            ^(\d{1,3})(?:コ|個|点)?$
+        /#
+    }
+
+    static var takeOutPattern: Regex<Substring> {
+        #/
+            ^[T1I]/[O0]\s
         /#
     }
 
@@ -424,21 +439,74 @@ private extension ReceiptLine {
         of name: String,
         value: Int
     ) -> Amount? {
+        if let match = name.firstMatch(of: columnsPattern),
+           let count = Int(match.count),
+           let unit = Int(match.unit.filter(\.isNumber)),
+           count > 0,
+           count * unit == value {
+            return Amount(
+                name: String(match.name).trimmingCharacters(in: .whitespaces),
+                value: value,
+                count: count
+            )
+        }
+
+        return misreadColumns(of: name, value: value)
+    }
+
+    static func misreadColumns(
+        of name: String,
+        value: Int
+    ) -> Amount? {
+        var tokens = name.split(separator: " ").map(String.init)
+
         guard
-            let match = name.firstMatch(of: columnsPattern),
-            let count = Int(match.count),
-            let unit = Int(match.unit.filter(\.isNumber)),
-            count > 0,
-            count * unit == value
+            value > 0,
+            let unitToken = tokens.popLast()
         else {
             return nil
         }
 
-        return Amount(
-            name: String(match.name).trimmingCharacters(in: .whitespaces),
-            value: value,
-            count: count
-        )
+        let countToken = tokens.last.flatMap { token in
+            token.firstMatch(of: countTokenPattern).flatMap { Int($0.output.1) }
+        }
+
+        let count = countToken ?? 1
+
+        guard
+            count > 0,
+            value % count == 0,
+            unitCandidates(of: unitToken).contains(value / count)
+        else {
+            return nil
+        }
+
+        if countToken != nil {
+            tokens.removeLast()
+        }
+
+        let rest = tokens.joined(separator: " ")
+
+        guard isNameLike(itemName(rest)) else {
+            return nil
+        }
+
+        return Amount(name: rest, value: value, count: count)
+    }
+
+    static func unitCandidates(of token: String) -> [Int] {
+        let digits = String(token.drop { !$0.isNumber }).replacing(",", with: "")
+
+        guard
+            digits.allSatisfy(\.isNumber),
+            let unit = Int(digits)
+        else {
+            return []
+        }
+
+        let isMisreadMark = digits.count > 1 && misreadMarks.contains(digits.first ?? " ")
+
+        return isMisreadMark ? [unit, Int(digits.dropFirst()) ?? unit] : [unit]
     }
 
     static func quantity(in text: String) -> Quantity? {

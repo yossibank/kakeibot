@@ -13,13 +13,15 @@ enum EntryReceiptReader {
 
         let lines = pageLines.flatMap(\.self)
         let reading = ReceiptReading(lines: lines)
+        let settled = reading.settlingTax()
 
         guard
             !lines.isEmpty,
+            !settled.isSettled,
             #available(iOS 26.0, *),
             let guessed = await EntryReceiptModel.read(pages: pageLines, rules: reading)
         else {
-            return reading.settlingTax()
+            return settled
         }
 
         return reading.merging(guessed)

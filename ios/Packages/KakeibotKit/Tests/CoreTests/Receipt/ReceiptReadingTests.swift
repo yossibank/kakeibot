@@ -29,6 +29,19 @@ struct ReceiptReadingTests {
     }
 
     @Test
+    func settlesOnlyWhenStoreAndItemsMatchTotal() {
+        let items = [EntryItem.Draft(name: "牛乳", amount: 396)]
+
+        let settled = ReceiptReading(store: "スーパー青葉", total: 396, items: items)
+        let off = ReceiptReading(store: "スーパー青葉", total: 400, items: items)
+        let storeless = ReceiptReading(total: 396, items: items)
+
+        #expect(settled.isSettled)
+        #expect(!off.isSettled)
+        #expect(!storeless.isSettled)
+    }
+
+    @Test
     func renamesItemsByRememberedNames() {
         let reading = ReceiptReading(
             store: "スーパー青葉",

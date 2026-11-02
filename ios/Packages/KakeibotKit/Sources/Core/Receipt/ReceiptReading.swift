@@ -38,6 +38,10 @@ public extension ReceiptReading {
         store == nil && date == nil && total == nil && items.isEmpty
     }
 
+    var isSettled: Bool {
+        store != nil && !items.isEmpty && difference == 0
+    }
+
     init(lines: [String]) {
         self.init()
 
