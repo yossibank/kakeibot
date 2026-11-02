@@ -18,6 +18,10 @@ struct EntryItemSheet: View {
     @State var scrollRequest: ScrollRequest?
     @State var removed: EntryModel.RemovedItem?
     @State var openIndex: Int?
+    @State var scrollPosition = ScrollPosition()
+    @State var scrollGeometry: ScrollGeometry?
+    @State var slipHeight: CGFloat = 0
+    @State var barHeight: CGFloat = 0
 
     @FocusState var focus: Field?
 
@@ -76,6 +80,12 @@ private extension EntryItemSheet {
                 .scrollBounceBehavior(.basedOnSize)
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
+                .scrollPosition($scrollPosition)
+                .onScrollGeometryChange(for: ScrollGeometry.self) { geometry in
+                    geometry
+                } action: { _, geometry in
+                    scrollGeometry = geometry
+                }
                 .onChange(of: scrollRequest) { _, request in
                     guard let request else {
                         return
@@ -89,9 +99,19 @@ private extension EntryItemSheet {
 
             if isSlipOpen {
                 slip
+                    .onGeometryChange(for: CGFloat.self) { proxy in
+                        proxy.size.height
+                    } action: { height in
+                        slipHeight = height
+                    }
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             } else {
                 addBar
+                    .onGeometryChange(for: CGFloat.self) { proxy in
+                        proxy.size.height
+                    } action: { height in
+                        barHeight = height
+                    }
             }
         }
         .settingsHideNotice(
@@ -176,8 +196,11 @@ private extension EntryItemSheet {
                 taxModeLine
             }
 
-            ForEach(model.itemTotals.taxes, id: \.rate) { tax in
-                taxLine(tax)
+            if !model.itemTotals.taxes.isEmpty {
+                EntryTaxBreakdown(
+                    taxes: model.itemTotals.taxes,
+                    taxIncluded: model.taxIncluded
+                )
             }
 
             if model.hasItemAdjustment {
@@ -224,8 +247,12 @@ private extension EntryItemSheet {
         .padding(.vertical, 28)
         .background {
             receiptShape
-                .fill(Palette.card)
+                .fill(Palette.paper)
                 .shadow(color: Palette.shadow.opacity(0.6), radius: 12, y: 4)
+        }
+        .overlay {
+            receiptShape
+                .stroke(Palette.paperEdge, lineWidth: 1)
         }
     }
 
@@ -313,13 +340,19 @@ private extension EntryItemSheet {
         } onAction: {
             remove(index)
         } content: {
-            HStack(spacing: 8) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(item.trimmedName)
-                        .textFont(.subheadline)
-                        .foregroundStyle(isNegative ? Palette.rose : Palette.text)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(item.trimmedName)
+                            .textFont(.subheadline)
+                            .foregroundStyle(isNegative ? Palette.rose : Palette.text)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+
+                        if showsRates, let rate = item.taxRate {
+                            EntryTaxRateBadge(rate: rate)
+                        }
+                    }
 
                     if let quantity = EntryModel.quantityText(for: item) {
                         Text(quantity)
@@ -329,28 +362,22 @@ private extension EntryItemSheet {
                     }
                 }
                 .padding(.leading, isNegative ? Self.discountIndent : 0)
+                .layoutPriority(1)
 
-                Spacer(minLength: 8)
+                EntryReceiptLeader()
 
                 Text(AmountText.text(item.amount))
                     .textFont(.subheadline)
                     .monospacedDigit()
                     .foregroundStyle(amountColor)
-
-                if showsRates {
-                    Text(item.taxRate.map { "\($0.rawValue)%" } ?? "")
-                        .textFont(.caption2)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accent)
-                        .frame(width: Self.rateWidth, alignment: .trailing)
-                }
+                    .layoutPriority(1)
             }
             .padding(.vertical, 7)
             .padding(.horizontal, 4)
             .background {
                 ZStack {
                     Rectangle()
-                        .fill(Palette.card)
+                        .fill(Palette.paper)
 
                     if isEditing {
                         Rectangle()
@@ -387,36 +414,11 @@ private extension EntryItemSheet {
                 .foregroundStyle(Palette.text)
         }
     }
-
-    func taxLine(_ tax: EntryItemTotal.Tax) -> some View {
-        HStack {
-            Text("\(tax.rate.rawValue)%対象")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-
-            Text(AmountText.text(tax.base))
-                .textFont(.caption)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-
-            Spacer()
-
-            Text(model.taxIncluded ? "うち消費税" : "消費税")
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-
-            Text(AmountText.text(tax.amount))
-                .textFont(.subheadline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.text)
-        }
-    }
 }
 
 private extension EntryItemSheet {
     static let noticeBottom: CGFloat = 76
     static let discountIndent: CGFloat = 12
-    static let rateWidth: CGFloat = 28
     static let taxModeWidth: CGFloat = 136
 
     static let taxModeOptions: [CapsulePicker<Bool>.Option] = [

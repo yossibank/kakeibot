@@ -14,6 +14,9 @@ extension RecordsView {
                 if isOpen {
                     RecordsItemReceipt(
                         taxIncluded: row.taxIncluded,
+                        onClose: {
+                            toggleItems(row.id)
+                        },
                         items: row.items,
                         amount: row.amount
                     )

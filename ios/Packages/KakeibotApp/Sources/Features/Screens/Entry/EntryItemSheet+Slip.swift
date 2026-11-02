@@ -77,7 +77,7 @@ extension EntryItemSheet {
         .fixedSize(horizontal: false, vertical: true)
         .background {
             EntryReceiptShape(tooth: 12, hasTopEdge: true, hasBottomEdge: false)
-                .fill(Palette.card)
+                .fill(Palette.paper)
                 .shadow(color: Palette.shadow.opacity(0.6), radius: 12, y: -2)
                 .ignoresSafeArea(edges: .bottom)
         }
@@ -340,9 +340,33 @@ private extension EntryItemSheet {
     func closeSlip() {
         focus = nil
 
-        withAnimation(.snappy) {
-            isSlipOpen = false
+        guard
+            let geometry = scrollGeometry,
+            geometry.contentOffset.y > settledOffset(of: geometry) + 1
+        else {
+            withAnimation(.snappy) {
+                isSlipOpen = false
+            }
+
+            return
         }
+
+        // 伝票を閉じて一覧が伸びると、上限を超えた位置はアニメーション無しで戻されるため、先に送っておく
+        withAnimation(.smooth(duration: 0.35)) {
+            scrollPosition.scrollTo(y: settledOffset(of: geometry))
+        } completion: {
+            withAnimation(.snappy) {
+                isSlipOpen = false
+            }
+        }
+    }
+
+    func settledOffset(of geometry: ScrollGeometry) -> CGFloat {
+        let insets = geometry.contentInsets
+        let grownHeight = geometry.containerSize.height + slipHeight - barHeight
+        let maxOffset = geometry.contentSize.height + insets.bottom - grownHeight
+
+        return max(-insets.top, maxOffset)
     }
 
     func resetInput() {
