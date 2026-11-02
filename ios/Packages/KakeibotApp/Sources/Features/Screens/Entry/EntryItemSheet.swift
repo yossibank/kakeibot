@@ -34,7 +34,7 @@ struct EntryItemSheet: View {
         .ignoresSafeArea(.keyboard)
         .overlay {
             if isShowingHelp {
-                EntryItemHelp {
+                EntryGuideCard(guide: .items) {
                     withAnimation(.snappy) {
                         isShowingHelp = false
                     }

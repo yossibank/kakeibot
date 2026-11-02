@@ -20,12 +20,7 @@ enum EntryReceiptReader {
             return reading
         }
 
-        return ReceiptReading(
-            store: guessed.store ?? reading.store,
-            date: reading.date ?? guessed.date,
-            total: guessed.total ?? reading.total,
-            items: guessed.items.isEmpty ? reading.items : guessed.items
-        )
+        return reading.merging(guessed)
     }
 }
 

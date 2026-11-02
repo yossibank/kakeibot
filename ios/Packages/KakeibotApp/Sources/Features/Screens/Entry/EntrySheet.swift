@@ -14,8 +14,7 @@ public struct EntrySheet: View {
     @State var drawerHeight: CGFloat = 0
     @State var deletion: Deletion?
     @State var hiddenCategory: EntryModel.HiddenCategory?
-    @State var receiptStep: ReceiptStep?
-    @State var receiptOffer: String?
+    @State var receipt = EntryReceiptFlow()
 
     @Environment(\.themeStyle.corner) var corner
     @Environment(\.isPro) var isPro
@@ -101,10 +100,10 @@ public struct EntrySheet: View {
                     }
                 }
             }
-            .proOffer(receiptOffer, presentsInSheet: true) {
-                receiptOffer = nil
+            .proOffer(receipt.offer, presentsInSheet: true) {
+                receipt.closeOffer()
             } onUnlock: {
-                startReceipt()
+                receipt.start(for: model, isPro: true)
             }
             .fullScreenCover(isPresented: isScanningReceipt) {
                 receiptCamera

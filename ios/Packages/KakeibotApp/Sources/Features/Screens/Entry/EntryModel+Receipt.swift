@@ -18,13 +18,11 @@ public extension EntryModel {
 
     func apply(_ reading: ReceiptReading) async {
         let store = reading.store?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let sources = reading.items.map(\.name)
         let names = await rememberedNames(at: store)
         let renamed = reading.renamed(by: names)
 
         if !renamed.items.isEmpty {
             items = renamed.items
-            itemSources = sources
         }
 
         if let total = renamed.total,
@@ -47,14 +45,6 @@ public extension EntryModel {
 }
 
 extension EntryModel {
-    func alignItemSources() {
-        if itemSources.count > items.count {
-            itemSources.removeLast(itemSources.count - items.count)
-        } else if itemSources.count < items.count {
-            itemSources += Array(repeating: nil, count: items.count - itemSources.count)
-        }
-    }
-
     func finishReceipt() async {
         await rememberItemNames()
 
@@ -90,8 +80,6 @@ private extension EntryModel {
     func rememberItemNames() async {
         let store = store.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        alignItemSources()
-
         guard
             showsItems,
             !store.isEmpty
@@ -101,10 +89,10 @@ private extension EntryModel {
 
         let now = Date()
 
-        for (item, source) in zip(items, itemSources) {
+        for item in items {
             guard
-                let source,
-                item.trimmedName != source
+                let read = item.readName,
+                item.trimmedName != read
             else {
                 continue
             }
@@ -112,7 +100,7 @@ private extension EntryModel {
             do {
                 try await database.rememberItemName(
                     item.trimmedName,
-                    for: source,
+                    for: read,
                     at: store,
                     on: now
                 )

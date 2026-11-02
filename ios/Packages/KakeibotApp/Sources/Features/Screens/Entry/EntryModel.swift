@@ -55,7 +55,6 @@ public final class EntryModel {
     var allTemplates: [EntryTemplate] = []
     var appliedTemplateId: EntryTemplate.ID?
     var history: EntryList?
-    var itemSources: [String?] = []
     var isReceiptRead = false
 
     private(set) var original: Entry?
@@ -231,7 +230,6 @@ public extension EntryModel {
         keypadTarget = .amount
         memo = ""
         items = []
-        itemSources = []
         isReceiptRead = false
         tagId = nil
         billMonth = nil

@@ -91,12 +91,22 @@ public extension ReceiptReading {
         var reading = self
 
         for index in reading.items.indices {
-            if let name = names[reading.items[index].name] {
-                reading.items[index].name = name
-            }
+            let read = reading.items[index].readName ?? reading.items[index].name
+
+            reading.items[index].readName = read
+            reading.items[index].name = names[read] ?? reading.items[index].name
         }
 
         return reading
+    }
+
+    func merging(_ guessed: ReceiptReading) -> ReceiptReading {
+        ReceiptReading(
+            store: guessed.store ?? store,
+            date: date ?? guessed.date,
+            total: guessed.total ?? total,
+            items: guessed.items.isEmpty ? items : guessed.items
+        )
     }
 }
 

@@ -82,7 +82,7 @@ struct SnapshotTests {
 
         try Self.write(emptySheet, to: "entry-item-empty.png")
 
-        let help = EntryItemHelp {}
+        let help = EntryGuideCard(guide: .items) {}
             .frame(width: Self.phone.width, height: Self.phone.height)
             .background(Palette.background)
             .environment(\.colorScheme, .light)

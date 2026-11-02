@@ -3,14 +3,6 @@ import DesignSystem
 import SwiftUI
 
 extension EntrySheet {
-    enum ReceiptStep: Hashable {
-        case guide
-        case camera
-        case reading
-    }
-
-    static let receiptFeature = "4 回目からのレシートの読み取り"
-
     var showsReceiptButton: Bool {
         model.showsReceipt && EntryReceiptCamera.isSupported
     }
@@ -18,11 +10,11 @@ extension EntrySheet {
     var isScanningReceipt: Binding<Bool> {
         Binding(
             get: {
-                receiptStep == .camera
+                receipt.isScanning
             },
             set: { isScanning in
-                if !isScanning, receiptStep == .camera {
-                    receiptStep = nil
+                if !isScanning, receipt.isScanning {
+                    receipt.cancel()
                 }
             }
         )
@@ -30,27 +22,26 @@ extension EntrySheet {
 
     var receiptButton: some View {
         ChipButton("レシート", systemImage: "doc.text.viewfinder") {
-            startReceipt()
+            withAnimation(.snappy) {
+                receipt.start(for: model, isPro: isPro)
+            }
         }
     }
 
     @ViewBuilder
     var receiptLayer: some View {
-        switch receiptStep {
+        switch receipt.step {
         case .guide:
-            EntryItemHelp(
-                title: "レシートの撮り方",
-                steps: EntryItemHelp.receiptSteps,
-                buttonTitle: "撮る",
+            EntryGuideCard(
                 onConfirm: {
-                    receiptStep = .camera
+                    receipt.confirmGuide()
                 },
-                onClose: {
-                    withAnimation(.snappy) {
-                        receiptStep = nil
-                    }
+                guide: .receipt
+            ) {
+                withAnimation(.snappy) {
+                    receipt.cancel()
                 }
-            )
+            }
         case .reading:
             readingCard
         case .camera, nil:
@@ -60,38 +51,18 @@ extension EntrySheet {
 
     var receiptCamera: some View {
         EntryReceiptCamera { pages in
-            receiptStep = .reading
-
             Task {
-                await readReceipt(pages)
+                await scanReceipt(pages)
             }
         } onCancel: {
-            receiptStep = nil
+            receipt.cancel()
         }
         .ignoresSafeArea()
-    }
-
-    func startReceipt() {
-        guard model.canReadReceipt(isPro: isPro) else {
-            receiptOffer = Self.receiptFeature
-            return
-        }
-
-        receiptOffer = nil
-
-        if model.showsReceiptGuide {
-            withAnimation(.snappy) {
-                receiptStep = .guide
-            }
-        } else {
-            receiptStep = .camera
-        }
     }
 }
 
 private extension EntrySheet {
     static let readingMessage = "レシートを読んでいます"
-    static let unreadMessage = "レシートを読めませんでした。明るい所で撮り直してください"
 
     var readingCard: some View {
         ZStack {
@@ -113,21 +84,10 @@ private extension EntrySheet {
         .transition(.opacity)
     }
 
-    func readReceipt(_ pages: [CGImage]) async {
-        let reading = await EntryReceiptReader.read(pages)
+    func scanReceipt(_ pages: [CGImage]) async {
+        let readAmount = await receipt.scan(pages, into: model)
 
-        withAnimation(.snappy) {
-            receiptStep = nil
-        }
-
-        guard !reading.isEmpty else {
-            model.errorNotice.show(Self.unreadMessage)
-            return
-        }
-
-        await model.apply(reading)
-
-        if model.amount > 0 {
+        if readAmount {
             setEnteringAmount(false)
         }
     }
