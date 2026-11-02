@@ -41,6 +41,7 @@ struct SnapshotTests {
                 onAddEntry: { _ in },
                 onRetry: {},
                 onOpenSettings: {},
+                onOpenNews: {},
                 onUseTemplate: { _ in },
                 onShowAllTemplates: {},
                 onOpenOrderMenu: { _ in },

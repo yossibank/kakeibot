@@ -12,39 +12,23 @@ public struct WidgetGuideView: View {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     WidgetGuideIntroCard()
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsSectionTitle("置けるもの")
+                    homeSection
 
-                        VStack(spacing: 0) {
-                            ForEach(Self.kinds) { kind in
-                                if kind.id != Self.kinds.first?.id {
-                                    Hairline()
-                                }
+                    place(
+                        "ロック画面",
+                        sample: .lockScreen,
+                        title: "あといくら",
+                        detail: "今月あといくら使えるかを、丸・横長・1 行の形で出します",
+                        howTo: "ロック画面を長押しして「カスタマイズ」から置けます"
+                    )
 
-                                kindRow(kind)
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .card()
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsSectionTitle("ホーム画面に置く")
-
-                        VStack(spacing: 0) {
-                            ForEach(Self.steps.indices, id: \.self) { index in
-                                if index > 0 {
-                                    Hairline()
-                                }
-
-                                stepRow(number: index + 1, text: Self.steps[index])
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .card()
-
-                        SettingsCaption(Self.otherPlaces)
-                    }
+                    place(
+                        "コントロールセンター",
+                        sample: .control,
+                        title: "記録する",
+                        detail: "押すと、今日の入力シートを開きます",
+                        howTo: "コントロールセンターを開き、左上の ＋ から置けます"
+                    )
                 }
                 .padding(.vertical, 8)
             }
@@ -63,82 +47,116 @@ public struct WidgetGuideView: View {
 }
 
 private extension WidgetGuideView {
-    struct Kind: Identifiable {
-        let id: String
-        let systemImage: String
-        let title: String
-        let place: String
-        let detail: String
-    }
-
-    static let kinds = [
-        Kind(
-            id: "quickRecord",
-            systemImage: "bolt",
-            title: "すぐ記録",
-            place: "ホーム画面・中と大",
-            detail: "テンプレートを押すと、アプリを開かずに記録します"
-        ),
-        Kind(
-            id: "budget",
-            systemImage: "yensign.circle",
-            title: "あといくら",
-            place: "ホーム画面・小と中",
-            detail: "今月あといくら使えるかと、今日の支出を出します"
-        ),
-        Kind(
-            id: "budgetLock",
-            systemImage: "lock",
-            title: "あといくら",
-            place: "ロック画面",
-            detail: "今月あといくら使えるかを出します"
-        ),
-        Kind(
-            id: "recordControl",
-            systemImage: "switch.2",
-            title: "記録する",
-            place: "コントロールセンター",
-            detail: "今日の入力シートを開きます"
-        )
-    ]
+    static let sideTextWidth: CGFloat = 150
 
     static let steps = [
         "ホーム画面の空いた所を長押しします",
         "左上の「編集」から「ウィジェットを追加」を選びます",
         "「かけいぼっと」を選び、置きたいものを選びます"
     ]
+}
 
-    static let otherPlaces = "ロック画面は、ロック画面を長押しして「カスタマイズ」から置けます。コントロールセンターは、開いて左上の ＋ から置けます。"
+private extension WidgetGuideView {
+    var homeSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionTitle("ホーム画面")
 
-    func kindRow(_ kind: Kind) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: kind.systemImage)
-                .sansFont(.body, weight: .light)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 22)
+            VStack(alignment: .leading, spacing: 16) {
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .center, spacing: 14) {
+                        WidgetGuideSample(kind: .budget)
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(kind.title)
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.text)
+                        budgetExplanation
+                            .frame(minWidth: Self.sideTextWidth)
+                    }
 
-                    Text(kind.place)
+                    VStack(alignment: .leading, spacing: 10) {
+                        WidgetGuideSample(kind: .budget)
+
+                        budgetExplanation
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    WidgetGuideSample(kind: .quickRecord)
+
+                    explanation(
+                        title: "すぐ記録",
+                        size: "中・大",
+                        detail: "テンプレートを押すと、アプリを開かずにその場で記録します。鉛筆の印のものは、入力シートで金額を入れます"
+                    )
+                }
+
+                Hairline()
+
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(Self.steps.indices, id: \.self) { index in
+                        stepRow(number: index + 1, text: Self.steps[index])
+                    }
+                }
+            }
+            .padding(16)
+            .card()
+        }
+    }
+
+    var budgetExplanation: some View {
+        explanation(
+            title: "あといくら",
+            size: "小・中",
+            detail: "今月あといくら使えるかと、今日の支出を出します。中では今週の支出と次の固定費も並べます"
+        )
+    }
+
+    func place(
+        _ name: String,
+        sample: WidgetGuideSample.Kind,
+        title: String,
+        detail: String,
+        howTo: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionTitle(name)
+
+            VStack(alignment: .leading, spacing: 12) {
+                WidgetGuideSample(kind: sample)
+
+                explanation(title: title, size: nil, detail: detail)
+
+                Label(howTo, systemImage: "hand.tap")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.accent)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(16)
+            .card()
+        }
+    }
+
+    func explanation(
+        title: String,
+        size: String?,
+        detail: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(title)
+                    .textFont(.subheadline, weight: .semibold)
+                    .foregroundStyle(Palette.text)
+
+                if let size {
+                    Text(size)
                         .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                 }
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-
-                Text(kind.detail)
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
             }
 
-            Spacer(minLength: 0)
+            Text(detail)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     func stepRow(
@@ -159,7 +177,7 @@ private extension WidgetGuideView {
 
             Spacer(minLength: 0)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, 8)
     }
 }
 

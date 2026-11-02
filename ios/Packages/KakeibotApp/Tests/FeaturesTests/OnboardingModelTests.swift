@@ -28,6 +28,7 @@ struct OnboardingModelTests {
         let title = model.nextTitle
         let finished = await model.finish()
         let completed = try await setup.database.setting(.onboardingCompleted)
+        let seenNews = try await setup.database.setting(.whatsNewSeenVersion)
 
         #expect(first)
         #expect(!locked)
@@ -38,6 +39,7 @@ struct OnboardingModelTests {
         #expect(title == "はじめる")
         #expect(finished)
         #expect(completed)
+        #expect(seenNews == WhatsNewRelease.latestVersion)
     }
 
     @Test

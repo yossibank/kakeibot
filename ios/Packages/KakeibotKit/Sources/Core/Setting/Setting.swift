@@ -53,6 +53,7 @@ public extension Setting {
         case transferInCategoryId = "transfer_in_category_id"
         case backupExportedAt = "backup_exported_at"
         case reviewRequestedVersion = "review_requested_version"
+        case whatsNewSeenVersion = "whats_new_seen_version"
     }
 }
 

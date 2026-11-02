@@ -26,6 +26,8 @@ public struct ProView: View {
                 VStack(alignment: .leading, spacing: 28) {
                     header
 
+                    section("記録", features: Self.recordFeatures)
+
                     section("同期と共有", features: Self.syncFeatures)
 
                     section("見た目", features: Self.lookFeatures)
@@ -73,7 +75,7 @@ public struct ProView: View {
 
 private extension ProView {
     struct Feature: Identifiable {
-        let systemImage: String
+        let art: FeatureArt.Kind
         let title: String
         let text: String
 
@@ -115,26 +117,18 @@ private extension ProView {
         VStack(alignment: .leading, spacing: 8) {
             SettingsSectionTitle(title)
 
-            VStack(spacing: 0) {
+            VStack(spacing: 12) {
                 ForEach(features) { feature in
-                    if feature.id != features.first?.id {
-                        Hairline()
-                    }
-
-                    row(feature)
+                    card(feature)
                 }
             }
-            .padding(.horizontal, 16)
-            .card()
         }
     }
 
-    func row(_ feature: Feature) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Image(systemName: feature.systemImage)
-                .sansFont(.small, weight: .medium)
-                .foregroundStyle(Palette.accent)
-                .frame(width: 24)
+    func card(_ feature: Feature) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            FeatureArt(kind: feature.art)
+                .frame(height: Self.artHeight)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(feature.title)
@@ -146,22 +140,32 @@ private extension ProView {
                     .foregroundStyle(Palette.subtext)
                     .fixedSize(horizontal: false, vertical: true)
             }
-
-            Spacer(minLength: 0)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.vertical, 14)
+        .padding(14)
+        .card()
     }
 }
 
 private extension ProView {
+    static let artHeight: CGFloat = 112
+
+    static let recordFeatures = [
+        Feature(
+            art: .receipt,
+            title: "レシートの読み取り",
+            text: "無料では 3 回までです。Pro なら回数を気にせず、撮ったレシートから品目・合計・日付・店名を読めます"
+        )
+    ]
+
     static let syncFeatures = [
         Feature(
-            systemImage: "icloud",
+            art: .sync,
             title: "端末間の同期",
             text: "自分の iPhone どうしで、記録と設定をそろえます"
         ),
         Feature(
-            systemImage: "person.2",
+            art: .share,
             title: "家族との共有",
             text: "口座を共有して、一緒に記録できます。招待された人は Pro が無くても使えます"
         )
@@ -169,12 +173,12 @@ private extension ProView {
 
     static let lookFeatures = [
         Feature(
-            systemImage: "paintpalette",
+            art: .theme,
             title: "テーマを作る",
             text: "色を選んで、自分だけのテーマを作れます"
         ),
         Feature(
-            systemImage: "textformat",
+            art: .fonts,
             title: "4 つの字体",
             text: "丸ゴシック・手書き・ドット・ポップの字体を使えます"
         )

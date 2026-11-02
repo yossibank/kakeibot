@@ -92,6 +92,29 @@ extension MainView {
         }
     }
 
+    func openNews() {
+        sheet = .whatsNew(seenVersion: setup.seenNewsVersion)
+
+        Task {
+            await setup.markNewsSeen()
+        }
+    }
+
+    func tryFeature(_ action: WhatsNewRelease.Action) {
+        Task {
+            sheet = nil
+            try? await Task.sleep(for: Self.sheetCloseDuration)
+
+            switch action {
+            case .entry:
+                tab = .home
+                sheet = .new
+            case let .setup(item):
+                sheet = .setup(item)
+            }
+        }
+    }
+
     func useTemplate(_ template: EntryTemplate) {
         guard template.amount != nil else {
             sheet = .template(template)

@@ -12,10 +12,12 @@ public final class SetupModel: ScreenModel {
     public private(set) var launchScreen: LaunchScreen = .home
     public private(set) var theme: ThemeChoice = .system
     public private(set) var customThemes: [Theme] = []
+    public private(set) var seenNewsVersion: String?
 
     public internal(set) var errorNotice = ErrorNotice()
 
     private var isCardClosedLoaded = false
+    private var isNewsLoaded = false
 
     private let database: AppDatabase
 
@@ -43,6 +45,10 @@ public extension SetupModel {
 
     var themeTitle: String {
         theme.title(in: customThemes)
+    }
+
+    var hasUnreadNews: Bool {
+        isNewsLoaded && AppVersion.isNewer(WhatsNewRelease.latestVersion, than: seenNewsVersion)
     }
 
     func isDone(_ item: SetupItem) -> Bool {
@@ -74,6 +80,26 @@ public extension SetupModel {
             group.addTask {
                 await self.observeCustomThemes()
             }
+
+            group.addTask {
+                await self.observeSeenNews()
+            }
+        }
+    }
+
+    func markNewsSeen() async {
+        let version = WhatsNewRelease.latestVersion
+
+        guard seenNewsVersion != version else {
+            return
+        }
+
+        seenNewsVersion = version
+
+        do {
+            try await database.setSetting(.whatsNewSeenVersion, to: version)
+        } catch {
+            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -149,6 +175,16 @@ private extension SetupModel {
             failure: Self.loadFailedMessage
         ) { themes in
             customThemes = themes
+        }
+    }
+
+    func observeSeenNews() async {
+        await observe(
+            database.settingUpdates(.whatsNewSeenVersion),
+            failure: Self.loadFailedMessage
+        ) { version in
+            seenNewsVersion = version
+            isNewsLoaded = true
         }
     }
 

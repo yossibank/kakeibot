@@ -126,6 +126,7 @@ public extension OnboardingModel {
 
     func finish() async -> Bool {
         do {
+            try await database.setSetting(.whatsNewSeenVersion, to: WhatsNewRelease.latestVersion)
             try await database.setSetting(.onboardingCompleted, to: true)
             return true
         } catch {

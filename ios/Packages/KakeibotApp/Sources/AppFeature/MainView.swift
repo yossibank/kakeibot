@@ -116,6 +116,7 @@ struct MainView: View {
                     onOpenSettings: {
                         sheet = .settings
                     },
+                    onOpenNews: openNews,
                     onUseTemplate: useTemplate,
                     onShowAllTemplates: {
                         sheet = .templates

@@ -17,6 +17,7 @@ extension MainView {
         case periodRecurrings
         case setup(SetupItem)
         case reward
+        case whatsNew(seenVersion: String?)
 
         var id: Self {
             self
@@ -97,6 +98,8 @@ extension MainView {
             }
         case .reward:
             RecordsRewardSheet(model: records, date: today)
+        case let .whatsNew(seenVersion):
+            WhatsNewSheet(seenVersion: seenVersion, onTry: tryFeature)
         case .periodRecurrings:
             PeriodRecurringSheet(
                 model: home,

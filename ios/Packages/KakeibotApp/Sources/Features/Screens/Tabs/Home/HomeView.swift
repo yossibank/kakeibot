@@ -29,6 +29,7 @@ public struct HomeView: View {
     private let onAddEntry: (LocalDate) -> Void
     private let onRetry: () -> Void
     private let onOpenSettings: () -> Void
+    private let onOpenNews: () -> Void
     private let onDeleteEntry: (Entry.ID) -> Void
 
     public init(
@@ -41,6 +42,7 @@ public struct HomeView: View {
         onAddEntry: @escaping (LocalDate) -> Void,
         onRetry: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
+        onOpenNews: @escaping () -> Void,
         onUseTemplate: @escaping (EntryTemplate) -> Void,
         onShowAllTemplates: @escaping () -> Void,
         onOpenOrderMenu: @escaping (CGRect) -> Void,
@@ -60,6 +62,7 @@ public struct HomeView: View {
         self.onAddEntry = onAddEntry
         self.onRetry = onRetry
         self.onOpenSettings = onOpenSettings
+        self.onOpenNews = onOpenNews
         self.onUseTemplate = onUseTemplate
         self.onShowAllTemplates = onShowAllTemplates
         self.onOpenOrderMenu = onOpenOrderMenu
@@ -127,7 +130,21 @@ private extension HomeView {
 
             Spacer()
 
-            HeaderButton(systemImage: "gearshape", action: onOpenSettings)
+            HStack(spacing: 8) {
+                HeaderButton(systemImage: "bell", action: onOpenNews)
+                    .overlay(alignment: .topTrailing) {
+                        if setup.hasUnreadNews {
+                            Circle()
+                                .fill(Palette.rose)
+                                .frame(width: 9, height: 9)
+                                .offset(x: -3, y: 5)
+                                .transition(.scale.combined(with: .opacity))
+                        }
+                    }
+                    .animation(.snappy, value: setup.hasUnreadNews)
+
+                HeaderButton(systemImage: "gearshape", action: onOpenSettings)
+            }
         }
     }
 
