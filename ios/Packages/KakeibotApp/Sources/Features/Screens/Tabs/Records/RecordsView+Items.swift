@@ -83,13 +83,11 @@ private struct ReceiptEmerge: ViewModifier {
                 y: Self.start.height + (1 - Self.start.height) * progress,
                 anchor: .topLeading
             )
-            .offset(y: Self.toggleOffset * (1 - progress))
     }
 }
 
 private extension ReceiptEmerge {
-    static let start = CGSize(width: 0.3, height: 0.08)
-    static let toggleOffset: CGFloat = -18
+    static let start = CGSize(width: 0.35, height: 0)
 }
 
 private extension AnyTransition {
