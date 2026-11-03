@@ -5,7 +5,7 @@ import Store
 import Testing
 
 @MainActor
-struct TransferEntryTests {
+struct EntryModelTransferTests {
     @Test
     func startsWithTwoDifferentWallets() async throws {
         let setup = try await Setup()
@@ -292,7 +292,7 @@ struct TransferEntryTests {
     }
 }
 
-extension TransferEntryTests {
+extension EntryModelTransferTests {
     struct Setup {
         let database: AppDatabase
         let date: LocalDate
@@ -302,7 +302,7 @@ extension TransferEntryTests {
     }
 }
 
-extension TransferEntryTests.Setup {
+extension EntryModelTransferTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let date = try #require(LocalDate("2026-10-12"))

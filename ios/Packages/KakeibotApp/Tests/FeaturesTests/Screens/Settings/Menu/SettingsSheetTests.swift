@@ -5,7 +5,7 @@ import SwiftUI
 import Testing
 
 @MainActor
-struct SettingsSheetTypeTests {
+struct SettingsSheetTests {
     static let limit = 14
 
     @Test
@@ -37,7 +37,7 @@ struct SettingsSheetTypeTests {
     }
 }
 
-extension SettingsSheetTypeTests {
+extension SettingsSheetTests {
     static func depth(of value: some Any) -> Int {
         var current = 0
         var deepest = 0

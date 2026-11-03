@@ -37,4 +37,30 @@ struct TemplateListModelTests {
         #expect(model.hidden.isEmpty)
         #expect(model.shown.map(\.id) == [saved.id])
     }
+
+    @Test
+    func describesAndReordersTemplates() async throws {
+        let setup = try await TemplateSetup()
+        try await setup.saveTemplate(name: "ランチ", amount: 980)
+        try await setup.saveTemplate(name: "給料", amount: nil, type: .income)
+        let pass = try await setup.saveTemplate(name: "定期", amount: nil)
+        let model = TemplateListModel(database: setup.database)
+        await model.load()
+        let first = try #require(model.shown.first)
+        let detail = model.detail(for: first)
+
+        model.move(pass.id, to: 0)
+        let moving = model.shown.map(\.name)
+        await model.finishMoving()
+        let stored = try await setup.database.templates()
+
+        model.type = .income
+        let income = model.shown.map(\.name)
+
+        #expect(detail == "日用品・財布")
+        #expect(moving == ["定期", "ランチ"])
+        #expect(stored.map(\.name) == ["定期", "ランチ", "給料"])
+        #expect(income == ["給料"])
+        #expect(model.movingOrder == nil)
+    }
 }

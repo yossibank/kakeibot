@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct SettingsOption: View {
+struct LaunchScreenOption: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let title: String
@@ -64,7 +64,7 @@ struct SettingsOption: View {
     }
 }
 
-private extension SettingsOption {
+private extension LaunchScreenOption {
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(20))
     }

@@ -33,19 +33,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `spec/` | `export-format.md`、`fixtures.md`、`fixtures/` |
 | `spec/fixtures/` | フォルダ名は、Core のフォルダ名の小文字にそろえる |
 | `.claude/rules/` | spec の文書の役割 |
-| `.claude/snapshots/widget/` | `ui-snapshot` で描くウィジェットの場合。あといくらの小・中、ロック画面の丸・横長・1 行 |
-| `.claude/snapshots/recent-transfers/` | `ui-snapshot` で描く、入力シートの最近の振替の行。長い口座名、手数料の有無 |
-| `.claude/snapshots/entry-sheet/` | `ui-snapshot` で描く入力シートの全体（支出・振替）。カテゴリの格子は描かれない |
-| `.claude/snapshots/records/` | `ui-snapshot` で描く記録のタブ。カレンダーと一覧 |
-| `.claude/snapshots/review/` | `ui-snapshot` で描く振り返りのタブ |
-| `.claude/snapshots/assets/` | `ui-snapshot` で描く資産のタブ |
-| `.claude/snapshots/home/` | `ui-snapshot` で描くホームのタブ |
-| `.claude/snapshots/settings/` | `ui-snapshot` で描く設定。メニュー・口座・ごほうび・記録忘れの通知 |
-| `.claude/snapshots/theme-style/` | `ui-snapshot` で描く、「文字」と「形と動き」の画面の見本 |
-| `.claude/snapshots/home-sections/` | `ui-snapshot` で描く、ホームの並べ替え |
-| `.claude/snapshots/parts/` | `ui-snapshot` で描く、カレンダー・タグ・テンプレートのカード |
-| `.claude/snapshots/entry-wallet/` | `ui-snapshot` で描く、入力シートの口座を選ぶシート |
-| `.claude/snapshots/entry-wallet-edit/` | `ui-snapshot` で描く、口座を選ぶシートの編集中 |
+| `.claude/snapshots/` | `ui-snapshot` で描くセット。名前は描く場所（`tabs-`・`entry-`・`settings-`・`components`・`widget`・`store`）で始める |
 | `.claude/snapshots/store/` | `store/screenshots/raw/` の画面に文言を重ね、ストアのスクリーンショットを描く |
 | `store/ja/` | App Store の掲載情報の文と URL |
 | `store/screenshots/` | ストアに出すスクリーンショット。6.9 インチは `6.9/`、6.3 インチは `6.3/`、元の画面は `raw/` |
@@ -214,11 +202,13 @@ KakeibotApp/
 │   │   │   ├── Tabs/
 │   │   │   └── WhatsNew/
 │   │   └── Shared/
+│   │       ├── EntryList/
 │   │       ├── FeatureArt/
 │   │       ├── Model/
 │   │       ├── Notice/
 │   │       ├── Notification/
 │   │       ├── Period/
+│   │       ├── Placeholder/
 │   │       ├── Pro/
 │   │       ├── SettingsParts/
 │   │       ├── Setup/
@@ -244,11 +234,13 @@ KakeibotApp/
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート |
+| `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro の画面で機能を見せる絵の部品（レシート・伝票・iPhone の枠・見本のデータ）。絵を幅に合わせて縮める枠も置く |
-| `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み |
-| `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、記録が無いときと読み込めないときの表示、保存の失敗が空き容量不足かの見分け |
-| `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |
+| `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、アプリの版 |
+| `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、保存の失敗が空き容量不足かの見分け |
 | `Features/Shared/Notification/` | 通知の許可の窓口と、許可が無いときの帯 |
+| `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |
+| `Features/Shared/Placeholder/` | 記録が無いときと読み込めないときの表示 |
 | `Features/Shared/Pro/` | Pro を買ったかの状態と、止めた場所で下に出すカード。StoreKit の中身は AppFeature が渡す |
 | `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |

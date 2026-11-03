@@ -4,7 +4,7 @@ import Foundation
 import Store
 import Testing
 
-extension TransferEntryTests {
+extension EntryModelTransferTests {
     @Test
     func keepsHiddenWalletsWhenEditing() async throws {
         let setup = try await Setup()
