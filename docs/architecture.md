@@ -78,7 +78,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 ## 📦 パッケージ
 
-2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/`・`Sync`・`TestSupport` を足している。`Core/` は `Concepts/` と `Shared/` の 2 段に分けている。
+2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/`・`Sync`・`TestSupport` を足している。
 
 依存の向きは、共通の形に次の 2 本を足したものである。
 
@@ -262,18 +262,8 @@ KakeibotApp/
 
 フォルダとファイルの名前は、共通の形の「名前の決まり」と `rules/swift-core.md` に従う。Migrations のファイルと型は、3 桁の通し番号で付ける。fixtures は `Core/Concepts/` のフォルダ名を小文字にして置く。
 
-共通の部品は、機能のフォルダと同じ階層に置かない。1 段上で機能の束と並べ、`Shared/` と名付ける。
-
-| 機能の束 | 共通 |
-| --- | --- |
-| `Core/Concepts/` | `Core/Shared/` |
-| `Features/Screens/` | `Features/Shared/` |
-| `AppWidget/Widgets/` | `AppWidget/Shared/` |
-
 画面の組み立てと通知とウィジェットの方式は、[architecture-screens](architecture-screens.md) にある。
 
 ## 🧪 テスト
 
 テストの形は、共通の形に `SyncTests` と `AppWidgetTests` を足したものである。Core のテストは、fixtures を全部通す。
-
-`CoreTests` と `FeaturesTests` は、機能の束の下をソースと同じフォルダに分ける。`Shared/` は分けない。
