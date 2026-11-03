@@ -26,6 +26,7 @@ struct MainView: View {
     @State private var observationRound = 0
     @State private var foreground = ForegroundReturn()
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
 
     let database: AppDatabase
@@ -231,13 +232,27 @@ struct MainView: View {
                 .tabContent()
             }
         }
+        .overlay(alignment: .leading) {
+            if hasSidebar {
+                SideTabBar(
+                    selection: $tab,
+                    title: "かけいぼっと",
+                    items: Self.tabItems,
+                    isAddHinted: !setup.isEntryOpened
+                ) {
+                    sheet = .new
+                }
+            }
+        }
         .overlay(alignment: .bottom) {
-            FloatingTabBar(
-                selection: $tab,
-                items: Self.tabItems,
-                isAddHinted: !setup.isEntryOpened
-            ) {
-                sheet = .new
+            if !hasSidebar {
+                FloatingTabBar(
+                    selection: $tab,
+                    items: Self.tabItems,
+                    isAddHinted: !setup.isEntryOpened
+                ) {
+                    sheet = .new
+                }
             }
         }
         .overlay {
@@ -253,14 +268,8 @@ struct MainView: View {
                 .transition(.opacity)
             }
         }
-        .entryNotice(notice, above: FloatingTabBar<Int>.height)
-        .deletionNotice($undo.deletion, bottom: Self.noticeBottom) { deletion in
-            Task {
-                await undo.restore(deletion)
-            }
-        }
-        .errorBanner(undo.errorNotice, bottom: Self.noticeBottom) {
-            undo.errorNotice.clear()
+        .overlay {
+            notices
         }
         .background {
             if isWarmingEntry {
@@ -342,7 +351,17 @@ extension MainView {
         case assets
     }
 
-    static let noticeBottom = FloatingTabBar<Int>.height + 24
+    static func hasSidebar(_ sizeClass: UserInterfaceSizeClass?) -> Bool {
+        sizeClass == .regular
+    }
+
+    static func noticeLeading(hasSidebar: Bool) -> CGFloat {
+        hasSidebar ? SideTabBar<Int>.width : 0
+    }
+
+    static func noticeBottom(hasSidebar: Bool) -> CGFloat {
+        hasSidebar ? 12 : FloatingTabBar<Int>.height + 24
+    }
 }
 
 private extension MainView {
@@ -357,6 +376,23 @@ private extension MainView {
 }
 
 private extension MainView {
+    var notices: some View {
+        let noticeAbove = hasSidebar ? 0 : FloatingTabBar<Int>.height
+        let noticeBottom = Self.noticeBottom(hasSidebar: hasSidebar)
+
+        return Color.clear
+            .padding(.leading, Self.noticeLeading(hasSidebar: hasSidebar))
+            .entryNotice(notice, above: noticeAbove)
+            .deletionNotice($undo.deletion, bottom: noticeBottom) { deletion in
+                Task {
+                    await undo.restore(deletion)
+                }
+            }
+            .errorBanner(undo.errorNotice, bottom: noticeBottom) {
+                undo.errorNotice.clear()
+            }
+    }
+
     var entryWarmup: some View {
         EntrySheet(model: draft)
             .opacity(0)
@@ -372,12 +408,30 @@ private extension MainView {
     var isLaunchReady: Bool {
         isRevealed && launchScreen != nil
     }
+
+    var hasSidebar: Bool {
+        Self.hasSidebar(horizontalSizeClass)
+    }
 }
 
 private extension View {
     func tabContent() -> some View {
-        toolbar(.hidden, for: .tabBar)
-            .safeAreaPadding(.bottom, FloatingTabBar<Int>.clearance)
+        modifier(TabContent())
+    }
+}
+
+private struct TabContent: ViewModifier {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    func body(content: Content) -> some View {
+        let hasSidebar = MainView.hasSidebar(horizontalSizeClass)
+        let leading = hasSidebar ? SideTabBar<Int>.width : 0
+        let bottom = hasSidebar ? 0 : FloatingTabBar<Int>.clearance
+
+        content
+            .toolbar(.hidden, for: .tabBar)
+            .safeAreaPadding(.leading, leading)
+            .safeAreaPadding(.bottom, bottom)
     }
 }
 

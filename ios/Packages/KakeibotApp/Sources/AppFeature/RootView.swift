@@ -17,14 +17,19 @@ public struct RootView: View {
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     public init() {}
 
     public var body: some View {
         ZStack {
             content
-                .errorBanner(model.notice, bottom: noticeBottom) {
-                    model.notice.clear()
+                .overlay {
+                    Color.clear
+                        .padding(.leading, MainView.noticeLeading(hasSidebar: hasSidebar))
+                        .errorBanner(model.notice, bottom: noticeBottom) {
+                            model.notice.clear()
+                        }
                 }
 
             if isLaunching {
@@ -151,9 +156,16 @@ private extension RootView {
         }
     }
 
+    var hasSidebar: Bool {
+        switch model.launch {
+        case .ready: MainView.hasSidebar(horizontalSizeClass)
+        case .opening, .onboarding, .failed: false
+        }
+    }
+
     var noticeBottom: CGFloat {
         switch model.launch {
-        case .ready: MainView.noticeBottom
+        case .ready: MainView.noticeBottom(hasSidebar: hasSidebar)
         case .opening, .onboarding, .failed: 12
         }
     }
