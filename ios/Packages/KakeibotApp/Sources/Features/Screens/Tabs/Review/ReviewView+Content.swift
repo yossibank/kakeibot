@@ -4,7 +4,7 @@ import SwiftUI
 
 extension ReviewView {
     var content: some View {
-        VStack(spacing: 12) {
+        TwoColumnLayout(spacing: 12) {
             HStack(spacing: 8) {
                 ForEach(ReviewKind.allCases, id: \.self) { kind in
                     kindTile(kind)
@@ -32,6 +32,7 @@ extension ReviewView {
                     }
                     .padding(16)
                     .card()
+                    .layoutColumn(.trailing)
                 } else {
                     ReviewSharesCard(
                         title: "カテゴリごと",
@@ -45,6 +46,7 @@ extension ReviewView {
                             openShare = share
                         }
                     )
+                    .layoutColumn(.trailing)
 
                     ReviewSharesCard(
                         title: "口座ごと",
@@ -55,6 +57,7 @@ extension ReviewView {
                             openShare = share
                         }
                     )
+                    .layoutColumn(.trailing)
                 }
             }
 
@@ -65,6 +68,7 @@ extension ReviewView {
                     openStamp = tally
                 }
             )
+            .layoutColumn(.trailing)
         }
     }
 }

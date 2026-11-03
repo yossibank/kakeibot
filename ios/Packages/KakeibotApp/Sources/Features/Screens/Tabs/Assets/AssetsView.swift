@@ -41,30 +41,34 @@ public struct AssetsView: View {
             VStack(spacing: 12) {
                 header
 
-                totalCard
+                TwoColumnLayout(spacing: 12) {
+                    totalCard
 
-                if !model.upcomingBills.isEmpty {
-                    billCard
+                    if !model.upcomingBills.isEmpty {
+                        billCard
+                    }
+
+                    if !ownedSections.isEmpty {
+                        walletGroup(
+                            "資産",
+                            systemImage: "yensign",
+                            sections: ownedSections
+                        )
+                        .layoutColumn(.trailing)
+                    }
+
+                    if !owedSections.isEmpty {
+                        walletGroup(
+                            "負債",
+                            systemImage: "arrow.uturn.backward",
+                            sections: owedSections
+                        )
+                        .layoutColumn(.trailing)
+                    }
+
+                    rewardCard
+                        .padding(.top, 12)
                 }
-
-                if !ownedSections.isEmpty {
-                    walletGroup(
-                        "資産",
-                        systemImage: "yensign",
-                        sections: ownedSections
-                    )
-                }
-
-                if !owedSections.isEmpty {
-                    walletGroup(
-                        "負債",
-                        systemImage: "arrow.uturn.backward",
-                        sections: owedSections
-                    )
-                }
-
-                rewardCard
-                    .padding(.top, 12)
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
