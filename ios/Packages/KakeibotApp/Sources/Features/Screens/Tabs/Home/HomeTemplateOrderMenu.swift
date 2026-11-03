@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-public struct TemplateOrderMenu: View {
+public struct HomeTemplateOrderMenu: View {
     @Binding private var selection: TemplateOrder
 
     private let anchor: CGRect
@@ -55,7 +55,7 @@ public struct TemplateOrderMenu: View {
     }
 }
 
-private extension TemplateOrderMenu {
+private extension HomeTemplateOrderMenu {
     static let width: CGFloat = 248
     static let inset: CGFloat = 16
 

@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 import SwiftUI
 
-public struct PeriodRecurringSheet: View {
+public struct HomeRecurringSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     private let model: HomeModel
@@ -43,7 +43,7 @@ public struct PeriodRecurringSheet: View {
     }
 }
 
-private extension PeriodRecurringSheet {
+private extension HomeRecurringSheet {
     var header: some View {
         ZStack {
             SheetTitle("今月の固定費")
@@ -276,7 +276,7 @@ private extension PeriodRecurringSheet {
     }
 }
 
-private extension PeriodRecurringSheet {
+private extension HomeRecurringSheet {
     var items: [PeriodRecurring] {
         model.periodRecurrings
     }

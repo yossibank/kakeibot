@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class RecordResetModel {
+public final class SettingsResetModel {
     public private(set) var count = 0
     public private(set) var hasSharedWallets = false
 
@@ -19,7 +19,7 @@ public final class RecordResetModel {
     }
 }
 
-public extension RecordResetModel {
+public extension SettingsResetModel {
     func prepare() async -> Bool {
         do {
             count = try await database.deletableRecordCount()
@@ -62,7 +62,7 @@ public extension RecordResetModel {
     }
 }
 
-private extension RecordResetModel {
+private extension SettingsResetModel {
     static let emptyMessage = "削除する記録はありません"
     static let deletedMessage = "記録をすべて削除しました"
     static let loadFailedMessage = "記録の件数を読み込めませんでした"

@@ -5,7 +5,7 @@ import SwiftUI
 extension HomeView {
     var templateCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            TemplateHeaderLayout(spacing: 8) {
+            HomeTemplateHeaderLayout(spacing: 8) {
                 SectionTitle("テンプレート")
 
                 CapsulePicker(

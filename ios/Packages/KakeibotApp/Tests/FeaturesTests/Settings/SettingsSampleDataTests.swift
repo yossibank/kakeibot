@@ -5,7 +5,7 @@ import Foundation
 import Store
 import Testing
 
-struct SampleDataTests {
+struct SettingsSampleDataTests {
     @Test
     func insertsMonthsOfData() async throws {
         let database = try AppDatabase.inMemory()
@@ -13,12 +13,12 @@ struct SampleDataTests {
         try database.insertDefaultsIfEmpty(at: now)
         let today = try #require(LocalDate("2026-10-17"))
 
-        try await SampleData.insert(into: database, today: today, now: now)
+        try await SettingsSampleData.insert(into: database, today: today, now: now)
         let snapshot = try database.snapshot()
         let types = Set(snapshot.entries.map(\.type))
         let dates = snapshot.entries.map(\.date)
         let noSpendDays = Set(snapshot.noSpendDays.map(\.date))
-        let start = today.adding(days: -SampleData.dayCount)
+        let start = today.adding(days: -SettingsSampleData.dayCount)
         let spentDays = Set(snapshot.entries.filter { $0.type == .expense }.map(\.date))
 
         #expect(snapshot.entries.count > 250)

@@ -1,7 +1,7 @@
 # 画面の組み立て
 
 > [!NOTE]
-> 画面をどう組み立て、保存した変更をどう画面へ届けるかが分かる。通知とウィジェットの方式もここにある。
+> 画面をどう組み立て、保存した変更をどう画面へ届けるかが分かる。通知とウィジェットの方式と、画面のフォルダもここにある。
 > 全体の構成は [architecture](architecture.md) にある。
 
 ## 📱 画面の組み立て
@@ -99,3 +99,36 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 | すぐ記録の反映 | アプリを前面に戻すと、書いた記録が画面に出る |
 | DB のファイル保護 | `NSFileProtectionCompleteUntilFirstUserAuthentication` にそろえる。ロック中も、ロック画面のウィジェットが金額を出す |
 | DB のバックアップ | App Group の DB は、端末の iCloud バックアップに含まれる |
+
+## 📂 画面とフォルダ
+
+画面のフォルダは、Pro のほかは `Features/Screens/` の下にある。
+
+| 画面 | フォルダ |
+| --- | --- |
+| ホーム | `Tabs/Home/` |
+| 記録 | `Tabs/Records/` |
+| 振り返り | `Tabs/Review/` |
+| 資産 | `Tabs/Assets/` |
+| 入力シート | `Entry/` |
+| 設定（入口） | `Settings/Menu/` |
+| 口座 | `Settings/Wallets/` |
+| カテゴリ | `Settings/Categories/` |
+| テンプレート | `Settings/Templates/` |
+| 予算 | `Settings/Budgets/` |
+| 固定費 | `Settings/Recurring/` |
+| 月の始まり | `Settings/MonthStartDay/` |
+| スタンプ | `Settings/Stamps/` |
+| ごほうびの決まり | `Settings/Rewards/` |
+| ホームに出すもの | `Settings/HomeSections/` |
+| 起動時に開く画面 | `Settings/Launch/` |
+| 記録忘れの通知 | `Settings/Reminder/` |
+| テーマ | `Settings/Themes/` |
+| アプリアイコン | `Settings/AppIcons/` |
+| 文字・形と動き | `Settings/ThemeStyle/` |
+| 同期と共有 | `Settings/Sync/` |
+| バックアップ | `Settings/Backup/` |
+| ウィジェットの置き方 | `Settings/Widgets/` |
+| お知らせ | `WhatsNew/` |
+| 最初の設定 | `Onboarding/` |
+| Pro | `Features/Shared/Pro/` |

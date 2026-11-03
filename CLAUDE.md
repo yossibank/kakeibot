@@ -29,7 +29,7 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 
 | 作業 | 先に読む | 終えたら直す |
 | --- | --- | --- |
-| 機能・画面を足す | [overview](docs/overview.md)、[roadmap](docs/roadmap.md) | overview、roadmap |
+| 機能・画面を足す | [overview](docs/overview.md)、[roadmap](docs/roadmap.md) | overview、roadmap、architecture-screens の「画面とフォルダ」 |
 | ターゲット・依存・フォルダを変える、ファイルを足す・名前を変える | [architecture](docs/architecture.md) | architecture |
 | 画面の組み立て・見張り・通知とウィジェットの流れを変える | [architecture-screens](docs/architecture-screens.md) | architecture-screens |
 | 表の形を変える | [data](docs/data.md)、[data-settings](docs/data-settings.md)、[data-sync](docs/data-sync.md) | 変えた表の文書。書き出しに響くなら export-format も |

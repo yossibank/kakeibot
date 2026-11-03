@@ -53,7 +53,7 @@ struct SnapshotTests {
                 onOpenDay: { _ in }
             )
 
-            let sheet = PeriodRecurringSheet(model: model) { _ in }
+            let sheet = HomeRecurringSheet(model: model) { _ in }
 
             try Self.write(view, variant: variant, to: "home")
             try Self.write(sheet, variant: variant, to: "home-recurring")
@@ -98,7 +98,7 @@ private extension SnapshotTests {
         let database = try AppDatabase.inMemory()
 
         try database.insertDefaultsIfEmpty(at: now)
-        try await SampleData.insert(into: database, today: today, now: now)
+        try await SettingsSampleData.insert(into: database, today: today, now: now)
 
         let walletDraft = WalletDraft(
             kind: .bank,
