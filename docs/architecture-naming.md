@@ -6,7 +6,7 @@
 
 ## 📏 名前の決まり
 
-フォルダとファイルの名前は、共通の形の「名前の決まり」と `rules/swift-core.md` に従う。ほかに、次の決まりを足す。
+共通の決まりは、claude-config の `docs/architecture-ios-naming.md` にある。Swift のファイルは `rules/swift-core.md` に従う。ここには、次の決まりを足す。
 
 | 対象 | 決まり |
 | --- | --- |
@@ -15,17 +15,8 @@
 | `Features/Screens/Settings/` | 子フォルダが 20 を超えたら、下の表の領域の子フォルダでまとめる |
 | 設定の一覧の画面 | 型は `<単数>ListModel`・`<単数>ListView` にする |
 | `Features/Shared/SettingsParts/` | ファイルの頭に `Settings` を付ける。Core の型の拡張（`<型>+<役割>`）は除く |
-| `AppWidget/Intents/` | ウィジェットとコントロールの AppIntent を、すべてここに置く。頭に、使うウィジェットの名前を付ける |
-| `AppWidget/Widgets/` | コントロールも、ファイルが 1 つでも、ウィジェットと同じくフォルダを分ける。コントロールの `kind` の文字列は変えない |
-| `Store/Writes/Methods/`・`Store/Queries/Methods/` | `+` の後ろは、Core の型の名前のまま書く（`AppDatabase+EntryTag`） |
-| `Store/Records/` | 行の型の拡張は `Rows/`、行の型が従うプロトコルは `Protocols/` に置く |
-
-DesignSystem の `Components/` の子フォルダは、種類と題材の 2 通りがある。
-
-| フォルダ | 入れるもの |
-| --- | --- |
-| 種類（`Button/`・`Modal/`・`Text/` など） | 1 つの種類の部品。題材をまたいで使う部品は、ここに置く |
-| 題材（`Budget/`・`Date/`・`Entry/`・`Tag/`・`Template/`） | その題材の型を表す部品と、その型の拡張だけ |
+| `AppWidget/Widgets/` | コントロールの `kind` の文字列は、フォルダを移しても変えない |
+| DesignSystem の題材のフォルダ | `Budget/`・`Date/`・`Entry/`・`Tag/`・`Template/` |
 
 設定の画面をまとめるときは、次の領域に分ける。入口の `Menu/` は、まとめずに残す。
 
