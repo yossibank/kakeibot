@@ -149,7 +149,7 @@ extension SnapshotTests.Stashed {
 private extension SnapshotTests {
     static var export: ExportV1 {
         get throws {
-            let json = try Fixture.data("export/export-v1.json")
+            let json = try StoreFixture.data("export/export-v1.json")
             return try ExportV1(json: json)
         }
     }

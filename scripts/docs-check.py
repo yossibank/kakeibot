@@ -133,11 +133,13 @@ def check_make(path, text, targets):
 
 def check_fixtures():
     base = os.path.join(ROOT, "spec", "fixtures")
-    core = os.path.join(ROOT, "ios", "Packages", "KakeibotKit", "Sources", "Core")
-    folders = {d.lower() for d in os.listdir(core)}
+    concepts = os.path.join(
+        ROOT, "ios", "Packages", "KakeibotKit", "Sources", "Core", "Concepts"
+    )
+    folders = {d.lower() for d in os.listdir(concepts)}
     for folder in sorted(os.listdir(base)):
         if os.path.isdir(os.path.join(base, folder)) and folder not in folders:
-            error(os.path.join(base, folder), 1, "Core に同じ名前のフォルダが無い")
+            error(os.path.join(base, folder), 1, "Core/Concepts に同じ名前のフォルダが無い")
     for top, _, files in os.walk(base):
         for file in sorted(files):
             path = os.path.join(top, file)

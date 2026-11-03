@@ -27,7 +27,7 @@ struct RecordsItemReceipt: View {
             EntryReceiptRule(style: .dashed)
 
             if !totals.taxes.isEmpty {
-                EntryTaxBreakdown(taxes: totals.taxes, taxIncluded: taxIncluded)
+                EntryReceiptTaxBreakdown(taxes: totals.taxes, taxIncluded: taxIncluded)
             }
 
             if adjustment != 0 {
@@ -133,7 +133,7 @@ private extension RecordsItemReceipt {
             }
 
             if showsRates, let rate = item.taxRate {
-                EntryTaxRateBadge(rate: rate)
+                EntryReceiptTaxRateBadge(rate: rate)
             }
 
             EntryReceiptLeader()

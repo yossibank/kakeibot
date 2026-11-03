@@ -78,7 +78,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 ## 📦 パッケージ
 
-2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/`・`Sync`・`TestSupport` を足している。
+2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/`・`Sync`・`TestSupport` を足している。`Core/` は `Concepts/` と `Shared/` の 2 段に分けている。
 
 依存の向きは、共通の形に次の 2 本を足したものである。
 
@@ -121,21 +121,22 @@ KakeibotKit のフォルダは、次の木のとおりである。
 KakeibotKit/
 ├── Sources/
 │   ├── Core/
-│   │   ├── Budget/
-│   │   ├── Category/
-│   │   ├── Date/
-│   │   ├── Entry/
-│   │   ├── Export/V1/
-│   │   ├── Icon/
-│   │   ├── Notification/
-│   │   ├── Receipt/
-│   │   ├── Recurring/
-│   │   ├── Review/
-│   │   ├── Reward/
-│   │   ├── Setting/
-│   │   ├── Shared/
-│   │   ├── Theme/
-│   │   └── Wallet/
+│   │   ├── Concepts/
+│   │   │   ├── Budget/
+│   │   │   ├── Category/
+│   │   │   ├── Date/
+│   │   │   ├── Entry/
+│   │   │   ├── Export/V1/
+│   │   │   ├── Icon/
+│   │   │   ├── Notification/
+│   │   │   ├── Receipt/
+│   │   │   ├── Recurring/
+│   │   │   ├── Review/
+│   │   │   ├── Reward/
+│   │   │   ├── Setting/
+│   │   │   ├── Theme/
+│   │   │   └── Wallet/
+│   │   └── Shared/
 │   └── Store/
 │       ├── Database/
 │       ├── Migrations/
@@ -143,6 +144,9 @@ KakeibotKit/
 │       │   ├── Methods/
 │       │   └── Types/
 │       ├── Records/
+│       │   ├── Rows/
+│       │   ├── SettingKeys/
+│       │   └── Values/
 │       ├── Snapshot/
 │       ├── Sync/
 │       │   ├── Methods/
@@ -157,22 +161,24 @@ KakeibotKit/
 
 | フォルダ | 中身 |
 | --- | --- |
-| `Core/Budget/` | 予算と消化 |
-| `Core/Category/` | 記録のカテゴリとタグ |
-| `Core/Date/` | LocalDate、期間の区切り、祝日、休日のずらし |
-| `Core/Entry/` | 記録と品目、金額の電卓、日ごとのまとめ |
-| `Core/Export/V1/` | 書き出しの形 |
-| `Core/Icon/` | アイコンとスタンプ |
-| `Core/Notification/` | 予約されているべき通知の計算と行き先 |
-| `Core/Receipt/` | 文字の断片をレシートの行にまとめ、行かモデルが答えた行の役割から品目・合計・日付・店名を組み立てる決まり。人が直した品名 |
-| `Core/Recurring/` | 固定費と記録漏れの後追い |
-| `Core/Review/` | 振り返りの範囲と集計 |
-| `Core/Reward/` | ごほうびと貯金箱 |
-| `Core/Setting/` | 設定の値 |
-| `Core/Shared/` | 型付きの ID、割合、下書きの問題 |
-| `Core/Theme/` | テーマの色・書体・形 |
-| `Core/Wallet/` | 財布と残高 |
+| `Concepts/Budget/` | 予算と消化 |
+| `Concepts/Category/` | 記録のカテゴリとタグ |
+| `Concepts/Date/` | LocalDate、期間の区切り、祝日、休日のずらし |
+| `Concepts/Entry/` | 記録と品目、金額の電卓、日ごとのまとめ |
+| `Concepts/Export/V1/` | 書き出しの形 |
+| `Concepts/Icon/` | アイコンとスタンプ |
+| `Concepts/Notification/` | 予約されているべき通知の計算と行き先 |
+| `Concepts/Receipt/` | 文字の断片をレシートの行にまとめ、行かモデルが答えた行の役割から品目・合計・日付・店名を組み立てる決まり。人が直した品名 |
+| `Concepts/Recurring/` | 固定費と記録漏れの後追い |
+| `Concepts/Review/` | 振り返りの範囲と集計 |
+| `Concepts/Reward/` | ごほうびと貯金箱 |
+| `Concepts/Setting/` | 設定の値 |
+| `Concepts/Theme/` | テーマの色・書体・形 |
+| `Concepts/Wallet/` | 財布と残高 |
+| `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、下書きの問題 |
 | `Store/Queries/`・`Store/Sync/`・`Store/Writes/` | `Methods/` に `AppDatabase+*.swift` の拡張、`Types/` にそれ以外の型を置く |
+| `Store/Queries/Methods/` | 返す型の名前で付ける。書き込みと同じ型なら `+<型>Query` |
+| `Store/Records/` | 表の行・設定のキー・列の値の適合 |
 | `Store/Migrations/` | `MigrationV<3 桁の通し番号>.swift`。欠番は 14 |
 | `Store/Database/` | 最初の財布とカテゴリも作る。止める通知は AppFeature が送る |
 | `Store/Snapshot/` | 書き出し用の全データの読み出し、読み込み用の全置き換え |
@@ -191,28 +197,21 @@ KakeibotApp/
 │   │   ├── Bridge/
 │   │   └── Main/
 │   ├── AppWidget/
+│   │   ├── Intents/
+│   │   ├── Shared/
+│   │   └── Widgets/
+│   │       ├── Budget/
+│   │       └── QuickRecord/
 │   ├── DesignSystem/
 │   │   ├── Components/
 │   │   └── Theme/
 │   ├── Features/
 │   │   ├── Screens/
 │   │   │   ├── Entry/
-│   │   │   │   ├── Item/
-│   │   │   │   ├── Model/
-│   │   │   │   ├── Parts/
-│   │   │   │   ├── Receipt/
-│   │   │   │   ├── Sheet/
-│   │   │   │   └── Transfer/
 │   │   │   ├── Onboarding/
+│   │   │   ├── Pro/
 │   │   │   ├── Settings/
 │   │   │   ├── Tabs/
-│   │   │   │   ├── Assets/
-│   │   │   │   ├── Home/
-│   │   │   │   ├── Records/
-│   │   │   │   │   ├── Model/
-│   │   │   │   │   ├── Sheet/
-│   │   │   │   │   └── View/
-│   │   │   │   └── Review/
 │   │   │   └── WhatsNew/
 │   │   └── Shared/
 │   │       ├── FeatureArt/
@@ -236,19 +235,21 @@ KakeibotApp/
 | `AppFeature/App/` | アプリの入口と起動、起動の印の動き、入力の準備、レビューのお願い。Pro が無くなったら同期を止める |
 | `AppFeature/Bridge/` | Pro の購入を StoreKit で確かめる。同期の口座と参加者を CloudKit で読む |
 | `AppFeature/Main/` | 4 つのタブと入力シートなどのシートを組む |
-| `AppWidget/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
-| `DesignSystem/Components/` | Amount・Banner・Button・Calendar・Chart・Dial・Gesture・Icon・Input・Layout・Menu・Navigation・Row・Sheet・Surface・Tag・Template |
+| `AppWidget/Intents/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
+| `AppWidget/Shared/` | ウィジェットをまたいで使う読み出し・書体・テーマ・タイムライン |
+| `AppWidget/Widgets/` | ウィジェットごとのフォルダ |
 | `Features/Screens/Entry/` | 記録の入力シート。レシートは VisionKit で撮り、Vision と Foundation Models で読む |
 | `Features/Screens/Onboarding/` | 最初の設定のチュートリアル |
+| `Features/Screens/Pro/` | Pro の画面と購入のモデル |
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
-| `Features/Screens/Tabs/` | Assets・Home・Records・Review。Records は Model・Sheet・View に分ける |
+| `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート |
 | `Features/Shared/FeatureArt/` | お知らせと Pro の画面で機能を見せる絵の部品（レシート・伝票・iPhone の枠・見本のデータ）。絵を幅に合わせて縮める枠も置く |
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、記録が無いときと読み込めないときの表示、保存の失敗が空き容量不足かの見分け |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |
 | `Features/Shared/Notification/` | 通知の許可の窓口と、許可が無いときの帯 |
-| `Features/Shared/Pro/` | Pro を買ったかの状態、Pro の画面、止めた場所で下に出すカード。StoreKit の中身は AppFeature が渡す |
+| `Features/Shared/Pro/` | Pro を買ったかの状態と、止めた場所で下に出すカード。StoreKit の中身は AppFeature が渡す |
 | `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Features/Shared/Stamp/` | 押したスタンプの数のカードと、押した日の一覧のシート |
@@ -259,10 +260,20 @@ KakeibotApp/
 
 ## 📏 名前の決まり
 
-フォルダとファイルの名前は、共通の形の「名前の決まり」と `rules/swift-core.md` に従う。Migrations のファイルと型は、3 桁の通し番号で付ける。fixtures は `spec/fixtures/` の下の、Core のフォルダ名を小文字にしたフォルダに置く。
+フォルダとファイルの名前は、共通の形の「名前の決まり」と `rules/swift-core.md` に従う。Migrations のファイルと型は、3 桁の通し番号で付ける。fixtures は `Core/Concepts/` のフォルダ名を小文字にして置く。
+
+共通の部品は、機能のフォルダと同じ階層に置かない。1 段上で機能の束と並べ、`Shared/` と名付ける。
+
+| 機能の束 | 共通 |
+| --- | --- |
+| `Core/Concepts/` | `Core/Shared/` |
+| `Features/Screens/` | `Features/Shared/` |
+| `AppWidget/Widgets/` | `AppWidget/Shared/` |
 
 画面の組み立てと通知とウィジェットの方式は、[architecture-screens](architecture-screens.md) にある。
 
 ## 🧪 テスト
 
 テストの形は、共通の形に `SyncTests` と `AppWidgetTests` を足したものである。Core のテストは、fixtures を全部通す。
+
+`CoreTests` と `FeaturesTests` は、機能の束の下をソースと同じフォルダに分ける。`Shared/` は分けない。

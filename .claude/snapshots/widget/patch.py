@@ -4,9 +4,9 @@ package = sys.argv[1]
 
 FAMILY = "    @Environment(\\.widgetFamily) private var family\n"
 VIEWS = {
-    "BudgetWidgetView": "BudgetWidgetEntry",
-    "BudgetLockWidgetView": "BudgetWidgetEntry",
-    "QuickRecordWidgetView": "QuickRecordWidgetEntry",
+    "Budget/BudgetWidgetView": "BudgetWidgetEntry",
+    "Budget/BudgetLockWidgetView": "BudgetWidgetEntry",
+    "QuickRecord/QuickRecordWidgetView": "QuickRecordWidgetEntry",
 }
 
 
@@ -18,7 +18,7 @@ def replace(path, old, new):
 
 
 for view, entry in VIEWS.items():
-    path = f"{package}/Sources/AppWidget/{view}.swift"
+    path = f"{package}/Sources/AppWidget/Widgets/{view}.swift"
     stored = f"    let entry: {entry}\n"
     replace(path, FAMILY, "")
     replace(path, stored, stored + "    var family: WidgetFamily = .systemSmall\n")

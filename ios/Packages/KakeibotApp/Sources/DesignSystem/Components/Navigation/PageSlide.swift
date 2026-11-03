@@ -96,7 +96,6 @@ public extension View {
         _ slide: PageSlide,
         page: some Hashable
     ) -> some View {
-        // 同じビューを使い回すと、戻るアニメーションが中身の書き換えにも掛かり、前のページの字が残って溶け合う
         id(page)
             .transition(.identity)
             .pageSlide(slide)

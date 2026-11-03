@@ -57,7 +57,7 @@ extension EntryItemSheet {
             }
 
             if !model.itemTotals.taxes.isEmpty {
-                EntryTaxBreakdown(
+                EntryReceiptTaxBreakdown(
                     taxes: model.itemTotals.taxes,
                     taxIncluded: model.taxIncluded
                 )
@@ -210,7 +210,7 @@ extension EntryItemSheet {
                             .minimumScaleFactor(0.8)
 
                         if showsRates, let rate = item.taxRate {
-                            EntryTaxRateBadge(rate: rate)
+                            EntryReceiptTaxRateBadge(rate: rate)
                         }
                     }
 
