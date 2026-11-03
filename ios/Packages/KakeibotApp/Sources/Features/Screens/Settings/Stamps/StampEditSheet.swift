@@ -46,7 +46,7 @@ public struct StampEditSheet: View {
                     StampTileFace(icon: model.icon.preview, isHidden: false)
                         .frame(width: 80, height: 78)
 
-                    IconEditor(
+                    SettingsIconEditor(
                         model: model.icon,
                         focus: $focus,
                         textField: .text

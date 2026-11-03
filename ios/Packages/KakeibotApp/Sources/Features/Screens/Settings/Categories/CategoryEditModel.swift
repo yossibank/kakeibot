@@ -17,7 +17,7 @@ public final class CategoryEditModel {
     public internal(set) var errorNotice = ErrorNotice()
 
     public let kind: EntryCategory.Kind
-    public let icon = IconEditModel(glyph: .food)
+    public let icon = SettingsIconEditorModel(glyph: .food)
 
     private var baseline: Snapshot?
 
@@ -51,8 +51,8 @@ public extension CategoryEditModel {
         baseline.map { $0 != snapshot } ?? false
     }
 
-    var draft: CategoryDraft {
-        CategoryDraft(
+    var draft: EntryCategoryDraft {
+        EntryCategoryDraft(
             kind: kind,
             name: name,
             mark: icon.mark,
@@ -153,7 +153,7 @@ public extension CategoryEditModel {
                 return
             }
 
-            let loaded = CategoryDraft(category, icon: icon)
+            let loaded = EntryCategoryDraft(category, icon: icon)
 
             apply(loaded)
 
@@ -223,7 +223,7 @@ public extension CategoryEditModel {
 
 private extension CategoryEditModel {
     struct Snapshot: Equatable {
-        let draft: CategoryDraft
+        let draft: EntryCategoryDraft
         let tags: [EntryTagDraft]
     }
 
@@ -259,7 +259,7 @@ private extension CategoryEditModel {
         }
     }
 
-    func apply(_ draft: CategoryDraft) {
+    func apply(_ draft: EntryCategoryDraft) {
         name = draft.name
         icon.apply(draft.icon)
     }

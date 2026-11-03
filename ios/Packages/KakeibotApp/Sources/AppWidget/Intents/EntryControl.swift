@@ -1,10 +1,10 @@
 import SwiftUI
 import WidgetKit
 
-public struct RecordEntryControl: ControlWidget {
+public struct EntryControl: ControlWidget {
     public var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(kind: "RecordEntryControl") {
-            ControlWidgetButton(action: OpenEntryIntent()) {
+            ControlWidgetButton(action: EntryControlIntent()) {
                 Label("記録する", systemImage: "square.and.pencil")
             }
         }

@@ -27,7 +27,7 @@ extension ReviewView {
                     EmptyView()
                 } else if model.categoryShares.isEmpty,
                           model.walletShares.isEmpty {
-                    EmptyNote(text: "この期間の記録はありません") {
+                    PlaceholderEmpty(text: "この期間の記録はありません") {
                         onAddEntry(recordDate)
                     }
                     .padding(16)
@@ -162,7 +162,7 @@ private extension ReviewView {
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
 
-                    UsageBar(usage)
+                    BudgetUsageBar(usage)
                 }
                 .padding(.top, 4)
             }

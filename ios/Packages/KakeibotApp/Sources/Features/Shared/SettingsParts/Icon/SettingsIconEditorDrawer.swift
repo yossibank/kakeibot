@@ -1,12 +1,12 @@
 import DesignSystem
 import SwiftUI
 
-struct IconEditorDrawer<Field: Hashable>: ViewModifier {
+struct SettingsIconEditorDrawer<Field: Hashable>: ViewModifier {
     @Binding var isPresented: Bool
 
     @State private var top: CGFloat = 0
 
-    let model: IconEditModel
+    let model: SettingsIconEditorModel
     let focus: FocusState<Field?>.Binding
     let textField: Field
     let below: CGFloat
@@ -27,7 +27,7 @@ struct IconEditorDrawer<Field: Hashable>: ViewModifier {
                             close()
                         } content: {
                             ScrollView {
-                                IconEditor(
+                                SettingsIconEditor(
                                     model: model,
                                     focus: focus,
                                     textField: textField
@@ -54,13 +54,13 @@ struct IconEditorDrawer<Field: Hashable>: ViewModifier {
 extension View {
     func iconEditorDrawer<Field: Hashable>(
         isPresented: Binding<Bool>,
-        model: IconEditModel,
+        model: SettingsIconEditorModel,
         focus: FocusState<Field?>.Binding,
         textField: Field,
         below: CGFloat
     ) -> some View {
         modifier(
-            IconEditorDrawer(
+            SettingsIconEditorDrawer(
                 isPresented: isPresented,
                 model: model,
                 focus: focus,
@@ -71,7 +71,7 @@ extension View {
     }
 }
 
-private extension IconEditorDrawer {
+private extension SettingsIconEditorDrawer {
     static var gap: CGFloat {
         16
     }

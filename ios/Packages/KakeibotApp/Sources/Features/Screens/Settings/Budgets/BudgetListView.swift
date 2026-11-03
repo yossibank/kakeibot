@@ -242,7 +242,7 @@ private extension BudgetListView {
 
     func usageLine(_ usage: BudgetUsage) -> some View {
         VStack(spacing: 4) {
-            UsageBar(usage)
+            BudgetUsageBar(usage)
 
             HStack {
                 Text("使った額 \(AmountText.text(usage.spent))")

@@ -3,7 +3,7 @@ import Foundation
 import Store
 import Testing
 
-struct DefaultsTests {
+struct AppDatabaseDefaultsTests {
     @Test
     func insertsWalletsAndCategoriesOnce() async throws {
         let database = try AppDatabase.inMemory()

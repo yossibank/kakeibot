@@ -163,9 +163,9 @@ private extension HomeView {
             }
 
             if model.isListFailed {
-                LoadFailedNotice(onRetry: onRetry)
+                PlaceholderLoadFailed(onRetry: onRetry)
             } else if model.showsNoRecords {
-                EmptyNote(text: "まだ記録がありません") {
+                PlaceholderEmpty(text: "まだ記録がありません") {
                     onAddEntry(model.today)
                 }
                 .padding(.vertical, 16)

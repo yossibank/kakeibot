@@ -11,7 +11,7 @@ struct KakeibotWidgetBundle: WidgetBundle {
 
         QuickRecordWidget()
 
-        RecordEntryControl()
+        EntryControl()
     }
 
     init() {

@@ -131,7 +131,7 @@ extension CategoryWriteTests {
     struct Setup {
         let database: AppDatabase
         let now: Date
-        let draft: CategoryDraft
+        let draft: EntryCategoryDraft
     }
 }
 
@@ -139,7 +139,12 @@ extension CategoryWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
-        let draft = CategoryDraft(kind: .expense, name: "外食", mark: .glyph(.cafe), color: "#E07A5F")
+        let draft = EntryCategoryDraft(
+            kind: .expense,
+            name: "外食",
+            mark: .glyph(.cafe),
+            color: "#E07A5F"
+        )
 
         try database.insertDefaultsIfEmpty(at: now)
 

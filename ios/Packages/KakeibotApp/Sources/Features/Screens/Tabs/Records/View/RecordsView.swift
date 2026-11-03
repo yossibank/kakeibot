@@ -211,7 +211,7 @@ private extension RecordsView {
             if model.isMonthHiddenByFilter {
                 filteredEmpty
             } else if model.showsNoRecords {
-                EmptyNote(text: "この月の記録はありません", onRecord: recordAction)
+                PlaceholderEmpty(text: "この月の記録はありません", onRecord: recordAction)
                     .padding(.vertical, 40)
             }
 

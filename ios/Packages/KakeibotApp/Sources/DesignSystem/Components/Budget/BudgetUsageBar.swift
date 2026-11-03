@@ -1,7 +1,7 @@
 import Core
 import SwiftUI
 
-public struct UsageBar: View {
+public struct BudgetUsageBar: View {
     let usage: BudgetUsage
 
     public init(_ usage: BudgetUsage) {

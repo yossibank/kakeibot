@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct EmptyNote: View {
+struct PlaceholderEmpty: View {
     let text: String
     let onRecord: (() -> Void)?
 
@@ -22,9 +22,9 @@ struct EmptyNote: View {
 
 #Preview {
     VStack(spacing: 40) {
-        EmptyNote(text: "まだ記録がありません") {}
+        PlaceholderEmpty(text: "まだ記録がありません") {}
 
-        EmptyNote(text: "この月の記録はありません", onRecord: nil)
+        PlaceholderEmpty(text: "この月の記録はありません", onRecord: nil)
     }
     .padding()
     .background(Palette.background)

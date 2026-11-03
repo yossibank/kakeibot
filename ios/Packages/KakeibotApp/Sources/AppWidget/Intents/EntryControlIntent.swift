@@ -3,7 +3,7 @@ import Core
 import Foundation
 import Notifications
 
-struct OpenEntryIntent: AppIntent {
+struct EntryControlIntent: AppIntent {
     static let openAppWhenRun = true
 
     static var title: LocalizedStringResource {

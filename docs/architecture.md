@@ -7,7 +7,7 @@
 
 ## 🛠️ 使う技術
 
-iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである。画面と保存を選んだ理由は、decisions の[画面の作り](decisions/ios.md#画面の作り)と [DB](decisions/ios.md#db) にある。Android は、次の技術を使う。
+iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである。画面と保存を選んだ理由は、decisions の[画面の作り](decisions/ios.md#画面の作り)と [DB](decisions/storage.md#db) にある。Android は、次の技術を使う。
 
 | 項目 | Android |
 | --- | --- |
@@ -204,6 +204,7 @@ KakeibotApp/
 │   │   │   ├── Tabs/
 │   │   │   └── WhatsNew/
 │   │   └── Shared/
+│   │       ├── DateChoice/
 │   │       ├── EntryList/
 │   │       ├── FeatureArt/
 │   │       ├── Model/
@@ -236,13 +237,14 @@ KakeibotApp/
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート |
+| `Features/Shared/DateChoice/` | 月の始まりの日・休日のずらし・曜日を選ぶ部品と、その表示の名前 |
 | `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro の画面で機能を見せる絵の部品（レシート・伝票・iPhone の枠・見本のデータ）。絵を幅に合わせて縮める枠も置く |
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、アプリの版 |
-| `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、保存の失敗が空き容量不足かの見分け |
+| `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、保存の失敗が空き容量不足かの見分け。ファイルの頭は、元の型ごとに分かれる |
 | `Features/Shared/Notification/` | 通知の許可の窓口と、許可が無いときの帯 |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |
-| `Features/Shared/Placeholder/` | 記録が無いときと読み込めないときの表示 |
+| `Features/Shared/Placeholder/` | タブの画面で、記録が無いときと読み込めないときの表示。設定の一覧が空のときは `SettingsParts/Hint/` の `SettingsEmptyNote` を使う |
 | `Features/Shared/Pro/` | Pro を買ったかの状態と、止めた場所で下に出すカード。StoreKit の中身は AppFeature が渡す |
 | `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
@@ -250,13 +252,7 @@ KakeibotApp/
 | `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |
 | `Tests/TestSupport/` | テストの補助。観測している値が変わるのを、上限の時間まで待つ |
 
-画面ごとのフォルダは、[architecture-screens の「画面とフォルダ」](architecture-screens.md#-画面とフォルダ)にある。
-
-## 📏 名前の決まり
-
-フォルダとファイルの名前は、共通の形の「名前の決まり」と `rules/swift-core.md` に従う。Migrations のファイルと型は、3 桁の通し番号で付ける。fixtures は `Core/Concepts/` のフォルダ名を小文字にして置く。
-
-画面の組み立てと通知とウィジェットの方式は、[architecture-screens](architecture-screens.md) にある。
+画面ごとのフォルダは、[architecture-screens の「画面とフォルダ」](architecture-screens.md#-画面とフォルダ)にある。名前の決まりと、概念ごとの置き場所は、[architecture-naming](architecture-naming.md) にある。
 
 ## 🧪 テスト
 
@@ -269,3 +265,10 @@ KakeibotApp/
 | 1 つのテストターゲット | そのターゲットの直下の `Support/`。例は `StoreTests/Support/`・`FeaturesTests/Support/` |
 | 複数のテストターゲット | `Tests/TestSupport/` のターゲット |
 | 1 つのテストの型 | その型の `+Setup.swift` か、同じファイル |
+
+テストのフォルダは、共通の形の「名前の決まり」でソースにそろえる。`Shared` のテストを子フォルダに分けないことのほかに、次のものが外れる。
+
+| テスト | 置き場所 |
+| --- | --- |
+| `Store/Queries`・`Store/Sync`・`Store/Writes` | `Methods/`・`Types/` に分けず、`StoreTests/Queries/` などの直下に置く |
+| `TestSupport` のテスト | `TestSupport` にテストのターゲットが無いので、`FeaturesTests/Shared/` に置く |

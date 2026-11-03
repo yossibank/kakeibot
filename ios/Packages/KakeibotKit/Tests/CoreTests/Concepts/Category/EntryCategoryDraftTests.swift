@@ -2,7 +2,7 @@ import Core
 import Foundation
 import Testing
 
-struct CategoryDraftTests {
+struct EntryCategoryDraftTests {
     @Test(arguments: try draftCases)
     func findsProblems(fixture: DraftCase) throws {
         let draft = try fixture.draft()
@@ -13,7 +13,7 @@ struct CategoryDraftTests {
     func makesIconWithOnlyTheChosenMark() throws {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
 
-        let draft = CategoryDraft(
+        let draft = EntryCategoryDraft(
             kind: .expense,
             name: " 推し ",
             mark: .text(" 推し "),
@@ -53,14 +53,14 @@ struct CategoryDraftTests {
             updatedAt: created
         )
 
-        var draft = CategoryDraft(category, icon: icon)
+        var draft = EntryCategoryDraft(category, icon: icon)
         draft.name = "外食"
         draft.mark = .glyph(.cafe)
 
         let updatedIcon = try draft.applied(to: icon, at: now)
         let updatedCategory = try draft.applied(to: category, at: now)
 
-        #expect(CategoryDraft.Mark(icon) == .emoji("🍙"))
+        #expect(EntryCategoryDraft.Mark(icon) == .emoji("🍙"))
         #expect(updatedIcon.id == icon.id)
         #expect(updatedIcon.glyph == .cafe)
         #expect(updatedIcon.emoji == nil)
@@ -72,26 +72,26 @@ struct CategoryDraftTests {
     }
 }
 
-extension CategoryDraftTests {
+extension EntryCategoryDraftTests {
     struct DraftCase: Decodable, Sendable {
         let name: String
         let mark: FixtureMark
         let color: String
-        let problems: [CategoryDraft.Problem]
+        let problems: [EntryCategoryDraft.Problem]
     }
 }
 
-extension CategoryDraftTests.DraftCase {
-    func draft() throws -> CategoryDraft {
+extension EntryCategoryDraftTests.DraftCase {
+    func draft() throws -> EntryCategoryDraft {
         let mark = try mark.mark()
-        return CategoryDraft(kind: .expense, name: name, mark: mark, color: color)
+        return EntryCategoryDraft(kind: .expense, name: name, mark: mark, color: color)
     }
 }
 
-private extension CategoryDraftTests {
+private extension EntryCategoryDraftTests {
     static var draftCases: [DraftCase] {
         get throws {
-            try CoreFixture.cases("category/category-draft.json")
+            try CoreFixture.cases("category/entry-category-draft.json")
         }
     }
 }
