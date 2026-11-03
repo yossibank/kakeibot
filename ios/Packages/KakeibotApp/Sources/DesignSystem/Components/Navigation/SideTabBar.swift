@@ -7,18 +7,21 @@ public struct SideTabBar<Value: Hashable>: View {
 
     let title: String
     let items: [FloatingTabBar<Value>.Item]
+    let isAddHinted: Bool
     let onAdd: () -> Void
 
     public init(
         selection: Binding<Value>,
         title: String,
         items: [FloatingTabBar<Value>.Item],
+        isAddHinted: Bool = false,
         onAdd: @escaping () -> Void
     ) {
         _selection = selection
 
         self.title = title
         self.items = items
+        self.isAddHinted = isAddHinted
         self.onAdd = onAdd
     }
 
@@ -45,6 +48,10 @@ public struct SideTabBar<Value: Hashable>: View {
         .padding(.vertical, 24)
         .frame(width: Self.width)
         .frame(maxHeight: .infinity)
+        .background {
+            Backdrop()
+                .ignoresSafeArea()
+        }
         .overlay(alignment: .trailing) {
             Rectangle()
                 .fill(Palette.hairline)
@@ -83,6 +90,12 @@ private extension SideTabBar {
                 Capsule()
                     .strokeBorder(TabBarStyle.ring(hasDecorations: hasDecorations), lineWidth: 1.2)
             }
+            .overlay {
+                if isAddHinted {
+                    TabBarAddHint(shape: Capsule())
+                }
+            }
+            .animation(.easeOut(duration: 0.3), value: isAddHinted)
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -147,7 +160,8 @@ private extension SideTabBar {
         SideTabBar(
             selection: $selection,
             title: "かけいぼっと",
-            items: items
+            items: items,
+            isAddHinted: true
         ) {}
 
         Spacer()
