@@ -21,7 +21,7 @@ extension WidgetGuideStage {
 
                 lockRectangle
             }
-            .padding(.top, 6)
+            .padding(.top, 4)
         }
         .foregroundStyle(.white)
     }
@@ -45,7 +45,7 @@ extension WidgetGuideStage {
                     .monospacedDigit()
             }
         }
-        .padding(6)
+        .padding(4)
         .frame(width: 72, height: 72)
         .background(.white.opacity(0.14), in: Circle())
     }

@@ -5,7 +5,7 @@ struct ProFeatureCard: View {
     let feature: ProFeature
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 12) {
                 Image(systemName: feature.systemImage)
                     .sansFont(.small, weight: .medium)
@@ -42,7 +42,7 @@ struct ProFeatureCard: View {
                 }
             }
         }
-        .padding(18)
+        .padding(16)
         .card()
     }
 }

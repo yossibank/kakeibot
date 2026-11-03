@@ -150,7 +150,7 @@ extension EntryItemSheet {
     }
 
     var taxModeLine: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 4) {
             Text("税の計算")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
@@ -170,7 +170,7 @@ extension EntryItemSheet {
     }
 
     var suspectHint: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 4) {
             Image(systemName: "exclamationmark.magnifyingglass")
 
             Text("色の付いた行が、読み違えているかもしれません")
@@ -202,7 +202,7 @@ extension EntryItemSheet {
         } content: {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 VStack(alignment: .leading, spacing: 1) {
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(item.trimmedName)
                             .textFont(.subheadline)
                             .foregroundStyle(isNegative ? Palette.rose : Palette.text)
@@ -232,7 +232,7 @@ extension EntryItemSheet {
                     .foregroundStyle(amountColor)
                     .layoutPriority(1)
             }
-            .padding(.vertical, 7)
+            .padding(.vertical, 8)
             .padding(.horizontal, 4)
             .background {
                 ZStack {

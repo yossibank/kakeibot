@@ -11,8 +11,8 @@ struct FeatureArt: View {
         FeatureArtCanvas(width: Self.width, height: Self.height) {
             content
         }
-        .padding(.vertical, 14)
-        .padding(.horizontal, 10)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 8)
         .background(Palette.faint, in: .rect(cornerRadius: corner.radius(16)))
         .overlay {
             RoundedRectangle(cornerRadius: corner.radius(16))
@@ -56,7 +56,7 @@ private extension FeatureArt {
 
             arrow
 
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
                 FeatureArtSlip()
 
                 EntryItemButton(
@@ -74,7 +74,7 @@ private extension FeatureArt {
         HStack(spacing: 16) {
             phone("いまの iPhone")
 
-            VStack(spacing: 6) {
+            VStack(spacing: 4) {
                 Image(systemName: "checkmark.icloud")
                     .font(.system(size: 26, weight: .light))
                     .foregroundStyle(Palette.accent)
@@ -114,7 +114,7 @@ private extension FeatureArt {
                     .monospacedDigit()
                     .foregroundStyle(Palette.text)
 
-                VStack(spacing: 5) {
+                VStack(spacing: 4) {
                     sharedRow("自", title: "スーパー", amount: 2180)
 
                     sharedRow("家", title: "ドラッグストア", amount: 1340)
@@ -124,7 +124,7 @@ private extension FeatureArt {
             }
             .padding(12)
             .frame(width: 168)
-            .card(cornerRadius: 14)
+            .card(cornerRadius: 12)
 
             member("家族", systemImage: "person.fill")
         }
@@ -133,7 +133,7 @@ private extension FeatureArt {
     var theme: some View {
         HStack(alignment: .top, spacing: 12) {
             ForEach(Self.themeSamples, id: \.self) { preset in
-                VStack(spacing: 5) {
+                VStack(spacing: 4) {
                     ThemePreview(palette: preset.palette)
                         .frame(width: Self.themeWidth)
 
@@ -143,8 +143,8 @@ private extension FeatureArt {
                 }
             }
 
-            VStack(spacing: 5) {
-                VStack(spacing: 6) {
+            VStack(spacing: 4) {
+                VStack(spacing: 4) {
                     Image(systemName: "paintpalette")
                         .font(.system(size: 20, weight: .light))
 
@@ -167,7 +167,7 @@ private extension FeatureArt {
     }
 
     var fonts: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             ForEach(Self.fontSamples, id: \.self) { sample in
                 HStack(alignment: .firstTextBaseline) {
                     Text(sample.title)
@@ -184,7 +184,7 @@ private extension FeatureArt {
                     Spacer(minLength: 0)
                 }
                 .padding(.horizontal, 12)
-                .padding(.vertical, 3)
+                .padding(.vertical, 4)
                 .background(Palette.card, in: .rect(cornerRadius: 8))
             }
         }
@@ -197,7 +197,7 @@ private extension FeatureArt {
     }
 
     func phone(_ title: String) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             FeatureArtPhone {
                 FeatureArtMiniHome()
             }
@@ -212,7 +212,7 @@ private extension FeatureArt {
         _ title: String,
         systemImage: String
     ) -> some View {
-        VStack(spacing: 5) {
+        VStack(spacing: 4) {
             Image(systemName: systemImage)
                 .font(.system(size: 18))
                 .foregroundStyle(Palette.accent)
@@ -234,7 +234,7 @@ private extension FeatureArt {
         title: String,
         amount: Int
     ) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 4) {
             Text(initial)
                 .font(.system(size: 7, weight: .bold))
                 .foregroundStyle(Palette.backgroundTop)

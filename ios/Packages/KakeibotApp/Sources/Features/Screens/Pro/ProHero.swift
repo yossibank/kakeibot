@@ -5,7 +5,7 @@ struct ProHero: View {
     let price: String?
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 12) {
             Image(systemName: "sparkles")
                 .font(.system(size: 26, weight: .light))
                 .foregroundStyle(Self.gold)
@@ -15,7 +15,7 @@ struct ProHero: View {
                         .stroke(Self.gold, lineWidth: 1)
                 }
 
-            VStack(spacing: 6) {
+            VStack(spacing: 4) {
                 Text("かけいぼっと Pro")
                     .displayFont(.title, weight: .medium)
                     .foregroundStyle(Self.gold)
@@ -41,8 +41,8 @@ struct ProHero: View {
                     .textFont(.caption, weight: .semibold)
                     .tracking(2)
                     .foregroundStyle(Self.ink)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 3)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
                     .background(Self.gold, in: .capsule)
             }
 
@@ -51,13 +51,13 @@ struct ProHero: View {
             }
         }
         .padding(.horizontal, 20)
-        .padding(.vertical, 26)
+        .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
         .background(Self.night, in: .rect(cornerRadius: 24))
         .overlay {
             RoundedRectangle(cornerRadius: 24)
                 .stroke(Self.gold, lineWidth: 1.2)
-                .padding(5)
+                .padding(4)
                 .opacity(0.6)
         }
         .overlay {

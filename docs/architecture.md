@@ -259,3 +259,11 @@ KakeibotApp/
 ## 🧪 テスト
 
 テストの形は、共通の形に `SyncTests` と `AppWidgetTests` を足したものである。Core のテストは、fixtures を全部通す。
+
+テストの補助は、使う範囲で置き場所を分ける。
+
+| 使う範囲 | 置き場所 |
+| --- | --- |
+| 1 つのテストターゲット | そのターゲットの直下の `Support/`。例は `StoreTests/Support/`・`FeaturesTests/Support/` |
+| 複数のテストターゲット | `Tests/TestSupport/` のターゲット |
+| 1 つのテストの型 | その型の `+Setup.swift` か、同じファイル |

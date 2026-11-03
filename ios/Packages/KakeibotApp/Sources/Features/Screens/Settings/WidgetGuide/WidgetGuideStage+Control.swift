@@ -14,7 +14,7 @@ extension WidgetGuideStage {
                     controlButton(symbol)
                 }
 
-                VStack(spacing: 6) {
+                VStack(spacing: 4) {
                     Image(systemName: "square.and.pencil")
                         .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(Self.night)
@@ -37,7 +37,7 @@ extension WidgetGuideStage {
 
 private extension WidgetGuideStage {
     func controlButton(_ symbol: String) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             Image(systemName: symbol)
                 .font(.system(size: 20))
                 .foregroundStyle(.white.opacity(0.85))

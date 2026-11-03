@@ -9,7 +9,7 @@ struct HomeSectionThumbnail: View {
 
     var body: some View {
         content
-            .padding(6)
+            .padding(4)
             .frame(width: Self.size.width, height: Self.size.height, alignment: .topLeading)
             .background(Palette.card, in: .rect(cornerRadius: corner.radius(8)))
             .overlay {
@@ -34,7 +34,7 @@ private extension HomeSectionThumbnail {
     }
 
     var customize: some View {
-        HStack(spacing: 3) {
+        HStack(spacing: 4) {
             ForEach(Self.dots.prefix(3).indices, id: \.self) { index in
                 let isLit = index == 0
                 let glowColor = isLit ? Palette.glow : Color.clear
@@ -58,7 +58,7 @@ private extension HomeSectionThumbnail {
     }
 
     var budget: some View {
-        VStack(spacing: 3) {
+        VStack(spacing: 4) {
             ZStack {
                 ThumbnailArc(progress: 1)
                     .stroke(Palette.line, style: Self.dialStroke)
@@ -86,7 +86,7 @@ private extension HomeSectionThumbnail {
     }
 
     var recent: some View {
-        VStack(spacing: 3) {
+        VStack(spacing: 4) {
             ForEach(Self.recentWidths.indices, id: \.self) { index in
                 row(color: Self.dots[index], width: Self.recentWidths[index])
             }
@@ -94,9 +94,9 @@ private extension HomeSectionThumbnail {
     }
 
     var bills: some View {
-        VStack(spacing: 3) {
+        VStack(spacing: 4) {
             ForEach(Self.billWidths.indices, id: \.self) { index in
-                HStack(spacing: 3) {
+                HStack(spacing: 4) {
                     RoundedRectangle(cornerRadius: 1)
                         .stroke(Palette.accent, lineWidth: 0.6)
                         .frame(width: 6, height: 6)
@@ -112,7 +112,7 @@ private extension HomeSectionThumbnail {
     }
 
     var stamps: some View {
-        HStack(spacing: 3) {
+        HStack(spacing: 4) {
             ForEach(0..<4, id: \.self) { index in
                 let isPressed = index < 2
                 let fillColor = isPressed ? Palette.accent.opacity(.muted) : Color.clear
@@ -164,7 +164,7 @@ private extension HomeSectionThumbnail {
         color: Color,
         width: CGFloat
     ) -> some View {
-        HStack(spacing: 3) {
+        HStack(spacing: 4) {
             Circle()
                 .fill(color)
                 .frame(width: 4, height: 4)

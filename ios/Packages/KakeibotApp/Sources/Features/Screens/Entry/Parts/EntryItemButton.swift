@@ -10,7 +10,7 @@ struct EntryItemButton: View {
 
     var body: some View {
         Button(action: onOpen) {
-            HStack(spacing: 6) {
+            HStack(spacing: 4) {
                 Image(systemName: "receipt")
                     .foregroundStyle(Palette.accent)
 

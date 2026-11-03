@@ -120,7 +120,7 @@ private extension WidgetGuideView {
         VStack(alignment: .leading, spacing: 8) {
             SettingsSectionTitle("できること")
 
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 12) {
                 ForEach(place.abilities, id: \.self) { ability in
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: ability.systemImage)
@@ -177,7 +177,7 @@ private extension WidgetGuideView {
                             .foregroundStyle(Palette.text)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.top, 2)
-                            .padding(.bottom, 14)
+                            .padding(.bottom, 12)
 
                         Spacer(minLength: 0)
                     }
