@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 import SwiftUI
 
-public struct SettingsSheet: View {
+public struct SettingsMenuSheet: View {
     @State var monthStartDay: MonthStartDay = .first
     @State var launchScreen: LaunchScreen = .home
     @State var reminderTime: ReminderTime?
@@ -13,9 +13,9 @@ public struct SettingsSheet: View {
     @State var syncStatus = SyncStatus.off
     @State var backupExportedAt: Date?
     @State var firstEntryCreatedAt: Date?
-    @State var weekStart: SettingsValueModel<Weekday>
-    @State var entryStart: SettingsValueModel<Bool>
-    @State var recordReset: SettingsResetModel
+    @State var weekStart: SettingsMenuValueModel<Weekday>
+    @State var entryStart: SettingsMenuValueModel<Bool>
+    @State var recordReset: SettingsMenuResetModel
     @State var isConfirmingReset = false
 
     #if DEBUG
@@ -42,20 +42,20 @@ public struct SettingsSheet: View {
         appIcon: AppIconListModel
     ) {
         _weekStart = State(
-            initialValue: SettingsValueModel(
+            initialValue: SettingsMenuValueModel(
                 database: database,
                 key: .weekStart
             )
         )
 
         _entryStart = State(
-            initialValue: SettingsValueModel(
+            initialValue: SettingsMenuValueModel(
                 database: database,
                 key: .entryStartsWithAmount
             )
         )
 
-        _recordReset = State(initialValue: SettingsResetModel(database: database))
+        _recordReset = State(initialValue: SettingsMenuResetModel(database: database))
 
         self.database = database
         self.today = today
@@ -168,7 +168,7 @@ public struct SettingsSheet: View {
     }
 }
 
-private extension SettingsSheet {
+private extension SettingsMenuSheet {
     func observeLaunchScreen() async {
         do {
             for try await screen in database.settingUpdates(.launchScreen) {
@@ -245,6 +245,6 @@ private extension SettingsSheet {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
         let today = LocalDate(Date(), in: .current)
 
-        SettingsSheet(database: database, today: today, appIcon: AppIconListModel())
+        SettingsMenuSheet(database: database, today: today, appIcon: AppIconListModel())
     }
 }

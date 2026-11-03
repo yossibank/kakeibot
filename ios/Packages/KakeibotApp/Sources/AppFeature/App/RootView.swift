@@ -13,7 +13,7 @@ public struct RootView: View {
     @State private var isLaunching = true
     @State private var isRevealed = false
     @State private var isHomeLoaded = false
-    @State private var foreground = ForegroundReturn()
+    @State private var foreground = AppForegroundReturn()
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme

@@ -3,7 +3,7 @@ import GRDB
 import Store
 import Testing
 
-struct DateDatabaseValueTests {
+struct DatabaseValueTests {
     @Test
     func storesLocalDateAsText() throws {
         let database = try makeDatabase()
@@ -42,7 +42,7 @@ struct DateDatabaseValueTests {
     }
 }
 
-private extension DateDatabaseValueTests {
+private extension DatabaseValueTests {
     func makeDatabase() throws -> DatabaseQueue {
         let database = try DatabaseQueue()
 

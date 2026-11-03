@@ -3,7 +3,7 @@ import Foundation
 import Store
 import Testing
 
-struct TemplateWriteTests {
+struct EntryTemplateWriteTests {
     @Test
     func addsTemplatesInOrder() async throws {
         let setup = try await Setup()
@@ -141,7 +141,7 @@ struct TemplateWriteTests {
     }
 }
 
-extension TemplateWriteTests {
+extension EntryTemplateWriteTests {
     struct Setup {
         let database: AppDatabase
         let now: Date
@@ -149,7 +149,7 @@ extension TemplateWriteTests {
     }
 }
 
-extension TemplateWriteTests.Setup {
+extension EntryTemplateWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)

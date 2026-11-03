@@ -1,7 +1,7 @@
 import Core
 import Foundation
 
-enum SettingsLink {
+enum SettingsMenuLink {
     static let appStoreId = "6829072935"
     static let contactForm = "https://docs.google.com/forms/d/e/1FAIpQLSekvR-ZF6d760pAkQmw4lDToo8P5C8mJPYBGQbPRHMx3hH8gg/viewform"
     static let modelEntry = "entry.1282978121"

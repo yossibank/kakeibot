@@ -2,10 +2,10 @@
 import Foundation
 import Testing
 
-struct SettingsLinkTests {
+struct SettingsMenuLinkTests {
     @Test
     func fillsDeviceAndVersionsIntoContactForm() throws {
-        let url = try #require(SettingsLink.contact(
+        let url = try #require(SettingsMenuLink.contact(
             model: "iPhone17,3",
             system: "26.1",
             app: "1.0.0"
@@ -17,7 +17,7 @@ struct SettingsLinkTests {
             items.first { $0.name == name }?.value
         }
 
-        #expect(url.absoluteString.hasPrefix(SettingsLink.contactForm))
+        #expect(url.absoluteString.hasPrefix(SettingsMenuLink.contactForm))
         #expect(value("usp") == "pp_url")
         #expect(value("entry.1282978121") == "iPhone17,3")
         #expect(value("entry.885969465") == "26.1")
@@ -26,8 +26,8 @@ struct SettingsLinkTests {
 
     @Test
     func readsThisDevice() {
-        let model = SettingsLink.modelIdentifier
-        let system = SettingsLink.systemVersion
+        let model = SettingsMenuLink.modelIdentifier
+        let system = SettingsMenuLink.systemVersion
 
         #expect(!model.isEmpty)
         #expect(system.split(separator: ".").count >= 2)

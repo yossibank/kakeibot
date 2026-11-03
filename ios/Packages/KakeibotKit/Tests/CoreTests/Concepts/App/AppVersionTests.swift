@@ -26,7 +26,7 @@ extension AppVersionTests {
 private extension AppVersionTests {
     static var versionCases: [VersionCase] {
         get throws {
-            try CoreFixture.cases("setting/app-version.json")
+            try CoreFixture.cases("app/app-version.json")
         }
     }
 }

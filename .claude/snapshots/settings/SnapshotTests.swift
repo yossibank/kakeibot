@@ -15,7 +15,7 @@ struct SnapshotTests {
         let database = try await Self.database(today: today, now: now)
         let options = try await database.entryOptions()
         let longWallet = options.wallets.max { $0.name.count < $1.name.count }
-        let sheet = SettingsSheet(database: database, today: today, appIcon: AppIconListModel())
+        let sheet = SettingsMenuSheet(database: database, today: today, appIcon: AppIconListModel())
         let wallets = WalletListView(database: database)
         let rules = RewardRuleListView(database: database)
         let walletEdit = WalletEditModel(database: database, editing: longWallet?.id)
@@ -134,7 +134,7 @@ private extension SnapshotTests {
         let database = try AppDatabase.inMemory()
 
         try database.insertDefaultsIfEmpty(at: now)
-        try await SettingsSampleData.insert(into: database, today: today, now: now)
+        try await SettingsMenuSampleData.insert(into: database, today: today, now: now)
 
         let walletDraft = WalletDraft(
             kind: .bank,

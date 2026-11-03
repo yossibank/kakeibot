@@ -3,7 +3,7 @@ import Core
 import Foundation
 import Store
 
-enum SettingsSampleData {
+enum SettingsMenuSampleData {
     enum SampleError: Error {
         case missingDefault(String)
     }
