@@ -361,7 +361,6 @@ private extension ReviewView {
         let income = model.summary.income.total
         let expense = model.summary.expense.total
         let largest = max(income, expense)
-
         return largest > 0 ? Double(amount) / Double(largest) : 0
     }
 

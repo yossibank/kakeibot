@@ -2,9 +2,7 @@ import Core
 import GRDB
 
 public extension AppDatabase {
-    func monthOverviewUpdates(
-        on today: LocalDate
-    ) -> some AsyncSequence<MonthOverview, any Error> {
+    func monthOverviewUpdates(on today: LocalDate) -> some AsyncSequence<MonthOverview, any Error> {
         EntryListJoin.updates(in: self) { db in
             try Self.monthPlan(on: today, in: db)
         } join: { list, plan in

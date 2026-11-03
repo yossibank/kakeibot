@@ -63,7 +63,6 @@ private extension HomeTemplateOrderMenu {
         let preferred = anchor.maxX - Self.width
         let limit = width - Self.width - Self.inset
         let lower = max(preferred, Self.inset)
-
         return min(lower, limit)
     }
 

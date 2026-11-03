@@ -364,7 +364,6 @@ private extension EntryItemSheet {
         let insets = geometry.contentInsets
         let grownHeight = geometry.containerSize.height + slipHeight - barHeight
         let maxOffset = geometry.contentSize.height + insets.bottom - grownHeight
-
         return max(-insets.top, maxOffset)
     }
 

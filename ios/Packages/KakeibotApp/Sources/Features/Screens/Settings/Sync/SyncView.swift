@@ -280,6 +280,7 @@ private extension SyncView {
         switch offer {
         case .sync:
             turn(true)
+
         case let .share(item):
             Task {
                 await model.open(item)

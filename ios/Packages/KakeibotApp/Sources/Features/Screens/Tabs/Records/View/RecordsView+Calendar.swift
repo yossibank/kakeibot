@@ -92,8 +92,12 @@ private extension RecordsView {
         if let date {
             let isShown = date == model.shownDate
             let fill = isShown ? Palette.accent : Color.clear
-            let ring = date == model.today && !isShown ? Palette.accent : .clear
-            let opacity = date > model.today && !isShown ? 0.45 : 1
+            let ring = date == model.today && !isShown
+                ? Palette.accent
+                : .clear
+            let opacity = date > model.today && !isShown
+                ? 0.45
+                : 1
 
             Button {
                 model.selectedDate = date

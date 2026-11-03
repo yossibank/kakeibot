@@ -142,9 +142,7 @@ private extension AppDatabase {
         in db: Database
     ) throws -> [Entry.ID: [EntryItem]] {
         let ids = request.select(Column("id"))
-
         let items = try entryItems(where: ids.contains(Column("entry_id")), in: db)
-
         return Dictionary(grouping: items, by: \.entryId)
     }
 

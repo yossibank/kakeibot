@@ -216,6 +216,7 @@ extension ThemeListView {
         switch offer {
         case let .create(base):
             editing = .new(base: base)
+
         case let .select(choice):
             Task {
                 await model.select(choice)
@@ -259,7 +260,6 @@ private extension ThemeListView {
                     .mask {
                         HStack(spacing: 0) {
                             Color.clear
-
                             Color.black
                         }
                     }
@@ -320,7 +320,6 @@ private extension ThemeListView {
         let select = SettingsIntroCard.Note("hand.tap", "押すと、そのテーマに切り替わります")
         let edit = SettingsIntroCard.Note("square.and.pencil", "つくったテーマは、もう一度押すと編集できます")
         let base = SettingsIntroCard.Note("plus.square.on.square", "長押しで、その色をもとにつくれます")
-
         return model.customThemes.isEmpty ? [select, base] : [select, edit, base]
     }
 
@@ -336,7 +335,6 @@ private extension ThemeListView {
 
     var suggestionMessage: String {
         let title = model.suggestedIcon?.title ?? ""
-
         return "アプリアイコンも\(title)にできます"
     }
 

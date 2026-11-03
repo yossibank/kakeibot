@@ -5,7 +5,6 @@ import SwiftUI
 extension ReminderView {
     var recurringText: String {
         let time = model.time ?? .morning
-
         return "固定費の通知は \(time) に届きます"
     }
 

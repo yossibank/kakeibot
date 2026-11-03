@@ -123,18 +123,21 @@ extension RecordTests {
                     categoryId: nil,
                     toWalletId: nil
                 )
+
             case .transferWithCategory:
                 sample.entry(
                     type: .transfer,
                     categoryId: sample.category.id,
                     toWalletId: sample.cash.id
                 )
+
             case .transferToSameWallet:
                 sample.entry(
                     type: .transfer,
                     categoryId: nil,
                     toWalletId: sample.bank.id
                 )
+
             case .zeroAmount:
                 sample.entry(
                     type: .expense,
@@ -142,6 +145,7 @@ extension RecordTests {
                     toWalletId: nil,
                     amount: 0
                 )
+
             case .duplicateRecurringDate:
                 sample.entry(
                     type: .expense,
@@ -150,6 +154,7 @@ extension RecordTests {
                     recurringId: sample.recurring.id,
                     recurringDate: sample.expense.recurringDate
                 )
+
             case .unknownWallet:
                 sample.entry(
                     type: .expense,
@@ -157,12 +162,14 @@ extension RecordTests {
                     toWalletId: nil,
                     walletId: Wallet.ID()
                 )
+
             case .secondWholeMonthBudget:
                 Budget(
                     categoryId: nil,
                     fromMonth: sample.wholeBudget.fromMonth,
                     amount: 1
                 )
+
             case .duplicateRewardLog:
                 RewardLog(
                     ruleId: sample.rule.id,
@@ -170,6 +177,7 @@ extension RecordTests {
                     amount: 1,
                     createdAt: sample.now
                 )
+
             case .iconWithoutEmojiOrText:
                 Icon(
                     emoji: nil,

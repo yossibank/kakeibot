@@ -29,8 +29,10 @@ public extension ThemeListModel {
         switch current {
         case .system:
             return ThemePreset.white.palette
+
         case let .preset(preset):
             return preset.palette
+
         case let .custom(id):
             let theme = customThemes.first { $0.id == id }
             return theme?.palette ?? ThemePreset.white.palette

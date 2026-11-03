@@ -131,7 +131,6 @@ private extension EntryReceiptModel {
 
     static var isUsable: Bool {
         let model = SystemLanguageModel.default
-
         return model.isAvailable && model.supportsLocale(locale)
     }
 

@@ -58,18 +58,21 @@ public extension PlannedNotification {
                 }
 
                 self = .entry(date)
+
             case "recurring":
                 guard let id = Recurring.ID(parts[1]) else {
                     return nil
                 }
 
                 self = .recurring(id)
+
             case "template":
                 guard let id = EntryTemplate.ID(parts[1]) else {
                     return nil
                 }
 
                 self = .template(id)
+
             default:
                 return nil
             }

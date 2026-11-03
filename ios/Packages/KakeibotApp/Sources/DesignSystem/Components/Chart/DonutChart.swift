@@ -98,7 +98,12 @@ private extension DonutChart {
                 start = end
             }
 
-            return Segment(id: slice.id, start: start, end: trimmedEnd, color: slice.color)
+            return Segment(
+                id: slice.id,
+                start: start,
+                end: trimmedEnd,
+                color: slice.color
+            )
         }
     }
 

@@ -84,6 +84,7 @@ private extension HomeSectionListView {
                         }
                         .offset(y: offset(of: section))
                         .zIndex(layer(of: section))
+
                 case .boundary:
                     boundary
                 }
@@ -201,9 +202,11 @@ private extension HomeSectionListView {
                 switch value {
                 case .first(true):
                     startDragging(section)
+
                 case let .second(true, drag?):
                     startDragging(section)
                     moveDragging(section, by: drag.translation.height)
+
                 default:
                     break
                 }

@@ -43,7 +43,6 @@ public extension YearMonth {
         let first = LocalDate(yearMonth: self, clampedDay: 1)
         let lastOffset = numberOfDays - 1
         let last = first.adding(days: lastOffset)
-
         return (first...last).weeks(startingOn: weekStart)
     }
 
@@ -62,7 +61,9 @@ extension YearMonth {
         let previousYear = year - 1
         let leapDays = Self.leapDays(through: previousYear)
         let daysBeforeYear = previousYear * 365 + leapDays
-        let leapDayThisYear = month > 2 && isLeapYear ? 1 : 0
+        let leapDayThisYear = month > 2 && isLeapYear
+            ? 1
+            : 0
         let commonDays = Self.daysBeforeMonthInCommonYear[month - 1]
         let daysBeforeMonth = commonDays + leapDayThisYear
 
@@ -94,7 +95,6 @@ private extension YearMonth {
     var isLeapYear: Bool {
         let isFourth = year.isMultiple(of: 4)
         let isCentury = year.isMultiple(of: 100)
-
         return isFourth && (!isCentury || year.isMultiple(of: 400))
     }
 

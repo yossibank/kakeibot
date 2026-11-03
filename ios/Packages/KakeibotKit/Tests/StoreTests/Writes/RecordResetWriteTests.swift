@@ -120,7 +120,6 @@ extension RecordResetWriteTests.Setup {
 
     func count(_ source: String) async throws -> Int {
         let value = try await base.value("SELECT COUNT(*) FROM \(source)")
-
         return try #require(Int(value))
     }
 

@@ -264,10 +264,12 @@ private extension HomeRecurringSheet {
             Label("済み", systemImage: "checkmark")
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
+
         case .upcoming:
             Text(daysText(until: item.date))
                 .textFont(.caption2)
                 .foregroundStyle(Palette.accent)
+
         case .missing:
             Label("記録がありません", systemImage: "exclamationmark.circle")
                 .textFont(.caption2)

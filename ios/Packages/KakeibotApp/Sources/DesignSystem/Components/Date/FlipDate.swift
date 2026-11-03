@@ -50,7 +50,6 @@ public struct FlipDate: View {
         .overlay(alignment: .top) {
             HStack(spacing: 20) {
                 binding
-
                 binding
             }
             .offset(y: -4)

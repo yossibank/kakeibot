@@ -23,7 +23,6 @@ struct PlaceholderEmpty: View {
 #Preview {
     VStack(spacing: 40) {
         PlaceholderEmpty(text: "まだ記録がありません") {}
-
         PlaceholderEmpty(text: "この月の記録はありません", onRecord: nil)
     }
     .padding()

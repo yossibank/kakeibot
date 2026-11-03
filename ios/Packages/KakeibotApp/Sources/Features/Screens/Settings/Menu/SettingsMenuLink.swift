@@ -27,7 +27,6 @@ enum SettingsMenuLink {
     static var systemVersion: String {
         let version = ProcessInfo.processInfo.operatingSystemVersion
         let base = "\(version.majorVersion).\(version.minorVersion)"
-
         return version.patchVersion > 0 ? "\(base).\(version.patchVersion)" : base
     }
 

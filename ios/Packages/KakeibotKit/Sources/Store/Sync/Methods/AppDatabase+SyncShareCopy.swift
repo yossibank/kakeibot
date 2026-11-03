@@ -154,7 +154,9 @@ private extension AppDatabase {
         let names = try db.columns(in: table).map(\.name)
 
         let expressions = names.map { name in
-            name == "id" || values[name] != nil ? "?" : name
+            name == "id" || values[name] != nil
+                ? "?"
+                : name
         }
 
         let replaced = names.compactMap { name in

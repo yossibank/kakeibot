@@ -56,9 +56,7 @@ private extension SyncView {
     var steps: some View {
         VStack(alignment: .leading, spacing: 8) {
             step(1, "「招待」から、相手に招待を送ります")
-
             step(2, "相手が、届いたリンクを開きます")
-
             step(3, "相手のかけいぼっとにこの口座が並び、一緒に記録できます")
         }
         .padding(.top, 8)

@@ -13,15 +13,11 @@ public extension StoreRecord {
         .convertToSnakeCase
     }
 
-    static func databaseDateDecodingStrategy(
-        for column: String
-    ) -> DatabaseDateDecodingStrategy {
+    static func databaseDateDecodingStrategy(for column: String) -> DatabaseDateDecodingStrategy {
         .custom(Date.init(storedValue:))
     }
 
-    static func databaseDateEncodingStrategy(
-        for column: String
-    ) -> DatabaseDateEncodingStrategy {
+    static func databaseDateEncodingStrategy(for column: String) -> DatabaseDateEncodingStrategy {
         .iso8601
     }
 }

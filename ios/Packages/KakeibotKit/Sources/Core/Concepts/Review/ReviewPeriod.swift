@@ -17,8 +17,10 @@ public struct ReviewPeriod: Hashable, Sendable {
         switch scale {
         case .week:
             self.range = date.week(startingOn: weekStart)
+
         case .month:
             self.range = date.period(startingOn: monthStartDay)
+
         case .year:
             let month = date.periodMonth(startingOn: monthStartDay)
             let monthsToDecember = 12 - month.month
@@ -64,9 +66,11 @@ public extension ReviewPeriod {
         case .week:
             let days = 7 * count
             date = range.lowerBound.adding(days: days)
+
         case .month:
             let month = range.upperBound.yearMonth.adding(months: count)
             date = month.period(startingOn: monthStartDay).lowerBound
+
         case .year:
             let months = 12 * count
             let month = range.upperBound.yearMonth.adding(months: months)

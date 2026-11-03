@@ -79,9 +79,7 @@ private extension StampEditModelTests {
         return database
     }
 
-    static func firstShelfIcon(
-        in database: AppDatabase
-    ) async throws -> ShelfIcon {
+    static func firstShelfIcon(in database: AppDatabase) async throws -> ShelfIcon {
         let shelf = try await database.iconShelf()
         return try #require(shelf.shelfIcons.first)
     }

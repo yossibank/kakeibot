@@ -52,7 +52,6 @@ public extension RewardBank {
         let ruleIds = logs(on: date).map(\.ruleId)
         let achieved = Set(ruleIds)
         let hidden = rules.filter { !$0.isActive && achieved.contains($0.id) }
-
         return activeRules + hidden
     }
 

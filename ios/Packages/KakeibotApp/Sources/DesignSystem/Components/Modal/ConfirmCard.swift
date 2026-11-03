@@ -101,6 +101,7 @@ private extension ConfirmCard {
             CardButton(keepTitle, style: .filled, action: onKeep)
 
             CardButton(confirmTitle, style: .outlined(Palette.rose), action: onConfirm)
+
         case .suggestion:
             CardButton(confirmTitle, style: .filled, action: onConfirm)
 

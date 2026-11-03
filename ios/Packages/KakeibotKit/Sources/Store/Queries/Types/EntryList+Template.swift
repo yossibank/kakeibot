@@ -12,7 +12,6 @@ public extension EntryList {
         let shown = template.tagId.flatMap { tags[$0] }.flatMap { $0.archivedAt == nil ? $0 : nil }
         let tag = shown?.name
         let wallet = wallets[template.walletId]?.name
-
         return [category, tag, wallet]
     }
 
@@ -59,6 +58,7 @@ private extension EntryList {
         switch order {
         case .manual:
             break
+
         case .frequent:
             let left = uses[lhs.id, default: 0]
             let right = uses[rhs.id, default: 0]
@@ -66,6 +66,7 @@ private extension EntryList {
             if left != right {
                 return left > right
             }
+
         case .category:
             let left = categoryOrder(of: lhs)
             let right = categoryOrder(of: rhs)
@@ -73,6 +74,7 @@ private extension EntryList {
             if left != right {
                 return left < right
             }
+
         case .amount:
             let left = lhs.amount ?? -1
             let right = rhs.amount ?? -1
@@ -80,6 +82,7 @@ private extension EntryList {
             if left != right {
                 return left > right
             }
+
         case .name:
             let result = lhs.name.compare(
                 rhs.name,

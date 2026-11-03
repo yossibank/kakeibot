@@ -20,7 +20,6 @@ private extension AppDatabase {
         let iconPairs = icons.map { ($0.id, $0) }
         let stampsByDate = Dictionary(uniqueKeysWithValues: stampPairs)
         let iconsByID = Dictionary(uniqueKeysWithValues: iconPairs)
-
         return StampCalendar(stamps: stampsByDate, icons: iconsByID)
     }
 }

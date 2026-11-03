@@ -69,7 +69,6 @@ struct SyncInviteCard: View {
 
                 VStack(spacing: 12) {
                     CardButton("招待を送る", style: .filled, action: onInvite)
-
                     CardButton("あとで", style: .outlined(Palette.subtext), action: onCancel)
                 }
             }

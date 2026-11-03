@@ -11,15 +11,10 @@ struct QuickRecordWidgetView: View {
     var body: some View {
         ViewThatFits(in: .vertical) {
             layout(Self.regular)
-
             layout(Self.tight)
-
             layout(Self.tight.limited(2))
-
             layout(Self.tight.limited(1))
-
             layout(Self.compact.limited(2))
-
             layout(Self.compact.limited(1))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

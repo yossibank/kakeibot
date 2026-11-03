@@ -36,7 +36,6 @@ struct SyncChoiceCard: View {
 
                 HStack(alignment: .top, spacing: 12) {
                     tile(.local)
-
                     tile(.cloud)
                 }
 

@@ -29,10 +29,12 @@ extension CategoryListView {
         switch drag.drop() {
         case let .hide(id):
             hide(id)
+
         case .move:
             Task {
                 await model.finishMoving()
             }
+
         case nil:
             break
         }

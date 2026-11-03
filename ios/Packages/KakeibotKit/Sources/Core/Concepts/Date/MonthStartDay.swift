@@ -43,7 +43,6 @@ extension MonthStartDay {
         let start = date(in: yearMonth)
         let nextMonth = yearMonth.adding(months: 1)
         let end = date(in: nextMonth).adding(days: -1)
-
         return start...end
     }
 

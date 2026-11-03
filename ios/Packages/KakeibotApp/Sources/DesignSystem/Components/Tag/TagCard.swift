@@ -63,7 +63,6 @@ extension TagCard {
         let font = UIFont.systemFont(ofSize: size.fontSize)
         let text = (title as NSString).size(withAttributes: [.font: font])
         let width = ceil(text.width) + size.padding * 2
-
         return max(width, size.minWidth)
     }
 }
@@ -167,11 +166,8 @@ private struct TagFont: ViewModifier {
 #Preview {
     HStack(spacing: 8) {
         TagCard("朝ごはん")
-
         TagCard("昼ごはん", style: .selected)
-
         TagCard("＋", style: .add)
-
         TagCard("夜ごはん", size: .small)
     }
     .padding()

@@ -34,7 +34,6 @@ public struct PageDots: View {
 #Preview {
     VStack(spacing: 16) {
         PageDots(count: 2, current: 0)
-
         PageDots(count: 3, current: 2)
     }
     .padding()

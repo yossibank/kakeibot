@@ -80,8 +80,10 @@ private extension IconDraft {
         switch mark {
         case .glyph:
             return []
+
         case let .emoji(value):
             return Self.trimmed(value).isEmpty ? [.emptyMark] : []
+
         case let .text(value):
             let trimmed = Self.trimmed(value)
 

@@ -57,11 +57,17 @@ public enum SyncTable: String, CaseIterable, Sendable {
                 UniqueKey(columns: ["recurring_id", "recurring_date"], matchesNull: false),
                 UniqueKey(columns: ["transfer_id"], matchesNull: false)
             ]
+
         case .valuation: [UniqueKey(columns: ["wallet_id", "date"], matchesNull: false)]
+
         case .budget: [UniqueKey(columns: ["category_id", "from_month"], matchesNull: true)]
+
         case .rewardLog: [UniqueKey(columns: ["rule_id", "date"], matchesNull: false)]
+
         case .calendarStamp: [UniqueKey(columns: ["date"], matchesNull: false)]
+
         case .itemName: [UniqueKey(columns: ["store", "raw"], matchesNull: false)]
+
         default: []
         }
     }

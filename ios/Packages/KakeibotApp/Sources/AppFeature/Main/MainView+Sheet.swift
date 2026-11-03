@@ -29,6 +29,7 @@ extension MainView {
         switch sheet {
         case .new:
             EntrySheet(model: draft, onChange: show)
+
         case let .edit(id):
             EntrySheet(
                 model: EntryModel(
@@ -38,12 +39,14 @@ extension MainView {
                 ),
                 onChange: show
             )
+
         case .settings:
             SettingsMenuSheet(
                 database: database,
                 today: today,
                 appIcon: appIcon
             )
+
         case let .template(template):
             EntrySheet(
                 model: EntryModel(
@@ -53,6 +56,7 @@ extension MainView {
                 ),
                 onChange: show
             )
+
         case .transfer:
             EntrySheet(
                 model: EntryModel(
@@ -62,12 +66,14 @@ extension MainView {
                 ),
                 onChange: show
             )
+
         case .templates:
             HomeTemplateShelfSheet(
                 model: home,
                 database: database,
                 onUse: useTemplate
             )
+
         case .newTemplate:
             TemplateEditSheet(
                 model: TemplateEditModel(
@@ -75,6 +81,7 @@ extension MainView {
                     type: home.templateType
                 )
             )
+
         case let .recurring(id):
             RecurringEditSheet(
                 model: RecurringEditModel(
@@ -85,6 +92,7 @@ extension MainView {
             ) { deletion in
                 undo.deletion = deletion
             }
+
         case let .setup(item):
             NavigationStack {
                 SetupDestination(
@@ -96,10 +104,13 @@ extension MainView {
                 .toolbar(.hidden, for: .navigationBar)
                 .environment(\.isSettingsSheetRoot, true)
             }
+
         case .reward:
             RecordsRewardSheet(model: records, date: today)
+
         case let .whatsNew(seenVersion):
             WhatsNewSheet(seenVersion: seenVersion, onTry: tryFeature)
+
         case .periodRecurrings:
             HomeRecurringSheet(
                 model: home,
@@ -107,6 +118,7 @@ extension MainView {
                     self.sheet = .recurring(id)
                 }
             )
+
         case let .wallet(id):
             WalletEditSheet(
                 model: WalletEditModel(

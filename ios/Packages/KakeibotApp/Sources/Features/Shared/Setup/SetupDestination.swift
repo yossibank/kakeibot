@@ -31,10 +31,13 @@ public struct SetupDestination: View {
                     today: today
                 )
             )
+
         case .wallets:
             WalletListView(database: database)
+
         case .categories:
             CategoryListView(database: database)
+
         case .recurrings:
             RecurringListView(
                 model: RecurringListModel(
@@ -42,8 +45,10 @@ public struct SetupDestination: View {
                     today: today
                 )
             )
+
         case .templates:
             TemplateListView(database: database)
+
         case .reminder:
             ReminderView(
                 model: ReminderModel(
@@ -53,16 +58,22 @@ public struct SetupDestination: View {
                     permission: permission
                 )
             )
+
         case .launchScreen:
             LaunchScreenView(model: LaunchScreenModel(database: database))
+
         case .theme:
             ThemeListView(database: database, appIcon: appIcon)
+
         case .appIcon:
             AppIconListView(model: appIcon)
+
         case .themeStyle:
             ThemeStyleTextView(model: ThemeStyleModel(database: database))
+
         case .themeLook:
             ThemeStyleLookView(model: ThemeStyleModel(database: database))
+
         case .homeSections:
             HomeSectionListView(
                 model: HomeSectionListModel(database: database),

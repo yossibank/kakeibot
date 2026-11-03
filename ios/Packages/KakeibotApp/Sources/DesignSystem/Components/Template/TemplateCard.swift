@@ -85,7 +85,6 @@ public extension TemplateCard where Name == TemplateCardName, Amount == Template
 
         HStack(spacing: 8) {
             TemplateCard(icon: nil, name: "コーヒー", detail: "カフェ・財布", amount: 450)
-
             TemplateCard(icon: nil, name: "定期", detail: "交通・銀行", amount: nil)
         }
     }

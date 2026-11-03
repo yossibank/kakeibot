@@ -103,7 +103,6 @@ private extension CategoryTagCard {
 
     var previewName: String {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
-
         return trimmed.isEmpty ? "名前" : trimmed
     }
 

@@ -43,6 +43,8 @@ snapshot:
 
 verify: verify-docs
 	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
+	@test -f $(CLAUDE_CONFIG)/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build
 

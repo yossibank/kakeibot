@@ -94,6 +94,7 @@ private extension RootView {
         switch model.launch {
         case .opening:
             ProgressView()
+
         case let .onboarding(database):
             OnboardingView(
                 database: database,
@@ -104,6 +105,7 @@ private extension RootView {
                 }
             }
             .transition(.opacity)
+
         case let .ready(database):
             MainView(
                 database: database,
@@ -133,6 +135,7 @@ private extension RootView {
             .task {
                 await model.observePro(in: database)
             }
+
         case .failed:
             ContentUnavailableView {
                 Label("データを開けませんでした", systemImage: "exclamationmark.triangle")

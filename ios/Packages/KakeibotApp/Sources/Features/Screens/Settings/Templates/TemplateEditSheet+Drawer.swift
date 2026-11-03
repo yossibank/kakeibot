@@ -17,6 +17,7 @@ extension TemplateEditSheet {
 
                 saveButton
             }
+
         case .category:
             SettingsTileGrid(items: model.categories, columns: 5, spacing: 4) { category in
                 SettingsCategoryTile(
@@ -29,9 +30,11 @@ extension TemplateEditSheet {
                 }
             }
             .padding(.bottom, 8)
+
         case .tag:
             tagChooser
                 .padding(.bottom, 8)
+
         case .wallet:
             SettingsTileGrid(items: model.wallets, columns: 3, spacing: 8) { wallet in
                 SettingsWalletTile(
@@ -44,6 +47,7 @@ extension TemplateEditSheet {
                 }
             }
             .padding(.bottom, 8)
+
         case .memo:
             EmptyView()
         }

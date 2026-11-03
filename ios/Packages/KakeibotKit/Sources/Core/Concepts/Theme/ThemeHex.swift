@@ -17,7 +17,6 @@ enum ThemeHex {
         let digits = String(rgb, radix: 16, uppercase: true)
         let missing = 6 - digits.count
         let padding = String(repeating: "0", count: missing)
-
         return "#" + padding + digits
     }
 }

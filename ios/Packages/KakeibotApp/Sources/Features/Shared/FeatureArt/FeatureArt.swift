@@ -116,9 +116,7 @@ private extension FeatureArt {
 
                 VStack(spacing: 4) {
                     sharedRow("自", title: "スーパー", amount: 2180)
-
                     sharedRow("家", title: "ドラッグストア", amount: 1340)
-
                     sharedRow("自", title: "電気代", amount: 6820)
                 }
             }

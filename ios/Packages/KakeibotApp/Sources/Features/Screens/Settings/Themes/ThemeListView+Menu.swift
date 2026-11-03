@@ -98,7 +98,6 @@ private extension ThemeListView {
     func menuX(for menu: Menu) -> CGFloat {
         let preferred = menu.frame.midX - Self.menuWidth / 2
         let limit = size.width - Self.menuWidth - Self.menuInset
-
         return min(max(preferred, Self.menuInset), limit)
     }
 

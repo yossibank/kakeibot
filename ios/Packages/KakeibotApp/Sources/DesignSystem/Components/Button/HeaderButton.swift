@@ -75,7 +75,6 @@ private extension HeaderButton {
 #Preview {
     HStack(spacing: 24) {
         HeaderButton(systemImage: "gearshape") {}
-
         HeaderButton(systemImage: "arrow.left.arrow.right", title: "振替") {}
     }
     .padding()

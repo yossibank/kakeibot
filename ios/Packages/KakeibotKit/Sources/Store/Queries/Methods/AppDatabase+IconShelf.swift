@@ -17,7 +17,6 @@ private extension AppDatabase {
         let iconIds = shelfIcons.map(\.iconId)
         let pairs = try Icon.fetchAll(db, keys: iconIds).map { ($0.id, $0) }
         let icons = Dictionary(uniqueKeysWithValues: pairs)
-
         return IconShelf(shelfIcons: shelfIcons, icons: icons)
     }
 }

@@ -247,12 +247,15 @@ private extension CategoryEditModel {
         case .emptyName:
             tagProblem = "タグの名前を入れてください"
             return false
+
         case .nameTooLong:
             tagProblem = "タグは \(EntryTagDraft.maxNameLength) 文字までです"
             return false
+
         case .duplicateName:
             tagProblem = "同じ名前のタグがあります"
             return false
+
         case nil:
             tagProblem = nil
             return true

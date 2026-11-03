@@ -29,7 +29,6 @@ struct ProOfferCard: View {
 
             HStack(spacing: 12) {
                 CardButton("Pro について", style: .outlined(Palette.accent), action: onLearnMore)
-
                 CardButton("あとで", style: .outlined(Palette.subtext), action: onCancel)
             }
         }

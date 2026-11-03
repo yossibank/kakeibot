@@ -313,6 +313,7 @@ private extension TemplateListView {
         switch destination {
         case let .new(type):
             TemplateEditModel(database: database, type: type)
+
         case let .edit(id):
             TemplateEditModel(database: database, type: model.type, editing: id)
         }

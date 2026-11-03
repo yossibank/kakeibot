@@ -177,16 +177,20 @@ public extension ThemeEditModel.Slot {
                 "#2C1A36", "#F8F4EB", "#FFFFFF", "#EEF4FA", "#EEF3EA",
                 "#F8EEEC", "#F4E8C8"
             ]
+
         case .surface:
             [
                 "#141C2F", "#18181B", "#12322A", "#0E333B", "#2E0F1A",
                 "#26162E", "#FFFFFF", "#F5EFE3", "#F0F5FA", "#F2F6EF",
                 "#F8EEEB", "#FFF8E6"
             ]
+
         case .text:
             ["#EDE6D6", "#ECECEA", "#F0F5F2", "#2A2418", "#1E1E22", "#17233A"]
+
         case .subtext:
             ["#8C97AE", "#9A9CA3", "#8FB0A3", "#6B6152", "#63636B", "#54627A"]
+
         case .accent:
             [
                 "#CDAA6B", "#C9CCD2", "#D9966A", "#7FD1B9", "#E3A3A3",
@@ -204,7 +208,6 @@ private extension ThemeEditModel {
         let rgb = UInt32(hex.dropFirst(), radix: 16) ?? 0
         let onBlack = ThemePalette.contrast(rgb, 0x000000)
         let onWhite = ThemePalette.contrast(rgb, 0xFFFFFF)
-
         return onBlack > onWhite
     }
 

@@ -212,24 +212,32 @@ extension SyncEngine: CKSyncEngineDelegate {
         case let .stateUpdate(update):
             let data = try? JSONEncoder().encode(update.stateSerialization)
             try? await database.saveSyncEngineState(data, isShared: isShared)
+
         case let .accountChange(change):
             await changeAccount(change)
+
         case let .fetchedDatabaseChanges(changes):
             for deletion in changes.deletions {
                 await deleteZone(deletion)
             }
+
         case let .fetchedRecordZoneChanges(changes):
             await applyFetched(changes)
+
         case let .sentRecordZoneChanges(sent):
             await finishSending(sent)
+
         case .willFetchChanges:
             await showFetching(true)
+
         case .didFetchChanges:
             knowsZones = true
             await showFetching(false)
             await showSynced()
+
         case .didSendChanges:
             await showSynced()
+
         default:
             break
         }

@@ -27,7 +27,6 @@ public extension RowOrColumnLayout {
 
         guard rowWidth > proposal.width ?? .infinity else {
             let rowHeight = sizes.map(\.height).max() ?? 0
-
             return CGSize(width: rowWidth, height: rowHeight)
         }
 

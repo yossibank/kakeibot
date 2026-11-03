@@ -108,7 +108,6 @@ extension WalletEditSheet {
 
     var colorNote: some View {
         let color = Color(hex: model.icon.color) ?? Palette.subtext
-
         return SettingsPreviewNote("アイコンの色は、振り返りのグラフの色になります", dot: color)
     }
 

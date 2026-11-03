@@ -75,6 +75,7 @@ extension ReceiptLine {
         switch kind {
         case .total, .stop:
             true
+
         default:
             false
         }
@@ -84,8 +85,10 @@ extension ReceiptLine {
         switch kind {
         case let .item(amount):
             amount.value > 0
+
         case .heading(isTitle: false):
             (amount?.value ?? 0) > 0
+
         default:
             false
         }
@@ -117,7 +120,6 @@ extension ReceiptLine {
 
     static func isNameLike(_ name: String) -> Bool {
         let letters = name.filter(\.isLetter)
-
         return letters.count >= 2 || letters.contains { !$0.isASCII }
     }
 

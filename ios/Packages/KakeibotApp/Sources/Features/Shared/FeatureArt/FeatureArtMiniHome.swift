@@ -79,7 +79,6 @@ private extension FeatureArtMiniHome {
 
             HStack(spacing: 0) {
                 summary("今日の支出", amount: FeatureArtSample.todayExpense)
-
                 summary("今月の支出", amount: FeatureArtSample.monthExpense)
             }
             .padding(.top, 4)

@@ -19,6 +19,7 @@ extension RecurringEditSheet {
 
                 saveButton
             }
+
         case .category:
             SettingsTileGrid(items: model.categories, columns: 5, spacing: 4) { category in
                 SettingsCategoryTile(
@@ -31,6 +32,7 @@ extension RecurringEditSheet {
                 }
             }
             .padding(.bottom, 8)
+
         case .wallet:
             SettingsTileGrid(items: model.wallets, columns: 3, spacing: 8) { wallet in
                 SettingsWalletTile(
@@ -43,6 +45,7 @@ extension RecurringEditSheet {
                 }
             }
             .padding(.bottom, 8)
+
         case .destination:
             SettingsTileGrid(items: model.wallets, columns: 3, spacing: 8) { wallet in
                 SettingsWalletTile(
@@ -55,16 +58,22 @@ extension RecurringEditSheet {
                 }
             }
             .padding(.bottom, 8)
+
         case .schedule:
             scheduleChooser
+
         case .start:
             MonthCalendar(selection: $model.startDate, today: model.today)
+
         case .end:
             endChooser
+
         case .holiday:
             holidayChooser
+
         case .closing:
             closingChooser
+
         case .fee:
             VStack(spacing: 12) {
                 SettingsKeypadValue(model.fee)
@@ -81,6 +90,7 @@ extension RecurringEditSheet {
 
                 saveButton
             }
+
         case .remind:
             remindChooser
         }

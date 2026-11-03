@@ -36,8 +36,10 @@ private extension AppDatabase {
         switch try setting(.theme, in: db) {
         case .system:
             return .followsDevice
+
         case let .preset(preset):
             return .fixed(preset.palette)
+
         case let .custom(id):
             let theme = try Theme.fetchOne(db, key: id)
             let palette = theme?.palette

@@ -62,9 +62,7 @@ private extension EntryReceiptButton {
 #Preview {
     VStack(spacing: 16) {
         EntryReceiptButton(freeLeft: 2) {}
-
         EntryReceiptButton(freeLeft: 0) {}
-
         EntryReceiptButton(freeLeft: nil) {}
     }
     .padding()

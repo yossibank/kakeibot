@@ -46,9 +46,11 @@ private extension WhatsNewScene {
             tapped {
                 EntryReceiptButton(freeLeft: nil) {}
             }
+
         case .receiptCamera:
             FeatureArtReceipt(showsViewfinder: true)
                 .scaleEffect(0.95)
+
         case .receiptItems:
             VStack(spacing: 8) {
                 FeatureArtSlip(showsRates: false)
@@ -56,6 +58,7 @@ private extension WhatsNewScene {
                 countBadge
             }
             .padding(.horizontal, 4)
+
         case .itemsAdd:
             tapped {
                 Label("品目", systemImage: "plus")
@@ -68,15 +71,20 @@ private extension WhatsNewScene {
                             .stroke(Palette.accent, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
                     }
             }
+
         case .itemsSlip:
             itemForm
+
         case .itemsList:
             FeatureArtSlip(showsRates: true, count: 2)
                 .padding(.horizontal, 2)
+
         case .carryoverSwitch:
             carryoverSwitch
+
         case .carryoverLeft:
             carryoverLeft
+
         case .carryoverNext:
             carryoverNext
         }

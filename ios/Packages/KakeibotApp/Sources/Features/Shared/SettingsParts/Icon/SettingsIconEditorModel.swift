@@ -259,9 +259,11 @@ public extension SettingsIconEditorModel {
         case let .glyph(glyph):
             markKind = .glyph
             self.glyph = glyph
+
         case let .emoji(emoji):
             markKind = .emoji
             self.emoji = emoji
+
         case let .text(text):
             markKind = .text
             self.text = text

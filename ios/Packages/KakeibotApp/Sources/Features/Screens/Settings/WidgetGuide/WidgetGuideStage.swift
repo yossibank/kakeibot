@@ -102,6 +102,7 @@ private extension WidgetGuideStage {
                     endPoint: .bottomTrailing
                 )
             )
+
         case .lockScreen, .control:
             AnyShapeStyle(
                 LinearGradient(
@@ -122,15 +123,20 @@ private extension WidgetGuideStage {
             switch (widget, size) {
             case (.budget, .small):
                 budgetSmall
+
             case (.budget, _):
                 budget
+
             case (.quickRecord, .large):
                 quickRecordLarge
+
             case (.quickRecord, _):
                 quickRecord
             }
+
         case .lockScreen:
             lockScreen
+
         case .control:
             control
         }

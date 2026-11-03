@@ -10,10 +10,13 @@ struct EntryReceiptArt: View {
         switch kind {
         case .flat:
             flat
+
         case .bright:
             bright
+
         case .edges:
             edges
+
         case .reading:
             reading
         }
@@ -182,11 +185,8 @@ private struct FinderCorners: Shape {
 #Preview {
     HStack(spacing: 16) {
         EntryReceiptArt(kind: .flat)
-
         EntryReceiptArt(kind: .bright)
-
         EntryReceiptArt(kind: .edges)
-
         EntryReceiptArt(kind: .reading)
     }
     .padding()

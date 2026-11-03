@@ -116,6 +116,7 @@ private extension StorePage {
                 badgeText: Color(rgb: 0xFBF7EF),
                 glow: Color(rgb: 0x9A6A2A)
             )
+
         case .blush: Colors(
                 top: Color(rgb: 0xFCF3F1),
                 bottom: Color(rgb: 0xEFD3D1),
@@ -125,6 +126,7 @@ private extension StorePage {
                 badgeText: Color(rgb: 0xFCF3F1),
                 glow: Color(rgb: 0x9C4A5A)
             )
+
         case .night: Colors(
                 top: Color(rgb: 0x1B2236),
                 bottom: Color(rgb: 0x0C1020),
@@ -134,6 +136,7 @@ private extension StorePage {
                 badgeText: Color(rgb: 0x1B2236),
                 glow: Color(rgb: 0xE0B66A)
             )
+
         case .sage: Colors(
                 top: Color(rgb: 0xF4F6EF),
                 bottom: Color(rgb: 0xD7DFCB),
@@ -143,6 +146,7 @@ private extension StorePage {
                 badgeText: Color(rgb: 0xF4F6EF),
                 glow: Color(rgb: 0x4F6B45)
             )
+
         case .sand: Colors(
                 top: Color(rgb: 0xF8F1E4),
                 bottom: Color(rgb: 0xE6CFA6),
@@ -188,6 +192,7 @@ private extension StorePage {
         switch art {
         case let .phone(shot):
             phone(shot, width: 360)
+
         case let .tap(shot, point):
             phone(shot, width: 360)
                 .overlay {
@@ -199,6 +204,7 @@ private extension StorePage {
                             )
                     }
                 }
+
         case let .inset(shot, part, corner, width, point):
             ZStack(alignment: .top) {
                 phone(shot, width: 360)
@@ -216,13 +222,16 @@ private extension StorePage {
                         )
                 }
             }
+
         case let .fan(left, center, right, labels):
             fan(
                 [left, center, right],
                 labels: labels
             )
+
         case let .compare(base, parts, labels):
             compare(base, parts: parts, labels: labels)
+
         case let .pair(left, right):
             ZStack(alignment: .top) {
                 phone(left, width: 260)
@@ -467,8 +476,10 @@ private extension SnapshotTests {
         switch art {
         case let .phone(name):
             return try .phone(image(name))
+
         case let .tap(name, point):
             return try .tap(image(name), at: point)
+
         case let .inset(name, source, crop, corner, width, point):
             let cropped = try #require(image(source).cgImage?.cropping(to: crop))
 
@@ -479,6 +490,7 @@ private extension SnapshotTests {
                 width: width,
                 at: point
             )
+
         case let .fan(left, center, right, labels):
             return try .fan(
                 left: image(left),
@@ -486,6 +498,7 @@ private extension SnapshotTests {
                 right: image(right),
                 labels: labels
             )
+
         case let .compare(base, parts, labels, crop):
             let cropped = try parts.map { name in
                 let part = try #require(image(name).cgImage?.cropping(to: crop))
@@ -493,6 +506,7 @@ private extension SnapshotTests {
             }
 
             return try .compare(image(base), parts: cropped, labels: labels)
+
         case let .pair(left, right):
             return try .pair(image(left), image(right))
         }

@@ -167,10 +167,12 @@ private extension ThemeStyleTextView {
             model.cancelPreview()
             model.preview(displayFont: font)
             fontOffer = offer
+
         case let .text(font) where isLocked(font) && font != model.savedStyle.textFont:
             model.cancelPreview()
             model.preview(textFont: font)
             fontOffer = offer
+
         default:
             fontOffer = nil
             model.cancelPreview()
@@ -194,6 +196,7 @@ private extension ThemeStyleTextView {
         switch offer {
         case let .display(font):
             await model.choose(displayFont: font)
+
         case let .text(font):
             await model.choose(textFont: font)
         }

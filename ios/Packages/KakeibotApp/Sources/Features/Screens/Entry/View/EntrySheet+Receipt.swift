@@ -42,8 +42,10 @@ extension EntrySheet {
                     receipt.cancel()
                 }
             }
+
         case .reading:
             EntryReceiptReadingCard()
+
         case .camera, nil:
             EmptyView()
         }

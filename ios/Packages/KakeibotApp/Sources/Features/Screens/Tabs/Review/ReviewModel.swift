@@ -104,7 +104,6 @@ public extension ReviewModel {
 
     var hasPreviousEntries: Bool {
         let range = period.comparisonRange(today: today)
-
         return entries.contains { range.contains($0.date) }
     }
 

@@ -113,11 +113,13 @@ private extension ReceiptReading.Builder {
             return
         }
 
+        let isReduced = amount.isReduced || pendingReduced
+
         var item = EntryItem.Draft(
             name: name,
             quantity: amount.count,
             amount: amount.value,
-            taxRate: amount.isIncluded ? nil : (amount.isReduced || pendingReduced ? .reduced : nil)
+            taxRate: amount.isIncluded ? nil : (isReduced ? .reduced : nil)
         )
 
         if let quantity = pendingQuantity {

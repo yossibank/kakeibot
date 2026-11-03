@@ -16,10 +16,13 @@ extension FixtureMark {
         case "glyph":
             let glyph = try #require(Icon.Glyph(rawValue: value))
             return .glyph(glyph)
+
         case "emoji":
             return .emoji(value)
+
         case "text":
             return .text(value)
+
         default:
             throw Problem.unknownKind(kind)
         }

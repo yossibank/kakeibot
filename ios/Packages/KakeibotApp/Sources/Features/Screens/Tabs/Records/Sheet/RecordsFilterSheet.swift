@@ -204,8 +204,10 @@ private extension RecordsFilterSheet {
         switch tab {
         case .tag where !filter.categoryIds.isEmpty:
             "選んだカテゴリにはタグがありません"
+
         case .tag:
             "カテゴリの編集でタグを足すと、ここで選べます"
+
         case .expense, .income, .wallet:
             "選べるものがありません"
         }

@@ -77,7 +77,6 @@ public extension RecordsModel {
 
     var days: [EntryDay] {
         let days = list?.days.filter { period.contains($0.date) } ?? []
-
         return filter.apply(to: days)
     }
 

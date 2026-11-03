@@ -60,9 +60,7 @@ extension WidgetGuideStage {
 
                 VStack(spacing: 4) {
                     row("今週の支出", amount: FeatureArtSample.weekExpense)
-
                     row("今月の支出", amount: FeatureArtSample.monthExpense)
-
                     row("家賃 11/27", amount: 85000)
                 }
 
@@ -130,13 +128,11 @@ extension WidgetGuideStage {
             Grid(horizontalSpacing: 22, verticalSpacing: 22) {
                 GridRow {
                     app(Self.apps[0])
-
                     app(Self.apps[1])
                 }
 
                 GridRow {
                     app(Self.apps[2])
-
                     app(Self.apps[3])
                 }
             }
@@ -153,7 +149,6 @@ extension WidgetGuideStage {
                 ForEach(0..<3, id: \.self) { row in
                     GridRow {
                         tile(Self.tiles[row * 2], showsDetail: true)
-
                         tile(Self.tiles[row * 2 + 1], showsDetail: true)
                     }
                 }
@@ -215,13 +210,11 @@ extension WidgetGuideStage {
             Grid(horizontalSpacing: 8, verticalSpacing: 8) {
                 GridRow {
                     tile(Self.tiles[0])
-
                     tile(Self.tiles[1])
                 }
 
                 GridRow {
                     tile(Self.tiles[2])
-
                     tile(Self.tiles[3])
                 }
             }

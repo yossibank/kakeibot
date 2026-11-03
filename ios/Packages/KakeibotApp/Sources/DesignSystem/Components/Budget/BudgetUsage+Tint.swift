@@ -11,6 +11,8 @@ public extension BudgetUsage {
     }
 
     var amountTint: Color {
-        isOver || isNearLimit ? tint : Palette.accentStrong
+        isOver || isNearLimit
+            ? tint
+            : Palette.accentStrong
     }
 }

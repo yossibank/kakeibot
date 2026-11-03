@@ -139,9 +139,7 @@ private extension ReviewSharesCard {
     static let chartLimit = 5
     static let minorRatio = 0.05
 
-    static func otherShares(
-        _ shares: [ReviewModel.Share]
-    ) -> [ReviewModel.Share]? {
+    static func otherShares(_ shares: [ReviewModel.Share]) -> [ReviewModel.Share]? {
         let main = shares
             .prefix(chartLimit)
             .prefix(while: { $0.ratio >= minorRatio })
@@ -151,9 +149,7 @@ private extension ReviewSharesCard {
         return others.count > 1 ? others : nil
     }
 
-    static func slices(
-        _ shares: [ReviewModel.Share]
-    ) -> [DonutChart<AnyHashable>.Slice] {
+    static func slices(_ shares: [ReviewModel.Share]) -> [DonutChart<AnyHashable>.Slice] {
         let others = otherShares(shares) ?? []
         let main = shares.dropLast(others.count)
 

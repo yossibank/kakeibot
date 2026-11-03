@@ -106,7 +106,6 @@ public extension BackupModel {
 
     func previousTitle(of item: Previous) -> String {
         let text = Self.dayTimeText(item.date)
-
         return "\(text) の退避に戻す"
     }
 
@@ -150,6 +149,7 @@ public extension BackupModel {
             if kind == .json {
                 try? await database.setSetting(.backupExportedAt, to: date)
             }
+
         case .failure:
             errorNotice.show(Self.exportFailedMessage)
         }
@@ -336,6 +336,7 @@ private extension BackupModel {
         case .json:
             let app = ExportV1.App(platform: .ios, version: appVersion)
             return try await database.backup(at: date, app: app)
+
         case .csv:
             return try await database.spreadsheet()
         }
@@ -352,7 +353,6 @@ private extension ExportV1.Tables {
     var needsNotifications: Bool {
         let hasReminder = settings.contains { $0.key == .reminderTime }
         let hasNotice = recurrings.contains { $0.archivedAt == nil && $0.remindDaysBefore != nil }
-
         return hasReminder || hasNotice
     }
 }

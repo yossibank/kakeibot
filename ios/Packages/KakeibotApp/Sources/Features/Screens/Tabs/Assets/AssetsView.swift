@@ -175,7 +175,6 @@ private extension AssetsView {
     var trendLegend: some View {
         HStack(spacing: 16) {
             legend("手元のお金", dash: [])
-
             legend("純資産", dash: AssetsBalanceTrend.netWorthDash)
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -276,7 +275,6 @@ private extension AssetsView {
         let owned = max(ownedTotal, 0)
         let owed = max(-owedTotal, 0)
         let total = owned + owed
-
         return total == 0 ? 1 : Double(owned) / Double(total)
     }
 
@@ -302,7 +300,6 @@ private extension AssetsView {
     var changeText: String {
         let change = model.changeFromLastMonth
         let sign = change > 0 ? "+" : ""
-
         return "先月末より \(sign)\(AmountText.text(change))"
     }
 
