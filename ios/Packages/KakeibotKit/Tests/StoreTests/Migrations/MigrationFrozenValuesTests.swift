@@ -7,43 +7,43 @@ struct MigrationFrozenValuesTests {
 
     @Test
     func walletKindsStayFrozen() {
-        #expect(MigrationV1.walletKinds == Self.walletKinds, Self.hint)
-        #expect(MigrationV15.walletKinds == Self.walletKinds, Self.hint)
+        #expect(MigrationV001.walletKinds == Self.walletKinds, Self.hint)
+        #expect(MigrationV015.walletKinds == Self.walletKinds, Self.hint)
     }
 
     @Test
     func categoryKindsStayFrozen() {
-        #expect(MigrationV1.categoryKinds == Self.categoryKinds, Self.hint)
+        #expect(MigrationV001.categoryKinds == Self.categoryKinds, Self.hint)
     }
 
     @Test
     func frequenciesStayFrozen() {
-        #expect(MigrationV1.frequencies == Self.frequencies, Self.hint)
-        #expect(MigrationV13.frequencies == Self.frequencies, Self.hint)
+        #expect(MigrationV001.frequencies == Self.frequencies, Self.hint)
+        #expect(MigrationV013.frequencies == Self.frequencies, Self.hint)
     }
 
     @Test
     func entryKindsStayFrozen() {
-        #expect(MigrationV1.entryKinds == Self.entryKinds, Self.hint)
-        #expect(MigrationV13.entryKinds == Self.entryKinds, Self.hint)
+        #expect(MigrationV001.entryKinds == Self.entryKinds, Self.hint)
+        #expect(MigrationV013.entryKinds == Self.entryKinds, Self.hint)
     }
 
     @Test
     func settingKeysStayFrozen() {
-        #expect(MigrationV1.settingKeys == Self.settingKeys, Self.hint)
+        #expect(MigrationV001.settingKeys == Self.settingKeys, Self.hint)
     }
 
     @Test
     func syncTriggersStayFrozen() {
-        let tables = MigrationV26.tables.map { table, key in
+        let tables = MigrationV026.tables.map { table, key in
             "\(table).\(key)"
         }
 
-        let events = MigrationV26.events.map { name, event, row in
+        let events = MigrationV026.events.map { name, event, row in
             "\(name) \(event) \(row)"
         }
 
-        let localSettingKeys = MigrationV26.localSettingKeys
+        let localSettingKeys = MigrationV026.localSettingKeys
             .split(separator: ",")
             .map { key in
                 key.trimmingCharacters(in: CharacterSet(charactersIn: " '"))
@@ -52,7 +52,7 @@ struct MigrationFrozenValuesTests {
         #expect(tables == Self.syncTables, Self.hint)
         #expect(events == Self.syncEvents, Self.hint)
         #expect(localSettingKeys == Self.localSettingKeys, Self.hint)
-        #expect(MigrationV26.recording == Self.syncRecording, Self.hint)
+        #expect(MigrationV026.recording == Self.syncRecording, Self.hint)
     }
 }
 
