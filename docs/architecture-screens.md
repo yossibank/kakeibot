@@ -102,7 +102,7 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 
 ## 📂 画面とフォルダ
 
-画面のフォルダは、Pro のほかは `Features/Screens/` の下にある。
+画面のフォルダは、`Features/Screens/` の下にある。設定の画面のフォルダは、中のファイルの頭と同じ名前にする。
 
 | 画面 | フォルダ |
 | --- | --- |
@@ -119,16 +119,16 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 | 固定費 | `Settings/Recurring/` |
 | 月の始まり | `Settings/MonthStartDay/` |
 | スタンプ | `Settings/Stamps/` |
-| ごほうびの決まり | `Settings/Rewards/` |
+| ごほうびの決まり | `Settings/RewardRules/` |
 | ホームに出すもの | `Settings/HomeSections/` |
-| 起動時に開く画面 | `Settings/Launch/` |
+| 起動時に開く画面 | `Settings/LaunchScreen/` |
 | 記録忘れの通知 | `Settings/Reminder/` |
 | テーマ | `Settings/Themes/` |
 | アプリアイコン | `Settings/AppIcons/` |
 | 文字・形と動き | `Settings/ThemeStyle/` |
 | 同期と共有 | `Settings/Sync/` |
 | バックアップ | `Settings/Backup/` |
-| ウィジェットの置き方 | `Settings/Widgets/` |
+| ウィジェットの置き方 | `Settings/WidgetGuide/` |
 | お知らせ | `WhatsNew/` |
 | 最初の設定 | `Onboarding/` |
-| Pro | `Features/Shared/Pro/` |
+| Pro | `Pro/` |

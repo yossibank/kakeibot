@@ -351,7 +351,6 @@ private extension EntryItemSheet {
             return
         }
 
-        // 伝票を閉じて一覧が伸びると、上限を超えた位置はアニメーション無しで戻されるため、先に送っておく
         withAnimation(.smooth(duration: 0.35)) {
             scrollPosition.scrollTo(y: settledOffset(of: geometry))
         } completion: {
