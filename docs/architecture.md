@@ -29,6 +29,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `scripts/docs-check.py` | 文書と実物の一致を確かめ、`make verify-docs` で走る。リンク先とその見出し、Makefile の入口、この文書のパッケージの木を見る |
 | `scripts/docs-check.py` の fixtures | fixtures の `description` と `summary` も見る |
 | `scripts/docs-check.py` のテストプラン | `Package.swift` のテストのターゲットと、テストプランの中身が一致するかも見る |
+| `scripts/spacing-check.py` | 余白・間隔・角の丸みの数値が 4 の倍数かを確かめ、`make verify` で走る。2 以下と、式の中の値は見ない |
 | claude-config の `hooks/docs-check.py` | 文書の書き方の決まりを確かめ、`make verify-docs` で追跡している全部の `.md` にかける |
 | `spec/` | `export-format.md`、`fixtures.md`、`fixtures/` |
 | `spec/fixtures/` | フォルダ名は、Core のフォルダ名の小文字にそろえる |

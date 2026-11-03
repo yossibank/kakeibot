@@ -42,6 +42,7 @@ snapshot:
 	$(CLAUDE_CONFIG)/skills/ui-snapshot/scripts/render-snapshots.sh ios/Packages/KakeibotApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
 
 verify: verify-docs
+	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build
 
