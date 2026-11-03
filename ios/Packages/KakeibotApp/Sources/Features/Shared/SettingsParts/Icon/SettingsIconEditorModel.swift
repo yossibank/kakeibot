@@ -4,7 +4,7 @@ import Observation
 
 @MainActor
 @Observable
-public final class IconEditModel {
+public final class SettingsIconEditorModel {
     public var markKind: MarkKind = .glyph
     public var glyph: Icon.Glyph
     public var color: String
@@ -14,14 +14,14 @@ public final class IconEditModel {
 
     public init(
         glyph: Icon.Glyph,
-        color: String = IconEditModel.colors[0]
+        color: String = SettingsIconEditorModel.colors[0]
     ) {
         self.glyph = glyph
         self.color = color
     }
 }
 
-public extension IconEditModel {
+public extension SettingsIconEditorModel {
     enum MarkKind: Hashable, CaseIterable, Sendable {
         case glyph
         case emoji
@@ -269,7 +269,7 @@ public extension IconEditModel {
     }
 }
 
-private extension IconEditModel {
+private extension SettingsIconEditorModel {
     static func isEmoji(_ character: Character) -> Bool {
         let scalars = character.unicodeScalars
 
@@ -283,13 +283,13 @@ private extension IconEditModel {
     }
 }
 
-extension IconEditModel.GlyphSection: Identifiable {
+extension SettingsIconEditorModel.GlyphSection: Identifiable {
     public var id: String {
         title
     }
 }
 
-extension IconEditModel.EmojiSection: Identifiable {
+extension SettingsIconEditorModel.EmojiSection: Identifiable {
     public var id: String {
         title
     }

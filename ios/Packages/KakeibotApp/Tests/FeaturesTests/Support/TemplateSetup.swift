@@ -22,7 +22,7 @@ extension TemplateSetup {
         let options = try await database.entryOptions()
         let category = options.expenseCategories[1]
         let icon = try #require(list.icons[category.iconId])
-        let draft = CategoryDraft(category, icon: icon)
+        let draft = EntryCategoryDraft(category, icon: icon)
         let tagDrafts = [EntryTagDraft(name: name)]
 
         try await database.saveCategory(draft, tags: tagDrafts, editing: category.id, at: Date())

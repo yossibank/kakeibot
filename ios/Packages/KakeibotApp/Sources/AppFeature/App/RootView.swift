@@ -33,7 +33,7 @@ public struct RootView: View {
                 }
 
             if isLaunching {
-                LaunchView(
+                AppLaunchView(
                     palette: themePalette,
                     isReady: isLaunchReady
                 ) {

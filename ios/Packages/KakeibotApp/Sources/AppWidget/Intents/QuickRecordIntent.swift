@@ -3,7 +3,7 @@ import Core
 import Foundation
 import Store
 
-struct RecordTemplateIntent: AppIntent {
+struct QuickRecordIntent: AppIntent {
     @Parameter(title: "テンプレート")
     var templateId: String
 
@@ -14,7 +14,7 @@ struct RecordTemplateIntent: AppIntent {
     }
 }
 
-extension RecordTemplateIntent {
+extension QuickRecordIntent {
     static var title: LocalizedStringResource {
         "テンプレートで記録する"
     }

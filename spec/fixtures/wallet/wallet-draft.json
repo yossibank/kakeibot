@@ -1,5 +1,5 @@
 {
-  "description": "財布の入力の判定で出る問題を試す。財布の名前とアイコンは、カテゴリと同じ決まりで判定する。最初の残高は、マイナスでもよい。mark は category-draft.json と同じ形で書く。recordedKind は、記録・評価額・固定費がある財布の、保存されている種類である。recordedKind があるときは、資産（cash・bank・emoney・point・other・investment）と負債（card・loan）をまたぐ kind に変えられず、kindLocked が出る。同じ側の中なら変えられるが、hasValuations（評価額がある）が true の投資は、投資以外にも変えられず、valuedKindLocked が出る。recordedKind が無い財布は、自由に変えられる。",
+  "description": "財布の入力の判定で出る問題を試す。財布の名前とアイコンは、カテゴリと同じ決まりで判定する。最初の残高は、マイナスでもよい。mark は entry-category-draft.json と同じ形で書く。recordedKind は、記録・評価額・固定費がある財布の、保存されている種類である。recordedKind があるときは、資産（cash・bank・emoney・point・other・investment）と負債（card・loan）をまたぐ kind に変えられず、kindLocked が出る。同じ側の中なら変えられるが、hasValuations（評価額がある）が true の投資は、投資以外にも変えられず、valuedKindLocked が出る。recordedKind が無い財布は、自由に変えられる。",
   "cases": [
     {
       "summary": "現金の正しい入力",

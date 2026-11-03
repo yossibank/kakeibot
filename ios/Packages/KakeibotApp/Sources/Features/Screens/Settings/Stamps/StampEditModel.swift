@@ -11,7 +11,7 @@ public final class StampEditModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    public let icon = IconEditModel(glyph: .star)
+    public let icon = SettingsIconEditorModel(glyph: .star)
 
     private var baseline: IconDraft?
 

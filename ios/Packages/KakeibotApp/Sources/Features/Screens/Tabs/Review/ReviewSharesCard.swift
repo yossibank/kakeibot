@@ -127,7 +127,7 @@ private extension ReviewSharesCard {
             }
 
             if let usage = share.usage {
-                UsageBar(usage)
+                BudgetUsageBar(usage)
                     .padding(.leading, 40)
             }
         }

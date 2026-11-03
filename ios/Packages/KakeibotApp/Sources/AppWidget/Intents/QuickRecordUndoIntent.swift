@@ -3,7 +3,7 @@ import Core
 import Foundation
 import Store
 
-struct UndoWidgetEntryIntent: AppIntent {
+struct QuickRecordUndoIntent: AppIntent {
     @Parameter(title: "記録")
     var entryId: String
 
@@ -14,7 +14,7 @@ struct UndoWidgetEntryIntent: AppIntent {
     }
 }
 
-extension UndoWidgetEntryIntent {
+extension QuickRecordUndoIntent {
     static var title: LocalizedStringResource {
         "ウィジェットの記録を取り消す"
     }

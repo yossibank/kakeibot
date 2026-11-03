@@ -206,7 +206,7 @@ extension TagWriteTests.Setup {
         let food = try await category(named: "食費")
         let list = try await database.categoryList()
         let icon = try #require(list.icons[food.iconId])
-        let draft = CategoryDraft(food, icon: icon)
+        let draft = EntryCategoryDraft(food, icon: icon)
 
         try await database.saveCategory(draft, tags: tags, editing: food.id, at: now)
     }

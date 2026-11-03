@@ -99,7 +99,7 @@ private extension QuickRecordWidgetView {
 
                 Spacer(minLength: 4)
 
-                Button(intent: UndoWidgetEntryIntent(recorded.id)) {
+                Button(intent: QuickRecordUndoIntent(recorded.id)) {
                     NoticeActionLabel("取り消す", height: nil)
                         .textFont(size: .caption, weight: .semibold)
                         .lineLimit(1)

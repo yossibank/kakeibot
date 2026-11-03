@@ -3,5 +3,6 @@ xcuserdata/
 DerivedData/
 .build/
 .swiftpm/
+__pycache__/
 .claude/worktrees/
 .claude/handoff.md

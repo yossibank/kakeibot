@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-public struct LaunchView: View {
+public struct AppLaunchView: View {
     @State private var sweep: CGFloat = 0
     @State private var glow: Double = 0
     @State private var hasSwept = false
@@ -52,7 +52,7 @@ public struct LaunchView: View {
     }
 }
 
-private extension LaunchView {
+private extension AppLaunchView {
     var mark: some View {
         let isDark = colorScheme == .dark
         let sweepColor = isDark ? Palette.accentStrong : Palette.accent
@@ -92,7 +92,7 @@ private extension LaunchView {
     }
 }
 
-private extension LaunchView {
+private extension AppLaunchView {
     static let markSize: CGFloat = 160
     static let ringSize: CGFloat = 160 * 694 / 1024
     static let sweepLength: CGFloat = 0.22
@@ -187,5 +187,5 @@ private struct RingSweep: Shape {
 }
 
 #Preview {
-    LaunchView(palette: .night, isReady: true) {} onFinish: {}
+    AppLaunchView(palette: .night, isReady: true) {} onFinish: {}
 }

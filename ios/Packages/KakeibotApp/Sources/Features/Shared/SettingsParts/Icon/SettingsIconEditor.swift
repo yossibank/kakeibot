@@ -2,8 +2,8 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct IconEditor<Field: Hashable>: View {
-    @Bindable var model: IconEditModel
+struct SettingsIconEditor<Field: Hashable>: View {
+    @Bindable var model: SettingsIconEditorModel
 
     @Environment(\.themeStyle.displayFont) private var themeFont
     @Environment(\.themeStyle.textSize.scale) private var textScale
@@ -39,10 +39,10 @@ struct IconEditor<Field: Hashable>: View {
     }
 }
 
-private extension IconEditor {
+private extension SettingsIconEditor {
     var colors: some View {
         LazyVGrid(columns: Self.colorColumns, spacing: 4) {
-            ForEach(IconEditModel.colors, id: \.self) { hex in
+            ForEach(SettingsIconEditorModel.colors, id: \.self) { hex in
                 colorButton(hex)
             }
 
@@ -70,7 +70,7 @@ private extension IconEditor {
 
     var glyphChooser: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ForEach(IconEditModel.glyphSections) { section in
+            ForEach(SettingsIconEditorModel.glyphSections) { section in
                 VStack(alignment: .leading, spacing: 8) {
                     SectionTitle(section.title)
 
@@ -86,7 +86,7 @@ private extension IconEditor {
 
     var emojiChooser: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ForEach(IconEditModel.emojiSections) { section in
+            ForEach(SettingsIconEditorModel.emojiSections) { section in
                 VStack(alignment: .leading, spacing: 8) {
                     SectionTitle(section.title)
 
@@ -186,8 +186,8 @@ private extension IconEditor {
     }
 }
 
-private extension IconEditor {
-    typealias MarkOption = CapsulePicker<IconEditModel.MarkKind>.Option
+private extension SettingsIconEditor {
+    typealias MarkOption = CapsulePicker<SettingsIconEditorModel.MarkKind>.Option
 
     static var markOptions: [MarkOption] {
         [

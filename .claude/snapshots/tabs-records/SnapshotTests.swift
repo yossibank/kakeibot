@@ -193,7 +193,7 @@ private extension SnapshotTests {
             initialBalance: 98_765_432
         )
 
-        let categoryDraft = CategoryDraft(
+        let categoryDraft = EntryCategoryDraft(
             kind: .expense,
             name: "子どもの習い事と教材と遠征費",
             mark: .glyph(.hobby),

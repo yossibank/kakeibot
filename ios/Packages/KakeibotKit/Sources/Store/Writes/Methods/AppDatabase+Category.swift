@@ -12,7 +12,7 @@ public extension AppDatabase {
 
     @discardableResult
     func saveCategory(
-        _ draft: CategoryDraft,
+        _ draft: EntryCategoryDraft,
         tags: [EntryTagDraft],
         editing id: EntryCategory.ID? = nil,
         at now: Date
@@ -117,7 +117,7 @@ public extension AppDatabase {
 
 private extension AppDatabase {
     static func insertCategory(
-        _ draft: CategoryDraft,
+        _ draft: EntryCategoryDraft,
         into db: Database,
         at now: Date
     ) throws -> EntryCategory {
@@ -138,7 +138,7 @@ private extension AppDatabase {
 
     static func updateCategory(
         _ id: EntryCategory.ID,
-        with draft: CategoryDraft,
+        with draft: EntryCategoryDraft,
         in db: Database,
         at now: Date
     ) throws -> EntryCategory {

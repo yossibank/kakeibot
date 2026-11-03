@@ -1,6 +1,6 @@
 import Foundation
 
-public struct CategoryDraft: Hashable, Sendable {
+public struct EntryCategoryDraft: Hashable, Sendable {
     public var kind: EntryCategory.Kind
     public var name: String
     public var mark: Mark
@@ -28,7 +28,7 @@ public struct CategoryDraft: Hashable, Sendable {
     }
 }
 
-public extension CategoryDraft {
+public extension EntryCategoryDraft {
     typealias Mark = IconDraft.Mark
     typealias Problem = DraftProblem
 
@@ -88,7 +88,7 @@ public extension CategoryDraft {
     }
 }
 
-private extension CategoryDraft {
+private extension EntryCategoryDraft {
     var trimmedName: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines)
     }

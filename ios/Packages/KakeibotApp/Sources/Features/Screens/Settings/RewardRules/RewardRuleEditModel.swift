@@ -14,7 +14,7 @@ public final class RewardRuleEditModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    public let icon = IconEditModel(glyph: .giftbox)
+    public let icon = SettingsIconEditorModel(glyph: .giftbox)
 
     private var baseline: RewardRuleDraft?
 

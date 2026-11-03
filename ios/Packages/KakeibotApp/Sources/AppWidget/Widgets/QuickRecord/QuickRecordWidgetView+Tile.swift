@@ -10,7 +10,7 @@ extension QuickRecordWidgetView {
         padding: CGFloat
     ) -> some View {
         if tile.amount != nil {
-            Button(intent: RecordTemplateIntent(tile.id)) {
+            Button(intent: QuickRecordIntent(tile.id)) {
                 tileFace(tile, padding: padding)
             }
             .buttonStyle(.plain)

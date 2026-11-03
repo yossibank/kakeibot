@@ -54,6 +54,7 @@ xcrun simctl launch booted com.yossibank.kakeibot -open homeSections
 | --- | --- |
 | 何を作るか | [docs/overview.md](docs/overview.md) |
 | どう作るか | [docs/architecture.md](docs/architecture.md) |
+| 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
 | 画面の組み立て・見張り・通知とウィジェット | [docs/architecture-screens.md](docs/architecture-screens.md) |
 | データの形 | [docs/data.md](docs/data.md) |
 | 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |

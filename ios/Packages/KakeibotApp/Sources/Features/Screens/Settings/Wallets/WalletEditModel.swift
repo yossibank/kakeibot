@@ -30,7 +30,7 @@ public final class WalletEditModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    public let icon = IconEditModel(
+    public let icon = SettingsIconEditorModel(
         glyph: WalletEditModel.glyph(for: .cash),
         color: WalletEditModel.defaultColor
     )
