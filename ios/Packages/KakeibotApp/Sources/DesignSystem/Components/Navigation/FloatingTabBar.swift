@@ -65,14 +65,6 @@ public extension FloatingTabBar {
 }
 
 private extension FloatingTabBar {
-    var ring: AnyShapeStyle {
-        if hasDecorations {
-            return AnyShapeStyle(Self.goldRing)
-        }
-
-        return AnyShapeStyle(Palette.outline)
-    }
-
     var tabs: some View {
         let indexedItems = Array(items.enumerated())
 
@@ -95,11 +87,11 @@ private extension FloatingTabBar {
         .padding(8)
         .background {
             Capsule()
-                .fill(Self.sheen)
+                .fill(TabBarStyle.sheen)
         }
         .overlay {
             Capsule()
-                .strokeBorder(Self.rim, lineWidth: 1)
+                .strokeBorder(TabBarStyle.rim, lineWidth: 1)
         }
         .glass(tint: Palette.backgroundBottom.opacity(.medium), in: Capsule())
     }
@@ -115,7 +107,7 @@ private extension FloatingTabBar {
             .fill(fill)
             .overlay {
                 Capsule()
-                    .strokeBorder(Self.indicatorRim, lineWidth: 0.8)
+                    .strokeBorder(TabBarStyle.indicatorRim, lineWidth: 0.8)
             }
             .frame(width: itemWidth, height: Self.height - 12)
             .scaleEffect(scale)
@@ -140,11 +132,11 @@ private extension FloatingTabBar {
             .frame(width: Self.height, height: Self.height)
             .background {
                 Circle()
-                    .fill(Self.sheen)
+                    .fill(TabBarStyle.sheen)
             }
             .overlay {
                 Circle()
-                    .strokeBorder(ring, lineWidth: 1.2)
+                    .strokeBorder(TabBarStyle.ring(hasDecorations: hasDecorations), lineWidth: 1.2)
             }
             .overlay {
                 if isAddHinted {
@@ -214,49 +206,6 @@ private extension FloatingTabBar {
 
     static var hintLength: CGFloat {
         0.22
-    }
-
-    static var sheen: LinearGradient {
-        LinearGradient(
-            colors: [.white.opacity(0.07), .white.opacity(0)],
-            startPoint: .top,
-            endPoint: .center
-        )
-    }
-
-    static var rim: LinearGradient {
-        LinearGradient(
-            colors: [
-                Palette.accent.opacity(.strong),
-                Palette.accent.opacity(.muted)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
-    static var indicatorRim: LinearGradient {
-        LinearGradient(
-            colors: [
-                Palette.accentStrong.opacity(.strong),
-                Palette.accent.opacity(.soft)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
-    static var goldRing: AngularGradient {
-        AngularGradient(
-            colors: [
-                Palette.accentStrong,
-                Palette.accent,
-                Palette.accentDeep,
-                Palette.accent,
-                Palette.accentStrong
-            ],
-            center: .center
-        )
     }
 
     var itemWidth: CGFloat {

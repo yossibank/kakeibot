@@ -26,6 +26,7 @@ struct MainView: View {
     @State private var observationRound = 0
     @State private var foreground = ForegroundReturn()
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
 
     let database: AppDatabase
@@ -231,13 +232,26 @@ struct MainView: View {
                 .tabContent()
             }
         }
+        .overlay(alignment: .leading) {
+            if hasSidebar {
+                SideTabBar(
+                    selection: $tab,
+                    title: "かけいぼっと",
+                    items: Self.tabItems
+                ) {
+                    sheet = .new
+                }
+            }
+        }
         .overlay(alignment: .bottom) {
-            FloatingTabBar(
-                selection: $tab,
-                items: Self.tabItems,
-                isAddHinted: !setup.isEntryOpened
-            ) {
-                sheet = .new
+            if !hasSidebar {
+                FloatingTabBar(
+                    selection: $tab,
+                    items: Self.tabItems,
+                    isAddHinted: !setup.isEntryOpened
+                ) {
+                    sheet = .new
+                }
             }
         }
         .overlay {
@@ -372,12 +386,30 @@ private extension MainView {
     var isLaunchReady: Bool {
         isRevealed && launchScreen != nil
     }
+
+    var hasSidebar: Bool {
+        horizontalSizeClass == .regular
+    }
 }
 
 private extension View {
     func tabContent() -> some View {
-        toolbar(.hidden, for: .tabBar)
-            .safeAreaPadding(.bottom, FloatingTabBar<Int>.clearance)
+        modifier(TabContent())
+    }
+}
+
+private struct TabContent: ViewModifier {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    func body(content: Content) -> some View {
+        let hasSidebar = horizontalSizeClass == .regular
+        let leading = hasSidebar ? SideTabBar<Int>.width : 0
+        let bottom = hasSidebar ? 0 : FloatingTabBar<Int>.clearance
+
+        content
+            .toolbar(.hidden, for: .tabBar)
+            .safeAreaPadding(.leading, leading)
+            .safeAreaPadding(.bottom, bottom)
     }
 }
 
