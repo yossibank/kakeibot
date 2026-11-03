@@ -63,17 +63,7 @@ DesignSystem の `Components/` の子フォルダは、種類と題材の 2 通�
 
 ## 🧪 テストの名前
 
-テストのファイルと型は、試すものに合わせて次の名前にする。
-
-| 試すもの | 名前 | 例 |
-| --- | --- | --- |
-| 1 つのソースのファイル | ソースのファイル名から `+` を抜き、`Tests` を付ける | `ThemePaletteContrastTests` |
-| 1 つのソースを話題で分ける | 上の名前の `Tests` の前に話題を足す | `BudgetCarryoverTests` |
-| 1 つのテストの型を分ける | `<テストの型>+<話題>.swift` | `EntryModelTests+Item` |
-| `Store/Writes/` の `AppDatabase+<型>` | `<型>WriteTests` | `EntryTagWriteTests` |
-| `Store/Queries/` | 返す型の名前に `Tests` を付ける | `EntryHistoryTests` |
-| `Store/Sync/` | `Sync<話題>Tests` | `SyncConflictTests` |
-| 同じ役割の複数のファイル | 役割の名前に `Tests` を付ける | `DatabaseValueTests`・`RecordTests` |
+テストのファイルと型の名前は、`rules/swift-test.md` の「テストの名前」に従う。
 
 `StoreTests/Sync/` は、ファイルが 20 本を超えたら、次の子フォルダに分ける。
 
