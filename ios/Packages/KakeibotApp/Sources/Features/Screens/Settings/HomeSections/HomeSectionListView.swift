@@ -3,8 +3,8 @@ import DesignSystem
 import Store
 import SwiftUI
 
-public struct HomeSectionsView: View {
-    @State private var model: HomeSectionsModel
+public struct HomeSectionListView: View {
+    @State private var model: HomeSectionListModel
     @State private var dragging: HomeSection?
     @State private var dragStart = 0
     @State private var dragTranslation: CGFloat = 0
@@ -13,7 +13,7 @@ public struct HomeSectionsView: View {
     @Environment(\.themeStyle.corner) private var corner
 
     public init(
-        model: HomeSectionsModel,
+        model: HomeSectionListModel,
         database: AppDatabase
     ) {
         let hintFlag = SettingsScreenFlag.closedHint(.homeSections, in: database)
@@ -65,7 +65,7 @@ public struct HomeSectionsView: View {
     }
 }
 
-private extension HomeSectionsView {
+private extension HomeSectionListView {
     var board: some View {
         let slots = model.layout.slots
 
@@ -166,7 +166,7 @@ private extension HomeSectionsView {
     }
 }
 
-private extension HomeSectionsView {
+private extension HomeSectionListView {
     static let rowHeight: CGFloat = 56
     static let zoneGap: CGFloat = 16
     static let liftScale: CGFloat = 1.02
@@ -259,8 +259,8 @@ private extension HomeSectionsView {
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         NavigationStack {
-            HomeSectionsView(
-                model: HomeSectionsModel(database: database),
+            HomeSectionListView(
+                model: HomeSectionListModel(database: database),
                 database: database
             )
         }

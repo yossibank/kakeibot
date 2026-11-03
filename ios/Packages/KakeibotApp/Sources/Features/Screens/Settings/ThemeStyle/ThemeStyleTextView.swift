@@ -17,7 +17,7 @@ public struct ThemeStyleTextView: View {
     }
 
     public var body: some View {
-        ThemeStyleScreen(
+        ThemeStyleFrame(
             title: "文字",
             intro: Self.intro,
             hint: hintFlag,

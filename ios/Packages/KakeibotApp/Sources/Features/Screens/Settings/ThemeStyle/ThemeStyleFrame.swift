@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct ThemeStyleScreen<Preview: View, Content: View>: View {
+struct ThemeStyleFrame<Preview: View, Content: View>: View {
     @State private var openedStyle: ThemeStyle?
 
     @Environment(\.themeStyle) private var appStyle
@@ -65,7 +65,7 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
     }
 }
 
-private extension ThemeStyleScreen {
+private extension ThemeStyleFrame {
     static var fade: CGFloat {
         16
     }

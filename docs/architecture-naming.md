@@ -12,10 +12,20 @@
 | --- | --- |
 | Migrations | ファイルと型は、3 桁の通し番号で付ける |
 | fixtures | `Core/Concepts/` のフォルダ名を小文字にして置く |
-| `Features/Screens/Settings/` | 子フォルダが 20 を超えたら、領域の子フォルダ（例 `Book/`・`Look/`・`Data/`）でまとめる |
+| `Features/Screens/Settings/` | 子フォルダが 20 を超えたら、下の表の領域の子フォルダでまとめる |
+| 設定の一覧の画面 | 型は `<単数>ListModel`・`<単数>ListView` にする |
 | `Features/Shared/SettingsParts/` | ファイルの頭に `Settings` を付ける |
-| `AppWidget/Intents/` | 頭に、使うウィジェットかコントロールの名前を付ける。コントロールの `kind` の文字列は変えない |
+| `AppWidget/Intents/` | 頭に、使うウィジェットの名前を付ける |
+| `AppWidget/Widgets/` | コントロールも、ウィジェットと同じくフォルダを分ける。コントロールの `kind` の文字列は変えない |
 | DesignSystem の題材のフォルダ | `Entry/`・`Budget/`・`Tag/`・`Template/` は、その題材の部品だけを入れる |
+
+設定の画面をまとめるときは、次の領域に分ける。入口の `Menu/` は、まとめずに残す。
+
+| 領域 | 画面のフォルダ |
+| --- | --- |
+| `Book/` | `Budgets/`・`Categories/`・`MonthStartDay/`・`Recurring/`・`RewardRules/`・`Stamps/`・`Templates/`・`Wallets/` |
+| `Look/` | `AppIcons/`・`HomeSections/`・`LaunchScreen/`・`Themes/`・`ThemeStyle/`・`WidgetGuide/` |
+| `Data/` | `Backup/`・`Reminder/`・`Sync/` |
 
 画面の組み立てと通知とウィジェットの方式は、[architecture-screens](architecture-screens.md) にある。
 
