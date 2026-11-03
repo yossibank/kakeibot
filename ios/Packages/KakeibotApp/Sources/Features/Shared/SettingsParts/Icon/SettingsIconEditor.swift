@@ -61,8 +61,10 @@ private extension SettingsIconEditor {
         switch model.markKind {
         case .glyph:
             glyphChooser
+
         case .emoji:
             emojiChooser
+
         case .text:
             textChooser
         }

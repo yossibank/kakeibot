@@ -200,10 +200,12 @@ private extension EntrySheet {
         switch cell {
         case let .category(category):
             categoryButton(category)
+
         case .add:
             dashedCell("追加", systemImage: "plus") {
                 open(.newCategory)
             }
+
         case .edit:
             dashedCell("編集", systemImage: "gearshape") {
                 open(.categories)
@@ -282,7 +284,6 @@ private extension EntrySheet {
 
     static var pagerHeight: CGFloat {
         let rows = CGFloat(categoryRows)
-
         return categoryHeight * rows + categorySpacing * (rows - 1)
     }
 
@@ -315,7 +316,6 @@ private extension EntrySheet {
         let width = EntryCategoryMenu.width
         let inset = Self.menuInset
         let preferred = menu.frame.midX - width / 2
-
         return min(max(preferred, inset), sheetWidth - width - inset)
     }
 

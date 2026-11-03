@@ -84,7 +84,9 @@ private extension RingButton {
     }
 
     var fill: Color {
-        isEnabled && style == .prominent ? Palette.accent.opacity(.subtle) : Color.clear
+        isEnabled && style == .prominent
+            ? Palette.accent.opacity(.subtle)
+            : Color.clear
     }
 }
 
@@ -121,11 +123,8 @@ private extension RingButton.Size {
 #Preview {
     HStack(spacing: 24) {
         RingButton(systemImage: "xmark") {}
-
         RingButton(systemImage: "xmark", size: .small) {}
-
         RingButton(systemImage: "checkmark", style: .prominent) {}
-
         RingButton(systemImage: "trash", style: .destructive, label: "削除") {}
     }
     .padding()

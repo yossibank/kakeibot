@@ -219,7 +219,9 @@ private extension RecurringDraft {
     }
 
     var savedFee: Int? {
-        type == .transfer && fee > 0 ? fee : nil
+        type == .transfer && fee > 0
+            ? fee
+            : nil
     }
 
     var savedAmount: Int {

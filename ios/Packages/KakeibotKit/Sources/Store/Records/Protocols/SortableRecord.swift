@@ -43,7 +43,6 @@ extension SortableRecord {
         in db: Database
     ) throws -> Int {
         let maxOrder = try request.select(max(sortOrder), as: Int?.self).fetchOne(db)
-
         return (maxOrder ?? nil).map { $0 + 1 } ?? 0
     }
 }

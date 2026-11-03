@@ -27,12 +27,16 @@ public extension SyncChoice {
         switch (localMinute, cloudMinute) {
         case let (local?, cloud?) where local > cloud:
             return .local
+
         case let (local?, cloud?) where local < cloud:
             return .cloud
+
         case (_?, nil):
             return .local
+
         case (nil, _?):
             return .cloud
+
         default:
             return nil
         }

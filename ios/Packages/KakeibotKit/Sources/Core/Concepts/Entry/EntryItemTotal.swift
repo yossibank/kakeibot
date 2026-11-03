@@ -58,7 +58,6 @@ private extension EntryItemTotal.Tax {
     ) -> Int {
         let numerator = abs(base) * rate * 2 + 100 + rate
         let rounded = numerator / ((100 + rate) * 2)
-
         return base < 0 ? -rounded : rounded
     }
 }

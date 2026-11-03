@@ -29,6 +29,7 @@ private extension BudgetWidgetView {
             switch family {
             case .systemMedium:
                 medium(summary)
+
             default:
                 small(summary)
             }

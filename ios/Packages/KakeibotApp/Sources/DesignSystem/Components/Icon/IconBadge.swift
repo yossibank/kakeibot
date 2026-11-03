@@ -66,9 +66,7 @@ private extension IconBadge {
 
     HStack {
         IconBadge(emoji)
-
         IconBadge(text)
-
         IconBadge(nil)
     }
     .padding()

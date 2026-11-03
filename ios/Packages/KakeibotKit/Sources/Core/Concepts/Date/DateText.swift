@@ -25,7 +25,6 @@ enum DateText {
         let paddingCount = max(0, missing)
         let padding = String(repeating: "0", count: paddingCount)
         let sign = value < 0 ? "-" : ""
-
         return sign + padding + text
     }
 

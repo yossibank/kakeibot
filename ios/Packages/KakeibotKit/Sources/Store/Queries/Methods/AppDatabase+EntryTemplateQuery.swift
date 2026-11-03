@@ -12,9 +12,7 @@ public extension AppDatabase {
             .values(in: writer)
     }
 
-    func templates(
-        includingHidden: Bool = false
-    ) async throws -> [EntryTemplate] {
+    func templates(includingHidden: Bool = false) async throws -> [EntryTemplate] {
         try await writer.read { db in
             try Self.templates(in: db, includingHidden: includingHidden)
         }

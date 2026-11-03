@@ -86,9 +86,11 @@ private extension ChangeSignal {
             switch state {
             case .idle:
                 state = .fired(wake)
+
             case let .waiting(continuation):
                 continuation.resume(returning: wake)
                 state = .fired(wake)
+
             case .fired:
                 break
             }

@@ -129,9 +129,7 @@ private extension SyncEngine {
         try? await database.removeSyncChanges(dropped)
     }
 
-    func pendingTargets(
-        of change: SyncChange
-    ) -> [(
+    func pendingTargets(of change: SyncChange) -> [(
         wanted: CKSyncEngine.PendingRecordZoneChange,
         opposite: CKSyncEngine.PendingRecordZoneChange
     )] {
@@ -191,6 +189,7 @@ private extension SyncEngine {
         switch route.retry(after: failure.error.code) {
         case .resolveConflict:
             await resolveConflict(of: id, with: failure.error.serverRecord)
+
         case .saveZoneAgain:
             guard await (try? database.syncSaveZone(for: id.key)) == id.zoneName else {
                 return
@@ -200,9 +199,11 @@ private extension SyncEngine {
 
             engine?.state.add(pendingDatabaseChanges: [.saveZone(zone)])
             engine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
+
         case .sendAgain:
             try? await database.removeSyncSystemFields([id])
             engine?.state.add(pendingRecordZoneChanges: [.saveRecord(recordID)])
+
         case .skip:
             break
         }

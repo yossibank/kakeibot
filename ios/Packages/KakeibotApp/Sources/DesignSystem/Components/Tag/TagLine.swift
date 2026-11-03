@@ -290,8 +290,10 @@ private extension TagLine {
         switch card {
         case let .tag(item):
             onSelect(item.id)
+
         case .add:
             onAdd?()
+
         case .edit:
             onEdit?()
         }

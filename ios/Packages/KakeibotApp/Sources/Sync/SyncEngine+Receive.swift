@@ -11,10 +11,13 @@ extension SyncEngine {
             }
 
             try? await database.queueAllForSync()
+
         case .signOut:
             await isShared ? leaveShares() : leaveAccount(because: .signedOut)
+
         case .switchAccounts:
             await isShared ? leaveShares() : leaveAccount(because: .accountChanged)
+
         @unknown default:
             break
         }
@@ -42,6 +45,7 @@ extension SyncEngine {
             try? await database.resetSync(isShared: false)
             await restart()
             try? await database.queueAllForSync()
+
         default:
             await turnOff(because: .cloudReplaced)
         }

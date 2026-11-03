@@ -26,6 +26,7 @@ struct RecordsBatchSheet: View {
                                 change: .category(category.id)
                             )
                         }
+
                     case .wallet:
                         ForEach(model.batchWallets) { wallet in
                             row(

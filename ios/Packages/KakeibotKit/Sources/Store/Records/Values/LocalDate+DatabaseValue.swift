@@ -6,9 +6,7 @@ extension LocalDate: DatabaseValueConvertible {
         description.databaseValue
     }
 
-    public static func fromDatabaseValue(
-        _ dbValue: DatabaseValue
-    ) -> LocalDate? {
+    public static func fromDatabaseValue(_ dbValue: DatabaseValue) -> LocalDate? {
         String.fromDatabaseValue(dbValue).flatMap(LocalDate.init)
     }
 }

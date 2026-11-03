@@ -12,9 +12,7 @@ public extension AppDatabase {
         }
     }
 
-    func notificationInput(
-        from start: LocalDate
-    ) async throws -> NotificationInput {
+    func notificationInput(from start: LocalDate) async throws -> NotificationInput {
         try await writer.read { db in
             let list = try Self.entryList(in: db, includesItems: false)
             let part = try Self.notificationPart(from: start, in: db)

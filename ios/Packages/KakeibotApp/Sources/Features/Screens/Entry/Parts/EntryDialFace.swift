@@ -149,6 +149,8 @@ private extension EntryDialFace {
             return Palette.subtext
         }
 
-        return usage.isOver || usage.isNearLimit ? usage.tint : Palette.subtext
+        return usage.isOver || usage.isNearLimit
+            ? usage.tint
+            : Palette.subtext
     }
 }

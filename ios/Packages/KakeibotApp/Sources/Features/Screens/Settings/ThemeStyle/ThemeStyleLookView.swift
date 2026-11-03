@@ -202,7 +202,6 @@ private extension ThemeStyleLookView {
 
     func cornerMark(_ option: ThemeCorner) -> some View {
         let color = option == model.style.corner ? Palette.accent : Palette.subtext
-
         return ThemeStyleCornerMark(corner: option, color: color, size: Self.markSize)
     }
 }

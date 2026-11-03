@@ -19,7 +19,6 @@ private extension AppDatabase {
         let icons = Dictionary(uniqueKeysWithValues: pairs)
         let logs = try RewardLog.order(Column("date").desc, Column("created_at").desc).fetchAll(db)
         let goals = try RewardGoal.fetchAll(db)
-
         return RewardBank(rules: rules, icons: icons, logs: logs, goals: goals)
     }
 }

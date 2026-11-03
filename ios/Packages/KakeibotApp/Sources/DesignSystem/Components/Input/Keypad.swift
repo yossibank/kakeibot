@@ -122,14 +122,18 @@ private extension Keypad {
         switch key {
         case let .digit(value):
             digitText(String(value))
+
         case .doubleZero:
             digitText("00")
+
         case .tripleZero:
             digitText("000")
+
         case .delete, .clear:
             Image(systemName: "delete.left")
                 .sansFont(.headline, weight: .light)
                 .foregroundStyle(Palette.text)
+
         case let .tax(rate):
             let labelColor = isActive ? Palette.accent : Palette.subtext
             let valueColor = isActive ? Palette.accentStrong : Palette.text
@@ -149,10 +153,12 @@ private extension Keypad {
                 }
                 .foregroundStyle(valueColor)
             }
+
         case let .operation(operation):
             Text(operation.symbol)
                 .textFont(size: .headline)
                 .foregroundStyle(Palette.accentStrong)
+
         case .equals:
             if !showsDone {
                 Text("＝")

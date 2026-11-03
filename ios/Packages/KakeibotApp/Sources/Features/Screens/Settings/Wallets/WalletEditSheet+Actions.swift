@@ -56,7 +56,6 @@ extension WalletEditSheet {
     var rowItems: [SettingsRowList<Panel>.Item] {
         let loan = model.showsLoanAmount ? [loanAmountItem] : []
         let payment = model.showsPayment ? paymentItems : []
-
         return payment + loan
     }
 

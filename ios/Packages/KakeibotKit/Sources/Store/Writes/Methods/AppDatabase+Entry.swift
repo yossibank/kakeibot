@@ -104,6 +104,7 @@ public extension AppDatabase {
                 case let .category(id):
                     entry.categoryId = id
                     entry.tagId = nil
+
                 case let .wallet(id):
                     entry.walletId = id
                     entry.billMonth = nil
@@ -250,6 +251,7 @@ private extension AppDatabase {
         case let .category(id):
             let category = try EntryCategory.fetchOne(db, key: id)
             return category?.kind.rawValue == entry.type.rawValue
+
         case let .wallet(id):
             return try entry.transferId == nil && Wallet.exists(db, key: id)
         }

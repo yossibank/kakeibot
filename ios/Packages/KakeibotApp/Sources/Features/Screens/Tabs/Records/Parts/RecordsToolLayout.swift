@@ -16,7 +16,6 @@ struct RecordsToolLayout: Layout {
 
         guard Self.fitsInRow(sizes, width: width, spacing: spacing) else {
             let stackedHeight = sizes[0].height + spacing + sizes[1].height
-
             return CGSize(width: width, height: stackedHeight)
         }
 

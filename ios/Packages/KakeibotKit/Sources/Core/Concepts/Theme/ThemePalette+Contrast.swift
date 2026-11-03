@@ -22,7 +22,6 @@ public extension ThemePalette {
         let secondLuminance = luminance(second)
         let lighter = max(firstLuminance, secondLuminance)
         let darker = min(firstLuminance, secondLuminance)
-
         return (lighter + 0.05) / (darker + 0.05)
     }
 }

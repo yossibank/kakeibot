@@ -86,6 +86,7 @@ private extension ChipButton {
         case .regular:
             content
                 .textFont(size: .caption)
+
         case .large:
             content
                 .textFont(.subheadline)
@@ -191,15 +192,12 @@ public struct ChipLabel: View {
     VStack(spacing: 16) {
         HStack(spacing: 8) {
             ChipButton("なし", isSelected: true) {}
-
             ChipButton("¥110") {}
-
             ChipButton("今の入力を保存", systemImage: "plus", outline: .dashed) {}
         }
 
         HStack(spacing: 8) {
             ChipButton("今日", isSelected: true, size: .large) {}
-
             ChipButton("昨日", size: .large) {}
         }
     }

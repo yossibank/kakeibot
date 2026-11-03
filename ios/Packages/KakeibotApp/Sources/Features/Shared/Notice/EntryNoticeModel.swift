@@ -44,9 +44,11 @@ public extension EntryNoticeModel {
             switch undone {
             case let .changed(change):
                 try await undo(change)
+
             case let .batch(batch):
                 let items = batch.kind == .deleted ? batch.items : nil
                 try await database.restoreEntries(batch.previous, items: items)
+
             case .undone, .failed, nil:
                 return
             }
@@ -191,12 +193,14 @@ private extension EntryNoticeModel {
                 change.entry.id,
                 restoringNoSpend: change.clearedNoSpendDays
             )
+
         case let .edited(previous, previousFee):
             try await database.restoreEntry(
                 previous,
                 fee: previousFee,
                 restoringNoSpend: change.clearedNoSpendDays
             )
+
         case .deleted:
             try await database.restoreEntry(change.entry, fee: change.fee, items: change.items)
         }

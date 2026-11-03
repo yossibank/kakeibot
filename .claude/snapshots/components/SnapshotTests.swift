@@ -25,9 +25,7 @@ struct SnapshotTests {
 
             HStack(spacing: 8) {
                 TagCard(names[0], size: .small)
-
                 TagCard(names[1], style: .selected)
-
                 TagCard("＋", style: .add)
             }
         }

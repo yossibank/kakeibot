@@ -102,7 +102,6 @@ private extension EntrySheet {
     var preparationRow: some View {
         ViewThatFits(in: .horizontal) {
             preparationButtons(saveTitle: "今の入力を保存")
-
             preparationButtons(saveTitle: "保存")
         }
     }

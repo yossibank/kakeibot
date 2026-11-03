@@ -72,7 +72,6 @@ private extension SettingsIntroCard {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(headline.0)
-
                     Text(headline.1)
                 }
                 .displayFont(.body, weight: .medium)

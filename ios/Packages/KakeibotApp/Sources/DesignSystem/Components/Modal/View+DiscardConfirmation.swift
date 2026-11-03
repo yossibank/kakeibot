@@ -110,15 +110,11 @@ extension DismissAttemptController: UIAdaptivePresentationControllerDelegate {
         original?.presentationControllerDidAttemptToDismiss?(presentationController)
     }
 
-    func presentationControllerWillDismiss(
-        _ presentationController: UIPresentationController
-    ) {
+    func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
         original?.presentationControllerWillDismiss?(presentationController)
     }
 
-    func presentationControllerDidDismiss(
-        _ presentationController: UIPresentationController
-    ) {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         original?.presentationControllerDidDismiss?(presentationController)
     }
 }

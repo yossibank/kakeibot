@@ -92,11 +92,8 @@ private extension CardHeader {
 #Preview {
     VStack(spacing: 16) {
         CardHeader("最近の記録")
-
         CardHeader("これからの引き落とし", note: "合計 ¥32,000")
-
         CardHeader("資産", systemImage: "yensign", note: "3 口座")
-
         CardHeader("あと 2 つで準備がそろいます") {}
     }
     .padding(.horizontal, 16)

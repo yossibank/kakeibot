@@ -93,9 +93,13 @@ private extension MonthCalendar {
         if let date {
             let isSelected = date == selection
             let weight: Font.Weight = isSelected ? .semibold : .regular
-            let ring = date == today && !isSelected ? Palette.accent : Color.clear
+            let ring = date == today && !isSelected
+                ? Palette.accent
+                : Color.clear
             let fill = isSelected ? Palette.accent : Color.clear
-            let opacity = date > today && !isSelected ? 0.5 : 1
+            let opacity = date > today && !isSelected
+                ? 0.5
+                : 1
             let holiday = Holiday.name(of: date)
 
             Button {
@@ -156,7 +160,6 @@ private extension MonthCalendar {
         let weeks = month.weeks(startingOn: weekStart)
         let blank = [LocalDate?](repeating: nil, count: 7)
         let missing = max(Self.rowCount - weeks.count, 0)
-
         return weeks + Array(repeating: blank, count: missing)
     }
 

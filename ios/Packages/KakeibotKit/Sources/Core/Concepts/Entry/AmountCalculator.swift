@@ -58,6 +58,7 @@ public extension AmountCalculator {
             case let .number(number):
                 let operand = Int128(number)
                 total = pending.apply(total, operand)
+
             case let .operation(operation):
                 pending = operation
             }
@@ -152,8 +153,10 @@ private extension AmountCalculator {
         switch tokens.last {
         case .none:
             return
+
         case .operation:
             tokens[tokens.count - 1] = .operation(operation)
+
         case .number:
             tokens.append(.operation(operation))
         }

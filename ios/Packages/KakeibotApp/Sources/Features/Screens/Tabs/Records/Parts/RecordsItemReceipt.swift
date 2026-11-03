@@ -104,9 +104,7 @@ private extension RecordsItemReceipt {
     func itemLine(_ item: EntryItem) -> some View {
         ViewThatFits(in: .horizontal) {
             itemLine(item, style: .caption, fitsName: true)
-
             itemLine(item, style: .caption2, fitsName: true)
-
             itemLine(item, style: .caption2, fitsName: false)
         }
     }

@@ -9,23 +9,29 @@ extension EntrySheet {
         switch sheet {
         case let .wallet(role):
             EntryWalletSheet(model: model, role: role)
+
         case .date:
             EntryDateSheet(model: model, today: today)
+
         case .items:
             EntryItemSheet(model: model)
+
         case .newItem:
             EntryItemSheet(model: model, isSlipOpen: true)
+
         case .newCategory:
             CategoryEditSheet(model: model.newCategoryModel()) { category in
                 Task {
                     await addCategory(category)
                 }
             }
+
         case let .editCategory(category):
             CategoryEditSheet(model: model.editCategoryModel(category)) { _ in
             } onDelete: { deletion in
                 self.deletion = deletion
             }
+
         case let .addTag(category):
             CategoryEditSheet(
                 model: model.editCategoryModel(category),
@@ -34,8 +40,10 @@ extension EntrySheet {
             } onDelete: { deletion in
                 self.deletion = deletion
             }
+
         case .newTemplate:
             TemplateEditSheet(model: model.newTemplateModel())
+
         case .categories:
             NavigationStack {
                 CategoryListView(

@@ -62,7 +62,6 @@ private extension EntryItemButton {
 #Preview {
     VStack(spacing: 16) {
         EntryItemButton(count: 4, total: 1674, adjustment: 0) {}
-
         EntryItemButton(count: 4, total: 1674, adjustment: -1008) {}
     }
     .padding()

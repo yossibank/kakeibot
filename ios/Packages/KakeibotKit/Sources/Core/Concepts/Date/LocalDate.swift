@@ -101,7 +101,6 @@ public extension LocalDate {
         let difference = weekday.daysSinceMonday - weekStart.daysSinceMonday
         let offset = (difference + 7) % 7
         let start = adding(days: -offset)
-
         return start...start.adding(days: 6)
     }
 }

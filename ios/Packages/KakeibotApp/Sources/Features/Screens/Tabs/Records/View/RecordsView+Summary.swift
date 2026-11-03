@@ -6,7 +6,6 @@ extension RecordsView {
     var summary: some View {
         HStack(spacing: 0) {
             total("支出", amount: model.expenseTotal, type: .expense)
-
             total("収入", amount: model.incomeTotal, type: .income)
         }
         .padding(.horizontal, 16)
@@ -34,7 +33,6 @@ extension RecordsView {
 
             HStack(spacing: 0) {
                 total("支出", amount: summary.expenseTotal, type: .expense)
-
                 total("収入", amount: summary.incomeTotal, type: .income)
             }
         }

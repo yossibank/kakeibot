@@ -79,7 +79,9 @@ public extension EntryDraft {
 
     var problems: [Problem] {
         let amountProblems: [Problem] = amount < 1 ? [.amountNotPositive] : []
-        let tagProblems: [Problem] = tagId != nil && categoryId == nil ? [.tagWithoutCategory] : []
+        let tagProblems: [Problem] = tagId != nil && categoryId == nil
+            ? [.tagWithoutCategory]
+            : []
         return amountProblems + typeProblems + tagProblems + feeProblems + itemProblems
     }
 
@@ -140,6 +142,7 @@ private extension EntryDraft {
         switch type {
         case .expense, .income:
             return categoryId == nil ? [.missingCategory] : []
+
         case .transfer:
             let categoryProblems: [Problem] = categoryId == nil ? [] : [.categoryOnTransfer]
             return categoryProblems + destinationProblems

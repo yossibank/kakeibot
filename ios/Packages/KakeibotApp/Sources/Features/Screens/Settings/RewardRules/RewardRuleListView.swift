@@ -303,10 +303,12 @@ private extension RewardRuleListView {
         switch drag.drop() {
         case let .hide(id):
             hide(id)
+
         case .move:
             Task {
                 await model.finishMoving()
             }
+
         case nil:
             break
         }
@@ -360,6 +362,7 @@ private extension RewardRuleListView {
         switch destination {
         case .new:
             RewardRuleEditModel(database: database)
+
         case let .edit(id):
             RewardRuleEditModel(database: database, editing: id)
         }

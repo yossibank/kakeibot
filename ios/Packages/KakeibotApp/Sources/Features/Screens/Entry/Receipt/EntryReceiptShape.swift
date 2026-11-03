@@ -69,6 +69,7 @@ struct EntryReceiptRule: View {
                     style: StrokeStyle(lineWidth: 1, dash: [4, 3])
                 )
                 .frame(height: 1)
+
         case .double:
             VStack(spacing: 2) {
                 Rectangle()

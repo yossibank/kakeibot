@@ -7,7 +7,6 @@ extension MainView {
     var isLoaded: Bool {
         let isHomeLoaded = home.list != nil || home.errorNotice.message != nil
         let isSetupLoaded = setup.isLoaded || setup.errorNotice.message != nil
-
         return isHomeLoaded && isSetupLoaded && launchScreen != nil && areTabsLoaded
     }
 
@@ -79,12 +78,15 @@ extension MainView {
             switch route {
             case .home:
                 tab = .home
+
             case let .entry(date):
                 tab = .home
                 draft.date = date
                 sheet = .new
+
             case let .recurring(id):
                 sheet = .recurring(id)
+
             case let .template(id):
                 tab = .home
                 sheet = await templateSheet(id)
@@ -109,6 +111,7 @@ extension MainView {
             case .entry:
                 tab = .home
                 sheet = .new
+
             case let .setup(item):
                 sheet = .setup(item)
             }
@@ -163,7 +166,6 @@ private extension MainView {
         let isRecordsLoaded = records.list != nil || records.errorNotice.message != nil
         let isReviewLoaded = review.list != nil || review.errorNotice.message != nil
         let isAssetsLoaded = assets.list != nil || assets.errorNotice.message != nil
-
         return isRecordsLoaded && isReviewLoaded && isAssetsLoaded
     }
 

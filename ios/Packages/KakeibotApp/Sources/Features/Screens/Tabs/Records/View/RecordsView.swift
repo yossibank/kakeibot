@@ -218,6 +218,7 @@ private extension RecordsView {
             ForEach(model.days, id: \.date) { day in
                 dayCard(day)
             }
+
         case .calendar:
             calendar
                 .monthSwipe(following: $slide, perform: moveMonth)

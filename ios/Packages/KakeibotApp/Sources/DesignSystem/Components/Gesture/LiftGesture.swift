@@ -18,9 +18,7 @@ public struct LiftGesture {
 }
 
 extension LiftGesture: UIGestureRecognizerRepresentable {
-    public func makeUIGestureRecognizer(
-        context: Context
-    ) -> UILongPressGestureRecognizer {
+    public func makeUIGestureRecognizer(context: Context) -> UILongPressGestureRecognizer {
         let recognizer = UILongPressGestureRecognizer()
         recognizer.minimumPressDuration = 0.3
         return recognizer
@@ -35,8 +33,10 @@ extension LiftGesture: UIGestureRecognizerRepresentable {
         switch recognizer.state {
         case .began, .changed:
             onMove(location)
+
         case .ended, .cancelled, .failed:
             onEnd()
+
         default:
             break
         }

@@ -23,8 +23,10 @@ private extension BudgetLockWidgetView {
             switch family {
             case .accessoryCircular:
                 circular(summary)
+
             case .accessoryInline:
                 inline(summary)
+
             default:
                 rectangular(summary)
             }

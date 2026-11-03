@@ -96,7 +96,6 @@ extension AssetsModelTests.Setup {
     func saveRule(amount: Int) async throws -> RewardRule {
         let icon = IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         let draft = RewardRuleDraft(name: "自炊した日", amount: amount, icon: icon)
-
         return try await database.saveRewardRule(draft, at: Date())
     }
 

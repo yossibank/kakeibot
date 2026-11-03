@@ -123,7 +123,6 @@ private extension ReceiptReading {
         let start = (first ?? 0) + 1
         let ruled = lines.indices.dropFirst(start).first { lines[$0].isEnd }
         let answered = totalLine.flatMap { $0 >= start ? $0 : nil }
-
         return [ruled, answered].compactMap(\.self).min() ?? lines.count
     }
 
@@ -131,8 +130,10 @@ private extension ReceiptReading {
         switch line.kind {
         case let .total(amount):
             amount > 0 ? amount : nil
+
         case .heading, .item, .skip:
             line.amount.flatMap { $0.value > 0 ? $0.value : nil }
+
         default:
             nil
         }

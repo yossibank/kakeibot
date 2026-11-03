@@ -147,6 +147,7 @@ extension AppModel {
             try? await database.reloadAfterOtherProcesses()
             await generateRecurring(in: database)
             await scheduleNotifications(in: database)
+
         case .opening, .failed:
             return
         }
@@ -156,6 +157,7 @@ extension AppModel {
         switch launch {
         case let .onboarding(database), let .ready(database):
             await scheduleNotifications(in: database)
+
         case .opening, .failed:
             return
         }
@@ -173,6 +175,7 @@ extension AppModel {
                     await self.observeStyle(in: database)
                 }
             }
+
         case .opening, .failed:
             return
         }

@@ -310,6 +310,7 @@ private extension EntryWalletSheet {
         switch role {
         case .source:
             model.walletId = wallet.id
+
         case .destination:
             model.toWalletId = wallet.id
         }

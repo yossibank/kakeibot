@@ -69,10 +69,13 @@ private enum ProEntitlement {
         case let .success(.verified(transaction)):
             await transaction.finish()
             return await refresh()
+
         case .success(.unverified):
             throw ProStoreError.unavailable
+
         case .pending, .userCancelled:
             return .locked
+
         @unknown default:
             return .locked
         }

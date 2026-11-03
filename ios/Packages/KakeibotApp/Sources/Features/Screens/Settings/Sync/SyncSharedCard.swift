@@ -49,9 +49,7 @@ struct SyncSharedCard: View {
 
                 VStack(spacing: 12) {
                     CardButton("ほかの人も誘う", style: .filled, action: onInvite)
-
                     CardButton("共有をやめる", style: .outlined(Palette.rose), action: onStop)
-
                     CardButton("閉じる", style: .outlined(Palette.subtext), action: onClose)
                 }
             }

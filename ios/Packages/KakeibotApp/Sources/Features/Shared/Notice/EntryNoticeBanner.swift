@@ -67,11 +67,13 @@ private extension EntryNoticeBanner {
                     await model.undo()
                 }
             }
+
         case .undone:
             NoticeBanner(
                 notice.message,
                 systemImage: "arrow.uturn.backward"
             )
+
         case .failed:
             NoticeBanner(
                 notice.message,

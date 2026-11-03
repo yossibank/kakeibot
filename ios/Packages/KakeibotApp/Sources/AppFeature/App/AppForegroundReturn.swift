@@ -10,12 +10,14 @@ extension AppForegroundReturn {
         case .background:
             wasBackground = true
             return false
+
         case .active:
             defer {
                 wasBackground = false
             }
 
             return wasBackground
+
         default:
             return false
         }

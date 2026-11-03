@@ -102,6 +102,7 @@ private extension Recurring {
         switch frequency {
         case .monthly:
             return indices.map { YearMonth(monthIndex: $0) }
+
         case .yearly:
             let month = month ?? 1
             return indices.map { YearMonth(monthIndex: $0) }.filter { $0.month == month }

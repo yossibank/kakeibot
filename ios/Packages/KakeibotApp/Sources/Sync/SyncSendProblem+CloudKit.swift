@@ -6,10 +6,13 @@ extension SyncSendProblem {
         switch code {
         case .quotaExceeded:
             self = .quotaExceeded
+
         case .networkUnavailable, .networkFailure:
             self = .networkUnavailable
+
         case .notAuthenticated, .permissionFailure:
             self = .notAllowed
+
         default:
             return nil
         }

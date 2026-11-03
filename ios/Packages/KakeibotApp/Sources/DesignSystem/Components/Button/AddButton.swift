@@ -41,7 +41,6 @@ public struct AddButton: View {
 #Preview {
     VStack(spacing: 12) {
         AddButton("口座を追加") {}
-
         AddButton("テーマを追加", isLocked: true) {}
     }
     .padding()

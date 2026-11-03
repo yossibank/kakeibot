@@ -17,7 +17,6 @@ struct HomeTemplateHeaderLayout: Layout {
 
         guard Self.fitsInRow(sizes, width: width, spacing: spacing) else {
             let stackedHeight = sideHeight + spacing + sizes[1].height
-
             return CGSize(width: width, height: stackedHeight)
         }
 
@@ -70,7 +69,6 @@ private extension HomeTemplateHeaderLayout {
         spacing: CGFloat
     ) -> CGFloat {
         let side = max(sizes[0].width, sizes[2].width)
-
         return side * 2 + sizes[1].width + spacing * 2
     }
 

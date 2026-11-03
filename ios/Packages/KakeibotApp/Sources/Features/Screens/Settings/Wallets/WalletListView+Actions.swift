@@ -56,10 +56,12 @@ extension WalletListView {
             if let wallet {
                 requestHide(wallet)
             }
+
         case .move:
             Task {
                 await model.finishMoving()
             }
+
         case nil:
             break
         }

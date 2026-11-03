@@ -39,6 +39,7 @@ extension WidgetGuidePlace {
                     detail: "鉛筆の印のテンプレートは、入力シートを開いて金額を入れます"
                 )
             ]
+
         case .lockScreen:
             [
                 Ability(
@@ -57,6 +58,7 @@ extension WidgetGuidePlace {
                     detail: "押すと、アプリのホームを開きます"
                 )
             ]
+
         case .control:
             [
                 Ability(
@@ -81,12 +83,14 @@ extension WidgetGuidePlace {
                 "左上の「編集」から「ウィジェットを追加」を選びます",
                 "「かけいぼっと」を選び、置きたいものを選びます"
             ]
+
         case .lockScreen:
             [
                 "ロック画面を長押しし、「カスタマイズ」を押します",
                 "「ロック画面」を選び、時計の下の枠を押します",
                 "「かけいぼっと」の「あといくら」を選びます"
             ]
+
         case .control:
             [
                 "画面の右上から下へなぞり、コントロールセンターを開きます",

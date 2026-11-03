@@ -18,13 +18,10 @@ private extension AppDatabase {
         let pairs = try Icon.fetchAll(db, keys: iconIds).map { ($0.id, $0) }
         let icons = Dictionary(uniqueKeysWithValues: pairs)
         let totals = try rewardTotals(in: db)
-
         return RewardRuleList(rules: rules, icons: icons, totals: totals)
     }
 
-    static func rewardTotals(
-        in db: Database
-    ) throws -> [RewardRule.ID: RewardRuleList.Total] {
+    static func rewardTotals(in db: Database) throws -> [RewardRule.ID: RewardRuleList.Total] {
         let rows = try Row.fetchAll(
             db,
             sql: """

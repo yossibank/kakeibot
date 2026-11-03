@@ -376,7 +376,6 @@ extension SyncTests.Setup {
         let id = try await value("SELECT icon_id FROM wallet WHERE id = '\(wallet.id)'")
         let key = SyncKey(table: .icon, id: id)
         let record = try await database.syncRecord(for: key)
-
         return try #require(record)
     }
 

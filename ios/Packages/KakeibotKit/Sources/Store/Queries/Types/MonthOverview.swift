@@ -201,7 +201,9 @@ private extension MonthOverview {
 
         let isGenerated = recurring.generatedUntil.map { date <= $0 } ?? false
 
-        return date == today && !isGenerated ? .upcoming : .missing
+        return date == today && !isGenerated
+            ? .upcoming
+            : .missing
     }
 
     func expense(on date: LocalDate) -> Int {

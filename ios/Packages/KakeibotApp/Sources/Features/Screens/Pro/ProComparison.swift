@@ -91,10 +91,12 @@ private extension ProComparison {
             case .yes:
                 Image(systemName: isPro ? "checkmark.circle.fill" : "checkmark")
                     .textFont(.footnote, weight: .semibold)
+
             case .no:
                 Text("—")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.hint)
+
             case let .text(text):
                 Text(text)
                     .textFont(.caption2, weight: isPro ? .bold : .regular)

@@ -32,6 +32,7 @@ public struct IconSeal: View {
                         .strokeBorder(Palette.backgroundBottom, lineWidth: size * 0.08)
                 }
                 .glow(tint.opacity(glow), radius: size * 0.2)
+
         case .seal:
             Circle()
                 .strokeBorder(tint, lineWidth: size * 0.06)
@@ -62,6 +63,7 @@ private extension IconSeal {
         switch stampShape {
         case .circle, .seal:
             RoundedRectangle(cornerRadius: size / 2, style: .circular)
+
         case .rounded:
             RoundedRectangle(cornerRadius: corner.radius(size * 0.3), style: .continuous)
         }
@@ -90,9 +92,7 @@ private extension IconSeal {
 
     HStack(spacing: 16) {
         IconSeal(star, size: 18)
-
         IconSeal(cake, size: 18)
-
         IconSeal(star, size: 30)
     }
     .padding()

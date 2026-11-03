@@ -9,7 +9,6 @@ struct EntryReceiptTaxBreakdown: View {
     var body: some View {
         ViewThatFits(in: .horizontal) {
             grid(isCompact: false)
-
             grid(isCompact: true)
         }
         .textFont(.caption)

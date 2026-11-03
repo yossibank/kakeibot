@@ -29,7 +29,6 @@ public extension TwoColumnLayout {
         let width = proposal.width ?? minWidth
         let frames = frames(of: subviews, width: width)
         let height = frames.map(\.maxY).max() ?? 0
-
         return CGSize(width: width, height: height)
     }
 
@@ -79,6 +78,7 @@ private extension TwoColumnLayout {
                 let frame = CGRect(x: 0, y: leadingY, width: columnWidth, height: height)
                 leadingY += height + spacing
                 return frame
+
             case .trailing:
                 let x = columnWidth + spacing
                 let frame = CGRect(x: x, y: trailingY, width: columnWidth, height: height)

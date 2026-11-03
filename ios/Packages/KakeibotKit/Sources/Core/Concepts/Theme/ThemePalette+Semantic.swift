@@ -156,7 +156,6 @@ private extension ThemePalette.HSL {
         let shifted = lightness + amount
         let lowerClamped = max(shifted, 0)
         let clamped = min(lowerClamped, 1)
-
         return ThemePalette.HSL(hue: hue, saturation: saturation, lightness: clamped)
     }
 }

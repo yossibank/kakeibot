@@ -68,7 +68,6 @@ extension NoticeBanner.Tone {
 #Preview {
     VStack(spacing: 16) {
         NoticeBanner("ランチ ¥980 を記録しました", systemImage: "checkmark", actionTitle: "取り消す") {}
-
         NoticeBanner("名前を入れてください", systemImage: "exclamationmark", tone: .error)
     }
     .padding()

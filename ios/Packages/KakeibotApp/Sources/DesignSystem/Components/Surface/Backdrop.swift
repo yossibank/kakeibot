@@ -26,10 +26,12 @@ private extension Backdrop {
         switch backdrop {
         case .plain:
             EmptyView()
+
         case .ruled:
             Canvas { context, size in
                 drawRules(in: &context, size: size)
             }
+
         case .grid:
             Canvas { context, size in
                 drawGrid(in: &context, size: size)

@@ -33,9 +33,7 @@ extension SwipeGesture: UIGestureRecognizerRepresentable {
         context.coordinator.allowsRightward = allowsRightward
     }
 
-    func makeUIGestureRecognizer(
-        context: Context
-    ) -> UIPanGestureRecognizer {
+    func makeUIGestureRecognizer(context: Context) -> UIPanGestureRecognizer {
         let recognizer = UIPanGestureRecognizer()
         recognizer.delegate = context.coordinator
         return recognizer
@@ -50,10 +48,13 @@ extension SwipeGesture: UIGestureRecognizerRepresentable {
         switch recognizer.state {
         case .began, .changed:
             onMove(x)
+
         case .ended:
             onEnd(x)
+
         case .cancelled, .failed:
             onEnd(0)
+
         default:
             break
         }
@@ -61,9 +62,7 @@ extension SwipeGesture: UIGestureRecognizerRepresentable {
 }
 
 extension SwipeGesture.Coordinator: UIGestureRecognizerDelegate {
-    func gestureRecognizerShouldBegin(
-        _ recognizer: UIGestureRecognizer
-    ) -> Bool {
+    func gestureRecognizerShouldBegin(_ recognizer: UIGestureRecognizer) -> Bool {
         guard let pan = recognizer as? UIPanGestureRecognizer else {
             return false
         }

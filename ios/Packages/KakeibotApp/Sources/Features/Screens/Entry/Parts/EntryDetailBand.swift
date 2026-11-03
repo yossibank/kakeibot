@@ -148,9 +148,7 @@ private extension EntryDetailBand {
                 if let shortValue {
                     ViewThatFits(in: .horizontal) {
                         valueText(value, color: valueTint)
-
                         valueText(value, color: valueTint, style: .caption)
-
                         valueText(shortValue, color: valueTint)
                     }
                     .layoutPriority(1)
@@ -212,7 +210,6 @@ private extension EntryDetailBand {
 
     var memoText: String {
         let firstLine = model.memo.split(whereSeparator: \.isNewline).first
-
         return firstLine.map(String.init) ?? "＋ \(model.memoHint)"
     }
 }

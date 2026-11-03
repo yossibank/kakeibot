@@ -33,6 +33,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
         switch self {
         case .navy:
             .night
+
         case .black:
             ThemePalette(
                 backgroundTop: 0x1D1D20,
@@ -48,6 +49,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0x9A9CA3,
                 hint: 0x878A92
             )
+
         case .forest:
             ThemePalette(
                 backgroundTop: 0x143C32,
@@ -63,6 +65,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0x8FB0A3,
                 hint: 0x7E9C90
             )
+
         case .teal:
             ThemePalette(
                 backgroundTop: 0x0F3B44,
@@ -78,6 +81,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0x8FAEB3,
                 hint: 0x7C9CA1
             )
+
         case .wine:
             ThemePalette(
                 backgroundTop: 0x3A1220,
@@ -93,6 +97,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0xB39AA2,
                 hint: 0xA0858E
             )
+
         case .plum:
             ThemePalette(
                 backgroundTop: 0x2C1A36,
@@ -108,6 +113,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0xA99AB5,
                 hint: 0x958AA3
             )
+
         case .ivory:
             ThemePalette(
                 backgroundTop: 0xF8F4EB,
@@ -123,6 +129,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0x6B6152,
                 hint: 0x7A705F
             )
+
         case .white:
             ThemePalette(
                 backgroundTop: 0xFFFFFF,
@@ -138,6 +145,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0x63636B,
                 hint: 0x74747C
             )
+
         case .sky:
             ThemePalette(
                 backgroundTop: 0xEEF4FA,
@@ -153,6 +161,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0x54627A,
                 hint: 0x637089
             )
+
         case .sage:
             ThemePalette(
                 backgroundTop: 0xEEF3EA,
@@ -168,6 +177,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0x56685E,
                 hint: 0x65776C
             )
+
         case .rose:
             ThemePalette(
                 backgroundTop: 0xF8EEEC,
@@ -183,6 +193,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
                 subtext: 0x6E5559,
                 hint: 0x7C6266
             )
+
         case .gold:
             ThemePalette(
                 backgroundTop: 0xF4E8C8,

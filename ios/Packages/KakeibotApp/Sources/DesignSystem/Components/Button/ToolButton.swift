@@ -32,7 +32,6 @@ public struct ToolButton: View {
 #Preview {
     HStack(spacing: 16) {
         ToolButton(systemImage: "plus") {}
-
         ToolButton(systemImage: "pencil") {}
     }
     .padding()

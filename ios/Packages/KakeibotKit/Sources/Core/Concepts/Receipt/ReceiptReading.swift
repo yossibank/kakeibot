@@ -57,8 +57,10 @@ public extension ReceiptReading {
             switch line.kind {
             case .taxBase:
                 builder.add(line)
+
             case let .total(amount) where total == nil:
                 self.total = amount
+
             default:
                 if total == nil {
                     builder.add(line)

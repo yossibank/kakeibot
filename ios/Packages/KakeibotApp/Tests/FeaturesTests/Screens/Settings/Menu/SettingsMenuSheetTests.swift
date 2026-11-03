@@ -47,8 +47,10 @@ extension SettingsMenuSheetTests {
             case "<", "(":
                 current += 1
                 deepest = max(deepest, current)
+
             case ">", ")":
                 current -= 1
+
             default:
                 break
             }

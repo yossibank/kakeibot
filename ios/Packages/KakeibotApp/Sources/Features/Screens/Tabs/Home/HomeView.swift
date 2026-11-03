@@ -226,14 +226,19 @@ private extension HomeView {
                 }
             )
             .transition(Self.cardTransition)
+
         case .budget:
             dialCard
+
         case .templates:
             templateCard
+
         case .recent:
             recentCard
+
         case .bills:
             billCard
+
         case .stamps:
             stampCard
         }

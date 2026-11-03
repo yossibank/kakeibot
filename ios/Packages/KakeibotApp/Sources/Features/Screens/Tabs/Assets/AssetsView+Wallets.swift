@@ -283,7 +283,9 @@ private extension AssetsView {
     static func amountColor(of row: AssetsModel.WalletRow) -> Color {
         switch row.wallet.kind.role {
         case .card: row.balance > 0 ? Palette.accent : Palette.text
+
         case .loan: Palette.text
+
         case .onHand, .investment:
             row.balance < 0 ? Palette.rose : Palette.accentStrong
         }
@@ -309,7 +311,6 @@ private extension AssetsView {
         let inText = movedIn > 0 ? ["前から \(movedIn) 件"] : []
         let outText = movedOut > 0 ? ["後へ \(movedOut) 件"] : []
         let parts = inText + outText
-
         return parts.isEmpty ? nil : parts.joined(separator: "・")
     }
 

@@ -13,9 +13,7 @@ public extension AppDatabase {
             .values(in: writer)
     }
 
-    func recurrings(
-        includingHidden: Bool = false
-    ) async throws -> [Recurring] {
+    func recurrings(includingHidden: Bool = false) async throws -> [Recurring] {
         try await writer.read { db in
             try Self.recurrings(in: db, includingHidden: includingHidden)
         }

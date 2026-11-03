@@ -98,6 +98,7 @@ private extension TextFont.Spec {
                 scale: scale,
                 shared: shared
             )
+
         case let .size(size, weight):
             .text(
                 size: size,

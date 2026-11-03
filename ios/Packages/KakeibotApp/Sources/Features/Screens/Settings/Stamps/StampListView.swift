@@ -295,10 +295,12 @@ private extension StampListView {
         switch drag.drop() {
         case let .hide(id):
             hide(id)
+
         case .move:
             Task {
                 await model.finishMoving()
             }
+
         case nil:
             break
         }
@@ -349,6 +351,7 @@ private extension StampListView {
         switch destination {
         case .new:
             StampEditModel(database: database)
+
         case let .edit(id):
             StampEditModel(database: database, editing: id)
         }

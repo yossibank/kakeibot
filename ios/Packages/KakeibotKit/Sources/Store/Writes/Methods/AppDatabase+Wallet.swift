@@ -185,10 +185,8 @@ private extension AppDatabase {
         in db: Database
     ) throws -> Bool {
         let walletColumns = Column("wallet_id") == id || Column("to_wallet_id") == id
-
         let hasEntries = try Entry.filter(walletColumns).fetchCount(db) > 0
         let hasRecurrings = try Recurring.filter(walletColumns).fetchCount(db) > 0
-
         return try hasEntries || hasRecurrings || hasValuations(of: id, in: db)
     }
 
