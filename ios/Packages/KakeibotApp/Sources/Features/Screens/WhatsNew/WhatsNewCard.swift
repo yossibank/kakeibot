@@ -72,7 +72,7 @@ struct WhatsNewCard: View {
                         }
                     }
                 } else {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 8) {
                         ForEach(indexedSteps, id: \.offset) { index, step in
                             HStack(spacing: 12) {
                                 WhatsNewScene(kind: step.scene)

@@ -7,7 +7,7 @@ struct EntryReceiptButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 6) {
+            HStack(spacing: 4) {
                 Image(systemName: "doc.text.viewfinder")
                     .foregroundStyle(Palette.accent)
 

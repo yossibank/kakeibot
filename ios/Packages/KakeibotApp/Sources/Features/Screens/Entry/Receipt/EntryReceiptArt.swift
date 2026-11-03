@@ -45,7 +45,7 @@ private extension EntryReceiptArt {
                     anchor: .bottom,
                     perspective: 0.6
                 )
-                .padding(.bottom, 3)
+                .padding(.bottom, 4)
         }
         .frame(width: 56, height: 56)
     }
@@ -63,7 +63,7 @@ private extension EntryReceiptArt {
 
     var edges: some View {
         paper(width: 28, height: 40)
-            .padding(7)
+            .padding(8)
             .overlay {
                 FinderCorners(length: 9)
                     .stroke(
@@ -92,7 +92,7 @@ private extension EntryReceiptArt {
                 }
                 .clipShape(EntryReceiptShape(tooth: 6, hasTopEdge: true))
             }
-            .padding(10)
+            .padding(8)
             .overlay {
                 FinderCorners(length: 14)
                     .stroke(
@@ -137,7 +137,7 @@ private extension EntryReceiptArt {
                 .frame(width: (width - 10) * 0.45, height: max(2, height / 20))
                 .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(.horizontal, 5)
+        .padding(.horizontal, 4)
         .padding(.top, tooth)
         .padding(.bottom, tooth)
         .frame(width: width, height: height)

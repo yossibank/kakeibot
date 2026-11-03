@@ -48,12 +48,12 @@ private extension FeatureArtMiniHome {
 
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 12)
         .padding(.top, 8)
     }
 
     var dialCard: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             ZStack(alignment: .bottom) {
                 HalfDial(progress: 0.62)
 
@@ -91,14 +91,14 @@ private extension FeatureArtMiniHome {
     }
 
     var recentCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("最近の記録")
                 .textFont(.caption)
                 .tracking(3)
                 .foregroundStyle(Palette.accent)
 
             ForEach(FeatureArtSample.items, id: \.self) { item in
-                HStack(spacing: 10) {
+                HStack(spacing: 8) {
                     Circle()
                         .fill(Palette.accent.opacity(.subtle))
                         .frame(width: 26, height: 26)

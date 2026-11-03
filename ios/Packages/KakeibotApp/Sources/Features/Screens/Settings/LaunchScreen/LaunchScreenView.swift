@@ -28,7 +28,7 @@ public struct LaunchScreenView: View {
 
                     VStack(spacing: 12) {
                         ForEach(LaunchScreen.allCases, id: \.self) { screen in
-                            SettingsOption(
+                            LaunchScreenOption(
                                 screen.title,
                                 note: screen.note,
                                 systemImage: screen.systemImage,

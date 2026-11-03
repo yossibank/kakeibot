@@ -31,7 +31,7 @@ struct ProComparison: View {
 
                         mark(row.pro, isPro: true)
                     }
-                    .padding(.vertical, 11)
+                    .padding(.vertical, 12)
                 }
             }
             .padding(16)

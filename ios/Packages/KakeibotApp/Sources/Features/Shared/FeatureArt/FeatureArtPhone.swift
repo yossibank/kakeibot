@@ -8,7 +8,7 @@ struct FeatureArtPhone<Content: View>: View {
     @ViewBuilder let content: Content
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             Capsule()
                 .fill(Palette.text.opacity(0.7))
                 .frame(width: 22, height: 5)
@@ -16,8 +16,8 @@ struct FeatureArtPhone<Content: View>: View {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
-        .padding(.horizontal, 7)
-        .padding(.top, 6)
+        .padding(.horizontal, 8)
+        .padding(.top, 4)
         .padding(.bottom, 8)
         .frame(width: 84, height: 150)
         .background(Palette.background, in: .rect(cornerRadius: 16))

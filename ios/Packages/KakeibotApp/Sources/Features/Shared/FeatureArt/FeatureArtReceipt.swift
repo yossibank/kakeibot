@@ -27,8 +27,8 @@ struct FeatureArtReceipt: View {
                 .font(.system(size: 8, weight: .bold))
         }
         .foregroundStyle(Self.ink)
-        .padding(.horizontal, 9)
-        .padding(.top, 9)
+        .padding(.horizontal, 8)
+        .padding(.top, 8)
         .padding(.bottom, 12)
         .frame(width: 96)
         .background {

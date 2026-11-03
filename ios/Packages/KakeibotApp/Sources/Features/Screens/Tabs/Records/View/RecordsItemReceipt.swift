@@ -10,7 +10,7 @@ struct RecordsItemReceipt: View {
     let amount: Int
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             Text("お買上明細")
                 .textFont(.caption2, weight: .semibold)
                 .tracking(3)
@@ -18,7 +18,7 @@ struct RecordsItemReceipt: View {
 
             EntryReceiptRule(style: .dashed)
 
-            VStack(spacing: 7) {
+            VStack(spacing: 8) {
                 ForEach(items) { item in
                     itemLine(item)
                 }
@@ -56,7 +56,7 @@ struct RecordsItemReceipt: View {
                     .minimumScaleFactor(0.6)
             }
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 12)
         .padding(.vertical, 12 + Self.tooth / 2)
         .background {
             paper

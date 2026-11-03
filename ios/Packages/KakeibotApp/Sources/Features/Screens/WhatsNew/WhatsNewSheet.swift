@@ -76,7 +76,7 @@ private extension WhatsNewSheet {
         _ release: WhatsNewRelease,
         onJump: @escaping (String) -> Void
     ) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             summary(release, onJump: onJump)
 
             ForEach(release.features) { feature in
@@ -94,7 +94,7 @@ private extension WhatsNewSheet {
         _ release: WhatsNewRelease,
         onJump: @escaping (String) -> Void
     ) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(release.version)
                     .displayFont(.title, weight: .medium)
@@ -148,7 +148,7 @@ private extension WhatsNewSheet {
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
                     .fixedSize()
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, 8)
                     .frame(height: 32)
                     .background(Palette.card, in: .capsule)
                     .overlay {

@@ -12,9 +12,9 @@ struct WhatsNewScene: View {
             content
         }
         .padding(2)
-        .background(Palette.faint, in: .rect(cornerRadius: corner.radius(14)))
+        .background(Palette.faint, in: .rect(cornerRadius: corner.radius(12)))
         .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(14))
+            RoundedRectangle(cornerRadius: corner.radius(12))
                 .stroke(Palette.hairline, lineWidth: 1)
         }
     }
@@ -61,7 +61,7 @@ private extension WhatsNewScene {
                 Label("品目", systemImage: "plus")
                     .textFont(size: .caption, weight: .semibold)
                     .foregroundStyle(Palette.accent)
-                    .padding(.horizontal, 14)
+                    .padding(.horizontal, 12)
                     .frame(height: 30)
                     .overlay {
                         Capsule()
@@ -93,7 +93,7 @@ private extension WhatsNewScene {
         }
         .textFont(size: .caption, weight: .semibold)
         .foregroundStyle(Palette.accentStrong)
-        .padding(.horizontal, 10)
+        .padding(.horizontal, 8)
         .frame(height: 24)
         .background(Palette.accent.opacity(.subtle), in: .capsule)
     }
@@ -110,7 +110,7 @@ private extension WhatsNewScene {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 8)
                 .frame(height: 26)
-                .background(Palette.card, in: .rect(cornerRadius: 6))
+                .background(Palette.card, in: .rect(cornerRadius: 4))
 
             HStack(spacing: 4) {
                 Text(AmountText.text(198))
@@ -131,7 +131,7 @@ private extension WhatsNewScene {
             .monospacedDigit()
             .foregroundStyle(Palette.text)
         }
-        .padding(10)
+        .padding(8)
         .background {
             EntryReceiptShape(tooth: 6, hasTopEdge: true, hasBottomEdge: false)
                 .fill(Palette.paper)
@@ -140,11 +140,11 @@ private extension WhatsNewScene {
             EntryReceiptShape(tooth: 6, hasTopEdge: true, hasBottomEdge: false)
                 .stroke(Palette.paperEdge, lineWidth: 1)
         }
-        .padding(.horizontal, 6)
+        .padding(.horizontal, 4)
     }
 
     var carryoverSwitch: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("予算")
                 .textFont(size: .micro, weight: .semibold)
                 .tracking(1)
@@ -169,12 +169,12 @@ private extension WhatsNewScene {
             }
         }
         .padding(12)
-        .card(cornerRadius: 14)
+        .card(cornerRadius: 12)
         .padding(.horizontal, 4)
     }
 
     var carryoverLeft: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             Text("11月の残り")
                 .textFont(size: .caption)
                 .foregroundStyle(Palette.subtext)
@@ -192,7 +192,7 @@ private extension WhatsNewScene {
     }
 
     var carryoverNext: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 4) {
             Text("12月")
                 .textFont(size: .caption, weight: .semibold)
                 .foregroundStyle(Palette.accent)
@@ -204,7 +204,7 @@ private extension WhatsNewScene {
             Text("＋ 繰越 \(AmountText.text(FeatureArtSample.carryover))")
                 .textFont(size: .caption, weight: .semibold)
                 .foregroundStyle(Palette.accentStrong)
-                .padding(.horizontal, 6)
+                .padding(.horizontal, 4)
                 .padding(.vertical, 2)
                 .background(Palette.accent.opacity(.subtle), in: .capsule)
 

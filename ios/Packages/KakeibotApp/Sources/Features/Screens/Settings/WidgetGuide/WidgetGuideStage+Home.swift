@@ -4,7 +4,7 @@ import SwiftUI
 
 extension WidgetGuideStage {
     var budget: some View {
-        HStack(spacing: 18) {
+        HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 0) {
                 Text("今月あといくら")
                     .textFont(size: .caption)
@@ -22,7 +22,7 @@ extension WidgetGuideStage {
                         .foregroundStyle(Palette.accentStrong)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
-                        .padding(.horizontal, 22)
+                        .padding(.horizontal, 20)
                 }
 
                 Spacer(minLength: 4)
@@ -56,9 +56,9 @@ extension WidgetGuideStage {
                 Rectangle()
                     .fill(Palette.line)
                     .frame(height: 1)
-                    .padding(.vertical, 7)
+                    .padding(.vertical, 8)
 
-                VStack(spacing: 6) {
+                VStack(spacing: 4) {
                     row("今週の支出", amount: FeatureArtSample.weekExpense)
 
                     row("今月の支出", amount: FeatureArtSample.monthExpense)
@@ -76,7 +76,7 @@ extension WidgetGuideStage {
     }
 
     var budgetSmall: some View {
-        HStack(spacing: 22) {
+        HStack(spacing: 20) {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .firstTextBaseline) {
                     Text("今月あといくら")
@@ -105,7 +105,7 @@ extension WidgetGuideStage {
                         .foregroundStyle(Palette.accentStrong)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
-                        .padding(.horizontal, 22)
+                        .padding(.horizontal, 20)
                 }
 
                 Spacer(minLength: 4)
@@ -123,7 +123,7 @@ extension WidgetGuideStage {
                         .foregroundStyle(Palette.text)
                 }
             }
-            .padding(14)
+            .padding(12)
             .frame(width: Self.widgetHeight, height: Self.widgetHeight)
             .card(cornerRadius: Self.widgetRadius)
 
@@ -258,7 +258,7 @@ private extension WidgetGuideStage {
             .font(.system(size: 24))
             .foregroundStyle(Palette.accent)
             .frame(width: Self.appSize, height: Self.appSize)
-            .background(Palette.card.opacity(0.8), in: .rect(cornerRadius: 15))
+            .background(Palette.card.opacity(0.8), in: .rect(cornerRadius: 16))
     }
 
     func badge(_ systemImage: String) -> some View {

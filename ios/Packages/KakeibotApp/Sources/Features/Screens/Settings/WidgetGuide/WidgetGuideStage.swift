@@ -12,7 +12,7 @@ struct WidgetGuideStage: View {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .padding(14)
+        .padding(12)
         .background(wallpaper, in: .rect(cornerRadius: 28))
         .overlay {
             RoundedRectangle(cornerRadius: 28)

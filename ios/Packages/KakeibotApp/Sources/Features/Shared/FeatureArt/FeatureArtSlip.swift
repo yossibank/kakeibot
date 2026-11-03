@@ -8,7 +8,7 @@ struct FeatureArtSlip: View {
     var count = FeatureArtSample.items.count
 
     var body: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             ForEach(FeatureArtSample.items.prefix(count), id: \.self) { item in
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(item.name)
@@ -45,9 +45,9 @@ struct FeatureArtSlip: View {
             }
         }
         .textFont(size: .caption)
-        .padding(.horizontal, 10)
-        .padding(.top, 9)
-        .padding(.bottom, 9 + Self.tooth / 2)
+        .padding(.horizontal, 8)
+        .padding(.top, 8)
+        .padding(.bottom, 8 + Self.tooth / 2)
         .background {
             EntryReceiptShape(tooth: Self.tooth, hasTopEdge: false)
                 .fill(Palette.paper)

@@ -12,7 +12,7 @@ struct EntryReceiptTaxRateBadge: View {
             .lineLimit(1)
             .fixedSize()
             .foregroundStyle(Palette.accentStrong)
-            .padding(.horizontal, 6)
+            .padding(.horizontal, 4)
             .frame(minWidth: Self.minWidth)
             .padding(.vertical, 1)
             .background(Palette.accent.opacity(.subtle), in: .capsule)
