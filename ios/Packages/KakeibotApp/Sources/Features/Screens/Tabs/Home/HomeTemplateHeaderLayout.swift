@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TemplateHeaderLayout: Layout {
+struct HomeTemplateHeaderLayout: Layout {
     let spacing: CGFloat
 
     func sizeThatFits(
@@ -64,7 +64,7 @@ struct TemplateHeaderLayout: Layout {
     }
 }
 
-private extension TemplateHeaderLayout {
+private extension HomeTemplateHeaderLayout {
     static func rowWidth(
         of sizes: [CGSize],
         spacing: CGFloat

@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 import SwiftUI
 
-public struct TemplateShelfSheet: View {
+public struct HomeTemplateShelfSheet: View {
     @Bindable private var model: HomeModel
 
     @State private var query = ""
@@ -78,7 +78,7 @@ public struct TemplateShelfSheet: View {
     }
 }
 
-private extension TemplateShelfSheet {
+private extension HomeTemplateShelfSheet {
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
@@ -119,7 +119,7 @@ private extension TemplateShelfSheet {
     }
 }
 
-private extension TemplateShelfSheet {
+private extension HomeTemplateShelfSheet {
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income)

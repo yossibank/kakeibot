@@ -219,22 +219,6 @@ public extension HomeModel {
         }
     }
 
-    func title(of recurring: Recurring) -> String {
-        list?.title(of: recurring) ?? Self.recurringTitle
-    }
-
-    func place(of recurring: Recurring) -> String? {
-        list?.place(of: recurring)
-    }
-
-    func icon(of recurring: Recurring) -> Icon? {
-        list?.icon(of: recurring)
-    }
-
-    func icon(for template: EntryTemplate) -> Icon? {
-        list?.icon(for: template)
-    }
-
     func record(_ item: PeriodRecurring) async {
         do {
             try await database.recordRecurring(
@@ -275,7 +259,6 @@ private extension HomeModel {
     static let saveFailedMessage = "記録できませんでした"
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
     static let layoutSaveFailedMessage = "設定を保存できませんでした"
-    static let recurringTitle = "固定費"
 
     func observe() async {
         isListFailed = false

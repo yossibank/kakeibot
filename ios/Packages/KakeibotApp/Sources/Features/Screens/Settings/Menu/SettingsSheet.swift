@@ -13,9 +13,9 @@ public struct SettingsSheet: View {
     @State var syncStatus = SyncStatus.off
     @State var backupExportedAt: Date?
     @State var firstEntryCreatedAt: Date?
-    @State var weekStart: SettingValueModel<Weekday>
-    @State var entryStart: SettingValueModel<Bool>
-    @State var recordReset: RecordResetModel
+    @State var weekStart: SettingsValueModel<Weekday>
+    @State var entryStart: SettingsValueModel<Bool>
+    @State var recordReset: SettingsResetModel
     @State var isConfirmingReset = false
 
     #if DEBUG
@@ -42,20 +42,20 @@ public struct SettingsSheet: View {
         appIcon: AppIconListModel
     ) {
         _weekStart = State(
-            initialValue: SettingValueModel(
+            initialValue: SettingsValueModel(
                 database: database,
                 key: .weekStart
             )
         )
 
         _entryStart = State(
-            initialValue: SettingValueModel(
+            initialValue: SettingsValueModel(
                 database: database,
                 key: .entryStartsWithAmount
             )
         )
 
-        _recordReset = State(initialValue: RecordResetModel(database: database))
+        _recordReset = State(initialValue: SettingsResetModel(database: database))
 
         self.database = database
         self.today = today

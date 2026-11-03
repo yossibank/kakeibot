@@ -2,7 +2,7 @@
 import Core
 import Store
 
-extension SampleData {
+extension SettingsSampleData {
     struct Book {
         let expense: [String: EntryCategory.ID]
         let income: [String: EntryCategory.ID]
@@ -13,7 +13,7 @@ extension SampleData {
     }
 }
 
-extension SampleData.Book {
+extension SettingsSampleData.Book {
     init(
         options: EntryOptions,
         card: Wallet.ID,
@@ -35,11 +35,11 @@ extension SampleData.Book {
         )
 
         guard let cash = wallets["財布"] else {
-            throw SampleData.SampleError.missingDefault("財布")
+            throw SettingsSampleData.SampleError.missingDefault("財布")
         }
 
         guard let bank = wallets["銀行"] else {
-            throw SampleData.SampleError.missingDefault("銀行")
+            throw SettingsSampleData.SampleError.missingDefault("銀行")
         }
 
         self.init(expense: expense, income: income, cash: cash, bank: bank, card: card, loan: loan)
@@ -50,7 +50,7 @@ extension SampleData.Book {
         in categories: [String: EntryCategory.ID]
     ) throws -> EntryCategory.ID {
         guard let id = categories[name] else {
-            throw SampleData.SampleError.missingDefault(name)
+            throw SettingsSampleData.SampleError.missingDefault(name)
         }
 
         return id

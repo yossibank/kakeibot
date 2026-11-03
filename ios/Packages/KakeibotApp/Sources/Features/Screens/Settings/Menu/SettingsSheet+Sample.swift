@@ -49,7 +49,7 @@ private extension SettingsSheet {
         sampleMessage = nil
 
         do {
-            try await SampleData.insert(into: database, today: today, now: Date())
+            try await SettingsSampleData.insert(into: database, today: today, now: Date())
             sampleMessage = "テストデータを入れました"
         } catch {
             sampleMessage = "テストデータを入れられませんでした"

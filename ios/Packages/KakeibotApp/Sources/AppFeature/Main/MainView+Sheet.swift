@@ -63,7 +63,7 @@ extension MainView {
                 onChange: show
             )
         case .templates:
-            TemplateShelfSheet(
+            HomeTemplateShelfSheet(
                 model: home,
                 database: database,
                 onUse: useTemplate
@@ -101,7 +101,7 @@ extension MainView {
         case let .whatsNew(seenVersion):
             WhatsNewSheet(seenVersion: seenVersion, onTry: tryFeature)
         case .periodRecurrings:
-            PeriodRecurringSheet(
+            HomeRecurringSheet(
                 model: home,
                 onOpenRecurring: { id in
                     self.sheet = .recurring(id)

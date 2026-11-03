@@ -4,11 +4,11 @@ import Store
 import Testing
 
 @MainActor
-struct SettingValueModelTests {
+struct SettingsValueModelTests {
     @Test
     func startsWithAmountUntilTurnedOff() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingValueModel(database: setup.database, key: .entryStartsWithAmount)
+        let model = SettingsValueModel(database: setup.database, key: .entryStartsWithAmount)
         await model.load()
         let before = model.value
 
@@ -23,7 +23,7 @@ struct SettingValueModelTests {
     @Test
     func savesChosenDay() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingValueModel(database: setup.database, key: .weekStart)
+        let model = SettingsValueModel(database: setup.database, key: .weekStart)
         await model.load()
 
         await model.choose(.monday)
@@ -37,7 +37,7 @@ struct SettingValueModelTests {
     @Test
     func rollsBackAndTellsWhenSavingFails() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingValueModel(database: setup.database, key: .weekStart)
+        let model = SettingsValueModel(database: setup.database, key: .weekStart)
         await model.load()
         try await setup.database.failWrites(to: "setting")
 
@@ -52,7 +52,7 @@ struct SettingValueModelTests {
     @Test
     func keepsLaterChoiceWhenEarlierSaveFails() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingValueModel(database: setup.database, key: .weekStart)
+        let model = SettingsValueModel(database: setup.database, key: .weekStart)
         await model.load()
 
         try await setup.database.writer.write { db in
@@ -86,7 +86,7 @@ struct SettingValueModelTests {
     @Test
     func returnsToSavedDayWhenBothQuickSavesFail() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingValueModel(database: setup.database, key: .weekStart)
+        let model = SettingsValueModel(database: setup.database, key: .weekStart)
         await model.load()
         try await setup.database.failWrites(to: "setting")
 

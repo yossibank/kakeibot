@@ -177,6 +177,9 @@ KakeibotApp のフォルダは、次の木のとおりである。
 KakeibotApp/
 ├── Sources/
 │   ├── AppFeature/
+│   │   ├── App/
+│   │   ├── Bridge/
+│   │   └── Main/
 │   ├── AppWidget/
 │   ├── DesignSystem/
 │   │   ├── Components/
@@ -184,17 +187,31 @@ KakeibotApp/
 │   ├── Features/
 │   │   ├── Screens/
 │   │   │   ├── Entry/
+│   │   │   │   ├── Item/
+│   │   │   │   ├── Model/
+│   │   │   │   ├── Parts/
+│   │   │   │   ├── Receipt/
+│   │   │   │   ├── Sheet/
+│   │   │   │   └── Transfer/
 │   │   │   ├── Onboarding/
 │   │   │   ├── Settings/
 │   │   │   ├── Tabs/
+│   │   │   │   ├── Assets/
+│   │   │   │   ├── Home/
+│   │   │   │   ├── Records/
+│   │   │   │   │   ├── Model/
+│   │   │   │   │   ├── Sheet/
+│   │   │   │   │   └── View/
+│   │   │   │   └── Review/
 │   │   │   └── WhatsNew/
 │   │   └── Shared/
 │   │       ├── FeatureArt/
 │   │       ├── Model/
 │   │       ├── Notice/
+│   │       ├── Notification/
 │   │       ├── Period/
 │   │       ├── Pro/
-│   │       ├── Settings/
+│   │       ├── SettingsParts/
 │   │       ├── Setup/
 │   │       └── Stamp/
 │   ├── Notifications/
@@ -206,24 +223,29 @@ KakeibotApp/
 
 | フォルダ | 中身 |
 | --- | --- |
-| `AppFeature/` | 起動の印の動き、通知の許可、入力の準備、レビューのお願いも持つ。Pro の購入を StoreKit で確かめ、Pro が無くなったら同期を止める |
+| `AppFeature/App/` | アプリの入口と起動、起動の印の動き、入力の準備、レビューのお願い。Pro が無くなったら同期を止める |
+| `AppFeature/Bridge/` | Pro の購入を StoreKit で確かめる。同期の口座と参加者を CloudKit で読む |
+| `AppFeature/Main/` | 4 つのタブと入力シートなどのシートを組む |
 | `AppWidget/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
 | `DesignSystem/Components/` | Amount・Banner・Button・Calendar・Chart・Dial・Gesture・Icon・Input・Layout・Menu・Navigation・Row・Sheet・Surface・Tag・Template |
 | `Features/Screens/Entry/` | 記録の入力シート。レシートは VisionKit で撮り、Vision と Foundation Models で読む |
 | `Features/Screens/Onboarding/` | 最初の設定のチュートリアル |
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
-| `Features/Screens/Tabs/` | Assets・Home・Records・Review |
+| `Features/Screens/Tabs/` | Assets・Home・Records・Review。Records は Model・Sheet・View に分ける |
 | `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート |
 | `Features/Shared/FeatureArt/` | お知らせと Pro の画面で機能を見せる絵の部品（レシート・伝票・iPhone の枠・見本のデータ）。絵を幅に合わせて縮める枠も置く |
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、記録の検索と絞り込み |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、記録が無いときと読み込めないときの表示、保存の失敗が空き容量不足かの見分け |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |
+| `Features/Shared/Notification/` | 通知の許可の窓口と、許可が無いときの帯 |
 | `Features/Shared/Pro/` | Pro を買ったかの状態、Pro の画面、止めた場所で下に出すカード。StoreKit の中身は AppFeature が渡す |
-| `Features/Shared/Settings/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
+| `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Features/Shared/Stamp/` | 押したスタンプの数のカードと、押した日の一覧のシート |
 | `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |
 | `Tests/TestSupport/` | テストの補助。観測している値が変わるのを、上限の時間まで待つ |
+
+画面ごとのフォルダは、[architecture-screens の「画面とフォルダ」](architecture-screens.md#-画面とフォルダ)にある。
 
 ## 📏 名前の決まり
 

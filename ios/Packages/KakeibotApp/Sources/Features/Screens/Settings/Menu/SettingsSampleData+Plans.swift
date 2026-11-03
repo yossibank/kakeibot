@@ -3,7 +3,7 @@ import Core
 import Foundation
 import Store
 
-extension SampleData {
+extension SettingsSampleData {
     static func insertBudgets(
         book: Book,
         today: LocalDate,

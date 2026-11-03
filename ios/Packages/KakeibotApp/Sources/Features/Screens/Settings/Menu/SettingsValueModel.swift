@@ -5,7 +5,7 @@ import Store
 
 @MainActor
 @Observable
-public final class SettingValueModel<Value: Equatable & Sendable> {
+public final class SettingsValueModel<Value: Equatable & Sendable> {
     public private(set) var value: Value
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -26,7 +26,7 @@ public final class SettingValueModel<Value: Equatable & Sendable> {
     }
 }
 
-public extension SettingValueModel {
+public extension SettingsValueModel {
     func load() async {
         value = await (try? database.setting(key)) ?? key.defaultValue
         savedValue = value
@@ -48,7 +48,7 @@ public extension SettingValueModel {
     }
 }
 
-private extension SettingValueModel {
+private extension SettingsValueModel {
     static var saveFailedMessage: String {
         "設定を保存できませんでした"
     }
