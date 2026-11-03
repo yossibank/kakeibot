@@ -274,6 +274,7 @@ KakeibotApp/
 
 | テスト | 置き場所 |
 | --- | --- |
-| `Store/Queries`・`Store/Sync`・`Store/Writes` | `Methods/`・`Types/` に分けず、`StoreTests/Queries/` などの直下に置く |
+| `Store/Queries`・`Store/Writes` | `Methods/`・`Types/` に分けず、直下に置く |
+| `Store/Sync` | 話題で `Share/`・`Change/` に分ける |
 | `TestSupport` のテスト | `TestSupport` にテストのターゲットが無いので、`FeaturesTests/Shared/` に置く |
 | `Notifications` のテスト | テストのターゲットが無いので、`AppFeatureTests/Notifications/` に置く |

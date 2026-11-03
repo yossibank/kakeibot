@@ -65,7 +65,7 @@ DesignSystem の `Components/` の子フォルダは、種類と題材の 2 通�
 
 テストのファイルと型の名前は、`rules/swift-test.md` の「テストの名前」に従う。
 
-`StoreTests/Sync/` は、ファイルが 20 本を超えたら、次の子フォルダに分ける。
+`StoreTests/Sync/` は、次の子フォルダに分ける。
 
 | 子フォルダ | 入れるテスト |
 | --- | --- |
