@@ -24,7 +24,7 @@ struct MainView: View {
     @State private var isWarmingEntry = true
     @State private var orderMenuAnchor: CGRect?
     @State private var observationRound = 0
-    @State private var foreground = ForegroundReturn()
+    @State private var foreground = AppForegroundReturn()
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase

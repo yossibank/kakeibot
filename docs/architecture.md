@@ -112,6 +112,7 @@ KakeibotKit/
 ├── Sources/
 │   ├── Core/
 │   │   ├── Concepts/
+│   │   │   ├── App/
 │   │   │   ├── Budget/
 │   │   │   ├── Category/
 │   │   │   ├── Date/
@@ -134,6 +135,7 @@ KakeibotKit/
 │       │   ├── Methods/
 │       │   └── Types/
 │       ├── Records/
+│       │   ├── Protocols/
 │       │   ├── Rows/
 │       │   ├── SettingKeys/
 │       │   └── Values/
@@ -151,6 +153,7 @@ KakeibotKit/
 
 | フォルダ | 中身 |
 | --- | --- |
+| `Concepts/App/` | アプリの版 |
 | `Concepts/Budget/` | 予算と消化 |
 | `Concepts/Category/` | 記録のカテゴリとタグ |
 | `Concepts/Date/` | LocalDate、期間の区切り、祝日、休日のずらし |
@@ -162,7 +165,7 @@ KakeibotKit/
 | `Concepts/Recurring/` | 固定費と記録漏れの後追い |
 | `Concepts/Review/` | 振り返りの範囲と集計 |
 | `Concepts/Reward/` | ごほうびと貯金箱 |
-| `Concepts/Setting/` | 設定の値と、アプリの版 |
+| `Concepts/Setting/` | 設定の値 |
 | `Concepts/Theme/` | テーマの色・書体・形 |
 | `Concepts/Wallet/` | 財布と残高 |
 | `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、下書きの問題 |
@@ -229,7 +232,7 @@ KakeibotApp/
 | `AppFeature/App/` | アプリの入口と起動、起動の印の動き、入力の準備、レビューのお願い。Pro が無くなったら同期を止める |
 | `AppFeature/Bridge/` | Pro の購入を StoreKit で確かめる。同期の口座と参加者を CloudKit で読む |
 | `AppFeature/Main/` | 4 つのタブと入力シートなどのシートを組む |
-| `AppWidget/Intents/` | すぐ記録の記録と取り消し |
+| `AppWidget/Intents/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
 | `AppWidget/Shared/` | ウィジェットをまたいで使う読み出し・書体・テーマ・タイムライン |
 | `AppWidget/Widgets/` | ウィジェットごとのフォルダ。コントロールの「記録する」は `EntryControl/` |
 | `Features/Screens/Entry/` | 記録の入力シート。レシートは VisionKit で撮り、Vision と Foundation Models で読む |

@@ -4,7 +4,7 @@ import GRDB
 import Store
 import Testing
 
-struct IconGlyphTests {
+struct IconRecordTests {
     @Test
     func readsGlyphAddedByNewerVersionAsDefault() async throws {
         let database = try AppDatabase.inMemory()

@@ -1,10 +1,10 @@
 import SwiftUI
 
-struct ForegroundReturn {
+struct AppForegroundReturn {
     private var wasBackground = false
 }
 
-extension ForegroundReturn {
+extension AppForegroundReturn {
     mutating func receive(_ phase: ScenePhase) -> Bool {
         switch phase {
         case .background:

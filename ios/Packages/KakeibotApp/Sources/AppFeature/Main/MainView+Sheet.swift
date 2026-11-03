@@ -39,7 +39,7 @@ extension MainView {
                 onChange: show
             )
         case .settings:
-            SettingsSheet(
+            SettingsMenuSheet(
                 database: database,
                 today: today,
                 appIcon: appIcon

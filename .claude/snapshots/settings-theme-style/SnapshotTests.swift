@@ -29,7 +29,7 @@ struct SnapshotTests {
                 await model.choose(decorations: style.decorations)
                 await model.load()
 
-                let sheet = SettingsSheet(
+                let sheet = SettingsMenuSheet(
                     database: database,
                     today: today,
                     appIcon: AppIconListModel()
@@ -146,7 +146,7 @@ private extension SnapshotTests {
         let database = try AppDatabase.inMemory()
 
         try database.insertDefaultsIfEmpty(at: now)
-        try await SettingsSampleData.insert(into: database, today: today, now: now)
+        try await SettingsMenuSampleData.insert(into: database, today: today, now: now)
 
         let walletDraft = WalletDraft(
             kind: .bank,

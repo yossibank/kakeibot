@@ -3,7 +3,7 @@ import Foundation
 import Store
 import Testing
 
-struct TagWriteTests {
+struct EntryTagWriteTests {
     @Test
     func savesTagsInOrder() async throws {
         let setup = try await Setup()
@@ -174,14 +174,14 @@ struct TagWriteTests {
     }
 }
 
-extension TagWriteTests {
+extension EntryTagWriteTests {
     struct Setup {
         let database: AppDatabase
         let now: Date
     }
 }
 
-extension TagWriteTests.Setup {
+extension EntryTagWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)

@@ -4,11 +4,11 @@ import Store
 import Testing
 
 @MainActor
-struct SettingsValueModelTests {
+struct SettingsMenuValueModelTests {
     @Test
     func startsWithAmountUntilTurnedOff() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingsValueModel(database: setup.database, key: .entryStartsWithAmount)
+        let model = SettingsMenuValueModel(database: setup.database, key: .entryStartsWithAmount)
         await model.load()
         let before = model.value
 
@@ -23,7 +23,7 @@ struct SettingsValueModelTests {
     @Test
     func savesChosenDay() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingsValueModel(database: setup.database, key: .weekStart)
+        let model = SettingsMenuValueModel(database: setup.database, key: .weekStart)
         await model.load()
 
         await model.choose(.monday)
@@ -37,7 +37,7 @@ struct SettingsValueModelTests {
     @Test
     func rollsBackAndTellsWhenSavingFails() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingsValueModel(database: setup.database, key: .weekStart)
+        let model = SettingsMenuValueModel(database: setup.database, key: .weekStart)
         await model.load()
         try await setup.database.failWrites(to: "setting")
 
@@ -52,7 +52,7 @@ struct SettingsValueModelTests {
     @Test
     func keepsLaterChoiceWhenEarlierSaveFails() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingsValueModel(database: setup.database, key: .weekStart)
+        let model = SettingsMenuValueModel(database: setup.database, key: .weekStart)
         await model.load()
 
         try await setup.database.writer.write { db in
@@ -86,7 +86,7 @@ struct SettingsValueModelTests {
     @Test
     func returnsToSavedDayWhenBothQuickSavesFail() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = SettingsValueModel(database: setup.database, key: .weekStart)
+        let model = SettingsMenuValueModel(database: setup.database, key: .weekStart)
         await model.load()
         try await setup.database.failWrites(to: "setting")
 

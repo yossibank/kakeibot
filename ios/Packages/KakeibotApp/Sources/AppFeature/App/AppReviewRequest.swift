@@ -3,7 +3,7 @@ import Features
 import Foundation
 import Store
 
-struct StoreReviewRequest: Sendable {
+struct AppReviewRequest: Sendable {
     let database: AppDatabase
     let version: String
     let calendar: Calendar
@@ -19,7 +19,7 @@ struct StoreReviewRequest: Sendable {
     }
 }
 
-extension StoreReviewRequest {
+extension AppReviewRequest {
     static let minimumEntries = 30
     static let minimumDays = 7
 
@@ -39,7 +39,7 @@ extension StoreReviewRequest {
     }
 }
 
-private extension StoreReviewRequest {
+private extension AppReviewRequest {
     nonisolated func isReady(
         _ history: EntryHistory,
         at now: Date

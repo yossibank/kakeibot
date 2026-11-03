@@ -3,7 +3,7 @@ import Foundation
 import Store
 import Testing
 
-struct CategoryWriteTests {
+struct EntryCategoryWriteTests {
     @Test
     func addsCategoryAfterSameKind() async throws {
         let setup = try await Setup()
@@ -127,7 +127,7 @@ struct CategoryWriteTests {
     }
 }
 
-extension CategoryWriteTests {
+extension EntryCategoryWriteTests {
     struct Setup {
         let database: AppDatabase
         let now: Date
@@ -135,7 +135,7 @@ extension CategoryWriteTests {
     }
 }
 
-extension CategoryWriteTests.Setup {
+extension EntryCategoryWriteTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)

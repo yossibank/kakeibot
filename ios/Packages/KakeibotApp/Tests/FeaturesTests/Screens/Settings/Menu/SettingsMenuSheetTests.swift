@@ -5,7 +5,7 @@ import SwiftUI
 import Testing
 
 @MainActor
-struct SettingsSheetTests {
+struct SettingsMenuSheetTests {
     static let limit = 14
 
     @Test
@@ -15,7 +15,7 @@ struct SettingsSheetTests {
 
         try database.insertDefaultsIfEmpty(at: now)
 
-        let sheet = SettingsSheet(
+        let sheet = SettingsMenuSheet(
             database: database,
             today: LocalDate(now, in: .current),
             appIcon: AppIconListModel()
@@ -37,7 +37,7 @@ struct SettingsSheetTests {
     }
 }
 
-extension SettingsSheetTests {
+extension SettingsMenuSheetTests {
     static func depth(of value: some Any) -> Int {
         var current = 0
         var deepest = 0

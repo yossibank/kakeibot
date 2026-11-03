@@ -2,7 +2,7 @@
 import DesignSystem
 import SwiftUI
 
-extension SettingsSheet {
+extension SettingsMenuSheet {
     var sampleSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("開発")
@@ -43,13 +43,13 @@ extension SettingsSheet {
     }
 }
 
-private extension SettingsSheet {
+private extension SettingsMenuSheet {
     func insertSample() async {
         isInsertingSample = true
         sampleMessage = nil
 
         do {
-            try await SettingsSampleData.insert(into: database, today: today, now: Date())
+            try await SettingsMenuSampleData.insert(into: database, today: today, now: Date())
             sampleMessage = "テストデータを入れました"
         } catch {
             sampleMessage = "テストデータを入れられませんでした"

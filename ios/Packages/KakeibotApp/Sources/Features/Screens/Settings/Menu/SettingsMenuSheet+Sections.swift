@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 import SwiftUI
 
-extension SettingsSheet {
+extension SettingsMenuSheet {
     var recordSection: some View {
         section("記録に使うもの") {
             NavigationLink {
@@ -246,7 +246,7 @@ extension SettingsSheet {
             Hairline()
 
             Button {
-                open(SettingsLink.contact())
+                open(SettingsMenuLink.contact())
             } label: {
                 row("お問い合わせ", systemImage: "envelope", trailingImage: "arrow.up.right")
             }
@@ -254,7 +254,7 @@ extension SettingsSheet {
             Hairline()
 
             Button {
-                open(SettingsLink.review)
+                open(SettingsMenuLink.review)
             } label: {
                 row("レビューを書く", systemImage: "star", trailingImage: "arrow.up.right")
             }
@@ -262,7 +262,7 @@ extension SettingsSheet {
     }
 }
 
-private extension SettingsSheet {
+private extension SettingsMenuSheet {
     var monthStartDayText: String {
         PeriodText.startDay(monthStartDay)
     }

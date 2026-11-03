@@ -131,7 +131,7 @@ extension MainView {
     }
 
     func show(_ change: EntryChange) {
-        let request = StoreReviewRequest(database: database)
+        let request = AppReviewRequest(database: database)
 
         notice.show(change)
 

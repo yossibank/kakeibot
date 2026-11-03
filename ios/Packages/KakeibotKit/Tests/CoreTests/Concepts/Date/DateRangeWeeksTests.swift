@@ -1,7 +1,7 @@
 import Core
 import Testing
 
-struct DateRangeTests {
+struct DateRangeWeeksTests {
     @Test(arguments: try weeksCases)
     func laysOutWeeks(fixture: WeeksCase) {
         let range = fixture.start...fixture.end
@@ -21,7 +21,7 @@ struct DateRangeTests {
     }
 }
 
-extension DateRangeTests {
+extension DateRangeWeeksTests {
     struct WeeksCase: Decodable, Sendable {
         let weekStart: Weekday
         let start: LocalDate
@@ -32,7 +32,7 @@ extension DateRangeTests {
     }
 }
 
-private extension DateRangeTests {
+private extension DateRangeWeeksTests {
     static var weeksCases: [WeeksCase] {
         get throws {
             try CoreFixture.cases("date/date-range-weeks.json")

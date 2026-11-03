@@ -5,7 +5,7 @@ import Foundation
 import Store
 import Testing
 
-struct StoreReviewRequestTests {
+struct AppReviewRequestTests {
     @Test
     func asksOnceWhenReady() async throws {
         let setup = try await Setup(entries: 30, daysAgo: 7)
@@ -22,7 +22,7 @@ struct StoreReviewRequestTests {
     @Test
     func asksAgainForNewVersion() async throws {
         let setup = try await Setup(entries: 30, daysAgo: 7)
-        let next = StoreReviewRequest(
+        let next = AppReviewRequest(
             database: setup.database,
             version: "1.3",
             calendar: Setup.calendar
@@ -84,7 +84,7 @@ struct StoreReviewRequestTests {
     }
 }
 
-extension StoreReviewRequestTests {
+extension AppReviewRequestTests {
     struct Setup {
         static var calendar: Calendar {
             var calendar = Calendar(identifier: .gregorian)
@@ -95,13 +95,13 @@ extension StoreReviewRequestTests {
         }
 
         let database: AppDatabase
-        let request: StoreReviewRequest
+        let request: AppReviewRequest
         let recorded: EntryChange
         let now: Date
     }
 }
 
-extension StoreReviewRequestTests.Setup {
+extension AppReviewRequestTests.Setup {
     init(
         entries: Int,
         daysAgo: Int
@@ -137,7 +137,7 @@ extension StoreReviewRequestTests.Setup {
 
         self.init(
             database: database,
-            request: StoreReviewRequest(
+            request: AppReviewRequest(
                 database: database,
                 version: "1.2",
                 calendar: Self.calendar

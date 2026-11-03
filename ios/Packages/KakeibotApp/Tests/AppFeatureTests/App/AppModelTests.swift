@@ -334,7 +334,7 @@ struct AppModelTests {
 
     @Test
     func detectsForegroundAfterInactive() {
-        var foreground = ForegroundReturn()
+        var foreground = AppForegroundReturn()
 
         let results = [
             foreground.receive(.inactive),

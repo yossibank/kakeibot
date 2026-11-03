@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-extension SettingsSheet {
+extension SettingsMenuSheet {
     var versionText: some View {
         Text("かけいぼっと \(Bundle.main.shortVersion)")
             .textFont(.caption2)
