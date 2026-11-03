@@ -35,6 +35,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `spec/fixtures/` | フォルダ名は、Core のフォルダ名の小文字にそろえる |
 | `.claude/rules/` | spec の文書の役割 |
 | `.claude/snapshots/` | `ui-snapshot` で描くセット。名前は描く場所（`tabs-`・`entry-`・`settings-`・`components`・`widget`・`store`）で始める |
+| `scripts/snapshot-scroll.py` | セットの `patch.py` から呼ぶ。スクロールを伸ばして全体を描けるようにし、ガラスの効果を背景に変える |
 | `.claude/snapshots/store/` | `store/screenshots/raw/` の画面に文言を重ね、ストアのスクリーンショットを描く |
 | `store/ja/` | App Store の掲載情報の文と URL |
 | `store/screenshots/` | ストアに出すスクリーンショット。6.9 インチは `6.9/`、6.3 インチは `6.3/`、元の画面は `raw/` |
