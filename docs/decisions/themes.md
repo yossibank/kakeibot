@@ -39,7 +39,7 @@
 > - 消した直後は「取り消す」を出し、押すとテーマと、消す前に選んでいたテーマに戻す。
 > - 選んだテーマは、設定の `theme_id` に名前で保存する。
 > - 手で作るテーマは、`theme` 表に地・カード・文字・控えめな文字・強調の 5 色を保存する。`expense`・`income` の列は描画に使わない。
-> - 描くほかの色は、この 5 色から作る。作り方は [theme-palette-base.json](../../spec/fixtures/setting/theme-palette-base.json) の `description` にある。
+> - 描くほかの色は、この 5 色から作る。作り方は [theme-palette-base.json](../../spec/fixtures/theme/theme-palette-base.json) の `description` にある。
 > - 手で作るときは、色ごとに用意した色の並びから選ぶ。並びの最後の色の選択で、細かく調整もできる。
 > - 作ったテーマは、保存するとそのまま選ぶ。
 > - 用意したテーマや作ったテーマの見本を長押しすると、入力シートのカテゴリと同じ形のメニューを出し、その色をもとに作れる。

@@ -127,22 +127,29 @@ KakeibotKit/
 │   │   ├── Entry/
 │   │   ├── Export/V1/
 │   │   ├── Icon/
-│   │   ├── Identifier/
 │   │   ├── Notification/
 │   │   ├── Receipt/
 │   │   ├── Recurring/
 │   │   ├── Review/
 │   │   ├── Reward/
 │   │   ├── Setting/
+│   │   ├── Shared/
+│   │   ├── Theme/
 │   │   └── Wallet/
 │   └── Store/
 │       ├── Database/
 │       ├── Migrations/
 │       ├── Queries/
+│       │   ├── Methods/
+│       │   └── Types/
 │       ├── Records/
 │       ├── Snapshot/
 │       ├── Sync/
+│       │   ├── Methods/
+│       │   └── Types/
 │       └── Writes/
+│           ├── Methods/
+│           └── Types/
 └── Tests/
 ```
 
@@ -156,14 +163,17 @@ KakeibotKit/
 | `Core/Entry/` | 記録と品目、金額の電卓、日ごとのまとめ |
 | `Core/Export/V1/` | 書き出しの形 |
 | `Core/Icon/` | アイコンとスタンプ |
-| `Core/Identifier/` | 型付きの ID |
 | `Core/Notification/` | 予約されているべき通知の計算と行き先 |
 | `Core/Receipt/` | 文字の断片をレシートの行にまとめ、行かモデルが答えた行の役割から品目・合計・日付・店名を組み立てる決まり。人が直した品名 |
 | `Core/Recurring/` | 固定費と記録漏れの後追い |
 | `Core/Review/` | 振り返りの範囲と集計 |
 | `Core/Reward/` | ごほうびと貯金箱 |
-| `Core/Setting/` | 設定の値とテーマ |
+| `Core/Setting/` | 設定の値 |
+| `Core/Shared/` | 型付きの ID、割合、下書きの問題 |
+| `Core/Theme/` | テーマの色・書体・形 |
 | `Core/Wallet/` | 財布と残高 |
+| `Store/Queries/`・`Store/Sync/`・`Store/Writes/` | `Methods/` に `AppDatabase+*.swift` の拡張、`Types/` にそれ以外の型を置く |
+| `Store/Migrations/` | `MigrationV<3 桁の通し番号>.swift`。欠番は 14 |
 | `Store/Database/` | 最初の財布とカテゴリも作る。止める通知は AppFeature が送る |
 | `Store/Snapshot/` | 書き出し用の全データの読み出し、読み込み用の全置き換え |
 | `Store/Sync/` | 同期で送る行の記録と、受け取った行の書き込み |
@@ -227,7 +237,7 @@ KakeibotApp/
 
 ## 📏 名前の決まり
 
-フォルダとファイルの名前は、共通の形の「名前の決まり」と `rules/swift-core.md` に従う。kakeibot では、入れる先のない `Core/Identifier` だけ、ファイルが 1 つのフォルダを認める。fixtures は `spec/fixtures/` の下の、Core のフォルダ名を小文字にしたフォルダに置く。
+フォルダとファイルの名前は、共通の形の「名前の決まり」と `rules/swift-core.md` に従う。Migrations のファイルと型は、3 桁の通し番号で付ける。fixtures は `spec/fixtures/` の下の、Core のフォルダ名を小文字にしたフォルダに置く。
 
 画面の組み立てと通知とウィジェットの方式は、[architecture-screens](architecture-screens.md) にある。
 
