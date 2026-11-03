@@ -276,4 +276,4 @@ KakeibotApp/
 
 テストの形は、共通の形に `SyncTests` と `AppWidgetTests` を足したものである。Core のテストは、fixtures を全部通す。
 
-`CoreTests` と `FeaturesTests` のフォルダは、ソースの 2 段目までと同じ分け方にする。テストが 1 本だけでも、ソースと同じフォルダに置く。
+`CoreTests` と `FeaturesTests` は、機能の束の下をソースと同じフォルダに分ける。`Shared/` は分けない。
