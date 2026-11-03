@@ -14,7 +14,7 @@ public struct ThemeStyleLookView: View {
     }
 
     public var body: some View {
-        ThemeStyleScreen(
+        ThemeStyleFrame(
             title: "形と動き",
             intro: Self.intro,
             hint: hintFlag,

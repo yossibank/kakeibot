@@ -13,7 +13,7 @@ struct SnapshotTests {
         let now = Date()
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = HomeSectionsModel(database: database)
+        let model = HomeSectionListModel(database: database)
         let sections = HomeSection.allCases
         let rows = [Array(sections.prefix(3)), Array(sections.dropFirst(3))]
 
@@ -33,7 +33,7 @@ struct SnapshotTests {
         .frame(width: 344, height: 184, alignment: .topLeading)
 
         for variant in Self.variants {
-            let view = HomeSectionsView(model: model, database: database)
+            let view = HomeSectionListView(model: model, database: database)
 
             try Self.write(view, variant: variant, to: "home-sections")
             try Self.write(thumbnails, variant: variant, to: "home-sections-thumbnails")

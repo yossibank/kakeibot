@@ -106,7 +106,10 @@ extension SettingsSheet {
     var homeSection: some View {
         section("ホームと通知") {
             NavigationLink {
-                HomeSectionsView(model: HomeSectionsModel(database: database), database: database)
+                HomeSectionListView(
+                    model: HomeSectionListModel(database: database),
+                    database: database
+                )
             } label: {
                 row("ホームに出すもの", systemImage: "rectangle.grid.1x2")
             }

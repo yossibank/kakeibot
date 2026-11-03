@@ -64,8 +64,8 @@ public struct SetupDestination: View {
         case .themeLook:
             ThemeStyleLookView(model: ThemeStyleModel(database: database))
         case .homeSections:
-            HomeSectionsView(
-                model: HomeSectionsModel(database: database),
+            HomeSectionListView(
+                model: HomeSectionListModel(database: database),
                 database: database
             )
         }

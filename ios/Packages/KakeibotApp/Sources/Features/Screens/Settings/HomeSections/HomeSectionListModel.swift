@@ -5,7 +5,7 @@ import Store
 
 @MainActor
 @Observable
-public final class HomeSectionsModel {
+public final class HomeSectionListModel {
     public private(set) var layout = HomeLayout.standard
     public private(set) var isLoaded = false
 
@@ -18,7 +18,7 @@ public final class HomeSectionsModel {
     }
 }
 
-public extension HomeSectionsModel {
+public extension HomeSectionListModel {
     func load() async {
         do {
             let order = try await database.setting(.homeSections)
@@ -49,7 +49,7 @@ public extension HomeSectionsModel {
     }
 }
 
-private extension HomeSectionsModel {
+private extension HomeSectionListModel {
     static let loadFailedMessage = "設定を読めませんでした"
     static let saveFailedMessage = "設定を保存できませんでした"
 }

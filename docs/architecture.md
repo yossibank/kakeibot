@@ -162,7 +162,7 @@ KakeibotKit/
 | `Concepts/Recurring/` | 固定費と記録漏れの後追い |
 | `Concepts/Review/` | 振り返りの範囲と集計 |
 | `Concepts/Reward/` | ごほうびと貯金箱 |
-| `Concepts/Setting/` | 設定の値 |
+| `Concepts/Setting/` | 設定の値と、アプリの版 |
 | `Concepts/Theme/` | テーマの色・書体・形 |
 | `Concepts/Wallet/` | 財布と残高 |
 | `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、下書きの問題 |
@@ -191,6 +191,7 @@ KakeibotApp/
 │   │   ├── Shared/
 │   │   └── Widgets/
 │   │       ├── Budget/
+│   │       ├── EntryControl/
 │   │       └── QuickRecord/
 │   ├── DesignSystem/
 │   │   ├── Components/
@@ -228,9 +229,9 @@ KakeibotApp/
 | `AppFeature/App/` | アプリの入口と起動、起動の印の動き、入力の準備、レビューのお願い。Pro が無くなったら同期を止める |
 | `AppFeature/Bridge/` | Pro の購入を StoreKit で確かめる。同期の口座と参加者を CloudKit で読む |
 | `AppFeature/Main/` | 4 つのタブと入力シートなどのシートを組む |
-| `AppWidget/Intents/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
+| `AppWidget/Intents/` | すぐ記録の記録と取り消し |
 | `AppWidget/Shared/` | ウィジェットをまたいで使う読み出し・書体・テーマ・タイムライン |
-| `AppWidget/Widgets/` | ウィジェットごとのフォルダ |
+| `AppWidget/Widgets/` | ウィジェットごとのフォルダ。コントロールの「記録する」は `EntryControl/` |
 | `Features/Screens/Entry/` | 記録の入力シート。レシートは VisionKit で撮り、Vision と Foundation Models で読む |
 | `Features/Screens/Onboarding/` | 最初の設定のチュートリアル |
 | `Features/Screens/Pro/` | Pro の画面と購入のモデル |
@@ -240,7 +241,7 @@ KakeibotApp/
 | `Features/Shared/DateChoice/` | 月の始まりの日・休日のずらし・曜日を選ぶ部品と、その表示の名前 |
 | `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro の画面で機能を見せる絵の部品（レシート・伝票・iPhone の枠・見本のデータ）。絵を幅に合わせて縮める枠も置く |
-| `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、アプリの版 |
+| `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す） |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、保存の失敗が空き容量不足かの見分け。ファイルの頭は、元の型ごとに分かれる |
 | `Features/Shared/Notification/` | 通知の許可の窓口と、許可が無いときの帯 |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |
@@ -272,3 +273,4 @@ KakeibotApp/
 | --- | --- |
 | `Store/Queries`・`Store/Sync`・`Store/Writes` | `Methods/`・`Types/` に分けず、`StoreTests/Queries/` などの直下に置く |
 | `TestSupport` のテスト | `TestSupport` にテストのターゲットが無いので、`FeaturesTests/Shared/` に置く |
+| `Notifications` のテスト | テストのターゲットが無いので、`AppFeatureTests/Notifications/` に置く |
