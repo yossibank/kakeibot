@@ -80,12 +80,14 @@ private extension AssetsView {
 
                 Spacer(minLength: 8)
 
-                Text(AmountText.text(total))
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                if section.rows.count > 1 {
+                    Text(AmountText.text(total))
+                        .textFont(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
             }
             .padding(.top, 12)
             .padding(.bottom, 4)
@@ -104,10 +106,7 @@ private extension AssetsView {
     }
 
     func walletRow(_ row: AssetsModel.WalletRow) -> some View {
-        let facts = owedFacts(of: row)
-        let note = owedNote(of: row)
-
-        return HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             IconBadge(row.icon, size: 32)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -135,27 +134,7 @@ private extension AssetsView {
                         .minimumScaleFactor(0.7)
                 }
 
-                if let facts {
-                    AssetsDebtFacts(facts: facts)
-                }
-
-                if row.repaidRatio != nil || note != nil {
-                    HStack(spacing: 8) {
-                        if let ratio = row.repaidRatio {
-                            RatioBar(ratio, tint: Palette.accent)
-                        }
-
-                        if let note {
-                            Text(note)
-                                .textFont(.caption2)
-                                .monospacedDigit()
-                                .foregroundStyle(Palette.subtext)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                                .fixedSize(horizontal: row.repaidRatio != nil, vertical: false)
-                        }
-                    }
-                }
+                debtDetail(of: row)
             }
             .frame(minHeight: 32)
 
@@ -268,6 +247,43 @@ private extension AssetsView {
 }
 
 private extension AssetsView {
+    @ViewBuilder
+    func debtDetail(of row: AssetsModel.WalletRow) -> some View {
+        if row.wallet.kind == .card,
+           let bill = row.nextBill {
+            HStack(spacing: 8) {
+                FlipDate(bill.date, size: .small)
+
+                AssetsDebtFacts(facts: nextBillFacts(bill), isInline: false)
+            }
+        }
+
+        if let ratio = row.repaidRatio,
+           let percent = row.repaidPercent {
+            HStack(spacing: 8) {
+                RatioBar(ratio, tint: Palette.accent)
+
+                Text("\(percent)% 返した")
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .fixedSize()
+            }
+        }
+
+        if case let .until(payoff) = row.repayment {
+            AssetsDebtFacts(facts: Self.payoffFacts(payoff), isInline: true)
+        } else if let note = plainNote(of: row) {
+            Text(note)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+    }
+
     static func title(of role: Wallet.Kind.Role) -> String {
         switch role {
         case .onHand: "手持ち"
@@ -334,24 +350,6 @@ private extension AssetsView {
         return CGFloat(clamped)
     }
 
-    func owedFacts(of row: AssetsModel.WalletRow) -> [AssetsDebtFacts.Fact]? {
-        if case let .until(payoff) = row.repayment {
-            return Self.payoffFacts(payoff)
-        }
-
-        guard row.wallet.kind == .card else {
-            return nil
-        }
-
-        return row.nextBill.map(nextBillFacts)
-    }
-
-    func owedNote(of row: AssetsModel.WalletRow) -> String? {
-        let percent = row.repaidPercent.map { "\($0)%" }
-        let parts = [percent, plainNote(of: row)].compactMap(\.self)
-        return parts.isEmpty ? nil : parts.joined(separator: "・")
-    }
-
     func plainNote(of row: AssetsModel.WalletRow) -> String? {
         if let repayment = row.repayment {
             return Self.repaymentText(repayment)
@@ -369,9 +367,10 @@ private extension AssetsView {
 
     func nextBillFacts(_ bill: CardBill) -> [AssetsDebtFacts.Fact] {
         let date = "\(bill.date.month)/\(bill.date.day)"
+        let weekday = bill.date.weekday.shortName
 
         return [
-            .init(date, trail: "引き落とし"),
+            .init(date, trail: "（\(weekday)）に引き落とし"),
             daysFact(until: bill.date)
         ]
     }

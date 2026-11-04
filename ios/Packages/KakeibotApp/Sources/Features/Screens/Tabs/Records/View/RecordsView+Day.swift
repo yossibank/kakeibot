@@ -16,7 +16,7 @@ extension RecordsView {
             dayHeader(day.date, day: day)
 
             ForEach(model.rows(for: day)) { row in
-                swipeRow(row)
+                recordRow(row)
 
                 itemList(row)
             }
@@ -28,7 +28,7 @@ extension RecordsView {
     }
 
     @ViewBuilder
-    func swipeRow(_ row: EntryRowItem) -> some View {
+    func recordRow(_ row: EntryRowItem) -> some View {
         if let selection {
             let isSelected = selection.contains(row.id)
             let mark = isSelected ? "checkmark.circle.fill" : "circle"
@@ -51,13 +51,12 @@ extension RecordsView {
                 Hairline(thickness: 1)
             }
         } else {
-            SwipeRow(id: row.id, openId: $openId) {
+            Button {
                 onOpenEntry(row.id)
-            } onAction: {
-                onDelete(row.id)
-            } content: {
+            } label: {
                 entryRow(row)
             }
+            .buttonStyle(.plain)
             .overlay(alignment: .top) {
                 Hairline(thickness: 1)
             }

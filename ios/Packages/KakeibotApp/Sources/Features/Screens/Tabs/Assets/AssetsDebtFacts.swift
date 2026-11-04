@@ -3,11 +3,26 @@ import SwiftUI
 
 struct AssetsDebtFacts: View {
     let facts: [Fact]
+    let isInline: Bool
 
     var body: some View {
-        RowOrColumnLayout(rowSpacing: 8, columnSpacing: 4) {
-            ForEach(facts, id: \.self) { fact in
-                chip(fact)
+        if isInline {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                ForEach(Array(facts.enumerated()), id: \.offset) { index, fact in
+                    if index > 0 {
+                        Text("・")
+                            .textFont(.caption)
+                            .foregroundStyle(Palette.subtext)
+                    }
+
+                    line(fact)
+                }
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(facts, id: \.self) { fact in
+                    line(fact)
+                }
             }
         }
     }
@@ -36,29 +51,30 @@ extension AssetsDebtFacts {
 }
 
 private extension AssetsDebtFacts {
-    func chip(_ fact: Fact) -> some View {
+    func line(_ fact: Fact) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 2) {
             if let lead = fact.lead {
                 Text(lead)
-                    .textFont(.caption2)
+                    .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
 
             Text(fact.value)
-                .textFont(.subheadline, weight: .semibold)
+                .textFont(.headline)
                 .monospacedDigit()
                 .foregroundStyle(Palette.text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             if let trail = fact.trail {
                 Text(trail)
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
         }
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(Palette.accent.opacity(.faint), in: Capsule())
     }
 }

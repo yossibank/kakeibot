@@ -121,7 +121,6 @@ private extension RecordsView {
 
     func closeSearch() {
         isSearchFocused = false
-        openId = nil
 
         if model.searchSummary != nil {
             rememberSearch()

@@ -30,7 +30,6 @@ struct SnapshotTests {
                 let view = RecordsView(
                     model: model,
                     onOpenEntry: { _ in },
-                    onDelete: { _ in },
                     onAddEntry: { _ in },
                     onOpenRecurring: { _ in },
                     onChangeEntries: { _, _ in },
@@ -52,7 +51,6 @@ struct SnapshotTests {
             let view = RecordsView(
                 model: model,
                 onOpenEntry: { _ in },
-                onDelete: { _ in },
                 onAddEntry: { _ in },
                 onOpenRecurring: { _ in },
                 onChangeEntries: { _, _ in },
