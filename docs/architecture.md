@@ -38,7 +38,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `scripts/snapshot-scroll.py` | セットの `patch.py` から呼ぶ。スクロールを伸ばして全体を描けるようにし、ガラスの効果を背景に変える |
 | `.claude/snapshots/store/` | `store/screenshots/raw/` の画面に文言を重ね、ストアのスクリーンショットを描く |
 | `store/ja/` | App Store の掲載情報の文と URL |
-| `store/screenshots/` | ストアに出すスクリーンショット。6.9 インチは `6.9/`、6.3 インチは `6.3/`、元の画面は `raw/` |
+| `store/screenshots/` | ストアに出す画像。大きさごとのフォルダに置き、元の画面は `raw/` |
 
 ## 📱 ios
 
