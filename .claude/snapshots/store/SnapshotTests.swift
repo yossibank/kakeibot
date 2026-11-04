@@ -689,145 +689,145 @@ private struct Line: Shape {
 
 private extension SnapshotTests {
     static let directory = "__OUT__"
-    static let bannerShots = ["1-home", "3-receipt", "7-review"]
+    static let bannerShots = ["01-home", "03-receipt", "07-review"]
 
     static let outerPages = [
         Page(
-            file: "1-home",
+            file: "01-home",
             badge: "広告なしの家計簿",
             lines: ["今月あといくら？", "が、ひと目で"],
             note: "予算の残りをメーターでお知らせ",
             mood: .cream,
-            art: .phone("outer-1-home")
+            art: .phone("outer-01-home")
         ),
         Page(
-            file: "2-entry",
+            file: "02-entry",
             badge: nil,
             lines: ["よく使う支出は、", "タップ 1 回"],
             note: "テンプレートと電卓ですばやく記録",
             mood: .blush,
-            art: .phone("outer-2-entry")
+            art: .phone("outer-02-entry")
         ),
         Page(
-            file: "3-receipt",
+            file: "03-receipt",
             badge: "NEW",
             lines: ["レシートを撮れば、", "品目まで入る"],
             note: "品名・合計・日付・店名を読み取り",
             mood: .sage,
-            art: .receipt("outer-3-receipt")
+            art: .receipt("outer-03-receipt")
         ),
         Page(
-            file: "4-theme",
+            file: "04-theme",
             badge: nil,
             lines: ["色もアイコンも、", "自分好みに"],
             note: "ライトとダーク、12 色のテーマを着せ替え",
             mood: .night,
             art: .fan(
-                left: "outer-4-theme-rose",
-                center: "outer-1-home",
-                right: "outer-4-theme-navy",
+                left: "outer-04-theme-rose",
+                center: "outer-01-home",
+                right: "outer-04-theme-navy",
                 labels: ["ローズ", "ホワイト", "ネイビー"]
             )
         ),
         Page(
-            file: "5-font",
+            file: "05-font",
             badge: "PRO",
             lines: ["文字の雰囲気も、", "選べる"],
             note: "明朝・ゴシック・手書き・ドットなど 6 種類",
             mood: .cream,
             art: .compare(
-                "outer-5-font-hand",
-                parts: ["outer-1-home", "outer-5-font-hand"],
+                "outer-05-font-hand",
+                parts: ["outer-01-home", "outer-05-font-hand"],
                 labels: ["明朝", "手書き"],
                 crop: CGRect(x: 52, y: 200, width: 1040, height: 560)
             )
         ),
         Page(
-            file: "6-assets",
+            file: "06-assets",
             badge: nil,
             lines: ["残高も引き落としも、", "まとめて"],
             note: "口座ごとの残高と、カードの引き落とし日",
             mood: .sand,
-            art: .phone("outer-6-assets")
+            art: .phone("outer-06-assets")
         ),
         Page(
-            file: "7-review",
+            file: "07-review",
             badge: nil,
             lines: ["何に使ったか、", "すぐ分かる"],
             note: "カテゴリごとの内訳と前の月との比べ",
             mood: .sage,
-            art: .phone("outer-7-review")
+            art: .phone("outer-07-review")
         ),
         Page(
-            file: "8-records",
+            file: "08-records",
             badge: nil,
             lines: ["毎日の支出を、", "カレンダーで"],
             note: "使わなかった日には印がつきます",
             mood: .cream,
-            art: .phone("outer-8-records")
+            art: .phone("outer-08-records")
         )
     ]
 
     static let pages = [
         Page(
-            file: "1-home",
+            file: "01-home",
             badge: "広告なしの家計簿",
             lines: ["今月あといくら？", "が、ひと目で"],
             note: "予算の残りをメーターでお知らせ",
             mood: .cream,
-            art: .phone("1-home")
+            art: .phone("01-home")
         ),
         Page(
-            file: "2-entry",
+            file: "02-entry",
             badge: nil,
             lines: ["よく使う支出は、", "タップ 1 回"],
             note: "テンプレートと電卓ですばやく記録",
             mood: .blush,
-            art: .phone("2-entry")
+            art: .phone("02-entry")
         ),
         Page(
-            file: "3-receipt",
+            file: "03-receipt",
             badge: "NEW",
             lines: ["レシートを撮れば、", "品目まで入る"],
             note: "品名・合計・日付・店名を読み取り",
             mood: .sage,
-            art: .receipt("3-receipt")
+            art: .receipt("03-receipt")
         ),
         Page(
-            file: "4-theme",
+            file: "04-theme",
             badge: nil,
             lines: ["色もアイコンも、", "自分好みに"],
             note: "ライトとダーク、12 色のテーマを着せ替え",
             mood: .night,
             art: .fan(
-                left: "4-theme-rose",
-                center: "4-theme-white",
-                right: "4-theme-navy",
+                left: "04-theme-rose",
+                center: "04-theme-white",
+                right: "04-theme-navy",
                 labels: ["ローズ", "ホワイト", "ネイビー"]
             )
         ),
         Page(
-            file: "5-font",
+            file: "05-font",
             badge: "PRO",
             lines: ["文字の雰囲気も、", "選べる"],
             note: "明朝・ゴシック・手書き・ドットなど 6 種類",
             mood: .cream,
             art: .compare(
-                "5-font-hand",
-                parts: ["4-theme-white", "5-font-hand"],
+                "05-font-hand",
+                parts: ["04-theme-white", "05-font-hand"],
                 labels: ["明朝", "手書き"],
                 crop: CGRect(x: 160, y: 560, width: 1000, height: 520)
             )
         ),
         Page(
-            file: "6-assets",
+            file: "06-assets",
             badge: nil,
             lines: ["残高も引き落としも、", "まとめて"],
             note: "口座ごとの残高と、カードの引き落とし日",
             mood: .sand,
             art: .inset(
-                "6-assets",
-                from: "6-assets",
+                "06-assets",
+                from: "06-assets",
                 crop: CGRect(x: 53, y: 1549, width: 1215, height: 534),
                 corner: 20,
                 width: 400,
@@ -835,35 +835,35 @@ private extension SnapshotTests {
             )
         ),
         Page(
-            file: "7-review",
+            file: "07-review",
             badge: nil,
             lines: ["何に使ったか、", "すぐ分かる"],
             note: "カテゴリごとの内訳と前の月との比べ",
             mood: .sage,
-            art: .phone("7-review")
+            art: .phone("07-review")
         ),
         Page(
-            file: "8-records",
+            file: "08-records",
             badge: nil,
             lines: ["毎日の支出を、", "カレンダーで"],
             note: "使わなかった日には印がつきます",
             mood: .cream,
             art: .inset(
-                "8-records",
-                from: "8-records",
-                crop: CGRect(x: 69, y: 1270, width: 676, height: 430),
+                "08-records",
+                from: "08-records",
+                crop: CGRect(x: 69, y: 1365, width: 676, height: 400),
                 corner: 20,
                 width: 320,
                 at: UnitPoint(x: 0.5, y: 0.6)
             )
         ),
         Page(
-            file: "9-share",
+            file: "09-share",
             badge: "PRO",
             lines: ["家族と、", "ひとつの家計簿を"],
             note: "iCloud で記録をいっしょに",
             mood: .blush,
-            art: .pair("8-records", "9-share-rose")
+            art: .pair("08-records", "09-share-rose")
         ),
         Page(
             file: "10-widget",
@@ -877,44 +877,44 @@ private extension SnapshotTests {
 
     static let innerPages = [
         Page(
-            file: "1-home",
+            file: "01-home",
             badge: nil,
             lines: ["広い画面で、", "家計をひと目で"],
             note: "左のサイドバーから、すぐに切り替え",
             mood: .cream,
-            art: .phone("inner-1-home")
+            art: .phone("inner-01-home")
         ),
         Page(
-            file: "2-review",
+            file: "02-review",
             badge: nil,
             lines: ["何に使ったか、", "並べて分かる"],
             note: "内訳と前の月との比べを 2 列で",
             mood: .sage,
-            art: .phone("inner-2-review")
+            art: .phone("inner-02-review")
         ),
         Page(
-            file: "3-assets",
+            file: "03-assets",
             badge: nil,
             lines: ["残高も引き落としも、", "まとめて"],
             note: "口座ごとの残高と、カードの引き落とし日",
             mood: .sand,
-            art: .phone("inner-3-assets")
+            art: .phone("inner-03-assets")
         ),
         Page(
-            file: "4-records",
+            file: "04-records",
             badge: nil,
             lines: ["毎日の支出を、", "カレンダーで"],
             note: "使わなかった日には印がつきます",
             mood: .blush,
-            art: .phone("inner-4-records")
+            art: .phone("inner-04-records")
         ),
         Page(
-            file: "5-entry",
+            file: "05-entry",
             badge: nil,
             lines: ["よく使う支出は、", "タップ 1 回"],
             note: "テンプレートと電卓ですばやく記録",
             mood: .cream,
-            art: .phone("inner-5-entry")
+            art: .phone("inner-05-entry")
         )
     ]
 
