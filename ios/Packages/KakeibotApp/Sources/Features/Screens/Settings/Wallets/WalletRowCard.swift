@@ -82,6 +82,8 @@ struct WalletRowIcon: View {
     var strokeWidth: CGFloat = 1
 
     var body: some View {
+        let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.subtext
+
         IconImage(icon, size: 18)
             .foregroundStyle(Palette.accent)
             .frame(width: 40, height: 40)
@@ -89,6 +91,12 @@ struct WalletRowIcon: View {
                 Palette.accent.opacity(.subtle),
                 in: .rect(cornerRadius: corner.radius(12))
             )
+            .overlay(alignment: .bottom) {
+                Capsule()
+                    .fill(color)
+                    .frame(width: 16, height: 2)
+                    .padding(.bottom, 4)
+            }
             .overlay {
                 RoundedRectangle(cornerRadius: corner.radius(12))
                     .stroke(stroke, lineWidth: strokeWidth)
