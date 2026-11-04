@@ -84,9 +84,9 @@ struct WalletRowIcon: View {
     var body: some View {
         let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.subtext
 
-        IconImage(icon, size: 18)
+        IconImage(icon, size: 22)
             .foregroundStyle(Palette.accent)
-            .frame(width: 40, height: 40)
+            .frame(width: 48, height: 48)
             .background(
                 Palette.accent.opacity(.subtle),
                 in: .rect(cornerRadius: corner.radius(12))
@@ -94,7 +94,7 @@ struct WalletRowIcon: View {
             .overlay(alignment: .bottom) {
                 Capsule()
                     .fill(color)
-                    .frame(width: 16, height: 2)
+                    .frame(width: 20, height: 2)
                     .padding(.bottom, 4)
             }
             .overlay {
