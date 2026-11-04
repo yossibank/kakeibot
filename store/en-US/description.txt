@@ -1,0 +1,42 @@
+Kakeibot is a simple household budget book that is easy to keep up and fun to look back on. No ads.
+
+The app is in Japanese and amounts are in yen.
+
+■ Log quickly
+・Save frequent expenses as templates and log them in one or two taps
+・Built-in calculator handles tax on the spot
+・Record transfers between accounts and fees as well as expenses and income
+・Fixed costs such as rent and subscriptions are logged automatically every month or year
+・Scan a receipt to read the items, total, date and store
+
+■ Know what you can still spend
+・Set budgets for the whole month and for each category
+・A half-circle meter on the home screen shows what is left this month
+・Start the month on payday and the week on Monday
+・Carry unused budget over to the next period
+
+■ Clear reviews
+・See totals of spending and income by week, month and year
+・Breakdowns by category and account, compared with the previous period
+・Track loan repayments and investment plans
+
+■ Make it yours
+・Pick an app color from the themes
+・Choose text size, line spacing, corner roundness and background patterns
+・Create category icons and calendar stamps from symbols, emoji or short text
+
+■ Help to keep going
+・Reward savings: reach your own goals and fill a virtual piggy bank
+・Reminders: get notified only on days you have not logged by your chosen time
+・Widgets: check what is left and log right from the Home Screen and Lock Screen
+
+■ About your data
+・Your data stays on your device and in your own iCloud. It is never sent to outside servers
+・Export and import to keep a copy of your data
+
+■ Pro (one-time purchase)
+Buy once and use it forever. Family Sharing members can use it too.
+・Sync records and settings across your iPhones with iCloud
+・Share accounts with family and log together. Invited people do not need Pro
+・Create your own theme by choosing colors
+・Use rounded, handwritten, dot and pop typefaces
