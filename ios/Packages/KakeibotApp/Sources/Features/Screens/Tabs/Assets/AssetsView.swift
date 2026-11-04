@@ -97,14 +97,7 @@ public struct AssetsView: View {
 
 private extension AssetsView {
     var header: some View {
-        HStack {
-            Text("資産")
-                .displayFont(.body)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
+        TabHeader("資産") {
             HeaderButton(
                 systemImage: "arrow.left.arrow.right",
                 title: "振替",

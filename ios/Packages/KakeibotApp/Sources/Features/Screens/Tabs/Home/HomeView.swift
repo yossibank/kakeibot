@@ -116,20 +116,7 @@ public struct HomeView: View {
 
 private extension HomeView {
     var header: some View {
-        HStack {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("\(model.month.month)月")
-                    .displayFont(.body)
-                    .tracking(3)
-                    .foregroundStyle(Palette.accent)
-
-                Text(model.monthRangeText)
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-            }
-
-            Spacer()
-
+        TabHeader("\(model.month.month)月", subtitle: model.monthRangeText) {
             HStack(spacing: 8) {
                 HeaderButton(systemImage: "bell", action: onOpenNews)
                     .overlay(alignment: .topTrailing) {
