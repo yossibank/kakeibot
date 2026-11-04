@@ -165,6 +165,8 @@ public extension EntryModel {
             return
         }
 
+        let isUntouched = !isEditing && !isChanged
+
         categoryByType[self.type] = categoryId
         self.type = type
         keypadTarget = .amount
@@ -179,6 +181,10 @@ public extension EntryModel {
 
         if type == .transfer {
             chooseDestination()
+        }
+
+        if isUntouched {
+            baseline = snapshot
         }
     }
 
