@@ -128,28 +128,30 @@ extension WalletEditSheet {
             SettingsSectionTitle("最初の残高")
 
             HStack(spacing: 12) {
-                Button {
-                    model.isNegative.toggle()
-                } label: {
-                    Image(systemName: signSymbol)
-                        .sansFont(.body, weight: .semibold)
-                        .foregroundStyle(signColor)
-                        .frame(width: 46, height: 46)
-                        .background(signFill, in: .rect(cornerRadius: corner.radius(16)))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: corner.radius(16))
-                                .stroke(signColor.opacity(0.6), lineWidth: 1)
-                        }
-                        .contentShape(.rect)
+                if model.showsSign {
+                    Button {
+                        model.isNegative.toggle()
+                    } label: {
+                        Image(systemName: signSymbol)
+                            .sansFont(.body, weight: .semibold)
+                            .foregroundStyle(signColor)
+                            .frame(width: 46, height: 46)
+                            .background(signFill, in: .rect(cornerRadius: corner.radius(16)))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: corner.radius(16))
+                                    .stroke(signColor.opacity(0.6), lineWidth: 1)
+                            }
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                    .haptic(.selection, trigger: model.isNegative)
                 }
-                .buttonStyle(.plain)
-                .haptic(.selection, trigger: model.isNegative)
 
                 Button {
                     openAmount()
                 } label: {
                     HStack(spacing: 8) {
-                        Text(AmountText.text(model.calculator.amount))
+                        Text(model.balanceText)
                             .displayFont(.headline)
                             .monospacedDigit()
                             .foregroundStyle(Palette.text)

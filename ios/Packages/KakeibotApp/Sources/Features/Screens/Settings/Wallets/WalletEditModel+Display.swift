@@ -41,6 +41,14 @@ public extension WalletEditModel {
         kind == .loan
     }
 
+    var showsSign: Bool {
+        !kind.isDebt
+    }
+
+    var balanceText: String {
+        AmountText.text(showsSign ? calculator.amount : initialBalance)
+    }
+
     var loanAmountText: String {
         loanAmount.amount > 0 ? AmountText.text(loanAmount.amount) : "未入力"
     }
@@ -49,6 +57,10 @@ public extension WalletEditModel {
         let borrowed = loanAmount.amount
 
         guard borrowed > 0 else {
+            return nil
+        }
+
+        guard isEditing || calculator.amount > 0 else {
             return nil
         }
 

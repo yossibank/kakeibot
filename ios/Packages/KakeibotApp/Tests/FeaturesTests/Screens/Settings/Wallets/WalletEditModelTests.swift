@@ -280,6 +280,29 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func showsRepaidOnNewLoanOnlyAfterBalance() async throws {
+        let setup = try await Setup()
+        let model = WalletEditModel(database: setup.database)
+        model.name = "奨学金"
+        model.kind = .loan
+        model.pressLoanAmount(.digit(3))
+        model.pressLoanAmount(.doubleZero)
+        model.pressLoanAmount(.doubleZero)
+        model.pressLoanAmount(.digit(0))
+
+        let beforeBalance = model.repaidText
+        model.press(.digit(1))
+        model.press(.doubleZero)
+        model.press(.doubleZero)
+        model.press(.digit(0))
+
+        #expect(beforeBalance == nil)
+        #expect(model.repaidText == "¥200,000 返済済み（66%）")
+        #expect(!model.showsSign)
+        #expect(model.balanceText == "−¥100,000")
+    }
+
+    @Test
     func asksBeforeHidingWalletWithBalance() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
