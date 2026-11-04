@@ -3,6 +3,10 @@ import DesignSystem
 import SwiftUI
 
 extension WalletEditSheet {
+    var showsSaveButton: Bool {
+        focus == nil && !isEnteringAmount && !isEnteringValuation && !isEnteringLoanAmount
+    }
+
     var content: some View {
         VStack(spacing: 16) {
             SettingsEditHeader(
@@ -56,8 +60,12 @@ extension WalletEditSheet {
             .padding(.vertical, -Self.fade)
             .scrollDismissesKeyboard(.interactively)
 
-            saveButton
+            if showsSaveButton {
+                saveButton
+                    .transition(.opacity)
+            }
         }
+        .animation(.snappy, value: showsSaveButton)
         .padding(.horizontal, 20)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
@@ -219,6 +227,27 @@ extension WalletEditSheet {
     func amountDrawer(
         _ title: String,
         calculator: AmountCalculator,
+        amount: Int? = nil,
+        onPress: @escaping (AmountCalculator.Key) -> Void,
+        onDismiss: @escaping () -> Void,
+        onDone: @escaping () -> Void
+    ) -> some View {
+        amountDrawer(
+            title,
+            calculator: calculator,
+            amount: amount,
+            onPress: onPress,
+            onDismiss: onDismiss,
+            onDone: onDone
+        ) {
+            EmptyView()
+        }
+    }
+
+    func amountDrawer(
+        _ title: String,
+        calculator: AmountCalculator,
+        amount: Int? = nil,
         onPress: @escaping (AmountCalculator.Key) -> Void,
         onDismiss: @escaping () -> Void,
         onDone: @escaping () -> Void,
@@ -238,7 +267,7 @@ extension WalletEditSheet {
                 onDone()
             } content: {
                 VStack(spacing: 12) {
-                    SettingsKeypadValue(calculator.amount)
+                    SettingsKeypadValue(amount ?? calculator.amount)
 
                     Keypad(calculator: calculator) {
                         onDone()

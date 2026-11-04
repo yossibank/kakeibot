@@ -205,6 +205,24 @@ struct EntryModelTests {
     }
 
     @Test
+    func ignoresTypeSwitchOnUntouchedNewEntry() async throws {
+        let model = try await Self.newModel()
+
+        model.select(.income)
+        let income = model.isChanged
+
+        model.select(.transfer)
+        let transfer = model.isChanged
+
+        model.press(.digit(5))
+        model.select(.expense)
+
+        #expect(!income)
+        #expect(!transfer)
+        #expect(model.isChanged)
+    }
+
+    @Test
     func ignoresCancelledLoad() async throws {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date)

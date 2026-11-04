@@ -14,8 +14,6 @@ extension TemplateEditSheet {
                 } onKey: { key in
                     model.press(key)
                 }
-
-                saveButton
             }
 
         case .category:

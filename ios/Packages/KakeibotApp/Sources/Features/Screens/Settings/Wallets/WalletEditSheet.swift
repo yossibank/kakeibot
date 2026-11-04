@@ -48,30 +48,14 @@ public struct WalletEditSheet: View {
                 content
 
                 if isEnteringAmount {
-                    Palette.scrim
-                        .opacity(0.35)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            closeAmount()
-                        }
-                        .transition(.opacity)
-                        .zIndex(1)
-
-                    SettingsDrawer("最初の残高", showsDone: false) {
-                        closeAmount()
-                    } content: {
-                        VStack(spacing: 12) {
-                            Keypad(calculator: model.calculator) {
-                                closeAmount()
-                            } onKey: { key in
-                                model.press(key)
-                            }
-
-                            saveButton
-                        }
-                    }
-                    .transition(.settingsDrawer)
-                    .zIndex(1)
+                    amountDrawer(
+                        "最初の残高",
+                        calculator: model.calculator,
+                        amount: model.initialBalance,
+                        onPress: model.press,
+                        onDismiss: closeAmount,
+                        onDone: closeAmount
+                    )
                 }
 
                 if isEnteringValuation {
@@ -100,9 +84,7 @@ public struct WalletEditSheet: View {
                         onPress: model.pressLoanAmount,
                         onDismiss: closeLoanAmount,
                         onDone: closeLoanAmount
-                    ) {
-                        saveButton
-                    }
+                    )
                 }
             }
         }
