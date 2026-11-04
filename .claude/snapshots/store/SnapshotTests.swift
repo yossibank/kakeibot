@@ -451,16 +451,8 @@ private extension StorePage {
         _ shot: UIImage,
         width: CGFloat
     ) -> some View {
-        let scale = width / 360
-
-        return Image(uiImage: shot)
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .clipShape(.rect(cornerRadius: 44 * scale))
-            .padding(10 * scale)
-            .background(Color.black, in: .rect(cornerRadius: 54 * scale))
+        PhoneFrame(shot: shot, width: width)
             .shadow(color: colors.glow.opacity(0.35), radius: 24, y: 12)
-            .frame(width: width)
     }
 
     func fan(
@@ -612,15 +604,25 @@ private extension StoreBanner {
         _ shot: UIImage,
         width: CGFloat
     ) -> some View {
-        let scale = width / 360
+        PhoneFrame(shot: shot, width: width)
+            .shadow(color: Color(rgb: 0x9A6A2A).opacity(0.3), radius: 16, y: 8)
+    }
+}
 
-        return Image(uiImage: shot)
+private struct PhoneFrame: View {
+    let shot: UIImage
+    let width: CGFloat
+
+    var body: some View {
+        let height = width * shot.size.height / shot.size.width
+        let scale = min(width, height) / 360
+
+        Image(uiImage: shot)
             .resizable()
             .aspectRatio(contentMode: .fit)
             .clipShape(.rect(cornerRadius: 44 * scale))
             .padding(10 * scale)
             .background(Color.black, in: .rect(cornerRadius: 54 * scale))
-            .shadow(color: Color(rgb: 0x9A6A2A).opacity(0.3), radius: 16, y: 8)
             .frame(width: width)
     }
 }
