@@ -137,9 +137,6 @@ extension RecurringEditSheet {
 extension RecurringEditSheet {
     enum Panel: Hashable {
         case amount
-        case category
-        case wallet
-        case destination
         case start
         case end
         case holiday
@@ -157,101 +154,36 @@ extension RecurringEditSheet {
 
 private extension RecurringEditSheet {
     var content: some View {
-        VStack(spacing: 16) {
-            Color.clear
-                .frame(height: 44)
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: SettingsSpacing.form) {
-                    if !model.isEditing {
-                        CapsulePicker(selection: typeBinding, options: Self.typeOptions)
-                            .frame(maxWidth: .infinity)
-
-                        RecurringPresetStrip(presets: model.presets) { preset in
-                            model.apply(preset)
-                        }
-                        .padding(.horizontal, -4)
-                    }
-
-                    VStack(spacing: 8) {
-                        RecurringRowCard(row: model.previewRow)
-                            .frame(height: RecurringRowCard.height)
-                            .sharesTextScale(id: model.previewRow.place)
-
-                        SettingsPreviewNote("一覧では、このカードで並びます")
-                    }
-
-                    SettingsField(namePrompt, text: $model.memo, focus: $focus, field: .name)
-
-                    RecurringQuickCard(model: model) { panel in
-                        open(panel)
-                    }
-
-                    details
-
-                    if model.isNotificationDenied {
-                        NotificationDeniedBanner()
-                            .transition(.opacity)
-                    }
-                }
-                .padding(.bottom, 8)
-                .padding(.vertical, Self.fade)
+        SettingsEditForm(showsSave: panel == nil && focus == nil) {
+            if !model.isEditing {
+                CapsulePicker(selection: typeBinding, options: Self.typeOptions)
+                    .frame(maxWidth: .infinity)
             }
-            .scrollIndicators(.hidden)
-            .edgeFade(Self.fade)
-            .padding(.vertical, -Self.fade)
-            .scrollDismissesKeyboard(.interactively)
 
-            if panel == nil, focus == nil {
-                saveButton
-                    .transition(.opacity)
+            SettingsPreviewSection(note: "一覧では、このカードで並びます") {
+                RecurringRowCard(row: model.previewRow)
+                    .frame(height: RecurringRowCard.height)
+                    .sharesTextScale(id: model.previewRow.place)
             }
-        }
-        .animation(.snappy, value: panel == nil && focus == nil)
-        .padding(.horizontal, 20)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
-    }
 
-    var details: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Button {
-                withAnimation(.snappy) {
-                    isShowingDetails.toggle()
-                }
-            } label: {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Image(systemName: "chevron.right")
-                        .sansFont(.small)
-                        .foregroundStyle(Palette.accent)
-                        .rotationEffect(.degrees(isShowingDetails ? 90 : 0))
+            SettingsField(namePrompt, text: $model.memo, focus: $focus, field: .name)
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("くわしい設定")
-                            .textFont(.subheadline)
-                            .foregroundStyle(Palette.accentStrong)
-
-                        if !isShowingDetails {
-                            Text(detailSummary)
-                                .textFont(.caption)
-                                .foregroundStyle(Palette.subtext)
-                                .multilineTextAlignment(.leading)
-                        }
-                    }
-
-                    Spacer(minLength: 0)
-                }
-                .padding(.horizontal, 8)
-                .contentShape(.rect)
+            RecurringQuickCard(model: model) { panel in
+                open(panel)
             }
-            .buttonStyle(.plain)
 
-            if isShowingDetails {
+            SettingsDetails(isOpen: $isShowingDetails, chips: detailChips) {
                 SettingsRowList(items: detailItems) { panel in
                     open(panel)
                 }
-                .transition(.opacity)
             }
+
+            if model.isNotificationDenied {
+                NotificationDeniedBanner()
+                    .transition(.opacity)
+            }
+        } save: {
+            saveButton
         }
     }
 }
@@ -260,8 +192,6 @@ private extension RecurringEditSheet {
     enum Field: Hashable {
         case name
     }
-
-    static let fade: CGFloat = 16
 
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
@@ -296,9 +226,6 @@ private extension RecurringEditSheet {
     func title(for panel: Panel) -> String {
         switch panel {
         case .amount: "金額"
-        case .category: "カテゴリ"
-        case .wallet: model.walletTitle
-        case .destination: RecurringEditModel.destinationTitle
         case .start: "始まり"
         case .end: "終わり"
         case .holiday: "休日なら"

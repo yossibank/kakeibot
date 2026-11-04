@@ -18,54 +18,6 @@ extension RecurringEditSheet {
                 }
             }
 
-        case .category:
-            SettingsTileGrid(items: model.categories, columns: 5, spacing: 4) { category in
-                SettingsCategoryTile(
-                    category: category,
-                    icon: model.icon(for: category),
-                    isSelected: model.categoryId == category.id
-                ) {
-                    model.select(category: category.id)
-                    closePanel()
-                }
-            }
-            .padding(.bottom, 8)
-
-        case .wallet:
-            VStack(alignment: .leading, spacing: 16) {
-                SettingsTileGrid(items: model.wallets, columns: 2, spacing: 8) { wallet in
-                    SettingsWalletTile(
-                        wallet: wallet,
-                        icon: model.icon(for: wallet),
-                        isSelected: model.walletId == wallet.id
-                    ) {
-                        model.walletId = wallet.id
-
-                        if model.billRecurring == nil {
-                            closePanel()
-                        }
-                    }
-                }
-
-                if model.billRecurring != nil {
-                    SettingsBillShiftPicker(shift: $model.billShift, dates: model.billDates)
-                }
-            }
-            .padding(.bottom, 8)
-
-        case .destination:
-            SettingsTileGrid(items: model.wallets, columns: 2, spacing: 8) { wallet in
-                SettingsWalletTile(
-                    wallet: wallet,
-                    icon: model.icon(for: wallet),
-                    isSelected: model.toWalletId == wallet.id
-                ) {
-                    model.toWalletId = wallet.id
-                    closePanel()
-                }
-            }
-            .padding(.bottom, 8)
-
         case .start:
             MonthCalendar(selection: $model.startDate, today: model.today)
 

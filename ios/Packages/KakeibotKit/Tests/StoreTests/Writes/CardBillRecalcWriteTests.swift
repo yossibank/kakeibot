@@ -214,7 +214,7 @@ struct CardBillRecalcWriteTests {
     }
 
     @Test
-    func countsFeeOfGeneratedTransferInBill() async throws {
+    func countsGeneratedTransferAndFeeInBill() async throws {
         let setup = try await Setup(usage: [])
         let startDate = try #require(LocalDate("2026-10-05"))
         let through = try #require(LocalDate("2026-11-10"))
@@ -239,7 +239,7 @@ struct CardBillRecalcWriteTests {
 
         try await setup.database.generateRecurringEntries(through: through, at: setup.now)
 
-        #expect(try setup.bill()?.amount == 110)
+        #expect(try setup.bill()?.amount == 5110)
     }
 
     @Test

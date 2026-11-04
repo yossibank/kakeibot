@@ -102,41 +102,40 @@ struct SnapshotTests {
             )
         }
 
-        let rentEdit = RecurringEditModel(database: database, today: today)
-        let cardEdit = RecurringEditModel(database: database, today: today, type: .transfer)
+        let card = options.wallets.first { $0.kind == .card }
+        let expenseEdit = RecurringEditModel(database: database, today: today)
+        let transferEdit = RecurringEditModel(database: database, today: today, type: .transfer)
 
-        await rentEdit.load()
-        await cardEdit.load()
+        await expenseEdit.load()
+        await transferEdit.load()
 
-        rentEdit.apply(RecurringPreset.presets(for: .expense)[0])
-        cardEdit.apply(RecurringPreset.presets(for: .transfer)[0])
+        expenseEdit.day = 27
+        transferEdit.toWalletId = card?.id
 
         for variant in Self.variants {
             try Self.write(
-                RecurringQuickCard(model: rentEdit) { _ in }.padding(20),
+                RecurringQuickCard(model: expenseEdit) { _ in }.padding(20),
                 variant: variant,
-                to: "settings-recurring-quick-rent"
+                to: "settings-recurring-quick-expense"
             )
             try Self.write(
-                RecurringQuickCard(model: cardEdit) { _ in }.padding(20),
+                RecurringQuickCard(model: transferEdit) { _ in }.padding(20),
                 variant: variant,
-                to: "settings-recurring-quick-card"
+                to: "settings-recurring-quick-transfer"
             )
         }
-
-        let card = options.wallets.first { $0.kind == .card }
 
         templateEdit.walletId = card?.id
         recurringEdit.walletId = card?.id
 
         for variant in Self.variants {
             try Self.write(
-                TemplateEditSheet(model: templateEdit).drawerBody(.wallet).padding(20),
+                TemplateQuickCard(model: templateEdit) { _ in }.padding(20),
                 variant: variant,
                 to: "settings-template-bill"
             )
             try Self.write(
-                RecurringEditSheet(model: recurringEdit).drawerBody(.wallet).padding(20),
+                RecurringQuickCard(model: recurringEdit) { _ in }.padding(20),
                 variant: variant,
                 to: "settings-recurring-bill"
             )

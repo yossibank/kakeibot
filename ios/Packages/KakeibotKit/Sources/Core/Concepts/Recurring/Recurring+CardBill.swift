@@ -112,9 +112,8 @@ public extension [Recurring] {
 private extension Recurring {
     static func usage(of entry: Entry) -> Int {
         switch entry.type {
-        case .expense: entry.amount
+        case .expense, .transfer: entry.amount
         case .income: -entry.amount
-        case .transfer: 0
         }
     }
 

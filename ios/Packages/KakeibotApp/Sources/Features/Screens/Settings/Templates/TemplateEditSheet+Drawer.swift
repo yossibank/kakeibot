@@ -16,44 +16,9 @@ extension TemplateEditSheet {
                 }
             }
 
-        case .category:
-            SettingsTileGrid(items: model.categories, columns: 5, spacing: 4) { category in
-                SettingsCategoryTile(
-                    category: category,
-                    icon: model.icon(for: category),
-                    isSelected: model.categoryId == category.id
-                ) {
-                    model.categoryId = category.id
-                    closePanel()
-                }
-            }
-            .padding(.bottom, 8)
-
         case .tag:
             tagChooser
                 .padding(.bottom, 8)
-
-        case .wallet:
-            VStack(alignment: .leading, spacing: 16) {
-                SettingsTileGrid(items: model.wallets, columns: 2, spacing: 8) { wallet in
-                    SettingsWalletTile(
-                        wallet: wallet,
-                        icon: model.icon(for: wallet),
-                        isSelected: model.walletId == wallet.id
-                    ) {
-                        model.walletId = wallet.id
-
-                        if model.billRecurring == nil {
-                            closePanel()
-                        }
-                    }
-                }
-
-                if model.billRecurring != nil {
-                    SettingsBillShiftPicker(shift: $model.billShift, dates: [])
-                }
-            }
-            .padding(.bottom, 8)
 
         case .memo:
             EmptyView()

@@ -14,6 +14,7 @@ public struct TemplateEditSheet: View {
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
+    @State private var isShowingDetails = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -151,9 +152,7 @@ extension TemplateEditSheet {
 
     enum Panel: Hashable {
         case amount
-        case category
         case tag
-        case wallet
         case memo
     }
 
@@ -173,49 +172,33 @@ extension TemplateEditSheet {
 
 private extension TemplateEditSheet {
     var content: some View {
-        VStack(spacing: 16) {
-            Color.clear
-                .frame(height: 44)
+        SettingsEditForm(showsSave: panel == nil && focus == nil) {
+            preview
 
-            ScrollView {
-                VStack(spacing: SettingsSpacing.form) {
-                    preview
+            VStack(alignment: .leading, spacing: 8) {
+                TemplateQuickCard(model: model) { panel in
+                    open(panel)
+                }
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsRowList(items: rowItems) { panel in
-                            open(panel)
-                        }
+                SettingsCaption("金額を空にすると、使うときに入れられます。")
+            }
 
-                        SettingsCaption("金額を空にすると、使うときに入れられます。")
-                    }
-
-                    if !model.isEditing {
-                        capsulePreview
-                    }
+            SettingsDetails(isOpen: $isShowingDetails, chips: detailChips) {
+                SettingsRowList(items: detailItems) { panel in
+                    open(panel)
                 }
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollIndicators(.hidden)
-            .contentMargins(.horizontal, 20, for: .scrollContent)
-            .contentMargins(.vertical, Self.fade, for: .scrollContent)
-            .edgeFade(Self.fade)
-            .padding(.horizontal, -20)
 
-            if panel == nil, focus == nil {
-                saveButton
-                    .transition(.opacity)
+            if !model.isEditing {
+                capsulePreview
             }
+        } save: {
+            saveButton
         }
-        .animation(.snappy, value: panel == nil && focus == nil)
-        .padding(.horizontal, 20)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
     }
 }
 
 private extension TemplateEditSheet {
-    static let fade: CGFloat = 16
-
     var title: String {
         let action = model.isEditing ? "編集" : "追加"
         return "\(model.typeName)のテンプレートを\(action)"
@@ -229,36 +212,20 @@ private extension TemplateEditSheet {
         model.memo.isEmpty ? "なし" : model.memo
     }
 
-    var rowItems: [SettingsRowList<Panel>.Item] {
+    var detailChips: [String] {
+        let tag = model.selectedTag.map { "タグ \($0.name)" } ?? "タグなし"
+        let memo = model.memo.isEmpty ? "メモなし" : "メモ \(model.memo)"
+        return [tag, memo]
+    }
+
+    var detailItems: [SettingsRowList<Panel>.Item] {
         [
-            .init(
-                panel: .amount,
-                systemImage: "yensign",
-                title: "金額",
-                value: amountValue,
-                isEmpty: model.amount == nil,
-                isAmount: true
-            ),
-            .init(
-                panel: .category,
-                systemImage: "square.grid.2x2",
-                title: "カテゴリ",
-                value: model.selectedCategory?.name ?? "選ぶ",
-                isEmpty: model.selectedCategory == nil
-            ),
             .init(
                 panel: .tag,
                 systemImage: "tag",
                 title: "タグ",
                 value: model.selectedTag?.name ?? "なし",
                 isEmpty: model.selectedTag == nil
-            ),
-            .init(
-                panel: .wallet,
-                systemImage: "wallet.bifold",
-                title: model.walletTitle,
-                value: model.selectedWallet?.name ?? "選ぶ",
-                isEmpty: model.selectedWallet == nil
             ),
             .init(
                 panel: .memo,
@@ -277,9 +244,7 @@ private extension TemplateEditSheet {
     func title(for panel: Panel) -> String {
         switch panel {
         case .amount: "金額"
-        case .category: "カテゴリ"
         case .tag: "タグ"
-        case .wallet: model.walletTitle
         case .memo: "メモ"
         }
     }
