@@ -57,11 +57,14 @@ public extension Recurring {
             return []
         }
 
+        var schedule = self
         var dates: [LocalDate] = []
         var cursor = used
 
+        schedule.startDate = min(startDate, used)
+
         while dates.count < count,
-              let next = nextDate(onOrAfter: cursor) {
+              let next = schedule.nextDate(onOrAfter: cursor) {
             let closing = billingPeriod(paidOn: next)?.upperBound ?? next
 
             if !dates.isEmpty || used <= closing {
