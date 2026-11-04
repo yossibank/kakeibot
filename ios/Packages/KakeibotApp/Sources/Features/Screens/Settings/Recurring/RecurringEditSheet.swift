@@ -154,7 +154,7 @@ extension RecurringEditSheet {
 
 private extension RecurringEditSheet {
     var content: some View {
-        SettingsEditForm(showsSave: panel == nil && focus == nil) {
+        SettingsEditForm(showsSave: focus == nil) {
             if !model.isEditing {
                 CapsulePicker(selection: typeBinding, options: Self.typeOptions)
                     .frame(maxWidth: .infinity)

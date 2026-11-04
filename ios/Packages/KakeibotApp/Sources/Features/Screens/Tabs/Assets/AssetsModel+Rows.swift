@@ -12,6 +12,7 @@ public extension AssetsModel {
     }
 
     struct Unpaid: Equatable {
+        public let total: Int
         public let billed: [EntryRowItem]
         public let later: [EntryRowItem]
     }

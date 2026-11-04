@@ -6,60 +6,16 @@ public struct FlipDate: View {
 
     let date: LocalDate
     let isSelected: Bool
-    let size: Size
 
     public init(
         _ date: LocalDate,
-        isSelected: Bool = false,
-        size: Size = .regular
+        isSelected: Bool = false
     ) {
         self.date = date
         self.isSelected = isSelected
-        self.size = size
     }
 
     public var body: some View {
-        switch size {
-        case .regular: regular
-        case .small: small
-        }
-    }
-}
-
-public extension FlipDate {
-    enum Size: Hashable, Sendable {
-        case regular
-        case small
-    }
-}
-
-private extension FlipDate {
-    var small: some View {
-        let shape = RoundedRectangle(cornerRadius: corner.radius(8))
-
-        return Text("\(date.day)")
-            .displayFont(.headline)
-            .monospacedDigit()
-            .foregroundStyle(Palette.text)
-            .padding(.top, 4)
-            .frame(width: 36, height: 36)
-            .background(Palette.panel, in: shape)
-            .overlay {
-                shape
-                    .stroke(Palette.outline, lineWidth: 1)
-            }
-            .overlay(alignment: .top) {
-                HStack(spacing: 12) {
-                    binding
-                    binding
-                }
-                .offset(y: -4)
-            }
-            .padding(.top, 4)
-    }
-
-    @ViewBuilder
-    var regular: some View {
         let shape = RoundedRectangle(cornerRadius: corner.radius(12))
         let ring = isSelected ? Palette.accent : Palette.outline
         let width: CGFloat = isSelected ? 1.5 : 1
@@ -100,7 +56,9 @@ private extension FlipDate {
         }
         .padding(.top, 4)
     }
+}
 
+private extension FlipDate {
     var binding: some View {
         Capsule()
             .fill(Palette.accent)

@@ -130,8 +130,8 @@ private extension AssetsView {
                         .textFont(.subheadline, weight: .semibold)
                         .monospacedDigit()
                         .foregroundStyle(Self.amountColor(of: row))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .fixedSize()
+                        .layoutPriority(1)
                 }
 
                 debtDetail(of: row)
@@ -251,11 +251,7 @@ private extension AssetsView {
     func debtDetail(of row: AssetsModel.WalletRow) -> some View {
         if row.wallet.kind == .card,
            let bill = row.nextBill {
-            HStack(spacing: 8) {
-                FlipDate(bill.date, size: .small)
-
-                AssetsDebtFacts(facts: nextBillFacts(bill), isInline: false)
-            }
+            AssetsDebtChip(systemImage: "calendar", text: nextBillText(bill))
 
             if let unpaid = row.unpaid {
                 Button {
@@ -297,7 +293,10 @@ private extension AssetsView {
         }
 
         if case let .until(payoff) = row.repayment {
-            AssetsDebtFacts(facts: Self.payoffFacts(payoff), isInline: true)
+            AssetsDebtChip(
+                systemImage: "arrow.triangle.2.circlepath",
+                text: Self.payoffText(payoff)
+            )
         } else if let note = plainNote(of: row) {
             Text(note)
                 .textFont(.caption)
@@ -344,13 +343,9 @@ private extension AssetsView {
         }
     }
 
-    static func payoffFacts(_ payoff: LoanPayoff) -> [AssetsDebtFacts.Fact] {
+    static func payoffText(_ payoff: LoanPayoff) -> String {
         let date = payoff.lastDate
-
-        return [
-            .init(lead: "あと", "\(payoff.count)", trail: "回"),
-            .init("\(String(date.year))/\(date.month)", trail: "まで")
-        ]
+        return "あと \(payoff.count) 回 · \(String(date.year))/\(date.month) まで"
     }
 
     static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
@@ -388,14 +383,11 @@ private extension AssetsView {
         return "引き落としは未設定"
     }
 
-    func nextBillFacts(_ bill: CardBill) -> [AssetsDebtFacts.Fact] {
+    func nextBillText(_ bill: CardBill) -> String {
         let date = "\(bill.date.month)/\(bill.date.day)"
         let weekday = bill.date.weekday.shortName
-
-        return [
-            .init(date, trail: "（\(weekday)）に引き落とし"),
-            daysFact(until: bill.date)
-        ]
+        let days = daysText(until: bill.date)
+        return "\(date)（\(weekday)）引き落とし · \(days)"
     }
 
     func balanceText(_ bill: CardBill) -> String {
@@ -414,11 +406,7 @@ private extension AssetsView {
     }
 
     func daysText(until date: LocalDate) -> String {
-        daysFact(until: date).text
-    }
-
-    func daysFact(until date: LocalDate) -> AssetsDebtFacts.Fact {
         let days = model.today.days(until: date)
-        return days == 1 ? .init("明日") : .init(lead: "あと", "\(days)", trail: "日")
+        return days == 1 ? "明日" : "あと \(days) 日"
     }
 }

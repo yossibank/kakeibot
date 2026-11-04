@@ -54,7 +54,6 @@ public struct RecordsView: View {
                     header
 
                     monthStepper
-                        .monthSwipe(following: $slide, perform: moveMonth)
 
                     RecordsToolLayout(spacing: 8) {
                         CapsulePicker(
@@ -80,7 +79,6 @@ public struct RecordsView: View {
                     Group {
                         monthContent
                     }
-                    .monthSwipe(following: $slide, perform: moveMonth)
                     .pageSlide(slide, page: model.month)
                 }
             }
@@ -88,6 +86,7 @@ public struct RecordsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
+        .monthSwipe(following: $slide, perform: moveMonth)
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom) {
             if let selection {
@@ -273,6 +272,10 @@ private extension RecordsView {
     }
 
     func moveMonth(_ direction: PageSwipeDirection) {
+        guard !model.isSearching else {
+            return
+        }
+
         switch direction {
         case .forward: move(months: 1)
         case .backward: move(months: -1)

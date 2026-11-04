@@ -274,7 +274,12 @@ private extension AssetsModel {
                 entry.billMonth.map { $0 > month } ?? (entry.date > period.upperBound)
             }
 
+        let total = (billed + later).reduce(0) { sum, entry in
+            entry.type == .income ? sum - entry.amount : sum + entry.amount
+        }
+
         let unpaid = Unpaid(
+            total: total,
             billed: Self.rows(of: billed, in: list),
             later: Self.rows(of: later, in: list)
         )

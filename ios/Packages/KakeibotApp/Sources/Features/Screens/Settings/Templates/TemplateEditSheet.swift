@@ -172,7 +172,7 @@ extension TemplateEditSheet {
 
 private extension TemplateEditSheet {
     var content: some View {
-        SettingsEditForm(showsSave: panel == nil && focus == nil) {
+        SettingsEditForm(showsSave: focus == nil) {
             preview
 
             VStack(alignment: .leading, spacing: 8) {

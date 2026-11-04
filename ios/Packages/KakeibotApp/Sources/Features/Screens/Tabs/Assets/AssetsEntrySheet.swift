@@ -11,18 +11,21 @@ struct AssetsEntrySheet: View {
     var body: some View {
         FittedSheet {
             VStack(alignment: .leading, spacing: 20) {
-                HStack(alignment: .top, spacing: 16) {
-                    FlipDate(content.date)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(content.title)
+                        .textFont(.subheadline, weight: .semibold)
+                        .foregroundStyle(Palette.subtext)
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(content.title)
-                            .textFont(.headline)
-                            .foregroundStyle(Palette.accentStrong)
+                    Text(AmountText.text(content.amount))
+                        .displayFont(.largeTitle, weight: .bold)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.accentStrong)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
 
-                        Text(content.note)
-                            .textFont(.caption)
-                            .foregroundStyle(Palette.subtext)
-                    }
+                    Text(content.note)
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
                 }
 
                 ForEach(content.sections.filter { !$0.rows.isEmpty }) { section in
@@ -36,7 +39,7 @@ struct AssetsEntrySheet: View {
 extension AssetsEntrySheet {
     struct Content: Identifiable {
         let id: String
-        let date: LocalDate
+        let amount: Int
         let title: String
         let note: String
         let sections: [Section]
@@ -50,11 +53,14 @@ extension AssetsEntrySheet {
 
 extension AssetsEntrySheet.Content {
     static func moved(_ row: AssetsModel.UpcomingBill) -> Self {
-        Self(
+        let count = row.movedIn.count + row.movedOut.count
+        let day = billDay(row.bill.date)
+
+        return Self(
             id: "moved-\(row.id)",
-            date: row.bill.date,
+            amount: row.bill.amount,
             title: "回した記録",
-            note: "\(row.title) の引き落としに出し入れした記録です",
+            note: "\(row.title) · \(count) 件 · \(day)に引き落とし",
             sections: [
                 .init(title: "この引き落としに入れた", rows: row.movedIn),
                 .init(title: "後の引き落としに回した", rows: row.movedOut)
@@ -68,17 +74,24 @@ extension AssetsEntrySheet.Content {
         bill: CardBill
     ) -> Self {
         let date = "\(bill.date.month)/\(bill.date.day)"
+        let day = billDay(bill.date)
 
         return Self(
             id: "unpaid-\(row.id)",
-            date: bill.date,
+            amount: unpaid.total,
             title: "未払いの記録",
-            note: "\(row.wallet.name) で払い、まだ引き落とされていない記録です",
+            note: "\(row.wallet.name) · \(unpaid.count) 件 · \(day)に引き落とし",
             sections: [
                 .init(title: "\(date) に引き落とす", rows: unpaid.billed),
                 .init(title: "その後に引き落とす", rows: unpaid.later)
             ]
         )
+    }
+}
+
+private extension AssetsEntrySheet.Content {
+    static func billDay(_ date: LocalDate) -> String {
+        "\(date.month)/\(date.day)（\(date.weekday.shortName)）"
     }
 }
 
