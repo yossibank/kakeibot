@@ -1,5 +1,8 @@
-・Scan a receipt to read the items, total, date and store name.
-・Add items to a record, with the 8% and 10% consumption tax shown separately.
-・Carry unused budget over to the next period.
-・Move the start of the month to a weekday when it falls on a weekend or holiday.
-・New layout for the wide screen of iPhone Duo.
+・See card purchases that have not been billed yet, all in one list from the Assets tab.
+・Recurring items and templates can now move card charges to the next bill.
+・The recurring list is now split into Expense, Income and Transfer tabs.
+・Add tags right from the template editor.
+・Records on the same day now follow your category order.
+・Transfers from a card, such as savings, now count toward the card bill.
+・Debt due dates and remaining payments are easier to read.
+・Edit screens share one layout, and transfers have a new look.
