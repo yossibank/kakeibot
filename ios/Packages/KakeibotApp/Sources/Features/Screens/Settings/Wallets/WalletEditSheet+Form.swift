@@ -106,7 +106,7 @@ extension WalletEditSheet {
                 )
                 .overlay(alignment: .bottomTrailing) {
                     EditBadge()
-                        .offset(x: 4, y: 4)
+                        .offset(x: 8, y: 4)
                 }
                 .contentShape(.rect)
             }
