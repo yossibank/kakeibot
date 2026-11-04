@@ -60,13 +60,17 @@ public struct StampEditSheet: View {
             .padding(.vertical, -Self.fade)
             .scrollDismissesKeyboard(.interactively)
 
-            PrimaryButton(model.saveTitle) {
-                Task {
-                    await save()
+            if focus == nil {
+                PrimaryButton(model.saveTitle) {
+                    Task {
+                        await save()
+                    }
                 }
+                .disabled(!model.canSave)
+                .transition(.opacity)
             }
-            .disabled(!model.canSave)
         }
+        .animation(.snappy, value: focus == nil)
         .padding(.horizontal, 20)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)

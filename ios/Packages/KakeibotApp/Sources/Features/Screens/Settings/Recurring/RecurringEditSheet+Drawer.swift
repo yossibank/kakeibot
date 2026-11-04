@@ -16,8 +16,6 @@ extension RecurringEditSheet {
                 } onKey: { key in
                     model.press(key)
                 }
-
-                saveButton
             }
 
         case .category:
@@ -87,8 +85,6 @@ extension RecurringEditSheet {
                 } onKey: { key in
                     model.pressFee(key)
                 }
-
-                saveButton
             }
 
         case .remind:

@@ -201,8 +201,12 @@ private extension TemplateEditSheet {
             .edgeFade(Self.fade)
             .padding(.horizontal, -20)
 
-            saveButton
+            if panel == nil, focus == nil {
+                saveButton
+                    .transition(.opacity)
+            }
         }
+        .animation(.snappy, value: panel == nil && focus == nil)
         .padding(.horizontal, 20)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)

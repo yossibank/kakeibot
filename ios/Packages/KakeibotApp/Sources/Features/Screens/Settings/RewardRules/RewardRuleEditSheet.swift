@@ -192,8 +192,12 @@ private extension RewardRuleEditSheet {
             .padding(.vertical, -Self.fade)
             .scrollDismissesKeyboard(.interactively)
 
-            saveButton
+            if panel == nil, focus == nil {
+                saveButton
+                    .transition(.opacity)
+            }
         }
+        .animation(.snappy, value: panel == nil && focus == nil)
         .padding(.horizontal, 20)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
@@ -218,8 +222,6 @@ private extension RewardRuleEditSheet {
                 } onKey: { key in
                     model.press(key)
                 }
-
-                saveButton
             }
         }
     }

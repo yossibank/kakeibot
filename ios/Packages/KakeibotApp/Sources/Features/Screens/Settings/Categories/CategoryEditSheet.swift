@@ -162,13 +162,17 @@ private extension CategoryEditSheet {
             .scrollDismissesKeyboard(.interactively)
             .scrollDisabled(isMovingTag)
 
-            PrimaryButton(model.saveTitle) {
-                Task {
-                    await save()
+            if focus == nil, isTagFocused == nil {
+                PrimaryButton(model.saveTitle) {
+                    Task {
+                        await save()
+                    }
                 }
+                .disabled(!model.canSave)
+                .transition(.opacity)
             }
-            .disabled(!model.canSave)
         }
+        .animation(.snappy, value: focus == nil && isTagFocused == nil)
         .padding(.horizontal, 20)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
