@@ -17,7 +17,7 @@ struct SettingsAmountButton: View {
                         .minimumScaleFactor(0.5)
                         .frame(maxWidth: .infinity)
                 } else {
-                    SettingsKeypadValue(amount)
+                    SettingsKeypadValue(amount, isAnimated: false)
                         .frame(maxWidth: .infinity)
                 }
 

@@ -5,6 +5,7 @@ import SwiftUI
 
 public struct TemplateEditSheet: View {
     @State var model: TemplateEditModel
+    @State var tagCategory: EntryCategory?
 
     @FocusState var focus: Field?
 
@@ -125,6 +126,12 @@ public struct TemplateEditSheet: View {
                     hidePanel()
                 }
             }
+            .sheet(item: $tagCategory, onDismiss: reloadTags) { category in
+                CategoryEditSheet(
+                    model: model.editCategoryModel(category),
+                    startsAddingTag: true
+                )
+            }
             .task {
                 await model.load()
             }
@@ -171,7 +178,7 @@ extension TemplateEditSheet {
 
 private extension TemplateEditSheet {
     var content: some View {
-        SettingsEditForm(showsSave: focus == nil) {
+        SettingsEditForm(showsSave: focus != .name) {
             preview
 
             TemplateQuickCard(model: model) { panel in
@@ -235,6 +242,12 @@ private extension TemplateEditSheet {
         case .amount: "金額"
         case .tag: "タグ"
         case .memo: "メモ"
+        }
+    }
+
+    func reloadTags() {
+        Task {
+            await model.reloadTags()
         }
     }
 

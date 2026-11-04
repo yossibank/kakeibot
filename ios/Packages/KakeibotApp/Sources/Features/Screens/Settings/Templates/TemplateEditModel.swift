@@ -168,6 +168,24 @@ public extension TemplateEditModel {
         tagId = tagId == id ? nil : id
     }
 
+    func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
+        CategoryEditModel(
+            database: database,
+            kind: category.kind,
+            editing: category.id
+        )
+    }
+
+    func reloadTags() async {
+        do {
+            options = try await database.entryOptions()
+        } catch is CancellationError {
+            return
+        } catch {
+            errorNotice.show(Self.loadFailedMessage)
+        }
+    }
+
     func load() async {
         do {
             options = try await database.entryOptions()

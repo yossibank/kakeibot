@@ -85,15 +85,7 @@ public struct EntryRow: View {
                 }
 
                 if let route {
-                    HStack(spacing: 4) {
-                        EntryRouteChip(route.source, isDestination: false)
-
-                        Image(systemName: "arrow.right")
-                            .sansFont(.micro, weight: .semibold)
-                            .foregroundStyle(Palette.subtext)
-
-                        EntryRouteChip(route.destination, isDestination: true)
-                    }
+                    EntryRoute(source: route.source, destination: route.destination)
                 }
 
                 if let memo {

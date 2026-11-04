@@ -48,7 +48,7 @@ public struct RecurringListView: View {
                     if model.rows.isEmpty {
                         SettingsEmptyNote(
                             systemImage: "repeat",
-                            text: "家賃や給料などを足すと、ここに並びます"
+                            text: emptyText
                         )
                     }
 
@@ -287,6 +287,14 @@ private extension RecurringListView {
 
     var places: [String?] {
         (model.rows + model.hiddenRows).map(\.place)
+    }
+
+    var emptyText: String {
+        switch model.type {
+        case .expense: "家賃やサブスクなどを足すと、ここに並びます"
+        case .income: "給料や年金などを足すと、ここに並びます"
+        case .transfer: "カードの引き落としや積立などを足すと、ここに並びます"
+        }
     }
 
     var notes: [SettingsIntroCard.Note] {

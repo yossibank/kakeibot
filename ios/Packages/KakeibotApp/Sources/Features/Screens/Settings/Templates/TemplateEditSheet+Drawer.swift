@@ -27,16 +27,17 @@ extension TemplateEditSheet {
 }
 
 private extension TemplateEditSheet {
-    @ViewBuilder
     var tagChooser: some View {
-        if model.tags.isEmpty {
-            SettingsCaption("このカテゴリにタグはありません。カテゴリの編集で足せます")
-                .frame(maxWidth: .infinity, minHeight: 54, alignment: .leading)
-        } else {
-            TagLine(tagItems, selection: model.tagId) { id in
+        TagLine(
+            tagItems,
+            selection: model.tagId,
+            onSelect: { id in
                 model.toggleTag(id)
+            },
+            onAdd: {
+                tagCategory = model.selectedCategory
             }
-        }
+        )
     }
 }
 

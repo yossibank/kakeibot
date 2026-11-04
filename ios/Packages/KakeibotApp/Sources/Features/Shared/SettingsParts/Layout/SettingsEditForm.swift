@@ -15,6 +15,7 @@ struct SettingsEditForm<Content: View, Save: View>: View {
                 VStack(alignment: .leading, spacing: SettingsSpacing.form) {
                     content()
                 }
+                .padding(.horizontal, Self.inset)
                 .padding(.bottom, 8)
                 .padding(.vertical, Self.fade)
             }
@@ -26,11 +27,11 @@ struct SettingsEditForm<Content: View, Save: View>: View {
 
             if showsSave {
                 save()
+                    .padding(.horizontal, Self.inset)
                     .transition(.opacity)
             }
         }
         .animation(.snappy, value: showsSave)
-        .padding(.horizontal, 20)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
     }
@@ -39,5 +40,9 @@ struct SettingsEditForm<Content: View, Save: View>: View {
 private extension SettingsEditForm {
     static var fade: CGFloat {
         16
+    }
+
+    static var inset: CGFloat {
+        20
     }
 }
