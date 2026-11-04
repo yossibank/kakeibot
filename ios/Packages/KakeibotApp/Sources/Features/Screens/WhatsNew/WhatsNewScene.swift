@@ -34,6 +34,15 @@ extension WhatsNewScene {
         case monthStartDay
         case monthStartShift
         case monthStartPeriod
+        case unpaidRow
+        case unpaidButton
+        case unpaidList
+        case shiftWallet
+        case shiftChoice
+        case shiftBill
+        case recurringRow
+        case recurringTabs
+        case recurringList
     }
 }
 
@@ -101,6 +110,12 @@ private extension WhatsNewScene {
 
         case .monthStartPeriod:
             monthStartPeriod
+
+        case .unpaidRow, .unpaidButton, .unpaidList, .shiftWallet, .shiftChoice, .shiftBill:
+            WhatsNewBillScene(kind: kind)
+
+        case .recurringRow, .recurringTabs, .recurringList:
+            WhatsNewRecurringScene(kind: kind)
         }
     }
 
@@ -326,7 +341,13 @@ private extension WhatsNewScene {
 
     func tapped(@ViewBuilder _ content: () -> some View) -> some View {
         content()
-            .allowsHitTesting(false)
+            .whatsNewTapped()
+    }
+}
+
+extension View {
+    func whatsNewTapped() -> some View {
+        allowsHitTesting(false)
             .overlay(alignment: .bottomTrailing) {
                 Image(systemName: "hand.tap.fill")
                     .font(.system(size: 26))

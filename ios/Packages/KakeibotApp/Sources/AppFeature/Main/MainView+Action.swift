@@ -112,6 +112,9 @@ extension MainView {
                 tab = .home
                 sheet = .new
 
+            case .assets:
+                tab = .assets
+
             case let .setup(item):
                 sheet = .setup(item)
             }
