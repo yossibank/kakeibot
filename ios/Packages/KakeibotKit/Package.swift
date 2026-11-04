@@ -21,7 +21,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/groue/GRDB.swift",
-            from: "7.11.1"
+            from: "7.12.0"
         )
     ],
     targets: [
