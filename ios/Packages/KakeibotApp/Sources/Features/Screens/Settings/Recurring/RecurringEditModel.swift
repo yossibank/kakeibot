@@ -8,7 +8,6 @@ import Store
 @Observable
 public final class RecurringEditModel {
     public var categoryId: EntryCategory.ID?
-    public var walletId: Wallet.ID?
     public var toWalletId: Wallet.ID?
     public var memo = ""
     public var frequency: Recurring.Frequency = .monthly
@@ -18,12 +17,22 @@ public final class RecurringEditModel {
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
+    public var billShift = 0
+
+    public var walletId: Wallet.ID? {
+        didSet {
+            if walletId != oldValue {
+                billShift = 0
+            }
+        }
+    }
 
     public private(set) var holidayShift: HolidayShift = .none
     public private(set) var type: Entry.Kind = .expense
     public private(set) var calculator = AmountCalculator()
     public private(set) var feeCalculator = AmountCalculator()
     public private(set) var options: EntryOptions?
+    public private(set) var cardBills: [Recurring] = []
     public private(set) var isHidden = false
 
     public internal(set) var authorization: NotificationAuthorization = .allowed
@@ -93,10 +102,26 @@ public extension RecurringEditModel {
             holidayShift: holidayShift,
             closingDay: closing,
             fee: transferFee,
+            billShift: billRecurring == nil ? 0 : billShift,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore
         )
+    }
+
+    var billRecurring: Recurring? {
+        type == .transfer ? nil : cardBills.cardBill(paidBy: walletId)
+    }
+
+    var billDates: [LocalDate] {
+        guard
+            let bill = billRecurring,
+            let next = previewRow.next
+        else {
+            return []
+        }
+
+        return bill.billDates(for: next, count: Recurring.billChoiceCount)
     }
 
     var canUseClosingDay: Bool {
@@ -193,6 +218,7 @@ public extension RecurringEditModel {
     func load() async {
         do {
             options = try await database.entryOptions()
+            cardBills = try await database.recurrings()
 
             try await loadRecurring()
             presetPayment()
@@ -390,6 +416,7 @@ private extension RecurringEditModel {
         holidayShift = draft.holidayShift
         closingDay = draft.closingDay
         feeCalculator = AmountCalculator(amount: draft.fee)
+        billShift = draft.billShift
         startDate = draft.startDate
         endDate = draft.endDate
         remindDaysBefore = draft.remindDaysBefore

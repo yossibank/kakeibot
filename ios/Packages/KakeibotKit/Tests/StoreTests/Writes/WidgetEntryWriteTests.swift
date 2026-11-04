@@ -94,6 +94,35 @@ struct WidgetEntryWriteTests {
     }
 
     @Test
+    func buildsDraftWithShiftedBillMonth() async throws {
+        let setup = try await Setup()
+        let bill = try await setup.database.insertCardBill(at: setup.now)
+        var draft = setup.draft
+        draft.walletId = bill.toWalletId
+        draft.billShift = 1
+
+        let template = try await setup.database.saveTemplate(draft, at: setup.now)
+        let entryDraft = try await setup.database.entryDraft(for: template, on: setup.today)
+
+        #expect(entryDraft?.billMonth != nil)
+        #expect(entryDraft?.billMonth == bill.billMonth(for: setup.today, shift: 1))
+    }
+
+    @Test
+    func buildsDraftWithoutBillMonthForUsualBill() async throws {
+        let setup = try await Setup()
+        let bill = try await setup.database.insertCardBill(at: setup.now)
+        var draft = setup.draft
+        draft.walletId = bill.toWalletId
+
+        let template = try await setup.database.saveTemplate(draft, at: setup.now)
+        let entryDraft = try await setup.database.entryDraft(for: template, on: setup.today)
+
+        #expect(entryDraft != nil)
+        #expect(entryDraft?.billMonth == nil)
+    }
+
+    @Test
     func undoRestoresNoSpendDayClearedByWidget() async throws {
         let setup = try await Setup()
         try await setup.database.markNoSpendDay(setup.today, at: setup.now)

@@ -71,6 +71,34 @@ struct ExportV1Tests {
     }
 
     @Test
+    func readsTemplatesAndRecurringsWithoutBillShift() throws {
+        let json = try Self.fixture(billShift: nil)
+
+        let export = try ExportV1(json: json)
+        let templates = export.data.templates.map(\.billShift)
+        let recurrings = export.data.recurrings.map(\.billShift)
+
+        #expect(!templates.isEmpty)
+        #expect(!recurrings.isEmpty)
+        #expect(templates.allSatisfy { $0 == 0 })
+        #expect(recurrings.allSatisfy { $0 == 0 })
+    }
+
+    @Test(arguments: [(-1, 0), (5, 2)])
+    func clampsBillShiftOutOfRange(shift: Int, expected: Int) throws {
+        let json = try Self.fixture(billShift: shift)
+
+        let export = try ExportV1(json: json)
+        let templates = export.data.templates.map(\.billShift)
+        let recurrings = export.data.recurrings.map(\.billShift)
+
+        #expect(!templates.isEmpty)
+        #expect(!recurrings.isEmpty)
+        #expect(templates.allSatisfy { $0 == expected })
+        #expect(recurrings.allSatisfy { $0 == expected })
+    }
+
+    @Test
     func readsWalletsWithoutLoanAmount() throws {
         let json = try Self.fixtureWithoutLoanAmount()
 
@@ -280,6 +308,28 @@ private extension ExportV1Tests {
         let rows = try #require(tables["recurrings"] as? [[String: Any]])
 
         tables["recurrings"] = rows.map { $0.filter { $0.key != "holidayShift" } }
+        object["data"] = tables
+
+        return try JSONSerialization.data(withJSONObject: object)
+    }
+
+    static func fixture(billShift: Int?) throws -> Data {
+        let data = try CoreFixture.data("export/export-v1.json")
+        let json = try JSONSerialization.jsonObject(with: data)
+
+        var object = try #require(json as? [String: Any])
+        var tables = try #require(object["data"] as? [String: Any])
+
+        for key in ["templates", "recurrings"] {
+            let rows = try #require(tables[key] as? [[String: Any]])
+
+            tables[key] = rows.map { row in
+                var row = row
+                row["billShift"] = billShift
+                return row
+            }
+        }
+
         object["data"] = tables
 
         return try JSONSerialization.data(withJSONObject: object)

@@ -96,6 +96,33 @@ struct RecurringDraftTests {
         #expect(bill.closingDay == 15)
         #expect(bill.amount == 0)
     }
+
+    @Test
+    func keepsBillShiftOnlyForExpense() throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        var draft = try Self.rentDraft()
+        draft.billShift = 1
+
+        let expense = try draft.newRecurring(at: now)
+        draft.type = .transfer
+        draft.categoryId = nil
+        draft.toWalletId = Wallet.ID()
+        let bill = try draft.newRecurring(at: now)
+
+        #expect(expense.billShift == 1)
+        #expect(bill.billShift == 0)
+    }
+
+    @Test(arguments: [(-3, 0), (5, 2)])
+    func clampsBillShiftOfRecurring(shift: Int, expected: Int) throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        var draft = try Self.rentDraft()
+        draft.billShift = shift
+
+        let recurring = try draft.newRecurring(at: now)
+
+        #expect(recurring.billShift == expected)
+    }
 }
 
 extension RecurringDraftTests {

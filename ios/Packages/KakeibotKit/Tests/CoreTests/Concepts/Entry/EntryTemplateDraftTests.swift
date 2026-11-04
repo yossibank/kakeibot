@@ -24,6 +24,17 @@ struct EntryTemplateDraftTests {
         #expect(template.createdAt == now)
     }
 
+    @Test(arguments: [(-3, 0), (1, 1), (5, 2)])
+    func clampsBillShiftOfTemplate(shift: Int, expected: Int) throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        var draft = Self.lunchDraft()
+        draft.billShift = shift
+
+        let template = try draft.newTemplate(sortOrder: 0, at: now)
+
+        #expect(template.billShift == expected)
+    }
+
     @Test
     func keepsIdentityWhenApplied() throws {
         let created = Date(timeIntervalSince1970: 1_790_000_000)

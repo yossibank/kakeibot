@@ -196,6 +196,14 @@ extension AppDatabase {
             return nil
         }
 
+        let billMonth = try billMonth(
+            paidBy: recurring.walletId,
+            type: recurring.type,
+            on: date,
+            shift: recurring.billShift,
+            in: db
+        )
+
         var entry = Entry(
             type: recurring.type,
             amount: amount,
@@ -206,6 +214,7 @@ extension AppDatabase {
             memo: recurring.memo,
             recurringId: recurring.id,
             recurringDate: occurrence.scheduled,
+            billMonth: billMonth,
             createdAt: now,
             updatedAt: now
         )

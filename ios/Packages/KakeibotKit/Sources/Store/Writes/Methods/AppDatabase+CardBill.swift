@@ -42,6 +42,31 @@ extension AppDatabase {
         }
     }
 
+    static func billMonth(
+        paidBy walletId: Wallet.ID,
+        type: Entry.Kind,
+        on date: LocalDate,
+        shift: Int,
+        in db: Database
+    ) throws -> YearMonth? {
+        guard
+            type != .transfer,
+            shift > 0
+        else {
+            return nil
+        }
+
+        let bill = try Recurring
+            .filter(Column("archived_at") == nil)
+            .filter(Column("type") == Entry.Kind.transfer)
+            .filter(Column("closing_day") != nil)
+            .filter(Column("to_wallet_id") == walletId)
+            .order(Recurring.sortOrder, Column("created_at"))
+            .fetchOne(db)
+
+        return bill?.billMonth(for: date, shift: shift)
+    }
+
     static func existingRows(
         of entries: [Entry],
         in db: Database

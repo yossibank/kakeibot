@@ -15,6 +15,7 @@ public struct Recurring: Hashable, Identifiable, Sendable {
     public var holidayShift: HolidayShift
     public var closingDay: Int?
     public var fee: Int?
+    public var billShift: Int
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -38,6 +39,7 @@ public struct Recurring: Hashable, Identifiable, Sendable {
         holidayShift: HolidayShift = .none,
         closingDay: Int? = nil,
         fee: Int? = nil,
+        billShift: Int = 0,
         startDate: LocalDate,
         endDate: LocalDate? = nil,
         remindDaysBefore: Int? = nil,
@@ -60,6 +62,7 @@ public struct Recurring: Hashable, Identifiable, Sendable {
         self.holidayShift = holidayShift
         self.closingDay = closingDay
         self.fee = fee
+        self.billShift = billShift
         self.startDate = startDate
         self.endDate = endDate
         self.remindDaysBefore = remindDaysBefore
@@ -95,6 +98,7 @@ extension Recurring: Codable {
         case holidayShift
         case closingDay
         case fee
+        case billShift
         case startDate
         case endDate
         case remindDaysBefore
@@ -120,6 +124,7 @@ extension Recurring: Codable {
         let day = try container.decode(Int.self, forKey: .day)
         let closingDay = try container.decodeIfPresent(Int.self, forKey: .closingDay)
         let fee = try container.decodeIfPresent(Int.self, forKey: .fee)
+        let billShift = try container.decodeIfPresent(Int.self, forKey: .billShift)
         let startDate = try container.decode(LocalDate.self, forKey: .startDate)
         let endDate = try container.decodeIfPresent(LocalDate.self, forKey: .endDate)
         let remindDaysBefore = try container.decodeIfPresent(Int.self, forKey: .remindDaysBefore)
@@ -128,6 +133,7 @@ extension Recurring: Codable {
         let archivedAt = try container.decodeIfPresent(Date.self, forKey: .archivedAt)
         let createdAt = try container.decode(Date.self, forKey: .createdAt)
         let updatedAt = try container.decode(Date.self, forKey: .updatedAt)
+        let clampedShift = Self.clampedBillShift(billShift ?? 0)
 
         self.init(
             id: id,
@@ -143,6 +149,7 @@ extension Recurring: Codable {
             holidayShift: shift ?? .none,
             closingDay: closingDay,
             fee: fee,
+            billShift: clampedShift,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore,
@@ -170,6 +177,7 @@ extension Recurring: Codable {
         try container.encode(holidayShift, forKey: .holidayShift)
         try container.encodeOrNull(closingDay, forKey: .closingDay)
         try container.encodeOrNull(fee, forKey: .fee)
+        try container.encode(billShift, forKey: .billShift)
         try container.encode(startDate, forKey: .startDate)
         try container.encodeOrNull(endDate, forKey: .endDate)
         try container.encodeOrNull(remindDaysBefore, forKey: .remindDaysBefore)

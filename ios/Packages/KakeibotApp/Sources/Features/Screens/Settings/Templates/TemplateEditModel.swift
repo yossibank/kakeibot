@@ -8,8 +8,16 @@ import Store
 @Observable
 public final class TemplateEditModel {
     public var name: String
-    public var walletId: Wallet.ID?
     public var memo: String
+    public var billShift: Int
+
+    public var walletId: Wallet.ID? {
+        didSet {
+            if walletId != oldValue {
+                billShift = 0
+            }
+        }
+    }
 
     public var categoryId: EntryCategory.ID? {
         didSet {
@@ -23,6 +31,7 @@ public final class TemplateEditModel {
     public private(set) var type: Entry.Kind
     public private(set) var calculator: AmountCalculator
     public private(set) var options: EntryOptions?
+    public private(set) var cardBills: [Recurring] = []
     public private(set) var isHidden = false
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -43,6 +52,7 @@ public final class TemplateEditModel {
         self.type = type
         self.calculator = AmountCalculator()
         self.memo = ""
+        self.billShift = 0
     }
 
     public init(
@@ -58,6 +68,7 @@ public final class TemplateEditModel {
         self.tagId = draft.tagId
         self.walletId = draft.walletId
         self.memo = draft.memo
+        self.billShift = draft.billShift
     }
 }
 
@@ -86,8 +97,13 @@ public extension TemplateEditModel {
             categoryId: categoryId,
             tagId: tagId,
             walletId: walletId,
-            memo: memo
+            memo: memo,
+            billShift: billRecurring == nil ? 0 : billShift
         )
+    }
+
+    var billRecurring: Recurring? {
+        cardBills.cardBill(paidBy: walletId)
     }
 
     var canSave: Bool {
@@ -155,6 +171,7 @@ public extension TemplateEditModel {
     func load() async {
         do {
             options = try await database.entryOptions()
+            cardBills = try await database.recurrings()
 
             try await loadTemplate()
 
@@ -256,5 +273,6 @@ private extension TemplateEditModel {
         tagId = draft.tagId
         walletId = draft.walletId
         memo = draft.memo
+        billShift = draft.billShift
     }
 }

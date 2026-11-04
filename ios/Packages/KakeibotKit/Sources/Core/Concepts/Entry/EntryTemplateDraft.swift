@@ -8,6 +8,7 @@ public struct EntryTemplateDraft: Hashable, Sendable {
     public var tagId: EntryTag.ID?
     public var walletId: Wallet.ID?
     public var memo: String
+    public var billShift: Int
 
     public init(
         name: String,
@@ -16,7 +17,8 @@ public struct EntryTemplateDraft: Hashable, Sendable {
         categoryId: EntryCategory.ID?,
         tagId: EntryTag.ID? = nil,
         walletId: Wallet.ID?,
-        memo: String = ""
+        memo: String = "",
+        billShift: Int = 0
     ) {
         self.name = name
         self.type = type
@@ -25,6 +27,7 @@ public struct EntryTemplateDraft: Hashable, Sendable {
         self.tagId = tagId
         self.walletId = walletId
         self.memo = memo
+        self.billShift = billShift
     }
 
     public init(_ template: EntryTemplate) {
@@ -35,7 +38,8 @@ public struct EntryTemplateDraft: Hashable, Sendable {
             categoryId: template.categoryId,
             tagId: template.tagId,
             walletId: template.walletId,
-            memo: template.memo ?? ""
+            memo: template.memo ?? "",
+            billShift: template.billShift
         )
     }
 }
@@ -90,6 +94,7 @@ public extension EntryTemplateDraft {
             tagId: tagId,
             walletId: fields.walletId,
             memo: trimmedMemo,
+            billShift: Recurring.clampedBillShift(billShift),
             sortOrder: sortOrder,
             createdAt: now,
             updatedAt: now
@@ -111,6 +116,7 @@ public extension EntryTemplateDraft {
         updated.tagId = tagId
         updated.walletId = fields.walletId
         updated.memo = trimmedMemo
+        updated.billShift = Recurring.clampedBillShift(billShift)
         updated.updatedAt = now
 
         return updated
