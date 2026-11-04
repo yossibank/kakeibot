@@ -53,8 +53,8 @@ extension AppDatabase {
         includesItems: Bool = false
     ) throws -> EntryList {
         let entries = try request.fetchAll(db)
-        let days = EntryDay.grouping(entries)
         let categories = try byID(EntryCategory.self, in: db)
+        let days = EntryDay.grouping(entries, categories: categories)
         let tags = try byID(EntryTag.self, in: db)
         let wallets = try byID(Wallet.self, in: db)
         let valuations = try Valuation.fetchAll(db)

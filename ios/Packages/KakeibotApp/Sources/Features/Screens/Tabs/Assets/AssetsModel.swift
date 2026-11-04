@@ -259,13 +259,14 @@ private extension AssetsModel {
             let list,
             let card = recurring.toWalletId,
             let period = bill.period,
-            let billed = recurring.billedEntries(paidOn: bill.date, entries: entries)
+            let billedAll = recurring.billedEntries(paidOn: bill.date, entries: entries)
         else {
             return nil
         }
 
         let month = recurring.occurrenceMonth(of: bill.date)
-        let billedIds = Set(billed.map(\.id))
+        let billed = billedAll.filter { $0.date <= today }
+        let billedIds = Set(billedAll.map(\.id))
 
         let later = entries
             .filter { $0.walletId == card && $0.date <= today }
