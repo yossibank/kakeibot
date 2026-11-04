@@ -6,3 +6,9 @@ DerivedData/
 __pycache__/
 .claude/worktrees/
 .claude/handoff.md
+android/.gradle/
+android/.kotlin/
+android/.idea/
+android/build/
+android/*/build/
+android/local.properties

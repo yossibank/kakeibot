@@ -12,6 +12,28 @@
 | 理由 | Swift が得意で iPhone を毎日使い、AI の段階は Swift 専用である。iOS をストアに出してから、13 番で Android に取りかかる |
 | 却下 | Kotlin Multiplatform、Compose Multiplatform、Flutter、Swift SDK for Android |
 
+## Android の範囲
+
+**決定：最初のリリースは、無料の機能だけで出す。**
+
+| 項目 | 内容 |
+| --- | --- |
+| 理由 | 同期と共有は iCloud なので Android に無い。Pro の中身を決める前に、1〜9 の画面をそろえられる |
+| 却下 | 最初から Google Play の課金で Pro を入れる、Pro を設けず全部を無料にする |
+
+> [!IMPORTANT]
+> - テーマを作る・字体など、iOS で Pro の機能は、最初は出さない。
+> - レシートの読み取りは入れない。iOS は Apple の Foundation Models で品目を読むためである。
+
+## Android のモジュール
+
+**決定：iOS のターゲットに合わせて分ける。**
+
+| 項目 | 内容 |
+| --- | --- |
+| 理由 | Core を Kotlin に移すとき、iOS のどこに当たるかを追いやすい。`:core` は Android に頼らず、速くテストできる |
+| 却下 | 1 つのモジュールにまとめる |
+
 ## リポジトリ
 
 **決定：1 つにまとめる。**

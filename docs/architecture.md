@@ -7,15 +7,7 @@
 
 ## 🛠️ 使う技術
 
-iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである。画面と保存を選んだ理由は、decisions の[画面の作り](decisions/ios.md#画面の作り)と [DB](decisions/storage.md#db) にある。Android は、次の技術を使う。
-
-| 項目 | Android |
-| --- | --- |
-| 言語 | Kotlin |
-| 画面 | Jetpack Compose |
-| 保存 | Room（SQLite）。表の形は iOS と同じ |
-| ウィジェット | Glance |
-| 通信 | なし |
+iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである。画面と保存を選んだ理由は、decisions の[画面の作り](decisions/ios.md#画面の作り)と [DB](decisions/storage.md#db) にある。Android の技術は [architecture-android](architecture-android.md) にある。
 
 両 OS の分け方とそろえ方は、[decisions/build.md の「共通化」](decisions/build.md#共通化)にある。
 
@@ -25,7 +17,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 | パス | 中身 |
 | --- | --- |
-| `android/` | 未着手 |
+| `android/` | Android の Gradle のプロジェクト。中身は [architecture-android](architecture-android.md) にある |
 | `scripts/docs-check.py` | 文書と実物の一致を確かめ、`make verify-docs` で走る。リンク先とその見出し、Makefile の入口、この文書のパッケージの木を見る |
 | `scripts/docs-check.py` の fixtures | fixtures の `description` と `summary` も見る |
 | `scripts/docs-check.py` のテストプラン | `Package.swift` のテストのターゲットと、テストプランの中身が一致するかも見る |

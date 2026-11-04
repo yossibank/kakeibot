@@ -18,6 +18,6 @@ if [[ $status -eq 0 ]]; then
     exit 0
 fi
 
-grep -E "error:|failed|Test Case .* failed|✖|\.md:[0-9]+: " "$log" | sort -u | head -40
+grep -E "error:|^e: |FAILED|failed|Test Case .* failed|✖|\.md:[0-9]+: " "$log" | sort -u | head -40
 echo "NG $label (full log: $log)"
 exit "$status"
