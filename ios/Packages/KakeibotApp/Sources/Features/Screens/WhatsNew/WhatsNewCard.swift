@@ -111,6 +111,19 @@ struct WhatsNewCard: View {
                     }
                     .textFont(.footnote)
                 }
+
+                if let note = feature.note {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Image(systemName: "sparkles")
+                            .foregroundStyle(Palette.accent)
+
+                        Text(note)
+                            .foregroundStyle(Palette.subtext)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .textFont(.caption)
+                    .padding(.top, 4)
+                }
             }
 
             if let action = feature.action {
