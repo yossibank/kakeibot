@@ -113,7 +113,6 @@ public struct CategoryListView: View {
         ) { id in
             floatingTile(id)
         }
-        .sharesTextScale(id: model.shown + model.hidden)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
