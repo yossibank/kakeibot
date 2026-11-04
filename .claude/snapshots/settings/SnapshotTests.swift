@@ -18,6 +18,7 @@ struct SnapshotTests {
         let sheet = SettingsMenuSheet(database: database, today: today, appIcon: AppIconListModel())
         let wallets = WalletListView(database: database)
         let rules = RewardRuleListView(database: database)
+        let categories = CategoryListView(database: database)
         let walletEdit = WalletEditModel(database: database, editing: longWallet?.id)
 
         let reminder = ReminderModel(
@@ -37,6 +38,7 @@ struct SnapshotTests {
 
         await wallets.model.load()
         await rules.model.load()
+        await categories.model.load()
         await walletEdit.load()
         await reminder.load()
         await monthStart.load()
@@ -61,6 +63,7 @@ struct SnapshotTests {
             try Self.write(sheet, variant: variant, to: "settings")
             try Self.write(wallets, variant: variant, to: "settings-wallets")
             try Self.write(rules, variant: variant, to: "settings-rewards")
+            try Self.write(categories, variant: variant, to: "settings-categories")
             try Self.write(walletSheet, variant: variant, to: "settings-wallet-edit")
             try Self.write(reminderView, variant: variant, to: "settings-reminder")
             try Self.write(monthStartView, variant: variant, to: "settings-month-start")

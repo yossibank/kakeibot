@@ -18,7 +18,8 @@ struct CategoryTileFace: View {
             Text(name)
                 .textFont(size: .caption)
                 .foregroundStyle(Palette.text)
-                .sharedTextScale()
+                .lineLimit(1)
+                .minimumScaleFactor(TextScale.floor)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottom) {
