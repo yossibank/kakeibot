@@ -43,8 +43,12 @@ struct RecurringListModelTests {
         #expect(row.schedule == "毎月 27 日")
         #expect(row.place == "財布")
         #expect(row.next?.description == "2026-10-27")
-        #expect(model.monthTotal.expense == 78000)
-        #expect(model.monthTotal.income == 0)
+        #expect(model.monthTotal == 78000)
+
+        model.type = .income
+
+        #expect(model.rows.isEmpty)
+        #expect(model.monthTotal == 0)
     }
 
     @Test
@@ -83,7 +87,7 @@ struct RecurringListModelTests {
         }
 
         let shownWhileHidden = model.rows.count
-        let totalWhileHidden = model.monthTotal.expense
+        let totalWhileHidden = model.monthTotal
 
         await model.show(saved.id)
 

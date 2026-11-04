@@ -57,6 +57,49 @@ struct SnapshotTests {
 
         try await database.setSetting(.backupExportedAt, to: exportedAt)
 
+        let recurring = RecurringListModel(database: database, today: today)
+
+        let observing = Task {
+            await recurring.observe()
+        }
+
+        try await Self.wait {
+            !recurring.rows.isEmpty
+        }
+
+        for type in Entry.Kind.allCases {
+            recurring.type = type
+
+            for variant in Self.variants {
+                try Self.write(
+                    RecurringListView(model: recurring),
+                    variant: variant,
+                    to: "settings-recurring-\(type.rawValue)"
+                )
+            }
+        }
+
+        observing.cancel()
+
+        let templateEdit = TemplateEditModel(database: database, type: .expense)
+        let recurringEdit = RecurringEditModel(database: database, today: today)
+
+        await templateEdit.load()
+        await recurringEdit.load()
+
+        for variant in Self.variants {
+            try Self.write(
+                TemplateEditSheet(model: templateEdit),
+                variant: variant,
+                to: "settings-template-edit"
+            )
+            try Self.write(
+                RecurringEditSheet(model: recurringEdit),
+                variant: variant,
+                to: "settings-recurring-edit"
+            )
+        }
+
         for variant in Self.variants {
             try Self.write(sheet, variant: variant, to: "settings")
             try Self.write(wallets, variant: variant, to: "settings-wallets")

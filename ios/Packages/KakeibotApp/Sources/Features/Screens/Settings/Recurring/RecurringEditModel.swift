@@ -41,11 +41,13 @@ public final class RecurringEditModel {
     public init(
         database: AppDatabase,
         today: LocalDate,
+        type: Entry.Kind = .expense,
         editing id: Recurring.ID? = nil,
         paying wallet: Wallet.ID? = nil
     ) {
         self.database = database
         self.today = today
+        self.type = type
         self.editingId = id
         self.paidWallet = wallet
         self.month = today.month
@@ -162,11 +164,7 @@ public extension RecurringEditModel {
         self.type = type
         categoryId = categories.first?.id
 
-        if type == .transfer,
-           toWalletId == nil {
-            toWalletId = wallets.first { $0.id != walletId }?.id
-        }
-
+        presetDestination()
         suggestHolidayShift()
     }
 
@@ -209,6 +207,7 @@ public extension RecurringEditModel {
                 walletId = wallets.first?.id
             }
 
+            presetDestination()
             baseline = draft
         } catch is CancellationError {
             return
@@ -326,6 +325,17 @@ private extension RecurringEditModel {
         } else {
             memo = "\(name)の返済"
         }
+    }
+
+    func presetDestination() {
+        guard
+            type == .transfer,
+            toWalletId == nil
+        else {
+            return
+        }
+
+        toWalletId = wallets.first { $0.id != walletId }?.id
     }
 
     func suggestHolidayShift() {

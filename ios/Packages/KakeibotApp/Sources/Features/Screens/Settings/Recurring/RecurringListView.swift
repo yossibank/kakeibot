@@ -37,6 +37,8 @@ public struct RecurringListView: View {
                 flag: hintFlag
             )
 
+            CapsulePicker(selection: $model.type, options: Self.typeOptions)
+
             ScrollView {
                 VStack(spacing: SettingsSpacing.section) {
                     if !model.rows.isEmpty {
@@ -78,7 +80,7 @@ public struct RecurringListView: View {
             if drag.lift != nil {
                 SettingsHideTarget(zones: $drag.zones, isArmed: drag.isOverHide)
             } else {
-                AddButton("固定費を追加") {
+                AddButton("\(typeName)の固定費を追加") {
                     destination = .new
                 }
             }
@@ -145,15 +147,20 @@ extension RecurringListView {
 
 private extension RecurringListView {
     var totalCard: some View {
-        HStack(spacing: 0) {
-            totalColumn("今月の支出", amount: model.monthTotal.expense)
+        VStack(spacing: 4) {
+            Text("今月の\(typeName)")
+                .textFont(.caption2)
+                .tracking(2)
+                .foregroundStyle(Palette.accent)
 
-            Rectangle()
-                .fill(Palette.accent.opacity(.soft))
-                .frame(width: 1, height: 34)
-
-            totalColumn("今月の収入", amount: model.monthTotal.income)
+            Text(AmountText.text(model.monthTotal))
+                .displayFont(.headline)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
         }
+        .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
         .card()
     }
@@ -214,26 +221,6 @@ private extension RecurringListView {
             )
     }
 
-    func totalColumn(
-        _ title: String,
-        amount: Int
-    ) -> some View {
-        VStack(spacing: 4) {
-            Text(title)
-                .textFont(.caption2)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
-
-            Text(AmountText.text(amount))
-                .displayFont(.headline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
     @ViewBuilder
     func floatingTile(_ id: Recurring.ID) -> some View {
         let items = model.rows + model.hiddenRows
@@ -287,6 +274,16 @@ private extension RecurringListView {
     nonisolated static let space = "RecurringList"
 
     static let rowHeight = RecurringRowCard.height
+
+    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
+        .init("支出", value: .expense),
+        .init("収入", value: .income),
+        .init("振替", value: .transfer)
+    ]
+
+    var typeName: String {
+        model.type.name
+    }
 
     var places: [String?] {
         (model.rows + model.hiddenRows).map(\.place)
