@@ -21,11 +21,7 @@ public extension EntryModel {
     }
 
     var typeName: String {
-        switch type {
-        case .expense: "支出"
-        case .income: "収入"
-        case .transfer: "振替"
-        }
+        type.name
     }
 
     var saveTitle: String {

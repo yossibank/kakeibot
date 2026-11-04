@@ -35,6 +35,25 @@ struct RecurringEditModelTests {
     }
 
     @Test
+    func startsNewRecurringWithGivenTransferType() async throws {
+        let setup = try await HomeModelTests.Setup()
+
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today,
+            type: .transfer
+        )
+
+        await model.load()
+
+        #expect(model.type == .transfer)
+        #expect(model.categoryId == nil)
+        #expect(model.toWalletId != nil)
+        #expect(model.toWalletId != model.walletId)
+        #expect(model.isChanged == false)
+    }
+
+    @Test
     func savesRecurringAndGeneratesEntries() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))

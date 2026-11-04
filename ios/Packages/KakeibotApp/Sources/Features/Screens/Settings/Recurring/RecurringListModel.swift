@@ -7,6 +7,7 @@ import Store
 @MainActor
 @Observable
 public final class RecurringListModel: ScreenModel {
+    public var type: Entry.Kind = .expense
     public var movingOrder: [Recurring.ID]?
     public var errorNotice = ErrorNotice()
 
@@ -39,17 +40,12 @@ public extension RecurringListModel {
         public let closing: String?
     }
 
-    struct MonthTotal: Equatable {
-        public let expense: Int
-        public let income: Int
-    }
-
     var visible: [Recurring] {
-        recurrings.filter { $0.archivedAt == nil }
+        recurrings(isHidden: false)
     }
 
     var hidden: [Recurring] {
-        recurrings.filter { $0.archivedAt != nil }
+        recurrings(isHidden: true)
     }
 
     var rows: [Row] {
@@ -68,13 +64,17 @@ public extension RecurringListModel {
         return hidden.map { row(for: $0, in: list) }
     }
 
-    var monthTotal: MonthTotal {
+    var monthTotal: Int {
         let month = today.yearMonth.period(startingOn: .first)
 
-        return MonthTotal(
-            expense: visible.total(of: .expense, in: month),
-            income: visible.total(of: .income, in: month)
-        )
+        guard let list else {
+            return visible.total(of: type, in: month)
+        }
+
+        return visible.reduce(0) { sum, recurring in
+            let dates = recurring.dates(from: month.lowerBound, through: month.upperBound)
+            return sum + dates.reduce(0) { $0 + list.amount(of: recurring, on: $1) }
+        }
     }
 
     static func title(of type: Entry.Kind) -> String {
@@ -90,7 +90,12 @@ public extension RecurringListModel {
     }
 
     func editModel(for id: Recurring.ID?) -> RecurringEditModel {
-        RecurringEditModel(database: database, today: today, editing: id)
+        RecurringEditModel(
+            database: database,
+            today: today,
+            type: type,
+            editing: id
+        )
     }
 
     func observe() async {
@@ -108,6 +113,12 @@ public extension RecurringListModel {
 
 private extension RecurringListModel {
     static let loadFailedMessage = "固定費を読めませんでした"
+
+    func recurrings(isHidden: Bool) -> [Recurring] {
+        recurrings.filter { recurring in
+            recurring.type == type && (recurring.archivedAt != nil) == isHidden
+        }
+    }
 
     func observeRecurrings() async {
         await observe(
@@ -170,8 +181,10 @@ extension RecurringListModel: SettingsBoardModel {
     }
 
     public func saveOrder(_ ids: [Recurring.ID]) async throws {
-        let ids = ids + hidden.map(\.id)
-        try await database.reorderRecurrings(ids, at: Date())
+        let others = recurrings.map(\.id).filter { !ids.contains($0) }
+        let ordered = ids + others
+
+        try await database.reorderRecurrings(ordered, at: Date())
     }
 
     public func saveHidden(
