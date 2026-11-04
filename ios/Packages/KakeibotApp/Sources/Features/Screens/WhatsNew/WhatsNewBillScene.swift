@@ -36,8 +36,6 @@ private extension WhatsNewBillScene {
         let amount: Int
     }
 
-    static let shiftTitles = ["いつもどおり", "次に回す", "2 回先"]
-
     static let unpaidEntries = [
         UnpaidEntry(name: "スーパー", amount: 3280),
         UnpaidEntry(name: "ドラッグストア", amount: 1460),
@@ -141,8 +139,8 @@ private extension WhatsNewBillScene {
                 .textFont(size: .micro, weight: .semibold)
                 .foregroundStyle(Palette.accent)
 
-            ForEach(Self.shiftTitles, id: \.self) { title in
-                choice(title, isSelected: title == "次に回す", height: 24)
+            ForEach(Array(Recurring.billShiftTitles.enumerated()), id: \.offset) { index, title in
+                choice(title, isSelected: index == 1, height: 24)
             }
         }
         .padding(.horizontal, 12)
