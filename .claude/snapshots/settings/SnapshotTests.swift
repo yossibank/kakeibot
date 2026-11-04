@@ -102,6 +102,28 @@ struct SnapshotTests {
             )
         }
 
+        let rentEdit = RecurringEditModel(database: database, today: today)
+        let cardEdit = RecurringEditModel(database: database, today: today, type: .transfer)
+
+        await rentEdit.load()
+        await cardEdit.load()
+
+        rentEdit.apply(RecurringPreset.presets(for: .expense)[0])
+        cardEdit.apply(RecurringPreset.presets(for: .transfer)[0])
+
+        for variant in Self.variants {
+            try Self.write(
+                RecurringQuickCard(model: rentEdit) { _ in }.padding(20),
+                variant: variant,
+                to: "settings-recurring-quick-rent"
+            )
+            try Self.write(
+                RecurringQuickCard(model: cardEdit) { _ in }.padding(20),
+                variant: variant,
+                to: "settings-recurring-quick-card"
+            )
+        }
+
         let card = options.wallets.first { $0.kind == .card }
 
         templateEdit.walletId = card?.id

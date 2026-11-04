@@ -10,6 +10,7 @@ public struct RecurringEditSheet: View {
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
+    @State private var isShowingDetails = false
 
     @FocusState private var focus: Field?
 
@@ -139,7 +140,6 @@ extension RecurringEditSheet {
         case category
         case wallet
         case destination
-        case schedule
         case start
         case end
         case holiday
@@ -166,6 +166,11 @@ private extension RecurringEditSheet {
                     if !model.isEditing {
                         CapsulePicker(selection: typeBinding, options: Self.typeOptions)
                             .frame(maxWidth: .infinity)
+
+                        RecurringPresetStrip(presets: model.presets) { preset in
+                            model.apply(preset)
+                        }
+                        .padding(.horizontal, -4)
                     }
 
                     VStack(spacing: 8) {
@@ -178,9 +183,11 @@ private extension RecurringEditSheet {
 
                     SettingsField(namePrompt, text: $model.memo, focus: $focus, field: .name)
 
-                    SettingsRowList(items: rowItems) { panel in
+                    RecurringQuickCard(model: model) { panel in
                         open(panel)
                     }
+
+                    details
 
                     if model.isNotificationDenied {
                         NotificationDeniedBanner()
@@ -204,6 +211,48 @@ private extension RecurringEditSheet {
         .padding(.horizontal, 20)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
+    }
+
+    var details: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Button {
+                withAnimation(.snappy) {
+                    isShowingDetails.toggle()
+                }
+            } label: {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Image(systemName: "chevron.right")
+                        .sansFont(.small)
+                        .foregroundStyle(Palette.accent)
+                        .rotationEffect(.degrees(isShowingDetails ? 90 : 0))
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("くわしい設定")
+                            .textFont(.subheadline)
+                            .foregroundStyle(Palette.accentStrong)
+
+                        if !isShowingDetails {
+                            Text(detailSummary)
+                                .textFont(.caption)
+                                .foregroundStyle(Palette.subtext)
+                                .multilineTextAlignment(.leading)
+                        }
+                    }
+
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 8)
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+
+            if isShowingDetails {
+                SettingsRowList(items: detailItems) { panel in
+                    open(panel)
+                }
+                .transition(.opacity)
+            }
+        }
     }
 }
 
@@ -250,7 +299,6 @@ private extension RecurringEditSheet {
         case .category: "カテゴリ"
         case .wallet: model.walletTitle
         case .destination: RecurringEditModel.destinationTitle
-        case .schedule: "繰り返し"
         case .start: "始まり"
         case .end: "終わり"
         case .holiday: "休日なら"

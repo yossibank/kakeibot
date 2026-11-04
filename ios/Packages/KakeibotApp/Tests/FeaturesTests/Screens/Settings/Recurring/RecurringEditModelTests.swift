@@ -159,6 +159,60 @@ struct RecurringEditModelTests {
     }
 
     @Test
+    func appliesSalaryPreset() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        model.select(.income)
+
+        let preset = try #require(model.presets.first { $0.title == "給料" })
+
+        model.apply(preset)
+
+        let glyph = model.selectedCategory.flatMap { model.icon(for: $0) }?.glyph
+
+        #expect(model.memo == "給料")
+        #expect(model.frequency == .monthly)
+        #expect(model.day == 25)
+        #expect(model.holidayShift == .previous)
+        #expect(glyph == .salary)
+    }
+
+    @Test
+    func appliesCardPresetFromBank() async throws {
+        let setup = try await RecordsModelTests.Setup()
+
+        let wallet = WalletDraft(
+            kind: .card,
+            name: "カード",
+            mark: .glyph(.card),
+            color: "#4A6FA5",
+            initialBalance: 0
+        )
+
+        let card = try await setup.database.saveWallet(wallet, at: Date())
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today,
+            type: .transfer
+        )
+
+        await model.load()
+
+        let preset = try #require(model.presets.first { $0.destination == .card })
+
+        model.apply(preset)
+
+        #expect(model.toWalletId == card.id)
+        #expect(model.selectedWallet?.kind == .bank)
+        #expect(model.closingDay == 31)
+        #expect(model.day == 27)
+        #expect(model.holidayShift == .next)
+        #expect(model.memo == "カード")
+    }
+
+    @Test
     func presetsLoanRepaymentFromLoan() async throws {
         let setup = try await RecordsModelTests.Setup()
 

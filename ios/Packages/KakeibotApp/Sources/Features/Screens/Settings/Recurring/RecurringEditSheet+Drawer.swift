@@ -66,9 +66,6 @@ extension RecurringEditSheet {
             }
             .padding(.bottom, 8)
 
-        case .schedule:
-            scheduleChooser
-
         case .start:
             MonthCalendar(selection: $model.startDate, today: model.today)
 
@@ -103,28 +100,6 @@ extension RecurringEditSheet {
 }
 
 private extension RecurringEditSheet {
-    var scheduleChooser: some View {
-        VStack(spacing: 16) {
-            CapsulePicker(selection: $model.frequency, options: Self.frequencyOptions)
-
-            if model.frequency == .yearly {
-                LazyVGrid(columns: Self.monthColumns, spacing: 8) {
-                    ForEach(1...12, id: \.self) { month in
-                        SettingsChoice("\(month) 月", isSelected: model.month == month) {
-                            model.month = month
-                        }
-                    }
-                }
-                .transition(Self.monthTransition)
-            }
-
-            MonthStartDayGrid(selection: scheduleDay) { day in
-                model.day = day.day
-            }
-        }
-        .padding(.bottom, 8)
-    }
-
     var endChooser: some View {
         VStack(spacing: 12) {
             HStack(spacing: 8) {
@@ -202,19 +177,6 @@ private extension RecurringEditSheet {
 }
 
 private extension RecurringEditSheet {
-    static let frequencyOptions: [CapsulePicker<Recurring.Frequency>.Option] = [
-        .init("毎月", value: .monthly),
-        .init("毎年", value: .yearly)
-    ]
-
-    static let monthColumns = Array(
-        repeating: GridItem(
-            .flexible(),
-            spacing: 8
-        ),
-        count: 4
-    )
-
     static let remindColumns = Array(
         repeating: GridItem(
             .flexible(),
@@ -222,17 +184,6 @@ private extension RecurringEditSheet {
         ),
         count: 3
     )
-
-    static var monthTransition: AnyTransition {
-        .asymmetric(
-            insertion: .opacity.animation(.snappy.delay(0.15)),
-            removal: .identity
-        )
-    }
-
-    var scheduleDay: MonthStartDay {
-        MonthStartDay(model.day) ?? .first
-    }
 
     var closingDaySelection: MonthStartDay? {
         model.closingDay.flatMap { MonthStartDay($0) }
