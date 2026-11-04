@@ -15,8 +15,6 @@ extension WalletEditSheet {
         case loanAmount
     }
 
-    static let fade: CGFloat = 16
-
     static let kindColumns = Array(
         repeating: GridItem(
             .flexible(),
@@ -57,6 +55,14 @@ extension WalletEditSheet {
         let loan = model.showsLoanAmount ? [loanAmountItem] : []
         let payment = model.showsPayment ? paymentItems : []
         return payment + loan
+    }
+
+    var detailChips: [String] {
+        rowItems.map { "\($0.title) \($0.value)" }
+    }
+
+    var noteColor: Color {
+        Color(hex: model.icon.color) ?? Palette.subtext
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {

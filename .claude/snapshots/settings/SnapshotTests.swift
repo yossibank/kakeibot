@@ -45,6 +45,27 @@ struct SnapshotTests {
         await budgets.load()
 
         let walletSheet = WalletEditSheet(model: walletEdit)
+            .frame(height: 1000)
+
+        let categoryEdit = CategoryEditModel(database: database, kind: .expense)
+        let stampEdit = StampEditModel(database: database)
+        let ruleEdit = RewardRuleEditModel(database: database)
+
+        await categoryEdit.load()
+        await stampEdit.load()
+        await ruleEdit.load()
+
+        let editSheets: [(String, AnyView)] = [
+            ("settings-category-edit", AnyView(CategoryEditSheet(model: categoryEdit))),
+            ("settings-stamp-edit", AnyView(StampEditSheet(model: stampEdit))),
+            ("settings-reward-edit", AnyView(RewardRuleEditSheet(model: ruleEdit)))
+        ]
+
+        for (name, view) in editSheets {
+            for variant in Self.variants {
+                try Self.write(view.frame(height: 1000), variant: variant, to: name)
+            }
+        }
         let reminderView = ReminderView(model: reminder)
         let monthStartView = MonthStartDayView(model: monthStart)
         let budgetView = BudgetListView(model: budgets)
@@ -91,12 +112,12 @@ struct SnapshotTests {
 
         for variant in Self.variants {
             try Self.write(
-                TemplateEditSheet(model: templateEdit),
+                TemplateEditSheet(model: templateEdit).frame(height: 1000),
                 variant: variant,
                 to: "settings-template-edit"
             )
             try Self.write(
-                RecurringEditSheet(model: recurringEdit),
+                RecurringEditSheet(model: recurringEdit).frame(height: 1000),
                 variant: variant,
                 to: "settings-recurring-edit"
             )

@@ -17,6 +17,7 @@ public struct WalletEditSheet: View {
     @State var isConfirmingDelete = false
     @State var isEditingPayment = false
     @State var isAskingPayment = false
+    @State var isShowingDetails = false
     @State var addedWallet: Wallet?
     @State var valuationDeletion: Deletion?
 

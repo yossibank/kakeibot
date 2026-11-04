@@ -82,7 +82,7 @@ private extension AssetsView {
 
                 if section.rows.count > 1 {
                     Text(AmountText.text(total))
-                        .textFont(.caption)
+                        .textFont(.footnote, weight: .semibold)
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)

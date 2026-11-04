@@ -3,12 +3,43 @@ import DesignSystem
 import SwiftUI
 
 extension WalletEditSheet {
-    var showsSaveButton: Bool {
-        focus == nil && !isEnteringAmount && !isEnteringValuation && !isEnteringLoanAmount
-    }
-
     var content: some View {
-        VStack(spacing: 16) {
+        SettingsEditForm(showsSave: focus == nil) {
+            SettingsPreviewSection(
+                note: "アイコンの色は、振り返りのグラフの色になります",
+                dot: noteColor
+            ) {
+                preview
+            }
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.frame(in: .global).maxY
+            } action: { maxY in
+                iconBottom = maxY
+            }
+
+            SettingsField("名前", text: $model.name, focus: $focus, field: .name)
+
+            SettingsFormCard {
+                kindChooser
+
+                balanceField
+            }
+
+            if model.showsValuation {
+                valuationField
+            }
+
+            if !rowItems.isEmpty {
+                SettingsDetails(isOpen: $isShowingDetails, chips: detailChips) {
+                    SettingsRowList(items: rowItems) { panel in
+                        open(panel)
+                    }
+                }
+            }
+        } save: {
+            saveButton
+        }
+        .overlay(alignment: .top) {
             SettingsEditHeader(
                 title: title,
                 isEditing: model.isEditing,
@@ -22,53 +53,9 @@ extension WalletEditSheet {
                 focus = nil
                 isConfirmingDelete = true
             }
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: SettingsSpacing.form) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        preview
-
-                        colorNote
-                    }
-                    .onGeometryChange(for: CGFloat.self) { proxy in
-                        proxy.frame(in: .global).maxY
-                    } action: { maxY in
-                        iconBottom = maxY
-                    }
-
-                    SettingsField("名前", text: $model.name, focus: $focus, field: .name)
-
-                    kindChooser
-
-                    balanceField
-
-                    if model.showsValuation {
-                        valuationField
-                    }
-
-                    if !rowItems.isEmpty {
-                        SettingsRowList(items: rowItems) { panel in
-                            open(panel)
-                        }
-                    }
-                }
-                .padding(.bottom, 8)
-                .padding(.vertical, Self.fade)
-            }
-            .scrollIndicators(.hidden)
-            .edgeFade(Self.fade)
-            .padding(.vertical, -Self.fade)
-            .scrollDismissesKeyboard(.interactively)
-
-            if showsSaveButton {
-                saveButton
-                    .transition(.opacity)
-            }
+            .padding(.horizontal, 20)
+            .padding(.top, SettingsSpacing.top)
         }
-        .animation(.snappy, value: showsSaveButton)
-        .padding(.horizontal, 20)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {
             focus = nil
@@ -114,15 +101,8 @@ extension WalletEditSheet {
         }
     }
 
-    var colorNote: some View {
-        let color = Color(hex: model.icon.color) ?? Palette.subtext
-        return SettingsPreviewNote("アイコンの色は、振り返りのグラフの色になります", dot: color)
-    }
-
     var kindChooser: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SettingsSectionTitle("種類")
-
+        SettingsFormSection("種類", value: model.kind.title) {
             LazyVGrid(columns: Self.kindColumns, spacing: 8) {
                 ForEach(Wallet.Kind.allCases, id: \.self) { kind in
                     kindButton(kind)
@@ -132,9 +112,7 @@ extension WalletEditSheet {
     }
 
     var balanceField: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SettingsSectionTitle("最初の残高")
-
+        SettingsFormSection("最初の残高") {
             HStack(spacing: 12) {
                 if model.showsSign {
                     Button {

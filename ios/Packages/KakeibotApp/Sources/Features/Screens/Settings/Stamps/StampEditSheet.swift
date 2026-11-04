@@ -28,7 +28,28 @@ public struct StampEditSheet: View {
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
+        SettingsEditForm(showsSave: focus == nil) {
+            SettingsPreviewSection(note: "カレンダーの日に、このスタンプで押します") {
+                StampTileFace(icon: model.icon.preview, isHidden: false)
+                    .frame(width: 80, height: 78)
+            }
+
+            SettingsFormCard {
+                SettingsIconEditor(
+                    model: model.icon,
+                    focus: $focus,
+                    textField: .text
+                )
+            }
+        } save: {
+            PrimaryButton(model.saveTitle) {
+                Task {
+                    await save()
+                }
+            }
+            .disabled(!model.canSave)
+        }
+        .overlay(alignment: .top) {
             SettingsEditHeader(
                 title: model.isEditing ? "スタンプを編集" : "スタンプを追加",
                 isEditing: model.isEditing,
@@ -40,40 +61,9 @@ public struct StampEditSheet: View {
             } onDelete: {
                 isConfirmingDelete = true
             }
-
-            ScrollView {
-                VStack(spacing: SettingsSpacing.form) {
-                    StampTileFace(icon: model.icon.preview, isHidden: false)
-                        .frame(width: 80, height: 78)
-
-                    SettingsIconEditor(
-                        model: model.icon,
-                        focus: $focus,
-                        textField: .text
-                    )
-                }
-                .padding(.bottom, 8)
-                .padding(.vertical, Self.fade)
-            }
-            .scrollIndicators(.hidden)
-            .edgeFade(Self.fade)
-            .padding(.vertical, -Self.fade)
-            .scrollDismissesKeyboard(.interactively)
-
-            if focus == nil {
-                PrimaryButton(model.saveTitle) {
-                    Task {
-                        await save()
-                    }
-                }
-                .disabled(!model.canSave)
-                .transition(.opacity)
-            }
+            .padding(.horizontal, 20)
+            .padding(.top, SettingsSpacing.top)
         }
-        .animation(.snappy, value: focus == nil)
-        .padding(.horizontal, 20)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {
             focus = nil
@@ -126,8 +116,6 @@ private extension StampEditSheet {
     enum Field: Hashable {
         case text
     }
-
-    static let fade: CGFloat = 16
 
     func close() {
         focus = nil

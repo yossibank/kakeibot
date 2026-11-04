@@ -132,75 +132,61 @@ public struct RewardRuleEditSheet: View {
 
 private extension RewardRuleEditSheet {
     var content: some View {
-        VStack(spacing: 16) {
-            Color.clear
-                .frame(height: 44)
-
-            ScrollView {
-                VStack(spacing: SettingsSpacing.form) {
-                    Button {
-                        focus = nil
-                        isEditingIcon = true
-                    } label: {
-                        RewardRuleTile(
-                            icon: model.icon.preview,
-                            name: model.name.isEmpty ? "名前" : model.name,
-                            amount: model.amount ?? 0,
-                            total: nil,
-                            isHidden: false
-                        )
-                        .frame(width: 172, height: 156)
-                        .overlay {
-                            if isEditingIcon {
-                                RoundedRectangle(cornerRadius: corner.radius(16))
-                                    .stroke(Palette.accent, lineWidth: 2)
-                            }
-                        }
-                        .overlay(alignment: .bottomTrailing) {
-                            EditBadge()
-                                .offset(x: 4, y: 4)
-                        }
-                        .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                    .onGeometryChange(for: CGFloat.self) { proxy in
-                        proxy.frame(in: .global).maxY
-                    } action: { maxY in
-                        iconBottom = maxY
-                    }
-
-                    SettingsField(
-                        "自炊した日など",
-                        text: $model.name,
-                        focus: $focus,
-                        field: .name
+        SettingsEditForm(showsSave: focus == nil) {
+            SettingsPreviewSection(note: "ごほうび貯金箱では、このタイルで並びます") {
+                Button {
+                    focus = nil
+                    isEditingIcon = true
+                } label: {
+                    RewardRuleTile(
+                        icon: model.icon.preview,
+                        name: model.name.isEmpty ? "名前" : model.name,
+                        amount: model.amount ?? 0,
+                        total: nil,
+                        isHidden: false
                     )
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsRowList(items: rowItems) { panel in
-                            open(panel)
+                    .frame(width: 172, height: 156)
+                    .overlay {
+                        if isEditingIcon {
+                            RoundedRectangle(cornerRadius: corner.radius(16))
+                                .stroke(Palette.accent, lineWidth: 2)
                         }
+                    }
+                    .overlay(alignment: .bottomTrailing) {
+                        EditBadge()
+                            .offset(x: 4, y: 4)
+                    }
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            }
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.frame(in: .global).maxY
+            } action: { maxY in
+                iconBottom = maxY
+            }
 
-                        SettingsCaption("達成した日に、この金額を貯金箱に貯めます。")
+            SettingsField(
+                "自炊した日など",
+                text: $model.name,
+                focus: $focus,
+                field: .name
+            )
+
+            VStack(alignment: .leading, spacing: 8) {
+                SettingsFormCard {
+                    SettingsFormSection("金額") {
+                        SettingsAmountButton(amount: model.amount ?? 0, text: amountPrompt) {
+                            open(.amount)
+                        }
                     }
                 }
-                .padding(.bottom, 8)
-                .padding(.vertical, Self.fade)
-            }
-            .scrollIndicators(.hidden)
-            .edgeFade(Self.fade)
-            .padding(.vertical, -Self.fade)
-            .scrollDismissesKeyboard(.interactively)
 
-            if panel == nil, focus == nil {
-                saveButton
-                    .transition(.opacity)
+                SettingsCaption("達成した日に、この金額を貯金箱に貯めます。")
             }
+        } save: {
+            saveButton
         }
-        .animation(.snappy, value: panel == nil && focus == nil)
-        .padding(.horizontal, 20)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
     }
 
     var saveButton: some View {
@@ -237,10 +223,8 @@ private extension RewardRuleEditSheet {
         case amount
     }
 
-    static let fade: CGFloat = 16
-
-    var amountValue: String {
-        AmountText.text(model.amount ?? 0)
+    var amountPrompt: String? {
+        model.amount == nil ? "金額を入れる" : nil
     }
 
     var deleteImage: String {
@@ -261,19 +245,6 @@ private extension RewardRuleEditSheet {
 
     var deleteRole: ConfirmCard.Role {
         model.hasLogs ? .suggestion : .destructive
-    }
-
-    var rowItems: [SettingsRowList<Panel>.Item] {
-        [
-            .init(
-                panel: .amount,
-                systemImage: "yensign",
-                title: "金額",
-                value: amountValue,
-                isEmpty: model.amount == nil,
-                isAmount: true
-            )
-        ]
     }
 
     func open(_ panel: Panel) {
