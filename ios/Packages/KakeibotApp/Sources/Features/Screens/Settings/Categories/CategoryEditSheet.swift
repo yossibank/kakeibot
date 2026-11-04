@@ -132,50 +132,38 @@ extension CategoryEditSheet {
 
 private extension CategoryEditSheet {
     var content: some View {
-        VStack(spacing: 16) {
-            header
-
-            ScrollView {
-                VStack(spacing: SettingsSpacing.form) {
-                    preview
-                        .onGeometryChange(for: CGFloat.self) { proxy in
-                            proxy.frame(in: .global).maxY
-                        } action: { maxY in
-                            iconBottom = maxY
-                        }
-
-                    SettingsField(
-                        "名前",
-                        text: $model.name,
-                        focus: $focus,
-                        field: .name
-                    )
-
-                    tags
+        SettingsEditForm(showsSave: focus == nil && isTagFocused == nil) {
+            preview
+                .onGeometryChange(for: CGFloat.self) { proxy in
+                    proxy.frame(in: .global).maxY
+                } action: { maxY in
+                    iconBottom = maxY
                 }
-                .padding(.bottom, 8)
-                .padding(.vertical, Self.fade)
-            }
-            .scrollIndicators(.hidden)
-            .edgeFade(Self.fade)
-            .padding(.vertical, -Self.fade)
-            .scrollDismissesKeyboard(.interactively)
-            .scrollDisabled(isMovingTag)
 
-            if focus == nil, isTagFocused == nil {
-                PrimaryButton(model.saveTitle) {
-                    Task {
-                        await save()
-                    }
-                }
-                .disabled(!model.canSave)
-                .transition(.opacity)
+            SettingsField(
+                "名前",
+                text: $model.name,
+                focus: $focus,
+                field: .name
+            )
+
+            SettingsFormCard {
+                tags
             }
+        } save: {
+            PrimaryButton(model.saveTitle) {
+                Task {
+                    await save()
+                }
+            }
+            .disabled(!model.canSave)
         }
-        .animation(.snappy, value: focus == nil && isTagFocused == nil)
-        .padding(.horizontal, 20)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
+        .scrollDisabled(isMovingTag)
+        .overlay(alignment: .top) {
+            header
+                .padding(.horizontal, 20)
+                .padding(.top, SettingsSpacing.top)
+        }
         .contentShape(.rect)
         .onTapGesture {
             focus = nil
@@ -202,7 +190,10 @@ private extension CategoryEditSheet {
     }
 
     var preview: some View {
-        VStack(spacing: 8) {
+        SettingsPreviewSection(
+            note: "入力シートでは、このタイルで並びます。色は、振り返りのグラフの色になります",
+            dot: graphColor
+        ) {
             Button {
                 focus = nil
                 isEditingIcon = true
@@ -226,17 +217,11 @@ private extension CategoryEditSheet {
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
-
-            SettingsPreviewNote("入力シートでは、このタイルで並びます")
-
-            SettingsPreviewNote("アイコンの色は、振り返りのグラフの色になります", dot: graphColor)
         }
     }
 
     var tags: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SettingsSectionTitle("タグ")
-
+        SettingsFormSection("タグ") {
             TagLine(tagItems, selection: nil) { id in
                 editTag(id)
             } onAdd: {
@@ -272,7 +257,6 @@ private extension CategoryEditSheet {
 }
 
 private extension CategoryEditSheet {
-    static let fade: CGFloat = 16
     static let hasEntriesMessage = "記録があります。非表示にすると、記録を残したまま一覧から外せます"
 
     var addTitle: String {

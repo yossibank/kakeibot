@@ -5,7 +5,6 @@ import SwiftUI
 public struct RecordsView: View {
     @Bindable var model: RecordsModel
 
-    @State var openId: Entry.ID?
     @State var stampTarget: StampTarget?
     @State var rewardTarget: StampTarget?
     @State var selection: Set<Entry.ID>?
@@ -20,7 +19,6 @@ public struct RecordsView: View {
     @State private var stampCount = 0
 
     let onOpenEntry: (Entry.ID) -> Void
-    let onDelete: (Entry.ID) -> Void
     let onAddEntry: (LocalDate) -> Void
     let onOpenRecurring: (Recurring.ID) -> Void
     let onDeleteEntries: ([Entry.ID]) -> Void
@@ -30,7 +28,6 @@ public struct RecordsView: View {
     public init(
         model: RecordsModel,
         onOpenEntry: @escaping (Entry.ID) -> Void,
-        onDelete: @escaping (Entry.ID) -> Void,
         onAddEntry: @escaping (LocalDate) -> Void,
         onOpenRecurring: @escaping (Recurring.ID) -> Void,
         onChangeEntries: @escaping ([Entry.ID], EntryBatchChange) -> Void,
@@ -38,7 +35,6 @@ public struct RecordsView: View {
     ) {
         self.model = model
         self.onOpenEntry = onOpenEntry
-        self.onDelete = onDelete
         self.onAddEntry = onAddEntry
         self.onOpenRecurring = onOpenRecurring
         self.onChangeEntries = onChangeEntries
@@ -58,7 +54,6 @@ public struct RecordsView: View {
                     header
 
                     monthStepper
-                        .monthSwipe(following: $slide, perform: moveMonth)
 
                     RecordsToolLayout(spacing: 8) {
                         CapsulePicker(
@@ -91,6 +86,7 @@ public struct RecordsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
+        .monthSwipe(following: $slide, perform: moveMonth)
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom) {
             if let selection {
@@ -200,7 +196,6 @@ private extension RecordsView {
     @ViewBuilder
     var monthContent: some View {
         summary
-            .monthSwipe(following: $slide, perform: moveMonth)
 
         switch model.layout {
         case .list:
@@ -217,7 +212,6 @@ private extension RecordsView {
 
         case .calendar:
             calendar
-                .monthSwipe(following: $slide, perform: moveMonth)
 
             shownDayCard
         }
@@ -270,8 +264,6 @@ private extension RecordsView {
     }
 
     func openSearch() {
-        openId = nil
-
         withAnimation(.snappy) {
             model.isSearching = true
         }
@@ -280,6 +272,10 @@ private extension RecordsView {
     }
 
     func moveMonth(_ direction: PageSwipeDirection) {
+        guard !model.isSearching else {
+            return
+        }
+
         switch direction {
         case .forward: move(months: 1)
         case .backward: move(months: -1)
@@ -287,7 +283,6 @@ private extension RecordsView {
     }
 
     func move(months: Int) {
-        openId = nil
         isMovingForward = months > 0
 
         PageSlide.run($slide, forward: months > 0) {
@@ -298,7 +293,6 @@ private extension RecordsView {
     func moveToCurrentMonth() {
         let isForward = model.month < model.currentMonth
 
-        openId = nil
         isMovingForward = isForward
 
         PageSlide.run($slide, forward: isForward) {

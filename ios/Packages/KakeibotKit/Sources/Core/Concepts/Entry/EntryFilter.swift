@@ -30,9 +30,7 @@ public extension EntryFilter {
             return days
         }
 
-        let entries = days.flatMap(\.entries).filter(includes)
-
-        return EntryDay.grouping(entries)
+        return days.filtered(by: includes)
     }
 }
 

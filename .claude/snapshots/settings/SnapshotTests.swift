@@ -45,6 +45,27 @@ struct SnapshotTests {
         await budgets.load()
 
         let walletSheet = WalletEditSheet(model: walletEdit)
+            .frame(height: 1000)
+
+        let categoryEdit = CategoryEditModel(database: database, kind: .expense)
+        let stampEdit = StampEditModel(database: database)
+        let ruleEdit = RewardRuleEditModel(database: database)
+
+        await categoryEdit.load()
+        await stampEdit.load()
+        await ruleEdit.load()
+
+        let editSheets: [(String, AnyView)] = [
+            ("settings-category-edit", AnyView(CategoryEditSheet(model: categoryEdit))),
+            ("settings-stamp-edit", AnyView(StampEditSheet(model: stampEdit))),
+            ("settings-reward-edit", AnyView(RewardRuleEditSheet(model: ruleEdit)))
+        ]
+
+        for (name, view) in editSheets {
+            for variant in Self.variants {
+                try Self.write(view.frame(height: 1000), variant: variant, to: name)
+            }
+        }
         let reminderView = ReminderView(model: reminder)
         let monthStartView = MonthStartDayView(model: monthStart)
         let budgetView = BudgetListView(model: budgets)
@@ -91,30 +112,51 @@ struct SnapshotTests {
 
         for variant in Self.variants {
             try Self.write(
-                TemplateEditSheet(model: templateEdit),
+                TemplateEditSheet(model: templateEdit).frame(height: 1000),
                 variant: variant,
                 to: "settings-template-edit"
             )
             try Self.write(
-                RecurringEditSheet(model: recurringEdit),
+                RecurringEditSheet(model: recurringEdit).frame(height: 1000),
                 variant: variant,
                 to: "settings-recurring-edit"
             )
         }
 
         let card = options.wallets.first { $0.kind == .card }
+        let expenseEdit = RecurringEditModel(database: database, today: today)
+        let transferEdit = RecurringEditModel(database: database, today: today, type: .transfer)
+
+        await expenseEdit.load()
+        await transferEdit.load()
+
+        expenseEdit.day = 27
+        transferEdit.toWalletId = card?.id
+
+        for variant in Self.variants {
+            try Self.write(
+                RecurringQuickCard(model: expenseEdit) { _ in }.padding(20),
+                variant: variant,
+                to: "settings-recurring-quick-expense"
+            )
+            try Self.write(
+                RecurringQuickCard(model: transferEdit) { _ in }.padding(20),
+                variant: variant,
+                to: "settings-recurring-quick-transfer"
+            )
+        }
 
         templateEdit.walletId = card?.id
         recurringEdit.walletId = card?.id
 
         for variant in Self.variants {
             try Self.write(
-                TemplateEditSheet(model: templateEdit).drawerBody(.wallet).padding(20),
+                TemplateQuickCard(model: templateEdit) { _ in }.padding(20),
                 variant: variant,
                 to: "settings-template-bill"
             )
             try Self.write(
-                RecurringEditSheet(model: recurringEdit).drawerBody(.wallet).padding(20),
+                RecurringQuickCard(model: recurringEdit) { _ in }.padding(20),
                 variant: variant,
                 to: "settings-recurring-bill"
             )

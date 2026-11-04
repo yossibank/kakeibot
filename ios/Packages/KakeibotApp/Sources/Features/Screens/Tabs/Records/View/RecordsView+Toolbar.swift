@@ -10,8 +10,6 @@ extension RecordsView {
             title: isSelecting ? "完了" : "選択",
             isOn: isSelecting
         ) {
-            openId = nil
-
             withAnimation(.snappy) {
                 selection = isSelecting ? nil : []
             }

@@ -63,7 +63,25 @@ struct RecurringCardBillTests {
         ]
 
         let amount = bill.amount(paidOn: paidOn, entries: entries)
-        #expect(amount == 40000)
+        #expect(amount == 85000)
+    }
+
+    @Test
+    func skipsPaymentIntoCard() throws {
+        let bill = try Self.bill(closingDay: 15)
+        let card = try #require(bill.toWalletId)
+        let paidOn = try #require(LocalDate("2026-11-10"))
+        var payment = try Self.entry(.transfer, 45000, on: "2026-10-10", wallet: bill.walletId)
+
+        payment.toWalletId = card
+
+        let entries = try [
+            payment,
+            Self.entry(.expense, 12000, on: "2026-10-15", wallet: card)
+        ]
+
+        let amount = bill.amount(paidOn: paidOn, entries: entries)
+        #expect(amount == 12000)
     }
 
     @Test

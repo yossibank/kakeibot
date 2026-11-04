@@ -5,7 +5,7 @@ import SwiftUI
 public struct AssetsView: View {
     @Bindable var model: AssetsModel
 
-    @State var movedBill: AssetsModel.UpcomingBill?
+    @State var entrySheet: AssetsEntrySheet.Content?
     @State var isShowingReward = false
     @State var isAddingGoal = false
 
@@ -83,8 +83,8 @@ public struct AssetsView: View {
         .sheet(isPresented: $isAddingGoal) {
             AssetsGoalSheet(model: model.goalEditModel(editing: nil))
         }
-        .sheet(item: $movedBill, onDismiss: openPendingEntry) { bill in
-            AssetsMovedSheet(row: bill) { id in
+        .sheet(item: $entrySheet, onDismiss: openPendingEntry) { content in
+            AssetsEntrySheet(content: content) { id in
                 pendingEntry = id
             }
         }

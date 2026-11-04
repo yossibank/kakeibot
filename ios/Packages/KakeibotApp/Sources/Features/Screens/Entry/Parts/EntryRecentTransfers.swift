@@ -36,21 +36,10 @@ private extension EntryRecentTransfers {
             onUse(transfer)
         } label: {
             HStack(spacing: 8) {
-                HStack(spacing: 4) {
-                    EntryRouteChip(
-                        model.wallet(transfer.walletId)?.name ?? "",
-                        isDestination: false
-                    )
-
-                    Image(systemName: "arrow.right")
-                        .sansFont(.micro, weight: .semibold)
-                        .foregroundStyle(Palette.subtext)
-
-                    EntryRouteChip(
-                        model.wallet(transfer.toWalletId)?.name ?? "",
-                        isDestination: true
-                    )
-                }
+                EntryRoute(
+                    source: model.wallet(transfer.walletId)?.name ?? "",
+                    destination: model.wallet(transfer.toWalletId)?.name ?? ""
+                )
 
                 Spacer(minLength: 8)
 

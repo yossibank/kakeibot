@@ -63,31 +63,29 @@ public struct EntryRow: View {
                             .sansFont(.caption, weight: .semibold)
                             .foregroundStyle(Palette.accent.opacity(.strong))
                     }
+                }
 
-                    if let tag {
-                        TagCard(tag, size: .small)
-                            .sharesTextScale(id: tag)
-                            .layoutPriority(1)
-                    }
+                if tag != nil || detail != nil {
+                    HStack(spacing: 8) {
+                        if let tag {
+                            TagCard(tag, size: .small)
+                                .sharesTextScale(id: tag)
+                                .layoutPriority(1)
+                        }
 
-                    if let detail {
-                        Text(detail)
-                            .textFont(.caption)
-                            .foregroundStyle(Palette.subtext)
-                            .sharedTextScale()
+                        if let detail {
+                            Text(detail)
+                                .textFont(.caption)
+                                .foregroundStyle(Palette.subtext)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .minimumScaleFactor(0.8)
+                        }
                     }
                 }
 
                 if let route {
-                    HStack(spacing: 4) {
-                        EntryRouteChip(route.source, isDestination: false)
-
-                        Image(systemName: "arrow.right")
-                            .sansFont(.micro, weight: .semibold)
-                            .foregroundStyle(Palette.subtext)
-
-                        EntryRouteChip(route.destination, isDestination: true)
-                    }
+                    EntryRoute(source: route.source, destination: route.destination)
                 }
 
                 if let memo {

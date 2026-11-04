@@ -4,65 +4,16 @@ import Store
 import SwiftUI
 
 extension RecurringEditSheet {
-    var rowItems: [SettingsRowList<Panel>.Item] {
-        [amountItem] + moneyItems + scheduleItems
+    var detailItems: [SettingsRowList<Panel>.Item] {
+        transferItems + scheduleItems
     }
 }
 
 private extension RecurringEditSheet {
-    var amountText: String {
-        model.isCardBill ? "カードの利用分" : AmountText.text(model.amount)
-    }
-
-    var amountPanel: Panel {
-        model.isCardBill ? .closing : .amount
-    }
-
-    var scheduleText: String {
-        RecurringText.schedule(model.frequency, month: model.month, day: model.day)
-    }
-
-    var amountItem: SettingsRowList<Panel>.Item {
-        let isEmpty = model.amount == 0 && !model.isCardBill
-
-        return .init(
-            panel: amountPanel,
-            systemImage: "yensign",
-            title: "金額",
-            value: amountText,
-            isEmpty: isEmpty,
-            isAmount: true
-        )
-    }
-
-    var moneyItems: [SettingsRowList<Panel>.Item] {
-        let wallet = SettingsRowList<Panel>.Item(
-            panel: .wallet,
-            systemImage: "wallet.bifold",
-            title: model.walletTitle,
-            value: model.selectedWallet?.name ?? "選ぶ",
-            isEmpty: model.selectedWallet == nil
-        )
-
+    var transferItems: [SettingsRowList<Panel>.Item] {
         guard model.type == .transfer else {
-            let category = SettingsRowList<Panel>.Item(
-                panel: .category,
-                systemImage: "square.grid.2x2",
-                title: "カテゴリ",
-                value: model.selectedCategory?.name ?? "選ぶ",
-                isEmpty: model.selectedCategory == nil
-            )
-
-            return [category, wallet]
+            return []
         }
-
-        let destination = SettingsRowList<Panel>.Item(
-            panel: .destination,
-            systemImage: "arrow.right.circle",
-            title: RecurringEditModel.destinationTitle,
-            value: model.selectedDestination?.name ?? "選ぶ",
-            isEmpty: model.selectedDestination == nil
-        )
 
         let fee = SettingsRowList<Panel>.Item(
             panel: .fee,
@@ -74,7 +25,7 @@ private extension RecurringEditSheet {
         )
 
         guard model.canUseClosingDay else {
-            return [wallet, destination, fee]
+            return [fee]
         }
 
         let closing = SettingsRowList<Panel>.Item(
@@ -85,18 +36,11 @@ private extension RecurringEditSheet {
             isEmpty: model.closingDay == nil
         )
 
-        return [wallet, destination, closing, fee]
+        return [closing, fee]
     }
 
     var scheduleItems: [SettingsRowList<Panel>.Item] {
         [
-            .init(
-                panel: .schedule,
-                systemImage: "repeat",
-                title: "繰り返し",
-                value: scheduleText,
-                isEmpty: false
-            ),
             .init(
                 panel: .start,
                 systemImage: "calendar",

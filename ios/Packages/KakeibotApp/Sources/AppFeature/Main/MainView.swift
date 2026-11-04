@@ -159,11 +159,6 @@ struct MainView: View {
                     onOpenEntry: { id in
                         sheet = .edit(id)
                     },
-                    onDelete: { id in
-                        Task {
-                            await notice.delete(id, in: records.list)
-                        }
-                    },
                     onAddEntry: addEntry(on:),
                     onOpenRecurring: { id in
                         sheet = .recurring(id)

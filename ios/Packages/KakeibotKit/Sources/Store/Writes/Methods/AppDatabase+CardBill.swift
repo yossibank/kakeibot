@@ -11,7 +11,8 @@ extension AppDatabase {
     static func recalculateCardBills(
         _ change: CardBillChange,
         in db: Database,
-        at now: Date
+        at now: Date,
+        visited: Set<Recurring.ID> = []
     ) throws {
         let changed = change.before + change.after
         let walletIds = changed.map(\.walletId)
@@ -25,6 +26,9 @@ extension AppDatabase {
             .filter(Column("closing_day") != nil)
             .filter(cards.contains(Column("to_wallet_id")))
             .fetchAll(db)
+            .filter { !visited.contains($0.id) }
+
+        var cascade = CardBillChange()
 
         for recurring in recurrings {
             guard
@@ -37,9 +41,23 @@ extension AppDatabase {
             let entries = changed.filter { $0.walletId == card }
 
             for occurrence in recurring.occurrences(affectedBy: entries, through: until) {
-                try recalculateBill(of: recurring, on: occurrence, after: change, in: db, at: now)
+                let billChange = try recalculateBill(
+                    of: recurring,
+                    on: occurrence,
+                    after: change,
+                    in: db,
+                    at: now
+                )
+
+                cascade.before += billChange.before
+                cascade.after += billChange.after
             }
         }
+
+        let recurringIds = recurrings.map(\.id)
+        let passed = visited.union(recurringIds)
+
+        try recalculateCardBills(cascade, in: db, at: now, visited: passed)
     }
 
     static func billMonth(
@@ -96,7 +114,7 @@ private extension AppDatabase {
         after change: CardBillChange,
         in db: Database,
         at now: Date
-    ) throws {
+    ) throws -> CardBillChange {
         let used = try billEntries(of: recurring, on: occurrence, in: db)
         let amount = recurring.amount(paidOn: occurrence.date, entries: used)
         let earliest = occurrence.scheduled.adding(days: -40)
@@ -115,26 +133,35 @@ private extension AppDatabase {
             let previous = used.filter { !changedIds.contains($0.id) } + change.before
             let previousAmount = recurring.amount(paidOn: occurrence.date, entries: previous)
 
-            if previousAmount == 0,
-               amount > 0,
-               recurring.archivedAt == nil {
-                try insertEntry(of: recurring, on: occurrence, in: db, at: now)
+            guard
+                previousAmount == 0,
+                amount > 0,
+                recurring.archivedAt == nil,
+                let inserted = try insertEntry(of: recurring, on: occurrence, in: db, at: now)
+            else {
+                return CardBillChange()
             }
 
-            return
+            let fees = try Entry.filter(Column("transfer_id") == inserted.id).fetchAll(db)
+
+            return CardBillChange(after: [inserted] + fees)
         }
 
         guard
             bill.updatedAt == bill.createdAt,
             bill.amount != amount
         else {
-            return
+            return CardBillChange()
         }
 
         guard amount > 0 else {
-            _ = try Entry.filter(Column("transfer_id") == bill.id).deleteAll(db)
+            let fees = Entry.filter(Column("transfer_id") == bill.id)
+            let removed = try fees.fetchAll(db)
+
+            _ = try fees.deleteAll(db)
             try bill.delete(db)
-            return
+
+            return CardBillChange(before: [bill] + removed)
         }
 
         var recalculated = bill
@@ -142,6 +169,8 @@ private extension AppDatabase {
         recalculated.amount = amount
 
         try recalculated.update(db)
+
+        return CardBillChange(before: [bill], after: [recalculated])
     }
 }
 

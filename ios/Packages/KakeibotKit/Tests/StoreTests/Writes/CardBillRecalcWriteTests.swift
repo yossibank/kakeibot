@@ -214,7 +214,7 @@ struct CardBillRecalcWriteTests {
     }
 
     @Test
-    func countsFeeOfGeneratedTransferInBill() async throws {
+    func countsGeneratedTransferAndFeeInBill() async throws {
         let setup = try await Setup(usage: [])
         let startDate = try #require(LocalDate("2026-10-05"))
         let through = try #require(LocalDate("2026-11-10"))
@@ -239,7 +239,7 @@ struct CardBillRecalcWriteTests {
 
         try await setup.database.generateRecurringEntries(through: through, at: setup.now)
 
-        #expect(try setup.bill()?.amount == 110)
+        #expect(try setup.bill()?.amount == 5110)
     }
 
     @Test
@@ -311,6 +311,55 @@ struct CardBillRecalcWriteTests {
 
         #expect(bills.count == 1)
         #expect(bills.first?.id == bill.id)
+    }
+
+    @Test
+    func recalculatesBillOfCardPayingAnotherCard() async throws {
+        let setup = try await Setup(usage: [])
+        let startDate = try #require(LocalDate("2026-11-01"))
+        let through = try #require(LocalDate("2026-11-30"))
+
+        let draft = WalletDraft(
+            kind: .card,
+            name: "払う側のカード",
+            mark: .glyph(.bank),
+            color: "#4A6FA5",
+            initialBalance: 0
+        )
+
+        let payer = try await setup.database.saveWallet(draft, at: setup.now)
+
+        let payerBill = Recurring(
+            type: .transfer,
+            amount: 0,
+            categoryId: nil,
+            walletId: setup.bank,
+            toWalletId: payer.id,
+            frequency: .monthly,
+            day: 25,
+            closingDay: 10,
+            startDate: startDate,
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
+        try await setup.database.writer.write { db in
+            var bill = try #require(try Recurring.fetchOne(db, key: setup.recurringId))
+
+            bill.walletId = payer.id
+
+            try bill.update(db)
+            try payerBill.insert(db)
+        }
+
+        try await setup.spend(10000, on: "2026-10-01")
+        try await setup.database.generateRecurringEntries(through: through, at: setup.now)
+        #expect(try setup.bill()?.amount == 10000)
+        #expect(try setup.bill(of: payerBill.id)?.amount == 10000)
+
+        try await setup.spend(3000, on: "2026-10-05")
+        #expect(try setup.bill()?.amount == 13000)
+        #expect(try setup.bill(of: payerBill.id)?.amount == 13000)
     }
 }
 

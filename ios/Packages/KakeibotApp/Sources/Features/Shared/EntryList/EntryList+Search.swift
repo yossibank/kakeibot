@@ -3,11 +3,9 @@ import Store
 
 extension EntryList {
     func days(matching search: EntrySearch) -> [EntryDay] {
-        let entries = days.flatMap(\.entries).filter { entry in
+        days.filtered { entry in
             search.matches(amount: entry.amount, texts: texts(of: entry))
         }
-
-        return EntryDay.grouping(entries)
     }
 }
 
