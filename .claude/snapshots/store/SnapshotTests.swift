@@ -8,16 +8,76 @@ import UIKit
 struct SnapshotTests {
     @Test
     func render() throws {
-        for page in Self.pages {
-            let art = try Self.load(page.art)
-            let view = StorePage(page: page, art: art)
+        for (canvas, pages) in Self.pageSets {
+            for page in pages {
+                let art = try Self.load(page.art)
+                let view = StorePage(page: page, art: art, canvas: canvas)
 
-            try Self.write(view, to: page.file)
+                try Self.write(view, canvas: canvas, to: page.file)
+            }
+        }
+
+        let shots = try Self.bannerShots.map(Self.image)
+
+        for canvas in [Canvas.header, .search] {
+            let view = StoreBanner(shots: shots, canvas: canvas)
+
+            try Self.write(view, canvas: canvas, to: canvas.folder)
         }
     }
 }
 
 extension SnapshotTests {
+    enum Canvas {
+        case phone
+        case duoOuter
+        case duoInner
+        case header
+        case search
+
+        var size: CGSize {
+            switch self {
+            case .phone: CGSize(width: 440, height: 956)
+            case .duoOuter: CGSize(width: 466, height: 678)
+            case .duoInner: CGSize(width: 951, height: 669)
+            case .header: CGSize(width: 1920, height: 823)
+            case .search: CGSize(width: 1920, height: 1280)
+            }
+        }
+
+        var scale: CGFloat {
+            switch self {
+            case .phone, .duoOuter, .duoInner: 3
+            case .header, .search: 2
+            }
+        }
+
+        var folder: String {
+            switch self {
+            case .phone: "6.9"
+            case .duoOuter: "duo-outer"
+            case .duoInner: "duo-inner"
+            case .header: "header"
+            case .search: "search"
+            }
+        }
+
+        var headerHeight: CGFloat {
+            switch self {
+            case .duoOuter, .duoInner: 216
+            default: 300
+            }
+        }
+
+        var artScale: CGFloat {
+            switch self {
+            case .duoOuter: 0.78
+            case .duoInner: 1.6
+            default: 1
+            }
+        }
+    }
+
     struct Page {
         let file: String
         let badge: String?
@@ -49,6 +109,7 @@ extension SnapshotTests {
         case fan(left: String, center: String, right: String, labels: [String])
         case compare(String, parts: [String], labels: [String], crop: CGRect)
         case pair(String, String)
+        case receipt(String)
     }
 
     enum LoadedArt {
@@ -58,21 +119,31 @@ extension SnapshotTests {
         case fan(left: UIImage, center: UIImage, right: UIImage, labels: [String])
         case compare(UIImage, parts: [UIImage], labels: [String])
         case pair(UIImage, UIImage)
+        case receipt(UIImage)
     }
 }
 
 private struct StorePage: View {
     let page: SnapshotTests.Page
     let art: SnapshotTests.LoadedArt
+    let canvas: SnapshotTests.Canvas
 
     var body: some View {
+        let artHeight = canvas.size.height - canvas.headerHeight
+
         VStack(spacing: 0) {
             header
 
             artwork
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .frame(
+                    width: Self.designWidth,
+                    height: artHeight / canvas.artScale,
+                    alignment: .top
+                )
+                .scaleEffect(canvas.artScale, anchor: .top)
+                .frame(width: canvas.size.width, height: artHeight, alignment: .top)
         }
-        .frame(width: 440, height: 956, alignment: .top)
+        .frame(width: canvas.size.width, height: canvas.size.height, alignment: .top)
         .background {
             LinearGradient(
                 colors: [colors.top, colors.bottom],
@@ -95,6 +166,11 @@ private struct StorePage: View {
 }
 
 private extension StorePage {
+    struct ReceiptLine {
+        let name: String
+        let amount: String
+    }
+
     struct Colors {
         let top: Color
         let bottom: Color
@@ -103,6 +179,24 @@ private extension StorePage {
         let badge: Color
         let badgeText: Color
         let glow: Color
+    }
+
+    static let designWidth: CGFloat = 440
+
+    static let receiptLines = [
+        ReceiptLine(name: "牛乳", amount: "¥198"),
+        ReceiptLine(name: "食パン", amount: "¥168"),
+        ReceiptLine(name: "卵", amount: "¥248"),
+        ReceiptLine(name: "鶏むね肉", amount: "¥498"),
+        ReceiptLine(name: "バナナ", amount: "¥158"),
+        ReceiptLine(name: "ヨーグルト×2", amount: "¥276"),
+        ReceiptLine(name: "豆腐", amount: "¥98"),
+        ReceiptLine(name: "洗剤", amount: "¥456")
+    ]
+
+    var topPadding: CGFloat {
+        let full: CGFloat = page.badge == nil ? 72 : 48
+        return full * canvas.headerHeight / 300
     }
 
     var colors: Colors {
@@ -183,8 +277,8 @@ private extension StorePage {
                 .textFont(size: .body)
                 .foregroundStyle(colors.note)
         }
-        .padding(.top, page.badge == nil ? 72 : 48)
-        .frame(height: 300, alignment: .top)
+        .padding(.top, topPadding)
+        .frame(height: canvas.headerHeight, alignment: .top)
     }
 
     @ViewBuilder
@@ -254,7 +348,83 @@ private extension StorePage {
                     .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
                     .offset(y: 220)
             }
+
+        case let .receipt(shot):
+            ZStack(alignment: .topLeading) {
+                phone(shot, width: 300)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.trailing, 20)
+                    .offset(y: 120)
+
+                scannedReceipt
+                    .rotationEffect(.degrees(-6))
+                    .offset(x: 32, y: 4)
+            }
         }
+    }
+
+    var scannedReceipt: some View {
+        VStack(spacing: 6) {
+            Text("スーパー青葉")
+                .textFont(size: .small, weight: .semibold)
+
+            Text("2026/11/03 18:24")
+                .textFont(size: .micro)
+                .foregroundStyle(Color(rgb: 0x8A8A8A))
+
+            receiptRule
+
+            ForEach(Self.receiptLines, id: \.name) { line in
+                HStack {
+                    Text(line.name)
+
+                    Spacer(minLength: 4)
+
+                    Text(line.amount)
+                        .monospacedDigit()
+                }
+                .textFont(size: .micro)
+            }
+
+            receiptRule
+
+            HStack {
+                Text("合計")
+
+                Spacer(minLength: 4)
+
+                Text("¥2,100")
+                    .monospacedDigit()
+            }
+            .textFont(size: .small, weight: .bold)
+        }
+        .foregroundStyle(Color(rgb: 0x333333))
+        .padding(.horizontal, 12)
+        .padding(.top, 16)
+        .padding(.bottom, 24)
+        .frame(width: 164)
+        .background(.white, in: ReceiptPaper())
+        .shadow(color: .black.opacity(0.18), radius: 12, y: 6)
+        .padding(16)
+        .overlay {
+            ViewfinderCorners()
+                .stroke(colors.badge, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+        }
+        .overlay(alignment: .topLeading) {
+            Image(systemName: "camera.fill")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(colors.badgeText)
+                .frame(width: 52, height: 52)
+                .background(colors.badge, in: .circle)
+                .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+                .offset(x: -16, y: -16)
+        }
+    }
+
+    var receiptRule: some View {
+        Line()
+            .stroke(Color(rgb: 0xBBBBBB), style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+            .frame(height: 1)
     }
 
     var tapMark: some View {
@@ -357,8 +527,244 @@ private extension StorePage {
     }
 }
 
+private struct StoreBanner: View {
+    let shots: [UIImage]
+    let canvas: SnapshotTests.Canvas
+
+    var body: some View {
+        let zoom = canvas.size.width / Self.designWidth
+        let height = canvas.size.height / zoom
+
+        HStack(spacing: 40) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("広告なしの家計簿")
+                    .textFont(size: .body, weight: .semibold)
+                    .tracking(2)
+                    .foregroundStyle(Color(rgb: 0xFBF7EF))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .background(Color(rgb: 0x9A6A2A), in: .capsule)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("今月あといくら？")
+                    Text("が、ひと目で")
+                }
+                .displayFont(.display, weight: .bold)
+                .foregroundStyle(Color(rgb: 0x5A3A12))
+
+                Text("レシートを撮れば、品目まで入る")
+                    .textFont(size: .body)
+                    .foregroundStyle(Color(rgb: 0x8A7357))
+            }
+            .fixedSize()
+
+            phones(height: height)
+        }
+        .frame(width: Self.designWidth, height: height)
+        .background {
+            LinearGradient(
+                colors: [Color(rgb: 0xFBF7EF), Color(rgb: 0xEBDDC4)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+        .clipped()
+        .scaleEffect(zoom, anchor: .topLeading)
+        .frame(width: canvas.size.width, height: canvas.size.height, alignment: .topLeading)
+        .environment(\.colorScheme, .light)
+        .environment(
+            \.themeStyle,
+            ThemeStyle(
+                corner: .standard,
+                displayFont: .mincho,
+                textFont: .gothic,
+                textSize: .standard
+            )
+        )
+    }
+}
+
+private extension StoreBanner {
+    static let designWidth: CGFloat = 800
+}
+
+private extension StoreBanner {
+    func phones(height: CGFloat) -> some View {
+        let limit: CGFloat = canvas == .header ? 150 : 180
+        let width = min(height * 0.52, limit)
+
+        return ZStack(alignment: .top) {
+            phone(shots[1], width: width * 0.86)
+                .rotationEffect(.degrees(-8), anchor: .bottom)
+                .offset(x: -width * 0.62, y: height * 0.2)
+
+            phone(shots[2], width: width * 0.86)
+                .rotationEffect(.degrees(8), anchor: .bottom)
+                .offset(x: width * 0.62, y: height * 0.2)
+
+            phone(shots[0], width: width)
+                .offset(y: height * 0.1)
+        }
+        .frame(width: width * 2.2, height: height, alignment: .top)
+    }
+
+    func phone(
+        _ shot: UIImage,
+        width: CGFloat
+    ) -> some View {
+        let scale = width / 360
+
+        return Image(uiImage: shot)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .clipShape(.rect(cornerRadius: 44 * scale))
+            .padding(10 * scale)
+            .background(Color.black, in: .rect(cornerRadius: 54 * scale))
+            .shadow(color: Color(rgb: 0x9A6A2A).opacity(0.3), radius: 16, y: 8)
+            .frame(width: width)
+    }
+}
+
+private struct ReceiptPaper: Shape {
+    func path(in rect: CGRect) -> Path {
+        let tooth: CGFloat = 8
+        let count = Int(rect.width / tooth)
+        let step = rect.width / CGFloat(count)
+        var path = Path()
+
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+
+        for index in 0..<count {
+            let x = rect.maxX - step * CGFloat(index)
+
+            path.addLine(to: CGPoint(x: x - step / 2, y: rect.maxY - tooth / 2))
+            path.addLine(to: CGPoint(x: x - step, y: rect.maxY))
+        }
+
+        path.closeSubpath()
+
+        return path
+    }
+}
+
+private struct ViewfinderCorners: Shape {
+    func path(in rect: CGRect) -> Path {
+        let length: CGFloat = 28
+        var path = Path()
+
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY + length))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.minX + length, y: rect.minY))
+
+        path.move(to: CGPoint(x: rect.maxX - length, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + length))
+
+        path.move(to: CGPoint(x: rect.maxX, y: rect.maxY - length))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX - length, y: rect.maxY))
+
+        path.move(to: CGPoint(x: rect.minX + length, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY - length))
+
+        return path
+    }
+}
+
+private struct Line: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+
+        path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+
+        return path
+    }
+}
+
 private extension SnapshotTests {
     static let directory = "__OUT__"
+    static let bannerShots = ["1-home", "3-receipt", "7-review"]
+
+    static let outerPages = [
+        Page(
+            file: "1-home",
+            badge: "広告なしの家計簿",
+            lines: ["今月あといくら？", "が、ひと目で"],
+            note: "予算の残りをメーターでお知らせ",
+            mood: .cream,
+            art: .phone("outer-1-home")
+        ),
+        Page(
+            file: "2-entry",
+            badge: nil,
+            lines: ["よく使う支出は、", "タップ 1 回"],
+            note: "テンプレートと電卓ですばやく記録",
+            mood: .blush,
+            art: .phone("outer-2-entry")
+        ),
+        Page(
+            file: "3-receipt",
+            badge: "NEW",
+            lines: ["レシートを撮れば、", "品目まで入る"],
+            note: "品名・合計・日付・店名を読み取り",
+            mood: .sage,
+            art: .receipt("outer-3-receipt")
+        ),
+        Page(
+            file: "4-theme",
+            badge: nil,
+            lines: ["色もアイコンも、", "自分好みに"],
+            note: "ライトとダーク、12 色のテーマを着せ替え",
+            mood: .night,
+            art: .fan(
+                left: "outer-4-theme-rose",
+                center: "outer-1-home",
+                right: "outer-4-theme-navy",
+                labels: ["ローズ", "ホワイト", "ネイビー"]
+            )
+        ),
+        Page(
+            file: "5-font",
+            badge: "PRO",
+            lines: ["文字の雰囲気も、", "選べる"],
+            note: "明朝・ゴシック・手書き・ドットなど 6 種類",
+            mood: .cream,
+            art: .compare(
+                "outer-5-font-hand",
+                parts: ["outer-1-home", "outer-5-font-hand"],
+                labels: ["明朝", "手書き"],
+                crop: CGRect(x: 52, y: 200, width: 1040, height: 560)
+            )
+        ),
+        Page(
+            file: "6-assets",
+            badge: nil,
+            lines: ["残高も引き落としも、", "まとめて"],
+            note: "口座ごとの残高と、カードの引き落とし日",
+            mood: .sand,
+            art: .phone("outer-6-assets")
+        ),
+        Page(
+            file: "7-review",
+            badge: nil,
+            lines: ["何に使ったか、", "すぐ分かる"],
+            note: "カテゴリごとの内訳と前の月との比べ",
+            mood: .sage,
+            art: .phone("outer-7-review")
+        ),
+        Page(
+            file: "8-records",
+            badge: nil,
+            lines: ["毎日の支出を、", "カレンダーで"],
+            note: "使わなかった日には印がつきます",
+            mood: .cream,
+            art: .phone("outer-8-records")
+        )
+    ]
 
     static let pages = [
         Page(
@@ -378,40 +784,48 @@ private extension SnapshotTests {
             art: .phone("2-entry")
         ),
         Page(
-            file: "3-theme",
+            file: "3-receipt",
+            badge: "NEW",
+            lines: ["レシートを撮れば、", "品目まで入る"],
+            note: "品名・合計・日付・店名を読み取り",
+            mood: .sage,
+            art: .receipt("3-receipt")
+        ),
+        Page(
+            file: "4-theme",
             badge: nil,
             lines: ["色もアイコンも、", "自分好みに"],
             note: "ライトとダーク、12 色のテーマを着せ替え",
             mood: .night,
             art: .fan(
-                left: "3-theme-rose",
-                center: "3-theme-white",
-                right: "3-theme-navy",
+                left: "4-theme-rose",
+                center: "4-theme-white",
+                right: "4-theme-navy",
                 labels: ["ローズ", "ホワイト", "ネイビー"]
             )
         ),
         Page(
-            file: "4-font",
+            file: "5-font",
             badge: "PRO",
             lines: ["文字の雰囲気も、", "選べる"],
             note: "明朝・ゴシック・手書き・ドットなど 6 種類",
             mood: .cream,
             art: .compare(
-                "4-font-hand",
-                parts: ["3-theme-white", "4-font-hand"],
+                "5-font-hand",
+                parts: ["4-theme-white", "5-font-hand"],
                 labels: ["明朝", "手書き"],
                 crop: CGRect(x: 160, y: 560, width: 1000, height: 520)
             )
         ),
         Page(
-            file: "5-assets",
+            file: "6-assets",
             badge: nil,
             lines: ["残高も引き落としも、", "まとめて"],
             note: "口座ごとの残高と、カードの引き落とし日",
-            mood: .sage,
+            mood: .sand,
             art: .inset(
-                "5-assets",
-                from: "5-assets",
+                "6-assets",
+                from: "6-assets",
                 crop: CGRect(x: 53, y: 1549, width: 1215, height: 534),
                 corner: 20,
                 width: 400,
@@ -419,22 +833,22 @@ private extension SnapshotTests {
             )
         ),
         Page(
-            file: "6-review",
+            file: "7-review",
             badge: nil,
             lines: ["何に使ったか、", "すぐ分かる"],
             note: "カテゴリごとの内訳と前の月との比べ",
-            mood: .sand,
-            art: .phone("6-review")
+            mood: .sage,
+            art: .phone("7-review")
         ),
         Page(
-            file: "7-records",
+            file: "8-records",
             badge: nil,
             lines: ["毎日の支出を、", "カレンダーで"],
             note: "使わなかった日には印がつきます",
             mood: .cream,
             art: .inset(
-                "7-records",
-                from: "7-records",
+                "8-records",
+                from: "8-records",
                 crop: CGRect(x: 69, y: 1270, width: 676, height: 430),
                 corner: 20,
                 width: 320,
@@ -442,22 +856,73 @@ private extension SnapshotTests {
             )
         ),
         Page(
-            file: "8-share",
+            file: "9-share",
             badge: "PRO",
             lines: ["家族と、", "ひとつの家計簿を"],
             note: "iCloud で記録をいっしょに",
             mood: .blush,
-            art: .pair("7-records", "8-share-rose")
+            art: .pair("8-records", "9-share-rose")
         ),
         Page(
-            file: "9-widget",
+            file: "10-widget",
             badge: nil,
             lines: ["アプリを開かずに、", "すぐ記録"],
             note: "ホーム画面のウィジェットから 1 タップ",
             mood: .sand,
-            art: .tap("9-widget", at: UnitPoint(x: 0.85, y: 0.372))
+            art: .tap("10-widget", at: UnitPoint(x: 0.85, y: 0.372))
         )
     ]
+
+    static let innerPages = [
+        Page(
+            file: "1-home",
+            badge: nil,
+            lines: ["広い画面で、", "家計をひと目で"],
+            note: "左のサイドバーから、すぐに切り替え",
+            mood: .cream,
+            art: .phone("inner-1-home")
+        ),
+        Page(
+            file: "2-review",
+            badge: nil,
+            lines: ["何に使ったか、", "並べて分かる"],
+            note: "内訳と前の月との比べを 2 列で",
+            mood: .sage,
+            art: .phone("inner-2-review")
+        ),
+        Page(
+            file: "3-assets",
+            badge: nil,
+            lines: ["残高も引き落としも、", "まとめて"],
+            note: "口座ごとの残高と、カードの引き落とし日",
+            mood: .sand,
+            art: .phone("inner-3-assets")
+        ),
+        Page(
+            file: "4-records",
+            badge: nil,
+            lines: ["毎日の支出を、", "カレンダーで"],
+            note: "使わなかった日には印がつきます",
+            mood: .blush,
+            art: .phone("inner-4-records")
+        ),
+        Page(
+            file: "5-entry",
+            badge: nil,
+            lines: ["よく使う支出は、", "タップ 1 回"],
+            note: "テンプレートと電卓ですばやく記録",
+            mood: .cream,
+            art: .phone("inner-5-entry")
+        )
+    ]
+
+    static var pageSets: [(Canvas, [Page])] {
+        [
+            (.phone, pages),
+            (.duoOuter, outerPages),
+            (.duoInner, innerPages)
+        ]
+    }
 
     static var screenshots: URL {
         URL(fileURLWithPath: directory)
@@ -509,25 +974,33 @@ private extension SnapshotTests {
 
         case let .pair(left, right):
             return try .pair(image(left), image(right))
+
+        case let .receipt(name):
+            return try .receipt(image(name))
         }
     }
 
     static func write(
         _ view: some View,
+        canvas: Canvas,
         to name: String
     ) throws {
         let renderer = ImageRenderer(content: view)
 
-        renderer.scale = 3
+        renderer.scale = canvas.scale
         renderer.isOpaque = true
-        renderer.proposedSize = ProposedViewSize(width: 440, height: 956)
+        renderer.proposedSize = ProposedViewSize(canvas.size)
 
         let image = try #require(renderer.cgImage)
         let data = try #require(UIImage(cgImage: image).pngData())
-        let url = URL(fileURLWithPath: directory).appending(path: "\(name).png")
+        let folder = URL(fileURLWithPath: directory).appending(path: canvas.folder)
 
-        try data.write(to: url)
-        try writeSmall(image, to: name)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try data.write(to: folder.appending(path: "\(name).png"))
+
+        if canvas == .phone {
+            try writeSmall(image, to: name)
+        }
     }
 
     static func writeSmall(
