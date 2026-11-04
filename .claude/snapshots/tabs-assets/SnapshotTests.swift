@@ -50,6 +50,16 @@ struct SnapshotTests {
                 .frame(height: 852)
 
             try Self.write(editing, variant: variant, to: "assets-goal-edit")
+
+            let card = try #require(model.rows.first { $0.unpaid != nil })
+            let unpaid = try #require(card.unpaid)
+            let bill = try #require(card.nextBill)
+            let content = AssetsEntrySheet.Content.unpaid(unpaid, of: card, bill: bill)
+
+            let unpaidSheet = AssetsEntrySheet(content: content) { _ in }
+                .frame(height: 1200)
+
+            try Self.write(unpaidSheet, variant: variant, to: "assets-unpaid")
         }
 
         task.cancel()

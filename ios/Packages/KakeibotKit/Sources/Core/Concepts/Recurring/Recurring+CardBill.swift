@@ -32,19 +32,29 @@ public extension Recurring {
         paidOn date: LocalDate,
         entries: [Entry]
     ) -> Int {
+        guard let billed = billedEntries(paidOn: date, entries: entries) else {
+            return amount
+        }
+
+        let used = billed.reduce(0) { $0 + Self.usage(of: $1) }
+
+        return max(used, 0)
+    }
+
+    func billedEntries(
+        paidOn date: LocalDate,
+        entries: [Entry]
+    ) -> [Entry]? {
         guard
             let period = billingPeriod(paidOn: date),
             let card = toWalletId
         else {
-            return amount
+            return nil
         }
 
-        let used = entries
+        return entries
             .filter { $0.walletId == card }
             .filter { isBilled($0, paidOn: date, in: period) }
-            .reduce(0) { $0 + Self.usage(of: $1) }
-
-        return max(used, 0)
     }
 
     func billMonth(

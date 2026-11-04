@@ -169,7 +169,7 @@ private extension AssetsView {
 
                         if let moves = Self.movesText(of: row) {
                             Button {
-                                movedBill = row
+                                entrySheet = .moved(row)
                             } label: {
                                 HStack(spacing: 4) {
                                     Label(
@@ -255,6 +255,29 @@ private extension AssetsView {
                 FlipDate(bill.date, size: .small)
 
                 AssetsDebtFacts(facts: nextBillFacts(bill), isInline: false)
+            }
+
+            if let unpaid = row.unpaid {
+                Button {
+                    entrySheet = .unpaid(unpaid, of: row, bill: bill)
+                } label: {
+                    HStack(spacing: 4) {
+                        Label(
+                            "未払いの記録を見る（\(unpaid.count) 件）",
+                            systemImage: "list.bullet"
+                        )
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+
+                        Image(systemName: "chevron.right")
+                            .sansFont(.micro, weight: .bold)
+                    }
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.accent)
+                    .padding(.vertical, 4)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
             }
         }
 

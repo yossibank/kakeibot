@@ -146,6 +146,15 @@ private extension AssetsModel {
         return EntryRowItem(entry, in: list, dayLabel: day)
     }
 
+    static func rows(
+        of entries: [Entry],
+        in list: EntryList
+    ) -> [EntryRowItem] {
+        entries
+            .sorted { $0.date < $1.date }
+            .map { row(of: $0, in: list) }
+    }
+
     func update() {
         entries = list?.days.flatMap(\.entries) ?? []
         holdings = makeHoldings()
@@ -236,10 +245,41 @@ private extension AssetsModel {
                 icon: list?.icons[wallet.iconId],
                 balance: balance,
                 nextBill: next?.bill,
+                unpaid: next.flatMap { unpaid(of: $0.bill) },
                 repayment: repayment(of: wallet),
                 repaidRatio: ratio
             )
         }
+    }
+
+    func unpaid(of bill: CardBill) -> Unpaid? {
+        let recurring = bill.recurring
+
+        guard
+            let list,
+            let card = recurring.toWalletId,
+            let period = bill.period,
+            let billed = recurring.billedEntries(paidOn: bill.date, entries: entries)
+        else {
+            return nil
+        }
+
+        let month = recurring.occurrenceMonth(of: bill.date)
+        let billedIds = Set(billed.map(\.id))
+
+        let later = entries
+            .filter { $0.walletId == card && $0.date <= today }
+            .filter { !billedIds.contains($0.id) }
+            .filter { entry in
+                entry.billMonth.map { $0 > month } ?? (entry.date > period.upperBound)
+            }
+
+        let unpaid = Unpaid(
+            billed: Self.rows(of: billed, in: list),
+            later: Self.rows(of: later, in: list)
+        )
+
+        return unpaid.count > 0 ? unpaid : nil
     }
 
     func makeMonthTotals() -> [MonthTotal] {

@@ -6,8 +6,14 @@ public extension AssetsModel {
         public let icon: Icon?
         public let balance: Int
         public let nextBill: CardBill?
+        public let unpaid: Unpaid?
         public let repayment: Repayment?
         public let repaidRatio: Double?
+    }
+
+    struct Unpaid: Equatable {
+        public let billed: [EntryRowItem]
+        public let later: [EntryRowItem]
     }
 
     enum Repayment: Equatable {
@@ -51,6 +57,12 @@ public extension AssetsModel.WalletRow {
         let repaid = loanAmount - max(-balance, 0)
 
         return Percent.floor(repaid, of: loanAmount)
+    }
+}
+
+public extension AssetsModel.Unpaid {
+    var count: Int {
+        billed.count + later.count
     }
 }
 
