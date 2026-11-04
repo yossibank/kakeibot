@@ -11,7 +11,7 @@ public extension EntryModel {
     }
 
     var showsReceiptGuide: Bool {
-        receiptSavedCount == 0
+        !receiptGuideHidden
     }
 
     var freeReceiptsLeft: Int {
@@ -69,6 +69,15 @@ public extension EntryModel {
 }
 
 extension EntryModel {
+    func hideReceiptGuide() async {
+        do {
+            try await database.setSetting(.receiptGuideHidden, to: true)
+            receiptGuideHidden = true
+        } catch {
+            report(error)
+        }
+    }
+
     func finishReceipt() async {
         guard showsItems else {
             isReceiptRead = false

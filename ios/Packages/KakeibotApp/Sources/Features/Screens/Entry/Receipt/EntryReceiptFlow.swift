@@ -5,6 +5,8 @@ import Observation
 @MainActor
 @Observable
 final class EntryReceiptFlow {
+    var hidesGuide = false
+
     private(set) var step: Step?
     private(set) var offer: String?
 
@@ -50,6 +52,7 @@ extension EntryReceiptFlow {
         }
 
         offer = nil
+        hidesGuide = false
         prepare()
         step = model.showsReceiptGuide ? .guide : .camera
     }
@@ -61,6 +64,14 @@ extension EntryReceiptFlow {
 
     func cancel() {
         step = nil
+    }
+
+    func saveGuideChoice(for model: EntryModel) async {
+        guard hidesGuide else {
+            return
+        }
+
+        await model.hideReceiptGuide()
     }
 
     func closeOffer() {

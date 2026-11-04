@@ -52,6 +52,7 @@ public final class EntryModel {
     public internal(set) var balances: [Wallet.ID: Int] = [:]
     public internal(set) var errorNotice = ErrorNotice()
     public internal(set) var receiptSavedCount = 0
+    public internal(set) var receiptGuideHidden = false
 
     var allTemplates: [EntryTemplate] = []
     var appliedTemplateId: EntryTemplate.ID?
@@ -144,6 +145,8 @@ public extension EntryModel {
             startsWithAmount = try await database.setting(.entryStartsWithAmount)
 
             receiptSavedCount = try await database.setting(.receiptSavedCount)
+
+            receiptGuideHidden = try await database.setting(.receiptGuideHidden)
 
             budgets = try await database.budgets()
 

@@ -35,12 +35,16 @@ extension EntrySheet {
             EntryGuideCard(
                 onConfirm: {
                     receipt.confirmGuide()
+                    saveReceiptGuideChoice()
                 },
+                hidesNext: $receipt.hidesGuide,
                 guide: .receipt
             ) {
                 withAnimation(.snappy) {
                     receipt.cancel()
                 }
+
+                saveReceiptGuideChoice()
             }
 
         case .reading:
@@ -68,6 +72,12 @@ private extension EntrySheet {
 }
 
 private extension EntrySheet {
+    func saveReceiptGuideChoice() {
+        Task {
+            await receipt.saveGuideChoice(for: model)
+        }
+    }
+
     func scanReceipt(_ pages: [CGImage]) async {
         let outcome = await receipt.scan(pages, into: model)
 

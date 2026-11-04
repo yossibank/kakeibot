@@ -97,6 +97,10 @@ public extension SettingKey where Value == Bool {
         Self(flag: .entryOpened)
     }
 
+    static var receiptGuideHidden: Self {
+        Self(flag: .receiptGuideHidden)
+    }
+
     static var settingsOpened: Self {
         Self(flag: .settingsOpened)
     }

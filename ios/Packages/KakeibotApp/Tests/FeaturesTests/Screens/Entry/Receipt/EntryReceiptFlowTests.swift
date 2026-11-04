@@ -45,9 +45,25 @@ struct EntryReceiptFlowTests {
     }
 
     @Test
-    func opensCameraAfterFirstReceipt() async throws {
+    func showsGuideAfterFirstReceipt() async throws {
         let setup = try await EntryModelTests.Setup()
         try await setup.database.setSetting(.receiptSavedCount, to: 1)
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        let flow = EntryReceiptFlow { _ in
+            ReceiptReading()
+        }
+
+        flow.start(for: model, isPro: true)
+
+        #expect(flow.step == .guide)
+        #expect(flow.offer == nil)
+    }
+
+    @Test
+    func opensCameraWhenGuideIsHidden() async throws {
+        let setup = try await EntryModelTests.Setup()
+        try await setup.database.setSetting(.receiptGuideHidden, to: true)
         let model = EntryModel(database: setup.database, date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
@@ -58,6 +74,49 @@ struct EntryReceiptFlowTests {
 
         #expect(flow.step == .camera)
         #expect(flow.offer == nil)
+    }
+
+    @Test
+    func hidesGuideWhenChecked() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        let flow = EntryReceiptFlow { _ in
+            ReceiptReading()
+        }
+
+        flow.start(for: model, isPro: false)
+        flow.hidesGuide = true
+        flow.cancel()
+        await flow.saveGuideChoice(for: model)
+        let saved = try await setup.database.setting(.receiptGuideHidden)
+
+        flow.start(for: model, isPro: false)
+
+        #expect(saved)
+        #expect(!flow.hidesGuide)
+        #expect(flow.step == .camera)
+    }
+
+    @Test
+    func keepsGuideWhenUnchecked() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        let flow = EntryReceiptFlow { _ in
+            ReceiptReading()
+        }
+
+        flow.start(for: model, isPro: false)
+        flow.confirmGuide()
+        await flow.saveGuideChoice(for: model)
+        let saved = try await setup.database.setting(.receiptGuideHidden)
+
+        flow.cancel()
+        flow.start(for: model, isPro: false)
+
+        #expect(!saved)
+        #expect(flow.step == .guide)
     }
 
     @Test
@@ -79,7 +138,7 @@ struct EntryReceiptFlowTests {
         #expect(offer == EntryReceiptFlow.offerFeature)
         #expect(step == nil)
         #expect(flow.offer == nil)
-        #expect(flow.step == .camera)
+        #expect(flow.step == .guide)
     }
 
     @Test

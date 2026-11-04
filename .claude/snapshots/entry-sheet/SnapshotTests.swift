@@ -134,7 +134,11 @@ private extension SnapshotTests {
                 .background(Palette.background)
                 .environment(\.canScanReceipt, true)
 
-            let guide = EntryGuideCard(onConfirm: {}, guide: .receipt) {}
+            let guide = EntryGuideCard(
+                onConfirm: {},
+                hidesNext: .constant(false),
+                guide: .receipt
+            ) {}
                 .frame(width: Self.phone.width, height: Self.phone.height)
                 .background(Palette.background)
 
