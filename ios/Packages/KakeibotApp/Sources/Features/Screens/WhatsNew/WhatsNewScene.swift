@@ -31,6 +31,9 @@ extension WhatsNewScene {
         case carryoverSwitch
         case carryoverLeft
         case carryoverNext
+        case monthStartDay
+        case monthStartShift
+        case monthStartPeriod
     }
 }
 
@@ -87,6 +90,17 @@ private extension WhatsNewScene {
 
         case .carryoverNext:
             carryoverNext
+
+        case .monthStartDay:
+            monthStartDay
+
+        case .monthStartShift:
+            tapped {
+                monthStartShift
+            }
+
+        case .monthStartPeriod:
+            monthStartPeriod
         }
     }
 
@@ -224,6 +238,90 @@ private extension WhatsNewScene {
         .monospacedDigit()
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
+    }
+
+    var monthStartDay: some View {
+        VStack(spacing: 8) {
+            Text("月の始まり")
+                .textFont(size: .micro, weight: .semibold)
+                .tracking(1)
+                .foregroundStyle(Palette.accent)
+
+            HStack(spacing: 4) {
+                ForEach(23...27, id: \.self) { day in
+                    let isSelected = day == 25
+
+                    Text("\(day)")
+                        .textFont(size: .caption, weight: isSelected ? .bold : .regular)
+                        .monospacedDigit()
+                        .foregroundStyle(isSelected ? Palette.backgroundTop : Palette.text)
+                        .frame(width: 22, height: 22)
+                        .background(isSelected ? Palette.accent : .clear, in: Circle())
+                }
+            }
+
+            Text("毎月 25 日")
+                .textFont(size: .caption)
+                .foregroundStyle(Palette.subtext)
+        }
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
+        .card(cornerRadius: 12)
+        .padding(.horizontal, 4)
+    }
+
+    var monthStartShift: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("土日・祝日のとき")
+                .textFont(size: .micro, weight: .semibold)
+                .foregroundStyle(Palette.accent)
+
+            ForEach(HolidayShift.allCases, id: \.self) { shift in
+                let isSelected = shift == .previous
+
+                Text(shift.title)
+                    .textFont(size: .caption, weight: isSelected ? .semibold : .regular)
+                    .foregroundStyle(isSelected ? Palette.accentStrong : Palette.subtext)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 24)
+                    .background(SettingsTile.fill(isSelected: isSelected), in: .capsule)
+                    .overlay {
+                        Capsule()
+                            .stroke(SettingsTile.stroke(isSelected: isSelected), lineWidth: 1)
+                    }
+            }
+        }
+        .padding(.horizontal, 12)
+    }
+
+    var monthStartPeriod: some View {
+        VStack(spacing: 4) {
+            Text("11月の始まり")
+                .textFont(size: .caption)
+                .foregroundStyle(Palette.subtext)
+
+            HStack(spacing: 4) {
+                Text("25日(日)")
+                    .strikethrough()
+                    .foregroundStyle(Palette.hint)
+
+                Image(systemName: "arrow.right")
+                    .foregroundStyle(Palette.hint)
+
+                Text("23日(金)")
+                    .bold()
+                    .foregroundStyle(Palette.accentStrong)
+            }
+            .textFont(size: .caption)
+
+            Text("10/23〜11/24")
+                .displayFont(.body, weight: .bold)
+                .foregroundStyle(Palette.accentStrong)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 2)
+                .background(Palette.accent.opacity(.subtle), in: .capsule)
+        }
+        .monospacedDigit()
     }
 
     func tapped(@ViewBuilder _ content: () -> some View) -> some View {

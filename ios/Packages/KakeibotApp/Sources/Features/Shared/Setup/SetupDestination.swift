@@ -32,6 +32,14 @@ public struct SetupDestination: View {
                 )
             )
 
+        case .monthStart:
+            MonthStartDayView(
+                model: MonthStartDayModel(
+                    database: database,
+                    today: today
+                )
+            )
+
         case .wallets:
             WalletListView(database: database)
 

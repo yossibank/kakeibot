@@ -2,6 +2,7 @@ import Store
 
 public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
     case budget
+    case monthStart
     case wallets
     case categories
     case recurrings
@@ -43,6 +44,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
     public var title: String {
         switch self {
         case .budget: "月の予算"
+        case .monthStart: "月の始まり"
         case .wallets: "口座と今の残高"
         case .categories: "使うカテゴリ"
         case .recurrings: "固定費"
@@ -60,6 +62,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
     public var systemImage: String {
         switch self {
         case .budget: "chart.bar"
+        case .monthStart: "calendar"
         case .wallets: "building.columns"
         case .categories: "tag"
         case .recurrings: "repeat"
@@ -81,7 +84,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         case .recurrings: progress.hasRecurring
         case .reminder: progress.hasReminder
         case .theme: progress.hasTheme
-        case .categories, .templates, .launchScreen, .appIcon, .themeStyle, .themeLook,
+        case .monthStart, .categories, .templates, .launchScreen, .appIcon, .themeStyle, .themeLook,
              .homeSections: false
         }
     }
