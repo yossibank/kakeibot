@@ -169,11 +169,7 @@ public struct RecordsView: View {
 
 private extension RecordsView {
     var header: some View {
-        Text("記録")
-            .displayFont(.body)
-            .tracking(3)
-            .foregroundStyle(Palette.accent)
-            .frame(maxWidth: .infinity, alignment: .leading)
+        TabHeader("記録")
     }
 
     var monthStepper: some View {

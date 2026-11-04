@@ -87,14 +87,7 @@ public struct ReviewView: View {
 
 private extension ReviewView {
     var header: some View {
-        HStack {
-            Text("振り返り")
-                .displayFont(.body)
-                .tracking(3)
-                .foregroundStyle(Palette.accent)
-
-            Spacer()
-
+        TabHeader("振り返り") {
             CapsulePicker(
                 selection: scaleBinding,
                 options: Self.scaleOptions
