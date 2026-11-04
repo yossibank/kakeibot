@@ -369,13 +369,10 @@ private extension AssetsView {
 
     func nextBillFacts(_ bill: CardBill) -> [AssetsDebtFacts.Fact] {
         let date = "\(bill.date.month)/\(bill.date.day)"
-        let days = model.today.days(until: bill.date)
-        let tomorrow = AssetsDebtFacts.Fact("明日")
-        let later = AssetsDebtFacts.Fact(lead: "あと", "\(days)", trail: "日")
 
         return [
             .init(date, trail: "引き落とし"),
-            days == 1 ? tomorrow : later
+            daysFact(until: bill.date)
         ]
     }
 
@@ -395,7 +392,11 @@ private extension AssetsView {
     }
 
     func daysText(until date: LocalDate) -> String {
+        daysFact(until: date).text
+    }
+
+    func daysFact(until date: LocalDate) -> AssetsDebtFacts.Fact {
         let days = model.today.days(until: date)
-        return days == 1 ? "明日" : "あと \(days) 日"
+        return days == 1 ? .init("明日") : .init(lead: "あと", "\(days)", trail: "日")
     }
 }

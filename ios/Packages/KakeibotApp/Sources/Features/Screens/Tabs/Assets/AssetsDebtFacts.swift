@@ -19,6 +19,10 @@ extension AssetsDebtFacts {
         let value: String
         let trail: String?
 
+        var text: String {
+            [lead, value, trail].compactMap(\.self).joined(separator: " ")
+        }
+
         init(
             lead: String? = nil,
             _ value: String,
