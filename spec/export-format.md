@@ -55,6 +55,7 @@
 | `closingDay`（`recurrings`） | 無ければ、空として読む |
 | `walletId`（`categories`） | 無ければ、空として読む |
 | `fee`（`recurrings`） | 無ければ、空として読む |
+| `billShift`（`templates`・`recurrings`） | 無ければ、`0` として読む |
 | `loanAmount`（`wallets`） | 無ければ、空として読む |
 | `valuations` | 無いファイルは、空として読む |
 | `tags` | 無いファイルは、空として読む。記録とテンプレート（`EntryTemplate`）の `tagId` も、無ければ空として読む |

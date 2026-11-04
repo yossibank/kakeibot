@@ -87,6 +87,7 @@ public extension EntryModel {
         tagId = recordableTagId(of: template)
         walletId = template.walletId
         appliedTemplateId = template.id
+        billMonth = billRecurring?.billMonth(for: date, shift: template.billShift)
 
         if let memo = template.filledMemo {
             self.memo = memo

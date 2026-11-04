@@ -102,6 +102,24 @@ struct SnapshotTests {
             )
         }
 
+        let card = options.wallets.first { $0.kind == .card }
+
+        templateEdit.walletId = card?.id
+        recurringEdit.walletId = card?.id
+
+        for variant in Self.variants {
+            try Self.write(
+                TemplateEditSheet(model: templateEdit).drawerBody(.wallet).padding(20),
+                variant: variant,
+                to: "settings-template-bill"
+            )
+            try Self.write(
+                RecurringEditSheet(model: recurringEdit).drawerBody(.wallet).padding(20),
+                variant: variant,
+                to: "settings-recurring-bill"
+            )
+        }
+
         for variant in Self.variants {
             try Self.write(sheet, variant: variant, to: "settings")
             try Self.write(wallets, variant: variant, to: "settings-wallets")

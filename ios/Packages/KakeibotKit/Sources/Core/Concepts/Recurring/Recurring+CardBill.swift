@@ -1,8 +1,13 @@
 public extension Recurring {
     static let billChoiceCount = 3
+    static let billShiftTitles = ["いつもどおり", "次に回す", "2 回先"]
 
     static func billText(paidOn date: LocalDate) -> String {
         "\(date.month)/\(date.day)払い"
+    }
+
+    static func clampedBillShift(_ shift: Int) -> Int {
+        min(max(shift, 0), billChoiceCount - 1)
     }
 
     func billingPeriod(paidOn date: LocalDate) -> ClosedRange<LocalDate>? {
@@ -42,6 +47,22 @@ public extension Recurring {
         return max(used, 0)
     }
 
+    func billMonth(
+        for used: LocalDate,
+        shift: Int
+    ) -> YearMonth? {
+        let dates = billDates(for: used, count: Self.billChoiceCount)
+
+        guard
+            shift > 0,
+            dates.indices.contains(shift)
+        else {
+            return nil
+        }
+
+        return occurrenceMonth(of: dates[shift])
+    }
+
     func billDate(
         for used: LocalDate,
         in month: YearMonth
@@ -75,6 +96,16 @@ public extension Recurring {
         }
 
         return dates
+    }
+}
+
+public extension [Recurring] {
+    func cardBill(paidBy walletId: Wallet.ID?) -> Recurring? {
+        first { recurring in
+            recurring.type == .transfer
+                && recurring.closingDay != nil
+                && recurring.toWalletId == walletId
+        }
     }
 }
 

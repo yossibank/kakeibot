@@ -13,6 +13,7 @@ public struct RecurringDraft: Hashable, Sendable {
     public var holidayShift: HolidayShift
     public var closingDay: Int?
     public var fee: Int
+    public var billShift: Int
     public var startDate: LocalDate
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
@@ -30,6 +31,7 @@ public struct RecurringDraft: Hashable, Sendable {
         holidayShift: HolidayShift = .none,
         closingDay: Int? = nil,
         fee: Int = 0,
+        billShift: Int = 0,
         startDate: LocalDate,
         endDate: LocalDate? = nil,
         remindDaysBefore: Int? = nil
@@ -46,6 +48,7 @@ public struct RecurringDraft: Hashable, Sendable {
         self.holidayShift = holidayShift
         self.closingDay = closingDay
         self.fee = fee
+        self.billShift = billShift
         self.startDate = startDate
         self.endDate = endDate
         self.remindDaysBefore = remindDaysBefore
@@ -65,6 +68,7 @@ public struct RecurringDraft: Hashable, Sendable {
             holidayShift: recurring.holidayShift,
             closingDay: recurring.closingDay,
             fee: recurring.fee ?? 0,
+            billShift: recurring.billShift,
             startDate: recurring.startDate,
             endDate: recurring.endDate,
             remindDaysBefore: recurring.remindDaysBefore
@@ -153,6 +157,7 @@ public extension RecurringDraft {
             holidayShift: holidayShift,
             closingDay: cardClosingDay,
             fee: savedFee,
+            billShift: savedBillShift,
             startDate: startDate,
             endDate: endDate,
             remindDaysBefore: remindDaysBefore,
@@ -181,6 +186,7 @@ public extension RecurringDraft {
         updated.holidayShift = holidayShift
         updated.closingDay = cardClosingDay
         updated.fee = savedFee
+        updated.billShift = savedBillShift
         updated.startDate = startDate
         updated.endDate = endDate
         updated.remindDaysBefore = remindDaysBefore
@@ -222,6 +228,10 @@ private extension RecurringDraft {
         type == .transfer && fee > 0
             ? fee
             : nil
+    }
+
+    var savedBillShift: Int {
+        type == .transfer ? 0 : Recurring.clampedBillShift(billShift)
     }
 
     var savedAmount: Int {

@@ -34,14 +34,23 @@ extension TemplateEditSheet {
                 .padding(.bottom, 8)
 
         case .wallet:
-            SettingsTileGrid(items: model.wallets, columns: 2, spacing: 8) { wallet in
-                SettingsWalletTile(
-                    wallet: wallet,
-                    icon: model.icon(for: wallet),
-                    isSelected: model.walletId == wallet.id
-                ) {
-                    model.walletId = wallet.id
-                    closePanel()
+            VStack(alignment: .leading, spacing: 16) {
+                SettingsTileGrid(items: model.wallets, columns: 2, spacing: 8) { wallet in
+                    SettingsWalletTile(
+                        wallet: wallet,
+                        icon: model.icon(for: wallet),
+                        isSelected: model.walletId == wallet.id
+                    ) {
+                        model.walletId = wallet.id
+
+                        if model.billRecurring == nil {
+                            closePanel()
+                        }
+                    }
+                }
+
+                if model.billRecurring != nil {
+                    SettingsBillShiftPicker(shift: $model.billShift, dates: [])
                 }
             }
             .padding(.bottom, 8)

@@ -92,6 +92,14 @@ extension AppDatabase {
             draft.tagId = nil
         }
 
+        draft.billMonth = try billMonth(
+            paidBy: template.walletId,
+            type: template.type,
+            on: date,
+            shift: template.billShift,
+            in: db
+        )
+
         return draft
     }
 }

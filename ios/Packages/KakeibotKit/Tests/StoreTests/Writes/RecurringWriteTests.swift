@@ -149,6 +149,41 @@ struct RecurringWriteTests {
         #expect(snapshot.noSpendDays.isEmpty)
         #expect(snapshot.entries.count == 1)
     }
+
+    @Test
+    func recordsShiftedBillMonthOfCardRecurring() async throws {
+        let setup = try await Setup()
+        let bill = try await setup.database.insertCardBill(at: setup.now)
+        let options = try await setup.database.entryOptions()
+        let start = try #require(LocalDate("2026-01-01"))
+        let today = try #require(LocalDate("2026-02-28"))
+
+        let subscription = try Recurring(
+            type: .expense,
+            amount: 1200,
+            categoryId: options.expenseCategories[0].id,
+            walletId: #require(bill.toWalletId),
+            frequency: .monthly,
+            day: 20,
+            billShift: 1,
+            startDate: start,
+            createdAt: setup.now,
+            updatedAt: setup.now
+        )
+
+        try await setup.database.writer.write { db in
+            try subscription.insert(db)
+        }
+
+        try await setup.database.generateRecurringEntries(through: today, at: setup.now)
+
+        let all = try setup.database.snapshot().entries
+        let entries = all.filter { $0.recurringId == subscription.id }
+
+        #expect(!entries.isEmpty)
+        #expect(entries.allSatisfy { $0.billMonth != nil })
+        #expect(entries.allSatisfy { $0.billMonth == bill.billMonth(for: $0.date, shift: 1) })
+    }
 }
 
 extension RecurringWriteTests {

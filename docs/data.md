@@ -249,6 +249,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | tag_id | TEXT | 空でもよい。入れるなら category_id のタグ |
 | wallet_id | TEXT | |
 | memo | TEXT | |
+| bill_shift | INTEGER | 0〜2。wallet_id がカードのとき、使った日の何回あとの引き落としに入れるか。カードでなければ 0 |
 | sort_order | INTEGER | |
 | archived_at | TEXT | |
 | created_at / updated_at | TEXT | |
@@ -294,6 +295,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | holiday_shift | TEXT | `none` `previous` `next`。休日に当たったら、そのまま・前の平日・次の平日にする |
 | closing_day | INTEGER | 振替だけで、1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にし、amount は 0 にする |
 | fee | INTEGER | 振替だけで、1 以上。あれば、記録するときに手数料も記録する |
+| bill_shift | INTEGER | 0〜2。テンプレートと同じ。振替では 0 |
 | start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |

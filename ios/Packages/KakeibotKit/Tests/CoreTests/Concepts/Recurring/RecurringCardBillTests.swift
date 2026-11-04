@@ -121,6 +121,75 @@ struct RecurringCardBillTests {
         #expect(dates.map(\.description) == ["2026-09-10", "2026-10-10", "2026-11-10"])
     }
 
+    @Test(arguments: [1, 2])
+    func findsBillMonthOfShiftedBill(shift: Int) throws {
+        let bill = try Self.bill(closingDay: 31)
+        let used = try #require(LocalDate("2026-08-31"))
+        let dates = bill.billDates(for: used, count: 3)
+
+        let month = bill.billMonth(for: used, shift: shift)
+
+        #expect(month == bill.occurrenceMonth(of: dates[shift]))
+        #expect(month != nil)
+    }
+
+    @Test(arguments: [0, 3, -1])
+    func skipsBillMonthOutsideShiftRange(shift: Int) throws {
+        let bill = try Self.bill(closingDay: 31)
+        let used = try #require(LocalDate("2026-08-31"))
+
+        let month = bill.billMonth(for: used, shift: shift)
+
+        #expect(month == nil)
+    }
+
+    @Test
+    func skipsBillMonthWithoutClosingDay() throws {
+        var bill = try Self.bill(closingDay: 31)
+        bill.closingDay = nil
+        let used = try #require(LocalDate("2026-08-31"))
+
+        let month = bill.billMonth(for: used, shift: 1)
+
+        #expect(month == nil)
+    }
+
+    @Test(arguments: [(-1, 0), (0, 0), (1, 1), (2, 2), (5, 2)])
+    func clampsBillShift(shift: Int, expected: Int) {
+        #expect(Recurring.clampedBillShift(shift) == expected)
+    }
+
+    @Test
+    func findsCardBillOfWallet() throws {
+        let bill = try Self.bill(closingDay: 15)
+        let card = try #require(bill.toWalletId)
+        var noClosing = try Self.bill(closingDay: 15)
+        noClosing.closingDay = nil
+        var expense = try Self.bill(closingDay: 15)
+        expense.type = .expense
+
+        let found = [noClosing, expense, bill].cardBill(paidBy: card)
+
+        #expect(found?.id == bill.id)
+    }
+
+    @Test
+    func skipsCardBillWithoutClosingDayOrExpense() throws {
+        var noClosing = try Self.bill(closingDay: 15)
+        noClosing.closingDay = nil
+        var expense = try Self.bill(closingDay: 15)
+        expense.type = .expense
+        let other = try Self.bill(closingDay: 15)
+
+        let none = [noClosing, expense].cardBill(paidBy: noClosing.toWalletId)
+        let noneForExpense = [expense].cardBill(paidBy: expense.toWalletId)
+        let otherCard = [other].cardBill(paidBy: Wallet.ID())
+
+        #expect(none == nil)
+        #expect(noneForExpense == nil)
+        #expect(otherCard == nil)
+    }
+
     @Test
     func listsBillDatesBeforeStartFromUsualOne() throws {
         var bill = try Self.bill(closingDay: 31)

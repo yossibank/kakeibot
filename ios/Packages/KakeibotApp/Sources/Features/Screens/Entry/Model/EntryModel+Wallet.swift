@@ -75,7 +75,7 @@ public extension EntryModel {
             return nil
         }
 
-        return cardBills.first { $0.toWalletId == walletId }
+        return cardBills.cardBill(paidBy: walletId)
     }
 
     var billChoices: [BillChoice] {
@@ -85,7 +85,7 @@ public extension EntryModel {
 
         let dates = bill.billDates(for: date, count: Recurring.billChoiceCount)
 
-        return zip(dates, Self.billTitles).map { date, title in
+        return zip(dates, Recurring.billShiftTitles).map { date, title in
             BillChoice(
                 date: date,
                 title: title,
@@ -185,8 +185,6 @@ extension EntryModel {
 }
 
 private extension EntryModel {
-    static let billTitles = ["いつもどおり", "次に回す", "2 回先"]
-
     func updateBalances() {
         guard let list = history else {
             return
