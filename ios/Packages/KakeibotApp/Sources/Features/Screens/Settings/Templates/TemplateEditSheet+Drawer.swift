@@ -34,7 +34,7 @@ extension TemplateEditSheet {
                 .padding(.bottom, 8)
 
         case .wallet:
-            SettingsTileGrid(items: model.wallets, columns: 3, spacing: 8) { wallet in
+            SettingsTileGrid(items: model.wallets, columns: 2, spacing: 8) { wallet in
                 SettingsWalletTile(
                     wallet: wallet,
                     icon: model.icon(for: wallet),
