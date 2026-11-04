@@ -227,7 +227,7 @@ extension EntryModelTests {
         #expect(manual == 0)
         #expect(read == 1)
         #expect(model.receiptSavedCount == 1)
-        #expect(!model.showsReceiptGuide)
+        #expect(model.showsReceiptGuide)
     }
 
     @Test

@@ -47,6 +47,7 @@ public extension Setting {
         case closedHiddenLists = "closed_hidden_lists"
         case recentSearches = "recent_searches"
         case receiptSavedCount = "receipt_saved_count"
+        case receiptGuideHidden = "receipt_guide_hidden"
         case widgetEntry = "widget_entry"
         case feeCategoryId = "fee_category_id"
         case transferOutCategoryId = "transfer_out_category_id"

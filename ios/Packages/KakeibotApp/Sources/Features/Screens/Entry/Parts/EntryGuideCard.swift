@@ -5,6 +5,7 @@ struct EntryGuideCard: View {
     @State private var isShown = false
 
     var onConfirm: (() -> Void)?
+    var hidesNext: Binding<Bool>?
 
     let guide: Guide
     let onClose: () -> Void
@@ -31,6 +32,10 @@ struct EntryGuideCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 EntryReceiptRule(style: .double)
+
+                if let hidesNext {
+                    hideCheck(hidesNext)
+                }
 
                 PrimaryButton(guide.buttonTitle, action: onConfirm ?? onClose)
             }
@@ -133,6 +138,26 @@ private extension EntryGuideCard {
         }
     }
 
+    func hideCheck(_ hidesNext: Binding<Bool>) -> some View {
+        let symbol = hidesNext.wrappedValue ? "checkmark.square.fill" : "square"
+
+        return Button {
+            hidesNext.wrappedValue.toggle()
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: symbol)
+                    .foregroundStyle(Palette.accent)
+
+                Text("次から表示しない")
+                    .foregroundStyle(Palette.subtext)
+            }
+            .textFont(.footnote)
+            .frame(maxWidth: .infinity, minHeight: 32, alignment: .leading)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
     @ViewBuilder
     func stepMark(_ step: Step) -> some View {
         if let art = step.art {
@@ -156,6 +181,6 @@ private extension EntryGuideCard {
 }
 
 #Preview("撮り方") {
-    EntryGuideCard(onConfirm: {}, guide: .receipt) {}
+    EntryGuideCard(onConfirm: {}, hidesNext: .constant(false), guide: .receipt) {}
         .background(Palette.background)
 }
