@@ -9,11 +9,13 @@ struct RecurringQuickCard: View {
 
     var body: some View {
         SettingsFormCard {
-            SettingsAmountButton(
-                amount: model.amount,
-                text: model.isCardBill ? "カードの利用分" : nil
-            ) {
-                onOpen(model.isCardBill ? .closing : .amount)
+            SettingsFormSection("金額") {
+                SettingsAmountButton(
+                    amount: model.amount,
+                    text: model.isCardBill ? "カードの利用分" : nil
+                ) {
+                    onOpen(model.isCardBill ? .closing : .amount)
+                }
             }
 
             if model.type != .transfer {

@@ -10,7 +10,6 @@ public struct RecurringEditSheet: View {
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
-    @State private var isShowingDetails = false
 
     @FocusState private var focus: Field?
 
@@ -172,7 +171,7 @@ private extension RecurringEditSheet {
                 open(panel)
             }
 
-            SettingsDetails(isOpen: $isShowingDetails, chips: detailChips) {
+            SettingsDetails {
                 SettingsRowList(items: detailItems) { panel in
                     open(panel)
                 }

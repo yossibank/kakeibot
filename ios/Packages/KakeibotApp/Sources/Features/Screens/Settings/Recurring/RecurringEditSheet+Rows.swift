@@ -7,30 +7,6 @@ extension RecurringEditSheet {
     var detailItems: [SettingsRowList<Panel>.Item] {
         transferItems + scheduleItems
     }
-
-    var detailChips: [String] {
-        let end = model.endDate.map(RecurringText.date) ?? "なし"
-        let fee = model.fee > 0 ? AmountText.text(model.fee) : "なし"
-
-        let schedule = [
-            "\(RecurringText.date(model.startDate)) から",
-            model.endDate == nil ? "終わりなし" : "\(end) まで",
-            "休日 \(model.holidayShift.title)",
-            RecurringText.remind(model.remindDaysBefore)
-        ]
-
-        var transfer: [String] = []
-
-        if model.canUseClosingDay {
-            transfer.append(RecurringText.closingDay(model.closingDay))
-        }
-
-        if model.type == .transfer {
-            transfer.append("手数料 \(fee)")
-        }
-
-        return transfer + schedule
-    }
 }
 
 private extension RecurringEditSheet {

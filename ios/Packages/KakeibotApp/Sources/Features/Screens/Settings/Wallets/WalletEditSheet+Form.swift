@@ -30,7 +30,7 @@ extension WalletEditSheet {
             }
 
             if !rowItems.isEmpty {
-                SettingsDetails(isOpen: $isShowingDetails, chips: detailChips) {
+                SettingsDetails {
                     SettingsRowList(items: rowItems) { panel in
                         open(panel)
                     }

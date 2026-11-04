@@ -14,7 +14,6 @@ public struct TemplateEditSheet: View {
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingHideChanges = false
     @State private var isConfirmingDelete = false
-    @State private var isShowingDetails = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -175,15 +174,11 @@ private extension TemplateEditSheet {
         SettingsEditForm(showsSave: focus == nil) {
             preview
 
-            VStack(alignment: .leading, spacing: 8) {
-                TemplateQuickCard(model: model) { panel in
-                    open(panel)
-                }
-
-                SettingsCaption("金額を空にすると、使うときに入れられます。")
+            TemplateQuickCard(model: model) { panel in
+                open(panel)
             }
 
-            SettingsDetails(isOpen: $isShowingDetails, chips: detailChips) {
+            SettingsDetails {
                 SettingsRowList(items: detailItems) { panel in
                     open(panel)
                 }
@@ -210,12 +205,6 @@ private extension TemplateEditSheet {
 
     var memoValue: String {
         model.memo.isEmpty ? "なし" : model.memo
-    }
-
-    var detailChips: [String] {
-        let tag = model.selectedTag.map { "タグ \($0.name)" } ?? "タグなし"
-        let memo = model.memo.isEmpty ? "メモなし" : "メモ \(model.memo)"
-        return [tag, memo]
     }
 
     var detailItems: [SettingsRowList<Panel>.Item] {

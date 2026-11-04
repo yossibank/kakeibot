@@ -57,10 +57,6 @@ extension WalletEditSheet {
         return payment + loan
     }
 
-    var detailChips: [String] {
-        rowItems.map { "\($0.title) \($0.value)" }
-    }
-
     var noteColor: Color {
         Color(hex: model.icon.color) ?? Palette.subtext
     }

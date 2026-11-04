@@ -9,11 +9,17 @@ struct TemplateQuickCard: View {
 
     var body: some View {
         SettingsFormCard {
-            SettingsAmountButton(
-                amount: model.amount ?? 0,
-                text: model.amount == nil ? "毎回入れる" : nil
-            ) {
-                onOpen(.amount)
+            SettingsFormSection("金額") {
+                VStack(alignment: .leading, spacing: 8) {
+                    SettingsAmountButton(
+                        amount: model.amount ?? 0,
+                        text: model.amount == nil ? "毎回入れる" : nil
+                    ) {
+                        onOpen(.amount)
+                    }
+
+                    SettingsCaption("金額を空にすると、使うときに入れられます。")
+                }
             }
 
             SettingsFormSection("カテゴリ") {
