@@ -104,6 +104,7 @@ private extension AssetsView {
     }
 
     func walletRow(_ row: AssetsModel.WalletRow) -> some View {
+        let facts = owedFacts(of: row)
         let note = owedNote(of: row)
 
         return HStack(alignment: .top, spacing: 12) {
@@ -132,6 +133,10 @@ private extension AssetsView {
                         .foregroundStyle(Self.amountColor(of: row))
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
+                }
+
+                if let facts {
+                    AssetsDebtFacts(facts: facts)
                 }
 
                 if row.repaidRatio != nil || note != nil {
@@ -291,18 +296,22 @@ private extension AssetsView {
         }
     }
 
-    static func repaymentText(_ repayment: AssetsModel.Repayment) -> String {
+    static func repaymentText(_ repayment: AssetsModel.Repayment) -> String? {
         switch repayment {
         case .unset: "返済は未設定"
         case .finished: "返し終わりました"
         case .open: "返し終わる時期は未定"
-        case let .until(payoff): payoffText(payoff)
+        case .until: nil
         }
     }
 
-    static func payoffText(_ payoff: LoanPayoff) -> String {
+    static func payoffFacts(_ payoff: LoanPayoff) -> [AssetsDebtFacts.Fact] {
         let date = payoff.lastDate
-        return "あと \(payoff.count) 回・\(String(date.year))/\(date.month) まで"
+
+        return [
+            .init(lead: "あと", "\(payoff.count)", trail: "回"),
+            .init("\(String(date.year))/\(date.month)", trail: "まで")
+        ]
     }
 
     static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
@@ -325,27 +334,46 @@ private extension AssetsView {
         return CGFloat(clamped)
     }
 
-    func owedNote(of row: AssetsModel.WalletRow) -> String? {
-        if let repayment = row.repayment {
-            let text = Self.repaymentText(repayment)
-
-            guard let percent = row.repaidPercent else {
-                return text
-            }
-
-            return "\(percent)%・\(text)"
+    func owedFacts(of row: AssetsModel.WalletRow) -> [AssetsDebtFacts.Fact]? {
+        if case let .until(payoff) = row.repayment {
+            return Self.payoffFacts(payoff)
         }
 
         guard row.wallet.kind == .card else {
             return nil
         }
 
-        return row.nextBill.map(nextBillText) ?? "引き落としは未設定"
+        return row.nextBill.map(nextBillFacts)
     }
 
-    func nextBillText(_ bill: CardBill) -> String {
+    func owedNote(of row: AssetsModel.WalletRow) -> String? {
+        let percent = row.repaidPercent.map { "\($0)%" }
+        let parts = [percent, plainNote(of: row)].compactMap(\.self)
+        return parts.isEmpty ? nil : parts.joined(separator: "・")
+    }
+
+    func plainNote(of row: AssetsModel.WalletRow) -> String? {
+        if let repayment = row.repayment {
+            return Self.repaymentText(repayment)
+        }
+
+        guard
+            row.wallet.kind == .card,
+            row.nextBill == nil
+        else {
+            return nil
+        }
+
+        return "引き落としは未設定"
+    }
+
+    func nextBillFacts(_ bill: CardBill) -> [AssetsDebtFacts.Fact] {
         let date = "\(bill.date.month)/\(bill.date.day)"
-        return "\(date) に引き落とし・\(daysText(until: bill.date))"
+
+        return [
+            .init(date, trail: "引き落とし"),
+            daysFact(until: bill.date)
+        ]
     }
 
     func balanceText(_ bill: CardBill) -> String {
@@ -364,7 +392,11 @@ private extension AssetsView {
     }
 
     func daysText(until date: LocalDate) -> String {
+        daysFact(until: date).text
+    }
+
+    func daysFact(until date: LocalDate) -> AssetsDebtFacts.Fact {
         let days = model.today.days(until: date)
-        return days == 1 ? "明日" : "あと \(days) 日"
+        return days == 1 ? .init("明日") : .init(lead: "あと", "\(days)", trail: "日")
     }
 }
