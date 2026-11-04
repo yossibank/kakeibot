@@ -122,6 +122,18 @@ struct RecurringCardBillTests {
     }
 
     @Test
+    func listsBillDatesBeforeStartFromUsualOne() throws {
+        var bill = try Self.bill(closingDay: 31)
+        let used = try #require(LocalDate("2026-08-31"))
+
+        bill.startDate = try #require(LocalDate("2026-09-20"))
+
+        let dates = bill.billDates(for: used, count: 3)
+
+        #expect(dates.map(\.description) == ["2026-09-10", "2026-10-10", "2026-11-10"])
+    }
+
+    @Test
     func keepsFixedAmountWithoutClosingDay() throws {
         let paidOn = try #require(LocalDate("2026-11-10"))
         var bill = try Self.bill(closingDay: 15)
