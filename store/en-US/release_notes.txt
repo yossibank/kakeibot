@@ -1,0 +1,5 @@
+・Scan a receipt to read the items, total, date and store name.
+・Add items to a record, with the 8% and 10% consumption tax shown separately.
+・Carry unused budget over to the next period.
+・Move the start of the month to a weekday when it falls on a weekend or holiday.
+・New layout for the wide screen of iPhone Duo.
