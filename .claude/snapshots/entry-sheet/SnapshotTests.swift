@@ -211,6 +211,7 @@ private extension SnapshotTests {
     static let cases: [(String, Entry.Kind, [AmountCalculator.Key])] = [
         ("entry-expense", .expense, smallDigits),
         ("entry-transfer", .transfer, smallDigits),
+        ("entry-transfer-empty", .transfer, []),
         ("entry-expense-large", .expense, largeDigits)
     ]
 
