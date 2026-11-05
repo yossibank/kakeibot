@@ -135,20 +135,25 @@ private extension AssetsView {
     }
 
     func walletLine(_ row: AssetsModel.WalletRow) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
+        let label = Self.label(of: row)
+        let nameWidth = label == nil ? Self.nameMinWidth : Self.labeledNameMinWidth
+
+        return HStack(alignment: .firstTextBaseline, spacing: 8) {
             walletName(row)
-                .frame(minWidth: Self.nameMinWidth, alignment: .leading)
+                .frame(minWidth: nameWidth, alignment: .leading)
 
-            if let label = Self.label(of: row) {
-                walletLabel(label)
+            Spacer(minLength: 0)
+
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                if let label {
+                    walletLabel(label)
+                }
+
+                walletBalance(row)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
-
-            Spacer(minLength: 8)
-
-            walletBalance(row)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .layoutPriority(1)
+            .layoutPriority(1)
         }
     }
 
@@ -163,8 +168,7 @@ private extension AssetsView {
         Text(label)
             .textFont(.caption2)
             .foregroundStyle(Palette.subtext)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
+            .fixedSize()
     }
 
     func walletBalance(_ row: AssetsModel.WalletRow) -> some View {
@@ -219,17 +223,16 @@ private extension AssetsView {
         Button {
             adjusting = row
         } label: {
-            ViewThatFits(in: .horizontal) {
-                adjustLine("手持ちがマイナス", showsIcon: true)
-                adjustLine("手持ちがマイナス", showsIcon: false)
-                adjustLine("マイナス", showsIcon: true)
+            VStack(spacing: 8) {
+                Hairline(thickness: 1)
+
+                ViewThatFits(in: .horizontal) {
+                    adjustLine("手持ちがマイナス", showsDot: true)
+                    adjustLine("手持ちがマイナス", showsDot: false)
+                    adjustLine("マイナス", showsDot: true)
+                }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(
-                Palette.rose.opacity(.subtle),
-                in: .rect(cornerRadius: corner.radius(12))
-            )
+            .padding(.top, 4)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -237,29 +240,31 @@ private extension AssetsView {
 
     func adjustLine(
         _ text: String,
-        showsIcon: Bool
+        showsDot: Bool
     ) -> some View {
         HStack(spacing: 8) {
-            Group {
-                if showsIcon {
-                    Label(text, systemImage: "exclamationmark.circle")
-                } else {
-                    Text(text)
-                }
+            if showsDot {
+                Circle()
+                    .fill(Palette.rose)
+                    .frame(width: 6, height: 6)
             }
-            .textFont(.caption)
-            .foregroundStyle(Palette.rose)
-            .fixedSize()
+
+            Text(text)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .fixedSize()
 
             Spacer(minLength: 8)
 
-            Text("合わせる")
-                .textFont(.caption, weight: .semibold)
-                .foregroundStyle(Palette.accentStrong)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 4)
-                .background(Palette.panel, in: .capsule)
-                .fixedSize()
+            HStack(spacing: 4) {
+                Text("合わせる")
+                    .textFont(.caption, weight: .semibold)
+
+                Image(systemName: "chevron.right")
+                    .sansFont(.micro, weight: .semibold)
+            }
+            .foregroundStyle(Palette.accentStrong)
+            .fixedSize()
         }
     }
 
@@ -298,6 +303,7 @@ private extension AssetsView {
 
 private extension AssetsView {
     static let nameMinWidth: CGFloat = 64
+    static let labeledNameMinWidth: CGFloat = 48
 
     @ViewBuilder
     func debtDetail(of row: AssetsModel.WalletRow) -> some View {
