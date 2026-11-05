@@ -92,28 +92,12 @@ private extension WidgetGuideView {
 
 private extension WidgetGuideView {
     var samplePickers: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 12) {
-                widgetPicker
+        HStack(spacing: 12) {
+            CapsulePicker(selection: $widget, options: Self.widgetOptions)
 
-                sizePicker
-            }
-
-            VStack(spacing: 12) {
-                widgetPicker
-
-                sizePicker
-            }
+            CapsulePicker(selection: $size, options: sizeOptions, size: .small)
+                .id(widget)
         }
-    }
-
-    var widgetPicker: some View {
-        CapsulePicker(selection: $widget, options: Self.widgetOptions)
-    }
-
-    var sizePicker: some View {
-        CapsulePicker(selection: $size, options: sizeOptions, size: .small)
-            .id(widget)
     }
 
     var abilities: some View {
