@@ -147,7 +147,7 @@ private extension AssetsView {
 
             walletBalance(row)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.8)
                 .layoutPriority(1)
         }
     }
@@ -221,9 +221,7 @@ private extension AssetsView {
         } label: {
             ViewThatFits(in: .horizontal) {
                 adjustLine("手持ちがマイナス", showsIcon: true)
-
                 adjustLine("手持ちがマイナス", showsIcon: false)
-
                 adjustLine("マイナス", showsIcon: true)
             }
             .padding(.horizontal, 12)

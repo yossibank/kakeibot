@@ -189,6 +189,7 @@ private extension AssetsView {
             .textFont(.caption2)
             .foregroundStyle(Palette.hint)
             .lineLimit(1)
+            .minimumScaleFactor(0.8)
     }
 
     var netWorthAmount: some View {

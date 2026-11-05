@@ -135,14 +135,13 @@ private extension BillRow {
                         if let period = bill.period {
                             ViewThatFits(in: .horizontal) {
                                 Text("\(RecurringText.period(period)) の利用分")
-
                                 Text(RecurringText.period(period))
-
                                 Text("\(period.upperBound.month)/\(period.upperBound.day) 締め")
                             }
                             .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                         }
 
                         moves

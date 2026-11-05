@@ -12,7 +12,8 @@ struct RecurringQuickCard: View {
             SettingsFormSection("金額") {
                 SettingsAmountButton(
                     amount: model.amount,
-                    text: model.isCardBill ? "カードの利用分" : nil
+                    text: model.isCardBill ? "カードの利用分" : nil,
+                    isEmpty: !model.isCardBill && model.amount == 0
                 ) {
                     onOpen(model.isCardBill ? .closing : .amount)
                 }

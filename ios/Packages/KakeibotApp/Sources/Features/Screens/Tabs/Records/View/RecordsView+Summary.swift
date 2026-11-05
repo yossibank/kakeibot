@@ -51,7 +51,6 @@ private extension RecordsView {
         VStack(spacing: 8) {
             ViewThatFits(in: .horizontal) {
                 totalsRow(expense: expense, income: income, isStacked: false)
-
                 totalsRow(expense: expense, income: income, isStacked: true)
             }
 

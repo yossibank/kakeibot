@@ -6,6 +6,7 @@ struct SettingsAmountButton: View {
 
     let amount: Int
     let text: String?
+    let isEmpty: Bool
     let action: () -> Void
 
     var body: some View {
@@ -38,10 +39,6 @@ struct SettingsAmountButton: View {
 }
 
 private extension SettingsAmountButton {
-    var isEmpty: Bool {
-        text == nil && amount == 0
-    }
-
     var stroke: StrokeStyle {
         isEmpty ? .dashed : StrokeStyle(lineWidth: 1)
     }

@@ -176,7 +176,11 @@ private extension RewardRuleEditSheet {
             VStack(alignment: .leading, spacing: 8) {
                 SettingsFormCard {
                     SettingsFormSection("金額") {
-                        SettingsAmountButton(amount: model.amount ?? 0, text: amountPrompt) {
+                        SettingsAmountButton(
+                            amount: model.amount ?? 0,
+                            text: amountPrompt,
+                            isEmpty: (model.amount ?? 0) == 0
+                        ) {
                             open(.amount)
                         }
                     }
