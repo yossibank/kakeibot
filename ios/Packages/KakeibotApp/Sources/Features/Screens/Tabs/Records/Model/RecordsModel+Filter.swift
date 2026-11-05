@@ -35,7 +35,6 @@ public extension RecordsModel {
 
     var shownEntryCount: Int {
         let isSearched = isSearching && !EntrySearch(searchText).isEmpty
-
         return Self.entryCount(in: isSearched ? searchDays : days)
     }
 

@@ -115,11 +115,7 @@ private extension AssetsView {
             IconBadge(row.icon, size: 32)
 
             VStack(alignment: .leading, spacing: 4) {
-                ViewThatFits(in: .horizontal) {
-                    walletLine(row)
-
-                    walletLines(row)
-                }
+                walletLine(row)
 
                 debtDetail(of: row)
 
@@ -141,6 +137,7 @@ private extension AssetsView {
     func walletLine(_ row: AssetsModel.WalletRow) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             walletName(row)
+                .frame(minWidth: Self.nameMinWidth, alignment: .leading)
 
             if let label = Self.label(of: row) {
                 walletLabel(label)
@@ -149,27 +146,9 @@ private extension AssetsView {
             Spacer(minLength: 8)
 
             walletBalance(row)
-                .fixedSize()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .layoutPriority(1)
-        }
-    }
-
-    func walletLines(_ row: AssetsModel.WalletRow) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            walletName(row)
-
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                if let label = Self.label(of: row) {
-                    walletLabel(label)
-                }
-
-                Spacer(minLength: 8)
-
-                walletBalance(row)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                    .layoutPriority(1)
-            }
         }
     }
 
@@ -237,23 +216,35 @@ private extension AssetsView {
     }
 
     func adjustNotice(of row: AssetsModel.WalletRow) -> some View {
-        ViewThatFits(in: .horizontal) {
-            adjustLine(row, showsText: true)
-
-            adjustLine(row, showsText: false)
+        Button {
+            adjusting = row
+        } label: {
+            ViewThatFits(in: .horizontal) {
+                adjustLine("手持ちがマイナス", showsIcon: true)
+                adjustLine("手持ちがマイナス", showsIcon: false)
+                adjustLine("マイナス", showsIcon: true)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                Palette.rose.opacity(.subtle),
+                in: .rect(cornerRadius: corner.radius(12))
+            )
+            .contentShape(.rect)
         }
+        .buttonStyle(.plain)
     }
 
     func adjustLine(
-        _ row: AssetsModel.WalletRow,
-        showsText: Bool
+        _ text: String,
+        showsIcon: Bool
     ) -> some View {
         HStack(spacing: 8) {
             Group {
-                if showsText {
-                    Label("手持ちがマイナスです", systemImage: "exclamationmark.circle")
+                if showsIcon {
+                    Label(text, systemImage: "exclamationmark.circle")
                 } else {
-                    Image(systemName: "exclamationmark.circle")
+                    Text(text)
                 }
             }
             .textFont(.caption)
@@ -262,10 +253,13 @@ private extension AssetsView {
 
             Spacer(minLength: 8)
 
-            ChipButton("残高を合わせる", systemImage: "equal") {
-                adjusting = row
-            }
-            .fixedSize()
+            Text("合わせる")
+                .textFont(.caption, weight: .semibold)
+                .foregroundStyle(Palette.accentStrong)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 4)
+                .background(Palette.panel, in: .capsule)
+                .fixedSize()
         }
     }
 
@@ -303,11 +297,17 @@ private extension AssetsView {
 }
 
 private extension AssetsView {
+    static let nameMinWidth: CGFloat = 64
+
     @ViewBuilder
     func debtDetail(of row: AssetsModel.WalletRow) -> some View {
         if row.wallet.kind == .card,
            let bill = row.nextBill {
-            AssetsDebtChip(systemImage: "calendar", text: nextBillText(bill))
+            AssetsDebtChip(
+                systemImage: "calendar",
+                text: nextBillText(bill),
+                shortText: shortBillText(bill)
+            )
 
             if let unpaid = row.unpaid {
                 Button {
@@ -433,5 +433,12 @@ private extension AssetsView {
         let weekday = bill.date.weekday.shortName
         let days = BillText.days(until: bill.date, today: model.today)
         return "\(date)（\(weekday)）引き落とし · \(days)"
+    }
+
+    func shortBillText(_ bill: CardBill) -> String {
+        let date = "\(bill.date.month)/\(bill.date.day)"
+        let weekday = bill.date.weekday.shortName
+        let days = BillText.days(until: bill.date, today: model.today)
+        return "\(date)（\(weekday)）· \(days)"
     }
 }

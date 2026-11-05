@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import SwiftUI
 
 enum ReviewText {
     static func shares(_ amounts: [Int]) -> [String] {
@@ -36,6 +37,14 @@ enum ReviewText {
         }
 
         return amount < 0 ? "収支 · 赤字" : "収支"
+    }
+
+    static func balanceColor(_ amount: Int) -> Color {
+        if amount > 0 {
+            return Palette.accent
+        }
+
+        return amount < 0 ? Palette.rose : Palette.accentStrong
     }
 }
 

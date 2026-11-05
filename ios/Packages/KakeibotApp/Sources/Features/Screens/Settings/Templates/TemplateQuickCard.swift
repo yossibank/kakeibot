@@ -13,7 +13,8 @@ struct TemplateQuickCard: View {
                 VStack(alignment: .leading, spacing: 8) {
                     SettingsAmountButton(
                         amount: model.amount ?? 0,
-                        text: model.amount == nil ? "毎回入れる" : nil
+                        text: model.amount == nil ? "毎回入れる" : nil,
+                        isEmpty: (model.amount ?? 0) == 0
                     ) {
                         onOpen(.amount)
                     }

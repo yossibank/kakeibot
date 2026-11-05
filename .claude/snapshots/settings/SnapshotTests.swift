@@ -146,6 +146,16 @@ struct SnapshotTests {
             )
         }
 
+        transferEdit.closingDay = 27
+
+        for variant in Self.variants {
+            try Self.write(
+                RecurringQuickCard(model: transferEdit) { _ in }.padding(20),
+                variant: variant,
+                to: "settings-recurring-quick-card-bill"
+            )
+        }
+
         let loanDraft = WalletDraft(
             kind: .loan,
             name: "日本学生支援機構 第二種（有利子）",

@@ -57,6 +57,7 @@ private extension EntrySaveButton {
         if let amount = label.amount {
             ViewThatFits(in: .horizontal) {
                 sideLayout(amount)
+
                 stackedLayout(amount)
             }
         } else {

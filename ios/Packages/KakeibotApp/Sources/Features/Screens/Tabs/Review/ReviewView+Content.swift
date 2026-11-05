@@ -257,7 +257,7 @@ private extension ReviewView {
         if kind == .balance {
             Text(ReviewText.balance(total))
                 .monospacedDigit()
-                .foregroundStyle(Self.balanceColor(total))
+                .foregroundStyle(ReviewText.balanceColor(total))
         } else {
             AmountText(total, type: kind.entryType)
         }
@@ -358,14 +358,6 @@ private extension ReviewView {
         let isGood = kind == .expense ? change < 0 : change > 0
 
         return isGood ? Palette.accent : Palette.rose
-    }
-
-    static func balanceColor(_ amount: Int) -> Color {
-        if amount > 0 {
-            return Palette.accent
-        }
-
-        return amount < 0 ? Palette.rose : Palette.accentStrong
     }
 
     static func title(of kind: ReviewKind) -> String {

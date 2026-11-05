@@ -25,7 +25,9 @@ public struct RepaymentPlan: Hashable, Sendable {
         let fits = last > 0 && last < amount * 2
 
         self.count = count
-        self.finalAmount = fits && last != amount ? last : nil
+        self.finalAmount = fits && last != amount
+            ? last
+            : nil
         self.gap = fits ? 0 : amount * count - owed
     }
 }
