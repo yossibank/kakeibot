@@ -12,6 +12,8 @@ public extension Recurring {
         }
     }
 
+    static let maxCount = 1200
+
     var finalDate: LocalDate? {
         guard let endDate else {
             return nil
@@ -70,7 +72,7 @@ public extension Recurring {
     }
 
     func endDate(afterCount count: Int) -> LocalDate? {
-        guard count > 0 else {
+        guard (1...Self.maxCount).contains(count) else {
             return nil
         }
 

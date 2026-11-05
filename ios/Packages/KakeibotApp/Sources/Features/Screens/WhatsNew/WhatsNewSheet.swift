@@ -105,7 +105,7 @@ private extension WhatsNewSheet {
         return Button {
             version = release.version
         } label: {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 Text(release.version)
                     .textFont(.subheadline, weight: isSelected ? .bold : .medium)
                     .monospacedDigit()

@@ -23,6 +23,14 @@ struct RecurringFinalAmountTests {
 
         #expect(recurring.plannedTotal == fixture.total)
     }
+
+    @Test(arguments: try finalCases)
+    func limitsCount(fixture: FinalCase) {
+        let recurring = fixture.recurring(endDate: nil)
+
+        #expect(recurring.endDate(afterCount: Recurring.maxCount) != nil)
+        #expect(recurring.endDate(afterCount: Recurring.maxCount + 1) == nil)
+    }
 }
 
 extension RecurringFinalAmountTests {

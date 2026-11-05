@@ -264,6 +264,10 @@ public extension RecurringEditModel {
     func pressCount(_ key: AmountCalculator.Key) {
         countCalculator.press(key)
 
+        if countCalculator.amount > Recurring.maxCount {
+            countCalculator = AmountCalculator(amount: Recurring.maxCount)
+        }
+
         var open = plannedRecurring
         open.endDate = nil
 
