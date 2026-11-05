@@ -99,14 +99,24 @@ private extension EntrySheet {
         )
     }
 
+    var quickDate: LocalDate {
+        model.quickDate(today: today)
+    }
+}
+
+private extension EntrySheet {
     var preparationRow: some View {
         ViewThatFits(in: .horizontal) {
-            preparationButtons(saveTitle: "今の入力を保存")
-            preparationButtons(saveTitle: "保存")
+            preparationButtons(showsDateIcon: true, showsQuickDate: true)
+            preparationButtons(showsDateIcon: false, showsQuickDate: true)
+            preparationButtons(showsDateIcon: false, showsQuickDate: false)
         }
     }
 
-    func preparationButtons(saveTitle: String) -> some View {
+    func preparationButtons(
+        showsDateIcon: Bool,
+        showsQuickDate: Bool
+    ) -> some View {
         HStack(spacing: 8) {
             if showsReceiptButton {
                 receiptButton
@@ -122,14 +132,24 @@ private extension EntrySheet {
                 }
             }
 
+            Spacer(minLength: 0)
+
+            if showsQuickDate {
+                ChipButton(EntryModel.shortDateText(for: quickDate, today: today)) {
+                    withAnimation(.snappy) {
+                        model.date = quickDate
+                    }
+                }
+            }
+
             ChipButton(
-                saveTitle,
-                systemImage: "plus",
-                outline: .dashed
+                EntryModel.keypadDateText(for: model.date, today: today),
+                systemImage: showsDateIcon ? "calendar" : nil,
+                isSelected: model.date != today
             ) {
-                open(.newTemplate)
+                sheet = .date
             }
         }
-        .fixedSize()
+        .fixedSize(horizontal: false, vertical: true)
     }
 }

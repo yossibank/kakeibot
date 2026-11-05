@@ -4,6 +4,31 @@ import Foundation
 import Store
 
 public extension EntryModel {
+    struct SaveLabel: Equatable {
+        public let title: String
+        public let amount: String?
+        public let category: String?
+        public let day: String?
+        public let wallets: String?
+        public let fee: String?
+
+        public init(
+            title: String,
+            amount: String? = nil,
+            category: String? = nil,
+            day: String? = nil,
+            wallets: String? = nil,
+            fee: String? = nil
+        ) {
+            self.title = title
+            self.amount = amount
+            self.category = category
+            self.day = day
+            self.wallets = wallets
+            self.fee = fee
+        }
+    }
+
     var memoPrompt: String {
         switch type {
         case .expense: "店名や買ったもの"
@@ -22,37 +47,6 @@ public extension EntryModel {
 
     var typeName: String {
         type.name
-    }
-
-    var saveTitle: String {
-        if isEditing {
-            return "変更を保存"
-        }
-
-        guard amount > 0 else {
-            return "金額を入れてください"
-        }
-
-        if type == .transfer,
-           toWalletId == nil {
-            return "\(Self.destinationTitle)を選んでください"
-        }
-
-        let action = type == .transfer ? "振り替える" : "記録する"
-
-        return "\(AmountText.text(amount)) を\(action)"
-    }
-
-    var saveSubject: String? {
-        guard
-            !isEditing,
-            amount > 0,
-            type != .transfer
-        else {
-            return nil
-        }
-
-        return selectedCategory?.name
     }
 
     var budgetUsage: BudgetUsage? {
@@ -138,14 +132,20 @@ public extension EntryModel {
         for date: LocalDate,
         today: LocalDate
     ) -> String {
-        let day = PeriodText.day(date, today: today)
-        let text = "\(day)（\(date.weekday.shortName)）"
+        let text = weekdayText(for: date, today: today)
 
         switch date {
         case today: return "今日 \(text)"
         case today.adding(days: -1): return "昨日 \(text)"
         default: return text
         }
+    }
+
+    static func keypadDateText(
+        for date: LocalDate,
+        today: LocalDate
+    ) -> String {
+        date == today ? "今日" : weekdayText(for: date, today: today)
     }
 
     static func shortDateText(
@@ -172,29 +172,70 @@ public extension EntryModel {
         }
     }
 
-    func saveDetail(today: LocalDate) -> String? {
-        if type == .transfer,
-           fee > 0 {
-            return "手数料 \(AmountText.text(fee)) も記録"
+    func quickDate(today: LocalDate) -> LocalDate {
+        date == today ? today.adding(days: -1) : today
+    }
+
+    func saveLabel(today: LocalDate) -> SaveLabel {
+        if !isEditing {
+            guard amount > 0 else {
+                return SaveLabel(title: "金額を入れてください")
+            }
+
+            if type == .transfer,
+               toWalletId == nil {
+                return SaveLabel(title: "\(Self.destinationTitle)を選んでください")
+            }
         }
 
-        guard
-            !isEditing,
-            canSave,
-            type != .transfer,
-            let wallet = wallet(walletId)
-        else {
-            return nil
+        guard amount > 0 else {
+            return SaveLabel(title: saveAction)
         }
 
-        let day = Self.shortDateText(for: date, today: today)
-        let direction = type == .income ? "へ" : "から"
-
-        return "\(day)・\(wallet.name)\(direction)"
+        return SaveLabel(
+            title: saveAction,
+            amount: AmountText.text(amount),
+            category: type == .transfer ? nil : selectedCategory?.name,
+            day: Self.shortDateText(for: date, today: today),
+            wallets: saveWallets,
+            fee: fee > 0 ? "手数料 \(AmountText.text(fee))" : nil
+        )
     }
 }
 
 private extension EntryModel {
+    var saveAction: String {
+        switch (isEditing, type) {
+        case (true, _): "変更を保存"
+        case (false, .transfer): "振り替える"
+        case (false, _): "記録する"
+        }
+    }
+
+    var saveWallets: String? {
+        let source = wallet(walletId)?.name
+
+        guard type == .transfer else {
+            return source
+        }
+
+        guard
+            let source,
+            let destination = wallet(toWalletId)?.name
+        else {
+            return nil
+        }
+
+        return "\(source) → \(destination)"
+    }
+
+    static func weekdayText(
+        for date: LocalDate,
+        today: LocalDate
+    ) -> String {
+        "\(PeriodText.day(date, today: today))（\(date.weekday.shortName)）"
+    }
+
     func monthTotals(matching isIncluded: (Entry) -> Bool) -> (current: Int, after: Int) {
         let period = monthOverview.period
 

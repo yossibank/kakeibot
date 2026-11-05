@@ -135,11 +135,7 @@ public struct EntrySheet: View {
 extension EntrySheet {
     var saveButtons: some View {
         HStack(spacing: 8) {
-            PrimaryButton(
-                model.saveTitle,
-                subject: model.saveSubject,
-                detail: saveDetail
-            ) {
+            EntrySaveButton(label: model.saveLabel(today: today)) {
                 Task {
                     await save()
                 }
@@ -297,10 +293,6 @@ private extension EntrySheet {
 
     var bannerBottom: CGFloat {
         isEnteringAmount ? drawerHeight + 12 : 12
-    }
-
-    var saveDetail: String? {
-        model.saveDetail(today: today)
     }
 
     var continueOpacity: Double {
