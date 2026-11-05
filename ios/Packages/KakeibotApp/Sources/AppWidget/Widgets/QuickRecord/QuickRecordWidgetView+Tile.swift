@@ -86,7 +86,7 @@ private extension QuickRecordWidgetView {
     }
 }
 
-private extension QuickRecordWidgetView {
+extension QuickRecordWidgetView {
     static let tileRadius: CGFloat = 12
     static let markSize: CGFloat = 20
 }
