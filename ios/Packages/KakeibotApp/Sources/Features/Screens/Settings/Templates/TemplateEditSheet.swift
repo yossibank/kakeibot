@@ -70,7 +70,8 @@ public struct TemplateEditSheet: View {
                 SettingsEditHeader(
                     title: title,
                     isEditing: model.isEditing,
-                    isHidden: model.isHidden
+                    isHidden: model.isHidden,
+                    subtitle: model.typeName
                 ) {
                     close()
                 } onHide: {
@@ -202,8 +203,7 @@ private extension TemplateEditSheet {
 
 private extension TemplateEditSheet {
     var title: String {
-        let action = model.isEditing ? "編集" : "追加"
-        return "\(model.typeName)のテンプレートを\(action)"
+        model.isEditing ? "テンプレートを編集" : "テンプレートを追加"
     }
 
     var keyboardRegions: SafeAreaRegions {
