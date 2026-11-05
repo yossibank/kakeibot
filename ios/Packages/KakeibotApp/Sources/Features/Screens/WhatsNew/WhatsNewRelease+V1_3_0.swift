@@ -7,14 +7,14 @@ extension WhatsNewRelease {
                 systemImage: "calendar.badge.clock",
                 title: "借入の返済の回数",
                 shortTitle: "返済",
-                lead: "返還表どおりに、返済を登録できます",
+                lead: "回数を入れると、返し終わるまでが分かります",
                 points: [
-                    "回数と最後の回の額を入れる",
+                    "最後の回の額を残高から出す",
                     "返す総額と終わりの月が分かる"
                 ],
                 steps: [
                     Step(scene: .loanCount, caption: "「回数」を押す"),
-                    Step(scene: .loanFinal, caption: "回数と最後の回を入れる"),
+                    Step(scene: .loanFinal, caption: "回数を入れる"),
                     Step(scene: .loanTotal, caption: "総額と終わりが出る")
                 ],
                 action: .setup(.recurrings),

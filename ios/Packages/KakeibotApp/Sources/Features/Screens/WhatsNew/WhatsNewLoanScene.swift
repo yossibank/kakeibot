@@ -35,7 +35,7 @@ private extension WhatsNewLoanScene {
 
             Spacer(minLength: 4)
 
-            Text("決めない")
+            Text("\(Self.count - 1) 回")
                 .foregroundStyle(Palette.subtext)
         }
         .textFont(size: .caption, weight: .semibold)

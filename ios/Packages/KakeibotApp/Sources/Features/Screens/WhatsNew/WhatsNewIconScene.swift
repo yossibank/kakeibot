@@ -30,7 +30,7 @@ private extension WhatsNewIconScene {
 
     var row: some View {
         HStack(spacing: 8) {
-            Image(systemName: "square.grid.2x2")
+            Image(systemName: "tag")
                 .foregroundStyle(Palette.accent)
 
             Text("カテゴリ")

@@ -1,4 +1,4 @@
-・Recurring transfers to a loan can now set the number of payments and the final amount, and show the total and the last month.
+・Recurring transfers to a loan can now set the number of payments, and show the final amount, the total and the last month.
 ・More icons and emoji for categories and more.
 ・What's New now switches between versions.
 ・Text no longer gets cut off on small screens in the Assets tab, the Records tab and amount fields in Settings.
