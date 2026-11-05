@@ -14,5 +14,8 @@ dependencies {
 }
 
 tasks.test {
-    systemProperty("fixtures", rootDir.resolve("../spec/fixtures").absolutePath)
+    val fixtures = rootDir.resolve("../spec/fixtures")
+
+    inputs.dir(fixtures).withPathSensitivity(PathSensitivity.RELATIVE)
+    systemProperty("fixtures", fixtures.absolutePath)
 }

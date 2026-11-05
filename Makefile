@@ -8,7 +8,7 @@ ANY_SIMULATOR = -destination 'generic/platform=iOS Simulator'
 ON_SIMULATOR = -destination 'id=$(SIMULATOR)'
 CLAUDE_CONFIG ?= $(HOME)/Applications/AI/claude-config
 SNAPSHOT ?=
-ANDROID_JAVA_HOME ?= /Applications/Android Studio.app/Contents/jbr/Contents/Home
+ANDROID_JAVA_HOME ?= $(shell /usr/libexec/java_home -v 17 2>/dev/null)
 ANDROID_HOME ?= $(HOME)/Library/Android/sdk
 GRADLE = env JAVA_HOME="$(ANDROID_JAVA_HOME)" ANDROID_HOME="$(ANDROID_HOME)" android/gradlew -p android --console=plain
 CHECKOUT = $(if $(BRANCH),$(shell git worktree list --porcelain | awk '/^worktree / { path = substr($$0, 10) } $$0 == "branch refs/heads/$(BRANCH)" { print path }'),.)

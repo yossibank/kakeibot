@@ -36,10 +36,15 @@ Android は、次の技術を使う。
 | applicationId | `com.yossibank.kakeibot` |
 | minSdk | 26（Android 8） |
 | compileSdk・targetSdk | 36 |
-| JDK | Android Studio に入っている JBR。Kotlin の toolchain は 17 |
+| JDK | 17。Gradle も Kotlin の toolchain も、この版で動かす |
 
 ## 🧪 確認
 
-`make android-test` は `:core` のテストを走らせ、`make android-build` はデバッグの APK を作る。どちらも `make verify` に含まれる。
+`make android-test` は `:core` のテストを走らせる。`make android-build` はデバッグの APK を作る。どちらも `make verify` に含まれる。
 
-JDK と SDK の場所は、Makefile の `ANDROID_JAVA_HOME`・`ANDROID_HOME` で変えられる。
+JDK と SDK の場所は、Makefile の次の変数で変えられる。
+
+| 場所 | 変数 |
+| --- | --- |
+| JDK | `ANDROID_JAVA_HOME` |
+| SDK | `ANDROID_HOME` |
