@@ -171,6 +171,44 @@ struct SnapshotTests {
             )
         }
 
+        let savedTemplate = try await database.templates().first
+        let templateEditing = TemplateEditModel(
+            database: database,
+            type: .expense,
+            editing: savedTemplate?.id
+        )
+        let budgetDrawer = BudgetListModel(database: database, today: today)
+        let minusWallet = WalletEditModel(database: database)
+
+        await templateEditing.load()
+        await budgetDrawer.load()
+
+        budgetDrawer.startEditing(.total)
+        minusWallet.name = "楽天カード"
+        minusWallet.kind = .card
+
+        for key in [AmountCalculator.Key.digit(5), .digit(2), .tripleZero] {
+            minusWallet.press(key)
+        }
+
+        for variant in Self.variants {
+            try Self.write(
+                TemplateEditSheet(model: templateEditing).frame(height: 1000),
+                variant: variant,
+                to: "settings-template-edit-editing"
+            )
+            try Self.write(
+                BudgetListView(model: budgetDrawer).frame(height: 852),
+                variant: variant,
+                to: "settings-budgets-suggestions"
+            )
+            try Self.write(
+                WalletEditSheet(model: minusWallet).frame(height: 1000),
+                variant: variant,
+                to: "settings-wallet-edit-minus"
+            )
+        }
+
         templateEdit.walletId = card?.id
         recurringEdit.walletId = card?.id
 

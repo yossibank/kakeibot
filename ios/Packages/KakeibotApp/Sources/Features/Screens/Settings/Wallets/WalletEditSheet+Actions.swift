@@ -23,6 +23,11 @@ extension WalletEditSheet {
         count: 3
     )
 
+    static let signOptions: [CapsulePicker<Bool>.Option] = [
+        .init("プラス", value: false),
+        .init("マイナス", value: true)
+    ]
+
     var title: String {
         model.isEditing ? "口座を編集" : "口座を追加"
     }
@@ -82,22 +87,10 @@ extension WalletEditSheet {
 
     var balanceHint: String {
         switch model.kind {
-        case .card: "まだ引き落とされていない額を入れます。\n自動でマイナスにします。"
-        case .loan: "まだ返していない額を入れます。\n自動でマイナスにします。"
-        default: "記録を始める前の、いまの残高を入れます。"
+        case .card: "まだ引き落とされていない額を入れます。\nカードの未払いは、マイナスにします。"
+        case .loan: "まだ返していない額を入れます。\n借入は、マイナスにします。"
+        default: "記録を始める前の、いまの残高を入れます。\nカードの未払いや借入は、マイナスにします。"
         }
-    }
-
-    var signSymbol: String {
-        model.isNegative ? "minus" : "plus"
-    }
-
-    var signColor: Color {
-        model.isNegative ? Palette.rose : Palette.accent
-    }
-
-    var signFill: Color {
-        signColor.opacity(0.1)
     }
 
     var iconStroke: Color {

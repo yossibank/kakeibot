@@ -73,7 +73,16 @@ public extension WalletEditModel {
     }
 
     func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        guard
+            calculator.tokens.isEmpty,
+            case let .operation(operation) = key,
+            operation == .add || operation == .subtract
+        else {
+            calculator.press(key)
+            return
+        }
+
+        isNegative = operation == .subtract
     }
 
     func pressValuation(_ key: AmountCalculator.Key) {

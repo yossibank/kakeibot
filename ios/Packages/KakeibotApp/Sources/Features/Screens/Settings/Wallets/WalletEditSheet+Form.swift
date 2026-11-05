@@ -113,57 +113,38 @@ extension WalletEditSheet {
 
     var balanceField: some View {
         SettingsFormSection("最初の残高") {
-            HStack(spacing: 12) {
-                if model.showsSign {
-                    Button {
-                        model.isNegative.toggle()
-                    } label: {
-                        Image(systemName: signSymbol)
-                            .sansFont(.body, weight: .semibold)
-                            .foregroundStyle(signColor)
-                            .frame(width: 46, height: 46)
-                            .background(signFill, in: .rect(cornerRadius: corner.radius(16)))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: corner.radius(16))
-                                    .stroke(signColor.opacity(0.6), lineWidth: 1)
-                            }
-                            .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                    .haptic(.selection, trigger: model.isNegative)
+            CapsulePicker(selection: $model.isNegative, options: Self.signOptions)
+
+            Button {
+                openAmount()
+            } label: {
+                HStack(spacing: 8) {
+                    Text(model.balanceText)
+                        .displayFont(.headline)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.text)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+
+                    Spacer(minLength: 8)
+
+                    EditBadge()
                 }
-
-                Button {
-                    openAmount()
-                } label: {
-                    HStack(spacing: 8) {
-                        Text(model.balanceText)
-                            .displayFont(.headline)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-
-                        Spacer(minLength: 8)
-
-                        EditBadge()
-                    }
-                    .padding(.leading, 16)
-                    .padding(.trailing, 12)
-                    .frame(height: 46)
-                    .background(Palette.panel, in: .rect(cornerRadius: corner.radius(16)))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: corner.radius(16))
-                            .stroke(amountStroke, lineWidth: 1)
-                    }
-                    .contentShape(.rect)
+                .padding(.leading, 16)
+                .padding(.trailing, 12)
+                .frame(height: 46)
+                .background(Palette.panel, in: .rect(cornerRadius: corner.radius(16)))
+                .overlay {
+                    RoundedRectangle(cornerRadius: corner.radius(16))
+                        .stroke(amountStroke, lineWidth: 1)
                 }
-                .buttonStyle(.plain)
+                .contentShape(.rect)
             }
+            .buttonStyle(.plain)
 
             SettingsCaption(balanceHint)
                 .contentTransition(.opacity)
-                .animation(.snappy, value: model.kind == .card)
+                .animation(.snappy, value: model.kind)
         }
     }
 
