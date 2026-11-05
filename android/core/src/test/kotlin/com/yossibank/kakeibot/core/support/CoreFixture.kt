@@ -11,12 +11,26 @@ object CoreFixture {
     fun <T> cases(
         path: String,
         serializer: KSerializer<T>,
-    ): List<T> {
-        val root = System.getProperty("fixtures") ?: error("fixtures の場所が渡されていない")
-        val text = File(root, path).readText()
+    ): List<T> = json.decodeFromString(Cases.serializer(serializer), read(path)).cases
 
-        return json.decodeFromString(Cases.serializer(serializer), text).cases
+    fun <T> validity(
+        path: String,
+        serializer: KSerializer<T>,
+    ): Validity<T> = json.decodeFromString(Validity.serializer(serializer), read(path))
+
+    fun data(path: String): ByteArray {
+        val root = System.getProperty("fixtures") ?: error("fixtures の場所が渡されていない")
+
+        return File(root, path).readBytes()
     }
+
+    private fun read(path: String): String = data(path).toString(Charsets.UTF_8)
+
+    @Serializable
+    class Validity<T>(
+        val valid: List<T>,
+        val invalid: List<T>,
+    )
 
     @Serializable
     private class Cases<T>(
