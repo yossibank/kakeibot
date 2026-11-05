@@ -1,5 +1,5 @@
 {
-  "description": "1 つの財布の、ある日までの残高を出す。wallet と toWallet は、self（残高を出す財布）か other（ほかの財布）で書く。残高は、最初の残高に、収入と振替で入った額を足し、支出と振替で出した額を引く。through までに評価額があれば、いちばん新しい評価額から、その日より後の記録だけを足し引きする。評価額と同じ日の記録は、評価額より後に作ったものだけを足し引きする。評価額を使うのは kind が investment の財布だけで、ほかの種類の財布は評価額があっても使わない。kind が無ければ cash とする。記録と評価額に createdAt が無ければ、記録を先に作ったものとする。最初の残高は、マイナスでもよい。valuations は、無ければ空にする。through が空なら、すべての記録を足し引きする。",
+  "description": "1 つの財布の、ある日までの残高を出す。wallet と toWallet は、self（残高を出す財布）か other（ほかの財布）で書く。残高は、最初の残高に、収入と振替で入った額を足し、支出と振替で出した額を引く。through までに評価額があれば、いちばん新しい評価額から、その日より後の記録だけを足し引きする。評価額と同じ日の記録は、評価額より後に作ったものだけを足し引きする。評価額を使うのは kind が investment の財布だけで、ほかの種類の財布は評価額があっても使わない。kind が無ければ cash とする。記録と評価額に createdAt が無ければ、記録を先に作ったものとする。最初の残高は、マイナスでもよい。valuations は、無ければ空にする。through が空なら、すべての記録を足し引きする。adjustments は残高の調整で、wallet の財布の残高に amount（符号付き）を足す。調整も記録と同じく、through より後と評価額に含まれる分は足さない。adjustments は、無ければ空にする。",
   "cases": [
     {
       "summary": "記録が無い",
@@ -117,6 +117,46 @@
       ],
       "through": null,
       "balance": 9500
+    },
+    {
+      "summary": "調整を符号のまま足す",
+      "initialBalance": 1000,
+      "entries": [
+        { "type": "expense", "amount": 3000, "date": "2026-10-01", "wallet": "self", "toWallet": null }
+      ],
+      "adjustments": [
+        { "date": "2026-10-02", "amount": 2500, "wallet": "self" },
+        { "date": "2026-10-02", "amount": -400, "wallet": "self" },
+        { "date": "2026-10-02", "amount": 9000, "wallet": "other" }
+      ],
+      "through": null,
+      "balance": 100
+    },
+    {
+      "summary": "through より後の調整は入れない",
+      "initialBalance": 1000,
+      "entries": [],
+      "adjustments": [
+        { "date": "2026-10-01", "amount": -300, "wallet": "self" },
+        { "date": "2026-10-03", "amount": 500, "wallet": "self" }
+      ],
+      "through": "2026-10-02",
+      "balance": 700
+    },
+    {
+      "summary": "評価額より前の調整は入れない",
+      "kind": "investment",
+      "initialBalance": 100000,
+      "entries": [],
+      "adjustments": [
+        { "date": "2026-10-01", "amount": 5000, "wallet": "self" },
+        { "date": "2026-10-10", "amount": -1000, "wallet": "self" }
+      ],
+      "valuations": [
+        { "date": "2026-10-05", "amount": 180000 }
+      ],
+      "through": null,
+      "balance": 179000
     }
   ]
 }

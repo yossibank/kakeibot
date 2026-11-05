@@ -511,6 +511,7 @@ private extension RecurringEditModel {
                 let balance = wallet.balance(
                     with: entries,
                     valuations: list.valuations,
+                    adjustments: list.adjustments,
                     through: today
                 )
 

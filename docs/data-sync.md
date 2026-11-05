@@ -88,6 +88,7 @@ setting は、次の key を記録しない。
 | --- | --- |
 | wallet | その id |
 | valuation | wallet_id |
+| adjustment | wallet_id |
 | entry | wallet_id。無ければ to_wallet_id（振替は、どちらかが共有なら共有のゾーン） |
 | entry_item | その entry と同じ。entry の財布が変わると、品目の updated_at を書き換えて送り直す |
 | category | wallet_id |

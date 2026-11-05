@@ -83,6 +83,7 @@ public extension AppDatabase {
 
             let templates = EntryTemplate.filter(Column("wallet_id") == id)
             let valuations = Valuation.filter(Column("wallet_id") == id)
+            let adjustments = Adjustment.filter(Column("wallet_id") == id)
             let categories = EntryCategory.filter(Column("wallet_id") == id)
             let deletedCategories = try categories.fetchAll(db)
             let categoryIds = deletedCategories.map(\.id)
@@ -94,6 +95,7 @@ public extension AppDatabase {
             let recurringRecords = try recurrings.fetchAll(db)
             let templateRecords = try templates.fetchAll(db)
             let valuationRecords = try valuations.fetchAll(db)
+            let adjustmentRecords = try adjustments.fetchAll(db)
 
             let deletion = Deletion(
                 icons: iconRecords,
@@ -102,7 +104,8 @@ public extension AppDatabase {
                 tags: tagRecords,
                 recurrings: recurringRecords,
                 templates: templateRecords,
-                valuations: valuationRecords
+                valuations: valuationRecords,
+                adjustments: adjustmentRecords
             )
 
             let key = SyncKey(table: .wallet, id: id.description)
@@ -111,6 +114,7 @@ public extension AppDatabase {
             try Self.deleteRecurrings(recurrings, in: db, at: now)
             try templates.deleteAll(db)
             try valuations.deleteAll(db)
+            try adjustments.deleteAll(db)
             try tags.deleteAll(db)
             try categories.deleteAll(db)
             try wallet.delete(db)
@@ -187,7 +191,8 @@ private extension AppDatabase {
         let walletColumns = Column("wallet_id") == id || Column("to_wallet_id") == id
         let hasEntries = try Entry.filter(walletColumns).fetchCount(db) > 0
         let hasRecurrings = try Recurring.filter(walletColumns).fetchCount(db) > 0
-        return try hasEntries || hasRecurrings || hasValuations(of: id, in: db)
+        let hasAdjustments = try Adjustment.filter(Column("wallet_id") == id).fetchCount(db) > 0
+        return try hasEntries || hasRecurrings || hasAdjustments || hasValuations(of: id, in: db)
     }
 
     static func shownWalletCount(in db: Database) throws -> Int {

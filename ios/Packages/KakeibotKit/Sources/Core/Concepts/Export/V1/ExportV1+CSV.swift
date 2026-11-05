@@ -2,7 +2,7 @@ import Foundation
 
 public extension ExportV1.Tables {
     func csv() -> Data {
-        let rows = [Self.csvHeader] + sortedEntries.map(row)
+        let rows = [Self.csvHeader] + sortedRows.map(\.fields)
 
         let text = rows
             .map { $0.map(Self.escape).joined(separator: ",") }
@@ -16,15 +16,25 @@ public extension ExportV1.Tables {
 }
 
 private extension ExportV1.Tables {
+    struct CSVRow {
+        let date: LocalDate
+        let createdAt: Date
+        let id: String
+        let fields: [String]
+    }
+
     static let csvHeader = [
         "日付", "種類", "金額", "カテゴリ", "タグ", "財布", "振替先", "メモ"
     ]
 
+    static let adjustmentTitle = "調整"
     static let byteOrderMark: [UInt8] = [0xEF, 0xBB, 0xBF]
     static let formulaPrefixes: Set<Character> = ["=", "+", "-", "@"]
 
-    var sortedEntries: [Entry] {
-        entries.sorted { lhs, rhs in
+    var sortedRows: [CSVRow] {
+        let rows = entries.map(row) + adjustments.map(row)
+
+        return rows.sorted { lhs, rhs in
             if lhs.date != rhs.date {
                 return lhs.date < rhs.date
             }
@@ -33,7 +43,7 @@ private extension ExportV1.Tables {
                 return lhs.createdAt < rhs.createdAt
             }
 
-            return lhs.id.description < rhs.id.description
+            return lhs.id < rhs.id
         }
     }
 
@@ -68,21 +78,50 @@ private extension ExportV1.Tables {
         }
     }
 
-    func row(_ entry: Entry) -> [String] {
+    func walletName(_ id: Wallet.ID?) -> String {
+        wallets.first { $0.id == id }?.name ?? ""
+    }
+
+    func row(_ entry: Entry) -> CSVRow {
         let categoryName = categories.first { $0.id == entry.categoryId }?.name ?? ""
         let tagName = tags.first { $0.id == entry.tagId }?.name ?? ""
-        let walletName = wallets.first { $0.id == entry.walletId }?.name ?? ""
-        let toWalletName = wallets.first { $0.id == entry.toWalletId }?.name ?? ""
 
-        return [
+        let fields = [
             entry.date.description,
             Self.kindTitle(entry.type),
             String(entry.amount),
             Self.text(categoryName),
             Self.text(tagName),
-            Self.text(walletName),
-            Self.text(toWalletName),
+            Self.text(walletName(entry.walletId)),
+            Self.text(walletName(entry.toWalletId)),
             Self.text(entry.memo ?? "")
         ]
+
+        return CSVRow(
+            date: entry.date,
+            createdAt: entry.createdAt,
+            id: entry.id.description,
+            fields: fields
+        )
+    }
+
+    func row(_ adjustment: Adjustment) -> CSVRow {
+        let fields = [
+            adjustment.date.description,
+            Self.adjustmentTitle,
+            String(adjustment.amount),
+            "",
+            "",
+            Self.text(walletName(adjustment.walletId)),
+            "",
+            ""
+        ]
+
+        return CSVRow(
+            date: adjustment.date,
+            createdAt: adjustment.createdAt,
+            id: adjustment.id.description,
+            fields: fields
+        )
     }
 }
