@@ -142,7 +142,6 @@ extension RecurringEditSheet {
         case closing
         case fee
         case count
-        case finalAmount
         case remind
     }
 
@@ -180,10 +179,13 @@ private extension RecurringEditSheet {
             }
 
             if model.isLoanRepayment,
-               let total = model.plannedTotal,
-               let end = model.endDate {
-                RecurringLoanPlan(total: total, endDate: end)
-                    .transition(.opacity)
+               model.plannedTotal != nil || model.autoPlan != nil {
+                RecurringLoanPlan(model: model) {
+                    withAnimation(.snappy) {
+                        model.useAutoCount()
+                    }
+                }
+                .transition(.opacity)
             }
 
             if model.isNotificationDenied {
@@ -228,7 +230,7 @@ private extension RecurringEditSheet {
     }
 
     func showsDone(for panel: Panel) -> Bool {
-        ![.amount, .fee, .count, .finalAmount].contains(panel)
+        ![.amount, .fee, .count].contains(panel)
     }
 
     func title(for panel: Panel) -> String {
@@ -240,7 +242,6 @@ private extension RecurringEditSheet {
         case .closing: "金額の決め方"
         case .fee: "手数料"
         case .count: "回数"
-        case .finalAmount: "最終回の額"
         case .remind: "前に知らせる"
         }
     }

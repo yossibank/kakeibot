@@ -71,7 +71,10 @@ public extension Recurring {
         return occurrences(from: start, through: today)
     }
 
-    func endDate(afterCount count: Int) -> LocalDate? {
+    func endDate(
+        afterCount count: Int,
+        from start: LocalDate? = nil
+    ) -> LocalDate? {
         guard (1...Self.maxCount).contains(count) else {
             return nil
         }
@@ -79,12 +82,13 @@ public extension Recurring {
         var open = self
         open.endDate = nil
 
+        let from = max(start ?? startDate, startDate)
         let months = frequency == .monthly ? count + 2 : (count + 1) * 12
         let horizon = LocalDate(
-            yearMonth: startDate.yearMonth.adding(months: months),
+            yearMonth: from.yearMonth.adding(months: months),
             clampedDay: 31
         )
-        let dates = open.dates(from: startDate, through: horizon)
+        let dates = open.dates(from: from, through: horizon)
 
         return dates.count >= count ? dates[count - 1] : nil
     }

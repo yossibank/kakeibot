@@ -189,48 +189,52 @@ struct RecurringEditModelTests {
     }
 
     @Test
-    func setsRepaymentEndAndFinalAmountFromCount() async throws {
-        let setup = try await RecordsModelTests.Setup()
-        let start = try #require(LocalDate("2026-10-27"))
+    func plansRepaymentFromLoanBalance() async throws {
+        let model = try await Self.loanModel()
         let end = try #require(LocalDate("2046-09-27"))
 
-        let wallet = WalletDraft(
-            kind: .loan,
-            name: "奨学金",
-            mark: .glyph(.scholarship),
-            color: "#4A6FA5",
-            initialBalance: -3_896_752
-        )
-
-        let loan = try await setup.database.saveWallet(wallet, at: Date())
-
-        let model = RecurringEditModel(
-            database: setup.database,
-            today: setup.today,
-            paying: loan.id
-        )
-
-        await model.load()
-        model.startDate = start
-        model.choose(.none)
-
-        for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
-            model.press(key)
-        }
-
-        for key in [AmountCalculator.Key.digit(2), .digit(4), .digit(0)] {
-            model.pressCount(key)
-        }
-
-        for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(5), .digit(8), .digit(7)] {
-            model.pressFinal(key)
-        }
-
         #expect(model.isLoanRepayment)
-        #expect(model.endDate == end)
+        #expect(model.usesAutoCount)
+        #expect(model.scheduledEndDate == end)
         #expect(model.repaymentCount == 240)
         #expect(model.plannedTotal == 3_896_752)
+        #expect(model.balanceGap == nil)
+        #expect(model.draft.endDate == end)
         #expect(model.draft.finalAmount == 16587)
+    }
+
+    @Test
+    func leavesRemainderForLastPaymentWhenCountIsLonger() async throws {
+        let model = try await Self.loanModel()
+
+        model.prepareCount()
+        model.pressCount(.delete)
+        model.pressCount(.digit(1))
+
+        #expect(!model.usesAutoCount)
+        #expect(model.repaymentCount == 241)
+        #expect(model.draft.finalAmount == 352)
+        #expect(model.balanceGap == nil)
+    }
+
+    @Test
+    func showsGapWhenCountIsShort() async throws {
+        let model = try await Self.loanModel()
+
+        model.prepareCount()
+        model.pressCount(.delete)
+        model.pressCount(.delete)
+        model.pressCount(.digit(3))
+        model.pressCount(.digit(9))
+
+        #expect(model.repaymentCount == 239)
+        #expect(model.draft.finalAmount == 0)
+        #expect(model.balanceGap == -16587)
+
+        model.useAutoCount()
+
+        #expect(model.repaymentCount == 240)
+        #expect(model.balanceGap == nil)
     }
 
     @Test
@@ -283,5 +287,38 @@ struct RecurringEditModelTests {
 
         #expect(!saved)
         #expect(model.errorNotice.message == "金額を入れてください")
+    }
+}
+
+private extension RecurringEditModelTests {
+    static func loanModel() async throws -> RecurringEditModel {
+        let setup = try await RecordsModelTests.Setup()
+        let start = try #require(LocalDate("2026-10-27"))
+
+        let wallet = WalletDraft(
+            kind: .loan,
+            name: "奨学金",
+            mark: .glyph(.scholarship),
+            color: "#4A6FA5",
+            initialBalance: -3_896_752
+        )
+
+        let loan = try await setup.database.saveWallet(wallet, at: Date())
+
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today,
+            paying: loan.id
+        )
+
+        await model.load()
+        model.startDate = start
+        model.choose(.none)
+
+        for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
+            model.press(key)
+        }
+
+        return model
     }
 }

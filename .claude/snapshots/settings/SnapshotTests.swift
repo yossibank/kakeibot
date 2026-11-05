@@ -163,14 +163,6 @@ struct SnapshotTests {
             loanEdit.press(key)
         }
 
-        for key in [AmountCalculator.Key.digit(2), .digit(4), .digit(0)] {
-            loanEdit.pressCount(key)
-        }
-
-        for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(5), .digit(8), .digit(7)] {
-            loanEdit.pressFinal(key)
-        }
-
         for variant in Self.variants {
             try Self.write(
                 RecurringEditSheet(model: loanEdit).frame(height: 1900),

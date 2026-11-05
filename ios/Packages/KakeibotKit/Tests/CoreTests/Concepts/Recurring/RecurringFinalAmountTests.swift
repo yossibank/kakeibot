@@ -10,6 +10,16 @@ struct RecurringFinalAmountTests {
         #expect(recurring.endDate(afterCount: fixture.count) == fixture.endDate)
     }
 
+    @Test
+    func countsEndDateFromLaterDay() throws {
+        let fixture = try #require(try Self.finalCases.first)
+        let recurring = fixture.recurring(endDate: nil)
+        let from = try #require(LocalDate("2027-01-01"))
+        let end = try #require(LocalDate("2027-02-27"))
+
+        #expect(recurring.endDate(afterCount: 2, from: from) == end)
+    }
+
     @Test(arguments: try finalCases)
     func countsOccurrences(fixture: FinalCase) {
         let recurring = fixture.recurring(endDate: fixture.endDate)

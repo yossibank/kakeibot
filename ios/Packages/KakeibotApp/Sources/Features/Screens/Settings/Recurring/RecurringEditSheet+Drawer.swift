@@ -47,28 +47,14 @@ extension RecurringEditSheet {
 
         case .count:
             VStack(spacing: 12) {
+                countChoices
+
                 countValue
 
                 Keypad(calculator: model.countCalculator) {
                     closePanel()
                 } onKey: { key in
                     model.pressCount(key)
-                }
-            }
-
-        case .finalAmount:
-            VStack(spacing: 12) {
-                SettingsKeypadValue(model.finalAmount)
-
-                Text("最後の回だけ額が違うときに入れます。0 なら毎回と同じ額です")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .multilineTextAlignment(.center)
-
-                Keypad(calculator: model.finalCalculator) {
-                    closePanel()
-                } onKey: { key in
-                    model.pressFinal(key)
                 }
             }
 
@@ -88,22 +74,50 @@ private extension RecurringEditSheet {
                 .contentTransition(.numericText())
                 .animation(.snappy, value: model.countCalculator.amount)
 
-            Text(model.endDate.map { "終わり \(RecurringText.date($0))" } ?? "回数を入れると、終わりの日が決まります")
+            Text(model.scheduledEndDate
+                .map { "終わり \(RecurringText.date($0))" } ?? "回数を入れると、終わりの日が決まります")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
+        }
+    }
+
+    @ViewBuilder
+    var countChoices: some View {
+        if let plan = model.autoPlan,
+           let owed = model.loanOwed {
+            VStack(spacing: 8) {
+                HStack(spacing: 8) {
+                    SettingsChoice("残高から自動", isSelected: model.usesAutoCount) {
+                        model.useAutoCount()
+                        model.prepareCount()
+                    }
+
+                    SettingsChoice("決めない", isSelected: model.scheduledEndDate == nil) {
+                        model.setEnd(nil)
+                        closePanel()
+                    }
+                }
+
+                Text(
+                    "残高 \(AmountText.text(owed)) ÷ \(AmountText.text(model.amount)) で \(plan.count) 回。端数は最後の回に足します"
+                )
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+            }
         }
     }
 
     var endChooser: some View {
         VStack(spacing: 12) {
             HStack(spacing: 8) {
-                SettingsChoice("終わりなし", isSelected: model.endDate == nil) {
-                    model.endDate = nil
+                SettingsChoice("終わりなし", isSelected: model.scheduledEndDate == nil) {
+                    model.setEnd(nil)
                     closePanel()
                 }
 
                 SettingsChoice("今日で終える", isSelected: isEndingToday) {
-                    model.endDate = model.today
+                    model.setEnd(model.today)
                     closePanel()
                 }
             }
@@ -184,14 +198,14 @@ private extension RecurringEditSheet {
     }
 
     var isEndingToday: Bool {
-        model.endDate == model.today
+        model.scheduledEndDate == model.today
     }
 
     var endBinding: Binding<LocalDate> {
         Binding {
-            model.endDate ?? model.startDate
+            model.scheduledEndDate ?? model.startDate
         } set: { date in
-            model.endDate = date
+            model.setEnd(date)
         }
     }
 }
