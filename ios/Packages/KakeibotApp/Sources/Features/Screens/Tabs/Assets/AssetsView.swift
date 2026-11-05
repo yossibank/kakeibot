@@ -177,27 +177,53 @@ private extension AssetsView {
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
 
+    var netWorthTitle: some View {
+        Text("純資産")
+            .textFont(.caption)
+            .foregroundStyle(Palette.text)
+            .fixedSize()
+    }
+
+    var netWorthNote: some View {
+        Text("投資と借入を含む")
+            .textFont(.caption2)
+            .foregroundStyle(Palette.hint)
+            .lineLimit(1)
+    }
+
+    var netWorthAmount: some View {
+        Text(AmountText.text(model.holdings.netWorth))
+            .displayFont(.headline)
+            .monospacedDigit()
+            .foregroundStyle(Palette.accentStrong)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+    }
+
     var netWorthRow: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("純資産")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.text)
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        netWorthTitle
 
-                    Text("投資と借入も入れた額")
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.hint)
+                        netWorthNote
+                    }
+
+                    Spacer(minLength: 8)
+
+                    netWorthAmount
                 }
 
-                Spacer(minLength: 8)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        netWorthTitle
 
-                Text(AmountText.text(model.holdings.netWorth))
-                    .displayFont(.headline)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                        netWorthNote
+                    }
+
+                    netWorthAmount
+                }
             }
 
             if !owedSections.isEmpty {

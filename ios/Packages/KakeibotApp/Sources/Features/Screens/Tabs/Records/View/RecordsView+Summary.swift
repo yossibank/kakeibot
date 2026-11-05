@@ -48,10 +48,34 @@ private extension RecordsView {
         expense: Int,
         income: Int
     ) -> some View {
-        ViewThatFits(in: .horizontal) {
-            totalsRow(expense: expense, income: income, isStacked: false)
+        VStack(spacing: 8) {
+            ViewThatFits(in: .horizontal) {
+                totalsRow(expense: expense, income: income, isStacked: false)
 
-            totalsRow(expense: expense, income: income, isStacked: true)
+                totalsRow(expense: expense, income: income, isStacked: true)
+            }
+
+            Hairline(thickness: 1)
+
+            balanceRow(income - expense)
+        }
+    }
+
+    func balanceRow(_ balance: Int) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(ReviewText.balanceTitle(balance))
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .fixedSize()
+
+            Spacer(minLength: 8)
+
+            Text(ReviewText.balance(balance))
+                .textFont(.subheadline, weight: .semibold)
+                .monospacedDigit()
+                .foregroundStyle(ReviewText.balanceColor(balance))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
     }
 
