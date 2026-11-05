@@ -234,6 +234,49 @@ struct SnapshotTests {
             )
             try Self.write(intros, variant: variant, to: "settings-intros")
         }
+
+        let choice = SyncChoiceCard(
+            choice: SyncChoice(
+                local: SyncSummary(entryCount: 1234, updatedAt: now),
+                cloud: SyncSummary(entryCount: 1301, updatedAt: now.addingTimeInterval(3600))
+            ),
+            onUseLocal: {},
+            onUseCloud: {},
+            onKeep: {}
+        )
+
+        let shared = try SyncSharedCard(
+            item: WalletShare(
+                wallet: #require(options.wallets.first),
+                icon: nil,
+                isShared: true
+            ),
+            participants: [
+                SyncParticipant(name: "山田 太郎", state: .owner),
+                SyncParticipant(name: "山田 花子", state: .joined),
+                SyncParticipant(name: "taro@example.com", state: .invited)
+            ],
+            isFailed: false,
+            onInvite: {},
+            onStop: {},
+            onClose: {}
+        )
+
+        let squares: [(String, AnyView)] = [
+            ("settings-pro-square", AnyView(ProView(model: ProPurchaseModel(store: .unavailable)))),
+            ("settings-sync-choice-square", AnyView(choice.frame(height: 852))),
+            ("settings-sync-shared-square", AnyView(shared.frame(height: 852)))
+        ]
+
+        for (name, view) in squares {
+            for variant in Self.variants {
+                try Self.write(
+                    view.environment(\.themeStyle.corner, .square),
+                    variant: variant,
+                    to: name
+                )
+            }
+        }
     }
 }
 

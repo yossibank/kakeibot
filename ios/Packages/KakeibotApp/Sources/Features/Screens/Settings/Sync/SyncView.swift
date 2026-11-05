@@ -101,10 +101,10 @@ public struct SyncView: View {
         .confirmation(
             isPresented: isStoppingBinding,
             systemImage: "person.2.slash",
-            title: "共有をやめますか",
+            title: "共有を終えますか",
             message: "相手の iPhone から、この口座と記録が消えます。この iPhone には残ります",
-            keepTitle: "続ける",
-            confirmTitle: "やめる"
+            keepTitle: "やめる",
+            confirmTitle: "共有を終える"
         ) { [stopping] in
             stopSharing(stopping)
         }

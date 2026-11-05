@@ -167,7 +167,7 @@ extension SyncModelTests {
         let after = try await firstShare(in: setup.database)
 
         #expect(after.isShared)
-        #expect(model.errorNotice.message == "共有をやめられませんでした。時間をおいて試してください")
+        #expect(model.errorNotice.message == "共有を終えられませんでした。時間をおいて試してください")
     }
 }
 
