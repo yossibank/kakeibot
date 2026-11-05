@@ -18,11 +18,13 @@ object CoreFixture {
         serializer: KSerializer<T>,
     ): Validity<T> = json.decodeFromString(Validity.serializer(serializer), read(path))
 
-    private fun read(path: String): String {
+    fun data(path: String): ByteArray {
         val root = System.getProperty("fixtures") ?: error("fixtures の場所が渡されていない")
 
-        return File(root, path).readText()
+        return File(root, path).readBytes()
     }
+
+    private fun read(path: String): String = data(path).toString(Charsets.UTF_8)
 
     @Serializable
     class Validity<T>(

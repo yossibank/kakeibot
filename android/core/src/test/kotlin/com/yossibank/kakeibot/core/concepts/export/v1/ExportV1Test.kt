@@ -17,7 +17,6 @@ import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
@@ -311,11 +310,7 @@ internal object ExportFixture {
             ),
         )
 
-    fun data(path: String): ByteArray {
-        val root = System.getProperty("fixtures") ?: error("fixtures の場所が渡されていない")
-
-        return File(root, path).readBytes()
-    }
+    fun data(path: String): ByteArray = CoreFixture.data(path)
 
     fun jsonObject(data: ByteArray): JsonObject = Json.parseToJsonElement(data.toString(Charsets.UTF_8)).jsonObject
 
