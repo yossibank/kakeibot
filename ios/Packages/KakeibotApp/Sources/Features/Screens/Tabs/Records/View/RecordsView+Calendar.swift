@@ -42,6 +42,8 @@ extension RecordsView {
                 }
             }
 
+            adjustmentList(on: date)
+
             let upcoming = model.upcomingRecurrings(on: date)
 
             if !upcoming.isEmpty {

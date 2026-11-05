@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Store
 import SwiftUI
 
 public struct RecordsView: View {
@@ -11,6 +12,7 @@ public struct RecordsView: View {
     @State var batchTarget: RecordsBatchSheet.Target?
     @State var isFiltering = false
     @State var openItemIds: Set<Entry.ID> = []
+    @State var openAdjustment: RecordsModel.AdjustmentRow?
 
     @FocusState var isSearchFocused: Bool
 
@@ -24,6 +26,7 @@ public struct RecordsView: View {
     let onDeleteEntries: ([Entry.ID]) -> Void
 
     private let onChangeEntries: ([Entry.ID], EntryBatchChange) -> Void
+    private let onDeleteAdjustment: (Deletion) -> Void
 
     public init(
         model: RecordsModel,
@@ -32,7 +35,8 @@ public struct RecordsView: View {
         onAddEntry: @escaping (LocalDate) -> Void,
         onOpenRecurring: @escaping (Recurring.ID) -> Void,
         onChangeEntries: @escaping ([Entry.ID], EntryBatchChange) -> Void,
-        onDeleteEntries: @escaping ([Entry.ID]) -> Void
+        onDeleteEntries: @escaping ([Entry.ID]) -> Void,
+        onDeleteAdjustment: @escaping (Deletion) -> Void = { _ in }
     ) {
         self.model = model
         _selection = State(initialValue: selection)
@@ -41,6 +45,7 @@ public struct RecordsView: View {
         self.onOpenRecurring = onOpenRecurring
         self.onChangeEntries = onChangeEntries
         self.onDeleteEntries = onDeleteEntries
+        self.onDeleteAdjustment = onDeleteAdjustment
     }
 
     public var body: some View {
@@ -156,6 +161,11 @@ public struct RecordsView: View {
         }
         .sheet(isPresented: $isFiltering) {
             RecordsFilterSheet(model: model)
+        }
+        .sheet(item: $openAdjustment) { row in
+            RecordsAdjustmentSheet(row: row) {
+                deleteAdjustment(row.id)
+            }
         }
         .haptic(.success, trigger: stampCount)
         .background {
@@ -302,6 +312,14 @@ private extension RecordsView {
 
         PageSlide.run($slide, forward: isForward) {
             model.openCurrentMonth()
+        }
+    }
+
+    func deleteAdjustment(_ id: Adjustment.ID) {
+        Task {
+            if let deletion = await model.deleteAdjustment(id) {
+                onDeleteAdjustment(deletion)
+            }
         }
     }
 }

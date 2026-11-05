@@ -20,6 +20,8 @@ extension RecordsView {
 
                 itemList(row)
             }
+
+            adjustmentList(on: day.date)
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
@@ -59,6 +61,23 @@ extension RecordsView {
             .buttonStyle(.plain)
             .overlay(alignment: .top) {
                 Hairline(thickness: 1)
+            }
+        }
+    }
+
+    @ViewBuilder
+    func adjustmentList(on date: LocalDate) -> some View {
+        if selection == nil {
+            ForEach(model.adjustmentRows(on: date)) { row in
+                Button {
+                    openAdjustment = row
+                } label: {
+                    RecordsAdjustmentRow(row: row)
+                }
+                .buttonStyle(.plain)
+                .overlay(alignment: .top) {
+                    Hairline(thickness: 1)
+                }
             }
         }
     }

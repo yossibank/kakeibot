@@ -77,7 +77,14 @@ public extension RecordsModel {
 
     var days: [EntryDay] {
         let days = list?.days.filter { period.contains($0.date) } ?? []
-        return filter.apply(to: days)
+        let filtered = filter.apply(to: days)
+        let adjusted = adjustedDays(besides: filtered)
+
+        guard !adjusted.isEmpty else {
+            return filtered
+        }
+
+        return (filtered + adjusted).sorted { $0.date > $1.date }
     }
 
     var showsNoRecords: Bool {
