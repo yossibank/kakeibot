@@ -9,10 +9,12 @@ struct WalletBalanceTests {
         let wallet = fixture.wallet()
         let entries = fixture.entries(wallet: wallet.id, other: other)
         let valuations = fixture.valuations(wallet: wallet.id)
+        let adjustments = fixture.adjustments(wallet: wallet.id, other: other)
 
         let balance = wallet.balance(
             with: entries,
             valuations: valuations,
+            adjustments: adjustments,
             through: fixture.through
         )
 
@@ -46,6 +48,7 @@ extension WalletBalanceTests {
         let initialBalance: Int
         let entries: [EntryCase]
         let valuations: [ValuationCase]?
+        let adjustments: [AdjustmentCase]?
         let through: LocalDate?
         let balance: Int
     }
@@ -54,6 +57,12 @@ extension WalletBalanceTests {
         let date: LocalDate
         let amount: Int
         let createdAt: Date?
+    }
+
+    struct AdjustmentCase: Decodable, Sendable {
+        let date: LocalDate
+        let amount: Int
+        let wallet: Side
     }
 
     struct EntryCase: Decodable, Sendable {
@@ -101,6 +110,21 @@ extension WalletBalanceTests.BalanceCase {
                 date: valuation.date,
                 amount: valuation.amount,
                 createdAt: valuation.createdAt ?? Self.valuedAt,
+                updatedAt: Date()
+            )
+        }
+    }
+
+    func adjustments(
+        wallet: Wallet.ID,
+        other: Wallet.ID
+    ) -> [Adjustment] {
+        (adjustments ?? []).map { adjustment in
+            Adjustment(
+                walletId: adjustment.wallet == .self ? wallet : other,
+                date: adjustment.date,
+                amount: adjustment.amount,
+                createdAt: Self.recordedAt,
                 updatedAt: Date()
             )
         }

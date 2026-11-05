@@ -64,6 +64,21 @@ struct RecordResetWriteTests {
     }
 
     @Test
+    func deletesOnlyOwnAdjustments() async throws {
+        let setup = try await Setup()
+        let day = try #require(LocalDate("2026-10-12"))
+        try await setup.database.saveAdjustment(-300, of: setup.other, on: day, at: setup.now)
+        try await setup.database.saveAdjustment(400, of: setup.shared, on: day, at: setup.now)
+
+        let count = try await setup.database.deletableRecordCount()
+        try await setup.database.deleteAllRecords(at: setup.now)
+
+        #expect(count == 1)
+        #expect(try await setup.count("adjustment WHERE wallet_id = '\(setup.shared)'") == 1)
+        #expect(try await setup.count("adjustment") == 1)
+    }
+
+    @Test
     func countsOnlyDeletableRecords() async throws {
         let setup = try await Setup()
         try await setup.addOwnRecords()

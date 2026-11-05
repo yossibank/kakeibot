@@ -41,4 +41,29 @@ extension EntryModelTests {
         let description = EntryModel.shortDateText(for: date, today: today)
         #expect(description == expected)
     }
+
+    @Test(arguments: [
+        ("2026-10-12", "今日"),
+        ("2026-10-11", "10/11（日）"),
+        ("2025-12-31", "2025/12/31（水）")
+    ])
+    func labelsKeypadDate(text: String, expected: String) throws {
+        let today = try #require(LocalDate("2026-10-12"))
+        let date = try #require(LocalDate(text))
+        let description = EntryModel.keypadDateText(for: date, today: today)
+        #expect(description == expected)
+    }
+
+    @Test(arguments: [
+        ("2026-10-12", "2026-10-11"),
+        ("2026-10-11", "2026-10-12"),
+        ("2026-10-05", "2026-10-12")
+    ])
+    func switchesQuickDate(text: String, expected: String) async throws {
+        let model = try await Self.newModel()
+        let today = try #require(LocalDate("2026-10-12"))
+        model.date = try #require(LocalDate(text))
+        let quick = model.quickDate(today: today)
+        #expect(quick == LocalDate(expected))
+    }
 }

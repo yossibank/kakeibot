@@ -20,6 +20,7 @@ public struct Holdings: Hashable, Sendable {
         wallets: [Wallet],
         entries: [Entry],
         valuations: [Valuation] = [],
+        adjustments: [Adjustment] = [],
         through date: LocalDate? = nil
     ) {
         func total(_ role: Wallet.Kind.Role) -> Int {
@@ -29,6 +30,7 @@ public struct Holdings: Hashable, Sendable {
                 of: wallets,
                 with: entries,
                 valuations: valuations,
+                adjustments: adjustments,
                 through: date
             )
         }

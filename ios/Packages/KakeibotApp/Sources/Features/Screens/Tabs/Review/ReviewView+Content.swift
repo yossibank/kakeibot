@@ -27,10 +27,14 @@ extension ReviewView {
                     EmptyView()
                 } else if model.categoryShares.isEmpty,
                           model.walletShares.isEmpty {
-                    PlaceholderEmpty(text: "この期間の記録はありません") {
-                        onAddEntry(recordDate)
-                    }
-                    .padding(16)
+                    PlaceholderEmpty(
+                        systemImage: "chart.pie",
+                        text: "この期間の記録はありません",
+                        onRecord: {
+                            onAddEntry(recordDate)
+                        }
+                    )
+                    .padding(.horizontal, 16)
                     .card()
                     .layoutColumn(.trailing)
                 } else {
@@ -61,14 +65,21 @@ extension ReviewView {
                 }
             }
 
-            StampTallyCard(
-                tallies: model.stampTallies,
-                emptyText: "この期間に押したスタンプはありません",
-                onOpen: { tally in
-                    openStamp = tally
-                }
-            )
-            .layoutColumn(.trailing)
+            let tallies = model.stampTallies
+
+            if tallies.isEmpty {
+                stampHint
+                    .layoutColumn(.trailing)
+            } else {
+                StampTallyCard(
+                    tallies: tallies,
+                    emptyText: "この期間に押したスタンプはありません",
+                    onOpen: { tally in
+                        openStamp = tally
+                    }
+                )
+                .layoutColumn(.trailing)
+            }
         }
     }
 }
@@ -173,6 +184,19 @@ private extension ReviewView {
         .card()
     }
 
+    var stampHint: some View {
+        Label("記録のカレンダーで日を選ぶと、スタンプを押せます", systemImage: "seal")
+            .textFont(.footnote)
+            .foregroundStyle(Palette.subtext)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .overlay {
+                RoundedRectangle(cornerRadius: corner.radius(16))
+                    .strokeBorder(Palette.outline, style: .dashed)
+            }
+    }
+
     func kindTile(_ kind: ReviewKind) -> some View {
         let isSelected = kind == model.kind
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
@@ -185,9 +209,16 @@ private extension ReviewView {
         } label: {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
-                    Text(Self.title(of: kind))
-                        .textFont(.caption)
-                        .foregroundStyle(titleColor)
+                    ViewThatFits(in: .horizontal) {
+                        Text(tileTitle(of: kind))
+                            .fixedSize()
+
+                        Text(Self.title(of: kind))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .textFont(.caption)
+                    .foregroundStyle(titleColor)
 
                     Spacer(minLength: 0)
 
@@ -198,7 +229,7 @@ private extension ReviewView {
                     }
                 }
 
-                AmountText(model.total(of: kind), type: kind.entryType)
+                tileAmount(of: kind)
                     .displayFont(.body)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -217,6 +248,19 @@ private extension ReviewView {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    func tileAmount(of kind: ReviewKind) -> some View {
+        let total = model.total(of: kind)
+
+        if kind == .balance {
+            Text(ReviewText.balance(total))
+                .monospacedDigit()
+                .foregroundStyle(Self.balanceColor(total))
+        } else {
+            AmountText(total, type: kind.entryType)
+        }
     }
 
     func balanceBar(
@@ -316,6 +360,14 @@ private extension ReviewView {
         return isGood ? Palette.accent : Palette.rose
     }
 
+    static func balanceColor(_ amount: Int) -> Color {
+        if amount > 0 {
+            return Palette.accent
+        }
+
+        return amount < 0 ? Palette.rose : Palette.accentStrong
+    }
+
     static func title(of kind: ReviewKind) -> String {
         switch kind {
         case .expense: "支出"
@@ -350,6 +402,14 @@ private extension ReviewView {
             bottom: bottom ? 10 : 0,
             trailing: 0
         )
+    }
+
+    func tileTitle(of kind: ReviewKind) -> String {
+        guard kind == .balance else {
+            return Self.title(of: kind)
+        }
+
+        return ReviewText.balanceTitle(model.total(of: kind))
     }
 
     func recurringText(_ recurring: Int) -> String {

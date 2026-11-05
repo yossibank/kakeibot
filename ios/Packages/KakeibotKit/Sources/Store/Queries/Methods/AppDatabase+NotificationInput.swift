@@ -55,6 +55,7 @@ private extension NotificationPart {
             wallets: wallets,
             entries: entries,
             valuations: list.valuations,
+            adjustments: list.adjustments,
             after: yesterday
         )
 

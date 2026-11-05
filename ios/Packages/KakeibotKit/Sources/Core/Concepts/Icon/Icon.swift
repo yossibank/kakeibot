@@ -270,6 +270,36 @@ public extension Icon {
         case smile
         case infinity
         case number
+        case dryer
+        case sink
+        case garage
+        case cabin
+        case hometown
+        case call
+        case streaming
+        case app
+        case storage
+        case study
+        case lab
+        case allergy
+        case dental
+        case makeup
+        case climbing
+        case cycling
+        case martialarts
+        case bowling
+        case pingpong
+        case snowboard
+        case boxing
+        case exchange
+        case refund
+        case giftcard
+        case scholarship
+        case repayment
+        case installment
+        case cinema
+        case livemusic
+        case savings
 
         public init(known rawValue: String) {
             self = Self(rawValue: rawValue) ?? .other

@@ -6,6 +6,7 @@ public struct EntryList: Equatable, Sendable {
     public let tags: [EntryTag.ID: EntryTag]
     public let wallets: [Wallet.ID: Wallet]
     public let valuations: [Valuation]
+    public let adjustments: [Adjustment]
     public let icons: [Icon.ID: Icon]
     public let cardBills: [Recurring]
     public let items: [Entry.ID: [EntryItem]]
@@ -16,6 +17,7 @@ public struct EntryList: Equatable, Sendable {
         tags: [EntryTag.ID: EntryTag],
         wallets: [Wallet.ID: Wallet],
         valuations: [Valuation] = [],
+        adjustments: [Adjustment] = [],
         icons: [Icon.ID: Icon],
         cardBills: [Recurring] = [],
         items: [Entry.ID: [EntryItem]] = [:]
@@ -25,6 +27,7 @@ public struct EntryList: Equatable, Sendable {
         self.tags = tags
         self.wallets = wallets
         self.valuations = valuations
+        self.adjustments = adjustments
         self.icons = icons
         self.cardBills = cardBills
         self.items = items

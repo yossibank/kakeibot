@@ -20,6 +20,8 @@ extension RecordsView {
 
                 itemList(row)
             }
+
+            adjustmentList(on: day.date)
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
@@ -63,56 +65,58 @@ extension RecordsView {
         }
     }
 
+    @ViewBuilder
+    func adjustmentList(on date: LocalDate) -> some View {
+        if selection == nil {
+            ForEach(model.adjustmentRows(on: date)) { row in
+                Button {
+                    openAdjustment = row
+                } label: {
+                    RecordsAdjustmentRow(row: row)
+                }
+                .buttonStyle(.plain)
+                .overlay(alignment: .top) {
+                    Hairline(thickness: 1)
+                }
+            }
+        }
+    }
+
     func dayHeader(
         _ date: LocalDate,
         day: EntryDay?
     ) -> some View {
-        let holiday = Holiday.name(of: date)
+        Group {
+            if let selection,
+               let day {
+                ViewThatFits(in: .horizontal) {
+                    dayHeaderRow(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: true)
+                    }
 
-        return HStack(spacing: 12) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(PeriodText.day(date, today: model.today))
-                    .displayFont(.headline)
-                    .foregroundStyle(Palette.accentStrong)
-                    .fixedSize()
+                    dayHeaderRow(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: false)
+                    }
 
-                Text("（\(date.weekday.shortName)）")
-                    .textFont(.caption)
-                    .foregroundStyle(Self.weekdayColor(for: date))
-                    .fixedSize()
+                    dayHeaderStack(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: true)
+                    }
 
-                if let holiday {
-                    Text(holiday)
-                        .textFont(.caption2)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .foregroundStyle(Palette.holiday)
+                    dayHeaderStack(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: false)
+                    }
                 }
+            } else {
+                ViewThatFits(in: .horizontal) {
+                    dayHeaderRow(date, day: day) {
+                        dayButtons(on: date)
+                    }
 
-                Spacer(minLength: 8)
-
-                if let day {
-                    dayTotals(day)
+                    dayHeaderStack(date, day: day) {
+                        dayButtons(on: date)
+                    }
                 }
             }
-
-            if model.canReward(on: date) {
-                Button {
-                    rewardTarget = StampTarget(date: date)
-                } label: {
-                    rewardButtonLabel(on: date)
-                        .tapArea(Self.dayButtonTapOutsets)
-                }
-                .buttonStyle(.plain)
-            }
-
-            Button {
-                stampTarget = StampTarget(date: date)
-            } label: {
-                stampButtonLabel(on: date)
-                    .tapArea(Self.dayButtonTapOutsets)
-            }
-            .buttonStyle(.plain)
         }
         .padding(.top, 12)
         .padding(.bottom, 8)
@@ -132,6 +136,141 @@ private extension RecordsView {
             type: row.type,
             isRecurring: row.isRecurring
         )
+    }
+
+    func dayHeaderRow(
+        _ date: LocalDate,
+        day: EntryDay?,
+        @ViewBuilder trailing: () -> some View
+    ) -> some View {
+        HStack(spacing: 12) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                dayTitle(date)
+
+                if let holiday = Holiday.name(of: date) {
+                    holidayText(holiday)
+                }
+
+                Spacer(minLength: 8)
+
+                if let day {
+                    dayTotals(day)
+                        .fixedSize()
+                }
+            }
+
+            trailing()
+        }
+    }
+
+    func dayHeaderStack(
+        _ date: LocalDate,
+        day: EntryDay?,
+        @ViewBuilder trailing: () -> some View
+    ) -> some View {
+        let holiday = Holiday.name(of: date)
+        let hasTotals = day.map(Self.hasTotals) ?? false
+
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 12) {
+                dayTitle(date)
+
+                Spacer(minLength: 8)
+
+                trailing()
+            }
+
+            if holiday != nil || hasTotals {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    if let holiday {
+                        holidayText(holiday)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    if let day {
+                        dayTotals(day)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .layoutPriority(1)
+                    }
+                }
+            }
+        }
+    }
+
+    func dayTitle(_ date: LocalDate) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(PeriodText.day(date, today: model.today))
+                .displayFont(.headline)
+                .foregroundStyle(Palette.accentStrong)
+                .fixedSize()
+
+            Text("（\(date.weekday.shortName)）")
+                .textFont(.caption)
+                .foregroundStyle(Self.weekdayColor(for: date))
+                .fixedSize()
+        }
+    }
+
+    func holidayText(_ holiday: String) -> some View {
+        Text(holiday)
+            .textFont(.caption2)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .foregroundStyle(Palette.holiday)
+    }
+
+    @ViewBuilder
+    func dayButtons(on date: LocalDate) -> some View {
+        if model.canReward(on: date) {
+            Button {
+                rewardTarget = StampTarget(date: date)
+            } label: {
+                rewardButtonLabel(on: date)
+                    .tapArea(Self.dayButtonTapOutsets)
+            }
+            .buttonStyle(.plain)
+        }
+
+        Button {
+            stampTarget = StampTarget(date: date)
+        } label: {
+            stampButtonLabel(on: date)
+                .tapArea(Self.dayButtonTapOutsets)
+        }
+        .buttonStyle(.plain)
+    }
+
+    func daySelectButton(
+        _ day: EntryDay,
+        in selection: Set<Entry.ID>,
+        showsTitle: Bool
+    ) -> some View {
+        let isSelected = model.isSelected(day, in: selection)
+        let mark = isSelected ? "checkmark.circle.fill" : "circle"
+
+        return Button {
+            self.selection = model.toggling(day, in: selection)
+        } label: {
+            HStack(spacing: 4) {
+                if showsTitle {
+                    Text("この日を選ぶ")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.accent)
+                        .lineLimit(1)
+                        .fixedSize()
+                }
+
+                Image(systemName: mark)
+                    .sansFont(.headline)
+                    .foregroundStyle(Palette.accent)
+                    .contentTransition(.symbolEffect(.replace))
+            }
+            .frame(minHeight: 26)
+            .tapArea(Self.dayButtonTapOutsets)
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -181,8 +320,6 @@ private extension RecordsView {
             }
         }
         .textFont(.caption)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
     }
 }
 
@@ -198,17 +335,15 @@ private extension RecordsView {
         date.tint ?? Palette.subtext
     }
 
+    static func hasTotals(_ day: EntryDay) -> Bool {
+        day.expenseTotal > 0 || day.incomeTotal > 0
+    }
+
     func toggleSelection(_ id: Entry.ID) {
-        guard var selected = selection else {
+        guard let selection else {
             return
         }
 
-        if selected.contains(id) {
-            selected.remove(id)
-        } else {
-            selected.insert(id)
-        }
-
-        selection = selected
+        self.selection = model.toggling(id, in: selection)
     }
 }

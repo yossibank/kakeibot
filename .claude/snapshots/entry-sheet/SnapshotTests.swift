@@ -104,6 +104,98 @@ struct SnapshotTests {
         try Self.write(help, to: "entry-item-help.png")
 
         try await renderReceipt()
+        try await renderSaveLabels()
+    }
+}
+
+private extension SnapshotTests {
+    func renderSaveLabels() async throws {
+        let longModel = try await Self.model(
+            .expense,
+            digits: Self.largeDigits,
+            hasTemplates: true,
+            hasLongNames: true
+        )
+
+        for (name, size) in [("entry-long", Self.phone), ("entry-long-narrow", Self.narrow)] {
+            let view = EntrySheet(model: longModel)
+                .frame(width: size.width, height: size.height)
+                .background(Palette.background)
+                .environment(\.canScanReceipt, true)
+                .environment(\.colorScheme, .light)
+
+            try Self.write(view, to: "\(name).png")
+        }
+
+        let pastModel = try await Self.model(
+            .expense,
+            digits: Self.smallDigits,
+            hasTemplates: true
+        )
+
+        pastModel.date = LocalDate(Date(), in: .current).adding(days: -3)
+
+        for (name, size) in [
+            ("entry-past-date", Self.mini),
+            ("entry-past-date-narrow", Self.narrow)
+        ] {
+            let view = EntrySheet(model: pastModel)
+                .frame(width: size.width, height: size.height)
+                .background(Palette.background)
+                .environment(\.canScanReceipt, true)
+                .environment(\.colorScheme, .dark)
+
+            try Self.write(view, to: "\(name).png")
+        }
+
+        let transferModel = try await Self.model(
+            .transfer,
+            digits: Self.largeDigits,
+            startsWithAmount: false,
+            hasLongNames: true
+        )
+
+        transferModel.setFee(440)
+
+        let transfer = EntrySheet(model: transferModel)
+            .frame(width: Self.narrow.width, height: Self.narrow.height)
+            .background(Palette.background)
+            .environment(\.colorScheme, .light)
+
+        try Self.write(transfer, to: "entry-transfer-narrow.png")
+
+        let longClosedModel = try await Self.model(
+            .expense,
+            digits: Self.largeDigits,
+            startsWithAmount: false,
+            hasLongNames: true
+        )
+
+        let labels = VStack(spacing: 16) {
+            EntrySaveButton(label: longClosedModel.saveLabel(today: longClosedModel.date)) {}
+
+            EntrySaveButton(label: transferModel.saveLabel(today: transferModel.date)) {}
+
+            EntrySaveButton(label: EntryModel.SaveLabel(
+                title: "変更を保存",
+                amount: "¥1,200",
+                category: "食費",
+                day: "昨日",
+                wallets: "財布"
+            )) {}
+
+            EntrySaveButton(label: EntryModel.SaveLabel(title: "金額を入れてください")) {}
+                .disabled(true)
+
+            EntrySaveButton(label: EntryModel.SaveLabel(title: "振替先を選んでください")) {}
+                .disabled(true)
+        }
+        .padding(16)
+        .frame(width: 168 + 32)
+        .background(Palette.background)
+        .environment(\.colorScheme, .light)
+
+        try Self.write(labels, to: "entry-save-labels-168.png")
     }
 }
 
@@ -203,6 +295,7 @@ private extension SnapshotTests {
     static let directory = "__OUT__"
     static let phone = CGSize(width: 393, height: 852)
     static let mini = CGSize(width: 375, height: 812)
+    static let narrow = CGSize(width: 320, height: 693)
 
     static let smallDigits: [AmountCalculator.Key] = [.digit(1), .digit(2), .doubleZero]
     static let largeDigits = (2...9).reversed().map(AmountCalculator.Key.digit)
@@ -211,6 +304,7 @@ private extension SnapshotTests {
     static let cases: [(String, Entry.Kind, [AmountCalculator.Key])] = [
         ("entry-expense", .expense, smallDigits),
         ("entry-transfer", .transfer, smallDigits),
+        ("entry-transfer-empty", .transfer, []),
         ("entry-expense-large", .expense, largeDigits)
     ]
 
@@ -241,7 +335,8 @@ private extension SnapshotTests {
         _ type: Entry.Kind,
         digits: [AmountCalculator.Key],
         startsWithAmount: Bool = true,
-        hasTemplates: Bool = false
+        hasTemplates: Bool = false,
+        hasLongNames: Bool = false
     ) async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
         let now = Date()
@@ -266,6 +361,10 @@ private extension SnapshotTests {
             }
         }
 
+        if hasLongNames {
+            try await renameLong(in: database, at: now)
+        }
+
         let model = EntryModel(database: database, date: date, type: type)
 
         await model.load()
@@ -275,6 +374,26 @@ private extension SnapshotTests {
         }
 
         return model
+    }
+
+    static func renameLong(
+        in database: AppDatabase,
+        at now: Date
+    ) async throws {
+        let options = try await database.entryOptions()
+        let category = try #require(options.expenseCategories.first)
+        let categoryIcon = try #require(options.icons[category.iconId])
+        let wallet = try #require(options.wallets.first)
+        let walletIcon = try #require(options.icons[wallet.iconId])
+
+        var categoryDraft = EntryCategoryDraft(category, icon: categoryIcon)
+        var walletDraft = WalletDraft(wallet, icon: walletIcon)
+
+        categoryDraft.name = "子どもの習い事と教材と遠足の費用"
+        walletDraft.name = "三井住友カード ゴールド 家族カード"
+
+        try await database.saveCategory(categoryDraft, tags: [], editing: category.id, at: now)
+        try await database.saveWallet(walletDraft, editing: wallet.id, at: now)
     }
 
     static func addItems(to model: EntryModel) {

@@ -47,6 +47,7 @@ private extension Deletion.Kind {
         case .theme: "テーマ"
         case .shelfIcon: "スタンプ"
         case .valuation: "評価額"
+        case .adjustment: "残高の調整"
         }
     }
 }

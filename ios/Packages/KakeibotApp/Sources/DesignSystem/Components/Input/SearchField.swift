@@ -45,11 +45,14 @@ public struct SearchField: View {
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(Palette.hint)
+                        .frame(width: 32, height: 32)
+                        .tapArea(6)
                 }
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.leading, 16)
+        .padding(.trailing, text.isEmpty ? 16 : 8)
         .frame(height: 44)
         .background(Palette.faint, in: Capsule())
         .overlay {

@@ -8,6 +8,8 @@ public struct AssetsView: View {
     @State var entrySheet: AssetsEntrySheet.Content?
     @State var isShowingReward = false
     @State var isAddingGoal = false
+    @State var isAddingWallet = false
+    @State var adjusting: AssetsModel.WalletRow?
 
     @Environment(\.themeStyle.corner) var corner
 
@@ -48,22 +50,12 @@ public struct AssetsView: View {
                         billCard
                     }
 
-                    if !ownedSections.isEmpty {
-                        walletGroup(
-                            "資産",
-                            systemImage: "yensign",
-                            sections: ownedSections
-                        )
+                    ownedCard
                         .layoutColumn(.trailing)
-                    }
 
                     if !owedSections.isEmpty {
-                        walletGroup(
-                            "負債",
-                            systemImage: "arrow.uturn.backward",
-                            sections: owedSections
-                        )
-                        .layoutColumn(.trailing)
+                        walletGroup("負債", sections: owedSections)
+                            .layoutColumn(.trailing)
                     }
 
                     rewardCard
@@ -82,6 +74,12 @@ public struct AssetsView: View {
         }
         .sheet(isPresented: $isAddingGoal) {
             AssetsGoalSheet(model: model.goalEditModel(editing: nil))
+        }
+        .sheet(isPresented: $isAddingWallet) {
+            WalletEditSheet(model: WalletEditModel(database: model.database))
+        }
+        .sheet(item: $adjusting) { row in
+            AssetsAdjustSheet(model: model.adjustModel(for: row))
         }
         .sheet(item: $entrySheet, onDismiss: openPendingEntry) { content in
             AssetsEntrySheet(content: content) { id in
@@ -115,6 +113,12 @@ private extension AssetsView {
         .padding(.horizontal, 16)
         .padding(.bottom, 16)
         .card()
+    }
+
+    var ownedCard: some View {
+        walletGroup("資産", sections: ownedSections) {
+            isAddingWallet = true
+        }
     }
 
     var totalContent: some View {

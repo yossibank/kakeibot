@@ -92,6 +92,15 @@ public extension AssetsModel {
         upcomingBills.reduce(0) { $0 + $1.bill.amount }
     }
 
+    func adjustModel(for row: WalletRow) -> AssetsAdjustModel {
+        AssetsAdjustModel(
+            database: database,
+            wallet: row.wallet,
+            balance: row.balance,
+            today: today
+        )
+    }
+
     func run() async {
         await withDiscardingTaskGroup { group in
             group.addTask {
@@ -138,6 +147,10 @@ private extension AssetsModel {
         list?.valuations ?? []
     }
 
+    var adjustments: [Adjustment] {
+        list?.adjustments ?? []
+    }
+
     static func row(
         of entry: Entry,
         in list: EntryList
@@ -169,6 +182,7 @@ private extension AssetsModel {
             wallets: wallets,
             entries: entries,
             valuations: valuations,
+            adjustments: adjustments,
             through: today
         )
     }
@@ -181,6 +195,7 @@ private extension AssetsModel {
             wallets: wallets,
             entries: entries,
             valuations: valuations,
+            adjustments: adjustments,
             through: end
         )
 
@@ -199,6 +214,7 @@ private extension AssetsModel {
             wallets: allWallets,
             entries: entries,
             valuations: valuations,
+            adjustments: adjustments,
             after: today
         )
 
@@ -298,6 +314,7 @@ private extension AssetsModel {
                 wallets: wallets,
                 entries: entries,
                 valuations: valuations,
+                adjustments: adjustments,
                 through: end
             )
 
@@ -313,6 +330,7 @@ private extension AssetsModel {
         wallet.balance(
             with: entries,
             valuations: valuations,
+            adjustments: adjustments,
             through: today
         )
     }

@@ -129,7 +129,29 @@ private extension SnapshotTests {
             recorded: nil
         )
 
-        return [("normal", sample), ("undo", undo), ("long", long)]
+        let two = QuickRecordWidgetSummary(
+            todayExpense: sample.todayExpense,
+            tiles: Array(sample.tiles.prefix(2)),
+            todayRecords: sample.todayRecords,
+            todayCount: sample.todayCount,
+            recorded: nil
+        )
+
+        let none = QuickRecordWidgetSummary(
+            todayExpense: 0,
+            tiles: [],
+            todayRecords: [],
+            todayCount: 0,
+            recorded: nil
+        )
+
+        return [
+            ("normal", sample),
+            ("undo", undo),
+            ("long", long),
+            ("two", two),
+            ("none", none)
+        ]
     }
 
     static func cases(on today: LocalDate) -> [(String, BudgetWidgetSummary?)] {

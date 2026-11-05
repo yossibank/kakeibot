@@ -111,6 +111,7 @@ private extension ReviewModel {
                 let balance = wallet.balance(
                     with: entries,
                     valuations: list.valuations,
+                    adjustments: list.adjustments,
                     through: today
                 )
 

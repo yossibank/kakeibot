@@ -41,12 +41,8 @@ public extension WalletEditModel {
         kind == .loan
     }
 
-    var showsSign: Bool {
-        !kind.isDebt
-    }
-
     var balanceText: String {
-        AmountText.text(showsSign ? calculator.amount : initialBalance)
+        AmountText.text(initialBalance)
     }
 
     var loanAmountText: String {

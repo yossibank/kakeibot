@@ -5,7 +5,8 @@ public extension [Recurring] {
     ) -> Int {
         filter { $0.type == type }.reduce(0) { sum, recurring in
             let dates = recurring.dates(from: range.lowerBound, through: range.upperBound)
-            return sum + recurring.amount * dates.count
+            let amounts = dates.map(recurring.scheduledAmount(paidOn:))
+            return sum + amounts.reduce(0, +)
         }
     }
 }

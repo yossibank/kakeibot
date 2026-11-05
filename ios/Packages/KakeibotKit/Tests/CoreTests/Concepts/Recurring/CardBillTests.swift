@@ -35,6 +35,7 @@ struct CardBillTests {
             wallets: [bank, first, second],
             entries: [],
             valuations: [],
+            adjustments: [],
             after: today
         )
 
@@ -78,11 +79,54 @@ struct CardBillTests {
             wallets: [source, card],
             entries: [],
             valuations: [valuation],
+            adjustments: [],
             after: today
         )
 
         #expect(upcoming.map(\.balanceBefore) == [50000])
         #expect(upcoming.map(\.shortage) == [0])
+    }
+
+    @Test
+    func startsFromAdjustedBalanceOfSource() throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        let today = try #require(LocalDate("2026-10-20"))
+        let start = try #require(LocalDate("2026-01-01"))
+        let source = Self.wallet(.bank, balance: 10000, at: now)
+        let card = Self.wallet(.card, balance: 0, at: now)
+
+        let bill = Recurring(
+            type: .transfer,
+            amount: 30000,
+            categoryId: nil,
+            walletId: source.id,
+            toWalletId: card.id,
+            frequency: .monthly,
+            day: 27,
+            startDate: start,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let adjustment = Adjustment(
+            walletId: source.id,
+            date: today,
+            amount: 5000,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let upcoming = CardBill.upcoming(
+            recurrings: [bill],
+            wallets: [source, card],
+            entries: [],
+            valuations: [],
+            adjustments: [adjustment],
+            after: today
+        )
+
+        #expect(upcoming.map(\.balanceBefore) == [15000])
+        #expect(upcoming.map(\.shortage) == [15000])
     }
 }
 

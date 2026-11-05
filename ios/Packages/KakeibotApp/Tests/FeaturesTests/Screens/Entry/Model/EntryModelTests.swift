@@ -285,33 +285,26 @@ struct EntryModelTests {
     }
 
     @Test
-    func namesSaveButtonByState() async throws {
-        let model = try await Self.newModel()
-
-        let empty = model.saveTitle
-        model.press(.digit(9))
-        model.press(.digit(8))
-        model.press(.digit(0))
-
-        #expect(empty == "金額を入れてください")
-        #expect(model.saveTitle == "¥980 を記録する")
-        #expect(model.saveSubject == "食費")
-    }
-
-    @Test
-    func describesSaveDetail() async throws {
+    func labelsSaveButtonByState() async throws {
         let model = try await Self.newModel()
         let today = model.date
 
-        let empty = model.saveDetail(today: today)
-        model.press(.digit(5))
-        let recorded = model.saveDetail(today: today)
+        let empty = model.saveLabel(today: today)
+        model.press(.digit(9))
+        model.press(.digit(8))
+        model.press(.digit(0))
+        let recorded = model.saveLabel(today: today)
         model.date = today.adding(days: -2)
-        let earlier = model.saveDetail(today: today)
+        let earlier = model.saveLabel(today: today)
 
-        #expect(empty == nil)
-        #expect(recorded == "今日・財布から")
-        #expect(earlier == "10/10・財布から")
+        #expect(empty == EntryModel.SaveLabel(title: "金額を入れてください"))
+        #expect(recorded.title == "記録する")
+        #expect(recorded.amount == "¥980")
+        #expect(recorded.category == "食費")
+        #expect(recorded.day == "今日")
+        #expect(recorded.wallets == "財布")
+        #expect(recorded.fee == nil)
+        #expect(earlier.day == "10/10")
     }
 
     @Test

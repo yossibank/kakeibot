@@ -146,6 +146,69 @@ struct SnapshotTests {
             )
         }
 
+        let loanDraft = WalletDraft(
+            kind: .loan,
+            name: "日本学生支援機構 第二種（有利子）",
+            mark: .glyph(.scholarship),
+            color: "#4A6FA5",
+            initialBalance: -3_896_752
+        )
+
+        let loan = try await database.saveWallet(loanDraft, at: Date())
+        let loanEdit = RecurringEditModel(database: database, today: today, paying: loan.id)
+
+        await loanEdit.load()
+
+        for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
+            loanEdit.press(key)
+        }
+
+        for variant in Self.variants {
+            try Self.write(
+                RecurringEditSheet(model: loanEdit).frame(height: 1900),
+                variant: variant,
+                to: "settings-recurring-loan"
+            )
+        }
+
+        let savedTemplate = try await database.templates().first
+        let templateEditing = TemplateEditModel(
+            database: database,
+            type: .expense,
+            editing: savedTemplate?.id
+        )
+        let budgetDrawer = BudgetListModel(database: database, today: today)
+        let minusWallet = WalletEditModel(database: database)
+
+        await templateEditing.load()
+        await budgetDrawer.load()
+
+        budgetDrawer.startEditing(.total)
+        minusWallet.name = "楽天カード"
+        minusWallet.kind = .card
+
+        for key in [AmountCalculator.Key.digit(5), .digit(2), .tripleZero] {
+            minusWallet.press(key)
+        }
+
+        for variant in Self.variants {
+            try Self.write(
+                TemplateEditSheet(model: templateEditing).frame(height: 1000),
+                variant: variant,
+                to: "settings-template-edit-editing"
+            )
+            try Self.write(
+                BudgetListView(model: budgetDrawer).frame(height: 852),
+                variant: variant,
+                to: "settings-budgets-suggestions"
+            )
+            try Self.write(
+                WalletEditSheet(model: minusWallet).frame(height: 1000),
+                variant: variant,
+                to: "settings-wallet-edit-minus"
+            )
+        }
+
         templateEdit.walletId = card?.id
         recurringEdit.walletId = card?.id
 
@@ -202,7 +265,55 @@ struct SnapshotTests {
                 variant: variant,
                 to: "settings-whats-new"
             )
+            try Self.write(
+                WhatsNewSheet(seenVersion: "1.1.0", version: "1.1.0", revealsSteps: false) { _ in },
+                variant: variant,
+                to: "settings-whats-new-older"
+            )
             try Self.write(intros, variant: variant, to: "settings-intros")
+        }
+
+        let choice = SyncChoiceCard(
+            choice: SyncChoice(
+                local: SyncSummary(entryCount: 1234, updatedAt: now),
+                cloud: SyncSummary(entryCount: 1301, updatedAt: now.addingTimeInterval(3600))
+            ),
+            onUseLocal: {},
+            onUseCloud: {},
+            onKeep: {}
+        )
+
+        let shared = try SyncSharedCard(
+            item: WalletShare(
+                wallet: #require(options.wallets.first),
+                icon: nil,
+                isShared: true
+            ),
+            participants: [
+                SyncParticipant(name: "山田 太郎", state: .owner),
+                SyncParticipant(name: "山田 花子", state: .joined),
+                SyncParticipant(name: "taro@example.com", state: .invited)
+            ],
+            isFailed: false,
+            onInvite: {},
+            onStop: {},
+            onClose: {}
+        )
+
+        let squares: [(String, AnyView)] = [
+            ("settings-pro-square", AnyView(ProView(model: ProPurchaseModel(store: .unavailable)))),
+            ("settings-sync-choice-square", AnyView(choice.frame(height: 852))),
+            ("settings-sync-shared-square", AnyView(shared.frame(height: 852)))
+        ]
+
+        for (name, view) in squares {
+            for variant in Self.variants {
+                try Self.write(
+                    view.environment(\.themeStyle.corner, .square),
+                    variant: variant,
+                    to: name
+                )
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ extension RecordsView {
     var searchBar: some View {
         HStack(spacing: 12) {
             SearchField(
-                "メモ・カテゴリ・タグ・口座・金額",
+                "メモや金額で探す",
                 text: $model.searchText,
                 focus: $isSearchFocused
             ) {
@@ -33,80 +33,40 @@ extension RecordsView {
         let days = model.searchDays
 
         if EntrySearch(model.searchText).isEmpty {
-            if model.recentSearches.isEmpty {
-                Text("メモ・カテゴリ・タグ・口座の名前や、金額で探せます")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.subtext)
-                    .padding(.vertical, 40)
-            } else {
-                recentList
-            }
+            RecordsSearchHistory(
+                words: model.recentSearches,
+                onSelect: selectRecent,
+                onClear: clearRecent,
+                onRestore: restoreRecent
+            )
         } else if let summary = model.searchSummary {
             searchSummary(summary)
 
             ForEach(days, id: \.date) { day in
                 dayCard(day)
             }
-        } else if model.isSearchHiddenByFilter {
-            filteredEmpty
         } else {
-            Text("見つかりませんでした")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-                .padding(.vertical, 40)
+            searchEmpty
         }
     }
 }
 
 private extension RecordsView {
-    var recentList: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            CardHeader("最近探した言葉") {
-                Button {
-                    Task {
-                        await model.clearRecentSearches()
-                    }
-                } label: {
-                    Text("消す")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-                        .padding(.horizontal, 8)
-                        .frame(minHeight: 36)
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
+    var searchEmpty: some View {
+        let word = model.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hiddenCount = model.searchHiddenCount
 
-            ForEach(model.recentSearches, id: \.self) { word in
-                Button {
-                    model.searchText = word
-                    rememberSearch()
-                } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .sansFont(.small)
-                            .foregroundStyle(Palette.subtext)
-
-                        Text(word)
-                            .textFont(.subheadline)
-                            .foregroundStyle(Palette.text)
-                            .sharedTextScale()
-
-                        Spacer()
-                    }
-                    .frame(minHeight: 44)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-                .overlay(alignment: .top) {
-                    Hairline(thickness: 1)
+        return PlaceholderEmpty(
+            systemImage: "magnifyingglass",
+            text: "「\(word)」は見つかりませんでした",
+            detail: "金額やメモの一部でも探せます"
+        ) {
+            if hiddenCount > 0 {
+                RecordsFilterClearButton(count: hiddenCount) {
+                    clearFilter()
                 }
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 4)
-        .card()
-        .sharesTextScale(id: model.recentSearches)
     }
 }
 
@@ -116,6 +76,23 @@ private extension RecordsView {
 
         Task {
             await model.rememberSearch(text)
+        }
+    }
+
+    func selectRecent(_ word: String) {
+        model.searchText = word
+        rememberSearch()
+    }
+
+    func clearRecent() {
+        Task {
+            await model.clearRecentSearches()
+        }
+    }
+
+    func restoreRecent(_ words: [String]) {
+        Task {
+            await model.restoreRecentSearches(words)
         }
     }
 

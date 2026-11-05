@@ -11,6 +11,7 @@ struct SettingsEditHeader: View {
     let isHidden: Bool
     var canHide = true
     var canDelete = true
+    var subtitle: String?
     let onClose: () -> Void
     let onHide: () -> Void
     let onDelete: () -> Void
@@ -22,7 +23,16 @@ struct SettingsEditHeader: View {
 
             Spacer()
 
-            SheetTitle(title)
+            VStack(spacing: 4) {
+                SheetTitle(title, wraps: false)
+
+                if let subtitle {
+                    Text(subtitle)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                }
+            }
 
             Spacer()
 

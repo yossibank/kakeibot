@@ -69,6 +69,10 @@ private extension BudgetKeypadLayer {
                     .contentTransition(.numericText())
                     .animation(.snappy, value: model.calculator.amount)
 
+                if !model.suggestions.isEmpty {
+                    suggestionRow
+                }
+
                 Keypad(calculator: model.calculator) {
                     Task {
                         await model.finishEditing()
@@ -101,6 +105,36 @@ private extension BudgetKeypadLayer {
                     }
                 }
             }
+        }
+    }
+
+    var suggestionRow: some View {
+        HStack(spacing: 8) {
+            ForEach(model.suggestions, id: \.self) { suggestion in
+                suggestionChip(suggestion)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    func suggestionChip(_ suggestion: BudgetListModel.Suggestion) -> some View {
+        ChipButton(
+            isSelected: model.calculator.amount == suggestion.amount,
+            width: .fill
+        ) {
+            model.choose(suggestion)
+        } content: {
+            VStack(spacing: 0) {
+                Text(suggestion.title)
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+
+                Text(AmountText.text(suggestion.amount))
+                    .monospacedDigit()
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .padding(.vertical, 4)
         }
     }
 }

@@ -12,6 +12,7 @@ public struct Deletion: Hashable, Sendable, Identifiable {
     var templates: [EntryTemplate] = []
     var budgets: [Budget] = []
     var valuations: [Valuation] = []
+    var adjustments: [Adjustment] = []
     var shelfIcons: [ShelfIcon] = []
     var rewardRules: [RewardRule] = []
     var rewardLogs: [RewardLog] = []
@@ -32,6 +33,7 @@ public extension Deletion {
         self.templates = deletions.flatMap(\.templates)
         self.budgets = deletions.flatMap(\.budgets)
         self.valuations = deletions.flatMap(\.valuations)
+        self.adjustments = deletions.flatMap(\.adjustments)
         self.shelfIcons = deletions.flatMap(\.shelfIcons)
         self.rewardRules = deletions.flatMap(\.rewardRules)
         self.rewardLogs = deletions.flatMap(\.rewardLogs)

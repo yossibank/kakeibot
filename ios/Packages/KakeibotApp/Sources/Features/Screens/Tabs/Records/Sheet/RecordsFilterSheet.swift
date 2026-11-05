@@ -4,14 +4,12 @@ import Store
 import SwiftUI
 
 struct RecordsFilterSheet: View {
-    @Binding var filter: EntryFilter
+    @Bindable var model: RecordsModel
 
     @State private var tab: Tab = .expense
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
-
-    let list: EntryList?
 
     var body: some View {
         VStack(spacing: 20) {
@@ -45,6 +43,10 @@ struct RecordsFilterSheet: View {
                 }
                 .scrollIndicators(.hidden)
             }
+
+            Spacer(minLength: 0)
+
+            footer
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -98,24 +100,25 @@ private extension RecordsFilterSheet {
 
             Spacer()
 
-            ZStack {
-                if !filter.isEmpty {
-                    Button {
-                        withAnimation(.snappy) {
-                            filter = EntryFilter()
-                        }
-                    } label: {
-                        Text("すべて外す")
-                            .textFont(.caption)
-                            .foregroundStyle(Palette.rose)
-                            .frame(minHeight: 44)
-                            .contentShape(.rect)
+            Color.clear
+                .frame(width: Self.sideWidth, height: 1)
+        }
+    }
+
+    var footer: some View {
+        HStack(spacing: 8) {
+            if !filter.isEmpty {
+                RecordsFilterClearButton {
+                    withAnimation(.snappy) {
+                        filter = EntryFilter()
                     }
-                    .buttonStyle(.plain)
-                    .transition(.opacity)
                 }
+                .transition(.opacity)
             }
-            .frame(width: Self.sideWidth, alignment: .trailing)
+
+            PrimaryButton(showTitle) {
+                dismiss()
+            }
         }
     }
 
@@ -178,6 +181,25 @@ private extension RecordsFilterSheet {
         ),
         count: 4
     )
+
+    var filter: EntryFilter {
+        get {
+            model.filter
+        }
+        nonmutating set {
+            model.filter = newValue
+        }
+    }
+
+    var list: EntryList? {
+        model.list
+    }
+
+    var showTitle: String {
+        let count = model.shownEntryCount
+
+        return count > 0 ? "\(count) 件を表示" : "当てはまる記録はありません"
+    }
 
     var tabOptions: [CapsulePicker<Tab>.Option] {
         let expense = tabTitle("支出", count: count(of: .expense))

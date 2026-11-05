@@ -3,6 +3,8 @@ import Store
 import SwiftUI
 
 struct SyncChoiceCard: View {
+    @Environment(\.themeStyle.corner) var corner
+
     let choice: SyncChoice
     let onUseLocal: () -> Void
     let onUseCloud: () -> Void
@@ -91,9 +93,9 @@ private extension SyncChoiceCard {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Palette.faint, in: .rect(cornerRadius: 16))
+        .background(Palette.faint, in: .rect(cornerRadius: corner.radius(16)))
         .overlay {
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: corner.radius(16))
                 .stroke(rim, lineWidth: 1)
         }
         .overlay(alignment: .top) {

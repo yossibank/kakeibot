@@ -52,11 +52,7 @@ private extension QuickRecordWidgetView {
                     .layoutPriority(1)
 
                 if summary.tiles.isEmpty {
-                    Text("テンプレートを作ると、ここから記録できます")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    emptyEntryLink
                 } else {
                     grid(of: summary, metrics: metrics)
                         .fixedSize(horizontal: false, vertical: true)
@@ -169,6 +165,8 @@ private extension QuickRecordWidgetView {
     ) -> some View {
         if index < tiles.count {
             tileButton(tiles[index], padding: padding)
+        } else if index == tiles.count {
+            entryTileLink(padding: padding)
         } else {
             Color.clear
         }

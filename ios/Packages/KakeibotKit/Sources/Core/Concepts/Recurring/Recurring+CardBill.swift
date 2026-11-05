@@ -33,7 +33,7 @@ public extension Recurring {
         entries: [Entry]
     ) -> Int {
         guard let billed = billedEntries(paidOn: date, entries: entries) else {
-            return amount
+            return scheduledAmount(paidOn: date)
         }
 
         let used = billed.reduce(0) { $0 + Self.usage(of: $1) }
