@@ -7,13 +7,12 @@ public struct AppVersion: Comparable, Hashable, Sendable {
         let pieces = text.split(separator: ".", omittingEmptySubsequences: false)
 
         let numbers = pieces.compactMap { piece in
-            piece.allSatisfy(\.isASCII) ? Int(piece) : nil
+            piece.allSatisfy { ("0"..."9").contains($0) } ? Int(piece) : nil
         }
 
         guard
             !pieces.isEmpty,
-            numbers.count == pieces.count,
-            numbers.allSatisfy({ $0 >= 0 })
+            numbers.count == pieces.count
         else {
             return nil
         }
