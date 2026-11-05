@@ -212,6 +212,83 @@ struct BudgetListModelTests {
         #expect(zero == nil)
         #expect(stored == model.month)
     }
+
+    @Test
+    func suggestsLastMonthAverageAndRecurring() async throws {
+        let setup = try await HomeModelTests.Setup()
+        try await setup.save(.expense, amount: 48200, daysAgo: 20)
+        try await setup.save(.expense, amount: 40000, daysAgo: 50)
+        try await setup.save(.expense, amount: 45150, daysAgo: 80)
+        try await setup.save(.income, amount: 300_000, daysAgo: 20)
+        try await setup.saveRecurring(amount: 82800, day: 25)
+        let model = BudgetListModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        let closed = model.suggestions
+
+        model.startEditing(.total)
+        let total = model.suggestions
+
+        let food = try #require(model.categories.first)
+        model.startEditing(.category(food))
+        let category = model.suggestions
+        let average = try #require(category.last)
+        model.choose(average)
+
+        #expect(closed.isEmpty)
+        #expect(total.map(\.title) == ["先月", "3 か月の平均", "固定費"])
+        #expect(total.map(\.amount) == [48200, 44500, 82800])
+        #expect(category.map(\.amount) == [48200, 44500])
+        #expect(model.calculator.amount == 44500)
+    }
+
+    @Test
+    func averagesOnlyMonthsSinceFirstRecord() async throws {
+        let setup = try await HomeModelTests.Setup()
+        try await setup.save(.expense, amount: 30000, daysAgo: 20)
+        try await setup.save(.expense, amount: 20001, daysAgo: 50)
+        let model = BudgetListModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        model.startEditing(.total)
+
+        #expect(model.suggestions.map(\.amount) == [30000, 25100])
+    }
+
+    @Test
+    func skipsAverageUntilTwoMonthsAreRecorded() async throws {
+        let setup = try await HomeModelTests.Setup()
+        try await setup.save(.expense, amount: 30000, daysAgo: 20)
+        let model = BudgetListModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        model.startEditing(.total)
+
+        #expect(model.suggestions.map(\.title) == ["先月"])
+    }
+
+    @Test
+    func suggestsOnlyRecurringWithoutRecords() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = BudgetListModel(database: setup.database, today: setup.today)
+
+        await model.load()
+        model.startEditing(.total)
+        let empty = model.suggestions
+
+        try await setup.saveRecurring(amount: 82800, day: 25)
+        await model.load()
+        model.startEditing(.total)
+        let total = model.suggestions
+
+        let food = try #require(model.categories.first)
+        model.startEditing(.category(food))
+
+        #expect(empty.isEmpty)
+        #expect(total.map(\.title) == ["固定費"])
+        #expect(total.map(\.amount) == [82800])
+        #expect(model.suggestions.isEmpty)
+    }
 }
 
 private extension BudgetListModelTests {

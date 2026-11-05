@@ -62,6 +62,11 @@ public extension BudgetListModel {
         public let month: YearMonth
     }
 
+    struct Suggestion: Hashable {
+        public let title: String
+        public let amount: Int
+    }
+
     var recurringExpense: Int {
         let period = month.period(startingOn: monthStartDay)
         return recurrings.total(of: .expense, in: period)
@@ -106,6 +111,27 @@ public extension BudgetListModel {
         (editing ?? .total).title
     }
 
+    var suggestions: [Suggestion] {
+        guard let editing else {
+            return []
+        }
+
+        let categoryId = editing.categoryId
+        let lastMonth = spent(for: categoryId, in: month.adding(months: -1))
+        let recurring = categoryId == nil ? recurringExpense : 0
+        var seen: Set<Int> = []
+
+        let candidates = [
+            Suggestion(title: "先月", amount: lastMonth),
+            Suggestion(title: "3 か月の平均", amount: averageSpent(for: categoryId)),
+            Suggestion(title: "固定費", amount: recurring)
+        ]
+
+        return candidates.filter { suggestion in
+            suggestion.amount > 0 && seen.insert(suggestion.amount).inserted
+        }
+    }
+
     var canSave: Bool {
         calculator.amount > 0
     }
@@ -123,6 +149,13 @@ public extension BudgetListModel {
     }
 
     func spent(for categoryId: EntryCategory.ID?) -> Int {
+        spent(for: categoryId, in: month)
+    }
+
+    func spent(
+        for categoryId: EntryCategory.ID?,
+        in month: YearMonth
+    ) -> Int {
         let period = month.period(startingOn: monthStartDay)
 
         return (entryList?.days.filter { period.contains($0.date) } ?? [])
@@ -207,6 +240,10 @@ public extension BudgetListModel {
         editing = nil
     }
 
+    func choose(_ suggestion: Suggestion) {
+        calculator = AmountCalculator(amount: suggestion.amount)
+    }
+
     func press(_ key: AmountCalculator.Key) {
         calculator.press(key)
     }
@@ -269,6 +306,27 @@ private extension BudgetListModel {
     static let loadFailedMessage = "予算を読めませんでした"
     static let saveFailedMessage = "予算を保存できませんでした"
     static let restoreFailedMessage = "元に戻せませんでした"
+    static let averageMonths = 3
+    static let averageUnit = 100
+
+    func averageSpent(for categoryId: EntryCategory.ID?) -> Int {
+        guard let firstDate = entryList?.days.map(\.date).min() else {
+            return 0
+        }
+
+        let months = (1...Self.averageMonths)
+            .map { month.adding(months: -$0) }
+            .filter { $0.period(startingOn: monthStartDay).upperBound >= firstDate }
+
+        guard months.count >= 2 else {
+            return 0
+        }
+
+        let total = months.reduce(0) { $0 + spent(for: categoryId, in: $1) }
+        let unit = months.count * Self.averageUnit
+
+        return (total + unit - 1) / unit * Self.averageUnit
+    }
 
     @discardableResult
     func setBudget(_ amount: Int?) async -> Bool {
