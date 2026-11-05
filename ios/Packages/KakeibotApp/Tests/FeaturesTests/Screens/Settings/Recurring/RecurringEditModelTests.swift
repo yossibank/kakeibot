@@ -54,6 +54,39 @@ struct RecurringEditModelTests {
     }
 
     @Test
+    func opensScheduleWhenAddingRecurring() async throws {
+        let setup = try await HomeModelTests.Setup()
+
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
+
+        #expect(model.isScheduleOpen)
+    }
+
+    @Test
+    func closesScheduleWhenEditingRecurring() async throws {
+        let setup = try await HomeModelTests.Setup()
+
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today,
+            editing: Recurring.ID()
+        )
+
+        #expect(!model.isScheduleOpen)
+    }
+
+    @Test
+    func doesNotCountClosingScheduleAsChange() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        await model.load()
+
+        model.isScheduleOpen = false
+
+        #expect(model.isChanged == false)
+    }
+
+    @Test
     func savesRecurringAndGeneratesEntries() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))

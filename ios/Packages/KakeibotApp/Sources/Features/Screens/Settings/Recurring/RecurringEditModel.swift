@@ -18,6 +18,7 @@ public final class RecurringEditModel {
     public var endDate: LocalDate?
     public var remindDaysBefore: Int?
     public var billShift = 0
+    public var isScheduleOpen: Bool
 
     public var walletId: Wallet.ID? {
         didSet {
@@ -67,6 +68,7 @@ public final class RecurringEditModel {
         self.month = today.month
         self.day = today.day
         self.startDate = today
+        self.isScheduleOpen = id == nil
     }
 }
 

@@ -42,9 +42,7 @@ struct RecurringQuickCard: View {
                 }
             }
 
-            SettingsFormSection("繰り返し", value: scheduleText) {
-                scheduleChooser
-            }
+            schedule
         }
     }
 }
@@ -110,6 +108,53 @@ private extension RecurringQuickCard {
         }
     }
 
+    var schedule: some View {
+        VStack(spacing: 12) {
+            scheduleHeader
+
+            if model.isScheduleOpen {
+                scheduleChooser
+                    .transition(.opacity)
+            }
+        }
+    }
+
+    var scheduleHeader: some View {
+        Button {
+            withAnimation(.snappy) {
+                model.isScheduleOpen.toggle()
+            }
+        } label: {
+            HStack(alignment: .firstTextBaseline) {
+                SettingsSectionTitle("繰り返し")
+                    .layoutPriority(1)
+
+                Spacer(minLength: 8)
+
+                HStack(spacing: 4) {
+                    Text(RecurringText.schedule(
+                        model.frequency,
+                        month: model.month,
+                        day: model.day
+                    ))
+                    .textFont(.footnote)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                    Image(systemName: "chevron.down")
+                        .sansFont(.small)
+                        .rotationEffect(.degrees(model.isScheduleOpen ? 180 : 0))
+                }
+                .foregroundStyle(Palette.accentStrong)
+                .padding(.trailing, 8)
+            }
+            .frame(minHeight: 44)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
     var scheduleChooser: some View {
         VStack(spacing: 12) {
             CapsulePicker(selection: $model.frequency, options: Self.frequencyOptions)
@@ -146,10 +191,6 @@ private extension RecurringQuickCard {
         ),
         count: 4
     )
-
-    var scheduleText: String {
-        RecurringText.schedule(model.frequency, month: model.month, day: model.day)
-    }
 
     var scheduleDay: MonthStartDay {
         MonthStartDay(model.day) ?? .first
