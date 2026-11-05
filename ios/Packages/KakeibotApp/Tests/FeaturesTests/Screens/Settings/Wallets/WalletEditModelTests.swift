@@ -100,6 +100,47 @@ struct WalletEditModelTests {
     }
 
     @Test
+    func switchesSignWithKeypadOnlyBeforeAmount() async throws {
+        let setup = try await Setup()
+        let model = WalletEditModel(database: setup.database)
+
+        model.press(.operation(.subtract))
+        let minus = model.isNegative
+        model.press(.operation(.add))
+        let plus = model.isNegative
+        model.press(.operation(.subtract))
+        model.press(.digit(5))
+        model.press(.doubleZero)
+        model.press(.operation(.add))
+        model.press(.digit(3))
+        model.press(.doubleZero)
+        model.press(.operation(.subtract))
+        model.press(.digit(1))
+        model.press(.doubleZero)
+
+        #expect(minus)
+        #expect(!plus)
+        #expect(model.isNegative)
+        #expect(model.initialBalance == -700)
+        #expect(model.balanceText == "−¥700")
+    }
+
+    @Test
+    func startsDebtAsMinusAndKeepsChosenSign() async throws {
+        let setup = try await Setup()
+        let model = WalletEditModel(database: setup.database)
+
+        model.kind = .loan
+        let loan = model.isNegative
+        model.isNegative = false
+        model.kind = .card
+        let overpaid = model.isNegative
+
+        #expect(loan)
+        #expect(!overpaid)
+    }
+
+    @Test
     func locksKindAcrossDebtOnlyWithRecords() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
@@ -298,7 +339,7 @@ struct WalletEditModelTests {
 
         #expect(beforeBalance == nil)
         #expect(model.repaidText == "¥200,000 返済済み（66%）")
-        #expect(!model.showsSign)
+        #expect(model.isNegative)
         #expect(model.balanceText == "−¥100,000")
     }
 

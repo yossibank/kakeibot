@@ -131,6 +131,7 @@ private extension AppDatabase {
 
         for sql in [
             "DELETE FROM valuation WHERE wallet_id = ?1",
+            "DELETE FROM adjustment WHERE wallet_id = ?1",
             "DELETE FROM tag WHERE category_id IN (\(walletCategories))",
             "DELETE FROM category WHERE wallet_id = ?1",
             "DELETE FROM wallet WHERE id = ?1"

@@ -67,7 +67,7 @@ private extension ReviewSharesCard {
                     }
                 }
 
-                let percents = Percent.shares(shares.map(\.amount))
+                let percents = ReviewText.shares(shares.map(\.amount))
                 let items = Array(zip(shares, percents))
 
                 ForEach(items, id: \.0.id) { share, percent in
@@ -98,22 +98,24 @@ private extension ReviewSharesCard {
 
     func label(
         _ share: ReviewModel.Share,
-        percent: Int
+        percent: String
     ) -> some View {
         VStack(spacing: 8) {
             HStack(spacing: 12) {
                 IconBadge(share.icon, size: 30)
 
-                Text(share.name)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
-                    .sharedTextScale()
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(share.name)
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.text)
+                        .sharedTextScale()
 
-                Text("\(percent)%")
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize()
+                    Text(percent)
+                        .textFont(.caption)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                }
 
                 Spacer(minLength: 8)
 
@@ -128,11 +130,25 @@ private extension ReviewSharesCard {
             }
 
             if let usage = share.usage {
-                BudgetUsageBar(usage)
+                budgetLine(usage)
                     .padding(.leading, 40)
             }
         }
         .contentShape(.rect)
+    }
+
+    func budgetLine(_ usage: BudgetUsage) -> some View {
+        HStack(spacing: 8) {
+            BudgetUsageBar(usage)
+
+            Text(ReviewText.budget(usage))
+                .textFont(.caption2)
+                .monospacedDigit()
+                .foregroundStyle(usage.isOver ? Palette.rose : Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .layoutPriority(1)
+        }
     }
 }
 

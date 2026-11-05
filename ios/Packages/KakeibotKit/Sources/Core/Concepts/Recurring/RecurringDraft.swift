@@ -13,6 +13,7 @@ public struct RecurringDraft: Hashable, Sendable {
     public var holidayShift: HolidayShift
     public var closingDay: Int?
     public var fee: Int
+    public var finalAmount: Int
     public var billShift: Int
     public var startDate: LocalDate
     public var endDate: LocalDate?
@@ -31,6 +32,7 @@ public struct RecurringDraft: Hashable, Sendable {
         holidayShift: HolidayShift = .none,
         closingDay: Int? = nil,
         fee: Int = 0,
+        finalAmount: Int = 0,
         billShift: Int = 0,
         startDate: LocalDate,
         endDate: LocalDate? = nil,
@@ -48,6 +50,7 @@ public struct RecurringDraft: Hashable, Sendable {
         self.holidayShift = holidayShift
         self.closingDay = closingDay
         self.fee = fee
+        self.finalAmount = finalAmount
         self.billShift = billShift
         self.startDate = startDate
         self.endDate = endDate
@@ -68,6 +71,7 @@ public struct RecurringDraft: Hashable, Sendable {
             holidayShift: recurring.holidayShift,
             closingDay: recurring.closingDay,
             fee: recurring.fee ?? 0,
+            finalAmount: recurring.finalAmount ?? 0,
             billShift: recurring.billShift,
             startDate: recurring.startDate,
             endDate: recurring.endDate,
@@ -157,6 +161,7 @@ public extension RecurringDraft {
             holidayShift: holidayShift,
             closingDay: cardClosingDay,
             fee: savedFee,
+            finalAmount: savedFinalAmount,
             billShift: savedBillShift,
             startDate: startDate,
             endDate: endDate,
@@ -186,6 +191,7 @@ public extension RecurringDraft {
         updated.holidayShift = holidayShift
         updated.closingDay = cardClosingDay
         updated.fee = savedFee
+        updated.finalAmount = savedFinalAmount
         updated.billShift = savedBillShift
         updated.startDate = startDate
         updated.endDate = endDate
@@ -228,6 +234,18 @@ private extension RecurringDraft {
         type == .transfer && fee > 0
             ? fee
             : nil
+    }
+
+    var savedFinalAmount: Int? {
+        guard
+            endDate != nil,
+            cardClosingDay == nil,
+            finalAmount > 0
+        else {
+            return nil
+        }
+
+        return finalAmount
     }
 
     var savedBillShift: Int {

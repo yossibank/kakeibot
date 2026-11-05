@@ -53,6 +53,7 @@ public extension ExportV1 {
         public var shelfIcons: [ShelfIcon]
         public var wallets: [Wallet]
         public var valuations: [Valuation]
+        public var adjustments: [Adjustment]
         public var categories: [EntryCategory]
         public var tags: [EntryTag]
         public var entries: [Entry]
@@ -74,6 +75,7 @@ public extension ExportV1 {
             shelfIcons: [ShelfIcon] = [],
             wallets: [Wallet],
             valuations: [Valuation] = [],
+            adjustments: [Adjustment] = [],
             categories: [EntryCategory],
             tags: [EntryTag] = [],
             entries: [Entry],
@@ -94,6 +96,7 @@ public extension ExportV1 {
             self.shelfIcons = shelfIcons
             self.wallets = wallets
             self.valuations = valuations
+            self.adjustments = adjustments
             self.categories = categories
             self.tags = tags
             self.entries = entries
@@ -191,6 +194,7 @@ extension ExportV1.Tables: Codable {
         let shelfIcons = try container.decodeIfPresent([ShelfIcon].self, forKey: .shelfIcons)
         let wallets = try container.decode([Wallet].self, forKey: .wallets)
         let valuations = try container.decodeIfPresent([Valuation].self, forKey: .valuations)
+        let adjustments = try container.decodeIfPresent([Adjustment].self, forKey: .adjustments)
         let categories = try container.decode([EntryCategory].self, forKey: .categories)
         let tags = try container.decodeIfPresent([EntryTag].self, forKey: .tags)
         let entries = try container.decode([Entry].self, forKey: .entries)
@@ -213,6 +217,7 @@ extension ExportV1.Tables: Codable {
             shelfIcons: shelfIcons ?? [],
             wallets: wallets,
             valuations: valuations ?? [],
+            adjustments: adjustments ?? [],
             categories: categories,
             tags: tags ?? [],
             entries: entries,

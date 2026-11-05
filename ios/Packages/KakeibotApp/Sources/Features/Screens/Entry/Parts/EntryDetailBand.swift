@@ -91,10 +91,10 @@ private extension EntryDetailBand {
         .overlay(alignment: .topTrailing) {
             Button {
                 withAnimation(.snappy) {
-                    model.date = isToday ? today.adding(days: -1) : today
+                    model.date = quickDate
                 }
             } label: {
-                Text(isToday ? "昨日" : "今日")
+                Text(EntryModel.shortDateText(for: quickDate, today: today))
                     .textFont(.caption2)
                     .foregroundStyle(Palette.accent)
                     .padding(.horizontal, 8)
@@ -204,8 +204,8 @@ private extension EntryDetailBand {
         model.billText ?? model.walletTitle
     }
 
-    var isToday: Bool {
-        model.date == today
+    var quickDate: LocalDate {
+        model.quickDate(today: today)
     }
 
     var memoText: String {

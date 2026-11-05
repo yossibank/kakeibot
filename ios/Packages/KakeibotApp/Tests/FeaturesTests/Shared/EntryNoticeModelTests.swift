@@ -81,7 +81,7 @@ struct EntryNoticeModelTests {
         await setup.notice.undo()
         let entries = try setup.database.snapshot().entries
 
-        #expect(change.message == "食費 ¥980 を削除しました")
+        #expect(change.message == "食費 ¥980 を消しました")
         #expect(deleted.isEmpty)
         #expect(entries.map(\.id) == [saved.id])
         #expect(entries.map(\.amount) == [980])
@@ -99,9 +99,49 @@ struct EntryNoticeModelTests {
         await setup.notice.undo()
         let restored = try setup.database.snapshot().entries
 
-        #expect(message == "食費 ¥980 を削除しました")
+        #expect(message == "食費 ¥980 を消しました")
         #expect(deleted.isEmpty)
         #expect(restored.map(\.id) == [saved.id])
+    }
+
+    @Test
+    func namesDeletedEntryByMemo() async throws {
+        let setup = try await Setup()
+        let saved = try await setup.saveEntry(memo: "ランチ\n同僚と")
+        let list = try await setup.database.entryList()
+
+        await setup.notice.delete(saved.id, in: list)
+        let change = setup.notice.change
+
+        #expect(change?.subject == "ランチ")
+        #expect(change?.amountText == "¥980")
+        #expect(change?.predicate == "を消しました")
+        #expect(change?.message == "ランチ ¥980 を消しました")
+    }
+
+    @Test
+    func namesDeletedEntryWithoutCategoryAsRecord() async throws {
+        let setup = try await Setup()
+        let saved = try await setup.saveEntry(memo: "  ")
+        let change = EntryChange(kind: .deleted, entry: saved, label: "")
+
+        #expect(change.subject == "記録")
+        #expect(change.message == "記録 ¥980 を消しました")
+    }
+
+    @Test
+    func keepsDeletionNoticeOnScreenTap() async throws {
+        let setup = try await Setup()
+        let saved = try await setup.saveEntry()
+        let list = try await setup.database.entryList()
+
+        await setup.notice.delete(saved.id, in: list)
+        setup.notice.clearOnTap()
+        let notice = setup.notice.notice
+
+        #expect(notice?.seconds == 4)
+        #expect(notice?.dismissesOnTap == false)
+        #expect(setup.notice.change?.isDeletion == true)
     }
 
     @Test
@@ -248,7 +288,7 @@ extension EntryNoticeModelTests.Setup {
         return model
     }
 
-    func saveEntry() async throws -> Entry {
+    func saveEntry(memo: String = "") async throws -> Entry {
         let options = try await database.entryOptions()
 
         let draft = EntryDraft(
@@ -256,7 +296,8 @@ extension EntryNoticeModelTests.Setup {
             amount: 980,
             date: date,
             categoryId: options.expenseCategories[0].id,
-            walletId: options.wallets[0].id
+            walletId: options.wallets[0].id,
+            memo: memo
         )
 
         return try await database.saveEntry(draft, at: Date())

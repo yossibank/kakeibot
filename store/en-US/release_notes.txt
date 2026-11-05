@@ -1,8 +1,5 @@
-・See card purchases that have not been billed yet, all in one list from the Assets tab.
-・Recurring items and templates can now move card charges to the next bill.
-・The recurring list is now split into Expense, Income and Transfer tabs.
-・Add tags right from the template editor.
-・Records on the same day now follow your category order.
-・Transfers from a card, such as savings, now count toward the card bill.
-・Debt due dates and remaining payments are easier to read.
-・Edit screens share one layout, and transfers have a new look.
+・Recurring transfers to a loan can now set the number of payments, and show the final amount, the total and the last month.
+・More icons and emoji for categories and more.
+・What's New now switches between versions.
+・Text no longer gets cut off on small screens in the Assets tab, the Records tab and amount fields in Settings.
+・The Records tab total now shows the month's balance.

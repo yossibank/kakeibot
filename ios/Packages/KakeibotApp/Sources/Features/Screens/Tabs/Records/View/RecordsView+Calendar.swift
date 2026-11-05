@@ -42,6 +42,8 @@ extension RecordsView {
                 }
             }
 
+            adjustmentList(on: date)
+
             let upcoming = model.upcomingRecurrings(on: date)
 
             if !upcoming.isEmpty {
@@ -120,7 +122,6 @@ private extension RecordsView {
                         .animation(Self.stampAnimation, value: model.stampIcon(on: date)?.id)
 
                     dayMark(date)
-                        .frame(height: 24, alignment: .top)
                 }
                 .opacity(opacity)
                 .frame(maxWidth: .infinity, minHeight: 62)
@@ -139,22 +140,34 @@ private extension RecordsView {
         let income = day?.incomeTotal ?? 0
 
         return VStack(spacing: 0) {
-            if expense > 0 {
-                markAmount(expense, type: .expense)
-            } else if model.noSpendDays.contains(date) {
-                Image(systemName: "leaf.fill")
-                    .sansFont(.micro)
-                    .foregroundStyle(Palette.accent)
-            } else if !model.upcomingRecurrings(on: date).isEmpty {
-                Image(systemName: "repeat")
-                    .sansFont(.micro)
-                    .foregroundStyle(Palette.hint)
+            markSlot {
+                if expense > 0 {
+                    markAmount(expense, type: .expense)
+                } else if model.noSpendDays.contains(date) {
+                    Image(systemName: "leaf.fill")
+                        .sansFont(.micro)
+                        .foregroundStyle(Palette.accent)
+                } else if !model.upcomingRecurrings(on: date).isEmpty {
+                    Image(systemName: "repeat")
+                        .sansFont(.micro)
+                        .foregroundStyle(Palette.hint)
+                }
             }
 
-            if income > 0 {
-                markAmount(income, type: .income)
+            markSlot {
+                if income > 0 {
+                    markAmount(income, type: .income)
+                }
             }
         }
+    }
+
+    func markSlot(@ViewBuilder _ content: () -> some View) -> some View {
+        Color.clear
+            .frame(height: Self.markLineHeight)
+            .overlay {
+                content()
+            }
     }
 
     func markAmount(
@@ -241,6 +254,8 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
+    static let markLineHeight: CGFloat = 12
+
     static var stampTransition: AnyTransition {
         .scale(scale: 0.2).combined(with: .opacity)
     }

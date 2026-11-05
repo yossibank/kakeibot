@@ -15,6 +15,10 @@ public extension RecordsModel {
     }
 
     var isSearchHiddenByFilter: Bool {
+        searchHiddenCount > 0
+    }
+
+    var searchHiddenCount: Int {
         let search = EntrySearch(searchText)
 
         guard
@@ -23,13 +27,24 @@ public extension RecordsModel {
             searchDays.isEmpty,
             let list
         else {
-            return false
+            return 0
         }
 
-        return !list.days(matching: search).isEmpty
+        return Self.entryCount(in: list.days(matching: search))
+    }
+
+    var shownEntryCount: Int {
+        let isSearched = isSearching && !EntrySearch(searchText).isEmpty
+        return Self.entryCount(in: isSearched ? searchDays : days)
     }
 
     func clearFilter() {
         filter = EntryFilter()
+    }
+}
+
+private extension RecordsModel {
+    static func entryCount(in days: [EntryDay]) -> Int {
+        days.reduce(0) { $0 + $1.entries.count }
     }
 }

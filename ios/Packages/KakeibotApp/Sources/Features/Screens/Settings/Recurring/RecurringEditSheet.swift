@@ -141,6 +141,7 @@ extension RecurringEditSheet {
         case holiday
         case closing
         case fee
+        case count
         case remind
     }
 
@@ -175,6 +176,16 @@ private extension RecurringEditSheet {
                 SettingsRowList(items: detailItems) { panel in
                     open(panel)
                 }
+            }
+
+            if model.isLoanRepayment,
+               model.plannedTotal != nil || model.autoPlan != nil {
+                RecurringLoanPlan(model: model) {
+                    withAnimation(.snappy) {
+                        model.useAutoCount()
+                    }
+                }
+                .transition(.opacity)
             }
 
             if model.isNotificationDenied {
@@ -219,7 +230,7 @@ private extension RecurringEditSheet {
     }
 
     func showsDone(for panel: Panel) -> Bool {
-        panel != .amount && panel != .fee
+        ![.amount, .fee, .count].contains(panel)
     }
 
     func title(for panel: Panel) -> String {
@@ -230,12 +241,17 @@ private extension RecurringEditSheet {
         case .holiday: "休日なら"
         case .closing: "金額の決め方"
         case .fee: "手数料"
+        case .count: "回数"
         case .remind: "前に知らせる"
         }
     }
 
     func open(_ panel: Panel) {
         focus = nil
+
+        if panel == .count {
+            model.prepareCount()
+        }
 
         withAnimation(.snappy) {
             self.panel = panel

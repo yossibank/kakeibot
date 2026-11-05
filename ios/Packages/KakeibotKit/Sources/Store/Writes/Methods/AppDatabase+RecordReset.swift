@@ -8,6 +8,7 @@ public extension AppDatabase {
             let counts = try [
                 Self.deletableEntries.fetchCount(db),
                 Self.deletableValuations.fetchCount(db),
+                Self.deletableAdjustments.fetchCount(db),
                 RewardLog.fetchCount(db),
                 CalendarStamp.fetchCount(db),
                 NoSpendDay.fetchCount(db)
@@ -25,6 +26,7 @@ public extension AppDatabase {
             try Self.detachRewardGoals(from: entries.map(\.id), in: db, at: now)
             _ = try Self.deletableEntries.deleteAll(db)
             _ = try Self.deletableValuations.deleteAll(db)
+            _ = try Self.deletableAdjustments.deleteAll(db)
             _ = try RewardLog.deleteAll(db)
             _ = try CalendarStamp.deleteAll(db)
             _ = try NoSpendDay.deleteAll(db)
@@ -48,5 +50,9 @@ private extension AppDatabase {
 
     static var deletableValuations: QueryInterfaceRequest<Valuation> {
         Valuation.filter(sql: "wallet_id NOT IN (SELECT wallet_id FROM sync_share)")
+    }
+
+    static var deletableAdjustments: QueryInterfaceRequest<Adjustment> {
+        Adjustment.filter(sql: "wallet_id NOT IN (SELECT wallet_id FROM sync_share)")
     }
 }

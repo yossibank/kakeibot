@@ -5,15 +5,20 @@ import SwiftUI
 public struct WhatsNewSheet: View {
     @Environment(\.dismiss) private var dismiss
 
+    @State private var version: String
+
     private let seenVersion: String?
     private let revealsSteps: Bool
     private let onTry: (WhatsNewRelease.Action) -> Void
 
     public init(
         seenVersion: String?,
+        version: String = WhatsNewRelease.latestVersion,
         revealsSteps: Bool = true,
         onTry: @escaping (WhatsNewRelease.Action) -> Void
     ) {
+        _version = State(initialValue: version)
+
         self.seenVersion = seenVersion
         self.revealsSteps = revealsSteps
         self.onTry = onTry
@@ -23,23 +28,26 @@ public struct WhatsNewSheet: View {
         VStack(spacing: 16) {
             header
 
+            versionPicker
+
             ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 28) {
-                        ForEach(WhatsNewRelease.all) { release in
-                            section(release) { id in
-                                withAnimation(.smooth) {
-                                    proxy.scrollTo(id, anchor: .top)
-                                }
+                    if let release {
+                        section(release) { id in
+                            withAnimation(.smooth) {
+                                proxy.scrollTo(id, anchor: .top)
                             }
                         }
+                        .padding(.vertical, 8)
                     }
-                    .padding(.vertical, 8)
                 }
+                .id(version)
+                .transition(.opacity)
                 .scrollIndicators(.hidden)
                 .contentMargins(.horizontal, 20, for: .scrollContent)
                 .padding(.horizontal, -20)
             }
+            .animation(.snappy, value: version)
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -52,6 +60,10 @@ public struct WhatsNewSheet: View {
 }
 
 private extension WhatsNewSheet {
+    var release: WhatsNewRelease? {
+        WhatsNewRelease.all.first { $0.version == version } ?? WhatsNewRelease.all.first
+    }
+
     func isNew(_ release: WhatsNewRelease) -> Bool {
         AppVersion.isNewer(release.version, than: seenVersion)
     }
@@ -70,6 +82,54 @@ private extension WhatsNewSheet {
                 Spacer()
             }
         }
+    }
+
+    var versionPicker: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 8) {
+                ForEach(WhatsNewRelease.all) { release in
+                    versionChip(release)
+                }
+            }
+            .padding(.vertical, 2)
+        }
+        .haptic(.selection, trigger: version)
+        .scrollIndicators(.hidden)
+        .contentMargins(.horizontal, 20, for: .scrollContent)
+        .padding(.horizontal, -20)
+    }
+
+    func versionChip(_ release: WhatsNewRelease) -> some View {
+        let isSelected = release.version == version
+
+        return Button {
+            version = release.version
+        } label: {
+            HStack(spacing: 8) {
+                Text(release.version)
+                    .textFont(.subheadline, weight: isSelected ? .bold : .medium)
+                    .monospacedDigit()
+
+                if isNew(release) {
+                    Circle()
+                        .fill(isSelected ? Palette.backgroundTop : Palette.rose)
+                        .frame(width: 8, height: 8)
+                }
+            }
+            .foregroundStyle(isSelected ? Palette.backgroundTop : Palette.accentStrong)
+            .padding(.horizontal, 16)
+            .frame(height: 36)
+            .background(
+                isSelected ? AnyShapeStyle(Palette.accent) : AnyShapeStyle(Palette.card),
+                in: .capsule
+            )
+            .overlay {
+                Capsule()
+                    .stroke(Palette.outline, lineWidth: isSelected ? 0 : 0.8)
+            }
+            .contentShape(.capsule)
+        }
+        .buttonStyle(.plain)
     }
 
     func section(
@@ -96,31 +156,15 @@ private extension WhatsNewSheet {
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(release.version)
-                    .displayFont(.title, weight: .medium)
-                    .foregroundStyle(Palette.accentStrong)
+                Text("\(release.features.count) つの新しいこと")
+                    .textFont(.subheadline, weight: .semibold)
+                    .foregroundStyle(Palette.text)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("\(release.features.count) つの新しいこと")
-                        .textFont(.subheadline, weight: .semibold)
-                        .foregroundStyle(Palette.text)
-
-                    Text(release.month)
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
-                }
+                Text(release.month)
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
 
                 Spacer(minLength: 0)
-
-                if isNew(release) {
-                    Text("NEW")
-                        .textFont(.caption2, weight: .bold)
-                        .tracking(1)
-                        .foregroundStyle(Palette.backgroundTop)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Palette.accent, in: .capsule)
-                }
             }
 
             RowOrColumnLayout(rowSpacing: 8, columnSpacing: 8) {

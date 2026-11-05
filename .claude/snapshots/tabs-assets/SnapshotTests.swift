@@ -63,6 +63,30 @@ struct SnapshotTests {
         }
 
         task.cancel()
+
+        let emptyModel = try AssetsModel(database: AppDatabase.inMemory(), today: today)
+        let emptyTask = Task {
+            await emptyModel.run()
+        }
+
+        try await Self.wait {
+            emptyModel.list != nil
+        }
+
+        for variant in Self.variants {
+            let view = AssetsView(
+                model: emptyModel,
+                onTransfer: {},
+                onOpenWallet: { _ in },
+                onOpenRecurring: { _ in },
+                onOpenEntry: { _ in },
+                onMarkReward: {}
+            )
+
+            try Self.write(view, variant: variant, to: "assets-empty")
+        }
+
+        emptyTask.cancel()
     }
 }
 

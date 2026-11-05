@@ -241,7 +241,7 @@ extension AppDatabase {
             recurring.billingPeriod(paidOn: occurrence.date) != nil,
             recurring.toWalletId != nil
         else {
-            return recurring.amount
+            return recurring.scheduledAmount(paidOn: occurrence.date)
         }
 
         let entries = try billEntries(of: recurring, on: occurrence, in: db)

@@ -41,6 +41,41 @@ struct SnapshotTests {
         }
 
         model.setLayout(.list)
+
+        let selectedDays = model.days.prefix(2)
+        let firstDayIds = selectedDays.first?.entries.map(\.id) ?? []
+        let secondDayIds = selectedDays.dropFirst().first?.entries.prefix(1).map(\.id) ?? []
+        let selection = Set(firstDayIds + secondDayIds)
+
+        for variant in Self.variants {
+            let view = RecordsView(
+                model: model,
+                selection: selection,
+                onOpenEntry: { _ in },
+                onAddEntry: { _ in },
+                onOpenRecurring: { _ in },
+                onChangeEntries: { _, _ in },
+                onDeleteEntries: { _ in }
+            )
+
+            try Self.write(view, variant: variant, to: "records-selecting")
+        }
+
+        let deletions = Self.deletions(in: model)
+
+        for (name, change) in deletions {
+            for variant in Self.variants {
+                let notice = EntryNoticeModel(database: database)
+                notice.show(change)
+
+                let view = Color.clear
+                    .frame(height: 140)
+                    .entryNotice(notice, above: 0)
+
+                try Self.write(view, variant: variant, to: "records-deleted-\(name)")
+            }
+        }
+
         model.move(months: -1)
 
         try await Self.wait {
@@ -59,6 +94,8 @@ struct SnapshotTests {
 
             try Self.write(view, variant: variant, to: "records-previous-month")
         }
+
+        try await Self.writeSearchAndFilter(model, database: database)
 
         task.cancel()
 
@@ -163,6 +200,98 @@ private extension SnapshotTests {
                     createdAt: now,
                     updatedAt: now
                 )
+            }
+    }
+
+    static func writeSearchAndFilter(
+        _ model: RecordsModel,
+        database: AppDatabase
+    ) async throws {
+        let options = try await database.entryOptions()
+        let income = try #require(options.incomeCategories.last)
+
+        model.isSearching = true
+        model.searchText = "サブスクの解約金"
+
+        for variant in variants {
+            try write(recordsView(model), variant: variant, to: "records-search-empty")
+        }
+
+        model.searchText = "発表会"
+
+        let category = try #require(model.searchDays.first?.entries.first?.categoryId)
+
+        model.filter = EntryFilter(categoryIds: [income.id])
+
+        for variant in variants {
+            try write(recordsView(model), variant: variant, to: "records-search-filtered")
+        }
+
+        model.filter = EntryFilter(categoryIds: [category])
+        model.openCurrentMonth()
+
+        for variant in variants {
+            let sheet = RecordsFilterSheet(model: model)
+                .frame(height: 720)
+
+            try write(sheet, variant: variant, to: "records-filter-sheet")
+        }
+
+        model.filter = EntryFilter(categoryIds: [income.id])
+
+        for variant in variants {
+            let sheet = RecordsFilterSheet(model: model)
+                .frame(height: 720)
+
+            try write(sheet, variant: variant, to: "records-filter-sheet-none")
+        }
+
+        model.clearFilter()
+    }
+
+    static func recordsView(_ model: RecordsModel) -> RecordsView {
+        RecordsView(
+            model: model,
+            onOpenEntry: { _ in },
+            onAddEntry: { _ in },
+            onOpenRecurring: { _ in },
+            onChangeEntries: { _, _ in },
+            onDeleteEntries: { _ in }
+        )
+    }
+
+    static func deletions(in model: RecordsModel) -> [(String, EntryChange)] {
+        guard let list = model.list else {
+            return []
+        }
+
+        let entries = model.days.flatMap(\.entries)
+
+        let label = { (entry: Entry) in
+            EntryChange.label(for: entry) { id in
+                list.categories[id]
+            } wallet: { id in
+                list.wallets[id]
+            }
+        }
+
+        let long = entries.first { entry in
+            !(entry.memo ?? "").isEmpty
+        }
+
+        let unnamed = entries.last { entry in
+            (entry.memo ?? "").isEmpty
+        }
+
+        var short = long
+        short?.memo = "ランチ"
+        short?.amount = 900
+
+        return [("long", long), ("short", short), ("category", unnamed)]
+            .compactMap { name, entry in
+                entry.map { entry in
+                    (name, EntryChange(kind: .deleted, entry: entry, label: label(entry)))
+                }
             }
     }
 

@@ -172,6 +172,9 @@ struct MainView: View {
                         Task {
                             await notice.deleteEntries(ids)
                         }
+                    },
+                    onDeleteAdjustment: { deletion in
+                        undo.deletion = deletion
                     }
                 )
                 .loadFailed(records.isListFailed) {

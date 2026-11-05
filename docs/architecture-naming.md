@@ -17,6 +17,7 @@
 | `Features/Shared/SettingsParts/` | ファイルの頭に `Settings` を付ける。Core の型の拡張（`<型>+<役割>`）は除く |
 | `AppWidget/Widgets/` | コントロールの `kind` の文字列は、フォルダを移しても変えない |
 | DesignSystem の題材のフォルダ | `Budget/`・`Date/`・`Entry/`・`Tag/`・`Template/` |
+| お知らせの版の中身 | `WhatsNew/` の `WhatsNewRelease+V<版>.swift` に 1 版ずつ置く。版の `.` は `_` にする |
 
 設定の画面をまとめるときは、次の領域に分ける。入口の `Menu/` は、まとめずに残す。
 

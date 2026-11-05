@@ -80,7 +80,7 @@ public extension SyncModel {
 private extension SyncModel {
     static let shareFailedMessage = "共有を開けませんでした。時間をおいて試してください"
     static let inviteFailedMessage = "招待を保存できませんでした。時間をおいて試してください"
-    static let stopFailedMessage = "共有をやめられませんでした。時間をおいて試してください"
+    static let stopFailedMessage = "共有を終えられませんでした。時間をおいて試してください"
     static let leaveFailedMessage = "共有から抜けられませんでした。時間をおいて試してください"
     static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Sharing")
 

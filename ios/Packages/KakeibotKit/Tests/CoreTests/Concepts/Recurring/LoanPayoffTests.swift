@@ -32,6 +32,7 @@ extension LoanPayoffTests {
         let amount: Int
         let day: Int
         let endDate: LocalDate?
+        let finalAmount: Int?
     }
 }
 
@@ -48,6 +49,7 @@ extension LoanPayoffTests.RepaymentCase {
             toWalletId: loan,
             frequency: .monthly,
             day: day,
+            finalAmount: finalAmount,
             startDate: startDate,
             endDate: endDate,
             createdAt: now,

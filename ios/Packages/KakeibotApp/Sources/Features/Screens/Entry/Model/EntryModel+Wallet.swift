@@ -195,11 +195,13 @@ private extension EntryModel {
             .filter { $0.id != editingId && !isOwnFee($0) }
 
         let valuations = list.valuations
+        let adjustments = list.adjustments
 
         let pairs = wallets.map { wallet in
             let balance = wallet.balance(
                 with: entries,
                 valuations: valuations,
+                adjustments: adjustments,
                 through: Self.today
             )
 

@@ -1,0 +1,59 @@
+{
+  "description": "借入の残り (owed) と毎回の額から、返す回数と最後の回の額を出す。count が空なら残り÷額の切り捨て (最低 1 回)。最後の回は残り−額×(回数−1) で、0 より大きく額の 2 倍未満の時だけ使い、額と同じなら null。それ以外は回数と残りが合わないので、finalAmount は null、gap に額×回数−残りを入れる。",
+  "cases": [
+    {
+      "summary": "有利子の奨学金は端数を最後の回に足す",
+      "owed": 3896752,
+      "amount": 16235,
+      "count": null,
+      "expectedCount": 240,
+      "finalAmount": 16587,
+      "gap": 0
+    },
+    {
+      "summary": "割り切れる無利子の奨学金は最後の回も同じ額",
+      "owed": 2592000,
+      "amount": 10800,
+      "count": null,
+      "expectedCount": 240,
+      "finalAmount": null,
+      "gap": 0
+    },
+    {
+      "summary": "回数を 1 つ増やすと最後の回は端数だけ",
+      "owed": 3896752,
+      "amount": 16235,
+      "count": 241,
+      "expectedCount": 241,
+      "finalAmount": 352,
+      "gap": 0
+    },
+    {
+      "summary": "回数が少なすぎると残りが返しきれない",
+      "owed": 3896752,
+      "amount": 16235,
+      "count": 239,
+      "expectedCount": 239,
+      "finalAmount": null,
+      "gap": -16587
+    },
+    {
+      "summary": "回数が多すぎると返しすぎになる",
+      "owed": 3896752,
+      "amount": 16235,
+      "count": 300,
+      "expectedCount": 300,
+      "finalAmount": null,
+      "gap": 973748
+    },
+    {
+      "summary": "残りが額より少なければ 1 回で残りだけ返す",
+      "owed": 5000,
+      "amount": 16235,
+      "count": null,
+      "expectedCount": 1,
+      "finalAmount": 5000,
+      "gap": 0
+    }
+  ]
+}

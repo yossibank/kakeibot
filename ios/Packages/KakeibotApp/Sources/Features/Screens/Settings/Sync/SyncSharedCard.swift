@@ -4,6 +4,8 @@ import Store
 import SwiftUI
 
 struct SyncSharedCard: View {
+    @Environment(\.themeStyle.corner) var corner
+
     let item: WalletShare
     let participants: [SyncParticipant]?
     let isFailed: Bool
@@ -38,7 +40,7 @@ struct SyncSharedCard: View {
                     members
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 12)
-                        .background(Palette.faint, in: .rect(cornerRadius: 16))
+                        .background(Palette.faint, in: .rect(cornerRadius: corner.radius(16)))
                 }
 
                 Text("招待した人は、リンクを開くと参加中になります")
@@ -49,7 +51,7 @@ struct SyncSharedCard: View {
 
                 VStack(spacing: 12) {
                     CardButton("ほかの人も誘う", style: .filled, action: onInvite)
-                    CardButton("共有をやめる", style: .outlined(Palette.rose), action: onStop)
+                    CardButton("共有を終える", style: .outlined(Palette.rose), action: onStop)
                     CardButton("閉じる", style: .outlined(Palette.subtext), action: onClose)
                 }
             }

@@ -46,6 +46,10 @@ public extension AssetsModel {
 }
 
 public extension AssetsModel.WalletRow {
+    var needsAdjustment: Bool {
+        wallet.kind.role == .onHand && balance < 0
+    }
+
     var repaidPercent: Int? {
         guard
             wallet.kind == .loan,

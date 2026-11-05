@@ -1,6 +1,14 @@
 public struct EntryDay: Hashable, Sendable {
     public let date: LocalDate
     public let entries: [Entry]
+
+    public init(
+        date: LocalDate,
+        entries: [Entry]
+    ) {
+        self.date = date
+        self.entries = entries
+    }
 }
 
 public extension EntryDay {

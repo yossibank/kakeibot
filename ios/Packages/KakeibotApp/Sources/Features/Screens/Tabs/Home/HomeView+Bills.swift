@@ -17,7 +17,13 @@ extension HomeView {
                     Button {
                         onOpenRecurring(bill.recurring.id)
                     } label: {
-                        billRow(bill)
+                        BillRow(
+                            bill,
+                            title: model.title(of: bill.recurring),
+                            source: model.walletName(of: bill.recurring),
+                            today: model.today,
+                            style: .compact
+                        )
                     }
                     .buttonStyle(.plain)
                     .overlay(alignment: .top) {
@@ -34,63 +40,11 @@ extension HomeView {
 }
 
 private extension HomeView {
-    func billRow(_ bill: CardBill) -> some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(bill.date.month)/\(bill.date.day)")
-                    .displayFont(.body)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accent)
-
-                Text(daysText(until: bill.date))
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-            }
-            .frame(width: Self.billDateWidth, alignment: .leading)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(model.title(of: bill.recurring))
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
-                    .sharedTextScale()
-
-                if bill.shortage > 0 {
-                    Text("残高が \(AmountText.text(bill.shortage)) 足りません")
-                        .textFont(.caption2)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.rose)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-            }
-
-            Spacer(minLength: 8)
-
-            Text(AmountText.text(bill.amount))
-                .displayFont(.headline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-        }
-        .padding(.vertical, 12)
-        .contentShape(.rect)
-    }
-}
-
-private extension HomeView {
-    static let billDateWidth: CGFloat = 56
-
     var billTotalText: String? {
         guard !model.upcomingBills.isEmpty else {
             return nil
         }
 
         return "合計 \(AmountText.text(model.upcomingBillTotal))"
-    }
-
-    func daysText(until date: LocalDate) -> String {
-        let days = model.today.days(until: date)
-        return days == 1 ? "明日" : "あと \(days) 日"
     }
 }

@@ -56,6 +56,7 @@ struct SnapshotTests {
             let sheet = HomeRecurringSheet(model: model) { _ in }
 
             try Self.write(view, variant: variant, to: "home")
+            try Self.write(view.billCard.padding(16), variant: variant, to: "home-bills")
             try Self.write(sheet, variant: variant, to: "home-recurring")
         }
 
