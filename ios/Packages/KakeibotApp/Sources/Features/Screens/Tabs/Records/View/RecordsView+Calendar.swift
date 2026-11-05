@@ -174,13 +174,10 @@ private extension RecordsView {
         _ amount: Int,
         type: Entry.Kind
     ) -> some View {
-        Text(RecordsCalendarAmount.text(amount, type: type))
+        AmountText(amount, type: type)
             .textFont(size: .micro)
-            .monospacedDigit()
-            .foregroundStyle(type == .income ? Palette.accent : Palette.accentStrong)
             .lineLimit(1)
             .minimumScaleFactor(0.6)
-            .padding(.horizontal, 2)
     }
 
     func upcomingList(
