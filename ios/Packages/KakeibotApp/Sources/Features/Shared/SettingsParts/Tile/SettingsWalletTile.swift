@@ -3,8 +3,6 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsWalletTile: View {
-    @Environment(\.themeStyle.corner) private var corner
-
     let wallet: Wallet
     let icon: Icon?
     let isSelected: Bool
@@ -14,28 +12,23 @@ struct SettingsWalletTile: View {
         let color = isSelected ? Palette.accentStrong : Palette.subtext
 
         Button(action: action) {
-            VStack(spacing: 4) {
-                IconImage(icon, size: 15)
+            HStack(spacing: 8) {
+                IconImage(icon, size: 13)
 
                 Text(wallet.name)
-                    .textFont(.caption2)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
+                    .textFont(.caption)
+                    .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
             .foregroundStyle(color)
-            .padding(.horizontal, 4)
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity, minHeight: 68, maxHeight: .infinity)
-            .background(
-                SettingsTile.fill(isSelected: isSelected),
-                in: .rect(cornerRadius: corner.radius(12))
-            )
+            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, minHeight: 40)
+            .background(SettingsTile.fill(isSelected: isSelected), in: Capsule())
             .overlay {
-                RoundedRectangle(cornerRadius: corner.radius(12))
+                Capsule()
                     .stroke(SettingsTile.stroke(isSelected: isSelected), lineWidth: 1)
             }
-            .contentShape(.rect)
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
     }

@@ -49,8 +49,8 @@ struct TemplateQuickCard: View {
                     SettingsPagedGrid(
                         items: model.wallets,
                         selected: model.walletId,
-                        columns: 3,
-                        rows: 2,
+                        columns: 2,
+                        rows: 3,
                         spacing: 8
                     ) { wallet in
                         SettingsWalletTile(
