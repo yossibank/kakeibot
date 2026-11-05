@@ -154,6 +154,8 @@ internal class ExportRow(
 
     fun intOrNull(key: String): Int? = optional(key) { integer(it) }
 
+    fun long(key: String): Long = required(key) { long(it) }
+
     fun boolean(key: String): Boolean = required(key) { flag(it) }
 
     fun booleanOrNull(key: String): Boolean? = optional(key) { flag(it) }
@@ -240,6 +242,22 @@ internal class ExportRow(
 
             return try {
                 BigDecimal(value.content).intValueExact()
+            } catch (_: ArithmeticException) {
+                throw SerializationException("Expected an integer: ${value.content}")
+            } catch (_: NumberFormatException) {
+                throw SerializationException("Expected a number: ${value.content}")
+            }
+        }
+
+        fun long(element: JsonElement): Long {
+            val value = primitive(element)
+
+            if (value.isString) {
+                throw SerializationException("Expected a number")
+            }
+
+            return try {
+                BigDecimal(value.content).longValueExact()
             } catch (_: ArithmeticException) {
                 throw SerializationException("Expected an integer: ${value.content}")
             } catch (_: NumberFormatException) {

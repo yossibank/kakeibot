@@ -8,7 +8,7 @@ data class Adjustment(
     val id: Identifier<Adjustment> = Identifier(),
     val walletId: Identifier<Wallet>,
     val date: LocalDate,
-    val amount: Int,
+    val amount: Long,
     val createdAt: Instant,
     val updatedAt: Instant,
 )

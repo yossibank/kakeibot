@@ -37,6 +37,18 @@ class ExportV1Test {
         }
 
         @Test
+        fun roundTripsAdjustmentBeyondIntRange() {
+            val export = ExportV1.of(ExportFixture.data("export/export-v1.json"))
+            val adjustment = export.data.adjustments.first().copy(amount = 3_000_000_000L)
+            val big = export.copy(data = export.data.copy(adjustments = listOf(adjustment)))
+
+            val reread = ExportV1.of(big.json())
+
+            assertEquals(3_000_000_000L, reread.data.adjustments.single().amount)
+            assertEquals(big, reread)
+        }
+
+        @Test
         fun readsFileWithoutTemplates() {
             val json = ExportFixture.edited { tables ->
                 tables.remove("templates")

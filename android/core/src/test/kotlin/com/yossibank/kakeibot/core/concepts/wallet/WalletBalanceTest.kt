@@ -43,7 +43,7 @@ class WalletBalanceTest {
         @Serializable
         data class AdjustmentCase(
             val date: LocalDate,
-            val amount: Int,
+            val amount: Long,
             val wallet: Side,
         )
 
@@ -148,6 +148,27 @@ class WalletBalanceTest {
             )
 
             assertEquals(200, total)
+        }
+
+        @Test
+        fun addsAdjustmentBeyondIntRange() {
+            val cash = wallet(initialBalance = 0)
+            val date = assertNotNull(LocalDate.parse("2026-10-01"))
+
+            val adjustment = Adjustment(
+                walletId = cash.id,
+                date = date,
+                amount = 3_000_000_000L,
+                createdAt = Instant.now(),
+                updatedAt = Instant.now(),
+            )
+
+            val balance = cash.balance(
+                with = emptyList(),
+                adjustments = listOf(adjustment),
+            )
+
+            assertEquals(3_000_000_000L, balance)
         }
 
         @Test

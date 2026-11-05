@@ -16,12 +16,12 @@ data class LoanPayoff(
         private const val daysPerSearch = 365
 
         fun of(
-            balance: Int,
+            balance: Long,
             repayments: List<Recurring>,
             after: LocalDate,
         ): LoanPayoff? {
             val paying = repayments.filter { it.amount > 0 }
-            var remaining = -balance.toLong()
+            var remaining = -balance
 
             if (remaining <= 0 || paying.isEmpty()) {
                 return null

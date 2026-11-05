@@ -13,7 +13,7 @@ object NotificationPlan {
         val recurringId: Identifier<Recurring>,
         val date: LocalDate,
         val walletName: String,
-        val amount: Int,
+        val amount: Long,
     )
 
     const val reminderDays = 30
@@ -98,7 +98,7 @@ object NotificationPlan {
                 through = end,
             )
             .map { date ->
-                val amount = if (usesCardBill) null else of.scheduledAmount(paidOn = date)
+                val amount = if (usesCardBill) null else of.scheduledAmount(paidOn = date).toLong()
 
                 val shortage = shortages.firstOrNull { shortage ->
                     shortage.recurringId == of.id && shortage.date == date
@@ -125,7 +125,7 @@ object NotificationPlan {
     }
 
     private fun body(
-        amount: Int?,
+        amount: Long?,
         on: LocalDate,
         daysBefore: Int,
         shortage: Shortage?,
@@ -155,8 +155,8 @@ object NotificationPlan {
         return "${on.month}/${on.day} に $yen です"
     }
 
-    private fun grouped(amount: Int): String {
-        val digits = amount.toLong().absoluteValue.toString()
+    private fun grouped(amount: Long): String {
+        val digits = amount.absoluteValue.toString()
         val text = StringBuilder()
 
         for ((index, digit) in digits.withIndex()) {

@@ -16,9 +16,9 @@ class EntryItemTotalTest(
         val summary: String,
         val taxIncluded: Boolean,
         val items: List<Item>,
-        val subtotal: Int,
+        val subtotal: Long,
         val taxes: List<Tax>,
-        val total: Int,
+        val total: Long,
     ) {
         override fun toString(): String = summary
     }
@@ -32,8 +32,8 @@ class EntryItemTotalTest(
     @Serializable
     data class Tax(
         val rate: Int,
-        val base: Int,
-        val amount: Int,
+        val base: Long,
+        val amount: Long,
     )
 
     @Test
@@ -63,6 +63,28 @@ class EntryItemTotalTest(
         assertEquals(fixture.taxes, taxes)
         assertEquals(fixture.total, total.total)
         assertEquals(fixture.taxIncluded, total.taxIncluded)
+    }
+
+    @Test
+    fun sumsWithoutWrappingAround() {
+        val limit = 999_999_999
+
+        val items = List(3) {
+            EntryItem.Draft(
+                name = "品目",
+                amount = limit,
+                taxRate = AmountCalculator.TaxRate.of(10),
+            )
+        }
+
+        val exclusive = EntryItemTotal(items = items)
+        val inclusive = EntryItemTotal(items = items, taxIncluded = true)
+
+        assertEquals(3L * limit, exclusive.subtotal)
+        assertEquals(3L * limit, exclusive.taxes.single().base)
+        assertEquals(3L * limit / 10, exclusive.taxes.single().amount)
+        assertEquals(3L * limit + 3L * limit / 10, exclusive.total)
+        assertEquals(3L * limit, inclusive.total)
     }
 
     companion object {

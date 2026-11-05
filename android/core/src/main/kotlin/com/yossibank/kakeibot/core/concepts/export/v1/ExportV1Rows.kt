@@ -190,7 +190,7 @@ private fun ExportRow.adjustment(): Adjustment = Adjustment(
     id = id("id"),
     walletId = id("walletId"),
     date = date("date"),
-    amount = int("amount"),
+    amount = long("amount"),
     createdAt = instant("createdAt"),
     updatedAt = instant("updatedAt"),
 )

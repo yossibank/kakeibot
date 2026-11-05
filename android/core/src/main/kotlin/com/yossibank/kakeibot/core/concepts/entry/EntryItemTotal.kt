@@ -4,15 +4,15 @@ import kotlin.math.absoluteValue
 
 @ConsistentCopyVisibility
 data class EntryItemTotal private constructor(
-    val subtotal: Int,
+    val subtotal: Long,
     val taxes: List<Tax>,
-    val total: Int,
+    val total: Long,
     val taxIncluded: Boolean,
 ) {
     data class Tax(
         val rate: AmountCalculator.TaxRate,
-        val base: Int,
-        val amount: Int,
+        val base: Long,
+        val amount: Long,
     ) {
         internal companion object {
             fun of(
@@ -26,7 +26,7 @@ data class EntryItemTotal private constructor(
                     return null
                 }
 
-                val base = rated.sumOf { it.amount }
+                val base = rated.sumOf { it.amount.toLong() }
 
                 val amount = if (taxIncluded) {
                     included(
@@ -34,7 +34,7 @@ data class EntryItemTotal private constructor(
                         rate = rate.rawValue,
                     )
                 } else {
-                    (base.toLong() * rate.rawValue / 100).toInt()
+                    base * rate.rawValue / 100
                 }
 
                 return Tax(
@@ -45,11 +45,11 @@ data class EntryItemTotal private constructor(
             }
 
             private fun included(
-                base: Int,
+                base: Long,
                 rate: Int,
-            ): Int {
-                val numerator = base.toLong().absoluteValue * rate * 2 + 100 + rate
-                val rounded = (numerator / ((100 + rate) * 2)).toInt()
+            ): Long {
+                val numerator = base.absoluteValue * rate * 2 + 100 + rate
+                val rounded = numerator / ((100 + rate) * 2)
 
                 return if (base < 0) -rounded else rounded
             }
@@ -61,7 +61,7 @@ data class EntryItemTotal private constructor(
             items: List<EntryItem.Draft>,
             taxIncluded: Boolean = false,
         ): EntryItemTotal {
-            val subtotal = items.sumOf { it.amount }
+            val subtotal = items.sumOf { it.amount.toLong() }
 
             val taxes = AmountCalculator.TaxRate.entries.mapNotNull { rate ->
                 Tax.of(

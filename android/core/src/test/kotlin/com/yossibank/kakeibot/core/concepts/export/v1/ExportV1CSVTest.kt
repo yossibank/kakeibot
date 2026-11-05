@@ -37,6 +37,16 @@ class ExportV1CSVTest {
         assertTrue(lines[1].endsWith(",'-1"))
     }
 
+    @Test
+    fun writesAdjustmentBeyondIntRange() {
+        val tables = ExportV1.of(ExportFixture.data("export/export-v1.json")).data
+        val adjustment = tables.adjustments.first().copy(amount = 3_000_000_000L)
+
+        val csv = tables.copy(adjustments = listOf(adjustment)).csv().toString(Charsets.UTF_8)
+
+        assertTrue(csv.contains(",調整,3000000000,"))
+    }
+
     private fun csvLines(memo: String): List<String> = csvText(memo).split("\r\n")
 
     private fun csvText(memo: String): String {

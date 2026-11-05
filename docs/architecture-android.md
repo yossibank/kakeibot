@@ -42,7 +42,8 @@ Android は、次の技術を使う。
 | 関連値のある enum | sealed interface。case は PascalCase |
 | `name` など Kotlin の予約された名前 | 別の名前にし、rawValue は iOS のまま |
 | `DraftProblem` を投げる | `DraftProblemException` |
-| 金額の和と、和を返す戻り値 | `Long`。iOS の `Int` は 64 ビットなので、回り込まないようにする。1 件の金額は `Int` のまま |
+| 金額の和と、和を返す戻り値 | `Long` |
+| 1 件の金額 | `Int`。調整の額（`Adjustment.amount`）だけは `Long` |
 
 ## 🔧 設定
 

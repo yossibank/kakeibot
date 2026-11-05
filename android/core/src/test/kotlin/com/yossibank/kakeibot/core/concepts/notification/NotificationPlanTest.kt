@@ -96,7 +96,7 @@ class NotificationPlanTest {
                         recurringId = recurring.id,
                         date = shortage.date,
                         walletName = shortage.wallet,
-                        amount = shortage.amount,
+                        amount = shortage.amount.toLong(),
                     )
                 }
             }
@@ -167,6 +167,48 @@ class NotificationPlanTest {
             assertEquals(today, notifications.firstOrNull()?.date)
             assertEquals(last, notifications.lastOrNull()?.date)
             assertEquals(notifications.map { it.date }.sorted(), notifications.map { it.date })
+        }
+
+        @Test
+        fun writesShortageBeyondIntRange() {
+            val now = Instant.ofEpochSecond(1_791_000_000)
+            val today = date("2026-10-17")
+            val time = assertNotNull(ReminderTime.parse("21:00"))
+
+            val bill = Recurring(
+                type = Entry.Kind.transfer,
+                amount = 0,
+                categoryId = null,
+                walletId = Identifier(),
+                toWalletId = Identifier(),
+                frequency = Recurring.Frequency.monthly,
+                day = 5,
+                closingDay = 15,
+                startDate = today,
+                remindDaysBefore = 0,
+                createdAt = now,
+                updatedAt = now,
+            )
+
+            val shortage = NotificationPlan.Shortage(
+                recurringId = bill.id,
+                date = date("2026-11-05"),
+                walletName = "銀行",
+                amount = 3_000_000_000L,
+            )
+
+            val notifications = NotificationPlan.notifications(
+                today = today,
+                reminderTime = time,
+                recordedDates = emptySet(),
+                recurrings = listOf(bill),
+                names = emptyMap(),
+                shortages = listOf(shortage),
+            )
+
+            val body = notifications.single { it.route is PlannedNotification.Route.Recurring && it.date == date("2026-11-05") }.body
+
+            assertEquals("今日は引き落としの日です。銀行が ¥3,000,000,000 足りません", body)
         }
 
         @Test

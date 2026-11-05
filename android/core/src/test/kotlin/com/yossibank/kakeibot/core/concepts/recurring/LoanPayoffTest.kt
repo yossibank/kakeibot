@@ -20,7 +20,7 @@ class LoanPayoffTest(
     @Serializable
     data class PayoffCase(
         val summary: String,
-        val balance: Int,
+        val balance: Long,
         val today: LocalDate,
         val repayments: List<RepaymentCase>,
         val count: Int? = null,
