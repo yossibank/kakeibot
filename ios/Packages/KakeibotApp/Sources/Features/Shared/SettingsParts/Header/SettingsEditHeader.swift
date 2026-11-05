@@ -23,7 +23,7 @@ struct SettingsEditHeader: View {
 
             Spacer()
 
-            VStack(spacing: 0) {
+            VStack(spacing: 4) {
                 SheetTitle(title, wraps: false)
 
                 if let subtitle {
