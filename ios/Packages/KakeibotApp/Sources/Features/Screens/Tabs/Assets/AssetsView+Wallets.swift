@@ -153,12 +153,42 @@ private extension AssetsView {
     }
 
     func addWalletRow(action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Label("口座を足す", systemImage: "plus")
-                .textFont(.subheadline)
-                .foregroundStyle(Palette.accent)
-                .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
-                .contentShape(.rect)
+        let shape = RoundedRectangle(cornerRadius: corner.radius(32 * 0.3), style: .continuous)
+
+        return Button(action: action) {
+            HStack(spacing: 12) {
+                shape
+                    .fill(Palette.faint)
+                    .overlay {
+                        shape
+                            .stroke(Palette.outline, style: .dashed)
+                    }
+                    .overlay {
+                        Image(systemName: "plus")
+                            .sansFont(.small, weight: .semibold)
+                            .foregroundStyle(Palette.accent)
+                    }
+                    .frame(width: 32, height: 32)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("口座を足す")
+                        .textFont(.subheadline, weight: .semibold)
+                        .foregroundStyle(Palette.accentStrong)
+
+                    Text("銀行・カード・投資・借入")
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                }
+                .lineLimit(1)
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .sansFont(.small)
+                    .foregroundStyle(Palette.hint)
+            }
+            .padding(.vertical, 12)
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
     }
