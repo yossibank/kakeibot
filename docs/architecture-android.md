@@ -25,7 +25,23 @@ Android は、次の技術を使う。
 | `:core` | Kotlin だけで書く Core。テストは `spec/fixtures` を読み、iOS と同じ結果を確かめる |
 | `:app` | Jetpack Compose のアプリ |
 
-`:core` のパッケージは、iOS の `Core/Concepts/<概念>/` に当たる `core.concepts.<概念>` に置く。概念の名前は小文字にする。
+`:core` は、iOS の Core のファイルと 1 対 1 に対応させる。レシートの読み取りは Android に無い。`Concepts/Receipt/` は、書き出しが使う `ItemName` だけを移す。
+
+| iOS | Android |
+| --- | --- |
+| `Core/Concepts/<概念>/X.swift` | `core/concepts/<概念>/X.kt`。概念の名前は小文字にする |
+| `Core/Shared/X.swift` | `core/shared/X.kt` |
+| `Type+Topic.swift` | `TypeTopic.kt`。拡張関数で書く |
+| `Tests/CoreTests/.../XTests.swift` | `src/test/.../XTest.kt`。テストの補助は `support/` に置く |
+
+型・プロパティ・関数の名前は iOS と同じにする。Kotlin で使えない名前だけ、次のように変える。
+
+| 場面 | 書き方 |
+| --- | --- |
+| 失敗しうる `init?` | companion の `parse(text)`、または `of(...)` |
+| 関連値のある enum | sealed interface。case は PascalCase |
+| `name` など Kotlin の予約された名前 | 別の名前にし、rawValue は iOS のまま |
+| `DraftProblem` を投げる | `DraftProblemException` |
 
 ## 🔧 設定
 
