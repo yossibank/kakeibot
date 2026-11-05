@@ -113,13 +113,14 @@ private extension ReviewSharesCard {
                     .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
+                    .fixedSize()
 
                 Spacer(minLength: 8)
 
                 AmountText(share.amount, type: type)
                     .displayFont(.body)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                    .fixedSize()
+                    .layoutPriority(1)
 
                 Image(systemName: "chevron.right")
                     .sansFont(.small)

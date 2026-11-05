@@ -151,16 +151,17 @@ private extension ReviewView {
                 VStack(spacing: 8) {
                     HStack {
                         Text(usage.budgetText)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .sharedTextScale()
 
                         Spacer()
 
                         Text(usage.remainingText)
+                            .sharedTextScale()
                     }
                     .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
+                    .sharesTextScale(id: [usage.budgetText, usage.remainingText])
 
                     BudgetUsageBar(usage)
                 }
