@@ -34,10 +34,9 @@ extension AssetsView {
     ) -> some View {
         let rows = sections.flatMap(\.rows)
         let total = rows.reduce(0) { $0 + $1.balance }
-        let note = "\(rows.count) 口座 · \(AmountText.text(total))"
 
         return VStack(alignment: .leading, spacing: 0) {
-            CardHeader(title, note: rows.isEmpty ? nil : note)
+            CardHeader(title, note: rows.isEmpty ? nil : "\(rows.count) 口座")
 
             if rows.isEmpty {
                 Text("口座を追加すると、ここに並びます")
@@ -45,6 +44,14 @@ extension AssetsView {
                     .foregroundStyle(Palette.subtext)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.bottom, 8)
+            } else {
+                Text(AmountText.text(total))
+                    .displayFont(.title, weight: .bold)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .padding(.bottom, 4)
             }
 
             ForEach(sections) { section in
