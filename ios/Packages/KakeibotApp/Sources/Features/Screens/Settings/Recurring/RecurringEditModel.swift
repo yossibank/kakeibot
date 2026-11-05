@@ -31,6 +31,8 @@ public final class RecurringEditModel {
     public private(set) var type: Entry.Kind = .expense
     public private(set) var calculator = AmountCalculator()
     public private(set) var feeCalculator = AmountCalculator()
+    public private(set) var finalCalculator = AmountCalculator()
+    public private(set) var countCalculator = AmountCalculator()
     public private(set) var options: EntryOptions?
     public private(set) var cardBills: [Recurring] = []
     public private(set) var isHidden = false
@@ -102,6 +104,7 @@ public extension RecurringEditModel {
             holidayShift: holidayShift,
             closingDay: closing,
             fee: transferFee,
+            finalAmount: isLoanRepayment ? finalAmount : 0,
             billShift: billRecurring == nil ? 0 : billShift,
             startDate: startDate,
             endDate: endDate,
@@ -134,6 +137,41 @@ public extension RecurringEditModel {
 
     var isCardBill: Bool {
         canUseClosingDay && closingDay != nil
+    }
+
+    var isLoanRepayment: Bool {
+        type == .transfer && selectedDestination?.kind == .loan
+    }
+
+    var finalAmount: Int {
+        finalCalculator.amount
+    }
+
+    var plannedRecurring: Recurring {
+        Recurring(
+            type: type,
+            amount: amount,
+            categoryId: nil,
+            walletId: walletId ?? Wallet.ID(),
+            toWalletId: toWalletId,
+            frequency: frequency,
+            month: frequency == .yearly ? month : nil,
+            day: day,
+            holidayShift: holidayShift,
+            finalAmount: finalAmount > 0 ? finalAmount : nil,
+            startDate: startDate,
+            endDate: endDate,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+    }
+
+    var repaymentCount: Int? {
+        plannedRecurring.occurrenceCount
+    }
+
+    var plannedTotal: Int? {
+        plannedRecurring.plannedTotal
     }
 
     var canSave: Bool {
@@ -213,6 +251,23 @@ public extension RecurringEditModel {
 
     func setFee(_ amount: Int) {
         feeCalculator = AmountCalculator(amount: amount)
+    }
+
+    func pressFinal(_ key: AmountCalculator.Key) {
+        finalCalculator.press(key)
+    }
+
+    func prepareCount() {
+        countCalculator = AmountCalculator(amount: repaymentCount ?? 0)
+    }
+
+    func pressCount(_ key: AmountCalculator.Key) {
+        countCalculator.press(key)
+
+        var open = plannedRecurring
+        open.endDate = nil
+
+        endDate = open.endDate(afterCount: countCalculator.amount)
     }
 
     func load() async {
@@ -416,6 +471,7 @@ private extension RecurringEditModel {
         holidayShift = draft.holidayShift
         closingDay = draft.closingDay
         feeCalculator = AmountCalculator(amount: draft.fee)
+        finalCalculator = AmountCalculator(amount: draft.finalAmount)
         billShift = draft.billShift
         startDate = draft.startDate
         endDate = draft.endDate

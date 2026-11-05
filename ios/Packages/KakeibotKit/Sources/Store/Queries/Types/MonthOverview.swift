@@ -160,7 +160,7 @@ private extension MonthOverview {
 
                         let amount = entry?.amount
                             ?? entries.map { recurring.amount(paidOn: date, entries: $0) }
-                            ?? recurring.amount
+                            ?? recurring.scheduledAmount(paidOn: date)
 
                         guard entry != nil || amount > 0 else {
                             return nil

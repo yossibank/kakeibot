@@ -45,6 +45,33 @@ extension RecurringEditSheet {
                 }
             }
 
+        case .count:
+            VStack(spacing: 12) {
+                countValue
+
+                Keypad(calculator: model.countCalculator) {
+                    closePanel()
+                } onKey: { key in
+                    model.pressCount(key)
+                }
+            }
+
+        case .finalAmount:
+            VStack(spacing: 12) {
+                SettingsKeypadValue(model.finalAmount)
+
+                Text("最後の回だけ額が違うときに入れます。0 なら毎回と同じ額です")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+                    .multilineTextAlignment(.center)
+
+                Keypad(calculator: model.finalCalculator) {
+                    closePanel()
+                } onKey: { key in
+                    model.pressFinal(key)
+                }
+            }
+
         case .remind:
             remindChooser
         }
@@ -52,6 +79,21 @@ extension RecurringEditSheet {
 }
 
 private extension RecurringEditSheet {
+    var countValue: some View {
+        VStack(spacing: 4) {
+            Text("\(model.countCalculator.amount) 回")
+                .displayFont(.largeTitle, weight: .bold)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+                .contentTransition(.numericText())
+                .animation(.snappy, value: model.countCalculator.amount)
+
+            Text(model.endDate.map { "終わり \(RecurringText.date($0))" } ?? "回数を入れると、終わりの日が決まります")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+        }
+    }
+
     var endChooser: some View {
         VStack(spacing: 12) {
             HStack(spacing: 8) {

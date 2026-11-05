@@ -296,6 +296,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | closing_day | INTEGER | 振替だけで、1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にし、amount は 0 にする |
 | fee | INTEGER | 振替だけで、1 以上。あれば、記録するときに手数料も記録する |
 | bill_shift | INTEGER | 0〜2。テンプレートと同じ。振替では 0 |
+| final_amount | INTEGER | 最後の回の額で、end_date があり決まった額のときだけ入る。空なら最後の回も amount |
 | start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |

@@ -24,6 +24,10 @@ private extension RecurringEditSheet {
             isAmount: true
         )
 
+        guard !model.isLoanRepayment else {
+            return loanItems + [fee]
+        }
+
         guard model.canUseClosingDay else {
             return [fee]
         }
@@ -37,6 +41,31 @@ private extension RecurringEditSheet {
         )
 
         return [closing, fee]
+    }
+
+    var loanItems: [SettingsRowList<Panel>.Item] {
+        let count = SettingsRowList<Panel>.Item(
+            panel: .count,
+            systemImage: "number",
+            title: "回数",
+            value: model.repaymentCount.map { "\($0) 回" } ?? "決めない",
+            isEmpty: model.repaymentCount == nil
+        )
+
+        guard model.endDate != nil else {
+            return [count]
+        }
+
+        let final = SettingsRowList<Panel>.Item(
+            panel: .finalAmount,
+            systemImage: "flag.checkered",
+            title: "最終回の額",
+            value: model.finalAmount > 0 ? AmountText.text(model.finalAmount) : "毎回と同じ",
+            isEmpty: model.finalAmount == 0,
+            isAmount: model.finalAmount > 0
+        )
+
+        return [count, final]
     }
 
     var scheduleItems: [SettingsRowList<Panel>.Item] {

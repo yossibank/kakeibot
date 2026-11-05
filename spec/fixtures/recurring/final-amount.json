@@ -1,0 +1,45 @@
+{
+  "description": "回数と最後の回の額から、返済の終わりの日と返す総額を出す。endDate は count 回目の日、total は始まりから終わりまでの額の合計。finalAmount が空なら、最後の回も amount にする。",
+  "cases": [
+    {
+      "summary": "最終回だけ額が多い有利子の奨学金",
+      "amount": 16235,
+      "finalAmount": 16587,
+      "day": 27,
+      "startDate": "2026-10-27",
+      "count": 240,
+      "endDate": "2046-09-27",
+      "total": 3896752
+    },
+    {
+      "summary": "毎月同じ額の無利子の奨学金",
+      "amount": 10800,
+      "finalAmount": null,
+      "day": 27,
+      "startDate": "2026-10-27",
+      "count": 240,
+      "endDate": "2046-09-27",
+      "total": 2592000
+    },
+    {
+      "summary": "月末を超える日は月の最終日で数える",
+      "amount": 1000,
+      "finalAmount": 500,
+      "day": 31,
+      "startDate": "2026-01-31",
+      "count": 2,
+      "endDate": "2026-02-28",
+      "total": 1500
+    },
+    {
+      "summary": "1 回だけなら最後の回の額だけになる",
+      "amount": 5000,
+      "finalAmount": 3000,
+      "day": 10,
+      "startDate": "2026-03-01",
+      "count": 1,
+      "endDate": "2026-03-10",
+      "total": 3000
+    }
+  ]
+}

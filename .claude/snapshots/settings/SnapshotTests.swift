@@ -146,6 +146,39 @@ struct SnapshotTests {
             )
         }
 
+        let loanDraft = WalletDraft(
+            kind: .loan,
+            name: "日本学生支援機構 第二種（有利子）",
+            mark: .glyph(.scholarship),
+            color: "#4A6FA5",
+            initialBalance: -3_896_752
+        )
+
+        let loan = try await database.saveWallet(loanDraft, at: Date())
+        let loanEdit = RecurringEditModel(database: database, today: today, paying: loan.id)
+
+        await loanEdit.load()
+
+        for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
+            loanEdit.press(key)
+        }
+
+        for key in [AmountCalculator.Key.digit(2), .digit(4), .digit(0)] {
+            loanEdit.pressCount(key)
+        }
+
+        for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(5), .digit(8), .digit(7)] {
+            loanEdit.pressFinal(key)
+        }
+
+        for variant in Self.variants {
+            try Self.write(
+                RecurringEditSheet(model: loanEdit).frame(height: 1900),
+                variant: variant,
+                to: "settings-recurring-loan"
+            )
+        }
+
         templateEdit.walletId = card?.id
         recurringEdit.walletId = card?.id
 

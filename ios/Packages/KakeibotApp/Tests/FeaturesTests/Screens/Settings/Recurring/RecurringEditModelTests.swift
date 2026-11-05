@@ -189,6 +189,51 @@ struct RecurringEditModelTests {
     }
 
     @Test
+    func setsRepaymentEndAndFinalAmountFromCount() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let start = try #require(LocalDate("2026-10-27"))
+        let end = try #require(LocalDate("2046-09-27"))
+
+        let wallet = WalletDraft(
+            kind: .loan,
+            name: "奨学金",
+            mark: .glyph(.scholarship),
+            color: "#4A6FA5",
+            initialBalance: -3_896_752
+        )
+
+        let loan = try await setup.database.saveWallet(wallet, at: Date())
+
+        let model = RecurringEditModel(
+            database: setup.database,
+            today: setup.today,
+            paying: loan.id
+        )
+
+        await model.load()
+        model.startDate = start
+        model.choose(.none)
+
+        for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
+            model.press(key)
+        }
+
+        for key in [AmountCalculator.Key.digit(2), .digit(4), .digit(0)] {
+            model.pressCount(key)
+        }
+
+        for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(5), .digit(8), .digit(7)] {
+            model.pressFinal(key)
+        }
+
+        #expect(model.isLoanRepayment)
+        #expect(model.endDate == end)
+        #expect(model.repaymentCount == 240)
+        #expect(model.plannedTotal == 3_896_752)
+        #expect(model.draft.finalAmount == 16587)
+    }
+
+    @Test
     func savesTransferBetweenWallets() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))

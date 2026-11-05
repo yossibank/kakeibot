@@ -12,6 +12,31 @@ public extension Recurring {
         }
     }
 
+    var finalDate: LocalDate? {
+        guard let endDate else {
+            return nil
+        }
+
+        let from = LocalDate(
+            yearMonth: endDate.yearMonth.adding(months: -Self.finalSearchMonths),
+            clampedDay: 1
+        )
+
+        return dates(from: from, through: endDate).last
+    }
+
+    var occurrenceCount: Int? {
+        endDate.map { dates(from: startDate, through: $0).count }
+    }
+
+    var plannedTotal: Int? {
+        endDate.map { end in
+            dates(from: startDate, through: end)
+                .map(scheduledAmount(paidOn:))
+                .reduce(0, +)
+        }
+    }
+
     func occurrences(
         from start: LocalDate,
         through end: LocalDate
@@ -42,6 +67,35 @@ public extension Recurring {
     func pendingOccurrences(through today: LocalDate) -> [Occurrence] {
         let start = generatedUntil.map { $0.adding(days: 1) } ?? startDate
         return occurrences(from: start, through: today)
+    }
+
+    func endDate(afterCount count: Int) -> LocalDate? {
+        guard count > 0 else {
+            return nil
+        }
+
+        var open = self
+        open.endDate = nil
+
+        let months = frequency == .monthly ? count + 2 : (count + 1) * 12
+        let horizon = LocalDate(
+            yearMonth: startDate.yearMonth.adding(months: months),
+            clampedDay: 31
+        )
+        let dates = open.dates(from: startDate, through: horizon)
+
+        return dates.count >= count ? dates[count - 1] : nil
+    }
+
+    func scheduledAmount(paidOn date: LocalDate) -> Int {
+        guard
+            let finalAmount,
+            date == finalDate
+        else {
+            return amount
+        }
+
+        return finalAmount
     }
 
     func nextDate(onOrAfter date: LocalDate) -> LocalDate? {
@@ -92,6 +146,7 @@ public extension Recurring {
 
 private extension Recurring {
     static let searchDays = 400
+    static let finalSearchMonths = 13
 
     func months(
         from first: YearMonth,
