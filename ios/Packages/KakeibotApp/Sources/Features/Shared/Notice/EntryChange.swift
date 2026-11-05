@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import Foundation
 
 public struct EntryChange: Hashable, Sendable {
     public let kind: Kind
@@ -33,8 +34,37 @@ public extension EntryChange {
         case deleted
     }
 
+    var isDeletion: Bool {
+        kind == .deleted
+    }
+
+    var subject: String {
+        guard isDeletion else {
+            return label
+        }
+
+        let memo = entry.memo?
+            .split(whereSeparator: \.isNewline)
+            .first?
+            .trimmingCharacters(in: .whitespaces) ?? ""
+
+        if !memo.isEmpty {
+            return memo
+        }
+
+        return label.isEmpty ? "記録" : label
+    }
+
+    var amountText: String {
+        AmountText.text(entry.amount)
+    }
+
+    var predicate: String {
+        "を\(verb)"
+    }
+
     var message: String {
-        "\(label) \(AmountText.text(entry.amount)) を\(verb)"
+        "\(subject) \(amountText) \(predicate)"
     }
 
     static func label(
@@ -58,7 +88,7 @@ private extension EntryChange {
         switch kind {
         case .recorded: entry.type == .transfer ? "振り替えました" : "記録しました"
         case .edited: "変えました"
-        case .deleted: "削除しました"
+        case .deleted: "消しました"
         }
     }
 }

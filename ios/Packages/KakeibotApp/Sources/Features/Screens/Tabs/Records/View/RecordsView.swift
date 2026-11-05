@@ -27,6 +27,7 @@ public struct RecordsView: View {
 
     public init(
         model: RecordsModel,
+        selection: Set<Entry.ID>? = nil,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onAddEntry: @escaping (LocalDate) -> Void,
         onOpenRecurring: @escaping (Recurring.ID) -> Void,
@@ -34,6 +35,7 @@ public struct RecordsView: View {
         onDeleteEntries: @escaping ([Entry.ID]) -> Void
     ) {
         self.model = model
+        _selection = State(initialValue: selection)
         self.onOpenEntry = onOpenEntry
         self.onAddEntry = onAddEntry
         self.onOpenRecurring = onOpenRecurring

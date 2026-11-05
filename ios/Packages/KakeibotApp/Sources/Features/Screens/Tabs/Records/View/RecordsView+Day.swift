@@ -67,6 +67,49 @@ extension RecordsView {
         _ date: LocalDate,
         day: EntryDay?
     ) -> some View {
+        Group {
+            if let selection,
+               let day {
+                ViewThatFits(in: .horizontal) {
+                    dayHeaderRow(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: true)
+                    }
+
+                    dayHeaderRow(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: false)
+                    }
+                }
+            } else {
+                dayHeaderRow(date, day: day) {
+                    dayButtons(on: date)
+                }
+            }
+        }
+        .padding(.top, 12)
+        .padding(.bottom, 8)
+    }
+}
+
+private extension RecordsView {
+    func entryRow(_ row: EntryRowItem) -> some View {
+        EntryRow(
+            icon: row.icon,
+            title: row.title,
+            tag: row.tag,
+            detail: row.detail,
+            route: row.route,
+            memo: row.memo,
+            amount: row.amount,
+            type: row.type,
+            isRecurring: row.isRecurring
+        )
+    }
+
+    func dayHeaderRow(
+        _ date: LocalDate,
+        day: EntryDay?,
+        @ViewBuilder trailing: () -> some View
+    ) -> some View {
         let holiday = Holiday.name(of: date)
 
         return HStack(spacing: 12) {
@@ -96,42 +139,60 @@ extension RecordsView {
                 }
             }
 
-            if model.canReward(on: date) {
-                Button {
-                    rewardTarget = StampTarget(date: date)
-                } label: {
-                    rewardButtonLabel(on: date)
-                        .tapArea(Self.dayButtonTapOutsets)
-                }
-                .buttonStyle(.plain)
-            }
+            trailing()
+        }
+    }
 
+    @ViewBuilder
+    func dayButtons(on date: LocalDate) -> some View {
+        if model.canReward(on: date) {
             Button {
-                stampTarget = StampTarget(date: date)
+                rewardTarget = StampTarget(date: date)
             } label: {
-                stampButtonLabel(on: date)
+                rewardButtonLabel(on: date)
                     .tapArea(Self.dayButtonTapOutsets)
             }
             .buttonStyle(.plain)
         }
-        .padding(.top, 12)
-        .padding(.bottom, 8)
-    }
-}
 
-private extension RecordsView {
-    func entryRow(_ row: EntryRowItem) -> some View {
-        EntryRow(
-            icon: row.icon,
-            title: row.title,
-            tag: row.tag,
-            detail: row.detail,
-            route: row.route,
-            memo: row.memo,
-            amount: row.amount,
-            type: row.type,
-            isRecurring: row.isRecurring
-        )
+        Button {
+            stampTarget = StampTarget(date: date)
+        } label: {
+            stampButtonLabel(on: date)
+                .tapArea(Self.dayButtonTapOutsets)
+        }
+        .buttonStyle(.plain)
+    }
+
+    func daySelectButton(
+        _ day: EntryDay,
+        in selection: Set<Entry.ID>,
+        showsTitle: Bool
+    ) -> some View {
+        let isSelected = model.isSelected(day, in: selection)
+        let mark = isSelected ? "checkmark.circle.fill" : "circle"
+
+        return Button {
+            self.selection = model.toggling(day, in: selection)
+        } label: {
+            HStack(spacing: 4) {
+                if showsTitle {
+                    Text("この日を選ぶ")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.accent)
+                        .lineLimit(1)
+                        .fixedSize()
+                }
+
+                Image(systemName: mark)
+                    .sansFont(.headline)
+                    .foregroundStyle(Palette.accent)
+                    .contentTransition(.symbolEffect(.replace))
+            }
+            .frame(minHeight: 26)
+            .tapArea(Self.dayButtonTapOutsets)
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -199,16 +260,10 @@ private extension RecordsView {
     }
 
     func toggleSelection(_ id: Entry.ID) {
-        guard var selected = selection else {
+        guard let selection else {
             return
         }
 
-        if selected.contains(id) {
-            selected.remove(id)
-        } else {
-            selected.insert(id)
-        }
-
-        selection = selected
+        self.selection = model.toggling(id, in: selection)
     }
 }
