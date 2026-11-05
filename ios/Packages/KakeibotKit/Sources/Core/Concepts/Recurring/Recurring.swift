@@ -15,6 +15,7 @@ public struct Recurring: Hashable, Identifiable, Sendable {
     public var holidayShift: HolidayShift
     public var closingDay: Int?
     public var fee: Int?
+    public var finalAmount: Int?
     public var billShift: Int
     public var startDate: LocalDate
     public var endDate: LocalDate?
@@ -39,6 +40,7 @@ public struct Recurring: Hashable, Identifiable, Sendable {
         holidayShift: HolidayShift = .none,
         closingDay: Int? = nil,
         fee: Int? = nil,
+        finalAmount: Int? = nil,
         billShift: Int = 0,
         startDate: LocalDate,
         endDate: LocalDate? = nil,
@@ -62,6 +64,7 @@ public struct Recurring: Hashable, Identifiable, Sendable {
         self.holidayShift = holidayShift
         self.closingDay = closingDay
         self.fee = fee
+        self.finalAmount = finalAmount
         self.billShift = billShift
         self.startDate = startDate
         self.endDate = endDate
@@ -98,6 +101,7 @@ extension Recurring: Codable {
         case holidayShift
         case closingDay
         case fee
+        case finalAmount
         case billShift
         case startDate
         case endDate
@@ -124,6 +128,7 @@ extension Recurring: Codable {
         let day = try container.decode(Int.self, forKey: .day)
         let closingDay = try container.decodeIfPresent(Int.self, forKey: .closingDay)
         let fee = try container.decodeIfPresent(Int.self, forKey: .fee)
+        let finalAmount = try container.decodeIfPresent(Int.self, forKey: .finalAmount)
         let billShift = try container.decodeIfPresent(Int.self, forKey: .billShift)
         let startDate = try container.decode(LocalDate.self, forKey: .startDate)
         let endDate = try container.decodeIfPresent(LocalDate.self, forKey: .endDate)
@@ -149,6 +154,7 @@ extension Recurring: Codable {
             holidayShift: shift ?? .none,
             closingDay: closingDay,
             fee: fee,
+            finalAmount: finalAmount,
             billShift: clampedShift,
             startDate: startDate,
             endDate: endDate,
@@ -177,6 +183,7 @@ extension Recurring: Codable {
         try container.encode(holidayShift, forKey: .holidayShift)
         try container.encodeOrNull(closingDay, forKey: .closingDay)
         try container.encodeOrNull(fee, forKey: .fee)
+        try container.encodeOrNull(finalAmount, forKey: .finalAmount)
         try container.encode(billShift, forKey: .billShift)
         try container.encode(startDate, forKey: .startDate)
         try container.encodeOrNull(endDate, forKey: .endDate)

@@ -368,6 +368,7 @@ private extension HomeModel {
                 wallets: Array(list.wallets.values),
                 entries: list.days.flatMap(\.entries),
                 valuations: list.valuations,
+                adjustments: list.adjustments,
                 after: today
             )
         } ?? []

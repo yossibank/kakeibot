@@ -88,6 +88,7 @@ setting は、次の key を記録しない。
 | --- | --- |
 | wallet | その id |
 | valuation | wallet_id |
+| adjustment | wallet_id |
 | entry | wallet_id。無ければ to_wallet_id（振替は、どちらかが共有なら共有のゾーン） |
 | entry_item | その entry と同じ。entry の財布が変わると、品目の updated_at を書き換えて送り直す |
 | category | wallet_id |
@@ -134,3 +135,22 @@ iCloud の行に入れ替えて同期を入れるときは、手元の行を消�
 | reward_log | `(rule_id, date)` | created_at |
 | calendar_stamp | `date` | created_at |
 | item_name | `(store, raw)` | created_at |
+
+## 🔧 CloudKit の型
+
+型の名前は `SyncTable` の値と同じにする。どの型も、暗号化した `fields` を持つ。
+
+型は Development で初めて保存した時にでき、Production には Deploy で足す。同期する表を足したら、次の順に型を足す。
+
+1. Xcode の Run で入れた端末で、その表の行を保存して同期する。
+2. CloudKit Console で、Development の型を Production に Deploy する。
+3. リリースの前に、Production の型を `SyncTable` と比べる。
+
+| 型 | 作る操作 |
+| --- | --- |
+| adjustment | 手持ちがマイナスの帯から「残高を合わせる」で保存する |
+| entry_item | 記録に品目を足して保存する |
+| item_name | レシートを読み取り、品名を直して保存する |
+| reward_goal | 貯金箱の「目標を決める」で保存する |
+| theme | 新しいテーマを作る |
+| valuation | 投資の口座で「評価額を保存」を押す |

@@ -16,6 +16,7 @@ extension ExportV1.Tables {
         let shelfIcons = try ShelfIcon.orderByPrimaryKey().fetchAll(db)
         let wallets = try Wallet.orderByPrimaryKey().fetchAll(db)
         let valuations = try Valuation.orderByPrimaryKey().fetchAll(db)
+        let adjustments = try Adjustment.orderByPrimaryKey().fetchAll(db)
         let categories = try EntryCategory.orderByPrimaryKey().fetchAll(db)
         let tags = try EntryTag.orderByPrimaryKey().fetchAll(db)
         let entries = try Entry.orderByPrimaryKey().fetchAll(db)
@@ -36,6 +37,7 @@ extension ExportV1.Tables {
             shelfIcons: shelfIcons,
             wallets: wallets,
             valuations: valuations,
+            adjustments: adjustments,
             categories: categories,
             tags: tags,
             entries: entries,
@@ -73,6 +75,7 @@ private extension ExportV1.Tables {
         ShelfIcon.self,
         Wallet.self,
         Valuation.self,
+        Adjustment.self,
         EntryCategory.self,
         EntryTag.self,
         Recurring.self,
@@ -96,6 +99,7 @@ private extension ExportV1.Tables {
             shelfIcons,
             wallets,
             valuations,
+            adjustments,
             categories,
             tags,
             recurrings,

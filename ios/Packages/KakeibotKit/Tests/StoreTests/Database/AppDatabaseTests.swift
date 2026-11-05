@@ -34,6 +34,7 @@ private extension AppDatabaseTests {
     """
 
     static let tables: Set = [
+        "adjustment",
         "budget",
         "calendar_stamp",
         "category",

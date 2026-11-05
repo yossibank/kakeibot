@@ -50,6 +50,10 @@ private extension EntryTransferPanel {
             model.afterLine(of: wallet, isSource: role == .source)
         }
 
+        let idleAfter = wallet.flatMap { wallet in
+            model.idleAfterLine(of: wallet, isSource: role == .source)
+        }
+
         return Button {
             onPick(role)
         } label: {
@@ -73,9 +77,9 @@ private extension EntryTransferPanel {
 
                         if let after {
                             balanceLine(after)
-                        } else {
-                            balanceLine(current)
-                                .opacity(0)
+                        } else if let idleAfter {
+                            balanceLine(idleAfter)
+                                .foregroundStyle(Palette.hint)
                         }
                     }
                     .textFont(.footnote)

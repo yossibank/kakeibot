@@ -3,16 +3,14 @@ import SwiftUI
 
 extension RecordsView {
     var filteredEmpty: some View {
-        VStack(spacing: 16) {
-            Text("絞り込みに合う記録はありません")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-
-            HeaderButton(systemImage: "xmark", title: "絞り込みを外す") {
+        PlaceholderEmpty(
+            systemImage: "line.3.horizontal.decrease",
+            text: "絞り込みに合う記録はありません"
+        ) {
+            RecordsFilterClearButton {
                 clearFilter()
             }
         }
-        .padding(.vertical, 40)
     }
 
     func clearFilter() {

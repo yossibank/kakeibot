@@ -10,6 +10,7 @@ public enum SyncTable: String, CaseIterable, Sendable {
     case entryItem = "entry_item"
     case itemName = "item_name"
     case valuation
+    case adjustment
     case budget
     case rewardRule = "reward_rule"
     case rewardLog = "reward_log"

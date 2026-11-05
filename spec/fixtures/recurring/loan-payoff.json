@@ -1,5 +1,5 @@
 {
-  "description": "借入を返し終える回数と最後の日を出す。lastDate は、返し終わらなければ空にする。",
+  "description": "借入を返し終える回数と最後の日を出す。lastDate は、返し終わらなければ空にする。finalAmount は最後の回の額で、無ければ毎回 amount を返す。",
   "cases": [
     {
       "summary": "返済が 1 つで割り切れる",
@@ -35,6 +35,22 @@
       ],
       "count": 4,
       "lastDate": "2026-12-20"
+    },
+    {
+      "summary": "最終回だけ額が多い奨学金を 240 回で返す",
+      "balance": -3896752,
+      "today": "2026-10-26",
+      "repayments": [{ "amount": 16235, "day": 27, "endDate": "2046-09-27", "finalAmount": 16587 }],
+      "count": 240,
+      "lastDate": "2046-09-27"
+    },
+    {
+      "summary": "無利子の奨学金を毎月同じ額で 240 回返す",
+      "balance": -2592000,
+      "today": "2026-10-26",
+      "repayments": [{ "amount": 10800, "day": 27, "endDate": "2046-09-27" }],
+      "count": 240,
+      "lastDate": "2046-09-27"
     },
     {
       "summary": "借入が 0 円で返す回数は無い",

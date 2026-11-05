@@ -59,7 +59,7 @@ public struct RewardRuleEditSheet: View {
         )
         .overlay(alignment: .top) {
             SettingsEditHeader(
-                title: model.isEditing ? "決まりを編集" : "ごほうびの決まりを追加",
+                title: model.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
                 isEditing: model.isEditing,
                 isHidden: model.isHidden,
                 canDelete: !(model.isHidden && model.hasLogs)
@@ -176,7 +176,11 @@ private extension RewardRuleEditSheet {
             VStack(alignment: .leading, spacing: 8) {
                 SettingsFormCard {
                     SettingsFormSection("金額") {
-                        SettingsAmountButton(amount: model.amount ?? 0, text: amountPrompt) {
+                        SettingsAmountButton(
+                            amount: model.amount ?? 0,
+                            text: amountPrompt,
+                            isEmpty: (model.amount ?? 0) == 0
+                        ) {
                             open(.amount)
                         }
                     }

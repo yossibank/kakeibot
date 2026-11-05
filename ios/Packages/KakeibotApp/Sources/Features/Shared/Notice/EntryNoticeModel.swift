@@ -168,8 +168,9 @@ public extension EntryNoticeModel.Notice {
 
     var dismissesOnTap: Bool {
         switch self {
+        case let .changed(change): !change.isDeletion
         case .batch: false
-        case .changed, .undone, .failed: true
+        case .undone, .failed: true
         }
     }
 }

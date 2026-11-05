@@ -26,4 +26,12 @@ public extension RecordsModel {
             range: first...last
         )
     }
+
+    func restoreRecentSearches(_ words: [String]) async {
+        do {
+            try await database.setSetting(.recentSearches, to: words)
+        } catch {
+            errorNotice.show(Self.saveFailedMessage, for: error)
+        }
+    }
 }

@@ -100,9 +100,10 @@ public enum NotificationPlan {
         let start = today.adding(days: daysBefore)
         let span = recurringDays - 1
         let end = start.adding(days: span)
-        let amount = recurring.closingDay == nil ? recurring.amount : nil
+        let usesCardBill = recurring.closingDay != nil
 
         return recurring.dates(from: start, through: end).map { date in
+            let amount = usesCardBill ? nil : recurring.scheduledAmount(paidOn: date)
             let shortage = shortages.first { shortage in
                 shortage.recurringId == recurring.id && shortage.date == date
             }

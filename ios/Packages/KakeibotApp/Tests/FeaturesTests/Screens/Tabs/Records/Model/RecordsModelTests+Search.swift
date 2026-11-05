@@ -149,4 +149,74 @@ extension RecordsModelTests {
         #expect(saved == ["本", "ランチ"])
         #expect(model.recentSearches.isEmpty)
     }
+
+    @Test
+    func restoresClearedSearches() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.rememberSearch("ランチ")
+        await model.rememberSearch("本")
+        let words = model.recentSearches
+        await model.clearRecentSearches()
+
+        await model.restoreRecentSearches(words)
+        let saved = try await setup.database.setting(.recentSearches)
+
+        #expect(saved == ["本", "ランチ"])
+    }
+
+    @Test
+    func countsSearchResultsHiddenByFilter() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
+        try await setup.save(.expense, amount: 500, on: "2026-09-30", memo: "ランチ")
+        let options = try await setup.database.entryOptions()
+        let salary = try #require(options.incomeCategories.first)
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+        model.searchText = "ランチ"
+        let unfiltered = model.searchHiddenCount
+
+        model.filter = EntryFilter(categoryIds: [salary.id])
+        let hidden = model.searchHiddenCount
+
+        model.searchText = "コーヒー"
+        let missing = model.searchHiddenCount
+
+        #expect(unfiltered == 0)
+        #expect(hidden == 2)
+        #expect(missing == 0)
+    }
+
+    @Test
+    func countsShownEntries() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
+        try await setup.save(.income, amount: 250_000, on: "2026-10-10")
+        try await setup.save(.expense, amount: 500, on: "2026-09-30", memo: "ランチ")
+        let options = try await setup.database.entryOptions()
+        let food = try #require(options.expenseCategories.first)
+        let salary = try #require(options.incomeCategories.first)
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let month = model.shownEntryCount
+
+        model.filter = EntryFilter(categoryIds: [food.id])
+        let filteredMonth = model.shownEntryCount
+
+        model.isSearching = true
+        let blankSearch = model.shownEntryCount
+
+        model.searchText = "ランチ"
+        let searched = model.shownEntryCount
+
+        model.filter = EntryFilter(categoryIds: [salary.id])
+        let hiddenSearch = model.shownEntryCount
+
+        #expect(month == 2)
+        #expect(filteredMonth == 1)
+        #expect(blankSearch == 1)
+        #expect(searched == 2)
+        #expect(hiddenSearch == 0)
+    }
 }

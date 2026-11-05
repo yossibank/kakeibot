@@ -200,6 +200,7 @@ KakeibotApp/
 │   │   │   ├── Tabs/
 │   │   │   └── WhatsNew/
 │   │   └── Shared/
+│   │       ├── Bill/
 │   │       ├── DateChoice/
 │   │       ├── EntryList/
 │   │       ├── FeatureArt/
@@ -233,15 +234,16 @@ KakeibotApp/
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート |
+| `Features/Shared/Bill/` | これからの引き落としの行と、その言葉 |
 | `Features/Shared/DateChoice/` | 月の始まりの日・休日のずらし・曜日を選ぶ部品と、その表示の名前 |
 | `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値 |
-| `Features/Shared/FeatureArt/` | お知らせと Pro の画面で機能を見せる絵の部品（レシート・伝票・iPhone の枠・見本のデータ）。絵を幅に合わせて縮める枠も置く |
+| `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |
 | `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す） |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、保存の失敗が空き容量不足かの見分け。ファイルの頭は、元の型ごとに分かれる |
 | `Features/Shared/Notification/` | 通知の許可の窓口と、許可が無いときの帯 |
-| `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今の期間に戻るボタン |
-| `Features/Shared/Placeholder/` | タブの画面で、記録が無いときと読み込めないときの表示。設定の一覧が空のときは `SettingsParts/Hint/` の `SettingsEmptyNote` を使う |
-| `Features/Shared/Pro/` | Pro を買ったかの状態と、止めた場所で下に出すカード。StoreKit の中身は AppFeature が渡す |
+| `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今に戻るボタン |
+| `Features/Shared/Placeholder/` | タブで記録が無いときと読み込めないときの表示。設定の一覧が空なら `SettingsParts/Hint/` の `SettingsEmptyNote` を使う |
+| `Features/Shared/Pro/` | Pro を買ったかと、止めた所の下に出すカード。StoreKit の中身は AppFeature が渡す |
 | `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Features/Shared/Stamp/` | 押したスタンプの数のカードと、押した日の一覧のシート |

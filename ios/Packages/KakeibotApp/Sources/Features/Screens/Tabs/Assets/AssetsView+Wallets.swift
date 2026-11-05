@@ -29,42 +29,47 @@ extension AssetsView {
 
     func walletGroup(
         _ title: String,
-        systemImage: String,
-        sections: [AssetsModel.WalletSection]
+        sections: [AssetsModel.WalletSection],
+        onAdd: (() -> Void)? = nil
     ) -> some View {
         let rows = sections.flatMap(\.rows)
         let total = rows.reduce(0) { $0 + $1.balance }
 
-        return VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 0) {
-                CardHeader(
-                    title,
-                    systemImage: systemImage,
-                    note: "\(rows.count) 口座"
-                )
+        return VStack(alignment: .leading, spacing: 0) {
+            CardHeader(title, note: rows.isEmpty ? nil : "\(rows.count) 口座")
 
+            if rows.isEmpty {
+                Text("口座を追加すると、ここに並びます")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 8)
+            } else {
                 Text(AmountText.text(total))
                     .displayFont(.title, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
+                    .padding(.bottom, 4)
             }
-            .padding(.horizontal, 4)
 
-            VStack(spacing: 0) {
-                ForEach(sections) { section in
-                    walletSection(section)
-                        .overlay(alignment: .top) {
-                            if section.id != sections.first?.id {
-                                Hairline(thickness: 1)
-                            }
-                        }
-                }
+            ForEach(sections) { section in
+                walletSection(section)
+                    .overlay(alignment: .top) {
+                        Hairline(thickness: 1)
+                    }
             }
-            .padding(.horizontal, 16)
-            .card()
+
+            if let onAdd {
+                addWalletRow(action: onAdd)
+                    .overlay(alignment: .top) {
+                        Hairline(thickness: 1)
+                    }
+            }
         }
+        .padding(.horizontal, 16)
+        .card()
     }
 }
 
@@ -110,31 +115,13 @@ private extension AssetsView {
             IconBadge(row.icon, size: 32)
 
             VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(row.wallet.name)
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.text)
-                        .sharedTextScale()
-
-                    if let label = Self.label(of: row) {
-                        Text(label)
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                    }
-
-                    Spacer(minLength: 8)
-
-                    Text(AmountText.text(row.balance))
-                        .textFont(.subheadline, weight: .semibold)
-                        .monospacedDigit()
-                        .foregroundStyle(Self.amountColor(of: row))
-                        .fixedSize()
-                        .layoutPriority(1)
-                }
+                walletLine(row)
 
                 debtDetail(of: row)
+
+                if row.needsAdjustment {
+                    adjustNotice(of: row)
+                }
             }
             .frame(minHeight: 32)
 
@@ -147,111 +134,186 @@ private extension AssetsView {
         .contentShape(.rect)
     }
 
-    func billRow(_ row: AssetsModel.UpcomingBill) -> some View {
-        HStack(alignment: .top, spacing: 16) {
-            FlipDate(row.bill.date)
+    func walletLine(_ row: AssetsModel.WalletRow) -> some View {
+        let label = Self.label(of: row)
+        let nameWidth = label == nil ? Self.nameMinWidth : Self.labeledNameMinWidth
 
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .firstTextBaseline) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(row.title)
-                            .textFont(.subheadline)
-                            .foregroundStyle(Palette.text)
-                            .lineLimit(2)
+        return HStack(alignment: .firstTextBaseline, spacing: 8) {
+            walletName(row)
+                .frame(minWidth: nameWidth, alignment: .leading)
 
-                        if let period = row.bill.period {
-                            Text("\(RecurringText.period(period)) の利用分")
-                                .textFont(.caption2)
-                                .foregroundStyle(Palette.subtext)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                        }
+            Spacer(minLength: 0)
 
-                        if let moves = Self.movesText(of: row) {
-                            Button {
-                                entrySheet = .moved(row)
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Label(
-                                        moves,
-                                        systemImage: "arrow.uturn.right"
-                                    )
-                                    .lineLimit(2)
-
-                                    Image(systemName: "chevron.right")
-                                        .sansFont(.micro, weight: .bold)
-                                }
-                                .textFont(.caption2)
-                                .foregroundStyle(Palette.accent)
-                                .padding(.vertical, 4)
-                                .contentShape(.rect)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-
-                    Spacer(minLength: 8)
-
-                    Text(AmountText.text(row.bill.amount))
-                        .displayFont(.headline)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                if let label {
+                    walletLabel(label)
                 }
 
-                balanceBar(row.bill)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(row.source ?? "口座")
-                            .textFont(.caption2)
-                            .sharedTextScale()
-
-                        Spacer(minLength: 8)
-
-                        Text(daysText(until: row.bill.date))
-                            .foregroundStyle(Palette.accent)
-                    }
-
-                    Text(balanceText(row.bill))
-                        .monospacedDigit()
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-                .textFont(.caption2)
-                .foregroundStyle(balanceColor(row.bill))
+                walletBalance(row)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
+            .layoutPriority(1)
         }
-        .padding(12)
-        .background(
-            Palette.accent.opacity(.faint),
-            in: .rect(cornerRadius: corner.radius(20))
-        )
-        .contentShape(.rect)
     }
 
-    func balanceBar(_ bill: CardBill) -> some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(Palette.accent.opacity(.soft))
+    func walletName(_ row: AssetsModel.WalletRow) -> some View {
+        Text(row.wallet.name)
+            .textFont(.subheadline)
+            .foregroundStyle(Palette.text)
+            .sharedTextScale()
+    }
 
-                Capsule()
-                    .fill(balanceColor(bill))
-                    .frame(width: proxy.size.width * Self.share(of: bill))
+    func walletLabel(_ label: String) -> some View {
+        Text(label)
+            .textFont(.caption2)
+            .foregroundStyle(Palette.subtext)
+            .fixedSize()
+    }
+
+    func walletBalance(_ row: AssetsModel.WalletRow) -> some View {
+        Text(AmountText.text(row.balance))
+            .textFont(.subheadline, weight: .semibold)
+            .monospacedDigit()
+            .foregroundStyle(Self.amountColor(of: row))
+    }
+
+    func addWalletRow(action: @escaping () -> Void) -> some View {
+        let shape = RoundedRectangle(cornerRadius: corner.radius(32 * 0.3), style: .continuous)
+
+        return Button(action: action) {
+            HStack(spacing: 12) {
+                shape
+                    .fill(Palette.faint)
+                    .overlay {
+                        shape
+                            .stroke(Palette.outline, style: .dashed)
+                    }
+                    .overlay {
+                        Image(systemName: "plus")
+                            .sansFont(.small, weight: .semibold)
+                            .foregroundStyle(Palette.accent)
+                    }
+                    .frame(width: 32, height: 32)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("新しい口座を追加")
+                        .textFont(.subheadline, weight: .semibold)
+                        .foregroundStyle(Palette.accentStrong)
+
+                    Text("現金・銀行・カードなど")
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                }
+                .lineLimit(1)
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .sansFont(.small)
+                    .foregroundStyle(Palette.hint)
+            }
+            .padding(.vertical, 12)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
+    func adjustNotice(of row: AssetsModel.WalletRow) -> some View {
+        Button {
+            adjusting = row
+        } label: {
+            VStack(spacing: 8) {
+                Hairline(thickness: 1)
+
+                ViewThatFits(in: .horizontal) {
+                    adjustLine("手持ちがマイナス", showsDot: true)
+                    adjustLine("手持ちがマイナス", showsDot: false)
+                    adjustLine("マイナス", showsDot: true)
+                }
+            }
+            .padding(.top, 4)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
+    func adjustLine(
+        _ text: String,
+        showsDot: Bool
+    ) -> some View {
+        HStack(spacing: 8) {
+            if showsDot {
+                Circle()
+                    .fill(Palette.rose)
+                    .frame(width: 6, height: 6)
+            }
+
+            Text(text)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .fixedSize()
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 4) {
+                Text("合わせる")
+                    .textFont(.caption, weight: .semibold)
+
+                Image(systemName: "chevron.right")
+                    .sansFont(.micro, weight: .semibold)
+            }
+            .foregroundStyle(Palette.accentStrong)
+            .fixedSize()
+        }
+    }
+
+    func billRow(_ row: AssetsModel.UpcomingBill) -> some View {
+        BillRow(
+            row.bill,
+            title: row.title,
+            source: row.source,
+            today: model.today,
+            style: .detailed
+        ) {
+            if let moves = Self.movesText(of: row) {
+                Button {
+                    entrySheet = .moved(row)
+                } label: {
+                    HStack(spacing: 4) {
+                        Label(
+                            moves,
+                            systemImage: "arrow.uturn.right"
+                        )
+                        .lineLimit(2)
+
+                        Image(systemName: "chevron.right")
+                            .sansFont(.micro, weight: .bold)
+                    }
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.accent)
+                    .padding(.vertical, 4)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
             }
         }
-        .frame(height: 4)
     }
 }
 
 private extension AssetsView {
+    static let nameMinWidth: CGFloat = 64
+    static let labeledNameMinWidth: CGFloat = 48
+
     @ViewBuilder
     func debtDetail(of row: AssetsModel.WalletRow) -> some View {
         if row.wallet.kind == .card,
            let bill = row.nextBill {
-            AssetsDebtChip(systemImage: "calendar", text: nextBillText(bill))
+            AssetsDebtChip(
+                systemImage: "calendar",
+                text: nextBillText(bill),
+                shortText: shortBillText(bill)
+            )
 
             if let unpaid = row.unpaid {
                 Button {
@@ -357,17 +419,6 @@ private extension AssetsView {
         return parts.isEmpty ? nil : parts.joined(separator: "・")
     }
 
-    static func share(of bill: CardBill) -> CGFloat {
-        guard bill.balanceBefore > 0 else {
-            return 1
-        }
-
-        let share = Double(bill.amount) / Double(bill.balanceBefore)
-        let clamped = min(share, 1)
-
-        return CGFloat(clamped)
-    }
-
     func plainNote(of row: AssetsModel.WalletRow) -> String? {
         if let repayment = row.repayment {
             return Self.repaymentText(repayment)
@@ -386,27 +437,14 @@ private extension AssetsView {
     func nextBillText(_ bill: CardBill) -> String {
         let date = "\(bill.date.month)/\(bill.date.day)"
         let weekday = bill.date.weekday.shortName
-        let days = daysText(until: bill.date)
+        let days = BillText.days(until: bill.date, today: model.today)
         return "\(date)（\(weekday)）引き落とし · \(days)"
     }
 
-    func balanceText(_ bill: CardBill) -> String {
-        guard bill.shortage == 0 else {
-            return "\(AmountText.text(bill.shortage)) 足りません"
-        }
-
-        let before = AmountText.text(bill.balanceBefore)
-        let after = AmountText.text(bill.balanceAfter)
-
-        return "\(before) → \(after)"
-    }
-
-    func balanceColor(_ bill: CardBill) -> Color {
-        bill.shortage > 0 ? Palette.rose : Palette.accent
-    }
-
-    func daysText(until date: LocalDate) -> String {
-        let days = model.today.days(until: date)
-        return days == 1 ? "明日" : "あと \(days) 日"
+    func shortBillText(_ bill: CardBill) -> String {
+        let date = "\(bill.date.month)/\(bill.date.day)"
+        let weekday = bill.date.weekday.shortName
+        let days = BillText.days(until: bill.date, today: model.today)
+        return "\(date)（\(weekday)）· \(days)"
     }
 }

@@ -3,10 +3,17 @@ public extension Wallet {
         of wallets: [Wallet],
         with entries: [Entry],
         valuations: [Valuation] = [],
+        adjustments: [Adjustment] = [],
         through date: LocalDate? = nil
     ) -> Int {
         wallets.reduce(0) { total, wallet in
-            let balance = wallet.balance(with: entries, valuations: valuations, through: date)
+            let balance = wallet.balance(
+                with: entries,
+                valuations: valuations,
+                adjustments: adjustments,
+                through: date
+            )
+
             return total + balance
         }
     }
@@ -14,12 +21,13 @@ public extension Wallet {
     func balance(
         with entries: [Entry],
         valuations: [Valuation] = [],
+        adjustments: [Adjustment] = [],
         through date: LocalDate? = nil
     ) -> Int {
         let valuation = kind == .investment ? latestValuation(in: valuations, through: date) : nil
         let start = valuation?.amount ?? initialBalance
 
-        return entries.reduce(start) { balance, entry in
+        let recorded = entries.reduce(start) { balance, entry in
             if let date,
                date < entry.date {
                 return balance
@@ -31,6 +39,24 @@ public extension Wallet {
             }
 
             return balance + change(by: entry)
+        }
+
+        return adjustments.reduce(recorded) { balance, adjustment in
+            guard adjustment.walletId == id else {
+                return balance
+            }
+
+            if let date,
+               date < adjustment.date {
+                return balance
+            }
+
+            if let valuation,
+               valuation.includes(adjustment) {
+                return balance
+            }
+
+            return balance + adjustment.amount
         }
     }
 }

@@ -10,6 +10,8 @@ public struct HomeSectionListView: View {
     @State private var dragTranslation: CGFloat = 0
     @State private var hintFlag: SettingsScreenFlag
 
+    @GestureState private var isPressing = false
+
     @Environment(\.themeStyle.corner) private var corner
 
     public init(
@@ -59,6 +61,11 @@ public struct HomeSectionListView: View {
             transaction.disablesAnimations = true
         }
         .haptic(.selection, trigger: model.layout)
+        .onChange(of: isPressing) { _, isPressing in
+            if !isPressing {
+                finishDragging()
+            }
+        }
         .task {
             await model.load()
         }
@@ -198,6 +205,9 @@ private extension HomeSectionListView {
     func dragGesture(_ section: HomeSection) -> some Gesture {
         LongPressGesture(minimumDuration: 0.2)
             .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .global))
+            .updating($isPressing) { _, isPressing, _ in
+                isPressing = true
+            }
             .onChanged { value in
                 switch value {
                 case .first(true):

@@ -34,7 +34,7 @@ public extension RecurringEditModel {
             day: day,
             holidayShift: holidayShift,
             startDate: startDate,
-            endDate: endDate,
+            endDate: scheduledEndDate,
             createdAt: Date(),
             updatedAt: Date()
         )

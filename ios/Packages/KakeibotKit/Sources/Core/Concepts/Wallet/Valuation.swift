@@ -30,10 +30,23 @@ public extension Valuation {
     typealias ID = Identifier<Valuation>
 
     func includes(_ entry: Entry) -> Bool {
-        if entry.date == date {
-            return entry.createdAt <= createdAt
+        includes(date: entry.date, createdAt: entry.createdAt)
+    }
+
+    func includes(_ adjustment: Adjustment) -> Bool {
+        includes(date: adjustment.date, createdAt: adjustment.createdAt)
+    }
+}
+
+private extension Valuation {
+    func includes(
+        date: LocalDate,
+        createdAt: Date
+    ) -> Bool {
+        if date == self.date {
+            return createdAt <= self.createdAt
         }
 
-        return entry.date < date
+        return date < self.date
     }
 }

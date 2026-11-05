@@ -129,6 +129,13 @@ private extension AppDatabase {
         case .valuation:
             return try walletColumns("SELECT wallet_id FROM valuation WHERE id = ?", key.id, in: db)
 
+        case .adjustment:
+            return try walletColumns(
+                "SELECT wallet_id FROM adjustment WHERE id = ?",
+                key.id,
+                in: db
+            )
+
         case .entry:
             return try walletColumns(
                 "SELECT wallet_id, to_wallet_id FROM entry WHERE id = ?",
@@ -328,6 +335,12 @@ private extension AppDatabase {
             arguments: [walletID]
         )
 
+        let adjustments = try String.fetchAll(
+            db,
+            sql: "SELECT id FROM adjustment WHERE wallet_id = ?",
+            arguments: [walletID]
+        )
+
         let entries = try String.fetchAll(
             db,
             sql: "SELECT id FROM entry WHERE wallet_id = ?1 OR to_wallet_id = ?1",
@@ -347,6 +360,7 @@ private extension AppDatabase {
         return [SyncKey(table: .wallet, id: walletID)]
             + icons.map { SyncKey(table: .icon, id: $0) }
             + valuations.map { SyncKey(table: .valuation, id: $0) }
+            + adjustments.map { SyncKey(table: .adjustment, id: $0) }
             + entries.map { SyncKey(table: .entry, id: $0) }
             + items.map { SyncKey(table: .entryItem, id: $0) }
     }

@@ -19,34 +19,46 @@ struct EntryReceiptTaxBreakdown: View {
 private extension EntryReceiptTaxBreakdown {
     func grid(isCompact: Bool) -> some View {
         Grid(alignment: .leading, horizontalSpacing: 6, verticalSpacing: 6) {
-            ForEach(taxes, id: \.rate) { tax in
-                GridRow(alignment: .firstTextBaseline) {
-                    EntryReceiptTaxRateBadge(rate: tax.rate)
-
-                    if !isCompact {
-                        Text("対象")
-                            .fixedSize()
-                    }
-
-                    Text(AmountText.text(tax.base))
-                        .monospacedDigit()
-                        .fixedSize()
-                        .gridColumnAlignment(.trailing)
-
-                    Color.clear
-                        .frame(maxWidth: .infinity, maxHeight: 0)
-
-                    Text(taxTitle(isCompact: isCompact))
-                        .fixedSize()
-                        .gridColumnAlignment(.trailing)
-
-                    Text(AmountText.text(tax.amount))
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.text)
-                        .fixedSize()
-                        .gridColumnAlignment(.trailing)
-                }
+            if let first = taxes.first {
+                row(first, isCompact: isCompact)
             }
+
+            if taxes.count > 1,
+               let last = taxes.last {
+                row(last, isCompact: isCompact)
+            }
+        }
+    }
+
+    func row(
+        _ tax: EntryItemTotal.Tax,
+        isCompact: Bool
+    ) -> some View {
+        GridRow(alignment: .firstTextBaseline) {
+            EntryReceiptTaxRateBadge(rate: tax.rate)
+
+            if !isCompact {
+                Text("対象")
+                    .fixedSize()
+            }
+
+            Text(AmountText.text(tax.base))
+                .monospacedDigit()
+                .fixedSize()
+                .gridColumnAlignment(.trailing)
+
+            Color.clear
+                .frame(maxWidth: .infinity, maxHeight: 0)
+
+            Text(taxTitle(isCompact: isCompact))
+                .fixedSize()
+                .gridColumnAlignment(.trailing)
+
+            Text(AmountText.text(tax.amount))
+                .monospacedDigit()
+                .foregroundStyle(Palette.text)
+                .fixedSize()
+                .gridColumnAlignment(.trailing)
         }
     }
 

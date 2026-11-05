@@ -73,7 +73,16 @@ public extension WalletEditModel {
     }
 
     func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        guard
+            calculator.tokens.isEmpty,
+            case let .operation(operation) = key,
+            operation == .add || operation == .subtract
+        else {
+            calculator.press(key)
+            return
+        }
+
+        isNegative = operation == .subtract
     }
 
     func pressValuation(_ key: AmountCalculator.Key) {
@@ -309,11 +318,7 @@ private extension WalletEditModel {
             isNegative = kind.isDebt
         }
 
-        guard icon.markKind == .glyph else {
-            return
-        }
-
-        guard icon.glyph == Self.glyph(for: oldKind) else {
+        guard icon.markKind == .glyph, icon.glyph == Self.glyph(for: oldKind) else {
             return
         }
 
@@ -326,8 +331,18 @@ private extension WalletEditModel {
     ) {
         let entries = list.days.flatMap(\.entries)
 
-        balance = wallet.balance(with: entries, valuations: list.valuations, through: Self.today)
-        totalBalance = wallet.balance(with: entries, valuations: list.valuations)
+        balance = wallet.balance(
+            with: entries,
+            valuations: list.valuations,
+            adjustments: list.adjustments,
+            through: Self.today
+        )
+
+        totalBalance = wallet.balance(
+            with: entries,
+            valuations: list.valuations,
+            adjustments: list.adjustments
+        )
 
         valuations = list.valuations
             .filter { $0.walletId == wallet.id }

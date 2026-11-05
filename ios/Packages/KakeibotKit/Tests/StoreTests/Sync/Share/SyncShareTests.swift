@@ -259,11 +259,17 @@ struct SyncShareTests {
         let walletKey = SyncKey(table: .wallet, id: shared)
         let iconKey = SyncKey(table: .icon, id: iconID)
         let valuationKey = SyncKey(table: .valuation, id: "v1")
+        let adjustmentKey = SyncKey(table: .adjustment, id: "a1")
         let entryKey = SyncKey(table: .entry, id: "e1")
 
         try await setup.execute("""
         INSERT INTO valuation (id, wallet_id, date, amount, created_at, updated_at)
         VALUES ('v1', '\(shared)', '2026-10-01', 100, 'x', 'x')
+        """)
+
+        try await setup.execute("""
+        INSERT INTO adjustment (id, wallet_id, date, amount, created_at, updated_at)
+        VALUES ('a1', '\(shared)', '2026-10-01', -100, 'x', 'x')
         """)
 
         try await setup.insertEntry("e1", wallet: shared, category: categoryID, tag: nil)
@@ -277,6 +283,7 @@ struct SyncShareTests {
         #expect(keys.contains(walletKey))
         #expect(keys.contains(iconKey))
         #expect(keys.contains(valuationKey))
+        #expect(keys.contains(adjustmentKey))
         #expect(keys.contains(entryKey))
         #expect(keys.isSuperset(of: categoryKeys))
         #expect(keys.isSuperset(of: copiedIconKeys))

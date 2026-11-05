@@ -35,7 +35,7 @@ public struct LoanPayoff: Hashable, Sendable {
             let payments = repayments
                 .flatMap { recurring in
                     recurring.dates(from: start, through: end)
-                        .map { Payment(date: $0, amount: recurring.amount) }
+                        .map { Payment(date: $0, amount: recurring.scheduledAmount(paidOn: $0)) }
                 }
                 .sorted { $0.date < $1.date }
 

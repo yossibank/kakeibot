@@ -55,7 +55,8 @@ public struct EntryRow: View {
                     Text(title)
                         .textFont(.subheadline)
                         .foregroundStyle(Palette.text)
-                        .sharedTextScale()
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                         .layoutPriority(1)
 
                     if isRecurring {
@@ -65,23 +66,27 @@ public struct EntryRow: View {
                     }
                 }
 
-                if tag != nil || detail != nil {
-                    HStack(spacing: 8) {
-                        if let tag {
-                            TagCard(tag, size: .small)
-                                .sharesTextScale(id: tag)
-                                .layoutPriority(1)
+                if let tag {
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 8) {
+                            tagCard(tag)
+
+                            if let detail {
+                                detailText(detail)
+                                    .fixedSize()
+                            }
                         }
 
-                        if let detail {
-                            Text(detail)
-                                .textFont(.caption)
-                                .foregroundStyle(Palette.subtext)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
-                                .minimumScaleFactor(0.8)
+                        VStack(alignment: .leading, spacing: 4) {
+                            if let detail {
+                                detailText(detail)
+                            }
+
+                            tagCard(tag)
                         }
                     }
+                } else if let detail {
+                    detailText(detail)
                 }
 
                 if let route {
@@ -104,6 +109,22 @@ public struct EntryRow: View {
         }
         .frame(minHeight: rowSpacing.minHeight)
         .contentShape(.rect)
+    }
+}
+
+private extension EntryRow {
+    func tagCard(_ tag: String) -> some View {
+        TagCard(tag, size: .small)
+            .sharesTextScale(id: tag)
+    }
+
+    func detailText(_ detail: String) -> some View {
+        Text(detail)
+            .textFont(.caption)
+            .foregroundStyle(Palette.subtext)
+            .lineLimit(1)
+            .truncationMode(.tail)
+            .minimumScaleFactor(0.8)
     }
 }
 

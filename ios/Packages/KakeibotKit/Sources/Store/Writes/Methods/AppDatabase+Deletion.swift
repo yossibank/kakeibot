@@ -73,6 +73,7 @@ private extension Deletion {
             templates,
             budgets,
             valuations,
+            adjustments,
             shelfIcons,
             rewardRules,
             rewardLogs,

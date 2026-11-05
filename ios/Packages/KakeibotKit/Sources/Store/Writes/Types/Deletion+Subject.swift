@@ -16,6 +16,7 @@ public extension Deletion {
         case theme
         case shelfIcon
         case valuation
+        case adjustment
     }
 
     var subject: Subject? {
@@ -49,6 +50,10 @@ public extension Deletion {
 
         if !valuations.isEmpty {
             return Subject(.valuation, names: valuations.map { _ in nil })
+        }
+
+        if !adjustments.isEmpty {
+            return Subject(.adjustment, names: adjustments.map { _ in nil })
         }
 
         return nil

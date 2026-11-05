@@ -136,12 +136,28 @@ public extension EntryModel {
         }
 
         let after = isSource ? balance - amount - fee : balance + amount
+        let shown = wallet.kind.role == .loan ? max(-after, 0) : after
 
+        return BalanceLine(title: afterTitle(of: wallet, isSource: isSource), amount: shown)
+    }
+
+    func idleAfterLine(
+        of wallet: Wallet,
+        isSource: Bool
+    ) -> BalanceLine? {
+        currentLine(of: wallet).map { current in
+            BalanceLine(title: afterTitle(of: wallet, isSource: isSource), amount: current.amount)
+        }
+    }
+
+    func afterTitle(
+        of wallet: Wallet,
+        isSource: Bool
+    ) -> String {
         switch (wallet.kind.role, isSource) {
-        case (.loan, false): return BalanceLine(title: "返済後", amount: max(-after, 0))
-        case (.investment, false): return BalanceLine(title: "積立後", amount: after)
-        case (.loan, true): return BalanceLine(title: "振替後", amount: max(-after, 0))
-        default: return BalanceLine(title: "振替後", amount: after)
+        case (.loan, false): "返済後"
+        case (.investment, false): "積立後"
+        default: "振替後"
         }
     }
 

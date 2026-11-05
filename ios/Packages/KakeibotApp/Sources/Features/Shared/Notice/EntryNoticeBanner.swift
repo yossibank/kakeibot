@@ -57,6 +57,17 @@ private extension EntryNoticeBanner {
     @ViewBuilder
     func banner(_ notice: EntryNoticeModel.Notice) -> some View {
         switch notice {
+        case let .changed(change) where change.isDeletion:
+            EntryDeletionBanner(
+                change: change,
+                seconds: notice.seconds
+            ) {
+                Task {
+                    await model.undo()
+                }
+            }
+            .id(notice)
+
         case .changed, .batch:
             NoticeBanner(
                 notice.message,

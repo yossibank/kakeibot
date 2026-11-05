@@ -2,6 +2,8 @@ import DesignSystem
 import SwiftUI
 
 struct ProHero: View {
+    @Environment(\.themeStyle.corner) var corner
+
     let price: String?
 
     var body: some View {
@@ -46,22 +48,22 @@ struct ProHero: View {
                     .background(Self.gold, in: .capsule)
             }
 
-            RowOrColumnLayout(rowSpacing: 14, columnSpacing: 6) {
+            RowOrColumnLayout(rowSpacing: 12, columnSpacing: 8) {
                 promises
             }
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
-        .background(Self.night, in: .rect(cornerRadius: 24))
+        .background(Self.night, in: .rect(cornerRadius: radius))
         .overlay {
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: innerRadius)
                 .stroke(Self.gold, lineWidth: 1.2)
                 .padding(4)
                 .opacity(0.6)
         }
         .overlay {
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: radius)
                 .stroke(Self.gold, lineWidth: 1)
         }
         .shadow(color: .black.opacity(0.25), radius: 12, y: 6)
@@ -98,6 +100,16 @@ private extension ProHero {
             startPoint: .top,
             endPoint: .bottom
         )
+    }
+}
+
+private extension ProHero {
+    var radius: CGFloat {
+        corner.radius(24)
+    }
+
+    var innerRadius: CGFloat {
+        max(radius - 4, 0)
     }
 }
 

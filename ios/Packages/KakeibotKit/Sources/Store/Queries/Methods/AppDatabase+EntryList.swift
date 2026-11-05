@@ -58,6 +58,7 @@ extension AppDatabase {
         let tags = try byID(EntryTag.self, in: db)
         let wallets = try byID(Wallet.self, in: db)
         let valuations = try Valuation.fetchAll(db)
+        let adjustments = try Adjustment.order(Column("date"), Column("created_at")).fetchAll(db)
         let icons = try byID(Icon.self, in: db)
         let cardBills = try cardBills(in: db)
         let items = includesItems ? try listItems(of: request, in: db) : [:]
@@ -68,6 +69,7 @@ extension AppDatabase {
             tags: tags,
             wallets: wallets,
             valuations: valuations,
+            adjustments: adjustments,
             icons: icons,
             cardBills: cardBills,
             items: items

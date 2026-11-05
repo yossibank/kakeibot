@@ -17,6 +17,7 @@ erDiagram
     icon ||--o{ shelf_icon : "icon_id"
     wallet ||--o{ entry : "wallet_id・to_wallet_id"
     wallet ||--o{ valuation : "wallet_id"
+    wallet ||--o{ adjustment : "wallet_id"
     category |o--o{ entry : "category_id"
     category ||--o{ tag : "category_id"
     wallet |o--o{ category : "wallet_id"
@@ -152,6 +153,20 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | 評価額と同じ日の記録 | 評価額より後に作ったものだけを足し引きする |
 | 評価額が無い | 最初の残高に、すべての記録を足し引きする |
 | ある日の時点の残高 | その日までの評価額だけを使う |
+
+### adjustment
+
+口座の残高の調整。記録とは別に持ち、残高にだけ足す。
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| id | TEXT | |
+| wallet_id | TEXT | |
+| date | TEXT | |
+| amount | INTEGER | 残高に足す額。符号付きで、0 は入れない |
+| created_at / updated_at | TEXT | |
+
+残高は、記録と同じく日までの調整を足す。評価額のある投資は、評価額より前の調整を足さない。
 
 ### category
 
@@ -296,6 +311,7 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | closing_day | INTEGER | 振替だけで、1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にし、amount は 0 にする |
 | fee | INTEGER | 振替だけで、1 以上。あれば、記録するときに手数料も記録する |
 | bill_shift | INTEGER | 0〜2。テンプレートと同じ。振替では 0 |
+| final_amount | INTEGER | 最後の回の額で、end_date があり決まった額のときだけ入る。空なら最後の回も amount |
 | start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |

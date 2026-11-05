@@ -13,7 +13,8 @@ struct TemplateQuickCard: View {
                 VStack(alignment: .leading, spacing: 8) {
                     SettingsAmountButton(
                         amount: model.amount ?? 0,
-                        text: model.amount == nil ? "毎回入れる" : nil
+                        text: model.amount == nil ? "毎回入れる" : nil,
+                        isEmpty: (model.amount ?? 0) == 0
                     ) {
                         onOpen(.amount)
                     }
@@ -40,13 +41,17 @@ struct TemplateQuickCard: View {
                 }
             }
 
-            SettingsFormSection(model.walletTitle) {
+            SettingsFormSection(
+                model.walletTitle,
+                value: model.selectedWallet?.name,
+                valueIcon: model.selectedWallet.flatMap(model.icon(for:))
+            ) {
                 VStack(alignment: .leading, spacing: 12) {
                     SettingsPagedGrid(
                         items: model.wallets,
                         selected: model.walletId,
                         columns: 2,
-                        rows: 2,
+                        rows: 3,
                         spacing: 8
                     ) { wallet in
                         SettingsWalletTile(
