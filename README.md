@@ -10,7 +10,7 @@ iOS・Android の家計簿アプリ
 
 ## 🚀 動かし方
 
-Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setup` で入る。
+Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](https://developer.android.com/studio) と、その SDK が要る。ほかの道具は `make setup` で入る。
 
 | 道具 | 使い道 |
 | --- | --- |
@@ -29,12 +29,14 @@ Xcode と [Homebrew](https://brew.sh/) が要る。ほかの道具は `make setu
 | 道具を入れ、hook を入れる | `make setup` |
 | Xcode でワークスペースを開く | `make open` |
 | ブランチのワークツリーを Xcode で開く | `make open BRANCH=feat/...` |
-| 変更の確認（文書の一致と書き方・Swift の書き方・余白の値・KakeibotKit のテスト・iOS のビルド。出力は成否と失敗の箇所だけ） | `make verify` |
+| 変更の確認（文書・Swift の書き方・余白の値・両 OS のテストとビルド。出力は成否と失敗の箇所だけ） | `make verify` |
 | 文書の一致と書き方だけを確かめる（文書だけの変更） | `make verify-docs` |
 | iOS のビルド（シミュレーター） | `make build` |
 | テストのコンパイルだけ（走らせない） | `make test-build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
 | 画面の部品を PNG に描く（下の注） | `make snapshot SNAPSHOT=widget` |
+| Android のビルド（デバッグの APK） | `make android-build` |
+| Android の Core のテスト | `make android-test` |
 | Swift の整形 | `make format` |
 | ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
 
@@ -55,6 +57,7 @@ xcrun simctl launch booted com.yossibank.kakeibot -open homeSections
 | 何を作るか | [docs/overview.md](docs/overview.md) |
 | どう作るか | [docs/architecture.md](docs/architecture.md) |
 | 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
+| Android の構成 | [docs/architecture-android.md](docs/architecture-android.md) |
 | 画面の組み立て・見張り・通知とウィジェット | [docs/architecture-screens.md](docs/architecture-screens.md) |
 | データの形 | [docs/data.md](docs/data.md) |
 | 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |

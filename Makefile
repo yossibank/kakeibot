@@ -1,4 +1,4 @@
-.PHONY: setup open format licenses build test-build test snapshot verify verify-docs
+.PHONY: setup open format licenses build test-build test snapshot android-build android-test verify verify-docs
 
 SIMULATOR ?= $(shell scripts/find-simulator.sh)
 XCBEAUTIFY = $(shell command -v xcbeautify)
@@ -8,6 +8,9 @@ ANY_SIMULATOR = -destination 'generic/platform=iOS Simulator'
 ON_SIMULATOR = -destination 'id=$(SIMULATOR)'
 CLAUDE_CONFIG ?= $(HOME)/Applications/AI/claude-config
 SNAPSHOT ?=
+ANDROID_JAVA_HOME ?= /Applications/Android Studio.app/Contents/jbr/Contents/Home
+ANDROID_HOME ?= $(HOME)/Library/Android/sdk
+GRADLE = env JAVA_HOME="$(ANDROID_JAVA_HOME)" ANDROID_HOME="$(ANDROID_HOME)" android/gradlew -p android --console=plain
 CHECKOUT = $(if $(BRANCH),$(shell git worktree list --porcelain | awk '/^worktree / { path = substr($$0, 10) } $$0 == "branch refs/heads/$(BRANCH)" { print path }'),.)
 
 setup:
@@ -41,12 +44,20 @@ snapshot:
 	@test -n "$(SNAPSHOT)" || { echo "NG SNAPSHOT に .claude/snapshots/ の下のセットの名前を渡す"; exit 1; }
 	$(CLAUDE_CONFIG)/skills/ui-snapshot/scripts/render-snapshots.sh ios/Packages/KakeibotApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
 
+android-build:
+	$(GRADLE) :app:assembleDebug
+
+android-test:
+	$(GRADLE) :core:test
+
 verify: verify-docs
 	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
 	@test -f $(CLAUDE_CONFIG)/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build
+	scripts/verify.sh android-test $(GRADLE) :core:test
+	scripts/verify.sh android-build $(GRADLE) :app:assembleDebug
 
 verify-docs:
 	scripts/verify.sh docs-check scripts/docs-check.py
