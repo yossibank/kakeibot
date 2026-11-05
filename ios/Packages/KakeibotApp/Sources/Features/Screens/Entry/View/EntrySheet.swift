@@ -142,19 +142,7 @@ extension EntrySheet {
             }
 
             if !model.isEditing {
-                CardButton(
-                    "続けて記録",
-                    style: .outlined(Palette.accent),
-                    height: 56
-                ) {
-                    Task {
-                        await saveAndContinue()
-                    }
-                }
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .frame(width: Self.continueWidth)
-                .opacity(continueOpacity)
+                continueButton
             }
         }
         .disabled(!model.canSave)
@@ -279,11 +267,38 @@ private extension EntrySheet {
         }
         .frame(maxWidth: .infinity)
     }
+
+    var continueButton: some View {
+        Button {
+            Task {
+                await saveAndContinue()
+            }
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: "plus.square.on.square")
+                    .sansFont(.body)
+
+                Text("続けて")
+                    .textFont(.caption2, weight: .semibold)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .foregroundStyle(Palette.accent)
+            .frame(width: Self.continueWidth, height: 56)
+            .overlay {
+                Capsule()
+                    .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .opacity(continueOpacity)
+    }
 }
 
 private extension EntrySheet {
     static let fade: CGFloat = 20
-    static let continueWidth: CGFloat = 104
+    static let continueWidth: CGFloat = 64
 
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
