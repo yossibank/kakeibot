@@ -31,6 +31,7 @@ struct ExportV1CSVTests {
         var tables = try ExportV1(json: json).data
         tables.entries = [tables.entries[0]]
         tables.entries[0].memo = memo
+        tables.adjustments = []
 
         let data = tables.csv()
         let csv = String(decoding: data, as: UTF8.self)
