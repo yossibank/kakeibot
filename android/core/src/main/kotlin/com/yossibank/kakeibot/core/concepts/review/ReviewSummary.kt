@@ -13,25 +13,25 @@ data class ReviewSummary private constructor(
 ) {
     @ConsistentCopyVisibility
     data class Breakdown internal constructor(
-        val total: Int,
-        val byCategory: Map<Identifier<EntryCategory>, Int>,
-        val byWallet: Map<Identifier<Wallet>, Int>,
+        val total: Long,
+        val byCategory: Map<Identifier<EntryCategory>, Long>,
+        val byWallet: Map<Identifier<Wallet>, Long>,
     ) {
         companion object {
             internal operator fun invoke(entries: List<Entry>): Breakdown {
-                val total = entries.sumOf { it.amount }
+                val total = entries.sumOf { it.amount.toLong() }
 
-                val byCategory = mutableMapOf<Identifier<EntryCategory>, Int>()
-                val byWallet = mutableMapOf<Identifier<Wallet>, Int>()
+                val byCategory = mutableMapOf<Identifier<EntryCategory>, Long>()
+                val byWallet = mutableMapOf<Identifier<Wallet>, Long>()
 
                 for (entry in entries) {
                     val categoryId = entry.categoryId
 
                     if (categoryId != null) {
-                        byCategory[categoryId] = (byCategory[categoryId] ?: 0) + entry.amount
+                        byCategory[categoryId] = (byCategory[categoryId] ?: 0L) + entry.amount
                     }
 
-                    byWallet[entry.walletId] = (byWallet[entry.walletId] ?: 0) + entry.amount
+                    byWallet[entry.walletId] = (byWallet[entry.walletId] ?: 0L) + entry.amount
                 }
 
                 return Breakdown(
@@ -43,7 +43,7 @@ data class ReviewSummary private constructor(
         }
     }
 
-    val balance: Int
+    val balance: Long
         get() = income.total - expense.total
 
     fun breakdown(of: Entry.Kind): Breakdown? = when (of) {

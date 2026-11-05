@@ -74,8 +74,8 @@ class CardBillTest {
         )
 
         assertEquals(listOf(26, 27), upcoming.map { it.date.day })
-        assertEquals(listOf(60000, 30000), upcoming.map { it.balanceBefore })
-        assertEquals(listOf(0, 10000), upcoming.map { it.shortage })
+        assertEquals(listOf(60000L, 30000L), upcoming.map { it.balanceBefore })
+        assertEquals(listOf(0L, 10000L), upcoming.map { it.shortage })
     }
 
     @Test
@@ -126,8 +126,8 @@ class CardBillTest {
             after = today,
         )
 
-        assertEquals(listOf(50000), upcoming.map { it.balanceBefore })
-        assertEquals(listOf(0), upcoming.map { it.shortage })
+        assertEquals(listOf(50000L), upcoming.map { it.balanceBefore })
+        assertEquals(listOf(0L), upcoming.map { it.shortage })
     }
 
     @Test
@@ -178,8 +178,56 @@ class CardBillTest {
             after = today,
         )
 
-        assertEquals(listOf(15000), upcoming.map { it.balanceBefore })
-        assertEquals(listOf(15000), upcoming.map { it.shortage })
+        assertEquals(listOf(15000L), upcoming.map { it.balanceBefore })
+        assertEquals(listOf(15000L), upcoming.map { it.shortage })
+    }
+
+    @Test
+    fun subtractsWithoutWrappingAround() {
+        val limit = 999_999_999
+        val now = Instant.ofEpochSecond(1_791_000_000)
+        val today = date("2026-10-20")
+
+        val source = wallet(
+            kind = Wallet.Kind.bank,
+            balance = limit,
+            at = now,
+        )
+
+        val card = wallet(
+            kind = Wallet.Kind.card,
+            balance = 0,
+            at = now,
+        )
+
+        val bill = Recurring(
+            type = Entry.Kind.transfer,
+            amount = limit,
+            categoryId = null,
+            walletId = source.id,
+            toWalletId = card.id,
+            frequency = Recurring.Frequency.monthly,
+            day = 27,
+            startDate = date("2026-01-01"),
+            createdAt = now,
+            updatedAt = now,
+        )
+
+        val upcoming = CardBill.upcoming(
+            recurrings = listOf(
+                bill,
+                bill.copy(id = Identifier(), day = 28),
+                bill.copy(id = Identifier(), day = 29),
+            ),
+            wallets = listOf(source, card),
+            entries = emptyList(),
+            valuations = emptyList(),
+            adjustments = emptyList(),
+            after = today,
+        )
+
+        assertEquals(listOf(limit.toLong(), 0L, -limit.toLong()), upcoming.map { it.balanceBefore })
+        assertEquals(-2L * limit, upcoming.last().balanceAfter)
     }
 
     private data class Bill(

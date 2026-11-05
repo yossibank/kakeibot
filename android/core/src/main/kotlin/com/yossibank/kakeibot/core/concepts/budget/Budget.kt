@@ -25,17 +25,17 @@ fun List<Budget>.amount(
 fun List<Budget>.carryover(
     into: YearMonth,
     from: YearMonth?,
-    expense: (YearMonth) -> Int,
-): Int {
-    val start = from ?: return 0
+    expense: (YearMonth) -> Long,
+): Long {
+    val start = from ?: return 0L
 
     val months = generateSequence(start) { it.adding(months = 1) }.takeWhile { it < into }
 
-    return months.fold(0) { total, current ->
+    return months.fold(0L) { total, current ->
         val budget = amount(
             categoryId = null,
             month = current,
-        ) ?: return@fold 0
+        ) ?: return@fold 0L
 
         total + budget - expense(current)
     }

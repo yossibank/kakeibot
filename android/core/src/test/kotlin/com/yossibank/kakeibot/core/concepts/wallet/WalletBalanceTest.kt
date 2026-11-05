@@ -28,7 +28,7 @@ class WalletBalanceTest {
             val valuations: List<ValuationCase>? = null,
             val adjustments: List<AdjustmentCase>? = null,
             val through: LocalDate? = null,
-            val balance: Int,
+            val balance: Long,
         ) {
             override fun toString(): String = summary
         }
@@ -150,6 +150,32 @@ class WalletBalanceTest {
             assertEquals(200, total)
         }
 
+        @Test
+        fun sumsWithoutWrappingAround() {
+            val date = assertNotNull(LocalDate.parse("2026-10-01"))
+            val limit = 999_999_999
+
+            val wallets = List(3) { wallet(initialBalance = limit) }
+
+            val entries = wallets.map { wallet ->
+                Entry(
+                    type = Entry.Kind.income,
+                    amount = limit,
+                    date = date,
+                    categoryId = Identifier(),
+                    walletId = wallet.id,
+                    createdAt = Instant.now(),
+                    updatedAt = Instant.now(),
+                )
+            }
+
+            val total = Wallet.totalBalance(
+                of = wallets,
+                with = entries,
+            )
+
+            assertEquals(6L * limit, total)
+        }
     }
 }
 

@@ -214,6 +214,30 @@ class RecurringScheduleTest {
             assertEquals(78000, income)
         }
 
+        @Test
+        fun totalsWithoutWrappingAround() {
+            val limit = 999_999_999
+            val now = Instant.ofEpochSecond(1_791_000_000)
+
+            val rent = Recurring(
+                type = Entry.Kind.expense,
+                amount = limit,
+                categoryId = Identifier(),
+                walletId = Identifier(),
+                frequency = Recurring.Frequency.monthly,
+                day = 27,
+                startDate = date("2026-01-01"),
+                createdAt = now,
+                updatedAt = now,
+            )
+
+            val total = listOf(rent).total(
+                of = Entry.Kind.expense,
+                range = date("2026-10-01")..date("2026-12-31"),
+            )
+
+            assertEquals(3L * limit, total)
+        }
     }
 }
 

@@ -9,7 +9,7 @@ fun Wallet.Companion.totalBalance(
     valuations: List<Valuation> = emptyList(),
     adjustments: List<Adjustment> = emptyList(),
     through: LocalDate? = null,
-): Int = of.fold(0) { total, wallet ->
+): Long = of.fold(0L) { total, wallet ->
     val balance = wallet.balance(
         with = with,
         valuations = valuations,
@@ -25,7 +25,7 @@ fun Wallet.balance(
     valuations: List<Valuation> = emptyList(),
     adjustments: List<Adjustment> = emptyList(),
     through: LocalDate? = null,
-): Int {
+): Long {
     val valuation = if (kind == Wallet.Kind.investment) {
         latestValuation(
             valuations = valuations,
@@ -35,7 +35,7 @@ fun Wallet.balance(
         null
     }
 
-    val start = valuation?.amount ?: initialBalance
+    val start = (valuation?.amount ?: initialBalance).toLong()
 
     val recorded = with.fold(start) { balance, entry ->
         when {
@@ -64,15 +64,15 @@ private fun Wallet.latestValuation(
     }
     .maxByOrNull { it.date }
 
-private fun Wallet.change(entry: Entry): Int = when (entry.type) {
-    Entry.Kind.expense -> if (entry.walletId == id) -entry.amount else 0
-    Entry.Kind.income -> if (entry.walletId == id) entry.amount else 0
+private fun Wallet.change(entry: Entry): Long = when (entry.type) {
+    Entry.Kind.expense -> if (entry.walletId == id) -entry.amount.toLong() else 0
+    Entry.Kind.income -> if (entry.walletId == id) entry.amount.toLong() else 0
     Entry.Kind.transfer -> transferChange(entry)
 }
 
-private fun Wallet.transferChange(entry: Entry): Int {
-    val outgoing = if (entry.walletId == id) -entry.amount else 0
-    val incoming = if (entry.toWalletId == id) entry.amount else 0
+private fun Wallet.transferChange(entry: Entry): Long {
+    val outgoing = if (entry.walletId == id) -entry.amount.toLong() else 0L
+    val incoming = if (entry.toWalletId == id) entry.amount.toLong() else 0L
 
     return outgoing + incoming
 }

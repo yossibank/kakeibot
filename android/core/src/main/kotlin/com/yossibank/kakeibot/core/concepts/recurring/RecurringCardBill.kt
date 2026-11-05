@@ -46,15 +46,15 @@ fun Recurring.billingPeriod(paidOn: LocalDate): ClosedRange<LocalDate>? {
 fun Recurring.amount(
     paidOn: LocalDate,
     entries: List<Entry>,
-): Int {
+): Long {
     val billed = billedEntries(
         paidOn = paidOn,
         entries = entries,
-    ) ?: return scheduledAmount(paidOn = paidOn)
+    ) ?: return scheduledAmount(paidOn = paidOn).toLong()
 
     val used = billed.sumOf { usage(it) }
 
-    return maxOf(used, 0)
+    return maxOf(used, 0L)
 }
 
 fun Recurring.billedEntries(
@@ -131,12 +131,12 @@ fun List<Recurring>.cardBill(paidBy: Identifier<Wallet>?): Recurring? = firstOrN
         recurring.toWalletId == paidBy
 }
 
-private fun usage(entry: Entry): Int = when (entry.type) {
+private fun usage(entry: Entry): Long = when (entry.type) {
     Entry.Kind.expense,
     Entry.Kind.transfer,
-    -> entry.amount
+    -> entry.amount.toLong()
 
-    Entry.Kind.income -> -entry.amount
+    Entry.Kind.income -> -entry.amount.toLong()
 }
 
 private fun Recurring.isBilled(

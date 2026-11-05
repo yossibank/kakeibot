@@ -33,12 +33,12 @@ val Recurring.occurrenceCount: Int?
         ).size
     }
 
-val Recurring.plannedTotal: Int?
+val Recurring.plannedTotal: Long?
     get() = endDate?.let { end ->
         dates(
             from = startDate,
             through = end,
-        ).sumOf { scheduledAmount(paidOn = it) }
+        ).sumOf { scheduledAmount(paidOn = it).toLong() }
     }
 
 fun Recurring.occurrences(

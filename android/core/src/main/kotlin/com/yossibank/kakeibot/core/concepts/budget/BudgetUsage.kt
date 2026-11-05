@@ -5,21 +5,21 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 @ConsistentCopyVisibility
 data class BudgetUsage private constructor(
     val baseBudget: Int,
-    val carryover: Int,
-    val spent: Int,
+    val carryover: Long,
+    val spent: Long,
     val daysLeft: Int,
 ) {
-    val budget: Int
+    val budget: Long
         get() = baseBudget + carryover
 
-    val remaining: Int
+    val remaining: Long
         get() = budget - spent
 
     val isOver: Boolean
         get() = spent > budget
 
     val isNearLimit: Boolean
-        get() = budget > 0 && !isOver && spent.toLong() * 5 >= budget.toLong() * 4
+        get() = budget > 0 && !isOver && spent * 5 >= budget * 4
 
     val progress: Double
         get() {
@@ -35,8 +35,8 @@ data class BudgetUsage private constructor(
     companion object {
         operator fun invoke(
             budget: Int,
-            carryover: Int = 0,
-            spent: Int,
+            carryover: Long = 0,
+            spent: Long,
             today: LocalDate,
             periodEnd: LocalDate,
         ): BudgetUsage {

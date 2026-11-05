@@ -32,7 +32,7 @@ class BudgetCarryoverTest {
         val result = budgets.carryover(
             into = month("2026-10"),
             from = month("2026-07"),
-        ) { expenses[it.toString()] ?: 0 }
+        ) { (expenses[it.toString()] ?: 0).toLong() }
 
         assertEquals(30000, result)
     }
@@ -49,7 +49,7 @@ class BudgetCarryoverTest {
         val result = budgets.carryover(
             into = month("2026-10"),
             from = month("2026-08"),
-        ) { expenses[it.toString()] ?: 0 }
+        ) { (expenses[it.toString()] ?: 0).toLong() }
 
         assertEquals(-10000, result)
     }
@@ -118,6 +118,19 @@ class BudgetCarryoverTest {
         ) { 20000 }
 
         assertEquals(30000, result)
+    }
+
+    @Test
+    fun sumsWithoutWrappingAround() {
+        val limit = 999_999_999
+        val budgets = listOf(budget("2026-01", limit))
+
+        val result = budgets.carryover(
+            into = month("2026-04"),
+            from = month("2026-01"),
+        ) { 0L }
+
+        assertEquals(3L * limit, result)
     }
 
     private fun budget(

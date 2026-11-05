@@ -205,6 +205,24 @@ class RecurringCardBillTest {
         }
 
         @Test
+        fun sumsCardUsageWithoutWrappingAround() {
+            val limit = 999_999_999
+            val bill = bill(closingDay = 15)
+            val card = assertNotNull(bill.toWalletId)
+
+            val entries = List(3) {
+                entry(Entry.Kind.expense, limit, "2026-10-01", card)
+            }
+
+            val amount = bill.amount(
+                paidOn = date("2026-11-10"),
+                entries = entries,
+            )
+
+            assertEquals(3L * limit, amount)
+        }
+
+        @Test
         fun skipsPaymentIntoCard() {
             val bill = bill(closingDay = 15)
             val card = assertNotNull(bill.toWalletId)

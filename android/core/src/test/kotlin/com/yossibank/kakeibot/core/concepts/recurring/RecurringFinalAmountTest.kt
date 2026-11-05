@@ -27,7 +27,7 @@ class RecurringFinalAmountTest(
         val startDate: LocalDate,
         val count: Int,
         val endDate: LocalDate,
-        val total: Int,
+        val total: Long,
     ) {
         override fun toString(): String = summary
     }

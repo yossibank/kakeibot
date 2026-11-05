@@ -4,10 +4,10 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 
 data class Holdings(
-    val onHand: Int,
-    val cards: Int,
-    val investments: Int,
-    val loans: Int,
+    val onHand: Long,
+    val cards: Long,
+    val investments: Long,
+    val loans: Long,
 ) {
     constructor(
         wallets: List<Wallet>,
@@ -50,17 +50,17 @@ data class Holdings(
         ),
     )
 
-    val available: Int
+    val available: Long
         get() = onHand + cards
 
-    val netWorth: Int
+    val netWorth: Long
         get() = available + investments + loans
 
-    val unpaid: Int
-        get() = maxOf(-cards, 0)
+    val unpaid: Long
+        get() = maxOf(-cards, 0L)
 
-    val refund: Int
-        get() = maxOf(cards, 0)
+    val refund: Long
+        get() = maxOf(cards, 0L)
 
     private companion object {
         fun total(
@@ -70,7 +70,7 @@ data class Holdings(
             adjustments: List<Adjustment>,
             through: LocalDate?,
             role: Wallet.Kind.Role,
-        ): Int = Wallet.totalBalance(
+        ): Long = Wallet.totalBalance(
             of = wallets.filter { it.kind.role == role },
             with = entries,
             valuations = valuations,

@@ -25,7 +25,7 @@ class ReviewSummaryTest(
         val entries: List<Row>,
         val expense: Totals,
         val income: Totals,
-        val balance: Int,
+        val balance: Long,
     ) {
         override fun toString(): String = summary
     }
@@ -41,9 +41,9 @@ class ReviewSummaryTest(
 
     @Serializable
     data class Totals(
-        val total: Int,
-        val categories: Map<String, Int>,
-        val wallets: Map<String, Int>,
+        val total: Long,
+        val categories: Map<String, Long>,
+        val wallets: Map<String, Long>,
     )
 
     class Ids {

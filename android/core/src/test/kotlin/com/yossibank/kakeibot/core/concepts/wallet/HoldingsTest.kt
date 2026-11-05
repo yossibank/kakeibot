@@ -43,6 +43,22 @@ class HoldingsTest {
         assertEquals(13000, holdings.available)
     }
 
+    @Test
+    fun sumsWithoutWrappingAround() {
+        val limit = 999_999_999
+
+        val wallets = List(3) { wallet(Wallet.Kind.bank, limit) }
+
+        val holdings = Holdings(
+            wallets = wallets,
+            entries = emptyList(),
+        )
+
+        assertEquals(3L * limit, holdings.onHand)
+        assertEquals(3L * limit, holdings.available)
+        assertEquals(3L * limit, holdings.netWorth)
+    }
+
     private fun wallet(
         kind: Wallet.Kind,
         balance: Int,

@@ -19,7 +19,7 @@ class BudgetUsageTest(
         val spent: Int,
         val today: LocalDate,
         val periodEnd: LocalDate,
-        val remaining: Int,
+        val remaining: Long,
         val daysLeft: Int,
         val isOver: Boolean,
         val isNearLimit: Boolean,
@@ -31,7 +31,7 @@ class BudgetUsageTest(
     fun countsRemainingAndDaysLeft() {
         val usage = BudgetUsage(
             budget = fixture.budget,
-            spent = fixture.spent,
+            spent = fixture.spent.toLong(),
             today = fixture.today,
             periodEnd = fixture.periodEnd,
         )

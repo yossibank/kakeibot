@@ -8,13 +8,13 @@ data class EntryDay(
     val date: LocalDate,
     val entries: List<Entry>,
 ) {
-    val expenseTotal: Int
+    val expenseTotal: Long
         get() = total(Entry.Kind.expense)
 
-    val incomeTotal: Int
+    val incomeTotal: Long
         get() = total(Entry.Kind.income)
 
-    private fun total(type: Entry.Kind): Int = entries.filter { it.type == type }.sumOf { it.amount }
+    private fun total(type: Entry.Kind): Long = entries.filter { it.type == type }.sumOf { it.amount.toLong() }
 
     companion object {
         fun grouping(

@@ -11,14 +11,14 @@ import com.yossibank.kakeibot.core.shared.Identifier
 data class CardBill(
     val recurring: Recurring,
     val date: LocalDate,
-    val amount: Int,
-    val balanceBefore: Int,
+    val amount: Long,
+    val balanceBefore: Long,
 ) {
-    val balanceAfter: Int
+    val balanceAfter: Long
         get() = balanceBefore - amount
 
-    val shortage: Int
-        get() = maxOf(-balanceAfter, 0)
+    val shortage: Long
+        get() = maxOf(-balanceAfter, 0L)
 
     val period: ClosedRange<LocalDate>?
         get() = recurring.billingPeriod(paidOn = date)
@@ -34,7 +34,7 @@ data class CardBill(
         ): List<CardBill> {
             val cards = wallets.filter { it.kind == Wallet.Kind.card }.map { it.id }.toSet()
             val tomorrow = after.adding(days = 1)
-            val balances = mutableMapOf<Identifier<Wallet>, Int>()
+            val balances = mutableMapOf<Identifier<Wallet>, Long>()
 
             return recurrings
                 .filter { recurring ->
@@ -52,7 +52,7 @@ data class CardBill(
                         with = entries,
                         valuations = valuations,
                         adjustments = adjustments,
-                    ) ?: 0
+                    ) ?: 0L
 
                     val before = balances[source] ?: current
 

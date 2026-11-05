@@ -45,8 +45,8 @@ class EntryDayTest(
     @Serializable
     data class DaySummary(
         val date: LocalDate,
-        val expense: Int,
-        val income: Int,
+        val expense: Long,
+        val income: Long,
         val entryIds: List<String>,
     )
 
