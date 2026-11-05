@@ -30,6 +30,7 @@ private extension ExportV1.Tables {
     static let adjustmentTitle = "調整"
     static let byteOrderMark: [UInt8] = [0xEF, 0xBB, 0xBF]
     static let formulaPrefixes: Set<Character> = ["=", "+", "-", "@"]
+    static let quotedScalars: Set<Unicode.Scalar> = ["\"", ",", "\r", "\n"]
 
     var sortedRows: [CSVRow] {
         let rows = entries.map(row) + adjustments.map(row)
@@ -59,7 +60,7 @@ private extension ExportV1.Tables {
     }
 
     static func escape(_ field: String) -> String {
-        let needsQuotes = field.contains { "\",\r\n".contains($0) }
+        let needsQuotes = field.unicodeScalars.contains { quotedScalars.contains($0) }
 
         guard needsQuotes else {
             return field
