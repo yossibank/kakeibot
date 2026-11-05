@@ -22,20 +22,28 @@ class ExportV1CSVTest {
     }
 
     @Test
+    fun quotesFieldsWithLineBreaks() {
+        for (memo in listOf("1行目\n2行目", "1行目\r2行目", "1行目\r\n2行目")) {
+            val csv = csvText(memo = memo)
+
+            assertTrue(csv.endsWith(",\"$memo\"\r\n"), memo)
+        }
+    }
+
+    @Test
     fun prefixesMemoStartingWithMinus() {
         val lines = csvLines(memo = "-1")
 
         assertTrue(lines[1].endsWith(",'-1"))
     }
 
-    private fun csvLines(memo: String): List<String> {
+    private fun csvLines(memo: String): List<String> = csvText(memo).split("\r\n")
+
+    private fun csvText(memo: String): String {
         val json = ExportFixture.data("export/export-v1.json")
         val tables = ExportV1.of(json).data
         val entry = tables.entries[0].copy(memo = memo)
 
-        val data = tables.copy(entries = listOf(entry)).csv()
-        val csv = data.toString(Charsets.UTF_8)
-
-        return csv.split("\r\n")
+        return tables.copy(entries = listOf(entry)).csv().toString(Charsets.UTF_8)
     }
 }
