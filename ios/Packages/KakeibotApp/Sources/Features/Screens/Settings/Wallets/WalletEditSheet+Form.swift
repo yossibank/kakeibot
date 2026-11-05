@@ -113,7 +113,11 @@ extension WalletEditSheet {
 
     var balanceField: some View {
         SettingsFormSection("最初の残高") {
-            CapsulePicker(selection: $model.isNegative, options: Self.signOptions)
+            HStack(spacing: 8) {
+                signButton(isNegative: false)
+
+                signButton(isNegative: true)
+            }
 
             Button {
                 openAmount()
@@ -122,7 +126,7 @@ extension WalletEditSheet {
                     Text(model.balanceText)
                         .displayFont(.headline)
                         .monospacedDigit()
-                        .foregroundStyle(Palette.text)
+                        .foregroundStyle(signColor)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
 
@@ -133,7 +137,7 @@ extension WalletEditSheet {
                 .padding(.leading, 16)
                 .padding(.trailing, 12)
                 .frame(height: 46)
-                .background(Palette.panel, in: .rect(cornerRadius: corner.radius(16)))
+                .background(signColor.opacity(.subtle), in: .rect(cornerRadius: corner.radius(16)))
                 .overlay {
                     RoundedRectangle(cornerRadius: corner.radius(16))
                         .stroke(amountStroke, lineWidth: 1)
@@ -263,6 +267,50 @@ extension WalletEditSheet {
         .padding(.horizontal, 16)
         .frame(height: 48)
         .card(cornerRadius: 16)
+    }
+
+    func signButton(isNegative: Bool) -> some View {
+        let isSelected = model.isNegative == isNegative
+        let tint = isNegative ? Palette.rose : Palette.accent
+        let color = isSelected ? tint : Palette.subtext
+        let fill = isSelected ? tint.opacity(.subtle) : Color.clear
+        let stroke = isSelected ? tint : Palette.accent.opacity(.soft)
+        let shape = RoundedRectangle(cornerRadius: corner.radius(16))
+
+        return Button {
+            withAnimation(.snappy) {
+                model.isNegative = isNegative
+            }
+        } label: {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Image(systemName: isNegative ? "minus.circle.fill" : "plus.circle.fill")
+                        .sansFont(.small)
+
+                    Text(isNegative ? "払う・返す分" : "お金がある")
+                        .textFont(.footnote, weight: .semibold)
+                }
+
+                Text(isNegative ? "未払い・借入" : "残高・貯金")
+                    .textFont(.caption2)
+                    .foregroundStyle(isSelected ? tint : Palette.hint)
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .foregroundStyle(color)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, minHeight: 52)
+            .background(fill, in: shape)
+            .overlay {
+                shape
+                    .stroke(stroke, lineWidth: isSelected ? 1.5 : 1)
+            }
+            .contentShape(shape)
+        }
+        .buttonStyle(.plain)
+        .haptic(.selection, trigger: isSelected)
     }
 
     func kindButton(_ kind: Wallet.Kind) -> some View {
