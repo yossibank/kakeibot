@@ -78,10 +78,24 @@ extension RecordsView {
                     dayHeaderRow(date, day: day) {
                         daySelectButton(day, in: selection, showsTitle: false)
                     }
+
+                    dayHeaderStack(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: true)
+                    }
+
+                    dayHeaderStack(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: false)
+                    }
                 }
             } else {
-                dayHeaderRow(date, day: day) {
-                    dayButtons(on: date)
+                ViewThatFits(in: .horizontal) {
+                    dayHeaderRow(date, day: day) {
+                        dayButtons(on: date)
+                    }
+
+                    dayHeaderStack(date, day: day) {
+                        dayButtons(on: date)
+                    }
                 }
             }
         }
@@ -110,37 +124,82 @@ private extension RecordsView {
         day: EntryDay?,
         @ViewBuilder trailing: () -> some View
     ) -> some View {
-        let holiday = Holiday.name(of: date)
-
-        return HStack(spacing: 12) {
+        HStack(spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(PeriodText.day(date, today: model.today))
-                    .displayFont(.headline)
-                    .foregroundStyle(Palette.accentStrong)
-                    .fixedSize()
+                dayTitle(date)
 
-                Text("（\(date.weekday.shortName)）")
-                    .textFont(.caption)
-                    .foregroundStyle(Self.weekdayColor(for: date))
-                    .fixedSize()
-
-                if let holiday {
-                    Text(holiday)
-                        .textFont(.caption2)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .foregroundStyle(Palette.holiday)
+                if let holiday = Holiday.name(of: date) {
+                    holidayText(holiday)
                 }
 
                 Spacer(minLength: 8)
 
                 if let day {
                     dayTotals(day)
+                        .fixedSize()
                 }
             }
 
             trailing()
         }
+    }
+
+    func dayHeaderStack(
+        _ date: LocalDate,
+        day: EntryDay?,
+        @ViewBuilder trailing: () -> some View
+    ) -> some View {
+        let holiday = Holiday.name(of: date)
+        let hasTotals = day.map(Self.hasTotals) ?? false
+
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 12) {
+                dayTitle(date)
+
+                Spacer(minLength: 8)
+
+                trailing()
+            }
+
+            if holiday != nil || hasTotals {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    if let holiday {
+                        holidayText(holiday)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    if let day {
+                        dayTotals(day)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .layoutPriority(1)
+                    }
+                }
+            }
+        }
+    }
+
+    func dayTitle(_ date: LocalDate) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(PeriodText.day(date, today: model.today))
+                .displayFont(.headline)
+                .foregroundStyle(Palette.accentStrong)
+                .fixedSize()
+
+            Text("（\(date.weekday.shortName)）")
+                .textFont(.caption)
+                .foregroundStyle(Self.weekdayColor(for: date))
+                .fixedSize()
+        }
+    }
+
+    func holidayText(_ holiday: String) -> some View {
+        Text(holiday)
+            .textFont(.caption2)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .foregroundStyle(Palette.holiday)
     }
 
     @ViewBuilder
@@ -242,8 +301,6 @@ private extension RecordsView {
             }
         }
         .textFont(.caption)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
     }
 }
 
@@ -257,6 +314,10 @@ private extension RecordsView {
 
     static func weekdayColor(for date: LocalDate) -> Color {
         date.tint ?? Palette.subtext
+    }
+
+    static func hasTotals(_ day: EntryDay) -> Bool {
+        day.expenseTotal > 0 || day.incomeTotal > 0
     }
 
     func toggleSelection(_ id: Entry.ID) {
