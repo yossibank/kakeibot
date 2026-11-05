@@ -92,6 +92,15 @@ public extension AssetsModel {
         upcomingBills.reduce(0) { $0 + $1.bill.amount }
     }
 
+    func adjustModel(for row: WalletRow) -> AssetsAdjustModel {
+        AssetsAdjustModel(
+            database: database,
+            wallet: row.wallet,
+            balance: row.balance,
+            today: today
+        )
+    }
+
     func run() async {
         await withDiscardingTaskGroup { group in
             group.addTask {

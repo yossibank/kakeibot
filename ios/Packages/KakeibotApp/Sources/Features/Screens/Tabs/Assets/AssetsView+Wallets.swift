@@ -34,24 +34,17 @@ extension AssetsView {
     ) -> some View {
         let rows = sections.flatMap(\.rows)
         let total = rows.reduce(0) { $0 + $1.balance }
+        let note = "\(rows.count) 口座 · \(AmountText.text(total))"
 
         return VStack(alignment: .leading, spacing: 0) {
-            CardHeader(title, note: rows.isEmpty ? nil : "\(rows.count) 口座")
+            CardHeader(title, note: rows.isEmpty ? nil : note)
 
             if rows.isEmpty {
-                Text("口座を足すと、ここに並びます")
+                Text("口座を追加すると、ここに並びます")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.bottom, 8)
-            } else {
-                Text(AmountText.text(total))
-                    .displayFont(.title, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .padding(.bottom, 4)
             }
 
             ForEach(sections) { section in
@@ -122,6 +115,10 @@ private extension AssetsView {
                 }
 
                 debtDetail(of: row)
+
+                if row.needsAdjustment {
+                    adjustNotice(of: row)
+                }
             }
             .frame(minHeight: 32)
 
@@ -210,11 +207,11 @@ private extension AssetsView {
                     .frame(width: 32, height: 32)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("口座を足す")
+                    Text("新しい口座を追加")
                         .textFont(.subheadline, weight: .semibold)
                         .foregroundStyle(Palette.accentStrong)
 
-                    Text("銀行・カード・投資・借入")
+                    Text("現金・銀行・カードなど")
                         .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                 }
@@ -230,6 +227,39 @@ private extension AssetsView {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+
+    func adjustNotice(of row: AssetsModel.WalletRow) -> some View {
+        ViewThatFits(in: .horizontal) {
+            adjustLine(row, showsText: true)
+
+            adjustLine(row, showsText: false)
+        }
+    }
+
+    func adjustLine(
+        _ row: AssetsModel.WalletRow,
+        showsText: Bool
+    ) -> some View {
+        HStack(spacing: 8) {
+            Group {
+                if showsText {
+                    Label("手持ちがマイナスです", systemImage: "exclamationmark.circle")
+                } else {
+                    Image(systemName: "exclamationmark.circle")
+                }
+            }
+            .textFont(.caption)
+            .foregroundStyle(Palette.rose)
+            .fixedSize()
+
+            Spacer(minLength: 8)
+
+            ChipButton("残高を合わせる", systemImage: "equal") {
+                adjusting = row
+            }
+            .fixedSize()
+        }
     }
 
     func billRow(_ row: AssetsModel.UpcomingBill) -> some View {

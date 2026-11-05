@@ -55,7 +55,7 @@ public struct WalletListView: View {
                     if model.shown.isEmpty {
                         SettingsEmptyNote(
                             systemImage: "building.columns",
-                            text: "口座を足すと、ここに並びます"
+                            text: "口座を追加すると、ここに並びます"
                         )
                     }
 
