@@ -24,12 +24,20 @@ struct RecurringQuickCard: View {
                 }
             }
 
-            SettingsFormSection(model.walletTitle) {
+            SettingsFormSection(
+                model.walletTitle,
+                value: model.selectedWallet?.name,
+                valueIcon: model.selectedWallet.flatMap(model.icon(for:))
+            ) {
                 walletGrid
             }
 
             if model.type == .transfer {
-                SettingsFormSection(RecurringEditModel.destinationTitle) {
+                SettingsFormSection(
+                    RecurringEditModel.destinationTitle,
+                    value: model.selectedDestination?.name,
+                    valueIcon: model.selectedDestination.flatMap(model.icon(for:))
+                ) {
                     destinationGrid
                 }
             }
@@ -65,7 +73,7 @@ private extension RecurringQuickCard {
             SettingsPagedGrid(
                 items: model.wallets,
                 selected: model.walletId,
-                columns: 2,
+                columns: 3,
                 rows: 2,
                 spacing: 8
             ) { wallet in
@@ -88,7 +96,7 @@ private extension RecurringQuickCard {
         SettingsPagedGrid(
             items: model.wallets,
             selected: model.toWalletId,
-            columns: 2,
+            columns: 3,
             rows: 2,
             spacing: 8
         ) { wallet in

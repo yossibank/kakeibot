@@ -40,12 +40,16 @@ struct TemplateQuickCard: View {
                 }
             }
 
-            SettingsFormSection(model.walletTitle) {
+            SettingsFormSection(
+                model.walletTitle,
+                value: model.selectedWallet?.name,
+                valueIcon: model.selectedWallet.flatMap(model.icon(for:))
+            ) {
                 VStack(alignment: .leading, spacing: 12) {
                     SettingsPagedGrid(
                         items: model.wallets,
                         selected: model.walletId,
-                        columns: 2,
+                        columns: 3,
                         rows: 2,
                         spacing: 8
                     ) { wallet in
