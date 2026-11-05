@@ -36,7 +36,8 @@ Android は、次の技術を使う。
 | applicationId | `com.yossibank.kakeibot` |
 | minSdk | 26（Android 8） |
 | compileSdk・targetSdk | 36 |
-| JDK | 17。Gradle も Kotlin の toolchain も、この版で動かす |
+| Gradle を動かす JDK | Android Studio に入っている JBR |
+| Kotlin の toolchain | 17 |
 
 ## 🧪 確認
 
