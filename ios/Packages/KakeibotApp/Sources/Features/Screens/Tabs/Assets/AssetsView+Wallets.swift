@@ -29,42 +29,47 @@ extension AssetsView {
 
     func walletGroup(
         _ title: String,
-        systemImage: String,
-        sections: [AssetsModel.WalletSection]
+        sections: [AssetsModel.WalletSection],
+        onAdd: (() -> Void)? = nil
     ) -> some View {
         let rows = sections.flatMap(\.rows)
         let total = rows.reduce(0) { $0 + $1.balance }
 
-        return VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 0) {
-                CardHeader(
-                    title,
-                    systemImage: systemImage,
-                    note: "\(rows.count) 口座"
-                )
+        return VStack(alignment: .leading, spacing: 0) {
+            CardHeader(title, note: rows.isEmpty ? nil : "\(rows.count) 口座")
 
+            if rows.isEmpty {
+                Text("口座を足すと、ここに並びます")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 8)
+            } else {
                 Text(AmountText.text(total))
                     .displayFont(.title, weight: .bold)
                     .monospacedDigit()
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
+                    .padding(.bottom, 4)
             }
-            .padding(.horizontal, 4)
 
-            VStack(spacing: 0) {
-                ForEach(sections) { section in
-                    walletSection(section)
-                        .overlay(alignment: .top) {
-                            if section.id != sections.first?.id {
-                                Hairline(thickness: 1)
-                            }
-                        }
-                }
+            ForEach(sections) { section in
+                walletSection(section)
+                    .overlay(alignment: .top) {
+                        Hairline(thickness: 1)
+                    }
             }
-            .padding(.horizontal, 16)
-            .card()
+
+            if let onAdd {
+                addWalletRow(action: onAdd)
+                    .overlay(alignment: .top) {
+                        Hairline(thickness: 1)
+                    }
+            }
         }
+        .padding(.horizontal, 16)
+        .card()
     }
 }
 
@@ -145,6 +150,17 @@ private extension AssetsView {
         }
         .padding(.vertical, 8)
         .contentShape(.rect)
+    }
+
+    func addWalletRow(action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label("口座を足す", systemImage: "plus")
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.accent)
+                .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
     }
 
     func billRow(_ row: AssetsModel.UpcomingBill) -> some View {
