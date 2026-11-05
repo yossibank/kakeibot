@@ -1,4 +1,5 @@
 brew "jq"
 brew "mint"
+brew "openjdk@17"
 brew "pre-commit"
 brew "xcbeautify"
