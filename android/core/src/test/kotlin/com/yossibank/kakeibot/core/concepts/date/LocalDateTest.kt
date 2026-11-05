@@ -199,7 +199,7 @@ class LocalDateTest {
     }
 
     companion object {
-        private val validity: ValidityFixture<String>
-            get() = ValidityFixture.load("date/local-date-text.json", String.serializer())
+        private val validity: CoreFixture.Validity<String>
+            get() = CoreFixture.validity("date/local-date-text.json", String.serializer())
     }
 }

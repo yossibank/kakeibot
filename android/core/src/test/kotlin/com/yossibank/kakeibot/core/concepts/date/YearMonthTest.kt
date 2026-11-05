@@ -139,7 +139,7 @@ class YearMonthTest {
     }
 
     companion object {
-        private val validity: ValidityFixture<String>
-            get() = ValidityFixture.load("date/year-month-text.json", String.serializer())
+        private val validity: CoreFixture.Validity<String>
+            get() = CoreFixture.validity("date/year-month-text.json", String.serializer())
     }
 }

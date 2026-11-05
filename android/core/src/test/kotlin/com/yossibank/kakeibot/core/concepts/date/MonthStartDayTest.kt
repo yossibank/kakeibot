@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.core.concepts.date
 
+import com.yossibank.kakeibot.core.support.CoreFixture
 import kotlinx.serialization.builtins.serializer
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,7 +45,7 @@ class MonthStartDayTest {
     }
 
     companion object {
-        private val validity: ValidityFixture<Int>
-            get() = ValidityFixture.load("date/month-start-day.json", Int.serializer())
+        private val validity: CoreFixture.Validity<Int>
+            get() = CoreFixture.validity("date/month-start-day.json", Int.serializer())
     }
 }

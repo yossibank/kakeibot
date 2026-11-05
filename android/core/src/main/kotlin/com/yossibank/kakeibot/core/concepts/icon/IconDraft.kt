@@ -1,6 +1,7 @@
 package com.yossibank.kakeibot.core.concepts.icon
 
 import com.yossibank.kakeibot.core.shared.DraftProblem
+import com.yossibank.kakeibot.core.shared.DraftProblemException
 import java.text.BreakIterator
 import java.time.Instant
 
@@ -113,7 +114,7 @@ data class IconDraft(
     private fun validate() {
         val problem = problems.firstOrNull() ?: return
 
-        throw IllegalStateException(problem.name)
+        throw DraftProblemException(problem)
     }
 
     companion object {
