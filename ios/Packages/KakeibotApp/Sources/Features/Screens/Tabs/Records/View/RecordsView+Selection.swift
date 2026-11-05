@@ -7,27 +7,30 @@ extension RecordsView {
         let type = model.batchType(of: selection)
         let canChangeWallet = !selection.isEmpty && !model.hasTransfer(in: selection)
 
-        return HStack(spacing: 4) {
-            countMenu(selection)
+        return ViewThatFits(in: .horizontal) {
+            barContent(
+                selection,
+                type: type,
+                canChangeWallet: canChangeWallet,
+                isCompact: false,
+                isStacked: false
+            )
 
-            Spacer(minLength: 4)
+            barContent(
+                selection,
+                type: type,
+                canChangeWallet: canChangeWallet,
+                isCompact: false,
+                isStacked: true
+            )
 
-            ViewThatFits(in: .horizontal) {
-                barButtons(
-                    selection,
-                    type: type,
-                    canChangeWallet: canChangeWallet,
-                    isStacked: false
-                )
-
-                barButtons(
-                    selection,
-                    type: type,
-                    canChangeWallet: canChangeWallet,
-                    isStacked: true
-                )
-            }
-            .layoutPriority(1)
+            barContent(
+                selection,
+                type: type,
+                canChangeWallet: canChangeWallet,
+                isCompact: true,
+                isStacked: true
+            )
         }
         .padding(.horizontal, 8)
         .frame(minHeight: 56)
@@ -42,40 +45,60 @@ extension RecordsView {
 }
 
 private extension RecordsView {
-    func countMenu(_ selection: Set<Entry.ID>) -> some View {
-        let shownCount = model.shownEntryIDs.count
+    func barContent(
+        _ selection: Set<Entry.ID>,
+        type: Entry.Kind?,
+        canChangeWallet: Bool,
+        isCompact: Bool,
+        isStacked: Bool
+    ) -> some View {
+        HStack(spacing: 4) {
+            selectAll(selection, isCompact: isCompact)
 
-        return Menu {
-            Button {
-                self.selection = model.selectingAllShown(in: selection)
-            } label: {
-                Label("表示中の \(shownCount) 件をすべて選ぶ", systemImage: "checkmark.circle")
-            }
-            .disabled(model.selectsAllShown(selection))
+            Spacer(minLength: 4)
 
-            Button {
-                self.selection = []
-            } label: {
-                Label("すべて外す", systemImage: "circle")
-            }
-            .disabled(selection.isEmpty)
-        } label: {
-            HStack(spacing: 4) {
-                Text("\(selection.count) 件")
-                    .textFont(.subheadline)
-                    .monospacedDigit()
-
-                Image(systemName: "chevron.down")
-                    .sansFont(.caption, weight: .semibold)
-            }
-            .foregroundStyle(Palette.accentStrong)
-            .lineLimit(1)
-            .fixedSize()
-            .padding(.leading, 8)
-            .frame(minHeight: 44)
-            .contentShape(.rect)
+            barButtons(
+                selection,
+                type: type,
+                canChangeWallet: canChangeWallet,
+                isStacked: isStacked
+            )
         }
-        .menuOrder(.fixed)
+    }
+
+    func selectAll(
+        _ selection: Set<Entry.ID>,
+        isCompact: Bool
+    ) -> some View {
+        let selectsAll = model.selectsAllShown(selection)
+        let title = selectsAll ? "すべて外す" : "すべて選ぶ"
+        let systemImage = selectsAll ? "xmark" : "checkmark"
+
+        return HStack(spacing: 8) {
+            Text("\(selection.count) 件")
+                .textFont(.subheadline, weight: .semibold)
+                .monospacedDigit()
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .fixedSize()
+
+            ChipButton(isSelected: selectsAll) {
+                self.selection = selectsAll ? [] : model.selectingAllShown(in: selection)
+            } content: {
+                HStack(spacing: 4) {
+                    Image(systemName: systemImage)
+
+                    if !isCompact {
+                        Text(title)
+                    }
+                }
+                .lineLimit(1)
+            }
+            .fixedSize()
+            .disabled(model.shownEntryIDs.isEmpty)
+        }
+        .padding(.leading, 8)
+        .animation(.snappy, value: selectsAll)
     }
 
     func barButtons(
