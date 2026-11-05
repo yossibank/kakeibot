@@ -56,14 +56,17 @@ public extension SettingsIconEditorModel {
                 "🍙", "🍣", "🍜", "🍛", "🍝", "🍔", "🍕", "🍞",
                 "🥗", "🍱", "🍰", "🍩", "🍎", "🥩", "🥚", "🍪",
                 "🍤", "🍢", "🍡", "🥟", "🍳", "🧀", "🍇", "🍓",
-                "🍌", "🥐", "🍦", "🍫"
+                "🍌", "🥐", "🍦", "🍫",
+                "🍚", "🍗", "🥓", "🌮", "🥪", "🍲", "🍮", "🍠",
+                "🥦", "🍅", "🥕", "🍑", "🍉", "🍊", "🥝", "🍒"
             ]
         ),
         EmojiSection(
             title: "飲み物",
             emojis: [
                 "☕️", "🍵", "🧋", "🥤", "🍺", "🍷", "🍶", "🍹",
-                "🥛", "🧃", "🍸", "🥂", "🧉", "🫖"
+                "🥛", "🧃", "🍸", "🥂", "🧉", "🫖",
+                "🧊", "🍾", "🥃", "🍼"
             ]
         ),
         EmojiSection(
@@ -71,14 +74,17 @@ public extension SettingsIconEditorModel {
             emojis: [
                 "🏠", "🛒", "🧻", "🧴", "🧹", "🛁", "💡", "💧",
                 "🔥", "📦", "🧺", "🪴", "🛋️", "🔑", "🧼", "🪥",
-                "🧽", "🪑", "🛏️", "🚿", "🔌", "📺"
+                "🧽", "🪑", "🛏️", "🚿", "🔌", "📺",
+                "🧯", "🪣", "🧷", "🪒", "🧦", "🪟", "🚪", "🛠️",
+                "🧰", "🗑️"
             ]
         ),
         EmojiSection(
             title: "乗り物",
             emojis: [
                 "🚃", "🚌", "🚕", "🚗", "🚲", "✈️", "⛽️", "🚢",
-                "🛵", "🅿️", "🚄", "🚇", "🛻", "🛳️", "🚁", "🏍️"
+                "🛵", "🅿️", "🚄", "🚇", "🛻", "🛳️", "🚁", "🏍️",
+                "🚉", "🚏", "🚆", "⛴️", "🚖", "🛴", "🚐", "🛞"
             ]
         ),
         EmojiSection(
@@ -87,7 +93,9 @@ public extension SettingsIconEditorModel {
                 "🎮", "🎬", "🎤", "🎵", "🎨", "📚", "🎯", "🎳",
                 "⚽️", "⛳️", "🎢", "🎁", "🎉", "🏕️", "♨️", "📷",
                 "🎸", "🎹", "🎲", "🧩", "🎟️", "🏀", "🎾", "🏊",
-                "🎿", "🎣", "🎪", "🏖️"
+                "🎿", "🎣", "🎪", "🏖️",
+                "🎧", "📖", "🎭", "🃏", "🧶", "🪁", "🛶", "🏓",
+                "🏸", "🏂"
             ]
         ),
         EmojiSection(
@@ -95,7 +103,8 @@ public extension SettingsIconEditorModel {
             emojis: [
                 "💊", "🏥", "🦷", "💇", "💄", "👕", "👟", "👜",
                 "💅", "🧖", "🩺", "🩹", "💉", "👓", "🕶️", "👗",
-                "👠", "🧢"
+                "👠", "🧢",
+                "🦴", "🧘", "💆", "🧥", "👔", "👖", "🩳", "🧣"
             ]
         ),
         EmojiSection(
@@ -103,7 +112,8 @@ public extension SettingsIconEditorModel {
             emojis: [
                 "👶", "🧒", "👪", "🐶", "🐱", "🐟", "🐦", "🌸",
                 "👫", "👨‍👩‍👧", "🧸", "🐰", "🐹", "🐢", "🦜", "🌳",
-                "🌻"
+                "🌻",
+                "🐣", "🐼", "🐻", "🐸", "🦋", "🌷", "🍀", "🌵"
             ]
         ),
         EmojiSection(
@@ -111,14 +121,17 @@ public extension SettingsIconEditorModel {
             emojis: [
                 "💰", "💴", "💳", "🏦", "📈", "🧾", "💼", "🏢",
                 "🎫", "✉️", "📱", "💻", "💵", "🪙", "📉", "🏧",
-                "📝", "📮", "🧧", "💎"
+                "📝", "📮", "🧧", "💎",
+                "💹", "💸", "🏛️", "🎓", "🏷️", "📊", "🔁", "🤝"
             ]
         ),
         EmojiSection(
             title: "季節と記号",
             emojis: [
                 "🎂", "🎄", "🎍", "🌙", "☀️", "⭐️", "❤️", "✨",
-                "🔔", "📅", "🎀", "🏆"
+                "🔔", "📅", "🎀", "🏆",
+                "🎃", "🎎", "🎏", "🌺", "🍁", "❄️", "⛄️", "🌈",
+                "💐", "🎐", "🎆"
             ]
         )
     ]
@@ -139,14 +152,16 @@ public extension SettingsIconEditorModel {
                 .bath, .toilet, .laundry, .cleaning, .trash, .fridge, .lamp,
                 .light, .utility, .water, .gas, .key, .lock, .tools, .repair,
                 .battery, .dishwasher, .aircon, .fan, .heater, .faucet, .plug,
-                .door, .chair, .floorlamp, .pipe, .apartment, .bathtub
+                .door, .chair, .floorlamp, .pipe, .apartment, .bathtub,
+                .dryer, .sink, .garage, .cabin, .hometown
             ]
         ),
         GlyphSection(
             title: "機械",
             glyphs: [
                 .phone, .wifi, .laptop, .computer, .tv, .audio, .printer,
-                .display, .keyboard, .video, .antenna, .media
+                .display, .keyboard, .video, .antenna, .media, .call,
+                .streaming, .app, .storage
             ]
         ),
         GlyphSection(
@@ -164,7 +179,8 @@ public extension SettingsIconEditorModel {
                 .hobby, .movie, .music, .karaoke, .guitar, .ticket, .party,
                 .balloon, .camera, .photo, .paint, .art, .theater, .book, .news,
                 .magazine, .puzzle, .dice, .star, .trophy, .notes, .piano,
-                .books, .fireworks, .dance, .crown, .laurel, .giftbox
+                .books, .fireworks, .dance, .crown, .laurel, .giftbox,
+                .cinema, .livemusic
             ]
         ),
         GlyphSection(
@@ -173,7 +189,9 @@ public extension SettingsIconEditorModel {
                 .sports, .fitness, .yoga, .swim, .soccer, .baseball, .tennis,
                 .beach, .mountain, .tent, .binoculars, .court, .ski, .hiking,
                 .golf, .fishing, .basketball, .football, .volleyball,
-                .skateboard, .surfing, .race, .medal, .training
+                .skateboard, .surfing, .race, .medal, .training,
+                .climbing, .cycling, .martialarts, .bowling, .pingpong,
+                .snowboard, .boxing
             ]
         ),
         GlyphSection(
@@ -181,7 +199,8 @@ public extension SettingsIconEditorModel {
             glyphs: [
                 .beauty, .haircut, .comb, .glasses, .clothes, .hanger, .shoe,
                 .handbag, .medical, .pill, .syringe, .bandage, .mask, .health,
-                .hospital, .checkup, .drip, .hearing, .eye, .sunglasses
+                .hospital, .checkup, .drip, .hearing, .eye, .sunglasses,
+                .lab, .allergy, .dental, .makeup
             ]
         ),
         GlyphSection(
@@ -190,7 +209,7 @@ public extension SettingsIconEditorModel {
                 .baby, .toy, .family, .parent, .friends, .person, .pet, .dog,
                 .cat, .bird, .rabbit, .tortoise, .school, .plant, .tree,
                 .flower, .couple, .group, .backpack, .pencil, .stationery,
-                .desk, .lizard, .insect, .ladybug
+                .desk, .lizard, .insect, .ladybug, .study, .scholarship
             ]
         ),
         GlyphSection(
@@ -200,7 +219,8 @@ public extension SettingsIconEditorModel {
                 .budget, .stats, .discount, .insurance, .tax, .contract,
                 .subscription, .work, .office, .goal, .target, .loss,
                 .walletPass, .barcode, .qrcode, .donation, .security, .document,
-                .clipboard, .tag
+                .clipboard, .tag, .exchange, .refund, .giftcard,
+                .repayment, .installment, .savings
             ]
         ),
         GlyphSection(
