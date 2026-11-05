@@ -5,6 +5,41 @@ import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 
 private const val searchDays = 400
+private const val finalSearchMonths = 13
+
+val Recurring.Companion.maxCount: Int
+    get() = 1200
+
+val Recurring.finalDate: LocalDate?
+    get() {
+        val endDate = endDate ?: return null
+
+        val from = LocalDate.ofClamped(
+            yearMonth = endDate.yearMonth.adding(months = -finalSearchMonths),
+            clampedDay = 1,
+        )
+
+        return dates(
+            from = from,
+            through = endDate,
+        ).lastOrNull()
+    }
+
+val Recurring.occurrenceCount: Int?
+    get() = endDate?.let {
+        dates(
+            from = startDate,
+            through = it,
+        ).size
+    }
+
+val Recurring.plannedTotal: Int?
+    get() = endDate?.let { end ->
+        dates(
+            from = startDate,
+            through = end,
+        ).sumOf { scheduledAmount(paidOn = it) }
+    }
 
 fun Recurring.occurrences(
     from: LocalDate,
@@ -41,6 +76,42 @@ fun Recurring.dates(
     from = from,
     through = through,
 ).map { it.date }
+
+fun Recurring.endDate(
+    afterCount: Int,
+    from: LocalDate? = null,
+): LocalDate? {
+    if (afterCount !in 1..Recurring.maxCount) {
+        return null
+    }
+
+    val open = copy(endDate = null)
+    val lower = maxOf(from ?: startDate, startDate)
+
+    val months = if (frequency == Recurring.Frequency.monthly) {
+        afterCount + 2
+    } else {
+        (afterCount + 1) * 12
+    }
+
+    val horizon = LocalDate.ofClamped(
+        yearMonth = lower.yearMonth.adding(months = months),
+        clampedDay = 31,
+    )
+
+    val dates = open.dates(
+        from = lower,
+        through = horizon,
+    )
+
+    return if (dates.size >= afterCount) dates[afterCount - 1] else null
+}
+
+fun Recurring.scheduledAmount(paidOn: LocalDate): Int {
+    val finalAmount = finalAmount ?: return amount
+
+    return if (paidOn == finalDate) finalAmount else amount
+}
 
 fun Recurring.pendingOccurrences(through: LocalDate): List<Recurring.Occurrence> {
     val start = generatedUntil?.adding(days = 1) ?: startDate

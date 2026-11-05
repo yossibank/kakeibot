@@ -26,6 +26,7 @@ class WalletBalanceTest {
             val initialBalance: Int,
             val entries: List<EntryCase>,
             val valuations: List<ValuationCase>? = null,
+            val adjustments: List<AdjustmentCase>? = null,
             val through: LocalDate? = null,
             val balance: Int,
         ) {
@@ -37,6 +38,13 @@ class WalletBalanceTest {
             val date: LocalDate,
             val amount: Int,
             val createdAt: String? = null,
+        )
+
+        @Serializable
+        data class AdjustmentCase(
+            val date: LocalDate,
+            val amount: Int,
+            val wallet: Side,
         )
 
         @Serializable
@@ -87,9 +95,20 @@ class WalletBalanceTest {
                 )
             }
 
+            val adjustments = (fixture.adjustments ?: emptyList()).map { adjustment ->
+                Adjustment(
+                    walletId = if (adjustment.wallet == Side.self) wallet.id else other,
+                    date = adjustment.date,
+                    amount = adjustment.amount,
+                    createdAt = recordedAt,
+                    updatedAt = Instant.now(),
+                )
+            }
+
             val balance = wallet.balance(
                 with = entries,
                 valuations = valuations,
+                adjustments = adjustments,
                 through = fixture.through,
             )
 
@@ -130,6 +149,7 @@ class WalletBalanceTest {
 
             assertEquals(200, total)
         }
+
     }
 }
 

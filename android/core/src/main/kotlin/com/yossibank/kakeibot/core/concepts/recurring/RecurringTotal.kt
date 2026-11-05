@@ -12,5 +12,5 @@ fun List<Recurring>.total(
         through = range.endInclusive,
     )
 
-    sum + recurring.amount * dates.size
+    sum + dates.sumOf { recurring.scheduledAmount(paidOn = it) }
 }

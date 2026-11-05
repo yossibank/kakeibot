@@ -23,6 +23,7 @@ data class Recurring(
     val holidayShift: HolidayShift = HolidayShift.none,
     val closingDay: Int? = null,
     val fee: Int? = null,
+    val finalAmount: Int? = null,
     val billShift: Int = 0,
     val startDate: LocalDate,
     val endDate: LocalDate? = null,

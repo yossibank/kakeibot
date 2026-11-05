@@ -1,7 +1,12 @@
 package com.yossibank.kakeibot.core.concepts.export.v1
 
+import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.wallet.Adjustment
+import com.yossibank.kakeibot.core.concepts.wallet.Wallet
+import com.yossibank.kakeibot.core.shared.Identifier
 import java.text.BreakIterator
+import java.time.Instant
 
 private val csvHeader = listOf(
     "日付",
@@ -22,8 +27,17 @@ private val byteOrderMark = byteArrayOf(
 
 private val formulaPrefixes = setOf("=", "+", "-", "@")
 
+private const val adjustmentTitle = "調整"
+
+private data class CSVRow(
+    val date: LocalDate,
+    val createdAt: Instant,
+    val id: String,
+    val fields: List<String>,
+)
+
 fun ExportV1.Tables.csv(): ByteArray {
-    val rows = listOf(csvHeader) + sortedEntries.map { row(it) }
+    val rows = listOf(csvHeader) + sortedRows.map { it.fields }
 
     val text = rows.joinToString(separator = "") { fields ->
         fields.joinToString(separator = ",") { escape(it) } + "\r\n"
@@ -32,28 +46,56 @@ fun ExportV1.Tables.csv(): ByteArray {
     return byteOrderMark + text.toByteArray(Charsets.UTF_8)
 }
 
-private val ExportV1.Tables.sortedEntries: List<Entry>
-    get() = entries.sortedWith(
-        compareBy<Entry> { it.date }
+private val ExportV1.Tables.sortedRows: List<CSVRow>
+    get() = (entries.map { row(it) } + adjustments.map { row(it) }).sortedWith(
+        compareBy<CSVRow> { it.date }
             .thenBy { it.createdAt }
-            .thenBy { it.id.toString() },
+            .thenBy { it.id },
     )
 
-private fun ExportV1.Tables.row(entry: Entry): List<String> {
+private fun ExportV1.Tables.walletName(id: Identifier<Wallet>?): String =
+    wallets.firstOrNull { it.id == id }?.name ?: ""
+
+private fun ExportV1.Tables.row(entry: Entry): CSVRow {
     val categoryName = categories.firstOrNull { it.id == entry.categoryId }?.name ?: ""
     val tagName = tags.firstOrNull { it.id == entry.tagId }?.name ?: ""
-    val walletName = wallets.firstOrNull { it.id == entry.walletId }?.name ?: ""
-    val toWalletName = wallets.firstOrNull { it.id == entry.toWalletId }?.name ?: ""
 
-    return listOf(
+    val fields = listOf(
         entry.date.toString(),
         kindTitle(entry.type),
         entry.amount.toString(),
         text(categoryName),
         text(tagName),
-        text(walletName),
-        text(toWalletName),
+        text(walletName(entry.walletId)),
+        text(walletName(entry.toWalletId)),
         text(entry.memo ?: ""),
+    )
+
+    return CSVRow(
+        date = entry.date,
+        createdAt = entry.createdAt,
+        id = entry.id.toString(),
+        fields = fields,
+    )
+}
+
+private fun ExportV1.Tables.row(adjustment: Adjustment): CSVRow {
+    val fields = listOf(
+        adjustment.date.toString(),
+        adjustmentTitle,
+        adjustment.amount.toString(),
+        "",
+        "",
+        text(walletName(adjustment.walletId)),
+        "",
+        "",
+    )
+
+    return CSVRow(
+        date = adjustment.date,
+        createdAt = adjustment.createdAt,
+        id = adjustment.id.toString(),
+        fields = fields,
     )
 }
 

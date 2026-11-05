@@ -34,6 +34,7 @@ class LoanPayoffTest(
         val amount: Int,
         val day: Int,
         val endDate: LocalDate? = null,
+        val finalAmount: Int? = null,
     )
 
     @Test
@@ -51,6 +52,7 @@ class LoanPayoffTest(
                 toWalletId = loan,
                 frequency = Recurring.Frequency.monthly,
                 day = repayment.day,
+                finalAmount = repayment.finalAmount,
                 startDate = startDate,
                 endDate = repayment.endDate,
                 createdAt = now,

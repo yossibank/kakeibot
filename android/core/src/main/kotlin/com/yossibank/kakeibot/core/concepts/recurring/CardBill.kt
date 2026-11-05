@@ -2,6 +2,7 @@ package com.yossibank.kakeibot.core.concepts.recurring
 
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.wallet.Adjustment
 import com.yossibank.kakeibot.core.concepts.wallet.Valuation
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.concepts.wallet.balance
@@ -28,6 +29,7 @@ data class CardBill(
             wallets: List<Wallet>,
             entries: List<Entry>,
             valuations: List<Valuation>,
+            adjustments: List<Adjustment>,
             after: LocalDate,
         ): List<CardBill> {
             val cards = wallets.filter { it.kind == Wallet.Kind.card }.map { it.id }.toSet()
@@ -49,6 +51,7 @@ data class CardBill(
                     val current = wallet?.balance(
                         with = entries,
                         valuations = valuations,
+                        adjustments = adjustments,
                     ) ?: 0
 
                     val before = balances[source] ?: current

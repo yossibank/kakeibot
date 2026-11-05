@@ -13,12 +13,14 @@ data class Holdings(
         wallets: List<Wallet>,
         entries: List<Entry>,
         valuations: List<Valuation> = emptyList(),
+        adjustments: List<Adjustment> = emptyList(),
         through: LocalDate? = null,
     ) : this(
         onHand = total(
             wallets = wallets,
             entries = entries,
             valuations = valuations,
+            adjustments = adjustments,
             through = through,
             role = Wallet.Kind.Role.onHand,
         ),
@@ -26,6 +28,7 @@ data class Holdings(
             wallets = wallets,
             entries = entries,
             valuations = valuations,
+            adjustments = adjustments,
             through = through,
             role = Wallet.Kind.Role.card,
         ),
@@ -33,6 +36,7 @@ data class Holdings(
             wallets = wallets,
             entries = entries,
             valuations = valuations,
+            adjustments = adjustments,
             through = through,
             role = Wallet.Kind.Role.investment,
         ),
@@ -40,6 +44,7 @@ data class Holdings(
             wallets = wallets,
             entries = entries,
             valuations = valuations,
+            adjustments = adjustments,
             through = through,
             role = Wallet.Kind.Role.loan,
         ),
@@ -62,12 +67,14 @@ data class Holdings(
             wallets: List<Wallet>,
             entries: List<Entry>,
             valuations: List<Valuation>,
+            adjustments: List<Adjustment>,
             through: LocalDate?,
             role: Wallet.Kind.Role,
         ): Int = Wallet.totalBalance(
             of = wallets.filter { it.kind.role == role },
             with = entries,
             valuations = valuations,
+            adjustments = adjustments,
             through = through,
         )
     }

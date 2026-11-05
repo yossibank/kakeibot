@@ -41,7 +41,7 @@ data class LoanPayoff(
                         ).map { date ->
                             Payment(
                                 date = date,
-                                amount = recurring.amount,
+                                amount = recurring.scheduledAmount(paidOn = date),
                             )
                         }
                     }

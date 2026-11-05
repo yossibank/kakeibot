@@ -20,6 +20,7 @@ import com.yossibank.kakeibot.core.concepts.reward.RewardLog
 import com.yossibank.kakeibot.core.concepts.reward.RewardRule
 import com.yossibank.kakeibot.core.concepts.setting.Setting
 import com.yossibank.kakeibot.core.concepts.theme.Theme
+import com.yossibank.kakeibot.core.concepts.wallet.Adjustment
 import com.yossibank.kakeibot.core.concepts.wallet.Valuation
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.InstantSerializer
@@ -41,6 +42,7 @@ internal fun ExportV1.Tables.row(): JsonObject = buildJsonObject {
     put("shelfIcons", JsonArray(shelfIcons.map { it.row() }))
     put("wallets", JsonArray(wallets.map { it.row() }))
     put("valuations", JsonArray(valuations.map { it.row() }))
+    put("adjustments", JsonArray(adjustments.map { it.row() }))
     put("categories", JsonArray(categories.map { it.row() }))
     put("tags", JsonArray(tags.map { it.row() }))
     put("entries", JsonArray(entries.map { it.row() }))
@@ -68,6 +70,7 @@ internal fun ExportRow.tables(): ExportV1.Tables = ExportV1.Tables(
     shelfIcons = rowsOrEmpty("shelfIcons").map { it.shelfIcon() },
     wallets = rows("wallets").map { it.wallet() },
     valuations = rowsOrEmpty("valuations").map { it.valuation() },
+    adjustments = rowsOrEmpty("adjustments").map { it.adjustment() },
     categories = rows("categories").map { it.category() },
     tags = rowsOrEmpty("tags").map { it.tag() },
     entries = rows("entries").map { it.entry() },
@@ -166,6 +169,24 @@ private fun Valuation.row(): JsonObject = buildJsonObject {
 }
 
 private fun ExportRow.valuation(): Valuation = Valuation(
+    id = id("id"),
+    walletId = id("walletId"),
+    date = date("date"),
+    amount = int("amount"),
+    createdAt = instant("createdAt"),
+    updatedAt = instant("updatedAt"),
+)
+
+private fun Adjustment.row(): JsonObject = buildJsonObject {
+    put("id", id.toString())
+    put("walletId", walletId.toString())
+    put("date", date.toString())
+    put("amount", amount)
+    put("createdAt", createdAt)
+    put("updatedAt", updatedAt)
+}
+
+private fun ExportRow.adjustment(): Adjustment = Adjustment(
     id = id("id"),
     walletId = id("walletId"),
     date = date("date"),
@@ -363,6 +384,7 @@ private fun Recurring.row(): JsonObject = buildJsonObject {
     put("holidayShift", holidayShift.rawValue)
     put("closingDay", closingDay)
     put("fee", fee)
+    put("finalAmount", finalAmount)
     put("billShift", billShift)
     put("startDate", startDate.toString())
     put("endDate", endDate?.toString())
@@ -391,6 +413,7 @@ private fun ExportRow.recurring(): Recurring {
         holidayShift = holidayShift ?: HolidayShift.none,
         closingDay = intOrNull("closingDay"),
         fee = intOrNull("fee"),
+        finalAmount = intOrNull("finalAmount"),
         billShift = Recurring.clampedBillShift(intOrNull("billShift") ?: 0),
         startDate = date("startDate"),
         endDate = dateOrNull("endDate"),

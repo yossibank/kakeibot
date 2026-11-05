@@ -50,7 +50,7 @@ fun Recurring.amount(
     val billed = billedEntries(
         paidOn = paidOn,
         entries = entries,
-    ) ?: return amount
+    ) ?: return scheduledAmount(paidOn = paidOn)
 
     val used = billed.sumOf { usage(it) }
 

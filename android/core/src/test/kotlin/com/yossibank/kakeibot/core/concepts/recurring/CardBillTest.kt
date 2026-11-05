@@ -2,6 +2,7 @@ package com.yossibank.kakeibot.core.concepts.recurring
 
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.wallet.Adjustment
 import com.yossibank.kakeibot.core.concepts.wallet.Valuation
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
@@ -68,6 +69,7 @@ class CardBillTest {
             wallets = listOf(bank, first, second),
             entries = emptyList(),
             valuations = emptyList(),
+            adjustments = emptyList(),
             after = today,
         )
 
@@ -120,11 +122,64 @@ class CardBillTest {
             wallets = listOf(source, card),
             entries = emptyList(),
             valuations = listOf(valuation),
+            adjustments = emptyList(),
             after = today,
         )
 
         assertEquals(listOf(50000), upcoming.map { it.balanceBefore })
         assertEquals(listOf(0), upcoming.map { it.shortage })
+    }
+
+    @Test
+    fun startsFromAdjustedBalanceOfSource() {
+        val now = Instant.ofEpochSecond(1_791_000_000)
+        val today = date("2026-10-20")
+        val start = date("2026-01-01")
+
+        val source = wallet(
+            kind = Wallet.Kind.bank,
+            balance = 10000,
+            at = now,
+        )
+
+        val card = wallet(
+            kind = Wallet.Kind.card,
+            balance = 0,
+            at = now,
+        )
+
+        val bill = Recurring(
+            type = Entry.Kind.transfer,
+            amount = 30000,
+            categoryId = null,
+            walletId = source.id,
+            toWalletId = card.id,
+            frequency = Recurring.Frequency.monthly,
+            day = 27,
+            startDate = start,
+            createdAt = now,
+            updatedAt = now,
+        )
+
+        val adjustment = Adjustment(
+            walletId = source.id,
+            date = today,
+            amount = 5000,
+            createdAt = now,
+            updatedAt = now,
+        )
+
+        val upcoming = CardBill.upcoming(
+            recurrings = listOf(bill),
+            wallets = listOf(source, card),
+            entries = emptyList(),
+            valuations = emptyList(),
+            adjustments = listOf(adjustment),
+            after = today,
+        )
+
+        assertEquals(listOf(15000), upcoming.map { it.balanceBefore })
+        assertEquals(listOf(15000), upcoming.map { it.shortage })
     }
 
     private data class Bill(

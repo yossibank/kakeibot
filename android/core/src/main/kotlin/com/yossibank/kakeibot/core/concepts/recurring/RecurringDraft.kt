@@ -22,6 +22,7 @@ data class RecurringDraft(
     val holidayShift: HolidayShift = HolidayShift.none,
     val closingDay: Int? = null,
     val fee: Int = 0,
+    val finalAmount: Int = 0,
     val billShift: Int = 0,
     val startDate: LocalDate,
     val endDate: LocalDate? = null,
@@ -40,6 +41,7 @@ data class RecurringDraft(
         holidayShift = recurring.holidayShift,
         closingDay = recurring.closingDay,
         fee = recurring.fee ?: 0,
+        finalAmount = recurring.finalAmount ?: 0,
         billShift = recurring.billShift,
         startDate = recurring.startDate,
         endDate = recurring.endDate,
@@ -146,6 +148,9 @@ data class RecurringDraft(
     private val savedFee: Int?
         get() = if (type == Entry.Kind.transfer && fee > 0) fee else null
 
+    private val savedFinalAmount: Int?
+        get() = if (endDate != null && cardClosingDay == null && finalAmount > 0) finalAmount else null
+
     private val savedBillShift: Int
         get() = if (type == Entry.Kind.transfer) 0 else Recurring.clampedBillShift(billShift)
 
@@ -174,6 +179,7 @@ data class RecurringDraft(
             holidayShift = holidayShift,
             closingDay = cardClosingDay,
             fee = savedFee,
+            finalAmount = savedFinalAmount,
             billShift = savedBillShift,
             startDate = startDate,
             endDate = endDate,
@@ -202,6 +208,7 @@ data class RecurringDraft(
             holidayShift = holidayShift,
             closingDay = cardClosingDay,
             fee = savedFee,
+            finalAmount = savedFinalAmount,
             billShift = savedBillShift,
             startDate = startDate,
             endDate = endDate,

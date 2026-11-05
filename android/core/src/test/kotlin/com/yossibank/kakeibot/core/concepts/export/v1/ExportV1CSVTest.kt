@@ -44,6 +44,6 @@ class ExportV1CSVTest {
         val tables = ExportV1.of(json).data
         val entry = tables.entries[0].copy(memo = memo)
 
-        return tables.copy(entries = listOf(entry)).csv().toString(Charsets.UTF_8)
+        return tables.copy(entries = listOf(entry), adjustments = emptyList()).csv().toString(Charsets.UTF_8)
     }
 }

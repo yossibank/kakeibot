@@ -13,11 +13,24 @@ data class Valuation(
     val createdAt: Instant,
     val updatedAt: Instant,
 ) {
-    fun includes(entry: Entry): Boolean {
-        if (entry.date == date) {
-            return entry.createdAt <= createdAt
+    fun includes(entry: Entry): Boolean = includes(
+        date = entry.date,
+        createdAt = entry.createdAt,
+    )
+
+    fun includes(adjustment: Adjustment): Boolean = includes(
+        date = adjustment.date,
+        createdAt = adjustment.createdAt,
+    )
+
+    private fun includes(
+        date: LocalDate,
+        createdAt: Instant,
+    ): Boolean {
+        if (date == this.date) {
+            return createdAt <= this.createdAt
         }
 
-        return entry.date < date
+        return date < this.date
     }
 }

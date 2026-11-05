@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.dates
+import com.yossibank.kakeibot.core.concepts.recurring.scheduledAmount
 import com.yossibank.kakeibot.core.shared.Identifier
 import kotlin.math.absoluteValue
 
@@ -89,7 +90,7 @@ object NotificationPlan {
         val start = today.adding(days = daysBefore)
         val span = recurringDays - 1
         val end = start.adding(days = span)
-        val amount = if (of.closingDay == null) of.amount else null
+        val usesCardBill = of.closingDay != null
 
         return of
             .dates(
@@ -97,6 +98,8 @@ object NotificationPlan {
                 through = end,
             )
             .map { date ->
+                val amount = if (usesCardBill) null else of.scheduledAmount(paidOn = date)
+
                 val shortage = shortages.firstOrNull { shortage ->
                     shortage.recurringId == of.id && shortage.date == date
                 }

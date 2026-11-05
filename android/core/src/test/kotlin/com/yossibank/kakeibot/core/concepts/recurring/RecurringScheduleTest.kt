@@ -213,6 +213,7 @@ class RecurringScheduleTest {
             assertEquals(78000, expense)
             assertEquals(78000, income)
         }
+
     }
 }
 

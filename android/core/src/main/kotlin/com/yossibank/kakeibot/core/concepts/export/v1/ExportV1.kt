@@ -17,6 +17,7 @@ import com.yossibank.kakeibot.core.concepts.reward.RewardLog
 import com.yossibank.kakeibot.core.concepts.reward.RewardRule
 import com.yossibank.kakeibot.core.concepts.setting.Setting
 import com.yossibank.kakeibot.core.concepts.theme.Theme
+import com.yossibank.kakeibot.core.concepts.wallet.Adjustment
 import com.yossibank.kakeibot.core.concepts.wallet.Valuation
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.InstantSerializer
@@ -66,6 +67,7 @@ data class ExportV1(
         val shelfIcons: List<ShelfIcon> = emptyList(),
         val wallets: List<Wallet>,
         val valuations: List<Valuation> = emptyList(),
+        val adjustments: List<Adjustment> = emptyList(),
         val categories: List<EntryCategory>,
         val tags: List<EntryTag> = emptyList(),
         val entries: List<Entry>,
