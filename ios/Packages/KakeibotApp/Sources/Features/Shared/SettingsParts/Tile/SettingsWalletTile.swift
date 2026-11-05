@@ -17,7 +17,8 @@ struct SettingsWalletTile: View {
 
                 Text(wallet.name)
                     .textFont(.caption)
-                    .sharedTextScale()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .foregroundStyle(color)
             .padding(.horizontal, 12)
