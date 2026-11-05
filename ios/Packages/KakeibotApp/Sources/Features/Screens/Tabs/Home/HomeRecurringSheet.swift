@@ -266,7 +266,7 @@ private extension HomeRecurringSheet {
                 .foregroundStyle(Palette.subtext)
 
         case .upcoming:
-            Text(daysText(until: item.date))
+            Text(BillText.days(until: item.date, today: model.today))
                 .textFont(.caption2)
                 .foregroundStyle(Palette.accent)
 
@@ -289,10 +289,5 @@ private extension HomeRecurringSheet {
 
     static func opacity(of status: PeriodRecurring.Status) -> Double {
         status == .done ? 0.5 : 1
-    }
-
-    func daysText(until date: LocalDate) -> String {
-        let days = model.today.days(until: date)
-        return days == 1 ? "明日" : "あと \(days) 日"
     }
 }

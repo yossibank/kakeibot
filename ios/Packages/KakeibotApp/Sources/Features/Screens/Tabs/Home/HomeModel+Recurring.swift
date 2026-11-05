@@ -10,6 +10,10 @@ public extension HomeModel {
         list?.place(of: recurring)
     }
 
+    func walletName(of recurring: Recurring) -> String? {
+        list?.wallets[recurring.walletId]?.name
+    }
+
     func icon(of recurring: Recurring) -> Icon? {
         list?.icon(of: recurring)
     }

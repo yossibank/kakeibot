@@ -6,13 +6,16 @@ public struct FlipDate: View {
 
     let date: LocalDate
     let isSelected: Bool
+    let isCompact: Bool
 
     public init(
         _ date: LocalDate,
-        isSelected: Bool = false
+        isSelected: Bool = false,
+        isCompact: Bool = false
     ) {
         self.date = date
         self.isSelected = isSelected
+        self.isCompact = isCompact
     }
 
     public var body: some View {
@@ -20,7 +23,7 @@ public struct FlipDate: View {
         let ring = isSelected ? Palette.accent : Palette.outline
         let width: CGFloat = isSelected ? 1.5 : 1
 
-        VStack(spacing: 4) {
+        VStack(spacing: isCompact ? 2 : 4) {
             Text("\(date.month)月")
                 .textFont(.caption2)
                 .tracking(1)
@@ -31,7 +34,7 @@ public struct FlipDate: View {
                 .frame(width: 20, height: 1)
 
             Text("\(date.day)")
-                .displayFont(.title)
+                .displayFont(isCompact ? .headline : .title)
                 .monospacedDigit()
                 .foregroundStyle(Palette.text)
 
@@ -39,9 +42,9 @@ public struct FlipDate: View {
                 .textFont(.caption2)
                 .foregroundStyle(date.tint ?? Palette.subtext)
         }
-        .padding(.top, 12)
-        .padding(.bottom, 8)
-        .frame(width: 52)
+        .padding(.top, isCompact ? 8 : 12)
+        .padding(.bottom, isCompact ? 4 : 8)
+        .frame(width: isCompact ? 44 : 52)
         .background(Palette.panel, in: shape)
         .overlay {
             shape
@@ -76,6 +79,8 @@ private extension FlipDate {
             FlipDate(date)
 
             FlipDate(date, isSelected: true)
+
+            FlipDate(date, isCompact: true)
         }
     }
     .padding()
