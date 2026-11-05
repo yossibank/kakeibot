@@ -43,6 +43,12 @@ extension WhatsNewScene {
         case recurringRow
         case recurringTabs
         case recurringList
+        case loanCount
+        case loanFinal
+        case loanTotal
+        case iconRow
+        case iconButton
+        case iconGrid
     }
 }
 
@@ -116,6 +122,12 @@ private extension WhatsNewScene {
 
         case .recurringRow, .recurringTabs, .recurringList:
             WhatsNewRecurringScene(kind: kind)
+
+        case .loanCount, .loanFinal, .loanTotal:
+            WhatsNewLoanScene(kind: kind)
+
+        case .iconRow, .iconButton, .iconGrid:
+            WhatsNewIconScene(kind: kind)
         }
     }
 
