@@ -16,7 +16,6 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | --- | --- |
 | [jq](https://jqlang.org/) | テストに使うシミュレーターを選ぶ（`scripts/find-simulator.sh`） |
 | [Mint](https://github.com/yonaskolb/Mint) | SwiftFormat と LicensePlist の版をそろえる（`Mintfile`） |
-| [OpenJDK 17](https://openjdk.org/) | Android の Gradle を動かす |
 | [pre-commit](https://pre-commit.com/) | commit の前の確認を動かす |
 | [xcbeautify](https://github.com/cpisciotta/xcbeautify) | ビルドとテストの出力を読みやすくする |
 
