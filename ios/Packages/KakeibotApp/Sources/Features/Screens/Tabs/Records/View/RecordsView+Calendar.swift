@@ -120,7 +120,6 @@ private extension RecordsView {
                         .animation(Self.stampAnimation, value: model.stampIcon(on: date)?.id)
 
                     dayMark(date)
-                        .frame(height: 24, alignment: .top)
                 }
                 .opacity(opacity)
                 .frame(maxWidth: .infinity, minHeight: 62)
@@ -139,32 +138,47 @@ private extension RecordsView {
         let income = day?.incomeTotal ?? 0
 
         return VStack(spacing: 0) {
-            if expense > 0 {
-                markAmount(expense, type: .expense)
-            } else if model.noSpendDays.contains(date) {
-                Image(systemName: "leaf.fill")
-                    .sansFont(.micro)
-                    .foregroundStyle(Palette.accent)
-            } else if !model.upcomingRecurrings(on: date).isEmpty {
-                Image(systemName: "repeat")
-                    .sansFont(.micro)
-                    .foregroundStyle(Palette.hint)
+            markSlot {
+                if expense > 0 {
+                    markAmount(expense, type: .expense)
+                } else if model.noSpendDays.contains(date) {
+                    Image(systemName: "leaf.fill")
+                        .sansFont(.micro)
+                        .foregroundStyle(Palette.accent)
+                } else if !model.upcomingRecurrings(on: date).isEmpty {
+                    Image(systemName: "repeat")
+                        .sansFont(.micro)
+                        .foregroundStyle(Palette.hint)
+                }
             }
 
-            if income > 0 {
-                markAmount(income, type: .income)
+            markSlot {
+                if income > 0 {
+                    markAmount(income, type: .income)
+                }
             }
         }
+    }
+
+    func markSlot(@ViewBuilder _ content: () -> some View) -> some View {
+        Color.clear
+            .frame(height: Self.markLineHeight)
+            .overlay {
+                content()
+            }
     }
 
     func markAmount(
         _ amount: Int,
         type: Entry.Kind
     ) -> some View {
-        AmountText(amount, type: type)
+        Text(RecordsCalendarAmount.text(amount, type: type))
             .textFont(size: .micro)
+            .monospacedDigit()
+            .foregroundStyle(type == .income ? Palette.accent : Palette.accentStrong)
             .lineLimit(1)
             .minimumScaleFactor(0.6)
+            .padding(.horizontal, 2)
     }
 
     func upcomingList(
@@ -241,6 +255,8 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
+    static let markLineHeight: CGFloat = 12
+
     static var stampTransition: AnyTransition {
         .scale(scale: 0.2).combined(with: .opacity)
     }
