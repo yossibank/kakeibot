@@ -202,6 +202,11 @@ struct SnapshotTests {
                 variant: variant,
                 to: "settings-whats-new"
             )
+            try Self.write(
+                WhatsNewSheet(seenVersion: "1.1.0", version: "1.1.0", revealsSteps: false) { _ in },
+                variant: variant,
+                to: "settings-whats-new-older"
+            )
             try Self.write(intros, variant: variant, to: "settings-intros")
         }
     }
