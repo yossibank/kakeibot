@@ -27,10 +27,14 @@ extension ReviewView {
                     EmptyView()
                 } else if model.categoryShares.isEmpty,
                           model.walletShares.isEmpty {
-                    PlaceholderEmpty(text: "この期間の記録はありません") {
-                        onAddEntry(recordDate)
-                    }
-                    .padding(16)
+                    PlaceholderEmpty(
+                        systemImage: "chart.pie",
+                        text: "この期間の記録はありません",
+                        onRecord: {
+                            onAddEntry(recordDate)
+                        }
+                    )
+                    .padding(.horizontal, 16)
                     .card()
                     .layoutColumn(.trailing)
                 } else {

@@ -152,10 +152,13 @@ private extension HomeView {
             if model.isListFailed {
                 PlaceholderLoadFailed(onRetry: onRetry)
             } else if model.showsNoRecords {
-                PlaceholderEmpty(text: "まだ記録がありません") {
-                    onAddEntry(model.today)
-                }
-                .padding(.vertical, 16)
+                PlaceholderEmpty(
+                    systemImage: "square.and.pencil",
+                    text: "まだ記録がありません",
+                    onRecord: {
+                        onAddEntry(model.today)
+                    }
+                )
             } else {
                 ForEach(model.recentRows) { row in
                     SwipeRow(id: row.id, openId: $openId) {

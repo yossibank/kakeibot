@@ -155,7 +155,7 @@ public struct RecordsView: View {
             }
         }
         .sheet(isPresented: $isFiltering) {
-            RecordsFilterSheet(filter: $model.filter, list: model.list)
+            RecordsFilterSheet(model: model)
         }
         .haptic(.success, trigger: stampCount)
         .background {
@@ -204,8 +204,11 @@ private extension RecordsView {
             if model.isMonthHiddenByFilter {
                 filteredEmpty
             } else if model.showsNoRecords {
-                PlaceholderEmpty(text: "この月の記録はありません", onRecord: recordAction)
-                    .padding(.vertical, 40)
+                PlaceholderEmpty(
+                    systemImage: "calendar",
+                    text: "この月の記録はありません",
+                    onRecord: recordAction
+                )
             }
 
             ForEach(model.days, id: \.date) { day in
