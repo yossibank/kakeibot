@@ -142,12 +142,12 @@ class WalletBalanceTest {
                 updatedAt = Instant.now(),
             )
 
-            val total = Wallet.totalBalance(
-                of = listOf(cash, card),
-                with = listOf(entry),
+            val holdings = Holdings(
+                wallets = listOf(cash, card),
+                entriesByWallet = Wallet.entriesByWallet(listOf(entry)),
             )
 
-            assertEquals(200, total)
+            assertEquals(200, holdings.onHand)
         }
 
         @Test
@@ -190,12 +190,19 @@ class WalletBalanceTest {
                 )
             }
 
-            val total = Wallet.totalBalance(
-                of = wallets,
-                with = entries,
+            val holdings = Holdings(
+                wallets = wallets,
+                entriesByWallet = Wallet.entriesByWallet(entries),
             )
 
-            assertEquals(6L * limit, total)
+            assertEquals(6L * limit, holdings.onHand)
+        }
+
+        @Test
+        fun keepsRepaidWithinBorrowed() {
+            assertEquals(200_000L, Wallet.repaid(borrowed = 300_000, balance = -100_000))
+            assertEquals(0L, Wallet.repaid(borrowed = 300_000, balance = -500_000))
+            assertEquals(300_000L, Wallet.repaid(borrowed = 300_000, balance = 50000))
         }
 
         @Test

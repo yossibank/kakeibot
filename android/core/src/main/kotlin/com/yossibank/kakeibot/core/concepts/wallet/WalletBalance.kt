@@ -4,25 +4,13 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
 
-fun Wallet.Companion.totalBalance(
-    of: List<Wallet>,
-    with: List<Entry>,
-    valuations: List<Valuation> = emptyList(),
-    adjustments: List<Adjustment> = emptyList(),
-    through: LocalDate? = null,
+fun Wallet.Companion.repaid(
+    borrowed: Long,
+    balance: Long,
 ): Long {
-    val related = entriesByWallet(with)
+    val remaining = maxOf(-balance, 0L)
 
-    return of.fold(0L) { total, wallet ->
-        val balance = wallet.balance(
-            with = related[wallet.id].orEmpty(),
-            valuations = valuations,
-            adjustments = adjustments,
-            through = through,
-        )
-
-        total + balance
-    }
+    return minOf(maxOf(borrowed - remaining, 0L), borrowed)
 }
 
 fun Wallet.Companion.entriesByWallet(entries: List<Entry>): Map<Identifier<Wallet>, List<Entry>> {

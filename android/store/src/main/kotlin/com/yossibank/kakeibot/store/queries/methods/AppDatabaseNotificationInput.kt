@@ -3,7 +3,6 @@ package com.yossibank.kakeibot.store.queries.methods
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.notification.NotificationPlan
 import com.yossibank.kakeibot.core.concepts.notification.ReminderTime
-import com.yossibank.kakeibot.core.concepts.recurring.CardBill
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.observation
@@ -11,6 +10,7 @@ import com.yossibank.kakeibot.store.database.read
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import com.yossibank.kakeibot.store.queries.types.NotificationInput
 import com.yossibank.kakeibot.store.queries.types.entryListJoin
+import com.yossibank.kakeibot.store.queries.types.upcomingCardBills
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.rows.NoSpendDayRecord
 import com.yossibank.kakeibot.store.records.rows.noSpendDay
@@ -59,13 +59,11 @@ private data class NotificationPart(
     }
 
     private fun shortages(list: EntryList): List<NotificationPlan.Shortage> {
-        val bills = CardBill.upcoming(
+        val yesterday = start.adding(days = -1)
+
+        val bills = list.upcomingCardBills(
             recurrings = recurrings,
-            wallets = list.wallets.values.toList(),
-            entries = list.days.flatMap { it.entries },
-            valuations = list.valuations,
-            adjustments = list.adjustments,
-            after = start.adding(days = -1),
+            after = yesterday,
         )
 
         return bills

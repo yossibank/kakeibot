@@ -8,6 +8,9 @@ import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryDay
+import com.yossibank.kakeibot.core.concepts.entry.expenseTotal
+import com.yossibank.kakeibot.core.concepts.entry.incomeTotal
+import com.yossibank.kakeibot.core.concepts.entry.within
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.amount
 import com.yossibank.kakeibot.core.concepts.recurring.occurrences
@@ -22,18 +25,22 @@ data class MonthOverview(
     val carryoverFrom: YearMonth? = null,
     val today: LocalDate,
 ) {
-    val month: YearMonth
-        get() = today.periodMonth(startingOn = monthStartDay)
+    val month: YearMonth = today.periodMonth(startingOn = monthStartDay)
 
-    val period: ClosedRange<LocalDate>
-        get() = month.period(startingOn = monthStartDay)
+    val period: ClosedRange<LocalDate> = month.period(startingOn = monthStartDay)
 
     val periodRecurrings: List<PeriodRecurring> = periodRecurrings(
         of = recurrings,
         period = period,
-        entries = list?.days?.flatMap { it.entries },
+        entries = list?.entries,
         today = today,
     )
+
+    val monthDays: List<EntryDay> = list?.days?.within(period).orEmpty()
+
+    val monthExpense: Long = monthDays.expenseTotal
+
+    val monthIncome: Long = monthDays.incomeTotal
 
     val budgetCarryover: Long = list?.budgetCarryover(
         budgets = budgets,
@@ -41,14 +48,6 @@ data class MonthOverview(
         into = month,
         startingOn = monthStartDay,
     ) ?: 0L
-
-    private val monthDays: List<EntryDay> = list?.days?.filter { it.date in period }.orEmpty()
-
-    val monthExpense: Long
-        get() = monthDays.sumOf { it.expenseTotal }
-
-    val monthIncome: Long
-        get() = monthDays.sumOf { it.incomeTotal }
 
     val todayExpense: Long
         get() = expense(on = today)
@@ -100,10 +99,7 @@ data class MonthOverview(
             item.recurring.type == Entry.Kind.expense && item.status == PeriodRecurring.Status.upcoming
         }
 
-    fun expense(range: ClosedRange<LocalDate>): Long = list?.days
-        ?.filter { it.date in range }
-        ?.sumOf { it.expenseTotal }
-        ?: 0L
+    fun expense(range: ClosedRange<LocalDate>): Long = list?.days?.within(range)?.expenseTotal ?: 0L
 
     fun moved(to: LocalDate): MonthOverview = copy(today = to)
 

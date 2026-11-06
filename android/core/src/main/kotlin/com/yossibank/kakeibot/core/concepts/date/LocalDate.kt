@@ -23,6 +23,9 @@ data class LocalDate private constructor(
     val month: Int
         get() = yearMonth.month
 
+    val monthDayText: String
+        get() = "$month/$day"
+
     val weekday: Weekday
         get() = Weekday.of(daysSinceMonday = dayNumber)
 

@@ -3,14 +3,15 @@ package com.yossibank.kakeibot.store.queries.types
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
+import com.yossibank.kakeibot.core.concepts.recurring.CardBill
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.amount
+import com.yossibank.kakeibot.core.concepts.recurring.title
 
 fun EntryList.title(of: Recurring): String? {
-    val memo = of.memo?.takeIf { it.isNotEmpty() }
     val category = of.categoryId?.let { categories[it] }
 
-    return memo ?: category?.name
+    return of.title(categoryName = category?.name)
 }
 
 fun EntryList.place(of: Recurring): String? {
@@ -32,13 +33,23 @@ fun EntryList.amount(
     of: Recurring,
     on: LocalDate,
 ): Long {
-    val entries = days.flatMap { it.entries }
-
     return of.amount(
         paidOn = on,
         entries = entries,
     )
 }
+
+fun EntryList.upcomingCardBills(
+    recurrings: List<Recurring>,
+    after: LocalDate,
+): List<CardBill> = CardBill.upcoming(
+    recurrings = recurrings,
+    wallets = wallets.values.toList(),
+    entries = entries,
+    valuations = valuations,
+    adjustments = adjustments,
+    after = after,
+)
 
 fun EntryList.icon(of: Recurring): Icon? {
     val category = of.categoryId?.let { categories[it] }

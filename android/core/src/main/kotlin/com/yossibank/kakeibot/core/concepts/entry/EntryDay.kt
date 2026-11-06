@@ -8,13 +8,9 @@ data class EntryDay(
     val date: LocalDate,
     val entries: List<Entry>,
 ) {
-    val expenseTotal: Long
-        get() = total(Entry.Kind.expense)
+    val expenseTotal: Long = total(Entry.Kind.expense, entries)
 
-    val incomeTotal: Long
-        get() = total(Entry.Kind.income)
-
-    private fun total(type: Entry.Kind): Long = entries.filter { it.type == type }.sumOf { it.amount.toLong() }
+    val incomeTotal: Long = total(Entry.Kind.income, entries)
 
     companion object {
         fun grouping(
@@ -39,6 +35,11 @@ data class EntryDay(
                 .sortedByDescending { it.date }
         }
 
+        private fun total(
+            type: Entry.Kind,
+            entries: List<Entry>,
+        ): Long = entries.filter { it.type == type }.sumOf { it.amount.toLong() }
+
         private fun rank(
             entry: Entry,
             categories: Map<Identifier<EntryCategory>, EntryCategory>,
@@ -50,6 +51,14 @@ data class EntryDay(
         }
     }
 }
+
+val Iterable<EntryDay>.expenseTotal: Long
+    get() = sumOf { it.expenseTotal }
+
+val Iterable<EntryDay>.incomeTotal: Long
+    get() = sumOf { it.incomeTotal }
+
+fun List<EntryDay>.within(range: ClosedRange<LocalDate>): List<EntryDay> = filter { it.date in range }
 
 fun List<EntryDay>.filtered(isIncluded: (Entry) -> Boolean): List<EntryDay> = mapNotNull { day ->
     val entries = day.entries.filter(isIncluded)

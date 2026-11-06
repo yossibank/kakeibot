@@ -16,7 +16,7 @@ val Recurring.Companion.billShiftTitles: List<String>
         "2 回先",
     )
 
-fun Recurring.Companion.billText(paidOn: LocalDate): String = "${paidOn.month}/${paidOn.day}払い"
+fun Recurring.Companion.billText(paidOn: LocalDate): String = "${paidOn.monthDayText}払い"
 
 fun Recurring.Companion.clampedBillShift(shift: Int): Int = shift.coerceIn(0, billChoiceCount - 1)
 
@@ -52,7 +52,7 @@ fun Recurring.amount(
         entries = entries,
     ) ?: return scheduledAmount(paidOn = paidOn).toLong()
 
-    val used = billed.sumOf { usage(it) }
+    val used = billed.billedTotal
 
     return maxOf(used, 0L)
 }
@@ -130,6 +130,9 @@ fun List<Recurring>.cardBill(paidBy: Identifier<Wallet>?): Recurring? = firstOrN
         recurring.closingDay != null &&
         recurring.toWalletId == paidBy
 }
+
+val List<Entry>.billedTotal: Long
+    get() = sumOf { usage(it) }
 
 private fun usage(entry: Entry): Long = when (entry.type) {
     Entry.Kind.expense,

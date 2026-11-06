@@ -179,7 +179,7 @@ class AdjustmentWriteTest {
             at = now,
         )
 
-        fun entries(list: EntryList): List<Entry> = list.days.flatMap { it.entries }
+        fun entries(list: EntryList): List<Entry> = list.entries
 
         companion object {
             suspend fun make(): Setup {

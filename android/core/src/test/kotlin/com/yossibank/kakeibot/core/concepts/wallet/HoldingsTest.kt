@@ -17,7 +17,7 @@ class HoldingsTest {
 
         val holdings = Holdings(
             wallets = wallets,
-            entries = emptyList(),
+            entriesByWallet = emptyMap(),
         )
 
         assertEquals(437_700, holdings.available)
@@ -35,7 +35,7 @@ class HoldingsTest {
 
         val holdings = Holdings(
             wallets = wallets,
-            entries = emptyList(),
+            entriesByWallet = emptyMap(),
         )
 
         assertEquals(0, holdings.unpaid)
@@ -51,7 +51,7 @@ class HoldingsTest {
 
         val holdings = Holdings(
             wallets = wallets,
-            entries = emptyList(),
+            entriesByWallet = emptyMap(),
         )
 
         assertEquals(3L * limit, holdings.onHand)
