@@ -49,14 +49,6 @@ extension ReceiptLine {
         var isIncluded = false
     }
 
-    var isHeading: Bool {
-        if case .heading = kind {
-            return true
-        }
-
-        return false
-    }
-
     var isNamed: Bool {
         guard case let .text(text) = kind else {
             return false

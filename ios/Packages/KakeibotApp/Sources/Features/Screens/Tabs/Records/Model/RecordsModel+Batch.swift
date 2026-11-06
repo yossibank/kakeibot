@@ -69,7 +69,7 @@ private extension RecordsModel {
 
 private extension RecordsModel {
     func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
-        let entries = list?.days.flatMap(\.entries) ?? []
+        let entries = list?.entries ?? []
         return entries.filter { ids.contains($0.id) }
     }
 }

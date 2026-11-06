@@ -78,9 +78,7 @@ extension ReviewModel {
         return moveEntries(to: wallet, in: list)
             .sorted { $0.date > $1.date }
             .map { entry in
-                let label = "\(entry.date.month)/\(entry.date.day)"
-
-                return EntryRowItem(entry, in: list, dayLabel: label)
+                EntryRowItem.dated(entry, in: list)
             }
     }
 }
@@ -108,12 +106,7 @@ private extension ReviewModel {
                     return nil
                 }
 
-                let balance = wallet.balance(
-                    with: entries,
-                    valuations: list.valuations,
-                    adjustments: list.adjustments,
-                    through: today
-                )
+                let balance = list.balance(of: wallet, through: today)
 
                 return Move(
                     wallet: wallet,

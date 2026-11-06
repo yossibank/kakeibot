@@ -7,10 +7,13 @@ public struct MonthOverview: Equatable, Sendable {
     public let monthStartDay: MonthStartDay
     public let carryoverFrom: YearMonth?
     public let today: LocalDate
+    public let month: YearMonth
+    public let period: ClosedRange<LocalDate>
     public let periodRecurrings: [PeriodRecurring]
+    public let monthDays: [EntryDay]
+    public let monthExpense: Int
+    public let monthIncome: Int
     public let budgetCarryover: Int
-
-    private let monthDays: [EntryDay]
 
     public init(
         list: EntryList?,
@@ -22,7 +25,7 @@ public struct MonthOverview: Equatable, Sendable {
     ) {
         let month = today.periodMonth(startingOn: monthStartDay)
         let period = month.period(startingOn: monthStartDay)
-        let entries = list?.days.flatMap(\.entries)
+        let entries = list?.entries
 
         self.list = list
         self.budgets = budgets
@@ -30,6 +33,8 @@ public struct MonthOverview: Equatable, Sendable {
         self.monthStartDay = monthStartDay
         self.carryoverFrom = carryoverFrom
         self.today = today
+        self.month = month
+        self.period = period
 
         self.periodRecurrings = Self.periodRecurrings(
             of: recurrings,
@@ -38,7 +43,9 @@ public struct MonthOverview: Equatable, Sendable {
             today: today
         )
 
-        self.monthDays = list?.days.filter { period.contains($0.date) } ?? []
+        self.monthDays = list?.days.within(period) ?? []
+        self.monthExpense = monthDays.expenseTotal
+        self.monthIncome = monthDays.incomeTotal
 
         self.budgetCarryover = list?.budgetCarryover(
             budgets: budgets,
@@ -50,22 +57,6 @@ public struct MonthOverview: Equatable, Sendable {
 }
 
 public extension MonthOverview {
-    var month: YearMonth {
-        today.periodMonth(startingOn: monthStartDay)
-    }
-
-    var period: ClosedRange<LocalDate> {
-        month.period(startingOn: monthStartDay)
-    }
-
-    var monthExpense: Int {
-        monthDays.reduce(0) { $0 + $1.expenseTotal }
-    }
-
-    var monthIncome: Int {
-        monthDays.reduce(0) { $0 + $1.incomeTotal }
-    }
-
     var todayExpense: Int {
         expense(on: today)
     }
@@ -122,7 +113,7 @@ public extension MonthOverview {
     }
 
     func expense(in range: ClosedRange<LocalDate>) -> Int {
-        list?.days.filter { range.contains($0.date) }.reduce(0) { $0 + $1.expenseTotal } ?? 0
+        list?.days.within(range).expenseTotal ?? 0
     }
 
     func moved(to day: LocalDate) -> MonthOverview {
@@ -153,9 +144,7 @@ private extension MonthOverview {
                     .compactMap { occurrence in
                         let date = occurrence.date
 
-                        let entry = recorded.first { entry in
-                            recurring.isRecorded(by: entry, scheduled: occurrence.scheduled)
-                        }
+                        let entry = recurring.record(of: occurrence, in: recorded)
 
                         let amount = entry?.amount
                             ?? entries.map { recurring.amount(paidOn: date, entries: $0) }

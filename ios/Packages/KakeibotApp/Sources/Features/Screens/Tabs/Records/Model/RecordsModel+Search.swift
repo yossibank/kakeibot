@@ -21,8 +21,8 @@ public extension RecordsModel {
 
         return SearchSummary(
             count: days.reduce(0) { $0 + $1.entries.count },
-            expenseTotal: days.reduce(0) { $0 + $1.expenseTotal },
-            incomeTotal: days.reduce(0) { $0 + $1.incomeTotal },
+            expenseTotal: days.expenseTotal,
+            incomeTotal: days.incomeTotal,
             range: first...last
         )
     }

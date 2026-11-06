@@ -1,23 +1,10 @@
 public extension Wallet {
-    static func totalBalance(
-        of wallets: [Wallet],
-        with entries: [Entry],
-        valuations: [Valuation] = [],
-        adjustments: [Adjustment] = [],
-        through date: LocalDate? = nil
+    static func repaid(
+        borrowed: Int,
+        balance: Int
     ) -> Int {
-        let related = entriesByWallet(entries)
-
-        return wallets.reduce(0) { total, wallet in
-            let balance = wallet.balance(
-                with: related[wallet.id] ?? [],
-                valuations: valuations,
-                adjustments: adjustments,
-                through: date
-            )
-
-            return total + balance
-        }
+        let remaining = max(-balance, 0)
+        return min(max(borrowed - remaining, 0), borrowed)
     }
 
     static func entriesByWallet(_ entries: [Entry]) -> [Wallet.ID: [Entry]] {

@@ -3,7 +3,7 @@ public extension Recurring {
     static let billShiftTitles = ["いつもどおり", "次に回す", "2 回先"]
 
     static func billText(paidOn date: LocalDate) -> String {
-        "\(date.month)/\(date.day)払い"
+        "\(date.monthDayText)払い"
     }
 
     static func clampedBillShift(_ shift: Int) -> Int {
@@ -36,7 +36,7 @@ public extension Recurring {
             return scheduledAmount(paidOn: date)
         }
 
-        let used = billed.reduce(0) { $0 + Self.usage(of: $1) }
+        let used = billed.billedTotal
 
         return max(used, 0)
     }
@@ -106,6 +106,12 @@ public extension Recurring {
         }
 
         return dates
+    }
+}
+
+public extension [Entry] {
+    var billedTotal: Int {
+        reduce(0) { $0 + Recurring.usage(of: $1) }
     }
 }
 

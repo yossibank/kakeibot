@@ -64,6 +64,10 @@ public extension LocalDate {
         yearMonth.month
     }
 
+    var monthDayText: String {
+        "\(month)/\(day)"
+    }
+
     var weekday: Weekday {
         Weekday(daysSinceMonday: dayNumber)
     }

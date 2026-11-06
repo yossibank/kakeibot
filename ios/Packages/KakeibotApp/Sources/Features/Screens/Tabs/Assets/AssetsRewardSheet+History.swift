@@ -61,7 +61,7 @@ private extension AssetsRewardSheet {
 
             Spacer(minLength: 8)
 
-            Text("\(log.date.month)/\(log.date.day)")
+            Text(log.date.monthDayText)
                 .textFont(.caption2)
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)

@@ -163,7 +163,7 @@ extension EntryItemSheet {
 
     var dateText: String {
         let date = model.date
-        return "\(date.year)/\(date.month)/\(date.day)（\(date.weekday.shortName)）"
+        return "\(date.year)/\(date.monthDayText)（\(date.weekday.shortName)）"
     }
 
     func restore(_ removed: EntryModel.RemovedItem) {

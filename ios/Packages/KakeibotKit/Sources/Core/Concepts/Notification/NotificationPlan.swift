@@ -94,9 +94,8 @@ public enum NotificationPlan {
             return []
         }
 
-        let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
         let category = recurring.categoryId.flatMap { names[$0] }
-        let name = memo ?? category ?? "固定費"
+        let name = recurring.title(categoryName: category) ?? "固定費"
         let start = today.adding(days: daysBefore)
         let span = recurringDays - 1
         let end = start.adding(days: span)
@@ -131,7 +130,7 @@ public enum NotificationPlan {
         guard let amount else {
             let bill = daysBefore == 0
                 ? "今日は引き落としの日です"
-                : "\(date.month)/\(date.day) に引き落としがあります"
+                : "\(date.monthDayText) に引き落としがあります"
 
             guard let shortage else {
                 return bill
@@ -148,7 +147,7 @@ public enum NotificationPlan {
             return "今日は \(yen) の日です"
         }
 
-        return "\(date.month)/\(date.day) に \(yen) です"
+        return "\(date.monthDayText) に \(yen) です"
     }
 
     private static func grouped(_ amount: Int) -> String {

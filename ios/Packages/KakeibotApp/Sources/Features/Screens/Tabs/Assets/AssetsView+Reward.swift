@@ -153,7 +153,7 @@ private extension AssetsView {
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("\(log.date.month)/\(log.date.day)")
+                Text(log.date.monthDayText)
                     .textFont(.caption2)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)

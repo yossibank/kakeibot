@@ -81,7 +81,7 @@ private extension StampDaysSheet {
         let day = entryDay(date)
 
         return HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Text("\(date.month)/\(date.day)")
+            Text(date.monthDayText)
                 .displayFont(.body)
                 .foregroundStyle(Palette.accentStrong)
 

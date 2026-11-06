@@ -143,6 +143,45 @@ struct RecurringScheduleTests {
         #expect(expense == 78000)
         #expect(income == 78000)
     }
+
+    @Test
+    func totalsRecordedAmountOverScheduled() throws {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+        let start = try #require(LocalDate("2026-01-01"))
+        let from = try #require(LocalDate("2026-10-01"))
+        let through = try #require(LocalDate("2026-10-31"))
+        let payday = try #require(LocalDate("2026-10-27"))
+
+        let rent = Recurring(
+            type: .expense,
+            amount: 78000,
+            categoryId: EntryCategory.ID(),
+            walletId: Wallet.ID(),
+            frequency: .monthly,
+            day: 27,
+            startDate: start,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let recorded = Entry(
+            type: .expense,
+            amount: 80000,
+            date: payday,
+            categoryId: rent.categoryId,
+            walletId: rent.walletId,
+            recurringId: rent.id,
+            recurringDate: payday,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        let total = [rent].total(of: .expense, in: from...through, entries: [recorded])
+        let unrecorded = [rent].total(of: .expense, in: from...through, entries: [])
+
+        #expect(total == 80000)
+        #expect(unrecorded == 78000)
+    }
 }
 
 extension RecurringScheduleTests {

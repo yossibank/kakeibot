@@ -52,6 +52,42 @@ struct RecurringListModelTests {
     }
 
     @Test
+    func totalsMonthFromMonthStartDay() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let options = try await setup.database.entryOptions()
+        let start = try #require(LocalDate("2026-10-01"))
+        let payday = try #require(MonthStartDay(25))
+        try await setup.database.setSetting(.monthStartDay, to: payday)
+
+        let draft = RecurringDraft(
+            type: .expense,
+            amount: 78000,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            memo: "家賃",
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: start
+        )
+
+        try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
+        let model = RecurringListModel(database: setup.database, today: setup.today)
+
+        let task = Task {
+            await model.observe()
+        }
+
+        await ObservationWait.until {
+            !model.rows.isEmpty && model.monthStartDay == payday
+        }
+
+        task.cancel()
+
+        #expect(model.monthTotal == 0)
+    }
+
+    @Test
     func hidesAndShowsRecurring() async throws {
         let setup = try await RecordsModelTests.Setup()
         let options = try await setup.database.entryOptions()

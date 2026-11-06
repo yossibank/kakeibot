@@ -1,6 +1,8 @@
 public struct EntryDay: Hashable, Sendable {
     public let date: LocalDate
     public let entries: [Entry]
+    public let expenseTotal: Int
+    public let incomeTotal: Int
 
     public init(
         date: LocalDate,
@@ -8,18 +10,12 @@ public struct EntryDay: Hashable, Sendable {
     ) {
         self.date = date
         self.entries = entries
+        self.expenseTotal = Self.total(of: .expense, in: entries)
+        self.incomeTotal = Self.total(of: .income, in: entries)
     }
 }
 
 public extension EntryDay {
-    var expenseTotal: Int {
-        total(of: .expense)
-    }
-
-    var incomeTotal: Int {
-        total(of: .income)
-    }
-
     static func grouping(
         _ entries: [Entry],
         categories: [EntryCategory.ID: EntryCategory] = [:]
@@ -36,7 +32,21 @@ public extension EntryDay {
     }
 }
 
+public extension Sequence<EntryDay> {
+    var expenseTotal: Int {
+        reduce(0) { $0 + $1.expenseTotal }
+    }
+
+    var incomeTotal: Int {
+        reduce(0) { $0 + $1.incomeTotal }
+    }
+}
+
 public extension [EntryDay] {
+    func within(_ range: ClosedRange<LocalDate>) -> [EntryDay] {
+        filter { range.contains($0.date) }
+    }
+
     func filtered(by isIncluded: (Entry) -> Bool) -> [EntryDay] {
         compactMap { day in
             let entries = day.entries.filter(isIncluded)
@@ -87,7 +97,12 @@ private extension EntryDay {
         return lhs.id.description < rhs.id.description
     }
 
-    func total(of type: Entry.Kind) -> Int {
-        entries.filter { $0.type == type }.reduce(0) { $0 + $1.amount }
+    static func total(
+        of type: Entry.Kind,
+        in entries: [Entry]
+    ) -> Int {
+        entries
+            .filter { $0.type == type }
+            .reduce(0) { $0 + $1.amount }
     }
 }

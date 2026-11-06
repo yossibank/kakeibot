@@ -235,7 +235,7 @@ private extension EntryWalletSheet {
             return nil
         }
 
-        let day = "\(chosen.date.month)/\(chosen.date.day)"
+        let day = chosen.date.monthDayText
 
         guard chosen.date == choices.first?.date else {
             return "カード会社の確定が遅れた分として、\(day) の引き落としに入れます"
@@ -251,7 +251,7 @@ private extension EntryWalletSheet {
             return "決める"
         }
 
-        return "\(date.month)/\(date.day) 払いで決める"
+        return "\(date.monthDayText) 払いで決める"
     }
 
     var title: String {

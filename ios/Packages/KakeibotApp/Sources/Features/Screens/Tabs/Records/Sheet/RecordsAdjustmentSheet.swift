@@ -56,7 +56,6 @@ struct RecordsAdjustmentSheet: View {
 
 private extension RecordsAdjustmentSheet {
     var detail: String {
-        let date = row.adjustment.date
-        return "\(row.walletName) · \(date.month)/\(date.day)（\(date.weekday.shortName)）"
+        "\(row.walletName) · \(PeriodText.weekdayDate(row.adjustment.date))"
     }
 }

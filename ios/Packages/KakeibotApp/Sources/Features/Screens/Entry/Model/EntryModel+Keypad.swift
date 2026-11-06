@@ -14,18 +14,9 @@ public extension EntryModel {
     }
 
     var feeChoices: [Int] {
-        let generation = historyGeneration
-
-        if let feeChoicesCache,
-           feeChoicesCache.historyGeneration == generation {
-            return feeChoicesCache.choices
+        feeChoicesMemo.value(for: historyGeneration) {
+            recentFeeChoices
         }
-
-        let choices = recentFeeChoices
-
-        feeChoicesCache = FeeChoicesCache(historyGeneration: generation, choices: choices)
-
-        return choices
     }
 
     var expressionText: String? {
@@ -66,11 +57,6 @@ public extension EntryModel {
 }
 
 extension EntryModel {
-    struct FeeChoicesCache {
-        let historyGeneration: Int
-        let choices: [Int]
-    }
-
     var recentFeeChoices: [Int] {
         let used = (history?.days ?? [])
             .lazy

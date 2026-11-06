@@ -69,7 +69,12 @@ public extension BudgetListModel {
 
     var recurringExpense: Int {
         let period = month.period(startingOn: monthStartDay)
-        return recurrings.total(of: .expense, in: period)
+
+        guard let entryList else {
+            return recurrings.total(of: .expense, in: period)
+        }
+
+        return recurrings.total(of: .expense, in: period, entries: entryList.entries)
     }
 
     var periodText: String {
@@ -158,7 +163,7 @@ public extension BudgetListModel {
     ) -> Int {
         let period = month.period(startingOn: monthStartDay)
 
-        return (entryList?.days.filter { period.contains($0.date) } ?? [])
+        return (entryList?.days.within(period) ?? [])
             .flatMap(\.entries)
             .filter { entry in
                 entry.type == .expense

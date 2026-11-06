@@ -142,7 +142,7 @@ public extension CategoryEditModel {
 
         do {
             let list = try await database.categoryList()
-            let entries = try await database.entryList().days.flatMap(\.entries)
+            let entries = try await database.entryList().entries
             let category = list.categories.first { $0.id == editingId }
 
             guard

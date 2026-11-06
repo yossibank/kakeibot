@@ -18,22 +18,6 @@ public struct Holdings: Hashable, Sendable {
 
     public init(
         wallets: [Wallet],
-        entries: [Entry],
-        valuations: [Valuation] = [],
-        adjustments: [Adjustment] = [],
-        through date: LocalDate? = nil
-    ) {
-        self.init(
-            wallets: wallets,
-            entriesByWallet: Wallet.entriesByWallet(entries),
-            valuations: valuations,
-            adjustments: adjustments,
-            through: date
-        )
-    }
-
-    public init(
-        wallets: [Wallet],
         entriesByWallet: [Wallet.ID: [Entry]],
         valuations: [Valuation] = [],
         adjustments: [Adjustment] = [],

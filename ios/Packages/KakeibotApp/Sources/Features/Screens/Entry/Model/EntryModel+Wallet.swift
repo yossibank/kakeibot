@@ -197,8 +197,7 @@ private extension EntryModel {
             return
         }
 
-        let entries = list.days
-            .flatMap(\.entries)
+        let entries = list.entries
             .filter { $0.id != editingId && !isOwnFee($0) }
 
         let related = Wallet.entriesByWallet(entries)

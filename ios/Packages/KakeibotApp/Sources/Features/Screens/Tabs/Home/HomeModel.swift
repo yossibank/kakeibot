@@ -377,16 +377,7 @@ private extension HomeModel {
             today: today
         )
 
-        upcomingBills = list.map { list in
-            CardBill.upcoming(
-                recurrings: recurrings,
-                wallets: Array(list.wallets.values),
-                entries: list.days.flatMap(\.entries),
-                valuations: list.valuations,
-                adjustments: list.adjustments,
-                after: today
-            )
-        } ?? []
+        upcomingBills = list?.upcomingCardBills(recurrings: recurrings, after: today) ?? []
     }
 
     func updateTemplates() {
@@ -399,7 +390,7 @@ private extension HomeModel {
         switch date {
         case today: "今日"
         case today.adding(days: -1): "昨日"
-        default: "\(date.month)/\(date.day)"
+        default: date.monthDayText
         }
     }
 }

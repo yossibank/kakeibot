@@ -12,7 +12,7 @@ struct HoldingsTests {
             Self.wallet(.loan, -1_200_000)
         ]
 
-        let holdings = Holdings(wallets: wallets, entries: [])
+        let holdings = Holdings(wallets: wallets, entriesByWallet: [:])
 
         #expect(holdings.available == 437_700)
         #expect(holdings.unpaid == 52000)
@@ -27,7 +27,7 @@ struct HoldingsTests {
             Self.wallet(.card, 3000)
         ]
 
-        let holdings = Holdings(wallets: wallets, entries: [])
+        let holdings = Holdings(wallets: wallets, entriesByWallet: [:])
 
         #expect(holdings.unpaid == 0)
         #expect(holdings.refund == 3000)

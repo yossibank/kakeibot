@@ -61,7 +61,7 @@ private extension RecordsRewardSheet {
 
             Spacer()
 
-            SheetTitle("\(date.month)/\(date.day) のごほうび")
+            SheetTitle("\(date.monthDayText) のごほうび")
 
             Spacer()
 

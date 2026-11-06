@@ -27,6 +27,7 @@
       }
     },
     {
+      "parallelizable" : false,
       "target" : {
         "containerPath" : "container:Packages\/KakeibotApp",
         "identifier" : "AppFeatureTests",
@@ -48,6 +49,7 @@
       }
     },
     {
+      "parallelizable" : false,
       "target" : {
         "containerPath" : "container:Packages\/KakeibotApp",
         "identifier" : "FeaturesTests",

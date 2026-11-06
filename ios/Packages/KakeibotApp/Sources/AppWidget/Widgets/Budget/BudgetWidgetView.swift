@@ -251,7 +251,7 @@ private extension BudgetWidgetView {
             return spending
         }
 
-        let title = "\(next.title) \(next.date.month)/\(next.date.day)"
+        let title = "\(next.title) \(next.date.monthDayText)"
 
         return spending + [Row(title: title, amount: next.amount)]
     }

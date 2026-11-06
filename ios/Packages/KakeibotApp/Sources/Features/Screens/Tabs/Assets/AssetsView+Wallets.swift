@@ -463,14 +463,14 @@ private extension AssetsView {
     }
 
     func nextBillText(_ bill: CardBill) -> String {
-        let date = "\(bill.date.month)/\(bill.date.day)"
+        let date = bill.date.monthDayText
         let weekday = bill.date.weekday.shortName
         let days = BillText.days(until: bill.date, today: model.today)
         return "\(date)（\(weekday)）引き落とし · \(days)"
     }
 
     func shortBillText(_ bill: CardBill) -> String {
-        let date = "\(bill.date.month)/\(bill.date.day)"
+        let date = bill.date.monthDayText
         let weekday = bill.date.weekday.shortName
         let days = BillText.days(until: bill.date, today: model.today)
         return "\(date)（\(weekday)）· \(days)"

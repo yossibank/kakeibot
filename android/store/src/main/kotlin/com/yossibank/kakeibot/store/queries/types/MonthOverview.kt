@@ -10,8 +10,8 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryDay
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.amount
-import com.yossibank.kakeibot.core.concepts.recurring.isRecorded
 import com.yossibank.kakeibot.core.concepts.recurring.occurrences
+import com.yossibank.kakeibot.core.concepts.recurring.record
 import com.yossibank.kakeibot.core.concepts.recurring.scheduledAmount
 
 data class MonthOverview(
@@ -135,12 +135,10 @@ data class MonthOverview(
                         .mapNotNull { occurrence ->
                             val date = occurrence.date
 
-                            val entry = recorded.firstOrNull { entry ->
-                                recurring.isRecorded(
-                                    by = entry,
-                                    scheduled = occurrence.scheduled,
-                                )
-                            }
+                            val entry = recurring.record(
+                                of = occurrence,
+                                entries = recorded,
+                            )
 
                             val amount = entry?.amount?.toLong()
                                 ?: entries?.let {

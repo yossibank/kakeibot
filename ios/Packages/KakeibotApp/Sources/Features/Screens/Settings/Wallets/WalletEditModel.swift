@@ -261,7 +261,7 @@ extension WalletEditModel {
         of wallet: Wallet,
         in list: EntryList
     ) -> Bool {
-        list.days.flatMap(\.entries).contains { entry in
+        list.entries.contains { entry in
             entry.walletId == wallet.id || entry.toWalletId == wallet.id
         }
     }
@@ -329,20 +329,8 @@ private extension WalletEditModel {
         _ list: EntryList,
         to wallet: Wallet
     ) {
-        let entries = list.days.flatMap(\.entries)
-
-        balance = wallet.balance(
-            with: entries,
-            valuations: list.valuations,
-            adjustments: list.adjustments,
-            through: Self.today
-        )
-
-        totalBalance = wallet.balance(
-            with: entries,
-            valuations: list.valuations,
-            adjustments: list.adjustments
-        )
+        balance = list.balance(of: wallet, through: Self.today)
+        totalBalance = list.balance(of: wallet)
 
         valuations = list.valuations
             .filter { $0.walletId == wallet.id }

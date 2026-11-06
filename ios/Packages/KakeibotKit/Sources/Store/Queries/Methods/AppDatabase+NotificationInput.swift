@@ -46,18 +46,8 @@ private extension NotificationPart {
     }
 
     func shortages(in list: EntryList) -> [NotificationPlan.Shortage] {
-        let wallets = Array(list.wallets.values)
         let yesterday = start.adding(days: -1)
-        let entries = list.days.flatMap(\.entries)
-
-        let bills = CardBill.upcoming(
-            recurrings: recurrings,
-            wallets: wallets,
-            entries: entries,
-            valuations: list.valuations,
-            adjustments: list.adjustments,
-            after: yesterday
-        )
+        let bills = list.upcomingCardBills(recurrings: recurrings, after: yesterday)
 
         return bills.filter { $0.shortage > 0 }.map { bill in
             let source = list.wallets[bill.recurring.walletId]
