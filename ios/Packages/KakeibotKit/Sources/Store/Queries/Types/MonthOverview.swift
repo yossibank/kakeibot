@@ -8,6 +8,7 @@ public struct MonthOverview: Equatable, Sendable {
     public let carryoverFrom: YearMonth?
     public let today: LocalDate
     public let periodRecurrings: [PeriodRecurring]
+    public let budgetCarryover: Int
 
     private let monthDays: [EntryDay]
 
@@ -38,6 +39,13 @@ public struct MonthOverview: Equatable, Sendable {
         )
 
         self.monthDays = list?.days.filter { period.contains($0.date) } ?? []
+
+        self.budgetCarryover = list?.budgetCarryover(
+            budgets: budgets,
+            from: carryoverFrom,
+            into: month,
+            startingOn: monthStartDay
+        ) ?? 0
     }
 }
 
@@ -91,15 +99,6 @@ public extension MonthOverview {
         let ratio = Double(paidRecurringExpense) / Double(recurringExpense)
 
         return min(ratio, 1)
-    }
-
-    var budgetCarryover: Int {
-        list?.budgetCarryover(
-            budgets: budgets,
-            from: carryoverFrom,
-            into: month,
-            startingOn: monthStartDay
-        ) ?? 0
     }
 
     var budgetUsage: BudgetUsage? {
