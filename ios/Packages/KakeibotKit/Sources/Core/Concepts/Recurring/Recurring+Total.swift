@@ -7,14 +7,6 @@ public extension Recurring {
             isRecorded(by: entry, scheduled: occurrence.scheduled)
         }
     }
-
-    func amount(
-        of occurrence: Occurrence,
-        entries: [Entry]
-    ) -> Int {
-        record(of: occurrence, in: entries)?.amount
-            ?? amount(paidOn: occurrence.date, entries: entries)
-    }
 }
 
 public extension [Recurring] {
@@ -34,14 +26,17 @@ public extension [Recurring] {
         in range: ClosedRange<LocalDate>,
         entries: [Entry]
     ) -> Int {
-        filter { $0.type == type }.reduce(0) { sum, recurring in
+        let recorded = entries.filter { $0.recurringId != nil }
+
+        return filter { $0.type == type }.reduce(0) { sum, recurring in
             let occurrences = recurring.occurrences(
                 from: range.lowerBound,
                 through: range.upperBound
             )
 
             let amounts = occurrences.map { occurrence in
-                recurring.amount(of: occurrence, entries: entries)
+                recurring.record(of: occurrence, in: recorded)?.amount
+                    ?? recurring.amount(paidOn: occurrence.date, entries: entries)
             }
 
             return sum + amounts.reduce(0, +)
