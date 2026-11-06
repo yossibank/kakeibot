@@ -36,7 +36,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
 | 画面の部品を PNG に描く（下の注） | `make snapshot SNAPSHOT=widget` |
 | Android のビルド（デバッグの APK） | `make android-build` |
-| Android の Core のテスト | `make android-test` |
+| Android の Core と Store のテスト | `make android-test` |
 | Swift と JSON の整形 | `make format` |
 | ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
 
