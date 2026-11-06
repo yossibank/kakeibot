@@ -37,8 +37,12 @@ struct WalletBalanceTests {
             updatedAt: Date()
         )
 
-        let total = Wallet.totalBalance(of: [cash, card], with: [entry])
-        #expect(total == 200)
+        let holdings = Holdings(
+            wallets: [cash, card],
+            entriesByWallet: Wallet.entriesByWallet([entry])
+        )
+
+        #expect(holdings.onHand == 200)
     }
 
     @Test

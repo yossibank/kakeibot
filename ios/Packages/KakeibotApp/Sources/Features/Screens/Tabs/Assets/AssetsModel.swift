@@ -54,10 +54,10 @@ public final class AssetsModel: ScreenModel {
         self.today = today
 
         self.holdings = Holdings(
-            wallets: [],
-            entries: [],
-            valuations: [],
-            through: today
+            onHand: 0,
+            cards: 0,
+            investments: 0,
+            loans: 0
         )
 
         update()

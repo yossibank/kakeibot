@@ -1,25 +1,4 @@
 public extension Wallet {
-    static func totalBalance(
-        of wallets: [Wallet],
-        with entries: [Entry],
-        valuations: [Valuation] = [],
-        adjustments: [Adjustment] = [],
-        through date: LocalDate? = nil
-    ) -> Int {
-        let related = entriesByWallet(entries)
-
-        return wallets.reduce(0) { total, wallet in
-            let balance = wallet.balance(
-                with: related[wallet.id] ?? [],
-                valuations: valuations,
-                adjustments: adjustments,
-                through: date
-            )
-
-            return total + balance
-        }
-    }
-
     static func entriesByWallet(_ entries: [Entry]) -> [Wallet.ID: [Entry]] {
         var related: [Wallet.ID: [Entry]] = [:]
 
