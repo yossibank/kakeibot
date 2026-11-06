@@ -75,8 +75,8 @@ public final class EntryModel {
     private(set) var editingId: Entry.ID?
     private(set) var historyGeneration = 0
 
-    @ObservationIgnored var monthCache: MonthCache?
-    @ObservationIgnored var feeChoicesCache: FeeChoicesCache?
+    @ObservationIgnored var monthMemo = Memo<MonthSummary.Key, MonthSummary>()
+    @ObservationIgnored var feeChoicesMemo = Memo<Int, [Int]>()
 
     let database: AppDatabase
 

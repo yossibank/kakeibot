@@ -54,7 +54,7 @@ public extension EntryModel {
             return nil
         }
 
-        return currentMonthCache.budgetUsage
+        return currentMonth.budgetUsage
     }
 
     var budgetUsageAfterSave: BudgetUsage? {
@@ -118,7 +118,7 @@ public extension EntryModel {
     }
 
     var monthOverview: MonthOverview {
-        currentMonthCache.overview
+        currentMonth.overview
     }
 
     static func dateText(
@@ -197,7 +197,7 @@ public extension EntryModel {
 }
 
 extension EntryModel {
-    struct MonthCache {
+    struct MonthSummary {
         struct Key: Equatable {
             let historyGeneration: Int
             let budgets: [Budget]
@@ -206,14 +206,13 @@ extension EntryModel {
             let today: LocalDate
         }
 
-        let key: Key
         let overview: MonthOverview
         let budgetUsage: BudgetUsage?
         let entries: [Entry]
     }
 
-    var currentMonthCache: MonthCache {
-        let key = MonthCache.Key(
+    var currentMonth: MonthSummary {
+        let key = MonthSummary.Key(
             historyGeneration: historyGeneration,
             budgets: budgets,
             monthStartDay: monthStartDay,
@@ -221,33 +220,9 @@ extension EntryModel {
             today: Self.today
         )
 
-        if let monthCache,
-           monthCache.key == key {
-            return monthCache
+        return monthMemo.value(for: key) {
+            makeMonthSummary()
         }
-
-        let overview = MonthOverview(
-            list: history,
-            budgets: budgets,
-            recurrings: [],
-            monthStartDay: monthStartDay,
-            carryoverFrom: carryoverFrom,
-            today: Self.today
-        )
-        let period = overview.period
-        let entries = (history?.days ?? [])
-            .filter { period.contains($0.date) }
-            .flatMap(\.entries)
-        let cache = MonthCache(
-            key: key,
-            overview: overview,
-            budgetUsage: overview.budgetUsage,
-            entries: entries
-        )
-
-        monthCache = cache
-
-        return cache
     }
 }
 
@@ -286,10 +261,26 @@ private extension EntryModel {
 
     func monthTotals(matching isIncluded: (Entry) -> Bool) -> (current: Int, after: Int) {
         let period = monthOverview.period
-        let entries = currentMonthCache.entries.filter(isIncluded)
+        let entries = currentMonth.entries.filter(isIncluded)
         let current = entries.reduce(0) { $0 + $1.amount }
         let previous = entries.first { $0.id == original?.id }?.amount ?? 0
         let added = period.contains(date) ? amount : 0
         return (current, current - previous + added)
+    }
+
+    func makeMonthSummary() -> MonthSummary {
+        let overview = MonthOverview(
+            list: history,
+            budgets: budgets,
+            recurrings: [],
+            monthStartDay: monthStartDay,
+            carryoverFrom: carryoverFrom,
+            today: Self.today
+        )
+        return MonthSummary(
+            overview: overview,
+            budgetUsage: overview.budgetUsage,
+            entries: overview.monthDays.flatMap(\.entries)
+        )
     }
 }

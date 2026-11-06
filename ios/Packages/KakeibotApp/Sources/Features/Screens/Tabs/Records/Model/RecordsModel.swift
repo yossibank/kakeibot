@@ -53,7 +53,7 @@ public final class RecordsModel: ScreenModel {
 
     private var listGeneration = 0
 
-    @ObservationIgnored private var monthDays: MonthDays?
+    @ObservationIgnored private var monthDaysMemo = Memo<MonthDays.Key, MonthDays>()
     @ObservationIgnored private var searchIndex: EntrySearchIndex?
 
     public init(
@@ -92,11 +92,11 @@ public extension RecordsModel {
     }
 
     var expenseTotal: Int {
-        days.reduce(0) { $0 + $1.expenseTotal }
+        currentMonthDays.expenseTotal
     }
 
     var incomeTotal: Int {
-        days.reduce(0) { $0 + $1.incomeTotal }
+        currentMonthDays.incomeTotal
     }
 
     var filterTitle: String? {
@@ -291,9 +291,10 @@ private extension RecordsModel {
             let isSearching: Bool
         }
 
-        let key: Key
         let days: [EntryDay]
         let byDate: [LocalDate: EntryDay]
+        let expenseTotal: Int
+        let incomeTotal: Int
     }
 
     static let confirmDeleteThreshold = 10
@@ -309,13 +310,12 @@ private extension RecordsModel {
     }
 
     var currentMonthDays: MonthDays {
-        let key = monthDaysKey
-
-        if let monthDays,
-           monthDays.key == key {
-            return monthDays
+        monthDaysMemo.value(for: monthDaysKey) {
+            makeMonthDays()
         }
+    }
 
+    func makeMonthDays() -> MonthDays {
         let days = makeDays()
         let byDate = Dictionary(
             days.map { ($0.date, $0) },
@@ -323,15 +323,17 @@ private extension RecordsModel {
                 first
             }
         )
-        let computed = MonthDays(key: key, days: days, byDate: byDate)
 
-        monthDays = computed
-
-        return computed
+        return MonthDays(
+            days: days,
+            byDate: byDate,
+            expenseTotal: days.expenseTotal,
+            incomeTotal: days.incomeTotal
+        )
     }
 
     func makeDays() -> [EntryDay] {
-        let days = list?.days.filter { period.contains($0.date) } ?? []
+        let days = list?.days.within(period) ?? []
         let filtered = filter.apply(to: days)
         let adjusted = adjustedDays(besides: filtered)
 
