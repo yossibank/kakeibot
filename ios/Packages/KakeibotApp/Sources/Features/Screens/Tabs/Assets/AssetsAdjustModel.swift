@@ -49,11 +49,15 @@ public extension AssetsAdjustModel {
     }
 
     var differenceText: String {
-        guard canSave else {
-            return "記録の残高と同じです"
-        }
+        canSave ? AmountText.text(difference, type: .income) : "なし"
+    }
 
-        return "差の \(AmountText.text(difference)) を「残高の調整」として今日の記録に入れます"
+    var differenceNote: String {
+        canSave ? "差は今日の記録に入ります" : "記録の残高と同じです"
+    }
+
+    var saveTitle: String {
+        canSave ? "\(differenceText) で合わせる" : "合わせる"
     }
 
     func press(_ key: AmountCalculator.Key) {

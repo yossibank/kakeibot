@@ -87,6 +87,8 @@ struct AssetsAdjustModelTests {
         let row = try #require(model.rows.first)
         let adjust = model.adjustModel(for: row)
 
-        #expect(adjust.differenceText == "差の ¥37,580 を「残高の調整」として今日の記録に入れます")
+        #expect(adjust.differenceText == "+¥37,580")
+        #expect(adjust.differenceNote == "差は今日の記録に入ります")
+        #expect(adjust.saveTitle == "+¥37,580 で合わせる")
     }
 }
