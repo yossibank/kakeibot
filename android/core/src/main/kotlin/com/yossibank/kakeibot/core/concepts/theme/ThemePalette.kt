@@ -100,7 +100,7 @@ data class ThemePalette(
             accentStrong = 0xF4E6C1,
             text = 0xEDE6D6,
             subtext = 0x8C97AE,
-            hint = 0x7E89A0,
+            hint = 0x7F8AA1,
         )
     }
 }
