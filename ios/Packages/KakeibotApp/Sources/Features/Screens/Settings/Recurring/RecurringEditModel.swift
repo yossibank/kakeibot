@@ -503,19 +503,11 @@ private extension RecurringEditModel {
 
     func loadLoanBalances() async throws {
         let list = try await database.latestEntryList()
-        let entries = list.days.flatMap(\.entries)
 
         let pairs = wallets
             .filter { $0.kind == .loan }
             .map { wallet in
-                let balance = wallet.balance(
-                    with: entries,
-                    valuations: list.valuations,
-                    adjustments: list.adjustments,
-                    through: today
-                )
-
-                return (wallet.id, balance)
+                (wallet.id, list.balance(of: wallet, through: today))
             }
 
         loanBalances = Dictionary(uniqueKeysWithValues: pairs)

@@ -162,7 +162,7 @@ public extension EntryModel {
     }
 
     func fee(of transfer: Entry) -> Int {
-        let entries = history?.days.flatMap(\.entries) ?? []
+        let entries = history?.entries ?? []
         return entries.first { $0.transferId == transfer.id }?.amount ?? 0
     }
 

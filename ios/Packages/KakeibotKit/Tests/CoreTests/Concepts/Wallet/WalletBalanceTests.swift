@@ -77,6 +77,13 @@ struct WalletBalanceTests {
         #expect(grouped[cash]?.map(\.id) == [expense.id, transfer.id])
         #expect(grouped[bank]?.map(\.id) == [transfer.id])
     }
+
+    @Test
+    func keepsRepaidWithinBorrowed() {
+        #expect(Wallet.repaid(borrowed: 300_000, balance: -100_000) == 200_000)
+        #expect(Wallet.repaid(borrowed: 300_000, balance: -500_000) == 0)
+        #expect(Wallet.repaid(borrowed: 300_000, balance: 50000) == 300_000)
+    }
 }
 
 extension WalletBalanceTests {

@@ -2,9 +2,8 @@ import Core
 
 public extension EntryList {
     func title(of recurring: Recurring) -> String? {
-        let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
         let category = recurring.categoryId.flatMap { categories[$0] }
-        return memo ?? category?.name
+        return recurring.title(categoryName: category?.name)
     }
 
     func place(of recurring: Recurring) -> String? {
@@ -23,8 +22,21 @@ public extension EntryList {
         of recurring: Recurring,
         on date: LocalDate
     ) -> Int {
-        let entries = days.flatMap(\.entries)
-        return recurring.amount(paidOn: date, entries: entries)
+        recurring.amount(paidOn: date, entries: entries)
+    }
+
+    func upcomingCardBills(
+        recurrings: [Recurring],
+        after date: LocalDate
+    ) -> [CardBill] {
+        CardBill.upcoming(
+            recurrings: recurrings,
+            wallets: Array(wallets.values),
+            entries: entries,
+            valuations: valuations,
+            adjustments: adjustments,
+            after: date
+        )
     }
 
     func icon(of recurring: Recurring) -> Icon? {

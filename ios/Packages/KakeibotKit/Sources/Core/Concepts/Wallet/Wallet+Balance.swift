@@ -1,4 +1,12 @@
 public extension Wallet {
+    static func repaid(
+        borrowed: Int,
+        balance: Int
+    ) -> Int {
+        let remaining = max(-balance, 0)
+        return min(max(borrowed - remaining, 0), borrowed)
+    }
+
     static func entriesByWallet(_ entries: [Entry]) -> [Wallet.ID: [Entry]] {
         var related: [Wallet.ID: [Entry]] = [:]
 

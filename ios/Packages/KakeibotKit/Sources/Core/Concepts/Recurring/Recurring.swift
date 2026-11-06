@@ -86,6 +86,13 @@ public extension Recurring {
     }
 }
 
+public extension Recurring {
+    func title(categoryName: String?) -> String? {
+        let note = memo.flatMap { $0.isEmpty ? nil : $0 }
+        return note ?? categoryName
+    }
+}
+
 extension Recurring: Codable {
     enum CodingKeys: String, CodingKey {
         case id

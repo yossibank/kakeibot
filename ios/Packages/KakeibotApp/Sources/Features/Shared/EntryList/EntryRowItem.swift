@@ -44,6 +44,13 @@ extension EntryRowItem {
             taxIncluded: entry.taxIncluded
         )
     }
+
+    static func dated(
+        _ entry: Entry,
+        in list: EntryList
+    ) -> EntryRowItem {
+        EntryRowItem(entry, in: list, dayLabel: entry.date.monthDayText)
+    }
 }
 
 private extension EntryRowItem {

@@ -98,7 +98,7 @@ public extension EntryNoticeModel {
         _ id: Entry.ID,
         in list: EntryList?
     ) async {
-        let entries = list?.days.flatMap(\.entries) ?? []
+        let entries = list?.entries ?? []
 
         guard
             let list,

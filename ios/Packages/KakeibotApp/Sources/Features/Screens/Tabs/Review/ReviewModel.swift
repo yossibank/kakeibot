@@ -26,7 +26,7 @@ public final class ReviewModel: ScreenModel {
 
     public private(set) var list: EntryList? {
         didSet {
-            entries = list?.days.flatMap(\.entries) ?? []
+            entries = list?.entries ?? []
             summaries = [:]
             moveCache = [:]
         }
@@ -161,9 +161,7 @@ public extension ReviewModel {
             }
             .sorted { $0.date > $1.date }
             .map { entry in
-                let label = entry.date.monthDayText
-
-                return EntryRowItem(entry, in: list, dayLabel: label)
+                EntryRowItem.dated(entry, in: list)
             }
     }
 

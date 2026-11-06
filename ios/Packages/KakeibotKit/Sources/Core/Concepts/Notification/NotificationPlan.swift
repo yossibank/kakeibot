@@ -94,9 +94,8 @@ public enum NotificationPlan {
             return []
         }
 
-        let memo = recurring.memo.flatMap { $0.isEmpty ? nil : $0 }
         let category = recurring.categoryId.flatMap { names[$0] }
-        let name = memo ?? category ?? "固定費"
+        let name = recurring.title(categoryName: category) ?? "固定費"
         let start = today.adding(days: daysBefore)
         let span = recurringDays - 1
         let end = start.adding(days: span)

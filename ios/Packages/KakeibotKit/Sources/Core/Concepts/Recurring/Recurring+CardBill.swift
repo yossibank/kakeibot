@@ -36,7 +36,7 @@ public extension Recurring {
             return scheduledAmount(paidOn: date)
         }
 
-        let used = billed.reduce(0) { $0 + Self.usage(of: $1) }
+        let used = billed.billedTotal
 
         return max(used, 0)
     }
@@ -106,6 +106,12 @@ public extension Recurring {
         }
 
         return dates
+    }
+}
+
+public extension [Entry] {
+    var billedTotal: Int {
+        reduce(0) { $0 + Recurring.usage(of: $1) }
     }
 }
 

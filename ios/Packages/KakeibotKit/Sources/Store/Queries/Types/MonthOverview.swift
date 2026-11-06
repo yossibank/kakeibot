@@ -7,6 +7,8 @@ public struct MonthOverview: Equatable, Sendable {
     public let monthStartDay: MonthStartDay
     public let carryoverFrom: YearMonth?
     public let today: LocalDate
+    public let month: YearMonth
+    public let period: ClosedRange<LocalDate>
     public let periodRecurrings: [PeriodRecurring]
     public let monthDays: [EntryDay]
     public let monthExpense: Int
@@ -23,7 +25,7 @@ public struct MonthOverview: Equatable, Sendable {
     ) {
         let month = today.periodMonth(startingOn: monthStartDay)
         let period = month.period(startingOn: monthStartDay)
-        let entries = list?.days.flatMap(\.entries)
+        let entries = list?.entries
 
         self.list = list
         self.budgets = budgets
@@ -31,6 +33,8 @@ public struct MonthOverview: Equatable, Sendable {
         self.monthStartDay = monthStartDay
         self.carryoverFrom = carryoverFrom
         self.today = today
+        self.month = month
+        self.period = period
 
         self.periodRecurrings = Self.periodRecurrings(
             of: recurrings,
@@ -53,14 +57,6 @@ public struct MonthOverview: Equatable, Sendable {
 }
 
 public extension MonthOverview {
-    var month: YearMonth {
-        today.periodMonth(startingOn: monthStartDay)
-    }
-
-    var period: ClosedRange<LocalDate> {
-        month.period(startingOn: monthStartDay)
-    }
-
     var todayExpense: Int {
         expense(on: today)
     }

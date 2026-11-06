@@ -60,8 +60,10 @@ public extension WalletEditModel {
             return nil
         }
 
-        let remaining = max(-(isEditing ? balance : initialBalance), 0)
-        let repaid = min(max(borrowed - remaining, 0), borrowed)
+        let repaid = Wallet.repaid(
+            borrowed: borrowed,
+            balance: isEditing ? balance : initialBalance
+        )
         let percent = Percent.floor(repaid, of: borrowed)
 
         return "\(AmountText.text(repaid)) 返済済み（\(percent)%）"

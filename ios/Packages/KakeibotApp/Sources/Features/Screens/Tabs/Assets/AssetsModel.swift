@@ -152,26 +152,18 @@ private extension AssetsModel {
         list?.adjustments ?? []
     }
 
-    static func row(
-        of entry: Entry,
-        in list: EntryList
-    ) -> EntryRowItem {
-        let day = entry.date.monthDayText
-        return EntryRowItem(entry, in: list, dayLabel: day)
-    }
-
     static func rows(
         of entries: [Entry],
         in list: EntryList
     ) -> [EntryRowItem] {
         entries
             .sorted { $0.date < $1.date }
-            .map { row(of: $0, in: list) }
+            .map { EntryRowItem.dated($0, in: list) }
     }
 
     func update() {
-        entries = list?.days.flatMap(\.entries) ?? []
-        entriesByWallet = Wallet.entriesByWallet(entries)
+        entries = list?.entries ?? []
+        entriesByWallet = list?.entriesByWallet ?? [:]
         holdings = makeHoldings()
         changeFromLastMonth = makeChangeFromLastMonth()
         upcomingBills = makeUpcomingBills()
@@ -209,16 +201,7 @@ private extension AssetsModel {
             return []
         }
 
-        let allWallets = Array(list.wallets.values)
-
-        let bills = CardBill.upcoming(
-            recurrings: recurrings,
-            wallets: allWallets,
-            entries: entries,
-            valuations: valuations,
-            adjustments: adjustments,
-            after: today
-        )
+        let bills = list.upcomingCardBills(recurrings: recurrings, after: today)
 
         return bills.map { bill in
             let card = bill.recurring.toWalletId
@@ -230,14 +213,14 @@ private extension AssetsModel {
 
             let movedIn = moved
                 .filter { $0.billMonth == month }
-                .map { Self.row(of: $0, in: list) }
+                .map { EntryRowItem.dated($0, in: list) }
 
             let movedOut = moved
                 .filter { entry in
                     entry.billMonth != month
                         && bill.period?.contains(entry.date) == true
                 }
-                .map { Self.row(of: $0, in: list) }
+                .map { EntryRowItem.dated($0, in: list) }
 
             return UpcomingBill(
                 bill: bill,
@@ -293,9 +276,7 @@ private extension AssetsModel {
                 entry.billMonth.map { $0 > month } ?? (entry.date > period.upperBound)
             }
 
-        let total = (billed + later).reduce(0) { sum, entry in
-            entry.type == .income ? sum - entry.amount : sum + entry.amount
-        }
+        let total = (billed + later).billedTotal
 
         let unpaid = Unpaid(
             total: total,
@@ -349,11 +330,9 @@ private extension AssetsModel {
             return nil
         }
 
-        let repaid = loanAmount - max(-balance, 0)
-        let ratio = Double(repaid) / Double(loanAmount)
-        let lower = max(ratio, 0)
+        let repaid = Wallet.repaid(borrowed: loanAmount, balance: balance)
 
-        return min(lower, 1)
+        return Double(repaid) / Double(loanAmount)
     }
 
     func repayment(of wallet: Wallet) -> Repayment? {
