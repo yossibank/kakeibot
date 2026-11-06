@@ -79,6 +79,24 @@ class ThemePaletteContrastTest {
         }
 
         @Test
+        fun keepsPresetHintsReadableAsBody() {
+            val surfaces = listOf(
+                ThemePalette.Role.backgroundTop,
+                ThemePalette.Role.backgroundBottom,
+                ThemePalette.Role.panel,
+                ThemePalette.Role.cardTop,
+                ThemePalette.Role.cardBottom,
+            )
+
+            for (preset in ThemePreset.entries) {
+                val palette = preset.palette
+                val lowest = surfaces.minOf { ThemePalette.contrast(palette.hint, palette[it]) }
+
+                assertTrue(lowest >= 4.5, preset.rawValue)
+            }
+        }
+
+        @Test
         fun tellsLightBackground() {
             val light = ThemePreset.entries.filter { it.palette.isLight }
 

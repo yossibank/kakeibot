@@ -234,6 +234,7 @@ class NotificationPlanTest {
             assertEquals(entry, PlannedNotification.Route.of(link = entry.link))
             assertEquals(recurring, PlannedNotification.Route.of(link = recurring.link))
             assertEquals(template, PlannedNotification.Route.of(link = template.link))
+            assertEquals(PlannedNotification.Route.NewTemplate, PlannedNotification.Route.of(link = "new-template"))
             assertNull(PlannedNotification.Route.of(link = "template/x"))
             assertNull(PlannedNotification.Route.of(link = "entry/2026-13-01"))
             assertNull(PlannedNotification.Route.of(link = "budget/1"))
@@ -247,12 +248,15 @@ class NotificationPlanTest {
             val entry = PlannedNotification.Route.Entry(date)
             val homeURL = assertNotNull(home.url)
             val entryURL = assertNotNull(entry.url)
+            val newTemplateURL = assertNotNull(PlannedNotification.Route.NewTemplate.url)
             val other = URI("https://example.com/home")
 
             assertEquals("kakeibot://home", homeURL.toString())
             assertEquals("kakeibot://entry/2026-10-18", entryURL.toString())
             assertEquals(home, PlannedNotification.Route.of(url = homeURL))
             assertEquals(entry, PlannedNotification.Route.of(url = entryURL))
+            assertEquals("kakeibot://new-template", newTemplateURL.toString())
+            assertEquals(PlannedNotification.Route.NewTemplate, PlannedNotification.Route.of(url = newTemplateURL))
             assertNull(PlannedNotification.Route.of(url = other))
         }
     }
