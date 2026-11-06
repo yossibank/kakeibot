@@ -44,7 +44,7 @@ public struct ReviewView: View {
                 periodBar
 
                 content
-                    .pageSlide(slide)
+                    .pageSlide(slide, page: model.period)
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)

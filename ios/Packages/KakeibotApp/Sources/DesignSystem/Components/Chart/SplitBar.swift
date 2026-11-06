@@ -34,11 +34,7 @@ public struct SplitBar: View {
             }
         }
         .frame(height: height)
-        .transaction(value: ratio) { transaction in
-            if !transaction.disablesAnimations {
-                transaction.animation = .snappy
-            }
-        }
+        .animation(.snappy, value: ratio)
     }
 }
 
