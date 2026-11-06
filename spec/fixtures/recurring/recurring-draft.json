@@ -1,25 +1,320 @@
 {
   "description": "固定費の入力の判定で出る問題を試す。category と wallet は、入っているかを真偽で書く。toWallet は other か same にし、無ければ空にする。closingDay は、無ければ空にする。",
   "cases": [
-    { "summary": "毎月の支出の正しい入力", "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 3, "problems": [] },
-    { "summary": "終了日のある収入", "type": "income", "amount": 280000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 25, "startDate": "2026-01-01", "endDate": "2026-12-31", "remindDaysBefore": null, "problems": [] },
-    { "summary": "毎年の支出", "type": "expense", "amount": 12000, "category": true, "wallet": true, "frequency": "yearly", "month": 4, "day": 1, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 7, "problems": [] },
-    { "summary": "振替の正しい入力", "type": "transfer", "amount": 45000, "category": false, "wallet": true, "toWallet": "other", "frequency": "monthly", "month": 1, "day": 26, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": [] },
-    { "summary": "振替にカテゴリが付いている", "type": "transfer", "amount": 45000, "category": true, "wallet": true, "toWallet": "other", "frequency": "monthly", "month": 1, "day": 26, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["categoryOnTransfer"] },
-    { "summary": "振替の移動先が無い", "type": "transfer", "amount": 45000, "category": false, "wallet": true, "toWallet": null, "frequency": "monthly", "month": 1, "day": 26, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["missingDestination"] },
-    { "summary": "振替の移動先が同じ財布", "type": "transfer", "amount": 45000, "category": false, "wallet": true, "toWallet": "same", "frequency": "monthly", "month": 1, "day": 26, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["sameWallet"] },
-    { "summary": "支出の移動先は見ない", "type": "expense", "amount": 78000, "category": true, "wallet": true, "toWallet": "other", "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": [] },
-    { "summary": "金額が 0 円", "type": "expense", "amount": 0, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["amountNotPositive"] },
-    { "summary": "カテゴリと財布が無い", "type": "expense", "amount": 78000, "category": false, "wallet": false, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["missingCategory", "missingWallet"] },
-    { "summary": "日が 32 日で範囲外", "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 32, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["dayOutOfRange"] },
-    { "summary": "日が 0 日で範囲外", "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 0, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["dayOutOfRange"] },
-    { "summary": "毎年で月が 13", "type": "expense", "amount": 12000, "category": true, "wallet": true, "frequency": "yearly", "month": 13, "day": 1, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["monthOutOfRange"] },
-    { "summary": "毎月なら月は見ない", "type": "expense", "amount": 12000, "category": true, "wallet": true, "frequency": "monthly", "month": 13, "day": 1, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": [] },
-    { "summary": "終了日が開始日より前", "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-05-01", "endDate": "2026-04-30", "remindDaysBefore": null, "problems": ["endBeforeStart"] },
-    { "summary": "終了日が開始日と同じ", "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": "2026-01-01", "remindDaysBefore": 0, "problems": [] },
-    { "summary": "前もっての知らせが 31 日", "type": "expense", "amount": 78000, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": 31, "problems": ["remindOutOfRange"] },
-    { "summary": "締め日付きの振替は 0 円で通る", "type": "transfer", "amount": 0, "category": false, "wallet": true, "toWallet": "other", "frequency": "monthly", "month": 1, "day": 27, "closingDay": 15, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": [] },
-    { "summary": "締め日が 32 日で範囲外", "type": "transfer", "amount": 0, "category": false, "wallet": true, "toWallet": "other", "frequency": "monthly", "month": 1, "day": 27, "closingDay": 32, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["closingDayOutOfRange"] },
-    { "summary": "締め日付きの支出は 0 円を許さない", "type": "expense", "amount": 0, "category": true, "wallet": true, "frequency": "monthly", "month": 1, "day": 27, "closingDay": 15, "startDate": "2026-01-01", "endDate": null, "remindDaysBefore": null, "problems": ["amountNotPositive"] }
+    {
+      "summary": "毎月の支出の正しい入力",
+      "type": "expense",
+      "amount": 78000,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": 3,
+      "problems": []
+    },
+    {
+      "summary": "終了日のある収入",
+      "type": "income",
+      "amount": 280000,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 25,
+      "startDate": "2026-01-01",
+      "endDate": "2026-12-31",
+      "remindDaysBefore": null,
+      "problems": []
+    },
+    {
+      "summary": "毎年の支出",
+      "type": "expense",
+      "amount": 12000,
+      "category": true,
+      "wallet": true,
+      "frequency": "yearly",
+      "month": 4,
+      "day": 1,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": 7,
+      "problems": []
+    },
+    {
+      "summary": "振替の正しい入力",
+      "type": "transfer",
+      "amount": 45000,
+      "category": false,
+      "wallet": true,
+      "toWallet": "other",
+      "frequency": "monthly",
+      "month": 1,
+      "day": 26,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": []
+    },
+    {
+      "summary": "振替にカテゴリが付いている",
+      "type": "transfer",
+      "amount": 45000,
+      "category": true,
+      "wallet": true,
+      "toWallet": "other",
+      "frequency": "monthly",
+      "month": 1,
+      "day": 26,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "categoryOnTransfer"
+      ]
+    },
+    {
+      "summary": "振替の移動先が無い",
+      "type": "transfer",
+      "amount": 45000,
+      "category": false,
+      "wallet": true,
+      "toWallet": null,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 26,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "missingDestination"
+      ]
+    },
+    {
+      "summary": "振替の移動先が同じ財布",
+      "type": "transfer",
+      "amount": 45000,
+      "category": false,
+      "wallet": true,
+      "toWallet": "same",
+      "frequency": "monthly",
+      "month": 1,
+      "day": 26,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "sameWallet"
+      ]
+    },
+    {
+      "summary": "支出の移動先は見ない",
+      "type": "expense",
+      "amount": 78000,
+      "category": true,
+      "wallet": true,
+      "toWallet": "other",
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": []
+    },
+    {
+      "summary": "金額が 0 円",
+      "type": "expense",
+      "amount": 0,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "amountNotPositive"
+      ]
+    },
+    {
+      "summary": "カテゴリと財布が無い",
+      "type": "expense",
+      "amount": 78000,
+      "category": false,
+      "wallet": false,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "missingCategory",
+        "missingWallet"
+      ]
+    },
+    {
+      "summary": "日が 32 日で範囲外",
+      "type": "expense",
+      "amount": 78000,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 32,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "dayOutOfRange"
+      ]
+    },
+    {
+      "summary": "日が 0 日で範囲外",
+      "type": "expense",
+      "amount": 78000,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 0,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "dayOutOfRange"
+      ]
+    },
+    {
+      "summary": "毎年で月が 13",
+      "type": "expense",
+      "amount": 12000,
+      "category": true,
+      "wallet": true,
+      "frequency": "yearly",
+      "month": 13,
+      "day": 1,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "monthOutOfRange"
+      ]
+    },
+    {
+      "summary": "毎月なら月は見ない",
+      "type": "expense",
+      "amount": 12000,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 13,
+      "day": 1,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": []
+    },
+    {
+      "summary": "終了日が開始日より前",
+      "type": "expense",
+      "amount": 78000,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "startDate": "2026-05-01",
+      "endDate": "2026-04-30",
+      "remindDaysBefore": null,
+      "problems": [
+        "endBeforeStart"
+      ]
+    },
+    {
+      "summary": "終了日が開始日と同じ",
+      "type": "expense",
+      "amount": 78000,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "startDate": "2026-01-01",
+      "endDate": "2026-01-01",
+      "remindDaysBefore": 0,
+      "problems": []
+    },
+    {
+      "summary": "前もっての知らせが 31 日",
+      "type": "expense",
+      "amount": 78000,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": 31,
+      "problems": [
+        "remindOutOfRange"
+      ]
+    },
+    {
+      "summary": "締め日付きの振替は 0 円で通る",
+      "type": "transfer",
+      "amount": 0,
+      "category": false,
+      "wallet": true,
+      "toWallet": "other",
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "closingDay": 15,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": []
+    },
+    {
+      "summary": "締め日が 32 日で範囲外",
+      "type": "transfer",
+      "amount": 0,
+      "category": false,
+      "wallet": true,
+      "toWallet": "other",
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "closingDay": 32,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "closingDayOutOfRange"
+      ]
+    },
+    {
+      "summary": "締め日付きの支出は 0 円を許さない",
+      "type": "expense",
+      "amount": 0,
+      "category": true,
+      "wallet": true,
+      "frequency": "monthly",
+      "month": 1,
+      "day": 27,
+      "closingDay": 15,
+      "startDate": "2026-01-01",
+      "endDate": null,
+      "remindDaysBefore": null,
+      "problems": [
+        "amountNotPositive"
+      ]
+    }
   ]
 }

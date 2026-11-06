@@ -6,3 +6,8 @@ repos:
         entry: mint run swiftformat
         language: system
         types: [swift]
+      - id: json-format
+        name: JSON format
+        entry: scripts/json-format.sh write
+        language: system
+        files: ^(spec/fixtures|store)/.*\.json$

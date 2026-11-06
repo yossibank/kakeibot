@@ -11,9 +11,21 @@
     {
       "summary": "最初の予算より前の月",
       "budgets": [
-        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-        { "category": null, "fromMonth": "2026-04", "amount": 120000 },
-        { "category": null, "fromMonth": "2026-07", "amount": null }
+        {
+          "category": null,
+          "fromMonth": "2026-01",
+          "amount": 100000
+        },
+        {
+          "category": null,
+          "fromMonth": "2026-04",
+          "amount": 120000
+        },
+        {
+          "category": null,
+          "fromMonth": "2026-07",
+          "amount": null
+        }
       ],
       "category": null,
       "month": "2025-12",
@@ -22,9 +34,21 @@
     {
       "summary": "次の予算が始まる前は前の額",
       "budgets": [
-        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-        { "category": null, "fromMonth": "2026-04", "amount": 120000 },
-        { "category": null, "fromMonth": "2026-07", "amount": null }
+        {
+          "category": null,
+          "fromMonth": "2026-01",
+          "amount": 100000
+        },
+        {
+          "category": null,
+          "fromMonth": "2026-04",
+          "amount": 120000
+        },
+        {
+          "category": null,
+          "fromMonth": "2026-07",
+          "amount": null
+        }
       ],
       "category": null,
       "month": "2026-03",
@@ -33,9 +57,21 @@
     {
       "summary": "並びが順不同でも新しい行を使う",
       "budgets": [
-        { "category": null, "fromMonth": "2026-04", "amount": 120000 },
-        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-        { "category": null, "fromMonth": "2026-07", "amount": null }
+        {
+          "category": null,
+          "fromMonth": "2026-04",
+          "amount": 120000
+        },
+        {
+          "category": null,
+          "fromMonth": "2026-01",
+          "amount": 100000
+        },
+        {
+          "category": null,
+          "fromMonth": "2026-07",
+          "amount": null
+        }
       ],
       "category": null,
       "month": "2026-04",
@@ -44,9 +80,21 @@
     {
       "summary": "額が空の行が新しければ予算なし",
       "budgets": [
-        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-        { "category": null, "fromMonth": "2026-04", "amount": 120000 },
-        { "category": null, "fromMonth": "2026-07", "amount": null }
+        {
+          "category": null,
+          "fromMonth": "2026-01",
+          "amount": 100000
+        },
+        {
+          "category": null,
+          "fromMonth": "2026-04",
+          "amount": 120000
+        },
+        {
+          "category": null,
+          "fromMonth": "2026-07",
+          "amount": null
+        }
       ],
       "category": null,
       "month": "2026-08",
@@ -55,8 +103,16 @@
     {
       "summary": "カテゴリの予算が始まる前の月",
       "budgets": [
-        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-        { "category": "food", "fromMonth": "2026-02", "amount": 30000 }
+        {
+          "category": null,
+          "fromMonth": "2026-01",
+          "amount": 100000
+        },
+        {
+          "category": "food",
+          "fromMonth": "2026-02",
+          "amount": 30000
+        }
       ],
       "category": "food",
       "month": "2026-01",
@@ -65,9 +121,21 @@
     {
       "summary": "ほかのカテゴリの予算と混ぜない",
       "budgets": [
-        { "category": null, "fromMonth": "2026-01", "amount": 100000 },
-        { "category": "food", "fromMonth": "2026-02", "amount": 30000 },
-        { "category": "daily", "fromMonth": "2026-02", "amount": 8000 }
+        {
+          "category": null,
+          "fromMonth": "2026-01",
+          "amount": 100000
+        },
+        {
+          "category": "food",
+          "fromMonth": "2026-02",
+          "amount": 30000
+        },
+        {
+          "category": "daily",
+          "fromMonth": "2026-02",
+          "amount": 8000
+        }
       ],
       "category": "food",
       "month": "2026-05",
@@ -76,7 +144,11 @@
     {
       "summary": "月全体の予算にカテゴリを混ぜない",
       "budgets": [
-        { "category": "food", "fromMonth": "2026-02", "amount": 30000 }
+        {
+          "category": "food",
+          "fromMonth": "2026-02",
+          "amount": 30000
+        }
       ],
       "category": null,
       "month": "2026-05",

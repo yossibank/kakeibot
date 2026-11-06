@@ -5,7 +5,13 @@
       "summary": "返済が 1 つで割り切れる",
       "balance": -1200000,
       "today": "2026-10-21",
-      "repayments": [{ "amount": 15000, "day": 27, "endDate": null }],
+      "repayments": [
+        {
+          "amount": 15000,
+          "day": 27,
+          "endDate": null
+        }
+      ],
       "count": 80,
       "lastDate": "2033-05-27"
     },
@@ -13,7 +19,13 @@
       "summary": "返済が割り切れず最後は少ない額",
       "balance": -100000,
       "today": "2026-10-21",
-      "repayments": [{ "amount": 30000, "day": 10, "endDate": null }],
+      "repayments": [
+        {
+          "amount": 30000,
+          "day": 10,
+          "endDate": null
+        }
+      ],
       "count": 4,
       "lastDate": "2027-02-10"
     },
@@ -21,7 +33,13 @@
       "summary": "今日の返済日は数えない",
       "balance": -30000,
       "today": "2026-10-27",
-      "repayments": [{ "amount": 15000, "day": 27, "endDate": null }],
+      "repayments": [
+        {
+          "amount": 15000,
+          "day": 27,
+          "endDate": null
+        }
+      ],
       "count": 2,
       "lastDate": "2026-12-27"
     },
@@ -30,8 +48,16 @@
       "balance": -50000,
       "today": "2026-10-21",
       "repayments": [
-        { "amount": 10000, "day": 5, "endDate": null },
-        { "amount": 20000, "day": 20, "endDate": null }
+        {
+          "amount": 10000,
+          "day": 5,
+          "endDate": null
+        },
+        {
+          "amount": 20000,
+          "day": 20,
+          "endDate": null
+        }
       ],
       "count": 4,
       "lastDate": "2026-12-20"
@@ -40,7 +66,14 @@
       "summary": "最終回だけ額が多い奨学金を 240 回で返す",
       "balance": -3896752,
       "today": "2026-10-26",
-      "repayments": [{ "amount": 16235, "day": 27, "endDate": "2046-09-27", "finalAmount": 16587 }],
+      "repayments": [
+        {
+          "amount": 16235,
+          "day": 27,
+          "endDate": "2046-09-27",
+          "finalAmount": 16587
+        }
+      ],
       "count": 240,
       "lastDate": "2046-09-27"
     },
@@ -48,7 +81,13 @@
       "summary": "無利子の奨学金を毎月同じ額で 240 回返す",
       "balance": -2592000,
       "today": "2026-10-26",
-      "repayments": [{ "amount": 10800, "day": 27, "endDate": "2046-09-27" }],
+      "repayments": [
+        {
+          "amount": 10800,
+          "day": 27,
+          "endDate": "2046-09-27"
+        }
+      ],
       "count": 240,
       "lastDate": "2046-09-27"
     },
@@ -56,7 +95,13 @@
       "summary": "借入が 0 円で返す回数は無い",
       "balance": 0,
       "today": "2026-10-21",
-      "repayments": [{ "amount": 15000, "day": 27, "endDate": null }],
+      "repayments": [
+        {
+          "amount": 15000,
+          "day": 27,
+          "endDate": null
+        }
+      ],
       "count": null,
       "lastDate": null
     },
@@ -64,7 +109,13 @@
       "summary": "終わりの日までに返し終わらない",
       "balance": -100000,
       "today": "2026-10-21",
-      "repayments": [{ "amount": 30000, "day": 10, "endDate": "2026-12-31" }],
+      "repayments": [
+        {
+          "amount": 30000,
+          "day": 10,
+          "endDate": "2026-12-31"
+        }
+      ],
       "count": null,
       "lastDate": null
     },

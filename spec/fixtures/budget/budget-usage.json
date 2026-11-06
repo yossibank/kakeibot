@@ -1,14 +1,104 @@
 {
   "description": "予算の残りと、期間の終わりまでの日数、8 割を超えたかを出す。期間の終わりまでの日数は、今日を含めて数え、1 より小さくしない。isNearLimit は、予算が 0 より大きく、使った額が予算の 8 割以上で、超えていないときに真にする。",
   "cases": [
-    {"summary": "月の初めでまだ使っていない", "budget": 120000, "spent": 0, "today": "2026-10-01", "periodEnd": "2026-10-31", "remaining": 120000, "daysLeft": 31, "isOver": false, "isNearLimit": false},
-    {"summary": "月の途中でまだ余裕がある", "budget": 120000, "spent": 45000, "today": "2026-10-12", "periodEnd": "2026-10-31", "remaining": 75000, "daysLeft": 20, "isOver": false, "isNearLimit": false},
-    {"summary": "ちょうど使い切った", "budget": 120000, "spent": 120000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 0, "daysLeft": 12, "isOver": false, "isNearLimit": true},
-    {"summary": "予算を超えた", "budget": 120000, "spent": 123000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": -3000, "daysLeft": 12, "isOver": true, "isNearLimit": false},
-    {"summary": "期間の最終日は 1 日と数える", "budget": 50000, "spent": 10000, "today": "2026-10-24", "periodEnd": "2026-10-24", "remaining": 40000, "daysLeft": 1, "isOver": false, "isNearLimit": false},
-    {"summary": "月の途中から始まる期間", "budget": 90000, "spent": 30000, "today": "2026-09-25", "periodEnd": "2026-10-24", "remaining": 60000, "daysLeft": 30, "isOver": false, "isNearLimit": false},
-    {"summary": "8 割にわずかに届かない", "budget": 100000, "spent": 79999, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 20001, "daysLeft": 12, "isOver": false, "isNearLimit": false},
-    {"summary": "ちょうど 8 割に届いた", "budget": 100000, "spent": 80000, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 20000, "daysLeft": 12, "isOver": false, "isNearLimit": true},
-    {"summary": "予算が 0 円なら 8 割とは言わない", "budget": 0, "spent": 0, "today": "2026-10-20", "periodEnd": "2026-10-31", "remaining": 0, "daysLeft": 12, "isOver": false, "isNearLimit": false}
+    {
+      "summary": "月の初めでまだ使っていない",
+      "budget": 120000,
+      "spent": 0,
+      "today": "2026-10-01",
+      "periodEnd": "2026-10-31",
+      "remaining": 120000,
+      "daysLeft": 31,
+      "isOver": false,
+      "isNearLimit": false
+    },
+    {
+      "summary": "月の途中でまだ余裕がある",
+      "budget": 120000,
+      "spent": 45000,
+      "today": "2026-10-12",
+      "periodEnd": "2026-10-31",
+      "remaining": 75000,
+      "daysLeft": 20,
+      "isOver": false,
+      "isNearLimit": false
+    },
+    {
+      "summary": "ちょうど使い切った",
+      "budget": 120000,
+      "spent": 120000,
+      "today": "2026-10-20",
+      "periodEnd": "2026-10-31",
+      "remaining": 0,
+      "daysLeft": 12,
+      "isOver": false,
+      "isNearLimit": true
+    },
+    {
+      "summary": "予算を超えた",
+      "budget": 120000,
+      "spent": 123000,
+      "today": "2026-10-20",
+      "periodEnd": "2026-10-31",
+      "remaining": -3000,
+      "daysLeft": 12,
+      "isOver": true,
+      "isNearLimit": false
+    },
+    {
+      "summary": "期間の最終日は 1 日と数える",
+      "budget": 50000,
+      "spent": 10000,
+      "today": "2026-10-24",
+      "periodEnd": "2026-10-24",
+      "remaining": 40000,
+      "daysLeft": 1,
+      "isOver": false,
+      "isNearLimit": false
+    },
+    {
+      "summary": "月の途中から始まる期間",
+      "budget": 90000,
+      "spent": 30000,
+      "today": "2026-09-25",
+      "periodEnd": "2026-10-24",
+      "remaining": 60000,
+      "daysLeft": 30,
+      "isOver": false,
+      "isNearLimit": false
+    },
+    {
+      "summary": "8 割にわずかに届かない",
+      "budget": 100000,
+      "spent": 79999,
+      "today": "2026-10-20",
+      "periodEnd": "2026-10-31",
+      "remaining": 20001,
+      "daysLeft": 12,
+      "isOver": false,
+      "isNearLimit": false
+    },
+    {
+      "summary": "ちょうど 8 割に届いた",
+      "budget": 100000,
+      "spent": 80000,
+      "today": "2026-10-20",
+      "periodEnd": "2026-10-31",
+      "remaining": 20000,
+      "daysLeft": 12,
+      "isOver": false,
+      "isNearLimit": true
+    },
+    {
+      "summary": "予算が 0 円なら 8 割とは言わない",
+      "budget": 0,
+      "spent": 0,
+      "today": "2026-10-20",
+      "periodEnd": "2026-10-31",
+      "remaining": 0,
+      "daysLeft": 12,
+      "isOver": false,
+      "isNearLimit": false
+    }
   ]
 }

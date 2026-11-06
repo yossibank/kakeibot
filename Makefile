@@ -24,6 +24,7 @@ open:
 
 format:
 	mint run swiftformat .
+	scripts/json-format.sh write
 
 licenses:
 	cd ios && mint run --mintfile ../Mintfile LicensePlist --xcworkspace-path Kakeibot.xcworkspace --config-path license_plist.yml --output-path Kakeibot/Settings.bundle --add-version-numbers --add-sources --suppress-opening-directory --fail-if-missing-license --force
@@ -61,5 +62,6 @@ verify: verify-docs
 
 verify-docs:
 	scripts/verify.sh docs-check scripts/docs-check.py
+	scripts/verify.sh json-format scripts/json-format.sh check
 	@test -f $(CLAUDE_CONFIG)/hooks/docs-check.py || { echo "NG claude-config が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	scripts/verify.sh docs-rules python3 -I $(CLAUDE_CONFIG)/hooks/docs-check.py $$(git ls-files '*.md')

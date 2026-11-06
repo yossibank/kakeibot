@@ -1,18 +1,83 @@
 {
   "description": "お知らせに未読があるかを、お知らせの一番新しい版と、最後に見た版で決める。版は数字を . でつないだもので、各桁は 0〜9 の数字だけ（符号は付けず、64 ビットに収まらない桁は版の形でない）で、足りない桁と末尾の 0 は 0 とみる。seen が null か版の形でなければ、まだ見ていないとみて未読にする。latest が版の形でなければ未読にしない。isNewer は latest が seen より新しいか。",
   "cases": [
-    { "summary": "まだ一度も見ていない", "latest": "1.1", "seen": null, "isNewer": true },
-    { "summary": "同じ版まで見た", "latest": "1.1", "seen": "1.1", "isNewer": false },
-    { "summary": "前の版までしか見ていない", "latest": "1.1", "seen": "1.0", "isNewer": true },
-    { "summary": "桁ごとに数で比べる", "latest": "1.10", "seen": "1.9", "isNewer": true },
-    { "summary": "末尾の 0 は無いのと同じ", "latest": "1.1.0", "seen": "1.1", "isNewer": false },
-    { "summary": "3 つ目の桁だけ新しい", "latest": "1.1.1", "seen": "1.1", "isNewer": true },
-    { "summary": "見た版の方が新しい", "latest": "1.1", "seen": "1.2", "isNewer": false },
-    { "summary": "見た版が版の形でない", "latest": "1.1", "seen": "abc", "isNewer": true },
-    { "summary": "一番新しい版が版の形でない", "latest": "1..1", "seen": null, "isNewer": false },
-    { "summary": "全角の数字は版の形でない", "latest": "１.１", "seen": null, "isNewer": false },
-    { "summary": "符号付きは版の形でない", "latest": "+1", "seen": null, "isNewer": false },
-    { "summary": "32 ビットを超える桁も比べる", "latest": "2147483648", "seen": "2147483647", "isNewer": true },
-    { "summary": "64 ビットに収まらない桁は版の形でない", "latest": "9223372036854775808", "seen": null, "isNewer": false }
+    {
+      "summary": "まだ一度も見ていない",
+      "latest": "1.1",
+      "seen": null,
+      "isNewer": true
+    },
+    {
+      "summary": "同じ版まで見た",
+      "latest": "1.1",
+      "seen": "1.1",
+      "isNewer": false
+    },
+    {
+      "summary": "前の版までしか見ていない",
+      "latest": "1.1",
+      "seen": "1.0",
+      "isNewer": true
+    },
+    {
+      "summary": "桁ごとに数で比べる",
+      "latest": "1.10",
+      "seen": "1.9",
+      "isNewer": true
+    },
+    {
+      "summary": "末尾の 0 は無いのと同じ",
+      "latest": "1.1.0",
+      "seen": "1.1",
+      "isNewer": false
+    },
+    {
+      "summary": "3 つ目の桁だけ新しい",
+      "latest": "1.1.1",
+      "seen": "1.1",
+      "isNewer": true
+    },
+    {
+      "summary": "見た版の方が新しい",
+      "latest": "1.1",
+      "seen": "1.2",
+      "isNewer": false
+    },
+    {
+      "summary": "見た版が版の形でない",
+      "latest": "1.1",
+      "seen": "abc",
+      "isNewer": true
+    },
+    {
+      "summary": "一番新しい版が版の形でない",
+      "latest": "1..1",
+      "seen": null,
+      "isNewer": false
+    },
+    {
+      "summary": "全角の数字は版の形でない",
+      "latest": "１.１",
+      "seen": null,
+      "isNewer": false
+    },
+    {
+      "summary": "符号付きは版の形でない",
+      "latest": "+1",
+      "seen": null,
+      "isNewer": false
+    },
+    {
+      "summary": "32 ビットを超える桁も比べる",
+      "latest": "2147483648",
+      "seen": "2147483647",
+      "isNewer": true
+    },
+    {
+      "summary": "64 ビットに収まらない桁は版の形でない",
+      "latest": "9223372036854775808",
+      "seen": null,
+      "isNewer": false
+    }
   ]
 }

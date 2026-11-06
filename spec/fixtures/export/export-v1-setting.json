@@ -1,10 +1,19 @@
 {
   "description": "読み込みで扱う設定の行を試す。valid は読み込み、invalid は知らないキーなので、その行だけ読み飛ばす。どちらも key と value を持つオブジェクトの配列にする。",
   "valid": [
-    { "key": "month_start_day", "value": "25" }
+    {
+      "key": "month_start_day",
+      "value": "25"
+    }
   ],
   "invalid": [
-    { "key": "category_menu_opened", "value": "true" },
-    { "key": "customize_card_closed", "value": "true" }
+    {
+      "key": "category_menu_opened",
+      "value": "true"
+    },
+    {
+      "key": "customize_card_closed",
+      "value": "true"
+    }
   ]
 }

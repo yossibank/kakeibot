@@ -4,72 +4,118 @@
     {
       "summary": "アイコンを選んだ入力",
       "name": "外食",
-      "mark": { "kind": "glyph", "value": "food" },
+      "mark": {
+        "kind": "glyph",
+        "value": "food"
+      },
       "color": "#E07A5F",
       "problems": []
     },
     {
       "summary": "文字のアイコンで名前に空白がある",
       "name": "  推し  ",
-      "mark": { "kind": "text", "value": "推し" },
+      "mark": {
+        "kind": "text",
+        "value": "推し"
+      },
       "color": "#9C6ADE",
       "problems": []
     },
     {
       "summary": "絵文字を選んだ入力",
       "name": "ペット",
-      "mark": { "kind": "emoji", "value": "🐶" },
+      "mark": {
+        "kind": "emoji",
+        "value": "🐶"
+      },
       "color": "#81B29A",
       "problems": []
     },
     {
       "summary": "名前が空白だけ",
       "name": "   ",
-      "mark": { "kind": "glyph", "value": "other" },
+      "mark": {
+        "kind": "glyph",
+        "value": "other"
+      },
       "color": "#8D99AE",
-      "problems": ["emptyName"]
+      "problems": [
+        "emptyName"
+      ]
     },
     {
       "summary": "絵文字が空",
       "name": "空の絵文字",
-      "mark": { "kind": "emoji", "value": " " },
+      "mark": {
+        "kind": "emoji",
+        "value": " "
+      },
       "color": "#8D99AE",
-      "problems": ["emptyMark"]
+      "problems": [
+        "emptyMark"
+      ]
     },
     {
       "summary": "文字が空",
       "name": "空の文字",
-      "mark": { "kind": "text", "value": "" },
+      "mark": {
+        "kind": "text",
+        "value": ""
+      },
       "color": "#8D99AE",
-      "problems": ["emptyMark"]
+      "problems": [
+        "emptyMark"
+      ]
     },
     {
       "summary": "文字が 3 文字を超える",
       "name": "長い文字",
-      "mark": { "kind": "text", "value": "サブスク" },
+      "mark": {
+        "kind": "text",
+        "value": "サブスク"
+      },
       "color": "#8D99AE",
-      "problems": ["textTooLong"]
+      "problems": [
+        "textTooLong"
+      ]
     },
     {
       "summary": "色に # が無い",
       "name": "色なし",
-      "mark": { "kind": "glyph", "value": "other" },
+      "mark": {
+        "kind": "glyph",
+        "value": "other"
+      },
       "color": "8D99AE",
-      "problems": ["invalidColor"]
+      "problems": [
+        "invalidColor"
+      ]
     },
     {
       "summary": "色が 3 桁",
       "name": "短い色",
-      "mark": { "kind": "glyph", "value": "other" },
+      "mark": {
+        "kind": "glyph",
+        "value": "other"
+      },
       "color": "#8D9",
-      "problems": ["invalidColor"]
+      "problems": [
+        "invalidColor"
+      ]
     },
     {
       "summary": "すべて誤っている",
       "name": "",
-      "mark": { "kind": "text", "value": "" },
+      "mark": {
+        "kind": "text",
+        "value": ""
+      },
       "color": "#GGGGGG",
-      "problems": ["emptyName", "emptyMark", "invalidColor"]
+      "problems": [
+        "emptyName",
+        "emptyMark",
+        "invalidColor"
+      ]
     }
   ]
 }
