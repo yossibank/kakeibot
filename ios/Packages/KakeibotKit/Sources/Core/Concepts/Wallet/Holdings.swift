@@ -23,16 +23,35 @@ public struct Holdings: Hashable, Sendable {
         adjustments: [Adjustment] = [],
         through date: LocalDate? = nil
     ) {
-        func total(_ role: Wallet.Kind.Role) -> Int {
-            let wallets = wallets.filter { $0.kind.role == role }
+        self.init(
+            wallets: wallets,
+            entriesByWallet: Wallet.entriesByWallet(entries),
+            valuations: valuations,
+            adjustments: adjustments,
+            through: date
+        )
+    }
 
-            return Wallet.totalBalance(
-                of: wallets,
-                with: entries,
-                valuations: valuations,
-                adjustments: adjustments,
-                through: date
-            )
+    public init(
+        wallets: [Wallet],
+        entriesByWallet: [Wallet.ID: [Entry]],
+        valuations: [Valuation] = [],
+        adjustments: [Adjustment] = [],
+        through date: LocalDate? = nil
+    ) {
+        func total(_ role: Wallet.Kind.Role) -> Int {
+            wallets
+                .filter { $0.kind.role == role }
+                .reduce(0) { total, wallet in
+                    let balance = wallet.balance(
+                        with: entriesByWallet[wallet.id] ?? [],
+                        valuations: valuations,
+                        adjustments: adjustments,
+                        through: date
+                    )
+
+                    return total + balance
+                }
         }
 
         let onHand = total(.onHand)

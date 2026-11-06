@@ -38,6 +38,7 @@ public final class AssetsModel: ScreenModel {
     let database: AppDatabase
 
     private var entries: [Entry] = []
+    private var entriesByWallet: [Wallet.ID: [Entry]] = [:]
 
     private var recurrings: [Recurring] = [] {
         didSet {
@@ -170,6 +171,7 @@ private extension AssetsModel {
 
     func update() {
         entries = list?.days.flatMap(\.entries) ?? []
+        entriesByWallet = Wallet.entriesByWallet(entries)
         holdings = makeHoldings()
         changeFromLastMonth = makeChangeFromLastMonth()
         upcomingBills = makeUpcomingBills()
@@ -180,7 +182,7 @@ private extension AssetsModel {
     func makeHoldings() -> Holdings {
         Holdings(
             wallets: wallets,
-            entries: entries,
+            entriesByWallet: entriesByWallet,
             valuations: valuations,
             adjustments: adjustments,
             through: today
@@ -193,7 +195,7 @@ private extension AssetsModel {
 
         let previous = Holdings(
             wallets: wallets,
-            entries: entries,
+            entriesByWallet: entriesByWallet,
             valuations: valuations,
             adjustments: adjustments,
             through: end
@@ -312,7 +314,7 @@ private extension AssetsModel {
 
             let holdings = Holdings(
                 wallets: wallets,
-                entries: entries,
+                entriesByWallet: entriesByWallet,
                 valuations: valuations,
                 adjustments: adjustments,
                 through: end
@@ -328,7 +330,7 @@ private extension AssetsModel {
 
     func balance(of wallet: Wallet) -> Int {
         wallet.balance(
-            with: entries,
+            with: entriesByWallet[wallet.id] ?? [],
             valuations: valuations,
             adjustments: adjustments,
             through: today
