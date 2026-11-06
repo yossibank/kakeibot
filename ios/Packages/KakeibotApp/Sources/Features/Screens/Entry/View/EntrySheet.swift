@@ -140,12 +140,30 @@ extension EntrySheet {
                     await save()
                 }
             }
+            .disabled(!model.canSave)
 
-            if !model.isEditing {
-                continueButton
+            if model.isEditing {
+                sideButton(
+                    "もう一度",
+                    systemImage: "doc.on.doc",
+                    isEnabled: true
+                ) {
+                    Task {
+                        await recordAgain()
+                    }
+                }
+            } else {
+                sideButton(
+                    "続けて",
+                    systemImage: "plus.square.on.square",
+                    isEnabled: model.canSave
+                ) {
+                    Task {
+                        await saveAndContinue()
+                    }
+                }
             }
         }
-        .disabled(!model.canSave)
     }
 
     func close() {
@@ -260,17 +278,18 @@ private extension EntrySheet {
         .frame(maxWidth: .infinity)
     }
 
-    var continueButton: some View {
-        Button {
-            Task {
-                await saveAndContinue()
-            }
-        } label: {
+    func sideButton(
+        _ title: String,
+        systemImage: String,
+        isEnabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
             VStack(spacing: 4) {
-                Image(systemName: "plus.square.on.square")
+                Image(systemName: systemImage)
                     .sansFont(.body)
 
-                Text("続けて")
+                Text(title)
                     .textFont(.caption2, weight: .semibold)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -284,7 +303,13 @@ private extension EntrySheet {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .opacity(continueOpacity)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.4)
+    }
+
+    func recordAgain() async {
+        await model.recordAgain()
+        showSelectedCategory()
     }
 }
 
@@ -294,10 +319,6 @@ private extension EntrySheet {
 
     var bannerBottom: CGFloat {
         isEnteringAmount ? drawerHeight + 12 : 12
-    }
-
-    var continueOpacity: Double {
-        model.canSave ? 1 : 0.4
     }
 
     func editMemo(_ isEditing: Bool) {

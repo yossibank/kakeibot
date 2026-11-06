@@ -49,6 +49,17 @@ struct SnapshotTests {
 
         try Self.write(closed, to: "entry-closed.png")
 
+        for (name, size) in [("entry-editing", Self.phone), ("entry-editing-narrow", Self.narrow)] {
+            let editing = try await Self.editingModel()
+
+            let edit = EntrySheet(model: editing)
+                .frame(width: size.width, height: size.height)
+                .background(Color(uiColor: .systemBackground))
+                .environment(\.colorScheme, .light)
+
+            try Self.write(edit, to: "\(name).png")
+        }
+
         let itemModel = try await Self.model(
             .expense,
             digits: Self.itemDigits,
@@ -372,6 +383,29 @@ private extension SnapshotTests {
         for key in digits {
             model.press(key)
         }
+
+        return model
+    }
+
+    static func editingModel() async throws -> EntryModel {
+        let database = try AppDatabase.inMemory()
+        let now = Date()
+        let date = LocalDate(now, in: .current)
+
+        try database.insertDefaultsIfEmpty(at: now)
+
+        let draft = EntryModel(database: database, date: date)
+
+        await draft.load()
+
+        for key in smallDigits {
+            draft.press(key)
+        }
+
+        let saved = try #require(await draft.save())
+        let model = EntryModel(database: database, editing: saved.entry.id, date: date)
+
+        await model.load()
 
         return model
     }
