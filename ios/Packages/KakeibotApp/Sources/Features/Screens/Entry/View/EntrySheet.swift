@@ -6,6 +6,7 @@ import SwiftUI
 public struct EntrySheet: View {
     @State var model: EntryModel
     @State var isEnteringAmount: Bool
+    @State var isFormDeferred: Bool
     @State var categoryPage: Int? = 0
     @State var sheet: Sheet?
     @State var categoryMenu: CategoryMenu?
@@ -36,6 +37,7 @@ public struct EntrySheet: View {
     ) {
         _model = State(initialValue: model)
         _isEnteringAmount = State(initialValue: model.opensKeypad)
+        _isFormDeferred = State(initialValue: model.opensKeypad)
         _notice = State(initialValue: EntryNoticeModel(database: model.database))
 
         self.onChange = onChange
@@ -129,6 +131,9 @@ public struct EntrySheet: View {
             }
             .task {
                 await model.observeHistory()
+            }
+            .task {
+                await revealForm()
             }
         }
     }
@@ -265,7 +270,10 @@ private extension EntrySheet {
         VStack(spacing: 24) {
             dial
 
-            if model.type == .transfer {
+            if isFormDeferred {
+                Color.clear
+                    .frame(height: Self.deferredFormHeight)
+            } else if model.type == .transfer {
                 transferArea
             } else {
                 categoryArea
@@ -312,6 +320,15 @@ private extension EntrySheet {
         .opacity(isEnabled ? 1 : 0.4)
     }
 
+    func revealForm() async {
+        guard isFormDeferred else {
+            return
+        }
+
+        try? await Task.sleep(for: Self.formRevealDelay)
+        isFormDeferred = false
+    }
+
     func recordAgain() async {
         await model.recordAgain()
         showSelectedCategory()
@@ -320,6 +337,8 @@ private extension EntrySheet {
 
 private extension EntrySheet {
     static let fade: CGFloat = 20
+    static let deferredFormHeight: CGFloat = 200
+    static let formRevealDelay: Duration = .milliseconds(450)
     static let continueWidth: CGFloat = 64
 
     var bannerBottom: CGFloat {

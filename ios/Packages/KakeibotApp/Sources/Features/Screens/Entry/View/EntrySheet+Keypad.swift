@@ -62,6 +62,8 @@ extension EntrySheet {
 
 extension EntrySheet {
     func setEnteringAmount(_ isEntering: Bool) {
+        isFormDeferred = false
+
         withAnimation(.snappy) {
             isEnteringAmount = isEntering
 
