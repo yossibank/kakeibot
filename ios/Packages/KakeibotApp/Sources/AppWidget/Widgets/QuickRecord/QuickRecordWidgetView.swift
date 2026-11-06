@@ -68,7 +68,7 @@ private extension QuickRecordWidgetView {
                 }
             }
         } else {
-            Text("ロックを解除すると出ます")
+            Text("アプリを開くと出ます")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
