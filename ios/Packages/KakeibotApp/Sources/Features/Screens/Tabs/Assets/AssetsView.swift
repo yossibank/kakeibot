@@ -43,7 +43,7 @@ public struct AssetsView: View {
             VStack(spacing: 12) {
                 header
 
-                TwoColumnLayout(spacing: 12) {
+                TwoColumnStack(spacing: 12) {
                     totalCard
 
                     if !model.upcomingBills.isEmpty {
