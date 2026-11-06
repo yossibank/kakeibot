@@ -132,7 +132,9 @@ public struct BackupView: View {
             isPresented: $isImporting,
             allowedContentTypes: [.json]
         ) { result in
-            isConfirmingRestore = model.read(result)
+            Task {
+                isConfirmingRestore = await model.read(result)
+            }
         }
         .confirmation(
             isPresented: $isConfirmingRestore,
