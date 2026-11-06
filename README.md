@@ -1,12 +1,53 @@
 # かけいぼっと（Kakeibot）
 
-iOS・Android の家計簿アプリ
+見返すのが楽しい、iOS・Android の家計簿アプリ。
+
+[![App Store](https://img.shields.io/itunes/v/6829072935?label=App%20Store&logo=appstore&logoColor=white)](https://apps.apple.com/jp/app/id6829072935)
 
 ![iOS 18+](https://img.shields.io/badge/iOS-18%2B-000000?logo=apple&logoColor=white)
 ![Android 8+](https://img.shields.io/badge/Android-8%2B-3DDC84?logo=android&logoColor=white)
 ![Swift 6](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)
+![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?logo=kotlin&logoColor=white)
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-0A84FF?logo=swift&logoColor=white)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-4285F4?logo=jetpackcompose&logoColor=white)
 ![GRDB](https://img.shields.io/badge/GRDB-003B57?logo=sqlite&logoColor=white)
+![Room](https://img.shields.io/badge/Room-3DDC84?logo=sqlite&logoColor=white)
+
+<table>
+  <tr>
+    <th>ホーム</th>
+    <th>レシート</th>
+    <th>振り返り</th>
+    <th>ウィジェット</th>
+  </tr>
+  <tr>
+    <td><img src="store/screenshots/6.9/01-home.png" width="200" alt="ホームで今月あといくら使えるかが分かる"></td>
+    <td><img src="store/screenshots/6.9/03-receipt.png" width="200" alt="レシートを撮って記録する"></td>
+    <td><img src="store/screenshots/6.9/07-review.png" width="200" alt="月の支出を振り返る"></td>
+    <td><img src="store/screenshots/6.9/10-widget.png" width="200" alt="ホーム画面のウィジェット"></td>
+  </tr>
+</table>
+
+1 タップの記録 ・ レシートの読み取り ・ 着せ替えのテーマ ・ 振り返り ・ ウィジェット ・ 家族と共有
+
+## 🗺️ 全体像
+
+iOS と Android は、同じ表の形と同じ計算の決まりを持つ。計算の結果は、両 OS のテストが `spec/fixtures/` を読んでそろえる。
+
+```mermaid
+flowchart LR
+    subgraph ios["🍎 iOS"]
+        IApp["KakeibotApp<br/>画面・ウィジェット"] --> IKit["KakeibotKit<br/>Core・Store（GRDB）"]
+    end
+    subgraph android["🤖 Android"]
+        AApp[":app<br/>画面・ウィジェット"] --> AKit[":core・:store（Room）"]
+    end
+    fixtures["🧩 spec/fixtures"] -.->|テストで確かめる| IKit
+    fixtures -.->|テストで確かめる| AKit
+    IApp -->|同期と共有| icloud["iCloud"]
+```
+
+iOS のパッケージは [architecture-packages](docs/architecture-packages.md) にある。Android のモジュールは [architecture-android](docs/architecture-android.md) にある。
 
 ## 🚀 動かし方
 
