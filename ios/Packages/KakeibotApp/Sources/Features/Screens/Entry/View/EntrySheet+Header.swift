@@ -67,6 +67,8 @@ private extension EntrySheet {
                     await delete()
                 }
             }
+        } else {
+            Color.clear
         }
     }
 }
