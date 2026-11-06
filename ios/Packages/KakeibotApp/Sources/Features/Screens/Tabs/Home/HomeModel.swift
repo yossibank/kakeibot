@@ -399,7 +399,7 @@ private extension HomeModel {
         switch date {
         case today: "今日"
         case today.adding(days: -1): "昨日"
-        default: "\(date.month)/\(date.day)"
+        default: date.monthDayText
         }
     }
 }

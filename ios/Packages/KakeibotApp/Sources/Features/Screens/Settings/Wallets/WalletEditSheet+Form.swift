@@ -249,7 +249,7 @@ extension WalletEditSheet {
         let date = valuation.date
 
         return HStack {
-            Text("\(String(date.year))/\(date.month)/\(date.day)")
+            Text("\(String(date.year))/\(date.monthDayText)")
                 .textFont(.subheadline)
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)

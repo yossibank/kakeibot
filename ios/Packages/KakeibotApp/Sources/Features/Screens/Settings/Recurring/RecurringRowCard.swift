@@ -84,7 +84,7 @@ private extension RecurringRowCard {
             return "終わりました"
         }
 
-        let next = "次は \(date.month)/\(date.day)"
+        let next = "次は \(date.monthDayText)"
 
         return [row.closing, next].compactMap(\.self).joined(separator: "・")
     }

@@ -151,7 +151,7 @@ private extension HomeRecurringSheet {
                 .fill(Palette.accent.opacity(.muted))
                 .frame(height: 1)
 
-            Text("今日 \(model.today.month)/\(model.today.day)")
+            Text("今日 \(model.today.monthDayText)")
                 .textFont(.caption2)
                 .tracking(1)
                 .foregroundStyle(Palette.accent)

@@ -68,7 +68,7 @@ private extension RecordsStampSheet {
 
             Spacer()
 
-            SheetTitle("\(date.month)/\(date.day) のスタンプ")
+            SheetTitle("\(date.monthDayText) のスタンプ")
 
             Spacer()
 

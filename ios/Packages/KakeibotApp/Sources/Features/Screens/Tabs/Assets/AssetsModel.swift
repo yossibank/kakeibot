@@ -156,7 +156,7 @@ private extension AssetsModel {
         of entry: Entry,
         in list: EntryList
     ) -> EntryRowItem {
-        let day = "\(entry.date.month)/\(entry.date.day)"
+        let day = entry.date.monthDayText
         return EntryRowItem(entry, in: list, dayLabel: day)
     }
 

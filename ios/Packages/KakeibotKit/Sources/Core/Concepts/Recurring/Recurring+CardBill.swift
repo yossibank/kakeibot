@@ -3,7 +3,7 @@ public extension Recurring {
     static let billShiftTitles = ["いつもどおり", "次に回す", "2 回先"]
 
     static func billText(paidOn date: LocalDate) -> String {
-        "\(date.month)/\(date.day)払い"
+        "\(date.monthDayText)払い"
     }
 
     static func clampedBillShift(_ shift: Int) -> Int {

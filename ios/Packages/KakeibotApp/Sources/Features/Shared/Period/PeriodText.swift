@@ -2,7 +2,7 @@ import Core
 
 enum PeriodText {
     static func range(_ period: ClosedRange<LocalDate>) -> String {
-        "\(date(period.lowerBound))〜\(date(period.upperBound))"
+        "\(period.lowerBound.monthDayText)〜\(period.upperBound.monthDayText)"
     }
 
     static func range(
@@ -16,7 +16,7 @@ enum PeriodText {
         _ date: LocalDate,
         today: LocalDate
     ) -> String {
-        date.year == today.year ? self.date(date) : "\(date.year)/\(self.date(date))"
+        date.year == today.year ? date.monthDayText : "\(date.year)/\(date.monthDayText)"
     }
 
     static func startDay(_ startDay: MonthStartDay) -> String {
@@ -25,10 +25,6 @@ enum PeriodText {
     }
 
     static func weekdayDate(_ date: LocalDate) -> String {
-        "\(self.date(date))（\(date.weekday.shortName)）"
-    }
-
-    private static func date(_ date: LocalDate) -> String {
-        "\(date.month)/\(date.day)"
+        "\(date.monthDayText)（\(date.weekday.shortName)）"
     }
 }

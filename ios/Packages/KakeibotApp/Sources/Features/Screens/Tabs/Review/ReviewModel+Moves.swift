@@ -78,7 +78,7 @@ extension ReviewModel {
         return moveEntries(to: wallet, in: list)
             .sorted { $0.date > $1.date }
             .map { entry in
-                let label = "\(entry.date.month)/\(entry.date.day)"
+                let label = entry.date.monthDayText
 
                 return EntryRowItem(entry, in: list, dayLabel: label)
             }

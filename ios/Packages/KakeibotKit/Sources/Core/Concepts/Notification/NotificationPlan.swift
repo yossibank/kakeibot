@@ -131,7 +131,7 @@ public enum NotificationPlan {
         guard let amount else {
             let bill = daysBefore == 0
                 ? "今日は引き落としの日です"
-                : "\(date.month)/\(date.day) に引き落としがあります"
+                : "\(date.monthDayText) に引き落としがあります"
 
             guard let shortage else {
                 return bill
@@ -148,7 +148,7 @@ public enum NotificationPlan {
             return "今日は \(yen) の日です"
         }
 
-        return "\(date.month)/\(date.day) に \(yen) です"
+        return "\(date.monthDayText) に \(yen) です"
     }
 
     private static func grouped(_ amount: Int) -> String {

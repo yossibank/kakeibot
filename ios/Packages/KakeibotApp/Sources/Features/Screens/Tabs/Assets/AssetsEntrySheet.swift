@@ -55,7 +55,7 @@ extension AssetsEntrySheet {
 extension AssetsEntrySheet.Content {
     static func moved(_ row: AssetsModel.UpcomingBill) -> Self {
         let count = row.movedIn.count + row.movedOut.count
-        let day = billDay(row.bill.date)
+        let day = PeriodText.weekdayDate(row.bill.date)
 
         return Self(
             id: "moved-\(row.id)",
@@ -74,8 +74,8 @@ extension AssetsEntrySheet.Content {
         of row: AssetsModel.WalletRow,
         bill: CardBill
     ) -> Self {
-        let date = "\(bill.date.month)/\(bill.date.day)"
-        let day = billDay(bill.date)
+        let date = bill.date.monthDayText
+        let day = PeriodText.weekdayDate(bill.date)
 
         return Self(
             id: "unpaid-\(row.id)",
@@ -87,12 +87,6 @@ extension AssetsEntrySheet.Content {
                 .init(title: "その後に引き落とす", rows: unpaid.later)
             ]
         )
-    }
-}
-
-private extension AssetsEntrySheet.Content {
-    static func billDay(_ date: LocalDate) -> String {
-        "\(date.month)/\(date.day)（\(date.weekday.shortName)）"
     }
 }
 

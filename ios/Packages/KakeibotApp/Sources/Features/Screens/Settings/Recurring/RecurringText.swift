@@ -37,7 +37,7 @@ enum RecurringText {
     static func period(_ period: ClosedRange<LocalDate>) -> String {
         let from = period.lowerBound
         let through = period.upperBound
-        return "\(from.month)/\(from.day)〜\(through.month)/\(through.day)"
+        return "\(from.monthDayText)〜\(through.monthDayText)"
     }
 
     static func remind(_ days: Int?) -> String {
@@ -50,6 +50,6 @@ enum RecurringText {
     }
 
     static func date(_ date: LocalDate) -> String {
-        "\(date.year)/\(date.month)/\(date.day)"
+        "\(date.year)/\(date.monthDayText)"
     }
 }

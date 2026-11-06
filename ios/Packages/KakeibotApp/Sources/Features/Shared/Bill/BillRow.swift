@@ -136,7 +136,7 @@ private extension BillRow {
                             ViewThatFits(in: .horizontal) {
                                 Text("\(RecurringText.period(period)) の利用分")
                                 Text(RecurringText.period(period))
-                                Text("\(period.upperBound.month)/\(period.upperBound.day) 締め")
+                                Text("\(period.upperBound.monthDayText) 締め")
                             }
                             .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
