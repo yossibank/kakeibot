@@ -2,6 +2,7 @@ package com.yossibank.kakeibot.core.concepts.wallet
 
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.shared.Identifier
 
 data class Holdings(
     val onHand: Long,
@@ -16,9 +17,23 @@ data class Holdings(
         adjustments: List<Adjustment> = emptyList(),
         through: LocalDate? = null,
     ) : this(
+        wallets = wallets,
+        entriesByWallet = Wallet.entriesByWallet(entries),
+        valuations = valuations,
+        adjustments = adjustments,
+        through = through,
+    )
+
+    constructor(
+        wallets: List<Wallet>,
+        entriesByWallet: Map<Identifier<Wallet>, List<Entry>>,
+        valuations: List<Valuation> = emptyList(),
+        adjustments: List<Adjustment> = emptyList(),
+        through: LocalDate? = null,
+    ) : this(
         onHand = total(
             wallets = wallets,
-            entries = entries,
+            entriesByWallet = entriesByWallet,
             valuations = valuations,
             adjustments = adjustments,
             through = through,
@@ -26,7 +41,7 @@ data class Holdings(
         ),
         cards = total(
             wallets = wallets,
-            entries = entries,
+            entriesByWallet = entriesByWallet,
             valuations = valuations,
             adjustments = adjustments,
             through = through,
@@ -34,7 +49,7 @@ data class Holdings(
         ),
         investments = total(
             wallets = wallets,
-            entries = entries,
+            entriesByWallet = entriesByWallet,
             valuations = valuations,
             adjustments = adjustments,
             through = through,
@@ -42,7 +57,7 @@ data class Holdings(
         ),
         loans = total(
             wallets = wallets,
-            entries = entries,
+            entriesByWallet = entriesByWallet,
             valuations = valuations,
             adjustments = adjustments,
             through = through,
@@ -65,18 +80,23 @@ data class Holdings(
     private companion object {
         fun total(
             wallets: List<Wallet>,
-            entries: List<Entry>,
+            entriesByWallet: Map<Identifier<Wallet>, List<Entry>>,
             valuations: List<Valuation>,
             adjustments: List<Adjustment>,
             through: LocalDate?,
             role: Wallet.Kind.Role,
-        ): Long = Wallet.totalBalance(
-            of = wallets.filter { it.kind.role == role },
-            with = entries,
-            valuations = valuations,
-            adjustments = adjustments,
-            through = through,
-        )
+        ): Long = wallets
+            .filter { it.kind.role == role }
+            .fold(0L) { total, wallet ->
+                val balance = wallet.balance(
+                    with = entriesByWallet[wallet.id].orEmpty(),
+                    valuations = valuations,
+                    adjustments = adjustments,
+                    through = through,
+                )
+
+                total + balance
+            }
     }
 }
 

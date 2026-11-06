@@ -197,6 +197,54 @@ class WalletBalanceTest {
 
             assertEquals(6L * limit, total)
         }
+
+        @Test
+        fun groupsEntriesByBothWalletsOfTransfer() {
+            val cash = Identifier<Wallet>()
+            val bank = Identifier<Wallet>()
+            val date = assertNotNull(LocalDate.parse("2026-10-01"))
+
+            val expense = Entry(
+                type = Entry.Kind.expense,
+                amount = 300,
+                date = date,
+                categoryId = Identifier(),
+                walletId = cash,
+                createdAt = Instant.now(),
+                updatedAt = Instant.now(),
+            )
+
+            val transfer = Entry(
+                type = Entry.Kind.transfer,
+                amount = 1000,
+                date = date,
+                categoryId = null,
+                walletId = bank,
+                toWalletId = cash,
+                createdAt = Instant.now(),
+                updatedAt = Instant.now(),
+            )
+
+            val grouped = Wallet.entriesByWallet(
+                listOf(
+                    expense,
+                    transfer,
+                ),
+            )
+
+            assertEquals(
+                listOf(
+                    expense.id,
+                    transfer.id,
+                ),
+                grouped[cash]?.map { it.id },
+            )
+
+            assertEquals(
+                listOf(transfer.id),
+                grouped[bank]?.map { it.id },
+            )
+        }
     }
 }
 
