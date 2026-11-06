@@ -27,7 +27,11 @@ public struct RatioBar: View {
             }
         }
         .frame(height: height)
-        .animation(.snappy, value: progress)
+        .transaction(value: progress) { transaction in
+            if !transaction.disablesAnimations {
+                transaction.animation = .snappy
+            }
+        }
     }
 }
 
