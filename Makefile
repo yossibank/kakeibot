@@ -49,7 +49,7 @@ android-build:
 	$(GRADLE) :app:assembleDebug
 
 android-test:
-	$(GRADLE) :core:test
+	$(GRADLE) :core:test :store:test
 
 verify: verify-docs
 	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
@@ -57,7 +57,7 @@ verify: verify-docs
 	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build
-	scripts/verify.sh android-test $(GRADLE) :core:test
+	scripts/verify.sh android-test $(GRADLE) :core:test :store:test
 	scripts/verify.sh android-build $(GRADLE) :app:assembleDebug
 
 verify-docs:
