@@ -41,6 +41,12 @@ interface ThemeRecordDao {
 
     @Query("DELETE FROM theme")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM theme WHERE id = :id")
+    suspend fun find(id: String): ThemeRecord?
+
+    @Query("SELECT * FROM theme WHERE is_builtin = 0 ORDER BY created_at")
+    suspend fun custom(): List<ThemeRecord>
 }
 
 fun Theme.record(): ThemeRecord = ThemeRecord(

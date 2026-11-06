@@ -48,6 +48,9 @@ interface BudgetRecordDao {
 
     @Query("DELETE FROM budget")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM budget ORDER BY from_month")
+    suspend fun inMonthOrder(): List<BudgetRecord>
 }
 
 fun Budget.record(): BudgetRecord = BudgetRecord(

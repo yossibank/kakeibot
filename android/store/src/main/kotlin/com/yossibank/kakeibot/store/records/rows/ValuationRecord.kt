@@ -52,6 +52,9 @@ interface ValuationRecordDao {
 
     @Query("DELETE FROM valuation")
     suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM valuation")
+    suspend fun count(): Int
 }
 
 fun Valuation.record(): ValuationRecord = ValuationRecord(

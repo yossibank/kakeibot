@@ -46,6 +46,33 @@ interface EntryTagRecordDao {
 
     @Query("DELETE FROM tag")
     suspend fun deleteAll()
+
+    @Query(
+        """
+        SELECT * FROM tag
+        WHERE archived_at IS NULL AND category_id IN (SELECT id FROM category WHERE wallet_id IS NULL)
+        ORDER BY sort_order
+        """,
+    )
+    suspend fun unarchivedWithoutWallet(): List<EntryTagRecord>
+
+    @Query(
+        """
+        SELECT * FROM tag
+        WHERE category_id IN (SELECT id FROM category WHERE wallet_id IS NULL)
+        ORDER BY sort_order
+        """,
+    )
+    suspend fun withoutWalletInOrder(): List<EntryTagRecord>
+
+    @Query(
+        """
+        SELECT * FROM tag
+        WHERE category_id IN (SELECT id FROM category WHERE wallet_id IS NOT NULL)
+        ORDER BY sort_order
+        """,
+    )
+    suspend fun ofWalletsInOrder(): List<EntryTagRecord>
 }
 
 fun EntryTag.record(): EntryTagRecord = EntryTagRecord(

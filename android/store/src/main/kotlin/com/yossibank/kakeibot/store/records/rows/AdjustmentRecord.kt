@@ -52,6 +52,9 @@ interface AdjustmentRecordDao {
 
     @Query("DELETE FROM adjustment")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM adjustment ORDER BY date, created_at")
+    suspend fun inDateOrder(): List<AdjustmentRecord>
 }
 
 fun Adjustment.record(): AdjustmentRecord = AdjustmentRecord(

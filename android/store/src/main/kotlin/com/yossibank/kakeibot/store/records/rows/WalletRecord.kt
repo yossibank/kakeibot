@@ -55,6 +55,9 @@ interface WalletRecordDao {
 
     @Query("SELECT COUNT(*) FROM wallet")
     suspend fun count(): Int
+
+    @Query("SELECT * FROM wallet WHERE archived_at IS NULL ORDER BY sort_order")
+    suspend fun unarchivedInOrder(): List<WalletRecord>
 }
 
 fun Wallet.record(): WalletRecord = WalletRecord(

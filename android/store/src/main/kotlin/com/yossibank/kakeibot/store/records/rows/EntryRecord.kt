@@ -127,6 +127,32 @@ interface EntryRecordDao {
 
     @Query("SELECT COUNT(*) FROM entry")
     suspend fun count(): Int
+
+    @Query("SELECT * FROM entry ORDER BY created_at LIMIT 1")
+    suspend fun firstCreated(): EntryRecord?
+
+    @Query(
+        """
+        SELECT * FROM entry
+        WHERE date >= :start OR recurring_date >= :start OR bill_month >= :month OR id = :id
+        """,
+    )
+    suspend fun since(
+        start: String,
+        month: String,
+        id: String?,
+    ): List<EntryRecord>
+
+    @Query(
+        """
+        SELECT memo FROM entry
+        WHERE memo IS NOT NULL AND memo <> ''
+        GROUP BY memo
+        ORDER BY MAX(created_at) DESC
+        LIMIT :limit
+        """,
+    )
+    suspend fun recentMemos(limit: Int): List<String>
 }
 
 fun Entry.record(): EntryRecord = EntryRecord(

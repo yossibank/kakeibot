@@ -96,6 +96,15 @@ interface EntryCategoryRecordDao {
         kind: String,
         name: String,
     ): String?
+
+    @Query("SELECT * FROM category WHERE wallet_id IS NULL ORDER BY sort_order")
+    suspend fun withoutWalletInOrder(): List<EntryCategoryRecord>
+
+    @Query("SELECT * FROM category WHERE archived_at IS NULL AND wallet_id IS NULL ORDER BY sort_order")
+    suspend fun unarchivedWithoutWallet(): List<EntryCategoryRecord>
+
+    @Query("SELECT * FROM category WHERE archived_at IS NULL AND wallet_id IS NOT NULL ORDER BY sort_order")
+    suspend fun unarchivedOfWallets(): List<EntryCategoryRecord>
 }
 
 fun EntryCategory.record(): EntryCategoryRecord = EntryCategoryRecord(

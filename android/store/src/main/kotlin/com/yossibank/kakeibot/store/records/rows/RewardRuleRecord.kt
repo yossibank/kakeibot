@@ -47,6 +47,9 @@ interface RewardRuleRecordDao {
 
     @Query("DELETE FROM reward_rule")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM reward_rule ORDER BY sort_order, created_at")
+    suspend fun inOrder(): List<RewardRuleRecord>
 }
 
 fun RewardRule.record(): RewardRuleRecord = RewardRuleRecord(

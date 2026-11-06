@@ -37,6 +37,9 @@ interface IconRecordDao {
 
     @Query("DELETE FROM icon")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM icon WHERE id IN (:ids)")
+    suspend fun withIds(ids: List<String>): List<IconRecord>
 }
 
 fun Icon.record(): IconRecord = IconRecord(

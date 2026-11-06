@@ -76,6 +76,21 @@ interface RecurringRecordDao {
 
     @Query("DELETE FROM recurring")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM recurring ORDER BY sort_order, created_at")
+    suspend fun inOrder(): List<RecurringRecord>
+
+    @Query("SELECT * FROM recurring WHERE archived_at IS NULL ORDER BY sort_order, created_at")
+    suspend fun unarchivedInOrder(): List<RecurringRecord>
+
+    @Query(
+        """
+        SELECT * FROM recurring
+        WHERE archived_at IS NULL AND type = 'transfer' AND closing_day IS NOT NULL
+        ORDER BY sort_order, created_at
+        """,
+    )
+    suspend fun cardBills(): List<RecurringRecord>
 }
 
 fun Recurring.record(): RecurringRecord = RecurringRecord(

@@ -68,6 +68,12 @@ interface EntryTemplateRecordDao {
 
     @Query("SELECT COUNT(*) FROM template")
     suspend fun count(): Int
+
+    @Query("SELECT * FROM template ORDER BY sort_order, created_at")
+    suspend fun inOrder(): List<EntryTemplateRecord>
+
+    @Query("SELECT * FROM template WHERE archived_at IS NULL ORDER BY sort_order, created_at")
+    suspend fun unarchivedInOrder(): List<EntryTemplateRecord>
 }
 
 fun EntryTemplate.record(): EntryTemplateRecord = EntryTemplateRecord(

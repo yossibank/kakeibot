@@ -51,6 +51,9 @@ interface ShelfIconRecordDao {
 
     @Query("SELECT COUNT(*) FROM shelf_icon")
     suspend fun count(): Int
+
+    @Query("SELECT * FROM shelf_icon ORDER BY sort_order")
+    suspend fun inOrder(): List<ShelfIconRecord>
 }
 
 fun ShelfIcon.record(): ShelfIconRecord = ShelfIconRecord(

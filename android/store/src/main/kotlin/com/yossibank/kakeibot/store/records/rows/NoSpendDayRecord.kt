@@ -29,6 +29,9 @@ interface NoSpendDayRecordDao {
 
     @Query("DELETE FROM no_spend_day")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM no_spend_day WHERE date >= :start")
+    suspend fun since(start: String): List<NoSpendDayRecord>
 }
 
 fun NoSpendDay.record(): NoSpendDayRecord = NoSpendDayRecord(
