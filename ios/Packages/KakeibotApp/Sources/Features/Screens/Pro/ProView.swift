@@ -128,7 +128,9 @@ private extension ProView {
 
 private extension ProView {
     func opacity(of work: ProPurchaseModel.Work) -> Double {
-        model.isWorking && model.working != work ? 0.4 : 1
+        model.isWorking && model.working != work
+            ? 0.4
+            : 1
     }
 
     func purchase() {
