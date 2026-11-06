@@ -262,6 +262,8 @@ public extension EntryModel {
         editingId = nil
         original = nil
         originalFee = nil
+        feeCalculator = AmountCalculator()
+        appliedTemplateId = nil
         date = Self.today
         billMonth = nil
         items = []
@@ -284,7 +286,7 @@ public extension EntryModel {
             categoryId = categories.first?.id
         }
 
-        if !tags.contains(where: { $0.id == tagId }) {
+        if !tags.contains(where: { $0.id == tagId && $0.archivedAt == nil }) {
             tagId = nil
         }
 
