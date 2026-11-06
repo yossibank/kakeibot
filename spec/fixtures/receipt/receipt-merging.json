@@ -6,21 +6,51 @@
       "rules": {
         "total": 650,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": null },
-          { "name": "洗剤", "quantity": 1, "amount": 398, "taxRate": null }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": null
+          },
+          {
+            "name": "洗剤",
+            "quantity": 1,
+            "amount": 398,
+            "taxRate": null
+          }
         ]
       },
       "guessed": {
         "total": 650,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": 8 },
-          { "name": "洗剤", "quantity": 1, "amount": 398, "taxRate": 10 }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": 8
+          },
+          {
+            "name": "洗剤",
+            "quantity": 1,
+            "amount": 398,
+            "taxRate": 10
+          }
         ]
       },
       "total": 650,
       "items": [
-        { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": 8 },
-        { "name": "洗剤", "quantity": 1, "amount": 398, "taxRate": 10 }
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 198,
+          "taxRate": 8
+        },
+        {
+          "name": "洗剤",
+          "quantity": 1,
+          "amount": 398,
+          "taxRate": 10
+        }
       ],
       "taxIncluded": false
     },
@@ -29,20 +59,45 @@
       "rules": {
         "total": 596,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": null }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": null
+          }
         ]
       },
       "guessed": {
         "total": 596,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": 8 },
-          { "name": "洗剤", "quantity": 1, "amount": 398, "taxRate": 10 }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": 8
+          },
+          {
+            "name": "洗剤",
+            "quantity": 1,
+            "amount": 398,
+            "taxRate": 10
+          }
         ]
       },
       "total": 596,
       "items": [
-        { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": 8 },
-        { "name": "洗剤", "quantity": 1, "amount": 398, "taxRate": 10 }
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 198,
+          "taxRate": 8
+        },
+        {
+          "name": "洗剤",
+          "quantity": 1,
+          "amount": 398,
+          "taxRate": 10
+        }
       ],
       "taxIncluded": true
     },
@@ -51,20 +106,45 @@
       "rules": {
         "total": 616,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 396, "taxRate": null },
-          { "name": "食パン", "quantity": 1, "amount": 220, "taxRate": null }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          },
+          {
+            "name": "食パン",
+            "quantity": 1,
+            "amount": 220,
+            "taxRate": null
+          }
         ]
       },
       "guessed": {
         "total": 616,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 396, "taxRate": null }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          }
         ]
       },
       "total": 616,
       "items": [
-        { "name": "牛乳", "quantity": 1, "amount": 396, "taxRate": null },
-        { "name": "食パン", "quantity": 1, "amount": 220, "taxRate": null }
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 396,
+          "taxRate": null
+        },
+        {
+          "name": "食パン",
+          "quantity": 1,
+          "amount": 220,
+          "taxRate": null
+        }
       ],
       "taxIncluded": false
     },
@@ -73,21 +153,51 @@
       "rules": {
         "total": 616,
         "items": [
-          { "name": "ギユウニユウ", "quantity": 1, "amount": 396, "taxRate": null },
-          { "name": "ハン", "quantity": 1, "amount": 220, "taxRate": null }
+          {
+            "name": "ギユウニユウ",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          },
+          {
+            "name": "ハン",
+            "quantity": 1,
+            "amount": 220,
+            "taxRate": null
+          }
         ]
       },
       "guessed": {
         "total": 616,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 396, "taxRate": null },
-          { "name": "パン", "quantity": 1, "amount": 220, "taxRate": null }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          },
+          {
+            "name": "パン",
+            "quantity": 1,
+            "amount": 220,
+            "taxRate": null
+          }
         ]
       },
       "total": 616,
       "items": [
-        { "name": "牛乳", "quantity": 1, "amount": 396, "taxRate": null },
-        { "name": "パン", "quantity": 1, "amount": 220, "taxRate": null }
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 396,
+          "taxRate": null
+        },
+        {
+          "name": "パン",
+          "quantity": 1,
+          "amount": 220,
+          "taxRate": null
+        }
       ],
       "taxIncluded": false
     },
@@ -96,7 +206,12 @@
       "rules": {
         "total": null,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 396, "taxRate": null }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          }
         ]
       },
       "guessed": {
@@ -105,7 +220,12 @@
       },
       "total": 911,
       "items": [
-        { "name": "牛乳", "quantity": 1, "amount": 396, "taxRate": null }
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 396,
+          "taxRate": null
+        }
       ],
       "taxIncluded": false
     },
@@ -114,18 +234,33 @@
       "rules": {
         "total": null,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 396, "taxRate": null }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 396,
+            "taxRate": null
+          }
         ]
       },
       "guessed": {
         "total": null,
         "items": [
-          { "name": "牛乳 1L", "quantity": 2, "amount": 396, "taxRate": null }
+          {
+            "name": "牛乳 1L",
+            "quantity": 2,
+            "amount": 396,
+            "taxRate": null
+          }
         ]
       },
       "total": null,
       "items": [
-        { "name": "牛乳 1L", "quantity": 2, "amount": 396, "taxRate": null }
+        {
+          "name": "牛乳 1L",
+          "quantity": 2,
+          "amount": 396,
+          "taxRate": null
+        }
       ],
       "taxIncluded": false
     },
@@ -138,14 +273,34 @@
       "guessed": {
         "total": 631,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": 8 },
-          { "name": "洗剤", "quantity": 1, "amount": 380, "taxRate": null }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": 8
+          },
+          {
+            "name": "洗剤",
+            "quantity": 1,
+            "amount": 380,
+            "taxRate": null
+          }
         ]
       },
       "total": 631,
       "items": [
-        { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": 8 },
-        { "name": "洗剤", "quantity": 1, "amount": 380, "taxRate": 10 }
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 198,
+          "taxRate": 8
+        },
+        {
+          "name": "洗剤",
+          "quantity": 1,
+          "amount": 380,
+          "taxRate": 10
+        }
       ],
       "taxIncluded": false
     },
@@ -158,14 +313,34 @@
       "guessed": {
         "total": 700,
         "items": [
-          { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": 8 },
-          { "name": "洗剤", "quantity": 1, "amount": 398, "taxRate": 10 }
+          {
+            "name": "牛乳",
+            "quantity": 1,
+            "amount": 198,
+            "taxRate": 8
+          },
+          {
+            "name": "洗剤",
+            "quantity": 1,
+            "amount": 398,
+            "taxRate": 10
+          }
         ]
       },
       "total": 700,
       "items": [
-        { "name": "牛乳", "quantity": 1, "amount": 198, "taxRate": null },
-        { "name": "洗剤", "quantity": 1, "amount": 398, "taxRate": null }
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 198,
+          "taxRate": null
+        },
+        {
+          "name": "洗剤",
+          "quantity": 1,
+          "amount": 398,
+          "taxRate": null
+        }
       ],
       "taxIncluded": false
     }

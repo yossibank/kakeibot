@@ -14,13 +14,13 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 
 | 道具 | 使い道 |
 | --- | --- |
-| [jq](https://jqlang.org/) | テストに使うシミュレーターを選ぶ（`scripts/find-simulator.sh`） |
+| [jq](https://jqlang.org/) | テストに使うシミュレーターを選ぶ（`scripts/find-simulator.sh`）。JSON を整形する（`scripts/json-format.sh`） |
 | [Mint](https://github.com/yonaskolb/Mint) | SwiftFormat と LicensePlist の版をそろえる（`Mintfile`） |
 | [pre-commit](https://pre-commit.com/) | commit の前の確認を動かす |
 | [xcbeautify](https://github.com/cpisciotta/xcbeautify) | ビルドとテストの出力を読みやすくする |
 
 > [!NOTE]
-> commit の前に pre-commit が、ステージした Swift を SwiftFormat で整形する。直したファイルがあると commit は止まるので、`git add` して commit し直す。
+> commit の前に pre-commit が、ステージした Swift と JSON を整形する。直したファイルがあると commit は止まるので、`git add` して commit し直す。
 
 よく使うコマンドを、次の表に挙げる。
 
@@ -29,15 +29,15 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | 道具を入れ、hook を入れる | `make setup` |
 | Xcode でワークスペースを開く | `make open` |
 | ブランチのワークツリーを Xcode で開く | `make open BRANCH=feat/...` |
-| 変更の確認（文書・Swift の書き方・余白の値・両 OS のテストとビルド。出力は成否と失敗の箇所だけ） | `make verify` |
-| 文書の一致と書き方だけを確かめる（文書だけの変更） | `make verify-docs` |
+| 変更の確認（文書・JSON の整形・Swift の書き方・余白の値・両 OS のテストとビルド。出力は成否と失敗の箇所だけ） | `make verify` |
+| 文書の一致と書き方、JSON の整形だけを確かめる（文書だけの変更） | `make verify-docs` |
 | iOS のビルド（シミュレーター） | `make build` |
 | テストのコンパイルだけ（走らせない） | `make test-build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター） | `make test` |
 | 画面の部品を PNG に描く（下の注） | `make snapshot SNAPSHOT=widget` |
 | Android のビルド（デバッグの APK） | `make android-build` |
 | Android の Core のテスト | `make android-test` |
-| Swift の整形 | `make format` |
+| Swift と JSON の整形 | `make format` |
 | ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
 
 `make snapshot` は claude-config の `ui-snapshot` を使う。セットは `.claude/snapshots/` の下の名前で、出力は `.build/snapshots/<セット>/` に出る。

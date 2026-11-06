@@ -1,25 +1,251 @@
 {
   "description": "入力の判定で出る問題を試す。category と tag は、入っているかを真偽で書く。toWallet は none・same・other のどれかにする。fee は手数料で、無ければ 0 として読む。items は品目の name・quantity・amount の配列で、無ければ品目に触れない。",
   "cases": [
-    { "summary": "支出の正しい入力", "type": "expense", "amount": 500, "category": true, "tag": false, "toWallet": "none", "problems": [] },
-    { "summary": "収入は 1 円から通る", "type": "income", "amount": 1, "category": true, "tag": false, "toWallet": "none", "problems": [] },
-    { "summary": "振替の正しい入力", "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "other", "problems": [] },
-    { "summary": "タグ付きの支出", "type": "expense", "amount": 500, "category": true, "tag": true, "toWallet": "none", "problems": [] },
-    { "summary": "金額が 0 円", "type": "expense", "amount": 0, "category": true, "tag": false, "toWallet": "none", "problems": ["amountNotPositive"] },
-    { "summary": "金額がマイナス", "type": "expense", "amount": -100, "category": true, "tag": false, "toWallet": "none", "problems": ["amountNotPositive"] },
-    { "summary": "カテゴリが無い", "type": "expense", "amount": 500, "category": false, "tag": false, "toWallet": "none", "problems": ["missingCategory"] },
-    { "summary": "金額とカテゴリがどちらも誤り", "type": "income", "amount": 0, "category": false, "tag": false, "toWallet": "none", "problems": ["amountNotPositive", "missingCategory"] },
-    { "summary": "振替にカテゴリが付いている", "type": "transfer", "amount": 3000, "category": true, "tag": false, "toWallet": "other", "problems": ["categoryOnTransfer"] },
-    { "summary": "振替の移動先が無い", "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "none", "problems": ["missingDestination"] },
-    { "summary": "振替の移動先が同じ財布", "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "same", "problems": ["sameWallet"] },
-    { "summary": "カテゴリが無くタグだけある", "type": "expense", "amount": 500, "category": false, "tag": true, "toWallet": "none", "problems": ["missingCategory", "tagWithoutCategory"] },
-    { "summary": "振替にタグだけ付いている", "type": "transfer", "amount": 3000, "category": false, "tag": true, "toWallet": "other", "problems": ["tagWithoutCategory"] },
-    { "summary": "手数料付きの振替", "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "other", "fee": 110, "problems": [] },
-    { "summary": "手数料がマイナス", "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "other", "fee": -10, "problems": ["feeNegative"] },
-    { "summary": "支出に手数料が付いている", "type": "expense", "amount": 500, "category": true, "tag": false, "toWallet": "none", "fee": 110, "problems": ["feeOnNonTransfer"] },
-    { "summary": "品目付きの支出", "type": "expense", "amount": 500, "category": true, "tag": false, "toWallet": "none", "items": [{ "name": "牛乳", "quantity": 2, "amount": 396 }, { "name": "値引", "quantity": 1, "amount": -30 }], "problems": [] },
-    { "summary": "振替に品目が付いている", "type": "transfer", "amount": 3000, "category": false, "tag": false, "toWallet": "other", "items": [{ "name": "牛乳", "quantity": 1, "amount": 198 }], "problems": ["itemsOnTransfer"] },
-    { "summary": "品名が空白だけ", "type": "expense", "amount": 500, "category": true, "tag": false, "toWallet": "none", "items": [{ "name": "  ", "quantity": 1, "amount": 500 }], "problems": ["itemNameEmpty"] },
-    { "summary": "品目の数量が 0", "type": "expense", "amount": 500, "category": true, "tag": false, "toWallet": "none", "items": [{ "name": "牛乳", "quantity": 0, "amount": 500 }], "problems": ["itemQuantityNotPositive"] }
+    {
+      "summary": "支出の正しい入力",
+      "type": "expense",
+      "amount": 500,
+      "category": true,
+      "tag": false,
+      "toWallet": "none",
+      "problems": []
+    },
+    {
+      "summary": "収入は 1 円から通る",
+      "type": "income",
+      "amount": 1,
+      "category": true,
+      "tag": false,
+      "toWallet": "none",
+      "problems": []
+    },
+    {
+      "summary": "振替の正しい入力",
+      "type": "transfer",
+      "amount": 3000,
+      "category": false,
+      "tag": false,
+      "toWallet": "other",
+      "problems": []
+    },
+    {
+      "summary": "タグ付きの支出",
+      "type": "expense",
+      "amount": 500,
+      "category": true,
+      "tag": true,
+      "toWallet": "none",
+      "problems": []
+    },
+    {
+      "summary": "金額が 0 円",
+      "type": "expense",
+      "amount": 0,
+      "category": true,
+      "tag": false,
+      "toWallet": "none",
+      "problems": [
+        "amountNotPositive"
+      ]
+    },
+    {
+      "summary": "金額がマイナス",
+      "type": "expense",
+      "amount": -100,
+      "category": true,
+      "tag": false,
+      "toWallet": "none",
+      "problems": [
+        "amountNotPositive"
+      ]
+    },
+    {
+      "summary": "カテゴリが無い",
+      "type": "expense",
+      "amount": 500,
+      "category": false,
+      "tag": false,
+      "toWallet": "none",
+      "problems": [
+        "missingCategory"
+      ]
+    },
+    {
+      "summary": "金額とカテゴリがどちらも誤り",
+      "type": "income",
+      "amount": 0,
+      "category": false,
+      "tag": false,
+      "toWallet": "none",
+      "problems": [
+        "amountNotPositive",
+        "missingCategory"
+      ]
+    },
+    {
+      "summary": "振替にカテゴリが付いている",
+      "type": "transfer",
+      "amount": 3000,
+      "category": true,
+      "tag": false,
+      "toWallet": "other",
+      "problems": [
+        "categoryOnTransfer"
+      ]
+    },
+    {
+      "summary": "振替の移動先が無い",
+      "type": "transfer",
+      "amount": 3000,
+      "category": false,
+      "tag": false,
+      "toWallet": "none",
+      "problems": [
+        "missingDestination"
+      ]
+    },
+    {
+      "summary": "振替の移動先が同じ財布",
+      "type": "transfer",
+      "amount": 3000,
+      "category": false,
+      "tag": false,
+      "toWallet": "same",
+      "problems": [
+        "sameWallet"
+      ]
+    },
+    {
+      "summary": "カテゴリが無くタグだけある",
+      "type": "expense",
+      "amount": 500,
+      "category": false,
+      "tag": true,
+      "toWallet": "none",
+      "problems": [
+        "missingCategory",
+        "tagWithoutCategory"
+      ]
+    },
+    {
+      "summary": "振替にタグだけ付いている",
+      "type": "transfer",
+      "amount": 3000,
+      "category": false,
+      "tag": true,
+      "toWallet": "other",
+      "problems": [
+        "tagWithoutCategory"
+      ]
+    },
+    {
+      "summary": "手数料付きの振替",
+      "type": "transfer",
+      "amount": 3000,
+      "category": false,
+      "tag": false,
+      "toWallet": "other",
+      "fee": 110,
+      "problems": []
+    },
+    {
+      "summary": "手数料がマイナス",
+      "type": "transfer",
+      "amount": 3000,
+      "category": false,
+      "tag": false,
+      "toWallet": "other",
+      "fee": -10,
+      "problems": [
+        "feeNegative"
+      ]
+    },
+    {
+      "summary": "支出に手数料が付いている",
+      "type": "expense",
+      "amount": 500,
+      "category": true,
+      "tag": false,
+      "toWallet": "none",
+      "fee": 110,
+      "problems": [
+        "feeOnNonTransfer"
+      ]
+    },
+    {
+      "summary": "品目付きの支出",
+      "type": "expense",
+      "amount": 500,
+      "category": true,
+      "tag": false,
+      "toWallet": "none",
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 2,
+          "amount": 396
+        },
+        {
+          "name": "値引",
+          "quantity": 1,
+          "amount": -30
+        }
+      ],
+      "problems": []
+    },
+    {
+      "summary": "振替に品目が付いている",
+      "type": "transfer",
+      "amount": 3000,
+      "category": false,
+      "tag": false,
+      "toWallet": "other",
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 1,
+          "amount": 198
+        }
+      ],
+      "problems": [
+        "itemsOnTransfer"
+      ]
+    },
+    {
+      "summary": "品名が空白だけ",
+      "type": "expense",
+      "amount": 500,
+      "category": true,
+      "tag": false,
+      "toWallet": "none",
+      "items": [
+        {
+          "name": "  ",
+          "quantity": 1,
+          "amount": 500
+        }
+      ],
+      "problems": [
+        "itemNameEmpty"
+      ]
+    },
+    {
+      "summary": "品目の数量が 0",
+      "type": "expense",
+      "amount": 500,
+      "category": true,
+      "tag": false,
+      "toWallet": "none",
+      "items": [
+        {
+          "name": "牛乳",
+          "quantity": 0,
+          "amount": 500
+        }
+      ],
+      "problems": [
+        "itemQuantityNotPositive"
+      ]
+    }
   ]
 }
