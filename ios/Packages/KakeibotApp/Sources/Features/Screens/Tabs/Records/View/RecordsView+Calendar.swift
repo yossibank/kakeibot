@@ -93,91 +93,32 @@ private extension RecordsView {
     func calendarCell(_ date: LocalDate?) -> some View {
         if let date {
             let isShown = date == model.shownDate
-            let fill = isShown ? Palette.accent : Color.clear
-            let ring = date == model.today && !isShown
-                ? Palette.accent
-                : .clear
-            let opacity = date > model.today && !isShown
-                ? 0.45
-                : 1
+            let day = model.day(on: date)
+            let expense = day?.expenseTotal ?? 0
+            let isNoSpend = model.noSpendDays.contains(date)
+            let hasUpcoming = expense == 0
+                && !isNoSpend
+                && !model.upcomingRecurrings(on: date).isEmpty
 
-            Button {
+            RecordsCalendarCell(
+                day: date.day,
+                dayColor: dayColor(date, isShown: isShown),
+                isShown: isShown,
+                isToday: date == model.today,
+                isDimmed: date > model.today && !isShown,
+                stamp: model.stampIcon(on: date),
+                expense: expense,
+                income: day?.incomeTotal ?? 0,
+                isNoSpend: isNoSpend,
+                hasUpcoming: hasUpcoming
+            ) {
                 model.selectedDate = date
-            } label: {
-                VStack(spacing: 4) {
-                    Text(String(date.day))
-                        .displayFont(.body)
-                        .foregroundStyle(dayColor(date, isShown: isShown))
-                        .frame(width: 30, height: 30)
-                        .background(fill, in: Circle())
-                        .overlay(Circle().stroke(ring, lineWidth: 1))
-                        .overlay(alignment: .topTrailing) {
-                            if let stamp = model.stampIcon(on: date) {
-                                IconSeal(stamp, size: 22)
-                                    .offset(x: 11, y: -9)
-                                    .id(stamp.id)
-                                    .transition(Self.stampTransition)
-                            }
-                        }
-                        .animation(Self.stampAnimation, value: model.stampIcon(on: date)?.id)
-
-                    dayMark(date)
-                }
-                .opacity(opacity)
-                .frame(maxWidth: .infinity, minHeight: 62)
-                .contentShape(.rect)
             }
-            .buttonStyle(.plain)
+            .equatable()
         } else {
             Color.clear
                 .frame(maxWidth: .infinity, minHeight: 62)
         }
-    }
-
-    func dayMark(_ date: LocalDate) -> some View {
-        let day = model.day(on: date)
-        let expense = day?.expenseTotal ?? 0
-        let income = day?.incomeTotal ?? 0
-
-        return VStack(spacing: 0) {
-            markSlot {
-                if expense > 0 {
-                    markAmount(expense, type: .expense)
-                } else if model.noSpendDays.contains(date) {
-                    Image(systemName: "leaf.fill")
-                        .sansFont(.micro)
-                        .foregroundStyle(Palette.accent)
-                } else if !model.upcomingRecurrings(on: date).isEmpty {
-                    Image(systemName: "repeat")
-                        .sansFont(.micro)
-                        .foregroundStyle(Palette.hint)
-                }
-            }
-
-            markSlot {
-                if income > 0 {
-                    markAmount(income, type: .income)
-                }
-            }
-        }
-    }
-
-    func markSlot(@ViewBuilder _ content: () -> some View) -> some View {
-        Color.clear
-            .frame(height: Self.markLineHeight)
-            .overlay {
-                content()
-            }
-    }
-
-    func markAmount(
-        _ amount: Int,
-        type: Entry.Kind
-    ) -> some View {
-        AmountText(amount, type: type)
-            .textFont(size: .micro)
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
     }
 
     func upcomingList(
@@ -254,16 +195,6 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
-    static let markLineHeight: CGFloat = 12
-
-    static var stampTransition: AnyTransition {
-        .scale(scale: 0.2).combined(with: .opacity)
-    }
-
-    static var stampAnimation: Animation {
-        .bouncy(duration: 0.45, extraBounce: 0.25)
-    }
-
     func dayColor(
         _ date: LocalDate,
         isShown: Bool
