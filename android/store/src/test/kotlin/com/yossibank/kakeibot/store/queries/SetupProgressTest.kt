@@ -11,7 +11,7 @@ import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.reminderTime
 import com.yossibank.kakeibot.store.records.settingkeys.theme
 import com.yossibank.kakeibot.store.support.setBudget
-import com.yossibank.kakeibot.store.support.setSetting
+import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -36,12 +36,12 @@ class SetupProgressTest {
 
         database.setSetting(
             key = SettingKey.reminderTime,
-            value = ReminderTime.parse("21:00"),
+            to = ReminderTime.parse("21:00"),
         )
 
         database.setSetting(
             key = SettingKey.theme,
-            value = ThemeChoice.Preset(ThemePreset.sky),
+            to = ThemeChoice.Preset(ThemePreset.sky),
         )
 
         val filled = database.setupProgressUpdates().first()

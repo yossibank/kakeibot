@@ -69,6 +69,24 @@ interface RewardLogRecordDao {
         """,
     )
     suspend fun totals(): List<RewardLogTotal>
+
+    @Query("SELECT * FROM reward_log WHERE rule_id = :ruleId AND date = :date")
+    suspend fun on(
+        ruleId: String,
+        date: String,
+    ): List<RewardLogRecord>
+
+    @Query("DELETE FROM reward_log WHERE rule_id = :ruleId AND date = :date")
+    suspend fun deleteOn(
+        ruleId: String,
+        date: String,
+    )
+
+    @Query("SELECT COUNT(*) FROM reward_log WHERE rule_id = :ruleId")
+    suspend fun countOfRule(ruleId: String): Int
+
+    @Query("SELECT COUNT(*) FROM reward_log")
+    suspend fun count(): Int
 }
 
 fun RewardLog.record(): RewardLogRecord = RewardLogRecord(

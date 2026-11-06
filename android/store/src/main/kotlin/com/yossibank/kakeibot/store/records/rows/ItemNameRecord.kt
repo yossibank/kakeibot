@@ -7,6 +7,7 @@ import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.receipt.ItemName
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
@@ -42,6 +43,24 @@ interface ItemNameRecordDao {
 
     @Query("DELETE FROM item_name")
     suspend fun deleteAll()
+
+    @Upsert
+    suspend fun save(record: ItemNameRecord)
+
+    @Query("SELECT * FROM item_name WHERE store = :store")
+    suspend fun atStore(store: String): List<ItemNameRecord>
+
+    @Query("SELECT * FROM item_name WHERE store = :store AND raw = :raw LIMIT 1")
+    suspend fun find(
+        store: String,
+        raw: String,
+    ): ItemNameRecord?
+
+    @Query("DELETE FROM item_name WHERE store = :store AND raw = :raw")
+    suspend fun delete(
+        store: String,
+        raw: String,
+    )
 }
 
 fun ItemName.record(): ItemNameRecord = ItemNameRecord(

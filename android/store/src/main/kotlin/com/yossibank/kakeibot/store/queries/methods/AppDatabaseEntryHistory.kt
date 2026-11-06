@@ -9,6 +9,7 @@ import com.yossibank.kakeibot.store.records.rows.EntryRecord
 import com.yossibank.kakeibot.store.records.rows.entry
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.reviewRequestedVersion
+import com.yossibank.kakeibot.store.writes.methods.storeSetting
 
 suspend fun AppDatabase.entryHistory(): EntryHistory = read {
     fetchEntryHistory()
@@ -26,7 +27,10 @@ suspend fun AppDatabase.claimReviewRequest(
         return@write false
     }
 
-    SettingKey.reviewRequestedVersion.write(version, this)
+    storeSetting(
+        key = SettingKey.reviewRequestedVersion,
+        to = version,
+    )
 
     true
 }

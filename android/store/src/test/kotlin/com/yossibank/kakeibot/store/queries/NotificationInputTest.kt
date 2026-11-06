@@ -12,7 +12,7 @@ import com.yossibank.kakeibot.store.records.settingkeys.reminderTime
 import com.yossibank.kakeibot.store.support.insertCardBill
 import com.yossibank.kakeibot.store.support.insertEntry
 import com.yossibank.kakeibot.store.support.markNoSpendDay
-import com.yossibank.kakeibot.store.support.setSetting
+import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -56,7 +56,7 @@ class NotificationInputTest {
 
         database.setSetting(
             key = SettingKey.reminderTime,
-            value = time,
+            to = time,
         )
 
         val input = database.notificationInput(from = today)
@@ -104,7 +104,7 @@ class NotificationInputTest {
 
         database.setSetting(
             key = SettingKey.reminderTime,
-            value = time,
+            to = time,
         )
 
         val updates = database.notificationInputUpdates(from = today).produceIn(backgroundScope)

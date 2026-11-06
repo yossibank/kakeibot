@@ -8,6 +8,7 @@ import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
@@ -105,6 +106,34 @@ interface EntryCategoryRecordDao {
 
     @Query("SELECT * FROM category WHERE archived_at IS NULL AND wallet_id IS NOT NULL ORDER BY sort_order")
     suspend fun unarchivedOfWallets(): List<EntryCategoryRecord>
+
+    @Update
+    suspend fun update(record: EntryCategoryRecord)
+
+    @Query("DELETE FROM category WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("SELECT * FROM category WHERE wallet_id = :walletId")
+    suspend fun ofWallet(walletId: String): List<EntryCategoryRecord>
+
+    @Query("DELETE FROM category WHERE wallet_id = :walletId")
+    suspend fun deleteOfWallet(walletId: String)
+
+    @Query("SELECT MAX(sort_order) FROM category WHERE kind = :kind AND wallet_id IS NULL")
+    suspend fun maxSortOrderWithoutWallet(kind: String): Int?
+
+    @Query(
+        """
+        SELECT id FROM category
+        WHERE wallet_id IS NULL AND kind = :kind AND name = :name
+        ORDER BY archived_at IS NOT NULL, sort_order
+        LIMIT 1
+        """,
+    )
+    suspend fun firstIdWithoutWallet(
+        kind: String,
+        name: String,
+    ): String?
 }
 
 fun EntryCategory.record(): EntryCategoryRecord = EntryCategoryRecord(

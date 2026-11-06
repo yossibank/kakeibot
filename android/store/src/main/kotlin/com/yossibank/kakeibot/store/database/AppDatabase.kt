@@ -1,6 +1,7 @@
 package com.yossibank.kakeibot.store.database
 
 import androidx.room.Database
+import androidx.room.PooledConnection
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.deferredTransaction
@@ -143,13 +144,13 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
-internal suspend fun <Result> AppDatabase.write(block: suspend () -> Result): Result = useWriterConnection { connection ->
+internal suspend fun <Result> AppDatabase.write(block: suspend PooledConnection.() -> Result): Result = useWriterConnection { connection ->
     connection.immediateTransaction {
         block()
     }
 }
 
-internal suspend fun <Result> AppDatabase.read(block: suspend () -> Result): Result = useReaderConnection { connection ->
+internal suspend fun <Result> AppDatabase.read(block: suspend PooledConnection.() -> Result): Result = useReaderConnection { connection ->
     connection.deferredTransaction {
         block()
     }

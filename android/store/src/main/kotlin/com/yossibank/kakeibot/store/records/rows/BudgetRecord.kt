@@ -8,6 +8,7 @@ import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.budget.Budget
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
@@ -51,6 +52,18 @@ interface BudgetRecordDao {
 
     @Query("SELECT * FROM budget ORDER BY from_month")
     suspend fun inMonthOrder(): List<BudgetRecord>
+
+    @Update
+    suspend fun update(record: BudgetRecord)
+
+    @Query("DELETE FROM budget WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("SELECT * FROM budget WHERE category_id = :categoryId")
+    suspend fun ofCategory(categoryId: String): List<BudgetRecord>
+
+    @Query("DELETE FROM budget WHERE category_id = :categoryId")
+    suspend fun deleteOfCategory(categoryId: String)
 }
 
 fun Budget.record(): BudgetRecord = BudgetRecord(

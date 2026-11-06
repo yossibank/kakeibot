@@ -8,6 +8,8 @@ import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
+import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
@@ -153,6 +155,105 @@ interface EntryRecordDao {
         """,
     )
     suspend fun recentMemos(limit: Int): List<String>
+
+    @Update
+    suspend fun update(record: EntryRecord)
+
+    @Upsert
+    suspend fun save(record: EntryRecord)
+
+    @Query("SELECT EXISTS (SELECT 1 FROM entry WHERE id = :id)")
+    suspend fun exists(id: String): Boolean
+
+    @Query("DELETE FROM entry WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("DELETE FROM entry WHERE id IN (:ids)")
+    suspend fun deleteIds(ids: List<String>)
+
+    @Query("SELECT * FROM entry WHERE id IN (:ids)")
+    suspend fun withIds(ids: List<String>): List<EntryRecord>
+
+    @Query("SELECT COUNT(*) FROM entry WHERE wallet_id = :walletId OR to_wallet_id = :walletId")
+    suspend fun countOfWallet(walletId: String): Int
+
+    @Query("SELECT COUNT(*) FROM entry WHERE category_id = :categoryId")
+    suspend fun countOfCategory(categoryId: String): Int
+
+    @Query("SELECT * FROM entry WHERE transfer_id = :transferId LIMIT 1")
+    suspend fun fee(transferId: String): EntryRecord?
+
+    @Query("SELECT * FROM entry WHERE transfer_id IN (:transferIds)")
+    suspend fun fees(transferIds: List<String>): List<EntryRecord>
+
+    @Query("SELECT * FROM entry WHERE transfer_id IN (:ids) AND id NOT IN (:ids)")
+    suspend fun feesOutside(ids: List<String>): List<EntryRecord>
+
+    @Query("DELETE FROM entry WHERE transfer_id IN (:transferIds)")
+    suspend fun deleteFees(transferIds: List<String>)
+
+    @Query("DELETE FROM entry WHERE transfer_id = :transferId AND id IS NOT :keptId")
+    suspend fun deleteFees(
+        transferId: String,
+        keptId: String?,
+    )
+
+    @Query("SELECT * FROM entry WHERE recurring_id IN (:recurringIds)")
+    suspend fun ofRecurrings(recurringIds: List<String>): List<EntryRecord>
+
+    @Query(
+        """
+        UPDATE entry SET recurring_id = NULL, recurring_date = NULL, updated_at = :updatedAt
+        WHERE recurring_id IN (:recurringIds)
+        """,
+    )
+    suspend fun detachRecurrings(
+        recurringIds: List<String>,
+        updatedAt: String,
+    )
+
+    @Query("SELECT * FROM entry WHERE template_id = :templateId")
+    suspend fun ofTemplate(templateId: String): List<EntryRecord>
+
+    @Query("SELECT COUNT(*) FROM entry WHERE date = :date AND type = 'expense'")
+    suspend fun countExpenses(date: String): Int
+
+    @Query(
+        """
+        SELECT * FROM entry
+        WHERE recurring_id = :recurringId AND recurring_date >= :earliest AND recurring_date <= :latest
+        """,
+    )
+    suspend fun ofRecurring(
+        recurringId: String,
+        earliest: String,
+        latest: String,
+    ): List<EntryRecord>
+
+    @Query(
+        """
+        SELECT * FROM entry
+        WHERE recurring_id = :recurringId AND recurring_date >= :first AND recurring_date < :next
+        """,
+    )
+    suspend fun ofRecurrence(
+        recurringId: String,
+        first: String,
+        next: String,
+    ): List<EntryRecord>
+
+    @Query(
+        """
+        SELECT * FROM entry
+        WHERE wallet_id = :card AND ((date >= :start AND date <= :end) OR bill_month = :month)
+        """,
+    )
+    suspend fun billed(
+        card: String,
+        start: String,
+        end: String,
+        month: String,
+    ): List<EntryRecord>
 }
 
 fun Entry.record(): EntryRecord = EntryRecord(

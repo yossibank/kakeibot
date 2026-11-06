@@ -20,7 +20,6 @@ import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.rows.BudgetRecord
 import com.yossibank.kakeibot.store.records.rows.budget
 import com.yossibank.kakeibot.store.records.rows.record
-import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.values.databaseValue
 import java.time.Instant
 
@@ -93,15 +92,6 @@ suspend fun AppDatabase.setBudget(
             amount,
             existing.id.databaseValue,
         )
-    }
-}
-
-suspend fun <Value> AppDatabase.setSetting(
-    key: SettingKey<Value>,
-    value: Value,
-) {
-    write {
-        key.write(value, this)
     }
 }
 

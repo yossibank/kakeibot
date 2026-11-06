@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.shared.Identifier
@@ -73,6 +74,35 @@ interface EntryTagRecordDao {
         """,
     )
     suspend fun ofWalletsInOrder(): List<EntryTagRecord>
+
+    @Query("SELECT * FROM tag WHERE id = :id")
+    suspend fun find(id: String): EntryTagRecord?
+
+    @Update
+    suspend fun update(record: EntryTagRecord)
+
+    @Query("SELECT * FROM tag WHERE category_id = :categoryId")
+    suspend fun ofCategory(categoryId: String): List<EntryTagRecord>
+
+    @Query("SELECT * FROM tag WHERE category_id IN (:categoryIds)")
+    suspend fun ofCategories(categoryIds: List<String>): List<EntryTagRecord>
+
+    @Query("DELETE FROM tag WHERE category_id IN (:categoryIds)")
+    suspend fun deleteOfCategories(categoryIds: List<String>)
+
+    @Query(
+        """
+        SELECT tag.id FROM tag
+        JOIN tag AS original ON original.name = tag.name
+        WHERE original.id = :tagId AND tag.category_id = :categoryId
+        ORDER BY tag.archived_at IS NOT NULL, tag.sort_order
+        LIMIT 1
+        """,
+    )
+    suspend fun firstId(
+        tagId: String,
+        categoryId: String,
+    ): String?
 }
 
 fun EntryTag.record(): EntryTagRecord = EntryTagRecord(

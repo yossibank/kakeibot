@@ -18,7 +18,7 @@ import com.yossibank.kakeibot.store.records.settingkeys.budgetCarryoverFrom
 import com.yossibank.kakeibot.store.support.insertCardBill
 import com.yossibank.kakeibot.store.support.insertEntry
 import com.yossibank.kakeibot.store.support.setBudget
-import com.yossibank.kakeibot.store.support.setSetting
+import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -99,7 +99,7 @@ class MonthOverviewTest {
 
         database.setSetting(
             key = SettingKey.budgetCarryoverFrom,
-            value = start,
+            to = start,
         )
 
         val overview = database.monthOverview(on = today)

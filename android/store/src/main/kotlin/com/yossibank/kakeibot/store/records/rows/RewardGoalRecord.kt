@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.reward.RewardGoal
 import com.yossibank.kakeibot.core.shared.Identifier
@@ -45,6 +46,21 @@ interface RewardGoalRecordDao {
 
     @Query("DELETE FROM reward_goal")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM reward_goal WHERE id = :id")
+    suspend fun find(id: String): RewardGoalRecord?
+
+    @Update
+    suspend fun update(record: RewardGoalRecord)
+
+    @Query("DELETE FROM reward_goal WHERE id = :id")
+    suspend fun delete(id: String): Int
+
+    @Query("UPDATE reward_goal SET entry_id = NULL, updated_at = :updatedAt WHERE entry_id IN (:entryIds)")
+    suspend fun detach(
+        entryIds: List<String>,
+        updatedAt: String,
+    )
 }
 
 fun RewardGoal.record(): RewardGoalRecord = RewardGoalRecord(
