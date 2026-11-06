@@ -38,9 +38,9 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 | 画面の言葉・型の名前を足す・変える | [glossary](docs/glossary.md) | glossary |
 | 方針を決める・変える | [decisions](docs/decisions/) の、`docs-section.sh` で探した節だけ | decisions |
 | 作る順番の 1 段を終える | [roadmap](docs/roadmap.md) | roadmap の状態 |
-| 対応 OS を変える | [overview](docs/overview.md) | overview、README のバッジ |
-| Swift の版・使う技術を変える | [architecture](docs/architecture.md) | architecture、README のバッジ |
+| 対応 OS を変える | [overview](docs/overview.md) | overview、README の技術のアイコンと実行環境 |
+| Swift の版・使う技術を変える | [architecture](docs/architecture.md) | architecture、README の技術のアイコンと実行環境 |
 | 未検証の項目を確かめる | 各文書の `[!WARNING]` | 結果で本文を書き換え、WARNING から消す |
-| 整形・確認の仕組みを変える | [README の「動かし方」](README.md#-動かし方) | README、architecture のリポジトリの表 |
+| 整形・確認の仕組みを変える | [development](docs/development.md) | development、architecture のリポジトリの表 |
 
 spec の文書の役割は [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) にあり、文書を開くと読み込まれる。
