@@ -34,6 +34,7 @@ final class AppModel {
     private var hasStoppedObservation = false
     private var syncEngine: SyncEngine?
     private var sharedSyncEngine: SyncEngine?
+    private var widgetReload: Task<Void, Never>?
 
     init(
         openDatabase: @escaping @Sendable () throws -> AppDatabase,
@@ -308,6 +309,7 @@ extension AppModel {
 
 private extension AppModel {
     static let shareFailedMessage = "共有の口座に参加できませんでした"
+    static let widgetReloadDelay: Duration = .seconds(1)
     static let recurringFailedMessage = "固定費を自動で記録できませんでした"
 
     func observeLook(in database: AppDatabase) async {
@@ -345,7 +347,17 @@ private extension AppModel {
     }
 
     func reloadWidgets() {
-        WidgetCenter.shared.reloadAllTimelines()
+        widgetReload?.cancel()
+
+        widgetReload = Task {
+            try? await Task.sleep(for: Self.widgetReloadDelay)
+
+            guard !Task.isCancelled else {
+                return
+            }
+
+            WidgetCenter.shared.reloadAllTimelines()
+        }
     }
 
     func scheduleNotifications(in database: AppDatabase) async {
