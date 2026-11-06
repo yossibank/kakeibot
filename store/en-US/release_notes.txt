@@ -1,5 +1,6 @@
-・Recurring transfers to a loan can now set the number of payments, and show the final amount, the total and the last month.
-・More icons and emoji for categories and more.
-・What's New now switches between versions.
-・Text no longer gets cut off on small screens in the Assets tab, the Records tab and amount fields in Settings.
-・The Records tab total now shows the month's balance.
+・While editing a record, tap "Again" to add a copy of it dated today.
+・When sync stops, the Settings list and the gear on Home now show a mark and the reason.
+・When Quick Entry in the widget is empty, it now offers a shortcut to create a template.
+・Switching periods is smoother, and the entry sheet and the Records tab are faster.
+・Amounts now share one font, and unpaid and remaining amounts in the Assets tab are easier to read.
+・Fixed CSV export sometimes breaking fields that contain line breaks.
