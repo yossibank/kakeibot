@@ -4,7 +4,7 @@ import SwiftUI
 
 extension ReviewView {
     var content: some View {
-        TwoColumnLayout(spacing: 12) {
+        TwoColumnStack(spacing: 12) {
             HStack(spacing: 8) {
                 ForEach(ReviewKind.allCases, id: \.self) { kind in
                     kindTile(kind)
