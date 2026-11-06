@@ -105,4 +105,30 @@ extension EntryModelTransferTests {
         #expect(saved?.fee?.amount == 330)
         #expect(after?.amount == -10220)
     }
+
+    @Test
+    func dropsFeeWhenRecordingAgain() async throws {
+        let setup = try await Setup()
+
+        let draft = EntryDraft(
+            type: .transfer,
+            amount: 10000,
+            date: setup.date,
+            categoryId: nil,
+            walletId: setup.bank,
+            toWalletId: setup.cash,
+            fee: 220
+        )
+
+        let transfer = try await setup.database.saveEntry(draft, at: Date())
+        let model = EntryModel(database: setup.database, editing: transfer.id, date: setup.date)
+        await model.load()
+
+        await model.recordAgain()
+        let saved = await model.save()
+
+        #expect(saved?.entry.id != transfer.id)
+        #expect(saved?.entry.amount == 10000)
+        #expect(saved?.fee == nil)
+    }
 }

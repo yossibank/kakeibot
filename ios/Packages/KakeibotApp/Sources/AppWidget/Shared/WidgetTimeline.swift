@@ -1,7 +1,7 @@
 import Foundation
 
 enum WidgetTimeline {
-    static let retryInterval: TimeInterval = 30 * 60
+    static let retryInterval: TimeInterval = 5 * 60
 
     static func nextMidnight(after date: Date) -> Date? {
         let calendar = Calendar.current

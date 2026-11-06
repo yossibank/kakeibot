@@ -2,6 +2,7 @@
 
 > [!NOTE]
 > 財布の持ち方と消し方の決定が分かる。純資産は [net-worth](net-worth.md) にある。
+> 投資の評価額は [wallets-valuation](wallets-valuation.md) にある。
 > 言葉の対応は [glossary](../glossary.md) にある。
 
 ## 財布の種類

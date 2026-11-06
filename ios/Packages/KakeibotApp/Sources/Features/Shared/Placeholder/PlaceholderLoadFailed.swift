@@ -6,7 +6,7 @@ struct PlaceholderLoadFailed: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            Text("読み込めませんでした")
+            Text("読めませんでした")
                 .textFont(.footnote)
                 .foregroundStyle(Palette.subtext)
 

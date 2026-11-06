@@ -116,6 +116,7 @@ struct NotificationPlanTests {
         #expect(PlannedNotification.Route(link: entry.link) == entry)
         #expect(PlannedNotification.Route(link: recurring.link) == recurring)
         #expect(PlannedNotification.Route(link: template.link) == template)
+        #expect(PlannedNotification.Route(link: "new-template") == .newTemplate)
         #expect(PlannedNotification.Route(link: "template/x") == nil)
         #expect(PlannedNotification.Route(link: "entry/2026-13-01") == nil)
         #expect(PlannedNotification.Route(link: "budget/1") == nil)
@@ -129,12 +130,15 @@ struct NotificationPlanTests {
         let entry = PlannedNotification.Route.entry(date)
         let homeURL = try #require(home.url)
         let entryURL = try #require(entry.url)
+        let newTemplateURL = try #require(PlannedNotification.Route.newTemplate.url)
         let other = try #require(URL(string: "https://example.com/home"))
 
         #expect(homeURL.absoluteString == "kakeibot://home")
         #expect(entryURL.absoluteString == "kakeibot://entry/2026-10-18")
         #expect(PlannedNotification.Route(url: homeURL) == home)
         #expect(PlannedNotification.Route(url: entryURL) == entry)
+        #expect(newTemplateURL.absoluteString == "kakeibot://new-template")
+        #expect(PlannedNotification.Route(url: newTemplateURL) == .newTemplate)
         #expect(PlannedNotification.Route(url: other) == nil)
     }
 }

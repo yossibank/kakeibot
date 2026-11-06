@@ -196,7 +196,7 @@ public extension SyncModel {
 extension SyncModel: ScreenModel {}
 
 private extension SyncModel {
-    static let loadFailedMessage = "同期の状態を読み込めませんでした"
+    static let loadFailedMessage = "同期の状態を読めませんでした"
     static let saveFailedMessage = "同期を切り替えられませんでした。時間をおいて試してください"
 
     func observeStatus() async {

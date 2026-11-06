@@ -60,6 +60,26 @@ struct SnapshotTests {
                 .frame(height: 1200)
 
             try Self.write(unpaidSheet, variant: variant, to: "assets-unpaid")
+
+            let wallet = try #require(model.rows.first)
+
+            for (name, keys) in [
+                ("assets-adjust", [AmountCalculator.Key]()),
+                ("assets-adjust-typed", [.digit(4), .digit(8), .digit(2), .doubleZero])
+            ] {
+                let adjust = model.adjustModel(for: wallet)
+
+                for key in keys {
+                    adjust.press(key)
+                }
+
+                let sheet = AssetsAdjustSheet(model: adjust).content
+                    .padding(.horizontal, 20)
+                    .padding(.top, 28)
+                    .background(Palette.panel)
+
+                try Self.write(sheet, variant: variant, to: name)
+            }
         }
 
         task.cancel()

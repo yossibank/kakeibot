@@ -101,3 +101,70 @@ extension RecordsModelTests {
         #expect(model.selectsAllShown([]) == false)
     }
 }
+
+extension RecordsModelTests {
+    @Test
+    func allowsBatchChangeOfOneType() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-12")
+        try await setup.save(.expense, amount: 220, on: "2026-10-11")
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let ids = Set(model.shownEntryIDs)
+
+        #expect(model.batchCategoryBlock(of: ids) == nil)
+        #expect(model.batchWalletBlock(of: ids) == nil)
+        #expect(model.batchDeleteBlock(of: ids) == nil)
+    }
+
+    @Test
+    func blocksCategoryWhenTypesAreMixed() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-12")
+        try await setup.save(.income, amount: 250_000, on: "2026-10-10")
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let ids = Set(model.shownEntryIDs)
+
+        #expect(model.batchCategoryBlock(of: ids) == "支出と収入が混ざっているので、カテゴリはまとめて変えられません")
+        #expect(model.batchWalletBlock(of: ids) == nil)
+    }
+
+    @Test
+    func blocksCategoryAndWalletWithTransfer() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-12")
+        let options = try await setup.database.entryOptions()
+        let date = try #require(LocalDate("2026-10-11"))
+
+        let transfer = EntryDraft(
+            type: .transfer,
+            amount: 10000,
+            date: date,
+            categoryId: nil,
+            walletId: options.wallets[1].id,
+            toWalletId: options.wallets[0].id
+        )
+
+        try await setup.database.saveEntry(transfer, at: Date())
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let ids = Set(model.shownEntryIDs)
+
+        #expect(ids.count == 2)
+        #expect(model.batchCategoryBlock(of: ids) == "振替を含むので、カテゴリはまとめて変えられません")
+        #expect(model.batchWalletBlock(of: ids) == "振替を含むので、口座はまとめて変えられません")
+    }
+
+    @Test
+    func blocksBatchWhenNothingSelected() async throws {
+        let setup = try await Setup()
+        try await setup.save(.expense, amount: 980, on: "2026-10-12")
+        let model = RecordsModel(database: setup.database, today: setup.today)
+        await model.load()
+
+        #expect(model.batchCategoryBlock(of: []) == "記録を選んでください")
+        #expect(model.batchWalletBlock(of: []) == "記録を選んでください")
+        #expect(model.batchDeleteBlock(of: []) == "記録を選んでください")
+    }
+}

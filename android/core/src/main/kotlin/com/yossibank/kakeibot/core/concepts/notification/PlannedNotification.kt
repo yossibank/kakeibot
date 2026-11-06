@@ -50,10 +50,16 @@ data class PlannedNotification(
                 get() = "template/$id"
         }
 
+        data object NewTemplate : Route {
+            override val link: String
+                get() = "new-template"
+        }
+
         companion object {
             fun of(link: String): Route? {
-                if (link == "home") {
-                    return Home
+                when (link) {
+                    "home" -> return Home
+                    "new-template" -> return NewTemplate
                 }
 
                 val parts = parts(link)

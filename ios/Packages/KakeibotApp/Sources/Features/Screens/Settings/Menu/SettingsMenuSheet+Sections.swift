@@ -207,7 +207,7 @@ extension SettingsMenuSheet {
                     )
                 )
             } label: {
-                row("同期と共有", systemImage: "icloud", value: syncText)
+                SettingsMenuSyncRow(status: syncStatus)
             }
 
             Hairline()
@@ -273,14 +273,6 @@ private extension SettingsMenuSheet {
 
     var proText: String {
         isPro ? "購入済み" : "詳しく見る"
-    }
-
-    var syncText: String {
-        switch (syncStatus.isEnabled, syncStatus.stopReason) {
-        case (true, _): "オン"
-        case (false, .some): "切れました"
-        case (false, nil): "オフ"
-        }
     }
 
     var backupText: String? {

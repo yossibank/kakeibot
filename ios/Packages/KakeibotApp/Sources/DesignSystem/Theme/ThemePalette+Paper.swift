@@ -2,11 +2,11 @@ import Core
 
 extension ThemePalette {
     var paper: UInt32 {
-        isDark ? Self.mix(cardTop, text, by: 0.1) : cardTop
+        isDark ? Self.mix(cardTop, accent, by: 0.1) : cardTop
     }
 
     var paperEdge: UInt32 {
-        isDark ? Self.mix(cardTop, text, by: 0.3) : Self.mix(cardTop, accent, by: 0.35)
+        Self.mix(cardTop, accent, by: 0.35)
     }
 }
 

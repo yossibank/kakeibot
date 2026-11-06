@@ -23,7 +23,7 @@ private struct EntryNoticeBanner: ViewModifier {
     let clearsOnTap: Bool
 
     func body(content: Content) -> some View {
-        let bottom = 12 + inset
+        let bottom = NoticeBanner.bottomMargin + inset
 
         return content
             .simultaneousGesture(
@@ -35,7 +35,7 @@ private struct EntryNoticeBanner: ViewModifier {
             .overlay(alignment: .bottom) {
                 if let notice = model.notice {
                     banner(notice)
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, NoticeBanner.sideMargin)
                         .padding(.bottom, bottom)
                         .onTapGesture {
                             model.clearOnTap()

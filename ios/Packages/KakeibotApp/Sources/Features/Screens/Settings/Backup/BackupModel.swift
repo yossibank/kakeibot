@@ -266,7 +266,7 @@ private extension BackupModel {
     static let unknownFormatMessage = "かけいぼっとのバックアップではありません"
     static let newerVersionMessage = "新しい版のアプリで書き出したファイルです"
     static let missingTransferMessage = "元の振替が無い手数料があるため、読み込めません"
-    static let restoreFailedMessage = "読み込めませんでした。いまのデータはそのままです"
+    static let restoreFailedMessage = "バックアップを読めませんでした。いまのデータはそのままです"
     static let syncActiveMessage = "同期と共有をやめると、読み込めます"
 
     nonisolated static func previous(in stash: BackupStash) -> [Previous] {

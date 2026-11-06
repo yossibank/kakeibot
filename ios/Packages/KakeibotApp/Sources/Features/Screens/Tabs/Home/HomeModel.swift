@@ -24,6 +24,7 @@ public final class HomeModel: ScreenModel {
     public private(set) var templates: [EntryTemplate] = []
     public private(set) var overview: MonthOverview
     public private(set) var upcomingBills: [CardBill] = []
+    public private(set) var syncStatus = SyncStatus.off
 
     public private(set) var monthStartDay: MonthStartDay = .first {
         didSet {
@@ -172,6 +173,10 @@ public extension HomeModel {
 
             group.addTask {
                 await self.observeStamps()
+            }
+
+            group.addTask {
+                await self.observeSyncStatus()
             }
         }
     }
@@ -331,6 +336,16 @@ private extension HomeModel {
             failure: Self.loadFailedMessage
         ) { calendar in
             stampCalendar = calendar
+        }
+    }
+
+    func observeSyncStatus() async {
+        do {
+            for try await status in database.syncStatusUpdates() {
+                syncStatus = status
+            }
+        } catch {
+            syncStatus = .off
         }
     }
 

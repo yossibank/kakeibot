@@ -8,6 +8,7 @@ public struct ThemeStyleTextView: View {
     @State private var fontOffer: FontOffer?
 
     @Environment(\.isPro) private var isPro
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     public init(model: ThemeStyleModel) {
         let hintFlag = model.closedHint(.themeText)
@@ -25,6 +26,10 @@ public struct ThemeStyleTextView: View {
         ) {
             preview
         } content: {
+            if suggestsLarge {
+                largeSuggestion
+            }
+
             ThemeStyleChoices(
                 title: "文字の大きさ",
                 options: ThemeTextSize.allCases,
@@ -97,6 +102,12 @@ private extension ThemeStyleTextView {
 }
 
 private extension ThemeStyleTextView {
+    var suggestsLarge: Bool {
+        dynamicTypeSize >= .xLarge && model.style.textSize != .large
+    }
+}
+
+private extension ThemeStyleTextView {
     var preview: some View {
         VStack(spacing: 12) {
             VStack(spacing: 4) {
@@ -139,6 +150,24 @@ private extension ThemeStyleTextView {
                 )
             }
         }
+    }
+
+    var largeSuggestion: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("iPhone の文字を大きくしています。このアプリでは「大きめ」にすると読みやすくなります。")
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ChipButton("大きめにする", systemImage: "textformat.size") {
+                Task {
+                    await model.choose(ThemeTextSize.large)
+                }
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
     }
 
     func fontSample(

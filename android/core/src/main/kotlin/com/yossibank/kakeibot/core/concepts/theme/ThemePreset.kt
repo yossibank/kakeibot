@@ -70,7 +70,7 @@ enum class ThemePreset(
                         accentStrong = 0x4A340C,
                         text = 0x1E1E22,
                         subtext = 0x63636B,
-                        hint = 0x74747C,
+                        hint = 0x707078,
                     )
                 ivory ->
                     ThemePalette(
@@ -85,7 +85,7 @@ enum class ThemePreset(
                         accentStrong = 0x4A340C,
                         text = 0x2A2418,
                         subtext = 0x6B6152,
-                        hint = 0x7A705F,
+                        hint = 0x736959,
                     )
                 sky ->
                     ThemePalette(
@@ -100,7 +100,7 @@ enum class ThemePreset(
                         accentStrong = 0x14315A,
                         text = 0x17233A,
                         subtext = 0x54627A,
-                        hint = 0x637089,
+                        hint = 0x5E6B84,
                     )
                 sage ->
                     ThemePalette(
@@ -115,7 +115,7 @@ enum class ThemePreset(
                         accentStrong = 0x143C32,
                         text = 0x1A2A22,
                         subtext = 0x56685E,
-                        hint = 0x65776C,
+                        hint = 0x5C6E63,
                     )
                 rose ->
                     ThemePalette(
@@ -176,7 +176,7 @@ enum class ThemePreset(
                         accentStrong = 0xF4E6C1,
                         text = 0xEDE6D6,
                         subtext = 0x8FB0A3,
-                        hint = 0x7E9C90,
+                        hint = 0x8AA498,
                     )
                 teal ->
                     ThemePalette(
@@ -191,7 +191,7 @@ enum class ThemePreset(
                         accentStrong = 0xF2F2F0,
                         text = 0xECEFEE,
                         subtext = 0x8FAEB3,
-                        hint = 0x7C9CA1,
+                        hint = 0x85A3A7,
                     )
                 wine ->
                     ThemePalette(

@@ -29,6 +29,7 @@ public extension PlannedNotification {
         case entry(LocalDate)
         case recurring(Recurring.ID)
         case template(EntryTemplate.ID)
+        case newTemplate
 
         public var link: String {
             switch self {
@@ -36,13 +37,22 @@ public extension PlannedNotification {
             case let .entry(date): "entry/\(date)"
             case let .recurring(id): "recurring/\(id)"
             case let .template(id): "template/\(id)"
+            case .newTemplate: "new-template"
             }
         }
 
         public init?(link: String) {
-            if link == "home" {
+            switch link {
+            case "home":
                 self = .home
                 return
+
+            case "new-template":
+                self = .newTemplate
+                return
+
+            default:
+                break
             }
 
             let parts = link.split(separator: "/", maxSplits: 1).map(String.init)

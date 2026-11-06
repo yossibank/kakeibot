@@ -50,6 +50,7 @@ public struct ProView: View {
                 .ignoresSafeArea()
         }
         .toolbar(.hidden, for: .navigationBar)
+        .interactiveDismissDisabled(model.isWorking)
         .task {
             await model.load()
         }
@@ -67,19 +68,69 @@ private extension ProView {
                 .frame(maxWidth: .infinity, minHeight: 48)
         } else {
             VStack(spacing: 4) {
-                CardButton(model.purchaseTitle, style: .filled) {
+                Button {
                     purchase()
+                } label: {
+                    workLabel(
+                        model.purchaseTitle,
+                        work: .purchase,
+                        tint: Palette.backgroundBottom
+                    )
+                    .textFont(.subheadline, weight: .bold)
+                    .frame(maxWidth: .infinity, minHeight: 48)
+                    .goldFace()
                 }
+                .buttonStyle(.plain)
+                .opacity(opacity(of: .purchase))
 
-                Button("購入を復元") {
+                Button {
                     restore()
+                } label: {
+                    workLabel(
+                        "購入を復元",
+                        work: .restore,
+                        tint: Palette.subtext
+                    )
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .frame(minHeight: 44)
+                    .contentShape(.rect)
                 }
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
-                .frame(minHeight: 44)
+                .buttonStyle(.plain)
+                .opacity(opacity(of: .restore))
             }
-            .disabled(model.isWorking)
+            .allowsHitTesting(!model.isWorking)
         }
+    }
+
+    func workLabel(
+        _ title: String,
+        work: ProPurchaseModel.Work,
+        tint: Color
+    ) -> some View {
+        let isWorking = model.working == work
+
+        return ZStack {
+            Text(title)
+                .opacity(isWorking ? 0 : 1)
+
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                    .tint(tint)
+
+                Text(work.title)
+            }
+            .opacity(isWorking ? 1 : 0)
+        }
+    }
+}
+
+private extension ProView {
+    func opacity(of work: ProPurchaseModel.Work) -> Double {
+        model.isWorking && model.working != work
+            ? 0.4
+            : 1
     }
 
     func purchase() {

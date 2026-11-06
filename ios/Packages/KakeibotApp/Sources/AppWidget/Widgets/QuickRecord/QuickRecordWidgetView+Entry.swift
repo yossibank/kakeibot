@@ -4,23 +4,26 @@ import SwiftUI
 import WidgetKit
 
 extension QuickRecordWidgetView {
-    var emptyEntryLink: some View {
-        entryLink {
-            VStack(spacing: 4) {
-                Label("記録する", systemImage: "plus")
-                    .textFont(size: .caption, weight: .medium)
-                    .foregroundStyle(Palette.accent)
+    var emptyTemplateGuide: some View {
+        VStack(spacing: 8) {
+            Text("よく使う支出を 1 回で記録できます")
+                .textFont(size: .caption)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.5)
 
-                Text("テンプレートを作ると、ここから 1 回で記録できます")
-                    .textFont(size: .micro)
-                    .foregroundStyle(Palette.subtext)
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.5)
-            }
-            .padding(8)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .modifier(QuickRecordEntryOutline())
+            Label("テンプレートを作る", systemImage: "plus")
+                .textFont(size: .caption, weight: .semibold)
+                .foregroundStyle(Palette.backgroundTop)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 4)
+                .background(Palette.accent, in: Capsule())
         }
+        .padding(8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .modifier(QuickRecordEntryOutline())
     }
 
     func entryTileLink(padding: CGFloat) -> some View {
