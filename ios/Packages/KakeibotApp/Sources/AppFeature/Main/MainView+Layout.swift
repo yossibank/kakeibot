@@ -17,8 +17,12 @@ extension MainView {
         hasSidebar ? SideTabBar<Int>.width : 0
     }
 
+    static func noticeAbove(hasSidebar: Bool) -> CGFloat {
+        hasSidebar ? 0 : FloatingTabBar<Int>.clearance
+    }
+
     static func noticeBottom(hasSidebar: Bool) -> CGFloat {
-        hasSidebar ? 12 : FloatingTabBar<Int>.height + 24
+        noticeAbove(hasSidebar: hasSidebar) + NoticeBanner.bottomMargin
     }
 }
 

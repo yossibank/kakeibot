@@ -121,16 +121,18 @@ private extension HomeView {
                 HeaderButton(systemImage: "bell", action: onOpenNews)
                     .overlay(alignment: .topTrailing) {
                         if setup.hasUnreadNews {
-                            Circle()
-                                .fill(Palette.rose)
-                                .frame(width: 9, height: 9)
-                                .offset(x: -3, y: 5)
-                                .transition(.scale.combined(with: .opacity))
+                            headerDot(Palette.rose)
                         }
                     }
                     .animation(.snappy, value: setup.hasUnreadNews)
 
                 HeaderButton(systemImage: "gearshape", action: onOpenSettings)
+                    .overlay(alignment: .topTrailing) {
+                        if model.syncStatus.hasTrouble {
+                            headerDot(Palette.amber)
+                        }
+                    }
+                    .animation(.snappy, value: model.syncStatus.hasTrouble)
             }
         }
     }
@@ -198,6 +200,14 @@ private extension HomeView {
                 openStamp = tally
             }
         )
+    }
+
+    func headerDot(_ color: Color) -> some View {
+        Circle()
+            .fill(color)
+            .frame(width: 9, height: 9)
+            .offset(x: -3, y: 5)
+            .transition(.scale.combined(with: .opacity))
     }
 
     @ViewBuilder

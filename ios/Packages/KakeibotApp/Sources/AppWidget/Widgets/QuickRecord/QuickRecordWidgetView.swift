@@ -18,7 +18,7 @@ struct QuickRecordWidgetView: View {
             layout(Self.compact.limited(1))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .widgetURL(PlannedNotification.Route.home.url)
+        .widgetURL(route.url)
         .widgetTheme(entry.look, style: entry.style)
     }
 }
@@ -52,7 +52,7 @@ private extension QuickRecordWidgetView {
                     .layoutPriority(1)
 
                 if summary.tiles.isEmpty {
-                    emptyEntryLink
+                    emptyTemplateGuide
                 } else {
                     grid(of: summary, metrics: metrics)
                         .fixedSize(horizontal: false, vertical: true)
@@ -68,7 +68,7 @@ private extension QuickRecordWidgetView {
                 }
             }
         } else {
-            Text("アプリを開くと出ます")
+            Text("ロックを解除すると出ます")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
@@ -286,6 +286,10 @@ private extension QuickRecordWidgetView {
         tilePadding: 4,
         todayLimit: .max
     )
+
+    var route: PlannedNotification.Route {
+        entry.summary?.tiles.isEmpty == true ? .newTemplate : .home
+    }
 
     var rowCount: Int {
         isLarge ? 3 : 2

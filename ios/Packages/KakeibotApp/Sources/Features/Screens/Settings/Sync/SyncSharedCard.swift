@@ -73,7 +73,7 @@ private extension SyncSharedCard {
                 }
             }
         } else if isFailed {
-            Text("参加している人を読み込めませんでした")
+            Text("参加している人を読めませんでした")
                 .textFont(.footnote)
                 .foregroundStyle(Palette.rose)
                 .fixedSize(horizontal: false, vertical: true)

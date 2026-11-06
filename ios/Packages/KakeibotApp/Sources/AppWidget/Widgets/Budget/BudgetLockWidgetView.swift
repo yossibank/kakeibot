@@ -38,7 +38,7 @@ private extension BudgetLockWidgetView {
                     .sansFont(.headline)
             }
         } else {
-            Text("アプリを開くと出ます")
+            Text("ロックを解除すると出ます")
                 .textFont(.caption)
         }
     }

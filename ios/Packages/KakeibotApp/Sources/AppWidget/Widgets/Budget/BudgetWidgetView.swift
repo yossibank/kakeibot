@@ -34,7 +34,7 @@ private extension BudgetWidgetView {
                 small(summary)
             }
         } else {
-            Text("アプリを開くと出ます")
+            Text("ロックを解除すると出ます")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)

@@ -1,3 +1,4 @@
+import DesignSystem
 import Store
 import SwiftUI
 
@@ -5,7 +6,7 @@ public extension View {
     func deletionNotice(
         _ deletion: Binding<Deletion?>,
         note: String? = nil,
-        bottom: CGFloat = 12,
+        bottom: CGFloat = NoticeBanner.bottomMargin,
         onUndo: @escaping (Deletion) -> Void
     ) -> some View {
         let subject = deletion.wrappedValue?.subject?.noticeMessage ?? "削除しました"

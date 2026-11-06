@@ -84,30 +84,8 @@ private extension EntryDetailBand {
                 value: EntryModel.dateText(for: model.date, today: today),
                 shortValue: EntryModel.shortDateText(for: model.date, today: today),
                 isChanged: model.date != today,
-                showsChevron: true,
-                trailingInset: Self.pillWidth
+                showsChevron: true
             )
-        }
-        .overlay(alignment: .topTrailing) {
-            Button {
-                withAnimation(.snappy) {
-                    model.date = quickDate
-                }
-            } label: {
-                Text(EntryModel.shortDateText(for: quickDate, today: today))
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.accent)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 1)
-                    .overlay {
-                        Capsule()
-                            .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
-                    }
-                    .padding(.top, 8)
-                    .padding(.trailing, 8)
-                    .frame(minWidth: 44, minHeight: 44, alignment: .topTrailing)
-                    .contentShape(.rect)
-            }
         }
     }
 
@@ -129,8 +107,7 @@ private extension EntryDetailBand {
         shortValue: String? = nil,
         valueColor: Color = Palette.text,
         isChanged: Bool,
-        showsChevron: Bool,
-        trailingInset: CGFloat = 0
+        showsChevron: Bool
     ) -> some View {
         let tint = isChanged ? Palette.amber : nil
         let fill = isChanged ? Palette.amber.opacity(.subtle) : Color.clear
@@ -142,7 +119,6 @@ private extension EntryDetailBand {
                 .foregroundStyle(tint ?? Palette.subtext)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-                .padding(.trailing, trailingInset)
 
             HStack(spacing: 4) {
                 if let shortValue {
@@ -190,7 +166,6 @@ private extension EntryDetailBand {
     static let walletWeight: CGFloat = 1
     static let dateWeight: CGFloat = 1.25
     static let memoWeight: CGFloat = 1
-    static let pillWidth: CGFloat = 40
 
     var showsWallet: Bool {
         model.type != .transfer
@@ -202,10 +177,6 @@ private extension EntryDetailBand {
 
     var walletTitle: String {
         model.billText ?? model.walletTitle
-    }
-
-    var quickDate: LocalDate {
-        model.quickDate(today: today)
     }
 
     var memoText: String {

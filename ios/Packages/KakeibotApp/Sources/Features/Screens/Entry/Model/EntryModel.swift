@@ -258,6 +258,48 @@ public extension EntryModel {
         isSaving = false
     }
 
+    func recordAgain() async {
+        editingId = nil
+        original = nil
+        originalFee = nil
+        date = Self.today
+        billMonth = nil
+        items = []
+        taxIncluded = false
+        isReceiptRead = false
+        receiptStore = nil
+        keypadTarget = .amount
+
+        if !wallets.contains(where: { $0.id == walletId }) {
+            walletId = wallets.first?.id
+        }
+
+        if !wallets.contains(where: { $0.id == toWalletId }) {
+            toWalletId = nil
+        }
+
+        if type == .transfer {
+            chooseDestination()
+        } else if !categories.contains(where: { $0.id == categoryId }) {
+            categoryId = categories.first?.id
+        }
+
+        if !tags.contains(where: { $0.id == tagId }) {
+            tagId = nil
+        }
+
+        do {
+            try await loadBalances()
+        } catch {
+            report(error)
+        }
+
+        baseline = snapshot
+        isSaving = false
+
+        errorNotice.inform(Self.recordAgainMessage)
+    }
+
     func delete() async -> EntryChange? {
         guard let original else {
             return nil
@@ -295,6 +337,8 @@ extension EntryModel {
 }
 
 private extension EntryModel {
+    static let recordAgainMessage = "同じ内容で新しい記録にしました"
+
     func loadEntry() async throws {
         guard let editingId else {
             categoryId = categories.first?.id

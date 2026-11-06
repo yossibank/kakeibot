@@ -7,7 +7,7 @@ import Store
 @MainActor
 @Observable
 public final class AssetsAdjustModel {
-    public private(set) var calculator = AmountCalculator()
+    public private(set) var calculator: AmountCalculator
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -16,6 +16,7 @@ public final class AssetsAdjustModel {
 
     private let database: AppDatabase
     private let today: LocalDate
+    private let openingAmount: Int
 
     public init(
         database: AppDatabase,
@@ -23,10 +24,14 @@ public final class AssetsAdjustModel {
         balance: Int,
         today: LocalDate
     ) {
+        let calculator = AmountCalculator()
+
+        self.calculator = calculator
         self.database = database
         self.wallet = wallet
         self.balance = balance
         self.today = today
+        self.openingAmount = calculator.amount
     }
 }
 
@@ -37,6 +42,10 @@ public extension AssetsAdjustModel {
 
     var canSave: Bool {
         difference != 0
+    }
+
+    var isChanged: Bool {
+        calculator.amount != openingAmount
     }
 
     var differenceText: String {

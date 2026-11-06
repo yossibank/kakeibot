@@ -4,6 +4,7 @@ import SwiftUI
 
 struct AssetsAdjustSheet: View {
     @State private var model: AssetsAdjustModel
+    @State private var isConfirmingDiscard = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -55,6 +56,12 @@ struct AssetsAdjustSheet: View {
         }
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
+        }
+        .confirmsDiscard(
+            when: model.isChanged,
+            isPresented: $isConfirmingDiscard
+        ) {
+            dismiss()
         }
     }
 }
