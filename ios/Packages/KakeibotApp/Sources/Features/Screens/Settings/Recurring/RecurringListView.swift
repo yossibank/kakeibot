@@ -153,10 +153,7 @@ private extension RecurringListView {
                 .tracking(2)
                 .foregroundStyle(Palette.accent)
 
-            Text(AmountText.text(model.monthTotal))
-                .displayFont(.headline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
+            AmountText(model.monthTotal, font: .size(.headline), color: Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
         }

@@ -17,12 +17,13 @@ public struct TemplateCardAmount: View {
 
     public var body: some View {
         if let amount {
-            Text(AmountText.text(amount))
-                .font(size.amountFont(in: themeStyle))
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
+            AmountText(
+                amount,
+                font: .fixed(size.amountFont(in: themeStyle)),
+                color: Palette.accentStrong
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
         } else {
             Text("毎回入れる")
                 .font(size.emptyAmountFont(in: themeStyle))

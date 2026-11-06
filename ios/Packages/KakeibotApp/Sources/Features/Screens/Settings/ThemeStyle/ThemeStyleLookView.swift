@@ -146,7 +146,7 @@ private extension ThemeStyleLookView {
 
                     Spacer(minLength: 8)
 
-                    AmountText(1340, type: .expense)
+                    AmountText(1340, type: .expense, font: .style(.body))
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                 }

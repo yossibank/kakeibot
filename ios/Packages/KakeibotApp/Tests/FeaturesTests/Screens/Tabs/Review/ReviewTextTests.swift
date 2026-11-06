@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 @testable import Features
 import Testing
 
@@ -43,7 +44,7 @@ struct ReviewTextTests {
         (0, "¥0", "収支")
     ])
     func signsBalance(amount: Int, expected: String, title: String) {
-        #expect(ReviewText.balance(amount) == expected)
+        #expect(AmountText.text(amount, sign: .plus) == expected)
         #expect(ReviewText.balanceTitle(amount) == title)
     }
 }

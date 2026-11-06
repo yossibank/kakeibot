@@ -28,7 +28,7 @@ struct RecurringRowCard: View {
                     Spacer(minLength: 8)
 
                     if let amount = row.amount {
-                        AmountText(amount, type: row.type)
+                        AmountText(amount, type: row.type, font: .style(.body))
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
                             .layoutPriority(1)

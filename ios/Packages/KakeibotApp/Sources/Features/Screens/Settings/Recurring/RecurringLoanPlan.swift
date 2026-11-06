@@ -21,10 +21,11 @@ struct RecurringLoanPlan: View {
 
                     Spacer(minLength: 8)
 
-                    Text(AmountText.text(finalAmount))
-                        .textFont(.subheadline, weight: .semibold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.text)
+                    AmountText(
+                        finalAmount,
+                        font: .style(.subheadline, weight: .semibold),
+                        color: Palette.text
+                    )
                 }
             }
 
@@ -92,12 +93,13 @@ private extension RecurringLoanPlan {
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
 
-                Text(AmountText.text(total))
-                    .displayFont(.title, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                AmountText(
+                    total,
+                    font: .size(.title, weight: .bold),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
             }
 
             Spacer(minLength: 12)

@@ -217,7 +217,9 @@ private extension EntryItemSheet {
     }
 
     var equation: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let lineColor = isDiscount ? Palette.rose : Palette.accentStrong
+
+        return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 4) {
                 token(AmountText.text(unit.amount), label: "単価", for: .unit)
 
@@ -233,12 +235,13 @@ private extension EntryItemSheet {
                     .textFont(.body)
                     .foregroundStyle(Palette.subtext)
 
-                Text(AmountText.text(lineAmount))
-                    .displayFont(.headline, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(isDiscount ? Palette.rose : Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                AmountText(
+                    lineAmount,
+                    font: .size(.headline, weight: .bold),
+                    color: lineColor
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             }
 
             CapsulePicker(selection: $taxRate, options: Self.taxOptions, size: .small)

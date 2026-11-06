@@ -33,10 +33,7 @@ private extension AssetsRewardSheet {
 
                 Spacer()
 
-                Text("+\(AmountText.text(total))")
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accent)
+                AmountText(total, font: .style(.caption), sign: .plus, color: Palette.accent)
             }
 
             VStack(spacing: 8) {
@@ -69,10 +66,7 @@ private extension AssetsRewardSheet {
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)
 
-            Text("+\(AmountText.text(log.amount))")
-                .textFont(.footnote)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accent)
+            AmountText(log.amount, font: .style(.footnote), sign: .plus, color: Palette.accent)
         }
     }
 }

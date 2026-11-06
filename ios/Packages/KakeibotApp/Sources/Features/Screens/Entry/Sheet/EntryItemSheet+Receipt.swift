@@ -80,12 +80,13 @@ extension EntryItemSheet {
 
                 Spacer()
 
-                Text(AmountText.text(model.amount))
-                    .displayFont(.title, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                AmountText(
+                    model.amount,
+                    font: .size(.title, weight: .bold),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             }
 
             if !model.items.isEmpty {
@@ -142,10 +143,11 @@ extension EntryItemSheet {
 
             Spacer()
 
-            Text(AmountText.text(model.itemAdjustment))
-                .textFont(.subheadline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.amber)
+            AmountText(
+                model.itemAdjustment,
+                font: .style(.subheadline),
+                color: Palette.amber
+            )
         }
     }
 
@@ -226,11 +228,12 @@ extension EntryItemSheet {
 
                 EntryReceiptLeader()
 
-                Text(AmountText.text(item.amount))
-                    .textFont(.subheadline)
-                    .monospacedDigit()
-                    .foregroundStyle(amountColor)
-                    .layoutPriority(1)
+                AmountText(
+                    item.amount,
+                    font: .style(.subheadline),
+                    color: amountColor
+                )
+                .layoutPriority(1)
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 4)
@@ -268,10 +271,7 @@ extension EntryItemSheet {
 
             Spacer()
 
-            Text(AmountText.text(amount))
-                .textFont(.subheadline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.text)
+            AmountText(amount, font: .style(.subheadline), color: Palette.text)
         }
     }
 }

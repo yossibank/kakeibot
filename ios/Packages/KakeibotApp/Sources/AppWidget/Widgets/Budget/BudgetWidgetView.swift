@@ -94,13 +94,14 @@ private extension BudgetWidgetView {
                     days(of: summary)
                 }
 
-                Text(AmountText.text(summary.todayExpense))
-                    .displayFont(.title, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .privacySensitive()
+                AmountText(
+                    summary.todayExpense,
+                    font: .size(.title, weight: .bold),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .privacySensitive()
 
                 Rectangle()
                     .fill(Palette.line)
@@ -116,13 +117,14 @@ private extension BudgetWidgetView {
 
                             Spacer(minLength: 8)
 
-                            Text(AmountText.text(row.amount))
-                                .displayFont(.body, weight: .medium)
-                                .monospacedDigit()
-                                .foregroundStyle(Palette.text)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
-                                .privacySensitive()
+                            AmountText(
+                                row.amount,
+                                font: .size(.body, weight: .medium),
+                                color: Palette.text
+                            )
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                            .privacySensitive()
                         }
                     }
                 }
@@ -189,13 +191,14 @@ private extension BudgetWidgetView {
 
                 Spacer(minLength: 4)
 
-                Text(AmountText.text(summary.todayExpense))
-                    .textFont(size: .small, weight: .semibold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .privacySensitive()
+                AmountText(
+                    summary.todayExpense,
+                    font: .size(.small, weight: .semibold),
+                    color: Palette.text
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .privacySensitive()
             }
         }
     }

@@ -137,8 +137,7 @@ private extension WhatsNewScene {
 
             Text("品目 \(FeatureArtSample.items.count)件")
 
-            Text(AmountText.text(FeatureArtSample.total))
-                .monospacedDigit()
+            AmountText(FeatureArtSample.total, font: .size(.caption, weight: .semibold))
         }
         .textFont(size: .caption, weight: .semibold)
         .foregroundStyle(Palette.accentStrong)
@@ -162,7 +161,7 @@ private extension WhatsNewScene {
                 .background(Palette.card, in: .rect(cornerRadius: 4))
 
             HStack(spacing: 4) {
-                Text(AmountText.text(198))
+                AmountText(198, font: .size(.caption, weight: .medium))
 
                 Text("×")
                     .foregroundStyle(Palette.hint)
@@ -172,8 +171,7 @@ private extension WhatsNewScene {
                 Text("=")
                     .foregroundStyle(Palette.hint)
 
-                Text(AmountText.text(396))
-                    .foregroundStyle(Palette.accentStrong)
+                AmountText(396, font: .size(.caption, weight: .medium), color: Palette.accentStrong)
                     .bold()
             }
             .textFont(size: .caption, weight: .medium)
@@ -231,17 +229,20 @@ private extension WhatsNewScene {
             ZStack(alignment: .bottom) {
                 HalfDial(progress: 0.84)
 
-                Text(AmountText.text(FeatureArtSample.carryover))
-                    .displayFont(.body, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
+                AmountText(
+                    FeatureArtSample.carryover,
+                    font: .size(.body, weight: .bold),
+                    color: Palette.accentStrong
+                )
             }
             .frame(width: 120, height: 60)
         }
     }
 
     var carryoverNext: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        let total = FeatureArtSample.budget + FeatureArtSample.carryover
+
+        return VStack(alignment: .leading, spacing: 4) {
             Text("12月")
                 .textFont(size: .caption, weight: .semibold)
                 .foregroundStyle(Palette.accent)
@@ -257,10 +258,7 @@ private extension WhatsNewScene {
                 .padding(.vertical, 2)
                 .background(Palette.accent.opacity(.subtle), in: .capsule)
 
-            Text(AmountText.text(FeatureArtSample.budget + FeatureArtSample.carryover))
-                .displayFont(.headline, weight: .bold)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
+            AmountText(total, font: .size(.headline, weight: .bold), color: Palette.accentStrong)
         }
         .monospacedDigit()
         .frame(maxWidth: .infinity, alignment: .leading)

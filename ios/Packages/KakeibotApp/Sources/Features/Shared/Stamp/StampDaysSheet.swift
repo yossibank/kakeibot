@@ -93,16 +93,14 @@ private extension StampDaysSheet {
 
             if let day,
                day.expenseTotal > 0 {
-                AmountText(day.expenseTotal, type: .expense)
-                    .textFont(.caption)
+                AmountText(day.expenseTotal, type: .expense, font: .style(.caption))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
 
             if let day,
                day.incomeTotal > 0 {
-                AmountText(day.incomeTotal, type: .income)
-                    .textFont(.caption)
+                AmountText(day.incomeTotal, type: .income, font: .style(.caption))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }

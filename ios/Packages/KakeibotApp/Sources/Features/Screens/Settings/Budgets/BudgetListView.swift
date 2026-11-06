@@ -133,10 +133,7 @@ private extension BudgetListView {
                         .minimumScaleFactor(0.8)
                 }
 
-                Text(amountText(model.totalAmount))
-                    .displayFont(.largeTitle, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(amountColor(model.totalAmount))
+                amountValue(model.totalAmount, size: .largeTitle, weight: .bold)
                     .editBadge()
 
                 if model.isCarryoverOn,
@@ -213,10 +210,7 @@ private extension BudgetListView {
 
                     Spacer()
 
-                    Text(amountText(amount))
-                        .displayFont(.body)
-                        .monospacedDigit()
-                        .foregroundStyle(amountColor(amount))
+                    amountValue(amount, size: .body)
 
                     EditBadge(size: 16)
                 }
@@ -258,6 +252,21 @@ private extension BudgetListView {
             .foregroundStyle(Palette.subtext)
         }
     }
+
+    @ViewBuilder
+    func amountValue(
+        _ amount: Int?,
+        size: FontSize,
+        weight: Font.Weight = .regular
+    ) -> some View {
+        if let amount {
+            AmountText(amount, font: .size(size, weight: weight), color: Palette.accentStrong)
+        } else {
+            Text("なし")
+                .displayFont(size, weight: weight)
+                .foregroundStyle(Palette.hint)
+        }
+    }
 }
 
 private extension BudgetListView {
@@ -271,14 +280,6 @@ private extension BudgetListView {
 
     var clearedMessage: String {
         cleared.map { "\($0.target.title)をなくしました" } ?? ""
-    }
-
-    func amountText(_ amount: Int?) -> String {
-        amount.map { AmountText.text($0) } ?? "なし"
-    }
-
-    func amountColor(_ amount: Int?) -> Color {
-        amount == nil ? Palette.hint : Palette.accentStrong
     }
 
     func openDrawer(_ target: BudgetListModel.Target) {

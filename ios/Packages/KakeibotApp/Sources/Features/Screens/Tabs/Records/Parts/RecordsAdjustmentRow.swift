@@ -29,13 +29,15 @@ struct RecordsAdjustmentRow: View {
 
             Spacer(minLength: 8)
 
-            Text(row.amountText)
-                .displayFont(.body)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .layoutPriority(2)
+            AmountText(
+                row.adjustment.amount,
+                font: .size(.body),
+                sign: .plus,
+                color: Palette.subtext
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .layoutPriority(2)
         }
         .frame(minHeight: rowSpacing.minHeight)
         .contentShape(.rect)

@@ -41,13 +41,6 @@ public extension RecordsModel {
     }
 }
 
-public extension RecordsModel.AdjustmentRow {
-    var amountText: String {
-        let sign = adjustment.amount > 0 ? "+" : ""
-        return sign + AmountText.text(adjustment.amount)
-    }
-}
-
 extension RecordsModel {
     func adjustedDays(besides days: [EntryDay]) -> [EntryDay] {
         guard

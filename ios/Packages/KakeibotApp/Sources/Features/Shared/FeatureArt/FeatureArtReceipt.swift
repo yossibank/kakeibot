@@ -3,15 +3,17 @@ import DesignSystem
 import SwiftUI
 
 struct FeatureArtReceipt: View {
+    @Environment(\.themeStyle) private var themeStyle
+
     var showsViewfinder = false
 
     var body: some View {
         VStack(spacing: 4) {
             Text(FeatureArtSample.store)
-                .font(.system(size: 9, weight: .bold))
+                .font(.display(size: 9, weight: .bold, in: themeStyle.textFont))
 
             Text(FeatureArtSample.date)
-                .font(.system(size: 6))
+                .font(.display(size: 6, in: themeStyle.textFont))
                 .monospacedDigit()
                 .opacity(0.6)
 
@@ -24,7 +26,7 @@ struct FeatureArtReceipt: View {
             rule
 
             line("合計", amount: FeatureArtSample.total)
-                .font(.system(size: 8, weight: .bold))
+                .font(.display(size: 8, weight: .bold, in: themeStyle.textFont))
         }
         .foregroundStyle(Self.ink)
         .padding(.horizontal, 8)
@@ -82,10 +84,9 @@ private extension FeatureArtReceipt {
 
             Spacer(minLength: 4)
 
-            Text(AmountText.text(amount))
-                .monospacedDigit()
+            AmountText(amount, font: .fixed(.display(size: 8, in: themeStyle.displayFont)))
         }
-        .font(.system(size: 8))
+        .font(.display(size: 8, in: themeStyle.textFont))
     }
 }
 

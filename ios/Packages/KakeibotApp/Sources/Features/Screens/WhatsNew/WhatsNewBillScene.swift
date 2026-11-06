@@ -57,9 +57,11 @@ private extension WhatsNewBillScene {
 
                 Spacer(minLength: 4)
 
-                Text(AmountText.text(Self.unpaidTotal))
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.text)
+                AmountText(
+                    Self.unpaidTotal,
+                    font: .size(.caption, weight: .semibold),
+                    color: Palette.text
+                )
             }
             .textFont(size: .caption, weight: .semibold)
 
@@ -94,9 +96,11 @@ private extension WhatsNewBillScene {
                 .textFont(size: .micro)
                 .foregroundStyle(Palette.subtext)
 
-            Text(AmountText.text(Self.unpaidTotal))
-                .displayFont(.headline, weight: .bold)
-                .foregroundStyle(Palette.accentStrong)
+            AmountText(
+                Self.unpaidTotal,
+                font: .size(.headline, weight: .bold),
+                color: Palette.accentStrong
+            )
 
             ForEach(Self.unpaidEntries, id: \.name) { entry in
                 HStack {
@@ -105,8 +109,7 @@ private extension WhatsNewBillScene {
 
                     Spacer(minLength: 4)
 
-                    Text(AmountText.text(entry.amount))
-                        .foregroundStyle(Palette.subtext)
+                    AmountText(entry.amount, font: .size(.caption), color: Palette.subtext)
                 }
                 .textFont(size: .caption)
             }

@@ -190,10 +190,7 @@ private extension BillRow {
     }
 
     var amountText: some View {
-        Text(AmountText.text(bill.amount))
-            .displayFont(.headline)
-            .monospacedDigit()
-            .foregroundStyle(Palette.accentStrong)
+        AmountText(bill.amount, font: .size(.headline), color: Palette.accentStrong)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
     }

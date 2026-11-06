@@ -126,14 +126,15 @@ private extension AssetsAdjustSheet {
 
             EntryReceiptLeader()
 
-            Text(AmountText.text(model.calculator.amount))
-                .displayFont(.title, weight: .bold)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .fixedSize()
-                .contentTransition(.numericText())
-                .animation(.snappy, value: model.calculator.amount)
+            AmountText(
+                model.calculator.amount,
+                font: .size(.title, weight: .bold),
+                color: Palette.accentStrong
+            )
+            .lineLimit(1)
+            .fixedSize()
+            .contentTransition(.numericText())
+            .animation(.snappy, value: model.calculator.amount)
         }
     }
 

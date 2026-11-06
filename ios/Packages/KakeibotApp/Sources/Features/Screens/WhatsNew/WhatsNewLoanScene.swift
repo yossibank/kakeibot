@@ -57,8 +57,11 @@ private extension WhatsNewLoanScene {
 
                 Spacer(minLength: 4)
 
-                Text(AmountText.text(Self.lastAmount))
-                    .foregroundStyle(Palette.text)
+                AmountText(
+                    Self.lastAmount,
+                    font: .size(.caption, weight: .semibold),
+                    color: Palette.text
+                )
             }
             .textFont(size: .caption, weight: .semibold)
         }
@@ -76,9 +79,7 @@ private extension WhatsNewLoanScene {
                 .textFont(size: .caption)
                 .foregroundStyle(Palette.subtext)
 
-            Text(AmountText.text(sum))
-                .displayFont(.body, weight: .bold)
-                .foregroundStyle(Palette.accentStrong)
+            AmountText(sum, font: .size(.body, weight: .bold), color: Palette.accentStrong)
 
             Text("終わり 2029年10月")
                 .textFont(size: .caption, weight: .semibold)

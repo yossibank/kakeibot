@@ -11,10 +11,7 @@ extension ReviewView {
         return VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 0) {
                 CardHeader("返済と積立", systemImage: "arrow.left.arrow.right") {
-                    Text(AmountText.text(total))
-                        .displayFont(.headline)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
+                    AmountText(total, font: .size(.headline), color: Palette.accentStrong)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                 }
@@ -110,10 +107,7 @@ private extension ReviewView {
 
             Spacer(minLength: 8)
 
-            Text(AmountText.text(move.amount))
-                .textFont(.subheadline)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
+            AmountText(move.amount, font: .style(.subheadline), color: Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
 

@@ -6,7 +6,14 @@ public extension View {
         _ size: FontSize,
         weight: Font.Weight = .regular
     ) -> some View {
-        modifier(DisplayFont(size: size, weight: weight))
+        modifier(ThemeFontModifier(role: .display, spec: .size(size, weight)))
+    }
+
+    func displayFont(
+        style: Font.TextStyle,
+        weight: Font.Weight? = nil
+    ) -> some View {
+        modifier(ThemeFontModifier(role: .display, spec: .style(style, weight)))
     }
 
     func sansFont(
@@ -20,35 +27,29 @@ public extension View {
         _ style: Font.TextStyle,
         weight: Font.Weight? = nil
     ) -> some View {
-        modifier(TextFont(spec: .style(style, weight)))
+        modifier(ThemeFontModifier(role: .text, spec: .style(style, weight)))
     }
 
     func textFont(
         size: FontSize,
         weight: Font.Weight = .regular
     ) -> some View {
-        modifier(TextFont(spec: .size(size, weight)))
+        modifier(ThemeFontModifier(role: .text, spec: .size(size, weight)))
     }
 }
 
-private struct DisplayFont: ViewModifier {
-    @Environment(\.themeStyle.displayFont) private var font
+private struct ThemeFontModifier: ViewModifier {
+    @Environment(\.themeStyle.displayFont) private var displayFont
+    @Environment(\.themeStyle.textFont) private var textFont
     @Environment(\.themeStyle.textSize.scale) private var textSize
     @Environment(\.sharedTextScale) private var shared
 
-    let size: FontSize
-    let weight: Font.Weight
+    let role: Role
+    let spec: Spec
 
     func body(content: Content) -> some View {
-        content.font(
-            .display(
-                size,
-                weight: weight,
-                in: font,
-                scale: textSize,
-                shared: shared
-            )
-        )
+        let font = role == .display ? displayFont : textFont
+        return content.font(spec.font(in: font, scale: textSize, shared: shared))
     }
 }
 
@@ -64,26 +65,19 @@ private struct SansFont: ViewModifier {
     }
 }
 
-private struct TextFont: ViewModifier {
-    @Environment(\.themeStyle.textFont) private var font
-    @Environment(\.themeStyle.textSize.scale) private var textSize
-    @Environment(\.sharedTextScale) private var shared
-
-    let spec: Spec
-
-    func body(content: Content) -> some View {
-        content.font(spec.font(in: font, scale: textSize, shared: shared))
+private extension ThemeFontModifier {
+    enum Role {
+        case display
+        case text
     }
-}
 
-private extension TextFont {
     enum Spec {
         case style(Font.TextStyle, Font.Weight?)
         case size(FontSize, Font.Weight)
     }
 }
 
-private extension TextFont.Spec {
+private extension ThemeFontModifier.Spec {
     func font(
         in font: ThemeFont,
         scale: Double,
@@ -100,8 +94,8 @@ private extension TextFont.Spec {
             )
 
         case let .size(size, weight):
-            .text(
-                size: size,
+            .display(
+                size,
                 weight: weight,
                 in: font,
                 scale: scale,

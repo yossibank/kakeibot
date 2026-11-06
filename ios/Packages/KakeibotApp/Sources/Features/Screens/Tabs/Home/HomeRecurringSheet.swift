@@ -70,12 +70,13 @@ private extension HomeRecurringSheet {
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
 
-                Text(AmountText.text(model.upcomingRecurringExpense))
-                    .displayFont(.largeTitle, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                AmountText(
+                    model.upcomingRecurringExpense,
+                    font: .size(.largeTitle, weight: .bold),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             }
 
             RatioBar(model.paidRecurringRatio, tint: Palette.accent, height: 6)
@@ -173,9 +174,7 @@ private extension HomeRecurringSheet {
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
-            AmountText(amount, type: type)
-                .textFont(.subheadline)
-                .monospacedDigit()
+            AmountText(amount, type: type, font: .style(.subheadline))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -216,8 +215,7 @@ private extension HomeRecurringSheet {
             Spacer(minLength: 8)
 
             VStack(alignment: .trailing, spacing: 4) {
-                AmountText(item.amount, type: item.recurring.type)
-                    .textFont(.subheadline)
+                AmountText(item.amount, type: item.recurring.type, font: .style(.subheadline))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
 

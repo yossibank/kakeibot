@@ -21,9 +21,7 @@ struct FeatureArtSlip: View {
 
                     EntryReceiptLeader()
 
-                    Text(AmountText.text(item.amount))
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.text)
+                    AmountText(item.amount, font: .size(.caption), color: Palette.text)
                         .fixedSize()
                 }
             }
@@ -37,10 +35,11 @@ struct FeatureArtSlip: View {
 
                     Spacer(minLength: 4)
 
-                    Text(AmountText.text(FeatureArtSample.total))
-                        .displayFont(.small, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
+                    AmountText(
+                        FeatureArtSample.total,
+                        font: .size(.small, weight: .bold),
+                        color: Palette.accentStrong
+                    )
                 }
             }
         }

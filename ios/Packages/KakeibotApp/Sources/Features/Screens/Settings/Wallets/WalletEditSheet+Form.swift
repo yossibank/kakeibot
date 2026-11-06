@@ -256,10 +256,7 @@ extension WalletEditSheet {
 
             Spacer(minLength: 8)
 
-            Text(AmountText.text(valuation.amount))
-                .displayFont(.body)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accentStrong)
+            AmountText(valuation.amount, font: .size(.body), color: Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
         }

@@ -163,8 +163,7 @@ private extension RecordsView {
 
             Spacer()
 
-            AmountText(amount, type: recurring.type)
-                .textFont(.subheadline)
+            AmountText(amount, type: recurring.type, font: .style(.subheadline))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .layoutPriority(1)

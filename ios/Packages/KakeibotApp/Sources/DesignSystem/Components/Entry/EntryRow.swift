@@ -101,8 +101,7 @@ public struct EntryRow: View {
 
             Spacer(minLength: 8)
 
-            AmountText(amount, type: type)
-                .displayFont(.body)
+            AmountText(amount, type: type, font: .size(.body))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
                 .layoutPriority(2)

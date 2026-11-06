@@ -81,10 +81,7 @@ private extension AssetsView {
     var rewardContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(AmountText.text(model.rewardBalance))
-                    .displayFont(.title)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
+                AmountText(model.rewardBalance, font: .size(.title), color: Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
 
@@ -164,10 +161,7 @@ private extension AssetsView {
 
             Spacer(minLength: 8)
 
-            Text("+\(AmountText.text(log.amount))")
-                .textFont(.footnote)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accent)
+            AmountText(log.amount, font: .style(.footnote), sign: .plus, color: Palette.accent)
         }
     }
 }

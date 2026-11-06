@@ -231,8 +231,7 @@ private extension QuickRecordWidgetView {
 
             Spacer(minLength: 8)
 
-            AmountText(record.amount, type: record.type)
-                .displayFont(.small, weight: .medium)
+            AmountText(record.amount, type: record.type, font: .size(.small, weight: .medium))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
                 .privacySensitive()

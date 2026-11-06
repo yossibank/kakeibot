@@ -48,10 +48,7 @@ struct WalletRowCard<Leading: View>: View {
                         .foregroundStyle(Palette.subtext)
                 }
 
-                Text(AmountText.text(amount))
-                    .displayFont(.body)
-                    .monospacedDigit()
-                    .foregroundStyle(amountColor)
+                AmountText(amount, font: .size(.body), color: amountColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             }
