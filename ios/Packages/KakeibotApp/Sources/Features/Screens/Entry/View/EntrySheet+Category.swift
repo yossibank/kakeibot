@@ -42,13 +42,18 @@ extension EntrySheet {
             }
             .transition(.opacity)
 
-        categoryFace(menu.category, isLifted: true)
-            .frame(width: menu.frame.width, height: menu.frame.height)
-            .scaleEffect(1.06)
-            .glow(Palette.glow.opacity(.muted), radius: 12)
-            .position(x: menu.frame.midX, y: menu.frame.midY)
-            .allowsHitTesting(false)
-            .transition(.opacity)
+        EntryCategoryFace(
+            category: menu.category,
+            icon: model.icon(for: menu.category),
+            isLit: true,
+            isLifted: true
+        )
+        .frame(width: menu.frame.width, height: menu.frame.height)
+        .scaleEffect(1.06)
+        .glow(Palette.glow.opacity(.muted), radius: 12)
+        .position(x: menu.frame.midX, y: menu.frame.midY)
+        .allowsHitTesting(false)
+        .transition(.opacity)
 
         Color.clear
             .frame(height: max(menu.frame.minY - 12, 0))
@@ -197,7 +202,16 @@ private extension EntrySheet {
     func categoryCell(_ cell: EntryModel.CategoryCell) -> some View {
         switch cell {
         case let .category(category):
-            categoryButton(category)
+            EntryCategoryCell(
+                category: category,
+                icon: model.icon(for: category),
+                isSelected: model.categoryId == category.id
+            ) {
+                select(category)
+            } onMenu: { frame in
+                openMenu(for: category, at: frame)
+            }
+            .equatable()
 
         case .add:
             dashedCell("追加", systemImage: "plus") {
@@ -210,66 +224,6 @@ private extension EntrySheet {
             }
         }
     }
-
-    func categoryButton(_ category: EntryCategory) -> some View {
-        let isPressing = pressingCategory == category.id
-        let isSelected = model.categoryId == category.id
-        let restingScale = isSelected ? Self.selectedScale : 1
-        let scale = isPressing ? 0.93 : restingScale
-        let glow = isSelected ? Palette.glow.opacity(.muted) : Color.clear
-
-        return categoryFace(category, isLifted: false)
-            .glow(glow, radius: 8)
-            .scaleEffect(scale)
-            .animation(.snappy(duration: 0.2), value: isPressing)
-            .animation(.snappy(duration: 0.25), value: isSelected)
-            .overlay {
-                GeometryReader { proxy in
-                    Color.clear
-                        .contentShape(.rect)
-                        .onTapGesture {
-                            select(category)
-                        }
-                        .onLongPressGesture(minimumDuration: Self.menuPressDuration) {
-                            let space = CoordinateSpace.named(Self.coordinateSpace)
-
-                            openMenu(for: category, at: proxy.frame(in: space))
-                        } onPressingChanged: { isPressing in
-                            pressingCategory = isPressing ? category.id : nil
-                        }
-                }
-            }
-    }
-
-    func categoryFace(
-        _ category: EntryCategory,
-        isLifted: Bool
-    ) -> some View {
-        let isSelected = model.categoryId == category.id
-        let isLit = isSelected || isLifted
-        let color = isLit ? Palette.accentStrong : Palette.subtext
-        let fill = isLifted ? Palette.panel : Self.categoryFill(isLit)
-        let border = isLit ? Palette.outline : Color.clear
-        let width: CGFloat = isLifted ? 1.2 : 1
-        let iconSize: CGFloat = isLit ? 19 : 17
-
-        return VStack(spacing: 4) {
-            IconImage(model.icon(for: category), size: iconSize)
-
-            Text(category.name)
-                .textFont(size: .caption)
-                .lineLimit(1)
-                .minimumScaleFactor(TextScale.floor)
-        }
-        .foregroundStyle(color)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(fill, in: .rect(cornerRadius: corner.radius(12)))
-        .overlay {
-            RoundedRectangle(cornerRadius: corner.radius(12))
-                .stroke(border, lineWidth: width)
-        }
-        .contentShape(.rect)
-    }
 }
 
 private extension EntrySheet {
@@ -277,9 +231,7 @@ private extension EntrySheet {
     static let categoryColumns = 5
     static let categorySpacing: CGFloat = 4
     static let categoryHeight: CGFloat = 54
-    static let selectedScale: CGFloat = 1.05
     static let actionInset: CGFloat = 4
-    static let menuPressDuration = 0.4
 
     static var pagerHeight: CGFloat {
         let rows = CGFloat(categoryRows)
@@ -328,8 +280,6 @@ private extension EntrySheet {
         at frame: CGRect
     ) {
         setEnteringAmount(false)
-
-        pressingCategory = nil
 
         withAnimation(.snappy(duration: 0.25)) {
             categoryMenu = CategoryMenu(category: category, frame: frame)

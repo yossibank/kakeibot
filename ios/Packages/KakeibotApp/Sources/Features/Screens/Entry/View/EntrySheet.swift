@@ -10,7 +10,6 @@ public struct EntrySheet: View {
     @State var categoryPage: Int? = 0
     @State var sheet: Sheet?
     @State var categoryMenu: CategoryMenu?
-    @State var pressingCategory: EntryCategory.ID?
     @State var sheetWidth: CGFloat = 0
     @State var drawerHeight: CGFloat = 0
     @State var deletion: Deletion?
@@ -206,10 +205,6 @@ extension EntrySheet {
 
     var today: LocalDate {
         LocalDate(Date(), in: .current)
-    }
-
-    static func categoryFill(_ isSelected: Bool) -> Color {
-        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
     }
 }
 
