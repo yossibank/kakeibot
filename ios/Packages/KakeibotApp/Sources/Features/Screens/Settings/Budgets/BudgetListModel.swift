@@ -158,7 +158,7 @@ public extension BudgetListModel {
     ) -> Int {
         let period = month.period(startingOn: monthStartDay)
 
-        return (entryList?.days.filter { period.contains($0.date) } ?? [])
+        return (entryList?.days.within(period) ?? [])
             .flatMap(\.entries)
             .filter { entry in
                 entry.type == .expense

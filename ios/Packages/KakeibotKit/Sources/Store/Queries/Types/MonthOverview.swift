@@ -8,9 +8,10 @@ public struct MonthOverview: Equatable, Sendable {
     public let carryoverFrom: YearMonth?
     public let today: LocalDate
     public let periodRecurrings: [PeriodRecurring]
+    public let monthDays: [EntryDay]
+    public let monthExpense: Int
+    public let monthIncome: Int
     public let budgetCarryover: Int
-
-    private let monthDays: [EntryDay]
 
     public init(
         list: EntryList?,
@@ -38,7 +39,9 @@ public struct MonthOverview: Equatable, Sendable {
             today: today
         )
 
-        self.monthDays = list?.days.filter { period.contains($0.date) } ?? []
+        self.monthDays = list?.days.within(period) ?? []
+        self.monthExpense = monthDays.expenseTotal
+        self.monthIncome = monthDays.incomeTotal
 
         self.budgetCarryover = list?.budgetCarryover(
             budgets: budgets,
@@ -56,14 +59,6 @@ public extension MonthOverview {
 
     var period: ClosedRange<LocalDate> {
         month.period(startingOn: monthStartDay)
-    }
-
-    var monthExpense: Int {
-        monthDays.reduce(0) { $0 + $1.expenseTotal }
-    }
-
-    var monthIncome: Int {
-        monthDays.reduce(0) { $0 + $1.incomeTotal }
     }
 
     var todayExpense: Int {
@@ -122,7 +117,7 @@ public extension MonthOverview {
     }
 
     func expense(in range: ClosedRange<LocalDate>) -> Int {
-        list?.days.filter { range.contains($0.date) }.reduce(0) { $0 + $1.expenseTotal } ?? 0
+        list?.days.within(range).expenseTotal ?? 0
     }
 
     func moved(to day: LocalDate) -> MonthOverview {

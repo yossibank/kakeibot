@@ -44,9 +44,7 @@ public extension EntryList {
         budgets.carryover(into: month, from: start) { month in
             let period = month.period(startingOn: startDay)
 
-            return days
-                .filter { period.contains($0.date) }
-                .reduce(0) { $0 + $1.expenseTotal }
+            return days.within(period).expenseTotal
         }
     }
 }
