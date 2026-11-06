@@ -183,6 +183,7 @@ extension EntrySheet {
             return
         }
 
+        model.isClosing = true
         onChange(change)
         dismiss()
     }
@@ -351,6 +352,7 @@ private extension EntrySheet {
             return
         }
 
+        model.isClosing = true
         onChange(change)
         dismiss()
     }

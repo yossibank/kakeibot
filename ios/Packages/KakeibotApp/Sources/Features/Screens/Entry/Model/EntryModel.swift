@@ -63,6 +63,7 @@ public final class EntryModel {
     }
 
     var isReceiptRead = false
+    var isClosing = false
     var receiptStore: String?
 
     private(set) var original: Entry?
