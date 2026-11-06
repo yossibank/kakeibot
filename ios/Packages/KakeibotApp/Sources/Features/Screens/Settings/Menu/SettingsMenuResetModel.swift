@@ -65,7 +65,7 @@ public extension SettingsMenuResetModel {
 private extension SettingsMenuResetModel {
     static let emptyMessage = "削除する記録はありません"
     static let deletedMessage = "記録をすべて削除しました"
-    static let loadFailedMessage = "記録の件数を読み込めませんでした"
+    static let loadFailedMessage = "記録の件数を読めませんでした"
     static let deleteFailedMessage = "記録を削除できませんでした"
 
     func sharesWallets() async throws -> Bool {

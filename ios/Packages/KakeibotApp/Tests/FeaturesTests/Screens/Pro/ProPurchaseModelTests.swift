@@ -119,6 +119,7 @@ struct ProPurchaseModelTests {
         #expect(!isUnlocked)
         #expect(model.errorNotice.message == "購入を復元できませんでした。時間をおいて試してください")
         #expect(model.errorNotice.tone == .error)
+        #expect(model.working == nil)
     }
 
     @Test

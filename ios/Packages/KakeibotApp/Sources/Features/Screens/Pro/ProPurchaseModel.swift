@@ -7,7 +7,7 @@ import OSLog
 @Observable
 public final class ProPurchaseModel {
     public private(set) var price: String?
-    public private(set) var isWorking = false
+    public private(set) var working: Work?
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -20,6 +20,22 @@ public final class ProPurchaseModel {
 }
 
 public extension ProPurchaseModel {
+    enum Work: Sendable {
+        case purchase
+        case restore
+
+        public var title: String {
+            switch self {
+            case .purchase: "確かめています"
+            case .restore: "購入を確かめています"
+            }
+        }
+    }
+
+    var isWorking: Bool {
+        working != nil
+    }
+
     var purchaseTitle: String {
         guard let price else {
             return "購入する"
@@ -37,7 +53,10 @@ public extension ProPurchaseModel {
     }
 
     func purchase() async -> Bool {
-        let status = await work(failedMessage: Self.purchaseFailedMessage) {
+        let status = await work(
+            .purchase,
+            failedMessage: Self.purchaseFailedMessage
+        ) {
             try await store.purchase()
         }
 
@@ -45,7 +64,10 @@ public extension ProPurchaseModel {
     }
 
     func restore() async -> Bool {
-        let status = await work(failedMessage: Self.restoreFailedMessage) {
+        let status = await work(
+            .restore,
+            failedMessage: Self.restoreFailedMessage
+        ) {
             try await store.restore()
         }
 
@@ -68,6 +90,7 @@ private extension ProPurchaseModel {
     static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Pro")
 
     func work(
+        _ work: Work,
         failedMessage: String,
         _ operation: () async throws -> ProStatus
     ) async -> ProStatus? {
@@ -75,11 +98,11 @@ private extension ProPurchaseModel {
             return nil
         }
 
-        isWorking = true
+        working = work
         errorNotice.clear()
 
         defer {
-            isWorking = false
+            working = nil
         }
 
         do {

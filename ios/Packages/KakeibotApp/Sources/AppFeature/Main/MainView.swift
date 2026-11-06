@@ -25,6 +25,7 @@ struct MainView: View {
     @State private var orderMenuAnchor: CGRect?
     @State private var observationRound = 0
     @State private var foreground = AppForegroundReturn()
+    @State private var noticeRound = 0
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
@@ -230,6 +231,7 @@ struct MainView: View {
                 .tabContent()
             }
         }
+        .environment(\.noticeRound, noticeRound)
         .overlay(alignment: .leading) {
             if hasSidebar {
                 SideTabBar(
@@ -342,8 +344,17 @@ struct MainView: View {
 }
 
 private extension MainView {
+    enum NoticeSource {
+        case entry
+        case deletion
+        case undoError
+        case tab
+    }
+}
+
+private extension MainView {
     var notices: some View {
-        let noticeAbove = hasSidebar ? 0 : FloatingTabBar<Int>.height
+        let noticeAbove = Self.noticeAbove(hasSidebar: hasSidebar)
         let noticeBottom = Self.noticeBottom(hasSidebar: hasSidebar)
 
         return Color.clear
@@ -356,6 +367,22 @@ private extension MainView {
             }
             .errorBanner(undo.errorNotice, bottom: noticeBottom) {
                 undo.errorNotice.clear()
+            }
+            .onChange(of: notice.notice) { _, new in
+                if new != nil {
+                    replaceNotices(with: .entry)
+                }
+            }
+            .onChange(of: undo.deletion) { _, new in
+                if new != nil {
+                    replaceNotices(with: .deletion)
+                }
+            }
+            .onChange(of: undo.errorNotice.count) {
+                replaceNotices(with: .undoError)
+            }
+            .onChange(of: tabErrorCounts) {
+                replaceNotices(with: .tab)
             }
     }
 
@@ -377,6 +404,35 @@ private extension MainView {
 
     var hasSidebar: Bool {
         Self.hasSidebar(horizontalSizeClass)
+    }
+
+    var tabErrorCounts: [Int] {
+        [
+            home.errorNotice.count,
+            records.errorNotice.count,
+            review.errorNotice.count,
+            assets.errorNotice.count
+        ]
+    }
+}
+
+private extension MainView {
+    func replaceNotices(with source: NoticeSource) {
+        if source != .entry {
+            notice.clear()
+        }
+
+        if source != .deletion {
+            undo.deletion = nil
+        }
+
+        if source != .undoError {
+            undo.errorNotice.clear()
+        }
+
+        if source != .tab {
+            noticeRound += 1
+        }
     }
 }
 

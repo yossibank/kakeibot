@@ -23,6 +23,14 @@ struct ThemePaletteContrastTests {
         #expect(preset.palette.unreadableRoles.isEmpty)
     }
 
+    @Test(arguments: ThemePreset.allCases)
+    func keepsPresetHintsReadableAsBody(preset: ThemePreset) {
+        let palette = preset.palette
+        let ratios = Self.surfaces.map { ThemePalette.contrast(palette.hint, palette[$0]) }
+        let lowest = ratios.min() ?? 0
+        #expect(lowest >= 4.5)
+    }
+
     @Test
     func tellsLightBackground() {
         let light = ThemePreset.allCases.filter(\.palette.isLight)
@@ -44,6 +52,14 @@ extension ThemePaletteContrastTests {
 }
 
 private extension ThemePaletteContrastTests {
+    static let surfaces: [ThemePalette.Role] = [
+        .backgroundTop,
+        .backgroundBottom,
+        .panel,
+        .cardTop,
+        .cardBottom
+    ]
+
     static var contrastCases: [ContrastCase] {
         get throws {
             try CoreFixture.cases("theme/theme-palette-contrast.json")

@@ -93,8 +93,11 @@ public struct RecordsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .monthSwipe(following: $slide, perform: moveMonth)
+        .monthSwipe(following: swipeSlide, perform: moveMonth)
         .scrollDismissesKeyboard(.interactively)
+        .errorBanner(model.errorNotice) {
+            model.errorNotice.clear()
+        }
         .safeAreaInset(edge: .bottom) {
             if let selection {
                 selectionBar(selection)
@@ -125,9 +128,6 @@ public struct RecordsView: View {
         }
         .haptic(.selection, trigger: model.month)
         .haptic(.selection, trigger: model.selectedDate)
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
         .sheet(item: $stampTarget) { target in
             RecordsStampSheet(
                 date: target.date,
@@ -266,6 +266,14 @@ private extension RecordsView {
         .numericText(countsDown: !isMovingForward)
     }
 
+    var canSwipeMonth: Bool {
+        !model.isSearching && selection == nil
+    }
+
+    var swipeSlide: Binding<PageSlide> {
+        canSwipeMonth ? $slide : .constant(PageSlide())
+    }
+
     var recordAction: (() -> Void)? {
         guard model.filter.isEmpty else {
             return nil
@@ -287,7 +295,7 @@ private extension RecordsView {
     }
 
     func moveMonth(_ direction: PageSwipeDirection) {
-        guard !model.isSearching else {
+        guard canSwipeMonth else {
             return
         }
 

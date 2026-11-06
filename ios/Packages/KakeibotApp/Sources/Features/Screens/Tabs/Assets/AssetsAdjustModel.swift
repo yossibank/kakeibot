@@ -7,7 +7,7 @@ import Store
 @MainActor
 @Observable
 public final class AssetsAdjustModel {
-    public private(set) var calculator = AmountCalculator()
+    public private(set) var calculator: AmountCalculator
 
     public internal(set) var errorNotice = ErrorNotice()
 
@@ -16,6 +16,7 @@ public final class AssetsAdjustModel {
 
     private let database: AppDatabase
     private let today: LocalDate
+    private let openingAmount: Int
 
     public init(
         database: AppDatabase,
@@ -23,10 +24,14 @@ public final class AssetsAdjustModel {
         balance: Int,
         today: LocalDate
     ) {
+        let calculator = AmountCalculator()
+
+        self.calculator = calculator
         self.database = database
         self.wallet = wallet
         self.balance = balance
         self.today = today
+        self.openingAmount = calculator.amount
     }
 }
 
@@ -39,12 +44,20 @@ public extension AssetsAdjustModel {
         difference != 0
     }
 
-    var differenceText: String {
-        guard canSave else {
-            return "記録の残高と同じです"
-        }
+    var isChanged: Bool {
+        calculator.amount != openingAmount
+    }
 
-        return "差の \(AmountText.text(difference)) を「残高の調整」として今日の記録に入れます"
+    var differenceText: String {
+        canSave ? AmountText.text(difference, type: .income) : "なし"
+    }
+
+    var differenceNote: String {
+        canSave ? "差は今日の記録に入ります" : "記録の残高と同じです"
+    }
+
+    var saveTitle: String {
+        canSave ? "\(differenceText) で合わせる" : "合わせる"
     }
 
     func press(_ key: AmountCalculator.Key) {

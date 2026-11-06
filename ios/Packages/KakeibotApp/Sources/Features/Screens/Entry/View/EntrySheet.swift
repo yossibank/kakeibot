@@ -140,12 +140,47 @@ extension EntrySheet {
                     await save()
                 }
             }
+            .disabled(!model.canSave)
 
-            if !model.isEditing {
-                continueButton
+            if model.isEditing {
+                sideButton(
+                    "もう一度",
+                    systemImage: "doc.on.doc",
+                    isEnabled: true
+                ) {
+                    Task {
+                        await recordAgain()
+                    }
+                }
+            } else {
+                sideButton(
+                    "続けて",
+                    systemImage: "plus.square.on.square",
+                    isEnabled: model.canSave
+                ) {
+                    Task {
+                        await saveAndContinue()
+                    }
+                }
             }
         }
-        .disabled(!model.canSave)
+    }
+
+    func close() {
+        if model.isChanged {
+            isConfirmingDiscard = true
+        } else {
+            dismiss()
+        }
+    }
+
+    func delete() async {
+        guard let change = await model.delete() else {
+            return
+        }
+
+        onChange(change)
+        dismiss()
     }
 }
 
@@ -233,31 +268,6 @@ private extension EntrySheet {
         }
     }
 
-    var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                close()
-            }
-
-            Spacer()
-
-            CapsulePicker(selection: typeBinding, options: Self.typeOptions)
-
-            Spacer()
-
-            if model.isEditing {
-                RingButton(systemImage: "trash", style: .destructive) {
-                    Task {
-                        await delete()
-                    }
-                }
-            } else {
-                Color.clear
-                    .frame(width: 44, height: 44)
-            }
-        }
-    }
-
     var dial: some View {
         EntryDialFace(model: model) {
             open(.items)
@@ -268,17 +278,18 @@ private extension EntrySheet {
         .frame(maxWidth: .infinity)
     }
 
-    var continueButton: some View {
-        Button {
-            Task {
-                await saveAndContinue()
-            }
-        } label: {
+    func sideButton(
+        _ title: String,
+        systemImage: String,
+        isEnabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
             VStack(spacing: 4) {
-                Image(systemName: "plus.square.on.square")
+                Image(systemName: systemImage)
                     .sansFont(.body)
 
-                Text("続けて")
+                Text(title)
                     .textFont(.caption2, weight: .semibold)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -292,7 +303,13 @@ private extension EntrySheet {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .opacity(continueOpacity)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.4)
+    }
+
+    func recordAgain() async {
+        await model.recordAgain()
+        showSelectedCategory()
     }
 }
 
@@ -300,44 +317,8 @@ private extension EntrySheet {
     static let fade: CGFloat = 20
     static let continueWidth: CGFloat = 64
 
-    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
-        .init("支出", value: .expense),
-        .init("収入", value: .income),
-        .init("振替", value: .transfer)
-    ]
-
     var bannerBottom: CGFloat {
         isEnteringAmount ? drawerHeight + 12 : 12
-    }
-
-    var continueOpacity: Double {
-        model.canSave ? 1 : 0.4
-    }
-
-    var typeBinding: Binding<Entry.Kind> {
-        Binding(
-            get: {
-                model.type
-            },
-            set: { type in
-                var transaction = Transaction()
-
-                transaction.disablesAnimations = true
-
-                withTransaction(transaction) {
-                    model.select(type)
-                    showSelectedCategory()
-                }
-            }
-        )
-    }
-
-    func close() {
-        if model.isChanged {
-            isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
     }
 
     func editMemo(_ isEditing: Bool) {
@@ -378,15 +359,6 @@ private extension EntrySheet {
         await model.startNext()
         notice.show(change)
         setEnteringAmount(model.startsWithAmount)
-    }
-
-    func delete() async {
-        guard let change = await model.delete() else {
-            return
-        }
-
-        onChange(change)
-        dismiss()
     }
 }
 

@@ -90,6 +90,10 @@ extension MainView {
             case let .template(id):
                 tab = .home
                 sheet = await templateSheet(id)
+
+            case .newTemplate:
+                tab = .home
+                sheet = .newTemplate
             }
         }
     }

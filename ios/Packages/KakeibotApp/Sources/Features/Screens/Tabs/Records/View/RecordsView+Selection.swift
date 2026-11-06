@@ -5,13 +5,11 @@ import SwiftUI
 extension RecordsView {
     func selectionBar(_ selection: Set<Entry.ID>) -> some View {
         let type = model.batchType(of: selection)
-        let canChangeWallet = !selection.isEmpty && !model.hasTransfer(in: selection)
 
         return ViewThatFits(in: .horizontal) {
             barContent(
                 selection,
                 type: type,
-                canChangeWallet: canChangeWallet,
                 isCompact: false,
                 isStacked: false
             )
@@ -19,7 +17,6 @@ extension RecordsView {
             barContent(
                 selection,
                 type: type,
-                canChangeWallet: canChangeWallet,
                 isCompact: false,
                 isStacked: true
             )
@@ -27,7 +24,6 @@ extension RecordsView {
             barContent(
                 selection,
                 type: type,
-                canChangeWallet: canChangeWallet,
                 isCompact: true,
                 isStacked: true
             )
@@ -48,7 +44,6 @@ private extension RecordsView {
     func barContent(
         _ selection: Set<Entry.ID>,
         type: Entry.Kind?,
-        canChangeWallet: Bool,
         isCompact: Bool,
         isStacked: Bool
     ) -> some View {
@@ -60,7 +55,6 @@ private extension RecordsView {
             barButtons(
                 selection,
                 type: type,
-                canChangeWallet: canChangeWallet,
                 isStacked: isStacked
             )
         }
@@ -104,14 +98,13 @@ private extension RecordsView {
     func barButtons(
         _ selection: Set<Entry.ID>,
         type: Entry.Kind?,
-        canChangeWallet: Bool,
         isStacked: Bool
     ) -> some View {
         HStack(spacing: 4) {
             barButton(
                 "カテゴリ",
                 systemImage: "tag",
-                isEnabled: type != nil,
+                block: model.batchCategoryBlock(of: selection),
                 isStacked: isStacked
             ) {
                 if let type {
@@ -122,7 +115,7 @@ private extension RecordsView {
             barButton(
                 "口座",
                 systemImage: "building.columns",
-                isEnabled: canChangeWallet,
+                block: model.batchWalletBlock(of: selection),
                 isStacked: isStacked
             ) {
                 batchTarget = .wallet
@@ -131,7 +124,7 @@ private extension RecordsView {
             barButton(
                 "削除",
                 systemImage: "trash",
-                isEnabled: !selection.isEmpty,
+                block: model.batchDeleteBlock(of: selection),
                 isStacked: isStacked,
                 tint: Palette.rose
             ) {
@@ -146,14 +139,20 @@ private extension RecordsView {
     func barButton(
         _ title: String,
         systemImage: String,
-        isEnabled: Bool,
+        block: String?,
         isStacked: Bool,
         tint: Color = Palette.accent,
         action: @escaping () -> Void
     ) -> some View {
-        let opacity = isEnabled ? 1 : 0.4
+        let opacity = block == nil ? 1 : 0.4
 
-        return Button(action: action) {
+        return Button {
+            if let block {
+                model.errorNotice.inform(block)
+            } else {
+                action()
+            }
+        } label: {
             Group {
                 if isStacked {
                     VStack(spacing: 2) {
@@ -177,7 +176,6 @@ private extension RecordsView {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .disabled(!isEnabled)
         .opacity(opacity)
     }
 }

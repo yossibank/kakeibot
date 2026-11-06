@@ -111,24 +111,27 @@ private extension AssetsView {
     }
 
     func walletRow(_ row: AssetsModel.WalletRow) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            IconBadge(row.icon, size: 32)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 12) {
+                IconBadge(row.icon, size: 32)
 
-            VStack(alignment: .leading, spacing: 4) {
-                walletLine(row)
+                VStack(alignment: .leading, spacing: 4) {
+                    walletLine(row)
 
-                debtDetail(of: row)
-
-                if row.needsAdjustment {
-                    adjustNotice(of: row)
+                    debtDetail(of: row)
                 }
-            }
-            .frame(minHeight: 32)
+                .frame(minHeight: 32)
 
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
-                .frame(height: 32)
+                Image(systemName: "chevron.right")
+                    .sansFont(.small)
+                    .foregroundStyle(Palette.hint)
+                    .frame(height: 32)
+            }
+
+            if row.needsAdjustment {
+                adjustNotice(of: row)
+                    .padding(.leading, 44)
+            }
         }
         .padding(.vertical, 8)
         .contentShape(.rect)
@@ -220,52 +223,74 @@ private extension AssetsView {
     }
 
     func adjustNotice(of row: AssetsModel.WalletRow) -> some View {
-        Button {
+        let shape = RoundedRectangle(cornerRadius: corner.radius(12))
+
+        return Button {
             adjusting = row
         } label: {
-            VStack(spacing: 8) {
-                Hairline(thickness: 1)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    adjustMessage(showsReason: true)
 
-                ViewThatFits(in: .horizontal) {
-                    adjustLine("手持ちがマイナス", showsDot: true)
-                    adjustLine("手持ちがマイナス", showsDot: false)
-                    adjustLine("マイナス", showsDot: true)
+                    Spacer(minLength: 8)
+
+                    adjustAction(fills: false)
+                }
+
+                HStack(spacing: 8) {
+                    adjustMessage(showsReason: false)
+
+                    Spacer(minLength: 8)
+
+                    adjustAction(fills: false)
+                }
+
+                VStack(alignment: .leading, spacing: 12) {
+                    adjustMessage(showsReason: true)
+
+                    adjustAction(fills: true)
                 }
             }
-            .padding(.top, 4)
-            .contentShape(.rect)
+            .padding(12)
+            .background(Palette.rose.opacity(.faint), in: shape)
+            .overlay {
+                shape
+                    .strokeBorder(Palette.rose.opacity(.soft), lineWidth: 1)
+            }
+            .contentShape(shape)
         }
         .buttonStyle(.plain)
     }
 
-    func adjustLine(
-        _ text: String,
-        showsDot: Bool
-    ) -> some View {
-        HStack(spacing: 8) {
-            if showsDot {
-                Circle()
-                    .fill(Palette.rose)
-                    .frame(width: 6, height: 6)
+    func adjustAction(fills: Bool) -> some View {
+        Text("残高を合わせる")
+            .textFont(.caption, weight: .bold)
+            .lineLimit(1)
+            .padding(.horizontal, 12)
+            .frame(maxWidth: fills ? .infinity : nil)
+            .frame(height: 32)
+            .goldFace()
+    }
+
+    func adjustMessage(showsReason: Bool) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: "exclamationmark.circle.fill")
+                .sansFont(.body)
+                .foregroundStyle(Palette.rose)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("手持ちがマイナスです")
+                    .textFont(.caption, weight: .bold)
+                    .foregroundStyle(Palette.rose)
+
+                if showsReason {
+                    Text("記録と手元のお金がずれています")
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                }
             }
-
-            Text(text)
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .fixedSize()
-
-            Spacer(minLength: 8)
-
-            HStack(spacing: 4) {
-                Text("合わせる")
-                    .textFont(.caption, weight: .semibold)
-
-                Image(systemName: "chevron.right")
-                    .sansFont(.micro, weight: .semibold)
-            }
-            .foregroundStyle(Palette.accentStrong)
-            .fixedSize()
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     func billRow(_ row: AssetsModel.UpcomingBill) -> some View {

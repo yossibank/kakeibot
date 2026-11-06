@@ -61,6 +61,24 @@ struct AssetsAdjustModelTests {
     }
 
     @Test
+    func reportsChangeOnlyWhileAmountDiffersFromOpening() async throws {
+        let setup = try await AssetsModelTests.Setup()
+        let model = AssetsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let row = try #require(model.rows.first)
+        let adjust = model.adjustModel(for: row)
+
+        let opened = adjust.isChanged
+        adjust.press(.digit(5))
+        let typed = adjust.isChanged
+        adjust.press(.delete)
+
+        #expect(!opened)
+        #expect(typed)
+        #expect(!adjust.isChanged)
+    }
+
+    @Test
     func describesDifference() async throws {
         let setup = try await AssetsModelTests.Setup()
         try await setup.save(.expense, 37580, on: "2026-10-10", from: setup.cash)
@@ -69,6 +87,8 @@ struct AssetsAdjustModelTests {
         let row = try #require(model.rows.first)
         let adjust = model.adjustModel(for: row)
 
-        #expect(adjust.differenceText == "差の ¥37,580 を「残高の調整」として今日の記録に入れます")
+        #expect(adjust.differenceText == "+¥37,580")
+        #expect(adjust.differenceNote == "差は今日の記録に入ります")
+        #expect(adjust.saveTitle == "+¥37,580 で合わせる")
     }
 }

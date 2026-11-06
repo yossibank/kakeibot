@@ -114,6 +114,30 @@ struct EntryModelTests {
     }
 
     @Test
+    func recordsEditedEntryAgainAsNewEntry() async throws {
+        let setup = try await Setup()
+        let entry = try await setup.saveEntry(amount: 980)
+        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        await model.load()
+        model.memo = "ランチ"
+
+        await model.recordAgain()
+        let saved = await model.save()
+        let entries = try setup.database.snapshot().entries
+        let stored = try await setup.database.entry(entry.id)
+
+        #expect(!model.isEditing)
+        #expect(model.errorNotice.message == "同じ内容で新しい記録にしました")
+        #expect(saved?.entry.id != entry.id)
+        #expect(saved?.entry.amount == 980)
+        #expect(saved?.entry.memo == "ランチ")
+        #expect(saved?.entry.categoryId == entry.categoryId)
+        #expect(saved?.entry.date == LocalDate(Date(), in: .current))
+        #expect(entries.count == 2)
+        #expect(stored?.memo == entry.memo)
+    }
+
+    @Test
     func describesExpressionAndTax() async throws {
         let model = try await Self.newModel()
 

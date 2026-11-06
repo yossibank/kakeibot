@@ -6,7 +6,7 @@ extension View {
         _ id: Binding<ID?>,
         message: String = "非表示にしました",
         systemImage: String = "eye.slash",
-        bottom: CGFloat = 12,
+        bottom: CGFloat = NoticeBanner.bottomMargin,
         onUndo: @escaping (ID) -> Void
     ) -> some View {
         overlay(alignment: .bottom) {
@@ -19,6 +19,7 @@ extension View {
                     id.wrappedValue = nil
                     onUndo(hiddenId)
                 }
+                .padding(.horizontal, NoticeBanner.sideMargin)
                 .padding(.bottom, bottom)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .task(id: hiddenId) {

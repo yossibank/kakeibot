@@ -207,7 +207,7 @@ struct BackupModelTests {
         target.read(file.data)
         await target.restore()
 
-        #expect(target.errorNotice.message == "読み込めませんでした。いまのデータはそのままです")
+        #expect(target.errorNotice.message == "バックアップを読めませんでした。いまのデータはそのままです")
         #expect(try setup.target.snapshot().wallets.isEmpty)
         #expect(target.previous.isEmpty)
     }
