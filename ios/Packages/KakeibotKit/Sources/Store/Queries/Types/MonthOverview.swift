@@ -144,9 +144,7 @@ private extension MonthOverview {
                     .compactMap { occurrence in
                         let date = occurrence.date
 
-                        let entry = recorded.first { entry in
-                            recurring.isRecorded(by: entry, scheduled: occurrence.scheduled)
-                        }
+                        let entry = recurring.record(of: occurrence, in: recorded)
 
                         let amount = entry?.amount
                             ?? entries.map { recurring.amount(paidOn: date, entries: $0) }

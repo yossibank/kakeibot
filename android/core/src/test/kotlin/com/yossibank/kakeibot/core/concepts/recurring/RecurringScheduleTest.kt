@@ -215,6 +215,53 @@ class RecurringScheduleTest {
         }
 
         @Test
+        fun totalsRecordedAmountOverScheduled() {
+            val now = Instant.ofEpochSecond(1_791_000_000)
+            val payday = date("2026-10-27")
+
+            val rent = Recurring(
+                type = Entry.Kind.expense,
+                amount = 78000,
+                categoryId = Identifier(),
+                walletId = Identifier(),
+                frequency = Recurring.Frequency.monthly,
+                day = 27,
+                startDate = date("2026-01-01"),
+                createdAt = now,
+                updatedAt = now,
+            )
+
+            val recorded = Entry(
+                type = Entry.Kind.expense,
+                amount = 80000,
+                date = payday,
+                categoryId = rent.categoryId,
+                walletId = rent.walletId,
+                recurringId = rent.id,
+                recurringDate = payday,
+                createdAt = now,
+                updatedAt = now,
+            )
+
+            val range = date("2026-10-01")..date("2026-10-31")
+
+            val total = listOf(rent).total(
+                of = Entry.Kind.expense,
+                range = range,
+                entries = listOf(recorded),
+            )
+
+            val unrecorded = listOf(rent).total(
+                of = Entry.Kind.expense,
+                range = range,
+                entries = emptyList(),
+            )
+
+            assertEquals(80000, total)
+            assertEquals(78000, unrecorded)
+        }
+
+        @Test
         fun totalsWithoutWrappingAround() {
             val limit = 999_999_999
             val now = Instant.ofEpochSecond(1_791_000_000)

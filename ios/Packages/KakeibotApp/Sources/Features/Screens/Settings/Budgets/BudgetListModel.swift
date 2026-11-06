@@ -69,7 +69,12 @@ public extension BudgetListModel {
 
     var recurringExpense: Int {
         let period = month.period(startingOn: monthStartDay)
-        return recurrings.total(of: .expense, in: period)
+
+        guard let entryList else {
+            return recurrings.total(of: .expense, in: period)
+        }
+
+        return recurrings.total(of: .expense, in: period, entries: entryList.entries)
     }
 
     var periodText: String {

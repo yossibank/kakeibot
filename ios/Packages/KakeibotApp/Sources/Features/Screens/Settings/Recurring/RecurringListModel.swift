@@ -13,6 +13,7 @@ public final class RecurringListModel: ScreenModel {
 
     public private(set) var recurrings: [Recurring] = []
     public private(set) var list: EntryList?
+    public private(set) var monthStartDay: MonthStartDay = .first
 
     let today: LocalDate
 
@@ -65,16 +66,15 @@ public extension RecurringListModel {
     }
 
     var monthTotal: Int {
-        let month = today.yearMonth.period(startingOn: .first)
+        let period = today
+            .periodMonth(startingOn: monthStartDay)
+            .period(startingOn: monthStartDay)
 
         guard let list else {
-            return visible.total(of: type, in: month)
+            return visible.total(of: type, in: period)
         }
 
-        return visible.reduce(0) { sum, recurring in
-            let dates = recurring.dates(from: month.lowerBound, through: month.upperBound)
-            return sum + dates.reduce(0) { $0 + list.amount(of: recurring, on: $1) }
-        }
+        return visible.total(of: type, in: period, entries: list.entries)
     }
 
     static func title(of type: Entry.Kind) -> String {
@@ -107,6 +107,10 @@ public extension RecurringListModel {
             group.addTask {
                 await self.observeList()
             }
+
+            group.addTask {
+                await self.observeMonthStartDay()
+            }
         }
     }
 }
@@ -135,6 +139,15 @@ private extension RecurringListModel {
             failure: Self.loadFailedMessage
         ) { list in
             self.list = list
+        }
+    }
+
+    func observeMonthStartDay() async {
+        await observe(
+            database.settingUpdates(.monthStartDay),
+            failure: Self.loadFailedMessage
+        ) { startDay in
+            self.monthStartDay = startDay
         }
     }
 
