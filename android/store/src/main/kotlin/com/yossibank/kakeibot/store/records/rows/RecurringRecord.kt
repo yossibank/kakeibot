@@ -127,7 +127,7 @@ interface RecurringRecordDao {
     )
     suspend fun cardBill(walletId: String): RecurringRecord?
 
-    @Query("UPDATE recurring SET generated_until = :date WHERE id = :id")
+    @Query("UPDATE recurring SET generated_until = :date WHERE id = :id AND generated_until IS NOT :date")
     suspend fun setGeneratedUntil(
         id: String,
         date: String,
