@@ -88,8 +88,7 @@ private extension ReviewSharesCard {
                 .textFont(.caption2)
                 .foregroundStyle(Palette.subtext)
 
-            AmountText(total.amount, type: type)
-                .displayFont(.body)
+            AmountText(total.amount, type: type, font: .size(.body))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
         }
@@ -119,8 +118,7 @@ private extension ReviewSharesCard {
 
                 Spacer(minLength: 8)
 
-                AmountText(share.amount, type: type)
-                    .displayFont(.body)
+                AmountText(share.amount, type: type, font: .size(.body))
                     .fixedSize()
                     .layoutPriority(1)
 

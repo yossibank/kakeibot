@@ -44,10 +44,12 @@ private extension EntryRecentTransfers {
                 Spacer(minLength: 8)
 
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text(AmountText.text(transfer.amount))
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .fixedSize()
+                    AmountText(
+                        transfer.amount,
+                        font: .style(.footnote),
+                        color: Palette.accentStrong
+                    )
+                    .fixedSize()
 
                     if fee > 0 {
                         Text("＋手数料 \(AmountText.text(fee))")

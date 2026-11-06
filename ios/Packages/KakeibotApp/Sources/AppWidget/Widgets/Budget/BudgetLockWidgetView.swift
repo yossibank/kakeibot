@@ -96,9 +96,7 @@ private extension BudgetLockWidgetView {
                 }
             }
 
-            Text(AmountText.text(mainAmount(of: summary)))
-                .displayFont(.headline, weight: .bold)
-                .monospacedDigit()
+            AmountText(mainAmount(of: summary), font: .size(.headline, weight: .bold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
                 .widgetAccentable()

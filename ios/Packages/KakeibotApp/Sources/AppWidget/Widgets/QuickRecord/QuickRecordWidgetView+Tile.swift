@@ -53,13 +53,14 @@ private extension QuickRecordWidgetView {
 
             HStack(spacing: 4) {
                 if let amount = tile.amount {
-                    Text(AmountText.text(amount))
-                        .displayFont(.body, weight: .medium)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                        .privacySensitive()
+                    AmountText(
+                        amount,
+                        font: .size(.body, weight: .medium),
+                        color: Palette.accentStrong
+                    )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .privacySensitive()
                 } else {
                     Text("毎回入れる")
                         .textFont(size: .micro)

@@ -69,12 +69,14 @@ private extension RecordsView {
 
             Spacer(minLength: 8)
 
-            Text(ReviewText.balance(balance))
-                .textFont(.subheadline, weight: .semibold)
-                .monospacedDigit()
-                .foregroundStyle(ReviewText.balanceColor(balance))
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+            AmountText(
+                balance,
+                font: .style(.subheadline, weight: .semibold),
+                sign: .plus,
+                color: ReviewText.balanceColor(balance)
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
         }
     }
 
@@ -110,8 +112,7 @@ private extension RecordsView {
                 .lineLimit(1)
                 .fixedSize()
 
-            AmountText(amount, type: type)
-                .displayFont(.body)
+            AmountText(amount, type: type, font: .size(.body))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }

@@ -84,13 +84,15 @@ private extension RecordsRewardSheet {
 
             Spacer()
 
-            Text(AmountText.text(model.rewardTotal(on: date)))
-                .displayFont(.headline)
-                .foregroundStyle(Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .contentTransition(.numericText())
-                .animation(.snappy, value: model.rewardTotal(on: date))
+            AmountText(
+                model.rewardTotal(on: date),
+                font: .size(.headline),
+                color: Palette.accentStrong
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .contentTransition(.numericText())
+            .animation(.snappy, value: model.rewardTotal(on: date))
         }
         .padding(.horizontal, 8)
     }
@@ -115,9 +117,12 @@ private extension RecordsRewardSheet {
 
                 Spacer(minLength: 8)
 
-                Text("+\(AmountText.text(rule.amount))")
-                    .textFont(.footnote)
-                    .foregroundStyle(Palette.accent)
+                AmountText(
+                    rule.amount,
+                    font: .style(.footnote),
+                    sign: .plus,
+                    color: Palette.accent
+                )
 
                 Image(systemName: mark)
                     .sansFont(.headline)

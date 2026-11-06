@@ -40,10 +40,7 @@ struct ReviewShareSheet: View {
 
                 Spacer()
 
-                Text(AmountText.text(share.amount))
-                    .displayFont(.headline)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
+                AmountText(share.amount, font: .size(.headline), color: Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             }

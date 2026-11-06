@@ -42,8 +42,7 @@ private extension EntryReceiptTaxBreakdown {
                     .fixedSize()
             }
 
-            Text(AmountText.text(tax.base))
-                .monospacedDigit()
+            AmountText(tax.base, font: .style(.caption))
                 .fixedSize()
                 .gridColumnAlignment(.trailing)
 
@@ -54,9 +53,7 @@ private extension EntryReceiptTaxBreakdown {
                 .fixedSize()
                 .gridColumnAlignment(.trailing)
 
-            Text(AmountText.text(tax.amount))
-                .monospacedDigit()
-                .foregroundStyle(Palette.text)
+            AmountText(tax.amount, font: .style(.caption), color: Palette.text)
                 .fixedSize()
                 .gridColumnAlignment(.trailing)
         }

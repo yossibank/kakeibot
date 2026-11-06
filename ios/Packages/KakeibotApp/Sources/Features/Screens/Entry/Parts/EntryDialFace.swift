@@ -39,14 +39,15 @@ struct EntryDialFace: View {
                 .foregroundStyle(Palette.accentStrong)
                 .frame(maxWidth: Self.maxWidth * 0.7, minHeight: 20)
 
-                Text(AmountText.text(shownAmount))
-                    .font(amountFont)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .editBadge()
-                    .frame(height: Self.amountHeight)
+                AmountText(
+                    shownAmount,
+                    font: .fixed(amountFont),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .editBadge()
+                .frame(height: Self.amountHeight)
 
                 Text(note ?? " ")
                     .textFont(.caption)

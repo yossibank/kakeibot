@@ -4,6 +4,7 @@ import SwiftUI
 
 struct FeatureArt: View {
     @Environment(\.themeStyle.corner) private var corner
+    @Environment(\.themeStyle) private var themeStyle
 
     let kind: Kind
 
@@ -84,7 +85,7 @@ private extension FeatureArt {
                     .foregroundStyle(Palette.hint)
 
                 Text("自動でそろう")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(.display(size: 9, weight: .semibold, in: themeStyle.textFont))
                     .foregroundStyle(Palette.accentStrong)
             }
 
@@ -109,10 +110,7 @@ private extension FeatureArt {
                         .foregroundStyle(Palette.accent)
                 }
 
-                Text(AmountText.text(32400))
-                    .displayFont(.headline, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.text)
+                AmountText(32400, font: .size(.headline, weight: .bold), color: Palette.text)
 
                 VStack(spacing: 4) {
                     sharedRow("自", title: "スーパー", amount: 2180)
@@ -136,7 +134,7 @@ private extension FeatureArt {
                         .frame(width: Self.themeWidth)
 
                     Text(preset.title)
-                        .font(.system(size: 9))
+                        .font(.display(size: 9, in: themeStyle.textFont))
                         .foregroundStyle(Palette.subtext)
                 }
             }
@@ -147,7 +145,7 @@ private extension FeatureArt {
                         .font(.system(size: 20, weight: .light))
 
                     Text("自分で\n作る")
-                        .font(.system(size: 10, weight: .semibold))
+                        .font(.display(size: 10, weight: .semibold, in: themeStyle.textFont))
                         .multilineTextAlignment(.center)
                 }
                 .foregroundStyle(Palette.accent)
@@ -158,7 +156,7 @@ private extension FeatureArt {
                 }
 
                 Text("Pro")
-                    .font(.system(size: 9, weight: .bold))
+                    .font(.display(size: 9, weight: .bold, in: themeStyle.textFont))
                     .foregroundStyle(Palette.accentStrong)
             }
         }
@@ -169,7 +167,7 @@ private extension FeatureArt {
             ForEach(Self.fontSamples, id: \.self) { sample in
                 HStack(alignment: .firstTextBaseline) {
                     Text(sample.title)
-                        .font(.system(size: 10))
+                        .font(.display(size: 10, in: themeStyle.textFont))
                         .foregroundStyle(Palette.subtext)
                         .frame(width: 64, alignment: .leading)
 
@@ -201,7 +199,7 @@ private extension FeatureArt {
             }
 
             Text(title)
-                .font(.system(size: 9))
+                .font(.display(size: 9, in: themeStyle.textFont))
                 .foregroundStyle(Palette.subtext)
         }
     }
@@ -222,7 +220,7 @@ private extension FeatureArt {
                 }
 
             Text(title)
-                .font(.system(size: 9))
+                .font(.display(size: 9, in: themeStyle.textFont))
                 .foregroundStyle(Palette.subtext)
         }
     }
@@ -234,21 +232,22 @@ private extension FeatureArt {
     ) -> some View {
         HStack(spacing: 4) {
             Text(initial)
-                .font(.system(size: 7, weight: .bold))
+                .font(.display(size: 7, weight: .bold, in: themeStyle.textFont))
                 .foregroundStyle(Palette.backgroundTop)
                 .frame(width: 14, height: 14)
                 .background(Palette.accent, in: Circle())
 
             Text(title)
-                .font(.system(size: 9))
+                .font(.display(size: 9, in: themeStyle.textFont))
                 .foregroundStyle(Palette.text)
 
             Spacer(minLength: 4)
 
-            Text(AmountText.text(amount))
-                .font(.system(size: 9))
-                .monospacedDigit()
-                .foregroundStyle(Palette.text)
+            AmountText(
+                amount,
+                font: .fixed(.display(size: 9, in: themeStyle.displayFont)),
+                color: Palette.text
+            )
         }
     }
 }

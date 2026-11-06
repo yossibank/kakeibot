@@ -63,10 +63,11 @@ private extension FeatureArtMiniHome {
                         .tracking(4)
                         .foregroundStyle(Palette.accent)
 
-                    Text(AmountText.text(FeatureArtSample.remaining))
-                        .displayFont(.title, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
+                    AmountText(
+                        FeatureArtSample.remaining,
+                        font: .size(.title, weight: .bold),
+                        color: Palette.accentStrong
+                    )
                 }
                 .padding(.horizontal, 28)
             }
@@ -108,10 +109,11 @@ private extension FeatureArtMiniHome {
 
                     Spacer(minLength: 0)
 
-                    Text(AmountText.text(item.amount))
-                        .displayFont(.body, weight: .medium)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.text)
+                    AmountText(
+                        item.amount,
+                        font: .size(.body, weight: .medium),
+                        color: Palette.text
+                    )
                 }
             }
         }
@@ -129,10 +131,7 @@ private extension FeatureArtMiniHome {
                 .textFont(size: .caption)
                 .foregroundStyle(Palette.subtext)
 
-            Text(AmountText.text(amount))
-                .displayFont(.body, weight: .bold)
-                .monospacedDigit()
-                .foregroundStyle(Palette.text)
+            AmountText(amount, font: .size(.body, weight: .bold), color: Palette.text)
         }
         .frame(maxWidth: .infinity)
     }

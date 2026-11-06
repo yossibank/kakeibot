@@ -90,12 +90,13 @@ private extension AssetsRewardSheet {
     var balanceCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
-                Text(AmountText.text(model.rewardBalance))
-                    .displayFont(.largeTitle)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                AmountText(
+                    model.rewardBalance,
+                    font: .size(.largeTitle),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
 
                 Spacer(minLength: 8)
 
@@ -251,10 +252,12 @@ private extension AssetsRewardSheet {
 
             Spacer(minLength: 8)
 
-            Text("+\(AmountText.text(rule.amount))")
-                .textFont(.footnote)
-                .monospacedDigit()
-                .foregroundStyle(Palette.accent)
+            AmountText(
+                rule.amount,
+                font: .style(.footnote),
+                sign: .plus,
+                color: Palette.accent
+            )
         }
     }
 }

@@ -16,12 +16,13 @@ struct AssetsEntrySheet: View {
                         .textFont(.subheadline, weight: .semibold)
                         .foregroundStyle(Palette.subtext)
 
-                    Text(AmountText.text(content.amount))
-                        .displayFont(.largeTitle, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
+                    AmountText(
+                        content.amount,
+                        font: .size(.largeTitle, weight: .bold),
+                        color: Palette.accentStrong
+                    )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
 
                     Text(content.note)
                         .textFont(.caption)

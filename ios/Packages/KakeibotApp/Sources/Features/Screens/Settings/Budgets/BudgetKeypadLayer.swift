@@ -60,14 +60,15 @@ private extension BudgetKeypadLayer {
             }
         } content: {
             VStack(spacing: 12) {
-                Text(AmountText.text(model.calculator.amount))
-                    .displayFont(.largeTitle, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .contentTransition(.numericText())
-                    .animation(.snappy, value: model.calculator.amount)
+                AmountText(
+                    model.calculator.amount,
+                    font: .size(.largeTitle, weight: .bold),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .contentTransition(.numericText())
+                .animation(.snappy, value: model.calculator.amount)
 
                 if !model.suggestions.isEmpty {
                     suggestionRow
@@ -129,8 +130,7 @@ private extension BudgetKeypadLayer {
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
 
-                Text(AmountText.text(suggestion.amount))
-                    .monospacedDigit()
+                AmountText(suggestion.amount, font: .size(.caption))
             }
             .lineLimit(1)
             .minimumScaleFactor(0.8)

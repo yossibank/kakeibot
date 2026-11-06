@@ -103,8 +103,7 @@ private extension EntryTransferPanel {
             Text(line.title)
                 .gridColumnAlignment(.leading)
 
-            Text(AmountText.text(line.amount))
-                .monospacedDigit()
+            AmountText(line.amount, font: .style(.footnote))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .contentTransition(.numericText())

@@ -154,7 +154,7 @@ private extension HomeView {
                     Text(Self.unknownAmount)
                         .foregroundStyle(Palette.subtext)
                 } else {
-                    AmountText(amount, type: type)
+                    AmountText(amount, type: type, font: .size(.body))
                 }
             }
             .displayFont(.body)

@@ -233,7 +233,6 @@ private extension ReviewView {
                 }
 
                 tileAmount(of: kind)
-                    .displayFont(.body)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             }
@@ -258,11 +257,14 @@ private extension ReviewView {
         let total = model.total(of: kind)
 
         if kind == .balance {
-            Text(ReviewText.balance(total))
-                .monospacedDigit()
-                .foregroundStyle(ReviewText.balanceColor(total))
+            AmountText(
+                total,
+                font: .size(.body),
+                sign: .plus,
+                color: ReviewText.balanceColor(total)
+            )
         } else {
-            AmountText(total, type: kind.entryType)
+            AmountText(total, type: kind.entryType, font: .size(.body))
         }
     }
 
@@ -281,8 +283,7 @@ private extension ReviewView {
 
                 Spacer()
 
-                AmountText(amount, type: type)
-                    .displayFont(.body)
+                AmountText(amount, type: type, font: .size(.body))
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             }

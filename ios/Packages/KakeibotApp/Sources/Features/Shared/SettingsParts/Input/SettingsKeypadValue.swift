@@ -14,10 +14,7 @@ struct SettingsKeypadValue: View {
     }
 
     var body: some View {
-        Text(AmountText.text(amount))
-            .displayFont(.largeTitle, weight: .bold)
-            .monospacedDigit()
-            .foregroundStyle(Palette.accentStrong)
+        AmountText(amount, font: .size(.largeTitle, weight: .bold), color: Palette.accentStrong)
             .lineLimit(1)
             .minimumScaleFactor(0.5)
             .contentTransition(.numericText())

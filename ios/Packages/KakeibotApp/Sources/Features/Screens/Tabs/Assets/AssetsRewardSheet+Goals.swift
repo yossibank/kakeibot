@@ -83,10 +83,7 @@ private extension AssetsRewardSheet {
 
             Spacer(minLength: 8)
 
-            Text("−\(AmountText.text(goal.targetAmount))")
-                .textFont(.footnote)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
+            AmountText(-goal.targetAmount, font: .style(.footnote), color: Palette.subtext)
 
             Button {
                 Task {

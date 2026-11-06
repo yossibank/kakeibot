@@ -18,12 +18,14 @@ struct RecordsAdjustmentSheet: View {
 
                     SheetTitle(RecordsAdjustmentRow.title)
 
-                    Text(row.amountText)
-                        .displayFont(.largeTitle, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
+                    AmountText(
+                        row.adjustment.amount,
+                        font: .size(.largeTitle, weight: .bold),
+                        sign: .plus,
+                        color: Palette.accentStrong
+                    )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
 
                     Text(detail)
                         .textFont(.caption)

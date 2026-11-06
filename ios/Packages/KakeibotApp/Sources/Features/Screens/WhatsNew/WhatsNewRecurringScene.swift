@@ -83,9 +83,11 @@ private extension WhatsNewRecurringScene {
 
                         Spacer(minLength: 4)
 
-                        Text(AmountText.text(income.amount))
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.accentStrong)
+                        AmountText(
+                            income.amount,
+                            font: .size(.caption, weight: .semibold),
+                            color: Palette.accentStrong
+                        )
                     }
                     .textFont(size: .caption, weight: .semibold)
 

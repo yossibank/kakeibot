@@ -39,12 +39,14 @@ struct RewardRuleTile: View {
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
 
-                Text("+\(AmountText.text(amount))")
-                    .displayFont(.headline)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accent)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                AmountText(
+                    amount,
+                    font: .size(.headline),
+                    sign: .plus,
+                    color: Palette.accent
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             }
         }
         .padding(16)

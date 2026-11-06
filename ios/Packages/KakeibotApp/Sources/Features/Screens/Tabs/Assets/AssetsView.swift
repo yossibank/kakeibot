@@ -124,12 +124,13 @@ private extension AssetsView {
     var totalContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(AmountText.text(model.total))
-                    .displayFont(.largeTitle, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                AmountText(
+                    model.total,
+                    font: .size(.largeTitle, weight: .bold),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
 
                 Text(changeText)
                     .textFont(.caption)
@@ -193,12 +194,13 @@ private extension AssetsView {
     }
 
     var netWorthAmount: some View {
-        Text(AmountText.text(model.holdings.netWorth))
-            .displayFont(.headline)
-            .monospacedDigit()
-            .foregroundStyle(Palette.accentStrong)
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
+        AmountText(
+            model.holdings.netWorth,
+            font: .size(.headline),
+            color: Palette.accentStrong
+        )
+        .lineLimit(1)
+        .minimumScaleFactor(0.5)
     }
 
     var netWorthRow: some View {

@@ -314,14 +314,13 @@ private extension RecordsView {
     func dayTotals(_ day: EntryDay) -> some View {
         HStack(spacing: 8) {
             if day.expenseTotal > 0 {
-                AmountText(day.expenseTotal, type: .expense)
+                AmountText(day.expenseTotal, type: .expense, font: .style(.caption))
             }
 
             if day.incomeTotal > 0 {
-                AmountText(day.incomeTotal, type: .income)
+                AmountText(day.incomeTotal, type: .income, font: .style(.caption))
             }
         }
-        .textFont(.caption)
     }
 }
 

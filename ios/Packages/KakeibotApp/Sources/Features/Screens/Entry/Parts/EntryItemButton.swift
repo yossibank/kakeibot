@@ -17,9 +17,11 @@ struct EntryItemButton: View {
                 Text("品目 \(count)件")
                     .foregroundStyle(Palette.accentStrong)
 
-                Text(AmountText.text(total))
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.text)
+                AmountText(
+                    total,
+                    font: .style(.caption, weight: .semibold),
+                    color: Palette.text
+                )
 
                 if adjustment != 0 {
                     Text("差額 \(AmountText.text(adjustment))")

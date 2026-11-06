@@ -26,11 +26,6 @@ enum ReviewText {
         return "予算 \(AmountText.text(usage.budget)) の \(percent)%"
     }
 
-    static func balance(_ amount: Int) -> String {
-        let text = AmountText.text(amount)
-        return amount > 0 ? "+\(text)" : text
-    }
-
     static func balanceTitle(_ amount: Int) -> String {
         if amount > 0 {
             return "収支 · 黒字"

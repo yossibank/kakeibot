@@ -16,13 +16,14 @@ extension WidgetGuideStage {
                 ZStack(alignment: .bottom) {
                     HalfDial(progress: 0.62)
 
-                    Text(AmountText.text(FeatureArtSample.remaining))
-                        .displayFont(.headline, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                        .padding(.horizontal, 20)
+                    AmountText(
+                        FeatureArtSample.remaining,
+                        font: .size(.headline, weight: .bold),
+                        color: Palette.accentStrong
+                    )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .padding(.horizontal, 20)
                 }
 
                 Spacer(minLength: 4)
@@ -48,10 +49,11 @@ extension WidgetGuideStage {
                         .foregroundStyle(Palette.subtext)
                 }
 
-                Text(AmountText.text(FeatureArtSample.todayExpense))
-                    .displayFont(.title, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
+                AmountText(
+                    FeatureArtSample.todayExpense,
+                    font: .size(.title, weight: .bold),
+                    color: Palette.accentStrong
+                )
 
                 Rectangle()
                     .fill(Palette.line)
@@ -97,13 +99,14 @@ extension WidgetGuideStage {
                 ZStack(alignment: .bottom) {
                     HalfDial(progress: 0.62)
 
-                    Text(AmountText.text(FeatureArtSample.remaining))
-                        .displayFont(.headline, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                        .padding(.horizontal, 20)
+                    AmountText(
+                        FeatureArtSample.remaining,
+                        font: .size(.headline, weight: .bold),
+                        color: Palette.accentStrong
+                    )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .padding(.horizontal, 20)
                 }
 
                 Spacer(minLength: 4)
@@ -115,10 +118,11 @@ extension WidgetGuideStage {
 
                     Spacer(minLength: 4)
 
-                    Text(AmountText.text(FeatureArtSample.todayExpense))
-                        .textFont(size: .small, weight: .semibold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.text)
+                    AmountText(
+                        FeatureArtSample.todayExpense,
+                        font: .size(.small, weight: .semibold),
+                        color: Palette.text
+                    )
                 }
             }
             .padding(12)
@@ -239,10 +243,7 @@ private extension WidgetGuideStage {
 
             Spacer(minLength: 6)
 
-            Text(AmountText.text(amount))
-                .displayFont(.small, weight: .medium)
-                .monospacedDigit()
-                .foregroundStyle(Palette.text)
+            AmountText(amount, font: .size(.small, weight: .medium), color: Palette.text)
         }
     }
 
@@ -278,10 +279,7 @@ private extension WidgetGuideStage {
 
             Spacer(minLength: 8)
 
-            Text(AmountText.text(record.amount))
-                .displayFont(.small, weight: .medium)
-                .monospacedDigit()
-                .foregroundStyle(Palette.text)
+            AmountText(record.amount, font: .size(.small, weight: .medium), color: Palette.text)
         }
     }
 
@@ -311,10 +309,11 @@ private extension WidgetGuideStage {
 
             HStack(spacing: 4) {
                 if let amount = tile.amount {
-                    Text(AmountText.text(amount))
-                        .displayFont(.body, weight: .medium)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.accentStrong)
+                    AmountText(
+                        amount,
+                        font: .size(.body, weight: .medium),
+                        color: Palette.accentStrong
+                    )
                 } else {
                     Text("毎回入れる")
                         .textFont(size: .micro)

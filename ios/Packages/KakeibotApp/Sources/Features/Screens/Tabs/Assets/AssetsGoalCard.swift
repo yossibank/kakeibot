@@ -18,10 +18,7 @@ struct AssetsGoalCard: View {
 
                 Spacer(minLength: 8)
 
-                Text(AmountText.text(targetAmount))
-                    .textFont(.footnote)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
+                AmountText(targetAmount, font: .style(.footnote), color: Palette.subtext)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }

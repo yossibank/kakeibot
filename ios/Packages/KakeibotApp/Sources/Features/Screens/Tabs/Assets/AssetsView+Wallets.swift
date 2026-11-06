@@ -45,13 +45,14 @@ extension AssetsView {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.bottom, 8)
             } else {
-                Text(AmountText.text(total))
-                    .displayFont(.title, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .padding(.bottom, 4)
+                AmountText(
+                    total,
+                    font: .size(.title, weight: .bold),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.bottom, 4)
             }
 
             ForEach(sections) { section in
@@ -86,12 +87,13 @@ private extension AssetsView {
                 Spacer(minLength: 8)
 
                 if section.rows.count > 1 {
-                    Text(AmountText.text(total))
-                        .textFont(.footnote, weight: .semibold)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    AmountText(
+                        total,
+                        font: .style(.footnote, weight: .semibold),
+                        color: Palette.subtext
+                    )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 }
             }
             .padding(.top, 12)
@@ -175,10 +177,11 @@ private extension AssetsView {
     }
 
     func walletBalance(_ row: AssetsModel.WalletRow) -> some View {
-        Text(AmountText.text(row.balance))
-            .textFont(.subheadline, weight: .semibold)
-            .monospacedDigit()
-            .foregroundStyle(Self.amountColor(of: row))
+        AmountText(
+            row.balance,
+            font: .style(.subheadline, weight: .semibold),
+            color: Self.amountColor(of: row)
+        )
     }
 
     func addWalletRow(action: @escaping () -> Void) -> some View {

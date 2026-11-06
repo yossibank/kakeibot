@@ -48,12 +48,13 @@ struct RecordsItemReceipt: View {
 
                 Spacer()
 
-                Text(AmountText.text(amount))
-                    .displayFont(.headline, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                AmountText(
+                    amount,
+                    font: .size(.headline, weight: .bold),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
             }
         }
         .padding(.horizontal, 12)
@@ -136,9 +137,7 @@ private extension RecordsItemReceipt {
 
             EntryReceiptLeader()
 
-            Text(AmountText.text(item.amount))
-                .monospacedDigit()
-                .foregroundStyle(color)
+            AmountText(item.amount, font: .style(style), color: color)
                 .fixedSize()
         }
         .textFont(style)
@@ -154,8 +153,7 @@ private extension RecordsItemReceipt {
 
             Spacer()
 
-            Text(AmountText.text(amount))
-                .monospacedDigit()
+            AmountText(amount, font: .style(.caption))
         }
         .textFont(.caption)
         .foregroundStyle(color)

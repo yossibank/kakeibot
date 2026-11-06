@@ -117,11 +117,12 @@ private extension ThemeStyleTextView {
                     .foregroundStyle(Palette.accent)
                     .minimumScaleFactor(0.8)
 
-                Text(AmountText.text(Self.sampleRest))
-                    .displayFont(.title, weight: .bold)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.accentStrong)
-                    .minimumScaleFactor(0.5)
+                AmountText(
+                    Self.sampleRest,
+                    font: .size(.title, weight: .bold),
+                    color: Palette.accentStrong
+                )
+                .minimumScaleFactor(0.5)
 
                 Text("予算 ¥200,000")
                     .textFont(.subheadline)
