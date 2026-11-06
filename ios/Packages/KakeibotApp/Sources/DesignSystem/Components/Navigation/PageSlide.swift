@@ -13,7 +13,7 @@ public struct PageSlide: Equatable, Sendable {
 
 public extension PageSlide {
     static let distance: CGFloat = 40
-    static let outDuration = 0.1
+    static let outDuration = 0.15
     static let fadeDistance: CGFloat = 400
     static let minimumOpacity = 0.4
 
@@ -73,7 +73,7 @@ public extension PageSlide {
 
 private extension PageSlide {
     static let frameDuration = 1.0 / 60
-    static let inDuration = 0.34
+    static let inDuration = 0.5
 
     init(
         offset: CGFloat,
