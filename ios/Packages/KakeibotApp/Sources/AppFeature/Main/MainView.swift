@@ -275,6 +275,12 @@ struct MainView: View {
             if isWarmingEntry {
                 entryWarmup
             }
+
+            MainLoadSignal {
+                isLoaded
+            } onLoad: {
+                onLoad()
+            }
         }
         .sheet(item: $sheet, onDismiss: prepareDraft) { sheet in
             sheetContent(for: sheet)
@@ -314,11 +320,6 @@ struct MainView: View {
         .onChange(of: scenePhase) { _, phase in
             if foreground.receive(phase) {
                 observationRound += 1
-            }
-        }
-        .onChange(of: isLoaded, initial: true) {
-            if isLoaded {
-                onLoad()
             }
         }
         .onChange(of: route) { _, route in
