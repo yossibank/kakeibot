@@ -12,10 +12,12 @@ extension RecordsView {
     }
 
     func dayCard(_ day: EntryDay) -> some View {
-        VStack(spacing: 0) {
+        let rows = model.rows(for: day)
+
+        return VStack(spacing: 0) {
             dayHeader(day.date, day: day)
 
-            ForEach(model.rows(for: day)) { row in
+            ForEach(rows) { row in
                 recordRow(row)
 
                 itemList(row)
@@ -26,7 +28,7 @@ extension RecordsView {
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
         .card()
-        .sharesTextScale(id: model.rows(for: day))
+        .sharesTextScale(id: rows)
     }
 
     @ViewBuilder
