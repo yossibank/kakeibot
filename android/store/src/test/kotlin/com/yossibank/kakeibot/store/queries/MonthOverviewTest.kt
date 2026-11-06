@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -16,8 +17,8 @@ import com.yossibank.kakeibot.store.queries.types.PeriodRecurring
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.budgetCarryoverFrom
 import com.yossibank.kakeibot.store.support.insertCardBill
-import com.yossibank.kakeibot.store.support.insertEntry
-import com.yossibank.kakeibot.store.support.setBudget
+import com.yossibank.kakeibot.store.writes.methods.saveEntry
+import com.yossibank.kakeibot.store.writes.methods.setBudget
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.test.runTest
@@ -46,17 +47,22 @@ class MonthOverviewTest {
         )
 
         for ((text, amount) in amounts) {
-            database.insertEntry(
-                amount = amount,
-                date = assertNotNull(LocalDate.parse(text)),
-                categoryId = options.expenseCategories[0].id,
-                walletId = options.wallets[0].id,
+            database.saveEntry(
+                EntryDraft(
+                    type = Entry.Kind.expense,
+                    amount = amount,
+                    date = assertNotNull(LocalDate.parse(text)),
+                    categoryId = options.expenseCategories[0].id,
+                    walletId = options.wallets[0].id,
+                ),
                 at = now,
             )
         }
 
         database.setBudget(
             amount = 50000,
+
+            categoryId = null,
             from = month,
         )
 
@@ -84,16 +90,21 @@ class MonthOverviewTest {
         val month = assertNotNull(YearMonth.parse("2026-09"))
         val start = assertNotNull(YearMonth.parse("2026-09"))
 
-        database.insertEntry(
-            amount = 12000,
-            date = assertNotNull(LocalDate.parse("2026-09-10")),
-            categoryId = options.expenseCategories[0].id,
-            walletId = options.wallets[0].id,
+        database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 12000,
+                date = assertNotNull(LocalDate.parse("2026-09-10")),
+                categoryId = options.expenseCategories[0].id,
+                walletId = options.wallets[0].id,
+            ),
             at = now,
         )
 
         database.setBudget(
             amount = 50000,
+
+            categoryId = null,
             from = month,
         )
 
@@ -121,6 +132,8 @@ class MonthOverviewTest {
 
         database.setBudget(
             amount = 50000,
+
+            categoryId = null,
             from = month,
         )
 
@@ -142,16 +155,21 @@ class MonthOverviewTest {
         val today = assertNotNull(LocalDate.parse("2026-10-23"))
         val month = assertNotNull(YearMonth.parse("2026-10"))
 
-        database.insertEntry(
-            amount = 1200,
-            date = today,
-            categoryId = options.expenseCategories[0].id,
-            walletId = options.wallets[0].id,
+        database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 1200,
+                date = today,
+                categoryId = options.expenseCategories[0].id,
+                walletId = options.wallets[0].id,
+            ),
             at = now,
         )
 
         database.setBudget(
             amount = 50000,
+
+            categoryId = null,
             from = month,
         )
 
@@ -164,6 +182,8 @@ class MonthOverviewTest {
 
         database.setBudget(
             amount = 60000,
+
+            categoryId = null,
             from = month,
         )
 
@@ -213,11 +233,14 @@ class MonthOverviewTest {
         val today = assertNotNull(LocalDate.parse("2026-10-17"))
         val billDate = assertNotNull(LocalDate.parse("2026-10-27"))
 
-        database.insertEntry(
-            amount = 5000,
-            date = used,
-            categoryId = options.expenseCategories[0].id,
-            walletId = card,
+        database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 5000,
+                date = used,
+                categoryId = options.expenseCategories[0].id,
+                walletId = card,
+            ),
             at = now,
         )
 

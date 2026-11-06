@@ -1,13 +1,16 @@
 package com.yossibank.kakeibot.store.queries
 
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
+import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
+import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
 import com.yossibank.kakeibot.store.database.read
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.methods.fetchEntryList
 import com.yossibank.kakeibot.store.queries.types.EntryOptions
-import com.yossibank.kakeibot.store.support.insertEntry
+import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -63,11 +66,19 @@ private suspend fun AppDatabase.insertReceipt(
     date: LocalDate,
     options: EntryOptions,
     at: Instant,
-) = insertEntry(
-    amount = 300,
-    date = date,
-    categoryId = options.expenseCategories[0].id,
-    walletId = options.wallets[0].id,
-    items = listOf(name to 300),
+) = saveEntry(
+    EntryDraft(
+        type = Entry.Kind.expense,
+        amount = 300,
+        date = date,
+        categoryId = options.expenseCategories[0].id,
+        walletId = options.wallets[0].id,
+        items = listOf(
+            EntryItem.Draft(
+                name = name,
+                amount = 300,
+            ),
+        ),
+    ),
     at = at,
 )

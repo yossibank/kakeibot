@@ -58,9 +58,6 @@ interface EntryItemRecordDao {
     @Query("DELETE FROM entry_item")
     suspend fun deleteAll()
 
-    @Query("SELECT * FROM entry_item ORDER BY entry_id, sort_order")
-    suspend fun inEntryOrder(): List<EntryItemRecord>
-
     @Upsert
     suspend fun save(record: EntryItemRecord)
 

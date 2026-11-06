@@ -14,7 +14,6 @@ import com.yossibank.kakeibot.store.queries.types.EntryOptions
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.rows.AdjustmentRecord
 import com.yossibank.kakeibot.store.records.rows.EntryCategoryRecord
-import com.yossibank.kakeibot.store.records.rows.EntryItemRecord
 import com.yossibank.kakeibot.store.records.rows.EntryRecord
 import com.yossibank.kakeibot.store.records.rows.EntryTagRecord
 import com.yossibank.kakeibot.store.records.rows.IconRecord
@@ -24,13 +23,13 @@ import com.yossibank.kakeibot.store.records.rows.WalletRecord
 import com.yossibank.kakeibot.store.records.rows.adjustment
 import com.yossibank.kakeibot.store.records.rows.entry
 import com.yossibank.kakeibot.store.records.rows.entryCategory
-import com.yossibank.kakeibot.store.records.rows.entryItem
 import com.yossibank.kakeibot.store.records.rows.entryTag
 import com.yossibank.kakeibot.store.records.rows.icon
 import com.yossibank.kakeibot.store.records.rows.recurring
 import com.yossibank.kakeibot.store.records.rows.valuation
 import com.yossibank.kakeibot.store.records.rows.wallet
 import com.yossibank.kakeibot.store.records.values.databaseValue
+import com.yossibank.kakeibot.store.writes.methods.fetchEntryItems
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -95,12 +94,7 @@ internal suspend fun AppDatabase.fetchEntryList(
         .map { it.decoded(AdjustmentRecord::adjustment) }
 
     val items = if (includesItems) {
-        val ids = entries.map { it.id }.toSet()
-
-        entryItemDao()
-            .inEntryOrder()
-            .map { it.decoded(EntryItemRecord::entryItem) }
-            .filter { it.entryId in ids }
+        fetchEntryItems(of = entries.map { it.id })
             .groupBy { it.entryId }
     } else {
         emptyMap()

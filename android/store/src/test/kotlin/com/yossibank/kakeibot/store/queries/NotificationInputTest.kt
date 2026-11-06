@@ -1,6 +1,8 @@
 package com.yossibank.kakeibot.store.queries
 
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
+import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
 import com.yossibank.kakeibot.core.concepts.notification.ReminderTime
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
@@ -10,8 +12,8 @@ import com.yossibank.kakeibot.store.queries.methods.notificationInputUpdates
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.reminderTime
 import com.yossibank.kakeibot.store.support.insertCardBill
-import com.yossibank.kakeibot.store.support.insertEntry
-import com.yossibank.kakeibot.store.support.markNoSpendDay
+import com.yossibank.kakeibot.store.writes.methods.markNoSpendDay
+import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.test.runTest
@@ -40,11 +42,14 @@ class NotificationInputTest {
         )
 
         for (date in dates) {
-            database.insertEntry(
-                amount = 500,
-                date = date,
-                categoryId = options.expenseCategories[0].id,
-                walletId = options.wallets[0].id,
+            database.saveEntry(
+                EntryDraft(
+                    type = Entry.Kind.expense,
+                    amount = 500,
+                    date = date,
+                    categoryId = options.expenseCategories[0].id,
+                    walletId = options.wallets[0].id,
+                ),
                 at = now,
             )
         }
@@ -89,11 +94,14 @@ class NotificationInputTest {
         val marked = assertNotNull(LocalDate.parse("2026-10-18"))
         val time = assertNotNull(ReminderTime.parse("21:00"))
 
-        database.insertEntry(
-            amount = 5000,
-            date = used,
-            categoryId = options.expenseCategories[0].id,
-            walletId = card,
+        database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 5000,
+                date = used,
+                categoryId = options.expenseCategories[0].id,
+                walletId = card,
+            ),
             at = now,
         )
 
@@ -115,11 +123,14 @@ class NotificationInputTest {
         assertEquals(setOf(marked), read.recordedDates)
         assertEquals(listOf(5000L), read.shortages.map { it.amount })
 
-        database.insertEntry(
-            amount = 800,
-            date = today,
-            categoryId = options.expenseCategories[0].id,
-            walletId = options.wallets[0].id,
+        database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 800,
+                date = today,
+                categoryId = options.expenseCategories[0].id,
+                walletId = options.wallets[0].id,
+            ),
             at = now,
         )
 

@@ -2,6 +2,8 @@ package com.yossibank.kakeibot.store.queries
 
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
+import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
 import com.yossibank.kakeibot.store.queries.methods.entryList
@@ -13,7 +15,7 @@ import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
 import com.yossibank.kakeibot.store.support.execute
 import com.yossibank.kakeibot.store.support.insertCardBill
-import com.yossibank.kakeibot.store.support.insertEntry
+import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -39,11 +41,14 @@ class EntryListTest {
         assertTrue(first.days.isEmpty())
         assertEquals(category, first.categories[category.id])
 
-        val saved = database.insertEntry(
-            amount = 980,
-            date = date,
-            categoryId = category.id,
-            walletId = options.wallets[0].id,
+        val saved = database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 980,
+                date = date,
+                categoryId = category.id,
+                walletId = options.wallets[0].id,
+            ),
             at = now,
         )
 
@@ -64,23 +69,35 @@ class EntryListTest {
         val options = database.entryOptions()
         val date = assertNotNull(LocalDate.parse("2026-10-03"))
 
-        val saved = database.insertEntry(
-            amount = 616,
-            date = date,
-            categoryId = options.expenseCategories[0].id,
-            walletId = options.wallets[0].id,
-            items = listOf(
-                "牛乳" to 396,
-                "食パン" to 220,
+        val saved = database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 616,
+                date = date,
+                categoryId = options.expenseCategories[0].id,
+                walletId = options.wallets[0].id,
+                items = listOf(
+                    EntryItem.Draft(
+                        name = "牛乳",
+                        amount = 396,
+                    ),
+                    EntryItem.Draft(
+                        name = "食パン",
+                        amount = 220,
+                    ),
+                ),
             ),
             at = now,
         )
 
-        val other = database.insertEntry(
-            amount = 500,
-            date = date,
-            categoryId = options.expenseCategories[0].id,
-            walletId = options.wallets[0].id,
+        val other = database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 500,
+                date = date,
+                categoryId = options.expenseCategories[0].id,
+                walletId = options.wallets[0].id,
+            ),
             at = now,
         )
 
@@ -151,12 +168,14 @@ class EntryListTest {
         val options = database.entryOptions()
         val date = assertNotNull(LocalDate.parse("2026-10-03"))
 
-        val saved = database.insertEntry(
-            type = Entry.Kind.income,
-            amount = 250_000,
-            date = date,
-            categoryId = options.incomeCategories[0].id,
-            walletId = options.wallets[1].id,
+        val saved = database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.income,
+                amount = 250_000,
+                date = date,
+                categoryId = options.incomeCategories[0].id,
+                walletId = options.wallets[1].id,
+            ),
             at = now,
         )
 
@@ -202,12 +221,15 @@ class EntryListTest {
         )
 
         for ((offset, memo) in memos.withIndex()) {
-            database.insertEntry(
-                amount = 500,
-                date = date,
-                categoryId = options.expenseCategories[0].id,
-                walletId = options.wallets[0].id,
-                memo = memo,
+            database.saveEntry(
+                EntryDraft(
+                    type = Entry.Kind.expense,
+                    amount = 500,
+                    date = date,
+                    categoryId = options.expenseCategories[0].id,
+                    walletId = options.wallets[0].id,
+                    memo = memo,
+                ),
                 at = start.plusSeconds(offset.toLong()),
             )
         }
@@ -268,11 +290,14 @@ private const val touchWallets = "UPDATE wallet SET name = name"
 private suspend fun AppDatabase.insertExpense(at: Instant): Entry {
     val options = entryOptions()
 
-    return insertEntry(
-        amount = 980,
-        date = assertNotNull(LocalDate.parse("2026-10-03")),
-        categoryId = options.expenseCategories[0].id,
-        walletId = options.wallets[0].id,
+    return saveEntry(
+        EntryDraft(
+            type = Entry.Kind.expense,
+            amount = 980,
+            date = assertNotNull(LocalDate.parse("2026-10-03")),
+            categoryId = options.expenseCategories[0].id,
+            walletId = options.wallets[0].id,
+        ),
         at = at,
     )
 }

@@ -2,11 +2,13 @@ package com.yossibank.kakeibot.store.queries
 
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.icon.Icon
+import com.yossibank.kakeibot.core.concepts.icon.IconDraft
+import com.yossibank.kakeibot.core.concepts.reward.RewardRuleDraft
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.rewardBank
-import com.yossibank.kakeibot.store.support.hideRewardRule
-import com.yossibank.kakeibot.store.support.insertRewardLog
-import com.yossibank.kakeibot.store.support.insertRewardRule
+import com.yossibank.kakeibot.store.writes.methods.saveRewardRule
+import com.yossibank.kakeibot.store.writes.methods.setReward
+import com.yossibank.kakeibot.store.writes.methods.setRewardRuleHidden
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -21,30 +23,39 @@ class RewardBankTest {
         val day = assertNotNull(LocalDate.parse("2026-10-22"))
         val other = assertNotNull(LocalDate.parse("2026-10-23"))
 
-        val shown = database.insertRewardRule(
-            name = "自炊した日",
-            amount = 500,
-            glyph = Icon.Glyph.giftbox,
+        val icon = IconDraft(
+            mark = IconDraft.Mark.Glyph(Icon.Glyph.giftbox),
             color = "#E07A5F",
+        )
+
+        val shown = database.saveRewardRule(
+            RewardRuleDraft(
+                name = "自炊した日",
+                amount = 500,
+                icon = icon,
+            ),
             at = now,
         )
 
-        val hidden = database.insertRewardRule(
-            name = "歩いて帰った日",
-            amount = 300,
-            glyph = Icon.Glyph.giftbox,
-            color = "#E07A5F",
+        val hidden = database.saveRewardRule(
+            RewardRuleDraft(
+                name = "歩いて帰った日",
+                amount = 300,
+                icon = icon,
+            ),
             at = now,
         )
 
-        database.insertRewardLog(
-            rule = hidden,
-            date = day,
+        database.setReward(
+            hidden.id,
+            isAchieved = true,
+            on = day,
             at = now,
         )
 
-        database.hideRewardRule(
-            id = hidden.id,
+        database.setRewardRuleHidden(
+            hidden.id,
+            isHidden = true,
             at = now,
         )
 

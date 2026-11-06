@@ -10,7 +10,7 @@ import com.yossibank.kakeibot.store.queries.methods.setupProgressUpdates
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.reminderTime
 import com.yossibank.kakeibot.store.records.settingkeys.theme
-import com.yossibank.kakeibot.store.support.setBudget
+import com.yossibank.kakeibot.store.writes.methods.setBudget
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -31,6 +31,8 @@ class SetupProgressTest {
 
         database.setBudget(
             amount = 80000,
+
+            categoryId = null,
             from = month,
         )
 

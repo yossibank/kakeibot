@@ -55,6 +55,7 @@ Android は、次の技術を使う。
 | `AppDatabase` の拡張 | `AppDatabase` の拡張関数（suspend） |
 | 変化を見張る `ValueObservation`（`xxxUpdates()`） | `Flow` を返す拡張関数。読む表の変化を `InvalidationTracker` で受け、読み直す |
 | `removeDuplicates()` | `distinctUntilChanged()` |
+| 失敗を表す enum（`XError`）を投げる | 同じ名前の enum と、それを持つ `XException` |
 
 表の形は、`store/src/test/resources/ios-schema.json` と比べて確かめる。このファイルは iOS の DB から書き出したものである。Room で同じに書けないものは、次のように守る。
 

@@ -2,12 +2,13 @@ package com.yossibank.kakeibot.store.queries
 
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
 import com.yossibank.kakeibot.store.queries.methods.entryHistory
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.types.EntryHistory
-import com.yossibank.kakeibot.store.support.insertEntry
+import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -76,11 +77,14 @@ class EntryHistoryTest {
 private suspend fun AppDatabase.insertExpense(at: Instant): Entry {
     val options = entryOptions()
 
-    return insertEntry(
-        amount = 980,
-        date = assertNotNull(LocalDate.parse("2026-10-03")),
-        categoryId = options.expenseCategories[0].id,
-        walletId = options.wallets[0].id,
+    return saveEntry(
+        EntryDraft(
+            type = Entry.Kind.expense,
+            amount = 980,
+            date = assertNotNull(LocalDate.parse("2026-10-03")),
+            categoryId = options.expenseCategories[0].id,
+            walletId = options.wallets[0].id,
+        ),
         at = at,
     )
 }

@@ -4,7 +4,9 @@ import com.yossibank.kakeibot.core.concepts.budget.BudgetUsage
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
+import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryDay
+import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
 import com.yossibank.kakeibot.core.concepts.setting.TemplateOrder
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
@@ -14,8 +16,8 @@ import com.yossibank.kakeibot.store.queries.methods.widgetOverview
 import com.yossibank.kakeibot.store.queries.types.MonthOverview
 import com.yossibank.kakeibot.store.queries.types.PeriodRecurring
 import com.yossibank.kakeibot.store.support.insertCardBill
-import com.yossibank.kakeibot.store.support.insertEntry
-import com.yossibank.kakeibot.store.support.setBudget
+import com.yossibank.kakeibot.store.writes.methods.saveEntry
+import com.yossibank.kakeibot.store.writes.methods.setBudget
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -43,34 +45,45 @@ class MonthOverviewWidgetTest {
         )
 
         for (index in 0 until 120) {
-            database.insertEntry(
-                amount = 100 + index,
-                date = today.adding(days = -index * 6),
-                categoryId = options.expenseCategories[0].id,
-                walletId = wallets[index % wallets.size],
+            database.saveEntry(
+                EntryDraft(
+                    type = Entry.Kind.expense,
+                    amount = 100 + index,
+                    date = today.adding(days = -index * 6),
+                    categoryId = options.expenseCategories[0].id,
+                    walletId = wallets[index % wallets.size],
+                ),
                 at = now,
             )
         }
 
-        database.insertEntry(
-            amount = 7000,
-            date = longAgo,
-            categoryId = options.expenseCategories[0].id,
-            walletId = card,
-            billMonth = month,
+        database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 7000,
+                date = longAgo,
+                categoryId = options.expenseCategories[0].id,
+                walletId = card,
+                billMonth = month,
+            ),
             at = now,
         )
 
-        val recorded = database.insertEntry(
-            amount = 300,
-            date = longAgo,
-            categoryId = options.expenseCategories[0].id,
-            walletId = options.wallets[0].id,
+        val recorded = database.saveEntry(
+            EntryDraft(
+                type = Entry.Kind.expense,
+                amount = 300,
+                date = longAgo,
+                categoryId = options.expenseCategories[0].id,
+                walletId = options.wallets[0].id,
+            ),
             at = now,
         )
 
         database.setBudget(
             amount = 50000,
+
+            categoryId = null,
             from = month,
         )
 
