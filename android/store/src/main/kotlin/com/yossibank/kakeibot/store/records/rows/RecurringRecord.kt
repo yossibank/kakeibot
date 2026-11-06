@@ -73,6 +73,9 @@ interface RecurringRecordDao {
 
     @Query("SELECT * FROM recurring ORDER BY id")
     suspend fun all(): List<RecurringRecord>
+
+    @Query("DELETE FROM recurring")
+    suspend fun deleteAll()
 }
 
 fun Recurring.record(): RecurringRecord = RecurringRecord(

@@ -28,6 +28,9 @@ interface SettingRecordDao {
     @Query("SELECT * FROM setting ORDER BY `key`")
     suspend fun all(): List<SettingRecord>
 
+    @Query("DELETE FROM setting")
+    suspend fun deleteAll()
+
     @Query("SELECT * FROM setting WHERE `key` IN (:keys) ORDER BY `key`")
     suspend fun all(keys: List<String>): List<SettingRecord>
 

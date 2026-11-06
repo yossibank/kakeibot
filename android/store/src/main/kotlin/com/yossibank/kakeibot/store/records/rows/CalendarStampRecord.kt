@@ -48,6 +48,9 @@ interface CalendarStampRecordDao {
 
     @Query("SELECT * FROM calendar_stamp ORDER BY id")
     suspend fun all(): List<CalendarStampRecord>
+
+    @Query("DELETE FROM calendar_stamp")
+    suspend fun deleteAll()
 }
 
 fun CalendarStamp.record(): CalendarStampRecord = CalendarStampRecord(

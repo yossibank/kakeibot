@@ -50,6 +50,9 @@ interface WalletRecordDao {
     @Query("SELECT * FROM wallet ORDER BY id")
     suspend fun all(): List<WalletRecord>
 
+    @Query("DELETE FROM wallet")
+    suspend fun deleteAll()
+
     @Query("SELECT COUNT(*) FROM wallet")
     suspend fun count(): Int
 }

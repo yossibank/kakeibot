@@ -42,6 +42,9 @@ interface RewardGoalRecordDao {
 
     @Query("SELECT * FROM reward_goal ORDER BY id")
     suspend fun all(): List<RewardGoalRecord>
+
+    @Query("DELETE FROM reward_goal")
+    suspend fun deleteAll()
 }
 
 fun RewardGoal.record(): RewardGoalRecord = RewardGoalRecord(

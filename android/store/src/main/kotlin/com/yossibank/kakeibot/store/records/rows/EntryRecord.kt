@@ -122,6 +122,9 @@ interface EntryRecordDao {
     @Query("SELECT * FROM entry ORDER BY id")
     suspend fun all(): List<EntryRecord>
 
+    @Query("DELETE FROM entry")
+    suspend fun deleteAll()
+
     @Query("SELECT COUNT(*) FROM entry")
     suspend fun count(): Int
 }

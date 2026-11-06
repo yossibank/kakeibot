@@ -49,6 +49,9 @@ interface ValuationRecordDao {
 
     @Query("SELECT * FROM valuation ORDER BY id")
     suspend fun all(): List<ValuationRecord>
+
+    @Query("DELETE FROM valuation")
+    suspend fun deleteAll()
 }
 
 fun Valuation.record(): ValuationRecord = ValuationRecord(

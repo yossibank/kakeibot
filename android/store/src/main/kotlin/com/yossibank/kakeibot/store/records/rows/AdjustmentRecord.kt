@@ -49,6 +49,9 @@ interface AdjustmentRecordDao {
 
     @Query("SELECT * FROM adjustment ORDER BY id")
     suspend fun all(): List<AdjustmentRecord>
+
+    @Query("DELETE FROM adjustment")
+    suspend fun deleteAll()
 }
 
 fun Adjustment.record(): AdjustmentRecord = AdjustmentRecord(

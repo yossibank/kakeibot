@@ -43,6 +43,9 @@ interface EntryTagRecordDao {
 
     @Query("SELECT * FROM tag ORDER BY id")
     suspend fun all(): List<EntryTagRecord>
+
+    @Query("DELETE FROM tag")
+    suspend fun deleteAll()
 }
 
 fun EntryTag.record(): EntryTagRecord = EntryTagRecord(

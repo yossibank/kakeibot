@@ -39,6 +39,9 @@ interface ItemNameRecordDao {
 
     @Query("SELECT * FROM item_name ORDER BY id")
     suspend fun all(): List<ItemNameRecord>
+
+    @Query("DELETE FROM item_name")
+    suspend fun deleteAll()
 }
 
 fun ItemName.record(): ItemNameRecord = ItemNameRecord(

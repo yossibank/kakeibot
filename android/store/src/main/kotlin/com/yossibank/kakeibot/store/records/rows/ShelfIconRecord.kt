@@ -46,6 +46,9 @@ interface ShelfIconRecordDao {
     @Query("SELECT * FROM shelf_icon ORDER BY id")
     suspend fun all(): List<ShelfIconRecord>
 
+    @Query("DELETE FROM shelf_icon")
+    suspend fun deleteAll()
+
     @Query("SELECT COUNT(*) FROM shelf_icon")
     suspend fun count(): Int
 }

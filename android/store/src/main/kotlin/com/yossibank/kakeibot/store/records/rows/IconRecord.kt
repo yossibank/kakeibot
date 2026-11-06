@@ -34,6 +34,9 @@ interface IconRecordDao {
 
     @Query("SELECT * FROM icon ORDER BY id")
     suspend fun all(): List<IconRecord>
+
+    @Query("DELETE FROM icon")
+    suspend fun deleteAll()
 }
 
 fun Icon.record(): IconRecord = IconRecord(

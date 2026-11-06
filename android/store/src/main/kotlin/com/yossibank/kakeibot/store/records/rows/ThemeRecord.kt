@@ -38,6 +38,9 @@ interface ThemeRecordDao {
 
     @Query("SELECT * FROM theme ORDER BY id")
     suspend fun all(): List<ThemeRecord>
+
+    @Query("DELETE FROM theme")
+    suspend fun deleteAll()
 }
 
 fun Theme.record(): ThemeRecord = ThemeRecord(

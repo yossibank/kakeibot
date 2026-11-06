@@ -63,6 +63,9 @@ interface EntryTemplateRecordDao {
     @Query("SELECT * FROM template ORDER BY id")
     suspend fun all(): List<EntryTemplateRecord>
 
+    @Query("DELETE FROM template")
+    suspend fun deleteAll()
+
     @Query("SELECT COUNT(*) FROM template")
     suspend fun count(): Int
 }

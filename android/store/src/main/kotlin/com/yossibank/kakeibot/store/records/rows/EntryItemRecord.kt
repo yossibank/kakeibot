@@ -53,6 +53,9 @@ interface EntryItemRecordDao {
 
     @Query("SELECT * FROM entry_item ORDER BY id")
     suspend fun all(): List<EntryItemRecord>
+
+    @Query("DELETE FROM entry_item")
+    suspend fun deleteAll()
 }
 
 fun EntryItem.record(): EntryItemRecord = EntryItemRecord(

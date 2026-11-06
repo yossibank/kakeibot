@@ -62,6 +62,9 @@ interface EntryCategoryRecordDao {
     @Query("SELECT * FROM category ORDER BY id")
     suspend fun all(): List<EntryCategoryRecord>
 
+    @Query("DELETE FROM category")
+    suspend fun deleteAll()
+
     @Query("SELECT * FROM category WHERE wallet_id IS NULL")
     suspend fun withoutWallet(): List<EntryCategoryRecord>
 
