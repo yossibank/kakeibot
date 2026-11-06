@@ -113,9 +113,9 @@ private extension EntryDetailBand {
         let fill = isChanged ? Palette.amber.opacity(.subtle) : Color.clear
         let valueTint = tint ?? valueColor
 
-        return VStack(alignment: .leading, spacing: 2) {
+        return VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .textFont(.caption2)
+                .textFont(.caption)
                 .foregroundStyle(tint ?? Palette.subtext)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -162,7 +162,7 @@ private extension EntryDetailBand {
 }
 
 private extension EntryDetailBand {
-    static let height: CGFloat = 64
+    static let height: CGFloat = 72
     static let walletWeight: CGFloat = 1
     static let dateWeight: CGFloat = 1.25
     static let memoWeight: CGFloat = 1
