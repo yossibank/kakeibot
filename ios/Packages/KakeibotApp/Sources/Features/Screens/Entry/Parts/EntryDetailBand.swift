@@ -113,24 +113,13 @@ private extension EntryDetailBand {
         let fill = isChanged ? Palette.amber.opacity(.subtle) : Color.clear
         let valueTint = tint ?? valueColor
 
-        return VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .textFont(.caption)
-                .foregroundStyle(tint ?? Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-
+        return VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 4) {
-                if let shortValue {
-                    ViewThatFits(in: .horizontal) {
-                        valueText(value, color: valueTint)
-                        valueText(value, color: valueTint, style: .caption)
-                        valueText(shortValue, color: valueTint)
-                    }
-                    .layoutPriority(1)
-                } else {
-                    valueText(value, color: valueTint)
-                }
+                Text(title)
+                    .textFont(.caption2)
+                    .foregroundStyle(tint ?? Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 if showsChevron {
                     Spacer(minLength: 0)
@@ -140,9 +129,24 @@ private extension EntryDetailBand {
                         .foregroundStyle(tint ?? Palette.subtext)
                 }
             }
+
+            Spacer(minLength: 2)
+
+            if let shortValue {
+                ViewThatFits(in: .horizontal) {
+                    valueText(value, color: valueTint)
+                    valueText(value, color: valueTint, style: .subheadline)
+                    valueText(shortValue, color: valueTint)
+                }
+            } else {
+                valueText(value, color: valueTint)
+            }
+
+            Spacer(minLength: 0)
         }
-        .padding(.horizontal, 12)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .padding(.top, 8)
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(fill)
         .contentShape(.rect)
     }
@@ -150,10 +154,10 @@ private extension EntryDetailBand {
     func valueText(
         _ text: String,
         color: Color,
-        style: Font.TextStyle = .subheadline
+        style: Font.TextStyle = .body
     ) -> some View {
         Text(text)
-            .textFont(style)
+            .textFont(style, weight: .semibold)
             .monospacedDigit()
             .foregroundStyle(color)
             .lineLimit(1)
