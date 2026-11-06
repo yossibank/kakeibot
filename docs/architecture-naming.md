@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > フォルダとファイルの名前の決まりと、1 つの概念のファイルを層ごとにどこへ置くかが分かる。
-> フォルダの今の形は [architecture](architecture.md) にある。
+> フォルダの今の形は [architecture-packages](architecture-packages.md) にある。
 
 ## 📏 名前の決まり
 

@@ -56,6 +56,7 @@ xcrun simctl launch booted com.yossibank.kakeibot -open homeSections
 | --- | --- |
 | 何を作るか | [docs/overview.md](docs/overview.md) |
 | どう作るか | [docs/architecture.md](docs/architecture.md) |
+| パッケージの依存とフォルダ | [docs/architecture-packages.md](docs/architecture-packages.md) |
 | 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
 | Android の構成 | [docs/architecture-android.md](docs/architecture-android.md) |
 | 画面の組み立て・見張り・通知とウィジェット | [docs/architecture-screens.md](docs/architecture-screens.md) |
