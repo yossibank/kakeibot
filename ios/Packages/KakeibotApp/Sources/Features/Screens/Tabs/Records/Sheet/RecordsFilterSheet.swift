@@ -197,7 +197,6 @@ private extension RecordsFilterSheet {
 
     var showTitle: String {
         let count = model.shownEntryCount
-
         return count > 0 ? "\(count) 件を表示" : "当てはまる記録はありません"
     }
 

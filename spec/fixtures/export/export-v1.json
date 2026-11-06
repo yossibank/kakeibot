@@ -2,7 +2,10 @@
   "format": "kakeibot-export",
   "version": 1,
   "exportedAt": "2026-10-09T12:00:00Z",
-  "app": { "platform": "ios", "version": "1.0.0" },
+  "app": {
+    "platform": "ios",
+    "version": "1.0.0"
+  },
   "data": {
     "icons": [
       {

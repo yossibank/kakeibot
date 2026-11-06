@@ -10,6 +10,7 @@
 
 | 決まり | 中身 |
 | --- | --- |
+| 整形 | `jq --indent 2 .` の出力の形。オブジェクトと配列を 1 行に畳まない |
 | キー | camelCase |
 | 日付・月・日時 | [data.md](../docs/data.md) と同じ書き方 |
 | 判定の fixtures | `description`・`valid`・`invalid` を持つオブジェクト。`valid` は受け付け、`invalid` は受け付けない |

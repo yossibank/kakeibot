@@ -1,13 +1,53 @@
 {
   "description": "時刻と時差から、その場所の日付を出す。timeZone は IANA の名前で書く。同じケースで、その日の始まりの時刻と、その 1 秒前が前の日になることも確かめる。",
   "cases": [
-    { "summary": "東京で日付が変わる直前", "instant": "2026-10-10T14:59:59Z", "timeZone": "Asia/Tokyo", "date": "2026-10-10" },
-    { "summary": "東京で日付が変わった瞬間", "instant": "2026-10-10T15:00:00Z", "timeZone": "Asia/Tokyo", "date": "2026-10-11" },
-    { "summary": "同じ時刻が UTC では前の日", "instant": "2026-10-10T15:00:00Z", "timeZone": "UTC", "date": "2026-10-10" },
-    { "summary": "東京で年をまたぐ", "instant": "2026-12-31T15:00:00Z", "timeZone": "Asia/Tokyo", "date": "2027-01-01" },
-    { "summary": "ロサンゼルスで日付が変わる直前", "instant": "2026-03-08T07:59:59Z", "timeZone": "America/Los_Angeles", "date": "2026-03-07" },
-    { "summary": "ロサンゼルスで日付が変わった瞬間", "instant": "2026-03-08T08:00:00Z", "timeZone": "America/Los_Angeles", "date": "2026-03-08" },
-    { "summary": "サンティアゴで 0 時が無い日の前日の終わり", "instant": "2026-09-06T03:59:59Z", "timeZone": "America/Santiago", "date": "2026-09-05" },
-    { "summary": "サンティアゴで 0 時が無い日は 1 時から始まる", "instant": "2026-09-06T04:00:00Z", "timeZone": "America/Santiago", "date": "2026-09-06" }
+    {
+      "summary": "東京で日付が変わる直前",
+      "instant": "2026-10-10T14:59:59Z",
+      "timeZone": "Asia/Tokyo",
+      "date": "2026-10-10"
+    },
+    {
+      "summary": "東京で日付が変わった瞬間",
+      "instant": "2026-10-10T15:00:00Z",
+      "timeZone": "Asia/Tokyo",
+      "date": "2026-10-11"
+    },
+    {
+      "summary": "同じ時刻が UTC では前の日",
+      "instant": "2026-10-10T15:00:00Z",
+      "timeZone": "UTC",
+      "date": "2026-10-10"
+    },
+    {
+      "summary": "東京で年をまたぐ",
+      "instant": "2026-12-31T15:00:00Z",
+      "timeZone": "Asia/Tokyo",
+      "date": "2027-01-01"
+    },
+    {
+      "summary": "ロサンゼルスで日付が変わる直前",
+      "instant": "2026-03-08T07:59:59Z",
+      "timeZone": "America/Los_Angeles",
+      "date": "2026-03-07"
+    },
+    {
+      "summary": "ロサンゼルスで日付が変わった瞬間",
+      "instant": "2026-03-08T08:00:00Z",
+      "timeZone": "America/Los_Angeles",
+      "date": "2026-03-08"
+    },
+    {
+      "summary": "サンティアゴで 0 時が無い日の前日の終わり",
+      "instant": "2026-09-06T03:59:59Z",
+      "timeZone": "America/Santiago",
+      "date": "2026-09-05"
+    },
+    {
+      "summary": "サンティアゴで 0 時が無い日は 1 時から始まる",
+      "instant": "2026-09-06T04:00:00Z",
+      "timeZone": "America/Santiago",
+      "date": "2026-09-06"
+    }
   ]
 }

@@ -70,7 +70,9 @@ private extension PlaceholderEmpty {
 #Preview {
     VStack(spacing: 0) {
         PlaceholderEmpty(systemImage: "square.and.pencil", text: "まだ記録がありません", onRecord: {})
+
         PlaceholderEmpty(systemImage: "calendar", text: "この月の記録はありません", onRecord: nil)
+
         PlaceholderEmpty(
             systemImage: "magnifyingglass",
             text: "「コーヒー」は見つかりませんでした",

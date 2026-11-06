@@ -22,9 +22,24 @@
       "date": "2026-10-03",
       "total": 911,
       "items": [
-        { "name": "牛乳", "quantity": 2, "amount": 396, "taxRate": null },
-        { "name": "食パン", "quantity": 1, "amount": 220, "taxRate": null },
-        { "name": "たまご", "quantity": 1, "amount": 228, "taxRate": null }
+        {
+          "name": "牛乳",
+          "quantity": 2,
+          "amount": 396,
+          "taxRate": null
+        },
+        {
+          "name": "食パン",
+          "quantity": 1,
+          "amount": 220,
+          "taxRate": null
+        },
+        {
+          "name": "たまご",
+          "quantity": 1,
+          "amount": 228,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -40,8 +55,18 @@
       "date": "2026-10-05",
       "total": 1696,
       "items": [
-        { "name": "ハンドソープ", "quantity": 1, "amount": 398, "taxRate": null },
-        { "name": "ティッシュ", "quantity": 1, "amount": 1298, "taxRate": 8 }
+        {
+          "name": "ハンドソープ",
+          "quantity": 1,
+          "amount": 398,
+          "taxRate": null
+        },
+        {
+          "name": "ティッシュ",
+          "quantity": 1,
+          "amount": 1298,
+          "taxRate": 8
+        }
       ]
     },
     {
@@ -56,7 +81,12 @@
       "date": null,
       "total": 450,
       "items": [
-        { "name": "クロワッサン", "quantity": 3, "amount": 450, "taxRate": null }
+        {
+          "name": "クロワッサン",
+          "quantity": 3,
+          "amount": 450,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -70,7 +100,12 @@
       "date": null,
       "total": 360,
       "items": [
-        { "name": "おにぎり", "quantity": 3, "amount": 360, "taxRate": null }
+        {
+          "name": "おにぎり",
+          "quantity": 3,
+          "amount": 360,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -84,7 +119,12 @@
       "date": null,
       "total": 300,
       "items": [
-        { "name": "コーヒー", "quantity": 1, "amount": 300, "taxRate": null }
+        {
+          "name": "コーヒー",
+          "quantity": 1,
+          "amount": 300,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -100,7 +140,12 @@
       "date": null,
       "total": null,
       "items": [
-        { "name": "ケーキセット", "quantity": 1, "amount": 880, "taxRate": null }
+        {
+          "name": "ケーキセット",
+          "quantity": 1,
+          "amount": 880,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -116,8 +161,18 @@
       "date": null,
       "total": 850,
       "items": [
-        { "name": "クロワッサン", "quantity": 3, "amount": 450, "taxRate": null },
-        { "name": "メロンパン", "quantity": 2, "amount": 400, "taxRate": null }
+        {
+          "name": "クロワッサン",
+          "quantity": 3,
+          "amount": 450,
+          "taxRate": null
+        },
+        {
+          "name": "メロンパン",
+          "quantity": 2,
+          "amount": 400,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -132,8 +187,18 @@
       "date": null,
       "total": 3260,
       "items": [
-        { "name": "ビール 6x350ml", "quantity": 1, "amount": 1280, "taxRate": null },
-        { "name": "水 500mlx24", "quantity": 1, "amount": 1980, "taxRate": null }
+        {
+          "name": "ビール 6x350ml",
+          "quantity": 1,
+          "amount": 1280,
+          "taxRate": null
+        },
+        {
+          "name": "水 500mlx24",
+          "quantity": 1,
+          "amount": 1980,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -147,12 +212,20 @@
       "date": null,
       "total": null,
       "items": [
-        { "name": "サンドイッチ", "quantity": 1, "amount": 380, "taxRate": null }
+        {
+          "name": "サンドイッチ",
+          "quantity": 1,
+          "amount": 380,
+          "taxRate": null
+        }
       ]
     },
     {
       "summary": "何も読めない",
-      "lines": ["", "ありがとうございました"],
+      "lines": [
+        "",
+        "ありがとうございました"
+      ],
       "store": null,
       "date": null,
       "total": null,
@@ -190,9 +263,24 @@
       "date": "2026-10-30",
       "total": 3170,
       "items": [
-        { "name": "T/O オムレツサンド", "quantity": 1, "amount": 780, "taxRate": 8 },
-        { "name": "絹香食パン", "quantity": 1, "amount": 890, "taxRate": 8 },
-        { "name": "スイートポテト", "quantity": 1, "amount": 1500, "taxRate": 8 }
+        {
+          "name": "T/O オムレツサンド",
+          "quantity": 1,
+          "amount": 780,
+          "taxRate": 8
+        },
+        {
+          "name": "絹香食パン",
+          "quantity": 1,
+          "amount": 890,
+          "taxRate": 8
+        },
+        {
+          "name": "スイートポテト",
+          "quantity": 1,
+          "amount": 1500,
+          "taxRate": 8
+        }
       ]
     },
     {
@@ -224,11 +312,36 @@
       "date": "2026-10-29",
       "total": 2340,
       "items": [
-        { "name": "ジンジャーエール", "quantity": 1, "amount": 520, "taxRate": null },
-        { "name": "オレンジジュース", "quantity": 1, "amount": 520, "taxRate": null },
-        { "name": "大根", "quantity": 1, "amount": 440, "taxRate": null },
-        { "name": "筍", "quantity": 1, "amount": 480, "taxRate": null },
-        { "name": "餅きんちゃく", "quantity": 1, "amount": 380, "taxRate": null }
+        {
+          "name": "ジンジャーエール",
+          "quantity": 1,
+          "amount": 520,
+          "taxRate": null
+        },
+        {
+          "name": "オレンジジュース",
+          "quantity": 1,
+          "amount": 520,
+          "taxRate": null
+        },
+        {
+          "name": "大根",
+          "quantity": 1,
+          "amount": 440,
+          "taxRate": null
+        },
+        {
+          "name": "筍",
+          "quantity": 1,
+          "amount": 480,
+          "taxRate": null
+        },
+        {
+          "name": "餅きんちゃく",
+          "quantity": 1,
+          "amount": 380,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -258,9 +371,24 @@
       "date": "2026-10-23",
       "total": 26961,
       "items": [
-        { "name": "ワンピース", "quantity": 1, "amount": 27200, "taxRate": null },
-        { "name": "買物袋", "quantity": 1, "amount": 33, "taxRate": null },
-        { "name": "株主優待", "quantity": 1, "amount": -2720, "taxRate": null }
+        {
+          "name": "ワンピース",
+          "quantity": 1,
+          "amount": 27200,
+          "taxRate": null
+        },
+        {
+          "name": "買物袋",
+          "quantity": 1,
+          "amount": 33,
+          "taxRate": null
+        },
+        {
+          "name": "株主優待",
+          "quantity": 1,
+          "amount": -2720,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -290,8 +418,18 @@
       "date": "2026-10-30",
       "total": 585,
       "items": [
-        { "name": "揚物惣菜", "quantity": 1, "amount": 602, "taxRate": 8 },
-        { "name": "歩引額", "quantity": 1, "amount": -60, "taxRate": 8 }
+        {
+          "name": "揚物惣菜",
+          "quantity": 1,
+          "amount": 602,
+          "taxRate": 8
+        },
+        {
+          "name": "歩引額",
+          "quantity": 1,
+          "amount": -60,
+          "taxRate": 8
+        }
       ]
     },
     {
@@ -327,10 +465,30 @@
       "date": "2026-10-30",
       "total": 3156,
       "items": [
-        { "name": "弁当", "quantity": 1, "amount": 3241, "taxRate": 8 },
-        { "name": "プラスチック製等買物袋", "quantity": 1, "amount": 3, "taxRate": null },
-        { "name": "プラスチック製等買物袋", "quantity": 1, "amount": 3, "taxRate": null },
-        { "name": "歩引額", "quantity": 1, "amount": -324, "taxRate": 8 }
+        {
+          "name": "弁当",
+          "quantity": 1,
+          "amount": 3241,
+          "taxRate": 8
+        },
+        {
+          "name": "プラスチック製等買物袋",
+          "quantity": 1,
+          "amount": 3,
+          "taxRate": null
+        },
+        {
+          "name": "プラスチック製等買物袋",
+          "quantity": 1,
+          "amount": 3,
+          "taxRate": null
+        },
+        {
+          "name": "歩引額",
+          "quantity": 1,
+          "amount": -324,
+          "taxRate": 8
+        }
       ]
     },
     {
@@ -350,10 +508,30 @@
       "date": "2026-10-30",
       "total": 3568,
       "items": [
-        { "name": "T/O オムレツサンド", "quantity": 1, "amount": 780, "taxRate": 8 },
-        { "name": "絹香食パン", "quantity": 1, "amount": 890, "taxRate": 8 },
-        { "name": "スイートポテト", "quantity": 1, "amount": 1500, "taxRate": 8 },
-        { "name": "ティッシュ 5", "quantity": 1, "amount": 398, "taxRate": null }
+        {
+          "name": "T/O オムレツサンド",
+          "quantity": 1,
+          "amount": 780,
+          "taxRate": 8
+        },
+        {
+          "name": "絹香食パン",
+          "quantity": 1,
+          "amount": 890,
+          "taxRate": 8
+        },
+        {
+          "name": "スイートポテト",
+          "quantity": 1,
+          "amount": 1500,
+          "taxRate": 8
+        },
+        {
+          "name": "ティッシュ 5",
+          "quantity": 1,
+          "amount": 398,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -375,9 +553,24 @@
       "date": "2026-10-29",
       "total": 1440,
       "items": [
-        { "name": "ジンジャーエール", "quantity": 1, "amount": 520, "taxRate": null },
-        { "name": "大根", "quantity": 1, "amount": 440, "taxRate": null },
-        { "name": "筍", "quantity": 1, "amount": 480, "taxRate": null }
+        {
+          "name": "ジンジャーエール",
+          "quantity": 1,
+          "amount": 520,
+          "taxRate": null
+        },
+        {
+          "name": "大根",
+          "quantity": 1,
+          "amount": 440,
+          "taxRate": null
+        },
+        {
+          "name": "筍",
+          "quantity": 1,
+          "amount": 480,
+          "taxRate": null
+        }
       ]
     },
     {
@@ -394,7 +587,12 @@
       "date": "2026-10-30",
       "total": 780,
       "items": [
-        { "name": "T/O オムレツサンド", "quantity": 1, "amount": 780, "taxRate": 8 }
+        {
+          "name": "T/O オムレツサンド",
+          "quantity": 1,
+          "amount": 780,
+          "taxRate": 8
+        }
       ]
     }
   ]

@@ -16,7 +16,7 @@ MAKE = re.compile(r"`make ([a-z][a-z-]*)")
 TARGET = re.compile(r"^([a-z][a-z-]*):", re.M)
 TEST_TARGET = re.compile(r"\.testTarget\(\s*name:\s*\"([^\"]+)\"")
 SAMPLES = {"export/export-v1.json"}
-DOC = os.path.join(ROOT, "docs", "architecture.md")
+DOC = os.path.join(ROOT, "docs", "architecture-packages.md")
 
 errors = []
 anchors = {}

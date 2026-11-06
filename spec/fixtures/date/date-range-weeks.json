@@ -1,10 +1,50 @@
 {
   "description": "期間のカレンダーのマス目を出す。前後の空きマスの数と、週の数を確かめる。leading と trailing は前後の空きマスの数、rows は週の数を表す。",
   "cases": [
-    { "summary": "日曜始まりで終わりが土曜", "weekStart": "sunday", "start": "2026-09-25", "end": "2026-10-24", "leading": 5, "trailing": 0, "rows": 5 },
-    { "summary": "月曜始まりで前後に空きがある", "weekStart": "monday", "start": "2026-09-25", "end": "2026-10-24", "leading": 4, "trailing": 1, "rows": 5 },
-    { "summary": "月曜始まりで終わりが日曜", "weekStart": "monday", "start": "2026-10-31", "end": "2026-11-29", "leading": 5, "trailing": 0, "rows": 5 },
-    { "summary": "日曜始まりで 6 週にわたる", "weekStart": "sunday", "start": "2026-10-31", "end": "2026-11-29", "leading": 6, "trailing": 6, "rows": 6 },
-    { "summary": "1 日だけの期間", "weekStart": "sunday", "start": "2026-10-17", "end": "2026-10-17", "leading": 6, "trailing": 0, "rows": 1 }
+    {
+      "summary": "日曜始まりで終わりが土曜",
+      "weekStart": "sunday",
+      "start": "2026-09-25",
+      "end": "2026-10-24",
+      "leading": 5,
+      "trailing": 0,
+      "rows": 5
+    },
+    {
+      "summary": "月曜始まりで前後に空きがある",
+      "weekStart": "monday",
+      "start": "2026-09-25",
+      "end": "2026-10-24",
+      "leading": 4,
+      "trailing": 1,
+      "rows": 5
+    },
+    {
+      "summary": "月曜始まりで終わりが日曜",
+      "weekStart": "monday",
+      "start": "2026-10-31",
+      "end": "2026-11-29",
+      "leading": 5,
+      "trailing": 0,
+      "rows": 5
+    },
+    {
+      "summary": "日曜始まりで 6 週にわたる",
+      "weekStart": "sunday",
+      "start": "2026-10-31",
+      "end": "2026-11-29",
+      "leading": 6,
+      "trailing": 6,
+      "rows": 6
+    },
+    {
+      "summary": "1 日だけの期間",
+      "weekStart": "sunday",
+      "start": "2026-10-17",
+      "end": "2026-10-17",
+      "leading": 6,
+      "trailing": 0,
+      "rows": 1
+    }
   ]
 }

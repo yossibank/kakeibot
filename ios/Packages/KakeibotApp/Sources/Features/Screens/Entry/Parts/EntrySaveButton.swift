@@ -17,37 +17,23 @@ struct EntrySaveButton: View {
 }
 
 private extension EntrySaveButton {
-    struct Part {
-        let text: String
-        let isFixed: Bool
-    }
-}
-
-private extension EntrySaveButton {
-    var fullParts: [Part] {
+    var fullParts: [String] {
         [label.category, label.day, label.wallets, label.fee]
             .compactMap(\.self)
-            .map { Part(text: $0, isFixed: true) }
     }
 
-    var routeParts: [Part] {
+    var routeParts: [String] {
         [label.day, label.wallets, label.fee]
             .compactMap(\.self)
-            .map { Part(text: $0, isFixed: true) }
     }
 
-    var feeParts: [Part] {
+    var feeParts: [String] {
         [label.day, label.fee]
             .compactMap(\.self)
-            .map { Part(text: $0, isFixed: true) }
     }
 
-    var compactParts: [Part] {
-        [
-            label.day.map { Part(text: $0, isFixed: true) },
-            label.wallets.map { Part(text: $0, isFixed: false) }
-        ]
-        .compactMap(\.self)
+    var hasCompactParts: Bool {
+        label.day != nil || label.wallets != nil
     }
 }
 
@@ -57,6 +43,7 @@ private extension EntrySaveButton {
         if let amount = label.amount {
             ViewThatFits(in: .horizontal) {
                 sideLayout(amount)
+
                 stackedLayout(amount)
             }
         } else {
@@ -89,12 +76,31 @@ private extension EntrySaveButton {
                 partsLine(feeParts)
             }
 
-            partsLine(compactParts)
+            compactLine
         }
         .textFont(.caption2)
         .monospacedDigit()
         .lineLimit(1)
         .frame(idealWidth: 0, alignment: .leading)
+    }
+
+    var compactLine: some View {
+        HStack(spacing: 4) {
+            if let day = label.day {
+                Text(day)
+                    .fixedSize()
+            }
+
+            if label.day != nil,
+               label.wallets != nil {
+                Text("·")
+                    .fixedSize()
+            }
+
+            if let wallets = label.wallets {
+                Text(wallets)
+            }
+        }
     }
 
     func amountText(
@@ -133,7 +139,7 @@ private extension EntrySaveButton {
                     .lineLimit(1)
                     .fixedSize()
 
-                if !compactParts.isEmpty {
+                if hasCompactParts {
                     Text("·")
                         .textFont(.caption2)
                         .fixedSize()
@@ -145,21 +151,8 @@ private extension EntrySaveButton {
         }
     }
 
-    func partsLine(_ parts: [Part]) -> some View {
-        HStack(spacing: 4) {
-            ForEach(Array(parts.enumerated()), id: \.offset) { index, part in
-                if index > 0 {
-                    Text("·")
-                        .fixedSize()
-                }
-
-                if part.isFixed {
-                    Text(part.text)
-                        .fixedSize()
-                } else {
-                    Text(part.text)
-                }
-            }
-        }
+    func partsLine(_ parts: [String]) -> some View {
+        Text(parts.joined(separator: " · "))
+            .fixedSize()
     }
 }

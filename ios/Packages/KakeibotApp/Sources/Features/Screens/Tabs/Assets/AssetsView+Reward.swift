@@ -107,7 +107,6 @@ private extension AssetsView {
                         rewardRow(log)
                     }
                 }
-                .sharesTextScale(id: model.recentRewards)
             }
         }
     }
@@ -118,22 +117,28 @@ private extension AssetsView {
         let note = remaining > 0 ? "あと \(AmountText.text(remaining))" : "届きました"
 
         return VStack(alignment: .leading, spacing: 8) {
+            Text("\(goal.name) まで")
+                .textFont(.caption, weight: .semibold)
+                .foregroundStyle(Palette.text)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+
+            RatioBar(progress, tint: Palette.accent, height: 6)
+
             HStack(alignment: .firstTextBaseline) {
-                Text("\(goal.name) まで")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                Text("目標 \(AmountText.text(goal.targetAmount))")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
 
                 Spacer(minLength: 8)
 
                 Text(note)
                     .textFont(.caption, weight: .semibold)
-                    .monospacedDigit()
                     .foregroundStyle(Palette.accent)
             }
-
-            RatioBar(progress, tint: Palette.accent, height: 6)
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
         }
     }
 
@@ -144,17 +149,20 @@ private extension AssetsView {
         return HStack(spacing: 12) {
             IconBadge(icon, size: 26)
 
-            Text(rule?.name ?? "")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.text)
-                .sharedTextScale()
+            VStack(alignment: .leading, spacing: 2) {
+                Text(rule?.name ?? "")
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("\(log.date.month)/\(log.date.day)")
+                    .textFont(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+            }
 
             Spacer(minLength: 8)
-
-            Text("\(log.date.month)/\(log.date.day)")
-                .textFont(.caption2)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
 
             Text("+\(AmountText.text(log.amount))")
                 .textFont(.footnote)

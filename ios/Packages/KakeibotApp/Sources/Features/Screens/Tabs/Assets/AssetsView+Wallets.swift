@@ -115,11 +115,7 @@ private extension AssetsView {
             IconBadge(row.icon, size: 32)
 
             VStack(alignment: .leading, spacing: 4) {
-                ViewThatFits(in: .horizontal) {
-                    walletLine(row)
-
-                    walletLines(row)
-                }
+                walletLine(row)
 
                 debtDetail(of: row)
 
@@ -139,37 +135,25 @@ private extension AssetsView {
     }
 
     func walletLine(_ row: AssetsModel.WalletRow) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
+        let label = Self.label(of: row)
+        let nameWidth = label == nil ? Self.nameMinWidth : Self.labeledNameMinWidth
+
+        return HStack(alignment: .firstTextBaseline, spacing: 8) {
             walletName(row)
+                .frame(minWidth: nameWidth, alignment: .leading)
 
-            if let label = Self.label(of: row) {
-                walletLabel(label)
-            }
+            Spacer(minLength: 0)
 
-            Spacer(minLength: 8)
-
-            walletBalance(row)
-                .fixedSize()
-                .layoutPriority(1)
-        }
-    }
-
-    func walletLines(_ row: AssetsModel.WalletRow) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            walletName(row)
-
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                if let label = Self.label(of: row) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                if let label {
                     walletLabel(label)
                 }
-
-                Spacer(minLength: 8)
 
                 walletBalance(row)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    .layoutPriority(1)
             }
+            .layoutPriority(1)
         }
     }
 
@@ -184,8 +168,7 @@ private extension AssetsView {
         Text(label)
             .textFont(.caption2)
             .foregroundStyle(Palette.subtext)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
+            .fixedSize()
     }
 
     func walletBalance(_ row: AssetsModel.WalletRow) -> some View {
@@ -237,34 +220,50 @@ private extension AssetsView {
     }
 
     func adjustNotice(of row: AssetsModel.WalletRow) -> some View {
-        ViewThatFits(in: .horizontal) {
-            adjustLine(row, showsText: true)
+        Button {
+            adjusting = row
+        } label: {
+            VStack(spacing: 8) {
+                Hairline(thickness: 1)
 
-            adjustLine(row, showsText: false)
+                ViewThatFits(in: .horizontal) {
+                    adjustLine("手持ちがマイナス", showsDot: true)
+                    adjustLine("手持ちがマイナス", showsDot: false)
+                    adjustLine("マイナス", showsDot: true)
+                }
+            }
+            .padding(.top, 4)
+            .contentShape(.rect)
         }
+        .buttonStyle(.plain)
     }
 
     func adjustLine(
-        _ row: AssetsModel.WalletRow,
-        showsText: Bool
+        _ text: String,
+        showsDot: Bool
     ) -> some View {
         HStack(spacing: 8) {
-            Group {
-                if showsText {
-                    Label("手持ちがマイナスです", systemImage: "exclamationmark.circle")
-                } else {
-                    Image(systemName: "exclamationmark.circle")
-                }
+            if showsDot {
+                Circle()
+                    .fill(Palette.rose)
+                    .frame(width: 6, height: 6)
             }
-            .textFont(.caption)
-            .foregroundStyle(Palette.rose)
-            .fixedSize()
+
+            Text(text)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .fixedSize()
 
             Spacer(minLength: 8)
 
-            ChipButton("残高を合わせる", systemImage: "equal") {
-                adjusting = row
+            HStack(spacing: 4) {
+                Text("合わせる")
+                    .textFont(.caption, weight: .semibold)
+
+                Image(systemName: "chevron.right")
+                    .sansFont(.micro, weight: .semibold)
             }
+            .foregroundStyle(Palette.accentStrong)
             .fixedSize()
         }
     }
@@ -303,11 +302,18 @@ private extension AssetsView {
 }
 
 private extension AssetsView {
+    static let nameMinWidth: CGFloat = 64
+    static let labeledNameMinWidth: CGFloat = 48
+
     @ViewBuilder
     func debtDetail(of row: AssetsModel.WalletRow) -> some View {
         if row.wallet.kind == .card,
            let bill = row.nextBill {
-            AssetsDebtChip(systemImage: "calendar", text: nextBillText(bill))
+            AssetsDebtChip(
+                systemImage: "calendar",
+                text: nextBillText(bill),
+                shortText: shortBillText(bill)
+            )
 
             if let unpaid = row.unpaid {
                 Button {
@@ -433,5 +439,12 @@ private extension AssetsView {
         let weekday = bill.date.weekday.shortName
         let days = BillText.days(until: bill.date, today: model.today)
         return "\(date)（\(weekday)）引き落とし · \(days)"
+    }
+
+    func shortBillText(_ bill: CardBill) -> String {
+        let date = "\(bill.date.month)/\(bill.date.day)"
+        let weekday = bill.date.weekday.shortName
+        let days = BillText.days(until: bill.date, today: model.today)
+        return "\(date)（\(weekday)）· \(days)"
     }
 }

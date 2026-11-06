@@ -1,15 +1,80 @@
 {
   "description": "タグの名前の判定で出る問題を試す。名前の前後の空白は除いてから判定する。タグの名前は 8 文字までにする。others は同じカテゴリの、ほかのタグの名前で、書かないときは空とする。名前が同じかどうかは、前後の空白を除いて完全に一致するかで見る。",
   "cases": [
-    { "summary": "ふつうの名前", "name": "朝ごはん", "problems": [] },
-    { "summary": "前後の空白を除いて通る", "name": "  昼ごはん  ", "problems": [] },
-    { "summary": "ちょうど 8 文字", "name": "おやつと夜食の分", "problems": [] },
-    { "summary": "名前が空", "name": "", "problems": ["emptyName"] },
-    { "summary": "名前が空白だけ", "name": "   ", "problems": ["emptyName"] },
-    { "summary": "名前が 8 文字を超える", "name": "朝ごはんと昼ごはん", "problems": ["nameTooLong"] },
-    { "summary": "ほかのタグと同じ名前", "name": "朝ごはん", "others": ["昼ごはん", "朝ごはん"], "problems": ["duplicateName"] },
-    { "summary": "前後の空白を除くとほかのタグと同じ", "name": "  朝ごはん ", "others": ["朝ごはん"], "problems": ["duplicateName"] },
-    { "summary": "ほかのタグと名前が違う", "name": "朝ごはん", "others": ["昼ごはん"], "problems": [] },
-    { "summary": "名前が空なら同じ名前の問題は出さない", "name": "", "others": [""], "problems": ["emptyName"] }
+    {
+      "summary": "ふつうの名前",
+      "name": "朝ごはん",
+      "problems": []
+    },
+    {
+      "summary": "前後の空白を除いて通る",
+      "name": "  昼ごはん  ",
+      "problems": []
+    },
+    {
+      "summary": "ちょうど 8 文字",
+      "name": "おやつと夜食の分",
+      "problems": []
+    },
+    {
+      "summary": "名前が空",
+      "name": "",
+      "problems": [
+        "emptyName"
+      ]
+    },
+    {
+      "summary": "名前が空白だけ",
+      "name": "   ",
+      "problems": [
+        "emptyName"
+      ]
+    },
+    {
+      "summary": "名前が 8 文字を超える",
+      "name": "朝ごはんと昼ごはん",
+      "problems": [
+        "nameTooLong"
+      ]
+    },
+    {
+      "summary": "ほかのタグと同じ名前",
+      "name": "朝ごはん",
+      "others": [
+        "昼ごはん",
+        "朝ごはん"
+      ],
+      "problems": [
+        "duplicateName"
+      ]
+    },
+    {
+      "summary": "前後の空白を除くとほかのタグと同じ",
+      "name": "  朝ごはん ",
+      "others": [
+        "朝ごはん"
+      ],
+      "problems": [
+        "duplicateName"
+      ]
+    },
+    {
+      "summary": "ほかのタグと名前が違う",
+      "name": "朝ごはん",
+      "others": [
+        "昼ごはん"
+      ],
+      "problems": []
+    },
+    {
+      "summary": "名前が空なら同じ名前の問題は出さない",
+      "name": "",
+      "others": [
+        ""
+      ],
+      "problems": [
+        "emptyName"
+      ]
+    }
   ]
 }

@@ -5,7 +5,10 @@
       "summary": "現金の正しい入力",
       "name": "財布",
       "kind": "cash",
-      "mark": { "kind": "glyph", "value": "cash" },
+      "mark": {
+        "kind": "glyph",
+        "value": "cash"
+      },
       "color": "#C9A96E",
       "initialBalance": 12000,
       "problems": []
@@ -14,7 +17,10 @@
       "summary": "前後の空白を除いてマイナスの残高で通る",
       "name": "  楽天カード  ",
       "kind": "card",
-      "mark": { "kind": "text", "value": "楽" },
+      "mark": {
+        "kind": "text",
+        "value": "楽"
+      },
       "color": "#BF4040",
       "initialBalance": -38000,
       "problems": []
@@ -23,57 +29,88 @@
       "summary": "名前が空白だけ",
       "name": "   ",
       "kind": "bank",
-      "mark": { "kind": "glyph", "value": "bank" },
+      "mark": {
+        "kind": "glyph",
+        "value": "bank"
+      },
       "color": "#8DB0EA",
       "initialBalance": 0,
-      "problems": ["emptyName"]
+      "problems": [
+        "emptyName"
+      ]
     },
     {
       "summary": "絵文字が空",
       "name": "Suica",
       "kind": "emoney",
-      "mark": { "kind": "emoji", "value": " " },
+      "mark": {
+        "kind": "emoji",
+        "value": " "
+      },
       "color": "#81B29A",
       "initialBalance": 2000,
-      "problems": ["emptyMark"]
+      "problems": [
+        "emptyMark"
+      ]
     },
     {
       "summary": "文字が 3 文字を超える",
       "name": "ポイント",
       "kind": "point",
-      "mark": { "kind": "text", "value": "ポイント" },
+      "mark": {
+        "kind": "text",
+        "value": "ポイント"
+      },
       "color": "#C9A96E",
       "initialBalance": 0,
-      "problems": ["textTooLong"]
+      "problems": [
+        "textTooLong"
+      ]
     },
     {
       "summary": "名前が空で色に # が無い",
       "name": "",
       "kind": "cash",
-      "mark": { "kind": "glyph", "value": "cash" },
+      "mark": {
+        "kind": "glyph",
+        "value": "cash"
+      },
       "color": "C9A96E",
       "initialBalance": 0,
-      "problems": ["emptyName", "invalidColor"]
+      "problems": [
+        "emptyName",
+        "invalidColor"
+      ]
     },
     {
       "summary": "記録があるカードは現金に変えられない",
       "name": "楽天カード",
       "kind": "cash",
       "recordedKind": "card",
-      "mark": { "kind": "text", "value": "楽" },
+      "mark": {
+        "kind": "text",
+        "value": "楽"
+      },
       "color": "#BF4040",
       "initialBalance": 0,
-      "problems": ["kindLocked"]
+      "problems": [
+        "kindLocked"
+      ]
     },
     {
       "summary": "記録がある銀行はローンに変えられない",
       "name": "銀行",
       "kind": "loan",
       "recordedKind": "bank",
-      "mark": { "kind": "glyph", "value": "bank" },
+      "mark": {
+        "kind": "glyph",
+        "value": "bank"
+      },
       "color": "#8DB0EA",
       "initialBalance": 0,
-      "problems": ["kindLocked"]
+      "problems": [
+        "kindLocked"
+      ]
     },
     {
       "summary": "記録があり評価額が無い投資は銀行に変えられる",
@@ -81,7 +118,10 @@
       "kind": "bank",
       "recordedKind": "investment",
       "hasValuations": false,
-      "mark": { "kind": "glyph", "value": "bank" },
+      "mark": {
+        "kind": "glyph",
+        "value": "bank"
+      },
       "color": "#8DB0EA",
       "initialBalance": 0,
       "problems": []
@@ -92,10 +132,15 @@
       "kind": "bank",
       "recordedKind": "investment",
       "hasValuations": true,
-      "mark": { "kind": "glyph", "value": "bank" },
+      "mark": {
+        "kind": "glyph",
+        "value": "bank"
+      },
       "color": "#8DB0EA",
       "initialBalance": 0,
-      "problems": ["valuedKindLocked"]
+      "problems": [
+        "valuedKindLocked"
+      ]
     },
     {
       "summary": "評価額がある投資は投資のまま編集できる",
@@ -103,7 +148,10 @@
       "kind": "investment",
       "recordedKind": "investment",
       "hasValuations": true,
-      "mark": { "kind": "glyph", "value": "invest" },
+      "mark": {
+        "kind": "glyph",
+        "value": "invest"
+      },
       "color": "#8DB0EA",
       "initialBalance": 0,
       "problems": []
@@ -113,7 +161,10 @@
       "name": "分割払い",
       "kind": "loan",
       "recordedKind": "card",
-      "mark": { "kind": "text", "value": "分" },
+      "mark": {
+        "kind": "text",
+        "value": "分"
+      },
       "color": "#BF4040",
       "initialBalance": -30000,
       "problems": []
@@ -122,7 +173,10 @@
       "summary": "記録が無ければカードを現金に変えられる",
       "name": "楽天カード",
       "kind": "cash",
-      "mark": { "kind": "text", "value": "楽" },
+      "mark": {
+        "kind": "text",
+        "value": "楽"
+      },
       "color": "#BF4040",
       "initialBalance": 0,
       "problems": []

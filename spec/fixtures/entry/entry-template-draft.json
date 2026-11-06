@@ -1,14 +1,102 @@
 {
   "description": "テンプレートの判定で出る問題を試す。amount は空でもよい。category と wallet は、入っているかを真偽で書く。",
   "cases": [
-    { "summary": "支出の正しいテンプレート", "name": "ランチ", "type": "expense", "amount": 980, "category": true, "wallet": true, "problems": [] },
-    { "summary": "金額が空でも通る", "name": "定期", "type": "expense", "amount": null, "category": true, "wallet": true, "problems": [] },
-    { "summary": "収入の正しいテンプレート", "name": "お小遣い", "type": "income", "amount": 30000, "category": true, "wallet": true, "problems": [] },
-    { "summary": "名前が空白だけ", "name": "  ", "type": "expense", "amount": 980, "category": true, "wallet": true, "problems": ["emptyName"] },
-    { "summary": "振替は作れない", "name": "移動", "type": "transfer", "amount": 1000, "category": true, "wallet": true, "problems": ["transfer"] },
-    { "summary": "金額が 0 円", "name": "ゼロ", "type": "expense", "amount": 0, "category": true, "wallet": true, "problems": ["amountNotPositive"] },
-    { "summary": "カテゴリが無い", "name": "カテゴリなし", "type": "expense", "amount": 980, "category": false, "wallet": true, "problems": ["missingCategory"] },
-    { "summary": "財布が無い", "name": "財布なし", "type": "income", "amount": null, "category": true, "wallet": false, "problems": ["missingWallet"] },
-    { "summary": "すべて誤っている", "name": "", "type": "transfer", "amount": -1, "category": false, "wallet": false, "problems": ["emptyName", "transfer", "amountNotPositive", "missingCategory", "missingWallet"] }
+    {
+      "summary": "支出の正しいテンプレート",
+      "name": "ランチ",
+      "type": "expense",
+      "amount": 980,
+      "category": true,
+      "wallet": true,
+      "problems": []
+    },
+    {
+      "summary": "金額が空でも通る",
+      "name": "定期",
+      "type": "expense",
+      "amount": null,
+      "category": true,
+      "wallet": true,
+      "problems": []
+    },
+    {
+      "summary": "収入の正しいテンプレート",
+      "name": "お小遣い",
+      "type": "income",
+      "amount": 30000,
+      "category": true,
+      "wallet": true,
+      "problems": []
+    },
+    {
+      "summary": "名前が空白だけ",
+      "name": "  ",
+      "type": "expense",
+      "amount": 980,
+      "category": true,
+      "wallet": true,
+      "problems": [
+        "emptyName"
+      ]
+    },
+    {
+      "summary": "振替は作れない",
+      "name": "移動",
+      "type": "transfer",
+      "amount": 1000,
+      "category": true,
+      "wallet": true,
+      "problems": [
+        "transfer"
+      ]
+    },
+    {
+      "summary": "金額が 0 円",
+      "name": "ゼロ",
+      "type": "expense",
+      "amount": 0,
+      "category": true,
+      "wallet": true,
+      "problems": [
+        "amountNotPositive"
+      ]
+    },
+    {
+      "summary": "カテゴリが無い",
+      "name": "カテゴリなし",
+      "type": "expense",
+      "amount": 980,
+      "category": false,
+      "wallet": true,
+      "problems": [
+        "missingCategory"
+      ]
+    },
+    {
+      "summary": "財布が無い",
+      "name": "財布なし",
+      "type": "income",
+      "amount": null,
+      "category": true,
+      "wallet": false,
+      "problems": [
+        "missingWallet"
+      ]
+    },
+    {
+      "summary": "すべて誤っている",
+      "name": "",
+      "type": "transfer",
+      "amount": -1,
+      "category": false,
+      "wallet": false,
+      "problems": [
+        "emptyName",
+        "transfer",
+        "amountNotPositive",
+        "missingCategory",
+        "missingWallet"
+      ]
+    }
   ]
 }

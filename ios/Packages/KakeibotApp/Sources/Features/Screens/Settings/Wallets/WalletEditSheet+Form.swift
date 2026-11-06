@@ -115,7 +115,6 @@ extension WalletEditSheet {
         SettingsFormSection("最初の残高") {
             HStack(spacing: 8) {
                 signButton(isNegative: false)
-
                 signButton(isNegative: true)
             }
 
