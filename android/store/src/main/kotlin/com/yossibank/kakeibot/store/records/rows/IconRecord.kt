@@ -8,7 +8,10 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.core.shared.InstantSerializer
+import com.yossibank.kakeibot.store.records.protocols.storedInstant
+import com.yossibank.kakeibot.store.records.protocols.storedValue
+import com.yossibank.kakeibot.store.records.values.databaseValue
+import com.yossibank.kakeibot.store.records.values.fromDatabaseValue
 
 @Entity(tableName = "icon")
 data class IconRecord(
@@ -28,22 +31,25 @@ interface IconRecordDao {
 
     @Query("SELECT * FROM icon WHERE id = :id")
     suspend fun find(id: String): IconRecord?
+
+    @Query("SELECT * FROM icon ORDER BY id")
+    suspend fun all(): List<IconRecord>
 }
 
 fun Icon.record(): IconRecord = IconRecord(
-    id = id.toString(),
+    id = id.databaseValue,
     emoji = emoji,
     text = text,
     glyph = glyph?.rawValue,
     color = color,
-    createdAt = InstantSerializer.format(createdAt),
-    updatedAt = InstantSerializer.format(updatedAt),
+    createdAt = createdAt.storedValue,
+    updatedAt = updatedAt.storedValue,
 )
 
 fun IconRecord.icon(): Icon? {
-    val id = Identifier.parse<Icon>(id) ?: return null
-    val createdAt = InstantSerializer.parse(createdAt) ?: return null
-    val updatedAt = InstantSerializer.parse(updatedAt) ?: return null
+    val id = Identifier.fromDatabaseValue<Icon>(id) ?: return null
+    val createdAt = storedInstant(createdAt) ?: return null
+    val updatedAt = storedInstant(updatedAt) ?: return null
 
     return Icon(
         id = id,
