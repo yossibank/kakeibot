@@ -4,6 +4,7 @@ public struct PageSlide: Equatable, Sendable {
     public var offset: CGFloat
     public var opacity: Double
     public var isDragging = false
+    public var animation: Animation?
 
     public init() {
         self.init(offset: 0, opacity: 1)
@@ -24,20 +25,12 @@ public extension PageSlide {
         let fade = Double(abs(x) / fadeDistance)
         let opacity = max(1 - fade, minimumOpacity)
 
-        var transaction = Transaction()
-
-        transaction.disablesAnimations = true
-
-        withTransaction(transaction) {
-            slide.wrappedValue = PageSlide(offset: x, opacity: opacity, isDragging: true)
-        }
+        slide.wrappedValue = PageSlide(offset: x, opacity: opacity, isDragging: true)
     }
 
     @MainActor
     static func settle(_ slide: Binding<PageSlide>) {
-        withAnimation(.snappy) {
-            slide.wrappedValue = PageSlide()
-        }
+        slide.wrappedValue = PageSlide(offset: 0, opacity: 1, animation: .snappy)
     }
 
     @MainActor
@@ -51,45 +44,52 @@ public extension PageSlide {
         let out = start + (forward ? -distance : distance)
         let entry = forward ? distance : -distance
 
-        withAnimation(.easeIn(duration: outDuration)) {
-            slide.wrappedValue = PageSlide(offset: out, opacity: 0)
-        }
+        slide.wrappedValue = PageSlide(
+            offset: out,
+            opacity: 0,
+            animation: .easeIn(duration: outDuration)
+        )
 
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(outDuration))
 
-            var transaction = Transaction()
+            change()
+            slide.wrappedValue = PageSlide(offset: entry, opacity: 0)
 
-            transaction.disablesAnimations = true
+            try? await Task.sleep(for: .seconds(frameDuration))
 
-            withTransaction(transaction) {
-                change()
-                slide.wrappedValue = PageSlide(offset: entry, opacity: 0)
-            }
-
-            withAnimation(.snappy(duration: 0.28)) {
-                slide.wrappedValue = PageSlide()
-            }
+            slide.wrappedValue = PageSlide(
+                offset: 0,
+                opacity: 1,
+                animation: .snappy(duration: 0.28)
+            )
         }
     }
 }
 
 private extension PageSlide {
+    static let frameDuration = 1.0 / 60
+
     init(
         offset: CGFloat,
         opacity: Double,
-        isDragging: Bool = false
+        isDragging: Bool = false,
+        animation: Animation? = nil
     ) {
         self.offset = offset
         self.opacity = opacity
         self.isDragging = isDragging
+        self.animation = animation
     }
 }
 
 public extension View {
     func pageSlide(_ slide: PageSlide) -> some View {
-        offset(x: slide.offset)
-            .opacity(slide.opacity)
+        animation(slide.animation) { content in
+            content
+                .offset(x: slide.offset)
+                .opacity(slide.opacity)
+        }
     }
 
     func pageSlide(
