@@ -49,6 +49,7 @@ import com.yossibank.kakeibot.store.records.rows.ValuationRecordDao
 import com.yossibank.kakeibot.store.records.rows.WalletRecord
 import com.yossibank.kakeibot.store.records.rows.WalletRecordDao
 import kotlinx.coroutines.Dispatchers
+import java.time.Instant
 
 @Database(
     entities = [
@@ -120,6 +121,20 @@ abstract class AppDatabase : RoomDatabase() {
         fun inMemory(): AppDatabase = Room
             .inMemoryDatabaseBuilder<AppDatabase>()
             .configured()
+
+        suspend fun file(
+            path: String,
+            now: Instant = Instant.now(),
+        ): AppDatabase {
+            val database = Room
+                .databaseBuilder<AppDatabase>(name = path)
+                .configured()
+
+            database.insertDefaultsIfEmpty(now)
+            database.insertShelfIfEmpty(now)
+
+            return database
+        }
 
         private fun Builder<AppDatabase>.configured(): AppDatabase = setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)

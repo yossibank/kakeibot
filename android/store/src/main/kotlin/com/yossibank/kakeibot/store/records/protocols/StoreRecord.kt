@@ -30,3 +30,10 @@ private fun fractional(text: String): Instant? = try {
 } catch (_: DateTimeException) {
     null
 }
+
+class RecordDecodingException(
+    record: Any,
+) : Exception("Unreadable record: $record")
+
+fun <Record : Any, Value : Any> Record.decoded(convert: (Record) -> Value?): Value =
+    convert(this) ?: throw RecordDecodingException(this)
