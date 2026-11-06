@@ -14,18 +14,18 @@ public extension EntryModel {
     }
 
     var feeChoices: [Int] {
-        let used = (history?.days ?? [])
-            .lazy
-            .flatMap(\.entries)
-            .filter { $0.transferId != nil }
-            .sorted { $0.createdAt > $1.createdAt }
-            .map(\.amount)
+        let generation = historyGeneration
 
-        var seen: Set<Int> = []
+        if let feeChoicesCache,
+           feeChoicesCache.historyGeneration == generation {
+            return feeChoicesCache.choices
+        }
 
-        let ordered = (used + FeeChoiceRow.defaultChoices).filter { seen.insert($0).inserted }
+        let choices = recentFeeChoices
 
-        return Array(ordered.prefix(FeeChoiceRow.defaultChoices.count))
+        feeChoicesCache = FeeChoicesCache(historyGeneration: generation, choices: choices)
+
+        return choices
     }
 
     var expressionText: String? {
@@ -62,6 +62,28 @@ public extension EntryModel {
 
     func setFee(_ amount: Int) {
         feeCalculator = AmountCalculator(amount: amount)
+    }
+}
+
+extension EntryModel {
+    struct FeeChoicesCache {
+        let historyGeneration: Int
+        let choices: [Int]
+    }
+
+    var recentFeeChoices: [Int] {
+        let used = (history?.days ?? [])
+            .lazy
+            .flatMap(\.entries)
+            .filter { $0.transferId != nil }
+            .sorted { $0.createdAt > $1.createdAt }
+            .map(\.amount)
+
+        var seen: Set<Int> = []
+
+        let ordered = (used + FeeChoiceRow.defaultChoices).filter { seen.insert($0).inserted }
+
+        return Array(ordered.prefix(FeeChoiceRow.defaultChoices.count))
     }
 }
 

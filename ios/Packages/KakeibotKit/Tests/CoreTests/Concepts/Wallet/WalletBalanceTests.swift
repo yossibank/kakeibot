@@ -40,6 +40,39 @@ struct WalletBalanceTests {
         let total = Wallet.totalBalance(of: [cash, card], with: [entry])
         #expect(total == 200)
     }
+
+    @Test
+    func groupsEntriesByBothWalletsOfTransfer() throws {
+        let cash = Wallet.ID()
+        let bank = Wallet.ID()
+        let date = try #require(LocalDate("2026-10-01"))
+
+        let expense = Entry(
+            type: .expense,
+            amount: 300,
+            date: date,
+            categoryId: EntryCategory.ID(),
+            walletId: cash,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+
+        let transfer = Entry(
+            type: .transfer,
+            amount: 1000,
+            date: date,
+            categoryId: nil,
+            walletId: bank,
+            toWalletId: cash,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+
+        let grouped = Wallet.entriesByWallet([expense, transfer])
+
+        #expect(grouped[cash]?.map(\.id) == [expense.id, transfer.id])
+        #expect(grouped[bank]?.map(\.id) == [transfer.id])
+    }
 }
 
 extension WalletBalanceTests {

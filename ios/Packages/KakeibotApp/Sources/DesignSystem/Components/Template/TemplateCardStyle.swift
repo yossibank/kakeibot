@@ -60,6 +60,12 @@ private struct TemplateCardFace: ViewModifier {
                 ZStack {
                     shape
                         .fill(TemplateCardStyle.fill)
+                        .shadow(color: Palette.shadow.opacity(0.35), radius: 3, y: 2)
+                        .shadow(
+                            color: Palette.shadow.opacity(0.55),
+                            radius: shadowRadius,
+                            y: shadowRadius * 0.7
+                        )
 
                     shape
                         .fill(TemplateCardStyle.gloss)
@@ -74,11 +80,5 @@ private struct TemplateCardFace: ViewModifier {
                     .inset(by: 4)
                     .strokeBorder(Palette.accent.opacity(.subtle), lineWidth: 0.5)
             }
-            .shadow(color: Palette.shadow.opacity(0.35), radius: 3, y: 2)
-            .shadow(
-                color: Palette.shadow.opacity(0.55),
-                radius: shadowRadius,
-                y: shadowRadius * 0.7
-            )
     }
 }

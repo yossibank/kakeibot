@@ -26,6 +26,7 @@ struct MainView: View {
     @State private var observationRound = 0
     @State private var foreground = AppForegroundReturn()
     @State private var noticeRound = 0
+    @State private var visitedTabs: Set<MainTab> = []
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
@@ -96,8 +97,8 @@ struct MainView: View {
     }
 
     var body: some View {
-        TabView(selection: $tab) {
-            Tab(value: MainTab.home) {
+        ZStack {
+            tabLayer(.home) {
                 HomeView(
                     model: home,
                     setup: setup,
@@ -154,7 +155,7 @@ struct MainView: View {
                 .tabContent()
             }
 
-            Tab(value: MainTab.records) {
+            tabLayer(.records) {
                 RecordsView(
                     model: records,
                     onOpenEntry: { id in
@@ -184,7 +185,7 @@ struct MainView: View {
                 .tabContent()
             }
 
-            Tab(value: MainTab.review) {
+            tabLayer(.review) {
                 ReviewView(
                     model: review,
                     onOpenEntry: { id in
@@ -206,7 +207,7 @@ struct MainView: View {
                 .tabContent()
             }
 
-            Tab(value: MainTab.assets) {
+            tabLayer(.assets) {
                 AssetsView(
                     model: assets,
                     onTransfer: {
@@ -232,6 +233,9 @@ struct MainView: View {
             }
         }
         .environment(\.noticeRound, noticeRound)
+        .onChange(of: tab, initial: true) {
+            visitedTabs.insert(tab)
+        }
         .overlay(alignment: .leading) {
             if hasSidebar {
                 SideTabBar(
@@ -275,6 +279,12 @@ struct MainView: View {
             if isWarmingEntry {
                 entryWarmup
             }
+
+            MainLoadSignal {
+                isLoaded
+            } onLoad: {
+                onLoad()
+            }
         }
         .sheet(item: $sheet, onDismiss: prepareDraft) { sheet in
             sheetContent(for: sheet)
@@ -314,11 +324,6 @@ struct MainView: View {
         .onChange(of: scenePhase) { _, phase in
             if foreground.receive(phase) {
                 observationRound += 1
-            }
-        }
-        .onChange(of: isLoaded, initial: true) {
-            if isLoaded {
-                onLoad()
             }
         }
         .onChange(of: route) { _, route in
@@ -394,6 +399,22 @@ private extension MainView {
                 try? await Task.sleep(for: Self.warmupDuration)
                 isWarmingEntry = false
             }
+    }
+
+    @ViewBuilder
+    func tabLayer(
+        _ value: MainTab,
+        @ViewBuilder content: () -> some View
+    ) -> some View {
+        if visitedTabs.contains(value) || tab == value {
+            let isShown = tab == value
+
+            content()
+                .opacity(isShown ? 1 : 0)
+                .allowsHitTesting(isShown)
+                .zIndex(isShown ? 1 : 0)
+                .animation(nil, value: isShown)
+        }
     }
 }
 

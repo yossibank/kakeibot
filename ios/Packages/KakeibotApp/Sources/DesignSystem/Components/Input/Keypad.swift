@@ -32,6 +32,8 @@ public struct Keypad: View {
                     ForEach(row, id: \.self) { key in
                         if let accessory = accessory(for: key) {
                             accessoryButton(accessory)
+                        } else if key == .delete {
+                            deleteButton
                         } else {
                             button(for: key)
                         }
@@ -62,6 +64,17 @@ public extension Keypad {
 }
 
 private extension Keypad {
+    var deleteButton: some View {
+        button(for: .delete)
+            .simultaneousGesture(
+                LongPressGesture(minimumDuration: Self.clearPressDuration)
+                    .onEnded { _ in
+                        clearCount += 1
+                        onKey(.clear)
+                    }
+            )
+    }
+
     func accessoryButton(_ accessory: Accessory) -> some View {
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
         let fill = accessory.isActive ? Palette.accent.opacity(.subtle) : Color.clear
@@ -103,15 +116,6 @@ private extension Keypad {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .simultaneousGesture(
-            LongPressGesture(minimumDuration: Self.clearPressDuration)
-                .onEnded { _ in
-                    if key == .delete {
-                        clearCount += 1
-                        onKey(.clear)
-                    }
-                }
-        )
     }
 
     @ViewBuilder

@@ -175,6 +175,13 @@ extension EntryModel {
     func observeHistory() async {
         do {
             for try await list in database.entryListUpdates() {
+                guard
+                    !isClosing,
+                    list != history
+                else {
+                    continue
+                }
+
                 history = list
                 updateBalances()
             }
@@ -194,12 +201,13 @@ private extension EntryModel {
             .flatMap(\.entries)
             .filter { $0.id != editingId && !isOwnFee($0) }
 
+        let related = Wallet.entriesByWallet(entries)
         let valuations = list.valuations
         let adjustments = list.adjustments
 
         let pairs = wallets.map { wallet in
             let balance = wallet.balance(
-                with: entries,
+                with: related[wallet.id] ?? [],
                 valuations: valuations,
                 adjustments: adjustments,
                 through: Self.today

@@ -6,10 +6,10 @@ import SwiftUI
 public struct EntrySheet: View {
     @State var model: EntryModel
     @State var isEnteringAmount: Bool
+    @State var isFormDeferred: Bool
     @State var categoryPage: Int? = 0
     @State var sheet: Sheet?
     @State var categoryMenu: CategoryMenu?
-    @State var pressingCategory: EntryCategory.ID?
     @State var sheetWidth: CGFloat = 0
     @State var drawerHeight: CGFloat = 0
     @State var deletion: Deletion?
@@ -36,6 +36,7 @@ public struct EntrySheet: View {
     ) {
         _model = State(initialValue: model)
         _isEnteringAmount = State(initialValue: model.opensKeypad)
+        _isFormDeferred = State(initialValue: model.opensKeypad)
         _notice = State(initialValue: EntryNoticeModel(database: model.database))
 
         self.onChange = onChange
@@ -113,12 +114,14 @@ public struct EntrySheet: View {
                 Backdrop()
                     .ignoresSafeArea()
             }
-            .confirmsDiscard(
-                when: model.isChanged,
-                isPresented: $isConfirmingDiscard
-            ) {
-                dismiss()
-            }
+            .modifier(
+                EntryDiscardGuard(
+                    isPresented: $isConfirmingDiscard,
+                    model: model
+                ) {
+                    dismiss()
+                }
+            )
             .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
                 sheetContent(for: sheet)
             }
@@ -128,38 +131,43 @@ public struct EntrySheet: View {
             .task {
                 await model.observeHistory()
             }
+            .task {
+                await revealForm()
+            }
         }
     }
 }
 
 extension EntrySheet {
     var saveButtons: some View {
-        HStack(spacing: 8) {
-            EntrySaveButton(label: model.saveLabel(today: today)) {
-                Task {
-                    await save()
-                }
-            }
-            .disabled(!model.canSave)
-
-            if model.isEditing {
-                sideButton(
-                    "もう一度",
-                    systemImage: "doc.on.doc",
-                    isEnabled: true
-                ) {
+        EntryLiveSlot {
+            HStack(spacing: 8) {
+                EntrySaveButton(label: model.saveLabel(today: today)) {
                     Task {
-                        await recordAgain()
+                        await save()
                     }
                 }
-            } else {
-                sideButton(
-                    "続けて",
-                    systemImage: "plus.square.on.square",
-                    isEnabled: model.canSave
-                ) {
-                    Task {
-                        await saveAndContinue()
+                .disabled(!model.canSave)
+
+                if model.isEditing {
+                    sideButton(
+                        "もう一度",
+                        systemImage: "doc.on.doc",
+                        isEnabled: true
+                    ) {
+                        Task {
+                            await recordAgain()
+                        }
+                    }
+                } else {
+                    sideButton(
+                        "続けて",
+                        systemImage: "plus.square.on.square",
+                        isEnabled: model.canSave
+                    ) {
+                        Task {
+                            await saveAndContinue()
+                        }
                     }
                 }
             }
@@ -179,6 +187,7 @@ extension EntrySheet {
             return
         }
 
+        model.isClosing = true
         onChange(change)
         dismiss()
     }
@@ -196,10 +205,6 @@ extension EntrySheet {
 
     var today: LocalDate {
         LocalDate(Date(), in: .current)
-    }
-
-    static func categoryFill(_ isSelected: Bool) -> Color {
-        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
     }
 }
 
@@ -260,7 +265,10 @@ private extension EntrySheet {
         VStack(spacing: 24) {
             dial
 
-            if model.type == .transfer {
+            if isFormDeferred {
+                Color.clear
+                    .frame(height: Self.deferredFormHeight)
+            } else if model.type == .transfer {
                 transferArea
             } else {
                 categoryArea
@@ -307,6 +315,15 @@ private extension EntrySheet {
         .opacity(isEnabled ? 1 : 0.4)
     }
 
+    func revealForm() async {
+        guard isFormDeferred else {
+            return
+        }
+
+        try? await Task.sleep(for: Self.formRevealDelay)
+        isFormDeferred = false
+    }
+
     func recordAgain() async {
         await model.recordAgain()
         showSelectedCategory()
@@ -315,6 +332,8 @@ private extension EntrySheet {
 
 private extension EntrySheet {
     static let fade: CGFloat = 20
+    static let deferredFormHeight: CGFloat = 200
+    static let formRevealDelay: Duration = .milliseconds(450)
     static let continueWidth: CGFloat = 64
 
     var bannerBottom: CGFloat {
@@ -347,6 +366,7 @@ private extension EntrySheet {
             return
         }
 
+        model.isClosing = true
         onChange(change)
         dismiss()
     }

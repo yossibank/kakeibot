@@ -6,9 +6,11 @@ public extension Wallet {
         adjustments: [Adjustment] = [],
         through date: LocalDate? = nil
     ) -> Int {
-        wallets.reduce(0) { total, wallet in
+        let related = entriesByWallet(entries)
+
+        return wallets.reduce(0) { total, wallet in
             let balance = wallet.balance(
-                with: entries,
+                with: related[wallet.id] ?? [],
                 valuations: valuations,
                 adjustments: adjustments,
                 through: date
@@ -16,6 +18,21 @@ public extension Wallet {
 
             return total + balance
         }
+    }
+
+    static func entriesByWallet(_ entries: [Entry]) -> [Wallet.ID: [Entry]] {
+        var related: [Wallet.ID: [Entry]] = [:]
+
+        for entry in entries {
+            related[entry.walletId, default: []].append(entry)
+
+            if let toWalletId = entry.toWalletId,
+               toWalletId != entry.walletId {
+                related[toWalletId, default: []].append(entry)
+            }
+        }
+
+        return related
     }
 
     func balance(

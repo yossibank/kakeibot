@@ -52,6 +52,7 @@ private extension EntryDetailBand {
         Rectangle()
             .fill(Palette.line)
             .frame(width: 1)
+            .padding(.vertical, 16)
     }
 
     var walletCell: some View {
@@ -70,7 +71,7 @@ private extension EntryDetailBand {
             cell(
                 title: "手数料",
                 value: model.fee > 0 ? AmountText.text(model.fee) : "なし",
-                valueColor: model.fee > 0 ? Palette.text : Palette.subtext,
+                valueColor: model.fee > 0 ? nil : Palette.subtext,
                 isChanged: model.fee > 0,
                 showsChevron: true
             )
@@ -94,7 +95,7 @@ private extension EntryDetailBand {
             cell(
                 title: "メモ",
                 value: memoText,
-                valueColor: model.memo.isEmpty ? Palette.subtext : Palette.text,
+                isPlaceholder: model.memo.isEmpty,
                 isChanged: false,
                 showsChevron: false
             )
@@ -105,7 +106,8 @@ private extension EntryDetailBand {
         title: String,
         value: String,
         shortValue: String? = nil,
-        valueColor: Color = Palette.text,
+        valueColor: Color? = nil,
+        isPlaceholder: Bool = false,
         isChanged: Bool,
         showsChevron: Bool
     ) -> some View {
@@ -115,31 +117,34 @@ private extension EntryDetailBand {
 
         return VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .textFont(.caption)
+                .textFont(.caption2)
                 .foregroundStyle(tint ?? Palette.subtext)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
 
             HStack(spacing: 4) {
-                if let shortValue {
-                    ViewThatFits(in: .horizontal) {
+                Group {
+                    if isPlaceholder {
+                        placeholderText(value)
+                    } else if let shortValue {
+                        ViewThatFits(in: .horizontal) {
+                            valueText(value, color: valueTint)
+                            valueText(value, color: valueTint, style: .subheadline)
+                            valueText(shortValue, color: valueTint)
+                        }
+                    } else {
                         valueText(value, color: valueTint)
-                        valueText(value, color: valueTint, style: .caption)
-                        valueText(shortValue, color: valueTint)
                     }
-                    .layoutPriority(1)
-                } else {
-                    valueText(value, color: valueTint)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 if showsChevron {
-                    Spacer(minLength: 0)
-
                     Image(systemName: "chevron.right")
                         .sansFont(.micro, weight: .semibold)
-                        .foregroundStyle(tint ?? Palette.subtext)
+                        .foregroundStyle(tint ?? Palette.hint)
                 }
             }
+            .frame(height: Self.valueHeight)
         }
         .padding(.horizontal, 12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -149,20 +154,34 @@ private extension EntryDetailBand {
 
     func valueText(
         _ text: String,
-        color: Color,
-        style: Font.TextStyle = .subheadline
+        color: Color?,
+        style: Font.TextStyle = .callout
     ) -> some View {
         Text(text)
-            .textFont(style)
+            .textFont(style, weight: .medium)
             .monospacedDigit()
-            .foregroundStyle(color)
+            .foregroundStyle(color ?? Palette.text)
             .lineLimit(1)
             .minimumScaleFactor(0.7)
+    }
+
+    func placeholderText(_ text: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "plus")
+                .sansFont(.caption, weight: .semibold)
+
+            Text(text)
+                .textFont(.subheadline)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .foregroundStyle(Palette.hint)
     }
 }
 
 private extension EntryDetailBand {
     static let height: CGFloat = 72
+    static let valueHeight: CGFloat = 24
     static let walletWeight: CGFloat = 1
     static let dateWeight: CGFloat = 1.25
     static let memoWeight: CGFloat = 1
@@ -181,6 +200,6 @@ private extension EntryDetailBand {
 
     var memoText: String {
         let firstLine = model.memo.split(whereSeparator: \.isNewline).first
-        return firstLine.map(String.init) ?? "＋ \(model.memoHint)"
+        return firstLine.map(String.init) ?? model.memoHint
     }
 }

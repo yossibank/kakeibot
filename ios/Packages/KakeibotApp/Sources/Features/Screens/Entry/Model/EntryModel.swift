@@ -56,8 +56,14 @@ public final class EntryModel {
 
     var allTemplates: [EntryTemplate] = []
     var appliedTemplateId: EntryTemplate.ID?
-    var history: EntryList?
+    var history: EntryList? {
+        didSet {
+            historyGeneration += 1
+        }
+    }
+
     var isReceiptRead = false
+    var isClosing = false
     var receiptStore: String?
 
     private(set) var original: Entry?
@@ -67,6 +73,10 @@ public final class EntryModel {
     private(set) var monthStartDay: MonthStartDay = .first
     private(set) var carryoverFrom: YearMonth?
     private(set) var editingId: Entry.ID?
+    private(set) var historyGeneration = 0
+
+    @ObservationIgnored var monthCache: MonthCache?
+    @ObservationIgnored var feeChoicesCache: FeeChoicesCache?
 
     let database: AppDatabase
 
