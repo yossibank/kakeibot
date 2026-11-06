@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.concepts.entry.Entry
@@ -68,6 +69,39 @@ interface EntryTemplateRecordDao {
 
     @Query("SELECT COUNT(*) FROM template")
     suspend fun count(): Int
+
+    @Query("SELECT * FROM template ORDER BY sort_order, created_at")
+    suspend fun inOrder(): List<EntryTemplateRecord>
+
+    @Query("SELECT * FROM template WHERE archived_at IS NULL ORDER BY sort_order, created_at")
+    suspend fun unarchivedInOrder(): List<EntryTemplateRecord>
+
+    @Query("SELECT * FROM template WHERE id = :id")
+    suspend fun find(id: String): EntryTemplateRecord?
+
+    @Update
+    suspend fun update(record: EntryTemplateRecord)
+
+    @Query("DELETE FROM template WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("SELECT MAX(sort_order) FROM template")
+    suspend fun maxSortOrder(): Int?
+
+    @Query("SELECT * FROM template WHERE wallet_id = :walletId")
+    suspend fun ofWallet(walletId: String): List<EntryTemplateRecord>
+
+    @Query("DELETE FROM template WHERE wallet_id = :walletId")
+    suspend fun deleteOfWallet(walletId: String)
+
+    @Query("SELECT * FROM template WHERE category_id = :categoryId")
+    suspend fun ofCategory(categoryId: String): List<EntryTemplateRecord>
+
+    @Query("DELETE FROM template WHERE category_id = :categoryId")
+    suspend fun deleteOfCategory(categoryId: String)
+
+    @Query("SELECT EXISTS (SELECT 1 FROM template WHERE id = :id)")
+    suspend fun exists(id: String): Boolean
 }
 
 fun EntryTemplate.record(): EntryTemplateRecord = EntryTemplateRecord(

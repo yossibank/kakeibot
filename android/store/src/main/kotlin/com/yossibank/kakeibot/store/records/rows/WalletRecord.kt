@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
@@ -55,6 +56,24 @@ interface WalletRecordDao {
 
     @Query("SELECT COUNT(*) FROM wallet")
     suspend fun count(): Int
+
+    @Query("SELECT * FROM wallet WHERE archived_at IS NULL ORDER BY sort_order")
+    suspend fun unarchivedInOrder(): List<WalletRecord>
+
+    @Update
+    suspend fun update(record: WalletRecord)
+
+    @Query("DELETE FROM wallet WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("SELECT EXISTS (SELECT 1 FROM wallet WHERE id = :id)")
+    suspend fun exists(id: String): Boolean
+
+    @Query("SELECT MAX(sort_order) FROM wallet")
+    suspend fun maxSortOrder(): Int?
+
+    @Query("SELECT COUNT(*) FROM wallet WHERE archived_at IS NULL")
+    suspend fun countUnarchived(): Int
 }
 
 fun Wallet.record(): WalletRecord = WalletRecord(

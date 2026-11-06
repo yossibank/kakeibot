@@ -2,6 +2,7 @@ package com.yossibank.kakeibot.core.concepts.wallet
 
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.shared.Identifier
 
 fun Wallet.Companion.totalBalance(
     of: List<Wallet>,
@@ -9,15 +10,35 @@ fun Wallet.Companion.totalBalance(
     valuations: List<Valuation> = emptyList(),
     adjustments: List<Adjustment> = emptyList(),
     through: LocalDate? = null,
-): Long = of.fold(0L) { total, wallet ->
-    val balance = wallet.balance(
-        with = with,
-        valuations = valuations,
-        adjustments = adjustments,
-        through = through,
-    )
+): Long {
+    val related = entriesByWallet(with)
 
-    total + balance
+    return of.fold(0L) { total, wallet ->
+        val balance = wallet.balance(
+            with = related[wallet.id].orEmpty(),
+            valuations = valuations,
+            adjustments = adjustments,
+            through = through,
+        )
+
+        total + balance
+    }
+}
+
+fun Wallet.Companion.entriesByWallet(entries: List<Entry>): Map<Identifier<Wallet>, List<Entry>> {
+    val related = mutableMapOf<Identifier<Wallet>, MutableList<Entry>>()
+
+    for (entry in entries) {
+        related.getOrPut(entry.walletId) { mutableListOf() }.add(entry)
+
+        val toWalletId = entry.toWalletId
+
+        if (toWalletId != null && toWalletId != entry.walletId) {
+            related.getOrPut(toWalletId) { mutableListOf() }.add(entry)
+        }
+    }
+
+    return related
 }
 
 fun Wallet.balance(

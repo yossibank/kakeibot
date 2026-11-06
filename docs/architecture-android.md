@@ -53,6 +53,9 @@ Android は、次の技術を使う。
 | `Store/<フォルダ>/<中のフォルダ>/X.swift` | `store/<フォルダ>/<中のフォルダ>/X.kt`。フォルダの名前は小文字にする |
 | Core の型をそのまま表の行にする | 表ごとの `XRecord`（`@Entity`）と、Core の型との変換を `records/rows/` に置く |
 | `AppDatabase` の拡張 | `AppDatabase` の拡張関数（suspend） |
+| 変化を見張る `ValueObservation`（`xxxUpdates()`） | `Flow` を返す拡張関数。読む表の変化を `InvalidationTracker` で受け、読み直す |
+| `removeDuplicates()` | `distinctUntilChanged()` |
+| 失敗を表す enum（`XError`）を投げる | 同じ名前の enum と、それを持つ `XException` |
 
 表の形は、`store/src/test/resources/ios-schema.json` と比べて確かめる。このファイルは iOS の DB から書き出したものである。Room で同じに書けないものは、次のように守る。
 

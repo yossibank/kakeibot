@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.theme.Theme
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
@@ -41,6 +42,18 @@ interface ThemeRecordDao {
 
     @Query("DELETE FROM theme")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM theme WHERE id = :id")
+    suspend fun find(id: String): ThemeRecord?
+
+    @Query("SELECT * FROM theme WHERE is_builtin = 0 ORDER BY created_at")
+    suspend fun custom(): List<ThemeRecord>
+
+    @Update
+    suspend fun update(record: ThemeRecord)
+
+    @Query("DELETE FROM theme WHERE id = :id")
+    suspend fun delete(id: String)
 }
 
 fun Theme.record(): ThemeRecord = ThemeRecord(

@@ -52,6 +52,27 @@ interface AdjustmentRecordDao {
 
     @Query("DELETE FROM adjustment")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM adjustment ORDER BY date, created_at")
+    suspend fun inDateOrder(): List<AdjustmentRecord>
+
+    @Query("SELECT * FROM adjustment WHERE id = :id")
+    suspend fun find(id: String): AdjustmentRecord?
+
+    @Query("DELETE FROM adjustment WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("SELECT COUNT(*) FROM adjustment")
+    suspend fun count(): Int
+
+    @Query("SELECT * FROM adjustment WHERE wallet_id = :walletId")
+    suspend fun ofWallet(walletId: String): List<AdjustmentRecord>
+
+    @Query("SELECT COUNT(*) FROM adjustment WHERE wallet_id = :walletId")
+    suspend fun countOfWallet(walletId: String): Int
+
+    @Query("DELETE FROM adjustment WHERE wallet_id = :walletId")
+    suspend fun deleteOfWallet(walletId: String)
 }
 
 fun Adjustment.record(): AdjustmentRecord = AdjustmentRecord(

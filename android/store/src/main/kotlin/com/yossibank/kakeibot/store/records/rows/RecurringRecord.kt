@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.HolidayShift
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
@@ -76,6 +77,61 @@ interface RecurringRecordDao {
 
     @Query("DELETE FROM recurring")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM recurring ORDER BY sort_order, created_at")
+    suspend fun inOrder(): List<RecurringRecord>
+
+    @Query("SELECT * FROM recurring WHERE archived_at IS NULL ORDER BY sort_order, created_at")
+    suspend fun unarchivedInOrder(): List<RecurringRecord>
+
+    @Query(
+        """
+        SELECT * FROM recurring
+        WHERE archived_at IS NULL AND type = 'transfer' AND closing_day IS NOT NULL
+        ORDER BY sort_order, created_at
+        """,
+    )
+    suspend fun cardBills(): List<RecurringRecord>
+
+    @Query("SELECT * FROM recurring WHERE id = :id")
+    suspend fun find(id: String): RecurringRecord?
+
+    @Update
+    suspend fun update(record: RecurringRecord)
+
+    @Query("SELECT MAX(sort_order) FROM recurring")
+    suspend fun maxSortOrder(): Int?
+
+    @Query("SELECT * FROM recurring WHERE wallet_id = :walletId OR to_wallet_id = :walletId")
+    suspend fun ofWallet(walletId: String): List<RecurringRecord>
+
+    @Query("SELECT COUNT(*) FROM recurring WHERE wallet_id = :walletId OR to_wallet_id = :walletId")
+    suspend fun countOfWallet(walletId: String): Int
+
+    @Query("SELECT * FROM recurring WHERE category_id = :categoryId")
+    suspend fun ofCategory(categoryId: String): List<RecurringRecord>
+
+    @Query("DELETE FROM recurring WHERE id IN (:ids)")
+    suspend fun deleteIds(ids: List<String>)
+
+    @Query("SELECT * FROM recurring WHERE closing_day IS NOT NULL AND to_wallet_id IN (:cards)")
+    suspend fun billing(cards: List<String>): List<RecurringRecord>
+
+    @Query(
+        """
+        SELECT * FROM recurring
+        WHERE archived_at IS NULL AND type = 'transfer' AND closing_day IS NOT NULL AND to_wallet_id = :walletId
+        ORDER BY sort_order, created_at
+        LIMIT 1
+        """,
+    )
+    suspend fun cardBill(walletId: String): RecurringRecord?
+
+    @Query("UPDATE recurring SET generated_until = :date WHERE id = :id AND generated_until IS NOT :date")
+    suspend fun setGeneratedUntil(
+        id: String,
+        date: String,
+    )
 }
 
 fun Recurring.record(): RecurringRecord = RecurringRecord(

@@ -41,6 +41,12 @@ data class RewardLogRecord(
     @ColumnInfo(name = "created_at") val createdAt: String,
 )
 
+data class RewardLogTotal(
+    @ColumnInfo(name = "rule_id") val ruleId: String,
+    val count: Int,
+    val amount: Long,
+)
+
 @Dao
 interface RewardLogRecordDao {
     @Insert
@@ -51,6 +57,36 @@ interface RewardLogRecordDao {
 
     @Query("DELETE FROM reward_log")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM reward_log ORDER BY date DESC, created_at DESC")
+    suspend fun latestFirst(): List<RewardLogRecord>
+
+    @Query(
+        """
+        SELECT rule_id, COUNT(*) AS count, SUM(amount) AS amount
+        FROM reward_log
+        GROUP BY rule_id
+        """,
+    )
+    suspend fun totals(): List<RewardLogTotal>
+
+    @Query("SELECT * FROM reward_log WHERE rule_id = :ruleId AND date = :date")
+    suspend fun on(
+        ruleId: String,
+        date: String,
+    ): List<RewardLogRecord>
+
+    @Query("DELETE FROM reward_log WHERE rule_id = :ruleId AND date = :date")
+    suspend fun deleteOn(
+        ruleId: String,
+        date: String,
+    )
+
+    @Query("SELECT COUNT(*) FROM reward_log WHERE rule_id = :ruleId")
+    suspend fun countOfRule(ruleId: String): Int
+
+    @Query("SELECT COUNT(*) FROM reward_log")
+    suspend fun count(): Int
 }
 
 fun RewardLog.record(): RewardLogRecord = RewardLogRecord(

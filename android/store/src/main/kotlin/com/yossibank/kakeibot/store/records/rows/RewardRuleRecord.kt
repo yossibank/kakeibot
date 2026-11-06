@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.reward.RewardRule
 import com.yossibank.kakeibot.core.shared.Identifier
@@ -47,6 +48,21 @@ interface RewardRuleRecordDao {
 
     @Query("DELETE FROM reward_rule")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM reward_rule ORDER BY sort_order, created_at")
+    suspend fun inOrder(): List<RewardRuleRecord>
+
+    @Query("SELECT * FROM reward_rule WHERE id = :id")
+    suspend fun find(id: String): RewardRuleRecord?
+
+    @Update
+    suspend fun update(record: RewardRuleRecord)
+
+    @Query("DELETE FROM reward_rule WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("SELECT MAX(sort_order) FROM reward_rule")
+    suspend fun maxSortOrder(): Int?
 }
 
 fun RewardRule.record(): RewardRuleRecord = RewardRuleRecord(

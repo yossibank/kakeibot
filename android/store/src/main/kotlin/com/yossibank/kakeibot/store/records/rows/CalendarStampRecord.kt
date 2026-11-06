@@ -51,6 +51,12 @@ interface CalendarStampRecordDao {
 
     @Query("DELETE FROM calendar_stamp")
     suspend fun deleteAll()
+
+    @Query("DELETE FROM calendar_stamp WHERE date = :date")
+    suspend fun deleteOn(date: String)
+
+    @Query("SELECT COUNT(*) FROM calendar_stamp")
+    suspend fun count(): Int
 }
 
 fun CalendarStamp.record(): CalendarStampRecord = CalendarStampRecord(

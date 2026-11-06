@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.setting.Setting
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.core.shared.InstantSerializer
+import com.yossibank.kakeibot.store.writes.types.WidgetRecord
 import java.time.Instant
 
 val SettingKey.Companion.receiptSavedCount: SettingKey<Int>
@@ -12,6 +13,14 @@ val SettingKey.Companion.receiptSavedCount: SettingKey<Int>
         default = 0,
         decode = { text -> decimalInt(text)?.let { maxOf(it, 0) } },
         encode = { if (it > 0) it.toString() else null },
+    )
+
+val SettingKey.Companion.widgetEntry: SettingKey<WidgetRecord?>
+    get() = of(
+        key = Setting.Key.widgetEntry,
+        default = null,
+        decode = { WidgetRecord.parse(it) },
+        encode = { it?.text },
     )
 
 val SettingKey.Companion.feeCategory: SettingKey<Identifier<EntryCategory>?>

@@ -52,6 +52,30 @@ interface ValuationRecordDao {
 
     @Query("DELETE FROM valuation")
     suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM valuation")
+    suspend fun count(): Int
+
+    @Query("SELECT * FROM valuation WHERE id = :id")
+    suspend fun find(id: String): ValuationRecord?
+
+    @Query("DELETE FROM valuation WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("DELETE FROM valuation WHERE wallet_id = :walletId AND date = :date")
+    suspend fun deleteOn(
+        walletId: String,
+        date: String,
+    )
+
+    @Query("SELECT * FROM valuation WHERE wallet_id = :walletId")
+    suspend fun ofWallet(walletId: String): List<ValuationRecord>
+
+    @Query("SELECT COUNT(*) FROM valuation WHERE wallet_id = :walletId")
+    suspend fun countOfWallet(walletId: String): Int
+
+    @Query("DELETE FROM valuation WHERE wallet_id = :walletId")
+    suspend fun deleteOfWallet(walletId: String)
 }
 
 fun Valuation.record(): ValuationRecord = ValuationRecord(

@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
@@ -37,6 +38,15 @@ interface IconRecordDao {
 
     @Query("DELETE FROM icon")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM icon WHERE id IN (:ids)")
+    suspend fun withIds(ids: List<String>): List<IconRecord>
+
+    @Update
+    suspend fun update(record: IconRecord)
+
+    @Query("DELETE FROM icon WHERE id IN (:ids)")
+    suspend fun deleteIds(ids: List<String>)
 }
 
 fun Icon.record(): IconRecord = IconRecord(

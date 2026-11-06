@@ -8,6 +8,7 @@ import androidx.room.Index
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
@@ -56,6 +57,41 @@ interface EntryItemRecordDao {
 
     @Query("DELETE FROM entry_item")
     suspend fun deleteAll()
+
+    @Upsert
+    suspend fun save(record: EntryItemRecord)
+
+    @Query("SELECT * FROM entry_item WHERE entry_id = :entryId ORDER BY sort_order, created_at")
+    suspend fun ofEntry(entryId: String): List<EntryItemRecord>
+
+    @Query("SELECT * FROM entry_item WHERE entry_id IN (:entryIds) ORDER BY entry_id, sort_order")
+    suspend fun ofEntries(entryIds: List<String>): List<EntryItemRecord>
+
+    @Query("DELETE FROM entry_item WHERE id IN (:ids)")
+    suspend fun deleteIds(ids: List<String>)
+
+    @Query("DELETE FROM entry_item WHERE entry_id IN (:entryIds) AND id NOT IN (:keptIds)")
+    suspend fun deleteOfEntries(
+        entryIds: List<String>,
+        keptIds: List<String>,
+    )
+
+    @Query("UPDATE entry_item SET updated_at = :updatedAt WHERE entry_id IN (:entryIds)")
+    suspend fun touch(
+        entryIds: List<String>,
+        updatedAt: String,
+    )
+
+    @Query(
+        """
+        SELECT name FROM entry_item
+        WHERE amount > 0
+        GROUP BY name
+        ORDER BY MAX(updated_at) DESC
+        LIMIT :limit
+        """,
+    )
+    suspend fun recentNames(limit: Int): List<String>
 }
 
 fun EntryItem.record(): EntryItemRecord = EntryItemRecord(

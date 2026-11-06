@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.NoSpendDay
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
@@ -29,6 +30,21 @@ interface NoSpendDayRecordDao {
 
     @Query("DELETE FROM no_spend_day")
     suspend fun deleteAll()
+
+    @Query("SELECT * FROM no_spend_day WHERE date >= :start")
+    suspend fun since(start: String): List<NoSpendDayRecord>
+
+    @Upsert
+    suspend fun save(record: NoSpendDayRecord)
+
+    @Query("SELECT * FROM no_spend_day WHERE date = :date")
+    suspend fun find(date: String): NoSpendDayRecord?
+
+    @Query("DELETE FROM no_spend_day WHERE date = :date")
+    suspend fun delete(date: String)
+
+    @Query("SELECT COUNT(*) FROM no_spend_day")
+    suspend fun count(): Int
 }
 
 fun NoSpendDay.record(): NoSpendDayRecord = NoSpendDayRecord(
