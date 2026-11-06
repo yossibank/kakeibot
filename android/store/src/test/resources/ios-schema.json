@@ -1,0 +1,1591 @@
+{
+  "description": "iOS の Store を最新の版まで移した DB の表の形。同期の表（sync_*）は除く。type は SQLite の宣言の型、default は宣言の既定値の文字列。indexes は主キーを除き、名前ではなく列と一意かどうかで比べる。partial は WHERE 付きのインデックス",
+  "tables": [
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "wallet_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "date",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "amount",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "wallet_id",
+          "onDelete": "NO ACTION",
+          "table": "wallet",
+          "to": "id"
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "wallet_id"
+          ],
+          "partial": false,
+          "unique": false
+        }
+      ],
+      "name": "adjustment"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "category_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "from_month",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "amount",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "INTEGER"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "category_id",
+          "onDelete": "NO ACTION",
+          "table": "category",
+          "to": "id"
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "category_id",
+            "from_month"
+          ],
+          "partial": false,
+          "unique": true
+        },
+        {
+          "columns": [
+            "from_month"
+          ],
+          "partial": true,
+          "unique": true
+        }
+      ],
+      "name": "budget"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "date",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "icon_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "icon_id",
+          "onDelete": "NO ACTION",
+          "table": "icon",
+          "to": "id"
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "date"
+          ],
+          "partial": false,
+          "unique": true
+        }
+      ],
+      "name": "calendar_stamp"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "kind",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "icon_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "sort_order",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "archived_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "wallet_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "icon_id",
+          "onDelete": "NO ACTION",
+          "table": "icon",
+          "to": "id"
+        },
+        {
+          "column": "wallet_id",
+          "onDelete": "NO ACTION",
+          "table": "wallet",
+          "to": "id"
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "wallet_id"
+          ],
+          "partial": false,
+          "unique": false
+        }
+      ],
+      "name": "category"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "type",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "amount",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "category_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "wallet_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "to_wallet_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "memo",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "date",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "recurring_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "recurring_date",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "tag_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "template_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "bill_month",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "transfer_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": "0",
+          "name": "tax_included",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "category_id",
+          "onDelete": "NO ACTION",
+          "table": "category",
+          "to": "id"
+        },
+        {
+          "column": "recurring_id",
+          "onDelete": "NO ACTION",
+          "table": "recurring",
+          "to": "id"
+        },
+        {
+          "column": "tag_id",
+          "onDelete": "NO ACTION",
+          "table": "tag",
+          "to": "id"
+        },
+        {
+          "column": "template_id",
+          "onDelete": "SET NULL",
+          "table": "template",
+          "to": "id"
+        },
+        {
+          "column": "to_wallet_id",
+          "onDelete": "NO ACTION",
+          "table": "wallet",
+          "to": "id"
+        },
+        {
+          "column": "transfer_id",
+          "onDelete": "CASCADE",
+          "table": "entry",
+          "to": "id"
+        },
+        {
+          "column": "wallet_id",
+          "onDelete": "NO ACTION",
+          "table": "wallet",
+          "to": "id"
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "category_id"
+          ],
+          "partial": false,
+          "unique": false
+        },
+        {
+          "columns": [
+            "date"
+          ],
+          "partial": false,
+          "unique": false
+        },
+        {
+          "columns": [
+            "recurring_id",
+            "recurring_date"
+          ],
+          "partial": false,
+          "unique": true
+        },
+        {
+          "columns": [
+            "to_wallet_id"
+          ],
+          "partial": false,
+          "unique": false
+        },
+        {
+          "columns": [
+            "transfer_id"
+          ],
+          "partial": false,
+          "unique": true
+        },
+        {
+          "columns": [
+            "wallet_id",
+            "date"
+          ],
+          "partial": false,
+          "unique": false
+        }
+      ],
+      "name": "entry"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "entry_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "quantity",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "amount",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "sort_order",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "tax_rate",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "INTEGER"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "entry_id",
+          "onDelete": "CASCADE",
+          "table": "entry",
+          "to": "id"
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "entry_id"
+          ],
+          "partial": false,
+          "unique": false
+        }
+      ],
+      "name": "entry_item"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "emoji",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "text",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "glyph",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "color",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [],
+      "name": "icon"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "store",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "raw",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [
+        {
+          "columns": [
+            "store",
+            "raw"
+          ],
+          "partial": false,
+          "unique": true
+        }
+      ],
+      "name": "item_name"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "date",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [],
+      "name": "no_spend_day"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "type",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "amount",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "category_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "wallet_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "to_wallet_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "memo",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "frequency",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "month",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "day",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": "'none'",
+          "name": "holiday_shift",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "closing_day",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "start_date",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "end_date",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "remind_days_before",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "generated_until",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": "0",
+          "name": "sort_order",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "archived_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "fee",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": "0",
+          "name": "bill_shift",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "final_amount",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "INTEGER"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "category_id",
+          "onDelete": "NO ACTION",
+          "table": "category",
+          "to": "id"
+        },
+        {
+          "column": "to_wallet_id",
+          "onDelete": "NO ACTION",
+          "table": "wallet",
+          "to": "id"
+        },
+        {
+          "column": "wallet_id",
+          "onDelete": "NO ACTION",
+          "table": "wallet",
+          "to": "id"
+        }
+      ],
+      "indexes": [],
+      "name": "recurring"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "target_amount",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "purchased_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "entry_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "entry_id",
+          "onDelete": "NO ACTION",
+          "table": "entry",
+          "to": "id"
+        }
+      ],
+      "indexes": [],
+      "name": "reward_goal"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "rule_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "date",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "amount",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "rule_id",
+          "onDelete": "NO ACTION",
+          "table": "reward_rule",
+          "to": "id"
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "rule_id",
+            "date"
+          ],
+          "partial": false,
+          "unique": true
+        }
+      ],
+      "name": "reward_log"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "amount",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "icon_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "is_active",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        },
+        {
+          "default": null,
+          "name": "sort_order",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "icon_id",
+          "onDelete": "NO ACTION",
+          "table": "icon",
+          "to": "id"
+        }
+      ],
+      "indexes": [],
+      "name": "reward_rule"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "key",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "value",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [],
+      "name": "setting"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "icon_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "sort_order",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "archived_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "icon_id",
+          "onDelete": "NO ACTION",
+          "table": "icon",
+          "to": "id"
+        }
+      ],
+      "indexes": [],
+      "name": "shelf_icon"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "category_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "sort_order",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "archived_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "category_id",
+          "onDelete": "NO ACTION",
+          "table": "category",
+          "to": "id"
+        }
+      ],
+      "indexes": [],
+      "name": "tag"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "type",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "amount",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "category_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "wallet_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "memo",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "sort_order",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "tag_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "archived_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": "0",
+          "name": "bill_shift",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "category_id",
+          "onDelete": "NO ACTION",
+          "table": "category",
+          "to": "id"
+        },
+        {
+          "column": "tag_id",
+          "onDelete": "NO ACTION",
+          "table": "tag",
+          "to": "id"
+        },
+        {
+          "column": "wallet_id",
+          "onDelete": "NO ACTION",
+          "table": "wallet",
+          "to": "id"
+        }
+      ],
+      "indexes": [],
+      "name": "template"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "background",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "surface",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "text_primary",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "text_secondary",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "accent",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "expense",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "income",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "corner_radius",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "font_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "is_builtin",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "BOOLEAN"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [],
+      "indexes": [],
+      "name": "theme"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "wallet_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "date",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "amount",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "wallet_id",
+          "onDelete": "NO ACTION",
+          "table": "wallet",
+          "to": "id"
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "wallet_id",
+            "date"
+          ],
+          "partial": false,
+          "unique": true
+        }
+      ],
+      "name": "valuation"
+    },
+    {
+      "columns": [
+        {
+          "default": null,
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "kind",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "icon_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "initial_balance",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "sort_order",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "INTEGER"
+        },
+        {
+          "default": null,
+          "name": "archived_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "TEXT"
+        },
+        {
+          "default": null,
+          "name": "loan_amount",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "INTEGER"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "column": "icon_id",
+          "onDelete": "NO ACTION",
+          "table": "icon",
+          "to": "id"
+        }
+      ],
+      "indexes": [],
+      "name": "wallet"
+    }
+  ]
+}
