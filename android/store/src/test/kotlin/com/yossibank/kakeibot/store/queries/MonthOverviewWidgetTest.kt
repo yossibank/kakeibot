@@ -108,8 +108,8 @@ class MonthOverviewWidgetTest {
             assertEquals(expected, actual)
         }
 
-        assertFalse(widget.list?.days.orEmpty().flatMap { it.entries }.contains(recorded))
-        assertTrue(including.list?.days.orEmpty().flatMap { it.entries }.contains(recorded))
+        assertFalse(widget.list?.entries.orEmpty().contains(recorded))
+        assertTrue(including.list?.entries.orEmpty().contains(recorded))
         assertTrue(widget.list?.days.orEmpty().size < full.list?.days.orEmpty().size)
 
         database.close()

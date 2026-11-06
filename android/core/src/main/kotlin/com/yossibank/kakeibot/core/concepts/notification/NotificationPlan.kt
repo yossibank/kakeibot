@@ -5,6 +5,7 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.dates
 import com.yossibank.kakeibot.core.concepts.recurring.scheduledAmount
+import com.yossibank.kakeibot.core.concepts.recurring.title
 import com.yossibank.kakeibot.core.shared.Identifier
 import kotlin.math.absoluteValue
 
@@ -84,9 +85,8 @@ object NotificationPlan {
     ): List<PlannedNotification> {
         val daysBefore = of.remindDaysBefore ?: return emptyList()
 
-        val memo = of.memo?.takeIf { it.isNotEmpty() }
         val category = of.categoryId?.let { names[it] }
-        val name = memo ?: category ?: "固定費"
+        val name = of.title(categoryName = category) ?: "固定費"
         val start = today.adding(days = daysBefore)
         val span = recurringDays - 1
         val end = start.adding(days = span)
@@ -134,7 +134,7 @@ object NotificationPlan {
             val bill = if (daysBefore == 0) {
                 "今日は引き落としの日です"
             } else {
-                "${on.month}/${on.day} に引き落としがあります"
+                "${on.monthDayText} に引き落としがあります"
             }
 
             if (shortage == null) {
@@ -152,7 +152,7 @@ object NotificationPlan {
             return "今日は $yen の日です"
         }
 
-        return "${on.month}/${on.day} に $yen です"
+        return "${on.monthDayText} に $yen です"
     }
 
     private fun grouped(amount: Long): String {

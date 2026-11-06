@@ -12,20 +12,6 @@ data class Holdings(
 ) {
     constructor(
         wallets: List<Wallet>,
-        entries: List<Entry>,
-        valuations: List<Valuation> = emptyList(),
-        adjustments: List<Adjustment> = emptyList(),
-        through: LocalDate? = null,
-    ) : this(
-        wallets = wallets,
-        entriesByWallet = Wallet.entriesByWallet(entries),
-        valuations = valuations,
-        adjustments = adjustments,
-        through = through,
-    )
-
-    constructor(
-        wallets: List<Wallet>,
         entriesByWallet: Map<Identifier<Wallet>, List<Entry>>,
         valuations: List<Valuation> = emptyList(),
         adjustments: List<Adjustment> = emptyList(),

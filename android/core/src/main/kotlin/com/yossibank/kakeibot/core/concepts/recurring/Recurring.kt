@@ -54,3 +54,5 @@ data class Recurring(
 
     companion object
 }
+
+fun Recurring.title(categoryName: String?): String? = memo?.takeIf { it.isNotEmpty() } ?: categoryName
