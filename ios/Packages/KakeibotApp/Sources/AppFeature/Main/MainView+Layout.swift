@@ -52,7 +52,6 @@ private struct TabContent: ViewModifier {
         let bottom = hasSidebar ? 0 : FloatingTabBar<Int>.clearance
 
         content
-            .toolbar(.hidden, for: .tabBar)
             .safeAreaPadding(.leading, leading)
             .safeAreaPadding(.bottom, bottom)
     }
