@@ -22,6 +22,7 @@ public struct IconSeal: View {
         case .circle, .rounded:
             shape
                 .fill(tint)
+                .glow(tint.opacity(glow), radius: size * 0.2)
                 .frame(width: size, height: size)
                 .overlay {
                     IconImage(icon, size: size * 0.42)
@@ -31,7 +32,6 @@ public struct IconSeal: View {
                     shape
                         .strokeBorder(Palette.backgroundBottom, lineWidth: size * 0.08)
                 }
-                .glow(tint.opacity(glow), radius: size * 0.2)
 
         case .seal:
             Circle()
