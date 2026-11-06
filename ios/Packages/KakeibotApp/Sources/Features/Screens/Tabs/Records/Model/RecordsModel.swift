@@ -37,10 +37,12 @@ public final class RecordsModel: ScreenModel {
     public private(set) var recentSearches: [String] = []
     public private(set) var pendingDeleteIDs: [Entry.ID] = []
     public private(set) var searchDays: [EntryDay] = []
+    public private(set) var searchHiddenCount = 0
 
     public private(set) var list: EntryList? {
         didSet {
             listGeneration += 1
+            searchIndex = nil
             updateSearch()
         }
     }
@@ -52,6 +54,7 @@ public final class RecordsModel: ScreenModel {
     private var listGeneration = 0
 
     @ObservationIgnored private var monthDays: MonthDays?
+    @ObservationIgnored private var searchIndex: EntrySearchIndex?
 
     public init(
         database: AppDatabase,
@@ -347,10 +350,18 @@ private extension RecordsModel {
             let list
         else {
             searchDays = []
+            searchHiddenCount = 0
             return
         }
 
-        searchDays = filter.apply(to: list.days(matching: search))
+        let index = searchIndex ?? EntrySearchIndex(list)
+        let matched = index.days(matching: search)
+        let shown = filter.apply(to: matched)
+        let isHidden = !filter.isEmpty && shown.isEmpty
+
+        searchIndex = index
+        searchDays = shown
+        searchHiddenCount = isHidden ? Self.entryCount(in: matched) : 0
     }
 
     func saveRecentSearches() async {

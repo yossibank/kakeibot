@@ -155,7 +155,7 @@ public extension BackupModel {
         }
     }
 
-    func read(_ result: Result<URL, any Error>) -> Bool {
+    func read(_ result: Result<URL, any Error>) async -> Bool {
         doneMessage = nil
 
         guard case let .success(url) = result else {
@@ -163,50 +163,39 @@ public extension BackupModel {
             return false
         }
 
-        let isAccessing = url.startAccessingSecurityScopedResource()
+        let export = await Task.detached {
+            Result {
+                let isAccessing = url.startAccessingSecurityScopedResource()
 
-        defer {
-            if isAccessing {
-                url.stopAccessingSecurityScopedResource()
+                defer {
+                    if isAccessing {
+                        url.stopAccessingSecurityScopedResource()
+                    }
+                }
+
+                return try ExportV1(json: Data(contentsOf: url))
             }
-        }
+        }.value
 
-        guard let data = try? Data(contentsOf: url) else {
-            errorNotice.show(Self.readFailedMessage)
-            return false
-        }
-
-        return read(data)
+        return accept(export)
     }
 
     @discardableResult
     func read(_ data: Data) -> Bool {
-        do {
-            pending = try ExportV1(json: data)
-            return true
-        } catch {
-            errorNotice.show(Self.readMessage(for: error))
-            return false
-        }
+        accept(Result { try ExportV1(json: data) })
     }
 
     @discardableResult
     func readPrevious(_ item: Previous) async -> Bool {
         doneMessage = nil
 
-        let result = await Task.detached {
+        let export = await Task.detached {
             Result {
                 try ExportV1(json: Data(contentsOf: item.url))
             }
         }.value
 
-        do {
-            pending = try result.get()
-            return true
-        } catch {
-            errorNotice.show(Self.readMessage(for: error))
-            return false
-        }
+        return accept(export)
     }
 
     func cancelRestore() {
@@ -314,6 +303,16 @@ private extension BackupModel {
         formatter.dateFormat = "yyyy/M/d H:mm"
 
         return formatter.string(from: date)
+    }
+
+    func accept(_ export: Result<ExportV1, any Error>) -> Bool {
+        do {
+            pending = try export.get()
+            return true
+        } catch {
+            errorNotice.show(Self.readMessage(for: error))
+            return false
+        }
     }
 
     func isSyncActiveNow() async -> Bool {

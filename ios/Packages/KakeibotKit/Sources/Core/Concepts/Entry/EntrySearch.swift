@@ -3,8 +3,13 @@ import Foundation
 public struct EntrySearch: Hashable, Sendable {
     public let words: [String]
 
+    private let amounts: [Int?]
+
     public init(_ text: String) {
-        self.words = text.split(whereSeparator: \.isWhitespace).map { Self.fold(String($0)) }
+        let words = text.split(whereSeparator: \.isWhitespace).map { Self.fold(String($0)) }
+
+        self.words = words
+        self.amounts = words.map(Self.amount)
     }
 }
 
@@ -32,14 +37,26 @@ public extension EntrySearch {
         return Array(kept)
     }
 
+    static func fold(_ text: String) -> String {
+        text.folding(
+            options: [.caseInsensitive, .widthInsensitive],
+            locale: japanese
+        )
+    }
+
     func matches(
         amount: Int,
         texts: [String]
     ) -> Bool {
-        let folded = texts.map(Self.fold)
+        matches(amount: amount, folded: texts.map(Self.fold))
+    }
 
-        return words.allSatisfy { word in
-            if Self.amount(in: word) == amount {
+    func matches(
+        amount: Int,
+        folded: [String]
+    ) -> Bool {
+        zip(words, amounts).allSatisfy { word, wordAmount in
+            if wordAmount == amount {
                 return true
             }
 
@@ -51,13 +68,6 @@ public extension EntrySearch {
 private extension EntrySearch {
     static let amountMarks: Set<Character> = ["¥", "\\", ",", "円"]
     static let japanese = Locale(identifier: "ja_JP")
-
-    static func fold(_ text: String) -> String {
-        text.folding(
-            options: [.caseInsensitive, .widthInsensitive],
-            locale: japanese
-        )
-    }
 
     static func amount(in word: String) -> Int? {
         let digits = word.filter { !amountMarks.contains($0) }
