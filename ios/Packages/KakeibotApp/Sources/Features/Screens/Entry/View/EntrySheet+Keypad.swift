@@ -30,10 +30,12 @@ extension EntrySheet {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            Keypad(calculator: model.activeCalculator) {
-                setEnteringAmount(false)
-            } onKey: { key in
-                model.press(key)
+            EntryLiveSlot {
+                Keypad(calculator: model.activeCalculator) {
+                    setEnteringAmount(false)
+                } onKey: { key in
+                    model.press(key)
+                }
             }
 
             saveButtons

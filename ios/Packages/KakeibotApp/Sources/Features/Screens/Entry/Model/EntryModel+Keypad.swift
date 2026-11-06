@@ -3,17 +3,13 @@ import DesignSystem
 import Foundation
 import Store
 
-public extension EntryModel {
-    enum KeypadTarget: Hashable {
-        case amount
-        case fee
+extension EntryModel {
+    struct FeeChoicesCache {
+        let historyGeneration: Int
+        let choices: [Int]
     }
 
-    var activeCalculator: AmountCalculator {
-        keypadTarget == .fee ? feeCalculator : calculator
-    }
-
-    var feeChoices: [Int] {
+    var recentFeeChoices: [Int] {
         let used = (history?.days ?? [])
             .lazy
             .flatMap(\.entries)
@@ -26,6 +22,32 @@ public extension EntryModel {
         let ordered = (used + FeeChoiceRow.defaultChoices).filter { seen.insert($0).inserted }
 
         return Array(ordered.prefix(FeeChoiceRow.defaultChoices.count))
+    }
+}
+
+public extension EntryModel {
+    enum KeypadTarget: Hashable {
+        case amount
+        case fee
+    }
+
+    var activeCalculator: AmountCalculator {
+        keypadTarget == .fee ? feeCalculator : calculator
+    }
+
+    var feeChoices: [Int] {
+        let generation = historyGeneration
+
+        if let feeChoicesCache,
+           feeChoicesCache.historyGeneration == generation {
+            return feeChoicesCache.choices
+        }
+
+        let choices = recentFeeChoices
+
+        feeChoicesCache = FeeChoicesCache(historyGeneration: generation, choices: choices)
+
+        return choices
     }
 
     var expressionText: String? {

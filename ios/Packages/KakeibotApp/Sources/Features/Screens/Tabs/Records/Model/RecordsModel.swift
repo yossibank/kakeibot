@@ -40,6 +40,7 @@ public final class RecordsModel: ScreenModel {
 
     public private(set) var list: EntryList? {
         didSet {
+            listGeneration += 1
             updateSearch()
         }
     }
@@ -47,6 +48,10 @@ public final class RecordsModel: ScreenModel {
     public internal(set) var errorNotice = ErrorNotice()
 
     let database: AppDatabase
+
+    private var listGeneration = 0
+
+    @ObservationIgnored private var monthDays: MonthDays?
 
     public init(
         database: AppDatabase,
@@ -76,15 +81,7 @@ public extension RecordsModel {
     }
 
     var days: [EntryDay] {
-        let days = list?.days.filter { period.contains($0.date) } ?? []
-        let filtered = filter.apply(to: days)
-        let adjusted = adjustedDays(besides: filtered)
-
-        guard !adjusted.isEmpty else {
-            return filtered
-        }
-
-        return (filtered + adjusted).sorted { $0.date > $1.date }
+        currentMonthDays.days
     }
 
     var showsNoRecords: Bool {
@@ -146,7 +143,7 @@ public extension RecordsModel {
     }
 
     func day(on date: LocalDate) -> EntryDay? {
-        days.first { $0.date == date }
+        currentMonthDays.byDate[date]
     }
 
     func requestDelete(
@@ -282,7 +279,65 @@ extension RecordsModel {
 }
 
 private extension RecordsModel {
+    struct MonthDays {
+        struct Key: Equatable {
+            let listGeneration: Int
+            let month: YearMonth
+            let monthStartDay: MonthStartDay
+            let filter: EntryFilter
+            let isSearching: Bool
+        }
+
+        let key: Key
+        let days: [EntryDay]
+        let byDate: [LocalDate: EntryDay]
+    }
+
     static let confirmDeleteThreshold = 10
+
+    var monthDaysKey: MonthDays.Key {
+        MonthDays.Key(
+            listGeneration: listGeneration,
+            month: month,
+            monthStartDay: monthStartDay,
+            filter: filter,
+            isSearching: isSearching
+        )
+    }
+
+    var currentMonthDays: MonthDays {
+        let key = monthDaysKey
+
+        if let monthDays,
+           monthDays.key == key {
+            return monthDays
+        }
+
+        let days = makeDays()
+        let byDate = Dictionary(
+            days.map { ($0.date, $0) },
+            uniquingKeysWith: { first, _ in
+                first
+            }
+        )
+        let computed = MonthDays(key: key, days: days, byDate: byDate)
+
+        monthDays = computed
+
+        return computed
+    }
+
+    func makeDays() -> [EntryDay] {
+        let days = list?.days.filter { period.contains($0.date) } ?? []
+        let filtered = filter.apply(to: days)
+        let adjusted = adjustedDays(besides: filtered)
+
+        guard !adjusted.isEmpty else {
+            return filtered
+        }
+
+        return (filtered + adjusted).sorted { $0.date > $1.date }
+    }
 
     func updateSearch() {
         let search = EntrySearch(searchText)

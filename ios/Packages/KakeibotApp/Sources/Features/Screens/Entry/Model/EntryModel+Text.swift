@@ -3,6 +3,61 @@ import DesignSystem
 import Foundation
 import Store
 
+extension EntryModel {
+    struct MonthCache {
+        struct Key: Equatable {
+            let historyGeneration: Int
+            let budgets: [Budget]
+            let monthStartDay: MonthStartDay
+            let carryoverFrom: YearMonth?
+            let today: LocalDate
+        }
+
+        let key: Key
+        let overview: MonthOverview
+        let budgetUsage: BudgetUsage?
+        let entries: [Entry]
+    }
+
+    var currentMonthCache: MonthCache {
+        let key = MonthCache.Key(
+            historyGeneration: historyGeneration,
+            budgets: budgets,
+            monthStartDay: monthStartDay,
+            carryoverFrom: carryoverFrom,
+            today: Self.today
+        )
+
+        if let monthCache,
+           monthCache.key == key {
+            return monthCache
+        }
+
+        let overview = MonthOverview(
+            list: history,
+            budgets: budgets,
+            recurrings: [],
+            monthStartDay: monthStartDay,
+            carryoverFrom: carryoverFrom,
+            today: Self.today
+        )
+        let period = overview.period
+        let entries = (history?.days ?? [])
+            .filter { period.contains($0.date) }
+            .flatMap(\.entries)
+        let cache = MonthCache(
+            key: key,
+            overview: overview,
+            budgetUsage: overview.budgetUsage,
+            entries: entries
+        )
+
+        monthCache = cache
+
+        return cache
+    }
+}
+
 public extension EntryModel {
     struct SaveLabel: Equatable {
         public let title: String
@@ -54,7 +109,7 @@ public extension EntryModel {
             return nil
         }
 
-        return monthOverview.budgetUsage
+        return currentMonthCache.budgetUsage
     }
 
     var budgetUsageAfterSave: BudgetUsage? {
@@ -118,14 +173,7 @@ public extension EntryModel {
     }
 
     var monthOverview: MonthOverview {
-        MonthOverview(
-            list: history,
-            budgets: budgets,
-            recurrings: [],
-            monthStartDay: monthStartDay,
-            carryoverFrom: carryoverFrom,
-            today: Self.today
-        )
+        currentMonthCache.overview
     }
 
     static func dateText(
@@ -238,11 +286,7 @@ private extension EntryModel {
 
     func monthTotals(matching isIncluded: (Entry) -> Bool) -> (current: Int, after: Int) {
         let period = monthOverview.period
-
-        let entries = (history?.days ?? [])
-            .filter { period.contains($0.date) }
-            .flatMap(\.entries)
-            .filter(isIncluded)
+        let entries = currentMonthCache.entries.filter(isIncluded)
 
         let current = entries.reduce(0) { $0 + $1.amount }
         let previous = entries.first { $0.id == original?.id }?.amount ?? 0

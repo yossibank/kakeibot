@@ -113,12 +113,14 @@ public struct EntrySheet: View {
                 Backdrop()
                     .ignoresSafeArea()
             }
-            .confirmsDiscard(
-                when: model.isChanged,
-                isPresented: $isConfirmingDiscard
-            ) {
-                dismiss()
-            }
+            .modifier(
+                EntryDiscardGuard(
+                    isPresented: $isConfirmingDiscard,
+                    model: model
+                ) {
+                    dismiss()
+                }
+            )
             .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
                 sheetContent(for: sheet)
             }
@@ -134,32 +136,34 @@ public struct EntrySheet: View {
 
 extension EntrySheet {
     var saveButtons: some View {
-        HStack(spacing: 8) {
-            EntrySaveButton(label: model.saveLabel(today: today)) {
-                Task {
-                    await save()
-                }
-            }
-            .disabled(!model.canSave)
-
-            if model.isEditing {
-                sideButton(
-                    "もう一度",
-                    systemImage: "doc.on.doc",
-                    isEnabled: true
-                ) {
+        EntryLiveSlot {
+            HStack(spacing: 8) {
+                EntrySaveButton(label: model.saveLabel(today: today)) {
                     Task {
-                        await recordAgain()
+                        await save()
                     }
                 }
-            } else {
-                sideButton(
-                    "続けて",
-                    systemImage: "plus.square.on.square",
-                    isEnabled: model.canSave
-                ) {
-                    Task {
-                        await saveAndContinue()
+                .disabled(!model.canSave)
+
+                if model.isEditing {
+                    sideButton(
+                        "もう一度",
+                        systemImage: "doc.on.doc",
+                        isEnabled: true
+                    ) {
+                        Task {
+                            await recordAgain()
+                        }
+                    }
+                } else {
+                    sideButton(
+                        "続けて",
+                        systemImage: "plus.square.on.square",
+                        isEnabled: model.canSave
+                    ) {
+                        Task {
+                            await saveAndContinue()
+                        }
                     }
                 }
             }

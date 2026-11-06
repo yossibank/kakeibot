@@ -31,9 +31,11 @@ extension EntrySheet {
                 .padding(.top, 8)
             }
 
-            if let remaining = model.loanRemaining,
-               remaining != model.amount {
-                payOffButton(remaining)
+            EntryLiveSlot {
+                if let remaining = model.loanRemaining,
+                   remaining != model.amount {
+                    payOffButton(remaining)
+                }
             }
         }
     }
