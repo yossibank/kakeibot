@@ -19,22 +19,23 @@ fun List<Recurring>.total(
     of: Entry.Kind,
     range: ClosedRange<LocalDate>,
     entries: List<Entry>,
-): Long = filter { it.type == of }.fold(0L) { sum, recurring ->
-    val occurrences = recurring.occurrences(
-        from = range.start,
-        through = range.endInclusive,
-    )
+): Long {
+    val recorded = entries.filter { it.recurringId != null }
 
-    sum + occurrences.sumOf { recurring.amount(of = it, entries = entries) }
+    return filter { it.type == of }.fold(0L) { sum, recurring ->
+        val occurrences = recurring.occurrences(
+            from = range.start,
+            through = range.endInclusive,
+        )
+
+        sum + occurrences.sumOf { occurrence ->
+            recurring.record(of = occurrence, entries = recorded)?.amount?.toLong()
+                ?: recurring.amount(paidOn = occurrence.date, entries = entries)
+        }
+    }
 }
 
 fun Recurring.record(
     of: Recurring.Occurrence,
     entries: List<Entry>,
 ): Entry? = entries.firstOrNull { isRecorded(by = it, scheduled = of.scheduled) }
-
-fun Recurring.amount(
-    of: Recurring.Occurrence,
-    entries: List<Entry>,
-): Long = record(of = of, entries = entries)?.amount?.toLong()
-    ?: amount(paidOn = of.date, entries = entries)
