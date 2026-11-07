@@ -2,7 +2,7 @@
 
 SIMULATOR ?= $(shell scripts/find-simulator.sh)
 XCBEAUTIFY = $(shell command -v xcbeautify)
-BEAUTIFY = $(if $(XCBEAUTIFY),| xcbeautify)
+BEAUTIFY = $(if $(XCBEAUTIFY),| perl -pe 's/\xe2\x80\x8b//g' | xcbeautify)
 XCODEBUILD = xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot
 ANY_SIMULATOR = -destination 'generic/platform=iOS Simulator'
 ON_SIMULATOR = -destination 'id=$(SIMULATOR)'
@@ -39,7 +39,8 @@ test-build:
 
 test:
 	@test -n "$(SIMULATOR)" || { echo "NG iPhone のシミュレーターが無い。SIMULATOR に UDID を渡す"; exit 1; }
-	set -o pipefail; $(XCODEBUILD) -testPlan Kakeibot $(ON_SIMULATOR) -collect-test-diagnostics never test $(BEAUTIFY)
+	@mkdir -p .build
+	set -o pipefail; $(XCODEBUILD) -testPlan Kakeibot $(ON_SIMULATOR) -collect-test-diagnostics never test 2>&1 $(BEAUTIFY) | tee .build/test.log
 
 snapshot:
 	@test -n "$(SNAPSHOT)" || { echo "NG SNAPSHOT に .claude/snapshots/ の下のセットの名前を渡す"; exit 1; }
