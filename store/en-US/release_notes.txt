@@ -1,6 +1,6 @@
-・While editing a record, tap "Again" to add a copy of it dated today.
-・When sync stops, the Settings list and the gear on Home now show a mark and the reason.
-・When Quick Entry in the widget is empty, it now offers a shortcut to create a template.
-・Switching periods is smoother, and the entry sheet and the Records tab are faster.
-・Amounts now share one font, and unpaid and remaining amounts in the Assets tab are easier to read.
-・Fixed CSV export sometimes breaking fields that contain line breaks.
+・The Assets tab now shows your money on hand including records from tomorrow on, along with a list of the planned records.
+・Upcoming bills are now split by month, and you can swipe sideways to switch months. You can also see which bills are estimates until the closing day and which are settled.
+・Account types are now grouped into three sets for easier picking, and you can create a card account from the Liabilities card on the Assets tab.
+・Liability rows now show the plan for each payment, and upcoming bills are easier to read.
+・You can now pick a category while the entry keypad stays open.
+・Fixed card bills of zero yen appearing in upcoming bills.
