@@ -219,6 +219,47 @@ struct CardBillTests {
         #expect(upcoming.map(\.isOpen) == [false, false, true, false])
         #expect(upcoming.map(\.month.description) == ["2026-10", "2026-10", "2026-11", "2026-11"])
     }
+
+    @Test(
+        arguments: [
+            ("2026-10-15", 0.0),
+            ("2026-10-16", 1.0 / 31),
+            ("2026-10-31", 16.0 / 31),
+            ("2026-11-15", 1.0),
+            ("2026-11-20", 1.0)
+        ]
+    )
+    func measuresProgressThroughBillingPeriod(
+        day: String,
+        expected: Double
+    ) throws {
+        let bank = Self.wallet(.bank, balance: 0, at: Date(timeIntervalSince1970: 1_791_000_000))
+        let card = Self.wallet(.card, balance: 0, at: Date(timeIntervalSince1970: 1_791_000_000))
+        let recurring = try Self.recurring(
+            from: bank.id,
+            to: card.id,
+            amount: 0,
+            day: 26,
+            closingDay: 15
+        )
+        let paidOn = try #require(LocalDate("2026-11-26"))
+        let today = try #require(LocalDate(day))
+        let bill = CardBill(recurring: recurring, date: paidOn, amount: 0, balanceBefore: 0)
+
+        #expect(abs(bill.progress(on: today) - expected) < 0.0001)
+    }
+
+    @Test
+    func treatsBillWithoutClosingDayAsDone() throws {
+        let bank = Self.wallet(.bank, balance: 0, at: Date(timeIntervalSince1970: 1_791_000_000))
+        let card = Self.wallet(.card, balance: 0, at: Date(timeIntervalSince1970: 1_791_000_000))
+        let recurring = try Self.recurring(from: bank.id, to: card.id, amount: 30000, day: 27)
+        let paidOn = try #require(LocalDate("2026-11-27"))
+        let today = try #require(LocalDate("2026-11-01"))
+        let bill = CardBill(recurring: recurring, date: paidOn, amount: 30000, balanceBefore: 0)
+
+        #expect(bill.progress(on: today) == 1)
+    }
 }
 
 extension CardBillTests {

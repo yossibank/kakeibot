@@ -28,6 +28,15 @@ data class CardBill(
     val month: YearMonth
         get() = recurring.occurrenceMonth(of = date)
 
+    fun progress(on: LocalDate): Double {
+        val period = period ?: return 1.0
+        val length = period.start.days(until = period.endInclusive) + 1
+        val passed = period.start.days(until = on) + 1
+        val progress = passed.toDouble() / length.toDouble()
+
+        return progress.coerceIn(0.0, 1.0)
+    }
+
     companion object {
         fun upcoming(
             recurrings: List<Recurring>,
