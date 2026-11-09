@@ -15,14 +15,6 @@ extension WalletEditSheet {
         case loanAmount
     }
 
-    static let kindColumns = Array(
-        repeating: GridItem(
-            .flexible(),
-            spacing: 8
-        ),
-        count: 3
-    )
-
     var title: String {
         model.isEditing ? "口座を編集" : "口座を追加"
     }

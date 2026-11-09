@@ -101,16 +101,6 @@ extension WalletEditSheet {
         }
     }
 
-    var kindChooser: some View {
-        SettingsFormSection("種類", value: model.kind.title) {
-            LazyVGrid(columns: Self.kindColumns, spacing: 8) {
-                ForEach(Wallet.Kind.allCases, id: \.self) { kind in
-                    kindButton(kind)
-                }
-            }
-        }
-    }
-
     var balanceField: some View {
         SettingsFormSection("最初の残高") {
             HStack(spacing: 8) {
@@ -304,32 +294,6 @@ extension WalletEditSheet {
                     .stroke(stroke, lineWidth: isSelected ? 1.5 : 1)
             }
             .contentShape(shape)
-        }
-        .buttonStyle(.plain)
-        .haptic(.selection, trigger: isSelected)
-    }
-
-    func kindButton(_ kind: Wallet.Kind) -> some View {
-        let isSelected = model.kind == kind
-        let textColor = isSelected ? Palette.accentStrong : Palette.subtext
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
-        let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
-
-        return Button {
-            model.kind = kind
-        } label: {
-            Text(kind.title)
-                .textFont(.footnote)
-                .foregroundStyle(textColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity, minHeight: 40)
-                .background(fill, in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(stroke, lineWidth: 1)
-                }
-                .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .haptic(.selection, trigger: isSelected)
