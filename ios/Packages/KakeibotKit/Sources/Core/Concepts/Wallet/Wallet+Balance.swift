@@ -65,6 +65,16 @@ public extension Wallet {
     }
 }
 
+extension Wallet {
+    func change(by entry: Entry) -> Int {
+        switch entry.type {
+        case .expense: entry.walletId == id ? -entry.amount : 0
+        case .income: entry.walletId == id ? entry.amount : 0
+        case .transfer: transferChange(by: entry)
+        }
+    }
+}
+
 private extension Wallet {
     func latestValuation(
         in valuations: [Valuation],
@@ -76,14 +86,6 @@ private extension Wallet {
                     && date.map { valuation.date <= $0 } ?? true
             }
             .max { $0.date < $1.date }
-    }
-
-    func change(by entry: Entry) -> Int {
-        switch entry.type {
-        case .expense: entry.walletId == id ? -entry.amount : 0
-        case .income: entry.walletId == id ? entry.amount : 0
-        case .transfer: transferChange(by: entry)
-        }
     }
 
     func transferChange(by entry: Entry) -> Int {

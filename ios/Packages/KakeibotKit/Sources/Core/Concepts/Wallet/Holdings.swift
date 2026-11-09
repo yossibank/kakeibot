@@ -65,6 +65,14 @@ public extension Holdings {
     }
 }
 
+public extension Entry {
+    func availableChange(in wallets: [Wallet]) -> Int {
+        wallets
+            .filter { [.onHand, .card].contains($0.kind.role) }
+            .reduce(0) { $0 + $1.change(by: self) }
+    }
+}
+
 public extension Wallet.Kind {
     enum Role: CaseIterable, Sendable {
         case onHand
