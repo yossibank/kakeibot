@@ -29,6 +29,7 @@ extension AssetsView {
 
                         planAmount
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 Image(systemName: "chevron.right")
@@ -49,36 +50,19 @@ extension AssetsView {
 }
 
 private extension AssetsView {
-    static let planTitleIdealWidth: CGFloat = 48
-}
-
-private extension AssetsView {
     var planTexts: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("予定を含めると")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
-                .fixedSize()
 
-            if let first = model.plans.first {
-                HStack(spacing: 4) {
-                    Text("\(first.date.monthDayText) \(first.title)")
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .frame(
-                            minWidth: 0,
-                            idealWidth: Self.planTitleIdealWidth,
-                            alignment: .leading
-                        )
-
-                    Text(planNote(first))
-                        .fixedSize()
-                }
+            Text("\(model.plans.count) 件の予定")
                 .textFont(.caption2)
                 .monospacedDigit()
                 .foregroundStyle(Palette.text)
-            }
         }
+        .lineLimit(1)
+        .fixedSize()
     }
 
     var planAmount: some View {
@@ -89,11 +73,5 @@ private extension AssetsView {
         )
         .lineLimit(1)
         .minimumScaleFactor(0.5)
-    }
-
-    func planNote(_ first: AssetsModel.Plan) -> String {
-        let amount = AmountText.text(first.change, sign: .plus)
-        let others = model.plans.count - 1
-        return others > 0 ? "\(amount) ほか \(others) 件" : amount
     }
 }

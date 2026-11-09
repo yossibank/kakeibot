@@ -2,8 +2,9 @@ import Core
 import DesignSystem
 
 enum BillText {
-    static let openTag = "途中"
-    static let openNote = "締め日までは、今日までに記録した利用分です。締め日を過ぎると額が決まります。"
+    static let estimate = "見込み"
+    static let settled = "確定"
+    static let progressNote = "輪は締め日までの進み具合。締めると額が確定します"
 
     static func days(
         until date: LocalDate,
@@ -28,22 +29,22 @@ enum BillText {
         "\(month.month)月払い"
     }
 
-    static func total(of page: BillPage) -> String {
-        let amount = AmountText.text(page.total)
-        return page.isOpen ? "今のところ \(amount)" : "合計 \(amount)"
+    static func count(of page: BillPage) -> String {
+        let count = "\(page.bills.count) 件"
+
+        switch page.openCount {
+        case 0: return count
+        case page.bills.count: return "\(count) · すべて\(estimate)"
+        case let open: return "\(count) · \(open) 件は\(estimate)"
+        }
     }
 
-    static func closing(
-        of bill: CardBill,
-        today: LocalDate
-    ) -> String? {
+    static func estimate(of bill: CardBill) -> String {
         guard let closing = bill.period?.upperBound else {
-            return nil
+            return estimate
         }
 
-        let days = Self.days(until: closing, today: today)
-
-        return "\(closing.monthDayText) 締め · \(days)で決まる"
+        return "\(estimate) · \(closing.monthDayText) 締め"
     }
 
     static func balance(_ bill: CardBill) -> String {

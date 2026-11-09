@@ -16,6 +16,10 @@ public extension BillPage {
         bills.contains(where: \.isOpen)
     }
 
+    var openCount: Int {
+        bills.filter(\.isOpen).count
+    }
+
     static func pages(of bills: [CardBill]) -> [BillPage] {
         guard let first = bills.map(\.month).min() else {
             return []

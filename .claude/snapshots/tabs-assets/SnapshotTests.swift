@@ -59,9 +59,7 @@ struct SnapshotTests {
 
             model.billPage = 0
 
-            let card = try #require(model.rows.first { $0.unpaid != nil })
-            let unpaid = try #require(card.unpaid)
-            let content = AssetsEntrySheet.Content.unpaid(unpaid, of: card)
+            let content = AssetsEntrySheet.Content.unpaid(of: model.rows)
 
             let unpaidSheet = AssetsEntrySheet(content: content) { _ in }
                 .frame(height: 1200)

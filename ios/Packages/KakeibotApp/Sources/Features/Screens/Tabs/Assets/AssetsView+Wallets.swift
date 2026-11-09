@@ -3,55 +3,6 @@ import DesignSystem
 import SwiftUI
 
 extension AssetsView {
-    var billCard: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if model.billPages.count > 1,
-               let page = model.shownBillPage {
-                ViewThatFits(in: .horizontal) {
-                    CardHeader(Self.billTitle) {
-                        billStepper(page)
-                    }
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        CardHeader(Self.billTitle)
-
-                        billStepper(page)
-                    }
-                }
-            } else {
-                CardHeader(Self.billTitle)
-            }
-
-            if let page = model.shownBillPage {
-                Text(BillText.total(of: page))
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .padding(.bottom, 8)
-            }
-
-            VStack(spacing: 12) {
-                ForEach(model.shownUpcomingBills) { row in
-                    Button {
-                        onOpenRecurring(row.id)
-                    } label: {
-                        billRow(row)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .pageSlide(billSlide, page: model.shownBillPage?.month)
-            .sharesTextScale(id: model.upcomingBills.map(\.source))
-        }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 16)
-        .card()
-        .onPageSwipe(following: $billSlide, canMove: canMoveBillPage) { direction in
-            moveBillPage(by: Self.billCount(of: direction))
-        }
-        .haptic(.selection, trigger: model.billPage)
-    }
-
     func walletGroup(
         _ title: String,
         sections: [AssetsModel.WalletSection],
@@ -131,6 +82,10 @@ private extension AssetsView {
                 }
                 .buttonStyle(.plain)
             }
+
+            if section.role == .card {
+                unpaidLink(of: section.rows)
+            }
         }
         .padding(.bottom, 4)
         .sharesTextScale(id: section.rows.map(\.wallet.name))
@@ -138,20 +93,21 @@ private extension AssetsView {
 
     func walletRow(_ row: AssetsModel.WalletRow) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top, spacing: 12) {
-                IconBadge(row.icon, size: 32)
+            HStack(spacing: 12) {
+                HStack(alignment: .top, spacing: 12) {
+                    IconBadge(row.icon, size: 32)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    walletLine(row)
+                    VStack(alignment: .leading, spacing: 4) {
+                        walletLine(row)
 
-                    debtDetail(of: row)
+                        debtDetail(of: row)
+                    }
+                    .frame(minHeight: 32)
                 }
-                .frame(minHeight: 32)
 
                 Image(systemName: "chevron.right")
                     .sansFont(.small)
                     .foregroundStyle(Palette.hint)
-                    .frame(height: 32)
             }
 
             if row.needsAdjustment {
@@ -323,120 +279,48 @@ private extension AssetsView {
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    func billStepper(_ page: BillPage) -> some View {
-        BillPageStepper(
-            month: page.month,
-            canMoveBackward: model.canMoveBillPage(by: -1),
-            canMoveForward: model.canMoveBillPage(by: 1)
-        ) { count in
-            moveBillPage(by: count)
-        }
-    }
+    @ViewBuilder
+    func unpaidLink(of rows: [AssetsModel.WalletRow]) -> some View {
+        let count = rows.compactMap(\.unpaid).reduce(0) { $0 + $1.count }
 
-    func billChip(_ bill: CardBill) -> some View {
-        let shape = Capsule()
-        let fill = bill.isOpen ? Color.clear : Palette.accent.opacity(.faint)
-        let stroke = bill.isOpen ? Palette.accent.opacity(.medium) : Color.clear
+        if count > 0 {
+            Button {
+                entrySheet = .unpaid(of: rows)
+            } label: {
+                HStack(spacing: 4) {
+                    Label(
+                        "未払いの記録を見る（\(count) 件）",
+                        systemImage: "list.bullet"
+                    )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
-        return HStack(alignment: .firstTextBaseline, spacing: 4) {
-            Text(Recurring.billText(paidOn: bill.date))
-                .textFont(.caption)
-                .monospacedDigit()
-                .foregroundStyle(Palette.subtext)
-
-            AmountText(
-                bill.amount,
-                font: .style(.caption, weight: .semibold),
-                color: Palette.text
-            )
-
-            if bill.isOpen {
-                Text(BillText.openTag)
-                    .textFont(.caption2, weight: .semibold)
-                    .foregroundStyle(Palette.accent)
-            }
-        }
-        .lineLimit(1)
-        .fixedSize()
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(fill, in: shape)
-        .overlay {
-            shape
-                .strokeBorder(stroke, style: .dashed)
-        }
-    }
-
-    func billRow(_ row: AssetsModel.UpcomingBill) -> some View {
-        BillRow(
-            row.bill,
-            title: row.title,
-            source: row.source,
-            today: model.today,
-            style: .detailed
-        ) {
-            if let moves = Self.movesText(of: row) {
-                Button {
-                    entrySheet = .moved(row)
-                } label: {
-                    HStack(spacing: 4) {
-                        Label(
-                            moves,
-                            systemImage: "arrow.uturn.right"
-                        )
-                        .lineLimit(2)
-
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .bold)
-                    }
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.accent)
-                    .padding(.vertical, 4)
-                    .contentShape(.rect)
+                    Image(systemName: "chevron.right")
+                        .sansFont(.micro, weight: .bold)
                 }
-                .buttonStyle(.plain)
+                .textFont(.caption2)
+                .foregroundStyle(Palette.accent)
+                .padding(.leading, 44)
+                .padding(.vertical, 8)
+                .contentShape(.rect)
             }
+            .buttonStyle(.plain)
         }
     }
 }
 
 private extension AssetsView {
-    static let billTitle = "これからの引き落とし"
     static let nameMinWidth: CGFloat = 64
     static let labeledNameMinWidth: CGFloat = 48
 
     @ViewBuilder
     func debtDetail(of row: AssetsModel.WalletRow) -> some View {
+        let bills = row.bills.filter { $0.amount > 0 }
+
         if row.wallet.kind == .card,
-           !row.bills.isEmpty {
-            RowOrColumnLayout(rowSpacing: 8, columnSpacing: 4) {
-                ForEach(row.bills, id: \.self) { bill in
-                    billChip(bill)
-                }
-            }
-
-            if let unpaid = row.unpaid {
-                Button {
-                    entrySheet = .unpaid(unpaid, of: row)
-                } label: {
-                    HStack(spacing: 4) {
-                        Label(
-                            "未払いの記録を見る（\(unpaid.count) 件）",
-                            systemImage: "list.bullet"
-                        )
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .bold)
-                    }
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.accent)
-                    .padding(.vertical, 4)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
+           !bills.isEmpty {
+            AssetsBillSchedule(bills: bills)
+                .padding(.top, 4)
         }
 
         if let ratio = row.repaidRatio,
@@ -510,22 +394,6 @@ private extension AssetsView {
         return "あと \(payoff.count) 回 · \(String(date.year))/\(date.month) まで"
     }
 
-    static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
-        let movedIn = row.movedIn.count
-        let movedOut = row.movedOut.count
-        let inText = movedIn > 0 ? ["前から \(movedIn) 件"] : []
-        let outText = movedOut > 0 ? ["後へ \(movedOut) 件"] : []
-        let parts = inText + outText
-        return parts.isEmpty ? nil : parts.joined(separator: "・")
-    }
-
-    static func billCount(of direction: PageSwipeDirection) -> Int {
-        switch direction {
-        case .forward: 1
-        case .backward: -1
-        }
-    }
-
     func plainNote(of row: AssetsModel.WalletRow) -> String? {
         if let repayment = row.repayment {
             return Self.repaymentText(repayment)
@@ -539,19 +407,5 @@ private extension AssetsView {
         }
 
         return "引き落としは未設定"
-    }
-
-    func canMoveBillPage(_ direction: PageSwipeDirection) -> Bool {
-        model.canMoveBillPage(by: Self.billCount(of: direction))
-    }
-
-    func moveBillPage(by count: Int) {
-        guard model.canMoveBillPage(by: count) else {
-            return
-        }
-
-        PageSlide.run($billSlide, forward: count > 0) {
-            model.moveBillPage(by: count)
-        }
     }
 }

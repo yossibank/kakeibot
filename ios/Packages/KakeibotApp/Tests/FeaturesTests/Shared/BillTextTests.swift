@@ -51,24 +51,35 @@ struct BillTextTests {
     }
 
     @Test
-    func namesPageAndTotal() throws {
+    func namesPage() throws {
         let month = try #require(YearMonth("2026-11"))
-        let closed = try Self.bill(amount: 48200, balanceBefore: 0)
-        let open = try Self.bill(amount: 17500, balanceBefore: 0, isOpen: true)
-        let closedPage = BillPage(month: month, bills: [closed])
-        let openPage = BillPage(month: month, bills: [open])
-
         #expect(BillText.page(month) == "11月払い")
-        #expect(BillText.total(of: closedPage) == "合計 ¥48,200")
-        #expect(BillText.total(of: openPage) == "今のところ ¥17,500")
+    }
+
+    @Test(arguments: [
+        ([false, false], "2 件"),
+        ([true, false], "2 件 · 1 件は見込み"),
+        ([true, true], "2 件 · すべて見込み")
+    ])
+    func countsBillsAndEstimates(opens: [Bool], expected: String) throws {
+        let month = try #require(YearMonth("2026-11"))
+        let bills = try opens.map { isOpen in
+            try Self.bill(amount: 1000, balanceBefore: 0, isOpen: isOpen)
+        }
+        let page = BillPage(month: month, bills: bills)
+        #expect(BillText.count(of: page) == expected)
     }
 
     @Test
-    func namesClosingOfOpenBill() throws {
-        let today = try #require(LocalDate("2026-09-09"))
+    func namesEstimateWithClosingDate() throws {
         let bill = try Self.bill(amount: 12400, balanceBefore: 0, closingDay: 31)
-        let text = BillText.closing(of: bill, today: today)
-        #expect(text == "9/30 締め · あと 21 日で決まる")
+        #expect(BillText.estimate(of: bill) == "見込み · 9/30 締め")
+    }
+
+    @Test
+    func namesEstimateWithoutClosingDate() throws {
+        let bill = try Self.bill(amount: 12400, balanceBefore: 0)
+        #expect(BillText.estimate(of: bill) == "見込み")
     }
 
     @Test(arguments: [

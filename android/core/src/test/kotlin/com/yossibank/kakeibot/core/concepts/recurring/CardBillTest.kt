@@ -371,6 +371,48 @@ class CardBillTest {
         )
     }
 
+    @Test
+    fun measuresProgressThroughBillingPeriod() {
+        val now = Instant.ofEpochSecond(1_791_000_000)
+        val bank = wallet(kind = Wallet.Kind.bank, balance = 0, at = now)
+        val card = wallet(kind = Wallet.Kind.card, balance = 0, at = now)
+
+        val bill = CardBill(
+            recurring = recurring(from = bank.id, to = card.id, amount = 0, day = 26, closingDay = 15),
+            date = date("2026-11-26"),
+            amount = 0,
+            balanceBefore = 0,
+        )
+
+        val cases = listOf(
+            "2026-10-15" to 0.0,
+            "2026-10-16" to 1.0 / 31,
+            "2026-10-31" to 16.0 / 31,
+            "2026-11-15" to 1.0,
+            "2026-11-20" to 1.0,
+        )
+
+        for ((day, expected) in cases) {
+            assertEquals(expected, bill.progress(on = date(day)), 0.0001)
+        }
+    }
+
+    @Test
+    fun treatsBillWithoutClosingDayAsDone() {
+        val now = Instant.ofEpochSecond(1_791_000_000)
+        val bank = wallet(kind = Wallet.Kind.bank, balance = 0, at = now)
+        val card = wallet(kind = Wallet.Kind.card, balance = 0, at = now)
+
+        val bill = CardBill(
+            recurring = recurring(from = bank.id, to = card.id, amount = 30000, day = 27),
+            date = date("2026-11-27"),
+            amount = 30000,
+            balanceBefore = 0,
+        )
+
+        assertEquals(1.0, bill.progress(on = date("2026-11-01")))
+    }
+
     private data class Bill(
         val from: Identifier<Wallet>,
         val to: Identifier<Wallet>,

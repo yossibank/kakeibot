@@ -88,6 +88,18 @@ public extension CardBill {
                 )
             }
     }
+
+    func progress(on today: LocalDate) -> Double {
+        guard let period else {
+            return 1
+        }
+
+        let length = period.lowerBound.days(until: period.upperBound) + 1
+        let passed = period.lowerBound.days(until: today) + 1
+        let progress = Double(passed) / Double(length)
+
+        return min(max(progress, 0), 1)
+    }
 }
 
 private extension CardBill {
