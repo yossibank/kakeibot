@@ -6,17 +6,20 @@ extension HomeView {
     var billCard: some View {
         VStack(alignment: .leading, spacing: 0) {
             if let page = model.shownBillPage {
-                ViewThatFits(in: .horizontal) {
-                    CardHeader(Self.billTitle, note: BillText.total(of: page))
-                    CardHeader(Self.billTitle, note: AmountText.text(page.total))
-                }
+                CardHeader(Self.billTitle)
 
-                if model.billPages.count > 1 {
-                    billPager(page)
+                BillTabs(pages: model.billPages, current: model.billPage) { index in
+                    moveBillPage(by: index - model.billPage)
                 }
+                .padding(.bottom, 4)
 
                 billList(page)
                     .pageSlide(billSlide, page: page.month)
+
+                if page.isOpen {
+                    BillProgressNote()
+                        .padding(.vertical, 8)
+                }
             } else {
                 CardHeader(Self.billTitle)
 
@@ -38,23 +41,6 @@ extension HomeView {
 }
 
 private extension HomeView {
-    func billPager(_ page: BillPage) -> some View {
-        HStack(spacing: 8) {
-            BillPageStepper(
-                month: page.month,
-                canMoveBackward: model.canMoveBillPage(by: -1),
-                canMoveForward: model.canMoveBillPage(by: 1)
-            ) { count in
-                moveBillPage(by: count)
-            }
-
-            Spacer(minLength: 8)
-
-            PageDots(count: model.billPages.count, current: model.billPage)
-        }
-        .padding(.bottom, 4)
-    }
-
     func billList(_ page: BillPage) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(page.bills, id: \.recurring.id) { bill in
@@ -73,20 +59,6 @@ private extension HomeView {
                 .overlay(alignment: .top) {
                     Hairline(thickness: 1)
                 }
-            }
-
-            if page.isOpen {
-                Text(BillText.openNote)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background(
-                        Palette.accent.opacity(.faint),
-                        in: .rect(cornerRadius: corner.radius(12))
-                    )
-                    .padding(.vertical, 8)
             }
         }
     }

@@ -18,6 +18,7 @@ struct BillPageTests {
         #expect(pages.map(\.month) == [YearMonth("2026-10"), YearMonth("2026-11")])
         #expect(pages.map(\.total) == [30000, 20000])
         #expect(pages.map(\.isOpen) == [false, true])
+        #expect(pages.map(\.openCount) == [0, 2])
     }
 
     @Test

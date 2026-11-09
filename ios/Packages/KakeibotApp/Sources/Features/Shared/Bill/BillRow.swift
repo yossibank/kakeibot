@@ -92,44 +92,39 @@ private extension BillRow {
         HStack(spacing: 12) {
             FlipDate(bill.date, isCompact: true)
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    titleText
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        titleText
 
-                    if bill.isOpen {
-                        openTag
+                        sourceLine
+
+                        if isShort {
+                            shortageText
+                        }
                     }
 
-                    Spacer(minLength: 8)
+                    Spacer(minLength: 0)
 
-                    amountText
+                    amountAndStatus
                 }
 
-                if bill.isOpen,
-                   let closing = BillText.closing(of: bill, today: today) {
-                    Text(closing)
-                        .textFont(.caption2)
-                        .foregroundStyle(Palette.subtext)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                } else {
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(BillText.source(source))
-                            .foregroundStyle(Palette.subtext)
-                            .lineLimit(1)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        titleText
 
-                        Text("·")
-                            .foregroundStyle(Palette.subtext)
+                        Spacer(minLength: 0)
 
-                        Text(daysText)
-                            .foregroundStyle(Palette.accent)
-                            .fixedSize()
+                        amountText
                     }
-                    .textFont(.caption2)
-                }
 
-                if isShort {
-                    shortageText
+                    sourceLine
+
+                    BillStatus(bill: bill, today: today)
+
+                    if isShort {
+                        shortageText
+                    }
                 }
             }
         }
@@ -142,44 +137,22 @@ private extension BillRow {
             FlipDate(bill.date)
 
             VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .firstTextBaseline) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        if bill.isOpen {
-                            ViewThatFits(in: .horizontal) {
-                                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                                    detailedTitle
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        detailedTitle(showsStatus: false)
 
-                                    openTag
-                                }
+                        Spacer(minLength: 0)
 
-                                VStack(alignment: .leading, spacing: 4) {
-                                    detailedTitle
-
-                                    openTag
-                                }
-                            }
-                        } else {
-                            detailedTitle
-                        }
-
-                        if let period = bill.period {
-                            ViewThatFits(in: .horizontal) {
-                                Text("\(RecurringText.period(period)) の利用分")
-                                Text(RecurringText.period(period))
-                                Text("\(period.upperBound.monthDayText) 締め")
-                            }
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                        }
-
-                        moves
+                        amountAndStatus
                     }
 
-                    Spacer(minLength: 8)
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        detailedTitle(showsStatus: true)
 
-                    amountText
+                        Spacer(minLength: 0)
+
+                        amountText
+                    }
                 }
 
                 balanceBar
@@ -212,13 +185,6 @@ private extension BillRow {
         .contentShape(.rect)
     }
 
-    var detailedTitle: some View {
-        Text(title)
-            .textFont(.subheadline)
-            .foregroundStyle(Palette.text)
-            .lineLimit(2)
-    }
-
     var titleText: some View {
         Text(title)
             .textFont(.subheadline)
@@ -226,23 +192,39 @@ private extension BillRow {
             .sharedTextScale()
     }
 
-    var openTag: some View {
-        Text(BillText.openTag)
-            .textFont(.caption2, weight: .semibold)
-            .foregroundStyle(Palette.accent)
-            .fixedSize()
-            .padding(.horizontal, 8)
-            .padding(.vertical, 2)
-            .overlay {
-                Capsule()
-                    .strokeBorder(Palette.accent, lineWidth: 1)
-            }
+    var sourceLine: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
+            Text(BillText.source(source))
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+
+            Text("·")
+                .foregroundStyle(Palette.subtext)
+
+            Text(daysText)
+                .foregroundStyle(Palette.accent)
+                .fixedSize()
+        }
+        .textFont(.caption2)
+    }
+
+    var amountAndStatus: some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            amountText
+
+            BillStatus(bill: bill, today: today)
+        }
+        .layoutPriority(1)
     }
 
     var amountText: some View {
-        AmountText(bill.amount, font: .size(.headline), color: Palette.accentStrong)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
+        AmountText(
+            bill.amount,
+            font: .size(.headline),
+            color: bill.isOpen ? Palette.accent : Palette.accentStrong
+        )
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
     }
 
     var shortageText: some View {
@@ -266,5 +248,33 @@ private extension BillRow {
             }
         }
         .frame(height: 4)
+    }
+
+    func detailedTitle(showsStatus: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+                .lineLimit(2)
+
+            if let period = bill.period {
+                ViewThatFits(in: .horizontal) {
+                    Text("\(RecurringText.period(period)) の利用分")
+                    Text(RecurringText.period(period))
+                    Text("\(period.upperBound.monthDayText) 締め")
+                }
+                .textFont(.caption2)
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            }
+
+            if showsStatus {
+                BillStatus(bill: bill, today: today)
+                    .padding(.top, 2)
+            }
+
+            moves
+        }
     }
 }

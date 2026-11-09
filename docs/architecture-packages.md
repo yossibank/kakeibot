@@ -180,7 +180,7 @@ KakeibotApp/
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート |
-| `Features/Shared/Bill/` | これからの引き落としの行・月のページと送る行と、その言葉 |
+| `Features/Shared/Bill/` | これからの引き落としの行・月のページとタブ・見込みと確定の印と、その言葉 |
 | `Features/Shared/DateChoice/` | 月の始まりの日・休日のずらし・曜日を選ぶ部品と、その表示の名前 |
 | `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |
