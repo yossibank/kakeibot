@@ -21,13 +21,15 @@ public extension BillPage {
     }
 
     static func pages(of bills: [CardBill]) -> [BillPage] {
-        guard let first = bills.map(\.month).min() else {
+        let charged = bills.filter { $0.amount > 0 }
+
+        guard let first = charged.map(\.month).min() else {
             return []
         }
 
         return (0..<limit).compactMap { offset in
             let month = first.adding(months: offset)
-            let members = bills.filter { $0.month == month }
+            let members = charged.filter { $0.month == month }
 
             return members.isEmpty ? nil : BillPage(month: month, bills: members)
         }
