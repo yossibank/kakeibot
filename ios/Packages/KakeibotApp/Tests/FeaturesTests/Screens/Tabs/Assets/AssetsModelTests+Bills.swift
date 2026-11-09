@@ -64,11 +64,11 @@ extension AssetsModelTests {
         #expect(unpaid.later.map(\.amount) == [800])
         #expect(unpaid.total == 42800)
 
-        model.moveBillPage(by: 1)
+        model.billPage = 1
 
         #expect(model.upcomingBillTotal == 17000)
         #expect(model.shownBillPage?.isOpen == true)
-        #expect(model.canMoveBillPage(by: 1) == false)
+        #expect(model.billPages.count == 2)
     }
 
     @Test
