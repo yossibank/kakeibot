@@ -4,7 +4,6 @@ import DesignSystem
 enum BillText {
     static let estimate = "見込み"
     static let settled = "確定"
-    static let progressNote = "輪は締め日までの進み具合。締めると額が確定します"
 
     static func days(
         until date: LocalDate,

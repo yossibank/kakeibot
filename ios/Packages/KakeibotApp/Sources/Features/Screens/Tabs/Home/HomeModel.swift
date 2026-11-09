@@ -132,22 +132,6 @@ public extension HomeModel {
         HomeLayout(order: homeSections, hidden: homeHiddenSections)
     }
 
-    var shownBillPage: BillPage? {
-        BillPage.page(billPage, in: billPages)
-    }
-
-    func canMoveBillPage(by count: Int) -> Bool {
-        billPages.indices.contains(billPage + count)
-    }
-
-    func moveBillPage(by count: Int) {
-        guard canMoveBillPage(by: count) else {
-            return
-        }
-
-        billPage += count
-    }
-
     func run() async {
         await loadTemplateOrder()
         await loadHomeLayout()
