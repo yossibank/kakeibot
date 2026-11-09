@@ -9,6 +9,8 @@ public struct AssetsView: View {
     @State var isShowingReward = false
     @State var isAddingGoal = false
     @State var isAddingWallet = false
+    @State var isShowingPlans = false
+    @State var addingKind = Wallet.Kind.cash
     @State var adjusting: AssetsModel.WalletRow?
     @State var billSlide = PageSlide()
 
@@ -54,10 +56,8 @@ public struct AssetsView: View {
                     ownedCard
                         .layoutColumn(.trailing)
 
-                    if !owedSections.isEmpty {
-                        walletGroup("負債", sections: owedSections)
-                            .layoutColumn(.trailing)
-                    }
+                    owedCard
+                        .layoutColumn(.trailing)
 
                     rewardCard
                         .padding(.top, 12)
@@ -77,10 +77,20 @@ public struct AssetsView: View {
             AssetsGoalSheet(model: model.goalEditModel(editing: nil))
         }
         .sheet(isPresented: $isAddingWallet) {
-            WalletEditSheet(model: WalletEditModel(database: model.database))
+            WalletEditSheet(
+                model: WalletEditModel(
+                    database: model.database,
+                    kind: addingKind
+                )
+            )
         }
         .sheet(item: $adjusting) { row in
             AssetsAdjustSheet(model: model.adjustModel(for: row))
+        }
+        .sheet(isPresented: $isShowingPlans, onDismiss: openPendingEntry) {
+            AssetsPlanSheet(model: model) { id in
+                pendingEntry = id
+            }
         }
         .sheet(item: $entrySheet, onDismiss: openPendingEntry) { content in
             AssetsEntrySheet(content: content) { id in
@@ -117,8 +127,22 @@ private extension AssetsView {
     }
 
     var ownedCard: some View {
-        walletGroup("資産", sections: ownedSections) {
-            isAddingWallet = true
+        walletGroup(
+            "資産",
+            sections: ownedSections,
+            addNote: "現金・銀行・投資など"
+        ) {
+            addWallet(.cash)
+        }
+    }
+
+    var owedCard: some View {
+        walletGroup(
+            "負債",
+            sections: owedSections,
+            addNote: "カード・借入"
+        ) {
+            addWallet(.card)
         }
     }
 
@@ -145,6 +169,10 @@ private extension AssetsView {
                 .foregroundStyle(Palette.subtext)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+
+            if !model.plans.isEmpty {
+                planButton
+            }
 
             if model.showsNetWorth {
                 netWorthRow
@@ -339,6 +367,11 @@ private extension AssetsView {
 
     func monthColor(_ month: YearMonth) -> Color {
         month == model.currentMonth ? Palette.accent : Palette.hint
+    }
+
+    func addWallet(_ kind: Wallet.Kind) {
+        addingKind = kind
+        isAddingWallet = true
     }
 
     func openPendingEntry() {

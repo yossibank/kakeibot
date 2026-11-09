@@ -42,10 +42,16 @@ public final class WalletEditModel {
 
     public init(
         database: AppDatabase,
-        editing id: Wallet.ID? = nil
+        editing id: Wallet.ID? = nil,
+        kind: Wallet.Kind = .cash
     ) {
         self.database = database
         self.editingId = id
+        self.kind = kind
+        self.isNegative = kind.isDebt
+
+        icon.glyph = Self.glyph(for: kind)
+
         self.baseline = draft
     }
 }

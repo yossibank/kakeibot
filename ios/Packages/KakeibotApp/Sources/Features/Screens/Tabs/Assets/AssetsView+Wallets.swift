@@ -55,7 +55,8 @@ extension AssetsView {
     func walletGroup(
         _ title: String,
         sections: [AssetsModel.WalletSection],
-        onAdd: (() -> Void)? = nil
+        addNote: String,
+        onAdd: @escaping () -> Void
     ) -> some View {
         let rows = sections.flatMap(\.rows)
         let total = rows.reduce(0) { $0 + $1.balance }
@@ -87,12 +88,10 @@ extension AssetsView {
                     }
             }
 
-            if let onAdd {
-                addWalletRow(action: onAdd)
-                    .overlay(alignment: .top) {
-                        Hairline(thickness: 1)
-                    }
-            }
+            addWalletRow(note: addNote, action: onAdd)
+                .overlay(alignment: .top) {
+                    Hairline(thickness: 1)
+                }
         }
         .padding(.horizontal, 16)
         .card()
@@ -209,7 +208,10 @@ private extension AssetsView {
         )
     }
 
-    func addWalletRow(action: @escaping () -> Void) -> some View {
+    func addWalletRow(
+        note: String,
+        action: @escaping () -> Void
+    ) -> some View {
         let shape = RoundedRectangle(cornerRadius: corner.radius(32 * 0.3), style: .continuous)
 
         return Button(action: action) {
@@ -232,7 +234,7 @@ private extension AssetsView {
                         .textFont(.subheadline, weight: .semibold)
                         .foregroundStyle(Palette.accentStrong)
 
-                    Text("現金・銀行・カードなど")
+                    Text(note)
                         .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                 }
