@@ -61,6 +61,13 @@ struct SnapshotTests {
 
             try Self.write(unpaidSheet, variant: variant, to: "assets-unpaid")
 
+            let plans = AssetsPlanSheet(model: model) { _ in }.content
+                .padding(.horizontal, 20)
+                .padding(.top, 28)
+                .background(Palette.panel)
+
+            try Self.write(plans, variant: variant, to: "assets-plans")
+
             let wallet = try #require(model.rows.first)
 
             for (name, keys) in [
@@ -213,6 +220,27 @@ private extension SnapshotTests {
                 type: .expense,
                 amount: 9_876_543,
                 date: today.adding(days: -1),
+                categoryId: category.id,
+                walletId: wallet.id
+            ),
+            EntryDraft(
+                type: .expense,
+                amount: 4000,
+                date: today.adding(days: 7),
+                categoryId: category.id,
+                walletId: wallet.id
+            ),
+            EntryDraft(
+                type: .income,
+                amount: 250_000,
+                date: today.adding(days: 14),
+                categoryId: options.incomeCategories.first?.id,
+                walletId: wallet.id
+            ),
+            EntryDraft(
+                type: .expense,
+                amount: 12500,
+                date: today.adding(days: 21),
                 categoryId: category.id,
                 walletId: wallet.id
             )

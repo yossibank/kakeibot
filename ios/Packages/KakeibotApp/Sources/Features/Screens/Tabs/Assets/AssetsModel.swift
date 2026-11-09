@@ -20,6 +20,7 @@ public final class AssetsModel: ScreenModel {
     public private(set) var rows: [WalletRow] = []
     public private(set) var upcomingBills: [UpcomingBill] = []
     public private(set) var monthTotals: [MonthTotal] = []
+    public private(set) var plans: [Plan] = []
 
     public private(set) var monthStartDay: MonthStartDay = .first {
         didSet {
@@ -169,6 +170,7 @@ private extension AssetsModel {
         upcomingBills = makeUpcomingBills()
         rows = makeRows()
         monthTotals = makeMonthTotals()
+        plans = makePlans(in: wallets)
     }
 
     func makeHoldings() -> Holdings {
