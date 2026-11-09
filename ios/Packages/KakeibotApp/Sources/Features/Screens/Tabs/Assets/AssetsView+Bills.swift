@@ -5,13 +5,15 @@ import SwiftUI
 extension AssetsView {
     var billCard: some View {
         VStack(alignment: .leading, spacing: 0) {
-            CardHeader(Self.billTitle)
+            CardHeader(Self.billTitle, note: BillText.note(of: model.billPages))
 
             if !model.billPages.isEmpty {
-                BillTabs(pages: model.billPages, current: model.billPage) { index in
-                    model.billPage = index
+                if model.billPages.count > 1 {
+                    BillTabs(pages: model.billPages, current: model.billPage) { index in
+                        model.billPage = index
+                    }
+                    .padding(.bottom, 12)
                 }
-                .padding(.bottom, 12)
 
                 BillPager(
                     current: $model.billPage,

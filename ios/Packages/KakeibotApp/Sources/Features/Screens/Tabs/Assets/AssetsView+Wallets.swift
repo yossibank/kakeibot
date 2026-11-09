@@ -301,7 +301,8 @@ private extension AssetsView {
                 .textFont(.caption2)
                 .foregroundStyle(Palette.accent)
                 .padding(.leading, 44)
-                .padding(.vertical, 8)
+                .padding(.top, -4)
+                .padding(.bottom, 4)
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
@@ -319,8 +320,11 @@ private extension AssetsView {
 
         if row.wallet.kind == .card,
            !bills.isEmpty {
-            AssetsBillSchedule(bills: bills)
-                .padding(.top, 4)
+            AssetsBillSchedule(
+                bills: bills,
+                showsAmounts: Self.showsBillAmounts(bills, balance: row.balance)
+            )
+            .padding(.top, 2)
         }
 
         if let ratio = row.repaidRatio,
@@ -350,6 +354,13 @@ private extension AssetsView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
+    }
+
+    static func showsBillAmounts(
+        _ bills: [CardBill],
+        balance: Int
+    ) -> Bool {
+        bills.count > 1 || bills.first?.amount != -balance
     }
 
     static func title(of role: Wallet.Kind.Role) -> String {

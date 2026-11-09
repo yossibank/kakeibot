@@ -4,6 +4,7 @@ import SwiftUI
 
 struct AssetsBillSchedule: View {
     let bills: [CardBill]
+    let showsAmounts: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -26,7 +27,7 @@ struct AssetsBillSchedule: View {
                 }
                 .lineLimit(1)
                 .monospacedDigit()
-                .frame(minHeight: 26)
+                .frame(minHeight: 22)
             }
         }
     }
@@ -84,12 +85,14 @@ private extension AssetsBillSchedule {
 
             Spacer(minLength: 8)
 
-            AmountText(
-                bill.amount,
-                font: .style(.caption, weight: .semibold),
-                color: bill.isOpen ? Palette.subtext : Palette.text
-            )
-            .fixedSize()
+            if showsAmounts {
+                AmountText(
+                    bill.amount,
+                    font: .style(.caption, weight: .semibold),
+                    color: bill.isOpen ? Palette.subtext : Palette.text
+                )
+                .fixedSize()
+            }
         }
     }
 

@@ -22,6 +22,25 @@ struct BillPageTests {
     }
 
     @Test
+    func leavesOutBillsWithNothingToPay() throws {
+        let bills = try [
+            Self.bill(on: "2026-11-26", amount: 0),
+            Self.bill(on: "2026-11-27", amount: 48200),
+            Self.bill(on: "2026-12-26", amount: 0, isOpen: true),
+            Self.bill(on: "2026-12-27", amount: 0, isOpen: true)
+        ]
+
+        let zero = try Self.bill(on: "2026-12-26", amount: 0, isOpen: true)
+
+        let pages = BillPage.pages(of: bills)
+
+        #expect(pages.map(\.month) == [YearMonth("2026-11")])
+        #expect(pages.map(\.bills.count) == [1])
+        #expect(pages.map(\.total) == [48200])
+        #expect(BillPage.pages(of: [zero]).isEmpty)
+    }
+
+    @Test
     func keepsLastPageForIndexOutOfRange() throws {
         let bills = try [
             Self.bill(on: "2026-10-26", amount: 30000),
