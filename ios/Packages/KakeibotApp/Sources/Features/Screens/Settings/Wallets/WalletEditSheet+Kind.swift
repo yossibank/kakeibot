@@ -67,6 +67,7 @@ extension WalletEditSheet {
                     .foregroundStyle(Palette.hint)
             }
             .lineLimit(1)
+            .minimumScaleFactor(0.8)
             .padding(.leading, 8)
 
             LazyVGrid(columns: Self.kindColumns, spacing: 8) {
