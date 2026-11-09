@@ -118,18 +118,6 @@ public extension AssetsModel {
         )
     }
 
-    func canMoveBillPage(by count: Int) -> Bool {
-        billPages.indices.contains(billPage + count)
-    }
-
-    func moveBillPage(by count: Int) {
-        guard canMoveBillPage(by: count) else {
-            return
-        }
-
-        billPage += count
-    }
-
     func run() async {
         await withDiscardingTaskGroup { group in
             group.addTask {
