@@ -9,41 +9,30 @@ extension AssetsView {
 
             if !model.billPages.isEmpty {
                 BillTabs(pages: model.billPages, current: model.billPage) { index in
-                    moveBillPage(by: index - model.billPage)
+                    model.billPage = index
                 }
                 .padding(.bottom, 12)
-            }
 
-            VStack(spacing: 12) {
-                ForEach(model.shownUpcomingBills) { row in
-                    Button {
-                        onOpenRecurring(row.id)
-                    } label: {
-                        billRow(row)
-                    }
-                    .buttonStyle(.plain)
+                BillPager(
+                    current: $model.billPage,
+                    pages: model.billPages,
+                    inset: Self.billInset
+                ) { page in
+                    billList(page)
                 }
-            }
-            .pageSlide(billSlide, page: model.shownBillPage?.month)
-            .sharesTextScale(id: model.upcomingBills.map(\.source))
-
-            if model.shownBillPage?.isOpen == true {
-                BillProgressNote()
-                    .padding(.top, 12)
+                .sharesTextScale(id: model.upcomingBills.map(\.source))
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, Self.billInset)
         .padding(.bottom, 16)
         .card()
-        .onPageSwipe(following: $billSlide, canMove: canMoveBillPage) { direction in
-            moveBillPage(by: Self.billCount(of: direction))
-        }
         .haptic(.selection, trigger: model.billPage)
     }
 }
 
 private extension AssetsView {
     static let billTitle = "これからの引き落とし"
+    static let billInset: CGFloat = 16
 
     static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
         let movedIn = row.movedIn.count
@@ -53,20 +42,22 @@ private extension AssetsView {
         let parts = inText + outText
         return parts.isEmpty ? nil : parts.joined(separator: "・")
     }
-
-    static func billCount(of direction: PageSwipeDirection) -> Int {
-        switch direction {
-        case .forward: 1
-        case .backward: -1
-        }
-    }
-
-    func canMoveBillPage(_ direction: PageSwipeDirection) -> Bool {
-        model.canMoveBillPage(by: Self.billCount(of: direction))
-    }
 }
 
 private extension AssetsView {
+    func billList(_ page: BillPage) -> some View {
+        VStack(spacing: 12) {
+            ForEach(model.upcomingBills(in: page.month)) { row in
+                Button {
+                    onOpenRecurring(row.id)
+                } label: {
+                    billRow(row)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
     func billRow(_ row: AssetsModel.UpcomingBill) -> some View {
         BillRow(
             row.bill,
@@ -96,18 +87,6 @@ private extension AssetsView {
                 }
                 .buttonStyle(.plain)
             }
-        }
-    }
-}
-
-private extension AssetsView {
-    func moveBillPage(by count: Int) {
-        guard model.canMoveBillPage(by: count) else {
-            return
-        }
-
-        PageSlide.run($billSlide, forward: count > 0) {
-            model.moveBillPage(by: count)
         }
     }
 }

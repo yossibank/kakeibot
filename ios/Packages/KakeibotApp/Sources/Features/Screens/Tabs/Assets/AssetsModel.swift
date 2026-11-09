@@ -98,12 +98,15 @@ public extension AssetsModel {
     }
 
     var shownUpcomingBills: [UpcomingBill] {
-        let month = shownBillPage?.month
-        return upcomingBills.filter { $0.bill.month == month }
+        shownBillPage.map { upcomingBills(in: $0.month) } ?? []
     }
 
     var upcomingBillTotal: Int {
         shownBillPage?.total ?? 0
+    }
+
+    func upcomingBills(in month: YearMonth) -> [UpcomingBill] {
+        upcomingBills.filter { $0.bill.month == month }
     }
 
     func adjustModel(for row: WalletRow) -> AssetsAdjustModel {
