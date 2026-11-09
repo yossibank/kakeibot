@@ -49,6 +49,7 @@ extension AssetsPlanSheet {
             }
             .padding(.horizontal, 16)
             .card()
+            .sharesTextScale(id: model.plans)
 
             total
         }
@@ -119,8 +120,7 @@ private extension AssetsPlanSheet {
                 Text(plan.title)
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .sharedTextScale()
 
                 Text(caption(of: plan))
                     .textFont(.caption)
