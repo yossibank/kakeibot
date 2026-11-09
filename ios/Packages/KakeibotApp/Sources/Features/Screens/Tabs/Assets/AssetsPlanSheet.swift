@@ -121,17 +121,10 @@ private extension AssetsPlanSheet {
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
 
-                HStack(spacing: 0) {
-                    if let wallet = plan.wallet {
-                        Text("\(wallet) · ")
-                            .lineLimit(1)
-                    }
-
-                    Text(BillText.days(until: plan.date, today: model.today))
-                        .fixedSize()
-                }
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
+                Text(caption(of: plan))
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
             }
             .padding(.vertical, rowSpacing.padding)
 
@@ -153,5 +146,15 @@ private extension AssetsPlanSheet {
 
     func color(of plan: AssetsModel.Plan) -> Color {
         plan.change > 0 ? Palette.accent : Palette.accentStrong
+    }
+
+    func caption(of plan: AssetsModel.Plan) -> String {
+        let days = BillText.days(until: plan.date, today: model.today)
+
+        guard let wallet = plan.wallet else {
+            return days
+        }
+
+        return "\(days) · \(wallet)"
     }
 }
