@@ -19,12 +19,50 @@ struct SnapshotTests {
             .environment(\.colorScheme, .light)
 
         try Self.write(view, to: "wallet-edit.png")
+
+        let database = try AppDatabase.inMemory()
+
+        for kind in [Wallet.Kind.cash, .card] {
+            for (variant, width, textSize) in Self.variants {
+                let sheet = WalletEditSheet(
+                    model: WalletEditModel(
+                        database: database,
+                        kind: kind
+                    )
+                )
+
+                let style = ThemeStyle(
+                    corner: .standard,
+                    displayFont: .mincho,
+                    textFont: .gothic,
+                    textSize: textSize
+                )
+
+                let form = SettingsFormCard {
+                    sheet.kindChooser
+
+                    sheet.balanceField
+                }
+                .padding(20)
+                .frame(width: width)
+                .background(Palette.background)
+                .environment(\.themeStyle, style)
+                .environment(\.colorScheme, .light)
+
+                try Self.write(form, to: "wallet-kind-\(kind.rawValue)-\(variant).png")
+            }
+        }
     }
 }
 
 private extension SnapshotTests {
     static let directory = "__OUT__"
     static let phone = CGSize(width: 393, height: 600)
+
+    static let variants: [(String, CGFloat, ThemeTextSize)] = [
+        ("regular", 393, .standard),
+        ("narrow", 320, .large)
+    ]
 
     static func model() async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
