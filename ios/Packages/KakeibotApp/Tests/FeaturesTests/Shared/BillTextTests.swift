@@ -56,6 +56,19 @@ struct BillTextTests {
         #expect(BillText.page(month) == "11月払い")
     }
 
+    @Test
+    func notesOnlyPageInHeader() throws {
+        let november = try #require(YearMonth("2026-11"))
+        let december = try #require(YearMonth("2026-12"))
+        let bill = try Self.bill(amount: 74000, balanceBefore: 0)
+        let only = BillPage(month: november, bills: [bill])
+        let next = BillPage(month: december, bills: [bill])
+
+        #expect(BillText.note(of: [only]) == "11月払い ¥74,000")
+        #expect(BillText.note(of: [only, next]) == nil)
+        #expect(BillText.note(of: []) == nil)
+    }
+
     @Test(arguments: [
         ([false, false], "2 件"),
         ([true, false], "2 件 · 1 件は見込み"),

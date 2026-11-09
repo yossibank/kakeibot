@@ -28,6 +28,17 @@ enum BillText {
         "\(month.month)月払い"
     }
 
+    static func note(of pages: [BillPage]) -> String? {
+        guard
+            pages.count == 1,
+            let page = pages.first
+        else {
+            return nil
+        }
+
+        return "\(Self.page(page.month)) \(AmountText.text(page.total))"
+    }
+
     static func count(of page: BillPage) -> String {
         let count = "\(page.bills.count) 件"
 
