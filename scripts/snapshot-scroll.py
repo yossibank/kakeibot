@@ -47,6 +47,9 @@ for path in paths:
     if path.name == "View+Glass.swift":
         patched = patched.replace("glassEffect(.regular.tint(tint).interactive(), in: shape)", "background(tint ?? Color.clear, in: shape)")
 
+    if "SnapshotScroll" in patched and "import DesignSystem" not in patched:
+        patched = "import DesignSystem\n" + patched
+
     if patched != text:
         path.write_text(patched, encoding="utf-8")
 
