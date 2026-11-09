@@ -120,11 +120,13 @@ private extension AssetsPlanSheet {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
 
                 Text(caption(of: plan))
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .padding(.vertical, rowSpacing.padding)
 

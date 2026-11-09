@@ -64,6 +64,7 @@ private extension AssetsView {
                 HStack(spacing: 4) {
                     Text("\(first.date.monthDayText) \(first.title)")
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                         .frame(
                             minWidth: 0,
                             idealWidth: Self.planTitleIdealWidth,
