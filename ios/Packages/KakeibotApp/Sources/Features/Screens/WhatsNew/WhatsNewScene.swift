@@ -49,6 +49,15 @@ extension WhatsNewScene {
         case iconRow
         case iconButton
         case iconGrid
+        case planTab
+        case planButton
+        case planList
+        case pagerCard
+        case pagerSwipe
+        case pagerNext
+        case walletAdd
+        case walletKinds
+        case walletMade
     }
 }
 
@@ -128,6 +137,15 @@ private extension WhatsNewScene {
 
         case .iconRow, .iconButton, .iconGrid:
             WhatsNewIconScene(kind: kind)
+
+        case .planTab, .planButton, .planList:
+            WhatsNewPlanScene(kind: kind)
+
+        case .pagerCard, .pagerSwipe, .pagerNext:
+            WhatsNewPagerScene(kind: kind)
+
+        case .walletAdd, .walletKinds, .walletMade:
+            WhatsNewWalletScene(kind: kind)
         }
     }
 
