@@ -301,7 +301,8 @@ private extension AssetsView {
                 .textFont(.caption2)
                 .foregroundStyle(Palette.accent)
                 .padding(.leading, 44)
-                .frame(minHeight: 32, alignment: .top)
+                .padding(.top, -4)
+                .padding(.bottom, 4)
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
