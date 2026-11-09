@@ -57,6 +57,12 @@ struct SnapshotTests {
 
             try Self.write(view, variant: variant, to: "home")
             try Self.write(view.billCard.padding(16), variant: variant, to: "home-bills")
+
+            model.billPage = 1
+
+            try Self.write(view.billCard.padding(16), variant: variant, to: "home-bills-next")
+
+            model.billPage = 0
             try Self.write(sheet, variant: variant, to: "home-recurring")
         }
 
@@ -175,8 +181,62 @@ private extension SnapshotTests {
 
         try await database.saveEntries(drafts, at: now)
         try await database.setReward(rule.id, isAchieved: true, on: today, at: now)
+        try await insertSecondCard(into: database, today: today, now: now)
 
         return database
+    }
+
+    static func insertSecondCard(
+        into database: AppDatabase,
+        today: LocalDate,
+        now: Date
+    ) async throws {
+        let options = try await database.entryOptions()
+        let bank = try #require(options.wallets.first { $0.kind == .bank })
+        let category = options.expenseCategories.first?.id
+
+        let cardDraft = WalletDraft(
+            kind: .card,
+            name: "楽天カード",
+            mark: .glyph(.card),
+            color: "#C0392B",
+            initialBalance: 0
+        )
+
+        let card = try await database.saveWallet(cardDraft, at: now)
+        let lastMonth = today.yearMonth.adding(months: -1)
+        let start = try #require(LocalDate(yearMonth: lastMonth, day: 1))
+
+        let drafts = try [
+            (#require(LocalDate(yearMonth: lastMonth, day: 5)), 28400),
+            (#require(LocalDate(yearMonth: lastMonth, day: 18)), 19800),
+            (#require(LocalDate(yearMonth: today.yearMonth, day: 1)), 12400)
+        ].map { date, amount in
+            EntryDraft(
+                type: .expense,
+                amount: amount,
+                date: min(date, today),
+                categoryId: category,
+                walletId: card.id
+            )
+        }
+
+        let recurring = RecurringDraft(
+            type: .transfer,
+            amount: 0,
+            categoryId: nil,
+            walletId: bank.id,
+            toWalletId: card.id,
+            memo: "楽天カード",
+            frequency: .monthly,
+            month: today.month,
+            day: 27,
+            closingDay: 31,
+            startDate: start
+        )
+
+        try await database.saveEntries(drafts, at: now)
+        try await database.saveRecurring(recurring, today: today, at: now)
     }
 
     static func write(

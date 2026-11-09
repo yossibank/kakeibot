@@ -27,7 +27,8 @@ public extension EntryList {
 
     func upcomingCardBills(
         recurrings: [Recurring],
-        after date: LocalDate
+        after date: LocalDate,
+        count: Int = 1
     ) -> [CardBill] {
         CardBill.upcoming(
             recurrings: recurrings,
@@ -35,7 +36,8 @@ public extension EntryList {
             entries: entries,
             valuations: valuations,
             adjustments: adjustments,
-            after: date
+            after: date,
+            count: count
         )
     }
 

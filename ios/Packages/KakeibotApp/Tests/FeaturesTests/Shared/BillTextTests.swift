@@ -43,6 +43,34 @@ struct BillTextTests {
         #expect(text == expected)
     }
 
+    @Test
+    func keepsBalanceOfOpenBillWithoutShortage() throws {
+        let bill = try Self.bill(amount: 50800, balanceBefore: 49600, isOpen: true)
+        let text = BillText.balance(bill)
+        #expect(text == "¥49,600 → −¥1,200")
+    }
+
+    @Test
+    func namesPageAndTotal() throws {
+        let month = try #require(YearMonth("2026-11"))
+        let closed = try Self.bill(amount: 48200, balanceBefore: 0)
+        let open = try Self.bill(amount: 17500, balanceBefore: 0, isOpen: true)
+        let closedPage = BillPage(month: month, bills: [closed])
+        let openPage = BillPage(month: month, bills: [open])
+
+        #expect(BillText.page(month) == "11月払い")
+        #expect(BillText.total(of: closedPage) == "合計 ¥48,200")
+        #expect(BillText.total(of: openPage) == "今のところ ¥17,500")
+    }
+
+    @Test
+    func namesClosingOfOpenBill() throws {
+        let today = try #require(LocalDate("2026-09-09"))
+        let bill = try Self.bill(amount: 12400, balanceBefore: 0, closingDay: 31)
+        let text = BillText.closing(of: bill, today: today)
+        #expect(text == "9/30 締め · あと 21 日で決まる")
+    }
+
     @Test(arguments: [
         (50800, 203_200, 0.25),
         (50800, 49600, 1),
@@ -58,7 +86,9 @@ struct BillTextTests {
 private extension BillTextTests {
     static func bill(
         amount: Int,
-        balanceBefore: Int
+        balanceBefore: Int,
+        isOpen: Bool = false,
+        closingDay: Int? = nil
     ) throws -> CardBill {
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         let date = try #require(LocalDate("2026-10-26"))
@@ -71,6 +101,7 @@ private extension BillTextTests {
             toWalletId: Wallet.ID(),
             frequency: .monthly,
             day: 26,
+            closingDay: closingDay,
             startDate: date,
             createdAt: now,
             updatedAt: now
@@ -80,7 +111,8 @@ private extension BillTextTests {
             recurring: recurring,
             date: date,
             amount: amount,
-            balanceBefore: balanceBefore
+            balanceBefore: balanceBefore,
+            isOpen: isOpen
         )
     }
 }

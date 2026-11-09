@@ -46,7 +46,11 @@ extension AssetsEntrySheet {
         let sections: [Section]
     }
 
-    struct Section {
+    struct Section: Identifiable {
+        var amount: Int?
+        var isOpen = false
+
+        let id: String
         let title: String
         let rows: [EntryRowItem]
     }
@@ -63,29 +67,38 @@ extension AssetsEntrySheet.Content {
             title: "回した記録",
             note: "\(row.title) · \(count) 件 · \(day)に引き落とし",
             sections: [
-                .init(title: "この引き落としに入れた", rows: row.movedIn),
-                .init(title: "後の引き落としに回した", rows: row.movedOut)
+                .init(id: "moved-in", title: "この引き落としに入れた", rows: row.movedIn),
+                .init(id: "moved-out", title: "後の引き落としに回した", rows: row.movedOut)
             ]
         )
     }
 
     static func unpaid(
         _ unpaid: AssetsModel.Unpaid,
-        of row: AssetsModel.WalletRow,
-        bill: CardBill
+        of row: AssetsModel.WalletRow
     ) -> Self {
-        let date = bill.date.monthDayText
-        let day = PeriodText.weekdayDate(bill.date)
+        let billSections = unpaid.bills.map { group in
+            AssetsEntrySheet.Section(
+                amount: group.total,
+                isOpen: group.bill.isOpen,
+                id: "bill-\(group.bill.recurring.id)-\(group.bill.date)",
+                title: "\(Recurring.billText(paidOn: group.bill.date)) · \(group.rows.count) 件",
+                rows: group.rows
+            )
+        }
+
+        let later = AssetsEntrySheet.Section(
+            id: "later",
+            title: "その後に引き落とす",
+            rows: unpaid.later
+        )
 
         return Self(
             id: "unpaid-\(row.id)",
             amount: unpaid.total,
             title: "未払いの記録",
-            note: "\(row.wallet.name) · \(unpaid.count) 件 · \(day)に引き落とし",
-            sections: [
-                .init(title: "\(date) に引き落とす", rows: unpaid.billed),
-                .init(title: "その後に引き落とす", rows: unpaid.later)
-            ]
+            note: "\(row.wallet.name) · \(unpaid.count) 件",
+            sections: billSections + [later]
         )
     }
 }
@@ -93,7 +106,7 @@ extension AssetsEntrySheet.Content {
 private extension AssetsEntrySheet {
     func sectionView(_ section: Section) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            SectionTitle(section.title)
+            sectionHeader(section)
 
             VStack(spacing: 0) {
                 ForEach(section.rows) { item in
@@ -126,10 +139,43 @@ private extension AssetsEntrySheet {
             .sharesTextScale(id: section.rows)
         }
     }
+
+    func sectionHeader(_ section: Section) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            SectionTitle(section.title)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            Spacer(minLength: 8)
+
+            if let amount = section.amount {
+                AmountText(
+                    amount,
+                    font: .style(.subheadline, weight: .semibold),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            }
+        }
+        .padding(.bottom, 4)
+        .overlay(alignment: .bottom) {
+            if section.isOpen {
+                DashedRule()
+                    .stroke(Palette.accent.opacity(.medium), style: .dashed)
+                    .frame(height: 1)
+            }
+        }
+    }
 }
 
-extension AssetsEntrySheet.Section: Identifiable {
-    var id: String {
-        title
+private struct DashedRule: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+
+        path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+
+        return path
     }
 }

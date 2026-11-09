@@ -230,6 +230,147 @@ class CardBillTest {
         assertEquals(-2L * limit, upcoming.last().balanceAfter)
     }
 
+    @Test
+    fun countsSourceRecordsBeforeBillDate() {
+        val now = Instant.ofEpochSecond(1_791_000_000)
+        val today = date("2026-10-20")
+
+        val bank = wallet(
+            kind = Wallet.Kind.bank,
+            balance = 100_000,
+            at = now,
+        )
+
+        val card = wallet(
+            kind = Wallet.Kind.card,
+            balance = 0,
+            at = now,
+        )
+
+        val entries = listOf(
+            entry(Entry.Kind.expense, 10000, on = "2026-10-26", wallet = bank.id),
+            entry(Entry.Kind.income, 280_000, on = "2026-10-27", wallet = bank.id),
+            entry(Entry.Kind.income, 50000, on = "2026-11-25", wallet = bank.id),
+        )
+
+        val bill = recurring(
+            from = bank.id,
+            to = card.id,
+            amount = 30000,
+            day = 27,
+        )
+
+        val upcoming = CardBill.upcoming(
+            recurrings = listOf(bill),
+            wallets = listOf(bank, card),
+            entries = entries,
+            valuations = emptyList(),
+            adjustments = emptyList(),
+            after = today,
+        )
+
+        assertEquals(listOf(90000L), upcoming.map { it.balanceBefore })
+    }
+
+    @Test
+    fun listsBillsOfEachCardUpToCount() {
+        val now = Instant.ofEpochSecond(1_791_000_000)
+        val today = date("2026-10-20")
+
+        val bank = wallet(
+            kind = Wallet.Kind.bank,
+            balance = 100_000,
+            at = now,
+        )
+
+        val first = wallet(
+            kind = Wallet.Kind.card,
+            balance = 0,
+            at = now,
+        )
+
+        val second = wallet(
+            kind = Wallet.Kind.card,
+            balance = 0,
+            at = now,
+        )
+
+        val recurrings = listOf(
+            recurring(from = bank.id, to = first.id, amount = 30000, day = 26),
+            recurring(from = bank.id, to = second.id, amount = 20000, day = 10),
+        )
+
+        val entries = listOf(
+            entry(Entry.Kind.income, 280_000, on = "2026-10-27", wallet = bank.id),
+            entry(Entry.Kind.expense, 5000, on = "2026-11-26", wallet = bank.id),
+        )
+
+        val upcoming = CardBill.upcoming(
+            recurrings = recurrings,
+            wallets = listOf(bank, first, second),
+            entries = entries,
+            valuations = emptyList(),
+            adjustments = emptyList(),
+            after = today,
+            count = 2,
+        )
+
+        assertEquals(
+            listOf("2026-10-26", "2026-11-10", "2026-11-26", "2026-12-10"),
+            upcoming.map { it.date.toString() },
+        )
+
+        assertEquals(
+            listOf(100_000L, 350_000L, 330_000L, 295_000L),
+            upcoming.map { it.balanceBefore },
+        )
+    }
+
+    @Test
+    fun marksBillBeforeClosingAsOpen() {
+        val now = Instant.ofEpochSecond(1_791_000_000)
+        val today = date("2026-10-16")
+
+        val bank = wallet(
+            kind = Wallet.Kind.bank,
+            balance = 100_000,
+            at = now,
+        )
+
+        val card = wallet(
+            kind = Wallet.Kind.card,
+            balance = 0,
+            at = now,
+        )
+
+        val fixed = wallet(
+            kind = Wallet.Kind.card,
+            balance = 0,
+            at = now,
+        )
+
+        val recurrings = listOf(
+            recurring(from = bank.id, to = card.id, amount = 0, day = 26, closingDay = 15),
+            recurring(from = bank.id, to = fixed.id, amount = 30000, day = 27),
+        )
+
+        val upcoming = CardBill.upcoming(
+            recurrings = recurrings,
+            wallets = listOf(bank, card, fixed),
+            entries = emptyList(),
+            valuations = emptyList(),
+            adjustments = emptyList(),
+            after = today,
+            count = 2,
+        )
+
+        assertEquals(listOf(false, false, true, false), upcoming.map { it.isOpen })
+        assertEquals(
+            listOf("2026-10", "2026-10", "2026-11", "2026-11"),
+            upcoming.map { it.month.toString() },
+        )
+    }
+
     private data class Bill(
         val from: Identifier<Wallet>,
         val to: Identifier<Wallet>,
@@ -250,6 +391,49 @@ class CardBillTest {
         createdAt = at,
         updatedAt = at,
     )
+
+    private fun recurring(
+        from: Identifier<Wallet>,
+        to: Identifier<Wallet>,
+        amount: Int,
+        day: Int,
+        closingDay: Int? = null,
+    ): Recurring {
+        val now = Instant.ofEpochSecond(1_791_000_000)
+
+        return Recurring(
+            type = Entry.Kind.transfer,
+            amount = amount,
+            categoryId = null,
+            walletId = from,
+            toWalletId = to,
+            frequency = Recurring.Frequency.monthly,
+            day = day,
+            closingDay = closingDay,
+            startDate = date("2026-01-01"),
+            createdAt = now,
+            updatedAt = now,
+        )
+    }
+
+    private fun entry(
+        type: Entry.Kind,
+        amount: Int,
+        on: String,
+        wallet: Identifier<Wallet>,
+    ): Entry {
+        val now = Instant.ofEpochSecond(1_791_000_000)
+
+        return Entry(
+            type = type,
+            amount = amount,
+            date = date(on),
+            categoryId = null,
+            walletId = wallet,
+            createdAt = now,
+            updatedAt = now,
+        )
+    }
 
     private fun date(text: String): LocalDate = assertNotNull(LocalDate.parse(text))
 }

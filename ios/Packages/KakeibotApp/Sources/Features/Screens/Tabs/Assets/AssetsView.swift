@@ -12,6 +12,7 @@ public struct AssetsView: View {
     @State var isShowingPlans = false
     @State var addingKind = Wallet.Kind.cash
     @State var adjusting: AssetsModel.WalletRow?
+    @State var billSlide = PageSlide()
 
     @Environment(\.themeStyle.corner) var corner
 

@@ -42,6 +42,7 @@ fun EntryList.amount(
 fun EntryList.upcomingCardBills(
     recurrings: List<Recurring>,
     after: LocalDate,
+    count: Int = 1,
 ): List<CardBill> = CardBill.upcoming(
     recurrings = recurrings,
     wallets = wallets.values.toList(),
@@ -49,6 +50,7 @@ fun EntryList.upcomingCardBills(
     valuations = valuations,
     adjustments = adjustments,
     after = after,
+    count = count,
 )
 
 fun EntryList.icon(of: Recurring): Icon? {
