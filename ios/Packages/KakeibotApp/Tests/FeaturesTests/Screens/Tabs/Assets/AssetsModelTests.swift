@@ -39,6 +39,24 @@ struct AssetsModelTests {
     }
 
     @Test
+    func listsFutureEntriesAsPlans() async throws {
+        let setup = try await Setup()
+        try await setup.save(.income, 1000, on: "2026-10-10", from: setup.cash)
+        try await setup.save(.income, 5000, on: "2026-10-25", from: setup.bank)
+        try await setup.save(.expense, 400, on: "2026-10-20", from: setup.cash)
+        try await setup.save(.transfer, 300, on: "2026-10-18", from: setup.bank, to: setup.cash)
+        let model = AssetsModel(database: setup.database, today: setup.today)
+
+        await model.load()
+
+        #expect(model.plans.map(\.change) == [-400, 5000])
+        #expect(model.plans.first?.date == LocalDate("2026-10-20"))
+        #expect(model.plans.first?.wallet == "財布")
+        #expect(model.total == 1000)
+        #expect(model.plannedTotal == 5600)
+    }
+
+    @Test
     func listsUpcomingCardBills() async throws {
         let setup = try await Setup()
 

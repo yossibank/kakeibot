@@ -86,6 +86,10 @@ data class Holdings(
     }
 }
 
+fun Entry.availableChange(wallets: List<Wallet>): Long = wallets
+    .filter { it.kind.role == Wallet.Kind.Role.onHand || it.kind.role == Wallet.Kind.Role.card }
+    .fold(0L) { total, wallet -> total + wallet.change(this) }
+
 val Wallet.Kind.role: Wallet.Kind.Role
     get() = when (this) {
         Wallet.Kind.cash,

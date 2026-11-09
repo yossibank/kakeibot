@@ -33,6 +33,23 @@ struct HoldingsTests {
         #expect(holdings.refund == 3000)
         #expect(holdings.available == 13000)
     }
+
+    @Test
+    func countsOnlyChangesToAvailableMoney() {
+        let bank = Self.wallet(.bank, 0)
+        let card = Self.wallet(.card, 0)
+        let investment = Self.wallet(.investment, 0)
+        let wallets = [bank, card, investment]
+        let expense = Self.entry(.expense, from: bank.id)
+        let charge = Self.entry(.transfer, from: bank.id, to: card.id)
+        let saving = Self.entry(.transfer, from: bank.id, to: investment.id)
+        let dividend = Self.entry(.income, from: investment.id)
+
+        #expect(expense.availableChange(in: wallets) == -3000)
+        #expect(charge.availableChange(in: wallets) == 0)
+        #expect(saving.availableChange(in: wallets) == -3000)
+        #expect(dividend.availableChange(in: wallets) == 0)
+    }
 }
 
 private extension HoldingsTests {
@@ -48,6 +65,25 @@ private extension HoldingsTests {
             iconId: Icon.ID(),
             initialBalance: balance,
             sortOrder: 0,
+            createdAt: now,
+            updatedAt: now
+        )
+    }
+
+    static func entry(
+        _ type: Entry.Kind,
+        from walletId: Wallet.ID,
+        to toWalletId: Wallet.ID? = nil
+    ) -> Entry {
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+
+        return Entry(
+            type: type,
+            amount: 3000,
+            date: LocalDate(now, in: .gmt),
+            categoryId: type == .transfer ? nil : EntryCategory.ID(),
+            walletId: walletId,
+            toWalletId: toWalletId,
             createdAt: now,
             updatedAt: now
         )

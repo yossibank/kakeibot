@@ -73,7 +73,7 @@ private fun Wallet.latestValuation(
     }
     .maxByOrNull { it.date }
 
-private fun Wallet.change(entry: Entry): Long = when (entry.type) {
+internal fun Wallet.change(entry: Entry): Long = when (entry.type) {
     Entry.Kind.expense -> if (entry.walletId == id) -entry.amount.toLong() else 0
     Entry.Kind.income -> if (entry.walletId == id) entry.amount.toLong() else 0
     Entry.Kind.transfer -> transferChange(entry)

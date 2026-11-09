@@ -9,6 +9,7 @@ public struct AssetsView: View {
     @State var isShowingReward = false
     @State var isAddingGoal = false
     @State var isAddingWallet = false
+    @State var isShowingPlans = false
     @State var addingKind = Wallet.Kind.cash
     @State var adjusting: AssetsModel.WalletRow?
 
@@ -84,6 +85,11 @@ public struct AssetsView: View {
         }
         .sheet(item: $adjusting) { row in
             AssetsAdjustSheet(model: model.adjustModel(for: row))
+        }
+        .sheet(isPresented: $isShowingPlans, onDismiss: openPendingEntry) {
+            AssetsPlanSheet(model: model) { id in
+                pendingEntry = id
+            }
         }
         .sheet(item: $entrySheet, onDismiss: openPendingEntry) { content in
             AssetsEntrySheet(content: content) { id in
@@ -162,6 +168,10 @@ private extension AssetsView {
                 .foregroundStyle(Palette.subtext)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+
+            if !model.plans.isEmpty {
+                planButton
+            }
 
             if model.showsNetWorth {
                 netWorthRow
