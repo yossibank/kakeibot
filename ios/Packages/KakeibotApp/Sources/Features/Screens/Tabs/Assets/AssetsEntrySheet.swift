@@ -46,10 +46,11 @@ extension AssetsEntrySheet {
         let sections: [Section]
     }
 
-    struct Section {
+    struct Section: Identifiable {
         var amount: Int?
         var isOpen = false
 
+        let id: String
         let title: String
         let rows: [EntryRowItem]
     }
@@ -66,8 +67,8 @@ extension AssetsEntrySheet.Content {
             title: "回した記録",
             note: "\(row.title) · \(count) 件 · \(day)に引き落とし",
             sections: [
-                .init(title: "この引き落としに入れた", rows: row.movedIn),
-                .init(title: "後の引き落としに回した", rows: row.movedOut)
+                .init(id: "moved-in", title: "この引き落としに入れた", rows: row.movedIn),
+                .init(id: "moved-out", title: "後の引き落としに回した", rows: row.movedOut)
             ]
         )
     }
@@ -80,12 +81,17 @@ extension AssetsEntrySheet.Content {
             AssetsEntrySheet.Section(
                 amount: group.total,
                 isOpen: group.bill.isOpen,
-                title: "\(BillText.paid(on: group.bill.date)) · \(group.rows.count) 件",
+                id: "bill-\(group.bill.recurring.id)-\(group.bill.date)",
+                title: "\(Recurring.billText(paidOn: group.bill.date)) · \(group.rows.count) 件",
                 rows: group.rows
             )
         }
 
-        let later = AssetsEntrySheet.Section(title: "その後に引き落とす", rows: unpaid.later)
+        let later = AssetsEntrySheet.Section(
+            id: "later",
+            title: "その後に引き落とす",
+            rows: unpaid.later
+        )
 
         return Self(
             id: "unpaid-\(row.id)",
@@ -160,12 +166,6 @@ private extension AssetsEntrySheet {
                     .frame(height: 1)
             }
         }
-    }
-}
-
-extension AssetsEntrySheet.Section: Identifiable {
-    var id: String {
-        title
     }
 }
 

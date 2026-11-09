@@ -70,4 +70,47 @@ extension AssetsModelTests {
         #expect(model.shownBillPage?.isOpen == true)
         #expect(model.canMoveBillPage(by: 1) == false)
     }
+
+    @Test
+    func countsUnpaidEntriesOnceWithTwoCardBills() async throws {
+        let setup = try await Setup()
+
+        let wallet = WalletDraft(
+            kind: .card,
+            name: "カード",
+            mark: .glyph(.card),
+            color: "#4A6FA5",
+            initialBalance: 0
+        )
+
+        let card = try await setup.database.saveWallet(wallet, at: Date())
+
+        try await setup.save(.expense, 30000, on: "2026-09-20", from: card.id)
+        try await setup.save(.expense, 12000, on: "2026-10-10", from: card.id)
+
+        let draft = try RecurringDraft(
+            type: .transfer,
+            amount: 0,
+            categoryId: nil,
+            walletId: setup.bank,
+            toWalletId: card.id,
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            closingDay: 31,
+            startDate: #require(LocalDate("2026-10-01"))
+        )
+
+        try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
+        try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
+
+        let model = AssetsModel(database: setup.database, today: setup.today)
+        await model.load()
+        let row = try #require(model.rows.first { $0.wallet.id == card.id })
+        let unpaid = try #require(row.unpaid)
+        let ids = unpaid.bills.flatMap(\.rows).map(\.id) + unpaid.later.map(\.id)
+
+        #expect(Set(ids).count == ids.count)
+        #expect(unpaid.total == 42000)
+    }
 }

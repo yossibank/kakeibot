@@ -307,10 +307,12 @@ private extension AssetsModel {
             return nil
         }
 
-        let billedIds = Set(billed.flatMap(\.1).map(\.id))
+        var billedIds: Set<Entry.ID> = []
 
         let groups = billed.map { bill, billedEntries in
-            let recorded = billedEntries.filter { $0.date <= today }
+            let recorded = billedEntries.filter { $0.date <= today && !billedIds.contains($0.id) }
+
+            billedIds.formUnion(billedEntries.map(\.id))
 
             return UnpaidBill(
                 bill: bill,

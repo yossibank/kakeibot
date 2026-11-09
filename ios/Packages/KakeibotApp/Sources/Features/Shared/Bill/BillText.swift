@@ -33,10 +33,6 @@ enum BillText {
         return page.isOpen ? "今のところ \(amount)" : "合計 \(amount)"
     }
 
-    static func paid(on date: LocalDate) -> String {
-        "\(date.monthDayText) 払い"
-    }
-
     static func closing(
         of bill: CardBill,
         today: LocalDate

@@ -408,7 +408,7 @@ private extension AssetsView {
         if row.wallet.kind == .card,
            !row.bills.isEmpty {
             RowOrColumnLayout(rowSpacing: 8, columnSpacing: 4) {
-                ForEach(row.bills, id: \.date) { bill in
+                ForEach(row.bills, id: \.self) { bill in
                     billChip(bill)
                 }
             }
