@@ -265,13 +265,13 @@ private extension EntrySheet {
         VStack(spacing: 24) {
             dial
 
-            if isFormDeferred {
+            if model.type != .transfer {
+                categoryArea
+            } else if isFormDeferred {
                 Color.clear
                     .frame(height: Self.deferredFormHeight)
-            } else if model.type == .transfer {
-                transferArea
             } else {
-                categoryArea
+                transferArea
             }
         }
     }

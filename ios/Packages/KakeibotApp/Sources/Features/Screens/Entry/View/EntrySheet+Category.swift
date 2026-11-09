@@ -7,6 +7,14 @@ extension EntrySheet {
         VStack(spacing: 16) {
             categoryPager
 
+            if !isFormDeferred {
+                tagAndTemplates
+            }
+        }
+    }
+
+    var tagAndTemplates: some View {
+        VStack(spacing: 16) {
             TagLine(
                 tagItems,
                 selection: model.tagId,
