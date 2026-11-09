@@ -5,7 +5,7 @@ public extension AssetsModel {
         public let wallet: Wallet
         public let icon: Icon?
         public let balance: Int
-        public let nextBill: CardBill?
+        public let bills: [CardBill]
         public let unpaid: Unpaid?
         public let repayment: Repayment?
         public let repaidRatio: Double?
@@ -13,8 +13,14 @@ public extension AssetsModel {
 
     struct Unpaid: Equatable {
         public let total: Int
-        public let billed: [EntryRowItem]
+        public let bills: [UnpaidBill]
         public let later: [EntryRowItem]
+    }
+
+    struct UnpaidBill: Equatable {
+        public let bill: CardBill
+        public let total: Int
+        public let rows: [EntryRowItem]
     }
 
     enum Repayment: Equatable {
@@ -46,6 +52,10 @@ public extension AssetsModel {
 }
 
 public extension AssetsModel.WalletRow {
+    var nextBill: CardBill? {
+        bills.first
+    }
+
     var needsAdjustment: Bool {
         wallet.kind.role == .onHand && balance < 0
     }
@@ -67,7 +77,7 @@ public extension AssetsModel.WalletRow {
 
 public extension AssetsModel.Unpaid {
     var count: Int {
-        billed.count + later.count
+        bills.reduce(later.count) { $0 + $1.rows.count }
     }
 }
 

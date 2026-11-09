@@ -20,10 +20,12 @@ public final class HomeModel: ScreenModel {
         }
     }
 
+    public var billPage = 0
+
     public private(set) var isListFailed = false
     public private(set) var templates: [EntryTemplate] = []
     public private(set) var overview: MonthOverview
-    public private(set) var upcomingBills: [CardBill] = []
+    public private(set) var billPages: [BillPage] = []
     public private(set) var syncStatus = SyncStatus.off
 
     public private(set) var monthStartDay: MonthStartDay = .first {
@@ -130,8 +132,20 @@ public extension HomeModel {
         HomeLayout(order: homeSections, hidden: homeHiddenSections)
     }
 
-    var upcomingBillTotal: Int {
-        upcomingBills.reduce(0) { $0 + $1.amount }
+    var shownBillPage: BillPage? {
+        BillPage.page(billPage, in: billPages)
+    }
+
+    func canMoveBillPage(by count: Int) -> Bool {
+        billPages.indices.contains(billPage + count)
+    }
+
+    func moveBillPage(by count: Int) {
+        guard canMoveBillPage(by: count) else {
+            return
+        }
+
+        billPage += count
     }
 
     func run() async {
@@ -368,6 +382,12 @@ private extension HomeModel {
     }
 
     func updateOverview() {
+        let bills = list?.upcomingCardBills(
+            recurrings: recurrings,
+            after: today,
+            count: BillPage.limit
+        )
+
         overview = MonthOverview(
             list: list,
             budgets: budgets,
@@ -377,7 +397,8 @@ private extension HomeModel {
             today: today
         )
 
-        upcomingBills = list?.upcomingCardBills(recurrings: recurrings, after: today) ?? []
+        billPages = BillPage.pages(of: bills ?? [])
+        billPage = min(billPage, max(billPages.count - 1, 0))
     }
 
     func updateTemplates() {

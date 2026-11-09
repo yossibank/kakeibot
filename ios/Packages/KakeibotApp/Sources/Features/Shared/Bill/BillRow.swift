@@ -74,8 +74,12 @@ extension BillRow {
 }
 
 private extension BillRow {
+    var isShort: Bool {
+        bill.shortage > 0 && !bill.isOpen
+    }
+
     var balanceColor: Color {
-        bill.shortage > 0 ? Palette.rose : Palette.accent
+        isShort ? Palette.rose : Palette.accent
     }
 
     var daysText: String {
@@ -92,26 +96,39 @@ private extension BillRow {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     titleText
 
+                    if bill.isOpen {
+                        openTag
+                    }
+
                     Spacer(minLength: 8)
 
                     amountText
                 }
 
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(BillText.source(source))
+                if bill.isOpen,
+                   let closing = BillText.closing(of: bill, today: today) {
+                    Text(closing)
+                        .textFont(.caption2)
                         .foregroundStyle(Palette.subtext)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                } else {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(BillText.source(source))
+                            .foregroundStyle(Palette.subtext)
+                            .lineLimit(1)
 
-                    Text("·")
-                        .foregroundStyle(Palette.subtext)
+                        Text("·")
+                            .foregroundStyle(Palette.subtext)
 
-                    Text(daysText)
-                        .foregroundStyle(Palette.accent)
-                        .fixedSize()
+                        Text(daysText)
+                            .foregroundStyle(Palette.accent)
+                            .fixedSize()
+                    }
+                    .textFont(.caption2)
                 }
-                .textFont(.caption2)
 
-                if bill.shortage > 0 {
+                if isShort {
                     shortageText
                 }
             }
@@ -127,10 +144,23 @@ private extension BillRow {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(title)
-                            .textFont(.subheadline)
-                            .foregroundStyle(Palette.text)
-                            .lineLimit(2)
+                        if bill.isOpen {
+                            ViewThatFits(in: .horizontal) {
+                                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                    detailedTitle
+
+                                    openTag
+                                }
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    detailedTitle
+
+                                    openTag
+                                }
+                            }
+                        } else {
+                            detailedTitle
+                        }
 
                         if let period = bill.period {
                             ViewThatFits(in: .horizontal) {
@@ -182,11 +212,31 @@ private extension BillRow {
         .contentShape(.rect)
     }
 
+    var detailedTitle: some View {
+        Text(title)
+            .textFont(.subheadline)
+            .foregroundStyle(Palette.text)
+            .lineLimit(2)
+    }
+
     var titleText: some View {
         Text(title)
             .textFont(.subheadline)
             .foregroundStyle(Palette.text)
             .sharedTextScale()
+    }
+
+    var openTag: some View {
+        Text(BillText.openTag)
+            .textFont(.caption2, weight: .semibold)
+            .foregroundStyle(Palette.accent)
+            .fixedSize()
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .overlay {
+                Capsule()
+                    .strokeBorder(Palette.accent, lineWidth: 1)
+            }
     }
 
     var amountText: some View {

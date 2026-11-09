@@ -7,6 +7,9 @@ public struct HomeView: View {
     @Bindable var model: HomeModel
 
     @State var orderButtonFrame: CGRect = .zero
+    @State var billSlide = PageSlide()
+
+    @Environment(\.themeStyle.corner) var corner
 
     @State private var openId: Entry.ID?
     @State private var openStamp: StampCalendar.Tally?

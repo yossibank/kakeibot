@@ -13,12 +13,15 @@ public final class AssetsModel: ScreenModel {
         }
     }
 
+    public var billPage = 0
+
     public private(set) var isListFailed = false
     public private(set) var rewardBank: RewardBank?
     public private(set) var holdings: Holdings
     public private(set) var changeFromLastMonth = 0
     public private(set) var rows: [WalletRow] = []
     public private(set) var upcomingBills: [UpcomingBill] = []
+    public private(set) var billPages: [BillPage] = []
     public private(set) var monthTotals: [MonthTotal] = []
 
     public private(set) var monthStartDay: MonthStartDay = .first {
@@ -89,8 +92,17 @@ public extension AssetsModel {
         }
     }
 
+    var shownBillPage: BillPage? {
+        BillPage.page(billPage, in: billPages)
+    }
+
+    var shownUpcomingBills: [UpcomingBill] {
+        let month = shownBillPage?.month
+        return upcomingBills.filter { $0.bill.month == month }
+    }
+
     var upcomingBillTotal: Int {
-        upcomingBills.reduce(0) { $0 + $1.bill.amount }
+        shownBillPage?.total ?? 0
     }
 
     func adjustModel(for row: WalletRow) -> AssetsAdjustModel {
@@ -100,6 +112,18 @@ public extension AssetsModel {
             balance: row.balance,
             today: today
         )
+    }
+
+    func canMoveBillPage(by count: Int) -> Bool {
+        billPages.indices.contains(billPage + count)
+    }
+
+    func moveBillPage(by count: Int) {
+        guard canMoveBillPage(by: count) else {
+            return
+        }
+
+        billPage += count
     }
 
     func run() async {
@@ -166,6 +190,8 @@ private extension AssetsModel {
         entriesByWallet = list?.entriesByWallet ?? [:]
         holdings = makeHoldings()
         changeFromLastMonth = makeChangeFromLastMonth()
+        billPages = makeBillPages()
+        billPage = min(billPage, max(billPages.count - 1, 0))
         upcomingBills = makeUpcomingBills()
         rows = makeRows()
         monthTotals = makeMonthTotals()
@@ -196,16 +222,26 @@ private extension AssetsModel {
         return total - previous.available
     }
 
+    func makeBillPages() -> [BillPage] {
+        let bills = list?.upcomingCardBills(
+            recurrings: recurrings,
+            after: today,
+            count: BillPage.limit
+        )
+
+        return BillPage.pages(of: bills ?? [])
+    }
+
     func makeUpcomingBills() -> [UpcomingBill] {
         guard let list else {
             return []
         }
 
-        let bills = list.upcomingCardBills(recurrings: recurrings, after: today)
+        let bills = billPages.flatMap(\.bills)
 
         return bills.map { bill in
             let card = bill.recurring.toWalletId
-            let month = bill.recurring.occurrenceMonth(of: bill.date)
+            let month = bill.month
 
             let moved = entries
                 .filter { $0.walletId == card && $0.billMonth != nil }
@@ -237,7 +273,7 @@ private extension AssetsModel {
         let bills = upcomingBills
 
         return wallets.map { wallet in
-            let next = bills.first { $0.bill.recurring.toWalletId == wallet.id }
+            let cardBills = bills.map(\.bill).filter { $0.recurring.toWalletId == wallet.id }
             let balance = balance(of: wallet)
             let ratio = repaidRatio(of: wallet, balance: balance)
 
@@ -245,42 +281,57 @@ private extension AssetsModel {
                 wallet: wallet,
                 icon: list?.icons[wallet.iconId],
                 balance: balance,
-                nextBill: next?.bill,
-                unpaid: next.flatMap { unpaid(of: $0.bill) },
+                bills: cardBills,
+                unpaid: unpaid(of: cardBills),
                 repayment: repayment(of: wallet),
                 repaidRatio: ratio
             )
         }
     }
 
-    func unpaid(of bill: CardBill) -> Unpaid? {
-        let recurring = bill.recurring
-
+    func unpaid(of bills: [CardBill]) -> Unpaid? {
         guard
             let list,
-            let card = recurring.toWalletId,
-            let period = bill.period,
-            let billedAll = recurring.billedEntries(paidOn: bill.date, entries: entries)
+            let last = bills.last,
+            let card = last.recurring.toWalletId,
+            let period = last.period
         else {
             return nil
         }
 
-        let month = recurring.occurrenceMonth(of: bill.date)
-        let billed = billedAll.filter { $0.date <= today }
-        let billedIds = Set(billedAll.map(\.id))
+        let billed = bills.compactMap { bill in
+            bill.recurring.billedEntries(paidOn: bill.date, entries: entries).map { (bill, $0) }
+        }
+
+        guard billed.count == bills.count else {
+            return nil
+        }
+
+        let billedIds = Set(billed.flatMap(\.1).map(\.id))
+
+        let groups = billed.map { bill, billedEntries in
+            let recorded = billedEntries.filter { $0.date <= today }
+
+            return UnpaidBill(
+                bill: bill,
+                total: recorded.billedTotal,
+                rows: Self.rows(of: recorded, in: list)
+            )
+        }
 
         let later = entries
             .filter { $0.walletId == card && $0.date <= today }
             .filter { !billedIds.contains($0.id) }
             .filter { entry in
-                entry.billMonth.map { $0 > month } ?? (entry.date > period.upperBound)
+                entry.billMonth.map { $0 > last.month } ?? (entry.date > period.upperBound)
             }
 
-        let total = (billed + later).billedTotal
+        let laterTotal = later.billedTotal
+        let total = groups.reduce(laterTotal) { $0 + $1.total }
 
         let unpaid = Unpaid(
             total: total,
-            billed: Self.rows(of: billed, in: list),
+            bills: groups,
             later: Self.rows(of: later, in: list)
         )
 

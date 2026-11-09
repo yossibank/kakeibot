@@ -5,13 +5,33 @@ import SwiftUI
 extension AssetsView {
     var billCard: some View {
         VStack(alignment: .leading, spacing: 0) {
-            CardHeader(
-                "これからの引き落とし",
-                note: "合計 \(AmountText.text(model.upcomingBillTotal))"
-            )
+            if model.billPages.count > 1,
+               let page = model.shownBillPage {
+                ViewThatFits(in: .horizontal) {
+                    CardHeader(Self.billTitle) {
+                        billStepper(page)
+                    }
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        CardHeader(Self.billTitle)
+
+                        billStepper(page)
+                    }
+                }
+            } else {
+                CardHeader(Self.billTitle)
+            }
+
+            if let page = model.shownBillPage {
+                Text(BillText.total(of: page))
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .padding(.bottom, 8)
+            }
 
             VStack(spacing: 12) {
-                ForEach(model.upcomingBills) { row in
+                ForEach(model.shownUpcomingBills) { row in
                     Button {
                         onOpenRecurring(row.id)
                     } label: {
@@ -20,11 +40,16 @@ extension AssetsView {
                     .buttonStyle(.plain)
                 }
             }
+            .pageSlide(billSlide, page: model.shownBillPage?.month)
             .sharesTextScale(id: model.upcomingBills.map(\.source))
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 16)
         .card()
+        .onPageSwipe(following: $billSlide, canMove: canMoveBillPage) { direction in
+            moveBillPage(by: Self.billCount(of: direction))
+        }
+        .haptic(.selection, trigger: model.billPage)
     }
 
     func walletGroup(
@@ -296,6 +321,50 @@ private extension AssetsView {
         .fixedSize(horizontal: false, vertical: true)
     }
 
+    func billStepper(_ page: BillPage) -> some View {
+        BillPageStepper(
+            month: page.month,
+            canMoveBackward: model.canMoveBillPage(by: -1),
+            canMoveForward: model.canMoveBillPage(by: 1)
+        ) { count in
+            moveBillPage(by: count)
+        }
+    }
+
+    func billChip(_ bill: CardBill) -> some View {
+        let shape = Capsule()
+        let fill = bill.isOpen ? Color.clear : Palette.accent.opacity(.faint)
+        let stroke = bill.isOpen ? Palette.accent.opacity(.medium) : Color.clear
+
+        return HStack(alignment: .firstTextBaseline, spacing: 4) {
+            Text(Recurring.billText(paidOn: bill.date))
+                .textFont(.caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+
+            AmountText(
+                bill.amount,
+                font: .style(.caption, weight: .semibold),
+                color: Palette.text
+            )
+
+            if bill.isOpen {
+                Text(BillText.openTag)
+                    .textFont(.caption2, weight: .semibold)
+                    .foregroundStyle(Palette.accent)
+            }
+        }
+        .lineLimit(1)
+        .fixedSize()
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(fill, in: shape)
+        .overlay {
+            shape
+                .strokeBorder(stroke, style: .dashed)
+        }
+    }
+
     func billRow(_ row: AssetsModel.UpcomingBill) -> some View {
         BillRow(
             row.bill,
@@ -330,22 +399,23 @@ private extension AssetsView {
 }
 
 private extension AssetsView {
+    static let billTitle = "これからの引き落とし"
     static let nameMinWidth: CGFloat = 64
     static let labeledNameMinWidth: CGFloat = 48
 
     @ViewBuilder
     func debtDetail(of row: AssetsModel.WalletRow) -> some View {
         if row.wallet.kind == .card,
-           let bill = row.nextBill {
-            AssetsDebtChip(
-                systemImage: "calendar",
-                text: nextBillText(bill),
-                shortText: shortBillText(bill)
-            )
+           !row.bills.isEmpty {
+            RowOrColumnLayout(rowSpacing: 8, columnSpacing: 4) {
+                ForEach(row.bills, id: \.date) { bill in
+                    billChip(bill)
+                }
+            }
 
             if let unpaid = row.unpaid {
                 Button {
-                    entrySheet = .unpaid(unpaid, of: row, bill: bill)
+                    entrySheet = .unpaid(unpaid, of: row)
                 } label: {
                     HStack(spacing: 4) {
                         Label(
@@ -447,6 +517,13 @@ private extension AssetsView {
         return parts.isEmpty ? nil : parts.joined(separator: "・")
     }
 
+    static func billCount(of direction: PageSwipeDirection) -> Int {
+        switch direction {
+        case .forward: 1
+        case .backward: -1
+        }
+    }
+
     func plainNote(of row: AssetsModel.WalletRow) -> String? {
         if let repayment = row.repayment {
             return Self.repaymentText(repayment)
@@ -454,7 +531,7 @@ private extension AssetsView {
 
         guard
             row.wallet.kind == .card,
-            row.nextBill == nil
+            row.bills.isEmpty
         else {
             return nil
         }
@@ -462,17 +539,17 @@ private extension AssetsView {
         return "引き落としは未設定"
     }
 
-    func nextBillText(_ bill: CardBill) -> String {
-        let date = bill.date.monthDayText
-        let weekday = bill.date.weekday.shortName
-        let days = BillText.days(until: bill.date, today: model.today)
-        return "\(date)（\(weekday)）引き落とし · \(days)"
+    func canMoveBillPage(_ direction: PageSwipeDirection) -> Bool {
+        model.canMoveBillPage(by: Self.billCount(of: direction))
     }
 
-    func shortBillText(_ bill: CardBill) -> String {
-        let date = bill.date.monthDayText
-        let weekday = bill.date.weekday.shortName
-        let days = BillText.days(until: bill.date, today: model.today)
-        return "\(date)（\(weekday)）· \(days)"
+    func moveBillPage(by count: Int) {
+        guard model.canMoveBillPage(by: count) else {
+            return
+        }
+
+        PageSlide.run($billSlide, forward: count > 0) {
+            model.moveBillPage(by: count)
+        }
     }
 }
