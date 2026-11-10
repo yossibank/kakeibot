@@ -17,6 +17,7 @@ public struct SettingsMenuSheet: View {
     @State var entryStart: SettingsMenuValueModel<Bool>
     @State var recordReset: SettingsMenuResetModel
     @State var isConfirmingReset = false
+    @State var isListShown = false
 
     #if DEBUG
     @State var isConfirmingSample = false
@@ -69,29 +70,10 @@ public struct SettingsMenuSheet: View {
                     .environment(\.isSettingsSheetRoot, true)
 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        recordSection
-
-                        budgetSection
-
-                        funSection
-
-                        homeSection
-
-                        lookSection
-
-                        dataSection
-
-                        aboutSection
-
-                        #if DEBUG
-                        sampleSection
-                        #endif
-
-                        versionText
-                            .padding(.top, 8)
+                    if isListShown {
+                        sectionList
+                            .transition(.opacity)
                     }
-                    .padding(.bottom, 24)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -133,6 +115,13 @@ public struct SettingsMenuSheet: View {
             }
         }
         .task {
+            try? await Task.sleep(for: Self.listDelay)
+
+            withAnimation(.easeOut(duration: 0.2)) {
+                isListShown = true
+            }
+        }
+        .task {
             await observeMonthStartDay()
         }
         .task {
@@ -165,6 +154,36 @@ public struct SettingsMenuSheet: View {
         .task {
             firstEntryCreatedAt = try? await database.entryHistory().firstCreatedAt
         }
+    }
+}
+
+private extension SettingsMenuSheet {
+    static let listDelay: Duration = .milliseconds(30)
+
+    var sectionList: some View {
+        LazyVStack(alignment: .leading, spacing: 16) {
+            recordSection
+
+            budgetSection
+
+            funSection
+
+            homeSection
+
+            lookSection
+
+            dataSection
+
+            aboutSection
+
+            #if DEBUG
+            sampleSection
+            #endif
+
+            versionText
+                .padding(.top, 8)
+        }
+        .padding(.bottom, 24)
     }
 }
 

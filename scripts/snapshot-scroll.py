@@ -44,6 +44,9 @@ for path in paths:
     patched = patched.replace("NavigationStack {", "VStack(spacing: 0) {")
     patched = re.sub(r"containerRelativeFrame\(\.horizontal\) \{ width, _ in\s+width \* 0\.62\s+\}", "frame(width: 240)", patched)
 
+    if path.name == "SettingsMenuSheet.swift":
+        patched = patched.replace("@State var isListShown = false", "@State var isListShown = true")
+
     if path.name == "View+Glass.swift":
         patched = patched.replace("glassEffect(.regular.tint(tint).interactive(), in: shape)", "background(tint ?? Color.clear, in: shape)")
 
