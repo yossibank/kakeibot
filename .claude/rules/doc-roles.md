@@ -9,7 +9,7 @@ paths:
 
 kakeibot の文書を読み書きするときに読み込まれる決まり。spec の文書の役割を決める。
 
-ほかの文書の役割と足す条件は、[claude-config](https://github.com/yossibank/claude-config) の `rules/docs-app.md` にある。
+ほかの文書の役割と足す条件は、claude-config の `docs-app.md` の決まりにある。
 
 | 文書 | 書く | 書かない |
 | --- | --- | --- |

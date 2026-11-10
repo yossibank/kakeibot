@@ -2,8 +2,8 @@
 
 > [!NOTE]
 > kakeibot の今の形のうち、共通の iOS の構成から外れた点と、kakeibot だけの事実が分かる。
-> 共通の形は [claude-config の architecture-ios](https://github.com/yossibank/claude-config/blob/main/docs/architecture-ios.md) にある。
-> 手元の置き場所は、claude-config の `docs/architecture-ios.md` である。
+> 共通の形は [claude-config の ios-architecture](https://github.com/yossibank/claude-config/blob/main/docs/app/ios-architecture.md) にある。
+> 手元の置き場所は、claude-config の `docs/app/ios-architecture.md` である。
 
 ## 🛠️ 使う技術
 
@@ -23,7 +23,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `scripts/docs-check.py` のテストプラン | `Package.swift` のテストのターゲットと、テストプランの中身が一致するかも見る |
 | `scripts/spacing-check.py` | 余白・間隔・角の丸みの数値が 4 の倍数かを確かめ、`make verify` で走る。2 以下と、式の中の値は見ない |
 | `scripts/json-format.sh` | `spec/fixtures/` と `store/` の JSON を整形する。`make format` と pre-commit で直し、`make verify-docs` で確かめる |
-| claude-config の `hooks/docs-check.py`・`swift-style-check.py` | 書き方の決まりを確かめる。`.md` は `make verify-docs`、`.swift` は `make verify` で全部にかける |
+| claude-config のフック `docs-check.py`・`swift-style-check.py` | 書き方の決まりを確かめる。`.md` は `make verify-docs`、`.swift` は `make verify` で全部にかける |
 | `spec/` | `export-format.md`、`fixtures.md`、`fixtures/` |
 | `spec/fixtures/` | フォルダ名は、Core のフォルダ名の小文字にそろえる |
 | `.claude/rules/` | spec の文書の役割 |

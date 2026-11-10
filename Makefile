@@ -44,7 +44,7 @@ test:
 
 snapshot:
 	@test -n "$(SNAPSHOT)" || { echo "NG SNAPSHOT に .claude/snapshots/ の下のセットの名前を渡す"; exit 1; }
-	$(CLAUDE_CONFIG)/skills/ui-snapshot/scripts/render-snapshots.sh ios/Packages/KakeibotApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
+	$(CLAUDE_CONFIG)/dotclaude/skills/ui-snapshot/scripts/render-snapshots.sh ios/Packages/KakeibotApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
 
 android-build:
 	$(GRADLE) :app:assembleDebug
@@ -54,8 +54,8 @@ android-test:
 
 verify: verify-docs
 	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
-	@test -f $(CLAUDE_CONFIG)/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
-	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/hooks/swift-style-check.py $$(git ls-files '*.swift')
+	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build
 	scripts/verify.sh android-test $(GRADLE) :core:test :store:test
@@ -64,5 +64,5 @@ verify: verify-docs
 verify-docs:
 	scripts/verify.sh docs-check scripts/docs-check.py
 	scripts/verify.sh json-format scripts/json-format.sh check
-	@test -f $(CLAUDE_CONFIG)/hooks/docs-check.py || { echo "NG claude-config が無い: $(CLAUDE_CONFIG)"; exit 1; }
-	scripts/verify.sh docs-rules python3 -I $(CLAUDE_CONFIG)/hooks/docs-check.py $$(git ls-files '*.md')
+	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/docs-check.py || { echo "NG claude-config が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh docs-rules python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/docs-check.py $$(git ls-files '*.md')
