@@ -9,8 +9,8 @@ extension WhatsNewRelease {
                 shortTitle: "予定",
                 lead: "先の記録を含めた手元のお金が分かります",
                 points: [
-                    "明日以降の記録を含めた額を出す",
-                    "押すと予定の記録を日付順に見られる"
+                    "明日以降の記録を含めた額を表示します",
+                    "押すと予定の記録を日付順に見られます"
                 ],
                 steps: [
                     Step(scene: .planTab, caption: "「資産」を開く"),
@@ -26,8 +26,8 @@ extension WhatsNewRelease {
                 shortTitle: "引き落とし",
                 lead: "これからの引き落としを月ごとに見られます",
                 points: [
-                    "指で横に送って月を切り替える",
-                    "締め日までの見込みと確定が分かる"
+                    "指で横に送って月を切り替えられます",
+                    "締め日までの見込みと確定が分かります"
                 ],
                 steps: [
                     Step(scene: .pagerCard, caption: "引き落としのカードを見る"),
@@ -43,8 +43,8 @@ extension WhatsNewRelease {
                 shortTitle: "口座",
                 lead: "口座の種類を選びやすくしました",
                 points: [
-                    "3 つの組に分けて並べる",
-                    "資産タブからカードの口座を作れる"
+                    "3 つの組に分けて並べました",
+                    "資産タブからカードの口座を作れます"
                 ],
                 steps: [
                     Step(scene: .walletAdd, caption: "負債の「＋」を押す"),
