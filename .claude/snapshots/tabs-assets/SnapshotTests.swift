@@ -66,12 +66,18 @@ struct SnapshotTests {
 
             try Self.write(unpaidSheet, variant: variant, to: "assets-unpaid")
 
-            let plans = AssetsPlanSheet(model: model) { _ in }.content
+            let outlookSheet = AssetsOutlookSheet(
+                model: model,
+                onOpen: { _ in },
+                onOpenRecurring: { _ in }
+            )
+
+            let outlook = outlookSheet.content
                 .padding(.horizontal, 20)
                 .padding(.top, 28)
                 .background(Palette.panel)
 
-            try Self.write(plans, variant: variant, to: "assets-plans")
+            try Self.write(outlook, variant: variant, to: "assets-outlook")
 
             let wallet = try #require(model.rows.first)
 

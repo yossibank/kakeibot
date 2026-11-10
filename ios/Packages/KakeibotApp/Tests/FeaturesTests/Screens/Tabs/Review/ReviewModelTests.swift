@@ -235,6 +235,43 @@ struct ReviewModelTests {
     }
 
     @Test
+    func totalsUpcomingRecurringsOfCurrentPeriod() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let options = try await setup.database.entryOptions()
+
+        let recurring = try RecurringDraft(
+            type: .expense,
+            amount: 3000,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            toWalletId: nil,
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: #require(LocalDate("2026-10-01"))
+        )
+
+        try await setup.database.saveRecurring(recurring, today: setup.today, at: Date())
+
+        let model = ReviewModel(database: setup.database, today: setup.today)
+
+        try await observe(model) {
+            model.list != nil && model.upcomingRecurringTotal != nil
+        }
+
+        #expect(model.upcomingRecurringTotal == 3000)
+
+        model.setKind(.income)
+
+        #expect(model.upcomingRecurringTotal == nil)
+
+        model.setKind(.expense)
+        model.move(by: -1)
+
+        #expect(model.upcomingRecurringTotal == nil)
+    }
+
+    @Test
     func ranksCategoriesByAmount() async throws {
         let setup = try await RecordsModelTests.Setup()
         let options = try await setup.database.entryOptions()

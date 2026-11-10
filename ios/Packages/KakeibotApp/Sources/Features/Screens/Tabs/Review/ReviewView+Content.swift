@@ -88,6 +88,14 @@ extension ReviewView {
 }
 
 private extension ReviewView {
+    enum DetailRow {
+        case recurring
+        case upcoming
+        case move
+    }
+}
+
+private extension ReviewView {
     var detailCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
@@ -102,7 +110,7 @@ private extension ReviewView {
                     .foregroundStyle(Palette.text)
             }
 
-            if hasRecurringRow || showsMoveRow {
+            if hasRecurringRow || hasUpcomingRow || showsMoveRow {
                 VStack(alignment: .leading, spacing: 0) {
                     if let recurring = model.recurringTotal {
                         Button {
@@ -118,9 +126,18 @@ private extension ReviewView {
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
                             .frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
-                            .tapArea(Self.rowTapOutsets(top: true, bottom: !showsMoveRow))
+                            .tapArea(Self.rowTapOutsets(top: true, bottom: isLastRow(.recurring)))
                         }
                         .buttonStyle(.plain)
+                    }
+
+                    if let upcoming = model.upcomingRecurringTotal {
+                        let outsets = Self.rowTapOutsets(
+                            top: isFirstRow(.upcoming),
+                            bottom: isLastRow(.upcoming)
+                        )
+
+                        upcomingRow(upcoming, tapOutsets: outsets)
                     }
 
                     if showsMoveRow {
@@ -137,7 +154,7 @@ private extension ReviewView {
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
                             .frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
-                            .tapArea(Self.rowTapOutsets(top: !hasRecurringRow, bottom: true))
+                            .tapArea(Self.rowTapOutsets(top: isFirstRow(.move), bottom: true))
                         }
                         .buttonStyle(.plain)
                     }
@@ -298,8 +315,19 @@ private extension ReviewView {
         model.recurringTotal != nil
     }
 
+    var hasUpcomingRow: Bool {
+        model.upcomingRecurringTotal != nil
+    }
+
     var showsMoveRow: Bool {
         model.kind == .expense && !model.moves.isEmpty
+    }
+
+    var detailRows: [DetailRow] {
+        let recurring: [DetailRow] = hasRecurringRow ? [.recurring] : []
+        let upcoming: [DetailRow] = hasUpcomingRow ? [.upcoming] : []
+        let move: [DetailRow] = showsMoveRow ? [.move] : []
+        return recurring + upcoming + move
     }
 
     var totalTitle: String {
@@ -412,6 +440,14 @@ private extension ReviewView {
         let other = model.total(of: model.kind) - recurring
         let fixed = "固定費 \(AmountText.text(recurring))"
         return "\(fixed)・それ以外 \(AmountText.text(other))"
+    }
+
+    func isFirstRow(_ row: DetailRow) -> Bool {
+        detailRows.first == row
+    }
+
+    func isLastRow(_ row: DetailRow) -> Bool {
+        detailRows.last == row
     }
 
     func balanceRatio(of amount: Int) -> Double {

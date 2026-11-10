@@ -10,11 +10,17 @@ public final class ReviewModel: ScreenModel {
     public var today: LocalDate {
         didSet {
             moveCache = [:]
+            upcomingCache = [:]
         }
     }
 
     public private(set) var scale: ReviewPeriod.Scale = .month
-    public private(set) var kind: ReviewKind = .expense
+    public private(set) var kind: ReviewKind = .expense {
+        didSet {
+            upcomingCache = [:]
+        }
+    }
+
     public private(set) var isListFailed = false
     public private(set) var offset = 0
     public private(set) var isMovingForward = true
@@ -29,6 +35,7 @@ public final class ReviewModel: ScreenModel {
             entries = list?.entries ?? []
             summaries = [:]
             moveCache = [:]
+            upcomingCache = [:]
         }
     }
 
@@ -39,10 +46,12 @@ public final class ReviewModel: ScreenModel {
     private(set) var recurrings: [Recurring] = [] {
         didSet {
             moveCache = [:]
+            upcomingCache = [:]
         }
     }
 
     @ObservationIgnored var moveCache: [ClosedRange<LocalDate>: [Move]] = [:]
+    @ObservationIgnored var upcomingCache: [ClosedRange<LocalDate>: Int] = [:]
 
     @ObservationIgnored private var summaries: [
         ClosedRange<LocalDate>: ReviewSummary

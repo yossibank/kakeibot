@@ -76,6 +76,39 @@ public extension ReviewModel {
         return total > 0 ? total : nil
     }
 
+    var upcomingRecurringTotal: Int? {
+        guard
+            let type = entryType,
+            period.range.contains(today)
+        else {
+            return nil
+        }
+
+        let range = period.range
+
+        _ = list
+        _ = recurrings
+
+        if let cached = upcomingCache[range] {
+            return cached > 0 ? cached : nil
+        }
+
+        let all = PeriodRecurring.all(
+            of: recurrings,
+            in: range,
+            entries: entries,
+            today: today
+        )
+
+        let total = all
+            .filter { $0.status == .upcoming && $0.recurring.type == type }
+            .reduce(0) { $0 + $1.amount }
+
+        upcomingCache[range] = total
+
+        return total > 0 ? total : nil
+    }
+
     var recurringShare: Share? {
         guard let recurringTotal else {
             return nil

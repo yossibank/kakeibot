@@ -18,6 +18,7 @@ public final class AssetsModel: ScreenModel {
     public private(set) var isListFailed = false
     public private(set) var rewardBank: RewardBank?
     public private(set) var holdings: Holdings
+    public private(set) var outlook: Outlook
     public private(set) var changeFromLastMonth = 0
     public private(set) var rows: [WalletRow] = []
     public private(set) var upcomingBills: [UpcomingBill] = []
@@ -62,6 +63,13 @@ public final class AssetsModel: ScreenModel {
             cards: 0,
             investments: 0,
             loans: 0
+        )
+
+        self.outlook = Outlook(
+            end: today,
+            start: 0,
+            items: [],
+            later: []
         )
 
         update()
@@ -188,6 +196,12 @@ private extension AssetsModel {
         rows = makeRows()
         monthTotals = makeMonthTotals()
         plans = makePlans(in: wallets)
+
+        outlook = makeOutlook(
+            in: wallets,
+            recurrings: recurrings,
+            monthStartDay: monthStartDay
+        )
     }
 
     func makeHoldings() -> Holdings {

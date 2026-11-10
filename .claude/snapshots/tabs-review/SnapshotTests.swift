@@ -31,7 +31,8 @@ struct SnapshotTests {
                     onOpenEntry: { _ in },
                     onOpenRecurring: { _ in },
                     onOpenDay: { _ in },
-                    onAddEntry: { _ in }
+                    onAddEntry: { _ in },
+                    onOpenRecurrings: {}
                 )
 
                 try Self.write(view, variant: variant, to: "review-\(kind.rawValue)")
