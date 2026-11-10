@@ -29,7 +29,7 @@ extension ReviewView {
 
 private extension ReviewView {
     func upcomingLabel(_ upcoming: Int) -> some View {
-        let rest = "これからの固定費 \(AmountText.text(upcoming))"
+        let rest = "固定費あと \(AmountText.text(upcoming))"
         let outlook = outlookText(upcoming)
 
         return Label {
@@ -49,9 +49,9 @@ private extension ReviewView {
 
     static func outlookName(of scale: ReviewPeriod.Scale) -> String {
         switch scale {
-        case .week: "週末の見込み"
-        case .month: "月末の見込み"
-        case .year: "年末の見込み"
+        case .week: "週末"
+        case .month: "月末"
+        case .year: "年末"
         }
     }
 
