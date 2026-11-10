@@ -1,3 +1,5 @@
 ・The Assets tab now shows "Rest of this month", with your month-end outlook after upcoming fixed costs and planned records.
 ・You are now told the day your money runs lowest before month-end, or the day it runs short.
 ・The Review tab now shows the fixed costs not yet recorded in the current period, and the outlook for the end of the period.
+・Entries now show the wallet and memo on one line when they fit, so the list is easier to read.
+・Pro now sits at the top of the settings list.
