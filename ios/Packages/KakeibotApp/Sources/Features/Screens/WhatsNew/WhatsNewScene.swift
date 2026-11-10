@@ -58,6 +58,9 @@ extension WhatsNewScene {
         case walletAdd
         case walletKinds
         case walletMade
+        case outlookTab
+        case outlookBlock
+        case outlookList
     }
 }
 
@@ -146,6 +149,9 @@ private extension WhatsNewScene {
 
         case .walletAdd, .walletKinds, .walletMade:
             WhatsNewWalletScene(kind: kind)
+
+        case .outlookTab, .outlookBlock, .outlookList:
+            WhatsNewOutlookScene(kind: kind)
         }
     }
 
