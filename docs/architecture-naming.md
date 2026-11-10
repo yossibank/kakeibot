@@ -6,7 +6,7 @@
 
 ## 📏 名前の決まり
 
-共通の決まりは、claude-config の `docs/architecture-ios-naming.md` にある。Swift のファイルは `rules/swift-core.md` に従う。ここには、次の決まりを足す。
+共通の決まりは、claude-config の `docs/app/ios-naming.md` にある。Swift のファイルは `dotclaude/rules/swift-core.md` に従う。ここには、次の決まりを足す。
 
 | 対象 | 決まり |
 | --- | --- |
