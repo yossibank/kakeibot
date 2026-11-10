@@ -9,8 +9,8 @@ extension WhatsNewRelease {
                 shortTitle: "返済",
                 lead: "回数を入れると、返し終わるまでが分かります",
                 points: [
-                    "最後の回の額を残高から出す",
-                    "返す総額と終わりの月が分かる"
+                    "最後の回の額を残高から計算します",
+                    "返す総額と終わりの月が分かります"
                 ],
                 steps: [
                     Step(scene: .loanCount, caption: "「回数」を押す"),
@@ -26,8 +26,8 @@ extension WhatsNewRelease {
                 shortTitle: "アイコン",
                 lead: "カテゴリなどに使える絵柄が増えました",
                 points: [
-                    "暮らしや趣味の絵柄を選べる",
-                    "食べ物などの絵文字も選べる"
+                    "暮らしや趣味の絵柄を選べます",
+                    "食べ物などの絵文字も選べます"
                 ],
                 steps: [
                     Step(scene: .iconRow, caption: "「カテゴリ」を開く"),

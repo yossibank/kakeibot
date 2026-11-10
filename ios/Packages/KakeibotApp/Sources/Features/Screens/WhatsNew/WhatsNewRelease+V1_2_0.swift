@@ -9,8 +9,8 @@ extension WhatsNewRelease {
                 shortTitle: "未払い",
                 lead: "まだ引き落とされていない記録を、まとめて見られます",
                 points: [
-                    "次の引き落としの日と合計を出す",
-                    "引き落としの回ごとに記録を並べる"
+                    "次の引き落としの日と合計を表示します",
+                    "引き落としの回ごとに記録を並べます"
                 ],
                 steps: [
                     Step(scene: .unpaidRow, caption: "カードの行"),
@@ -26,8 +26,8 @@ extension WhatsNewRelease {
                 shortTitle: "請求",
                 lead: "カードの記録を、次の引き落としに回せます",
                 points: [
-                    "「次に回す」「2 回先」を選べる",
-                    "記録を作るたびに、選んだ回に入る"
+                    "「次に回す」「2 回先」を選べます",
+                    "記録を作るたびに、選んだ回に入ります"
                 ],
                 steps: [
                     Step(scene: .shiftWallet, caption: "カードを選ぶ"),
@@ -43,8 +43,8 @@ extension WhatsNewRelease {
                 shortTitle: "固定費",
                 lead: "支出・収入・振替を分けて並べます",
                 points: [
-                    "上のタブで種類を切り替える",
-                    "作る画面は 1 画面に収まる"
+                    "上のタブで種類を切り替えられます",
+                    "作る画面が 1 画面に収まりました"
                 ],
                 steps: [
                     Step(scene: .recurringRow, caption: "「固定費」を開く"),
