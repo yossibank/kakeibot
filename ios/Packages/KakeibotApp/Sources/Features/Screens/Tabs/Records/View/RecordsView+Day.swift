@@ -11,6 +11,16 @@ extension RecordsView {
         }
     }
 
+    var isChoosingMark: Binding<Bool> {
+        Binding {
+            markTarget != nil
+        } set: { isOpen in
+            if !isOpen {
+                markTarget = nil
+            }
+        }
+    }
+
     func dayCard(_ day: EntryDay) -> some View {
         let rows = model.rows(for: day)
 
@@ -225,23 +235,37 @@ private extension RecordsView {
 
     @ViewBuilder
     func dayButtons(on date: LocalDate) -> some View {
-        if model.canReward(on: date) {
+        let canReward = model.canReward(on: date)
+        let hasReward = model.rewardTotal(on: date) > 0
+        let hasStamp = model.stampIcon(on: date) != nil
+
+        if canReward, !hasReward, !hasStamp {
             Button {
-                rewardTarget = StampTarget(date: date)
+                markTarget = StampTarget(date: date)
             } label: {
-                rewardButtonLabel(on: date)
+                emptyButtonLabel("plus")
+                    .tapArea(Self.dayButtonTapOutsets)
+            }
+            .buttonStyle(.plain)
+        } else {
+            if canReward {
+                Button {
+                    rewardTarget = StampTarget(date: date)
+                } label: {
+                    rewardButtonLabel(on: date)
+                        .tapArea(Self.dayButtonTapOutsets)
+                }
+                .buttonStyle(.plain)
+            }
+
+            Button {
+                stampTarget = StampTarget(date: date)
+            } label: {
+                stampButtonLabel(on: date)
                     .tapArea(Self.dayButtonTapOutsets)
             }
             .buttonStyle(.plain)
         }
-
-        Button {
-            stampTarget = StampTarget(date: date)
-        } label: {
-            stampButtonLabel(on: date)
-                .tapArea(Self.dayButtonTapOutsets)
-        }
-        .buttonStyle(.plain)
     }
 
     func daySelectButton(
@@ -284,15 +308,19 @@ private extension RecordsView {
                 .frame(width: 26, height: 26)
                 .background(Palette.accent, in: .circle)
         } else {
-            Image(systemName: "gift")
-                .sansFont(.small)
-                .foregroundStyle(Palette.subtext)
-                .frame(width: 26, height: 26)
-                .overlay {
-                    Circle()
-                        .stroke(Palette.subtext.opacity(.muted), style: .dashed)
-                }
+            emptyButtonLabel("gift")
         }
+    }
+
+    func emptyButtonLabel(_ systemImage: String) -> some View {
+        Image(systemName: systemImage)
+            .sansFont(.small)
+            .foregroundStyle(Palette.subtext)
+            .frame(width: 26, height: 26)
+            .overlay {
+                Circle()
+                    .stroke(Palette.subtext.opacity(.muted), style: .dashed)
+            }
     }
 
     @ViewBuilder
@@ -300,14 +328,7 @@ private extension RecordsView {
         if let stamp = model.stampIcon(on: date) {
             IconSeal(stamp, size: 26)
         } else {
-            Image(systemName: "seal")
-                .sansFont(.small)
-                .foregroundStyle(Palette.subtext)
-                .frame(width: 26, height: 26)
-                .overlay {
-                    Circle()
-                        .stroke(Palette.subtext.opacity(.muted), style: .dashed)
-                }
+            emptyButtonLabel("seal")
         }
     }
 

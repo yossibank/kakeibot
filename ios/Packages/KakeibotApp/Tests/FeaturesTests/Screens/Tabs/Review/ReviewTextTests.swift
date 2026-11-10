@@ -6,21 +6,21 @@ import Testing
 struct ReviewTextTests {
     @Test(arguments: [
         ([42400, 36400, 21200], ["43%", "36%", "21%"]),
-        ([11_000_000, 5880], ["99.9%", "1%未満"]),
-        ([1000, 5], ["99.5%", "1%未満"]),
+        ([11_000_000, 5880], ["99.9%", nil]),
+        ([1000, 5], ["99.5%", nil]),
         ([99, 1], ["99%", "1%"]),
         ([100], ["100%"]),
         ([500, 0], ["100%", "0%"]),
         ([0, 0], ["0%", "0%"])
-    ])
-    func namesShares(amounts: [Int], expected: [String]) {
+    ] as [([Int], [String?])])
+    func namesShares(amounts: [Int], expected: [String?]) {
         let texts = ReviewText.shares(amounts)
         #expect(texts == expected)
     }
 
     @Test(arguments: [
-        (6000, "予算 ¥40,000 の 15%"),
-        (40000, "予算 ¥40,000 の 100%"),
+        (6000, "予算の 15%"),
+        (40000, "予算の 100%"),
         (41200, "¥1,200 オーバー")
     ])
     func namesBudgetUsage(spent: Int, expected: String) throws {

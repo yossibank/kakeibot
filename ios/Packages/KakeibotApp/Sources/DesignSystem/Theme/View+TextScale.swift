@@ -5,8 +5,8 @@ public extension View {
         modifier(SharesTextScale(id: id))
     }
 
-    func sharedTextScale() -> some View {
-        modifier(SharedTextScale())
+    func sharedTextScale(floor: Double = TextScale.floor) -> some View {
+        modifier(SharedTextScale(floor: floor))
     }
 }
 
@@ -69,8 +69,10 @@ private struct SharedTextScale: ViewModifier {
     @Environment(\.groupTextScale) private var group
     @Environment(\.textScaleEpoch) private var epoch
 
+    let floor: Double
+
     func body(content: Content) -> some View {
-        let scale = TextScale.fitting(available: available, needed: needed)
+        let scale = TextScale.fitting(available: available, needed: needed, floor: floor)
 
         ProposedWidth {
             content

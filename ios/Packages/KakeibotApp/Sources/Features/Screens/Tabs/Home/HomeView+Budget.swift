@@ -76,11 +76,11 @@ extension HomeView {
 
                 if hasRecurringRow {
                     Button(action: onOpenRecurrings) {
-                        HStack(spacing: 4) {
-                            Label(recurringText, systemImage: "repeat")
+                        ViewThatFits(in: .horizontal) {
+                            recurringLabel(recurringText(title: "今月の固定費"))
 
-                            Image(systemName: "chevron.right")
-                                .sansFont(.micro, weight: .semibold)
+                            recurringLabel(recurringText(title: "固定費"))
+                                .minimumScaleFactor(0.8)
                         }
                         .textFont(.caption2)
                         .monospacedDigit()
@@ -119,6 +119,7 @@ extension HomeView {
                     type: .income
                 )
             }
+            .sharesTextScale(id: statAmounts)
             .padding(.top, 12)
             .overlay(alignment: .top) {
                 Rectangle()
@@ -137,6 +138,16 @@ private extension HomeView {
         Rectangle()
             .fill(Palette.accent.opacity(.soft))
             .frame(width: 1, height: 32)
+    }
+
+    func recurringLabel(_ text: String) -> some View {
+        HStack(spacing: 4) {
+            Label(text, systemImage: "repeat")
+                .lineLimit(1)
+
+            Image(systemName: "chevron.right")
+                .sansFont(.micro, weight: .semibold)
+        }
     }
 
     func stat(
@@ -158,7 +169,7 @@ private extension HomeView {
                 }
             }
             .displayFont(.body)
-            .lineLimit(1)
+            .sharedTextScale(floor: 0.5)
             .minimumScaleFactor(0.5)
         }
         .padding(.horizontal, 4)
@@ -226,8 +237,16 @@ private extension HomeView {
         return model.budgetUsage?.amountTint ?? Palette.accentStrong
     }
 
-    var recurringText: String {
-        let total = "今月の固定費 \(AmountText.text(model.recurringExpense))"
+    var statAmounts: [Int] {
+        [model.todayExpense, model.middleAmount, model.monthIncome]
+    }
+
+    var dialTint: Color {
+        model.budgetUsage?.tint ?? Palette.accent
+    }
+
+    func recurringText(title: String) -> String {
+        let total = "\(title) \(AmountText.text(model.recurringExpense))"
         let upcoming = model.upcomingRecurringExpense
 
         guard upcoming > 0 else {
@@ -235,9 +254,5 @@ private extension HomeView {
         }
 
         return "\(total)・これから \(AmountText.text(upcoming))"
-    }
-
-    var dialTint: Color {
-        model.budgetUsage?.tint ?? Palette.accent
     }
 }
