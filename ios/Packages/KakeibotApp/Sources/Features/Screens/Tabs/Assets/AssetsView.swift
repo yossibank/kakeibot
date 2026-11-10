@@ -9,13 +9,14 @@ public struct AssetsView: View {
     @State var isShowingReward = false
     @State var isAddingGoal = false
     @State var isAddingWallet = false
-    @State var isShowingPlans = false
+    @State var isShowingOutlook = false
     @State var addingKind = Wallet.Kind.cash
     @State var adjusting: AssetsModel.WalletRow?
 
     @Environment(\.themeStyle.corner) var corner
 
     @State private var pendingEntry: Entry.ID?
+    @State private var pendingRecurring: Recurring.ID?
 
     let onOpenWallet: (Wallet.ID) -> Void
     let onOpenRecurring: (Recurring.ID) -> Void
@@ -86,10 +87,16 @@ public struct AssetsView: View {
         .sheet(item: $adjusting) { row in
             AssetsAdjustSheet(model: model.adjustModel(for: row))
         }
-        .sheet(isPresented: $isShowingPlans, onDismiss: openPendingEntry) {
-            AssetsPlanSheet(model: model) { id in
-                pendingEntry = id
-            }
+        .sheet(isPresented: $isShowingOutlook, onDismiss: openPendingEntry) {
+            AssetsOutlookSheet(
+                model: model,
+                onOpen: { id in
+                    pendingEntry = id
+                },
+                onOpenRecurring: { id in
+                    pendingRecurring = id
+                }
+            )
         }
         .sheet(item: $entrySheet, onDismiss: openPendingEntry) { content in
             AssetsEntrySheet(content: content) { id in
@@ -169,8 +176,8 @@ private extension AssetsView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
 
-            if !model.plans.isEmpty {
-                planButton
+            if model.outlook.isShown {
+                outlookButton
             }
 
             if model.showsNetWorth {
@@ -374,6 +381,12 @@ private extension AssetsView {
     }
 
     func openPendingEntry() {
+        if let pendingRecurring {
+            self.pendingRecurring = nil
+
+            onOpenRecurring(pendingRecurring)
+        }
+
         guard let pendingEntry else {
             return
         }

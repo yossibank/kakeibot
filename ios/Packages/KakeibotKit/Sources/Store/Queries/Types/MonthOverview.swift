@@ -36,7 +36,7 @@ public struct MonthOverview: Equatable, Sendable {
         self.month = month
         self.period = period
 
-        self.periodRecurrings = Self.periodRecurrings(
+        self.periodRecurrings = PeriodRecurring.all(
             of: recurrings,
             in: period,
             entries: entries,
@@ -129,71 +129,6 @@ public extension MonthOverview {
 }
 
 private extension MonthOverview {
-    static func periodRecurrings(
-        of recurrings: [Recurring],
-        in period: ClosedRange<LocalDate>,
-        entries: [Entry]?,
-        today: LocalDate
-    ) -> [PeriodRecurring] {
-        let recorded = entries?.filter { $0.recurringId != nil } ?? []
-
-        return recurrings
-            .flatMap { recurring in
-                recurring
-                    .occurrences(from: period.lowerBound, through: period.upperBound)
-                    .compactMap { occurrence in
-                        let date = occurrence.date
-
-                        let entry = recurring.record(of: occurrence, in: recorded)
-
-                        let amount = entry?.amount
-                            ?? entries.map { recurring.amount(paidOn: date, entries: $0) }
-                            ?? recurring.scheduledAmount(paidOn: date)
-
-                        guard entry != nil || amount > 0 else {
-                            return nil
-                        }
-
-                        let state = status(
-                            of: date,
-                            entry: entry,
-                            recurring: recurring,
-                            today: today
-                        )
-
-                        return PeriodRecurring(
-                            date: date,
-                            recurring: recurring,
-                            entry: entry,
-                            status: state,
-                            amount: amount
-                        )
-                    }
-            }
-            .sorted { $0.date < $1.date }
-    }
-
-    static func status(
-        of date: LocalDate,
-        entry: Entry?,
-        recurring: Recurring,
-        today: LocalDate
-    ) -> PeriodRecurring.Status {
-        if entry != nil {
-            return .done
-        }
-
-        if date > today {
-            return .upcoming
-        }
-
-        let isGenerated = recurring.generatedUntil.map { date <= $0 } ?? false
-
-        return date == today && !isGenerated
-            ? .upcoming
-            : .missing
-    }
-
     func expense(on date: LocalDate) -> Int {
         list?.days.first { $0.date == date }?.expenseTotal ?? 0
     }

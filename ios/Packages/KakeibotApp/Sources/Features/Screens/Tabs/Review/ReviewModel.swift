@@ -10,6 +10,7 @@ public final class ReviewModel: ScreenModel {
     public var today: LocalDate {
         didSet {
             moveCache = [:]
+            upcomingCache = [:]
         }
     }
 
@@ -29,6 +30,7 @@ public final class ReviewModel: ScreenModel {
             entries = list?.entries ?? []
             summaries = [:]
             moveCache = [:]
+            upcomingCache = [:]
         }
     }
 
@@ -39,10 +41,12 @@ public final class ReviewModel: ScreenModel {
     private(set) var recurrings: [Recurring] = [] {
         didSet {
             moveCache = [:]
+            upcomingCache = [:]
         }
     }
 
     @ObservationIgnored var moveCache: [ClosedRange<LocalDate>: [Move]] = [:]
+    @ObservationIgnored var upcomingCache: [ClosedRange<LocalDate>: Int] = [:]
 
     @ObservationIgnored private var summaries: [
         ClosedRange<LocalDate>: ReviewSummary

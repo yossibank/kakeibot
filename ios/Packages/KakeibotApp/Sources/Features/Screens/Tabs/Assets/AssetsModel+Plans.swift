@@ -9,10 +9,6 @@ public extension AssetsModel {
         public let wallet: String?
         public let change: Int
     }
-
-    var plannedTotal: Int {
-        plans.reduce(total) { $0 + $1.change }
-    }
 }
 
 extension AssetsModel {

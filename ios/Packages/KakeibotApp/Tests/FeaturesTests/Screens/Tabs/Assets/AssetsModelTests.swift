@@ -53,7 +53,6 @@ struct AssetsModelTests {
         #expect(model.plans.first?.date == LocalDate("2026-10-20"))
         #expect(model.plans.first?.wallet == "財布")
         #expect(model.total == 1000)
-        #expect(model.plannedTotal == 5600)
     }
 
     @Test

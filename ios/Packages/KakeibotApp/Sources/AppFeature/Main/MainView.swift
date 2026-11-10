@@ -198,7 +198,10 @@ struct MainView: View {
 
                         tab = .records
                     },
-                    onAddEntry: addEntry(on:)
+                    onAddEntry: addEntry(on:),
+                    onOpenRecurrings: {
+                        sheet = .periodRecurrings
+                    }
                 )
                 .loadFailed(review.isListFailed) {
                     observationRound += 1
