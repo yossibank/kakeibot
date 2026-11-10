@@ -189,16 +189,21 @@ extension SettingsMenuSheet {
         }
     }
 
-    var dataSection: some View {
-        section("データ") {
+    var proSection: some View {
+        VStack(spacing: 0) {
             NavigationLink {
                 ProView(model: ProPurchaseModel(store: proStore))
             } label: {
                 row("Pro", systemImage: "sparkles", value: proText)
             }
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 16)
+        .card()
+    }
 
-            Hairline()
-
+    var dataSection: some View {
+        section("データ") {
             NavigationLink {
                 SyncView(
                     model: SyncModel(

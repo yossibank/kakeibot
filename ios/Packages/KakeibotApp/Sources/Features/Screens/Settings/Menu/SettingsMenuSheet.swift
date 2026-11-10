@@ -70,6 +70,8 @@ public struct SettingsMenuSheet: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
+                        proSection
+
                         recordSection
 
                         budgetSection
