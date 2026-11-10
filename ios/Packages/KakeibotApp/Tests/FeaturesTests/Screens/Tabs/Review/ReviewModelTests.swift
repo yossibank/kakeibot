@@ -261,6 +261,11 @@ struct ReviewModelTests {
 
         #expect(model.upcomingRecurringTotal == 3000)
 
+        model.setKind(.income)
+
+        #expect(model.upcomingRecurringTotal == nil)
+
+        model.setKind(.expense)
         model.move(by: -1)
 
         #expect(model.upcomingRecurringTotal == nil)

@@ -15,7 +15,12 @@ public final class ReviewModel: ScreenModel {
     }
 
     public private(set) var scale: ReviewPeriod.Scale = .month
-    public private(set) var kind: ReviewKind = .expense
+    public private(set) var kind: ReviewKind = .expense {
+        didSet {
+            upcomingCache = [:]
+        }
+    }
+
     public private(set) var isListFailed = false
     public private(set) var offset = 0
     public private(set) var isMovingForward = true
