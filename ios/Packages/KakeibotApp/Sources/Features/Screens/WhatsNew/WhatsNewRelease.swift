@@ -43,6 +43,7 @@ extension WhatsNewRelease {
     }
 
     static let all = [
+        v1_5_0,
         v1_4_0,
         v1_3_0,
         v1_2_0,
