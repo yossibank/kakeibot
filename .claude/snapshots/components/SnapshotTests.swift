@@ -53,7 +53,57 @@ struct SnapshotTests {
         }
         .padding(16)
 
+        let longMemo = "同僚と駅前の新しいイタリアンでランチ。パスタとサラダのセットに、食後のコーヒーも付けた"
+        let longWallet = "みずほ銀行 普通預金 給与と生活費の口座"
+
+        let entryRows = VStack(spacing: 0) {
+            EntryRow(
+                icon: nil,
+                title: "食費",
+                detail: "今日・財布",
+                memo: "コーヒー",
+                amount: 380,
+                type: .expense
+            )
+            EntryRow(
+                icon: nil,
+                title: "食費",
+                detail: "今日・財布",
+                memo: longMemo,
+                amount: 1200,
+                type: .expense
+            )
+            EntryRow(
+                icon: nil,
+                title: "食費",
+                detail: "11/10・\(longWallet)",
+                memo: "スーパー",
+                amount: 3300,
+                type: .expense
+            )
+            EntryRow(
+                icon: nil,
+                title: "食費",
+                detail: "11/10・\(longWallet)",
+                memo: longMemo,
+                amount: 9_876_543,
+                type: .expense
+            )
+            EntryRow(
+                icon: nil,
+                title: "食費",
+                tag: names[0],
+                detail: "今日・財布",
+                memo: "コーヒー",
+                amount: 380,
+                type: .expense
+            )
+            EntryRow(icon: nil, title: "食費", detail: "今日・財布", amount: 380, type: .expense)
+        }
+        .padding(16)
+
         for variant in Self.variants {
+            try Self.write(entryRows, variant: variant, to: "parts-entry-rows")
             try Self.write(calendar, variant: variant, to: "parts-calendar")
             try Self.write(tagViews, variant: variant, to: "parts-tags")
             try Self.write(templates, variant: variant, to: "parts-templates")

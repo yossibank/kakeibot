@@ -85,6 +85,22 @@ public struct EntryRow: View {
                             tagCard(tag)
                         }
                     }
+                } else if let detail, let memo, route == nil {
+                    ViewThatFits(in: .horizontal) {
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            detailText(detail)
+                                .fixedSize()
+
+                            EntryMemo(memo)
+                                .fixedSize()
+                        }
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            detailText(detail)
+
+                            EntryMemo(memo)
+                        }
+                    }
                 } else if let detail {
                     detailText(detail)
                 }
@@ -93,7 +109,7 @@ public struct EntryRow: View {
                     EntryRoute(source: route.source, destination: route.destination)
                 }
 
-                if let memo {
+                if let memo, tag != nil || detail == nil || route != nil {
                     EntryMemo(memo)
                 }
             }
