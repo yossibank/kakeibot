@@ -6,7 +6,7 @@ import StoreKit
 import SwiftUI
 
 struct MainView: View {
-    @State var tab: MainTab = .home
+    @State var selection = MainTabSelection()
     @State var sheet: Sheet?
     @State var home: HomeModel
     @State var records: RecordsModel
@@ -26,7 +26,6 @@ struct MainView: View {
     @State private var observationRound = 0
     @State private var foreground = AppForegroundReturn()
     @State private var noticeRound = 0
-    @State private var visitedTabs: Set<MainTab> = []
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
@@ -98,7 +97,7 @@ struct MainView: View {
 
     var body: some View {
         ZStack {
-            tabLayer(.home) {
+            MainTabLayer(selection: selection, value: .home) {
                 HomeView(
                     model: home,
                     setup: setup,
@@ -155,7 +154,7 @@ struct MainView: View {
                 .tabContent()
             }
 
-            tabLayer(.records) {
+            MainTabLayer(selection: selection, value: .records) {
                 RecordsView(
                     model: records,
                     onOpenEntry: { id in
@@ -185,7 +184,7 @@ struct MainView: View {
                 .tabContent()
             }
 
-            tabLayer(.review) {
+            MainTabLayer(selection: selection, value: .review) {
                 ReviewView(
                     model: review,
                     onOpenEntry: { id in
@@ -207,7 +206,7 @@ struct MainView: View {
                 .tabContent()
             }
 
-            tabLayer(.assets) {
+            MainTabLayer(selection: selection, value: .assets) {
                 AssetsView(
                     model: assets,
                     onTransfer: {
@@ -233,15 +232,11 @@ struct MainView: View {
             }
         }
         .environment(\.noticeRound, noticeRound)
-        .onChange(of: tab, initial: true) {
-            visitedTabs.insert(tab)
-        }
         .overlay(alignment: .leading) {
             if hasSidebar {
-                SideTabBar(
-                    selection: $tab,
-                    title: "かけいぼっと",
-                    items: Self.tabItems,
+                MainTabBar(
+                    selection: selection,
+                    hasSidebar: true,
                     isAddHinted: !setup.isEntryOpened
                 ) {
                     sheet = .new
@@ -250,9 +245,9 @@ struct MainView: View {
         }
         .overlay(alignment: .bottom) {
             if !hasSidebar {
-                FloatingTabBar(
-                    selection: $tab,
-                    items: Self.tabItems,
+                MainTabBar(
+                    selection: selection,
+                    hasSidebar: false,
                     isAddHinted: !setup.isEntryOpened
                 ) {
                     sheet = .new
@@ -348,6 +343,17 @@ struct MainView: View {
     }
 }
 
+extension MainView {
+    var tab: MainTab {
+        get {
+            selection.value
+        }
+        nonmutating set {
+            selection.value = newValue
+        }
+    }
+}
+
 private extension MainView {
     enum NoticeSource {
         case entry
@@ -399,22 +405,6 @@ private extension MainView {
                 try? await Task.sleep(for: Self.warmupDuration)
                 isWarmingEntry = false
             }
-    }
-
-    @ViewBuilder
-    func tabLayer(
-        _ value: MainTab,
-        @ViewBuilder content: () -> some View
-    ) -> some View {
-        if visitedTabs.contains(value) || tab == value {
-            let isShown = tab == value
-
-            content()
-                .opacity(isShown ? 1 : 0)
-                .allowsHitTesting(isShown)
-                .zIndex(isShown ? 1 : 0)
-                .animation(nil, value: isShown)
-        }
     }
 }
 
