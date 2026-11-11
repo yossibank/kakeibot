@@ -38,17 +38,15 @@ public struct EntryRow: View {
 
     public var body: some View {
         HStack(spacing: 12) {
-            Group {
-                if icon == nil,
-                   type == .transfer {
-                    Image(systemName: "arrow.left.arrow.right")
-                        .sansFont(.small, weight: .light)
-                        .frame(width: 21, height: 21)
-                } else {
-                    IconImage(icon, size: 15)
-                }
+            if icon == nil,
+               type == .transfer {
+                Image(systemName: "arrow.left.arrow.right")
+                    .sansFont(.small, weight: .light)
+                    .foregroundStyle(Palette.accent)
+                    .frame(width: 28, height: 28)
+            } else {
+                IconBadge(icon, size: 28)
             }
-            .foregroundStyle(Palette.accent)
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {

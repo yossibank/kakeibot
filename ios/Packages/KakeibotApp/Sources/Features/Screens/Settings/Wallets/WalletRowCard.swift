@@ -67,7 +67,7 @@ extension WalletRowCard {
 
 private extension WalletRowCard {
     var amountColor: Color {
-        amount < 0 ? Palette.rose : Palette.accentStrong
+        kind.role.balanceColor(amount)
     }
 }
 
@@ -85,15 +85,9 @@ struct WalletRowIcon: View {
             .foregroundStyle(Palette.accent)
             .frame(width: 48, height: 48)
             .background(
-                Palette.accent.opacity(.subtle),
+                color.opacity(0.3),
                 in: .rect(cornerRadius: corner.radius(12))
             )
-            .overlay(alignment: .bottom) {
-                Capsule()
-                    .fill(color)
-                    .frame(width: 20, height: 2)
-                    .padding(.bottom, 4)
-            }
             .overlay {
                 RoundedRectangle(cornerRadius: corner.radius(12))
                     .stroke(stroke, lineWidth: strokeWidth)

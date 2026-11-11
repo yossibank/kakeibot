@@ -28,11 +28,11 @@ public struct IconBadge: View {
 
     public var body: some View {
         RoundedRectangle(cornerRadius: corner.radius(size * 0.3), style: .continuous)
-            .fill(tint.opacity(0.18))
+            .fill(tint.opacity(0.3))
             .frame(width: size, height: size)
             .overlay {
                 mark
-                    .foregroundStyle(tint)
+                    .foregroundStyle(Palette.accent)
             }
     }
 }

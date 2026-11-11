@@ -71,17 +71,27 @@ private extension BudgetListView {
                                 .padding(.trailing, 8)
                         }
 
-                        VStack(spacing: 0) {
-                            ForEach(model.categories) { category in
-                                categoryRow(category)
-
-                                if category.id != model.categories.last?.id {
-                                    Hairline()
-                                }
-                            }
+                        if !budgeted.isEmpty {
+                            rowsCard(budgeted, row: categoryRow)
                         }
-                        .padding(.horizontal, 16)
-                        .card()
+                    }
+
+                    if !unbudgeted.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                SettingsSectionTitle("予算なし")
+
+                                Spacer()
+
+                                Text("\(unbudgeted.count) カテゴリ")
+                                    .textFont(.caption2)
+                                    .monospacedDigit()
+                                    .foregroundStyle(Palette.subtext)
+                                    .padding(.trailing, 8)
+                            }
+
+                            rowsCard(unbudgeted, row: plainRow)
+                        }
                     }
                 }
                 .padding(.vertical, 8)
@@ -200,9 +210,7 @@ private extension BudgetListView {
         } label: {
             VStack(spacing: 8) {
                 HStack(spacing: 12) {
-                    IconImage(model.icon(for: category), size: 16)
-                        .foregroundStyle(Palette.accent)
-                        .frame(width: 24)
+                    IconBadge(model.icon(for: category), size: 28)
 
                     Text(category.name)
                         .textFont(.subheadline)
@@ -217,14 +225,14 @@ private extension BudgetListView {
 
                 if let usage {
                     usageLine(usage)
-                        .padding(.leading, 36)
+                        .padding(.leading, 40)
                 } else if spent > 0 {
                     Text("使った額 \(AmountText.text(spent))")
                         .textFont(.caption2)
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading, 36)
+                        .padding(.leading, 40)
                 }
             }
             .padding(.vertical, 12)
@@ -232,6 +240,56 @@ private extension BudgetListView {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+
+    func plainRow(_ category: EntryCategory) -> some View {
+        let spent = model.spent(for: category.id)
+
+        return Button {
+            openDrawer(.category(category))
+        } label: {
+            HStack(spacing: 12) {
+                IconBadge(model.icon(for: category), size: 28)
+
+                Text(category.name)
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+
+                Spacer(minLength: 8)
+
+                if spent > 0 {
+                    Text("使った額 \(AmountText.text(spent))")
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                        .layoutPriority(1)
+                }
+
+                EditBadge(size: 16)
+            }
+            .padding(.vertical, 8)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+
+    func rowsCard(
+        _ categories: [EntryCategory],
+        row: @escaping (EntryCategory) -> some View
+    ) -> some View {
+        VStack(spacing: 0) {
+            ForEach(categories) { category in
+                row(category)
+
+                if category.id != categories.last?.id {
+                    Hairline()
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .card()
     }
 
     func usageLine(_ usage: BudgetUsage) -> some View {
@@ -270,6 +328,20 @@ private extension BudgetListView {
 }
 
 private extension BudgetListView {
+    var budgeted: [EntryCategory] {
+        model.categories.filter { model.amount(for: $0.id) != nil }
+    }
+
+    var unbudgeted: [EntryCategory] {
+        let rest = model.categories.filter { model.amount(for: $0.id) == nil }
+        let order = rest.enumerated().sorted { lhs, rhs in
+            let spent = (model.spent(for: lhs.element.id), model.spent(for: rhs.element.id))
+            return spent.0 == spent.1 ? lhs.offset < rhs.offset : spent.0 > spent.1
+        }
+
+        return order.map(\.element)
+    }
+
     var periodText: String {
         "\(model.month.month)月（\(model.periodText)）から使う額"
     }

@@ -250,7 +250,8 @@ private extension WalletListView {
         WalletRowCard(
             name: wallet.name,
             kind: wallet.kind,
-            amount: model.balance(of: wallet)
+            amount: model.balance(of: wallet),
+            caption: wallet.kind.role.balanceLabel(model.balance(of: wallet))
         ) {
             WalletRowIcon(icon: model.icon(for: wallet))
         }

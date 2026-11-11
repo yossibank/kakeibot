@@ -7,6 +7,7 @@ struct AssetsRewardSheet: View {
     @State var boughtId: RewardGoal.ID?
 
     @State private var isEditingRules = false
+    @State private var isGuideOpen = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -70,6 +71,10 @@ extension AssetsRewardSheet {
 }
 
 private extension AssetsRewardSheet {
+    var isSetUp: Bool {
+        !model.rewardRules.isEmpty && model.rewardGoal != nil
+    }
+
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
@@ -125,8 +130,37 @@ private extension AssetsRewardSheet {
 
     var guideSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionTitle("使い方")
+            if isSetUp {
+                Button {
+                    withAnimation(.snappy) {
+                        isGuideOpen.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        SectionTitle("使い方")
 
+                        Image(systemName: "chevron.down")
+                            .sansFont(.micro, weight: .semibold)
+                            .foregroundStyle(Palette.accent)
+                            .rotationEffect(.degrees(isGuideOpen ? 180 : 0))
+
+                        Spacer()
+                    }
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+            } else {
+                SectionTitle("使い方")
+            }
+
+            if !isSetUp || isGuideOpen {
+                guideCard
+            }
+        }
+    }
+
+    var guideCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 12) {
                 guideStep(
                     1,
@@ -248,7 +282,8 @@ private extension AssetsRewardSheet {
             Text(rule.name)
                 .textFont(.footnote)
                 .foregroundStyle(Palette.text)
-                .sharedTextScale()
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
 
             Spacer(minLength: 8)
 

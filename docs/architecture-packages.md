@@ -158,7 +158,8 @@ KakeibotApp/
 │   │       ├── Pro/
 │   │       ├── SettingsParts/
 │   │       ├── Setup/
-│   │       └── Stamp/
+│   │       ├── Stamp/
+│   │       └── Wallet/
 │   ├── Notifications/
 │   └── Sync/
 └── Tests/
@@ -193,6 +194,7 @@ KakeibotApp/
 | `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Features/Shared/Stamp/` | 押したスタンプの数のカードと、押した日の一覧のシート |
+| `Features/Shared/Wallet/` | 口座の役割ごとの、残高に添える言葉と額の色。資産のタブと設定の口座で使う |
 | `Sync/` | CKSyncEngine で変更を送り受けする。財布の共有、共有シート、共有の受け入れも作る |
 | `Tests/TestSupport/` | テストの補助。観測している値が変わるのを、上限の時間まで待つ |
 
