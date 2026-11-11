@@ -89,7 +89,7 @@ extension WalletEditSheet {
     }
 
     var iconStrokeWidth: CGFloat {
-        isEditingIcon ? 2 : 1.5
+        isEditingIcon ? 2 : IconBadge.lineWidth
     }
 
     var amountStroke: Color {

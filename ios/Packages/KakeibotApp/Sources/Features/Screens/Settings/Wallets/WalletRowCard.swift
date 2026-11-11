@@ -72,9 +72,11 @@ private extension WalletRowCard {
 }
 
 struct WalletRowIcon: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let icon: Icon?
     var stroke: Color?
-    var strokeWidth: CGFloat = 1.5
+    var strokeWidth: CGFloat = IconBadge.lineWidth
 
     var body: some View {
         let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.subtext
@@ -83,7 +85,7 @@ struct WalletRowIcon: View {
             .foregroundStyle(Palette.accent)
             .frame(width: 48, height: 48)
             .overlay {
-                Circle()
+                RoundedRectangle(cornerRadius: corner.radius(12), style: .continuous)
                     .strokeBorder(stroke ?? color, lineWidth: strokeWidth)
             }
     }
