@@ -8,6 +8,7 @@ public struct RecordsView: View {
 
     @State var stampTarget: StampTarget?
     @State var rewardTarget: StampTarget?
+    @State var markTarget: StampTarget?
     @State var selection: Set<Entry.ID>?
     @State var batchTarget: RecordsBatchSheet.Target?
     @State var isFiltering = false
@@ -148,6 +149,19 @@ public struct RecordsView: View {
         }
         .sheet(item: $rewardTarget) { target in
             RecordsRewardSheet(model: model, date: target.date)
+        }
+        .confirmationDialog(
+            "この日に付けるもの",
+            isPresented: isChoosingMark,
+            presenting: markTarget
+        ) { target in
+            Button("スタンプを押す") {
+                stampTarget = target
+            }
+
+            Button("ごほうびを付ける") {
+                rewardTarget = target
+            }
         }
         .sheet(item: $batchTarget) { target in
             RecordsBatchSheet(

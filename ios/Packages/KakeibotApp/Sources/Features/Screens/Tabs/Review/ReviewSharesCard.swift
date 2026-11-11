@@ -97,56 +97,75 @@ private extension ReviewSharesCard {
 
     func label(
         _ share: ReviewModel.Share,
-        percent: String
+        percent: String?
     ) -> some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 12) {
-                IconBadge(share.icon, size: 30)
+        HStack(spacing: 12) {
+            HStack(spacing: 8) {
+                if total != nil {
+                    Circle()
+                        .fill(Self.color(of: share, in: shares))
+                        .frame(width: 8, height: 8)
+                }
 
-                VStack(alignment: .leading, spacing: 2) {
+                IconBadge(share.icon, size: 26)
+            }
+
+            ZStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(verbatim: " ")
+                        .textFont(.subheadline)
+
+                    Text(verbatim: " ")
+                        .textFont(.caption)
+                }
+                .hidden()
+
+                VStack(alignment: .leading, spacing: 4) {
                     Text(share.name)
                         .textFont(.subheadline)
                         .foregroundStyle(Palette.text)
                         .sharedTextScale()
 
-                    Text(percent)
-                        .textFont(.caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                        .lineLimit(1)
+                    if percent != nil || share.usage != nil {
+                        HStack(spacing: 8) {
+                            if let percent {
+                                Text(percent)
+                                    .textFont(.caption)
+                                    .monospacedDigit()
+                                    .foregroundStyle(Palette.subtext)
+                                    .lineLimit(1)
+                                    .fixedSize()
+                            }
+
+                            if let usage = share.usage {
+                                BudgetUsageBar(usage)
+                            }
+                        }
+                    }
                 }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-                Spacer(minLength: 8)
-
+            VStack(alignment: .trailing, spacing: 2) {
                 AmountText(share.amount, type: type, font: .size(.body))
                     .fixedSize()
-                    .layoutPriority(1)
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.small)
-                    .foregroundStyle(Palette.hint)
+                if let usage = share.usage {
+                    Text(ReviewText.budget(usage))
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(usage.isOver ? Palette.rose : Palette.subtext)
+                        .lineLimit(1)
+                        .fixedSize()
+                }
             }
+            .layoutPriority(1)
 
-            if let usage = share.usage {
-                budgetLine(usage)
-                    .padding(.leading, 40)
-            }
+            Image(systemName: "chevron.right")
+                .sansFont(.small)
+                .foregroundStyle(Palette.hint)
         }
         .contentShape(.rect)
-    }
-
-    func budgetLine(_ usage: BudgetUsage) -> some View {
-        HStack(spacing: 8) {
-            BudgetUsageBar(usage)
-
-            Text(ReviewText.budget(usage))
-                .textFont(.caption2)
-                .monospacedDigit()
-                .foregroundStyle(usage.isOver ? Palette.rose : Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .layoutPriority(1)
-        }
     }
 }
 
@@ -164,17 +183,27 @@ private extension ReviewSharesCard {
         return others.count > 1 ? others : nil
     }
 
+    static func color(
+        of share: ReviewModel.Share,
+        in shares: [ReviewModel.Share]
+    ) -> Color {
+        let others = otherShares(shares) ?? []
+        return others.contains { $0.id == share.id } ? Palette.hint : color(of: share)
+    }
+
+    static func color(of share: ReviewModel.Share) -> Color {
+        share.icon.flatMap { Color(hex: $0.color) } ?? Palette.accent
+    }
+
     static func slices(_ shares: [ReviewModel.Share]) -> [DonutChart<AnyHashable>.Slice] {
         let others = otherShares(shares) ?? []
         let main = shares.dropLast(others.count)
 
         let slices = main.map { share in
-            let color = share.icon.flatMap { Color(hex: $0.color) }
-
-            return DonutChart<AnyHashable>.Slice(
+            DonutChart<AnyHashable>.Slice(
                 id: share.id,
                 value: share.amount,
-                color: color ?? Palette.accent
+                color: color(of: share)
             )
         }
 

@@ -5,7 +5,8 @@ public enum TextScale {
 
     public static func fitting(
         available: CGFloat,
-        needed: CGFloat
+        needed: CGFloat,
+        floor: Double = floor
     ) -> Double {
         guard
             needed > 0,

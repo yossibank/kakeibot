@@ -3,7 +3,7 @@ import DesignSystem
 import SwiftUI
 
 enum ReviewText {
-    static func shares(_ amounts: [Int]) -> [String] {
+    static func shares(_ amounts: [Int]) -> [String?] {
         let whole = amounts.reduce(0, +)
         let percents = Percent.shares(amounts)
 
@@ -23,7 +23,7 @@ enum ReviewText {
 
         let percent = Percent.floor(usage.spent, of: usage.budget)
 
-        return "予算 \(AmountText.text(usage.budget)) の \(percent)%"
+        return "予算の \(percent)%"
     }
 
     static func balanceTitle(_ amount: Int) -> String {
@@ -48,7 +48,7 @@ private extension ReviewText {
         _ amount: Int,
         percent: Int,
         whole: Int
-    ) -> String {
+    ) -> String? {
         guard
             amount > 0,
             whole > 0
@@ -57,7 +57,7 @@ private extension ReviewText {
         }
 
         if amount * 100 < whole {
-            return "1%未満"
+            return nil
         }
 
         if percent >= 100,
