@@ -3,3 +3,6 @@
 ・The Review tab now shows the fixed costs not yet recorded in the current period, and the outlook for the end of the period.
 ・Entries now show the wallet and memo on one line when they fit, so the list is easier to read.
 ・Pro now sits at the top of the settings list.
+・Calendar amounts are larger and titles are darker, so they are easier to read.
+・Icons now share the same look on every screen.
+・Budget settings now list the categories with a budget first.
