@@ -34,7 +34,7 @@ private extension SheetTitle {
             .displayFont(.body)
             .tracking(tracking)
             .multilineTextAlignment(.center)
-            .foregroundStyle(Palette.accent)
+            .foregroundStyle(Palette.accentStrong)
     }
 }
 

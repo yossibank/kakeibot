@@ -117,7 +117,7 @@ private extension RecordsView {
             .equatable()
         } else {
             Color.clear
-                .frame(maxWidth: .infinity, minHeight: 62)
+                .frame(maxWidth: .infinity, minHeight: 66)
         }
     }
 
