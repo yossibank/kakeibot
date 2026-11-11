@@ -6,7 +6,7 @@ extension WalletEditSheet {
     var content: some View {
         SettingsEditForm(showsSave: focus == nil) {
             SettingsPreviewSection(
-                note: "アイコンの色は、振り返りのグラフの色になります",
+                note: "アイコンの色は、枠と振り返りのグラフに使います",
                 dot: noteColor
             ) {
                 preview
