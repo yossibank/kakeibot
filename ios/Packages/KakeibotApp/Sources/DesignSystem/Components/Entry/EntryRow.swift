@@ -44,8 +44,11 @@ public struct EntryRow: View {
                     .sansFont(.small, weight: .light)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 28, height: 28)
-            } else {
+            } else if let icon {
                 IconBadge(icon, size: 28)
+            } else {
+                Color.clear
+                    .frame(width: 28, height: 28)
             }
 
             VStack(alignment: .leading, spacing: 4) {

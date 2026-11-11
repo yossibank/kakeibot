@@ -70,8 +70,6 @@ public struct SettingsMenuSheet: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        proSection
-
                         recordSection
 
                         budgetSection
@@ -85,6 +83,8 @@ public struct SettingsMenuSheet: View {
                         dataSection
 
                         aboutSection
+
+                        proSection
 
                         #if DEBUG
                         sampleSection

@@ -2,8 +2,6 @@ import Core
 import SwiftUI
 
 public struct IconBadge: View {
-    @Environment(\.themeStyle.corner) private var corner
-
     let icon: Icon?
     let systemImage: String?
     let size: CGFloat
@@ -27,8 +25,8 @@ public struct IconBadge: View {
     }
 
     public var body: some View {
-        RoundedRectangle(cornerRadius: corner.radius(size * 0.3), style: .continuous)
-            .fill(tint.opacity(0.3))
+        Circle()
+            .strokeBorder(tint, lineWidth: 1.5)
             .frame(width: size, height: size)
             .overlay {
                 mark
