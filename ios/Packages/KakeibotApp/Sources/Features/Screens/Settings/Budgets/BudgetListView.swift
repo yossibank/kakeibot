@@ -58,20 +58,20 @@ private extension BudgetListView {
                         await model.setCarryover(isOn)
                     }
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            SettingsSectionTitle("カテゴリごと")
+                    if !budgeted.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                SettingsSectionTitle("カテゴリごと")
 
-                            Spacer()
+                                Spacer()
 
-                            Text("合計 \(AmountText.text(model.categoriesTotal))")
-                                .textFont(.caption2)
-                                .monospacedDigit()
-                                .foregroundStyle(Palette.subtext)
-                                .padding(.trailing, 8)
-                        }
+                                Text("合計 \(AmountText.text(model.categoriesTotal))")
+                                    .textFont(.caption2)
+                                    .monospacedDigit()
+                                    .foregroundStyle(Palette.subtext)
+                                    .padding(.trailing, 8)
+                            }
 
-                        if !budgeted.isEmpty {
                             rowsCard(budgeted, row: categoryRow)
                         }
                     }
