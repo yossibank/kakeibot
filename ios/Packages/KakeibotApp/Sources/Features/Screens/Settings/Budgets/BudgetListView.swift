@@ -267,7 +267,10 @@ private extension BudgetListView {
                         .layoutPriority(1)
                 }
 
-                EditBadge(size: 16)
+                Image(systemName: "plus")
+                    .sansFont(.small)
+                    .foregroundStyle(Palette.hint)
+                    .frame(width: 16, height: 16)
             }
             .padding(.vertical, 8)
             .contentShape(.rect)

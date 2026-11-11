@@ -63,7 +63,7 @@ struct RecordsCalendarCell: View {
             }
         }
         .opacity(isDimmed ? 0.45 : 1)
-        .frame(maxWidth: .infinity, minHeight: 62)
+        .frame(maxWidth: .infinity, minHeight: 66)
         .contentShape(.rect)
         .onTapGesture(perform: onSelect)
     }
@@ -88,7 +88,7 @@ extension RecordsCalendarCell: Equatable {
 }
 
 private extension RecordsCalendarCell {
-    static let markLineHeight: CGFloat = 12
+    static let markLineHeight: CGFloat = 14
 
     static var stampTransition: AnyTransition {
         .scale(scale: 0.2).combined(with: .opacity)
@@ -110,7 +110,7 @@ private extension RecordsCalendarCell {
         _ amount: Int,
         type: Entry.Kind
     ) -> some View {
-        AmountText(amount, type: type, font: .size(.micro), isCompact: true)
+        AmountText(amount, type: type, font: .size(.caption), isCompact: true)
             .lineLimit(1)
             .minimumScaleFactor(0.6)
             .padding(.horizontal, 2)

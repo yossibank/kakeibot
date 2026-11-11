@@ -19,9 +19,9 @@ public struct TabHeader<Accessory: View>: View {
         HStack {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(title)
-                    .displayFont(.body)
+                    .displayFont(.headline)
                     .tracking(3)
-                    .foregroundStyle(Palette.accent)
+                    .foregroundStyle(Palette.accentStrong)
 
                 if let subtitle {
                     Text(subtitle)
