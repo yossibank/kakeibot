@@ -28,13 +28,17 @@ public struct IconBadge: View {
 
     public var body: some View {
         RoundedRectangle(cornerRadius: corner.radius(size * 0.3), style: .continuous)
-            .fill(tint.opacity(0.18))
+            .strokeBorder(tint, lineWidth: Self.lineWidth)
             .frame(width: size, height: size)
             .overlay {
                 mark
-                    .foregroundStyle(tint)
+                    .foregroundStyle(Palette.accent)
             }
     }
+}
+
+public extension IconBadge {
+    static let lineWidth: CGFloat = 0.8
 }
 
 private extension IconBadge {

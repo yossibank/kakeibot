@@ -110,8 +110,9 @@ private extension RecordsCalendarCell {
         _ amount: Int,
         type: Entry.Kind
     ) -> some View {
-        AmountText(amount, type: type, font: .size(.micro))
+        AmountText(amount, type: type, font: .size(.micro), isCompact: true)
             .lineLimit(1)
             .minimumScaleFactor(0.6)
+            .padding(.horizontal, 2)
     }
 }

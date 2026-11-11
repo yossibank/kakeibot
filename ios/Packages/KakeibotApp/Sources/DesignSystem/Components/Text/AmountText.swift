@@ -7,23 +7,30 @@ public struct AmountText: View {
     let font: FontSpec
     let sign: Sign
     let color: Color?
+    let isCompact: Bool
 
     public init(
         _ amount: Int,
         type: Entry.Kind? = nil,
         font: FontSpec,
         sign: Sign = .auto,
-        color: Color? = nil
+        color: Color? = nil,
+        isCompact: Bool = false
     ) {
         self.amount = amount
         self.type = type
         self.font = font
         self.sign = sign
         self.color = color
+        self.isCompact = isCompact
     }
 
     public var body: some View {
-        Text(Self.text(amount, type: type, sign: sign))
+        let text = isCompact
+            ? Self.compactText(amount, type: type, sign: sign)
+            : Self.text(amount, type: type, sign: sign)
+
+        Text(text)
             .modifier(AmountFont(spec: font))
             .monospacedDigit()
             .modifier(AmountTint(color: color ?? typeColor))
@@ -50,10 +57,24 @@ public extension AmountText {
         let number = abs(amount).formatted(.number.locale(locale))
         return "\(mark(of: amount, type: type, sign: sign))¥\(number)"
     }
+
+    nonisolated static func compactText(
+        _ amount: Int,
+        type: Entry.Kind? = nil,
+        sign: Sign = .auto
+    ) -> String {
+        guard abs(amount) >= compactFloor else {
+            return text(amount, type: type, sign: sign)
+        }
+
+        let number = (abs(amount) / 10000).formatted(.number.locale(locale))
+        return "\(mark(of: amount, type: type, sign: sign))\(number)万円"
+    }
 }
 
 private extension AmountText {
     nonisolated static let locale = Locale(identifier: "ja_JP")
+    nonisolated static let compactFloor = 1_000_000
 
     var typeColor: Color? {
         switch type {

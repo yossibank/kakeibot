@@ -67,7 +67,7 @@ extension WalletRowCard {
 
 private extension WalletRowCard {
     var amountColor: Color {
-        amount < 0 ? Palette.rose : Palette.accentStrong
+        kind.role.balanceColor(amount)
     }
 }
 
@@ -75,8 +75,8 @@ struct WalletRowIcon: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let icon: Icon?
-    var stroke: Color = Palette.accent.opacity(.muted)
-    var strokeWidth: CGFloat = 1
+    var stroke: Color?
+    var strokeWidth: CGFloat = IconBadge.lineWidth
 
     var body: some View {
         let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.subtext
@@ -84,19 +84,9 @@ struct WalletRowIcon: View {
         IconImage(icon, size: 22)
             .foregroundStyle(Palette.accent)
             .frame(width: 48, height: 48)
-            .background(
-                Palette.accent.opacity(.subtle),
-                in: .rect(cornerRadius: corner.radius(12))
-            )
-            .overlay(alignment: .bottom) {
-                Capsule()
-                    .fill(color)
-                    .frame(width: 20, height: 2)
-                    .padding(.bottom, 4)
-            }
             .overlay {
-                RoundedRectangle(cornerRadius: corner.radius(12))
-                    .stroke(stroke, lineWidth: strokeWidth)
+                RoundedRectangle(cornerRadius: corner.radius(12), style: .continuous)
+                    .strokeBorder(stroke ?? color, lineWidth: strokeWidth)
             }
     }
 }

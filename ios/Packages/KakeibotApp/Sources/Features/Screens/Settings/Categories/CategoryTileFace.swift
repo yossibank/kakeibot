@@ -8,12 +8,10 @@ struct CategoryTileFace: View {
     let isHidden: Bool
 
     var body: some View {
-        let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.subtext
         let opacity: Double = isHidden ? 0.6 : 1
 
         VStack(spacing: 8) {
-            IconImage(icon, size: 20)
-                .foregroundStyle(Palette.accent)
+            IconBadge(icon, size: 40)
 
             Text(name)
                 .textFont(size: .caption)
@@ -22,12 +20,6 @@ struct CategoryTileFace: View {
                 .minimumScaleFactor(TextScale.floor)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .bottom) {
-            Capsule()
-                .fill(color)
-                .frame(width: 24, height: 2)
-                .padding(.bottom, 8)
-        }
         .settingsTileFace(isHidden: isHidden)
         .opacity(opacity)
     }

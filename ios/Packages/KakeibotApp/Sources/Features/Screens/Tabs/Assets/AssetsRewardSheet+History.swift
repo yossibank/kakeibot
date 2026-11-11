@@ -57,7 +57,8 @@ private extension AssetsRewardSheet {
             Text(rule?.name ?? "")
                 .textFont(.footnote)
                 .foregroundStyle(Palette.text)
-                .sharedTextScale()
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
 
             Spacer(minLength: 8)
 

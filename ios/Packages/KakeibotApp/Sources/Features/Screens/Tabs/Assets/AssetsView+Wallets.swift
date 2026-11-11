@@ -373,22 +373,11 @@ private extension AssetsView {
     }
 
     static func label(of row: AssetsModel.WalletRow) -> String? {
-        switch row.wallet.kind.role {
-        case .card: row.balance > 0 ? "返ってくる額" : "未払い"
-        case .loan: "残り"
-        case .onHand, .investment: nil
-        }
+        row.wallet.kind.role.balanceLabel(row.balance)
     }
 
     static func amountColor(of row: AssetsModel.WalletRow) -> Color {
-        switch row.wallet.kind.role {
-        case .card: row.balance > 0 ? Palette.accent : Palette.text
-
-        case .loan: Palette.text
-
-        case .onHand, .investment:
-            row.balance < 0 ? Palette.rose : Palette.accentStrong
-        }
+        row.wallet.kind.role.balanceColor(row.balance)
     }
 
     static func repaymentText(_ repayment: AssetsModel.Repayment) -> String? {

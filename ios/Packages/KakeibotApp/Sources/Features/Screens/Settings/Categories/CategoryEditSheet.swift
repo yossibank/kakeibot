@@ -192,7 +192,8 @@ private extension CategoryEditSheet {
 
     var preview: some View {
         SettingsPreviewSection(
-            note: "入力シートでは、このタイルで並びます。色は、振り返りのグラフの色になります",
+            note: "入力シートに、アイコンと名前が並びます",
+            colorNote: "色は、枠と振り返りのグラフに使います",
             dot: graphColor
         ) {
             Button {
