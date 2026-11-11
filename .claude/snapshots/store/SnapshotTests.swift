@@ -97,7 +97,6 @@ extension SnapshotTests {
 
     enum Art {
         case phone(String)
-        case tap(String, at: UnitPoint)
         case inset(
             String,
             from: String,
@@ -114,7 +113,6 @@ extension SnapshotTests {
 
     enum LoadedArt {
         case phone(UIImage)
-        case tap(UIImage, at: UnitPoint)
         case inset(UIImage, part: UIImage, corner: CGFloat, width: CGFloat, at: UnitPoint)
         case fan(left: UIImage, center: UIImage, right: UIImage, labels: [String])
         case compare(UIImage, parts: [UIImage], labels: [String])
@@ -287,18 +285,6 @@ private extension StorePage {
         case let .phone(shot):
             phone(shot, width: 360)
 
-        case let .tap(shot, point):
-            phone(shot, width: 360)
-                .overlay {
-                    GeometryReader { proxy in
-                        tapMark
-                            .position(
-                                x: 10 + (proxy.size.width - 20) * point.x,
-                                y: 10 + (proxy.size.height - 20) * point.y
-                            )
-                    }
-                }
-
         case let .inset(shot, part, corner, width, point):
             ZStack(alignment: .top) {
                 phone(shot, width: 360)
@@ -368,7 +354,7 @@ private extension StorePage {
             Text("スーパー青葉")
                 .textFont(size: .small, weight: .semibold)
 
-            Text("2026/11/03 18:24")
+            Text("2026/11/10 18:24")
                 .textFont(size: .micro)
                 .foregroundStyle(Color(rgb: 0x8A8A8A))
 
@@ -425,26 +411,6 @@ private extension StorePage {
         Line()
             .stroke(Color(rgb: 0xBBBBBB), style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
             .frame(height: 1)
-    }
-
-    var tapMark: some View {
-        ZStack {
-            Circle()
-                .fill(colors.badge.opacity(0.18))
-                .frame(width: 112, height: 112)
-
-            Circle()
-                .stroke(colors.badge.opacity(0.5), lineWidth: 3)
-                .frame(width: 84, height: 84)
-
-            Circle()
-                .fill(.white.opacity(0.55))
-                .frame(width: 52, height: 52)
-                .overlay {
-                    Circle()
-                        .stroke(colors.badge, lineWidth: 3)
-                }
-        }
     }
 
     func phone(
@@ -710,7 +676,7 @@ private extension SnapshotTests {
         ),
         Page(
             file: "03-receipt",
-            badge: "NEW",
+            badge: nil,
             lines: ["レシートを撮れば、", "品目まで入る"],
             note: "品名・合計・日付・店名を読み取り",
             mood: .sage,
@@ -787,7 +753,7 @@ private extension SnapshotTests {
         ),
         Page(
             file: "03-receipt",
-            badge: "NEW",
+            badge: nil,
             lines: ["レシートを撮れば、", "品目まで入る"],
             note: "品名・合計・日付・店名を読み取り",
             mood: .sage,
@@ -828,7 +794,7 @@ private extension SnapshotTests {
             art: .inset(
                 "06-assets",
                 from: "06-assets",
-                crop: CGRect(x: 53, y: 1549, width: 1215, height: 534),
+                crop: CGRect(x: 53, y: 1981, width: 1215, height: 534),
                 corner: 20,
                 width: 400,
                 at: UnitPoint(x: 0.5, y: 0.66)
@@ -851,7 +817,7 @@ private extension SnapshotTests {
             art: .inset(
                 "08-records",
                 from: "08-records",
-                crop: CGRect(x: 69, y: 1365, width: 676, height: 400),
+                crop: CGRect(x: 69, y: 1725, width: 676, height: 400),
                 corner: 20,
                 width: 320,
                 at: UnitPoint(x: 0.5, y: 0.6)
@@ -866,12 +832,12 @@ private extension SnapshotTests {
             art: .pair("08-records", "09-share-rose")
         ),
         Page(
-            file: "10-widget",
-            badge: nil,
-            lines: ["アプリを開かずに、", "すぐ記録"],
-            note: "ホーム画面のウィジェットから 1 タップ",
+            file: "10-outlook",
+            badge: "NEW",
+            lines: ["月末にいくら残る？", "が、先に分かる"],
+            note: "固定費と予定の記録から、月末の残りを見込み",
             mood: .sand,
-            art: .tap("10-widget", at: UnitPoint(x: 0.85, y: 0.372))
+            art: .phone("10-outlook")
         )
     ]
 
@@ -931,6 +897,7 @@ private extension SnapshotTests {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
+            .deletingLastPathComponent()
             .appending(path: "store/screenshots/raw")
     }
 
@@ -943,9 +910,6 @@ private extension SnapshotTests {
         switch art {
         case let .phone(name):
             return try .phone(image(name))
-
-        case let .tap(name, point):
-            return try .tap(image(name), at: point)
 
         case let .inset(name, source, crop, corner, width, point):
             let cropped = try #require(image(source).cgImage?.cropping(to: crop))
@@ -995,10 +959,8 @@ private extension SnapshotTests {
 
         let image = try #require(renderer.cgImage)
         let data = try #require(UIImage(cgImage: image).pngData())
-        let folder = URL(fileURLWithPath: directory).appending(path: canvas.folder)
 
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        try data.write(to: folder.appending(path: "\(name).png"))
+        try data.write(to: output(canvas.folder, name))
 
         if canvas == .phone {
             try writeSmall(image, to: name)
@@ -1026,9 +988,14 @@ private extension SnapshotTests {
 
         let small = try #require(context.makeImage())
         let data = try #require(UIImage(cgImage: small).pngData())
-        let folder = URL(fileURLWithPath: directory).appending(path: "6.3")
 
-        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        try data.write(to: folder.appending(path: "\(name).png"))
+        try data.write(to: output("6.3", name))
+    }
+
+    static func output(
+        _ folder: String,
+        _ name: String
+    ) -> URL {
+        URL(fileURLWithPath: directory).appending(path: "\(folder)_\(name).png")
     }
 }
