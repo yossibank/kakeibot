@@ -600,7 +600,7 @@ private struct StoreBanner: View {
 
         HStack(spacing: 40) {
             VStack(alignment: .leading, spacing: 14) {
-                StoreHeadline(lines: ["今月あと", "いくら？"], lead: .free, scale: 1.3)
+                StoreHeadline(lines: ["好きな色で、", "続く家計簿。"], lead: .free, scale: 1.15)
 
                 Text("色も字体も、着せ替え")
                     .font(.system(size: 20, weight: .medium))
