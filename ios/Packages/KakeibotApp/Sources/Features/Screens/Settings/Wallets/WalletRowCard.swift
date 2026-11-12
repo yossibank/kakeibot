@@ -75,7 +75,6 @@ struct WalletRowIcon: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let icon: Icon?
-    var stroke: Color?
     var strokeWidth: CGFloat = IconBadge.lineWidth
 
     var body: some View {
@@ -86,7 +85,7 @@ struct WalletRowIcon: View {
             .frame(width: 48, height: 48)
             .overlay {
                 RoundedRectangle(cornerRadius: corner.radius(12), style: .continuous)
-                    .strokeBorder(stroke ?? color, lineWidth: strokeWidth)
+                    .strokeBorder(color, lineWidth: strokeWidth)
             }
     }
 }
