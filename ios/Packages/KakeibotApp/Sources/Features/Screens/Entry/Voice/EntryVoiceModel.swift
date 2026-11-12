@@ -1,6 +1,7 @@
 import Core
 import Foundation
 import FoundationModels
+import OSLog
 
 @available(iOS 26.0, *)
 @MainActor
@@ -28,20 +29,32 @@ enum EntryVoiceModel {
     ) async -> VoiceReading.Choice? {
         guard
             isUsable,
-            !text.isEmpty,
-            let schema = try? schema(categories: categories, wallets: wallets)
+            !text.isEmpty
         else {
+            return nil
+        }
+
+        let schema: GenerationSchema
+        let response: LanguageModelSession.Response<GeneratedContent>
+
+        do {
+            schema = try Self.schema(categories: categories, wallets: wallets)
+        } catch {
+            logger.error("schema \(String(describing: error), privacy: .public)")
             return nil
         }
 
         let session = prepared ?? makeSession()
         prepared = nil
 
-        guard let response = try? await session.respond(
-            to: prompt(text, examples: examples),
-            schema: schema,
-            options: options
-        ) else {
+        do {
+            response = try await session.respond(
+                to: prompt(text, examples: examples),
+                schema: schema,
+                options: options
+            )
+        } catch {
+            logger.error("respond \(String(describing: error), privacy: .public)")
             return nil
         }
 
@@ -51,34 +64,6 @@ enum EntryVoiceModel {
         return VoiceReading.Choice(
             categoryIndex: category.flatMap { categories.firstIndex(of: $0) },
             walletIndex: wallet.flatMap { wallets.firstIndex(of: $0) }
-        )
-    }
-}
-
-@available(iOS 26.0, *)
-private extension EntryVoiceModel {
-    static let locale = Locale(identifier: "ja_JP")
-    static let options = GenerationOptions(sampling: .greedy)
-    static let categoryKey = "category"
-    static let walletKey = "wallet"
-    static let none = "当たるものが無い"
-
-    static let instructions = """
-    家計簿に記録するために話した日本語の文から、カテゴリと口座を選ぶ。
-    カテゴリは、名前が文に無くても、買ったものや店から考えて当てる。例：ランチ・コンビニは食費、電車・タクシーは交通、薬・病院は医療。
-    口座は、文に口座の名前や払い方（カード・クレカ・現金・PayPay・Suica など）が出てきた時だけ選ぶ。現金は財布にする。払い方の話が無ければ「\(none)」にする。
-    この人の前の記録の例があれば、同じ店や同じものはその例と同じカテゴリと口座にする。
-    """
-
-    static var isUsable: Bool {
-        let model = SystemLanguageModel.default
-        return model.isAvailable && model.supportsLocale(locale)
-    }
-
-    static func makeSession() -> LanguageModelSession {
-        LanguageModelSession(
-            model: .default,
-            instructions: instructions
         )
     }
 
@@ -113,6 +98,35 @@ private extension EntryVoiceModel {
         )
 
         return try GenerationSchema(root: answer, dependencies: [])
+    }
+}
+
+@available(iOS 26.0, *)
+private extension EntryVoiceModel {
+    static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Voice")
+    static let locale = Locale(identifier: "ja_JP")
+    static let options = GenerationOptions(sampling: .greedy)
+    static let categoryKey = "category"
+    static let walletKey = "wallet"
+    static let none = "当たるものが無い"
+
+    static let instructions = """
+    家計簿に記録するために話した日本語の文から、カテゴリと口座を選ぶ。
+    カテゴリは、名前が文に無くても、買ったものや店から考えて当てる。例：ランチ・コンビニは食費、電車・タクシーは交通、薬・病院は医療。
+    口座は、文に口座の名前や払い方（カード・クレカ・現金・PayPay・Suica など）が出てきた時だけ選ぶ。現金は財布にする。払い方の話が無ければ「\(none)」にする。
+    この人の前の記録の例があれば、同じ店や同じものはその例と同じカテゴリと口座にする。
+    """
+
+    static var isUsable: Bool {
+        let model = SystemLanguageModel.default
+        return model.isAvailable && model.supportsLocale(locale)
+    }
+
+    static func makeSession() -> LanguageModelSession {
+        LanguageModelSession(
+            model: .default,
+            instructions: instructions
+        )
     }
 
     static func choices(_ names: [String]) -> [String] {
