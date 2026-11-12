@@ -58,14 +58,7 @@ extension MainView {
             )
 
         case .transfer:
-            EntrySheet(
-                model: EntryModel(
-                    database: database,
-                    date: today,
-                    type: .transfer
-                ),
-                onChange: show
-            )
+            EntrySheet(model: draft, onChange: show)
 
         case .templates:
             HomeTemplateShelfSheet(
