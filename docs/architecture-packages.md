@@ -64,6 +64,7 @@ KakeibotKit/
 │   │   │   ├── Reward/
 │   │   │   ├── Setting/
 │   │   │   ├── Theme/
+│   │   │   ├── Voice/
 │   │   │   └── Wallet/
 │   │   └── Shared/
 │   └── Store/
@@ -105,6 +106,7 @@ KakeibotKit/
 | `Concepts/Reward/` | ごほうびと貯金箱 |
 | `Concepts/Setting/` | 設定の値 |
 | `Concepts/Theme/` | テーマの色・書体・形 |
+| `Concepts/Voice/` | 話した文から金額・日付・カテゴリ・口座・メモを読む決まり |
 | `Concepts/Wallet/` | 財布と残高 |
 | `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、下書きの問題 |
 | `Store/Queries/`・`Store/Sync/`・`Store/Writes/` | `Methods/` に `AppDatabase+*.swift` の拡張、`Types/` にそれ以外の型を置く |
@@ -175,7 +177,9 @@ KakeibotApp/
 | `AppWidget/Intents/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
 | `AppWidget/Shared/` | ウィジェットをまたいで使う読み出し・書体・テーマ・タイムライン |
 | `AppWidget/Widgets/` | ウィジェットごとのフォルダ。コントロールの「記録する」は `EntryControl/` |
-| `Features/Screens/Entry/` | 記録の入力シート。レシートは VisionKit で撮り、Vision と Foundation Models で読む |
+| `Features/Screens/Entry/` | 記録の入力シート |
+| `Features/Screens/Entry/Receipt/` | レシートを VisionKit で撮り、Vision と Foundation Models で読む |
+| `Features/Screens/Entry/Voice/` | 声を SpeechAnalyzer で聞き、Foundation Models でカテゴリと口座を選ぶ |
 | `Features/Screens/Onboarding/` | 最初の設定のチュートリアル |
 | `Features/Screens/Pro/` | Pro の画面と購入のモデル |
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |

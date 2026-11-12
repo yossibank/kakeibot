@@ -1,0 +1,677 @@
+{
+  "description": "話した文から、記録に入れる金額・日付・カテゴリ・口座・メモを読む。今日は today、カテゴリと口座は categories と wallets の名前の一覧。amount・date・category・wallet・memo は文の文字から決まりで読んだ値で、読めなければ null。category と wallet は、一覧の名前が文に含まれる時に一番長い名前にする。ひらがなとカタカナ、大文字と小文字は同じとみる。modelCategory と modelWallet は、名前が文に無い時にモデルに選ばせたい正解の候補で、精度を測るのに使う。",
+  "today": "2026-11-12",
+  "categories": [
+    "食費",
+    "日用品",
+    "交通",
+    "交際",
+    "趣味",
+    "衣服",
+    "美容",
+    "医療",
+    "住まい",
+    "通信",
+    "光熱"
+  ],
+  "wallets": [
+    "財布",
+    "銀行",
+    "カード",
+    "楽天カード",
+    "PayPay",
+    "Suica"
+  ],
+  "cases": [
+    {
+      "summary": "全部の項目を言う",
+      "text": "昨日、駅前でランチ980円、カードで",
+      "amount": 980,
+      "date": "2026-11-11",
+      "category": null,
+      "wallet": "カード",
+      "memo": "駅前でランチ",
+      "modelCategory": [
+        "食費"
+      ]
+    },
+    {
+      "summary": "桁区切りの金額",
+      "text": "コンビニで1,280円",
+      "amount": 1280,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "コンビニ",
+      "modelCategory": [
+        "食費"
+      ]
+    },
+    {
+      "summary": "漢数字の金額とカテゴリの名前",
+      "text": "交通費 三千円",
+      "amount": 3000,
+      "date": null,
+      "category": "交通",
+      "wallet": null,
+      "memo": "交通費",
+      "modelCategory": [
+        "交通"
+      ]
+    },
+    {
+      "summary": "万を含む金額と口座",
+      "text": "1万2000円 財布から",
+      "amount": 12000,
+      "date": null,
+      "category": null,
+      "wallet": "財布",
+      "memo": null
+    },
+    {
+      "summary": "円の記号が前に付く金額",
+      "text": "¥450 Suicaでコーヒー",
+      "amount": 450,
+      "date": null,
+      "category": null,
+      "wallet": "Suica",
+      "memo": "コーヒー",
+      "modelCategory": [
+        "食費",
+        "交際"
+      ]
+    },
+    {
+      "summary": "ひらがなの円",
+      "text": "980えん",
+      "amount": 980,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": null
+    },
+    {
+      "summary": "今朝",
+      "text": "今朝パン屋で320円",
+      "amount": 320,
+      "date": "2026-11-12",
+      "category": null,
+      "wallet": null,
+      "memo": "パン屋",
+      "modelCategory": [
+        "食費"
+      ]
+    },
+    {
+      "summary": "ゆうべ",
+      "text": "ゆうべ居酒屋で4500円",
+      "amount": 4500,
+      "date": "2026-11-11",
+      "category": null,
+      "wallet": null,
+      "memo": "居酒屋",
+      "modelCategory": [
+        "食費",
+        "交際"
+      ]
+    },
+    {
+      "summary": "何日前",
+      "text": "3日前に本屋で1200円",
+      "amount": 1200,
+      "date": "2026-11-09",
+      "category": null,
+      "wallet": null,
+      "memo": "本屋",
+      "modelCategory": [
+        "趣味"
+      ]
+    },
+    {
+      "summary": "先週の曜日",
+      "text": "先週の金曜にタクシー 2800円",
+      "amount": 2800,
+      "date": "2026-11-06",
+      "category": null,
+      "wallet": null,
+      "memo": "タクシー",
+      "modelCategory": [
+        "交通"
+      ]
+    },
+    {
+      "summary": "今週の曜日",
+      "text": "月曜日に電気代 8,200円",
+      "amount": 8200,
+      "date": "2026-11-09",
+      "category": null,
+      "wallet": null,
+      "memo": "電気代",
+      "modelCategory": [
+        "光熱"
+      ]
+    },
+    {
+      "summary": "曜日だけとカテゴリを含む名前",
+      "text": "日曜 美容院 6600円",
+      "amount": 6600,
+      "date": "2026-11-08",
+      "category": "美容",
+      "wallet": null,
+      "memo": "美容院",
+      "modelCategory": [
+        "美容"
+      ]
+    },
+    {
+      "summary": "月と日",
+      "text": "11月3日 ドラッグストアで薬 1,580円",
+      "amount": 1580,
+      "date": "2026-11-03",
+      "category": null,
+      "wallet": null,
+      "memo": "ドラッグストアで薬",
+      "modelCategory": [
+        "医療",
+        "日用品"
+      ]
+    },
+    {
+      "summary": "日だけで今日より後なら先月",
+      "text": "15日に家賃 85000円",
+      "amount": 85000,
+      "date": "2026-10-15",
+      "category": null,
+      "wallet": null,
+      "memo": "家賃",
+      "modelCategory": [
+        "住まい"
+      ]
+    },
+    {
+      "summary": "長い方の口座の名前",
+      "text": "スマホ代 4800円 楽天カードで",
+      "amount": 4800,
+      "date": null,
+      "category": null,
+      "wallet": "楽天カード",
+      "memo": "スマホ代",
+      "modelCategory": [
+        "通信"
+      ]
+    },
+    {
+      "summary": "英字の口座の名前",
+      "text": "PayPayでドラッグストア 980円",
+      "amount": 980,
+      "date": null,
+      "category": null,
+      "wallet": "PayPay",
+      "memo": "ドラッグストア",
+      "modelCategory": [
+        "日用品",
+        "医療"
+      ]
+    },
+    {
+      "summary": "ひらがなで言った口座",
+      "text": "かーどで交通費 220円",
+      "amount": 220,
+      "date": null,
+      "category": "交通",
+      "wallet": "カード",
+      "memo": "交通費",
+      "modelCategory": [
+        "交通"
+      ]
+    },
+    {
+      "summary": "言いよどみだけ",
+      "text": "えっと、あの",
+      "amount": null,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": null
+    },
+    {
+      "summary": "払ったを外す",
+      "text": "本屋で1200円払った",
+      "amount": 1200,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "本屋",
+      "modelCategory": [
+        "趣味"
+      ]
+    },
+    {
+      "summary": "円の無い数",
+      "text": "500",
+      "amount": 500,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": null
+    },
+    {
+      "summary": "日付の数を金額にしない",
+      "text": "3日 500円",
+      "amount": 500,
+      "date": "2026-11-03",
+      "category": null,
+      "wallet": null,
+      "memo": null
+    },
+    {
+      "summary": "日付だけ",
+      "text": "3日にコンビニ",
+      "amount": null,
+      "date": "2026-11-03",
+      "category": null,
+      "wallet": null,
+      "memo": "コンビニ",
+      "modelCategory": [
+        "食費"
+      ]
+    },
+    {
+      "summary": "二万円",
+      "text": "二万円 洋服",
+      "amount": 20000,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "洋服",
+      "modelCategory": [
+        "衣服"
+      ]
+    },
+    {
+      "summary": "千五百円",
+      "text": "千五百円 ガソリン",
+      "amount": 1500,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "ガソリン",
+      "modelCategory": [
+        "交通"
+      ]
+    },
+    {
+      "summary": "円の無い数とメモ",
+      "text": "ランチ 980",
+      "amount": 980,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "ランチ",
+      "modelCategory": [
+        "食費"
+      ]
+    },
+    {
+      "summary": "今日より後の月日は去年",
+      "text": "12月24日 プレゼント 5000円",
+      "amount": 5000,
+      "date": "2025-12-24",
+      "category": null,
+      "wallet": null,
+      "memo": "プレゼント",
+      "modelCategory": [
+        "交際"
+      ]
+    },
+    {
+      "summary": "割合の数を金額にしない",
+      "text": "病院 3割負担で1,200円",
+      "amount": 1200,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "病院 3割負担",
+      "modelCategory": [
+        "医療"
+      ]
+    },
+    {
+      "summary": "今日のを外す",
+      "text": "今日の電車代 168円",
+      "amount": 168,
+      "date": "2026-11-12",
+      "category": null,
+      "wallet": null,
+      "memo": "電車代",
+      "modelCategory": [
+        "交通"
+      ]
+    },
+    {
+      "summary": "チャージ",
+      "text": "昨日Suicaにチャージ3000円",
+      "amount": 3000,
+      "date": "2026-11-11",
+      "category": null,
+      "wallet": "Suica",
+      "memo": "チャージ",
+      "modelCategory": [
+        "交通"
+      ]
+    },
+    {
+      "summary": "人数を金額にしない",
+      "text": "4人で飲み会 一人3500円",
+      "amount": 3500,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "4人で飲み会 一人",
+      "modelCategory": [
+        "交際"
+      ]
+    },
+    {
+      "summary": "店の名前の円より後の金額",
+      "text": "100円ショップで日用品 330円",
+      "amount": 330,
+      "date": null,
+      "category": "日用品",
+      "wallet": null,
+      "memo": "100円ショップで日用品",
+      "modelCategory": [
+        "日用品"
+      ]
+    },
+    {
+      "summary": "英字の店",
+      "text": "Amazonで本 1,980円 カード",
+      "amount": 1980,
+      "date": null,
+      "category": null,
+      "wallet": "カード",
+      "memo": "Amazonで本",
+      "modelCategory": [
+        "趣味"
+      ]
+    },
+    {
+      "summary": "漢数字だけの金額",
+      "text": "七百八十円",
+      "amount": 780,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": null
+    },
+    {
+      "summary": "今夜",
+      "text": "今夜スーパーで2,450円",
+      "amount": 2450,
+      "date": "2026-11-12",
+      "category": null,
+      "wallet": null,
+      "memo": "スーパー",
+      "modelCategory": [
+        "食費"
+      ]
+    },
+    {
+      "summary": "昨晩と口座",
+      "text": "昨晩タクシー1800円 現金で",
+      "amount": 1800,
+      "date": "2026-11-11",
+      "category": null,
+      "wallet": null,
+      "memo": "タクシー",
+      "modelCategory": [
+        "交通"
+      ],
+      "modelWallet": [
+        "財布"
+      ]
+    },
+    {
+      "summary": "家賃をカードで",
+      "text": "昨日、家賃を132000円、カードで",
+      "amount": 132000,
+      "date": "2026-11-11",
+      "category": null,
+      "wallet": "カード",
+      "memo": "家賃",
+      "modelCategory": [
+        "住まい"
+      ]
+    },
+    {
+      "summary": "支払いを除く",
+      "text": "iPhoneの支払い 4800円",
+      "amount": 4800,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "iPhone",
+      "modelCategory": [
+        "通信"
+      ]
+    },
+    {
+      "summary": "代の後の支払いを除く",
+      "text": "携帯代の支払い 5200円",
+      "amount": 5200,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "携帯代",
+      "modelCategory": [
+        "通信"
+      ]
+    },
+    {
+      "summary": "料金を除く",
+      "text": "Wi-Fiの料金 4400円",
+      "amount": 4400,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "Wi-Fi",
+      "modelCategory": [
+        "通信"
+      ]
+    },
+    {
+      "summary": "代金を除く",
+      "text": "本の代金 1500円",
+      "amount": 1500,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "本",
+      "modelCategory": [
+        "趣味"
+      ]
+    },
+    {
+      "summary": "ネットの代",
+      "text": "ネット代 5500円",
+      "amount": 5500,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "ネット代",
+      "modelCategory": [
+        "通信"
+      ]
+    },
+    {
+      "summary": "分割の支払い",
+      "text": "スマホの分割 3000円",
+      "amount": 3000,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "スマホの分割",
+      "modelCategory": [
+        "通信"
+      ]
+    },
+    {
+      "summary": "管理費",
+      "text": "管理費 15000円",
+      "amount": 15000,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "管理費",
+      "modelCategory": [
+        "住まい"
+      ]
+    },
+    {
+      "summary": "保険",
+      "text": "火災保険 20000円",
+      "amount": 20000,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "火災保険",
+      "modelCategory": [
+        "住まい"
+      ]
+    },
+    {
+      "summary": "ガスを銀行で",
+      "text": "ガス代 4300円 銀行で",
+      "amount": 4300,
+      "date": null,
+      "category": null,
+      "wallet": "銀行",
+      "memo": "ガス代",
+      "modelCategory": [
+        "光熱"
+      ]
+    },
+    {
+      "summary": "水道",
+      "text": "水道代 3200円",
+      "amount": 3200,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "水道代",
+      "modelCategory": [
+        "光熱"
+      ]
+    },
+    {
+      "summary": "歯医者",
+      "text": "歯医者 3000円",
+      "amount": 3000,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "歯医者",
+      "modelCategory": [
+        "医療"
+      ]
+    },
+    {
+      "summary": "髪を切る",
+      "text": "ヘアカット 4000円",
+      "amount": 4000,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "ヘアカット",
+      "modelCategory": [
+        "美容"
+      ]
+    },
+    {
+      "summary": "店と服",
+      "text": "ユニクロでセーター 3990円",
+      "amount": 3990,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "ユニクロでセーター",
+      "modelCategory": [
+        "衣服"
+      ]
+    },
+    {
+      "summary": "映画",
+      "text": "映画のチケット 1900円",
+      "amount": 1900,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "映画のチケット",
+      "modelCategory": [
+        "趣味"
+      ]
+    },
+    {
+      "summary": "紙もの",
+      "text": "ティッシュとトイレットペーパー 680円",
+      "amount": 680,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "ティッシュとトイレットペーパー",
+      "modelCategory": [
+        "日用品"
+      ]
+    },
+    {
+      "summary": "飲み会をPayPayで",
+      "text": "飲み会 5000円 PayPayで",
+      "amount": 5000,
+      "date": null,
+      "category": null,
+      "wallet": "PayPay",
+      "memo": "飲み会",
+      "modelCategory": [
+        "交際"
+      ]
+    },
+    {
+      "summary": "動画の定額",
+      "text": "Netflix 1590円",
+      "amount": 1590,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "Netflix",
+      "modelCategory": [
+        "趣味",
+        "通信"
+      ]
+    },
+    {
+      "summary": "電車をSuicaで",
+      "text": "電車代 480円 Suicaで",
+      "amount": 480,
+      "date": null,
+      "category": null,
+      "wallet": "Suica",
+      "memo": "電車代",
+      "modelCategory": [
+        "交通"
+      ]
+    },
+    {
+      "summary": "スーパーの野菜",
+      "text": "スーパーで野菜 1200円",
+      "amount": 1200,
+      "date": null,
+      "category": null,
+      "wallet": null,
+      "memo": "スーパーで野菜",
+      "modelCategory": [
+        "食費"
+      ]
+    }
+  ]
+}
