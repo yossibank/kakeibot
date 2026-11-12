@@ -157,11 +157,16 @@ extension EntrySheet {
         EntryLiveSlot {
             HStack(spacing: 8) {
                 EntrySaveButton(label: model.saveLabel(today: today)) {
+                    guard !opensKeypadOnSave else {
+                        setEnteringAmount(true)
+                        return
+                    }
+
                     Task {
                         await save()
                     }
                 }
-                .disabled(!model.canSave)
+                .disabled(!model.canSave && !opensKeypadOnSave)
 
                 if model.isEditing {
                     sideButton(
@@ -348,6 +353,10 @@ private extension EntrySheet {
 
     var bannerBottom: CGFloat {
         isEnteringAmount ? drawerHeight + 12 : 12
+    }
+
+    var opensKeypadOnSave: Bool {
+        !isEnteringAmount && !model.isEditing && model.amount <= 0
     }
 
     func editMemo(_ isEditing: Bool) {
