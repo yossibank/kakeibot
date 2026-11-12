@@ -20,3 +20,4 @@
 | 書き出しの見本 | `export/export-v1.json` は、読み込んで書き出すと同じ JSON になる。DB に入れて読み出しても同じになる |
 | 表計算の見本 | `export/export-v1.csv` は、JSON の見本の記録を表計算用に書き出した結果である。形は [export-format.md](export-format.md) にある |
 | 設定の行の見本 | `export/export-v1-setting.json` は、`settings` の行の判定である |
+| `voice/voice-reading.json` | `today`・`categories`・`wallets` は全ケースで使う。`modelCategory`・`modelWallet` は精度を測る時だけ使う |

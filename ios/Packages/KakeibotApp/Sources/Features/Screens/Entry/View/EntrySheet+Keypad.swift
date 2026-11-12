@@ -12,7 +12,7 @@ extension EntrySheet {
                 ) { amount in
                     model.setFee(amount)
                 }
-            } else if model.type != .transfer {
+            } else if model.type != .transfer, !voice.isActive {
                 VStack(alignment: .leading, spacing: 8) {
                     preparationRow
 
@@ -31,12 +31,18 @@ extension EntrySheet {
             }
 
             EntryLiveSlot {
-                Keypad(calculator: model.activeCalculator) {
-                    setEnteringAmount(false)
-                } onKey: { key in
-                    model.press(key)
+                if voice.isActive {
+                    voiceCard
+                        .transition(.opacity)
+                } else {
+                    Keypad(calculator: model.activeCalculator) {
+                        setEnteringAmount(false)
+                    } onKey: { key in
+                        model.press(key)
+                    }
                 }
             }
+            .animation(.snappy, value: voice.isActive)
 
             saveButtons
         }
@@ -63,6 +69,10 @@ extension EntrySheet {
 extension EntrySheet {
     func setEnteringAmount(_ isEntering: Bool) {
         isFormDeferred = false
+
+        if !isEntering, voice.step == .listening {
+            cancelVoice()
+        }
 
         withAnimation(.snappy) {
             isEnteringAmount = isEntering
@@ -111,19 +121,25 @@ private extension EntrySheet {
 private extension EntrySheet {
     var preparationRow: some View {
         ViewThatFits(in: .horizontal) {
-            preparationButtons(showsDateIcon: true, showsQuickDate: true)
-            preparationButtons(showsDateIcon: false, showsQuickDate: true)
-            preparationButtons(showsDateIcon: false, showsQuickDate: false)
+            preparationButtons(showsVoiceTitle: true, showsDateIcon: true, showsQuickDate: true)
+            preparationButtons(showsVoiceTitle: false, showsDateIcon: true, showsQuickDate: true)
+            preparationButtons(showsVoiceTitle: false, showsDateIcon: false, showsQuickDate: true)
+            preparationButtons(showsVoiceTitle: false, showsDateIcon: false, showsQuickDate: false)
         }
     }
 
     func preparationButtons(
+        showsVoiceTitle: Bool,
         showsDateIcon: Bool,
         showsQuickDate: Bool
     ) -> some View {
         HStack(spacing: 8) {
             if showsReceiptButton {
                 receiptButton
+            }
+
+            if showsVoiceButton {
+                voiceButton(showsTitle: showsVoiceTitle)
             }
 
             if model.showsItems {

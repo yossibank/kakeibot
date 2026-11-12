@@ -53,6 +53,8 @@ public final class EntryModel {
     public internal(set) var errorNotice = ErrorNotice()
     public internal(set) var receiptSavedCount = 0
     public internal(set) var receiptGuideHidden = false
+    public internal(set) var voiceHintShown = true
+    public internal(set) var voiceFilled: VoiceFilled?
 
     var allTemplates: [EntryTemplate] = []
     var appliedTemplateId: EntryTemplate.ID?
@@ -158,6 +160,8 @@ public extension EntryModel {
 
             receiptGuideHidden = try await database.setting(.receiptGuideHidden)
 
+            voiceHintShown = try await database.setting(.voiceHintShown)
+
             budgets = try await database.budgets()
 
             try await loadEntry()
@@ -257,6 +261,7 @@ public extension EntryModel {
         tagId = nil
         billMonth = nil
         appliedTemplateId = nil
+        voiceFilled = nil
 
         do {
             try await loadBalances()
@@ -269,6 +274,7 @@ public extension EntryModel {
     }
 
     func recordAgain() async {
+        voiceFilled = nil
         editingId = nil
         original = nil
         originalFee = nil

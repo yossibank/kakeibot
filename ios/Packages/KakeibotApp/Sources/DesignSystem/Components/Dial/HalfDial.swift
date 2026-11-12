@@ -3,13 +3,16 @@ import SwiftUI
 public struct HalfDial: View {
     let progress: Double?
     let tint: Color
+    let levels: [Double]?
 
     public init(
         progress: Double? = nil,
-        tint: Color = Palette.accent
+        tint: Color = Palette.accent,
+        levels: [Double]? = nil
     ) {
         self.progress = progress
         self.tint = tint
+        self.levels = levels
     }
 
     public var body: some View {
@@ -17,6 +20,19 @@ public struct HalfDial: View {
             HalfArc(progress: 1)
                 .stroke(Palette.line, lineWidth: 2)
 
+            if let levels {
+                HalfLevelTicks(levels: levels)
+            } else {
+                scale
+            }
+        }
+        .aspectRatio(2, contentMode: .fit)
+    }
+}
+
+private extension HalfDial {
+    var scale: some View {
+        ZStack {
             if let progress {
                 let clamped = min(max(progress, 0), 1)
 
@@ -30,8 +46,50 @@ public struct HalfDial: View {
             HalfTicks(count: 30, step: 5, length: 13, inset: 10)
                 .stroke(Palette.accent, lineWidth: 1.4)
         }
-        .aspectRatio(2, contentMode: .fit)
     }
+}
+
+private struct HalfLevelTicks: View {
+    let levels: [Double]
+
+    var body: some View {
+        Canvas { context, size in
+            let center = CGPoint(x: size.width / 2, y: size.height)
+            let outer = min(size.width / 2, size.height) - Self.inset
+            let count = max(levels.count - 1, 1)
+
+            for (index, level) in levels.enumerated() {
+                let clamped = min(max(level, 0), 1)
+                let base = index % 5 == 0 ? Self.majorLength : Self.minorLength
+                let length = base + Self.reach * clamped
+                let angle = Double.pi + Double(index) / Double(count) * .pi
+                let start = HalfTicks.point(from: center, at: angle, radius: outer - length)
+                let end = HalfTicks.point(from: center, at: angle, radius: outer)
+
+                var path = Path()
+                path.move(to: start)
+                path.addLine(to: end)
+
+                let color = clamped > Self.brightLevel ? Palette.accentStrong : Palette.accent
+
+                context.stroke(
+                    path,
+                    with: .color(color.opacity(Self.dim + (1 - Self.dim) * clamped)),
+                    style: StrokeStyle(lineWidth: 1 + 1.2 * clamped, lineCap: .round)
+                )
+            }
+        }
+        .animation(.easeOut(duration: 0.12), value: levels)
+    }
+}
+
+private extension HalfLevelTicks {
+    static let inset: CGFloat = 10
+    static let minorLength: CGFloat = 6
+    static let majorLength: CGFloat = 13
+    static let reach: CGFloat = 22
+    static let dim = 0.35
+    static let brightLevel = 0.6
 }
 
 private struct HalfArc {
@@ -63,7 +121,7 @@ private struct HalfTicks {
     let inset: CGFloat
 }
 
-private extension HalfTicks {
+extension HalfTicks {
     static func point(
         from center: CGPoint,
         at angle: Double,
@@ -100,6 +158,9 @@ extension HalfTicks: Shape {
             .frame(width: 290)
 
         HalfDial(progress: 0.4)
+            .frame(width: 290)
+
+        HalfDial(levels: (0...30).map { abs(sin(Double($0) / 3)) })
             .frame(width: 290)
     }
     .padding()

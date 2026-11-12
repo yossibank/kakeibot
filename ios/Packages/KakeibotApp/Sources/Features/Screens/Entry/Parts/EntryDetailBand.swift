@@ -61,6 +61,7 @@ private extension EntryDetailBand {
                 title: walletTitle,
                 value: model.walletName,
                 isChanged: !model.isUsualWallet || model.billText != nil,
+                isFromVoice: model.isWalletFromVoice,
                 showsChevron: true
             )
         }
@@ -85,6 +86,7 @@ private extension EntryDetailBand {
                 value: EntryModel.dateText(for: model.date, today: today),
                 shortValue: EntryModel.shortDateText(for: model.date, today: today),
                 isChanged: model.date != today,
+                isFromVoice: model.isDateFromVoice,
                 showsChevron: true
             )
         }
@@ -97,6 +99,7 @@ private extension EntryDetailBand {
                 value: memoText,
                 isPlaceholder: model.memo.isEmpty,
                 isChanged: false,
+                isFromVoice: model.isMemoFromVoice,
                 showsChevron: false
             )
         }
@@ -109,6 +112,7 @@ private extension EntryDetailBand {
         valueColor: Color? = nil,
         isPlaceholder: Bool = false,
         isChanged: Bool,
+        isFromVoice: Bool = false,
         showsChevron: Bool
     ) -> some View {
         let tint = isChanged ? Palette.amber : nil
@@ -136,6 +140,7 @@ private extension EntryDetailBand {
                         valueText(value, color: valueTint)
                     }
                 }
+                .underline(isFromVoice, color: Palette.accent.opacity(.medium))
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 if showsChevron {

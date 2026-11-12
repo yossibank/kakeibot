@@ -116,6 +116,171 @@ struct SnapshotTests {
 
         try await renderReceipt()
         try await renderSaveLabels()
+        try await renderVoice()
+    }
+}
+
+private extension SnapshotTests {
+    static let voiceCards: [(String, CGSize, (String, String))] = [
+        ("empty", phone, ("", "")),
+        ("listening", phone, ("昨日、駅前でランチ980円、", "カードで")),
+        ("long", narrow, ("昨日の夜、駅前の居酒屋で会社の同期と送別会をして、二次会のカラオケも含めて一人", "5,800円を楽天カードで払った")),
+        ("very-long", narrow, (String(repeating: "今日は朝からスーパーで買い物をして、", count: 5), "合計3,240円"))
+    ]
+
+    func renderVoice() async throws {
+        let today = LocalDate(Date(), in: .current)
+
+        for (name, size, text) in Self.voiceCards {
+            let model = try await Self.model(.expense, digits: [])
+            let source = VoiceSnapshotSource()
+            let flow = EntryVoiceFlow(dependencies: .snapshot(source))
+
+            await flow.start(for: model, today: today) {}
+            source.say(settled: text.0, pending: text.1)
+
+            let card = EntryVoiceCard(
+                flow: flow,
+                model: model,
+                today: today,
+                onCancel: {},
+                onFinish: {},
+                onOpenSettings: {}
+            )
+            .padding(16)
+            .frame(width: size.width)
+            .background(Palette.panel)
+            .environment(\.colorScheme, .dark)
+
+            try Self.write(card, to: "voice-card-\(name).png")
+        }
+
+        let deniedModel = try await Self.model(.expense, digits: [])
+        var denied = EntryVoiceFlow.Dependencies.snapshot(VoiceSnapshotSource())
+        denied.requestPermission = { false }
+        denied.isDenied = { true }
+        let deniedFlow = EntryVoiceFlow(dependencies: denied)
+
+        await deniedFlow.start(for: deniedModel, today: today) {}
+
+        let deniedCard = EntryVoiceCard(
+            flow: deniedFlow,
+            model: deniedModel,
+            today: today,
+            onCancel: {},
+            onFinish: {},
+            onOpenSettings: {}
+        )
+        .padding(16)
+        .frame(width: Self.phone.width)
+        .background(Palette.panel)
+
+        try Self.write(deniedCard, to: "voice-card-denied.png")
+
+        let notices: [(String, EntryVoiceFlow.Notice)] = [
+            (
+                "applied",
+                .init(outcome: .applied, count: 4, text: "昨日、駅前の喫茶店でモーニングセットとコーヒーのおかわりで980円、カードで")
+            ),
+            ("missing", .init(outcome: .missingAmount, count: 1, text: "昨日のコンビニ")),
+            ("unheard", .init(outcome: .unheard, count: 0, text: ""))
+        ]
+
+        for (name, notice) in notices {
+            let view = EntryVoiceNotice(notice: notice, onUndo: {}, onClose: {})
+                .padding(20)
+                .frame(width: Self.narrow.width)
+                .background(Palette.background)
+
+            try Self.write(view, to: "voice-notice-\(name).png")
+        }
+
+        let dialModel = try await Self.model(.expense, digits: [])
+        let levels = (0..<EntryVoiceFlow.levelCount).map { index in
+            abs(sin(Double(index) / 2.6)) * (0.3 + Double(index % 7) / 10)
+        }
+        let category = try #require(dialModel.categories.first)
+        let dial = EntryDialFace(
+            model: dialModel,
+            levels: levels,
+            preview: VoiceReading(amount: 980, categoryId: category.id)
+        ) {}
+            .padding(24)
+            .frame(width: Self.phone.width)
+            .background(Palette.background)
+            .environment(\.colorScheme, .dark)
+
+        try Self.write(dial, to: "voice-dial.png")
+
+        let bandModel = try await Self.model(.expense, digits: [])
+        let wallet = try #require(bandModel.wallets.last)
+        bandModel.apply(VoiceReading(
+            amount: 980,
+            date: today.adding(days: -1),
+            walletId: wallet.id,
+            memo: "駅前でランチ"
+        ))
+
+        let band = EntryDetailBand(
+            model: bandModel,
+            today: today,
+            onWallet: {},
+            onFee: {},
+            onDate: {},
+            onMemo: {}
+        )
+        .padding(20)
+        .frame(width: Self.phone.width)
+        .background(Palette.background)
+
+        try Self.write(band, to: "voice-band.png")
+
+        let buttons = VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                EntryVoiceButton(showsTitle: true, glows: false, onGlowed: {}) {}
+                EntryVoiceButton(showsTitle: false, glows: false, onGlowed: {}) {}
+            }
+        }
+        .padding(20)
+        .background(Palette.panel)
+
+        try Self.write(buttons, to: "voice-buttons.png")
+    }
+}
+
+@MainActor
+private final class VoiceSnapshotSource: EntryVoiceSource {
+    private var onEvent: (@MainActor (EntryVoiceEvent) -> Void)?
+
+    func start(
+        hints: [String],
+        _ onEvent: @escaping @MainActor (EntryVoiceEvent) -> Void
+    ) async throws {
+        self.onEvent = onEvent
+    }
+
+    func finish() async {}
+
+    func cancel() async {}
+
+    func say(settled: String, pending: String) {
+        onEvent?(.transcript(EntryVoiceTranscript(settled: settled, pending: pending)))
+    }
+}
+
+private extension EntryVoiceFlow.Dependencies {
+    @MainActor
+    static func snapshot(_ source: VoiceSnapshotSource) -> Self {
+        Self(
+            isAvailable: { true },
+            isDenied: { false },
+            requestPermission: { true },
+            makeSource: { source },
+            prepare: {},
+            choose: { _ in nil },
+            silence: .seconds(60),
+            noticeDuration: .seconds(60)
+        )
     }
 }
 

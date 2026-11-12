@@ -63,6 +63,7 @@ expense・income の列は、描画に使わない。
 | widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。取り消すと消す | その記録で支出なしの印を消したときは、`,` に続けてその日付（`2026-10-03`）を付ける |
 | receipt_saved_count | レシートから読んで保存した記録の数 | 空なら 0。Pro でなければ 3 で止める |
 | receipt_guide_hidden | `true` なら、レシートの撮り方を出さずにカメラを開く | 撮り方の「次から表示しない」に印を付けて閉じると `true` にする |
+| voice_hint_shown | `true` なら、入力シートの「声」の札を光らせない | 初めて「声」の札を出して光らせた時に `true` にする。iOS だけで使う |
 | fee_category_id | 振替の手数料に付ける category の id | |
 | transfer_out_category_id | 抜けた共有の財布への振替を、支出に変えるときに付ける category の id | |
 | transfer_in_category_id | 抜けた共有の財布からの振替を、収入に変えるときに付ける category の id | |

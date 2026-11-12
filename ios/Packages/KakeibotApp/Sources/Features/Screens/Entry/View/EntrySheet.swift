@@ -15,10 +15,12 @@ public struct EntrySheet: View {
     @State var deletion: Deletion?
     @State var hiddenCategory: EntryModel.HiddenCategory?
     @State var receipt = EntryReceiptFlow()
+    @State var voice = EntryVoiceFlow()
 
     @Environment(\.themeStyle.corner) var corner
     @Environment(\.isPro) var isPro
     @Environment(\.canScanReceipt) var canScanReceipt
+    @Environment(\.openURL) var openURL
 
     @State private var isEditingMemo = false
     @State private var isConfirmingDiscard = false
@@ -60,6 +62,8 @@ public struct EntrySheet: View {
                 }
 
                 receiptLayer
+
+                voiceNoticeLayer(bottom: bannerBottom)
             }
             .coordinateSpace(.named(Self.coordinateSpace))
             .onGeometryChange(for: CGFloat.self) { proxy in
@@ -73,6 +77,8 @@ public struct EntrySheet: View {
             ) { _, menu in
                 menu != nil
             }
+            .haptic(.impact(weight: .light), trigger: voice.startCount)
+            .haptic(.impact(weight: .light), trigger: voice.endCount)
             .errorBanner(
                 model.errorNotice,
                 bottom: bannerBottom
@@ -133,6 +139,14 @@ public struct EntrySheet: View {
             }
             .task {
                 await revealForm()
+            }
+            .task {
+                await voice.checkAvailability()
+            }
+            .onDisappear {
+                Task {
+                    await voice.cancel()
+                }
             }
         }
     }
@@ -277,7 +291,7 @@ private extension EntrySheet {
     }
 
     var dial: some View {
-        EntryDialFace(model: model) {
+        EntryDialFace(model: model, levels: voiceLevels, preview: voice.preview) {
             open(.items)
         }
         .onTapGesture {

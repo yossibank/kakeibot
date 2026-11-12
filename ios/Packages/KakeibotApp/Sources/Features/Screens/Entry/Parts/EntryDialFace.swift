@@ -6,11 +6,13 @@ struct EntryDialFace: View {
     @Environment(\.themeStyle.displayFont) private var themeFont
 
     let model: EntryModel
+    var levels: [Double]?
+    var preview: VoiceReading?
     let onOpenItems: () -> Void
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            HalfDial(progress: progress, tint: tint)
+            HalfDial(progress: progress, tint: tint, levels: levels)
 
             VStack(spacing: 4) {
                 HStack(spacing: 8) {
@@ -27,7 +29,7 @@ struct EntryDialFace: View {
                         Text(route)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
-                    } else if let category = model.selectedCategory {
+                    } else if let category = shownCategory {
                         IconImage(model.icon(for: category), size: 13)
 
                         Text(category.name)
@@ -81,6 +83,7 @@ private extension EntryDialFace {
     static let amountHeight: CGFloat = 48
     static let lift: CGFloat = 12
     static let itemDrop: CGFloat = 24
+    static let listeningNote = "聞いています"
 
     var usage: BudgetUsage? {
         model.budgetUsageAfterSave
@@ -106,8 +109,28 @@ private extension EntryDialFace {
         model.keypadTarget == .fee
     }
 
+    var isListening: Bool {
+        levels != nil
+    }
+
+    var shownCategory: EntryCategory? {
+        guard
+            isListening,
+            let id = preview?.categoryId,
+            let category = model.categories.first(where: { $0.id == id })
+        else {
+            return model.selectedCategory
+        }
+
+        return category
+    }
+
     var shownAmount: Int {
-        isEnteringFee ? model.fee : model.amount
+        if isListening, let amount = preview?.amount {
+            return amount
+        }
+
+        return isEnteringFee ? model.fee : model.amount
     }
 
     var amountFont: Font {
@@ -116,6 +139,10 @@ private extension EntryDialFace {
     }
 
     var note: String? {
+        if isListening {
+            return Self.listeningNote
+        }
+
         if let expression = model.expressionText {
             return expression
         }
