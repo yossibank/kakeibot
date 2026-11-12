@@ -84,10 +84,6 @@ extension WalletEditSheet {
         model.isNegative ? Palette.rose : Palette.accentStrong
     }
 
-    var iconStroke: Color? {
-        isEditingIcon ? Palette.accent : nil
-    }
-
     var iconStrokeWidth: CGFloat {
         isEditingIcon ? 2 : IconBadge.lineWidth
     }

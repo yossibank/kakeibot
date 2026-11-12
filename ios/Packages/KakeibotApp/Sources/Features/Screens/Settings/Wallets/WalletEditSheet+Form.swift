@@ -88,7 +88,6 @@ extension WalletEditSheet {
             } label: {
                 WalletRowIcon(
                     icon: model.icon.preview,
-                    stroke: iconStroke,
                     strokeWidth: iconStrokeWidth
                 )
                 .overlay(alignment: .bottomTrailing) {
