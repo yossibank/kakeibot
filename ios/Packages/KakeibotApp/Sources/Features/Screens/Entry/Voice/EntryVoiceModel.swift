@@ -112,7 +112,7 @@ private extension EntryVoiceModel {
             ]
         )
 
-        return try GenerationSchema(root: answer, dependencies: [category, wallet])
+        return try GenerationSchema(root: answer, dependencies: [])
     }
 
     static func choices(_ names: [String]) -> [String] {
