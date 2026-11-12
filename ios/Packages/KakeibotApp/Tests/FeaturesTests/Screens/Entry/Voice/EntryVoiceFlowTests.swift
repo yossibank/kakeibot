@@ -239,6 +239,33 @@ struct EntryVoiceFlowTests {
     }
 
     @Test
+    func putsSimilarEntriesFirstInExamples() async throws {
+        let setup = try await EntryModelTests.Setup()
+        try await saveEntry(memo: "iPhone", in: setup, at: 1_791_000_000)
+
+        for index in 0..<10 {
+            try await saveEntry(memo: "ランチ\(index)", in: setup, at: 1_791_000_100 + Double(index))
+        }
+
+        let model = try await loadedModel(setup)
+        let observing = Task {
+            await model.observeHistory()
+        }
+        defer {
+            observing.cancel()
+        }
+        try await waitForHistory(model)
+
+        let similar = model.voiceExamples(for: "iPhoneの支払い 4800円")
+        let recent = model.voiceExamples(for: "コーヒー 450円")
+
+        #expect(similar.first?.hasPrefix("iPhone → カテゴリ：") == true)
+        #expect(similar.count == 8)
+        #expect(recent.first?.hasPrefix("ランチ9 → カテゴリ：") == true)
+        #expect(!recent.contains { $0.hasPrefix("iPhone") })
+    }
+
+    @Test
     func showsHintOnlyUntilItIsMarked() async throws {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
@@ -325,7 +352,8 @@ struct EntryVoiceFlowTests {
 private extension EntryVoiceFlowTests {
     func saveEntry(
         memo: String,
-        in setup: EntryModelTests.Setup
+        in setup: EntryModelTests.Setup,
+        at seconds: TimeInterval = 1_791_000_000
     ) async throws {
         let options = try await setup.database.entryOptions()
         let walletId = try #require(options.wallets.first?.id)
@@ -341,12 +369,12 @@ private extension EntryVoiceFlowTests {
 
         _ = try await setup.database.saveEntry(
             draft,
-            at: Date(timeIntervalSince1970: 1_791_000_000)
+            at: Date(timeIntervalSince1970: seconds)
         )
     }
 
     func waitForHistory(_ model: EntryModel) async throws {
-        for _ in 0..<50 where model.voiceExamples.isEmpty {
+        for _ in 0..<50 where model.voiceExamples(for: "").isEmpty {
             try await Task.sleep(for: .milliseconds(20))
         }
     }

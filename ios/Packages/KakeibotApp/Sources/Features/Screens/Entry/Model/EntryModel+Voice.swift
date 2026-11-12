@@ -52,16 +52,26 @@ public extension EntryModel {
         return Self.distinct(names)
     }
 
-    var voiceExamples: [String] {
+    func voiceExamples(for text: String) -> [String] {
+        let spoken = Self.voicePairs(of: text)
+
         let entries = (history?.days ?? [])
             .flatMap(\.entries)
             .filter { $0.type == type }
             .sorted { $0.createdAt > $1.createdAt }
 
+        let similar = entries
+            .map { entry in
+                (entry, Self.voicePairs(of: entry.memo ?? "").intersection(spoken).count)
+            }
+            .filter { $0.1 > 0 }
+            .sorted { $0.1 > $1.1 }
+            .map(\.0)
+
         var seen: Set<String> = []
         var examples: [String] = []
 
-        for entry in entries where examples.count < Self.voiceExampleLimit {
+        for entry in similar + entries where examples.count < Self.voiceExampleLimit {
             guard
                 let memo = entry.memo?.split(whereSeparator: \.isNewline).first.map(String.init),
                 !memo.isEmpty,
@@ -151,6 +161,16 @@ public extension EntryModel {
 
 private extension EntryModel {
     static let voiceExampleLimit = 8
+
+    static func voicePairs(of text: String) -> Set<String> {
+        let letters = Array(text.lowercased().filter(\.isLetter))
+
+        guard letters.count > 1 else {
+            return Set(letters.map(String.init))
+        }
+
+        return Set(zip(letters, letters.dropFirst()).map { "\($0)\($1)" })
+    }
 
     static func distinct(_ names: [String]) -> [String] {
         var seen: Set<String> = []

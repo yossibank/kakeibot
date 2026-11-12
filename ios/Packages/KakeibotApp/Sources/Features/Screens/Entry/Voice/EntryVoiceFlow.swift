@@ -295,7 +295,7 @@ private extension EntryVoiceFlow {
             text: text,
             categories: model.categories.map(\.name),
             wallets: model.wallets.map(\.name),
-            examples: model.voiceExamples
+            examples: model.voiceExamples(for: text)
         )
 
         let choice = await dependencies.choose(question)
