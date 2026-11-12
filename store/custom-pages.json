@@ -12,9 +12,9 @@
         "同期"
       ],
       "lead": [
-        "09-share.png",
+        "07-share.png",
         "01-home.png",
-        "02-entry.png"
+        "03-entry.png"
       ],
       "promotionalText": "夫婦やカップルで、共有の財布をいっしょにつけられる家計簿です。それぞれの家計簿は分けたまま、共有した分だけを相手と記録できます。誘われた側は Pro が無くても使えます。広告は出ません。"
     },
@@ -26,8 +26,9 @@
         "かわいい"
       ],
       "lead": [
-        "04-theme.png",
-        "05-font.png"
+        "02-theme.png",
+        "04-font.png",
+        "05-backdrop.png"
       ],
       "promotionalText": "色やアイコン、字体を自分好みに着せ替えられる家計簿です。見返すのが楽しくなる画面で、毎日の記録が続けやすくなります。広告は出ません。"
     },
@@ -41,8 +42,8 @@
       ],
       "lead": [
         "01-home.png",
-        "02-entry.png",
-        "08-records.png"
+        "03-entry.png",
+        "08-review.png"
       ],
       "promotionalText": "よく使う支出はタップ 1 回で記録できる、かんたんなおこづかい帳です。「今月あといくら使えるか」が、ホームでひと目で分かります。広告は出ません。"
     },
@@ -56,9 +57,9 @@
         "サブスク"
       ],
       "lead": [
-        "06-assets.png",
-        "01-home.png",
-        "07-review.png"
+        "10-assets.png",
+        "09-outlook.png",
+        "01-home.png"
       ],
       "promotionalText": "口座とクレジットカードをまとめて見られる家計簿です。カードの請求や固定費・サブスクも、次の引き落としに回して管理できます。広告は出ません。"
     }

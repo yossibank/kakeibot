@@ -17,6 +17,13 @@ struct SnapshotTests {
             }
         }
 
+        for (index, shot) in Self.shots.enumerated() {
+            let images = try shot.phones.map { try Self.image($0.name) }
+            let view = PanoramaPage(shot: shot, index: index, images: images)
+
+            try Self.write(view, canvas: .phone, to: shot.file)
+        }
+
         let shots = try Self.bannerShots.map(Self.image)
 
         for canvas in [Canvas.header, .search] {
@@ -80,44 +87,262 @@ extension SnapshotTests {
 
     struct Page {
         let file: String
-        let badge: String?
         let lines: [String]
-        let note: String
-        let mood: Mood
+        let lead: Lead
         let art: Art
-    }
-
-    enum Mood {
-        case cream
-        case blush
-        case night
-        case sage
-        case sand
     }
 
     enum Art {
         case phone(String)
-        case inset(
-            String,
-            from: String,
-            crop: CGRect,
-            corner: CGFloat,
-            width: CGFloat,
-            at: UnitPoint
-        )
         case fan(left: String, center: String, right: String, labels: [String])
         case compare(String, parts: [String], labels: [String], crop: CGRect)
-        case pair(String, String)
         case receipt(String)
     }
 
     enum LoadedArt {
         case phone(UIImage)
-        case inset(UIImage, part: UIImage, corner: CGFloat, width: CGFloat, at: UnitPoint)
         case fan(left: UIImage, center: UIImage, right: UIImage, labels: [String])
         case compare(UIImage, parts: [UIImage], labels: [String])
-        case pair(UIImage, UIImage)
         case receipt(UIImage)
+    }
+
+    struct Shot {
+        let file: String
+        let lines: [String]
+        let lead: Lead
+        let phones: [Phone]
+    }
+
+    enum Lead {
+        case free
+        case note(String)
+    }
+
+    struct Phone {
+        let name: String
+        let x: CGFloat
+        let y: CGFloat
+        let width: CGFloat
+        let angle: Double
+        var anchor: UnitPoint = .center
+    }
+}
+
+private struct PanoramaPage: View {
+    let shot: SnapshotTests.Shot
+    let index: Int
+    let images: [UIImage]
+
+    var body: some View {
+        let canvas = SnapshotTests.Canvas.phone
+        let zoom = canvas.size.width / Self.designWidth
+
+        ZStack(alignment: .topLeading) {
+            StoreRings(rings: Self.rings, shift: Self.pitch * CGFloat(index))
+
+            ForEach(Array(zip(shot.phones, images).enumerated()), id: \.offset) { _, pair in
+                phone(pair.0, image: pair.1)
+            }
+
+            StoreHeadline(lines: shot.lines, lead: shot.lead, scale: 1)
+                .offset(x: 24, y: 44)
+        }
+        .frame(
+            width: Self.designWidth,
+            height: canvas.size.height / zoom,
+            alignment: .topLeading
+        )
+        .background(StoreInk.ground)
+        .clipped()
+        .scaleEffect(zoom, anchor: .topLeading)
+        .frame(width: canvas.size.width, height: canvas.size.height, alignment: .topLeading)
+        .environment(\.colorScheme, .light)
+    }
+}
+
+private extension PanoramaPage {
+    static let designWidth: CGFloat = 320
+    static let pitch: CGFloat = 336
+
+    static let rings = [
+        StoreRings.Ring(
+            x: 496,
+            y: 900,
+            radius: 640,
+            paint: .stroke(opacity: 0.7, width: 2, dash: [])
+        ),
+        StoreRings.Ring(
+            x: 496,
+            y: 900,
+            radius: 600,
+            paint: .stroke(opacity: 0.3, width: 1, dash: [2, 14])
+        ),
+        StoreRings.Ring(
+            x: 496,
+            y: 900,
+            radius: 690,
+            paint: .stroke(opacity: 0.18, width: 1, dash: [])
+        ),
+        StoreRings.Ring(
+            x: 1340,
+            y: 680,
+            radius: 250,
+            paint: .stroke(opacity: 0.4, width: 2, dash: [])
+        ),
+        StoreRings.Ring(
+            x: 2016,
+            y: 660,
+            radius: 320,
+            paint: .stroke(opacity: 0.55, width: 2, dash: [])
+        ),
+        StoreRings.Ring(
+            x: 2016,
+            y: 660,
+            radius: 290,
+            paint: .stroke(opacity: 0.25, width: 1, dash: [2, 14])
+        ),
+        StoreRings.Ring(x: 2900, y: 620, radius: 210, paint: .fill(Color(rgb: 0xF4E9E4)))
+    ]
+
+    func phone(
+        _ phone: SnapshotTests.Phone,
+        image: UIImage
+    ) -> some View {
+        PhoneFrame(shot: image, width: phone.width)
+            .shadow(color: .black.opacity(0.5), radius: 30, y: 30)
+            .rotationEffect(.degrees(phone.angle), anchor: phone.anchor)
+            .offset(x: phone.x, y: phone.y)
+    }
+}
+
+private enum StoreInk {
+    static let ground = Color(rgb: 0x131A30)
+    static let accent = Color(rgb: 0xE3C58A)
+    static let title = Color(rgb: 0xF6EAD2)
+    static let note = Color(rgb: 0xC9CFE0)
+}
+
+private struct StoreRings: View {
+    let rings: [Ring]
+    var shift: CGFloat = 0
+
+    var body: some View {
+        Canvas { context, _ in
+            for ring in rings {
+                let rect = CGRect(
+                    x: ring.x - shift - ring.radius,
+                    y: ring.y - ring.radius,
+                    width: ring.radius * 2,
+                    height: ring.radius * 2
+                )
+                let path = Path(ellipseIn: rect)
+
+                switch ring.paint {
+                case let .stroke(opacity, width, dash):
+                    context.stroke(
+                        path,
+                        with: .color(StoreInk.accent.opacity(opacity)),
+                        style: StrokeStyle(lineWidth: width, dash: dash)
+                    )
+
+                case let .fill(color):
+                    context.fill(path, with: .color(color))
+                }
+            }
+        }
+    }
+}
+
+extension StoreRings {
+    enum Paint {
+        case stroke(opacity: Double, width: CGFloat, dash: [CGFloat])
+        case fill(Color)
+    }
+
+    struct Ring {
+        let x: CGFloat
+        let y: CGFloat
+        let radius: CGFloat
+        let paint: Paint
+    }
+
+    static func arcs(
+        x: CGFloat,
+        y: CGFloat,
+        radius: CGFloat
+    ) -> [Ring] {
+        [
+            Ring(x: x, y: y, radius: radius, paint: .stroke(opacity: 0.7, width: 2, dash: [])),
+            Ring(
+                x: x,
+                y: y,
+                radius: radius * 0.94,
+                paint: .stroke(opacity: 0.3, width: 1, dash: [2, 14])
+            ),
+            Ring(
+                x: x,
+                y: y,
+                radius: radius * 1.08,
+                paint: .stroke(opacity: 0.18, width: 1, dash: [])
+            )
+        ]
+    }
+}
+
+private struct StoreHeadline: View {
+    let lines: [String]
+    let lead: SnapshotTests.Lead
+    let scale: CGFloat
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10 * scale) {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(lines, id: \.self) { line in
+                    Text(line)
+                        .font(.display(size: 44 * scale, weight: .bold, in: .mincho))
+                        .foregroundStyle(StoreInk.title)
+                        .frame(height: 50.6 * scale, alignment: .leading)
+                }
+            }
+
+            switch lead {
+            case .free:
+                freeBand
+
+            case let .note(note):
+                Text(note)
+                    .font(.system(size: 16 * scale, weight: .medium))
+                    .foregroundStyle(StoreInk.note)
+                    .fixedSize()
+            }
+        }
+    }
+}
+
+private extension StoreHeadline {
+    var freeBand: some View {
+        HStack(spacing: 10 * scale) {
+            Text("無料")
+
+            Circle()
+                .fill(StoreInk.accent)
+                .frame(width: 4 * scale, height: 4 * scale)
+
+            Text("広告なし")
+        }
+        .font(.display(size: 19 * scale, weight: .bold, in: .mincho))
+        .tracking(2.6 * scale)
+        .foregroundStyle(StoreInk.accent)
+        .padding(.horizontal, 12 * scale)
+        .padding(.vertical, 5 * scale)
+        .overlay(alignment: .top) {
+            StoreInk.accent
+                .frame(height: 1)
+        }
+        .overlay(alignment: .bottom) {
+            StoreInk.accent
+                .frame(height: 1)
+        }
     }
 }
 
@@ -143,12 +368,9 @@ private struct StorePage: View {
         }
         .frame(width: canvas.size.width, height: canvas.size.height, alignment: .top)
         .background {
-            LinearGradient(
-                colors: [colors.top, colors.bottom],
-                startPoint: .top,
-                endPoint: .bottom
-            )
+            StoreRings(rings: rings)
         }
+        .background(StoreInk.ground)
         .clipped()
         .environment(\.colorScheme, .light)
         .environment(
@@ -169,16 +391,6 @@ private extension StorePage {
         let amount: String
     }
 
-    struct Colors {
-        let top: Color
-        let bottom: Color
-        let title: Color
-        let note: Color
-        let badge: Color
-        let badgeText: Color
-        let glow: Color
-    }
-
     static let designWidth: CGFloat = 440
 
     static let receiptLines = [
@@ -192,91 +404,25 @@ private extension StorePage {
         ReceiptLine(name: "洗剤", amount: "¥456")
     ]
 
-    var topPadding: CGFloat {
-        let full: CGFloat = page.badge == nil ? 72 : 48
-        return full * canvas.headerHeight / 300
-    }
+    var rings: [StoreRings.Ring] {
+        let size = canvas.size
 
-    var colors: Colors {
-        switch page.mood {
-        case .cream: Colors(
-                top: Color(rgb: 0xFBF7EF),
-                bottom: Color(rgb: 0xEBDDC4),
-                title: Color(rgb: 0x5A3A12),
-                note: Color(rgb: 0x8A7357),
-                badge: Color(rgb: 0x9A6A2A),
-                badgeText: Color(rgb: 0xFBF7EF),
-                glow: Color(rgb: 0x9A6A2A)
-            )
-
-        case .blush: Colors(
-                top: Color(rgb: 0xFCF3F1),
-                bottom: Color(rgb: 0xEFD3D1),
-                title: Color(rgb: 0x7A3442),
-                note: Color(rgb: 0x9A6670),
-                badge: Color(rgb: 0x9C4A5A),
-                badgeText: Color(rgb: 0xFCF3F1),
-                glow: Color(rgb: 0x9C4A5A)
-            )
-
-        case .night: Colors(
-                top: Color(rgb: 0x1B2236),
-                bottom: Color(rgb: 0x0C1020),
-                title: Color(rgb: 0xF3DFB4),
-                note: Color(rgb: 0xB8B3A6),
-                badge: Color(rgb: 0xE0B66A),
-                badgeText: Color(rgb: 0x1B2236),
-                glow: Color(rgb: 0xE0B66A)
-            )
-
-        case .sage: Colors(
-                top: Color(rgb: 0xF4F6EF),
-                bottom: Color(rgb: 0xD7DFCB),
-                title: Color(rgb: 0x34492E),
-                note: Color(rgb: 0x6A7A62),
-                badge: Color(rgb: 0x4F6B45),
-                badgeText: Color(rgb: 0xF4F6EF),
-                glow: Color(rgb: 0x4F6B45)
-            )
-
-        case .sand: Colors(
-                top: Color(rgb: 0xF8F1E4),
-                bottom: Color(rgb: 0xE6CFA6),
-                title: Color(rgb: 0x5E3F12),
-                note: Color(rgb: 0x8C7048),
-                badge: Color(rgb: 0xA8741E),
-                badgeText: Color(rgb: 0xF8F1E4),
-                glow: Color(rgb: 0xA8741E)
-            )
-        }
+        return StoreRings.arcs(
+            x: size.width * 1.1,
+            y: size.height * 1.15,
+            radius: max(size.width, size.height) * 0.85
+        )
     }
 
     var header: some View {
-        VStack(spacing: 16) {
-            if let badge = page.badge {
-                Text(badge)
-                    .textFont(size: .body, weight: .semibold)
-                    .tracking(2)
-                    .foregroundStyle(colors.badgeText)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 6)
-                    .background(colors.badge, in: .capsule)
-            }
-
-            VStack(spacing: 4) {
-                ForEach(page.lines, id: \.self) { line in
-                    Text(line)
-                        .displayFont(.display, weight: .bold)
-                        .foregroundStyle(colors.title)
-                }
-            }
-
-            Text(page.note)
-                .textFont(size: .body)
-                .foregroundStyle(colors.note)
-        }
-        .padding(.top, topPadding)
-        .frame(height: canvas.headerHeight, alignment: .top)
+        StoreHeadline(lines: page.lines, lead: page.lead, scale: 1.15)
+            .padding(.leading, 28)
+            .padding(.top, 30)
+            .frame(
+                width: canvas.size.width,
+                height: canvas.headerHeight,
+                alignment: .topLeading
+            )
     }
 
     @ViewBuilder
@@ -284,24 +430,6 @@ private extension StorePage {
         switch art {
         case let .phone(shot):
             phone(shot, width: 360)
-
-        case let .inset(shot, part, corner, width, point):
-            ZStack(alignment: .top) {
-                phone(shot, width: 360)
-
-                GeometryReader { proxy in
-                    Image(uiImage: part)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .clipShape(.rect(cornerRadius: corner))
-                        .frame(width: width)
-                        .shadow(color: .black.opacity(0.22), radius: 20, y: 12)
-                        .position(
-                            x: proxy.size.width * point.x,
-                            y: proxy.size.height * point.y
-                        )
-                }
-            }
 
         case let .fan(left, center, right, labels):
             fan(
@@ -311,29 +439,6 @@ private extension StorePage {
 
         case let .compare(base, parts, labels):
             compare(base, parts: parts, labels: labels)
-
-        case let .pair(left, right):
-            ZStack(alignment: .top) {
-                phone(left, width: 260)
-                    .rotationEffect(.degrees(-6))
-                    .offset(x: -88, y: 28)
-
-                phone(right, width: 260)
-                    .rotationEffect(.degrees(6))
-                    .offset(x: 88, y: 28)
-
-                Image(systemName: "link")
-                    .font(.system(size: 28, weight: .semibold))
-                    .foregroundStyle(colors.badgeText)
-                    .frame(width: 72, height: 72)
-                    .background(colors.badge, in: .circle)
-                    .overlay {
-                        Circle()
-                            .stroke(colors.badgeText, lineWidth: 4)
-                    }
-                    .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
-                    .offset(y: 220)
-            }
 
         case let .receipt(shot):
             ZStack(alignment: .topLeading) {
@@ -394,14 +499,14 @@ private extension StorePage {
         .padding(16)
         .overlay {
             ViewfinderCorners()
-                .stroke(colors.badge, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                .stroke(StoreInk.accent, style: StrokeStyle(lineWidth: 4, lineCap: .round))
         }
         .overlay(alignment: .topLeading) {
             Image(systemName: "camera.fill")
                 .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(colors.badgeText)
+                .foregroundStyle(StoreInk.ground)
                 .frame(width: 52, height: 52)
-                .background(colors.badge, in: .circle)
+                .background(StoreInk.accent, in: .circle)
                 .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
                 .offset(x: -16, y: -16)
         }
@@ -418,7 +523,7 @@ private extension StorePage {
         width: CGFloat
     ) -> some View {
         PhoneFrame(shot: shot, width: width)
-            .shadow(color: colors.glow.opacity(0.35), radius: 24, y: 12)
+            .shadow(color: .black.opacity(0.5), radius: 24, y: 16)
     }
 
     func fan(
@@ -441,10 +546,10 @@ private extension StorePage {
                 ForEach(labels, id: \.self) { label in
                     Text(label)
                         .textFont(size: .small, weight: .semibold)
-                        .foregroundStyle(colors.title)
+                        .foregroundStyle(StoreInk.title)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 4)
-                        .background(colors.title.opacity(0.12), in: .capsule)
+                        .background(StoreInk.accent.opacity(0.2), in: .capsule)
                 }
             }
             .offset(y: -12)
@@ -466,10 +571,10 @@ private extension StorePage {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(label)
                             .textFont(size: .body, weight: .semibold)
-                            .foregroundStyle(colors.badgeText)
+                            .foregroundStyle(StoreInk.ground)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 4)
-                            .background(colors.badge, in: .capsule)
+                            .background(StoreInk.accent, in: .capsule)
 
                         Image(uiImage: part)
                             .resizable()
@@ -494,25 +599,12 @@ private struct StoreBanner: View {
         let height = canvas.size.height / zoom
 
         HStack(spacing: 40) {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("広告なしの家計簿")
-                    .textFont(size: .body, weight: .semibold)
-                    .tracking(2)
-                    .foregroundStyle(Color(rgb: 0xFBF7EF))
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 6)
-                    .background(Color(rgb: 0x9A6A2A), in: .capsule)
+            VStack(alignment: .leading, spacing: 14) {
+                StoreHeadline(lines: ["好きな色で、", "続く家計簿。"], lead: .free, scale: 1.15)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("今月あといくら？")
-                    Text("が、ひと目で")
-                }
-                .displayFont(.display, weight: .bold)
-                .foregroundStyle(Color(rgb: 0x5A3A12))
-
-                Text("レシートを撮れば、品目まで入る")
-                    .textFont(size: .body)
-                    .foregroundStyle(Color(rgb: 0x8A7357))
+                Text("色も字体も、着せ替え")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(StoreInk.note)
             }
             .fixedSize()
 
@@ -520,12 +612,9 @@ private struct StoreBanner: View {
         }
         .frame(width: Self.designWidth, height: height)
         .background {
-            LinearGradient(
-                colors: [Color(rgb: 0xFBF7EF), Color(rgb: 0xEBDDC4)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            StoreRings(rings: rings(height: height))
         }
+        .background(StoreInk.ground)
         .clipped()
         .scaleEffect(zoom, anchor: .topLeading)
         .frame(width: canvas.size.width, height: canvas.size.height, alignment: .topLeading)
@@ -571,7 +660,18 @@ private extension StoreBanner {
         width: CGFloat
     ) -> some View {
         PhoneFrame(shot: shot, width: width)
-            .shadow(color: Color(rgb: 0x9A6A2A).opacity(0.3), radius: 16, y: 8)
+            .shadow(color: .black.opacity(0.5), radius: 20, y: 14)
+    }
+
+    func rings(height: CGFloat) -> [StoreRings.Ring] {
+        let width = Self.designWidth
+        let radius = (pow(width * 0.67, 2) + pow(height * 1.05, 2)).squareRoot()
+
+        return StoreRings.arcs(
+            x: width * 1.25,
+            y: height * 2.05,
+            radius: radius
+        )
     }
 }
 
@@ -655,39 +755,19 @@ private struct Line: Shape {
 
 private extension SnapshotTests {
     static let directory = "__OUT__"
-    static let bannerShots = ["01-home", "03-receipt", "07-review"]
+    static let bannerShots = ["04-theme-navy", "04-theme-rose", "04-theme-sage"]
 
     static let outerPages = [
         Page(
             file: "01-home",
-            badge: "広告なしの家計簿",
-            lines: ["今月あといくら？", "が、ひと目で"],
-            note: "予算の残りをメーターでお知らせ",
-            mood: .cream,
+            lines: ["今月あと", "いくら？"],
+            lead: .free,
             art: .phone("outer-01-home")
         ),
         Page(
-            file: "02-entry",
-            badge: nil,
-            lines: ["よく使う支出は、", "タップ 1 回"],
-            note: "テンプレートと電卓ですばやく記録",
-            mood: .blush,
-            art: .phone("outer-02-entry")
-        ),
-        Page(
-            file: "03-receipt",
-            badge: nil,
-            lines: ["レシートを撮れば、", "品目まで入る"],
-            note: "品名・合計・日付・店名を読み取り",
-            mood: .sage,
-            art: .receipt("outer-03-receipt")
-        ),
-        Page(
-            file: "04-theme",
-            badge: nil,
-            lines: ["色もアイコンも、", "自分好みに"],
-            note: "ライトとダーク、12 色のテーマを着せ替え",
-            mood: .night,
+            file: "02-theme",
+            lines: ["色も、", "着せ替え。"],
+            lead: .note("ライトとダークの 12 色から選べます"),
             art: .fan(
                 left: "outer-04-theme-rose",
                 center: "outer-01-home",
@@ -696,11 +776,21 @@ private extension SnapshotTests {
             )
         ),
         Page(
+            file: "03-entry",
+            lines: ["記録は、", "タップ 1 回"],
+            lead: .note("テンプレートと電卓ですばやく"),
+            art: .phone("outer-02-entry")
+        ),
+        Page(
+            file: "04-receipt",
+            lines: ["レシートを", "撮れば入る"],
+            lead: .note("品名・合計・日付を読み取り"),
+            art: .receipt("outer-03-receipt")
+        ),
+        Page(
             file: "05-font",
-            badge: "PRO",
-            lines: ["文字の雰囲気も、", "選べる"],
-            note: "明朝・ゴシック・手書き・ドットなど 6 種類",
-            mood: .cream,
+            lines: ["字体も、", "選べる"],
+            lead: .note("手書きやドットなど 6 種類"),
             art: .compare(
                 "outer-05-font-hand",
                 parts: ["outer-01-home", "outer-05-font-hand"],
@@ -710,183 +800,159 @@ private extension SnapshotTests {
         ),
         Page(
             file: "06-assets",
-            badge: nil,
-            lines: ["残高も引き落としも、", "まとめて"],
-            note: "口座ごとの残高と、カードの引き落とし日",
-            mood: .sand,
+            lines: ["残高も、", "引き落としも"],
+            lead: .note("口座とカードをまとめて"),
             art: .phone("outer-06-assets")
         ),
         Page(
             file: "07-review",
-            badge: nil,
-            lines: ["何に使ったか、", "すぐ分かる"],
-            note: "カテゴリごとの内訳と前の月との比べ",
-            mood: .sage,
+            lines: ["何に使ったか", "すぐ分かる"],
+            lead: .note("内訳と前の月との比べ"),
             art: .phone("outer-07-review")
         ),
         Page(
             file: "08-records",
-            badge: nil,
-            lines: ["毎日の支出を、", "カレンダーで"],
-            note: "使わなかった日には印がつきます",
-            mood: .cream,
+            lines: ["毎日の支出を", "カレンダーで"],
+            lead: .note("使わなかった日には印がつきます"),
             art: .phone("outer-08-records")
         )
     ]
 
-    static let pages = [
-        Page(
+    static let shots = [
+        Shot(
             file: "01-home",
-            badge: "広告なしの家計簿",
-            lines: ["今月あといくら？", "が、ひと目で"],
-            note: "予算の残りをメーターでお知らせ",
-            mood: .cream,
-            art: .phone("01-home")
+            lines: ["今月あと", "いくら？"],
+            lead: .free,
+            phones: [
+                Phone(name: "04-theme-navy", x: 34, y: 200, width: 270, angle: -3)
+            ]
         ),
-        Page(
-            file: "02-entry",
-            badge: nil,
-            lines: ["よく使う支出は、", "タップ 1 回"],
-            note: "テンプレートと電卓ですばやく記録",
-            mood: .blush,
-            art: .phone("02-entry")
+        Shot(
+            file: "02-theme",
+            lines: ["色も、", "着せ替え。"],
+            lead: .note("ライトとダークの 12 色から選べます"),
+            phones: [
+                Phone(
+                    name: "04-theme-ivory",
+                    x: 16,
+                    y: 238,
+                    width: 210,
+                    angle: -10,
+                    anchor: .bottom
+                ),
+                Phone(
+                    name: "04-theme-sage",
+                    x: 94,
+                    y: 238,
+                    width: 210,
+                    angle: 10,
+                    anchor: .bottom
+                ),
+                Phone(name: "04-theme-rose", x: 40, y: 200, width: 240, angle: 0)
+            ]
         ),
-        Page(
-            file: "03-receipt",
-            badge: nil,
-            lines: ["レシートを撮れば、", "品目まで入る"],
-            note: "品名・合計・日付・店名を読み取り",
-            mood: .sage,
-            art: .receipt("03-receipt")
+        Shot(
+            file: "03-entry",
+            lines: ["記録は、", "タップ 1 回"],
+            lead: .note("テンプレートと電卓ですばやく"),
+            phones: [
+                Phone(name: "02-entry-black", x: 30, y: 200, width: 270, angle: 3)
+            ]
         ),
-        Page(
-            file: "04-theme",
-            badge: nil,
-            lines: ["色もアイコンも、", "自分好みに"],
-            note: "ライトとダーク、12 色のテーマを着せ替え",
-            mood: .night,
-            art: .fan(
-                left: "04-theme-rose",
-                center: "04-theme-white",
-                right: "04-theme-navy",
-                labels: ["ローズ", "ホワイト", "ネイビー"]
-            )
+        Shot(
+            file: "04-font",
+            lines: ["字体も、", "選べる"],
+            lead: .note("手書きやドットなど 6 種類"),
+            phones: [
+                Phone(name: "05-font-hand", x: 12, y: 196, width: 250, angle: -4),
+                Phone(name: "05-font-text", x: 132, y: 270, width: 220, angle: 5)
+            ]
         ),
-        Page(
-            file: "05-font",
-            badge: "PRO",
-            lines: ["文字の雰囲気も、", "選べる"],
-            note: "明朝・ゴシック・手書き・ドットなど 6 種類",
-            mood: .cream,
-            art: .compare(
-                "05-font-hand",
-                parts: ["04-theme-white", "05-font-hand"],
-                labels: ["明朝", "手書き"],
-                crop: CGRect(x: 160, y: 560, width: 1000, height: 520)
-            )
+        Shot(
+            file: "05-backdrop",
+            lines: ["背景も、", "和紙や方眼に"],
+            lead: .note("角の丸みや行の間隔まで"),
+            phones: [
+                Phone(name: "05-look-backdrop", x: 20, y: 196, width: 280, angle: 2)
+            ]
         ),
-        Page(
-            file: "06-assets",
-            badge: nil,
-            lines: ["残高も引き落としも、", "まとめて"],
-            note: "口座ごとの残高と、カードの引き落とし日",
-            mood: .sand,
-            art: .inset(
-                "06-assets",
-                from: "06-assets",
-                crop: CGRect(x: 53, y: 1981, width: 1215, height: 534),
-                corner: 20,
-                width: 400,
-                at: UnitPoint(x: 0.5, y: 0.66)
-            )
+        Shot(
+            file: "06-receipt",
+            lines: ["レシートを", "撮れば入る"],
+            lead: .note("品名・合計・日付を読み取り"),
+            phones: [
+                Phone(name: "03-receipt", x: 20, y: 196, width: 280, angle: -2)
+            ]
         ),
-        Page(
-            file: "07-review",
-            badge: nil,
-            lines: ["何に使ったか、", "すぐ分かる"],
-            note: "カテゴリごとの内訳と前の月との比べ",
-            mood: .sage,
-            art: .phone("07-review")
+        Shot(
+            file: "07-share",
+            lines: ["ふたりで、", "ひとつの家計"],
+            lead: .note("共有の財布をいっしょに"),
+            phones: [
+                Phone(name: "09-share-rose", x: 20, y: 196, width: 280, angle: 2)
+            ]
         ),
-        Page(
-            file: "08-records",
-            badge: nil,
-            lines: ["毎日の支出を、", "カレンダーで"],
-            note: "使わなかった日には印がつきます",
-            mood: .cream,
-            art: .inset(
-                "08-records",
-                from: "08-records",
-                crop: CGRect(x: 69, y: 1725, width: 676, height: 400),
-                corner: 20,
-                width: 320,
-                at: UnitPoint(x: 0.5, y: 0.6)
-            )
+        Shot(
+            file: "08-review",
+            lines: ["何に使ったか", "すぐ分かる"],
+            lead: .note("内訳と前の月との比べ"),
+            phones: [
+                Phone(name: "07-review-black", x: 20, y: 196, width: 280, angle: -2)
+            ]
         ),
-        Page(
-            file: "09-share",
-            badge: "PRO",
-            lines: ["家族と、", "ひとつの家計簿を"],
-            note: "iCloud で記録をいっしょに",
-            mood: .blush,
-            art: .pair("08-records", "09-share-rose")
+        Shot(
+            file: "09-outlook",
+            lines: ["月末の残りが", "先に分かる"],
+            lead: .note("固定費と予定から見込みます"),
+            phones: [
+                Phone(name: "10-outlook", x: 20, y: 196, width: 280, angle: 2)
+            ]
         ),
-        Page(
-            file: "10-outlook",
-            badge: "NEW",
-            lines: ["月末にいくら残る？", "が、先に分かる"],
-            note: "固定費と予定の記録から、月末の残りを見込み",
-            mood: .sand,
-            art: .phone("10-outlook")
+        Shot(
+            file: "10-assets",
+            lines: ["残高も、", "引き落としも"],
+            lead: .note("口座とカードをまとめて"),
+            phones: [
+                Phone(name: "06-assets-black", x: 20, y: 196, width: 280, angle: -2)
+            ]
         )
     ]
 
     static let innerPages = [
         Page(
             file: "01-home",
-            badge: nil,
             lines: ["広い画面で、", "家計をひと目で"],
-            note: "左のサイドバーから、すぐに切り替え",
-            mood: .cream,
+            lead: .free,
             art: .phone("inner-01-home")
         ),
         Page(
             file: "02-review",
-            badge: nil,
             lines: ["何に使ったか、", "並べて分かる"],
-            note: "内訳と前の月との比べを 2 列で",
-            mood: .sage,
+            lead: .note("内訳と前の月との比べを 2 列で"),
             art: .phone("inner-02-review")
         ),
         Page(
             file: "03-assets",
-            badge: nil,
             lines: ["残高も引き落としも、", "まとめて"],
-            note: "口座ごとの残高と、カードの引き落とし日",
-            mood: .sand,
+            lead: .note("口座ごとの残高と、カードの引き落とし日"),
             art: .phone("inner-03-assets")
         ),
         Page(
             file: "04-records",
-            badge: nil,
             lines: ["毎日の支出を、", "カレンダーで"],
-            note: "使わなかった日には印がつきます",
-            mood: .blush,
+            lead: .note("使わなかった日には印がつきます"),
             art: .phone("inner-04-records")
         ),
         Page(
             file: "05-entry",
-            badge: nil,
             lines: ["よく使う支出は、", "タップ 1 回"],
-            note: "テンプレートと電卓ですばやく記録",
-            mood: .cream,
+            lead: .note("テンプレートと電卓ですばやく記録"),
             art: .phone("inner-05-entry")
         )
     ]
 
     static var pageSets: [(Canvas, [Page])] {
         [
-            (.phone, pages),
             (.duoOuter, outerPages),
             (.duoInner, innerPages)
         ]
@@ -911,17 +977,6 @@ private extension SnapshotTests {
         case let .phone(name):
             return try .phone(image(name))
 
-        case let .inset(name, source, crop, corner, width, point):
-            let cropped = try #require(image(source).cgImage?.cropping(to: crop))
-
-            return try .inset(
-                image(name),
-                part: UIImage(cgImage: cropped),
-                corner: corner,
-                width: width,
-                at: point
-            )
-
         case let .fan(left, center, right, labels):
             return try .fan(
                 left: image(left),
@@ -937,9 +992,6 @@ private extension SnapshotTests {
             }
 
             return try .compare(image(base), parts: cropped, labels: labels)
-
-        case let .pair(left, right):
-            return try .pair(image(left), image(right))
 
         case let .receipt(name):
             return try .receipt(image(name))

@@ -8,13 +8,13 @@
 
 ## ✨ 機能
 
-| ホーム | 1 タップの記録 | レシートの読み取り |
+| ホーム | 着せ替えのテーマ | 1 タップの記録 |
 | :---: | :---: | :---: |
-| <img src="store/screenshots/6.9/01-home.png" width="200" alt="ホームで今月あといくら使えるかが分かる"> | <img src="store/screenshots/6.9/02-entry.png" width="200" alt="金額と分類を入れて記録する"> | <img src="store/screenshots/6.9/03-receipt.png" width="200" alt="レシートを撮って記録する"> |
+| <img src="store/screenshots/6.9/01-home.png" width="200" alt="ホームで今月あといくら使えるかが分かる"> | <img src="store/screenshots/6.9/02-theme.png" width="200" alt="テーマで見た目を着せ替える"> | <img src="store/screenshots/6.9/03-entry.png" width="200" alt="金額と分類を入れて記録する"> |
 
-| 着せ替えのテーマ | 振り返り | 月末の見込み |
+| レシートの読み取り | 振り返り | 月末の見込み |
 | :---: | :---: | :---: |
-| <img src="store/screenshots/6.9/04-theme.png" width="200" alt="テーマで見た目を着せ替える"> | <img src="store/screenshots/6.9/07-review.png" width="200" alt="月の支出を振り返る"> | <img src="store/screenshots/6.9/10-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"> |
+| <img src="store/screenshots/6.9/06-receipt.png" width="200" alt="レシートを撮って記録する"> | <img src="store/screenshots/6.9/08-review.png" width="200" alt="月の支出を振り返る"> | <img src="store/screenshots/6.9/09-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"> |
 
 ## 🗺️ 全体像
 
