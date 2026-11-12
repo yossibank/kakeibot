@@ -265,13 +265,10 @@ private extension EntrySheet {
         VStack(spacing: 24) {
             dial
 
-            if model.type != .transfer {
-                categoryArea
-            } else if isFormDeferred {
-                Color.clear
-                    .frame(height: Self.deferredFormHeight)
-            } else {
+            if model.type == .transfer {
                 transferArea
+            } else {
+                categoryArea
             }
         }
     }
@@ -332,7 +329,6 @@ private extension EntrySheet {
 
 private extension EntrySheet {
     static let fade: CGFloat = 20
-    static let deferredFormHeight: CGFloat = 200
     static let formRevealDelay: Duration = .milliseconds(450)
     static let continueWidth: CGFloat = 64
 

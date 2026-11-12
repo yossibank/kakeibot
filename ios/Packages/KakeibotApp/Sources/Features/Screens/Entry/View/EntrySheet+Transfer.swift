@@ -10,6 +10,14 @@ extension EntrySheet {
                 open(.wallet(role))
             }
 
+            if !isFormDeferred {
+                transferExtras
+            }
+        }
+    }
+
+    var transferExtras: some View {
+        VStack(spacing: 12) {
             EntryRouteRow(model: model) { route in
                 withAnimation(.snappy) {
                     model.applyRoute(route)
