@@ -54,5 +54,25 @@ private struct TabContent: ViewModifier {
         content
             .safeAreaPadding(.leading, leading)
             .safeAreaPadding(.bottom, bottom)
+            .overlay(alignment: .bottom) {
+                if !hasSidebar {
+                    tabBarFade
+                }
+            }
+    }
+}
+
+private extension TabContent {
+    static let fadeReach: CGFloat = 24
+
+    var tabBarFade: some View {
+        LinearGradient(
+            colors: [Palette.backgroundBottom.opacity(0.0), Palette.backgroundBottom],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        .frame(height: FloatingTabBar<Int>.clearance + Self.fadeReach)
+        .ignoresSafeArea(edges: .bottom)
+        .allowsHitTesting(false)
     }
 }

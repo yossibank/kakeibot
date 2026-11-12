@@ -212,9 +212,7 @@ struct MainView: View {
             MainTabLayer(selection: selection, value: .assets) {
                 AssetsView(
                     model: assets,
-                    onTransfer: {
-                        sheet = .transfer
-                    },
+                    onTransfer: addTransfer,
                     onOpenWallet: { id in
                         sheet = .wallet(id)
                     },

@@ -58,6 +58,11 @@ extension MainView {
         sheet = .new
     }
 
+    func addTransfer() {
+        draft.select(.transfer)
+        sheet = .transfer
+    }
+
     func markOpened(_ sheet: Sheet?) async {
         guard sheet == .new else {
             return

@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct AssetsBalanceTrend: View {
-    static let netWorthDash: [CGFloat] = [4, 3]
+    static let netWorthColor = Palette.subtext
 
     let totals: [Int]
     let netWorths: [Int]?
@@ -21,12 +21,8 @@ struct AssetsBalanceTrend: View {
                         path.addLines(netWorthPoints)
                     }
                     .stroke(
-                        Palette.accent.opacity(.strong),
-                        style: StrokeStyle(
-                            lineWidth: 1.2,
-                            lineJoin: .round,
-                            dash: Self.netWorthDash
-                        )
+                        Self.netWorthColor,
+                        style: StrokeStyle(lineWidth: 1.2, lineJoin: .round)
                     )
                 }
 

@@ -11,14 +11,9 @@ extension RecordsView {
         }
     }
 
-    var isChoosingMark: Binding<Bool> {
-        Binding {
-            markTarget != nil
-        } set: { isOpen in
-            if !isOpen {
-                markTarget = nil
-            }
-        }
+    struct MarkMenu {
+        let date: LocalDate
+        let anchor: CGRect
     }
 
     func dayCard(_ day: EntryDay) -> some View {
@@ -133,6 +128,18 @@ extension RecordsView {
         .padding(.top, 12)
         .padding(.bottom, 8)
     }
+
+    func openMarkMenu(on date: LocalDate, anchor: CGRect) {
+        withAnimation(.snappy(duration: 0.25)) {
+            markMenu = MarkMenu(date: date, anchor: anchor)
+        }
+    }
+
+    func closeMarkMenu() {
+        withAnimation(.snappy(duration: 0.2)) {
+            markMenu = nil
+        }
+    }
 }
 
 private extension RecordsView {
@@ -240,13 +247,12 @@ private extension RecordsView {
         let hasStamp = model.stampIcon(on: date) != nil
 
         if canReward, !hasReward, !hasStamp {
-            Button {
-                markTarget = StampTarget(date: date)
+            RecordsMarkButton { anchor in
+                openMarkMenu(on: date, anchor: anchor)
             } label: {
                 emptyButtonLabel("plus")
                     .tapArea(Self.dayButtonTapOutsets)
             }
-            .buttonStyle(.plain)
         } else {
             if canReward {
                 Button {

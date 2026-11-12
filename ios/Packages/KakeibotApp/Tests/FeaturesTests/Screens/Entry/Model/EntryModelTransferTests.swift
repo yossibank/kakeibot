@@ -21,6 +21,23 @@ struct EntryModelTransferTests {
     }
 
     @Test
+    func loadedDraftSwitchedToTransferMatchesFreshTransfer() async throws {
+        let setup = try await Setup()
+        let fresh = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let draft = EntryModel(database: setup.database, date: setup.date)
+
+        await fresh.load()
+        await draft.load()
+        draft.select(.transfer)
+
+        #expect(draft.type == .transfer)
+        #expect(draft.walletId == fresh.walletId)
+        #expect(draft.toWalletId == fresh.toWalletId)
+        #expect(draft.categoryId == fresh.categoryId)
+        #expect(!draft.isChanged)
+    }
+
+    @Test
     func savesSwappedTransfer() async throws {
         let setup = try await Setup()
         let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
