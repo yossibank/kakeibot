@@ -53,7 +53,7 @@ public extension EntryModel {
     }
 
     var isUsualWallet: Bool {
-        type == .transfer || walletId == wallets.first?.id
+        type == .transfer || walletId == usualWalletId
     }
 
     var billText: String? {
@@ -167,6 +167,11 @@ public extension EntryModel {
 }
 
 extension EntryModel {
+    var usualWalletId: Wallet.ID? {
+        let recent = recentWalletIds[type]
+        return wallets.contains { $0.id == recent } ? recent : wallets.first?.id
+    }
+
     func loadBalances() async throws {
         history = try await database.latestEntryList()
         updateBalances()
@@ -192,6 +197,26 @@ extension EntryModel {
 }
 
 private extension EntryModel {
+    var recentWalletIds: [Entry.Kind: Wallet.ID] {
+        recentWalletsMemo.value(for: historyGeneration) {
+            latestWalletIds
+        }
+    }
+
+    var latestWalletIds: [Entry.Kind: Wallet.ID] {
+        let entries = (history?.entries ?? [])
+            .filter { $0.type != .transfer && $0.transferId == nil }
+            .sorted { $0.createdAt > $1.createdAt }
+
+        var ids: [Entry.Kind: Wallet.ID] = [:]
+
+        for entry in entries where ids[entry.type] == nil {
+            ids[entry.type] = entry.walletId
+        }
+
+        return ids
+    }
+
     func updateBalances() {
         guard let list = history else {
             return
