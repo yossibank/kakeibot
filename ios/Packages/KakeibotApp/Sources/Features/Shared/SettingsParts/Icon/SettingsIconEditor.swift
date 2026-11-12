@@ -122,24 +122,19 @@ private extension SettingsIconEditor {
 
     func glyphButton(_ glyph: Icon.Glyph) -> some View {
         let isSelected = model.glyph == glyph
-        let color = isSelected ? markColor : Palette.subtext
 
         return Button {
             model.glyph = glyph
         } label: {
-            Image(systemName: glyph.symbolName)
-                .sansFont(.headline, weight: .light)
-                .foregroundStyle(color)
-                .frame(maxWidth: .infinity, minHeight: 40)
-                .background(
-                    tileFill(isSelected: isSelected),
-                    in: .rect(cornerRadius: corner.radius(12))
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(12))
-                        .stroke(tileStroke(isSelected: isSelected), lineWidth: 1)
-                }
-                .contentShape(.rect)
+            tile(isSelected: isSelected) {
+                Image(systemName: glyph.symbolName)
+                    .resizable()
+                    .scaledToFit()
+                    .fontWeight(.light)
+                    .foregroundStyle(isSelected ? Palette.accent : Palette.subtext)
+                    .frame(maxHeight: 20)
+                    .padding(4)
+            }
         }
         .buttonStyle(.plain)
     }
@@ -150,20 +145,27 @@ private extension SettingsIconEditor {
         return Button {
             model.inputEmoji(emoji)
         } label: {
-            Text(emoji)
-                .textFont(.title3)
-                .frame(maxWidth: .infinity, minHeight: 40)
-                .background(
-                    tileFill(isSelected: isSelected),
-                    in: .rect(cornerRadius: corner.radius(12))
-                )
-                .overlay {
-                    RoundedRectangle(cornerRadius: corner.radius(12))
-                        .stroke(tileStroke(isSelected: isSelected), lineWidth: 1)
-                }
-                .contentShape(.rect)
+            tile(isSelected: isSelected) {
+                Text(emoji)
+                    .textFont(.title3)
+            }
         }
         .buttonStyle(.plain)
+    }
+
+    func tile(
+        isSelected: Bool,
+        @ViewBuilder mark: () -> some View
+    ) -> some View {
+        let stroke = isSelected ? markColor : Palette.line
+
+        return RoundedRectangle(cornerRadius: corner.radius(12), style: .continuous)
+            .strokeBorder(stroke, lineWidth: 1)
+            .aspectRatio(1, contentMode: .fit)
+            .overlay {
+                mark()
+            }
+            .contentShape(.rect)
     }
 
     func colorButton(_ hex: String) -> some View {
@@ -235,13 +237,5 @@ private extension SettingsIconEditor {
 
     var markColor: Color {
         Color(hex: model.color) ?? Palette.subtext
-    }
-
-    func tileFill(isSelected: Bool) -> Color {
-        isSelected ? markColor.opacity(.subtle) : Color.clear
-    }
-
-    func tileStroke(isSelected: Bool) -> Color {
-        isSelected ? markColor : Palette.line
     }
 }
