@@ -122,7 +122,7 @@ private extension SettingsIconEditor {
 
     func glyphButton(_ glyph: Icon.Glyph) -> some View {
         let isSelected = model.glyph == glyph
-        let color = isSelected ? Palette.accentStrong : Palette.subtext
+        let color = isSelected ? markColor : Palette.subtext
 
         return Button {
             model.glyph = glyph
@@ -132,12 +132,12 @@ private extension SettingsIconEditor {
                 .foregroundStyle(color)
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(
-                    Self.tileFill(isSelected: isSelected),
+                    tileFill(isSelected: isSelected),
                     in: .rect(cornerRadius: corner.radius(12))
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: corner.radius(12))
-                        .stroke(Self.tileStroke(isSelected: isSelected), lineWidth: 1)
+                        .stroke(tileStroke(isSelected: isSelected), lineWidth: 1)
                 }
                 .contentShape(.rect)
         }
@@ -154,12 +154,12 @@ private extension SettingsIconEditor {
                 .textFont(.title3)
                 .frame(maxWidth: .infinity, minHeight: 40)
                 .background(
-                    Self.tileFill(isSelected: isSelected),
+                    tileFill(isSelected: isSelected),
                     in: .rect(cornerRadius: corner.radius(12))
                 )
                 .overlay {
                     RoundedRectangle(cornerRadius: corner.radius(12))
-                        .stroke(Self.tileStroke(isSelected: isSelected), lineWidth: 1)
+                        .stroke(tileStroke(isSelected: isSelected), lineWidth: 1)
                 }
                 .contentShape(.rect)
         }
@@ -168,19 +168,21 @@ private extension SettingsIconEditor {
 
     func colorButton(_ hex: String) -> some View {
         let isSelected = model.color == hex
-        let ring = isSelected ? Palette.accentStrong : Color.clear
+        let fill = Color(hex: hex) ?? Palette.subtext
+        let ring = isSelected ? fill : Color.clear
 
         return Button {
             model.color = hex
         } label: {
             Circle()
-                .fill(Color(hex: hex) ?? Palette.subtext)
+                .fill(fill)
                 .padding(4)
                 .overlay {
                     Circle()
-                        .stroke(ring, lineWidth: 1.5)
+                        .strokeBorder(ring, lineWidth: 1.5)
                 }
-                .frame(width: 30, height: 30)
+                .aspectRatio(1, contentMode: .fit)
+                .frame(maxWidth: 30)
                 .frame(maxWidth: .infinity)
                 .contentShape(.rect)
         }
@@ -212,7 +214,7 @@ private extension SettingsIconEditor {
     var customColor: Binding<Color> {
         Binding(
             get: {
-                Color(hex: model.color) ?? Palette.subtext
+                markColor
             },
             set: { color in
                 model.color = color.hex
@@ -231,11 +233,15 @@ private extension SettingsIconEditor {
         )
     }
 
-    static func tileFill(isSelected: Bool) -> Color {
-        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+    var markColor: Color {
+        Color(hex: model.color) ?? Palette.subtext
     }
 
-    static func tileStroke(isSelected: Bool) -> Color {
-        isSelected ? Palette.accent : Palette.accent.opacity(.subtle)
+    func tileFill(isSelected: Bool) -> Color {
+        isSelected ? markColor.opacity(.subtle) : Color.clear
+    }
+
+    func tileStroke(isSelected: Bool) -> Color {
+        isSelected ? markColor : Palette.line
     }
 }
