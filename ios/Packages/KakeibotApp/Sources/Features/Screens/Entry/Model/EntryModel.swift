@@ -79,6 +79,7 @@ public final class EntryModel {
 
     @ObservationIgnored var monthMemo = Memo<MonthSummary.Key, MonthSummary>()
     @ObservationIgnored var feeChoicesMemo = Memo<Int, [Int]>()
+    @ObservationIgnored var recentWalletsMemo = Memo<Int, [Entry.Kind: Wallet.ID]>()
 
     let database: AppDatabase
 
@@ -167,6 +168,10 @@ public extension EntryModel {
             try await loadEntry()
             try await loadBalances()
 
+            if !isEditing {
+                startNew()
+            }
+
             if let startingTemplate {
                 apply(startingTemplate)
             }
@@ -187,6 +192,11 @@ public extension EntryModel {
         categoryByType[self.type] = categoryId
         self.type = type
         keypadTarget = .amount
+
+        if isUntouched,
+           type != .transfer {
+            walletId = usualWalletId
+        }
 
         let remembered = categoryByType[type]
 
@@ -357,15 +367,17 @@ extension EntryModel {
 private extension EntryModel {
     static let recordAgainMessage = "同じ内容で新しい記録にしました"
 
+    func startNew() {
+        categoryId = categories.first?.id
+        walletId = usualWalletId
+
+        if type == .transfer {
+            chooseDestination()
+        }
+    }
+
     func loadEntry() async throws {
         guard let editingId else {
-            categoryId = categories.first?.id
-            walletId = wallets.first?.id
-
-            if type == .transfer {
-                chooseDestination()
-            }
-
             return
         }
 
