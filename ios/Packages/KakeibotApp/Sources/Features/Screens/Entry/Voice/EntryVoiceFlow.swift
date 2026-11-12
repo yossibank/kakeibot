@@ -146,9 +146,19 @@ extension EntryVoiceFlow {
             }
         } catch {
             await source.cancel()
+
+            guard self.source === source else {
+                return
+            }
+
             reset()
             endCount += 1
             model.errorNotice.show(Self.failedMessage)
+            return
+        }
+
+        if self.source !== source || step != .listening {
+            await source.cancel()
         }
     }
 
@@ -223,6 +233,11 @@ private extension EntryVoiceFlow {
     }
 
     func receive(_ event: EntryVoiceEvent) {
+        if step == .reading, case let .transcript(transcript) = event {
+            self.transcript = transcript
+            return
+        }
+
         guard step == .listening else {
             return
         }

@@ -267,6 +267,49 @@ struct EntryVoiceFlowTests {
     }
 
     @Test
+    func cancelWhileStartingStopsTheSource() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = try await loadedModel(setup)
+        let source = FakeVoiceSource()
+        let flow = EntryVoiceFlow(dependencies: .fake(source))
+        source.holdsStart = true
+
+        let starting = Task {
+            await flow.start(for: model, today: setup.date) {}
+        }
+
+        for _ in 0..<100 where !source.isHolding {
+            await Task.yield()
+        }
+
+        await flow.cancel()
+        source.releaseStart()
+        await starting.value
+
+        #expect(flow.step == nil)
+        #expect(source.log.last == "cancel")
+    }
+
+    @Test
+    func readsTheLastResultGivenWhileFinishing() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = try await loadedModel(setup)
+        let source = FakeVoiceSource()
+        let flow = EntryVoiceFlow(dependencies: .fake(source))
+        source.finalTranscript = EntryVoiceTranscript(
+            settled: "コンビニで",
+            alternatives: ["コンビニで980円"]
+        )
+
+        await flow.start(for: model, today: setup.date) {}
+        source.say("コンビニで")
+        await flow.finish()
+
+        #expect(model.amount == 980)
+        #expect(flow.notice?.outcome == .applied)
+    }
+
+    @Test
     func hidesVoiceForTransfers() async throws {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
@@ -320,8 +363,17 @@ private final class FakeVoiceSource: EntryVoiceSource {
     private(set) var isFinished = false
     private(set) var isCancelled = false
     private(set) var hints: [String] = []
+    private(set) var log: [String] = []
+
+    var holdsStart = false
+    var finalTranscript: EntryVoiceTranscript?
 
     private var onEvent: (@MainActor (EntryVoiceEvent) -> Void)?
+    private var startGate: CheckedContinuation<Void, Never>?
+
+    var isHolding: Bool {
+        startGate != nil
+    }
 
     func start(
         hints: [String],
@@ -329,14 +381,33 @@ private final class FakeVoiceSource: EntryVoiceSource {
     ) async throws {
         self.hints = hints
         self.onEvent = onEvent
+
+        if holdsStart {
+            await withCheckedContinuation { continuation in
+                startGate = continuation
+            }
+        }
+
+        log.append("start")
     }
 
     func finish() async {
+        if let finalTranscript {
+            onEvent?(.transcript(finalTranscript))
+        }
+
         isFinished = true
+        log.append("finish")
     }
 
     func cancel() async {
         isCancelled = true
+        log.append("cancel")
+    }
+
+    func releaseStart() {
+        startGate?.resume()
+        startGate = nil
     }
 
     func say(

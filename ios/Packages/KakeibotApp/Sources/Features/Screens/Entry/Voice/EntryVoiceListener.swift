@@ -55,6 +55,9 @@ final class EntryVoiceListener: EntryVoiceSource {
             onLevel: Self.levelHandler(onEvent)
         )
 
+        self.analyzer = analyzer
+        self.feed = feed
+
         input.installTap(
             onBus: 0,
             bufferSize: Self.bufferSize,
@@ -65,9 +68,6 @@ final class EntryVoiceListener: EntryVoiceSource {
         engine.prepare()
         try engine.start()
         try await analyzer.start(inputSequence: stream)
-
-        self.analyzer = analyzer
-        self.feed = feed
 
         resultsTask = Task { @MainActor in
             var transcript = EntryVoiceTranscript()
