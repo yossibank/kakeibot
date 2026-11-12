@@ -97,6 +97,21 @@ struct SnapshotTests {
 
         try await Self.writeSearchAndFilter(model, database: database)
 
+        for (name, y) in [("below", 140.0), ("above", 480.0)] {
+            for variant in Self.variants {
+                let menu = RecordsMarkMenu(
+                    anchor: CGRect(x: variant.width - 58, y: y, width: 26, height: 26),
+                    onStamp: {},
+                    onReward: {},
+                    onClose: {}
+                )
+                .frame(height: 560)
+                .background(Palette.background)
+
+                try Self.write(menu, variant: variant, to: "records-mark-menu-\(name)")
+            }
+        }
+
         task.cancel()
 
         let entryId = Entry.ID()
