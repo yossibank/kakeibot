@@ -14,6 +14,7 @@ public struct RecordsView: View {
     @State var isFiltering = false
     @State var openItemIds: Set<Entry.ID> = []
     @State var openAdjustment: RecordsModel.AdjustmentRow?
+    @State var isCalendarWide = false
 
     @FocusState var isSearchFocused: Bool
 
@@ -244,14 +245,24 @@ private extension RecordsView {
             }
 
         case .calendar:
-            calendar
+            TwoColumnStack(spacing: 12, minWidth: Self.wideCalendarWidth) {
+                calendar
 
-            shownDayCard
+                shownDayCard
+                    .layoutColumn(.trailing)
+            }
+            .onGeometryChange(for: Bool.self) { proxy in
+                proxy.size.width >= Self.wideCalendarWidth
+            } action: { isWide in
+                isCalendarWide = isWide
+            }
         }
     }
 }
 
 private extension RecordsView {
+    static let wideCalendarWidth: CGFloat = 560
+
     static let layoutOptions: [CapsulePicker<RecordsLayout>.Option] = [
         .init("カレンダー", value: .calendar),
         .init("一覧", value: .list)

@@ -207,8 +207,8 @@ private extension AssetsView {
 
     var trendLegend: some View {
         HStack(spacing: 16) {
-            legend("手元のお金", dash: [])
-            legend("純資産", dash: AssetsBalanceTrend.netWorthDash)
+            legend("手元のお金", color: Palette.accent)
+            legend("純資産", color: AssetsBalanceTrend.netWorthColor)
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
@@ -295,17 +295,14 @@ private extension AssetsView {
 
     func legend(
         _ title: String,
-        dash: [CGFloat]
+        color: Color
     ) -> some View {
         HStack(spacing: 8) {
             Path { path in
                 path.move(to: CGPoint(x: 0, y: 1))
                 path.addLine(to: CGPoint(x: 16, y: 1))
             }
-            .stroke(
-                Palette.accent,
-                style: StrokeStyle(lineWidth: 1.6, dash: dash)
-            )
+            .stroke(color, lineWidth: 1.6)
             .frame(width: 16, height: 2)
 
             Text(title)

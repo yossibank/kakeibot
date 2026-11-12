@@ -35,7 +35,7 @@ extension AssetsView {
             .padding(12)
             .background(Palette.faint, in: shape)
             .overlay {
-                shape.stroke(Palette.accent.opacity(.muted), style: .dashed)
+                shape.stroke(Palette.hairline, lineWidth: 1)
             }
             .contentShape(shape)
         }

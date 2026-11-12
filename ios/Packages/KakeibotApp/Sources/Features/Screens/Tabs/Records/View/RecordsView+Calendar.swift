@@ -14,10 +14,12 @@ extension RecordsView {
                 }
             }
 
+            let peak = isCalendarWide ? model.days.map(\.expenseTotal).max() ?? 0 : 0
+
             ForEach(Array(model.weeks.enumerated()), id: \.offset) { _, week in
                 HStack(spacing: 0) {
                     ForEach(Array(week.enumerated()), id: \.offset) { _, date in
-                        calendarCell(date)
+                        calendarCell(date, peak: peak)
                     }
                 }
             }
@@ -90,7 +92,10 @@ extension RecordsView {
 
 private extension RecordsView {
     @ViewBuilder
-    func calendarCell(_ date: LocalDate?) -> some View {
+    func calendarCell(
+        _ date: LocalDate?,
+        peak: Int
+    ) -> some View {
         if let date {
             let isShown = date == model.shownDate
             let day = model.day(on: date)
@@ -110,7 +115,8 @@ private extension RecordsView {
                 expense: expense,
                 income: day?.incomeTotal ?? 0,
                 isNoSpend: isNoSpend,
-                hasUpcoming: hasUpcoming
+                hasUpcoming: hasUpcoming,
+                heat: Self.heat(of: expense, peak: peak)
             ) {
                 model.selectedDate = date
             }
@@ -190,6 +196,17 @@ private extension RecordsView {
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+
+    static func heat(
+        of expense: Int,
+        peak: Int
+    ) -> Double {
+        guard peak > 0, expense > 0 else {
+            return 0
+        }
+
+        return (Double(expense) / Double(peak)).squareRoot()
     }
 }
 

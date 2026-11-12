@@ -3,6 +3,8 @@ import DesignSystem
 import SwiftUI
 
 struct RecordsCalendarCell: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let day: Int
     let dayColor: Color
     let isShown: Bool
@@ -13,6 +15,7 @@ struct RecordsCalendarCell: View {
     let income: Int
     let isNoSpend: Bool
     let hasUpcoming: Bool
+    var heat: Double = 0
     let onSelect: () -> Void
 
     var body: some View {
@@ -64,6 +67,13 @@ struct RecordsCalendarCell: View {
         }
         .opacity(isDimmed ? 0.45 : 1)
         .frame(maxWidth: .infinity, minHeight: 66)
+        .background {
+            if heat > 0 {
+                RoundedRectangle(cornerRadius: corner.radius(12))
+                    .fill(Palette.accent.opacity(Self.heatFloor + Self.heatRange * heat))
+                    .padding(2)
+            }
+        }
         .contentShape(.rect)
         .onTapGesture(perform: onSelect)
     }
@@ -84,11 +94,14 @@ extension RecordsCalendarCell: Equatable {
             && lhs.income == rhs.income
             && lhs.isNoSpend == rhs.isNoSpend
             && lhs.hasUpcoming == rhs.hasUpcoming
+            && lhs.heat == rhs.heat
     }
 }
 
 private extension RecordsCalendarCell {
     static let markLineHeight: CGFloat = 14
+    static let heatFloor = 0.05
+    static let heatRange = 0.3
 
     static var stampTransition: AnyTransition {
         .scale(scale: 0.2).combined(with: .opacity)

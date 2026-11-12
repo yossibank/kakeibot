@@ -40,6 +40,12 @@ struct SnapshotTests {
             }
         }
 
+        model.setLayout(.calendar)
+
+        let wide = Variant(name: "wide", width: 820, scheme: .light, textSize: .standard)
+
+        try Self.write(Self.recordsView(model), variant: wide, to: "records-calendar")
+
         model.setLayout(.list)
 
         let selectedDays = model.days.prefix(2)
