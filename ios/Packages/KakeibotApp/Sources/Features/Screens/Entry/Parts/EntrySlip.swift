@@ -5,6 +5,7 @@ import SwiftUI
 struct EntrySlip: View {
     @Environment(\.themeStyle.displayFont) private var themeFont
     @Environment(\.themeStyle.corner) private var corner
+    @Environment(\.isPro) private var isPro
 
     let model: EntryModel
     let deck: EntryDeck
@@ -236,6 +237,11 @@ private extension EntrySlip {
 
             if let onReceipt {
                 quickButton("doc.text.viewfinder", action: onReceipt)
+                    .overlay(alignment: .topTrailing) {
+                        if let receiptsLeft {
+                            receiptBadge(receiptsLeft)
+                        }
+                    }
             }
 
             if let onVoice {
@@ -343,9 +349,9 @@ private extension EntrySlip {
     ) -> some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .textFont(.caption2, weight: .semibold)
+                .textFont(.footnote, weight: .semibold)
                 .foregroundStyle(Palette.accent)
-                .frame(width: 28, height: 28)
+                .frame(width: Self.quickSize, height: Self.quickSize)
                 .overlay {
                     Circle()
                         .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
@@ -353,6 +359,19 @@ private extension EntrySlip {
                 .contentShape(.circle)
         }
         .buttonStyle(.plain)
+    }
+
+    func receiptBadge(_ left: Int) -> some View {
+        let fill = left > 0 ? Palette.accent : Palette.amber
+
+        return Text("\(left)")
+            .sansFont(.micro, weight: .bold)
+            .monospacedDigit()
+            .foregroundStyle(Palette.backgroundBottom)
+            .frame(minWidth: Self.badgeSize, minHeight: Self.badgeSize)
+            .background(fill, in: .capsule)
+            .offset(x: 4, y: -4)
+            .allowsHitTesting(false)
     }
 
     func amountText(color: Color) -> some View {
@@ -369,5 +388,9 @@ private extension EntrySlip {
 private extension EntrySlip {
     var amountFont: Font {
         .display(size: 36, weight: .semibold, in: themeFont)
+    }
+
+    var receiptsLeft: Int? {
+        isPro ? nil : model.freeReceiptsLeft
     }
 }

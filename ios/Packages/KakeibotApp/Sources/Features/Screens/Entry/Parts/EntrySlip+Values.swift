@@ -7,6 +7,8 @@ extension EntrySlip {
     static let amountHeight: CGFloat = 60
     static let rowHeight: CGFloat = 44
     static let markSize: CGFloat = 24
+    static let quickSize: CGFloat = 32
+    static let badgeSize: CGFloat = 16
 
     static var amountGold: LinearGradient {
         LinearGradient(
