@@ -58,9 +58,8 @@ public extension EntryModel {
 
 extension EntryModel {
     var recentFeeChoices: [Int] {
-        let used = (history?.days ?? [])
+        let used = (history?.entries ?? [])
             .lazy
-            .flatMap(\.entries)
             .filter { $0.transferId != nil }
             .sorted { $0.createdAt > $1.createdAt }
             .map(\.amount)

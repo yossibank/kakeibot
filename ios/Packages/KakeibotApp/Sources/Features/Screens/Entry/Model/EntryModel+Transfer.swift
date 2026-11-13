@@ -18,24 +18,14 @@ public extension EntryModel {
     static let frequentRouteLimit = 6
     static let destinationTitle = "振替先"
 
-    var transferProgress: Double? {
-        guard
-            type == .transfer,
-            let balance = wallet(walletId).flatMap(balance(of:)),
-            balance > 0
-        else {
-            return nil
-        }
-
-        return min(max(Double(amount + fee) / Double(balance), 0), 1)
-    }
-
     var recentTransfers: [Entry] {
+        let fees = feesByTransfer
+
         var seen: Set<String> = []
 
         let unique = manualTransfers.filter { entry in
             let route = "\(entry.walletId)>\(String(describing: entry.toWalletId))"
-            let key = "\(route)>\(entry.amount)>\(fee(of: entry))"
+            let key = "\(route)>\(entry.amount)>\(fees[entry.id] ?? 0)"
             return seen.insert(key).inserted
         }
 
@@ -57,29 +47,6 @@ public extension EntryModel {
         }
 
         return sorted.prefix(Self.frequentRouteLimit).map(\.element)
-    }
-
-    var routeText: String? {
-        guard
-            let source = wallet(walletId),
-            let destination = wallet(toWalletId)
-        else {
-            return nil
-        }
-
-        return "\(source.name) → \(destination.name)"
-    }
-
-    var sourceBalanceText: String? {
-        guard
-            type == .transfer,
-            let source = wallet(walletId),
-            let line = afterLine(of: source, isSource: true) ?? currentLine(of: source)
-        else {
-            return nil
-        }
-
-        return "\(source.name) \(line.title) \(AmountText.text(line.amount))"
     }
 
     var isOverSourceBalance: Bool {
@@ -205,16 +172,25 @@ extension EntryModel {
 
 private extension EntryModel {
     var manualTransfers: [Entry] {
-        (history?.days ?? [])
-            .flatMap(\.entries)
+        let shown = Set(wallets.map(\.id))
+
+        return (history?.entries ?? [])
             .filter { entry in
                 entry.type == .transfer
                     && entry.recurringId == nil
                     && entry.id != editingId
-                    && wallet(entry.walletId) != nil
-                    && wallet(entry.toWalletId) != nil
+                    && shown.contains(entry.walletId)
+                    && entry.toWalletId.map(shown.contains) == true
             }
             .sorted { $0.createdAt > $1.createdAt }
+    }
+
+    var feesByTransfer: [Entry.ID: Int] {
+        let fees = (history?.entries ?? []).compactMap { entry in
+            entry.transferId.map { ($0, entry.amount) }
+        }
+
+        return Dictionary(fees) { first, _ in first }
     }
 
     static func route(of entry: Entry) -> TransferRoute? {

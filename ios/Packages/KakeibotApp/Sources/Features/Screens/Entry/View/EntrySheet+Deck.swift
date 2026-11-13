@@ -248,14 +248,19 @@ private extension EntrySheet {
                     useTransfer(transfer)
                 }
             }
-        } else if !model.templates.isEmpty || !model.recentEntries.isEmpty {
-            EntryRecentRow(title: "テンプレート・最近の記録") {
-                ForEach(model.templates) { template in
-                    templateCard(template)
-                }
+        } else {
+            let templates = model.templates
+            let entries = model.recentEntries
 
-                ForEach(model.recentEntries) { entry in
-                    recentCard(entry)
+            if !templates.isEmpty || !entries.isEmpty {
+                EntryRecentRow(title: "テンプレート・最近の記録") {
+                    ForEach(templates) { template in
+                        templateCard(template)
+                    }
+
+                    ForEach(entries) { entry in
+                        recentCard(entry)
+                    }
                 }
             }
         }

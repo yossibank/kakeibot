@@ -132,44 +132,6 @@ struct EntryModelTransferTests {
     }
 
     @Test
-    func stretchesDialByShareOfSourceBalance() async throws {
-        let setup = try await Setup()
-        let date = try #require(LocalDate("2026-10-01"))
-
-        let income = EntryDraft(
-            type: .income,
-            amount: 3000,
-            date: date,
-            categoryId: setup.salary,
-            walletId: setup.cash
-        )
-
-        try await setup.database.saveEntry(income, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
-
-        await model.load()
-        model.press(.digit(1))
-        model.press(.digit(5))
-        model.press(.doubleZero)
-        let half = model.transferProgress
-        model.press(.digit(9))
-
-        #expect(half == 0.5)
-        #expect(model.transferProgress == 1)
-    }
-
-    @Test
-    func hidesDialProgressWithoutBalance() async throws {
-        let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
-
-        await model.load()
-        model.press(.digit(5))
-
-        #expect(model.transferProgress == nil)
-    }
-
-    @Test
     func waitsForAmountBeforeWarningOverNegativeBalance() async throws {
         let setup = try await Setup()
 
@@ -276,8 +238,6 @@ struct EntryModelTransferTests {
         #expect(routes.map(\.walletId) == [setup.bank, setup.cash])
         #expect(model.walletId == setup.cash)
         #expect(model.toWalletId == setup.bank)
-        #expect(model.routeText == "財布 → 銀行")
-        #expect(model.sourceBalanceText?.hasPrefix("財布 残高 ") == true)
     }
 
     @Test
