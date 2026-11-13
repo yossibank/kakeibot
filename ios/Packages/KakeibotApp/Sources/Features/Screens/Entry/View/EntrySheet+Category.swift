@@ -4,17 +4,15 @@ import SwiftUI
 
 extension EntrySheet {
     var categoryArea: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             categoryPager
 
-            if !isFormDeferred {
-                tagAndTemplates
-            }
+            tagAndTemplates
         }
     }
 
     var tagAndTemplates: some View {
-        VStack(spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             TagLine(
                 tagItems,
                 selection: model.tagId,
@@ -27,16 +25,15 @@ extension EntrySheet {
                 onEdit: tagEditAction
             )
 
-            EntryTemplateRow(
-                model: model,
-                isCompact: false,
-                onUse: { template in
-                    useTemplate(template)
-                },
-                onAdd: {
+            if model.amount > 0 {
+                ChipButton(
+                    "今の入力を保存",
+                    systemImage: "plus",
+                    outline: .dashed
+                ) {
                     open(.newTemplate)
                 }
-            )
+            }
         }
     }
 
@@ -108,7 +105,9 @@ extension EntrySheet {
             showSelectedCategory()
         }
 
-        setEnteringAmount(template.amount == nil)
+        if template.amount == nil {
+            show(.amount)
+        }
     }
 
     func reloadCategories() {
@@ -279,16 +278,14 @@ private extension EntrySheet {
     }
 
     func select(_ category: EntryCategory) {
-        setEnteringAmount(false)
         model.categoryId = category.id
+        show(.amount)
     }
 
     func openMenu(
         for category: EntryCategory,
         at frame: CGRect
     ) {
-        setEnteringAmount(false)
-
         withAnimation(.snappy(duration: 0.25)) {
             categoryMenu = CategoryMenu(category: category, frame: frame)
         }

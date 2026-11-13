@@ -266,20 +266,6 @@ struct EntryVoiceFlowTests {
     }
 
     @Test
-    func showsHintOnlyUntilItIsMarked() async throws {
-        let setup = try await EntryModelTests.Setup()
-        let model = try await loadedModel(setup)
-        let before = model.voiceHintShown
-
-        await model.markVoiceHintShown()
-        let saved = try await setup.database.setting(.voiceHintShown)
-
-        #expect(!before)
-        #expect(model.voiceHintShown)
-        #expect(saved)
-    }
-
-    @Test
     func dropsUnderlineWhenTheFieldChanges() async throws {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
@@ -442,7 +428,6 @@ private final class FakeVoiceSource: EntryVoiceSource {
         _ text: String,
         alternatives: [String] = []
     ) {
-        onEvent?(.level(0.8))
         onEvent?(.transcript(EntryVoiceTranscript(settled: text, alternatives: alternatives)))
     }
 }

@@ -180,19 +180,3 @@ private extension EntryModel {
             .filter { !$0.isEmpty && seen.insert($0).inserted }
     }
 }
-
-extension EntryModel {
-    func markVoiceHintShown() async {
-        guard !voiceHintShown else {
-            return
-        }
-
-        voiceHintShown = true
-
-        do {
-            try await database.setSetting(.voiceHintShown, to: true)
-        } catch {
-            report(error)
-        }
-    }
-}

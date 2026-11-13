@@ -51,8 +51,7 @@ final class EntryVoiceListener: EntryVoiceSource {
         let feed = try EntryVoiceAudioFeed(
             from: inputFormat,
             to: format,
-            continuation: continuation,
-            onLevel: Self.levelHandler(onEvent)
+            continuation: continuation
         )
 
         self.analyzer = analyzer
@@ -154,16 +153,6 @@ private extension EntryVoiceListener {
     nonisolated static func tap(_ feed: EntryVoiceAudioFeed) -> AVAudioNodeTapBlock {
         { buffer, _ in
             feed.receive(buffer)
-        }
-    }
-
-    nonisolated static func levelHandler(
-        _ onEvent: @escaping @MainActor (EntryVoiceEvent) -> Void
-    ) -> @Sendable (Double) -> Void {
-        { level in
-            Task { @MainActor in
-                onEvent(.level(level))
-            }
         }
     }
 

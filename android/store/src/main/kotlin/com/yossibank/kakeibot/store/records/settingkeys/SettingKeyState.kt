@@ -58,9 +58,6 @@ val SettingKey.Companion.entryOpened: SettingKey<Boolean>
 val SettingKey.Companion.receiptGuideHidden: SettingKey<Boolean>
     get() = flag(Setting.Key.receiptGuideHidden)
 
-val SettingKey.Companion.voiceHintShown: SettingKey<Boolean>
-    get() = flag(Setting.Key.voiceHintShown)
-
 val SettingKey.Companion.settingsOpened: SettingKey<Boolean>
     get() = flag(Setting.Key.settingsOpened)
 

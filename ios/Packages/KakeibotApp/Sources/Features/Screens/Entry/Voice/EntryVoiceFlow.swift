@@ -8,7 +8,6 @@ final class EntryVoiceFlow {
     private(set) var isAvailable = false
     private(set) var step: Step?
     private(set) var transcript = EntryVoiceTranscript()
-    private(set) var levels = EntryVoiceFlow.quietLevels
     private(set) var preview: VoiceReading?
     private(set) var notice: Notice?
     private(set) var startCount = 0
@@ -92,8 +91,6 @@ extension EntryVoiceFlow {
         var noticeDuration: Duration
     }
 
-    static let levelCount = 31
-    static let quietLevels = Array(repeating: 0.0, count: levelCount)
     static let failedMessage = "声を聞き取れませんでした。もう一度押してください"
 
     var isActive: Bool {
@@ -136,7 +133,6 @@ extension EntryVoiceFlow {
         session = Session(model: model, today: today, onApplied: onApplied)
         transcript = EntryVoiceTranscript()
         preview = nil
-        levels = Self.quietLevels
         step = .listening
         startCount += 1
 
@@ -243,9 +239,6 @@ private extension EntryVoiceFlow {
         }
 
         switch event {
-        case let .level(level):
-            levels = Array(levels.dropFirst()) + [level]
-
         case let .transcript(transcript):
             self.transcript = transcript
 
@@ -343,7 +336,6 @@ private extension EntryVoiceFlow {
         source = nil
         session = nil
         step = nil
-        levels = Self.quietLevels
         preview = nil
     }
 }

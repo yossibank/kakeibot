@@ -39,7 +39,6 @@ public final class EntryModel {
     public private(set) var recentMemos: [String] = []
     public private(set) var recentItemNames: [String] = []
     public private(set) var weekStart: Weekday = .sunday
-    public private(set) var startsWithAmount = true
 
     public internal(set) var tagId: EntryTag.ID?
     public internal(set) var billMonth: YearMonth?
@@ -53,7 +52,6 @@ public final class EntryModel {
     public internal(set) var errorNotice = ErrorNotice()
     public internal(set) var receiptSavedCount = 0
     public internal(set) var receiptGuideHidden = false
-    public internal(set) var voiceHintShown = true
     public internal(set) var voiceFilled: VoiceFilled?
 
     var allTemplates: [EntryTemplate] = []
@@ -109,10 +107,6 @@ public extension EntryModel {
         editingId != nil
     }
 
-    var opensKeypad: Bool {
-        startsWithAmount && !isEditing && startingTemplate == nil
-    }
-
     var isLoaded: Bool {
         options != nil
     }
@@ -155,13 +149,9 @@ public extension EntryModel {
 
             carryoverFrom = try await database.setting(.budgetCarryoverFrom)
 
-            startsWithAmount = try await database.setting(.entryStartsWithAmount)
-
             receiptSavedCount = try await database.setting(.receiptSavedCount)
 
             receiptGuideHidden = try await database.setting(.receiptGuideHidden)
-
-            voiceHintShown = try await database.setting(.voiceHintShown)
 
             budgets = try await database.budgets()
 

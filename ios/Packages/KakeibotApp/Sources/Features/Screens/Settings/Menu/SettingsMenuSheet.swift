@@ -14,7 +14,6 @@ public struct SettingsMenuSheet: View {
     @State var backupExportedAt: Date?
     @State var firstEntryCreatedAt: Date?
     @State var weekStart: SettingsMenuValueModel<Weekday>
-    @State var entryStart: SettingsMenuValueModel<Bool>
     @State var recordReset: SettingsMenuResetModel
     @State var isConfirmingReset = false
 
@@ -45,13 +44,6 @@ public struct SettingsMenuSheet: View {
             initialValue: SettingsMenuValueModel(
                 database: database,
                 key: .weekStart
-            )
-        )
-
-        _entryStart = State(
-            initialValue: SettingsMenuValueModel(
-                database: database,
-                key: .entryStartsWithAmount
             )
         )
 
@@ -109,9 +101,6 @@ public struct SettingsMenuSheet: View {
         .errorBanner(weekStart.errorNotice) {
             weekStart.errorNotice.clear()
         }
-        .errorBanner(entryStart.errorNotice) {
-            entryStart.errorNotice.clear()
-        }
         .errorBanner(recordReset.errorNotice) {
             recordReset.errorNotice.clear()
         }
@@ -139,9 +128,6 @@ public struct SettingsMenuSheet: View {
         }
         .task {
             await weekStart.load()
-        }
-        .task {
-            await entryStart.load()
         }
         .task {
             await observeReminderTime()

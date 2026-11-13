@@ -7,12 +7,10 @@ extension EntrySheet {
     var transferArea: some View {
         VStack(spacing: 12) {
             EntryTransferPanel(model: model) { role in
-                open(.wallet(role))
+                show(.wallet(role))
             }
 
-            if !isFormDeferred {
-                transferExtras
-            }
+            transferExtras
         }
     }
 
@@ -24,19 +22,10 @@ extension EntrySheet {
                 }
             }
 
-            let transfers = model.recentTransfers
-
-            if transfers.isEmpty {
+            if model.recentTransfers.isEmpty {
                 Text("チャージ・カードの支払い・口座のあいだの移動")
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
-            } else {
-                EntryRecentTransfers(model: model, transfers: transfers) { transfer in
-                    withAnimation(.snappy) {
-                        model.applyTransfer(transfer)
-                    }
-                }
-                .padding(.top, 8)
             }
 
             EntryLiveSlot {

@@ -86,18 +86,6 @@ struct EntryModelTests {
     }
 
     @Test
-    func opensKeypadOnlyForNewEntries() async throws {
-        let setup = try await Setup()
-        let entry = try await setup.saveEntry(amount: 980)
-
-        let new = EntryModel(database: setup.database, date: setup.date)
-        let edit = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
-
-        #expect(new.opensKeypad)
-        #expect(!edit.opensKeypad)
-    }
-
-    @Test
     func editsExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
@@ -311,24 +299,15 @@ struct EntryModelTests {
     @Test
     func labelsSaveButtonByState() async throws {
         let model = try await Self.newModel()
-        let today = model.date
 
-        let empty = model.saveLabel(today: today)
+        let empty = model.saveTitle
         model.press(.digit(9))
         model.press(.digit(8))
         model.press(.digit(0))
-        let recorded = model.saveLabel(today: today)
-        model.date = today.adding(days: -2)
-        let earlier = model.saveLabel(today: today)
+        let recorded = model.saveTitle
 
-        #expect(empty == EntryModel.SaveLabel(title: "金額を入れてください"))
-        #expect(recorded.title == "記録する")
-        #expect(recorded.amount == "¥980")
-        #expect(recorded.category == "食費")
-        #expect(recorded.day == "今日")
-        #expect(recorded.wallets == "財布")
-        #expect(recorded.fee == nil)
-        #expect(earlier.day == "10/10")
+        #expect(empty == "金額を入れてください")
+        #expect(recorded == "記録する")
     }
 
     @Test

@@ -10,16 +10,41 @@ import UIKit
 struct SnapshotTests {
     @Test
     func render() async throws {
-        for (name, type, digits) in Self.cases {
+        for (name, type, digits, deck) in Self.cases {
             let model = try await Self.model(type, digits: digits)
 
-            let view = EntrySheet(model: model)
+            let view = EntrySheet(model: model, deck: deck)
                 .frame(width: Self.phone.width, height: Self.phone.height)
                 .background(Color(uiColor: .systemBackground))
                 .environment(\.colorScheme, .light)
 
             try Self.write(view, to: "\(name).png")
+
+            let dark = EntrySheet(model: model, deck: deck)
+                .frame(width: Self.phone.width, height: Self.phone.height)
+                .background(Palette.background)
+                .environment(\.canScanReceipt, true)
+                .environment(\.palette, ThemePreset.black.palette)
+
+            try Self.write(dark, to: "\(name)-dark.png")
         }
+
+        let startModel = try await Self.startModel()
+
+        let start = EntrySheet(model: startModel, deck: .category)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .background(Palette.background)
+            .environment(\.canScanReceipt, true)
+
+        try Self.write(start, to: "entry-start.png")
+
+        let startDark = EntrySheet(model: startModel, deck: .category)
+            .frame(width: Self.phone.width, height: Self.phone.height)
+            .background(Palette.background)
+            .environment(\.canScanReceipt, true)
+            .environment(\.palette, ThemePreset.black.palette)
+
+        try Self.write(startDark, to: "entry-start-dark.png")
 
         let model = try await Self.model(.expense, digits: Self.smallDigits)
         let style = ThemeStyle(
@@ -38,16 +63,8 @@ struct SnapshotTests {
 
         let closedModel = try await Self.model(
             .expense,
-            digits: Self.smallDigits,
-            startsWithAmount: false
+            digits: Self.smallDigits
         )
-
-        let closed = EntrySheet(model: closedModel)
-            .frame(width: Self.phone.width, height: Self.phone.height)
-            .background(Color(uiColor: .systemBackground))
-            .environment(\.colorScheme, .light)
-
-        try Self.write(closed, to: "entry-closed.png")
 
         for (name, size) in [("entry-editing", Self.phone), ("entry-editing-narrow", Self.narrow)] {
             let editing = try await Self.editingModel()
@@ -62,8 +79,7 @@ struct SnapshotTests {
 
         let itemModel = try await Self.model(
             .expense,
-            digits: Self.itemDigits,
-            startsWithAmount: false
+            digits: Self.itemDigits
         )
 
         Self.addItems(to: itemModel)
@@ -89,8 +105,7 @@ struct SnapshotTests {
 
         let includedModel = try await Self.model(
             .expense,
-            digits: [],
-            startsWithAmount: false
+            digits: []
         )
 
         await includedModel.apply(Self.includedReading)
@@ -195,56 +210,59 @@ private extension SnapshotTests {
             try Self.write(view, to: "voice-notice-\(name).png")
         }
 
-        let dialModel = try await Self.model(.expense, digits: [])
-        let levels = (0..<EntryVoiceFlow.levelCount).map { index in
-            abs(sin(Double(index) / 2.6)) * (0.3 + Double(index % 7) / 10)
-        }
-        let category = try #require(dialModel.categories.first)
-        let dial = EntryDialFace(
-            model: dialModel,
-            levels: levels,
-            preview: VoiceReading(amount: 980, categoryId: category.id)
-        ) {}
-            .padding(24)
-            .frame(width: Self.phone.width)
-            .background(Palette.background)
-            .environment(\.colorScheme, .dark)
+        let listeningModel = try await Self.model(.expense, digits: [])
+        let category = try #require(listeningModel.categories.first)
 
-        try Self.write(dial, to: "voice-dial.png")
+        let listening = EntrySlip(
+            model: listeningModel,
+            deck: .amount,
+            today: today,
+            isMemoActive: false,
+            isListening: true,
+            preview: VoiceReading(amount: 980, categoryId: category.id),
+            onSelect: { _ in },
+            onMemo: {},
+            onOpenItems: {},
+            onReceipt: nil,
+            onVoice: nil
+        )
+        .background(Palette.card)
+        .padding(20)
+        .frame(width: Self.phone.width)
+        .background(Palette.background)
+        .environment(\.colorScheme, .dark)
 
-        let bandModel = try await Self.model(.expense, digits: [])
-        let wallet = try #require(bandModel.wallets.last)
-        bandModel.apply(VoiceReading(
+        try Self.write(listening, to: "voice-slip-listening.png")
+
+        let appliedModel = try await Self.model(.expense, digits: [])
+        let wallet = try #require(appliedModel.wallets.last)
+
+        appliedModel.apply(VoiceReading(
             amount: 980,
             date: today.adding(days: -1),
             walletId: wallet.id,
             memo: "駅前でランチ"
         ))
 
-        let band = EntryDetailBand(
-            model: bandModel,
+        let applied = EntrySlip(
+            model: appliedModel,
+            deck: .amount,
             today: today,
-            onWallet: {},
-            onFee: {},
-            onDate: {},
-            onMemo: {}
+            isMemoActive: false,
+            isListening: false,
+            preview: nil,
+            onSelect: { _ in },
+            onMemo: {},
+            onOpenItems: {},
+            onReceipt: {},
+            onVoice: {}
         )
+        .background(Palette.card)
         .padding(20)
         .frame(width: Self.phone.width)
         .background(Palette.background)
 
-        try Self.write(band, to: "voice-band.png")
-
-        let buttons = VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                EntryVoiceButton(showsTitle: true, glows: false, onGlowed: {}) {}
-                EntryVoiceButton(showsTitle: false, glows: false, onGlowed: {}) {}
-            }
-        }
-        .padding(20)
-        .background(Palette.panel)
-
-        try Self.write(buttons, to: "voice-buttons.png")
+        try Self.write(applied, to: "voice-slip-applied.png")
     }
 }
 
@@ -327,7 +345,6 @@ private extension SnapshotTests {
         let transferModel = try await Self.model(
             .transfer,
             digits: Self.largeDigits,
-            startsWithAmount: false,
             hasLongNames: true
         )
 
@@ -339,39 +356,6 @@ private extension SnapshotTests {
             .environment(\.colorScheme, .light)
 
         try Self.write(transfer, to: "entry-transfer-narrow.png")
-
-        let longClosedModel = try await Self.model(
-            .expense,
-            digits: Self.largeDigits,
-            startsWithAmount: false,
-            hasLongNames: true
-        )
-
-        let labels = VStack(spacing: 16) {
-            EntrySaveButton(label: longClosedModel.saveLabel(today: longClosedModel.date)) {}
-
-            EntrySaveButton(label: transferModel.saveLabel(today: transferModel.date)) {}
-
-            EntrySaveButton(label: EntryModel.SaveLabel(
-                title: "変更を保存",
-                amount: "¥1,200",
-                category: "食費",
-                day: "昨日",
-                wallets: "財布"
-            )) {}
-
-            EntrySaveButton(label: EntryModel.SaveLabel(title: "金額を入れてください")) {}
-                .disabled(true)
-
-            EntrySaveButton(label: EntryModel.SaveLabel(title: "振替先を選んでください")) {}
-                .disabled(true)
-        }
-        .padding(16)
-        .frame(width: 168 + 32)
-        .background(Palette.background)
-        .environment(\.colorScheme, .light)
-
-        try Self.write(labels, to: "entry-save-labels-168.png")
     }
 }
 
@@ -381,8 +365,7 @@ private extension SnapshotTests {
     func renderReceipt() async throws {
         let suspectModel = try await Self.model(
             .expense,
-            digits: [],
-            startsWithAmount: false
+            digits: []
         )
 
         await suspectModel.apply(Self.suspectReading)
@@ -477,11 +460,15 @@ private extension SnapshotTests {
     static let largeDigits = (2...9).reversed().map(AmountCalculator.Key.digit)
     static let itemDigits: [AmountCalculator.Key] = [.digit(6), .digit(6), .digit(6)]
 
-    static let cases: [(String, Entry.Kind, [AmountCalculator.Key])] = [
-        ("entry-expense", .expense, smallDigits),
-        ("entry-transfer", .transfer, smallDigits),
-        ("entry-transfer-empty", .transfer, []),
-        ("entry-expense-large", .expense, largeDigits)
+    static let cases: [(String, Entry.Kind, [AmountCalculator.Key], EntryDeck)] = [
+        ("entry-expense", .expense, smallDigits, .amount),
+        ("entry-category", .expense, [], .category),
+        ("entry-wallet", .expense, smallDigits, .wallet(.source)),
+        ("entry-date", .expense, smallDigits, .date),
+        ("entry-transfer", .transfer, smallDigits, .amount),
+        ("entry-transfer-empty", .transfer, [], .transfer),
+        ("entry-fee", .transfer, smallDigits, .fee),
+        ("entry-expense-large", .expense, largeDigits, .amount)
     ]
 
     static let includedReading = ReceiptReading(
@@ -510,7 +497,6 @@ private extension SnapshotTests {
     static func model(
         _ type: Entry.Kind,
         digits: [AmountCalculator.Key],
-        startsWithAmount: Bool = true,
         hasTemplates: Bool = false,
         hasLongNames: Bool = false
     ) async throws -> EntryModel {
@@ -519,7 +505,6 @@ private extension SnapshotTests {
         let date = LocalDate(now, in: .current)
 
         try database.insertDefaultsIfEmpty(at: now)
-        try await database.setSetting(.entryStartsWithAmount, to: startsWithAmount)
 
         if hasTemplates {
             let options = try await database.entryOptions()
@@ -548,6 +533,35 @@ private extension SnapshotTests {
         for key in digits {
             model.press(key)
         }
+
+        return model
+    }
+
+    static func startModel() async throws -> EntryModel {
+        let database = try AppDatabase.inMemory()
+        let now = Date()
+        let date = LocalDate(now, in: .current)
+
+        try database.insertDefaultsIfEmpty(at: now)
+
+        for (amount, memo, offset) in [(980, "ランチ", -1), (220, "", -1), (1540, "ドラッグストア", -2)] {
+            let draft = EntryModel(database: database, date: date.adding(days: offset))
+
+            await draft.load()
+
+            draft.memo = memo
+
+            for character in String(amount) {
+                draft.press(.digit(Int(String(character)) ?? 0))
+            }
+
+            _ = try #require(await draft.save())
+        }
+
+        let model = EntryModel(database: database, date: date)
+
+        await model.load()
+        await model.reloadCategories()
 
         return model
     }

@@ -4,29 +4,9 @@ import Foundation
 import Store
 
 public extension EntryModel {
-    struct SaveLabel: Equatable {
+    struct NoteLine: Equatable {
         public let title: String
-        public let amount: String?
-        public let category: String?
-        public let day: String?
-        public let wallets: String?
-        public let fee: String?
-
-        public init(
-            title: String,
-            amount: String? = nil,
-            category: String? = nil,
-            day: String? = nil,
-            wallets: String? = nil,
-            fee: String? = nil
-        ) {
-            self.title = title
-            self.amount = amount
-            self.category = category
-            self.day = day
-            self.wallets = wallets
-            self.fee = fee
-        }
+        public let value: String
     }
 
     var memoPrompt: String {
@@ -73,7 +53,7 @@ public extension EntryModel {
         )
     }
 
-    var budgetText: String? {
+    var budgetNote: NoteLine? {
         guard
             let usage = budgetUsage,
             let after = budgetUsageAfterSave
@@ -82,7 +62,7 @@ public extension EntryModel {
         }
 
         guard after.spent != usage.spent else {
-            return "\(usage.remainingTitle) \(usage.remainingAmountText)"
+            return NoteLine(title: usage.remainingTitle, value: usage.remainingAmountText)
         }
 
         let title = usage.isOver ? "予算オーバー" : "今月あと"
@@ -93,7 +73,12 @@ public extension EntryModel {
         default: ""
         }
 
-        return "\(title) \(usage.remainingAmountText) → \(label)\(after.remainingAmountText)"
+        let value = "\(usage.remainingAmountText) → \(label)\(after.remainingAmountText)"
+        return NoteLine(title: title, value: value)
+    }
+
+    var budgetText: String? {
+        budgetNote.map { "\($0.title) \($0.value)" }
     }
 
     var monthTotalText: String? {
@@ -119,6 +104,23 @@ public extension EntryModel {
 
     var monthOverview: MonthOverview {
         currentMonth.overview
+    }
+
+    var saveTitle: String {
+        guard !isEditing else {
+            return saveAction
+        }
+
+        guard amount > 0 else {
+            return "金額を入れてください"
+        }
+
+        if type == .transfer,
+           toWalletId == nil {
+            return "\(Self.destinationTitle)を選んでください"
+        }
+
+        return saveAction
     }
 
     static func dateText(
@@ -168,32 +170,6 @@ public extension EntryModel {
     func quickDate(today: LocalDate) -> LocalDate {
         date == today ? today.adding(days: -1) : today
     }
-
-    func saveLabel(today: LocalDate) -> SaveLabel {
-        if !isEditing {
-            guard amount > 0 else {
-                return SaveLabel(title: "金額を入れてください")
-            }
-
-            if type == .transfer,
-               toWalletId == nil {
-                return SaveLabel(title: "\(Self.destinationTitle)を選んでください")
-            }
-        }
-
-        guard amount > 0 else {
-            return SaveLabel(title: saveAction)
-        }
-
-        return SaveLabel(
-            title: saveAction,
-            amount: AmountText.text(amount),
-            category: type == .transfer ? nil : selectedCategory?.name,
-            day: Self.shortDateText(for: date, today: today),
-            wallets: saveWallets,
-            fee: fee > 0 ? "手数料 \(AmountText.text(fee))" : nil
-        )
-    }
 }
 
 extension EntryModel {
@@ -233,23 +209,6 @@ private extension EntryModel {
         case (false, .transfer): "振り替える"
         case (false, _): "記録する"
         }
-    }
-
-    var saveWallets: String? {
-        let source = wallet(walletId)?.name
-
-        guard type == .transfer else {
-            return source
-        }
-
-        guard
-            let source,
-            let destination = wallet(toWalletId)?.name
-        else {
-            return nil
-        }
-
-        return "\(source) → \(destination)"
     }
 
     static func weekdayText(

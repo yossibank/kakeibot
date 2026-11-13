@@ -14,7 +14,11 @@ struct SnapshotTests {
         let transfers = model.recentTransfers
 
         for scheme in [ColorScheme.light, .dark] {
-            let view = EntryRecentTransfers(model: model, transfers: transfers) { _ in }
+            let view = EntryRecentTransfers(
+                model: model,
+                transfers: transfers,
+                today: LocalDate(Date(), in: .current)
+            ) { _ in }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
                 .frame(width: Self.width)

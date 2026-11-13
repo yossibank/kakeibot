@@ -9,17 +9,20 @@ public struct MonthCalendar: View {
 
     let today: LocalDate
     let weekStart: Weekday
+    let isCompact: Bool
 
     public init(
         selection: Binding<LocalDate>,
         today: LocalDate,
-        weekStart: Weekday = .sunday
+        weekStart: Weekday = .sunday,
+        isCompact: Bool = false
     ) {
         _selection = selection
         _month = State(initialValue: selection.wrappedValue.yearMonth)
 
         self.today = today
         self.weekStart = weekStart
+        self.isCompact = isCompact
     }
 
     public var body: some View {
@@ -51,7 +54,7 @@ public struct MonthCalendar: View {
                 }
             }
 
-            VStack(spacing: 8) {
+            VStack(spacing: rowSpacing) {
                 ForEach(rows, id: \.offset) { _, week in
                     let days = Array(week.enumerated())
 
@@ -65,7 +68,7 @@ public struct MonthCalendar: View {
             .id(month)
             .transition(.push(from: edge))
             .contentShape(.rect)
-            .simultaneousGesture(swipe)
+            .gesture(swipe)
         }
         .clipped()
     }
@@ -109,7 +112,7 @@ private extension MonthCalendar {
                     Text(String(date.day))
                         .displayFont(.body, weight: weight)
                         .foregroundStyle(foreground(for: date))
-                        .frame(width: 32, height: 32)
+                        .frame(width: dayWidth, height: dayWidth)
                         .background(fill, in: Circle())
                         .overlay(Circle().stroke(ring, lineWidth: 1))
 
@@ -121,13 +124,13 @@ private extension MonthCalendar {
                         .frame(height: 10)
                 }
                 .opacity(opacity)
-                .frame(maxWidth: .infinity, minHeight: Self.cellHeight)
+                .frame(maxWidth: .infinity, minHeight: cellHeight)
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
         } else {
             Color.clear
-                .frame(height: Self.cellHeight)
+                .frame(height: cellHeight)
                 .frame(maxWidth: .infinity)
         }
     }
@@ -136,24 +139,29 @@ private extension MonthCalendar {
 private extension MonthCalendar {
     static let rowCount = 6
     static let swipeDistance: CGFloat = 50
-    static let cellHeight: CGFloat = 46
 
-    var swipe: some Gesture {
-        DragGesture(minimumDistance: 20)
-            .onEnded { value in
-                let width = value.translation.width
+    var cellHeight: CGFloat {
+        isCompact ? 36 : 46
+    }
 
-                guard
-                    abs(width) > Self.swipeDistance,
-                    abs(width) > abs(value.translation.height)
-                else {
-                    return
-                }
+    var dayWidth: CGFloat {
+        isCompact ? 26 : 32
+    }
 
-                let months = width < 0 ? 1 : -1
+    var rowSpacing: CGFloat {
+        isCompact ? 2 : 8
+    }
 
-                move(months: months)
+    var swipe: SwipeGesture {
+        SwipeGesture { _ in } onEnd: { width in
+            guard abs(width) > Self.swipeDistance else {
+                return
             }
+
+            let months = width < 0 ? 1 : -1
+
+            move(months: months)
+        }
     }
 
     var weeks: [[LocalDate?]] {

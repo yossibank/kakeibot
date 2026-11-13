@@ -126,7 +126,6 @@ extension EntryModelTests {
 
         await model.load()
 
-        #expect(!model.opensKeypad)
         #expect(model.amount == 0)
         #expect(model.memo == "社食")
         #expect(!model.isChanged)

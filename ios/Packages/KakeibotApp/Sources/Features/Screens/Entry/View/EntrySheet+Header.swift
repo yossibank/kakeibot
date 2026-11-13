@@ -4,37 +4,31 @@ import SwiftUI
 
 extension EntrySheet {
     var header: some View {
-        HStack {
+        HStack(spacing: 8) {
+            EntryTypeSwitch(selection: typeBinding)
+
+            Spacer(minLength: 0)
+
+            if model.isEditing {
+                RingButton(
+                    systemImage: "trash",
+                    style: .destructive,
+                    label: "削除"
+                ) {
+                    Task {
+                        await delete()
+                    }
+                }
+            }
+
             RingButton(systemImage: "xmark") {
                 close()
             }
-            .frame(width: Self.slotSize, alignment: .leading)
-
-            Spacer()
-
-            CapsulePicker(selection: typeBinding, options: Self.typeOptions)
-
-            Spacer()
-
-            deleteButton
-                .frame(
-                    width: Self.slotSize,
-                    height: Self.slotSize,
-                    alignment: .trailing
-                )
         }
     }
 }
 
 private extension EntrySheet {
-    static let slotSize: CGFloat = 44
-
-    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
-        .init("支出", value: .expense),
-        .init("収入", value: .income),
-        .init("振替", value: .transfer)
-    ]
-
     var typeBinding: Binding<Entry.Kind> {
         Binding(
             get: {
@@ -47,28 +41,10 @@ private extension EntrySheet {
 
                 withTransaction(transaction) {
                     model.select(type)
+                    resetDeck()
                     showSelectedCategory()
                 }
             }
         )
-    }
-}
-
-private extension EntrySheet {
-    @ViewBuilder
-    var deleteButton: some View {
-        if model.isEditing {
-            RingButton(
-                systemImage: "trash",
-                style: .destructive,
-                label: "削除"
-            ) {
-                Task {
-                    await delete()
-                }
-            }
-        } else {
-            Color.clear
-        }
     }
 }
