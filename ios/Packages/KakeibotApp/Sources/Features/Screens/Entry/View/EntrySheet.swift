@@ -324,6 +324,8 @@ private extension EntrySheet {
     func load() async {
         if !model.isLoaded {
             await model.load()
+
+            deck = EntryDeck.start(for: model.type)
         }
 
         showSelectedCategory()
