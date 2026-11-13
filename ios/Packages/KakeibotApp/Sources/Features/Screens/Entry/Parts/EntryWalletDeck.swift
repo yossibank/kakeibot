@@ -88,6 +88,15 @@ private extension EntryWalletDeck {
         }
     }
 
+    var editBadge: some View {
+        Image(systemName: "pencil")
+            .sansFont(.micro, weight: .heavy)
+            .foregroundStyle(Palette.backgroundBottom)
+            .frame(width: Self.badgeSize, height: Self.badgeSize)
+            .background(Palette.accent, in: .circle)
+            .offset(x: 4, y: -8)
+    }
+
     func tile(_ wallet: Wallet) -> some View {
         let isSelected = selectedId == wallet.id
         let isLocked = takenId == wallet.id && !isEditing
@@ -108,6 +117,12 @@ private extension EntryWalletDeck {
             HStack(spacing: 8) {
                 IconImage(model.icon(for: wallet), size: 16)
                     .foregroundStyle(isSelected ? Palette.accent : Palette.subtext)
+                    .overlay(alignment: .topTrailing) {
+                        if isEditing {
+                            editBadge
+                                .transition(.scale.combined(with: .opacity))
+                        }
+                    }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(wallet.name)
@@ -127,13 +142,6 @@ private extension EntryWalletDeck {
                 }
 
                 Spacer(minLength: 0)
-
-                if isEditing {
-                    Image(systemName: "pencil")
-                        .sansFont(.small, weight: .semibold)
-                        .foregroundStyle(Palette.accent)
-                        .transition(.opacity)
-                }
             }
             .padding(.horizontal, 12)
             .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
@@ -182,6 +190,8 @@ private extension EntryWalletDeck {
 }
 
 private extension EntryWalletDeck {
+    static let badgeSize: CGFloat = 16
+
     static let columns = [
         GridItem(.flexible(), spacing: 8),
         GridItem(.flexible(), spacing: 8)

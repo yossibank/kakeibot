@@ -28,34 +28,9 @@ extension EntrySheet {
             onVoice: quickVoice
         )
     }
-
-    var board: some View {
-        let shape = UnevenRoundedRectangle(
-            topLeadingRadius: corner.radius(28),
-            topTrailingRadius: corner.radius(28)
-        )
-
-        return shape
-            .fill(Palette.card)
-            .overlay {
-                shape
-                    .fill(Self.boardLight)
-            }
-            .shadow(color: Palette.shadow.opacity(0.4), radius: 16, y: 6)
-            .ignoresSafeArea(edges: .bottom)
-    }
 }
 
 private extension EntrySheet {
-    static var boardLight: RadialGradient {
-        RadialGradient(
-            colors: [Palette.accent.opacity(.subtle), .clear],
-            center: .top,
-            startRadius: 0,
-            endRadius: 280
-        )
-    }
-
     var isBlankEntry: Bool {
         !model.isEditing && model.amount <= 0
     }

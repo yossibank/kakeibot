@@ -266,9 +266,6 @@ private extension EntrySheet {
                     .padding(.horizontal, 8)
                     .padding(.bottom, bottomGap)
             }
-            .background {
-                board
-            }
             .padding(.horizontal, 8)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

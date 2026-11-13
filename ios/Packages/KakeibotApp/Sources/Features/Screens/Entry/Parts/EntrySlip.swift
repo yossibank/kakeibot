@@ -307,11 +307,8 @@ private extension EntrySlip {
             if isSelected {
                 Self.litFill
 
-                Capsule()
-                    .fill(Palette.accent)
-                    .frame(width: 3)
-                    .padding(.vertical, 12)
-                    .padding(.leading, 8)
+                Palette.accent
+                    .frame(width: 4)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)

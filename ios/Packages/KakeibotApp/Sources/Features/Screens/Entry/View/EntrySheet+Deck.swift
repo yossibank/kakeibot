@@ -91,19 +91,8 @@ extension EntrySheet {
             model.toWalletId = wallet.id
         }
 
-        guard model.type == .transfer else {
-            return
-        }
-
-        switch role {
-        case .source where model.toWalletId == nil:
-            show(.wallet(.destination))
-
-        case .destination where model.walletId == nil:
-            show(.wallet(.source))
-
-        default:
-            break
+        if model.type == .transfer {
+            show(.transfer)
         }
     }
 }
@@ -131,8 +120,8 @@ private extension EntrySheet {
 
     static var wellFill: some ShapeStyle {
         Palette.panel
-            .mix(with: Palette.accent, by: 0.06)
-            .shadow(.inner(color: Palette.shadow.opacity(.subtle), radius: 6, y: 3))
+            .mix(with: Palette.accent, by: 0.02)
+            .shadow(.inner(color: Palette.shadow.opacity(.faint), radius: 4, y: 2))
     }
 
     var deckTransition: AnyTransition {

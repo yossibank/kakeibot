@@ -272,6 +272,7 @@ private extension EntrySheet {
 
     func select(_ category: EntryCategory) {
         model.categoryId = category.id
+        show(.amount)
     }
 
     func openMenu(
