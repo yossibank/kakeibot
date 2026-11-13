@@ -61,6 +61,12 @@ extension WhatsNewScene {
         case outlookTab
         case outlookBlock
         case outlookList
+        case voiceButton
+        case voiceListen
+        case voiceFilled
+        case entrySlip
+        case entryDeck
+        case entryShortcuts
     }
 }
 
@@ -152,6 +158,12 @@ private extension WhatsNewScene {
 
         case .outlookTab, .outlookBlock, .outlookList:
             WhatsNewOutlookScene(kind: kind)
+
+        case .voiceButton, .voiceListen, .voiceFilled:
+            WhatsNewVoiceScene(kind: kind)
+
+        case .entrySlip, .entryDeck, .entryShortcuts:
+            WhatsNewEntryScene(kind: kind)
         }
     }
 

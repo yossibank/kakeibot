@@ -1,8 +1,8 @@
-・The Assets tab now shows "Rest of this month", with your month-end outlook after upcoming fixed costs and planned records.
-・You are now told the day your money runs lowest before month-end, or the day it runs short.
-・The Review tab now shows the fixed costs not yet recorded in the current period, and the outlook for the end of the period.
-・Entries now show the wallet and memo on one line when they fit, so the list is easier to read.
-・Pro now sits at the top of the settings list.
-・Calendar amounts are larger and titles are darker, so they are easier to read.
-・Icons now share the same look on every screen.
-・Budget settings now list the categories with a budget first.
+・You can now record by voice. Say the amount, category, wallet, date and memo, and they are filled in for you. Your voice is recognized on the device and never saved.
+・The entry sheet has been rebuilt. You see the category, wallet, date and amount on one card, and enter the amount on the keypad below.
+・The entry sheet now opens with your templates and recent records, so you can add one with a single tap.
+・The entry sheet now starts with the wallet you used last.
+・Swiping down a sheet with changes now asks whether to close without saving.
+・Template cards on Home and in Settings now match the entry sheet.
+・You can now pick a day mark from the menu beside the plus button.
+・The icon picker now previews the color you chose and keeps its tiles square on narrow screens.

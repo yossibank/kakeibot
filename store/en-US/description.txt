@@ -5,6 +5,7 @@ The app is in Japanese and amounts are in yen.
 ■ Log quickly
 ・Save frequent expenses as templates and log them in one or two taps
 ・Built-in calculator handles tax on the spot
+・Just speak, and the amount, category, wallet, date and memo are filled in. Your voice is recognized on the device and never saved
 ・Record transfers between accounts and fees as well as expenses and income
 ・Fixed costs such as rent and subscriptions are logged automatically every month or year
 ・Scan a receipt to read the items, total, date and store

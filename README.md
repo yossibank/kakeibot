@@ -14,7 +14,7 @@
 
 | レシートの読み取り | 振り返り | 月末の見込み |
 | :---: | :---: | :---: |
-| <img src="store/screenshots/6.9/06-receipt.png" width="200" alt="レシートを撮って記録する"> | <img src="store/screenshots/6.9/08-review.png" width="200" alt="月の支出を振り返る"> | <img src="store/screenshots/6.9/09-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"> |
+| <img src="store/screenshots/6.9/07-receipt.png" width="200" alt="レシートを撮って記録する"> | <img src="store/screenshots/6.9/09-review.png" width="200" alt="月の支出を振り返る"> | <img src="store/screenshots/6.9/10-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"> |
 
 ## 🗺️ 全体像
 

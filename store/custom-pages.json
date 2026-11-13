@@ -12,7 +12,7 @@
         "同期"
       ],
       "lead": [
-        "07-share.png",
+        "08-share.png",
         "01-home.png",
         "03-entry.png"
       ],
@@ -27,8 +27,8 @@
       ],
       "lead": [
         "02-theme.png",
-        "04-font.png",
-        "05-backdrop.png"
+        "05-font.png",
+        "06-backdrop.png"
       ],
       "promotionalText": "色やアイコン、字体を自分好みに着せ替えられる家計簿です。見返すのが楽しくなる画面で、毎日の記録が続けやすくなります。広告は出ません。"
     },
@@ -43,7 +43,7 @@
       "lead": [
         "01-home.png",
         "03-entry.png",
-        "08-review.png"
+        "09-review.png"
       ],
       "promotionalText": "よく使う支出はタップ 1 回で記録できる、かんたんなおこづかい帳です。「今月あといくら使えるか」が、ホームでひと目で分かります。広告は出ません。"
     },
@@ -57,8 +57,8 @@
         "サブスク"
       ],
       "lead": [
-        "10-assets.png",
-        "09-outlook.png",
+        "11-assets.png",
+        "10-outlook.png",
         "01-home.png"
       ],
       "promotionalText": "口座とクレジットカードをまとめて見られる家計簿です。カードの請求や固定費・サブスクも、次の引き落としに回して管理できます。広告は出ません。"
