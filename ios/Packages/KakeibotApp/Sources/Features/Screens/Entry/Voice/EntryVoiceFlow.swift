@@ -17,6 +17,7 @@ final class EntryVoiceFlow {
 
     @ObservationIgnored private var source: (any EntryVoiceSource)?
     @ObservationIgnored private var silenceTask: Task<Void, Never>?
+    @ObservationIgnored private var lastVoice: Date?
     @ObservationIgnored private var noticeTask: Task<Void, Never>?
     @ObservationIgnored private var session: Session?
     @ObservationIgnored private var undo: EntryModel.VoiceUndo?
@@ -78,7 +79,7 @@ extension EntryVoiceFlow {
                 makeSource: EntryVoiceReader.makeSource,
                 prepare: EntryVoiceReader.prepare,
                 choose: EntryVoiceReader.choose,
-                silence: .milliseconds(1500),
+                silence: .seconds(1),
                 noticeDuration: .seconds(4)
             )
         }
@@ -94,7 +95,7 @@ extension EntryVoiceFlow {
     }
 
     static let failedMessage = "声を聞き取れませんでした。もう一度押してください"
-    static let levelCount = 12
+    static let levelCount = 16
 
     var silenceDuration: TimeInterval {
         dependencies.silence / .seconds(1)
@@ -224,6 +225,7 @@ private extension EntryVoiceFlow {
     }
 
     static let quietLevels = [Double](repeating: 0, count: levelCount)
+    static let voiceLevel = 0.2
 
     static func spokenText(
         of transcript: EntryVoiceTranscript,
@@ -262,20 +264,37 @@ private extension EntryVoiceFlow {
                 )
             }
 
-            if !transcript.isEmpty {
+            if !transcript.isEmpty, lastVoice == nil {
                 waitForSilence()
             }
 
         case let .level(level):
             levels = [level] + levels.dropLast()
+            follow(level)
+        }
+    }
+
+    func follow(_ level: Double) {
+        guard level < Self.voiceLevel else {
+            lastVoice = Date()
+            silenceTask?.cancel()
+            silenceTask = nil
+            silenceStart = nil
+            return
+        }
+
+        if lastVoice != nil {
+            waitForSilence()
         }
     }
 
     func waitForSilence() {
-        silenceTask?.cancel()
-        silenceStart = Date()
+        guard silenceTask == nil else {
+            return
+        }
 
         let silence = dependencies.silence
+        silenceStart = Date()
 
         silenceTask = Task { [weak self] in
             try? await Task.sleep(for: silence)
@@ -350,6 +369,7 @@ private extension EntryVoiceFlow {
         silenceTask?.cancel()
         silenceTask = nil
         silenceStart = nil
+        lastVoice = nil
         levels = Self.quietLevels
         source = nil
         session = nil

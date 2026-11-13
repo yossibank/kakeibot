@@ -37,7 +37,7 @@ private extension EntryVoiceCard {
     static let largeTextLimit = 36
     static let mediumTextLimit = 64
     static let cancelWidth: CGFloat = 104
-    static let waveHeight: CGFloat = 24
+    static let waveHeight: CGFloat = 40
 
     var isReading: Bool {
         flow.step == .reading
@@ -97,23 +97,15 @@ private extension EntryVoiceCard {
             slots
 
             HStack(spacing: 8) {
-                Text("黙ると聞き終えます")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize()
-
-                EntryVoiceCountdown(
-                    start: flow.silenceStart,
-                    duration: flow.silenceDuration,
-                    isSpent: isReading
-                )
-            }
-
-            HStack(spacing: 8) {
                 CardButton("やめる", style: .outlined(Palette.subtext), height: 44, action: onCancel)
                     .frame(width: Self.cancelWidth)
 
-                CardButton("話し終えた", style: .filled, height: 44, action: onFinish)
+                EntryVoiceFinishButton(
+                    start: flow.silenceStart,
+                    duration: flow.silenceDuration,
+                    isSpent: isReading,
+                    action: onFinish
+                )
             }
             .disabled(isReading)
             .opacity(isReading ? 0.5 : 1)
