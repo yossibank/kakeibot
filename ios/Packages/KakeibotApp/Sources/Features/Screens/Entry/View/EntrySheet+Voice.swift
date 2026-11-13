@@ -8,10 +8,6 @@ extension EntrySheet {
         voice.isAvailable && model.showsVoice
     }
 
-    var voiceLevels: [Double]? {
-        voice.step == .listening ? voice.levels : nil
-    }
-
     var voiceCard: some View {
         EntryVoiceCard(
             flow: voice,
@@ -24,19 +20,6 @@ extension EntrySheet {
                 }
             },
             onOpenSettings: openVoiceSettings
-        )
-    }
-
-    func voiceButton(showsTitle: Bool) -> some View {
-        EntryVoiceButton(
-            showsTitle: showsTitle,
-            glows: model.isLoaded && !model.voiceHintShown,
-            onGlowed: {
-                Task {
-                    await model.markVoiceHintShown()
-                }
-            },
-            action: startVoice
         )
     }
 
@@ -63,9 +46,11 @@ extension EntrySheet {
     }
 
     func startVoice() {
+        show(.amount)
+
         Task {
             await voice.start(for: model, today: today) {
-                setEnteringAmount(false)
+                showSelectedCategory()
             }
         }
     }

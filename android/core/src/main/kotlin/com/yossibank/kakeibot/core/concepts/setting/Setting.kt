@@ -83,8 +83,6 @@ data class Setting(
         receiptSavedCount("receipt_saved_count"),
         @SerialName("receipt_guide_hidden")
         receiptGuideHidden("receipt_guide_hidden"),
-        @SerialName("voice_hint_shown")
-        voiceHintShown("voice_hint_shown"),
         @SerialName("widget_entry")
         widgetEntry("widget_entry"),
         @SerialName("fee_category_id")

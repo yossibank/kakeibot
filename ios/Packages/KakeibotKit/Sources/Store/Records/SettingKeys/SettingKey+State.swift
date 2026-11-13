@@ -101,10 +101,6 @@ public extension SettingKey where Value == Bool {
         Self(flag: .receiptGuideHidden)
     }
 
-    static var voiceHintShown: Self {
-        Self(flag: .voiceHintShown)
-    }
-
     static var settingsOpened: Self {
         Self(flag: .settingsOpened)
     }

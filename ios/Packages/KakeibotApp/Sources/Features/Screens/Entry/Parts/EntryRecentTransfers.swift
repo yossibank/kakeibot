@@ -5,71 +5,45 @@ import SwiftUI
 struct EntryRecentTransfers: View {
     let model: EntryModel
     let transfers: [Entry]
+    let today: LocalDate
     let onUse: (Entry) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            SectionTitle("最近の振替")
-                .padding(.horizontal, 4)
-
+        EntryRecentRow(title: "最近の振替") {
             ForEach(transfers) { transfer in
-                row(transfer)
+                EntryRecentCard(
+                    title: route(transfer),
+                    amount: transfer.amount,
+                    detail: detail(transfer),
+                    onUse: {
+                        onUse(transfer)
+                    },
+                    mark: {
+                        Image(systemName: "arrow.left.arrow.right")
+                            .textFont(.caption2, weight: .bold)
+                            .foregroundStyle(Palette.accent)
+                    }
+                )
             }
         }
-        .sharesTextScale(id: names)
     }
 }
 
 private extension EntryRecentTransfers {
-    var names: [String] {
-        transfers.flatMap { transfer in
-            [transfer.walletId, transfer.toWalletId].map { id in
-                model.wallet(id)?.name ?? ""
-            }
-        }
+    func route(_ transfer: Entry) -> String {
+        let source = model.wallet(transfer.walletId)?.name ?? ""
+        let destination = model.wallet(transfer.toWalletId)?.name ?? ""
+        return "\(source) → \(destination)"
     }
 
-    func row(_ transfer: Entry) -> some View {
+    func detail(_ transfer: Entry) -> String {
         let fee = model.fee(of: transfer)
+        let day = EntryModel.shortDateText(for: transfer.date, today: today)
 
-        return Button {
-            onUse(transfer)
-        } label: {
-            HStack(spacing: 8) {
-                EntryRoute(
-                    source: model.wallet(transfer.walletId)?.name ?? "",
-                    destination: model.wallet(transfer.toWalletId)?.name ?? ""
-                )
-
-                Spacer(minLength: 8)
-
-                VStack(alignment: .trailing, spacing: 2) {
-                    AmountText(
-                        transfer.amount,
-                        font: .style(.footnote),
-                        color: Palette.accentStrong
-                    )
-                    .fixedSize()
-
-                    if fee > 0 {
-                        Text("＋手数料 \(AmountText.text(fee))")
-                            .textFont(.caption2)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                            .fixedSize()
-                    }
-                }
-                .layoutPriority(1)
-
-                Image(systemName: "chevron.right")
-                    .sansFont(.micro, weight: .semibold)
-                    .foregroundStyle(Palette.subtext)
-            }
-            .textFont(.footnote)
-            .padding(.horizontal, 4)
-            .frame(minHeight: 36)
-            .contentShape(.rect)
+        guard fee > 0 else {
+            return day
         }
-        .buttonStyle(.plain)
+
+        return "\(day) · 手数料 \(AmountText.text(fee))"
     }
 }

@@ -54,14 +54,9 @@ private extension EntryCategoryCell {
     }
 
     static let menuPressDuration = 0.4
-    static let selectedScale: CGFloat = 1.05
     static let pressedScale: CGFloat = 0.93
 
     var scale: CGFloat {
-        if isPressing {
-            return Self.pressedScale
-        }
-
-        return isSelected ? Self.selectedScale : 1
+        isPressing ? Self.pressedScale : 1
     }
 }

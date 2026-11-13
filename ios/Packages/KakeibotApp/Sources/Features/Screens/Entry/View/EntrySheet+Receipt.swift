@@ -20,14 +20,6 @@ extension EntrySheet {
         )
     }
 
-    var receiptButton: some View {
-        EntryReceiptButton(freeLeft: isPro ? nil : model.freeReceiptsLeft) {
-            withAnimation(.snappy) {
-                receipt.start(for: model, isPro: isPro)
-            }
-        }
-    }
-
     @ViewBuilder
     var receiptLayer: some View {
         switch receipt.step {
@@ -81,12 +73,8 @@ private extension EntrySheet {
     func scanReceipt(_ pages: [CGImage]) async {
         let outcome = await receipt.scan(pages, into: model)
 
-        guard case let .read(itemCount, hasAmount) = outcome else {
+        guard case let .read(itemCount, _) = outcome else {
             return
-        }
-
-        if hasAmount {
-            setEnteringAmount(false)
         }
 
         guard itemCount > 0 else {

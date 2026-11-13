@@ -86,7 +86,7 @@ private extension Keypad {
                 .foregroundStyle(accessory.isActive ? Palette.accentStrong : Palette.text)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity, minHeight: 50)
+                .frame(maxWidth: .infinity, minHeight: 40, idealHeight: 50, maxHeight: 50)
                 .background(fill, in: shape)
                 .overlay {
                     shape
@@ -104,7 +104,7 @@ private extension Keypad {
             press(key)
         } label: {
             label(for: key, isActive: isActive)
-                .frame(maxWidth: .infinity, minHeight: 50)
+                .frame(maxWidth: .infinity, minHeight: 40, idealHeight: 50, maxHeight: 50)
                 .background(
                     background(for: key, isActive: isActive),
                     in: .rect(cornerRadius: corner.radius(16))

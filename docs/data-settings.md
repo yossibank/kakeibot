@@ -49,7 +49,7 @@ expense・income の列は、描画に使わない。
 | backdrop | 画面の背景の柄。`plain`・`ruled`（ノートの罫線）・`grid` | 空なら `plain`。`washi` は `ruled` として読む |
 | haptics | 押した時に振動するか。`true` `false` | 空なら `true` |
 | decorations | 光の影とタブの金の輪を出すか。`true` `false` | 空なら `true` |
-| entry_starts_with_amount | 新しい記録の入力シートを、テンキーを開いて始めるか。`true` `false` | 空なら `true` |
+| entry_starts_with_amount | 今は使わない | |
 | categories_by_use | 今は使わない | |
 | template_order | `manual` `frequent` `category` `amount` `name` | 空なら並べた順 |
 | home_sections | ホームに並べる順。`customize` `budget` `templates` `recent` `bills` `stamps` を `,` でつないだもの | 空なら `customize` `budget` `templates` `recent` の順。無いものは後ろに足し、`bills` と `stamps` は非表示にする |
@@ -63,7 +63,6 @@ expense・income の列は、描画に使わない。
 | widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。取り消すと消す | その記録で支出なしの印を消したときは、`,` に続けてその日付（`2026-10-03`）を付ける |
 | receipt_saved_count | レシートから読んで保存した記録の数 | 空なら 0。Pro でなければ 3 で止める |
 | receipt_guide_hidden | `true` なら、レシートの撮り方を出さずにカメラを開く | 撮り方の「次から表示しない」に印を付けて閉じると `true` にする |
-| voice_hint_shown | `true` なら、入力シートの「声」の札を光らせない | 初めて「声」の札を出して光らせた時に `true` にする。iOS だけで使う |
 | fee_category_id | 振替の手数料に付ける category の id | |
 | transfer_out_category_id | 抜けた共有の財布への振替を、支出に変えるときに付ける category の id | |
 | transfer_in_category_id | 抜けた共有の財布からの振替を、収入に変えるときに付ける category の id | |

@@ -3,32 +3,46 @@ import DesignSystem
 import SwiftUI
 
 struct EntryTransferPanel: View {
+    @Environment(\.themeStyle.corner) private var corner
+
     let model: EntryModel
     let onPick: (EntryWalletSheet.Role) -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
+        VStack(spacing: 0) {
             card(.source)
 
-            Button {
-                withAnimation(.snappy) {
-                    model.swapWallets()
-                }
-            } label: {
-                Image(systemName: "arrow.left.arrow.right")
-                    .sansFont(.small, weight: .light)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 44, height: 44)
-                    .overlay {
-                        Circle()
-                            .stroke(
-                                Palette.accent.opacity(.muted),
-                                lineWidth: 1
-                            )
+            HStack(spacing: 0) {
+                EntryTransferLink()
+                    .stroke(
+                        Palette.accent.opacity(.medium),
+                        style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [1, 4])
+                    )
+                    .frame(width: Self.iconSize)
+                    .padding(.leading, 16)
+
+                Spacer(minLength: 0)
+
+                Button {
+                    withAnimation(.snappy) {
+                        model.swapWallets()
                     }
-                    .contentShape(Circle())
+                } label: {
+                    Image(systemName: "arrow.up.arrow.down")
+                        .textFont(.caption, weight: .semibold)
+                        .foregroundStyle(Palette.accent)
+                        .frame(width: 32, height: 32)
+                        .background(Palette.panel, in: .circle)
+                        .overlay {
+                            Circle()
+                                .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
+                        }
+                        .contentShape(.circle)
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 20)
             }
-            .buttonStyle(.plain)
+            .frame(height: 48)
 
             card(.destination)
         }
@@ -38,6 +52,8 @@ struct EntryTransferPanel: View {
 }
 
 private extension EntryTransferPanel {
+    static let iconSize: CGFloat = 40
+
     func card(_ role: EntryWalletSheet.Role) -> some View {
         let id = role == .source ? model.walletId : model.toWalletId
         let wallet = model.wallet(id)
@@ -45,6 +61,8 @@ private extension EntryTransferPanel {
         let isOver = role == .source && model.isOverSourceBalance
         let balanceColor = isOver ? Palette.rose : Palette.subtext
         let current = wallet.flatMap(model.currentLine)
+        let nameColor = wallet == nil ? Palette.hint : Palette.text
+        let iconShape = RoundedRectangle(cornerRadius: corner.radius(12))
 
         let after = wallet.flatMap { wallet in
             model.afterLine(of: wallet, isSource: role == .source)
@@ -54,44 +72,68 @@ private extension EntryTransferPanel {
             model.idleAfterLine(of: wallet, isSource: role == .source)
         }
 
+        let info = VStack(alignment: .leading, spacing: 2) {
+            Text(title(role))
+                .textFont(.caption2, weight: .bold)
+                .tracking(2)
+                .foregroundStyle(Palette.accent)
+                .fixedSize()
+
+            Text(wallet?.name ?? "選ぶ")
+                .textFont(.subheadline, weight: .bold)
+                .foregroundStyle(nameColor)
+                .lineLimit(2)
+                .sharedTextScale()
+        }
+
+        let balances = Grid(alignment: .trailing, horizontalSpacing: 8, verticalSpacing: 2) {
+            if let current {
+                balanceLine(current)
+            }
+
+            if let after {
+                balanceLine(after)
+            } else if let idleAfter {
+                balanceLine(idleAfter)
+                    .foregroundStyle(Palette.hint)
+            }
+        }
+        .textFont(.caption)
+        .lineLimit(1)
+        .foregroundStyle(balanceColor)
+        .fixedSize()
+        .animation(.snappy, value: after)
+
         return Button {
             onPick(role)
         } label: {
-            VStack(spacing: 4) {
-                Text(title(role))
-                    .textFont(.caption2)
-                    .tracking(3)
-                    .foregroundStyle(Palette.accent)
-
+            HStack(spacing: 12) {
                 IconImage(icon, size: 20)
                     .foregroundStyle(Palette.accent)
+                    .frame(width: Self.iconSize, height: Self.iconSize)
+                    .background(Palette.accent.opacity(.subtle), in: iconShape)
 
-                Text(wallet?.name ?? "選ぶ")
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.accentStrong)
-                    .sharedTextScale()
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) {
+                        info
+                            .fixedSize()
 
-                if let current {
-                    Grid(horizontalSpacing: 8, verticalSpacing: 4) {
-                        balanceLine(current)
+                        Spacer(minLength: 8)
 
-                        if let after {
-                            balanceLine(after)
-                        } else if let idleAfter {
-                            balanceLine(idleAfter)
-                                .foregroundStyle(Palette.hint)
-                        }
+                        balances
                     }
-                    .textFont(.footnote)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                    .foregroundStyle(balanceColor)
-                    .animation(.snappy, value: after)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        info
+
+                        balances
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .card(cornerRadius: 20)
             .contentShape(.rect)
         }
@@ -101,13 +143,11 @@ private extension EntryTransferPanel {
     func balanceLine(_ line: EntryModel.BalanceLine) -> some View {
         GridRow {
             Text(line.title)
-                .gridColumnAlignment(.leading)
 
             AmountText(line.amount, font: .style(.footnote))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .contentTransition(.numericText())
-                .gridColumnAlignment(.trailing)
         }
     }
 }
@@ -117,6 +157,15 @@ private extension EntryTransferPanel {
         switch role {
         case .source: model.walletTitle
         case .destination: EntryModel.destinationTitle
+        }
+    }
+}
+
+private struct EntryTransferLink: Shape {
+    func path(in rect: CGRect) -> Path {
+        Path { path in
+            path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
         }
     }
 }

@@ -42,14 +42,6 @@ extension SettingsMenuSheet {
         SettingsPickerRow(title, systemImage: systemImage, picker: picker())
     }
 
-    func switchRow(
-        _ title: String,
-        systemImage: String,
-        isOn: Binding<Bool>
-    ) -> SettingsSwitchRow {
-        SettingsSwitchRow(title, systemImage: systemImage, isOn: isOn)
-    }
-
     func row(
         _ title: String,
         systemImage: String,

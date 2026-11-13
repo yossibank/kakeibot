@@ -5,13 +5,15 @@ import SwiftUI
 
 public struct EntrySheet: View {
     @State var model: EntryModel
-    @State var isEnteringAmount: Bool
-    @State var isFormDeferred: Bool
+    @State var deck: EntryDeck
+    @State var deckEdge: Edge = .trailing
+    @State var isEditingMemo = false
     @State var categoryPage: Int? = 0
     @State var sheet: Sheet?
     @State var categoryMenu: CategoryMenu?
     @State var sheetWidth: CGFloat = 0
-    @State var drawerHeight: CGFloat = 0
+    @State var panelHeight: CGFloat = 0
+    @State var bottomInset: CGFloat = 0
     @State var deletion: Deletion?
     @State var hiddenCategory: EntryModel.HiddenCategory?
     @State var receipt = EntryReceiptFlow()
@@ -22,7 +24,6 @@ public struct EntrySheet: View {
     @Environment(\.canScanReceipt) var canScanReceipt
     @Environment(\.openURL) var openURL
 
-    @State private var isEditingMemo = false
     @State private var isConfirmingDiscard = false
     @State private var notice: EntryNoticeModel
 
@@ -37,8 +38,7 @@ public struct EntrySheet: View {
         onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
-        _isEnteringAmount = State(initialValue: model.opensKeypad)
-        _isFormDeferred = State(initialValue: model.opensKeypad)
+        _deck = State(initialValue: EntryDeck.start(for: model.type))
         _notice = State(initialValue: EntryNoticeModel(database: model.database))
 
         self.onChange = onChange
@@ -49,6 +49,7 @@ public struct EntrySheet: View {
             ZStack(alignment: .top) {
                 content
                     .ignoresSafeArea(.keyboard)
+                    .ignoresSafeArea(.container, edges: .bottom)
                     .floatingInput(isPresented: isEditingMemo) {
                         editMemo(false)
                     } card: {
@@ -70,6 +71,11 @@ public struct EntrySheet: View {
                 proxy.size.width
             } action: { width in
                 sheetWidth = width
+            }
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.safeAreaInsets.bottom
+            } action: { inset in
+                bottomInset = inset
             }
             .haptic(
                 .impact(weight: .medium),
@@ -138,9 +144,6 @@ public struct EntrySheet: View {
                 await model.observeHistory()
             }
             .task {
-                await revealForm()
-            }
-            .task {
                 await voice.checkAvailability()
             }
             .onDisappear {
@@ -156,9 +159,9 @@ extension EntrySheet {
     var saveButtons: some View {
         EntryLiveSlot {
             HStack(spacing: 8) {
-                EntrySaveButton(label: model.saveLabel(today: today)) {
+                PrimaryButton(model.saveTitle) {
                     guard !opensKeypadOnSave else {
-                        setEnteringAmount(true)
+                        show(.amount)
                         return
                     }
 
@@ -190,6 +193,16 @@ extension EntrySheet {
                     }
                 }
             }
+        }
+    }
+
+    func editMemo(_ isEditing: Bool) {
+        if !isEditing {
+            isMemoFocused = false
+        }
+
+        withAnimation(.snappy(duration: 0.25)) {
+            isEditingMemo = isEditing
         }
     }
 
@@ -225,81 +238,37 @@ extension EntrySheet {
     var today: LocalDate {
         LocalDate(Date(), in: .current)
     }
+
+    init(
+        model: EntryModel,
+        deck: EntryDeck
+    ) {
+        self.init(model: model)
+
+        _deck = State(initialValue: deck)
+    }
 }
 
 private extension EntrySheet {
     var content: some View {
         VStack(spacing: 12) {
             header
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
 
-            ScrollView {
-                form
-                    .padding(.vertical, Self.fade)
-                    .padding(.horizontal, Self.liftInset)
+            VStack(spacing: 0) {
+                summary
+
+                deckPanel
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, bottomGap)
             }
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollIndicators(.hidden)
-            .edgeFade(Self.fade)
-            .padding(.vertical, -Self.fade)
-            .padding(.horizontal, -Self.liftInset)
-
-            VStack(spacing: 12) {
-                EntryDetailBand(
-                    model: model,
-                    today: today,
-                    onWallet: {
-                        open(.wallet(.source))
-                    },
-                    onFee: {
-                        enterFee()
-                    },
-                    onDate: {
-                        open(.date)
-                    },
-                    onMemo: {
-                        editMemo(true)
-                    }
-                )
-
-                saveButtons
+            .background {
+                board
             }
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 20)
-        .padding(.bottom, 8)
-        .contentShape(.rect)
-        .onTapGesture {
-            setEnteringAmount(false)
+            .padding(.horizontal, 8)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .bottom) {
-            if isEnteringAmount {
-                keypadDrawer
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
-    }
-
-    var form: some View {
-        VStack(spacing: 24) {
-            dial
-
-            if model.type == .transfer {
-                transferArea
-            } else {
-                categoryArea
-            }
-        }
-    }
-
-    var dial: some View {
-        EntryDialFace(model: model, levels: voiceLevels, preview: voice.preview) {
-            open(.items)
-        }
-        .onTapGesture {
-            tapDial()
-        }
-        .frame(maxWidth: .infinity)
     }
 
     func sideButton(
@@ -331,15 +300,6 @@ private extension EntrySheet {
         .opacity(isEnabled ? 1 : 0.4)
     }
 
-    func revealForm() async {
-        guard isFormDeferred else {
-            return
-        }
-
-        try? await Task.sleep(for: Self.formRevealDelay)
-        isFormDeferred = false
-    }
-
     func recordAgain() async {
         await model.recordAgain()
         showSelectedCategory()
@@ -347,34 +307,25 @@ private extension EntrySheet {
 }
 
 private extension EntrySheet {
-    static let fade: CGFloat = 20
-    static let formRevealDelay: Duration = .milliseconds(450)
     static let continueWidth: CGFloat = 64
 
+    var bottomGap: CGFloat {
+        bottomInset > 0 ? 20 : 8
+    }
+
     var bannerBottom: CGFloat {
-        isEnteringAmount ? drawerHeight + 12 : 12
+        panelHeight + bottomGap - bottomInset + 4
     }
 
     var opensKeypadOnSave: Bool {
-        !isEnteringAmount && !model.isEditing && model.amount <= 0
-    }
-
-    func editMemo(_ isEditing: Bool) {
-        setEnteringAmount(false)
-
-        if !isEditing {
-            isMemoFocused = false
-        }
-
-        withAnimation(.snappy(duration: 0.25)) {
-            isEditingMemo = isEditing
-        }
+        deck != .amount && !model.isEditing && model.amount <= 0
     }
 
     func load() async {
         if !model.isLoaded {
             await model.load()
-            isEnteringAmount = model.opensKeypad
+
+            deck = EntryDeck.start(for: model.type)
         }
 
         showSelectedCategory()
@@ -397,7 +348,7 @@ private extension EntrySheet {
 
         await model.startNext()
         notice.show(change)
-        setEnteringAmount(model.startsWithAmount)
+        show(EntryDeck.start(for: model.type))
     }
 }
 

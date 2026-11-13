@@ -48,7 +48,7 @@ struct EntryModelTransferTests {
         model.press(.doubleZero)
         model.swapWallets()
 
-        let title = model.saveLabel(today: setup.date).title
+        let title = model.saveTitle
         let saved = await model.save()
         let entry = try setup.database.snapshot().entries.first
 
@@ -100,29 +100,7 @@ struct EntryModelTransferTests {
         model.toWalletId = nil
 
         #expect(balance == 5000)
-        #expect(model.saveLabel(today: setup.date).title == "振替先を選んでください")
-    }
-
-    @Test
-    func labelsTransferSaveButton() async throws {
-        let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
-
-        await model.load()
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.setFee(110)
-
-        let label = model.saveLabel(today: setup.date)
-        let cash = try #require(model.wallet(setup.cash))
-        let bank = try #require(model.wallet(setup.bank))
-
-        #expect(label.title == "振り替える")
-        #expect(label.amount == "¥300")
-        #expect(label.category == nil)
-        #expect(label.day == "今日")
-        #expect(label.wallets == "\(cash.name) → \(bank.name)")
-        #expect(label.fee == "手数料 ¥110")
+        #expect(model.saveTitle == "振替先を選んでください")
     }
 
     @Test

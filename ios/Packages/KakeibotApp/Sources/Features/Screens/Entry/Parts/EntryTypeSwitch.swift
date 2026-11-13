@@ -1,0 +1,132 @@
+import Core
+import DesignSystem
+import SwiftUI
+
+struct EntryTypeSwitch: View {
+    @Binding var selection: Entry.Kind
+
+    @Environment(\.themeStyle.corner) private var corner
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(Self.kinds, id: \.self) { kind in
+                key(kind)
+            }
+        }
+        .animation(.snappy, value: selection)
+    }
+}
+
+private extension EntryTypeSwitch {
+    static var kinds: [Entry.Kind] {
+        [.expense, .income, .transfer]
+    }
+
+    static var gold: LinearGradient {
+        LinearGradient(
+            colors: [Palette.accentStrong, Palette.accent, Palette.accentDeep],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    static var keyFill: LinearGradient {
+        LinearGradient(
+            colors: [
+                Palette.cardTop.mix(with: .white, by: 0.12),
+                Palette.cardTop,
+                Palette.cardTop.mix(with: .black, by: 0.1)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    static var shine: LinearGradient {
+        LinearGradient(
+            stops: [
+                .init(color: .white.opacity(0.4), location: 0),
+                .init(color: .clear, location: 0.4)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    func key(_ kind: Entry.Kind) -> some View {
+        let isSelected = selection == kind
+        let shape = RoundedRectangle(cornerRadius: corner.radius(12))
+        let color = isSelected ? Palette.backgroundBottom : Palette.subtext
+        let weight: Font.Weight = isSelected ? .bold : .medium
+        let press: CGFloat = isSelected ? 2 : 0
+
+        return Button {
+            selection = kind
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: symbol(of: kind))
+                    .textFont(.caption2, weight: weight)
+
+                Text(title(of: kind))
+                    .textFont(.subheadline, weight: weight)
+                    .fixedSize()
+            }
+            .foregroundStyle(color)
+            .padding(.horizontal, 4)
+            .frame(maxWidth: 76)
+            .frame(height: 34)
+            .background {
+                face(isSelected: isSelected, shape: shape)
+            }
+            .contentShape(shape)
+            .offset(y: press)
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    func face(
+        isSelected: Bool,
+        shape: RoundedRectangle
+    ) -> some View {
+        if isSelected {
+            shape
+                .fill(Self.gold)
+                .overlay {
+                    shape
+                        .inset(by: 1)
+                        .stroke(Self.shine, lineWidth: 1)
+                }
+                .glow(Palette.glow.opacity(.muted), radius: 8)
+        } else {
+            shape
+                .fill(Self.keyFill)
+                .background {
+                    shape
+                        .fill(Palette.cardTop.mix(with: .black, by: 0.35))
+                        .offset(y: 2)
+                        .shadow(color: Palette.shadow.opacity(.soft), radius: 3, y: 2)
+                }
+                .overlay {
+                    shape
+                        .strokeBorder(Palette.accent.opacity(.muted), lineWidth: 1)
+                }
+        }
+    }
+
+    func title(of kind: Entry.Kind) -> String {
+        switch kind {
+        case .expense: "支出"
+        case .income: "収入"
+        case .transfer: "振替"
+        }
+    }
+
+    func symbol(of kind: Entry.Kind) -> String {
+        switch kind {
+        case .expense: "arrow.up"
+        case .income: "arrow.down"
+        case .transfer: "arrow.left.arrow.right"
+        }
+    }
+}

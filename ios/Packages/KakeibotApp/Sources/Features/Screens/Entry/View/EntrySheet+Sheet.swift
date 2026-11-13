@@ -10,9 +10,6 @@ extension EntrySheet {
         case let .wallet(role):
             EntryWalletSheet(model: model, role: role)
 
-        case .date:
-            EntryDateSheet(model: model, today: today)
-
         case .items:
             EntryItemSheet(model: model)
 
@@ -59,7 +56,6 @@ extension EntrySheet {
 extension EntrySheet {
     enum Sheet: Hashable, Identifiable {
         case wallet(EntryWalletSheet.Role)
-        case date
         case items
         case newItem
         case newCategory
@@ -74,7 +70,6 @@ extension EntrySheet {
     }
 
     func open(_ sheet: Sheet) {
-        setEnteringAmount(false)
         self.sheet = sheet
     }
 }
