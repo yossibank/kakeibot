@@ -10,6 +10,8 @@ public struct EntrySheet: View {
     @State var isEditingMemo = false
     @State var categoryPage: Int? = 0
     @State var sheet: Sheet?
+    @State var addedWallet: AddedWallet?
+    @State var opensWallet = false
     @State var categoryMenu: CategoryMenu?
     @State var sheetWidth: CGFloat = 0
     @State var panelHeight: CGFloat = 0
@@ -94,6 +96,7 @@ public struct EntrySheet: View {
             .deletionNotice($deletion, bottom: bannerBottom) { deletion in
                 Task {
                     await model.restore(deletion)
+                    await model.reloadWallets()
                 }
             }
             .settingsHideNotice($hiddenCategory, bottom: bannerBottom) { hidden in
@@ -134,7 +137,7 @@ public struct EntrySheet: View {
                     dismiss()
                 }
             )
-            .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
+            .sheet(item: $sheet, onDismiss: reloadAfterSheet) { sheet in
                 sheetContent(for: sheet)
             }
             .task {

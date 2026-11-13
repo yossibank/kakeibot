@@ -301,10 +301,11 @@ private extension EntrySlip {
             if isSelected {
                 Self.litFill
 
-                Palette.accent
+                Capsule()
+                    .fill(Self.amountGold)
                     .frame(width: 3)
-                    .clipShape(.rect(cornerRadius: 2))
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 12)
+                    .padding(.leading, 8)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)

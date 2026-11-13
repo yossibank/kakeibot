@@ -5,7 +5,7 @@ enum EntryDeck: Hashable {
     case transfer
     case amount
     case fee
-    case wallet(EntryWalletSheet.Role)
+    case wallet(EntryWalletDeck.Role)
     case date
 
     static func fields(for type: Entry.Kind) -> [Self] {

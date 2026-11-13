@@ -8,9 +8,12 @@ struct EntryWalletDeck: View {
 
     @Environment(\.themeStyle.corner) private var corner
 
-    let role: EntryWalletSheet.Role
+    @State private var isEditing = false
+
+    let role: Role
     let onChoose: (Wallet) -> Void
-    let onEdit: () -> Void
+    let onEdit: (Wallet) -> Void
+    let onAdd: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -21,7 +24,17 @@ struct EntryWalletDeck: View {
 
                 Spacer()
 
-                ChipButton("編集", systemImage: "pencil", action: onEdit)
+                ChipButton("追加", systemImage: "plus", action: onAdd)
+
+                ChipButton(
+                    isEditing ? "完了" : "編集",
+                    systemImage: isEditing ? "checkmark" : "pencil",
+                    isSelected: isEditing
+                ) {
+                    withAnimation(.snappy) {
+                        isEditing.toggle()
+                    }
+                }
             }
 
             ScrollView {
@@ -47,6 +60,13 @@ struct EntryWalletDeck: View {
     }
 }
 
+extension EntryWalletDeck {
+    enum Role: Hashable {
+        case source
+        case destination
+    }
+}
+
 private extension EntryWalletDeck {
     var billSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -62,12 +82,17 @@ private extension EntryWalletDeck {
 
     func tile(_ wallet: Wallet) -> some View {
         let isSelected = selectedId == wallet.id
-        let isTaken = takenId == wallet.id
+        let isLocked = takenId == wallet.id && !isEditing
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Palette.panel.opacity(.strong)
         let ring = isSelected ? Palette.accent : Palette.line
 
         return Button {
+            guard !isEditing else {
+                onEdit(wallet)
+                return
+            }
+
             withAnimation(.snappy) {
                 onChoose(wallet)
             }
@@ -94,6 +119,13 @@ private extension EntryWalletDeck {
                 }
 
                 Spacer(minLength: 0)
+
+                if isEditing {
+                    Image(systemName: "pencil")
+                        .sansFont(.small, weight: .semibold)
+                        .foregroundStyle(Palette.accent)
+                        .transition(.opacity)
+                }
             }
             .padding(.horizontal, 12)
             .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
@@ -105,8 +137,8 @@ private extension EntryWalletDeck {
             .contentShape(shape)
         }
         .buttonStyle(.plain)
-        .disabled(isTaken)
-        .opacity(isTaken ? 0.45 : 1)
+        .disabled(isLocked)
+        .opacity(isLocked ? 0.45 : 1)
     }
 
     func billButton(_ choice: EntryModel.BillChoice) -> some View {
@@ -152,7 +184,7 @@ private extension EntryWalletDeck {
     }
 
     var showsBills: Bool {
-        role == .source && !model.billChoices.isEmpty
+        role == .source && !model.billChoices.isEmpty && !isEditing
     }
 
     var title: String {

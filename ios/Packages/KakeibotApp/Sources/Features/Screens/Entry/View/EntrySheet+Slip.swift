@@ -41,15 +41,6 @@ extension EntrySheet {
                 shape
                     .fill(Self.boardLight)
             }
-            .overlay {
-                shape
-                    .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
-            }
-            .overlay(alignment: .top) {
-                Self.boardEdge
-                    .frame(height: 1)
-                    .padding(.horizontal, 24)
-            }
             .shadow(color: Palette.shadow.opacity(0.4), radius: 16, y: 6)
             .ignoresSafeArea(edges: .bottom)
     }
@@ -62,14 +53,6 @@ private extension EntrySheet {
             center: .top,
             startRadius: 0,
             endRadius: 280
-        )
-    }
-
-    static var boardEdge: LinearGradient {
-        LinearGradient(
-            colors: [.clear, Palette.accent, .clear],
-            startPoint: .leading,
-            endPoint: .trailing
         )
     }
 

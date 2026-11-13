@@ -29,7 +29,7 @@ extension EntrySheet {
                 .fill(Self.wellFill)
                 .overlay {
                     panelShape
-                        .strokeBorder(Palette.subtext.opacity(.muted), lineWidth: 1)
+                        .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
                 }
         }
         .onGeometryChange(for: CGFloat.self) { proxy in
@@ -83,6 +83,8 @@ extension EntrySheet {
 private extension EntrySheet {
     typealias AmountTarget = EntryModel.KeypadTarget
 
+    static let amountTitleHeight: CGFloat = 28
+
     static var pillMark: LinearGradient {
         LinearGradient(
             colors: [Palette.accentStrong, Palette.accent],
@@ -101,12 +103,8 @@ private extension EntrySheet {
 
     static var wellFill: some ShapeStyle {
         Palette.panel
-            .mix(with: .black, by: 0.04)
-            .shadow(.inner(color: Palette.shadow.opacity(.soft), radius: 6, y: 3))
-    }
-
-    var showsItemPill: Bool {
-        deck == .amount && model.showsItems && !voice.isActive
+            .mix(with: Palette.accent, by: 0.06)
+            .shadow(.inner(color: Palette.shadow.opacity(.subtle), radius: 6, y: 3))
     }
 
     var deckTransition: AnyTransition {
@@ -159,8 +157,10 @@ private extension EntrySheet {
         case let .wallet(role):
             EntryWalletDeck(model: model, role: role) { wallet in
                 choose(wallet, as: role)
-            } onEdit: {
-                open(.wallet(role))
+            } onEdit: { wallet in
+                open(.editWallet(wallet.id))
+            } onAdd: {
+                open(.newWallet(role))
             }
 
         case .date:
@@ -181,7 +181,7 @@ private extension EntrySheet {
                 ) { amount in
                     model.setFee(amount)
                 }
-            } else if showsItemPill {
+            } else if !voice.isActive {
                 HStack(spacing: 8) {
                     Text("金額を入力")
                         .textFont(.caption2, weight: .bold)
@@ -189,8 +189,11 @@ private extension EntrySheet {
 
                     Spacer(minLength: 0)
 
-                    itemPill
+                    if model.showsItems {
+                        itemPill
+                    }
                 }
+                .frame(height: Self.amountTitleHeight)
             }
 
             EntryLiveSlot {
@@ -315,21 +318,10 @@ private extension EntrySheet {
     }
 }
 
-private extension EntrySheet {
-    struct QuickDay {
-        let title: String
-        let offset: Int
-    }
-
-    static let quickDays = [
-        QuickDay(title: "今日", offset: 0),
-        QuickDay(title: "昨日", offset: -1),
-        QuickDay(title: "おととい", offset: -2)
-    ]
-
+extension EntrySheet {
     func choose(
         _ wallet: Wallet,
-        as role: EntryWalletSheet.Role
+        as role: EntryWalletDeck.Role
     ) {
         switch role {
         case .source:
@@ -339,14 +331,7 @@ private extension EntrySheet {
             model.toWalletId = wallet.id
         }
 
-        let needsAmount = model.amount <= 0
-
         guard model.type == .transfer else {
-            if needsAmount,
-               model.billChoices.isEmpty {
-                show(.amount)
-            }
-
             return
         }
 
@@ -358,9 +343,20 @@ private extension EntrySheet {
             show(.wallet(.source))
 
         default:
-            if needsAmount {
-                show(.amount)
-            }
+            break
         }
     }
+}
+
+private extension EntrySheet {
+    struct QuickDay {
+        let title: String
+        let offset: Int
+    }
+
+    static let quickDays = [
+        QuickDay(title: "今日", offset: 0),
+        QuickDay(title: "昨日", offset: -1),
+        QuickDay(title: "おととい", offset: -2)
+    ]
 }
