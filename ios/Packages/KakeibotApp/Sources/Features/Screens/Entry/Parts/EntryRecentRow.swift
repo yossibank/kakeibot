@@ -40,32 +40,34 @@ struct EntryRecentCard<Mark: View>: View {
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
 
         Button(action: onUse) {
-            HStack(spacing: 8) {
-                mark
+            CappedWidthLayout(maxWidth: Self.maxWidth) {
+                HStack(spacing: 8) {
+                    mark
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .textFont(.caption, weight: .bold)
-                        .foregroundStyle(Palette.text)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text(detail)
-                            .textFont(.caption2)
-                            .foregroundStyle(Palette.subtext)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title)
+                            .textFont(.caption, weight: .bold)
+                            .foregroundStyle(Palette.text)
                             .lineLimit(1)
-                            .minimumScaleFactor(0.85)
+                            .minimumScaleFactor(0.8)
 
-                        Spacer(minLength: 0)
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            Text(detail)
+                                .textFont(.caption2)
+                                .foregroundStyle(Palette.subtext)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
 
-                        amountLabel
+                            Spacer(minLength: 0)
+
+                            amountLabel
+                        }
                     }
                 }
+                .padding(.leading, 8)
+                .padding(.trailing, 12)
+                .frame(height: Self.height, alignment: .leading)
             }
-            .padding(.leading, 8)
-            .padding(.trailing, 12)
-            .frame(width: Self.width, height: Self.height, alignment: .leading)
             .background(Palette.card, in: shape)
             .overlay {
                 shape
@@ -78,8 +80,8 @@ struct EntryRecentCard<Mark: View>: View {
 }
 
 private extension EntryRecentCard {
-    static var width: CGFloat {
-        200
+    static var maxWidth: CGFloat {
+        240
     }
 
     static var height: CGFloat {
@@ -124,4 +126,31 @@ struct EntryRecentMark: View {
 
 private extension EntryRecentMark {
     static let size: CGFloat = 32
+}
+
+private struct CappedWidthLayout: Layout {
+    let maxWidth: CGFloat
+
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) -> CGSize {
+        guard let subview = subviews.first else {
+            return .zero
+        }
+
+        let ideal = subview.sizeThatFits(.unspecified)
+        let width = min(ideal.width, maxWidth)
+        return subview.sizeThatFits(ProposedViewSize(width: width, height: proposal.height))
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        subviews.first?.place(at: bounds.origin, proposal: ProposedViewSize(bounds.size))
+    }
 }
