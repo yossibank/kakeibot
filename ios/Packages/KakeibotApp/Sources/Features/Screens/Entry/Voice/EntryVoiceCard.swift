@@ -37,6 +37,7 @@ private extension EntryVoiceCard {
     static let largeTextLimit = 36
     static let mediumTextLimit = 64
     static let cancelWidth: CGFloat = 104
+    static let waveHeight: CGFloat = 24
 
     var isReading: Bool {
         flow.step == .reading
@@ -67,24 +68,27 @@ private extension EntryVoiceCard {
     var listening: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Circle()
-                    .fill(Palette.accent)
-                    .frame(width: 8, height: 8)
-                    .opacity(isReading ? 0.4 : 1)
-
-                Text(isReading ? "読んでいます" : "聞いています")
-                    .textFont(.caption, weight: .semibold)
-                    .tracking(2)
-                    .foregroundStyle(Palette.accent)
-
-                Spacer(minLength: 0)
-
                 if isReading {
+                    Text("読んでいます")
+                        .textFont(.caption, weight: .semibold)
+                        .tracking(2)
+                        .foregroundStyle(Palette.accent)
+
+                    Spacer(minLength: 0)
+
                     ProgressView()
                         .controlSize(.small)
                         .tint(Palette.accent)
+                } else {
+                    EntryVoiceWave(
+                        flow: flow,
+                        reach: EntryVoiceFlow.levelCount - 1,
+                        height: Self.waveHeight
+                    )
+                    .frame(maxWidth: .infinity)
                 }
             }
+            .frame(height: Self.waveHeight)
 
             transcript
                 .frame(height: Self.transcriptHeight, alignment: .topLeading)
@@ -92,9 +96,18 @@ private extension EntryVoiceCard {
 
             slots
 
-            Text("黙ると 1.5 秒で聞き終えます")
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
+            HStack(spacing: 8) {
+                Text("黙ると聞き終えます")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+                    .fixedSize()
+
+                EntryVoiceCountdown(
+                    start: flow.silenceStart,
+                    duration: flow.silenceDuration,
+                    isSpent: isReading
+                )
+            }
 
             HStack(spacing: 8) {
                 CardButton("やめる", style: .outlined(Palette.subtext), height: 44, action: onCancel)

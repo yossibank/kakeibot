@@ -46,8 +46,6 @@ extension EntrySheet {
     }
 
     func startVoice() {
-        show(.amount)
-
         Task {
             await voice.start(for: model, today: today) {
                 showSelectedCategory()

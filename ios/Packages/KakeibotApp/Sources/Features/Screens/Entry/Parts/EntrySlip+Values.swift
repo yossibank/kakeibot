@@ -3,7 +3,7 @@ import DesignSystem
 import SwiftUI
 
 extension EntrySlip {
-    static let listeningNote = "聞いています"
+    static let waveHeight: CGFloat = 16
     static let amountHeight: CGFloat = 60
     static let rowHeight: CGFloat = 44
     static let markSize: CGFloat = 24
@@ -117,8 +117,8 @@ extension EntrySlip {
         return model.amount
     }
 
-    var status: String? {
-        isListening ? Self.listeningNote : model.expressionText
+    var isListening: Bool {
+        listening != nil
     }
 
     func isSelected(_ target: EntryDeck) -> Bool {

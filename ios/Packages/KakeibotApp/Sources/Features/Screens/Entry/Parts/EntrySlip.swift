@@ -11,7 +11,7 @@ struct EntrySlip: View {
     let deck: EntryDeck
     let today: LocalDate
     let isMemoActive: Bool
-    let isListening: Bool
+    let listening: EntryVoiceFlow?
     let preview: VoiceReading?
     let onSelect: (EntryDeck) -> Void
     let onMemo: () -> Void
@@ -68,7 +68,9 @@ private extension EntrySlip {
                     .foregroundStyle(titleColor)
                     .fixedSize()
 
-                if let status {
+                if let listening {
+                    EntryVoiceWave(flow: listening, reach: 2, height: Self.waveHeight)
+                } else if let status = model.expressionText {
                     Text(status)
                         .textFont(.caption2)
                         .monospacedDigit()

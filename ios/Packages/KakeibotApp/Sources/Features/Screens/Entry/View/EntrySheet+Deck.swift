@@ -223,8 +223,8 @@ private extension EntrySheet {
                     }
                 }
             }
-            .animation(.snappy, value: voice.isActive)
         }
+        .animation(.snappy, value: voice.isActive)
     }
 
     var itemPill: some View {

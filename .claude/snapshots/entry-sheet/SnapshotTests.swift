@@ -154,6 +154,10 @@ private extension SnapshotTests {
             await flow.start(for: model, today: today) {}
             source.say(settled: text.0, pending: text.1)
 
+            if !text.0.isEmpty {
+                source.speak()
+            }
+
             let card = EntryVoiceCard(
                 flow: flow,
                 model: model,
@@ -213,12 +217,18 @@ private extension SnapshotTests {
         let listeningModel = try await Self.model(.expense, digits: [])
         let category = try #require(listeningModel.categories.first)
 
+        let listeningSource = VoiceSnapshotSource()
+        let listeningFlow = EntryVoiceFlow(dependencies: .snapshot(listeningSource))
+
+        await listeningFlow.start(for: listeningModel, today: today) {}
+        listeningSource.speak()
+
         let listening = EntrySlip(
             model: listeningModel,
             deck: .amount,
             today: today,
             isMemoActive: false,
-            isListening: true,
+            listening: listeningFlow,
             preview: VoiceReading(amount: 980, categoryId: category.id),
             onSelect: { _ in },
             onMemo: {},
@@ -249,7 +259,7 @@ private extension SnapshotTests {
             deck: .amount,
             today: today,
             isMemoActive: false,
-            isListening: false,
+            listening: nil,
             preview: nil,
             onSelect: { _ in },
             onMemo: {},
@@ -283,6 +293,12 @@ private final class VoiceSnapshotSource: EntryVoiceSource {
 
     func say(settled: String, pending: String) {
         onEvent?(.transcript(EntryVoiceTranscript(settled: settled, pending: pending)))
+    }
+
+    func speak() {
+        for level in [0.2, 0.5, 0.9, 0.6, 0.3, 0.7, 1, 0.5, 0.8, 0.4, 0.6, 0.9] {
+            onEvent?(.level(level))
+        }
     }
 }
 

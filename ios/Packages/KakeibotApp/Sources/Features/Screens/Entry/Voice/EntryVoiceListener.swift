@@ -5,10 +5,9 @@ import Speech
 @available(iOS 26.0, *)
 @MainActor
 final class EntryVoiceListener: EntryVoiceSource {
-    private let engine = AVAudioEngine()
+    private let mic = EntryVoiceMic()
 
     private var analyzer: SpeechAnalyzer?
-    private var feed: EntryVoiceAudioFeed?
     private var resultsTask: Task<Void, Never>?
 
     func start(
@@ -37,35 +36,21 @@ final class EntryVoiceListener: EntryVoiceSource {
             throw ListenError.unsupported
         }
 
-        try Self.activateSession()
-
         let analyzer = SpeechAnalyzer(modules: [transcriber])
         let context = AnalysisContext()
 
         context.contextualStrings[.general] = Array(hints.prefix(Self.maxHints))
         try? await analyzer.setContext(context)
         let (stream, continuation) = AsyncStream.makeStream(of: AnalyzerInput.self)
-        let input = engine.inputNode
-        let inputFormat = input.outputFormat(forBus: 0)
-
-        let feed = try EntryVoiceAudioFeed(
-            from: inputFormat,
-            to: format,
-            continuation: continuation
-        )
 
         self.analyzer = analyzer
-        self.feed = feed
 
-        input.installTap(
-            onBus: 0,
-            bufferSize: Self.bufferSize,
-            format: inputFormat,
-            block: Self.tap(feed)
+        try await mic.start(
+            to: format,
+            continuation: continuation,
+            onLevel: Self.report(to: onEvent)
         )
 
-        engine.prepare()
-        try engine.start()
         try await analyzer.start(inputSequence: stream)
 
         resultsTask = Task { @MainActor in
@@ -98,7 +83,7 @@ final class EntryVoiceListener: EntryVoiceSource {
     }
 
     func finish() async {
-        stopAudio()
+        await mic.stop()
 
         try? await analyzer?.finalizeAndFinishThroughEndOfInput()
 
@@ -110,7 +95,7 @@ final class EntryVoiceListener: EntryVoiceSource {
     }
 
     func cancel() async {
-        stopAudio()
+        await mic.stop()
         resultsTask?.cancel()
         await analyzer?.cancelAndFinishNow()
         clear()
@@ -123,7 +108,6 @@ private extension EntryVoiceListener {
         case unsupported
     }
 
-    static let bufferSize: AVAudioFrameCount = 1024
     static let maxHints = 100
     static let maxCandidates = 8
 
@@ -144,15 +128,13 @@ private extension EntryVoiceListener {
         return Array(candidates.prefix(maxCandidates))
     }
 
-    static func activateSession() throws {
-        let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.record, mode: .measurement, options: .duckOthers)
-        try session.setActive(true, options: .notifyOthersOnDeactivation)
-    }
-
-    nonisolated static func tap(_ feed: EntryVoiceAudioFeed) -> AVAudioNodeTapBlock {
-        { buffer, _ in
-            feed.receive(buffer)
+    nonisolated static func report(
+        to onEvent: @escaping @MainActor (EntryVoiceEvent) -> Void
+    ) -> @Sendable (Double) -> Void {
+        { level in
+            Task { @MainActor in
+                onEvent(.level(level))
+            }
         }
     }
 
@@ -174,20 +156,8 @@ private extension EntryVoiceListener {
         }
     }
 
-    func stopAudio() {
-        if engine.isRunning {
-            engine.stop()
-        }
-
-        engine.inputNode.removeTap(onBus: 0)
-        feed?.finish()
-
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-    }
-
     func clear() {
         analyzer = nil
-        feed = nil
         resultsTask = nil
     }
 }

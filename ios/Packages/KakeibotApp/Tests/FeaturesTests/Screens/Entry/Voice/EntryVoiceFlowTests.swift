@@ -101,6 +101,52 @@ struct EntryVoiceFlowTests {
     }
 
     @Test
+    func keepsRecentLevelsWhileListening() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = try await loadedModel(setup)
+        let source = FakeVoiceSource()
+        let flow = EntryVoiceFlow(dependencies: .fake(source))
+
+        await flow.start(for: model, today: setup.date) {}
+        source.hear(0.4)
+        source.hear(0.8)
+
+        #expect(flow.levels.count == EntryVoiceFlow.levelCount)
+        #expect(Array(flow.levels.prefix(3)) == [0.8, 0.4, 0])
+
+        await flow.cancel()
+        source.hear(0.6)
+
+        #expect(flow.levels.allSatisfy { $0 == 0 })
+    }
+
+    @Test
+    func countsSilenceFromTheLastWords() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = try await loadedModel(setup)
+        let source = FakeVoiceSource()
+        let flow = EntryVoiceFlow(dependencies: .fake(source))
+
+        await flow.start(for: model, today: setup.date) {}
+
+        #expect(flow.silenceStart == nil)
+        #expect(flow.silenceDuration == 0.1)
+
+        source.say("500円")
+        let first = try #require(flow.silenceStart)
+
+        try await Task.sleep(for: .milliseconds(20))
+        source.say("500円、カードで")
+        let second = try #require(flow.silenceStart)
+
+        #expect(second > first)
+
+        await flow.cancel()
+
+        #expect(flow.silenceStart == nil)
+    }
+
+    @Test
     func clearsNoticeAfterAWhile() async throws {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
@@ -422,6 +468,10 @@ private final class FakeVoiceSource: EntryVoiceSource {
     func releaseStart() {
         startGate?.resume()
         startGate = nil
+    }
+
+    func hear(_ level: Double) {
+        onEvent?(.level(level))
     }
 
     func say(

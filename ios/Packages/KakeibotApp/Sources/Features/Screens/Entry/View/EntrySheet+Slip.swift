@@ -13,7 +13,7 @@ extension EntrySheet {
             deck: deck,
             today: today,
             isMemoActive: isEditingMemo,
-            isListening: voice.step == .listening,
+            listening: voice.step == .listening ? voice : nil,
             preview: voice.preview,
             onSelect: { next in
                 show(next)

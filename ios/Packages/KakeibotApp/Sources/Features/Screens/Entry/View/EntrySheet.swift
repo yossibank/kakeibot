@@ -84,6 +84,11 @@ public struct EntrySheet: View {
             ) { _, menu in
                 menu != nil
             }
+            .onChange(of: voice.isActive) {
+                if voice.isActive {
+                    show(.amount)
+                }
+            }
             .haptic(.impact(weight: .light), trigger: voice.startCount)
             .haptic(.impact(weight: .light), trigger: voice.endCount)
             .errorBanner(
