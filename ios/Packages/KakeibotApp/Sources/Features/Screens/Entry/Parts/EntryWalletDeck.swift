@@ -54,6 +54,7 @@ struct EntryWalletDeck: View {
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
+            .scrollClipDisabled()
         }
         .animation(.snappy, value: showsBills)
         .haptic(.selection, trigger: model.billMonth)
@@ -94,7 +95,7 @@ private extension EntryWalletDeck {
             .foregroundStyle(Palette.backgroundBottom)
             .frame(width: Self.badgeSize, height: Self.badgeSize)
             .background(Palette.accent, in: .circle)
-            .offset(x: 4, y: -8)
+            .offset(x: -4, y: -4)
     }
 
     func tile(_ wallet: Wallet) -> some View {
@@ -117,12 +118,6 @@ private extension EntryWalletDeck {
             HStack(spacing: 8) {
                 IconImage(model.icon(for: wallet), size: 16)
                     .foregroundStyle(isSelected ? Palette.accent : Palette.subtext)
-                    .overlay(alignment: .topTrailing) {
-                        if isEditing {
-                            editBadge
-                                .transition(.scale.combined(with: .opacity))
-                        }
-                    }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(wallet.name)
@@ -149,6 +144,12 @@ private extension EntryWalletDeck {
             .overlay {
                 shape
                     .stroke(ring, lineWidth: 1)
+            }
+            .overlay(alignment: .topTrailing) {
+                if isEditing {
+                    editBadge
+                        .transition(.scale.combined(with: .opacity))
+                }
             }
             .contentShape(shape)
         }
@@ -190,7 +191,7 @@ private extension EntryWalletDeck {
 }
 
 private extension EntryWalletDeck {
-    static let badgeSize: CGFloat = 16
+    static let badgeSize: CGFloat = 20
 
     static let columns = [
         GridItem(.flexible(), spacing: 8),

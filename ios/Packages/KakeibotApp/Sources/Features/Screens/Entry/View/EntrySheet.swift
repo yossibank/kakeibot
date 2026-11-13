@@ -51,7 +51,6 @@ public struct EntrySheet: View {
             ZStack(alignment: .top) {
                 content
                     .ignoresSafeArea(.keyboard)
-                    .ignoresSafeArea(.container, edges: .bottom)
                     .floatingInput(isPresented: isEditingMemo) {
                         editMemo(false)
                     } card: {
@@ -267,6 +266,7 @@ private extension EntrySheet {
                     .padding(.bottom, bottomGap)
             }
             .padding(.horizontal, 8)
+            .ignoresSafeArea(.container, edges: .bottom)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
