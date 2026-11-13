@@ -64,7 +64,7 @@ final class DismissAttemptController: UIViewController {
         super.viewWillDisappear(animated)
 
         guard
-            let presentation = presentationController,
+            let presentation = sheetPresentation,
             presentation.delegate === self
         else {
             return
@@ -93,7 +93,7 @@ extension DismissAttemptController {
     func takeDelegate() {
         guard
             viewIfLoaded?.window != nil,
-            let presentation = presentationController,
+            let presentation = sheetPresentation,
             presentation.delegate !== self
         else {
             return
@@ -101,6 +101,22 @@ extension DismissAttemptController {
 
         original = presentation.delegate
         presentation.delegate = self
+    }
+}
+
+private extension DismissAttemptController {
+    var sheetPresentation: UIPresentationController? {
+        var sheet: UIViewController = self
+
+        while let parent = sheet.parent {
+            sheet = parent
+        }
+
+        guard sheet.presentingViewController != nil else {
+            return nil
+        }
+
+        return sheet.presentationController
     }
 }
 
