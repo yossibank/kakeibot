@@ -854,13 +854,21 @@ private extension SnapshotTests {
         Shot(
             file: "03-entry",
             lines: ["記録は、", "タップ 1 回"],
-            lead: .note("テンプレートと電卓ですばやく"),
+            lead: .note("1 枚のカードと電卓ですばやく"),
             phones: [
                 Phone(name: "02-entry-black", x: 30, y: 200, width: 270, angle: 3)
             ]
         ),
         Shot(
-            file: "04-font",
+            file: "04-voice",
+            lines: ["話すだけで、", "記録できる"],
+            lead: .note("金額・日付・口座を声から読み取り"),
+            phones: [
+                Phone(name: "11-voice-black", x: 20, y: 196, width: 280, angle: -2)
+            ]
+        ),
+        Shot(
+            file: "05-font",
             lines: ["字体も、", "選べる"],
             lead: .note("手書きやドットなど 6 種類"),
             phones: [
@@ -869,7 +877,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "05-backdrop",
+            file: "06-backdrop",
             lines: ["背景も、", "和紙や方眼に"],
             lead: .note("角の丸みや行の間隔まで"),
             phones: [
@@ -877,7 +885,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "06-receipt",
+            file: "07-receipt",
             lines: ["レシートを", "撮れば入る"],
             lead: .note("品名・合計・日付を読み取り"),
             phones: [
@@ -885,7 +893,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "07-share",
+            file: "08-share",
             lines: ["ふたりで、", "ひとつの家計"],
             lead: .note("共有の財布をいっしょに"),
             phones: [
@@ -893,7 +901,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "08-review",
+            file: "09-review",
             lines: ["何に使ったか", "すぐ分かる"],
             lead: .note("内訳と前の月との比べ"),
             phones: [
@@ -901,7 +909,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "09-outlook",
+            file: "10-outlook",
             lines: ["月末の残りが", "先に分かる"],
             lead: .note("固定費と予定から見込みます"),
             phones: [
@@ -909,7 +917,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "10-assets",
+            file: "11-assets",
             lines: ["残高も、", "引き落としも"],
             lead: .note("口座とカードをまとめて"),
             phones: [
