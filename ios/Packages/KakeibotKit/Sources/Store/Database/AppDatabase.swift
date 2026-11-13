@@ -41,7 +41,14 @@ public extension AppDatabase {
 
     static func inMemory() throws -> AppDatabase {
         let queue = try DatabaseQueue(configuration: configuration)
-        return try AppDatabase(queue)
+
+        guard let migratedTemplate else {
+            return try AppDatabase(queue)
+        }
+
+        try migratedTemplate.backup(to: queue)
+
+        return AppDatabase(migrated: queue)
     }
 
     static func suspend() {
@@ -111,6 +118,20 @@ private extension AppDatabase {
     static let groupIdentifier = "group.com.yossibank.kakeibot"
     static let fileName = "kakeibot.sqlite"
     static let busyTimeout: TimeInterval = 5
+
+    static let migratedTemplate: DatabaseQueue? = {
+        guard let queue = try? DatabaseQueue() else {
+            return nil
+        }
+
+        do {
+            try migrator.migrate(queue)
+        } catch {
+            return nil
+        }
+
+        return queue
+    }()
 
     static var groupContainer: URL? {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)
