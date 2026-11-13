@@ -227,34 +227,6 @@ private extension EntrySheet {
         }
     }
 
-    @ViewBuilder
-    var recentRow: some View {
-        if model.type == .transfer {
-            let transfers = model.recentTransfers
-
-            if !transfers.isEmpty {
-                EntryRecentTransfers(model: model, transfers: transfers, today: today) { transfer in
-                    useTransfer(transfer)
-                }
-            }
-        } else {
-            let templates = model.templates
-            let entries = model.recentEntries
-
-            if !templates.isEmpty || !entries.isEmpty {
-                EntryRecentRow(title: "テンプレート・最近の記録") {
-                    ForEach(templates) { template in
-                        templateCard(template)
-                    }
-
-                    ForEach(entries) { entry in
-                        recentCard(entry)
-                    }
-                }
-            }
-        }
-    }
-
     var itemPill: some View {
         Button {
             open(.newItem)
@@ -304,39 +276,6 @@ private extension EntrySheet {
                 isCompact: true
             )
         }
-    }
-
-    func templateCard(_ template: EntryTemplate) -> some View {
-        EntryRecentCard(
-            title: template.name,
-            amount: template.amount,
-            detail: "テンプレート",
-            onUse: {
-                useTemplate(template)
-            },
-            mark: {
-                IconImage(model.icon(for: template), size: 14)
-            }
-        )
-    }
-
-    func recentCard(_ entry: Entry) -> some View {
-        let category = model.category(of: entry)
-        let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
-
-        return EntryRecentCard(
-            title: memo ?? category?.name ?? "",
-            amount: entry.amount,
-            detail: EntryModel.shortDateText(for: entry.date, today: today),
-            onUse: {
-                useRecent(entry)
-            },
-            mark: {
-                if let category {
-                    IconImage(model.icon(for: category), size: 14)
-                }
-            }
-        )
     }
 }
 

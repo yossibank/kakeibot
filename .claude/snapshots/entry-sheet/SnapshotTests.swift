@@ -286,8 +286,8 @@ private final class VoiceSnapshotSource: EntryVoiceSource {
     }
 }
 
+@MainActor
 private extension EntryVoiceFlow.Dependencies {
-    @MainActor
     static func snapshot(_ source: VoiceSnapshotSource) -> Self {
         Self(
             isAvailable: { true },
@@ -543,6 +543,22 @@ private extension SnapshotTests {
         let date = LocalDate(now, in: .current)
 
         try database.insertDefaultsIfEmpty(at: now)
+
+        let options = try await database.entryOptions()
+
+        let templates: [(String, Int?)] = [("子どもの習い事の月謝", 12000), ("電車", nil), ("コーヒー", 380)]
+
+        for (name, amount) in templates {
+            let template = EntryTemplateDraft(
+                name: name,
+                type: .expense,
+                amount: amount,
+                categoryId: options.expenseCategories.first?.id,
+                walletId: options.wallets.last?.id
+            )
+
+            _ = try await database.saveTemplate(template, at: now)
+        }
 
         for (amount, memo, offset) in [(980, "ランチ", -1), (220, "", -1), (1540, "ドラッグストア", -2)] {
             let draft = EntryModel(database: database, date: date.adding(days: offset))

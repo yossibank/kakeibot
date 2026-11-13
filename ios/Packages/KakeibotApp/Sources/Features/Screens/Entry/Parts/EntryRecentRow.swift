@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -7,19 +8,11 @@ struct EntryRecentRow<Content: View>: View {
     @ViewBuilder let content: Content
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("前と同じ内容で入れる")
-                    .textFont(.caption, weight: .semibold)
-                    .foregroundStyle(Palette.subtext)
-
-                Spacer()
-
-                Text(title)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.hint)
-            }
-            .padding(.horizontal, 4)
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .textFont(.caption2, weight: .bold)
+                .foregroundStyle(Palette.subtext)
+                .padding(.horizontal, 4)
 
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
@@ -45,52 +38,90 @@ struct EntryRecentCard<Mark: View>: View {
 
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
-        let amountOpacity = amount == nil ? 0.0 : 1.0
 
         Button(action: onUse) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 4) {
-                    mark
+            HStack(spacing: 8) {
+                mark
 
+                VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .textFont(.caption, weight: .bold)
                         .foregroundStyle(Palette.text)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
-                }
 
-                AmountText(amount ?? 0, font: .size(.headline, weight: .semibold))
-                    .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .opacity(amountOpacity)
-                    .overlay(alignment: .leading) {
-                        if amount == nil {
-                            Text("毎回入れる")
-                                .textFont(.footnote, weight: .semibold)
-                                .foregroundStyle(Palette.hint)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                                .fixedSize()
-                        }
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(detail)
+                            .textFont(.caption2)
+                            .foregroundStyle(Palette.subtext)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.85)
+
+                        Spacer(minLength: 0)
+
+                        amountLabel
                     }
-
-                Text(detail)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .frame(width: 112, alignment: .leading)
-            .background(Palette.cardTop, in: shape)
+            .padding(.leading, 8)
+            .padding(.trailing, 12)
+            .frame(width: Self.width, height: Self.height, alignment: .leading)
+            .background(Palette.card, in: shape)
             .overlay {
                 shape
-                    .stroke(Palette.line, lineWidth: 1)
+                    .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
             }
             .contentShape(shape)
         }
         .buttonStyle(.plain)
     }
+}
+
+private extension EntryRecentCard {
+    static var width: CGFloat {
+        200
+    }
+
+    static var height: CGFloat {
+        48
+    }
+
+    @ViewBuilder
+    var amountLabel: some View {
+        if let amount {
+            AmountText(amount, font: .style(.footnote))
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .layoutPriority(1)
+        } else {
+            Text("毎回入れる")
+                .textFont(.caption2, weight: .semibold)
+                .foregroundStyle(Palette.hint)
+                .fixedSize()
+        }
+    }
+}
+
+struct EntryRecentMark: View {
+    @Environment(\.themeStyle.corner) private var corner
+
+    let icon: Icon?
+
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: corner.radius(8))
+        let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.accent
+
+        IconImage(icon, size: 14)
+            .frame(width: Self.size, height: Self.size)
+            .background(color.opacity(.subtle), in: shape)
+            .overlay {
+                shape
+                    .strokeBorder(color.opacity(.medium), lineWidth: 1)
+            }
+    }
+}
+
+private extension EntryRecentMark {
+    static let size: CGFloat = 32
 }
