@@ -41,6 +41,10 @@ extension DismissAttemptReader: UIViewControllerRepresentable {
     ) {
         controller.isChanged = isChanged
         controller.onAttempt = onAttempt
+
+        DispatchQueue.main.async {
+            controller.takeDelegate()
+        }
     }
 }
 
@@ -53,15 +57,7 @@ final class DismissAttemptController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        guard
-            let presentation = presentationController,
-            presentation.delegate !== self
-        else {
-            return
-        }
-
-        original = presentation.delegate
-        presentation.delegate = self
+        takeDelegate()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -92,6 +88,19 @@ extension DismissAttemptController {
         }
 
         return nil
+    }
+
+    func takeDelegate() {
+        guard
+            viewIfLoaded?.window != nil,
+            let presentation = presentationController,
+            presentation.delegate !== self
+        else {
+            return
+        }
+
+        original = presentation.delegate
+        presentation.delegate = self
     }
 }
 
