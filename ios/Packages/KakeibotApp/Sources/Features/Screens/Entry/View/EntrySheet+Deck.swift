@@ -78,6 +78,34 @@ extension EntrySheet {
 
         show(.amount)
     }
+
+    func choose(
+        _ wallet: Wallet,
+        as role: EntryWalletDeck.Role
+    ) {
+        switch role {
+        case .source:
+            model.walletId = wallet.id
+
+        case .destination:
+            model.toWalletId = wallet.id
+        }
+
+        guard model.type == .transfer else {
+            return
+        }
+
+        switch role {
+        case .source where model.toWalletId == nil:
+            show(.wallet(.destination))
+
+        case .destination where model.walletId == nil:
+            show(.wallet(.source))
+
+        default:
+            break
+        }
+    }
 }
 
 private extension EntrySheet {
@@ -315,36 +343,6 @@ private extension EntrySheet {
                 }
             }
         )
-    }
-}
-
-extension EntrySheet {
-    func choose(
-        _ wallet: Wallet,
-        as role: EntryWalletDeck.Role
-    ) {
-        switch role {
-        case .source:
-            model.walletId = wallet.id
-
-        case .destination:
-            model.toWalletId = wallet.id
-        }
-
-        guard model.type == .transfer else {
-            return
-        }
-
-        switch role {
-        case .source where model.toWalletId == nil:
-            show(.wallet(.destination))
-
-        case .destination where model.walletId == nil:
-            show(.wallet(.source))
-
-        default:
-            break
-        }
     }
 }
 

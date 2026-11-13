@@ -93,21 +93,21 @@ extension EntrySheet {
     func open(_ sheet: Sheet) {
         self.sheet = sheet
 
-        opensWallet = sheet.isWallet
+        reloadsWallets = sheet.isWallet
     }
 
     func reloadAfterSheet() {
         let added = addedWallet
-        let reloadsWallets = opensWallet
+        let needsWallets = reloadsWallets
 
         addedWallet = nil
-        opensWallet = false
+        reloadsWallets = false
 
         Task {
             await model.reloadCategories()
             await model.reloadTemplates()
 
-            guard reloadsWallets else {
+            guard needsWallets else {
                 return
             }
 

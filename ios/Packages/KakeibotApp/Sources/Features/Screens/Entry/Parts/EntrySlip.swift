@@ -302,7 +302,7 @@ private extension EntrySlip {
                 Self.litFill
 
                 Capsule()
-                    .fill(Self.amountGold)
+                    .fill(Palette.accent)
                     .frame(width: 3)
                     .padding(.vertical, 12)
                     .padding(.leading, 8)

@@ -27,8 +27,8 @@ struct EntryWalletDeck: View {
                 ChipButton("追加", systemImage: "plus", action: onAdd)
 
                 ChipButton(
-                    isEditing ? "完了" : "編集",
-                    systemImage: isEditing ? "checkmark" : "pencil",
+                    editTitle,
+                    systemImage: editImage,
                     isSelected: isEditing
                 ) {
                     withAnimation(.snappy) {
@@ -76,6 +76,14 @@ private extension EntryWalletDeck {
                 ForEach(model.billChoices) { choice in
                     billButton(choice)
                 }
+            }
+
+            if let billNote {
+                Text(billNote)
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 4)
             }
         }
     }
@@ -185,6 +193,33 @@ private extension EntryWalletDeck {
 
     var showsBills: Bool {
         role == .source && !model.billChoices.isEmpty && !isEditing
+    }
+
+    var editTitle: String {
+        isEditing ? "完了" : "編集"
+    }
+
+    var editImage: String {
+        isEditing ? "checkmark" : "pencil"
+    }
+
+    var billNote: String? {
+        let choices = model.billChoices
+        let chosen = choices.first { $0.date == model.selectedBillDate }
+
+        guard let chosen else {
+            return nil
+        }
+
+        let day = chosen.date.monthDayText
+
+        guard chosen.date == choices.first?.date else {
+            return "カード会社の確定が遅れた分として、\(day) の引き落としに入れます"
+        }
+
+        let period = chosen.period.map(RecurringText.period) ?? ""
+
+        return "\(period) の利用分として、\(day) に引き落とされます"
     }
 
     var title: String {

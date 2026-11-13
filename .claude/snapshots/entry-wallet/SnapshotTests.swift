@@ -13,7 +13,7 @@ struct SnapshotTests {
         let model = try await Self.model()
 
         let view = EntrySheet(model: model, deck: .wallet(.source))
-            .frame(width: Self.phone.width, height: Self.sheetHeight)
+            .frame(width: Self.phone.width, height: Self.phone.height)
             .background(Color(uiColor: .systemBackground))
             .environment(\.colorScheme, .light)
 
@@ -23,8 +23,7 @@ struct SnapshotTests {
 
 private extension SnapshotTests {
     static let directory = "__OUT__"
-    static let phone = CGSize(width: 393, height: 600)
-    static let sheetHeight: CGFloat = 852
+    static let phone = CGSize(width: 393, height: 852)
 
     static func model() async throws -> EntryModel {
         let database = try AppDatabase.inMemory()

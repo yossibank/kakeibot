@@ -65,6 +65,7 @@ private extension EntryTransferPanel {
             if model.amount > 0 {
                 AmountText(model.amount, font: .style(.caption), color: Palette.accentStrong)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     .contentTransition(.numericText())
             }
         }

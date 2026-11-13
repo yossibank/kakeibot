@@ -11,7 +11,7 @@ public struct EntrySheet: View {
     @State var categoryPage: Int? = 0
     @State var sheet: Sheet?
     @State var addedWallet: AddedWallet?
-    @State var opensWallet = false
+    @State var reloadsWallets = false
     @State var categoryMenu: CategoryMenu?
     @State var sheetWidth: CGFloat = 0
     @State var panelHeight: CGFloat = 0
