@@ -50,11 +50,11 @@ struct EntryWalletDeck: View {
                             .transition(.opacity)
                     }
                 }
-                .padding(.vertical, 1)
+                .padding(.top, 4)
+                .padding(.bottom, 1)
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
-            .scrollClipDisabled()
         }
         .animation(.snappy, value: showsBills)
         .haptic(.selection, trigger: model.billMonth)
