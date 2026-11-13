@@ -64,11 +64,11 @@ private extension WhatsNewVoiceScene {
 
     var filled: some View {
         VStack(spacing: 0) {
-            row("カテゴリ", value: "食費")
+            row("カテゴリ", value: "食費", isMarked: false)
 
             Hairline()
 
-            row("支払い元", value: "カード")
+            row("支払い元", value: "カード", isMarked: true)
 
             Hairline()
 
@@ -101,7 +101,8 @@ private extension WhatsNewVoiceScene {
 
     func row(
         _ label: String,
-        value: String
+        value: String,
+        isMarked: Bool
     ) -> some View {
         HStack(spacing: 4) {
             Text(label)
@@ -111,7 +112,7 @@ private extension WhatsNewVoiceScene {
 
             Text(value)
                 .foregroundStyle(Palette.text)
-                .underline(color: Palette.accent.opacity(.medium))
+                .underline(isMarked, color: Palette.accent.opacity(.medium))
         }
         .textFont(size: .micro, weight: .semibold)
         .frame(height: 28)
