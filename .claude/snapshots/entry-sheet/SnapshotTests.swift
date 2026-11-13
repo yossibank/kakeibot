@@ -154,6 +154,10 @@ private extension SnapshotTests {
             await flow.start(for: model, today: today) {}
             source.say(settled: text.0, pending: text.1)
 
+            if !text.0.isEmpty {
+                source.speak()
+            }
+
             let card = EntryVoiceCard(
                 flow: flow,
                 model: model,
@@ -213,12 +217,18 @@ private extension SnapshotTests {
         let listeningModel = try await Self.model(.expense, digits: [])
         let category = try #require(listeningModel.categories.first)
 
+        let listeningSource = VoiceSnapshotSource()
+        let listeningFlow = EntryVoiceFlow(dependencies: .snapshot(listeningSource))
+
+        await listeningFlow.start(for: listeningModel, today: today) {}
+        listeningSource.speak()
+
         let listening = EntrySlip(
             model: listeningModel,
             deck: .amount,
             today: today,
             isMemoActive: false,
-            isListening: true,
+            listening: listeningFlow,
             preview: VoiceReading(amount: 980, categoryId: category.id),
             onSelect: { _ in },
             onMemo: {},
@@ -249,7 +259,7 @@ private extension SnapshotTests {
             deck: .amount,
             today: today,
             isMemoActive: false,
-            isListening: false,
+            listening: nil,
             preview: nil,
             onSelect: { _ in },
             onMemo: {},
@@ -284,10 +294,16 @@ private final class VoiceSnapshotSource: EntryVoiceSource {
     func say(settled: String, pending: String) {
         onEvent?(.transcript(EntryVoiceTranscript(settled: settled, pending: pending)))
     }
+
+    func speak() {
+        for level in [0.2, 0.5, 0.9, 0.6, 0.3, 0.7, 1, 0.5, 0.8, 0.4, 0.6, 0.9] {
+            onEvent?(.level(level))
+        }
+    }
 }
 
+@MainActor
 private extension EntryVoiceFlow.Dependencies {
-    @MainActor
     static func snapshot(_ source: VoiceSnapshotSource) -> Self {
         Self(
             isAvailable: { true },
@@ -543,6 +559,22 @@ private extension SnapshotTests {
         let date = LocalDate(now, in: .current)
 
         try database.insertDefaultsIfEmpty(at: now)
+
+        let options = try await database.entryOptions()
+
+        let templates: [(String, Int?)] = [("子どもの習い事の月謝", 12000), ("電車", nil), ("コーヒー", 380)]
+
+        for (name, amount) in templates {
+            let template = EntryTemplateDraft(
+                name: name,
+                type: .expense,
+                amount: amount,
+                categoryId: options.expenseCategories.first?.id,
+                walletId: options.wallets.last?.id
+            )
+
+            _ = try await database.saveTemplate(template, at: now)
+        }
 
         for (amount, memo, offset) in [(980, "ランチ", -1), (220, "", -1), (1540, "ドラッグストア", -2)] {
             let draft = EntryModel(database: database, date: date.adding(days: offset))

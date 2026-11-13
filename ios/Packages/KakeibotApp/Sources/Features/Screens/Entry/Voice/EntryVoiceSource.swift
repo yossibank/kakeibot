@@ -23,6 +23,7 @@ struct EntryVoiceQuestion: Equatable, Sendable {
 
 enum EntryVoiceEvent: Equatable, Sendable {
     case transcript(EntryVoiceTranscript)
+    case level(Double)
 }
 
 @MainActor

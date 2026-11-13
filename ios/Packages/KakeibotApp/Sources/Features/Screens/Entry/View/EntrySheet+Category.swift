@@ -110,13 +110,6 @@ extension EntrySheet {
         }
     }
 
-    func reloadCategories() {
-        Task {
-            await model.reloadCategories()
-            await model.reloadTemplates()
-        }
-    }
-
     func addCategory(_ category: EntryCategory) async {
         await model.reloadCategories(selecting: category.id)
 

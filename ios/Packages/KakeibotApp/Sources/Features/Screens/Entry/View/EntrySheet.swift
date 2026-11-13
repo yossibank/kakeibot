@@ -10,6 +10,8 @@ public struct EntrySheet: View {
     @State var isEditingMemo = false
     @State var categoryPage: Int? = 0
     @State var sheet: Sheet?
+    @State var addedWallet: AddedWallet?
+    @State var reloadsWallets = false
     @State var categoryMenu: CategoryMenu?
     @State var sheetWidth: CGFloat = 0
     @State var panelHeight: CGFloat = 0
@@ -49,7 +51,6 @@ public struct EntrySheet: View {
             ZStack(alignment: .top) {
                 content
                     .ignoresSafeArea(.keyboard)
-                    .ignoresSafeArea(.container, edges: .bottom)
                     .floatingInput(isPresented: isEditingMemo) {
                         editMemo(false)
                     } card: {
@@ -83,6 +84,11 @@ public struct EntrySheet: View {
             ) { _, menu in
                 menu != nil
             }
+            .onChange(of: voice.isActive) {
+                if voice.isActive {
+                    show(.amount)
+                }
+            }
             .haptic(.impact(weight: .light), trigger: voice.startCount)
             .haptic(.impact(weight: .light), trigger: voice.endCount)
             .errorBanner(
@@ -94,6 +100,7 @@ public struct EntrySheet: View {
             .deletionNotice($deletion, bottom: bannerBottom) { deletion in
                 Task {
                     await model.restore(deletion)
+                    await model.reloadWallets()
                 }
             }
             .settingsHideNotice($hiddenCategory, bottom: bannerBottom) { hidden in
@@ -134,7 +141,7 @@ public struct EntrySheet: View {
                     dismiss()
                 }
             )
-            .sheet(item: $sheet, onDismiss: reloadCategories) { sheet in
+            .sheet(item: $sheet, onDismiss: reloadAfterSheet) { sheet in
                 sheetContent(for: sheet)
             }
             .task {
@@ -263,10 +270,8 @@ private extension EntrySheet {
                     .padding(.horizontal, 8)
                     .padding(.bottom, bottomGap)
             }
-            .background {
-                board
-            }
             .padding(.horizontal, 8)
+            .ignoresSafeArea(.container, edges: .bottom)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

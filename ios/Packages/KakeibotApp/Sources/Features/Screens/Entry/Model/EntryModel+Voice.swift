@@ -55,8 +55,7 @@ public extension EntryModel {
     func voiceExamples(for text: String) -> [String] {
         let spoken = Self.voicePairs(of: text)
 
-        let entries = (history?.days ?? [])
-            .flatMap(\.entries)
+        let entries = (history?.entries ?? [])
             .filter { $0.type == type }
             .sorted { $0.createdAt > $1.createdAt }
 

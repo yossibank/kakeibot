@@ -13,19 +13,13 @@ struct SnapshotTests {
         let model = try await Self.model()
         let transfers = model.recentTransfers
 
-        for scheme in [ColorScheme.light, .dark] {
-            let view = EntryRecentTransfers(
-                model: model,
-                transfers: transfers,
-                today: LocalDate(Date(), in: .current)
-            ) { _ in }
+        for (suffix, preset) in [("light", ThemePreset.white), ("dark", .black)] {
+            let view = EntryRecentTransfers(model: model, transfers: transfers) { _ in }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
                 .frame(width: Self.width)
-                .background(Color(uiColor: .systemBackground))
-                .environment(\.colorScheme, scheme)
-
-            let suffix = scheme == .dark ? "dark" : "light"
+                .background(Palette.background)
+                .environment(\.palette, preset.palette)
 
             try Self.write(view, to: "recent-\(suffix).png")
         }

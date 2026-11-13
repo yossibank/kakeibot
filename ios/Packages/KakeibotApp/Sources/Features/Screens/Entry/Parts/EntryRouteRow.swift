@@ -7,9 +7,11 @@ struct EntryRouteRow: View {
     let onUse: (EntryModel.TransferRoute) -> Void
 
     var body: some View {
+        let routes = model.frequentRoutes
+
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
-                ForEach(model.frequentRoutes, id: \.self) { route in
+                ForEach(routes, id: \.self) { route in
                     button(route)
                 }
             }
@@ -17,7 +19,7 @@ struct EntryRouteRow: View {
             .padding(.vertical, 1)
         }
         .scrollIndicators(.hidden)
-        .sharesTextScale(id: model.frequentRoutes)
+        .sharesTextScale(id: routes)
     }
 }
 

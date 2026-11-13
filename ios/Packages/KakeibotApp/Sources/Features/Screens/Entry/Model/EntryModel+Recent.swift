@@ -10,16 +10,17 @@ public extension EntryModel {
             return []
         }
 
+        let shown = Set(categories.map(\.id))
+
         var seen: Set<String> = []
 
-        let entries = (history?.days ?? [])
-            .flatMap(\.entries)
+        let entries = (history?.entries ?? [])
             .filter { entry in
                 entry.type == type
                     && entry.recurringId == nil
                     && entry.transferId == nil
                     && entry.id != editingId
-                    && category(of: entry) != nil
+                    && entry.categoryId.map(shown.contains) == true
             }
             .sorted { $0.createdAt > $1.createdAt }
 
@@ -30,28 +31,6 @@ public extension EntryModel {
         }
 
         return Array(unique.prefix(Self.recentEntryLimit))
-    }
-
-    var lastCategoryNote: NoteLine? {
-        guard
-            type != .transfer,
-            let category = selectedCategory
-        else {
-            return nil
-        }
-
-        let last = (history?.days ?? [])
-            .flatMap(\.entries)
-            .filter { $0.type == type && $0.categoryId == category.id && $0.id != editingId }
-            .max { $0.createdAt < $1.createdAt }
-
-        guard let last else {
-            return nil
-        }
-
-        let day = Self.shortDateText(for: last.date, today: Self.today)
-        let value = "\(AmountText.text(last.amount)) · \(day)"
-        return NoteLine(title: "前回の\(category.name)", value: value)
     }
 
     func category(of entry: Entry) -> EntryCategory? {

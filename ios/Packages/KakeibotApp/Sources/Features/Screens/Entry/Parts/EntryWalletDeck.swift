@@ -8,9 +8,12 @@ struct EntryWalletDeck: View {
 
     @Environment(\.themeStyle.corner) private var corner
 
-    let role: EntryWalletSheet.Role
+    @State private var isEditing = false
+
+    let role: Role
     let onChoose: (Wallet) -> Void
-    let onEdit: () -> Void
+    let onEdit: (Wallet) -> Void
+    let onAdd: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -21,7 +24,17 @@ struct EntryWalletDeck: View {
 
                 Spacer()
 
-                ChipButton("編集", systemImage: "pencil", action: onEdit)
+                ChipButton("追加", systemImage: "plus", action: onAdd)
+
+                ChipButton(
+                    editTitle,
+                    systemImage: editImage,
+                    isSelected: isEditing
+                ) {
+                    withAnimation(.snappy) {
+                        isEditing.toggle()
+                    }
+                }
             }
 
             ScrollView {
@@ -41,9 +54,17 @@ struct EntryWalletDeck: View {
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
+            .scrollClipDisabled()
         }
         .animation(.snappy, value: showsBills)
         .haptic(.selection, trigger: model.billMonth)
+    }
+}
+
+extension EntryWalletDeck {
+    enum Role: Hashable {
+        case source
+        case destination
     }
 }
 
@@ -57,17 +78,39 @@ private extension EntryWalletDeck {
                     billButton(choice)
                 }
             }
+
+            if let billNote {
+                Text(billNote)
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 4)
+            }
         }
+    }
+
+    var editBadge: some View {
+        Image(systemName: "pencil")
+            .sansFont(.micro, weight: .heavy)
+            .foregroundStyle(Palette.backgroundBottom)
+            .frame(width: Self.badgeSize, height: Self.badgeSize)
+            .background(Palette.accent, in: .circle)
+            .offset(x: -4, y: -4)
     }
 
     func tile(_ wallet: Wallet) -> some View {
         let isSelected = selectedId == wallet.id
-        let isTaken = takenId == wallet.id
+        let isLocked = takenId == wallet.id && !isEditing
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Palette.panel.opacity(.strong)
         let ring = isSelected ? Palette.accent : Palette.line
 
         return Button {
+            guard !isEditing else {
+                onEdit(wallet)
+                return
+            }
+
             withAnimation(.snappy) {
                 onChoose(wallet)
             }
@@ -102,11 +145,17 @@ private extension EntryWalletDeck {
                 shape
                     .stroke(ring, lineWidth: 1)
             }
+            .overlay(alignment: .topTrailing) {
+                if isEditing {
+                    editBadge
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
             .contentShape(shape)
         }
         .buttonStyle(.plain)
-        .disabled(isTaken)
-        .opacity(isTaken ? 0.45 : 1)
+        .disabled(isLocked)
+        .opacity(isLocked ? 0.45 : 1)
     }
 
     func billButton(_ choice: EntryModel.BillChoice) -> some View {
@@ -142,6 +191,8 @@ private extension EntryWalletDeck {
 }
 
 private extension EntryWalletDeck {
+    static let badgeSize: CGFloat = 20
+
     static let columns = [
         GridItem(.flexible(), spacing: 8),
         GridItem(.flexible(), spacing: 8)
@@ -152,7 +203,34 @@ private extension EntryWalletDeck {
     }
 
     var showsBills: Bool {
-        role == .source && !model.billChoices.isEmpty
+        role == .source && !model.billChoices.isEmpty && !isEditing
+    }
+
+    var editTitle: String {
+        isEditing ? "完了" : "編集"
+    }
+
+    var editImage: String {
+        isEditing ? "checkmark" : "pencil"
+    }
+
+    var billNote: String? {
+        let choices = model.billChoices
+        let chosen = choices.first { $0.date == model.selectedBillDate }
+
+        guard let chosen else {
+            return nil
+        }
+
+        let day = chosen.date.monthDayText
+
+        guard chosen.date == choices.first?.date else {
+            return "カード会社の確定が遅れた分として、\(day) の引き落としに入れます"
+        }
+
+        let period = chosen.period.map(RecurringText.period) ?? ""
+
+        return "\(period) の利用分として、\(day) に引き落とされます"
     }
 
     var title: String {

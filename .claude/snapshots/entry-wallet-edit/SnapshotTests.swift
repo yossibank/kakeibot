@@ -12,8 +12,7 @@ struct SnapshotTests {
     func render() async throws {
         let model = try await Self.model()
 
-        let view = EntryWalletSheet(model: model, role: .source)
-            .padding(20)
+        let view = EntrySheet(model: model, deck: .wallet(.source))
             .frame(width: Self.phone.width, height: Self.phone.height)
             .background(Color(uiColor: .systemBackground))
             .environment(\.colorScheme, .light)
@@ -57,7 +56,7 @@ struct SnapshotTests {
 
 private extension SnapshotTests {
     static let directory = "__OUT__"
-    static let phone = CGSize(width: 393, height: 600)
+    static let phone = CGSize(width: 393, height: 852)
 
     static let variants: [(String, CGFloat, ThemeTextSize)] = [
         ("regular", 393, .standard),

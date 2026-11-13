@@ -7,8 +7,16 @@ extension EntrySheet {
     @ViewBuilder
     func sheetContent(for sheet: Sheet) -> some View {
         switch sheet {
-        case let .wallet(role):
-            EntryWalletSheet(model: model, role: role)
+        case let .newWallet(role):
+            WalletEditSheet(model: model.newWalletModel()) { wallet in
+                addedWallet = AddedWallet(wallet: wallet, role: role)
+            }
+
+        case let .editWallet(id):
+            WalletEditSheet(model: model.editWalletModel(id)) { _ in
+            } onDelete: { deletion in
+                self.deletion = deletion
+            }
 
         case .items:
             EntryItemSheet(model: model)
@@ -55,7 +63,8 @@ extension EntrySheet {
 
 extension EntrySheet {
     enum Sheet: Hashable, Identifiable {
-        case wallet(EntryWalletSheet.Role)
+        case newWallet(EntryWalletDeck.Role)
+        case editWallet(Wallet.ID)
         case items
         case newItem
         case newCategory
@@ -67,9 +76,46 @@ extension EntrySheet {
         var id: Self {
             self
         }
+
+        var isWallet: Bool {
+            switch self {
+            case .newWallet, .editWallet: true
+            default: false
+            }
+        }
+    }
+
+    struct AddedWallet {
+        let wallet: Wallet
+        let role: EntryWalletDeck.Role
     }
 
     func open(_ sheet: Sheet) {
         self.sheet = sheet
+
+        reloadsWallets = sheet.isWallet
+    }
+
+    func reloadAfterSheet() {
+        let added = addedWallet
+        let needsWallets = reloadsWallets
+
+        addedWallet = nil
+        reloadsWallets = false
+
+        Task {
+            await model.reloadCategories()
+            await model.reloadTemplates()
+
+            guard needsWallets else {
+                return
+            }
+
+            await model.reloadWallets()
+
+            if let added {
+                choose(added.wallet, as: added.role)
+            }
+        }
     }
 }

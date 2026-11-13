@@ -6,7 +6,7 @@ struct EntryTransferPanel: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let model: EntryModel
-    let onPick: (EntryWalletSheet.Role) -> Void
+    let onPick: (EntryWalletDeck.Role) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,6 +21,9 @@ struct EntryTransferPanel: View {
                     .frame(width: Self.iconSize)
                     .padding(.leading, 16)
 
+                flow
+                    .padding(.leading, 8)
+
                 Spacer(minLength: 0)
 
                 Button {
@@ -32,7 +35,7 @@ struct EntryTransferPanel: View {
                         .textFont(.caption, weight: .semibold)
                         .foregroundStyle(Palette.accent)
                         .frame(width: 32, height: 32)
-                        .background(Palette.panel, in: .circle)
+                        .background(Palette.card, in: .circle)
                         .overlay {
                             Circle()
                                 .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
@@ -42,7 +45,7 @@ struct EntryTransferPanel: View {
                 .buttonStyle(.plain)
                 .padding(.trailing, 20)
             }
-            .frame(height: 48)
+            .frame(height: 44)
 
             card(.destination)
         }
@@ -52,9 +55,28 @@ struct EntryTransferPanel: View {
 }
 
 private extension EntryTransferPanel {
-    static let iconSize: CGFloat = 40
+    static let iconSize: CGFloat = 44
 
-    func card(_ role: EntryWalletSheet.Role) -> some View {
+    var flow: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "arrow.down")
+                .sansFont(.micro, weight: .heavy)
+
+            if model.amount > 0 {
+                AmountText(model.amount, font: .style(.caption), color: Palette.accentStrong)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .contentTransition(.numericText())
+            }
+        }
+        .foregroundStyle(Palette.accent)
+        .padding(.horizontal, 8)
+        .frame(height: 24)
+        .background(Palette.accent.opacity(.subtle), in: .capsule)
+        .animation(.snappy, value: model.amount)
+    }
+
+    func card(_ role: EntryWalletDeck.Role) -> some View {
         let id = role == .source ? model.walletId : model.toWalletId
         let wallet = model.wallet(id)
         let icon = wallet.flatMap { model.icon(for: $0) }
@@ -63,6 +85,8 @@ private extension EntryTransferPanel {
         let current = wallet.flatMap(model.currentLine)
         let nameColor = wallet == nil ? Palette.hint : Palette.text
         let iconShape = RoundedRectangle(cornerRadius: corner.radius(12))
+        let shape = RoundedRectangle(cornerRadius: corner.radius(20))
+        let tint = icon.flatMap { Color(hex: $0.color) } ?? Palette.accent
 
         let after = wallet.flatMap { wallet in
             model.afterLine(of: wallet, isSource: role == .source)
@@ -72,12 +96,8 @@ private extension EntryTransferPanel {
             model.idleAfterLine(of: wallet, isSource: role == .source)
         }
 
-        let info = VStack(alignment: .leading, spacing: 2) {
-            Text(title(role))
-                .textFont(.caption2, weight: .bold)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
-                .fixedSize()
+        let info = VStack(alignment: .leading, spacing: 4) {
+            roleTag(role)
 
             Text(wallet?.name ?? "選ぶ")
                 .textFont(.subheadline, weight: .bold)
@@ -108,10 +128,14 @@ private extension EntryTransferPanel {
             onPick(role)
         } label: {
             HStack(spacing: 12) {
-                IconImage(icon, size: 20)
+                IconImage(icon, size: 22)
                     .foregroundStyle(Palette.accent)
                     .frame(width: Self.iconSize, height: Self.iconSize)
-                    .background(Palette.accent.opacity(.subtle), in: iconShape)
+                    .background(tint.opacity(.subtle), in: iconShape)
+                    .overlay {
+                        iconShape
+                            .strokeBorder(tint.opacity(.medium), lineWidth: 1.5)
+                    }
 
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 8) {
@@ -130,14 +154,53 @@ private extension EntryTransferPanel {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
+
+                Image(systemName: "chevron.right")
+                    .sansFont(.micro, weight: .bold)
+                    .foregroundStyle(Palette.hint)
             }
-            .padding(.horizontal, 16)
+            .padding(.leading, 16)
+            .padding(.trailing, 12)
             .padding(.vertical, 12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .card(cornerRadius: 20)
+            .background(EntrySlip.cardFill, in: shape)
+            .overlay {
+                shape
+                    .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 1)
+            }
+            .overlay {
+                shape
+                    .inset(by: 1)
+                    .stroke(EntrySlip.shine, lineWidth: 1)
+            }
+            .shadow(color: Palette.shadow.opacity(.soft), radius: 6, y: 3)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    func roleTag(_ role: EntryWalletDeck.Role) -> some View {
+        let tag = Text(title(role))
+            .textFont(.caption2, weight: .bold)
+            .fixedSize()
+            .padding(.horizontal, 8)
+            .frame(height: 20)
+
+        switch role {
+        case .source:
+            tag
+                .foregroundStyle(Palette.backgroundBottom)
+                .background(EntrySlip.gold, in: .capsule)
+
+        case .destination:
+            tag
+                .foregroundStyle(Palette.accent)
+                .overlay {
+                    Capsule()
+                        .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 1)
+                }
+        }
     }
 
     func balanceLine(_ line: EntryModel.BalanceLine) -> some View {
@@ -153,7 +216,7 @@ private extension EntryTransferPanel {
 }
 
 private extension EntryTransferPanel {
-    func title(_ role: EntryWalletSheet.Role) -> String {
+    func title(_ role: EntryWalletDeck.Role) -> String {
         switch role {
         case .source: model.walletTitle
         case .destination: EntryModel.destinationTitle
