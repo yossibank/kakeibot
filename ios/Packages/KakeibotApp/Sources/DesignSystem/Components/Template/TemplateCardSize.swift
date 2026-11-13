@@ -94,13 +94,6 @@ extension TemplateCardSize {
         }
     }
 
-    var shadowRadius: CGFloat {
-        switch self {
-        case .regular: 12
-        case .large: 24
-        }
-    }
-
     func detailFont(in style: ThemeStyle) -> Font {
         let font = style.textFont
         let scale = style.textSize.scale

@@ -105,29 +105,6 @@ private extension EntryRecentCard {
     }
 }
 
-struct EntryRecentMark: View {
-    @Environment(\.themeStyle.corner) private var corner
-
-    let icon: Icon?
-
-    var body: some View {
-        let shape = RoundedRectangle(cornerRadius: corner.radius(8))
-        let color = icon.flatMap { Color(hex: $0.color) } ?? Palette.accent
-
-        IconImage(icon, size: 14)
-            .frame(width: Self.size, height: Self.size)
-            .background(color.opacity(.subtle), in: shape)
-            .overlay {
-                shape
-                    .strokeBorder(color.opacity(.medium), lineWidth: 1)
-            }
-    }
-}
-
-private extension EntryRecentMark {
-    static let size: CGFloat = 32
-}
-
 private struct CappedWidthLayout: Layout {
     let maxWidth: CGFloat
 

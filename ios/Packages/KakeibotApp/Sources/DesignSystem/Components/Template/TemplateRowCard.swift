@@ -24,7 +24,7 @@ public struct TemplateRowCard: View {
 
     public var body: some View {
         HStack(spacing: 12) {
-            TemplateBadge(icon: icon, size: .regular)
+            IconTile(icon, size: TemplateBadge.Size.regular.diameter)
 
             VStack(alignment: .leading, spacing: 4) {
                 TemplateCardName(name: name, size: .regular)
@@ -50,7 +50,7 @@ public struct TemplateRowCard: View {
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .frame(height: Self.height)
-        .templateCardFace(cornerRadius: 20, shadowRadius: 8)
+        .card(cornerRadius: 20)
     }
 }
 

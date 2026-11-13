@@ -7,17 +7,21 @@ struct EntryTypeSwitch: View {
 
     @Environment(\.themeStyle.corner) private var corner
 
+    @Namespace private var face
+
     var body: some View {
         HStack(spacing: 8) {
             ForEach(Self.kinds, id: \.self) { kind in
                 key(kind)
             }
         }
-        .animation(.snappy, value: selection)
+        .animation(.spring(duration: 0.35, bounce: 0.25), value: selection)
     }
 }
 
 private extension EntryTypeSwitch {
+    static let faceID = "face"
+
     static var kinds: [Entry.Kind] {
         [.expense, .income, .transfer]
     }
@@ -66,6 +70,13 @@ private extension EntryTypeSwitch {
             HStack(spacing: 4) {
                 Image(systemName: symbol(of: kind))
                     .textFont(.caption2, weight: weight)
+                    .keyframeAnimator(initialValue: 1.0, trigger: selection) { content, scale in
+                        content
+                            .scaleEffect(isSelected ? scale : 1)
+                    } keyframes: { _ in
+                        SpringKeyframe(1.4, duration: 0.15)
+                        SpringKeyframe(1, duration: 0.3, spring: .bouncy)
+                    }
 
                 Text(title(of: kind))
                     .textFont(.subheadline, weight: weight)
@@ -98,6 +109,7 @@ private extension EntryTypeSwitch {
                         .stroke(Self.shine, lineWidth: 1)
                 }
                 .glow(Palette.glow.opacity(.muted), radius: 8)
+                .matchedGeometryEffect(id: Self.faceID, in: face)
         } else {
             shape
                 .fill(Self.keyFill)

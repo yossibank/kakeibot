@@ -52,7 +52,7 @@ private extension EntrySheet {
                 useTemplate(template)
             },
             mark: {
-                EntryRecentMark(icon: model.icon(for: template))
+                IconTile(model.icon(for: template), size: 32)
             }
         )
     }
@@ -70,7 +70,7 @@ private extension EntrySheet {
                 useRecent(entry)
             },
             mark: {
-                EntryRecentMark(icon: category.flatMap(model.icon(for:)))
+                IconTile(category.flatMap(model.icon(for:)), size: 32)
             }
         )
     }
@@ -79,9 +79,9 @@ private extension EntrySheet {
         category: String?,
         walletId: Wallet.ID?
     ) -> String {
-        let kind = model.wallet(walletId)?.kind.title
+        let wallet = model.wallet(walletId)?.name
 
-        return [category, kind]
+        return [category, wallet]
             .compactMap(\.self)
             .joined(separator: "・")
     }

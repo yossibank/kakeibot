@@ -28,7 +28,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: size.spacing) {
             HStack(spacing: size.gap) {
-                TemplateBadge(icon: icon, size: size.badge)
+                IconTile(icon, size: size.badge.diameter)
 
                 VStack(alignment: .leading, spacing: size.textSpacing) {
                     name
@@ -59,7 +59,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
         .padding(.horizontal, size.padding)
         .frame(maxWidth: .infinity)
         .frame(height: size.height)
-        .templateCardFace(cornerRadius: size.cornerRadius, shadowRadius: size.shadowRadius)
+        .card(cornerRadius: size.cornerRadius)
     }
 }
 

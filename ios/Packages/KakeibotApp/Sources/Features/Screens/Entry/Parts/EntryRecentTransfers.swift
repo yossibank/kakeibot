@@ -18,7 +18,7 @@ struct EntryRecentTransfers: View {
                         onUse(transfer)
                     },
                     mark: {
-                        EntryRecentMark(icon: sourceIcon(transfer))
+                        IconTile(sourceIcon(transfer), size: 32)
                     }
                 )
             }
