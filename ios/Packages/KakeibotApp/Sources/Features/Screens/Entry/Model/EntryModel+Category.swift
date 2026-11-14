@@ -58,9 +58,11 @@ public extension EntryModel {
     }
 
     func icon(for template: EntryTemplate) -> Icon? {
-        let categories = categories(for: template.type)
-        let category = categories.first { $0.id == template.categoryId }
-        return category.flatMap { options?.icons[$0.iconId] }
+        category(of: template).flatMap(icon(for:))
+    }
+
+    func category(of template: EntryTemplate) -> EntryCategory? {
+        allCategories.first { $0.id == template.categoryId }
     }
 
     func isApplied(_ template: EntryTemplate) -> Bool {

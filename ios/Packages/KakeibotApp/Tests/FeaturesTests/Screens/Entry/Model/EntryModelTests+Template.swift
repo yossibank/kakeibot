@@ -6,6 +6,20 @@ import Testing
 
 extension EntryModelTests {
     @Test
+    func showsTemplateIconWhileSharedWalletIsChosen() async throws {
+        let setup = try await TemplateSetup()
+        let salary = try await setup.saveTemplate(name: "給料", amount: 300_000, type: .income)
+        let shared = try await setup.database.entryOptions().wallets[1]
+        try await setup.database.startSharing(shared.id)
+        let model = EntryModel(database: setup.database, date: setup.date, type: .income)
+        await model.load()
+
+        model.walletId = shared.id
+
+        #expect(model.icon(for: salary) != nil)
+    }
+
+    @Test
     func appliesTemplateToEntry() async throws {
         let setup = try await TemplateSetup()
         let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980)
