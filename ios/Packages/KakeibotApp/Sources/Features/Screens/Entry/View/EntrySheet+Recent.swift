@@ -36,7 +36,7 @@ extension EntrySheet {
 
 private extension EntrySheet {
     func templateCard(_ template: EntryTemplate) -> some View {
-        let category = model.categories.first { $0.id == template.categoryId }
+        let category = model.category(of: template)
 
         return EntryRecentCard(
             title: template.name,
