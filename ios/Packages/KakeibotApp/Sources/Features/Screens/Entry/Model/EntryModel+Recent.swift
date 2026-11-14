@@ -12,7 +12,13 @@ public extension EntryModel {
 
         let shown = Set(categories.map(\.id))
 
-        var seen: Set<String> = []
+        let templateKeys = templates.map { template in
+            Self.recentKey(
+                categoryId: template.categoryId,
+                amount: template.amount,
+                memo: template.memo
+            )
+        }
 
         let entries = (history?.entries ?? [])
             .filter { entry in
@@ -24,9 +30,15 @@ public extension EntryModel {
             }
             .sorted { $0.createdAt > $1.createdAt }
 
+        var seen = Set(templateKeys)
+
         let unique = entries.filter { entry in
-            let category = entry.categoryId.map { "\($0)" } ?? ""
-            let key = "\(category)>\(entry.amount)>\(entry.memo ?? "")"
+            let key = Self.recentKey(
+                categoryId: entry.categoryId,
+                amount: entry.amount,
+                memo: entry.memo
+            )
+
             return seen.insert(key).inserted
         }
 
@@ -54,5 +66,17 @@ public extension EntryModel {
         }
 
         calculator = AmountCalculator(amount: entry.amount)
+    }
+}
+
+private extension EntryModel {
+    static func recentKey(
+        categoryId: EntryCategory.ID?,
+        amount: Int?,
+        memo: String?
+    ) -> String {
+        let category = categoryId.map { "\($0)" } ?? ""
+        let amount = amount.map { "\($0)" } ?? ""
+        return "\(category)>\(amount)>\(memo ?? "")"
     }
 }

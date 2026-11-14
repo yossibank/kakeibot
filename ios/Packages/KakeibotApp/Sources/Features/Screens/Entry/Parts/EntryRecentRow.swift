@@ -15,7 +15,7 @@ struct EntryRecentRow<Content: View>: View {
                 .padding(.horizontal, 4)
 
             ScrollView(.horizontal) {
-                HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 8) {
                     content
                 }
                 .padding(.vertical, 1)
@@ -26,12 +26,23 @@ struct EntryRecentRow<Content: View>: View {
     }
 }
 
+struct EntryRecentLine<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        HStack(spacing: 8) {
+            content
+        }
+    }
+}
+
 struct EntryRecentCard<Mark: View>: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let title: String
     let amount: Int?
     let detail: String
+    let isPinned: Bool
     let onUse: () -> Void
 
     @ViewBuilder let mark: Mark
@@ -45,11 +56,19 @@ struct EntryRecentCard<Mark: View>: View {
                     mark
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(title)
-                            .textFont(.caption, weight: .bold)
-                            .foregroundStyle(Palette.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                        HStack(spacing: 4) {
+                            if isPinned {
+                                Image(systemName: "pin.fill")
+                                    .sansFont(.micro, weight: .bold)
+                                    .foregroundStyle(Palette.accent)
+                            }
+
+                            Text(title)
+                                .textFont(.caption, weight: .bold)
+                                .foregroundStyle(Palette.text)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
 
                         HStack(alignment: .firstTextBaseline, spacing: 8) {
                             Text(detail)
