@@ -4,6 +4,7 @@ import Features
 import Foundation
 import Notifications
 import Observation
+import OSLog
 import Store
 import SwiftUI
 import Sync
@@ -75,8 +76,8 @@ extension AppModel {
         router.route
     }
 
-    var pendingShareCount: Int {
-        shareInbox.pending.count
+    var receivedShareCount: Int {
+        shareInbox.receivedCount
     }
 
     nonisolated static func deviceDay() -> LocalDate {
@@ -263,6 +264,12 @@ extension AppModel {
             } catch is CancellationError {
                 continue
             } catch {
+                let code = error as NSError
+                let detail = String(describing: error)
+
+                Self.logger.error(
+                    "\(Self.shareFailedMessage, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
+                )
                 notice.show(Self.shareFailedMessage)
             }
         }
@@ -311,6 +318,7 @@ private extension AppModel {
     static let shareFailedMessage = "共有の口座に参加できませんでした"
     static let widgetReloadDelay: Duration = .seconds(1)
     static let recurringFailedMessage = "固定費を自動で記録できませんでした"
+    static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Sharing")
 
     func observeLook(in database: AppDatabase) async {
         await watch(database.themeLookUpdates()) { look in
