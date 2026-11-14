@@ -5,7 +5,7 @@ import SwiftUI
 
 extension EntrySheet {
     var deckPanel: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Self.panelInset) {
             ZStack(alignment: .top) {
                 deckContent
                     .id(deck)
@@ -21,9 +21,7 @@ extension EntrySheet {
                 saveButtons
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.top, 12)
-        .padding(.bottom, 12)
+        .padding(Self.panelInset)
         .background {
             panelShape
                 .fill(Self.wellFill)
@@ -36,6 +34,7 @@ extension EntrySheet {
             proxy.size.height
         } action: { height in
             panelHeight = height
+            slipGrowth = slipGrowth(forPanel: height)
         }
     }
 }
@@ -101,6 +100,16 @@ private extension EntrySheet {
     typealias AmountTarget = EntryModel.KeypadTarget
 
     static let amountTitleHeight: CGFloat = 28
+    static let panelInset: CGFloat = 12
+    static let dateSpacing: CGFloat = 8
+    static let maxKeyHeight: CGFloat = 64
+
+    static var panelNeed: CGFloat {
+        let chips = ChipButton<ChipLabel>.Size.regular.height
+        let calendar = MonthCalendar.height(isCompact: true)
+        let dateDeck = chips + dateSpacing + calendar
+        return panelInset * 3 + saveHeight + dateDeck
+    }
 
     static var pillMark: LinearGradient {
         LinearGradient(
@@ -147,6 +156,11 @@ private extension EntrySheet {
                 }
             }
         )
+    }
+
+    func slipGrowth(forPanel height: CGFloat) -> CGFloat {
+        let spare = height + slipGrowth - Self.panelNeed
+        return min(max(spare, 0), EntrySlip.growthLimit)
     }
 }
 
@@ -218,7 +232,10 @@ private extension EntrySheet {
                     voiceCard
                         .transition(.opacity)
                 } else {
-                    Keypad(calculator: model.activeCalculator) { key in
+                    Keypad(
+                        calculator: model.activeCalculator,
+                        maxKeyHeight: Self.maxKeyHeight
+                    ) { key in
                         model.press(key)
                     }
                 }
@@ -256,7 +273,7 @@ private extension EntrySheet {
     }
 
     var dateDeck: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: Self.dateSpacing) {
             HStack(spacing: 8) {
                 ForEach(Self.quickDays, id: \.offset) { quickDay in
                     let date = today.adding(days: quickDay.offset)

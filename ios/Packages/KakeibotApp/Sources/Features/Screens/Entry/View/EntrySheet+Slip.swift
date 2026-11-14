@@ -15,6 +15,7 @@ extension EntrySheet {
             isMemoActive: isEditingMemo,
             listening: voice.step == .listening ? voice : nil,
             preview: voice.preview,
+            growth: slipGrowth,
             onSelect: { next in
                 show(next)
             },

@@ -15,6 +15,7 @@ public struct EntrySheet: View {
     @State var categoryMenu: CategoryMenu?
     @State var sheetWidth: CGFloat = 0
     @State var panelHeight: CGFloat = 0
+    @State var slipGrowth: CGFloat = 0
     @State var bottomInset: CGFloat = 0
     @State var deletion: Deletion?
     @State var hiddenCategory: EntryModel.HiddenCategory?
@@ -237,6 +238,7 @@ extension EntrySheet {
 
     static let menuInset: CGFloat = 12
     static let liftInset: CGFloat = 12
+    static let saveHeight: CGFloat = 56
 
     static var menuTransition: AnyTransition {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
@@ -293,7 +295,7 @@ private extension EntrySheet {
                     .minimumScaleFactor(0.8)
             }
             .foregroundStyle(Palette.accent)
-            .frame(width: Self.continueWidth, height: 56)
+            .frame(width: Self.continueWidth, height: Self.saveHeight)
             .overlay {
                 Capsule()
                     .stroke(Palette.accent.opacity(.medium), lineWidth: 1)

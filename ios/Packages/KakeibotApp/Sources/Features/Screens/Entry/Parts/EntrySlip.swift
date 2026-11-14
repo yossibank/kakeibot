@@ -13,6 +13,7 @@ struct EntrySlip: View {
     let isMemoActive: Bool
     let listening: EntryVoiceFlow?
     let preview: VoiceReading?
+    let growth: CGFloat
     let onSelect: (EntryDeck) -> Void
     let onMemo: () -> Void
     let onOpenItems: () -> Void
@@ -86,7 +87,7 @@ private extension EntrySlip {
             }
             .padding(.leading, 16)
             .padding(.trailing, 16)
-            .frame(height: Self.amountHeight)
+            .frame(height: amountRowHeight)
             .background {
                 rowFace(isSelected: isSelected)
             }
@@ -252,7 +253,7 @@ private extension EntrySlip {
         }
         .padding(.leading, 16)
         .padding(.trailing, 12)
-        .frame(height: Self.rowHeight)
+        .frame(height: memoHeight)
     }
 
     func row(
@@ -295,7 +296,7 @@ private extension EntrySlip {
             }
             .padding(.leading, 16)
             .padding(.trailing, 12)
-            .frame(height: Self.rowHeight)
+            .frame(height: fieldHeight)
             .background {
                 rowFace(isSelected: isSelected)
             }
@@ -386,7 +387,7 @@ private extension EntrySlip {
 
 private extension EntrySlip {
     var amountFont: Font {
-        .display(size: 36, weight: .semibold, in: themeFont)
+        .display(size: amountSize, weight: .semibold, in: themeFont)
     }
 
     var receiptsLeft: Int? {

@@ -5,10 +5,20 @@ import SwiftUI
 extension EntrySlip {
     static let waveHeight: CGFloat = 16
     static let amountHeight: CGFloat = 60
+    static let amountGrowth: CGFloat = 24
+    static let amountSize: CGFloat = 36
+    static let amountSizeGrowth: CGFloat = 8
     static let rowHeight: CGFloat = 44
+    static let rowGrowth: CGFloat = 12
+    static let memoGrowth: CGFloat = 8
+    static let fieldCount: CGFloat = 3
     static let markSize: CGFloat = 24
     static let quickSize: CGFloat = 32
     static let badgeSize: CGFloat = 16
+
+    static var growthLimit: CGFloat {
+        fieldCount * rowGrowth + amountGrowth + memoGrowth
+    }
 
     static var amountGold: LinearGradient {
         LinearGradient(
@@ -55,6 +65,26 @@ extension EntrySlip {
             startPoint: .top,
             endPoint: .bottom
         )
+    }
+
+    var stretch: CGFloat {
+        min(max(growth / Self.growthLimit, 0), 1)
+    }
+
+    var fieldHeight: CGFloat {
+        Self.rowHeight + Self.rowGrowth * stretch
+    }
+
+    var amountRowHeight: CGFloat {
+        Self.amountHeight + Self.amountGrowth * stretch
+    }
+
+    var memoHeight: CGFloat {
+        Self.rowHeight + Self.memoGrowth * stretch
+    }
+
+    var amountSize: CGFloat {
+        Self.amountSize + Self.amountSizeGrowth * stretch
     }
 
     var idleAmountColor: Color {
