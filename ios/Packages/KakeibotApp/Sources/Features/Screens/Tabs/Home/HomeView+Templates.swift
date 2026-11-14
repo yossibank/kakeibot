@@ -114,7 +114,7 @@ private extension HomeView {
         Button {
             onUseTemplate(template)
         } label: {
-            TemplateCard(
+            TemplateRowCard(
                 icon: model.icon(for: template),
                 name: template.name,
                 detail: model.detail(for: template),
@@ -126,7 +126,7 @@ private extension HomeView {
 }
 
 private extension HomeView {
-    static let tileHeight = TemplateCardSize.regular.height
+    static let tileHeight = TemplateRowCard.height
     static let shadowRoom: CGFloat = 32
     static let toolStroke = Palette.accent.opacity(.muted)
 
@@ -143,7 +143,7 @@ private extension HomeView {
 private extension View {
     func homeShelfWidth() -> some View {
         containerRelativeFrame(.horizontal) { width, _ in
-            width * 0.62
+            width * 0.85
         }
     }
 }
