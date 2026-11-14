@@ -4,6 +4,10 @@ import Store
 import SwiftUI
 
 extension SettingsMenuSheet {
+    var usesFun: Bool {
+        hasStamps || hasRewardRules
+    }
+
     var recordSection: some View {
         section("記録に使うもの") {
             NavigationLink {
@@ -128,6 +132,16 @@ extension SettingsMenuSheet {
                 )
             } label: {
                 row("記録忘れの通知", systemImage: "bell", value: reminderText)
+            }
+
+            if !usesFun {
+                Hairline()
+
+                NavigationLink {
+                    RewardRuleListView(database: database)
+                } label: {
+                    row("ごほうび貯金を始める", systemImage: "gift")
+                }
             }
         }
     }

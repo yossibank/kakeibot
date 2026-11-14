@@ -16,6 +16,8 @@ public struct SettingsMenuSheet: View {
     @State var weekStart: SettingsMenuValueModel<Weekday>
     @State var recordReset: SettingsMenuResetModel
     @State var isConfirmingReset = false
+    @State var hasStamps = false
+    @State var hasRewardRules = false
 
     #if DEBUG
     @State var isConfirmingSample = false
@@ -66,7 +68,9 @@ public struct SettingsMenuSheet: View {
 
                         budgetSection
 
-                        funSection
+                        if usesFun {
+                            funSection
+                        }
 
                         homeSection
 
@@ -153,10 +157,36 @@ public struct SettingsMenuSheet: View {
         .task {
             firstEntryCreatedAt = try? await database.entryHistory().firstCreatedAt
         }
+        .task {
+            await observeStamps()
+        }
+        .task {
+            await observeRewardRules()
+        }
     }
 }
 
 private extension SettingsMenuSheet {
+    func observeStamps() async {
+        do {
+            for try await calendar in database.stampCalendarUpdates() {
+                hasStamps = !calendar.stamps.isEmpty
+            }
+        } catch {
+            hasStamps = false
+        }
+    }
+
+    func observeRewardRules() async {
+        do {
+            for try await list in database.rewardRuleListUpdates() {
+                hasRewardRules = !list.rules.isEmpty
+            }
+        } catch {
+            hasRewardRules = false
+        }
+    }
+
     func observeLaunchScreen() async {
         do {
             for try await screen in database.settingUpdates(.launchScreen) {
