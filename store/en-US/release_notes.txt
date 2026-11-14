@@ -1,8 +1,7 @@
-・You can now record by voice. Say the amount, category, wallet, date and memo, and they are filled in for you. Your voice is recognized on the device and never saved.
-・The entry sheet has been rebuilt. You see the category, wallet, date and amount on one card, and enter the amount on the keypad below.
-・The entry sheet now opens with your templates and recent records, so you can add one with a single tap.
-・The entry sheet now starts with the wallet you used last.
-・Swiping down a sheet with changes now asks whether to close without saving.
-・Template cards on Home and in Settings now match the entry sheet.
-・You can now pick a day mark from the menu beside the plus button.
-・The icon picker now previews the color you chose and keeps its tiles square on narrow screens.
+・Fixed an issue where opening an invitation link to a shared wallet could fail to join it.
+・Templates and recent records in the entry sheet are now combined into "Frequent", leaving more room for categories.
+・The card bill month now fits in one row and opens only when you tap it.
+・On tall iPhones, the entry sheet now fills the screen height and its keys are easier to tap.
+・Fixed the type switch briefly moving when you open an income or transfer record.
+・Fixed wallets overlapping the header when scrolling the payment source in the entry sheet.
+・The "Fun" section in Settings now appears once you start using stamps or the reward bank.
