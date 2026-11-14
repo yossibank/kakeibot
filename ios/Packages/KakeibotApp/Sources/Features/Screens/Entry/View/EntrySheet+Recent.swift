@@ -19,19 +19,13 @@ extension EntrySheet {
 
             if !templates.isEmpty || !entries.isEmpty {
                 EntryRecentRow(title: "よく使う") {
-                    if !templates.isEmpty {
-                        EntryRecentLine {
-                            ForEach(templates) { template in
-                                templateCard(template)
-                            }
+                    EntryRecentLines {
+                        ForEach(templates) { template in
+                            templateCard(template)
                         }
-                    }
 
-                    if !entries.isEmpty {
-                        EntryRecentLine {
-                            ForEach(entries) { entry in
-                                recentCard(entry)
-                            }
+                        ForEach(entries) { entry in
+                            recentCard(entry)
                         }
                     }
                 }
