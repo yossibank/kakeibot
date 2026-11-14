@@ -4,7 +4,6 @@ import SwiftUI
 
 struct EntryRecentRow<Content: View>: View {
     let title: String
-    let rows: Int
 
     @ViewBuilder let content: Content
 
@@ -16,27 +15,24 @@ struct EntryRecentRow<Content: View>: View {
                 .padding(.horizontal, 4)
 
             ScrollView(.horizontal) {
-                LazyHGrid(rows: gridRows, spacing: 8) {
+                VStack(alignment: .leading, spacing: 8) {
                     content
                 }
                 .padding(.vertical, 1)
             }
             .scrollIndicators(.hidden)
             .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
-            .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
 
-private extension EntryRecentRow {
-    var gridRows: [GridItem] {
-        let row = GridItem(
-            .fixed(EntryRecentCard<EmptyView>.height),
-            spacing: 8,
-            alignment: .leading
-        )
+struct EntryRecentLine<Content: View>: View {
+    @ViewBuilder let content: Content
 
-        return Array(repeating: row, count: rows)
+    var body: some View {
+        HStack(spacing: 8) {
+            content
+        }
     }
 }
 
@@ -102,15 +98,13 @@ struct EntryRecentCard<Mark: View>: View {
     }
 }
 
-extension EntryRecentCard {
-    static var height: CGFloat {
-        48
-    }
-}
-
 private extension EntryRecentCard {
     static var maxWidth: CGFloat {
         240
+    }
+
+    static var height: CGFloat {
+        48
     }
 
     @ViewBuilder

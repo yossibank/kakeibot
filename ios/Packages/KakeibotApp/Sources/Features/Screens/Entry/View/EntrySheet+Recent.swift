@@ -16,16 +16,23 @@ extension EntrySheet {
         } else {
             let templates = model.templates
             let entries = model.recentEntries
-            let count = templates.count + entries.count
 
-            if count > 0 {
-                EntryRecentRow(title: "よく使う", rows: min(count, 2)) {
-                    ForEach(templates) { template in
-                        templateCard(template)
+            if !templates.isEmpty || !entries.isEmpty {
+                EntryRecentRow(title: "よく使う") {
+                    if !templates.isEmpty {
+                        EntryRecentLine {
+                            ForEach(templates) { template in
+                                templateCard(template)
+                            }
+                        }
                     }
 
-                    ForEach(entries) { entry in
-                        recentCard(entry)
+                    if !entries.isEmpty {
+                        EntryRecentLine {
+                            ForEach(entries) { entry in
+                                recentCard(entry)
+                            }
+                        }
                     }
                 }
             }
